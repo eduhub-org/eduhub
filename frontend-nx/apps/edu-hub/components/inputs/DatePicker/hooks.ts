@@ -82,7 +82,7 @@ export const useDatePickerLogic = (
       showSavedNotification: false,
       setShowSavedNotification: setShowSavedNotification,
       errorMessage: '',
-      handleValueChange: async (date: Date | null, _dateFieldName: string) => {
+      handleValueChange: async (date: Date | null, _dateFieldName: string) => { // eslint-disable-line @typescript-eslint/no-unused-vars
         onValueUpdated(date);
       },
     };

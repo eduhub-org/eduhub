@@ -304,6 +304,7 @@ resource "google_cloudfunctions2_function" "call_node_function" {
       KEYCLOAK_USER   = var.keycloak_user
       KEYCLOAK_URL    = "https://${local.keycloak_service_name}.opencampus.sh"
       HASURA_ENDPOINT = "https://${local.hasura_service_name}.opencampus.sh/v1/graphql"
+      FRONTEND_URL    = "https://${local.eduhub_service_name}.opencampus.sh"
     }
 
     secret_environment_variables {

@@ -676,7 +676,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
                   courseId={enrollment.courseId}
                   userId={enrollment.userId}
                   enrollmentId={enrollment.id}
-                  formbricksEnrollmentSurveyUrl={effectiveSurveyUrl!}
+                  formbricksEnrollmentSurveyUrl={effectiveSurveyUrl || ''}
                 />
               ) : (
                 <>

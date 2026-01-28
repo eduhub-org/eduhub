@@ -38,10 +38,10 @@ alwaysApply: true
 ```bash
 # Frontend development
 cd frontend-nx
-yarn dev                 # Start development server
-yarn build               # Build for production
-yarn test                # Run tests
-yarn lint                # Lint code
+yarn start               # Start development server (nx serve)
+yarn build               # Build for production (nx build)
+yarn test                # Run tests (nx test)
+yarn nx run edu-hub:lint # Lint edu-hub app
 
 # Backend development
 cd backend

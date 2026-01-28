@@ -5,7 +5,7 @@ import {
   CourseEnrollmentWithUserQuery,
   CourseEnrollmentWithUserQueryVariables,
 } from '../../../queries/__generated__/CourseEnrollmentWithUserQuery';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { FC, useCallback, useState } from 'react';
 import { MdClose } from 'react-icons/md';
 import { makeFullName } from '../../../helpers/util';

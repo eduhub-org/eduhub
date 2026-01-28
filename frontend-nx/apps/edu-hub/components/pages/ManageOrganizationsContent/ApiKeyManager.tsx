@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { useRoleMutation } from '../../../hooks/authedMutation';
 import { OrganizationList_Organization } from '../../../queries/__generated__/OrganizationList';
 import { UPDATE_ORGANIZATION_API_KEY_HASH } from '../../../queries/organization';

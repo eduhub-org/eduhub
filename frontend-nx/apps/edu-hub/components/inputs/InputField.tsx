@@ -7,7 +7,7 @@ import { HelpOutline } from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
 import { useDebouncedCallback } from 'use-debounce';
 import { useRoleMutation } from '../../hooks/authedMutation';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { DebounceInput } from 'react-debounce-input';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -197,6 +197,7 @@ const InputField: React.FC<InputFieldProps> = ({
   invertColors = false,
   min,
   max,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   immediateUpdate, // Extract this prop to prevent it from being spread to DOM elements
   ...props
 }) => {

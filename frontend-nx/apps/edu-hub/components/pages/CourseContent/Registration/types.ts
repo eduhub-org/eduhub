@@ -37,21 +37,20 @@ export const REGISTRATION_TYPE_CONFIG: Record<CourseRegistrationType_enum, Regis
     isExternal: false,
     isDirect: true,
   },
-  // Note: These will be added when payment functionality is implemented
-  // [CourseRegistrationType_enum.DIRECT_WITH_INPUT_AND_PAYMENT]: {
-  //   requiresInput: true,
-  //   requiresApproval: false,
-  //   requiresPayment: true,
-  //   isExternal: false,
-  //   isDirect: true,
-  // },
-  // [CourseRegistrationType_enum.DIRECT_CONFIRMATION_AND_PAYMENT]: {
-  //   requiresInput: false,
-  //   requiresApproval: false,
-  //   requiresPayment: true,
-  //   isExternal: false,
-  //   isDirect: true,
-  // },
+  [CourseRegistrationType_enum.DIRECT_WITH_INPUT_AND_PAYMENT]: {
+    requiresInput: true,
+    requiresApproval: false,
+    requiresPayment: true,
+    isExternal: false,
+    isDirect: true,
+  },
+  [CourseRegistrationType_enum.DIRECT_CONFIRMATION_AND_PAYMENT]: {
+    requiresInput: false,
+    requiresApproval: false,
+    requiresPayment: true,
+    isExternal: false,
+    isDirect: true,
+  },
 };
 
 export const getRegistrationTypeConfig = (

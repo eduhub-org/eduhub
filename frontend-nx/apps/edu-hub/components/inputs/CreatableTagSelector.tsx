@@ -3,7 +3,7 @@ import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import { useAdminMutation } from '../../hooks/authedMutation';
 import { DocumentNode } from 'graphql';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import Tooltip from '@mui/material/Tooltip';
 import { HelpOutline } from '@mui/icons-material';
 import { prioritizeClasses } from '../../helpers/util';

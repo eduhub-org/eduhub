@@ -1,5 +1,5 @@
 import React, { FC, useMemo, useCallback, useState } from 'react';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { ColumnDef } from '@tanstack/react-table';
 import DOMPurify from 'dompurify';
 import { useRouter } from 'next/router';

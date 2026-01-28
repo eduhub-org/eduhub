@@ -7,6 +7,8 @@ import { useAuthedMutation } from '../../../../../hooks/authedMutation';
 import { useUserId } from '../../../../../hooks/user';
 import { UPDATE_ENROLLMENT } from '../../../../../queries/insertEnrollment';
 import { UpdateEnrollment, UpdateEnrollmentVariables } from '../../../../../queries/__generated__/UpdateEnrollment';
+import { CREATE_STRIPE_CHECKOUT } from '../../../../../queries/stripe';
+import { CreateStripeCheckout, CreateStripeCheckoutVariables } from '../../../../../queries/__generated__/CreateStripeCheckout';
 import { getRegistrationTypeConfig, RegistrationFormData, RegistrationResult } from '../types';
 
 /**
@@ -56,6 +58,10 @@ export const useRegistrationHandler = ({
   
   const [updateEnrollmentMutation] = useAuthedMutation<UpdateEnrollment, UpdateEnrollmentVariables>(
     UPDATE_ENROLLMENT
+  );
+
+  const [createStripeCheckoutMutation] = useAuthedMutation<CreateStripeCheckout, CreateStripeCheckoutVariables>(
+    CREATE_STRIPE_CHECKOUT
   );
 
   const registrationType = course.registrationType || CourseRegistrationType_enum.APPROVAL_WITH_INPUT;
@@ -114,12 +120,74 @@ export const useRegistrationHandler = ({
 
   const handlePaymentRegistration = useCallback(
     async (formData: RegistrationFormData): Promise<RegistrationResult> => {
-      // TODO: Implement payment logic
-      // This would integrate with a payment provider
-      console.log('Payment registration not yet implemented', formData);
-      return { success: false, error: 'Payment registration not yet implemented' };
+      if (!userId) {
+        return { success: false, error: 'User not authenticated' };
+      }
+
+      setIsLoading(true);
+      try {
+        // 1. Create pending enrollment with payment status
+        const enrollmentResult = await updateEnrollmentMutation({
+          variables: {
+            courseId: course.id,
+            userId,
+            motivationLetter: formData?.motivationLetter || '[Formbricks Survey Completed]',
+            status: CourseEnrollmentStatus_enum.APPLIED, // Will be updated to CONFIRMED after payment
+          },
+        });
+
+        const enrollmentId = enrollmentResult.data?.insert_CourseEnrollment?.returning?.[0]?.id;
+        if (!enrollmentId) {
+          return { success: false, error: 'Failed to create enrollment' };
+        }
+
+        // 2. Get Formbricks response to extract selected add-ons
+        // Note: Formbricks response will be fetched server-side in createStripeCheckout
+        // For now, we pass null and let the backend handle it
+
+        // Note: Formbricks response will be fetched server-side in createStripeCheckout
+        // For now, we pass null and let the backend handle it
+
+        // 3. Create Stripe Checkout session
+        // URLs are now built server-side from FRONTEND_URL for security
+        const checkoutResult = await createStripeCheckoutMutation({
+          variables: {
+            courseId: course.id,
+            enrollmentId,
+            formbricksResponseId: null, // Will be fetched server-side if needed
+            userEmail: null, // Will be fetched from user context server-side
+            course: null, // Will be fetched server-side from Hasura
+            addonMappings: null, // Will be fetched server-side from Hasura
+            selectedAddons: null, // Will be extracted server-side from Formbricks response
+          },
+        });
+
+        if (checkoutResult.data?.createStripeCheckout?.success && checkoutResult.data.createStripeCheckout.checkoutUrl) {
+          // 4. Redirect to Stripe Checkout
+          window.location.href = checkoutResult.data.createStripeCheckout.checkoutUrl;
+          
+          return {
+            success: true,
+            paymentUrl: checkoutResult.data.createStripeCheckout.checkoutUrl,
+            enrollmentId,
+          };
+        }
+
+        return {
+          success: false,
+          error: checkoutResult.data?.createStripeCheckout?.error || 'Failed to create checkout session',
+        };
+      } catch (error) {
+        console.error('Payment registration error:', error);
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Payment registration failed',
+        };
+      } finally {
+        setIsLoading(false);
+      }
     },
-    []
+    [course, userId, updateEnrollmentMutation, createStripeCheckoutMutation]
   );
 
   const handleRegistration = useCallback(() => {

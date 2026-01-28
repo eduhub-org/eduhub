@@ -81,6 +81,13 @@ array_relationships:
         table:
           name: Session
           schema: public
+  - name: CourseAddonMappings
+    using:
+      foreign_key_constraint_on:
+        column: courseId
+        table:
+          name: CourseAddonMapping
+          schema: public
 select_permissions:
   - role: anonymous
     permission:
@@ -113,6 +120,10 @@ select_permissions:
         - updated_at
         - weekDay
         - formbricksEnrollmentSurveyUrl
+        - basePrice
+        - currency
+        - stripeProductId
+        - stripePriceId
       filter:
         _and:
           - Program:
@@ -151,6 +162,10 @@ select_permissions:
         - updated_at
         - weekDay
         - formbricksEnrollmentSurveyUrl
+        - basePrice
+        - currency
+        - stripeProductId
+        - stripePriceId
       filter: {}
   - role: user_access
     permission:
@@ -182,6 +197,10 @@ select_permissions:
         - updated_at
         - weekDay
         - formbricksEnrollmentSurveyUrl
+        - basePrice
+        - currency
+        - stripeProductId
+        - stripePriceId
       filter:
         CourseEnrollments:
           User:
@@ -209,6 +228,10 @@ update_permissions:
         - title
         - weekDay
         - formbricksEnrollmentSurveyUrl
+        - basePrice
+        - currency
+        - stripeProductId
+        - stripePriceId
       filter:
         CourseInstructors:
           User:

@@ -9,6 +9,9 @@ object_relationships:
     using:
       foreign_key_constraint_on: status
   - name: LocationOption
+  - name: PaymentStatus
+    using:
+      foreign_key_constraint_on: paymentStatus
     using:
       foreign_key_constraint_on: location
   - name: MotivationRating
@@ -43,6 +46,11 @@ select_permissions:
         - updated_at
         - invitationExpirationDate
         - location
+        - stripeCheckoutSessionId
+        - stripePaymentIntentId
+        - paymentStatus
+        - paymentAmount
+        - paymentCurrency
       filter: {}
   - role: user_access
     permission:
@@ -56,6 +64,11 @@ select_permissions:
         - status
         - userId
         - location
+        - stripeCheckoutSessionId
+        - stripePaymentIntentId
+        - paymentStatus
+        - paymentAmount
+        - paymentCurrency
       filter:
         _and:
           - userId:

@@ -1,4 +1,4 @@
-import { FC, Fragment, useCallback, useState } from 'react';
+import { FC, Fragment, useCallback, useState, useEffect } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
 import { MdCheckBox, MdOutlineCheckBoxOutlineBlank, MdAddCircle, MdEmail } from 'react-icons/md';
 import { useRouter } from 'next/router';
@@ -49,12 +49,19 @@ import {
   UPDATE_COURSE_REGISTRATION_TYPE,
   UPDATE_COURSE_LEARNING_GOALS,
   UPDATE_COURSE_FORMBRICKS_ENROLLMENT_SURVEY,
+  UPDATE_COURSE_BASE_PRICE,
+  UPDATE_COURSE_CURRENCY,
 } from '../../../queries/course';
+import { VALIDATE_FORMBRICKS_SURVEY, SAVE_ADDON_MAPPINGS, CREATE_STRIPE_BASE_PRICE, GET_COURSE_ADDON_MAPPINGS } from '../../../queries/stripe';
+import { AddonValidationDialog } from './AddonValidationDialog';
+import { Button } from '../../common/Button';
 import { UPDATE_COURSE_PROPERTY } from '../../../queries/mutateCourse';
 import useErrorHandler from '../../../hooks/useErrorHandler';
 import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
+import { InfoDialog } from '../../common/dialogs/InfoDialog';
 import { translateErrorMessage } from '../../../helpers/errorHandling';
-import { useAdminQuery, useLazyRoleQuery } from '../../../hooks/authedQuery';
+import { useRoleQuery, useLazyRoleQuery } from '../../../hooks/authedQuery';
+import PricingSummary from '../../common/PricingSummary';
 import {
   GET_COURSE_TEMPLATES_COUNT,
   GET_DEFAULT_TEMPLATES,
@@ -84,7 +91,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
   const { error, handleError, resetError } = useErrorHandler();
 
   // Check if course has custom email templates
-  const { data: templatesCountData, refetch: refetchTemplatesCount } = useAdminQuery<GetCourseTemplatesCount>(
+  const { data: templatesCountData, refetch: refetchTemplatesCount } = useRoleQuery<GetCourseTemplatesCount>(
     GET_COURSE_TEMPLATES_COUNT,
     {
       variables: { courseId: course.id },
@@ -93,13 +100,173 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
   const hasCustomTemplates = (templatesCountData?.MailTemplate_aggregate?.aggregate?.count || 0) > 0;
 
   // Get default templates
-  const { data: defaultTemplatesData } = useAdminQuery<GetDefaultTemplates>(GET_DEFAULT_TEMPLATES);
+  const { data: defaultTemplatesData } = useRoleQuery<GetDefaultTemplates>(GET_DEFAULT_TEMPLATES);
 
   const [insertEmailTemplate] = useAdminMutation<InsertEmailTemplate, InsertEmailTemplateVariables>(
     INSERT_EMAIL_TEMPLATE
   );
 
   const isExternalRegistration = course.registrationType === CourseRegistrationType_enum.EXTERNAL_REGISTRATION;
+  
+  // Check if course requires payment
+  const requiresPayment = course.registrationType === 'DIRECT_WITH_INPUT_AND_PAYMENT' ||
+    course.registrationType === 'DIRECT_CONFIRMATION_AND_PAYMENT';
+
+  // Payment and add-on validation state
+  const [isValidationDialogOpen, setIsValidationDialogOpen] = useState(false);
+  const [addonQuestions, setAddonQuestions] = useState<any[]>([]);
+  const [isValidatingSurvey, setIsValidatingSurvey] = useState(false);
+  const [isSavingMappings, setIsSavingMappings] = useState(false);
+
+  // Formbricks help dialog state
+  const [isFormbricksHelpDialogOpen, setIsFormbricksHelpDialogOpen] = useState(false);
+
+  // Stripe sync state
+  const [isStripeSyncing, setIsStripeSyncing] = useState(false);
+  const [stripeSyncStatus, setStripeSyncStatus] = useState<'idle' | 'syncing' | 'success' | 'error'>('idle');
+
+  const [validateSurvey] = useAdminMutation(VALIDATE_FORMBRICKS_SURVEY);
+  const [saveAddonMappings] = useAdminMutation(SAVE_ADDON_MAPPINGS);
+  const [createStripeBasePrice] = useAdminMutation(CREATE_STRIPE_BASE_PRICE);
+
+  // Fetch addon mappings for the course
+  const { data: addonMappingsData, refetch: refetchAddonMappings } = useRoleQuery(GET_COURSE_ADDON_MAPPINGS, {
+    variables: { courseId: course.id },
+    skip: !requiresPayment, // Only fetch for payment-enabled courses
+  });
+  const addonMappings = addonMappingsData?.CourseAddonMapping || [];
+
+
+  // Handle survey validation
+  const handleValidateSurvey = useCallback(async () => {
+    const surveyUrl = course.formbricksEnrollmentSurveyUrl || course.Program?.defaultFormbricksEnrollmentSurveyUrl;
+    if (!surveyUrl) {
+      handleError(t('manageCourse.formbricks.no_survey_url'));
+      return;
+    }
+
+    setIsValidatingSurvey(true);
+    try {
+      const result = await validateSurvey({
+        variables: {
+          surveyUrl,
+          courseId: course.id,
+        },
+      });
+
+      if (result.data?.validateFormbricksSurvey?.success) {
+        setAddonQuestions(result.data.validateFormbricksSurvey.addonQuestions || []);
+        setIsValidationDialogOpen(true);
+      } else {
+        handleError(result.data?.validateFormbricksSurvey?.error || 'Validation failed');
+      }
+    } catch (err: any) {
+      handleError(err?.message || 'Validation failed');
+    } finally {
+      setIsValidatingSurvey(false);
+    }
+  }, [course, validateSurvey, handleError, t]);
+
+  // Handle saving add-on mappings
+  const handleSaveAddonMappings = useCallback(async (mappings: any[]) => {
+    setIsSavingMappings(true);
+    try {
+      const result = await saveAddonMappings({
+        variables: {
+          courseId: course.id,
+          mappings,
+        },
+        refetchQueries: [
+          //{ query: GET_COURSE_ADDON_MAPPINGS, variables: { courseId: course.id } },
+          'AdminCourseList'
+        ],
+        awaitRefetchQueries: true,
+        errorPolicy: 'all', // Return partial data even if there are errors
+      });
+
+      // Check if mutation succeeded even if there were GraphQL errors
+      if (result.data?.saveAddonMappings?.success) {
+        setIsValidationDialogOpen(false);
+        //Manually refetch to ensure UI updates immediately
+        if (refetchAddonMappings) {
+          await refetchAddonMappings();
+        }
+      } else if (result.errors && result.errors.length > 0) {
+        // Check if it's just a stripeResults field error but mutation succeeded
+        const hasStripeResultsError = result.errors.some(
+          (e: any) => e.message?.includes('stripeResults') || e.message?.includes('Cannot query field')
+        );
+        if (hasStripeResultsError && result.data?.saveAddonMappings) {
+          // Mutation likely succeeded, just schema mismatch
+          console.warn('GraphQL schema mismatch with stripeResults field, but mutation may have succeeded');
+          setIsValidationDialogOpen(false);
+          // The refetchQueries should update the UI
+        } else {
+          handleError(result.data?.saveAddonMappings?.error || result.errors[0]?.message || 'Failed to save mappings');
+        }
+      } else {
+        handleError(result.data?.saveAddonMappings?.error || 'Failed to save mappings');
+      }
+    } catch (err: any) {
+      const errorMessage = err?.message || err?.graphQLErrors?.[0]?.message || 'Failed to save mappings';
+      handleError(errorMessage);
+    } finally {
+      setIsSavingMappings(false);
+    }
+  }, [course.id, saveAddonMappings, handleError, refetchAddonMappings]);
+
+  // Handle Stripe base price sync
+  const handleSyncStripeBasePrice = useCallback(async () => {
+    const basePrice = (course as any).basePrice || 0;
+    const currency = (course as any).currency || 'EUR';
+    
+    if (basePrice <= 0) {
+      setStripeSyncStatus('idle');
+      return;
+    }
+    
+    setIsStripeSyncing(true);
+    setStripeSyncStatus('syncing');
+    
+    try {
+      const result = await createStripeBasePrice({
+        variables: {
+          courseId: course.id,
+          basePrice: basePrice,
+          currency: currency,
+          courseTitle: course.title,
+        },
+        refetchQueries: ['AdminCourseList'],
+      });
+      
+      if (result.data?.createStripeBasePrice?.success) {
+        setStripeSyncStatus('success');
+        // Reset to idle after 3 seconds
+        setTimeout(() => setStripeSyncStatus('idle'), 3000);
+      } else {
+        setStripeSyncStatus('error');
+        handleError(result.data?.createStripeBasePrice?.error || 'Stripe sync failed');
+      }
+    } catch (err: any) {
+      setStripeSyncStatus('error');
+      handleError(err?.message || 'Failed to sync with Stripe');
+    } finally {
+      setIsStripeSyncing(false);
+    }
+  }, [course, createStripeBasePrice, handleError]);
+
+  // Auto-sync on mount if base price exists but no Stripe product
+  useEffect(() => {
+    const basePrice = (course as any).basePrice || 0;
+    const hasStripeProduct = !!(course as any).stripeProductId;
+    if (requiresPayment && basePrice > 0 && !hasStripeProduct && stripeSyncStatus === 'idle' && !isStripeSyncing) {
+      // Auto-sync after a short delay to avoid blocking render
+      const timer = setTimeout(() => {
+        handleSyncStripeBasePrice();
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [course, requiresPayment, stripeSyncStatus, isStripeSyncing, handleSyncStripeBasePrice]);
 
   // Determine available template types based on registration type
   const getAvailableTemplates = useCallback((): string[] => {
@@ -159,19 +326,19 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                   },
                   refetchQueries: ['GetCourseTemplatesCount', 'AdminCourseList'],
                 });
-              } catch (insertError: any) {
-                // If template already exists (unique constraint violation), that's okay
-                // This can happen if templates were created in another tab/session
-                if (
-                  insertError?.message?.includes('Uniqueness violation') ||
-                  insertError?.message?.includes('duplicate key')
-                ) {
-                  console.log(`Template ${defaultTemplate.type} already exists for course ${course.id}`);
-                } else {
-                  // Re-throw other errors to be caught by outer catch
-                  throw insertError;
+              } catch (insertError: any                ) {
+                  // If template already exists (unique constraint violation), that's okay
+                  // This can happen if templates were created in another tab/session
+                  if (
+                    insertError?.message?.includes('Uniqueness violation') ||
+                    insertError?.message?.includes('duplicate key')
+                  ) {
+                    // Template already exists, continue silently
+                  } else {
+                    // Re-throw other errors to be caught by outer catch
+                    throw insertError;
+                  }
                 }
-              }
             }
           }
           refetchTemplatesCount();
@@ -503,7 +670,8 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
 
               {/* Formbricks Survey Configuration - Show for courses that require input */}
               {(course.registrationType === CourseRegistrationType_enum.APPROVAL_WITH_INPUT ||
-                course.registrationType === CourseRegistrationType_enum.DIRECT_WITH_INPUT) && (
+                course.registrationType === CourseRegistrationType_enum.DIRECT_WITH_INPUT ||
+                course.registrationType === 'DIRECT_WITH_INPUT_AND_PAYMENT') && (
                 <div className="mt-4 pt-4 border-t border-gray-200">
                   <div className="mb-4">
                     <span>{t('manageCourse.formbricks.title')}</span>
@@ -516,11 +684,75 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                       value={course.formbricksEnrollmentSurveyUrl || ''}
                       updateValueMutation={UPDATE_COURSE_FORMBRICKS_ENROLLMENT_SURVEY}
                       refetchQueries={['AdminCourseList']}
-                      helpText={t('manageCourse.formbricks.help_text_hidden_fields')}
+                      helpText={t('manageCourse.formbricks.help_text')}
                       onValueUpdated={() => {
                         // Refetch handled via refetchQueries prop
                       }}
                     />
+                    <button
+                      type="button"
+                      onClick={() => setIsFormbricksHelpDialogOpen(true)}
+                      className="text-xs text-blue-600 hover:text-blue-800 mt-1 underline"
+                    >
+                      {t('manageCourse.formbricks.learn_more')}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Payment Configuration - Show for courses that require payment */}
+              {requiresPayment && (
+                <div className="mt-4 pt-4 border-t border-gray-200">
+                  <div className="space-y-4">
+                    <div>
+                      <span className="font-medium">{t('manageCourse.pricing.title')}</span>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <InputField
+                        variant="material"
+                        type="number"
+                        label={t('manageCourse.pricing.base_price')}
+                        placeholder="0"
+                        itemId={course.id}
+                        value={(course as any).basePrice?.toString() || '0'}
+                        updateValueMutation={UPDATE_COURSE_BASE_PRICE}
+                        refetchQueries={['AdminCourseList']}
+                        helpText={t('manageCourse.pricing.base_price_help')}
+                        min={0}
+                        onValueUpdated={handleSyncStripeBasePrice}
+                      />
+
+                      <DropDownSelector
+                        variant="material"
+                        label={t('manageCourse.pricing.currency')}
+                        value={(course as any).currency || 'EUR'}
+                        options={[
+                          { value: 'EUR', label: 'EUR (€)' },
+                          { value: 'USD', label: 'USD ($)' },
+                          { value: 'GBP', label: 'GBP (£)' },
+                        ]}
+                        updateValueMutation={UPDATE_COURSE_CURRENCY}
+                        identifierVariables={{ itemId: course.id }}
+                        refetchQueries={['AdminCourseList']}
+                        onValueUpdated={handleSyncStripeBasePrice}
+                      />
+                    </div>
+
+                    {/* Survey Validation - Show if survey URL exists */}
+                    {(course.formbricksEnrollmentSurveyUrl || course.Program?.defaultFormbricksEnrollmentSurveyUrl) && (
+                      <div className="mt-4">
+                        <Button
+                          onClick={handleValidateSurvey}
+                          disabled={isValidatingSurvey}
+                        >
+                          {isValidatingSurvey ? t('manageCourse.pricing.validating') : t('manageCourse.pricing.validate_addons')}
+                        </Button>
+                        <p className="text-sm text-gray-600 mt-2">
+                          {t('manageCourse.pricing.validate_help')}
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
@@ -629,7 +861,39 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
 
           {/* Right Column */}
           <div className="space-y-4 w-full min-w-0">
-            {/* 1. List of Instructors - Card Container */}
+            {/* 1. Pricing Summary - Read-only Display (only for payment courses) */}
+            {requiresPayment && (
+              <>
+                {(course as any).basePrice > 0 || (addonMappings && addonMappings.length > 0) ? (
+                  <>
+                    <PricingSummary
+                      basePrice={(course as any).basePrice || 0}
+                      currency={(course as any).currency || 'EUR'}
+                      stripeProductId={(course as any).stripeProductId}
+                      stripePriceId={(course as any).stripePriceId}
+                      addons={addonMappings || []}
+                      showStripeStatus={true}
+                      showTotal={false}
+                    />
+                    
+                    {/* Hint for managing addons */}
+                    {addonMappings && addonMappings.length > 0 && (
+                      <p className="text-xs text-gray-500 mt-2 italic px-4">
+                        {t('manageCourse.addons.manage_hint')}
+                      </p>
+                    )}
+                  </>
+                ) : (
+                  <div className="bg-white border border-gray-200 rounded-lg p-4">
+                    <p className="text-sm text-gray-500 italic">
+                      {t('manageCourse.pricing.no_pricing_configured')}
+                    </p>
+                  </div>
+                )}
+              </>
+            )}
+
+            {/* 2. List of Instructors - Card Container */}
             <div className="bg-white border border-gray-200 rounded-lg p-4">
               <h4 className="text-sm font-medium text-gray-700 mb-3">{t('manageCourses.instructors.label')}</h4>
               <div className="space-y-2">
@@ -648,7 +912,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
               </div>
             </div>
 
-            {/* 2. Funding Organizations - Card Container */}
+            {/* 3. Funding Organizations - Card Container */}
             <div className="bg-white border border-gray-200 rounded-lg p-4 w-full">
               <EntityListManager
                 variant="material"
@@ -743,7 +1007,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
               </div>
             </div>
 
-            {/* 4. Course Requirements - Card Container */}
+            {/* 5. Course Requirements - Card Container */}
             <div className="bg-white border border-gray-200 rounded-lg p-4 space-y-4">
               {/* Maximum Number of Allowed Missing Sessions */}
               <InputField
@@ -760,7 +1024,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
               />
             </div>
 
-            {/* 5. Learning Goals - Card Container */}
+            {/* 6. Learning Goals - Card Container */}
             <div className="bg-white border border-gray-200 rounded-lg p-4 [&_.text-gray-400]:text-gray-700">
               <InputField
                 variant="eduhub"
@@ -776,6 +1040,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                 className="h-32 !text-gray-700"
               />
             </div>
+
           </div>
         </div>
       </div>
@@ -809,6 +1074,23 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
 
       {/* Error Message Dialog */}
       {error && <ErrorMessageDialog errorMessage={error} open={!!error} onClose={resetError} />}
+      
+      <AddonValidationDialog
+        open={isValidationDialogOpen}
+        onClose={() => setIsValidationDialogOpen(false)}
+        onSave={handleSaveAddonMappings}
+        addonQuestions={addonQuestions}
+        courseId={course.id}
+        isLoading={isSavingMappings}
+      />
+
+      {/* Formbricks Help Dialog */}
+      <InfoDialog
+        open={isFormbricksHelpDialogOpen}
+        onClose={() => setIsFormbricksHelpDialogOpen(false)}
+        title={t('manageCourse.formbricks.setup_dialog_title')}
+        content={t('manageCourse.formbricks.setup_dialog_content')}
+      />
     </div>
   );
 };

@@ -25,7 +25,7 @@ import {
 import { AchievementRecordRating_enum } from '../../../../../__generated__/globalTypes';
 import EhTagStingId from '../../../../common/EhTagStingId';
 import { AtLeastNameEmail, MinAchievementOption } from '../../../../../helpers/achievement';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { CircularProgress } from '@mui/material';
 import { Button } from '../../../../common/Button';
 import EnrolledUserForACourseDialog from '../../../../common/dialogs/EnrolledUserForACourseDialog';

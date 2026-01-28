@@ -12,7 +12,7 @@ import { Menu } from './Menu';
 import { RegisterButton } from './RegisterButton';
 import { ClientOnly } from '@opencampus/shared-components';
 import { OnlyDesktop } from '@opencampus/shared-components';
-import { useTranslations, useLocale } from 'next-intl';
+import { useLocale } from 'next-intl';
 import UserCard from '../common/UserCard';
 
 export const Header: FC = () => {

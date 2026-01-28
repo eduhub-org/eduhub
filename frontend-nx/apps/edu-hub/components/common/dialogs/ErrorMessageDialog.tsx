@@ -1,6 +1,6 @@
 import { Dialog, DialogTitle, Slide } from '@mui/material';
 import { TransitionProps } from '@mui/material/transitions';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { FC, useCallback, forwardRef, ReactElement } from 'react';
 import { MdClose } from 'react-icons/md';
 

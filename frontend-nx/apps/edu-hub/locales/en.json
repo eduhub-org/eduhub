@@ -374,6 +374,7 @@
     },
     "registration": {
       "application_deadline": "Application deadline: ",
+      "registration_deadline": "Registration deadline: ",
       "apply_now": "Apply now",
       "register_external": "Register via External Link",
       "register_with_payment": "Register with Payment",
@@ -389,7 +390,9 @@
       "invited": "You have been invited and need to confirm your participation",
       "invitation_expired": "Your invitation has expired",
       "application_period_ended": "Unfortunately, the application period has ended. You can subscribe to our <a>newsletter</a> to stay informed about new offers.",
-      "application_period_ended_title": "Application Period Ended"
+      "application_period_ended_title": "Application Period Ended",
+      "registration_period_ended": "Unfortunately, the registration period has ended. You can subscribe to our <a>newsletter</a> to stay informed about new offers.",
+      "registration_period_ended_title": "Registration Period Ended"
     },
     "modal": {
       "title_approval": "Application",
@@ -400,6 +403,20 @@
       "payment_info": "This course costs {cost}. You will be redirected to the payment page after registration.",
       "accept_terms": "I accept the Terms and Conditions and Privacy Policy",
       "cancel": "Cancel",
+      "payment": {
+        "verifying": "Verifying payment...",
+        "verifying_description": "Please wait a moment while we confirm your payment.",
+        "success_title": "Payment successful!",
+        "success_description": "Your payment has been processed successfully. You have been enrolled in the course.",
+        "cancelled_title": "Payment cancelled",
+        "cancelled_description": "The payment was cancelled. You can try again later.",
+        "error_verifying": "Error verifying payment",
+        "back_to_course": "Back to course",
+        "view_course": "View course",
+        "my_courses": "My courses",
+        "try_again": "Try again",
+        "back_to_home": "Back to home"
+      },
       "close": "Close",
       "submit": "Submit Application",
       "proceed_to_payment": "Proceed to Payment",
@@ -438,6 +455,12 @@
   "coursePage": {
     "courseCosts": "This course costs {price}",
     "courseIsFree": "This course is free of charge",
+    "price_label": "Course Fee",
+    "add_ons": "Add-ons",
+    "free_course": "Free",
+    "total": "Total",
+    "pricing_section_title": "Prizing",
+    "starts_at": "Starts at",
     "courseGroups": "Course Groups",
     "courseDegree": "Degrees",
     "courseDegreeTitle": "Part of the following degrees",
@@ -838,7 +861,9 @@
         "APPROVAL_WITH_INPUT": "Approval Required with Questionnaire and Application Process",
         "DIRECT_CONFIRMATION": "Direct Confirmation without Questionnaire",
         "DIRECT_WITH_INPUT": "Direct Confirmation with Questionnaire",
-        "EXTERNAL_REGISTRATION": "External Registration"
+        "EXTERNAL_REGISTRATION": "External Registration",
+        "DIRECT_CONFIRMATION_AND_PAYMENT": "Direct Confirmation with Payment",
+        "DIRECT_WITH_INPUT_AND_PAYMENT": "Direct Confirmation with Questionnaire and Payment"
       }
     },
     "external_registration_link": {
@@ -1004,12 +1029,41 @@
       "open_survey": "Open questionnaire",
       "remove_survey": "Remove questionnaire",
       "invalid_url": "Please enter a valid Formbricks Survey URL",
+      "help_text": "Collect registration information and optional add-on selections via Formbricks survey.",
+      "learn_more": "Learn more",
+      "setup_dialog_title": "Formbricks Survey Setup",
+      "setup_dialog_content": "The Formbricks survey serves two purposes:\n\n1. Collect Registration Information\nCollect applicant information, motivation letters, and other registration details that will be displayed in the applications overview.\n\n2. Define Add-on Prices (for payment-enabled courses)\nIf your course requires payment, you can include questions about optional add-ons (e.g., \"Would you like to add a certificate? (+€50)\"). The system automatically extracts prices mentioned in survey questions.\n\n---\n\nHidden Fields Configuration\n\nImportant: You must configure Hidden Fields in your Formbricks survey!\n\nRequired Hidden Fields:\n• eduhubUserId - Automatically filled with EduHub user ID\n• eduhubCourseId - Automatically filled with course ID\n• eduhubEnrollmentId - Automatically filled with enrollment ID (optional)\n\nIn Formbricks: Edit Survey → Enable Hidden Fields → Add these field IDs. Without this configuration, responses cannot be properly matched.\n\nNote: eduhubEnrollmentId is optional because the enrollment is created AFTER the survey is completed during registration.\n\n---\n\nAdd-on Price Extraction\n\nFor courses with payment enabled:\n1. Include add-n selection answer options with price information in your survey questions (e.g., \"Certificate (+€50)\" or \"Workshop materials: €25\")\n2. Use the \"Validate Add-ons\" button in the Pricing Settings section\n3. The system will analyze your survey and extract detected prices\n4. Review and validate the extracted prices in the validation dialog\n5. Validated add-ons are automatically synced with Stripe for payment processing",
       "help_text_hidden_fields": "Important: You must configure Hidden Fields in your Formbricks survey!\n\nRequired Hidden Fields:\n• eduhubUserId - Automatically filled with EduHub user ID\n• eduhubCourseId - Automatically filled with course ID\n• eduhubEnrollmentId - Automatically filled with enrollment ID (optional)\n\nIn Formbricks: Edit Survey → Enable Hidden Fields → Add these field IDs. Without this configuration, responses cannot be properly matched.\n\nNote: eduhubEnrollmentId is optional because the enrollment is created AFTER the survey is completed during registration.",
+      "no_survey_url": "No survey URL configured",
       "loading_responses": "Loading responses...",
       "error_loading_responses": "Error loading questionnaire responses",
       "no_responses": "No questionnaire responses available",
       "questionnaire_responses": "Questionnaire Responses",
       "incomplete_response": "Questionnaire not fully completed"
+    },
+    "pricing": {
+      "title": "Pricing Settings",
+      "base_price": "Base Price (in cents)",
+      "base_price_help": "The base price for the course in the smallest currency unit (e.g., cents for EUR)",
+      "currency": "Currency",
+      "validate_addons": "Validate Add-ons",
+      "validating": "Validating...",
+      "validate_help": "Analyze the questionnaire and extract add-on prices for validation",
+      "stripe_status": "Stripe Status",
+      "stripe_syncing": "Syncing...",
+      "stripe_synced": "Synchronized",
+      "stripe_sync_error": "Sync failed",
+      "stripe_product": "Product",
+      "stripe_price": "Price",
+      "price_amount": "Price Amount",
+      "view_in_stripe": "View in Stripe",
+      "no_stripe_product": "No Stripe product yet. Save a price > 0 to sync.",
+      "no_pricing_configured": "No pricing configured yet. Set a base price or validate add-ons.",
+      "sync_hint": "Synchronization will start automatically...",
+      "sync_now": "Sync Now"
+    },
+    "addons": {
+      "manage_hint": "To edit add-ons, use \"Validate Add-ons\" in the Pricing Settings section."
     },
     "common": {
       "edit": "Edit",
@@ -1553,5 +1607,14 @@
     "title": "Title",
     "delete": "Delete",
     "upload": "Upload"
+  },
+  "pricing_summary": {
+    "title": "Pricing Summary",
+    "base_price": "Course Fee",
+    "addons": "Add-ons",
+    "total": "Total",
+    "no_pricing": "No pricing configured.",
+    "synced": "Synced",
+    "not_synced": "Not synced"
   }
 }

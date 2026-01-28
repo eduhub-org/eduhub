@@ -434,6 +434,61 @@ export enum Country_update_column {
 }
 
 /**
+ * unique or primary key constraints on table "CourseAddonMapping"
+ */
+export enum CourseAddonMapping_constraint {
+  CourseAddonMapping_pkey = "CourseAddonMapping_pkey",
+  CourseAddonMapping_unique_no_choice = "CourseAddonMapping_unique_no_choice",
+  CourseAddonMapping_unique_with_choice = "CourseAddonMapping_unique_with_choice",
+}
+
+/**
+ * select columns of table "CourseAddonMapping"
+ */
+export enum CourseAddonMapping_select_column {
+  choiceId = "choiceId",
+  confidence = "confidence",
+  courseId = "courseId",
+  created_at = "created_at",
+  currency = "currency",
+  description = "description",
+  extractedPrice = "extractedPrice",
+  id = "id",
+  questionId = "questionId",
+  questionTextDe = "questionTextDe",
+  questionTextEn = "questionTextEn",
+  stripePriceId = "stripePriceId",
+  stripeProductId = "stripeProductId",
+  updated_at = "updated_at",
+  validatedAt = "validatedAt",
+  validatedBy = "validatedBy",
+  validatedPrice = "validatedPrice",
+}
+
+/**
+ * update columns of table "CourseAddonMapping"
+ */
+export enum CourseAddonMapping_update_column {
+  choiceId = "choiceId",
+  confidence = "confidence",
+  courseId = "courseId",
+  created_at = "created_at",
+  currency = "currency",
+  description = "description",
+  extractedPrice = "extractedPrice",
+  id = "id",
+  questionId = "questionId",
+  questionTextDe = "questionTextDe",
+  questionTextEn = "questionTextEn",
+  stripePriceId = "stripePriceId",
+  stripeProductId = "stripeProductId",
+  updated_at = "updated_at",
+  validatedAt = "validatedAt",
+  validatedBy = "validatedBy",
+  validatedPrice = "validatedPrice",
+}
+
+/**
  * unique or primary key constraints on table "CourseDegree"
  */
 export enum CourseDegree_constraint {
@@ -509,7 +564,12 @@ export enum CourseEnrollment_select_column {
   location = "location",
   motivationLetter = "motivationLetter",
   motivationRating = "motivationRating",
+  paymentAmount = "paymentAmount",
+  paymentCurrency = "paymentCurrency",
+  paymentStatus = "paymentStatus",
   status = "status",
+  stripeCheckoutSessionId = "stripeCheckoutSessionId",
+  stripePaymentIntentId = "stripePaymentIntentId",
   updated_at = "updated_at",
   userId = "userId",
 }
@@ -527,7 +587,12 @@ export enum CourseEnrollment_update_column {
   location = "location",
   motivationLetter = "motivationLetter",
   motivationRating = "motivationRating",
+  paymentAmount = "paymentAmount",
+  paymentCurrency = "paymentCurrency",
+  paymentStatus = "paymentStatus",
   status = "status",
+  stripeCheckoutSessionId = "stripeCheckoutSessionId",
+  stripePaymentIntentId = "stripePaymentIntentId",
   updated_at = "updated_at",
   userId = "userId",
 }
@@ -684,7 +749,9 @@ export enum CourseRegistrationType_constraint {
 export enum CourseRegistrationType_enum {
   APPROVAL_WITH_INPUT = "APPROVAL_WITH_INPUT",
   DIRECT_CONFIRMATION = "DIRECT_CONFIRMATION",
+  DIRECT_CONFIRMATION_AND_PAYMENT = "DIRECT_CONFIRMATION_AND_PAYMENT",
   DIRECT_WITH_INPUT = "DIRECT_WITH_INPUT",
+  DIRECT_WITH_INPUT_AND_PAYMENT = "DIRECT_WITH_INPUT_AND_PAYMENT",
   EXTERNAL_REGISTRATION = "EXTERNAL_REGISTRATION",
 }
 
@@ -733,12 +800,14 @@ export enum Course_select_column {
   achievementCertificatePossible = "achievementCertificatePossible",
   applicationEnd = "applicationEnd",
   attendanceCertificatePossible = "attendanceCertificatePossible",
+  basePrice = "basePrice",
   chatLink = "chatLink",
   contentDescriptionField1 = "contentDescriptionField1",
   contentDescriptionField2 = "contentDescriptionField2",
   cost = "cost",
   coverImage = "coverImage",
   created_at = "created_at",
+  currency = "currency",
   ects = "ects",
   endTime = "endTime",
   externalRegistrationLink = "externalRegistrationLink",
@@ -755,6 +824,8 @@ export enum Course_select_column {
   registrationType = "registrationType",
   startTime = "startTime",
   status = "status",
+  stripePriceId = "stripePriceId",
+  stripeProductId = "stripeProductId",
   tagline = "tagline",
   title = "title",
   updated_at = "updated_at",
@@ -786,12 +857,14 @@ export enum Course_update_column {
   achievementCertificatePossible = "achievementCertificatePossible",
   applicationEnd = "applicationEnd",
   attendanceCertificatePossible = "attendanceCertificatePossible",
+  basePrice = "basePrice",
   chatLink = "chatLink",
   contentDescriptionField1 = "contentDescriptionField1",
   contentDescriptionField2 = "contentDescriptionField2",
   cost = "cost",
   coverImage = "coverImage",
   created_at = "created_at",
+  currency = "currency",
   ects = "ects",
   endTime = "endTime",
   externalRegistrationLink = "externalRegistrationLink",
@@ -808,6 +881,8 @@ export enum Course_update_column {
   registrationType = "registrationType",
   startTime = "startTime",
   status = "status",
+  stripePriceId = "stripePriceId",
+  stripeProductId = "stripeProductId",
   tagline = "tagline",
   title = "title",
   updated_at = "updated_at",
@@ -2870,6 +2945,20 @@ export interface AchievementRecord_variance_order_by {
   score?: order_by | null;
 }
 
+export interface AddonMappingInput {
+  choiceId: string;
+  confidence: string;
+  currency: string;
+  description: string;
+  extractedPrice: number;
+  questionId: string;
+  questionTextDe?: string | null;
+  questionTextEn?: string | null;
+  stripePriceId?: string | null;
+  stripeProductId?: string | null;
+  validatedPrice: number;
+}
+
 /**
  * Boolean expression to filter rows from the table "AttendanceSource". All fields are combined with a logical 'AND'.
  */
@@ -3542,6 +3631,230 @@ export interface Country_order_by {
   name_en?: order_by | null;
 }
 
+export interface CourseAddonMapping_aggregate_bool_exp {
+  count?: CourseAddonMapping_aggregate_bool_exp_count | null;
+}
+
+export interface CourseAddonMapping_aggregate_bool_exp_count {
+  arguments?: CourseAddonMapping_select_column[] | null;
+  distinct?: boolean | null;
+  filter?: CourseAddonMapping_bool_exp | null;
+  predicate: Int_comparison_exp;
+}
+
+/**
+ * order by aggregate values of table "CourseAddonMapping"
+ */
+export interface CourseAddonMapping_aggregate_order_by {
+  avg?: CourseAddonMapping_avg_order_by | null;
+  count?: order_by | null;
+  max?: CourseAddonMapping_max_order_by | null;
+  min?: CourseAddonMapping_min_order_by | null;
+  stddev?: CourseAddonMapping_stddev_order_by | null;
+  stddev_pop?: CourseAddonMapping_stddev_pop_order_by | null;
+  stddev_samp?: CourseAddonMapping_stddev_samp_order_by | null;
+  sum?: CourseAddonMapping_sum_order_by | null;
+  var_pop?: CourseAddonMapping_var_pop_order_by | null;
+  var_samp?: CourseAddonMapping_var_samp_order_by | null;
+  variance?: CourseAddonMapping_variance_order_by | null;
+}
+
+/**
+ * input type for inserting array relation for remote table "CourseAddonMapping"
+ */
+export interface CourseAddonMapping_arr_rel_insert_input {
+  data: CourseAddonMapping_insert_input[];
+  on_conflict?: CourseAddonMapping_on_conflict | null;
+}
+
+/**
+ * order by avg() on columns of table "CourseAddonMapping"
+ */
+export interface CourseAddonMapping_avg_order_by {
+  courseId?: order_by | null;
+  extractedPrice?: order_by | null;
+  id?: order_by | null;
+  validatedPrice?: order_by | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "CourseAddonMapping". All fields are combined with a logical 'AND'.
+ */
+export interface CourseAddonMapping_bool_exp {
+  Course?: Course_bool_exp | null;
+  User?: User_bool_exp | null;
+  _and?: CourseAddonMapping_bool_exp[] | null;
+  _not?: CourseAddonMapping_bool_exp | null;
+  _or?: CourseAddonMapping_bool_exp[] | null;
+  choiceId?: String_comparison_exp | null;
+  confidence?: String_comparison_exp | null;
+  courseId?: Int_comparison_exp | null;
+  created_at?: timestamptz_comparison_exp | null;
+  currency?: String_comparison_exp | null;
+  description?: String_comparison_exp | null;
+  extractedPrice?: Int_comparison_exp | null;
+  id?: Int_comparison_exp | null;
+  questionId?: String_comparison_exp | null;
+  questionTextDe?: String_comparison_exp | null;
+  questionTextEn?: String_comparison_exp | null;
+  stripePriceId?: String_comparison_exp | null;
+  stripeProductId?: String_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
+  validatedAt?: timestamptz_comparison_exp | null;
+  validatedBy?: uuid_comparison_exp | null;
+  validatedPrice?: Int_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "CourseAddonMapping"
+ */
+export interface CourseAddonMapping_insert_input {
+  Course?: Course_obj_rel_insert_input | null;
+  User?: User_obj_rel_insert_input | null;
+  choiceId?: string | null;
+  confidence?: string | null;
+  courseId?: number | null;
+  created_at?: any | null;
+  currency?: string | null;
+  description?: string | null;
+  extractedPrice?: number | null;
+  id?: number | null;
+  questionId?: string | null;
+  questionTextDe?: string | null;
+  questionTextEn?: string | null;
+  stripePriceId?: string | null;
+  stripeProductId?: string | null;
+  updated_at?: any | null;
+  validatedAt?: any | null;
+  validatedBy?: any | null;
+  validatedPrice?: number | null;
+}
+
+/**
+ * order by max() on columns of table "CourseAddonMapping"
+ */
+export interface CourseAddonMapping_max_order_by {
+  choiceId?: order_by | null;
+  confidence?: order_by | null;
+  courseId?: order_by | null;
+  created_at?: order_by | null;
+  currency?: order_by | null;
+  description?: order_by | null;
+  extractedPrice?: order_by | null;
+  id?: order_by | null;
+  questionId?: order_by | null;
+  questionTextDe?: order_by | null;
+  questionTextEn?: order_by | null;
+  stripePriceId?: order_by | null;
+  stripeProductId?: order_by | null;
+  updated_at?: order_by | null;
+  validatedAt?: order_by | null;
+  validatedBy?: order_by | null;
+  validatedPrice?: order_by | null;
+}
+
+/**
+ * order by min() on columns of table "CourseAddonMapping"
+ */
+export interface CourseAddonMapping_min_order_by {
+  choiceId?: order_by | null;
+  confidence?: order_by | null;
+  courseId?: order_by | null;
+  created_at?: order_by | null;
+  currency?: order_by | null;
+  description?: order_by | null;
+  extractedPrice?: order_by | null;
+  id?: order_by | null;
+  questionId?: order_by | null;
+  questionTextDe?: order_by | null;
+  questionTextEn?: order_by | null;
+  stripePriceId?: order_by | null;
+  stripeProductId?: order_by | null;
+  updated_at?: order_by | null;
+  validatedAt?: order_by | null;
+  validatedBy?: order_by | null;
+  validatedPrice?: order_by | null;
+}
+
+/**
+ * on_conflict condition type for table "CourseAddonMapping"
+ */
+export interface CourseAddonMapping_on_conflict {
+  constraint: CourseAddonMapping_constraint;
+  update_columns: CourseAddonMapping_update_column[];
+  where?: CourseAddonMapping_bool_exp | null;
+}
+
+/**
+ * order by stddev() on columns of table "CourseAddonMapping"
+ */
+export interface CourseAddonMapping_stddev_order_by {
+  courseId?: order_by | null;
+  extractedPrice?: order_by | null;
+  id?: order_by | null;
+  validatedPrice?: order_by | null;
+}
+
+/**
+ * order by stddev_pop() on columns of table "CourseAddonMapping"
+ */
+export interface CourseAddonMapping_stddev_pop_order_by {
+  courseId?: order_by | null;
+  extractedPrice?: order_by | null;
+  id?: order_by | null;
+  validatedPrice?: order_by | null;
+}
+
+/**
+ * order by stddev_samp() on columns of table "CourseAddonMapping"
+ */
+export interface CourseAddonMapping_stddev_samp_order_by {
+  courseId?: order_by | null;
+  extractedPrice?: order_by | null;
+  id?: order_by | null;
+  validatedPrice?: order_by | null;
+}
+
+/**
+ * order by sum() on columns of table "CourseAddonMapping"
+ */
+export interface CourseAddonMapping_sum_order_by {
+  courseId?: order_by | null;
+  extractedPrice?: order_by | null;
+  id?: order_by | null;
+  validatedPrice?: order_by | null;
+}
+
+/**
+ * order by var_pop() on columns of table "CourseAddonMapping"
+ */
+export interface CourseAddonMapping_var_pop_order_by {
+  courseId?: order_by | null;
+  extractedPrice?: order_by | null;
+  id?: order_by | null;
+  validatedPrice?: order_by | null;
+}
+
+/**
+ * order by var_samp() on columns of table "CourseAddonMapping"
+ */
+export interface CourseAddonMapping_var_samp_order_by {
+  courseId?: order_by | null;
+  extractedPrice?: order_by | null;
+  id?: order_by | null;
+  validatedPrice?: order_by | null;
+}
+
+/**
+ * order by variance() on columns of table "CourseAddonMapping"
+ */
+export interface CourseAddonMapping_variance_order_by {
+  courseId?: order_by | null;
+  extractedPrice?: order_by | null;
+  id?: order_by | null;
+  validatedPrice?: order_by | null;
+}
+
 export interface CourseDegree_aggregate_bool_exp {
   count?: CourseDegree_aggregate_bool_exp_count | null;
 }
@@ -3811,6 +4124,7 @@ export interface CourseEnrollment_arr_rel_insert_input {
 export interface CourseEnrollment_avg_order_by {
   courseId?: order_by | null;
   id?: order_by | null;
+  paymentAmount?: order_by | null;
 }
 
 /**
@@ -3834,7 +4148,12 @@ export interface CourseEnrollment_bool_exp {
   location?: LocationOption_enum_comparison_exp | null;
   motivationLetter?: String_comparison_exp | null;
   motivationRating?: MotivationRating_enum_comparison_exp | null;
+  paymentAmount?: Int_comparison_exp | null;
+  paymentCurrency?: String_comparison_exp | null;
+  paymentStatus?: String_comparison_exp | null;
   status?: CourseEnrollmentStatus_enum_comparison_exp | null;
+  stripeCheckoutSessionId?: String_comparison_exp | null;
+  stripePaymentIntentId?: String_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
   userId?: uuid_comparison_exp | null;
 }
@@ -3857,7 +4176,12 @@ export interface CourseEnrollment_insert_input {
   location?: LocationOption_enum | null;
   motivationLetter?: string | null;
   motivationRating?: MotivationRating_enum | null;
+  paymentAmount?: number | null;
+  paymentCurrency?: string | null;
+  paymentStatus?: string | null;
   status?: CourseEnrollmentStatus_enum | null;
+  stripeCheckoutSessionId?: string | null;
+  stripePaymentIntentId?: string | null;
   updated_at?: any | null;
   userId?: any | null;
 }
@@ -3873,6 +4197,11 @@ export interface CourseEnrollment_max_order_by {
   id?: order_by | null;
   invitationExpirationDate?: order_by | null;
   motivationLetter?: order_by | null;
+  paymentAmount?: order_by | null;
+  paymentCurrency?: order_by | null;
+  paymentStatus?: order_by | null;
+  stripeCheckoutSessionId?: order_by | null;
+  stripePaymentIntentId?: order_by | null;
   updated_at?: order_by | null;
   userId?: order_by | null;
 }
@@ -3888,6 +4217,11 @@ export interface CourseEnrollment_min_order_by {
   id?: order_by | null;
   invitationExpirationDate?: order_by | null;
   motivationLetter?: order_by | null;
+  paymentAmount?: order_by | null;
+  paymentCurrency?: order_by | null;
+  paymentStatus?: order_by | null;
+  stripeCheckoutSessionId?: order_by | null;
+  stripePaymentIntentId?: order_by | null;
   updated_at?: order_by | null;
   userId?: order_by | null;
 }
@@ -3919,7 +4253,12 @@ export interface CourseEnrollment_order_by {
   location?: order_by | null;
   motivationLetter?: order_by | null;
   motivationRating?: order_by | null;
+  paymentAmount?: order_by | null;
+  paymentCurrency?: order_by | null;
+  paymentStatus?: order_by | null;
   status?: order_by | null;
+  stripeCheckoutSessionId?: order_by | null;
+  stripePaymentIntentId?: order_by | null;
   updated_at?: order_by | null;
   userId?: order_by | null;
 }
@@ -3930,6 +4269,7 @@ export interface CourseEnrollment_order_by {
 export interface CourseEnrollment_stddev_order_by {
   courseId?: order_by | null;
   id?: order_by | null;
+  paymentAmount?: order_by | null;
 }
 
 /**
@@ -3938,6 +4278,7 @@ export interface CourseEnrollment_stddev_order_by {
 export interface CourseEnrollment_stddev_pop_order_by {
   courseId?: order_by | null;
   id?: order_by | null;
+  paymentAmount?: order_by | null;
 }
 
 /**
@@ -3946,6 +4287,7 @@ export interface CourseEnrollment_stddev_pop_order_by {
 export interface CourseEnrollment_stddev_samp_order_by {
   courseId?: order_by | null;
   id?: order_by | null;
+  paymentAmount?: order_by | null;
 }
 
 /**
@@ -3954,6 +4296,7 @@ export interface CourseEnrollment_stddev_samp_order_by {
 export interface CourseEnrollment_sum_order_by {
   courseId?: order_by | null;
   id?: order_by | null;
+  paymentAmount?: order_by | null;
 }
 
 /**
@@ -3962,6 +4305,7 @@ export interface CourseEnrollment_sum_order_by {
 export interface CourseEnrollment_var_pop_order_by {
   courseId?: order_by | null;
   id?: order_by | null;
+  paymentAmount?: order_by | null;
 }
 
 /**
@@ -3970,6 +4314,7 @@ export interface CourseEnrollment_var_pop_order_by {
 export interface CourseEnrollment_var_samp_order_by {
   courseId?: order_by | null;
   id?: order_by | null;
+  paymentAmount?: order_by | null;
 }
 
 /**
@@ -3978,6 +4323,7 @@ export interface CourseEnrollment_var_samp_order_by {
 export interface CourseEnrollment_variance_order_by {
   courseId?: order_by | null;
   id?: order_by | null;
+  paymentAmount?: order_by | null;
 }
 
 export interface CourseFundingOrganization_aggregate_bool_exp {
@@ -4361,6 +4707,15 @@ export interface CourseGroup_variance_order_by {
   courseId?: order_by | null;
   groupOptionId?: order_by | null;
   id?: order_by | null;
+}
+
+export interface CourseInput {
+  basePrice?: number | null;
+  currency?: string | null;
+  id: number;
+  stripePriceId?: string | null;
+  stripeProductId?: string | null;
+  title: string;
 }
 
 export interface CourseInstructor_aggregate_bool_exp {
@@ -4881,6 +5236,7 @@ export interface Course_arr_rel_insert_input {
  * order by avg() on columns of table "Course"
  */
 export interface Course_avg_order_by {
+  basePrice?: order_by | null;
   id?: order_by | null;
   maxMissedSessions?: order_by | null;
   maxParticipants?: order_by | null;
@@ -4893,6 +5249,8 @@ export interface Course_avg_order_by {
 export interface Course_bool_exp {
   AchievementOptionCourses?: AchievementOptionCourse_bool_exp | null;
   AchievementOptionCourses_aggregate?: AchievementOptionCourse_aggregate_bool_exp | null;
+  CourseAddonMappings?: CourseAddonMapping_bool_exp | null;
+  CourseAddonMappings_aggregate?: CourseAddonMapping_aggregate_bool_exp | null;
   CourseDegrees?: CourseDegree_bool_exp | null;
   CourseDegrees_aggregate?: CourseDegree_aggregate_bool_exp | null;
   CourseEnrollments?: CourseEnrollment_bool_exp | null;
@@ -4920,12 +5278,14 @@ export interface Course_bool_exp {
   achievementCertificatePossible?: Boolean_comparison_exp | null;
   applicationEnd?: date_comparison_exp | null;
   attendanceCertificatePossible?: Boolean_comparison_exp | null;
+  basePrice?: Int_comparison_exp | null;
   chatLink?: String_comparison_exp | null;
   contentDescriptionField1?: String_comparison_exp | null;
   contentDescriptionField2?: String_comparison_exp | null;
   cost?: String_comparison_exp | null;
   coverImage?: String_comparison_exp | null;
   created_at?: timestamptz_comparison_exp | null;
+  currency?: String_comparison_exp | null;
   ects?: String_comparison_exp | null;
   endTime?: time_comparison_exp | null;
   externalRegistrationLink?: String_comparison_exp | null;
@@ -4942,6 +5302,8 @@ export interface Course_bool_exp {
   registrationType?: CourseRegistrationType_enum_comparison_exp | null;
   startTime?: time_comparison_exp | null;
   status?: CourseStatus_enum_comparison_exp | null;
+  stripePriceId?: String_comparison_exp | null;
+  stripeProductId?: String_comparison_exp | null;
   tagline?: String_comparison_exp | null;
   title?: String_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
@@ -4953,6 +5315,7 @@ export interface Course_bool_exp {
  */
 export interface Course_insert_input {
   AchievementOptionCourses?: AchievementOptionCourse_arr_rel_insert_input | null;
+  CourseAddonMappings?: CourseAddonMapping_arr_rel_insert_input | null;
   CourseDegrees?: CourseDegree_arr_rel_insert_input | null;
   CourseEnrollments?: CourseEnrollment_arr_rel_insert_input | null;
   CourseFundingOrganizations?: CourseFundingOrganization_arr_rel_insert_input | null;
@@ -4969,12 +5332,14 @@ export interface Course_insert_input {
   achievementCertificatePossible?: boolean | null;
   applicationEnd?: any | null;
   attendanceCertificatePossible?: boolean | null;
+  basePrice?: number | null;
   chatLink?: string | null;
   contentDescriptionField1?: string | null;
   contentDescriptionField2?: string | null;
   cost?: string | null;
   coverImage?: string | null;
   created_at?: any | null;
+  currency?: string | null;
   ects?: string | null;
   endTime?: any | null;
   externalRegistrationLink?: string | null;
@@ -4991,6 +5356,8 @@ export interface Course_insert_input {
   registrationType?: CourseRegistrationType_enum | null;
   startTime?: any | null;
   status?: CourseStatus_enum | null;
+  stripePriceId?: string | null;
+  stripeProductId?: string | null;
   tagline?: string | null;
   title?: string | null;
   updated_at?: any | null;
@@ -5002,12 +5369,14 @@ export interface Course_insert_input {
  */
 export interface Course_max_order_by {
   applicationEnd?: order_by | null;
+  basePrice?: order_by | null;
   chatLink?: order_by | null;
   contentDescriptionField1?: order_by | null;
   contentDescriptionField2?: order_by | null;
   cost?: order_by | null;
   coverImage?: order_by | null;
   created_at?: order_by | null;
+  currency?: order_by | null;
   ects?: order_by | null;
   externalRegistrationLink?: order_by | null;
   formbricksEnrollmentSurveyUrl?: order_by | null;
@@ -5019,6 +5388,8 @@ export interface Course_max_order_by {
   maxMissedSessions?: order_by | null;
   maxParticipants?: order_by | null;
   programId?: order_by | null;
+  stripePriceId?: order_by | null;
+  stripeProductId?: order_by | null;
   tagline?: order_by | null;
   title?: order_by | null;
   updated_at?: order_by | null;
@@ -5029,12 +5400,14 @@ export interface Course_max_order_by {
  */
 export interface Course_min_order_by {
   applicationEnd?: order_by | null;
+  basePrice?: order_by | null;
   chatLink?: order_by | null;
   contentDescriptionField1?: order_by | null;
   contentDescriptionField2?: order_by | null;
   cost?: order_by | null;
   coverImage?: order_by | null;
   created_at?: order_by | null;
+  currency?: order_by | null;
   ects?: order_by | null;
   externalRegistrationLink?: order_by | null;
   formbricksEnrollmentSurveyUrl?: order_by | null;
@@ -5046,6 +5419,8 @@ export interface Course_min_order_by {
   maxMissedSessions?: order_by | null;
   maxParticipants?: order_by | null;
   programId?: order_by | null;
+  stripePriceId?: order_by | null;
+  stripeProductId?: order_by | null;
   tagline?: order_by | null;
   title?: order_by | null;
   updated_at?: order_by | null;
@@ -5073,6 +5448,7 @@ export interface Course_on_conflict {
  */
 export interface Course_order_by {
   AchievementOptionCourses_aggregate?: AchievementOptionCourse_aggregate_order_by | null;
+  CourseAddonMappings_aggregate?: CourseAddonMapping_aggregate_order_by | null;
   CourseDegrees_aggregate?: CourseDegree_aggregate_order_by | null;
   CourseEnrollments_aggregate?: CourseEnrollment_aggregate_order_by | null;
   CourseFundingOrganizations_aggregate?: CourseFundingOrganization_aggregate_order_by | null;
@@ -5089,12 +5465,14 @@ export interface Course_order_by {
   achievementCertificatePossible?: order_by | null;
   applicationEnd?: order_by | null;
   attendanceCertificatePossible?: order_by | null;
+  basePrice?: order_by | null;
   chatLink?: order_by | null;
   contentDescriptionField1?: order_by | null;
   contentDescriptionField2?: order_by | null;
   cost?: order_by | null;
   coverImage?: order_by | null;
   created_at?: order_by | null;
+  currency?: order_by | null;
   ects?: order_by | null;
   endTime?: order_by | null;
   externalRegistrationLink?: order_by | null;
@@ -5111,6 +5489,8 @@ export interface Course_order_by {
   registrationType?: order_by | null;
   startTime?: order_by | null;
   status?: order_by | null;
+  stripePriceId?: order_by | null;
+  stripeProductId?: order_by | null;
   tagline?: order_by | null;
   title?: order_by | null;
   updated_at?: order_by | null;
@@ -5124,12 +5504,14 @@ export interface Course_set_input {
   achievementCertificatePossible?: boolean | null;
   applicationEnd?: any | null;
   attendanceCertificatePossible?: boolean | null;
+  basePrice?: number | null;
   chatLink?: string | null;
   contentDescriptionField1?: string | null;
   contentDescriptionField2?: string | null;
   cost?: string | null;
   coverImage?: string | null;
   created_at?: any | null;
+  currency?: string | null;
   ects?: string | null;
   endTime?: any | null;
   externalRegistrationLink?: string | null;
@@ -5146,6 +5528,8 @@ export interface Course_set_input {
   registrationType?: CourseRegistrationType_enum | null;
   startTime?: any | null;
   status?: CourseStatus_enum | null;
+  stripePriceId?: string | null;
+  stripeProductId?: string | null;
   tagline?: string | null;
   title?: string | null;
   updated_at?: any | null;
@@ -5156,6 +5540,7 @@ export interface Course_set_input {
  * order by stddev() on columns of table "Course"
  */
 export interface Course_stddev_order_by {
+  basePrice?: order_by | null;
   id?: order_by | null;
   maxMissedSessions?: order_by | null;
   maxParticipants?: order_by | null;
@@ -5166,6 +5551,7 @@ export interface Course_stddev_order_by {
  * order by stddev_pop() on columns of table "Course"
  */
 export interface Course_stddev_pop_order_by {
+  basePrice?: order_by | null;
   id?: order_by | null;
   maxMissedSessions?: order_by | null;
   maxParticipants?: order_by | null;
@@ -5176,6 +5562,7 @@ export interface Course_stddev_pop_order_by {
  * order by stddev_samp() on columns of table "Course"
  */
 export interface Course_stddev_samp_order_by {
+  basePrice?: order_by | null;
   id?: order_by | null;
   maxMissedSessions?: order_by | null;
   maxParticipants?: order_by | null;
@@ -5186,6 +5573,7 @@ export interface Course_stddev_samp_order_by {
  * order by sum() on columns of table "Course"
  */
 export interface Course_sum_order_by {
+  basePrice?: order_by | null;
   id?: order_by | null;
   maxMissedSessions?: order_by | null;
   maxParticipants?: order_by | null;
@@ -5196,6 +5584,7 @@ export interface Course_sum_order_by {
  * order by var_pop() on columns of table "Course"
  */
 export interface Course_var_pop_order_by {
+  basePrice?: order_by | null;
   id?: order_by | null;
   maxMissedSessions?: order_by | null;
   maxParticipants?: order_by | null;
@@ -5206,6 +5595,7 @@ export interface Course_var_pop_order_by {
  * order by var_samp() on columns of table "Course"
  */
 export interface Course_var_samp_order_by {
+  basePrice?: order_by | null;
   id?: order_by | null;
   maxMissedSessions?: order_by | null;
   maxParticipants?: order_by | null;
@@ -5216,6 +5606,7 @@ export interface Course_var_samp_order_by {
  * order by variance() on columns of table "Course"
  */
 export interface Course_variance_order_by {
+  basePrice?: order_by | null;
   id?: order_by | null;
   maxMissedSessions?: order_by | null;
   maxParticipants?: order_by | null;
@@ -7173,6 +7564,12 @@ export interface Scientist_on_conflict {
   constraint: Scientist_constraint;
   update_columns: Scientist_update_column[];
   where?: Scientist_bool_exp | null;
+}
+
+export interface SelectedAddonInput {
+  choiceId: string;
+  questionId: string;
+  selected: boolean;
 }
 
 export interface SessionAddress_aggregate_bool_exp {

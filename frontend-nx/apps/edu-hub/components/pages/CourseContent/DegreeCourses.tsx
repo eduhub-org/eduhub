@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import NextLink from 'next/link';
 import MuiLink from '@mui/material/Link';
 import { useUser } from '../../../../edu-hub/hooks/user';

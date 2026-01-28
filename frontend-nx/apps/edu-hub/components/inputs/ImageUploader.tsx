@@ -5,7 +5,7 @@ import Tooltip from '@mui/material/Tooltip';
 import { HelpOutline, CloudUpload } from '@mui/icons-material';
 import Button from '@mui/material/Button';
 import { useRoleMutation } from '../../hooks/authedMutation';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { prioritizeClasses } from '../../helpers/util';
 import { AlertMessageDialog } from '../common/dialogs/AlertMessageDialog';
 import Snackbar from '@mui/material/Snackbar';

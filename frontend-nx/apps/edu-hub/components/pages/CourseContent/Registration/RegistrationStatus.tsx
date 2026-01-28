@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { MdHourglassEmpty, MdCancel, MdError, MdMailOutline, MdAccessTime } from 'react-icons/md';
 
 import { CourseEnrollmentStatus_enum } from '../../../../__generated__/globalTypes';

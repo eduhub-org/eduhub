@@ -13,7 +13,7 @@ import {
   UpdateAnAchievementOptionVariables,
 } from '../../../queries/__generated__/UpdateAnAchievementOption';
 import { useAdminMutation } from '../../../hooks/authedMutation';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 
 export interface IPropsDashBoard {
   course?: AdminCourseList_Course;
