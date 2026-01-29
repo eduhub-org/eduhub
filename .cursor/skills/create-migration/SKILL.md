@@ -39,7 +39,7 @@ mkdir -p backend/migrations/default/{timestamp}_{action}_{description}
 Replace:
 - `{timestamp}` with the generated timestamp
 - `{action}` with the action type (e.g., `add_column`, `remove_column`, `create_table`)
-- `{description}` with a snake_case description (e.g., `scheduled_at_to_MailLog`)
+- `{description}` with a snake_case description (e.g., `scheduled_at_to_mail_log`)
 
 ## Step 3: Create up.sql
 
@@ -107,7 +107,7 @@ After ANY schema change that affects GraphQL, regenerate types using the `regene
 - **Columns**: camelCase (`firstName`, `organizationId`)
 - **Timestamps**: snake_case (`created_at`, `updated_at`)
 - **Foreign keys**: `{tableName}Id` (`userId`, `courseId`)
-- **Migration folders**: `{timestamp}_{action}_{description}` (`1753957404053_add_column_status_to_MailLog`)
+- **Migration folders**: `{timestamp}_{action}_{description}` (`1753957404053_add_column_status_to_mail_log`)
 
 ## Checklist
 
