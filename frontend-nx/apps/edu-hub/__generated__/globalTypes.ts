@@ -97,13 +97,11 @@ export enum AchievementOption_constraint {
 export enum AchievementOption_select_column {
   achievementDocumentationTemplateId = "achievementDocumentationTemplateId",
   created_at = "created_at",
-  csvTemplateUrl = "csvTemplateUrl",
   description = "description",
   evaluationScriptUrl = "evaluationScriptUrl",
   id = "id",
   published = "published",
   recordType = "recordType",
-  showScoreAuthors = "showScoreAuthors",
   title = "title",
   updated_at = "updated_at",
 }
@@ -113,7 +111,6 @@ export enum AchievementOption_select_column {
  */
 export enum AchievementOption_select_column_AchievementOption_aggregate_bool_exp_bool_and_arguments_columns {
   published = "published",
-  showScoreAuthors = "showScoreAuthors",
 }
 
 /**
@@ -121,7 +118,6 @@ export enum AchievementOption_select_column_AchievementOption_aggregate_bool_exp
  */
 export enum AchievementOption_select_column_AchievementOption_aggregate_bool_exp_bool_or_arguments_columns {
   published = "published",
-  showScoreAuthors = "showScoreAuthors",
 }
 
 /**
@@ -130,13 +126,11 @@ export enum AchievementOption_select_column_AchievementOption_aggregate_bool_exp
 export enum AchievementOption_update_column {
   achievementDocumentationTemplateId = "achievementDocumentationTemplateId",
   created_at = "created_at",
-  csvTemplateUrl = "csvTemplateUrl",
   description = "description",
   evaluationScriptUrl = "evaluationScriptUrl",
   id = "id",
   published = "published",
   recordType = "recordType",
-  showScoreAuthors = "showScoreAuthors",
   title = "title",
   updated_at = "updated_at",
 }
@@ -200,7 +194,6 @@ export enum AchievementRecordType_constraint {
 
 export enum AchievementRecordType_enum {
   DOCUMENTATION = "DOCUMENTATION",
-  DOCUMENTATION_AND_CSV = "DOCUMENTATION_AND_CSV",
   ONLINE_COURSE = "ONLINE_COURSE",
 }
 
@@ -1099,6 +1092,29 @@ export enum Organization_update_column {
   name = "name",
   type = "type",
   updated_at = "updated_at",
+}
+
+/**
+ * unique or primary key constraints on table "PaymentStatus"
+ */
+export enum PaymentStatus_constraint {
+  PaymentStatus_pkey = "PaymentStatus_pkey",
+}
+
+export enum PaymentStatus_enum {
+  COMPLETED = "COMPLETED",
+  FAILED = "FAILED",
+  NONE = "NONE",
+  PENDING = "PENDING",
+  REFUNDED = "REFUNDED",
+}
+
+/**
+ * update columns of table "PaymentStatus"
+ */
+export enum PaymentStatus_update_column {
+  comment = "comment",
+  value = "value",
 }
 
 /**
@@ -2223,13 +2239,11 @@ export interface AchievementOption_bool_exp {
   _or?: AchievementOption_bool_exp[] | null;
   achievementDocumentationTemplateId?: Int_comparison_exp | null;
   created_at?: timestamptz_comparison_exp | null;
-  csvTemplateUrl?: String_comparison_exp | null;
   description?: String_comparison_exp | null;
   evaluationScriptUrl?: String_comparison_exp | null;
   id?: Int_comparison_exp | null;
   published?: Boolean_comparison_exp | null;
   recordType?: AchievementRecordType_enum_comparison_exp | null;
-  showScoreAuthors?: Boolean_comparison_exp | null;
   title?: String_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
 }
@@ -2245,13 +2259,11 @@ export interface AchievementOption_insert_input {
   AchievementRecords?: AchievementRecord_arr_rel_insert_input | null;
   achievementDocumentationTemplateId?: number | null;
   created_at?: any | null;
-  csvTemplateUrl?: string | null;
   description?: string | null;
   evaluationScriptUrl?: string | null;
   id?: number | null;
   published?: boolean | null;
   recordType?: AchievementRecordType_enum | null;
-  showScoreAuthors?: boolean | null;
   title?: string | null;
   updated_at?: any | null;
 }
@@ -2262,7 +2274,6 @@ export interface AchievementOption_insert_input {
 export interface AchievementOption_max_order_by {
   achievementDocumentationTemplateId?: order_by | null;
   created_at?: order_by | null;
-  csvTemplateUrl?: order_by | null;
   description?: order_by | null;
   evaluationScriptUrl?: order_by | null;
   id?: order_by | null;
@@ -2276,7 +2287,6 @@ export interface AchievementOption_max_order_by {
 export interface AchievementOption_min_order_by {
   achievementDocumentationTemplateId?: order_by | null;
   created_at?: order_by | null;
-  csvTemplateUrl?: order_by | null;
   description?: order_by | null;
   evaluationScriptUrl?: order_by | null;
   id?: order_by | null;
@@ -2312,13 +2322,11 @@ export interface AchievementOption_order_by {
   AchievementRecords_aggregate?: AchievementRecord_aggregate_order_by | null;
   achievementDocumentationTemplateId?: order_by | null;
   created_at?: order_by | null;
-  csvTemplateUrl?: order_by | null;
   description?: order_by | null;
   evaluationScriptUrl?: order_by | null;
   id?: order_by | null;
   published?: order_by | null;
   recordType?: order_by | null;
-  showScoreAuthors?: order_by | null;
   title?: order_by | null;
   updated_at?: order_by | null;
 }
@@ -2329,13 +2337,11 @@ export interface AchievementOption_order_by {
 export interface AchievementOption_set_input {
   achievementDocumentationTemplateId?: number | null;
   created_at?: any | null;
-  csvTemplateUrl?: string | null;
   description?: string | null;
   evaluationScriptUrl?: string | null;
   id?: number | null;
   published?: boolean | null;
   recordType?: AchievementRecordType_enum | null;
-  showScoreAuthors?: boolean | null;
   title?: string | null;
   updated_at?: any | null;
 }
@@ -4135,6 +4141,7 @@ export interface CourseEnrollment_bool_exp {
   CourseEnrollmentStatus?: CourseEnrollmentStatus_bool_exp | null;
   LocationOption?: LocationOption_bool_exp | null;
   MotivationRating?: MotivationRating_bool_exp | null;
+  PaymentStatus?: PaymentStatus_bool_exp | null;
   User?: User_bool_exp | null;
   _and?: CourseEnrollment_bool_exp[] | null;
   _not?: CourseEnrollment_bool_exp | null;
@@ -4150,7 +4157,7 @@ export interface CourseEnrollment_bool_exp {
   motivationRating?: MotivationRating_enum_comparison_exp | null;
   paymentAmount?: Int_comparison_exp | null;
   paymentCurrency?: String_comparison_exp | null;
-  paymentStatus?: String_comparison_exp | null;
+  paymentStatus?: PaymentStatus_enum_comparison_exp | null;
   status?: CourseEnrollmentStatus_enum_comparison_exp | null;
   stripeCheckoutSessionId?: String_comparison_exp | null;
   stripePaymentIntentId?: String_comparison_exp | null;
@@ -4166,6 +4173,7 @@ export interface CourseEnrollment_insert_input {
   CourseEnrollmentStatus?: CourseEnrollmentStatus_obj_rel_insert_input | null;
   LocationOption?: LocationOption_obj_rel_insert_input | null;
   MotivationRating?: MotivationRating_obj_rel_insert_input | null;
+  PaymentStatus?: PaymentStatus_obj_rel_insert_input | null;
   User?: User_obj_rel_insert_input | null;
   achievementCertificateURL?: string | null;
   attendanceCertificateURL?: string | null;
@@ -4178,7 +4186,7 @@ export interface CourseEnrollment_insert_input {
   motivationRating?: MotivationRating_enum | null;
   paymentAmount?: number | null;
   paymentCurrency?: string | null;
-  paymentStatus?: string | null;
+  paymentStatus?: PaymentStatus_enum | null;
   status?: CourseEnrollmentStatus_enum | null;
   stripeCheckoutSessionId?: string | null;
   stripePaymentIntentId?: string | null;
@@ -4199,7 +4207,6 @@ export interface CourseEnrollment_max_order_by {
   motivationLetter?: order_by | null;
   paymentAmount?: order_by | null;
   paymentCurrency?: order_by | null;
-  paymentStatus?: order_by | null;
   stripeCheckoutSessionId?: order_by | null;
   stripePaymentIntentId?: order_by | null;
   updated_at?: order_by | null;
@@ -4219,7 +4226,6 @@ export interface CourseEnrollment_min_order_by {
   motivationLetter?: order_by | null;
   paymentAmount?: order_by | null;
   paymentCurrency?: order_by | null;
-  paymentStatus?: order_by | null;
   stripeCheckoutSessionId?: order_by | null;
   stripePaymentIntentId?: order_by | null;
   updated_at?: order_by | null;
@@ -4243,6 +4249,7 @@ export interface CourseEnrollment_order_by {
   CourseEnrollmentStatus?: CourseEnrollmentStatus_order_by | null;
   LocationOption?: LocationOption_order_by | null;
   MotivationRating?: MotivationRating_order_by | null;
+  PaymentStatus?: PaymentStatus_order_by | null;
   User?: User_order_by | null;
   achievementCertificateURL?: order_by | null;
   attendanceCertificateURL?: order_by | null;
@@ -6494,6 +6501,65 @@ export interface Organization_var_samp_order_by {
  */
 export interface Organization_variance_order_by {
   id?: order_by | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "PaymentStatus". All fields are combined with a logical 'AND'.
+ */
+export interface PaymentStatus_bool_exp {
+  CourseEnrollments?: CourseEnrollment_bool_exp | null;
+  CourseEnrollments_aggregate?: CourseEnrollment_aggregate_bool_exp | null;
+  _and?: PaymentStatus_bool_exp[] | null;
+  _not?: PaymentStatus_bool_exp | null;
+  _or?: PaymentStatus_bool_exp[] | null;
+  comment?: String_comparison_exp | null;
+  value?: String_comparison_exp | null;
+}
+
+/**
+ * Boolean expression to compare columns of type "PaymentStatus_enum". All fields are combined with logical 'AND'.
+ */
+export interface PaymentStatus_enum_comparison_exp {
+  _eq?: PaymentStatus_enum | null;
+  _in?: PaymentStatus_enum[] | null;
+  _is_null?: boolean | null;
+  _neq?: PaymentStatus_enum | null;
+  _nin?: PaymentStatus_enum[] | null;
+}
+
+/**
+ * input type for inserting data into table "PaymentStatus"
+ */
+export interface PaymentStatus_insert_input {
+  CourseEnrollments?: CourseEnrollment_arr_rel_insert_input | null;
+  comment?: string | null;
+  value?: string | null;
+}
+
+/**
+ * input type for inserting object relation for remote table "PaymentStatus"
+ */
+export interface PaymentStatus_obj_rel_insert_input {
+  data: PaymentStatus_insert_input;
+  on_conflict?: PaymentStatus_on_conflict | null;
+}
+
+/**
+ * on_conflict condition type for table "PaymentStatus"
+ */
+export interface PaymentStatus_on_conflict {
+  constraint: PaymentStatus_constraint;
+  update_columns: PaymentStatus_update_column[];
+  where?: PaymentStatus_bool_exp | null;
+}
+
+/**
+ * Ordering options when selecting data from "PaymentStatus".
+ */
+export interface PaymentStatus_order_by {
+  CourseEnrollments_aggregate?: CourseEnrollment_aggregate_order_by | null;
+  comment?: order_by | null;
+  value?: order_by | null;
 }
 
 /**

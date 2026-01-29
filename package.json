@@ -2,6 +2,9 @@
   "name": "eduhub-root",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=20 <21"
+  },
   "scripts": {
     "preinstall": "echo \"Please run package manager commands in the frontend-nx directory\" && exit 1"
   },

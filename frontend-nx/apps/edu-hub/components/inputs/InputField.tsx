@@ -11,11 +11,10 @@ import { useTranslations } from 'next-intl';
 import { DebounceInput } from 'react-debounce-input';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { prioritizeClasses } from '../../helpers/util';
+import { prioritizeClasses, isLinkFormat, isECTSFormat } from '../../helpers/util';
 import useErrorHandler from '../../hooks/useErrorHandler';
 import { AlertMessageDialog } from '../common/dialogs/AlertMessageDialog';
 import { ErrorMessageDialog } from '../common/dialogs/ErrorMessageDialog';
-import { isLinkFormat, isECTSFormat } from '../../helpers/util';
 import NotificationSnackbar from '../common/dialogs/NotificationSnackbar';
 import { gql } from 'graphql-tag';
 
@@ -197,8 +196,8 @@ const InputField: React.FC<InputFieldProps> = ({
   invertColors = false,
   min,
   max,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  immediateUpdate, // Extract this prop to prevent it from being spread to DOM elements
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Extract this prop to prevent it from being spread to DOM elements
+  immediateUpdate: _immediateUpdate,
   ...props
 }) => {
   const t = useTranslations('common');
@@ -230,7 +229,7 @@ const InputField: React.FC<InputFieldProps> = ({
         itemId,
         // If type is number, convert the text to number
         ...(type === 'number' 
-          ? { text: parseInt(localText, 10) }
+          ? { text: Number.parseInt(localText, 10) }
           : { text: localText }
         )
       },
@@ -251,9 +250,9 @@ const InputField: React.FC<InputFieldProps> = ({
         case 'ects':
           return isECTSFormat(text);
         case 'number': {
-          const num = parseInt(text, 10);
+          const num = Number.parseInt(text, 10);
           return (
-            !isNaN(num) &&
+            !Number.isNaN(num) &&
             Number.isInteger(num) &&
             (min === undefined || num >= min) &&
             (max === undefined || num <= max)
@@ -276,7 +275,7 @@ const InputField: React.FC<InputFieldProps> = ({
         case 'ects':
           return t('input_field.invalid_ects_format');
         case 'number': {
-          if (!Number.isInteger(parseInt(value, 10))) {
+          if (!Number.isInteger(Number.parseInt(value, 10))) {
             return t('input_field.invalid_integer_format');
           }
           if (min !== undefined && max !== undefined) {

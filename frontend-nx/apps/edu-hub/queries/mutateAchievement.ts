@@ -114,3 +114,37 @@ export const DELETE_AN_ACHIEVEMENT_OPTION_MENTOR = gql`
   }
 `;
 /* #endregion */
+
+/* #region Individual Field Update Mutations */
+export const UPDATE_ACHIEVEMENT_OPTION_TITLE = gql`
+  mutation UpdateAchievementOptionTitle($itemId: Int!, $text: String!) {
+    update_AchievementOption_by_pk(pk_columns: { id: $itemId }, _set: { title: $text }) {
+      id
+    }
+  }
+`;
+
+export const UPDATE_ACHIEVEMENT_OPTION_DESCRIPTION = gql`
+  mutation UpdateAchievementOptionDescription($itemId: Int!, $text: String!) {
+    update_AchievementOption_by_pk(pk_columns: { id: $itemId }, _set: { description: $text }) {
+      id
+    }
+  }
+`;
+
+export const UPDATE_ACHIEVEMENT_OPTION_RECORD_TYPE = gql`
+  mutation UpdateAchievementOptionRecordType($itemId: Int!, $value: AchievementRecordType_enum!) {
+    update_AchievementOption_by_pk(pk_columns: { id: $itemId }, _set: { recordType: $value }) {
+      id
+    }
+  }
+`;
+
+export const UPDATE_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE = gql`
+  mutation UpdateAchievementOptionDocumentationTemplate($itemId: Int!, $value: Int) {
+    update_AchievementOption_by_pk(pk_columns: { id: $itemId }, _set: { achievementDocumentationTemplateId: $value }) {
+      id
+    }
+  }
+`;
+/* #endregion */

@@ -113,7 +113,7 @@
       "other": "Andere Beschäftigung",
       "teacher": "Name der Schule"
     },
-    "achievement-documentation-template": "Leistungsnachweisvorlage",
+    "achievement-documentation-template": "Dokumentationsvorlage",
     "preview": "Vorschau",
     "edit_markdown": "Bearbeiten",
     "markdown_info": "Markdown-Formatierung wird unterstützt.",
@@ -128,6 +128,21 @@
       "type_name_or_email_minimum_2_letters": "Gib einen Namen oder eine E-Mail ein (mindestens 2 Buchstaben).",
       "no_users_found": "Keine Benutzer gefunden",
       "add_new_user": "Neuen Benutzer hinzufügen"
+    },
+    "select_course_dialog": {
+      "type_course_name_minimum_2_letters": "Gib einen Kursnamen ein (mindestens 2 Buchstaben).",
+      "no_courses_found": "Keine Kurse gefunden"
+    },
+    "dialogs": {
+      "select_course_dialog": {
+        "type_course_name_minimum_2_letters": "Gib einen Kursnamen ein (mindestens 2 Buchstaben).",
+        "no_courses_found": "Keine Kurse gefunden"
+      },
+      "search": "Suche",
+      "loading": "Lädt...",
+      "cancel": "Abbrechen",
+      "error": "Fehler",
+      "close": "Schließen"
     },
     "deletion_confirmation_question": "Bist du sicher, dass du diesen Eintrag löschen möchtest?",
     "confirm_delete": "Löschen bestätigen",
@@ -183,6 +198,7 @@
       "drag_drop_text": "Datei hier ablegen",
       "click_or_drag": "Klicken zum Hochladen oder Datei hier ablegen",
       "remove": "Entfernen",
+      "remove_course": "Kurs entfernen",
       "replace": "Ersetzen",
       "download": "Herunterladen",
       "file_size": "Dateigröße",
@@ -664,7 +680,9 @@
     "upload-proof": "Leistungsnachweis hochladen",
     "form-info-cover-image-size": "Optimal ist eine Größe von {width} x {height} Pixel.",
     "form-info-documentations": "<component>Benutze diese Vorlage zum Hochladen der Dokumentation!</component>",
-    "uploadDocumentationTemplate": "Dokumentationsvorlage hochladen"
+    "uploadDocumentationTemplate": "Dokumentationsvorlage hochladen",
+    "error_loading_record_types": "Fehler beim Laden der Leistungsnachweis-Typen. Bitte versuche es später erneut.",
+    "no_record_types_available": "Keine Leistungsnachweis-Typen verfügbar."
   },
   "statistics": {
     "statistics": "Statistiken",
@@ -1247,6 +1265,40 @@
       "programs_unpublished_success_plural": "{count} Programme wurden erfolgreich zurückgezogen",
       "bulk_action_failed": "Massenaktion '{action}' ist fehlgeschlagen"
     }
+  },
+  "manageAchievementOptions": {
+    "table_header": {
+      "title": "Titel",
+      "record_type": "Leistungsnachweis-Typ",
+      "mentors": "Mentoren",
+      "courses": "Kurse"
+    },
+    "title": {
+      "placeholder": "Neue Leistungsnachweis-Option"
+    },
+    "record_type": {
+      "ONLINE_COURSE": "Online-Kurs",
+      "DOCUMENTATION": "Dokumentation"
+    },
+    "description": {
+      "placeholder": "Beschreibung eingeben..."
+    },
+    "documentation_template": {
+      "placeholder": "Dokumentationsvorlage auswählen...",
+      "help_text": "Wähle eine Vorlage, die für die Dokumentation dieser Leistungsnachweis-Option verwendet wird"
+    },
+    "add_mentor": "Mentor hinzufügen",
+    "add_course": "Kurs hinzufügen",
+    "remove_mentor": "Mentor entfernen",
+    "delete_button": {
+      "delete_achievement_option_confirmation": "Bist Du sicher, dass Du die Leistungsnachweis-Option '{title}' löschen möchtest?",
+      "untitled_achievement_option": "Unbenannte Leistungsnachweis-Option"
+    },
+    "notifications": {
+      "achievement_option_added": "Leistungsnachweis-Option wurde erfolgreich hinzugefügt",
+      "add_failed": "Leistungsnachweis-Option konnte nicht hinzugefügt werden"
+    },
+    "manage_templates_button": "Dokumentationsvorlagen bearbeiten"
   },
   "manageUsers": {
     "headline": "Benutzer",
