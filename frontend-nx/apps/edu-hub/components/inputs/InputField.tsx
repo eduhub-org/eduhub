@@ -197,8 +197,7 @@ const InputField: React.FC<InputFieldProps> = ({
   invertColors = false,
   min,
   max,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  immediateUpdate, // Extract this prop to prevent it from being spread to DOM elements
+  immediateUpdate: _immediateUpdate, // eslint-disable-line @typescript-eslint/no-unused-vars -- Extract this prop to prevent it from being spread to DOM elements
   ...props
 }) => {
   const t = useTranslations('common');

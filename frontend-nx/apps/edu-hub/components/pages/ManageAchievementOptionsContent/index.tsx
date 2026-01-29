@@ -4,7 +4,6 @@ import { ColumnDef } from '@tanstack/react-table';
 import { useTranslations } from 'next-intl';
 import { useAdminMutation } from '../../../hooks/authedMutation';
 import { useAdminQuery } from '../../../hooks/authedQuery';
-import { useIsAdmin } from '../../../hooks/authentication';
 import { IUserProfile } from '../../../hooks/user';
 import { AchievementOptionList_AchievementOption } from '../../../queries/__generated__/AchievementOptionList';
 import { ACHIEVEMENT_OPTIONS, ACHIEVEMENT_RECORD_TYPES } from '../../../queries/achievementOption';
@@ -31,7 +30,7 @@ import { makeFullName } from '../../../helpers/util';
 const QUERY_LIMIT = 100;
 
 // Helper function to truncate text with ellipsis
-const truncateText = (text: string, maxLength: number = 15): string => {
+const truncateText = (text: string, maxLength = 15): string => {
   if (!text || text.length <= maxLength) return text || '';
   return text.slice(0, maxLength) + '...';
 };
@@ -76,7 +75,6 @@ const ManageAchievementOptionsContent: FC<{
   const t = useTranslations('manageAchievementOptions');
   const tCommon = useTranslations('common');
   const tAchievementsPage = useTranslations('achievementsPage');
-  const isAdmin = useIsAdmin();
 
   // Load achievement record types for dropdown
   const { data: recordTypesData } = useAdminQuery<AchievementRecordTypes>(ACHIEVEMENT_RECORD_TYPES);

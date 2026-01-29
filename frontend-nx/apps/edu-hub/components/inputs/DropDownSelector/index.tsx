@@ -47,7 +47,7 @@ const DropDownSelector: React.FC<DropDownSelectorProps> = ({
           ...options,
         ]
       : options;
-  }, [nullable, nullableLabel, variant, options, t]);
+  }, [nullable, nullableLabel, options, t]);
 
   const {
     localValue,
