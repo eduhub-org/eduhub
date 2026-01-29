@@ -557,60 +557,66 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
         });
       }
 
-      // Status column - only for approval-based registration (APPROVAL_WITH_INPUT)
-      if (features.hasApplicationProcess) {
-        baseColumns.push({
-          header: t('status_label'),
-          accessorKey: 'status',
-          size: 100,
-          enableSorting: true,
-          sortingFn: (rowA, rowB) => {
-            return statusSortFn(rowA.original.status, rowB.original.status);
-          },
-          cell: ({ row }) => {
-            const enrollment = row.original;
-            const expired = isExpired(enrollment);
-            return (
-              <div className="text-center">
-                {!expired && enrollment.status === 'APPLIED' && (
-                  <GoDotFill className="inline" title={t('status.applied')} color="grey" size="2.5em" />
-                )}
-                {!expired && enrollment.status === 'INVITED' && (
-                  <IoIosCheckmarkCircle className="inline" title={t('status.invited')} color="grey" size="1.5em" />
-                )}
-                {(enrollment.status === 'CONFIRMED' || enrollment.status === 'COMPLETED') && (
-                  <IoIosCheckmarkCircle
-                    className="inline"
-                    title={t('status.invitation_confirmed')}
-                    color="lightgreen"
-                    size="1.5em"
-                  />
-                )}
-                {enrollment.status === 'ABORTED' && (
-                  <IoIosCheckmarkCircle title={t('status.aborted')} color="red" size="1.5em" className="inline" />
-                )}
-                {enrollment.status === 'REJECTED' && (
-                  <IoIosCloseCircle title={t('status.rejected')} color="red" size="1.5em" className="inline" />
-                )}
-                {enrollment.status === 'CANCELLED' && (
-                  <IoIosCloseCircle title={t('status.cancelled')} color="red" size="1.5em" className="inline" />
-                )}
-                {expired && (enrollment.status === 'APPLIED' || enrollment.status === 'INVITED') && (
-                  <IoIosCloseCircle
-                    className="inline"
-                    title={t('status.invitation_expired')}
-                    color="grey"
-                    size="1.5em"
-                  />
-                )}
-              </div>
-            );
-          },
-          meta: {
-            className: 'ml-auto',
-          },
-        });
-      }
+      // Status column - shown for all registration types
+      baseColumns.push({
+        header: t('status_label'),
+        accessorKey: 'status',
+        size: 100,
+        enableSorting: true,
+        sortingFn: (rowA, rowB) => {
+          return statusSortFn(rowA.original.status, rowB.original.status);
+        },
+        cell: ({ row }) => {
+          const enrollment = row.original;
+          const expired = isExpired(enrollment);
+          return (
+            <div className="text-center">
+              {!expired && enrollment.status === 'APPLIED' && (
+                <GoDotFill className="inline" title={t('status.applied')} color="grey" size="2.5em" />
+              )}
+              {!expired && enrollment.status === 'INVITED' && (
+                <IoIosCheckmarkCircle className="inline" title={t('status.invited')} color="grey" size="1.5em" />
+              )}
+              {(enrollment.status === 'CONFIRMED' || enrollment.status === 'COMPLETED') && (
+                <IoIosCheckmarkCircle
+                  className="inline"
+                  title={t('status.invitation_confirmed')}
+                  color="lightgreen"
+                  size="1.5em"
+                />
+              )}
+              {enrollment.status === 'REGISTERED' && (
+                <IoIosCheckmarkCircle
+                  className="inline"
+                  title={t('status.registered')}
+                  color="lightgreen"
+                  size="1.5em"
+                />
+              )}
+              {enrollment.status === 'ABORTED' && (
+                <IoIosCheckmarkCircle title={t('status.aborted')} color="red" size="1.5em" className="inline" />
+              )}
+              {enrollment.status === 'REJECTED' && (
+                <IoIosCloseCircle title={t('status.rejected')} color="red" size="1.5em" className="inline" />
+              )}
+              {enrollment.status === 'CANCELLED' && (
+                <IoIosCloseCircle title={t('status.cancelled')} color="red" size="1.5em" className="inline" />
+              )}
+              {expired && (enrollment.status === 'APPLIED' || enrollment.status === 'INVITED') && (
+                <IoIosCloseCircle
+                  className="inline"
+                  title={t('status.invitation_expired')}
+                  color="grey"
+                  size="1.5em"
+                />
+              )}
+            </div>
+          );
+        },
+        meta: {
+          className: 'ml-auto',
+        },
+      });
 
       return baseColumns;
     },

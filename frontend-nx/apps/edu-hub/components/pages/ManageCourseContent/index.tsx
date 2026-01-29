@@ -18,7 +18,6 @@ import { ApplicationsTab } from './ApplicationsTab';
 import { CourseParticipationsTab } from './CourseParticipationsTab';
 import { DegreeParticipationsTab } from './DegreeParticipationsTab';
 import { useIsAdmin, useIsUserIdInList } from '../../../hooks/authentication';
-import { CourseRegistrationType_enum } from '../../../__generated__/globalTypes';
 import { getRegistrationFeatures } from './ApplicationsTab/registrationConfig';
 
 interface Props {

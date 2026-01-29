@@ -1102,6 +1102,29 @@ export enum Organization_update_column {
 }
 
 /**
+ * unique or primary key constraints on table "PaymentStatus"
+ */
+export enum PaymentStatus_constraint {
+  PaymentStatus_pkey = "PaymentStatus_pkey",
+}
+
+export enum PaymentStatus_enum {
+  COMPLETED = "COMPLETED",
+  FAILED = "FAILED",
+  NONE = "NONE",
+  PENDING = "PENDING",
+  REFUNDED = "REFUNDED",
+}
+
+/**
+ * update columns of table "PaymentStatus"
+ */
+export enum PaymentStatus_update_column {
+  comment = "comment",
+  value = "value",
+}
+
+/**
  * unique or primary key constraints on table "ProgramType"
  */
 export enum ProgramType_constraint {
@@ -4135,6 +4158,7 @@ export interface CourseEnrollment_bool_exp {
   CourseEnrollmentStatus?: CourseEnrollmentStatus_bool_exp | null;
   LocationOption?: LocationOption_bool_exp | null;
   MotivationRating?: MotivationRating_bool_exp | null;
+  PaymentStatus?: PaymentStatus_bool_exp | null;
   User?: User_bool_exp | null;
   _and?: CourseEnrollment_bool_exp[] | null;
   _not?: CourseEnrollment_bool_exp | null;
@@ -4150,7 +4174,7 @@ export interface CourseEnrollment_bool_exp {
   motivationRating?: MotivationRating_enum_comparison_exp | null;
   paymentAmount?: Int_comparison_exp | null;
   paymentCurrency?: String_comparison_exp | null;
-  paymentStatus?: String_comparison_exp | null;
+  paymentStatus?: PaymentStatus_enum_comparison_exp | null;
   status?: CourseEnrollmentStatus_enum_comparison_exp | null;
   stripeCheckoutSessionId?: String_comparison_exp | null;
   stripePaymentIntentId?: String_comparison_exp | null;
@@ -4166,6 +4190,7 @@ export interface CourseEnrollment_insert_input {
   CourseEnrollmentStatus?: CourseEnrollmentStatus_obj_rel_insert_input | null;
   LocationOption?: LocationOption_obj_rel_insert_input | null;
   MotivationRating?: MotivationRating_obj_rel_insert_input | null;
+  PaymentStatus?: PaymentStatus_obj_rel_insert_input | null;
   User?: User_obj_rel_insert_input | null;
   achievementCertificateURL?: string | null;
   attendanceCertificateURL?: string | null;
@@ -4178,7 +4203,7 @@ export interface CourseEnrollment_insert_input {
   motivationRating?: MotivationRating_enum | null;
   paymentAmount?: number | null;
   paymentCurrency?: string | null;
-  paymentStatus?: string | null;
+  paymentStatus?: PaymentStatus_enum | null;
   status?: CourseEnrollmentStatus_enum | null;
   stripeCheckoutSessionId?: string | null;
   stripePaymentIntentId?: string | null;
@@ -4199,7 +4224,6 @@ export interface CourseEnrollment_max_order_by {
   motivationLetter?: order_by | null;
   paymentAmount?: order_by | null;
   paymentCurrency?: order_by | null;
-  paymentStatus?: order_by | null;
   stripeCheckoutSessionId?: order_by | null;
   stripePaymentIntentId?: order_by | null;
   updated_at?: order_by | null;
@@ -4219,7 +4243,6 @@ export interface CourseEnrollment_min_order_by {
   motivationLetter?: order_by | null;
   paymentAmount?: order_by | null;
   paymentCurrency?: order_by | null;
-  paymentStatus?: order_by | null;
   stripeCheckoutSessionId?: order_by | null;
   stripePaymentIntentId?: order_by | null;
   updated_at?: order_by | null;
@@ -4243,6 +4266,7 @@ export interface CourseEnrollment_order_by {
   CourseEnrollmentStatus?: CourseEnrollmentStatus_order_by | null;
   LocationOption?: LocationOption_order_by | null;
   MotivationRating?: MotivationRating_order_by | null;
+  PaymentStatus?: PaymentStatus_order_by | null;
   User?: User_order_by | null;
   achievementCertificateURL?: order_by | null;
   attendanceCertificateURL?: order_by | null;
@@ -6494,6 +6518,65 @@ export interface Organization_var_samp_order_by {
  */
 export interface Organization_variance_order_by {
   id?: order_by | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "PaymentStatus". All fields are combined with a logical 'AND'.
+ */
+export interface PaymentStatus_bool_exp {
+  CourseEnrollments?: CourseEnrollment_bool_exp | null;
+  CourseEnrollments_aggregate?: CourseEnrollment_aggregate_bool_exp | null;
+  _and?: PaymentStatus_bool_exp[] | null;
+  _not?: PaymentStatus_bool_exp | null;
+  _or?: PaymentStatus_bool_exp[] | null;
+  comment?: String_comparison_exp | null;
+  value?: String_comparison_exp | null;
+}
+
+/**
+ * Boolean expression to compare columns of type "PaymentStatus_enum". All fields are combined with logical 'AND'.
+ */
+export interface PaymentStatus_enum_comparison_exp {
+  _eq?: PaymentStatus_enum | null;
+  _in?: PaymentStatus_enum[] | null;
+  _is_null?: boolean | null;
+  _neq?: PaymentStatus_enum | null;
+  _nin?: PaymentStatus_enum[] | null;
+}
+
+/**
+ * input type for inserting data into table "PaymentStatus"
+ */
+export interface PaymentStatus_insert_input {
+  CourseEnrollments?: CourseEnrollment_arr_rel_insert_input | null;
+  comment?: string | null;
+  value?: string | null;
+}
+
+/**
+ * input type for inserting object relation for remote table "PaymentStatus"
+ */
+export interface PaymentStatus_obj_rel_insert_input {
+  data: PaymentStatus_insert_input;
+  on_conflict?: PaymentStatus_on_conflict | null;
+}
+
+/**
+ * on_conflict condition type for table "PaymentStatus"
+ */
+export interface PaymentStatus_on_conflict {
+  constraint: PaymentStatus_constraint;
+  update_columns: PaymentStatus_update_column[];
+  where?: PaymentStatus_bool_exp | null;
+}
+
+/**
+ * Ordering options when selecting data from "PaymentStatus".
+ */
+export interface PaymentStatus_order_by {
+  CourseEnrollments_aggregate?: CourseEnrollment_aggregate_order_by | null;
+  comment?: order_by | null;
+  value?: order_by | null;
 }
 
 /**
