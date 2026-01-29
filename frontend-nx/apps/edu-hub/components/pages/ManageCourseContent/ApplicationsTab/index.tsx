@@ -78,7 +78,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
       (enrollment) => enrollment.status === 'INVITED' || enrollment.status === 'CONFIRMED'
     ).length;
     const confirmedApplicants = course.CourseEnrollments.filter(
-      (enrollment) => enrollment.status === 'CONFIRMED' || enrollment.status === 'COMPLETED'
+      (enrollment) => enrollment.status === 'CONFIRMED' || enrollment.status === 'COMPLETED' || enrollment.status === 'REGISTERED'
     ).length;
     return { totalApplications, approvedApplications, invitedApplicants, confirmedApplicants };
   }, [course.CourseEnrollments]);
