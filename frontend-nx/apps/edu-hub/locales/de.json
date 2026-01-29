@@ -113,7 +113,7 @@
       "other": "Andere Beschäftigung",
       "teacher": "Name der Schule"
     },
-    "achievement-documentation-template": "Leistungsnachweisvorlage",
+    "achievement-documentation-template": "Dokumentationsvorlage",
     "preview": "Vorschau",
     "edit_markdown": "Bearbeiten",
     "markdown_info": "Markdown-Formatierung wird unterstützt.",
@@ -1247,6 +1247,39 @@
       "programs_unpublished_success_plural": "{count} Programme wurden erfolgreich zurückgezogen",
       "bulk_action_failed": "Massenaktion '{action}' ist fehlgeschlagen"
     }
+  },
+  "manageAchievementOptions": {
+    "table_header": {
+      "title": "Titel",
+      "record_type": "Leistungsnachweis-Typ",
+      "mentors": "Mentoren",
+      "courses": "Kurse"
+    },
+    "title": {
+      "placeholder": "Neue Leistungsnachweis-Option"
+    },
+    "record_type": {
+      "ONLINE_COURSE": "Online-Kurs",
+      "DOCUMENTATION": "Dokumentation"
+    },
+    "description": {
+      "placeholder": "Beschreibung eingeben..."
+    },
+    "documentation_template": {
+      "placeholder": "Dokumentationsvorlage auswählen...",
+      "help_text": "Wähle eine Vorlage, die für die Dokumentation dieser Leistungsnachweis-Option verwendet wird"
+    },
+    "add_mentor": "Mentor hinzufügen",
+    "add_course": "Kurs hinzufügen",
+    "delete_button": {
+      "delete_achievement_option_confirmation": "Bist Du sicher, dass Du die Leistungsnachweis-Option '{title}' löschen möchtest?",
+      "untitled_achievement_option": "Unbenannte Leistungsnachweis-Option"
+    },
+    "notifications": {
+      "achievement_option_added": "Leistungsnachweis-Option wurde erfolgreich hinzugefügt",
+      "add_failed": "Leistungsnachweis-Option konnte nicht hinzugefügt werden"
+    },
+    "manage_templates_button": "Dokumentationsvorlagen bearbeiten"
   },
   "manageUsers": {
     "headline": "Benutzer",

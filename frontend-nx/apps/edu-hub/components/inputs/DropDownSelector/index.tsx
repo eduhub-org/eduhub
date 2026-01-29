@@ -41,14 +41,13 @@ const DropDownSelector: React.FC<DropDownSelectorProps> = ({
     return nullable
       ? [
           {
-            label:
-              nullableLabel || (variant === 'eduhub' ? 'dropdown_selector.none_option' : 'dropdown_selector.none_option'),
+            label: nullableLabel || t('dropdown_selector.none_option'),
             value: '',
           },
           ...options,
         ]
       : options;
-  }, [nullable, nullableLabel, variant, options]);
+  }, [nullable, nullableLabel, variant, options, t]);
 
   const {
     localValue,

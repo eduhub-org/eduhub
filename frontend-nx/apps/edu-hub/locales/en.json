@@ -82,7 +82,7 @@
     "UNI_LUEBECK": "Uni Lübeck",
     "project-title": "Project title",
     "project-mentors": "Project mentors",
-    "project-description": "Projekt description",
+    "project-description": "Project description",
     "project-new-button": "New project",
     "courses": "Courses",
     "achievement-record-type": "Achievement record type",
@@ -113,7 +113,7 @@
       "other": "Other",
       "teacher": "Name of the school"
     },
-    "achievement-documentation-template": "Achievement Record Documentation Template",
+    "achievement-documentation-template": "Documentation Template",
     "preview": "Preview",
     "edit_markdown": "Edit",
     "markdown_info": "Markdown formatting is supported.",
@@ -128,6 +128,10 @@
       "type_name_or_email_minimum_2_letters": "Type a name or email (minimum 2 letters).",
       "no_users_found": "No users found",
       "add_new_user": "Add new user"
+    },
+    "select_course_dialog": {
+      "type_course_name_minimum_2_letters": "Type a course name (minimum 2 letters).",
+      "no_courses_found": "No courses found"
     },
     "deletion_confirmation_question": "Are you sure you want to delete this entry?",
     "confirm_delete": "Confirm Deletion",
@@ -659,7 +663,7 @@
   "achievementsPage": {
     "title": "Achievements",
     "page-header": "Performance records",
-    "achievement-record": "Performance records",
+    "achievement-record": "Achievement Options",
     "achievement-record-admin": "Administration performance records",
     "results": "Results",
     "upload": "↑ Upload",
@@ -1260,6 +1264,39 @@
       "programs_unpublished_success_plural": "{count} programs were successfully unpublished",
       "bulk_action_failed": "Bulk action '{action}' failed"
     }
+  },
+  "manageAchievementOptions": {
+    "table_header": {
+      "title": "Title",
+      "record_type": "Record Type",
+      "mentors": "Mentors",
+      "courses": "Courses"
+    },
+    "title": {
+      "placeholder": "New Achievement Option"
+    },
+    "record_type": {
+      "ONLINE_COURSE": "Online Course",
+      "DOCUMENTATION": "Documentation"
+    },
+    "description": {
+      "placeholder": "Enter description..."
+    },
+    "documentation_template": {
+      "placeholder": "Select a documentation template...",
+      "help_text": "Choose a template that will be used for documenting this achievement option"
+    },
+    "add_mentor": "Add Mentor",
+    "add_course": "Add Course",
+    "delete_button": {
+      "delete_achievement_option_confirmation": "Are you sure you want to delete the achievement option '{title}'?",
+      "untitled_achievement_option": "Untitled Achievement Option"
+    },
+    "notifications": {
+      "achievement_option_added": "Achievement option was successfully added",
+      "add_failed": "Failed to add achievement option"
+    },
+    "manage_templates_button": "Edit Documentation Templates"
   },
   "manageUsers": {
     "headline": "Users",

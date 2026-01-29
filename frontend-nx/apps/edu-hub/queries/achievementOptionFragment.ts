@@ -7,8 +7,6 @@ export const ACHIEVEMENT_OPTION_FRAGMENT = gql`
     description
     recordType
     evaluationScriptUrl
-    csvTemplateUrl
-    showScoreAuthors
     achievementDocumentationTemplateId
     AchievementOptionTemplate {
       title
