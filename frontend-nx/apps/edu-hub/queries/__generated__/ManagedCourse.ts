@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { Weekday_enum, CourseRegistrationType_enum, LocationOption_enum, ProgramType_enum, OrganizationType_enum, CourseStatus_enum, CourseEnrollmentStatus_enum, MotivationRating_enum, AttendanceStatus_enum, AchievementRecordRating_enum, AchievementRecordType_enum } from "./../../__generated__/globalTypes";
+import { Weekday_enum, CourseRegistrationType_enum, LocationOption_enum, ProgramType_enum, OrganizationType_enum, CourseStatus_enum, CourseEnrollmentStatus_enum, MotivationRating_enum, PaymentStatus_enum, AttendanceStatus_enum, AchievementRecordRating_enum, AchievementRecordType_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: ManagedCourse
@@ -469,6 +469,14 @@ export interface ManagedCourse_Course_by_pk_CourseEnrollments {
    * Rating that the user's motivation letter received from the course instructor
    */
   motivationRating: MotivationRating_enum;
+  /**
+   * Current payment status
+   */
+  paymentStatus: PaymentStatus_enum | null;
+  /**
+   * Stripe Payment Intent ID
+   */
+  stripePaymentIntentId: string | null;
   /**
    * An object relationship
    */

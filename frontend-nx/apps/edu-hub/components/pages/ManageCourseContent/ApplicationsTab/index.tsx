@@ -36,12 +36,13 @@ import TableGrid from '../../../common/TableGrid';
 import { ColumnDef } from '@tanstack/react-table';
 import { GoDotFill } from 'react-icons/go';
 import { IoIosCheckmarkCircle, IoIosCloseCircle } from 'react-icons/io';
-import { MotivationRating_enum, CourseEnrollmentStatus_enum, CourseRegistrationType_enum } from '../../../../__generated__/globalTypes';
+import { MotivationRating_enum, CourseEnrollmentStatus_enum } from '../../../../__generated__/globalTypes';
 import { useDisplayDate } from '../../../../helpers/dateTimeHelpers';
 import { BulkAction } from '../../../common/TableGrid/types';
 import { ApolloError } from '@apollo/client';
 import { ErrorMessageDialog } from '../../../common/dialogs/ErrorMessageDialog';
 import { FormbricksResponsesDisplay } from './FormbricksResponsesDisplay';
+import { getRegistrationFeatures } from './registrationConfig';
 
 interface IProps {
   course: ManagedCourse_Course_by_pk;
@@ -55,13 +56,6 @@ const isExpired = (enrollment: ManagedCourse_Course_by_pk_CourseEnrollments) => 
   return new Date(enrollment.invitationExpirationDate).setHours(0, 0, 0, 0) < new Date().setHours(0, 0, 0, 0);
 };
 
-const isDirectRegistration = (registrationType: CourseRegistrationType_enum | null): boolean => {
-  return (
-    registrationType === CourseRegistrationType_enum.DIRECT_CONFIRMATION ||
-    registrationType === CourseRegistrationType_enum.DIRECT_WITH_INPUT
-  );
-};
-
 export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
   const t = useTranslations('manageCourse');
   const locale = useLocale();
@@ -70,7 +64,10 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
   const isAdmin = useIsAdmin();
   const theme = useTheme();
 
-  const isDirectReg = isDirectRegistration(course.registrationType);
+  const features = useMemo(
+    () => getRegistrationFeatures(course.registrationType),
+    [course.registrationType]
+  );
   
   const applicationStats = useMemo(() => {
     const totalApplications = course.CourseEnrollments.length;
@@ -81,7 +78,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
       (enrollment) => enrollment.status === 'INVITED' || enrollment.status === 'CONFIRMED'
     ).length;
     const confirmedApplicants = course.CourseEnrollments.filter(
-      (enrollment) => enrollment.status === 'CONFIRMED' || enrollment.status === 'COMPLETED'
+      (enrollment) => enrollment.status === 'CONFIRMED' || enrollment.status === 'COMPLETED' || enrollment.status === 'REGISTERED'
     ).length;
     return { totalApplications, approvedApplications, invitedApplicants, confirmedApplicants };
   }, [course.CourseEnrollments]);
@@ -515,8 +512,8 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
         },
       ];
 
-      // Only include evaluation column for non-direct registration types
-      if (!isDirectReg) {
+      // Only include evaluation column for application process types
+      if (features.hasApplicationProcess) {
         baseColumns.push({
           header: t('evaluation'),
           accessorKey: 'motivationRating',
@@ -542,6 +539,28 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
         });
       }
 
+      // Payment status column - only for payment types
+      if (features.hasPayment) {
+        baseColumns.push({
+          header: t('payment_status'),
+          accessorKey: 'paymentStatus',
+          size: 120,
+          enableSorting: true,
+          cell: ({ row }) => {
+            const paymentStatus = row.original.paymentStatus;
+            const statusKey = paymentStatus || 'NONE';
+            return (
+              <div className="text-center">
+                <span className="text-sm">
+                  {t(`payment_status_values.${statusKey}`)}
+                </span>
+              </div>
+            );
+          },
+        });
+      }
+
+      // Status column - shown for all registration types
       baseColumns.push({
         header: t('status_label'),
         accessorKey: 'status',
@@ -565,6 +584,14 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
                 <IoIosCheckmarkCircle
                   className="inline"
                   title={t('status.invitation_confirmed')}
+                  color="lightgreen"
+                  size="1.5em"
+                />
+              )}
+              {enrollment.status === 'REGISTERED' && (
+                <IoIosCheckmarkCircle
+                  className="inline"
+                  title={t('status.registered')}
                   color="lightgreen"
                   size="1.5em"
                 />
@@ -596,7 +623,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
 
       return baseColumns;
     },
-    [t, ratingSortFn, statusSortFn, isDirectReg]
+    [t, ratingSortFn, statusSortFn, features]
   );
 
   // Expandable row component
@@ -669,28 +696,30 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
 
           {/* Application Content - Formbricks or Motivation Letter */}
           {/* Total available: 960px (mainRowContentWidth), minus: 400px (email) + 100px (rating) + 24px (2 gaps) + 12px (padding) = 424px */}
-          <div style={{ width: '424px', flexShrink: 0 }}>
-            <div className="mb-4">
-              {hasFormbricksSurvey ? (
-                <FormbricksResponsesDisplay
-                  courseId={enrollment.courseId}
-                  userId={enrollment.userId}
-                  enrollmentId={enrollment.id}
-                  formbricksEnrollmentSurveyUrl={effectiveSurveyUrl || ''}
-                />
-              ) : (
-                <>
-                  <div className="text-sm font-medium text-gray-700 mb-1">{t('application')}</div>
-                  <div className="text-gray-900 whitespace-pre-wrap break-words pl-4">
-                    {enrollment.motivationLetter || '-'}
-                  </div>
-                </>
-              )}
+          {features.hasQuestionnaire && (
+            <div style={{ width: '424px', flexShrink: 0 }}>
+              <div className="mb-4">
+                {hasFormbricksSurvey ? (
+                  <FormbricksResponsesDisplay
+                    courseId={enrollment.courseId}
+                    userId={enrollment.userId}
+                    enrollmentId={enrollment.id}
+                    formbricksEnrollmentSurveyUrl={effectiveSurveyUrl || ''}
+                  />
+                ) : (
+                  <>
+                    <div className="text-sm font-medium text-gray-700 mb-1">{t('application')}</div>
+                    <div className="text-gray-900 whitespace-pre-wrap break-words pl-4">
+                      {enrollment.motivationLetter || '-'}
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
-          </div>
+          )}
 
-          {/* Rating Controls - aligned with motivationRating column (100px) - only show for non-direct registration */}
-          {!isDirectReg && (
+          {/* Rating Controls - aligned with motivationRating column (100px) - only show for application process */}
+          {features.hasApplicationProcess && (
             <div style={{ width: '100px', flexShrink: 0 }}>
               <div className="mb-4">
                 <div className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-1">
@@ -787,20 +816,8 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
 
       {/* Statistics Cards */}
       {courseEnrollments.length > 0 && (
-        <div className={`grid grid-cols-1 md:grid-cols-2 ${isDirectReg ? 'lg:grid-cols-2' : 'lg:grid-cols-4'} gap-4 mb-6`}>
-          {isDirectReg ? (
-            <>
-              {/* Direct Registration: Show only total and confirmed registrations */}
-              <div className="bg-edu-light-gray p-4 rounded-lg">
-                <div className="text-gray-600 text-sm mb-1">{t('statistics_registrations_total')}</div>
-                <div className="text-gray-900 text-2xl font-semibold">{applicationStats.totalApplications}</div>
-              </div>
-              <div className="bg-edu-light-gray p-4 rounded-lg">
-                <div className="text-gray-600 text-sm mb-1">{t('statistics_registrations_confirmed')}</div>
-                <div className="text-gray-900 text-2xl font-semibold">{applicationStats.confirmedApplicants}</div>
-              </div>
-            </>
-          ) : (
+        <div className={`grid grid-cols-1 md:grid-cols-2 ${features.hasApplicationProcess ? 'lg:grid-cols-4' : 'lg:grid-cols-2'} gap-4 mb-6`}>
+          {features.hasApplicationProcess ? (
             <>
               {/* Approval-based Registration: Show all 4 cards */}
               <div className="bg-edu-light-gray p-4 rounded-lg">
@@ -817,6 +834,18 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
               </div>
               <div className="bg-edu-light-gray p-4 rounded-lg">
                 <div className="text-gray-600 text-sm mb-1">{t('statistics_invitations_confirmed')}</div>
+                <div className="text-gray-900 text-2xl font-semibold">{applicationStats.confirmedApplicants}</div>
+              </div>
+            </>
+          ) : (
+            <>
+              {/* Direct Registration: Show only total and confirmed registrations */}
+              <div className="bg-edu-light-gray p-4 rounded-lg">
+                <div className="text-gray-600 text-sm mb-1">{t('statistics_registrations_total')}</div>
+                <div className="text-gray-900 text-2xl font-semibold">{applicationStats.totalApplications}</div>
+              </div>
+              <div className="bg-edu-light-gray p-4 rounded-lg">
+                <div className="text-gray-600 text-sm mb-1">{t('statistics_registrations_confirmed')}</div>
                 <div className="text-gray-900 text-2xl font-semibold">{applicationStats.confirmedApplicants}</div>
               </div>
             </>
@@ -850,7 +879,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
               />
             </OnlyInstructor>
 
-            {filteredEnrollments.length > 0 && !isDirectReg && (
+            {filteredEnrollments.length > 0 && features.hasApplicationProcess && (
               <div className="-mt-8 mb-3">{infoDots}</div>
             )}
 

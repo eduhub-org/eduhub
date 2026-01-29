@@ -1,5 +1,5 @@
 import { useTranslations } from 'next-intl';
-import { FC, useCallback, useState } from 'react';
+import { FC, useCallback, useMemo, useState } from 'react';
 import { useRoleMutation } from '../../../hooks/authedMutation';
 import { useRoleQuery } from '../../../hooks/authedQuery';
 import { MANAGED_COURSE, UPDATE_COURSE_STATUS } from '../../../queries/course';
@@ -18,7 +18,7 @@ import { ApplicationsTab } from './ApplicationsTab';
 import { CourseParticipationsTab } from './CourseParticipationsTab';
 import { DegreeParticipationsTab } from './DegreeParticipationsTab';
 import { useIsAdmin, useIsUserIdInList } from '../../../hooks/authentication';
-import { CourseRegistrationType_enum } from '../../../__generated__/globalTypes';
+import { getRegistrationFeatures } from './ApplicationsTab/registrationConfig';
 
 interface Props {
   courseId: number;
@@ -55,12 +55,6 @@ const getNextCourseStatus = (course: ManagedCourse_Course_by_pk) => {
   }
 };
 
-const isDirectRegistration = (registrationType: CourseRegistrationType_enum | null): boolean => {
-  return (
-    registrationType === CourseRegistrationType_enum.DIRECT_CONFIRMATION ||
-    registrationType === CourseRegistrationType_enum.DIRECT_WITH_INPUT
-  );
-};
 
 /**
  *
@@ -157,6 +151,12 @@ export const ManageCourseContent: FC<Props> = ({ courseId }) => {
     [setConfirmUpgradeStatusOpen, course, updateCourseStatusMutation, qResult, openTabIndex]
   );
 
+  // useMemo must be called before any early returns to comply with Rules of Hooks
+  const registrationFeatures = useMemo(
+    () => getRegistrationFeatures(course?.registrationType),
+    [course?.registrationType]
+  );
+
   if (course == null) {
     return <div>{t('course_not_found', { courseId: courseId })}</div>;
   }
@@ -188,7 +188,7 @@ export const ManageCourseContent: FC<Props> = ({ courseId }) => {
 
             {course.externalRegistrationLink ? null : (
               <div className={`p-4 m-2 ${determineTabClasses(2, openTabIndex)}`} onClick={openTab2}>
-                {isDirectRegistration(course.registrationType) ? t('registrations') : t('applications')}
+                {t(registrationFeatures.tabNameKey)}
               </div>
             )}
 
