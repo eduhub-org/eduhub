@@ -1,5 +1,5 @@
 import { useTranslations } from 'next-intl';
-import { FC, useCallback, useState } from 'react';
+import { FC, useCallback, useMemo, useState } from 'react';
 import { useRoleMutation } from '../../../hooks/authedMutation';
 import { useRoleQuery } from '../../../hooks/authedQuery';
 import { MANAGED_COURSE, UPDATE_COURSE_STATUS } from '../../../queries/course';
@@ -151,6 +151,12 @@ export const ManageCourseContent: FC<Props> = ({ courseId }) => {
     [setConfirmUpgradeStatusOpen, course, updateCourseStatusMutation, qResult, openTabIndex]
   );
 
+  // useMemo must be called before any early returns to comply with Rules of Hooks
+  const registrationFeatures = useMemo(
+    () => getRegistrationFeatures(course?.registrationType),
+    [course?.registrationType]
+  );
+
   if (course == null) {
     return <div>{t('course_not_found', { courseId: courseId })}</div>;
   }
@@ -160,11 +166,6 @@ export const ManageCourseContent: FC<Props> = ({ courseId }) => {
   if (!isAdmin && !isInstructorOfCourse) {
     return <div></div>;
   }
-
-  const registrationFeatures = useMemo(
-    () => getRegistrationFeatures(course.registrationType),
-    [course.registrationType]
-  );
 
   return (
     <>
