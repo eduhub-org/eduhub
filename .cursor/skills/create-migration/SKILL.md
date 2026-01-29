@@ -14,9 +14,17 @@ Use this skill when:
 
 ## Step 1: Generate Migration Timestamp
 
+**GNU/Linux:**
 ```bash
 date +%s%3N
 ```
+
+**macOS/BSD (alternative):**
+```bash
+python3 -c "import time; print(int(time.time() * 1000))"
+```
+
+**Note**: The `date +%s%3N` command works on GNU/Linux systems but not on macOS/BSD due to differences in the `date` command. macOS users should use the Python one-liner instead.
 
 Example output: `1753957404053`
 
@@ -25,12 +33,13 @@ Example output: `1753957404053`
 Create the migration folder with the timestamp:
 
 ```bash
-mkdir -p /home/steffen/git/eduhub/backend/migrations/default/{TIMESTAMP}_{description}
+mkdir -p backend/migrations/default/{timestamp}_{action}_{description}
 ```
 
 Replace:
-- `{TIMESTAMP}` with the generated timestamp
-- `{description}` with a snake_case description (e.g., `add_column_scheduledAt_to_MailLog`)
+- `{timestamp}` with the generated timestamp
+- `{action}` with the action type (e.g., `add_column`, `remove_column`, `create_table`)
+- `{description}` with a snake_case description (e.g., `scheduled_at_to_MailLog`)
 
 ## Step 3: Create up.sql
 
@@ -85,13 +94,9 @@ See the `database-table-creation.md` rule for metadata templates.
 
 ## Step 6: Regenerate TypeScript Types (MANDATORY)
 
-After ANY schema change that affects GraphQL, regenerate types:
+After ANY schema change that affects GraphQL, regenerate types using the `regenerate-types` skill.
 
-```bash
-cd /home/steffen/git/eduhub/frontend-nx && GRAPHQL_URI=http://localhost:8080/v1/graphql yarn nx run edu-hub:apollo 2>&1 | tail -50
-```
-
-**Note**: Hasura must be running at `http://localhost:8080/v1/graphql` for this to work.
+**Note**: Hasura must be running at `http://localhost:8080/v1/graphql` for this to work. See the `regenerate-types` skill for the complete command and troubleshooting steps.
 
 ## Naming Conventions
 

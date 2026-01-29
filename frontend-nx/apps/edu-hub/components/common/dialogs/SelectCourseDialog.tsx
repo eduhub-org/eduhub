@@ -14,6 +14,7 @@ import { order_by } from '../../../__generated__/globalTypes';
 
 import { Button } from '../Button';
 import SelectCourseRow from './SelectCourseRow';
+import { ErrorMessageDialog } from './ErrorMessageDialog';
 
 interface IProps {
   title: string;
@@ -46,17 +47,17 @@ export const SelectCourseDialog: FC<IProps> = ({ onClose, open, title }) => {
     },
     [onClose]
   );
-
   // Create filter condition using multi-word search
+  const shouldSearch = searchValue.trim().length >= 2;
   const filter = useMemo(() => {
-    if (searchValue.trim().length < 2) {
+    if (!shouldSearch) {
       return {};
     }
     return createMultiWordSearchCondition(searchValue.trim(), ['title']);
-  }, [searchValue]);
+  }, [searchValue, shouldSearch]);
 
   // Query courses with dynamic filter
-  const { data, loading } = useAdminQuery<AdminCourseList, AdminCourseListVariables>(
+  const { data, loading, error } = useAdminQuery<AdminCourseList, AdminCourseListVariables>(
     ADMIN_COURSE_LIST,
     {
       variables: {
@@ -65,16 +66,17 @@ export const SelectCourseDialog: FC<IProps> = ({ onClose, open, title }) => {
         where: filter,
         order_by: [{ title: order_by.asc }],
       },
-      skip: !open,
+      skip: !open || !shouldSearch,
     }
   );
 
-  const courses = data?.Course || [];
-  const hasSearched = searchValue.trim().length >= 2;
-  const showNoResults = hasSearched && !loading && courses.length === 0;
+  const courses = shouldSearch ? data?.Course || [] : [];
+  const hasSearched = shouldSearch;
+  const showNoResults = hasSearched && !loading && !error && courses.length === 0;
 
   return (
-    <Dialog open={open} onClose={handleCancel} maxWidth="md" fullWidth>
+    <>
+      <Dialog open={open} onClose={handleCancel} maxWidth="md" fullWidth>
       <DialogTitle>
         <div className="grid grid-cols-2">
           <div>{title}</div>
@@ -98,31 +100,40 @@ export const SelectCourseDialog: FC<IProps> = ({ onClose, open, title }) => {
         </div>
 
         <div className="h-[32rem] overflow-auto border border-gray-200 rounded">
-          {courses.length > 0 && (
-            <>
-              {courses.map((course) => (
-                <SelectCourseRow course={course} key={course.id} onClick={handleConfirm} />
-              ))}
-            </>
-          )}
+          {courses.length > 0 &&
+            courses.map((course) => (
+              <SelectCourseRow course={course} key={course.id} onClick={handleConfirm} />
+            ))}
           {showNoResults && (
-            <div className="p-4 text-center text-gray-500">{t('common.select_course_dialog.no_courses_found')}</div>
-          )}
-          {loading && hasSearched && (
-            <div className="p-4 text-center text-gray-500">{t('common.loading')}</div>
-          )}
-          {searchValue.trim().length < 2 && (
-            <div className="p-4 text-center text-gray-500">{t('common.select_course_dialog.type_course_name_minimum_2_letters')}</div>
-          )}
-        </div>
-
-        <div className="grid grid-cols-2 mt-4">
-          <div>
-            <Button onClick={handleCancel}>{t('common.cancel')}</Button>
+              <div className="p-4 text-center text-gray-500">{t('common.select_course_dialog.no_courses_found')}</div>
+            )}
+            {loading && hasSearched && (
+              <div className="p-4 text-center text-gray-500">{t('common.loading')}</div>
+            )}
+            {searchValue.trim().length < 2 && (
+              <div className="p-4 text-center text-gray-500">{t('common.select_course_dialog.type_course_name_minimum_2_letters')}</div>
+            )}
           </div>
-          <div />
-        </div>
-      </DialogContent>
-    </Dialog>
+
+          <div className="grid grid-cols-2 mt-4">
+            <div>
+              <Button onClick={handleCancel}>{t('common.cancel')}</Button>
+            </div>
+            <div />
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {error && open && (
+        <ErrorMessageDialog
+          errorMessage={error.message || t('common.error')}
+          open={!!error && open}
+          onClose={() => {
+            // Error will persist until query succeeds, but dialog is closed
+            // User can retry by closing and reopening the dialog
+          }}
+        />
+      )}
+    </>
   );
 };

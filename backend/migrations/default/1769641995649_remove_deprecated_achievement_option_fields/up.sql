@@ -9,5 +9,9 @@ UPDATE "public"."AchievementOption"
 SET "recordType" = 'DOCUMENTATION' 
 WHERE "recordType" = 'DOCUMENTATION_AND_CSV';
 
+UPDATE "public"."CertificateTemplateText" 
+SET "recordType" = 'DOCUMENTATION' 
+WHERE "recordType" = 'DOCUMENTATION_AND_CSV';
+
 -- Then delete the enum value
 DELETE FROM "public"."AchievementRecordType" WHERE "value" = 'DOCUMENTATION_AND_CSV';

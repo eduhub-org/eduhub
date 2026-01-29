@@ -183,6 +183,7 @@
       "drag_drop_text": "Datei hier ablegen",
       "click_or_drag": "Klicken zum Hochladen oder Datei hier ablegen",
       "remove": "Entfernen",
+      "remove_course": "Kurs entfernen",
       "replace": "Ersetzen",
       "download": "Herunterladen",
       "file_size": "Dateigröße",
@@ -1271,6 +1272,7 @@
     },
     "add_mentor": "Mentor hinzufügen",
     "add_course": "Kurs hinzufügen",
+    "remove_mentor": "Mentor entfernen",
     "delete_button": {
       "delete_achievement_option_confirmation": "Bist Du sicher, dass Du die Leistungsnachweis-Option '{title}' löschen möchtest?",
       "untitled_achievement_option": "Unbenannte Leistungsnachweis-Option"

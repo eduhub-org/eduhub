@@ -1,5 +1,4 @@
-import { FC, useCallback, useState } from 'react';
-import { MdAddCircle } from 'react-icons/md';
+import { FC, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAdminMutation } from '../../../hooks/authedMutation';
 import { useAdminQuery } from '../../../hooks/authedQuery';
@@ -9,8 +8,6 @@ import {
   DELETE_AN_ACHIEVEMENT_OPTION_MENTOR_BY_PK,
   INSERT_AN_ACHIEVEMENT_OPTION_COURSE,
   DELETE_AN_ACHIEVEMENT_OPTION_COURSE_BY_PK,
-} from '../../../queries/mutateAchievement';
-import {
   UPDATE_ACHIEVEMENT_OPTION_DESCRIPTION,
   UPDATE_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE,
 } from '../../../queries/mutateAchievement';
@@ -21,17 +18,17 @@ import {
   InsertAnAchievementOptionMentorVariables,
 } from '../../../queries/__generated__/InsertAnAchievementOptionMentor';
 import {
-  DeleteAnAchievementOptionMentorByPk,
-  DeleteAnAchievementOptionMentorByPkVariables,
-} from '../../../queries/__generated__/DeleteAnAchievementOptionMentorByPk';
+  DeleteAnAchievementOptionMentor,
+  DeleteAnAchievementOptionMentorVariables,
+} from '../../../queries/__generated__/DeleteAnAchievementOptionMentor';
 import {
   InsertAnAchievementOptionCourse,
   InsertAnAchievementOptionCourseVariables,
 } from '../../../queries/__generated__/InsertAnAchievementOptionCourse';
 import {
-  DeleteAnAchievementOptionCourseByPk,
-  DeleteAnAchievementOptionCourseByPkVariables,
-} from '../../../queries/__generated__/DeleteAnAchievementOptionCourseByPk';
+  DeleteAnAchievementOptionCourse,
+  DeleteAnAchievementOptionCourseVariables,
+} from '../../../queries/__generated__/DeleteAnAchievementOptionCourse';
 import { UserSelectionWithFilter_User } from '../../../queries/__generated__/UserSelectionWithFilter';
 import { AdminCourseList_Course } from '../../../queries/__generated__/AdminCourseList';
 import { SelectUserDialog } from '../../common/dialogs/SelectUserDialog';
@@ -41,6 +38,7 @@ import DropDownSelector from '../../inputs/DropDownSelector';
 import { makeFullName } from '../../../helpers/util';
 import useErrorHandler from '../../../hooks/useErrorHandler';
 import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
+import ManagedItemList from '../../common/ManagedItemList';
 
 interface ExpandableAchievementOptionRowProps {
   achievementOption: AchievementOptionList_AchievementOption;
@@ -71,12 +69,6 @@ const ExpandableAchievementOptionRow: FC<ExpandableAchievementOptionRowProps> = 
     })),
   ];
 
-  // Mentors management state
-  const [mentorDialogOpen, setMentorDialogOpen] = useState(false);
-
-  // Courses management state
-  const [courseDialogOpen, setCourseDialogOpen] = useState(false);
-
   // Mentor mutations
   const [insertMentor] = useAdminMutation<InsertAnAchievementOptionMentor, InsertAnAchievementOptionMentorVariables>(
     INSERT_AN_ACHIEVEMENT_OPTION_MENTOR,
@@ -86,8 +78,8 @@ const ExpandableAchievementOptionRow: FC<ExpandableAchievementOptionRowProps> = 
   );
 
   const [deleteMentor] = useAdminMutation<
-    DeleteAnAchievementOptionMentorByPk,
-    DeleteAnAchievementOptionMentorByPkVariables
+    DeleteAnAchievementOptionMentor,
+    DeleteAnAchievementOptionMentorVariables
   >(DELETE_AN_ACHIEVEMENT_OPTION_MENTOR_BY_PK, {
     refetchQueries: ['AchievementOptionList'],
   });
@@ -101,31 +93,16 @@ const ExpandableAchievementOptionRow: FC<ExpandableAchievementOptionRowProps> = 
   );
 
   const [deleteCourse] = useAdminMutation<
-    DeleteAnAchievementOptionCourseByPk,
-    DeleteAnAchievementOptionCourseByPkVariables
+    DeleteAnAchievementOptionCourse,
+    DeleteAnAchievementOptionCourseVariables
   >(DELETE_AN_ACHIEVEMENT_OPTION_COURSE_BY_PK, {
     refetchQueries: ['AchievementOptionList'],
   });
 
-  // Mentor management functions
-  const openMentorDialog = useCallback(() => {
-    setMentorDialogOpen(true);
-  }, []);
-
-  const closeMentorDialog = useCallback(() => {
-    setMentorDialogOpen(false);
-  }, []);
-
+  // Mentor management handlers
   const addMentorHandler = useCallback(
     async (confirmed: boolean, user: UserSelectionWithFilter_User | null) => {
       if (!confirmed || user == null) {
-        closeMentorDialog();
-        return;
-      }
-
-      // Check if user is already a mentor
-      if (achievementOption.AchievementOptionMentors.some((mentor) => mentor.User.id === user.id)) {
-        closeMentorDialog();
         return;
       }
 
@@ -140,47 +117,30 @@ const ExpandableAchievementOptionRow: FC<ExpandableAchievementOptionRowProps> = 
         });
       } catch (err: any) {
         handleError(err?.message || tCommon('operation_failed'));
-      } finally {
-        closeMentorDialog();
       }
     },
-    [achievementOption, insertMentor, closeMentorDialog, handleError, tCommon]
+    [achievementOption, insertMentor, handleError, tCommon]
   );
 
   const deleteMentorHandler = useCallback(
-    async (mentorId: number) => {
+    async (mentor: typeof achievementOption.AchievementOptionMentors[0]) => {
       try {
         await deleteMentor({
           variables: {
-            id: mentorId,
+            id: mentor.id,
           },
         });
       } catch (err: any) {
         handleError(err?.message || tCommon('operation_failed'));
       }
     },
-    [deleteMentor, handleError, tCommon]
+    [deleteMentor, handleError, tCommon, achievementOption]
   );
 
-  // Course management functions
-  const openCourseDialog = useCallback(() => {
-    setCourseDialogOpen(true);
-  }, []);
-
-  const closeCourseDialog = useCallback(() => {
-    setCourseDialogOpen(false);
-  }, []);
-
+  // Course management handlers
   const addCourseHandler = useCallback(
     async (confirmed: boolean, course: AdminCourseList_Course | null) => {
       if (!confirmed || course == null) {
-        closeCourseDialog();
-        return;
-      }
-
-      // Check if course is already linked
-      if (achievementOption.AchievementOptionCourses.some((aoCourse) => aoCourse.courseId === course.id)) {
-        closeCourseDialog();
         return;
       }
 
@@ -195,29 +155,24 @@ const ExpandableAchievementOptionRow: FC<ExpandableAchievementOptionRowProps> = 
         });
       } catch (err: any) {
         handleError(err?.message || tCommon('operation_failed'));
-      } finally {
-        closeCourseDialog();
       }
     },
-    [achievementOption, insertCourse, closeCourseDialog, handleError, tCommon]
+    [achievementOption, insertCourse, handleError, tCommon]
   );
 
   const deleteCourseHandler = useCallback(
-    async (courseId: number) => {
-      const courseLink = achievementOption.AchievementOptionCourses.find((aoCourse) => aoCourse.courseId === courseId);
-      if (!courseLink) return;
-
+    async (aoCourse: typeof achievementOption.AchievementOptionCourses[0]) => {
       try {
         await deleteCourse({
           variables: {
-            id: courseLink.id,
+            id: aoCourse.id,
           },
         });
       } catch (err: any) {
         handleError(err?.message || tCommon('operation_failed'));
       }
     },
-    [achievementOption, deleteCourse, handleError, tCommon]
+    [deleteCourse, handleError, tCommon, achievementOption]
   );
 
   return (
@@ -271,87 +226,43 @@ const ExpandableAchievementOptionRow: FC<ExpandableAchievementOptionRowProps> = 
           {/* Right Column */}
           <div className="space-y-4 w-full min-w-0">
             {/* Mentors */}
-            <div className="bg-white border border-gray-200 rounded-lg p-4">
-              <h4 className="text-sm font-medium text-gray-700 mb-3">{tCommon('project-mentors')}</h4>
-              <div className="space-y-2">
-                {achievementOption.AchievementOptionMentors.map((mentor) => (
-                  <div key={mentor.id} className="flex items-center justify-between bg-gray-50 p-2 rounded">
-                    <div className="flex-1">
-                      <div className="font-medium">
-                        {makeFullName(mentor.User.firstName, mentor.User.lastName ?? '')}
-                        {mentor.User.email && (
-                          <span className="text-sm text-gray-600 ml-1">({mentor.User.email})</span>
-                        )}
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => deleteMentorHandler(mentor.id)}
-                      className="text-red-500 hover:text-red-700 p-1"
-                    >
-                      ×
-                    </button>
-                  </div>
-                ))}
-                <button
-                  onClick={openMentorDialog}
-                  className="flex items-center space-x-2 text-blue-600 hover:text-blue-800 p-2 w-full rounded hover:bg-blue-50 transition-colors"
-                >
-                  <MdAddCircle className="w-5 h-5" />
-                  <span>{t('add_mentor')}</span>
-                </button>
-              </div>
-            </div>
+            <ManagedItemList
+              title={tCommon('project-mentors')}
+              items={achievementOption.AchievementOptionMentors}
+              renderItem={(mentor) => ({
+                label: makeFullName(mentor.User.firstName, mentor.User.lastName ?? ''),
+                sublabel: mentor.User.email ? `(${mentor.User.email})` : undefined,
+              })}
+              getItemKey={(mentor) => mentor.id}
+              onDelete={deleteMentorHandler}
+              onAdd={addMentorHandler}
+              addButtonLabel={t('add_mentor')}
+              removeAriaLabel={t('remove_mentor')}
+              SelectionDialog={SelectUserDialog}
+              dialogTitle={t('add_mentor')}
+              checkDuplicate={(mentor, user) => mentor.User.id === user.id}
+            />
 
             {/* Courses */}
-            <div className="bg-white border border-gray-200 rounded-lg p-4">
-              <h4 className="text-sm font-medium text-gray-700 mb-3">{tCommon('courses')}</h4>
-              <div className="space-y-2">
-                {achievementOption.AchievementOptionCourses.map((aoCourse) => (
-                  <div key={aoCourse.id} className="flex items-center justify-between bg-gray-50 p-2 rounded">
-                    <div className="flex-1">
-                      <div className="font-medium">{aoCourse.Course.title}</div>
-                      {aoCourse.Course.Program?.shortTitle && (
-                        <div className="text-sm text-gray-600 mt-1">{aoCourse.Course.Program.shortTitle}</div>
-                      )}
-                    </div>
-                    <button
-                      onClick={() => deleteCourseHandler(aoCourse.courseId)}
-                      className="text-red-500 hover:text-red-700 p-1"
-                    >
-                      ×
-                    </button>
-                  </div>
-                ))}
-                <button
-                  onClick={openCourseDialog}
-                  className="flex items-center space-x-2 text-blue-600 hover:text-blue-800 p-2 w-full rounded hover:bg-blue-50 transition-colors"
-                >
-                  <MdAddCircle className="w-5 h-5" />
-                  <span>{t('add_course')}</span>
-                </button>
-              </div>
-            </div>
+            <ManagedItemList
+              title={tCommon('courses')}
+              items={achievementOption.AchievementOptionCourses}
+              renderItem={(aoCourse) => ({
+                label: aoCourse.Course.title,
+                sublabel: aoCourse.Course.Program?.shortTitle,
+              })}
+              getItemKey={(aoCourse) => aoCourse.id}
+              onDelete={deleteCourseHandler}
+              onAdd={addCourseHandler}
+              addButtonLabel={t('add_course')}
+              removeAriaLabel={tCommon('remove_course')}
+              SelectionDialog={SelectCourseDialog}
+              dialogTitle={t('add_course')}
+              checkDuplicate={(aoCourse, course) => aoCourse.courseId === course.id}
+            />
           </div>
         </div>
       </div>
-
-      {/* Mentor Selection Dialog */}
-      {mentorDialogOpen && (
-        <SelectUserDialog
-          onClose={addMentorHandler}
-          open={mentorDialogOpen}
-          title={t('add_mentor')}
-        />
-      )}
-
-      {/* Course Selection Dialog */}
-      {courseDialogOpen && (
-        <SelectCourseDialog
-          onClose={addCourseHandler}
-          open={courseDialogOpen}
-          title={t('add_course')}
-        />
-      )}
 
       {/* Error Message Dialog */}
       {error && <ErrorMessageDialog errorMessage={error} open={!!error} onClose={resetError} />}

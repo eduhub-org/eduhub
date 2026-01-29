@@ -14,13 +14,13 @@ description: Regenerate TypeScript types from GraphQL schema using Apollo codege
 Run from the `frontend-nx` directory with the GraphQL URI:
 
 ```bash
-cd /home/steffen/git/eduhub/frontend-nx && GRAPHQL_URI=http://localhost:8080/v1/graphql yarn nx run edu-hub:apollo 2>&1 | tail -50
+cd frontend-nx && GRAPHQL_URI=http://localhost:8080/v1/graphql yarn nx run edu-hub:apollo
 ```
 
 For rent-a-scientist:
 
 ```bash
-cd /home/steffen/git/eduhub/frontend-nx && GRAPHQL_URI=http://localhost:8080/v1/graphql yarn nx run rent-a-scientist:apollo 2>&1 | tail -50
+cd frontend-nx && GRAPHQL_URI=http://localhost:8080/v1/graphql yarn nx run rent-a-scientist:apollo
 ```
 
 ## When to Run
@@ -43,7 +43,7 @@ docker-compose up hasura
 Clear and regenerate:
 ```bash
 rm -rf frontend-nx/apps/edu-hub/queries/__generated__/*
-cd /home/steffen/git/eduhub/frontend-nx && GRAPHQL_URI=http://localhost:8080/v1/graphql yarn nx run edu-hub:apollo 2>&1 | tail -50
+cd frontend-nx && GRAPHQL_URI=http://localhost:8080/v1/graphql yarn nx run edu-hub:apollo
 ```
 
 ## Generated Files Location
