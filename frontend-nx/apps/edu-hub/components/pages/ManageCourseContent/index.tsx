@@ -161,7 +161,10 @@ export const ManageCourseContent: FC<Props> = ({ courseId }) => {
     return <div></div>;
   }
 
-  const registrationFeatures = getRegistrationFeatures(course.registrationType);
+  const registrationFeatures = useMemo(
+    () => getRegistrationFeatures(course.registrationType),
+    [course.registrationType]
+  );
 
   return (
     <>

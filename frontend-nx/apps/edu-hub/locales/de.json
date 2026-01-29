@@ -984,7 +984,8 @@
       "NONE": "Keine",
       "PENDING": "Ausstehend",
       "COMPLETED": "Bezahlt",
-      "FAILED": "Fehlgeschlagen"
+      "FAILED": "Fehlgeschlagen",
+      "REFUNDED": "Erstattet"
     },
     "name": "Name",
     "first_name": "Vorname",

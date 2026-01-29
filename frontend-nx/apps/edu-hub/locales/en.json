@@ -1000,7 +1000,8 @@
       "NONE": "None",
       "PENDING": "Pending",
       "COMPLETED": "Paid",
-      "FAILED": "Failed"
+      "FAILED": "Failed",
+      "REFUNDED": "Refunded"
     },
     "name": "Name",
     "first_name": "First Name",

@@ -64,7 +64,10 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
   const isAdmin = useIsAdmin();
   const theme = useTheme();
 
-  const features = getRegistrationFeatures(course.registrationType);
+  const features = useMemo(
+    () => getRegistrationFeatures(course.registrationType),
+    [course.registrationType]
+  );
   
   const applicationStats = useMemo(() => {
     const totalApplications = course.CourseEnrollments.length;
