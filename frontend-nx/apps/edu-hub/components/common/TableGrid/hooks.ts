@@ -54,7 +54,7 @@ export function useTableGrid<V>({
   queryHook,
   query,
   queryVariables = {} as V,
-  pageSize = 15,
+  pageSize: initialPageSize = 15,
   debounceMs = 300, // Default to 300ms
   refetchFilter,
   sortColumnMapper,
@@ -62,6 +62,7 @@ export function useTableGrid<V>({
 }: UseTableGridProps<V>) {
   const [searchFilter, setSearchFilter] = useState('');
   const [pageIndex, setPageIndex] = useState(0);
+  const [pageSize, setPageSize] = useState(initialPageSize);
   const [sorting, setSorting] = useState<SortingState>([]);
 
   // Convert sorting state to Hasura order_by format
@@ -119,6 +120,8 @@ export function useTableGrid<V>({
     pageIndex,
     setSearchFilter: handleSetSearchFilter,
     setPageIndex: handleSetPageIndex,
+    pageSize,
+    setPageSize,
     sorting,
     setSorting: handleSetSorting,
   };

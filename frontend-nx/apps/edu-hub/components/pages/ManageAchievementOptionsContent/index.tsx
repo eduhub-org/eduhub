@@ -89,7 +89,7 @@ const ManageAchievementOptionsContent: FC<{
   }, [recordTypesData, props.achievementRecordTypes, t]);
 
   // Use TableGrid hook with server-side pagination, search, and sorting
-  const { data, loading, error, searchFilter, pageIndex, sorting, setSearchFilter, setPageIndex, setSorting } = useTableGrid({
+  const { data, loading, error, searchFilter, pageIndex, pageSize, sorting, setSearchFilter, setPageIndex, setPageSize, setSorting } = useTableGrid({
     queryHook: useAdminQuery,
     query: ACHIEVEMENT_OPTIONS,
     pageSize: QUERY_LIMIT,
@@ -212,9 +212,10 @@ const ManageAchievementOptionsContent: FC<{
     [t, recordTypeOptions]
   );
 
-  const handlePageSizeChange = useCallback(() => {
+  const handlePageSizeChange = useCallback((size: number) => {
     setPageIndex(0);
-  }, [setPageIndex]);
+    setPageSize(size);
+  }, [setPageIndex, setPageSize]);
 
   if (loading && !data) {
     return <CircularProgress />;
@@ -243,7 +244,7 @@ const ManageAchievementOptionsContent: FC<{
         totalCount={totalCount}
         pageIndex={pageIndex}
         onPageChange={setPageIndex}
-        pageSize={QUERY_LIMIT}
+        pageSize={pageSize}
         onPageSizeChange={handlePageSizeChange}
         searchFilter={searchFilter}
         onSearchFilterChange={setSearchFilter}

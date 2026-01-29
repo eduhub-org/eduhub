@@ -64,7 +64,10 @@ CREATE TABLE "public"."TableName" (
   "updated_at" timestamptz NOT NULL DEFAULT now(),
   PRIMARY KEY ("id")
 );
+COMMENT ON TABLE "public"."TableName" IS 'Brief description of the table purpose';
 ```
+
+**Note**: Always include a `COMMENT ON TABLE` statement to document the table's purpose. This helps maintain database documentation and makes the schema more understandable for future developers.
 
 ## Step 4: Create down.sql
 

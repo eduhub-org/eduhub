@@ -9,7 +9,7 @@ interface ManagedItemListProps<T, TSelected> {
   readonly onDelete: (item: T) => Promise<void>;
   readonly onAdd: (confirmed: boolean, selected: TSelected | null) => Promise<void>;
   readonly addButtonLabel: string;
-  readonly removeAriaLabel?: string;
+  readonly removeAriaLabel: string;
   readonly SelectionDialog: FC<{
     open: boolean;
     onClose: (confirmed: boolean, selected: TSelected | null) => void;

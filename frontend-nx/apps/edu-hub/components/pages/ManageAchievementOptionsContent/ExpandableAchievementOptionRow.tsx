@@ -61,13 +61,10 @@ const ExpandableAchievementOptionRow: FC<ExpandableAchievementOptionRowProps> = 
   );
 
   const templates = templatesData?.AchievementDocumentationTemplate || [];
-  const templateOptions = [
-    { value: '', label: tCommon('dropdown_selector.none_option') },
-    ...templates.map((template) => ({
-      value: template.id.toString(),
-      label: template.title,
-    })),
-  ];
+  const templateOptions = templates.map((template) => ({
+    value: template.id.toString(),
+    label: template.title,
+  }));
 
   // Mentor mutations
   const [insertMentor] = useAdminMutation<InsertAnAchievementOptionMentor, InsertAnAchievementOptionMentorVariables>(
@@ -217,7 +214,7 @@ const ExpandableAchievementOptionRow: FC<ExpandableAchievementOptionRowProps> = 
                   updateValueMutation={UPDATE_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE}
                   identifierVariables={{ itemId: achievementOption.id }}
                   refetchQueries={['AchievementOptionList']}
-                  nullable={false}
+                  nullable={true}
                 />
               </div>
             )}

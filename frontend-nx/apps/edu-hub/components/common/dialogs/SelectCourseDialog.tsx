@@ -26,7 +26,7 @@ interface IProps {
 // then select the course from a list
 export const SelectCourseDialog: FC<IProps> = ({ onClose, open, title }) => {
   const [searchValue, setSearchValue] = useState('');
-  const t = useTranslations();
+  const t = useTranslations('common.dialogs');
 
   const handleNewInput = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
@@ -80,18 +80,28 @@ export const SelectCourseDialog: FC<IProps> = ({ onClose, open, title }) => {
       <DialogTitle>
         <div className="grid grid-cols-2">
           <div>{title}</div>
-          <div className="cursor-pointer flex justify-end">
-            <MdClose onClick={handleCancel} />
-          </div>
+          <button
+            className="cursor-pointer flex justify-end"
+            onClick={handleCancel}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                handleCancel();
+              }
+            }}
+            aria-label={t('close')}
+          >
+            <MdClose />
+          </button>
         </div>
       </DialogTitle>
 
       <DialogContent>
-        <div className="mb-4">{t('common.select_course_dialog.type_course_name_minimum_2_letters')}</div>
+        <div className="mb-4">{t('select_course_dialog.type_course_name_minimum_2_letters')}</div>
 
         <div className="mb-4">
           <input
-            placeholder={t('common.search')}
+            placeholder={t('search')}
             className="w-full border border-solid border-gray-300 rounded px-3 py-2"
             type="text"
             value={searchValue}
@@ -105,19 +115,19 @@ export const SelectCourseDialog: FC<IProps> = ({ onClose, open, title }) => {
               <SelectCourseRow course={course} key={course.id} onClick={handleConfirm} />
             ))}
           {showNoResults && (
-              <div className="p-4 text-center text-gray-500">{t('common.select_course_dialog.no_courses_found')}</div>
+              <div className="p-4 text-center text-gray-500">{t('select_course_dialog.no_courses_found')}</div>
             )}
             {loading && hasSearched && (
-              <div className="p-4 text-center text-gray-500">{t('common.loading')}</div>
+              <div className="p-4 text-center text-gray-500">{t('loading')}</div>
             )}
             {searchValue.trim().length < 2 && (
-              <div className="p-4 text-center text-gray-500">{t('common.select_course_dialog.type_course_name_minimum_2_letters')}</div>
+              <div className="p-4 text-center text-gray-500">{t('select_course_dialog.type_course_name_minimum_2_letters')}</div>
             )}
           </div>
 
           <div className="grid grid-cols-2 mt-4">
             <div>
-              <Button onClick={handleCancel}>{t('common.cancel')}</Button>
+              <Button onClick={handleCancel}>{t('cancel')}</Button>
             </div>
             <div />
           </div>
@@ -126,12 +136,9 @@ export const SelectCourseDialog: FC<IProps> = ({ onClose, open, title }) => {
 
       {error && open && (
         <ErrorMessageDialog
-          errorMessage={error.message || t('common.error')}
+          errorMessage={error.message || t('error')}
           open={!!error && open}
-          onClose={() => {
-            // Error will persist until query succeeds, but dialog is closed
-            // User can retry by closing and reopening the dialog
-          }}
+          onClose={handleCancel}
         />
       )}
     </>

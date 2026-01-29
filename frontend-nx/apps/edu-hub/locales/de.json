@@ -129,6 +129,21 @@
       "no_users_found": "Keine Benutzer gefunden",
       "add_new_user": "Neuen Benutzer hinzufügen"
     },
+    "select_course_dialog": {
+      "type_course_name_minimum_2_letters": "Gib einen Kursnamen ein (mindestens 2 Buchstaben).",
+      "no_courses_found": "Keine Kurse gefunden"
+    },
+    "dialogs": {
+      "select_course_dialog": {
+        "type_course_name_minimum_2_letters": "Gib einen Kursnamen ein (mindestens 2 Buchstaben).",
+        "no_courses_found": "Keine Kurse gefunden"
+      },
+      "search": "Suche",
+      "loading": "Lädt...",
+      "cancel": "Abbrechen",
+      "error": "Fehler",
+      "close": "Schließen"
+    },
     "deletion_confirmation_question": "Bist du sicher, dass du diesen Eintrag löschen möchtest?",
     "confirm_delete": "Löschen bestätigen",
     "error": "Fehler",
@@ -665,7 +680,9 @@
     "upload-proof": "Leistungsnachweis hochladen",
     "form-info-cover-image-size": "Optimal ist eine Größe von {width} x {height} Pixel.",
     "form-info-documentations": "<component>Benutze diese Vorlage zum Hochladen der Dokumentation!</component>",
-    "uploadDocumentationTemplate": "Dokumentationsvorlage hochladen"
+    "uploadDocumentationTemplate": "Dokumentationsvorlage hochladen",
+    "error_loading_record_types": "Fehler beim Laden der Leistungsnachweis-Typen. Bitte versuche es später erneut.",
+    "no_record_types_available": "Keine Leistungsnachweis-Typen verfügbar."
   },
   "statistics": {
     "statistics": "Statistiken",
