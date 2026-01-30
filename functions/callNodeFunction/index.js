@@ -13,6 +13,7 @@ import makeCertificatePublic from "./makeCertificatePublic/index.js";
 import createUser from "./createUser/index.js";
 import getFormbricksResponses from "./getFormbricksResponses/index.js";
 import createStripeCheckout from "./createStripeCheckout/index.js";
+import createStripeBasePrice from "./createStripeBasePrice/index.js";
 
 /**
  * Creates a logger instance with structured logging.
@@ -46,7 +47,8 @@ const functionMap = {
   makeCertificatePublic,
   createUser,
   getFormbricksResponses,
-  createStripeCheckout
+  createStripeCheckout,
+  createStripeBasePrice
 };
 
 /**

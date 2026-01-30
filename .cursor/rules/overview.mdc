@@ -45,11 +45,11 @@ yarn nx run edu-hub:lint # Lint edu-hub app
 
 # Backend development
 cd backend
-docker-compose up        # Start Hasura and PostgreSQL
+docker compose up        # Start Hasura and PostgreSQL
 hasura console           # Open Hasura console
 
 # Full stack
-docker-compose up        # Start all services
+docker compose up        # Start all services
 ```
 
 ### Component Architecture Principles

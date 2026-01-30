@@ -7,7 +7,7 @@ description: Regenerate TypeScript types from GraphQL schema using Apollo codege
 ## Prerequisites
 
 - Hasura must be running and accessible at `http://localhost:8080/v1/graphql`
-- Start with: `docker-compose up hasura` (from project root)
+- Start with: `docker compose up hasura` (from project root)
 
 ## Quick Command
 
@@ -36,7 +36,7 @@ Run codegen after:
 ### "Connection refused" or similar network errors
 Ensure Hasura is running:
 ```bash
-docker-compose up hasura
+docker compose up hasura
 ```
 
 ### Types not updating

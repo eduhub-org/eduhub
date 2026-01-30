@@ -8,7 +8,7 @@ description: Start EduHub development environment with Docker. Use when the user
 
 ```bash
 # From project root
-docker-compose up
+docker compose up
 ```
 
 This starts all services:
@@ -20,13 +20,13 @@ This starts all services:
 
 ```bash
 # Start specific services
-docker-compose up frontend-nx hasura
+docker compose up frontend-nx hasura
 
 # Start in background
-docker-compose up -d
+docker compose up -d
 
 # View logs for specific service
-docker-compose logs -f frontend-nx
+docker compose logs -f frontend-nx
 ```
 
 ## Service Overview
@@ -44,18 +44,18 @@ docker-compose logs -f frontend-nx
 
 ### Rebuild containers
 ```bash
-docker-compose up --build
+docker compose up --build
 ```
 
 ### Reset database
 ```bash
-docker-compose down -v
-docker-compose up
+docker compose down -v
+docker compose up
 ```
 
 ### Stop all services
 ```bash
-docker-compose down
+docker compose down
 ```
 
 ## Hasura Console

@@ -55,6 +55,7 @@ services:
       HASURA_CLOUD_FUNCTION_SECRET: test1234
       LIBRARY_PATH: "../lib/cloud-storage.js"
       FORMBRICKS_API_KEY: ${FORMBRICKS_API_KEY:-}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
       FRONTEND_URL: http://localhost:5000
 
   python_functions:
