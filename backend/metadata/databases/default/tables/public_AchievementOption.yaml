@@ -76,12 +76,10 @@ select_permissions:
       columns:
         - achievementDocumentationTemplateId
         - created_at
-        - csvTemplateUrl
         - description
         - evaluationScriptUrl
         - id
         - recordType
-        - showScoreAuthors
         - title
         - updated_at
       filter: {}
