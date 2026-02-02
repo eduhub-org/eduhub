@@ -207,7 +207,7 @@ const TagSelector: React.FC<TagSelectorProps> = ({
   }, [variant, tags, isMandatory, debouncedUpdateTags, handleError, resetError, t]);
 
   const baseClass = `w-full px-3 py-3 mb-8 rounded ${
-    invertColors ? 'bg-gray-200 text-black' : 'text-gray-500 bg-edu-light-gray'
+    invertColors ? 'bg-gray-200 text-black' : 'text-label-primary bg-fill-primary'
   }`;
   const finalClassName = prioritizeClasses(`${baseClass} ${className}`);
 
@@ -257,7 +257,7 @@ const TagSelector: React.FC<TagSelectorProps> = ({
 
   const renderEduHub = () => (
     <div className="px-2 w-full">
-      <div className="text-gray-400">
+      <div className="text-label-primary">
         <div className="flex justify-between mb-2">
           <div className="flex items-center">
             {helpText && (
@@ -268,7 +268,8 @@ const TagSelector: React.FC<TagSelectorProps> = ({
             {label}
           </div>
         </div>
-        <Autocomplete
+        <div className="light">
+          <Autocomplete
           multiple
           id="tags-eduhub"
           options={options}
@@ -285,6 +286,7 @@ const TagSelector: React.FC<TagSelectorProps> = ({
           fullWidth
         />
         {hasBlurred && errorMessage && <p className="text-red-500 mt-2 text-sm">{errorMessage}</p>}
+        </div>
       </div>
     </div>
   );

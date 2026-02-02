@@ -185,7 +185,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
     ]
   );
 
-  const baseClass = 'w-full px-3 py-3 mb-8 text-gray-500 rounded bg-edu-light-gray';
+  const baseClass = 'w-full px-3 py-3 mb-8 text-label-primary rounded bg-fill-primary';
   const finalClassName = prioritizeClasses(`${baseClass} ${className}`);
 
   const handleIconClick = useCallback(() => {
@@ -341,7 +341,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
 
   const renderEduhub = () => (
     <div className="px-2">
-      <div className="text-gray-400">
+      <div className="text-label-primary">
         <div className="flex justify-between mb-2">
           <div className="flex items-center">
             {element !== 'profilePicture' && helpText && (
@@ -352,7 +352,9 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
             {element !== 'profilePicture' && label}
           </div>
         </div>
-        {element === 'profilePicture' ? renderProfilePicture() : renderDefault()}
+        <div className="light">
+          {element === 'profilePicture' ? renderProfilePicture() : renderDefault()}
+        </div>
       </div>
     </div>
   );

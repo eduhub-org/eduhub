@@ -124,7 +124,7 @@ export const InfoPanel: FC<IProps> = ({ course }) => {
       elements.push(
         <div key="session-date" className="flex flex-col items-center">
           <div className="flex justify-center items-center mb-2">
-            <MdCalendarMonth className="text-gray-700" size={28} />
+            <MdCalendarMonth className="text-label-primary" size={28} />
           </div>
           <span className="text-sm mt-2 text-center">{sessionDisplay}</span>
         </div>
@@ -146,14 +146,14 @@ export const InfoPanel: FC<IProps> = ({ course }) => {
       elements.push(
         <div key="price" className="flex flex-col items-center">
           <div className="flex justify-center items-center mb-2">
-            <MdAttachMoney className="text-gray-700" size={24} />
+            <MdAttachMoney className="text-label-primary" size={24} />
           </div>
           <div className="text-sm text-center">
             {hasPrice ? (
               <div className="flex flex-col items-center gap-1">
                 <span>{formatPrice(basePrice, currency)}</span>
                 {hasAddons && (
-                  <span className="text-gray-600 text-xs">
+                  <span className="text-label-secondary text-xs">
                     + {tCoursePage('add_ons')}
                   </span>
                 )}
@@ -216,7 +216,7 @@ export const InfoPanel: FC<IProps> = ({ course }) => {
   ]);
 
   return (
-    <div className="flex flex-1 flex-col justify-center items-center mx-6 lg:mx-0 mb-9 rounded-2xl lg:max-w-md bg-gray-100 p-12 sm:p-24">
+    <div className="flex flex-1 flex-col justify-center items-center mx-6 lg:mx-0 mb-9 rounded-2xl lg:max-w-md bg-fill-primary text-label-primary light p-12 sm:p-24">
       {/* All info elements in a 2-column grid */}
       {infoElements.length > 0 && (
         <div className="grid grid-cols-2 gap-x-28 gap-y-8 w-full mb-8">

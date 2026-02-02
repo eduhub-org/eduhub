@@ -28,7 +28,7 @@ export const CurrentDegreeCourses: FC<{
             {currentDegreeCourses.map((degreeCourse) => (
               <li className="dot-before" key={degreeCourse?.Course?.id}>
                 <NextLink href={`/course/${degreeCourse?.Course?.id}`} passHref>
-                  <MuiLink style={{ color: '#9CA3AF' }}>{degreeCourse?.Course?.title}</MuiLink>
+                  <MuiLink className="text-label-secondary">{degreeCourse?.Course?.title}</MuiLink>
                 </NextLink>
               </li>
             ))}
@@ -57,7 +57,7 @@ export const CompletedDegreeCourses: FC<{ degreeCourseId: number }> = ({ degreeC
   const ectsTranslations = t.raw('ects') as Record<string, string>;
 
   return (
-    <div className=" text-edu-black bg-white px-8 py-8">
+    <div className="text-label-primary bg-fill-primary light px-8 py-8">
       <div className="flex flex-col">
         <span className="text-3xl font-semibold mb-4">{t('degree_elements.completed_degree_elements')}</span>
         {completedDegreeEnrollments.length > 0 ? (
@@ -65,7 +65,7 @@ export const CompletedDegreeCourses: FC<{ degreeCourseId: number }> = ({ degreeC
             {completedDegreeEnrollments.map((degreeEnrollment) => (
               <li key={degreeEnrollment?.Course?.id}>
                 <NextLink href={`/course/${degreeEnrollment?.Course?.id}`} passHref>
-                  <MuiLink style={{ color: '#9CA3AF' }}>
+                  <MuiLink className="text-label-secondary">
                     {degreeEnrollment?.Course?.title} -{' '}
                     {degreeEnrollment?.Course?.Program?.shortTitle !== 'EVENTS'
                       ? ` ${t(degreeEnrollment?.Course?.Program?.title)} (${ectsTranslations[degreeEnrollment?.Course?.ects] || degreeEnrollment?.Course?.ects} ECTS)`

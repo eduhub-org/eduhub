@@ -67,6 +67,35 @@ The MUI theme is configured to use brand colors. Use theme-aware props:
 2. Add Tailwind reference in `tailwind.config.js`
 3. If needed for MUI, update `config/theme.ts`
 
+## Light Theme Sections
+
+For components with light backgrounds in the current dark theme, wrap them with the `light` class:
+
+```tsx
+// Before - hardcoded colors, poor contrast
+<div className="bg-edu-light-gray">
+  <input className="text-gray-500" />
+</div>
+
+// After - semantic colors with .light class
+<div className="light bg-fill-primary">
+  <input className="text-label-primary" />
+</div>
+```
+
+The `light` class inverts the semantic color variables so:
+- `text-label-primary` becomes dark text (#222222) instead of light (#F2F2F2)
+- `bg-fill-primary` becomes white (#ffffff) instead of dark (#222222)
+- All semantic classes work correctly for light backgrounds
+
+**When to use `.light` class:**
+- Form inputs with light backgrounds (`bg-edu-light-gray`, `bg-white`)
+- Modal/dialog content (already applied to `DialogShell` and `Modal`)
+- Statistics cards and content cards with white backgrounds
+- Any component where text appears on a light background
+
+**Future:** When implementing global light mode, move `.light` class to `<body>` and the entire app will use light theme colors.
+
 ## Legacy Color Migration
 
 Old `edu-*` classes are aliased to CSS variables for backward compatibility:

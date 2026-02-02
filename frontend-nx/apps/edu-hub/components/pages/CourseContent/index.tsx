@@ -199,7 +199,7 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                 isCourseWithEnrollment && // needed to assure the type of the course object
                 courseEnrollment?.status === CourseEnrollmentStatus_enum.CONFIRMED &&
                 (course.achievementCertificatePossible || course.attendanceCertificatePossible) && (
-                  <ContentRow className="my-24 text-edu-black bg-white px-8 py-8">
+                  <ContentRow className="my-24 text-label-primary bg-fill-primary light px-8 py-8">
                     {!isDegreeCourse && (
                       <>
                         <div className="flex flex-col md:flex-row gap-12 md:gap-24 w-full">

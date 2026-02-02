@@ -48,17 +48,28 @@
   --eduhub-status-missed: #F2991D66;
 }
 
-/* Future: Light mode override
+/* Light theme - for light background sections (current) or full light mode (future) */
 .light {
+  /* Fill Colors (light aesthetic) */
   --eduhub-fill-primary: #ffffff;
   --eduhub-fill-secondary: #222222;
+  --eduhub-fill-disabled: #E5E5E5;
+  
+  /* Label Colors (dark text on light backgrounds) */
   --eduhub-label-primary: #222222;
   --eduhub-label-secondary: #666666;
+  --eduhub-label-disabled: #999999;
+  
+  /* Border Colors */
+  --eduhub-border-primary: #D8D8D8;
+  --eduhub-border-secondary: #222222;
+  
+  /* Background Colors (light aesthetic) */
   --eduhub-bg-primary: #ffffff;
   --eduhub-bg-secondary: #F2F2F2;
-  ...
+  --eduhub-bg-modal: #ffffff;
+  --eduhub-bg-card: #ffffff;
 }
-*/
 
 .check-list {
   background: url(/images/course/checkmark.svg) no-repeat 0 0.5rem;

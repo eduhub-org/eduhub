@@ -141,16 +141,16 @@ const ExpandableEmailTemplateRow: React.FC<{ row: EmailTemplateRow }> = ({ row }
   };
 
   return (
-    <div className="font-medium bg-edu-course-list p-4 space-y-6">
+    <div className="font-medium bg-fill-primary text-label-primary light p-4 space-y-6">
       {/* Trigger description */}
       <div>
-        <h4 className="text-lg font-semibold mb-2 text-gray-800">{t('expandable.trigger_description')}</h4>
-        <p className="text-gray-600 bg-gray-100 p-3 rounded">{triggerDescription}</p>
+        <h4 className="text-lg font-semibold mb-2 text-label-primary">{t('expandable.trigger_description')}</h4>
+        <p className="text-label-secondary bg-bg-secondary p-3 rounded">{triggerDescription}</p>
       </div>
 
       {/* Body content editor */}
       <div>
-        <h4 className="text-lg font-semibold mb-2 text-gray-800">{t('expandable.body_content')}</h4>
+        <h4 className="text-lg font-semibold mb-2 text-label-primary">{t('expandable.body_content')}</h4>
         <EmailEditor
           itemId={row.id}
           value={row.content || ''}
@@ -166,7 +166,7 @@ const ExpandableEmailTemplateRow: React.FC<{ row: EmailTemplateRow }> = ({ row }
       {/* Preview section */}
       <div>
         <div className="flex items-center gap-4 mb-2">
-          <h4 className="text-lg font-semibold text-gray-800">{t('expandable.preview')}</h4>
+          <h4 className="text-lg font-semibold text-label-primary">{t('expandable.preview')}</h4>
           <Button
             onClick={handlePreview}
             disabled={previewLoading}
@@ -178,7 +178,7 @@ const ExpandableEmailTemplateRow: React.FC<{ row: EmailTemplateRow }> = ({ row }
         </div>
 
         {showPreview && (
-          <div className="bg-white border border-gray-300 p-4 rounded max-h-96 overflow-y-auto">
+          <div className="bg-fill-primary border border-border-primary p-4 rounded max-h-96 overflow-y-auto">
             <div dangerouslySetInnerHTML={{ __html: preview }} />
           </div>
         )}

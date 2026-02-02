@@ -94,7 +94,7 @@ const ExpandableOrganizationRow: React.FC<ExpandableRowProps> = ({ row, onError 
     : [];
 
   return (
-    <div className="font-medium bg-edu-course-list p-4">
+    <div className="font-medium bg-fill-primary text-label-primary light p-4">
       <CreatableTagSelector
         variant="material"
         label={t('organization.aliases')}

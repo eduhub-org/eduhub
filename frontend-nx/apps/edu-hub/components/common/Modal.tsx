@@ -30,7 +30,7 @@ const Modal: FC<IProps> = ({ isOpen, onClose, title, children, maxWidth, dialogP
           <MdClose onClick={onCloseHandler} className="cursor-pointer" aria-label="Close" />
         </div>
       </DialogTitle>
-      <DialogContent>{children}</DialogContent>
+      <DialogContent className="light">{children}</DialogContent>
     </Dialog>
   );
 };

@@ -39,10 +39,17 @@ export const Button: FC<ButtonProps> = ({
   ...rest
 }) => {
   // Basis-Styling
-  const baseStyles = 'rounded-full py-2 px-4 border-2 border-black hover:border-indigo-300 select-none';
+  const baseStyles = 'rounded-full py-2 px-4 border-2 border-border-secondary hover:border-brand select-none transition-colors';
 
   // Bedingte Styling-Klassen
-  const colorStyles = filled ? (inverted ? 'text-edu-black bg-white' : 'bg-edu-black text-white') : 'text-edu-black';
+  let colorStyles = 'text-label-primary border-border-secondary hover:border-brand';
+  if (filled) {
+    if (inverted) {
+      colorStyles = 'text-label-primary bg-fill-secondary border-border-secondary hover:border-brand';
+    } else {
+      colorStyles = 'bg-label-primary text-fill-primary border-label-primary hover:border-brand-light';
+    }
+  }
 
   const disabledStyles = 'disabled:bg-gray-400 disabled:text-zinc-500';
 

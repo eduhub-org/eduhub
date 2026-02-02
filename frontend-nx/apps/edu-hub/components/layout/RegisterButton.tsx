@@ -20,8 +20,10 @@ export const RegisterButton: FC = () => {
   }, [router]);
 
   return (
-    <Button onClick={register} filled inverted>
-      {t('registerButton')}
-    </Button>
+    <div className="light">
+      <Button onClick={register} className="!border bg-fill-primary text-label-primary border-border-secondary hover:border-brand">
+        {t('registerButton')}
+      </Button>
+    </div>
   );
 };

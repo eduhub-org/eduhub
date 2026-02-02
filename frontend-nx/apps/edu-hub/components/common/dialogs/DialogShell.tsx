@@ -56,6 +56,7 @@ export const DialogShell: React.FC<DialogShellProps> = ({
       </DialogTitle>
 
       <DialogContent
+        className="light"
         sx={{
           overflowY: 'auto',
           flex: '1 1 auto',

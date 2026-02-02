@@ -372,16 +372,16 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
   // Entity render functions for EntityListManager
   const renderInstructor = useCallback(
     (instructor: any, onDelete: (id: string) => void) => (
-      <div className="flex items-center justify-between bg-gray-50 p-2 rounded">
+      <div className="flex items-center justify-between bg-bg-secondary p-2 rounded">
         <div className="flex-1">
-          <div className="font-medium">
+          <div className="font-medium text-label-primary">
             {makeFullName(instructor.User.firstName, instructor.User.lastName ?? '')}
             {instructor.User.email && (
-              <span className="text-sm text-gray-600 ml-1">({instructor.User.email})</span>
+              <span className="text-sm text-label-secondary ml-1">({instructor.User.email})</span>
             )}
           </div>
         </div>
-        <button onClick={() => onDelete(instructor.User.id)} className="text-red-500 hover:text-red-700 p-1">
+        <button onClick={() => onDelete(instructor.User.id)} className="text-error hover:text-error p-1">
           ×
         </button>
       </div>
@@ -391,17 +391,17 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
 
   const renderFundingOrganization = useCallback(
     (fundingOrg: any, onDelete: (id: number) => void) => (
-      <div className="flex items-center justify-between bg-gray-50 p-2 rounded">
+      <div className="flex items-center justify-between bg-bg-secondary p-2 rounded">
         <div className="flex-1">
-          <div className="font-medium">
+          <div className="font-medium text-label-primary">
             {fundingOrg.Organization.name}
             {fundingOrg.Organization.description && (
-              <div className="text-sm text-gray-600 mt-1">{fundingOrg.Organization.description}</div>
+              <div className="text-sm text-label-secondary mt-1">{fundingOrg.Organization.description}</div>
             )}
-            <div className="text-xs text-gray-500 mt-1">{fundingOrg.Organization.type}</div>
+            <div className="text-xs text-label-secondary mt-1">{fundingOrg.Organization.type}</div>
           </div>
         </div>
-        <button onClick={() => onDelete(fundingOrg.Organization.id)} className="text-red-500 hover:text-red-700 p-1">
+        <button onClick={() => onDelete(fundingOrg.Organization.id)} className="text-error hover:text-error p-1">
           ×
         </button>
       </div>
@@ -635,13 +635,13 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
   }));
 
   return (
-    <div className="w-full flex-1 min-w-0">
-      <div className="bg-edu-course-list p-6 w-full">
+    <div className="w-full flex-1 min-w-0 light">
+      <div className="bg-bg-secondary p-6 w-full">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
           {/* Left Column */}
           <div className="space-y-4 w-full min-w-0">
             {/* 1. Registration Settings - Card Container */}
-            <div className="bg-white border border-gray-200 rounded-lg p-4 space-y-4">
+            <div className="bg-fill-primary border border-border-primary rounded-lg p-4 space-y-4">
               <DropDownSelector
                 variant="material"
                 label={t('manageCourses.registration_type.label')}
@@ -672,7 +672,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
               {(course.registrationType === CourseRegistrationType_enum.APPROVAL_WITH_INPUT ||
                 course.registrationType === CourseRegistrationType_enum.DIRECT_WITH_INPUT ||
                 course.registrationType === 'DIRECT_WITH_INPUT_AND_PAYMENT') && (
-                <div className="mt-4 pt-4 border-t border-gray-200">
+                <div className="mt-4 pt-4 border-t border-border-primary">
                   <div className="mb-4">
                     <span>{t('manageCourse.formbricks.title')}</span>
                     <br />
@@ -702,7 +702,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
 
               {/* Payment Configuration - Show for courses that require payment */}
               {requiresPayment && (
-                <div className="mt-4 pt-4 border-t border-gray-200">
+                <div className="mt-4 pt-4 border-t border-border-primary">
                   <div className="space-y-4">
                     <div>
                       <span className="font-medium">{t('manageCourse.pricing.title')}</span>
@@ -748,7 +748,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                         >
                           {isValidatingSurvey ? t('manageCourse.pricing.validating') : t('manageCourse.pricing.validate_addons')}
                         </Button>
-                        <p className="text-sm text-gray-600 mt-2">
+                        <p className="text-sm text-label-secondary mt-2">
                           {t('manageCourse.pricing.validate_help')}
                         </p>
                       </div>
@@ -759,7 +759,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
             </div>
 
             {/* 2. Course Organization - Card Container */}
-            <div className="bg-white border border-gray-200 rounded-lg p-4 space-y-4">
+            <div className="bg-fill-primary border border-border-primary rounded-lg p-4 space-y-4">
               <TagSelector
                 variant="material"
                 label={t('manageCourses.course_degree_title.label')}
@@ -786,8 +786,8 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
             </div>
 
             {/* 3. Cover Image Upload - Card Container */}
-            <div className="bg-white border border-gray-200 rounded-lg p-4">
-              <h4 className="text-sm font-medium text-gray-700 mb-3">{t('manageCourses.cover_image.label')}</h4>
+            <div className="bg-fill-primary border border-border-primary rounded-lg p-4">
+              <h4 className="text-sm font-medium text-label-primary mb-3">{t('manageCourses.cover_image.label')}</h4>
               <FileUploadField
                 variant="material"
                 currentFileUrl={course?.coverImage}
@@ -817,7 +817,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
             </div>
 
             {/* 4. Communication Settings - Card Container */}
-            <div className="bg-white border border-gray-200 rounded-lg p-4 space-y-4">
+            <div className="bg-fill-primary border border-border-primary rounded-lg p-4 space-y-4">
               <InputField
                 variant="material"
                 type="link"
@@ -831,7 +831,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
               />
 
               <div>
-                <h4 className="text-sm font-medium text-gray-700 mb-2">
+                <h4 className="text-sm font-medium text-label-primary mb-2">
                   {t('manageCourses.email_templates.label')}
                 </h4>
                 <button
@@ -839,7 +839,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                   disabled={isExternalRegistration}
                   className={`flex items-center space-x-2 px-4 py-2 rounded ${
                     isExternalRegistration
-                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      ? 'bg-fill-disabled text-label-disabled cursor-not-allowed'
                       : 'bg-blue-600 text-white hover:bg-blue-700'
                   } transition-colors`}
                 >
@@ -851,7 +851,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                   </span>
                 </button>
                 {isExternalRegistration && (
-                  <p className="text-sm text-gray-500 mt-1">
+                  <p className="text-sm text-label-secondary mt-1">
                     {t('manageCourses.email_templates.external_registration_note')}
                   </p>
                 )}
@@ -878,14 +878,14 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                     
                     {/* Hint for managing addons */}
                     {addonMappings && addonMappings.length > 0 && (
-                      <p className="text-xs text-gray-500 mt-2 italic px-4">
+                      <p className="text-xs text-label-secondary mt-2 italic px-4">
                         {t('manageCourse.addons.manage_hint')}
                       </p>
                     )}
                   </>
                 ) : (
-                  <div className="bg-white border border-gray-200 rounded-lg p-4">
-                    <p className="text-sm text-gray-500 italic">
+                  <div className="bg-fill-primary border border-border-primary rounded-lg p-4">
+                    <p className="text-sm text-label-secondary italic">
                       {t('manageCourse.pricing.no_pricing_configured')}
                     </p>
                   </div>
@@ -894,8 +894,8 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
             )}
 
             {/* 2. List of Instructors - Card Container */}
-            <div className="bg-white border border-gray-200 rounded-lg p-4">
-              <h4 className="text-sm font-medium text-gray-700 mb-3">{t('manageCourses.instructors.label')}</h4>
+            <div className="bg-fill-primary border border-border-primary rounded-lg p-4">
+              <h4 className="text-sm font-medium text-label-primary mb-3">{t('manageCourses.instructors.label')}</h4>
               <div className="space-y-2">
                 {course.CourseInstructors.map((courseInstructor) => (
                   <Fragment key={courseInstructor.User.id}>
@@ -913,7 +913,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
             </div>
 
             {/* 3. Funding Organizations - Card Container */}
-            <div className="bg-white border border-gray-200 rounded-lg p-4 w-full">
+            <div className="bg-fill-primary border border-border-primary rounded-lg p-4 w-full">
               <EntityListManager
                 variant="material"
                 label={t('manageCourses.funding_organizations.label')}
@@ -944,8 +944,8 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
             </div>
 
             {/* 3. Types of Available Certificates - Card Container */}
-            <div className="bg-white border border-gray-200 rounded-lg p-4">
-              <h4 className="text-sm font-medium text-gray-700 mb-3">{t('manageCourses.possible_certificates.label')}</h4>
+            <div className="bg-fill-primary border border-border-primary rounded-lg p-4">
+              <h4 className="text-sm font-medium text-label-primary mb-3">{t('manageCourses.possible_certificates.label')}</h4>
               <div className="space-y-2">
                 <div className="flex items-center space-x-2">
                   <button
@@ -963,7 +963,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                     {course.attendanceCertificatePossible ? (
                       <MdCheckBox className="w-6 h-6 text-blue-600" />
                     ) : (
-                      <MdOutlineCheckBoxOutlineBlank className="w-6 h-6 text-gray-400" />
+                      <MdOutlineCheckBoxOutlineBlank className="w-6 h-6 text-label-disabled" />
                     )}
                   </button>
                   <span>{t('manageCourses.possible_certificates.attendance_certificate')}</span>
@@ -984,7 +984,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                     {course.achievementCertificatePossible ? (
                       <MdCheckBox className="w-6 h-6 text-blue-600" />
                     ) : (
-                      <MdOutlineCheckBoxOutlineBlank className="w-6 h-6 text-gray-400" />
+                      <MdOutlineCheckBoxOutlineBlank className="w-6 h-6 text-label-disabled" />
                     )}
                   </button>
                   <span>{t('manageCourses.possible_certificates.achievement_certificate')}</span>
@@ -1008,7 +1008,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
             </div>
 
             {/* 5. Course Requirements - Card Container */}
-            <div className="bg-white border border-gray-200 rounded-lg p-4 space-y-4">
+            <div className="bg-fill-primary border border-border-primary rounded-lg p-4 space-y-4">
               {/* Maximum Number of Allowed Missing Sessions */}
               <InputField
                 variant="material"
@@ -1025,7 +1025,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
             </div>
 
             {/* 6. Learning Goals - Card Container */}
-            <div className="bg-white border border-gray-200 rounded-lg p-4 [&_.text-gray-400]:text-gray-700">
+            <div className="bg-fill-primary border border-border-primary rounded-lg p-4 [&_.text-label-disabled]:text-label-primary">
               <InputField
                 variant="eduhub"
                 type="textarea"
@@ -1037,7 +1037,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                 placeholder={t('manageCourses.learning_goals.placeholder')}
                 helpText={t('manageCourses.learning_goals.help_text')}
                 maxLength={500}
-                className="h-32 !text-gray-700"
+                className="h-32 !text-label-primary"
               />
             </div>
 

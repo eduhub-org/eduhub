@@ -19,27 +19,27 @@ const ExpandableUserRow: FC<{ row: UsersByLastName_User }> = ({ row }) => {
   const t = useTranslations('manageUsers');
   return (
     <div>
-      <div className="font-medium bg-edu-course-list grid grid-cols-[repeat(auto-fill,minmax(100px,1fr))]">
+      <div className="font-medium bg-fill-primary text-label-primary light grid grid-cols-[repeat(auto-fill,minmax(100px,1fr))]">
         <div className="pl-3 col-span-3">
-          <p className="text-gray-700 truncate font-medium">{`${t('occupation')}: ${
+          <p className="text-label-primary truncate font-medium">{`${t('occupation')}: ${
             row.occupation ? t(`profile:occupation.${row.occupation}`) : '-'
           }`}</p>
         </div>
         <div className="pl-3 col-span-3">
-          <p className="text-gray-700 truncate font-medium">{`${t('organization')}: ${
+          <p className="text-label-primary truncate font-medium">{`${t('organization')}: ${
             row.Organization?.name ? row.Organization.name : '-'
           }`}</p>
         </div>
         <div className="pl-3 col-span-3">
-          <p className="text-gray-700 truncate font-medium">{`${t('matriculation_number')}: ${
+          <p className="text-label-primary truncate font-medium">{`${t('matriculation_number')}: ${
             row.matriculationNumber ? `${row.matriculationNumber}` : '-'
           }`}</p>
         </div>
       </div>
-      <div className="font-medium bg-edu-course-list flex py-4">
+      <div className="font-medium bg-fill-primary text-label-primary light flex py-4">
         <div className="pl-3">
           {row.CourseEnrollments.map((enrollment, index) => (
-            <p key={index} className="text-gray-600 truncate text-sm">
+            <p key={index} className="text-label-secondary truncate text-sm">
               {enrollment.Course.title} ({enrollment.Course.Program.shortTitle}) - {enrollment.status}
             </p>
           ))}

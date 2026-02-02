@@ -149,7 +149,7 @@ const CreatableTagSelector: React.FC<CreatableTagSelectorProps> = ({
     }
   };
 
-  const baseClass = 'w-full px-3 py-1 mb-8 text-gray-500 rounded bg-edu-light-gray';
+  const baseClass = 'w-full px-3 py-1 mb-8 text-label-primary rounded bg-fill-primary';
   const finalClassName = prioritizeClasses(`${baseClass} ${className || ''}`);
 
   const renderMaterialUI = () => (
@@ -199,7 +199,7 @@ const CreatableTagSelector: React.FC<CreatableTagSelectorProps> = ({
 
   const renderEduhub = () => (
     <div className="px-2">
-      <div className="text-gray-400">
+      <div className="text-label-primary">
         <div className="flex justify-between mb-2">
           <div className="flex items-center">
             {helpText && (
@@ -210,7 +210,8 @@ const CreatableTagSelector: React.FC<CreatableTagSelectorProps> = ({
             {label}
           </div>
         </div>
-        <Autocomplete
+        <div className="light">
+          <Autocomplete
           multiple
           id="tags-autocomplete"
           options={options.map((tag) => ({ value: tag }))}

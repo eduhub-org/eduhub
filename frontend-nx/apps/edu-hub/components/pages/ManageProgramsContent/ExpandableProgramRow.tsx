@@ -103,12 +103,12 @@ const ExpandableProgramRow: FC<ExpandableProgramRowProps> = ({ program }) => {
 
   return (
     <div className="w-full flex-1 min-w-0">
-      <div className="bg-edu-course-list p-6 w-full">
+      <div className="bg-fill-primary text-label-primary light p-6 w-full">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
           {/* Left Column */}
           <div className="space-y-4 w-full min-w-0">
             {/* 0. Short Title */}
-            <div className="bg-white border border-gray-200 rounded-lg p-4">
+            <div className="bg-fill-primary border border-border-primary rounded-lg p-4">
               <InputField
                 variant="material"
                 type="input"
@@ -123,8 +123,8 @@ const ExpandableProgramRow: FC<ExpandableProgramRowProps> = ({ program }) => {
             </div>
 
             {/* 1. Questionnaires Card */}
-            <div className="bg-white border border-gray-200 rounded-lg p-4 space-y-4">
-              <h4 className="text-sm font-medium text-gray-700 mb-3">{t('start_evaluation.label')}</h4>
+            <div className="bg-fill-primary border border-border-primary rounded-lg p-4 space-y-4">
+              <h4 className="text-sm font-medium text-label-primary mb-3">{t('start_evaluation.label')}</h4>
               <InputField
                 variant="material"
                 type="link"
@@ -136,7 +136,7 @@ const ExpandableProgramRow: FC<ExpandableProgramRowProps> = ({ program }) => {
                 helpText={t('start_evaluation.help_text')}
               />
 
-              <h4 className="text-sm font-medium text-gray-700 mb-3">{t('speaker_evaluation.label')}</h4>
+              <h4 className="text-sm font-medium text-label-primary mb-3">{t('speaker_evaluation.label')}</h4>
               <InputField
                 variant="material"
                 type="link"
@@ -148,7 +148,7 @@ const ExpandableProgramRow: FC<ExpandableProgramRowProps> = ({ program }) => {
                 helpText={t('speaker_evaluation.help_text')}
               />
 
-              <h4 className="text-sm font-medium text-gray-700 mb-3">{t('final_evaluation.label')}</h4>
+              <h4 className="text-sm font-medium text-label-primary mb-3">{t('final_evaluation.label')}</h4>
               <InputField
                 variant="material"
                 type="link"
@@ -177,9 +177,9 @@ const ExpandableProgramRow: FC<ExpandableProgramRowProps> = ({ program }) => {
           {/* Right Column */}
           <div className="space-y-4 w-full min-w-0">
             {/* 0. Certificate Templates Card */}
-            <div className="bg-white border border-gray-200 rounded-lg p-4 space-y-4">
+            <div className="bg-fill-primary border border-border-primary rounded-lg p-4 space-y-4">
               <div>
-                <h4 className="text-sm font-medium text-gray-700 mb-3">
+                <h4 className="text-sm font-medium text-label-primary mb-3">
                   {`${t('certificates.template')} ${t('certificates.proof_of_participation')}`}
                 </h4>
                 <FileUploadField
@@ -222,8 +222,8 @@ const ExpandableProgramRow: FC<ExpandableProgramRowProps> = ({ program }) => {
             </div>
 
             {/* 1. Certificate Visibility Card */}
-            <div className="bg-white border border-gray-200 rounded-lg p-4">
-              <h4 className="text-sm font-medium text-gray-700 mb-3">{t('certificates.show_certificates')}</h4>
+            <div className="bg-fill-primary border border-border-primary rounded-lg p-4">
+              <h4 className="text-sm font-medium text-label-primary mb-3">{t('certificates.show_certificates')}</h4>
               <div className="space-y-2">
                 <CheckboxSelector
                   variant="material"
@@ -241,8 +241,8 @@ const ExpandableProgramRow: FC<ExpandableProgramRowProps> = ({ program }) => {
             </div>
 
             {/* 2. Participation Data Card */}
-            <div className="bg-white border border-gray-200 rounded-lg p-4">
-              <h4 className="text-sm font-medium text-gray-700 mb-3">{t('participation_data.generate')}</h4>
+            <div className="bg-fill-primary border border-border-primary rounded-lg p-4">
+              <h4 className="text-sm font-medium text-label-primary mb-3">{t('participation_data.generate')}</h4>
               <div className="space-y-2">
                 <Button as="button" onClick={handleLoadParticipationDataClick} disabled={loadParticipationDataLoading}>
                   {loadParticipationDataLoading ? <CircularProgress /> : t('participation_data.generate')}
