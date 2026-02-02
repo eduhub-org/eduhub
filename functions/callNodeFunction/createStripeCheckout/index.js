@@ -23,6 +23,17 @@ const GET_COURSE_AND_ADDONS = `
   }
 `;
 
+const GET_ENROLLMENT_USER = `
+  query GetEnrollmentUser($enrollmentId: Int!) {
+    CourseEnrollment_by_pk(id: $enrollmentId) {
+      userId
+      User {
+        email
+      }
+    }
+  }
+`;
+
 /**
  * Creates a Stripe Checkout Session for course enrollment with add-ons.
  * Builds success and cancel URLs server-side from FRONTEND_URL for security.
@@ -105,19 +116,80 @@ export default async function createStripeCheckout(req, logger) {
       };
     }
 
+    // Fetch enrollment to get user email if not provided
+    let emailToUse = userEmail;
+    if (!emailToUse || emailToUse.trim() === '') {
+      try {
+        const enrollmentData = await client.request(GET_ENROLLMENT_USER, { enrollmentId });
+        const enrollment = enrollmentData.CourseEnrollment_by_pk;
+        if (enrollment?.User?.email) {
+          emailToUse = enrollment.User.email;
+        }
+      } catch (error) {
+        logger.warn('Could not fetch user email from enrollment', { error: error.message });
+        // Continue without email - Stripe will prompt for it during checkout
+      }
+    }
+
     // Build line items array
     const lineItems = [];
 
     // Add base course price if it exists
     if (course.basePrice && course.basePrice > 0) {
       if (course.stripePriceId) {
-        // Use existing Stripe Price ID
-        lineItems.push({
-          price: course.stripePriceId,
-          quantity: 1
-        });
+        // Verify the Stripe Price ID is valid and has correct amount
+        try {
+          const stripePrice = await stripe.prices.retrieve(course.stripePriceId);
+          
+          // Check if the Stripe price amount matches our basePrice (in cents)
+          // If it doesn't match or is zero, fall back to dynamic pricing
+          if (stripePrice.unit_amount && stripePrice.unit_amount > 0 && stripePrice.unit_amount === course.basePrice) {
+            // Use existing Stripe Price ID
+            lineItems.push({
+              price: course.stripePriceId,
+              quantity: 1
+            });
+            logger.debug('Using existing Stripe Price ID', {
+              stripePriceId: course.stripePriceId,
+              amount: stripePrice.unit_amount
+            });
+          } else {
+            // Price ID exists but amount doesn't match or is invalid, use dynamic pricing
+            logger.warn('Stripe Price ID amount mismatch or invalid, using dynamic pricing', {
+              stripePriceId: course.stripePriceId,
+              stripeAmount: stripePrice.unit_amount,
+              expectedAmount: course.basePrice
+            });
+            lineItems.push({
+              price_data: {
+                currency: (course.currency || 'eur').toLowerCase(),
+                product_data: {
+                  name: course.title || 'Course Enrollment'
+                },
+                unit_amount: course.basePrice
+              },
+              quantity: 1
+            });
+          }
+        } catch (error) {
+          // Stripe Price ID doesn't exist or is invalid, fall back to dynamic pricing
+          logger.warn('Stripe Price ID not found or invalid, using dynamic pricing', {
+            stripePriceId: course.stripePriceId,
+            error: error.message
+          });
+          lineItems.push({
+            price_data: {
+              currency: (course.currency || 'eur').toLowerCase(),
+              product_data: {
+                name: course.title || 'Course Enrollment'
+              },
+              unit_amount: course.basePrice
+            },
+            quantity: 1
+          });
+        }
       } else {
-        // Create dynamic price (fallback)
+        // Create dynamic price (no Stripe Price ID exists)
         lineItems.push({
           price_data: {
             currency: (course.currency || 'eur').toLowerCase(),
@@ -127,6 +199,10 @@ export default async function createStripeCheckout(req, logger) {
             unit_amount: course.basePrice
           },
           quantity: 1
+        });
+        logger.debug('Using dynamic pricing', {
+          basePrice: course.basePrice,
+          currency: course.currency || 'eur'
         });
       }
     }
@@ -151,6 +227,18 @@ export default async function createStripeCheckout(req, logger) {
       }
     }
 
+    // Log line items for debugging
+    logger.debug('Line items prepared', {
+      lineItemCount: lineItems.length,
+      courseBasePrice: course.basePrice,
+      courseStripePriceId: course.stripePriceId,
+      lineItems: lineItems.map(item => ({
+        hasPrice: !!item.price,
+        hasPriceData: !!item.price_data,
+        unitAmount: item.price_data?.unit_amount
+      }))
+    });
+
     if (lineItems.length === 0) {
       return {
         success: false,
@@ -160,17 +248,19 @@ export default async function createStripeCheckout(req, logger) {
     }
 
     // Create Stripe Checkout Session
-    const session = await stripe.checkout.sessions.create({
+    // Only include customer_email if we have a valid email address
+    // Stripe will prompt for email during checkout if not provided
+    const sessionConfig = {
       line_items: lineItems,
       mode: 'payment',
       success_url: successUrl,
       cancel_url: cancelUrl,
-      customer_email: userEmail,
       metadata: {
         courseId: String(courseId),
         enrollmentId: String(enrollmentId),
         formbricksResponseId: formbricksResponseId || '',
-        source: 'eduhub'
+        source: 'eduhub',
+        selectedAddons: selectedAddons && selectedAddons.length > 0 ? JSON.stringify(selectedAddons) : ''
       },
       payment_intent_data: {
         metadata: {
@@ -178,7 +268,14 @@ export default async function createStripeCheckout(req, logger) {
           enrollmentId: String(enrollmentId)
         }
       }
-    });
+    };
+
+    // Only add customer_email if we have a valid email address
+    if (emailToUse && emailToUse.trim() !== '' && emailToUse.includes('@')) {
+      sessionConfig.customer_email = emailToUse.trim();
+    }
+
+    const session = await stripe.checkout.sessions.create(sessionConfig);
 
     logger.info('Created Stripe Checkout Session', {
       sessionId: session.id,

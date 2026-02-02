@@ -563,6 +563,7 @@ export enum CourseEnrollment_select_column {
   status = "status",
   stripeCheckoutSessionId = "stripeCheckoutSessionId",
   stripePaymentIntentId = "stripePaymentIntentId",
+  termsAcceptedAt = "termsAcceptedAt",
   updated_at = "updated_at",
   userId = "userId",
 }
@@ -586,6 +587,7 @@ export enum CourseEnrollment_update_column {
   status = "status",
   stripeCheckoutSessionId = "stripeCheckoutSessionId",
   stripePaymentIntentId = "stripePaymentIntentId",
+  termsAcceptedAt = "termsAcceptedAt",
   updated_at = "updated_at",
   userId = "userId",
 }
@@ -4161,6 +4163,7 @@ export interface CourseEnrollment_bool_exp {
   status?: CourseEnrollmentStatus_enum_comparison_exp | null;
   stripeCheckoutSessionId?: String_comparison_exp | null;
   stripePaymentIntentId?: String_comparison_exp | null;
+  termsAcceptedAt?: timestamptz_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
   userId?: uuid_comparison_exp | null;
 }
@@ -4190,6 +4193,7 @@ export interface CourseEnrollment_insert_input {
   status?: CourseEnrollmentStatus_enum | null;
   stripeCheckoutSessionId?: string | null;
   stripePaymentIntentId?: string | null;
+  termsAcceptedAt?: any | null;
   updated_at?: any | null;
   userId?: any | null;
 }
@@ -4209,6 +4213,7 @@ export interface CourseEnrollment_max_order_by {
   paymentCurrency?: order_by | null;
   stripeCheckoutSessionId?: order_by | null;
   stripePaymentIntentId?: order_by | null;
+  termsAcceptedAt?: order_by | null;
   updated_at?: order_by | null;
   userId?: order_by | null;
 }
@@ -4228,6 +4233,7 @@ export interface CourseEnrollment_min_order_by {
   paymentCurrency?: order_by | null;
   stripeCheckoutSessionId?: order_by | null;
   stripePaymentIntentId?: order_by | null;
+  termsAcceptedAt?: order_by | null;
   updated_at?: order_by | null;
   userId?: order_by | null;
 }
@@ -4266,6 +4272,7 @@ export interface CourseEnrollment_order_by {
   status?: order_by | null;
   stripeCheckoutSessionId?: order_by | null;
   stripePaymentIntentId?: order_by | null;
+  termsAcceptedAt?: order_by | null;
   updated_at?: order_by | null;
   userId?: order_by | null;
 }

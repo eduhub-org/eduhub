@@ -35,12 +35,13 @@ export default async function sendEnrollmentEmail(req, logger) {
       },
     });
 
-    // Get enrollment details with user and course information
+    // Get enrollment details with user, course, and add-ons information
     const GET_ENROLLMENT_DETAILS = gql`
       query GetEnrollmentDetails($enrollmentId: Int!) {
         CourseEnrollment_by_pk(id: $enrollmentId) {
           id
           status
+          paymentStatus
           created_at
           invitationExpirationDate
           User {
@@ -54,6 +55,17 @@ export default async function sendEnrollmentEmail(req, logger) {
             title
             startTime
             endTime
+            basePrice
+            currency
+          }
+          EnrollmentAddons {
+            id
+            priceAtPurchase
+            currency
+            CourseAddonMapping {
+              id
+              description
+            }
           }
         }
       }
@@ -99,22 +111,23 @@ export default async function sendEnrollmentEmail(req, logger) {
       }
     `;
 
-    let templateType;
+    // Determine base template type based on enrollment status
+    let baseTemplateType;
     switch (enrollment.status) {
       case 'APPLIED':
-        templateType = 'APPLICATION_RECEIVED';
+        baseTemplateType = 'APPLICATION_RECEIVED';
         break;
       case 'CONFIRMED':
-        templateType = 'APPLICATION_CONFIRMED';
+        baseTemplateType = 'APPLICATION_CONFIRMED';
         break;
       case 'INVITED':
-        templateType = 'INVITE';
+        baseTemplateType = 'INVITE';
         break;
       case 'REJECTED':
-        templateType = 'DECLINE';
+        baseTemplateType = 'DECLINE';
         break;
       case 'REGISTERED':
-        templateType = 'REGISTRATION_CONFIRMED';
+        baseTemplateType = 'REGISTRATION_CONFIRMED';
         break;
       default:
         // Don't send emails for other status changes
@@ -123,6 +136,18 @@ export default async function sendEnrollmentEmail(req, logger) {
           messageKey: 'NO_TEMPLATE_FOR_STATUS',
           message: `No email template for status: ${enrollment.status}`
         };
+    }
+    
+    // Select paid template variant if payment is completed
+    // Only for APPLICATION_RECEIVED and REGISTRATION_CONFIRMED
+    let templateType = baseTemplateType;
+    const isPaid = enrollmentDetails.paymentStatus === 'COMPLETED';
+    if (isPaid) {
+      if (baseTemplateType === 'REGISTRATION_CONFIRMED') {
+        templateType = 'REGISTRATION_CONFIRMED_PAID';
+      } else if (baseTemplateType === 'APPLICATION_RECEIVED') {
+        templateType = 'APPLICATION_RECEIVED_PAID';
+      }
     }
 
     // Get courseId from enrollment

@@ -63,6 +63,7 @@ export interface RegistrationFormData {
   motivationLetter?: string;
   paymentMethod?: string;
   acceptTerms?: boolean;
+  termsAcceptedAt?: string;  // ISO timestamp string
 }
 
 export interface RegistrationResult {

@@ -24,10 +24,24 @@ export default function PaymentCancelledPage() {
       }}
     >
       <Cancel color="error" sx={{ fontSize: 64 }} />
-      <Typography variant="h4" component="h1" align="center">
+      <Typography 
+        variant="h4" 
+        component="h1" 
+        align="center"
+        sx={{
+          color: (theme) => theme.palette.mode === 'dark' ? theme.palette.common.white : theme.palette.text.primary
+        }}
+      >
         {t('payment.cancelled_title')}
       </Typography>
-      <Typography variant="body1" color="text.secondary" align="center" sx={{ maxWidth: 600 }}>
+      <Typography 
+        variant="body1" 
+        align="center" 
+        sx={{ 
+          maxWidth: 600,
+          color: (theme) => theme.palette.mode === 'dark' ? theme.palette.common.white : theme.palette.text.primary
+        }}
+      >
         {t('payment.cancelled_description')}
       </Typography>
       <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>

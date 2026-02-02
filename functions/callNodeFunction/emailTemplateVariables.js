@@ -58,6 +58,11 @@ export const EMAIL_VARIABLES = {
       description: 'Course end date (formatted)',
       example: '20. März 2024',
       categories: ['enrollment']
+    },
+    '[Course:BasePrice]': {
+      description: 'Base course price formatted as currency (e.g., "49,00")',
+      example: '49,00',
+      categories: ['enrollment']
     }
   },
 
@@ -77,6 +82,16 @@ export const EMAIL_VARIABLES = {
       description: 'Link to course page',
       example: 'https://edu.opencampus.sh/course/123',
       categories: ['enrollment', 'session']
+    },
+    '[Enrollment:Addons]': {
+      description: 'HTML list of booked add-ons with prices (empty if no add-ons)',
+      example: '<strong>Add-ons:</strong>\n– Networking Dinner: 15,00 € inkl. MwSt.\n– Workshop-Materialien: 10,00 € inkl. MwSt.',
+      categories: ['enrollment']
+    },
+    '[Enrollment:TotalCost]': {
+      description: 'Total cost formatted as currency including base price and add-ons (e.g., "74,00")',
+      example: '74,00',
+      categories: ['enrollment']
     }
   },
 
@@ -201,6 +216,11 @@ export function createVariableReplacer(data, formatDate) {
       .replaceAll('[Course:StartTime]', data.course?.startTime ? formatDate(data.course.startTime) : 'TBD')
       .replaceAll('[Course:EndTime]', data.course?.endTime ? formatDate(data.course.endTime) : 'TBD');
     
+    // Format base price (convert cents to euros with 2 decimal places)
+    const basePrice = data.course?.basePrice || 0;
+    const formattedBasePrice = (basePrice / 100).toFixed(2).replace('.', ',');
+    result = result.replaceAll('[Course:BasePrice]', formattedBasePrice);
+    
     // Enrollment variables - always attempt replacement
     result = result
       .replaceAll('[Enrollment:CreatedAt]', data.enrollment?.created_at ? formatDate(data.enrollment.created_at) : '')
@@ -226,7 +246,7 @@ export function createVariableReplacer(data, formatDate) {
 
 /**
  * Convenience function for enrollment emails
- * @param {Object} enrollmentDetails - Enrollment data from GraphQL
+ * @param {Object} enrollmentDetails - Enrollment data from GraphQL (should include EnrollmentAddons with CourseAddonMapping)
  * @param {Function} formatDate - Date formatting function  
  * @returns {Function} Variable replacement function
  */
@@ -235,6 +255,7 @@ export function createEnrollmentVariableReplacer(enrollmentDetails, formatDate) 
     user: enrollmentDetails.User,
     course: enrollmentDetails.Course,
     enrollment: enrollmentDetails,
+    enrollmentAddons: enrollmentDetails.EnrollmentAddons || [],
     courseLink: `${process.env.FRONTEND_URL || 'https://edu.opencampus.sh'}/course/${enrollmentDetails.Course.id}`
   }, formatDate);
 }

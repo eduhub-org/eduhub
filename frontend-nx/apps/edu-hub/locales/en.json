@@ -394,6 +394,12 @@
       "registration_period_ended": "Unfortunately, the registration period has ended. You can subscribe to our <a>newsletter</a> to stay informed about new offers.",
       "registration_period_ended_title": "Registration Period Ended"
     },
+    "payment": {
+      "cancelled_title": "Payment cancelled",
+      "cancelled_description": "The payment was cancelled. You can try again later.",
+      "try_again": "Try again",
+      "back_to_home": "Back to home"
+    },
     "modal": {
       "title_approval": "Application",
       "title_direct": "Registration",
@@ -401,7 +407,7 @@
       "motivation_letter_label": "Motivation Letter",
       "motivation_letter_placeholder": "Please tell us why you want to participate in this course...",
       "payment_info": "This course costs {cost}. You will be redirected to the payment page after registration.",
-      "accept_terms": "I accept the Terms and Conditions and Privacy Policy",
+      "accept_terms": "I have read and accept the <terms>Terms and Conditions</terms> and the <privacy>Privacy Policy</privacy>.",
       "cancel": "Cancel",
       "payment": {
         "verifying": "Verifying payment...",

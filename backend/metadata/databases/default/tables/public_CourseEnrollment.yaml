@@ -30,6 +30,7 @@ insert_permissions:
         - status
         - userId
         - location
+        - termsAcceptedAt
 select_permissions:
   - role: instructor_access
     permission:
@@ -51,6 +52,7 @@ select_permissions:
         - paymentStatus
         - paymentAmount
         - paymentCurrency
+        - termsAcceptedAt
       filter: {}
   - role: user_access
     permission:
@@ -69,6 +71,7 @@ select_permissions:
         - paymentStatus
         - paymentAmount
         - paymentCurrency
+        - termsAcceptedAt
       filter:
         _and:
           - userId:
@@ -109,6 +112,7 @@ update_permissions:
         - motivationRating
         - status
         - location
+        - termsAcceptedAt
       filter:
         _or:
           - Course:

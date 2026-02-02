@@ -1,0 +1,82 @@
+table:
+  name: EnrollmentAddon
+  schema: public
+object_relationships:
+  - name: CourseEnrollment
+    using:
+      foreign_key_constraint_on: enrollmentId
+  - name: CourseAddonMapping
+    using:
+      foreign_key_constraint_on: addonMappingId
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - id
+        - enrollmentId
+        - addonMappingId
+        - priceAtPurchase
+        - currency
+        - created_at
+      filter:
+        CourseEnrollment:
+          User:
+            id:
+              _eq: X-Hasura-User-Id
+  - role: user_access
+    permission:
+      columns:
+        - id
+        - enrollmentId
+        - addonMappingId
+        - priceAtPurchase
+        - currency
+        - created_at
+      filter:
+        CourseEnrollment:
+          User:
+            id:
+              _eq: X-Hasura-User-Id
+  - role: instructor_access
+    permission:
+      columns:
+        - id
+        - enrollmentId
+        - addonMappingId
+        - priceAtPurchase
+        - currency
+        - created_at
+      filter:
+        CourseEnrollment:
+          Course:
+            CourseInstructors:
+              User:
+                id:
+                  _eq: X-Hasura-User-Id
+insert_permissions:
+  - role: user_access
+    permission:
+      check:
+        CourseEnrollment:
+          User:
+            id:
+              _eq: X-Hasura-User-Id
+      columns:
+        - enrollmentId
+        - addonMappingId
+        - priceAtPurchase
+        - currency
+  - role: instructor_access
+    permission:
+      check:
+        CourseEnrollment:
+          Course:
+            CourseInstructors:
+              User:
+                id:
+                  _eq: X-Hasura-User-Id
+      columns:
+        - enrollmentId
+        - addonMappingId
+        - priceAtPurchase
+        - currency

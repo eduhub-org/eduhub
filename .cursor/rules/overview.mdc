@@ -69,6 +69,7 @@ docker compose up        # Start all services
 - **Form inputs**: Use `CreatableTagSelector`, `DropDownSelector`, `InputField`
 - **Translations**: Use `useTranslation` hook with snake_case keys
 - **GraphQL**: Use `useAdminQuery`, `useRoleMutation` with proper error handling
+- **Theming**: Use CSS variables from `globals.css`; see [theme-and-styling.mdc](mdc:frontend-nx/apps/edu-hub/.cursor/rules/theme-and-styling.mdc)
 
 ### Backend Schema Change Workflow (MANDATORY)
 

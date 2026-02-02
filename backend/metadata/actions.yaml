@@ -35,6 +35,30 @@ actions:
         - name: Function-Name
           value: create_certificates
     comment: createCertificates
+  - name: createStripeBasePrice
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: name
+          value: createStripeBasePrice
+    permissions:
+      - role: instructor_access
+    comment: Creates or updates Stripe Product and Price for a course's base price
+  - name: createStripeCheckout
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: name
+          value: createStripeCheckout
+    permissions:
+      - role: user_access
+    comment: Creates a Stripe Checkout Session for course enrollment with add-ons
   - name: createUser
     definition:
       kind: synchronous
@@ -59,6 +83,18 @@ actions:
           value_from_env: HASURA_BUCKET
         - name: name
           value: getAdminUsers
+  - name: getFormbricksResponses
+    definition:
+      kind: ""
+      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: name
+          value: getFormbricksResponses
+    permissions:
+      - role: instructor_access
+    comment: Fetches Formbricks survey responses for a course enrollment
   - name: getSignedUrl
     definition:
       kind: ""
@@ -83,18 +119,6 @@ actions:
         - name: Hasura-Secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
     comment: loadParticipationData
-  - name: getFormbricksResponses
-    definition:
-      kind: ""
-      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
-      headers:
-        - name: secret
-          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
-        - name: name
-          value: getFormbricksResponses
-    permissions:
-      - role: instructor_access
-    comment: Fetches Formbricks survey responses for a course enrollment
   - name: makeCertificatePublic
     definition:
       kind: synchronous
@@ -169,6 +193,18 @@ actions:
           value: achievement-records/record-${achievementRecordId}/private/documentation/${filename}
     permissions:
       - role: user_access
+  - name: saveAddonMappings
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: name
+          value: createStripeAddonPrices
+    permissions:
+      - role: instructor_access
+    comment: Saves validated add-on mappings and creates Stripe Products/Prices
   - name: saveAttendanceCertificateTemplate
     definition:
       kind: synchronous
@@ -288,45 +324,12 @@ actions:
     permissions:
       - role: instructor_access
     comment: Validates a Formbricks survey and extracts add-on questions with pricing information
-  - name: saveAddonMappings
-    definition:
-      kind: synchronous
-      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
-      headers:
-        - name: secret
-          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
-        - name: name
-          value: createStripeAddonPrices
-    permissions:
-      - role: instructor_access
-    comment: Saves validated add-on mappings and creates Stripe Products/Prices
-  - name: createStripeBasePrice
-    definition:
-      kind: synchronous
-      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
-      headers:
-        - name: secret
-          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
-        - name: name
-          value: createStripeBasePrice
-    permissions:
-      - role: instructor_access
-    comment: Creates or updates Stripe Product and Price for a course's base price
-  - name: createStripeCheckout
-    definition:
-      kind: synchronous
-      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
-      headers:
-        - name: secret
-          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
-        - name: name
-          value: createStripeCheckout
-    permissions:
-      - role: user_access
-    comment: Creates a Stripe Checkout Session for course enrollment with add-ons
 custom_types:
   enums: []
-  input_objects: []
+  input_objects:
+    - name: AddonMappingInput
+    - name: CourseInput
+    - name: SelectedAddonInput
   objects:
     - name: CreateUserResult
     - name: loadFileOutput

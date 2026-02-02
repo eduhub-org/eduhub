@@ -394,6 +394,12 @@
       "registration_period_ended": "Die Anmeldefrist ist leider abgelaufen. Du kannst unseren <a>Newsletter</a> abonnieren, um über neue Angebote informiert zu bleiben.",
       "registration_period_ended_title": "Anmeldefrist abgelaufen"
     },
+    "payment": {
+      "cancelled_title": "Zahlung abgebrochen",
+      "cancelled_description": "Die Zahlung wurde abgebrochen. Du kannst es später erneut versuchen.",
+      "try_again": "Erneut versuchen",
+      "back_to_home": "Zurück zur Startseite"
+    },
     "modal": {
       "title_approval": "Bewerbung",
       "title_direct": "Registrierung",
@@ -401,7 +407,7 @@
       "motivation_letter_label": "Motivationsschreiben",
       "motivation_letter_placeholder": "Bitte erzähle uns, warum du teilnehmen möchtest...",
       "payment_info": "Dieser Kurs kostet {cost}. Du wirst nach der Registrierung zur Zahlungsseite weitergeleitet.",
-      "accept_terms": "Ich akzeptiere die Allgemeinen Geschäftsbedingungen und die Datenschutzerklärung",
+      "accept_terms": "Ich habe die <terms>Allgemeinen Geschäftsbedingungen (AGB)</terms> sowie die <privacy>Datenschutzerklärung</privacy> gelesen und akzeptiere sie.",
       "cancel": "Abbrechen",
       "payment": {
         "verifying": "Zahlung wird überprüft...",

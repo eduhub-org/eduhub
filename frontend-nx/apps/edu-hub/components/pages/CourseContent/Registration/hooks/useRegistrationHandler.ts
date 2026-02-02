@@ -96,6 +96,7 @@ export const useRegistrationHandler = ({
             userId,
             motivationLetter: formData?.motivationLetter || '',
             status,
+            termsAcceptedAt: formData?.termsAcceptedAt || null,
           },
         });
 
@@ -133,6 +134,7 @@ export const useRegistrationHandler = ({
             userId,
             motivationLetter: formData?.motivationLetter || '[Formbricks Survey Completed]',
             status: CourseEnrollmentStatus_enum.APPLIED, // Will be updated to CONFIRMED after payment
+            termsAcceptedAt: formData?.termsAcceptedAt || null,
           },
         });
 
@@ -141,12 +143,13 @@ export const useRegistrationHandler = ({
           return { success: false, error: 'Failed to create enrollment' };
         }
 
-        // 2. Get Formbricks response to extract selected add-ons
-        // Note: Formbricks response will be fetched server-side in createStripeCheckout
-        // For now, we pass null and let the backend handle it
-
-        // Note: Formbricks response will be fetched server-side in createStripeCheckout
-        // For now, we pass null and let the backend handle it
+        // 2. Determine selected add-ons based on registration type
+        // Addons are only available for DIRECT_WITH_INPUT_AND_PAYMENT (which has a questionnaire)
+        // For DIRECT_CONFIRMATION_AND_PAYMENT, there's no questionnaire, so no addons possible
+        const hasAddons = config.requiresInput; // Only registration types with input/questionnaire can have addons
+        const selectedAddons = hasAddons 
+          ? null // Will be extracted server-side from Formbricks response
+          : []; // Empty array for registration types without questionnaires
 
         // 3. Create Stripe Checkout session
         // URLs are now built server-side from FRONTEND_URL for security
@@ -158,7 +161,7 @@ export const useRegistrationHandler = ({
             userEmail: null, // Will be fetched from user context server-side
             course: null, // Will be fetched server-side from Hasura
             addonMappings: null, // Will be fetched server-side from Hasura
-            selectedAddons: null, // Will be extracted server-side from Formbricks response
+            selectedAddons, // Empty array for DIRECT_CONFIRMATION_AND_PAYMENT, null for DIRECT_WITH_INPUT_AND_PAYMENT
           },
         });
 

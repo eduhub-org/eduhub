@@ -37,6 +37,26 @@ const UPDATE_ENROLLMENT_PAYMENT = gql`
   }
 `;
 
+const INSERT_ENROLLMENT_ADDON = gql`
+  mutation InsertEnrollmentAddon(
+    $enrollmentId: Int!
+    $addonMappingId: Int!
+    $priceAtPurchase: Int!
+    $currency: String!
+  ) {
+    insert_EnrollmentAddon_one(
+      object: {
+        enrollmentId: $enrollmentId
+        addonMappingId: $addonMappingId
+        priceAtPurchase: $priceAtPurchase
+        currency: $currency
+      }
+    ) {
+      id
+    }
+  }
+`;
+
 const handleStripeWebhook = async (
   req: NextApiRequest,
   res: NextApiResponse
@@ -99,16 +119,18 @@ const handleStripeWebhook = async (
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session;
-        const { enrollmentId, courseId } = session.metadata || {};
+        const { enrollmentId, courseId, selectedAddons } = session.metadata || {};
 
         if (!enrollmentId) {
           console.error('Missing enrollmentId in session metadata');
           return res.status(400).json({ error: 'Missing enrollmentId' });
         }
 
+        const parsedEnrollmentId = Number.parseInt(enrollmentId, 10);
+
         // Update enrollment with payment information
         await client.request(UPDATE_ENROLLMENT_PAYMENT, {
-          enrollmentId: Number.parseInt(enrollmentId, 10),
+          enrollmentId: parsedEnrollmentId,
           stripeCheckoutSessionId: session.id,
           stripePaymentIntentId:
             typeof session.payment_intent === 'string'
@@ -118,6 +140,33 @@ const handleStripeWebhook = async (
           paymentAmount: session.amount_total || null,
           paymentCurrency: session.currency || null,
         });
+
+        // Parse and save selected add-ons
+        if (selectedAddons && selectedAddons.trim() !== '') {
+          try {
+            const addons = JSON.parse(selectedAddons);
+            const currency = (session.currency || 'EUR').toUpperCase();
+
+            for (const addon of addons) {
+              if (addon.id && addon.price !== undefined) {
+                await client.request(INSERT_ENROLLMENT_ADDON, {
+                  enrollmentId: parsedEnrollmentId,
+                  addonMappingId: addon.id,
+                  priceAtPurchase: addon.price,
+                  currency: currency,
+                });
+              }
+            }
+
+            console.log('Enrollment add-ons saved successfully', {
+              enrollmentId,
+              addonCount: addons.length,
+            });
+          } catch (error: any) {
+            console.error('Error parsing or saving add-ons:', error.message);
+            // Don't fail the webhook if add-on saving fails - payment is already recorded
+          }
+        }
 
         console.log('Enrollment updated successfully', {
           enrollmentId,

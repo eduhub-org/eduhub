@@ -9,6 +9,57 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  /* Brand Colors (same in both modes) */
+  --eduhub-brand: #00A398;
+  --eduhub-brand-light: #00C4B8;
+  --eduhub-brand-dark: #008078;
+  
+  /* Fill Colors (current dark aesthetic) */
+  --eduhub-fill-primary: #222222;
+  --eduhub-fill-secondary: #F2F2F2;
+  --eduhub-fill-disabled: #444444;
+  
+  /* Label Colors (light text on dark backgrounds) */
+  --eduhub-label-primary: #F2F2F2;
+  --eduhub-label-secondary: #D8D8D8;
+  --eduhub-label-disabled: #888888;
+  
+  /* Border Colors */
+  --eduhub-border-primary: #444444;
+  --eduhub-border-secondary: #D8D8D8;
+  
+  /* Background Colors (dark aesthetic) */
+  --eduhub-bg-primary: #222222;
+  --eduhub-bg-secondary: #333333;
+  --eduhub-bg-modal: #222222;
+  --eduhub-bg-card: #2a2a2a;
+  
+  /* Functional Colors (consistent across modes) */
+  --eduhub-success: #A2EBA0;
+  --eduhub-warning: #FFA665;
+  --eduhub-error: #D45A5A;
+  --eduhub-info: #1982fc;
+  
+  /* Status Colors */
+  --eduhub-status-confirmed: #A2EBA0;
+  --eduhub-status-invited: #FFA665;
+  --eduhub-status-current: #A2EBA0;
+  --eduhub-status-missed: #F2991D66;
+}
+
+/* Future: Light mode override
+.light {
+  --eduhub-fill-primary: #ffffff;
+  --eduhub-fill-secondary: #222222;
+  --eduhub-label-primary: #222222;
+  --eduhub-label-secondary: #666666;
+  --eduhub-bg-primary: #ffffff;
+  --eduhub-bg-secondary: #F2F2F2;
+  ...
+}
+*/
+
 .check-list {
   background: url(/images/course/checkmark.svg) no-repeat 0 0.5rem;
   list-style: none;

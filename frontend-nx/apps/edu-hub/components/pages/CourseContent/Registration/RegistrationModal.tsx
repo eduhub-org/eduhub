@@ -91,6 +91,7 @@ export const RegistrationModal: FC<RegistrationModalProps> = ({
     onSubmit({
       motivationLetter: '[Formbricks Survey Completed]',
       acceptTerms: true,
+      termsAcceptedAt: new Date().toISOString(),
     }).then((result) => {
       if (result.success) {
         closeModal();
@@ -122,6 +123,7 @@ export const RegistrationModal: FC<RegistrationModalProps> = ({
     const result = await onSubmit({
       motivationLetter: motivationLetter.trim(),
       acceptTerms,
+      termsAcceptedAt: acceptTerms ? new Date().toISOString() : undefined,
     });
 
     if (result.success) {
@@ -245,7 +247,32 @@ export const RegistrationModal: FC<RegistrationModalProps> = ({
                 className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded flex-shrink-0"
                 disabled={isLoading}
               />
-              <span className="text-sm text-gray-700 leading-relaxed">{t('modal.accept_terms')}</span>
+              <span className="text-sm text-gray-700 leading-relaxed">
+                {t.rich('modal.accept_terms', {
+                  terms: (chunks) => (
+                    <a
+                      href="/terms"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:underline"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {chunks}
+                    </a>
+                  ),
+                  privacy: (chunks) => (
+                    <a
+                      href="/privacy"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:underline"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {chunks}
+                    </a>
+                  ),
+                })}
+              </span>
             </label>
           </div>
         )}

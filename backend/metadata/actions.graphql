@@ -21,6 +21,27 @@ type Mutation {
 }
 
 type Mutation {
+  createStripeBasePrice(
+    courseId: Int!
+    basePrice: Int!
+    currency: String
+    courseTitle: String
+  ): CreateStripeBasePriceResult!
+}
+
+type Mutation {
+  createStripeCheckout(
+    courseId: Int!
+    enrollmentId: Int!
+    formbricksResponseId: String
+    userEmail: String
+    course: CourseInput
+    addonMappings: [AddonMappingInput!]
+    selectedAddons: [SelectedAddonInput!]
+  ): CreateStripeCheckoutResult!
+}
+
+type Mutation {
   createUser(
     firstName: String!
     lastName: String!
@@ -34,6 +55,15 @@ type Query {
 }
 
 type Query {
+  getFormbricksResponses(
+    courseId: Int!
+    userId: uuid!
+    enrollmentId: Int
+    formbricksSurveyUrl: String!
+  ): GetFormbricksResponsesResult!
+}
+
+type Query {
   getSignedUrl(
     path: String!
   ): getSignedUrlOutput
@@ -43,15 +73,6 @@ type Query {
   loadParticipationData(
     programId: Int!
   ): LoadParticipationDataResult!
-}
-
-type Query {
-  getFormbricksResponses(
-    courseId: Int!
-    userId: uuid!
-    enrollmentId: Int
-    formbricksSurveyUrl: String!
-  ): GetFormbricksResponsesResult!
 }
 
 type Mutation {
@@ -90,6 +111,13 @@ type Mutation {
     filename: String!
     achievementRecordId: Int!
   ): saveFileResult
+}
+
+type Mutation {
+  saveAddonMappings(
+    courseId: Int!
+    mappings: [AddonMappingInput!]!
+  ): SaveAddonMappingsResult!
 }
 
 type Mutation {
@@ -148,32 +176,33 @@ type Mutation {
   ): ValidateFormbricksSurveyResult!
 }
 
-type Mutation {
-  saveAddonMappings(
-    courseId: Int!
-    mappings: [AddonMappingInput!]!
-  ): SaveAddonMappingsResult!
+input AddonMappingInput {
+  questionId: String!
+  choiceId: String!
+  questionTextDe: String
+  questionTextEn: String
+  extractedPrice: Int!
+  validatedPrice: Int!
+  currency: String!
+  description: String!
+  stripeProductId: String
+  stripePriceId: String
+  confidence: String!
 }
 
-type Mutation {
-  createStripeBasePrice(
-    courseId: Int!
-    basePrice: Int!
-    currency: String
-    courseTitle: String
-  ): CreateStripeBasePriceResult!
+input CourseInput {
+  id: Int!
+  title: String!
+  basePrice: Int
+  currency: String
+  stripeProductId: String
+  stripePriceId: String
 }
 
-type Mutation {
-  createStripeCheckout(
-    courseId: Int!
-    enrollmentId: Int!
-    formbricksResponseId: String
-    userEmail: String
-    course: CourseInput
-    addonMappings: [AddonMappingInput!]
-    selectedAddons: [SelectedAddonInput!]
-  ): CreateStripeCheckoutResult!
+input SelectedAddonInput {
+  questionId: String!
+  choiceId: String!
+  selected: Boolean!
 }
 
 type CreateUserResult {
@@ -426,20 +455,6 @@ type DetectedPrice {
   originalText: String!
 }
 
-input AddonMappingInput {
-  questionId: String!
-  choiceId: String!
-  questionTextDe: String
-  questionTextEn: String
-  extractedPrice: Int!
-  validatedPrice: Int!
-  currency: String!
-  description: String!
-  stripeProductId: String
-  stripePriceId: String
-  confidence: String!
-}
-
 type SaveAddonMappingsResult {
   success: Boolean!
   messageKey: String!
@@ -505,20 +520,5 @@ type CourseAddonMapping {
   validatedBy: uuid
   created_at: timestamptz!
   updated_at: timestamptz!
-}
-
-input CourseInput {
-  id: Int!
-  title: String!
-  basePrice: Int
-  currency: String
-  stripeProductId: String
-  stripePriceId: String
-}
-
-input SelectedAddonInput {
-  questionId: String!
-  choiceId: String!
-  selected: Boolean!
 }
 
