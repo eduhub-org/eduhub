@@ -21,23 +21,29 @@ const Imprint: FC = () => {
         <div className="flex flex-wrap">
           <div className="ml-12 mr-10 mt-4">
             <h2 className="text-2xl mb-2">{isEnglish ? 'Address' : 'Anschrift'}</h2>
-            <dd>Campusbusinessbox e.V.</dd>
-            <dd>Wissenschaftszentrum Kiel</dd>
-            <dd>Fraunhoferstraße 13</dd>
-            <dd>24118 Kiel</dd>
-            <dt className="italic mt-2">{isEnglish ? 'Phone' : 'Telefon'}</dt>
-            <dd>0431.90894380</dd>
-            <dt className="italic mt-2">Email</dt>
-            <a href="mailto:edu@opencampus.sh">edu @ opencampus.sh</a>
+            <dl>
+              <dd>Campusbusinessbox e.V.</dd>
+              <dd>Wissenschaftszentrum Kiel</dd>
+              <dd>Fraunhoferstraße 13</dd>
+              <dd>24118 Kiel</dd>
+              <dt className="italic mt-2">{isEnglish ? 'Phone' : 'Telefon'}</dt>
+              <dd>0431.90894380</dd>
+              <dt className="italic mt-2">Email</dt>
+              <dd>
+                <a href="mailto:edu@opencampus.sh">edu @ opencampus.sh</a>
+              </dd>
+            </dl>
           </div>
           <div className="ml-12 mr-10 mt-4">
             <h2 className="text-2xl mb-2">{isEnglish ? 'Board' : 'Vorstand'}</h2>
-            <dt className="italic mt-2">{isEnglish ? '1st Chairman' : '1. Vorsitzender'}</dt>
-            <dd>Harm Brand</dd>
-            <dt className="italic mt-2">{isEnglish ? 'Board Member' : 'Beisitzer'}</dt>
-            <dd>Alexander Ohrt</dd>
-            <dt className="italic mt-2">{isEnglish ? 'Board Member' : 'Beisitzer'}</dt>
-            <dd>Frederik Steinbock</dd>
+            <dl>
+              <dt className="italic mt-2">{isEnglish ? '1st Chairman' : '1. Vorsitzender'}</dt>
+              <dd>Harm Brand</dd>
+              <dt className="italic mt-2">{isEnglish ? 'Board Member' : 'Beisitzer'}</dt>
+              <dd>Alexander Ohrt</dd>
+              <dt className="italic mt-2">{isEnglish ? 'Board Member' : 'Beisitzer'}</dt>
+              <dd>Frederik Steinbock</dd>
+            </dl>
           </div>
           <div className="col-0 col-md-1"></div>
         </div>
@@ -46,7 +52,7 @@ const Imprint: FC = () => {
           <p>
             {isEnglish
               ? 'Information on the processing of your personal data can be found in our '
-              : 'Informationen zur Verarbeitung Ihrer personenbezogenen Daten finden Sie in unserer '}
+              : 'Informationen zur Verarbeitung deiner personenbezogenen Daten findest du in unserer '}
             <a href="/privacy" className="underline hover:text-gray-300">
               {isEnglish ? 'Privacy Policy' : 'Datenschutzerklärung'}
             </a>

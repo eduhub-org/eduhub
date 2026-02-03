@@ -11,5 +11,9 @@ CREATE TABLE "public"."EnrollmentAddon" (
 -- Ensure one enrollment can only have one instance of each add-on
 CREATE UNIQUE INDEX "EnrollmentAddon_enrollmentId_addonMappingId_key" ON "public"."EnrollmentAddon" ("enrollmentId", "addonMappingId");
 
+-- Add indexes on foreign keys for optimized lookups
+CREATE INDEX "EnrollmentAddon_enrollmentId_idx" ON "public"."EnrollmentAddon" ("enrollmentId");
+CREATE INDEX "EnrollmentAddon_addonMappingId_idx" ON "public"."EnrollmentAddon" ("addonMappingId");
+
 -- Add comment
 COMMENT ON TABLE "public"."EnrollmentAddon" IS 'Tracks which add-ons were selected and purchased for each course enrollment';

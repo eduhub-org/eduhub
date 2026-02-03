@@ -56,8 +56,8 @@ const Terms: FC = () => {
           </p>
           <p>
             {isEnglish
-              ? 'For offerings that do not require an application, the contract is formed as soon as the booking process is completed and payment has been successfully initiated.'
-              : 'Bei nicht bewerbungspflichtigen Angeboten kommt der Vertrag zustande, sobald der Buchungsprozess abgeschlossen und die Zahlung erfolgreich ausgelöst wurde.'}
+              ? 'For offerings that do not require an application, the contract is formed as soon as the booking process is completed. For paid offerings, payment must also be successfully initiated.'
+              : 'Bei nicht bewerbungspflichtigen Angeboten kommt der Vertrag zustande, sobald der Buchungsprozess abgeschlossen ist. Bei kostenpflichtigen Angeboten muss zusätzlich die Zahlung erfolgreich ausgelöst worden sein.'}
           </p>
           <p>
             {isEnglish
@@ -104,8 +104,8 @@ const Terms: FC = () => {
           </h2>
           <p>
             {isEnglish
-              ? 'The collection of registration and application data is done through forms provided within the EduHub platform. For this purpose, the tool "Formbricks" is used as a technical service provider.'
-              : 'Die Erhebung von Registrierungs- und Bewerbungsdaten erfolgt über Formulare, die innerhalb der Plattform EduHub bereitgestellt werden. Hierfür wird das Tool „Formbricks" als technischer Dienstleister eingesetzt.'}
+              ? 'The collection of registration, application, onboarding, and evaluation data is done through forms and surveys provided within the EduHub platform. For this purpose, the tool "Formbricks" is used as a technical service provider.'
+              : 'Die Erhebung von Registrierungs-, Bewerbungs-, Onboarding- und Evaluationsdaten erfolgt über Formulare und Umfragen, die innerhalb der Plattform EduHub bereitgestellt werden. Hierfür wird das Tool „Formbricks" als technischer Dienstleister eingesetzt.'}
           </p>
           <p>
             {isEnglish
@@ -135,12 +135,12 @@ const Terms: FC = () => {
           <p>
             {isEnglish
               ? 'You have the right to withdraw from this contract within 14 days without giving any reason. The withdrawal period begins on the day of contract formation.'
-              : 'Sie haben das Recht, binnen 14 Tagen ohne Angabe von Gründen diesen Vertrag zu widerrufen. Die Frist beginnt mit dem Tag des Vertragsschlusses.'}
+              : 'Du hast das Recht, binnen 14 Tagen ohne Angabe von Gründen diesen Vertrag zu widerrufen. Die Frist beginnt mit dem Tag des Vertragsschlusses.'}
           </p>
           <p>
             {isEnglish
               ? 'To exercise your right of withdrawal, you must inform us (Campus Business Box e.V., Fraunhoferstraße 13, 24118 Kiel, Email: edu@opencampus.sh) by means of a clear statement (e.g., by email).'
-              : 'Um Ihr Widerrufsrecht auszuüben, müssen Sie uns (Campus Business Box e.V., Fraunhoferstraße 13, 24118 Kiel, E-Mail: edu@opencampus.sh) mittels einer eindeutigen Erklärung (z. B. per E-Mail) informieren.'}
+              : 'Um dein Widerrufsrecht auszuüben, musst du uns (Campus Business Box e.V., Fraunhoferstraße 13, 24118 Kiel, E-Mail: edu@opencampus.sh) mittels einer eindeutigen Erklärung (z. B. per E-Mail) informieren.'}
           </p>
           <p>
             <strong>{isEnglish ? 'Expiration of the Right of Withdrawal:' : 'Erlöschen des Widerrufsrechts:'}</strong>
@@ -148,7 +148,7 @@ const Terms: FC = () => {
           <p>
             {isEnglish
               ? 'The right of withdrawal expires prematurely if the event has been fully conducted or if you have expressly agreed that the provider may begin performance before the withdrawal period expires.'
-              : 'Das Widerrufsrecht erlischt vorzeitig, wenn die Veranstaltung vollständig durchgeführt wurde oder wenn Sie ausdrücklich zugestimmt haben, dass der Anbieter vor Ablauf der Widerrufsfrist mit der Leistung beginnt.'}
+              : 'Das Widerrufsrecht erlischt vorzeitig, wenn die Veranstaltung vollständig durchgeführt wurde oder wenn du ausdrücklich zugestimmt hast, dass der Anbieter vor Ablauf der Widerrufsfrist mit der Leistung beginnt.'}
           </p>
 
           <h2 className="text-2xl mt-6 mb-2">§ 7 {isEnglish ? 'Cancellation' : 'Stornierung'}</h2>
@@ -224,7 +224,7 @@ const Terms: FC = () => {
 
           <div className="mt-12 mb-8">
             <p className="text-sm text-gray-400">
-              {isEnglish ? 'As of: January 30, 2026' : 'Stand: 30. Januar 2026'}
+              {isEnglish ? 'As of: February 5, 2026' : 'Stand: 5. Februar 2026'}
             </p>
           </div>
         </div>

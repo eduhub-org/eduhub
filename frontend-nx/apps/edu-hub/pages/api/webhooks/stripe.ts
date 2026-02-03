@@ -128,6 +128,17 @@ const handleStripeWebhook = async (
 
         const parsedEnrollmentId = Number.parseInt(enrollmentId, 10);
 
+        // Validate parsed enrollment ID
+        if (
+          Number.isNaN(parsedEnrollmentId) ||
+          !Number.isFinite(parsedEnrollmentId) ||
+          !Number.isInteger(parsedEnrollmentId) ||
+          parsedEnrollmentId <= 0
+        ) {
+          console.error('Invalid enrollmentId in session metadata', { enrollmentId, parsedEnrollmentId });
+          return res.status(400).json({ error: 'Invalid enrollmentId' });
+        }
+
         // Update enrollment with payment information
         await client.request(UPDATE_ENROLLMENT_PAYMENT, {
           enrollmentId: parsedEnrollmentId,

@@ -232,6 +232,29 @@ export function createVariableReplacer(data, formatDate) {
         data.courseLink || `${process.env.FRONTEND_URL || 'https://edu.opencampus.sh'}/course/${data.course?.id || ''}`
       );
     
+    // Build addons HTML list
+    let addonsHtml = '';
+    if (data.enrollmentAddons && Array.isArray(data.enrollmentAddons) && data.enrollmentAddons.length > 0) {
+      const addonLines = data.enrollmentAddons.map(addon => {
+        const description = addon.CourseAddonMapping?.description || '';
+        const price = addon.priceAtPurchase || 0;
+        const currency = addon.currency || 'EUR';
+        const formattedPrice = (price / 100).toFixed(2).replace('.', ',');
+        return `– ${description}: ${formattedPrice} ${currency} inkl. MwSt.`;
+      });
+      addonsHtml = '<strong>Add-ons:</strong>\n' + addonLines.join('\n');
+    }
+    result = result.replaceAll('[Enrollment:Addons]', addonsHtml);
+    
+    // Calculate and format total cost (base price + all addon prices)
+    const basePrice = data.course?.basePrice || 0;
+    const addonsTotal = data.enrollmentAddons && Array.isArray(data.enrollmentAddons)
+      ? data.enrollmentAddons.reduce((sum, addon) => sum + (addon.priceAtPurchase || 0), 0)
+      : 0;
+    const totalCost = basePrice + addonsTotal;
+    const formattedTotalCost = (totalCost / 100).toFixed(2).replace('.', ',');
+    result = result.replaceAll('[Enrollment:TotalCost]', formattedTotalCost);
+    
     // Session variables (for reminders) - always attempt replacement
     result = result
       .replaceAll('[Session:Title]', data.session?.title || '')

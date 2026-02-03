@@ -260,7 +260,27 @@ export default async function createStripeCheckout(req, logger) {
         enrollmentId: String(enrollmentId),
         formbricksResponseId: formbricksResponseId || '',
         source: 'eduhub',
-        selectedAddons: selectedAddons && selectedAddons.length > 0 ? JSON.stringify(selectedAddons) : ''
+        selectedAddons: (() => {
+          if (!selectedAddons || selectedAddons.length === 0) {
+            return '';
+          }
+          // Map to only essential identifiers to reduce metadata size
+          const mappedAddons = selectedAddons.map(addon => ({
+            id: addon.id,
+            questionId: addon.questionId,
+            choiceId: addon.choiceId
+          }));
+          const serialized = JSON.stringify(mappedAddons);
+          // Stripe metadata has 500 char limit per key - validate and fall back if exceeded
+          if (serialized.length > 500) {
+            logger.warn('selectedAddons metadata exceeds 500 chars, omitting from metadata', {
+              length: serialized.length,
+              addonCount: selectedAddons.length
+            });
+            return '';
+          }
+          return serialized;
+        })()
       },
       payment_intent_data: {
         metadata: {

@@ -19,8 +19,13 @@ export const Footer: FC = () => {
 
           <div className="text-sm font-thin order-2 sm:order-1 mt-4 sm:mt-20">
             <p>
-              <a href="/impressum" target="_blank" rel="noopener noreferrer">
-                {'Impressum - Datenschutz'}
+              <a href="/imprint">
+                {'Impressum'}
+              </a>
+            </p>
+            <p>
+              <a href="/privacy">
+                {'Datenschutz'}
               </a>
             </p>
             <p>

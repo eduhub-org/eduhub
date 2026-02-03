@@ -42,4 +42,4 @@ All legal pages support both German and English translations. The language is au
 
 | Date       | Document        | Changes                                   |
 | ---------- | --------------- | ----------------------------------------- |
-| 2026-01-30 | Terms & Privacy | Initial versions with payment registration |
+| 2026-02-05 | Terms & Privacy | Initial versions with payment registration |
