@@ -31,7 +31,7 @@ exports.sendQuestionaires = async (req, res) => {
                   questionaire_sent
                   SessionSpeakers {
                     id
-                    expertId
+                    userId
                   }
                 }
                 Program {
@@ -49,7 +49,7 @@ exports.sendQuestionaires = async (req, res) => {
                   }
                 }
                 CourseInstructors {
-                  expertId
+                  userId
                 }
               }
             }`,
@@ -69,7 +69,7 @@ exports.sendQuestionaires = async (req, res) => {
         for (const sessionSpeaker of session.SessionSpeakers) {
           var isInstructor = false;
           for (const courseInstructor of course.CourseInstructors) {
-            if (courseInstructor.expertId == sessionSpeaker.expertId) {
+            if (courseInstructor.userId == sessionSpeaker.userId) {
               isInstructor = true;
             }
           }
