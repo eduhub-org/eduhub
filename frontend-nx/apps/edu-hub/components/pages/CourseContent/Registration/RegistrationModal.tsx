@@ -181,12 +181,12 @@ export const RegistrationModal: FC<RegistrationModalProps> = ({
         },
       }}
     >
-      <DialogTitle sx={{ padding: { xs: '16px', sm: '24px' } }}>
+      <DialogTitle sx={{ padding: { xs: '16px', sm: '24px' } }} className="light">
         <div className="flex justify-between items-center">
-          <span className="text-lg sm:text-xl font-semibold pr-4">{getModalTitle()}</span>
+          <span className="text-lg sm:text-xl font-semibold pr-4 text-label-primary">{getModalTitle()}</span>
           <button
             onClick={handleClose}
-            className="p-2 rounded-full hover:bg-gray-200 transition-colors flex-shrink-0"
+            className="p-2 rounded-full hover:bg-gray-200 transition-colors flex-shrink-0 text-label-primary"
             aria-label={t('modal.close')}
             disabled={isLoading}
           >
@@ -195,9 +195,9 @@ export const RegistrationModal: FC<RegistrationModalProps> = ({
         </div>
       </DialogTitle>
 
-      <DialogContent sx={{ padding: { xs: '0 16px', sm: '0 24px' }, flex: 1, display: 'flex', flexDirection: 'column' }}>
+      <DialogContent sx={{ padding: { xs: '0 16px', sm: '0 24px' }, flex: 1, display: 'flex', flexDirection: 'column' }} className="light">
         <div className="mb-4">
-          <p className="text-gray-600 font-medium text-sm sm:text-base">{course.title}</p>
+          <p className="text-label-primary font-medium text-sm sm:text-base">{course.title}</p>
         </div>
 
         {/* Formbricks Survey Embed */}
@@ -222,11 +222,11 @@ export const RegistrationModal: FC<RegistrationModalProps> = ({
         {/* Traditional Motivation Letter Input */}
         {!useFormbricks && config.requiresInput && (
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">{t('modal.motivation_letter_label')}</label>
+            <label className="block text-sm font-medium text-label-primary mb-2">{t('modal.motivation_letter_label')}</label>
             <textarea
               value={motivationLetter}
               onChange={(e) => setMotivationLetter(e.target.value)}
-              className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
+              className="w-full p-3 border border-border-primary rounded-md focus:ring-2 focus:ring-brand focus:border-transparent text-sm sm:text-base text-label-primary bg-fill-primary"
               rows={7}
               placeholder={t('modal.motivation_letter_placeholder')}
               disabled={isLoading}
@@ -247,14 +247,14 @@ export const RegistrationModal: FC<RegistrationModalProps> = ({
                 className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded flex-shrink-0"
                 disabled={isLoading}
               />
-              <span className="text-sm text-gray-700 leading-relaxed">
+              <span className="text-sm text-label-primary leading-relaxed">
                 {t.rich('modal.accept_terms', {
                   terms: (chunks) => (
                     <a
                       href="/terms"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline"
+                      className="text-brand hover:underline"
                       onClick={(e) => e.stopPropagation()}
                     >
                       {chunks}
@@ -265,7 +265,7 @@ export const RegistrationModal: FC<RegistrationModalProps> = ({
                       href="/privacy"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline"
+                      className="text-brand hover:underline"
                       onClick={(e) => e.stopPropagation()}
                     >
                       {chunks}
@@ -286,7 +286,7 @@ export const RegistrationModal: FC<RegistrationModalProps> = ({
 
       {/* Hide submit button when using Formbricks - auto-submit on completion */}
       {!useFormbricks && (
-      <DialogActions sx={{ padding: { xs: '16px', sm: '24px' }, paddingTop: 0 }}>
+      <DialogActions sx={{ padding: { xs: '16px', sm: '24px' }, paddingTop: 0 }} className="light">
         <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-3 w-full">
           <Button onClick={handleClose} disabled={isLoading} className="px-6 py-3 w-full sm:w-auto order-2 sm:order-1">
             {t('modal.cancel')}
@@ -295,7 +295,7 @@ export const RegistrationModal: FC<RegistrationModalProps> = ({
             onClick={handleSubmit}
             filled
             disabled={isSubmitDisabled}
-            className="px-6 py-3 min-w-[140px] font-medium w-full sm:w-auto order-1 sm:order-2"
+            className="px-6 py-3 min-w-[140px] font-medium w-full sm:w-auto order-1 sm:order-2 !text-white !bg-[#222222]"
           >
             {isLoading ? (
               <div className="flex items-center justify-center space-x-2">

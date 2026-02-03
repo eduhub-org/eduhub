@@ -241,6 +241,36 @@ export const theme = createTheme({
         },
       },
     },
+    // Dialog - use white background with dark text
+    MuiDialog: {
+      styleOverrides: {
+        paper: {
+          backgroundColor: '#ffffff',
+          color: '#222222',
+        },
+      },
+    },
+    MuiDialogTitle: {
+      styleOverrides: {
+        root: {
+          color: '#222222',
+        },
+      },
+    },
+    MuiDialogContent: {
+      styleOverrides: {
+        root: {
+          color: '#222222',
+        },
+      },
+    },
+    MuiDialogActions: {
+      styleOverrides: {
+        root: {
+          color: '#222222',
+        },
+      },
+    },
     // Tooltip
     MuiTooltip: {
       styleOverrides: {

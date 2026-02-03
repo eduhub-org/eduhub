@@ -116,12 +116,12 @@ export const AddonValidationDialog: React.FC<AddonValidationDialogProps> = ({
         },
       }}
     >
-      <DialogTitle>
+      <DialogTitle className="light">
         <div className="flex justify-between items-center">
-          <span>Add-ons validieren</span>
+          <span className="text-label-primary">Add-ons validieren</span>
           <button
             onClick={onClose}
-            className="p-1 rounded-full hover:bg-gray-200 transition-colors"
+            className="p-1 rounded-full hover:bg-gray-200 transition-colors text-label-primary"
             aria-label="Schließen"
           >
             <MdClose className="text-xl" />
@@ -129,7 +129,7 @@ export const AddonValidationDialog: React.FC<AddonValidationDialogProps> = ({
         </div>
       </DialogTitle>
 
-      <DialogContent sx={{ overflowY: 'auto', flex: '1 1 auto' }}>
+      <DialogContent sx={{ overflowY: 'auto', flex: '1 1 auto' }} className="light">
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, py: 2 }}>
           {addonQuestions.length === 0 ? (
             <Typography>Keine Add-ons gefunden.</Typography>
@@ -196,7 +196,7 @@ export const AddonValidationDialog: React.FC<AddonValidationDialogProps> = ({
         </Box>
       </DialogContent>
 
-      <DialogActions sx={{ px: 3, pb: 2 }}>
+      <DialogActions sx={{ px: 3, pb: 2 }} className="light">
         <Button onClick={onClose}>Abbrechen</Button>
         <Button filled onClick={handleSave} disabled={isLoading || addonQuestions.length === 0}>
           {isLoading ? 'Speichern...' : 'Speichern & Stripe Preise erstellen'}

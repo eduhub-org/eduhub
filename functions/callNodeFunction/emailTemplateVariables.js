@@ -247,7 +247,7 @@ export function createVariableReplacer(data, formatDate) {
     result = result.replaceAll('[Enrollment:Addons]', addonsHtml);
     
     // Calculate and format total cost (base price + all addon prices)
-    const basePrice = data.course?.basePrice || 0;
+    // Reuse basePrice declared above
     const addonsTotal = data.enrollmentAddons && Array.isArray(data.enrollmentAddons)
       ? data.enrollmentAddons.reduce((sum, addon) => sum + (addon.priceAtPurchase || 0), 0)
       : 0;

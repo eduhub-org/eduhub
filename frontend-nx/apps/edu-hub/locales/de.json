@@ -406,7 +406,7 @@
       "title_with_payment": "Registrierung und Bezahlung",
       "motivation_letter_label": "Motivationsschreiben",
       "motivation_letter_placeholder": "Bitte erzähle uns, warum du teilnehmen möchtest...",
-      "payment_info": "Dieser Kurs kostet {cost}. Du wirst nach der Registrierung zur Zahlungsseite weitergeleitet.",
+      "payment_info": "Die Teilnahme kostet {cost}. Du wirst nach der Registrierung zur Zahlungsseite weitergeleitet.",
       "accept_terms": "Ich habe die <terms>Allgemeinen Geschäftsbedingungen (AGB)</terms> sowie die <privacy>Datenschutzerklärung</privacy> gelesen und akzeptiere sie.",
       "cancel": "Abbrechen",
       "payment": {

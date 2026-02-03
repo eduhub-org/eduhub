@@ -37,8 +37,8 @@ export const ErrorMessageDialog: FC<ErrorProps> = ({ errorMessage, open, onClose
       fullWidth
       PaperProps={{
         sx: {
-          backgroundColor: 'var(--eduhub-bg-card)',
-          color: 'var(--eduhub-label-primary)',
+          backgroundColor: '#ffffff',
+          color: '#222222',
           maxHeight: '90vh',
         },
       }}
@@ -48,13 +48,14 @@ export const ErrorMessageDialog: FC<ErrorProps> = ({ errorMessage, open, onClose
     >
       <DialogTitle 
         id="error-dialog-title"
+        className="light"
         sx={{
-          color: 'var(--eduhub-label-primary)',
+          color: '#222222',
           borderBottom: '1px solid var(--eduhub-border-primary)',
         }}
       >
         <div className="grid grid-cols-2">
-          <div>{t('error')}</div>
+          <div className="text-label-primary">{t('error')}</div>
           <div className="cursor-pointer flex justify-end">
             <MdClose 
               aria-label={t('close')} 

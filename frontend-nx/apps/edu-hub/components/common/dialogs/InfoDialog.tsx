@@ -37,7 +37,7 @@ export const InfoDialog: FC<InfoDialogProps> = ({
       maxWidth="md"
       actions={actions}
     >
-      <div className="whitespace-pre-line text-sm text-gray-700">{content}</div>
+      <div className="whitespace-pre-line text-sm text-label-primary">{content}</div>
     </DialogShell>
   );
 };

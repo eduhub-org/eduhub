@@ -406,7 +406,7 @@
       "title_with_payment": "Registration and Payment",
       "motivation_letter_label": "Motivation Letter",
       "motivation_letter_placeholder": "Please tell us why you want to participate in this course...",
-      "payment_info": "This course costs {cost}. You will be redirected to the payment page after registration.",
+      "payment_info": "Participation costs {cost}. You will be redirected to the payment page after registration.",
       "accept_terms": "I have read and accept the <terms>Terms and Conditions</terms> and the <privacy>Privacy Policy</privacy>.",
       "cancel": "Cancel",
       "payment": {

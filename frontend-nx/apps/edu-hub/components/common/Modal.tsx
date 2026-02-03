@@ -24,10 +24,10 @@ const Modal: FC<IProps> = ({ isOpen, onClose, title, children, maxWidth, dialogP
 
   return (
     <Dialog open={isOpen} onClose={onCloseHandler} maxWidth={maxWidth} {...dialogProps}>
-      <DialogTitle>
+      <DialogTitle className="light">
         <div className="flex flex-row justify-between">
-          {title && <p>{title}</p>}
-          <MdClose onClick={onCloseHandler} className="cursor-pointer" aria-label="Close" />
+          {title && <p className="text-label-primary">{title}</p>}
+          <MdClose onClick={onCloseHandler} className="cursor-pointer text-label-primary" aria-label="Close" />
         </div>
       </DialogTitle>
       <DialogContent className="light">{children}</DialogContent>
