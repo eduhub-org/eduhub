@@ -1,4 +1,5 @@
 import Head from 'next/head';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { FC } from 'react';
 import { Page } from '../../components/layout/Page';
@@ -199,9 +200,9 @@ const Terms: FC = () => {
             {isEnglish
               ? 'The processing of personal data is carried out in accordance with the '
               : 'Die Verarbeitung personenbezogener Daten erfolgt gemäß der '}
-            <a href="/privacy" className="underline hover:text-gray-300">
+            <Link href="/privacy" className="underline hover:text-gray-300">
               {isEnglish ? 'Privacy Policy' : 'Datenschutzerklärung'}
-            </a>
+            </Link>
             {isEnglish
               ? ', which is an integral part of this contract.'
               : ', die integraler Bestandteil dieses Vertrags ist.'}

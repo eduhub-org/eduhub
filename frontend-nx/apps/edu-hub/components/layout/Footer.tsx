@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import { FC } from 'react';
 import facebookIcon from '../../public/images/share/facebook-icon.svg';
 import instagramIcon from '../../public/images/share/instagram-icon.svg';
@@ -19,14 +20,14 @@ export const Footer: FC = () => {
 
           <div className="text-sm font-thin order-2 sm:order-1 mt-4 sm:mt-20">
             <p>
-              <a href="/imprint">
+              <Link href="/imprint">
                 {'Impressum'}
-              </a>
+              </Link>
             </p>
             <p>
-              <a href="/privacy">
+              <Link href="/privacy">
                 {'Datenschutz'}
-              </a>
+              </Link>
             </p>
             <p>
               <a href="https://opencampus.gitbook.io/faq/" target="_blank" rel="noopener noreferrer">

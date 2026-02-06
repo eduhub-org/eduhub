@@ -1,4 +1,5 @@
 import Head from 'next/head';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { FC } from 'react';
 import { Page } from '../../components/layout/Page';
@@ -82,9 +83,9 @@ const Privacy: FC = () => {
             {isEnglish
               ? 'For this purpose and for further questions on the subject of data protection, you can contact us at any time at the address given in the '
               : 'Hierzu sowie zu weiteren Fragen zum Thema Datenschutz kannst du dich jederzeit unter der im '}
-            <a href="/imprint" className="underline hover:text-gray-300">
+            <Link href="/imprint" className="underline hover:text-gray-300">
               {isEnglish ? 'Imprint' : 'Impressum'}
-            </a>
+            </Link>
             {isEnglish ? '.' : ' angegebenen Adresse an uns wenden.'}
           </p>
           <h3 className="text-lg mt-2 mb-2 italic">
@@ -247,9 +248,9 @@ const Privacy: FC = () => {
             {isEnglish
               ? 'You have the right to request the restriction of processing of your personal data. For this purpose, you can contact us at any time at the address given in the '
               : 'Du hast das Recht, die Einschränkung der Verarbeitung deiner personenbezogenen Daten zu verlangen. Hierzu kannst du dich jederzeit unter der im '}
-            <a href="/imprint" className="underline hover:text-gray-300">
+            <Link href="/imprint" className="underline hover:text-gray-300">
               {isEnglish ? 'Imprint' : 'Impressum'}
-            </a>
+            </Link>
             {isEnglish
               ? '. The right to restriction of processing exists in the following cases:'
               : ' angegebenen Adresse an uns wenden. Das Recht auf Einschränkung der Verarbeitung besteht in folgenden Fällen:'}

@@ -1,4 +1,5 @@
 import Head from 'next/head';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { FC } from 'react';
 import { Page } from '../../components/layout/Page';
@@ -53,9 +54,9 @@ const Imprint: FC = () => {
             {isEnglish
               ? 'Information on the processing of your personal data can be found in our '
               : 'Informationen zur Verarbeitung deiner personenbezogenen Daten findest du in unserer '}
-            <a href="/privacy" className="underline hover:text-gray-300">
+            <Link href="/privacy" className="underline hover:text-gray-300">
               {isEnglish ? 'Privacy Policy' : 'Datenschutzerklärung'}
-            </a>
+            </Link>
             .
           </p>
         </div>

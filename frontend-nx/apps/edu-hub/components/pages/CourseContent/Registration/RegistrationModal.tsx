@@ -104,7 +104,7 @@ export const RegistrationModal: FC<RegistrationModalProps> = ({
     {
       variables: {
         courseId: course.id,
-        userId: userId!,
+        userId: userId ?? 0,
         enrollmentId: retryEnrollmentId || undefined,
         formbricksSurveyUrl: effectiveSurveyUrl || '',
       },
@@ -321,7 +321,7 @@ export const RegistrationModal: FC<RegistrationModalProps> = ({
     } else {
       setError(result.error || t('errors.registration_failed'));
     }
-  }, [config, motivationLetter, acceptTerms, onSubmit, t, closeModal, useFormbricks, formbricksSurveyCompleted, currentStep]);
+  }, [config, motivationLetter, acceptTerms, onSubmit, t, closeModal, useFormbricks, formbricksSurveyCompleted, currentStep, basePrice, enrollmentId, selectedAddons]);
 
   // When retry flow is active, mark survey as completed if we have prefilled data
   useEffect(() => {

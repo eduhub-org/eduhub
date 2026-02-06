@@ -269,7 +269,9 @@ const CreatableTagSelector: React.FC<CreatableTagSelectorProps> = ({
     </div>
   );
 
-  return <div className={className}>{variant === 'material' ? renderMaterialUI() : renderEduhub()}</div>;
+  return (
+    <div className={className}>{variant === 'material' ? renderMaterialUI() : renderEduhub()}</div>
+  );
 };
 
 export default CreatableTagSelector;
