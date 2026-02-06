@@ -145,7 +145,6 @@ export const useRegistrationHandler = ({
             userEmail: null, // Will be fetched from user context server-side
             course: null, // Will be fetched server-side from Hasura
             addonMappings: null, // Will be fetched server-side from Hasura
-            selectedAddons: null, // Deprecated: server reads from DB instead
           },
         });
 
