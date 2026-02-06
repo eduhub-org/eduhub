@@ -145,23 +145,25 @@ export const InfoPanel: FC<IProps> = ({ course }) => {
     if (showPrice) {
       elements.push(
         <div key="price" className="flex flex-col items-center">
-          <div className="flex justify-center items-center mb-2">
-            <MdAttachMoney className="text-label-primary" size={24} />
+          <div className="flex justify-center items-center mt-2">
+            <MdAttachMoney className="text-label-primary" size={28} />
           </div>
-          <div className="text-sm text-center">
+          <span className="text-sm mt-2 text-center">
             {hasPrice ? (
-              <div className="flex flex-col items-center gap-1">
-                <span>{formatPrice(basePrice, currency)}</span>
+              <>
+                {formatPrice(basePrice, currency)}
                 {hasAddons && (
-                  <span className="text-label-secondary text-xs">
+                  <span className="block text-label-secondary text-xs mt-1">
                     + {tCoursePage('add_ons')}
                   </span>
                 )}
-              </div>
+              </>
+            ) : basePrice === 0 && hasAddons ? (
+              tCoursePage('variable_price')
             ) : (
-              <span>{tCoursePage('free_course')}</span>
+              tCoursePage('free_course')
             )}
-          </div>
+          </span>
         </div>
       );
     }

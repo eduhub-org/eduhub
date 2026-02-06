@@ -380,7 +380,8 @@
       "register_with_payment": "Register Now",
       "register_now": "Register Now",
       "accept_invitation": "Accept invitation",
-      "placeholder_motivation_letter": "My motivation ..."
+      "placeholder_motivation_letter": "My motivation ...",
+      "retry_payment": "Retry Payment"
     },
     "status": {
       "applied": "Your application is under review",
@@ -389,6 +390,8 @@
       "cancelled": "Your invitation has been cancelled",
       "invited": "You have been invited and need to confirm your participation",
       "invitation_expired": "Your invitation has expired",
+      "payment_pending": "Your payment has not been completed yet. You can review your selections and try again.",
+      "payment_failed": "Your payment could not be processed. You can review your selections and try again.",
       "application_period_ended": "Unfortunately, the application period has ended. You can subscribe to our <a>newsletter</a> to stay informed about new offers.",
       "application_period_ended_title": "Application Period Ended",
       "registration_period_ended": "Unfortunately, the registration period has ended. You can subscribe to our <a>newsletter</a> to stay informed about new offers.",
@@ -406,7 +409,12 @@
       "title_with_payment": "Registration and Payment",
       "motivation_letter_label": "Motivation Letter",
       "motivation_letter_placeholder": "Please tell us why you want to participate in this course...",
-      "payment_info": "Participation costs {cost}. You will be redirected to the payment page after registration.",
+      "summary_description": "You are about to confirm your participation in \"{title}\" and will be redirected to complete your payment.",
+      "pricing_summary": "Pricing Summary",
+      "base_price": "Base Price",
+      "addons": "Add-ons",
+      "no_addons": "No add-ons",
+      "total": "Total",
       "accept_terms": "I have read and accept the <terms>Terms and Conditions</terms> and the <privacy>Privacy Policy</privacy>.",
       "cancel": "Cancel",
       "payment": {
@@ -439,7 +447,8 @@
     "formbricks": {
       "survey_title": "Application Questionnaire",
       "survey_completed": "Thank you! Your questionnaire has been successfully submitted.",
-      "embed_error": "The questionnaire could not be loaded. Please try again later."
+      "embed_error": "The questionnaire could not be loaded. Please try again later.",
+      "loading_addons": "Loading payment data"
     },
     "onboarding_modal": {
       "decline_confirm_text": "Do you really want to decline the invitation to this course?",
@@ -464,6 +473,7 @@
     "price_label": "Course Fee",
     "add_ons": "Add-ons",
     "free_course": "Free",
+    "variable_price": "Price: variable",
     "total": "Total",
     "pricing_section_title": "Prizing",
     "starts_at": "Starts at",
@@ -1047,7 +1057,7 @@
       "help_text": "Collect registration information and optional add-on selections via Formbricks survey.",
       "learn_more": "Learn more",
       "setup_dialog_title": "Formbricks Survey Setup",
-      "setup_dialog_content": "The Formbricks survey serves two purposes:\n\n1. Collect Registration Information\nCollect applicant information, motivation letters, and other registration details that will be displayed in the applications overview.\n\n2. Define Add-on Prices (for payment-enabled courses)\nIf your course requires payment, you can include questions about optional add-ons (e.g., \"Would you like to add a certificate? (+€50)\"). The system automatically extracts prices mentioned in survey questions.\n\n---\n\nHidden Fields Configuration\n\nImportant: You must configure Hidden Fields in your Formbricks survey!\n\nRequired Hidden Fields:\n• eduhubUserId - Automatically filled with EduHub user ID\n• eduhubCourseId - Automatically filled with course ID\n• eduhubEnrollmentId - Automatically filled with enrollment ID (optional)\n\nIn Formbricks: Edit Survey → Enable Hidden Fields → Add these field IDs. Without this configuration, responses cannot be properly matched.\n\nNote: eduhubEnrollmentId is optional because the enrollment is created AFTER the survey is completed during registration.\n\n---\n\nAdd-on Price Extraction\n\nFor courses with payment enabled:\n1. Include add-n selection answer options with price information in your survey questions (e.g., \"Certificate (+€50)\" or \"Workshop materials: €25\")\n2. Use the \"Validate Add-ons\" button in the Pricing Settings section\n3. The system will analyze your survey and extract detected prices\n4. Review and validate the extracted prices in the validation dialog\n5. Validated add-ons are automatically synced with Stripe for payment processing",
+      "setup_dialog_content": "The Formbricks survey serves two purposes:\n\n1. Collect Registration Information\nCollect applicant information, motivation letters, and other registration details that will be displayed in the applications overview.\n\n2. Define Add-on Prices (for payment-enabled courses)\nIf your course requires payment, you can include questions about optional add-ons (e.g., \"Would you like to add a certificate? (+€50)\"). The system automatically extracts prices mentioned in survey questions.\n\nTip: If you offer different price categories via add-ons (e.g., Basic, Standard, Premium), set the base price to 0. The InfoPanel will then display \"Price: variable\". For more details, see the base price help text.\n\n---\n\nHidden Fields Configuration\n\nImportant: You must configure Hidden Fields in your Formbricks survey!\n\nRequired Hidden Fields:\n• eduhubUserId - Automatically filled with EduHub user ID\n• eduhubCourseId - Automatically filled with course ID\n• eduhubEnrollmentId - Automatically filled with enrollment ID (optional)\n\nIn Formbricks: Edit Survey → Enable Hidden Fields → Add these field IDs. Without this configuration, responses cannot be properly matched.\n\nNote: eduhubEnrollmentId is optional because the enrollment is created AFTER the survey is completed during registration.\n\n---\n\nAdd-on Price Extraction\n\nFor courses with payment enabled:\n1. Include add-on selection answer options with price information in your survey questions (e.g., \"Certificate (+€50)\" or \"Workshop materials: €25\")\n2. Use the \"Validate Add-ons\" button in the Pricing Settings section\n3. The system will analyze your survey and extract detected prices\n4. Review and validate the extracted prices in the validation dialog\n5. Validated add-ons are automatically synced with Stripe for payment processing",
       "help_text_hidden_fields": "Important: You must configure Hidden Fields in your Formbricks survey!\n\nRequired Hidden Fields:\n• eduhubUserId - Automatically filled with EduHub user ID\n• eduhubCourseId - Automatically filled with course ID\n• eduhubEnrollmentId - Automatically filled with enrollment ID (optional)\n\nIn Formbricks: Edit Survey → Enable Hidden Fields → Add these field IDs. Without this configuration, responses cannot be properly matched.\n\nNote: eduhubEnrollmentId is optional because the enrollment is created AFTER the survey is completed during registration.",
       "no_survey_url": "No survey URL configured",
       "loading_responses": "Loading responses...",
@@ -1059,7 +1069,10 @@
     "pricing": {
       "title": "Pricing Settings",
       "base_price": "Base Price (in cents)",
-      "base_price_help": "The base price for the course in the smallest currency unit (e.g., cents for EUR)",
+      "base_price_help": "The base price for the course in the smallest currency unit (e.g., cents for EUR). Special rules apply when set to 0.",
+      "base_price_learn_more": "Learn more",
+      "base_price_dialog_title": "Base Price and Variable Pricing",
+      "base_price_dialog_content": "The base price is the base amount for course participation and is specified in the smallest currency unit (e.g., cents for EUR).\n\n--- Standard Case: Base Price > 0 ---\n\nWhen you set a base price above 0, this amount is displayed in the course InfoPanel. If you have additionally defined add-ons, a note \"+ Add-ons\" will appear.\n\nExample:\n• Base price: 5000 cents (50.00 EUR)\n• Add-on: Certificate for 1500 cents (15.00 EUR)\n→ InfoPanel shows: \"50.00 EUR + Add-ons\"\n\n--- Special Case: Base Price = 0 ---\n\nA base price of 0 has special significance and provides flexibility for different price categories:\n\n1. With Add-ons:\n   The InfoPanel displays \"Price: variable\". This is particularly useful when:\n   • Offering different price categories via the questionnaire\n   • Participants can choose between different packages\n   • The final price depends on individual add-on selections\n\n   Example: You offer different participation packages:\n   • Basic participation: 0 EUR (base price)\n   • Standard package: +50 EUR (add-on)\n   • Premium package: +100 EUR (add-on)\n   → InfoPanel shows: \"Price: variable\"\n\n2. Without Add-ons:\n   The InfoPanel displays \"Free\".\n   The course is completely free without payment options.\n\n--- Integration with Questionnaire ---\n\nAdd-ons are defined and validated via the Formbricks questionnaire:\n1. Include selection options with price information in your questionnaire\n2. Use the \"Validate Add-ons\" button to extract prices\n3. Validated add-ons are synced with Stripe\n4. During registration, participants select their desired options\n\nFor more details on questionnaire integration, see the help text for the Questionnaire URL.",
       "currency": "Currency",
       "validate_addons": "Validate Add-ons",
       "validating": "Validating...",

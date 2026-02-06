@@ -8,7 +8,6 @@ export const CREATE_STRIPE_CHECKOUT = gql`
     $userEmail: String
     $course: CourseInput
     $addonMappings: [AddonMappingInput!]
-    $selectedAddons: [SelectedAddonInput!]
   ) {
     createStripeCheckout(
       courseId: $courseId
@@ -17,7 +16,6 @@ export const CREATE_STRIPE_CHECKOUT = gql`
       userEmail: $userEmail
       course: $course
       addonMappings: $addonMappings
-      selectedAddons: $selectedAddons
     ) {
       success
       checkoutUrl

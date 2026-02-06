@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { CourseInput, AddonMappingInput, SelectedAddonInput } from "./../../__generated__/globalTypes";
+import { CourseInput, AddonMappingInput } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL mutation operation: CreateStripeCheckout
@@ -32,5 +32,4 @@ export interface CreateStripeCheckoutVariables {
   userEmail?: string | null;
   course?: CourseInput | null;
   addonMappings?: AddonMappingInput[] | null;
-  selectedAddons?: SelectedAddonInput[] | null;
 }

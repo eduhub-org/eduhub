@@ -58,7 +58,7 @@ export default async function sendEnrollmentEmail(req, logger) {
             basePrice
             currency
           }
-          EnrollmentAddons {
+          CourseEnrollmentAddons {
             id
             priceAtPurchase
             currency

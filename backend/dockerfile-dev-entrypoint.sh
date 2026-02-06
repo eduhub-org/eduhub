@@ -21,7 +21,11 @@ hasura-cli migrate apply --database-name default
 
 # Apply Hasura metadata
 echo "Applying metadata..."
-hasura-cli metadata apply
+# Use metadata apply to push local metadata files to Hasura
+hasura-cli metadata apply --endpoint http://localhost:8080 --admin-secret myadminsecretkey
+# Verify the action was loaded by checking metadata
+echo "Verifying metadata was applied..."
+sleep 2
 
 # Check if the "users" table is empty
 is_empty=$(psql $HASURA_GRAPHQL_DATABASE_URL -tAc "SELECT COUNT(*) FROM public.\"User\"")

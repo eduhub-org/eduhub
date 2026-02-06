@@ -52,8 +52,15 @@ export const useRoleQuery: typeof useQuery = (query, passedOptions) => {
     : passedOptions;
 
   const errorHandler = useErrorHandler();
+  const callerOnError = passedOptions?.onError;
       
-  return useQuery(query, { ...options, onError: errorHandler });
+  return useQuery(query, { 
+    ...options, 
+    onError: (error) => {
+      errorHandler(error);
+      callerOnError?.(error);
+    }
+  });
 };
 
 export const useLazyRoleQuery: typeof useLazyQuery = (query, passedOptions) => {
@@ -81,8 +88,15 @@ export const useLazyRoleQuery: typeof useLazyQuery = (query, passedOptions) => {
     : passedOptions;
 
   const errorHandler = useErrorHandler();
+  const callerOnError = passedOptions?.onError;
 
-  return useLazyQuery(query, { ...options, onError: errorHandler });
+  return useLazyQuery(query, { 
+    ...options, 
+    onError: (error) => {
+      errorHandler(error);
+      callerOnError?.(error);
+    }
+  });
 };
 
 export const useAdminQuery: typeof useQuery = (query, passedOptions) => {
@@ -104,8 +118,15 @@ export const useAdminQuery: typeof useQuery = (query, passedOptions) => {
     : passedOptions;
 
   const errorHandler = useErrorHandler();
+  const callerOnError = passedOptions?.onError;
 
-  return useQuery(query, { ...options, onError: errorHandler });
+  return useQuery(query, { 
+    ...options, 
+    onError: (error) => {
+      errorHandler(error);
+      callerOnError?.(error);
+    }
+  });
 };
 
 export const useAdminLazyQuery: typeof useLazyQuery = (query, passedOptions) => {
@@ -127,8 +148,15 @@ export const useAdminLazyQuery: typeof useLazyQuery = (query, passedOptions) => 
     : passedOptions;
 
   const errorHandler = useErrorHandler();
+  const callerOnError = passedOptions?.onError;
 
-  return useLazyQuery(query, { ...options, onError: errorHandler });
+  return useLazyQuery(query, { 
+    ...options, 
+    onError: (error) => {
+      errorHandler(error);
+      callerOnError?.(error);
+    }
+  });
 };
 
 export const useInstructorQuery: typeof useQuery = (query, passedOptions) => {
@@ -150,8 +178,15 @@ export const useInstructorQuery: typeof useQuery = (query, passedOptions) => {
     : passedOptions;
 
   const errorHandler = useErrorHandler();
+  const callerOnError = passedOptions?.onError;
 
-  return useQuery(query, { ...options, onError: errorHandler });
+  return useQuery(query, { 
+    ...options, 
+    onError: (error) => {
+      errorHandler(error);
+      callerOnError?.(error);
+    }
+  });
 };
 
 export const useAuthedQuery: typeof useQuery = (query, passedOptions) => {
@@ -173,6 +208,13 @@ export const useAuthedQuery: typeof useQuery = (query, passedOptions) => {
     : passedOptions;
 
   const errorHandler = useErrorHandler();
+  const callerOnError = passedOptions?.onError;
 
-  return useQuery(query, { ...options, onError: errorHandler });
+  return useQuery(query, { 
+    ...options, 
+    onError: (error) => {
+      errorHandler(error);
+      callerOnError?.(error);
+    }
+  });
 };

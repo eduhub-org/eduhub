@@ -121,6 +121,9 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
   // Formbricks help dialog state
   const [isFormbricksHelpDialogOpen, setIsFormbricksHelpDialogOpen] = useState(false);
 
+  // Base price help dialog state
+  const [isBasePriceHelpDialogOpen, setIsBasePriceHelpDialogOpen] = useState(false);
+
   // Stripe sync state
   const [isStripeSyncing, setIsStripeSyncing] = useState(false);
   const [stripeSyncStatus, setStripeSyncStatus] = useState<'idle' | 'syncing' | 'success' | 'error'>('idle');
@@ -709,19 +712,28 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                     </div>
                     
                     <div className="grid grid-cols-2 gap-4">
-                      <InputField
-                        variant="material"
-                        type="number"
-                        label={t('manageCourse.pricing.base_price')}
-                        placeholder="0"
-                        itemId={course.id}
-                        value={(course as any).basePrice?.toString() || '0'}
-                        updateValueMutation={UPDATE_COURSE_BASE_PRICE}
-                        refetchQueries={['AdminCourseList']}
-                        helpText={t('manageCourse.pricing.base_price_help')}
-                        min={0}
-                        onValueUpdated={handleSyncStripeBasePrice}
-                      />
+                      <div className="space-y-1">
+                        <InputField
+                          variant="material"
+                          type="number"
+                          label={t('manageCourse.pricing.base_price')}
+                          placeholder="0"
+                          itemId={course.id}
+                          value={(course as any).basePrice?.toString() || '0'}
+                          updateValueMutation={UPDATE_COURSE_BASE_PRICE}
+                          refetchQueries={['AdminCourseList']}
+                          helpText={t('manageCourse.pricing.base_price_help')}
+                          min={0}
+                          onValueUpdated={handleSyncStripeBasePrice}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setIsBasePriceHelpDialogOpen(true)}
+                          className="text-xs text-blue-600 hover:text-blue-800 mt-1 underline"
+                        >
+                          {t('manageCourse.pricing.base_price_learn_more')}
+                        </button>
+                      </div>
 
                       <DropDownSelector
                         variant="material"
@@ -1090,6 +1102,14 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
         onClose={() => setIsFormbricksHelpDialogOpen(false)}
         title={t('manageCourse.formbricks.setup_dialog_title')}
         content={t('manageCourse.formbricks.setup_dialog_content')}
+      />
+
+      {/* Base Price Help Dialog */}
+      <InfoDialog
+        open={isBasePriceHelpDialogOpen}
+        onClose={() => setIsBasePriceHelpDialogOpen(false)}
+        title={t('manageCourse.pricing.base_price_dialog_title')}
+        content={t('manageCourse.pricing.base_price_dialog_content')}
       />
     </div>
   );

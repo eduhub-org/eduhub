@@ -47,6 +47,18 @@ actions:
     permissions:
       - role: instructor_access
     comment: Creates or updates Stripe Product and Price for a course's base price
+  - name: createEnrollmentWithAddons
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: name
+          value: createEnrollmentWithAddons
+    permissions:
+      - role: user_access
+    comment: Creates a course enrollment and saves selected addons from Formbricks survey to the database
   - name: createStripeCheckout
     definition:
       kind: synchronous
@@ -95,6 +107,18 @@ actions:
     permissions:
       - role: instructor_access
     comment: Fetches Formbricks survey responses for a course enrollment
+  - name: getFormbricksAddonSelections
+    definition:
+      kind: ""
+      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: name
+          value: getFormbricksAddonSelections
+    permissions:
+      - role: user_access
+    comment: Fetches selected addons from Formbricks survey responses for course registration
   - name: getSignedUrl
     definition:
       kind: ""
@@ -372,7 +396,10 @@ custom_types:
     - name: StripePriceCreationResult
     - name: StripePriceResult
     - name: StripePriceSummary
+    - name: CreateEnrollmentWithAddonsResult
     - name: CreateStripeBasePriceResult
     - name: CreateStripeCheckoutResult
     - name: CourseAddonMapping
+    - name: GetFormbricksAddonSelectionsResult
+    - name: SelectedAddon
   scalars: []

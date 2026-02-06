@@ -10,12 +10,11 @@ export const config = {
   },
 };
 
-const UPDATE_ENROLLMENT_PAYMENT = gql`
-  mutation UpdateEnrollmentPayment(
+const UPDATE_ENROLLMENT_PAYMENT_SUCCESS = gql`
+  mutation UpdateEnrollmentPaymentSuccess(
     $enrollmentId: Int!
     $stripeCheckoutSessionId: String
     $stripePaymentIntentId: String
-    $paymentStatus: PaymentStatus_enum!
     $paymentAmount: Int
     $paymentCurrency: String
   ) {
@@ -24,7 +23,7 @@ const UPDATE_ENROLLMENT_PAYMENT = gql`
       _set: {
         stripeCheckoutSessionId: $stripeCheckoutSessionId
         stripePaymentIntentId: $stripePaymentIntentId
-        paymentStatus: $paymentStatus
+        paymentStatus: COMPLETED
         paymentAmount: $paymentAmount
         paymentCurrency: $paymentCurrency
         status: CONFIRMED
@@ -37,25 +36,31 @@ const UPDATE_ENROLLMENT_PAYMENT = gql`
   }
 `;
 
-const INSERT_ENROLLMENT_ADDON = gql`
-  mutation InsertEnrollmentAddon(
+const UPDATE_ENROLLMENT_PAYMENT_FAILURE = gql`
+  mutation UpdateEnrollmentPaymentFailure(
     $enrollmentId: Int!
-    $addonMappingId: Int!
-    $priceAtPurchase: Int!
-    $currency: String!
+    $stripeCheckoutSessionId: String
+    $stripePaymentIntentId: String
+    $paymentAmount: Int
+    $paymentCurrency: String
   ) {
-    insert_EnrollmentAddon_one(
-      object: {
-        enrollmentId: $enrollmentId
-        addonMappingId: $addonMappingId
-        priceAtPurchase: $priceAtPurchase
-        currency: $currency
+    update_CourseEnrollment_by_pk(
+      pk_columns: { id: $enrollmentId }
+      _set: {
+        stripeCheckoutSessionId: $stripeCheckoutSessionId
+        stripePaymentIntentId: $stripePaymentIntentId
+        paymentStatus: FAILED
+        paymentAmount: $paymentAmount
+        paymentCurrency: $paymentCurrency
       }
     ) {
       id
+      paymentStatus
+      status
     }
   }
 `;
+
 
 const handleStripeWebhook = async (
   req: NextApiRequest,
@@ -119,7 +124,7 @@ const handleStripeWebhook = async (
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session;
-        const { enrollmentId, courseId, selectedAddons } = session.metadata || {};
+        const { enrollmentId, courseId } = session.metadata || {};
 
         if (!enrollmentId) {
           console.error('Missing enrollmentId in session metadata');
@@ -140,44 +145,17 @@ const handleStripeWebhook = async (
         }
 
         // Update enrollment with payment information
-        await client.request(UPDATE_ENROLLMENT_PAYMENT, {
+        // Note: Addons are already saved to CourseEnrollmentAddon table before payment via createEnrollmentWithAddons action
+        await client.request(UPDATE_ENROLLMENT_PAYMENT_SUCCESS, {
           enrollmentId: parsedEnrollmentId,
           stripeCheckoutSessionId: session.id,
           stripePaymentIntentId:
             typeof session.payment_intent === 'string'
               ? session.payment_intent
               : session.payment_intent?.id || null,
-          paymentStatus: 'COMPLETED',
           paymentAmount: session.amount_total || null,
           paymentCurrency: session.currency || null,
         });
-
-        // Parse and save selected add-ons
-        if (selectedAddons && selectedAddons.trim() !== '') {
-          try {
-            const addons = JSON.parse(selectedAddons);
-            const currency = (session.currency || 'EUR').toUpperCase();
-
-            for (const addon of addons) {
-              if (addon.id && addon.price !== undefined) {
-                await client.request(INSERT_ENROLLMENT_ADDON, {
-                  enrollmentId: parsedEnrollmentId,
-                  addonMappingId: addon.id,
-                  priceAtPurchase: addon.price,
-                  currency: currency,
-                });
-              }
-            }
-
-            console.log('Enrollment add-ons saved successfully', {
-              enrollmentId,
-              addonCount: addons.length,
-            });
-          } catch (error: any) {
-            console.error('Error parsing or saving add-ons:', error.message);
-            // Don't fail the webhook if add-on saving fails - payment is already recorded
-          }
-        }
 
         console.log('Enrollment updated successfully', {
           enrollmentId,
@@ -193,11 +171,10 @@ const handleStripeWebhook = async (
         const { enrollmentId } = session.metadata || {};
 
         if (enrollmentId) {
-          await client.request(UPDATE_ENROLLMENT_PAYMENT, {
+          await client.request(UPDATE_ENROLLMENT_PAYMENT_FAILURE, {
             enrollmentId: Number.parseInt(enrollmentId, 10),
             stripeCheckoutSessionId: session.id,
             stripePaymentIntentId: null,
-            paymentStatus: 'FAILED',
             paymentAmount: null,
             paymentCurrency: null,
           });
@@ -211,11 +188,10 @@ const handleStripeWebhook = async (
         const { enrollmentId } = paymentIntent.metadata || {};
 
         if (enrollmentId) {
-          await client.request(UPDATE_ENROLLMENT_PAYMENT, {
+          await client.request(UPDATE_ENROLLMENT_PAYMENT_FAILURE, {
             enrollmentId: Number.parseInt(enrollmentId, 10),
             stripeCheckoutSessionId: null,
             stripePaymentIntentId: paymentIntent.id,
-            paymentStatus: 'FAILED',
             paymentAmount: paymentIntent.amount || null,
             paymentCurrency: paymentIntent.currency || null,
           });

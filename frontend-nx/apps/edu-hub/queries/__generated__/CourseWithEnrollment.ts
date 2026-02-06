@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { Weekday_enum, CourseRegistrationType_enum, LocationOption_enum, ProgramType_enum, OrganizationType_enum, CourseEnrollmentStatus_enum, AttendanceStatus_enum } from "./../../__generated__/globalTypes";
+import { Weekday_enum, CourseRegistrationType_enum, LocationOption_enum, ProgramType_enum, OrganizationType_enum, CourseEnrollmentStatus_enum, PaymentStatus_enum, AttendanceStatus_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: CourseWithEnrollment
@@ -328,6 +328,10 @@ export interface CourseWithEnrollment_Course_by_pk_CourseEnrollments {
    */
   status: CourseEnrollmentStatus_enum;
   /**
+   * Current payment status
+   */
+  paymentStatus: PaymentStatus_enum | null;
+  /**
    * URL to the file containing the user's achievement certificate (if he obtained one)
    */
   achievementCertificateURL: string | null;
@@ -352,10 +356,6 @@ export interface CourseWithEnrollment_Course_by_pk {
    * The day of the week the course takes place.
    */
   weekDay: Weekday_enum;
-  /**
-   * A text providing info about the costs of a participation.
-   */
-  cost: string;
   /**
    * Decides whether the course is published for all users or not.
    */

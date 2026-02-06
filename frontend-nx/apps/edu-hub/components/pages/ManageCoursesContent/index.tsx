@@ -451,7 +451,6 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
               tagline: course.tagline || '',
               language: course.language || 'DE',
               applicationEnd: defaultApplicationEnd,
-              cost: course.cost,
               ects: course.ects,
               maxMissedSessions: course.maxMissedSessions || 0,
               maxParticipants: course.maxParticipants,

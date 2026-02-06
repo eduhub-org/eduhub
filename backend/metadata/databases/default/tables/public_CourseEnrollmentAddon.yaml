@@ -1,5 +1,5 @@
 table:
-  name: EnrollmentAddon
+  name: CourseEnrollmentAddon
   schema: public
 object_relationships:
   - name: CourseEnrollment

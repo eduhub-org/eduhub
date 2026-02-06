@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { CourseEnrollmentStatus_enum } from "./../../__generated__/globalTypes";
+import { CourseEnrollmentStatus_enum, PaymentStatus_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL fragment: EnrollmentFragment
@@ -28,6 +28,10 @@ export interface EnrollmentFragment {
    * The users current enrollment status to this course
    */
   status: CourseEnrollmentStatus_enum;
+  /**
+   * Current payment status
+   */
+  paymentStatus: PaymentStatus_enum | null;
   /**
    * URL to the file containing the user's achievement certificate (if he obtained one)
    */

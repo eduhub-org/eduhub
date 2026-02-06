@@ -1,6 +1,6 @@
 import { FC } from 'react';
 
-import { CourseRegistrationType_enum } from '../../../../__generated__/globalTypes';
+import { CourseRegistrationType_enum, PaymentStatus_enum } from '../../../../__generated__/globalTypes';
 import { Course_Course_by_pk } from '../../../../queries/__generated__/Course';
 import { CourseWithEnrollment_Course_by_pk_CourseEnrollments } from '../../../../queries/__generated__/CourseWithEnrollment';
 import { useIsLoggedIn } from '../../../../hooks/authentication';
@@ -58,7 +58,25 @@ export const Registration: FC<RegistrationProps> = ({ course, courseEnrollment, 
   if (courseEnrollment) {
     return (
       <div className="w-full">
-        <RegistrationStatus courseEnrollment={courseEnrollment} course={course} />
+        <RegistrationStatus 
+          courseEnrollment={courseEnrollment} 
+          course={course}
+          onRetryPayment={courseEnrollment.paymentStatus && 
+            (courseEnrollment.paymentStatus === PaymentStatus_enum.PENDING || courseEnrollment.paymentStatus === PaymentStatus_enum.FAILED)
+            ? () => registrationHandler.retryPayment(courseEnrollment.id)
+            : undefined
+          }
+        />
+        {/* Always render modal so it can be opened for retry payment flow */}
+        <RegistrationModal
+          visible={registrationHandler.isModalOpen}
+          closeModal={() => registrationHandler.setIsModalOpen(false)}
+          course={course}
+          registrationType={registrationHandler.registrationType}
+          onSubmit={registrationHandler.submitRegistration}
+          isLoading={registrationHandler.isLoading}
+          retryEnrollmentId={registrationHandler.retryEnrollmentId}
+        />
       </div>
     );
   }
@@ -91,6 +109,7 @@ export const Registration: FC<RegistrationProps> = ({ course, courseEnrollment, 
         registrationType={registrationHandler.registrationType}
         onSubmit={registrationHandler.submitRegistration}
         isLoading={registrationHandler.isLoading}
+        retryEnrollmentId={registrationHandler.retryEnrollmentId}
       />
     </div>
   );

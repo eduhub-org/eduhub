@@ -37,10 +37,6 @@ export interface CourseFragmentMinimum {
    */
   applicationEnd: any;
   /**
-   * A text providing info about the costs of a participation.
-   */
-  cost: string;
-  /**
    * Indicates whether participants can get an achievement certificate. If the course is offering ECTS, it must be possible to obtain this certificate for the course
    */
   achievementCertificatePossible: boolean;

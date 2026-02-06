@@ -88,7 +88,7 @@ export const FormbricksSurveyEmbed: FC<Props> = ({
   }
 
   return (
-    <div className={`relative ${className}`}>
+    <div className={`relative ${className}`} style={{ height: '100%', minHeight: '700px' }}>
       {isLoading && (
         <div className="absolute inset-0 flex items-center justify-center bg-gray-100 rounded-md z-10">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
@@ -97,7 +97,7 @@ export const FormbricksSurveyEmbed: FC<Props> = ({
       <iframe
         src={buildSurveyUrl()}
         className="w-full h-full border-0 rounded-md"
-        style={{ minHeight: '500px' }}
+        style={{ minHeight: '700px', height: '100%' }}
         onLoad={handleIframeLoad}
         onError={handleIframeError}
         title={t('formbricks.survey_title')}

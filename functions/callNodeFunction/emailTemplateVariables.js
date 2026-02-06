@@ -269,7 +269,7 @@ export function createVariableReplacer(data, formatDate) {
 
 /**
  * Convenience function for enrollment emails
- * @param {Object} enrollmentDetails - Enrollment data from GraphQL (should include EnrollmentAddons with CourseAddonMapping)
+ * @param {Object} enrollmentDetails - Enrollment data from GraphQL (should include CourseEnrollmentAddons with CourseAddonMapping)
  * @param {Function} formatDate - Date formatting function  
  * @returns {Function} Variable replacement function
  */
@@ -278,7 +278,7 @@ export function createEnrollmentVariableReplacer(enrollmentDetails, formatDate) 
     user: enrollmentDetails.User,
     course: enrollmentDetails.Course,
     enrollment: enrollmentDetails,
-    enrollmentAddons: enrollmentDetails.EnrollmentAddons || [],
+    enrollmentAddons: enrollmentDetails.CourseEnrollmentAddons || [],
     courseLink: `${process.env.FRONTEND_URL || 'https://edu.opencampus.sh'}/course/${enrollmentDetails.Course.id}`
   }, formatDate);
 }

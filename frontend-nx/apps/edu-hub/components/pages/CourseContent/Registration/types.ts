@@ -59,11 +59,22 @@ export const getRegistrationTypeConfig = (
   return REGISTRATION_TYPE_CONFIG[registrationType];
 };
 
+export interface SelectedAddon {
+  id: number;
+  description: string;
+  validatedPrice: number;
+  currency: string;
+  questionId: string;
+  choiceId: string;
+}
+
 export interface RegistrationFormData {
   motivationLetter?: string;
   paymentMethod?: string;
   acceptTerms?: boolean;
   termsAcceptedAt?: string;  // ISO timestamp string
+  enrollmentId?: number;  // Enrollment ID for payment flows (enrollment created with addons before payment)
+  selectedAddons?: SelectedAddon[];  // Deprecated: kept for backward compatibility, not used for payment flows
 }
 
 export interface RegistrationResult {

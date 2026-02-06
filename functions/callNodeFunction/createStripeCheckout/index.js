@@ -34,11 +34,33 @@ const GET_ENROLLMENT_USER = `
   }
 `;
 
+const GET_ENROLLMENT_ADDONS = `
+  query GetEnrollmentAddons($enrollmentId: Int!) {
+    CourseEnrollmentAddon(where: { enrollmentId: { _eq: $enrollmentId } }) {
+      id
+      addonMappingId
+      priceAtPurchase
+      currency
+      CourseAddonMapping {
+        id
+        questionId
+        choiceId
+        description
+        validatedPrice
+        currency
+        stripeProductId
+        stripePriceId
+      }
+    }
+  }
+`;
+
 /**
  * Creates a Stripe Checkout Session for course enrollment with add-ons.
  * Builds success and cancel URLs server-side from FRONTEND_URL for security.
+ * Reads addons from CourseEnrollmentAddon table using enrollmentId.
  * 
- * @param {Object} req - Request object containing body with courseId, enrollmentId, formbricksResponseId, selectedAddons
+ * @param {Object} req - Request object containing body with courseId, enrollmentId, formbricksResponseId, userEmail
  * @param {Object} logger - Winston logger instance
  * @returns {Object} Checkout session URL
  */
@@ -51,8 +73,7 @@ export default async function createStripeCheckout(req, logger) {
       courseId,
       enrollmentId,
       formbricksResponseId,
-      userEmail,
-      selectedAddons = []
+      userEmail
     } = req.body.input || req.body;
 
     if (!courseId) {
@@ -131,6 +152,23 @@ export default async function createStripeCheckout(req, logger) {
       }
     }
 
+    // Fetch selected addons from CourseEnrollmentAddon table
+    let enrollmentAddons = [];
+    try {
+      const addonsData = await client.request(GET_ENROLLMENT_ADDONS, { enrollmentId });
+      enrollmentAddons = addonsData.CourseEnrollmentAddon || [];
+      logger.info('Fetched enrollment addons from database', {
+        enrollmentId,
+        addonCount: enrollmentAddons.length
+      });
+    } catch (error) {
+      logger.warn('Could not fetch enrollment addons from database', { 
+        error: error.message,
+        enrollmentId 
+      });
+      // Continue without addons - user will only pay base price
+    }
+
     // Build line items array
     const lineItems = [];
 
@@ -207,21 +245,47 @@ export default async function createStripeCheckout(req, logger) {
       }
     }
 
-    // Add selected add-ons as line items
-    if (course.CourseAddonMappings && Array.isArray(course.CourseAddonMappings)) {
-      for (const addonMapping of course.CourseAddonMappings) {
-        // Check if this addon was selected in the Formbricks response
-        // Match by both questionId and choiceId, and ensure selected flag is true
-        const isSelected = selectedAddons.some(
-          selected => selected.selected === true &&
-                     selected.questionId === addonMapping.questionId &&
-                     selected.choiceId === addonMapping.choiceId
-        );
+    // Add selected add-ons as line items (from CourseEnrollmentAddon table)
+    for (const enrollmentAddon of enrollmentAddons) {
+      const addonMapping = enrollmentAddon.CourseAddonMapping;
+      if (!addonMapping) {
+        logger.warn('CourseEnrollmentAddon missing CourseAddonMapping', {
+          enrollmentAddonId: enrollmentAddon.id,
+          addonMappingId: enrollmentAddon.addonMappingId
+        });
+        continue;
+      }
 
-        if (isSelected && addonMapping.stripePriceId) {
+      // Use priceAtPurchase from CourseEnrollmentAddon (price at time of purchase)
+      const addonPrice = enrollmentAddon.priceAtPurchase || addonMapping.validatedPrice;
+      
+      if (addonPrice > 0) {
+        if (addonMapping.stripePriceId) {
+          // Use existing Stripe Price ID
           lineItems.push({
             price: addonMapping.stripePriceId,
             quantity: 1
+          });
+          logger.debug('Using existing Stripe Price ID for addon', {
+            addonMappingId: addonMapping.id,
+            stripePriceId: addonMapping.stripePriceId
+          });
+        } else {
+          // Create dynamic price for addon (no Stripe Price ID exists)
+          lineItems.push({
+            price_data: {
+              currency: (enrollmentAddon.currency || addonMapping.currency || course.currency || 'eur').toLowerCase(),
+              product_data: {
+                name: addonMapping.description || `Add-on for ${course.title}`
+              },
+              unit_amount: addonPrice
+            },
+            quantity: 1
+          });
+          logger.debug('Using dynamic pricing for addon', {
+            addonMappingId: addonMapping.id,
+            description: addonMapping.description,
+            price: addonPrice
           });
         }
       }
@@ -232,6 +296,7 @@ export default async function createStripeCheckout(req, logger) {
       lineItemCount: lineItems.length,
       courseBasePrice: course.basePrice,
       courseStripePriceId: course.stripePriceId,
+      enrollmentAddonsCount: enrollmentAddons.length,
       lineItems: lineItems.map(item => ({
         hasPrice: !!item.price,
         hasPriceData: !!item.price_data,
@@ -240,9 +305,32 @@ export default async function createStripeCheckout(req, logger) {
     });
 
     if (lineItems.length === 0) {
+      // Log detailed information for debugging
+      logger.error('No items to charge - cannot create Stripe checkout', {
+        courseId,
+        enrollmentId,
+        courseBasePrice: course.basePrice,
+        courseHasBasePrice: !!(course.basePrice && course.basePrice > 0),
+        enrollmentAddonsCount: enrollmentAddons.length,
+        enrollmentAddons: enrollmentAddons.map(addon => ({
+          id: addon.id,
+          addonMappingId: addon.addonMappingId,
+          priceAtPurchase: addon.priceAtPurchase,
+          hasMapping: !!addon.CourseAddonMapping,
+          mappingPrice: addon.CourseAddonMapping?.validatedPrice
+        })),
+        possibleCauses: [
+          'Course has no base price configured (basePrice is 0 or null)',
+          'No add-ons were selected in the Formbricks survey',
+          'Add-ons were selected but not saved to CourseEnrollmentAddon table',
+          'All selected add-ons have price 0',
+          'CourseEnrollmentAddon records exist but CourseAddonMapping is missing'
+        ]
+      });
+
       return {
         success: false,
-        error: 'No items to charge. Course has no base price and no add-ons selected.',
+        error: 'No items to charge. Course has no base price and no add-ons selected. Please ensure the course has a base price configured or that add-ons are selected in the registration survey.',
         messageKey: 'NO_ITEMS_TO_CHARGE'
       };
     }
@@ -261,21 +349,23 @@ export default async function createStripeCheckout(req, logger) {
         formbricksResponseId: formbricksResponseId || '',
         source: 'eduhub',
         selectedAddons: (() => {
-          if (!selectedAddons || selectedAddons.length === 0) {
+          if (!enrollmentAddons || enrollmentAddons.length === 0) {
             return '';
           }
-          // Map to only essential identifiers to reduce metadata size
-          const mappedAddons = selectedAddons.map(addon => ({
-            id: addon.id,
-            questionId: addon.questionId,
-            choiceId: addon.choiceId
-          }));
+          // Map to essential identifiers with validatedPrice for audit trail
+          const mappedAddons = enrollmentAddons.map(enrollmentAddon => ({
+            id: enrollmentAddon.CourseAddonMapping?.id || enrollmentAddon.addonMappingId,
+            questionId: enrollmentAddon.CourseAddonMapping?.questionId,
+            choiceId: enrollmentAddon.CourseAddonMapping?.choiceId,
+            validatedPrice: enrollmentAddon.priceAtPurchase
+          })).filter(addon => addon.id); // Filter out any with missing data
+          
           const serialized = JSON.stringify(mappedAddons);
           // Stripe metadata has 500 char limit per key - validate and fall back if exceeded
           if (serialized.length > 500) {
             logger.warn('selectedAddons metadata exceeds 500 chars, omitting from metadata', {
               length: serialized.length,
-              addonCount: selectedAddons.length
+              addonCount: enrollmentAddons.length
             });
             return '';
           }

@@ -20,7 +20,7 @@ function extractFormbricksBaseUrlAndSurveyId(surveyUrl, logger) {
     }
 
     // 2. Validate against trusted origins
-    // Support both FORMBRICKS_BASE_URL (single) and FORMBRICKS_TRUSTED_ORIGINS (comma-separated)
+    // Support FORMBRICKS_API_URL (preferred), FORMBRICKS_BASE_URL (legacy), and FORMBRICKS_TRUSTED_ORIGINS (comma-separated)
     const trustedOrigins = [];
     
     if (process.env.FORMBRICKS_TRUSTED_ORIGINS) {
@@ -36,17 +36,19 @@ function extractFormbricksBaseUrlAndSurveyId(surveyUrl, logger) {
       }
     }
     
-    if (process.env.FORMBRICKS_BASE_URL) {
+    // Check FORMBRICKS_API_URL first (preferred), then FORMBRICKS_BASE_URL (legacy support)
+    const formbricksUrl = process.env.FORMBRICKS_API_URL || process.env.FORMBRICKS_BASE_URL;
+    if (formbricksUrl) {
       try {
-        const trustedUrl = new URL(process.env.FORMBRICKS_BASE_URL);
+        const trustedUrl = new URL(formbricksUrl);
         trustedOrigins.push(trustedUrl.origin);
       } catch (e) {
-        logger?.warn('SSRF protection: Invalid FORMBRICKS_BASE_URL', { url: process.env.FORMBRICKS_BASE_URL });
+        logger?.warn('SSRF protection: Invalid FORMBRICKS_API_URL or FORMBRICKS_BASE_URL', { url: formbricksUrl });
       }
     }
 
     if (trustedOrigins.length === 0) {
-      logger?.error('SSRF protection: No trusted origins configured. Set FORMBRICKS_BASE_URL or FORMBRICKS_TRUSTED_ORIGINS');
+      logger?.error('SSRF protection: No trusted origins configured. Set FORMBRICKS_API_URL, FORMBRICKS_BASE_URL, or FORMBRICKS_TRUSTED_ORIGINS');
       return null;
     }
 
@@ -311,12 +313,12 @@ export default async function validateFormbricksSurvey(req, logger) {
     if (!urlParts) {
       // Error already logged by extractFormbricksBaseUrlAndSurveyId
       // Check if it's a configuration issue (no trusted origins) vs invalid URL
-      const hasTrustedOrigins = !!(process.env.FORMBRICKS_BASE_URL || process.env.FORMBRICKS_TRUSTED_ORIGINS);
+      const hasTrustedOrigins = !!(process.env.FORMBRICKS_API_URL || process.env.FORMBRICKS_BASE_URL || process.env.FORMBRICKS_TRUSTED_ORIGINS);
       return {
         success: false,
         error: hasTrustedOrigins 
           ? 'Invalid Formbricks survey URL format or untrusted origin'
-          : 'Formbricks not configured: missing FORMBRICKS_BASE_URL or FORMBRICKS_TRUSTED_ORIGINS',
+          : 'Formbricks not configured: missing FORMBRICKS_API_URL, FORMBRICKS_BASE_URL, or FORMBRICKS_TRUSTED_ORIGINS',
         messageKey: hasTrustedOrigins ? 'INVALID_SURVEY_URL' : 'FORMBRICKS_NOT_CONFIGURED'
       };
     }

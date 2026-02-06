@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { CourseEnrollmentStatus_enum, MotivationRating_enum, PaymentStatus_enum } from "./../../__generated__/globalTypes";
+import { CourseEnrollmentStatus_enum, PaymentStatus_enum, MotivationRating_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL fragment: AdminEnrollmentFragment
@@ -29,6 +29,10 @@ export interface AdminEnrollmentFragment {
    */
   status: CourseEnrollmentStatus_enum;
   /**
+   * Current payment status
+   */
+  paymentStatus: PaymentStatus_enum | null;
+  /**
    * URL to the file containing the user's achievement certificate (if he obtained one)
    */
   achievementCertificateURL: string | null;
@@ -44,10 +48,6 @@ export interface AdminEnrollmentFragment {
    * Rating that the user's motivation letter received from the course instructor
    */
   motivationRating: MotivationRating_enum;
-  /**
-   * Current payment status
-   */
-  paymentStatus: PaymentStatus_enum | null;
   /**
    * Stripe Payment Intent ID
    */
