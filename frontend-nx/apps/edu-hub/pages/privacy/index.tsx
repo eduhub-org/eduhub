@@ -236,9 +236,9 @@ const Privacy: FC = () => {
             {isEnglish
               ? 'Within the framework of the applicable legal provisions, you have the right to free information about your stored personal data, its origin and recipient, and the purpose of data processing and, if applicable, a right to correction or deletion of this data at any time. For this purpose and for further questions on the subject of personal data, you can contact us at any time at the address given in the '
               : 'Du hast im Rahmen der geltenden gesetzlichen Bestimmungen jederzeit das Recht auf unentgeltliche Auskunft über deine gespeicherten personenbezogenen Daten, deren Herkunft und Empfänger und den Zweck der Datenverarbeitung und ggf. ein Recht auf Berichtigung oder Löschung dieser Daten. Hierzu sowie zu weiteren Fragen zum Thema personenbezogene Daten kannst du dich jederzeit unter der im '}
-            <a href="/imprint" className="underline hover:text-gray-300">
+            <Link href="/imprint" className="underline hover:text-gray-300">
               {isEnglish ? 'Imprint' : 'Impressum'}
-            </a>
+            </Link>
             {isEnglish ? '.' : ' angegebenen Adresse an uns wenden.'}
           </p>
           <h3 className="text-lg mt-2 mb-2 italic">

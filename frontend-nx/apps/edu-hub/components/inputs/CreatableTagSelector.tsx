@@ -212,65 +212,68 @@ const CreatableTagSelector: React.FC<CreatableTagSelectorProps> = ({
         </div>
         <div className="light">
           <Autocomplete
-          multiple
-          id="tags-autocomplete"
-          options={options.map((tag) => ({ value: tag }))}
-          value={tags}
-          onChange={handleTagChange}
-          inputValue={inputValue}
-          onInputChange={(event, newInputValue) => {
-            setInputValue(newInputValue);
-          }}
-          filterOptions={(options, params) => {
-            const filtered = filter(options, params);
-            const { inputValue } = params;
-            const isExisting = options.some((option) => inputValue === option.value);
-            if (inputValue !== '' && !isExisting) {
-              filtered.push({
-                inputValue: inputValue,
-                value: inputValue,
-              });
+            multiple
+            id="tags-autocomplete"
+            options={options.map((tag) => ({ value: tag }))}
+            value={tags}
+            onChange={handleTagChange}
+            inputValue={inputValue}
+            onInputChange={(event, newInputValue) => {
+              setInputValue(newInputValue);
+            }}
+            filterOptions={(options, params) => {
+              const filtered = filter(options, params);
+              const { inputValue } = params;
+              const isExisting = options.some((option) => inputValue === option.value);
+              if (inputValue !== '' && !isExisting) {
+                filtered.push({
+                  inputValue: inputValue,
+                  value: inputValue,
+                });
+              }
+              return filtered;
+            }}
+            getOptionLabel={(option: TagOption) => option.inputValue || option.value || ''}
+            renderOption={(props, option: TagOption) => {
+              const { key, ...otherProps } = props;
+              return (
+                <li key={key} {...otherProps}>
+                  {option.inputValue
+                    ? t('common.CreatableTagSelector.add_tag', { value: option.inputValue })
+                    : option.value}
+                </li>
+              );
+            }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                variant="standard"
+                placeholder={placeholder}
+                onKeyDown={handleKeyDown}
+                className={finalClassName}
+                InputProps={{
+                  ...params.InputProps,
+                  disableUnderline: true,
+                }}
+              />
+            )}
+            freeSolo
+            selectOnFocus
+            clearOnBlur
+            handleHomeEndKeys
+            isOptionEqualToValue={(option, value) =>
+              (option.value || option.inputValue || '') === (value.value || value.inputValue || '')
             }
-            return filtered;
-          }}
-          getOptionLabel={(option: TagOption) => option.inputValue || option.value || ''}
-          renderOption={(props, option: TagOption) => {
-            const { key, ...otherProps } = props;
-            return (
-              <li key={key} {...otherProps}>
-                {option.inputValue
-                  ? t('common.CreatableTagSelector.add_tag', { value: option.inputValue })
-                  : option.value}
-              </li>
-            );
-          }}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              variant="standard"
-              placeholder={placeholder}
-              onKeyDown={handleKeyDown}
-              className={finalClassName}
-              InputProps={{
-                ...params.InputProps,
-                disableUnderline: true,
-              }}
-            />
-          )}
-          freeSolo
-          selectOnFocus
-          clearOnBlur
-          handleHomeEndKeys
-          isOptionEqualToValue={(option, value) =>
-            (option.value || option.inputValue || '') === (value.value || value.inputValue || '')
-          }
-        />
+          />
+        </div>
       </div>
     </div>
   );
 
+  const content = variant === 'material' ? renderMaterialUI() : renderEduhub();
+  
   return (
-    <div className={className}>{variant === 'material' ? renderMaterialUI() : renderEduhub()}</div>
+    <div className={className || ''}>{content}</div>
   );
 };
 
