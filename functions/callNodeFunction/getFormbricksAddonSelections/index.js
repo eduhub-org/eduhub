@@ -270,23 +270,21 @@ export default async function getFormbricksAddonSelections(req, logger) {
       }))
     });
     
-    // Log all answer keys and values from the response for debugging
-    logger.info('Response data entries', {
-      entries: answerEntries.map(([key, value]) => ({
+    // Log answer keys from the response for debugging (no sensitive values)
+    logger.debug('Response data entries', {
+      entries: answerEntries.map(([key]) => ({
         questionId: key,
-        answerValue: value,
-        answerType: Array.isArray(value) ? 'array' : typeof value
+        answerType: Array.isArray(responseData[key]) ? 'array' : typeof responseData[key]
       }))
     });
     
-    // Log full response data structure for debugging
-    logger.info('Full response data structure', {
+    // Log response data structure metadata for debugging (no sensitive values)
+    logger.debug('Full response data structure', {
       responseId: latestResponse.id,
-      responseData: JSON.stringify(responseData),
       responseDataKeys: Object.keys(responseData),
+      dataEntryCount: Object.keys(responseData).length,
       allKeys: Object.keys(responseData).map(key => ({
         key,
-        value: responseData[key],
         type: typeof responseData[key],
         isArray: Array.isArray(responseData[key])
       }))

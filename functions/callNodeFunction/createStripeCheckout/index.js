@@ -179,9 +179,17 @@ export default async function createStripeCheckout(req, logger) {
         try {
           const stripePrice = await stripe.prices.retrieve(course.stripePriceId);
           
-          // Check if the Stripe price amount matches our basePrice (in cents)
-          // If it doesn't match or is zero, fall back to dynamic pricing
-          if (stripePrice.unit_amount && stripePrice.unit_amount > 0 && stripePrice.unit_amount === course.basePrice) {
+          // Check if the Stripe price is active, one-time, matches currency, and amount matches our basePrice (in cents)
+          // If any check fails, fall back to dynamic pricing
+          const expectedCurrency = (course.currency || 'eur').toLowerCase();
+          if (
+            stripePrice.active === true &&
+            stripePrice.type === 'one_time' &&
+            stripePrice.currency?.toLowerCase() === expectedCurrency &&
+            stripePrice.unit_amount &&
+            stripePrice.unit_amount > 0 &&
+            stripePrice.unit_amount === course.basePrice
+          ) {
             // Use existing Stripe Price ID
             lineItems.push({
               price: course.stripePriceId,
@@ -192,10 +200,14 @@ export default async function createStripeCheckout(req, logger) {
               amount: stripePrice.unit_amount
             });
           } else {
-            // Price ID exists but amount doesn't match or is invalid, use dynamic pricing
-            logger.warn('Stripe Price ID amount mismatch or invalid, using dynamic pricing', {
+            // Price ID exists but validation failed (not active, wrong type, currency mismatch, or amount mismatch), use dynamic pricing
+            logger.warn('Stripe Price ID validation failed, using dynamic pricing', {
               stripePriceId: course.stripePriceId,
+              stripeActive: stripePrice.active,
+              stripeType: stripePrice.type,
+              stripeCurrency: stripePrice.currency,
               stripeAmount: stripePrice.unit_amount,
+              expectedCurrency: expectedCurrency,
               expectedAmount: course.basePrice
             });
             lineItems.push({
@@ -261,15 +273,71 @@ export default async function createStripeCheckout(req, logger) {
       
       if (addonPrice > 0) {
         if (addonMapping.stripePriceId) {
-          // Use existing Stripe Price ID
-          lineItems.push({
-            price: addonMapping.stripePriceId,
-            quantity: 1
-          });
-          logger.debug('Using existing Stripe Price ID for addon', {
-            addonMappingId: addonMapping.id,
-            stripePriceId: addonMapping.stripePriceId
-          });
+          // Verify the Stripe Price ID is valid and matches requirements
+          try {
+            const stripePrice = await stripe.prices.retrieve(addonMapping.stripePriceId);
+            const expectedCurrency = (enrollmentAddon.currency || addonMapping.currency || course.currency || 'eur').toLowerCase();
+            
+            // Check if the Stripe price is active, one-time, matches currency, and amount matches addonPrice
+            if (
+              stripePrice.active === true &&
+              stripePrice.type === 'one_time' &&
+              stripePrice.currency?.toLowerCase() === expectedCurrency &&
+              stripePrice.unit_amount &&
+              stripePrice.unit_amount > 0 &&
+              stripePrice.unit_amount === addonPrice
+            ) {
+              // Use existing Stripe Price ID
+              lineItems.push({
+                price: addonMapping.stripePriceId,
+                quantity: 1
+              });
+              logger.debug('Using existing Stripe Price ID for addon', {
+                addonMappingId: addonMapping.id,
+                stripePriceId: addonMapping.stripePriceId
+              });
+            } else {
+              // Price ID exists but validation failed, use dynamic pricing
+              logger.warn('Stripe Price ID validation failed for addon, using dynamic pricing', {
+                addonMappingId: addonMapping.id,
+                stripePriceId: addonMapping.stripePriceId,
+                stripeActive: stripePrice.active,
+                stripeType: stripePrice.type,
+                stripeCurrency: stripePrice.currency,
+                stripeAmount: stripePrice.unit_amount,
+                expectedCurrency: expectedCurrency,
+                expectedAmount: addonPrice
+              });
+              lineItems.push({
+                price_data: {
+                  currency: expectedCurrency,
+                  product_data: {
+                    name: addonMapping.description || `Add-on for ${course.title}`
+                  },
+                  unit_amount: addonPrice
+                },
+                quantity: 1
+              });
+            }
+          } catch (error) {
+            // Stripe Price ID doesn't exist or is invalid, fall back to dynamic pricing
+            logger.warn('Stripe Price ID not found or invalid for addon, using dynamic pricing', {
+              addonMappingId: addonMapping.id,
+              stripePriceId: addonMapping.stripePriceId,
+              error: error.message
+            });
+            const expectedCurrency = (enrollmentAddon.currency || addonMapping.currency || course.currency || 'eur').toLowerCase();
+            lineItems.push({
+              price_data: {
+                currency: expectedCurrency,
+                product_data: {
+                  name: addonMapping.description || `Add-on for ${course.title}`
+                },
+                unit_amount: addonPrice
+              },
+              quantity: 1
+            });
+          }
         } else {
           // Create dynamic price for addon (no Stripe Price ID exists)
           lineItems.push({

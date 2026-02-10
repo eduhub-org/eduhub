@@ -53,18 +53,3 @@ select_permissions:
               User:
                 id:
                   _eq: X-Hasura-User-Id
-insert_permissions:
-  - role: instructor_access
-    permission:
-      check:
-        CourseEnrollment:
-          Course:
-            CourseInstructors:
-              User:
-                id:
-                  _eq: X-Hasura-User-Id
-      columns:
-        - enrollmentId
-        - addonMappingId
-        - priceAtPurchase
-        - currency

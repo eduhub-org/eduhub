@@ -442,7 +442,8 @@
       "motivation_letter_required": "Bitte schreib uns, warum du an diesem Kurs teilnehmen möchtest",
       "terms_required": "Bitte akzeptiere die Allgemeinen Geschäftsbedingungen",
       "registration_failed": "Registrierung fehlgeschlagen. Bitte versuche es erneut.",
-      "complete_survey_first": "Bitte fülle zuerst den Fragebogen vollständig aus."
+      "complete_survey_first": "Bitte fülle zuerst den Fragebogen vollständig aus.",
+      "no_items_to_charge": "Keine Artikel zum Berechnen. Der Kurs hat keinen Grundpreis und keine Add-ons wurden ausgewählt. Bitte kontaktiere den Support, falls dies unerwartet ist."
     },
     "formbricks": {
       "survey_title": "Bewerbungsfragebogen",
@@ -1642,5 +1643,24 @@
     "no_pricing": "Keine Preise konfiguriert.",
     "synced": "Synchronisiert",
     "not_synced": "Nicht synchronisiert"
+  },
+  "AddonValidationDialog": {
+    "title": "Add-ons validieren",
+    "close": "Schließen",
+    "no_addons_found": "Keine Add-ons gefunden.",
+    "price_label": "Preis (in Cent)",
+    "description_label": "Beschreibung",
+    "question_id": "Frage-ID",
+    "choice_id": "Choice-ID",
+    "cancel": "Abbrechen",
+    "saving": "Speichern...",
+    "save_and_create_stripe": "Speichern & Stripe Preise erstellen"
+  },
+  "footer": {
+    "imprint": "Impressum",
+    "privacy": "Datenschutz",
+    "faq": "FAQ",
+    "newsletter": "Newsletter",
+    "sponsored_by": "Gefördert durch:"
   }
 }

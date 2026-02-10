@@ -16,7 +16,7 @@ const Privacy: FC = () => {
       </Head>
       <Page className="text-white">
         <div className="flex flex-row text-white">
-          <h1 className="text-4xl font-bold p-24 pl-12 pb-0">
+          <h1 className="text-4xl font-bold p-4 md:p-24 md:pl-12 pb-0">
             {isEnglish ? 'Privacy Policy' : 'Datenschutzerklärung'}
           </h1>
         </div>
@@ -152,7 +152,7 @@ const Privacy: FC = () => {
               ? 'We point out that data transmission on the Internet (e.g., when communicating by email) can have security gaps. Complete protection of data against access by third parties is not possible.'
               : 'Wir weisen darauf hin, dass die Datenübertragung im Internet (z. B. bei der Kommunikation per E-Mail) Sicherheitslücken aufweisen kann. Ein lückenloser Schutz der Daten vor dem Zugriff durch Dritte ist nicht möglich.'}
           </p>
-          <h3>{isEnglish ? 'Note on the Responsible Party' : 'Hinweis zur verantwortlichen Stelle'}</h3>
+          <h3 className="text-lg mt-2 mb-2 italic">{isEnglish ? 'Note on the Responsible Party' : 'Hinweis zur verantwortlichen Stelle'}</h3>
           <p>
             {isEnglish
               ? 'The responsible party for data processing on this website is:'
@@ -255,7 +255,7 @@ const Privacy: FC = () => {
               ? '. The right to restriction of processing exists in the following cases:'
               : ' angegebenen Adresse an uns wenden. Das Recht auf Einschränkung der Verarbeitung besteht in folgenden Fällen:'}
           </p>
-          <ul>
+          <ul className="list-disc list-inside pl-5">
             <li>
               {isEnglish
                 ? 'If you dispute the accuracy of your personal data stored with us, we usually need time to verify this. For the duration of the verification, you have the right to request the restriction of processing of your personal data.'
@@ -302,7 +302,7 @@ const Privacy: FC = () => {
               ? 'The provider of the pages automatically collects and stores information in so-called server log files, which your browser automatically transmits to us. These are:'
               : 'Der Provider der Seiten erhebt und speichert automatisch Informationen in so genannten Server-Log-Dateien, die dein Browser automatisch an uns übermittelt. Dies sind:'}
           </p>
-          <ul>
+          <ul className="list-disc list-inside pl-5">
             <li>{isEnglish ? 'Browser type and browser version' : 'Browsertyp und Browserversion'}</li>
             <li>{isEnglish ? 'Operating system used' : 'verwendetes Betriebssystem'}</li>
             <li>{isEnglish ? 'Referrer URL' : 'Referrer URL'}</li>
@@ -365,7 +365,7 @@ const Privacy: FC = () => {
               ? 'We collect personal data through forms and surveys that are integrated within the EduHub platform. This includes:'
               : 'Wir erheben personenbezogene Daten über Formulare und Umfragen, die innerhalb der Plattform EduHub eingebunden sind. Dies umfasst:'}
           </p>
-          <ul>
+          <ul className="list-disc list-inside pl-5">
             <li>
               {isEnglish
                 ? 'Registration and applications for courses, events, and other educational offerings'

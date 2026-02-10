@@ -236,7 +236,7 @@ export function createVariableReplacer(data, formatDate) {
     let addonsHtml = '';
     if (data.enrollmentAddons && Array.isArray(data.enrollmentAddons) && data.enrollmentAddons.length > 0) {
       const addonLines = data.enrollmentAddons.map(addon => {
-        const description = addon.CourseAddonMapping?.description || '';
+        const description = addon.CourseAddonMapping?.description || addon.name || 'Zusatzleistung / Add-on';
         const price = addon.priceAtPurchase || 0;
         const currency = addon.currency || 'EUR';
         const formattedPrice = (price / 100).toFixed(2).replace('.', ',');

@@ -66,14 +66,14 @@ export const CREATE_ENROLLMENT_WITH_ADDONS = gql`
     $userId: uuid!
     $motivationLetter: String
     $formbricksSurveyUrl: String
-    $termsAcceptedAt: timestamptz
+    $acceptTerms: Boolean
   ) {
     createEnrollmentWithAddons(
       courseId: $courseId
       userId: $userId
       motivationLetter: $motivationLetter
       formbricksSurveyUrl: $formbricksSurveyUrl
-      termsAcceptedAt: $termsAcceptedAt
+      acceptTerms: $acceptTerms
     ) {
       success
       error

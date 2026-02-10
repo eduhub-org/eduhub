@@ -442,7 +442,8 @@
       "motivation_letter_required": "Please provide a motivation letter",
       "terms_required": "Please accept the Terms and Conditions",
       "registration_failed": "Registration failed. Please try again.",
-      "complete_survey_first": "Please complete the questionnaire first."
+      "complete_survey_first": "Please complete the questionnaire first.",
+      "no_items_to_charge": "No items to charge. Course has no base price and no add-ons selected. Please contact support if this is unexpected."
     },
     "formbricks": {
       "survey_title": "Application Questionnaire",
@@ -1645,5 +1646,24 @@
     "no_pricing": "No pricing configured.",
     "synced": "Synced",
     "not_synced": "Not synced"
+  },
+  "AddonValidationDialog": {
+    "title": "Validate Add-ons",
+    "close": "Close",
+    "no_addons_found": "No add-ons found.",
+    "price_label": "Price (in cents)",
+    "description_label": "Description",
+    "question_id": "Question ID",
+    "choice_id": "Choice ID",
+    "cancel": "Cancel",
+    "saving": "Saving...",
+    "save_and_create_stripe": "Save & Create Stripe Prices"
+  },
+  "footer": {
+    "imprint": "Imprint",
+    "privacy": "Privacy Policy",
+    "faq": "FAQ",
+    "newsletter": "Newsletter",
+    "sponsored_by": "Sponsored by:"
   }
 }

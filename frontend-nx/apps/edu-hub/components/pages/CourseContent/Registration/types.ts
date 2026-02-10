@@ -72,7 +72,6 @@ export interface RegistrationFormData {
   motivationLetter?: string;
   paymentMethod?: string;
   acceptTerms?: boolean;
-  termsAcceptedAt?: string;  // ISO timestamp string
   enrollmentId?: number;  // Enrollment ID for payment flows (enrollment created with addons before payment)
   selectedAddons?: SelectedAddon[];  // Deprecated: kept for backward compatibility, not used for payment flows
 }

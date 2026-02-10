@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Box, Typography, TextField, Chip, Alert } from '@mui/material';
 import { MdClose } from 'react-icons/md';
+import { useTranslations } from 'next-intl';
 import { Button } from '../../common/Button';
 
 interface AddonQuestion {
@@ -42,6 +43,7 @@ export const AddonValidationDialog: React.FC<AddonValidationDialogProps> = ({
   courseId: _courseId, // eslint-disable-line @typescript-eslint/no-unused-vars
   isLoading = false,
 }) => {
+  const t = useTranslations('AddonValidationDialog');
   const [validatedMappings, setValidatedMappings] = useState<Record<string, {
     validatedPrice: number;
     description: string;
@@ -118,11 +120,11 @@ export const AddonValidationDialog: React.FC<AddonValidationDialogProps> = ({
     >
       <DialogTitle className="light">
         <div className="flex justify-between items-center">
-          <span className="text-label-primary">Add-ons validieren</span>
+          <span className="text-label-primary">{t('title')}</span>
           <button
             onClick={onClose}
             className="p-1 rounded-full hover:bg-gray-200 transition-colors text-label-primary"
-            aria-label="Schließen"
+            aria-label={t('close')}
           >
             <MdClose className="text-xl" />
           </button>
@@ -132,7 +134,7 @@ export const AddonValidationDialog: React.FC<AddonValidationDialogProps> = ({
       <DialogContent sx={{ overflowY: 'auto', flex: '1 1 auto' }} className="light">
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, py: 2 }}>
           {addonQuestions.length === 0 ? (
-            <Typography>Keine Add-ons gefunden.</Typography>
+            <Typography>{t('no_addons_found')}</Typography>
           ) : (
             addonQuestions.map((question) => {
               const key = getMappingKey(question.questionId, question.choiceId);
@@ -169,7 +171,7 @@ export const AddonValidationDialog: React.FC<AddonValidationDialogProps> = ({
 
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                     <TextField
-                      label="Preis (in Cent)"
+                      label={t('price_label')}
                       type="number"
                       value={finalPrice}
                       onChange={(e) => handlePriceChange(question.questionId, question.choiceId, parseInt(e.target.value) || 0)}
@@ -178,7 +180,7 @@ export const AddonValidationDialog: React.FC<AddonValidationDialogProps> = ({
                     />
 
                     <TextField
-                      label="Beschreibung"
+                      label={t('description_label')}
                       value={finalDescription}
                       onChange={(e) => handleDescriptionChange(question.questionId, question.choiceId, e.target.value)}
                       fullWidth
@@ -186,7 +188,7 @@ export const AddonValidationDialog: React.FC<AddonValidationDialogProps> = ({
                     />
 
                     <Typography variant="caption" color="text.secondary">
-                      Frage-ID: {question.questionId} | Choice-ID: {question.choiceId}
+                      {t('question_id')}: {question.questionId} | {t('choice_id')}: {question.choiceId}
                     </Typography>
                   </Box>
                 </Box>
@@ -197,9 +199,9 @@ export const AddonValidationDialog: React.FC<AddonValidationDialogProps> = ({
       </DialogContent>
 
       <DialogActions sx={{ px: 3, pb: 2 }} className="light">
-        <Button onClick={onClose}>Abbrechen</Button>
+        <Button onClick={onClose}>{t('cancel')}</Button>
         <Button filled onClick={handleSave} disabled={isLoading || addonQuestions.length === 0}>
-          {isLoading ? 'Speichern...' : 'Speichern & Stripe Preise erstellen'}
+          {isLoading ? t('saving') : t('save_and_create_stripe')}
         </Button>
       </DialogActions>
     </Dialog>

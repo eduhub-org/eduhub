@@ -70,7 +70,7 @@ export const Registration: FC<RegistrationProps> = ({ course, courseEnrollment, 
         {/* Always render modal so it can be opened for retry payment flow */}
         <RegistrationModal
           visible={registrationHandler.isModalOpen}
-          closeModal={registrationHandler.setIsModalOpen}
+          closeModal={registrationHandler.closeModal}
           course={course}
           registrationType={registrationHandler.registrationType}
           onSubmit={registrationHandler.submitRegistration}

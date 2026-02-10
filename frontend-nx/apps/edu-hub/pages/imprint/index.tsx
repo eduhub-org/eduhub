@@ -22,18 +22,18 @@ const Imprint: FC = () => {
         <div className="flex flex-wrap">
           <div className="ml-12 mr-10 mt-4">
             <h2 className="text-2xl mb-2">{isEnglish ? 'Address' : 'Anschrift'}</h2>
-            <dl>
-              <dd>Campusbusinessbox e.V.</dd>
-              <dd>Wissenschaftszentrum Kiel</dd>
-              <dd>Fraunhoferstraße 13</dd>
-              <dd>24118 Kiel</dd>
-              <dt className="italic mt-2">{isEnglish ? 'Phone' : 'Telefon'}</dt>
-              <dd>0431.90894380</dd>
-              <dt className="italic mt-2">Email</dt>
-              <dd>
-                <a href="mailto:edu@opencampus.sh">edu @ opencampus.sh</a>
-              </dd>
-            </dl>
+            <address className="not-italic">
+              <p>Campusbusinessbox e.V.</p>
+              <p>Wissenschaftszentrum Kiel</p>
+              <p>Fraunhoferstraße 13</p>
+              <p>24118 Kiel</p>
+            </address>
+            <p className="italic mt-2">{isEnglish ? 'Phone' : 'Telefon'}</p>
+            <p>0431.90894380</p>
+            <p className="italic mt-2">Email</p>
+            <p>
+              <a href="mailto:edu@opencampus.sh">edu @ opencampus.sh</a>
+            </p>
           </div>
           <div className="ml-12 mr-10 mt-4">
             <h2 className="text-2xl mb-2">{isEnglish ? 'Board' : 'Vorstand'}</h2>

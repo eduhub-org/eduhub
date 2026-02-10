@@ -97,7 +97,7 @@ export const useRegistrationHandler = ({
             userId,
             motivationLetter: formData?.motivationLetter || '',
             status,
-            termsAcceptedAt: formData?.termsAcceptedAt || null,
+            termsAcceptedAt: formData?.acceptTerms ? new Date().toISOString() : null,
           },
         });
 
@@ -124,6 +124,10 @@ export const useRegistrationHandler = ({
     async (formData: RegistrationFormData): Promise<RegistrationResult> => {
       if (!userId) {
         return { success: false, error: 'User not authenticated' };
+      }
+
+      if (!course?.id) {
+        return { success: false, error: 'Course information is required' };
       }
 
       // Enrollment should already be created with addons via createEnrollmentWithAddons action
@@ -173,7 +177,7 @@ export const useRegistrationHandler = ({
         setIsLoading(false);
       }
     },
-    [course, userId, createStripeCheckoutMutation]
+    [course?.id, userId, createStripeCheckoutMutation]
   );
 
   const handleRegistration = useCallback(() => {
@@ -227,7 +231,7 @@ export const useRegistrationHandler = ({
 
   return {
     isModalOpen,
-    setIsModalOpen: handleCloseModal,
+    closeModal: handleCloseModal,
     isLoading,
     registrationType,
     config,

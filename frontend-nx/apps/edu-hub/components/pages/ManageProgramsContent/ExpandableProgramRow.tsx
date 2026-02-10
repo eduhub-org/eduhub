@@ -103,7 +103,7 @@ const ExpandableProgramRow: FC<ExpandableProgramRowProps> = ({ program }) => {
 
   return (
     <div className="w-full flex-1 min-w-0">
-      <div className="bg-fill-primary text-label-primary light p-6 w-full">
+      <div className="bg-fill-primary text-label-primary p-6 w-full">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
           {/* Left Column */}
           <div className="space-y-4 w-full min-w-0">

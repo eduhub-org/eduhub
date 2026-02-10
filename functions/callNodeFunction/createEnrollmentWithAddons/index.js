@@ -103,7 +103,7 @@ function extractFormbricksBaseUrlAndSurveyId(surveyUrl) {
 
 /**
  * Fetches Formbricks responses with retry logic to handle timing issues.
- * Retries up to 3 times with 1 second delays if response is not yet finished.
+ * Retries up to 5 times with 2 second delays if response is not yet finished.
  * 
  * @param {string} formbricksApiUrl - Base URL of Formbricks instance
  * @param {string} formbricksSurveyId - Survey ID
@@ -111,8 +111,8 @@ function extractFormbricksBaseUrlAndSurveyId(surveyUrl) {
  * @param {string} userId - User ID to filter responses
  * @param {number} courseId - Course ID to filter responses
  * @param {Object} logger - Winston logger instance
- * @param {number} maxRetries - Maximum number of retry attempts (default: 3)
- * @param {number} retryDelayMs - Delay between retries in milliseconds (default: 1000)
+ * @param {number} maxRetries - Maximum number of retry attempts (default: 5)
+ * @param {number} retryDelayMs - Delay between retries in milliseconds (default: 2000)
  * @returns {Promise<Object|null>} Latest matching response or null if not found
  */
 async function fetchFormbricksResponseWithRetry(
@@ -181,12 +181,12 @@ async function fetchFormbricksResponseWithRetry(
             finished: r.finished,
             createdAt: r.createdAt,
             dataKeys: Object.keys(r.data || {}),
-            eduhubUserId_inData: r.data?.eduhubUserId,
-            eduhubCourseId_inData: r.data?.eduhubCourseId,
-            eduhubUserId_inHiddenFields: r.hiddenFields?.eduhubUserId,
-            eduhubCourseId_inHiddenFields: r.hiddenFields?.eduhubCourseId,
+            hasEduhubUserIdInData: !!r.data?.eduhubUserId,
+            hasEduhubCourseIdInData: !!r.data?.eduhubCourseId,
+            hasEduhubUserIdInHiddenFields: !!r.hiddenFields?.eduhubUserId,
+            hasEduhubCourseIdInHiddenFields: !!r.hiddenFields?.eduhubCourseId,
             hasHiddenFieldsProperty: !!r.hiddenFields,
-            allDataEntries: Object.entries(r.data || {}).slice(0, 10) // First 10 entries
+            dataEntryCount: Object.keys(r.data || {}).length
           }))
         });
       } else {
@@ -485,7 +485,7 @@ function matchAddonsFromResponse(responseData, addonMappings, labelToChoiceIdMap
  * Creates a course enrollment and saves selected addons from Formbricks survey to the database.
  * Handles Formbricks timing issues with retry logic.
  * 
- * @param {Object} req - Request object containing body with courseId, userId, motivationLetter, formbricksSurveyUrl, termsAcceptedAt
+ * @param {Object} req - Request object containing body with courseId, userId, motivationLetter, formbricksSurveyUrl, acceptTerms
  * @param {Object} logger - Winston logger instance
  * @returns {Object} Result with success, enrollmentId, selectedAddons, or error
  */
@@ -499,7 +499,7 @@ export default async function createEnrollmentWithAddons(req, logger) {
       userId,
       motivationLetter,
       formbricksSurveyUrl,
-      termsAcceptedAt
+      acceptTerms
     } = req.body.input || req.body;
 
     // Validate required inputs
@@ -523,12 +523,15 @@ export default async function createEnrollmentWithAddons(req, logger) {
     // Step 1: Create CourseEnrollment with status APPLIED and paymentStatus PENDING
     logger.info('Creating enrollment', { courseId, userId });
     
+    // Set termsAcceptedAt server-side when acceptTerms is true (authoritative timestamp)
+    const termsAcceptedAt = acceptTerms === true ? new Date().toISOString() : null;
+    
     const enrollmentResult = await client.request(CREATE_ENROLLMENT, {
       courseId,
       userId,
       motivationLetter: motivationLetter || '[Formbricks Survey Completed]',
       status: 'APPLIED',
-      termsAcceptedAt: termsAcceptedAt || null,
+      termsAcceptedAt: termsAcceptedAt,
       paymentStatus: 'PENDING' // Set to PENDING for payment flows - will be updated by webhook on success/failure
     });
 

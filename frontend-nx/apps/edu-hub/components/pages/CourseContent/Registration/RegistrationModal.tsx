@@ -1,8 +1,9 @@
-import { FC, useState, useCallback, useMemo, useEffect } from 'react';
+import { FC, useState, useCallback, useMemo } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { MdClose } from 'react-icons/md';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 import { CourseRegistrationType_enum } from '../../../../__generated__/globalTypes';
 import { Course_Course_by_pk } from '../../../../queries/__generated__/Course';
 import { Button } from '../../../common/Button';
@@ -113,22 +114,6 @@ export const RegistrationModal: FC<RegistrationModalProps> = ({
     }
   );
 
-  // Debug logging
-  useEffect(() => {
-    if (retryEnrollmentId) {
-      console.log('Retry flow active:', {
-        retryEnrollmentId,
-        effectiveSurveyUrl,
-        userId,
-        shouldFetchResponses,
-        loadingResponses,
-        responsesError,
-        hasData: !!formbricksResponsesData,
-        responses: formbricksResponsesData?.getFormbricksResponses
-      });
-    }
-  }, [retryEnrollmentId, effectiveSurveyUrl, userId, shouldFetchResponses, loadingResponses, responsesError, formbricksResponsesData]);
-
   // Build prefilled survey URL from previous responses
   const prefilledSurveyUrl = useMemo(() => {
     if (!retryEnrollmentId || !effectiveSurveyUrl || !formbricksResponsesData?.getFormbricksResponses?.success) {
@@ -141,7 +126,13 @@ export const RegistrationModal: FC<RegistrationModalProps> = ({
     }
 
     const latestResponse = responses[0];
-    const url = new URL(effectiveSurveyUrl);
+    let url: URL;
+    try {
+      url = new URL(effectiveSurveyUrl);
+    } catch {
+      // Invalid URL - return null to fall back to non-prefilled URL
+      return null;
+    }
     
     // Add prefill parameters from response answers
     // Use rawAnswer which contains the actual values (not formatted strings with prices)
@@ -149,7 +140,7 @@ export const RegistrationModal: FC<RegistrationModalProps> = ({
       if (answer.questionId) {
         // rawAnswer can be a string (single-select) or JSON string of array (multi-select)
         // Prefer rawAnswer over answer since it doesn't include price formatting
-        const rawValue = (answer as any).rawAnswer ?? answer.answer;
+        const rawValue = answer.rawAnswer ?? answer.answer;
         
         if (!rawValue) {
           return;
@@ -219,6 +210,12 @@ export const RegistrationModal: FC<RegistrationModalProps> = ({
   const addonsTotal = selectedAddons.reduce((sum, addon) => sum + addon.validatedPrice, 0);
   const totalPrice = basePrice + addonsTotal;
 
+  // Validate currency consistency
+  const currencyMismatch = useMemo(() => {
+    if (selectedAddons.length === 0) return false;
+    return selectedAddons.some(addon => addon.currency !== currency);
+  }, [selectedAddons, currency]);
+
   const handleFormbricksComplete = useCallback(async () => {
     // Guard against duplicate submissions
     if (isLoading || formbricksSurveyCompleted) {
@@ -237,7 +234,7 @@ export const RegistrationModal: FC<RegistrationModalProps> = ({
             userId: userId,
             motivationLetter: '[Formbricks Survey Completed]',
             formbricksSurveyUrl: effectiveSurveyUrl,
-            termsAcceptedAt: null,
+            acceptTerms: false, // Terms not accepted yet - will be accepted in summary step
           },
         });
 
@@ -262,16 +259,19 @@ export const RegistrationModal: FC<RegistrationModalProps> = ({
       }
     } else if (!config.requiresPayment) {
       // For non-payment flows, auto-submit
-      onSubmit({
-        motivationLetter: '[Formbricks Survey Completed]',
-        acceptTerms: false,
-      }).then((result) => {
+      try {
+        const result = await onSubmit({
+          motivationLetter: '[Formbricks Survey Completed]',
+          acceptTerms: false,
+        });
         if (result.success) {
           closeModal();
         } else {
           setError(result.error || t('errors.registration_failed'));
         }
-      });
+      } catch (err: any) {
+        setError(err.message || t('errors.registration_failed'));
+      }
     } else {
       // Payment flow but no survey URL - proceed with empty addons
       setSelectedAddons([]);
@@ -301,7 +301,13 @@ export const RegistrationModal: FC<RegistrationModalProps> = ({
       const hasAddons = selectedAddons.length > 0 && selectedAddons.some(addon => addon.validatedPrice > 0);
       
       if (!hasBasePrice && !hasAddons) {
-        setError(t('errors.no_items_to_charge') || 'No items to charge. Course has no base price and no add-ons selected. Please contact support if this is unexpected.');
+        setError(t('errors.no_items_to_charge'));
+        return;
+      }
+
+      // Validate currency consistency
+      if (currencyMismatch) {
+        setError(t('errors.currency_mismatch') || 'All add-ons must use the same currency as the course');
         return;
       }
     }
@@ -311,7 +317,6 @@ export const RegistrationModal: FC<RegistrationModalProps> = ({
     const result = await onSubmit({
       motivationLetter: motivationLetter.trim(),
       acceptTerms,
-      termsAcceptedAt: acceptTerms ? new Date().toISOString() : undefined,
       enrollmentId: config.requiresPayment ? enrollmentId : undefined,
     });
 
@@ -321,17 +326,7 @@ export const RegistrationModal: FC<RegistrationModalProps> = ({
     } else {
       setError(result.error || t('errors.registration_failed'));
     }
-  }, [config, motivationLetter, acceptTerms, onSubmit, t, closeModal, useFormbricks, formbricksSurveyCompleted, currentStep, basePrice, enrollmentId, selectedAddons]);
-
-  // When retry flow is active, mark survey as completed if we have prefilled data
-  useEffect(() => {
-    if (retryEnrollmentId && prefilledSurveyUrl && !formbricksSurveyCompleted) {
-      // For retry flow, we want to show the summary step immediately
-      // The user can review/edit the prefilled survey, but we'll auto-advance to summary
-      // Actually, let's let them complete the survey normally - they can review and change answers
-      // So we don't auto-complete it
-    }
-  }, [retryEnrollmentId, prefilledSurveyUrl, formbricksSurveyCompleted]);
+  }, [config, motivationLetter, acceptTerms, onSubmit, t, closeModal, useFormbricks, formbricksSurveyCompleted, currentStep, basePrice, enrollmentId, selectedAddons, currencyMismatch]);
 
   const handleClose = useCallback(() => {
     if (!isLoading) {
@@ -359,9 +354,10 @@ export const RegistrationModal: FC<RegistrationModalProps> = ({
 
   const isSubmitDisabled = useMemo(() => {
     if (isLoading) return true;
+    if (isFetchingAddons) return true;
     
     if (config.requiresPayment && currentStep === 'summary') {
-      return !acceptTerms;
+      return !acceptTerms || currencyMismatch;
     }
     
     if (useFormbricks) {
@@ -373,7 +369,7 @@ export const RegistrationModal: FC<RegistrationModalProps> = ({
     }
     
     return false;
-  }, [isLoading, config, currentStep, acceptTerms, useFormbricks, formbricksSurveyCompleted, motivationLetter]);
+  }, [isLoading, isFetchingAddons, config, currentStep, acceptTerms, currencyMismatch, useFormbricks, formbricksSurveyCompleted, motivationLetter]);
 
   const renderQuestionnaireStep = () => (
     <>
@@ -481,7 +477,7 @@ export const RegistrationModal: FC<RegistrationModalProps> = ({
             <span className="text-sm text-label-primary leading-relaxed">
               {t.rich('modal.accept_terms', {
                 terms: (chunks) => (
-                  <a
+                  <Link
                     href="/terms"
                     target="_blank"
                     rel="noopener noreferrer"
@@ -489,10 +485,10 @@ export const RegistrationModal: FC<RegistrationModalProps> = ({
                     onClick={(e) => e.stopPropagation()}
                   >
                     {chunks}
-                  </a>
+                  </Link>
                 ),
                 privacy: (chunks) => (
-                  <a
+                  <Link
                     href="/privacy"
                     target="_blank"
                     rel="noopener noreferrer"
@@ -500,7 +496,7 @@ export const RegistrationModal: FC<RegistrationModalProps> = ({
                     onClick={(e) => e.stopPropagation()}
                   >
                     {chunks}
-                  </a>
+                  </Link>
                 ),
               })}
             </span>
@@ -558,7 +554,7 @@ export const RegistrationModal: FC<RegistrationModalProps> = ({
       </DialogContent>
 
       {/* Submit button - show for summary step or non-payment flows */}
-      {(currentStep === 'summary' || !config.requiresPayment) && (
+      {(currentStep === 'summary' || (!config.requiresPayment && (!useFormbricks || formbricksSurveyCompleted))) && (
         <DialogActions sx={{ padding: { xs: '16px', sm: '24px' }, paddingTop: 0 }} className="light">
           <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-3 w-full">
             <Button onClick={handleClose} disabled={isLoading} className="px-6 py-3 w-full sm:w-auto order-2 sm:order-1">

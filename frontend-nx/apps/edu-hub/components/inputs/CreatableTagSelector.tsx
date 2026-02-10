@@ -150,7 +150,7 @@ const CreatableTagSelector: React.FC<CreatableTagSelectorProps> = ({
   };
 
   const baseClass = 'w-full px-3 py-1 mb-8 text-label-primary rounded bg-fill-primary';
-  const finalClassName = prioritizeClasses(`${baseClass} ${className || ''}`);
+  const finalClassName = prioritizeClasses(baseClass);
 
   const renderMaterialUI = () => (
     <Autocomplete

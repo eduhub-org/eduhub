@@ -104,7 +104,6 @@ update_permissions:
         - motivationRating
         - status
         - location
-        - termsAcceptedAt
       filter:
         _or:
           - Course:
@@ -133,7 +132,6 @@ update_permissions:
         - motivationRating
         - status
         - location
-        - termsAcceptedAt
       filter:
         _or:
           - Course:
