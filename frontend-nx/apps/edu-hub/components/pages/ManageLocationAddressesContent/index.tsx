@@ -91,7 +91,7 @@ const ExpandableLocationAddressRow: React.FC<ExpandableRowProps> = ({ row, onErr
     : [];
 
   return (
-    <div className="font-medium bg-edu-course-list p-4">
+    <div className="font-medium bg-fill-primary text-label-primary light p-4">
       <CreatableTagSelector
         variant="material"
         label={t('locationAddress.aliases')}

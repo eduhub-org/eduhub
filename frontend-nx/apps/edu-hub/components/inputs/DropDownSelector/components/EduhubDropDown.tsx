@@ -37,7 +37,7 @@ export const EduhubDropDown: React.FC<EduhubDropDownProps> = ({
   onCreateOption,
   getLabelForValue,
 }) => {
-  const baseClass = 'w-full pl-3 pr-10 py-3 text-gray-500 rounded bg-edu-light-gray';
+  const baseClass = 'w-full pl-3 pr-10 py-3 text-label-primary rounded bg-fill-primary';
   const finalClassName = `${baseClass} ${className}`;
 
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -46,7 +46,7 @@ export const EduhubDropDown: React.FC<EduhubDropDownProps> = ({
 
   return (
     <div className="px-2">
-      <div className={className || 'text-gray-400'}>
+      <div className={className || 'text-label-primary'}>
         {label && (
           <div className="flex justify-between mb-2">
             <div className="flex items-center">
@@ -59,7 +59,7 @@ export const EduhubDropDown: React.FC<EduhubDropDownProps> = ({
             </div>
           </div>
         )}
-        <div className="relative">
+        <div className="light relative">
           {creatable && onInputChange && onCreateOption && getLabelForValue ? (
             <CreatableDropDown
               inputValue={inputValue || ''}

@@ -38,4 +38,5 @@ export interface UpdateEnrollmentVariables {
   courseId: number;
   motivationLetter: string;
   status: CourseEnrollmentStatus_enum;
+  termsAcceptedAt?: any | null;
 }

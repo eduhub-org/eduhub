@@ -20,6 +20,14 @@ object_relationships:
   - name: User
     using:
       foreign_key_constraint_on: userId
+array_relationships:
+  - name: CourseEnrollmentAddons
+    using:
+      foreign_key_constraint_on:
+        column: enrollmentId
+        table:
+          name: CourseEnrollmentAddon
+          schema: public
 insert_permissions:
   - role: user_access
     permission:
@@ -30,6 +38,7 @@ insert_permissions:
         - status
         - userId
         - location
+        - termsAcceptedAt
 select_permissions:
   - role: instructor_access
     permission:
@@ -51,6 +60,7 @@ select_permissions:
         - paymentStatus
         - paymentAmount
         - paymentCurrency
+        - termsAcceptedAt
       filter: {}
   - role: user_access
     permission:
@@ -69,6 +79,7 @@ select_permissions:
         - paymentStatus
         - paymentAmount
         - paymentCurrency
+        - termsAcceptedAt
       filter:
         _and:
           - userId:
@@ -103,6 +114,18 @@ update_permissions:
               _eq: X-Hasura-User-Id
       check: {}
   - role: user_access
+    permission:
+      columns:
+        - invitationExpirationDate
+        - motivationRating
+        - status
+        - location
+        - termsAcceptedAt
+      filter:
+        userId:
+          _eq: X-Hasura-User-Id
+      check: {}
+  - role: instructor
     permission:
       columns:
         - invitationExpirationDate

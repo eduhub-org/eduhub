@@ -115,19 +115,19 @@ const TimePicker: React.FC<TimePickerProps> = ({
     timeOptions.push(formatTime(date));
   }
 
-  const baseClass = 'w-full h-12 px-3 py-3 mb-8 text-gray-500 rounded bg-edu-light-gray';
+  const baseClass = 'w-full h-12 px-3 py-3 mb-8 text-label-primary rounded bg-fill-primary';
   const finalClassName = prioritizeClasses(`${baseClass} ${className}`);
 
   return (
     <>
       <div className="px-2">
-        <div className="text-gray-400">
+        <div className="text-label-primary">
           {label && (
             <div className="flex justify-between mb-2">
               <div className="flex items-center">{label}</div>
             </div>
           )}
-          <div>
+          <div className="light">
             <select className={finalClassName} onChange={handleChange} value={timeValue}>
               <option value="">{t('time_picker.select_time')}</option>
               {timeOptions.map((option) => (

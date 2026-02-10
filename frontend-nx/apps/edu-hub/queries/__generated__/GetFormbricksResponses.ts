@@ -12,6 +12,7 @@ export interface GetFormbricksResponses_getFormbricksResponses_responses_answers
   questionId: string;
   headline: string;
   answer: string;
+  rawAnswer: string | null;
 }
 
 export interface GetFormbricksResponses_getFormbricksResponses_responses {

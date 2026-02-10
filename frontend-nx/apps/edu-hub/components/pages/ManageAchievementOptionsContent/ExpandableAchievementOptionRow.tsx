@@ -174,14 +174,14 @@ const ExpandableAchievementOptionRow: FC<ExpandableAchievementOptionRowProps> = 
 
   return (
     <div className="w-full flex-1 min-w-0">
-      <div className="bg-edu-course-list p-6 w-full">
+      <div className="bg-fill-primary text-label-primary light p-6 w-full">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
           {/* Left Column */}
           <div className="space-y-4 w-full min-w-0">
             {/* Description */}
-            <div className="bg-white border border-gray-200 rounded-lg p-4">
+            <div className="bg-fill-primary border border-border-primary rounded-lg p-4">
               <div className="mb-2">
-                <label className="text-sm font-medium text-gray-700">
+                <label className="text-sm font-medium text-label-primary">
                   {tCommon('project-description')}
                 </label>
               </div>
@@ -199,9 +199,9 @@ const ExpandableAchievementOptionRow: FC<ExpandableAchievementOptionRowProps> = 
 
             {/* Documentation Template */}
             {(achievementOption.recordType === 'DOCUMENTATION' || achievementOption.recordType === 'ONLINE_COURSE') && (
-              <div className="bg-white border border-gray-200 rounded-lg p-4">
+              <div className="bg-fill-primary border border-border-primary rounded-lg p-4">
                 <div className="mb-2">
-                  <label className="text-sm font-medium text-gray-700">
+                  <label className="text-sm font-medium text-label-primary">
                     {tCommon('achievement-documentation-template')}
                   </label>
                 </div>

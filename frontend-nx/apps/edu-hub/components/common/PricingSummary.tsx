@@ -172,9 +172,11 @@ export const PricingSummary: FC<PricingSummaryProps> = ({
         {/* Addons */}
         {validAddons.length > 0 && (
           <div className="space-y-2 overflow-hidden">
-            <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-              {t('pricing_summary.addons')}
-            </span>
+            {basePriceValue > 0 && (
+              <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                {t('pricing_summary.addons')}
+              </span>
+            )}
             {validAddons.map((addon) => {
               const questionText = getLocalizedQuestionText(addon);
               

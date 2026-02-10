@@ -105,10 +105,9 @@ export const RegistrationButton: FC<RegistrationButtonProps> = ({ course, regist
     <div className="flex flex-1 flex-col justify-center items-center space-y-4 w-full">
       <Button
         filled
-        inverted
         onClick={onClick}
         disabled={course.applicationEnd <= now}
-        className="bg-edu-course-current hover:bg-opacity-90 transition-all duration-200 px-8 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+        className="light !bg-warning !text-[#222222] hover:bg-opacity-90 transition-all duration-200 px-8 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
       >
         {getButtonText()}
       </Button>

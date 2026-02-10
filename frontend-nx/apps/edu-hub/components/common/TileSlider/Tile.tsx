@@ -27,20 +27,20 @@ export const Tile: FC<TileProps> = ({ course, isManage }) => {
   return (
     <Link href={isManage ? `/manage/course/${course.id}` : `/course/${course.id}`}>
       <TileBase coverImage={course?.coverImage} title={course.title}>
-        <div className="flex justify-between mb-3 text-sm tracking-wider">
+        <div className="flex justify-between mb-3 text-sm tracking-wider text-label-primary">
           {course.weekDay !== 'NONE' && course.startTime && course.endTime
             ? getWeekdayStartAndEndString(course, t)
             : null}{' '}
-          <div className="flex items-center">
+          <div className="flex items-center text-label-primary">
             <div className="w-4 h-4 mr-1">
               <Image src={languageIcon} alt="language icon" width={16} height={16} unoptimized className="w-full h-full object-contain" />
             </div>
             {t(course.language)}
           </div>
         </div>
-        <span className="text-lg mb-auto line-clamp-3">{course.tagline}</span>
-        <div className="flex justify-between text-xs items-center tracking-wider">
-          <div className="flex uppercase">
+        <span className="text-lg mb-auto line-clamp-3 text-label-primary">{course.tagline}</span>
+        <div className="flex justify-between text-xs items-center tracking-wider text-label-primary">
+          <div className="flex uppercase text-label-primary">
             <div className="w-3 h-3 mr-1">
               <Image src={locationIcon} alt="location icon" width={12} height={12} unoptimized className="w-full h-full object-contain" />
             </div>

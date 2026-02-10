@@ -23,11 +23,44 @@ const GET_COURSE_AND_ADDONS = `
   }
 `;
 
+const GET_ENROLLMENT_USER = `
+  query GetEnrollmentUser($enrollmentId: Int!) {
+    CourseEnrollment_by_pk(id: $enrollmentId) {
+      userId
+      User {
+        email
+      }
+    }
+  }
+`;
+
+const GET_ENROLLMENT_ADDONS = `
+  query GetEnrollmentAddons($enrollmentId: Int!) {
+    CourseEnrollmentAddon(where: { enrollmentId: { _eq: $enrollmentId } }) {
+      id
+      addonMappingId
+      priceAtPurchase
+      currency
+      CourseAddonMapping {
+        id
+        questionId
+        choiceId
+        description
+        validatedPrice
+        currency
+        stripeProductId
+        stripePriceId
+      }
+    }
+  }
+`;
+
 /**
  * Creates a Stripe Checkout Session for course enrollment with add-ons.
  * Builds success and cancel URLs server-side from FRONTEND_URL for security.
+ * Reads addons from CourseEnrollmentAddon table using enrollmentId.
  * 
- * @param {Object} req - Request object containing body with courseId, enrollmentId, formbricksResponseId, selectedAddons
+ * @param {Object} req - Request object containing body with courseId, enrollmentId, formbricksResponseId, userEmail
  * @param {Object} logger - Winston logger instance
  * @returns {Object} Checkout session URL
  */
@@ -40,8 +73,7 @@ export default async function createStripeCheckout(req, logger) {
       courseId,
       enrollmentId,
       formbricksResponseId,
-      userEmail,
-      selectedAddons = []
+      userEmail
     } = req.body.input || req.body;
 
     if (!courseId) {
@@ -105,19 +137,109 @@ export default async function createStripeCheckout(req, logger) {
       };
     }
 
+    // Fetch enrollment to get user email if not provided
+    let emailToUse = userEmail;
+    if (!emailToUse || emailToUse.trim() === '') {
+      try {
+        const enrollmentData = await client.request(GET_ENROLLMENT_USER, { enrollmentId });
+        const enrollment = enrollmentData.CourseEnrollment_by_pk;
+        if (enrollment?.User?.email) {
+          emailToUse = enrollment.User.email;
+        }
+      } catch (error) {
+        logger.warn('Could not fetch user email from enrollment', { error: error.message });
+        // Continue without email - Stripe will prompt for it during checkout
+      }
+    }
+
+    // Fetch selected addons from CourseEnrollmentAddon table
+    let enrollmentAddons = [];
+    try {
+      const addonsData = await client.request(GET_ENROLLMENT_ADDONS, { enrollmentId });
+      enrollmentAddons = addonsData.CourseEnrollmentAddon || [];
+      logger.info('Fetched enrollment addons from database', {
+        enrollmentId,
+        addonCount: enrollmentAddons.length
+      });
+    } catch (error) {
+      logger.warn('Could not fetch enrollment addons from database', { 
+        error: error.message,
+        enrollmentId 
+      });
+      // Continue without addons - user will only pay base price
+    }
+
     // Build line items array
     const lineItems = [];
 
     // Add base course price if it exists
     if (course.basePrice && course.basePrice > 0) {
       if (course.stripePriceId) {
-        // Use existing Stripe Price ID
-        lineItems.push({
-          price: course.stripePriceId,
-          quantity: 1
-        });
+        // Verify the Stripe Price ID is valid and has correct amount
+        try {
+          const stripePrice = await stripe.prices.retrieve(course.stripePriceId);
+          
+          // Check if the Stripe price is active, one-time, matches currency, and amount matches our basePrice (in cents)
+          // If any check fails, fall back to dynamic pricing
+          const expectedCurrency = (course.currency || 'eur').toLowerCase();
+          if (
+            stripePrice.active === true &&
+            stripePrice.type === 'one_time' &&
+            stripePrice.currency?.toLowerCase() === expectedCurrency &&
+            stripePrice.unit_amount &&
+            stripePrice.unit_amount > 0 &&
+            stripePrice.unit_amount === course.basePrice
+          ) {
+            // Use existing Stripe Price ID
+            lineItems.push({
+              price: course.stripePriceId,
+              quantity: 1
+            });
+            logger.debug('Using existing Stripe Price ID', {
+              stripePriceId: course.stripePriceId,
+              amount: stripePrice.unit_amount
+            });
+          } else {
+            // Price ID exists but validation failed (not active, wrong type, currency mismatch, or amount mismatch), use dynamic pricing
+            logger.warn('Stripe Price ID validation failed, using dynamic pricing', {
+              stripePriceId: course.stripePriceId,
+              stripeActive: stripePrice.active,
+              stripeType: stripePrice.type,
+              stripeCurrency: stripePrice.currency,
+              stripeAmount: stripePrice.unit_amount,
+              expectedCurrency: expectedCurrency,
+              expectedAmount: course.basePrice
+            });
+            lineItems.push({
+              price_data: {
+                currency: (course.currency || 'eur').toLowerCase(),
+                product_data: {
+                  name: course.title || 'Course Enrollment'
+                },
+                unit_amount: course.basePrice
+              },
+              quantity: 1
+            });
+          }
+        } catch (error) {
+          // Stripe Price ID doesn't exist or is invalid, fall back to dynamic pricing
+          logger.warn('Stripe Price ID not found or invalid, using dynamic pricing', {
+            stripePriceId: course.stripePriceId,
+            error: error.message
+          });
+          lineItems.push({
+            price_data: {
+              currency: (course.currency || 'eur').toLowerCase(),
+              product_data: {
+                name: course.title || 'Course Enrollment'
+              },
+              unit_amount: course.basePrice
+            },
+            quantity: 1
+          });
+        }
       } else {
-        // Create dynamic price (fallback)
+        // Create dynamic price (no Stripe Price ID exists)
         lineItems.push({
           price_data: {
             currency: (course.currency || 'eur').toLowerCase(),
@@ -128,49 +250,196 @@ export default async function createStripeCheckout(req, logger) {
           },
           quantity: 1
         });
+        logger.debug('Using dynamic pricing', {
+          basePrice: course.basePrice,
+          currency: course.currency || 'eur'
+        });
       }
     }
 
-    // Add selected add-ons as line items
-    if (course.CourseAddonMappings && Array.isArray(course.CourseAddonMappings)) {
-      for (const addonMapping of course.CourseAddonMappings) {
-        // Check if this addon was selected in the Formbricks response
-        // Match by both questionId and choiceId, and ensure selected flag is true
-        const isSelected = selectedAddons.some(
-          selected => selected.selected === true &&
-                     selected.questionId === addonMapping.questionId &&
-                     selected.choiceId === addonMapping.choiceId
-        );
+    // Add selected add-ons as line items (from CourseEnrollmentAddon table)
+    for (const enrollmentAddon of enrollmentAddons) {
+      const addonMapping = enrollmentAddon.CourseAddonMapping;
+      if (!addonMapping) {
+        logger.warn('CourseEnrollmentAddon missing CourseAddonMapping', {
+          enrollmentAddonId: enrollmentAddon.id,
+          addonMappingId: enrollmentAddon.addonMappingId
+        });
+        continue;
+      }
 
-        if (isSelected && addonMapping.stripePriceId) {
+      // Use priceAtPurchase from CourseEnrollmentAddon (price at time of purchase)
+      // Use nullish coalescing so legitimate 0 price is preserved (not treated as absent)
+      const addonPrice = enrollmentAddon.priceAtPurchase ?? addonMapping.validatedPrice;
+      
+      if (addonPrice > 0) {
+        if (addonMapping.stripePriceId) {
+          // Verify the Stripe Price ID is valid and matches requirements
+          try {
+            const stripePrice = await stripe.prices.retrieve(addonMapping.stripePriceId);
+            const expectedCurrency = (enrollmentAddon.currency || addonMapping.currency || course.currency || 'eur').toLowerCase();
+            
+            // Check if the Stripe price is active, one-time, matches currency, and amount matches addonPrice
+            if (
+              stripePrice.active === true &&
+              stripePrice.type === 'one_time' &&
+              stripePrice.currency?.toLowerCase() === expectedCurrency &&
+              stripePrice.unit_amount &&
+              stripePrice.unit_amount > 0 &&
+              stripePrice.unit_amount === addonPrice
+            ) {
+              // Use existing Stripe Price ID
+              lineItems.push({
+                price: addonMapping.stripePriceId,
+                quantity: 1
+              });
+              logger.debug('Using existing Stripe Price ID for addon', {
+                addonMappingId: addonMapping.id,
+                stripePriceId: addonMapping.stripePriceId
+              });
+            } else {
+              // Price ID exists but validation failed, use dynamic pricing
+              logger.warn('Stripe Price ID validation failed for addon, using dynamic pricing', {
+                addonMappingId: addonMapping.id,
+                stripePriceId: addonMapping.stripePriceId,
+                stripeActive: stripePrice.active,
+                stripeType: stripePrice.type,
+                stripeCurrency: stripePrice.currency,
+                stripeAmount: stripePrice.unit_amount,
+                expectedCurrency: expectedCurrency,
+                expectedAmount: addonPrice
+              });
+              lineItems.push({
+                price_data: {
+                  currency: expectedCurrency,
+                  product_data: {
+                    name: addonMapping.description || `Add-on for ${course.title}`
+                  },
+                  unit_amount: addonPrice
+                },
+                quantity: 1
+              });
+            }
+          } catch (error) {
+            // Stripe Price ID doesn't exist or is invalid, fall back to dynamic pricing
+            logger.warn('Stripe Price ID not found or invalid for addon, using dynamic pricing', {
+              addonMappingId: addonMapping.id,
+              stripePriceId: addonMapping.stripePriceId,
+              error: error.message
+            });
+            const expectedCurrency = (enrollmentAddon.currency || addonMapping.currency || course.currency || 'eur').toLowerCase();
+            lineItems.push({
+              price_data: {
+                currency: expectedCurrency,
+                product_data: {
+                  name: addonMapping.description || `Add-on for ${course.title}`
+                },
+                unit_amount: addonPrice
+              },
+              quantity: 1
+            });
+          }
+        } else {
+          // Create dynamic price for addon (no Stripe Price ID exists)
           lineItems.push({
-            price: addonMapping.stripePriceId,
+            price_data: {
+              currency: (enrollmentAddon.currency || addonMapping.currency || course.currency || 'eur').toLowerCase(),
+              product_data: {
+                name: addonMapping.description || `Add-on for ${course.title}`
+              },
+              unit_amount: addonPrice
+            },
             quantity: 1
+          });
+          logger.debug('Using dynamic pricing for addon', {
+            addonMappingId: addonMapping.id,
+            description: addonMapping.description,
+            price: addonPrice
           });
         }
       }
     }
 
+    // Log line items for debugging
+    logger.debug('Line items prepared', {
+      lineItemCount: lineItems.length,
+      courseBasePrice: course.basePrice,
+      courseStripePriceId: course.stripePriceId,
+      enrollmentAddonsCount: enrollmentAddons.length,
+      lineItems: lineItems.map(item => ({
+        hasPrice: !!item.price,
+        hasPriceData: !!item.price_data,
+        unitAmount: item.price_data?.unit_amount
+      }))
+    });
+
     if (lineItems.length === 0) {
+      // Log detailed information for debugging
+      logger.error('No items to charge - cannot create Stripe checkout', {
+        courseId,
+        enrollmentId,
+        courseBasePrice: course.basePrice,
+        courseHasBasePrice: !!(course.basePrice && course.basePrice > 0),
+        enrollmentAddonsCount: enrollmentAddons.length,
+        enrollmentAddons: enrollmentAddons.map(addon => ({
+          id: addon.id,
+          addonMappingId: addon.addonMappingId,
+          priceAtPurchase: addon.priceAtPurchase,
+          hasMapping: !!addon.CourseAddonMapping,
+          mappingPrice: addon.CourseAddonMapping?.validatedPrice
+        })),
+        possibleCauses: [
+          'Course has no base price configured (basePrice is 0 or null)',
+          'No add-ons were selected in the Formbricks survey',
+          'Add-ons were selected but not saved to CourseEnrollmentAddon table',
+          'All selected add-ons have price 0',
+          'CourseEnrollmentAddon records exist but CourseAddonMapping is missing'
+        ]
+      });
+
       return {
         success: false,
-        error: 'No items to charge. Course has no base price and no add-ons selected.',
+        error: 'No items to charge. Course has no base price and no add-ons selected. Please ensure the course has a base price configured or that add-ons are selected in the registration survey.',
         messageKey: 'NO_ITEMS_TO_CHARGE'
       };
     }
 
     // Create Stripe Checkout Session
-    const session = await stripe.checkout.sessions.create({
+    // Only include customer_email if we have a valid email address
+    // Stripe will prompt for email during checkout if not provided
+    const sessionConfig = {
       line_items: lineItems,
       mode: 'payment',
       success_url: successUrl,
       cancel_url: cancelUrl,
-      customer_email: userEmail,
       metadata: {
         courseId: String(courseId),
         enrollmentId: String(enrollmentId),
         formbricksResponseId: formbricksResponseId || '',
-        source: 'eduhub'
+        source: 'eduhub',
+        selectedAddons: (() => {
+          if (!enrollmentAddons || enrollmentAddons.length === 0) {
+            return '';
+          }
+          // Map to essential identifiers with validatedPrice for audit trail
+          const mappedAddons = enrollmentAddons.map(enrollmentAddon => ({
+            id: enrollmentAddon.CourseAddonMapping?.id || enrollmentAddon.addonMappingId,
+            questionId: enrollmentAddon.CourseAddonMapping?.questionId,
+            choiceId: enrollmentAddon.CourseAddonMapping?.choiceId,
+            validatedPrice: enrollmentAddon.priceAtPurchase
+          })).filter(addon => addon.id); // Filter out any with missing data
+          
+          const serialized = JSON.stringify(mappedAddons);
+          // Stripe metadata has 500 char limit per key - validate and fall back if exceeded
+          if (serialized.length > 500) {
+            logger.warn('selectedAddons metadata exceeds 500 chars, omitting from metadata', {
+              length: serialized.length,
+              addonCount: enrollmentAddons.length
+            });
+            return '';
+          }
+          return serialized;
+        })()
       },
       payment_intent_data: {
         metadata: {
@@ -178,7 +447,14 @@ export default async function createStripeCheckout(req, logger) {
           enrollmentId: String(enrollmentId)
         }
       }
-    });
+    };
+
+    // Only add customer_email if we have a valid email address
+    if (emailToUse && emailToUse.trim() !== '' && emailToUse.includes('@')) {
+      sessionConfig.customer_email = emailToUse.trim();
+    }
+
+    const session = await stripe.checkout.sessions.create(sessionConfig);
 
     logger.info('Created Stripe Checkout Session', {
       sessionId: session.id,

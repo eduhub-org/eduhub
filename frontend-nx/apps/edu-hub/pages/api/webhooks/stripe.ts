@@ -10,12 +10,11 @@ export const config = {
   },
 };
 
-const UPDATE_ENROLLMENT_PAYMENT = gql`
-  mutation UpdateEnrollmentPayment(
+const UPDATE_ENROLLMENT_PAYMENT_SUCCESS = gql`
+  mutation UpdateEnrollmentPaymentSuccess(
     $enrollmentId: Int!
     $stripeCheckoutSessionId: String
     $stripePaymentIntentId: String
-    $paymentStatus: PaymentStatus_enum!
     $paymentAmount: Int
     $paymentCurrency: String
   ) {
@@ -24,7 +23,7 @@ const UPDATE_ENROLLMENT_PAYMENT = gql`
       _set: {
         stripeCheckoutSessionId: $stripeCheckoutSessionId
         stripePaymentIntentId: $stripePaymentIntentId
-        paymentStatus: $paymentStatus
+        paymentStatus: COMPLETED
         paymentAmount: $paymentAmount
         paymentCurrency: $paymentCurrency
         status: CONFIRMED
@@ -36,6 +35,50 @@ const UPDATE_ENROLLMENT_PAYMENT = gql`
     }
   }
 `;
+
+const UPDATE_ENROLLMENT_PAYMENT_FAILURE = gql`
+  mutation UpdateEnrollmentPaymentFailure(
+    $enrollmentId: Int!
+    $stripeCheckoutSessionId: String
+    $stripePaymentIntentId: String
+    $paymentAmount: Int
+    $paymentCurrency: String
+  ) {
+    update_CourseEnrollment_by_pk(
+      pk_columns: { id: $enrollmentId }
+      _set: {
+        stripeCheckoutSessionId: $stripeCheckoutSessionId
+        stripePaymentIntentId: $stripePaymentIntentId
+        paymentStatus: FAILED
+        paymentAmount: $paymentAmount
+        paymentCurrency: $paymentCurrency
+      }
+    ) {
+      id
+      paymentStatus
+      status
+    }
+  }
+`;
+
+/**
+ * Parses and validates an enrollment ID from a string.
+ * Returns null if the enrollment ID is invalid.
+ */
+function parseAndValidateEnrollmentId(enrollmentId: string): number | null {
+  const parsed = Number.parseInt(enrollmentId, 10);
+
+  if (
+    Number.isNaN(parsed) ||
+    !Number.isFinite(parsed) ||
+    !Number.isInteger(parsed) ||
+    parsed <= 0
+  ) {
+    return null;
+  }
+
+  return parsed;
+}
 
 const handleStripeWebhook = async (
   req: NextApiRequest,
@@ -106,15 +149,22 @@ const handleStripeWebhook = async (
           return res.status(400).json({ error: 'Missing enrollmentId' });
         }
 
+        const parsedEnrollmentId = parseAndValidateEnrollmentId(enrollmentId);
+
+        if (parsedEnrollmentId === null) {
+          console.error('Invalid enrollmentId in session metadata', { enrollmentId });
+          return res.status(400).json({ error: 'Invalid enrollmentId' });
+        }
+
         // Update enrollment with payment information
-        await client.request(UPDATE_ENROLLMENT_PAYMENT, {
-          enrollmentId: Number.parseInt(enrollmentId, 10),
+        // Note: Addons are already saved to CourseEnrollmentAddon table before payment via createEnrollmentWithAddons action
+        await client.request(UPDATE_ENROLLMENT_PAYMENT_SUCCESS, {
+          enrollmentId: parsedEnrollmentId,
           stripeCheckoutSessionId: session.id,
           stripePaymentIntentId:
             typeof session.payment_intent === 'string'
               ? session.payment_intent
               : session.payment_intent?.id || null,
-          paymentStatus: 'COMPLETED',
           paymentAmount: session.amount_total || null,
           paymentCurrency: session.currency || null,
         });
@@ -133,11 +183,16 @@ const handleStripeWebhook = async (
         const { enrollmentId } = session.metadata || {};
 
         if (enrollmentId) {
-          await client.request(UPDATE_ENROLLMENT_PAYMENT, {
-            enrollmentId: Number.parseInt(enrollmentId, 10),
+          const parsedEnrollmentId = parseAndValidateEnrollmentId(enrollmentId);
+          if (parsedEnrollmentId === null) {
+            console.error('Invalid enrollmentId in expired session metadata', { enrollmentId });
+            return res.status(400).json({ error: 'Invalid enrollmentId' });
+          }
+
+          await client.request(UPDATE_ENROLLMENT_PAYMENT_FAILURE, {
+            enrollmentId: parsedEnrollmentId,
             stripeCheckoutSessionId: session.id,
             stripePaymentIntentId: null,
-            paymentStatus: 'FAILED',
             paymentAmount: null,
             paymentCurrency: null,
           });
@@ -151,11 +206,16 @@ const handleStripeWebhook = async (
         const { enrollmentId } = paymentIntent.metadata || {};
 
         if (enrollmentId) {
-          await client.request(UPDATE_ENROLLMENT_PAYMENT, {
-            enrollmentId: Number.parseInt(enrollmentId, 10),
+          const parsedEnrollmentId = parseAndValidateEnrollmentId(enrollmentId);
+          if (parsedEnrollmentId === null) {
+            console.error('Invalid enrollmentId in payment_failed metadata', { enrollmentId });
+            return res.status(400).json({ error: 'Invalid enrollmentId' });
+          }
+
+          await client.request(UPDATE_ENROLLMENT_PAYMENT_FAILURE, {
+            enrollmentId: parsedEnrollmentId,
             stripeCheckoutSessionId: null,
             stripePaymentIntentId: paymentIntent.id,
-            paymentStatus: 'FAILED',
             paymentAmount: paymentIntent.amount || null,
             paymentCurrency: paymentIntent.currency || null,
           });

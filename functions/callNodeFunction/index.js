@@ -12,8 +12,12 @@ import sendSessionReminders from "./sendSessionReminders/index.js";
 import makeCertificatePublic from "./makeCertificatePublic/index.js";
 import createUser from "./createUser/index.js";
 import getFormbricksResponses from "./getFormbricksResponses/index.js";
+import getFormbricksAddonSelections from "./getFormbricksAddonSelections/index.js";
+import validateFormbricksSurvey from "./validateFormbricksSurvey/index.js";
 import createStripeCheckout from "./createStripeCheckout/index.js";
 import createStripeBasePrice from "./createStripeBasePrice/index.js";
+import createStripeAddonPrices from "./createStripeAddonPrices/index.js";
+import createEnrollmentWithAddons from "./createEnrollmentWithAddons/index.js";
 
 /**
  * Creates a logger instance with structured logging.
@@ -47,8 +51,12 @@ const functionMap = {
   makeCertificatePublic,
   createUser,
   getFormbricksResponses,
+  getFormbricksAddonSelections,
+  validateFormbricksSurvey,
   createStripeCheckout,
-  createStripeBasePrice
+  createStripeBasePrice,
+  createStripeAddonPrices,
+  createEnrollmentWithAddons
 };
 
 /**

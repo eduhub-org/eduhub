@@ -78,7 +78,7 @@ export const LinkDialog: React.FC<LinkDialogProps> = ({
       actions={actions}
     >
       <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-label-primary mb-2">
           {t('link_dialog.url_label')}
         </label>
         <InputField

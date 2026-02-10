@@ -652,21 +652,21 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
     const hasFormbricksSurvey = !!effectiveSurveyUrl;
 
     return (
-      <div className="pt-5 pb-5">
+      <div className="pt-5 pb-5 text-label-primary">
         <div className="flex items-start gap-3 pl-3">
           {/* Email and Application History - aligned with firstName/lastName columns (400px total) */}
           <div style={{ width: '400px', flexShrink: 0 }}>
             <div className="mb-4">
-              <div className="text-sm font-medium text-gray-700 mb-1">{t('email')}</div>
-              <div className="text-gray-900 break-words font-medium pl-4" title={enrollment.User.email}>
+              <div className="text-sm font-medium text-label-primary mb-1">{t('email')}</div>
+              <div className="text-label-primary break-words font-medium pl-4" title={enrollment.User.email}>
                 {enrollment.User.email}
               </div>
             </div>
             <div>
-              <div className="text-sm font-medium text-gray-700 mb-2">{t('application_history.label')}</div>
+              <div className="text-sm font-medium text-label-primary mb-2">{t('application_history.label')}</div>
               <div className="space-y-1">
                 {enrollment.User.CourseEnrollments.length > 0 && enrollment.User.CourseEnrollments.filter(e => e.courseId !== enrollment.courseId).length === 0 ? (
-                  <div className="text-sm text-gray-500 italic pl-4">{t('no_applications_present')}</div>
+                  <div className="text-sm text-label-secondary italic pl-4">{t('no_applications_present')}</div>
                 ) : (
                   enrollment.User.CourseEnrollments.map((pastEnrollment, index) => {
                     if (pastEnrollment.courseId === enrollment.courseId) {
@@ -708,8 +708,8 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
                   />
                 ) : (
                   <>
-                    <div className="text-sm font-medium text-gray-700 mb-1">{t('application')}</div>
-                    <div className="text-gray-900 whitespace-pre-wrap break-words pl-4">
+                    <div className="text-sm font-medium text-label-primary mb-1">{t('application')}</div>
+                    <div className="text-label-primary whitespace-pre-wrap break-words pl-4">
                       {enrollment.motivationLetter || '-'}
                     </div>
                   </>
@@ -820,33 +820,33 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
           {features.hasApplicationProcess ? (
             <>
               {/* Approval-based Registration: Show all 4 cards */}
-              <div className="bg-edu-light-gray p-4 rounded-lg">
-                <div className="text-gray-600 text-sm mb-1">{t('statistics_applications_total')}</div>
-                <div className="text-gray-900 text-2xl font-semibold">{applicationStats.totalApplications}</div>
+              <div className="bg-bg-secondary text-label-primary light p-4 rounded-lg">
+                <div className="text-label-secondary text-sm mb-1">{t('statistics_applications_total')}</div>
+                <div className="text-label-primary text-2xl font-semibold">{applicationStats.totalApplications}</div>
               </div>
-              <div className="bg-edu-light-gray p-4 rounded-lg">
-                <div className="text-gray-600 text-sm mb-1">{t('statistics_applications_accepted')}</div>
-                <div className="text-gray-900 text-2xl font-semibold">{applicationStats.approvedApplications}</div>
+              <div className="bg-bg-secondary text-label-primary light p-4 rounded-lg">
+                <div className="text-label-secondary text-sm mb-1">{t('statistics_applications_accepted')}</div>
+                <div className="text-label-primary text-2xl font-semibold">{applicationStats.approvedApplications}</div>
               </div>
-              <div className="bg-edu-light-gray p-4 rounded-lg">
-                <div className="text-gray-600 text-sm mb-1">{t('statistics_invitations_total')}</div>
-                <div className="text-gray-900 text-2xl font-semibold">{applicationStats.invitedApplicants}</div>
+              <div className="bg-bg-secondary text-label-primary light p-4 rounded-lg">
+                <div className="text-label-secondary text-sm mb-1">{t('statistics_invitations_total')}</div>
+                <div className="text-label-primary text-2xl font-semibold">{applicationStats.invitedApplicants}</div>
               </div>
-              <div className="bg-edu-light-gray p-4 rounded-lg">
-                <div className="text-gray-600 text-sm mb-1">{t('statistics_invitations_confirmed')}</div>
-                <div className="text-gray-900 text-2xl font-semibold">{applicationStats.confirmedApplicants}</div>
+              <div className="bg-bg-secondary text-label-primary light p-4 rounded-lg">
+                <div className="text-label-secondary text-sm mb-1">{t('statistics_invitations_confirmed')}</div>
+                <div className="text-label-primary text-2xl font-semibold">{applicationStats.confirmedApplicants}</div>
               </div>
             </>
           ) : (
             <>
               {/* Direct Registration: Show only total and confirmed registrations */}
-              <div className="bg-edu-light-gray p-4 rounded-lg">
-                <div className="text-gray-600 text-sm mb-1">{t('statistics_registrations_total')}</div>
-                <div className="text-gray-900 text-2xl font-semibold">{applicationStats.totalApplications}</div>
+              <div className="bg-bg-secondary text-label-primary light p-4 rounded-lg">
+                <div className="text-label-secondary text-sm mb-1">{t('statistics_registrations_total')}</div>
+                <div className="text-label-primary text-2xl font-semibold">{applicationStats.totalApplications}</div>
               </div>
-              <div className="bg-edu-light-gray p-4 rounded-lg">
-                <div className="text-gray-600 text-sm mb-1">{t('statistics_registrations_confirmed')}</div>
-                <div className="text-gray-900 text-2xl font-semibold">{applicationStats.confirmedApplicants}</div>
+              <div className="bg-bg-secondary text-label-primary light p-4 rounded-lg">
+                <div className="text-label-secondary text-sm mb-1">{t('statistics_registrations_confirmed')}</div>
+                <div className="text-label-primary text-2xl font-semibold">{applicationStats.confirmedApplicants}</div>
               </div>
             </>
           )}

@@ -7,6 +7,7 @@ export const ENROLLMENT_FRAGMENT = gql`
     invitationExpirationDate
     id
     status
+    paymentStatus
     achievementCertificateURL
     attendanceCertificateURL
   }

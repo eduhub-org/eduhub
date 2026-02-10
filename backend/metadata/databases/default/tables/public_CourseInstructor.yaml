@@ -19,6 +19,15 @@ select_permissions:
         - updated_at
       filter: {}
       limit: 10
+  - role: instructor_access
+    permission:
+      columns:
+        - id
+        - courseId
+        - userId
+        - created_at
+        - updated_at
+      filter: {}
 insert_permissions:
   - role: instructor_access
     permission:

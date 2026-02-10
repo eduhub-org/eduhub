@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { CourseEnrollmentStatus_enum, Weekday_enum, CourseRegistrationType_enum, LocationOption_enum, ProgramType_enum, OrganizationType_enum } from "./../../__generated__/globalTypes";
+import { CourseEnrollmentStatus_enum, PaymentStatus_enum, Weekday_enum, CourseRegistrationType_enum, LocationOption_enum, ProgramType_enum, OrganizationType_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: MyEnrollmentsForCourseQuery
@@ -306,10 +306,6 @@ export interface MyEnrollmentsForCourseQuery_CourseEnrollment_Course {
    */
   weekDay: Weekday_enum;
   /**
-   * A text providing info about the costs of a participation.
-   */
-  cost: string;
-  /**
    * Decides whether the course is published for all users or not.
    */
   published: boolean;
@@ -451,6 +447,10 @@ export interface MyEnrollmentsForCourseQuery_CourseEnrollment {
    * The users current enrollment status to this course
    */
   status: CourseEnrollmentStatus_enum;
+  /**
+   * Current payment status
+   */
+  paymentStatus: PaymentStatus_enum | null;
   /**
    * URL to the file containing the user's achievement certificate (if he obtained one)
    */

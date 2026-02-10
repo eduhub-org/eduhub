@@ -54,6 +54,7 @@ export const useRegistrationHandler = ({
 }: UseRegistrationHandlerProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [retryEnrollmentId, setRetryEnrollmentId] = useState<number | null>(null);
   const userId = useUserId();
   
   const [updateEnrollmentMutation] = useAuthedMutation<UpdateEnrollment, UpdateEnrollmentVariables>(
@@ -96,6 +97,7 @@ export const useRegistrationHandler = ({
             userId,
             motivationLetter: formData?.motivationLetter || '',
             status,
+            termsAcceptedAt: formData?.acceptTerms ? new Date().toISOString() : null,
           },
         });
 
@@ -124,32 +126,21 @@ export const useRegistrationHandler = ({
         return { success: false, error: 'User not authenticated' };
       }
 
+      if (!course?.id) {
+        return { success: false, error: 'Course information is required' };
+      }
+
+      // Enrollment should already be created with addons via createEnrollmentWithAddons action
+      const enrollmentId = formData?.enrollmentId;
+      if (!enrollmentId) {
+        return { success: false, error: 'Enrollment ID is required. Enrollment should be created before payment.' };
+      }
+
       setIsLoading(true);
       try {
-        // 1. Create pending enrollment with payment status
-        const enrollmentResult = await updateEnrollmentMutation({
-          variables: {
-            courseId: course.id,
-            userId,
-            motivationLetter: formData?.motivationLetter || '[Formbricks Survey Completed]',
-            status: CourseEnrollmentStatus_enum.APPLIED, // Will be updated to CONFIRMED after payment
-          },
-        });
-
-        const enrollmentId = enrollmentResult.data?.insert_CourseEnrollment?.returning?.[0]?.id;
-        if (!enrollmentId) {
-          return { success: false, error: 'Failed to create enrollment' };
-        }
-
-        // 2. Get Formbricks response to extract selected add-ons
-        // Note: Formbricks response will be fetched server-side in createStripeCheckout
-        // For now, we pass null and let the backend handle it
-
-        // Note: Formbricks response will be fetched server-side in createStripeCheckout
-        // For now, we pass null and let the backend handle it
-
-        // 3. Create Stripe Checkout session
-        // URLs are now built server-side from FRONTEND_URL for security
+        // Create Stripe Checkout session
+        // Server will read addons from CourseEnrollmentAddon table using enrollmentId
+        // URLs are built server-side from FRONTEND_URL for security
         const checkoutResult = await createStripeCheckoutMutation({
           variables: {
             courseId: course.id,
@@ -158,12 +149,11 @@ export const useRegistrationHandler = ({
             userEmail: null, // Will be fetched from user context server-side
             course: null, // Will be fetched server-side from Hasura
             addonMappings: null, // Will be fetched server-side from Hasura
-            selectedAddons: null, // Will be extracted server-side from Formbricks response
           },
         });
 
         if (checkoutResult.data?.createStripeCheckout?.success && checkoutResult.data.createStripeCheckout.checkoutUrl) {
-          // 4. Redirect to Stripe Checkout
+          // Redirect to Stripe Checkout
           window.location.href = checkoutResult.data.createStripeCheckout.checkoutUrl;
           
           return {
@@ -187,7 +177,7 @@ export const useRegistrationHandler = ({
         setIsLoading(false);
       }
     },
-    [course, userId, updateEnrollmentMutation, createStripeCheckoutMutation]
+    [course?.id, userId, createStripeCheckoutMutation]
   );
 
   const handleRegistration = useCallback(() => {
@@ -225,14 +215,30 @@ export const useRegistrationHandler = ({
     [config.requiresPayment, handlePaymentRegistration, handleDirectRegistration]
   );
 
+  const retryPayment = useCallback(
+    (enrollmentId: number): void => {
+      // Store enrollment ID for retry - RegistrationModal will fetch responses and build prefilled URL
+      setRetryEnrollmentId(enrollmentId);
+      setIsModalOpen(true);
+    },
+    []
+  );
+
+  const handleCloseModal = useCallback(() => {
+    setIsModalOpen(false);
+    setRetryEnrollmentId(null); // Clear retry enrollment ID when modal closes
+  }, []);
+
   return {
     isModalOpen,
-    setIsModalOpen,
+    closeModal: handleCloseModal,
     isLoading,
     registrationType,
     config,
     handleLogin,
     handleRegistration,
     submitRegistration,
+    retryPayment,
+    retryEnrollmentId,
   };
 }; 

@@ -171,12 +171,12 @@ export const CreateUserDialog: React.FC<CreateUserDialogProps> = ({
         maxWidth="sm"
         fullWidth
       >
-        <DialogTitle id="create-user-dialog-title">
+        <DialogTitle id="create-user-dialog-title" className="light">
           <div className="flex justify-between items-center">
-            <span>{t('create_user.dialog_title')}</span>
+            <span className="text-label-primary">{t('create_user.dialog_title')}</span>
             <button
               onClick={handleClose}
-              className="p-1 rounded-full hover:bg-gray-200 transition-colors"
+              className="p-1 rounded-full hover:bg-gray-200 transition-colors text-label-primary"
               aria-label={tCommon('close')}
               disabled={loading}
             >
@@ -185,7 +185,7 @@ export const CreateUserDialog: React.FC<CreateUserDialogProps> = ({
           </div>
         </DialogTitle>
 
-        <div className="px-6 pb-6">
+        <div className="px-6 pb-6 light">
           <div className="mb-6 space-y-4">
             <div>
               <InputField

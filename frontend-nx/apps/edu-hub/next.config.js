@@ -100,6 +100,11 @@ const nextConfig = {
   // https://nextjs.org/docs/advanced-features/output-file-tracing#caveats
   // Moved from experimental in Next.js 15
   outputFileTracingRoot: path.join(__dirname, '../../'),
+  async redirects() {
+    return [
+      { source: '/impressum', destination: '/imprint', permanent: true },
+    ];
+  },
   async headers() {
     return [
       {

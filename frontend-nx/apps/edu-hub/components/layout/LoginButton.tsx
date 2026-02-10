@@ -15,7 +15,7 @@ const signInHandler = () => {
 export const LoginButton: FC<IProps> = ({ className }) => {
   const t = useTranslations('common');
   return (
-    <Button onClick={signInHandler} className={className} filled>
+    <Button onClick={signInHandler} className={`bg-fill-primary text-label-primary border-fill-primary hover:border-brand-light ${className || ''}`}>
       {t('loginButton')}
     </Button>
   );

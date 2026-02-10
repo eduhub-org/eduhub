@@ -28,18 +28,20 @@ const determineTabClasses = (tabIndex: number, selectedTabIndex: number) => {
   const maxAllowedTab = 5;
 
   if (tabIndex === selectedTabIndex) {
-    return 'bg-gray-800 text-white';
+    // Active tab: dark background with light text (like second image)
+    return 'bg-bg-card text-label-primary';
   }
 
   if (tabIndex < maxAllowedTab) {
-    return 'bg-edu-confirmed cursor-pointer';
+    // Inactive tabs: light green background with dark text for good contrast (like second image)
+    return 'light bg-status-confirmed text-label-primary cursor-pointer hover:bg-status-confirmed hover:opacity-90';
   }
 
   if (tabIndex === maxAllowedTab) {
-    return 'bg-edu-dark-gray cursor-pointer';
+    return 'bg-bg-secondary text-label-secondary cursor-pointer';
   }
 
-  return 'bg-edu-light-gray';
+  return 'bg-bg-secondary text-label-disabled';
 };
 
 const getNextCourseStatus = (course: ManagedCourse_Course_by_pk) => {

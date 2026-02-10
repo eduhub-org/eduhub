@@ -302,10 +302,6 @@ export interface CourseFragmentAnonymous {
    */
   weekDay: Weekday_enum;
   /**
-   * A text providing info about the costs of a participation.
-   */
-  cost: string;
-  /**
    * Decides whether the course is published for all users or not.
    */
   published: boolean;

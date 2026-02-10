@@ -77,11 +77,11 @@ export const SelectCourseDialog: FC<IProps> = ({ onClose, open, title }) => {
   return (
     <>
       <Dialog open={open} onClose={handleCancel} maxWidth="md" fullWidth>
-      <DialogTitle>
+      <DialogTitle className="light">
         <div className="grid grid-cols-2">
-          <div>{title}</div>
+          <div className="text-label-primary">{title}</div>
           <button
-            className="cursor-pointer flex justify-end"
+            className="cursor-pointer flex justify-end text-label-primary"
             onClick={handleCancel}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
@@ -96,8 +96,8 @@ export const SelectCourseDialog: FC<IProps> = ({ onClose, open, title }) => {
         </div>
       </DialogTitle>
 
-      <DialogContent>
-        <div className="mb-4">{t('select_course_dialog.type_course_name_minimum_2_letters')}</div>
+      <DialogContent className="light">
+        <div className="mb-4 text-label-primary">{t('select_course_dialog.type_course_name_minimum_2_letters')}</div>
 
         <div className="mb-4">
           <input
@@ -115,13 +115,13 @@ export const SelectCourseDialog: FC<IProps> = ({ onClose, open, title }) => {
               <SelectCourseRow course={course} key={course.id} onClick={handleConfirm} />
             ))}
           {showNoResults && (
-              <div className="p-4 text-center text-gray-500">{t('select_course_dialog.no_courses_found')}</div>
+              <div className="p-4 text-center text-label-secondary">{t('select_course_dialog.no_courses_found')}</div>
             )}
             {loading && hasSearched && (
-              <div className="p-4 text-center text-gray-500">{t('loading')}</div>
+              <div className="p-4 text-center text-label-secondary">{t('loading')}</div>
             )}
             {searchValue.trim().length < 2 && (
-              <div className="p-4 text-center text-gray-500">{t('select_course_dialog.type_course_name_minimum_2_letters')}</div>
+              <div className="p-4 text-center text-label-secondary">{t('select_course_dialog.type_course_name_minimum_2_letters')}</div>
             )}
           </div>
 

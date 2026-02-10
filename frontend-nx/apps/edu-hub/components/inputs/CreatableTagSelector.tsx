@@ -149,8 +149,8 @@ const CreatableTagSelector: React.FC<CreatableTagSelectorProps> = ({
     }
   };
 
-  const baseClass = 'w-full px-3 py-1 mb-8 text-gray-500 rounded bg-edu-light-gray';
-  const finalClassName = prioritizeClasses(`${baseClass} ${className || ''}`);
+  const baseClass = 'w-full px-3 py-1 mb-8 text-label-primary rounded bg-fill-primary';
+  const finalClassName = prioritizeClasses(baseClass);
 
   const renderMaterialUI = () => (
     <Autocomplete
@@ -199,7 +199,7 @@ const CreatableTagSelector: React.FC<CreatableTagSelectorProps> = ({
 
   const renderEduhub = () => (
     <div className="px-2">
-      <div className="text-gray-400">
+      <div className="text-label-primary">
         <div className="flex justify-between mb-2">
           <div className="flex items-center">
             {helpText && (
@@ -210,65 +210,71 @@ const CreatableTagSelector: React.FC<CreatableTagSelectorProps> = ({
             {label}
           </div>
         </div>
-        <Autocomplete
-          multiple
-          id="tags-autocomplete"
-          options={options.map((tag) => ({ value: tag }))}
-          value={tags}
-          onChange={handleTagChange}
-          inputValue={inputValue}
-          onInputChange={(event, newInputValue) => {
-            setInputValue(newInputValue);
-          }}
-          filterOptions={(options, params) => {
-            const filtered = filter(options, params);
-            const { inputValue } = params;
-            const isExisting = options.some((option) => inputValue === option.value);
-            if (inputValue !== '' && !isExisting) {
-              filtered.push({
-                inputValue: inputValue,
-                value: inputValue,
-              });
+        <div className="light">
+          <Autocomplete
+            multiple
+            id="tags-autocomplete"
+            options={options.map((tag) => ({ value: tag }))}
+            value={tags}
+            onChange={handleTagChange}
+            inputValue={inputValue}
+            onInputChange={(event, newInputValue) => {
+              setInputValue(newInputValue);
+            }}
+            filterOptions={(options, params) => {
+              const filtered = filter(options, params);
+              const { inputValue } = params;
+              const isExisting = options.some((option) => inputValue === option.value);
+              if (inputValue !== '' && !isExisting) {
+                filtered.push({
+                  inputValue: inputValue,
+                  value: inputValue,
+                });
+              }
+              return filtered;
+            }}
+            getOptionLabel={(option: TagOption) => option.inputValue || option.value || ''}
+            renderOption={(props, option: TagOption) => {
+              const { key, ...otherProps } = props;
+              return (
+                <li key={key} {...otherProps}>
+                  {option.inputValue
+                    ? t('common.CreatableTagSelector.add_tag', { value: option.inputValue })
+                    : option.value}
+                </li>
+              );
+            }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                variant="standard"
+                placeholder={placeholder}
+                onKeyDown={handleKeyDown}
+                className={finalClassName}
+                InputProps={{
+                  ...params.InputProps,
+                  disableUnderline: true,
+                }}
+              />
+            )}
+            freeSolo
+            selectOnFocus
+            clearOnBlur
+            handleHomeEndKeys
+            isOptionEqualToValue={(option, value) =>
+              (option.value || option.inputValue || '') === (value.value || value.inputValue || '')
             }
-            return filtered;
-          }}
-          getOptionLabel={(option: TagOption) => option.inputValue || option.value || ''}
-          renderOption={(props, option: TagOption) => {
-            const { key, ...otherProps } = props;
-            return (
-              <li key={key} {...otherProps}>
-                {option.inputValue
-                  ? t('common.CreatableTagSelector.add_tag', { value: option.inputValue })
-                  : option.value}
-              </li>
-            );
-          }}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              variant="standard"
-              placeholder={placeholder}
-              onKeyDown={handleKeyDown}
-              className={finalClassName}
-              InputProps={{
-                ...params.InputProps,
-                disableUnderline: true,
-              }}
-            />
-          )}
-          freeSolo
-          selectOnFocus
-          clearOnBlur
-          handleHomeEndKeys
-          isOptionEqualToValue={(option, value) =>
-            (option.value || option.inputValue || '') === (value.value || value.inputValue || '')
-          }
-        />
+          />
+        </div>
       </div>
     </div>
   );
 
-  return <div className={className}>{variant === 'material' ? renderMaterialUI() : renderEduhub()}</div>;
+  const content = variant === 'material' ? renderMaterialUI() : renderEduhub();
+  
+  return (
+    <div className={className || ''}>{content}</div>
+  );
 };
 
 export default CreatableTagSelector;

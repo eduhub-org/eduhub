@@ -55,15 +55,15 @@ const ExpandableExpertRow: FC<{ row: ExpertsList_User }> = ({ row }) => {
 
   if (roles.length === 0) {
     return (
-      <div className="bg-edu-course-list p-4">
-        <p className="text-gray-600 text-sm">{t('no_roles')}</p>
+      <div className="bg-fill-primary text-label-primary light p-4">
+        <p className="text-label-secondary text-sm">{t('no_roles')}</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-edu-course-list">
-      <div className="hidden md:grid md:grid-cols-12 gap-2 p-2 font-medium text-gray-700 border-b border-gray-200">
+    <div className="bg-fill-primary text-label-primary light">
+      <div className="hidden md:grid md:grid-cols-12 gap-2 p-2 font-medium text-label-primary border-b border-border-primary">
         <div className="col-span-4 pl-3">{t('course')}</div>
         <div className="col-span-2">{t('program')}</div>
         <div className="col-span-3">{t('role')}</div>
@@ -72,7 +72,7 @@ const ExpandableExpertRow: FC<{ row: ExpertsList_User }> = ({ row }) => {
       {roles.map((role, index) => (
         <div
           key={index}
-          className="flex flex-col md:grid md:grid-cols-12 gap-2 p-2 text-gray-600 text-sm border-b border-gray-100 last:border-b-0"
+          className="flex flex-col md:grid md:grid-cols-12 gap-2 p-2 text-label-secondary text-sm border-b border-border-primary last:border-b-0"
         >
           <div className="md:col-span-4 md:pl-3 truncate font-medium md:font-normal" title={role.courseTitle}>
             {role.courseTitle}

@@ -41,12 +41,12 @@ export const DialogShell: React.FC<DialogShellProps> = ({
         },
       }}
     >
-      <DialogTitle id={ariaLabelledBy}>
+      <DialogTitle id={ariaLabelledBy} className="light">
         <div className="flex justify-between items-center">
-          <span>{title}</span>
+          <span className="text-label-primary">{title}</span>
           <button
             onClick={onClose}
-            className="p-1 rounded-full hover:bg-gray-200 transition-colors"
+            className="p-1 rounded-full hover:bg-gray-200 transition-colors text-label-primary"
             aria-label={t('close')}
             type="button"
           >
@@ -56,6 +56,7 @@ export const DialogShell: React.FC<DialogShellProps> = ({
       </DialogTitle>
 
       <DialogContent
+        className="light"
         sx={{
           overflowY: 'auto',
           flex: '1 1 auto',
@@ -67,7 +68,7 @@ export const DialogShell: React.FC<DialogShellProps> = ({
       </DialogContent>
 
       {actions && (
-        <div className="px-6 pb-4 flex-shrink-0">
+        <div className="px-6 pb-4 flex-shrink-0 light">
           {actions}
         </div>
       )}
