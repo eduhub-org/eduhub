@@ -232,15 +232,17 @@ export function createVariableReplacer(data, formatDate) {
         data.courseLink || `${process.env.FRONTEND_URL || 'https://edu.opencampus.sh'}/course/${data.course?.id || ''}`
       );
     
-    // Build addons HTML list
+    // Build addons HTML list (escape user-controlled strings to prevent XSS)
     let addonsHtml = '';
     if (data.enrollmentAddons && Array.isArray(data.enrollmentAddons) && data.enrollmentAddons.length > 0) {
+      const currencySymbolMap = { EUR: '€', USD: '$', GBP: '£', CHF: 'CHF' };
       const addonLines = data.enrollmentAddons.map(addon => {
-        const description = addon.CourseAddonMapping?.description || addon.name || 'Zusatzleistung / Add-on';
-        const price = addon.priceAtPurchase || 0;
-        const currency = addon.currency || 'EUR';
+        const description = escapeHtml(addon.CourseAddonMapping?.description || addon.name || 'Zusatzleistung / Add-on');
+        const price = addon.priceAtPurchase ?? 0;
+        const currencyCode = addon.currency || 'EUR';
+        const currencySymbol = currencySymbolMap[currencyCode] || currencyCode;
         const formattedPrice = (price / 100).toFixed(2).replace('.', ',');
-        return `– ${description}: ${formattedPrice} ${currency} inkl. MwSt.`;
+        return `– ${description}: ${formattedPrice} ${currencySymbol} inkl. MwSt.`;
       });
       addonsHtml = '<strong>Add-ons:</strong>\n' + addonLines.join('\n');
     }

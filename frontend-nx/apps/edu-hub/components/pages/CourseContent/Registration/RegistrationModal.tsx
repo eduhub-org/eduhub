@@ -100,7 +100,7 @@ export const RegistrationModal: FC<RegistrationModalProps> = ({
 
   // Fetch previous responses for retry flow to build prefilled URL
   const shouldFetchResponses = !!(retryEnrollmentId && effectiveSurveyUrl && userId);
-  const { data: formbricksResponsesData, loading: loadingResponses, error: responsesError } = useRoleQuery<GetFormbricksResponses, GetFormbricksResponsesVariables>(
+  const { data: formbricksResponsesData } = useRoleQuery<GetFormbricksResponses, GetFormbricksResponsesVariables>(
     GET_FORMBRICKS_RESPONSES,
     {
       variables: {
@@ -234,7 +234,8 @@ export const RegistrationModal: FC<RegistrationModalProps> = ({
             userId: userId,
             motivationLetter: '[Formbricks Survey Completed]',
             formbricksSurveyUrl: effectiveSurveyUrl,
-            acceptTerms: false, // Terms not accepted yet - will be accepted in summary step
+            // Terms not accepted yet - will be accepted in summary step
+            // termsAcceptedAt is set when user accepts terms in handleSubmit
           },
         });
 
@@ -453,13 +454,21 @@ export const RegistrationModal: FC<RegistrationModalProps> = ({
                 </div>
               ))}
 
-              {/* Total */}
-              <div className="flex justify-between items-center pt-2 border-t border-gray-200">
-                <span className="text-sm font-semibold text-gray-900">{t('modal.total')}</span>
-                <span className="text-base font-bold text-gray-900">
-                  {formatPrice(totalPrice, currency)}
-                </span>
-              </div>
+              {/* Total - hide or show warning when currency mismatch */}
+              {currencyMismatch ? (
+                <div className="flex justify-between items-center pt-2 border-t border-gray-200">
+                  <span className="text-sm font-semibold text-amber-700">
+                    {t('errors.currency_mismatch') || 'Prices in multiple currencies cannot be totaled'}
+                  </span>
+                </div>
+              ) : (
+                <div className="flex justify-between items-center pt-2 border-t border-gray-200">
+                  <span className="text-sm font-semibold text-gray-900">{t('modal.total')}</span>
+                  <span className="text-base font-bold text-gray-900">
+                    {formatPrice(totalPrice, currency)}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
         </div>

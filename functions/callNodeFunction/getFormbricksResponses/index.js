@@ -1,30 +1,4 @@
-/**
- * Extracts the base URL and survey ID from a Formbricks survey URL.
- * 
- * URL format: https://formbricks.example.com/s/{surveyId}
- * 
- * @param {string} surveyUrl - The Formbricks survey URL
- * @returns {Object|null} Object with baseUrl and surveyId, or null if invalid
- */
-function extractFormbricksBaseUrlAndSurveyId(surveyUrl) {
-  if (!surveyUrl) return null;
-  
-  try {
-    const urlObj = new URL(surveyUrl);
-    const pathParts = urlObj.pathname.split('/');
-    const sIndex = pathParts.indexOf('s');
-    
-    if (sIndex !== -1 && pathParts[sIndex + 1]) {
-      const surveyId = pathParts[sIndex + 1].split('?')[0];
-      // Extract base URL (origin) from the survey URL
-      const baseUrl = urlObj.origin;
-      return { baseUrl, surveyId };
-    }
-    return null;
-  } catch (error) {
-    return null;
-  }
-}
+import { validateAndExtractFormbricksSurvey } from '../lib/formbricks.js';
 
 /**
  * Fetches Formbricks survey responses for a specific enrollment.
@@ -61,8 +35,8 @@ export default async function getFormbricksResponses(req, logger) {
       };
     }
     
-    // Extract base URL and survey ID from the survey URL
-    const urlParts = extractFormbricksBaseUrlAndSurveyId(formbricksSurveyUrl);
+    // Extract base URL and survey ID from the survey URL (with SSRF protection)
+    const urlParts = validateAndExtractFormbricksSurvey(formbricksSurveyUrl, logger);
     if (!urlParts) {
       logger.error('Invalid Formbricks survey URL', { formbricksSurveyUrl });
       return {

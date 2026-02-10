@@ -269,7 +269,8 @@ export default async function createStripeCheckout(req, logger) {
       }
 
       // Use priceAtPurchase from CourseEnrollmentAddon (price at time of purchase)
-      const addonPrice = enrollmentAddon.priceAtPurchase || addonMapping.validatedPrice;
+      // Use nullish coalescing so legitimate 0 price is preserved (not treated as absent)
+      const addonPrice = enrollmentAddon.priceAtPurchase ?? addonMapping.validatedPrice;
       
       if (addonPrice > 0) {
         if (addonMapping.stripePriceId) {

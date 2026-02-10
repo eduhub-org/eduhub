@@ -1,4 +1,5 @@
 import { GraphQLClient } from 'graphql-request';
+import { validateAndExtractFormbricksSurvey, buildLabelToChoiceIdMap, matchAddonsFromResponse } from '../lib/formbricks.js';
 
 const GET_COURSE_ADDONS = `
   query GetCourseAddons($courseId: Int!) {
@@ -46,6 +47,17 @@ const CREATE_ENROLLMENT = `
   }
 `;
 
+const GET_ENROLLMENT_ADDONS = `
+  query GetEnrollmentAddons($enrollmentId: Int!) {
+    CourseEnrollmentAddon(where: { enrollmentId: { _eq: $enrollmentId } }) {
+      enrollmentId
+      addonMappingId
+      priceAtPurchase
+      currency
+    }
+  }
+`;
+
 const DELETE_ENROLLMENT_ADDONS = `
   mutation DeleteEnrollmentAddons(
     $enrollmentId: Int!
@@ -73,33 +85,6 @@ const INSERT_ENROLLMENT_ADDONS = `
     }
   }
 `;
-
-/**
- * Extracts the base URL and survey ID from a Formbricks survey URL.
- * 
- * URL format: https://formbricks.example.com/s/{surveyId}
- * 
- * @param {string} surveyUrl - The Formbricks survey URL
- * @returns {Object|null} Object with baseUrl and surveyId, or null if invalid
- */
-function extractFormbricksBaseUrlAndSurveyId(surveyUrl) {
-  if (!surveyUrl) return null;
-  
-  try {
-    const urlObj = new URL(surveyUrl);
-    const pathParts = urlObj.pathname.split('/');
-    const sIndex = pathParts.indexOf('s');
-    
-    if (sIndex !== -1 && pathParts[sIndex + 1]) {
-      const surveyId = pathParts[sIndex + 1].split('?')[0];
-      const baseUrl = urlObj.origin;
-      return { baseUrl, surveyId };
-    }
-    return null;
-  } catch (error) {
-    return null;
-  }
-}
 
 /**
  * Fetches Formbricks responses with retry logic to handle timing issues.
@@ -324,164 +309,6 @@ async function fetchFormbricksResponseWithRetry(
 }
 
 /**
- * Matches Formbricks response answers against CourseAddonMappings to find selected addons.
- * Supports multi-language surveys by mapping response labels to choice IDs.
- * 
- * IMPORTANT: CourseAddonMapping.choiceId must be a Formbricks choice ID (not a label).
- * The function maps response labels (which vary by language) to choice IDs for matching.
- * 
- * @param {Object} responseData - Formbricks response data object (contains localized labels)
- * @param {Array} addonMappings - Array of CourseAddonMapping objects (choiceId must be a Formbricks choice ID)
- * @param {Object} labelToChoiceIdMap - Map of questionId -> { normalizedLabel -> choiceId } for all languages
- * @param {Object} logger - Winston logger instance
- * @returns {Array} Array of selected addon objects with pricing
- */
-function matchAddonsFromResponse(responseData, addonMappings, labelToChoiceIdMap, logger) {
-  const selectedAddons = [];
-
-  // Filter out hidden fields from response data for logging
-  const answerEntries = Object.entries(responseData).filter(([key]) => !key.startsWith('eduhub'));
-
-  logger.info('Addon mappings for matching', {
-    addonCount: addonMappings.length,
-    mappings: addonMappings.map(m => ({
-      id: m.id,
-      questionId: m.questionId,
-      choiceId: m.choiceId,
-      description: m.description
-    })),
-    fullMappings: JSON.stringify(addonMappings.map(m => ({
-      id: m.id,
-      questionId: m.questionId,
-      choiceId: m.choiceId,
-      description: m.description
-    })), null, 2)
-  });
-
-  logger.info('Response data entries (excluding hidden fields)', {
-    entries: answerEntries.map(([key, value]) => ({
-      questionId: key,
-      answerValue: value,
-      answerType: Array.isArray(value) ? 'array' : typeof value
-    })),
-    fullEntries: JSON.stringify(answerEntries.map(([key, value]) => ({
-      questionId: key,
-      answerValue: value,
-      answerType: Array.isArray(value) ? 'array' : typeof value
-    })), null, 2)
-  });
-
-  // Log full response data structure for debugging
-  logger.info('Full response data structure', {
-    responseData: JSON.stringify(responseData),
-    responseDataKeys: Object.keys(responseData),
-    allKeys: Object.keys(responseData).map(key => ({
-      key,
-      value: responseData[key],
-      type: typeof responseData[key],
-      isArray: Array.isArray(responseData[key])
-    }))
-  });
-
-  for (const addonMapping of addonMappings) {
-    const answerValue = responseData[addonMapping.questionId];
-
-    logger.info('Checking addon mapping', {
-      addonId: addonMapping.id,
-      questionId: addonMapping.questionId,
-      expectedChoiceId: addonMapping.choiceId,
-      actualAnswer: answerValue,
-      answerType: answerValue === undefined ? 'undefined' : (Array.isArray(answerValue) ? 'array' : typeof answerValue),
-      hasLabelMap: Object.keys(labelToChoiceIdMap[addonMapping.questionId] || {}).length > 0
-    });
-
-    if (answerValue === undefined || answerValue === null) {
-      logger.debug('No answer found for question', { questionId: addonMapping.questionId });
-      continue;
-    }
-
-    // Check if this addon was selected in the response
-    // Handle both single-choice (string) and multi-choice (array) formats
-    let isSelected = false;
-
-    // Map response labels to choice IDs using the survey structure
-    // CourseAddonMapping.choiceId should always be a choice ID (not a label)
-    const questionLabelMap = labelToChoiceIdMap[addonMapping.questionId] || {};
-    
-    // Log the mapping for this question
-    if (Object.keys(questionLabelMap).length === 0) {
-      logger.warn('No label-to-ID mapping found for question', {
-        questionId: addonMapping.questionId,
-        availableQuestionIds: Object.keys(labelToChoiceIdMap),
-        allQuestionIds: Object.keys(labelToChoiceIdMap).join(', ')
-      });
-    } else {
-      logger.info('Label-to-ID map for question', {
-        questionId: addonMapping.questionId,
-        labelToIdMap: JSON.stringify(questionLabelMap, null, 2)
-      });
-    }
-
-    if (Array.isArray(answerValue)) {
-      // Multi-select: map response labels to IDs and check if choiceId matches
-      const mappedIds = answerValue.map(answer => {
-        const normalizedLabel = String(answer).trim().toLowerCase();
-        const mappedChoiceId = questionLabelMap[normalizedLabel];
-        return { answer, normalizedLabel, mappedChoiceId };
-      });
-      isSelected = mappedIds.some(m => m.mappedChoiceId === addonMapping.choiceId);
-      
-      logger.info('Multi-select check', {
-        questionId: addonMapping.questionId,
-        choiceId: addonMapping.choiceId,
-        answerArray: answerValue,
-        mappedIds: JSON.stringify(mappedIds, null, 2),
-        isSelected
-      });
-    } else {
-      // Single-select: map response label to ID and compare with choiceId
-      const normalizedLabel = String(answerValue).trim().toLowerCase();
-      const mappedChoiceId = questionLabelMap[normalizedLabel];
-      isSelected = mappedChoiceId === addonMapping.choiceId;
-      
-      logger.info('Single-select check', {
-        questionId: addonMapping.questionId,
-        choiceId: addonMapping.choiceId,
-        answerValue: String(answerValue),
-        normalizedLabel,
-        mappedChoiceId,
-        isSelected
-      });
-    }
-
-    if (isSelected) {
-      logger.info('Addon matched!', {
-        addonId: addonMapping.id,
-        description: addonMapping.description,
-        questionId: addonMapping.questionId,
-        choiceId: addonMapping.choiceId
-      });
-      selectedAddons.push({
-        id: addonMapping.id,
-        description: addonMapping.description,
-        validatedPrice: addonMapping.validatedPrice,
-        currency: addonMapping.currency,
-        questionId: addonMapping.questionId,
-        choiceId: addonMapping.choiceId
-      });
-    }
-  }
-
-  logger.info('Matching complete', {
-    totalMappings: addonMappings.length,
-    selectedCount: selectedAddons.length,
-    selectedAddons: selectedAddons.map(a => ({ id: a.id, description: a.description }))
-  });
-
-  return selectedAddons;
-}
-
-/**
  * Creates a course enrollment and saves selected addons from Formbricks survey to the database.
  * Handles Formbricks timing issues with retry logic.
  * 
@@ -561,8 +388,8 @@ export default async function createEnrollmentWithAddons(req, logger) {
       };
     }
 
-    // Extract base URL and survey ID from the survey URL
-    const urlParts = extractFormbricksBaseUrlAndSurveyId(formbricksSurveyUrl);
+    // Extract base URL and survey ID from the survey URL (with SSRF protection)
+    const urlParts = validateAndExtractFormbricksSurvey(formbricksSurveyUrl, logger);
     if (!urlParts) {
       logger.error('Invalid Formbricks survey URL', { formbricksSurveyUrl });
       return {
@@ -619,34 +446,7 @@ export default async function createEnrollmentWithAddons(req, logger) {
       if (surveyResponse.ok) {
         const surveyData = await surveyResponse.json();
         const survey = surveyData.data || surveyData;
-        
-        // Build label-to-choice-ID mapping for all questions
-        // Handle both blocks/elements structure and questions structure
-        const elements = survey.blocks?.flatMap(block => block.elements || []) || survey.questions || [];
-        
-        elements.forEach(element => {
-          if (element.choices && Array.isArray(element.choices)) {
-            const questionId = element.id;
-            labelToChoiceIdMap[questionId] = {};
-            
-            // For each choice, map all language variants of the label to the choice ID
-            element.choices.forEach(choice => {
-              if (choice.label) {
-                // Handle i18n object: { default: "English", de: "German", ... }
-                if (typeof choice.label === 'object' && choice.label !== null) {
-                  Object.values(choice.label).forEach(label => {
-                    if (label && typeof label === 'string') {
-                      labelToChoiceIdMap[questionId][label.toLowerCase().trim()] = choice.id;
-                    }
-                  });
-                } else if (typeof choice.label === 'string') {
-                  // Single string label
-                  labelToChoiceIdMap[questionId][choice.label.toLowerCase().trim()] = choice.id;
-                }
-              }
-            });
-          }
-        });
+        labelToChoiceIdMap = buildLabelToChoiceIdMap(survey);
         
         logger.info('Built label-to-choice-ID mapping', {
           questionCount: Object.keys(labelToChoiceIdMap).length,
@@ -742,7 +542,28 @@ export default async function createEnrollmentWithAddons(req, logger) {
     });
 
     // Step 4: Delete existing addons (for re-enrollment scenarios) and insert new ones
-    // First, delete any existing addons to prevent duplicates when user retries with changed selections
+    // Backup existing addons before delete so we can restore on insert failure
+    let backupAddonObjects = [];
+    try {
+      const existingAddonsData = await client.request(GET_ENROLLMENT_ADDONS, { enrollmentId });
+      const existingAddons = existingAddonsData.CourseEnrollmentAddon || [];
+      backupAddonObjects = existingAddons.map(row => ({
+        enrollmentId,
+        addonMappingId: row.addonMappingId,
+        priceAtPurchase: row.priceAtPurchase,
+        currency: row.currency
+      }));
+      logger.debug('Fetched backup of existing enrollment addons', {
+        enrollmentId,
+        backupCount: backupAddonObjects.length
+      });
+    } catch (backupError) {
+      logger.warn('Could not fetch existing addons for backup (may not exist yet)', {
+        error: backupError.message,
+        enrollmentId
+      });
+    }
+
     try {
       const deleteResult = await client.request(DELETE_ENROLLMENT_ADDONS, {
         enrollmentId
@@ -759,7 +580,6 @@ export default async function createEnrollmentWithAddons(req, logger) {
       // Continue - this is fine for first-time enrollment
     }
 
-    // Now insert the new addons
     if (selectedAddons.length > 0) {
       const addonObjects = selectedAddons.map(addon => ({
         enrollmentId,
@@ -780,11 +600,31 @@ export default async function createEnrollmentWithAddons(req, logger) {
       } catch (insertError) {
         logger.error('Failed to insert enrollment addons', {
           error: insertError.message,
+          stack: insertError.stack,
           enrollmentId,
           addonCount: selectedAddons.length
         });
-        // Don't fail the entire operation if addon insertion fails
-        // Enrollment is already created, addons can be retried later
+
+        if (backupAddonObjects.length > 0) {
+          try {
+            await client.request(INSERT_ENROLLMENT_ADDONS, {
+              objects: backupAddonObjects
+            });
+            logger.info('Restored previous addon state after insert failure', {
+              enrollmentId,
+              restoredCount: backupAddonObjects.length
+            });
+          } catch (restoreError) {
+            logger.error('Failed to restore backup addons after insert failure', {
+              enrollmentId,
+              restoreError: restoreError.message,
+              insertError: insertError.message,
+              backupCount: backupAddonObjects.length
+            });
+          }
+        } else {
+          logger.warn('No backup available to restore - addons were empty before delete', { enrollmentId });
+        }
       }
     }
 

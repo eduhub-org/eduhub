@@ -21,7 +21,7 @@ const Privacy: FC = () => {
           </h1>
         </div>
 
-        <div className="ml-12 mr-10">
+        <div className="mx-4 md:ml-12 md:mr-10">
           <h2 className="text-xl mt-6 mb-2">
             1. {isEnglish ? 'Data Protection at a Glance' : 'Datenschutz auf einen Blick'}
           </h2>

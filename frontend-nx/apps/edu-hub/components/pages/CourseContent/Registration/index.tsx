@@ -104,7 +104,7 @@ export const Registration: FC<RegistrationProps> = ({ course, courseEnrollment, 
       />
       <RegistrationModal
         visible={registrationHandler.isModalOpen}
-        closeModal={registrationHandler.setIsModalOpen}
+        closeModal={registrationHandler.closeModal}
         course={course}
         registrationType={registrationHandler.registrationType}
         onSubmit={registrationHandler.submitRegistration}

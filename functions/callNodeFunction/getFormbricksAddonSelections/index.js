@@ -15,32 +15,7 @@ const GET_COURSE_ADDONS = `
   }
 `;
 
-/**
- * Extracts the base URL and survey ID from a Formbricks survey URL.
- * 
- * URL format: https://formbricks.example.com/s/{surveyId}
- * 
- * @param {string} surveyUrl - The Formbricks survey URL
- * @returns {Object|null} Object with baseUrl and surveyId, or null if invalid
- */
-function extractFormbricksBaseUrlAndSurveyId(surveyUrl) {
-  if (!surveyUrl) return null;
-  
-  try {
-    const urlObj = new URL(surveyUrl);
-    const pathParts = urlObj.pathname.split('/');
-    const sIndex = pathParts.indexOf('s');
-    
-    if (sIndex !== -1 && pathParts[sIndex + 1]) {
-      const surveyId = pathParts[sIndex + 1].split('?')[0];
-      const baseUrl = urlObj.origin;
-      return { baseUrl, surveyId };
-    }
-    return null;
-  } catch (error) {
-    return null;
-  }
-}
+import { validateAndExtractFormbricksSurvey, buildLabelToChoiceIdMap, matchAddonsFromResponse } from '../lib/formbricks.js';
 
 /**
  * Fetches selected addons from the latest Formbricks response for a user/course.
@@ -76,8 +51,8 @@ export default async function getFormbricksAddonSelections(req, logger) {
       };
     }
     
-    // Extract base URL and survey ID from the survey URL
-    const urlParts = extractFormbricksBaseUrlAndSurveyId(formbricksSurveyUrl);
+    // Extract base URL and survey ID from the survey URL (with SSRF protection)
+    const urlParts = validateAndExtractFormbricksSurvey(formbricksSurveyUrl, logger);
     if (!urlParts) {
       logger.error('Invalid Formbricks survey URL', { formbricksSurveyUrl });
       return {
@@ -118,6 +93,35 @@ export default async function getFormbricksAddonSelections(req, logger) {
         selectedAddons: [],
         messageKey: 'NO_ADDONS_CONFIGURED'
       };
+    }
+
+    // Fetch survey structure to build label-to-choiceId mapping (responses may contain localized labels)
+    let labelToChoiceIdMap = {};
+    try {
+      const surveyUrl = `${formbricksApiUrl}/api/v1/management/surveys/${formbricksSurveyId}`;
+      const surveyResponse = await fetch(surveyUrl, {
+        method: 'GET',
+        headers: {
+          'x-api-key': formbricksApiKey,
+          'Content-Type': 'application/json'
+        }
+      });
+      if (surveyResponse.ok) {
+        const surveyData = await surveyResponse.json();
+        const survey = surveyData.data || surveyData;
+        labelToChoiceIdMap = buildLabelToChoiceIdMap(survey);
+        logger.debug('Built label-to-choiceId mapping for addon matching', {
+          questionCount: Object.keys(labelToChoiceIdMap).length
+        });
+      } else {
+        logger.warn('Could not fetch survey structure - addon matching may fail for localized responses', {
+          status: surveyResponse.status
+        });
+      }
+    } catch (surveyError) {
+      logger.warn('Error fetching survey structure for addon matching', {
+        error: surveyError.message
+      });
     }
     
     // Fetch the latest Formbricks response for this user/course
@@ -192,7 +196,7 @@ export default async function getFormbricksAddonSelections(req, logger) {
     });
     
     // Also check for unfinished responses that match (to detect timing issues)
-    const unfinshedMatchingResponses = (responsesData.data || []).filter(response => {
+    const unfinishedMatchingResponses = (responsesData.data || []).filter(response => {
       const responseData = response.data || {};
       const matchesUser = String(responseData.eduhubUserId) === String(userId);
       const matchesCourse = String(responseData.eduhubCourseId) === String(courseId);
@@ -201,23 +205,23 @@ export default async function getFormbricksAddonSelections(req, logger) {
     
     logger.info('Filtered user responses', {
       finishedCount: userResponses.length,
-      unfinishedCount: unfinshedMatchingResponses.length,
+      unfinishedCount: unfinishedMatchingResponses.length,
       userId: String(userId),
       courseId: String(courseId)
     });
     
     if (userResponses.length === 0) {
       // Check if there are unfinished responses - indicates timing issue
-      if (unfinshedMatchingResponses.length > 0) {
+      if (unfinishedMatchingResponses.length > 0) {
         logger.warn('Found unfinished responses for user/course - timing issue likely', {
           userId: String(userId),
           courseId: String(courseId),
-          unfinishedCount: unfinshedMatchingResponses.length,
-          unfinishedIds: unfinshedMatchingResponses.map(r => r.id)
+          unfinishedCount: unfinishedMatchingResponses.length,
+          unfinishedIds: unfinishedMatchingResponses.map(r => r.id)
         });
         // Use the most recent unfinished response if no finished ones exist
         // This handles the timing issue where survey just completed
-        const mostRecentUnfinished = unfinshedMatchingResponses.sort((a, b) => 
+        const mostRecentUnfinished = unfinishedMatchingResponses.sort((a, b) => 
           new Date(b.createdAt) - new Date(a.createdAt)
         )[0];
         userResponses.push(mostRecentUnfinished);
@@ -290,60 +294,9 @@ export default async function getFormbricksAddonSelections(req, logger) {
       }))
     });
     
-    // Match answers against CourseAddonMappings
-    const selectedAddons = [];
-    
-    for (const addonMapping of addonMappings) {
-      // Get the answer value for this questionId from response.data
-      const answerValue = responseData[addonMapping.questionId];
-      
-      logger.debug('Checking addon mapping', {
-        addonId: addonMapping.id,
-        questionId: addonMapping.questionId,
-        expectedChoiceId: addonMapping.choiceId,
-        actualAnswer: answerValue,
-        answerType: answerValue === undefined ? 'undefined' : (Array.isArray(answerValue) ? 'array' : typeof answerValue)
-      });
-      
-      // Skip if no answer for this question
-      if (answerValue === undefined || answerValue === null) {
-        logger.debug('No answer found for question', { questionId: addonMapping.questionId });
-        continue;
-      }
-      
-      // Check if this addon was selected in the response
-      // Handle both single-choice (string) and multi-choice (array) formats
-      let isSelected = false;
-      
-      if (Array.isArray(answerValue)) {
-        // Multi-select: check if choiceId is in the array
-        isSelected = answerValue.includes(addonMapping.choiceId);
-        logger.debug('Multi-select check', {
-          choiceId: addonMapping.choiceId,
-          answerArray: answerValue,
-          isSelected
-        });
-      } else {
-        // Single-select: check if answer matches choiceId
-        isSelected = String(answerValue) === String(addonMapping.choiceId);
-        logger.debug('Single-select check', {
-          choiceId: addonMapping.choiceId,
-          answerValue: String(answerValue),
-          isSelected
-        });
-      }
-      
-      if (isSelected) {
-        selectedAddons.push({
-          id: addonMapping.id,
-          description: addonMapping.description,
-          validatedPrice: addonMapping.validatedPrice,
-          currency: addonMapping.currency,
-          questionId: addonMapping.questionId,
-          choiceId: addonMapping.choiceId
-        });
-      }
-    }
+    // Match answers against CourseAddonMappings using label-to-choiceId map
+    // (Formbricks responses may contain localized labels, not choice IDs)
+    const selectedAddons = matchAddonsFromResponse(responseData, addonMappings, labelToChoiceIdMap, logger);
     
     logger.info('Extracted selected addons', {
       courseId,

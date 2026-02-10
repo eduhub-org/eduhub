@@ -1,92 +1,4 @@
-/**
- * Extracts the base URL and survey ID from a Formbricks survey URL.
- * Includes SSRF protection: enforces HTTPS, validates against trusted origins,
- * and ensures path matches expected pattern (/s/{id}).
- * 
- * @param {string} surveyUrl - The Formbricks survey URL to validate
- * @param {Object} logger - Winston logger instance for error logging
- * @returns {Object|null} Object with baseUrl and surveyId, or null if validation fails
- */
-function extractFormbricksBaseUrlAndSurveyId(surveyUrl, logger) {
-  if (!surveyUrl) return null;
-
-  try {
-    const urlObj = new URL(surveyUrl);
-
-    // 1. Enforce HTTPS only to prevent protocol smuggling and ensure encryption
-    if (urlObj.protocol !== 'https:') {
-      logger?.error('SSRF protection: Non-HTTPS URL rejected', { surveyUrl });
-      return null;
-    }
-
-    // 2. Validate against trusted origins
-    // Support FORMBRICKS_API_URL (preferred), FORMBRICKS_BASE_URL (legacy), and FORMBRICKS_TRUSTED_ORIGINS (comma-separated)
-    const trustedOrigins = [];
-    
-    if (process.env.FORMBRICKS_TRUSTED_ORIGINS) {
-      // Parse comma-separated list
-      const origins = process.env.FORMBRICKS_TRUSTED_ORIGINS.split(',').map(o => o.trim()).filter(Boolean);
-      for (const origin of origins) {
-        try {
-          const trustedUrl = new URL(origin);
-          trustedOrigins.push(trustedUrl.origin);
-        } catch (e) {
-          logger?.warn('SSRF protection: Invalid trusted origin in FORMBRICKS_TRUSTED_ORIGINS', { origin });
-        }
-      }
-    }
-    
-    // Check FORMBRICKS_API_URL first (preferred), then FORMBRICKS_BASE_URL (legacy support)
-    const formbricksUrl = process.env.FORMBRICKS_API_URL || process.env.FORMBRICKS_BASE_URL;
-    if (formbricksUrl) {
-      try {
-        const trustedUrl = new URL(formbricksUrl);
-        trustedOrigins.push(trustedUrl.origin);
-      } catch (e) {
-        logger?.warn('SSRF protection: Invalid FORMBRICKS_API_URL or FORMBRICKS_BASE_URL', { url: formbricksUrl });
-      }
-    }
-
-    if (trustedOrigins.length === 0) {
-      logger?.error('SSRF protection: No trusted origins configured. Set FORMBRICKS_API_URL, FORMBRICKS_BASE_URL, or FORMBRICKS_TRUSTED_ORIGINS');
-      return null;
-    }
-
-    // Check if the provided URL's origin matches any trusted origin
-    const originMatch = trustedOrigins.includes(urlObj.origin);
-    if (!originMatch) {
-      logger?.error('SSRF protection: Untrusted origin rejected', {
-        surveyUrl,
-        origin: urlObj.origin,
-        trustedOrigins
-      });
-      return null;
-    }
-
-    // 3. Validate path pattern: must be /s/{surveyId} (Link Survey format)
-    // Allow alphanumeric, hyphens, and underscores in survey ID
-    const pathMatch = urlObj.pathname.match(/^\/s\/([a-zA-Z0-9_-]+)$/);
-    if (!pathMatch) {
-      logger?.error('SSRF protection: Invalid path pattern', {
-        surveyUrl,
-        pathname: urlObj.pathname,
-        expectedPattern: '/s/{surveyId}'
-      });
-      return null;
-    }
-
-    const surveyId = pathMatch[1];
-    const baseUrl = urlObj.origin;
-
-    return { baseUrl, surveyId };
-  } catch (error) {
-    logger?.error('SSRF protection: URL parsing failed', {
-      surveyUrl,
-      error: error.message
-    });
-    return null;
-  }
-}
+import { validateAndExtractFormbricksSurvey } from '../lib/formbricks.js';
 
 /**
  * Extracts price and currency from question text using regex patterns.
@@ -309,7 +221,7 @@ export default async function validateFormbricksSurvey(req, logger) {
     }
 
     // Extract base URL and survey ID with SSRF protection
-    const urlParts = extractFormbricksBaseUrlAndSurveyId(surveyUrl, logger);
+    const urlParts = validateAndExtractFormbricksSurvey(surveyUrl, logger);
     if (!urlParts) {
       // Error already logged by extractFormbricksBaseUrlAndSurveyId
       // Check if it's a configuration issue (no trusted origins) vs invalid URL
