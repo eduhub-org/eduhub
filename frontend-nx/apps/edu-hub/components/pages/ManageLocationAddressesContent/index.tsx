@@ -1,5 +1,5 @@
 import React, { FC, useMemo, useState, useCallback } from 'react';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { ColumnDef } from '@tanstack/react-table';
 import { ApolloError } from '@apollo/client';
 import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
@@ -91,7 +91,7 @@ const ExpandableLocationAddressRow: React.FC<ExpandableRowProps> = ({ row, onErr
     : [];
 
   return (
-    <div className="font-medium bg-edu-course-list p-4">
+    <div className="font-medium bg-fill-primary text-label-primary light p-4">
       <CreatableTagSelector
         variant="material"
         label={t('locationAddress.aliases')}

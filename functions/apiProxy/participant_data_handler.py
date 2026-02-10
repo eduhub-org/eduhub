@@ -1195,7 +1195,7 @@ def handle_participants_schema():
             "privacy_policy": "No personally identifiable information (PII) is returned. Participant IDs are stable cryptographic hashes. Only enrollment status, completion certificates, and occupation category are provided.",
             "participant_data": {
                 "id": "urn:hash:{first_16_chars_of_sha256} - Privacy-preserving stable identifier",
-                "enrollmentStatus": "Enum: ENROLLED, COMPLETED, DROPPED, etc.",
+                "enrollmentStatus": "Enum: ABORTED, APPLIED, CANCELLED, COMPLETED, CONFIRMED, INVITED, REGISTERED, REJECTED",
                 "enrollmentDate": "ISO 8601 timestamp of enrollment",
                 "occupationStatus": "Optional occupation category (STUDENT, EMPLOYEE, etc.)",
                 "completionStatus": {

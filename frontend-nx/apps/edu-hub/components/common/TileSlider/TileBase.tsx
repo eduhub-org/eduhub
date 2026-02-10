@@ -40,7 +40,7 @@ const TileBaseComponent: FC<TileBaseProps> = ({ coverImage: coverImageProp, titl
 
   return (
     <div 
-      className={`flex flex-col rounded-2xl overflow-hidden font-medium text-edu-black ${onClick ? 'cursor-pointer' : ''} ${className}`}
+      className={`flex flex-col rounded-2xl overflow-hidden font-medium text-label-primary light ${onClick ? 'cursor-pointer' : ''} ${className}`}
       onClick={onClick}
       style={style}
     >
@@ -61,7 +61,7 @@ const TileBaseComponent: FC<TileBaseProps> = ({ coverImage: coverImageProp, titl
           <span className="text-3xl text-white">{title}</span>
         </div>
       </div>
-      <div className="flex flex-col h-[201px] justify-between bg-white p-5">
+      <div className="flex flex-col h-[201px] justify-between bg-fill-primary text-label-primary p-5">
         {children}
       </div>
     </div>

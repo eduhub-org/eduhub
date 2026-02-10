@@ -57,9 +57,15 @@ export const RegistrationButton: FC<RegistrationButtonProps> = ({ course, regist
             <MdInfoOutline className="text-2xl text-amber-600" />
           </div>
           <div className="text-amber-800">
-            <h3 className="font-semibold text-lg mb-2">{t('status.application_period_ended_title')}</h3>
+            <h3 className="font-semibold text-lg mb-2">
+              {config.requiresApproval 
+                ? t('status.application_period_ended_title') 
+                : t('status.registration_period_ended_title')}
+            </h3>
             <div className="text-sm leading-relaxed">
-              {t.rich('status.application_period_ended', {
+              {t.rich(config.requiresApproval 
+                ? 'status.application_period_ended' 
+                : 'status.registration_period_ended', {
                 a: (chunks) => (
                   <a
                     href="https://opencampus.substack.com"
@@ -99,15 +105,18 @@ export const RegistrationButton: FC<RegistrationButtonProps> = ({ course, regist
     <div className="flex flex-1 flex-col justify-center items-center space-y-4 w-full">
       <Button
         filled
-        inverted
         onClick={onClick}
         disabled={course.applicationEnd <= now}
-        className="bg-edu-course-current hover:bg-opacity-90 transition-all duration-200 px-8 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+        className="light !bg-warning !text-[#222222] hover:bg-opacity-90 transition-all duration-200 px-8 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
       >
         {getButtonText()}
       </Button>
       <div className="text-center">
-        <div className="text-xs text-white/90 mb-1">{t('registration.application_deadline')}</div>
+        <div className="text-xs text-white/90 mb-1">
+          {config.requiresApproval 
+            ? t('registration.application_deadline') 
+            : t('registration.registration_deadline')}
+        </div>
         <div className="text-sm font-medium text-white">
           {course.applicationEnd?.toLocaleDateString(locale, {
             year: 'numeric',

@@ -1,0 +1,109 @@
+---
+description: "Apply when creating or modifying components with colors, styling, or theming in EduHub"
+globs: "**/*.tsx,**/*.css,**/tailwind.config.*"
+alwaysApply: false
+---
+
+# Theme and Styling Guidelines
+
+## CSS Variables (Single Source of Truth)
+
+All colors are defined as CSS variables in `styles/globals.css`. The current design uses a **dark aesthetic** (`:root`). A `.light` class can be added later for light mode. 
+
+### Color Categories
+
+| Category | Variables | Usage |
+|----------|-----------|-------|
+| Brand | `--eduhub-brand`, `--eduhub-brand-light`, `--eduhub-brand-dark` | Primary actions, links, highlights |
+| Fill | `--eduhub-fill-primary`, `--eduhub-fill-secondary` | Button fills, backgrounds |
+| Label | `--eduhub-label-primary`, `--eduhub-label-secondary` | Text colors |
+| Border | `--eduhub-border-primary`, `--eduhub-border-secondary` | Borders, dividers |
+| Background | `--eduhub-bg-primary`, `--eduhub-bg-secondary`, `--eduhub-bg-modal` | Page/component backgrounds |
+| Functional | `--eduhub-success`, `--eduhub-warning`, `--eduhub-error`, `--eduhub-info` | Status indicators |
+| Status | `--eduhub-status-confirmed`, `--eduhub-status-invited`, etc. | Enrollment/course status |
+
+## MANDATORY: Use Semantic Colors
+
+### In Tailwind (preferred)
+
+Use semantic class names that reference CSS variables:
+
+```tsx
+// Good - semantic names
+<div className="bg-fill-primary text-label-primary border-border-primary">
+<button className="bg-brand hover:bg-brand-dark text-fill-primary">
+
+// Avoid - hardcoded colors
+<div className="bg-white text-gray-900">
+<div className="bg-[#00A398]">
+```
+
+### In Inline Styles (when necessary)
+
+```tsx
+// Good - CSS variables
+<div style={{ backgroundColor: 'var(--eduhub-bg-secondary)' }}>
+
+// Avoid - hardcoded
+<div style={{ backgroundColor: '#F2F2F2' }}>
+```
+
+### In MUI Components
+
+The MUI theme is configured to use brand colors. Use theme-aware props:
+
+```tsx
+// Good - uses theme
+<Button color="primary">
+<Typography color="text.primary">
+
+// Avoid - overriding with hardcoded
+<Button sx={{ backgroundColor: '#00A398' }}>
+```
+
+## Adding New Colors
+
+1. Add CSS variable to `styles/globals.css` under appropriate category
+2. Add Tailwind reference in `tailwind.config.js`
+3. If needed for MUI, update `config/theme.ts`
+
+## Light Theme Sections
+
+For components with light backgrounds in the current dark theme, wrap them with the `light` class:
+
+```tsx
+// Before - hardcoded colors, poor contrast
+<div className="bg-edu-light-gray">
+  <input className="text-gray-500" />
+</div>
+
+// After - semantic colors with .light class
+<div className="light bg-fill-primary">
+  <input className="text-label-primary" />
+</div>
+```
+
+The `light` class inverts the semantic color variables so:
+- `text-label-primary` becomes dark text (#222222) instead of light (#F2F2F2)
+- `bg-fill-primary` becomes white (#ffffff) instead of dark (#222222)
+- All semantic classes work correctly for light backgrounds
+
+**When to use `.light` class:**
+- Form inputs with light backgrounds (`bg-edu-light-gray`, `bg-white`)
+- Modal/dialog content (already applied to `DialogShell` and `Modal`)
+- Statistics cards and content cards with white backgrounds
+- Any component where text appears on a light background
+
+**Future:** When implementing global light mode, move `.light` class to `<body>` and the entire app will use light theme colors.
+
+## Legacy Color Migration
+
+Old `edu-*` classes are aliased to CSS variables for backward compatibility:
+
+- `edu-green` → `var(--eduhub-brand)`
+- `edu-black` → `var(--eduhub-label-primary)`
+
+When modifying components, prefer migrating to semantic names:
+
+- `bg-edu-green` → `bg-brand`
+- `text-edu-black` → `text-label-primary`

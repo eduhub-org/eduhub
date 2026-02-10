@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import { FC } from 'react';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { Page } from '../../components/layout/Page';
 import { useIsLoggedIn } from '../../hooks/authentication';
 import CertificatesContent from '../../components/pages/CertificatesContent';

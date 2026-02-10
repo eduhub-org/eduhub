@@ -319,7 +319,7 @@ The API is deployed as part of the EduHub infrastructure:
 
 ```bash
 # Start the development environment
-docker-compose up
+docker compose up
 
 # Access the API
 curl "http://localhost:42026/moochub"

@@ -1,7 +1,7 @@
 import React, { FC, useCallback, useState, useEffect, useMemo } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { useTranslations, useLocale } from 'next-intl';
+import { useLocale } from 'next-intl';
 import { getHolidaysByLocale } from './holidayUtils';
 
 // Beautiful highlighting styles for calendar days

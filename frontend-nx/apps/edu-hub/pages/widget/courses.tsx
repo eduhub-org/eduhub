@@ -1,7 +1,7 @@
 import { FC, useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import { useQuery } from '@apollo/client';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import Head from 'next/head';
 import { ClientOnly } from '@opencampus/shared-components';
 

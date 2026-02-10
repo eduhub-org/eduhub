@@ -1,0 +1,115 @@
+table:
+  name: CourseAddonMapping
+  schema: public
+object_relationships:
+  - name: Course
+    using:
+      foreign_key_constraint_on: courseId
+  - name: User
+    using:
+      foreign_key_constraint_on: validatedBy
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - id
+        - courseId
+        - description
+        - validatedPrice
+        - currency
+      filter:
+        Course:
+          _and:
+            - published:
+                _eq: true
+            - Program:
+                published:
+                  _eq: true
+  - role: instructor_access
+    permission:
+      columns:
+        - id
+        - courseId
+        - questionId
+        - choiceId
+        - questionTextDe
+        - questionTextEn
+        - extractedPrice
+        - validatedPrice
+        - currency
+        - description
+        - stripeProductId
+        - stripePriceId
+        - confidence
+        - validatedAt
+        - validatedBy
+        - created_at
+        - updated_at
+      filter: {}
+  - role: user_access
+    permission:
+      columns:
+        - id
+        - courseId
+        - questionId
+        - choiceId
+        - description
+        - validatedPrice
+        - currency
+      filter:
+        Course:
+          published:
+            _eq: true
+insert_permissions:
+  - role: instructor_access
+    permission:
+      check:
+        Course:
+          CourseInstructors:
+            User:
+              id:
+                _eq: X-Hasura-User-Id
+      columns:
+        - courseId
+        - questionId
+        - choiceId
+        - questionTextDe
+        - questionTextEn
+        - extractedPrice
+        - validatedPrice
+        - currency
+        - description
+        - stripeProductId
+        - stripePriceId
+        - confidence
+        - validatedAt
+        - validatedBy
+update_permissions:
+  - role: instructor_access
+    permission:
+      columns:
+        - validatedPrice
+        - currency
+        - description
+        - stripeProductId
+        - stripePriceId
+        - confidence
+        - validatedAt
+        - validatedBy
+      filter:
+        Course:
+          CourseInstructors:
+            User:
+              id:
+                _eq: X-Hasura-User-Id
+      check: null
+delete_permissions:
+  - role: instructor_access
+    permission:
+      filter:
+        Course:
+          CourseInstructors:
+            User:
+              id:
+                _eq: X-Hasura-User-Id
+

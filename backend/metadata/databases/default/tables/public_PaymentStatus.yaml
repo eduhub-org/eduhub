@@ -1,0 +1,19 @@
+table:
+  name: PaymentStatus
+  schema: public
+is_enum: true
+array_relationships:
+  - name: CourseEnrollments
+    using:
+      foreign_key_constraint_on:
+        column: paymentStatus
+        table:
+          name: CourseEnrollment
+          schema: public
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - value
+        - comment
+      filter: {}

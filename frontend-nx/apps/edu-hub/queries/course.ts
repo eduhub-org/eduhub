@@ -623,3 +623,27 @@ export const UPDATE_COURSE_FORMBRICKS_ENROLLMENT_SURVEY = gql`
     }
   }
 `;
+
+export const UPDATE_COURSE_BASE_PRICE = gql`
+  mutation UpdateCourseBasePrice($itemId: Int!, $text: Int!) {
+    update_Course_by_pk(
+      pk_columns: { id: $itemId }
+      _set: { basePrice: $text }
+    ) {
+      id
+      basePrice
+    }
+  }
+`;
+
+export const UPDATE_COURSE_CURRENCY = gql`
+  mutation UpdateCourseCurrency($itemId: Int!, $value: String!) {
+    update_Course_by_pk(
+      pk_columns: { id: $itemId }
+      _set: { currency: $value }
+    ) {
+      id
+      currency
+    }
+  }
+`;

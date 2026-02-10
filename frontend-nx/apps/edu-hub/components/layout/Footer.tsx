@@ -1,11 +1,14 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import { FC } from 'react';
+import { useTranslations } from 'next-intl';
 import facebookIcon from '../../public/images/share/facebook-icon.svg';
 import instagramIcon from '../../public/images/share/instagram-icon.svg';
 import dlcLogo from '../../public/images/share/logo_dlc.svg';
 import foerderLogo from '../../public/images/share/foerderlogos_2.svg';
 
 export const Footer: FC = () => {
+  const t = useTranslations('footer');
   return (
     <footer className="mt-7 sm:mt-20 bg-[#0F0F0F] text-white">
       <div className="flex flex-col w-full p-6 md:px-16 max-w-screen-xl mx-auto">
@@ -19,25 +22,30 @@ export const Footer: FC = () => {
 
           <div className="text-sm font-thin order-2 sm:order-1 mt-4 sm:mt-20">
             <p>
-              <a href="/impressum" target="_blank" rel="noopener noreferrer">
-                {'Impressum - Datenschutz'}
-              </a>
+              <Link href="/imprint">
+                {t('imprint')}
+              </Link>
+            </p>
+            <p>
+              <Link href="/privacy">
+                {t('privacy')}
+              </Link>
             </p>
             <p>
               <a href="https://opencampus.gitbook.io/faq/" target="_blank" rel="noopener noreferrer">
-                {'FAQ'}
+                {t('faq')}
               </a>
             </p>
             <p>
               <a href="https://opencampus.substack.com" target="_blank" rel="noopener noreferrer">
-                {'Newsletter'}
+                {t('newsletter')}
               </a>
             </p>
           </div>
           
           <div className="flex flex-col order-1 sm:order-2 mt-8 sm:-mt-14">
             <span className="text-white text-sm font-medium tracking-wide mb-2">
-              Gefördert durch:
+              {t('sponsored_by')}
             </span>
            
             <div className="flex flex-col sm:flex-row items-center sm:items-end gap-8 sm:gap-4 bg-white p-8 sm:p-4 rounded">

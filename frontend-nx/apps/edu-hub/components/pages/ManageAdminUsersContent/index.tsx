@@ -1,5 +1,5 @@
 import { FC, ReactNode, useMemo, useCallback, useState } from 'react';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { ColumnDef } from '@tanstack/react-table';
 
 import TableGrid from '../../common/TableGrid';
@@ -52,7 +52,7 @@ const ExpandableUserRow: FC<{
 
   return (
     <div>
-      <div className="font-medium bg-edu-course-list grid grid-cols-[repeat(auto-fill,minmax(100px,1fr))]">
+      <div className="font-medium bg-fill-primary text-label-primary light grid grid-cols-[repeat(auto-fill,minmax(100px,1fr))]">
         <div className="pl-3 col-span-3">
           <CheckboxSelector
             variant="eduhub"

@@ -1,6 +1,6 @@
 import { FC, ReactNode, useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
-import { useTranslations, useLocale } from 'next-intl';
+import { useLocale } from 'next-intl';
 import { Transition } from '@headlessui/react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';

@@ -27,7 +27,7 @@ import {
   UserSelectionWithFilterVariables,
 } from '../../../../queries/__generated__/UserSelectionWithFilter';
 import EhMultipleTag from '../../../common/EhMultipleTag';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import DeleteButton from '../../../../components/common/DeleteButton';
 import SessionAddresses from './SessionAddresses';
 import { LocationOption_enum, order_by } from '../../../../__generated__/globalTypes';
@@ -162,7 +162,6 @@ export const SessionRow: FC<IProps> = ({
   const [addSpeakerOpen, setAddSpeakerOpen] = useState(false);
   const [createUserDialogOpen, setCreateUserDialogOpen] = useState(false);
   const [searchValueForNewUser, setSearchValueForNewUser] = useState('');
-  const [pendingUserId, setPendingUserId] = useState<string | null>(null);
 
   const openAddSpeaker = useCallback(() => {
     setAddSpeakerOpen(true);
@@ -227,7 +226,6 @@ export const SessionRow: FC<IProps> = ({
 
   const handleUserCreated = useCallback(
     async (userId: string, firstName: string, lastName: string, email: string) => {
-      setPendingUserId(userId);
       setCreateUserDialogOpen(false);
 
       // Fetch the newly created user to get the full UserSelectionWithFilter_User structure
@@ -249,8 +247,6 @@ export const SessionRow: FC<IProps> = ({
         }
       } catch (error) {
         console.error('Error fetching new user:', error);
-      } finally {
-        setPendingUserId(null);
       }
     },
     [fetchUserByEmail, handleNewSpeaker, session]

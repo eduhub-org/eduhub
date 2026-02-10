@@ -249,6 +249,36 @@ resource "google_secret_manager_secret_version" "formbricks_api_key" {
   secret_data = var.formbricks_api_key
 }
 
+# ===== Stripe Secret Key =====
+resource "google_secret_manager_secret" "stripe_secret_key" {
+  provider  = google-beta
+  secret_id = "stripe-secret-key"
+  replication {
+    auto {}
+  }
+}
+
+resource "google_secret_manager_secret_version" "stripe_secret_key" {
+  provider    = google-beta
+  secret      = google_secret_manager_secret.stripe_secret_key.name
+  secret_data = var.stripe_secret_key
+}
+
+# ===== Stripe Webhook Secret =====
+resource "google_secret_manager_secret" "stripe_webhook_secret" {
+  provider  = google-beta
+  secret_id = "stripe-webhook-secret"
+  replication {
+    auto {}
+  }
+}
+
+resource "google_secret_manager_secret_version" "stripe_webhook_secret" {
+  provider    = google-beta
+  secret      = google_secret_manager_secret.stripe_webhook_secret.name
+  secret_data = var.stripe_webhook_secret
+}
+
 # =========================================================================================
 # IAM bindings for default compute engine service account
 # =========================================================================================
@@ -327,4 +357,18 @@ resource "google_secret_manager_secret_iam_member" "formbricks_api_key" {
   role       = "roles/secretmanager.secretAccessor"
   member     = "serviceAccount:${data.google_project.eduhub.number}-compute@developer.gserviceaccount.com"
   depends_on = [google_secret_manager_secret.formbricks_api_key]
+}
+
+resource "google_secret_manager_secret_iam_member" "stripe_secret_key" {
+  secret_id  = google_secret_manager_secret.stripe_secret_key.id
+  role       = "roles/secretmanager.secretAccessor"
+  member     = "serviceAccount:${google_service_account.custom_cloud_function_account.email}"
+  depends_on = [google_secret_manager_secret.stripe_secret_key]
+}
+
+resource "google_secret_manager_secret_iam_member" "stripe_webhook_secret" {
+  secret_id  = google_secret_manager_secret.stripe_webhook_secret.id
+  role       = "roles/secretmanager.secretAccessor"
+  member     = "serviceAccount:${google_service_account.custom_cloud_function_account.email}"
+  depends_on = [google_secret_manager_secret.stripe_webhook_secret]
 }

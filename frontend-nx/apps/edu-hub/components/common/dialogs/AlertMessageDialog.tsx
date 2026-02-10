@@ -1,9 +1,8 @@
-import { Dialog, DialogTitle } from '@mui/material';
 import { useTranslations } from 'next-intl';
-import { FC, useCallback } from 'react';
-import { MdClose } from 'react-icons/md';
+import { FC } from 'react';
 
 import { Button } from '../../common/Button';
+import { DialogShell } from './DialogShell';
 
 interface AlertProps {
   alert: string;
@@ -13,37 +12,24 @@ interface AlertProps {
 }
 
 export const AlertMessageDialog: FC<AlertProps> = ({ alert, confirmationText = 'OK', open, onClose }) => {
-  const handleClose = useCallback(() => onClose(), [onClose]);
   const t = useTranslations('common');
-  return (
-    <Dialog open={open} onClose={handleClose}>
-      <DialogTitle>
-        <div className="grid grid-cols-2">
-          <div>{t('warning')}</div>
-          <div className="flex justify-end">
-            <button
-              onClick={handleClose}
-              className="cursor-pointer"
-              aria-label={t('close')}
-              type="button"
-            >
-              <MdClose />
-            </button>
-          </div>
-        </div>
-      </DialogTitle>
 
-      <div className="m-16">
-        <div className="mb-8">{alert}</div>
-        <div className="grid grid-cols-2">
-          <div />
-          <div className="flex justify-end">
-            <Button filled onClick={handleClose}>
-              {confirmationText}
-            </Button>
-          </div>
-        </div>
-      </div>
-    </Dialog>
+  const actions = (
+    <div className="flex justify-end">
+      <Button filled onClick={onClose}>
+        {confirmationText}
+      </Button>
+    </div>
+  );
+
+  return (
+    <DialogShell
+      open={open}
+      onClose={onClose}
+      title={t('warning')}
+      actions={actions}
+    >
+      <div className="whitespace-pre-line">{alert}</div>
+    </DialogShell>
   );
 };

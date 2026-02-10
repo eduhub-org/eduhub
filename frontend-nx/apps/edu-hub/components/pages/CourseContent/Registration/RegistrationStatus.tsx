@@ -1,8 +1,8 @@
 import { FC } from 'react';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { MdHourglassEmpty, MdCancel, MdError, MdMailOutline, MdAccessTime } from 'react-icons/md';
 
-import { CourseEnrollmentStatus_enum } from '../../../../__generated__/globalTypes';
+import { CourseEnrollmentStatus_enum, PaymentStatus_enum } from '../../../../__generated__/globalTypes';
 import { Course_Course_by_pk } from '../../../../queries/__generated__/Course';
 import { CourseWithEnrollment_Course_by_pk_CourseEnrollments } from '../../../../queries/__generated__/CourseWithEnrollment';
 import { Button } from '../../../common/Button';
@@ -15,6 +15,8 @@ interface RegistrationStatusProps {
   courseEnrollment: CourseWithEnrollment_Course_by_pk_CourseEnrollments;
   /** Course data containing chat links and location information */
   course: Course_Course_by_pk;
+  /** Optional callback function to retry payment (opens modal with prefilled survey) */
+  onRetryPayment?: () => void;
 }
 
 /**
@@ -94,10 +96,11 @@ const CourseLinkInfos: FC<{ course: Course_Course_by_pk }> = ({ course }) => {
  * @param props - The component props
  * @returns JSX element representing the enrollment status and available actions
  */
-export const RegistrationStatus: FC<RegistrationStatusProps> = ({ courseEnrollment, course }) => {
+export const RegistrationStatus: FC<RegistrationStatusProps> = ({ courseEnrollment, course, onRetryPayment }) => {
   const t = useTranslations('course');
 
   const status = courseEnrollment.status;
+  const paymentStatus = courseEnrollment.paymentStatus;
 
   switch (status) {
     case CourseEnrollmentStatus_enum.ABORTED: {
@@ -108,6 +111,34 @@ export const RegistrationStatus: FC<RegistrationStatusProps> = ({ courseEnrollme
       );
     }
     case CourseEnrollmentStatus_enum.APPLIED: {
+      // Check if this is a payment-pending/failed enrollment (vs approval-based)
+      if (
+        paymentStatus === PaymentStatus_enum.PENDING ||
+        paymentStatus === PaymentStatus_enum.FAILED
+      ) {
+        return (
+          <div className="flex flex-col space-y-4 w-full">
+            <StatusCard 
+              status={paymentStatus === PaymentStatus_enum.FAILED ? "error" : "warning"} 
+              icon={<MdHourglassEmpty />}
+            >
+              {paymentStatus === PaymentStatus_enum.FAILED 
+                ? t('status.payment_failed')
+                : t('status.payment_pending')}
+            </StatusCard>
+            {onRetryPayment && (
+              <Button
+                onClick={onRetryPayment}
+                filled
+                className="w-full sm:w-auto px-6 py-3"
+              >
+                {t('registration.retry_payment')}
+              </Button>
+            )}
+          </div>
+        );
+      }
+      // Approval-based APPLIED status (no payment required)
       return (
         <StatusCard status="pending" icon={<MdHourglassEmpty />}>
           {t('status.applied')}

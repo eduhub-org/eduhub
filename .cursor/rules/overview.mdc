@@ -38,18 +38,18 @@ alwaysApply: true
 ```bash
 # Frontend development
 cd frontend-nx
-yarn dev                 # Start development server
-yarn build               # Build for production
-yarn test                # Run tests
-yarn lint                # Lint code
+yarn start               # Start development server (nx serve)
+yarn build               # Build for production (nx build)
+yarn test                # Run tests (nx test)
+yarn nx run edu-hub:lint # Lint edu-hub app
 
 # Backend development
 cd backend
-docker-compose up        # Start Hasura and PostgreSQL
+docker compose up        # Start Hasura and PostgreSQL
 hasura console           # Open Hasura console
 
 # Full stack
-docker-compose up        # Start all services
+docker compose up        # Start all services
 ```
 
 ### Component Architecture Principles
@@ -69,6 +69,24 @@ docker-compose up        # Start all services
 - **Form inputs**: Use `CreatableTagSelector`, `DropDownSelector`, `InputField`
 - **Translations**: Use `useTranslation` hook with snake_case keys
 - **GraphQL**: Use `useAdminQuery`, `useRoleMutation` with proper error handling
+- **Theming**: Use CSS variables from `globals.css`; see [theme-and-styling.mdc](mdc:frontend-nx/apps/edu-hub/.cursor/rules/theme-and-styling.mdc)
+
+### Backend Schema Change Workflow (MANDATORY)
+
+When ANY task involves database schema changes (adding/removing columns, tables, constraints, etc.), you MUST complete ALL of these steps:
+
+1. **Create Migration Files**: Create SQL migration files in `backend/migrations/default/{timestamp}_{description}/` with both `up.sql` and `down.sql`. See [database-table-creation.md](mdc:database-table-creation.md) for templates.
+
+2. **Update Hasura Metadata**: If adding/removing tables or relationships, update files in `backend/metadata/databases/default/tables/`.
+
+3. **Update GraphQL Queries**: Update existing query files and add any new GraphQL queries or documents required for new tables or fields in `frontend-nx/apps/edu-hub/queries/`.
+
+4. **Regenerate TypeScript Types**: After ANY GraphQL-related changes, regenerate types by running:
+   ```bash
+   cd frontend-nx && GRAPHQL_URI=http://localhost:8080/v1/graphql yarn nx run edu-hub:apollo 2>&1 | tail -50
+   ```
+
+**IMPORTANT**: Never consider a schema-change task complete until migrations are created AND types are regenerated.
 
 ### Essentials for every prompt
 
@@ -77,5 +95,6 @@ docker-compose up        # Start all services
 - **Translations**: German "Du" form mandatory, English fallbacks
 - **Error handling**: Comprehensive error boundaries and user feedback
 - **Testing**: Jest, React Testing Library, component behavior testing
+- **Schema changes**: ALWAYS create migrations AND regenerate types (see workflow above)
 
 For deeper details, consult component-specific rules and [frontend-nx/apps/edu-hub/](mdc:frontend-nx/apps/edu-hub/) structure.

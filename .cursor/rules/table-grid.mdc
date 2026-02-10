@@ -1,0 +1,79 @@
+---
+description: "Apply when implementing data tables, configuring columns, or using TableGrid component"
+globs: "**/TableGrid/**,**/*Table*.tsx"
+alwaysApply: false
+---
+
+# TableGrid Component
+
+Component: `frontend-nx/apps/edu-hub/components/common/TableGrid/index.tsx`
+Types: `frontend-nx/apps/edu-hub/components/common/TableGrid/types.ts`
+
+## Basic Usage
+
+```typescript
+import TableGrid from '../common/TableGrid';
+import { ColumnDef } from '@tanstack/react-table';
+
+const columns = useMemo<ColumnDef<MyRow>[]>(() => [
+  { header: 'ID', accessorKey: 'id', size: 80 },
+  { header: 'Title', accessorKey: 'title', size: 300, minSize: 200 },
+], []);
+
+<TableGrid<MyRow>
+  columns={columns}
+  data={data}
+  loading={loading}
+  error={error}
+  totalCount={totalCount}
+  pageIndex={pageIndex}
+  onPageChange={setPageIndex}
+  pageSize={pageSize}
+  onPageSizeChange={handlePageSizeChange}
+  searchFilter={searchFilter}
+  onSearchFilterChange={setSearchFilter}
+/>
+```
+
+## Column Sizing Guidelines
+
+| Content Type | Size | Example |
+|--------------|------|---------|
+| Status/Icon | 50-100px | `size: 80` |
+| Numeric/ID | 80-150px | `size: 100` |
+| Content | 200-500px | `size: 300, minSize: 200` |
+| Actions | 100-200px | `size: 150` |
+
+## useTableGrid Hook
+
+```typescript
+import { useTableGrid } from '../common/TableGrid/hooks';
+
+const { data, loading, error, searchFilter, pageIndex, setSearchFilter, setPageIndex } = useTableGrid({
+  queryHook: useAdminQuery,
+  query: MY_QUERY,
+  queryVariables: { programId },
+  pageSize: 20,
+  refetchFilter: useCallback((searchTerm) => ({
+    where: { title: { _ilike: `%${searchTerm}%` } }
+  }), []),
+});
+```
+
+## Multi-Word Search
+
+```typescript
+import { createMultiWordSearchCondition } from '../common/TableGrid/utils';
+
+refetchFilter: (searchFilter) => ({
+  where: createMultiWordSearchCondition(searchFilter, ['firstName', 'lastName', 'email'])
+})
+```
+
+## Key Rules
+
+- ✅ Always memoize columns with `useMemo`
+- ✅ Use `size` property (not legacy `meta.width`)
+- ✅ Reset pageIndex when filters/pageSize change
+- ✅ Synchronize pageSize between hook and component
+- ❌ Don't manage offset manually - let useTableGrid handle it

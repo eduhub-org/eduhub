@@ -7,6 +7,7 @@ export const ENROLLMENT_FRAGMENT = gql`
     invitationExpirationDate
     id
     status
+    paymentStatus
     achievementCertificateURL
     attendanceCertificateURL
   }
@@ -18,5 +19,7 @@ export const ADMIN_ENROLLMENT_FRAGMENT = gql`
     ...EnrollmentFragment
     motivationLetter
     motivationRating
+    paymentStatus
+    stripePaymentIntentId
   }
 `;

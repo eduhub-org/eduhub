@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { CourseEnrollmentStatus_enum, Weekday_enum, CourseRegistrationType_enum, LocationOption_enum, ProgramType_enum, OrganizationType_enum } from "./../../__generated__/globalTypes";
+import { CourseEnrollmentStatus_enum, PaymentStatus_enum, Weekday_enum, CourseRegistrationType_enum, LocationOption_enum, ProgramType_enum, OrganizationType_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL mutation operation: InsertEnrollment
@@ -279,6 +279,17 @@ export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_Cours
   Organization: InsertEnrollment_insert_CourseEnrollment_returning_Course_CourseFundingOrganizations_Organization;
 }
 
+export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_CourseAddonMappings {
+  __typename: "CourseAddonMapping";
+  id: number;
+  description: string;
+  /**
+   * Admin-validated price (in cents), can override extracted price
+   */
+  validatedPrice: number;
+  currency: string;
+}
+
 export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_CourseEnrollments {
   __typename: "CourseEnrollment";
   /**
@@ -298,6 +309,10 @@ export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_Cours
    * The users current enrollment status to this course
    */
   status: CourseEnrollmentStatus_enum;
+  /**
+   * Current payment status
+   */
+  paymentStatus: PaymentStatus_enum | null;
   /**
    * URL to the file containing the user's achievement certificate (if he obtained one)
    */
@@ -323,10 +338,6 @@ export interface InsertEnrollment_insert_CourseEnrollment_returning_Course {
    * The day of the week the course takes place.
    */
   weekDay: Weekday_enum;
-  /**
-   * A text providing info about the costs of a participation.
-   */
-  cost: string;
   /**
    * Decides whether the course is published for all users or not.
    */
@@ -437,6 +448,18 @@ export interface InsertEnrollment_insert_CourseEnrollment_returning_Course {
    */
   CourseFundingOrganizations: InsertEnrollment_insert_CourseEnrollment_returning_Course_CourseFundingOrganizations[];
   /**
+   * Base price in cents (e.g., 5000 = €50.00)
+   */
+  basePrice: number | null;
+  /**
+   * Currency code (EUR, USD, etc.)
+   */
+  currency: string | null;
+  /**
+   * An array relationship
+   */
+  CourseAddonMappings: InsertEnrollment_insert_CourseEnrollment_returning_Course_CourseAddonMappings[];
+  /**
    * An array relationship
    */
   CourseEnrollments: InsertEnrollment_insert_CourseEnrollment_returning_Course_CourseEnrollments[];
@@ -461,6 +484,10 @@ export interface InsertEnrollment_insert_CourseEnrollment_returning {
    * The users current enrollment status to this course
    */
   status: CourseEnrollmentStatus_enum;
+  /**
+   * Current payment status
+   */
+  paymentStatus: PaymentStatus_enum | null;
   /**
    * URL to the file containing the user's achievement certificate (if he obtained one)
    */

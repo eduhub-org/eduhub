@@ -1,5 +1,5 @@
 import { Dialog, DialogContent, DialogTitle } from '@mui/material';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { ChangeEvent, FC, useCallback, useState, useMemo } from 'react';
 import { MdClose } from 'react-icons/md';
 import { useAuthedQuery } from '../../../hooks/authedQuery';
@@ -63,17 +63,17 @@ export const SelectOrganizationDialog: FC<IProps> = ({ onClose, open, title }) =
 
   return (
     <Dialog open={open} onClose={handleCancel} maxWidth="md" fullWidth>
-      <DialogTitle>
+      <DialogTitle className="light">
         <div className="grid grid-cols-2">
-          <div>{title}</div>
-          <div className="cursor-pointer flex justify-end">
+          <div className="text-label-primary">{title}</div>
+          <div className="cursor-pointer flex justify-end text-label-primary">
             <MdClose onClick={handleCancel} />
           </div>
         </div>
       </DialogTitle>
 
-      <DialogContent>
-        <div className="mb-4">{t('organization_dialog.type_organization_name_minimum_2_letters')}</div>
+      <DialogContent className="light">
+        <div className="mb-4 text-label-primary">{t('organization_dialog.type_organization_name_minimum_2_letters')}</div>
 
         <div className="mb-4">
           <input
@@ -98,10 +98,10 @@ export const SelectOrganizationDialog: FC<IProps> = ({ onClose, open, title }) =
             </div>
           ))}
           {organizations.length === 0 && searchValue.length >= 2 && (
-            <div className="p-4 text-center text-gray-500">{t('organization_dialog.no_organizations_found')}</div>
+            <div className="p-4 text-center text-label-secondary">{t('organization_dialog.no_organizations_found')}</div>
           )}
           {searchValue.length < 2 && (
-            <div className="p-4 text-center text-gray-500">{t('organization_dialog.type_at_least_2_characters')}</div>
+            <div className="p-4 text-center text-label-secondary">{t('organization_dialog.type_at_least_2_characters')}</div>
           )}
         </div>
 

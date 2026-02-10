@@ -21,6 +21,36 @@ type Mutation {
 }
 
 type Mutation {
+  createStripeBasePrice(
+    courseId: Int!
+    basePrice: Int!
+    currency: String
+    courseTitle: String
+  ): CreateStripeBasePriceResult!
+}
+
+type Mutation {
+  createEnrollmentWithAddons(
+    courseId: Int!
+    userId: uuid!
+    motivationLetter: String
+    formbricksSurveyUrl: String
+    termsAcceptedAt: timestamptz
+  ): CreateEnrollmentWithAddonsResult!
+}
+
+type Mutation {
+  createStripeCheckout(
+    courseId: Int!
+    enrollmentId: Int!
+    formbricksResponseId: String
+    userEmail: String
+    course: CourseInput
+    addonMappings: [AddonMappingInput!]
+  ): CreateStripeCheckoutResult!
+}
+
+type Mutation {
   createUser(
     firstName: String!
     lastName: String!
@@ -34,6 +64,23 @@ type Query {
 }
 
 type Query {
+  getFormbricksResponses(
+    courseId: Int!
+    userId: uuid!
+    enrollmentId: Int
+    formbricksSurveyUrl: String!
+  ): GetFormbricksResponsesResult!
+}
+
+type Query {
+  getFormbricksAddonSelections(
+    courseId: Int!
+    userId: uuid!
+    formbricksSurveyUrl: String!
+  ): GetFormbricksAddonSelectionsResult!
+}
+
+type Query {
   getSignedUrl(
     path: String!
   ): getSignedUrlOutput
@@ -43,15 +90,6 @@ type Query {
   loadParticipationData(
     programId: Int!
   ): LoadParticipationDataResult!
-}
-
-type Query {
-  getFormbricksResponses(
-    courseId: Int!
-    userId: uuid!
-    enrollmentId: Int
-    formbricksSurveyUrl: String!
-  ): GetFormbricksResponsesResult!
 }
 
 type Mutation {
@@ -90,6 +128,13 @@ type Mutation {
     filename: String!
     achievementRecordId: Int!
   ): saveFileResult
+}
+
+type Mutation {
+  saveAddonMappings(
+    courseId: Int!
+    mappings: [AddonMappingInput!]!
+  ): SaveAddonMappingsResult!
 }
 
 type Mutation {
@@ -139,6 +184,42 @@ type Mutation {
     userId: String!
     isAdmin: Boolean!
   ): UpdateAdminStatusResult!
+}
+
+type Mutation {
+  validateFormbricksSurvey(
+    surveyUrl: String!
+    courseId: Int!
+  ): ValidateFormbricksSurveyResult!
+}
+
+input AddonMappingInput {
+  questionId: String!
+  choiceId: String!
+  questionTextDe: String
+  questionTextEn: String
+  extractedPrice: Int!
+  validatedPrice: Int!
+  currency: String!
+  description: String!
+  stripeProductId: String
+  stripePriceId: String
+  confidence: String!
+}
+
+input CourseInput {
+  id: Int!
+  title: String!
+  basePrice: Int
+  currency: String
+  stripeProductId: String
+  stripePriceId: String
+}
+
+input SelectedAddonInput {
+  questionId: String!
+  choiceId: String!
+  selected: Boolean!
 }
 
 type CreateUserResult {
@@ -353,5 +434,132 @@ type FormbricksAnswer {
 type FormbricksSurvey {
   id: String!
   name: String!
+}
+
+type ValidateFormbricksSurveyResult {
+  success: Boolean!
+  surveyId: String
+  surveyTitle: String
+  addonQuestions: [AddonQuestion!]
+  requiresReview: Boolean
+  error: String
+  messageKey: String
+}
+
+type AddonQuestion {
+  questionId: String!
+  choiceId: String!
+  questionType: String!
+  questionText: String
+  extractedPrice: Int!
+  extractedCurrency: String!
+  confidence: String!
+  warnings: [AddonWarning!]
+  allDetectedPrices: [DetectedPrice!]
+  description: String!
+}
+
+type AddonWarning {
+  type: String!
+  message: String!
+  severity: String!
+}
+
+type DetectedPrice {
+  language: String!
+  priceInCents: Int!
+  currency: String!
+  originalText: String!
+}
+
+type SaveAddonMappingsResult {
+  success: Boolean!
+  messageKey: String!
+  error: String
+  stripeResults: StripePriceCreationResult
+}
+
+type StripePriceCreationResult {
+  success: Boolean!
+  results: [StripePriceResult!]!
+  summary: StripePriceSummary!
+}
+
+type StripePriceResult {
+  questionId: String!
+  choiceId: String!
+  stripeProductId: String
+  stripePriceId: String
+  success: Boolean!
+  error: String
+}
+
+type StripePriceSummary {
+  total: Int!
+  success: Int!
+  failures: Int!
+}
+
+type CreateStripeBasePriceResult {
+  success: Boolean!
+  messageKey: String!
+  stripeProductId: String
+  stripePriceId: String
+  productName: String
+  priceAmount: Int
+  currency: String
+  error: String
+}
+
+type CreateEnrollmentWithAddonsResult {
+  success: Boolean!
+  enrollmentId: Int
+  selectedAddons: [SelectedAddon!]
+  error: String
+  messageKey: String
+}
+
+type CreateStripeCheckoutResult {
+  success: Boolean!
+  checkoutUrl: String
+  sessionId: String
+  error: String
+  messageKey: String
+}
+
+type GetFormbricksAddonSelectionsResult {
+  success: Boolean!
+  selectedAddons: [SelectedAddon!]
+  error: String
+  messageKey: String
+}
+
+type SelectedAddon {
+  id: Int!
+  description: String!
+  validatedPrice: Int!
+  currency: String!
+  questionId: String!
+  choiceId: String!
+}
+
+type CourseAddonMapping {
+  id: Int!
+  courseId: Int!
+  questionId: String!
+  choiceId: String
+  questionTextDe: String
+  questionTextEn: String
+  extractedPrice: Int!
+  validatedPrice: Int!
+  currency: String!
+  description: String!
+  stripeProductId: String
+  stripePriceId: String
+  confidence: String!
+  validatedAt: timestamptz
+  validatedBy: uuid
+  created_at: timestamptz!
+  updated_at: timestamptz!
 }
 

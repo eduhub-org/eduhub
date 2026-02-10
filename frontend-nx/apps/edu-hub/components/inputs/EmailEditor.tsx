@@ -18,7 +18,7 @@ import Placeholder from '@tiptap/extension-placeholder';
 import CharacterCount from '@tiptap/extension-character-count';
 import Link from '@tiptap/extension-link';
 import DOMPurify from 'dompurify';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { useRoleMutation } from '../../hooks/authedMutation';
 import NotificationSnackbar from '../common/dialogs/NotificationSnackbar';
 import { LinkDialog } from '../common/dialogs/LinkDialog';

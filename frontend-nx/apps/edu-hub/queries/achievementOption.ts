@@ -19,10 +19,10 @@ export const ACHIEVEMENT_OPTIONS = gql`
     $where: AchievementOption_bool_exp! = {}
     $limit: Int = null
     $offset: Int = 0
-    $orderBy: AchievementOption_order_by = { id: desc }
+    $order_by: [AchievementOption_order_by!]
   ) {
     AchievementOption(
-      order_by: [$orderBy]
+      order_by: $order_by
       where: $where
       limit: $limit
       offset: $offset
@@ -43,6 +43,11 @@ export const ACHIEVEMENT_OPTIONS = gql`
         User {
           ...UserFragment
         }
+      }
+    }
+    AchievementOption_aggregate(where: $where) {
+      aggregate {
+        count
       }
     }
   }

@@ -26,7 +26,7 @@ import { useLazyRoleQuery } from '../../../hooks/authedQuery';
 import NotificationSnackbar from '../../common/dialogs/NotificationSnackbar';
 import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
 
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { order_by } from '../../../__generated__/globalTypes';
 
 interface IPropsInstructorColumn {

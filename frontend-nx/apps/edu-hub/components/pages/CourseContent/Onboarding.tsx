@@ -1,5 +1,5 @@
 import { FC, useState } from 'react';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { CircularProgress } from '@mui/material';
 
 import { useAuthedMutation } from '../../../hooks/authedMutation';
@@ -146,7 +146,7 @@ const Onboarding: FC<OnboardingProps> = ({ course, enrollmentId, refetchCourse, 
   }
 
   return (
-    <div className="bg-edu-course-invited rounded-2xl p-6 !text-edu-black mb-12">
+    <div className="bg-edu-course-invited rounded-2xl p-6 text-label-primary light mb-12">
       <div className="pb-5 text-2xl font-bold">{t('onboarding_modal.important')}</div>
       <div className="pb-5 text-xl font-bold">{t('onboarding_modal.congratulation')}</div>
       <div className="pb-4">{t('onboarding_modal.form_intro')}</div>

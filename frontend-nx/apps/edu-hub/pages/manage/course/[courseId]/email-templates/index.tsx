@@ -5,7 +5,7 @@ import { Page } from '../../../../../components/layout/Page';
 import { useIsAdmin, useIsLoggedIn } from '../../../../../hooks/authentication';
 import { useRoleQuery } from '../../../../../hooks/authedQuery';
 import { useRoleMutation } from '../../../../../hooks/authedMutation';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import Loading from '../../../../../components/common/Loading';
 import { MANAGED_COURSE } from '../../../../../queries/course';
 import { ManagedCourse } from '../../../../../queries/__generated__/ManagedCourse';
@@ -15,7 +15,6 @@ import {
   GET_DEFAULT_TEMPLATES,
   GET_COURSE_TEMPLATES_COUNT,
   INSERT_EMAIL_TEMPLATE,
-  EMAIL_TEMPLATES_LIST,
 } from '../../../../../queries/emailTemplates';
 import { GetDefaultTemplates } from '../../../../../queries/__generated__/GetDefaultTemplates';
 import { GetCourseTemplatesCount } from '../../../../../queries/__generated__/GetCourseTemplatesCount';
@@ -199,7 +198,7 @@ const CourseEmailTemplates: FC = () => {
                 const key = 'course_specific_explanation';
                 const translation = t(key);
                 return translation !== key ? translation : 'These email templates are specific to this course and will override the default templates when sending emails for this course.';
-              } catch (error) {
+              } catch {
                 return 'These email templates are specific to this course and will override the default templates when sending emails for this course.';
               }
             })()}

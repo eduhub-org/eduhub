@@ -1,6 +1,6 @@
 import { FC, useState } from 'react';
 import { useSession } from 'next-auth/react';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/router';
 
 import { Button } from '../../common/Button';

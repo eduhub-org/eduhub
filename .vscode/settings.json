@@ -1,4 +1,12 @@
 {
+  // Exclude Cursor skills/rules from markdown and spell checking
+  "markdownlint.ignore": [
+    ".cursor/**/*.md"
+  ],
+  "cSpell.ignorePaths": [
+    ".cursor/skills/**",
+    ".cursor/rules/**"
+  ],
   "editor.wordWrap": "wordWrapColumn",
   "editor.wordWrapColumn": 120,
   "[python]": {

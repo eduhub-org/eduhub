@@ -32,7 +32,7 @@ import {
   DeleteSessionSpeaker,
   DeleteSessionSpeakerVariables,
 } from '../../../../queries/__generated__/DeleteSessionSpeaker';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { SessionAddress_insert_input } from '../../../../__generated__/globalTypes';
 
 interface IProps {

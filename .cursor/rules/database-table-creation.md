@@ -131,6 +131,9 @@ END $$;
 Create metadata files in `backend/metadata/databases/default/tables/`:
 
 #### public_TableName.yaml Template
+
+> **Important**: Do NOT add `admin` role permissions in Hasura metadata. The admin role automatically has full access to all tables and columns in Hasura by default.
+
 ```yaml
 table:
   name: TableName
@@ -316,6 +319,7 @@ See these existing implementations:
 3. **Add table comments** to document purpose
 4. **Use meaningful constraint names** following the pattern `TableName_column_fkey`
 5. **Set appropriate permissions** in metadata files
-6. **Order foreign keys** after table creation to avoid dependency issues
-6. **Test with sample data** before committing
-7. **Follow semantic release** commit message format for version bumping
+6. **Never add admin role permissions** - the admin role has full access to all tables by default in Hasura
+7. **Order foreign keys** after table creation to avoid dependency issues
+8. **Test with sample data** before committing
+9. **Follow semantic release** commit message format for version bumping
