@@ -275,7 +275,7 @@ const ParticipationList: FC<IPropsParticipationList> = ({ course, qResult }) => 
           )}
         </div>
       ) : (
-        <p className="m-auto text-center mb-14 text-gray-400">{t('no_enrollments_present')}</p>
+        <p className="m-auto text-center mb-14 text-gray-400">{t('manageCourse.no_enrollments_present')}</p>
       )}
     </>
   );

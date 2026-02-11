@@ -49,6 +49,7 @@
       "email_templates": "Email Templates",
       "app_settings": "App Settings",
       "statistics": "Statistics",
+      "kursleitungshandbuch": "Course Instructor Handbook",
       "logout": "Logout"
     },
     "change-password": "Change email or password",
@@ -822,6 +823,41 @@
     "course-start": "Course start",
     "course-end": "Course end",
     "achievement-upload-deadline": "Deadline achievement upload"
+  },
+  "manageAchievementOptions": {
+    "table_header": {
+      "title": "Title",
+      "description": "Description",
+      "record_type": "Type",
+      "mentors": "Mentors",
+      "courses": "Courses"
+    },
+    "title": {
+      "placeholder": "Project name"
+    },
+    "description": {
+      "placeholder": "Enter project description"
+    },
+    "record_type": {
+      "DOCUMENTATION": "Documentation",
+      "ONLINE_COURSE": "Online Course"
+    },
+    "documentation_template": {
+      "placeholder": "No selection",
+      "help_text": "Template for achievement record documentation"
+    },
+    "add_mentor": "Add mentor",
+    "remove_mentor": "Remove mentor",
+    "add_course": "Add course",
+    "manage_templates_button": "Manage achievement templates",
+    "notifications": {
+      "achievement_option_added": "Achievement option added successfully",
+      "add_failed": "Failed to add. Please try again."
+    },
+    "delete_button": {
+      "untitled_achievement_option": "Untitled achievement option",
+      "delete_achievement_option_confirmation": "Are you sure you want to delete the achievement option '{title}'?"
+    }
   },
   "manageCourses": {
     "table_header": {
