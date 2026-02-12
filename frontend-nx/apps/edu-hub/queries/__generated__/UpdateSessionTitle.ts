@@ -20,6 +20,6 @@ export interface UpdateSessionTitle {
 }
 
 export interface UpdateSessionTitleVariables {
-  sessionId: number;
-  title: string;
+  itemId: number;
+  text: string;
 }

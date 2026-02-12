@@ -1,5 +1,5 @@
 import { Dialog, DialogContent, DialogTitle } from '@mui/material';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { ChangeEvent, FC, useCallback, useState, useMemo } from 'react';
 import { MdClose } from 'react-icons/md';
 import { useRoleQuery } from '../../../hooks/authedQuery';
@@ -73,7 +73,7 @@ export const SelectUserDialog: FC<IProps> = ({ onClose, open, title, onAddNewUse
   const users = data?.User || [];
   const hasSearched = searchValue.trim().length >= 2;
   const showNoResults = hasSearched && !loading && users.length === 0;
-  const shouldShowAddNewUser = showAddNewUserOption && onAddNewUser && showNoResults;
+  const shouldShowAddNewUser = showAddNewUserOption && onAddNewUser && hasSearched && !loading;
 
   const handleAddNewUser = useCallback(() => {
     if (onAddNewUser) {
@@ -83,17 +83,17 @@ export const SelectUserDialog: FC<IProps> = ({ onClose, open, title, onAddNewUse
 
   return (
     <Dialog open={open} onClose={handleCancel} maxWidth="md" fullWidth>
-      <DialogTitle>
+      <DialogTitle className="light">
         <div className="grid grid-cols-2">
-          <div>{title}</div>
-          <div className="cursor-pointer flex justify-end">
+          <div className="text-label-primary">{title}</div>
+          <div className="cursor-pointer flex justify-end text-label-primary">
             <MdClose onClick={handleCancel} />
           </div>
         </div>
       </DialogTitle>
 
-      <DialogContent>
-        <div className="mb-4">{t('common.select_user_dialog.type_name_or_email_minimum_2_letters')}</div>
+      <DialogContent className="light">
+        <div className="mb-4 text-label-primary">{t('common.select_user_dialog.type_name_or_email_minimum_2_letters')}</div>
 
         <div className="mb-4">
           <input
@@ -113,26 +113,25 @@ export const SelectUserDialog: FC<IProps> = ({ onClose, open, title, onAddNewUse
               ))}
             </>
           )}
-          {showNoResults && shouldShowAddNewUser && (
+          {showNoResults && (
+            <div className="p-4 text-center text-label-secondary">{t('common.select_user_dialog.no_users_found')}</div>
+          )}
+          {shouldShowAddNewUser && (
             <div className="p-4">
-              <div className="text-gray-500 mb-2 text-center">{t('common.select_user_dialog.no_users_found')}</div>
               <button
                 type="button"
                 onClick={handleAddNewUser}
-                className="w-full cursor-pointer bg-blue-50 hover:bg-blue-100 p-3 rounded text-blue-600 font-medium text-center"
+                className="w-full cursor-pointer bg-brand/10 hover:bg-brand/20 p-3 rounded text-brand font-medium text-center"
               >
                 {t('common.select_user_dialog.add_new_user')}
               </button>
             </div>
           )}
-          {showNoResults && !shouldShowAddNewUser && (
-            <div className="p-4 text-center text-gray-500">{t('common.select_user_dialog.no_users_found')}</div>
-          )}
           {loading && hasSearched && (
-            <div className="p-4 text-center text-gray-500">{t('common.loading')}</div>
+            <div className="p-4 text-center text-label-secondary">{t('common.loading')}</div>
           )}
           {searchValue.trim().length < 2 && (
-            <div className="p-4 text-center text-gray-500">{t('common.select_user_dialog.type_name_or_email_minimum_2_letters')}</div>
+            <div className="p-4 text-center text-label-secondary">{t('common.select_user_dialog.type_name_or_email_minimum_2_letters')}</div>
           )}
         </div>
 

@@ -2,7 +2,7 @@ import React, { useState, useCallback, ChangeEvent, useEffect } from 'react';
 import { DocumentNode } from 'graphql';
 import { useDebouncedCallback } from 'use-debounce';
 import { useRoleMutation } from '../../hooks/authedMutation';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { prioritizeClasses } from '../../helpers/util';
 import useErrorHandler from '../../hooks/useErrorHandler';
 import { AlertMessageDialog } from '../common/dialogs/AlertMessageDialog';
@@ -21,6 +21,8 @@ type TimePickerProps = {
   isMandatory?: boolean;
   className?: string;
   saveAsDateTime?: boolean;
+  /** When true, reduces padding and margin for compact layouts (e.g. table cells) */
+  compact?: boolean;
 };
 
 const TimePicker: React.FC<TimePickerProps> = ({
@@ -33,6 +35,7 @@ const TimePicker: React.FC<TimePickerProps> = ({
   isMandatory = false,
   className = '',
   saveAsDateTime = false,
+  compact = false,
 }) => {
   const t = useTranslations('common');
   const formatTimeString = useFormatTimeString();
@@ -115,19 +118,21 @@ const TimePicker: React.FC<TimePickerProps> = ({
     timeOptions.push(formatTime(date));
   }
 
-  const baseClass = 'w-full h-12 px-3 py-3 mb-8 text-gray-500 rounded bg-edu-light-gray';
+  const baseClass = compact
+    ? 'w-full h-9 px-2 py-1.5 text-label-primary rounded bg-fill-primary'
+    : 'w-full h-12 px-3 py-3 mb-8 text-label-primary rounded bg-fill-primary';
   const finalClassName = prioritizeClasses(`${baseClass} ${className}`);
 
   return (
     <>
-      <div className="px-2">
-        <div className="text-gray-400">
+      <div className={compact ? 'px-0' : 'px-2'}>
+        <div className="text-label-primary">
           {label && (
             <div className="flex justify-between mb-2">
               <div className="flex items-center">{label}</div>
             </div>
           )}
-          <div>
+          <div className="light">
             <select className={finalClassName} onChange={handleChange} value={timeValue}>
               <option value="">{t('time_picker.select_time')}</option>
               {timeOptions.map((option) => (

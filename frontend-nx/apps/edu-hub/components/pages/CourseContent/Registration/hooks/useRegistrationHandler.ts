@@ -7,6 +7,8 @@ import { useAuthedMutation } from '../../../../../hooks/authedMutation';
 import { useUserId } from '../../../../../hooks/user';
 import { UPDATE_ENROLLMENT } from '../../../../../queries/insertEnrollment';
 import { UpdateEnrollment, UpdateEnrollmentVariables } from '../../../../../queries/__generated__/UpdateEnrollment';
+import { CREATE_STRIPE_CHECKOUT } from '../../../../../queries/stripe';
+import { CreateStripeCheckout, CreateStripeCheckoutVariables } from '../../../../../queries/__generated__/CreateStripeCheckout';
 import { getRegistrationTypeConfig, RegistrationFormData, RegistrationResult } from '../types';
 
 /**
@@ -52,10 +54,15 @@ export const useRegistrationHandler = ({
 }: UseRegistrationHandlerProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [retryEnrollmentId, setRetryEnrollmentId] = useState<number | null>(null);
   const userId = useUserId();
   
   const [updateEnrollmentMutation] = useAuthedMutation<UpdateEnrollment, UpdateEnrollmentVariables>(
     UPDATE_ENROLLMENT
+  );
+
+  const [createStripeCheckoutMutation] = useAuthedMutation<CreateStripeCheckout, CreateStripeCheckoutVariables>(
+    CREATE_STRIPE_CHECKOUT
   );
 
   const registrationType = course.registrationType || CourseRegistrationType_enum.APPROVAL_WITH_INPUT;
@@ -90,6 +97,7 @@ export const useRegistrationHandler = ({
             userId,
             motivationLetter: formData?.motivationLetter || '',
             status,
+            termsAcceptedAt: formData?.acceptTerms ? new Date().toISOString() : null,
           },
         });
 
@@ -114,12 +122,62 @@ export const useRegistrationHandler = ({
 
   const handlePaymentRegistration = useCallback(
     async (formData: RegistrationFormData): Promise<RegistrationResult> => {
-      // TODO: Implement payment logic
-      // This would integrate with a payment provider
-      console.log('Payment registration not yet implemented', formData);
-      return { success: false, error: 'Payment registration not yet implemented' };
+      if (!userId) {
+        return { success: false, error: 'User not authenticated' };
+      }
+
+      if (!course?.id) {
+        return { success: false, error: 'Course information is required' };
+      }
+
+      // Enrollment should already be created with addons via createEnrollmentWithAddons action
+      const enrollmentId = formData?.enrollmentId;
+      if (!enrollmentId) {
+        return { success: false, error: 'Enrollment ID is required. Enrollment should be created before payment.' };
+      }
+
+      setIsLoading(true);
+      try {
+        // Create Stripe Checkout session
+        // Server will read addons from CourseEnrollmentAddon table using enrollmentId
+        // URLs are built server-side from FRONTEND_URL for security
+        const checkoutResult = await createStripeCheckoutMutation({
+          variables: {
+            courseId: course.id,
+            enrollmentId,
+            formbricksResponseId: null, // Will be fetched server-side if needed
+            userEmail: null, // Will be fetched from user context server-side
+            course: null, // Will be fetched server-side from Hasura
+            addonMappings: null, // Will be fetched server-side from Hasura
+          },
+        });
+
+        if (checkoutResult.data?.createStripeCheckout?.success && checkoutResult.data.createStripeCheckout.checkoutUrl) {
+          // Redirect to Stripe Checkout
+          window.location.href = checkoutResult.data.createStripeCheckout.checkoutUrl;
+          
+          return {
+            success: true,
+            paymentUrl: checkoutResult.data.createStripeCheckout.checkoutUrl,
+            enrollmentId,
+          };
+        }
+
+        return {
+          success: false,
+          error: checkoutResult.data?.createStripeCheckout?.error || 'Failed to create checkout session',
+        };
+      } catch (error) {
+        console.error('Payment registration error:', error);
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Payment registration failed',
+        };
+      } finally {
+        setIsLoading(false);
+      }
     },
-    []
+    [course?.id, userId, createStripeCheckoutMutation]
   );
 
   const handleRegistration = useCallback(() => {
@@ -157,14 +215,30 @@ export const useRegistrationHandler = ({
     [config.requiresPayment, handlePaymentRegistration, handleDirectRegistration]
   );
 
+  const retryPayment = useCallback(
+    (enrollmentId: number): void => {
+      // Store enrollment ID for retry - RegistrationModal will fetch responses and build prefilled URL
+      setRetryEnrollmentId(enrollmentId);
+      setIsModalOpen(true);
+    },
+    []
+  );
+
+  const handleCloseModal = useCallback(() => {
+    setIsModalOpen(false);
+    setRetryEnrollmentId(null); // Clear retry enrollment ID when modal closes
+  }, []);
+
   return {
     isModalOpen,
-    setIsModalOpen,
+    closeModal: handleCloseModal,
     isLoading,
     registrationType,
     config,
     handleLogin,
     handleRegistration,
     submitRegistration,
+    retryPayment,
+    retryEnrollmentId,
   };
 }; 

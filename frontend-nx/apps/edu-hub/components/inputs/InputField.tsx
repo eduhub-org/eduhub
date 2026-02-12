@@ -4,18 +4,16 @@ import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 import InputAdornment from '@mui/material/InputAdornment';
 import { HelpOutline } from '@mui/icons-material';
-import { useTheme } from '@mui/material/styles';
 import { useDebouncedCallback } from 'use-debounce';
 import { useRoleMutation } from '../../hooks/authedMutation';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { DebounceInput } from 'react-debounce-input';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { prioritizeClasses } from '../../helpers/util';
+import { prioritizeClasses, isLinkFormat, isECTSFormat } from '../../helpers/util';
 import useErrorHandler from '../../hooks/useErrorHandler';
 import { AlertMessageDialog } from '../common/dialogs/AlertMessageDialog';
 import { ErrorMessageDialog } from '../common/dialogs/ErrorMessageDialog';
-import { isLinkFormat, isECTSFormat } from '../../helpers/util';
 import NotificationSnackbar from '../common/dialogs/NotificationSnackbar';
 import { gql } from 'graphql-tag';
 
@@ -171,6 +169,11 @@ type InputFieldProps = {
   max?: number;
 
   /**
+   * When true, reduces margin for compact layouts (e.g. table cells).
+   */
+  compact?: boolean;
+
+  /**
    * Allows for additional props to be passed.
    */
   [x: string]: any;
@@ -195,9 +198,11 @@ const InputField: React.FC<InputFieldProps> = ({
   forceNotifyByEnter = false,
   showCharacterCount = true,
   invertColors = false,
+  compact = false,
   min,
   max,
-  immediateUpdate, // Extract this prop to prevent it from being spread to DOM elements
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Extract this prop to prevent it from being spread to DOM elements
+  immediateUpdate: _immediateUpdate,
   ...props
 }) => {
   const t = useTranslations('common');
@@ -205,7 +210,6 @@ const InputField: React.FC<InputFieldProps> = ({
   const [hasBlurred, setHasBlurred] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const { error, handleError, resetError } = useErrorHandler();
-  const theme = useTheme();
   const [showSavedNotification, setShowSavedNotification] = useState(false);
 
   useEffect(() => {
@@ -229,7 +233,7 @@ const InputField: React.FC<InputFieldProps> = ({
         itemId,
         // If type is number, convert the text to number
         ...(type === 'number' 
-          ? { text: parseInt(localText, 10) }
+          ? { text: Number.parseInt(localText, 10) }
           : { text: localText }
         )
       },
@@ -250,9 +254,9 @@ const InputField: React.FC<InputFieldProps> = ({
         case 'ects':
           return isECTSFormat(text);
         case 'number': {
-          const num = parseInt(text, 10);
+          const num = Number.parseInt(text, 10);
           return (
-            !isNaN(num) &&
+            !Number.isNaN(num) &&
             Number.isInteger(num) &&
             (min === undefined || num >= min) &&
             (max === undefined || num <= max)
@@ -275,7 +279,7 @@ const InputField: React.FC<InputFieldProps> = ({
         case 'ects':
           return t('input_field.invalid_ects_format');
         case 'number': {
-          if (!Number.isInteger(parseInt(value, 10))) {
+          if (!Number.isInteger(Number.parseInt(value, 10))) {
             return t('input_field.invalid_integer_format');
           }
           if (min !== undefined && max !== undefined) {
@@ -339,13 +343,13 @@ const InputField: React.FC<InputFieldProps> = ({
   const [showPreview, setShowPreview] = useState(false);
   const togglePreview = () => setShowPreview(!showPreview);
 
-  const baseClass = `w-full px-3 py-3 mb-8 rounded ${
-    invertColors ? 'bg-gray-200 text-black' : 'text-gray-500 bg-edu-light-gray'
+  const baseClass = `w-full px-3 py-3 ${compact ? 'mb-0' : 'mb-8'} rounded ${
+    invertColors ? 'bg-gray-200 text-black' : 'text-label-primary bg-fill-primary'
   }`;
   const finalClassName = prioritizeClasses(`${baseClass} ${className}`);
 
   const renderMaterialUI = () => (
-    <div className="col-span-10 flex mt-3">
+    <div className={`col-span-10 flex ${compact ? 'mt-0' : 'mt-3'} ${props.fullWidth ? 'w-full min-w-0' : ''}`}>
       <TextField
         className={hasBlurred && errorMessage ? 'w-3/4' : 'w-full'}
         variant="standard"
@@ -355,20 +359,17 @@ const InputField: React.FC<InputFieldProps> = ({
         onChange={handleTextChange}
         onBlur={handleBlur}
         slotProps={{
-          inputLabel: {
-            style: { color: hasBlurred && errorMessage ? 'red' : 'rgb(34, 34, 34)' },
-          },
           input: {
-            style: { color: hasBlurred && errorMessage ? 'red' : 'inherit' },
             endAdornment: (
               <InputAdornment position="end">
                 <Tooltip title={helpText || ''} placement="top">
-                  <HelpOutline style={{ cursor: 'pointer', color: theme.palette.text.disabled }} />
+                  <HelpOutline style={{ cursor: 'pointer', color: 'var(--eduhub-label-disabled)' }} />
                 </Tooltip>
               </InputAdornment>
             ),
           },
         }}
+        error={hasBlurred && !!errorMessage}
         {...props}
       />
       {hasBlurred && errorMessage && <p className="text-red-500 mt-2 ml-2 text-sm">{errorMessage}</p>}
@@ -382,56 +383,60 @@ const InputField: React.FC<InputFieldProps> = ({
 
   const renderEduHub = () => (
     <div className="px-2">
-      <div className="text-gray-400">
-        <div className="flex justify-between mb-2">
-          <div className="flex items-center">
-            {helpText && (
-              <Tooltip title={helpText} placement="top">
-                <HelpOutline style={{ cursor: 'pointer', marginRight: '5px' }} />
-              </Tooltip>
-            )}
-            {label}
-          </div>
-          {type === 'markdown' && (
+      <div className="text-label-primary">
+        {(label || helpText || type === 'markdown') && (
+          <div className="flex justify-between mb-2">
+            <div className="flex items-center">
+              {helpText && (
+                <Tooltip title={helpText} placement="top">
+                  <HelpOutline style={{ cursor: 'pointer', marginRight: '5px' }} />
+                </Tooltip>
+              )}
+              {label}
+            </div>
+            {type === 'markdown' && (
             <button className="text-white text-xs px-3 pt-2" onClick={togglePreview}>
               {showPreview ? <u>{t('edit_markdown')}</u> : <u>{t('preview')}</u>}
             </button>
           )}
-        </div>
-        {type === 'markdown' && showPreview ? (
-          <div className={`${finalClassName} bg-gray-600`.trim()}>
-            <ReactMarkdown
-              className="prose max-w-none text-white whitespace-normal break-words"
-              remarkPlugins={[remarkGfm]}
-            >
-              {localText}
-            </ReactMarkdown>
-          </div>
-        ) : (
-          <div className="relative">
-            <DebounceInput
-              element={type === 'textarea' || type === 'markdown' ? 'textarea' : 'input'}
-              type={type === 'number' ? 'number' : type === 'ects' ? 'number' : 'text'}
-              debounceTimeout={debounceTimeout}
-              forceNotifyByEnter={forceNotifyByEnter}
-              className={`${finalClassName} ${errorMessage ? 'border-red-500' : ''}`}
-              value={localText}
-              onChange={handleTextChange}
-              onBlur={handleBlur}
-              maxLength={maxLength}
-              placeholder={placeholder}
-              min={type === 'number' ? min : undefined}
-              max={type === 'number' ? max : undefined}
-              step={type === 'number' ? 1 : undefined}
-              {...props}
-            />
-            {showCharacterCount && type !== 'ects' && (
-              <div className="absolute top-0 right-0 mr-2 mt-1 text-xs text-gray-400">
-                {`${localText.length}/${maxLength}`}
-              </div>
-            )}
           </div>
         )}
+        <div className="light">
+          {type === 'markdown' && showPreview ? (
+            <div className={`${finalClassName} bg-gray-600`.trim()}>
+              <ReactMarkdown
+                className="prose max-w-none text-white whitespace-normal break-words"
+                remarkPlugins={[remarkGfm]}
+              >
+                {localText}
+              </ReactMarkdown>
+            </div>
+          ) : (
+            <div className="relative">
+              <DebounceInput
+                element={type === 'textarea' || type === 'markdown' ? 'textarea' : 'input'}
+                type={type === 'number' ? 'number' : type === 'ects' ? 'number' : 'text'}
+                debounceTimeout={debounceTimeout}
+                forceNotifyByEnter={forceNotifyByEnter}
+                className={`${finalClassName} ${errorMessage ? 'border-red-500' : ''}`}
+                value={localText}
+                onChange={handleTextChange}
+                onBlur={handleBlur}
+                maxLength={maxLength}
+                placeholder={placeholder}
+                min={type === 'number' ? min : undefined}
+                max={type === 'number' ? max : undefined}
+                step={type === 'number' ? 1 : undefined}
+                {...props}
+              />
+              {showCharacterCount && type !== 'ects' && (
+                <div className="absolute top-0 right-0 mr-2 mt-1 text-xs text-label-secondary">
+                  {`${localText.length}/${maxLength}`}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
       {error && <AlertMessageDialog alert={error} open={!!error} onClose={resetError} />}
       <NotificationSnackbar

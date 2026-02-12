@@ -2,7 +2,7 @@ import React, { FC, useEffect, useState } from 'react';
 import { GetApp } from '@mui/icons-material';
 import { Button } from '../common/Button';
 import { useSignedUrl } from '../../hooks/signedUrl';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { ErrorMessageDialog } from '../common/dialogs/ErrorMessageDialog';
 
 interface IProps {

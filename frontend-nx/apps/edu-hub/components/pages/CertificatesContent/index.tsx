@@ -1,6 +1,6 @@
 import React, { FC, useState, useEffect, ErrorInfo, ReactNode } from 'react';
 import { useSession } from 'next-auth/react';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { CircularProgress } from '@mui/material';
 import Link from 'next/link';
 import { useRoleQuery } from '../../../hooks/authedQuery';

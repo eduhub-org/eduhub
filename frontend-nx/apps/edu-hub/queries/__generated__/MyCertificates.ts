@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { CourseEnrollmentStatus_enum, CourseStatus_enum, Weekday_enum, CourseRegistrationType_enum, ProgramType_enum } from "./../../__generated__/globalTypes";
+import { CourseEnrollmentStatus_enum, PaymentStatus_enum, CourseStatus_enum, Weekday_enum, CourseRegistrationType_enum, ProgramType_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: MyCertificates
@@ -83,10 +83,6 @@ export interface MyCertificates_CourseEnrollment_Course {
    */
   applicationEnd: any;
   /**
-   * A text providing info about the costs of a participation.
-   */
-  cost: string;
-  /**
    * Indicates whether participants can get an achievement certificate. If the course is offering ECTS, it must be possible to obtain this certificate for the course
    */
   achievementCertificatePossible: boolean;
@@ -164,6 +160,10 @@ export interface MyCertificates_CourseEnrollment {
    * The users current enrollment status to this course
    */
   status: CourseEnrollmentStatus_enum;
+  /**
+   * Current payment status
+   */
+  paymentStatus: PaymentStatus_enum | null;
   /**
    * URL to the file containing the user's achievement certificate (if he obtained one)
    */

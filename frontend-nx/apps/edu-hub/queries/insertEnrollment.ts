@@ -9,6 +9,7 @@ export const UPDATE_ENROLLMENT = gql`
     $courseId: Int!
     $motivationLetter: String!
     $status: CourseEnrollmentStatus_enum!
+    $termsAcceptedAt: timestamptz
   ) {
     insert_CourseEnrollment(
       objects: {
@@ -16,10 +17,11 @@ export const UPDATE_ENROLLMENT = gql`
         courseId: $courseId
         motivationLetter: $motivationLetter,
         status: $status
+        termsAcceptedAt: $termsAcceptedAt
       },
       on_conflict: {
         constraint: uniqueUserCourse,
-        update_columns: [status]
+        update_columns: [status, termsAcceptedAt]
       }
     ) {
       affected_rows

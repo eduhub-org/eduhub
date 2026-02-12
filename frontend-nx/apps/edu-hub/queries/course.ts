@@ -137,18 +137,18 @@ export const INSERT_SESSION = gql`
 `;
 
 export const DELETE_SESSION = gql`
-  mutation DeleteSession($sessionId: Int!) {
-    delete_Session_by_pk(id: $sessionId) {
+  mutation DeleteSession($id: Int!) {
+    delete_Session_by_pk(id: $id) {
       id
     }
   }
 `;
 
 export const UPDATE_SESSION_TITLE = gql`
-  mutation UpdateSessionTitle($sessionId: Int!, $title: String!) {
+  mutation UpdateSessionTitle($itemId: Int!, $text: String!) {
     update_Session_by_pk(
-      pk_columns: { id: $sessionId }
-      _set: { title: $title }
+      pk_columns: { id: $itemId }
+      _set: { title: $text }
     ) {
       id
     }
@@ -171,6 +171,17 @@ export const UPDATE_SESSION_END_TIME = gql`
     update_Session_by_pk(
       pk_columns: { id: $sessionId }
       _set: { endDateTime: $value }
+    ) {
+      id
+    }
+  }
+`;
+
+export const UPDATE_SESSION_DESCRIPTION = gql`
+  mutation UpdateSessionDescription($itemId: Int!, $text: String!) {
+    update_Session_by_pk(
+      pk_columns: { id: $itemId }
+      _set: { description: $text }
     ) {
       id
     }
@@ -620,6 +631,30 @@ export const UPDATE_COURSE_FORMBRICKS_ENROLLMENT_SURVEY = gql`
     ) {
       id
       formbricksEnrollmentSurveyUrl
+    }
+  }
+`;
+
+export const UPDATE_COURSE_BASE_PRICE = gql`
+  mutation UpdateCourseBasePrice($itemId: Int!, $text: Int!) {
+    update_Course_by_pk(
+      pk_columns: { id: $itemId }
+      _set: { basePrice: $text }
+    ) {
+      id
+      basePrice
+    }
+  }
+`;
+
+export const UPDATE_COURSE_CURRENCY = gql`
+  mutation UpdateCourseCurrency($itemId: Int!, $value: String!) {
+    update_Course_by_pk(
+      pk_columns: { id: $itemId }
+      _set: { currency: $value }
+    ) {
+      id
+      currency
     }
   }
 `;

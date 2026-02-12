@@ -7,7 +7,7 @@ import Script from 'next/script';
 import { useRouter } from 'next/router';
 import * as fbq from '../lib/fpixel';
 import { AppCacheProvider } from '@mui/material-nextjs/v15-pagesRouter';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { ThemeProvider } from '@mui/material/styles';
 import { NextIntlClientProvider } from 'next-intl';
 
 import { registerLocale, setDefaultLocale } from 'react-datepicker';
@@ -26,8 +26,6 @@ const messages: Record<string, Record<string, unknown>> = {
   en: enMessages,
 };
 
-const theme = createTheme();
-
 registerLocale('de', de);
 registerLocale('en', enUS);
 
@@ -39,6 +37,7 @@ if (process.env.NEXT_PUBLIC_ENVIRONMENT === 'production') {
 }
 
 import { client } from '../config/apollo';
+import { theme } from '../config/theme';
 
 import '../styles/globals.css';
 import '../styles/widget.css';

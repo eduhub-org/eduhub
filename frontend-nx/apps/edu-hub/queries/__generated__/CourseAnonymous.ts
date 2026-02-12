@@ -275,6 +275,17 @@ export interface CourseAnonymous_Course_by_pk_CourseFundingOrganizations {
   Organization: CourseAnonymous_Course_by_pk_CourseFundingOrganizations_Organization;
 }
 
+export interface CourseAnonymous_Course_by_pk_CourseAddonMappings {
+  __typename: "CourseAddonMapping";
+  id: number;
+  description: string;
+  /**
+   * Admin-validated price (in cents), can override extracted price
+   */
+  validatedPrice: number;
+  currency: string;
+}
+
 export interface CourseAnonymous_Course_by_pk {
   __typename: "Course";
   id: number;
@@ -290,10 +301,6 @@ export interface CourseAnonymous_Course_by_pk {
    * The day of the week the course takes place.
    */
   weekDay: Weekday_enum;
-  /**
-   * A text providing info about the costs of a participation.
-   */
-  cost: string;
   /**
    * Decides whether the course is published for all users or not.
    */
@@ -403,6 +410,18 @@ export interface CourseAnonymous_Course_by_pk {
    * An array relationship
    */
   CourseFundingOrganizations: CourseAnonymous_Course_by_pk_CourseFundingOrganizations[];
+  /**
+   * Base price in cents (e.g., 5000 = €50.00)
+   */
+  basePrice: number | null;
+  /**
+   * Currency code (EUR, USD, etc.)
+   */
+  currency: string | null;
+  /**
+   * An array relationship
+   */
+  CourseAddonMappings: CourseAnonymous_Course_by_pk_CourseAddonMappings[];
 }
 
 export interface CourseAnonymous {

@@ -157,14 +157,6 @@ export interface AchievementOptionList_AchievementOption {
    * If the record tye is "DOCUMENTATION_AND_CSV" an URL to a python script can be provided that returns a score for uploaded csv data.
    */
   evaluationScriptUrl: string | null;
-  /**
-   * URL to the template that shall be used for uploading csv data for a new achievement record
-   */
-  csvTemplateUrl: string | null;
-  /**
-   * For TRUE the score table will include a column showing the authors; for FALSE the scores will be anonymous.
-   */
-  showScoreAuthors: boolean | null;
   achievementDocumentationTemplateId: number | null;
   /**
    * An object relationship
@@ -180,16 +172,30 @@ export interface AchievementOptionList_AchievementOption {
   AchievementOptionMentors: AchievementOptionList_AchievementOption_AchievementOptionMentors[];
 }
 
+export interface AchievementOptionList_AchievementOption_aggregate_aggregate {
+  __typename: "AchievementOption_aggregate_fields";
+  count: number;
+}
+
+export interface AchievementOptionList_AchievementOption_aggregate {
+  __typename: "AchievementOption_aggregate";
+  aggregate: AchievementOptionList_AchievementOption_aggregate_aggregate | null;
+}
+
 export interface AchievementOptionList {
   /**
    * fetch data from the table: "AchievementOption"
    */
   AchievementOption: AchievementOptionList_AchievementOption[];
+  /**
+   * fetch aggregated fields from the table: "AchievementOption"
+   */
+  AchievementOption_aggregate: AchievementOptionList_AchievementOption_aggregate;
 }
 
 export interface AchievementOptionListVariables {
   where: AchievementOption_bool_exp;
   limit?: number | null;
   offset?: number | null;
-  orderBy?: AchievementOption_order_by | null;
+  order_by?: AchievementOption_order_by[] | null;
 }

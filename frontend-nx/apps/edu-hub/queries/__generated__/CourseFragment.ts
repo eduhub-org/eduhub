@@ -279,6 +279,17 @@ export interface CourseFragment_CourseFundingOrganizations {
   Organization: CourseFragment_CourseFundingOrganizations_Organization;
 }
 
+export interface CourseFragment_CourseAddonMappings {
+  __typename: "CourseAddonMapping";
+  id: number;
+  description: string;
+  /**
+   * Admin-validated price (in cents), can override extracted price
+   */
+  validatedPrice: number;
+  currency: string;
+}
+
 export interface CourseFragment {
   __typename: "Course";
   id: number;
@@ -294,10 +305,6 @@ export interface CourseFragment {
    * The day of the week the course takes place.
    */
   weekDay: Weekday_enum;
-  /**
-   * A text providing info about the costs of a participation.
-   */
-  cost: string;
   /**
    * Decides whether the course is published for all users or not.
    */
@@ -407,4 +414,16 @@ export interface CourseFragment {
    * An array relationship
    */
   CourseFundingOrganizations: CourseFragment_CourseFundingOrganizations[];
+  /**
+   * Base price in cents (e.g., 5000 = €50.00)
+   */
+  basePrice: number | null;
+  /**
+   * Currency code (EUR, USD, etc.)
+   */
+  currency: string | null;
+  /**
+   * An array relationship
+   */
+  CourseAddonMappings: CourseFragment_CourseAddonMappings[];
 }

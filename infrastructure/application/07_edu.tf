@@ -83,6 +83,10 @@ resource "google_cloud_run_service" "eduhub" {
           name  = "STORAGE_BUCKET_URL"
           value = "https://storage.googleapis.com/storage/v1/${var.project_id}"
         }
+        env {
+          name  = "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY"
+          value = var.stripe_publishable_key
+        }
       }
     }
 

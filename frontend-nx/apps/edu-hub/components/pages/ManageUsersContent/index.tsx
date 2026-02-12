@@ -1,5 +1,5 @@
 import { FC, ReactNode, useMemo, useCallback, useState } from 'react';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { ColumnDef } from '@tanstack/react-table';
 
 import TableGrid from '../../common/TableGrid';
@@ -19,27 +19,27 @@ const ExpandableUserRow: FC<{ row: UsersByLastName_User }> = ({ row }) => {
   const t = useTranslations('manageUsers');
   return (
     <div>
-      <div className="font-medium bg-edu-course-list grid grid-cols-[repeat(auto-fill,minmax(100px,1fr))]">
+      <div className="font-medium bg-fill-primary text-label-primary light grid grid-cols-[repeat(auto-fill,minmax(100px,1fr))]">
         <div className="pl-3 col-span-3">
-          <p className="text-gray-700 truncate font-medium">{`${t('occupation')}: ${
+          <p className="text-label-primary truncate font-medium">{`${t('occupation')}: ${
             row.occupation ? t(`profile:occupation.${row.occupation}`) : '-'
           }`}</p>
         </div>
         <div className="pl-3 col-span-3">
-          <p className="text-gray-700 truncate font-medium">{`${t('organization')}: ${
+          <p className="text-label-primary truncate font-medium">{`${t('organization')}: ${
             row.Organization?.name ? row.Organization.name : '-'
           }`}</p>
         </div>
         <div className="pl-3 col-span-3">
-          <p className="text-gray-700 truncate font-medium">{`${t('matriculation_number')}: ${
+          <p className="text-label-primary truncate font-medium">{`${t('matriculation_number')}: ${
             row.matriculationNumber ? `${row.matriculationNumber}` : '-'
           }`}</p>
         </div>
       </div>
-      <div className="font-medium bg-edu-course-list flex py-4">
+      <div className="font-medium bg-fill-primary text-label-primary light flex py-4">
         <div className="pl-3">
           {row.CourseEnrollments.map((enrollment, index) => (
-            <p key={index} className="text-gray-600 truncate text-sm">
+            <p key={index} className="text-label-secondary truncate text-sm">
               {enrollment.Course.title} ({enrollment.Course.Program.shortTitle}) - {enrollment.status}
             </p>
           ))}
@@ -59,10 +59,23 @@ const ManageUsersContent: FC = () => {
     setPageIndex(0); // Reset to first page when page size changes
   };
 
-  const { data, loading, error, pageIndex, setPageIndex, searchFilter, setSearchFilter, refetch } = useTableGrid({
+  const { data, loading, error, pageIndex, sorting, setPageIndex, setSorting, searchFilter, setSearchFilter, refetch } = useTableGrid({
     queryHook: useAdminQuery,
     query: USERS_BY_LAST_NAME,
     pageSize: pageSize,
+    sortColumnMapper: (columnId) => {
+      // Map table column IDs to GraphQL field names
+      switch (columnId) {
+        case 'firstName':
+          return 'firstName';
+        case 'lastName':
+          return 'lastName';
+        case 'email':
+          return 'email';
+        default:
+          return null;
+      }
+    },
     refetchFilter: (searchFilter) => {
       const searchCondition = createMultiWordSearchCondition(searchFilter, ['lastName', 'firstName', 'email']);
       return {
@@ -127,6 +140,8 @@ const ManageUsersContent: FC = () => {
               onPageSizeChange={handlePageSizeChange}
               searchFilter={searchFilter}
               onSearchFilterChange={setSearchFilter}
+              sorting={sorting}
+              onSortingChange={setSorting}
               deleteMutation={DELETE_USER}
               deleteIdType="uuidString"
               error={error}

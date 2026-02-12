@@ -37,21 +37,20 @@ export const REGISTRATION_TYPE_CONFIG: Record<CourseRegistrationType_enum, Regis
     isExternal: false,
     isDirect: true,
   },
-  // Note: These will be added when payment functionality is implemented
-  // [CourseRegistrationType_enum.DIRECT_WITH_INPUT_AND_PAYMENT]: {
-  //   requiresInput: true,
-  //   requiresApproval: false,
-  //   requiresPayment: true,
-  //   isExternal: false,
-  //   isDirect: true,
-  // },
-  // [CourseRegistrationType_enum.DIRECT_CONFIRMATION_AND_PAYMENT]: {
-  //   requiresInput: false,
-  //   requiresApproval: false,
-  //   requiresPayment: true,
-  //   isExternal: false,
-  //   isDirect: true,
-  // },
+  [CourseRegistrationType_enum.DIRECT_WITH_INPUT_AND_PAYMENT]: {
+    requiresInput: true,
+    requiresApproval: false,
+    requiresPayment: true,
+    isExternal: false,
+    isDirect: true,
+  },
+  [CourseRegistrationType_enum.DIRECT_CONFIRMATION_AND_PAYMENT]: {
+    requiresInput: false,
+    requiresApproval: false,
+    requiresPayment: true,
+    isExternal: false,
+    isDirect: true,
+  },
 };
 
 export const getRegistrationTypeConfig = (
@@ -60,10 +59,21 @@ export const getRegistrationTypeConfig = (
   return REGISTRATION_TYPE_CONFIG[registrationType];
 };
 
+export interface SelectedAddon {
+  id: number;
+  description: string;
+  validatedPrice: number;
+  currency: string;
+  questionId: string;
+  choiceId: string;
+}
+
 export interface RegistrationFormData {
   motivationLetter?: string;
   paymentMethod?: string;
   acceptTerms?: boolean;
+  enrollmentId?: number;  // Enrollment ID for payment flows (enrollment created with addons before payment)
+  selectedAddons?: SelectedAddon[];  // Deprecated: kept for backward compatibility, not used for payment flows
 }
 
 export interface RegistrationResult {

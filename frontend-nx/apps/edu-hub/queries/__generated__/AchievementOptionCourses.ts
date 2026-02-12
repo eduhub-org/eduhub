@@ -34,14 +34,6 @@ export interface AchievementOptionCourses_AchievementOptionCourse_AchievementOpt
    * If the record tye is "DOCUMENTATION_AND_CSV" an URL to a python script can be provided that returns a score for uploaded csv data.
    */
   evaluationScriptUrl: string | null;
-  /**
-   * URL to the template that shall be used for uploading csv data for a new achievement record
-   */
-  csvTemplateUrl: string | null;
-  /**
-   * For TRUE the score table will include a column showing the authors; for FALSE the scores will be anonymous.
-   */
-  showScoreAuthors: boolean | null;
   achievementDocumentationTemplateId: number | null;
   /**
    * An object relationship

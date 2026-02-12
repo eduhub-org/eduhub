@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router';
 import { FC, useCallback } from 'react';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 
 import { Button } from '../common/Button';
 
@@ -20,8 +20,10 @@ export const RegisterButton: FC = () => {
   }, [router]);
 
   return (
-    <Button onClick={register} filled inverted>
-      {t('registerButton')}
-    </Button>
+    <div className="light">
+      <Button onClick={register} className="!border bg-fill-primary text-label-primary border-border-secondary hover:border-brand">
+        {t('registerButton')}
+      </Button>
+    </div>
   );
 };

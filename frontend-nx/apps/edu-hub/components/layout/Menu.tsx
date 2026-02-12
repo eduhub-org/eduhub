@@ -3,9 +3,10 @@ import MaterialMenu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { styled } from '@mui/material/styles';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { FC, useCallback } from 'react';
-import { useIsAdmin } from '../../hooks/authentication';
-import { useTranslations, useLocale } from 'next-intl';
+import { useIsAdmin, useIsInstructor } from '../../hooks/authentication';
+import { useTranslations } from 'next-intl';
 import useLogout from '../../hooks/logout';
 
 interface IProps {
@@ -19,10 +20,31 @@ const StyledMenu = styled(MaterialMenu)(() => ({
   '& .MuiPaper-root': {
     minWidth: '225px',
     padding: '1rem 2rem',
+    backgroundColor: 'var(--eduhub-fill-primary, #ffffff) !important',
+    color: 'var(--eduhub-label-primary, #222222) !important',
+    borderRadius: '8px',
+    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+  },
+  '& .MuiMenuItem-root': {
+    color: 'var(--eduhub-label-primary, #222222) !important',
+    backgroundColor: 'var(--eduhub-fill-primary, #ffffff) !important',
+    padding: '0.75rem 1rem',
+    '&:hover': {
+      backgroundColor: '#E5E5E5 !important', // Slightly darker than selected for better contrast
+    },
+    '&.Mui-selected': {
+      backgroundColor: 'var(--eduhub-bg-secondary, #F2F2F2) !important',
+      borderLeft: '3px solid var(--eduhub-warning)',
+      paddingLeft: 'calc(1rem - 3px)',
+      '&:hover': {
+        backgroundColor: '#E5E5E5 !important', // Slightly darker than selected
+      },
+    },
   },
 }));
 
 export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
+  const router = useRouter();
   const hideMenu = useCallback(() => setVisible(false), [setVisible]);
 
   const closeMenu = useCallback(() => {
@@ -30,10 +52,17 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
   }, [setVisible]);
 
   const isAdmin = useIsAdmin();
+  const isInstructor = useIsInstructor();
+  const isInstructorOrAdmin = isAdmin || isInstructor;
 
   const t = useTranslations('common');
 
   const logout = useLogout();
+
+  const isActiveRoute = (href: string) => {
+    if (href.startsWith('http')) return false;
+    return router.pathname === href || router.asPath === href;
+  };
 
   return (
     <StyledMenu
@@ -50,21 +79,24 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
         vertical: 'top',
         horizontal: 'right',
       }}
+      PaperProps={{
+        className: 'light',
+      }}
     >
-      <MenuItem onClick={closeMenu}>
+      <MenuItem onClick={closeMenu} selected={isActiveRoute('/profile')}>
         <Link className="w-full text-lg" href="/profile">
           {t('menu.profile')}
         </Link>
       </MenuItem>
 
-      <MenuItem onClick={closeMenu}>
+      <MenuItem onClick={closeMenu} selected={isActiveRoute('/my-certificates')}>
         <Link className="w-full text-lg" href="/my-certificates">
           {t('menu.my_certificates')}
         </Link>
       </MenuItem>
 
       {isAdmin && (
-        <MenuItem onClick={closeMenu}>
+        <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/courses')}>
           <Link className="w-full text-lg" href="/manage/courses">
             {t('menu.courses')}
           </Link>
@@ -72,7 +104,7 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
       )}
 
       {isAdmin && (
-        <MenuItem onClick={closeMenu}>
+        <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/programs')}>
           <Link className="w-full text-lg" href="/manage/programs">
             {t('menu.programs')}
           </Link>
@@ -80,7 +112,7 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
       )}
 
       {isAdmin && (
-        <MenuItem onClick={closeMenu}>
+        <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/users')}>
           <Link className="w-full text-lg" href="/manage/users">
             {t('menu.user')}
           </Link>
@@ -88,7 +120,7 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
       )}
 
       {isAdmin && (
-        <MenuItem onClick={closeMenu}>
+        <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/experts')}>
           <Link className="w-full text-lg" href="/manage/experts">
             {t('menu.experts')}
           </Link>
@@ -96,7 +128,7 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
       )}
 
       {isAdmin && (
-        <MenuItem onClick={closeMenu}>
+        <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/organizations')}>
           <Link className="w-full text-lg" href="/manage/organizations">
             {t('menu.organizations')}
           </Link>
@@ -104,7 +136,7 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
       )}
 
       {isAdmin && (
-        <MenuItem onClick={closeMenu}>
+        <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/location-addresses')}>
           <Link className="w-full text-lg" href="/manage/location-addresses">
             {t('menu.location_addresses')}
           </Link>
@@ -112,22 +144,15 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
       )}
 
       {isAdmin && (
-        <MenuItem onClick={closeMenu}>
+        <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/achievement-options')}>
           <Link className="w-full text-lg" href="/manage/achievement-options">
             {t('menu.achievements')}
           </Link>
         </MenuItem>
       )}
-      {isAdmin && (
-        <MenuItem onClick={closeMenu}>
-          <Link className="w-full text-lg" href="/manage/achievement-templates">
-            {t('menu.achievement_templates')}
-          </Link>
-        </MenuItem>
-      )}
 
       {isAdmin && (
-        <MenuItem onClick={closeMenu}>
+        <MenuItem onClick={closeMenu} selected={isActiveRoute('/statistics')}>
           <Link className="w-full text-lg" href="/statistics">
             {t('menu.statistics')}
           </Link>
@@ -135,7 +160,7 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
       )}
 
       {isAdmin && (
-        <MenuItem onClick={closeMenu}>
+        <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/email-templates')}>
           <Link className="w-full text-lg" href="/manage/email-templates">
             {t('menu.email_templates')}
           </Link>
@@ -143,9 +168,22 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
       )}
 
       {isAdmin && (
-        <MenuItem onClick={closeMenu}>
+        <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/app-settings')}>
           <Link className="w-full text-lg" href="/manage/app-settings">
             {t('menu.app_settings')}
+          </Link>
+        </MenuItem>
+      )}
+
+      {isInstructorOrAdmin && (
+        <MenuItem onClick={closeMenu}>
+          <Link
+            className="w-full text-lg"
+            href="https://opencampus.gitbook.io/kursleitungshandbuch/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {t('menu.kursleitungshandbuch')}
           </Link>
         </MenuItem>
       )}

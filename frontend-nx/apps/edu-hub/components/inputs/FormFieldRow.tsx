@@ -1,5 +1,5 @@
 import { useFormContext } from 'react-hook-form';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 
 import type { InputHTMLAttributes, SelectHTMLAttributes } from 'react';
 
@@ -34,8 +34,8 @@ const FormFieldRow = <FieldNames,>({
   const t = useTranslations();
 
   return (
-    <div className={`relative ${formColor}`}>
-      <label htmlFor={name} className={`${className} text-xs uppercase tracking-widest font-medium ${formColor}`}>
+    <div className={`light relative ${formColor || 'text-label-primary'}`}>
+      <label htmlFor={name} className={`${className} text-xs uppercase tracking-widest font-medium ${formColor || 'text-label-primary'}`}>
         {label}
       </label>
       {(type === 'text' || type === 'email') && (
@@ -44,7 +44,7 @@ const FormFieldRow = <FieldNames,>({
           type={type}
           placeholder={placeholder || label}
           {...register(name, { required })}
-          className={`bg-edu-light-gray p-4 mb-5 w-full block ${formColor}`}
+          className={`bg-fill-primary p-4 mb-5 w-full block ${formColor || 'text-label-primary'}`}
           aria-invalid={errors[name] ? 'true' : 'false'}
           {...rest}
         />
@@ -53,7 +53,7 @@ const FormFieldRow = <FieldNames,>({
         <select
           id={name}
           {...register(name, { required })}
-          className={`bg-edu-light-gray p-4 mb-5 w-full block ${formColor}`}
+          className={`bg-fill-primary p-4 mb-5 w-full block ${formColor || 'text-label-primary'}`}
           aria-invalid={errors[name] ? 'true' : 'false'}
           defaultValue=""
           {...rest}

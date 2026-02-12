@@ -183,9 +183,9 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
         <div className="mx-4 mb-4">
           <div className="flex items-center mb-2">
             <Tooltip title={t('learning_goals.help_text')} placement="top">
-              <HelpOutline style={{ cursor: 'pointer', marginRight: '5px', color: 'gray' }} />
+              <HelpOutline className="text-label-primary cursor-pointer mr-1" />
             </Tooltip>
-            <h3 className="text-gray-400 text-md">{t('learning_goals.label')}</h3>
+            <h3 className="text-label-primary text-md">{t('learning_goals.label')}</h3>
           </div>
           <div className="p-4 h-64 overflow-y-auto text-white">
             {course.learningGoals ? (
@@ -334,7 +334,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
       </div>
 
       <div>
-        <div className="grid grid-cols-12 text-gray-400 px-2">
+        <div className="grid grid-cols-12 text-label-primary px-2">
           <div className="col-span-2">{t('location.label')}</div>
           <div className="col-span-7">{t('address.label')}</div>
         </div>

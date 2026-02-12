@@ -49,6 +49,7 @@
       "email_templates": "E-Mail-Vorlagen",
       "app_settings": "App-Einstellungen",
       "statistics": "Statistiken",
+      "kursleitungshandbuch": "Kursleitungshandbuch",
       "logout": "Logout"
     },
     "change-password": "Passwort oder E-Mail ändern",
@@ -373,13 +374,15 @@
       }
     },
     "registration": {
-      "application_deadline": "Anmeldeschluss: ",
+      "application_deadline": "Bewerbungsschluss: ",
+      "registration_deadline": "Anmeldeschluss: ",
       "apply_now": "Jetzt anmelden",
       "register_external": "Über externen Link registrieren",
-      "register_with_payment": "Mit Zahlung registrieren",
+      "register_with_payment": "Jetzt Registrieren",
       "register_now": "Jetzt registrieren",
       "accept_invitation": "Einladung annehmen",
-      "placeholder_motivation_letter": "Meine Motivation ..."
+      "placeholder_motivation_letter": "Meine Motivation ...",
+      "retry_payment": "Zahlung erneut versuchen"
     },
     "status": {
       "applied": "Deine Bewerbung ist in der Prüfung",
@@ -388,8 +391,18 @@
       "cancelled": "Du hast deine Einladung abgelehnt",
       "invited": "Du wurdest eingeladen und musst deine Teilnahme bestätigen",
       "invitation_expired": "Deine Einladung ist abgelaufen",
+      "payment_pending": "Deine Zahlung wurde noch nicht abgeschlossen. Du kannst deine Auswahl überprüfen und es erneut versuchen.",
+      "payment_failed": "Deine Zahlung konnte nicht verarbeitet werden. Du kannst deine Auswahl überprüfen und es erneut versuchen.",
       "application_period_ended": "Die Bewerbungsfrist  ist leider abgelaufen. Du kannst unseren <a>Newsletter</a> abonnieren, um über neue Angebote informiert zu bleiben.",
-      "application_period_ended_title": "Bewerbungsfrist abgelaufen"
+      "application_period_ended_title": "Bewerbungsfrist abgelaufen",
+      "registration_period_ended": "Die Anmeldefrist ist leider abgelaufen. Du kannst unseren <a>Newsletter</a> abonnieren, um über neue Angebote informiert zu bleiben.",
+      "registration_period_ended_title": "Anmeldefrist abgelaufen"
+    },
+    "payment": {
+      "cancelled_title": "Zahlung abgebrochen",
+      "cancelled_description": "Die Zahlung wurde abgebrochen. Du kannst es später erneut versuchen.",
+      "try_again": "Erneut versuchen",
+      "back_to_home": "Zurück zur Startseite"
     },
     "modal": {
       "title_approval": "Bewerbung",
@@ -397,9 +410,28 @@
       "title_with_payment": "Registrierung und Bezahlung",
       "motivation_letter_label": "Motivationsschreiben",
       "motivation_letter_placeholder": "Bitte erzähle uns, warum du teilnehmen möchtest...",
-      "payment_info": "Dieser Kurs kostet {cost}. Du wirst nach der Registrierung zur Zahlungsseite weitergeleitet.",
-      "accept_terms": "Ich akzeptiere die Allgemeinen Geschäftsbedingungen und die Datenschutzerklärung",
+      "summary_description": "Du bist dabei, deine Teilnahme an \"{title}\" zu bestätigen und wirst zur Zahlungsseite weitergeleitet.",
+      "pricing_summary": "Preisübersicht",
+      "base_price": "Grundpreis",
+      "addons": "Zusatzoptionen",
+      "no_addons": "Keine Zusatzoptionen",
+      "total": "Gesamtpreis",
+      "accept_terms": "Ich habe die <terms>Allgemeinen Geschäftsbedingungen (AGB)</terms> sowie die <privacy>Datenschutzerklärung</privacy> gelesen und akzeptiere sie.",
       "cancel": "Abbrechen",
+      "payment": {
+        "verifying": "Zahlung wird überprüft...",
+        "verifying_description": "Bitte warte einen Moment, während wir deine Zahlung bestätigen.",
+        "success_title": "Zahlung erfolgreich!",
+        "success_description": "Deine Zahlung wurde erfolgreich verarbeitet. Du wurdest für den Kurs angemeldet.",
+        "cancelled_title": "Zahlung abgebrochen",
+        "cancelled_description": "Die Zahlung wurde abgebrochen. Du kannst es später erneut versuchen.",
+        "error_verifying": "Fehler bei der Überprüfung",
+        "back_to_course": "Zurück zum Kurs",
+        "view_course": "Kurs ansehen",
+        "my_courses": "Meine Kurse",
+        "try_again": "Erneut versuchen",
+        "back_to_home": "Zurück zur Startseite"
+      },
       "close": "Schließen",
       "submit": "Bewerbung absenden",
       "proceed_to_payment": "Zur Zahlung",
@@ -411,12 +443,14 @@
       "motivation_letter_required": "Bitte schreib uns, warum du an diesem Kurs teilnehmen möchtest",
       "terms_required": "Bitte akzeptiere die Allgemeinen Geschäftsbedingungen",
       "registration_failed": "Registrierung fehlgeschlagen. Bitte versuche es erneut.",
-      "complete_survey_first": "Bitte fülle zuerst den Fragebogen vollständig aus."
+      "complete_survey_first": "Bitte fülle zuerst den Fragebogen vollständig aus.",
+      "no_items_to_charge": "Keine Artikel zum Berechnen. Der Kurs hat keinen Grundpreis und keine Add-ons wurden ausgewählt. Bitte kontaktiere den Support, falls dies unerwartet ist."
     },
     "formbricks": {
       "survey_title": "Bewerbungsfragebogen",
       "survey_completed": "Vielen Dank! Dein Fragebogen wurde erfolgreich eingereicht.",
-      "embed_error": "Der Fragebogen konnte nicht geladen werden. Bitte versuche es später erneut."
+      "embed_error": "Der Fragebogen konnte nicht geladen werden. Bitte versuche es später erneut.",
+      "loading_addons": "Lade Zahlungsdaten"
     },
     "onboarding_modal": {
       "decline_confirm_text": "Möchtest du die Einladung zu diesem Kurs wirklich ablehnen?",
@@ -438,6 +472,13 @@
   "coursePage": {
     "courseCosts": "Der Kurs kostet {price}",
     "courseIsFree": "Der Kurs ist kostenfrei",
+    "price_label": "Kursgebühr",
+    "add_ons": "Zusatzoptionen",
+    "free_course": "Kostenfrei",
+    "variable_price": "Preis: variabel",
+    "total": "Gesamt",
+    "pricing_section_title": "Preise",
+    "starts_at": "Startet am",
     "courseGroups": "Kursgruppen",
     "courseDegree": "Degrees",
     "courseDegreeTitle": "Teil der folgenden Degrees",
@@ -588,6 +629,7 @@
     "title": "Titel",
     "external_speakers": "Externe Referenten",
     "add_external_speaker": "Externen Referenten hinzufügen",
+    "remove_external_speaker": "Externen Referenten entfernen",
     "session_title": "Titel des Termins",
     "confirmDeleteSession": "Möchtest du den Termin wirklich löschen?",
     "cannotDeletePastSession": "Du kannst keinen Termin der in der Vergangenheit liegt löschen! Solltest du den Termin wirklich löschen wollen, kontaktiere bitte einen Administrator.",
@@ -767,6 +809,41 @@
     "course-end": "Kursende",
     "achievement-upload-deadline": "Abgabeschluss Leistungsnachweise"
   },
+  "manageAchievementOptions": {
+    "table_header": {
+      "title": "Titel",
+      "description": "Beschreibung",
+      "record_type": "Typ",
+      "mentors": "Mentoren",
+      "courses": "Kurse"
+    },
+    "title": {
+      "placeholder": "Projektname"
+    },
+    "description": {
+      "placeholder": "Projektbeschreibung eingeben"
+    },
+    "record_type": {
+      "DOCUMENTATION": "Dokumentation",
+      "ONLINE_COURSE": "Online-Kurs"
+    },
+    "documentation_template": {
+      "placeholder": "Keine Auswahl",
+      "help_text": "Vorlage für die Leistungsnachweisdokumentation"
+    },
+    "add_mentor": "Mentor hinzufügen",
+    "remove_mentor": "Mentor entfernen",
+    "add_course": "Kurs hinzufügen",
+    "manage_templates_button": "Leistungsnachweisvorlagen verwalten",
+    "notifications": {
+      "achievement_option_added": "Leistungsnachweis erfolgreich hinzugefügt",
+      "add_failed": "Hinzufügen fehlgeschlagen. Bitte versuche es erneut."
+    },
+    "delete_button": {
+      "untitled_achievement_option": "Unbenannter Leistungsnachweis",
+      "delete_achievement_option_confirmation": "Möchtest du den Leistungsnachweis '{title}' wirklich löschen?"
+    }
+  },
   "manageCourses": {
     "table_header": {
       "published": "Veröffent- licht",
@@ -822,7 +899,9 @@
         "APPROVAL_WITH_INPUT": "Zulassung mit Fragebogen und Bewerbungsprozess",
         "DIRECT_CONFIRMATION": "Direkte Zulassung ohne Fragebogen",
         "DIRECT_WITH_INPUT": "Direkte Zulassung mit Fragebogen",
-        "EXTERNAL_REGISTRATION": "Externe Anmeldung"
+        "EXTERNAL_REGISTRATION": "Externe Anmeldung",
+        "DIRECT_CONFIRMATION_AND_PAYMENT": "Direkte Zulassung mit Zahlung",
+        "DIRECT_WITH_INPUT_AND_PAYMENT": "Direkte Zulassung mit Fragebogen und Zahlung"
       }
     },
     "external_registration_link": {
@@ -888,6 +967,7 @@
     "sessions": "Termine",
     "applications": "Bewerbungen",
     "registrations": "Registrierungen",
+    "registrations_and_payments": "Registrierungen und Zahlungen",
     "participations_and_achievements": "Teilnahmen & Leistungen",
     "degree_participations": "Degree-Teilnahmen",
     "attendances": "Teilnahmen",
@@ -953,6 +1033,14 @@
     "statistics_invitations_confirmed": "Einladungen bestätigt",
     "statistics_registrations_total": "Registrierungen gesamt",
     "statistics_registrations_confirmed": "Bestätigte Registrierungen",
+    "payment_status": "Zahlung",
+    "payment_status_values": {
+      "NONE": "Keine",
+      "PENDING": "Ausstehend",
+      "COMPLETED": "Bezahlt",
+      "FAILED": "Fehlgeschlagen",
+      "REFUNDED": "Erstattet"
+    },
     "name": "Name",
     "first_name": "Vorname",
     "last_name": "Nachname",
@@ -988,12 +1076,44 @@
       "open_survey": "Fragebogen öffnen",
       "remove_survey": "Fragebogen entfernen",
       "invalid_url": "Bitte gib eine gültige Formbricks Survey URL ein",
+      "help_text": "Sammle Anmeldeinformationen und optionale Zusatzoptionen über einen Formbricks-Fragebogen.",
+      "learn_more": "Mehr erfahren",
+      "setup_dialog_title": "Formbricks Fragebogen Einrichtung",
+      "setup_dialog_content": "Der Formbricks-Fragebogen erfüllt zwei Zwecke:\n\n1. Anmeldeinformationen sammeln\nSammle Bewerberinformationen, Motivationsschreiben und andere Anmeldedetails, die in der Bewerbungsübersicht angezeigt werden.\n\n2. Add-On-Preise definieren (für kostenpflichtige Kurse)\nWenn dein Kurs kostenpflichtig ist, kannst du Fragen zu optionalen Zusatzoptionen einbinden (z.B. \"Möchtest du ein Zertifikat hinzufügen? (+€50)\"). Das System extrahiert automatisch Preise, die in den Fragen erwähnt werden.\n\nTipp: Wenn du verschiedene Preiskategorien über Add-Ons anbietest (z.B. Basis, Standard, Premium), setze den Grundpreis auf 0. Das InfoPanel zeigt dann \"Preis: variabel\" an. Weitere Details findest du im Hilfetext des Grundpreises.\n\n---\n\nHidden Fields Konfiguration\n\nWichtig: Du musst Hidden Fields in deinem Formbricks Survey konfigurieren!\n\nErforderliche Hidden Fields:\n• eduhubUserId - Wird automatisch mit der EduHub Benutzer-ID befüllt\n• eduhubCourseId - Wird automatisch mit der Kurs-ID befüllt\n• eduhubEnrollmentId - Wird automatisch mit der Anmeldungs-ID befüllt (optional)\n\nIn Formbricks: Survey bearbeiten → Hidden Fields aktivieren → Diese Feld-IDs hinzufügen. Ohne diese Konfiguration können Antworten nicht korrekt zugeordnet werden.\n\nHinweis: eduhubEnrollmentId ist optional, da die Anmeldung erst nach Abschluss des Fragebogens erstellt wird.\n\n---\n\nAdd-On-Preis Extraktion\n\nFür kostenpflichtige Kurse:\n1. Füge Auswahloptionen für Add-Ons mit Preisinformationen in deine Fragen ein (z.B. \"Zertifikat (+€50)\" oder \"Workshop-Materialien: €25\")\n2. Verwende den Button \"Add-Ons validieren\" im Bereich Preiseinstellungen\n3. Das System analysiert deinen Fragebogen und extrahiert erkannte Preise\n4. Überprüfe und validiere die extrahierten Preise im Validierungsdialog\n5. Validierte Add-Ons werden automatisch mit Stripe synchronisiert für die Zahlungsabwicklung",
       "help_text_hidden_fields": "Wichtig: Du musst Hidden Fields in deinem Formbricks Survey konfigurieren!\n\nErforderliche Hidden Fields:\n• eduhubUserId - Wird automatisch mit der EduHub Benutzer-ID befüllt\n• eduhubCourseId - Wird automatisch mit der Kurs-ID befüllt\n• eduhubEnrollmentId - Wird automatisch mit der Anmeldungs-ID befüllt (optional)\n\nIn Formbricks: Survey bearbeiten → Hidden Fields aktivieren → Diese Feld-IDs hinzufügen. Ohne diese Konfiguration können Antworten nicht korrekt zugeordnet werden.\n\nHinweis: eduhubEnrollmentId ist optional, da die Anmeldung erst nach Abschluss des Fragebogens erstellt wird.",
+      "no_survey_url": "Keine Fragebogen-URL konfiguriert",
       "loading_responses": "Lade Antworten...",
       "error_loading_responses": "Fehler beim Laden der Fragebogen-Antworten",
       "no_responses": "Keine Fragebogen-Antworten vorhanden",
       "questionnaire_responses": "Fragebogen-Antworten",
       "incomplete_response": "Fragebogen nicht vollständig ausgefüllt"
+    },
+    "pricing": {
+      "title": "Preiseinstellungen",
+      "base_price": "Grundpreis (in Cent)",
+      "base_price_help": "Der Grundpreis für den Kurs in der kleinsten Währungseinheit (z.B. Cent für EUR). Bei 0 gelten Sonderregeln.",
+      "base_price_learn_more": "Mehr erfahren",
+      "base_price_dialog_title": "Grundpreis und variable Preise",
+      "base_price_dialog_content": "Der Grundpreis ist der Basisbetrag für die Kursteilnahme und wird in der kleinsten Währungseinheit angegeben (z.B. Cent für EUR).\n\n--- Standardfall: Grundpreis > 0 ---\n\nWenn du einen Grundpreis über 0 festlegst, wird dieser Betrag im InfoPanel des Kurses angezeigt. Falls du zusätzlich Zusatzoptionen (Add-Ons) definiert hast, erscheint ein Hinweis \"+ Zusatzoptionen\".\n\nBeispiel:\n• Grundpreis: 5000 Cent (50,00 EUR)\n• Add-On: Zertifikat für 1500 Cent (15,00 EUR)\n→ InfoPanel zeigt: \"50,00 EUR + Zusatzoptionen\"\n\n--- Sonderfall: Grundpreis = 0 ---\n\nDer Grundpreis 0 hat eine besondere Bedeutung und bietet Flexibilität für verschiedene Preiskategorien:\n\n1. Mit Zusatzoptionen (Add-Ons):\n   Das InfoPanel zeigt \"Preis: variabel\" an. Dies ist besonders nützlich, wenn:\n   • Verschiedene Preiskategorien über den Fragebogen angeboten werden\n   • Teilnehmende zwischen verschiedenen Paketen wählen können\n   • Der finale Preis von individuellen Add-On-Auswahlen abhängt\n\n   Beispiel: Du bietest verschiedene Teilnahmepakete an:\n   • Basis-Teilnahme: 0 EUR (Grundpreis)\n   • Standard-Paket: +50 EUR (Add-On)\n   • Premium-Paket: +100 EUR (Add-On)\n   → InfoPanel zeigt: \"Preis: variabel\"\n\n2. Ohne Zusatzoptionen:\n   Das InfoPanel zeigt \"Kostenfrei\" an.\n   Der Kurs ist vollständig kostenfrei ohne Zahlungsoptionen.\n\n--- Integration mit Fragebogen ---\n\nAdd-Ons werden über den Formbricks-Fragebogen definiert und validiert:\n1. Füge Auswahloptionen mit Preisinformationen in deinen Fragebogen ein\n2. Verwende den Button \"Add-Ons validieren\" um Preise zu extrahieren\n3. Validierte Add-Ons werden mit Stripe synchronisiert\n4. Bei der Anmeldung wählen Teilnehmende ihre gewünschten Optionen\n\nWeitere Details zur Fragebogen-Integration findest du im Hilfetext der Fragebogen URL.",
+      "currency": "Währung",
+      "validate_addons": "Add-Ons validieren",
+      "validating": "Validiere...",
+      "validate_help": "Analysiere den Fragebogen und extrahiere Add-On-Preise zur Validierung",
+      "stripe_status": "Stripe Status",
+      "stripe_syncing": "Synchronisiere...",
+      "stripe_synced": "Synchronisiert",
+      "stripe_sync_error": "Synchronisierung fehlgeschlagen",
+      "stripe_product": "Produkt",
+      "stripe_price": "Preis",
+      "price_amount": "Preisbetrag",
+      "view_in_stripe": "In Stripe ansehen",
+      "no_stripe_product": "Noch kein Stripe-Produkt erstellt. Speichere einen Preis > 0 um zu synchronisieren.",
+      "no_pricing_configured": "Noch keine Preise konfiguriert. Setze einen Grundpreis oder validiere Add-ons.",
+      "sync_hint": "Die Synchronisation wird automatisch gestartet...",
+      "sync_now": "Jetzt synchronisieren"
+    },
+    "addons": {
+      "manage_hint": "Um Add-ons zu bearbeiten, nutze \"Add-Ons validieren\" im Bereich Preiseinstellungen."
     },
     "common": {
       "edit": "Bearbeiten",
@@ -1012,6 +1132,7 @@
       "applied": "Beworben",
       "invited": "Eingeladen",
       "invitation_confirmed": "Einladung bestätigt",
+      "registered": "Registriert",
       "aborted": "Abgebrochen",
       "rejected": "Bewerbung abgelehnt",
       "cancelled": "Einladung abgelehnt",
@@ -1021,6 +1142,11 @@
     "course_not_found": "Kurs {courseId} wurde nicht gefunden!",
     "add_session": "Termin hinzufügen",
     "SessionsTab": {
+      "session_description": {
+        "label": "Terminbeschreibung",
+        "help_text": "Eine Beschreibung dieses Termins (z.B. behandelte Themen, besondere Hinweise).",
+        "placeholder": "Terminbeschreibung eingeben..."
+      },
       "sessionAddresses": {
         "online": {
           "label": "Online",
@@ -1550,5 +1676,33 @@
     "title": "Titel",
     "delete": "Löschen",
     "upload": "Upload"
+  },
+  "pricing_summary": {
+    "title": "Preisübersicht",
+    "base_price": "Kursgebühr",
+    "addons": "Zusatzoptionen",
+    "total": "Gesamt",
+    "no_pricing": "Keine Preise konfiguriert.",
+    "synced": "Synchronisiert",
+    "not_synced": "Nicht synchronisiert"
+  },
+  "AddonValidationDialog": {
+    "title": "Add-ons validieren",
+    "close": "Schließen",
+    "no_addons_found": "Keine Add-ons gefunden.",
+    "price_label": "Preis (in Cent)",
+    "description_label": "Beschreibung",
+    "question_id": "Frage-ID",
+    "choice_id": "Choice-ID",
+    "cancel": "Abbrechen",
+    "saving": "Speichern...",
+    "save_and_create_stripe": "Speichern & Stripe Preise erstellen"
+  },
+  "footer": {
+    "imprint": "Impressum",
+    "privacy": "Datenschutz",
+    "faq": "FAQ",
+    "newsletter": "Newsletter",
+    "sponsored_by": "Gefördert durch:"
   }
 }

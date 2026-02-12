@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { CourseEnrollmentStatus_enum, Weekday_enum, CourseRegistrationType_enum, LocationOption_enum, ProgramType_enum, OrganizationType_enum } from "./../../__generated__/globalTypes";
+import { CourseEnrollmentStatus_enum, PaymentStatus_enum, Weekday_enum, CourseRegistrationType_enum, LocationOption_enum, ProgramType_enum, OrganizationType_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: MyEnrollmentsForCourseQuery
@@ -279,6 +279,17 @@ export interface MyEnrollmentsForCourseQuery_CourseEnrollment_Course_CourseFundi
   Organization: MyEnrollmentsForCourseQuery_CourseEnrollment_Course_CourseFundingOrganizations_Organization;
 }
 
+export interface MyEnrollmentsForCourseQuery_CourseEnrollment_Course_CourseAddonMappings {
+  __typename: "CourseAddonMapping";
+  id: number;
+  description: string;
+  /**
+   * Admin-validated price (in cents), can override extracted price
+   */
+  validatedPrice: number;
+  currency: string;
+}
+
 export interface MyEnrollmentsForCourseQuery_CourseEnrollment_Course {
   __typename: "Course";
   id: number;
@@ -294,10 +305,6 @@ export interface MyEnrollmentsForCourseQuery_CourseEnrollment_Course {
    * The day of the week the course takes place.
    */
   weekDay: Weekday_enum;
-  /**
-   * A text providing info about the costs of a participation.
-   */
-  cost: string;
   /**
    * Decides whether the course is published for all users or not.
    */
@@ -407,6 +414,18 @@ export interface MyEnrollmentsForCourseQuery_CourseEnrollment_Course {
    * An array relationship
    */
   CourseFundingOrganizations: MyEnrollmentsForCourseQuery_CourseEnrollment_Course_CourseFundingOrganizations[];
+  /**
+   * Base price in cents (e.g., 5000 = €50.00)
+   */
+  basePrice: number | null;
+  /**
+   * Currency code (EUR, USD, etc.)
+   */
+  currency: string | null;
+  /**
+   * An array relationship
+   */
+  CourseAddonMappings: MyEnrollmentsForCourseQuery_CourseEnrollment_Course_CourseAddonMappings[];
 }
 
 export interface MyEnrollmentsForCourseQuery_CourseEnrollment {
@@ -428,6 +447,10 @@ export interface MyEnrollmentsForCourseQuery_CourseEnrollment {
    * The users current enrollment status to this course
    */
   status: CourseEnrollmentStatus_enum;
+  /**
+   * Current payment status
+   */
+  paymentStatus: PaymentStatus_enum | null;
   /**
    * URL to the file containing the user's achievement certificate (if he obtained one)
    */

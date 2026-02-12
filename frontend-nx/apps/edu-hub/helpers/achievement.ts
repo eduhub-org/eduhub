@@ -24,9 +24,6 @@ export interface IDataToManipulate {
   courses: TempAchievementOptionCourse[];
   documentTemplateFile?: UploadFile;
   evaluationScriptFile?: UploadFile;
-  showScoreAuthors: boolean;
-  csvTemplateUrl: string;
-  csvTemplateFile?: UploadFile;
 }
 
 export interface IPayload {
@@ -43,7 +40,6 @@ export interface IPayload {
 export const DefaultAchievementOptions: string[] = [
   'ONLINE',
   'DOCUMENTATION',
-  'DOCUMENTATION_AND_CSV',
 ];
 
 /**
@@ -58,7 +54,6 @@ export const UploadFileTypes = {
 };
 
 export const AchievementKeys = {
-  CSV_TEMPLATE_URL: 'csvTemplateUrl',
   DESCRIPTION: 'description',
   RECORD_TYPE: 'recordType',
   TITLE: 'title',
@@ -68,8 +63,6 @@ export const AchievementKeys = {
   DELETE_A_COURSE: 'deleteACourse',
   DOCUMENT_TEMPLATE_FILE: 'documentTemplateFile',
   EVALUATION_SCRIPT_FILE: 'evaluationScriptFile',
-  CSV_TEMPLATE_FILE: 'csvTemplateFile',
-  SHOW_SCORE_AUTHORS: 'showScoreAuthors',
 };
 
 export interface ResponseToARequest {
@@ -97,5 +90,4 @@ export type MinAchievementOption = AtLeast<{
   description: string;
   recordType: AchievementRecordType_enum;
   evaluationScriptUrl: string;
-  csvTemplateUrl: string | null;
 }>;

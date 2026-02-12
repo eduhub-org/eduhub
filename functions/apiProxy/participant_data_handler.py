@@ -1000,7 +1000,7 @@ def handle_course_participants(course_id, auth_info, eduhub_client, client_ip, r
             "type": "Nonprofit",
             "legalName": "Campus Business Box e.V.",
             "websiteUrl": "https://edu.opencampus.sh",
-            "contactEmail": "team@opencampus.sh",
+            "contactEmail": "edu@opencampus.sh",
             "address": {
                 "streetAddress": "Wissenschaftszentrum Kiel, Fraunhoferstr. 13",
                 "postalCode": "24118",
@@ -1099,7 +1099,7 @@ def handle_organization_courses(auth_info, eduhub_client, client_ip, request_dat
             "type": "Nonprofit",
             "legalName": "Campus Business Box e.V.",
             "websiteUrl": "https://edu.opencampus.sh",
-            "contactEmail": "team@opencampus.sh",
+            "contactEmail": "edu@opencampus.sh",
             "address": {
                 "streetAddress": "Wissenschaftszentrum Kiel, Fraunhoferstr. 13",
                 "postalCode": "24118",
@@ -1195,7 +1195,7 @@ def handle_participants_schema():
             "privacy_policy": "No personally identifiable information (PII) is returned. Participant IDs are stable cryptographic hashes. Only enrollment status, completion certificates, and occupation category are provided.",
             "participant_data": {
                 "id": "urn:hash:{first_16_chars_of_sha256} - Privacy-preserving stable identifier",
-                "enrollmentStatus": "Enum: ENROLLED, COMPLETED, DROPPED, etc.",
+                "enrollmentStatus": "Enum: ABORTED, APPLIED, CANCELLED, COMPLETED, CONFIRMED, INVITED, REGISTERED, REJECTED",
                 "enrollmentDate": "ISO 8601 timestamp of enrollment",
                 "occupationStatus": "Optional occupation category (STUDENT, EMPLOYEE, etc.)",
                 "completionStatus": {

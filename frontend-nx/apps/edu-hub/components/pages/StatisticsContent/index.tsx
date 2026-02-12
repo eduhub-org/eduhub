@@ -1,5 +1,5 @@
 import React, { FC, useState, ErrorInfo, ReactNode } from 'react';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { Page } from '../../layout/Page';
 import CommonPageHeader from '../../common/CommonPageHeader';
 import { ApplicationStatistics } from './statistics/ApplicationStatistics';

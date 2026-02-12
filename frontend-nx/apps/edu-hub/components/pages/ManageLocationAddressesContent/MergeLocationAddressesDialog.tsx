@@ -1,7 +1,8 @@
 import React, { useState, useMemo } from 'react';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import DropDownSelector from '../../inputs/DropDownSelector';
-import { BaseDialog } from '../../common/dialogs/BaseDialog';
+import { DialogShell } from '../../common/dialogs/DialogShell';
+import { Button } from '../../common/Button';
 import { useAdminQuery } from '../../../hooks/authedQuery';
 import { LOCATION_ADDRESS_LIST } from '../../../queries/locationAddress';
 import { LocationAddressList_LocationAddress } from '../../../queries/__generated__/LocationAddressList';
@@ -121,13 +122,25 @@ export const MergeLocationAddressesDialog: React.FC<MergeLocationAddressesDialog
   const confirmButtonText = t('bulk_action.merge.confirm_merge');
   const confirmDisabled = !selectedTargetAddress || (mergePreview?.hasLocationMismatch ?? false);
 
+  const actions = (
+    <div className="grid grid-cols-2 w-full gap-2">
+      <div>
+        <Button onClick={onClose}>{tCommon('cancel')}</Button>
+      </div>
+      <div className="flex justify-end">
+        <Button filled onClick={handleConfirm} disabled={confirmDisabled}>
+          {confirmButtonText}
+        </Button>
+      </div>
+    </div>
+  );
+
   return (
-    <BaseDialog
+    <DialogShell
       open={open}
       onClose={onClose}
-      onConfirm={handleConfirm}
-      confirmDisabled={confirmDisabled}
-      confirmText={confirmButtonText}
+      title={tCommon('confirmation')}
+      actions={actions}
     >
       <div className="space-y-4">
         <div className="text-lg font-medium">{t('bulk_action.merge.title')}</div>
@@ -233,7 +246,7 @@ export const MergeLocationAddressesDialog: React.FC<MergeLocationAddressesDialog
           <div className="text-amber-600 text-sm">{t('bulk_action.merge.no_addresses_selected')}</div>
         )}
       </div>
-    </BaseDialog>
+    </DialogShell>
   );
 };
 

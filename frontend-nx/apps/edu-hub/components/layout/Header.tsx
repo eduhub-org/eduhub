@@ -12,7 +12,7 @@ import { Menu } from './Menu';
 import { RegisterButton } from './RegisterButton';
 import { ClientOnly } from '@opencampus/shared-components';
 import { OnlyDesktop } from '@opencampus/shared-components';
-import { useTranslations, useLocale } from 'next-intl';
+import { useLocale } from 'next-intl';
 import UserCard from '../common/UserCard';
 
 export const Header: FC = () => {
@@ -47,7 +47,7 @@ export const Header: FC = () => {
   };
 
   return (
-    <header className="w-full absolute top-0 left-0 bg-edu-bg-gray bg-opacity-50">
+    <header className="w-full absolute top-0 left-0" style={{ backgroundColor: 'rgba(34, 34, 34, 0.5)' }}>
       <div className="flex py-4 px-3 md:px-16 max-w-screen-xl w-full mx-auto justify-between">
         <div className="flex-grow w-full items-center">
           <Link href={`/`}>

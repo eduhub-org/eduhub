@@ -1,5 +1,7 @@
 import React from 'react';
-import { BaseDialog } from './BaseDialog';
+import { DialogShell } from './DialogShell';
+import { Button } from '../Button';
+import { useTranslations } from 'next-intl';
 
 interface QuestionConfirmationDialogProps {
   open: boolean;
@@ -20,16 +22,30 @@ export const QuestionConfirmationDialog: React.FC<QuestionConfirmationDialogProp
   onConfirm,
   onCancel,
 }) => {
+  const t = useTranslations('common');
+
+  const actions = (
+    <div className="grid grid-cols-2 w-full gap-2">
+      <div>
+        <Button onClick={onCancel || onClose}>{cancelText || t('cancel')}</Button>
+      </div>
+      <div className="flex justify-end">
+        <Button filled onClick={onConfirm}>
+          {confirmationText || t('confirm')}
+        </Button>
+      </div>
+    </div>
+  );
+
   return (
-    <BaseDialog
+    <DialogShell
       open={open}
       onClose={onClose}
-      onConfirm={onConfirm}
-      confirmText={confirmationText}
-      onCancel={onCancel}
-      cancelText={cancelText}
+      title={t('confirmation')}
+      ariaLabelledBy="confirmation-dialog-title"
+      actions={actions}
     >
-      {question}
-    </BaseDialog>
+      <div className="whitespace-pre-line">{question}</div>
+    </DialogShell>
   );
 };

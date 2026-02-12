@@ -58,6 +58,11 @@ export const EMAIL_VARIABLES = {
       description: 'Course end date (formatted)',
       example: '20. März 2024',
       categories: ['enrollment']
+    },
+    '[Course:BasePrice]': {
+      description: 'Base course price formatted as currency (e.g., "49,00")',
+      example: '49,00',
+      categories: ['enrollment']
     }
   },
 
@@ -77,6 +82,16 @@ export const EMAIL_VARIABLES = {
       description: 'Link to course page',
       example: 'https://edu.opencampus.sh/course/123',
       categories: ['enrollment', 'session']
+    },
+    '[Enrollment:Addons]': {
+      description: 'HTML list of booked add-ons with prices (empty if no add-ons)',
+      example: '<strong>Add-ons:</strong>\n– Networking Dinner: 15,00 € inkl. MwSt.\n– Workshop-Materialien: 10,00 € inkl. MwSt.',
+      categories: ['enrollment']
+    },
+    '[Enrollment:TotalCost]': {
+      description: 'Total cost formatted as currency including base price and add-ons (e.g., "74,00")',
+      example: '74,00',
+      categories: ['enrollment']
     }
   },
 
@@ -201,6 +216,11 @@ export function createVariableReplacer(data, formatDate) {
       .replaceAll('[Course:StartTime]', data.course?.startTime ? formatDate(data.course.startTime) : 'TBD')
       .replaceAll('[Course:EndTime]', data.course?.endTime ? formatDate(data.course.endTime) : 'TBD');
     
+    // Format base price (convert cents to euros with 2 decimal places)
+    const basePrice = data.course?.basePrice || 0;
+    const formattedBasePrice = (basePrice / 100).toFixed(2).replace('.', ',');
+    result = result.replaceAll('[Course:BasePrice]', formattedBasePrice);
+    
     // Enrollment variables - always attempt replacement
     result = result
       .replaceAll('[Enrollment:CreatedAt]', data.enrollment?.created_at ? formatDate(data.enrollment.created_at) : '')
@@ -211,6 +231,31 @@ export function createVariableReplacer(data, formatDate) {
       .replaceAll('[Enrollment:CourseLink]', 
         data.courseLink || `${process.env.FRONTEND_URL || 'https://edu.opencampus.sh'}/course/${data.course?.id || ''}`
       );
+    
+    // Build addons HTML list (escape user-controlled strings to prevent XSS)
+    let addonsHtml = '';
+    if (data.enrollmentAddons && Array.isArray(data.enrollmentAddons) && data.enrollmentAddons.length > 0) {
+      const currencySymbolMap = { EUR: '€', USD: '$', GBP: '£', CHF: 'CHF' };
+      const addonLines = data.enrollmentAddons.map(addon => {
+        const description = escapeHtml(addon.CourseAddonMapping?.description || addon.name || 'Zusatzleistung / Add-on');
+        const price = addon.priceAtPurchase ?? 0;
+        const currencyCode = addon.currency || 'EUR';
+        const currencySymbol = currencySymbolMap[currencyCode] || currencyCode;
+        const formattedPrice = (price / 100).toFixed(2).replace('.', ',');
+        return `– ${description}: ${formattedPrice} ${currencySymbol} inkl. MwSt.`;
+      });
+      addonsHtml = '<strong>Add-ons:</strong>\n' + addonLines.join('\n');
+    }
+    result = result.replaceAll('[Enrollment:Addons]', addonsHtml);
+    
+    // Calculate and format total cost (base price + all addon prices)
+    // Reuse basePrice declared above
+    const addonsTotal = data.enrollmentAddons && Array.isArray(data.enrollmentAddons)
+      ? data.enrollmentAddons.reduce((sum, addon) => sum + (addon.priceAtPurchase || 0), 0)
+      : 0;
+    const totalCost = basePrice + addonsTotal;
+    const formattedTotalCost = (totalCost / 100).toFixed(2).replace('.', ',');
+    result = result.replaceAll('[Enrollment:TotalCost]', formattedTotalCost);
     
     // Session variables (for reminders) - always attempt replacement
     result = result
@@ -226,7 +271,7 @@ export function createVariableReplacer(data, formatDate) {
 
 /**
  * Convenience function for enrollment emails
- * @param {Object} enrollmentDetails - Enrollment data from GraphQL
+ * @param {Object} enrollmentDetails - Enrollment data from GraphQL (should include CourseEnrollmentAddons with CourseAddonMapping)
  * @param {Function} formatDate - Date formatting function  
  * @returns {Function} Variable replacement function
  */
@@ -235,6 +280,7 @@ export function createEnrollmentVariableReplacer(enrollmentDetails, formatDate) 
     user: enrollmentDetails.User,
     course: enrollmentDetails.Course,
     enrollment: enrollmentDetails,
+    enrollmentAddons: enrollmentDetails.CourseEnrollmentAddons || [],
     courseLink: `${process.env.FRONTEND_URL || 'https://edu.opencampus.sh'}/course/${enrollmentDetails.Course.id}`
   }, formatDate);
 }

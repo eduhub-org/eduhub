@@ -1,6 +1,6 @@
-import { Dialog, DialogTitle, Slide } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, Slide } from '@mui/material';
 import { TransitionProps } from '@mui/material/transitions';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { FC, useCallback, forwardRef, ReactElement } from 'react';
 import { MdClose } from 'react-icons/md';
 
@@ -33,21 +33,48 @@ export const ErrorMessageDialog: FC<ErrorProps> = ({ errorMessage, open, onClose
       aria-labelledby="error-dialog-title"
       aria-describedby="error-dialog-description"
       keepMounted
+      maxWidth="sm"
+      fullWidth
+      PaperProps={{
+        sx: {
+          backgroundColor: '#ffffff',
+          color: '#222222',
+          maxHeight: '90vh',
+        },
+      }}
       sx={{
         zIndex: 1400, // Higher than default Dialog z-index (1300) to appear above other dialogs
       }}
     >
-      <DialogTitle id="error-dialog-title">
+      <DialogTitle 
+        id="error-dialog-title"
+        className="light"
+        sx={{
+          color: '#222222',
+          borderBottom: '1px solid var(--eduhub-border-primary)',
+        }}
+      >
         <div className="grid grid-cols-2">
-          <div>{t('error')}</div>
+          <div className="text-label-primary">{t('error')}</div>
           <div className="cursor-pointer flex justify-end">
-            <MdClose aria-label={t('close')} onClick={handleClose} />
+            <MdClose 
+              aria-label={t('close')} 
+              onClick={handleClose}
+              className="text-label-primary hover:text-label-secondary transition-colors"
+            />
           </div>
         </div>
       </DialogTitle>
 
-      <div className="m-16" id="error-dialog-description">
-        <div className="mb-8 text-red-600">{errorMessage}</div>
+      <DialogContent 
+        className="light"
+        id="error-dialog-description"
+        sx={{
+          px: 4,
+          py: 3,
+        }}
+      >
+        <div className="mb-8 text-error">{errorMessage}</div>
         <div className="grid grid-cols-2">
           <div />
           <div className="flex justify-end">
@@ -56,7 +83,7 @@ export const ErrorMessageDialog: FC<ErrorProps> = ({ errorMessage, open, onClose
             </Button>
           </div>
         </div>
-      </div>
+      </DialogContent>
     </Dialog>
   );
 };

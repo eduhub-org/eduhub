@@ -5,7 +5,7 @@ import {
   CourseEnrollmentWithUserQuery,
   CourseEnrollmentWithUserQueryVariables,
 } from '../../../queries/__generated__/CourseEnrollmentWithUserQuery';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { FC, useCallback, useState } from 'react';
 import { MdClose } from 'react-icons/md';
 import { makeFullName } from '../../../helpers/util';
@@ -71,17 +71,17 @@ const EnrolledUserForACourseDialog: FC<IProps> = (props) => {
 
   return (
     <Dialog open={props.open} onClose={handleCancel}>
-      <DialogTitle>
+      <DialogTitle className="light">
         <div className="grid grid-cols-2">
-          <div>{props.title}</div>
-          <div className="cursor-pointer flex justify-end">
+          <div className="text-label-primary">{props.title}</div>
+          <div className="cursor-pointer flex justify-end text-label-primary">
             <MdClose onClick={handleCancel} />
           </div>
         </div>
       </DialogTitle>
 
-      <DialogContent>
-        <p>{t('type-name-email-minimum-3-letters')}</p>
+      <DialogContent className="light">
+        <p className="text-label-primary">{t('type-name-email-minimum-3-letters')}</p>
         <div className="py-2">
           <SearchBox
             placeholder={t('search-value')}

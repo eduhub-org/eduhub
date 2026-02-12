@@ -2,7 +2,7 @@ import Head from 'next/head';
 import { FC } from 'react';
 import { Page } from '../../../components/layout/Page';
 import { useIsAdmin, useIsLoggedIn } from '../../../hooks/authentication';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 
 import ManageEmailTemplatesContent from '../../../components/pages/ManageEmailTemplatesContent';
 

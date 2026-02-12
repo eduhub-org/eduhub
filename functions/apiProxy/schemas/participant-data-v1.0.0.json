@@ -31,7 +31,19 @@
       "type": "object",
       "properties": {
         "id": { "type": "string", "pattern": "^urn:hash:[a-f0-9]{16}$" },
-        "enrollmentStatus": { "type": "string", "enum": ["ENROLLED", "COMPLETED", "DROPPED", "CANCELLED"] },
+        "enrollmentStatus": { 
+          "type": "string", 
+          "enum": [
+            "ABORTED",
+            "APPLIED",
+            "CANCELLED",
+            "COMPLETED",
+            "CONFIRMED",
+            "INVITED",
+            "REGISTERED",
+            "REJECTED"
+          ]
+        },
         "enrollmentDate": { "type": "string", "format": "date-time" },
         "occupationStatus": { "type": "string" },
         "completionStatus": { "$ref": "#/$defs/CompletionStatus" },

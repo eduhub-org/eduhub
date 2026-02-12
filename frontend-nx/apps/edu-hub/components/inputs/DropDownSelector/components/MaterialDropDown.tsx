@@ -6,8 +6,6 @@ import InputLabel from '@mui/material/InputLabel';
 import Tooltip from '@mui/material/Tooltip';
 import InputAdornment from '@mui/material/InputAdornment';
 import { HelpOutline } from '@mui/icons-material';
-import { useTheme } from '@mui/material/styles';
-import { useTranslations, useLocale } from 'next-intl';
 import { Option } from '../types';
 import { CreatableDropDown } from './CreatableDropDown';
 
@@ -44,8 +42,6 @@ export const MaterialDropDown: React.FC<MaterialDropDownProps> = ({
   onCreateOption,
   getLabelForValue,
 }) => {
-  const theme = useTheme();
-
   const handleChange = (event: SelectChangeEvent<string>) => {
     onValueChange(event);
   };
@@ -54,7 +50,7 @@ export const MaterialDropDown: React.FC<MaterialDropDownProps> = ({
     <div className="col-span-10 flex mt-3">
       <FormControl variant="standard" className={hasBlurred && errorMessage ? 'w-3/4' : 'w-full'}>
         {label && (
-          <InputLabel id={`${label}-label`} style={{ color: hasBlurred && errorMessage ? 'red' : 'rgb(34, 34, 34)' }}>
+          <InputLabel id={`${label}-label`}>
             {label}
           </InputLabel>
         )}
@@ -81,16 +77,33 @@ export const MaterialDropDown: React.FC<MaterialDropDownProps> = ({
             onBlur={onBlur}
             placeholder={placeholder}
             displayEmpty
-            style={{
-              color: hasBlurred && errorMessage ? 'red' : 'inherit',
-              backgroundColor: 'white',
+            sx={{
               minHeight: '32px',
               padding: '4px',
+              ...(hasBlurred && errorMessage && {
+                color: 'var(--eduhub-error)',
+                '& .MuiOutlinedInput-notchedOutline': {
+                  borderColor: 'var(--eduhub-error)',
+                },
+              }),
             }}
             MenuProps={{
+              disablePortal: true, // Keep menu inside light context
               PaperProps: {
-                style: {
-                  backgroundColor: 'white',
+                sx: {
+                  backgroundColor: 'var(--eduhub-fill-primary) !important',
+                  color: 'var(--eduhub-label-primary) !important',
+                  border: '1px solid var(--eduhub-border-primary)',
+                  '& .MuiMenuItem-root': {
+                    color: 'var(--eduhub-label-primary)',
+                    '&:hover': {
+                      backgroundColor: 'var(--eduhub-bg-secondary)',
+                    },
+                    '&.Mui-selected': {
+                      backgroundColor: 'var(--eduhub-bg-secondary)',
+                      color: 'var(--eduhub-label-primary)',
+                    },
+                  },
                 },
               },
             }}
@@ -101,7 +114,7 @@ export const MaterialDropDown: React.FC<MaterialDropDownProps> = ({
                     <HelpOutline
                       style={{
                         cursor: 'pointer',
-                        color: theme.palette.text.disabled,
+                        color: 'var(--eduhub-label-disabled)',
                         marginRight: '20px',
                       }}
                     />

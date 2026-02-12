@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { Weekday_enum, CourseRegistrationType_enum, LocationOption_enum, ProgramType_enum, OrganizationType_enum, CourseStatus_enum, CourseEnrollmentStatus_enum, MotivationRating_enum, AttendanceStatus_enum, AchievementRecordRating_enum, AchievementRecordType_enum } from "./../../__generated__/globalTypes";
+import { Weekday_enum, CourseRegistrationType_enum, LocationOption_enum, ProgramType_enum, OrganizationType_enum, CourseStatus_enum, CourseEnrollmentStatus_enum, PaymentStatus_enum, MotivationRating_enum, AttendanceStatus_enum, AchievementRecordRating_enum, AchievementRecordType_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: ManagedCourse
@@ -305,6 +305,17 @@ export interface ManagedCourse_Course_by_pk_CourseFundingOrganizations {
   Organization: ManagedCourse_Course_by_pk_CourseFundingOrganizations_Organization;
 }
 
+export interface ManagedCourse_Course_by_pk_CourseAddonMappings {
+  __typename: "CourseAddonMapping";
+  id: number;
+  description: string;
+  /**
+   * Admin-validated price (in cents), can override extracted price
+   */
+  validatedPrice: number;
+  currency: string;
+}
+
 export interface ManagedCourse_Course_by_pk_CourseEnrollments_User_Organization {
   __typename: "Organization";
   id: number;
@@ -443,6 +454,10 @@ export interface ManagedCourse_Course_by_pk_CourseEnrollments {
    */
   status: CourseEnrollmentStatus_enum;
   /**
+   * Current payment status
+   */
+  paymentStatus: PaymentStatus_enum | null;
+  /**
    * URL to the file containing the user's achievement certificate (if he obtained one)
    */
   achievementCertificateURL: string | null;
@@ -458,6 +473,10 @@ export interface ManagedCourse_Course_by_pk_CourseEnrollments {
    * Rating that the user's motivation letter received from the course instructor
    */
   motivationRating: MotivationRating_enum;
+  /**
+   * Stripe Payment Intent ID
+   */
+  stripePaymentIntentId: string | null;
   /**
    * An object relationship
    */
@@ -541,10 +560,6 @@ export interface ManagedCourse_Course_by_pk {
    * The day of the week the course takes place.
    */
   weekDay: Weekday_enum;
-  /**
-   * A text providing info about the costs of a participation.
-   */
-  cost: string;
   /**
    * Decides whether the course is published for all users or not.
    */
@@ -655,9 +670,29 @@ export interface ManagedCourse_Course_by_pk {
    */
   CourseFundingOrganizations: ManagedCourse_Course_by_pk_CourseFundingOrganizations[];
   /**
+   * Base price in cents (e.g., 5000 = €50.00)
+   */
+  basePrice: number | null;
+  /**
+   * Currency code (EUR, USD, etc.)
+   */
+  currency: string | null;
+  /**
+   * An array relationship
+   */
+  CourseAddonMappings: ManagedCourse_Course_by_pk_CourseAddonMappings[];
+  /**
    * Shows whether the current status is DRAFT, READY_FOR_PUBLICATION, READY_FOR_APPLICATION, APPLICANTS_INVITED, or PARTICIPANTS_RATED, which is set in correspondance to the tabs completed on the course administration page
    */
   status: CourseStatus_enum;
+  /**
+   * Stripe Product ID for the base course price
+   */
+  stripeProductId: string | null;
+  /**
+   * Stripe Price ID for the base course price
+   */
+  stripePriceId: string | null;
   /**
    * An array relationship
    */

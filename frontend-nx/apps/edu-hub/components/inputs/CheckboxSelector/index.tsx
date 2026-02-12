@@ -3,7 +3,7 @@ import { useCheckboxLogic } from './hooks';
 import { CheckboxSelectorProps } from './types';
 import { MaterialCheckbox } from './components/MaterialCheckbox';
 import { EduhubCheckbox } from './components/EduhubCheckbox';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import NotificationSnackbar from '../../common/dialogs/NotificationSnackbar';
 import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
 

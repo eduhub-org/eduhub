@@ -46,6 +46,7 @@ const TableGrid = <T extends BaseRow,>({
   availablePageSizes = [10, 20, 50, 100, 500],
   sorting: externalSorting,
   onSortingChange: externalOnSortingChange,
+  compactRows = false,
 }: TableGridProps<T>) => {
   const onGlobalFilterChange = useCallback(
     (value: string) => {
@@ -150,12 +151,12 @@ const TableGrid = <T extends BaseRow,>({
                 indeterminate={isSomeSelected(data)}
                 onChange={() => toggleAllRows(data)}
                 sx={{
-                  color: 'white',
+                  color: 'var(--eduhub-label-primary)',
                   '&.Mui-checked': {
-                    color: 'white',
+                    color: 'var(--eduhub-brand)',
                   },
                   '&.MuiCheckbox-indeterminate': {
-                    color: 'white',
+                    color: 'var(--eduhub-brand)',
                   },
                 }}
               />
@@ -165,9 +166,9 @@ const TableGrid = <T extends BaseRow,>({
                 checked={selectedRowIds.has(row.original.id)}
                 onChange={() => toggleRowSelection(row.original.id)}
                 sx={{
-                  color: 'black',
+                  color: 'var(--eduhub-label-primary)',
                   '&.Mui-checked': {
-                    color: 'black',
+                    color: 'var(--eduhub-brand)',
                   },
                 }}
               />
@@ -261,13 +262,13 @@ const TableGrid = <T extends BaseRow,>({
       <div className="flex justify-between items-center mb-4">
         <div className="flex items-center">
           {onAddButtonClick && (
-            <div className="text-white mr-4">
+            <div className="text-label-primary mr-4">
               <AddButton onClick={onAddButtonClick} title={addButtonText} size="medium" />
             </div>
           )}
           {showCheckbox && (
             <FormControl variant="outlined" size="small" sx={{ minWidth: 200 }}>
-              <InputLabel id="bulk-action-label" sx={{ color: 'white' }}>
+              <InputLabel id="bulk-action-label" sx={{ color: 'var(--eduhub-label-primary)' }}>
                 {t('common.table_grid.bulk_action')}
               </InputLabel>
               <Select
@@ -276,22 +277,31 @@ const TableGrid = <T extends BaseRow,>({
                 onChange={handleSelectChange}
                 label={t('common.table_grid.bulk_action')}
                 sx={{
-                  color: 'white',
+                  color: 'var(--eduhub-label-primary)',
+                  backgroundColor: 'var(--eduhub-bg-card)',
                   '& .MuiOutlinedInput-notchedOutline': {
-                    borderColor: 'rgba(255, 255, 255, 0.23)',
+                    borderColor: 'var(--eduhub-border-primary)',
                   },
                   '&:hover .MuiOutlinedInput-notchedOutline': {
-                    borderColor: 'rgba(255, 255, 255, 0.5)',
+                    borderColor: 'var(--eduhub-border-secondary)',
                   },
                   '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                    borderColor: 'white',
+                    borderColor: 'var(--eduhub-brand)',
                   },
                   '& .MuiSvgIcon-root': {
-                    color: 'white',
+                    color: 'var(--eduhub-label-primary)',
+                  },
+                }}
+                MenuProps={{
+                  PaperProps: {
+                    sx: {
+                      backgroundColor: 'var(--eduhub-bg-card)',
+                      color: 'var(--eduhub-label-primary)',
+                    },
                   },
                 }}
               >
-                <MenuItem value="">
+                <MenuItem value="" sx={{ color: 'var(--eduhub-label-primary)' }}>
                   <em>{t('common.table_grid.none')}</em>
                 </MenuItem>
                 {bulkActions.reduce((acc, action, index) => {
@@ -299,16 +309,16 @@ const TableGrid = <T extends BaseRow,>({
                   if (action.group && (index === 0 || bulkActions[index - 1]?.group !== action.group)) {
                     // Add divider before group (always add divider before groups, except for the first group)
                     if (index > 0) {
-                      acc.push(<Divider key={`divider-before-${action.value}`} sx={{ borderColor: 'rgba(0, 0, 0, 0.12)' }} />);
+                      acc.push(<Divider key={`divider-before-${action.value}`} sx={{ borderColor: 'var(--eduhub-border-primary)' }} />);
                     }
                     acc.push(
-                      <ListSubheader key={`group-${action.group}`} sx={{ color: 'rgba(0, 0, 0, 0.6)', backgroundColor: 'rgba(0, 0, 0, 0.04)', fontWeight: 600, fontSize: '0.75rem', lineHeight: 1.5 }}>
+                      <ListSubheader key={`group-${action.group}`} sx={{ color: 'var(--eduhub-label-secondary)', backgroundColor: 'var(--eduhub-bg-secondary)', fontWeight: 600, fontSize: '0.75rem', lineHeight: 1.5 }}>
                         {action.group}
                       </ListSubheader>
                     );
                   }
                   acc.push(
-                    <MenuItem key={action.value} value={action.value} sx={{ pl: action.group ? 3 : 1 }}>
+                    <MenuItem key={action.value} value={action.value} sx={{ pl: action.group ? 3 : 1, color: 'var(--eduhub-label-primary)' }}>
                       {action.label}
                     </MenuItem>
                   );
@@ -327,24 +337,32 @@ const TableGrid = <T extends BaseRow,>({
             size="small"
             sx={{
               width: '16rem',
-              backgroundColor: 'gray.600',
-              border: '1px solid',
-              borderColor: 'gray.500',
+              backgroundColor: 'var(--eduhub-bg-card)',
               '& .MuiInputBase-input': {
-                color: 'white',
+                color: 'var(--eduhub-label-primary)',
+                '&::placeholder': {
+                  color: 'var(--eduhub-label-secondary)',
+                  opacity: 1,
+                },
               },
               '& .MuiInputLabel-root': {
-                color: 'white',
+                color: 'var(--eduhub-label-primary)',
               },
               '& .MuiOutlinedInput-notchedOutline': {
-                borderColor: 'white',
+                borderColor: 'var(--eduhub-border-primary)',
+              },
+              '&:hover .MuiOutlinedInput-notchedOutline': {
+                borderColor: 'var(--eduhub-border-secondary)',
+              },
+              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: 'var(--eduhub-brand)',
               },
             }}
             InputProps={{
-              sx: { color: 'white' },
+              sx: { color: 'var(--eduhub-label-primary)' },
             }}
             InputLabelProps={{
-              sx: { color: 'white' },
+              sx: { color: 'var(--eduhub-label-primary)' },
             }}
           />
         )}
@@ -354,7 +372,7 @@ const TableGrid = <T extends BaseRow,>({
       <div className="overflow-x-auto">
         <div style={{ minWidth: `${mainRowContentWidth}px` }}>
           {/* Header row */}
-          <div className="flex items-center mb-1 text-white py-2">
+          <div className="flex items-center mb-1 bg-bg-primary text-label-primary py-2">
         <div className={`flex-grow flex gap-3 ${!showCheckbox ? 'pl-3' : ''}`} style={{ minWidth: `${mainRowContentWidth - (expandableRowComponent ? 40 : 0) - (deleteMutation ? 80 : 0)}px` }}>
           {table.getHeaderGroups().map((headerGroup) => (
             <React.Fragment key={headerGroup.id}>
@@ -410,18 +428,18 @@ const TableGrid = <T extends BaseRow,>({
           if (rowsToDisplay.length === 0) {
             return (
               <div className="flex items-stretch mb-1">
-                <div className="flex-grow bg-edu-light-gray py-2">
+                <div className={`flex-grow bg-bg-secondary text-label-primary light ${compactRows ? 'py-1' : 'py-2'}`}>
                   <div className={`flex items-center gap-3 ${!showCheckbox ? 'pl-3' : ''}`} style={{ minWidth: `${mainRowContentWidth - (expandableRowComponent ? 40 : 0) - (deleteMutation ? 80 : 0)}px` }}>
                     {table.getHeaderGroups()[0]?.headers.map((header) => (
                       <div
                         key={header.id}
-                        className={`${header.column.columnDef.meta?.className}`}
+                        className={`flex items-center min-h-0 ${header.column.columnDef.meta?.className || ''}`}
                         style={{
                           width: `${header.getSize()}px`,
                           flexShrink: 0,
                         }}
                       >
-                        <span className="text-gray-400">-</span>
+                        <span className="text-label-secondary">-</span>
                       </div>
                     ))}
                   </div>
@@ -437,12 +455,12 @@ const TableGrid = <T extends BaseRow,>({
             <React.Fragment key={row.id}>
               {/* Primary Row */}
               <div className={`flex items-stretch ${expandedRows.has(row.original.id) ? 'mb-0' : 'mb-1'}`}>
-                <div className="flex-grow bg-edu-light-gray py-2">
+                <div className={`flex-grow bg-bg-secondary text-label-primary light ${compactRows ? 'py-1' : 'py-2'}`}>
                   <div className={`flex items-center gap-3 ${!showCheckbox ? 'pl-3' : ''}`} style={{ minWidth: `${mainRowContentWidth - (expandableRowComponent ? 40 : 0) - (deleteMutation ? 80 : 0)}px` }}>
                     {row.getVisibleCells().map((cell) => (
                       <div
                         key={cell.id}
-                        className={`${cell.column.columnDef.meta?.className}`}
+                        className={`flex items-center min-h-0 ${cell.column.columnDef.meta?.className || ''}`}
                         style={{
                           width: `${cell.column.getSize()}px`,
                           flexShrink: 0,
@@ -483,7 +501,7 @@ const TableGrid = <T extends BaseRow,>({
               {/* Expandable Row */}
               {expandableRowComponent && expandedRows.has(row.original.id) && (
                 <div className="flex items-stretch mb-1">
-                  <div className="flex-grow bg-edu-light-gray py-2 overflow-x-auto">
+                  <div className="flex-grow bg-bg-secondary text-label-primary py-2 overflow-x-auto light">
                     <div className={`flex items-center gap-3 ${!showCheckbox ? 'pl-3' : ''}`} style={{ minWidth: `${mainRowContentWidth - (expandableRowComponent ? 40 : 0) - (deleteMutation ? 80 : 0)}px` }}>
                       <ExpandableRowComponent key={`expandableRow-${row.id}`} row={row.original} />
                     </div>
@@ -500,7 +518,7 @@ const TableGrid = <T extends BaseRow,>({
 
       {/* Pagination */}
       {!loading && !error && enablePagination && totalCount > 0 && (
-        <div className="flex justify-end pb-10 text-white mt-4">
+        <div className="flex justify-end pb-10 text-label-primary mt-4">
           <div className="flex flex-row items-center space-x-5">
             {onPageSizeChange && (
               <FormControl sx={{ m: 1, minWidth: 130 }} size="small">

@@ -38,7 +38,6 @@ export const COURSE_FRAGMENT = gql`
     ects
     tagline
     weekDay
-    cost
     published
     applicationEnd
     coverImage
@@ -106,6 +105,14 @@ export const COURSE_FRAGMENT = gql`
         logo
       }
     }
+    basePrice
+    currency
+    CourseAddonMappings {
+      id
+      description
+      validatedPrice
+      currency
+    }
 }
 `;
 
@@ -122,6 +129,10 @@ export const ADMIN_COURSE_FRAGMENT = gql`
     chatLink
     registrationType
     formbricksEnrollmentSurveyUrl
+    basePrice
+    currency
+    stripeProductId
+    stripePriceId
     Program {
       ...ProgramFragmentMinimumProperties
     }
@@ -137,7 +148,6 @@ export const COURSE_FRAGMENT_MINIMUM = gql`
     tagline
     language
     applicationEnd
-    cost
     achievementCertificatePossible
     attendanceCertificatePossible
     maxMissedSessions
@@ -165,7 +175,6 @@ export const COURSE_FRAGMENT_ANONYMOUS = gql`
     ects
     tagline
     weekDay
-    cost
     published
     applicationEnd
     coverImage
@@ -232,6 +241,14 @@ export const COURSE_FRAGMENT_ANONYMOUS = gql`
         type
         logo
       }
+    }
+    basePrice
+    currency
+    CourseAddonMappings {
+      id
+      description
+      validatedPrice
+      currency
     }
 }
 `;
