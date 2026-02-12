@@ -21,6 +21,8 @@ type TimePickerProps = {
   isMandatory?: boolean;
   className?: string;
   saveAsDateTime?: boolean;
+  /** When true, reduces padding and margin for compact layouts (e.g. table cells) */
+  compact?: boolean;
 };
 
 const TimePicker: React.FC<TimePickerProps> = ({
@@ -33,6 +35,7 @@ const TimePicker: React.FC<TimePickerProps> = ({
   isMandatory = false,
   className = '',
   saveAsDateTime = false,
+  compact = false,
 }) => {
   const t = useTranslations('common');
   const formatTimeString = useFormatTimeString();
@@ -115,12 +118,14 @@ const TimePicker: React.FC<TimePickerProps> = ({
     timeOptions.push(formatTime(date));
   }
 
-  const baseClass = 'w-full h-12 px-3 py-3 mb-8 text-label-primary rounded bg-fill-primary';
+  const baseClass = compact
+    ? 'w-full h-9 px-2 py-1.5 text-label-primary rounded bg-fill-primary'
+    : 'w-full h-12 px-3 py-3 mb-8 text-label-primary rounded bg-fill-primary';
   const finalClassName = prioritizeClasses(`${baseClass} ${className}`);
 
   return (
     <>
-      <div className="px-2">
+      <div className={compact ? 'px-0' : 'px-2'}>
         <div className="text-label-primary">
           {label && (
             <div className="flex justify-between mb-2">

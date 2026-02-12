@@ -5,7 +5,7 @@ import { styled } from '@mui/material/styles';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { FC, useCallback } from 'react';
-import { useIsAdmin } from '../../hooks/authentication';
+import { useIsAdmin, useIsInstructor } from '../../hooks/authentication';
 import { useTranslations } from 'next-intl';
 import useLogout from '../../hooks/logout';
 
@@ -52,6 +52,8 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
   }, [setVisible]);
 
   const isAdmin = useIsAdmin();
+  const isInstructor = useIsInstructor();
+  const isInstructorOrAdmin = isAdmin || isInstructor;
 
   const t = useTranslations('common');
 
@@ -169,6 +171,19 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
         <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/app-settings')}>
           <Link className="w-full text-lg" href="/manage/app-settings">
             {t('menu.app_settings')}
+          </Link>
+        </MenuItem>
+      )}
+
+      {isInstructorOrAdmin && (
+        <MenuItem onClick={closeMenu}>
+          <Link
+            className="w-full text-lg"
+            href="https://opencampus.gitbook.io/kursleitungshandbuch/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {t('menu.kursleitungshandbuch')}
           </Link>
         </MenuItem>
       )}

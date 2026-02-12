@@ -4,22 +4,22 @@
 // This file was automatically generated and should not be edited.
 
 // ====================================================
-// GraphQL mutation operation: UpdateSessionTitle
+// GraphQL mutation operation: UpdateSessionDescription
 // ====================================================
 
-export interface UpdateSessionTitle_update_Session_by_pk {
+export interface UpdateSessionDescription_update_Session_by_pk {
   __typename: "Session";
   id: number;
 }
 
-export interface UpdateSessionTitle {
+export interface UpdateSessionDescription {
   /**
    * update single row of the table: "Session"
    */
-  update_Session_by_pk: UpdateSessionTitle_update_Session_by_pk | null;
+  update_Session_by_pk: UpdateSessionDescription_update_Session_by_pk | null;
 }
 
-export interface UpdateSessionTitleVariables {
+export interface UpdateSessionDescriptionVariables {
   itemId: number;
   text: string;
 }

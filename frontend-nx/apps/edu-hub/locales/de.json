@@ -49,6 +49,7 @@
       "email_templates": "E-Mail-Vorlagen",
       "app_settings": "App-Einstellungen",
       "statistics": "Statistiken",
+      "kursleitungshandbuch": "Kursleitungshandbuch",
       "logout": "Logout"
     },
     "change-password": "Passwort oder E-Mail ändern",
@@ -628,6 +629,7 @@
     "title": "Titel",
     "external_speakers": "Externe Referenten",
     "add_external_speaker": "Externen Referenten hinzufügen",
+    "remove_external_speaker": "Externen Referenten entfernen",
     "session_title": "Titel des Termins",
     "confirmDeleteSession": "Möchtest du den Termin wirklich löschen?",
     "cannotDeletePastSession": "Du kannst keinen Termin der in der Vergangenheit liegt löschen! Solltest du den Termin wirklich löschen wollen, kontaktiere bitte einen Administrator.",
@@ -806,6 +808,41 @@
     "course-start": "Kursstart",
     "course-end": "Kursende",
     "achievement-upload-deadline": "Abgabeschluss Leistungsnachweise"
+  },
+  "manageAchievementOptions": {
+    "table_header": {
+      "title": "Titel",
+      "description": "Beschreibung",
+      "record_type": "Typ",
+      "mentors": "Mentoren",
+      "courses": "Kurse"
+    },
+    "title": {
+      "placeholder": "Projektname"
+    },
+    "description": {
+      "placeholder": "Projektbeschreibung eingeben"
+    },
+    "record_type": {
+      "DOCUMENTATION": "Dokumentation",
+      "ONLINE_COURSE": "Online-Kurs"
+    },
+    "documentation_template": {
+      "placeholder": "Keine Auswahl",
+      "help_text": "Vorlage für die Leistungsnachweisdokumentation"
+    },
+    "add_mentor": "Mentor hinzufügen",
+    "remove_mentor": "Mentor entfernen",
+    "add_course": "Kurs hinzufügen",
+    "manage_templates_button": "Leistungsnachweisvorlagen verwalten",
+    "notifications": {
+      "achievement_option_added": "Leistungsnachweis erfolgreich hinzugefügt",
+      "add_failed": "Hinzufügen fehlgeschlagen. Bitte versuche es erneut."
+    },
+    "delete_button": {
+      "untitled_achievement_option": "Unbenannter Leistungsnachweis",
+      "delete_achievement_option_confirmation": "Möchtest du den Leistungsnachweis '{title}' wirklich löschen?"
+    }
   },
   "manageCourses": {
     "table_header": {
@@ -1105,6 +1142,11 @@
     "course_not_found": "Kurs {courseId} wurde nicht gefunden!",
     "add_session": "Termin hinzufügen",
     "SessionsTab": {
+      "session_description": {
+        "label": "Terminbeschreibung",
+        "help_text": "Eine Beschreibung dieses Termins (z.B. behandelte Themen, besondere Hinweise).",
+        "placeholder": "Terminbeschreibung eingeben..."
+      },
       "sessionAddresses": {
         "online": {
           "label": "Online",

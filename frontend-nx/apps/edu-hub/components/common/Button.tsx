@@ -45,7 +45,7 @@ export const Button: FC<ButtonProps> = ({
   let colorStyles = 'text-label-primary border-border-secondary hover:border-brand';
   if (filled) {
     if (inverted) {
-      colorStyles = 'text-label-primary bg-fill-secondary border-border-secondary hover:border-brand';
+      colorStyles = 'text-fill-primary bg-fill-secondary border-border-secondary hover:border-brand';
     } else {
       colorStyles = 'bg-label-primary text-fill-primary border-label-primary hover:border-brand-light';
     }

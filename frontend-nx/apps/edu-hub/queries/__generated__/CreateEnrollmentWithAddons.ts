@@ -38,5 +38,5 @@ export interface CreateEnrollmentWithAddonsVariables {
   userId: any;
   motivationLetter?: string | null;
   formbricksSurveyUrl?: string | null;
-  termsAcceptedAt?: any | null;
+  acceptTerms?: boolean | null;
 }

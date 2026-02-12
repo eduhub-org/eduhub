@@ -511,6 +511,38 @@ export enum CourseDegree_update_column {
 }
 
 /**
+ * unique or primary key constraints on table "CourseEnrollmentAddon"
+ */
+export enum CourseEnrollmentAddon_constraint {
+  CourseEnrollmentAddon_enrollmentId_addonMappingId_key = "CourseEnrollmentAddon_enrollmentId_addonMappingId_key",
+  CourseEnrollmentAddon_pkey = "CourseEnrollmentAddon_pkey",
+}
+
+/**
+ * select columns of table "CourseEnrollmentAddon"
+ */
+export enum CourseEnrollmentAddon_select_column {
+  addonMappingId = "addonMappingId",
+  created_at = "created_at",
+  currency = "currency",
+  enrollmentId = "enrollmentId",
+  id = "id",
+  priceAtPurchase = "priceAtPurchase",
+}
+
+/**
+ * update columns of table "CourseEnrollmentAddon"
+ */
+export enum CourseEnrollmentAddon_update_column {
+  addonMappingId = "addonMappingId",
+  created_at = "created_at",
+  currency = "currency",
+  enrollmentId = "enrollmentId",
+  id = "id",
+  priceAtPurchase = "priceAtPurchase",
+}
+
+/**
  * unique or primary key constraints on table "CourseEnrollmentStatus"
  */
 export enum CourseEnrollmentStatus_constraint {
@@ -882,38 +914,6 @@ export enum Course_update_column {
   title = "title",
   updated_at = "updated_at",
   weekDay = "weekDay",
-}
-
-/**
- * unique or primary key constraints on table "EnrollmentAddon"
- */
-export enum EnrollmentAddon_constraint {
-  EnrollmentAddon_enrollmentId_addonMappingId_key = "EnrollmentAddon_enrollmentId_addonMappingId_key",
-  EnrollmentAddon_pkey = "EnrollmentAddon_pkey",
-}
-
-/**
- * select columns of table "EnrollmentAddon"
- */
-export enum EnrollmentAddon_select_column {
-  addonMappingId = "addonMappingId",
-  created_at = "created_at",
-  currency = "currency",
-  enrollmentId = "enrollmentId",
-  id = "id",
-  priceAtPurchase = "priceAtPurchase",
-}
-
-/**
- * update columns of table "EnrollmentAddon"
- */
-export enum EnrollmentAddon_update_column {
-  addonMappingId = "addonMappingId",
-  created_at = "created_at",
-  currency = "currency",
-  enrollmentId = "enrollmentId",
-  id = "id",
-  priceAtPurchase = "priceAtPurchase",
 }
 
 /**
@@ -4071,6 +4071,186 @@ export interface CourseDegree_variance_order_by {
   id?: order_by | null;
 }
 
+export interface CourseEnrollmentAddon_aggregate_bool_exp {
+  count?: CourseEnrollmentAddon_aggregate_bool_exp_count | null;
+}
+
+export interface CourseEnrollmentAddon_aggregate_bool_exp_count {
+  arguments?: CourseEnrollmentAddon_select_column[] | null;
+  distinct?: boolean | null;
+  filter?: CourseEnrollmentAddon_bool_exp | null;
+  predicate: Int_comparison_exp;
+}
+
+/**
+ * order by aggregate values of table "CourseEnrollmentAddon"
+ */
+export interface CourseEnrollmentAddon_aggregate_order_by {
+  avg?: CourseEnrollmentAddon_avg_order_by | null;
+  count?: order_by | null;
+  max?: CourseEnrollmentAddon_max_order_by | null;
+  min?: CourseEnrollmentAddon_min_order_by | null;
+  stddev?: CourseEnrollmentAddon_stddev_order_by | null;
+  stddev_pop?: CourseEnrollmentAddon_stddev_pop_order_by | null;
+  stddev_samp?: CourseEnrollmentAddon_stddev_samp_order_by | null;
+  sum?: CourseEnrollmentAddon_sum_order_by | null;
+  var_pop?: CourseEnrollmentAddon_var_pop_order_by | null;
+  var_samp?: CourseEnrollmentAddon_var_samp_order_by | null;
+  variance?: CourseEnrollmentAddon_variance_order_by | null;
+}
+
+/**
+ * input type for inserting array relation for remote table "CourseEnrollmentAddon"
+ */
+export interface CourseEnrollmentAddon_arr_rel_insert_input {
+  data: CourseEnrollmentAddon_insert_input[];
+  on_conflict?: CourseEnrollmentAddon_on_conflict | null;
+}
+
+/**
+ * order by avg() on columns of table "CourseEnrollmentAddon"
+ */
+export interface CourseEnrollmentAddon_avg_order_by {
+  addonMappingId?: order_by | null;
+  enrollmentId?: order_by | null;
+  id?: order_by | null;
+  priceAtPurchase?: order_by | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "CourseEnrollmentAddon". All fields are combined with a logical 'AND'.
+ */
+export interface CourseEnrollmentAddon_bool_exp {
+  CourseAddonMapping?: CourseAddonMapping_bool_exp | null;
+  CourseEnrollment?: CourseEnrollment_bool_exp | null;
+  _and?: CourseEnrollmentAddon_bool_exp[] | null;
+  _not?: CourseEnrollmentAddon_bool_exp | null;
+  _or?: CourseEnrollmentAddon_bool_exp[] | null;
+  addonMappingId?: Int_comparison_exp | null;
+  created_at?: timestamptz_comparison_exp | null;
+  currency?: String_comparison_exp | null;
+  enrollmentId?: Int_comparison_exp | null;
+  id?: Int_comparison_exp | null;
+  priceAtPurchase?: Int_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "CourseEnrollmentAddon"
+ */
+export interface CourseEnrollmentAddon_insert_input {
+  CourseAddonMapping?: CourseAddonMapping_obj_rel_insert_input | null;
+  CourseEnrollment?: CourseEnrollment_obj_rel_insert_input | null;
+  addonMappingId?: number | null;
+  created_at?: any | null;
+  currency?: string | null;
+  enrollmentId?: number | null;
+  id?: number | null;
+  priceAtPurchase?: number | null;
+}
+
+/**
+ * order by max() on columns of table "CourseEnrollmentAddon"
+ */
+export interface CourseEnrollmentAddon_max_order_by {
+  addonMappingId?: order_by | null;
+  created_at?: order_by | null;
+  currency?: order_by | null;
+  enrollmentId?: order_by | null;
+  id?: order_by | null;
+  priceAtPurchase?: order_by | null;
+}
+
+/**
+ * order by min() on columns of table "CourseEnrollmentAddon"
+ */
+export interface CourseEnrollmentAddon_min_order_by {
+  addonMappingId?: order_by | null;
+  created_at?: order_by | null;
+  currency?: order_by | null;
+  enrollmentId?: order_by | null;
+  id?: order_by | null;
+  priceAtPurchase?: order_by | null;
+}
+
+/**
+ * on_conflict condition type for table "CourseEnrollmentAddon"
+ */
+export interface CourseEnrollmentAddon_on_conflict {
+  constraint: CourseEnrollmentAddon_constraint;
+  update_columns: CourseEnrollmentAddon_update_column[];
+  where?: CourseEnrollmentAddon_bool_exp | null;
+}
+
+/**
+ * order by stddev() on columns of table "CourseEnrollmentAddon"
+ */
+export interface CourseEnrollmentAddon_stddev_order_by {
+  addonMappingId?: order_by | null;
+  enrollmentId?: order_by | null;
+  id?: order_by | null;
+  priceAtPurchase?: order_by | null;
+}
+
+/**
+ * order by stddev_pop() on columns of table "CourseEnrollmentAddon"
+ */
+export interface CourseEnrollmentAddon_stddev_pop_order_by {
+  addonMappingId?: order_by | null;
+  enrollmentId?: order_by | null;
+  id?: order_by | null;
+  priceAtPurchase?: order_by | null;
+}
+
+/**
+ * order by stddev_samp() on columns of table "CourseEnrollmentAddon"
+ */
+export interface CourseEnrollmentAddon_stddev_samp_order_by {
+  addonMappingId?: order_by | null;
+  enrollmentId?: order_by | null;
+  id?: order_by | null;
+  priceAtPurchase?: order_by | null;
+}
+
+/**
+ * order by sum() on columns of table "CourseEnrollmentAddon"
+ */
+export interface CourseEnrollmentAddon_sum_order_by {
+  addonMappingId?: order_by | null;
+  enrollmentId?: order_by | null;
+  id?: order_by | null;
+  priceAtPurchase?: order_by | null;
+}
+
+/**
+ * order by var_pop() on columns of table "CourseEnrollmentAddon"
+ */
+export interface CourseEnrollmentAddon_var_pop_order_by {
+  addonMappingId?: order_by | null;
+  enrollmentId?: order_by | null;
+  id?: order_by | null;
+  priceAtPurchase?: order_by | null;
+}
+
+/**
+ * order by var_samp() on columns of table "CourseEnrollmentAddon"
+ */
+export interface CourseEnrollmentAddon_var_samp_order_by {
+  addonMappingId?: order_by | null;
+  enrollmentId?: order_by | null;
+  id?: order_by | null;
+  priceAtPurchase?: order_by | null;
+}
+
+/**
+ * order by variance() on columns of table "CourseEnrollmentAddon"
+ */
+export interface CourseEnrollmentAddon_variance_order_by {
+  addonMappingId?: order_by | null;
+  enrollmentId?: order_by | null;
+  id?: order_by | null;
+  priceAtPurchase?: order_by | null;
+}
+
 /**
  * Boolean expression to filter rows from the table "CourseEnrollmentStatus". All fields are combined with a logical 'AND'.
  */
@@ -4180,9 +4360,9 @@ export interface CourseEnrollment_avg_order_by {
  */
 export interface CourseEnrollment_bool_exp {
   Course?: Course_bool_exp | null;
+  CourseEnrollmentAddons?: CourseEnrollmentAddon_bool_exp | null;
+  CourseEnrollmentAddons_aggregate?: CourseEnrollmentAddon_aggregate_bool_exp | null;
   CourseEnrollmentStatus?: CourseEnrollmentStatus_bool_exp | null;
-  EnrollmentAddons?: EnrollmentAddon_bool_exp | null;
-  EnrollmentAddons_aggregate?: EnrollmentAddon_aggregate_bool_exp | null;
   LocationOption?: LocationOption_bool_exp | null;
   MotivationRating?: MotivationRating_bool_exp | null;
   PaymentStatus?: PaymentStatus_bool_exp | null;
@@ -4215,8 +4395,8 @@ export interface CourseEnrollment_bool_exp {
  */
 export interface CourseEnrollment_insert_input {
   Course?: Course_obj_rel_insert_input | null;
+  CourseEnrollmentAddons?: CourseEnrollmentAddon_arr_rel_insert_input | null;
   CourseEnrollmentStatus?: CourseEnrollmentStatus_obj_rel_insert_input | null;
-  EnrollmentAddons?: EnrollmentAddon_arr_rel_insert_input | null;
   LocationOption?: LocationOption_obj_rel_insert_input | null;
   MotivationRating?: MotivationRating_obj_rel_insert_input | null;
   PaymentStatus?: PaymentStatus_obj_rel_insert_input | null;
@@ -4303,8 +4483,8 @@ export interface CourseEnrollment_on_conflict {
  */
 export interface CourseEnrollment_order_by {
   Course?: Course_order_by | null;
+  CourseEnrollmentAddons_aggregate?: CourseEnrollmentAddon_aggregate_order_by | null;
   CourseEnrollmentStatus?: CourseEnrollmentStatus_order_by | null;
-  EnrollmentAddons_aggregate?: EnrollmentAddon_aggregate_order_by | null;
   LocationOption?: LocationOption_order_by | null;
   MotivationRating?: MotivationRating_order_by | null;
   PaymentStatus?: PaymentStatus_order_by | null;
@@ -5677,186 +5857,6 @@ export interface Course_variance_order_by {
   maxMissedSessions?: order_by | null;
   maxParticipants?: order_by | null;
   programId?: order_by | null;
-}
-
-export interface EnrollmentAddon_aggregate_bool_exp {
-  count?: EnrollmentAddon_aggregate_bool_exp_count | null;
-}
-
-export interface EnrollmentAddon_aggregate_bool_exp_count {
-  arguments?: EnrollmentAddon_select_column[] | null;
-  distinct?: boolean | null;
-  filter?: EnrollmentAddon_bool_exp | null;
-  predicate: Int_comparison_exp;
-}
-
-/**
- * order by aggregate values of table "EnrollmentAddon"
- */
-export interface EnrollmentAddon_aggregate_order_by {
-  avg?: EnrollmentAddon_avg_order_by | null;
-  count?: order_by | null;
-  max?: EnrollmentAddon_max_order_by | null;
-  min?: EnrollmentAddon_min_order_by | null;
-  stddev?: EnrollmentAddon_stddev_order_by | null;
-  stddev_pop?: EnrollmentAddon_stddev_pop_order_by | null;
-  stddev_samp?: EnrollmentAddon_stddev_samp_order_by | null;
-  sum?: EnrollmentAddon_sum_order_by | null;
-  var_pop?: EnrollmentAddon_var_pop_order_by | null;
-  var_samp?: EnrollmentAddon_var_samp_order_by | null;
-  variance?: EnrollmentAddon_variance_order_by | null;
-}
-
-/**
- * input type for inserting array relation for remote table "EnrollmentAddon"
- */
-export interface EnrollmentAddon_arr_rel_insert_input {
-  data: EnrollmentAddon_insert_input[];
-  on_conflict?: EnrollmentAddon_on_conflict | null;
-}
-
-/**
- * order by avg() on columns of table "EnrollmentAddon"
- */
-export interface EnrollmentAddon_avg_order_by {
-  addonMappingId?: order_by | null;
-  enrollmentId?: order_by | null;
-  id?: order_by | null;
-  priceAtPurchase?: order_by | null;
-}
-
-/**
- * Boolean expression to filter rows from the table "EnrollmentAddon". All fields are combined with a logical 'AND'.
- */
-export interface EnrollmentAddon_bool_exp {
-  CourseAddonMapping?: CourseAddonMapping_bool_exp | null;
-  CourseEnrollment?: CourseEnrollment_bool_exp | null;
-  _and?: EnrollmentAddon_bool_exp[] | null;
-  _not?: EnrollmentAddon_bool_exp | null;
-  _or?: EnrollmentAddon_bool_exp[] | null;
-  addonMappingId?: Int_comparison_exp | null;
-  created_at?: timestamptz_comparison_exp | null;
-  currency?: String_comparison_exp | null;
-  enrollmentId?: Int_comparison_exp | null;
-  id?: Int_comparison_exp | null;
-  priceAtPurchase?: Int_comparison_exp | null;
-}
-
-/**
- * input type for inserting data into table "EnrollmentAddon"
- */
-export interface EnrollmentAddon_insert_input {
-  CourseAddonMapping?: CourseAddonMapping_obj_rel_insert_input | null;
-  CourseEnrollment?: CourseEnrollment_obj_rel_insert_input | null;
-  addonMappingId?: number | null;
-  created_at?: any | null;
-  currency?: string | null;
-  enrollmentId?: number | null;
-  id?: number | null;
-  priceAtPurchase?: number | null;
-}
-
-/**
- * order by max() on columns of table "EnrollmentAddon"
- */
-export interface EnrollmentAddon_max_order_by {
-  addonMappingId?: order_by | null;
-  created_at?: order_by | null;
-  currency?: order_by | null;
-  enrollmentId?: order_by | null;
-  id?: order_by | null;
-  priceAtPurchase?: order_by | null;
-}
-
-/**
- * order by min() on columns of table "EnrollmentAddon"
- */
-export interface EnrollmentAddon_min_order_by {
-  addonMappingId?: order_by | null;
-  created_at?: order_by | null;
-  currency?: order_by | null;
-  enrollmentId?: order_by | null;
-  id?: order_by | null;
-  priceAtPurchase?: order_by | null;
-}
-
-/**
- * on_conflict condition type for table "EnrollmentAddon"
- */
-export interface EnrollmentAddon_on_conflict {
-  constraint: EnrollmentAddon_constraint;
-  update_columns: EnrollmentAddon_update_column[];
-  where?: EnrollmentAddon_bool_exp | null;
-}
-
-/**
- * order by stddev() on columns of table "EnrollmentAddon"
- */
-export interface EnrollmentAddon_stddev_order_by {
-  addonMappingId?: order_by | null;
-  enrollmentId?: order_by | null;
-  id?: order_by | null;
-  priceAtPurchase?: order_by | null;
-}
-
-/**
- * order by stddev_pop() on columns of table "EnrollmentAddon"
- */
-export interface EnrollmentAddon_stddev_pop_order_by {
-  addonMappingId?: order_by | null;
-  enrollmentId?: order_by | null;
-  id?: order_by | null;
-  priceAtPurchase?: order_by | null;
-}
-
-/**
- * order by stddev_samp() on columns of table "EnrollmentAddon"
- */
-export interface EnrollmentAddon_stddev_samp_order_by {
-  addonMappingId?: order_by | null;
-  enrollmentId?: order_by | null;
-  id?: order_by | null;
-  priceAtPurchase?: order_by | null;
-}
-
-/**
- * order by sum() on columns of table "EnrollmentAddon"
- */
-export interface EnrollmentAddon_sum_order_by {
-  addonMappingId?: order_by | null;
-  enrollmentId?: order_by | null;
-  id?: order_by | null;
-  priceAtPurchase?: order_by | null;
-}
-
-/**
- * order by var_pop() on columns of table "EnrollmentAddon"
- */
-export interface EnrollmentAddon_var_pop_order_by {
-  addonMappingId?: order_by | null;
-  enrollmentId?: order_by | null;
-  id?: order_by | null;
-  priceAtPurchase?: order_by | null;
-}
-
-/**
- * order by var_samp() on columns of table "EnrollmentAddon"
- */
-export interface EnrollmentAddon_var_samp_order_by {
-  addonMappingId?: order_by | null;
-  enrollmentId?: order_by | null;
-  id?: order_by | null;
-  priceAtPurchase?: order_by | null;
-}
-
-/**
- * order by variance() on columns of table "EnrollmentAddon"
- */
-export interface EnrollmentAddon_variance_order_by {
-  addonMappingId?: order_by | null;
-  enrollmentId?: order_by | null;
-  id?: order_by | null;
-  priceAtPurchase?: order_by | null;
 }
 
 /**
