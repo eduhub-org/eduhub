@@ -217,17 +217,15 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
         enableSorting: true,
         cell: ({ row }) => (
           <div className="w-full light flex items-center">
-            {lectureStart && lectureEnd && (
-              <OptimisticDatePicker
-                minDate={lectureStart}
-                maxDate={lectureEnd}
-                className="w-full !bg-fill-primary !text-label-primary border border-border-primary rounded px-2 py-1.5 h-9"
-                value={row.original.startDateTime}
-                onChange={(event) => handleSetDate(row.original, event)}
-                showLoading={true}
-                showWeekends={true}
-              />
-            )}
+            <OptimisticDatePicker
+              minDate={lectureStart ?? undefined}
+              maxDate={lectureEnd ?? undefined}
+              className="w-full !bg-fill-primary !text-label-primary border border-border-primary rounded px-2 py-1.5 h-9"
+              value={row.original.startDateTime}
+              onChange={(event) => handleSetDate(row.original, event)}
+              showLoading={true}
+              showWeekends={true}
+            />
           </div>
         ),
       },
