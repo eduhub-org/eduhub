@@ -192,6 +192,11 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
     setPageIndex(0);
   }, []);
 
+  const handleSearchFilterChange = useCallback((value: string) => {
+    setSearchFilter(value);
+    setPageIndex(0);
+  }, []);
+
   const lectureStart = course.Program?.lectureStart;
   const lectureEnd = course.Program?.lectureEnd;
 
@@ -326,7 +331,7 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
         pageSize={pageSize}
         onPageSizeChange={handlePageSizeChange}
         searchFilter={searchFilter}
-        onSearchFilterChange={setSearchFilter}
+        onSearchFilterChange={handleSearchFilterChange}
         refetchQueries={['ManagedCourse']}
         onAddButtonClick={insertSession}
         addButtonText={t('add_session')}
