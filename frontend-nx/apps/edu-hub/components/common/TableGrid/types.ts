@@ -20,7 +20,7 @@ export interface TableGridProps<T extends BaseRow> {
   deleteIdType?: 'number' | 'uuidString';
   generateDeletionConfirmationQuestion?: (row: T) => string;
   enablePagination?: boolean;
-  error: ApolloError;
+  error: ApolloError | null | undefined;
   expandableRowComponent?: (props: { row: T }) => ReactElement | null;
   loading: boolean;
   pageSize?: number;

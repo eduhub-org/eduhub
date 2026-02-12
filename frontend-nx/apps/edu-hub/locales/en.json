@@ -637,6 +637,7 @@
     "title": "Title",
     "external_speakers": "External Speakers",
     "add_external_speaker": "Add External Speaker",
+    "remove_external_speaker": "Remove external speaker",
     "session_title": "Session Title",
     "confirmDeleteSession": "Do you really want to delete the session?",
     "cannotDeletePastSession": "You cannot delete a session that is in the past! If you really want to delete the session, please contact an administrator.",

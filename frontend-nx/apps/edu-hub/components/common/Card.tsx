@@ -15,7 +15,7 @@ interface CardProps {
  */
 export const Card: FC<CardProps> = ({ children, title, helpText, className = '' }) => (
   <div
-    className={`bg-fill-primary border border-border-primary rounded-lg p-4 ${className}`.trim()}
+    className={`light bg-fill-primary border border-border-primary rounded-lg p-4 ${className}`.trim()}
   >
     {(title || helpText) && (
       <div className="flex items-center gap-2 mb-3">

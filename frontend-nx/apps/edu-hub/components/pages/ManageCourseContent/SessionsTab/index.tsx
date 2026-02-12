@@ -1,4 +1,4 @@
-import { ApolloError, QueryResult } from '@apollo/client';
+import { QueryResult } from '@apollo/client';
 import { FC, useCallback, useMemo, useState } from 'react';
 import { ColumnDef } from '@tanstack/react-table';
 import {
@@ -42,6 +42,7 @@ import {
 import { useTranslations } from 'next-intl';
 import { LocationOption_enum, order_by, SessionAddress_insert_input } from '../../../../__generated__/globalTypes';
 import { useLazyRoleQuery } from '../../../../hooks/authedQuery';
+import { useIsAdmin } from '../../../../hooks/authentication';
 import { USER_SELECTION_WITH_FILTER } from '../../../../queries/user';
 
 import TableGrid from '../../../common/TableGrid';
@@ -84,6 +85,7 @@ const parseSearchValue = (searchValue: string) => {
 export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
   const t = useTranslations('manageCourse');
   const tCoursePage = useTranslations('coursePage');
+  const isAdmin = useIsAdmin();
 
   const [pageIndex, setPageIndex] = useState(0);
   const [pageSize, setPageSize] = useState(15);
@@ -193,9 +195,17 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
   const lectureStart = course.Program?.lectureStart;
   const lectureEnd = course.Program?.lectureEnd;
 
+  // Show delete button only when user is admin or course is not in the past (instructor guard)
+  const canDeleteSessions = useMemo(() => {
+    if (isAdmin) return true;
+    const lastSession = courseSessions[courseSessions.length - 1];
+    return !lastSession || lastSession.endDateTime >= new Date();
+  }, [isAdmin, courseSessions]);
+
   const columns = useMemo<ColumnDef<ManagedCourse_Course_by_pk_Sessions>[]>(
     () => [
       {
+        id: 'date',
         header: tCoursePage('date'),
         accessorKey: 'startDateTime',
         size: 130,
@@ -217,6 +227,7 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
         ),
       },
       {
+        id: 'startTime',
         header: tCoursePage('start_time'),
         accessorKey: 'startDateTime',
         size: 100,
@@ -298,11 +309,11 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
         columns={columns}
         compactRows
         loading={false}
-        error={null as ApolloError}
+        error={null}
         expandableRowComponent={(props) => (
           <ExpandableSessionRowContent session={props.row} qResult={qResult} />
         )}
-        deleteMutation={DELETE_SESSION}
+        deleteMutation={canDeleteSessions ? DELETE_SESSION : undefined}
         deleteIdType="number"
         generateDeletionConfirmationQuestion={(row) =>
           tCoursePage('confirmDeleteSession') +
@@ -461,7 +472,7 @@ const ExpandableSessionRowContent: FC<ExpandableSessionRowContentProps> = ({ ses
               onDelete={deleteSpeakerHandler}
               onAdd={handleNewSpeaker}
               addButtonLabel={tCoursePage('add_external_speaker')}
-              removeAriaLabel={tCoursePage('add_external_speaker')}
+              removeAriaLabel={tCoursePage('remove_external_speaker')}
               SelectionDialog={SelectUserDialog}
               dialogTitle={tCoursePage('add_external_speaker')}
               checkDuplicate={(speaker, user) => speaker.User.id === user.id}
