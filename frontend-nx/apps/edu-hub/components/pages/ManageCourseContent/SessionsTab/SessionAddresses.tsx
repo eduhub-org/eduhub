@@ -68,31 +68,39 @@ export const SessionAddresses: FC<SessionAddressesIProps> = ({ address, refetchQ
   }, [defaultAddressLabel, t]);
 
 
+  const labelCell = (
+    <span className="text-label-primary flex-shrink-0" style={{ minWidth: '5rem' }}>
+      {label}:
+    </span>
+  );
+
   // For online sessions, show the link as read-only
   if (isOnline) {
     const value = isValidLink ? sessionAddress : t('online.placeholder');
     return (
-      <div className="mt-5 mb-2 flex items-center">
-        <span className="w-24 flex-shrink-0">{label}:</span>
-        <span className="text-gray-800 flex-1">{value}</span>
-        <Tooltip title={t('online.placeholder')} placement="top">
-          <HelpOutline
-            style={{
-              cursor: 'pointer',
-              color: '#666',
-              marginLeft: '8px',
-              fontSize: '20px',
-            }}
-          />
-        </Tooltip>
-      </div>
+      <>
+        {labelCell}
+        <span className="text-label-primary flex-1 min-w-0 flex items-center">
+          {value}
+          <Tooltip title={t('online.placeholder')} placement="top">
+            <HelpOutline
+              style={{
+                cursor: 'pointer',
+                color: 'var(--eduhub-label-disabled)',
+                marginLeft: '8px',
+                fontSize: '20px',
+              }}
+            />
+          </Tooltip>
+        </span>
+      </>
     );
   }
 
   // For offline sessions, use the enhanced dropdown selector
   return (
-    <div className="flex items-center">
-      <span className="w-24 flex-shrink-0">{label}:</span>
+    <>
+      {labelCell}
       <div className="flex-1 min-w-0">
         <DropDownSelector
           variant="material"
@@ -113,7 +121,7 @@ export const SessionAddresses: FC<SessionAddressesIProps> = ({ address, refetchQ
           nullableLabel={nullableLabel}
         />
       </div>
-    </div>
+    </>
   );
 };
 

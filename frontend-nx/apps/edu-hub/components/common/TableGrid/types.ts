@@ -39,6 +39,8 @@ export interface TableGridProps<T extends BaseRow> {
   availablePageSizes?: number[];
   sorting?: SortingState;
   onSortingChange?: (sorting: SortingState | ((prev: SortingState) => SortingState)) => void;
+  /** When true, uses reduced row padding for more compact table layout */
+  compactRows?: boolean;
 }
 
 export interface UseTableGridProps<V> {

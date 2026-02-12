@@ -1157,6 +1157,11 @@
     "course_not_found": "Course {courseId} could not be found!",
     "add_session": "Add Session",
     "SessionsTab": {
+      "session_description": {
+        "label": "Session Description",
+        "help_text": "A description of this session (e.g., topics covered, special notes).",
+        "placeholder": "Enter session description..."
+      },
       "sessionAddresses": {
         "online": {
           "label": "Online",

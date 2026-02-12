@@ -21,6 +21,28 @@ export const makeFullName = (firstName: string, lastName: string): string => {
   return `${firstName} ${lastName}`;
 };
 
+/** Truncate text with ellipsis */
+export const truncateText = (text: string, maxLength = 15): string => {
+  if (!text || text.length <= maxLength) return text || '';
+  return text.slice(0, maxLength) + '...';
+};
+
+/** Format a list of items as a truncated comma-separated string with overflow count */
+export const formatTruncatedList = <T>(
+  items: readonly T[],
+  getLabel: (item: T) => string,
+  maxVisible = 2,
+  maxLabelLength = 15
+): string => {
+  if (!items || items.length === 0) return '-';
+  const visibleLabels = items
+    .slice(0, maxVisible)
+    .map((item) => truncateText(getLabel(item), maxLabelLength))
+    .join(', ');
+  const remaining = items.length - maxVisible;
+  return remaining > 0 ? `${visibleLabels} (+${remaining})` : visibleLabels;
+};
+
 export const formattedDate = (date: Date) => {
   const y = new Intl.DateTimeFormat('en', { year: 'numeric' }).format(date);
   const m = new Intl.DateTimeFormat('en', { month: '2-digit' }).format(date);

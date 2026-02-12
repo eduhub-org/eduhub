@@ -20,5 +20,5 @@ export interface DeleteSession {
 }
 
 export interface DeleteSessionVariables {
-  sessionId: number;
+  id: number;
 }

@@ -1141,6 +1141,11 @@
     "course_not_found": "Kurs {courseId} wurde nicht gefunden!",
     "add_session": "Termin hinzufügen",
     "SessionsTab": {
+      "session_description": {
+        "label": "Terminbeschreibung",
+        "help_text": "Eine Beschreibung dieses Termins (z.B. behandelte Themen, besondere Hinweise).",
+        "placeholder": "Terminbeschreibung eingeben..."
+      },
       "sessionAddresses": {
         "online": {
           "label": "Online",
