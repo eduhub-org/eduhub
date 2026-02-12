@@ -137,18 +137,18 @@ export const INSERT_SESSION = gql`
 `;
 
 export const DELETE_SESSION = gql`
-  mutation DeleteSession($sessionId: Int!) {
-    delete_Session_by_pk(id: $sessionId) {
+  mutation DeleteSession($id: Int!) {
+    delete_Session_by_pk(id: $id) {
       id
     }
   }
 `;
 
 export const UPDATE_SESSION_TITLE = gql`
-  mutation UpdateSessionTitle($sessionId: Int!, $title: String!) {
+  mutation UpdateSessionTitle($itemId: Int!, $text: String!) {
     update_Session_by_pk(
-      pk_columns: { id: $sessionId }
-      _set: { title: $title }
+      pk_columns: { id: $itemId }
+      _set: { title: $text }
     ) {
       id
     }
@@ -171,6 +171,17 @@ export const UPDATE_SESSION_END_TIME = gql`
     update_Session_by_pk(
       pk_columns: { id: $sessionId }
       _set: { endDateTime: $value }
+    ) {
+      id
+    }
+  }
+`;
+
+export const UPDATE_SESSION_DESCRIPTION = gql`
+  mutation UpdateSessionDescription($itemId: Int!, $text: String!) {
+    update_Session_by_pk(
+      pk_columns: { id: $itemId }
+      _set: { description: $text }
     ) {
       id
     }

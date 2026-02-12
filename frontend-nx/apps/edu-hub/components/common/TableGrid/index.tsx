@@ -46,6 +46,7 @@ const TableGrid = <T extends BaseRow,>({
   availablePageSizes = [10, 20, 50, 100, 500],
   sorting: externalSorting,
   onSortingChange: externalOnSortingChange,
+  compactRows = false,
 }: TableGridProps<T>) => {
   const onGlobalFilterChange = useCallback(
     (value: string) => {
@@ -427,12 +428,12 @@ const TableGrid = <T extends BaseRow,>({
           if (rowsToDisplay.length === 0) {
             return (
               <div className="flex items-stretch mb-1">
-                <div className="flex-grow bg-bg-secondary text-label-primary py-2 light">
+                <div className={`flex-grow bg-bg-secondary text-label-primary light ${compactRows ? 'py-1' : 'py-2'}`}>
                   <div className={`flex items-center gap-3 ${!showCheckbox ? 'pl-3' : ''}`} style={{ minWidth: `${mainRowContentWidth - (expandableRowComponent ? 40 : 0) - (deleteMutation ? 80 : 0)}px` }}>
                     {table.getHeaderGroups()[0]?.headers.map((header) => (
                       <div
                         key={header.id}
-                        className={`${header.column.columnDef.meta?.className}`}
+                        className={`flex items-center min-h-0 ${header.column.columnDef.meta?.className || ''}`}
                         style={{
                           width: `${header.getSize()}px`,
                           flexShrink: 0,
@@ -454,12 +455,12 @@ const TableGrid = <T extends BaseRow,>({
             <React.Fragment key={row.id}>
               {/* Primary Row */}
               <div className={`flex items-stretch ${expandedRows.has(row.original.id) ? 'mb-0' : 'mb-1'}`}>
-                <div className="flex-grow bg-bg-secondary text-label-primary py-2 light">
+                <div className={`flex-grow bg-bg-secondary text-label-primary light ${compactRows ? 'py-1' : 'py-2'}`}>
                   <div className={`flex items-center gap-3 ${!showCheckbox ? 'pl-3' : ''}`} style={{ minWidth: `${mainRowContentWidth - (expandableRowComponent ? 40 : 0) - (deleteMutation ? 80 : 0)}px` }}>
                     {row.getVisibleCells().map((cell) => (
                       <div
                         key={cell.id}
-                        className={`${cell.column.columnDef.meta?.className}`}
+                        className={`flex items-center min-h-0 ${cell.column.columnDef.meta?.className || ''}`}
                         style={{
                           width: `${cell.column.getSize()}px`,
                           flexShrink: 0,

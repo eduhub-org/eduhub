@@ -25,47 +25,9 @@ import DropDownSelector from '../../inputs/DropDownSelector';
 import NotificationSnackbar from '../../common/dialogs/NotificationSnackbar';
 import NavigationButton from '../../common/NavigationButton';
 import ExpandableAchievementOptionRow from './ExpandableAchievementOptionRow';
-import { makeFullName } from '../../../helpers/util';
+import { formatTruncatedList, makeFullName } from '../../../helpers/util';
 
 const QUERY_LIMIT = 100;
-
-// Helper function to truncate text with ellipsis
-const truncateText = (text: string, maxLength = 15): string => {
-  if (!text || text.length <= maxLength) return text || '';
-  return text.slice(0, maxLength) + '...';
-};
-
-// Helper function to format mentors list with truncated names and count indicator
-const formatMentorsList = (
-  mentors: AchievementOptionList_AchievementOption['AchievementOptionMentors']
-): string => {
-  if (!mentors || mentors.length === 0) return '-';
-
-  const maxVisible = 2;
-  const visibleNames = mentors
-    .slice(0, maxVisible)
-    .map((m) => truncateText(makeFullName(m.User.firstName, m.User.lastName ?? '')))
-    .join(', ');
-
-  const remaining = mentors.length - maxVisible;
-  return remaining > 0 ? `${visibleNames} (+${remaining})` : visibleNames;
-};
-
-// Helper function to format courses list with truncated titles and count indicator
-const formatCoursesList = (
-  courses: AchievementOptionList_AchievementOption['AchievementOptionCourses']
-): string => {
-  if (!courses || courses.length === 0) return '-';
-
-  const maxVisible = 2;
-  const visibleTitles = courses
-    .slice(0, maxVisible)
-    .map((c) => truncateText(c.Course.title))
-    .join(', ');
-
-  const remaining = courses.length - maxVisible;
-  return remaining > 0 ? `${visibleTitles} (+${remaining})` : visibleTitles;
-};
 
 const ManageAchievementOptionsContent: FC<{
   userId: string | undefined;
@@ -199,14 +161,25 @@ const ManageAchievementOptionsContent: FC<{
         accessorKey: 'mentorCount',
         size: 250,
         enableSorting: false,
-        cell: ({ row }) => <span>{formatMentorsList(row.original.AchievementOptionMentors)}</span>,
+        cell: ({ row }) => (
+          <span>
+            {formatTruncatedList(
+              row.original.AchievementOptionMentors,
+              (m) => makeFullName(m.User.firstName, m.User.lastName ?? '')
+            )}
+          </span>
+        ),
       },
       {
         header: t('table_header.courses'),
         accessorKey: 'courseCount',
         size: 250,
         enableSorting: false,
-        cell: ({ row }) => <span>{formatCoursesList(row.original.AchievementOptionCourses)}</span>,
+        cell: ({ row }) => (
+          <span>
+            {formatTruncatedList(row.original.AchievementOptionCourses, (c) => c.Course.title)}
+          </span>
+        ),
       },
     ],
     [t, recordTypeOptions]

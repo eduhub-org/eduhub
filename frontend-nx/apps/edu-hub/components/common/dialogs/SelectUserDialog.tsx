@@ -73,7 +73,7 @@ export const SelectUserDialog: FC<IProps> = ({ onClose, open, title, onAddNewUse
   const users = data?.User || [];
   const hasSearched = searchValue.trim().length >= 2;
   const showNoResults = hasSearched && !loading && users.length === 0;
-  const shouldShowAddNewUser = showAddNewUserOption && onAddNewUser && showNoResults;
+  const shouldShowAddNewUser = showAddNewUserOption && onAddNewUser && hasSearched && !loading;
 
   const handleAddNewUser = useCallback(() => {
     if (onAddNewUser) {
@@ -113,9 +113,11 @@ export const SelectUserDialog: FC<IProps> = ({ onClose, open, title, onAddNewUse
               ))}
             </>
           )}
-          {showNoResults && shouldShowAddNewUser && (
+          {showNoResults && (
+            <div className="p-4 text-center text-label-secondary">{t('common.select_user_dialog.no_users_found')}</div>
+          )}
+          {shouldShowAddNewUser && (
             <div className="p-4">
-              <div className="text-label-secondary mb-2 text-center">{t('common.select_user_dialog.no_users_found')}</div>
               <button
                 type="button"
                 onClick={handleAddNewUser}
@@ -124,9 +126,6 @@ export const SelectUserDialog: FC<IProps> = ({ onClose, open, title, onAddNewUse
                 {t('common.select_user_dialog.add_new_user')}
               </button>
             </div>
-          )}
-          {showNoResults && !shouldShowAddNewUser && (
-            <div className="p-4 text-center text-label-secondary">{t('common.select_user_dialog.no_users_found')}</div>
           )}
           {loading && hasSearched && (
             <div className="p-4 text-center text-label-secondary">{t('common.loading')}</div>

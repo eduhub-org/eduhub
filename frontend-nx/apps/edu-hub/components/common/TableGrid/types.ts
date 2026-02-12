@@ -20,7 +20,7 @@ export interface TableGridProps<T extends BaseRow> {
   deleteIdType?: 'number' | 'uuidString';
   generateDeletionConfirmationQuestion?: (row: T) => string;
   enablePagination?: boolean;
-  error: ApolloError;
+  error: ApolloError | null | undefined;
   expandableRowComponent?: (props: { row: T }) => ReactElement | null;
   loading: boolean;
   pageSize?: number;
@@ -39,6 +39,8 @@ export interface TableGridProps<T extends BaseRow> {
   availablePageSizes?: number[];
   sorting?: SortingState;
   onSortingChange?: (sorting: SortingState | ((prev: SortingState) => SortingState)) => void;
+  /** When true, uses reduced row padding for more compact table layout */
+  compactRows?: boolean;
 }
 
 export interface UseTableGridProps<V> {

@@ -637,6 +637,7 @@
     "title": "Title",
     "external_speakers": "External Speakers",
     "add_external_speaker": "Add External Speaker",
+    "remove_external_speaker": "Remove external speaker",
     "session_title": "Session Title",
     "confirmDeleteSession": "Do you really want to delete the session?",
     "cannotDeletePastSession": "You cannot delete a session that is in the past! If you really want to delete the session, please contact an administrator.",
@@ -1157,6 +1158,11 @@
     "course_not_found": "Course {courseId} could not be found!",
     "add_session": "Add Session",
     "SessionsTab": {
+      "session_description": {
+        "label": "Session Description",
+        "help_text": "A description of this session (e.g., topics covered, special notes).",
+        "placeholder": "Enter session description..."
+      },
       "sessionAddresses": {
         "online": {
           "label": "Online",

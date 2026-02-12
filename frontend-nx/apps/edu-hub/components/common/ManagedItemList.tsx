@@ -1,5 +1,6 @@
-import { FC, useCallback, useState, ReactElement } from 'react';
+import { FC, useCallback, useMemo, useState, ReactElement } from 'react';
 import { MdAddCircle } from 'react-icons/md';
+import { Card } from './Card';
 
 interface ManagedItemListProps<T, TSelected> {
   readonly title: string;
@@ -17,6 +18,7 @@ interface ManagedItemListProps<T, TSelected> {
   }>;
   readonly dialogTitle: string;
   readonly checkDuplicate?: (item: T, selected: TSelected) => boolean;
+  readonly additionalDialogProps?: Record<string, unknown>;
 }
 
 /**
@@ -35,6 +37,7 @@ function ManagedItemList<T, TSelected>({
   SelectionDialog,
   dialogTitle,
   checkDuplicate,
+  additionalDialogProps,
 }: ManagedItemListProps<T, TSelected>): ReactElement {
   const [dialogOpen, setDialogOpen] = useState(false);
 
@@ -83,41 +86,70 @@ function ManagedItemList<T, TSelected>({
     [onDelete]
   );
 
+  // Wrap onAddNewUser to close the selection dialog before opening CreateUserDialog
+  const safeAdditionalDialogProps = useMemo(() => {
+    const props = additionalDialogProps ?? {};
+    const wrapped = { ...props };
+    if (typeof wrapped.onAddNewUser === 'function') {
+      const original = wrapped.onAddNewUser;
+      wrapped.onAddNewUser = (searchValue: string) => {
+        closeDialog();
+        original(searchValue);
+      };
+    }
+    return wrapped;
+  }, [additionalDialogProps, closeDialog]);
+
+  // Filter reserved keys so they cannot be overridden by additionalDialogProps
+  const filteredAdditionalProps = useMemo(() => {
+    const props = { ...safeAdditionalDialogProps };
+    delete props.open;
+    delete props.onClose;
+    delete props.title;
+    return props;
+  }, [safeAdditionalDialogProps]);
+
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-4">
-      <h4 className="text-sm font-medium text-gray-700 mb-3">{title}</h4>
-      <div className="space-y-2">
-        {items.map((item) => {
-          const { label, sublabel } = renderItem(item);
-          return (
-            <div key={getItemKey(item)} className="flex items-center justify-between bg-gray-50 p-2 rounded">
-              <div className="flex-1">
-                <div className="font-medium">{label}</div>
-                {sublabel && <div className="text-sm text-gray-600 mt-1">{sublabel}</div>}
+    <>
+      <Card title={title}>
+        <div className="space-y-2">
+          {items.map((item) => {
+            const { label, sublabel } = renderItem(item);
+            return (
+              <div key={getItemKey(item)} className="flex items-center justify-between bg-fill-disabled p-2 rounded">
+                <div className="flex-1">
+                  <div className="font-medium text-label-primary">{label}</div>
+                  {sublabel && <div className="text-sm text-label-secondary mt-1">{sublabel}</div>}
+                </div>
+                <button
+                  onClick={() => handleDelete(item)}
+                  className="text-error hover:opacity-80 p-1 transition-opacity"
+                  aria-label={removeAriaLabel}
+                >
+                  ×
+                </button>
               </div>
-              <button
-                onClick={() => handleDelete(item)}
-                className="text-red-500 hover:text-red-700 p-1"
-                aria-label={removeAriaLabel}
-              >
-                ×
-              </button>
-            </div>
-          );
-        })}
-        <button
-          onClick={openDialog}
-          className="flex items-center space-x-2 text-blue-600 hover:text-blue-800 p-2 w-full rounded hover:bg-blue-50 transition-colors"
-        >
-          <MdAddCircle className="w-5 h-5" />
-          <span>{addButtonLabel}</span>
-        </button>
-      </div>
+            );
+          })}
+          <button
+            onClick={openDialog}
+            className="flex items-center space-x-2 text-brand hover:opacity-90 p-2 w-full rounded hover:bg-fill-disabled transition-colors"
+          >
+            <MdAddCircle className="w-5 h-5" />
+            <span>{addButtonLabel}</span>
+          </button>
+        </div>
+      </Card>
 
       {dialogOpen && (
-        <SelectionDialog open={dialogOpen} onClose={handleAdd} title={dialogTitle} />
+        <SelectionDialog
+          {...filteredAdditionalProps}
+          open={dialogOpen}
+          onClose={handleAdd}
+          title={dialogTitle}
+        />
       )}
-    </div>
+    </>
   );
 }
 

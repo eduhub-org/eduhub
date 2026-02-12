@@ -169,6 +169,11 @@ type InputFieldProps = {
   max?: number;
 
   /**
+   * When true, reduces margin for compact layouts (e.g. table cells).
+   */
+  compact?: boolean;
+
+  /**
    * Allows for additional props to be passed.
    */
   [x: string]: any;
@@ -193,6 +198,7 @@ const InputField: React.FC<InputFieldProps> = ({
   forceNotifyByEnter = false,
   showCharacterCount = true,
   invertColors = false,
+  compact = false,
   min,
   max,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Extract this prop to prevent it from being spread to DOM elements
@@ -337,13 +343,13 @@ const InputField: React.FC<InputFieldProps> = ({
   const [showPreview, setShowPreview] = useState(false);
   const togglePreview = () => setShowPreview(!showPreview);
 
-  const baseClass = `w-full px-3 py-3 mb-8 rounded ${
+  const baseClass = `w-full px-3 py-3 ${compact ? 'mb-0' : 'mb-8'} rounded ${
     invertColors ? 'bg-gray-200 text-black' : 'text-label-primary bg-fill-primary'
   }`;
   const finalClassName = prioritizeClasses(`${baseClass} ${className}`);
 
   const renderMaterialUI = () => (
-    <div className="col-span-10 flex mt-3">
+    <div className={`col-span-10 flex ${compact ? 'mt-0' : 'mt-3'} ${props.fullWidth ? 'w-full min-w-0' : ''}`}>
       <TextField
         className={hasBlurred && errorMessage ? 'w-3/4' : 'w-full'}
         variant="standard"
@@ -378,21 +384,23 @@ const InputField: React.FC<InputFieldProps> = ({
   const renderEduHub = () => (
     <div className="px-2">
       <div className="text-label-primary">
-        <div className="flex justify-between mb-2">
-          <div className="flex items-center">
-            {helpText && (
-              <Tooltip title={helpText} placement="top">
-                <HelpOutline style={{ cursor: 'pointer', marginRight: '5px' }} />
-              </Tooltip>
-            )}
-            {label}
-          </div>
-          {type === 'markdown' && (
+        {(label || helpText || type === 'markdown') && (
+          <div className="flex justify-between mb-2">
+            <div className="flex items-center">
+              {helpText && (
+                <Tooltip title={helpText} placement="top">
+                  <HelpOutline style={{ cursor: 'pointer', marginRight: '5px' }} />
+                </Tooltip>
+              )}
+              {label}
+            </div>
+            {type === 'markdown' && (
             <button className="text-white text-xs px-3 pt-2" onClick={togglePreview}>
               {showPreview ? <u>{t('edit_markdown')}</u> : <u>{t('preview')}</u>}
             </button>
           )}
-        </div>
+          </div>
+        )}
         <div className="light">
           {type === 'markdown' && showPreview ? (
             <div className={`${finalClassName} bg-gray-600`.trim()}>
