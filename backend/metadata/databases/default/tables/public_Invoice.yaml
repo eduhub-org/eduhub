@@ -57,7 +57,12 @@ select_permissions:
         - updated_at
         - userId
         - vatTotal
-      filter: {}
+      filter:
+        CourseEnrollment:
+          Course:
+            CourseInstructors:
+              userId:
+                _eq: X-Hasura-User-Id
       allow_aggregations: true
   - role: admin-ras
     permission:

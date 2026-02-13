@@ -1,15 +1,6 @@
 import { InvoiceStatus_enum } from '../__generated__/globalTypes';
 
 /**
- * Invoice status values that indicate payment is pending (not yet completed).
- */
-const PENDING_INVOICE_STATUSES: InvoiceStatus_enum[] = [
-  InvoiceStatus_enum.DRAFT,
-  InvoiceStatus_enum.ISSUED,
-  InvoiceStatus_enum.OVERDUE,
-];
-
-/**
  * Derives a display-friendly payment status from an enrollment's Invoices.
  * Used when CourseEnrollment no longer has paymentStatus (replaced by Invoice table).
  *

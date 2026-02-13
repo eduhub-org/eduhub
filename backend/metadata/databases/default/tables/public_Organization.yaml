@@ -45,9 +45,6 @@ insert_permissions:
         - addressLine1
         - addressLine2
         - aliases
-        - apiKeyHash
-        - bankBic
-        - bankIban
         - bankName
         - city
         - country
@@ -56,8 +53,6 @@ insert_permissions:
         - defaultVatRate
         - description
         - email
-        - formbricksApiKey
-        - formbricksApiUrl
         - id
         - invoiceFooterText
         - invoiceNumberPrefix
@@ -70,9 +65,6 @@ insert_permissions:
         - postalCode
         - registerCourt
         - registerNumber
-        - stripePublishableKey
-        - stripeSecretKey
-        - stripeWebhookSecret
         - taxNumber
         - type
         - updated_at
@@ -98,9 +90,6 @@ select_permissions:
         - addressLine1
         - addressLine2
         - aliases
-        - apiKeyHash
-        - bankBic
-        - bankIban
         - bankName
         - city
         - country
@@ -109,8 +98,6 @@ select_permissions:
         - defaultVatRate
         - description
         - email
-        - formbricksApiKey
-        - formbricksApiUrl
         - id
         - invoiceFooterText
         - invoiceNumberPrefix
@@ -123,15 +110,15 @@ select_permissions:
         - postalCode
         - registerCourt
         - registerNumber
-        - stripePublishableKey
-        - stripeSecretKey
-        - stripeWebhookSecret
         - taxNumber
         - type
         - updated_at
         - vatId
         - website
-      filter: {}
+      filter:
+        OrganizationAdmins:
+          userId:
+            _eq: X-Hasura-User-Id
       allow_aggregations: true
 update_permissions:
   - role: user_access
@@ -140,9 +127,6 @@ update_permissions:
         - addressLine1
         - addressLine2
         - aliases
-        - apiKeyHash
-        - bankBic
-        - bankIban
         - bankName
         - city
         - country
@@ -150,8 +134,6 @@ update_permissions:
         - defaultVatRate
         - description
         - email
-        - formbricksApiKey
-        - formbricksApiUrl
         - invoiceFooterText
         - invoiceNumberPrefix
         - legalForm
@@ -163,12 +145,12 @@ update_permissions:
         - postalCode
         - registerCourt
         - registerNumber
-        - stripePublishableKey
-        - stripeSecretKey
-        - stripeWebhookSecret
         - taxNumber
         - type
         - vatId
         - website
-      filter: {}
+      filter:
+        OrganizationAdmins:
+          userId:
+            _eq: X-Hasura-User-Id
       check: {}

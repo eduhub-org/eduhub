@@ -63,7 +63,7 @@ const CourseLinkInfos: FC<{ course: Course_Course_by_pk }> = ({ course }) => {
           {t('general.to_course_chat')}
         </Button>
       </div>
-      {onlineLocation?.defaultSessionAddress && (
+      {onlineLocation && onlineLocation.defaultSessionAddress && (
         <div className="">
           <Button className="bg-blue-200" as="a" href={onlineLocation.defaultSessionAddress} filled inverted>
             {t('general.to_online_meeting')}
@@ -123,7 +123,7 @@ export const RegistrationStatus: FC<RegistrationStatusProps> = ({ courseEnrollme
               status={paymentStatus === 'FAILED' ? "error" : "warning"} 
               icon={<MdHourglassEmpty />}
             >
-              {paymentStatus === PaymentStatus_enum.FAILED 
+              {paymentStatus === 'FAILED' 
                 ? t('status.payment_failed')
                 : t('status.payment_pending')}
             </StatusCard>

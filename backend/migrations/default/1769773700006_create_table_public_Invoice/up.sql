@@ -61,3 +61,10 @@ CREATE INDEX "Invoice_userId_idx" ON "public"."Invoice" ("userId");
 CREATE INDEX "Invoice_courseEnrollmentId_idx" ON "public"."Invoice" ("courseEnrollmentId");
 CREATE INDEX "Invoice_status_idx" ON "public"."Invoice" ("status");
 CREATE INDEX "Invoice_invoiceDate_idx" ON "public"."Invoice" ("invoiceDate");
+
+CREATE TRIGGER "set_public_Invoice_updated_at"
+BEFORE UPDATE ON "public"."Invoice"
+FOR EACH ROW
+EXECUTE PROCEDURE "public"."set_current_timestamp_updated_at"();
+COMMENT ON TRIGGER "set_public_Invoice_updated_at" ON "public"."Invoice"
+IS 'trigger to set value of column "updated_at" to current timestamp on row update';

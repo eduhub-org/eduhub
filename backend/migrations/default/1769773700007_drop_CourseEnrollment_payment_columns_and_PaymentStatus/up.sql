@@ -1,5 +1,6 @@
 -- Remove redundant payment fields from CourseEnrollment
 -- Invoice table now tracks payments via Stripe. Free enrollments have no linked Invoice.
+-- No data migration needed: platform has no payments yet.
 ALTER TABLE "public"."CourseEnrollment"
 DROP CONSTRAINT IF EXISTS "fk_courseenrollment_paymentstatus";
 

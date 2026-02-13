@@ -22,7 +22,8 @@ DROP COLUMN IF EXISTS "bankName",
 DROP COLUMN IF EXISTS "bankIban",
 DROP COLUMN IF EXISTS "bankBic";
 
--- Drop country foreign key constraint before dropping the column
+-- Drop country index and foreign key constraint before dropping the column
+DROP INDEX IF EXISTS "public"."Organization_country_idx";
 ALTER TABLE "public"."Organization"
 DROP CONSTRAINT IF EXISTS "Organization_country_fkey";
 

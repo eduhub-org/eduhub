@@ -10,3 +10,5 @@ ADD CONSTRAINT "Program_organizationId_fkey"
 FOREIGN KEY ("organizationId")
 REFERENCES "public"."Organization" ("id")
 ON UPDATE RESTRICT ON DELETE RESTRICT;
+
+CREATE INDEX "Program_organizationId_idx" ON "public"."Program" ("organizationId");

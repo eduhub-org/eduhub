@@ -61,6 +61,8 @@ FOREIGN KEY ("country")
 REFERENCES "public"."Country" ("code")
 ON UPDATE RESTRICT ON DELETE RESTRICT;
 
+CREATE INDEX "Organization_country_idx" ON "public"."Organization" ("country");
+
 -- Add Stripe integration fields
 ALTER TABLE "public"."Organization"
 ADD COLUMN "stripeSecretKey" text NULL,
