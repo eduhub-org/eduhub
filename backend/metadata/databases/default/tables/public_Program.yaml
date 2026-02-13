@@ -45,8 +45,6 @@ select_permissions:
         - organizationId
         - published
         - visibility
-        - visibilityAchievementCertificate
-        - visibilityAttendanceCertificate
         - shortTitle
         - applicationStart
         - achievementRecordUploadDeadline
@@ -77,8 +75,6 @@ select_permissions:
         - title
         - type
         - visibility
-        - visibilityAchievementCertificate
-        - visibilityAttendanceCertificate
         - defaultFormbricksEnrollmentSurveyUrl
       filter: {}
   - role: instructor_access
@@ -101,8 +97,6 @@ select_permissions:
         - speakerQuestionnaire
         - startQuestionnaire
         - title
-        - visibilityAchievementCertificate
-        - visibilityAttendanceCertificate
         - defaultFormbricksEnrollmentSurveyUrl
       filter: {}
 update_permissions:
@@ -113,8 +107,6 @@ update_permissions:
         - organizationId
         - published
         - visibility
-        - visibilityAchievementCertificate
-        - visibilityAttendanceCertificate
         - shortTitle
         - applicationStart
         - achievementRecordUploadDeadline
