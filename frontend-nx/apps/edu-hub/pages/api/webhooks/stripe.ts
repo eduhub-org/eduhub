@@ -28,6 +28,23 @@ const GET_ENROLLMENT_FOR_INVOICE = gql`
   }
 `;
 
+type GetEnrollmentForInvoiceResponse = {
+  CourseEnrollment_by_pk: {
+    id: number;
+    userId: string;
+    Course: {
+      Program: {
+        organizationId: number | null;
+        Organization: { invoiceNumberPrefix: string | null } | null;
+      } | null;
+    } | null;
+  } | null;
+};
+
+type GetInvoiceByStripeSessionIdResponse = {
+  Invoice: Array<{ id: number }>;
+};
+
 const GET_INVOICE_BY_STRIPE_SESSION_ID = gql`
   query GetInvoiceByStripeSessionId($stripeCheckoutSessionId: String!) {
     Invoice(where: { stripeCheckoutSessionId: { _eq: $stripeCheckoutSessionId } }, limit: 1) {
@@ -211,10 +228,11 @@ const handleStripeWebhook = async (
     stripeCheckoutSessionId: string | null,
     stripePaymentIntentId: string | null
   ) => {
-    const { CourseEnrollment_by_pk } = await client.request(
-      GET_ENROLLMENT_FOR_INVOICE,
-      { enrollmentId }
-    );
+    const { CourseEnrollment_by_pk } =
+      await client.request<GetEnrollmentForInvoiceResponse>(
+        GET_ENROLLMENT_FOR_INVOICE,
+        { enrollmentId }
+      );
 
     if (!CourseEnrollment_by_pk?.Course?.Program) {
       throw new Error(
@@ -300,10 +318,11 @@ const handleStripeWebhook = async (
             enrollmentId: parsedEnrollmentId,
           });
 
-          const { Invoice: existingInvoices } = await client.request(
-            GET_INVOICE_BY_STRIPE_SESSION_ID,
-            { stripeCheckoutSessionId: session.id }
-          );
+          const { Invoice: existingInvoices } =
+            await client.request<GetInvoiceByStripeSessionIdResponse>(
+              GET_INVOICE_BY_STRIPE_SESSION_ID,
+              { stripeCheckoutSessionId: session.id }
+            );
           if (existingInvoices?.length === 0) {
             await createInvoiceForEnrollment(
               parsedEnrollmentId,
