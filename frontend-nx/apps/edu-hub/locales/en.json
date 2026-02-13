@@ -49,7 +49,6 @@
       "email_templates": "Email Templates",
       "app_settings": "App Settings",
       "statistics": "Statistics",
-      "kursleitungshandbuch": "Course Instructor Handbook",
       "logout": "Logout"
     },
     "change-password": "Change email or password",
@@ -443,8 +442,7 @@
       "motivation_letter_required": "Please provide a motivation letter",
       "terms_required": "Please accept the Terms and Conditions",
       "registration_failed": "Registration failed. Please try again.",
-      "complete_survey_first": "Please complete the questionnaire first.",
-      "no_items_to_charge": "No items to charge. Course has no base price and no add-ons selected. Please contact support if this is unexpected."
+      "complete_survey_first": "Please complete the questionnaire first."
     },
     "formbricks": {
       "survey_title": "Application Questionnaire",
@@ -637,7 +635,6 @@
     "title": "Title",
     "external_speakers": "External Speakers",
     "add_external_speaker": "Add External Speaker",
-    "remove_external_speaker": "Remove external speaker",
     "session_title": "Session Title",
     "confirmDeleteSession": "Do you really want to delete the session?",
     "cannotDeletePastSession": "You cannot delete a session that is in the past! If you really want to delete the session, please contact an administrator.",
@@ -824,41 +821,6 @@
     "course-start": "Course start",
     "course-end": "Course end",
     "achievement-upload-deadline": "Deadline achievement upload"
-  },
-  "manageAchievementOptions": {
-    "table_header": {
-      "title": "Title",
-      "description": "Description",
-      "record_type": "Type",
-      "mentors": "Mentors",
-      "courses": "Courses"
-    },
-    "title": {
-      "placeholder": "Project name"
-    },
-    "description": {
-      "placeholder": "Enter project description"
-    },
-    "record_type": {
-      "DOCUMENTATION": "Documentation",
-      "ONLINE_COURSE": "Online Course"
-    },
-    "documentation_template": {
-      "placeholder": "No selection",
-      "help_text": "Template for achievement record documentation"
-    },
-    "add_mentor": "Add mentor",
-    "remove_mentor": "Remove mentor",
-    "add_course": "Add course",
-    "manage_templates_button": "Manage achievement templates",
-    "notifications": {
-      "achievement_option_added": "Achievement option added successfully",
-      "add_failed": "Failed to add. Please try again."
-    },
-    "delete_button": {
-      "untitled_achievement_option": "Untitled achievement option",
-      "delete_achievement_option_confirmation": "Are you sure you want to delete the achievement option '{title}'?"
-    }
   },
   "manageCourses": {
     "table_header": {
@@ -1158,11 +1120,6 @@
     "course_not_found": "Course {courseId} could not be found!",
     "add_session": "Add Session",
     "SessionsTab": {
-      "session_description": {
-        "label": "Session Description",
-        "help_text": "A description of this session (e.g., topics covered, special notes).",
-        "placeholder": "Enter session description..."
-      },
       "sessionAddresses": {
         "online": {
           "label": "Online",
@@ -1688,24 +1645,5 @@
     "no_pricing": "No pricing configured.",
     "synced": "Synced",
     "not_synced": "Not synced"
-  },
-  "AddonValidationDialog": {
-    "title": "Validate Add-ons",
-    "close": "Close",
-    "no_addons_found": "No add-ons found.",
-    "price_label": "Price (in cents)",
-    "description_label": "Description",
-    "question_id": "Question ID",
-    "choice_id": "Choice ID",
-    "cancel": "Cancel",
-    "saving": "Saving...",
-    "save_and_create_stripe": "Save & Create Stripe Prices"
-  },
-  "footer": {
-    "imprint": "Imprint",
-    "privacy": "Privacy Policy",
-    "faq": "FAQ",
-    "newsletter": "Newsletter",
-    "sponsored_by": "Sponsored by:"
   }
 }

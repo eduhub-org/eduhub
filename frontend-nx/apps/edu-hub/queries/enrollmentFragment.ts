@@ -7,9 +7,15 @@ export const ENROLLMENT_FRAGMENT = gql`
     invitationExpirationDate
     id
     status
-    paymentStatus
+    billingOrganizationId
     achievementCertificateURL
     attendanceCertificateURL
+    Invoices(limit: 1, order_by: { created_at: desc }) {
+      id
+      status
+      stripeHostedInvoiceUrl
+      stripeInvoicePdfUrl
+    }
   }
 `;
 
@@ -19,7 +25,5 @@ export const ADMIN_ENROLLMENT_FRAGMENT = gql`
     ...EnrollmentFragment
     motivationLetter
     motivationRating
-    paymentStatus
-    stripePaymentIntentId
   }
 `;

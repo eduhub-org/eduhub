@@ -3,11 +3,28 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { CourseEnrollmentStatus_enum, PaymentStatus_enum, Weekday_enum, CourseRegistrationType_enum, LocationOption_enum, ProgramType_enum, OrganizationType_enum } from "./../../__generated__/globalTypes";
+import { CourseEnrollmentStatus_enum, InvoiceStatus_enum, Weekday_enum, CourseRegistrationType_enum, LocationOption_enum, ProgramType_enum, OrganizationType_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: MyEnrollmentsForCourseQuery
 // ====================================================
+
+export interface MyEnrollmentsForCourseQuery_CourseEnrollment_Invoices {
+  __typename: "Invoice";
+  id: number;
+  /**
+   * Invoice lifecycle status. Synced from Stripe webhooks
+   */
+  status: InvoiceStatus_enum;
+  /**
+   * Stripe-hosted invoice page URL
+   */
+  stripeHostedInvoiceUrl: string | null;
+  /**
+   * Stripe-hosted PDF download URL
+   */
+  stripeInvoicePdfUrl: string | null;
+}
 
 export interface MyEnrollmentsForCourseQuery_CourseEnrollment_Course_Sessions_SessionAddresses_CourseLocation {
   __typename: "CourseLocation";
@@ -448,9 +465,9 @@ export interface MyEnrollmentsForCourseQuery_CourseEnrollment {
    */
   status: CourseEnrollmentStatus_enum;
   /**
-   * Current payment status
+   * Organization paying for this enrollment (B2B). NULL means the enrolling user pays personally (B2C)
    */
-  paymentStatus: PaymentStatus_enum | null;
+  billingOrganizationId: number | null;
   /**
    * URL to the file containing the user's achievement certificate (if he obtained one)
    */
@@ -459,6 +476,10 @@ export interface MyEnrollmentsForCourseQuery_CourseEnrollment {
    * URL to the file containing the user's attendance certificate (if he obtained one)
    */
   attendanceCertificateURL: string | null;
+  /**
+   * An array relationship
+   */
+  Invoices: MyEnrollmentsForCourseQuery_CourseEnrollment_Invoices[];
   /**
    * An object relationship
    */
