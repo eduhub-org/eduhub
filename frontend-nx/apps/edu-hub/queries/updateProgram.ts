@@ -11,8 +11,6 @@ export const INSERT_PROGRAM = gql`
         achievementRecordUploadDeadline: $today
         title: $title
         visibility: false
-        visibilityAttendanceCertificate: false
-        visibilityAchievementCertificate: false
         defaultMaxMissedSessions: 2
       }
     ) {
@@ -216,34 +214,6 @@ export const UPDATE_DEFAULT_ENROLLMENT_SURVEY = gql`
     update_Program_by_pk(
       pk_columns: { id: $itemId }
       _set: { defaultFormbricksEnrollmentSurveyUrl: $text }
-    ) {
-      id
-    }
-  }
-`;
-
-export const UPDATE_PROGRAM_ACHIEVEMENT_CERT_VISIBLE = gql`
-  mutation UpdateProgramAchievementCertVisible(
-    $programId: Int!
-    $isVisible: Boolean!
-  ) {
-    update_Program_by_pk(
-      pk_columns: { id: $programId }
-      _set: { visibilityAchievementCertificate: $isVisible }
-    ) {
-      id
-    }
-  }
-`;
-
-export const UPDATE_PROGRAM_PARTICIPATION_CERT_VISIBLE = gql`
-  mutation UpdateProgramParticipationCertVisible(
-    $programId: Int!
-    $isVisible: Boolean!
-  ) {
-    update_Program_by_pk(
-      pk_columns: { id: $programId }
-      _set: { visibilityAttendanceCertificate: $isVisible }
     ) {
       id
     }

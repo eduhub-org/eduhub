@@ -17,23 +17,12 @@ interface IProps {
   refetchAttendanceCertificates?: boolean;
   setRefetchAchievementCertificates?: Dispatch<SetStateAction<boolean>>;
   setRefetchAttendanceCertificates?: Dispatch<SetStateAction<boolean>>;
-  hideAchievementCertificateButton?: boolean;
-  hideAttendanceCertificateButton?: boolean;
 }
 
 export const CertificateDownload: FC<IProps> = ({
   courseEnrollment,
-  hideAchievementCertificateButton = false,
-  hideAttendanceCertificateButton = false,
   manageView,
 }) => {
-  console.log('=== CertificateDownload Component State ===', {
-    enrollmentId: courseEnrollment?.id,
-    achievementCertificateURL: courseEnrollment?.achievementCertificateURL,
-    attendanceCertificateURL: courseEnrollment?.attendanceCertificateURL,
-    hideAchievementButton: hideAchievementCertificateButton,
-    hideAttendanceButton: hideAttendanceCertificateButton
-  });
 
   const t = useTranslations();
   const [errorMessage, setErrorMessage] = useState('');
@@ -86,7 +75,7 @@ export const CertificateDownload: FC<IProps> = ({
   return (
     <div className={!manageView ? 'mt-4' : ''}>
       <div className={`flex gap-4 ${!manageView ? 'flex-col sm:px-24' : ''}`}>
-        {loadAchievementCertificateData && !loadAchievementCertificateLoading && !hideAchievementCertificateButton && (
+        {loadAchievementCertificateData && !loadAchievementCertificateLoading && (
           <>
             {!manageView && <h3 className="text-3xl font-medium">{t('coursePage.congrats-completion')}</h3>}
             <Button
@@ -102,7 +91,7 @@ export const CertificateDownload: FC<IProps> = ({
             </Button>
           </>
         )}
-        {loadAttendanceCertificateData && !loadAttendanceCertificateLoading && !hideAttendanceCertificateButton && (
+        {loadAttendanceCertificateData && !loadAttendanceCertificateLoading && (
           <Button
             as="a"
             filled
