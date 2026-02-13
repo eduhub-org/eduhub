@@ -10,53 +10,97 @@ export const config = {
   },
 };
 
-const UPDATE_ENROLLMENT_PAYMENT_SUCCESS = gql`
-  mutation UpdateEnrollmentPaymentSuccess(
-    $enrollmentId: Int!
-    $stripeCheckoutSessionId: String
-    $stripePaymentIntentId: String
-    $paymentAmount: Int
-    $paymentCurrency: String
-  ) {
+const GET_ENROLLMENT_FOR_INVOICE = gql`
+  query GetEnrollmentForInvoice($enrollmentId: Int!) {
+    CourseEnrollment_by_pk(id: $enrollmentId) {
+      id
+      userId
+      Course {
+        Program {
+          organizationId
+        }
+      }
+    }
+  }
+`;
+
+const UPDATE_ENROLLMENT_STATUS_CONFIRMED = gql`
+  mutation UpdateEnrollmentStatusConfirmed($enrollmentId: Int!) {
     update_CourseEnrollment_by_pk(
       pk_columns: { id: $enrollmentId }
-      _set: {
-        stripeCheckoutSessionId: $stripeCheckoutSessionId
-        stripePaymentIntentId: $stripePaymentIntentId
-        paymentStatus: COMPLETED
-        paymentAmount: $paymentAmount
-        paymentCurrency: $paymentCurrency
-        status: CONFIRMED
-      }
+      _set: { status: CONFIRMED }
     ) {
       id
-      paymentStatus
       status
     }
   }
 `;
 
-const UPDATE_ENROLLMENT_PAYMENT_FAILURE = gql`
-  mutation UpdateEnrollmentPaymentFailure(
-    $enrollmentId: Int!
+const INSERT_INVOICE = gql`
+  mutation InsertInvoice(
+    $organizationId: Int!
+    $userId: uuid!
+    $courseEnrollmentId: Int!
+    $invoiceNumber: String!
+    $status: String!
+    $netTotal: Int!
+    $vatTotal: Int!
+    $grossTotal: Int!
+    $currency: String!
     $stripeCheckoutSessionId: String
     $stripePaymentIntentId: String
-    $paymentAmount: Int
-    $paymentCurrency: String
+    $stripeHostedInvoiceUrl: String
   ) {
-    update_CourseEnrollment_by_pk(
-      pk_columns: { id: $enrollmentId }
-      _set: {
+    insert_Invoice_one(
+      object: {
+        organizationId: $organizationId
+        userId: $userId
+        courseEnrollmentId: $courseEnrollmentId
+        invoiceNumber: $invoiceNumber
+        status: $status
+        netTotal: $netTotal
+        vatTotal: $vatTotal
+        grossTotal: $grossTotal
+        currency: $currency
         stripeCheckoutSessionId: $stripeCheckoutSessionId
         stripePaymentIntentId: $stripePaymentIntentId
-        paymentStatus: FAILED
-        paymentAmount: $paymentAmount
-        paymentCurrency: $paymentCurrency
+        stripeHostedInvoiceUrl: $stripeHostedInvoiceUrl
       }
     ) {
       id
-      paymentStatus
-      status
+    }
+  }
+`;
+
+const INSERT_INVOICE_CANCELLED = gql`
+  mutation InsertInvoiceCancelled(
+    $organizationId: Int!
+    $userId: uuid!
+    $courseEnrollmentId: Int!
+    $invoiceNumber: String!
+    $netTotal: Int!
+    $vatTotal: Int!
+    $grossTotal: Int!
+    $currency: String!
+    $stripeCheckoutSessionId: String
+    $stripePaymentIntentId: String
+  ) {
+    insert_Invoice_one(
+      object: {
+        organizationId: $organizationId
+        userId: $userId
+        courseEnrollmentId: $courseEnrollmentId
+        invoiceNumber: $invoiceNumber
+        status: CANCELLED
+        netTotal: $netTotal
+        vatTotal: $vatTotal
+        grossTotal: $grossTotal
+        currency: $currency
+        stripeCheckoutSessionId: $stripeCheckoutSessionId
+        stripePaymentIntentId: $stripePaymentIntentId
+      }
+    ) {
+      id
     }
   }
 `;
@@ -78,6 +122,19 @@ function parseAndValidateEnrollmentId(enrollmentId: string): number | null {
   }
 
   return parsed;
+}
+
+/**
+ * Generates a unique invoice number for Stripe Checkout payments.
+ * Uses session/payment intent ID as unique suffix when available.
+ */
+function generateInvoiceNumber(
+  prefix: string,
+  sessionId?: string | null,
+  paymentIntentId?: string | null
+): string {
+  const suffix = sessionId || paymentIntentId || `web-${Date.now()}`;
+  return `${prefix}-${suffix}`;
 }
 
 const handleStripeWebhook = async (
@@ -112,8 +169,6 @@ const handleStripeWebhook = async (
   let event: Stripe.Event;
 
   try {
-    // Get raw body for signature verification
-    // When bodyParser is false, we need to read from the request stream
     const rawBody = await getRawBody(req as any, {
       limit: '10mb',
       encoding: 'utf8',
@@ -128,7 +183,6 @@ const handleStripeWebhook = async (
     return res.status(400).json({ error: `Webhook Error: ${err.message}` });
   }
 
-  // Create GraphQL client
   const client = new GraphQLClient(
     process.env.GRAPHQL_URI || 'http://hasura:8080/v1/graphql',
     {
@@ -137,6 +191,72 @@ const handleStripeWebhook = async (
       },
     }
   );
+
+  const createInvoiceForEnrollment = async (
+    enrollmentId: number,
+    amountTotal: number,
+    currency: string,
+    status: 'PAID' | 'CANCELLED',
+    stripeCheckoutSessionId: string | null,
+    stripePaymentIntentId: string | null,
+    stripeHostedInvoiceUrl?: string | null
+  ) => {
+    const { CourseEnrollment_by_pk } = await client.request(
+      GET_ENROLLMENT_FOR_INVOICE,
+      { enrollmentId }
+    );
+
+    if (!CourseEnrollment_by_pk?.Course?.Program) {
+      throw new Error(
+        `Enrollment ${enrollmentId} not found or missing Course/Program`
+      );
+    }
+
+    const organizationId = CourseEnrollment_by_pk.Course.Program.organizationId;
+    const userId = CourseEnrollment_by_pk.userId;
+
+    // For Stripe Checkout: amount_total is in cents, same as our schema.
+    // Net/VAT split: use Stripe Tax breakdown when available; otherwise net = gross, vat = 0.
+    const grossTotal = amountTotal;
+    const netTotal = amountTotal; // Stripe Tax breakdown can be used when available
+    const vatTotal = 0;
+
+    const invoiceNumber = generateInvoiceNumber(
+      'EDU',
+      stripeCheckoutSessionId,
+      stripePaymentIntentId
+    );
+
+    if (status === 'PAID') {
+      await client.request(INSERT_INVOICE, {
+        organizationId,
+        userId,
+        courseEnrollmentId: enrollmentId,
+        invoiceNumber,
+        status: 'PAID',
+        netTotal,
+        vatTotal,
+        grossTotal,
+        currency: (currency || 'eur').toUpperCase(),
+        stripeCheckoutSessionId,
+        stripePaymentIntentId,
+        stripeHostedInvoiceUrl,
+      });
+    } else {
+      await client.request(INSERT_INVOICE_CANCELLED, {
+        organizationId,
+        userId,
+        courseEnrollmentId: enrollmentId,
+        invoiceNumber,
+        netTotal,
+        vatTotal,
+        grossTotal,
+        currency: (currency || 'eur').toUpperCase(),
+        stripeCheckoutSessionId,
+        stripePaymentIntentId,
+      });
+    }
+  };
 
   try {
     switch (event.type) {
@@ -150,26 +270,30 @@ const handleStripeWebhook = async (
         }
 
         const parsedEnrollmentId = parseAndValidateEnrollmentId(enrollmentId);
-
         if (parsedEnrollmentId === null) {
-          console.error('Invalid enrollmentId in session metadata', { enrollmentId });
+          console.error('Invalid enrollmentId in session metadata', {
+            enrollmentId,
+          });
           return res.status(400).json({ error: 'Invalid enrollmentId' });
         }
 
-        // Update enrollment with payment information
-        // Note: Addons are already saved to CourseEnrollmentAddon table before payment via createEnrollmentWithAddons action
-        await client.request(UPDATE_ENROLLMENT_PAYMENT_SUCCESS, {
+        await createInvoiceForEnrollment(
+          parsedEnrollmentId,
+          session.amount_total ?? 0,
+          session.currency ?? 'eur',
+          'PAID',
+          session.id,
+          typeof session.payment_intent === 'string'
+            ? session.payment_intent
+            : session.payment_intent?.id ?? null,
+          session.url ?? null
+        );
+
+        await client.request(UPDATE_ENROLLMENT_STATUS_CONFIRMED, {
           enrollmentId: parsedEnrollmentId,
-          stripeCheckoutSessionId: session.id,
-          stripePaymentIntentId:
-            typeof session.payment_intent === 'string'
-              ? session.payment_intent
-              : session.payment_intent?.id || null,
-          paymentAmount: session.amount_total || null,
-          paymentCurrency: session.currency || null,
         });
 
-        console.log('Enrollment updated successfully', {
+        console.log('Enrollment and invoice updated successfully', {
           enrollmentId,
           courseId,
           sessionId: session.id,
@@ -184,18 +308,16 @@ const handleStripeWebhook = async (
 
         if (enrollmentId) {
           const parsedEnrollmentId = parseAndValidateEnrollmentId(enrollmentId);
-          if (parsedEnrollmentId === null) {
-            console.error('Invalid enrollmentId in expired session metadata', { enrollmentId });
-            return res.status(400).json({ error: 'Invalid enrollmentId' });
+          if (parsedEnrollmentId !== null) {
+            await createInvoiceForEnrollment(
+              parsedEnrollmentId,
+              session.amount_total ?? 0,
+              session.currency ?? 'eur',
+              'CANCELLED',
+              session.id,
+              null
+            );
           }
-
-          await client.request(UPDATE_ENROLLMENT_PAYMENT_FAILURE, {
-            enrollmentId: parsedEnrollmentId,
-            stripeCheckoutSessionId: session.id,
-            stripePaymentIntentId: null,
-            paymentAmount: null,
-            paymentCurrency: null,
-          });
         }
 
         return res.status(200).json({ received: true });
@@ -207,18 +329,16 @@ const handleStripeWebhook = async (
 
         if (enrollmentId) {
           const parsedEnrollmentId = parseAndValidateEnrollmentId(enrollmentId);
-          if (parsedEnrollmentId === null) {
-            console.error('Invalid enrollmentId in payment_failed metadata', { enrollmentId });
-            return res.status(400).json({ error: 'Invalid enrollmentId' });
+          if (parsedEnrollmentId !== null) {
+            await createInvoiceForEnrollment(
+              parsedEnrollmentId,
+              paymentIntent.amount ?? 0,
+              paymentIntent.currency ?? 'eur',
+              'CANCELLED',
+              null,
+              paymentIntent.id
+            );
           }
-
-          await client.request(UPDATE_ENROLLMENT_PAYMENT_FAILURE, {
-            enrollmentId: parsedEnrollmentId,
-            stripeCheckoutSessionId: null,
-            stripePaymentIntentId: paymentIntent.id,
-            paymentAmount: paymentIntent.amount || null,
-            paymentCurrency: paymentIntent.currency || null,
-          });
         }
 
         return res.status(200).json({ received: true });
@@ -235,4 +355,3 @@ const handleStripeWebhook = async (
 };
 
 export default handleStripeWebhook;
-

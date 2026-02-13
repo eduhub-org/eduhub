@@ -1,6 +1,7 @@
 import { FC } from 'react';
 
-import { CourseRegistrationType_enum, PaymentStatus_enum } from '../../../../__generated__/globalTypes';
+import { CourseRegistrationType_enum } from '../../../../__generated__/globalTypes';
+import { canRetryPayment } from '../../../../utils/invoicePaymentStatus';
 import { Course_Course_by_pk } from '../../../../queries/__generated__/Course';
 import { CourseWithEnrollment_Course_by_pk_CourseEnrollments } from '../../../../queries/__generated__/CourseWithEnrollment';
 import { useIsLoggedIn } from '../../../../hooks/authentication';
@@ -61,8 +62,7 @@ export const Registration: FC<RegistrationProps> = ({ course, courseEnrollment, 
         <RegistrationStatus 
           courseEnrollment={courseEnrollment} 
           course={course}
-          onRetryPayment={courseEnrollment.paymentStatus && 
-            (courseEnrollment.paymentStatus === PaymentStatus_enum.PENDING || courseEnrollment.paymentStatus === PaymentStatus_enum.FAILED)
+          onRetryPayment={canRetryPayment(courseEnrollment.Invoices)
             ? () => registrationHandler.retryPayment(courseEnrollment.id)
             : undefined
           }

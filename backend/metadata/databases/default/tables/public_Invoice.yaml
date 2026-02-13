@@ -1,0 +1,85 @@
+table:
+  name: Invoice
+  schema: public
+object_relationships:
+  - name: Organization
+    using:
+      foreign_key_constraint_on: organizationId
+  - name: User
+    using:
+      foreign_key_constraint_on: userId
+  - name: CourseEnrollment
+    using:
+      foreign_key_constraint_on: courseEnrollmentId
+  - name: InvoiceStatus
+    using:
+      foreign_key_constraint_on: status
+select_permissions:
+  - role: user_access
+    permission:
+      columns:
+        - courseEnrollmentId
+        - created_at
+        - currency
+        - grossTotal
+        - id
+        - invoiceDate
+        - invoiceNumber
+        - netTotal
+        - organizationId
+        - status
+        - stripeHostedInvoiceUrl
+        - stripeInvoicePdfUrl
+        - stripeInvoiceId
+        - updated_at
+        - userId
+        - vatTotal
+      filter:
+        userId:
+          _eq: X-Hasura-User-Id
+      allow_aggregations: true
+  - role: instructor_access
+    permission:
+      columns:
+        - courseEnrollmentId
+        - created_at
+        - currency
+        - grossTotal
+        - id
+        - invoiceDate
+        - invoiceNumber
+        - netTotal
+        - organizationId
+        - status
+        - stripeHostedInvoiceUrl
+        - stripeInvoicePdfUrl
+        - stripeInvoiceId
+        - updated_at
+        - userId
+        - vatTotal
+      filter: {}
+      allow_aggregations: true
+  - role: admin-ras
+    permission:
+      columns:
+        - courseEnrollmentId
+        - created_at
+        - currency
+        - grossTotal
+        - id
+        - invoiceDate
+        - invoiceNumber
+        - netTotal
+        - notes
+        - organizationId
+        - status
+        - stripeCheckoutSessionId
+        - stripeHostedInvoiceUrl
+        - stripeInvoiceId
+        - stripeInvoicePdfUrl
+        - stripePaymentIntentId
+        - updated_at
+        - userId
+        - vatTotal
+      filter: {}
+      allow_aggregations: true

@@ -2,6 +2,9 @@ table:
   name: CourseEnrollment
   schema: public
 object_relationships:
+  - name: BillingOrganization
+    using:
+      foreign_key_constraint_on: billingOrganizationId
   - name: Course
     using:
       foreign_key_constraint_on: courseId
@@ -11,9 +14,6 @@ object_relationships:
   - name: LocationOption
     using:
       foreign_key_constraint_on: location
-  - name: PaymentStatus
-    using:
-      foreign_key_constraint_on: paymentStatus
   - name: MotivationRating
     using:
       foreign_key_constraint_on: motivationRating
@@ -28,11 +28,19 @@ array_relationships:
         table:
           name: CourseEnrollmentAddon
           schema: public
+  - name: Invoices
+    using:
+      foreign_key_constraint_on:
+        column: courseEnrollmentId
+        table:
+          name: Invoice
+          schema: public
 insert_permissions:
   - role: user_access
     permission:
       check: {}
       columns:
+        - billingOrganizationId
         - courseId
         - motivationLetter
         - status
@@ -53,13 +61,9 @@ select_permissions:
         - attendanceCertificateURL
         - created_at
         - updated_at
+        - billingOrganizationId
         - invitationExpirationDate
         - location
-        - stripeCheckoutSessionId
-        - stripePaymentIntentId
-        - paymentStatus
-        - paymentAmount
-        - paymentCurrency
         - termsAcceptedAt
       filter: {}
   - role: user_access
@@ -69,16 +73,12 @@ select_permissions:
         - attendanceCertificateURL
         - courseId
         - id
+        - billingOrganizationId
         - invitationExpirationDate
         - motivationLetter
         - status
         - userId
         - location
-        - stripeCheckoutSessionId
-        - stripePaymentIntentId
-        - paymentStatus
-        - paymentAmount
-        - paymentCurrency
         - termsAcceptedAt
       filter:
         _and:
@@ -100,6 +100,7 @@ update_permissions:
   - role: instructor_access
     permission:
       columns:
+        - billingOrganizationId
         - invitationExpirationDate
         - motivationRating
         - status
@@ -116,6 +117,7 @@ update_permissions:
   - role: user_access
     permission:
       columns:
+        - billingOrganizationId
         - invitationExpirationDate
         - motivationRating
         - status
@@ -128,6 +130,7 @@ update_permissions:
   - role: instructor
     permission:
       columns:
+        - billingOrganizationId
         - invitationExpirationDate
         - motivationRating
         - status

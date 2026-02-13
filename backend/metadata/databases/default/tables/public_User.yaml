@@ -68,7 +68,10 @@ select_permissions:
   - role: admin-ras
     permission:
       columns:
+        - addressLine1
+        - addressLine2
         - anonymousId
+        - city
         - country
         - created_at
         - email
@@ -98,7 +101,10 @@ select_permissions:
   - role: instructor_access
     permission:
       columns:
+        - addressLine1
+        - addressLine2
         - anonymousId
+        - city
         - country
         - created_at
         - email
@@ -117,6 +123,9 @@ select_permissions:
   - role: user_access
     permission:
       columns:
+        - addressLine1
+        - addressLine2
+        - city
         - country
         - email
         - externalProfile
@@ -139,6 +148,9 @@ update_permissions:
   - role: user_access
     permission:
       columns:
+        - addressLine1
+        - addressLine2
+        - city
         - country
         - email
         - externalProfile

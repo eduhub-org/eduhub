@@ -2,6 +2,9 @@ table:
   name: Program
   schema: public
 object_relationships:
+  - name: Organization
+    using:
+      foreign_key_constraint_on: organizationId
   - name: ProgramType
     using:
       foreign_key_constraint_on: type
@@ -39,6 +42,7 @@ select_permissions:
     permission:
       columns:
         - id
+        - organizationId
         - published
         - visibility
         - visibilityAchievementCertificate
@@ -66,6 +70,7 @@ select_permissions:
         - defaultApplicationEnd
         - id
         - lectureEnd
+        - organizationId
         - lectureStart
         - published
         - shortTitle
@@ -82,6 +87,7 @@ select_permissions:
         - achievementRecordUploadDeadline
         - visibility
         - applicationStart
+        - organizationId
         - attendanceCertificateTemplateURL
         - closingQuestionnaire
         - defaultApplicationEnd
@@ -104,6 +110,7 @@ update_permissions:
     permission:
       columns:
         - id
+        - organizationId
         - published
         - visibility
         - visibilityAchievementCertificate

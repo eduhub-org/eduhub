@@ -3,11 +3,28 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { CourseEnrollmentStatus_enum, PaymentStatus_enum, Weekday_enum, CourseRegistrationType_enum, LocationOption_enum, ProgramType_enum, OrganizationType_enum } from "./../../__generated__/globalTypes";
+import { CourseEnrollmentStatus_enum, InvoiceStatus_enum, Weekday_enum, CourseRegistrationType_enum, LocationOption_enum, ProgramType_enum, OrganizationType_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: MyCourses
 // ====================================================
+
+export interface MyCourses_User_by_pk_CourseEnrollments_Invoices {
+  __typename: "Invoice";
+  id: number;
+  /**
+   * Invoice lifecycle status. Synced from Stripe webhooks
+   */
+  status: InvoiceStatus_enum;
+  /**
+   * Stripe-hosted invoice page URL
+   */
+  stripeHostedInvoiceUrl: string | null;
+  /**
+   * Stripe-hosted PDF download URL
+   */
+  stripeInvoicePdfUrl: string | null;
+}
 
 export interface MyCourses_User_by_pk_CourseEnrollments_Course_Sessions_SessionAddresses_CourseLocation {
   __typename: "CourseLocation";
@@ -294,6 +311,23 @@ export interface MyCourses_User_by_pk_CourseEnrollments_Course_CourseAddonMappin
   currency: string;
 }
 
+export interface MyCourses_User_by_pk_CourseEnrollments_Course_CourseEnrollments_Invoices {
+  __typename: "Invoice";
+  id: number;
+  /**
+   * Invoice lifecycle status. Synced from Stripe webhooks
+   */
+  status: InvoiceStatus_enum;
+  /**
+   * Stripe-hosted invoice page URL
+   */
+  stripeHostedInvoiceUrl: string | null;
+  /**
+   * Stripe-hosted PDF download URL
+   */
+  stripeInvoicePdfUrl: string | null;
+}
+
 export interface MyCourses_User_by_pk_CourseEnrollments_Course_CourseEnrollments {
   __typename: "CourseEnrollment";
   /**
@@ -314,9 +348,9 @@ export interface MyCourses_User_by_pk_CourseEnrollments_Course_CourseEnrollments
    */
   status: CourseEnrollmentStatus_enum;
   /**
-   * Current payment status
+   * Organization paying for this enrollment (B2B). NULL means the enrolling user pays personally (B2C)
    */
-  paymentStatus: PaymentStatus_enum | null;
+  billingOrganizationId: number | null;
   /**
    * URL to the file containing the user's achievement certificate (if he obtained one)
    */
@@ -325,6 +359,10 @@ export interface MyCourses_User_by_pk_CourseEnrollments_Course_CourseEnrollments
    * URL to the file containing the user's attendance certificate (if he obtained one)
    */
   attendanceCertificateURL: string | null;
+  /**
+   * An array relationship
+   */
+  Invoices: MyCourses_User_by_pk_CourseEnrollments_Course_CourseEnrollments_Invoices[];
 }
 
 export interface MyCourses_User_by_pk_CourseEnrollments_Course {
@@ -489,9 +527,9 @@ export interface MyCourses_User_by_pk_CourseEnrollments {
    */
   status: CourseEnrollmentStatus_enum;
   /**
-   * Current payment status
+   * Organization paying for this enrollment (B2B). NULL means the enrolling user pays personally (B2C)
    */
-  paymentStatus: PaymentStatus_enum | null;
+  billingOrganizationId: number | null;
   /**
    * URL to the file containing the user's achievement certificate (if he obtained one)
    */
@@ -500,6 +538,10 @@ export interface MyCourses_User_by_pk_CourseEnrollments {
    * URL to the file containing the user's attendance certificate (if he obtained one)
    */
   attendanceCertificateURL: string | null;
+  /**
+   * An array relationship
+   */
+  Invoices: MyCourses_User_by_pk_CourseEnrollments_Invoices[];
   /**
    * An object relationship
    */

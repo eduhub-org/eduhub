@@ -582,6 +582,7 @@ export enum CourseEnrollment_constraint {
 export enum CourseEnrollment_select_column {
   achievementCertificateURL = "achievementCertificateURL",
   attendanceCertificateURL = "attendanceCertificateURL",
+  billingOrganizationId = "billingOrganizationId",
   courseId = "courseId",
   created_at = "created_at",
   id = "id",
@@ -589,12 +590,7 @@ export enum CourseEnrollment_select_column {
   location = "location",
   motivationLetter = "motivationLetter",
   motivationRating = "motivationRating",
-  paymentAmount = "paymentAmount",
-  paymentCurrency = "paymentCurrency",
-  paymentStatus = "paymentStatus",
   status = "status",
-  stripeCheckoutSessionId = "stripeCheckoutSessionId",
-  stripePaymentIntentId = "stripePaymentIntentId",
   termsAcceptedAt = "termsAcceptedAt",
   updated_at = "updated_at",
   userId = "userId",
@@ -606,6 +602,7 @@ export enum CourseEnrollment_select_column {
 export enum CourseEnrollment_update_column {
   achievementCertificateURL = "achievementCertificateURL",
   attendanceCertificateURL = "attendanceCertificateURL",
+  billingOrganizationId = "billingOrganizationId",
   courseId = "courseId",
   created_at = "created_at",
   id = "id",
@@ -613,12 +610,7 @@ export enum CourseEnrollment_update_column {
   location = "location",
   motivationLetter = "motivationLetter",
   motivationRating = "motivationRating",
-  paymentAmount = "paymentAmount",
-  paymentCurrency = "paymentCurrency",
-  paymentStatus = "paymentStatus",
   status = "status",
-  stripeCheckoutSessionId = "stripeCheckoutSessionId",
-  stripePaymentIntentId = "stripePaymentIntentId",
   termsAcceptedAt = "termsAcceptedAt",
   updated_at = "updated_at",
   userId = "userId",
@@ -917,6 +909,89 @@ export enum Course_update_column {
 }
 
 /**
+ * unique or primary key constraints on table "InvoiceStatus"
+ */
+export enum InvoiceStatus_constraint {
+  InvoiceStatus_pkey = "InvoiceStatus_pkey",
+}
+
+export enum InvoiceStatus_enum {
+  CANCELLED = "CANCELLED",
+  DRAFT = "DRAFT",
+  ISSUED = "ISSUED",
+  OVERDUE = "OVERDUE",
+  PAID = "PAID",
+  REFUNDED = "REFUNDED",
+}
+
+/**
+ * update columns of table "InvoiceStatus"
+ */
+export enum InvoiceStatus_update_column {
+  comment = "comment",
+  value = "value",
+}
+
+/**
+ * unique or primary key constraints on table "Invoice"
+ */
+export enum Invoice_constraint {
+  Invoice_invoiceNumber_key = "Invoice_invoiceNumber_key",
+  Invoice_pkey = "Invoice_pkey",
+  Invoice_stripeInvoiceId_key = "Invoice_stripeInvoiceId_key",
+}
+
+/**
+ * select columns of table "Invoice"
+ */
+export enum Invoice_select_column {
+  courseEnrollmentId = "courseEnrollmentId",
+  created_at = "created_at",
+  currency = "currency",
+  grossTotal = "grossTotal",
+  id = "id",
+  invoiceDate = "invoiceDate",
+  invoiceNumber = "invoiceNumber",
+  netTotal = "netTotal",
+  notes = "notes",
+  organizationId = "organizationId",
+  status = "status",
+  stripeCheckoutSessionId = "stripeCheckoutSessionId",
+  stripeHostedInvoiceUrl = "stripeHostedInvoiceUrl",
+  stripeInvoiceId = "stripeInvoiceId",
+  stripeInvoicePdfUrl = "stripeInvoicePdfUrl",
+  stripePaymentIntentId = "stripePaymentIntentId",
+  updated_at = "updated_at",
+  userId = "userId",
+  vatTotal = "vatTotal",
+}
+
+/**
+ * update columns of table "Invoice"
+ */
+export enum Invoice_update_column {
+  courseEnrollmentId = "courseEnrollmentId",
+  created_at = "created_at",
+  currency = "currency",
+  grossTotal = "grossTotal",
+  id = "id",
+  invoiceDate = "invoiceDate",
+  invoiceNumber = "invoiceNumber",
+  netTotal = "netTotal",
+  notes = "notes",
+  organizationId = "organizationId",
+  status = "status",
+  stripeCheckoutSessionId = "stripeCheckoutSessionId",
+  stripeHostedInvoiceUrl = "stripeHostedInvoiceUrl",
+  stripeInvoiceId = "stripeInvoiceId",
+  stripeInvoicePdfUrl = "stripeInvoicePdfUrl",
+  stripePaymentIntentId = "stripePaymentIntentId",
+  updated_at = "updated_at",
+  userId = "userId",
+  vatTotal = "vatTotal",
+}
+
+/**
  * unique or primary key constraints on table "Language"
  */
 export enum Language_constraint {
@@ -1102,53 +1177,84 @@ export enum Organization_constraint {
  * select columns of table "Organization"
  */
 export enum Organization_select_column {
+  addressLine1 = "addressLine1",
+  addressLine2 = "addressLine2",
   aliases = "aliases",
   apiKeyHash = "apiKeyHash",
+  bankBic = "bankBic",
+  bankIban = "bankIban",
+  bankName = "bankName",
+  city = "city",
+  country = "country",
   created_at = "created_at",
+  defaultTaxExemptionNote = "defaultTaxExemptionNote",
+  defaultVatRate = "defaultVatRate",
   description = "description",
+  email = "email",
+  formbricksApiKey = "formbricksApiKey",
+  formbricksApiUrl = "formbricksApiUrl",
   id = "id",
+  invoiceFooterText = "invoiceFooterText",
+  invoiceNumberPrefix = "invoiceNumberPrefix",
+  legalForm = "legalForm",
+  legalName = "legalName",
   logo = "logo",
+  managingDirector = "managingDirector",
   name = "name",
+  phone = "phone",
+  postalCode = "postalCode",
+  registerCourt = "registerCourt",
+  registerNumber = "registerNumber",
+  stripePublishableKey = "stripePublishableKey",
+  stripeSecretKey = "stripeSecretKey",
+  stripeWebhookSecret = "stripeWebhookSecret",
+  taxNumber = "taxNumber",
   type = "type",
   updated_at = "updated_at",
+  vatId = "vatId",
+  website = "website",
 }
 
 /**
  * update columns of table "Organization"
  */
 export enum Organization_update_column {
+  addressLine1 = "addressLine1",
+  addressLine2 = "addressLine2",
   aliases = "aliases",
   apiKeyHash = "apiKeyHash",
+  bankBic = "bankBic",
+  bankIban = "bankIban",
+  bankName = "bankName",
+  city = "city",
+  country = "country",
   created_at = "created_at",
+  defaultTaxExemptionNote = "defaultTaxExemptionNote",
+  defaultVatRate = "defaultVatRate",
   description = "description",
+  email = "email",
+  formbricksApiKey = "formbricksApiKey",
+  formbricksApiUrl = "formbricksApiUrl",
   id = "id",
+  invoiceFooterText = "invoiceFooterText",
+  invoiceNumberPrefix = "invoiceNumberPrefix",
+  legalForm = "legalForm",
+  legalName = "legalName",
   logo = "logo",
+  managingDirector = "managingDirector",
   name = "name",
+  phone = "phone",
+  postalCode = "postalCode",
+  registerCourt = "registerCourt",
+  registerNumber = "registerNumber",
+  stripePublishableKey = "stripePublishableKey",
+  stripeSecretKey = "stripeSecretKey",
+  stripeWebhookSecret = "stripeWebhookSecret",
+  taxNumber = "taxNumber",
   type = "type",
   updated_at = "updated_at",
-}
-
-/**
- * unique or primary key constraints on table "PaymentStatus"
- */
-export enum PaymentStatus_constraint {
-  PaymentStatus_pkey = "PaymentStatus_pkey",
-}
-
-export enum PaymentStatus_enum {
-  COMPLETED = "COMPLETED",
-  FAILED = "FAILED",
-  NONE = "NONE",
-  PENDING = "PENDING",
-  REFUNDED = "REFUNDED",
-}
-
-/**
- * update columns of table "PaymentStatus"
- */
-export enum PaymentStatus_update_column {
-  comment = "comment",
-  value = "value",
+  vatId = "vatId",
+  website = "website",
 }
 
 /**
@@ -1197,6 +1303,7 @@ export enum Program_select_column {
   id = "id",
   lectureEnd = "lectureEnd",
   lectureStart = "lectureStart",
+  organizationId = "organizationId",
   published = "published",
   shortTitle = "shortTitle",
   speakerQuestionnaire = "speakerQuestionnaire",
@@ -1245,6 +1352,7 @@ export enum Program_update_column {
   id = "id",
   lectureEnd = "lectureEnd",
   lectureStart = "lectureStart",
+  organizationId = "organizationId",
   published = "published",
   shortTitle = "shortTitle",
   speakerQuestionnaire = "speakerQuestionnaire",
@@ -1686,7 +1794,10 @@ export enum User_constraint {
  * select columns of table "User"
  */
 export enum User_select_column {
+  addressLine1 = "addressLine1",
+  addressLine2 = "addressLine2",
   anonymousId = "anonymousId",
+  city = "city",
   country = "country",
   created_at = "created_at",
   email = "email",
@@ -1723,7 +1834,10 @@ export enum User_select_column_User_aggregate_bool_exp_bool_or_arguments_columns
  * update columns of table "User"
  */
 export enum User_update_column {
+  addressLine1 = "addressLine1",
+  addressLine2 = "addressLine2",
   anonymousId = "anonymousId",
+  city = "city",
   country = "country",
   created_at = "created_at",
   email = "email",
@@ -3624,6 +3738,8 @@ export interface CertificateType_on_conflict {
  * Boolean expression to filter rows from the table "Country". All fields are combined with a logical 'AND'.
  */
 export interface Country_bool_exp {
+  Organizations?: Organization_bool_exp | null;
+  Organizations_aggregate?: Organization_aggregate_bool_exp | null;
   Users?: User_bool_exp | null;
   Users_aggregate?: User_aggregate_bool_exp | null;
   _and?: Country_bool_exp[] | null;
@@ -3638,6 +3754,7 @@ export interface Country_bool_exp {
  * input type for inserting data into table "Country"
  */
 export interface Country_insert_input {
+  Organizations?: Organization_arr_rel_insert_input | null;
   Users?: User_arr_rel_insert_input | null;
   code?: string | null;
   name_de?: string | null;
@@ -3665,6 +3782,7 @@ export interface Country_on_conflict {
  * Ordering options when selecting data from "Country".
  */
 export interface Country_order_by {
+  Organizations_aggregate?: Organization_aggregate_order_by | null;
   Users_aggregate?: User_aggregate_order_by | null;
   code?: order_by | null;
   name_de?: order_by | null;
@@ -4350,28 +4468,31 @@ export interface CourseEnrollment_arr_rel_insert_input {
  * order by avg() on columns of table "CourseEnrollment"
  */
 export interface CourseEnrollment_avg_order_by {
+  billingOrganizationId?: order_by | null;
   courseId?: order_by | null;
   id?: order_by | null;
-  paymentAmount?: order_by | null;
 }
 
 /**
  * Boolean expression to filter rows from the table "CourseEnrollment". All fields are combined with a logical 'AND'.
  */
 export interface CourseEnrollment_bool_exp {
+  BillingOrganization?: Organization_bool_exp | null;
   Course?: Course_bool_exp | null;
   CourseEnrollmentAddons?: CourseEnrollmentAddon_bool_exp | null;
   CourseEnrollmentAddons_aggregate?: CourseEnrollmentAddon_aggregate_bool_exp | null;
   CourseEnrollmentStatus?: CourseEnrollmentStatus_bool_exp | null;
+  Invoices?: Invoice_bool_exp | null;
+  Invoices_aggregate?: Invoice_aggregate_bool_exp | null;
   LocationOption?: LocationOption_bool_exp | null;
   MotivationRating?: MotivationRating_bool_exp | null;
-  PaymentStatus?: PaymentStatus_bool_exp | null;
   User?: User_bool_exp | null;
   _and?: CourseEnrollment_bool_exp[] | null;
   _not?: CourseEnrollment_bool_exp | null;
   _or?: CourseEnrollment_bool_exp[] | null;
   achievementCertificateURL?: String_comparison_exp | null;
   attendanceCertificateURL?: String_comparison_exp | null;
+  billingOrganizationId?: Int_comparison_exp | null;
   courseId?: Int_comparison_exp | null;
   created_at?: timestamptz_comparison_exp | null;
   id?: Int_comparison_exp | null;
@@ -4379,12 +4500,7 @@ export interface CourseEnrollment_bool_exp {
   location?: LocationOption_enum_comparison_exp | null;
   motivationLetter?: String_comparison_exp | null;
   motivationRating?: MotivationRating_enum_comparison_exp | null;
-  paymentAmount?: Int_comparison_exp | null;
-  paymentCurrency?: String_comparison_exp | null;
-  paymentStatus?: PaymentStatus_enum_comparison_exp | null;
   status?: CourseEnrollmentStatus_enum_comparison_exp | null;
-  stripeCheckoutSessionId?: String_comparison_exp | null;
-  stripePaymentIntentId?: String_comparison_exp | null;
   termsAcceptedAt?: timestamptz_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
   userId?: uuid_comparison_exp | null;
@@ -4394,15 +4510,17 @@ export interface CourseEnrollment_bool_exp {
  * input type for inserting data into table "CourseEnrollment"
  */
 export interface CourseEnrollment_insert_input {
+  BillingOrganization?: Organization_obj_rel_insert_input | null;
   Course?: Course_obj_rel_insert_input | null;
   CourseEnrollmentAddons?: CourseEnrollmentAddon_arr_rel_insert_input | null;
   CourseEnrollmentStatus?: CourseEnrollmentStatus_obj_rel_insert_input | null;
+  Invoices?: Invoice_arr_rel_insert_input | null;
   LocationOption?: LocationOption_obj_rel_insert_input | null;
   MotivationRating?: MotivationRating_obj_rel_insert_input | null;
-  PaymentStatus?: PaymentStatus_obj_rel_insert_input | null;
   User?: User_obj_rel_insert_input | null;
   achievementCertificateURL?: string | null;
   attendanceCertificateURL?: string | null;
+  billingOrganizationId?: number | null;
   courseId?: number | null;
   created_at?: any | null;
   id?: number | null;
@@ -4410,12 +4528,7 @@ export interface CourseEnrollment_insert_input {
   location?: LocationOption_enum | null;
   motivationLetter?: string | null;
   motivationRating?: MotivationRating_enum | null;
-  paymentAmount?: number | null;
-  paymentCurrency?: string | null;
-  paymentStatus?: PaymentStatus_enum | null;
   status?: CourseEnrollmentStatus_enum | null;
-  stripeCheckoutSessionId?: string | null;
-  stripePaymentIntentId?: string | null;
   termsAcceptedAt?: any | null;
   updated_at?: any | null;
   userId?: any | null;
@@ -4427,15 +4540,12 @@ export interface CourseEnrollment_insert_input {
 export interface CourseEnrollment_max_order_by {
   achievementCertificateURL?: order_by | null;
   attendanceCertificateURL?: order_by | null;
+  billingOrganizationId?: order_by | null;
   courseId?: order_by | null;
   created_at?: order_by | null;
   id?: order_by | null;
   invitationExpirationDate?: order_by | null;
   motivationLetter?: order_by | null;
-  paymentAmount?: order_by | null;
-  paymentCurrency?: order_by | null;
-  stripeCheckoutSessionId?: order_by | null;
-  stripePaymentIntentId?: order_by | null;
   termsAcceptedAt?: order_by | null;
   updated_at?: order_by | null;
   userId?: order_by | null;
@@ -4447,15 +4557,12 @@ export interface CourseEnrollment_max_order_by {
 export interface CourseEnrollment_min_order_by {
   achievementCertificateURL?: order_by | null;
   attendanceCertificateURL?: order_by | null;
+  billingOrganizationId?: order_by | null;
   courseId?: order_by | null;
   created_at?: order_by | null;
   id?: order_by | null;
   invitationExpirationDate?: order_by | null;
   motivationLetter?: order_by | null;
-  paymentAmount?: order_by | null;
-  paymentCurrency?: order_by | null;
-  stripeCheckoutSessionId?: order_by | null;
-  stripePaymentIntentId?: order_by | null;
   termsAcceptedAt?: order_by | null;
   updated_at?: order_by | null;
   userId?: order_by | null;
@@ -4482,15 +4589,17 @@ export interface CourseEnrollment_on_conflict {
  * Ordering options when selecting data from "CourseEnrollment".
  */
 export interface CourseEnrollment_order_by {
+  BillingOrganization?: Organization_order_by | null;
   Course?: Course_order_by | null;
   CourseEnrollmentAddons_aggregate?: CourseEnrollmentAddon_aggregate_order_by | null;
   CourseEnrollmentStatus?: CourseEnrollmentStatus_order_by | null;
+  Invoices_aggregate?: Invoice_aggregate_order_by | null;
   LocationOption?: LocationOption_order_by | null;
   MotivationRating?: MotivationRating_order_by | null;
-  PaymentStatus?: PaymentStatus_order_by | null;
   User?: User_order_by | null;
   achievementCertificateURL?: order_by | null;
   attendanceCertificateURL?: order_by | null;
+  billingOrganizationId?: order_by | null;
   courseId?: order_by | null;
   created_at?: order_by | null;
   id?: order_by | null;
@@ -4498,12 +4607,7 @@ export interface CourseEnrollment_order_by {
   location?: order_by | null;
   motivationLetter?: order_by | null;
   motivationRating?: order_by | null;
-  paymentAmount?: order_by | null;
-  paymentCurrency?: order_by | null;
-  paymentStatus?: order_by | null;
   status?: order_by | null;
-  stripeCheckoutSessionId?: order_by | null;
-  stripePaymentIntentId?: order_by | null;
   termsAcceptedAt?: order_by | null;
   updated_at?: order_by | null;
   userId?: order_by | null;
@@ -4513,63 +4617,63 @@ export interface CourseEnrollment_order_by {
  * order by stddev() on columns of table "CourseEnrollment"
  */
 export interface CourseEnrollment_stddev_order_by {
+  billingOrganizationId?: order_by | null;
   courseId?: order_by | null;
   id?: order_by | null;
-  paymentAmount?: order_by | null;
 }
 
 /**
  * order by stddev_pop() on columns of table "CourseEnrollment"
  */
 export interface CourseEnrollment_stddev_pop_order_by {
+  billingOrganizationId?: order_by | null;
   courseId?: order_by | null;
   id?: order_by | null;
-  paymentAmount?: order_by | null;
 }
 
 /**
  * order by stddev_samp() on columns of table "CourseEnrollment"
  */
 export interface CourseEnrollment_stddev_samp_order_by {
+  billingOrganizationId?: order_by | null;
   courseId?: order_by | null;
   id?: order_by | null;
-  paymentAmount?: order_by | null;
 }
 
 /**
  * order by sum() on columns of table "CourseEnrollment"
  */
 export interface CourseEnrollment_sum_order_by {
+  billingOrganizationId?: order_by | null;
   courseId?: order_by | null;
   id?: order_by | null;
-  paymentAmount?: order_by | null;
 }
 
 /**
  * order by var_pop() on columns of table "CourseEnrollment"
  */
 export interface CourseEnrollment_var_pop_order_by {
+  billingOrganizationId?: order_by | null;
   courseId?: order_by | null;
   id?: order_by | null;
-  paymentAmount?: order_by | null;
 }
 
 /**
  * order by var_samp() on columns of table "CourseEnrollment"
  */
 export interface CourseEnrollment_var_samp_order_by {
+  billingOrganizationId?: order_by | null;
   courseId?: order_by | null;
   id?: order_by | null;
-  paymentAmount?: order_by | null;
 }
 
 /**
  * order by variance() on columns of table "CourseEnrollment"
  */
 export interface CourseEnrollment_variance_order_by {
+  billingOrganizationId?: order_by | null;
   courseId?: order_by | null;
   id?: order_by | null;
-  paymentAmount?: order_by | null;
 }
 
 export interface CourseFundingOrganization_aggregate_bool_exp {
@@ -5875,6 +5979,306 @@ export interface Int_comparison_exp {
 }
 
 /**
+ * Boolean expression to filter rows from the table "InvoiceStatus". All fields are combined with a logical 'AND'.
+ */
+export interface InvoiceStatus_bool_exp {
+  Invoices?: Invoice_bool_exp | null;
+  Invoices_aggregate?: Invoice_aggregate_bool_exp | null;
+  _and?: InvoiceStatus_bool_exp[] | null;
+  _not?: InvoiceStatus_bool_exp | null;
+  _or?: InvoiceStatus_bool_exp[] | null;
+  comment?: String_comparison_exp | null;
+  value?: String_comparison_exp | null;
+}
+
+/**
+ * Boolean expression to compare columns of type "InvoiceStatus_enum". All fields are combined with logical 'AND'.
+ */
+export interface InvoiceStatus_enum_comparison_exp {
+  _eq?: InvoiceStatus_enum | null;
+  _in?: InvoiceStatus_enum[] | null;
+  _is_null?: boolean | null;
+  _neq?: InvoiceStatus_enum | null;
+  _nin?: InvoiceStatus_enum[] | null;
+}
+
+/**
+ * input type for inserting data into table "InvoiceStatus"
+ */
+export interface InvoiceStatus_insert_input {
+  Invoices?: Invoice_arr_rel_insert_input | null;
+  comment?: string | null;
+  value?: string | null;
+}
+
+/**
+ * input type for inserting object relation for remote table "InvoiceStatus"
+ */
+export interface InvoiceStatus_obj_rel_insert_input {
+  data: InvoiceStatus_insert_input;
+  on_conflict?: InvoiceStatus_on_conflict | null;
+}
+
+/**
+ * on_conflict condition type for table "InvoiceStatus"
+ */
+export interface InvoiceStatus_on_conflict {
+  constraint: InvoiceStatus_constraint;
+  update_columns: InvoiceStatus_update_column[];
+  where?: InvoiceStatus_bool_exp | null;
+}
+
+export interface Invoice_aggregate_bool_exp {
+  count?: Invoice_aggregate_bool_exp_count | null;
+}
+
+export interface Invoice_aggregate_bool_exp_count {
+  arguments?: Invoice_select_column[] | null;
+  distinct?: boolean | null;
+  filter?: Invoice_bool_exp | null;
+  predicate: Int_comparison_exp;
+}
+
+/**
+ * order by aggregate values of table "Invoice"
+ */
+export interface Invoice_aggregate_order_by {
+  avg?: Invoice_avg_order_by | null;
+  count?: order_by | null;
+  max?: Invoice_max_order_by | null;
+  min?: Invoice_min_order_by | null;
+  stddev?: Invoice_stddev_order_by | null;
+  stddev_pop?: Invoice_stddev_pop_order_by | null;
+  stddev_samp?: Invoice_stddev_samp_order_by | null;
+  sum?: Invoice_sum_order_by | null;
+  var_pop?: Invoice_var_pop_order_by | null;
+  var_samp?: Invoice_var_samp_order_by | null;
+  variance?: Invoice_variance_order_by | null;
+}
+
+/**
+ * input type for inserting array relation for remote table "Invoice"
+ */
+export interface Invoice_arr_rel_insert_input {
+  data: Invoice_insert_input[];
+  on_conflict?: Invoice_on_conflict | null;
+}
+
+/**
+ * order by avg() on columns of table "Invoice"
+ */
+export interface Invoice_avg_order_by {
+  courseEnrollmentId?: order_by | null;
+  grossTotal?: order_by | null;
+  id?: order_by | null;
+  netTotal?: order_by | null;
+  organizationId?: order_by | null;
+  vatTotal?: order_by | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "Invoice". All fields are combined with a logical 'AND'.
+ */
+export interface Invoice_bool_exp {
+  CourseEnrollment?: CourseEnrollment_bool_exp | null;
+  InvoiceStatus?: InvoiceStatus_bool_exp | null;
+  Organization?: Organization_bool_exp | null;
+  User?: User_bool_exp | null;
+  _and?: Invoice_bool_exp[] | null;
+  _not?: Invoice_bool_exp | null;
+  _or?: Invoice_bool_exp[] | null;
+  courseEnrollmentId?: Int_comparison_exp | null;
+  created_at?: timestamptz_comparison_exp | null;
+  currency?: String_comparison_exp | null;
+  grossTotal?: Int_comparison_exp | null;
+  id?: Int_comparison_exp | null;
+  invoiceDate?: date_comparison_exp | null;
+  invoiceNumber?: String_comparison_exp | null;
+  netTotal?: Int_comparison_exp | null;
+  notes?: String_comparison_exp | null;
+  organizationId?: Int_comparison_exp | null;
+  status?: InvoiceStatus_enum_comparison_exp | null;
+  stripeCheckoutSessionId?: String_comparison_exp | null;
+  stripeHostedInvoiceUrl?: String_comparison_exp | null;
+  stripeInvoiceId?: String_comparison_exp | null;
+  stripeInvoicePdfUrl?: String_comparison_exp | null;
+  stripePaymentIntentId?: String_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
+  userId?: uuid_comparison_exp | null;
+  vatTotal?: Int_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "Invoice"
+ */
+export interface Invoice_insert_input {
+  CourseEnrollment?: CourseEnrollment_obj_rel_insert_input | null;
+  InvoiceStatus?: InvoiceStatus_obj_rel_insert_input | null;
+  Organization?: Organization_obj_rel_insert_input | null;
+  User?: User_obj_rel_insert_input | null;
+  courseEnrollmentId?: number | null;
+  created_at?: any | null;
+  currency?: string | null;
+  grossTotal?: number | null;
+  id?: number | null;
+  invoiceDate?: any | null;
+  invoiceNumber?: string | null;
+  netTotal?: number | null;
+  notes?: string | null;
+  organizationId?: number | null;
+  status?: InvoiceStatus_enum | null;
+  stripeCheckoutSessionId?: string | null;
+  stripeHostedInvoiceUrl?: string | null;
+  stripeInvoiceId?: string | null;
+  stripeInvoicePdfUrl?: string | null;
+  stripePaymentIntentId?: string | null;
+  updated_at?: any | null;
+  userId?: any | null;
+  vatTotal?: number | null;
+}
+
+/**
+ * order by max() on columns of table "Invoice"
+ */
+export interface Invoice_max_order_by {
+  courseEnrollmentId?: order_by | null;
+  created_at?: order_by | null;
+  currency?: order_by | null;
+  grossTotal?: order_by | null;
+  id?: order_by | null;
+  invoiceDate?: order_by | null;
+  invoiceNumber?: order_by | null;
+  netTotal?: order_by | null;
+  notes?: order_by | null;
+  organizationId?: order_by | null;
+  stripeCheckoutSessionId?: order_by | null;
+  stripeHostedInvoiceUrl?: order_by | null;
+  stripeInvoiceId?: order_by | null;
+  stripeInvoicePdfUrl?: order_by | null;
+  stripePaymentIntentId?: order_by | null;
+  updated_at?: order_by | null;
+  userId?: order_by | null;
+  vatTotal?: order_by | null;
+}
+
+/**
+ * order by min() on columns of table "Invoice"
+ */
+export interface Invoice_min_order_by {
+  courseEnrollmentId?: order_by | null;
+  created_at?: order_by | null;
+  currency?: order_by | null;
+  grossTotal?: order_by | null;
+  id?: order_by | null;
+  invoiceDate?: order_by | null;
+  invoiceNumber?: order_by | null;
+  netTotal?: order_by | null;
+  notes?: order_by | null;
+  organizationId?: order_by | null;
+  stripeCheckoutSessionId?: order_by | null;
+  stripeHostedInvoiceUrl?: order_by | null;
+  stripeInvoiceId?: order_by | null;
+  stripeInvoicePdfUrl?: order_by | null;
+  stripePaymentIntentId?: order_by | null;
+  updated_at?: order_by | null;
+  userId?: order_by | null;
+  vatTotal?: order_by | null;
+}
+
+/**
+ * on_conflict condition type for table "Invoice"
+ */
+export interface Invoice_on_conflict {
+  constraint: Invoice_constraint;
+  update_columns: Invoice_update_column[];
+  where?: Invoice_bool_exp | null;
+}
+
+/**
+ * order by stddev() on columns of table "Invoice"
+ */
+export interface Invoice_stddev_order_by {
+  courseEnrollmentId?: order_by | null;
+  grossTotal?: order_by | null;
+  id?: order_by | null;
+  netTotal?: order_by | null;
+  organizationId?: order_by | null;
+  vatTotal?: order_by | null;
+}
+
+/**
+ * order by stddev_pop() on columns of table "Invoice"
+ */
+export interface Invoice_stddev_pop_order_by {
+  courseEnrollmentId?: order_by | null;
+  grossTotal?: order_by | null;
+  id?: order_by | null;
+  netTotal?: order_by | null;
+  organizationId?: order_by | null;
+  vatTotal?: order_by | null;
+}
+
+/**
+ * order by stddev_samp() on columns of table "Invoice"
+ */
+export interface Invoice_stddev_samp_order_by {
+  courseEnrollmentId?: order_by | null;
+  grossTotal?: order_by | null;
+  id?: order_by | null;
+  netTotal?: order_by | null;
+  organizationId?: order_by | null;
+  vatTotal?: order_by | null;
+}
+
+/**
+ * order by sum() on columns of table "Invoice"
+ */
+export interface Invoice_sum_order_by {
+  courseEnrollmentId?: order_by | null;
+  grossTotal?: order_by | null;
+  id?: order_by | null;
+  netTotal?: order_by | null;
+  organizationId?: order_by | null;
+  vatTotal?: order_by | null;
+}
+
+/**
+ * order by var_pop() on columns of table "Invoice"
+ */
+export interface Invoice_var_pop_order_by {
+  courseEnrollmentId?: order_by | null;
+  grossTotal?: order_by | null;
+  id?: order_by | null;
+  netTotal?: order_by | null;
+  organizationId?: order_by | null;
+  vatTotal?: order_by | null;
+}
+
+/**
+ * order by var_samp() on columns of table "Invoice"
+ */
+export interface Invoice_var_samp_order_by {
+  courseEnrollmentId?: order_by | null;
+  grossTotal?: order_by | null;
+  id?: order_by | null;
+  netTotal?: order_by | null;
+  organizationId?: order_by | null;
+  vatTotal?: order_by | null;
+}
+
+/**
+ * order by variance() on columns of table "Invoice"
+ */
+export interface Invoice_variance_order_by {
+  courseEnrollmentId?: order_by | null;
+  grossTotal?: order_by | null;
+  id?: order_by | null;
+  netTotal?: order_by | null;
+  organizationId?: order_by | null;
+  vatTotal?: order_by | null;
+}
+
+/**
  * Boolean expression to filter rows from the table "Language". All fields are combined with a logical 'AND'.
  */
 export interface Language_bool_exp {
@@ -6584,6 +6988,7 @@ export interface Organization_arr_rel_insert_input {
  * order by avg() on columns of table "Organization"
  */
 export interface Organization_avg_order_by {
+  defaultVatRate?: order_by | null;
   id?: order_by | null;
 }
 
@@ -6591,70 +6996,183 @@ export interface Organization_avg_order_by {
  * Boolean expression to filter rows from the table "Organization". All fields are combined with a logical 'AND'.
  */
 export interface Organization_bool_exp {
+  Country?: Country_bool_exp | null;
   FundedCourses?: CourseFundingOrganization_bool_exp | null;
   FundedCourses_aggregate?: CourseFundingOrganization_aggregate_bool_exp | null;
   OrganizationAdmins?: OrganizationAdmin_bool_exp | null;
   OrganizationAdmins_aggregate?: OrganizationAdmin_aggregate_bool_exp | null;
   OrganizationType?: OrganizationType_bool_exp | null;
+  Programs?: Program_bool_exp | null;
+  Programs_aggregate?: Program_aggregate_bool_exp | null;
   Users?: User_bool_exp | null;
   Users_aggregate?: User_aggregate_bool_exp | null;
   _and?: Organization_bool_exp[] | null;
   _not?: Organization_bool_exp | null;
   _or?: Organization_bool_exp[] | null;
+  addressLine1?: String_comparison_exp | null;
+  addressLine2?: String_comparison_exp | null;
   aliases?: jsonb_comparison_exp | null;
   apiKeyHash?: String_comparison_exp | null;
+  bankBic?: String_comparison_exp | null;
+  bankIban?: String_comparison_exp | null;
+  bankName?: String_comparison_exp | null;
+  city?: String_comparison_exp | null;
+  country?: String_comparison_exp | null;
   created_at?: timestamptz_comparison_exp | null;
+  defaultTaxExemptionNote?: String_comparison_exp | null;
+  defaultVatRate?: numeric_comparison_exp | null;
   description?: String_comparison_exp | null;
+  email?: String_comparison_exp | null;
+  formbricksApiKey?: String_comparison_exp | null;
+  formbricksApiUrl?: String_comparison_exp | null;
   id?: Int_comparison_exp | null;
+  invoiceFooterText?: String_comparison_exp | null;
+  invoiceNumberPrefix?: String_comparison_exp | null;
+  legalForm?: String_comparison_exp | null;
+  legalName?: String_comparison_exp | null;
   logo?: String_comparison_exp | null;
+  managingDirector?: String_comparison_exp | null;
   name?: String_comparison_exp | null;
+  phone?: String_comparison_exp | null;
+  postalCode?: String_comparison_exp | null;
+  registerCourt?: String_comparison_exp | null;
+  registerNumber?: String_comparison_exp | null;
+  stripePublishableKey?: String_comparison_exp | null;
+  stripeSecretKey?: String_comparison_exp | null;
+  stripeWebhookSecret?: String_comparison_exp | null;
+  taxNumber?: String_comparison_exp | null;
   type?: OrganizationType_enum_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
+  vatId?: String_comparison_exp | null;
+  website?: String_comparison_exp | null;
 }
 
 /**
  * input type for inserting data into table "Organization"
  */
 export interface Organization_insert_input {
+  Country?: Country_obj_rel_insert_input | null;
   FundedCourses?: CourseFundingOrganization_arr_rel_insert_input | null;
   OrganizationAdmins?: OrganizationAdmin_arr_rel_insert_input | null;
   OrganizationType?: OrganizationType_obj_rel_insert_input | null;
+  Programs?: Program_arr_rel_insert_input | null;
   Users?: User_arr_rel_insert_input | null;
+  addressLine1?: string | null;
+  addressLine2?: string | null;
   aliases?: any | null;
   apiKeyHash?: string | null;
+  bankBic?: string | null;
+  bankIban?: string | null;
+  bankName?: string | null;
+  city?: string | null;
+  country?: string | null;
   created_at?: any | null;
+  defaultTaxExemptionNote?: string | null;
+  defaultVatRate?: any | null;
   description?: string | null;
+  email?: string | null;
+  formbricksApiKey?: string | null;
+  formbricksApiUrl?: string | null;
   id?: number | null;
+  invoiceFooterText?: string | null;
+  invoiceNumberPrefix?: string | null;
+  legalForm?: string | null;
+  legalName?: string | null;
   logo?: string | null;
+  managingDirector?: string | null;
   name?: string | null;
+  phone?: string | null;
+  postalCode?: string | null;
+  registerCourt?: string | null;
+  registerNumber?: string | null;
+  stripePublishableKey?: string | null;
+  stripeSecretKey?: string | null;
+  stripeWebhookSecret?: string | null;
+  taxNumber?: string | null;
   type?: OrganizationType_enum | null;
   updated_at?: any | null;
+  vatId?: string | null;
+  website?: string | null;
 }
 
 /**
  * order by max() on columns of table "Organization"
  */
 export interface Organization_max_order_by {
+  addressLine1?: order_by | null;
+  addressLine2?: order_by | null;
   apiKeyHash?: order_by | null;
+  bankBic?: order_by | null;
+  bankIban?: order_by | null;
+  bankName?: order_by | null;
+  city?: order_by | null;
+  country?: order_by | null;
   created_at?: order_by | null;
+  defaultTaxExemptionNote?: order_by | null;
+  defaultVatRate?: order_by | null;
   description?: order_by | null;
+  email?: order_by | null;
+  formbricksApiKey?: order_by | null;
+  formbricksApiUrl?: order_by | null;
   id?: order_by | null;
+  invoiceFooterText?: order_by | null;
+  invoiceNumberPrefix?: order_by | null;
+  legalForm?: order_by | null;
+  legalName?: order_by | null;
   logo?: order_by | null;
+  managingDirector?: order_by | null;
   name?: order_by | null;
+  phone?: order_by | null;
+  postalCode?: order_by | null;
+  registerCourt?: order_by | null;
+  registerNumber?: order_by | null;
+  stripePublishableKey?: order_by | null;
+  stripeSecretKey?: order_by | null;
+  stripeWebhookSecret?: order_by | null;
+  taxNumber?: order_by | null;
   updated_at?: order_by | null;
+  vatId?: order_by | null;
+  website?: order_by | null;
 }
 
 /**
  * order by min() on columns of table "Organization"
  */
 export interface Organization_min_order_by {
+  addressLine1?: order_by | null;
+  addressLine2?: order_by | null;
   apiKeyHash?: order_by | null;
+  bankBic?: order_by | null;
+  bankIban?: order_by | null;
+  bankName?: order_by | null;
+  city?: order_by | null;
+  country?: order_by | null;
   created_at?: order_by | null;
+  defaultTaxExemptionNote?: order_by | null;
+  defaultVatRate?: order_by | null;
   description?: order_by | null;
+  email?: order_by | null;
+  formbricksApiKey?: order_by | null;
+  formbricksApiUrl?: order_by | null;
   id?: order_by | null;
+  invoiceFooterText?: order_by | null;
+  invoiceNumberPrefix?: order_by | null;
+  legalForm?: order_by | null;
+  legalName?: order_by | null;
   logo?: order_by | null;
+  managingDirector?: order_by | null;
   name?: order_by | null;
+  phone?: order_by | null;
+  postalCode?: order_by | null;
+  registerCourt?: order_by | null;
+  registerNumber?: order_by | null;
+  stripePublishableKey?: order_by | null;
+  stripeSecretKey?: order_by | null;
+  stripeWebhookSecret?: order_by | null;
+  taxNumber?: order_by | null;
   updated_at?: order_by | null;
+  vatId?: order_by | null;
+  website?: order_by | null;
 }
 
 /**
@@ -6678,25 +7196,55 @@ export interface Organization_on_conflict {
  * Ordering options when selecting data from "Organization".
  */
 export interface Organization_order_by {
+  Country?: Country_order_by | null;
   FundedCourses_aggregate?: CourseFundingOrganization_aggregate_order_by | null;
   OrganizationAdmins_aggregate?: OrganizationAdmin_aggregate_order_by | null;
   OrganizationType?: OrganizationType_order_by | null;
+  Programs_aggregate?: Program_aggregate_order_by | null;
   Users_aggregate?: User_aggregate_order_by | null;
+  addressLine1?: order_by | null;
+  addressLine2?: order_by | null;
   aliases?: order_by | null;
   apiKeyHash?: order_by | null;
+  bankBic?: order_by | null;
+  bankIban?: order_by | null;
+  bankName?: order_by | null;
+  city?: order_by | null;
+  country?: order_by | null;
   created_at?: order_by | null;
+  defaultTaxExemptionNote?: order_by | null;
+  defaultVatRate?: order_by | null;
   description?: order_by | null;
+  email?: order_by | null;
+  formbricksApiKey?: order_by | null;
+  formbricksApiUrl?: order_by | null;
   id?: order_by | null;
+  invoiceFooterText?: order_by | null;
+  invoiceNumberPrefix?: order_by | null;
+  legalForm?: order_by | null;
+  legalName?: order_by | null;
   logo?: order_by | null;
+  managingDirector?: order_by | null;
   name?: order_by | null;
+  phone?: order_by | null;
+  postalCode?: order_by | null;
+  registerCourt?: order_by | null;
+  registerNumber?: order_by | null;
+  stripePublishableKey?: order_by | null;
+  stripeSecretKey?: order_by | null;
+  stripeWebhookSecret?: order_by | null;
+  taxNumber?: order_by | null;
   type?: order_by | null;
   updated_at?: order_by | null;
+  vatId?: order_by | null;
+  website?: order_by | null;
 }
 
 /**
  * order by stddev() on columns of table "Organization"
  */
 export interface Organization_stddev_order_by {
+  defaultVatRate?: order_by | null;
   id?: order_by | null;
 }
 
@@ -6704,6 +7252,7 @@ export interface Organization_stddev_order_by {
  * order by stddev_pop() on columns of table "Organization"
  */
 export interface Organization_stddev_pop_order_by {
+  defaultVatRate?: order_by | null;
   id?: order_by | null;
 }
 
@@ -6711,6 +7260,7 @@ export interface Organization_stddev_pop_order_by {
  * order by stddev_samp() on columns of table "Organization"
  */
 export interface Organization_stddev_samp_order_by {
+  defaultVatRate?: order_by | null;
   id?: order_by | null;
 }
 
@@ -6718,6 +7268,7 @@ export interface Organization_stddev_samp_order_by {
  * order by sum() on columns of table "Organization"
  */
 export interface Organization_sum_order_by {
+  defaultVatRate?: order_by | null;
   id?: order_by | null;
 }
 
@@ -6725,6 +7276,7 @@ export interface Organization_sum_order_by {
  * order by var_pop() on columns of table "Organization"
  */
 export interface Organization_var_pop_order_by {
+  defaultVatRate?: order_by | null;
   id?: order_by | null;
 }
 
@@ -6732,6 +7284,7 @@ export interface Organization_var_pop_order_by {
  * order by var_samp() on columns of table "Organization"
  */
 export interface Organization_var_samp_order_by {
+  defaultVatRate?: order_by | null;
   id?: order_by | null;
 }
 
@@ -6739,66 +7292,8 @@ export interface Organization_var_samp_order_by {
  * order by variance() on columns of table "Organization"
  */
 export interface Organization_variance_order_by {
+  defaultVatRate?: order_by | null;
   id?: order_by | null;
-}
-
-/**
- * Boolean expression to filter rows from the table "PaymentStatus". All fields are combined with a logical 'AND'.
- */
-export interface PaymentStatus_bool_exp {
-  CourseEnrollments?: CourseEnrollment_bool_exp | null;
-  CourseEnrollments_aggregate?: CourseEnrollment_aggregate_bool_exp | null;
-  _and?: PaymentStatus_bool_exp[] | null;
-  _not?: PaymentStatus_bool_exp | null;
-  _or?: PaymentStatus_bool_exp[] | null;
-  comment?: String_comparison_exp | null;
-  value?: String_comparison_exp | null;
-}
-
-/**
- * Boolean expression to compare columns of type "PaymentStatus_enum". All fields are combined with logical 'AND'.
- */
-export interface PaymentStatus_enum_comparison_exp {
-  _eq?: PaymentStatus_enum | null;
-  _in?: PaymentStatus_enum[] | null;
-  _is_null?: boolean | null;
-  _neq?: PaymentStatus_enum | null;
-  _nin?: PaymentStatus_enum[] | null;
-}
-
-/**
- * input type for inserting data into table "PaymentStatus"
- */
-export interface PaymentStatus_insert_input {
-  CourseEnrollments?: CourseEnrollment_arr_rel_insert_input | null;
-  comment?: string | null;
-  value?: string | null;
-}
-
-/**
- * input type for inserting object relation for remote table "PaymentStatus"
- */
-export interface PaymentStatus_obj_rel_insert_input {
-  data: PaymentStatus_insert_input;
-  on_conflict?: PaymentStatus_on_conflict | null;
-}
-
-/**
- * on_conflict condition type for table "PaymentStatus"
- */
-export interface PaymentStatus_on_conflict {
-  constraint: PaymentStatus_constraint;
-  update_columns: PaymentStatus_update_column[];
-  where?: PaymentStatus_bool_exp | null;
-}
-
-/**
- * Ordering options when selecting data from "PaymentStatus".
- */
-export interface PaymentStatus_order_by {
-  CourseEnrollments_aggregate?: CourseEnrollment_aggregate_order_by | null;
-  comment?: order_by | null;
-  value?: order_by | null;
 }
 
 /**
@@ -6920,6 +7415,7 @@ export interface Program_avg_order_by {
   attendanceCertificateTemplateTextId?: order_by | null;
   defaultMaxMissedSessions?: order_by | null;
   id?: order_by | null;
+  organizationId?: order_by | null;
 }
 
 /**
@@ -6930,6 +7426,7 @@ export interface Program_bool_exp {
   CertificateTemplatePrograms_aggregate?: CertificateTemplateProgram_aggregate_bool_exp | null;
   Courses?: Course_bool_exp | null;
   Courses_aggregate?: Course_aggregate_bool_exp | null;
+  Organization?: Organization_bool_exp | null;
   ProgramType?: ProgramType_bool_exp | null;
   RentAScientistConfigs?: RentAScientistConfig_bool_exp | null;
   RentAScientistConfigs_aggregate?: RentAScientistConfig_aggregate_bool_exp | null;
@@ -6951,6 +7448,7 @@ export interface Program_bool_exp {
   id?: Int_comparison_exp | null;
   lectureEnd?: date_comparison_exp | null;
   lectureStart?: date_comparison_exp | null;
+  organizationId?: Int_comparison_exp | null;
   published?: Boolean_comparison_exp | null;
   shortTitle?: String_comparison_exp | null;
   speakerQuestionnaire?: String_comparison_exp | null;
@@ -6968,6 +7466,7 @@ export interface Program_bool_exp {
 export interface Program_insert_input {
   CertificateTemplatePrograms?: CertificateTemplateProgram_arr_rel_insert_input | null;
   Courses?: Course_arr_rel_insert_input | null;
+  Organization?: Organization_obj_rel_insert_input | null;
   ProgramType?: ProgramType_obj_rel_insert_input | null;
   RentAScientistConfigs?: RentAScientistConfig_arr_rel_insert_input | null;
   ScientistOffers?: ScientistOffer_arr_rel_insert_input | null;
@@ -6984,6 +7483,7 @@ export interface Program_insert_input {
   id?: number | null;
   lectureEnd?: any | null;
   lectureStart?: any | null;
+  organizationId?: number | null;
   published?: boolean | null;
   shortTitle?: string | null;
   speakerQuestionnaire?: string | null;
@@ -7012,6 +7512,7 @@ export interface Program_max_order_by {
   id?: order_by | null;
   lectureEnd?: order_by | null;
   lectureStart?: order_by | null;
+  organizationId?: order_by | null;
   shortTitle?: order_by | null;
   speakerQuestionnaire?: order_by | null;
   startQuestionnaire?: order_by | null;
@@ -7035,6 +7536,7 @@ export interface Program_min_order_by {
   id?: order_by | null;
   lectureEnd?: order_by | null;
   lectureStart?: order_by | null;
+  organizationId?: order_by | null;
   shortTitle?: order_by | null;
   speakerQuestionnaire?: order_by | null;
   startQuestionnaire?: order_by | null;
@@ -7064,6 +7566,7 @@ export interface Program_on_conflict {
 export interface Program_order_by {
   CertificateTemplatePrograms_aggregate?: CertificateTemplateProgram_aggregate_order_by | null;
   Courses_aggregate?: Course_aggregate_order_by | null;
+  Organization?: Organization_order_by | null;
   ProgramType?: ProgramType_order_by | null;
   RentAScientistConfigs_aggregate?: RentAScientistConfig_aggregate_order_by | null;
   ScientistOffers_aggregate?: ScientistOffer_aggregate_order_by | null;
@@ -7080,6 +7583,7 @@ export interface Program_order_by {
   id?: order_by | null;
   lectureEnd?: order_by | null;
   lectureStart?: order_by | null;
+  organizationId?: order_by | null;
   published?: order_by | null;
   shortTitle?: order_by | null;
   speakerQuestionnaire?: order_by | null;
@@ -7099,6 +7603,7 @@ export interface Program_stddev_order_by {
   attendanceCertificateTemplateTextId?: order_by | null;
   defaultMaxMissedSessions?: order_by | null;
   id?: order_by | null;
+  organizationId?: order_by | null;
 }
 
 /**
@@ -7109,6 +7614,7 @@ export interface Program_stddev_pop_order_by {
   attendanceCertificateTemplateTextId?: order_by | null;
   defaultMaxMissedSessions?: order_by | null;
   id?: order_by | null;
+  organizationId?: order_by | null;
 }
 
 /**
@@ -7119,6 +7625,7 @@ export interface Program_stddev_samp_order_by {
   attendanceCertificateTemplateTextId?: order_by | null;
   defaultMaxMissedSessions?: order_by | null;
   id?: order_by | null;
+  organizationId?: order_by | null;
 }
 
 /**
@@ -7129,6 +7636,7 @@ export interface Program_sum_order_by {
   attendanceCertificateTemplateTextId?: order_by | null;
   defaultMaxMissedSessions?: order_by | null;
   id?: order_by | null;
+  organizationId?: order_by | null;
 }
 
 /**
@@ -7139,6 +7647,7 @@ export interface Program_var_pop_order_by {
   attendanceCertificateTemplateTextId?: order_by | null;
   defaultMaxMissedSessions?: order_by | null;
   id?: order_by | null;
+  organizationId?: order_by | null;
 }
 
 /**
@@ -7149,6 +7658,7 @@ export interface Program_var_samp_order_by {
   attendanceCertificateTemplateTextId?: order_by | null;
   defaultMaxMissedSessions?: order_by | null;
   id?: order_by | null;
+  organizationId?: order_by | null;
 }
 
 /**
@@ -7159,6 +7669,7 @@ export interface Program_variance_order_by {
   attendanceCertificateTemplateTextId?: order_by | null;
   defaultMaxMissedSessions?: order_by | null;
   id?: order_by | null;
+  organizationId?: order_by | null;
 }
 
 export interface RentAScientistConfig_aggregate_bool_exp {
@@ -8695,7 +9206,10 @@ export interface User_bool_exp {
   _and?: User_bool_exp[] | null;
   _not?: User_bool_exp | null;
   _or?: User_bool_exp[] | null;
+  addressLine1?: String_comparison_exp | null;
+  addressLine2?: String_comparison_exp | null;
   anonymousId?: String_comparison_exp | null;
+  city?: String_comparison_exp | null;
   country?: String_comparison_exp | null;
   created_at?: timestamptz_comparison_exp | null;
   email?: String_comparison_exp | null;
@@ -8729,7 +9243,10 @@ export interface User_insert_input {
   SessionSpeakers?: SessionSpeaker_arr_rel_insert_input | null;
   UserOccupation?: UserOccupation_obj_rel_insert_input | null;
   UserStatus?: UserStatus_obj_rel_insert_input | null;
+  addressLine1?: string | null;
+  addressLine2?: string | null;
   anonymousId?: string | null;
+  city?: string | null;
   country?: string | null;
   created_at?: any | null;
   email?: string | null;
@@ -8752,7 +9269,10 @@ export interface User_insert_input {
  * order by max() on columns of table "User"
  */
 export interface User_max_order_by {
+  addressLine1?: order_by | null;
+  addressLine2?: order_by | null;
   anonymousId?: order_by | null;
+  city?: order_by | null;
   country?: order_by | null;
   created_at?: order_by | null;
   email?: order_by | null;
@@ -8772,7 +9292,10 @@ export interface User_max_order_by {
  * order by min() on columns of table "User"
  */
 export interface User_min_order_by {
+  addressLine1?: order_by | null;
+  addressLine2?: order_by | null;
   anonymousId?: order_by | null;
+  city?: order_by | null;
   country?: order_by | null;
   created_at?: order_by | null;
   email?: order_by | null;
@@ -8820,7 +9343,10 @@ export interface User_order_by {
   SessionSpeakers_aggregate?: SessionSpeaker_aggregate_order_by | null;
   UserOccupation?: UserOccupation_order_by | null;
   UserStatus?: UserStatus_order_by | null;
+  addressLine1?: order_by | null;
+  addressLine2?: order_by | null;
   anonymousId?: order_by | null;
+  city?: order_by | null;
   country?: order_by | null;
   created_at?: order_by | null;
   email?: order_by | null;

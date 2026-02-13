@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { Weekday_enum, CourseRegistrationType_enum, LocationOption_enum, ProgramType_enum, OrganizationType_enum, CourseStatus_enum, CourseEnrollmentStatus_enum, PaymentStatus_enum, MotivationRating_enum, AttendanceStatus_enum, AchievementRecordRating_enum, AchievementRecordType_enum } from "./../../__generated__/globalTypes";
+import { Weekday_enum, CourseRegistrationType_enum, LocationOption_enum, ProgramType_enum, OrganizationType_enum, CourseStatus_enum, CourseEnrollmentStatus_enum, InvoiceStatus_enum, MotivationRating_enum, AttendanceStatus_enum, AchievementRecordRating_enum, AchievementRecordType_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: ManagedCourse
@@ -316,6 +316,23 @@ export interface ManagedCourse_Course_by_pk_CourseAddonMappings {
   currency: string;
 }
 
+export interface ManagedCourse_Course_by_pk_CourseEnrollments_Invoices {
+  __typename: "Invoice";
+  id: number;
+  /**
+   * Invoice lifecycle status. Synced from Stripe webhooks
+   */
+  status: InvoiceStatus_enum;
+  /**
+   * Stripe-hosted invoice page URL
+   */
+  stripeHostedInvoiceUrl: string | null;
+  /**
+   * Stripe-hosted PDF download URL
+   */
+  stripeInvoicePdfUrl: string | null;
+}
+
 export interface ManagedCourse_Course_by_pk_CourseEnrollments_User_Organization {
   __typename: "Organization";
   id: number;
@@ -454,9 +471,9 @@ export interface ManagedCourse_Course_by_pk_CourseEnrollments {
    */
   status: CourseEnrollmentStatus_enum;
   /**
-   * Current payment status
+   * Organization paying for this enrollment (B2B). NULL means the enrolling user pays personally (B2C)
    */
-  paymentStatus: PaymentStatus_enum | null;
+  billingOrganizationId: number | null;
   /**
    * URL to the file containing the user's achievement certificate (if he obtained one)
    */
@@ -466,6 +483,10 @@ export interface ManagedCourse_Course_by_pk_CourseEnrollments {
    */
   attendanceCertificateURL: string | null;
   /**
+   * An array relationship
+   */
+  Invoices: ManagedCourse_Course_by_pk_CourseEnrollments_Invoices[];
+  /**
    * The text of the user's motivation letter
    */
   motivationLetter: string;
@@ -473,10 +494,6 @@ export interface ManagedCourse_Course_by_pk_CourseEnrollments {
    * Rating that the user's motivation letter received from the course instructor
    */
   motivationRating: MotivationRating_enum;
-  /**
-   * Stripe Payment Intent ID
-   */
-  stripePaymentIntentId: string | null;
   /**
    * An object relationship
    */

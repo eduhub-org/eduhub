@@ -37,6 +37,7 @@ import { ColumnDef } from '@tanstack/react-table';
 import { GoDotFill } from 'react-icons/go';
 import { IoIosCheckmarkCircle, IoIosCloseCircle } from 'react-icons/io';
 import { MotivationRating_enum, CourseEnrollmentStatus_enum } from '../../../../__generated__/globalTypes';
+import { getPaymentStatusFromInvoices } from '../../../../utils/invoicePaymentStatus';
 import { useDisplayDate } from '../../../../helpers/dateTimeHelpers';
 import { BulkAction } from '../../../common/TableGrid/types';
 import { ApolloError } from '@apollo/client';
@@ -539,20 +540,19 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
         });
       }
 
-      // Payment status column - only for payment types
+      // Payment status column - only for payment types (derived from Invoice)
       if (features.hasPayment) {
         baseColumns.push({
           header: t('payment_status'),
-          accessorKey: 'paymentStatus',
+          accessorKey: 'Invoices',
           size: 120,
           enableSorting: true,
           cell: ({ row }) => {
-            const paymentStatus = row.original.paymentStatus;
-            const statusKey = paymentStatus || 'NONE';
+            const paymentStatus = getPaymentStatusFromInvoices(row.original.Invoices);
             return (
               <div className="text-center">
                 <span className="text-sm">
-                  {t(`payment_status_values.${statusKey}`)}
+                  {t(`payment_status_values.${paymentStatus}`)}
                 </span>
               </div>
             );
