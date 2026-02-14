@@ -15,6 +15,7 @@ import { getCourseEnrollment } from '../../../helpers/util';
 import { ContentRow } from '../../common/ContentRow';
 import { PageBlock } from '../../common/PageBlock';
 import { DescriptionFields } from './DescriptionFields';
+import { FundingOrganizations } from './FundingOrganizations';
 import { InfoPanel } from './InfoPanel';
 import { useWeekdayStartAndEndString } from '../../../helpers/dateTimeHelpers';
 import { LearningGoals } from './LearningGoals';
@@ -50,7 +51,7 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
       userId,
     },
     fetchPolicy: 'cache-and-network',
-    async onCompleted(data) {
+    onCompleted(data) {
       // Check if user has been invited to the course and the invitation has not expired
       const courseEnrollment = getCourseEnrollment(data?.Course_by_pk, userId);
       const enrollmentStatus = courseEnrollment?.status;
@@ -198,18 +199,16 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                 (course.achievementCertificatePossible || course.attendanceCertificatePossible) && (
                   <ContentRow className="my-24 text-label-primary bg-fill-primary light px-8 py-8">
                     {!isDegreeCourse && (
-                      <>
-                        <div className="flex flex-col md:flex-row gap-12 md:gap-24 w-full">
-                          <Attendances course={course} />
-                          {!courseEnrollment?.achievementCertificateURL && (
-                            <AchievementRecord
-                              courseId={course.id}
-                              achievementRecordUploadDeadline={course.Program.achievementRecordUploadDeadline}
-                              courseTitle={course.title}
-                            />
-                          )}
-                        </div>
-                      </>
+                      <div className="flex flex-col md:flex-row gap-12 md:gap-24 w-full">
+                        <Attendances course={course} />
+                        {!courseEnrollment?.achievementCertificateURL && (
+                          <AchievementRecord
+                            courseId={course.id}
+                            achievementRecordUploadDeadline={course.Program.achievementRecordUploadDeadline}
+                            courseTitle={course.title}
+                          />
+                        )}
+                      </div>
                     )}
                     {isDegreeCourse && <CompletedDegreeCourses degreeCourseId={course.id} />}
                     <CertificateDownload courseEnrollment={courseEnrollment} />
@@ -227,7 +226,7 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                   ) : (
                     <CurrentDegreeCourses degreeCourses={course.DegreeCourses} />
                   )}
-                  {requiresPayment && (course.basePrice || course.basePrice === 0 || course.basePrice === null || addonItems.length > 0) && (
+                  {!!(requiresPayment && (course.basePrice || course.basePrice === 0 || course.basePrice === null || addonItems.length > 0)) && (
                     <div className="mt-24">
                       <span className="text-3xl font-semibold block mb-6">{tCoursePage('pricing_section_title')}</span>
                       <PricingSummary
@@ -246,6 +245,7 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                 </div>
               </ContentRow>
               <DescriptionFields course={course} />
+              <FundingOrganizations courseFundingOrganizations={course.CourseFundingOrganizations ?? []} />
             </div>
           </div>
         </div>
