@@ -327,6 +327,7 @@
       "current_degree_elements": "Current Offerings that are Part of the Degree",
       "no_degree_elements_available": "Currently there are no ongoing offerings for this Degree."
     },
+    "funded_by": "Funded by:",
     "learning": {
       "you_will_learn": "You will learn",
       "general_achievement_certificate_conditions": "**Online Participation:**\nIf online participation is possible, attendances are only counted as present if the camera is continuously turned on!\n\n**Semester Opening:**\nWe invite you to the Semester Opening for all courses on October 16, 2025, at the COBL (Legienstraße 40, Kiel)! 💛\nHere you can get a glimpse behind the scenes of our OC community, get to know course instructors and other course participants and discover Kiel's corporate landscape in inspiring sessions.\nClick here for all information and to register: [HERE](https://forms.office.com/e/2TrRyRTCS5)."
@@ -1645,5 +1646,12 @@
     "no_pricing": "No pricing configured.",
     "synced": "Synced",
     "not_synced": "Not synced"
+  },
+  "footer": {
+    "imprint": "Imprint",
+    "privacy": "Privacy",
+    "faq": "FAQ",
+    "newsletter": "Newsletter",
+    "sponsored_by": "Sponsored by:"
   }
 }
