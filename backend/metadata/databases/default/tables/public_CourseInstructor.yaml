@@ -72,3 +72,18 @@ event_triggers:
       paused: true
       schedule: 0 0 * * *
       timeout: 60
+  - name: send_organizer_added_email
+    definition:
+      enable_manual: false
+      insert:
+        columns: '*'
+    retry_conf:
+      interval_sec: 3660
+      num_retries: 10
+      timeout_sec: 60
+    webhook: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+    headers:
+      - name: secret
+        value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+      - name: name
+        value: sendOrganizerAddedEmail

@@ -61,6 +61,7 @@ const CourseEmailTemplates: FC = () => {
       'INVITE',
       'DECLINE',
       'REGISTRATION_CONFIRMED',
+      'ORGANIZER_ADDED',
     ];
 
     if (!registrationType || registrationType === CourseRegistrationType_enum.EXTERNAL_REGISTRATION) {
@@ -71,7 +72,7 @@ const CourseEmailTemplates: FC = () => {
       registrationType === CourseRegistrationType_enum.DIRECT_WITH_INPUT ||
       registrationType === CourseRegistrationType_enum.DIRECT_CONFIRMATION
     ) {
-      return ['REGISTRATION_CONFIRMED', 'SESSION_REMINDER'];
+      return ['REGISTRATION_CONFIRMED', 'SESSION_REMINDER', 'ORGANIZER_ADDED'];
     }
 
     if (registrationType === CourseRegistrationType_enum.APPROVAL_WITH_INPUT) {

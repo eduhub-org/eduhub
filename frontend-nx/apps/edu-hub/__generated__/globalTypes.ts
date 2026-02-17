@@ -1311,8 +1311,6 @@ export enum Program_select_column {
   title = "title",
   type = "type",
   visibility = "visibility",
-  visibilityAchievementCertificate = "visibilityAchievementCertificate",
-  visibilityAttendanceCertificate = "visibilityAttendanceCertificate",
 }
 
 /**
@@ -1321,8 +1319,6 @@ export enum Program_select_column {
 export enum Program_select_column_Program_aggregate_bool_exp_bool_and_arguments_columns {
   published = "published",
   visibility = "visibility",
-  visibilityAchievementCertificate = "visibilityAchievementCertificate",
-  visibilityAttendanceCertificate = "visibilityAttendanceCertificate",
 }
 
 /**
@@ -1331,8 +1327,6 @@ export enum Program_select_column_Program_aggregate_bool_exp_bool_and_arguments_
 export enum Program_select_column_Program_aggregate_bool_exp_bool_or_arguments_columns {
   published = "published",
   visibility = "visibility",
-  visibilityAchievementCertificate = "visibilityAchievementCertificate",
-  visibilityAttendanceCertificate = "visibilityAttendanceCertificate",
 }
 
 /**
@@ -1360,8 +1354,6 @@ export enum Program_update_column {
   title = "title",
   type = "type",
   visibility = "visibility",
-  visibilityAchievementCertificate = "visibilityAchievementCertificate",
-  visibilityAttendanceCertificate = "visibilityAttendanceCertificate",
 }
 
 /**
@@ -7456,8 +7448,6 @@ export interface Program_bool_exp {
   title?: String_comparison_exp | null;
   type?: ProgramType_enum_comparison_exp | null;
   visibility?: Boolean_comparison_exp | null;
-  visibilityAchievementCertificate?: Boolean_comparison_exp | null;
-  visibilityAttendanceCertificate?: Boolean_comparison_exp | null;
 }
 
 /**
@@ -7491,8 +7481,6 @@ export interface Program_insert_input {
   title?: string | null;
   type?: ProgramType_enum | null;
   visibility?: boolean | null;
-  visibilityAchievementCertificate?: boolean | null;
-  visibilityAttendanceCertificate?: boolean | null;
 }
 
 /**
@@ -7591,8 +7579,6 @@ export interface Program_order_by {
   title?: order_by | null;
   type?: order_by | null;
   visibility?: order_by | null;
-  visibilityAchievementCertificate?: order_by | null;
-  visibilityAttendanceCertificate?: order_by | null;
 }
 
 /**
