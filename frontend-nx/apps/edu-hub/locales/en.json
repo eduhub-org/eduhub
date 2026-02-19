@@ -1607,7 +1607,7 @@
       "body": "Start typing your email content here. Use the toolbar for formatting and quick placeholders..."
     },
     "help_text": {
-      "subject": "The subject line that will appear in the recipient's email inbox. You can use placeholders like [User:Firstname] to personalize the subject."
+      "subject": "The subject line that will appear in the recipient's email inbox. You can use placeholders like [User:FirstName] to personalize the subject."
     },
     "expandable": {
       "body_content": "Email Content",

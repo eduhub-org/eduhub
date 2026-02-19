@@ -202,7 +202,7 @@ const EmailEditor: React.FC<EmailEditorProps> = ({
   // Define all available placeholders with their categories
   const ALL_PLACEHOLDERS = [
     // User variables (available in all contexts)
-    { text: '[User:Firstname]', label: 'User Firstname', categories: ['enrollment', 'session', 'general'] },
+    { text: '[User:FirstName]', label: 'User Firstname', categories: ['enrollment', 'session', 'general'] },
     { text: '[User:LastName]', label: 'User Lastname', categories: ['enrollment', 'session', 'general'] },
 
     // Course variables

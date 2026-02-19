@@ -30,7 +30,7 @@ export function escapeHtml(text) {
 export const EMAIL_VARIABLES = {
   // User-related variables
   USER: {
-    '[User:Firstname]': {
+    '[User:FirstName]': {
       description: 'User\'s first name',
       example: 'John',
       categories: ['enrollment', 'session', 'general']
@@ -207,7 +207,7 @@ export function createVariableReplacer(data, formatDate) {
     const firstName = escapeHtml(data.user?.firstName || '');
     const lastName = escapeHtml(data.user?.lastName || '');
     result = result
-      .replaceAll('[User:Firstname]', firstName)
+      .replaceAll('[User:FirstName]', firstName)
       .replaceAll('[User:LastName]', lastName);
     
     // Course variables - always attempt replacement  

@@ -169,7 +169,7 @@ The email system uses a **centralized variable system** located in `functions/ca
 ### Quick Reference
 
 #### User Variables (Available in all emails)
-- `[User:Firstname]`: User's first name
+- `[User:FirstName]`: User's first name
 - `[User:LastName]`: User's last name
 
 #### Course Variables (Available in enrollment emails)

@@ -81,7 +81,7 @@ export const mockEmailTemplates = {
     id: 1,
     title: 'APPLICATION_RECEIVED',
     subject: 'Application Received: [Enrollment:CourseId--Course:Name]',
-    content: 'Hello [User:Firstname] [User:LastName], we have received your application for [Enrollment:CourseId--Course:Name]. Applied on: [Enrollment:CreatedAt]. Course link: [Enrollment:CourseLink].',
+    content: 'Hello [User:FirstName] [User:LastName], we have received your application for [Enrollment:CourseId--Course:Name]. Applied on: [Enrollment:CreatedAt]. Course link: [Enrollment:CourseLink].',
     from: 'noreply@opencampus.sh',
     cc: null,
     bcc: null
@@ -90,7 +90,7 @@ export const mockEmailTemplates = {
     id: 2,
     title: 'APPLICATION_CONFIRMED',
     subject: 'Application Confirmed: [Enrollment:CourseId--Course:Name]',
-    content: 'Hello [User:Firstname] [User:LastName], your application for [Enrollment:CourseId--Course:Name] has been confirmed. Course starts: [Course:StartTime] and ends: [Course:EndTime].',
+    content: 'Hello [User:FirstName] [User:LastName], your application for [Enrollment:CourseId--Course:Name] has been confirmed. Course starts: [Course:StartTime] and ends: [Course:EndTime].',
     from: 'noreply@opencampus.sh',
     cc: null,
     bcc: null
@@ -99,7 +99,7 @@ export const mockEmailTemplates = {
     id: 3,
     title: 'INVITE',
     subject: 'Course Invitation: [Enrollment:CourseId--Course:Name]',
-    content: 'Hello [User:Firstname] [User:LastName], you have been invited to [Enrollment:CourseId--Course:Name]. Please confirm by [Enrollment:ExpirationDate]. Visit: [Enrollment:CourseLink].',
+    content: 'Hello [User:FirstName] [User:LastName], you have been invited to [Enrollment:CourseId--Course:Name]. Please confirm by [Enrollment:ExpirationDate]. Visit: [Enrollment:CourseLink].',
     from: 'noreply@opencampus.sh',
     cc: null,
     bcc: null
@@ -108,7 +108,7 @@ export const mockEmailTemplates = {
     id: 4,
     title: 'DECLINE',
     subject: 'Application Update: [Enrollment:CourseId--Course:Name]',
-    content: 'Hello [User:Firstname] [User:LastName], unfortunately we cannot accept your application for [Enrollment:CourseId--Course:Name] at this time.',
+    content: 'Hello [User:FirstName] [User:LastName], unfortunately we cannot accept your application for [Enrollment:CourseId--Course:Name] at this time.',
     from: 'noreply@opencampus.sh',
     cc: null,
     bcc: null
@@ -117,7 +117,7 @@ export const mockEmailTemplates = {
     id: 5,
     title: 'SESSION_REMINDER',
     subject: 'Session Reminder: [Session:Title] [Session:ReminderText]',
-    content: 'Hello [User:Firstname] [User:LastName], your session "[Session:Title]" for course "[Enrollment:CourseId--Course:Name]" [Session:ReminderText] at [Session:StartDateTime]. Duration: [Session:Duration]. Course link: [Enrollment:CourseLink].',
+    content: 'Hello [User:FirstName] [User:LastName], your session "[Session:Title]" for course "[Enrollment:CourseId--Course:Name]" [Session:ReminderText] at [Session:StartDateTime]. Duration: [Session:Duration]. Course link: [Enrollment:CourseLink].',
     from: 'noreply@opencampus.sh',
     cc: null,
     bcc: null
@@ -126,7 +126,7 @@ export const mockEmailTemplates = {
     id: 6,
     title: 'REGISTRATION_CONFIRMED',
     subject: 'Registration Confirmed: [Enrollment:CourseId--Course:Name]',
-    content: 'Hello [User:Firstname] [User:LastName], your registration for [Enrollment:CourseId--Course:Name] has been confirmed.',
+    content: 'Hello [User:FirstName] [User:LastName], your registration for [Enrollment:CourseId--Course:Name] has been confirmed.',
     from: 'noreply@opencampus.sh',
     cc: null,
     bcc: null

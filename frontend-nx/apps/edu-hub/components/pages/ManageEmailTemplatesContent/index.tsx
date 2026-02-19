@@ -79,7 +79,7 @@ const ExpandableEmailTemplateRow: React.FC<{ row: EmailTemplateRow }> = ({ row }
       // Map of template variables to sample values (following the existing email template system)
       const sampleReplacements = {
         // User variables
-        '\\[User:Firstname\\]': 'John',
+        '\\[User:FirstName\\]': 'John',
         '\\[User:LastName\\]': 'Doe',
 
         // Course variables

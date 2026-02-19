@@ -23,7 +23,7 @@ BEGIN
 </head>
 <body>
   <!-- German -->
-  <p>Hallo [User:Firstname] [User:LastName],</p>
+  <p>Hallo [User:FirstName] [User:LastName],</p>
   <p>Du wurdest als Organisator für <strong>[Enrollment:CourseId--Course:Name]</strong> hinzugefügt.</p>
   <p>Du kannst den Kurs bzw. das Event hier verwalten: <a href="[Enrollment:CourseLink]">[Enrollment:CourseLink]</a></p>
   <p>Bei Fragen wende dich bitte an die Plattform-Administration.</p>
@@ -32,7 +32,7 @@ BEGIN
   <hr style="margin: 2em 0; border: none; border-top: 1px solid #ccc;" />
 
   <!-- English -->
-  <p>Hello [User:Firstname] [User:LastName],</p>
+  <p>Hello [User:FirstName] [User:LastName],</p>
   <p>You have been added as an organizer for <strong>[Enrollment:CourseId--Course:Name]</strong>.</p>
   <p>You can manage the course or event here: <a href="[Enrollment:CourseLink]">[Enrollment:CourseLink]</a></p>
   <p>If you have any questions, please contact the platform administration.</p>
