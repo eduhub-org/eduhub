@@ -24,6 +24,32 @@ import NotificationSnackbar from '../common/dialogs/NotificationSnackbar';
 import { LinkDialog } from '../common/dialogs/LinkDialog';
 import { gql } from 'graphql-tag';
 
+/**
+ * Determine template category based on template type.
+ * ORGANIZER_ADDED uses 'organizer' category (user + course placeholders only, no enrollment dates).
+ */
+export function getTemplateCategory(templateType?: string): string {
+  if (!templateType) return 'enrollment';
+
+  const sessionTemplates = ['SESSION_REMINDER'];
+  const enrollmentTemplates = [
+    'APPLICATION_RECEIVED',
+    'APPLICATION_CONFIRMED',
+    'INVITE',
+    'DECLINE',
+    'REGISTRATION_CONFIRMED',
+  ];
+  const generalTemplates = ['USER_CREATED'];
+  const organizerTemplates = ['ORGANIZER_ADDED'];
+
+  if (sessionTemplates.includes(templateType)) return 'session';
+  if (enrollmentTemplates.includes(templateType)) return 'enrollment';
+  if (generalTemplates.includes(templateType)) return 'general';
+  if (organizerTemplates.includes(templateType)) return 'organizer';
+
+  return 'enrollment';
+}
+
 // Configure DOMPurify to allow links while maintaining security
 const sanitizeWithLinks = (content: string): string => {
   return DOMPurify.sanitize(content, {
@@ -202,18 +228,18 @@ const EmailEditor: React.FC<EmailEditorProps> = ({
   // Define all available placeholders with their categories
   const ALL_PLACEHOLDERS = [
     // User variables (available in all contexts)
-    { text: '[User:Firstname]', label: 'User Firstname', categories: ['enrollment', 'session', 'general'] },
-    { text: '[User:LastName]', label: 'User Lastname', categories: ['enrollment', 'session', 'general'] },
+    { text: '[User:FirstName]', label: 'User Firstname', categories: ['enrollment', 'session', 'general', 'organizer'] },
+    { text: '[User:LastName]', label: 'User Lastname', categories: ['enrollment', 'session', 'general', 'organizer'] },
 
     // Course variables
-    { text: '[Enrollment:CourseId--Course:Name]', label: 'Course Name', categories: ['enrollment', 'session'] },
+    { text: '[Enrollment:CourseId--Course:Name]', label: 'Course Name', categories: ['enrollment', 'session', 'organizer'] },
     { text: '[Course:StartTime]', label: 'Course Start', categories: ['enrollment'] },
     { text: '[Course:EndTime]', label: 'Course End', categories: ['enrollment'] },
 
-    // Enrollment variables (only for enrollment emails)
+    // Enrollment variables (only for enrollment emails; organizer uses CourseLink for manage URL)
     { text: '[Enrollment:CreatedAt]', label: 'Application Date', categories: ['enrollment'] },
     { text: '[Enrollment:ExpirationDate]', label: 'Expiration Date', categories: ['enrollment'] },
-    { text: '[Enrollment:CourseLink]', label: 'Course Link', categories: ['enrollment', 'session'] },
+    { text: '[Enrollment:CourseLink]', label: 'Course Link', categories: ['enrollment', 'session', 'organizer'] },
 
     // Session variables (only for session reminder emails)
     { text: '[Session:Title]', label: 'Session Title', categories: ['session'] },
@@ -226,27 +252,6 @@ const EmailEditor: React.FC<EmailEditorProps> = ({
     { text: '[System:PasswordResetLink]', label: 'Password Reset Link', categories: ['general'] },
     { text: '[System:PortalUrl]', label: 'Portal URL', categories: ['general'] },
   ];
-
-  // Determine template category based on template type
-  const getTemplateCategory = (templateType?: string): string => {
-    if (!templateType) return 'enrollment'; // Default fallback
-
-    const sessionTemplates = ['SESSION_REMINDER'];
-    const enrollmentTemplates = [
-      'APPLICATION_RECEIVED',
-      'APPLICATION_CONFIRMED',
-      'INVITE',
-      'DECLINE',
-      'REGISTRATION_CONFIRMED',
-    ];
-    const generalTemplates = ['USER_CREATED'];
-
-    if (sessionTemplates.includes(templateType)) return 'session';
-    if (enrollmentTemplates.includes(templateType)) return 'enrollment';
-    if (generalTemplates.includes(templateType)) return 'general';
-
-    return 'enrollment'; // Default fallback
-  };
 
   // Filter placeholders based on template type
   const templateCategory = getTemplateCategory(templateType);

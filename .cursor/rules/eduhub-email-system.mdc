@@ -31,7 +31,7 @@ functions/
 **Function**: `callNodeFunction/sendEnrollmentEmail/`
 - **Trigger**: User enrollment in courses
 - **Templates**: Application received, approval notifications, rejection notifications
-- **Variables**: `[Enrollment:CourseId--Course:Name]`, `[User:Firstname]`, `[User:LastName]`, `[Enrollment:CreatedAt]`
+- **Variables**: `[Enrollment:CourseId--Course:Name]`, `[User:FirstName]`, `[User:LastName]`, `[Enrollment:CreatedAt]`
 
 #### 2. Session Reminder Emails
 **Function**: `callNodeFunction/sendSessionReminders/`
@@ -54,14 +54,14 @@ const emailTemplate = {
   name: 'APPLICATION_RECEIVED',
   subject: 'Application Received - [Enrollment:CourseId--Course:Name]',
   content: `
-    Dear [User:Firstname] [User:LastName],
+    Dear [User:FirstName] [User:LastName],
     
     Your application for [Enrollment:CourseId--Course:Name] has been received and is under review.
     
     Best regards,
     EduHub Team
   `,
-  variables: ['[User:Firstname]', '[User:LastName]', '[Enrollment:CourseId--Course:Name]', '[Enrollment:CreatedAt]']
+  variables: ['[User:FirstName]', '[User:LastName]', '[Enrollment:CourseId--Course:Name]', '[Enrollment:CreatedAt]']
 };
 ```
 
@@ -69,7 +69,7 @@ const emailTemplate = {
 See [EMAIL_TEMPLATE_VARIABLES.md](mdc:functions/callNodeFunction/EMAIL_TEMPLATE_VARIABLES.md) for complete list:
 
 **User Variables**:
-- `[User:Firstname]`, `[User:LastName]`
+- `[User:FirstName]`, `[User:LastName]`
 
 **Course Variables**:
 - `[Enrollment:CourseId--Course:Name]` (Course title)
@@ -121,9 +121,9 @@ const reminderResult = await callNodeFunction({
 const emailResult = await sendMail({
   to: user.email,
   subject: 'Custom Notification',
-  content: 'Email content with [User:Firstname] substitution',
+  content: 'Email content with [User:FirstName] substitution',
   variables: {
-    '[User:Firstname]': 'John'
+    '[User:FirstName]': 'John'
   }
 });
 ```
