@@ -130,6 +130,15 @@ export const mockEmailTemplates = {
     from: 'noreply@opencampus.sh',
     cc: null,
     bcc: null
+  },
+  organizerAdded: {
+    id: 7,
+    title: 'ORGANIZER_ADDED',
+    subject: 'Du wurdest als Organisator hinzugefügt - [Enrollment:CourseId--Course:Name]',
+    content: 'Hello [User:FirstName] [User:LastName], you have been added as organizer for [Enrollment:CourseId--Course:Name]. Manage: [Enrollment:CourseLink].',
+    from: 'noreply@opencampus.sh',
+    cc: null,
+    bcc: null
   }
 };
 

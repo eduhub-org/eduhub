@@ -291,7 +291,7 @@ Monitor the email system by:
    - Ensure migration was applied correctly
    - Check `MailTemplate` table for required templates:
      ```sql
-     SELECT title FROM "MailTemplate" WHERE title IN ('APPLICATION_RECEIVED', 'APPLICATION_CONFIRMED', 'SESSION_REMINDER', 'INVITE', 'DECLINE');
+     SELECT type FROM "MailTemplate" WHERE type IN ('APPLICATION_RECEIVED', 'APPLICATION_CONFIRMED', 'SESSION_REMINDER', 'INVITE', 'DECLINE', 'ORGANIZER_ADDED');
      ```
 
 4. **Variable replacement not working**

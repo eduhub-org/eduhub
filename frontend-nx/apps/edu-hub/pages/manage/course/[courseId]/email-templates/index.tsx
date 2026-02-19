@@ -70,7 +70,9 @@ const CourseEmailTemplates: FC = () => {
 
     if (
       registrationType === CourseRegistrationType_enum.DIRECT_WITH_INPUT ||
-      registrationType === CourseRegistrationType_enum.DIRECT_CONFIRMATION
+      registrationType === CourseRegistrationType_enum.DIRECT_CONFIRMATION ||
+      registrationType === CourseRegistrationType_enum.DIRECT_WITH_INPUT_AND_PAYMENT ||
+      registrationType === CourseRegistrationType_enum.DIRECT_CONFIRMATION_AND_PAYMENT
     ) {
       return ['REGISTRATION_CONFIRMED', 'SESSION_REMINDER', 'ORGANIZER_ADDED'];
     }

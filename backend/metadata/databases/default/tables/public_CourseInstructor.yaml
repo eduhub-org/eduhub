@@ -81,9 +81,16 @@ event_triggers:
       interval_sec: 3660
       num_retries: 10
       timeout_sec: 60
-    webhook: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+    webhook_from_env: CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION
     headers:
       - name: secret
         value_from_env: HASURA_CLOUD_FUNCTION_SECRET
       - name: name
         value: sendOrganizerAddedEmail
+    cleanup_config:
+      batch_size: 10000
+      clean_invocation_logs: false
+      clear_older_than: 168
+      paused: true
+      schedule: 0 0 * * *
+      timeout: 60

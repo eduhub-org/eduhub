@@ -10,15 +10,23 @@ import { queueEmail } from '../lib/queueEmail.js';
  * @param {Object} logger - Winston logger instance
  * @returns {Object} Response object
  */
+const GRAPHQL_REQUEST_TIMEOUT_MS = 30000;
+
 export default async function sendOrganizerAddedEmail(req, logger) {
+  const start = Date.now();
   logger.info('########## Send Organizer Added Email ##########');
-  logger.debug(`Request body: ${JSON.stringify(req.body)}`);
+  logger.debug('Request (sanitized)', {
+    op: req.body?.event?.op,
+    newId: req.body?.event?.data?.new?.id,
+    userId: req.body?.session_variables?.['x-hasura-user-id'],
+  });
 
   try {
     const { event } = req.body;
     const { op, data } = event;
 
     if (op !== 'INSERT') {
+      logger.info('sendOrganizerAddedEmail completed', { duration: Date.now() - start });
       return {
         success: true,
         messageKey: 'NO_ACTION_NEEDED',
@@ -59,13 +67,22 @@ export default async function sendOrganizerAddedEmail(req, logger) {
       }
     `;
 
-    const result = await client.request(GET_ORGANIZER_DETAILS, {
-      courseInstructorId: courseInstructor.id,
-    });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), GRAPHQL_REQUEST_TIMEOUT_MS);
+    let result;
+    try {
+      result = await client.request({
+        document: GET_ORGANIZER_DETAILS,
+        variables: { courseInstructorId: courseInstructor.id },
+        signal: controller.signal,
+      });
+    } finally {
+      clearTimeout(timeoutId);
+    }
 
     const details = result?.CourseInstructor_by_pk;
     if (!details) {
-      logger.error(`CourseInstructor not found: ${courseInstructor.id}`);
+      logger.error(`CourseInstructor not found: ${courseInstructor.id}`, { duration: Date.now() - start });
       return {
         success: false,
         error: 'CourseInstructor not found',
@@ -75,7 +92,7 @@ export default async function sendOrganizerAddedEmail(req, logger) {
 
     const { User, Course } = details;
     if (!User?.email) {
-      logger.error(`Organizer has no email: userId=${details.userId}`);
+      logger.error(`Organizer has no email: userId=${details.userId}`, { duration: Date.now() - start });
       return {
         success: false,
         error: 'Organizer has no email address',
@@ -83,8 +100,10 @@ export default async function sendOrganizerAddedEmail(req, logger) {
       };
     }
 
-    const courseLink = `${process.env.FRONTEND_URL || 'https://edu.opencampus.sh'}/course/${Course.id}`;
+    const courseLink = `${process.env.FRONTEND_URL || 'https://edu.opencampus.sh'}/manage/course/${Course.id}`;
 
+    // ORGANIZER_ADDED template uses only Course-level placeholders ([Enrollment:CourseId--Course:Name],
+    // [Enrollment:CourseLink]). enrollment is empty and formatDate is a no-op by design.
     const formatDate = () => '';
     const variableReplacer = createVariableReplacer(
       {
@@ -106,7 +125,7 @@ export default async function sendOrganizerAddedEmail(req, logger) {
     });
 
     if (!emailResult.success) {
-      logger.error(`Failed to queue organizer added email: ${emailResult.error}`);
+      logger.error(`Failed to queue organizer added email: ${emailResult.error}`, { duration: Date.now() - start });
       return {
         success: false,
         error: emailResult.error,
@@ -114,9 +133,11 @@ export default async function sendOrganizerAddedEmail(req, logger) {
       };
     }
 
-    logger.info(
-      `Email queued for organizer ${User.email}, courseId=${Course.id}, mailId=${emailResult.mailId}`
-    );
+    logger.info('sendOrganizerAddedEmail completed', {
+      duration: Date.now() - start,
+      courseId: Course.id,
+      mailId: emailResult.mailId,
+    });
 
     return {
       success: true,
@@ -127,6 +148,7 @@ export default async function sendOrganizerAddedEmail(req, logger) {
   } catch (error) {
     logger.error(`Error processing organizer added email: ${error.message}`, {
       error,
+      duration: Date.now() - start,
     });
     return {
       success: false,
