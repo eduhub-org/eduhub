@@ -262,11 +262,13 @@ const EmailEditor: React.FC<EmailEditorProps> = ({
   }
 
   return (
-    <div className={`border border-gray-300 rounded-lg ${className}`}>
+    <div className={`border border-border-primary rounded-lg light ${className}`}>
       {/* Toolbar */}
-      <div className="flex flex-wrap items-center gap-2 p-3 bg-gray-50 border-b border-gray-300 rounded-t-lg">
+      <div className="flex flex-wrap items-center gap-2 p-3 bg-bg-secondary border-b border-border-primary rounded-t-lg text-label-primary">
         {/* View Toggle */}
-        <ToggleButtonGroup size="small" value={isHtmlMode ? 'html' : 'visual'} exclusive onChange={toggleHtmlMode}>
+        <ToggleButtonGroup size="small" value={isHtmlMode ? 'html' : 'visual'} exclusive onChange={toggleHtmlMode}
+          sx={{ '& .MuiToggleButton-root': { color: 'var(--eduhub-label-secondary)', '&.Mui-selected': { color: 'var(--eduhub-brand)' } } }}
+        >
           <ToggleButton value="visual" size="small">
             <Visibility fontSize="small" />
             Visual
@@ -289,6 +291,7 @@ const EmailEditor: React.FC<EmailEditorProps> = ({
                 onClick={() => (editor.chain().focus() as any)[button.command]().run()}
                 color={editor.isActive(button.command.replace('toggle', '').toLowerCase()) ? 'primary' : 'default'}
                 title={button.title}
+                sx={{ color: editor.isActive(button.command.replace('toggle', '').toLowerCase()) ? undefined : 'var(--eduhub-label-secondary)' }}
               >
                 {button.icon}
               </IconButton>
@@ -300,6 +303,7 @@ const EmailEditor: React.FC<EmailEditorProps> = ({
               onClick={setLink}
               color={editor.isActive('link') ? 'primary' : 'default'}
               title="Add/Edit Link"
+              sx={{ color: editor.isActive('link') ? undefined : 'var(--eduhub-label-secondary)' }}
             >
               <LinkIcon />
             </IconButton>
@@ -316,7 +320,7 @@ const EmailEditor: React.FC<EmailEditorProps> = ({
               size="small"
               variant="outlined"
               onClick={() => insertPlaceholder(placeholder.text)}
-              sx={{ fontSize: '0.7rem', padding: '2px 6px', minHeight: 'auto' }}
+              sx={{ fontSize: '0.7rem', padding: '2px 6px', minHeight: 'auto', color: 'var(--eduhub-label-secondary)', borderColor: 'var(--eduhub-border-primary)' }}
             >
               {placeholder.label}
             </Button>
@@ -339,7 +343,7 @@ const EmailEditor: React.FC<EmailEditorProps> = ({
         )}
 
         {/* Character count */}
-        <div className="absolute bottom-2 right-2 text-xs text-gray-400 bg-white px-2 py-1 rounded">
+        <div className="absolute bottom-2 right-2 text-xs text-label-secondary bg-fill-primary px-2 py-1 rounded">
           {editor.storage.characterCount.characters()}/{maxLength}
         </div>
       </div>

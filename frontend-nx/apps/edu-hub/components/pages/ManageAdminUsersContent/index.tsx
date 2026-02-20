@@ -116,8 +116,6 @@ const ManageAdminUsersContent: FC = () => {
     },
   });
 
-  console.log(adminData);
-
   const { data, loading, error, pageIndex, setPageIndex, searchFilter, setSearchFilter, refetch } = useTableGrid({
     queryHook: useAdminQuery,
     query: ORGANIZATION_ADMIN_LIST,
@@ -146,21 +144,21 @@ const ManageAdminUsersContent: FC = () => {
       },
       {
         header: t('first_name'),
-        accessorKey: 'firstName',
+        accessorKey: 'User.firstName',
         enableSorting: true,
         size: 200,
         cell: ({ getValue }) => <div>{getValue<ReactNode>()}</div>,
       },
       {
         header: t('last_name'),
-        accessorKey: 'lastName',
+        accessorKey: 'User.lastName',
         enableSorting: true,
         size: 200,
         cell: ({ getValue }) => <div>{getValue<ReactNode>()}</div>,
       },
       {
         header: t('email'),
-        accessorKey: 'email',
+        accessorKey: 'User.email',
         enableSorting: true,
         size: 300,
         cell: ({ getValue }) => <div>{getValue<ReactNode>()}</div>,
@@ -190,8 +188,8 @@ const ManageAdminUsersContent: FC = () => {
             <CommonPageHeader headline={t('headline')} />
             <TableGrid
               columns={columns}
-              data={data?.User || []}
-              totalCount={data?.User_aggregate?.aggregate?.count || 0}
+              data={data?.OrganizationAdmin || []}
+              totalCount={data?.OrganizationAdmin_aggregate?.aggregate?.count || 0}
               pageIndex={pageIndex}
               onPageChange={setPageIndex}
               searchFilter={searchFilter}

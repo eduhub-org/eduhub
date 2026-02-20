@@ -49,9 +49,8 @@ const ProfileContent: FC = () => {
   const queryOccupationOptions = useRoleQuery<UserOccupation>(USER_OCCUPATION, {
     skip: sessionStatus === 'loading',
   });
-  // Occupation enums and their translated labels
   const occupationOptions = (queryOccupationOptions.data?.UserOccupation || []).map((x) => ({
-    label: t(`profile:occupation.${x.value}`), // Apply translation here
+    label: t(`occupation.${x.value}`),
     value: x.value,
   }));
 

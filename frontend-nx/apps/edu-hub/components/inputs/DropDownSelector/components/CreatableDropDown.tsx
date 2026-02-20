@@ -176,7 +176,7 @@ export const CreatableDropDown: React.FC<CreatableDropDownProps> = ({
             <HelpOutline
               style={{
                 cursor: 'pointer',
-                color: '#666',
+                color: 'var(--eduhub-label-secondary)',
                 marginLeft: '8px',
                 fontSize: '20px',
               }}
@@ -186,7 +186,7 @@ export const CreatableDropDown: React.FC<CreatableDropDownProps> = ({
       </div>
       {isOpen && (
         <div
-          className={`absolute w-full bg-white border rounded-md shadow-lg max-h-60 overflow-auto ${
+          className={`absolute w-full bg-fill-primary text-label-primary border border-border-primary rounded-md shadow-lg max-h-60 overflow-auto light ${
             variant === 'eduhub' ? 'z-50' : 'z-10'
           }`}
         >
@@ -194,7 +194,7 @@ export const CreatableDropDown: React.FC<CreatableDropDownProps> = ({
             <div
               key={option.value}
               className={`dropdown-option px-4 py-2 cursor-pointer ${
-                highlightedIndex === index ? 'bg-gray-300' : 'hover:bg-gray-300'
+                highlightedIndex === index ? 'bg-[var(--eduhub-border-primary)]' : 'hover:bg-[var(--eduhub-border-primary)]'
               }`}
               onClick={() => handleOptionSelect(option.value)}
               onMouseEnter={() => setHighlightedIndex(index)}
@@ -205,8 +205,8 @@ export const CreatableDropDown: React.FC<CreatableDropDownProps> = ({
           ))}
           {shouldShowCreateOption(inputValue) && (
             <div
-              className={`px-4 py-2 cursor-pointer text-blue-600 flex items-center ${
-                highlightedIndex === getFilteredOptions(inputValue).length ? 'bg-gray-300' : 'hover:bg-gray-300'
+              className={`px-4 py-2 cursor-pointer text-brand flex items-center ${
+                highlightedIndex === getFilteredOptions(inputValue).length ? 'bg-[var(--eduhub-border-primary)]' : 'hover:bg-[var(--eduhub-border-primary)]'
               }`}
               onClick={onCreateOption}
             >

@@ -183,7 +183,7 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
             target="_blank"
             rel="noopener noreferrer"
           >
-            {t('menu.kursleitungshandbuch')}
+            {t('menu.course_instructor_manual')}
           </Link>
         </MenuItem>
       )}

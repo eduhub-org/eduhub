@@ -1,10 +1,26 @@
 ---
 description: "Apply when working with GraphQL queries, mutations, or Apollo Client in EduHub"
-globs: "**/queries/**,**/*Query*,**/*Mutation*"
+globs: "**/queries/**,**/*Query*,**/*Mutation*,**/hooks/authedQuery*,**/hooks/authedMutation*"
 alwaysApply: false
 ---
 
 # GraphQL Patterns
+
+## CRITICAL: Never use `useAuthedQuery` -- always use `useRoleQuery`
+
+**`useAuthedQuery` hardcodes `x-hasura-role: user`**, which bypasses the user's actual Hasura role. This causes permission errors when a query includes fields restricted to `admin` or other roles, because the request is always sent as the `user` role regardless of who is logged in.
+
+**Always use `useRoleQuery` instead.** It automatically sends the correct role (`admin`, `instructor`, or `user`) based on the current user's session, so Hasura permission checks work correctly.
+
+```typescript
+// CORRECT -- uses the current user's actual role
+const { data } = useRoleQuery(QUERY, options);
+
+// WRONG -- hardcodes x-hasura-role: user, causing permission errors
+const { data } = useAuthedQuery(QUERY, options);
+```
+
+The same applies to mutations: use `useRoleMutation` (not a hardcoded-role alternative).
 
 ## Query Structure
 
@@ -22,7 +38,7 @@ queries/
 const { data, loading, error } = useRoleQuery(QUERY, options);
 const [mutation] = useRoleMutation(MUTATION, options);
 
-// Admin-specific
+// Admin-specific (when you explicitly need admin regardless of user role)
 const { data } = useAdminQuery(QUERY, options);
 const [mutation] = useAdminMutation(MUTATION, options);
 
@@ -56,6 +72,7 @@ const [mutation] = useRoleMutation(MUTATION, {
 ## Key Rules
 
 - ✅ Always use role-based hooks (`useRoleQuery` is most common)
+- ❌ **Never use `useAuthedQuery`** -- it hardcodes the `user` role and causes Hasura permission errors
 - ✅ Include `onError` handler in mutations
 - ✅ Use fragments for reusable field sets
 - ✅ Add proper TypeScript types to queries

@@ -248,12 +248,12 @@ const ManageAppSettingsContent: FC = () => {
                             ref={provided.innerRef}
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
-                            className="p-4 border border-gray-300 rounded mb-2 bg-white flex justify-between items-center"
+                            className="p-4 border border-border-primary rounded mb-2 bg-fill-primary flex justify-between items-center light"
                           >
-                            <h2 className="text-xl font-semibold">
+                            <h2 className="text-xl font-semibold text-label-primary">
                               {option.title ? tCommon(`course_group_options.${option.title}`) : '—'}
                             </h2>
-                            <span className="text-gray-500">{index + 1}</span>
+                            <span className="text-label-secondary">{index + 1}</span>
                           </div>
                         )}
                       </Draggable>

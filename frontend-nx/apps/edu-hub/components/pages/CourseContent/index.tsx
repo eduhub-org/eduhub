@@ -198,20 +198,29 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                 courseEnrollment?.status === CourseEnrollmentStatus_enum.CONFIRMED &&
                 (course.achievementCertificatePossible || course.attendanceCertificatePossible) && (
                   <ContentRow className="my-24 text-label-primary bg-fill-primary light px-8 py-8">
-                    {!isDegreeCourse && (
-                      <div className="flex flex-col md:flex-row gap-12 md:gap-24 w-full">
-                        <Attendances course={course} />
-                        {!courseEnrollment?.achievementCertificateURL && (
-                          <AchievementRecord
-                            courseId={course.id}
-                            achievementRecordUploadDeadline={course.Program.achievementRecordUploadDeadline}
-                            courseTitle={course.title}
-                          />
-                        )}
-                      </div>
-                    )}
-                    {isDegreeCourse && <CompletedDegreeCourses degreeCourseId={course.id} />}
-                    <CertificateDownload courseEnrollment={courseEnrollment} />
+                    <div className="flex flex-col w-full min-w-0">
+                      {!isDegreeCourse && (
+                        <div className="flex flex-col md:flex-row gap-12 md:gap-24 w-full">
+                          <Attendances course={course} />
+                          <div className="flex flex-col w-full md:w-1/2">
+                            {!courseEnrollment?.achievementCertificateURL && (
+                              <AchievementRecord
+                                courseId={course.id}
+                                achievementRecordUploadDeadline={course.Program.achievementRecordUploadDeadline}
+                                courseTitle={course.title}
+                              />
+                            )}
+                            <CertificateDownload courseEnrollment={courseEnrollment} />
+                          </div>
+                        </div>
+                      )}
+                      {isDegreeCourse && (
+                        <>
+                          <CompletedDegreeCourses degreeCourseId={course.id} />
+                          <CertificateDownload courseEnrollment={courseEnrollment} />
+                        </>
+                      )}
+                    </div>
                   </ContentRow>
                 )}
               <ContentRow className="flex">

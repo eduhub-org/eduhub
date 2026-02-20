@@ -212,7 +212,7 @@ const TagSelector: React.FC<TagSelectorProps> = ({
   const finalClassName = prioritizeClasses(`${baseClass} ${className}`);
 
   const renderMaterialUI = () => (
-    <div className="col-span-10 flex mt-3 w-full">
+    <div className="col-span-10 flex mt-3 w-full light">
       <Autocomplete
         multiple
         id="tags-standard"
@@ -251,6 +251,13 @@ const TagSelector: React.FC<TagSelectorProps> = ({
         value={tags}
         isOptionEqualToValue={(option, value) => option.id === value.id}
         fullWidth
+        sx={{
+          '& .MuiChip-root': { color: 'var(--eduhub-label-primary)', backgroundColor: 'var(--eduhub-bg-secondary)' },
+          '& .MuiChip-deleteIcon': { color: 'var(--eduhub-label-secondary)', '&:hover': { color: 'var(--eduhub-label-primary)' } },
+          '& .MuiInputBase-input': { color: 'var(--eduhub-label-primary)' },
+          '& .MuiInputLabel-root': { color: 'var(--eduhub-label-secondary)' },
+          '& .MuiInput-underline:before': { borderBottomColor: 'var(--eduhub-border-primary)' },
+        }}
       />
     </div>
   );

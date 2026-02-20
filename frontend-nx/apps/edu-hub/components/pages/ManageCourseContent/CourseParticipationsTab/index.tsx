@@ -287,7 +287,7 @@ interface IDotData {
   color: DotColor;
   session: ManagedCourse_Course_by_pk_Sessions;
 }
-const pStyle = 'text-gray-700 truncate';
+const pStyle = 'text-label-primary truncate';
 const tdStyle = 'pl-5 py-4';
 
 /* #region ParticipationRow */
@@ -454,7 +454,7 @@ const ParticipationRow: FC<IPropsParticipationRow> = ({
             {!enrollment.mostRecentRecord?.documentationUrl ||
             enrollment.mostRecentRecord.documentationUrl === 'pending_upload' ? (
               <div>
-                <p className={pStyle}> {t('not_submitted')} </p>
+                <p className={pStyle}> {t('manageCourse.not_submitted')} </p>
               </div>
             ) : (
               <>
@@ -484,7 +484,7 @@ const ParticipationRow: FC<IPropsParticipationRow> = ({
         <td className={tdStyle}>
           <div>
             <button
-              className="focus:ring-2 rounded-md focus:outline-none"
+              className="focus:ring-2 rounded-md focus:outline-none text-label-primary"
               onClick={handleDetailsClick}
               aria-label={showDetails ? t('table.collapse') : t('table.expand')}
             >
@@ -534,7 +534,7 @@ const ShowDetails: FC<IPropsShowDetails> = ({ enrollment, achievementRecordDocum
   };
   return (
     <>
-      <tr className="bg-edu-course-list f-full">
+      <tr className="bg-edu-course-list light f-full">
         <td colSpan={3} className={tdStyle}>
           <div className="flex">
             <p className={pStyle}> {enrollment.User.email} </p>
@@ -585,13 +585,14 @@ const ShowDetails: FC<IPropsShowDetails> = ({ enrollment, achievementRecordDocum
                   </div>
                   <Button
                     as={'a'}
+                    filled
                     href={
                       achievementRecordDocumentationResult.loading
                         ? '#'
                         : achievementRecordDocumentationResult.data?.getSignedUrl?.link
                     }
                   >
-                    {achievementRecordDocumentationResult.loading ? <CircularProgress /> : 'Download Documentation'}
+                    {achievementRecordDocumentationResult.loading ? <CircularProgress /> : t('manageCourse.download_documentation')}
                   </Button>
                 </>
               )}
