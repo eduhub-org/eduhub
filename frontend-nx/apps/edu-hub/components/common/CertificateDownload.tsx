@@ -79,7 +79,7 @@ export const CertificateDownload: FC<IProps> = ({
       >
         {loadAchievementCertificateData && !loadAchievementCertificateLoading && (
           <>
-            {!manageView && <h3 className="text-3xl font-medium text-center w-full">{t('coursePage.congrats-completion')}</h3>}
+            {!manageView && <h3 className="text-3xl font-medium text-center w-full">{t('coursePage.congrats_completion')}</h3>}
             <Button
               as="a"
               filled

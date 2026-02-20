@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useId } from 'react';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import { useAdminMutation } from '../../hooks/authedMutation';
@@ -96,6 +96,7 @@ const CreatableTagSelector: React.FC<CreatableTagSelectorProps> = ({
   const [tags, setTags] = useState<TagOption[]>(values.map((tag) => ({ value: tag })));
   const [inputValue, setInputValue] = useState('');
   const t = useTranslations();
+  const tagsAutocompleteId = useId();
 
   useEffect(() => {
     setTags(values.map((tag) => ({ value: tag })));
@@ -156,7 +157,7 @@ const CreatableTagSelector: React.FC<CreatableTagSelectorProps> = ({
     <div className="light">
       <Autocomplete
         multiple
-        id="tags-autocomplete"
+        id={`${tagsAutocompleteId}-tags-autocomplete`}
         options={options.map((tag) => ({ value: tag }))}
         value={tags}
         onChange={handleTagChange}
@@ -222,7 +223,7 @@ const CreatableTagSelector: React.FC<CreatableTagSelectorProps> = ({
         <div className="light">
           <Autocomplete
             multiple
-            id="tags-autocomplete"
+            id={`${tagsAutocompleteId}-tags-autocomplete`}
             options={options.map((tag) => ({ value: tag }))}
             value={tags}
             onChange={handleTagChange}

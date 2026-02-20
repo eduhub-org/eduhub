@@ -558,7 +558,7 @@
     "default-course-title": "New course",
     "achievementCertificateDownload": "Download achievement certificate",
     "attendanceCertificateDownload": "Download attendance certificate",
-    "congrats-completion": "Congratulations for finishing this course!",
+    "congrats_completion": "Congratulations for finishing this course!",
     "add-session-address": "New address",
     "upgrade-status": "Update course status and switch to next tab.",
     "to-be-defined": "Location still to be determined",

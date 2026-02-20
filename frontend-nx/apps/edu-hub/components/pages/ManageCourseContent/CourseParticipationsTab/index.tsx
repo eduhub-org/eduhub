@@ -534,7 +534,7 @@ const ShowDetails: FC<IPropsShowDetails> = ({ enrollment, achievementRecordDocum
   };
   return (
     <>
-      <tr className="bg-edu-course-list light f-full">
+      <tr className="bg-fill-secondary light w-full">
         <td colSpan={3} className={tdStyle}>
           <div className="flex">
             <p className={pStyle}> {enrollment.User.email} </p>
