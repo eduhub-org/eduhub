@@ -74,13 +74,16 @@ export const CertificateDownload: FC<IProps> = ({
   }, [courseEnrollment?.achievementCertificateURL, courseEnrollment?.attendanceCertificateURL]);
   return (
     <div className={!manageView ? 'mt-4' : ''}>
-      <div className={`flex gap-4 ${!manageView ? 'flex-col sm:px-24' : ''}`}>
+      <div
+        className={`flex flex-wrap gap-4 min-w-0 items-center ${!manageView ? 'flex-col w-full' : ''}`}
+      >
         {loadAchievementCertificateData && !loadAchievementCertificateLoading && (
           <>
-            {!manageView && <h3 className="text-3xl font-medium">{t('coursePage.congrats-completion')}</h3>}
+            {!manageView && <h3 className="text-3xl font-medium text-center w-full">{t('coursePage.congrats_completion')}</h3>}
             <Button
               as="a"
               filled
+              className={`flex justify-center items-center ${!manageView ? 'w-full' : ''}`}
               href={loadAchievementCertificateData.getSignedUrl.link}
               target="_blank"
               rel="noopener noreferrer"
@@ -95,6 +98,7 @@ export const CertificateDownload: FC<IProps> = ({
           <Button
             as="a"
             filled
+            className={`flex justify-center items-center ${!manageView ? 'w-full' : ''}`}
             href={loadAttendanceCertificateData.getSignedUrl.link}
             target="_blank"
             rel="noopener noreferrer"
