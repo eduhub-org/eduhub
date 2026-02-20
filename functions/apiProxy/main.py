@@ -316,7 +316,9 @@ def handle_moochub_data(page=1, per_page=25):
                             }
                         }
                     else:
-                        content_location = {"name": default_addr.get("shortLabel")}
+                        safe_name = default_addr.get("shortLabel") or (
+                            location.get("locationOption") or ""
+                        ).title()
                         address_block = {
                             "city": (location.get("locationOption") or "").title()
                         }
@@ -324,8 +326,11 @@ def handle_moochub_data(page=1, per_page=25):
                             address_block["streetAddress"] = default_addr["address"]
                         if default_addr.get("description"):
                             address_block["description"] = default_addr["description"]
-                        content_location["address"] = address_block
-                        attributes["contentLocation"] = content_location
+                        if safe_name or address_block.get("streetAddress") or address_block.get(
+                            "description"
+                        ) or address_block.get("city"):
+                            content_location = {"name": safe_name, "address": address_block}
+                            attributes["contentLocation"] = content_location
                 
                 # Note: metadata_tags are collected but not included in the feed
                 # They are used internally for determining funding and other custom attributes
