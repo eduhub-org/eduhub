@@ -90,6 +90,10 @@ curl "https://api.edu.opencampus.sh/moochub?page=1&per_page=10"
         },
         "courseMode": ["online"],
         "inLanguage": ["en"],
+        "startDate": ["2024-03-15T09:00:00Z"],
+        "endDate": ["2024-06-20T17:00:00Z"],
+        "applicationStartDate": "2024-01-15T00:00:00Z",
+        "applicationDeadline": "2024-03-10T00:00:00Z",
         "url": "https://edu.opencampus.sh/course/123?source=moochub&provider=opencampus-sh&feed_version=3.0.1",
         "description": "<p>Course description in HTML</p>",
         "publisher": {
@@ -206,6 +210,21 @@ for location in course["CourseLocations"]:
 # Determine courseMode based on location
 course_mode = ["online"] if location["locationOption"] == "ONLINE" else ["onsite"]
 ```
+
+### Date Field Mapping
+
+The feed maps EduHub date fields to MOOCHub schema v3.0.1 as follows:
+
+| MOOCHub Field | Type | EduHub Source |
+|---------------|------|---------------|
+| `startDate` | DateTimeSeries (array) | First `Session.startDateTime` (sessions ordered by startDateTime asc) |
+| `endDate` | DateTimeSeries (array) | Last `Session.endDateTime` (sessions ordered by startDateTime asc) |
+| `applicationStartDate` | NullableDateTime (single) | `Program.applicationStart` |
+| `applicationDeadline` | NullableDateTime (single) | `Course.applicationEnd` |
+
+- **startDate** and **endDate**: Derived from the course's sessions. If a course has no sessions, both are `null`.
+- **applicationStartDate**: When the application/enrollment period begins (from the course's program).
+- **applicationDeadline**: When the application/enrollment period ends (last day applications are accepted).
 
 ### Metadata Tag Collection
 
