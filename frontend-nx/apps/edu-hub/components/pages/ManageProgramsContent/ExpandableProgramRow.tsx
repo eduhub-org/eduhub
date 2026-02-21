@@ -1,7 +1,6 @@
-import { FC, useCallback } from 'react';
+import { FC } from 'react';
 import { CircularProgress } from '@mui/material';
 import { useTranslations } from 'next-intl';
-import { useAdminMutation } from '../../../hooks/authedMutation';
 import { useLazyRoleQuery } from '../../../hooks/authedQuery';
 import { ProgramList_Program } from '../../../queries/__generated__/ProgramList';
 import {
@@ -17,27 +16,14 @@ import {
   UPDATE_ClOSING_QUESTIONAIRE,
   UPDATE_DEFAULT_ENROLLMENT_SURVEY,
   UPDATE_PROGRAM_SHORT_TITLE,
-  UPDATE_PROGRAM_ACHIEVEMENT_CERT_VISIBLE,
-  UPDATE_PROGRAM_PARTICIPATION_CERT_VISIBLE,
 } from '../../../queries/updateProgram';
 import {
   loadParticipationData,
   loadParticipationDataVariables,
 } from '../../../queries/__generated__/loadParticipationData';
 import InputField from '../../inputs/InputField';
-import CheckboxSelector from '../../inputs/CheckboxSelector';
 import { Button } from '../../common/Button';
 import FileUploadField from '../../inputs/FileUploadField';
-import {
-  UpdateProgramAchievementCertVisible,
-  UpdateProgramAchievementCertVisibleVariables,
-} from '../../../queries/__generated__/UpdateProgramAchievementCertVisible';
-import {
-  UpdateProgramParticipationCertVisible,
-  UpdateProgramParticipationCertVisibleVariables,
-} from '../../../queries/__generated__/UpdateProgramParticipationCertVisible';
-
-
 interface ExpandableProgramRowProps {
   program: ProgramList_Program;
 }
@@ -60,46 +46,6 @@ const ExpandableProgramRow: FC<ExpandableProgramRowProps> = ({ program }) => {
       console.log('loadParticipationDataError', error);
     }
   };
-
-  // Certificate visibility mutations (these use isVisible, not value)
-  const [updateAchievementCertVisible] = useAdminMutation<
-    UpdateProgramAchievementCertVisible,
-    UpdateProgramAchievementCertVisibleVariables
-  >(UPDATE_PROGRAM_ACHIEVEMENT_CERT_VISIBLE, {
-    refetchQueries: ['ProgramList'],
-  });
-
-  const [updateParticipationCertVisible] = useAdminMutation<
-    UpdateProgramParticipationCertVisible,
-    UpdateProgramParticipationCertVisibleVariables
-  >(UPDATE_PROGRAM_PARTICIPATION_CERT_VISIBLE, {
-    refetchQueries: ['ProgramList'],
-  });
-
-  const handleAchievementCertVisibleChange = useCallback(
-    async (checked: boolean) => {
-      await updateAchievementCertVisible({
-        variables: {
-          programId: program.id,
-          isVisible: checked,
-        },
-      });
-    },
-    [updateAchievementCertVisible, program.id]
-  );
-
-  const handleParticipationCertVisibleChange = useCallback(
-    async (checked: boolean) => {
-      await updateParticipationCertVisible({
-        variables: {
-          programId: program.id,
-          isVisible: checked,
-        },
-      });
-    },
-    [updateParticipationCertVisible, program.id]
-  );
-
 
   return (
     <div className="w-full flex-1 min-w-0">
@@ -221,26 +167,7 @@ const ExpandableProgramRow: FC<ExpandableProgramRowProps> = ({ program }) => {
               </div>
             </div>
 
-            {/* 1. Certificate Visibility Card */}
-            <div className="bg-fill-primary border border-border-primary rounded-lg p-4">
-              <h4 className="text-sm font-medium text-label-primary mb-3">{t('certificates.show_certificates')}</h4>
-              <div className="space-y-2">
-                <CheckboxSelector
-                  variant="material"
-                  label={t('certificates.proof_of_participation')}
-                  checked={program.visibilityAttendanceCertificate}
-                  onValueUpdated={handleParticipationCertVisibleChange}
-                />
-                <CheckboxSelector
-                  variant="material"
-                  label={t('certificates.performance_certificate')}
-                  checked={program.visibilityAchievementCertificate}
-                  onValueUpdated={handleAchievementCertVisibleChange}
-                />
-              </div>
-            </div>
-
-            {/* 2. Participation Data Card */}
+            {/* 1. Participation Data Card */}
             <div className="bg-fill-primary border border-border-primary rounded-lg p-4">
               <h4 className="text-sm font-medium text-label-primary mb-3">{t('participation_data.generate')}</h4>
               <div className="space-y-2">

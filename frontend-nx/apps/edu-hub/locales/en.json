@@ -49,7 +49,7 @@
       "email_templates": "Email Templates",
       "app_settings": "App Settings",
       "statistics": "Statistics",
-      "kursleitungshandbuch": "Course Instructor Handbook",
+      "course_instructor_manual": "Course Instructor Manual",
       "logout": "Logout"
     },
     "change-password": "Change email or password",
@@ -103,7 +103,7 @@
     "REJECTED": "rejected",
     "ABORTED": "aborted",
     "COMPLETED": "completed",
-    "CANCELED": "canceled",
+    "CANCELLED": "canceled",
     "password": "Password",
     "employmentStatus": "Employment Status",
     "nameOfUniversity": "Name of University",
@@ -240,6 +240,7 @@
     "tile_slider_unavailable": "Tile slider temporarily unavailable",
     "no_description_available": "No description available",
     "error_handling": {
+      "certificate_generation_failed": "Failed to generate achievement certificates. Please try again.",
       "delete_restricted_by_relationship": "{parent} cannot be deleted when they are still associated with {child}. Please remove all {child} first.",
       "delete_restricted_by_relationships": "{table} cannot be deleted when they are associated with other records. Please remove those records first.",
       "generic_error": "An error occurred. Please try again later.",
@@ -328,6 +329,7 @@
       "current_degree_elements": "Current Offerings that are Part of the Degree",
       "no_degree_elements_available": "Currently there are no ongoing offerings for this Degree."
     },
+    "funded_by": "Funded by:",
     "learning": {
       "you_will_learn": "You will learn",
       "general_achievement_certificate_conditions": "**Online Participation:**\nIf online participation is possible, attendances are only counted as present if the camera is continuously turned on!\n\n**Semester Opening:**\nWe invite you to the Semester Opening for all courses on October 16, 2025, at the COBL (Legienstraße 40, Kiel)! 💛\nHere you can get a glimpse behind the scenes of our OC community, get to know course instructors and other course participants and discover Kiel's corporate landscape in inspiring sessions.\nClick here for all information and to register: [HERE](https://forms.office.com/e/2TrRyRTCS5)."
@@ -443,8 +445,7 @@
       "motivation_letter_required": "Please provide a motivation letter",
       "terms_required": "Please accept the Terms and Conditions",
       "registration_failed": "Registration failed. Please try again.",
-      "complete_survey_first": "Please complete the questionnaire first.",
-      "no_items_to_charge": "No items to charge. Course has no base price and no add-ons selected. Please contact support if this is unexpected."
+      "complete_survey_first": "Please complete the questionnaire first."
     },
     "formbricks": {
       "survey_title": "Application Questionnaire",
@@ -556,9 +557,9 @@
     "day": "Day",
     "no-courses": "This program has no courses.",
     "default-course-title": "New course",
-    "achievementCertificateDownload": "Your achievement certificate",
-    "attendanceCertificateDownload": "Your attendance confirmation",
-    "congrats-completion": "Congratulations for finishing this course!",
+    "achievementCertificateDownload": "Download achievement certificate",
+    "attendanceCertificateDownload": "Download attendance certificate",
+    "congrats_completion": "Congratulations for finishing this course!",
     "add-session-address": "New address",
     "upgrade-status": "Update course status and switch to next tab.",
     "to-be-defined": "Location still to be determined",
@@ -637,7 +638,6 @@
     "title": "Title",
     "external_speakers": "External Speakers",
     "add_external_speaker": "Add External Speaker",
-    "remove_external_speaker": "Remove external speaker",
     "session_title": "Session Title",
     "confirmDeleteSession": "Do you really want to delete the session?",
     "cannotDeletePastSession": "You cannot delete a session that is in the past! If you really want to delete the session, please contact an administrator.",
@@ -825,41 +825,6 @@
     "course-end": "Course end",
     "achievement-upload-deadline": "Deadline achievement upload"
   },
-  "manageAchievementOptions": {
-    "table_header": {
-      "title": "Title",
-      "description": "Description",
-      "record_type": "Type",
-      "mentors": "Mentors",
-      "courses": "Courses"
-    },
-    "title": {
-      "placeholder": "Project name"
-    },
-    "description": {
-      "placeholder": "Enter project description"
-    },
-    "record_type": {
-      "DOCUMENTATION": "Documentation",
-      "ONLINE_COURSE": "Online Course"
-    },
-    "documentation_template": {
-      "placeholder": "No selection",
-      "help_text": "Template for achievement record documentation"
-    },
-    "add_mentor": "Add mentor",
-    "remove_mentor": "Remove mentor",
-    "add_course": "Add course",
-    "manage_templates_button": "Manage achievement templates",
-    "notifications": {
-      "achievement_option_added": "Achievement option added successfully",
-      "add_failed": "Failed to add. Please try again."
-    },
-    "delete_button": {
-      "untitled_achievement_option": "Untitled achievement option",
-      "delete_achievement_option_confirmation": "Are you sure you want to delete the achievement option '{title}'?"
-    }
-  },
   "manageCourses": {
     "table_header": {
       "published": "Published",
@@ -987,10 +952,12 @@
     "participations_and_achievements": "Participations and Achievements",
     "degree_participations": "Degree Participations",
     "attendances": "Attendances",
-    "certificate_achievement": "Certificate",
+    "certificate_achievement": "Project",
     "certificates": "Certificate Download",
-    "attendance_certificate_download": "Ach",
-    "achievement_certificate_download": "Att",
+    "attendance_certificate_download": "Download Attendance Certificate",
+    "achievement_certificate_download": "Download Achievement Certificate",
+    "attendance_cert_col": "Attendance Cert.",
+    "achievement_cert_col": "Achievement Cert.",
     "no_applications_present": "No applications present",
     "add_participants": "Add or Edit Participants",
     "selected_users": "Selected Users",
@@ -1069,11 +1036,34 @@
     "certificate": "Certificate",
     "projectTitle": "Project title",
     "lastRecordUpload": "Upload Date",
+    "uploaded_by": "Uploaded by",
+    "co_authors": "Co-authors",
+    "download_documentation": "Download Documentation",
     "generate_achievement_certificates": "Generate Achievement Certificates",
     "delete_achievement_certificates": "Delete Achievement Certificates",
     "no_certificates_deleted": "No certificates were deleted",
     "certificate_deleted_singular": "{count} achievement certificate was deleted",
     "certificates_deleted_plural": "{count} achievement certificates were deleted",
+    "available_project_options": "Available Project Options for this Course",
+    "no_project_options_available": "There are currently no project options available for this course. Participants cannot upload project documentation. Please contact a program admin to configure project options.",
+    "attendance_cert_issued": "Attendance certificate issued",
+    "attendance_cert_not_issued": "No attendance certificate issued",
+    "achievement_cert_issued": "Achievement certificate issued",
+    "achievement_cert_not_issued": "No achievement certificate issued",
+    "attendance_status_passed": "Attendance requirement met",
+    "attendance_status_failed": "Attendance requirement not met",
+    "achievement_not_submitted": "No documentation uploaded",
+    "achievement_unrated": "Documentation submitted – not yet rated",
+    "achievement_passed": "Documentation submitted – passed",
+    "achievement_failed": "Documentation submitted – failed",
+    "certificates_section": "Certificates",
+    "documentation_section": "Project Documentation",
+    "generate_attendance_certificates": "Generate Attendance Certificates",
+    "delete_attendance_certificates": "Delete Attendance Certificates",
+    "no_attendance_certificates_deleted": "No attendance certificates were deleted",
+    "attendance_certificate_deleted_singular": "{count} attendance certificate was deleted",
+    "attendance_certificates_deleted_plural": "{count} attendance certificates were deleted",
+    "certificates_group": "Certificates",
     "application_status_tooltip": "Click on the circles to change the rating",
     "application_deadline_tooltip": "If you want to change the date for the Confirmation deadline you can resend the invitation.",
     "max_participants": {
@@ -1158,11 +1148,6 @@
     "course_not_found": "Course {courseId} could not be found!",
     "add_session": "Add Session",
     "SessionsTab": {
-      "session_description": {
-        "label": "Session Description",
-        "help_text": "A description of this session (e.g., topics covered, special notes).",
-        "placeholder": "Enter session description..."
-      },
       "sessionAddresses": {
         "online": {
           "label": "Online",
@@ -1641,14 +1626,17 @@
       "INVITE": "Invitation",
       "DECLINE": "Application Declined",
       "REGISTRATION_CONFIRMED": "Registration Confirmed",
-      "USER_CREATED": "User Created"
+      "REGISTRATION_CONFIRMED_PAID": "Payment Confirmed",
+      "APPLICATION_RECEIVED_PAID": "Application Received (Paid)",
+      "USER_CREATED": "User Created",
+      "ORGANIZER_ADDED": "Organizer Added"
     },
     "placeholders": {
       "subject": "Enter email subject...",
       "body": "Start typing your email content here. Use the toolbar for formatting and quick placeholders..."
     },
     "help_text": {
-      "subject": "The subject line that will appear in the recipient's email inbox. You can use placeholders like [User:Firstname] to personalize the subject."
+      "subject": "The subject line that will appear in the recipient's email inbox. You can use placeholders like [User:FirstName] to personalize the subject."
     },
     "expandable": {
       "body_content": "Email Content",
@@ -1664,8 +1652,11 @@
       "INVITE": "Sent when admin invites users to a course",
       "DECLINE": "Sent when admin rejects applications",
       "REGISTRATION_CONFIRMED": "Sent when a user directly registers for a course/event",
+      "REGISTRATION_CONFIRMED_PAID": "Sent when a user's payment for a course registration is confirmed",
+      "APPLICATION_RECEIVED_PAID": "Sent when an application for a paid course is received",
       "SESSION_REMINDER": "Sent before sessions start (24h, 1h, 15min before)",
-      "USER_CREATED": "Sent when a new user account is created"
+      "USER_CREATED": "Sent when a new user account is created",
+      "ORGANIZER_ADDED": "Sent when a user is added as an organizer to a course or event"
     },
     "delete_confirmation": "Are you sure you want to delete the email template '{title}'?",
     "unknown_trigger": "Unknown trigger type"
@@ -1689,21 +1680,9 @@
     "synced": "Synced",
     "not_synced": "Not synced"
   },
-  "AddonValidationDialog": {
-    "title": "Validate Add-ons",
-    "close": "Close",
-    "no_addons_found": "No add-ons found.",
-    "price_label": "Price (in cents)",
-    "description_label": "Description",
-    "question_id": "Question ID",
-    "choice_id": "Choice ID",
-    "cancel": "Cancel",
-    "saving": "Saving...",
-    "save_and_create_stripe": "Save & Create Stripe Prices"
-  },
   "footer": {
     "imprint": "Imprint",
-    "privacy": "Privacy Policy",
+    "privacy": "Privacy",
     "faq": "FAQ",
     "newsletter": "Newsletter",
     "sponsored_by": "Sponsored by:"

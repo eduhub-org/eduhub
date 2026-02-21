@@ -67,7 +67,7 @@ const AttendanceEntry: FC<AttendanceEntryProps> = ({ session }) => {
   return (
     <span
       // className={`text-sm bg-gray-200 text-center px-4 py-3 rounded`}
-      className={`text-sm ${fontWeight} text-center px-4 py-3 ${bgColor} rounded`}
+      className={`text-sm ${fontWeight} text-center px-4 py-3 ${bgColor} rounded overflow-hidden whitespace-nowrap text-ellipsis`}
     >
       {session.startDateTime.toLocaleDateString(locale, {
         year: 'numeric',

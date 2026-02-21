@@ -37,6 +37,21 @@ export const REMOVE_ACHIEVEMENT_CERTIFICATES = gql`
   }
 `;
 
+export const REMOVE_ATTENDANCE_CERTIFICATES = gql`
+  mutation RemoveAttendanceCertificates($enrollmentIds: [Int!]!) {
+    update_CourseEnrollment(
+      where: { id: { _in: $enrollmentIds } }
+      _set: { attendanceCertificateURL: null }
+    ) {
+      affected_rows
+      returning {
+        id
+        attendanceCertificateURL
+      }
+    }
+  }
+`;
+
 export const COURSE_ENROLLMENTS = gql`
   ${COURSE_INSTRUCTOR_FRAGMENT}
   query CourseEnrollmentQuery(

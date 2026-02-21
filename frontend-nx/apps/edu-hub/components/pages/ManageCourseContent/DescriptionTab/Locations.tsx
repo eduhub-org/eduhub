@@ -115,7 +115,7 @@ export const Locations: FC<LocationsIProps> = ({ location, onDelete }) => {
               createOptionMutation={CREATE_LOCATION_ADDRESS}
               refetchQueries={['ManagedCourse', 'LocationAddressByLocationOption']}
               nullable={true}
-              nullableLabel={t('sessionAddress.no_address_selected')}
+              nullableLabel={t('SessionsTab.sessionAddresses.no_address_selected')}
               className="mb-2"
             />
           )}

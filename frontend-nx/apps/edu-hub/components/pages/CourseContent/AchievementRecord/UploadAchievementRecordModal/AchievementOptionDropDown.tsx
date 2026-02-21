@@ -20,6 +20,8 @@ const StyledMenu = styled(MaterialMenu)(() => ({
   '& .MuiPaper-root': {
     minWidth: '225px',
     padding: '1rem 2rem',
+    backgroundColor: 'var(--eduhub-fill-primary)',
+    color: 'var(--eduhub-label-primary)',
   },
 }));
 
@@ -46,6 +48,7 @@ export const AchievementOptionDropDown: FC<IProps> = ({
       open={isVisible}
       onClose={hideMenu}
       TransitionComponent={Fade}
+      slotProps={{ paper: { className: 'light' } }}
       anchorOrigin={{
         vertical: 'bottom',
         horizontal: 'right',

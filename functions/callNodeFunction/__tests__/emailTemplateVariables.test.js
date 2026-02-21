@@ -46,7 +46,7 @@ describe('Email Template Variables System', () => {
       const allKeys = getAllVariableKeys();
       
       // Check that all expected variables are present
-      expect(allKeys).toContain('[User:Firstname]');
+      expect(allKeys).toContain('[User:FirstName]');
       expect(allKeys).toContain('[User:LastName]');
       expect(allKeys).toContain('[Enrollment:CourseId--Course:Name]');
       expect(allKeys).toContain('[Course:StartTime]');
@@ -60,7 +60,7 @@ describe('Email Template Variables System', () => {
       const enrollmentVars = getVariablesByCategory('enrollment');
       const keys = Object.keys(enrollmentVars);
       
-      expect(keys).toContain('[User:Firstname]');
+      expect(keys).toContain('[User:FirstName]');
       expect(keys).toContain('[Enrollment:CreatedAt]');
       expect(keys).toContain('[Course:StartTime]');
     });
@@ -69,7 +69,7 @@ describe('Email Template Variables System', () => {
       const sessionVars = getVariablesByCategory('session');
       const keys = Object.keys(sessionVars);
       
-      expect(keys).toContain('[User:Firstname]');
+      expect(keys).toContain('[User:FirstName]');
       expect(keys).toContain('[Session:Title]');
       expect(keys).toContain('[Session:Duration]');
       expect(keys).not.toContain('[Course:StartTime]');
@@ -83,7 +83,7 @@ describe('Email Template Variables System', () => {
 
   describe('Template Validation', () => {
     it('should validate templates with known variables', () => {
-      const template = 'Hello [User:Firstname] [User:LastName], welcome to [Enrollment:CourseId--Course:Name]!';
+      const template = 'Hello [User:FirstName] [User:LastName], welcome to [Enrollment:CourseId--Course:Name]!';
       const result = validateTemplate(template);
       
       expect(result.valid).toBe(true);
@@ -91,7 +91,7 @@ describe('Email Template Variables System', () => {
     });
 
     it('should detect unknown variables', () => {
-      const template = 'Hello [User:Firstname], your [Unknown:Variable] is ready.';
+      const template = 'Hello [User:FirstName], your [Unknown:Variable] is ready.';
       const result = validateTemplate(template);
       
       expect(result.valid).toBe(false);
@@ -120,7 +120,7 @@ describe('Email Template Variables System', () => {
       };
       
       const replacer = createVariableReplacer(data, mockFormatDate);
-      const result = replacer('Hello [User:Firstname] [User:LastName]!');
+      const result = replacer('Hello [User:FirstName] [User:LastName]!');
       
       expect(result).toBe('Hello John Doe!');
     });
@@ -214,7 +214,7 @@ describe('Email Template Variables System', () => {
       process.env.FRONTEND_URL = 'https://test.example.com';
       
       const replacer = createEnrollmentVariableReplacer(enrollmentDetails, mockFormatDate);
-      const result = replacer('Hello [User:Firstname], your course [Enrollment:CourseId--Course:Name] starts [Course:StartTime]. Link: [Enrollment:CourseLink]');
+      const result = replacer('Hello [User:FirstName], your course [Enrollment:CourseId--Course:Name] starts [Course:StartTime]. Link: [Enrollment:CourseLink]');
       
       expect(result).toBe('Hello John, your course Test Course starts formatted-2024-01-15. Link: https://test.example.com/course/123');
     });
@@ -237,7 +237,7 @@ describe('Email Template Variables System', () => {
       };
       
       const replacer = createSessionVariableReplacer(session, enrollment, sessionData);
-      const result = replacer('Hello [User:Firstname], [Session:Title] for [Enrollment:CourseId--Course:Name] [Session:ReminderText]');
+      const result = replacer('Hello [User:FirstName], [Session:Title] for [Enrollment:CourseId--Course:Name] [Session:ReminderText]');
       
       expect(result).toBe('Hello Jane, Session 1 for Advanced Course starts in 1 hour');
     });
@@ -249,7 +249,7 @@ describe('Email Template Variables System', () => {
       
       expect(doc).toContain('# Email Template Variables');
       expect(doc).toContain('USER Variables');
-      expect(doc).toContain('[User:Firstname]');
+      expect(doc).toContain('[User:FirstName]');
       expect(doc).toContain('SESSION Variables');
       expect(doc).toContain('[Session:Title]');
     });
@@ -259,7 +259,7 @@ describe('Email Template Variables System', () => {
       
       expect(doc).toContain('Variables available for **session** emails');
       expect(doc).toContain('[Session:Title]');
-      expect(doc).toContain('[User:Firstname]'); // User vars are available in session emails
+      expect(doc).toContain('[User:FirstName]'); // User vars are available in session emails
     });
   });
 
@@ -274,7 +274,7 @@ describe('Email Template Variables System', () => {
 
     it('should handle missing data gracefully', () => {
       const replacer = createVariableReplacer({}, jest.fn());
-      const result = replacer('Hello [User:Firstname] [User:LastName]!');
+      const result = replacer('Hello [User:FirstName] [User:LastName]!');
       
       expect(result).toBe('Hello  !');
     });
@@ -285,7 +285,7 @@ describe('Email Template Variables System', () => {
       };
       
       const replacer = createVariableReplacer(data, jest.fn());
-      const result = replacer('Hello [User:Firstname] [User:LastName]!');
+      const result = replacer('Hello [User:FirstName] [User:LastName]!');
       
       expect(result).toBe('Hello John !');
     });

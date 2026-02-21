@@ -2,7 +2,7 @@ import { Dialog, DialogContent, DialogTitle } from '@mui/material';
 import { useTranslations } from 'next-intl';
 import { ChangeEvent, FC, useCallback, useState, useMemo } from 'react';
 import { MdClose } from 'react-icons/md';
-import { useAuthedQuery } from '../../../hooks/authedQuery';
+import { useRoleQuery } from '../../../hooks/authedQuery';
 import { ORGANIZATION_LIST } from '../../../queries/organization';
 import { OrganizationList_Organization } from '../../../queries/__generated__/OrganizationList';
 import { Button } from '../Button';
@@ -17,7 +17,7 @@ interface IProps {
 // Search organization by name, description, or aliases
 export const SelectOrganizationDialog: FC<IProps> = ({ onClose, open, title }) => {
   const [searchValue, setSearchValue] = useState('');
-  const t = useTranslations();
+  const t = useTranslations('common');
 
   const handleNewInput = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
@@ -50,7 +50,7 @@ export const SelectOrganizationDialog: FC<IProps> = ({ onClose, open, title }) =
   }, [searchValue]);
 
   // Query organizations with search filter
-  const { data } = useAuthedQuery(ORGANIZATION_LIST, {
+  const { data } = useRoleQuery(ORGANIZATION_LIST, {
     variables: {
       limit: 100,
       filter,

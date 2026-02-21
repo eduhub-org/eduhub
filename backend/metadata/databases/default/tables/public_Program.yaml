@@ -2,6 +2,9 @@ table:
   name: Program
   schema: public
 object_relationships:
+  - name: Organization
+    using:
+      foreign_key_constraint_on: organizationId
   - name: ProgramType
     using:
       foreign_key_constraint_on: type
@@ -39,10 +42,9 @@ select_permissions:
     permission:
       columns:
         - id
+        - organizationId
         - published
         - visibility
-        - visibilityAchievementCertificate
-        - visibilityAttendanceCertificate
         - shortTitle
         - applicationStart
         - achievementRecordUploadDeadline
@@ -66,14 +68,13 @@ select_permissions:
         - defaultApplicationEnd
         - id
         - lectureEnd
+        - organizationId
         - lectureStart
         - published
         - shortTitle
         - title
         - type
         - visibility
-        - visibilityAchievementCertificate
-        - visibilityAttendanceCertificate
         - defaultFormbricksEnrollmentSurveyUrl
       filter: {}
   - role: instructor_access
@@ -82,6 +83,7 @@ select_permissions:
         - achievementRecordUploadDeadline
         - visibility
         - applicationStart
+        - organizationId
         - attendanceCertificateTemplateURL
         - closingQuestionnaire
         - defaultApplicationEnd
@@ -95,8 +97,6 @@ select_permissions:
         - speakerQuestionnaire
         - startQuestionnaire
         - title
-        - visibilityAchievementCertificate
-        - visibilityAttendanceCertificate
         - defaultFormbricksEnrollmentSurveyUrl
       filter: {}
 update_permissions:
@@ -104,10 +104,9 @@ update_permissions:
     permission:
       columns:
         - id
+        - organizationId
         - published
         - visibility
-        - visibilityAchievementCertificate
-        - visibilityAttendanceCertificate
         - shortTitle
         - applicationStart
         - achievementRecordUploadDeadline

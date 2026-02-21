@@ -10,8 +10,6 @@ export const PROGRAM_FRAGMENT_MINIMUM_PROPERTIES = gql`
     defaultApplicationEnd
     achievementRecordUploadDeadline
     published
-    visibilityAchievementCertificate
-    visibilityAttendanceCertificate
     type
     defaultFormbricksEnrollmentSurveyUrl
   }
@@ -29,8 +27,6 @@ export const USER_PROGRAM_FRAGMENT = gql`
     shortTitle
     achievementRecordUploadDeadline
     published
-    visibilityAchievementCertificate
-    visibilityAttendanceCertificate
   }
 `;
 
@@ -47,8 +43,6 @@ export const ADMIN_PROGRAM_FRAGMENT = gql`
     attendanceCertificateTemplateURL
     achievementCertificateTemplateURL
     visibility
-    visibilityAchievementCertificate
-    visibilityAttendanceCertificate
     defaultFormbricksEnrollmentSurveyUrl
   }
 `;

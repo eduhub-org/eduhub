@@ -17,12 +17,13 @@ import { CreateUserDialog } from '../../common/dialogs/CreateUserDialog';
 
 const ExpandableUserRow: FC<{ row: UsersByLastName_User }> = ({ row }) => {
   const t = useTranslations('manageUsers');
+  const tProfile = useTranslations('profile');
   return (
     <div>
       <div className="font-medium bg-fill-primary text-label-primary light grid grid-cols-[repeat(auto-fill,minmax(100px,1fr))]">
         <div className="pl-3 col-span-3">
           <p className="text-label-primary truncate font-medium">{`${t('occupation')}: ${
-            row.occupation ? t(`profile:occupation.${row.occupation}`) : '-'
+            row.occupation ? tProfile(`occupation.${row.occupation}`) : '-'
           }`}</p>
         </div>
         <div className="pl-3 col-span-3">

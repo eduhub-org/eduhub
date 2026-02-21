@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent, useEffect, useCallback } from 'react';
+import React, { useState, ChangeEvent, useEffect, useCallback, useRef } from 'react';
 import { DocumentNode } from 'graphql';
 import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
@@ -169,11 +169,6 @@ type InputFieldProps = {
   max?: number;
 
   /**
-   * When true, reduces margin for compact layouts (e.g. table cells).
-   */
-  compact?: boolean;
-
-  /**
    * Allows for additional props to be passed.
    */
   [x: string]: any;
@@ -198,7 +193,6 @@ const InputField: React.FC<InputFieldProps> = ({
   forceNotifyByEnter = false,
   showCharacterCount = true,
   invertColors = false,
-  compact = false,
   min,
   max,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Extract this prop to prevent it from being spread to DOM elements
@@ -343,13 +337,32 @@ const InputField: React.FC<InputFieldProps> = ({
   const [showPreview, setShowPreview] = useState(false);
   const togglePreview = () => setShowPreview(!showPreview);
 
-  const baseClass = `w-full px-3 py-3 ${compact ? 'mb-0' : 'mb-8'} rounded ${
+  const [syncedHeight, setSyncedHeight] = useState<number | null>(null);
+  const observerRef = useRef<ResizeObserver | null>(null);
+
+  const resizableRef = useCallback(
+    (node: HTMLElement | null) => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+        observerRef.current = null;
+      }
+      if (node && type === 'markdown') {
+        observerRef.current = new ResizeObserver(() => {
+          setSyncedHeight(node.offsetHeight);
+        });
+        observerRef.current.observe(node);
+      }
+    },
+    [type]
+  );
+
+  const baseClass = `w-full px-3 py-3 mb-8 rounded ${
     invertColors ? 'bg-gray-200 text-black' : 'text-label-primary bg-fill-primary'
   }`;
   const finalClassName = prioritizeClasses(`${baseClass} ${className}`);
 
   const renderMaterialUI = () => (
-    <div className={`col-span-10 flex ${compact ? 'mt-0' : 'mt-3'} ${props.fullWidth ? 'w-full min-w-0' : ''}`}>
+    <div className="col-span-10 flex mt-3">
       <TextField
         className={hasBlurred && errorMessage ? 'w-3/4' : 'w-full'}
         variant="standard"
@@ -384,28 +397,30 @@ const InputField: React.FC<InputFieldProps> = ({
   const renderEduHub = () => (
     <div className="px-2">
       <div className="text-label-primary">
-        {(label || helpText || type === 'markdown') && (
-          <div className="flex justify-between mb-2">
-            <div className="flex items-center">
-              {helpText && (
-                <Tooltip title={helpText} placement="top">
-                  <HelpOutline style={{ cursor: 'pointer', marginRight: '5px' }} />
-                </Tooltip>
-              )}
-              {label}
-            </div>
-            {type === 'markdown' && (
+        <div className="flex justify-between mb-2">
+          <div className="flex items-center">
+            {helpText && (
+              <Tooltip title={helpText} placement="top">
+                <HelpOutline style={{ cursor: 'pointer', marginRight: '5px' }} />
+              </Tooltip>
+            )}
+            {label}
+          </div>
+          {type === 'markdown' && (
             <button className="text-white text-xs px-3 pt-2" onClick={togglePreview}>
               {showPreview ? <u>{t('edit_markdown')}</u> : <u>{t('preview')}</u>}
             </button>
           )}
-          </div>
-        )}
-        <div className="light">
+        </div>
+        <div className={`light ${type === 'markdown' ? 'min-h-0' : ''}`}>
           {type === 'markdown' && showPreview ? (
-            <div className={`${finalClassName} bg-gray-600`.trim()}>
+            <div
+              ref={resizableRef}
+              className={`${finalClassName} bg-gray-600 overflow-y-auto resize-y`.trim()}
+              style={syncedHeight ? { height: syncedHeight } : undefined}
+            >
               <ReactMarkdown
-                className="prose max-w-none text-white whitespace-normal break-words"
+                className="prose max-w-none text-white whitespace-normal break-words [&_*]:break-words"
                 remarkPlugins={[remarkGfm]}
               >
                 {localText}
@@ -414,11 +429,13 @@ const InputField: React.FC<InputFieldProps> = ({
           ) : (
             <div className="relative">
               <DebounceInput
+                inputRef={type === 'markdown' ? resizableRef : undefined}
                 element={type === 'textarea' || type === 'markdown' ? 'textarea' : 'input'}
                 type={type === 'number' ? 'number' : type === 'ects' ? 'number' : 'text'}
                 debounceTimeout={debounceTimeout}
                 forceNotifyByEnter={forceNotifyByEnter}
-                className={`${finalClassName} ${errorMessage ? 'border-red-500' : ''}`}
+                className={`${finalClassName.replace(/\bh-64\b/g, 'min-h-64')} ${errorMessage ? 'border-red-500' : ''}`}
+                style={type === 'markdown' && syncedHeight ? { height: syncedHeight } : undefined}
                 value={localText}
                 onChange={handleTextChange}
                 onBlur={handleBlur}

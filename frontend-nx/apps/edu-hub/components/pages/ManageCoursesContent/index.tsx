@@ -632,25 +632,25 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
       {
         header: t('table_header.applications'),
         accessorKey: 'applications',
-        size: 100,
+        size: 130,
         enableSorting: true,
-        meta: { className: 'text-center' },
-        cell: ({ row }) => <div className="text-center">{getApplicationsCount(row.original)}</div>,
+        meta: { className: 'justify-center' },
+        cell: ({ row }) => <div className="text-center w-full">{getApplicationsCount(row.original)}</div>,
       },
       {
         header: t('table_header.confirmed'),
         accessorKey: 'confirmed',
-        size: 100,
+        size: 120,
         enableSorting: true,
-        meta: { className: 'text-center' },
-        cell: ({ row }) => <div className="text-center">{getConfirmedCount(row.original)}</div>,
+        meta: { className: 'justify-center' },
+        cell: ({ row }) => <div className="text-center w-full">{getConfirmedCount(row.original)}</div>,
       },
       {
         header: t('table_header.unrated_rated_not_informed'),
         accessorKey: 'unratedRatedNotInformed',
         size: 140,
-        meta: { className: 'text-center' },
-        cell: ({ row }) => <div className="text-center">{getUnratedAndRatedButNotInformed(row.original)}</div>,
+        meta: { className: 'justify-center' },
+        cell: ({ row }) => <div className="text-center w-full">{getUnratedAndRatedButNotInformed(row.original)}</div>,
       },
       {
         header: t('table_header.application_end'),
@@ -685,7 +685,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
           const hasCustomTemplates = templateCount > 0;
 
           return (
-            <div className="flex items-center justify-center gap-1">
+            <div className="flex items-center justify-center gap-1 w-full">
               <div className="text-center">{courseStatus(row.original.status)}</div>
               {hasCustomTemplates && (
                 <MdMarkEmailRead
