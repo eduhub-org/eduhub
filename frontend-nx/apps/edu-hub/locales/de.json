@@ -240,6 +240,7 @@
     "tile_slider_unavailable": "Kachel-Slider vorübergehend nicht verfügbar",
     "no_description_available": "Keine Beschreibung verfügbar",
     "error_handling": {
+      "certificate_generation_failed": "Fehler beim Erstellen der Leistungsnachweise. Bitte versuche es erneut.",
       "delete_restricted_by_relationship": "{parent} können nicht gelöscht werden, wenn sie mit {child} verknüpft sind. Bitte lösche diese zuerst.",
       "delete_restricted_by_relationships": "{table} können nicht gelöscht werden, wenn sie mit anderen Einträgen verknüpft sind. Bitte lösche zuerst die anderen Einträge.",
       "generic_error": "Ein Fehler ist aufgetreten. Bitte versuche es erneut.",

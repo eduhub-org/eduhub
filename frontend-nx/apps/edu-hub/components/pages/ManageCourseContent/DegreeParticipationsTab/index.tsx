@@ -30,6 +30,7 @@ export interface ExtendedDegreeParticipantsEnrollment
 
 export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ course }) => {
   const t = useTranslations('manageCourse');
+  const tCommon = useTranslations('common');
   const locale = useLocale();
 
   const [pageSize, setPageSize] = useState(20);
@@ -222,7 +223,7 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
           setPageIndex(pageIndex); // This triggers a refetch via useTableGrid
         } catch (err) {
           console.error('Certificate generation error:', err);
-          setBulkActionError(err instanceof Error ? err.message : t('errors.certificate_generation_failed'));
+          setBulkActionError(err instanceof Error ? err.message : tCommon('error_handling.certificate_generation_failed'));
         }
       } else if (action === 'delete-achievement-certificates') {
         try {
@@ -253,11 +254,11 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
           setPageIndex(pageIndex); // This triggers a refetch via useTableGrid
         } catch (err) {
           console.error('Certificate deletion error:', err);
-          setBulkActionError(err instanceof Error ? err.message : t('common.error_handling.certificate_deletion_failed'));
+          setBulkActionError(err instanceof Error ? err.message : tCommon('error_handling.certificate_deletion_failed'));
         }
       }
     },
-    [course.id, createCertificates, removeAchievementCertificates, t, setPageIndex, pageIndex]
+    [course.id, createCertificates, removeAchievementCertificates, t, tCommon, setPageIndex, pageIndex]
   );
 
   const columns = useMemo<ColumnDef<ExtendedDegreeParticipantsEnrollment>[]>(
