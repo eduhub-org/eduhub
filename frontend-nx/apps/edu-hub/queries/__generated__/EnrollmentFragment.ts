@@ -3,11 +3,28 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { CourseEnrollmentStatus_enum, PaymentStatus_enum } from "./../../__generated__/globalTypes";
+import { CourseEnrollmentStatus_enum, InvoiceStatus_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL fragment: EnrollmentFragment
 // ====================================================
+
+export interface EnrollmentFragment_Invoices {
+  __typename: "Invoice";
+  id: number;
+  /**
+   * Invoice lifecycle status. Synced from Stripe webhooks
+   */
+  status: InvoiceStatus_enum;
+  /**
+   * Stripe-hosted invoice page URL
+   */
+  stripeHostedInvoiceUrl: string | null;
+  /**
+   * Stripe-hosted PDF download URL
+   */
+  stripeInvoicePdfUrl: string | null;
+}
 
 export interface EnrollmentFragment {
   __typename: "CourseEnrollment";
@@ -29,9 +46,9 @@ export interface EnrollmentFragment {
    */
   status: CourseEnrollmentStatus_enum;
   /**
-   * Current payment status
+   * Organization paying for this enrollment (B2B). NULL means the enrolling user pays personally (B2C)
    */
-  paymentStatus: PaymentStatus_enum | null;
+  billingOrganizationId: number | null;
   /**
    * URL to the file containing the user's achievement certificate (if he obtained one)
    */
@@ -40,4 +57,8 @@ export interface EnrollmentFragment {
    * URL to the file containing the user's attendance certificate (if he obtained one)
    */
   attendanceCertificateURL: string | null;
+  /**
+   * An array relationship
+   */
+  Invoices: EnrollmentFragment_Invoices[];
 }

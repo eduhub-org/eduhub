@@ -2,6 +2,9 @@ table:
   name: Organization
   schema: public
 object_relationships:
+  - name: Country
+    using:
+      foreign_key_constraint_on: country
   - name: OrganizationType
     using:
       foreign_key_constraint_on: type
@@ -27,20 +30,46 @@ array_relationships:
         table:
           name: User
           schema: public
+  - name: Programs
+    using:
+      foreign_key_constraint_on:
+        column: organizationId
+        table:
+          name: Program
+          schema: public
 insert_permissions:
   - role: user_access
     permission:
       check: {}
       columns:
+        - addressLine1
+        - addressLine2
         - aliases
-        - apiKeyHash
+        - bankName
+        - city
+        - country
         - created_at
+        - defaultTaxExemptionNote
+        - defaultVatRate
         - description
+        - email
         - id
+        - invoiceFooterText
+        - invoiceNumberPrefix
+        - legalForm
+        - legalName
         - logo
+        - managingDirector
         - name
+        - phone
+        - postalCode
+        - registerCourt
+        - registerNumber
+        - taxNumber
         - type
         - updated_at
+        - vatId
+        - website
 select_permissions:
   - role: anonymous
     permission:
@@ -58,26 +87,70 @@ select_permissions:
   - role: user_access
     permission:
       columns:
+        - addressLine1
+        - addressLine2
         - aliases
-        - apiKeyHash
+        - bankName
+        - city
+        - country
         - created_at
+        - defaultTaxExemptionNote
+        - defaultVatRate
         - description
+        - email
         - id
+        - invoiceFooterText
+        - invoiceNumberPrefix
+        - legalForm
+        - legalName
         - logo
+        - managingDirector
         - name
+        - phone
+        - postalCode
+        - registerCourt
+        - registerNumber
+        - taxNumber
         - type
         - updated_at
-      filter: {}
+        - vatId
+        - website
+      filter:
+        OrganizationAdmins:
+          userId:
+            _eq: X-Hasura-User-Id
       allow_aggregations: true
 update_permissions:
   - role: user_access
     permission:
       columns:
+        - addressLine1
+        - addressLine2
         - aliases
-        - apiKeyHash
+        - bankName
+        - city
+        - country
+        - defaultTaxExemptionNote
+        - defaultVatRate
         - description
+        - email
+        - invoiceFooterText
+        - invoiceNumberPrefix
+        - legalForm
+        - legalName
         - logo
+        - managingDirector
         - name
+        - phone
+        - postalCode
+        - registerCourt
+        - registerNumber
+        - taxNumber
         - type
-      filter: {}
+        - vatId
+        - website
+      filter:
+        OrganizationAdmins:
+          userId:
+            _eq: X-Hasura-User-Id
       check: {}

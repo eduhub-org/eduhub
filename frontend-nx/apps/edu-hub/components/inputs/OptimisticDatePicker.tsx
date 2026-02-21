@@ -684,6 +684,7 @@ export const OptimisticDatePicker: FC<OptimisticDatePickerProps> = ({
         readOnly={readOnly}
         required={required}
         tabIndex={tabIndex}
+        popperPlacement="bottom-start"
       />
 
       {/* Loading indicator */}

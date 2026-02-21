@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useId } from 'react';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import { useAdminMutation } from '../../hooks/authedMutation';
@@ -96,6 +96,7 @@ const CreatableTagSelector: React.FC<CreatableTagSelectorProps> = ({
   const [tags, setTags] = useState<TagOption[]>(values.map((tag) => ({ value: tag })));
   const [inputValue, setInputValue] = useState('');
   const t = useTranslations();
+  const tagsAutocompleteId = useId();
 
   useEffect(() => {
     setTags(values.map((tag) => ({ value: tag })));
@@ -153,48 +154,57 @@ const CreatableTagSelector: React.FC<CreatableTagSelectorProps> = ({
   const finalClassName = prioritizeClasses(baseClass);
 
   const renderMaterialUI = () => (
-    <Autocomplete
-      multiple
-      id="tags-autocomplete"
-      options={options.map((tag) => ({ value: tag }))}
-      value={tags}
-      onChange={handleTagChange}
-      inputValue={inputValue}
-      onInputChange={(event, newInputValue) => {
-        setInputValue(newInputValue);
-      }}
-      filterOptions={(options, params) => {
-        const filtered = filter(options, params);
-        const { inputValue } = params;
-        const isExisting = options.some((option) => inputValue === option.value);
-        if (inputValue !== '' && !isExisting) {
-          filtered.push({
-            inputValue: inputValue,
-            value: inputValue,
-          });
+    <div className="light">
+      <Autocomplete
+        multiple
+        id={`${tagsAutocompleteId}-tags-autocomplete`}
+        options={options.map((tag) => ({ value: tag }))}
+        value={tags}
+        onChange={handleTagChange}
+        inputValue={inputValue}
+        onInputChange={(event, newInputValue) => {
+          setInputValue(newInputValue);
+        }}
+        filterOptions={(options, params) => {
+          const filtered = filter(options, params);
+          const { inputValue } = params;
+          const isExisting = options.some((option) => inputValue === option.value);
+          if (inputValue !== '' && !isExisting) {
+            filtered.push({
+              inputValue: inputValue,
+              value: inputValue,
+            });
+          }
+          return filtered;
+        }}
+        getOptionLabel={(option: TagOption) => option.inputValue || option.value || ''}
+        renderOption={(props, option: TagOption) => {
+          const { key, ...otherProps } = props;
+          return (
+            <li key={key} {...otherProps}>
+              {option.inputValue ? t('common.CreatableTagSelector.add_tag', { value: option.inputValue }) : option.value}
+            </li>
+          );
+        }}
+        renderInput={(params) => (
+          <TextField {...params} variant="standard" label={label} placeholder={placeholder} onKeyDown={handleKeyDown} />
+        )}
+        sx={{
+          '& .MuiChip-root': { color: 'var(--eduhub-label-primary)', backgroundColor: 'var(--eduhub-bg-secondary)' },
+          '& .MuiChip-deleteIcon': { color: 'var(--eduhub-label-secondary)', '&:hover': { color: 'var(--eduhub-label-primary)' } },
+          '& .MuiInputBase-input': { color: 'var(--eduhub-label-primary)' },
+          '& .MuiInputLabel-root': { color: 'var(--eduhub-label-secondary)' },
+          '& .MuiInput-underline:before': { borderBottomColor: 'var(--eduhub-border-primary)' },
+        }}
+        freeSolo
+        selectOnFocus
+        clearOnBlur
+        handleHomeEndKeys
+        isOptionEqualToValue={(option, value) =>
+          (option.value || option.inputValue || '') === (value.value || value.inputValue || '')
         }
-        return filtered;
-      }}
-      getOptionLabel={(option: TagOption) => option.inputValue || option.value || ''}
-      renderOption={(props, option: TagOption) => {
-        const { key, ...otherProps } = props;
-        return (
-          <li key={key} {...otherProps}>
-            {option.inputValue ? t('common.CreatableTagSelector.add_tag', { value: option.inputValue }) : option.value}
-          </li>
-        );
-      }}
-      renderInput={(params) => (
-        <TextField {...params} variant="standard" label={label} placeholder={placeholder} onKeyDown={handleKeyDown} />
-      )}
-      freeSolo
-      selectOnFocus
-      clearOnBlur
-      handleHomeEndKeys
-      isOptionEqualToValue={(option, value) =>
-        (option.value || option.inputValue || '') === (value.value || value.inputValue || '')
-      }
-    />
+      />
+    </div>
   );
 
   const renderEduhub = () => (
@@ -213,7 +223,7 @@ const CreatableTagSelector: React.FC<CreatableTagSelectorProps> = ({
         <div className="light">
           <Autocomplete
             multiple
-            id="tags-autocomplete"
+            id={`${tagsAutocompleteId}-tags-autocomplete`}
             options={options.map((tag) => ({ value: tag }))}
             value={tags}
             onChange={handleTagChange}

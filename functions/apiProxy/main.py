@@ -127,6 +127,11 @@ def handle_moochub_data(page=1, per_page=25):
                 Program {
                     id
                     shortTitle
+                    applicationStart
+                }
+                Sessions(order_by: { startDateTime: asc }) {
+                    startDateTime
+                    endDateTime
                 }
                 CourseLocations {
                     id
@@ -234,7 +239,22 @@ def handle_moochub_data(page=1, per_page=25):
                             break
                     if has_dlc_funding:
                         break
-            
+
+            # Compute course start/end dates from first and last session
+            sessions = course.get("Sessions", [])
+            first_session_start = sessions[0]["startDateTime"] if sessions else None
+            last_session_end = sessions[-1]["endDateTime"] if sessions else None
+
+            # Format application dates for MOOCHub (date-only fields need time suffix)
+            application_start = course.get("Program", {}).get("applicationStart")
+            application_deadline = course.get("applicationEnd")
+            application_start_date = (
+                f"{application_start}T00:00:00Z" if application_start else None
+            )
+            application_deadline_str = (
+                f"{application_deadline}T00:00:00Z" if application_deadline else None
+            )
+
             # Create one entry per course location
             for location in course["CourseLocations"]:
                 # Determine courseMode based on location
@@ -251,7 +271,10 @@ def handle_moochub_data(page=1, per_page=25):
                     },
                     "courseMode": course_mode,
                     "inLanguage": [course["language"].lower()],
-                    "startDate": [f"{course['applicationEnd']}T00:00:00Z"] if course["applicationEnd"] else None,
+                    "startDate": [first_session_start] if first_session_start else None,
+                    "endDate": [last_session_end] if last_session_end else None,
+                    "applicationStartDate": application_start_date,
+                    "applicationDeadline": application_deadline_str,
                     "description": "".join(description_parts),
                     "publisher": {
                         "name": "opencampus.sh",
@@ -278,10 +301,11 @@ def handle_moochub_data(page=1, per_page=25):
                 moochub_params = "source=moochub&provider=opencampus-sh&feed_version=3.0.1"
                 attributes["url"] = f"{api_base_url}/course/{course['id']}?{moochub_params}"
                 
-                # Add contentLocation for onsite courses with valid defaultSessionAddressId
-                if location["locationOption"] != "ONLINE" and location.get("defaultSessionAddressId"):
-                    address_id = location["defaultSessionAddressId"]
-                    if address_id in LOCATION_ADDRESS_MAPPING:
+                # Add contentLocation for onsite courses
+                if location["locationOption"] != "ONLINE":
+                    address_id = location.get("defaultSessionAddressId")
+                    default_addr = location.get("DefaultSessionAddress") or {}
+                    if address_id and address_id in LOCATION_ADDRESS_MAPPING:
                         location_data = LOCATION_ADDRESS_MAPPING[address_id]
                         attributes["contentLocation"] = {
                             "name": location_data["name"],
@@ -291,6 +315,22 @@ def handle_moochub_data(page=1, per_page=25):
                                 "description": location_data["description"]
                             }
                         }
+                    else:
+                        safe_name = default_addr.get("shortLabel") or (
+                            location.get("locationOption") or ""
+                        ).title()
+                        address_block = {
+                            "city": (location.get("locationOption") or "").title()
+                        }
+                        if default_addr.get("address"):
+                            address_block["streetAddress"] = default_addr["address"]
+                        if default_addr.get("description"):
+                            address_block["description"] = default_addr["description"]
+                        if safe_name or address_block.get("streetAddress") or address_block.get(
+                            "description"
+                        ) or address_block.get("city"):
+                            content_location = {"name": safe_name, "address": address_block}
+                            attributes["contentLocation"] = content_location
                 
                 # Note: metadata_tags are collected but not included in the feed
                 # They are used internally for determining funding and other custom attributes

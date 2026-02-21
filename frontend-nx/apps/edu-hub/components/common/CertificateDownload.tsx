@@ -17,23 +17,12 @@ interface IProps {
   refetchAttendanceCertificates?: boolean;
   setRefetchAchievementCertificates?: Dispatch<SetStateAction<boolean>>;
   setRefetchAttendanceCertificates?: Dispatch<SetStateAction<boolean>>;
-  hideAchievementCertificateButton?: boolean;
-  hideAttendanceCertificateButton?: boolean;
 }
 
 export const CertificateDownload: FC<IProps> = ({
   courseEnrollment,
-  hideAchievementCertificateButton = false,
-  hideAttendanceCertificateButton = false,
   manageView,
 }) => {
-  console.log('=== CertificateDownload Component State ===', {
-    enrollmentId: courseEnrollment?.id,
-    achievementCertificateURL: courseEnrollment?.achievementCertificateURL,
-    attendanceCertificateURL: courseEnrollment?.attendanceCertificateURL,
-    hideAchievementButton: hideAchievementCertificateButton,
-    hideAttendanceButton: hideAttendanceCertificateButton
-  });
 
   const t = useTranslations();
   const [errorMessage, setErrorMessage] = useState('');
@@ -85,13 +74,16 @@ export const CertificateDownload: FC<IProps> = ({
   }, [courseEnrollment?.achievementCertificateURL, courseEnrollment?.attendanceCertificateURL]);
   return (
     <div className={!manageView ? 'mt-4' : ''}>
-      <div className={`flex gap-4 ${!manageView ? 'flex-col sm:px-24' : ''}`}>
-        {loadAchievementCertificateData && !loadAchievementCertificateLoading && !hideAchievementCertificateButton && (
+      <div
+        className={`flex flex-wrap gap-4 min-w-0 items-center ${!manageView ? 'flex-col w-full' : ''}`}
+      >
+        {loadAchievementCertificateData && !loadAchievementCertificateLoading && (
           <>
-            {!manageView && <h3 className="text-3xl font-medium">{t('coursePage.congrats-completion')}</h3>}
+            {!manageView && <h3 className="text-3xl font-medium text-center w-full">{t('coursePage.congrats_completion')}</h3>}
             <Button
               as="a"
               filled
+              className={`flex justify-center items-center ${!manageView ? 'w-full' : ''}`}
               href={loadAchievementCertificateData.getSignedUrl.link}
               target="_blank"
               rel="noopener noreferrer"
@@ -102,10 +94,11 @@ export const CertificateDownload: FC<IProps> = ({
             </Button>
           </>
         )}
-        {loadAttendanceCertificateData && !loadAttendanceCertificateLoading && !hideAttendanceCertificateButton && (
+        {loadAttendanceCertificateData && !loadAttendanceCertificateLoading && (
           <Button
             as="a"
             filled
+            className={`flex justify-center items-center ${!manageView ? 'w-full' : ''}`}
             href={loadAttendanceCertificateData.getSignedUrl.link}
             target="_blank"
             rel="noopener noreferrer"

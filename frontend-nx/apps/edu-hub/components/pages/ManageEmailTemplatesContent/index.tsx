@@ -79,7 +79,7 @@ const ExpandableEmailTemplateRow: React.FC<{ row: EmailTemplateRow }> = ({ row }
       // Map of template variables to sample values (following the existing email template system)
       const sampleReplacements = {
         // User variables
-        '\\[User:Firstname\\]': 'John',
+        '\\[User:FirstName\\]': 'John',
         '\\[User:LastName\\]': 'Doe',
 
         // Course variables
@@ -254,10 +254,10 @@ const ManageEmailTemplatesContent: FC<ManageEmailTemplatesContentProps> = ({
       {
         header: t('columns.title'),
         accessorKey: 'type',
-        meta: { width: 2, className: 'whitespace-nowrap' },
+        meta: { width: 3, className: 'min-w-0' },
         cell: ({ row }) => (
-          <div className="flex items-center h-full py-3">
-            <div className="w-full px-3 text-base text-gray-900 font-medium">
+          <div className="flex items-center h-full py-3 min-w-0">
+            <div className="w-full min-w-0 px-3 text-base text-gray-900 font-medium truncate" title={getTranslation(t, `template_types.${row.original.type}`, row.original.type)}>
               {getTranslation(t, `template_types.${row.original.type}`, row.original.type)}
             </div>
           </div>
@@ -266,7 +266,7 @@ const ManageEmailTemplatesContent: FC<ManageEmailTemplatesContentProps> = ({
       {
         header: t('columns.subject'),
         accessorKey: 'subject',
-        meta: { width: 8, className: 'whitespace-nowrap' },
+        meta: { width: 7, className: 'min-w-0' },
         cell: ({ row }) => (
           <InputField
             variant="material"

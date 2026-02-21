@@ -24,6 +24,32 @@ import NotificationSnackbar from '../common/dialogs/NotificationSnackbar';
 import { LinkDialog } from '../common/dialogs/LinkDialog';
 import { gql } from 'graphql-tag';
 
+/**
+ * Determine template category based on template type.
+ * ORGANIZER_ADDED uses 'organizer' category (user + course placeholders only, no enrollment dates).
+ */
+export function getTemplateCategory(templateType?: string): string {
+  if (!templateType) return 'enrollment';
+
+  const sessionTemplates = ['SESSION_REMINDER'];
+  const enrollmentTemplates = [
+    'APPLICATION_RECEIVED',
+    'APPLICATION_CONFIRMED',
+    'INVITE',
+    'DECLINE',
+    'REGISTRATION_CONFIRMED',
+  ];
+  const generalTemplates = ['USER_CREATED'];
+  const organizerTemplates = ['ORGANIZER_ADDED'];
+
+  if (sessionTemplates.includes(templateType)) return 'session';
+  if (enrollmentTemplates.includes(templateType)) return 'enrollment';
+  if (generalTemplates.includes(templateType)) return 'general';
+  if (organizerTemplates.includes(templateType)) return 'organizer';
+
+  return 'enrollment';
+}
+
 // Configure DOMPurify to allow links while maintaining security
 const sanitizeWithLinks = (content: string): string => {
   return DOMPurify.sanitize(content, {
@@ -202,18 +228,18 @@ const EmailEditor: React.FC<EmailEditorProps> = ({
   // Define all available placeholders with their categories
   const ALL_PLACEHOLDERS = [
     // User variables (available in all contexts)
-    { text: '[User:Firstname]', label: 'User Firstname', categories: ['enrollment', 'session', 'general'] },
-    { text: '[User:LastName]', label: 'User Lastname', categories: ['enrollment', 'session', 'general'] },
+    { text: '[User:FirstName]', label: 'User Firstname', categories: ['enrollment', 'session', 'general', 'organizer'] },
+    { text: '[User:LastName]', label: 'User Lastname', categories: ['enrollment', 'session', 'general', 'organizer'] },
 
     // Course variables
-    { text: '[Enrollment:CourseId--Course:Name]', label: 'Course Name', categories: ['enrollment', 'session'] },
+    { text: '[Enrollment:CourseId--Course:Name]', label: 'Course Name', categories: ['enrollment', 'session', 'organizer'] },
     { text: '[Course:StartTime]', label: 'Course Start', categories: ['enrollment'] },
     { text: '[Course:EndTime]', label: 'Course End', categories: ['enrollment'] },
 
-    // Enrollment variables (only for enrollment emails)
+    // Enrollment variables (only for enrollment emails; organizer uses CourseLink for manage URL)
     { text: '[Enrollment:CreatedAt]', label: 'Application Date', categories: ['enrollment'] },
     { text: '[Enrollment:ExpirationDate]', label: 'Expiration Date', categories: ['enrollment'] },
-    { text: '[Enrollment:CourseLink]', label: 'Course Link', categories: ['enrollment', 'session'] },
+    { text: '[Enrollment:CourseLink]', label: 'Course Link', categories: ['enrollment', 'session', 'organizer'] },
 
     // Session variables (only for session reminder emails)
     { text: '[Session:Title]', label: 'Session Title', categories: ['session'] },
@@ -227,27 +253,6 @@ const EmailEditor: React.FC<EmailEditorProps> = ({
     { text: '[System:PortalUrl]', label: 'Portal URL', categories: ['general'] },
   ];
 
-  // Determine template category based on template type
-  const getTemplateCategory = (templateType?: string): string => {
-    if (!templateType) return 'enrollment'; // Default fallback
-
-    const sessionTemplates = ['SESSION_REMINDER'];
-    const enrollmentTemplates = [
-      'APPLICATION_RECEIVED',
-      'APPLICATION_CONFIRMED',
-      'INVITE',
-      'DECLINE',
-      'REGISTRATION_CONFIRMED',
-    ];
-    const generalTemplates = ['USER_CREATED'];
-
-    if (sessionTemplates.includes(templateType)) return 'session';
-    if (enrollmentTemplates.includes(templateType)) return 'enrollment';
-    if (generalTemplates.includes(templateType)) return 'general';
-
-    return 'enrollment'; // Default fallback
-  };
-
   // Filter placeholders based on template type
   const templateCategory = getTemplateCategory(templateType);
   const allPlaceholders = ALL_PLACEHOLDERS.filter((placeholder) => placeholder.categories.includes(templateCategory));
@@ -257,11 +262,13 @@ const EmailEditor: React.FC<EmailEditorProps> = ({
   }
 
   return (
-    <div className={`border border-gray-300 rounded-lg ${className}`}>
+    <div className={`border border-border-primary rounded-lg light ${className}`}>
       {/* Toolbar */}
-      <div className="flex flex-wrap items-center gap-2 p-3 bg-gray-50 border-b border-gray-300 rounded-t-lg">
+      <div className="flex flex-wrap items-center gap-2 p-3 bg-bg-secondary border-b border-border-primary rounded-t-lg text-label-primary">
         {/* View Toggle */}
-        <ToggleButtonGroup size="small" value={isHtmlMode ? 'html' : 'visual'} exclusive onChange={toggleHtmlMode}>
+        <ToggleButtonGroup size="small" value={isHtmlMode ? 'html' : 'visual'} exclusive onChange={toggleHtmlMode}
+          sx={{ '& .MuiToggleButton-root': { color: 'var(--eduhub-label-secondary)', '&.Mui-selected': { color: 'var(--eduhub-brand)' } } }}
+        >
           <ToggleButton value="visual" size="small">
             <Visibility fontSize="small" />
             Visual
@@ -284,6 +291,7 @@ const EmailEditor: React.FC<EmailEditorProps> = ({
                 onClick={() => (editor.chain().focus() as any)[button.command]().run()}
                 color={editor.isActive(button.command.replace('toggle', '').toLowerCase()) ? 'primary' : 'default'}
                 title={button.title}
+                sx={{ color: editor.isActive(button.command.replace('toggle', '').toLowerCase()) ? undefined : 'var(--eduhub-label-secondary)' }}
               >
                 {button.icon}
               </IconButton>
@@ -295,6 +303,7 @@ const EmailEditor: React.FC<EmailEditorProps> = ({
               onClick={setLink}
               color={editor.isActive('link') ? 'primary' : 'default'}
               title="Add/Edit Link"
+              sx={{ color: editor.isActive('link') ? undefined : 'var(--eduhub-label-secondary)' }}
             >
               <LinkIcon />
             </IconButton>
@@ -311,7 +320,7 @@ const EmailEditor: React.FC<EmailEditorProps> = ({
               size="small"
               variant="outlined"
               onClick={() => insertPlaceholder(placeholder.text)}
-              sx={{ fontSize: '0.7rem', padding: '2px 6px', minHeight: 'auto' }}
+              sx={{ fontSize: '0.7rem', padding: '2px 6px', minHeight: 'auto', color: 'var(--eduhub-label-secondary)', borderColor: 'var(--eduhub-border-primary)' }}
             >
               {placeholder.label}
             </Button>
@@ -334,7 +343,7 @@ const EmailEditor: React.FC<EmailEditorProps> = ({
         )}
 
         {/* Character count */}
-        <div className="absolute bottom-2 right-2 text-xs text-gray-400 bg-white px-2 py-1 rounded">
+        <div className="absolute bottom-2 right-2 text-xs text-label-secondary bg-fill-primary px-2 py-1 rounded">
           {editor.storage.characterCount.characters()}/{maxLength}
         </div>
       </div>

@@ -222,7 +222,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
         </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2">
-        <div>
+        <div className="min-h-0">
           <InputField
             variant="eduhub"
             type="input"
@@ -247,7 +247,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
             className="h-64"
           />
         </div>
-        <div>
+        <div className="min-h-0">
           <InputField
             variant="eduhub"
             type="input"

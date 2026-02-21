@@ -2,6 +2,13 @@ table:
   name: Country
   schema: public
 array_relationships:
+  - name: Organizations
+    using:
+      foreign_key_constraint_on:
+        column: country
+        table:
+          name: Organization
+          schema: public
   - name: Users
     using:
       foreign_key_constraint_on:

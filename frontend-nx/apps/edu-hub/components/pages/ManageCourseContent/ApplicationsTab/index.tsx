@@ -37,6 +37,7 @@ import { ColumnDef } from '@tanstack/react-table';
 import { GoDotFill } from 'react-icons/go';
 import { IoIosCheckmarkCircle, IoIosCloseCircle } from 'react-icons/io';
 import { MotivationRating_enum, CourseEnrollmentStatus_enum } from '../../../../__generated__/globalTypes';
+import { getPaymentStatusFromInvoices } from '../../../../utils/invoicePaymentStatus';
 import { useDisplayDate } from '../../../../helpers/dateTimeHelpers';
 import { BulkAction } from '../../../common/TableGrid/types';
 import { ApolloError } from '@apollo/client';
@@ -58,6 +59,7 @@ const isExpired = (enrollment: ManagedCourse_Course_by_pk_CourseEnrollments) => 
 
 export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
   const t = useTranslations('manageCourse');
+  const tCommon = useTranslations('common');
   const locale = useLocale();
   const displayDate = useDisplayDate();
   const isInstructor = useIsInstructor();
@@ -529,30 +531,29 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
             const rating = row.original.motivationRating;
             return (
               <div className="text-center">
-                {rating === 'UNRATED' && <Dot color="grey" />}
-                {rating === 'INVITE' && <Dot color="lightgreen" />}
-                {rating === 'REVIEW' && <Dot color="orange" />}
-                {rating === 'DECLINE' && <Dot color="red" />}
+                {rating === 'UNRATED' && <Dot color="grey" title={t('rating.not_rated')} />}
+                {rating === 'INVITE' && <Dot color="lightgreen" title={t('rating.invite')} />}
+                {rating === 'REVIEW' && <Dot color="orange" title={t('rating.unclear')} />}
+                {rating === 'DECLINE' && <Dot color="red" title={t('rating.reject')} />}
               </div>
             );
           },
         });
       }
 
-      // Payment status column - only for payment types
+      // Payment status column - only for payment types (derived from Invoice)
       if (features.hasPayment) {
         baseColumns.push({
           header: t('payment_status'),
-          accessorKey: 'paymentStatus',
+          accessorKey: 'Invoices',
           size: 120,
           enableSorting: true,
           cell: ({ row }) => {
-            const paymentStatus = row.original.paymentStatus;
-            const statusKey = paymentStatus || 'NONE';
+            const paymentStatus = getPaymentStatusFromInvoices(row.original.Invoices);
             return (
               <div className="text-center">
                 <span className="text-sm">
-                  {t(`payment_status_values.${statusKey}`)}
+                  {t(`payment_status_values.${paymentStatus}`)}
                 </span>
               </div>
             );
@@ -575,7 +576,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
           return (
             <div className="text-center">
               {!expired && enrollment.status === 'APPLIED' && (
-                <GoDotFill className="inline" title={t('status.applied')} color="grey" size="2.5em" />
+                <GoDotFill className="inline" title={t('status.applied')} color="grey" size="1.5em" />
               )}
               {!expired && enrollment.status === 'INVITED' && (
                 <IoIosCheckmarkCircle className="inline" title={t('status.invited')} color="grey" size="1.5em" />
@@ -685,7 +686,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
                         className="text-sm text-gray-900 whitespace-normal break-words pl-4"
                       >
                         {pastEnrollment.Course?.title} ({pastEnrollment.Course?.Program.shortTitle}{ectsInfo})
-                        {orgName ? ` - ${orgName}` : ''} - {t(pastEnrollment.status)}
+                        {orgName ? ` - ${orgName}` : ''} - {tCommon(pastEnrollment.status)}
                       </div>
                     );
                   })

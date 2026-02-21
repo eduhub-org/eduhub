@@ -11,7 +11,7 @@ The email template variable system is centralized in `emailTemplateVariables.js`
 ### User Variables
 *Available in: enrollment emails, session reminders*
 
-- **`[User:Firstname]`**: User's first name
+- **`[User:FirstName]`**: User's first name
   - Example: `John`
   
 - **`[User:LastName]`**: User's last name
@@ -95,7 +95,7 @@ The timezone is retrieved from the `AppSettings` table and mapped to appropriate
 <!DOCTYPE html>
 <html>
 <body>
-  <p>Hello [User:Firstname] [User:LastName],</p>
+  <p>Hello [User:FirstName] [User:LastName],</p>
   <p>Your application for <strong>[Enrollment:CourseId--Course:Name]</strong> has been received.</p>
   <p>Application submitted: [Enrollment:CreatedAt]</p>
   <p>Course starts: [Course:StartTime] and ends: [Course:EndTime]</p>
@@ -110,7 +110,7 @@ The timezone is retrieved from the `AppSettings` table and mapped to appropriate
 <!DOCTYPE html>
 <html>
 <body>
-  <p>Hello [User:Firstname] [User:LastName],</p>
+  <p>Hello [User:FirstName] [User:LastName],</p>
   <p>Your session <strong>[Session:Title]</strong> for course <strong>[Enrollment:CourseId--Course:Name]</strong> [Session:ReminderText].</p>
   <p>Session starts: [Session:StartDateTime]</p>
   <p>Duration: [Session:Duration]</p>
@@ -125,7 +125,7 @@ The timezone is retrieved from the `AppSettings` table and mapped to appropriate
 <!DOCTYPE html>
 <html>
 <body>
-  <p>Hello [User:Firstname] [User:LastName],</p>
+  <p>Hello [User:FirstName] [User:LastName],</p>
   <p>Your account has been created for the EduHub platform.</p>
   <p>To set your password, please click on the following link:</p>
   <p><a href="[System:PasswordResetLink]">Set Password</a></p>
@@ -141,7 +141,7 @@ The system includes template validation to ensure only known variables are used:
 ```javascript
 import { validateTemplate } from './emailTemplateVariables.js';
 
-const template = 'Hello [User:Firstname], welcome to [Unknown:Variable]!';
+const template = 'Hello [User:FirstName], welcome to [Unknown:Variable]!';
 const validation = validateTemplate(template);
 
 console.log(validation);
@@ -282,7 +282,7 @@ If you have existing email functions using manual variable replacement:
    // Old way
    const replaceVariables = (text) => {
      return text
-       .replaceAll('[User:Firstname]', user.firstName)
+       .replaceAll('[User:FirstName]', user.firstName)
        .replaceAll('[User:LastName]', user.lastName);
    };
 
