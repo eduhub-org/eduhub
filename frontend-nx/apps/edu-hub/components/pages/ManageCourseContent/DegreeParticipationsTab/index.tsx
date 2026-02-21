@@ -14,6 +14,7 @@ import { CREATE_CERTIFICATES } from '../../../../queries/actions';
 import { REMOVE_ACHIEVEMENT_CERTIFICATES } from '../../../../queries/courseEnrollment';
 import { BulkAction } from '../../../common/TableGrid/types';
 import NotificationSnackbar from '../../../common/dialogs/NotificationSnackbar';
+import { ErrorMessageDialog } from '../../../common/dialogs/ErrorMessageDialog';
 
 interface DegreeParticipationsTabIProps {
   course: ManagedCourse_Course_by_pk;
@@ -34,6 +35,7 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
   const [pageSize, setPageSize] = useState(20);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [bulkActionError, setBulkActionError] = useState<string | null>(null);
 
   const handlePageSizeChange = (newPageSize: number) => {
     setPageSize(newPageSize);
@@ -220,39 +222,38 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
           setPageIndex(pageIndex); // This triggers a refetch via useTableGrid
         } catch (err) {
           console.error('Certificate generation error:', err);
-          setSnackbarMessage(err.message || t('errors.certificate_generation_failed'));
-          setSnackbarOpen(true);
+          setBulkActionError(err instanceof Error ? err.message : t('errors.certificate_generation_failed'));
         }
       } else if (action === 'delete-achievement-certificates') {
         try {
           const enrollmentIds = selectedRows.map((row) => row.id);
+          const actuallyDeleted = selectedRows.filter(
+            (row) => !!row.achievementCertificateURL
+          ).length;
 
-          const response = await removeAchievementCertificates({
+          await removeAchievementCertificates({
             variables: {
               enrollmentIds,
             },
           });
 
-          const affectedRows = response.data?.update_CourseEnrollment?.affected_rows || 0;
-
           let successTranslationKey: string;
-          if (affectedRows <= 1) {
-            successTranslationKey = affectedRows === 0
+          if (actuallyDeleted <= 1) {
+            successTranslationKey = actuallyDeleted === 0
               ? 'manageCourse:no_certificates_deleted'
               : 'manageCourse:certificate_deleted_singular';
           } else {
             successTranslationKey = 'manageCourse:certificates_deleted_plural';
           }
 
-          setSnackbarMessage(t(successTranslationKey, { count: affectedRows }));
+          setSnackbarMessage(t(successTranslationKey, { count: actuallyDeleted }));
           setSnackbarOpen(true);
 
           // Refetch data to update the table
           setPageIndex(pageIndex); // This triggers a refetch via useTableGrid
         } catch (err) {
           console.error('Certificate deletion error:', err);
-          setSnackbarMessage(err.message || t('common.error_handling.certificate_deletion_failed'));
-          setSnackbarOpen(true);
+          setBulkActionError(err instanceof Error ? err.message : t('common.error_handling.certificate_deletion_failed'));
         }
       }
     },
@@ -342,6 +343,13 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
         onClose={() => setSnackbarOpen(false)}
         message={snackbarMessage}
       />
+      {bulkActionError && (
+        <ErrorMessageDialog
+          errorMessage={bulkActionError}
+          open={!!bulkActionError}
+          onClose={() => setBulkActionError(null)}
+        />
+      )}
     </>
   );
 };
