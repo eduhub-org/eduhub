@@ -66,6 +66,7 @@ select_permissions:
         - location
         - termsAcceptedAt
       filter: {}
+      allow_aggregations: true
   - role: user_access
     permission:
       columns:
