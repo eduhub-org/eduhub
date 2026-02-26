@@ -3,7 +3,10 @@ import Image from 'next/image';
 import { MdUpload, MdDownload, MdCloudUpload, MdDelete } from 'react-icons/md';
 import { CircularProgress, IconButton, Tooltip, LinearProgress } from '@mui/material';
 import { useAdminMutation } from '../../../hooks/authedMutation';
+import { useLazyRoleQuery } from '../../../hooks/authedQuery';
 import { getPublicImageUrl, parseFileUploadEvent, getPublicUrl, UploadFile } from '../../../helpers/filehandling';
+import { GET_SIGNED_URL } from '../../../queries/actions';
+import { GetSignedUrl, GetSignedUrlVariables } from '../../../queries/__generated__/GetSignedUrl';
 import {
   detectFileType,
   getFilename,
@@ -46,9 +49,21 @@ export const FileUploadField: FC<FileUploadFieldProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dragCounterRef = useRef(0);
 
+  const [getFileSignedUrl, { data: signedUrlData }] =
+    useLazyRoleQuery<GetSignedUrl, GetSignedUrlVariables>(GET_SIGNED_URL);
+
   // Always auto-detect file type from URL
   // This ensures the component always shows the correct icon/preview for the actual file
   const detectedType = useMemo(() => detectFileType(currentFileUrl), [currentFileUrl]);
+
+  // Fetch signed URL for private files (e.g. certificate templates) when displaying image preview
+  const isPrivateFile = currentFileUrl && !getPublicUrl(currentFileUrl);
+  const needsSignedUrlForDisplay = detectedType === 'image' && !!isPrivateFile;
+  useEffect(() => {
+    if (needsSignedUrlForDisplay && currentFileUrl) {
+      getFileSignedUrl({ variables: { path: currentFileUrl } });
+    }
+  }, [currentFileUrl, needsSignedUrlForDisplay, getFileSignedUrl]);
 
   // Get file icon info for non-image files
   const fileIconInfo = useMemo(() => {
@@ -57,7 +72,7 @@ export const FileUploadField: FC<FileUploadFieldProps> = ({
   }, [detectedType]);
 
   // Get display URL for images
-  // For certificate templates, try accessUrl first, then try constructing URL from filePath
+  // For certificate templates (private GCS files), use signed URL from useLazyRoleQuery
   const displayUrl = useMemo(() => {
     // Only try to get image URL if the file is actually an image
     if (detectedType === 'image' && currentFileUrl) {
@@ -65,29 +80,26 @@ export const FileUploadField: FC<FileUploadFieldProps> = ({
       if (accessUrl) {
         return accessUrl;
       }
-      
+
       // Try resized public image URL
       const resizedUrl = getPublicImageUrl(currentFileUrl, 460);
       if (resizedUrl) {
         return resizedUrl;
       }
-      
+
       // Try direct public URL
       const publicUrl = getPublicUrl(currentFileUrl);
       if (publicUrl) {
         return publicUrl;
       }
-      
-      // For certificate templates or other private files, try constructing URL from storage bucket
-      // This handles cases where files are stored but not in /public/ directory
-      const serverAddress = process.env.NEXT_PUBLIC_STORAGE_BUCKET_URL;
-      if (serverAddress && currentFileUrl && !currentFileUrl.startsWith('http')) {
-        // Try constructing URL - certificate templates might be accessible this way
-        return `${serverAddress}/${currentFileUrl}`;
+
+      // For private files (e.g. certificate templates), use authenticated signed URL
+      if (signedUrlData?.getSignedUrl?.link) {
+        return signedUrlData.getSignedUrl.link;
       }
     }
     return null;
-  }, [currentFileUrl, detectedType, accessUrl]);
+  }, [currentFileUrl, detectedType, accessUrl, signedUrlData]);
 
   // Mutations
   const [upload] = useAdminMutation(uploadMutation, {
@@ -325,29 +337,36 @@ export const FileUploadField: FC<FileUploadFieldProps> = ({
     [processFileUpload, acceptedFileTypes, onUploadError, t]
   );
 
-  const handleDownloadClick = useCallback(() => {
-    if (currentFileUrl) {
-      // Try accessUrl first (for certificate templates)
-      if (accessUrl) {
-        window.open(accessUrl, '_blank');
-        return;
+  const handleDownloadClick = useCallback(async () => {
+    if (!currentFileUrl) return;
+
+    // Try accessUrl first (for recently uploaded certificate templates)
+    if (accessUrl) {
+      window.open(accessUrl, '_blank');
+      return;
+    }
+
+    // Try public URL
+    const downloadUrl = getPublicUrl(currentFileUrl);
+    if (downloadUrl) {
+      window.open(downloadUrl, '_blank');
+      return;
+    }
+
+    // For private files (e.g. certificate templates), fetch authenticated signed URL
+    try {
+      const result = await getFileSignedUrl({ variables: { path: currentFileUrl } });
+      const signedUrl = result.data?.getSignedUrl?.link;
+      if (signedUrl) {
+        window.open(signedUrl, '_blank');
       }
-      
-      // Try public URL
-      const downloadUrl = getPublicUrl(currentFileUrl);
-      if (downloadUrl) {
-        window.open(downloadUrl, '_blank');
-        return;
-      }
-      
-      // For certificate templates or other private files, try constructing URL from storage bucket
-      const serverAddress = process.env.NEXT_PUBLIC_STORAGE_BUCKET_URL;
-      if (serverAddress && currentFileUrl && !currentFileUrl.startsWith('http')) {
-        const constructedUrl = `${serverAddress}/${currentFileUrl}`;
-        window.open(constructedUrl, '_blank');
+    } catch (error) {
+      console.error('Failed to get signed URL for download:', error);
+      if (onUploadError) {
+        onUploadError(t('file_upload.upload_error'));
       }
     }
-  }, [currentFileUrl, accessUrl]);
+  }, [currentFileUrl, accessUrl, getFileSignedUrl, onUploadError, t]);
 
   const handleRemoveClick = useCallback(async () => {
     if (!currentFileUrl) return;
