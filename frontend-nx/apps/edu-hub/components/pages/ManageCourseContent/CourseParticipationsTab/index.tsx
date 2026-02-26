@@ -84,6 +84,41 @@ function flattenAchievementRecords(
   return achievementOptionCourses.flatMap((opt) => opt.AchievementOption.AchievementRecords);
 }
 
+type AttendanceOverallStatus = 'passed' | 'failed' | 'uncertain';
+
+function getAttendanceStatus(
+  enrollment: ExtendedEnrollment,
+  sessions: CourseParticipations_Course_by_pk_Sessions[],
+  maxMissedSessions: number
+): AttendanceOverallStatus {
+  const attendanceBySession = enrollment.User.Attendances.reduce<
+    Record<number, { id: number; status: AttendanceStatus_enum }>
+  >((prev, curr) => {
+    if (!prev[curr.Session.id] || prev[curr.Session.id].id < curr.id) {
+      prev[curr.Session.id] = { id: curr.id, status: curr.status };
+    }
+    return prev;
+  }, {});
+
+  let missed = 0;
+  let unchecked = 0;
+  for (const session of sessions) {
+    const att = attendanceBySession[session.id];
+    if (!att) {
+      unchecked += 1;
+    } else if (att.status === AttendanceStatus_enum.MISSED) {
+      missed += 1;
+    } else if (att.status === AttendanceStatus_enum.NO_INFO) {
+      unchecked += 1;
+    }
+    // ATTENDED: no change to missed or unchecked
+  }
+
+  if (missed > maxMissedSessions) return 'failed';
+  if (missed + unchecked <= maxMissedSessions) return 'passed';
+  return 'uncertain';
+}
+
 export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ course, qResult }) => {
   const t = useTranslations('manageCourse');
   const tCoursePage = useTranslations('coursePage');
@@ -169,7 +204,11 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
     async (action: string, selectedRows: ExtendedEnrollment[]) => {
       try {
         if (action === 'generate_attendance_certificates') {
-          const userIds = selectedRows.map((r) => r.userId);
+          const qualifyingRows = selectedRows.filter(
+            (r) => getAttendanceStatus(r, sessions, maxMissedSessions) === 'passed'
+          );
+          const skippedCount = selectedRows.length - qualifyingRows.length;
+          const userIds = qualifyingRows.map((r) => r.userId);
           const response = await createCertificates({
             variables: {
               courseId: course.id,
@@ -188,9 +227,21 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
                 ? 'no-certificate-generated'
                 : '1-certificate-generated'
               : 'certificates-generated';
-          setSnackbarMessage(tCoursePage(key, { number: count }));
+          let message = tCoursePage(key, { number: count });
+          if (skippedCount > 0) {
+            const skipKey =
+              skippedCount === 1 ? 'certificates_skipped_singular' : 'certificates_skipped_plural';
+            message += ` ${t(skipKey, { count: skippedCount })}`;
+          }
+          setSnackbarMessage(message);
         } else if (action === 'generate_achievement_certificates') {
-          const userIds = selectedRows.map((r) => r.userId);
+          const qualifyingRows = selectedRows.filter(
+            (r) =>
+              getAttendanceStatus(r, sessions, maxMissedSessions) === 'passed' &&
+              r.mostRecentRecord?.rating === AchievementRecordRating_enum.PASSED
+          );
+          const skippedCount = selectedRows.length - qualifyingRows.length;
+          const userIds = qualifyingRows.map((r) => r.userId);
           const response = await createCertificates({
             variables: {
               courseId: course.id,
@@ -209,7 +260,13 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
                 ? 'no-certificate-generated'
                 : '1-certificate-generated'
               : 'certificates-generated';
-          setSnackbarMessage(tCoursePage(key, { number: count }));
+          let message = tCoursePage(key, { number: count });
+          if (skippedCount > 0) {
+            const skipKey =
+              skippedCount === 1 ? 'certificates_skipped_singular' : 'certificates_skipped_plural';
+            message += ` ${t(skipKey, { count: skippedCount })}`;
+          }
+          setSnackbarMessage(message);
         } else if (action === 'delete_attendance_certificates') {
           const enrollmentIds = selectedRows.map((r) => r.id);
           const actuallyDeleted = selectedRows.filter(
@@ -269,6 +326,8 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
       tCoursePage,
       refetch,
       qResult,
+      sessions,
+      maxMissedSessions,
     ]
   );
 
@@ -339,7 +398,15 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
       const missed = dotsData.filter((d) => d.color === 'red').length;
       const attended = dotsData.filter((d) => d.color === 'lightgreen').length;
       const total = attended + missed;
-      const passed: DotColor = missed > maxMissedSessions ? 'red' : 'lightgreen';
+      const status = getAttendanceStatus(enrollment, sessions, maxMissedSessions);
+      const statusDotColor: DotColor =
+        status === 'passed' ? 'lightgreen' : status === 'failed' ? 'red' : 'grey';
+      const statusTooltip =
+        status === 'passed'
+          ? t('attendance_status_passed')
+          : status === 'failed'
+            ? t('attendance_status_failed')
+            : t('attendance_status_uncertain');
 
       return (
         <div className="flex flex-row items-center gap-4">
@@ -356,15 +423,9 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
           </div>
           <div className="flex flex-row items-center gap-1 flex-shrink-0">
             <span className="text-label-primary text-sm whitespace-nowrap">{`${attended}/${total}`}</span>
-            <Tooltip
-              title={
-                passed === 'lightgreen'
-                  ? t('attendance_status_passed')
-                  : t('attendance_status_failed')
-              }
-            >
+            <Tooltip title={statusTooltip}>
               <span className="inline-flex">
-                <Dot color={passed} />
+                <Dot color={statusDotColor} />
               </span>
             </Tooltip>
           </div>
@@ -596,6 +657,7 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
           open={snackbarOpen}
           onClose={() => setSnackbarOpen(false)}
           message={snackbarMessage}
+          duration={null}
         />
         {bulkActionError && (
           <ErrorMessageDialog
@@ -636,6 +698,7 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
         open={snackbarOpen}
         onClose={() => setSnackbarOpen(false)}
         message={snackbarMessage}
+        duration={null}
       />
       {bulkActionError && (
         <ErrorMessageDialog

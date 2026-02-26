@@ -1,8 +1,21 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 import { SortingState } from '@tanstack/react-table';
 import { BaseRow, BulkAction, UseTableGridProps } from './types';
 import { mergeSortDirection } from './utils';
+
+const DEFAULT_SORT: Record<string, any>[] = [{ updated_at: 'desc' }];
+
+/**
+ * Returns a referentially stable version of a JSON-serializable value.
+ * The returned reference only changes when the serialized form changes,
+ * preventing infinite re-render loops from inline object/array literals.
+ */
+function useStableValue<T>(value: T): T {
+  const serialized = JSON.stringify(value);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  return useMemo(() => JSON.parse(serialized) as T, [serialized]);
+}
 
 /**
  * Converts TanStack Table SortingState to Hasura order_by format
@@ -25,19 +38,16 @@ function convertSortingToOrderBy(
       const columnId = sort.id;
       const mappedField = sortColumnMapper ? sortColumnMapper(columnId) : columnId;
       
-      // Skip if mapper returns null (unsupported column for server-side sorting)
       if (!mappedField) {
         return null;
       }
 
-      // Handle string (simple field name)
       if (typeof mappedField === 'string') {
         return {
           [mappedField]: direction(sort.desc),
         };
       }
 
-      // Handle object (nested structure)
       if (typeof mappedField === 'object' && mappedField !== null) {
         return mergeSortDirection(mappedField, direction(sort.desc));
       }
@@ -46,7 +56,6 @@ function convertSortingToOrderBy(
     })
     .filter((orderBy): orderBy is Record<string, any> => orderBy !== null);
 
-  // Always return an array (empty if no valid sort orders) to clear server-side sort state
   return orderBy;
 }
 
@@ -55,29 +64,45 @@ export function useTableGrid<V>({
   query,
   queryVariables = {} as V,
   pageSize: initialPageSize = 15,
-  debounceMs = 300, // Default to 300ms
+  debounceMs = 300,
   refetchFilter,
   sortColumnMapper,
-  defaultSort = [{ updated_at: 'desc' }], // Default to updated_at desc if not specified
+  defaultSort = DEFAULT_SORT,
 }: UseTableGridProps<V>) {
   const [searchFilter, setSearchFilter] = useState('');
   const [pageIndex, setPageIndex] = useState(0);
   const [pageSize, setPageSize] = useState(initialPageSize);
   const [sorting, setSorting] = useState<SortingState>([]);
 
-  // Convert sorting state to Hasura order_by format
-  // Use defaultSort when no user sorting is applied
+  // Sync internal pageSize when the caller's prop changes (many callers manage
+  // pageSize as external state and pass it in; without this, only the initial
+  // value would be used).
+  useEffect(() => {
+    setPageSize(initialPageSize);
+  }, [initialPageSize]);
+
+  // Stabilize object/array props that callers typically pass as inline literals.
+  // Without this, a new object identity each render would retrigger the effect.
+  const stableQueryVariables = useStableValue(queryVariables);
+  const stableDefaultSort = useStableValue(defaultSort);
+
+  // Keep function props in refs so their identity changes don't trigger effects.
+  // The latest function is always available via .current when the effect fires.
+  const refetchFilterRef = useRef(refetchFilter);
+  refetchFilterRef.current = refetchFilter;
+  const sortColumnMapperRef = useRef(sortColumnMapper);
+  sortColumnMapperRef.current = sortColumnMapper;
+
   const orderBy = useMemo(() => {
-    const userSort = convertSortingToOrderBy(sorting, sortColumnMapper);
-    // If user has applied sorting, use it; otherwise use defaultSort
-    return userSort.length > 0 ? userSort : (defaultSort || []);
-  }, [sorting, sortColumnMapper, defaultSort]);
+    const userSort = convertSortingToOrderBy(sorting, sortColumnMapperRef.current);
+    return userSort.length > 0 ? userSort : (stableDefaultSort || []);
+  }, [sorting, stableDefaultSort]);
 
   const queryResult = queryHook(query, {
     variables: {
       offset: pageIndex * pageSize,
       limit: pageSize,
-      ...queryVariables,
+      ...stableQueryVariables,
       order_by: orderBy,
     },
   });
@@ -87,15 +112,16 @@ export function useTableGrid<V>({
   const debouncedRefetch = useDebouncedCallback(refetch, debounceMs);
 
   useEffect(() => {
-    const refetchVariables = refetchFilter ? refetchFilter(searchFilter) : {};
+    const currentFilter = refetchFilterRef.current;
+    const refetchVariables = currentFilter ? currentFilter(searchFilter) : {};
     debouncedRefetch({
       offset: pageIndex * pageSize,
       limit: pageSize,
-      ...queryVariables,
-      ...refetchVariables, // Merge refetchFilter result into queryVariables
+      ...stableQueryVariables,
+      ...refetchVariables,
       order_by: orderBy,
     });
-  }, [pageIndex, debouncedRefetch, searchFilter, queryVariables, pageSize, refetchFilter, orderBy]);
+  }, [pageIndex, debouncedRefetch, searchFilter, stableQueryVariables, pageSize, orderBy]);
 
   const handleSetSearchFilter = useCallback((value: string) => {
     setSearchFilter(value);
@@ -108,7 +134,7 @@ export function useTableGrid<V>({
 
   const handleSetSorting = useCallback((updater: SortingState | ((prev: SortingState) => SortingState)) => {
     setSorting(updater);
-    setPageIndex(0); // Reset to first page when sorting changes
+    setPageIndex(0);
   }, []);
 
   return {
