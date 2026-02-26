@@ -2,6 +2,13 @@ import { FC } from 'react';
 import { GoDotFill } from 'react-icons/go';
 export type DotColor = 'grey' | 'lightgreen' | 'orange' | 'red';
 
+const DOT_COLOR_MAP: Record<DotColor, string> = {
+  lightgreen: 'var(--eduhub-success)',
+  red: 'var(--eduhub-error)',
+  orange: 'var(--eduhub-warning)',
+  grey: 'var(--eduhub-label-disabled)',
+};
+
 interface DotProps {
   color?: DotColor;
   size?: 'DEFAULT' | 'LARGE';
@@ -12,12 +19,13 @@ interface DotProps {
 
 export const Dot: FC<DotProps> = ({ color, size = 'DEFAULT', className, onClick, title }) => {
   const sz = size === 'LARGE' ? '2.5em' : '1.5em';
+  const cssColor = color ? DOT_COLOR_MAP[color] : undefined;
   return (
     <GoDotFill
       onClick={onClick}
       size={sz}
       className={`${className || ''} inline-block`}
-      style={{ color: color }}
+      style={cssColor ? { color: cssColor } : undefined}
       title={title}
     />
   );
