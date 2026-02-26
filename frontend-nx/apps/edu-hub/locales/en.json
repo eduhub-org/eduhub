@@ -1177,6 +1177,11 @@
         "legacy_address": "Legacy Address (read-only)",
         "select_location_option_first": "Please select a location option first",
         "location_mismatch_error": "The selected address does not match the location option for this session. Please select an address that belongs to the correct location."
+      },
+      "session_description": {
+        "label": "Description",
+        "help_text": "Describe the content of the session here.",
+        "placeholder": "Describe the session content, e.g. schedule, topics or notes for participants..."
       }
     },
     "location": {
