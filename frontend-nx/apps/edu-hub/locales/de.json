@@ -1161,6 +1161,11 @@
         "legacy_address": "Legacy-Adresse (schreibgeschützt)",
         "select_location_option_first": "Bitte wähle zuerst eine Standortoption aus",
         "location_mismatch_error": "Die ausgewählte Adresse passt nicht zur Standortoption dieser Session. Bitte wähle eine Adresse aus, die zum richtigen Standort gehört."
+      },
+      "session_description": {
+        "label": "Beschreibung",
+        "help_text": "Beschreibe hier den Inhalt des Termins.",
+        "placeholder": "Beschreibe den Inhalt der Session, z.B. Ablauf, Themen oder Hinweise für Teilnehmende..."
       }
     },
     "location": {

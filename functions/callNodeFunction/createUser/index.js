@@ -3,6 +3,7 @@ import { GraphQLClient, gql } from 'graphql-request';
 import { queueEmail } from '../lib/queueEmail.js';
 import { createVariableReplacer } from '../emailTemplateVariables.js';
 import { logger } from '../index.js';
+import { computeMatrixHandle } from '../lib/matrixHandle.js';
 
 /**
  * Creates a new user in both Keycloak and Hasura
@@ -103,11 +104,17 @@ export default async function createUser(req, logger) {
       lastName: lastName,
       enabled: true,
       emailVerified: false,
-      // Don't set password - user will set it via password reset link
     });
 
     keycloakUserId = keycloakUser.id;
     logger.info(`Created Keycloak user: ${keycloakUserId}`);
+
+    const matrixHandle = computeMatrixHandle(firstName, lastName, keycloakUserId);
+    await kcAdminClient.users.update(
+      { id: keycloakUserId },
+      { attributes: { matrix_user_handle: [matrixHandle] } }
+    );
+    logger.info(`Set matrix_user_handle=${matrixHandle} for user ${keycloakUserId}`);
 
     // Construct password reset link
     const keycloakBaseUrl = process.env.KEYCLOAK_URL.replace('/auth', '');
@@ -115,17 +122,19 @@ export default async function createUser(req, logger) {
 
     // Create user in Hasura database
     const INSERT_USER = gql`
-      mutation InsertUser($id: uuid!, $firstName: String!, $lastName: String!, $email: String!) {
+      mutation InsertUser($id: uuid!, $firstName: String!, $lastName: String!, $email: String!, $matrixUserHandle: String) {
         insert_User_one(object: {
           id: $id
           firstName: $firstName
           lastName: $lastName
           email: $email
+          matrixUserHandle: $matrixUserHandle
         }) {
           id
           firstName
           lastName
           email
+          matrixUserHandle
         }
       }
     `;
@@ -134,7 +143,8 @@ export default async function createUser(req, logger) {
       id: keycloakUserId,
       firstName: firstName,
       lastName: lastName,
-      email: email
+      email: email,
+      matrixUserHandle: matrixHandle
     });
 
     hasuraUserId = hasuraUserResult.insert_User_one.id;

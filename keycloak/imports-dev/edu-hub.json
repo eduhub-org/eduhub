@@ -1979,6 +1979,20 @@
             "claim.name": "updated_at",
             "jsonType.label": "String"
           }
+        },
+        {
+          "name": "matrix_user_handle",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "userinfo.token.claim": "true",
+            "user.attribute": "matrix_user_handle",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "matrix_user_handle",
+            "jsonType.label": "String"
+          }
         }
       ]
     }
@@ -2013,7 +2027,8 @@
   "emailTheme": "edu-hub",
   "eventsEnabled": false,
   "eventsListeners": [
-    "jboss-logging"
+    "jboss-logging",
+    "matrix-handle-listener"
   ],
   "enabledEventTypes": [],
   "adminEventsEnabled": false,
