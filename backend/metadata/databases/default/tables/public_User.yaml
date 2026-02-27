@@ -80,6 +80,7 @@ select_permissions:
         - id
         - lastName
         - matriculationNumber
+        - matrixUserHandle
         - newsletterRegistration
         - occupation
         - picture
@@ -113,6 +114,7 @@ select_permissions:
         - id
         - lastName
         - matriculationNumber
+        - matrixUserHandle
         - newsletterRegistration
         - occupation
         - picture
@@ -133,6 +135,7 @@ select_permissions:
         - id
         - lastName
         - matriculationNumber
+        - matrixUserHandle
         - newsletterRegistration
         - occupation
         - organizationId
@@ -174,6 +177,7 @@ event_triggers:
         columns:
           - firstName
           - lastName
+          - picture
     retry_conf:
       interval_sec: 10
       num_retries: 5

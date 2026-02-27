@@ -1,5 +1,6 @@
 import { logger } from "../index.js";
 import axios from "axios";
+import { computeMatrixHandle } from "../lib/matrixHandle.js";
 
 const getKeycloakToken = async () => {
   try {
@@ -57,21 +58,26 @@ const updateKeycloakUser = async (userId, updatedFields, token) => {
 };
 
 /**
- * Updates user information in Keycloak when user data changes in the database.
- *
- * @param {Object} req Request object containing:
- *   - body.event.data.old (Object): Previous user data
- *   - body.event.data.new (Object): Updated user data containing:
- *     - id (string): User ID
- *     - firstName (string, optional): User's first name
- *     - lastName (string, optional): User's last name
- *     - email (string, optional): User's email
- * @returns {Object} Response containing:
- *   - success (boolean): Whether the operation was successful
- *   - messageKey (string): Translation key for messages
- *   - error (string, optional): Error message if operation failed
- *   - userId (string, optional): ID of the updated user
+ * Resolves a picture path from the DB to a full public URL.
+ * Legacy full URLs (http/https) are returned as-is.
+ * Relative paths containing "/public/" are prefixed with STORAGE_BUCKET_PUBLIC_URL.
  */
+const resolvePictureUrl = (picturePath) => {
+  if (!picturePath) return null;
+  if (picturePath.startsWith('http://') || picturePath.startsWith('https://')) {
+    return picturePath;
+  }
+  if (picturePath.startsWith('public/') || picturePath.includes('/public/')) {
+    const bucketUrl = process.env.STORAGE_BUCKET_PUBLIC_URL;
+    if (!bucketUrl) {
+      logger.warn('STORAGE_BUCKET_PUBLIC_URL not set, cannot resolve picture URL');
+      return null;
+    }
+    return `${bucketUrl}/${picturePath}`;
+  }
+  return null;
+};
+
 const updateKeycloakUserHandler = async (req) => {
   logger.info("########## Update Keycloak User ##########");
   logger.debug("Request parameters", { 
@@ -96,7 +102,21 @@ const updateKeycloakUserHandler = async (req) => {
     if (oldData.lastName !== newData.lastName) updatedFields.lastName = newData.lastName;
     if (oldData.email !== newData.email) updatedFields.email = newData.email;
 
-    if (Object.keys(updatedFields).length === 0) {
+    const newAttributes = {};
+    if (oldData.picture !== newData.picture) {
+      const pictureUrl = resolvePictureUrl(newData.picture);
+      if (pictureUrl) {
+        newAttributes.picture = [pictureUrl];
+      } else {
+        // Explicitly set empty array so Keycloak receives the removal when picture is cleared
+        newAttributes.picture = [];
+      }
+    }
+
+    const nameChanged = updatedFields.firstName || updatedFields.lastName;
+    const hasNewAttributes = Object.keys(newAttributes).length > 0;
+
+    if (Object.keys(updatedFields).length === 0 && !hasNewAttributes) {
       logger.debug(`No relevant fields updated for userId: ${userId}`);
       return {
         success: true,
@@ -106,9 +126,53 @@ const updateKeycloakUserHandler = async (req) => {
     }
 
     const keycloakToken = await getKeycloakToken();
+
+    // Fetch current user to merge attributes (KC PUT replaces attributes entirely)
+    const intendedAttributeUpdates = hasNewAttributes || nameChanged;
+    if (intendedAttributeUpdates) {
+      try {
+        const userResponse = await axios.get(
+          `${process.env.KEYCLOAK_URL}/admin/realms/edu-hub/users/${userId}`,
+          { headers: { Authorization: `Bearer ${keycloakToken}` } }
+        );
+        const existingAttrs = userResponse.data.attributes || {};
+
+        if (nameChanged && !existingAttrs.matrix_user_handle?.[0]) {
+          const handle = computeMatrixHandle(
+            newData.firstName,
+            newData.lastName,
+            userId
+          );
+          newAttributes.matrix_user_handle = [handle];
+          logger.debug(`Will set matrix_user_handle for user ${userId}`);
+        }
+
+        if (Object.keys(newAttributes).length > 0) {
+          updatedFields.attributes = { ...existingAttrs, ...newAttributes };
+        }
+      } catch (err) {
+        logger.error(`Could not fetch user ${userId} from Keycloak: ${err.message}`);
+        const failedUpdates = [];
+        if (hasNewAttributes) failedUpdates.push('picture');
+        if (nameChanged) failedUpdates.push('matrix_user_handle');
+
+        if (Object.keys(updatedFields).length === 0) {
+          throw new Error(
+            `Cannot update Keycloak attributes (${failedUpdates.join(', ')}): ` +
+            `failed to fetch existing user data: ${err.message}`
+          );
+        }
+
+        logger.warn(
+          `Proceeding with partial update for user ${userId}: ` +
+          `attribute updates skipped (${failedUpdates.join(', ')})`
+        );
+      }
+    }
+
+    const attributeUpdateSkipped = intendedAttributeUpdates && !updatedFields.attributes;
     const updateResult = await updateKeycloakUser(userId, updatedFields, keycloakToken);
 
-    // Prüfen, ob der Benutzer nicht gefunden wurde
     if (updateResult && updateResult.notFound) {
       logger.warn(`User ${userId} not found in Keycloak, skipping update`);
       return {
@@ -116,6 +180,16 @@ const updateKeycloakUserHandler = async (req) => {
         messageKey: "USER_NOT_FOUND_IN_KEYCLOAK",
         userId,
         details: "User not found in Keycloak, may have been deleted or never existed"
+      };
+    }
+
+    if (attributeUpdateSkipped) {
+      logger.warn(`Keycloak update partially completed for userId: ${userId} (attribute updates skipped)`);
+      return {
+        success: true,
+        messageKey: "UPDATE_PARTIAL",
+        userId,
+        details: "Basic fields updated but Keycloak attribute sync failed (picture/matrix_user_handle)"
       };
     }
 

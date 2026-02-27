@@ -58,6 +58,7 @@ services:
       FORMBRICKS_API_URL: ${FORMBRICKS_API_URL:-https://app.formbricks.com}
       STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
       FRONTEND_URL: http://localhost:5000
+      STORAGE_BUCKET_PUBLIC_URL: ${GITPOD_WORKSPACE_URL:-http://localhost}:4001/emulated-bucket
 
   python_functions:
     container_name: eduhub-python-functions
