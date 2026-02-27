@@ -241,9 +241,19 @@ def handle_moochub_data(page=1, per_page=25):
                         break
 
             # Build start/end date arrays from all sessions (irregular series per MOOCHub schema)
+            # Deduplicate by (start, end) pair - schema requires uniqueItems for startDate/endDate
             sessions = course.get("Sessions", [])
-            start_dates = [s["startDateTime"] for s in sessions] if sessions else None
-            end_dates = [s["endDateTime"] for s in sessions] if sessions else None
+            seen_pairs = set()
+            start_dates = []
+            end_dates = []
+            for s in sessions:
+                pair = (s["startDateTime"], s["endDateTime"])
+                if pair not in seen_pairs:
+                    seen_pairs.add(pair)
+                    start_dates.append(s["startDateTime"])
+                    end_dates.append(s["endDateTime"])
+            start_dates = start_dates if start_dates else None
+            end_dates = end_dates if end_dates else None
 
             # Format application dates for MOOCHub (date-only fields need time suffix)
             application_start = course.get("Program", {}).get("applicationStart")
