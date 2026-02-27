@@ -107,6 +107,9 @@ const updateKeycloakUserHandler = async (req) => {
       const pictureUrl = resolvePictureUrl(newData.picture);
       if (pictureUrl) {
         newAttributes.picture = [pictureUrl];
+      } else {
+        // Explicitly set empty array so Keycloak receives the removal when picture is cleared
+        newAttributes.picture = [];
       }
     }
 
