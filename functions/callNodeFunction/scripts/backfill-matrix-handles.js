@@ -29,13 +29,18 @@
  *   KEYCLOAK_PW=<admin-password> \
  *   HASURA_ENDPOINT=https://hasura.opencampus.sh/v1/graphql \
  *   HASURA_ADMIN_SECRET=<hasura-admin-secret> \
- *   STORAGE_BUCKET_PUBLIC_URL=https://storage.googleapis.com/storage/v1/<project-id> \
+ *   STORAGE_BUCKET_PUBLIC_URL=https://storage.googleapis.com/<project-id> \
  *   node scripts/backfill-matrix-handles.js [--dry-run]
  */
 
 import KcAdminClient from '@keycloak/keycloak-admin-client';
 
 const DRY_RUN = process.argv.includes('--dry-run');
+const DELAY_BETWEEN_USERS_MS = 100;
+const DELAY_BETWEEN_BATCHES_MS = 500;
+const MAX_RETRIES = 3;
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -168,7 +173,6 @@ async function main() {
       const existingHandle = user.attributes?.matrix_user_handle?.[0];
       const existingPicture = user.attributes?.picture?.[0];
 
-      // Resolve what the picture should be
       const hasuraPicturePath = pictureMap.get(user.id) || null;
       const resolvedPictureUrl = resolvePictureUrl(hasuraPicturePath);
 
@@ -188,25 +192,37 @@ async function main() {
       console.log(`[${totalProcessed}] ${user.id} (${user.firstName} ${user.lastName}) -> ${changes.join(', ')}`);
 
       if (!DRY_RUN) {
-        try {
-          const updatedAttrs = { ...user.attributes };
-          if (needsHandle) updatedAttrs.matrix_user_handle = [handle];
-          if (needsPicture) updatedAttrs.picture = [resolvedPictureUrl];
+        let attempt = 0;
+        while (attempt < MAX_RETRIES) {
+          try {
+            const updatedAttrs = { ...user.attributes };
+            if (needsHandle) updatedAttrs.matrix_user_handle = [handle];
+            if (needsPicture) updatedAttrs.picture = [resolvedPictureUrl];
 
-          await kcAdminClient.users.update(
-            { id: user.id },
-            { attributes: updatedAttrs }
-          );
+            await kcAdminClient.users.update(
+              { id: user.id },
+              { attributes: updatedAttrs }
+            );
 
-          if (needsHandle) {
-            await updateHasuraUser(user.id, handle);
+            if (needsHandle) {
+              await updateHasuraUser(user.id, handle);
+            }
+
+            totalUpdated++;
+            break;
+          } catch (err) {
+            attempt++;
+            if (attempt >= MAX_RETRIES) {
+              console.error(`  ERROR (after ${MAX_RETRIES} attempts): ${err.message}`);
+              totalErrors++;
+            } else {
+              const backoff = DELAY_BETWEEN_USERS_MS * Math.pow(2, attempt);
+              console.warn(`  Retry ${attempt}/${MAX_RETRIES} after ${backoff}ms: ${err.message}`);
+              await sleep(backoff);
+            }
           }
-
-          totalUpdated++;
-        } catch (err) {
-          console.error(`  ERROR: ${err.message}`);
-          totalErrors++;
         }
+        await sleep(DELAY_BETWEEN_USERS_MS);
       } else {
         totalUpdated++;
       }
@@ -214,6 +230,8 @@ async function main() {
 
     if (users.length < PAGE_SIZE) break;
     offset += PAGE_SIZE;
+
+    await sleep(DELAY_BETWEEN_BATCHES_MS);
 
     if (offset % 500 === 0) {
       await kcAdminClient.auth({

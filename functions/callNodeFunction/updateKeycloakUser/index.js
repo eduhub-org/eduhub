@@ -125,7 +125,8 @@ const updateKeycloakUserHandler = async (req) => {
     const keycloakToken = await getKeycloakToken();
 
     // Fetch current user to merge attributes (KC PUT replaces attributes entirely)
-    if (hasNewAttributes || nameChanged) {
+    const intendedAttributeUpdates = hasNewAttributes || nameChanged;
+    if (intendedAttributeUpdates) {
       try {
         const userResponse = await axios.get(
           `${process.env.KEYCLOAK_URL}/admin/realms/edu-hub/users/${userId}`,
@@ -140,17 +141,33 @@ const updateKeycloakUserHandler = async (req) => {
             userId
           );
           newAttributes.matrix_user_handle = [handle];
-          logger.info(`Setting matrix_user_handle=${handle} for user ${userId}`);
+          logger.debug(`Will set matrix_user_handle for user ${userId}`);
         }
 
         if (Object.keys(newAttributes).length > 0) {
           updatedFields.attributes = { ...existingAttrs, ...newAttributes };
         }
       } catch (err) {
-        logger.warn(`Could not fetch user ${userId} from Keycloak: ${err.message}`);
+        logger.error(`Could not fetch user ${userId} from Keycloak: ${err.message}`);
+        const failedUpdates = [];
+        if (hasNewAttributes) failedUpdates.push('picture');
+        if (nameChanged) failedUpdates.push('matrix_user_handle');
+
+        if (Object.keys(updatedFields).length === 0) {
+          throw new Error(
+            `Cannot update Keycloak attributes (${failedUpdates.join(', ')}): ` +
+            `failed to fetch existing user data: ${err.message}`
+          );
+        }
+
+        logger.warn(
+          `Proceeding with partial update for user ${userId}: ` +
+          `attribute updates skipped (${failedUpdates.join(', ')})`
+        );
       }
     }
 
+    const attributeUpdateSkipped = intendedAttributeUpdates && !updatedFields.attributes;
     const updateResult = await updateKeycloakUser(userId, updatedFields, keycloakToken);
 
     if (updateResult && updateResult.notFound) {
@@ -160,6 +177,16 @@ const updateKeycloakUserHandler = async (req) => {
         messageKey: "USER_NOT_FOUND_IN_KEYCLOAK",
         userId,
         details: "User not found in Keycloak, may have been deleted or never existed"
+      };
+    }
+
+    if (attributeUpdateSkipped) {
+      logger.warn(`Keycloak update partially completed for userId: ${userId} (attribute updates skipped)`);
+      return {
+        success: true,
+        messageKey: "UPDATE_PARTIAL",
+        userId,
+        details: "Basic fields updated but Keycloak attribute sync failed (picture/matrix_user_handle)"
       };
     }
 

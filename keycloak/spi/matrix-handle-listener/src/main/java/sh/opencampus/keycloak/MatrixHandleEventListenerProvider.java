@@ -70,7 +70,8 @@ public class MatrixHandleEventListenerProvider implements EventListenerProvider 
 
             String handle = computeHandle(user.getFirstName(), user.getLastName(), userId);
             user.setSingleAttribute(ATTRIBUTE_NAME, handle);
-            LOG.infof("Assigned %s = %s to user %s", ATTRIBUTE_NAME, handle, userId);
+            LOG.infof("Assigned %s to user %s", ATTRIBUTE_NAME, userId);
+            LOG.debugf("Assigned %s = %s to user %s", ATTRIBUTE_NAME, handle, userId);
         } catch (Exception e) {
             LOG.errorf(e, "Failed to assign matrix handle to user %s", userId);
         }
