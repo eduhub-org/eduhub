@@ -2,22 +2,30 @@ const KcAdminClient = require("@keycloak/keycloak-admin-client").default;
 
 const { createClient } = require("graphqurl");
 
+function computeMatrixHandle(firstName, lastName, userId) {
+  const sanitize = (input) => {
+    const normalized = input.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    return normalized.toLowerCase().replace(/[^a-z0-9._\-]/g, '');
+  };
+  const first = sanitize(firstName || 'user');
+  const last = sanitize(lastName || 'user');
+  const uuidPrefix = (userId || '').replace(/-/g, '').substring(0, 6);
+  return `${first}.${last}.${uuidPrefix}`;
+}
+
 exports.updateFromKeycloak = async (req, res) => {
   if (process.env.HASURA_CLOUD_FUNCTION_SECRET == req.headers.secret) {
     const kcAdminClient = new KcAdminClient({
       baseUrl: process.env.KEYCLOAK_URL,
-      //baseUrl: 'http://0.0.0.0:28080',
       realmName: "master",
     });
     
     const userid = req.body.input.userid;
     const access_key = req.body.input.access_key;
     
-    //auth keycloak
     await kcAdminClient.auth({
       username: process.env.KEYCLOAK_USER || "keycloak",
       password: process.env.KEYCLOAK_PW,
-      //password: 'admin',
       grantType: "password",
       clientId: "admin-cli",
     });
@@ -25,10 +33,8 @@ exports.updateFromKeycloak = async (req, res) => {
       realmName: "edu-hub",
     });
     
-    //get user by id
     let user = await kcAdminClient.users.findOne({ id: userid });
     const client = createClient({
-      //endpoint: 'http://localhost:8080/v1/graphql',
       endpoint: process.env.HASURA_ENDPOINT,
       headers: {
         "x-access-key": process.env.HASURA_ADMIN_SECRET,
@@ -37,13 +43,11 @@ exports.updateFromKeycloak = async (req, res) => {
       },
     });
     
-    //get hasura client from keycloak
     const hasura_client = await kcAdminClient.clients.find({
       clientId: 'hasura',
       first: 1,
     });
     
-    //get hasura client roles for user
     const roles = await kcAdminClient.users.listClientRoleMappings({
       id: userid,
       clientUniqueId: hasura_client[0].id,
@@ -51,11 +55,10 @@ exports.updateFromKeycloak = async (req, res) => {
     
     const admin_role = roles.filter(it => it.name === 'admin')[0];
 
-    //get user from hasura
     let findUserResponse;
     await client
       .query({
-        query: "query($id : uuid!) { User_by_pk(id: $id) { id firstName } }",
+        query: "query($id : uuid!) { User_by_pk(id: $id) { id firstName matrixUserHandle } }",
         variables: { id: userid },
       })
       .then((response) => {
@@ -64,32 +67,51 @@ exports.updateFromKeycloak = async (req, res) => {
       .catch((error) => console.error(error));
     
     if (user != null) {
-      //if user does not exits create it
+      // Ensure matrix_user_handle is set in Keycloak (backfill for pre-SPI users)
+      let matrixHandle = user.attributes?.matrix_user_handle?.[0] || null;
+      if (!matrixHandle) {
+        matrixHandle = computeMatrixHandle(user.firstName, user.lastName, userid);
+        try {
+          await kcAdminClient.users.update(
+            { id: userid },
+            { attributes: { ...user.attributes, matrix_user_handle: [matrixHandle] } }
+          );
+          console.log(`Backfilled matrix_user_handle=${matrixHandle} for user ${userid}`);
+        } catch (err) {
+          console.error(`Failed to backfill matrix_user_handle for user ${userid}:`, err);
+        }
+      }
+
       if (!findUserResponse || (findUserResponse.length == 0)) {
         await client
           .query({
             query:
-              "mutation($id : uuid!, $firstname : String, $lastname : String, $email : String) { insert_User(objects: {id: $id, firstName: $firstname, lastName: $lastname, email: $email}) { returning { id } } }",
+              "mutation($id : uuid!, $firstname : String, $lastname : String, $email : String, $matrixUserHandle : String) { insert_User(objects: {id: $id, firstName: $firstname, lastName: $lastname, email: $email, matrixUserHandle: $matrixUserHandle}) { returning { id } } }",
             variables: {
               id: userid,
               firstname: user.firstName,
               lastname: user.lastName,
               email: user.email,
+              matrixUserHandle: matrixHandle,
             },
           })
           .then((response) => {})
           .catch((error) => console.error(error));
-      //if it does exits just do an update
       } else {
+        // Only update matrixUserHandle if not already set in Hasura (immutable)
+        const existingHandle = findUserResponse.matrixUserHandle;
+        const handleToSet = existingHandle || matrixHandle;
+
         await client
           .query({
             query:
-              "mutation($id : uuid!, $firstname : String, $lastname : String, $email : String) { update_User_by_pk(pk_columns: {id: $id}, _set: {firstName: $firstname, lastName: $lastname, email: $email}) { id  } }",
+              "mutation($id : uuid!, $firstname : String, $lastname : String, $email : String, $matrixUserHandle : String) { update_User_by_pk(pk_columns: {id: $id}, _set: {firstName: $firstname, lastName: $lastname, email: $email, matrixUserHandle: $matrixUserHandle}) { id  } }",
             variables: {
               id: userid,
               firstname: user.firstName,
               lastname: user.lastName,
               email: user.email,
+              matrixUserHandle: handleToSet,
             },
           })
           .then((response) => {})
@@ -99,7 +121,6 @@ exports.updateFromKeycloak = async (req, res) => {
       // Note: Instructor role is now automatically assigned via event trigger when
       // a user is added as a CourseInstructor. The Expert table has been removed.
       
-      //if user is supposed to have admin role check if it has, if not add it
       let findAdminResponse;
       if (admin_role != null) { 
         await client

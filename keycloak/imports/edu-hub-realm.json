@@ -1137,6 +1137,19 @@
         "claim.name" : "updated_at",
         "jsonType.label" : "String"
       }
+    }, {
+      "name" : "matrix_user_handle",
+      "protocol" : "openid-connect",
+      "protocolMapper" : "oidc-usermodel-attribute-mapper",
+      "consentRequired" : false,
+      "config" : {
+        "userinfo.token.claim" : "true",
+        "user.attribute" : "matrix_user_handle",
+        "id.token.claim" : "true",
+        "access.token.claim" : "true",
+        "claim.name" : "matrix_user_handle",
+        "jsonType.label" : "String"
+      }
     } ]
   }, {
     "id" : "efd71c6a-5469-41eb-9717-7882dfb9d474",
@@ -1230,7 +1243,7 @@
   },
   "smtpServer" : { },
   "eventsEnabled" : false,
-  "eventsListeners" : [ "jboss-logging" ],
+  "eventsListeners" : [ "jboss-logging", "matrix-handle-listener" ],
   "enabledEventTypes" : [ ],
   "adminEventsEnabled" : false,
   "adminEventsDetailsEnabled" : false,
