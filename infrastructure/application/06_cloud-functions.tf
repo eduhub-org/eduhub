@@ -300,12 +300,12 @@ resource "google_cloudfunctions2_function" "call_node_function" {
 
   service_config {
     environment_variables = {
-      ENVIRONMENT                = var.environment
-      KEYCLOAK_USER              = var.keycloak_user
-      KEYCLOAK_URL               = "https://${local.keycloak_service_name}.opencampus.sh"
-      HASURA_ENDPOINT            = "https://${local.hasura_service_name}.opencampus.sh/v1/graphql"
-      FRONTEND_URL               = "https://${local.eduhub_service_name}.opencampus.sh"
-      STORAGE_BUCKET_PUBLIC_URL  = "https://storage.googleapis.com/${var.project_id}"
+      ENVIRONMENT               = var.environment
+      KEYCLOAK_USER             = var.keycloak_user
+      KEYCLOAK_URL              = "https://${local.keycloak_service_name}.opencampus.sh"
+      HASURA_ENDPOINT           = "https://${local.hasura_service_name}.opencampus.sh/v1/graphql"
+      FRONTEND_URL              = "https://${local.eduhub_service_name}.opencampus.sh"
+      STORAGE_BUCKET_PUBLIC_URL = "https://storage.googleapis.com/${var.project_id}"
     }
 
     secret_environment_variables {
