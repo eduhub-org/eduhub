@@ -39,8 +39,31 @@ const DRY_RUN = process.argv.includes('--dry-run');
 const DELAY_BETWEEN_USERS_MS = 100;
 const DELAY_BETWEEN_BATCHES_MS = 500;
 const MAX_RETRIES = 3;
+const REAUTH_EVERY_N_USERS = 100;
+const AUTH_RETRY_ATTEMPTS = 3;
+const AUTH_RETRY_DELAY_MS = 2000;
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+async function keycloakAuth(kcAdminClient) {
+  kcAdminClient.setConfig({ realmName: 'master' });
+  for (let attempt = 1; attempt <= AUTH_RETRY_ATTEMPTS; attempt++) {
+    try {
+      await kcAdminClient.auth({
+        username: process.env.KEYCLOAK_USER || 'keycloak',
+        password: process.env.KEYCLOAK_PW,
+        grantType: 'password',
+        clientId: 'admin-cli',
+      });
+      kcAdminClient.setConfig({ realmName: 'edu-hub' });
+      return;
+    } catch (err) {
+      if (attempt >= AUTH_RETRY_ATTEMPTS) throw err;
+      console.warn(`  Auth retry ${attempt}/${AUTH_RETRY_ATTEMPTS} after ${AUTH_RETRY_DELAY_MS}ms: ${err.message}`);
+      await sleep(AUTH_RETRY_DELAY_MS);
+    }
+  }
+}
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -147,13 +170,7 @@ async function main() {
     realmName: 'master',
   });
 
-  await kcAdminClient.auth({
-    username: process.env.KEYCLOAK_USER || 'keycloak',
-    password: process.env.KEYCLOAK_PW,
-    grantType: 'password',
-    clientId: 'admin-cli',
-  });
-  kcAdminClient.setConfig({ realmName: 'edu-hub' });
+  await keycloakAuth(kcAdminClient);
 
   // 3. Iterate all Keycloak users
   const PAGE_SIZE = 100;
@@ -233,14 +250,9 @@ async function main() {
 
     await sleep(DELAY_BETWEEN_BATCHES_MS);
 
-    if (offset % 500 === 0) {
-      await kcAdminClient.auth({
-        username: process.env.KEYCLOAK_USER || 'keycloak',
-        password: process.env.KEYCLOAK_PW,
-        grantType: 'password',
-        clientId: 'admin-cli',
-      });
-      kcAdminClient.setConfig({ realmName: 'edu-hub' });
+    if (offset > 0 && offset % REAUTH_EVERY_N_USERS === 0) {
+      console.log(`  Re-authenticating with Keycloak (processed ${totalProcessed} users)...`);
+      await keycloakAuth(kcAdminClient);
     }
   }
 
