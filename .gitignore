@@ -13,3 +13,6 @@ reminder.log
 
 # Next.js generated files
 next-env.d.ts
+
+# Keycloak SPI Maven build output
+keycloak/spi/*/target/

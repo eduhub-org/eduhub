@@ -240,10 +240,20 @@ def handle_moochub_data(page=1, per_page=25):
                     if has_dlc_funding:
                         break
 
-            # Compute course start/end dates from first and last session
+            # Build start/end date arrays from all sessions (irregular series per MOOCHub schema)
+            # Deduplicate by (start, end) pair - schema requires uniqueItems for startDate/endDate
             sessions = course.get("Sessions", [])
-            first_session_start = sessions[0]["startDateTime"] if sessions else None
-            last_session_end = sessions[-1]["endDateTime"] if sessions else None
+            seen_pairs = set()
+            start_dates = []
+            end_dates = []
+            for s in sessions:
+                pair = (s["startDateTime"], s["endDateTime"])
+                if pair not in seen_pairs:
+                    seen_pairs.add(pair)
+                    start_dates.append(s["startDateTime"])
+                    end_dates.append(s["endDateTime"])
+            start_dates = start_dates if start_dates else None
+            end_dates = end_dates if end_dates else None
 
             # Format application dates for MOOCHub (date-only fields need time suffix)
             application_start = course.get("Program", {}).get("applicationStart")
@@ -271,8 +281,8 @@ def handle_moochub_data(page=1, per_page=25):
                     },
                     "courseMode": course_mode,
                     "inLanguage": [course["language"].lower()],
-                    "startDate": [first_session_start] if first_session_start else None,
-                    "endDate": [last_session_end] if last_session_end else None,
+                    "startDate": start_dates,
+                    "endDate": end_dates,
                     "applicationStartDate": application_start_date,
                     "applicationDeadline": application_deadline_str,
                     "description": "".join(description_parts),
