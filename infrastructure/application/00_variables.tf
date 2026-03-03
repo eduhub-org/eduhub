@@ -268,6 +268,12 @@ variable "mm_token" {
 }
 
 # Formbricks Integration
+variable "formbricks_api_url" {
+  description = "Base URL of the Formbricks instance used for trusted origin validation"
+  type        = string
+  default     = "https://app.formbricks.com"
+}
+
 variable "formbricks_api_key" {
   description = "API key for accessing the Formbricks Management API"
   type        = string

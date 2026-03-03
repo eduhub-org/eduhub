@@ -306,6 +306,7 @@ resource "google_cloudfunctions2_function" "call_node_function" {
       HASURA_ENDPOINT           = "https://${local.hasura_service_name}.opencampus.sh/v1/graphql"
       FRONTEND_URL              = "https://${local.eduhub_service_name}.opencampus.sh"
       STORAGE_BUCKET_PUBLIC_URL = "https://storage.googleapis.com/${var.project_id}"
+      FORMBRICKS_API_URL        = var.formbricks_api_url
     }
 
     secret_environment_variables {

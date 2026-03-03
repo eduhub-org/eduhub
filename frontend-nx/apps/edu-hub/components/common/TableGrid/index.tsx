@@ -98,14 +98,49 @@ const TableGrid = <T extends BaseRow,>({
     toggleRowSelection,
     toggleAllRows,
     handleBulkActionChange,
+    clearSelections,
     isAllSelected,
     isSomeSelected,
   } = useBulkActions<T>(bulkActions, onBulkAction);
+
+  const handleRowExpansionBulkAction = useCallback(
+    (action: string) => {
+      if (selectedRowIds.size === 0) {
+        return false;
+      }
+
+      if (action === 'expand_selected_rows') {
+        setExpandedRows((prev) => {
+          const next = new Set(prev);
+          selectedRowIds.forEach((id) => next.add(id));
+          return next;
+        });
+        clearSelections();
+        return true;
+      }
+
+      if (action === 'collapse_selected_rows') {
+        setExpandedRows((prev) => {
+          const next = new Set(prev);
+          selectedRowIds.forEach((id) => next.delete(id));
+          return next;
+        });
+        clearSelections();
+        return true;
+      }
+
+      return false;
+    },
+    [selectedRowIds, clearSelections]
+  );
 
   // Add this new function to handle the Select onChange event
   const handleSelectChange = (event: SelectChangeEvent<string>) => {
     const selectedAction = event.target.value;
     setBulkAction(selectedAction);
+    if (handleRowExpansionBulkAction(selectedAction)) {
+      return;
+    }
     handleBulkActionChange(selectedAction, data);
   };
 

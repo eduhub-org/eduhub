@@ -978,6 +978,9 @@
     "send_email_to_applicants": "Send Email to Applicants",
     "select_applicants_first": "Please select applicants first",
     "bulk_actions": {
+      "expand_collapse_rows": "Expand/Collapse Rows",
+      "expand_selected_rows": "Expand Selected Rows",
+      "collapse_selected_rows": "Collapse Selected Rows",
       "email_selected": "Email Selected",
       "email_all_confirmed": "Email all Confirmed",
       "email_all_invited": "Email all Invited",
