@@ -296,6 +296,15 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
     (action: string, selectedRows: ManagedCourse_Course_by_pk_CourseEnrollments[]) => {
       let targetEnrollments: ManagedCourse_Course_by_pk_CourseEnrollments[] = [];
 
+      // Row expansion actions are handled directly in TableGrid.
+      // We only show feedback here when no row was selected.
+      if (action === 'expand_selected_rows' || action === 'collapse_selected_rows') {
+        if (selectedRows.length === 0) {
+          setIsNoSelectionDialogOpen(true);
+        }
+        return;
+      }
+
       // Handle invitation actions
       if (action === 'send_invitations_selected') {
         if (selectedRows.length === 0) {
@@ -367,6 +376,16 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
 
   const bulkActions: BulkAction[] = useMemo(() => {
     const actions: BulkAction[] = [
+      {
+        value: 'expand_selected_rows',
+        label: t('bulk_actions.expand_selected_rows'),
+        group: t('bulk_actions.expand_collapse_rows'),
+      },
+      {
+        value: 'collapse_selected_rows',
+        label: t('bulk_actions.collapse_selected_rows'),
+        group: t('bulk_actions.expand_collapse_rows'),
+      },
       { value: 'email_selected', label: t('bulk_actions.email_selected') },
     ];
 
@@ -931,7 +950,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
               </div>
               <div className="flex justify-end gap-3">
                 <OldButton onClick={handleCloseInviteDialog} inverted>
-                  {t('common.cancel')}
+                  {tCommon('cancel')}
                 </OldButton>
                 <OldButton onClick={handleSendInvitations} filled>
                   {t('bulk_actions.send_invitations_confirm')}
@@ -974,7 +993,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
               </div>
               <div className="flex justify-end gap-3">
                 <OldButton onClick={handleCloseRejectionDialog} inverted>
-                  {t('common.cancel')}
+                  {tCommon('cancel')}
                 </OldButton>
                 <OldButton onClick={handleSendRejections} filled>
                   {t('bulk_actions.send_rejections_confirm')}
@@ -1001,7 +1020,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
           </div>
           <div className="flex justify-end gap-3">
             <OldButton onClick={handleCloseNoSelectionDialog} filled>
-              {t('common.confirm')}
+              {tCommon('ok')}
             </OldButton>
           </div>
         </div>

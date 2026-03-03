@@ -962,6 +962,9 @@
     "send_email_to_applicants": "E-Mail an Bewerber senden",
     "select_applicants_first": "Bitte wähle zuerst Bewerber aus",
     "bulk_actions": {
+      "expand_collapse_rows": "Zeilen aus-/einklappen",
+      "expand_selected_rows": "Ausgewählte Zeilen ausklappen",
+      "collapse_selected_rows": "Ausgewählte Zeilen einklappen",
       "email_selected": "E-Mail an Ausgewählte",
       "email_all_confirmed": "E-Mail an alle Bestätigten",
       "email_all_invited": "E-Mail an alle Eingeladenen",

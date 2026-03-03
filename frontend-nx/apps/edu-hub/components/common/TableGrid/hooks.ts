@@ -191,6 +191,11 @@ export const useBulkActions = <T extends BaseRow>(
     }
   }, [onBulkAction, selectedRowIds]);
 
+  const clearSelections = useCallback(() => {
+    setSelectedRowIds(new Set());
+    setBulkAction('');
+  }, []);
+
   const isAllSelected = useMemo(() => (data: T[]) => {
     return data.length > 0 && selectedRowIds.size === data.length;
   }, [selectedRowIds]);
@@ -206,6 +211,7 @@ export const useBulkActions = <T extends BaseRow>(
     toggleRowSelection,
     toggleAllRows,
     handleBulkActionChange,
+    clearSelections,
     isAllSelected,
     isSomeSelected,
   };

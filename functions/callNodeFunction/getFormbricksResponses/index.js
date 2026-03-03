@@ -210,36 +210,52 @@ export default async function getFormbricksResponses(req, logger) {
       questionCount: survey.questions?.length || 0
     });
     
-    // Formbricks uses 'questions' array directly, not blocks
-    const questions = survey.questions || [];
+    // Formbricks can return questions directly or nested in blocks/elements
+    const questions = extractSurveyQuestions(survey);
     
-    // Create a map of question IDs to question metadata
+    // Create a map of possible response keys to question metadata
+    const questionDescriptors = questions
+      .filter(q => q?.id)
+      .map((q, index) => ({
+        questionId: q.id,
+        responseKeys: extractQuestionResponseKeys(q),
+        headline: extractQuestionTitle(q) || q.id,
+        type: q.type || 'unknown',
+        order: index
+      }));
+
     const questionMap = {};
-    questions.forEach(q => {
-      if (q.id) {
-        // Extract headline text from HTML if needed
-        let headlineText = q.id; // fallback to ID
-        if (q.headline) {
-          if (typeof q.headline === 'string') {
-            headlineText = stripHtml(q.headline);
-          } else if (q.headline.default) {
-            headlineText = stripHtml(q.headline.default);
-          } else if (q.headline.en) {
-            headlineText = stripHtml(q.headline.en);
-          } else {
-            // Try to get first available language
-            const firstLang = Object.values(q.headline)[0];
-            if (firstLang) {
-              headlineText = stripHtml(firstLang);
-            }
-          }
-        }
-        
-        questionMap[q.id] = {
-          headline: headlineText,
-          type: q.type || 'unknown'
+    questionDescriptors.forEach((descriptor) => {
+      descriptor.responseKeys.forEach((key) => {
+        questionMap[key] = {
+          headline: descriptor.headline,
+          type: descriptor.type,
+          order: descriptor.order,
+          questionId: descriptor.questionId
         };
-      }
+      });
+    });
+
+    logger.debug('Formbricks question key mapping', {
+      questionCount: questionDescriptors.length,
+      sampleQuestions: questionDescriptors.slice(0, 5).map((q) => ({
+        questionId: q.questionId,
+        responseKeys: q.responseKeys,
+        headline: q.headline
+      }))
+    });
+
+    const surveyQuestionKeys = new Set(Object.keys(questionMap));
+    const sampleResponseData = userResponses[0]?.data || {};
+    const sampleResponseKeys = Object.keys(sampleResponseData).filter(key => !key.startsWith('eduhub'));
+    const matchingSampleKeys = sampleResponseKeys.filter(key => surveyQuestionKeys.has(key));
+
+    logger.debug('Formbricks key overlap diagnostics', {
+      sampleResponseKeyCount: sampleResponseKeys.length,
+      surveyMappedKeyCount: surveyQuestionKeys.size,
+      matchingKeyCount: matchingSampleKeys.length,
+      sampleResponseKeys: sampleResponseKeys.slice(0, 10),
+      matchingSampleKeys: matchingSampleKeys.slice(0, 10)
     });
     
     const formattedResponses = userResponses.map(response => {
@@ -247,22 +263,40 @@ export default async function getFormbricksResponses(req, logger) {
       
       // Process response data
       const responseData = response.data || {};
-      
-      for (const [questionId, answerValue] of Object.entries(responseData)) {
-        // Skip hidden fields (eduhub* prefixed fields) - these are metadata, not question answers
-        if (questionId.startsWith('eduhub')) continue;
-        
-        const question = questionMap[questionId];
-        const headline = question?.headline || questionId;
-        
-        answers.push({
-          questionId,
+      const usedResponseKeys = new Set();
+
+      const toFormattedAnswer = (responseKey, answerValue) => {
+        const question = questionMap[responseKey];
+        const headline = question?.headline || responseKey;
+
+        return {
+          questionId: question?.questionId || responseKey,
           headline,
           answer: formatAnswer(answerValue),
           rawAnswer: answerValue
+        };
+      };
+
+      // First, add answers in survey/questionnaire order.
+      questionDescriptors.forEach((descriptor) => {
+        const matchingResponseKey = descriptor.responseKeys.find((key) => {
+          return !key.startsWith('eduhub') && Object.hasOwn(responseData, key);
         });
+
+        if (!matchingResponseKey) return;
+
+        usedResponseKeys.add(matchingResponseKey);
+        answers.push(toFormattedAnswer(matchingResponseKey, responseData[matchingResponseKey]));
+      });
+
+      // Then add any additional answer keys that were not part of the mapped survey keys.
+      for (const [responseKey, answerValue] of Object.entries(responseData)) {
+        if (responseKey.startsWith('eduhub')) continue;
+        if (usedResponseKeys.has(responseKey)) continue;
+
+        answers.push(toFormattedAnswer(responseKey, answerValue));
       }
-      
+
       return {
         id: response.id,
         createdAt: response.createdAt,
@@ -345,7 +379,7 @@ function formatAnswer(value) {
         return JSON.stringify(item);
       }).join('\n');
     }
-    return value.join(', ');
+    return formatMultipleChoiceArray(value);
   }
   
   // Handle objects (matrix, address, contact info, etc.)
@@ -395,6 +429,46 @@ function formatAnswer(value) {
 }
 
 /**
+ * Formats multi-select arrays and handles Formbricks "Other" text inputs.
+ * Formbricks can send an empty entry followed by the custom "Other" text.
+ */
+function formatMultipleChoiceArray(values) {
+  const normalized = values.map((entry) => String(entry ?? '').trim());
+  const formatted = [];
+
+  let index = 0;
+  while (index < normalized.length) {
+    const current = normalized[index];
+
+    if (current) {
+      formatted.push(current);
+      index += 1;
+      continue;
+    }
+
+    // Empty value followed by non-empty text is treated as "Other" free text.
+    let nextIndex = index + 1;
+    while (nextIndex < normalized.length && !normalized[nextIndex]) {
+      nextIndex += 1;
+    }
+
+    if (nextIndex < normalized.length) {
+      formatted.push(`Sonstiges: ${normalized[nextIndex]}`);
+      index = nextIndex + 1;
+      continue;
+    }
+
+    index += 1;
+  }
+
+  if (formatted.length === 0) {
+    return '-';
+  }
+
+  return formatted.join(', ');
+}
+
+/**
  * Strips HTML tags from a string
  */
 function stripHtml(html) {
@@ -411,5 +485,148 @@ function stripHtml(html) {
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
     .trim();
+}
+
+/**
+ * Extract questions from either survey.questions or survey.blocks[].elements[]
+ */
+function extractSurveyQuestions(survey) {
+  const collected = [];
+  const seenIds = new Set();
+
+  const pushQuestion = (candidate) => {
+    if (!candidate || typeof candidate !== 'object') return;
+    if (!candidate.id) return;
+    if (!looksLikeQuestion(candidate)) return;
+    if (seenIds.has(candidate.id)) return;
+
+    seenIds.add(candidate.id);
+    collected.push(candidate);
+  };
+
+  const collectFromArray = (arr) => {
+    if (!Array.isArray(arr)) return;
+    arr.forEach(pushQuestion);
+  };
+
+  // Known shapes (current and legacy Formbricks variants)
+  collectFromArray(survey?.questions);
+
+  if (Array.isArray(survey?.blocks)) {
+    for (const block of survey.blocks) {
+      collectFromArray(block?.elements);
+      collectFromArray(block?.questions);
+      collectFromArray(block?.items);
+      collectFromArray(block?.cards);
+    }
+  }
+
+  if (collected.length > 0) {
+    return collected;
+  }
+
+  // Fallback: recursively traverse blocks and pick question-like objects.
+  const walk = (node) => {
+    if (!node) return;
+
+    if (Array.isArray(node)) {
+      node.forEach(walk);
+      return;
+    }
+
+    if (typeof node !== 'object') {
+      return;
+    }
+
+    pushQuestion(node);
+    Object.values(node).forEach(walk);
+  };
+
+  walk(survey?.blocks);
+  return collected;
+}
+
+/**
+ * Extract a displayable question title from known Formbricks title fields.
+ */
+function extractQuestionTitle(question) {
+  const candidates = [
+    question?.headline,
+    question?.question,
+    question?.title,
+    question?.label
+  ];
+
+  for (const candidate of candidates) {
+    const title = extractLocalizedText(candidate);
+    if (title) return title;
+  }
+
+  return '';
+}
+
+/**
+ * Extract readable text from plain string or localized object.
+ */
+function extractLocalizedText(value) {
+  if (!value) return '';
+
+  if (typeof value === 'string') {
+    return stripHtml(value);
+  }
+
+  if (typeof value !== 'object') {
+    return stripHtml(String(value));
+  }
+
+  const preferredKeys = ['default', 'de', 'en'];
+  for (const key of preferredKeys) {
+    const candidate = value[key];
+    if (candidate) {
+      return stripHtml(typeof candidate === 'string' ? candidate : String(candidate));
+    }
+  }
+
+  for (const candidate of Object.values(value)) {
+    if (candidate) {
+      return stripHtml(typeof candidate === 'string' ? candidate : String(candidate));
+    }
+  }
+
+  return '';
+}
+
+/**
+ * Build all possible response keys for a Formbricks question.
+ */
+function extractQuestionResponseKeys(question) {
+  const keys = [
+    question?.id,
+    question?.name,
+    question?.variableId,
+    question?.variableName,
+    question?.slug,
+    question?.key
+  ].filter(Boolean);
+
+  return [...new Set(keys.map((key) => String(key)))];
+}
+
+/**
+ * Heuristic check whether an object is likely a Formbricks question node.
+ */
+function looksLikeQuestion(candidate) {
+  const hasPrompt =
+    candidate.headline != null ||
+    candidate.question != null ||
+    candidate.title != null ||
+    candidate.label != null;
+
+  const hasAnswerShape =
+    candidate.type != null ||
+    candidate.choices != null ||
+    candidate.required != null;
+
+  return hasPrompt || hasAnswerShape;
 }
 
