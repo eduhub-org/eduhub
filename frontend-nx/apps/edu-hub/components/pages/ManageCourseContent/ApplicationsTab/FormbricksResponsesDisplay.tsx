@@ -31,7 +31,8 @@ export const FormbricksResponsesDisplay: FC<Props> = ({
         enrollmentId, 
         formbricksSurveyUrl: formbricksEnrollmentSurveyUrl, 
       },
-      fetchPolicy: 'cache-first',
+      // Always fetch latest survey mapping to avoid stale question labels/order.
+      fetchPolicy: 'network-only',
       skip: !formbricksEnrollmentSurveyUrl,
     }
   );
