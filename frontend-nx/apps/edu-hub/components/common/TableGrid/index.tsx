@@ -20,6 +20,12 @@ import AddButton from '../AddButton';
 import { useBulkActions } from './hooks';
 import TableGridDeleteButton from './components/TableGridDeleteButton';
 
+/** Stable wrapper so expandable row content is not remounted when parent re-renders (e.g. after refetch). */
+const ExpandableRowWrapper: React.FC<{
+  renderFn: (props: { row: any }) => React.ReactElement | null;
+  row: any;
+}> = ({ renderFn, row }) => renderFn({ row });
+
 const TableGrid = <T extends BaseRow,>({
   addButtonText,
   data,
@@ -153,7 +159,6 @@ const TableGrid = <T extends BaseRow,>({
     const newIndex = pageIndex + 1;
     onPageChange?.(newIndex);
   };
-  const ExpandableRowComponent = expandableRowComponent;
 
   const toggleRowExpansion = useCallback(
     (rowId: number) => {
@@ -538,7 +543,11 @@ const TableGrid = <T extends BaseRow,>({
                 <div className="flex items-stretch mb-1">
                   <div className="flex-grow bg-bg-secondary text-label-primary py-2 overflow-x-auto light">
                     <div className={`flex items-center gap-3 ${!showCheckbox ? 'pl-3' : ''}`} style={{ minWidth: `${mainRowContentWidth - (expandableRowComponent ? 40 : 0) - (deleteMutation ? 80 : 0)}px` }}>
-                      <ExpandableRowComponent key={`expandableRow-${row.id}`} row={row.original} />
+                      <ExpandableRowWrapper
+                        key={`expandableRow-${row.id}`}
+                        renderFn={expandableRowComponent}
+                        row={row.original}
+                      />
                     </div>
                   </div>
                   {expandableRowComponent && <div className="w-10 flex-shrink-0"></div>}

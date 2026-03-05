@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useRoleMutation } from '../../../hooks/authedMutation';
 import { useDebouncedCallback } from 'use-debounce';
 import useErrorHandler from '../../../hooks/useErrorHandler';
@@ -21,6 +21,9 @@ export const useDropDownLogic = (
   const [showSavedNotification, setShowSavedNotification] = useState(false);
   const [hasBlurred, setHasBlurred] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+
+  // Conflict-safe sync: only accept server value when local matches last sent.
+  const lastSentValueRef = useRef(value);
 
   const [updateValue] = useRoleMutation(
     updateValueMutation ||
@@ -45,6 +48,7 @@ export const useDropDownLogic = (
 
   const debouncedUpdateValue = useDebouncedCallback((newValue: string, isMandatory = false) => {
     if (validateValue(newValue, isMandatory)) {
+      lastSentValueRef.current = newValue;
       if (updateValueMutation) {
         // Convert empty string to null for nullable fields
         const finalValue = nullable && newValue === '' ? null : newValue;
@@ -92,8 +96,12 @@ export const useDropDownLogic = (
   );
 
   useEffect(() => {
-    setLocalValue(value);
-  }, [value]);
+    const isDirty = localValue !== lastSentValueRef.current;
+    if (!isDirty) {
+      setLocalValue(value);
+      lastSentValueRef.current = value;
+    }
+  }, [value, localValue]);
 
   useEffect(() => {
     setLocalOptions(options);
