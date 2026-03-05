@@ -237,6 +237,7 @@ export const useRegistrationHandler = ({
     config,
     handleLogin,
     handleRegistration,
+    handleExternalRegistration,
     submitRegistration,
     retryPayment,
     retryEnrollmentId,
