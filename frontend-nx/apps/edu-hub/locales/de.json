@@ -685,6 +685,40 @@
     "form-info-documentations": "<component>Benutze diese Vorlage zum Hochladen der Dokumentation!</component>",
     "uploadDocumentationTemplate": "Dokumentationsvorlage hochladen"
   },
+  "manageAchievementOptions": {
+    "manage_templates_button": "Vorlagen verwalten",
+    "table_header": {
+      "title": "Titel",
+      "record_type": "Typ",
+      "mentors": "Mentor:innen",
+      "courses": "Kurse"
+    },
+    "record_type": {
+      "DOCUMENTATION": "Dokumentation",
+      "ONLINE_COURSE": "Online-Kurs"
+    },
+    "title": {
+      "placeholder": "Projekttitel eingeben"
+    },
+    "description": {
+      "placeholder": "Beschreibung eingeben"
+    },
+    "documentation_template": {
+      "placeholder": "Vorlage auswählen",
+      "help_text": "Wähle eine Dokumentationsvorlage für diesen Leistungsnachweis"
+    },
+    "add_mentor": "Mentor:in hinzufügen",
+    "remove_mentor": "Mentor:in entfernen",
+    "add_course": "Kurs hinzufügen",
+    "delete_button": {
+      "untitled_achievement_option": "Unbenannter Leistungsnachweis",
+      "delete_achievement_option_confirmation": "Bist du sicher, dass du den Leistungsnachweis „{title}“ löschen möchtest?"
+    },
+    "notifications": {
+      "achievement_option_added": "Leistungsnachweis wurde hinzugefügt",
+      "add_failed": "Leistungsnachweis konnte nicht hinzugefügt werden"
+    }
+  },
   "statistics": {
     "statistics": "Statistiken",
     "select_statistics": {
