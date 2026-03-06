@@ -42,9 +42,9 @@ export const MergeOrganizationsDialog: React.FC<MergeOrganizationsDialogProps> =
   useEffect(() => {
     if (selectedOrganizations.length > 0 && selectedTargetOrg) {
       const orgsToMerge = selectedOrganizations.filter(
-        (org) => org.id !== parseInt(selectedTargetOrg, 10)
+        (org: OrganizationList_Organization) => org.id !== parseInt(selectedTargetOrg, 10)
       );
-      const orgIds = orgsToMerge.map((org) => org.id);
+      const orgIds = orgsToMerge.map((org: OrganizationList_Organization) => org.id);
 
       if (orgIds.length > 0) {
         setLoadingRelatedData(true);
@@ -71,7 +71,7 @@ export const MergeOrganizationsDialog: React.FC<MergeOrganizationsDialogProps> =
     }
   }, [selectedOrganizations, selectedTargetOrg, fetchOrganizationAdmins, fetchCourseFundingOrgs]);
 
-  const organizationOptions = data?.Organization?.map((org) => ({
+  const organizationOptions = data?.Organization?.map((org: OrganizationList_Organization) => ({
     value: org.id.toString(),
     label: org.name,
   }));
@@ -86,25 +86,25 @@ export const MergeOrganizationsDialog: React.FC<MergeOrganizationsDialogProps> =
       return null;
     }
 
-    const targetOrg = data?.Organization?.find((org) => org.id === parseInt(selectedTargetOrg, 10));
+    const targetOrg = data?.Organization?.find((org: OrganizationList_Organization) => org.id === parseInt(selectedTargetOrg, 10));
     if (!targetOrg) return null;
 
-    const orgsToMerge = selectedOrganizations.filter((org) => org.id !== parseInt(selectedTargetOrg, 10));
+    const orgsToMerge = selectedOrganizations.filter((org: OrganizationList_Organization) => org.id !== parseInt(selectedTargetOrg, 10));
 
     // Count total users affected
     const totalUsersAffected = orgsToMerge.reduce((sum, org) => sum + (org.Users?.length || 0), 0);
 
     // Get all aliases from organizations being merged
-    const aliasesToMerge = orgsToMerge.flatMap((org) => {
+    const aliasesToMerge = orgsToMerge.flatMap((org: OrganizationList_Organization) => {
       const orgAliases = Array.isArray(org.aliases)
         ? org.aliases
-            .filter((alias) => alias != null)
-            .map((alias) => {
+            .filter((alias: unknown) => alias != null)
+            .map((alias: unknown) => {
               if (typeof alias === 'string') return alias;
               if (typeof alias === 'object' && alias !== null && 'name' in alias) return alias.name;
               return null;
             })
-            .filter((alias): alias is string => alias !== null)
+            .filter((alias: unknown): alias is string => alias !== null)
         : [];
 
       return [...orgAliases, org.name];
@@ -113,13 +113,13 @@ export const MergeOrganizationsDialog: React.FC<MergeOrganizationsDialogProps> =
     // Get existing target aliases
     const targetAliases = Array.isArray(targetOrg.aliases)
       ? targetOrg.aliases
-          .filter((alias) => alias != null)
-          .map((alias) => {
+          .filter((alias: unknown) => alias != null)
+          .map((alias: unknown) => {
             if (typeof alias === 'string') return alias;
             if (typeof alias === 'object' && alias !== null && 'name' in alias) return alias.name;
             return null;
           })
-          .filter((alias): alias is string => alias !== null)
+          .filter((alias: unknown): alias is string => alias !== null)
       : [];
 
     // Calculate new aliases (remove duplicates)
@@ -132,7 +132,7 @@ export const MergeOrganizationsDialog: React.FC<MergeOrganizationsDialogProps> =
 
     // Check for API keys - count organizations with apiKeyHash defined
     const orgsWithApiKeys = [
-      ...orgsToMerge.filter((org) => org.apiKeyHash != null && org.apiKeyHash !== ''),
+      ...orgsToMerge.filter((org: OrganizationList_Organization) => org.apiKeyHash != null && org.apiKeyHash !== ''),
       ...(targetOrg.apiKeyHash != null && targetOrg.apiKeyHash !== '' ? [targetOrg] : []),
     ];
     const hasMultipleApiKeys = orgsWithApiKeys.length > 1;
@@ -151,7 +151,7 @@ export const MergeOrganizationsDialog: React.FC<MergeOrganizationsDialogProps> =
   }, [selectedTargetOrg, selectedOrganizations, data]);
 
   const handleConfirm = () => {
-    const targetOrg = data?.Organization?.find((org) => org.id === parseInt(selectedTargetOrg, 10));
+    const targetOrg = data?.Organization?.find((org: OrganizationList_Organization) => org.id === parseInt(selectedTargetOrg, 10));
     if (targetOrg && mergePreview && !mergePreview.hasMultipleApiKeys) {
       onConfirm(selectedTargetOrg, targetOrg);
     }

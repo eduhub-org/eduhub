@@ -11,9 +11,9 @@ const useErrorHandler = () => {
   const t = useTranslations();
   const { showAuthError } = useAuthError();
 
-  return (error) => {
+  return (error: { message?: string }) => {
     console.log('error handler error: ', error);
-    if (error.message.includes('JWTExpired') || error.message.includes('JWSInvalidSignature')) {
+    if (error?.message?.includes('JWTExpired') || error?.message?.includes('JWSInvalidSignature')) {
       // For expired sessions, redirect immediately to login without showing a blocking dialog
       console.info('Session expired, redirecting to login...');
       signOut({ 
@@ -22,7 +22,7 @@ const useErrorHandler = () => {
       });
     } else {
       // Show error dialog for other authentication errors (without signing out)
-      showAuthError(t("common.authed_query.authentication_error") + ": " + error.message, false);
+      showAuthError(t("common.authed_query.authentication_error") + ": " + (error?.message ?? ''), false);
     }
   };
 };

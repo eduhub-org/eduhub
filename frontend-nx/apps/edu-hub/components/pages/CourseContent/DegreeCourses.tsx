@@ -11,7 +11,7 @@ import {
 import { useRoleQuery } from '../../../hooks/authedQuery';
 import { Course_Course_by_pk_DegreeCourses } from '../../../queries/__generated__/Course';
 
-const isPublished = (degreeCourse) => degreeCourse?.Course?.published && degreeCourse?.Course?.Program?.published;
+const isPublished = (degreeCourse: Course_Course_by_pk_DegreeCourses) => degreeCourse?.Course?.published && degreeCourse?.Course?.Program?.published;
 
 export const CurrentDegreeCourses: FC<{
   degreeCourses: Course_Course_by_pk_DegreeCourses[];
@@ -43,7 +43,8 @@ export const CurrentDegreeCourses: FC<{
 
 export const CompletedDegreeCourses: FC<{ degreeCourseId: number }> = ({ degreeCourseId }) => {
   const t = useTranslations('course');
-  const { id: userId } = useUser();
+  const user = useUser();
+  const userId = user?.id ?? '';
   const { data } = useRoleQuery<CompletedDegreeEnrollments, CompletedDegreeEnrollmentsVariables>(
     COMPLETED_DEGREE_ENROLLMENTS,
     {

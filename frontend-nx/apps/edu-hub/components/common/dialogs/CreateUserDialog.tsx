@@ -266,7 +266,7 @@ export const CreateUserDialog: React.FC<CreateUserDialogProps> = ({
       />
 
       <ErrorMessageDialog
-        errorMessage={serverError}
+        errorMessage={serverError ?? ''}
         open={!!serverError}
         onClose={() => setServerError(null)}
       />

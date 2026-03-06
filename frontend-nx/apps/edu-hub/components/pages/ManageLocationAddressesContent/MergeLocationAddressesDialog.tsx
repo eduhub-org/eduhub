@@ -35,7 +35,7 @@ export const MergeLocationAddressesDialog: React.FC<MergeLocationAddressesDialog
     },
   });
 
-  const addressOptions = data?.LocationAddress?.map((addr) => ({
+  const addressOptions = data?.LocationAddress?.map((addr: LocationAddressList_LocationAddress) => ({
     value: addr.id.toString(),
     label: addr.shortLabel,
   }));
@@ -50,35 +50,35 @@ export const MergeLocationAddressesDialog: React.FC<MergeLocationAddressesDialog
       return null;
     }
 
-    const targetAddr = data?.LocationAddress?.find((addr) => addr.id === parseInt(selectedTargetAddress, 10));
+    const targetAddr = data?.LocationAddress?.find((addr: LocationAddressList_LocationAddress) => addr.id === parseInt(selectedTargetAddress, 10));
     if (!targetAddr) return null;
 
-    const addressesToMerge = selectedAddresses.filter((addr) => addr.id !== parseInt(selectedTargetAddress, 10));
+    const addressesToMerge = selectedAddresses.filter((addr: LocationAddressList_LocationAddress) => addr.id !== parseInt(selectedTargetAddress, 10));
 
     // Check if all addresses have the same locationOption
     const targetLocationOption = targetAddr.locationOption;
     const addressesWithDifferentLocation = addressesToMerge.filter(
-      (addr) => addr.locationOption !== targetLocationOption
+      (addr: LocationAddressList_LocationAddress) => addr.locationOption !== targetLocationOption
     );
 
     // Calculate total usage affected
-    const totalUsageAffected = addressesToMerge.reduce((sum, addr) => {
+    const totalUsageAffected = addressesToMerge.reduce((sum: number, addr: LocationAddressList_LocationAddress) => {
       const sessionCount = addr.SessionAddresses_aggregate?.aggregate?.count || 0;
       const courseLocationCount = addr.CourseLocations_aggregate?.aggregate?.count || 0;
       return sum + sessionCount + courseLocationCount;
     }, 0);
 
     // Get all aliases from addresses being merged
-    const aliasesToMerge = addressesToMerge.flatMap((addr) => {
+    const aliasesToMerge = addressesToMerge.flatMap((addr: LocationAddressList_LocationAddress) => {
       const addrAliases = Array.isArray(addr.aliases)
         ? addr.aliases
-            .filter((alias) => alias != null)
-            .map((alias) => {
+            .filter((alias: unknown) => alias != null)
+            .map((alias: unknown) => {
               if (typeof alias === 'string') return alias;
               if (typeof alias === 'object' && alias !== null && 'name' in alias) return alias.name;
               return null;
             })
-            .filter((alias): alias is string => alias !== null)
+            .filter((alias: unknown): alias is string => alias !== null)
         : [];
 
       return [...addrAliases, addr.shortLabel];
@@ -87,18 +87,18 @@ export const MergeLocationAddressesDialog: React.FC<MergeLocationAddressesDialog
     // Get existing target aliases
     const targetAliases = Array.isArray(targetAddr.aliases)
       ? targetAddr.aliases
-          .filter((alias) => alias != null)
-          .map((alias) => {
+          .filter((alias: unknown) => alias != null)
+          .map((alias: unknown) => {
             if (typeof alias === 'string') return alias;
             if (typeof alias === 'object' && alias !== null && 'name' in alias) return alias.name;
             return null;
           })
-          .filter((alias): alias is string => alias !== null)
+          .filter((alias: string | null): alias is string => alias !== null)
       : [];
 
     // Calculate new aliases (remove duplicates)
     const newAliases = Array.from(new Set([...targetAliases, ...aliasesToMerge]));
-    const addedAliases = newAliases.filter((alias) => !targetAliases.includes(alias));
+    const addedAliases = newAliases.filter((alias: string) => !targetAliases.includes(alias));
 
     return {
       targetAddr,
@@ -113,7 +113,7 @@ export const MergeLocationAddressesDialog: React.FC<MergeLocationAddressesDialog
   }, [selectedTargetAddress, selectedAddresses, data]);
 
   const handleConfirm = () => {
-    const targetAddr = data?.LocationAddress?.find((addr) => addr.id === parseInt(selectedTargetAddress, 10));
+    const targetAddr = data?.LocationAddress?.find((addr: LocationAddressList_LocationAddress) => addr.id === parseInt(selectedTargetAddress, 10));
     if (targetAddr && mergePreview && !mergePreview.hasLocationMismatch) {
       onConfirm(selectedTargetAddress, targetAddr);
     }

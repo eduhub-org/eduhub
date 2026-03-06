@@ -441,7 +441,7 @@ export const OptimisticDatePicker: FC<OptimisticDatePickerProps> = ({
 
   // Re-apply styles when calendar changes (month navigation, open/close)
   useEffect(() => {
-    let currentObserver = null;
+    let currentObserver: MutationObserver | null = null;
 
     const applyHighlightingStylesToCalendar = () => {
       const calendar = document.querySelector('.react-datepicker');

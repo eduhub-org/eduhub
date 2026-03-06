@@ -33,11 +33,11 @@ export const getBackgroundImage = (filePath: string | null): Promise<string> => 
       img.src = optimalImageLink || oldOptimalImageLink;
 
       img.onload = () => {
-        resolve(optimalImageLink);
+        resolve(optimalImageLink ?? 'https://picsum.photos/1280/620');
       };
 
       img.onerror = () => {
-        resolve(filePath || 'https://picsum.photos/1280/620');
+        resolve(filePath ?? 'https://picsum.photos/1280/620');
       };
     });
   };
@@ -63,11 +63,11 @@ export const getBackgroundImage = (filePath: string | null): Promise<string> => 
       img.src = optimalImageLink || oldOptimalImageLink;
 
       img.onload = () => {
-        resolve(optimalImageLink);
+        resolve(optimalImageLink ?? 'https://picsum.photos/240/144');
       };
 
       img.onerror = () => {
-        resolve(filePath || 'https://picsum.photos/240/144');
+        resolve(filePath ?? 'https://picsum.photos/240/144');
       };
     });
   };

@@ -15,7 +15,7 @@ import SearchBox from '../SearchBox';
 
 interface IProps {
   title: string;
-  onClose: (confirmed: boolean, tempUser: AtLeastNameEmail) => void;
+  onClose: (confirmed: boolean, tempUser: AtLeastNameEmail | null) => void;
   open: boolean;
   courseId: number;
 }

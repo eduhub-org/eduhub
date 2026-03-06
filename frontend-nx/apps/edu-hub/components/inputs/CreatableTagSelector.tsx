@@ -74,7 +74,7 @@ type CreatableTagSelectorProps = {
 
 interface TagOption {
   inputValue?: string;
-  value?: string;
+  value: string;
 }
 
 const filter = createFilterOptions<TagOption>();
@@ -93,7 +93,7 @@ const CreatableTagSelector: React.FC<CreatableTagSelectorProps> = ({
   helpText,
   className,
 }) => {
-  const [tags, setTags] = useState<TagOption[]>(values.map((tag) => ({ value: tag })));
+  const [tags, setTags] = useState<TagOption[]>(values.map((tag) => ({ value: tag } as TagOption)));
   const [inputValue, setInputValue] = useState('');
   const t = useTranslations();
   const tagsAutocompleteId = useId();
@@ -106,7 +106,7 @@ const CreatableTagSelector: React.FC<CreatableTagSelectorProps> = ({
     refetchQueries,
   });
 
-  const handleTagChange = async (event: React.SyntheticEvent, newValue: TagOption[]) => {
+  const handleTagChange = async (_event: React.SyntheticEvent, newValue: TagOption[]) => {
     const updatedTags = newValue
       .map((option) => option.inputValue?.trim() || option.value?.trim() || '')
       .filter((tag) => tag !== ''); // Filter out empty strings
@@ -160,15 +160,18 @@ const CreatableTagSelector: React.FC<CreatableTagSelectorProps> = ({
         id={`${tagsAutocompleteId}-tags-autocomplete`}
         options={options.map((tag) => ({ value: tag }))}
         value={tags}
-        onChange={handleTagChange}
+        onChange={(e, v) => handleTagChange(e, v as TagOption[])}
         inputValue={inputValue}
-        onInputChange={(event, newInputValue) => {
+        onInputChange={(_event, newInputValue) => {
           setInputValue(newInputValue);
         }}
         filterOptions={(options, params) => {
-          const filtered = filter(options, params);
+          const normalizedOptions: TagOption[] = options.map((opt) =>
+            typeof opt === 'string' ? { value: opt, inputValue: undefined } : opt
+          );
+          const filtered = filter(normalizedOptions, params);
           const { inputValue } = params;
-          const isExisting = options.some((option) => inputValue === option.value);
+          const isExisting = normalizedOptions.some((opt) => inputValue === opt.value);
           if (inputValue !== '' && !isExisting) {
             filtered.push({
               inputValue: inputValue,
@@ -177,12 +180,13 @@ const CreatableTagSelector: React.FC<CreatableTagSelectorProps> = ({
           }
           return filtered;
         }}
-        getOptionLabel={(option: TagOption) => option.inputValue || option.value || ''}
-        renderOption={(props, option: TagOption) => {
+        getOptionLabel={(option: TagOption | string) => typeof option === 'string' ? option : (option.inputValue ?? option.value ?? '')}
+        renderOption={(props, option: TagOption | string) => {
           const { key, ...otherProps } = props;
+          const opt = typeof option === 'string' ? { value: option, inputValue: undefined } : option;
           return (
             <li key={key} {...otherProps}>
-              {option.inputValue ? t('common.CreatableTagSelector.add_tag', { value: option.inputValue }) : option.value}
+              {opt.inputValue ? t('common.CreatableTagSelector.add_tag', { value: opt.inputValue }) : opt.value}
             </li>
           );
         }}
@@ -200,9 +204,11 @@ const CreatableTagSelector: React.FC<CreatableTagSelectorProps> = ({
         selectOnFocus
         clearOnBlur
         handleHomeEndKeys
-        isOptionEqualToValue={(option, value) =>
-          (option.value || option.inputValue || '') === (value.value || value.inputValue || '')
-        }
+        isOptionEqualToValue={(option, value) => {
+          const optStr = typeof option === 'string' ? option : (option.value ?? option.inputValue ?? '');
+          const valStr = typeof value === 'string' ? value : (value?.value ?? (value as TagOption & { inputValue?: string })?.inputValue ?? '');
+          return optStr === valStr;
+        }}
       />
     </div>
   );
@@ -226,15 +232,18 @@ const CreatableTagSelector: React.FC<CreatableTagSelectorProps> = ({
             id={`${tagsAutocompleteId}-tags-autocomplete`}
             options={options.map((tag) => ({ value: tag }))}
             value={tags}
-            onChange={handleTagChange}
+            onChange={(e, v) => handleTagChange(e, v as TagOption[])}
             inputValue={inputValue}
-            onInputChange={(event, newInputValue) => {
+            onInputChange={(_event, newInputValue) => {
               setInputValue(newInputValue);
             }}
             filterOptions={(options, params) => {
-              const filtered = filter(options, params);
+              const normalizedOptions: TagOption[] = options.map((opt) =>
+                typeof opt === 'string' ? { value: opt, inputValue: undefined } : opt
+              );
+              const filtered = filter(normalizedOptions, params);
               const { inputValue } = params;
-              const isExisting = options.some((option) => inputValue === option.value);
+              const isExisting = normalizedOptions.some((opt) => inputValue === opt.value);
               if (inputValue !== '' && !isExisting) {
                 filtered.push({
                   inputValue: inputValue,
@@ -243,14 +252,15 @@ const CreatableTagSelector: React.FC<CreatableTagSelectorProps> = ({
               }
               return filtered;
             }}
-            getOptionLabel={(option: TagOption) => option.inputValue || option.value || ''}
-            renderOption={(props, option: TagOption) => {
+            getOptionLabel={(option: TagOption | string) => typeof option === 'string' ? option : (option.inputValue ?? option.value ?? '')}
+            renderOption={(props, option: TagOption | string) => {
               const { key, ...otherProps } = props;
+              const opt = typeof option === 'string' ? { value: option, inputValue: undefined } : option;
               return (
                 <li key={key} {...otherProps}>
-                  {option.inputValue
-                    ? t('common.CreatableTagSelector.add_tag', { value: option.inputValue })
-                    : option.value}
+                  {opt.inputValue
+                    ? t('common.CreatableTagSelector.add_tag', { value: opt.inputValue })
+                    : opt.value}
                 </li>
               );
             }}
@@ -271,9 +281,11 @@ const CreatableTagSelector: React.FC<CreatableTagSelectorProps> = ({
             selectOnFocus
             clearOnBlur
             handleHomeEndKeys
-            isOptionEqualToValue={(option, value) =>
-              (option.value || option.inputValue || '') === (value.value || value.inputValue || '')
-            }
+            isOptionEqualToValue={(option, value) => {
+              const optStr = typeof option === 'string' ? option : (option.value ?? option.inputValue ?? '');
+              const valStr = typeof value === 'string' ? value : (value?.value ?? (value as TagOption & { inputValue?: string })?.inputValue ?? '');
+              return optStr === valStr;
+            }}
           />
         </div>
       </div>

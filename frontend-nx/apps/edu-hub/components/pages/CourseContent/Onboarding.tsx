@@ -86,7 +86,7 @@ const Onboarding: FC<OnboardingProps> = ({ course, enrollmentId, refetchCourse, 
     return <div>Loading...</div>;
   }
 
-  const getOrganizationLabel = (occupation) => {
+  const getOrganizationLabel = (occupation: string) => {
     switch (occupation) {
       case 'HIGH_SCHOOL_STUDENT':
         return t('profile.organization.label_school');
@@ -166,7 +166,7 @@ const Onboarding: FC<OnboardingProps> = ({ course, enrollmentId, refetchCourse, 
           <DropDownSelector
             variant="eduhub"
             creatable={true}
-            label={getOrganizationLabel(userData?.User_by_pk?.occupation)}
+            label={getOrganizationLabel(userData?.User_by_pk?.occupation ?? '')}
             value={userData?.User_by_pk?.Organization?.id?.toString() || ''}
             placeholder={t('profile.organization.placeholder')}
             options={organizationOptions}

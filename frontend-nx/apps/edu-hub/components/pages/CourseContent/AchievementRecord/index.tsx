@@ -47,7 +47,7 @@ const AchievementRecord: FC<IProps> = ({ courseId, achievementRecordUploadDeadli
   const profile = useKeycloakUserProfile();
   const [showModal, setShowModal] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
-  const [myRecords, setMyRecords] = useState(null as AchievementRecordListWithAuthors_AchievementRecord);
+  const [myRecords, setMyRecords] = useState<AchievementRecordListWithAuthors_AchievementRecord | null>(null);
 
   const [achievementOptions, setAchievementOptions] = useState([] as MinAchievementOption[]);
 
@@ -59,7 +59,7 @@ const AchievementRecord: FC<IProps> = ({ courseId, achievementRecordUploadDeadli
 
   useEffect(() => {
     const options = [...(query.data?.AchievementOptionCourse || [])];
-    setAchievementOptions(options.map((options) => options.AchievementOption));
+    setAchievementOptions(options.map((opt) => opt.AchievementOption) as MinAchievementOption[]);
   }, [query.data?.AchievementOptionCourse]);
 
   const myRecordsQuery = useAuthedQuery<AchievementRecordListWithAuthors, AchievementRecordListWithAuthorsVariables>(
@@ -133,7 +133,7 @@ const AchievementRecord: FC<IProps> = ({ courseId, achievementRecordUploadDeadli
             <p>
               {t('achievement.last_record_upload', {
                 dateTime: formattedDateWithTime(new Date(myRecords.created_at), locale),
-                fullName: makeFullName(profile.firstName, profile.lastName),
+                fullName: makeFullName(profile?.firstName ?? '', profile?.lastName ?? ''),
                 achievementRecordTitle: myRecords.AchievementOption.title,
                 achievementRecordFileName: myRecords.documentationUrl.substring(
                   myRecords.documentationUrl.lastIndexOf('/') + 1
@@ -154,7 +154,7 @@ const AchievementRecord: FC<IProps> = ({ courseId, achievementRecordUploadDeadli
         </div>
       </div>
 
-      {showModal && (
+      {showModal && user && userId && (
         <FormToUploadAchievementRecord
           onClose={onClosed}
           achievementOptionsQuery={query}

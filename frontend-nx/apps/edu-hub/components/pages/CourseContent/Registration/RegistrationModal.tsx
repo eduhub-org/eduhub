@@ -318,7 +318,7 @@ export const RegistrationModal: FC<RegistrationModalProps> = ({
     const result = await onSubmit({
       motivationLetter: motivationLetter.trim(),
       acceptTerms,
-      enrollmentId: config.requiresPayment ? enrollmentId : undefined,
+      enrollmentId: config.requiresPayment ? (enrollmentId ?? undefined) : undefined,
     });
 
     if (result.success) {

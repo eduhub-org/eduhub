@@ -21,9 +21,9 @@ const CheckboxSelector: React.FC<CheckboxSelectorProps> = ({
 }) => {
   const t = useTranslations('common');
 
-  const handleMutationValueUpdate = (newValue: boolean) => {
+  const handleMutationValueUpdate = (value: unknown) => {
+    const newValue = value as boolean;
     onValueUpdated?.(newValue);
-    return newValue;
   };
 
   const {
@@ -34,7 +34,7 @@ const CheckboxSelector: React.FC<CheckboxSelectorProps> = ({
     setShowSavedNotification,
     errorMessage,
     handleValueChange,
-  } = useCheckboxLogic(checked, updateValueMutation, identifierVariables, handleMutationValueUpdate, refetchQueries);
+  } = useCheckboxLogic(checked, updateValueMutation ?? null, identifierVariables ?? {}, handleMutationValueUpdate, refetchQueries);
 
   const checkboxProps = {
     label,
@@ -58,7 +58,7 @@ const CheckboxSelector: React.FC<CheckboxSelectorProps> = ({
         message={t('notification_snackbar.saved')}
       />
 
-      <ErrorMessageDialog errorMessage={error?.message || ''} open={!!error} onClose={resetError} />
+      <ErrorMessageDialog errorMessage={typeof error === 'string' ? error : ''} open={!!error} onClose={resetError} />
     </>
   );
 };

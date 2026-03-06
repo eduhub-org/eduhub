@@ -47,7 +47,7 @@ const CertificatesContent: FC = () => {
     variables: {
       userId: sessionData?.profile?.sub || '',
     },
-    skip: !sessionData?.profile?.sub || sessionStatus === 'loading',
+    skip: !sessionData?.profile?.sub || (sessionStatus as string) === 'loading',
   });
 
   useEffect(() => {

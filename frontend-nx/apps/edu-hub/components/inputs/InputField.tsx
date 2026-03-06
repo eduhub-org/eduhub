@@ -318,7 +318,7 @@ const InputField: React.FC<InputFieldProps> = ({
       lastSentValueRef.current = newText;
       if (updateValueMutation) {
         const textValue = type === 'number' ? Number.parseInt(newText, 10) : newText;
-        updateText({ variables: { itemId, text: textValue } });
+        updateText({ variables: { itemId, text: String(textValue) } });
       } else if (onValueUpdated) {
         onValueUpdated({ text: newText });
       }

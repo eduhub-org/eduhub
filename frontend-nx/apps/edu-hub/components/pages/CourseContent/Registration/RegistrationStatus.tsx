@@ -59,13 +59,13 @@ const CourseLinkInfos: FC<{ course: Course_Course_by_pk }> = ({ course }) => {
   return (
     <div className="flex flex-col justify-between items-center w-full">
       <div className="mb-10">
-        <Button className="bg-blue-200" as="a" href={course.chatLink} filled inverted>
+        <Button className="bg-blue-200" as="a" href={course.chatLink ?? '#'} filled inverted>
           {t('general.to_course_chat')}
         </Button>
       </div>
       {onlineLocation && onlineLocation.defaultSessionAddress && (
         <div className="">
-          <Button className="bg-blue-200" as="a" href={onlineLocation.defaultSessionAddress} filled inverted>
+          <Button className="bg-blue-200" as="a" href={onlineLocation.defaultSessionAddress ?? '#'} filled inverted>
             {t('general.to_online_meeting')}
           </Button>
         </div>

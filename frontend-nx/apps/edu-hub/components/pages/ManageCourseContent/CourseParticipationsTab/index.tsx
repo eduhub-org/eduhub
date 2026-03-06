@@ -16,6 +16,7 @@ import {
 import { CREATE_CERTIFICATES, GET_SIGNED_URL } from '../../../../queries/actions';
 import { COURSE_PARTICIPATIONS } from '../../../../queries/courseParticipation';
 import {
+  CourseParticipations_Course_by_pk_AchievementOptionCourses,
   CourseParticipations_Course_by_pk_AchievementOptionCourses_AchievementOption_AchievementRecords,
   CourseParticipations_Course_by_pk_CourseEnrollments,
   CourseParticipations_Course_by_pk_Sessions,
@@ -53,6 +54,10 @@ interface CourseParticipationsTabIProps {
 type ExtendedEnrollment = CourseParticipations_Course_by_pk_CourseEnrollments & {
   mostRecentRecord?: CourseParticipations_Course_by_pk_AchievementOptionCourses_AchievementOption_AchievementRecords;
 };
+
+const EMPTY_ENROLLMENTS: CourseParticipations_Course_by_pk_CourseEnrollments[] = [];
+const EMPTY_SESSIONS: CourseParticipations_Course_by_pk_Sessions[] = [];
+const EMPTY_ACHIEVEMENT_OPTION_COURSES: CourseParticipations_Course_by_pk_AchievementOptionCourses[] = [];
 
 interface IDotData {
   color: DotColor;
@@ -172,9 +177,22 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
   });
 
   const courseData = data?.Course_by_pk;
-  const enrollments = courseData?.CourseEnrollments ?? [];
-  const sessions = courseData?.Sessions ?? [];
-  const achievementOptionCourses = courseData?.AchievementOptionCourses ?? [];
+  const courseEnrollments = courseData?.CourseEnrollments;
+  const courseSessions = courseData?.Sessions;
+  const courseAchievementOptionCourses = courseData?.AchievementOptionCourses;
+
+  const enrollments = useMemo(
+    () => courseEnrollments ?? EMPTY_ENROLLMENTS,
+    [courseEnrollments]
+  );
+  const sessions = useMemo(
+    () => courseSessions ?? EMPTY_SESSIONS,
+    [courseSessions]
+  );
+  const achievementOptionCourses = useMemo(
+    () => courseAchievementOptionCourses ?? EMPTY_ACHIEVEMENT_OPTION_COURSES,
+    [courseAchievementOptionCourses]
+  );
   const allRecords = useMemo(
     () => flattenAchievementRecords(achievementOptionCourses),
     [achievementOptionCourses]
@@ -183,7 +201,7 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
 
   const extendedEnrollments: ExtendedEnrollment[] = useMemo(
     () =>
-      enrollments.map((enrollment) => ({
+      enrollments.map((enrollment: CourseParticipations_Course_by_pk_CourseEnrollments) => ({
         ...enrollment,
         mostRecentRecord: computeMostRecentRecord(enrollment, course.id, allRecords),
       })),
@@ -394,7 +412,7 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
         return 'grey';
       };
 
-      const dotsData: IDotData[] = sessions.map((s) => ({ session: s, color: dotColor(s) }));
+      const dotsData: IDotData[] = sessions.map((s: CourseParticipations_Course_by_pk_Sessions) => ({ session: s, color: dotColor(s) }));
       const missed = dotsData.filter((d) => d.color === 'red').length;
       const attended = dotsData.filter((d) => d.color === 'lightgreen').length;
       const total = attended + missed;
@@ -657,7 +675,7 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
           open={snackbarOpen}
           onClose={() => setSnackbarOpen(false)}
           message={snackbarMessage}
-          duration={null}
+          duration={undefined}
         />
         {bulkActionError && (
           <ErrorMessageDialog
@@ -698,7 +716,7 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
         open={snackbarOpen}
         onClose={() => setSnackbarOpen(false)}
         message={snackbarMessage}
-        duration={null}
+        duration={undefined}
       />
       {bulkActionError && (
         <ErrorMessageDialog
@@ -855,11 +873,14 @@ function ExpandableRowContent({
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
         <Card title={t('email')}>
           <div className="text-label-primary break-words text-sm">
-            {enrollment.User.email}
+            {enrollment.User?.email ?? '-'}
           </div>
         </Card>
 
-        {hasDocumentation && (
+        {hasDocumentation && enrollment.mostRecentRecord && (() => {
+          const record = enrollment.mostRecentRecord;
+          if (!record) return null;
+          return (
           <Card title={t('documentation_section')}>
             <div className="flex items-center gap-2 mb-4">
               <Dot
@@ -867,7 +888,7 @@ function ExpandableRowContent({
                 className="cursor-pointer"
                 color="grey"
                 size={
-                  enrollment.mostRecentRecord!.rating === AchievementRecordRating_enum.UNRATED
+                  record.rating === AchievementRecordRating_enum.UNRATED
                     ? 'LARGE'
                     : 'DEFAULT'
                 }
@@ -877,7 +898,7 @@ function ExpandableRowContent({
                 className="cursor-pointer"
                 color="lightgreen"
                 size={
-                  enrollment.mostRecentRecord!.rating === AchievementRecordRating_enum.PASSED
+                  record.rating === AchievementRecordRating_enum.PASSED
                     ? 'LARGE'
                     : 'DEFAULT'
                 }
@@ -887,7 +908,7 @@ function ExpandableRowContent({
                 className="cursor-pointer"
                 color="red"
                 size={
-                  enrollment.mostRecentRecord!.rating === AchievementRecordRating_enum.FAILED
+                  record.rating === AchievementRecordRating_enum.FAILED
                     ? 'LARGE'
                     : 'DEFAULT'
                 }
@@ -896,27 +917,25 @@ function ExpandableRowContent({
             <div className="space-y-1 mb-4 text-sm">
               <div>
                 <span className="text-label-secondary">{t('projectTitle')}: </span>
-                {enrollment.mostRecentRecord!.AchievementOption?.title ?? '-'}
+                {record.AchievementOption?.title ?? '-'}
               </div>
               <div>
                 <span className="text-label-secondary">{t('uploaded_by')}: </span>
                 {(() => {
-                  const record = enrollment.mostRecentRecord!;
                   const uploader = (record.AchievementRecordAuthors ?? []).find(
                     (a) => a.userId === record.uploadUserId && a.User
                   );
                   return uploader
-                    ? makeFullName(uploader.User.firstName, uploader.User.lastName ?? '')
+                    ? makeFullName(uploader.User?.firstName ?? '', uploader.User?.lastName ?? '')
                     : '-';
                 })()}
               </div>
               {(() => {
-                const record = enrollment.mostRecentRecord!;
                 const uploadUserId = record.uploadUserId;
                 const coAuthors = (record.AchievementRecordAuthors ?? [])
                   .filter((a) => a.userId !== uploadUserId && a.User)
                   .map((a) =>
-                    makeFullName(a.User.firstName, a.User.lastName ?? '')
+                    makeFullName(a.User?.firstName ?? '', a.User?.lastName ?? '')
                   );
                 if (coAuthors.length === 0) return null;
                 return (
@@ -929,7 +948,7 @@ function ExpandableRowContent({
               <div>
                 <span className="text-label-secondary">{t('lastRecordUpload')}: </span>
                 {formattedDateWithTime(
-                  new Date(enrollment.mostRecentRecord!.created_at),
+                  new Date(record.created_at),
                   locale
                 )}
               </div>
@@ -947,7 +966,8 @@ function ExpandableRowContent({
               )}
             </Button>
           </Card>
-        )}
+          );
+        })()}
 
         {hasCertificates && (
           <Card title={t('certificates_section')}>

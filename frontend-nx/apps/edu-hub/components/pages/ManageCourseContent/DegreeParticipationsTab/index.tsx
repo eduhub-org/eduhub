@@ -4,7 +4,10 @@ import { ColumnDef } from '@tanstack/react-table';
 import { ManagedCourse_Course_by_pk } from '../../../../queries/__generated__/ManagedCourse';
 import TableGrid from '../../../common/TableGrid';
 import { useRoleQuery } from '../../../../hooks/authedQuery';
-import { DegreeParticipantsWithDegreeEnrollments_Course_by_pk_CourseEnrollments } from '../../../../queries/__generated__/DegreeParticipantsWithDegreeEnrollments';
+import type {
+  DegreeParticipantsWithDegreeEnrollments_Course_by_pk_CourseEnrollments,
+  DegreeParticipantsWithDegreeEnrollments_Course_by_pk_CourseEnrollments_User_CourseEnrollments,
+} from '../../../../queries/__generated__/DegreeParticipantsWithDegreeEnrollments';
 import { DEGREE_PARTICIPANTS_WITH_DEGREE_ENROLLMENTS } from '../../../../queries/courseDegree';
 import { CertificateDownload } from '../../../common/CertificateDownload';
 import { useTableGrid } from '../../../common/TableGrid/hooks';
@@ -63,7 +66,7 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
 
   const degreeParticipantsEnrollments =
     data?.Course_by_pk?.CourseEnrollments.filter(
-      (enrollment) =>
+      (enrollment: DegreeParticipantsWithDegreeEnrollments_Course_by_pk_CourseEnrollments) =>
         enrollment.status !== 'REJECTED' && enrollment.status !== 'APPLIED' && enrollment.status !== 'INVITED'
     ) || [];
 
@@ -71,23 +74,23 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
   const totalCount = data?.Course_by_pk?.CourseEnrollments_aggregate?.aggregate?.count || 0;
 
   // Helper functions for the table columns
-  const getMaxUpdatedAt = (courseEnrollments) => {
+  const getMaxUpdatedAt = (courseEnrollments: DegreeParticipantsWithDegreeEnrollments_Course_by_pk_CourseEnrollments_User_CourseEnrollments[]) => {
     if (!courseEnrollments || courseEnrollments.length === 0) {
       return null;
     }
     const maxDate = courseEnrollments
       .map((enrollment) => new Date(enrollment.updated_at))
-      .reduce((maxDate, currentDate) => Math.max(maxDate.getTime(), currentDate.getTime()) > maxDate.getTime() ? currentDate : maxDate);
+      .reduce((maxDate: Date, currentDate: Date) => (Math.max(maxDate.getTime(), currentDate.getTime()) > maxDate.getTime() ? currentDate : maxDate));
     return maxDate.toLocaleString(locale); // Convert the Date object to a string
   };
 
-  const getTotalECTS = (courseEnrollments) => {
+  const getTotalECTS = (courseEnrollments: DegreeParticipantsWithDegreeEnrollments_Course_by_pk_CourseEnrollments_User_CourseEnrollments[]) => {
     if (!courseEnrollments || courseEnrollments.length === 0) {
       return '0';
     }
     const totalEcts = courseEnrollments
       .filter((enrollment) => enrollment.achievementCertificateURL)
-      .reduce((total, current) => {
+      .reduce((total: number, current: DegreeParticipantsWithDegreeEnrollments_Course_by_pk_CourseEnrollments_User_CourseEnrollments) => {
         const ects = Number.parseFloat(current.Course.ects.replace(',', '.')) || 0;
         return total + ects;
       }, 0);
@@ -98,44 +101,45 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
     return formattedEcts;
   };
 
-  const getAttendedEventsCount = (courseEnrollments) => {
+  const getAttendedEventsCount = (courseEnrollments: DegreeParticipantsWithDegreeEnrollments_Course_by_pk_CourseEnrollments_User_CourseEnrollments[]) => {
     if (!courseEnrollments || courseEnrollments.length === 0) {
       return 0;
     }
     const attendedEventsCount = courseEnrollments.filter(
-      (enrollment) => enrollment.Course.Program.shortTitle === 'EVENTS'
+      (enrollment: DegreeParticipantsWithDegreeEnrollments_Course_by_pk_CourseEnrollments_User_CourseEnrollments) => enrollment.Course.Program.shortTitle === 'EVENTS'
     ).length;
 
     return attendedEventsCount;
   };
 
-  const formatParticipations = (courseEnrollments) => {
+  const formatParticipations = (courseEnrollments: DegreeParticipantsWithDegreeEnrollments_Course_by_pk_CourseEnrollments_User_CourseEnrollments[]) => {
     if (!courseEnrollments || courseEnrollments.length === 0) return '';
 
+    type CeType = DegreeParticipantsWithDegreeEnrollments_Course_by_pk_CourseEnrollments_User_CourseEnrollments;
     // Passed courses (achievement certificate - highest priority)
-    const passedEnrollments = courseEnrollments.filter((ce) => ce.achievementCertificateURL);
+    const passedEnrollments = courseEnrollments.filter((ce: CeType) => ce.achievementCertificateURL);
 
     // Attended courses (not passed AND (has attendance certificate OR is an EVENT course))
     const attendedEnrollments = courseEnrollments.filter(
-      (ce) =>
+      (ce: CeType) =>
         !ce.achievementCertificateURL && (ce.attendanceCertificateURL || ce.Course.Program.shortTitle === 'EVENTS')
     );
 
     // Enrolled courses (not passed AND not attended by new definition)
     const enrolledEnrollments = courseEnrollments.filter(
-      (ce) => !ce.achievementCertificateURL && !ce.attendanceCertificateURL && ce.Course.Program.shortTitle !== 'EVENTS'
+      (ce: CeType) => !ce.achievementCertificateURL && !ce.attendanceCertificateURL && ce.Course.Program.shortTitle !== 'EVENTS'
     );
 
-    const passed = passedEnrollments.map((ce) => {
+    const passed = passedEnrollments.map((ce: CeType) => {
       let ects = ce.Course.ects ? ce.Course.ects.replace(',', '.') : '0';
       const parsedEcts = Number.parseFloat(ects);
       ects = Number.isNaN(parsedEcts) ? '0' : parsedEcts.toString();
       return `${ce.Course.title} (${ce.Course.Program.shortTitle}; ${ects} ECTS)`;
     });
 
-    const attended = attendedEnrollments.map((ce) => `${ce.Course.title} (${ce.Course.Program.shortTitle})`);
+    const attended = attendedEnrollments.map((ce: CeType) => `${ce.Course.title} (${ce.Course.Program.shortTitle})`);
 
-    const enrolled = enrolledEnrollments.map((ce) => `${ce.Course.title} (${ce.Course.Program.shortTitle})`);
+    const enrolled = enrolledEnrollments.map((ce: CeType) => `${ce.Course.title} (${ce.Course.Program.shortTitle})`);
 
     let result = '';
     if (passed.length > 0) {
@@ -153,7 +157,7 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
   };
 
   const extendedDegreeParticipantsEnrollments: ExtendedDegreeParticipantsEnrollment[] =
-    degreeParticipantsEnrollments.map((enrollment) => {
+    degreeParticipantsEnrollments.map((enrollment: DegreeParticipantsWithDegreeEnrollments_Course_by_pk_CourseEnrollments) => {
       const name = `${enrollment.User.firstName} ${enrollment.User.lastName}`;
       const lastApplication = getMaxUpdatedAt(enrollment.User.CourseEnrollments) || 'N/A';
       const ectsTotal = getTotalECTS(enrollment.User.CourseEnrollments);

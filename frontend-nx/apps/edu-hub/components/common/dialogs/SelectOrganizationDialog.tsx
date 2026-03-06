@@ -86,7 +86,7 @@ export const SelectOrganizationDialog: FC<IProps> = ({ onClose, open, title }) =
         </div>
 
         <div className="h-[32rem] overflow-auto border border-gray-200 rounded">
-          {organizations.map((organization) => (
+          {organizations.map((organization: OrganizationList_Organization) => (
             <div
               key={organization.id}
               className="p-3 border-b border-gray-100 hover:bg-gray-50 cursor-pointer"

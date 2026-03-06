@@ -107,7 +107,7 @@ const TableGrid = <T extends BaseRow,>({
     clearSelections,
     isAllSelected,
     isSomeSelected,
-  } = useBulkActions<T>(bulkActions, onBulkAction);
+  } = useBulkActions<T>(bulkActions, onBulkAction ?? (() => undefined));
 
   const handleRowExpansionBulkAction = useCallback(
     (action: string) => {
@@ -303,7 +303,7 @@ const TableGrid = <T extends BaseRow,>({
         <div className="flex items-center">
           {onAddButtonClick && (
             <div className="text-label-primary mr-4">
-              <AddButton onClick={onAddButtonClick} title={addButtonText} size="medium" />
+              <AddButton onClick={onAddButtonClick} title={addButtonText ?? ''} size="medium" />
             </div>
           )}
           {showCheckbox && (
@@ -413,7 +413,7 @@ const TableGrid = <T extends BaseRow,>({
         <div style={{ minWidth: `${mainRowContentWidth}px` }}>
           {/* Header row */}
           <div className="flex items-center mb-1 bg-bg-primary text-label-primary py-2">
-        <div className={`flex-grow flex gap-3 ${!showCheckbox ? 'pl-3' : ''}`} style={{ minWidth: `${mainRowContentWidth - (expandableRowComponent ? 40 : 0) - (deleteMutation ? 80 : 0)}px` }}>
+        <div className={`flex-grow flex gap-3 ${!showCheckbox ? 'pl-3' : ''}`} style={{ minWidth: `${mainRowContentWidth - (expandableRowComponent != null ? 40 : 0) - (deleteMutation != null ? 80 : 0)}px` }}>
           {table.getHeaderGroups().map((headerGroup) => (
             <React.Fragment key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
@@ -469,7 +469,7 @@ const TableGrid = <T extends BaseRow,>({
             return (
               <div className="flex items-stretch mb-1">
                 <div className={`flex-grow bg-bg-secondary text-label-primary light ${compactRows ? 'py-1' : 'py-2'}`}>
-                  <div className={`flex items-center gap-3 ${!showCheckbox ? 'pl-3' : ''}`} style={{ minWidth: `${mainRowContentWidth - (expandableRowComponent ? 40 : 0) - (deleteMutation ? 80 : 0)}px` }}>
+                  <div className={`flex items-center gap-3 ${!showCheckbox ? 'pl-3' : ''}`} style={{ minWidth: `${mainRowContentWidth - (expandableRowComponent != null ? 40 : 0) - (deleteMutation != null ? 80 : 0)}px` }}>
                     {table.getHeaderGroups()[0]?.headers.map((header) => (
                       <div
                         key={header.id}
@@ -496,7 +496,7 @@ const TableGrid = <T extends BaseRow,>({
               {/* Primary Row */}
               <div className={`flex items-stretch ${expandedRows.has(row.original.id) ? 'mb-0' : 'mb-1'}`}>
                 <div className={`flex-grow bg-bg-secondary text-label-primary light ${compactRows ? 'py-1' : 'py-2'}`}>
-                  <div className={`flex items-center gap-3 ${!showCheckbox ? 'pl-3' : ''}`} style={{ minWidth: `${mainRowContentWidth - (expandableRowComponent ? 40 : 0) - (deleteMutation ? 80 : 0)}px` }}>
+                  <div className={`flex items-center gap-3 ${!showCheckbox ? 'pl-3' : ''}`} style={{ minWidth: `${mainRowContentWidth - (expandableRowComponent != null ? 40 : 0) - (deleteMutation != null ? 80 : 0)}px` }}>
                     {row.getVisibleCells().map((cell) => (
                       <div
                         key={cell.id}
@@ -527,7 +527,7 @@ const TableGrid = <T extends BaseRow,>({
                     <TableGridDeleteButton
                       deleteMutation={deleteMutation}
                       id={row.original.id}
-                      idType={deleteIdType}
+                      idType={deleteIdType ?? 'number'}
                       deletionConfirmationQuestion={
                         generateDeletionConfirmationQuestion
                           ? generateDeletionConfirmationQuestion(row.original)
@@ -542,7 +542,7 @@ const TableGrid = <T extends BaseRow,>({
               {expandableRowComponent && expandedRows.has(row.original.id) && (
                 <div className="flex items-stretch mb-1">
                   <div className="flex-grow bg-bg-secondary text-label-primary py-2 overflow-x-auto light">
-                    <div className={`flex items-center gap-3 ${!showCheckbox ? 'pl-3' : ''}`} style={{ minWidth: `${mainRowContentWidth - (expandableRowComponent ? 40 : 0) - (deleteMutation ? 80 : 0)}px` }}>
+                    <div className={`flex items-center gap-3 ${!showCheckbox ? 'pl-3' : ''}`} style={{ minWidth: `${mainRowContentWidth - (expandableRowComponent != null ? 40 : 0) - (deleteMutation != null ? 80 : 0)}px` }}>
                       <ExpandableRowWrapper
                         key={`expandableRow-${row.id}`}
                         renderFn={expandableRowComponent}
@@ -550,7 +550,7 @@ const TableGrid = <T extends BaseRow,>({
                       />
                     </div>
                   </div>
-                  {expandableRowComponent && <div className="w-10 flex-shrink-0"></div>}
+                  {expandableRowComponent != null && <div className="w-10 flex-shrink-0"></div>}
                   {deleteMutation && <div className="w-20 flex-shrink-0"></div>}
                 </div>
               )}
@@ -561,7 +561,7 @@ const TableGrid = <T extends BaseRow,>({
       </div>
 
       {/* Pagination */}
-      {!loading && !error && enablePagination && totalCount > 0 && (
+      {!loading && !error && enablePagination && (totalCount ?? 0) > 0 && (
         <div className="flex justify-end pb-10 text-label-primary mt-4">
           <div className="flex flex-row items-center space-x-5">
             {onPageSizeChange && (

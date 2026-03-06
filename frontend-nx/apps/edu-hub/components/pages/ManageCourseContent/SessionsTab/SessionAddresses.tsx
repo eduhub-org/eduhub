@@ -23,7 +23,7 @@ export const SessionAddresses: FC<SessionAddressesIProps> = ({ address, refetchQ
   const defaultSessionAddressId = (address?.CourseLocation as any)?.defaultSessionAddressId;
   const sessionAddress = address?.address || defaultSessionAddress;
   const isOnline = address?.CourseLocation?.locationOption === 'ONLINE';
-  const isValidLink = isLinkFormat(sessionAddress);
+  const isValidLink = isLinkFormat(sessionAddress ?? '');
   
   // Get the current locationAddressId if it exists
   const currentLocationAddressId = (address as any)?.locationAddressId || null;

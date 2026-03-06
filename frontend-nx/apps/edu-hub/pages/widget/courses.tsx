@@ -130,6 +130,7 @@ const WidgetCourses: FC = () => {
         document.documentElement.classList.remove('widget-page');
       };
     }
+    return undefined;
   }, []);
 
   // Hide Cookiebot cookie consent on widget pages

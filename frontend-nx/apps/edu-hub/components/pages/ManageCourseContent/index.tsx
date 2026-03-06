@@ -83,7 +83,7 @@ export const ManageCourseContent: FC<Props> = ({ courseId }) => {
 
   const isAdmin = useIsAdmin();
   const instructorIds = qResult?.data?.Course_by_pk?.CourseInstructors.map((ci) => ci.User.id);
-  const isInstructorOfCourse = useIsUserIdInList(instructorIds);
+  const isInstructorOfCourse = useIsUserIdInList(instructorIds ?? []);
 
   if (qResult.error) {
     console.log('query managed course error!', qResult.error);
@@ -155,7 +155,7 @@ export const ManageCourseContent: FC<Props> = ({ courseId }) => {
 
   // useMemo must be called before any early returns to comply with Rules of Hooks
   const registrationFeatures = useMemo(
-    () => getRegistrationFeatures(course?.registrationType),
+    () => getRegistrationFeatures(course?.registrationType ?? null),
     [course?.registrationType]
   );
 

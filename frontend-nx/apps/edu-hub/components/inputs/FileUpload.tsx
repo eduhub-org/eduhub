@@ -1,14 +1,24 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { Publish } from '@mui/icons-material';
+import { MutationFunction } from '@apollo/client';
 
 import { useFileUploader } from '../../hooks/fileUpload';
 
-const FileUpload = ({ id, uploadMutation, submitMutation, uploadVariables, submitVariables, refetchQueries }) => {
+interface FileUploadProps {
+  id: string;
+  uploadMutation: MutationFunction;
+  submitMutation: MutationFunction;
+  uploadVariables: Record<string, unknown>;
+  submitVariables: Record<string, unknown>;
+  refetchQueries?: string[];
+}
+
+const FileUpload = ({ id, uploadMutation, submitMutation, uploadVariables, submitVariables, refetchQueries = [] }: FileUploadProps) => {
   const { register } = useForm();
   const { getFileBase64, isLoading } = useFileUploader();
 
-  const handleFileUploadAndSubmit = async (file) => {
+  const handleFileUploadAndSubmit = async (file: File) => {
     let fileUrl = null;
     if (file) {
       const base64 = await getFileBase64(file);
@@ -44,8 +54,8 @@ const FileUpload = ({ id, uploadMutation, submitMutation, uploadVariables, submi
     });
   };
 
-  const onFileChange = async (event) => {
-    const file = event.target.files[0];
+  const onFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
     if (file) {
       await handleFileUploadAndSubmit(file);
     }

@@ -8,7 +8,7 @@ const path = require('path');
 /**
  * Extract hostname from a URL
  */
-const getHostnameFromUrl = (url) => {
+const getHostnameFromUrl = (/** @type {string} */ url) => {
   if (!url || typeof url !== 'string') return null;
   try {
     let urlToParse = url.trim();

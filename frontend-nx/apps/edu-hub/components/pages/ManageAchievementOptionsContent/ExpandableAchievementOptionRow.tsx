@@ -246,7 +246,7 @@ const ExpandableAchievementOptionRow: FC<ExpandableAchievementOptionRowProps> = 
               items={achievementOption.AchievementOptionCourses}
               renderItem={(aoCourse) => ({
                 label: aoCourse.Course.title,
-                sublabel: aoCourse.Course.Program?.shortTitle,
+                sublabel: aoCourse.Course.Program?.shortTitle ?? undefined,
               })}
               getItemKey={(aoCourse) => aoCourse.id}
               onDelete={deleteCourseHandler}

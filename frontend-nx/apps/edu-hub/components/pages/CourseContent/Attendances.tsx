@@ -8,7 +8,7 @@ import Dot from '../../common/Dot';
 import { AttendanceStatus_enum } from '../../../__generated__/globalTypes';
 import { CourseWithEnrollment_Course_by_pk_Sessions } from '../../../queries/__generated__/CourseWithEnrollment';
 
-const getBgColor = (status) => {
+const getBgColor = (status: AttendanceStatus_enum | string) => {
   if (status === NO_INFO) {
     return 'bg-gray-200';
   } else if (status === ATTENDED) {
