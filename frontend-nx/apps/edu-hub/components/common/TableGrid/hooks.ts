@@ -154,7 +154,7 @@ export function useTableGrid<V>({
 }
 
 export const useBulkActions = <T extends BaseRow>(
-  bulkActions: BulkAction[],
+  _bulkActions: BulkAction[],
   onBulkAction: (action: string, selectedRows: T[]) => void
 ) => {
   const [selectedRowIds, setSelectedRowIds] = useState<Set<number>>(new Set());

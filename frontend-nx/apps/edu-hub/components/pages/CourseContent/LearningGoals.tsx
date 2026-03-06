@@ -3,7 +3,7 @@ import { useTranslations } from 'next-intl';
 import checkmark from '../../../public/images/course/checkmark.svg';
 
 interface LearningGoalsProps {
-  learningGoals: string;
+  learningGoals: string | null;
 }
 
 export const LearningGoals: FC<LearningGoalsProps> = ({ learningGoals }) => {

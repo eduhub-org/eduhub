@@ -269,6 +269,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
       }, 1000);
       return () => clearTimeout(timer);
     }
+    return undefined;
   }, [course, requiresPayment, stripeSyncStatus, isStripeSyncing, handleSyncStripeBasePrice]);
 
   // Determine available template types based on registration type
@@ -347,7 +348,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
           refetchTemplatesCount();
         } catch (err) {
           console.error('Error creating templates from defaults:', err);
-          handleError(err);
+          handleError(err instanceof Error ? err.message : String(err));
           return;
         }
       }
@@ -384,7 +385,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
             )}
           </div>
         </div>
-        <button onClick={() => onDelete(instructor.User.id)} className="text-error hover:text-error p-1">
+        <button onClick={() => onDelete(String(instructor.User.id))} className="text-error hover:text-error p-1">
           ×
         </button>
       </div>
@@ -547,7 +548,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
   }, []);
 
   const handleUserCreated = useCallback(
-    async (userId: string, firstName: string, lastName: string, email: string) => {
+    async (userId: string, _firstName: string, _lastName: string, email: string) => {
       setCreateUserDialogOpen(false);
 
       // Fetch the newly created user to get the full UserSelectionWithFilter_User structure

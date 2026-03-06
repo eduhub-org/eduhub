@@ -26,7 +26,7 @@ export const Tile: FC<TileProps> = ({ course, isManage }) => {
 
   return (
     <Link href={isManage ? `/manage/course/${course.id}` : `/course/${course.id}`}>
-      <TileBase coverImage={course?.coverImage} title={course.title}>
+      <TileBase coverImage={course?.coverImage ?? null} title={course.title}>
         <div className="flex justify-between mb-3 text-sm tracking-wider text-label-primary">
           {course.weekDay !== 'NONE' && course.startTime && course.endTime
             ? getWeekdayStartAndEndString(course, t)
@@ -35,7 +35,7 @@ export const Tile: FC<TileProps> = ({ course, isManage }) => {
             <div className="w-4 h-4 mr-1">
               <Image src={languageIcon} alt="language icon" width={16} height={16} unoptimized className="w-full h-full object-contain" />
             </div>
-            {t(course.language)}
+            {t(course.language ?? '')}
           </div>
         </div>
         <span className="text-lg mb-auto line-clamp-3 text-label-primary">{course.tagline}</span>

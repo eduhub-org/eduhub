@@ -2,7 +2,7 @@ import { FC, useMemo } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { useSession } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
-import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import { DragDropContext, Droppable, Draggable, type DropResult } from '@hello-pangea/dnd';
 
 import { Button } from '../../common/Button';
 import FormFieldRow from '../../inputs/FormFieldRow';
@@ -80,10 +80,10 @@ const ManageAppSettingsContent: FC = () => {
 
       if (appSettings) {
         reset({
-          bannerBackgroundColor: appSettings.bannerBackgroundColor,
-          bannerFontColor: appSettings.bannerFontColor,
-          bannerTextDe: appSettings.bannerTextDe,
-          bannerTextEn: appSettings.bannerTextEn,
+          bannerBackgroundColor: appSettings.bannerBackgroundColor ?? undefined,
+          bannerFontColor: appSettings.bannerFontColor ?? undefined,
+          bannerTextDe: appSettings.bannerTextDe ?? undefined,
+          bannerTextEn: appSettings.bannerTextEn ?? undefined,
         });
       }
     },
@@ -135,7 +135,7 @@ const ManageAppSettingsContent: FC = () => {
     }
   };
 
-  const onDragEnd = async (result) => {
+  const onDragEnd = async (result: DropResult) => {
     if (!result.destination || !sliderGroupOptions) return;
 
     const reorderedItems = Array.from(sliderGroupOptions);
@@ -272,7 +272,7 @@ const ManageAppSettingsContent: FC = () => {
             <DropDownSelector
               variant="material"
               options={timeZoneOptions}
-              value={appSettingsData?.AppSettings[0]?.timeZone}
+              value={appSettingsData?.AppSettings[0]?.timeZone ?? ''}
               helpText={t('time_zone.help_text')}
               updateValueMutation={UPDATE_APP_SETTINGS_TIME_ZONE}
               identifierVariables={{ appName: 'edu' }}

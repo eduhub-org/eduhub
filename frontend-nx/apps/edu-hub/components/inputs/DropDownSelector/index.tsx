@@ -187,7 +187,7 @@ const DropDownSelector: React.FC<DropDownSelectorProps> = ({
         onClose={() => setShowSavedNotification(false)}
         message={t('notification_snackbar.saved')}
       />
-      <ErrorMessageDialog errorMessage={error} open={!!error} onClose={resetError} />
+      <ErrorMessageDialog errorMessage={typeof error === 'string' ? error : ''} open={!!error} onClose={resetError} />
     </>
   );
 };

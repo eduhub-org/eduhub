@@ -1,8 +1,8 @@
 import log from 'loglevel';
 
-const isPublicLegacy = (filePath) => filePath.startsWith("https://") || filePath.startsWith("http://");
+const isPublicLegacy = (filePath: string) => filePath.startsWith("https://") || filePath.startsWith("http://");
 
-const isPublic = (filePath) => filePath.includes("/public/");
+const isPublic = (filePath: string) => filePath.includes("/public/");
 
 export const getPublicUrl = (filePath: string): string | null  => {
   // log.debug(`getPublicUrl called with filePath: ${filePath}`);
@@ -31,7 +31,7 @@ export const getPublicUrl = (filePath: string): string | null  => {
   }
 }
 
-export const getPublicImageUrl = (filePath: string, size: number): string | null  => {
+export const getPublicImageUrl = (filePath: string | null, size: number): string | null  => {
   // log.debug(`getPublicImageUrl called with filePath: ${filePath} and size: ${size}`);
 
   // Check if filePath is null
@@ -44,7 +44,7 @@ export const getPublicImageUrl = (filePath: string, size: number): string | null
   const resizedFilePathBase = filePath.replace(/\.[^.]+$/, `-${size}`);
   const resizedFilePath = isPublicLegacy(filePath) ? `${resizedFilePathBase}.${originalFileType}` : `${resizedFilePathBase}.webp`;
 
-  const isLegacyProfileImagePath = isPublicLegacy && filePath.includes('profile_image');
+  const isLegacyProfileImagePath = isPublicLegacy(filePath) && filePath.includes('profile_image');
 
   // log.debug(`Resized file path: ${resizedFilePath}`);
 

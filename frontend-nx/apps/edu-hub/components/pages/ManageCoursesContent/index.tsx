@@ -250,7 +250,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
               ? selectedProgram.defaultApplicationEnd
               : new Date(),
           maxMissedSessions: 2,
-          programId: selectedProgramId,
+          programId: selectedProgramId ?? 0,
           locationOption: LocationOption_enum.ONLINE,
         },
         refetchQueries: ['AdminCourseList'],
@@ -341,8 +341,8 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
     if (data && !loading && !error) {
       return (
         data.CourseGroupOption
-          ?.filter((option) => option.sliderGroup)
-          .map((option) => ({
+          ?.filter((option: { sliderGroup: boolean }) => option.sliderGroup)
+          .map((option: { id: number; title: string | null }) => ({
             id: option.id,
             name: option.title ? tCommon(`course_group_options.${option.title}`) : '—',
           })) || []
@@ -723,7 +723,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
       <div className="flex justify-start mb-5 text-white">
         <ProgramsMenubar
           programs={menubarPrograms}
-          defaultProgramId={defaultProgramId}
+          defaultProgramId={defaultProgramId ?? 0}
           currentSelectedId={currentProgramId}
           onTabClicked={handleTabClick}
         />
@@ -738,7 +738,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
         totalCount={totalCount}
         pageIndex={pageIndex}
         onPageChange={setPageIndex}
-        pageSize={filter.limit || QUERY_LIMIT}
+        pageSize={filter.limit ?? QUERY_LIMIT}
         onPageSizeChange={handlePageSizeChange}
         searchFilter={searchFilter}
         onSearchFilterChange={setSearchFilter}

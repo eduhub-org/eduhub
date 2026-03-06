@@ -5,14 +5,13 @@ import MenuItem from '@mui/material/MenuItem';
 import { styled } from '@mui/material/styles';
 import { MinAchievementOption } from '../../../../../helpers/achievement';
 import React, { FC, createElement, useCallback } from 'react';
-import { AchievementOptionCourses_AchievementOptionCourse_AchievementOption } from '../../../../../queries/__generated__/AchievementOptionCourses';
 
 interface IProps {
   anchorElement: HTMLElement | undefined;
   isVisible: boolean;
   setVisible: (visible: boolean) => void;
   courseAchievementOptions: MinAchievementOption[];
-  callback: (item: AchievementOptionCourses_AchievementOptionCourse_AchievementOption) => void;
+  callback: (item: MinAchievementOption) => void;
 }
 
 // Replace with styled
@@ -34,7 +33,7 @@ export const AchievementOptionDropDown: FC<IProps> = ({
 }) => {
   const hideMenu = useCallback(() => setVisible(false), [setVisible]);
   const onOptionClick = useCallback(
-    (data: AchievementOptionCourses_AchievementOptionCourse_AchievementOption) => {
+    (data: MinAchievementOption) => {
       setVisible(false);
       callback(data);
     },

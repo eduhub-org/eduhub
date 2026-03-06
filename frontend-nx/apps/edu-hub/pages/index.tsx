@@ -106,17 +106,20 @@ const Home: FC = () => {
     [publishedCourses, courseGroupOptionsData]
   );
 
-  const renderCourseGroups = (groups, groupKey) => (
+  const renderCourseGroups = (
+    groups: Array<{ title?: string; courses: unknown[]; isManaged?: boolean }>,
+    groupKey: string
+  ) => (
     <>
       {groups.map(
-        (group, index) =>
+        (group: { title?: string; courses: unknown[]; isManaged?: boolean }, index: number) =>
           group.courses.length > 0 && (
             <Fragment key={`${groupKey}-${index}`}>
               <h2 id={`sliderGroup${index + 1}`} className="text-2xl font-semibold text-left ml-3 md:ml-0">
                 {group.title ? tCommon(`course_group_options.${group.title}`) : '—'}
               </h2>
               <div className="mt-2 mb-12">
-                <TileSlider courses={group.courses} isManage={group.isManaged ?? false} />
+                <TileSlider courses={group.courses as import('../components/common/TileSlider').CourseType[]} isManage={group.isManaged ?? false} />
               </div>
             </Fragment>
           )

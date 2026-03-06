@@ -202,7 +202,7 @@ const ManageOrganizationsContent: FC = () => {
 
   const organizationTypes = useMemo(
     () =>
-      data?.OrganizationType?.map((type) => ({ value: type.value, label: t(`type_selection.${type.value}`) })) || [],
+      data?.OrganizationType?.map((type: { value: string }) => ({ value: type.value, label: t(`type_selection.${type.value}`) })) || [],
     [data, t]
   );
 

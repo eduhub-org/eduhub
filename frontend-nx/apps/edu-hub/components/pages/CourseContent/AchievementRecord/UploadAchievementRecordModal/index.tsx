@@ -35,7 +35,6 @@ import { ErrorMessageDialog } from '../../../../common/dialogs/ErrorMessageDialo
 import useErrorHandler from '../../../../../hooks/useErrorHandler';
 import {
   AchievementOptionCourses,
-  AchievementOptionCourses_AchievementOptionCourse_AchievementOption,
   AchievementOptionCoursesVariables,
 } from '../../../../../queries/__generated__/AchievementOptionCourses';
 import { QueryResult } from '@apollo/client';
@@ -50,7 +49,7 @@ import {
 interface State {
   achievementRecordTableId: number; // book keeping
   coverImageUrl: UploadFile;
-  description: string;
+  description: string | null;
   documentationUrl: UploadFile;
   evaluationScriptUrl: UploadFile;
   csvResults: UploadFile;
@@ -121,8 +120,7 @@ const UploadAchievementRecordModal: FC<IProps> = ({
     onError: (error) => handleError(t(error.message)),
   });
 
-  const [selectedAchievementOption, setSelectedAchievementOption] =
-    useState<AchievementOptionCourses_AchievementOptionCourse_AchievementOption>();
+  const [selectedAchievementOption, setSelectedAchievementOption] = useState<MinAchievementOption>();
   const [isVisibleAchievementOptions, setAchievementOptionVisibility] = useState(false);
   const [archiveOptionsAnchorElement, setAnchorElement] = useState<HTMLElement>();
   const [achievementOptions, setAchievementOptions] = useState([] as MinAchievementOption[]);
@@ -136,7 +134,7 @@ const UploadAchievementRecordModal: FC<IProps> = ({
 
   useEffect(() => {
     const options = [...(achievementOptionsQuery.data?.AchievementOptionCourse || [])];
-    setAchievementOptions(options.map((options) => options.AchievementOption));
+    setAchievementOptions(options.map((opt) => opt.AchievementOption) as MinAchievementOption[]);
   }, [achievementOptionsQuery.data?.AchievementOptionCourse]);
 
   const onAchievementOptionDropdown = useCallback(
@@ -149,7 +147,7 @@ const UploadAchievementRecordModal: FC<IProps> = ({
     [setAnchorElement]
   );
   const onItemSelectedFromDropdown = useCallback(
-    async (item: AchievementOptionCourses_AchievementOptionCourse_AchievementOption) => {
+    async (item: MinAchievementOption) => {
       setSelectedAchievementOption(item);
     },
     [setSelectedAchievementOption]
@@ -172,7 +170,7 @@ const UploadAchievementRecordModal: FC<IProps> = ({
   }, [setVisibleAuthorList]);
 
   const onCloseAuthorList = useCallback(
-    (close: boolean, user: AtLeastNameEmail | null) => {
+    (_close: boolean, user: AtLeastNameEmail | null) => {
       if (user) {
         if (!state.authors.find((u) => u.id === user.id)) {
           dispatch({
@@ -214,7 +212,7 @@ const UploadAchievementRecordModal: FC<IProps> = ({
   >(INSERT_AN_ACHIEVEMENT_RECORD);
 
   const save = useCallback(
-    async (event) => {
+    async (event: React.FormEvent) => {
       let createdRecordId: number | null = null;
       try {
         setLoading(true);
@@ -336,17 +334,20 @@ const UploadAchievementRecordModal: FC<IProps> = ({
                 {t('achievement.selected_achievement_option')}:<br />
                 {selectedAchievementOption.title}
               </div>
-              {selectedAchievementOption.AchievementOptionTemplate && (
+              {(() => {
+                const template = (selectedAchievementOption as { AchievementOptionTemplate?: { url: string } }).AchievementOptionTemplate;
+                return template ? (
                 <div>
                   <p className="mb-3">{t('achievement.use_documentation_template')}</p>
                   <FileDownload
-                    filePath={selectedAchievementOption.AchievementOptionTemplate.url}
+                    filePath={template.url}
                     type="button"
                     className="mb-3 lg:mb-0 lg:mr-3"
                     label={t('achievement.download_template')}
                   />
                 </div>
-              )}
+                ) : null;
+              })()}
             </div>
           )}
 

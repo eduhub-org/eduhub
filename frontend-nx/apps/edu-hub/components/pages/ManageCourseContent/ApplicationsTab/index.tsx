@@ -879,7 +879,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
                 columns={columns}
                 data={filteredEnrollments}
                 loading={false}
-                error={null as ApolloError}
+                error={null as unknown as ApolloError}
                 expandableRowComponent={ExpandableApplicationRow}
                 bulkActions={bulkActions}
                 onBulkAction={handleBulkEmailAction}

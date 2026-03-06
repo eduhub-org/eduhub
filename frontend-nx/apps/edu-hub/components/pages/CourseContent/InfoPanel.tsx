@@ -187,7 +187,7 @@ export const InfoPanel: FC<IProps> = ({ course }) => {
           <div className="flex justify-center items-center mt-2">
             <Image src={languageIcon} alt="Language" width={47} height={40} unoptimized className="w-full h-full object-contain max-w-[47px] max-h-10" />
           </div>
-          <span className="text-sm mt-2 text-center">{t(course.language)}</span>
+          <span className="text-sm mt-2 text-center">{t(course.language ?? '')}</span>
         </div>
       );
     }

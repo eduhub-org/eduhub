@@ -37,7 +37,7 @@ export const CertificateDownload: FC<IProps> = ({
     GetSignedUrlVariables
   >(GET_SIGNED_URL, {
     variables: {
-      path: courseEnrollment?.achievementCertificateURL,
+      path: courseEnrollment?.achievementCertificateURL ?? '',
     },
     skip: !courseEnrollment?.achievementCertificateURL,
     onError: () => handleQueryError(t('errorMessages.loadAchievementCertificateError')),
@@ -54,7 +54,7 @@ export const CertificateDownload: FC<IProps> = ({
     GetSignedUrlVariables
   >(GET_SIGNED_URL, {
     variables: {
-      path: courseEnrollment?.attendanceCertificateURL,
+      path: courseEnrollment?.attendanceCertificateURL ?? '',
     },
     skip: !courseEnrollment?.attendanceCertificateURL,
     onError: () => handleQueryError(t('errorMessages.loadAttendanceCertificateError')),
@@ -84,7 +84,7 @@ export const CertificateDownload: FC<IProps> = ({
               as="a"
               filled
               className={`flex justify-center items-center ${!manageView ? 'w-full' : ''}`}
-              href={loadAchievementCertificateData.getSignedUrl.link}
+              href={loadAchievementCertificateData.getSignedUrl?.link ?? '#'}
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -99,7 +99,7 @@ export const CertificateDownload: FC<IProps> = ({
             as="a"
             filled
             className={`flex justify-center items-center ${!manageView ? 'w-full' : ''}`}
-            href={loadAttendanceCertificateData.getSignedUrl.link}
+            href={loadAttendanceCertificateData.getSignedUrl?.link ?? '#'}
             target="_blank"
             rel="noopener noreferrer"
           >

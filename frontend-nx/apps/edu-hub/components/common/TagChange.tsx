@@ -5,9 +5,9 @@ export const createHandleTagChange = (
   setTags: React.Dispatch<React.SetStateAction<{ id: number }[]>>,
   refetchCourses: () => void
 ) => {
-  return (event, value) => {
-    const removedTag = tags.find((tag) => !value.includes(tag));
-    const addedTag = value.find((tag) => !tags.includes(tag));
+  return (_event: React.SyntheticEvent, value: { id: number }[]) => {
+    const removedTag = tags.find((tag: { id: number }) => !value.includes(tag));
+    const addedTag = value.find((tag: { id: number }) => !tags.includes(tag));
 
     if (removedTag) {
       deleteTagFromItem(removedTag.id);

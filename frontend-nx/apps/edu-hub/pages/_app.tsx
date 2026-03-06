@@ -70,6 +70,7 @@ const MyApp: FC<AppProps & InitialProps> & {
         router.events.off('routeChangeComplete', handleRouteChange);
       };
     }
+    return undefined;
   }, [router.events, isFBPixelLoaded]);
 
   return (

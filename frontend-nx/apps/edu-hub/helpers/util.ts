@@ -2,8 +2,8 @@ import { Course_Course_by_pk } from '../queries/__generated__/Course';
 import { CourseWithEnrollment_Course_by_pk } from '../queries/__generated__/CourseWithEnrollment';
 
 export const prioritizeClasses = (classString: string, prefixes: string[] = ['mb-', 'w-']): string => {
-  const lastClasses = {};
-  const otherClasses = [];
+  const lastClasses: Record<string, string> = {};
+  const otherClasses: string[] = [];
 
   classString.split(' ').forEach(className => {
     const prefix = prefixes.find(prefix => className.startsWith(prefix));
@@ -104,11 +104,11 @@ export const isDateExpired = (givenDate: Date) => {
 };
 
 export const getCourseEnrollment = (
-  course: Course_Course_by_pk | CourseWithEnrollment_Course_by_pk,
-  userId: string
+  course: Course_Course_by_pk | CourseWithEnrollment_Course_by_pk | null | undefined,
+  userId: string | undefined
 ) => {
   // if the type is Course_Course_by_pk return the same value as if the type was CourseWithEnrollment_Course_by_pk and no enrollment was found
-  if (!course || !('CourseEnrollments' in course)) {
+  if (!course || !('CourseEnrollments' in course) || !userId) {
     return null;
   }
   return course.CourseEnrollments.find(
@@ -117,7 +117,7 @@ export const getCourseEnrollment = (
 };
 
 
-export const isLinkFormat = (str) => {
+export const isLinkFormat = (str: string) => {
   const pattern = new RegExp('^(https?:\\/\\/)?' + // protocol
     '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name and extension
     '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
@@ -128,6 +128,6 @@ export const isLinkFormat = (str) => {
   return pattern.test(str);
 };
 
-export const isECTSFormat = (str) => {
-  return str.match(/^(2,5|5|12,5|NONE)$/);
+export const isECTSFormat = (str: string): boolean => {
+  return str.match(/^(2,5|5|12,5|NONE)$/) !== null;
 };

@@ -104,7 +104,7 @@ const ManageAdminUsersContent: FC = () => {
   const [adminUserIds, setAdminUserIds] = useState<string[]>([]);
   const [adminError, setAdminError] = useState<Error | null>(null);
 
-  const { data: adminData } = useAdminQuery(ADMIN_USERS, {
+  useAdminQuery(ADMIN_USERS, {
     onCompleted: (data) => {
       if (data?.getAdminUsers?.success) {
         setAdminUserIds(data.getAdminUsers.adminUserIds);

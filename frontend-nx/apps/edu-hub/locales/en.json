@@ -701,6 +701,40 @@
     "form-info-documentations": "<component>Use this template to upload the documentation!</component>",
     "uploadDocumentationTemplate": "Upload documentation template"
   },
+  "manageAchievementOptions": {
+    "manage_templates_button": "Manage templates",
+    "table_header": {
+      "title": "Title",
+      "record_type": "Type",
+      "mentors": "Mentors",
+      "courses": "Courses"
+    },
+    "record_type": {
+      "DOCUMENTATION": "Documentation",
+      "ONLINE_COURSE": "Online course"
+    },
+    "title": {
+      "placeholder": "Enter project title"
+    },
+    "description": {
+      "placeholder": "Enter description"
+    },
+    "documentation_template": {
+      "placeholder": "Select template",
+      "help_text": "Select a documentation template for this achievement option"
+    },
+    "add_mentor": "Add mentor",
+    "remove_mentor": "Remove mentor",
+    "add_course": "Add course",
+    "delete_button": {
+      "untitled_achievement_option": "Untitled achievement option",
+      "delete_achievement_option_confirmation": "Are you sure you want to delete the achievement option \"{title}\"?"
+    },
+    "notifications": {
+      "achievement_option_added": "Achievement option was added",
+      "add_failed": "Failed to add achievement option"
+    }
+  },
   "statistics": {
     "statistics": "Statistics",
     "select_statistics": {

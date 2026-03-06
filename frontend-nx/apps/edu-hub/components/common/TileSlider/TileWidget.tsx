@@ -49,7 +49,7 @@ export const TileWidget: FC<TileWidgetProps> = ({ course }) => {
   return (
     <a href={courseUrl} target="_blank" rel="noopener noreferrer" style={{ display: 'block' }}>
       <TileBase 
-        coverImage={course?.coverImage} 
+        coverImage={course?.coverImage ?? null} 
         title={course.title} 
         className="shadow-lg"
         style={{ boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1)' }}
@@ -62,7 +62,7 @@ export const TileWidget: FC<TileWidgetProps> = ({ course }) => {
             <div className="w-4 h-4 mr-1">
               <Image src={languageIcon} alt="language icon" width={16} height={16} unoptimized className="w-full h-full object-contain" />
             </div>
-            {t(course.language)}
+            {t(course.language ?? '')}
           </div>
         </div>
         <span className="text-lg mb-auto line-clamp-3">{course.tagline}</span>
