@@ -5,15 +5,21 @@
     "allowJs": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "strict": false,
+    "strict": true,
+    "strictNullChecks": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "incremental": true,
-    "types": ["jest", "node"], // Only include necessary types
-    "typeRoots": ["../../node_modules/@types"], // Correct locations for type definitions
-    "baseUrl": "../../" // Set correctly to the workspace root
+    "types": ["jest", "node"],
+    "typeRoots": ["../../node_modules/@types"],
+    "baseUrl": "../../"
   },
   "include": [
     "**/*.ts",
@@ -21,7 +27,7 @@
     "**/*.js",
     "**/*.jsx",
     "next-env.d.ts",
-    "types/**/*.d.ts" // Include all types from your custom types directory
+    "types/**/*.d.ts"
   ],
   "exclude": ["node_modules", "jest.config.ts"]
 }

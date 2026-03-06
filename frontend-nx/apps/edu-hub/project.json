@@ -58,6 +58,13 @@
         "lintFilePatterns": ["apps/edu-hub/**/*.{ts,tsx,js,jsx}"]
       }
     },
+    "type-check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node_modules/.bin/tsc --noEmit --project apps/edu-hub/tsconfig.json",
+        "cwd": "."
+      }
+    },
     "apollo": {
       "executor": "nx:run-commands",
       "options": {
