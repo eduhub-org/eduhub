@@ -1,13 +1,35 @@
-import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client';
+import { ApolloClient, ApolloLink, InMemoryCache, createHttpLink } from '@apollo/client';
+import { AuthRoles } from '../types/enums';
+import { getAuthState } from './authStore';
 
 const httpLink = createHttpLink({
   uri: process.env.NEXT_PUBLIC_API_URL,
   credentials: 'include',
 });
 
+const authLink = new ApolloLink((operation, forward) => {
+  const { accessToken, role } = getAuthState();
+  const roleOverride = operation.getContext().role as AuthRoles | undefined;
+  const effectiveRole = roleOverride ?? role;
+  const willAddAuth = !!(accessToken && effectiveRole !== AuthRoles.anonymous);
+
+  if (willAddAuth) {
+    operation.setContext((prev: Record<string, unknown>) => ({
+      ...prev,
+      headers: {
+        ...prev.headers,
+        'x-hasura-role': effectiveRole,
+        Authorization: `Bearer ${accessToken}`,
+      },
+    }));
+  }
+
+  return forward(operation);
+});
+
 export const client = new ApolloClient({
   uri: process.env.NEXT_PUBLIC_API_URL,
-  link: httpLink,
+  link: ApolloLink.from([authLink, httpLink]),
   cache: new InMemoryCache({
     typePolicies: {
       Query: {
@@ -39,6 +61,29 @@ export const client = new ApolloClient({
           CourseEnrollments: {
             merge: (_, incoming) => incoming,
           },
+          // Prevent refetch loop: MANAGED_COURSE and COURSE_PARTICIPATIONS both write
+          // Course.Sessions and AchievementOptionCourses. Returning existing when refs
+          // match avoids cache broadcast that triggers refetch.
+          AchievementOptionCourses: {
+            merge(existing: unknown[] | undefined, incoming: unknown[] | undefined) {
+              if (!incoming?.length) return existing ?? incoming;
+              if (!existing?.length) return incoming;
+              const existingRefs = (existing as { __ref?: string }[]).map((e) => e?.__ref).join(',');
+              const incomingRefs = (incoming as { __ref?: string }[]).map((i) => i?.__ref).join(',');
+              if (existingRefs === incomingRefs) return existing;
+              return incoming;
+            },
+          },
+          Sessions: {
+            merge(existing: unknown[] | undefined, incoming: unknown[] | undefined) {
+              if (!incoming?.length) return existing ?? incoming;
+              if (!existing?.length) return incoming;
+              const existingRefs = (existing as { __ref?: string }[]).map((e) => e?.__ref).join(',');
+              const incomingRefs = (incoming as { __ref?: string }[]).map((i) => i?.__ref).join(',');
+              if (existingRefs === incomingRefs) return existing;
+              return incoming;
+            },
+          },
         },
       },
       AchievementOption: {
@@ -67,9 +112,7 @@ export const client = new ApolloClient({
         fields: {
           applicationStart: {
             merge: (_, applicationStart) => {
-              return applicationStart != null
-                ? new Date(applicationStart)
-                : null;
+              return applicationStart != null ? new Date(applicationStart) : null;
             },
           },
           applicationEnd: {

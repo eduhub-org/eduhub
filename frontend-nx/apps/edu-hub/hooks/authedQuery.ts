@@ -1,7 +1,7 @@
 import { ApolloError, useQuery, useLazyQuery } from '@apollo/client';
 import { useSession, signOut } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
-import { useCallback, useMemo, useRef } from 'react';
+import { useCallback, useRef } from 'react';
 
 import { useCurrentRole } from './authentication';
 import { useAuthError } from '../contexts/AuthErrorContext';
@@ -13,7 +13,6 @@ const useErrorHandler = () => {
   const { showAuthError } = useAuthError();
 
   return useCallback((error: { message?: string }) => {
-    console.log('error handler error: ', error);
     if (error?.message?.includes('JWTExpired') || error?.message?.includes('JWSInvalidSignature')) {
       // For expired sessions, redirect immediately to login without showing a blocking dialog
       console.info('Session expired, redirecting to login...');
@@ -21,6 +20,9 @@ const useErrorHandler = () => {
         callbackUrl: '/?sessionExpired=true',
         redirect: true 
       });
+    } else if (error?.message?.includes('NetworkError') || error?.message?.includes('Failed to fetch')) {
+      // NetworkError (e.g. aborted on page refresh, offline) — don't show auth dialog; log only
+      console.warn('GraphQL network error (may be transient):', error?.message);
     } else {
       // Show error dialog for other authentication errors (without signing out)
       showAuthError(t("common.authed_query.authentication_error") + ": " + (error?.message ?? ''), false);
@@ -29,34 +31,11 @@ const useErrorHandler = () => {
 };
 
 export const useRoleQuery: typeof useQuery = (query, passedOptions) => {
-  const { data } = useSession();
-  const accessToken = data?.accessToken;
-  const currentRole = useCurrentRole();
+  // Auth headers are added by the Apollo auth link (reads from authStore).
+  // We do NOT pass context with auth here — context changes trigger refetches
+  // (Apollo issue #11835). Only pass role override when caller needs it.
+  const roleOverride = passedOptions?.context?.role as AuthRoles | undefined;
 
-  // Keep a ref to passedOptions so the auth-context memo below doesn't need it
-  // as a dependency. Callers that pass inline option objects (new reference every
-  // render) would otherwise invalidate the memo on every render and send new
-  // options objects to Apollo, triggering unnecessary setOptions calls.
-  const passedOptionsRef = useRef(passedOptions);
-  passedOptionsRef.current = passedOptions;
-
-  // Auth context: only rebuilt when the token or role actually changes.
-  const authContext = useMemo(() => {
-    const opts = passedOptionsRef.current;
-    const passedRole = opts?.context?.role as AuthRoles | undefined;
-    if (!accessToken || currentRole === AuthRoles.anonymous) {
-      return opts?.context;
-    }
-    return {
-      ...opts?.context,
-      headers: {
-        'x-hasura-role': passedRole ?? currentRole,
-        Authorization: `Bearer ${accessToken}`,
-      },
-    };
-  }, [accessToken, currentRole]); // passedOptions intentionally NOT here
-
-  // onError: stable via refs so it never causes Apollo to see new options.
   const errorHandler = useErrorHandler();
   const errorHandlerRef = useRef(errorHandler);
   errorHandlerRef.current = errorHandler;
@@ -68,18 +47,13 @@ export const useRoleQuery: typeof useQuery = (query, passedOptions) => {
     callerOnErrorRef.current?.(error);
   }, []);
 
-  // Merge stable auth context into passedOptions without making passedOptions a
-  // memo dependency — Apollo's own deep-equality check handles variable changes.
-  const queryOptions = useMemo(
-    () => ({
-      ...passedOptionsRef.current,
-      context: authContext,
-      onError,
-    }),
-    [authContext, onError]
-  );
-
-  return useQuery(query, queryOptions);
+  return useQuery(query, {
+    ...passedOptions,
+    context: roleOverride ? { role: roleOverride } : undefined,
+    onError,
+    fetchPolicy: passedOptions?.fetchPolicy ?? 'cache-first',
+    nextFetchPolicy: passedOptions?.nextFetchPolicy ?? 'cache-first',
+  });
 };
 
 export const useLazyRoleQuery: typeof useLazyQuery = (query, passedOptions) => {
