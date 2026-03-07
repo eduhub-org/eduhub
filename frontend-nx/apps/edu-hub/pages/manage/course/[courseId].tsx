@@ -13,10 +13,14 @@ const ManageCoursePage: FC = () => {
   // Parse courseId only once it has been hydrated by the router
   const courseIdNumber = courseId ? Number(courseId) : null;
 
-  // Keep ManageCourseContent mounted once authenticated — it handles its own
-  // access-control check (admin vs. instructor-of-course). Gating on role here
-  // caused mount/unmount cycles during session transitions that re-fired queries.
-  if (status === 'loading' || !courseIdNumber || Number.isNaN(courseIdNumber)) {
+  // Keep ManageCourseContent mounted only when authenticated — it handles its own
+  // access-control check (admin vs. instructor-of-course). Blocking unauthenticated
+  // prevents MANAGED_COURSE from firing and triggering auth-error behavior.
+  if (
+    status !== 'authenticated' ||
+    !courseIdNumber ||
+    Number.isNaN(courseIdNumber)
+  ) {
     return (
       <>
         <Head>

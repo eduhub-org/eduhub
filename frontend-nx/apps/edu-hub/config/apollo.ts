@@ -14,14 +14,20 @@ const authLink = new ApolloLink((operation, forward) => {
   const willAddAuth = !!(accessToken && effectiveRole !== AuthRoles.anonymous);
 
   if (willAddAuth) {
-    operation.setContext((prev: Record<string, unknown>) => ({
-      ...prev,
-      headers: {
-        ...prev.headers,
-        'x-hasura-role': effectiveRole,
-        Authorization: `Bearer ${accessToken}`,
-      },
-    }));
+    operation.setContext((prev: Record<string, unknown>) => {
+      const existingHeaders =
+        prev.headers && typeof prev.headers === 'object'
+          ? (prev.headers as Record<string, string>)
+          : {};
+      return {
+        ...prev,
+        headers: {
+          ...existingHeaders,
+          'x-hasura-role': effectiveRole,
+          Authorization: `Bearer ${accessToken}`,
+        },
+      };
+    });
   }
 
   return forward(operation);
@@ -66,7 +72,7 @@ export const client = new ApolloClient({
           // match avoids cache broadcast that triggers refetch.
           AchievementOptionCourses: {
             merge(existing: unknown[] | undefined, incoming: unknown[] | undefined) {
-              if (!incoming?.length) return existing ?? incoming;
+              if (incoming == null) return existing ?? incoming;
               if (!existing?.length) return incoming;
               const existingRefs = (existing as { __ref?: string }[]).map((e) => e?.__ref).join(',');
               const incomingRefs = (incoming as { __ref?: string }[]).map((i) => i?.__ref).join(',');
@@ -76,7 +82,7 @@ export const client = new ApolloClient({
           },
           Sessions: {
             merge(existing: unknown[] | undefined, incoming: unknown[] | undefined) {
-              if (!incoming?.length) return existing ?? incoming;
+              if (incoming == null) return existing ?? incoming;
               if (!existing?.length) return incoming;
               const existingRefs = (existing as { __ref?: string }[]).map((e) => e?.__ref).join(',');
               const incomingRefs = (incoming as { __ref?: string }[]).map((i) => i?.__ref).join(',');

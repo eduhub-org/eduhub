@@ -847,26 +847,20 @@ function ExpandableRowContent({
       if (!docPath) return;
 
       setDownloadError(null);
-      let signedUrl = docResult.data?.getSignedUrl?.link;
-
-      if (!signedUrl) {
-        try {
-          const result = await getDoc({ variables: { path: docPath } });
-          signedUrl = result.data?.getSignedUrl?.link;
-        } catch (err) {
-          const msg = err instanceof Error ? err.message : String(err);
-          setDownloadError(t('download_documentation_error') || msg);
-          return;
+      try {
+        const result = await getDoc({ variables: { path: docPath } });
+        const signedUrl = result.data?.getSignedUrl?.link;
+        if (signedUrl) {
+          window.open(signedUrl, '_blank', 'noopener,noreferrer');
+        } else {
+          setDownloadError(t('download_documentation_error') || 'Failed to get download URL');
         }
-      }
-
-      if (signedUrl) {
-        window.open(signedUrl, '_blank', 'noopener,noreferrer');
-      } else {
-        setDownloadError(t('download_documentation_error') || 'Failed to get download URL');
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        setDownloadError(t('download_documentation_error') || msg);
       }
     },
-    [enrollment.mostRecentRecord?.documentationUrl, docResult.data?.getSignedUrl?.link, getDoc, t]
+    [enrollment.mostRecentRecord?.documentationUrl, getDoc, t]
   );
 
   const onSetRating = useCallback(

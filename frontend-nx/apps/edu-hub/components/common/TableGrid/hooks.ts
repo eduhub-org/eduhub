@@ -111,7 +111,14 @@ export function useTableGrid<V>({
       ...refetchVariables,
       order_by: orderBy,
     };
-  }, [pageIndex, pageSize, stableQueryVariables, debouncedSearchFilter, orderBy]);
+  }, [
+    pageIndex,
+    pageSize,
+    stableQueryVariables,
+    debouncedSearchFilter,
+    orderBy,
+    refetchFilter,
+  ]);
 
   const effectiveVariables = useStableValue(rawVariables);
 

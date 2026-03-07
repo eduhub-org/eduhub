@@ -1,5 +1,5 @@
 import { ApolloError, useQuery, useLazyQuery } from '@apollo/client';
-import { useSession, signOut } from 'next-auth/react';
+import { signOut } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
 import { useCallback, useRef } from 'react';
 
@@ -57,157 +57,109 @@ export const useRoleQuery: typeof useQuery = (query, passedOptions) => {
 };
 
 export const useLazyRoleQuery: typeof useLazyQuery = (query, passedOptions) => {
-  const { data } = useSession();
-  const accessToken = data?.accessToken;
   const currentRole = useCurrentRole();
+  const passedRole = passedOptions?.context?.role as AuthRoles | undefined;
 
-  const passedRole: AuthRoles = passedOptions?.context?.role;
-
-  const options = accessToken
-    ? {
-        ...passedOptions,
-        context: {
-          ...passedOptions?.context,
-          headers: {
-            ...(currentRole !== AuthRoles.anonymous && {
-              'x-hasura-role': passedRole ?? currentRole,
-            }),
-            ...(currentRole !== AuthRoles.anonymous && {
-              Authorization: `Bearer ${accessToken}`,
-            }),
-          },
-        },
-      }
-    : passedOptions;
+  const options = {
+    ...passedOptions,
+    context: {
+      ...passedOptions?.context,
+      role: passedRole ?? currentRole,
+    },
+  };
 
   const errorHandler = useErrorHandler();
   const callerOnError = passedOptions?.onError;
 
-  return useLazyQuery(query, { 
-    ...options, 
+  return useLazyQuery(query, {
+    ...options,
     onError: (error) => {
       errorHandler(error);
       callerOnError?.(error);
-    }
+    },
   });
 };
 
 export const useAdminQuery: typeof useQuery = (query, passedOptions) => {
-  const { data } = useSession();
-  const accessToken = data?.accessToken;
-
-  const options = accessToken
-    ? {
-        ...passedOptions,
-        context: {
-          ...passedOptions?.context,
-          headers: {
-            ...passedOptions?.context?.headers,
-            'x-hasura-role': AuthRoles.admin,
-            Authorization: `Bearer ${accessToken}`,
-          },
-        },
-      }
-    : passedOptions;
+  const options = {
+    ...passedOptions,
+    context: {
+      ...passedOptions?.context,
+      role: AuthRoles.admin,
+    },
+  };
 
   const errorHandler = useErrorHandler();
   const callerOnError = passedOptions?.onError;
 
-  return useQuery(query, { 
-    ...options, 
+  return useQuery(query, {
+    ...options,
     onError: (error) => {
       errorHandler(error);
       callerOnError?.(error);
-    }
+    },
   });
 };
 
 export const useAdminLazyQuery: typeof useLazyQuery = (query, passedOptions) => {
-  const { data } = useSession();
-  const accessToken = data?.accessToken;
-
-  const options = accessToken
-    ? {
-        ...passedOptions,
-        context: {
-          ...passedOptions?.context,
-          headers: {
-            ...passedOptions?.context?.headers,
-            'x-hasura-role': AuthRoles.admin,
-            Authorization: `Bearer ${accessToken}`,
-          },
-        },
-      }
-    : passedOptions;
+  const options = {
+    ...passedOptions,
+    context: {
+      ...passedOptions?.context,
+      role: AuthRoles.admin,
+    },
+  };
 
   const errorHandler = useErrorHandler();
   const callerOnError = passedOptions?.onError;
 
-  return useLazyQuery(query, { 
-    ...options, 
+  return useLazyQuery(query, {
+    ...options,
     onError: (error) => {
       errorHandler(error);
       callerOnError?.(error);
-    }
+    },
   });
 };
 
 export const useInstructorQuery: typeof useQuery = (query, passedOptions) => {
-  const { data } = useSession();
-  const accessToken = data?.accessToken;
-
-  const options = accessToken
-    ? {
-        ...passedOptions,
-        context: {
-          ...passedOptions?.context,
-          headers: {
-            ...passedOptions?.context?.headers,
-            'x-hasura-role': AuthRoles.instructor,
-            Authorization: `Bearer ${accessToken}`,
-          },
-        },
-      }
-    : passedOptions;
+  const options = {
+    ...passedOptions,
+    context: {
+      ...passedOptions?.context,
+      role: AuthRoles.instructor,
+    },
+  };
 
   const errorHandler = useErrorHandler();
   const callerOnError = passedOptions?.onError;
 
-  return useQuery(query, { 
-    ...options, 
+  return useQuery(query, {
+    ...options,
     onError: (error) => {
       errorHandler(error);
       callerOnError?.(error);
-    }
+    },
   });
 };
 
 export const useAuthedQuery: typeof useQuery = (query, passedOptions) => {
-  const { data } = useSession();
-  const accessToken = data?.accessToken;
-
-  const options = accessToken
-    ? {
-        ...passedOptions,
-        context: {
-          ...passedOptions?.context,
-          headers: {
-            ...passedOptions?.context?.headers,
-            'x-hasura-role': AuthRoles.user,
-            Authorization: `Bearer ${accessToken}`,
-          },
-        },
-      }
-    : passedOptions;
+  const options = {
+    ...passedOptions,
+    context: {
+      ...passedOptions?.context,
+      role: AuthRoles.user,
+    },
+  };
 
   const errorHandler = useErrorHandler();
   const callerOnError = passedOptions?.onError;
 
-  return useQuery(query, { 
-    ...options, 
+  return useQuery(query, {
+    ...options,
     onError: (error) => {
       errorHandler(error);
       callerOnError?.(error);
-    }
+    },
   });
 };
