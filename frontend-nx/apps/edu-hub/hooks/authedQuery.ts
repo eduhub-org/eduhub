@@ -60,13 +60,15 @@ export const useLazyRoleQuery: typeof useLazyQuery = (query, passedOptions) => {
   const currentRole = useCurrentRole();
   const passedRole = passedOptions?.context?.role as AuthRoles | undefined;
 
-  const options = {
-    ...passedOptions,
-    context: {
-      ...passedOptions?.context,
-      role: passedRole ?? currentRole,
-    },
-  };
+  const options = passedOptions
+    ? {
+        ...passedOptions,
+        context: {
+          ...passedOptions.context,
+          role: passedRole ?? currentRole,
+        },
+      }
+    : passedOptions;
 
   const errorHandler = useErrorHandler();
   const callerOnError = passedOptions?.onError;
