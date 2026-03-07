@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { useDebouncedCallback } from 'use-debounce';
+import { useDebounce } from 'use-debounce';
 import { SortingState } from '@tanstack/react-table';
 import { BaseRow, BulkAction, UseTableGridProps } from './types';
 import { mergeSortDirection } from './utils';
@@ -98,30 +98,33 @@ export function useTableGrid<V>({
     return userSort.length > 0 ? userSort : (stableDefaultSort || []);
   }, [sorting, stableDefaultSort]);
 
-  const queryResult = queryHook(query, {
-    variables: {
-      offset: pageIndex * pageSize,
-      limit: pageSize,
-      ...stableQueryVariables,
-      order_by: orderBy,
-    },
-  });
+  const [debouncedSearchFilter] = useDebounce(searchFilter, debounceMs);
 
-  const { data, loading, error, refetch } = queryResult;
-
-  const debouncedRefetch = useDebouncedCallback(refetch, debounceMs);
-
-  useEffect(() => {
-    const currentFilter = refetchFilterRef.current;
-    const refetchVariables = currentFilter ? currentFilter(searchFilter) : {};
-    debouncedRefetch({
+  const rawVariables = useMemo(() => {
+    const refetchVariables = refetchFilterRef.current
+      ? refetchFilterRef.current(debouncedSearchFilter)
+      : {};
+    return {
       offset: pageIndex * pageSize,
       limit: pageSize,
       ...stableQueryVariables,
       ...refetchVariables,
       order_by: orderBy,
-    });
-  }, [pageIndex, debouncedRefetch, searchFilter, stableQueryVariables, pageSize, orderBy]);
+    };
+  }, [pageIndex, pageSize, stableQueryVariables, debouncedSearchFilter, orderBy]);
+
+  const effectiveVariables = useStableValue(rawVariables);
+
+  const queryOptions = useMemo(
+    () => ({
+      variables: effectiveVariables,
+    }),
+    [effectiveVariables]
+  );
+
+  const queryResult = queryHook(query, queryOptions);
+
+  const { data, loading, error, refetch } = queryResult;
 
   const handleSetSearchFilter = useCallback((value: string) => {
     setSearchFilter(value);
@@ -141,7 +144,7 @@ export function useTableGrid<V>({
     data,
     loading,
     error,
-    refetch: debouncedRefetch,
+    refetch,
     searchFilter,
     pageIndex,
     setSearchFilter: handleSetSearchFilter,

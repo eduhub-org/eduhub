@@ -829,23 +829,45 @@ function ExpandableRowContent({
   t: (key: string) => string;
   locale: string;
 }) {
-  const [docUrlLoaded, setDocUrlLoaded] = useState(false);
+  const [downloadError, setDownloadError] = useState<string | null>(null);
   const [getDoc, docResult] = useLazyRoleQuery<GetSignedUrl, GetSignedUrlVariables>(GET_SIGNED_URL);
   const [setAchievementRecord] = useRoleMutation<
     UpdateAchievementRecordByPk,
     UpdateAchievementRecordByPkVariables
   >(UPDATE_AN_ACHIEVEMENT_RECORD);
 
-  const loadDoc = useCallback(() => {
-    if (
-      enrollment.mostRecentRecord?.documentationUrl &&
-      enrollment.mostRecentRecord.documentationUrl !== 'pending_upload' &&
-      !docUrlLoaded
-    ) {
-      getDoc({ variables: { path: enrollment.mostRecentRecord.documentationUrl } });
-      setDocUrlLoaded(true);
-    }
-  }, [enrollment.mostRecentRecord, docUrlLoaded, getDoc]);
+  const handleDownloadClick = useCallback(
+    async (e: React.MouseEvent) => {
+      e.preventDefault();
+      const docPath =
+        enrollment.mostRecentRecord?.documentationUrl &&
+        enrollment.mostRecentRecord.documentationUrl !== 'pending_upload'
+          ? enrollment.mostRecentRecord.documentationUrl
+          : null;
+      if (!docPath) return;
+
+      setDownloadError(null);
+      let signedUrl = docResult.data?.getSignedUrl?.link;
+
+      if (!signedUrl) {
+        try {
+          const result = await getDoc({ variables: { path: docPath } });
+          signedUrl = result.data?.getSignedUrl?.link;
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : String(err);
+          setDownloadError(t('download_documentation_error') || msg);
+          return;
+        }
+      }
+
+      if (signedUrl) {
+        window.open(signedUrl, '_blank', 'noopener,noreferrer');
+      } else {
+        setDownloadError(t('download_documentation_error') || 'Failed to get download URL');
+      }
+    },
+    [enrollment.mostRecentRecord?.documentationUrl, docResult.data?.getSignedUrl?.link, getDoc, t]
+  );
 
   const onSetRating = useCallback(
     async (rating: AchievementRecordRating_enum) => {
@@ -954,10 +976,11 @@ function ExpandableRowContent({
               </div>
             </div>
             <Button
-              as="a"
+              as="button"
+              type="button"
               filled
-              href={docResult.loading ? '#' : docResult.data?.getSignedUrl?.link ?? '#'}
-              onClick={loadDoc}
+              disabled={docResult.loading}
+              onClick={handleDownloadClick}
             >
               {docResult.loading ? (
                 <CircularProgress size={20} />
@@ -965,6 +988,13 @@ function ExpandableRowContent({
                 t('download_documentation')
               )}
             </Button>
+            {downloadError && (
+              <ErrorMessageDialog
+                errorMessage={downloadError}
+                open={!!downloadError}
+                onClose={() => setDownloadError(null)}
+              />
+            )}
           </Card>
           );
         })()}

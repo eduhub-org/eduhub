@@ -1060,6 +1060,7 @@
     "uploaded_by": "Hochgeladen von",
     "co_authors": "Co-Autoren",
     "download_documentation": "Dokumentation herunterladen",
+    "download_documentation_error": "Projektdokumentation konnte nicht geladen werden. Bitte versuche es erneut.",
     "generate_achievement_certificates": "Leistungsnachweise generieren",
     "delete_achievement_certificates": "Leistungsnachweise löschen",
     "no_certificates_deleted": "Es wurden keine Zertifikate gelöscht",
