@@ -911,6 +911,21 @@
       "label": "Kurs-Chat Link",
       "help_text": "Link zum Kurs-Chat oder zur Kommunikationsplattform"
     },
+    "matrix_room": {
+      "button_create": "Matrix-Raum erstellen",
+      "button_room_exists": "Matrix-Raum vorhanden",
+      "dialog_title": "Matrix-Raum erstellen",
+      "room_name_label": "Raumname",
+      "description_label": "Thema / Beschreibung",
+      "space_name_label": "Programm-Space-Name",
+      "space_will_be_created_hint": "Es gibt noch keinen Programm-Space — er wird automatisch erstellt.",
+      "error_no_config": "Die Matrix-Konfiguration ist unvollständig. Bitte kontaktiere eine Administratorin oder einen Administrator.",
+      "error_invalid_input": "Bitte überprüfe deine Eingaben.",
+      "error_creation_failed": "Erstellen des Matrix-Raums fehlgeschlagen",
+      "error_unknown": "Beim Erstellen des Matrix-Raums ist ein unbekannter Fehler aufgetreten.",
+      "success_created": "Matrix-Raum wurde erfolgreich erstellt.",
+      "open_in_element": "In Element öffnen"
+    },
     "email_templates": {
       "label": "E-Mail-Vorlagen",
       "manage_button": "E-Mail-Vorlagen verwalten",

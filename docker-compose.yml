@@ -21,6 +21,7 @@ services:
       NEXT_PUBLIC_HELP_DOCS_URL: https://opencampus.gitbook.io/faq/
       NEXT_PUBLIC_STORAGE_BUCKET_URL: ${GITPOD_WORKSPACE_URL:-http://localhost}:4001/emulated-bucket
       NEXT_PUBLIC_ENVIRONMENT: development
+      NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL: ${NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL:-https://element.opencampus.sh}
       MM_URL: "https://chat.opencampus.sh"
       # Enable file watching in Docker environment
       CHOKIDAR_USEPOLLING: "true"
@@ -57,6 +58,12 @@ services:
       FORMBRICKS_API_KEY: ${FORMBRICKS_API_KEY:-}
       FORMBRICKS_API_URL: ${FORMBRICKS_API_URL:-https://app.formbricks.com}
       STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+      MATRIX_HOMESERVER_URL: ${MATRIX_HOMESERVER_URL:-https://matrix.opencampus.sh}
+      MATRIX_SERVER_NAME: ${MATRIX_SERVER_NAME:-opencampus.sh}
+      MATRIX_ELEMENT_CLIENT_URL: ${MATRIX_ELEMENT_CLIENT_URL:-https://element.opencampus.sh}
+      MATRIX_MAIN_SPACE_ID: ${MATRIX_MAIN_SPACE_ID:-}
+      MATRIX_ADMIN_USER_ID: ${MATRIX_ADMIN_USER_ID:-}
+      MATRIX_ADMIN_ACCESS_TOKEN: ${MATRIX_ADMIN_ACCESS_TOKEN:-}
       FRONTEND_URL: http://localhost:5000
       STORAGE_BUCKET_PUBLIC_URL: ${GITPOD_WORKSPACE_URL:-http://localhost}:4001/emulated-bucket
 

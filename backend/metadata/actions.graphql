@@ -30,6 +30,15 @@ type Mutation {
 }
 
 type Mutation {
+  createMatrixRoom(
+    courseId: Int!
+    roomName: String!
+    topic: String
+    spaceName: String
+  ): CreateMatrixRoomResult!
+}
+
+type Mutation {
   createEnrollmentWithAddons(
     courseId: Int!
     userId: uuid!
@@ -508,6 +517,16 @@ type CreateStripeBasePriceResult {
   productName: String
   priceAmount: Int
   currency: String
+  error: String
+}
+
+type CreateMatrixRoomResult {
+  success: Boolean!
+  messageKey: String!
+  spaceId: String
+  roomId: String
+  chatLink: String
+  alreadyExists: Boolean
   error: String
 }
 

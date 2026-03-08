@@ -59,6 +59,7 @@ select_permissions:
         - attendanceCertificateTemplateURL
         - achievementCertificateTemplateURL
         - defaultFormbricksEnrollmentSurveyUrl
+        - matrixSpaceId
       filter: {}
   - role: anonymous
     permission:
@@ -98,6 +99,7 @@ select_permissions:
         - startQuestionnaire
         - title
         - defaultFormbricksEnrollmentSurveyUrl
+        - matrixSpaceId
       filter: {}
 update_permissions:
   - role: admin-ras
@@ -121,5 +123,6 @@ update_permissions:
         - attendanceCertificateTemplateURL
         - achievementCertificateTemplateURL
         - defaultFormbricksEnrollmentSurveyUrl
+        - matrixSpaceId
       filter: {}
       check: {}

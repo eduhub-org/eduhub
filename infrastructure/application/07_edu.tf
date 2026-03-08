@@ -87,6 +87,10 @@ resource "google_cloud_run_service" "eduhub" {
           name  = "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY"
           value = var.stripe_publishable_key
         }
+        env {
+          name  = "NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL"
+          value = var.matrix_element_client_url
+        }
       }
     }
 

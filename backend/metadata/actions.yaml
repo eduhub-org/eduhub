@@ -47,6 +47,19 @@ actions:
     permissions:
       - role: instructor_access
     comment: Creates or updates Stripe Product and Price for a course's base price
+  - name: createMatrixRoom
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: name
+          value: createMatrixRoom
+    permissions:
+      - role: instructor_access
+      - role: admin-ras
+    comment: Creates Matrix program space and course room, then stores matrix ids in Hasura
   - name: createEnrollmentWithAddons
     definition:
       kind: synchronous
@@ -398,6 +411,7 @@ custom_types:
     - name: StripePriceSummary
     - name: CreateEnrollmentWithAddonsResult
     - name: CreateStripeBasePriceResult
+    - name: CreateMatrixRoomResult
     - name: CreateStripeCheckoutResult
     - name: CourseAddonMapping
     - name: GetFormbricksAddonSelectionsResult

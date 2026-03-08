@@ -19,6 +19,7 @@ import createStripeCheckout from "./createStripeCheckout/index.js";
 import createStripeBasePrice from "./createStripeBasePrice/index.js";
 import createStripeAddonPrices from "./createStripeAddonPrices/index.js";
 import createEnrollmentWithAddons from "./createEnrollmentWithAddons/index.js";
+import createMatrixRoom from "./createMatrixRoom/index.js";
 
 /**
  * Creates a logger instance with structured logging.
@@ -58,7 +59,8 @@ const functionMap = {
   createStripeCheckout,
   createStripeBasePrice,
   createStripeAddonPrices,
-  createEnrollmentWithAddons
+  createEnrollmentWithAddons,
+  createMatrixRoom
 };
 
 /**

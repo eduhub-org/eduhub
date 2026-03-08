@@ -1,6 +1,6 @@
 import { FC, Fragment, useCallback, useState, useEffect } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
-import { MdCheckBox, MdOutlineCheckBoxOutlineBlank, MdAddCircle, MdEmail } from 'react-icons/md';
+import { MdCheckBox, MdOutlineCheckBoxOutlineBlank, MdAddCircle, MdEmail, MdForum } from 'react-icons/md';
 import { useRouter } from 'next/router';
 import { useAdminMutation } from '../../../hooks/authedMutation';
 import { SAVE_COURSE_IMAGE } from '../../../queries/actions';
@@ -54,6 +54,7 @@ import {
 } from '../../../queries/course';
 import { VALIDATE_FORMBRICKS_SURVEY, SAVE_ADDON_MAPPINGS, CREATE_STRIPE_BASE_PRICE, GET_COURSE_ADDON_MAPPINGS } from '../../../queries/stripe';
 import { AddonValidationDialog } from './AddonValidationDialog';
+import CreateMatrixRoomDialog from './CreateMatrixRoomDialog';
 import { Button } from '../../common/Button';
 import { UPDATE_COURSE_PROPERTY } from '../../../queries/mutateCourse';
 import useErrorHandler from '../../../hooks/useErrorHandler';
@@ -420,6 +421,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
 
   // Funding organization management state
   const [fundingOrgDialogOpen, setFundingOrgDialogOpen] = useState(false);
+  const [matrixDialogOpen, setMatrixDialogOpen] = useState(false);
 
   // Instructor management mutations
   const [insertCourseInstructor] = useAdminMutation<InsertCourseInstructor, InsertCourseInstructorVariables>(
@@ -638,6 +640,11 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
     label: t(`manageCourses.registration_type.options.${type}`),
   }));
 
+  const matrixRoomId = (course as any).matrixRoomId as string | undefined;
+  const matrixElementClientUrl = process.env.NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL?.replace(/\/+$/, '');
+  const derivedMatrixLink = matrixRoomId && matrixElementClientUrl ? `${matrixElementClientUrl}/#/room/${matrixRoomId}` : '';
+  const matrixRoomLink = derivedMatrixLink || course.chatLink || '';
+
   return (
     <div className="w-full flex-1 min-w-0 light">
       <div className="bg-bg-secondary p-6 w-full">
@@ -842,6 +849,27 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                 refetchQueries={['AdminCourseList']}
                 helpText={t('manageCourses.chat_link.help_text')}
               />
+
+              <div className="flex items-center gap-3">
+                <Button onClick={() => setMatrixDialogOpen(true)} filled={Boolean(matrixRoomId)}>
+                  <span className="inline-flex items-center gap-2">
+                    <MdForum className="w-4 h-4" />
+                    {matrixRoomId
+                      ? t('manageCourses.matrix_room.button_room_exists')
+                      : t('manageCourses.matrix_room.button_create')}
+                  </span>
+                </Button>
+                {matrixRoomId && matrixRoomLink && (
+                  <a
+                    href={matrixRoomLink}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-sm underline text-blue-600 hover:text-blue-800"
+                  >
+                    {t('manageCourses.matrix_room.open_in_element')}
+                  </a>
+                )}
+              </div>
 
               <div>
                 <h4 className="text-sm font-medium text-label-primary mb-2">
@@ -1111,6 +1139,12 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
         onClose={() => setIsBasePriceHelpDialogOpen(false)}
         title={t('manageCourse.pricing.base_price_dialog_title')}
         content={t('manageCourse.pricing.base_price_dialog_content')}
+      />
+
+      <CreateMatrixRoomDialog
+        open={matrixDialogOpen}
+        onClose={() => setMatrixDialogOpen(false)}
+        course={course}
       />
     </div>
   );

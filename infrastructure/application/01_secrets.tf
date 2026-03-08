@@ -279,6 +279,21 @@ resource "google_secret_manager_secret_version" "stripe_webhook_secret" {
   secret_data = var.stripe_webhook_secret
 }
 
+# ===== Matrix Admin Access Token =====
+resource "google_secret_manager_secret" "matrix_admin_access_token" {
+  provider  = google-beta
+  secret_id = "matrix-admin-access-token"
+  replication {
+    auto {}
+  }
+}
+
+resource "google_secret_manager_secret_version" "matrix_admin_access_token" {
+  provider    = google-beta
+  secret      = google_secret_manager_secret.matrix_admin_access_token.name
+  secret_data = var.matrix_admin_access_token
+}
+
 # =========================================================================================
 # IAM bindings for default compute engine service account
 # =========================================================================================
@@ -371,4 +386,11 @@ resource "google_secret_manager_secret_iam_member" "stripe_webhook_secret" {
   role       = "roles/secretmanager.secretAccessor"
   member     = "serviceAccount:${google_service_account.custom_cloud_function_account.email}"
   depends_on = [google_secret_manager_secret.stripe_webhook_secret]
+}
+
+resource "google_secret_manager_secret_iam_member" "matrix_admin_access_token" {
+  secret_id  = google_secret_manager_secret.matrix_admin_access_token.id
+  role       = "roles/secretmanager.secretAccessor"
+  member     = "serviceAccount:${data.google_project.eduhub.number}-compute@developer.gserviceaccount.com"
+  depends_on = [google_secret_manager_secret.matrix_admin_access_token]
 }

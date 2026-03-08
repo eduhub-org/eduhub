@@ -166,6 +166,7 @@ select_permissions:
         - currency
         - stripeProductId
         - stripePriceId
+        - matrixRoomId
       filter: {}
   - role: user_access
     permission:
@@ -232,6 +233,7 @@ update_permissions:
         - currency
         - stripeProductId
         - stripePriceId
+        - matrixRoomId
       filter:
         CourseInstructors:
           User:

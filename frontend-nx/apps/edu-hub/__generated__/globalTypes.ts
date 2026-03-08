@@ -836,6 +836,7 @@ export enum Course_select_column {
   id = "id",
   language = "language",
   learningGoals = "learningGoals",
+  matrixRoomId = "matrixRoomId",
   maxMissedSessions = "maxMissedSessions",
   maxParticipants = "maxParticipants",
   programId = "programId",
@@ -893,6 +894,7 @@ export enum Course_update_column {
   id = "id",
   language = "language",
   learningGoals = "learningGoals",
+  matrixRoomId = "matrixRoomId",
   maxMissedSessions = "maxMissedSessions",
   maxParticipants = "maxParticipants",
   programId = "programId",
@@ -1303,6 +1305,7 @@ export enum Program_select_column {
   id = "id",
   lectureEnd = "lectureEnd",
   lectureStart = "lectureStart",
+  matrixSpaceId = "matrixSpaceId",
   organizationId = "organizationId",
   published = "published",
   shortTitle = "shortTitle",
@@ -1346,6 +1349,7 @@ export enum Program_update_column {
   id = "id",
   lectureEnd = "lectureEnd",
   lectureStart = "lectureStart",
+  matrixSpaceId = "matrixSpaceId",
   organizationId = "organizationId",
   published = "published",
   shortTitle = "shortTitle",
@@ -5639,6 +5643,7 @@ export interface Course_bool_exp {
   id?: Int_comparison_exp | null;
   language?: String_comparison_exp | null;
   learningGoals?: String_comparison_exp | null;
+  matrixRoomId?: String_comparison_exp | null;
   maxMissedSessions?: Int_comparison_exp | null;
   maxParticipants?: Int_comparison_exp | null;
   programId?: Int_comparison_exp | null;
@@ -5693,6 +5698,7 @@ export interface Course_insert_input {
   id?: number | null;
   language?: string | null;
   learningGoals?: string | null;
+  matrixRoomId?: string | null;
   maxMissedSessions?: number | null;
   maxParticipants?: number | null;
   programId?: number | null;
@@ -5729,6 +5735,7 @@ export interface Course_max_order_by {
   id?: order_by | null;
   language?: order_by | null;
   learningGoals?: order_by | null;
+  matrixRoomId?: order_by | null;
   maxMissedSessions?: order_by | null;
   maxParticipants?: order_by | null;
   programId?: order_by | null;
@@ -5760,6 +5767,7 @@ export interface Course_min_order_by {
   id?: order_by | null;
   language?: order_by | null;
   learningGoals?: order_by | null;
+  matrixRoomId?: order_by | null;
   maxMissedSessions?: order_by | null;
   maxParticipants?: order_by | null;
   programId?: order_by | null;
@@ -5826,6 +5834,7 @@ export interface Course_order_by {
   id?: order_by | null;
   language?: order_by | null;
   learningGoals?: order_by | null;
+  matrixRoomId?: order_by | null;
   maxMissedSessions?: order_by | null;
   maxParticipants?: order_by | null;
   programId?: order_by | null;
@@ -5865,6 +5874,7 @@ export interface Course_set_input {
   id?: number | null;
   language?: string | null;
   learningGoals?: string | null;
+  matrixRoomId?: string | null;
   maxMissedSessions?: number | null;
   maxParticipants?: number | null;
   programId?: number | null;
@@ -7442,6 +7452,7 @@ export interface Program_bool_exp {
   id?: Int_comparison_exp | null;
   lectureEnd?: date_comparison_exp | null;
   lectureStart?: date_comparison_exp | null;
+  matrixSpaceId?: String_comparison_exp | null;
   organizationId?: Int_comparison_exp | null;
   published?: Boolean_comparison_exp | null;
   shortTitle?: String_comparison_exp | null;
@@ -7475,6 +7486,7 @@ export interface Program_insert_input {
   id?: number | null;
   lectureEnd?: any | null;
   lectureStart?: any | null;
+  matrixSpaceId?: string | null;
   organizationId?: number | null;
   published?: boolean | null;
   shortTitle?: string | null;
@@ -7502,6 +7514,7 @@ export interface Program_max_order_by {
   id?: order_by | null;
   lectureEnd?: order_by | null;
   lectureStart?: order_by | null;
+  matrixSpaceId?: order_by | null;
   organizationId?: order_by | null;
   shortTitle?: order_by | null;
   speakerQuestionnaire?: order_by | null;
@@ -7526,6 +7539,7 @@ export interface Program_min_order_by {
   id?: order_by | null;
   lectureEnd?: order_by | null;
   lectureStart?: order_by | null;
+  matrixSpaceId?: order_by | null;
   organizationId?: order_by | null;
   shortTitle?: order_by | null;
   speakerQuestionnaire?: order_by | null;
@@ -7573,6 +7587,7 @@ export interface Program_order_by {
   id?: order_by | null;
   lectureEnd?: order_by | null;
   lectureStart?: order_by | null;
+  matrixSpaceId?: order_by | null;
   organizationId?: order_by | null;
   published?: order_by | null;
   shortTitle?: order_by | null;
