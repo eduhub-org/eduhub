@@ -88,7 +88,9 @@ export const useRoleQuery: typeof useQuery = (query, passedOptions) => {
       context: mergedContext,
       onError,
       fetchPolicy: passedOptions?.fetchPolicy ?? 'cache-first',
-      nextFetchPolicy: passedOptions?.nextFetchPolicy ?? 'cache-first',
+      ...(passedOptions?.nextFetchPolicy !== undefined
+        ? { nextFetchPolicy: passedOptions.nextFetchPolicy }
+        : {}),
     }),
     [passedOptions, mergedContext, onError]
   );
@@ -129,7 +131,10 @@ export const useLazyRoleQuery: typeof useLazyQuery = (query, passedOptions) => {
             context: mergedContext,
             onError,
           }
-        : passedOptions,
+        : {
+            context: mergedContext,
+            onError,
+          },
     [passedOptions, mergedContext, onError]
   );
 
