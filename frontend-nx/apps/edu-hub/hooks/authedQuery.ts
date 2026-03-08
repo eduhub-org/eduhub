@@ -1,31 +1,51 @@
 import { ApolloError, useQuery, useLazyQuery } from '@apollo/client';
 import { signOut } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
-import { useCallback, useRef } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 
 import { useCurrentRole } from './authentication';
 import { useAuthError } from '../contexts/AuthErrorContext';
 
 import { AuthRoles } from '../types/enums';
 
+const getErrorMessage = (error: unknown): string | undefined => {
+  if (!error) {
+    return undefined;
+  }
+
+  if (typeof error === 'string') {
+    return error;
+  }
+
+  if (typeof error === 'object' && 'message' in error) {
+    const message = (error as { message?: unknown }).message;
+    return typeof message === 'string' ? message : undefined;
+  }
+
+  return undefined;
+};
+
 const useErrorHandler = () => {
   const t = useTranslations();
   const { showAuthError } = useAuthError();
 
-  return useCallback((error: { message?: string }) => {
-    if (error?.message?.includes('JWTExpired') || error?.message?.includes('JWSInvalidSignature')) {
+  return useCallback((error: unknown) => {
+    const message = getErrorMessage(error);
+
+    if (message?.includes('JWTExpired') || message?.includes('JWSInvalidSignature')) {
       // For expired sessions, redirect immediately to login without showing a blocking dialog
       console.info('Session expired, redirecting to login...');
-      signOut({ 
+      signOut({
         callbackUrl: '/?sessionExpired=true',
-        redirect: true 
+        redirect: true,
       });
-    } else if (error?.message?.includes('NetworkError') || error?.message?.includes('Failed to fetch')) {
+    } else if (message?.includes('NetworkError') || message?.includes('Failed to fetch')) {
       // NetworkError (e.g. aborted on page refresh, offline) — don't show auth dialog; log only
-      console.warn('GraphQL network error (may be transient):', error?.message);
+      console.warn('GraphQL network error (may be transient):', error);
     } else {
-      // Show error dialog for other authentication errors (without signing out)
-      showAuthError(t("common.authed_query.authentication_error") + ": " + (error?.message ?? ''), false);
+      console.error('Authentication error in query hook:', error);
+      // Show a generic user-facing auth dialog; internal details stay in logs only.
+      showAuthError(t('common.authed_query.authentication_error'), false);
     }
   }, [showAuthError, t]);
 };
@@ -35,6 +55,21 @@ export const useRoleQuery: typeof useQuery = (query, passedOptions) => {
   // We do NOT pass context with auth here — context changes trigger refetches
   // (Apollo issue #11835). Only pass role override when caller needs it.
   const roleOverride = passedOptions?.context?.role as AuthRoles | undefined;
+  const mergedContext = useMemo(() => {
+    const currentContext = passedOptions?.context;
+    if (!currentContext) {
+      return undefined;
+    }
+
+    if (!roleOverride) {
+      return currentContext;
+    }
+
+    return {
+      ...currentContext,
+      role: roleOverride,
+    };
+  }, [passedOptions?.context, roleOverride]);
 
   const errorHandler = useErrorHandler();
   const errorHandlerRef = useRef(errorHandler);
@@ -47,121 +82,160 @@ export const useRoleQuery: typeof useQuery = (query, passedOptions) => {
     callerOnErrorRef.current?.(error);
   }, []);
 
-  return useQuery(query, {
-    ...passedOptions,
-    context: roleOverride ? { role: roleOverride } : undefined,
-    onError,
-    fetchPolicy: passedOptions?.fetchPolicy ?? 'cache-first',
-    nextFetchPolicy: passedOptions?.nextFetchPolicy ?? 'cache-first',
-  });
+  const options = useMemo(
+    () => ({
+      ...passedOptions,
+      context: mergedContext,
+      onError,
+      fetchPolicy: passedOptions?.fetchPolicy ?? 'cache-first',
+      nextFetchPolicy: passedOptions?.nextFetchPolicy ?? 'cache-first',
+    }),
+    [passedOptions, mergedContext, onError]
+  );
+
+  return useQuery(query, options);
 };
 
 export const useLazyRoleQuery: typeof useLazyQuery = (query, passedOptions) => {
   const currentRole = useCurrentRole();
   const passedRole = passedOptions?.context?.role as AuthRoles | undefined;
+  const mergedContext = useMemo(() => {
+    if (!passedOptions?.context) {
+      return passedOptions?.context;
+    }
 
-  const options = passedOptions
-    ? {
-        ...passedOptions,
-        context: {
-          ...passedOptions.context,
-          role: passedRole ?? currentRole,
-        },
-      }
-    : passedOptions;
+    return {
+      ...passedOptions.context,
+      role: passedRole ?? currentRole,
+    };
+  }, [passedOptions?.context, passedRole, currentRole]);
 
   const errorHandler = useErrorHandler();
-  const callerOnError = passedOptions?.onError;
+  const errorHandlerRef = useRef(errorHandler);
+  errorHandlerRef.current = errorHandler;
+  const callerOnErrorRef = useRef(passedOptions?.onError);
+  callerOnErrorRef.current = passedOptions?.onError;
 
-  return useLazyQuery(query, {
-    ...options,
-    onError: (error) => {
-      errorHandler(error);
-      callerOnError?.(error);
-    },
-  });
+  const onError = useCallback((error: ApolloError) => {
+    errorHandlerRef.current(error);
+    callerOnErrorRef.current?.(error);
+  }, []);
+
+  const options = useMemo(
+    () =>
+      passedOptions
+        ? {
+            ...passedOptions,
+            context: mergedContext,
+            onError,
+          }
+        : passedOptions,
+    [passedOptions, mergedContext, onError]
+  );
+
+  return useLazyQuery(query, options);
 };
 
 export const useAdminQuery: typeof useQuery = (query, passedOptions) => {
-  const options = {
-    ...passedOptions,
-    context: {
+  const mergedContext = useMemo(
+    () => ({
       ...passedOptions?.context,
       role: AuthRoles.admin,
-    },
-  };
+    }),
+    [passedOptions?.context]
+  );
 
   const errorHandler = useErrorHandler();
-  const callerOnError = passedOptions?.onError;
+  const errorHandlerRef = useRef(errorHandler);
+  errorHandlerRef.current = errorHandler;
+  const callerOnErrorRef = useRef(passedOptions?.onError);
+  callerOnErrorRef.current = passedOptions?.onError;
 
-  return useQuery(query, {
-    ...options,
-    onError: (error) => {
-      errorHandler(error);
-      callerOnError?.(error);
-    },
-  });
+  const onError = useCallback((error: ApolloError) => {
+    errorHandlerRef.current(error);
+    callerOnErrorRef.current?.(error);
+  }, []);
+
+  const options = useMemo(
+    () => ({
+      ...passedOptions,
+      context: mergedContext,
+      onError,
+    }),
+    [passedOptions, mergedContext, onError]
+  );
+
+  return useQuery(query, options);
 };
 
 export const useAdminLazyQuery: typeof useLazyQuery = (query, passedOptions) => {
-  const options = {
-    ...passedOptions,
-    context: {
+  const mergedContext = useMemo(
+    () => ({
       ...passedOptions?.context,
       role: AuthRoles.admin,
-    },
-  };
+    }),
+    [passedOptions?.context]
+  );
 
   const errorHandler = useErrorHandler();
-  const callerOnError = passedOptions?.onError;
+  const errorHandlerRef = useRef(errorHandler);
+  errorHandlerRef.current = errorHandler;
+  const callerOnErrorRef = useRef(passedOptions?.onError);
+  callerOnErrorRef.current = passedOptions?.onError;
 
-  return useLazyQuery(query, {
-    ...options,
-    onError: (error) => {
-      errorHandler(error);
-      callerOnError?.(error);
-    },
-  });
+  const onError = useCallback((error: ApolloError) => {
+    errorHandlerRef.current(error);
+    callerOnErrorRef.current?.(error);
+  }, []);
+
+  const options = useMemo(
+    () => ({
+      ...passedOptions,
+      context: mergedContext,
+      onError,
+    }),
+    [passedOptions, mergedContext, onError]
+  );
+
+  return useLazyQuery(query, options);
 };
 
 export const useInstructorQuery: typeof useQuery = (query, passedOptions) => {
-  const options = {
-    ...passedOptions,
-    context: {
+  const mergedContext = useMemo(
+    () => ({
       ...passedOptions?.context,
       role: AuthRoles.instructor,
-    },
-  };
+    }),
+    [passedOptions?.context]
+  );
 
   const errorHandler = useErrorHandler();
-  const callerOnError = passedOptions?.onError;
+  const errorHandlerRef = useRef(errorHandler);
+  errorHandlerRef.current = errorHandler;
+  const callerOnErrorRef = useRef(passedOptions?.onError);
+  callerOnErrorRef.current = passedOptions?.onError;
 
-  return useQuery(query, {
-    ...options,
-    onError: (error) => {
-      errorHandler(error);
-      callerOnError?.(error);
-    },
-  });
+  const onError = useCallback((error: ApolloError) => {
+    errorHandlerRef.current(error);
+    callerOnErrorRef.current?.(error);
+  }, []);
+
+  const options = useMemo(
+    () => ({
+      ...passedOptions,
+      context: mergedContext,
+      onError,
+    }),
+    [passedOptions, mergedContext, onError]
+  );
+
+  return useQuery(query, options);
 };
 
+/**
+ * @deprecated Use useRoleQuery instead.
+ * This alias exists for backward compatibility and no longer forces role=user.
+ */
 export const useAuthedQuery: typeof useQuery = (query, passedOptions) => {
-  const options = {
-    ...passedOptions,
-    context: {
-      ...passedOptions?.context,
-      role: AuthRoles.user,
-    },
-  };
-
-  const errorHandler = useErrorHandler();
-  const callerOnError = passedOptions?.onError;
-
-  return useQuery(query, {
-    ...options,
-    onError: (error) => {
-      errorHandler(error);
-      callerOnError?.(error);
-    },
-  });
+  return useRoleQuery(query, passedOptions);
 };
