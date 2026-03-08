@@ -34,6 +34,9 @@ import {
   MY_ORGANIZATION_NEWSLETTER_OPTIONS,
   UPSERT_ORGANIZATION_NEWSLETTER_SUBSCRIPTION,
 } from '../../../queries/newsletterSubscription';
+import type { MyOrganizationNewsletterOptions_OrganizationNewsletterSubscription } from '../../../queries/__generated__/MyOrganizationNewsletterOptions';
+
+type NewsletterSubscriptionStatus = MyOrganizationNewsletterOptions_OrganizationNewsletterSubscription['status'];
 
 type NewsletterOrganizationOption = {
   organizationId: number;
@@ -41,7 +44,7 @@ type NewsletterOrganizationOption = {
   newsletterLabel: string;
   newsletterDescription: string;
   doubleOptInEnabled: boolean;
-  status: 'SUBSCRIBED' | 'UNSUBSCRIBED' | 'PENDING' | 'ERROR';
+  status: NewsletterSubscriptionStatus;
 };
 
 const ProfileContent: FC = () => {

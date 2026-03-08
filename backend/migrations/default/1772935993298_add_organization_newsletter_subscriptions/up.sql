@@ -61,6 +61,9 @@ CREATE TABLE "public"."OrganizationNewsletterSubscription" (
     CHECK ("source" IN ('CHECKBOX', 'PROFILE', 'WEBHOOK', 'ADMIN'))
 );
 
+CREATE INDEX "OrganizationNewsletterSubscription_organizationId_idx"
+  ON "public"."OrganizationNewsletterSubscription" ("organizationId");
+
 COMMENT ON TABLE "public"."OrganizationNewsletterSubscription" IS E'Tracks newsletter subscription state per user and organization, including synchronization metadata with external providers.';
 COMMENT ON COLUMN "public"."OrganizationNewsletterSubscription"."status" IS E'Current subscription state in local database and synchronization pipeline.';
 COMMENT ON COLUMN "public"."OrganizationNewsletterSubscription"."externalSubscriberId" IS E'Identifier of the subscriber in the external provider (e.g., Ghost member id).';

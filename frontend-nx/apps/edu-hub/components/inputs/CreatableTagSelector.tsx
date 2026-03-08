@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useId } from 'react';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
+import IconButton from '@mui/material/IconButton';
 import { useAdminMutation } from '../../hooks/authedMutation';
 import { DocumentNode } from 'graphql';
 import { useTranslations } from 'next-intl';
@@ -203,7 +204,17 @@ const CreatableTagSelector: React.FC<CreatableTagSelectorProps> = ({
                 <>
                   {helpText && (
                     <Tooltip title={helpText} placement="top">
-                      <HelpOutline style={{ cursor: 'pointer', marginRight: '6px', color: 'var(--eduhub-label-disabled)' }} />
+                      <IconButton
+                        size="small"
+                        aria-label={label ? `${label} help` : 'Field help'}
+                        onClick={(event) => {
+                          event.preventDefault();
+                          event.stopPropagation();
+                        }}
+                        sx={{ width: 44, height: 44, mr: 0.5, color: 'var(--eduhub-label-disabled)' }}
+                      >
+                        <HelpOutline fontSize="small" />
+                      </IconButton>
                     </Tooltip>
                   )}
                   {params.InputProps.endAdornment}

@@ -112,10 +112,18 @@ const callGhostSyncEndpoint = async ({ subscription, userEmail, subscribe }) => 
   };
 };
 
+const getRequiredEnv = (name) => {
+  const value = normalize(process.env[name]);
+  if (!value) {
+    throw new Error(`Missing ${name}`);
+  }
+  return value;
+};
+
 const getGraphqlClient = () =>
-  new GraphQLClient(process.env.HASURA_ENDPOINT, {
+  new GraphQLClient(getRequiredEnv('HASURA_ENDPOINT'), {
     headers: {
-      'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET,
+      'x-hasura-admin-secret': getRequiredEnv('HASURA_ADMIN_SECRET'),
     },
   });
 

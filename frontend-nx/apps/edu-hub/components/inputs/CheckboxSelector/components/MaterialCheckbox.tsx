@@ -1,5 +1,6 @@
 import React from 'react';
 import Tooltip from '@mui/material/Tooltip';
+import IconButton from '@mui/material/IconButton';
 import { HelpOutline } from '@mui/icons-material';
 import { CheckboxSelectorProps } from '../types';
 
@@ -22,28 +23,33 @@ export const MaterialCheckbox: React.FC<MaterialCheckboxProps> = ({
 }) => {
   return (
     <div className={`relative ${className}`}>
-      <label className="flex items-center cursor-pointer">
-        <input
-          type="checkbox"
-          checked={localChecked}
-          onChange={handleValueChange}
-          disabled={disabled}
-          className="mr-3 w-5 h-5 text-blue-600 bg-white border-gray-300 rounded focus:ring-blue-500 focus:ring-2 disabled:opacity-50 disabled:cursor-not-allowed"
-        />
-        {label && (
-          <span className="text-base font-medium flex items-center gap-1">
-            {label}
-            {helpText && (
-              <Tooltip title={helpText} placement="top">
-                <HelpOutline
-                  fontSize="small"
-                  style={{ cursor: 'pointer', color: 'var(--eduhub-label-disabled)' }}
-                />
-              </Tooltip>
-            )}
-          </span>
+      <div className="flex items-center">
+        <label className="flex flex-1 items-center cursor-pointer">
+          <input
+            type="checkbox"
+            checked={localChecked}
+            onChange={handleValueChange}
+            disabled={disabled}
+            className="mr-3 w-5 h-5 text-blue-600 bg-white border-gray-300 rounded focus:ring-blue-500 focus:ring-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          />
+          {label && <span className="text-base font-medium">{label}</span>}
+        </label>
+        {helpText && (
+          <Tooltip title={helpText} placement="top">
+            <IconButton
+              size="small"
+              aria-label={label ? `${label} help` : 'Field help'}
+              onClick={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+              }}
+              sx={{ ml: 1, width: 44, height: 44, color: 'var(--eduhub-label-disabled)' }}
+            >
+              <HelpOutline fontSize="small" />
+            </IconButton>
+          </Tooltip>
         )}
-      </label>
+      </div>
 
       {errorMessage && <p className="mt-1 text-sm text-red-600">{errorMessage}</p>}
 

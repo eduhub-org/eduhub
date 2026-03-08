@@ -47,6 +47,16 @@ interface OnboardingProps {
   setResetValues: (value: boolean) => void;
 }
 
+interface OrganizationWithNewsletter {
+  id: number;
+  name: string;
+  ghostNewsletterListId?: string | null;
+  ghostNewsletterSlug?: string | null;
+  ghostNewsletterLabel?: string | null;
+  ghostNewsletterDoubleOptInEnabled?: boolean | null;
+  newsletterDescription?: string | null;
+}
+
 const Onboarding: FC<OnboardingProps> = ({ course, enrollmentId, refetchCourse, setResetValues }) => {
   const tCourse = useTranslations('course');
   const tProfile = useTranslations('profile');
@@ -77,15 +87,7 @@ const Onboarding: FC<OnboardingProps> = ({ course, enrollmentId, refetchCourse, 
 
   const organizationWithNewsletter = (course?.Program as
     | {
-        Organization?: {
-          id: number;
-          name: string;
-          ghostNewsletterListId?: string | null;
-          ghostNewsletterSlug?: string | null;
-          ghostNewsletterLabel?: string | null;
-          ghostNewsletterDoubleOptInEnabled?: boolean | null;
-          newsletterDescription?: string | null;
-        } | null;
+        Organization?: OrganizationWithNewsletter | null;
       }
     | null
     | undefined)?.Organization;
@@ -179,23 +181,28 @@ const Onboarding: FC<OnboardingProps> = ({ course, enrollmentId, refetchCourse, 
       setSubmissionError(null);
       setIsSubmitting(true);
 
-      if (hasOrganizationNewsletter && hasOrganizationId && userId) {
-        await upsertNewsletterSubscription({
-          variables: {
-            userId,
-            organizationId,
-            status: newsletterOptIn ? 'SUBSCRIBED' : 'UNSUBSCRIBED',
-            source: 'CHECKBOX',
-          },
-        });
-      }
-
+      // Confirm enrollment first so newsletter preference changes are only applied after successful enrollment.
       await updateEnrollmentStatus({
         variables: {
           enrollmentId,
           status: CourseEnrollmentStatus_enum.CONFIRMED,
         },
       });
+
+      if (hasOrganizationNewsletter && hasOrganizationId && userId) {
+        try {
+          await upsertNewsletterSubscription({
+            variables: {
+              userId,
+              organizationId,
+              status: newsletterOptIn ? 'SUBSCRIBED' : 'UNSUBSCRIBED',
+              source: 'CHECKBOX',
+            },
+          });
+        } catch (newsletterError) {
+          console.log('Newsletter preference update failed after enrollment confirmation', newsletterError);
+        }
+      }
       await refetchCourse();
       setResetValues(false);
     } catch (error) {

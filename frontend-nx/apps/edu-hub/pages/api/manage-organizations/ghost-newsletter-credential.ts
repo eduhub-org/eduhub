@@ -6,7 +6,7 @@ type ResponseBody =
   | { success: true; configured: boolean }
   | { success: false; error: string };
 
-const HASURA_ADMIN_SECRET = process.env.HASURA_ADMIN_SECRET;
+const HASURA_ADMIN_SECRET = process.env.HASURA_ADMIN_SECRET || '';
 const GRAPHQL_URI = process.env.GRAPHQL_URI || 'http://hasura:8080/v1/graphql';
 const ENCRYPTION_KEY = process.env.GHOST_NEWSLETTER_CREDENTIALS_ENCRYPTION_KEY || '';
 
