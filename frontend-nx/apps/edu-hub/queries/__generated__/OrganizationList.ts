@@ -42,6 +42,10 @@ export interface OrganizationList_Organization {
    */
   ghostNewsletterApiUrl: string | null;
   /**
+   * Flag indicating whether an encrypted Ghost newsletter API credential is configured.
+   */
+  ghostNewsletterApiKeyConfigured: boolean;
+  /**
    * Optional Ghost newsletter list identifier.
    */
   ghostNewsletterListId: string | null;

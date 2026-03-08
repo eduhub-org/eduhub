@@ -49,6 +49,7 @@ import CreatableTagSelector from '../../inputs/CreatableTagSelector';
 import { OrganizationType_enum } from '../../../__generated__/globalTypes';
 import { MergeOrganizationsDialog } from './MergeOrganizationsDialog';
 import { ApiKeyManager } from './ApiKeyManager';
+import { GhostNewsletterCredentialManager } from './GhostNewsletterCredentialManager';
 import CommonPageHeader from '../../common/CommonPageHeader';
 import { useTableGrid } from '../../common/TableGrid/hooks';
 import { createMultiWordSearchCondition } from '../../common/TableGrid/utils';
@@ -150,6 +151,10 @@ const ExpandableOrganizationRow: React.FC<ExpandableRowProps> = ({ row, onError 
           updateValueMutation={UPDATE_ORGANIZATION_GHOST_NEWSLETTER_API_URL}
           refetchQueries={['OrganizationList']}
           showCharacterCount={false}
+        />
+        <GhostNewsletterCredentialManager
+          organizationId={row.id}
+          initiallyConfigured={Boolean(row.ghostNewsletterApiKeyConfigured)}
         />
         <InputField
           variant="material"

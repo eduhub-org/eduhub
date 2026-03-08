@@ -23,6 +23,7 @@ export const ORGANIZATION_LIST = gql`
       newsletterDescription
       newsletterProvider
       ghostNewsletterApiUrl
+      ghostNewsletterApiKeyConfigured
       ghostNewsletterListId
       ghostNewsletterSlug
       ghostNewsletterLabel

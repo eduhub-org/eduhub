@@ -1230,6 +1230,8 @@ export enum Organization_select_column {
   email = "email",
   formbricksApiKey = "formbricksApiKey",
   formbricksApiUrl = "formbricksApiUrl",
+  ghostNewsletterApiKeyConfigured = "ghostNewsletterApiKeyConfigured",
+  ghostNewsletterApiKeyEncrypted = "ghostNewsletterApiKeyEncrypted",
   ghostNewsletterApiUrl = "ghostNewsletterApiUrl",
   ghostNewsletterDoubleOptInEnabled = "ghostNewsletterDoubleOptInEnabled",
   ghostNewsletterLabel = "ghostNewsletterLabel",
@@ -1263,6 +1265,7 @@ export enum Organization_select_column {
  * select "Organization_aggregate_bool_exp_bool_and_arguments_columns" columns of table "Organization"
  */
 export enum Organization_select_column_Organization_aggregate_bool_exp_bool_and_arguments_columns {
+  ghostNewsletterApiKeyConfigured = "ghostNewsletterApiKeyConfigured",
   ghostNewsletterDoubleOptInEnabled = "ghostNewsletterDoubleOptInEnabled",
 }
 
@@ -1270,6 +1273,7 @@ export enum Organization_select_column_Organization_aggregate_bool_exp_bool_and_
  * select "Organization_aggregate_bool_exp_bool_or_arguments_columns" columns of table "Organization"
  */
 export enum Organization_select_column_Organization_aggregate_bool_exp_bool_or_arguments_columns {
+  ghostNewsletterApiKeyConfigured = "ghostNewsletterApiKeyConfigured",
   ghostNewsletterDoubleOptInEnabled = "ghostNewsletterDoubleOptInEnabled",
 }
 
@@ -1293,6 +1297,8 @@ export enum Organization_update_column {
   email = "email",
   formbricksApiKey = "formbricksApiKey",
   formbricksApiUrl = "formbricksApiUrl",
+  ghostNewsletterApiKeyConfigured = "ghostNewsletterApiKeyConfigured",
+  ghostNewsletterApiKeyEncrypted = "ghostNewsletterApiKeyEncrypted",
   ghostNewsletterApiUrl = "ghostNewsletterApiUrl",
   ghostNewsletterDoubleOptInEnabled = "ghostNewsletterDoubleOptInEnabled",
   ghostNewsletterLabel = "ghostNewsletterLabel",
@@ -7270,6 +7276,8 @@ export interface Organization_bool_exp {
   email?: String_comparison_exp | null;
   formbricksApiKey?: String_comparison_exp | null;
   formbricksApiUrl?: String_comparison_exp | null;
+  ghostNewsletterApiKeyConfigured?: Boolean_comparison_exp | null;
+  ghostNewsletterApiKeyEncrypted?: String_comparison_exp | null;
   ghostNewsletterApiUrl?: String_comparison_exp | null;
   ghostNewsletterDoubleOptInEnabled?: Boolean_comparison_exp | null;
   ghostNewsletterLabel?: String_comparison_exp | null;
@@ -7326,6 +7334,8 @@ export interface Organization_insert_input {
   email?: string | null;
   formbricksApiKey?: string | null;
   formbricksApiUrl?: string | null;
+  ghostNewsletterApiKeyConfigured?: boolean | null;
+  ghostNewsletterApiKeyEncrypted?: string | null;
   ghostNewsletterApiUrl?: string | null;
   ghostNewsletterDoubleOptInEnabled?: boolean | null;
   ghostNewsletterLabel?: string | null;
@@ -7374,6 +7384,7 @@ export interface Organization_max_order_by {
   email?: order_by | null;
   formbricksApiKey?: order_by | null;
   formbricksApiUrl?: order_by | null;
+  ghostNewsletterApiKeyEncrypted?: order_by | null;
   ghostNewsletterApiUrl?: order_by | null;
   ghostNewsletterLabel?: order_by | null;
   ghostNewsletterListId?: order_by | null;
@@ -7420,6 +7431,7 @@ export interface Organization_min_order_by {
   email?: order_by | null;
   formbricksApiKey?: order_by | null;
   formbricksApiUrl?: order_by | null;
+  ghostNewsletterApiKeyEncrypted?: order_by | null;
   ghostNewsletterApiUrl?: order_by | null;
   ghostNewsletterLabel?: order_by | null;
   ghostNewsletterListId?: order_by | null;
@@ -7491,6 +7503,8 @@ export interface Organization_order_by {
   email?: order_by | null;
   formbricksApiKey?: order_by | null;
   formbricksApiUrl?: order_by | null;
+  ghostNewsletterApiKeyConfigured?: order_by | null;
+  ghostNewsletterApiKeyEncrypted?: order_by | null;
   ghostNewsletterApiUrl?: order_by | null;
   ghostNewsletterDoubleOptInEnabled?: order_by | null;
   ghostNewsletterLabel?: order_by | null;
