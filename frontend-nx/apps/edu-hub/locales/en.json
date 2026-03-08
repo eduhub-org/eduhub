@@ -1496,7 +1496,7 @@
       "newsletter_label_placeholder": "Optional display label",
       "newsletter_description": "Newsletter description",
       "newsletter_description_placeholder": "Short participant-facing description",
-      "newsletter_double_opt_in": "Enable double opt-in confirmation"
+      "newsletter_double_opt_in": "Double opt-in confirmation is in Ghost enabled"
     },
     "api_key": {
       "title": "API Key Management",

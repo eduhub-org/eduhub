@@ -1493,7 +1493,7 @@
       "newsletter_label_placeholder": "Optionales Anzeige-Label",
       "newsletter_description": "Newsletter-Beschreibung",
       "newsletter_description_placeholder": "Kurze Beschreibung für Teilnehmende",
-      "newsletter_double_opt_in": "Double-Opt-In-Bestätigung ist aktiviert"
+      "newsletter_double_opt_in": "Double-Opt-In-Bestätigung ist in Ghost aktiviert"
     },
     "api_key": {
       "title": "API-Schlüssel Verwaltung",
