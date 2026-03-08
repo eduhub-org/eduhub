@@ -2,7 +2,7 @@ FROM quay.io/keycloak/keycloak:26.0 as builder
 
 ENV KC_METRICS_ENABLED=true
 ENV KC_FEATURES=token-exchange
-ENV KC_DB=postgres
+ENV KC_DB=dev-file
 COPY ./libs/keycloak-bcrypt-1.6.0.jar /opt/keycloak/providers/
 COPY ./libs/matrix-handle-listener.jar /opt/keycloak/providers/
 COPY ./themes/opencampus /opt/keycloak/themes/opencampus
