@@ -21,8 +21,12 @@ const UploadUI: FC<IPropsUpload> = (props) => {
   const onChangeHandler = useCallback(
     async (event: ChangeEvent<HTMLInputElement>) => {
       const uFile = await parseFileUploadEvent(event);
-      setFileName(uFile.name);
-      if (uFile) props.onFileSelected(event.target.name, uFile);
+      if (uFile) {
+        setFileName(uFile.name);
+        props.onFileSelected(event.target.name, uFile);
+      } else {
+        setFileName('');
+      }
     },
     [props, setFileName]
   );

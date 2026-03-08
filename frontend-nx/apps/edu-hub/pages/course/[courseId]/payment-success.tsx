@@ -90,13 +90,13 @@ export default function PaymentSuccessPage() {
       >
         <ErrorIcon color="error" sx={{ fontSize: 64 }} />
         <Typography variant="h5" component="h1">
-          {t('payment.error_verifying')}
+          {t('modal.payment.error_verifying')}
         </Typography>
         <Typography variant="body1" color="text.secondary">
           {error}
         </Typography>
         <Button variant="contained" onClick={() => router.push(`/course/${courseId}`)}>
-          {t('payment.back_to_course')}
+          {t('modal.payment.back_to_course')}
         </Button>
       </Box>
     );
@@ -116,10 +116,10 @@ export default function PaymentSuccessPage() {
       >
         <CircularProgress size={64} />
         <Typography variant="h5" component="h1">
-          {t('payment.verifying')}
+          {t('modal.payment.verifying')}
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          {t('payment.verifying_description')}
+          {t('modal.payment.verifying_description')}
         </Typography>
       </Box>
     );
@@ -139,7 +139,7 @@ export default function PaymentSuccessPage() {
     >
       <CheckCircle color="success" sx={{ fontSize: 64 }} />
       <Typography variant="h4" component="h1" align="center">
-        {t('payment.success_title')}
+        {t('modal.payment.success_title')}
       </Typography>
       {course && (
         <Typography variant="h6" color="text.secondary" align="center">
@@ -147,20 +147,20 @@ export default function PaymentSuccessPage() {
         </Typography>
       )}
       <Typography variant="body1" color="text.secondary" align="center" sx={{ maxWidth: 600 }}>
-        {t('payment.success_description')}
+        {t('modal.payment.success_description')}
       </Typography>
       <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
         <Button
           variant="contained"
           onClick={() => router.push(`/course/${courseId}`)}
         >
-          {t('payment.view_course')}
+          {t('modal.payment.view_course')}
         </Button>
         <Button
           variant="outlined"
           onClick={() => router.push('/my-courses')}
         >
-          {t('payment.my_courses')}
+          {t('modal.payment.my_courses')}
         </Button>
       </Box>
     </Box>

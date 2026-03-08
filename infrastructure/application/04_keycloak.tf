@@ -83,7 +83,7 @@ module "keycloak_service" {
       value = "jdbc:postgresql://${google_sql_database_instance.default.private_ip_address}/keycloak"
     },
     {
-      name  = "KEYCLOAK_ADMIN"
+      name  = "KC_BOOTSTRAP_ADMIN_USERNAME"
       value = var.keycloak_user
     },
     {
@@ -99,8 +99,8 @@ module "keycloak_service" {
       value = "${local.keycloak_service_name}.opencampus.sh"
     },
     {
-      name  = "KC_PROXY"
-      value = "edge"
+      name  = "KC_PROXY_HEADERS"
+      value = "xforwarded"
     },
     {
       name  = "KC_HTTP_ENABLED"
@@ -109,7 +109,7 @@ module "keycloak_service" {
   ]
   env_secret_vars = [
     {
-      name = "KEYCLOAK_ADMIN_PASSWORD"
+      name = "KC_BOOTSTRAP_ADMIN_PASSWORD"
       value_from = [
         {
           secret_key_ref = {

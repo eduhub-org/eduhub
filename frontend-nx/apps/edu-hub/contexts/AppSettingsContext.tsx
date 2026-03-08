@@ -1,4 +1,4 @@
-import React, { createContext, useContext, ReactNode } from 'react';
+import React, { createContext, useContext, ReactNode, useMemo } from 'react';
 import { useRoleQuery } from '../hooks/authedQuery';
 import { APP_SETTINGS } from '../queries/appSettings';
 import { AppSettings } from '../queries/__generated__/AppSettings';
@@ -29,17 +29,20 @@ const defaultSettings: AppSettingsContextType = {
 
 const AppSettingsContext = createContext<AppSettingsContextType>(defaultSettings);
 
-export const AppSettingsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const { data, loading, error } = useRoleQuery<AppSettings>(APP_SETTINGS, {
-    variables: { appName: 'edu' },
-  });
+const APP_SETTINGS_OPTIONS = { variables: { appName: 'edu' } };
 
-  const settings: AppSettingsContextType = {
-    ...defaultSettings,
-    ...(data?.AppSettings[0] || {}),
-    loading,
-    error,
-  };
+export const AppSettingsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const { data, loading, error } = useRoleQuery<AppSettings>(APP_SETTINGS, APP_SETTINGS_OPTIONS);
+
+  const settings = useMemo<AppSettingsContextType>(
+    () => ({
+      ...defaultSettings,
+      ...(data?.AppSettings[0] ?? undefined),
+      loading,
+      error,
+    }),
+    [data, loading, error]
+  );
 
   return <AppSettingsContext.Provider value={settings}>{children}</AppSettingsContext.Provider>;
 };

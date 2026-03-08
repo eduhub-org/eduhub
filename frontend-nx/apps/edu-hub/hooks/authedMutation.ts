@@ -22,7 +22,7 @@ export const useRoleMutation = <TData = any, TVariables = any>(
   const accessToken = data?.accessToken;
   const currentRole = useCurrentRole();
 
-  const passedRole: AuthRoles = passedOptions?.context?.role;
+  const passedRole: AuthRoles | undefined = passedOptions?.context?.role;
 
   const options = accessToken
     ? {
@@ -31,7 +31,7 @@ export const useRoleMutation = <TData = any, TVariables = any>(
           ...passedOptions?.context,
           headers: {
             ...(currentRole !== AuthRoles.anonymous && {
-              'x-hasura-role': passedRole ? passedRole : currentRole,
+              'x-hasura-role': passedRole ?? currentRole,
             }),
             ...(currentRole !== AuthRoles.anonymous && {
               Authorization: `Bearer ${accessToken}`,

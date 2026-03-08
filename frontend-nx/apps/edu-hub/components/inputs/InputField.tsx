@@ -46,6 +46,10 @@ import { gql } from 'graphql-tag';
  * - As a standalone input field that immediately persists changes to the server.
  * - As part of a larger form where updates are collected locally and submitted together later.
  *
+ * Conflict-safe sync: When the server refetches after a save, the incoming `value` prop may be
+ * stale (from before the user resumed typing). We only sync `localText` from `value` when it is
+ * safe: when local state matches what we last sent, so we never overwrite in-progress edits.
+ * Focus is preserved by avoiding unnecessary state updates during typing/save cycles.
  */
 
 type InputFieldProps = {
@@ -206,9 +210,24 @@ const InputField: React.FC<InputFieldProps> = ({
   const { error, handleError, resetError } = useErrorHandler();
   const [showSavedNotification, setShowSavedNotification] = useState(false);
 
+  // Conflict-safe sync: only accept server value when we're not mid-edit (local matches last sent).
+  // Prevents stale refetch responses from overwriting text typed after a save.
+  const lastSentValueRef = useRef(value);
+  const prevItemIdRef = useRef(itemId);
+
   useEffect(() => {
-    setLocalText(value);
-  }, [value]);
+    if (prevItemIdRef.current !== itemId) {
+      prevItemIdRef.current = itemId;
+      setLocalText(value);
+      lastSentValueRef.current = value;
+      return;
+    }
+    const isDirty = localText !== lastSentValueRef.current;
+    if (!isDirty) {
+      setLocalText(value);
+      lastSentValueRef.current = value;
+    }
+  }, [value, localText, itemId]);
 
   const [updateText] = useRoleMutation(
     updateValueMutation ||
@@ -296,8 +315,10 @@ const InputField: React.FC<InputFieldProps> = ({
 
   const debouncedUpdateText = useDebouncedCallback((newText: string) => {
     if (validateInput(newText)) {
+      lastSentValueRef.current = newText;
       if (updateValueMutation) {
-        updateText({ variables: { itemId, text: newText } });
+        const textValue = type === 'number' ? Number.parseInt(newText, 10) : newText;
+        updateText({ variables: { itemId, text: String(textValue) } });
       } else if (onValueUpdated) {
         onValueUpdated({ text: newText });
       }
@@ -386,11 +407,6 @@ const InputField: React.FC<InputFieldProps> = ({
         {...props}
       />
       {hasBlurred && errorMessage && <p className="text-red-500 mt-2 ml-2 text-sm">{errorMessage}</p>}
-      <NotificationSnackbar
-        open={showSavedNotification}
-        onClose={() => setShowSavedNotification(false)}
-        message={t('notification_snackbar.saved')}
-      />
     </div>
   );
 
@@ -456,11 +472,6 @@ const InputField: React.FC<InputFieldProps> = ({
         </div>
       </div>
       {error && <AlertMessageDialog alert={error} open={!!error} onClose={resetError} />}
-      <NotificationSnackbar
-        open={showSavedNotification}
-        onClose={() => setShowSavedNotification(false)}
-        message={t('notification_snackbar.saved')}
-      />
     </div>
   );
 

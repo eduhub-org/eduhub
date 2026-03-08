@@ -19,7 +19,7 @@ export const AddParticipantsForm: FC<AddParticipantsFormProps> = ({ courseId, on
   const t = useTranslations('manageCourse');
 
   // State hooks
-  const [selectedUserIds, setSelectedUserIds] = useState([]);
+  const [selectedUserIds, setSelectedUserIds] = useState<{ id: string; name: string }[]>([]);
   const [selectedStatus, setSelectedStatus] = useState(CourseEnrollmentStatus_enum.APPLIED);
   const [userSelectionError, setUserSelectionError] = useState<string | null>(null);
 
@@ -32,7 +32,7 @@ export const AddParticipantsForm: FC<AddParticipantsFormProps> = ({ courseId, on
   // Memoized user list based on GraphQL query
   const availableUsers = useMemo(() => {
     if (data && !loading && !error) {
-      return data.User.map((user) => ({
+      return data.User.map((user: { id: string; firstName: string; lastName: string; email: string }) => ({
         id: user.id,
         name: `${user.firstName} ${user.lastName} (${user.email})`,
       }));
@@ -49,8 +49,8 @@ export const AddParticipantsForm: FC<AddParticipantsFormProps> = ({ courseId, on
   ];
 
   // Event handlers
-  const handleUserSelection = (newUserIds) => setSelectedUserIds(newUserIds);
-  const handleStatusSelection = (newStatus) => setSelectedStatus(newStatus);
+  const handleUserSelection = (newUserIds: { id: string; name: string }[]) => setSelectedUserIds(newUserIds);
+  const handleStatusSelection = (newValue: string) => setSelectedStatus(newValue as CourseEnrollmentStatus_enum);
 
   // Submit form
   const handleSubmit = async (e: FormEvent) => {
@@ -83,8 +83,8 @@ export const AddParticipantsForm: FC<AddParticipantsFormProps> = ({ courseId, on
         label={t('selected_users')}
         placeholder={t('name_or_email')}
         itemId={0}
-        values={selectedUserIds}
-        options={availableUsers}
+        values={selectedUserIds as unknown as { id: number; name: string }[]}
+        options={availableUsers as unknown as { id: number; name: string }[]}
         onValueUpdated={handleUserSelection}
         refetchQueries={[]}
       />

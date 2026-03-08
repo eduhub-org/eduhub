@@ -37,7 +37,7 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
   const tCommon = useTranslations('common'); // Used for weekday translations
   const isLoggedIn = useIsLoggedIn();
   const userId = useUserId();
-  const [resetValues, setResetValues] = useState(null);
+  const [resetValues, setResetValues] = useState<boolean | null>(null);
   const [showSuccessSnackbar, setShowSuccessSnackbar] = useState(false);
   const getWeekdayStartAndEndString = useWeekdayStartAndEndString();
 
@@ -53,7 +53,7 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
     fetchPolicy: 'cache-and-network',
     onCompleted(data) {
       // Check if user has been invited to the course and the invitation has not expired
-      const courseEnrollment = getCourseEnrollment(data?.Course_by_pk, userId);
+      const courseEnrollment = getCourseEnrollment(data?.Course_by_pk, userId ?? '');
       const enrollmentStatus = courseEnrollment?.status;
       if (
         enrollmentStatus === CourseEnrollmentStatus_enum.INVITED &&
@@ -83,7 +83,7 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
 
   // Extract course data from authorized or unauthorized query result
   const course = authorizedCourseData?.Course_by_pk || unauthorizedCourseData?.Course_by_pk;
-  const enrollmentId = getCourseEnrollment(authorizedCourseData?.Course_by_pk, userId)?.id;
+  const enrollmentId = getCourseEnrollment(authorizedCourseData?.Course_by_pk, userId ?? '')?.id;
 
   const isCourseWithEnrollment = useIsCourseWithEnrollment(course);
 
@@ -91,7 +91,7 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
   // Use useEffect to call getBackgroundImage
   useEffect(() => {
     const fetchBackgroundImage = async () => {
-      const baseLink = course?.coverImage;
+      const baseLink = course?.coverImage ?? null;
       const optimalImageLink = await getBackgroundImage(baseLink);
       setBackgroundImage(optimalImageLink);
     };
@@ -143,7 +143,7 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
   })) || [];
 
   // Get the course enrollment of the current user (necessary for admins and instructors)
-  const courseEnrollment = getCourseEnrollment(course, userId);
+  const courseEnrollment = getCourseEnrollment(course, userId ?? undefined);
 
   const isLoggedInParticipant =
     isLoggedIn &&
@@ -168,7 +168,7 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
               <div className="max-w-screen-xl mx-auto w-full">{course.title}</div>
             </div>
             <div className="max-w-screen-xl mx-auto w-full">
-              {isLoggedIn && resetValues && (
+              {isLoggedIn && resetValues && enrollmentId != null && (
                 <Onboarding
                   course={course}
                   enrollmentId={enrollmentId}
@@ -187,7 +187,7 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                   <div className="flex flex-1 justify-center items-center mx-6 lg:mx-0 lg:max-w-md">
                     <Registration
                       course={course}
-                      courseEnrollment={courseEnrollment}
+                      courseEnrollment={courseEnrollment ?? undefined}
                       onRegistrationSuccess={handleRegistrationSuccess}
                     />
                   </div>
@@ -206,18 +206,20 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                             {!courseEnrollment?.achievementCertificateURL && (
                               <AchievementRecord
                                 courseId={course.id}
-                                achievementRecordUploadDeadline={course.Program.achievementRecordUploadDeadline}
+                                achievementRecordUploadDeadline={course.Program?.achievementRecordUploadDeadline}
                                 courseTitle={course.title}
                               />
                             )}
-                            <CertificateDownload courseEnrollment={courseEnrollment} />
+                            {courseEnrollment && <CertificateDownload courseEnrollment={courseEnrollment} />}
                           </div>
                         </div>
                       )}
                       {isDegreeCourse && (
                         <>
                           <CompletedDegreeCourses degreeCourseId={course.id} />
-                          <CertificateDownload courseEnrollment={courseEnrollment} />
+                          {courseEnrollment && (
+                            <CertificateDownload courseEnrollment={courseEnrollment} />
+                          )}
                         </>
                       )}
                     </div>

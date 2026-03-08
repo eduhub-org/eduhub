@@ -75,7 +75,7 @@ export const Header: FC = () => {
         </div>
         <ClientOnly>
           <div className="flex-shrink ">
-            {isLoggedIn ? (
+            {isLoggedIn && user ? (
               <div className="flex">
                 <div className="flex">
                   <div className="cursor-pointer" onClick={openMenu}>

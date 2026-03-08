@@ -177,7 +177,7 @@ const ExpandableProgramRow: FC<ExpandableProgramRowProps> = ({ program }) => {
                 {loadParticipationDataResult && !loadParticipationDataLoading && !loadParticipationDataError && (
                   <Button
                     as="a"
-                    href={loadParticipationDataResult.loadParticipationData.link}
+                    href={loadParticipationDataResult.loadParticipationData.link ?? undefined}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="block"

@@ -29,7 +29,7 @@ export const useIsInstructor = (): boolean => {
 export const useIsUserIdInList = (allowedIds: string[]): boolean => {
   const { data: sessionData } = useSession();
   const userId = sessionData?.profile?.['https://hasura.io/jwt/claims']?.['x-hasura-user-id'];
-  return allowedIds?.includes(userId) ?? false;
+  return Boolean(userId && allowedIds?.includes(userId));
 };
 
 export const useIsUser = (): boolean => {

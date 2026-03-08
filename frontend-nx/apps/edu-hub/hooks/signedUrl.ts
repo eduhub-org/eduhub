@@ -8,7 +8,7 @@ export const useSignedUrl = (filePath: string): { getSignedUrl: () => Promise<{ 
   const [getFileSignedUrl, { data, loading }] = useLazyRoleQuery<GetSignedUrl, GetSignedUrlVariables>(GET_SIGNED_URL, {
     variables: { path: filePath },
   });
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<unknown>(null);
 
   // Sets publicUrl to null if file is not public
   const publicUrl = getPublicUrl(filePath)
@@ -26,8 +26,9 @@ export const useSignedUrl = (filePath: string): { getSignedUrl: () => Promise<{ 
       } else {
         throw new Error('Signed URL not found in the response');
       }
-    } catch (err) {
-      console.error(`Error in getSignedUrl: ${err.message}`, err); // Error logging
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      console.error(`Error in getSignedUrl: ${message}`, err);
       setError(err);
       return { url: null };
     }

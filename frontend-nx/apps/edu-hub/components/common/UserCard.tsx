@@ -42,7 +42,7 @@ const UserCard: FC<UserCardProps> = ({ user, role, className, size = 'large' }) 
   const showName = size !== 'small';
 
   const userPictureUrl = useMemo(
-    () => getPublicImageUrl(user?.picture, imageSolution) || mysteryImg,
+    () => getPublicImageUrl(user?.picture ?? null, imageSolution) || mysteryImg,
     [user?.picture, imageSolution]
   );
 
@@ -81,7 +81,7 @@ const UserCard: FC<UserCardProps> = ({ user, role, className, size = 'large' }) 
             {user?.firstName} {user?.lastName}
           </span>
           {role && <span className="text-gray-500">{role}</span>}
-          {isLinkFormat(user?.externalProfile) && (
+          {user?.externalProfile && isLinkFormat(user.externalProfile) && (
             <span className="text-gray-500">{getProfileLink(user.externalProfile)}</span>
           )}
         </div>

@@ -57,14 +57,14 @@ export const getAttendancesForParticipants = (
       );
       // get the attendance that was added last by selecting the one with th highest id
       const attendance =
-        attendancesForSession &&
-        attendancesForSession.length > 0 &&
-        attendancesForSession.sort((a, b) => b.id - a.id)[0];
+        attendancesForSession && attendancesForSession.length > 0
+          ? [...attendancesForSession].sort((a, b) => b.id - a.id)[0]
+          : undefined;
       return {
         userId: participant.userId,
         sessionId: session.id,
         date: session.startDateTime,
-        status: attendance?.status || AttendanceStatus_enum.NO_INFO,
+        status: attendance?.status ?? AttendanceStatus_enum.NO_INFO,
       };
     });
     return attendances;

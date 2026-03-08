@@ -33,7 +33,7 @@ import {
   UpdateAchievementDocumentationTemplateVariables,
 } from '../../../queries/__generated__/UpdateAchievementDocumentationTemplate';
 import FileDownload from '../../inputs/FileDownload';
-import { ApolloError } from '@apollo/client';
+import { ApolloError, MutationFunction } from '@apollo/client';
 import { useTableGrid } from '../../common/TableGrid/hooks';
 import { createMultiWordSearchCondition } from '../../common/TableGrid/utils';
 
@@ -117,9 +117,9 @@ const ManageAchievementTemplatesContent: FC = () => {
         },
         cell: ({ getValue, row }) => (
           <FileUpload
-            id={row.original.id}
-            submitMutation={updateAchievementDocumentationTemplate}
-            uploadMutation={saveAchievementDocumentationTemplate}
+            id={String(row.original.id)}
+            submitMutation={updateAchievementDocumentationTemplate as MutationFunction}
+            uploadMutation={saveAchievementDocumentationTemplate as MutationFunction}
             uploadVariables={{ achievementDocumentationTemplateId: getValue() }}
             submitVariables={{ itemId: getValue(), text: row.original.title }}
             refetchQueries={['AchievementDocumentationTemplates']}
@@ -183,7 +183,7 @@ const ManageAchievementTemplatesContent: FC = () => {
               onAddButtonClick={onAddAchievementDocumentationTemplateClick}
               addButtonText={t('addUserAchievementDocumentationTemplateText')}
             />
-            <ErrorMessageDialog errorMessage={errorMessage} open={!!errorMessage} onClose={handleCloseErrorDialog} />
+            <ErrorMessageDialog errorMessage={errorMessage ?? ''} open={!!errorMessage} onClose={handleCloseErrorDialog} />
           </>
         )}
       </div>

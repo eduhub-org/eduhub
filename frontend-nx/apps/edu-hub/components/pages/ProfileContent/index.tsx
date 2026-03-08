@@ -43,7 +43,7 @@ const ProfileContent: FC = () => {
     variables: {
       userId: sessionData?.profile?.sub,
     },
-    skip: !sessionData?.profile?.sub || sessionStatus === 'loading',
+    skip: !sessionData?.profile?.sub || (sessionStatus as string) === 'loading',
   });
 
   const queryOccupationOptions = useRoleQuery<UserOccupation>(USER_OCCUPATION, {
@@ -58,7 +58,7 @@ const ProfileContent: FC = () => {
     skip: sessionStatus === 'loading',
   });
   // Country options with proper language selection
-  const countryOptions = (queryCountryOptions?.Country || []).map((country) => ({
+  const countryOptions = (queryCountryOptions?.Country || []).map((country: { name_de: string; name_en: string; code: string }) => ({
     label: locale === 'de' ? country.name_de : country.name_en,
     value: country.code,
   }));
@@ -69,7 +69,7 @@ const ProfileContent: FC = () => {
       order_by: [{ name: 'asc' }],
     },
   });
-  const organizationOptions = queryOrganizationOptions?.Organization?.map((org) => ({
+  const organizationOptions = queryOrganizationOptions?.Organization?.map((org: { id: number; name: string; aliases?: unknown }) => ({
     value: org.id.toString(),
     label: org.name,
     aliases: org.aliases, // Make sure to include this
@@ -95,7 +95,7 @@ const ProfileContent: FC = () => {
     console.log('query known occupation options error', queryOccupationOptions.error);
   }
 
-  const getOrganizationLabel = (occupation) => {
+  const getOrganizationLabel = (occupation: string) => {
     switch (occupation) {
       case 'HIGH_SCHOOL_STUDENT':
         return t('organization.label_school');
@@ -120,8 +120,8 @@ const ProfileContent: FC = () => {
         <ImageUploader
           variant="eduhub"
           element="profilePicture"
-          identifierVariables={{ userId: sessionData?.profile?.sub }}
-          currentFile={userData?.User_by_pk?.picture}
+          identifierVariables={{ userId: sessionData?.profile?.sub ?? '' }}
+          currentFile={userData?.User_by_pk?.picture ?? null}
           updateFileMutation={UPDATE_USER_PROFILE_PICTURE}
           onFileUpdated={() => refetchUser()}
           acceptedFileTypes="image/*"
@@ -135,7 +135,7 @@ const ProfileContent: FC = () => {
               type="input"
               label={t('first_name')}
               itemId={userData?.User_by_pk?.id}
-              value={userData?.User_by_pk?.firstName}
+              value={userData?.User_by_pk?.firstName ?? ''}
               updateValueMutation={UPDATE_USER_FIRST_NAME}
               showCharacterCount={false}
             />
@@ -146,7 +146,7 @@ const ProfileContent: FC = () => {
               type="input"
               label={t('last_name')}
               itemId={userData?.User_by_pk?.id}
-              value={userData?.User_by_pk?.lastName}
+              value={userData?.User_by_pk?.lastName ?? ''}
               updateValueMutation={UPDATE_USER_LAST_NAME}
               showCharacterCount={false}
             />
@@ -194,7 +194,7 @@ const ProfileContent: FC = () => {
           <div className="w-full md:w-1/2 md:p-0">
             <DropDownSelector
               variant="eduhub"
-              label={getOrganizationLabel(userData?.User_by_pk?.occupation)}
+              label={getOrganizationLabel(userData?.User_by_pk?.occupation ?? '')}
               placeholder={t('organization.placeholder')}
               value={userData?.User_by_pk?.Organization?.id?.toString() || ''}
               options={organizationOptions || []}

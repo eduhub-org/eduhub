@@ -33,9 +33,8 @@ const DatePicker: React.FC<DatePickerProps> = ({
   const t = useTranslations('common');
   const theme = useTheme();
 
-  const handleMutationValueUpdate = (newValue: Date | null) => {
-    onValueUpdated?.(newValue);
-    return newValue;
+  const handleMutationValueUpdate = (value: unknown) => {
+    onValueUpdated?.(value as Date | null);
   };
 
   const {
@@ -163,7 +162,7 @@ const DatePicker: React.FC<DatePickerProps> = ({
     <>
       {variant === 'material' ? renderMaterialUI() : renderEduHub()}
       {variant === 'material' && error && <AlertMessageDialog alert={error} open={!!error} onClose={resetError} />}
-      {variant === 'eduhub' && error && <ErrorMessageDialog errorMessage={error?.message || ''} open={!!error} onClose={resetError} />}
+      {variant === 'eduhub' && error && <ErrorMessageDialog errorMessage={typeof error === 'string' ? error : ''} open={!!error} onClose={resetError} />}
     </>
   );
 };

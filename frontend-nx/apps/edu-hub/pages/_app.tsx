@@ -16,6 +16,7 @@ import { enUS } from 'date-fns/locale/en-US';
 
 import { AppSettingsProvider } from '../contexts/AppSettingsContext';
 import { AuthErrorProvider } from '../contexts/AuthErrorContext';
+import { AuthStoreUpdater } from '../components/AuthStoreUpdater';
 
 // Import locale messages
 import deMessages from '../locales/de.json';
@@ -70,11 +71,13 @@ const MyApp: FC<AppProps & InitialProps> & {
         router.events.off('routeChangeComplete', handleRouteChange);
       };
     }
+    return undefined;
   }, [router.events, isFBPixelLoaded]);
 
   return (
     <NextIntlClientProvider locale={locale} messages={messages[locale]} timeZone="Europe/Berlin">
       <SessionProvider session={pageProps.session}>
+        <AuthStoreUpdater />
         <ApolloProvider client={client}>
           <AppCacheProvider {...pageProps}>
             <ThemeProvider theme={theme}>

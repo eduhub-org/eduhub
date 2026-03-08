@@ -1,6 +1,6 @@
 import React, { FC, useRef, useState, memo, useEffect } from 'react';
 import { Navigation, Mousewheel } from 'swiper/modules';
-import { Swiper, SwiperSlide } from 'swiper/react';
+import { Swiper, SwiperSlide, SwiperRef } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/mousewheel';
@@ -15,7 +15,7 @@ import { TileWidget } from './TileWidget';
 import sliderNextArrow from '../../../public/images/common/slider-next-arrow.svg';
 import sliderPreviousArrow from '../../../public/images/common/slider-previous-arrow.svg';
 
-type CourseType = CourseList_Course | CourseTiles_Course | CoursesEnrolledByUser_Course;
+export type CourseType = CourseList_Course | CourseTiles_Course | CoursesEnrolledByUser_Course;
 
 interface TileSliderProps {
   courses: CourseType[];
@@ -65,8 +65,8 @@ const breakpoints = {
 
 const TileSlider: FC<TileSliderProps> = ({ courses, isManage, isWidget = false }) => {
   const t = useTranslations('common');
-  const swiperRef = useRef(null);
-  const containerRef = useRef(null);
+  const swiperRef = useRef<SwiperRef | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
   const [nextVisible, setNextVisible] = useState(true);
   const [prevVisible, setPrevVisible] = useState(false);
   const [isSwiperReady, setIsSwiperReady] = useState(false);

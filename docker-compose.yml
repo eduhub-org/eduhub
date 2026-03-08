@@ -136,14 +136,21 @@ services:
     build:
       context: ./keycloak/
       dockerfile: Dockerfile-dev
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - >-
+        unset KC_BOOTSTRAP_ADMIN_USERNAME KC_BOOTSTRAP_ADMIN_PASSWORD &&
+        /opt/keycloak/bin/kc.sh import --file /opt/keycloak/data/import/master.json --override true &&
+        exec /opt/keycloak/bin/kc.sh start-dev --import-realm
     ports:
       - 28080:8080
     environment:
-      KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
       KC_HOSTNAME_STRICT: "false"
     volumes:
-      - ./keycloak/imports-dev:/opt/keycloak/data/import
+      - ./keycloak/imports-dev/master.json:/opt/keycloak/data/import/master.json
+      - ./keycloak/imports-dev/edu-hub.json:/opt/keycloak/data/import/edu-hub.json
       - ./keycloak/imports:/imports
       - ./keycloak/themes/opencampus:/opt/keycloak/themes/opencampus
       - ./keycloak/themes/edu-hub:/opt/keycloak/themes/edu-hub

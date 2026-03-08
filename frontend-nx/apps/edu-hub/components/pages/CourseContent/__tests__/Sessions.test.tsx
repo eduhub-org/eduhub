@@ -2,6 +2,8 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { Sessions } from '../Sessions';
+import type { Course_Course_by_pk_Sessions, Course_Course_by_pk_CourseLocations } from '../../../../queries/__generated__/Course';
+import { LocationOption_enum } from '../../../../__generated__/globalTypes';
 
 // Mock the hooks and dependencies
 jest.mock('next-intl', () => ({
@@ -27,50 +29,65 @@ jest.mock('../../../../helpers/util', () => ({
   isLinkFormat: () => false,
 }));
 
-// Mock data for testing
-const mockSessions = [
+// Mock data for testing - partial types sufficient for separator logic
+const mockSessions: Course_Course_by_pk_Sessions[] = [
   {
+    __typename: 'Session',
+    id: 1,
+    courseId: 1,
+    description: '',
     startDateTime: '2024-01-15T10:00:00Z',
     endDateTime: '2024-01-15T12:00:00Z',
     title: 'Test Session',
     SessionSpeakers: [],
     SessionAddresses: [
       {
+        __typename: 'SessionAddress',
         id: 1,
         address: 'Test Address 1',
+        locationAddressId: null,
         CourseLocation: {
+          __typename: 'CourseLocation',
           id: 1,
-          locationOption: 'OFFLINE',
+          locationOption: LocationOption_enum.KIEL,
           defaultSessionAddress: 'Default Address 1',
+          defaultSessionAddressId: null,
         },
       },
       {
+        __typename: 'SessionAddress',
         id: 2,
         address: 'Test Address 2',
+        locationAddressId: null,
         CourseLocation: {
+          __typename: 'CourseLocation',
           id: 2,
-          locationOption: 'OFFLINE',
+          locationOption: LocationOption_enum.KIEL,
           defaultSessionAddress: 'Default Address 2',
+          defaultSessionAddressId: null,
         },
       },
     ],
   },
 ];
 
-const mockCourseLocations = [
+const mockCourseLocations: Course_Course_by_pk_CourseLocations[] = [
   {
+    __typename: 'CourseLocation',
     id: 1,
-    locationOption: 'OFFLINE',
+    locationOption: LocationOption_enum.KIEL,
     defaultSessionAddress: 'Default Address 1',
   },
   {
+    __typename: 'CourseLocation',
     id: 2,
-    locationOption: 'OFFLINE',
+    locationOption: LocationOption_enum.KIEL,
     defaultSessionAddress: 'Default Address 2',
   },
   {
+    __typename: 'CourseLocation',
     id: 3,
-    locationOption: 'OFFLINE',
+    locationOption: LocationOption_enum.KIEL,
     defaultSessionAddress: 'Default Address 3',
   },
 ];

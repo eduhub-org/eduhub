@@ -183,7 +183,7 @@ const TagSelector: React.FC<TagSelectorProps> = ({
   }, debounceTimeout);
 
   const handleTagChange = useCallback(
-    (event, newValue) => {
+    (_event: React.SyntheticEvent, newValue: { id: number; name: string }[]) => {
       setTags(newValue);
       debouncedUpdateTags(newValue);
     },

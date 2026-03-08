@@ -95,7 +95,10 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
       // If there's is an available option, proceed with insertion
       const res = await insertCourseLocation({ variables: { courseId: course.id, option: availableOption } });
       //extract the location id from the response
-      const insertedLocationId = res?.data?.insert_CourseLocation?.returning[0].id;
+      const insertedLocationId = res?.data?.insert_CourseLocation?.returning[0]?.id;
+      if (insertedLocationId == null) {
+        throw new Error('Failed to get inserted location ID');
+      }
       // loop through the session addresses and add the new location
       await Promise.all(
         course.Sessions.map((session) => {
@@ -111,7 +114,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
       qResult.refetch();
     } catch (error) {
       // Handle errors if any step in the try block fails
-      handleError(error.message);
+      handleError(error instanceof Error ? error.message : String(error));
       // Optionally, re-throw the error if you want calling functions to be able to handle it as well
       throw error;
     }
@@ -131,7 +134,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
     onError: (error) => handleError(error.message),
   });
 
-  const handleDeleteCourseLocation = async (location) => {
+  const handleDeleteCourseLocation = async (location: { id: number }) => {
     // Check the number of course locations
     if (course.CourseLocations.length <= 1) {
       // Handle the case where the location is the last one (e.g., show an error message)
@@ -310,7 +313,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
             variant="eduhub"
             label={t('language')}
             options={languageOptions}
-            value={course.language}
+            value={course.language ?? ''}
             updateValueMutation={UPDATE_COURSE_LANGUAGE}
             identifierVariables={{ courseId: course.id }}
             refetchQueries={['ManagedCourse']}
