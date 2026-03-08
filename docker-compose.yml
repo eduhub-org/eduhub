@@ -139,11 +139,11 @@ services:
     ports:
       - 28080:8080
     environment:
-      KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
       KC_HOSTNAME_STRICT: "false"
     volumes:
-      - ./keycloak/imports-dev:/opt/keycloak/data/import
+      - ./keycloak/imports-dev/edu-hub.json:/opt/keycloak/data/import/edu-hub.json
       - ./keycloak/imports:/imports
       - ./keycloak/themes/opencampus:/opt/keycloak/themes/opencampus
       - ./keycloak/themes/edu-hub:/opt/keycloak/themes/edu-hub
