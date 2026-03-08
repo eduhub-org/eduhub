@@ -1799,6 +1799,7 @@ export enum User_select_column {
   integerId = "integerId",
   lastName = "lastName",
   matriculationNumber = "matriculationNumber",
+  matrixUserHandle = "matrixUserHandle",
   newsletterRegistration = "newsletterRegistration",
   occupation = "occupation",
   organizationId = "organizationId",
@@ -1839,6 +1840,7 @@ export enum User_update_column {
   integerId = "integerId",
   lastName = "lastName",
   matriculationNumber = "matriculationNumber",
+  matrixUserHandle = "matrixUserHandle",
   newsletterRegistration = "newsletterRegistration",
   occupation = "occupation",
   organizationId = "organizationId",
@@ -9205,6 +9207,7 @@ export interface User_bool_exp {
   integerId?: Int_comparison_exp | null;
   lastName?: String_comparison_exp | null;
   matriculationNumber?: String_comparison_exp | null;
+  matrixUserHandle?: String_comparison_exp | null;
   newsletterRegistration?: Boolean_comparison_exp | null;
   occupation?: UserOccupation_enum_comparison_exp | null;
   organizationId?: Int_comparison_exp | null;
@@ -9242,6 +9245,7 @@ export interface User_insert_input {
   integerId?: number | null;
   lastName?: string | null;
   matriculationNumber?: string | null;
+  matrixUserHandle?: string | null;
   newsletterRegistration?: boolean | null;
   occupation?: UserOccupation_enum | null;
   organizationId?: number | null;
@@ -9268,6 +9272,7 @@ export interface User_max_order_by {
   integerId?: order_by | null;
   lastName?: order_by | null;
   matriculationNumber?: order_by | null;
+  matrixUserHandle?: order_by | null;
   organizationId?: order_by | null;
   picture?: order_by | null;
   updated_at?: order_by | null;
@@ -9291,6 +9296,7 @@ export interface User_min_order_by {
   integerId?: order_by | null;
   lastName?: order_by | null;
   matriculationNumber?: order_by | null;
+  matrixUserHandle?: order_by | null;
   organizationId?: order_by | null;
   picture?: order_by | null;
   updated_at?: order_by | null;
@@ -9342,6 +9348,7 @@ export interface User_order_by {
   integerId?: order_by | null;
   lastName?: order_by | null;
   matriculationNumber?: order_by | null;
+  matrixUserHandle?: order_by | null;
   newsletterRegistration?: order_by | null;
   occupation?: order_by | null;
   organizationId?: order_by | null;

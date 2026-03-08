@@ -1076,6 +1076,7 @@
     "uploaded_by": "Uploaded by",
     "co_authors": "Co-authors",
     "download_documentation": "Download Documentation",
+    "download_documentation_error": "Failed to load project documentation. Please try again.",
     "generate_achievement_certificates": "Generate Achievement Certificates",
     "delete_achievement_certificates": "Delete Achievement Certificates",
     "no_certificates_deleted": "No certificates were deleted",
