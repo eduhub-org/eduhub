@@ -1578,6 +1578,18 @@
       "enter_description": "Enter organization description",
       "enter_name": "Enter organization name"
     },
+    "help": {
+      "name": "Official organization name shown across the platform.",
+      "type": "Used for categorization, filtering, and profile context.",
+      "aliases": "Alternative organization names that improve search and matching.",
+      "description": "Short organization text shown in context where available.",
+      "newsletter_description": "Additional newsletter text shown to participants in onboarding and profile.",
+      "newsletter_api_url": "Ghost Admin API base URL used for newsletter synchronization.",
+      "newsletter_list_id": "Optional Ghost newsletter/list ID. Use this or the slug field.",
+      "newsletter_slug": "Optional Ghost newsletter slug. Use this or the list ID field.",
+      "newsletter_label": "Optional participant-facing newsletter title overriding the organization name.",
+      "newsletter_double_opt_in": "If enabled, users must confirm by email before the subscription becomes active."
+    },
     "error": {
       "loading": "Error loading organizations",
       "duplicate_organization_name": "An organization with the default name is still existing. Please rename or delete that one first.",

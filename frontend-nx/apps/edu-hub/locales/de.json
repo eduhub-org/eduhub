@@ -1575,6 +1575,18 @@
       "enter_description": "Organisationsbeschreibung eingeben",
       "enter_name": "Organisationsname eingeben"
     },
+    "help": {
+      "name": "Offizieller Organisationsname, der in der Plattform angezeigt wird.",
+      "type": "Wird für Kategorisierung, Filter und Profilkontext verwendet.",
+      "aliases": "Alternative Namen der Organisation zur besseren Suche und Zuordnung.",
+      "description": "Kurzer Organisationstext, der an geeigneten Stellen angezeigt wird.",
+      "newsletter_description": "Zusätzlicher Newsletter-Text für Teilnehmende im Onboarding und Profil.",
+      "newsletter_api_url": "Ghost-Admin-API-Basis-URL für die Newsletter-Synchronisierung.",
+      "newsletter_list_id": "Optionale Ghost-Newsletter-/Listen-ID. Nutze dieses Feld oder den Slug.",
+      "newsletter_slug": "Optionaler Ghost-Newsletter-Slug. Nutze dieses Feld oder die Listen-ID.",
+      "newsletter_label": "Optionaler Newsletter-Titel für Teilnehmende statt des Organisationsnamens.",
+      "newsletter_double_opt_in": "Wenn aktiviert, müssen Nutzer das Abo zusätzlich per E-Mail bestätigen."
+    },
     "error": {
       "loading": "Fehler beim Laden der Organisationen",
       "duplicate_organization_name": "Eine Organisation mit dem Standardnamen existiert noch. Bitte benenne diese zuerst um oder lösche sie.",

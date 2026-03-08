@@ -191,7 +191,26 @@ const CreatableTagSelector: React.FC<CreatableTagSelectorProps> = ({
           );
         }}
         renderInput={(params) => (
-          <TextField {...params} variant="standard" label={label} placeholder={placeholder} onKeyDown={handleKeyDown} />
+          <TextField
+            {...params}
+            variant="standard"
+            label={label}
+            placeholder={placeholder}
+            onKeyDown={handleKeyDown}
+            InputProps={{
+              ...params.InputProps,
+              endAdornment: (
+                <>
+                  {helpText && (
+                    <Tooltip title={helpText} placement="top">
+                      <HelpOutline style={{ cursor: 'pointer', marginRight: '6px', color: 'var(--eduhub-label-disabled)' }} />
+                    </Tooltip>
+                  )}
+                  {params.InputProps.endAdornment}
+                </>
+              ),
+            }}
+          />
         )}
         sx={{
           '& .MuiChip-root': { color: 'var(--eduhub-label-primary)', backgroundColor: 'var(--eduhub-bg-secondary)' },
