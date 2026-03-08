@@ -457,12 +457,22 @@
       "decline_confirm_text": "Do you really want to decline the invitation to this course?",
       "decline_button_text": "Yes",
       "title": "Onboarding for your Course Participation",
+      "badge": "Action required",
       "congratulation": "Congratulations, you are invited to participate in this course!",
-      "form_intro": "Please, update you current employment status:",
+      "intro_copy": "Before confirming your participation, please review and update your personal details. This helps us personalize communication and course support.",
+      "form_intro": "Please update your current employment status:",
       "confirm_sufficient_time": "Finally, confirm your course participation only if you have the time to fully attend the course until the end.",
       "important": "IMPORTANT: CONFIRM COURSE INVITATION!",
       "mattermost_info_1": "After confirmation, please click directly on the button to go to the course chat.",
-      "mattermost_info_2": "If you don't have an account in our chat yet, you will need to sign up there first. The course chat is our central communication tool for the courses."
+      "mattermost_info_2": "If you don't have an account in our chat yet, you will need to sign up there first. The course chat is our central communication tool for the courses.",
+      "newsletter_title": "Subscribe to updates from {organization}",
+      "newsletter_description": "Receive news on upcoming courses, learning opportunities, and program updates from {organization}.",
+      "newsletter_legal": "You can revoke your consent at any time in your profile. Processing is based on our <privacy>Privacy Policy</privacy>.",
+      "newsletter_double_opt_in": "You may receive a confirmation email (double opt-in) before your subscription becomes active.",
+      "newsletter_sync_issue": "Your last newsletter synchronization could not be completed. You can update your preference in your profile.",
+      "errors": {
+        "confirmation_failed": "We could not confirm your participation at the moment. Please try again."
+      }
     },
     "success_messages": {
       "success_title": "You have successfully applied",
@@ -846,7 +856,16 @@
     "country_none": "-- Select Country --",
     "occupation_none": "-- Select Occupation --",
     "external_profile_placeholder": "e.g., https://linkedin.com/in/yourname",
-    "change_password_or_email": "Change password or email"
+    "change_password_or_email": "Change password or email",
+    "newsletter_preferences": {
+      "title": "Newsletter preferences",
+      "description": "Manage newsletter subscriptions for organizations connected to your enrolled programs.",
+      "checkbox_label": "I want to receive the newsletter from {organization}",
+      "legal": "You can revoke your consent at any time. Processing is based on our <privacy>Privacy Policy</privacy>.",
+      "double_opt_in_notice": "Subscription activation may require an additional confirmation email (double opt-in).",
+      "sync_error": "The last synchronization with the newsletter provider failed.",
+      "error": "Your newsletter preference could not be saved. Please try again."
+    }
   },
   "programs": {
     "add": "Add programm",
@@ -1465,7 +1484,17 @@
       "description": "Description",
       "logo": "Logo",
       "new_organization": "New Organization",
-      "default_description": "Description"
+      "default_description": "Description",
+      "newsletter_title": "Newsletter configuration (Ghost)",
+      "newsletter_api_url": "Ghost API URL",
+      "newsletter_api_url_placeholder": "https://your-ghost-site/ghost/api/admin",
+      "newsletter_list_id": "Ghost newsletter list ID",
+      "newsletter_list_id_placeholder": "Optional list ID",
+      "newsletter_slug": "Ghost newsletter slug",
+      "newsletter_slug_placeholder": "Optional slug, e.g. weekly-updates",
+      "newsletter_label": "Participant-facing newsletter label",
+      "newsletter_label_placeholder": "Optional display label",
+      "newsletter_double_opt_in": "Enable double opt-in confirmation"
     },
     "api_key": {
       "title": "API Key Management",

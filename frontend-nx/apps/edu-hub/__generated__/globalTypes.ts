@@ -1140,6 +1140,43 @@ export enum OrganizationAdmin_update_column {
 }
 
 /**
+ * unique or primary key constraints on table "OrganizationNewsletterSubscription"
+ */
+export enum OrganizationNewsletterSubscription_constraint {
+  OrganizationNewsletterSubscription_pkey = "OrganizationNewsletterSubscription_pkey",
+}
+
+/**
+ * select columns of table "OrganizationNewsletterSubscription"
+ */
+export enum OrganizationNewsletterSubscription_select_column {
+  created_at = "created_at",
+  errorMessage = "errorMessage",
+  externalSubscriberId = "externalSubscriberId",
+  lastSyncedAt = "lastSyncedAt",
+  organizationId = "organizationId",
+  source = "source",
+  status = "status",
+  updated_at = "updated_at",
+  userId = "userId",
+}
+
+/**
+ * update columns of table "OrganizationNewsletterSubscription"
+ */
+export enum OrganizationNewsletterSubscription_update_column {
+  created_at = "created_at",
+  errorMessage = "errorMessage",
+  externalSubscriberId = "externalSubscriberId",
+  lastSyncedAt = "lastSyncedAt",
+  organizationId = "organizationId",
+  source = "source",
+  status = "status",
+  updated_at = "updated_at",
+  userId = "userId",
+}
+
+/**
  * unique or primary key constraints on table "OrganizationType"
  */
 export enum OrganizationType_constraint {
@@ -1193,6 +1230,11 @@ export enum Organization_select_column {
   email = "email",
   formbricksApiKey = "formbricksApiKey",
   formbricksApiUrl = "formbricksApiUrl",
+  ghostNewsletterApiUrl = "ghostNewsletterApiUrl",
+  ghostNewsletterDoubleOptInEnabled = "ghostNewsletterDoubleOptInEnabled",
+  ghostNewsletterLabel = "ghostNewsletterLabel",
+  ghostNewsletterListId = "ghostNewsletterListId",
+  ghostNewsletterSlug = "ghostNewsletterSlug",
   id = "id",
   invoiceFooterText = "invoiceFooterText",
   invoiceNumberPrefix = "invoiceNumberPrefix",
@@ -1201,6 +1243,7 @@ export enum Organization_select_column {
   logo = "logo",
   managingDirector = "managingDirector",
   name = "name",
+  newsletterProvider = "newsletterProvider",
   phone = "phone",
   postalCode = "postalCode",
   registerCourt = "registerCourt",
@@ -1213,6 +1256,20 @@ export enum Organization_select_column {
   updated_at = "updated_at",
   vatId = "vatId",
   website = "website",
+}
+
+/**
+ * select "Organization_aggregate_bool_exp_bool_and_arguments_columns" columns of table "Organization"
+ */
+export enum Organization_select_column_Organization_aggregate_bool_exp_bool_and_arguments_columns {
+  ghostNewsletterDoubleOptInEnabled = "ghostNewsletterDoubleOptInEnabled",
+}
+
+/**
+ * select "Organization_aggregate_bool_exp_bool_or_arguments_columns" columns of table "Organization"
+ */
+export enum Organization_select_column_Organization_aggregate_bool_exp_bool_or_arguments_columns {
+  ghostNewsletterDoubleOptInEnabled = "ghostNewsletterDoubleOptInEnabled",
 }
 
 /**
@@ -1235,6 +1292,11 @@ export enum Organization_update_column {
   email = "email",
   formbricksApiKey = "formbricksApiKey",
   formbricksApiUrl = "formbricksApiUrl",
+  ghostNewsletterApiUrl = "ghostNewsletterApiUrl",
+  ghostNewsletterDoubleOptInEnabled = "ghostNewsletterDoubleOptInEnabled",
+  ghostNewsletterLabel = "ghostNewsletterLabel",
+  ghostNewsletterListId = "ghostNewsletterListId",
+  ghostNewsletterSlug = "ghostNewsletterSlug",
   id = "id",
   invoiceFooterText = "invoiceFooterText",
   invoiceNumberPrefix = "invoiceNumberPrefix",
@@ -1243,6 +1305,7 @@ export enum Organization_update_column {
   logo = "logo",
   managingDirector = "managingDirector",
   name = "name",
+  newsletterProvider = "newsletterProvider",
   phone = "phone",
   postalCode = "postalCode",
   registerCourt = "registerCourt",
@@ -1799,6 +1862,7 @@ export enum User_select_column {
   integerId = "integerId",
   lastName = "lastName",
   matriculationNumber = "matriculationNumber",
+  matrixUserHandle = "matrixUserHandle",
   newsletterRegistration = "newsletterRegistration",
   occupation = "occupation",
   organizationId = "organizationId",
@@ -1839,6 +1903,7 @@ export enum User_update_column {
   integerId = "integerId",
   lastName = "lastName",
   matriculationNumber = "matriculationNumber",
+  matrixUserHandle = "matrixUserHandle",
   newsletterRegistration = "newsletterRegistration",
   occupation = "occupation",
   organizationId = "organizationId",
@@ -6881,6 +6946,174 @@ export interface OrganizationAdmin_variance_order_by {
   organizationId?: order_by | null;
 }
 
+export interface OrganizationNewsletterSubscription_aggregate_bool_exp {
+  count?: OrganizationNewsletterSubscription_aggregate_bool_exp_count | null;
+}
+
+export interface OrganizationNewsletterSubscription_aggregate_bool_exp_count {
+  arguments?: OrganizationNewsletterSubscription_select_column[] | null;
+  distinct?: boolean | null;
+  filter?: OrganizationNewsletterSubscription_bool_exp | null;
+  predicate: Int_comparison_exp;
+}
+
+/**
+ * order by aggregate values of table "OrganizationNewsletterSubscription"
+ */
+export interface OrganizationNewsletterSubscription_aggregate_order_by {
+  avg?: OrganizationNewsletterSubscription_avg_order_by | null;
+  count?: order_by | null;
+  max?: OrganizationNewsletterSubscription_max_order_by | null;
+  min?: OrganizationNewsletterSubscription_min_order_by | null;
+  stddev?: OrganizationNewsletterSubscription_stddev_order_by | null;
+  stddev_pop?: OrganizationNewsletterSubscription_stddev_pop_order_by | null;
+  stddev_samp?: OrganizationNewsletterSubscription_stddev_samp_order_by | null;
+  sum?: OrganizationNewsletterSubscription_sum_order_by | null;
+  var_pop?: OrganizationNewsletterSubscription_var_pop_order_by | null;
+  var_samp?: OrganizationNewsletterSubscription_var_samp_order_by | null;
+  variance?: OrganizationNewsletterSubscription_variance_order_by | null;
+}
+
+/**
+ * input type for inserting array relation for remote table "OrganizationNewsletterSubscription"
+ */
+export interface OrganizationNewsletterSubscription_arr_rel_insert_input {
+  data: OrganizationNewsletterSubscription_insert_input[];
+  on_conflict?: OrganizationNewsletterSubscription_on_conflict | null;
+}
+
+/**
+ * order by avg() on columns of table "OrganizationNewsletterSubscription"
+ */
+export interface OrganizationNewsletterSubscription_avg_order_by {
+  organizationId?: order_by | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "OrganizationNewsletterSubscription". All fields are combined with a logical 'AND'.
+ */
+export interface OrganizationNewsletterSubscription_bool_exp {
+  Organization?: Organization_bool_exp | null;
+  User?: User_bool_exp | null;
+  _and?: OrganizationNewsletterSubscription_bool_exp[] | null;
+  _not?: OrganizationNewsletterSubscription_bool_exp | null;
+  _or?: OrganizationNewsletterSubscription_bool_exp[] | null;
+  created_at?: timestamptz_comparison_exp | null;
+  errorMessage?: String_comparison_exp | null;
+  externalSubscriberId?: String_comparison_exp | null;
+  lastSyncedAt?: timestamptz_comparison_exp | null;
+  organizationId?: Int_comparison_exp | null;
+  source?: String_comparison_exp | null;
+  status?: String_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
+  userId?: uuid_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "OrganizationNewsletterSubscription"
+ */
+export interface OrganizationNewsletterSubscription_insert_input {
+  Organization?: Organization_obj_rel_insert_input | null;
+  User?: User_obj_rel_insert_input | null;
+  created_at?: any | null;
+  errorMessage?: string | null;
+  externalSubscriberId?: string | null;
+  lastSyncedAt?: any | null;
+  organizationId?: number | null;
+  source?: string | null;
+  status?: string | null;
+  updated_at?: any | null;
+  userId?: any | null;
+}
+
+/**
+ * order by max() on columns of table "OrganizationNewsletterSubscription"
+ */
+export interface OrganizationNewsletterSubscription_max_order_by {
+  created_at?: order_by | null;
+  errorMessage?: order_by | null;
+  externalSubscriberId?: order_by | null;
+  lastSyncedAt?: order_by | null;
+  organizationId?: order_by | null;
+  source?: order_by | null;
+  status?: order_by | null;
+  updated_at?: order_by | null;
+  userId?: order_by | null;
+}
+
+/**
+ * order by min() on columns of table "OrganizationNewsletterSubscription"
+ */
+export interface OrganizationNewsletterSubscription_min_order_by {
+  created_at?: order_by | null;
+  errorMessage?: order_by | null;
+  externalSubscriberId?: order_by | null;
+  lastSyncedAt?: order_by | null;
+  organizationId?: order_by | null;
+  source?: order_by | null;
+  status?: order_by | null;
+  updated_at?: order_by | null;
+  userId?: order_by | null;
+}
+
+/**
+ * on_conflict condition type for table "OrganizationNewsletterSubscription"
+ */
+export interface OrganizationNewsletterSubscription_on_conflict {
+  constraint: OrganizationNewsletterSubscription_constraint;
+  update_columns: OrganizationNewsletterSubscription_update_column[];
+  where?: OrganizationNewsletterSubscription_bool_exp | null;
+}
+
+/**
+ * order by stddev() on columns of table "OrganizationNewsletterSubscription"
+ */
+export interface OrganizationNewsletterSubscription_stddev_order_by {
+  organizationId?: order_by | null;
+}
+
+/**
+ * order by stddev_pop() on columns of table "OrganizationNewsletterSubscription"
+ */
+export interface OrganizationNewsletterSubscription_stddev_pop_order_by {
+  organizationId?: order_by | null;
+}
+
+/**
+ * order by stddev_samp() on columns of table "OrganizationNewsletterSubscription"
+ */
+export interface OrganizationNewsletterSubscription_stddev_samp_order_by {
+  organizationId?: order_by | null;
+}
+
+/**
+ * order by sum() on columns of table "OrganizationNewsletterSubscription"
+ */
+export interface OrganizationNewsletterSubscription_sum_order_by {
+  organizationId?: order_by | null;
+}
+
+/**
+ * order by var_pop() on columns of table "OrganizationNewsletterSubscription"
+ */
+export interface OrganizationNewsletterSubscription_var_pop_order_by {
+  organizationId?: order_by | null;
+}
+
+/**
+ * order by var_samp() on columns of table "OrganizationNewsletterSubscription"
+ */
+export interface OrganizationNewsletterSubscription_var_samp_order_by {
+  organizationId?: order_by | null;
+}
+
+/**
+ * order by variance() on columns of table "OrganizationNewsletterSubscription"
+ */
+export interface OrganizationNewsletterSubscription_variance_order_by {
+  organizationId?: order_by | null;
+}
+
 /**
  * Boolean expression to filter rows from the table "OrganizationType". All fields are combined with a logical 'AND'.
  */
@@ -6941,7 +7174,23 @@ export interface OrganizationType_order_by {
 }
 
 export interface Organization_aggregate_bool_exp {
+  bool_and?: Organization_aggregate_bool_exp_bool_and | null;
+  bool_or?: Organization_aggregate_bool_exp_bool_or | null;
   count?: Organization_aggregate_bool_exp_count | null;
+}
+
+export interface Organization_aggregate_bool_exp_bool_and {
+  arguments: Organization_select_column_Organization_aggregate_bool_exp_bool_and_arguments_columns;
+  distinct?: boolean | null;
+  filter?: Organization_bool_exp | null;
+  predicate: Boolean_comparison_exp;
+}
+
+export interface Organization_aggregate_bool_exp_bool_or {
+  arguments: Organization_select_column_Organization_aggregate_bool_exp_bool_or_arguments_columns;
+  distinct?: boolean | null;
+  filter?: Organization_bool_exp | null;
+  predicate: Boolean_comparison_exp;
 }
 
 export interface Organization_aggregate_bool_exp_count {
@@ -6993,6 +7242,8 @@ export interface Organization_bool_exp {
   FundedCourses_aggregate?: CourseFundingOrganization_aggregate_bool_exp | null;
   OrganizationAdmins?: OrganizationAdmin_bool_exp | null;
   OrganizationAdmins_aggregate?: OrganizationAdmin_aggregate_bool_exp | null;
+  OrganizationNewsletterSubscriptions?: OrganizationNewsletterSubscription_bool_exp | null;
+  OrganizationNewsletterSubscriptions_aggregate?: OrganizationNewsletterSubscription_aggregate_bool_exp | null;
   OrganizationType?: OrganizationType_bool_exp | null;
   Programs?: Program_bool_exp | null;
   Programs_aggregate?: Program_aggregate_bool_exp | null;
@@ -7017,6 +7268,11 @@ export interface Organization_bool_exp {
   email?: String_comparison_exp | null;
   formbricksApiKey?: String_comparison_exp | null;
   formbricksApiUrl?: String_comparison_exp | null;
+  ghostNewsletterApiUrl?: String_comparison_exp | null;
+  ghostNewsletterDoubleOptInEnabled?: Boolean_comparison_exp | null;
+  ghostNewsletterLabel?: String_comparison_exp | null;
+  ghostNewsletterListId?: String_comparison_exp | null;
+  ghostNewsletterSlug?: String_comparison_exp | null;
   id?: Int_comparison_exp | null;
   invoiceFooterText?: String_comparison_exp | null;
   invoiceNumberPrefix?: String_comparison_exp | null;
@@ -7025,6 +7281,7 @@ export interface Organization_bool_exp {
   logo?: String_comparison_exp | null;
   managingDirector?: String_comparison_exp | null;
   name?: String_comparison_exp | null;
+  newsletterProvider?: String_comparison_exp | null;
   phone?: String_comparison_exp | null;
   postalCode?: String_comparison_exp | null;
   registerCourt?: String_comparison_exp | null;
@@ -7046,6 +7303,7 @@ export interface Organization_insert_input {
   Country?: Country_obj_rel_insert_input | null;
   FundedCourses?: CourseFundingOrganization_arr_rel_insert_input | null;
   OrganizationAdmins?: OrganizationAdmin_arr_rel_insert_input | null;
+  OrganizationNewsletterSubscriptions?: OrganizationNewsletterSubscription_arr_rel_insert_input | null;
   OrganizationType?: OrganizationType_obj_rel_insert_input | null;
   Programs?: Program_arr_rel_insert_input | null;
   Users?: User_arr_rel_insert_input | null;
@@ -7065,6 +7323,11 @@ export interface Organization_insert_input {
   email?: string | null;
   formbricksApiKey?: string | null;
   formbricksApiUrl?: string | null;
+  ghostNewsletterApiUrl?: string | null;
+  ghostNewsletterDoubleOptInEnabled?: boolean | null;
+  ghostNewsletterLabel?: string | null;
+  ghostNewsletterListId?: string | null;
+  ghostNewsletterSlug?: string | null;
   id?: number | null;
   invoiceFooterText?: string | null;
   invoiceNumberPrefix?: string | null;
@@ -7073,6 +7336,7 @@ export interface Organization_insert_input {
   logo?: string | null;
   managingDirector?: string | null;
   name?: string | null;
+  newsletterProvider?: string | null;
   phone?: string | null;
   postalCode?: string | null;
   registerCourt?: string | null;
@@ -7106,6 +7370,10 @@ export interface Organization_max_order_by {
   email?: order_by | null;
   formbricksApiKey?: order_by | null;
   formbricksApiUrl?: order_by | null;
+  ghostNewsletterApiUrl?: order_by | null;
+  ghostNewsletterLabel?: order_by | null;
+  ghostNewsletterListId?: order_by | null;
+  ghostNewsletterSlug?: order_by | null;
   id?: order_by | null;
   invoiceFooterText?: order_by | null;
   invoiceNumberPrefix?: order_by | null;
@@ -7114,6 +7382,7 @@ export interface Organization_max_order_by {
   logo?: order_by | null;
   managingDirector?: order_by | null;
   name?: order_by | null;
+  newsletterProvider?: order_by | null;
   phone?: order_by | null;
   postalCode?: order_by | null;
   registerCourt?: order_by | null;
@@ -7146,6 +7415,10 @@ export interface Organization_min_order_by {
   email?: order_by | null;
   formbricksApiKey?: order_by | null;
   formbricksApiUrl?: order_by | null;
+  ghostNewsletterApiUrl?: order_by | null;
+  ghostNewsletterLabel?: order_by | null;
+  ghostNewsletterListId?: order_by | null;
+  ghostNewsletterSlug?: order_by | null;
   id?: order_by | null;
   invoiceFooterText?: order_by | null;
   invoiceNumberPrefix?: order_by | null;
@@ -7154,6 +7427,7 @@ export interface Organization_min_order_by {
   logo?: order_by | null;
   managingDirector?: order_by | null;
   name?: order_by | null;
+  newsletterProvider?: order_by | null;
   phone?: order_by | null;
   postalCode?: order_by | null;
   registerCourt?: order_by | null;
@@ -7191,6 +7465,7 @@ export interface Organization_order_by {
   Country?: Country_order_by | null;
   FundedCourses_aggregate?: CourseFundingOrganization_aggregate_order_by | null;
   OrganizationAdmins_aggregate?: OrganizationAdmin_aggregate_order_by | null;
+  OrganizationNewsletterSubscriptions_aggregate?: OrganizationNewsletterSubscription_aggregate_order_by | null;
   OrganizationType?: OrganizationType_order_by | null;
   Programs_aggregate?: Program_aggregate_order_by | null;
   Users_aggregate?: User_aggregate_order_by | null;
@@ -7210,6 +7485,11 @@ export interface Organization_order_by {
   email?: order_by | null;
   formbricksApiKey?: order_by | null;
   formbricksApiUrl?: order_by | null;
+  ghostNewsletterApiUrl?: order_by | null;
+  ghostNewsletterDoubleOptInEnabled?: order_by | null;
+  ghostNewsletterLabel?: order_by | null;
+  ghostNewsletterListId?: order_by | null;
+  ghostNewsletterSlug?: order_by | null;
   id?: order_by | null;
   invoiceFooterText?: order_by | null;
   invoiceNumberPrefix?: order_by | null;
@@ -7218,6 +7498,7 @@ export interface Organization_order_by {
   logo?: order_by | null;
   managingDirector?: order_by | null;
   name?: order_by | null;
+  newsletterProvider?: order_by | null;
   phone?: order_by | null;
   postalCode?: order_by | null;
   registerCourt?: order_by | null;
@@ -9185,6 +9466,8 @@ export interface User_bool_exp {
   Organization?: Organization_bool_exp | null;
   OrganizationAdmins?: OrganizationAdmin_bool_exp | null;
   OrganizationAdmins_aggregate?: OrganizationAdmin_aggregate_bool_exp | null;
+  OrganizationNewsletterSubscriptions?: OrganizationNewsletterSubscription_bool_exp | null;
+  OrganizationNewsletterSubscriptions_aggregate?: OrganizationNewsletterSubscription_aggregate_bool_exp | null;
   SessionSpeakers?: SessionSpeaker_bool_exp | null;
   SessionSpeakers_aggregate?: SessionSpeaker_aggregate_bool_exp | null;
   UserOccupation?: UserOccupation_bool_exp | null;
@@ -9205,6 +9488,7 @@ export interface User_bool_exp {
   integerId?: Int_comparison_exp | null;
   lastName?: String_comparison_exp | null;
   matriculationNumber?: String_comparison_exp | null;
+  matrixUserHandle?: String_comparison_exp | null;
   newsletterRegistration?: Boolean_comparison_exp | null;
   occupation?: UserOccupation_enum_comparison_exp | null;
   organizationId?: Int_comparison_exp | null;
@@ -9226,6 +9510,7 @@ export interface User_insert_input {
   CourseInstructors?: CourseInstructor_arr_rel_insert_input | null;
   Organization?: Organization_obj_rel_insert_input | null;
   OrganizationAdmins?: OrganizationAdmin_arr_rel_insert_input | null;
+  OrganizationNewsletterSubscriptions?: OrganizationNewsletterSubscription_arr_rel_insert_input | null;
   SessionSpeakers?: SessionSpeaker_arr_rel_insert_input | null;
   UserOccupation?: UserOccupation_obj_rel_insert_input | null;
   UserStatus?: UserStatus_obj_rel_insert_input | null;
@@ -9242,6 +9527,7 @@ export interface User_insert_input {
   integerId?: number | null;
   lastName?: string | null;
   matriculationNumber?: string | null;
+  matrixUserHandle?: string | null;
   newsletterRegistration?: boolean | null;
   occupation?: UserOccupation_enum | null;
   organizationId?: number | null;
@@ -9268,6 +9554,7 @@ export interface User_max_order_by {
   integerId?: order_by | null;
   lastName?: order_by | null;
   matriculationNumber?: order_by | null;
+  matrixUserHandle?: order_by | null;
   organizationId?: order_by | null;
   picture?: order_by | null;
   updated_at?: order_by | null;
@@ -9291,6 +9578,7 @@ export interface User_min_order_by {
   integerId?: order_by | null;
   lastName?: order_by | null;
   matriculationNumber?: order_by | null;
+  matrixUserHandle?: order_by | null;
   organizationId?: order_by | null;
   picture?: order_by | null;
   updated_at?: order_by | null;
@@ -9326,6 +9614,7 @@ export interface User_order_by {
   CourseInstructors_aggregate?: CourseInstructor_aggregate_order_by | null;
   Organization?: Organization_order_by | null;
   OrganizationAdmins_aggregate?: OrganizationAdmin_aggregate_order_by | null;
+  OrganizationNewsletterSubscriptions_aggregate?: OrganizationNewsletterSubscription_aggregate_order_by | null;
   SessionSpeakers_aggregate?: SessionSpeaker_aggregate_order_by | null;
   UserOccupation?: UserOccupation_order_by | null;
   UserStatus?: UserStatus_order_by | null;
@@ -9342,6 +9631,7 @@ export interface User_order_by {
   integerId?: order_by | null;
   lastName?: order_by | null;
   matriculationNumber?: order_by | null;
+  matrixUserHandle?: order_by | null;
   newsletterRegistration?: order_by | null;
   occupation?: order_by | null;
   organizationId?: order_by | null;

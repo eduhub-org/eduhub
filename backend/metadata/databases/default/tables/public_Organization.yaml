@@ -37,6 +37,13 @@ array_relationships:
         table:
           name: Program
           schema: public
+  - name: OrganizationNewsletterSubscriptions
+    using:
+      foreign_key_constraint_on:
+        column: organizationId
+        table:
+          name: OrganizationNewsletterSubscription
+          schema: public
 insert_permissions:
   - role: user_access
     permission:
@@ -61,10 +68,16 @@ insert_permissions:
         - logo
         - managingDirector
         - name
+        - newsletterProvider
         - phone
         - postalCode
         - registerCourt
         - registerNumber
+        - ghostNewsletterApiUrl
+        - ghostNewsletterListId
+        - ghostNewsletterSlug
+        - ghostNewsletterLabel
+        - ghostNewsletterDoubleOptInEnabled
         - taxNumber
         - type
         - updated_at
@@ -77,9 +90,15 @@ select_permissions:
         - aliases
         - created_at
         - description
+        - ghostNewsletterApiUrl
+        - ghostNewsletterDoubleOptInEnabled
+        - ghostNewsletterLabel
+        - ghostNewsletterListId
+        - ghostNewsletterSlug
         - id
         - logo
         - name
+        - newsletterProvider
         - type
         - updated_at
       filter: {}
@@ -106,10 +125,16 @@ select_permissions:
         - logo
         - managingDirector
         - name
+        - newsletterProvider
         - phone
         - postalCode
         - registerCourt
         - registerNumber
+        - ghostNewsletterApiUrl
+        - ghostNewsletterListId
+        - ghostNewsletterSlug
+        - ghostNewsletterLabel
+        - ghostNewsletterDoubleOptInEnabled
         - taxNumber
         - type
         - updated_at
@@ -141,10 +166,16 @@ update_permissions:
         - logo
         - managingDirector
         - name
+        - newsletterProvider
         - phone
         - postalCode
         - registerCourt
         - registerNumber
+        - ghostNewsletterApiUrl
+        - ghostNewsletterListId
+        - ghostNewsletterSlug
+        - ghostNewsletterLabel
+        - ghostNewsletterDoubleOptInEnabled
         - taxNumber
         - type
         - vatId

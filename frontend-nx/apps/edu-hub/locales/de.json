@@ -457,12 +457,22 @@
       "decline_confirm_text": "Möchtest du die Einladung zu diesem Kurs wirklich ablehnen?",
       "decline_button_text": "Ja",
       "title": "Onboarding für Deine Kursteilnahme",
+      "badge": "Aktion erforderlich",
       "congratulation": "Herzlichen Glückwunsch zur Einladung für die Teilnahme an diesem Kurs!",
+      "intro_copy": "Bitte prüfe und aktualisiere vor der Teilnahmebestätigung kurz deine Angaben. So können wir dich passend informieren und im Kurs optimal unterstützen.",
       "form_intro": "Bitte aktualisiere Deinen aktuellen Beschäftigungsstatus:",
       "confirm_sufficient_time": "Bitte bestätige die Kursteilnahme nur, wenn Du Zeit hast, bis zum Ende am Kurs teilzunehmen.",
       "important": "WICHTIG: KURSEINLADUNG BESTÄTIGEN!",
       "mattermost_info_1": "Nach der Bestätigung gehe bitte direkt auf den Button zum Kurs-Chat.",
-      "mattermost_info_2": "Falls Du noch keinen Account in unserem Chat hast, musst Du Dich dort zunächst noch einmal anmelden.\nDer Kurs-Chat ist unser zentrales Kommunikationstool für die Kurse."
+      "mattermost_info_2": "Falls Du noch keinen Account in unserem Chat hast, musst Du Dich dort zunächst noch einmal anmelden.\nDer Kurs-Chat ist unser zentrales Kommunikationstool für die Kurse.",
+      "newsletter_title": "Updates von {organization} abonnieren",
+      "newsletter_description": "Erhalte Infos zu neuen Kursen, Lernangeboten und Programm-Neuigkeiten von {organization}.",
+      "newsletter_legal": "Du kannst deine Einwilligung jederzeit in deinem Profil widerrufen. Die Verarbeitung erfolgt gemäß unserer <privacy>Datenschutzerklärung</privacy>.",
+      "newsletter_double_opt_in": "Vor der Aktivierung kann eine zusätzliche Bestätigungs-E-Mail (Double-Opt-In) erforderlich sein.",
+      "newsletter_sync_issue": "Deine letzte Newsletter-Synchronisierung konnte nicht abgeschlossen werden. Du kannst deine Präferenz in deinem Profil aktualisieren.",
+      "errors": {
+        "confirmation_failed": "Deine Teilnahme konnte gerade nicht bestätigt werden. Bitte versuche es erneut."
+      }
     },
     "success_messages": {
       "success_title": "Bewerbung erfolgreich eingereicht!",
@@ -830,7 +840,16 @@
     "country_none": "-- Land auswählen --",
     "occupation_none": "-- Beschäftigung auswählen --",
     "external_profile_placeholder": "z.B. https://linkedin.com/in/deinname",
-    "change_password_or_email": "Passwort oder E-Mail ändern"
+    "change_password_or_email": "Passwort oder E-Mail ändern",
+    "newsletter_preferences": {
+      "title": "Newsletter-Einstellungen",
+      "description": "Verwalte Newsletter-Abos für Organisationen, die mit deinen belegten Programmen verknüpft sind.",
+      "checkbox_label": "Ich möchte den Newsletter von {organization} erhalten",
+      "legal": "Du kannst deine Einwilligung jederzeit widerrufen. Die Verarbeitung erfolgt gemäß unserer <privacy>Datenschutzerklärung</privacy>.",
+      "double_opt_in_notice": "Für die Aktivierung kann eine zusätzliche Bestätigung per E-Mail (Double-Opt-In) erforderlich sein.",
+      "sync_error": "Die letzte Synchronisierung mit dem Newsletter-Anbieter ist fehlgeschlagen.",
+      "error": "Deine Newsletter-Einstellung konnte nicht gespeichert werden. Bitte versuche es erneut."
+    }
   },
   "programs": {
     "add": "Programm hinzufügen",
@@ -1462,7 +1481,17 @@
       "description": "Beschreibung",
       "logo": "Logo",
       "new_organization": "Neue Organisation",
-      "default_description": "Beschreibung"
+      "default_description": "Beschreibung",
+      "newsletter_title": "Newsletter-Konfiguration (Ghost)",
+      "newsletter_api_url": "Ghost API-URL",
+      "newsletter_api_url_placeholder": "https://deine-ghost-site/ghost/api/admin",
+      "newsletter_list_id": "Ghost Newsletter-Listen-ID",
+      "newsletter_list_id_placeholder": "Optionale Listen-ID",
+      "newsletter_slug": "Ghost Newsletter-Slug",
+      "newsletter_slug_placeholder": "Optionaler Slug, z.B. weekly-updates",
+      "newsletter_label": "Anzeigetitel für Teilnehmende",
+      "newsletter_label_placeholder": "Optionales Anzeige-Label",
+      "newsletter_double_opt_in": "Double-Opt-In-Bestätigung aktivieren"
     },
     "api_key": {
       "title": "API-Schlüssel Verwaltung",

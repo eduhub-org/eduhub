@@ -1,0 +1,295 @@
+import axios from 'axios';
+import { gql, GraphQLClient } from 'graphql-request';
+
+const USER_DRIVEN_SOURCES = new Set(['CHECKBOX', 'PROFILE', 'ADMIN']);
+
+const normalize = (value) => (typeof value === 'string' ? value.trim() : '');
+
+const isSubscribedLikeStatus = (status) => status === 'SUBSCRIBED' || status === 'PENDING';
+
+const hasGhostConfiguration = (organization) =>
+  Boolean(
+    normalize(organization?.ghostNewsletterApiUrl) &&
+      (normalize(organization?.ghostNewsletterListId) || normalize(organization?.ghostNewsletterSlug))
+  );
+
+const buildGhostPayload = ({ subscription, userEmail, subscribe }) => {
+  const organization = subscription.Organization;
+  return {
+    email: userEmail,
+    action: subscribe ? 'subscribe' : 'unsubscribe',
+    listId: normalize(organization.ghostNewsletterListId) || null,
+    slug: normalize(organization.ghostNewsletterSlug) || null,
+    externalSubscriberId: normalize(subscription.externalSubscriberId) || null,
+    doubleOptInEnabled: Boolean(organization.ghostNewsletterDoubleOptInEnabled),
+  };
+};
+
+const callGhostSyncEndpoint = async ({ subscription, userEmail, subscribe }) => {
+  const apiUrl = normalize(subscription.Organization.ghostNewsletterApiUrl).replace(/\/+$/, '');
+  const endpoint = `${apiUrl}/members/`;
+  const payload = buildGhostPayload({ subscription, userEmail, subscribe });
+
+  const response = await axios.post(endpoint, payload, {
+    timeout: 15000,
+    validateStatus: () => true,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (response.status < 200 || response.status >= 300) {
+    const responseError =
+      response.data?.errors?.[0]?.message ||
+      response.data?.message ||
+      `Ghost sync request failed with status ${response.status}`;
+    throw new Error(responseError);
+  }
+
+  return {
+    externalSubscriberId:
+      response.data?.member?.id ||
+      response.data?.id ||
+      response.data?.externalSubscriberId ||
+      payload.externalSubscriberId ||
+      null,
+    remoteStatus: response.data?.status || null,
+  };
+};
+
+const getGraphqlClient = () =>
+  new GraphQLClient(process.env.HASURA_ENDPOINT, {
+    headers: {
+      'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET,
+    },
+  });
+
+const GET_SUBSCRIPTION_DETAILS = gql`
+  query GetOrganizationNewsletterSubscriptionDetails($userId: uuid!, $organizationId: Int!) {
+    OrganizationNewsletterSubscription_by_pk(userId: $userId, organizationId: $organizationId) {
+      userId
+      organizationId
+      status
+      source
+      externalSubscriberId
+      Organization {
+        id
+        name
+        newsletterProvider
+        ghostNewsletterApiUrl
+        ghostNewsletterListId
+        ghostNewsletterSlug
+        ghostNewsletterDoubleOptInEnabled
+      }
+      User {
+        id
+        email
+      }
+    }
+  }
+`;
+
+const UPDATE_SUBSCRIPTION = gql`
+  mutation UpdateOrganizationNewsletterSubscriptionAfterSync(
+    $userId: uuid!
+    $organizationId: Int!
+    $status: String!
+    $externalSubscriberId: String
+    $lastSyncedAt: timestamptz!
+    $source: String!
+    $errorMessage: String
+  ) {
+    update_OrganizationNewsletterSubscription_by_pk(
+      pk_columns: { userId: $userId, organizationId: $organizationId }
+      _set: {
+        status: $status
+        externalSubscriberId: $externalSubscriberId
+        lastSyncedAt: $lastSyncedAt
+        source: $source
+        errorMessage: $errorMessage
+      }
+    ) {
+      userId
+      organizationId
+      status
+      source
+    }
+  }
+`;
+
+const updateSubscriptionState = async (client, payload) =>
+  client.request(UPDATE_SUBSCRIPTION, {
+    ...payload,
+    lastSyncedAt: new Date().toISOString(),
+  });
+
+export default async function syncGhostNewsletterSubscription(req, logger) {
+  logger.info('########## Sync Ghost Newsletter Subscription ##########');
+
+  try {
+    const event = req.body?.event;
+    const newRow = event?.data?.new;
+    const op = event?.op;
+
+    if (!event || !newRow || (op !== 'INSERT' && op !== 'UPDATE')) {
+      return {
+        success: true,
+        messageKey: 'NO_ACTION_NEEDED',
+        message: 'No actionable event payload found',
+      };
+    }
+
+    if (!newRow.userId || !newRow.organizationId) {
+      return {
+        success: false,
+        messageKey: 'INVALID_EVENT_PAYLOAD',
+        error: 'Missing userId or organizationId in event payload',
+      };
+    }
+
+    const client = getGraphqlClient();
+    const detailsResult = await client.request(GET_SUBSCRIPTION_DETAILS, {
+      userId: newRow.userId,
+      organizationId: newRow.organizationId,
+    });
+
+    const subscription = detailsResult?.OrganizationNewsletterSubscription_by_pk;
+    if (!subscription) {
+      return {
+        success: false,
+        messageKey: 'SUBSCRIPTION_NOT_FOUND',
+        error: 'Newsletter subscription row not found',
+      };
+    }
+
+    if (subscription.source === 'WEBHOOK') {
+      return {
+        success: true,
+        messageKey: 'SOURCE_WEBHOOK_SKIPPED',
+        message: 'Skipping self-triggered sync update',
+      };
+    }
+
+    if (!USER_DRIVEN_SOURCES.has(subscription.source)) {
+      return {
+        success: true,
+        messageKey: 'SOURCE_NOT_SYNCED',
+        message: `No sync needed for source ${subscription.source}`,
+      };
+    }
+
+    if (subscription.Organization?.newsletterProvider !== 'GHOST') {
+      await updateSubscriptionState(client, {
+        userId: subscription.userId,
+        organizationId: subscription.organizationId,
+        status: 'ERROR',
+        source: 'WEBHOOK',
+        externalSubscriberId: subscription.externalSubscriberId || null,
+        errorMessage: 'Unsupported newsletter provider configured',
+      });
+
+      return {
+        success: false,
+        messageKey: 'UNSUPPORTED_PROVIDER',
+        error: 'Unsupported newsletter provider configured',
+      };
+    }
+
+    if (!hasGhostConfiguration(subscription.Organization)) {
+      await updateSubscriptionState(client, {
+        userId: subscription.userId,
+        organizationId: subscription.organizationId,
+        status: 'ERROR',
+        source: 'WEBHOOK',
+        externalSubscriberId: subscription.externalSubscriberId || null,
+        errorMessage: 'Ghost newsletter configuration is incomplete',
+      });
+
+      return {
+        success: false,
+        messageKey: 'GHOST_CONFIGURATION_MISSING',
+        error: 'Ghost newsletter configuration is incomplete',
+      };
+    }
+
+    if (!subscription.User?.email) {
+      await updateSubscriptionState(client, {
+        userId: subscription.userId,
+        organizationId: subscription.organizationId,
+        status: 'ERROR',
+        source: 'WEBHOOK',
+        externalSubscriberId: subscription.externalSubscriberId || null,
+        errorMessage: 'User email is missing',
+      });
+
+      return {
+        success: false,
+        messageKey: 'USER_EMAIL_MISSING',
+        error: 'User email is missing',
+      };
+    }
+
+    const subscribe = isSubscribedLikeStatus(subscription.status);
+
+    const ghostResult = await callGhostSyncEndpoint({
+      subscription,
+      userEmail: subscription.User.email,
+      subscribe,
+    });
+
+    const syncedStatus = subscribe
+      ? subscription.Organization.ghostNewsletterDoubleOptInEnabled
+        ? 'PENDING'
+        : 'SUBSCRIBED'
+      : 'UNSUBSCRIBED';
+
+    await updateSubscriptionState(client, {
+      userId: subscription.userId,
+      organizationId: subscription.organizationId,
+      status: ghostResult.remoteStatus || syncedStatus,
+      source: 'WEBHOOK',
+      externalSubscriberId: ghostResult.externalSubscriberId,
+      errorMessage: null,
+    });
+
+    return {
+      success: true,
+      messageKey: 'GHOST_SYNC_SUCCESS',
+      userId: subscription.userId,
+      organizationId: subscription.organizationId,
+      status: ghostResult.remoteStatus || syncedStatus,
+    };
+  } catch (error) {
+    logger.error('Ghost newsletter sync failed', {
+      message: error.message,
+      stack: error.stack,
+    });
+
+    const userId = req.body?.event?.data?.new?.userId;
+    const organizationId = req.body?.event?.data?.new?.organizationId;
+
+    if (userId && organizationId) {
+      try {
+        const client = getGraphqlClient();
+        await updateSubscriptionState(client, {
+          userId,
+          organizationId,
+          status: 'ERROR',
+          source: 'WEBHOOK',
+          externalSubscriberId: null,
+          errorMessage: error.message || 'Unexpected synchronization error',
+        });
+      } catch (updateError) {
+        logger.error('Failed to persist Ghost sync error state', {
+          message: updateError.message,
+        });
+      }
+    }
+
+    return {
+      success: false,
+      messageKey: 'GHOST_SYNC_FAILED',
+      error: error.message,
+    };
+  }
+}

@@ -1,12 +1,14 @@
-import { FC, useState } from 'react';
+import { FC, useMemo, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 
 import { Button } from '../../common/Button';
 import ImageUploader from '../../inputs/ImageUploader';
 
 import { useRoleQuery } from '../../../hooks/authedQuery';
+import { useRoleMutation } from '../../../hooks/authedMutation';
 
 import {
   UPDATE_USER_FIRST_NAME,
@@ -28,12 +30,26 @@ import InputField from '../../inputs/InputField';
 import DropDownSelector from '../../inputs/DropDownSelector';
 import { UserOccupation } from '../../../queries/__generated__/UserOccupation';
 import { CREATE_ORGANIZATION, ORGANIZATION_LIST } from '../../../queries/organization';
+import {
+  MY_ORGANIZATION_NEWSLETTER_OPTIONS,
+  UPSERT_ORGANIZATION_NEWSLETTER_SUBSCRIPTION,
+} from '../../../queries/newsletterSubscription';
+
+type NewsletterOrganizationOption = {
+  organizationId: number;
+  organizationName: string;
+  newsletterLabel: string;
+  doubleOptInEnabled: boolean;
+  status: 'SUBSCRIBED' | 'UNSUBSCRIBED' | 'PENDING' | 'ERROR';
+};
 
 const ProfileContent: FC = () => {
   const t = useTranslations('profile');
   const { locale } = useRouter();
   const { data: sessionData, status: sessionStatus } = useSession();
   const [showError, setShowError] = useState(true);
+  const [newsletterSavingOrgId, setNewsletterSavingOrgId] = useState<number | null>(null);
+  const [newsletterSaveError, setNewsletterSaveError] = useState<string | null>(null);
 
   const {
     data: userData,
@@ -74,6 +90,83 @@ const ProfileContent: FC = () => {
     label: org.name,
     aliases: org.aliases, // Make sure to include this
   }));
+
+  const [upsertOrganizationNewsletterSubscription] = useRoleMutation(UPSERT_ORGANIZATION_NEWSLETTER_SUBSCRIPTION);
+
+  const {
+    data: newsletterOptionsData,
+    refetch: refetchNewsletterOptions,
+  } = useRoleQuery(MY_ORGANIZATION_NEWSLETTER_OPTIONS, {
+    variables: {
+      userId: sessionData?.profile?.sub,
+    },
+    skip: !sessionData?.profile?.sub || (sessionStatus as string) === 'loading',
+  });
+
+  const newsletterOptions = useMemo<NewsletterOrganizationOption[]>(() => {
+    const hasConfiguredNewsletter = (organization: any): boolean =>
+      !!organization?.ghostNewsletterListId || !!organization?.ghostNewsletterSlug;
+
+    const options = new Map<number, NewsletterOrganizationOption>();
+
+    for (const program of newsletterOptionsData?.Program || []) {
+      const org = program?.Organization;
+      if (!org || !hasConfiguredNewsletter(org)) {
+        continue;
+      }
+
+      options.set(org.id, {
+        organizationId: org.id,
+        organizationName: org.name,
+        newsletterLabel: org.ghostNewsletterLabel || org.name,
+        doubleOptInEnabled: Boolean(org.ghostNewsletterDoubleOptInEnabled),
+        status: 'UNSUBSCRIBED',
+      });
+    }
+
+    for (const subscription of newsletterOptionsData?.OrganizationNewsletterSubscription || []) {
+      const org = subscription?.Organization;
+      if (!org) {
+        continue;
+      }
+
+      const hasConfig = hasConfiguredNewsletter(org);
+      if (!hasConfig && subscription.status === 'UNSUBSCRIBED') {
+        continue;
+      }
+
+      options.set(org.id, {
+        organizationId: org.id,
+        organizationName: org.name,
+        newsletterLabel: org.ghostNewsletterLabel || org.name,
+        doubleOptInEnabled: Boolean(org.ghostNewsletterDoubleOptInEnabled),
+        status: subscription.status,
+      });
+    }
+
+    return [...options.values()].sort((left, right) => left.organizationName.localeCompare(right.organizationName));
+  }, [newsletterOptionsData]);
+
+  const handleNewsletterToggle = async (organizationId: number, checked: boolean) => {
+    try {
+      setNewsletterSaveError(null);
+      setNewsletterSavingOrgId(organizationId);
+      await upsertOrganizationNewsletterSubscription({
+        variables: {
+          userId: sessionData?.profile?.sub,
+          organizationId,
+          status: checked ? 'SUBSCRIBED' : 'UNSUBSCRIBED',
+          source: 'PROFILE',
+        },
+      });
+      await refetchNewsletterOptions();
+    } catch (error) {
+      console.error(error);
+      setNewsletterSaveError(t('newsletter_preferences.error'));
+    } finally {
+      setNewsletterSavingOrgId(null);
+    }
+  };
 
   // Render loading state
   if (sessionStatus === 'loading') {
@@ -249,6 +342,67 @@ const ProfileContent: FC = () => {
             </Button>
           </div>
         </div>
+
+        {newsletterOptions.length > 0 && (
+          <div className="mt-8 rounded-xl border border-border-primary/40 bg-fill-primary p-4">
+            <h2 className="text-lg font-semibold text-label-primary">{t('newsletter_preferences.title')}</h2>
+            <p className="mt-1 text-sm text-label-secondary">{t('newsletter_preferences.description')}</p>
+
+            <div className="mt-4 space-y-4">
+              {newsletterOptions.map((newsletterOption) => {
+                const isChecked =
+                  newsletterOption.status === 'SUBSCRIBED' || newsletterOption.status === 'PENDING';
+                const isSaving = newsletterSavingOrgId === newsletterOption.organizationId;
+
+                return (
+                  <div key={newsletterOption.organizationId} className="rounded-lg border border-border-primary/30 p-3">
+                    <label
+                      htmlFor={`profile-newsletter-${newsletterOption.organizationId}`}
+                      className="flex items-start gap-3 cursor-pointer"
+                    >
+                      <input
+                        id={`profile-newsletter-${newsletterOption.organizationId}`}
+                        type="checkbox"
+                        checked={isChecked}
+                        disabled={isSaving}
+                        onChange={(event) =>
+                          handleNewsletterToggle(newsletterOption.organizationId, event.target.checked)
+                        }
+                        className="mt-1 h-4 w-4 rounded border-gray-300 text-brand focus:ring-brand"
+                      />
+                      <div>
+                        <p className="text-sm font-semibold text-label-primary">
+                          {t('newsletter_preferences.checkbox_label', {
+                            organization: newsletterOption.newsletterLabel,
+                          })}
+                        </p>
+                        <p className="text-xs text-label-secondary mt-1">
+                          {t.rich('newsletter_preferences.legal', {
+                            privacy: (chunks) => (
+                              <Link href="/privacy" target="_blank" rel="noopener noreferrer" className="underline">
+                                {chunks}
+                              </Link>
+                            ),
+                          })}
+                        </p>
+                        {newsletterOption.doubleOptInEnabled && (
+                          <p className="text-xs text-label-secondary mt-1">
+                            {t('newsletter_preferences.double_opt_in_notice')}
+                          </p>
+                        )}
+                        {newsletterOption.status === 'ERROR' && (
+                          <p className="text-xs text-red-700 mt-1">{t('newsletter_preferences.sync_error')}</p>
+                        )}
+                      </div>
+                    </label>
+                  </div>
+                );
+              })}
+            </div>
+
+            {newsletterSaveError && <p className="mt-3 text-sm text-red-700">{newsletterSaveError}</p>}
+          </div>
+        )}
       </>
     </div>
   );

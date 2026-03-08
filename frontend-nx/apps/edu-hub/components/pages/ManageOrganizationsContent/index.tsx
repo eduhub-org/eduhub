@@ -10,6 +10,7 @@ import Loading from '../../common/Loading';
 import InputField from '../../inputs/InputField';
 import DropDownSelector from '../../inputs/DropDownSelector';
 import ImageUploader from '../../inputs/ImageUploader';
+import CheckboxSelector from '../../inputs/CheckboxSelector';
 import { useRoleQuery, useLazyRoleQuery } from '../../../hooks/authedQuery';
 import { useRoleMutation } from '../../../hooks/authedMutation';
 import { PageBlock } from '../../common/PageBlock';
@@ -25,6 +26,11 @@ import {
   DELETE_ORGANIZATION,
   UPDATE_ORGANIZATION_ALIASES,
   UPDATE_ORGANIZATION_API_KEY_HASH,
+  UPDATE_ORGANIZATION_GHOST_NEWSLETTER_API_URL,
+  UPDATE_ORGANIZATION_GHOST_NEWSLETTER_LIST_ID,
+  UPDATE_ORGANIZATION_GHOST_NEWSLETTER_SLUG,
+  UPDATE_ORGANIZATION_GHOST_NEWSLETTER_LABEL,
+  UPDATE_ORGANIZATION_GHOST_NEWSLETTER_DOUBLE_OPT_IN_ENABLED,
 } from '../../../queries/organization';
 import { UPDATE_ORGANIZATION_LOGO } from '../../../queries/updateOrganization';
 import { UPDATE_USER_ORGANIZATION_ID } from '../../../queries/updateUser';
@@ -116,6 +122,62 @@ const ExpandableOrganizationRow: React.FC<ExpandableRowProps> = ({ row, onError 
         updateValueMutation={UPDATE_ORGANIZATION_DESCRIPTION}
         refetchQueries={['OrganizationList']}
       />
+      <div className="mt-4 rounded-lg border border-border-primary/30 p-3">
+        <p className="text-sm font-semibold mb-2">{t('organization.newsletter_title')}</p>
+        <InputField
+          variant="material"
+          type="input"
+          label={t('organization.newsletter_api_url')}
+          placeholder={t('organization.newsletter_api_url_placeholder')}
+          itemId={row.id}
+          value={row.ghostNewsletterApiUrl || ''}
+          updateValueMutation={UPDATE_ORGANIZATION_GHOST_NEWSLETTER_API_URL}
+          refetchQueries={['OrganizationList']}
+          showCharacterCount={false}
+        />
+        <InputField
+          variant="material"
+          type="input"
+          label={t('organization.newsletter_list_id')}
+          placeholder={t('organization.newsletter_list_id_placeholder')}
+          itemId={row.id}
+          value={row.ghostNewsletterListId || ''}
+          updateValueMutation={UPDATE_ORGANIZATION_GHOST_NEWSLETTER_LIST_ID}
+          refetchQueries={['OrganizationList']}
+          showCharacterCount={false}
+        />
+        <InputField
+          variant="material"
+          type="input"
+          label={t('organization.newsletter_slug')}
+          placeholder={t('organization.newsletter_slug_placeholder')}
+          itemId={row.id}
+          value={row.ghostNewsletterSlug || ''}
+          updateValueMutation={UPDATE_ORGANIZATION_GHOST_NEWSLETTER_SLUG}
+          refetchQueries={['OrganizationList']}
+          showCharacterCount={false}
+        />
+        <InputField
+          variant="material"
+          type="input"
+          label={t('organization.newsletter_label')}
+          placeholder={t('organization.newsletter_label_placeholder')}
+          itemId={row.id}
+          value={row.ghostNewsletterLabel || ''}
+          updateValueMutation={UPDATE_ORGANIZATION_GHOST_NEWSLETTER_LABEL}
+          refetchQueries={['OrganizationList']}
+          showCharacterCount={false}
+        />
+        <CheckboxSelector
+          variant="material"
+          label={t('organization.newsletter_double_opt_in')}
+          checked={Boolean(row.ghostNewsletterDoubleOptInEnabled)}
+          updateValueMutation={UPDATE_ORGANIZATION_GHOST_NEWSLETTER_DOUBLE_OPT_IN_ENABLED}
+          identifierVariables={{ id: row.id }}
+          refetchQueries={['OrganizationList']}
+          className="mt-2"
+        />
+      </div>
       <div className="mt-6">
         <ImageUploader
           variant="material"
