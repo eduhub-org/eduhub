@@ -74,12 +74,19 @@ const getNextCourseStatus = (course: ManagedCourse_Course_by_pk) => {
  */
 export const ManageCourseContent: FC<Props> = ({ courseId }) => {
   const t = useTranslations('manageCourse');
+  const managedCourseQueryOptions = useMemo(
+    () => ({
+      variables: {
+        id: courseId,
+      },
+    }),
+    [courseId]
+  );
 
-  const qResult = useRoleQuery<ManagedCourse, ManagedCourseVariables>(MANAGED_COURSE, {
-    variables: {
-      id: courseId,
-    },
-  });
+  const qResult = useRoleQuery<ManagedCourse, ManagedCourseVariables>(
+    MANAGED_COURSE,
+    managedCourseQueryOptions
+  );
 
   const isAdmin = useIsAdmin();
   const instructorIds = qResult?.data?.Course_by_pk?.CourseInstructors.map((ci) => ci.User.id);
