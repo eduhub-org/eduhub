@@ -31,6 +31,7 @@ import {
   UPDATE_ORGANIZATION_GHOST_NEWSLETTER_SLUG,
   UPDATE_ORGANIZATION_GHOST_NEWSLETTER_LABEL,
   UPDATE_ORGANIZATION_GHOST_NEWSLETTER_DOUBLE_OPT_IN_ENABLED,
+  UPDATE_ORGANIZATION_NEWSLETTER_DESCRIPTION,
 } from '../../../queries/organization';
 import { UPDATE_ORGANIZATION_LOGO } from '../../../queries/updateOrganization';
 import { UPDATE_USER_ORGANIZATION_ID } from '../../../queries/updateUser';
@@ -124,6 +125,17 @@ const ExpandableOrganizationRow: React.FC<ExpandableRowProps> = ({ row, onError 
       />
       <div className="mt-4 rounded-lg border border-border-primary/30 p-3">
         <p className="text-sm font-semibold mb-2">{t('organization.newsletter_title')}</p>
+        <InputField
+          variant="material"
+          type="input"
+          label={t('organization.newsletter_description')}
+          placeholder={t('organization.newsletter_description_placeholder')}
+          itemId={row.id}
+          value={row.newsletterDescription || ''}
+          updateValueMutation={UPDATE_ORGANIZATION_NEWSLETTER_DESCRIPTION}
+          refetchQueries={['OrganizationList']}
+          showCharacterCount={false}
+        />
         <InputField
           variant="material"
           type="input"

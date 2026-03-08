@@ -39,6 +39,7 @@ type NewsletterOrganizationOption = {
   organizationId: number;
   organizationName: string;
   newsletterLabel: string;
+  newsletterDescription: string;
   doubleOptInEnabled: boolean;
   status: 'SUBSCRIBED' | 'UNSUBSCRIBED' | 'PENDING' | 'ERROR';
 };
@@ -119,6 +120,7 @@ const ProfileContent: FC = () => {
         organizationId: org.id,
         organizationName: org.name,
         newsletterLabel: org.ghostNewsletterLabel || org.name,
+        newsletterDescription: org.newsletterDescription || '',
         doubleOptInEnabled: Boolean(org.ghostNewsletterDoubleOptInEnabled),
         status: 'UNSUBSCRIBED',
       });
@@ -139,6 +141,7 @@ const ProfileContent: FC = () => {
         organizationId: org.id,
         organizationName: org.name,
         newsletterLabel: org.ghostNewsletterLabel || org.name,
+        newsletterDescription: org.newsletterDescription || '',
         doubleOptInEnabled: Boolean(org.ghostNewsletterDoubleOptInEnabled),
         status: subscription.status,
       });
@@ -376,6 +379,9 @@ const ProfileContent: FC = () => {
                             organization: newsletterOption.newsletterLabel,
                           })}
                         </p>
+                        {newsletterOption.newsletterDescription && (
+                          <p className="text-xs text-label-secondary mt-1">{newsletterOption.newsletterDescription}</p>
+                        )}
                         <p className="text-xs text-label-secondary mt-1">
                           {t.rich('newsletter_preferences.legal', {
                             privacy: (chunks) => (

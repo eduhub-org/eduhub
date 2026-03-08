@@ -172,6 +172,10 @@ export interface CourseWithEnrollment_Course_by_pk_Program_Organization {
   id: number;
   name: string;
   /**
+   * Short organization newsletter description shown to participants in onboarding and profile preferences.
+   */
+  newsletterDescription: string | null;
+  /**
    * Newsletter provider for this organization. Currently only GHOST is supported.
    */
   newsletterProvider: string;

@@ -68,6 +68,7 @@ insert_permissions:
         - logo
         - managingDirector
         - name
+        - newsletterDescription
         - newsletterProvider
         - phone
         - postalCode
@@ -98,6 +99,7 @@ select_permissions:
         - id
         - logo
         - name
+        - newsletterDescription
         - newsletterProvider
         - type
         - updated_at
@@ -125,6 +127,7 @@ select_permissions:
         - logo
         - managingDirector
         - name
+        - newsletterDescription
         - newsletterProvider
         - phone
         - postalCode
@@ -166,6 +169,7 @@ update_permissions:
         - logo
         - managingDirector
         - name
+        - newsletterDescription
         - newsletterProvider
         - phone
         - postalCode

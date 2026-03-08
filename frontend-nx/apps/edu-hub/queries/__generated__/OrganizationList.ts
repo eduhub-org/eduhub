@@ -30,6 +30,10 @@ export interface OrganizationList_Organization {
    */
   apiKeyHash: string | null;
   /**
+   * Short organization newsletter description shown to participants in onboarding and profile preferences.
+   */
+  newsletterDescription: string | null;
+  /**
    * Newsletter provider for this organization. Currently only GHOST is supported.
    */
   newsletterProvider: string;

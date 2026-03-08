@@ -84,6 +84,7 @@ const Onboarding: FC<OnboardingProps> = ({ course, enrollmentId, refetchCourse, 
           ghostNewsletterSlug?: string | null;
           ghostNewsletterLabel?: string | null;
           ghostNewsletterDoubleOptInEnabled?: boolean | null;
+          newsletterDescription?: string | null;
         } | null;
       }
     | null
@@ -93,6 +94,7 @@ const Onboarding: FC<OnboardingProps> = ({ course, enrollmentId, refetchCourse, 
   const hasOrganizationNewsletter =
     !!organizationWithNewsletter &&
     (!!organizationWithNewsletter.ghostNewsletterListId || !!organizationWithNewsletter.ghostNewsletterSlug);
+  const newsletterDescription = organizationWithNewsletter?.newsletterDescription?.trim() || '';
 
   const { data: newsletterSubscriptionData } = useRoleQuery(ORGANIZATION_NEWSLETTER_SUBSCRIPTION_BY_PK, {
     skip: !hasOrganizationNewsletter || !hasOrganizationId || !userId,
@@ -286,6 +288,9 @@ const Onboarding: FC<OnboardingProps> = ({ course, enrollmentId, refetchCourse, 
                   organization: organizationWithNewsletter.name,
                 })}
               </p>
+              {newsletterDescription && (
+                <p className="mt-1 text-sm text-label-secondary">{newsletterDescription}</p>
+              )}
               <p className="mt-2 text-xs text-label-secondary">
                 {tCourse.rich('onboarding_modal.newsletter_legal', {
                   privacy: (chunks) => (

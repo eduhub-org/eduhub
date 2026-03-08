@@ -30,6 +30,7 @@ export const USER_PROGRAM_FRAGMENT = gql`
     Organization {
       id
       name
+      newsletterDescription
       newsletterProvider
       ghostNewsletterLabel
       ghostNewsletterDoubleOptInEnabled

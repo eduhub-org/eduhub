@@ -1243,6 +1243,7 @@ export enum Organization_select_column {
   logo = "logo",
   managingDirector = "managingDirector",
   name = "name",
+  newsletterDescription = "newsletterDescription",
   newsletterProvider = "newsletterProvider",
   phone = "phone",
   postalCode = "postalCode",
@@ -1305,6 +1306,7 @@ export enum Organization_update_column {
   logo = "logo",
   managingDirector = "managingDirector",
   name = "name",
+  newsletterDescription = "newsletterDescription",
   newsletterProvider = "newsletterProvider",
   phone = "phone",
   postalCode = "postalCode",
@@ -7281,6 +7283,7 @@ export interface Organization_bool_exp {
   logo?: String_comparison_exp | null;
   managingDirector?: String_comparison_exp | null;
   name?: String_comparison_exp | null;
+  newsletterDescription?: String_comparison_exp | null;
   newsletterProvider?: String_comparison_exp | null;
   phone?: String_comparison_exp | null;
   postalCode?: String_comparison_exp | null;
@@ -7336,6 +7339,7 @@ export interface Organization_insert_input {
   logo?: string | null;
   managingDirector?: string | null;
   name?: string | null;
+  newsletterDescription?: string | null;
   newsletterProvider?: string | null;
   phone?: string | null;
   postalCode?: string | null;
@@ -7382,6 +7386,7 @@ export interface Organization_max_order_by {
   logo?: order_by | null;
   managingDirector?: order_by | null;
   name?: order_by | null;
+  newsletterDescription?: order_by | null;
   newsletterProvider?: order_by | null;
   phone?: order_by | null;
   postalCode?: order_by | null;
@@ -7427,6 +7432,7 @@ export interface Organization_min_order_by {
   logo?: order_by | null;
   managingDirector?: order_by | null;
   name?: order_by | null;
+  newsletterDescription?: order_by | null;
   newsletterProvider?: order_by | null;
   phone?: order_by | null;
   postalCode?: order_by | null;
@@ -7498,6 +7504,7 @@ export interface Organization_order_by {
   logo?: order_by | null;
   managingDirector?: order_by | null;
   name?: order_by | null;
+  newsletterDescription?: order_by | null;
   newsletterProvider?: order_by | null;
   phone?: order_by | null;
   postalCode?: order_by | null;

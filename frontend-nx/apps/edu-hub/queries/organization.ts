@@ -20,6 +20,7 @@ export const ORGANIZATION_LIST = gql`
       aliases
       logo
       apiKeyHash
+      newsletterDescription
       newsletterProvider
       ghostNewsletterApiUrl
       ghostNewsletterListId
@@ -190,6 +191,18 @@ export const UPDATE_ORGANIZATION_GHOST_NEWSLETTER_DOUBLE_OPT_IN_ENABLED = gql`
     ) {
       id
       ghostNewsletterDoubleOptInEnabled
+    }
+  }
+`;
+
+export const UPDATE_ORGANIZATION_NEWSLETTER_DESCRIPTION = gql`
+  mutation UpdateOrganizationNewsletterDescription($itemId: Int!, $text: String) {
+    update_Organization_by_pk(
+      pk_columns: { id: $itemId }
+      _set: { newsletterDescription: $text }
+    ) {
+      id
+      newsletterDescription
     }
   }
 `;

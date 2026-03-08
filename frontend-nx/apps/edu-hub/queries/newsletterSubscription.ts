@@ -58,6 +58,7 @@ export const MY_ORGANIZATION_NEWSLETTER_OPTIONS = gql`
       Organization {
         id
         name
+        newsletterDescription
         newsletterProvider
         ghostNewsletterLabel
         ghostNewsletterDoubleOptInEnabled
@@ -75,6 +76,7 @@ export const MY_ORGANIZATION_NEWSLETTER_OPTIONS = gql`
       Organization {
         id
         name
+        newsletterDescription
         newsletterProvider
         ghostNewsletterLabel
         ghostNewsletterDoubleOptInEnabled
