@@ -1,32 +1,17 @@
 {
   "root": true,
-  "ignorePatterns": ["**/*"],
-  "extends": [
-    "eslint:recommended",
-    "plugin:react/recommended",
-    "plugin:@typescript-eslint/recommended",
-    "plugin:@nx/typescript",
-    "plugin:@nx/javascript"
-  ],
-  "plugins": ["@nx", "react", "@typescript-eslint"],
+  "ignorePatterns": [".next", "node_modules"],
+  "extends": ["eslint:recommended", "plugin:react/recommended", "plugin:@typescript-eslint/recommended"],
+  "plugins": ["react", "@typescript-eslint"],
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  },
   "overrides": [
     {
       "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
-      "rules": {
-        "@nx/enforce-module-boundaries": [
-          "error",
-          {
-            "enforceBuildableLibDependency": true,
-            "allow": [],
-            "depConstraints": [
-              {
-                "sourceTag": "*",
-                "onlyDependOnLibsWithTags": ["*"]
-              }
-            ]
-          }
-        ]
-      }
+      "rules": {}
     },
     {
       "files": ["*.ts", "*.tsx"],

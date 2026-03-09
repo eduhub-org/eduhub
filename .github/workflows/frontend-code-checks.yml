@@ -43,16 +43,8 @@ jobs:
 
       - name: Type check edu hub
         working-directory: frontend-nx
-        run: npx nx run edu-hub:build
-
-      # - name: Type check rent-a-scientist
-      #   working-directory: frontend-nx
-      #   run: npx nx run rent-a-scientist:build
+        run: yarn build
 
       - name: Check linting edu hub
         working-directory: frontend-nx
-        run: npx nx run edu-hub:lint
-
-      # - name: Check linting rent-a-scientist
-      #   working-directory: frontend-nx
-      #   run: npx nx run rent-a-scientist:lint
+        run: yarn lint

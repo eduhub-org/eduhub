@@ -63,10 +63,11 @@ hasura migrate apply --database-name default
 ### 2. Generate GraphQL Types
 
 ```bash
-cd frontend-nx/apps/edu-hub
+cd frontend-nx
 # Run Apollo codegen to generate TypeScript types
-nx run edu-hub:apollo
+yarn apollo
 # Or manually:
+cd apps/edu-hub
 rm -rf queries/__generated__/*
 ../../node_modules/apollo/bin/run client:codegen --includes ./queries/**/*.ts --target typescript
 ```
@@ -148,8 +149,8 @@ formbricks_api_key = "fb_prod_your_api_key_here"
 
 If you see TypeScript errors about missing types:
 ```bash
-cd frontend-nx/apps/edu-hub
-nx run edu-hub:apollo
+cd frontend-nx
+yarn apollo
 ```
 
 ### API Key Not Working

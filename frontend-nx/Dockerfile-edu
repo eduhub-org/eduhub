@@ -39,7 +39,7 @@ ARG NEXT_PUBLIC_STORAGE_BUCKET_URL
 ENV NEXT_PUBLIC_STORAGE_BUCKET_URL=${NEXT_PUBLIC_STORAGE_BUCKET_URL}
 
 
-RUN npx nx run edu-hub:build
+RUN yarn build
 
 # 3. Production image, copy all the files and run next
 FROM node:18-alpine AS runner
@@ -54,9 +54,9 @@ RUN adduser -S nextjs -u 1001
 
 # Automatically leverage output traces to reduce image size
 # https://nextjs.org/docs/advanced-features/output-file-tracing
-COPY --from=builder --chown=nextjs:nodejs /opt/app/dist/apps/edu-hub/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /opt/app/dist/apps/edu-hub/.next/static ./dist/apps/edu-hub/.next/static
-COPY --from=builder --chown=nextjs:nodejs /opt/app/dist/apps/edu-hub/public ./apps/edu-hub/public
+COPY --from=builder --chown=nextjs:nodejs /opt/app/apps/edu-hub/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /opt/app/apps/edu-hub/.next/static ./apps/edu-hub/.next/static
+COPY --from=builder --chown=nextjs:nodejs /opt/app/apps/edu-hub/public ./apps/edu-hub/public
 # Temporary fix to fix image generation
 # https://github.com/vercel/next.js/issues/48077
 # COPY --from=builder /opt/app/dist/apps/edu-hub/package.json ./package.json

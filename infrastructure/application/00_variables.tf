@@ -7,7 +7,6 @@ locals {
   keycloak_service_name         = "${var.keycloak_service_name_root}${var.service_name_extension}"
   hasura_service_name           = "${var.hasura_service_name_root}${var.service_name_extension}"
   eduhub_service_name           = "${var.eduhub_service_name_root}${var.service_name_extension}"
-  rent_a_scientist_service_name = "${var.rent_a_scientist_service_name_root}${var.service_name_extension}"
   eduhub_api_service_name       = "api-${local.eduhub_service_name}"
 }
 
@@ -61,10 +60,6 @@ variable "hasura_service_name_root" {
 }
 variable "eduhub_service_name_root" {
   description = "Name for the service of the edu frontend application"
-  type        = string
-}
-variable "rent_a_scientist_service_name_root" {
-  description = "Name for the service of the Rent-a-Scientist frontend application"
   type        = string
 }
 variable "service_name_extension" {
@@ -196,10 +191,6 @@ variable "nextauth_secret" {
 }
 variable "keycloak_hasura_client_secret" {
   description = "Used to authenticate login requests from the edu client."
-  type        = string
-}
-variable "keycloak_ras_client_secret" {
-  description = "Used to authenticate login requests from the rent-a-scientist client."
   type        = string
 }
 variable "help_docs_url" {

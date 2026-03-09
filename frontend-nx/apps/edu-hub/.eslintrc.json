@@ -4,7 +4,7 @@
     "next/core-web-vitals", // Next.js recommended rules including React Hooks
     "../../.eslintrc.json" // Extend from the shared root configuration
   ],
-  "ignorePatterns": ["!**/*", ".next", "next-env.d.ts"],
+  "ignorePatterns": [".next", "next-env.d.ts"],
   "overrides": [
     {
       "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
