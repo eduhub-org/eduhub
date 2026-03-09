@@ -23,20 +23,6 @@ array_relationships:
         table:
           name: Course
           schema: public
-  - name: RentAScientistConfigs
-    using:
-      foreign_key_constraint_on:
-        column: program_id
-        table:
-          name: RentAScientistConfig
-          schema: rentAScientist
-  - name: ScientistOffers
-    using:
-      foreign_key_constraint_on:
-        column: programId
-        table:
-          name: ScientistOffer
-          schema: rentAScientist
 select_permissions:
   - role: admin-ras
     permission:

@@ -9,7 +9,7 @@
     "test": "jest --config apps/edu-hub/jest.config.ts",
     "test:watch": "jest --config apps/edu-hub/jest.config.ts --watch",
     "lint": "eslint \"apps/edu-hub/**/*.{ts,tsx,js,jsx}\"",
-    "apollo": "cd apps/edu-hub && rm -rf queries/__generated__/* && ../../node_modules/apollo/bin/run client:codegen --includes ./queries/**/*.ts --target typescript",
+    "apollo": "cd apps/edu-hub && rm -rf queries/__generated__/* && ../../node_modules/apollo/bin/run client:codegen --includes \"./queries/**/*.ts\" --target typescript",
     "find-unused": "unused-exports ./apps/edu-hub/components",
     "type-check": "tsc --noEmit --project apps/edu-hub/tsconfig.json"
   },
