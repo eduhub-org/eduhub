@@ -1,16 +1,23 @@
 import React, { FC, ReactNode, useEffect, useState } from 'react';
+import { BREAKPOINTS } from '../../config/breakpoints';
+import { useMediaQuery } from '../../hooks/useMediaQuery';
 
-type OnlyDesktopProps = {
+export interface OnlyDesktopProps {
   children?: ReactNode;
-};
+}
 
 export const OnlyDesktop: FC<OnlyDesktopProps> = ({ children }: OnlyDesktopProps) => {
-  return <div className="hidden sm:flex">{children}</div>;
+  const isDesktop = useMediaQuery(`(min-width: ${BREAKPOINTS.sm}px)`);
+  if (!isDesktop) {
+    return null;
+  }
+
+  return <>{children}</>;
 };
 
-type ClientOnlyProps = {
+export interface ClientOnlyProps {
   children?: React.ReactNode;
-};
+}
 
 // https://www.joshwcomeau.com/react/the-perils-of-rehydration/
 export const ClientOnly: FC<ClientOnlyProps> = ({ children }: ClientOnlyProps) => {

@@ -6,3 +6,4 @@ DROP TABLE IF EXISTS "rentAScientist"."Scientist";
 DROP TABLE IF EXISTS "rentAScientist"."Teacher";
 DROP TABLE IF EXISTS "rentAScientist"."School";
 DROP TABLE IF EXISTS "rentAScientist"."RentAScientistConfig";
+DROP SCHEMA IF EXISTS "rentAScientist";

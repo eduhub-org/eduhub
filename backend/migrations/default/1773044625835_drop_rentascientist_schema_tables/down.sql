@@ -163,6 +163,7 @@ ALTER TABLE ONLY "rentAScientist"."RentAScientistConfig" ALTER COLUMN id SET DEF
 ALTER TABLE ONLY "rentAScientist"."SchoolClass" ALTER COLUMN id SET DEFAULT nextval('"rentAScientist"."SchoolClass_id_seq"'::regclass);
 ALTER TABLE ONLY "rentAScientist"."SchoolClassRequest" ALTER COLUMN id SET DEFAULT nextval('"rentAScientist"."SchoolClassRequest_id_seq"'::regclass);
 ALTER TABLE ONLY "rentAScientist"."Scientist" ALTER COLUMN id SET DEFAULT nextval('"rentAScientist"."Scientist_id_seq"'::regclass);
+ALTER TABLE ONLY "rentAScientist"."ScientistOffer" ALTER COLUMN id SET DEFAULT nextval('"rentAScientist"."ScientistOffer_id_seq"'::regclass);
 ALTER TABLE ONLY "rentAScientist"."Teacher" ALTER COLUMN id SET DEFAULT nextval('"rentAScientist"."Teacher_id_seq"'::regclass);
 
 ALTER TABLE ONLY "rentAScientist"."RentAScientistConfig" ADD CONSTRAINT "RentAScientistConfig_pkey" PRIMARY KEY (id);

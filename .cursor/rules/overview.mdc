@@ -82,7 +82,7 @@ When ANY task involves database schema changes (adding/removing columns, tables,
 
 4. **Regenerate TypeScript Types**: After ANY GraphQL-related changes, regenerate types by running:
    ```bash
-   cd frontend-nx && GRAPHQL_URI=http://localhost:8080/v1/graphql yarn apollo 2>&1 | tail -50
+   cd frontend-nx && GRAPHQL_URI=http://localhost:8080/v1/graphql yarn apollo
    ```
 
 **IMPORTANT**: Never consider a schema-change task complete until migrations are created AND types are regenerated.
