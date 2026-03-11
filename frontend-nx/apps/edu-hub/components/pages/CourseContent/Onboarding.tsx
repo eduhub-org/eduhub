@@ -13,8 +13,7 @@ import {
 import { UPDATE_ENROLLMENT_STATUS } from '../../../queries/insertEnrollment';
 import { CourseEnrollmentStatus_enum } from '../../../__generated__/globalTypes';
 import { USER_OCCUPATION } from '../../../queries/user';
-import { CREATE_ORGANIZATION, ORGANIZATION_LIST } from '../../../queries/organization';
-import { OrganizationList } from '../../../queries/__generated__/OrganizationList';
+import { CREATE_ORGANIZATION, ORGANIZATION_OPTIONS } from '../../../queries/organization';
 import { UserOccupation } from '../../../queries/__generated__/UserOccupation';
 import { Button } from '../../common/Button';
 import { QuestionConfirmationDialog } from '../../common/dialogs/QuestionConfirmationDialog';
@@ -56,7 +55,7 @@ const Onboarding: FC<OnboardingProps> = ({ course, enrollmentId, refetchCourse, 
   const queryOccupationOptions = useRoleQuery<UserOccupation>(USER_OCCUPATION, {
     skip: sessionStatus === 'loading',
   });
-  const { data: organizationData } = useRoleQuery<OrganizationList>(ORGANIZATION_LIST, {
+  const { data: organizationData } = useRoleQuery(ORGANIZATION_OPTIONS, {
     variables: {
       limit: 100, // Adjust as needed
     },
@@ -75,7 +74,7 @@ const Onboarding: FC<OnboardingProps> = ({ course, enrollmentId, refetchCourse, 
 
   // Organization ids and their corresponding names
   const organizationOptions =
-    organizationData?.Organization?.map((org) => ({
+    organizationData?.Organization?.map((org: { id: number; name: string; aliases?: unknown }) => ({
       label: org.name,
       value: org.id.toString(),
       aliases: org.aliases,

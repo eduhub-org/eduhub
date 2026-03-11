@@ -27,7 +27,7 @@ import { User, UserVariables } from '../../../queries/__generated__/User';
 import InputField from '../../inputs/InputField';
 import DropDownSelector from '../../inputs/DropDownSelector';
 import { UserOccupation } from '../../../queries/__generated__/UserOccupation';
-import { CREATE_ORGANIZATION, ORGANIZATION_LIST } from '../../../queries/organization';
+import { CREATE_ORGANIZATION, ORGANIZATION_OPTIONS } from '../../../queries/organization';
 
 const ProfileContent: FC = () => {
   const t = useTranslations('profile');
@@ -63,7 +63,7 @@ const ProfileContent: FC = () => {
     value: country.code,
   }));
 
-  const { data: queryOrganizationOptions } = useRoleQuery(ORGANIZATION_LIST, {
+  const { data: queryOrganizationOptions, error: organizationOptionsError } = useRoleQuery(ORGANIZATION_OPTIONS, {
     variables: {
       limit: 10000,
       order_by: [{ name: 'asc' }],
@@ -85,9 +85,15 @@ const ProfileContent: FC = () => {
     return <div>Not authenticated</div>;
   }
 
-  // Render query error
-  if (userError) {
-    return <ErrorMessageDialog errorMessage={userError.message} open={showError} onClose={() => setShowError(false)} />;
+  // Render query errors
+  if (userError || organizationOptionsError) {
+    return (
+      <ErrorMessageDialog
+        errorMessage={userError?.message || organizationOptionsError?.message || 'Failed to load profile data.'}
+        open={showError}
+        onClose={() => setShowError(false)}
+      />
+    );
   }
 
   // Log occupation options error but don't block rendering
