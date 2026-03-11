@@ -50,13 +50,17 @@ export const Locations: FC<LocationsIProps> = ({ location, onDelete }) => {
   const currentDefaultSessionAddressId = location?.defaultSessionAddressId || null;
 
   // Query location addresses for the selected location option (skip for ONLINE)
-  const { data: addressData } = useRoleQuery(LOCATION_ADDRESS_BY_LOCATION_OPTION, {
+  const { data: addressData, error: addressDataError } = useRoleQuery(LOCATION_ADDRESS_BY_LOCATION_OPTION, {
     variables: {
       locationOption: location?.locationOption ?? LocationOption_enum.ONLINE,
       searchFilter: '%',
     },
     skip: !location?.locationOption || isOnline,
   });
+
+  if (addressDataError) {
+    console.log('query known location address options error', addressDataError);
+  }
 
   // Transform addresses for dropdown options
   const addressOptions = useMemo(() => {

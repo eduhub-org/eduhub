@@ -33,13 +33,17 @@ export const SessionAddresses: FC<SessionAddressesIProps> = ({ address, refetchQ
     : tCommon('location.' + address?.CourseLocation?.locationOption);
 
   // Query location addresses for the selected location option
-  const { data: addressData } = useRoleQuery(LOCATION_ADDRESS_BY_LOCATION_OPTION, {
+  const { data: addressData, error: addressDataError } = useRoleQuery(LOCATION_ADDRESS_BY_LOCATION_OPTION, {
     variables: {
       locationOption: address?.CourseLocation?.locationOption as LocationOption_enum,
       searchFilter: '%',
     },
     skip: !address?.CourseLocation?.locationOption || isOnline,
   });
+
+  if (addressDataError) {
+    console.log('query known session location address options error', addressDataError);
+  }
 
   // Transform addresses for dropdown options
   const addressOptions = useMemo(() => {
