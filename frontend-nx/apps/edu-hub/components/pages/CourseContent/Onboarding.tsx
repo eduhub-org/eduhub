@@ -67,7 +67,6 @@ const Onboarding: FC<OnboardingProps> = ({ course, enrollmentId, refetchCourse, 
   >(ORGANIZATION_OPTIONS, {
     variables: {
       limit: 50000,
-      order_by: [{ name: 'asc' }],
     },
     skip: sessionStatus === 'loading',
   });
@@ -94,6 +93,7 @@ const Onboarding: FC<OnboardingProps> = ({ course, enrollmentId, refetchCourse, 
 
   useEffect(() => {
     if (organizationOptionsError) {
+      console.error('Failed to load organization options query:', organizationOptionsError);
       setShowOrganizationOptionsError(true);
     }
   }, [organizationOptionsError]);
@@ -246,7 +246,7 @@ const Onboarding: FC<OnboardingProps> = ({ course, enrollmentId, refetchCourse, 
         confirmationText={t('onboarding_modal.decline_button_text')}
       />
       <ErrorMessageDialog
-        errorMessage={organizationOptionsError?.message || t('errors.failed_to_load_organization_options')}
+        errorMessage={t('errors.failed_to_load_organization_options')}
         open={!!organizationOptionsError && showOrganizationOptionsError}
         onClose={() => setShowOrganizationOptionsError(false)}
       />
