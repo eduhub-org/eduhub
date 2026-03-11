@@ -55,7 +55,7 @@ const Onboarding: FC<OnboardingProps> = ({ course, enrollmentId, refetchCourse, 
   const queryOccupationOptions = useRoleQuery<UserOccupation>(USER_OCCUPATION, {
     skip: sessionStatus === 'loading',
   });
-  const { data: organizationData } = useRoleQuery(ORGANIZATION_OPTIONS, {
+  const { data: organizationData, error: organizationOptionsError } = useRoleQuery(ORGANIZATION_OPTIONS, {
     variables: {
       limit: 100, // Adjust as needed
     },
@@ -79,6 +79,10 @@ const Onboarding: FC<OnboardingProps> = ({ course, enrollmentId, refetchCourse, 
       value: org.id.toString(),
       aliases: org.aliases,
     })) || [];
+
+  if (organizationOptionsError) {
+    console.log('query known organization options error', organizationOptionsError);
+  }
 
   // Render loading state
   if (sessionStatus === 'loading') {

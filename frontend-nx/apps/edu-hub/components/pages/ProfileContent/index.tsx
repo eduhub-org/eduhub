@@ -208,7 +208,7 @@ const ProfileContent: FC = () => {
               identifierVariables={{ userId: userData?.User_by_pk?.id }}
               creatable={true}
               createOptionMutation={CREATE_ORGANIZATION}
-              refetchQueries={['OrganizationList', 'User']}
+              refetchQueries={['OrganizationList', 'OrganizationOptions', 'User']}
             />
           </div>
         </div>
