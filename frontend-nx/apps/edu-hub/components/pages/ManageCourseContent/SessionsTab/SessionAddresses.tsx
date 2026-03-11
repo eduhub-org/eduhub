@@ -57,9 +57,9 @@ export const SessionAddresses: FC<SessionAddressesIProps> = ({ address, refetchQ
   // Transform addresses for dropdown options
   const addressOptions = useMemo(() => {
     if (!addressData?.LocationAddress) return [];
-    
+
     return addressData.LocationAddress.map((addr: any) => ({
-      label: addr.shortLabel,
+      label: addr.address ? `${addr.shortLabel} (${addr.address})` : addr.shortLabel,
       value: addr.id.toString(),
       aliases: addr.aliases || [],
     }));
@@ -69,7 +69,7 @@ export const SessionAddresses: FC<SessionAddressesIProps> = ({ address, refetchQ
   const defaultAddressLabel = useMemo(() => {
     if (!defaultSessionAddressId || !addressData?.LocationAddress) return null;
     const defaultAddr = addressData.LocationAddress.find((addr: any) => addr.id === defaultSessionAddressId);
-    return defaultAddr ? defaultAddr.shortLabel : null;
+    return defaultAddr ? (defaultAddr.address ? `${defaultAddr.shortLabel} (${defaultAddr.address})` : defaultAddr.shortLabel) : null;
   }, [defaultSessionAddressId, addressData]);
 
   // Custom nullable label that shows the default address if one exists

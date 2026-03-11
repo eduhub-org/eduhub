@@ -74,9 +74,9 @@ export const Locations: FC<LocationsIProps> = ({ location, onDelete }) => {
   // Transform addresses for dropdown options
   const addressOptions = useMemo(() => {
     if (!addressData?.LocationAddress) return [];
-    
+
     return addressData.LocationAddress.map((addr: any) => ({
-      label: addr.shortLabel,
+      label: addr.address ? `${addr.shortLabel} (${addr.address})` : addr.shortLabel,
       value: addr.id.toString(),
       aliases: addr.aliases || [],
     }));
