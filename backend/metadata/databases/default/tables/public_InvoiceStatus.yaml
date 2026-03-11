@@ -29,9 +29,3 @@ select_permissions:
         - value
         - comment
       filter: {}
-  - role: admin-ras
-    permission:
-      columns:
-        - value
-        - comment
-      filter: {}

@@ -24,28 +24,6 @@ array_relationships:
           name: Course
           schema: public
 select_permissions:
-  - role: admin-ras
-    permission:
-      columns:
-        - id
-        - organizationId
-        - published
-        - visibility
-        - shortTitle
-        - applicationStart
-        - achievementRecordUploadDeadline
-        - defaultApplicationEnd
-        - defaultMaxMissedSessions
-        - lectureStart
-        - lectureEnd
-        - speakerQuestionnaire
-        - startQuestionnaire
-        - closingQuestionnaire
-        - title
-        - attendanceCertificateTemplateURL
-        - achievementCertificateTemplateURL
-        - defaultFormbricksEnrollmentSurveyUrl
-      filter: {}
   - role: anonymous
     permission:
       columns:
@@ -86,26 +64,3 @@ select_permissions:
         - defaultFormbricksEnrollmentSurveyUrl
       filter: {}
 update_permissions:
-  - role: admin-ras
-    permission:
-      columns:
-        - id
-        - organizationId
-        - published
-        - visibility
-        - shortTitle
-        - applicationStart
-        - achievementRecordUploadDeadline
-        - defaultApplicationEnd
-        - defaultMaxMissedSessions
-        - lectureStart
-        - lectureEnd
-        - speakerQuestionnaire
-        - startQuestionnaire
-        - closingQuestionnaire
-        - title
-        - attendanceCertificateTemplateURL
-        - achievementCertificateTemplateURL
-        - defaultFormbricksEnrollmentSurveyUrl
-      filter: {}
-      check: {}
