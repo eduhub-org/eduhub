@@ -14,6 +14,10 @@ import { UPDATE_ENROLLMENT_STATUS } from '../../../queries/insertEnrollment';
 import { CourseEnrollmentStatus_enum } from '../../../__generated__/globalTypes';
 import { USER_OCCUPATION } from '../../../queries/user';
 import { CREATE_ORGANIZATION, ORGANIZATION_OPTIONS } from '../../../queries/organization';
+import {
+  OrganizationOptions as OrganizationOptionsQuery,
+  OrganizationOptionsVariables,
+} from '../../../queries/__generated__/OrganizationOptions';
 import { UserOccupation } from '../../../queries/__generated__/UserOccupation';
 import { Button } from '../../common/Button';
 import { QuestionConfirmationDialog } from '../../common/dialogs/QuestionConfirmationDialog';
@@ -57,13 +61,16 @@ const Onboarding: FC<OnboardingProps> = ({ course, enrollmentId, refetchCourse, 
   const queryOccupationOptions = useRoleQuery<UserOccupation>(USER_OCCUPATION, {
     skip: sessionStatus === 'loading',
   });
-  const { data: organizationData, error: organizationOptionsError, loading: organizationOptionsLoading } = useRoleQuery(
-    ORGANIZATION_OPTIONS,
-    {
-      variables: {},
-      skip: sessionStatus === 'loading',
-    }
-  );
+  const { data: organizationData, error: organizationOptionsError, loading: organizationOptionsLoading } = useRoleQuery<
+    OrganizationOptionsQuery,
+    OrganizationOptionsVariables
+  >(ORGANIZATION_OPTIONS, {
+    variables: {
+      limit: 50000,
+      order_by: [{ name: 'asc' }],
+    },
+    skip: sessionStatus === 'loading',
+  });
 
   const [updateEnrollmentStatus] = useAuthedMutation<UpdateEnrollmentStatus, UpdateEnrollmentStatusVariables>(
     UPDATE_ENROLLMENT_STATUS
@@ -77,7 +84,7 @@ const Onboarding: FC<OnboardingProps> = ({ course, enrollmentId, refetchCourse, 
 
   // Organization ids and their corresponding names
   const organizationOptions =
-    organizationData?.Organization?.map((org: { id: number; name: string; aliases?: unknown }) => ({
+    organizationData?.Organization?.map((org) => ({
       label: org.name,
       value: org.id.toString(),
       aliases: org.aliases,
@@ -239,7 +246,7 @@ const Onboarding: FC<OnboardingProps> = ({ course, enrollmentId, refetchCourse, 
         confirmationText={t('onboarding_modal.decline_button_text')}
       />
       <ErrorMessageDialog
-        errorMessage={organizationOptionsError?.message || 'Failed to load organization options.'}
+        errorMessage={organizationOptionsError?.message || t('errors.failed_to_load_organization_options')}
         open={!!organizationOptionsError && showOrganizationOptionsError}
         onClose={() => setShowOrganizationOptionsError(false)}
       />

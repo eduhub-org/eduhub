@@ -11,6 +11,11 @@ import {
   UPDATE_COURSE_DEFAULT_SESSION_ADDRESS_ID,
 } from '../../../../queries/course';
 import { LOCATION_ADDRESS_BY_LOCATION_OPTION, CREATE_LOCATION_ADDRESS } from '../../../../queries/locationAddress';
+import {
+  LocationAddressByLocationOption,
+  LocationAddressByLocationOptionVariables,
+  LocationAddressByLocationOption_LocationAddress,
+} from '../../../../queries/__generated__/LocationAddressByLocationOption';
 import InputField from '../../../inputs/InputField';
 import DeleteButton from '../../../../components/common/DeleteButton';
 import { LocationOption_enum } from '../../../../__generated__/globalTypes';
@@ -52,7 +57,10 @@ export const Locations: FC<LocationsIProps> = ({ location, onDelete }) => {
   const currentDefaultSessionAddressId = location?.defaultSessionAddressId || null;
 
   // Query location addresses for the selected location option (skip for ONLINE)
-  const { data: addressData, error: addressDataError, loading: addressDataLoading } = useRoleQuery(
+  const { data: addressData, error: addressDataError, loading: addressDataLoading } = useRoleQuery<
+    LocationAddressByLocationOption,
+    LocationAddressByLocationOptionVariables
+  >(
     LOCATION_ADDRESS_BY_LOCATION_OPTION,
     {
       variables: {
@@ -75,7 +83,7 @@ export const Locations: FC<LocationsIProps> = ({ location, onDelete }) => {
   const addressOptions = useMemo(() => {
     if (!addressData?.LocationAddress) return [];
 
-    return addressData.LocationAddress.map((addr: any) => ({
+    return addressData.LocationAddress.map((addr: LocationAddressByLocationOption_LocationAddress) => ({
       label: addr.address ? `${addr.shortLabel} (${addr.address})` : addr.shortLabel,
       value: addr.id.toString(),
       aliases: addr.aliases || [],
@@ -137,7 +145,7 @@ export const Locations: FC<LocationsIProps> = ({ location, onDelete }) => {
       )}
       <div>{location && <DeleteButton handleDelete={handleDelete} />}</div>
       <ErrorMessageDialog
-        errorMessage={addressDataError?.message || 'Failed to load location addresses.'}
+        errorMessage={addressDataError?.message || t('errors.failed_to_load_location_addresses')}
         open={!!addressDataError && showAddressLookupError}
         onClose={() => setShowAddressLookupError(false)}
       />

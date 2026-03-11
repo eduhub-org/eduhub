@@ -445,7 +445,8 @@
       "motivation_letter_required": "Bitte schreib uns, warum du an diesem Kurs teilnehmen möchtest",
       "terms_required": "Bitte akzeptiere die Allgemeinen Geschäftsbedingungen",
       "registration_failed": "Registrierung fehlgeschlagen. Bitte versuche es erneut.",
-      "complete_survey_first": "Bitte fülle zuerst den Fragebogen vollständig aus."
+      "complete_survey_first": "Bitte fülle zuerst den Fragebogen vollständig aus.",
+      "failed_to_load_organization_options": "Organisationsoptionen konnten nicht geladen werden."
     },
     "formbricks": {
       "survey_title": "Bewerbungsfragebogen",
@@ -1198,7 +1199,8 @@
         "aliases_help": "Aliase eingeben und Enter drücken, um sie hinzuzufügen",
         "legacy_address": "Legacy-Adresse (schreibgeschützt)",
         "select_location_option_first": "Bitte wähle zuerst eine Standortoption aus",
-        "location_mismatch_error": "Die ausgewählte Adresse passt nicht zur Standortoption dieser Session. Bitte wähle eine Adresse aus, die zum richtigen Standort gehört."
+        "location_mismatch_error": "Die ausgewählte Adresse passt nicht zur Standortoption dieser Session. Bitte wähle eine Adresse aus, die zum richtigen Standort gehört.",
+        "failed_to_load_session_addresses": "Session-Adressen konnten nicht geladen werden."
       },
       "session_description": {
         "label": "Beschreibung",
@@ -1272,6 +1274,9 @@
     "confirmation_push_course_to_next_status": "Möchtest du den Kurs in den nächsten Status schieben?",
     "set_status_high": "Status hochsetzen",
     "please_fill_all_fields": "Bitte fülle alle Felder aus, um fortzufahren!",
+    "errors": {
+      "failed_to_load_location_addresses": "Veranstaltungsadressen konnten nicht geladen werden."
+    },
     "no-certificate-generated": "Es wurden keine Zertifikate generiert.",
     "certificates-generated": "Es wurden {number} Zertifikate generiert.",
     "1-certificate-generated": "Es wurde ein Zertifikat generiert."
