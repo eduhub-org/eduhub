@@ -1,5 +1,5 @@
 import { useTranslations } from 'next-intl';
-import { FC, useCallback, useMemo } from 'react';
+import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { ManagedCourse_Course_by_pk_CourseLocations } from '../../../../queries/__generated__/ManagedCourse';
 import DropDownSelector from '../../../inputs/DropDownSelector';
 import { useRoleQuery } from '../../../../hooks/authedQuery';
@@ -14,6 +14,7 @@ import { LOCATION_ADDRESS_BY_LOCATION_OPTION, CREATE_LOCATION_ADDRESS } from '..
 import InputField from '../../../inputs/InputField';
 import DeleteButton from '../../../../components/common/DeleteButton';
 import { LocationOption_enum } from '../../../../__generated__/globalTypes';
+import { ErrorMessageDialog } from '../../../common/dialogs/ErrorMessageDialog';
 
 interface LocationsIProps {
   location: ManagedCourse_Course_by_pk_CourseLocations | null;
@@ -22,6 +23,7 @@ interface LocationsIProps {
 
 export const Locations: FC<LocationsIProps> = ({ location, onDelete }) => {
   const t = useTranslations('manageCourse');
+  const [showAddressLookupError, setShowAddressLookupError] = useState(true);
 
   const queryLocationOptions = useRoleQuery<LocationOptions>(LOCATION_OPTIONS);
   if (queryLocationOptions.error) {
@@ -50,17 +52,24 @@ export const Locations: FC<LocationsIProps> = ({ location, onDelete }) => {
   const currentDefaultSessionAddressId = location?.defaultSessionAddressId || null;
 
   // Query location addresses for the selected location option (skip for ONLINE)
-  const { data: addressData, error: addressDataError } = useRoleQuery(LOCATION_ADDRESS_BY_LOCATION_OPTION, {
-    variables: {
-      locationOption: location?.locationOption ?? LocationOption_enum.ONLINE,
-      searchFilter: '%',
-    },
-    skip: !location?.locationOption || isOnline,
-  });
+  const { data: addressData, error: addressDataError, loading: addressDataLoading } = useRoleQuery(
+    LOCATION_ADDRESS_BY_LOCATION_OPTION,
+    {
+      variables: {
+        locationOption: location?.locationOption ?? LocationOption_enum.ONLINE,
+        searchFilter: '%',
+      },
+      skip: !location?.locationOption || isOnline,
+    }
+  );
 
-  if (addressDataError) {
-    console.log('query known location address options error', addressDataError);
-  }
+  useEffect(() => {
+    if (addressDataError) {
+      setShowAddressLookupError(true);
+    }
+  }, [addressDataError]);
+
+  const isAddressLookupUnavailable = addressDataLoading || !!addressDataError;
 
   // Transform addresses for dropdown options
   const addressOptions = useMemo(() => {
@@ -121,11 +130,17 @@ export const Locations: FC<LocationsIProps> = ({ location, onDelete }) => {
               nullable={true}
               nullableLabel={t('SessionsTab.sessionAddresses.no_address_selected')}
               className="mb-2"
+              disabled={isAddressLookupUnavailable}
             />
           )}
         </div>
       )}
       <div>{location && <DeleteButton handleDelete={handleDelete} />}</div>
+      <ErrorMessageDialog
+        errorMessage={addressDataError?.message || 'Failed to load location addresses.'}
+        open={!!addressDataError && showAddressLookupError}
+        onClose={() => setShowAddressLookupError(false)}
+      />
     </div>
   );
 };

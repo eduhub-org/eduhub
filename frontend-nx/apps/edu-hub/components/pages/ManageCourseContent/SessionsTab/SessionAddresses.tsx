@@ -1,5 +1,5 @@
 import { useTranslations } from 'next-intl';
-import { FC, useMemo } from 'react';
+import { FC, useEffect, useMemo, useState } from 'react';
 import { ManagedCourse_Course_by_pk_Sessions_SessionAddresses } from '../../../../queries/__generated__/ManagedCourse';
 import { UPDATE_SESSION_ADDRESS } from '../../../../queries/course';
 import { LOCATION_ADDRESS_BY_LOCATION_OPTION, CREATE_LOCATION_ADDRESS } from '../../../../queries/locationAddress';
@@ -9,6 +9,7 @@ import { isLinkFormat } from '../../../../helpers/util';
 import { LocationOption_enum } from '../../../../__generated__/globalTypes';
 import { Tooltip } from '@mui/material';
 import { HelpOutline } from '@mui/icons-material';
+import { ErrorMessageDialog } from '../../../common/dialogs/ErrorMessageDialog';
 
 interface SessionAddressesIProps {
   address: ManagedCourse_Course_by_pk_Sessions_SessionAddresses | null;
@@ -18,6 +19,7 @@ interface SessionAddressesIProps {
 export const SessionAddresses: FC<SessionAddressesIProps> = ({ address, refetchQueries }) => {
   const t = useTranslations('manageCourse.SessionsTab.sessionAddresses');
   const tCommon = useTranslations('common');
+  const [showAddressLookupError, setShowAddressLookupError] = useState(true);
 
   const defaultSessionAddress = address?.CourseLocation?.defaultSessionAddress;
   const defaultSessionAddressId = (address?.CourseLocation as any)?.defaultSessionAddressId;
@@ -33,17 +35,24 @@ export const SessionAddresses: FC<SessionAddressesIProps> = ({ address, refetchQ
     : tCommon('location.' + address?.CourseLocation?.locationOption);
 
   // Query location addresses for the selected location option
-  const { data: addressData, error: addressDataError } = useRoleQuery(LOCATION_ADDRESS_BY_LOCATION_OPTION, {
-    variables: {
-      locationOption: address?.CourseLocation?.locationOption as LocationOption_enum,
-      searchFilter: '%',
-    },
-    skip: !address?.CourseLocation?.locationOption || isOnline,
-  });
+  const { data: addressData, error: addressDataError, loading: addressLoading } = useRoleQuery(
+    LOCATION_ADDRESS_BY_LOCATION_OPTION,
+    {
+      variables: {
+        locationOption: address?.CourseLocation?.locationOption as LocationOption_enum,
+        searchFilter: '%',
+      },
+      skip: !address?.CourseLocation?.locationOption || isOnline,
+    }
+  );
 
-  if (addressDataError) {
-    console.log('query known session location address options error', addressDataError);
-  }
+  useEffect(() => {
+    if (addressDataError) {
+      setShowAddressLookupError(true);
+    }
+  }, [addressDataError]);
+
+  const isAddressLookupUnavailable = addressLoading || !!addressDataError;
 
   // Transform addresses for dropdown options
   const addressOptions = useMemo(() => {
@@ -123,8 +132,14 @@ export const SessionAddresses: FC<SessionAddressesIProps> = ({ address, refetchQ
           refetchQueries={[...refetchQueries, 'LocationAddressByLocationOption']}
           nullable={true}
           nullableLabel={nullableLabel}
+          disabled={isAddressLookupUnavailable}
         />
       </div>
+      <ErrorMessageDialog
+        errorMessage={addressDataError?.message || 'Failed to load session addresses.'}
+        open={!!addressDataError && showAddressLookupError}
+        onClose={() => setShowAddressLookupError(false)}
+      />
     </>
   );
 };
