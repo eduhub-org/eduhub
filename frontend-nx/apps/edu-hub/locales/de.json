@@ -48,6 +48,7 @@
       "location_addresses": "Veranstaltungsadressen",
       "email_templates": "E-Mail-Vorlagen",
       "app_settings": "App-Einstellungen",
+      "calendar": "Kalender",
       "statistics": "Statistiken",
       "course_instructor_manual": "Kursleitungshandbuch",
       "logout": "Logout"
@@ -1679,6 +1680,26 @@
     "no_pricing": "Keine Preise konfiguriert.",
     "synced": "Synchronisiert",
     "not_synced": "Nicht synchronisiert"
+  },
+  "calendar": {
+    "title": "Kalender",
+    "export_ical": "Kalender exportieren (.ics)",
+    "filter_type": "Typ",
+    "filter_type_all": "Alle",
+    "filter_courses": "Kurse",
+    "filter_events": "Events",
+    "filter_location": "Ort",
+    "filter_location_all": "Alle Orte",
+    "filter_course": "Kurs",
+    "filter_course_all": "Alle Kurse",
+    "select_all": "Alle auswählen",
+    "deselect_all": "Alle abwählen",
+    "month_view": "Monatsansicht",
+    "week_view": "Wochenansicht",
+    "day_view": "Tagesansicht",
+    "today": "Heute",
+    "no_sessions": "Keine Termine vorhanden.",
+    "session_details": "Termindetails"
   },
   "footer": {
     "imprint": "Impressum",

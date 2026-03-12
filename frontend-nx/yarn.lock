@@ -2879,6 +2879,55 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@fullcalendar/core@npm:^6.1.20":
+  version: 6.1.20
+  resolution: "@fullcalendar/core@npm:6.1.20"
+  dependencies:
+    preact: ~10.12.1
+  checksum: 149a9a8b55a97aaaba8bf1617f9b3a41eb3da40aa1de6030f5677780c1ddbc4f27a125841fa23e3ad47ce9c11757ec9e6ae3a9909f66692c22403955837f3298
+  languageName: node
+  linkType: hard
+
+"@fullcalendar/daygrid@npm:^6.1.20, @fullcalendar/daygrid@npm:~6.1.20":
+  version: 6.1.20
+  resolution: "@fullcalendar/daygrid@npm:6.1.20"
+  peerDependencies:
+    "@fullcalendar/core": ~6.1.20
+  checksum: e0633315ae41410f2d1ecf7a0d1f61a1d27cac3a7007426d6dba78b916408aa11dd7d8f914ee278b9982d652f47da71372b5d1443e4e1809867d9dc1df52adf8
+  languageName: node
+  linkType: hard
+
+"@fullcalendar/interaction@npm:^6.1.20":
+  version: 6.1.20
+  resolution: "@fullcalendar/interaction@npm:6.1.20"
+  peerDependencies:
+    "@fullcalendar/core": ~6.1.20
+  checksum: 72d85ae5a64dfb68ca4524167bcc9f81ed355557d42d9677c247185986bbd755a091cbdd21a89ce67a7523356e225e1595312ece6e08fe7bcd77ea80a0c771b0
+  languageName: node
+  linkType: hard
+
+"@fullcalendar/react@npm:^6.1.20":
+  version: 6.1.20
+  resolution: "@fullcalendar/react@npm:6.1.20"
+  peerDependencies:
+    "@fullcalendar/core": ~6.1.20
+    react: ^16.7.0 || ^17 || ^18 || ^19
+    react-dom: ^16.7.0 || ^17 || ^18 || ^19
+  checksum: b450caf193d62ac4ca41e6186556191160df1b4998fee9c883364d0deb0576c0808c74f417307a3db29dc28b5997218b36d21752dc0bd870cced92d4fb476c01
+  languageName: node
+  linkType: hard
+
+"@fullcalendar/timegrid@npm:^6.1.20":
+  version: 6.1.20
+  resolution: "@fullcalendar/timegrid@npm:6.1.20"
+  dependencies:
+    "@fullcalendar/daygrid": ~6.1.20
+  peerDependencies:
+    "@fullcalendar/core": ~6.1.20
+  checksum: ef7497eeb5e739700e1bef4ad0b8ebd911fb6d2640e8cdc3392fae57b81220d27b508ade4c883100adbb63827b2e313e17454fb78b514bb137056409535e444d
+  languageName: node
+  linkType: hard
+
 "@gar/promisify@npm:^1.1.3":
   version: 1.1.3
   resolution: "@gar/promisify@npm:1.1.3"
@@ -16580,6 +16629,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"ics@npm:^3.8.1":
+  version: 3.8.1
+  resolution: "ics@npm:3.8.1"
+  dependencies:
+    nanoid: ^3.1.23
+    runes2: ^1.1.2
+    yup: ^1.2.0
+  checksum: 83392ad1308fee6659079973c41d62b89eb4703cd44a150286ae27d06a3a5fb293e792d7b3baa9500d3d668661718550d64f07beabf042e747ddab1d597dc4bd
+  languageName: node
+  linkType: hard
+
 "icss-utils@npm:^5.0.0, icss-utils@npm:^5.1.0":
   version: 5.1.0
   resolution: "icss-utils@npm:5.1.0"
@@ -20945,6 +21005,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"nanoid@npm:^3.1.23":
+  version: 3.3.11
+  resolution: "nanoid@npm:3.3.11"
+  bin:
+    nanoid: bin/nanoid.cjs
+  checksum: 3be20d8866a57a6b6d218e82549711c8352ed969f9ab3c45379da28f405363ad4c9aeb0b39e9abc101a529ca65a72ff9502b00bf74a912c4b64a9d62dfd26c29
+  languageName: node
+  linkType: hard
+
 "nanoid@npm:^3.3.6, nanoid@npm:^3.3.7":
   version: 3.3.8
   resolution: "nanoid@npm:3.3.8"
@@ -22016,6 +22085,11 @@ __metadata:
     "@emotion/server": ^11.11.0
     "@emotion/styled": ^11.13.0
     "@eslint/compat": ^1.1.1
+    "@fullcalendar/core": ^6.1.20
+    "@fullcalendar/daygrid": ^6.1.20
+    "@fullcalendar/interaction": ^6.1.20
+    "@fullcalendar/react": ^6.1.20
+    "@fullcalendar/timegrid": ^6.1.20
     "@headlessui/react": ^2.1.3
     "@hello-pangea/dnd": ^16.6.0
     "@mui/icons-material": ^6.0.2
@@ -22097,6 +22171,7 @@ __metadata:
     eslint-plugin-standard: ^5.0.0
     graphql: ~15.8.0
     graphql-request: ^6.1.0
+    ics: ^3.8.1
     jest: 29.7.0
     jest-environment-jsdom: ^30.2.0
     jest-worker: ^29.7.0
@@ -23415,6 +23490,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"preact@npm:~10.12.1":
+  version: 10.12.1
+  resolution: "preact@npm:10.12.1"
+  checksum: 0de99f477563ab7f94a0f964952ad216375973c0dcd9eb49881f8eb5effc5ed6948da062548c87d5bb0d82f1a1e516b649020e760eab3a0503dfdd8e64d34a26
+  languageName: node
+  linkType: hard
+
 "prelude-ls@npm:^1.2.1":
   version: 1.2.1
   resolution: "prelude-ls@npm:1.2.1"
@@ -23580,6 +23662,13 @@ __metadata:
     object-assign: ^4.1.1
     react-is: ^16.13.1
   checksum: c056d3f1c057cb7ff8344c645450e14f088a915d078dcda795041765047fa080d38e5d626560ccaac94a4e16e3aa15f3557c1a9a8d1174530955e992c675e459
+  languageName: node
+  linkType: hard
+
+"property-expr@npm:^2.0.5":
+  version: 2.0.6
+  resolution: "property-expr@npm:2.0.6"
+  checksum: 89977f4bb230736c1876f460dd7ca9328034502fd92e738deb40516d16564b850c0bbc4e052c3df88b5b8cd58e51c93b46a94bea049a3f23f4a022c038864cab
   languageName: node
   linkType: hard
 
@@ -25167,6 +25256,13 @@ __metadata:
   dependencies:
     queue-microtask: ^1.2.2
   checksum: cb4f97ad25a75ebc11a8ef4e33bb962f8af8516bb2001082ceabd8902e15b98f4b84b4f8a9b222e5d57fc3bd1379c483886ed4619367a7680dad65316993021d
+  languageName: node
+  linkType: hard
+
+"runes2@npm:^1.1.2":
+  version: 1.1.4
+  resolution: "runes2@npm:1.1.4"
+  checksum: 1c9d478005bf89258a3695f3bddcd46d732051a9fd2e06c020883de41315d331244c19c46c622fe858fbc7c5a827222b88100ebca397fbaaa080946588f785b6
   languageName: node
   linkType: hard
 
@@ -27594,6 +27690,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"tiny-case@npm:^1.0.3":
+  version: 1.0.3
+  resolution: "tiny-case@npm:1.0.3"
+  checksum: 3f7a30c39d5b0e1bc097b0b271bec14eb5b836093db034f35a0de26c14422380b50dc12bfd37498cf35b192f5df06f28a710712c87ead68872a9e37ad6f6049d
+  languageName: node
+  linkType: hard
+
 "tiny-invariant@npm:^1.0.6, tiny-invariant@npm:^1.3.1":
   version: 1.3.3
   resolution: "tiny-invariant@npm:1.3.3"
@@ -27704,6 +27807,13 @@ __metadata:
   version: 1.0.1
   resolution: "toidentifier@npm:1.0.1"
   checksum: 952c29e2a85d7123239b5cfdd889a0dde47ab0497f0913d70588f19c53f7e0b5327c95f4651e413c74b785147f9637b17410ac8c846d5d4a20a5a33eb6dc3a45
+  languageName: node
+  linkType: hard
+
+"toposort@npm:^2.0.2":
+  version: 2.0.2
+  resolution: "toposort@npm:2.0.2"
+  checksum: d64c74b570391c9432873f48e231b439ee56bc49f7cb9780b505cfdf5cb832f808d0bae072515d93834dd6bceca5bb34448b5b4b408335e4d4716eaf68195dcb
   languageName: node
   linkType: hard
 
@@ -28135,7 +28245,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"type-fest@npm:^2.12.2":
+"type-fest@npm:^2.12.2, type-fest@npm:^2.19.0":
   version: 2.19.0
   resolution: "type-fest@npm:2.19.0"
   checksum: a4ef07ece297c9fba78fc1bd6d85dff4472fe043ede98bd4710d2615d15776902b595abf62bd78339ed6278f021235fb28a96361f8be86ed754f778973a0d278
@@ -29761,6 +29871,18 @@ __metadata:
   version: 1.1.1
   resolution: "yocto-queue@npm:1.1.1"
   checksum: f2e05b767ed3141e6372a80af9caa4715d60969227f38b1a4370d60bffe153c9c5b33a862905609afc9b375ec57cd40999810d20e5e10229a204e8bde7ef255c
+  languageName: node
+  linkType: hard
+
+"yup@npm:^1.2.0":
+  version: 1.7.1
+  resolution: "yup@npm:1.7.1"
+  dependencies:
+    property-expr: ^2.0.5
+    tiny-case: ^1.0.3
+    toposort: ^2.0.2
+    type-fest: ^2.19.0
+  checksum: 80d0d6838da457d489a97ee0b9c26fa9f59355a553f86842ea114b049811a918a0e7221f9c22bb88314699ddfb3e24ded49f7ab10a0e74dd273d03430110d5af
   languageName: node
   linkType: hard
 

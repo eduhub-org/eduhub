@@ -1,0 +1,31 @@
+import { FC } from 'react';
+import { useTranslations } from 'next-intl';
+import { LOCATION_COLORS, getLocationLabel } from '../../../helpers/calendarColors';
+
+const CalendarLegend: FC = () => {
+  const t = useTranslations('calendar');
+  return (
+    <div className="flex flex-wrap gap-4 items-center">
+      <div className="flex items-center gap-2">
+        <div
+          className="w-3 h-3 rounded border-2 border-dashed border-label-secondary"
+          aria-hidden
+        />
+        <span className="text-sm text-label-secondary">{t('filter_events')}</span>
+      </div>
+      {Object.entries(LOCATION_COLORS).map(([location, colors]) => (
+        <div key={location} className="flex items-center gap-2">
+          <div
+            className="w-3 h-3 rounded-full"
+            style={{ backgroundColor: colors.border }}
+          />
+          <span className="text-sm text-label-secondary">
+            {getLocationLabel(location)}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+export default CalendarLegend;
