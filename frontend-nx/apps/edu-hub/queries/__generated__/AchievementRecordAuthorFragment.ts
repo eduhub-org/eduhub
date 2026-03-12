@@ -1,0 +1,61 @@
+/* tslint:disable */
+/* eslint-disable */
+// @generated
+// This file was automatically generated and should not be edited.
+
+// ====================================================
+// GraphQL fragment: AchievementRecordAuthorFragment
+// ====================================================
+
+export interface AchievementRecordAuthorFragment_User_Organization {
+  __typename: "Organization";
+  id: number;
+  name: string;
+}
+
+export interface AchievementRecordAuthorFragment_User {
+  __typename: "User";
+  id: any;
+  /**
+   * The user's first name
+   */
+  firstName: string;
+  /**
+   * The user's last name
+   */
+  lastName: string;
+  /**
+   * The user's email address
+   */
+  email: string;
+  /**
+   * The user's profile picture
+   */
+  picture: string | null;
+  /**
+   * A link to an external profile, for example in LinkedIn or Xing
+   */
+  externalProfile: string | null;
+  /**
+   * The user's postal/zip code
+   */
+  zipCode: string | null;
+  /**
+   * The user's country of residence
+   */
+  country: string | null;
+  /**
+   * An object relationship
+   */
+  Organization: AchievementRecordAuthorFragment_User_Organization | null;
+}
+
+export interface AchievementRecordAuthorFragment {
+  __typename: "AchievementRecordAuthor";
+  id: number;
+  created_at: any;
+  /**
+   * An object relationship
+   */
+  User: AchievementRecordAuthorFragment_User;
+}
