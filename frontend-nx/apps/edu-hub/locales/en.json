@@ -48,6 +48,7 @@
       "location_addresses": "Location Addresses",
       "email_templates": "Email Templates",
       "app_settings": "App Settings",
+      "calendar": "Calendar",
       "statistics": "Statistics",
       "course_instructor_manual": "Course Instructor Manual",
       "logout": "Logout"
@@ -1725,6 +1726,27 @@
     "no_pricing": "No pricing configured.",
     "synced": "Synced",
     "not_synced": "Not synced"
+  },
+  "calendar": {
+    "title": "Calendar",
+    "export_ical": "Export Calendar (.ics)",
+    "filter_type": "Type",
+    "filter_type_all": "All",
+    "filter_courses": "Courses",
+    "filter_events": "Events",
+    "filter_location": "Location",
+    "filter_location_all": "All Locations",
+    "filter_course": "Course",
+    "filter_course_all": "All Courses",
+    "select_all": "Select all",
+    "deselect_all": "Deselect all",
+    "month_view": "Month View",
+    "week_view": "Week View",
+    "day_view": "Day View",
+    "today": "Today",
+    "no_sessions": "No sessions available.",
+    "session_details": "Session Details",
+    "error_loading": "Error loading calendar data."
   },
   "footer": {
     "imprint": "Imprint",
