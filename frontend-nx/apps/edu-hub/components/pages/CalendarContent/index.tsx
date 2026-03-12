@@ -107,33 +107,6 @@ const CalendarContent: FC = () => {
   const [showCourses, setShowCourses] = useState(true);
   const [showEvents, setShowEvents] = useState(true);
 
-  const where = useMemo(() => {
-    const conditions: unknown[] = [];
-    if (selectedCourseIds.length > 0) {
-      conditions.push({ courseId: { _in: selectedCourseIds } });
-    }
-    if (selectedLocations.length > 0) {
-      conditions.push({
-        SessionAddresses: {
-          CourseLocation: {
-            locationOption: { _in: selectedLocations as LocationOption_enum[] },
-          },
-        },
-      });
-    }
-    // Filter by type: Kurse (non-EVENTS programs) vs Events (EVENTS program)
-    if (!showCourses && !showEvents) {
-      conditions.push({ courseId: { _eq: -1 } }); // show nothing
-    } else if (showCourses && !showEvents) {
-      conditions.push({ Course: { Program: { shortTitle: { _neq: 'EVENTS' } } } });
-    } else if (!showCourses && showEvents) {
-      conditions.push({ Course: { Program: { shortTitle: { _eq: 'EVENTS' } } } });
-    }
-    if (conditions.length === 0) return {};
-    if (conditions.length === 1) return conditions[0];
-    return { _and: conditions };
-  }, [selectedLocations, selectedCourseIds, showCourses, showEvents]);
-
   const coursesWhere = useMemo(() => {
     if (!showCourses && !showEvents) {
       return { id: { _eq: -1 } }; // no courses when neither selected
@@ -147,11 +120,7 @@ const CalendarContent: FC = () => {
     return {};
   }, [showCourses, showEvents]);
 
-  const { data, loading } = useAdminQuery(CALENDAR_SESSIONS, {
-    variables: { where },
-  });
-
-  const { data: coursesData } = useAdminQuery(CALENDAR_COURSES, {
+  const { data: coursesData, error: coursesError } = useAdminQuery(CALENDAR_COURSES, {
     variables: { where: coursesWhere },
   });
 
@@ -159,6 +128,43 @@ const CalendarContent: FC = () => {
     () => (coursesData?.Course ?? []).map((c: { id: number; title: string }) => ({ id: c.id, title: c.title })),
     [coursesData?.Course]
   );
+
+  const validCourseIds = useMemo(
+    () => selectedCourseIds.filter((id) => courseList.some((c) => c.id === id)),
+    [selectedCourseIds, courseList]
+  );
+
+  const where = useMemo(() => {
+    const conditions: unknown[] = [];
+    if (validCourseIds.length > 0) {
+      conditions.push({ courseId: { _in: validCourseIds } });
+    }
+    if (selectedLocations.length > 0) {
+      const locs = selectedLocations as LocationOption_enum[];
+      conditions.push({
+        _or: [
+          { SessionAddresses: { CourseLocation: { locationOption: { _in: locs } } } },
+          { Course: { CourseLocations: { locationOption: { _in: locs } } } },
+        ],
+      });
+    }
+    // Filter by type: Kurse (non-EVENTS programs) vs Events (EVENTS program)
+    if (!showCourses && !showEvents) {
+      conditions.push({ courseId: { _eq: -1 } }); // show nothing
+    } else if (showCourses && !showEvents) {
+      conditions.push({ Course: { Program: { shortTitle: { _neq: 'EVENTS' } } } });
+    } else if (!showCourses && showEvents) {
+      conditions.push({ Course: { Program: { shortTitle: { _eq: 'EVENTS' } } } });
+    }
+    if (conditions.length === 0) return {};
+    if (conditions.length === 1) return conditions[0];
+    return { _and: conditions };
+  }, [validCourseIds, selectedLocations, showCourses, showEvents]);
+
+  const { data, loading, error } = useAdminQuery(CALENDAR_SESSIONS, {
+    variables: { where },
+    skip: validCourseIds.length > 0 && courseList.length === 0,
+  });
 
   const handleLocationToggle = useCallback((location: string) => {
     setSelectedLocations((prev) =>
@@ -418,7 +424,11 @@ const CalendarContent: FC = () => {
           <CalendarLegend />
         </div>
 
-        {loading ? (
+        {error || coursesError ? (
+          <div className="text-center py-20 text-red-600">
+            {t('calendar.error_loading')}: {(error || coursesError)?.message}
+          </div>
+        ) : loading ? (
           <div className="text-center py-20 text-label-secondary">
             {t('common.loading')}
           </div>

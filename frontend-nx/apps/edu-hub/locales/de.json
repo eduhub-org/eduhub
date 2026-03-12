@@ -1699,7 +1699,8 @@
     "day_view": "Tagesansicht",
     "today": "Heute",
     "no_sessions": "Keine Termine vorhanden.",
-    "session_details": "Termindetails"
+    "session_details": "Termindetails",
+    "error_loading": "Fehler beim Laden der Kalenderdaten."
   },
   "footer": {
     "imprint": "Impressum",

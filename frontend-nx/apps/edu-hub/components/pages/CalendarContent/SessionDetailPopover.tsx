@@ -4,8 +4,6 @@ import { useTranslations } from 'next-intl';
 import { format } from 'date-fns';
 import { de, enUS } from 'date-fns/locale';
 import { useLocale } from 'next-intl';
-import { getLocationLabel } from '../../../helpers/calendarColors';
-
 interface SessionDetail {
   id: number;
   title: string;
@@ -81,7 +79,7 @@ const SessionDetailPopover: FC<IProps> = ({ session, anchorEl, onClose }) => {
         {session.location && (
           <div className="text-sm text-label-primary">
             <span className="font-medium">{t('common.place')}:</span>{' '}
-            {getLocationLabel(session.location)}
+            {t(`common.location.${session.location}`)}
             {session.address && (
               <span className="text-label-secondary block text-xs mt-0.5">
                 {session.address}

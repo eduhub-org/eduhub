@@ -1,9 +1,9 @@
 import { FC } from 'react';
 import { useTranslations } from 'next-intl';
-import { LOCATION_COLORS, getLocationLabel } from '../../../helpers/calendarColors';
+import { LOCATION_COLORS } from '../../../helpers/calendarColors';
 
 const CalendarLegend: FC = () => {
-  const t = useTranslations('calendar');
+  const t = useTranslations();
   return (
     <div className="flex flex-wrap gap-4 items-center">
       <div className="flex items-center gap-2">
@@ -18,9 +18,10 @@ const CalendarLegend: FC = () => {
           <div
             className="w-3 h-3 rounded-full"
             style={{ backgroundColor: colors.border }}
+            aria-hidden
           />
           <span className="text-sm text-label-secondary">
-            {getLocationLabel(location)}
+            {t(`common.location.${location}`)}
           </span>
         </div>
       ))}

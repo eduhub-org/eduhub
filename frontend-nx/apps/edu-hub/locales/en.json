@@ -1702,7 +1702,8 @@
     "day_view": "Day View",
     "today": "Today",
     "no_sessions": "No sessions available.",
-    "session_details": "Session Details"
+    "session_details": "Session Details",
+    "error_loading": "Error loading calendar data."
   },
   "footer": {
     "imprint": "Imprint",
