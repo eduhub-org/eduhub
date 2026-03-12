@@ -186,9 +186,10 @@ const CalendarContent: FC = () => {
   }, []);
 
   const allCoursesSelected =
-    courseList.length > 0 && courseList.every((c) => selectedCourseIds.includes(c.id));
+    courseList.length > 0 &&
+    courseList.every((c: { id: number }) => selectedCourseIds.includes(c.id));
   const handleSelectAllCourses = useCallback(() => {
-    setSelectedCourseIds(courseList.map((c) => c.id));
+    setSelectedCourseIds(courseList.map((c: { id: number }) => c.id));
   }, [courseList]);
   const handleDeselectAllCourses = useCallback(() => {
     setSelectedCourseIds([]);
