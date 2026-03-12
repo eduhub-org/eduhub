@@ -92,3 +92,60 @@
   height: 600px;
 }
 
+/* FullCalendar EduHub design system overrides (used inside .light) */
+.eduhub-calendar .fc {
+  --fc-border-color: var(--eduhub-border-primary);
+  --fc-button-bg-color: var(--eduhub-bg-secondary);
+  --fc-button-text-color: var(--eduhub-label-primary);
+  --fc-button-border-color: var(--eduhub-border-primary);
+  --fc-button-hover-bg-color: var(--eduhub-border-primary);
+  --fc-button-hover-border-color: var(--eduhub-border-secondary);
+  --fc-button-active-bg-color: var(--eduhub-brand);
+  --fc-button-active-border-color: var(--eduhub-brand);
+  --fc-button-active-text-color: #ffffff;
+  --fc-today-bg-color: var(--eduhub-bg-secondary);
+  --fc-page-bg-color: var(--eduhub-fill-primary);
+  --fc-neutral-bg-color: var(--eduhub-fill-primary);
+  --fc-list-event-hover-bg-color: var(--eduhub-bg-secondary);
+}
+
+.eduhub-calendar .fc-toolbar-title,
+.eduhub-calendar .fc-col-header-cell-cushion,
+.eduhub-calendar .fc-daygrid-day-number {
+  color: var(--eduhub-label-primary);
+}
+
+.eduhub-calendar .fc-button {
+  color: var(--eduhub-label-primary);
+}
+
+.eduhub-calendar .fc-button-primary:not(:disabled):active,
+.eduhub-calendar .fc-button-primary:not(:disabled).fc-button-active {
+  background-color: var(--eduhub-brand);
+  border-color: var(--eduhub-brand);
+}
+
+.eduhub-calendar .fc-theme-standard td,
+.eduhub-calendar .fc-theme-standard th {
+  border-color: var(--eduhub-border-primary);
+}
+
+.eduhub-calendar .fc-scrollgrid {
+  border-color: var(--eduhub-border-primary);
+}
+
+.eduhub-calendar .fc-datagrid-cell-cushion,
+.eduhub-calendar .fc-timegrid-slot-label {
+  color: var(--eduhub-label-secondary);
+}
+
+/* Event-type sessions: dashed border to distinguish from regular courses */
+.eduhub-calendar .fc-event-event-type {
+  border-style: dashed;
+}
+
+/* Preserve line breaks in event titles (e.g. address on second line) */
+.eduhub-calendar .fc-event-title {
+  white-space: pre-line;
+}
+
