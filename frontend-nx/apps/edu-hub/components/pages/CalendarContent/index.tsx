@@ -20,6 +20,11 @@ import { Checkbox, FormControlLabel, FormGroup } from '@mui/material';
 import CalendarLegend from './CalendarLegend';
 import SessionDetailPopover from './SessionDetailPopover';
 
+interface CourseListItem {
+  id: number;
+  title: string;
+}
+
 interface SessionDetail {
   id: number;
   title: string;
@@ -150,7 +155,7 @@ const CalendarContent: FC = () => {
     variables: { where: coursesWhere },
   });
 
-  const courseList = useMemo(
+  const courseList = useMemo<CourseListItem[]>(
     () => (coursesData?.Course ?? []).map((c: { id: number; title: string }) => ({ id: c.id, title: c.title })),
     [coursesData?.Course]
   );
@@ -186,10 +191,9 @@ const CalendarContent: FC = () => {
   }, []);
 
   const allCoursesSelected =
-    courseList.length > 0 &&
-    courseList.every((c: { id: number }) => selectedCourseIds.includes(c.id));
+    courseList.length > 0 && courseList.every((c) => selectedCourseIds.includes(c.id));
   const handleSelectAllCourses = useCallback(() => {
-    setSelectedCourseIds(courseList.map((c: { id: number }) => c.id));
+    setSelectedCourseIds(courseList.map((c) => c.id));
   }, [courseList]);
   const handleDeselectAllCourses = useCallback(() => {
     setSelectedCourseIds([]);
