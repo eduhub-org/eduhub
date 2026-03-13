@@ -48,6 +48,7 @@
       "location_addresses": "Location Addresses",
       "email_templates": "Email Templates",
       "app_settings": "App Settings",
+      "calendar": "Calendar",
       "statistics": "Statistics",
       "course_instructor_manual": "Course Instructor Manual",
       "logout": "Logout"
@@ -445,7 +446,8 @@
       "motivation_letter_required": "Please provide a motivation letter",
       "terms_required": "Please accept the Terms and Conditions",
       "registration_failed": "Registration failed. Please try again.",
-      "complete_survey_first": "Please complete the questionnaire first."
+      "complete_survey_first": "Please complete the questionnaire first.",
+      "failed_to_load_organization_options": "Failed to load organization options."
     },
     "formbricks": {
       "survey_title": "Application Questionnaire",
@@ -1214,7 +1216,8 @@
         "aliases_help": "Enter aliases and press Enter to add them",
         "legacy_address": "Legacy Address (read-only)",
         "select_location_option_first": "Please select a location option first",
-        "location_mismatch_error": "The selected address does not match the location option for this session. Please select an address that belongs to the correct location."
+        "location_mismatch_error": "The selected address does not match the location option for this session. Please select an address that belongs to the correct location.",
+        "failed_to_load_session_addresses": "Failed to load session addresses."
       },
       "session_description": {
         "label": "Description",
@@ -1287,7 +1290,10 @@
     "not_submitted": "not submitted",
     "confirmation_push_course_to_next_status": "Do you want to send the course to its next state?",
     "set_status_high": "increase status",
-    "please_fill_all_fields": "Please fill out all fields to proceed!"
+    "please_fill_all_fields": "Please fill out all fields to proceed!",
+    "errors": {
+      "failed_to_load_location_addresses": "Failed to load location addresses."
+    }
   },
   "managePrograms": {
     "headline": "Programs",
@@ -1725,6 +1731,27 @@
     "no_pricing": "No pricing configured.",
     "synced": "Synced",
     "not_synced": "Not synced"
+  },
+  "calendar": {
+    "title": "Calendar",
+    "export_ical": "Export Calendar (.ics)",
+    "filter_type": "Type",
+    "filter_type_all": "All",
+    "filter_courses": "Courses",
+    "filter_events": "Events",
+    "filter_location": "Location",
+    "filter_location_all": "All Locations",
+    "filter_course": "Course",
+    "filter_course_all": "All Courses",
+    "select_all": "Select all",
+    "deselect_all": "Deselect all",
+    "month_view": "Month View",
+    "week_view": "Week View",
+    "day_view": "Day View",
+    "today": "Today",
+    "no_sessions": "No sessions available.",
+    "session_details": "Session Details",
+    "error_loading": "Error loading calendar data."
   },
   "footer": {
     "imprint": "Imprint",

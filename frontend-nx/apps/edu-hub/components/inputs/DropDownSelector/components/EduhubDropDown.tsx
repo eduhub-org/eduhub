@@ -19,6 +19,7 @@ type EduhubDropDownProps = {
   onBlur: () => void;
   onCreateOption?: () => void;
   getLabelForValue?: (value?: string) => string;
+  disabled?: boolean;
 };
 
 export const EduhubDropDown: React.FC<EduhubDropDownProps> = ({
@@ -36,6 +37,7 @@ export const EduhubDropDown: React.FC<EduhubDropDownProps> = ({
   onBlur,
   onCreateOption,
   getLabelForValue,
+  disabled = false,
 }) => {
   const baseClass = 'w-full pl-3 pr-10 py-3 text-label-primary rounded bg-fill-primary';
   const finalClassName = `${baseClass} ${className}`;
@@ -74,12 +76,14 @@ export const EduhubDropDown: React.FC<EduhubDropDownProps> = ({
               onValueChange={onValueChange}
               onCreateOption={onCreateOption}
               getLabelForValue={getLabelForValue}
+              disabled={disabled}
             />
           ) : (
             <select
               onChange={handleChange}
               onBlur={onBlur}
               value={localValue}
+              disabled={disabled}
               className={`${finalClassName} ${errorMessage ? 'border-red-500' : ''}`}
             >
               {localOptions.map((option) => (
