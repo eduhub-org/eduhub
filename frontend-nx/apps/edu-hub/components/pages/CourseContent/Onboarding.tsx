@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { CircularProgress } from '@mui/material';
 
@@ -13,11 +13,15 @@ import {
 import { UPDATE_ENROLLMENT_STATUS } from '../../../queries/insertEnrollment';
 import { CourseEnrollmentStatus_enum } from '../../../__generated__/globalTypes';
 import { USER_OCCUPATION } from '../../../queries/user';
-import { CREATE_ORGANIZATION, ORGANIZATION_LIST } from '../../../queries/organization';
-import { OrganizationList } from '../../../queries/__generated__/OrganizationList';
+import { CREATE_ORGANIZATION, ORGANIZATION_OPTIONS } from '../../../queries/organization';
+import {
+  OrganizationOptions as OrganizationOptionsQuery,
+  OrganizationOptionsVariables,
+} from '../../../queries/__generated__/OrganizationOptions';
 import { UserOccupation } from '../../../queries/__generated__/UserOccupation';
 import { Button } from '../../common/Button';
 import { QuestionConfirmationDialog } from '../../common/dialogs/QuestionConfirmationDialog';
+import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
 import InputField from '../../inputs/InputField';
 import DropDownSelector from '../../inputs/DropDownSelector';
 
@@ -47,6 +51,7 @@ const Onboarding: FC<OnboardingProps> = ({ course, enrollmentId, refetchCourse, 
   const userId = useUserId();
   const [showDeclineDialog, setShowDeclineDialog] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showOrganizationOptionsError, setShowOrganizationOptionsError] = useState(true);
   const { status: sessionStatus } = useSession();
 
   const { data: userData } = useAuthedQuery<User>(USER, {
@@ -56,9 +61,12 @@ const Onboarding: FC<OnboardingProps> = ({ course, enrollmentId, refetchCourse, 
   const queryOccupationOptions = useRoleQuery<UserOccupation>(USER_OCCUPATION, {
     skip: sessionStatus === 'loading',
   });
-  const { data: organizationData } = useRoleQuery<OrganizationList>(ORGANIZATION_LIST, {
+  const { data: organizationData, error: organizationOptionsError, loading: organizationOptionsLoading } = useRoleQuery<
+    OrganizationOptionsQuery,
+    OrganizationOptionsVariables
+  >(ORGANIZATION_OPTIONS, {
     variables: {
-      limit: 100, // Adjust as needed
+      limit: 50000,
     },
     skip: sessionStatus === 'loading',
   });
@@ -80,6 +88,15 @@ const Onboarding: FC<OnboardingProps> = ({ course, enrollmentId, refetchCourse, 
       value: org.id.toString(),
       aliases: org.aliases,
     })) || [];
+
+  const isOrganizationLookupUnavailable = organizationOptionsLoading || !!organizationOptionsError;
+
+  useEffect(() => {
+    if (organizationOptionsError) {
+      console.error('Failed to load organization options query:', organizationOptionsError);
+      setShowOrganizationOptionsError(true);
+    }
+  }, [organizationOptionsError]);
 
   // Render loading state
   if (sessionStatus === 'loading') {
@@ -165,7 +182,7 @@ const Onboarding: FC<OnboardingProps> = ({ course, enrollmentId, refetchCourse, 
         <div className="w-full lg:w-1/2 lg:pl-3">
           <DropDownSelector
             variant="eduhub"
-            creatable={true}
+            creatable={!isOrganizationLookupUnavailable}
             label={getOrganizationLabel(userData?.User_by_pk?.occupation ?? '')}
             value={userData?.User_by_pk?.Organization?.id?.toString() || ''}
             placeholder={t('profile.organization.placeholder')}
@@ -174,6 +191,7 @@ const Onboarding: FC<OnboardingProps> = ({ course, enrollmentId, refetchCourse, 
             identifierVariables={{ userId }}
             createOptionMutation={CREATE_ORGANIZATION}
             className="text-black mb-2"
+            disabled={isOrganizationLookupUnavailable}
           />
         </div>
       </div>
@@ -226,6 +244,11 @@ const Onboarding: FC<OnboardingProps> = ({ course, enrollmentId, refetchCourse, 
         onConfirm={handleEnrollmentCancellation}
         question={t('onboarding_modal.decline_confirm_text')}
         confirmationText={t('onboarding_modal.decline_button_text')}
+      />
+      <ErrorMessageDialog
+        errorMessage={t('errors.failed_to_load_organization_options')}
+        open={!!organizationOptionsError && showOrganizationOptionsError}
+        onClose={() => setShowOrganizationOptionsError(false)}
       />
     </div>
   );

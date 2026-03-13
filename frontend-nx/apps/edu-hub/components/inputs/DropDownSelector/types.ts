@@ -26,4 +26,5 @@ export type DropDownSelectorProps = {
   createOptionMutation?: DocumentNode;
   nullable?: boolean; // Allow clearing selection and convert empty string to null
   nullableLabel?: string; // Custom label for the "none" option
+  disabled?: boolean;
 }; 
