@@ -19,6 +19,7 @@ type CreatableDropDownProps = {
   onValueChange: (event: SelectChangeEvent<string> | React.ChangeEvent<HTMLSelectElement>) => void;
   onCreateOption: () => void;
   getLabelForValue: (value?: string) => string;
+  disabled?: boolean;
 };
 
 export const CreatableDropDown: React.FC<CreatableDropDownProps> = ({
@@ -35,6 +36,7 @@ export const CreatableDropDown: React.FC<CreatableDropDownProps> = ({
   onValueChange,
   onCreateOption,
   getLabelForValue,
+  disabled = false,
 }) => {
   const t = useTranslations('common');
   const [isOpen, setIsOpen] = useState(false);
@@ -142,8 +144,10 @@ export const CreatableDropDown: React.FC<CreatableDropDownProps> = ({
       <div className="flex items-center">
         <input
           type="text"
+          disabled={disabled}
           value={isCleared ? '' : inputValue || (localValue ? getLabelForValue(localValue) : '')}
           onChange={(e) => {
+            if (disabled) return;
             onInputChange(e.target.value);
             if (!e.target.value) {
               handleValueChange(null);
@@ -156,6 +160,7 @@ export const CreatableDropDown: React.FC<CreatableDropDownProps> = ({
           }}
           onKeyDown={handleKeyDown}
           onFocus={() => {
+            if (disabled) return;
             setIsOpen(true);
             if (!inputValue && !isCleared) {
               onInputChange(getLabelForValue(localValue));
@@ -167,7 +172,9 @@ export const CreatableDropDown: React.FC<CreatableDropDownProps> = ({
             }
           }}
           className={
-            variant === 'eduhub' ? `${className} ${errorMessage ? 'border-red-500' : ''}` : 'w-full p-2 border rounded'
+            variant === 'eduhub'
+              ? `${className} ${errorMessage ? 'border-red-500' : ''}`
+              : 'w-full p-2 border rounded'
           }
           placeholder={placeholder || label}
         />
@@ -184,7 +191,7 @@ export const CreatableDropDown: React.FC<CreatableDropDownProps> = ({
           </Tooltip>
         )}
       </div>
-      {isOpen && (
+      {!disabled && isOpen && (
         <div
           className={`absolute w-full bg-fill-primary text-label-primary border border-border-primary rounded-md shadow-lg max-h-60 overflow-auto light ${
             variant === 'eduhub' ? 'z-50' : 'z-10'
