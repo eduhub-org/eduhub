@@ -1,6 +1,5 @@
 import Image from 'next/image';
 import { FC, useMemo } from 'react';
-import mysteryImg from '../../public/images/common/mystery.svg';
 import { isLinkFormat } from '../../helpers/util';
 import { useTranslations } from 'next-intl';
 import { getPublicImageUrl } from '../../helpers/filehandling';
@@ -42,7 +41,7 @@ const UserCard: FC<UserCardProps> = ({ user, role, className, size = 'large' }) 
   const showName = size !== 'small';
 
   const userPictureUrl = useMemo(
-    () => getPublicImageUrl(user?.picture ?? null, imageSolution) || mysteryImg,
+    () => getPublicImageUrl(user?.picture ?? null, imageSolution) || '/images/common/mystery.svg',
     [user?.picture, imageSolution]
   );
 

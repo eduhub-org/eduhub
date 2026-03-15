@@ -4,8 +4,6 @@ import { useTranslations, useLocale } from 'next-intl';
 import { MdAttachMoney, MdCalendarMonth } from 'react-icons/md';
 
 import { useStartTimeString, useEndTimeString, getWeekdayString } from '../../../helpers/dateTimeHelpers';
-import languageIcon from '../../../public/images/course/language.svg';
-import pinIcon from '../../../public/images/course/pin.svg';
 import { Course_Course_by_pk } from '../../../queries/__generated__/Course';
 import UserCard from '../../common/UserCard';
 import { getRegistrationTypeConfig } from './Registration/types';
@@ -173,7 +171,7 @@ export const InfoPanel: FC<IProps> = ({ course }) => {
       elements.push(
         <div key="location" className="flex flex-col items-center">
           <div className="flex justify-center items-center mt-2">
-            <Image src={pinIcon} alt="Location" width={32} height={43} unoptimized className="w-full h-full object-contain max-w-8 max-h-[43px]" />
+            <Image src="/images/course/pin.svg" alt="Location" width={32} height={43} unoptimized className="w-full h-full object-contain max-w-8 max-h-[43px]" />
           </div>
           <span className="text-sm mt-2 text-center">{locationText}</span>
         </div>
@@ -185,7 +183,7 @@ export const InfoPanel: FC<IProps> = ({ course }) => {
       elements.push(
         <div key="language" className="flex flex-col items-center">
           <div className="flex justify-center items-center mt-2">
-            <Image src={languageIcon} alt="Language" width={47} height={40} unoptimized className="w-full h-full object-contain max-w-[47px] max-h-10" />
+            <Image src="/images/course/language.svg" alt="Language" width={47} height={40} unoptimized className="w-full h-full object-contain max-w-[47px] max-h-10" />
           </div>
           <span className="text-sm mt-2 text-center">{t(course.language ?? '')}</span>
         </div>

@@ -1,6 +1,5 @@
 import { FC } from 'react';
 import { useTranslations } from 'next-intl';
-import checkmark from '../../../public/images/course/checkmark.svg';
 
 interface LearningGoalsProps {
   learningGoals: string | null;
@@ -21,7 +20,7 @@ export const LearningGoals: FC<LearningGoalsProps> = ({ learningGoals }) => {
               .map((goal, index) => (
                 <li key={index} className="pl-6 mb-6">
                   <div className="flex">
-                    <img src={checkmark} alt="check mark" className="mr-2 inline-block" />
+                    <img src="/images/course/checkmark.svg" alt="check mark" className="mr-2 inline-block" />
                     <div className="ml-2">
                       {goal.split('\n').map((line, i) => (
                         <span key={i}>

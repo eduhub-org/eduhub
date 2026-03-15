@@ -12,9 +12,6 @@ import { CoursesEnrolledByUser_Course } from '../../../queries/__generated__/Cou
 import { Tile } from './Tile';
 import { TileWidget } from './TileWidget';
 
-import sliderNextArrow from '../../../public/images/common/slider-next-arrow.svg';
-import sliderPreviousArrow from '../../../public/images/common/slider-previous-arrow.svg';
-
 export type CourseType = CourseList_Course | CourseTiles_Course | CoursesEnrolledByUser_Course;
 
 interface TileSliderProps {
@@ -246,7 +243,7 @@ const TileSlider: FC<TileSliderProps> = ({ courses, isManage, isWidget = false }
             className="absolute top-0 left-0 z-10"
             visible={prevVisible}
             onClick={swiperPrev}
-            imgSrc={sliderPreviousArrow}
+            imgSrc="/images/common/slider-previous-arrow.svg"
             imgAlt="Previous"
             isWidget={isWidget}
           />
@@ -255,7 +252,7 @@ const TileSlider: FC<TileSliderProps> = ({ courses, isManage, isWidget = false }
             className="absolute top-0 right-0 z-10"
             visible={nextVisible}
             onClick={swiperNext}
-            imgSrc={sliderNextArrow}
+            imgSrc="/images/common/slider-next-arrow.svg"
             imgAlt="Next"
             isWidget={isWidget}
           />
