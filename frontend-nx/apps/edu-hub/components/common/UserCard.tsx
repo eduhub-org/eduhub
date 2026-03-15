@@ -79,9 +79,9 @@ const UserCard: FC<UserCardProps> = ({ user, role, className, size = 'large' }) 
           <span className="mb-1">
             {user?.firstName} {user?.lastName}
           </span>
-          {role && <span className="text-gray-500">{role}</span>}
+          {role && <span className="text-label-secondary">{role}</span>}
           {user?.externalProfile && isLinkFormat(user.externalProfile) && (
-            <span className="text-gray-500">{getProfileLink(user.externalProfile)}</span>
+            <span className="text-label-secondary">{getProfileLink(user.externalProfile)}</span>
           )}
         </div>
       )}
