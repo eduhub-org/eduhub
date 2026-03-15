@@ -50,3 +50,6 @@ Thumbs.db
 
 # Next.js
 .next
+
+# Nx (legacy; no longer used)
+.nx

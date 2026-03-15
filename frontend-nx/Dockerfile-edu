@@ -66,5 +66,4 @@ EXPOSE 25000
 
 ENV PORT 25000
 
-# CMD [ "node", "server.js" ]
 CMD [ "node", "server.js" ]

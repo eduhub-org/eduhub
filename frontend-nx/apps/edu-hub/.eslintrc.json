@@ -10,6 +10,7 @@
       "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
       "rules": {
         "@next/next/no-html-link-for-pages": ["error", "apps/edu-hub/pages"],
+        "@next/next/no-img-element": "off",
         "react/react-in-jsx-scope": "off",
         "react/prop-types": "off",
         "@typescript-eslint/no-require-imports": "off"

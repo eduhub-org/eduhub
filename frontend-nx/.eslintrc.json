@@ -20,7 +20,6 @@
       "files": ["*.ts", "*.tsx"],
       "rules": {
         "@typescript-eslint/no-explicit-any": "off",
-        "@next/next/no-img-element": "off",
         "no-extra-semi": "error", // Use the standard rule
         "react/react-in-jsx-scope": "off" // Disable rule for React 17+ JSX transform
       }

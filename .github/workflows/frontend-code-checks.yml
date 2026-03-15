@@ -49,7 +49,7 @@ jobs:
         working-directory: frontend-nx
         run: yarn install --immutable
 
-      - name: Type check edu hub
+      - name: Build edu hub
         working-directory: frontend-nx
         run: yarn build
 
