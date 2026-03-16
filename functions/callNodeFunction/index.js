@@ -19,6 +19,8 @@ import createStripeCheckout from "./createStripeCheckout/index.js";
 import createStripeBasePrice from "./createStripeBasePrice/index.js";
 import createStripeAddonPrices from "./createStripeAddonPrices/index.js";
 import createEnrollmentWithAddons from "./createEnrollmentWithAddons/index.js";
+import createMatrixRoom from "./createMatrixRoom/index.js";
+import updateMatrixInstructorPowerLevel from "./updateMatrixInstructorPowerLevel/index.js";
 
 /**
  * Creates a logger instance with structured logging.
@@ -58,7 +60,9 @@ const functionMap = {
   createStripeCheckout,
   createStripeBasePrice,
   createStripeAddonPrices,
-  createEnrollmentWithAddons
+  createEnrollmentWithAddons,
+  createMatrixRoom,
+  updateMatrixInstructorPowerLevel
 };
 
 /**
@@ -155,14 +159,9 @@ export const callNodeFunction = async (req, res) => {
 
     if (req.body.request_query?.includes('mutation')) {
       return res.status(200).json({
-        data: {
-          [functionName]: {
-            error: error.message || "Internal Server Error",
-            messageKey: "INTERNAL_SERVER_ERROR",
-            anonymizedUserId: null,
-            steps: null
-          }
-        }
+        success: false,
+        error: error.message || "Internal Server Error",
+        messageKey: error.messageKey || "INTERNAL_SERVER_ERROR",
       });
     }
     

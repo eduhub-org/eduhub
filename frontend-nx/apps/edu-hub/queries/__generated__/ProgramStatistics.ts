@@ -143,6 +143,7 @@ export interface ProgramStatistics_Program {
    * Defines whether the tab for this course program is shown or not.
    */
   visibility: boolean;
+  matrixSpaceId: string | null;
   /**
    * An array relationship
    */

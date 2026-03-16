@@ -62,5 +62,6 @@ select_permissions:
         - startQuestionnaire
         - title
         - defaultFormbricksEnrollmentSurveyUrl
+        - matrixSpaceId
       filter: {}
 update_permissions:

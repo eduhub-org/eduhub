@@ -211,6 +211,37 @@ variable "environment" {
   type        = string
 }
 
+variable "matrix_homeserver_url" {
+  description = "Base URL of the Matrix homeserver (e.g. https://matrix.example.org)"
+  type        = string
+}
+
+variable "matrix_server_name" {
+  description = "Matrix server name used in room aliases and via hints (e.g. example.org)"
+  type        = string
+}
+
+variable "matrix_element_client_url" {
+  description = "Base URL of the Element web client (e.g. https://element.example.org)"
+  type        = string
+}
+
+variable "matrix_main_space_id" {
+  description = "Top-level Matrix community space id (e.g. !abc123:example.org)"
+  type        = string
+}
+
+variable "matrix_admin_user_id" {
+  description = "Matrix admin user id used for administrative room operations (e.g. @admin:example.org)"
+  type        = string
+}
+
+variable "matrix_admin_access_token" {
+  description = "Long-lived Matrix admin access token for room and space management"
+  type        = string
+  sensitive   = true
+}
+
 variable "mailgun_api_key" {
   description = "API key for the Mailgun API"
   type        = string

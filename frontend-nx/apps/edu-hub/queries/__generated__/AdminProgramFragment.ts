@@ -77,4 +77,5 @@ export interface AdminProgramFragment {
    * Defines whether the tab for this course program is shown or not.
    */
   visibility: boolean;
+  matrixSpaceId: string | null;
 }
