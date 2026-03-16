@@ -94,3 +94,27 @@ event_triggers:
       paused: true
       schedule: 0 0 * * *
       timeout: 60
+  - name: update_matrix_instructor_power_level
+    definition:
+      enable_manual: false
+      insert:
+        columns: '*'
+      delete:
+        columns: '*'
+    retry_conf:
+      interval_sec: 10
+      num_retries: 3
+      timeout_sec: 60
+    webhook_from_env: CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION
+    headers:
+      - name: secret
+        value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+      - name: name
+        value: updateMatrixInstructorPowerLevel
+    cleanup_config:
+      batch_size: 10000
+      clean_invocation_logs: false
+      clear_older_than: 168
+      paused: true
+      schedule: 0 0 * * *
+      timeout: 60

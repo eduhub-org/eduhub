@@ -20,6 +20,7 @@ import createStripeBasePrice from "./createStripeBasePrice/index.js";
 import createStripeAddonPrices from "./createStripeAddonPrices/index.js";
 import createEnrollmentWithAddons from "./createEnrollmentWithAddons/index.js";
 import createMatrixRoom from "./createMatrixRoom/index.js";
+import updateMatrixInstructorPowerLevel from "./updateMatrixInstructorPowerLevel/index.js";
 
 /**
  * Creates a logger instance with structured logging.
@@ -60,7 +61,8 @@ const functionMap = {
   createStripeBasePrice,
   createStripeAddonPrices,
   createEnrollmentWithAddons,
-  createMatrixRoom
+  createMatrixRoom,
+  updateMatrixInstructorPowerLevel
 };
 
 /**

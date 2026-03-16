@@ -33,6 +33,16 @@ const GET_COURSE_ROOM = `
   }
 `;
 
+const GET_COURSE_INSTRUCTORS = `
+  query GetCourseInstructors($courseId: Int!) {
+    CourseInstructor(where: { courseId: { _eq: $courseId } }) {
+      User {
+        matrixUserHandle
+      }
+    }
+  }
+`;
+
 const SET_PROGRAM_SPACE_IF_EMPTY = `
   mutation SetProgramSpaceIfEmpty($programId: Int!, $spaceId: String!) {
     update_Program(
@@ -243,6 +253,36 @@ const getMatrixConfig = () => {
   };
 };
 
+const toMatrixUserId = (matrixUserHandle, serverName) => {
+  const trimmed = trimAndNull(matrixUserHandle);
+  if (!trimmed) return null;
+  const withoutSigil = trimmed.startsWith("@") ? trimmed.slice(1) : trimmed;
+  const localpart = withoutSigil.split(":")[0]?.trim();
+  if (!localpart) return null;
+  return `@${localpart}:${serverName}`;
+};
+
+const buildInstructorUsersMap = async ({ hasuraClient, courseId, serverName, logger }) => {
+  try {
+    const instructorResult = await hasuraClient.request(GET_COURSE_INSTRUCTORS, { courseId });
+    const users = {};
+    for (const courseInstructor of instructorResult?.CourseInstructor || []) {
+      const matrixUserId = toMatrixUserId(courseInstructor?.User?.matrixUserHandle, serverName);
+      if (matrixUserId) {
+        users[matrixUserId] = 50;
+      }
+    }
+    return users;
+  } catch (error) {
+    // Instructor power levels are best-effort and must not block room creation.
+    logger.warn("Unable to resolve instructor matrix handles during room creation", {
+      courseId,
+      error: error.message,
+    });
+    return {};
+  }
+};
+
 const MATRIX_FETCH_TIMEOUT_MS = 30_000;
 
 const ADMIN_ROLES = new Set(["admin", "admin-ras"]);
@@ -415,6 +455,12 @@ export default async function createMatrixRoom(req, logger) {
     }
 
     const roomAliasLocalPart = sanitizeAliasLocalPart(`edu-course-${course.id}`);
+    const instructorUsers = await buildInstructorUsersMap({
+      hasuraClient,
+      courseId: course.id,
+      serverName: matrixConfig.serverName,
+      logger,
+    });
     const roomId = await createRoomWithAlias({
       homeserverUrl: matrixConfig.homeserverUrl,
       token: matrixConfig.token,
@@ -433,6 +479,7 @@ export default async function createMatrixRoom(req, logger) {
           {
             type: "m.room.power_levels",
             content: {
+              users: instructorUsers,
               users_default: 0,
               events_default: 0,
               state_default: 50,
