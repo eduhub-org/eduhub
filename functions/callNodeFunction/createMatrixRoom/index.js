@@ -262,9 +262,13 @@ const toMatrixUserId = (matrixUserHandle, serverName) => {
   return `@${localpart}:${serverName}`;
 };
 
-const buildInstructorUsersMap = async ({ hasuraClient, courseId, serverName, logger }) => {
+const buildInstructorUsersMap = async ({ hasuraClient, courseId, serverName, logger, signal }) => {
   try {
-    const instructorResult = await hasuraClient.request(GET_COURSE_INSTRUCTORS, { courseId });
+    const instructorResult = await hasuraClient.request({
+      document: GET_COURSE_INSTRUCTORS,
+      variables: { courseId },
+      signal,
+    });
     const users = {};
     for (const courseInstructor of instructorResult?.CourseInstructor || []) {
       const matrixUserId = toMatrixUserId(courseInstructor?.User?.matrixUserHandle, serverName);
@@ -366,7 +370,11 @@ export default async function createMatrixRoom(req, logger) {
           error: "User ID missing from session",
         };
       }
-      const assignment = await hasuraClient.request(CHECK_INSTRUCTOR_ASSIGNMENT, { courseId, userId });
+      const assignment = await hasuraClient.request({
+        document: CHECK_INSTRUCTOR_ASSIGNMENT,
+        variables: { courseId, userId },
+        signal: controller.signal,
+      });
       if (!assignment?.CourseInstructor?.length) {
         return {
           success: false,
@@ -376,7 +384,11 @@ export default async function createMatrixRoom(req, logger) {
       }
     }
 
-    const context = await hasuraClient.request(GET_COURSE_CONTEXT, { courseId });
+    const context = await hasuraClient.request({
+      document: GET_COURSE_CONTEXT,
+      variables: { courseId },
+      signal: controller.signal,
+    });
     const course = context?.Course_by_pk;
     const program = course?.Program;
 
@@ -433,15 +445,23 @@ export default async function createMatrixRoom(req, logger) {
         signal: controller.signal,
       });
 
-      const setSpaceResult = await hasuraClient.request(SET_PROGRAM_SPACE_IF_EMPTY, {
-        programId: program.id,
-        spaceId: createdSpaceId,
+      const setSpaceResult = await hasuraClient.request({
+        document: SET_PROGRAM_SPACE_IF_EMPTY,
+        variables: {
+          programId: program.id,
+          spaceId: createdSpaceId,
+        },
+        signal: controller.signal,
       });
 
       if (setSpaceResult.update_Program.affected_rows > 0) {
         spaceId = createdSpaceId;
       } else {
-        const latestProgram = await hasuraClient.request(GET_PROGRAM_SPACE, { programId: program.id });
+        const latestProgram = await hasuraClient.request({
+          document: GET_PROGRAM_SPACE,
+          variables: { programId: program.id },
+          signal: controller.signal,
+        });
         spaceId = latestProgram?.Program_by_pk?.matrixSpaceId || createdSpaceId;
       }
     }
@@ -460,6 +480,7 @@ export default async function createMatrixRoom(req, logger) {
       courseId: course.id,
       serverName: matrixConfig.serverName,
       logger,
+      signal: controller.signal,
     });
     const roomId = await createRoomWithAlias({
       homeserverUrl: matrixConfig.homeserverUrl,
@@ -503,14 +524,22 @@ export default async function createMatrixRoom(req, logger) {
       signal: controller.signal,
     });
 
-    const setRoomResult = await hasuraClient.request(SET_COURSE_ROOM_IF_EMPTY, {
-      courseId: course.id,
-      roomId,
+    const setRoomResult = await hasuraClient.request({
+      document: SET_COURSE_ROOM_IF_EMPTY,
+      variables: {
+        courseId: course.id,
+        roomId,
+      },
+      signal: controller.signal,
     });
 
     let persistedRoomId = roomId;
     if (setRoomResult.update_Course.affected_rows === 0) {
-      const latestCourse = await hasuraClient.request(GET_COURSE_ROOM, { courseId: course.id });
+      const latestCourse = await hasuraClient.request({
+        document: GET_COURSE_ROOM,
+        variables: { courseId: course.id },
+        signal: controller.signal,
+      });
       persistedRoomId = latestCourse?.Course_by_pk?.matrixRoomId || roomId;
     }
 
