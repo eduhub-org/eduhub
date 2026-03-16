@@ -94,7 +94,6 @@ actions:
         - name: name
           value: createUser
     permissions:
-      - role: admin-ras
       - role: instructor_access
     comment: Creates a new user in Keycloak and Hasura, schedules welcome email
   - name: getAdminUsers
@@ -293,7 +292,6 @@ actions:
           value: '[64, 128, 256, 512]'
     permissions:
       - role: instructor_access
-      - role: admin-ras
   - name: saveUserProfileImage
     definition:
       kind: synchronous
@@ -324,7 +322,6 @@ actions:
         - name: secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
     permissions:
-      - role: admin-ras
       - role: instructor_access
   - name: updateFromKeycloak
     definition:

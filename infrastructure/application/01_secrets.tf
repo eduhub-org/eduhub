@@ -219,21 +219,6 @@ resource "google_secret_manager_secret_version" "mailgun_api_key" {
   secret_data = var.mailgun_api_key
 }
 
-# ===== Keycloak Rent-a-Scientist Client Secret =====
-resource "google_secret_manager_secret" "keycloak_ras_client_secret" {
-  provider  = google-beta
-  secret_id = "keycloak-ras-client-secret"
-  replication {
-    auto {}
-  }
-}
-
-resource "google_secret_manager_secret_version" "keycloak_ras_client_secret" {
-  provider    = google-beta
-  secret      = google_secret_manager_secret.keycloak_ras_client_secret.name
-  secret_data = var.keycloak_ras_client_secret
-}
-
 # ===== Formbricks API Key =====
 resource "google_secret_manager_secret" "formbricks_api_key" {
   provider  = google-beta
@@ -344,13 +329,6 @@ resource "google_secret_manager_secret_iam_member" "cloud_function" {
   role       = "roles/secretmanager.secretAccessor"
   member     = "serviceAccount:${data.google_project.eduhub.number}-compute@developer.gserviceaccount.com"
   depends_on = [google_secret_manager_secret.cloud_function]
-}
-
-resource "google_secret_manager_secret_iam_member" "keycloak_ras_client_secret" {
-  secret_id  = google_secret_manager_secret.keycloak_ras_client_secret.id
-  role       = "roles/secretmanager.secretAccessor"
-  member     = "serviceAccount:${data.google_project.eduhub.number}-compute@developer.gserviceaccount.com"
-  depends_on = [google_secret_manager_secret.keycloak_ras_client_secret]
 }
 
 resource "google_secret_manager_secret_iam_member" "hasura_mail_pw" {

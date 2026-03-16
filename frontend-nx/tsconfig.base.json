@@ -24,7 +24,7 @@
     "forceConsistentCasingInFileNames": true,
     "paths": {
       "@eduhub/*": ["apps/edu-hub/*"],
-      "@opencampus/shared-components": ["libs/shared-components/src/index.ts"]
+      "@opencampus/shared-components": ["apps/edu-hub/components/shared-components/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
