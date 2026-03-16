@@ -233,7 +233,6 @@ update_permissions:
         - currency
         - stripeProductId
         - stripePriceId
-        - matrixRoomId
       filter:
         CourseInstructors:
           User:

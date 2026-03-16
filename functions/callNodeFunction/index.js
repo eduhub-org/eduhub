@@ -157,14 +157,9 @@ export const callNodeFunction = async (req, res) => {
 
     if (req.body.request_query?.includes('mutation')) {
       return res.status(200).json({
-        data: {
-          [functionName]: {
-            error: error.message || "Internal Server Error",
-            messageKey: "INTERNAL_SERVER_ERROR",
-            anonymizedUserId: null,
-            steps: null
-          }
-        }
+        success: false,
+        error: error.message || "Internal Server Error",
+        messageKey: error.messageKey || "INTERNAL_SERVER_ERROR",
       });
     }
     

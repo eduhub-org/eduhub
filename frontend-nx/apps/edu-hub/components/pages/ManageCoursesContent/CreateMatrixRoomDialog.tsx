@@ -52,7 +52,7 @@ const CreateMatrixRoomDialog: FC<CreateMatrixRoomDialogProps> = ({ open, course,
     if (!open) return;
     const shortTitle = course.Program?.shortTitle || "";
     const title = course.title || "";
-    setRoomName(`${shortTitle} | ${title}`.trim());
+    setRoomName([shortTitle, title].filter(Boolean).join(" | "));
     setSpaceName(shortTitle || "");
     setTopic("");
     setError(null);
@@ -61,25 +61,29 @@ const CreateMatrixRoomDialog: FC<CreateMatrixRoomDialogProps> = ({ open, course,
 
   const handleCreate = async () => {
     setError(null);
-    const result = await createMatrixRoom({
-      variables: {
-        courseId: course.id,
-        roomName: roomName.trim(),
-        topic: topic.trim() || null,
-        spaceName: hasProgramSpace ? null : (spaceName.trim() || null),
-      },
-      refetchQueries: ["AdminCourseList"],
-      awaitRefetchQueries: true,
-    });
+    try {
+      const result = await createMatrixRoom({
+        variables: {
+          courseId: course.id,
+          roomName: roomName.trim(),
+          topic: topic.trim() || null,
+          spaceName: hasProgramSpace ? null : (spaceName.trim() || null),
+        },
+        refetchQueries: ["AdminCourseList"],
+        awaitRefetchQueries: true,
+      });
 
-    const payload = result?.data?.createMatrixRoom;
-    if (payload?.success) {
-      setSuccessLink(payload.chatLink || buildElementLink(payload.roomId));
-      return;
+      const payload = result?.data?.createMatrixRoom;
+      if (payload?.success) {
+        setSuccessLink(payload.chatLink || buildElementLink(payload.roomId));
+        return;
+      }
+
+      const fallbackError = payload?.error || t("manageCourses.matrix_room.error_unknown");
+      setError(mapErrorToMessage(payload?.messageKey, fallbackError, t));
+    } catch (err: any) {
+      setError(mapErrorToMessage(undefined, err.message || t("manageCourses.matrix_room.error_unknown"), t));
     }
-
-    const fallbackError = payload?.error || t("manageCourses.matrix_room.error_unknown");
-    setError(mapErrorToMessage(payload?.messageKey, fallbackError, t));
   };
 
   const canSubmit =

@@ -859,14 +859,24 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                       : t('manageCourses.matrix_room.button_create')}
                   </span>
                 </Button>
-                {matrixRoomId && matrixRoomLink && (
+                {matrixRoomId && derivedMatrixLink && (
+                  <a
+                    href={derivedMatrixLink}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-sm underline text-blue-600 hover:text-blue-800"
+                  >
+                    {t('manageCourses.matrix_room.open_in_element')}
+                  </a>
+                )}
+                {matrixRoomId && !derivedMatrixLink && matrixRoomLink && (
                   <a
                     href={matrixRoomLink}
                     target="_blank"
                     rel="noreferrer"
                     className="text-sm underline text-blue-600 hover:text-blue-800"
                   >
-                    {t('manageCourses.matrix_room.open_in_element')}
+                    {t('manageCourses.chat_link.label')}
                   </a>
                 )}
               </div>

@@ -119,12 +119,14 @@ const createRoomWithAlias = async ({
   aliasLocalPart,
   serverName,
   payload,
+  signal,
 }) => {
   const createPayload = { ...payload, room_alias_name: aliasLocalPart };
   const response = await fetch(`${homeserverUrl}/_matrix/client/v3/createRoom`, {
     method: "POST",
     headers: matrixHeaders(token),
     body: JSON.stringify(createPayload),
+    signal,
   });
 
   try {
@@ -139,6 +141,7 @@ const createRoomWithAlias = async ({
       {
         method: "GET",
         headers: matrixHeaders(token),
+        signal,
       }
     );
     const aliasResult = await parseMatrixResponse(aliasResponse);
@@ -153,6 +156,7 @@ const putStateEvent = async ({
   eventType,
   stateKey,
   content,
+  signal,
 }) => {
   const response = await fetch(
     `${homeserverUrl}/_matrix/client/v3/rooms/${encodeURIComponent(roomId)}/state/${eventType}/${encodeURIComponent(
@@ -162,6 +166,7 @@ const putStateEvent = async ({
       method: "PUT",
       headers: matrixHeaders(token),
       body: JSON.stringify(content),
+      signal,
     }
   );
   await parseMatrixResponse(response);
@@ -174,6 +179,7 @@ const linkParentAndChild = async ({
   parentSpaceId,
   childRoomId,
   canonical = true,
+  signal,
 }) => {
   const via = [serverName];
   await putStateEvent({
@@ -183,6 +189,7 @@ const linkParentAndChild = async ({
     eventType: "m.space.child",
     stateKey: childRoomId,
     content: { via },
+    signal,
   });
 
   await putStateEvent({
@@ -192,6 +199,7 @@ const linkParentAndChild = async ({
     eventType: "m.space.parent",
     stateKey: parentSpaceId,
     content: { via, canonical },
+    signal,
   });
 };
 
@@ -234,6 +242,18 @@ const getMatrixConfig = () => {
     serverName,
   };
 };
+
+const MATRIX_FETCH_TIMEOUT_MS = 30_000;
+
+const ADMIN_ROLES = new Set(["admin", "admin-ras"]);
+
+const CHECK_INSTRUCTOR_ASSIGNMENT = `
+  query CheckInstructorAssignment($courseId: Int!, $userId: uuid!) {
+    CourseInstructor(where: { courseId: { _eq: $courseId }, userId: { _eq: $userId } }) {
+      courseId
+    }
+  }
+`;
 
 export default async function createMatrixRoom(req, logger) {
   logger.info("########## Create Matrix Room ##########");
@@ -291,8 +311,31 @@ export default async function createMatrixRoom(req, logger) {
     };
   }
 
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), MATRIX_FETCH_TIMEOUT_MS);
+
   try {
     const hasuraClient = ensureHasuraClient();
+
+    if (!ADMIN_ROLES.has(role)) {
+      const userId = req.body?.session_variables?.["x-hasura-user-id"];
+      if (!userId) {
+        return {
+          success: false,
+          messageKey: "MATRIX_UNAUTHORIZED",
+          error: "User ID missing from session",
+        };
+      }
+      const assignment = await hasuraClient.request(CHECK_INSTRUCTOR_ASSIGNMENT, { courseId, userId });
+      if (!assignment?.CourseInstructor?.length) {
+        return {
+          success: false,
+          messageKey: "MATRIX_UNAUTHORIZED",
+          error: "You are not an instructor for this course",
+        };
+      }
+    }
+
     const context = await hasuraClient.request(GET_COURSE_CONTEXT, { courseId });
     const course = context?.Course_by_pk;
     const program = course?.Program;
@@ -326,6 +369,7 @@ export default async function createMatrixRoom(req, logger) {
         token: matrixConfig.token,
         aliasLocalPart: spaceAliasLocalPart,
         serverName: matrixConfig.serverName,
+        signal: controller.signal,
         payload: {
           name: spaceLabel,
           visibility: "private",
@@ -346,6 +390,7 @@ export default async function createMatrixRoom(req, logger) {
         parentSpaceId: matrixConfig.mainSpaceId,
         childRoomId: createdSpaceId,
         canonical: true,
+        signal: controller.signal,
       });
 
       const setSpaceResult = await hasuraClient.request(SET_PROGRAM_SPACE_IF_EMPTY, {
@@ -375,6 +420,7 @@ export default async function createMatrixRoom(req, logger) {
       token: matrixConfig.token,
       aliasLocalPart: roomAliasLocalPart,
       serverName: matrixConfig.serverName,
+      signal: controller.signal,
       payload: {
         name: roomName,
         topic: topic || "",
@@ -407,6 +453,7 @@ export default async function createMatrixRoom(req, logger) {
       parentSpaceId: spaceId,
       childRoomId: roomId,
       canonical: true,
+      signal: controller.signal,
     });
 
     const setRoomResult = await hasuraClient.request(SET_COURSE_ROOM_IF_EMPTY, {
@@ -445,8 +492,12 @@ export default async function createMatrixRoom(req, logger) {
     });
     return {
       success: false,
-      messageKey: "MATRIX_CREATION_FAILED",
-      error: error.message || "Failed to create Matrix room",
+      messageKey: error.name === "AbortError" ? "MATRIX_TIMEOUT" : "MATRIX_CREATION_FAILED",
+      error: error.name === "AbortError"
+        ? "Matrix request timed out"
+        : (error.message || "Failed to create Matrix room"),
     };
+  } finally {
+    clearTimeout(timeout);
   }
 }
