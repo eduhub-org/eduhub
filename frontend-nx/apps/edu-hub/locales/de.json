@@ -1720,6 +1720,18 @@
     "delete": "Löschen",
     "upload": "Upload"
   },
+  "AddonValidationDialog": {
+    "title": "Add-on-Validierung",
+    "close": "Schließen",
+    "no_addons_found": "Keine Add-ons gefunden.",
+    "price_label": "Preis",
+    "description_label": "Beschreibung",
+    "question_id": "Fragen-ID",
+    "choice_id": "Auswahl-ID",
+    "cancel": "Abbrechen",
+    "saving": "Speichern...",
+    "save_and_create_stripe": "Speichern und Stripe-Produkte erstellen"
+  },
   "pricing_summary": {
     "title": "Preisübersicht",
     "base_price": "Kursgebühr",

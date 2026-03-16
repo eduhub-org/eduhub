@@ -6,7 +6,6 @@ services:
     container_name: eduhub-frontend-nx
     ports:
       - "5000:4200"
-      - "5001:4201"
     build:
       context: ./frontend-nx
       dockerfile: Dockerfile-dev

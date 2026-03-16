@@ -10,7 +10,7 @@ EduHub is a Docker-based monorepo. All services run via `docker compose up` from
 
 | Service | Port | Purpose |
 |---------|------|---------|
-| frontend-nx | 5000 (edu-hub), 5001 (rent-a-scientist) | Next.js apps |
+| frontend-nx | 5000 (edu-hub) | Next.js app |
 | hasura | 8080 | GraphQL API |
 | keycloak | 28080 | Auth (admin/admin) |
 | db_hasura | 5432 (internal) | PostgreSQL |
@@ -40,9 +40,9 @@ The Cloud Agent VM runs inside a Firecracker VM with a nested Docker container. 
 
 Commands run on the **host** (not inside Docker), from `frontend-nx/`:
 
-- **Lint**: `npx nx run edu-hub:lint` (matches CI; see `.cursor/skills/lint-project/SKILL.md`)
-- **Test**: `yarn nx run edu-hub:test` (see `.cursor/skills/run-tests/SKILL.md`)
-- **Build**: `yarn nx run edu-hub:build`
+- **Lint**: `yarn lint` (matches CI)
+- **Test**: `yarn test`
+- **Build**: `yarn build`
 
 Requires Node.js 20.x (`nvm use 20`) and Yarn 3.4.1 (via Corepack).
 

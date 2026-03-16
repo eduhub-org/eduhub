@@ -9,7 +9,7 @@ alwaysApply: false
 ## Framework
 
 - Frontend: Jest + React Testing Library
-- Run: `yarn nx run edu-hub:test`
+- Run: `yarn test`
 
 ## File Structure
 

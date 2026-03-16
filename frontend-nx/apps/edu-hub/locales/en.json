@@ -1723,6 +1723,18 @@
     "delete": "Delete",
     "upload": "Upload"
   },
+  "AddonValidationDialog": {
+    "title": "Add-on Validation",
+    "close": "Close",
+    "no_addons_found": "No add-ons found.",
+    "price_label": "Price",
+    "description_label": "Description",
+    "question_id": "Question ID",
+    "choice_id": "Choice ID",
+    "cancel": "Cancel",
+    "saving": "Saving...",
+    "save_and_create_stripe": "Save and create Stripe products"
+  },
   "pricing_summary": {
     "title": "Pricing Summary",
     "base_price": "Course Fee",

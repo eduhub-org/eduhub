@@ -1,11 +1,19 @@
-/* eslint-disable */
-export default {
+import nextJest from 'next/jest.js';
+
+const createJestConfig = nextJest({
+  dir: './apps/edu-hub',
+});
+
+const customJestConfig = {
   displayName: 'edu-hub',
-  preset: '../../jest.preset.js',
-  transform: {
-    '^(?!.*\\.(js|jsx|ts|tsx|css|json)$)': '@nx/react/plugins/jest',
-    '^.+\\.[tj]sx?$': ['babel-jest', { presets: ['@nx/next/babel'] }],
-  },
+  testEnvironment: 'jest-environment-jsdom',
+  testMatch: ['<rootDir>/**/*.{spec,test}.{js,jsx,ts,tsx}'],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
   coverageDirectory: '../../coverage/apps/edu-hub',
+  moduleNameMapper: {
+    '^@eduhub/(.*)$': '<rootDir>/$1',
+    '^@opencampus/shared-components$': '<rootDir>/components/shared-components/index.ts',
+  },
 };
+
+export default createJestConfig(customJestConfig);
