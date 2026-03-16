@@ -257,7 +257,14 @@ const toMatrixUserId = (matrixUserHandle, serverName) => {
   const trimmed = trimAndNull(matrixUserHandle);
   if (!trimmed) return null;
   const withoutSigil = trimmed.startsWith("@") ? trimmed.slice(1) : trimmed;
-  const localpart = withoutSigil.split(":")[0]?.trim();
+  if (withoutSigil.includes(":")) {
+    const [localpartRaw, ...domainParts] = withoutSigil.split(":");
+    const localpart = trimAndNull(localpartRaw);
+    const domain = trimAndNull(domainParts.join(":"));
+    if (!localpart || !domain) return null;
+    return `@${localpart}:${domain}`;
+  }
+  const localpart = trimAndNull(withoutSigil);
   if (!localpart) return null;
   return `@${localpart}:${serverName}`;
 };

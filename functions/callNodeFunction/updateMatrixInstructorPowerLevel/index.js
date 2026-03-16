@@ -3,6 +3,21 @@ import { GraphQLClient } from "graphql-request";
 const GRAPHQL_TIMEOUT_MS = 30_000;
 const MATRIX_TIMEOUT_MS = 30_000;
 
+// Per-room promise chain to serialize read-modify-write on m.room.power_levels.
+const roomLocks = new Map();
+const withRoomLock = (roomId, fn) => {
+  const prev = roomLocks.get(roomId) || Promise.resolve();
+  const next = prev.then(fn, fn);
+  roomLocks.set(roomId, next);
+  next.finally(() => {
+    if (roomLocks.get(roomId) === next) roomLocks.delete(roomId);
+  });
+  return next;
+};
+
+// Tracks previous power levels we displaced so DELETE can restore them.
+const prevInstructorPowerLevels = new Map();
+
 const GET_COURSE_MATRIX_ROOM = `
   query GetCourseMatrixRoom($courseId: Int!) {
     Course_by_pk(id: $courseId) {
@@ -212,59 +227,81 @@ export default async function updateMatrixInstructorPowerLevel(req, logger) {
       };
     }
 
-    const matrixController = new AbortController();
-    const matrixTimeout = setTimeout(() => matrixController.abort(), MATRIX_TIMEOUT_MS);
-    try {
-      const currentPowerLevels = await getCurrentPowerLevels({
-        roomId,
-        matrixConfig,
-        signal: matrixController.signal,
-      });
+    const result = await withRoomLock(roomId, async () => {
+      const matrixController = new AbortController();
+      const matrixTimeout = setTimeout(() => matrixController.abort(), MATRIX_TIMEOUT_MS);
+      try {
+        const currentPowerLevels = await getCurrentPowerLevels({
+          roomId,
+          matrixConfig,
+          signal: matrixController.signal,
+        });
 
-      const nextPowerLevels = {
-        ...currentPowerLevels,
-        users: {
-          ...(currentPowerLevels?.users || {}),
-        },
-      };
+        const nextPowerLevels = {
+          ...currentPowerLevels,
+          users: {
+            ...(currentPowerLevels?.users || {}),
+          },
+        };
 
-      if (op === "INSERT") {
-        if (nextPowerLevels.users[matrixUserId] === 50) {
-          return {
-            success: true,
-            messageKey: "MATRIX_INSTRUCTOR_POWER_LEVEL_UNCHANGED",
-            details: "Instructor already has power level 50",
-          };
+        const existingLevel = nextPowerLevels.users[matrixUserId];
+
+        if (op === "INSERT") {
+          if (existingLevel != null && existingLevel >= 50) {
+            return {
+              success: true,
+              messageKey: "MATRIX_INSTRUCTOR_POWER_LEVEL_UNCHANGED",
+              details: `Instructor already has power level ${existingLevel}`,
+            };
+          }
+          if (existingLevel != null) {
+            prevInstructorPowerLevels.set(`${roomId}:${matrixUserId}`, existingLevel);
+          }
+          nextPowerLevels.users[matrixUserId] = 50;
+        } else if (op === "DELETE") {
+          if (existingLevel == null) {
+            return {
+              success: true,
+              messageKey: "MATRIX_INSTRUCTOR_POWER_LEVEL_UNCHANGED",
+              details: "Instructor had no explicit power level",
+            };
+          }
+          if (existingLevel > 50) {
+            return {
+              success: true,
+              messageKey: "MATRIX_INSTRUCTOR_POWER_LEVEL_UNCHANGED",
+              details: `Instructor has elevated power level ${existingLevel}; leaving untouched`,
+            };
+          }
+          const prevKey = `${roomId}:${matrixUserId}`;
+          const prevLevel = prevInstructorPowerLevels.get(prevKey);
+          if (prevLevel != null) {
+            nextPowerLevels.users[matrixUserId] = prevLevel;
+            prevInstructorPowerLevels.delete(prevKey);
+          } else {
+            delete nextPowerLevels.users[matrixUserId];
+          }
         }
-        nextPowerLevels.users[matrixUserId] = 50;
-      } else if (op === "DELETE") {
-        if (!(matrixUserId in nextPowerLevels.users)) {
-          return {
-            success: true,
-            messageKey: "MATRIX_INSTRUCTOR_POWER_LEVEL_UNCHANGED",
-            details: "Instructor had no explicit power level",
-          };
-        }
-        delete nextPowerLevels.users[matrixUserId];
+
+        await putPowerLevels({
+          roomId,
+          matrixConfig,
+          powerLevels: nextPowerLevels,
+          signal: matrixController.signal,
+        });
+
+        return {
+          success: true,
+          messageKey: "MATRIX_INSTRUCTOR_POWER_LEVEL_UPDATED",
+          roomId,
+          courseId,
+          op,
+        };
+      } finally {
+        clearTimeout(matrixTimeout);
       }
-
-      await putPowerLevels({
-        roomId,
-        matrixConfig,
-        powerLevels: nextPowerLevels,
-        signal: matrixController.signal,
-      });
-
-      return {
-        success: true,
-        messageKey: "MATRIX_INSTRUCTOR_POWER_LEVEL_UPDATED",
-        roomId,
-        courseId,
-        op,
-      };
-    } finally {
-      clearTimeout(matrixTimeout);
-    }
+    });
+    return result;
   } catch (error) {
     logger.error("Failed to update Matrix instructor power level", {
       op,
