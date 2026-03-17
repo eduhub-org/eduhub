@@ -8,6 +8,8 @@ import logging
 import hashlib
 import time
 from datetime import datetime, UTC
+import jwt
+from jwt import InvalidTokenError, PyJWKClient
 try:
     from api_clients.eduhub_client import EduHubClient
     from security_handler import security_handler, get_security_level_for_organization, validate_and_sanitize_input, SecurityLevel
@@ -324,43 +326,104 @@ def authenticate_api_key(api_key):
 
 def authenticate_jwt(token):
     """
-    Validate JWT token and extract organization permissions
-    In production, this would verify the token signature
+    Validate JWT token and extract organization permissions.
+    Enforces signature and standard claim validation.
     """
-    # Mock implementation - in production, verify JWT signature
-    import base64
-    import json
-    
-    # Helper to pad base64url strings safely to a multiple of 4
-    def _pad_base64url(segment: str) -> str:
-        missing = (-len(segment)) % 4
-        return segment + ('=' * missing)
+    jwt_issuer = os.getenv("JWT_ISSUER")
+    jwt_audience = os.getenv("JWT_AUDIENCE")
+    jwks_uri = os.getenv("JWT_JWKS_URI") or os.getenv("JWKS_URI")
+    jwt_public_key = os.getenv("JWT_PUBLIC_KEY")
+
+    if not jwt_issuer:
+        raise ValueError("JWT issuer is not configured")
+
+    if not jwks_uri and not jwt_public_key:
+        raise ValueError("JWT verification key is not configured")
+
+    def _build_verification_key():
+        if jwks_uri:
+            return PyJWKClient(jwks_uri).get_signing_key_from_jwt(token).key
+        # Allow escaped newlines for env-var injected PEM values.
+        return jwt_public_key.replace("\\n", "\n")
+
+    def _normalize_organization_id(raw_org_id):
+        try:
+            org_id = int(raw_org_id)
+            if org_id <= 0:
+                raise ValueError("organization_id must be positive")
+            return org_id
+        except (TypeError, ValueError) as err:
+            raise ValueError("Invalid organization_id claim") from err
+
+    def _fetch_organization(eduhub_client, organization_id):
+        query = """
+        query GetOrganizationForJwt($orgId: Int!) {
+            Organization(where: {id: {_eq: $orgId}}) {
+                id
+                name
+                type
+            }
+        }
+        """
+        result = eduhub_client.send_query(query, {"orgId": organization_id})
+        if not isinstance(result, dict) or "errors" in result:
+            raise ValueError("Database query error during JWT validation")
+
+        organizations = result.get("data", {}).get("Organization", [])
+        if not organizations:
+            raise ValueError("Organization from JWT claim not found")
+
+        return organizations[0]
 
     try:
-        # Decode JWT payload (without verification for demo)
-        parts = token.split('.')
-        if len(parts) < 2:
-            raise ValueError("Malformed JWT: missing payload segment")
-        payload_b64 = _pad_base64url(parts[1])
-        payload = base64.urlsafe_b64decode(payload_b64)
-        claims = json.loads(payload)
-        
-        # Map security_level claim (string) to SecurityLevel enum; default to BASIC
-        level_str = str(claims.get('security_level', 'basic')).lower()
-        try:
-            security_level = SecurityLevel(level_str)
-        except Exception:
-            security_level = SecurityLevel.BASIC
+        verification_key = _build_verification_key()
+        decode_kwargs = {
+            "key": verification_key,
+            "algorithms": ["RS256"],
+            "issuer": jwt_issuer,
+            "options": {
+                "require": ["exp", "iat", "iss"],
+                "verify_aud": bool(jwt_audience),
+            },
+            "leeway": 30,
+        }
+        if jwt_audience:
+            decode_kwargs["audience"] = jwt_audience
+
+        claims = jwt.decode(token, **decode_kwargs)
+        organization_id = _normalize_organization_id(claims.get("organization_id"))
+
+        eduhub_client = EduHubClient()
+        organization = _fetch_organization(eduhub_client, organization_id)
+
+        security_level = get_security_level_for_organization(organization.get("type", "unknown"))
+        access_level = str(claims.get("access_level", "basic")).lower()
+        if access_level not in {"basic", "detailed", "full"}:
+            access_level = "basic"
+
+        raw_course_access = claims.get("course_access", [])
+        course_access = []
+        if isinstance(raw_course_access, list):
+            for course_id in raw_course_access:
+                try:
+                    parsed_id = int(course_id)
+                    if parsed_id > 0:
+                        course_access.append(parsed_id)
+                except (TypeError, ValueError):
+                    continue
 
         return {
-            'organization_id': claims.get('organization_id'),
-            'organization_name': claims.get('organization_name'),
-            'access_level': claims.get('access_level', 'basic'),
-            'can_access_pii': claims.get('pii_access', False),
-            'can_access_grades': claims.get('grade_access', False),
-            'course_access': claims.get('course_access', []),
+            'organization_id': organization["id"],
+            'organization_name': organization["name"],
+            'organization_type': organization.get("type", "unknown"),
+            'access_level': access_level,
+            'can_access_pii': security_level.value in ['premium', 'enterprise'],
+            'can_access_grades': security_level.value == 'enterprise',
+            'course_access': course_access,
             'security_level': security_level
         }
+    except InvalidTokenError as err:
+        raise ValueError("Invalid JWT token") from err
     except Exception as err:
         raise ValueError("Invalid JWT token") from err
 

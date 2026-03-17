@@ -1,8 +1,22 @@
 
+const crypto = require("crypto");
 const { createClient } = require("graphqurl");
 
+function secretsMatch(providedSecret, expectedSecret) {
+  if (!providedSecret || !expectedSecret) return false;
+  const providedBuffer = Buffer.from(String(providedSecret), "utf8");
+  const expectedBuffer = Buffer.from(String(expectedSecret), "utf8");
+  if (providedBuffer.length !== expectedBuffer.length) return false;
+  return crypto.timingSafeEqual(providedBuffer, expectedBuffer);
+}
+
 exports.sendQuestionaires = async (req, res) => {
-  if (process.env.HASURA_CLOUD_FUNCTION_SECRET == req.headers.secret) {
+  const expectedSecret = process.env.HASURA_CLOUD_FUNCTION_SECRET;
+  if (!expectedSecret) {
+    return res.status(500).json({ error: "Server secret not configured" });
+  }
+
+  if (secretsMatch(req.headers.secret, expectedSecret)) {
     
     const client = createClient({
       //endpoint: 'http://localhost:8080/v1/graphql',
@@ -221,4 +235,6 @@ exports.sendQuestionaires = async (req, res) => {
       result: "questionaires sent",
     });
   }
+
+  return res.status(401).json({ error: "Unauthorized" });
 };

@@ -334,7 +334,6 @@ actions:
     permissions:
       - role: instructor_access
       - role: user_access
-      - role: anonymous
   - name: updateUserAdminStatus
     definition:
       kind: synchronous

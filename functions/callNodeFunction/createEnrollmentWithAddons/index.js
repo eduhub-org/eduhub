@@ -321,6 +321,7 @@ export default async function createEnrollmentWithAddons(req, logger) {
   logger.debug(`Request body: ${JSON.stringify(req.body)}`);
 
   try {
+    const sessionUserId = req.body?.session_variables?.['x-hasura-user-id'];
     const {
       courseId,
       userId,
@@ -340,6 +341,27 @@ export default async function createEnrollmentWithAddons(req, logger) {
       };
     }
 
+    if (!sessionUserId) {
+      return {
+        success: false,
+        error: 'Missing authenticated session user',
+        messageKey: 'UNAUTHORIZED',
+        enrollmentId: null,
+        selectedAddons: []
+      };
+    }
+
+    if (String(userId) !== String(sessionUserId)) {
+      return {
+        success: false,
+        error: 'User ID mismatch',
+        messageKey: 'UNAUTHORIZED',
+        enrollmentId: null,
+        selectedAddons: []
+      };
+    }
+    const effectiveUserId = sessionUserId;
+
     // Create Hasura GraphQL client
     const client = new GraphQLClient(process.env.HASURA_ENDPOINT, {
       headers: {
@@ -348,14 +370,14 @@ export default async function createEnrollmentWithAddons(req, logger) {
     });
 
     // Step 1: Create CourseEnrollment with status APPLIED and paymentStatus PENDING
-    logger.info('Creating enrollment', { courseId, userId });
+    logger.info('Creating enrollment', { courseId, userId: effectiveUserId });
     
     // Set termsAcceptedAt server-side when acceptTerms is true (authoritative timestamp)
     const termsAcceptedAt = acceptTerms === true ? new Date().toISOString() : null;
     
     const enrollmentResult = await client.request(CREATE_ENROLLMENT, {
       courseId,
-      userId,
+      userId: effectiveUserId,
       motivationLetter: motivationLetter || '[Formbricks Survey Completed]',
       status: 'APPLIED',
       termsAcceptedAt: termsAcceptedAt,
@@ -365,7 +387,7 @@ export default async function createEnrollmentWithAddons(req, logger) {
     const enrollmentId = enrollmentResult.insert_CourseEnrollment?.returning?.[0]?.id;
 
     if (!enrollmentId) {
-      logger.error('Failed to create enrollment', { courseId, userId });
+      logger.error('Failed to create enrollment', { courseId, userId: effectiveUserId });
       return {
         success: false,
         error: 'Failed to create enrollment',
@@ -492,14 +514,14 @@ export default async function createEnrollmentWithAddons(req, logger) {
       formbricksApiUrl,
       formbricksSurveyId,
       formbricksApiKey,
-      userId,
+      effectiveUserId,
       courseId,
       logger
     );
 
     if (!latestResponse) {
       logger.warn('No Formbricks response found for user/course after retries', { 
-        userId: String(userId), 
+        userId: String(effectiveUserId), 
         courseId: String(courseId),
         surveyId: formbricksSurveyId,
         enrollmentId

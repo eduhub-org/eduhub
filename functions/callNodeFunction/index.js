@@ -1,4 +1,5 @@
 import winston from "winston";
+import crypto from "crypto";
 import createCertificate from "./createCertificate/index.js";
 import getSignedUrl from "./getSignedUrl/index.js";
 import saveFile from "./saveFile/index.js";
@@ -65,6 +66,15 @@ const functionMap = {
   updateMatrixInstructorPowerLevel
 };
 
+const constantTimeEquals = (providedSecret, expectedSecret) => {
+  const providedBuffer = Buffer.from(providedSecret, "utf8");
+  const expectedBuffer = Buffer.from(expectedSecret, "utf8");
+  if (providedBuffer.length !== expectedBuffer.length) {
+    return false;
+  }
+  return crypto.timingSafeEqual(providedBuffer, expectedBuffer);
+};
+
 /**
  * Validates the Hasura secret from the request headers.
  * @param {string} hasuraSecret - The secret from request headers
@@ -72,10 +82,35 @@ const functionMap = {
  */
 const validateSecret = (hasuraSecret) => {
   const hasuraCloudFunctionSecret = process.env.HASURA_CLOUD_FUNCTION_SECRET;
-  
-  if (hasuraSecret !== hasuraCloudFunctionSecret) {
+
+  if (!hasuraCloudFunctionSecret || typeof hasuraCloudFunctionSecret !== "string" || hasuraCloudFunctionSecret.trim() === "") {
     return {
       isValid: false,
+      statusCode: 500,
+      error: {
+        success: false,
+        error: "Server secret is not configured.",
+        messageKey: "SERVER_MISCONFIGURED"
+      }
+    };
+  }
+
+  if (!hasuraSecret || typeof hasuraSecret !== "string") {
+    return {
+      isValid: false,
+      statusCode: 401,
+      error: {
+        success: false,
+        error: "Missing secret header.",
+        messageKey: "MISSING_SECRET"
+      }
+    };
+  }
+
+  if (!constantTimeEquals(hasuraSecret, hasuraCloudFunctionSecret)) {
+    return {
+      isValid: false,
+      statusCode: 401,
       error: {
         success: false,
         error: "Invalid secret provided.",
@@ -111,17 +146,14 @@ const formatResponse = (result) => {
  */
 export const callNodeFunction = async (req, res) => {
   const functionName = req.headers.name;
-  
-  logger.info(`Received request for function: ${functionName}`, {
-    headers: req.headers,
-    body: req.body
-  });
 
   // Validate secret
   const secretValidation = validateSecret(req.headers.secret);
   if (!secretValidation.isValid) {
-    return res.status(200).json(secretValidation.error);
+    return res.status(secretValidation.statusCode).json(secretValidation.error);
   }
+
+  logger.info(`Received request for function: ${functionName}`);
 
   // Validate function exists
   if (!(functionName in functionMap)) {
