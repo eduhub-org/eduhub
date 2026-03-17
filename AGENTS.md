@@ -28,6 +28,16 @@ Wait for all services: Keycloak and Hasura take ~30-60s on first start. The fron
 
 Login: `admin@example.com` / `dev`
 
+### Cloud startup bootstrap (Python checks)
+
+To avoid per-session `pip install` during security and pytest checks, run this once at agent startup:
+
+```bash
+bash /workspace/scripts/bootstrap_cloud_agent_python.sh
+```
+
+The script installs `/workspace/functions/apiProxy/requirements.txt` with `--user` and caches by requirements-file hash, so repeated sessions skip reinstall when unchanged.
+
 ### Docker-in-Docker gotchas
 
 The Cloud Agent VM runs inside a Firecracker VM with a nested Docker container. Required workarounds:
