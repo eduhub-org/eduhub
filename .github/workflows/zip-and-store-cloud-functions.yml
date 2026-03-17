@@ -41,6 +41,13 @@ jobs:
           rm -f ./${{ inputs.CLOUD_FUNCTION_FOLDER }}/callPythonFunction/api_clients
           cp -r ./${{ inputs.CLOUD_FUNCTION_FOLDER }}/shared_libs/api_clients ./${{ inputs.CLOUD_FUNCTION_FOLDER }}/callPythonFunction/
 
+          # Copy shared Node security helpers into each Node function package
+          for fn in callNodeFunction sendMail updateFromKeycloak addKeycloakRole sendQuestionaires; do
+            rm -rf ./${{ inputs.CLOUD_FUNCTION_FOLDER }}/$fn/shared_libs
+            mkdir -p ./${{ inputs.CLOUD_FUNCTION_FOLDER }}/$fn/shared_libs
+            cp -r ./${{ inputs.CLOUD_FUNCTION_FOLDER }}/shared_libs/node ./${{ inputs.CLOUD_FUNCTION_FOLDER }}/$fn/shared_libs/
+          done
+
       - name: Zip Archive for callPythonFunction
         uses: thedoctor0/zip-release@main
         with:

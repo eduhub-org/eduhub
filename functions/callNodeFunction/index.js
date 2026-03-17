@@ -1,5 +1,5 @@
 import winston from "winston";
-import crypto from "crypto";
+import { createRequire } from "module";
 import createCertificate from "./createCertificate/index.js";
 import getSignedUrl from "./getSignedUrl/index.js";
 import saveFile from "./saveFile/index.js";
@@ -22,6 +22,14 @@ import createStripeAddonPrices from "./createStripeAddonPrices/index.js";
 import createEnrollmentWithAddons from "./createEnrollmentWithAddons/index.js";
 import createMatrixRoom from "./createMatrixRoom/index.js";
 import updateMatrixInstructorPowerLevel from "./updateMatrixInstructorPowerLevel/index.js";
+
+const require = createRequire(import.meta.url);
+let constantTimeSecretsEqual;
+try {
+  ({ constantTimeSecretsEqual } = require("./shared_libs/node/security.cjs"));
+} catch {
+  ({ constantTimeSecretsEqual } = require("../shared_libs/node/security.cjs"));
+}
 
 /**
  * Creates a logger instance with structured logging.
@@ -67,12 +75,7 @@ const functionMap = {
 };
 
 const constantTimeEquals = (providedSecret, expectedSecret) => {
-  const providedBuffer = Buffer.from(providedSecret, "utf8");
-  const expectedBuffer = Buffer.from(expectedSecret, "utf8");
-  if (providedBuffer.length !== expectedBuffer.length) {
-    return false;
-  }
-  return crypto.timingSafeEqual(providedBuffer, expectedBuffer);
+  return constantTimeSecretsEqual(providedSecret, expectedSecret);
 };
 
 /**
@@ -157,7 +160,7 @@ export const callNodeFunction = async (req, res) => {
 
   // Validate function exists
   if (!(functionName in functionMap)) {
-    return res.status(200).json({
+    return res.status(404).json({
       success: false,
       error: "Function Not Found",
       messageKey: "FUNCTION_NOT_FOUND"
@@ -173,7 +176,7 @@ export const callNodeFunction = async (req, res) => {
       return res.status(200).json(result);
     }
     
-    // Definiere formattedResponse mit dem Ergebnis von formatResponse
+    // Define formattedResponse with the output from formatResponse.
     const formattedResponse = formatResponse(result);
     
     logger.info(`Successfully executed function: ${functionName}`, {

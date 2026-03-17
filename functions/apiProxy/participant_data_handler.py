@@ -24,6 +24,32 @@ except ImportError:
     from security_handler import security_handler, get_security_level_for_organization, validate_and_sanitize_input, SecurityLevel
     from course_id_utils import generate_course_hash_id
 
+logger = logging.getLogger(__name__)
+_JWKS_CLIENT_CACHE = {}
+_JWKS_CLIENT_TTL_SECONDS = 300
+
+
+def _get_jwks_client(jwks_uri):
+    """
+    Return a cached PyJWKClient for the given URI.
+    """
+    current_time = time.time()
+    cached = _JWKS_CLIENT_CACHE.get(jwks_uri)
+    if cached and (current_time - cached["created_at"] < _JWKS_CLIENT_TTL_SECONDS):
+        return cached["client"]
+
+    try:
+        client = PyJWKClient(jwks_uri, lifespan=_JWKS_CLIENT_TTL_SECONDS)
+    except TypeError:
+        # Compatibility fallback for PyJWT versions without `lifespan`.
+        client = PyJWKClient(jwks_uri)
+
+    _JWKS_CLIENT_CACHE[jwks_uri] = {
+        "client": client,
+        "created_at": current_time,
+    }
+    return client
+
 
 def select_priority_location(course_locations):
     """
@@ -342,7 +368,7 @@ def authenticate_jwt(token):
 
     def _build_verification_key():
         if jwks_uri:
-            return PyJWKClient(jwks_uri).get_signing_key_from_jwt(token).key
+            return _get_jwks_client(jwks_uri).get_signing_key_from_jwt(token).key
         # Allow escaped newlines for env-var injected PEM values.
         return jwt_public_key.replace("\\n", "\n")
 
@@ -423,8 +449,10 @@ def authenticate_jwt(token):
             'security_level': security_level
         }
     except InvalidTokenError as err:
+        logger.debug("JWT validation failed (%s): %s", err.__class__.__name__, str(err))
         raise ValueError("Invalid JWT token") from err
     except Exception as err:
+        logger.debug("JWT processing failed (%s): %s", err.__class__.__name__, str(err))
         raise ValueError("Invalid JWT token") from err
 
 

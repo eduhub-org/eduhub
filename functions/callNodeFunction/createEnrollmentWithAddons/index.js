@@ -1,6 +1,8 @@
 import { GraphQLClient } from 'graphql-request';
 import { validateAndExtractFormbricksSurvey, buildLabelToChoiceIdMap, matchAddonsFromResponse } from '../lib/formbricks.js';
 
+const normalizeUserId = (value) => String(value ?? '').trim().toLowerCase();
+
 const GET_COURSE_ADDONS = `
   query GetCourseAddons($courseId: Int!) {
     Course_by_pk(id: $courseId) {
@@ -110,6 +112,7 @@ async function fetchFormbricksResponseWithRetry(
   maxRetries = 5,
   retryDelayMs = 2000
 ) {
+  const normalizedUserId = normalizeUserId(userId);
   const responsesUrl = new URL(`${formbricksApiUrl}/api/v1/management/responses`);
   responsesUrl.searchParams.append('surveyId', formbricksSurveyId);
   responsesUrl.searchParams.append('limit', '100');
@@ -126,7 +129,7 @@ async function fetchFormbricksResponseWithRetry(
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       logger.debug(`Fetching Formbricks responses (attempt ${attempt}/${maxRetries})`, {
-        userId: String(userId),
+        userId: normalizedUserId,
         courseId: String(courseId)
       });
 
@@ -155,7 +158,7 @@ async function fetchFormbricksResponseWithRetry(
       logger.info(`Formbricks API returned ${allResponses.length} total responses`, {
         attempt,
         surveyId: formbricksSurveyId,
-        lookingFor: { userId: String(userId), courseId: String(courseId) }
+        lookingFor: { userId: normalizedUserId, courseId: String(courseId) }
       });
 
       // Log first few responses for debugging - check both data and hiddenFields
@@ -192,14 +195,15 @@ async function fetchFormbricksResponseWithRetry(
         // Also check if response has a separate hiddenFields property (for API compatibility)
         const responseUserId = responseData.eduhubUserId || response.hiddenFields?.eduhubUserId;
         const responseCourseId = responseData.eduhubCourseId || response.hiddenFields?.eduhubCourseId;
+        const normalizedResponseUserId = normalizeUserId(responseUserId);
         
-        const matchesUser = responseUserId && String(responseUserId) === String(userId);
+        const matchesUser = normalizedResponseUserId && normalizedResponseUserId === normalizedUserId;
         const matchesCourse = responseCourseId && String(responseCourseId) === String(courseId);
         
         logger.debug('Checking response match', {
           responseId: response.id,
-          responseUserId: responseUserId ? String(responseUserId) : 'undefined',
-          expectedUserId: String(userId),
+          responseUserId: normalizedResponseUserId || 'undefined',
+          expectedUserId: normalizedUserId,
           matchesUser,
           responseCourseId: responseCourseId ? String(responseCourseId) : 'undefined',
           expectedCourseId: String(courseId),
@@ -225,13 +229,14 @@ async function fetchFormbricksResponseWithRetry(
           const responseData = response.data || {};
           const responseUserId = responseData.eduhubUserId || response.hiddenFields?.eduhubUserId;
           const responseCourseId = responseData.eduhubCourseId || response.hiddenFields?.eduhubCourseId;
-          return (responseUserId && String(responseUserId) === String(userId)) || 
+          return (normalizeUserId(responseUserId) === normalizedUserId) || 
                  (responseCourseId && String(responseCourseId) === String(courseId));
         });
 
         if (attempt < maxRetries) {
           logger.warn(`No matching responses found (attempt ${attempt}/${maxRetries}), retrying in ${retryDelayMs}ms...`, {
             userId: String(userId),
+            normalizedUserId,
             courseId: String(courseId),
             totalResponses: allResponses.length,
             partialMatches: partialMatches.length,
@@ -244,6 +249,7 @@ async function fetchFormbricksResponseWithRetry(
         
         logger.error('No matching responses found after all retries', {
           userId: String(userId),
+          normalizedUserId,
           courseId: String(courseId),
           totalResponses: allResponses.length,
           partialMatches: partialMatches.length,
@@ -351,7 +357,10 @@ export default async function createEnrollmentWithAddons(req, logger) {
       };
     }
 
-    if (String(userId) !== String(sessionUserId)) {
+    const normalizedInputUserId = normalizeUserId(userId);
+    const normalizedSessionUserId = normalizeUserId(sessionUserId);
+
+    if (!normalizedInputUserId || !normalizedSessionUserId || normalizedInputUserId !== normalizedSessionUserId) {
       return {
         success: false,
         error: 'User ID mismatch',
@@ -360,7 +369,7 @@ export default async function createEnrollmentWithAddons(req, logger) {
         selectedAddons: []
       };
     }
-    const effectiveUserId = sessionUserId;
+    const effectiveUserId = normalizedSessionUserId;
 
     // Create Hasura GraphQL client
     const client = new GraphQLClient(process.env.HASURA_ENDPOINT, {
@@ -415,8 +424,8 @@ export default async function createEnrollmentWithAddons(req, logger) {
     if (!urlParts) {
       logger.error('Invalid Formbricks survey URL', { formbricksSurveyUrl });
       return {
-        success: false,
-        error: 'Invalid Formbricks survey URL format',
+        success: true,
+        error: 'Enrollment created, but survey URL is invalid so no add-ons were processed.',
         messageKey: 'INVALID_SURVEY_URL',
         enrollmentId,
         selectedAddons: []
@@ -429,8 +438,8 @@ export default async function createEnrollmentWithAddons(req, logger) {
     if (!formbricksApiKey) {
       logger.error('Formbricks API key missing');
       return {
-        success: false,
-        error: 'Formbricks API key not configured',
+        success: true,
+        error: 'Enrollment created, but Formbricks API key is missing so no add-ons were processed.',
         messageKey: 'FORMBRICKS_NOT_CONFIGURED',
         enrollmentId,
         selectedAddons: []
@@ -487,8 +496,8 @@ export default async function createEnrollmentWithAddons(req, logger) {
         });
         // Return early if we can't fetch survey structure - matching won't work without it
         return {
-          success: false,
-          error: 'Failed to fetch Formbricks survey structure. Cannot match addons without choice ID mapping.',
+          success: true,
+          error: 'Enrollment created, but survey structure could not be fetched so no add-ons were processed.',
           messageKey: 'SURVEY_FETCH_FAILED',
           enrollmentId,
           selectedAddons: []
@@ -501,8 +510,8 @@ export default async function createEnrollmentWithAddons(req, logger) {
       });
       // Return early if we can't fetch survey structure - matching won't work without it
       return {
-        success: false,
-        error: `Error fetching Formbricks survey structure: ${error.message}. Cannot match addons without choice ID mapping.`,
+        success: true,
+        error: 'Enrollment created, but survey structure retrieval failed so no add-ons were processed.',
         messageKey: 'SURVEY_FETCH_ERROR',
         enrollmentId,
         selectedAddons: []

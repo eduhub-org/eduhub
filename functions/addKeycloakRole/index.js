@@ -1,13 +1,13 @@
 import KcAdminClient from '@keycloak/keycloak-admin-client';
 import bodyParser from "body-parser";
-import crypto from 'crypto';
+import { createRequire } from 'module';
 
-function secretsMatch(providedSecret, expectedSecret) {
-  if (!providedSecret || !expectedSecret) return false;
-  const providedBuffer = Buffer.from(String(providedSecret), 'utf8');
-  const expectedBuffer = Buffer.from(String(expectedSecret), 'utf8');
-  if (providedBuffer.length !== expectedBuffer.length) return false;
-  return crypto.timingSafeEqual(providedBuffer, expectedBuffer);
+const require = createRequire(import.meta.url);
+let secretsMatch;
+try {
+  ({ secretsMatch } = require('./shared_libs/node/security.cjs'));
+} catch {
+  ({ secretsMatch } = require('../shared_libs/node/security.cjs'));
 }
 
 export const addKeycloakRole = async (req, res) => {

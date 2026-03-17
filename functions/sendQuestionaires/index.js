@@ -1,13 +1,10 @@
 
-const crypto = require("crypto");
 const { createClient } = require("graphqurl");
-
-function secretsMatch(providedSecret, expectedSecret) {
-  if (!providedSecret || !expectedSecret) return false;
-  const providedBuffer = Buffer.from(String(providedSecret), "utf8");
-  const expectedBuffer = Buffer.from(String(expectedSecret), "utf8");
-  if (providedBuffer.length !== expectedBuffer.length) return false;
-  return crypto.timingSafeEqual(providedBuffer, expectedBuffer);
+let secretsMatch;
+try {
+  ({ secretsMatch } = require("./shared_libs/node/security.cjs"));
+} catch {
+  ({ secretsMatch } = require("../shared_libs/node/security.cjs"));
 }
 
 exports.sendQuestionaires = async (req, res) => {

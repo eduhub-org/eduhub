@@ -7,5 +7,5 @@ google-cloud-storage==2.*
 markdown>=3.0.0
 pytest
 jsonschema
-PyJWT>=2.8.0
-cryptography>=42.0.0
+PyJWT==2.8.0
+cryptography==42.0.0
