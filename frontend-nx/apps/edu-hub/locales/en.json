@@ -336,9 +336,10 @@
       "general_achievement_certificate_conditions": "**Online Participation:**\nIf online participation is possible, attendances are only counted as present if the camera is continuously turned on!"
     },
     "sessions": {
-      "show_all_sessions": "Show all sessions",
-      "hide_sessions": "Collapse sessions",
-      "course_sessions": "Course Sessions"
+      "show_all_dates": "Show all dates",
+      "hide_dates": "Collapse dates",
+      "date_singular": "Date",
+      "date_plural": "Dates"
     },
     "attendances": {
       "attendances": "Attendances",

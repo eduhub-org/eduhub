@@ -336,9 +336,10 @@
       "general_achievement_certificate_conditions": "**Online-Teilnahme:**\nWenn eine Online-Teilnahme möglich ist, wird die Teilnahme nur dann als anwesend gewertet, wenn die Kamera eingeschaltet ist."
     },
     "sessions": {
-      "show_all_sessions": "Alle Termine anzeigen",
-      "hide_sessions": "Termine einklappen",
-      "course_sessions": "Kurstermine"
+      "show_all_dates": "Alle Termine anzeigen",
+      "hide_dates": "Termine einklappen",
+      "date_singular": "Termin",
+      "date_plural": "Termine"
     },
     "attendances": {
       "attendances": "Anwesenheiten",
