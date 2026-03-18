@@ -85,6 +85,9 @@ services:
       KEYCLOAK_USER: admin
       KEYCLOAK_PW: admin
       HASURA_ENDPOINT: http://hasura:8080/v1/graphql
+      JWT_ISSUER: http://keycloak:8080/realms/edu-hub
+      JWT_JWKS_URI: http://keycloak:8080/realms/edu-hub/protocol/openid-connect/certs
+      JWT_AUDIENCE: hasura
       HASURA_ADMIN_SECRET: myadminsecretkey
       HASURA_CLOUD_FUNCTION_SECRET: test1234
       BUCKET_NAME: emulated-bucket
