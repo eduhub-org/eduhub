@@ -126,6 +126,24 @@ const validateSecret = (hasuraSecret) => {
 };
 
 /**
+ * Returns a redacted summary of a response for safe logging (avoids persisting URLs, tokens, etc.).
+ * @param {*} response - The raw response object
+ * @returns {Object} Safe summary for logging
+ */
+const redactForLogging = (response) => {
+  if (!response || typeof response !== "object") return { type: typeof response };
+  const summary = { success: response.success, messageKey: response.messageKey };
+  if (response.enrollmentId) summary.hasEnrollmentId = true;
+  if (response.checkoutUrl) summary.hasCheckoutUrl = true;
+  if (response.link) summary.hasLink = true;
+  if (response.filePath) summary.hasFilePath = true;
+  if (response.accessUrl) summary.hasAccessUrl = true;
+  if (response.sessionId) summary.hasSessionId = true;
+  if (response.selectedAddons) summary.addonCount = response.selectedAddons.length;
+  return summary;
+};
+
+/**
  * Standardizes the response format by ensuring success flag is present.
  * @param {*} result - The function result
  * @returns {Object} Standardized response with success flag
@@ -180,7 +198,7 @@ export const callNodeFunction = async (req, res) => {
     const formattedResponse = formatResponse(result);
     
     logger.info(`Successfully executed function: ${functionName}`, {
-      response: formattedResponse
+      response: redactForLogging(formattedResponse)
     });
     
     return res.status(200).json(formattedResponse);

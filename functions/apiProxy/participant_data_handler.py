@@ -363,6 +363,9 @@ def authenticate_jwt(token):
     if not jwt_issuer:
         raise ValueError("JWT issuer is not configured")
 
+    if not jwt_audience:
+        raise ValueError("JWT audience is not configured")
+
     if not jwks_uri and not jwt_public_key:
         raise ValueError("JWT verification key is not configured")
 
@@ -407,14 +410,13 @@ def authenticate_jwt(token):
             "key": verification_key,
             "algorithms": ["RS256"],
             "issuer": jwt_issuer,
+            "audience": jwt_audience,
             "options": {
                 "require": ["exp", "iat", "iss"],
-                "verify_aud": bool(jwt_audience),
+                "verify_aud": True,
             },
             "leeway": 30,
         }
-        if jwt_audience:
-            decode_kwargs["audience"] = jwt_audience
 
         claims = jwt.decode(token, **decode_kwargs)
         organization_id = _normalize_organization_id(claims.get("organization_id"))
@@ -953,7 +955,15 @@ def handle_participants_request(request):
         
         # Fetch organization's funded courses early (needed for hash ID resolution)
         org_courses = get_organization_funded_courses(auth_info['organization_id'], eduhub_client)
-        
+
+        # Enforce JWT course_access restriction when present (empty = all funded courses)
+        allowed_course_ids = set(auth_info.get("course_access") or [])
+        if allowed_course_ids:
+            org_courses = [
+                c for c in org_courses
+                if (c.get("_internalId") or c.get("id")) in allowed_course_ids
+            ]
+
         # Get course ID from path or query params with validation
         path_parts = request.path.strip('/').split('/')
         resolved_info = None
