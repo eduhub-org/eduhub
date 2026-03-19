@@ -98,6 +98,9 @@ resource "google_cloudfunctions2_function" "api_proxy" {
       API_BASE_URL    = "https://${local.eduhub_service_name}.opencampus.sh"
       BUCKET_NAME     = var.project_id
       ENVIRONMENT     = var.environment
+      JWT_ISSUER      = "https://${local.keycloak_service_name}.opencampus.sh/realms/edu-hub"
+      JWT_JWKS_URI    = "https://${local.keycloak_service_name}.opencampus.sh/realms/edu-hub/protocol/openid-connect/certs"
+      JWT_AUDIENCE    = "hasura"
     }
 
     secret_environment_variables {

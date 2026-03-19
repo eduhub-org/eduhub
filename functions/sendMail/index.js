@@ -1,5 +1,11 @@
 const formData = require('form-data');
 const Mailgun = require('mailgun.js');
+let secretsMatch;
+try {
+  ({ secretsMatch } = require('./shared_libs/node/security.cjs'));
+} catch {
+  ({ secretsMatch } = require('../shared_libs/node/security.cjs'));
+}
 
 /**
  * Responds to any HTTP request to send emails via Mailgun.
@@ -8,8 +14,13 @@ const Mailgun = require('mailgun.js');
  * @param {!express:Response} res HTTP response context.
  */
 exports.sendMail = async (req, res) => {
+  const expectedSecret = process.env.HASURA_CLOUD_FUNCTION_SECRET;
+  if (!expectedSecret) {
+    return res.status(500).json({ error: 'Server secret not configured' });
+  }
+
   // Verify the request contains the correct secret header
-  if (process.env.HASURA_CLOUD_FUNCTION_SECRET !== req.headers.secret) {
+  if (!secretsMatch(req.headers.secret, expectedSecret)) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 

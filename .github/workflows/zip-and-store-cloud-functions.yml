@@ -32,14 +32,30 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Replace symlinks with actual files
+        env:
+          CF_FOLDER: ${{ inputs.CLOUD_FUNCTION_FOLDER }}
         run: |
+          set -euo pipefail
+          if [[ -z "${CF_FOLDER}" ]]; then echo "CLOUD_FUNCTION_FOLDER is empty"; exit 1; fi
+          if [[ "${CF_FOLDER}" == /* ]]; then echo "CLOUD_FUNCTION_FOLDER must be relative"; exit 1; fi
+          if [[ "${CF_FOLDER}" == *..* ]]; then echo "CLOUD_FUNCTION_FOLDER must not contain '..'"; exit 1; fi
+          resolved=$(cd "${GITHUB_WORKSPACE}/${CF_FOLDER}" 2>/dev/null && pwd)
+          if [[ -z "${resolved}" || "${resolved}" != "${GITHUB_WORKSPACE}"/* ]]; then echo "CLOUD_FUNCTION_FOLDER resolves outside workspace"; exit 1; fi
+
           # Remove symlinks and copy actual files for apiProxy
-          rm -f ./${{ inputs.CLOUD_FUNCTION_FOLDER }}/apiProxy/api_clients
-          cp -r ./${{ inputs.CLOUD_FUNCTION_FOLDER }}/shared_libs/api_clients ./${{ inputs.CLOUD_FUNCTION_FOLDER }}/apiProxy/
+          rm -f ./${CF_FOLDER}/apiProxy/api_clients
+          cp -r ./${CF_FOLDER}/shared_libs/api_clients ./${CF_FOLDER}/apiProxy/
 
           # Remove symlinks and copy actual files for callPythonFunction
-          rm -f ./${{ inputs.CLOUD_FUNCTION_FOLDER }}/callPythonFunction/api_clients
-          cp -r ./${{ inputs.CLOUD_FUNCTION_FOLDER }}/shared_libs/api_clients ./${{ inputs.CLOUD_FUNCTION_FOLDER }}/callPythonFunction/
+          rm -f ./${CF_FOLDER}/callPythonFunction/api_clients
+          cp -r ./${CF_FOLDER}/shared_libs/api_clients ./${CF_FOLDER}/callPythonFunction/
+
+          # Copy shared Node security helpers into each Node function package
+          for fn in callNodeFunction sendMail updateFromKeycloak addKeycloakRole sendQuestionaires; do
+            rm -rf ./${CF_FOLDER}/$fn/shared_libs
+            mkdir -p ./${CF_FOLDER}/$fn/shared_libs
+            cp -r ./${CF_FOLDER}/shared_libs/node ./${CF_FOLDER}/$fn/shared_libs/
+          done
 
       - name: Zip Archive for callPythonFunction
         uses: thedoctor0/zip-release@main
