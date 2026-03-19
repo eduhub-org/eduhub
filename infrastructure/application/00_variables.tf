@@ -4,10 +4,10 @@
 # Local Variables
 ###
 locals {
-  keycloak_service_name         = "${var.keycloak_service_name_root}${var.service_name_extension}"
-  hasura_service_name           = "${var.hasura_service_name_root}${var.service_name_extension}"
-  eduhub_service_name           = "${var.eduhub_service_name_root}${var.service_name_extension}"
-  eduhub_api_service_name       = "api-${local.eduhub_service_name}"
+  keycloak_service_name   = "${var.keycloak_service_name_root}${var.service_name_extension}"
+  hasura_service_name     = "${var.hasura_service_name_root}${var.service_name_extension}"
+  eduhub_service_name     = "${var.eduhub_service_name_root}${var.service_name_extension}"
+  eduhub_api_service_name = "api-${local.eduhub_service_name}"
 }
 
 ######
