@@ -912,12 +912,15 @@
       "label": "Externe Anmeldung Link",
       "help_text": "URL wo sich Teilnehmer extern anmelden können"
     },
-    "chat_link": {
-      "label": "Kurs-Chat Link",
-      "help_text": "Link zum Kurs-Chat oder zur Kommunikationsplattform"
+    "participant_chat": {
+      "title": "Teilnehmer-Chat",
+      "button_open_element": "Zum Element-Raum",
+      "button_open_mattermost": "Zum Mattermost-Channel",
+      "button_open_chat": "Zum Chat"
     },
     "matrix_room": {
       "button_create": "Matrix-Raum erstellen",
+      "button_creating": "Matrix-Raum wird erstellt …",
       "button_room_exists": "Matrix-Raum vorhanden",
       "dialog_title": "Matrix-Raum erstellen",
       "room_name_label": "Raumname",
@@ -933,7 +936,6 @@
     },
     "email_templates": {
       "label": "E-Mail-Vorlagen",
-      "manage_button": "E-Mail-Vorlagen verwalten",
       "create_button": "E-Mail-Vorlagen erstellen",
       "edit_button": "E-Mail-Vorlagen bearbeiten",
       "external_registration_note": "E-Mail-Vorlagen sind für externe Anmeldungen nicht verfügbar."

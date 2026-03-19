@@ -928,12 +928,15 @@
       "label": "External Registration Link",
       "help_text": "URL where participants can register externally"
     },
-    "chat_link": {
-      "label": "Course Chat Link",
-      "help_text": "Link to the course chat or communication platform"
+    "participant_chat": {
+      "title": "Participant chat",
+      "button_open_element": "To Element room",
+      "button_open_mattermost": "To Mattermost channel",
+      "button_open_chat": "Open chat"
     },
     "matrix_room": {
       "button_create": "Create Matrix Room",
+      "button_creating": "Creating Matrix room …",
       "button_room_exists": "Matrix Room Exists",
       "dialog_title": "Create Matrix Room",
       "room_name_label": "Room Name",
@@ -949,7 +952,6 @@
     },
     "email_templates": {
       "label": "Email Templates",
-      "manage_button": "Manage Email Templates",
       "create_button": "Create Email Templates",
       "edit_button": "Edit Email Templates",
       "external_registration_note": "Email templates are not available for external registration courses."
