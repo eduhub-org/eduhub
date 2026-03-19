@@ -16,6 +16,8 @@ export interface CreateMatrixRoom_createMatrixRoom {
   chatLink: string | null;
   alreadyExists: boolean | null;
   error: string | null;
+  partialSpaceId: string | null;
+  partialRoomId: string | null;
 }
 
 export interface CreateMatrixRoom {

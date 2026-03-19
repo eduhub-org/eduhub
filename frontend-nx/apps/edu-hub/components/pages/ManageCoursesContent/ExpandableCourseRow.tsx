@@ -42,7 +42,6 @@ import InputField from '../../inputs/InputField';
 import DropDownSelector from '../../inputs/DropDownSelector';
 import FileUploadField from '../../inputs/FileUploadField';
 import {
-  UPDATE_COURSE_CHAT_LINK,
   UPDATE_COURSE_ECTS,
   UPDATE_COURSE_EXTERNAL_REGISTRATION_LINK,
   UPDATE_COURSE_MAX_MISSED_SESSION,
@@ -838,20 +837,28 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
 
             {/* 4. Communication Settings - Card Container */}
             <div className="bg-fill-primary border border-border-primary rounded-lg p-4 space-y-4">
-              <InputField
-                variant="material"
-                type="link"
-                label={t('manageCourses.chat_link.label')}
-                placeholder={t('manageCourses.chat_link.label')}
-                itemId={course.id}
-                value={course.chatLink || ''}
-                updateValueMutation={UPDATE_COURSE_CHAT_LINK}
-                refetchQueries={['AdminCourseList']}
-                helpText={t('manageCourses.chat_link.help_text')}
-              />
+              {matrixRoomLink ? (
+                <div>
+                  <h4 className="text-sm font-medium text-label-primary mb-2">
+                    {t('manageCourses.chat_link.label')}
+                  </h4>
+                  <a
+                    href={matrixRoomLink}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-sm underline text-blue-600 hover:text-blue-800 break-all"
+                  >
+                    {matrixRoomLink}
+                  </a>
+                </div>
+              ) : null}
 
               <div className="flex items-center gap-3">
-                <Button onClick={() => setMatrixDialogOpen(true)} filled={Boolean(matrixRoomId)}>
+                <Button
+                  onClick={() => setMatrixDialogOpen(true)}
+                  filled={Boolean(matrixRoomId)}
+                  disabled={Boolean(matrixRoomId)}
+                >
                   <span className="inline-flex items-center gap-2">
                     <MdForum className="w-4 h-4" />
                     {matrixRoomId
@@ -859,26 +866,6 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                       : t('manageCourses.matrix_room.button_create')}
                   </span>
                 </Button>
-                {matrixRoomId && derivedMatrixLink && (
-                  <a
-                    href={derivedMatrixLink}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-sm underline text-blue-600 hover:text-blue-800"
-                  >
-                    {t('manageCourses.matrix_room.open_in_element')}
-                  </a>
-                )}
-                {matrixRoomId && !derivedMatrixLink && matrixRoomLink && (
-                  <a
-                    href={matrixRoomLink}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-sm underline text-blue-600 hover:text-blue-800"
-                  >
-                    {t('manageCourses.chat_link.label')}
-                  </a>
-                )}
               </div>
 
               <div>

@@ -20,6 +20,8 @@ export const CREATE_MATRIX_ROOM = gql`
       chatLink
       alreadyExists
       error
+      partialSpaceId
+      partialRoomId
     }
   }
 `;
