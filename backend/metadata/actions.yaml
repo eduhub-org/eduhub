@@ -58,7 +58,6 @@ actions:
           value: createMatrixRoom
     permissions:
       - role: instructor_access
-      - role: admin-ras
     comment: Creates Matrix program space and course room, then stores matrix ids in Hasura
   - name: createEnrollmentWithAddons
     definition:
