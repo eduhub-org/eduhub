@@ -11,41 +11,35 @@ description: Run ESLint on the EduHub frontend. Use when the user asks to lint c
 cd frontend-nx
 
 # Lint edu-hub app (matches GitHub Action CI)
-npx nx run edu-hub:lint
-
-# Alternative: using yarn (may differ from CI)
-# yarn nx run edu-hub:lint
+yarn lint
 
 # Lint with auto-fix
-npx nx run edu-hub:lint --fix
-
-# Lint rent-a-scientist app
-npx nx run rent-a-scientist:lint
+yarn lint --fix
 ```
 
 ## Alignment with GitHub Action
 
 The GitHub Action (`.github/workflows/frontend-code-checks.yml`) uses:
-- `npx nx run edu-hub:lint`
+- `yarn lint`
 - Node.js 20.x
 - Fresh `yarn install --immutable` before linting
 
 **To match CI results locally:**
-1. Use `npx nx` (as shown in commands above)
+1. Use `yarn lint` (as shown in commands above)
 2. Ensure Node.js 20.x (matches CI)
-3. Clear cache: `npx nx reset` if results differ
+3. Reinstall dependencies with `yarn install --immutable` if results differ
 
 ## Common Issues
 
 ### Many errors? Run with --fix first
 Most formatting issues can be auto-fixed:
 ```bash
-npx nx run edu-hub:lint --fix
+yarn lint --fix
 ```
 
 ### Specific file lint
 ```bash
-npx nx run edu-hub:lint --files=apps/edu-hub/components/MyComponent.tsx
+eslint apps/edu-hub/components/MyComponent.tsx
 ```
 
 ## After Linting

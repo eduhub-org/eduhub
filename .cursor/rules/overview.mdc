@@ -2,10 +2,10 @@
 alwaysApply: true
 ---
 
-### EduHub Monorepo Overview
+### EduHub Repository Overview
 
 - **Project**: EduHub — educational platform for course management, registration, and learning. Repo: [eduhub/eduhub](https://github.com/eduhub/eduhub)
-- **Monorepo**: Nx workspace with frontend and backend separation. Root configs: [package.json](mdc:package.json), [nx.json](mdc:frontend-nx/nx.json)
+- **Repository layout**: Frontend and backend separation in one repository. Root configs: [package.json](mdc:package.json), [frontend-nx/package.json](mdc:frontend-nx/package.json)
 - **Frontend**: Next.js app in `frontend-nx/apps/edu-hub` with TypeScript, Material-UI, GraphQL, i18n. Components organized by feature in [frontend-nx/apps/edu-hub/components/](mdc:frontend-nx/apps/edu-hub/components/)
 - **Backend**: Hasura GraphQL API with PostgreSQL. Schema and migrations in [backend/migrations/](mdc:backend/migrations/), metadata in [backend/metadata/](mdc:backend/metadata/)
 - **Authentication**: Keycloak integration with SSO support. Configuration in [keycloak/](mdc:keycloak/)
@@ -14,7 +14,6 @@ alwaysApply: true
 ### Apps
 
 - **frontend-nx/apps/edu-hub**: Main Next.js application (UI, components, pages, GraphQL integration, i18n)
-- **frontend-nx/apps/rent-a-scientist**: Secondary application for scientist booking platform
 
 ### Key Directories
 
@@ -31,17 +30,17 @@ alwaysApply: true
 
 - **Frontend**: Next.js, React, TypeScript, Material-UI, Apollo GraphQL, next-translate
 - **Backend**: Hasura GraphQL, PostgreSQL, Keycloak, Node.js/Python functions
-- **Development**: Docker, Nx workspace, Yarn, Jest, ESLint, Prettier
+- **Development**: Docker, Yarn, Jest, ESLint, Prettier
 
 ### Development Commands
 
 ```bash
 # Frontend development
 cd frontend-nx
-yarn start               # Start development server (nx serve)
-yarn build               # Build for production (nx build)
-yarn test                # Run tests (nx test)
-yarn nx run edu-hub:lint # Lint edu-hub app
+yarn start     # Start development server
+yarn build     # Build for production
+yarn test      # Run tests
+yarn lint      # Lint edu-hub app
 
 # Backend development
 cd backend
@@ -83,7 +82,7 @@ When ANY task involves database schema changes (adding/removing columns, tables,
 
 4. **Regenerate TypeScript Types**: After ANY GraphQL-related changes, regenerate types by running:
    ```bash
-   cd frontend-nx && GRAPHQL_URI=http://localhost:8080/v1/graphql yarn nx run edu-hub:apollo 2>&1 | tail -50
+   cd frontend-nx && GRAPHQL_URI=http://localhost:8080/v1/graphql yarn apollo
    ```
 
 **IMPORTANT**: Never consider a schema-change task complete until migrations are created AND types are regenerated.

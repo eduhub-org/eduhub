@@ -336,9 +336,10 @@
       "general_achievement_certificate_conditions": "**Online Participation:**\nIf online participation is possible, attendances are only counted as present if the camera is continuously turned on!"
     },
     "sessions": {
-      "show_all_sessions": "Show all sessions",
-      "hide_sessions": "Collapse sessions",
-      "course_sessions": "Course Sessions"
+      "show_all_dates": "Show all dates",
+      "hide_dates": "Collapse dates",
+      "date_singular": "Date",
+      "date_plural": "Dates"
     },
     "attendances": {
       "attendances": "Attendances",
@@ -928,6 +929,21 @@
     "chat_link": {
       "label": "Course Chat Link",
       "help_text": "Link to the course chat or communication platform"
+    },
+    "matrix_room": {
+      "button_create": "Create Matrix Room",
+      "button_room_exists": "Matrix Room Exists",
+      "dialog_title": "Create Matrix Room",
+      "room_name_label": "Room Name",
+      "description_label": "Topic / Description",
+      "space_name_label": "Program Space Name",
+      "space_will_be_created_hint": "No program Space exists yet — it will be created automatically.",
+      "error_no_config": "Matrix configuration is incomplete. Please contact an administrator.",
+      "error_invalid_input": "Please check your input values.",
+      "error_creation_failed": "Matrix room creation failed",
+      "error_unknown": "An unknown error occurred while creating the Matrix room.",
+      "success_created": "Matrix room created successfully.",
+      "open_in_element": "Open in Element"
     },
     "email_templates": {
       "label": "Email Templates",
@@ -1722,6 +1738,18 @@
     "title": "Title",
     "delete": "Delete",
     "upload": "Upload"
+  },
+  "AddonValidationDialog": {
+    "title": "Add-on Validation",
+    "close": "Close",
+    "no_addons_found": "No add-ons found.",
+    "price_label": "Price",
+    "description_label": "Description",
+    "question_id": "Question ID",
+    "choice_id": "Choice ID",
+    "cancel": "Cancel",
+    "saving": "Saving...",
+    "save_and_create_stripe": "Save and create Stripe products"
   },
   "pricing_summary": {
     "title": "Pricing Summary",

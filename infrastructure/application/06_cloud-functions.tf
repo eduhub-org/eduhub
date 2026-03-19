@@ -98,6 +98,9 @@ resource "google_cloudfunctions2_function" "api_proxy" {
       API_BASE_URL    = "https://${local.eduhub_service_name}.opencampus.sh"
       BUCKET_NAME     = var.project_id
       ENVIRONMENT     = var.environment
+      JWT_ISSUER      = "https://${local.keycloak_service_name}.opencampus.sh/realms/edu-hub"
+      JWT_JWKS_URI    = "https://${local.keycloak_service_name}.opencampus.sh/realms/edu-hub/protocol/openid-connect/certs"
+      JWT_AUDIENCE    = "hasura"
     }
 
     secret_environment_variables {
@@ -307,6 +310,11 @@ resource "google_cloudfunctions2_function" "call_node_function" {
       FRONTEND_URL              = "https://${local.eduhub_service_name}.opencampus.sh"
       STORAGE_BUCKET_PUBLIC_URL = "https://storage.googleapis.com/${var.project_id}"
       FORMBRICKS_API_URL        = var.formbricks_api_url
+      MATRIX_HOMESERVER_URL     = var.matrix_homeserver_url
+      MATRIX_SERVER_NAME        = var.matrix_server_name
+      MATRIX_ELEMENT_CLIENT_URL = var.matrix_element_client_url
+      MATRIX_MAIN_SPACE_ID      = var.matrix_main_space_id
+      MATRIX_ADMIN_USER_ID      = var.matrix_admin_user_id
     }
 
     secret_environment_variables {
@@ -341,6 +349,13 @@ resource "google_cloudfunctions2_function" "call_node_function" {
       key        = "STRIPE_SECRET_KEY"
       project_id = var.project_id
       secret     = google_secret_manager_secret.stripe_secret_key.secret_id
+      version    = "latest"
+    }
+
+    secret_environment_variables {
+      key        = "MATRIX_ADMIN_ACCESS_TOKEN"
+      project_id = var.project_id
+      secret     = google_secret_manager_secret.matrix_admin_access_token.secret_id
       version    = "latest"
     }
 
@@ -379,6 +394,13 @@ resource "google_secret_manager_secret_iam_member" "call_node_function_hasura_ad
   role       = "roles/secretmanager.secretAccessor"
   member     = "serviceAccount:${google_service_account.custom_cloud_function_account.email}"
   depends_on = [google_secret_manager_secret.hasura_graphql_admin_key]
+}
+
+resource "google_secret_manager_secret_iam_member" "call_node_function_matrix_admin_access_token" {
+  secret_id  = google_secret_manager_secret.matrix_admin_access_token.id
+  role       = "roles/secretmanager.secretAccessor"
+  member     = "serviceAccount:${google_service_account.custom_cloud_function_account.email}"
+  depends_on = [google_secret_manager_secret.matrix_admin_access_token]
 }
 
 

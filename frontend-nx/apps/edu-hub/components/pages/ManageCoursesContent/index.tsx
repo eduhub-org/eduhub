@@ -34,11 +34,6 @@ import ExpandableCourseRow from './ExpandableCourseRow';
 import { useParallelQueries } from '../../../hooks/useParallelQueries';
 import { CourseEnrollmentStatus_enum, order_by } from '../../../__generated__/globalTypes';
 import { useTranslations, useLocale } from 'next-intl';
-import draftPie from '../../../public/images/course/status/draft.svg';
-import readyForPublicationPie from '../../../public/images/course/status/ready-for-publication.svg';
-import readyForApplicationPie from '../../../public/images/course/status/ready-for-application.svg';
-import applicantsInvitedPie from '../../../public/images/course/status/applicants-invited.svg';
-import participantsRatedPie from '../../../public/images/course/status/participants-rated.svg';
 import { CourseStatus_enum, LocationOption_enum } from '../../../__generated__/globalTypes';
 import InputField from '../../inputs/InputField';
 import { UPDATE_COURSE_PROPERTY, INSERT_COURSE } from '../../../queries/mutateCourse';
@@ -510,37 +505,37 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
       case CourseStatus_enum.DRAFT:
         return (
           <span title="draft">
-            <img src={draftPie} alt="draft" />
+            <img src="/images/course/status/draft.svg" alt="draft" />
           </span>
         );
       case CourseStatus_enum.READY_FOR_PUBLICATION:
         return (
           <span title="ready for publication">
-            <img src={readyForPublicationPie} alt="ready for publication" />
+            <img src="/images/course/status/ready-for-publication.svg" alt="ready for publication" />
           </span>
         );
       case CourseStatus_enum.READY_FOR_APPLICATION:
         return (
           <span title="ready for application">
-            <img src={readyForApplicationPie} alt="ready for application" />
+            <img src="/images/course/status/ready-for-application.svg" alt="ready for application" />
           </span>
         );
       case CourseStatus_enum.APPLICANTS_INVITED:
         return (
           <span title="applicants invited">
-            <img src={applicantsInvitedPie} alt="applicants invited" />
+            <img src="/images/course/status/applicants-invited.svg" alt="applicants invited" />
           </span>
         );
       case CourseStatus_enum.PARTICIPANTS_RATED:
         return (
           <span title="participants rated">
-            <img src={participantsRatedPie} alt="participants rated" />
+            <img src="/images/course/status/participants-rated.svg" alt="participants rated" />
           </span>
         );
       default:
         return (
           <span title="default">
-            <img src={draftPie} alt="default" />
+            <img src="/images/course/status/draft.svg" alt="default" />
           </span>
         );
     }

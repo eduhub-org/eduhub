@@ -46,8 +46,6 @@ import {
   InsertSessionAddressVariables,
 } from '../../../../queries/__generated__/InsertSessionAddress';
 import InputField from '../../../inputs/InputField';
-import checkmark from '../../../../public/images/course/checkmark.svg';
-
 interface IProps {
   course: ManagedCourse_Course_by_pk;
   qResult: QueryResult<any, any>;
@@ -201,7 +199,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
                     return (
                       <li key={goalKey} className="pl-6 mb-6">
                         <div className="flex">
-                          <img src={checkmark} alt="check mark" className="mr-2 inline-block" />
+                          <img src="/images/course/checkmark.svg" alt="check mark" className="mr-2 inline-block" />
                           <div className="ml-2">
                             {goal.split('\n').map((line) => {
                               const lineKey = `${goalKey}-${line.trim().substring(0, 20).replace(/\s+/g, '-')}`;

@@ -2,10 +2,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { FC } from 'react';
 import { useTranslations } from 'next-intl';
-import facebookIcon from '../../public/images/share/facebook-icon.svg';
-import instagramIcon from '../../public/images/share/instagram-icon.svg';
-import dlcLogo from '../../public/images/share/logo_dlc.svg';
-import foerderLogo from '../../public/images/share/foerderlogos_2.svg';
 
 export const Footer: FC = () => {
   const t = useTranslations('footer');
@@ -51,7 +47,7 @@ export const Footer: FC = () => {
             <div className="flex flex-col sm:flex-row items-center sm:items-end gap-8 sm:gap-4 bg-white p-8 sm:p-4 rounded">
               <div className="flex items-end w-[200px] h-[80px]">
                 <Image 
-                  src={dlcLogo} 
+                  src="/images/share/logo_dlc.svg" 
                   alt="DLC Logo" 
                   width={200} 
                   height={80}
@@ -61,7 +57,7 @@ export const Footer: FC = () => {
               </div>
               <div className="flex items-end w-[400px] h-[80px]">
                 <Image 
-                  src={foerderLogo} 
+                  src="/images/share/foerderlogos_2.svg" 
                   alt="Förder Logo" 
                   width={400} 
                   height={80}
@@ -79,12 +75,12 @@ export const Footer: FC = () => {
           <div className="flex items-center">
             <a href="https://www.instagram.com/opencampus_sh/" target="_blank" rel="noopener noreferrer">
               <div className="flex items-center w-[23px] h-[23px]">
-                <Image src={instagramIcon} alt="Instagram" width={23} height={23} unoptimized className="w-full h-full object-contain" />
+                <Image src="/images/share/instagram-icon.svg" alt="Instagram" width={23} height={23} unoptimized className="w-full h-full object-contain" />
               </div>
             </a>
             <a href="https://de-de.facebook.com/opencampus.sh/" target="_blank" rel="noopener noreferrer">
               <div className="ml-6 sm:ml-20 sm:mr-10 flex items-center w-[23px] h-[23px]">
-                <Image src={facebookIcon} alt="Facebook" width={23} height={23} unoptimized className="w-full h-full object-contain" />
+                <Image src="/images/share/facebook-icon.svg" alt="Facebook" width={23} height={23} unoptimized className="w-full h-full object-contain" />
               </div>
             </a>
           </div>

@@ -4,12 +4,13 @@
     "next/core-web-vitals", // Next.js recommended rules including React Hooks
     "../../.eslintrc.json" // Extend from the shared root configuration
   ],
-  "ignorePatterns": ["!**/*", ".next", "next-env.d.ts"],
+  "ignorePatterns": [".next", "next-env.d.ts"],
   "overrides": [
     {
       "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
       "rules": {
         "@next/next/no-html-link-for-pages": ["error", "apps/edu-hub/pages"],
+        "@next/next/no-img-element": "off",
         "react/react-in-jsx-scope": "off",
         "react/prop-types": "off",
         "@typescript-eslint/no-require-imports": "off"

@@ -1,15 +1,11 @@
 const { join } = require('path');
 const defaultTheme = require('tailwindcss/defaultTheme');
 
-// available since Nx v 12.5
-const { createGlobPatternsForDependencies } = require('@nx/next/tailwind');
-
 module.exports = {
   plugins: [require('@tailwindcss/typography')],
   content: [
     join(__dirname, '/pages/**/*.{js,ts,jsx,tsx}'),
     join(__dirname, '/components/**/*.{js,ts,jsx,tsx}'),
-    ...createGlobPatternsForDependencies(__dirname),
   ],
   theme: {
     extend: {

@@ -96,7 +96,7 @@
   "participants": [
     {
       "id": "urn:hash:…",
-      "enrollmentStatus": "ENROLLED",
+      "enrollmentStatus": "REGISTERED",
       "enrollmentDate": "2025-05-01T12:34:56Z",
       "occupationStatus": "STUDENT",
       "completionStatus": {

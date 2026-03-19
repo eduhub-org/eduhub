@@ -1,4 +1,5 @@
 import winston from "winston";
+import { createRequire } from "module";
 import createCertificate from "./createCertificate/index.js";
 import getSignedUrl from "./getSignedUrl/index.js";
 import saveFile from "./saveFile/index.js";
@@ -19,6 +20,16 @@ import createStripeCheckout from "./createStripeCheckout/index.js";
 import createStripeBasePrice from "./createStripeBasePrice/index.js";
 import createStripeAddonPrices from "./createStripeAddonPrices/index.js";
 import createEnrollmentWithAddons from "./createEnrollmentWithAddons/index.js";
+import createMatrixRoom from "./createMatrixRoom/index.js";
+import updateMatrixInstructorPowerLevel from "./updateMatrixInstructorPowerLevel/index.js";
+
+const require = createRequire(import.meta.url);
+let constantTimeSecretsEqual;
+try {
+  ({ constantTimeSecretsEqual } = require("./shared_libs/node/security.cjs"));
+} catch {
+  ({ constantTimeSecretsEqual } = require("../shared_libs/node/security.cjs"));
+}
 
 /**
  * Creates a logger instance with structured logging.
@@ -58,7 +69,13 @@ const functionMap = {
   createStripeCheckout,
   createStripeBasePrice,
   createStripeAddonPrices,
-  createEnrollmentWithAddons
+  createEnrollmentWithAddons,
+  createMatrixRoom,
+  updateMatrixInstructorPowerLevel
+};
+
+const constantTimeEquals = (providedSecret, expectedSecret) => {
+  return constantTimeSecretsEqual(providedSecret, expectedSecret);
 };
 
 /**
@@ -68,10 +85,35 @@ const functionMap = {
  */
 const validateSecret = (hasuraSecret) => {
   const hasuraCloudFunctionSecret = process.env.HASURA_CLOUD_FUNCTION_SECRET;
-  
-  if (hasuraSecret !== hasuraCloudFunctionSecret) {
+
+  if (!hasuraCloudFunctionSecret || typeof hasuraCloudFunctionSecret !== "string" || hasuraCloudFunctionSecret.trim() === "") {
     return {
       isValid: false,
+      statusCode: 500,
+      error: {
+        success: false,
+        error: "Server secret is not configured.",
+        messageKey: "SERVER_MISCONFIGURED"
+      }
+    };
+  }
+
+  if (!hasuraSecret || typeof hasuraSecret !== "string") {
+    return {
+      isValid: false,
+      statusCode: 401,
+      error: {
+        success: false,
+        error: "Missing secret header.",
+        messageKey: "MISSING_SECRET"
+      }
+    };
+  }
+
+  if (!constantTimeEquals(hasuraSecret, hasuraCloudFunctionSecret)) {
+    return {
+      isValid: false,
+      statusCode: 401,
       error: {
         success: false,
         error: "Invalid secret provided.",
@@ -81,6 +123,24 @@ const validateSecret = (hasuraSecret) => {
   }
   
   return { isValid: true };
+};
+
+/**
+ * Returns a redacted summary of a response for safe logging (avoids persisting URLs, tokens, etc.).
+ * @param {*} response - The raw response object
+ * @returns {Object} Safe summary for logging
+ */
+const redactForLogging = (response) => {
+  if (!response || typeof response !== "object") return { type: typeof response };
+  const summary = { success: response.success, messageKey: response.messageKey };
+  if (response.enrollmentId) summary.hasEnrollmentId = true;
+  if (response.checkoutUrl) summary.hasCheckoutUrl = true;
+  if (response.link) summary.hasLink = true;
+  if (response.filePath) summary.hasFilePath = true;
+  if (response.accessUrl) summary.hasAccessUrl = true;
+  if (response.sessionId) summary.hasSessionId = true;
+  if (response.selectedAddons) summary.addonCount = response.selectedAddons.length;
+  return summary;
 };
 
 /**
@@ -107,21 +167,18 @@ const formatResponse = (result) => {
  */
 export const callNodeFunction = async (req, res) => {
   const functionName = req.headers.name;
-  
-  logger.info(`Received request for function: ${functionName}`, {
-    headers: req.headers,
-    body: req.body
-  });
 
   // Validate secret
   const secretValidation = validateSecret(req.headers.secret);
   if (!secretValidation.isValid) {
-    return res.status(200).json(secretValidation.error);
+    return res.status(secretValidation.statusCode).json(secretValidation.error);
   }
+
+  logger.info(`Received request for function: ${functionName}`);
 
   // Validate function exists
   if (!(functionName in functionMap)) {
-    return res.status(200).json({
+    return res.status(404).json({
       success: false,
       error: "Function Not Found",
       messageKey: "FUNCTION_NOT_FOUND"
@@ -137,11 +194,11 @@ export const callNodeFunction = async (req, res) => {
       return res.status(200).json(result);
     }
     
-    // Definiere formattedResponse mit dem Ergebnis von formatResponse
+    // Define formattedResponse with the output from formatResponse.
     const formattedResponse = formatResponse(result);
     
     logger.info(`Successfully executed function: ${functionName}`, {
-      response: formattedResponse
+      response: redactForLogging(formattedResponse)
     });
     
     return res.status(200).json(formattedResponse);
@@ -155,14 +212,9 @@ export const callNodeFunction = async (req, res) => {
 
     if (req.body.request_query?.includes('mutation')) {
       return res.status(200).json({
-        data: {
-          [functionName]: {
-            error: error.message || "Internal Server Error",
-            messageKey: "INTERNAL_SERVER_ERROR",
-            anonymizedUserId: null,
-            steps: null
-          }
-        }
+        success: false,
+        error: error.message || "Internal Server Error",
+        messageKey: error.messageKey || "INTERNAL_SERVER_ERROR",
       });
     }
     

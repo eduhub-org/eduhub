@@ -127,6 +127,7 @@ export const ADMIN_COURSE_FRAGMENT = gql`
     achievementCertificatePossible
     attendanceCertificatePossible
     chatLink
+    matrixRoomId
     registrationType
     formbricksEnrollmentSurveyUrl
     basePrice
@@ -135,6 +136,7 @@ export const ADMIN_COURSE_FRAGMENT = gql`
     stripePriceId
     Program {
       ...ProgramFragmentMinimumProperties
+      matrixSpaceId
     }
   }
 `;
