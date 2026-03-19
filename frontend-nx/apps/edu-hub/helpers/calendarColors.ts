@@ -23,7 +23,7 @@ export const LOCATION_COLORS: Record<string, { background: string; border: strin
     border: '#FFA665',
     text: '#c45f1a',
   },
-  [LocationOption_enum.HAMBURG]: {
+  HAMBURG: {
     background: '#9c6bff20',
     border: '#9c6bff',
     text: '#5a2e9e',
