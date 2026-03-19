@@ -27,7 +27,7 @@ module "hasura_service" {
     memory = var.hasura_memory_limit
   }
   container_concurrency = "80"
-  timeout_seconds      = 300  # Allow Hasura migrations to complete during startup (default 120s was too short)
+  timeout_seconds       = 300 # Allow Hasura migrations to complete during startup (default 120s was too short)
 
   service_annotations = {
     "run.googleapis.com/client-name" = "terraform"
