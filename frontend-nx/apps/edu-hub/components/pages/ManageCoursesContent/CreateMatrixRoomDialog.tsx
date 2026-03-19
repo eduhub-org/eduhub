@@ -160,7 +160,9 @@ const CreateMatrixRoomDialog: FC<CreateMatrixRoomDialogProps> = ({ open, course,
         <Button onClick={onClose}>{t("manageCourses.cancel")}</Button>
         {!hasCourseRoom && (
           <Button filled onClick={handleCreate} disabled={!canSubmit}>
-            {loading ? t("manageCourses.common.saving") : t("manageCourses.matrix_room.button_create")}
+            {loading
+              ? t("manageCourses.matrix_room.button_creating")
+              : t("manageCourses.matrix_room.button_create")}
           </Button>
         )}
       </DialogActions>

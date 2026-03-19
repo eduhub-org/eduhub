@@ -647,7 +647,24 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
       ? `${matrixElementClientUrl}/#/room/${matrixRoomId}`
       : `https://matrix.to/#/${matrixRoomId}`;
   }
-  const matrixRoomLink = derivedMatrixLink || course.chatLink || '';
+  const legacyChatUrl = course.chatLink?.trim() ? course.chatLink.trim() : '';
+  const openParticipantChatHref = derivedMatrixLink || legacyChatUrl || '';
+
+  const isLikelyMattermostChatUrl = (url: string) => {
+    try {
+      const host = new URL(url).hostname.toLowerCase();
+      return host.includes('mattermost') || host.includes('chat.opencampus');
+    } catch {
+      return false;
+    }
+  };
+
+  let participantChatButtonKey = 'manageCourses.participant_chat.button_open_chat';
+  if (matrixRoomId) {
+    participantChatButtonKey = 'manageCourses.participant_chat.button_open_element';
+  } else if (legacyChatUrl && isLikelyMattermostChatUrl(legacyChatUrl)) {
+    participantChatButtonKey = 'manageCourses.participant_chat.button_open_mattermost';
+  }
 
   return (
     <div className="w-full flex-1 min-w-0 light">
@@ -840,37 +857,33 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
               />
             </div>
 
-            {/* 4. Chat / Matrix Room - Card Container */}
+            {/* 4. Participant chat (Matrix / legacy channel) */}
             <div className="bg-fill-primary border border-border-primary rounded-lg p-4 space-y-4">
-              {matrixRoomLink ? (
-                <div>
-                  <h4 className="text-sm font-medium text-label-primary mb-2">
-                    {t('manageCourses.chat_link.label')}
-                  </h4>
-                  <a
-                    href={matrixRoomLink}
+              <h4 className="text-sm font-medium text-label-primary">
+                {t('manageCourses.participant_chat.title')}
+              </h4>
+              <div className="flex items-center gap-3 flex-wrap">
+                {openParticipantChatHref ? (
+                  <Button
+                    as="a"
+                    href={openParticipantChatHref}
                     target="_blank"
                     rel="noreferrer"
-                    className="text-sm underline text-blue-600 hover:text-blue-800 break-all"
+                    filled
                   >
-                    {matrixRoomLink}
-                  </a>
-                </div>
-              ) : null}
-
-              <div className="flex items-center gap-3">
-                <Button
-                  onClick={() => setMatrixDialogOpen(true)}
-                  filled={Boolean(matrixRoomId)}
-                  disabled={Boolean(matrixRoomId)}
-                >
-                  <span className="inline-flex items-center gap-2">
-                    <MdForum className="w-4 h-4" />
-                    {matrixRoomId
-                      ? t('manageCourses.matrix_room.button_room_exists')
-                      : t('manageCourses.matrix_room.button_create')}
-                  </span>
-                </Button>
+                    <span className="inline-flex items-center gap-2">
+                      <MdForum className="w-4 h-4" />
+                      {t(participantChatButtonKey)}
+                    </span>
+                  </Button>
+                ) : (
+                  <Button onClick={() => setMatrixDialogOpen(true)}>
+                    <span className="inline-flex items-center gap-2">
+                      <MdForum className="w-4 h-4" />
+                      {t('manageCourses.matrix_room.button_create')}
+                    </span>
+                  </Button>
+                )}
               </div>
             </div>
 
