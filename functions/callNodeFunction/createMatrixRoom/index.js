@@ -244,12 +244,15 @@ const getMatrixConfig = () => {
     return null;
   }
 
+  const resolvedAdminUserId = adminUserId ? toMatrixUserId(adminUserId, serverName) : null;
+
   return {
     homeserverUrl: normalizeBaseUrl(homeserverUrl),
     token,
     elementClientUrl: normalizeBaseUrl(elementClientUrl),
     mainSpaceId,
     serverName,
+    adminUserId: resolvedAdminUserId,
   };
 };
 
@@ -361,9 +364,19 @@ export default async function createMatrixRoom(req, logger) {
       error: "Matrix configuration is incomplete",
     };
   }
+  if (!matrixConfig.adminUserId) {
+    return {
+      success: false,
+      messageKey: "MATRIX_CONFIG_MISSING",
+      error: "MATRIX_ADMIN_USER_ID is required for room creation (power-level provisioning)",
+    };
+  }
 
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), MATRIX_FETCH_TIMEOUT_MS);
+
+  let partialSpaceId = null;
+  let partialRoomId = null;
 
   try {
     const hasuraClient = ensureHasuraClient();
@@ -442,16 +455,6 @@ export default async function createMatrixRoom(req, logger) {
         },
       });
 
-      await linkParentAndChild({
-        homeserverUrl: matrixConfig.homeserverUrl,
-        token: matrixConfig.token,
-        serverName: matrixConfig.serverName,
-        parentSpaceId: matrixConfig.mainSpaceId,
-        childRoomId: createdSpaceId,
-        canonical: true,
-        signal: controller.signal,
-      });
-
       const setSpaceResult = await hasuraClient.request({
         document: SET_PROGRAM_SPACE_IF_EMPTY,
         variables: {
@@ -471,6 +474,25 @@ export default async function createMatrixRoom(req, logger) {
         });
         spaceId = latestProgram?.Program_by_pk?.matrixSpaceId || createdSpaceId;
       }
+      partialSpaceId = spaceId;
+
+      try {
+        await linkParentAndChild({
+          homeserverUrl: matrixConfig.homeserverUrl,
+          token: matrixConfig.token,
+          serverName: matrixConfig.serverName,
+          parentSpaceId: matrixConfig.mainSpaceId,
+          childRoomId: createdSpaceId,
+          canonical: true,
+          signal: controller.signal,
+        });
+      } catch (linkError) {
+        logger.warn("Program space created and persisted but linking to main space failed", {
+          programId: program.id,
+          spaceId: createdSpaceId,
+          error: linkError.message,
+        });
+      }
     }
 
     if (!spaceId) {
@@ -480,6 +502,7 @@ export default async function createMatrixRoom(req, logger) {
         error: "Unable to resolve program space id",
       };
     }
+    partialSpaceId = spaceId;
 
     const roomAliasLocalPart = sanitizeAliasLocalPart(`edu-course-${course.id}`);
     const instructorUsers = await buildInstructorUsersMap({
@@ -489,6 +512,10 @@ export default async function createMatrixRoom(req, logger) {
       logger,
       signal: controller.signal,
     });
+    const powerLevelUsers = {
+      ...(matrixConfig.adminUserId && { [matrixConfig.adminUserId]: 100 }),
+      ...instructorUsers,
+    };
     const roomId = await createRoomWithAlias({
       homeserverUrl: matrixConfig.homeserverUrl,
       token: matrixConfig.token,
@@ -507,7 +534,7 @@ export default async function createMatrixRoom(req, logger) {
           {
             type: "m.room.power_levels",
             content: {
-              users: instructorUsers,
+              users: powerLevelUsers,
               users_default: 0,
               events_default: 0,
               state_default: 50,
@@ -520,6 +547,7 @@ export default async function createMatrixRoom(req, logger) {
         ],
       },
     });
+    partialRoomId = roomId;
 
     await linkParentAndChild({
       homeserverUrl: matrixConfig.homeserverUrl,
@@ -566,20 +594,27 @@ export default async function createMatrixRoom(req, logger) {
       alreadyExists: persistedRoomId !== roomId,
     };
   } catch (error) {
+    if (partialSpaceId) error.partialSpaceId = partialSpaceId;
+    if (partialRoomId) error.partialRoomId = partialRoomId;
     logger.error("Failed to create matrix room", {
       courseId,
       role,
       error: error.message,
       errcode: error.errcode,
       status: error.status,
+      ...(partialSpaceId && { partialSpaceId }),
+      ...(partialRoomId && { partialRoomId }),
     });
-    return {
+    const response = {
       success: false,
       messageKey: error.name === "AbortError" ? "MATRIX_TIMEOUT" : "MATRIX_CREATION_FAILED",
       error: error.name === "AbortError"
         ? "Matrix request timed out"
         : (error.message || "Failed to create Matrix room"),
     };
+    if (partialSpaceId) response.partialSpaceId = partialSpaceId;
+    if (partialRoomId) response.partialRoomId = partialRoomId;
+    return response;
   } finally {
     clearTimeout(timeout);
   }

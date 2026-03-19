@@ -528,6 +528,8 @@ type CreateMatrixRoomResult {
   chatLink: String
   alreadyExists: Boolean
   error: String
+  partialSpaceId: String
+  partialRoomId: String
 }
 
 type CreateEnrollmentWithAddonsResult {

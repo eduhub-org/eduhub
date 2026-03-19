@@ -1052,6 +1052,7 @@ export enum LocationOption_constraint {
 }
 
 export enum LocationOption_enum {
+  HAMBURG = "HAMBURG",
   HEIDE = "HEIDE",
   KIEL = "KIEL",
   ONLINE = "ONLINE",

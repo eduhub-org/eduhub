@@ -44,6 +44,15 @@ const StatusCard: FC<{
   );
 };
 
+const buildCourseChatLink = (course: Course_Course_by_pk & { matrixRoomId?: string | null }): string | null => {
+  const matrixRoomId = course.matrixRoomId;
+  const elementBaseUrl = process.env.NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL?.replace(/\/+$/, '');
+  if (matrixRoomId && elementBaseUrl) {
+    return `${elementBaseUrl}/#/room/${matrixRoomId}`;
+  }
+  return course.chatLink ?? null;
+};
+
 /**
  * Component that displays course resource access buttons for confirmed/completed enrollments.
  * Shows direct links to course chat and online meeting when available.
@@ -54,16 +63,19 @@ const StatusCard: FC<{
 const CourseLinkInfos: FC<{ course: Course_Course_by_pk }> = ({ course }) => {
   const t = useTranslations('course');
 
+  const chatLink = buildCourseChatLink(course);
   const onlineLocation = course.CourseLocations?.find((location) => location.locationOption === 'ONLINE');
 
   return (
     <div className="flex flex-col justify-between items-center w-full">
-      <div className="mb-10">
-        <Button className="bg-blue-200" as="a" href={course.chatLink ?? '#'} filled inverted>
-          {t('general.to_course_chat')}
-        </Button>
-      </div>
-      {onlineLocation && onlineLocation.defaultSessionAddress && (
+      {chatLink && (
+        <div className="mb-10">
+          <Button className="bg-blue-200" as="a" href={chatLink} filled inverted>
+            {t('general.to_course_chat')}
+          </Button>
+        </div>
+      )}
+      {onlineLocation?.defaultSessionAddress && (
         <div className="">
           <Button className="bg-blue-200" as="a" href={onlineLocation.defaultSessionAddress ?? '#'} filled inverted>
             {t('general.to_online_meeting')}
