@@ -123,7 +123,8 @@
     "location": {
       "ONLINE": "Online",
       "KIEL": "Kiel",
-      "HEIDE": "Heide"
+      "HEIDE": "Heide",
+      "HAMBURG": "Hamburg"
     },
     "type_name_or_email_minimum_3_letters": "Gib mindestens 3 Buchstaben ein.",
     "select_user_dialog": {
@@ -573,7 +574,8 @@
       "label": "Veranstaltungsort",
       "ONLINE": "Online",
       "KIEL": "Kiel",
-      "HEIDE": "Heide"
+      "HEIDE": "Heide",
+      "HAMBURG": "Hamburg"
     },
     "address": {
       "label": "Link oder Adresse",
@@ -1229,7 +1231,8 @@
       "label": "Veranstaltungsort",
       "ONLINE": "Online",
       "KIEL": "Kiel",
-      "HEIDE": "Heide"
+      "HEIDE": "Heide",
+      "HAMBURG": "Hamburg"
     },
     "address": {
       "label": "Link oder Adresse",
@@ -1670,7 +1673,8 @@
     "type_selection": {
       "KIEL": "Kiel",
       "ONLINE": "Online",
-      "HEIDE": "Heide"
+      "HEIDE": "Heide",
+      "HAMBURG": "Hamburg"
     }
   },
   "manageEmailTemplates": {
