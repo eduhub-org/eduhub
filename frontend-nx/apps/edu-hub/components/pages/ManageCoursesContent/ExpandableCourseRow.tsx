@@ -641,7 +641,12 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
 
   const matrixRoomId = (course as any).matrixRoomId as string | undefined;
   const matrixElementClientUrl = process.env.NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL?.replace(/\/+$/, '');
-  const derivedMatrixLink = matrixRoomId && matrixElementClientUrl ? `${matrixElementClientUrl}/#/room/${matrixRoomId}` : '';
+  let derivedMatrixLink = '';
+  if (matrixRoomId) {
+    derivedMatrixLink = matrixElementClientUrl
+      ? `${matrixElementClientUrl}/#/room/${matrixRoomId}`
+      : `https://matrix.to/#/${matrixRoomId}`;
+  }
   const matrixRoomLink = derivedMatrixLink || course.chatLink || '';
 
   return (
@@ -835,7 +840,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
               />
             </div>
 
-            {/* 4. Communication Settings - Card Container */}
+            {/* 4. Chat / Matrix Room - Card Container */}
             <div className="bg-fill-primary border border-border-primary rounded-lg p-4 space-y-4">
               {matrixRoomLink ? (
                 <div>
@@ -867,33 +872,34 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                   </span>
                 </Button>
               </div>
+            </div>
 
-              <div>
-                <h4 className="text-sm font-medium text-label-primary mb-2">
-                  {t('manageCourses.email_templates.label')}
-                </h4>
-                <button
-                  onClick={handleManageEmailTemplates}
-                  disabled={isExternalRegistration}
-                  className={`flex items-center space-x-2 px-4 py-2 rounded ${
-                    isExternalRegistration
-                      ? 'bg-fill-disabled text-label-disabled cursor-not-allowed'
-                      : 'bg-blue-600 text-white hover:bg-blue-700'
-                  } transition-colors`}
-                >
-                  <MdEmail className="w-5 h-5" />
-                  <span>
-                    {hasCustomTemplates
-                      ? t('manageCourses.email_templates.edit_button')
-                      : t('manageCourses.email_templates.create_button')}
-                  </span>
-                </button>
-                {isExternalRegistration && (
-                  <p className="text-sm text-label-secondary mt-1">
-                    {t('manageCourses.email_templates.external_registration_note')}
-                  </p>
-                )}
-              </div>
+            {/* 5. Email Templates - Card Container */}
+            <div className="bg-fill-primary border border-border-primary rounded-lg p-4 space-y-4">
+              <h4 className="text-sm font-medium text-label-primary mb-2">
+                {t('manageCourses.email_templates.label')}
+              </h4>
+              <button
+                onClick={handleManageEmailTemplates}
+                disabled={isExternalRegistration}
+                className={`flex items-center space-x-2 px-4 py-2 rounded ${
+                  isExternalRegistration
+                    ? 'bg-fill-disabled text-label-disabled cursor-not-allowed'
+                    : 'bg-blue-600 text-white hover:bg-blue-700'
+                } transition-colors`}
+              >
+                <MdEmail className="w-5 h-5" />
+                <span>
+                  {hasCustomTemplates
+                    ? t('manageCourses.email_templates.edit_button')
+                    : t('manageCourses.email_templates.create_button')}
+                </span>
+              </button>
+              {isExternalRegistration && (
+                <p className="text-sm text-label-secondary mt-1">
+                  {t('manageCourses.email_templates.external_registration_note')}
+                </p>
+              )}
             </div>
           </div>
 
