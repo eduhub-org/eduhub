@@ -1,4 +1,4 @@
-import { FC, useEffect, useMemo, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { Alert, Box, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Typography } from "@mui/material";
 import { useTranslations } from "next-intl";
 
@@ -29,6 +29,10 @@ const buildElementLink = (roomId: string | null | undefined) => {
   return `${elementBaseUrl}/#/room/${roomId}`;
 };
 
+/**
+ * Create flow only: parent (`ExpandableCourseRow`) opens this when the course has no Matrix room
+ * and no legacy chat link. There is no “room already exists” state in this dialog.
+ */
 const CreateMatrixRoomDialog: FC<CreateMatrixRoomDialogProps> = ({ open, course, onClose }) => {
   const t = useTranslations();
   const [roomName, setRoomName] = useState("");
@@ -40,13 +44,12 @@ const CreateMatrixRoomDialog: FC<CreateMatrixRoomDialogProps> = ({ open, course,
   const [createMatrixRoom, { loading }] = useRoleMutation(CREATE_MATRIX_ROOM);
 
   const hasProgramSpace = Boolean((course.Program as any)?.matrixSpaceId);
-  const hasCourseRoom = Boolean((course as any).matrixRoomId);
+  const courseMatrixRoomId = (course as any).matrixRoomId as string | null | undefined;
 
-  const existingRoomLink = useMemo(() => {
-    const matrixLink = buildElementLink((course as any).matrixRoomId);
-    if (matrixLink) return matrixLink;
-    return course.chatLink || "";
-  }, [course]);
+  /** Hide inputs only after we show success; refetch may set matrixRoomId a tick before successLink. */
+  const showForm = !successLink;
+  /** Hide after refetch sets matrixRoomId (brief gap before successLink); keep visible while loading. */
+  const showCreateButton = showForm && !courseMatrixRoomId;
 
   useEffect(() => {
     if (!open) return;
@@ -67,7 +70,7 @@ const CreateMatrixRoomDialog: FC<CreateMatrixRoomDialogProps> = ({ open, course,
           courseId: course.id,
           roomName: roomName.trim(),
           topic: topic.trim() || null,
-          spaceName: hasProgramSpace ? null : (spaceName.trim() || null),
+          spaceName: hasProgramSpace ? null : spaceName.trim() || null,
         },
         refetchQueries: ["AdminCourseList"],
         awaitRefetchQueries: true,
@@ -87,32 +90,18 @@ const CreateMatrixRoomDialog: FC<CreateMatrixRoomDialogProps> = ({ open, course,
   };
 
   const canSubmit =
-    roomName.trim().length > 0 && (hasProgramSpace || spaceName.trim().length > 0) && !loading;
+    showCreateButton && roomName.trim().length > 0 && (hasProgramSpace || spaceName.trim().length > 0) && !loading;
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
       <DialogTitle className="light">{t("manageCourses.matrix_room.dialog_title")}</DialogTitle>
       <DialogContent className="light">
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 1 }}>
-          {hasCourseRoom && (
-            <Alert severity="info">
-              {t("manageCourses.matrix_room.button_room_exists")}
-              {existingRoomLink ? (
-                <>
-                  {" "}
-                  <a href={existingRoomLink} target="_blank" rel="noreferrer" className="underline">
-                    {t("manageCourses.matrix_room.open_in_element")}
-                  </a>
-                </>
-              ) : null}
-            </Alert>
-          )}
-
-          {!hasCourseRoom && !hasProgramSpace && (
+          {showForm && !hasProgramSpace && (
             <Alert severity="info">{t("manageCourses.matrix_room.space_will_be_created_hint")}</Alert>
           )}
 
-          {!hasCourseRoom && !hasProgramSpace && (
+          {showForm && !hasProgramSpace && (
             <TextField
               label={t("manageCourses.matrix_room.space_name_label")}
               value={spaceName}
@@ -122,7 +111,7 @@ const CreateMatrixRoomDialog: FC<CreateMatrixRoomDialogProps> = ({ open, course,
             />
           )}
 
-          {!hasCourseRoom && (
+          {showForm && (
             <>
               <TextField
                 label={t("manageCourses.matrix_room.room_name_label")}
@@ -158,7 +147,7 @@ const CreateMatrixRoomDialog: FC<CreateMatrixRoomDialogProps> = ({ open, course,
       </DialogContent>
       <DialogActions className="light">
         <Button onClick={onClose}>{t("manageCourses.cancel")}</Button>
-        {!hasCourseRoom && (
+        {showCreateButton && (
           <Button filled onClick={handleCreate} disabled={!canSubmit}>
             {loading
               ? t("manageCourses.matrix_room.button_creating")
