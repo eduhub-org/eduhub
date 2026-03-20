@@ -913,7 +913,7 @@
       "help_text": "URL wo sich Teilnehmer extern anmelden können"
     },
     "participant_chat": {
-      "title": "Teilnehmer-Chat",
+      "title": "Teilnehmenden-Chat",
       "button_open_element": "Zum Element-Raum",
       "button_open_mattermost": "Zum Mattermost-Channel",
       "button_open_chat": "Zum Chat"
