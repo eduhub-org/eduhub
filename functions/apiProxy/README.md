@@ -126,11 +126,53 @@ curl -s \
 
 #### Development and Testing
 
-For local development and testing, use the development API key:
+The proxy listens on **`http://localhost:42026`** in development (see `functions/dev.py`). The automated tests call that URL; they **skip** if nothing is listening (no failure, but nothing is exercised).
+
+For the full local stack (PostgreSQL, Hasura, seed data), see [`docs/DEVELOPMENT_GUIDE.md`](../../docs/DEVELOPMENT_GUIDE.md). MOOCHub feed–specific examples live in [`docs/MOOCHUB_FEED_DOCUMENTATION.md`](../../docs/MOOCHUB_FEED_DOCUMENTATION.md).
+
+##### 1. Start the Python functions stack
+
+**Option A — Docker (recommended)**  
+From the repository root, bring up services (including `python_functions`). The container installs both Python requirement files and runs `start-python.sh`, which starts `dev.py` (ports **42025** and **42026** mapped to the host):
+
+```bash
+docker compose up -d python_functions
+```
+
+Wait until the container is healthy, then open `http://localhost:42026/health`.
+
+**Option B — Python on the host**  
+`dev.py` loads `callPythonFunction` before starting the apiProxy app, so you need dependencies for **both** trees:
+
+```bash
+cd functions
+python3 -m pip install -r callPythonFunction/requirements.txt -r apiProxy/requirements.txt
+# On PEP 668–managed Python (e.g. many Linux distros), use a venv instead, or pass --break-system-packages if you accept the risk.
+cp -n start-python.env.example start-python.env   # once, if start-python.env is missing
+python3 dev.py
+```
+
+Leave this running in a terminal; you should see Flask serving **42025** (callPythonFunction) and **42026** (apiProxy).
+
+##### 2. Automated tests (pytest)
+
+Tests live in `functions/apiProxy/__tests__` and hit the live server (mainly **`GET /participants/schema`**). Install the apiProxy test/runtime deps if you have not already, then run pytest from the **apiProxy** directory:
+
+```bash
+cd functions/apiProxy
+python3 -m pip install -r requirements.txt   # or use the same venv as above
+python3 -m pytest -v
+```
+
+With the server up, you should see **13 passed**. If the server is down, all tests are **skipped**.
+
+##### 3. Manual requests (curl)
+
+Use the development API key for local calls:
 
 **Development API Key:** `edh_live_org160_sk_056afe290cadf18e2b2d7482c5f4e5a5`
 
-This key is configured in the development database seed data and is safe to use for local testing. The development server runs on `http://localhost:42026`.
+This key is configured in the development database seed data and is safe to use for local testing.
 
 **Example development request:**
 ```bash
@@ -140,6 +182,6 @@ curl -X GET "http://localhost:42026/participants" \
   -H "Accept-Version: 3.0.1"
 ```
 
-**Note:** The development API key only works with the local development server. For production access, contact the EduHub team to obtain a production API key.
+**Note:** The development API key only works against environments that use the dev seed data (typically local Docker or a dev database). For production access, contact the EduHub team to obtain a production API key.
 
 
