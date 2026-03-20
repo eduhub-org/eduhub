@@ -126,7 +126,7 @@ curl -s \
 
 #### Development and Testing
 
-The proxy listens on **`http://localhost:42026`** in development (see `functions/dev.py`). The automated tests call that URL; they **skip** if nothing is listening (no failure, but nothing is exercised).
+The proxy listens on **`http://localhost:42026`** in development (see `functions/dev.py`). Pytest uses **`http://127.0.0.1:42026`** on purpose: on many Linux setups `localhost` resolves to IPv6 (`::1`) first while Docker publishes **42026** on IPv4 only, so tests would otherwise skip even when the container is up. Tests **skip** if nothing responds on **127.0.0.1:42026** (no failure, but nothing is exercised).
 
 For the full local stack (PostgreSQL, Hasura, seed data), see [`docs/DEVELOPMENT_GUIDE.md`](../../docs/DEVELOPMENT_GUIDE.md). MOOCHub feed–specific examples live in [`docs/MOOCHUB_FEED_DOCUMENTATION.md`](../../docs/MOOCHUB_FEED_DOCUMENTATION.md).
 
@@ -165,6 +165,8 @@ python3 -m pytest -v
 ```
 
 With the server up, you should see **13 passed**. If the server is down, all tests are **skipped**.
+
+If everything is **skipped** but Docker is running, verify the port from the same machine: `curl -s -o /dev/null -w "%{http_code}\n" http://127.0.0.1:42026/health` (expect `200`). Use **`127.0.0.1`** here; `localhost` can fail while the service is still up (IPv4/IPv6 mismatch).
 
 ##### 3. Manual requests (curl)
 
