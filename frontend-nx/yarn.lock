@@ -16899,7 +16899,7 @@ __metadata:
     semantic-release: ^21.1.2
     sharp: ^0.33.5
     stripe: ^14.21.0
-    swiper: ^11.1.12
+    swiper: ^12.1.2
     swr: ^2.2.5
     tailwind-merge: ^2.5.4
     tailwindcss: 3.4.10
@@ -20712,10 +20712,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"swiper@npm:^11.1.12":
-  version: 11.1.12
-  resolution: "swiper@npm:11.1.12"
-  checksum: c202d7952093e69d59eef0df46cae280f590f7090b20aa9a0babf2b9f705a25a291e46859c169d2c088f98d44b34b72cd33d6a2aa61eb1449e6f9e91052bbe46
+"swiper@npm:^12.1.2":
+  version: 12.1.2
+  resolution: "swiper@npm:12.1.2"
+  checksum: 1b7fcc647573f7c58cb67a48265ad7a1667e991b66a9859295bf9ab8696c7427f39b34ba2b5e043bf828389b0f363bca1cba0bfbf10d5f459d26a7329352675a
   languageName: node
   linkType: hard
 
