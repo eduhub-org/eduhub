@@ -48,8 +48,8 @@ const CreateMatrixRoomDialog: FC<CreateMatrixRoomDialogProps> = ({ open, course,
 
   /** Hide inputs only after we show success; refetch may set matrixRoomId a tick before successLink. */
   const showForm = !successLink;
-  /** Hide after refetch sets matrixRoomId (brief gap before successLink); keep visible while loading. */
-  const showCreateButton = showForm && !courseMatrixRoomId;
+  /** Refetch can set matrixRoomId while the mutation is still in flight — keep a visible "Creating…" action. */
+  const showIdleCreateButton = showForm && !loading && !courseMatrixRoomId;
 
   useEffect(() => {
     if (!open) return;
@@ -89,8 +89,8 @@ const CreateMatrixRoomDialog: FC<CreateMatrixRoomDialogProps> = ({ open, course,
     }
   };
 
-  const canSubmit =
-    showCreateButton && roomName.trim().length > 0 && (hasProgramSpace || spaceName.trim().length > 0) && !loading;
+  const canSubmitCreate =
+    roomName.trim().length > 0 && (hasProgramSpace || spaceName.trim().length > 0);
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
@@ -146,12 +146,17 @@ const CreateMatrixRoomDialog: FC<CreateMatrixRoomDialogProps> = ({ open, course,
         </Box>
       </DialogContent>
       <DialogActions className="light">
-        <Button onClick={onClose}>{t("manageCourses.cancel")}</Button>
-        {showCreateButton && (
-          <Button filled onClick={handleCreate} disabled={!canSubmit}>
-            {loading
-              ? t("manageCourses.matrix_room.button_creating")
-              : t("manageCourses.matrix_room.button_create")}
+        <Button onClick={onClose} filled={Boolean(successLink)}>
+          {successLink ? t("common.ok") : t("manageCourses.cancel")}
+        </Button>
+        {showForm && loading && (
+          <Button filled disabled>
+            {t("manageCourses.matrix_room.button_creating")}
+          </Button>
+        )}
+        {showIdleCreateButton && (
+          <Button filled onClick={handleCreate} disabled={!canSubmitCreate}>
+            {t("manageCourses.matrix_room.button_create")}
           </Button>
         )}
       </DialogActions>
