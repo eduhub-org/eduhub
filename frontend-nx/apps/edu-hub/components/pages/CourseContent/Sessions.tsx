@@ -66,7 +66,9 @@ export const Sessions: FC<SessionsProps> = ({ sessions, courseLocations, isLogge
     <>
       {visibleSessions.length > 0 && (
         <>
-          <span className="text-3xl font-semibold mt-24">{t('sessions.course_sessions')}</span>
+          <span className="text-3xl font-semibold mt-24">
+            {sessions.length === 1 ? t('sessions.date_singular') : t('sessions.date_plural')}
+          </span>
           <ul className="max-w-2xl">
             {visibleSessions.map(({ startDateTime, endDateTime, title, SessionSpeakers, SessionAddresses }, index) => (
               <li key={index} className="flex mb-4">
@@ -187,7 +189,7 @@ export const Sessions: FC<SessionsProps> = ({ sessions, courseLocations, isLogge
                 className="text-white text-sm sm:text-lg font-semibold hover:underline italic flex items-center pb-6"
                 onClick={() => setShowAllSessions(false)}
               >
-                {t('sessions.hide_sessions')}
+                {t('sessions.hide_dates')}
                 <IoIosArrowUp className="ml-1" />
               </button>
             ) : (
@@ -195,7 +197,7 @@ export const Sessions: FC<SessionsProps> = ({ sessions, courseLocations, isLogge
                 className="text-white text-sm sm:text-lg font-semibold hover:underline italic flex items-center pb-6"
                 onClick={() => setShowAllSessions(true)}
               >
-                {t('sessions.show_all_sessions')}
+                {t('sessions.show_all_dates')}
                 <IoIosArrowDown className="ml-1" />
               </button>
             ))}

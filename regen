@@ -16,7 +16,7 @@ echo "Make sure the frontend-nx container is running!"
 # Run the codegen inside the container as the current user
 # This ensures we can access containers started by the regular user
 echo "Running Apollo codegen in container..."
-docker exec -ti eduhub-frontend-nx npx nx run edu-hub:apollo
+docker exec -ti eduhub-frontend-nx yarn --cwd /opt/app apollo
 
 # Check if any files were created with wrong permissions and fix them
 echo "Checking for permission issues..."

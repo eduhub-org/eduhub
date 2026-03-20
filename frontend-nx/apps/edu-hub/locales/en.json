@@ -123,7 +123,8 @@
     "location": {
       "ONLINE": "Online",
       "KIEL": "Kiel",
-      "HEIDE": "Heide"
+      "HEIDE": "Heide",
+      "HAMBURG": "Hamburg"
     },
     "type_name_or_email_minimum_3_letters": "Type a name or email (minimum 3 letters).",
     "select_user_dialog": {
@@ -336,9 +337,10 @@
       "general_achievement_certificate_conditions": "**Online Participation:**\nIf online participation is possible, attendances are only counted as present if the camera is continuously turned on!"
     },
     "sessions": {
-      "show_all_sessions": "Show all sessions",
-      "hide_sessions": "Collapse sessions",
-      "course_sessions": "Course Sessions"
+      "show_all_dates": "Show all dates",
+      "hide_dates": "Collapse dates",
+      "date_singular": "Date",
+      "date_plural": "Dates"
     },
     "attendances": {
       "attendances": "Attendances",
@@ -581,7 +583,8 @@
       "label": "Location",
       "ONLINE": "Online",
       "KIEL": "Kiel",
-      "HEIDE": "Heide"
+      "HEIDE": "Heide",
+      "HAMBURG": "Hamburg"
     },
     "address": {
       "label": "Link or Address",
@@ -925,13 +928,31 @@
       "label": "External Registration Link",
       "help_text": "URL where participants can register externally"
     },
-    "chat_link": {
-      "label": "Course Chat Link",
-      "help_text": "Link to the course chat or communication platform"
+    "participant_chat": {
+      "title": "Participant chat",
+      "button_open_element": "To Element room",
+      "button_open_mattermost": "To Mattermost channel",
+      "button_open_chat": "Open chat"
+    },
+    "matrix_room": {
+      "button_create": "Create Matrix Room",
+      "button_creating": "Creating Matrix room …",
+      "button_open_details": "Matrix room details",
+      "dialog_title": "Create Matrix Room",
+      "dialog_title_existing": "Matrix room",
+      "room_name_label": "Room Name",
+      "description_label": "Topic / Description",
+      "space_name_label": "Program Space Name",
+      "space_will_be_created_hint": "No program Space exists yet — it will be created automatically.",
+      "error_no_config": "Matrix configuration is incomplete. Please contact an administrator.",
+      "error_invalid_input": "Please check your input values.",
+      "error_creation_failed": "Matrix room creation failed",
+      "error_unknown": "An unknown error occurred while creating the Matrix room.",
+      "success_created": "Matrix room created successfully.",
+      "open_in_element": "Open in Element"
     },
     "email_templates": {
       "label": "Email Templates",
-      "manage_button": "Manage Email Templates",
       "create_button": "Create Email Templates",
       "edit_button": "Edit Email Templates",
       "external_registration_note": "Email templates are not available for external registration courses."
@@ -1229,7 +1250,8 @@
       "label": "Location",
       "ONLINE": "Online",
       "KIEL": "Kiel",
-      "HEIDE": "Heide"
+      "HEIDE": "Heide",
+      "HAMBURG": "Hamburg"
     },
     "address": {
       "label": "Link or Address",
@@ -1657,7 +1679,8 @@
     "type_selection": {
       "KIEL": "Kiel",
       "ONLINE": "Online",
-      "HEIDE": "Heide"
+      "HEIDE": "Heide",
+      "HAMBURG": "Hamburg"
     }
   },
   "manageEmailTemplates": {
@@ -1722,6 +1745,18 @@
     "title": "Title",
     "delete": "Delete",
     "upload": "Upload"
+  },
+  "AddonValidationDialog": {
+    "title": "Add-on Validation",
+    "close": "Close",
+    "no_addons_found": "No add-ons found.",
+    "price_label": "Price",
+    "description_label": "Description",
+    "question_id": "Question ID",
+    "choice_id": "Choice ID",
+    "cancel": "Cancel",
+    "saving": "Saving...",
+    "save_and_create_stripe": "Save and create Stripe products"
   },
   "pricing_summary": {
     "title": "Pricing Summary",

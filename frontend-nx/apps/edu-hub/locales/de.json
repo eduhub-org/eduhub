@@ -123,7 +123,8 @@
     "location": {
       "ONLINE": "Online",
       "KIEL": "Kiel",
-      "HEIDE": "Heide"
+      "HEIDE": "Heide",
+      "HAMBURG": "Hamburg"
     },
     "type_name_or_email_minimum_3_letters": "Gib mindestens 3 Buchstaben ein.",
     "select_user_dialog": {
@@ -336,9 +337,10 @@
       "general_achievement_certificate_conditions": "**Online-Teilnahme:**\nWenn eine Online-Teilnahme möglich ist, wird die Teilnahme nur dann als anwesend gewertet, wenn die Kamera eingeschaltet ist."
     },
     "sessions": {
-      "show_all_sessions": "Alle Termine anzeigen",
-      "hide_sessions": "Termine einklappen",
-      "course_sessions": "Kurstermine"
+      "show_all_dates": "Alle Termine anzeigen",
+      "hide_dates": "Termine einklappen",
+      "date_singular": "Termin",
+      "date_plural": "Termine"
     },
     "attendances": {
       "attendances": "Anwesenheiten",
@@ -572,7 +574,8 @@
       "label": "Veranstaltungsort",
       "ONLINE": "Online",
       "KIEL": "Kiel",
-      "HEIDE": "Heide"
+      "HEIDE": "Heide",
+      "HAMBURG": "Hamburg"
     },
     "address": {
       "label": "Link oder Adresse",
@@ -909,13 +912,29 @@
       "label": "Externe Anmeldung Link",
       "help_text": "URL wo sich Teilnehmer extern anmelden können"
     },
-    "chat_link": {
-      "label": "Kurs-Chat Link",
-      "help_text": "Link zum Kurs-Chat oder zur Kommunikationsplattform"
+    "participant_chat": {
+      "title": "Teilnehmenden-Chat",
+      "button_open_element": "Zum Element-Raum",
+      "button_open_mattermost": "Zum Mattermost-Channel",
+      "button_open_chat": "Zum Chat"
+    },
+    "matrix_room": {
+      "button_create": "Matrix-Raum erstellen",
+      "button_creating": "Matrix-Raum wird erstellt …",
+      "dialog_title": "Matrix-Raum erstellen",
+      "room_name_label": "Raumname",
+      "description_label": "Thema / Beschreibung",
+      "space_name_label": "Programm-Space-Name",
+      "space_will_be_created_hint": "Es gibt noch keinen Programm-Space — er wird automatisch erstellt.",
+      "error_no_config": "Die Matrix-Konfiguration ist unvollständig. Bitte kontaktiere eine Administratorin oder einen Administrator.",
+      "error_invalid_input": "Bitte überprüfe deine Eingaben.",
+      "error_creation_failed": "Erstellen des Matrix-Raums fehlgeschlagen",
+      "error_unknown": "Beim Erstellen des Matrix-Raums ist ein unbekannter Fehler aufgetreten.",
+      "success_created": "Matrix-Raum wurde erfolgreich erstellt.",
+      "open_in_element": "In Element öffnen"
     },
     "email_templates": {
       "label": "E-Mail-Vorlagen",
-      "manage_button": "E-Mail-Vorlagen verwalten",
       "create_button": "E-Mail-Vorlagen erstellen",
       "edit_button": "E-Mail-Vorlagen bearbeiten",
       "external_registration_note": "E-Mail-Vorlagen sind für externe Anmeldungen nicht verfügbar."
@@ -1213,7 +1232,8 @@
       "label": "Veranstaltungsort",
       "ONLINE": "Online",
       "KIEL": "Kiel",
-      "HEIDE": "Heide"
+      "HEIDE": "Heide",
+      "HAMBURG": "Hamburg"
     },
     "address": {
       "label": "Link oder Adresse",
@@ -1654,7 +1674,8 @@
     "type_selection": {
       "KIEL": "Kiel",
       "ONLINE": "Online",
-      "HEIDE": "Heide"
+      "HEIDE": "Heide",
+      "HAMBURG": "Hamburg"
     }
   },
   "manageEmailTemplates": {
@@ -1719,6 +1740,18 @@
     "title": "Titel",
     "delete": "Löschen",
     "upload": "Upload"
+  },
+  "AddonValidationDialog": {
+    "title": "Add-on-Validierung",
+    "close": "Schließen",
+    "no_addons_found": "Keine Add-ons gefunden.",
+    "price_label": "Preis",
+    "description_label": "Beschreibung",
+    "question_id": "Fragen-ID",
+    "choice_id": "Auswahl-ID",
+    "cancel": "Abbrechen",
+    "saving": "Speichern...",
+    "save_and_create_stripe": "Speichern und Stripe-Produkte erstellen"
   },
   "pricing_summary": {
     "title": "Preisübersicht",

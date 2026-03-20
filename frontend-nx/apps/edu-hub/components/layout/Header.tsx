@@ -4,8 +4,6 @@ import { FC, MouseEvent, useCallback, useState } from 'react';
 
 import { useIsLoggedIn } from '../../hooks/authentication';
 import { useUser } from '../../hooks/user';
-import eduhubLogo from '../../public/images/eduhub-logo.svg';
-import ocLogo from '../../public/images/oc-logo.svg';
 
 import { LoginButton } from './LoginButton';
 import { Menu } from './Menu';
@@ -53,10 +51,10 @@ export const Header: FC = () => {
           <Link href={`/`}>
             <div className="flex cursor-pointer">
               <div className="flex items-center w-[34px] h-[34px]">
-                <Image src={ocLogo} alt="EduHub logo" width={34} height={34} priority unoptimized className="w-full h-full object-contain" />
+                <Image src="/images/oc-logo.svg" alt="EduHub logo" width={34} height={34} priority unoptimized className="w-full h-full object-contain" />
               </div>
               <div className="flex items-center ml-2 w-[46px] h-[33px]">
-                <Image src={eduhubLogo} alt="EduHub name" width={46} height={33} priority unoptimized className="w-full h-full object-contain" />
+                <Image src="/images/eduhub-logo.svg" alt="EduHub name" width={46} height={33} priority unoptimized className="w-full h-full object-contain" />
               </div>
             </div>
           </Link>

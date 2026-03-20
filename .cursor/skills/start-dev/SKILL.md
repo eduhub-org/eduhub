@@ -12,7 +12,7 @@ docker compose up
 ```
 
 This starts all services:
-- **Frontend**: http://localhost:5000 (edu-hub), http://localhost:5001 (rent-a-scientist)
+- **Frontend**: http://localhost:5000 (edu-hub)
 - **Hasura Console**: http://localhost:8080
 - **Keycloak**: http://localhost:28080
 
@@ -33,7 +33,7 @@ docker compose logs -f frontend-nx
 
 | Service | Port | Description |
 |---------|------|-------------|
-| frontend-nx | 5000, 5001 | Next.js apps |
+| frontend-nx | 5000 | Next.js app |
 | hasura | 8080 | GraphQL API |
 | keycloak | 28080 | Authentication |
 | db_hasura | 5432 | PostgreSQL |

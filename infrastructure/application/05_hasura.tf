@@ -27,6 +27,7 @@ module "hasura_service" {
     memory = var.hasura_memory_limit
   }
   container_concurrency = "80"
+  timeout_seconds       = 300 # Allow Hasura migrations to complete during startup (default 120s was too short)
 
   service_annotations = {
     "run.googleapis.com/client-name" = "terraform"
@@ -36,6 +37,7 @@ module "hasura_service" {
   }
   template_annotations = {
     "run.googleapis.com/client-name"           = "cloud-console"
+    "run.googleapis.com/startup-cpu-boost"     = "true"
     "autoscaling.knative.dev/minScale"         = "1"
     "run.googleapis.com/vpc-access-egress"     = "private-ranges-only"
     "run.googleapis.com/cloudsql-instances"    = google_sql_database_instance.default.connection_name
@@ -57,7 +59,7 @@ module "hasura_service" {
     },
     {
       name  = "HASURA_GRAPHQL_MIGRATIONS_SERVER_TIMEOUT"
-      value = 120
+      value = 300
     },
     {
       name  = "HASURA_GRAPHQL_DEV_MODE"

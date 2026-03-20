@@ -1,6 +1,6 @@
 import { FC, Fragment, useCallback, useState, useEffect } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
-import { MdCheckBox, MdOutlineCheckBoxOutlineBlank, MdAddCircle, MdEmail } from 'react-icons/md';
+import { MdCheckBox, MdOutlineCheckBoxOutlineBlank, MdAddCircle, MdEmail, MdForum } from 'react-icons/md';
 import { useRouter } from 'next/router';
 import { useAdminMutation } from '../../../hooks/authedMutation';
 import { SAVE_COURSE_IMAGE } from '../../../queries/actions';
@@ -42,7 +42,6 @@ import InputField from '../../inputs/InputField';
 import DropDownSelector from '../../inputs/DropDownSelector';
 import FileUploadField from '../../inputs/FileUploadField';
 import {
-  UPDATE_COURSE_CHAT_LINK,
   UPDATE_COURSE_ECTS,
   UPDATE_COURSE_EXTERNAL_REGISTRATION_LINK,
   UPDATE_COURSE_MAX_MISSED_SESSION,
@@ -54,6 +53,7 @@ import {
 } from '../../../queries/course';
 import { VALIDATE_FORMBRICKS_SURVEY, SAVE_ADDON_MAPPINGS, CREATE_STRIPE_BASE_PRICE, GET_COURSE_ADDON_MAPPINGS } from '../../../queries/stripe';
 import { AddonValidationDialog } from './AddonValidationDialog';
+import CreateMatrixRoomDialog from './CreateMatrixRoomDialog';
 import { Button } from '../../common/Button';
 import { UPDATE_COURSE_PROPERTY } from '../../../queries/mutateCourse';
 import useErrorHandler from '../../../hooks/useErrorHandler';
@@ -420,6 +420,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
 
   // Funding organization management state
   const [fundingOrgDialogOpen, setFundingOrgDialogOpen] = useState(false);
+  const [matrixDialogOpen, setMatrixDialogOpen] = useState(false);
 
   // Instructor management mutations
   const [insertCourseInstructor] = useAdminMutation<InsertCourseInstructor, InsertCourseInstructorVariables>(
@@ -638,6 +639,29 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
     label: t(`manageCourses.registration_type.options.${type}`),
   }));
 
+  const matrixRoomId = (course as any).matrixRoomId as string | undefined;
+  const elementBaseUrl = process.env.NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL?.replace(/\/+$/, '');
+  const derivedMatrixLink =
+    matrixRoomId && elementBaseUrl ? `${elementBaseUrl}/#/room/${matrixRoomId}` : '';
+  const legacyChatUrl = course.chatLink?.trim() ? course.chatLink.trim() : '';
+  const openParticipantChatHref = derivedMatrixLink || legacyChatUrl || '';
+
+  const isLikelyMattermostChatUrl = (url: string) => {
+    try {
+      const host = new URL(url).hostname.toLowerCase();
+      return host.includes('mattermost') || host.includes('chat.opencampus');
+    } catch {
+      return false;
+    }
+  };
+
+  let participantChatButtonKey = 'manageCourses.participant_chat.button_open_chat';
+  if (matrixRoomId) {
+    participantChatButtonKey = 'manageCourses.participant_chat.button_open_element';
+  } else if (legacyChatUrl && isLikelyMattermostChatUrl(legacyChatUrl)) {
+    participantChatButtonKey = 'manageCourses.participant_chat.button_open_mattermost';
+  }
+
   return (
     <div className="w-full flex-1 min-w-0 light">
       <div className="bg-bg-secondary p-6 w-full">
@@ -829,46 +853,62 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
               />
             </div>
 
-            {/* 4. Communication Settings - Card Container */}
+            {/* 4. Participant chat (Matrix / legacy channel) */}
             <div className="bg-fill-primary border border-border-primary rounded-lg p-4 space-y-4">
-              <InputField
-                variant="material"
-                type="link"
-                label={t('manageCourses.chat_link.label')}
-                placeholder={t('manageCourses.chat_link.label')}
-                itemId={course.id}
-                value={course.chatLink || ''}
-                updateValueMutation={UPDATE_COURSE_CHAT_LINK}
-                refetchQueries={['AdminCourseList']}
-                helpText={t('manageCourses.chat_link.help_text')}
-              />
-
-              <div>
-                <h4 className="text-sm font-medium text-label-primary mb-2">
-                  {t('manageCourses.email_templates.label')}
-                </h4>
-                <button
-                  onClick={handleManageEmailTemplates}
-                  disabled={isExternalRegistration}
-                  className={`flex items-center space-x-2 px-4 py-2 rounded ${
-                    isExternalRegistration
-                      ? 'bg-fill-disabled text-label-disabled cursor-not-allowed'
-                      : 'bg-blue-600 text-white hover:bg-blue-700'
-                  } transition-colors`}
-                >
-                  <MdEmail className="w-5 h-5" />
-                  <span>
-                    {hasCustomTemplates
-                      ? t('manageCourses.email_templates.edit_button')
-                      : t('manageCourses.email_templates.create_button')}
-                  </span>
-                </button>
-                {isExternalRegistration && (
-                  <p className="text-sm text-label-secondary mt-1">
-                    {t('manageCourses.email_templates.external_registration_note')}
-                  </p>
+              <h4 className="text-sm font-medium text-label-primary">
+                {t('manageCourses.participant_chat.title')}
+              </h4>
+              <div className="flex items-center gap-3 flex-wrap">
+                {openParticipantChatHref ? (
+                  <Button
+                    as="a"
+                    href={openParticipantChatHref}
+                    target="_blank"
+                    rel="noreferrer"
+                    filled
+                  >
+                    <span className="inline-flex items-center gap-2">
+                      <MdForum className="w-4 h-4" />
+                      {t(participantChatButtonKey)}
+                    </span>
+                  </Button>
+                ) : (
+                  <Button onClick={() => setMatrixDialogOpen(true)}>
+                    <span className="inline-flex items-center gap-2">
+                      <MdForum className="w-4 h-4" />
+                      {t('manageCourses.matrix_room.button_create')}
+                    </span>
+                  </Button>
                 )}
               </div>
+            </div>
+
+            {/* 5. Email Templates - Card Container */}
+            <div className="bg-fill-primary border border-border-primary rounded-lg p-4 space-y-4">
+              <h4 className="text-sm font-medium text-label-primary mb-2">
+                {t('manageCourses.email_templates.label')}
+              </h4>
+              <button
+                onClick={handleManageEmailTemplates}
+                disabled={isExternalRegistration}
+                className={`flex items-center space-x-2 px-4 py-2 rounded ${
+                  isExternalRegistration
+                    ? 'bg-fill-disabled text-label-disabled cursor-not-allowed'
+                    : 'bg-blue-600 text-white hover:bg-blue-700'
+                } transition-colors`}
+              >
+                <MdEmail className="w-5 h-5" />
+                <span>
+                  {hasCustomTemplates
+                    ? t('manageCourses.email_templates.edit_button')
+                    : t('manageCourses.email_templates.create_button')}
+                </span>
+              </button>
+              {isExternalRegistration && (
+                <p className="text-sm text-label-secondary mt-1">
+                  {t('manageCourses.email_templates.external_registration_note')}
+                </p>
+              )}
             </div>
           </div>
 
@@ -1111,6 +1151,12 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
         onClose={() => setIsBasePriceHelpDialogOpen(false)}
         title={t('manageCourse.pricing.base_price_dialog_title')}
         content={t('manageCourse.pricing.base_price_dialog_content')}
+      />
+
+      <CreateMatrixRoomDialog
+        open={matrixDialogOpen}
+        onClose={() => setMatrixDialogOpen(false)}
+        course={course}
       />
     </div>
   );

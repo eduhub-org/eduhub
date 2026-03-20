@@ -44,5 +44,6 @@ export const ADMIN_PROGRAM_FRAGMENT = gql`
     achievementCertificateTemplateURL
     visibility
     defaultFormbricksEnrollmentSurveyUrl
+    matrixSpaceId
   }
 `;

@@ -23,43 +23,7 @@ array_relationships:
         table:
           name: Course
           schema: public
-  - name: RentAScientistConfigs
-    using:
-      foreign_key_constraint_on:
-        column: program_id
-        table:
-          name: RentAScientistConfig
-          schema: rentAScientist
-  - name: ScientistOffers
-    using:
-      foreign_key_constraint_on:
-        column: programId
-        table:
-          name: ScientistOffer
-          schema: rentAScientist
 select_permissions:
-  - role: admin-ras
-    permission:
-      columns:
-        - id
-        - organizationId
-        - published
-        - visibility
-        - shortTitle
-        - applicationStart
-        - achievementRecordUploadDeadline
-        - defaultApplicationEnd
-        - defaultMaxMissedSessions
-        - lectureStart
-        - lectureEnd
-        - speakerQuestionnaire
-        - startQuestionnaire
-        - closingQuestionnaire
-        - title
-        - attendanceCertificateTemplateURL
-        - achievementCertificateTemplateURL
-        - defaultFormbricksEnrollmentSurveyUrl
-      filter: {}
   - role: anonymous
     permission:
       columns:
@@ -98,28 +62,6 @@ select_permissions:
         - startQuestionnaire
         - title
         - defaultFormbricksEnrollmentSurveyUrl
+        - matrixSpaceId
       filter: {}
 update_permissions:
-  - role: admin-ras
-    permission:
-      columns:
-        - id
-        - organizationId
-        - published
-        - visibility
-        - shortTitle
-        - applicationStart
-        - achievementRecordUploadDeadline
-        - defaultApplicationEnd
-        - defaultMaxMissedSessions
-        - lectureStart
-        - lectureEnd
-        - speakerQuestionnaire
-        - startQuestionnaire
-        - closingQuestionnaire
-        - title
-        - attendanceCertificateTemplateURL
-        - achievementCertificateTemplateURL
-        - defaultFormbricksEnrollmentSurveyUrl
-      filter: {}
-      check: {}

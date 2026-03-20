@@ -166,6 +166,7 @@ select_permissions:
         - currency
         - stripeProductId
         - stripePriceId
+        - matrixRoomId
       filter: {}
   - role: user_access
     permission:

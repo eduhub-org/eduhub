@@ -21,19 +21,27 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && !contains(github.event.head_commit.message, 'Merge pull request'))
     strategy:
       matrix:
         node-version: [20.x]
 
     steps:
+      - name: Harden the runner
+        uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
+        with:
+          egress-policy: audit
+
       - name: Checkout project
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: ${{ matrix.node-version }}
 
@@ -41,18 +49,10 @@ jobs:
         working-directory: frontend-nx
         run: yarn install --immutable
 
-      - name: Type check edu hub
+      - name: Build edu hub
         working-directory: frontend-nx
-        run: npx nx run edu-hub:build
-
-      # - name: Type check rent-a-scientist
-      #   working-directory: frontend-nx
-      #   run: npx nx run rent-a-scientist:build
+        run: yarn build
 
       - name: Check linting edu hub
         working-directory: frontend-nx
-        run: npx nx run edu-hub:lint
-
-      # - name: Check linting rent-a-scientist
-      #   working-directory: frontend-nx
-      #   run: npx nx run rent-a-scientist:lint
+        run: yarn lint

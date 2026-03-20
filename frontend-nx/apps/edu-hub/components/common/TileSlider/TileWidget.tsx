@@ -4,8 +4,6 @@ import { useTranslations } from 'next-intl';
 import { CourseList_Course } from '../../../queries/__generated__/CourseList';
 import { CoursesEnrolledByUser_Course } from '../../../queries/__generated__/CoursesEnrolledByUser';
 import { CourseTiles_Course } from '../../../queries/__generated__/CourseTiles';
-import languageIcon from '../../../public/images/course/language.svg';
-import locationIcon from '../../../public/images/course/pin.svg';
 import {
   useWeekdayStartAndEndString,
 } from '../../../helpers/dateTimeHelpers';
@@ -60,7 +58,7 @@ export const TileWidget: FC<TileWidgetProps> = ({ course }) => {
             : null}{' '}
           <div className="flex items-center">
             <div className="w-4 h-4 mr-1">
-              <Image src={languageIcon} alt="language icon" width={16} height={16} unoptimized className="w-full h-full object-contain" />
+              <Image src="/images/course/language.svg" alt="language icon" width={16} height={16} unoptimized className="w-full h-full object-contain" />
             </div>
             {t(course.language ?? '')}
           </div>
@@ -69,7 +67,7 @@ export const TileWidget: FC<TileWidgetProps> = ({ course }) => {
         <div className="flex justify-between text-xs items-center tracking-wider">
           <div className="flex uppercase">
             <div className="w-3 h-3 mr-1">
-              <Image src={locationIcon} alt="location icon" width={12} height={12} unoptimized className="w-full h-full object-contain" />
+              <Image src="/images/course/pin.svg" alt="location icon" width={12} height={12} unoptimized className="w-full h-full object-contain" />
             </div>
             {course.CourseLocations.map((location, index) => (
               <React.Fragment key={index}>

@@ -4,11 +4,10 @@
 # Local Variables
 ###
 locals {
-  keycloak_service_name         = "${var.keycloak_service_name_root}${var.service_name_extension}"
-  hasura_service_name           = "${var.hasura_service_name_root}${var.service_name_extension}"
-  eduhub_service_name           = "${var.eduhub_service_name_root}${var.service_name_extension}"
-  rent_a_scientist_service_name = "${var.rent_a_scientist_service_name_root}${var.service_name_extension}"
-  eduhub_api_service_name       = "api-${local.eduhub_service_name}"
+  keycloak_service_name   = "${var.keycloak_service_name_root}${var.service_name_extension}"
+  hasura_service_name     = "${var.hasura_service_name_root}${var.service_name_extension}"
+  eduhub_service_name     = "${var.eduhub_service_name_root}${var.service_name_extension}"
+  eduhub_api_service_name = "api-${local.eduhub_service_name}"
 }
 
 ######
@@ -61,10 +60,6 @@ variable "hasura_service_name_root" {
 }
 variable "eduhub_service_name_root" {
   description = "Name for the service of the edu frontend application"
-  type        = string
-}
-variable "rent_a_scientist_service_name_root" {
-  description = "Name for the service of the Rent-a-Scientist frontend application"
   type        = string
 }
 variable "service_name_extension" {
@@ -198,10 +193,6 @@ variable "keycloak_hasura_client_secret" {
   description = "Used to authenticate login requests from the edu client."
   type        = string
 }
-variable "keycloak_ras_client_secret" {
-  description = "Used to authenticate login requests from the rent-a-scientist client."
-  type        = string
-}
 variable "help_docs_url" {
   description = "Stores the URL to a GitBook or other documentation resources that serve as the FAQ and user help guide for the application. The URL is utilized within the app to include the resourec via an iframe"
   type        = string
@@ -218,6 +209,37 @@ variable "functions_sha" {
 variable "environment" {
   description = "Should typically be a value of either `production` or `staging` to possibly change the behaviour of as serverless function depending on the environment."
   type        = string
+}
+
+variable "matrix_homeserver_url" {
+  description = "Base URL of the Matrix homeserver (e.g. https://matrix.example.org)"
+  type        = string
+}
+
+variable "matrix_server_name" {
+  description = "Matrix server name used in room aliases and via hints (e.g. example.org)"
+  type        = string
+}
+
+variable "matrix_element_client_url" {
+  description = "Base URL of the Element web client (e.g. https://element.example.org)"
+  type        = string
+}
+
+variable "matrix_main_space_id" {
+  description = "Top-level Matrix community space id (e.g. !abc123:example.org)"
+  type        = string
+}
+
+variable "matrix_admin_user_id" {
+  description = "Matrix admin user id used for administrative room operations (e.g. @admin:example.org)"
+  type        = string
+}
+
+variable "matrix_admin_access_token" {
+  description = "Long-lived Matrix admin access token for room and space management"
+  type        = string
+  sensitive   = true
 }
 
 variable "mailgun_api_key" {
