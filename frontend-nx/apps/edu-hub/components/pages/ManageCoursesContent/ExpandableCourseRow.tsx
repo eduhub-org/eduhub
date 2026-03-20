@@ -640,13 +640,9 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
   }));
 
   const matrixRoomId = (course as any).matrixRoomId as string | undefined;
-  const matrixElementClientUrl = process.env.NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL?.replace(/\/+$/, '');
-  let derivedMatrixLink = '';
-  if (matrixRoomId) {
-    derivedMatrixLink = matrixElementClientUrl
-      ? `${matrixElementClientUrl}/#/room/${matrixRoomId}`
-      : `https://matrix.to/#/${matrixRoomId}`;
-  }
+  const elementBaseUrl = process.env.NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL?.replace(/\/+$/, '');
+  const derivedMatrixLink =
+    matrixRoomId && elementBaseUrl ? `${elementBaseUrl}/#/room/${matrixRoomId}` : '';
   const legacyChatUrl = course.chatLink?.trim() ? course.chatLink.trim() : '';
   const openParticipantChatHref = derivedMatrixLink || legacyChatUrl || '';
 

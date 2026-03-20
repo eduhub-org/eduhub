@@ -921,7 +921,6 @@
     "matrix_room": {
       "button_create": "Matrix-Raum erstellen",
       "button_creating": "Matrix-Raum wird erstellt …",
-      "button_room_exists": "Matrix-Raum vorhanden",
       "dialog_title": "Matrix-Raum erstellen",
       "room_name_label": "Raumname",
       "description_label": "Thema / Beschreibung",

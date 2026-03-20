@@ -937,8 +937,9 @@
     "matrix_room": {
       "button_create": "Create Matrix Room",
       "button_creating": "Creating Matrix room …",
-      "button_room_exists": "Matrix Room Exists",
+      "button_open_details": "Matrix room details",
       "dialog_title": "Create Matrix Room",
+      "dialog_title_existing": "Matrix room",
       "room_name_label": "Room Name",
       "description_label": "Topic / Description",
       "space_name_label": "Program Space Name",
