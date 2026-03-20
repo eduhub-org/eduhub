@@ -1,8 +1,7 @@
 import React, { FC, useRef, useState, memo, useEffect } from 'react';
-import { Navigation, Mousewheel } from 'swiper/modules';
+import { Mousewheel } from 'swiper/modules';
 import { Swiper, SwiperSlide, SwiperRef } from 'swiper/react';
 import 'swiper/css';
-import 'swiper/css/navigation';
 import 'swiper/css/mousewheel';
 import { useTranslations } from 'next-intl';
 
@@ -184,14 +183,13 @@ const TileSlider: FC<TileSliderProps> = ({ courses, isManage, isWidget = false }
       <Swiper
         className={isWidget ? '!overflow-visible' : ''}
         ref={swiperRef}
-        modules={[Navigation, Mousewheel]}
+        modules={[Mousewheel]}
         breakpoints={breakpoints}
         spaceBetween={COMMON_SPACE_BETWEEN}
         slidesPerView={'auto'}
         slidesOffsetBefore={13}
         slidesOffsetAfter={13}
         onSlideChange={handleSlideChange}
-        navigation
         mousewheel={{
           forceToAxis: true,
           sensitivity: 1,
