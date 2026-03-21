@@ -73,11 +73,13 @@ select_permissions:
         - achievementCertificateURL
         - attendanceCertificateURL
         - courseId
+        - created_at
         - id
         - billingOrganizationId
         - invitationExpirationDate
         - motivationLetter
         - status
+        - updated_at
         - userId
         - location
         - termsAcceptedAt
