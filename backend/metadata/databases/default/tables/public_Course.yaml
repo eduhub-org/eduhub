@@ -202,6 +202,7 @@ select_permissions:
         - currency
         - stripeProductId
         - stripePriceId
+        - matrixRoomId
       filter:
         CourseEnrollments:
           User:
