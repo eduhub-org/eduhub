@@ -17,7 +17,6 @@ const READ_ONLY_OR_DERIVED_FIELDS = [
   "userProfileMetadata",
   "access",
   "self",
-  "credentials",
 ];
 
 function mergeUserPutPayload(existingUser, patch) {
