@@ -33,7 +33,11 @@
  *   node scripts/backfill-matrix-handles.js [--dry-run]
  */
 
+import { createRequire } from 'module';
 import KcAdminClient from '@keycloak/keycloak-admin-client';
+
+const require = createRequire(import.meta.url);
+const { mergeUserPutPayload } = require('../../shared_libs/node/keycloakUserMerge.cjs');
 
 const DRY_RUN = process.argv.includes('--dry-run');
 const DELAY_BETWEEN_USERS_MS = 100;
@@ -212,13 +216,18 @@ async function main() {
         let attempt = 0;
         while (attempt < MAX_RETRIES) {
           try {
-            const updatedAttrs = { ...user.attributes };
+            const updatedAttrs = { ...(user.attributes || {}) };
             if (needsHandle) updatedAttrs.matrix_user_handle = [handle];
             if (needsPicture) updatedAttrs.picture = [resolvedPictureUrl];
 
+            const fullUser = await kcAdminClient.users.findOne({ id: user.id });
+            if (!fullUser?.username) {
+              throw new Error(`User ${user.id} has no username (cannot PUT)`);
+            }
+
             await kcAdminClient.users.update(
               { id: user.id },
-              { attributes: updatedAttrs }
+              mergeUserPutPayload(fullUser, { attributes: updatedAttrs })
             );
 
             if (needsHandle) {
