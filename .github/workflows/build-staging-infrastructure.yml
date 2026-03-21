@@ -102,8 +102,10 @@ jobs:
             echo $sha
           }
 
-          hasura_sha=$(calculate_sha "backend")
-          keycloak_sha=$(calculate_sha "keycloak")
+          # Same pattern as production: content hash plus timestamp so Terraform sees a new
+          # value each pipeline run and Cloud Run can roll out fresh :latest images when needed.
+          hasura_sha=$(calculate_sha "backend")-$(date +%s)
+          keycloak_sha=$(calculate_sha "keycloak")-$(date +%s)
           frontend_sha=$(calculate_sha "frontend-nx")
           functions_sha=$(calculate_sha "functions")
 

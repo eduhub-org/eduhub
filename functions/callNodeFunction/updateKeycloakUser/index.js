@@ -1,6 +1,10 @@
+import { createRequire } from "module";
 import { logger } from "../index.js";
 import axios from "axios";
 import { computeMatrixHandle } from "../lib/matrixHandle.js";
+
+const require = createRequire(import.meta.url);
+const { mergeUserPutPayload } = require("../../shared_libs/node/keycloakUserMerge.cjs");
 
 const getKeycloakToken = async () => {
   try {
@@ -40,7 +44,11 @@ const updateKeycloakUser = async (userId, updatedFields, token) => {
     logger.debug(`Updated user in Keycloak: ${userId}`);
     return true;
   } catch (error) {
-    logger.error(`Error updating user in Keycloak: ${error.message}`);
+    const detail = error.response?.data;
+    logger.error(
+      `Error updating user in Keycloak: ${error.message}`,
+      detail ? JSON.stringify(detail) : ""
+    );
     
     // Prüfen, ob es sich um einen 404-Fehler handelt (Benutzer nicht gefunden)
     if (error.response && error.response.status === 404) {
@@ -113,7 +121,7 @@ const updateKeycloakUserHandler = async (req) => {
       }
     }
 
-    const nameChanged = updatedFields.firstName || updatedFields.lastName;
+    const nameChanged = !!(updatedFields.firstName || updatedFields.lastName);
     const hasNewAttributes = Object.keys(newAttributes).length > 0;
 
     if (Object.keys(updatedFields).length === 0 && !hasNewAttributes) {
@@ -127,51 +135,42 @@ const updateKeycloakUserHandler = async (req) => {
 
     const keycloakToken = await getKeycloakToken();
 
-    // Fetch current user to merge attributes (KC PUT replaces attributes entirely)
-    const intendedAttributeUpdates = hasNewAttributes || nameChanged;
-    if (intendedAttributeUpdates) {
-      try {
-        const userResponse = await axios.get(
-          `${process.env.KEYCLOAK_URL}/admin/realms/edu-hub/users/${userId}`,
-          { headers: { Authorization: `Bearer ${keycloakToken}` } }
-        );
-        const existingAttrs = userResponse.data.attributes || {};
-
-        if (nameChanged && !existingAttrs.matrix_user_handle?.[0]) {
-          const handle = computeMatrixHandle(
-            newData.firstName,
-            newData.lastName,
-            userId
-          );
-          newAttributes.matrix_user_handle = [handle];
-          logger.debug(`Will set matrix_user_handle for user ${userId}`);
-        }
-
-        if (Object.keys(newAttributes).length > 0) {
-          updatedFields.attributes = { ...existingAttrs, ...newAttributes };
-        }
-      } catch (err) {
-        logger.error(`Could not fetch user ${userId} from Keycloak: ${err.message}`);
-        const failedUpdates = [];
-        if (hasNewAttributes) failedUpdates.push('picture');
-        if (nameChanged) failedUpdates.push('matrix_user_handle');
-
-        if (Object.keys(updatedFields).length === 0) {
-          throw new Error(
-            `Cannot update Keycloak attributes (${failedUpdates.join(', ')}): ` +
-            `failed to fetch existing user data: ${err.message}`
-          );
-        }
-
-        logger.warn(
-          `Proceeding with partial update for user ${userId}: ` +
-          `attribute updates skipped (${failedUpdates.join(', ')})`
-        );
-      }
+    let userResponse;
+    try {
+      userResponse = await axios.get(
+        `${process.env.KEYCLOAK_URL}/admin/realms/edu-hub/users/${userId}`,
+        { headers: { Authorization: `Bearer ${keycloakToken}` } }
+      );
+    } catch (err) {
+      logger.error(`Could not fetch user ${userId} from Keycloak: ${err.message}`);
+      throw new Error(
+        `Cannot update Keycloak user: failed to fetch existing user data: ${err.message}`
+      );
     }
 
-    const attributeUpdateSkipped = intendedAttributeUpdates && !updatedFields.attributes;
-    const updateResult = await updateKeycloakUser(userId, updatedFields, keycloakToken);
+    const existing = userResponse.data;
+    const existingAttrs = existing.attributes || {};
+    const patch = { ...updatedFields };
+
+    if (hasNewAttributes || nameChanged) {
+      const mergedAttrs = { ...existingAttrs };
+      if (hasNewAttributes) {
+        Object.assign(mergedAttrs, newAttributes);
+      }
+      if (nameChanged && !existingAttrs.matrix_user_handle?.[0]) {
+        const handle = computeMatrixHandle(
+          newData.firstName,
+          newData.lastName,
+          userId
+        );
+        mergedAttrs.matrix_user_handle = [handle];
+        logger.debug(`Will set matrix_user_handle for user ${userId}`);
+      }
+      patch.attributes = mergedAttrs;
+    }
+
+    const payload = mergeUserPutPayload(existing, patch);
+    const updateResult = await updateKeycloakUser(userId, payload, keycloakToken);
 
     if (updateResult && updateResult.notFound) {
       logger.warn(`User ${userId} not found in Keycloak, skipping update`);
@@ -180,16 +179,6 @@ const updateKeycloakUserHandler = async (req) => {
         messageKey: "USER_NOT_FOUND_IN_KEYCLOAK",
         userId,
         details: "User not found in Keycloak, may have been deleted or never existed"
-      };
-    }
-
-    if (attributeUpdateSkipped) {
-      logger.warn(`Keycloak update partially completed for userId: ${userId} (attribute updates skipped)`);
-      return {
-        success: true,
-        messageKey: "UPDATE_PARTIAL",
-        userId,
-        details: "Basic fields updated but Keycloak attribute sync failed (picture/matrix_user_handle)"
       };
     }
 

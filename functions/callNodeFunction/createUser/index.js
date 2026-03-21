@@ -3,7 +3,11 @@ import { GraphQLClient, gql } from 'graphql-request';
 import { queueEmail } from '../lib/queueEmail.js';
 import { createVariableReplacer } from '../emailTemplateVariables.js';
 import { logger } from '../index.js';
+import { createRequire } from 'module';
 import { computeMatrixHandle } from '../lib/matrixHandle.js';
+
+const require = createRequire(import.meta.url);
+const { mergeUserPutPayload } = require('../../shared_libs/node/keycloakUserMerge.cjs');
 
 /**
  * Creates a new user in both Keycloak and Hasura
@@ -110,9 +114,15 @@ export default async function createUser(req, logger) {
     logger.info(`Created Keycloak user: ${keycloakUserId}`);
 
     const matrixHandle = computeMatrixHandle(firstName, lastName, keycloakUserId);
+    const createdUser = await kcAdminClient.users.findOne({ id: keycloakUserId });
     await kcAdminClient.users.update(
       { id: keycloakUserId },
-      { attributes: { matrix_user_handle: [matrixHandle] } }
+      mergeUserPutPayload(createdUser, {
+        attributes: {
+          ...(createdUser.attributes || {}),
+          matrix_user_handle: [matrixHandle],
+        },
+      })
     );
     logger.info(`Set matrix_user_handle=${matrixHandle} for user ${keycloakUserId}`);
 
