@@ -1,5 +1,11 @@
 const KcAdminClient = require("@keycloak/keycloak-admin-client").default;
-const { mergeUserPutPayload } = require("../shared_libs/node/keycloakUserMerge.cjs");
+
+let mergeUserPutPayload;
+try {
+  ({ mergeUserPutPayload } = require("./shared_libs/node/keycloakUserMerge.cjs"));
+} catch {
+  ({ mergeUserPutPayload } = require("../shared_libs/node/keycloakUserMerge.cjs"));
+}
 
 const { createClient } = require("graphqurl");
 let secretsMatch;
