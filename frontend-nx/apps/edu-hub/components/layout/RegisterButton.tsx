@@ -9,10 +9,13 @@ export const RegisterButton: FC = () => {
   const router = useRouter();
 
   const register = useCallback(() => {
+    const signinUrl = `${window.location.origin}/auth/signin?provider=keycloak&callbackUrl=${encodeURIComponent(
+      window.location.href
+    )}`;
     const url = `${
       process.env.NEXT_PUBLIC_AUTH_URL
     }/realms/edu-hub/protocol/openid-connect/registrations?client_id=hasura&redirect_uri=${encodeURIComponent(
-      window.location.href
+      signinUrl
     )}&response_type=code`;
 
     if (!url) return;
