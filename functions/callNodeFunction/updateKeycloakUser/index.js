@@ -4,7 +4,12 @@ import axios from "axios";
 import { computeMatrixHandle } from "../lib/matrixHandle.js";
 
 const require = createRequire(import.meta.url);
-const { mergeUserPutPayload } = require("../../shared_libs/node/keycloakUserMerge.cjs");
+let mergeUserPutPayload;
+try {
+  ({ mergeUserPutPayload } = require("../shared_libs/node/keycloakUserMerge.cjs"));
+} catch {
+  ({ mergeUserPutPayload } = require("../../shared_libs/node/keycloakUserMerge.cjs"));
+}
 
 const getKeycloakToken = async () => {
   try {
