@@ -7,7 +7,12 @@ import { createRequire } from 'module';
 import { computeMatrixHandle } from '../lib/matrixHandle.js';
 
 const require = createRequire(import.meta.url);
-const { mergeUserPutPayload } = require('../../shared_libs/node/keycloakUserMerge.cjs');
+let mergeUserPutPayload;
+try {
+  ({ mergeUserPutPayload } = require('../shared_libs/node/keycloakUserMerge.cjs'));
+} catch {
+  ({ mergeUserPutPayload } = require('../../shared_libs/node/keycloakUserMerge.cjs'));
+}
 
 /**
  * Creates a new user in both Keycloak and Hasura
