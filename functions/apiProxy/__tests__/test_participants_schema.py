@@ -14,7 +14,14 @@ from jsonschema import validate, ValidationError
 
 # Test API key from seed data (organization ID 160)
 TEST_API_KEY = "edh_live_org160_sk_056afe290cadf18e2b2d7482c5f4e5a5"
-LOCAL_API_URL = "http://localhost:42026/participants/schema"
+# Use IPv4 loopback: on many Linux hosts `localhost` resolves to ::1 first while Docker maps
+# 42026 to IPv4 only, so http://localhost:42026 often fails with connection refused.
+LOCAL_API_BASE = "http://127.0.0.1:42026"
+LOCAL_API_URL = f"{LOCAL_API_BASE}/participants/schema"
+SERVER_DOWN_SKIP_REASON = (
+    "apiProxy not reachable at http://127.0.0.1:42026 "
+    "(start: docker compose up -d python_functions — or functions/dev.py on the host)"
+)
 
 # Path to the JSON schema file for validation
 SCHEMA_FILE_PATH = Path(__file__).parent.parent / "schemas" / "participant-data-v1.0.0.json"
@@ -33,7 +40,7 @@ def api_headers():
 def is_local_server_running():
     """Check if the local API server is running."""
     try:
-        response = requests.get("http://localhost:42026/health", timeout=2)
+        response = requests.get(f"{LOCAL_API_BASE}/health", timeout=2)
         return response.status_code == 200
     except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
         return False
@@ -50,7 +57,7 @@ class TestParticipantsSchemaConnectivity:
 
     @pytest.mark.skipif(
         not is_local_server_running(),
-        reason="Local server is not running on port 42026"
+        reason=SERVER_DOWN_SKIP_REASON
     )
     def test_schema_endpoint_responds(self, api_headers):
         """Test that the schema endpoint responds with 200 status."""
@@ -59,7 +66,7 @@ class TestParticipantsSchemaConnectivity:
 
     @pytest.mark.skipif(
         not is_local_server_running(),
-        reason="Local server is not running on port 42026"
+        reason=SERVER_DOWN_SKIP_REASON
     )
     def test_schema_endpoint_returns_json(self, api_headers):
         """Test that the schema endpoint returns valid JSON."""
@@ -77,7 +84,7 @@ class TestParticipantsSchemaConnectivity:
 
     @pytest.mark.skipif(
         not is_local_server_running(),
-        reason="Local server is not running on port 42026"
+        reason=SERVER_DOWN_SKIP_REASON
     )
     def test_schema_response_structure(self, api_headers):
         """Test that the schema response has the expected top-level structure."""
@@ -99,7 +106,7 @@ class TestParticipantsSchemaConnectivity:
 
     @pytest.mark.skipif(
         not is_local_server_running(),
-        reason="Local server is not running on port 42026"
+        reason=SERVER_DOWN_SKIP_REASON
     )
     def test_schema_api_section_structure(self, api_headers):
         """Test that the api section has the expected structure."""
@@ -132,7 +139,7 @@ class TestParticipantsSchemaConnectivity:
 
     @pytest.mark.skipif(
         not is_local_server_running(),
-        reason="Local server is not running on port 42026"
+        reason=SERVER_DOWN_SKIP_REASON
     )
     def test_schema_data_model_section(self, api_headers):
         """Test that the data_model section has the expected structure."""
@@ -152,7 +159,7 @@ class TestParticipantsSchemaValidation:
 
     @pytest.mark.skipif(
         not is_local_server_running(),
-        reason="Local server is not running on port 42026"
+        reason=SERVER_DOWN_SKIP_REASON
     )
     def test_schema_response_validates_against_file(self, api_headers):
         """Test that the schema response structure matches the expected schema file."""
@@ -169,7 +176,7 @@ class TestParticipantsSchemaValidation:
 
     @pytest.mark.skipif(
         not is_local_server_running(),
-        reason="Local server is not running on port 42026"
+        reason=SERVER_DOWN_SKIP_REASON
     )
     def test_schema_errors_section(self, api_headers):
         """Test that the errors section contains expected error codes."""
@@ -196,7 +203,7 @@ class TestParticipantsSchemaErrorHandling:
 
     @pytest.mark.skipif(
         not is_local_server_running(),
-        reason="Local server is not running on port 42026"
+        reason=SERVER_DOWN_SKIP_REASON
     )
     def test_schema_endpoint_publicly_accessible(self):
         """Test that the schema endpoint is publicly accessible without authentication."""
@@ -206,7 +213,7 @@ class TestParticipantsSchemaErrorHandling:
 
     @pytest.mark.skipif(
         not is_local_server_running(),
-        reason="Local server is not running on port 42026"
+        reason=SERVER_DOWN_SKIP_REASON
     )
     def test_schema_endpoint_without_user_agent(self):
         """Test that the schema endpoint works without User-Agent header."""
@@ -216,7 +223,7 @@ class TestParticipantsSchemaErrorHandling:
 
     @pytest.mark.skipif(
         not is_local_server_running(),
-        reason="Local server is not running on port 42026"
+        reason=SERVER_DOWN_SKIP_REASON
     )
     def test_schema_endpoint_with_invalid_api_key(self):
         """Test that the schema endpoint works even with invalid API key (public endpoint)."""
@@ -230,7 +237,7 @@ class TestParticipantsSchemaErrorHandling:
 
     @pytest.mark.skipif(
         not is_local_server_running(),
-        reason="Local server is not running on port 42026"
+        reason=SERVER_DOWN_SKIP_REASON
     )
     def test_valid_api_key_returns_200(self, api_headers):
         """Test that valid API key returns 200."""
@@ -243,7 +250,7 @@ class TestParticipantsSchemaContent:
 
     @pytest.mark.skipif(
         not is_local_server_running(),
-        reason="Local server is not running on port 42026"
+        reason=SERVER_DOWN_SKIP_REASON
     )
     def test_schema_contains_required_endpoints(self, api_headers):
         """Test that the schema documents all required endpoints."""
@@ -273,7 +280,7 @@ class TestParticipantsSchemaContent:
 
     @pytest.mark.skipif(
         not is_local_server_running(),
-        reason="Local server is not running on port 42026"
+        reason=SERVER_DOWN_SKIP_REASON
     )
     def test_schema_security_section(self, api_headers):
         """Test that the security section contains expected information."""

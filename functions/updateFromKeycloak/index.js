@@ -1,5 +1,12 @@
 const KcAdminClient = require("@keycloak/keycloak-admin-client").default;
 
+let mergeUserPutPayload;
+try {
+  ({ mergeUserPutPayload } = require("./shared_libs/node/keycloakUserMerge.cjs"));
+} catch {
+  ({ mergeUserPutPayload } = require("../shared_libs/node/keycloakUserMerge.cjs"));
+}
+
 const { createClient } = require("graphqurl");
 let secretsMatch;
 try {
@@ -85,7 +92,9 @@ exports.updateFromKeycloak = async (req, res) => {
         try {
           await kcAdminClient.users.update(
             { id: userid },
-            { attributes: { ...user.attributes, matrix_user_handle: [matrixHandle] } }
+            mergeUserPutPayload(user, {
+              attributes: { ...(user.attributes || {}), matrix_user_handle: [matrixHandle] },
+            })
           );
           console.log(`Backfilled matrix_user_handle=${matrixHandle} for user ${userid}`);
         } catch (err) {
