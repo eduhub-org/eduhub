@@ -84,6 +84,65 @@ export function matchAddonsFromResponse(responseData, addonMappings, labelToChoi
 }
 
 /**
+ * Fetches all Formbricks responses for a survey, handling pagination automatically.
+ * The Formbricks v1 Management API returns at most `limit` responses per request
+ * and supports `skip` for offset-based pagination.
+ *
+ * @param {string} formbricksApiUrl - Base URL of Formbricks instance (e.g. "https://app.formbricks.com")
+ * @param {string} surveyId - Formbricks survey ID
+ * @param {string} apiKey - Formbricks Management API key
+ * @param {Object} [logger] - Optional Winston logger instance
+ * @param {number} [pageSize=100] - Number of responses per page (max ~250 for v1)
+ * @returns {Promise<Array>} All response objects for the survey
+ */
+export async function fetchAllFormbricksResponses(formbricksApiUrl, surveyId, apiKey, logger, pageSize = 100) {
+  const allResponses = [];
+  let skip = 0;
+  const MAX_PAGES = 50; // safety limit to avoid infinite loops
+
+  for (let page = 0; page < MAX_PAGES; page++) {
+    const url = new URL(`${formbricksApiUrl}/api/v1/management/responses`);
+    url.searchParams.append('surveyId', surveyId);
+    url.searchParams.append('limit', String(pageSize));
+    url.searchParams.append('skip', String(skip));
+
+    logger?.debug('Fetching Formbricks responses page', { page, skip, pageSize, surveyId });
+
+    const res = await fetch(url.toString(), {
+      method: 'GET',
+      headers: {
+        'x-api-key': apiKey,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      logger?.error(`Failed to fetch responses page ${page}: ${res.status}`, { errorText });
+      throw new Error(`Failed to fetch Formbricks responses: ${res.status} - ${errorText}`);
+    }
+
+    const body = await res.json();
+    const pageData = body.data || [];
+
+    allResponses.push(...pageData);
+
+    if (pageData.length < pageSize) {
+      break; // last page
+    }
+
+    skip += pageData.length;
+  }
+
+  logger?.debug('Finished paginated fetch of Formbricks responses', {
+    surveyId,
+    totalFetched: allResponses.length,
+  });
+
+  return allResponses;
+}
+
+/**
  * Shared Formbricks utilities for URL validation and extraction.
  * Enforces HTTPS, validates against trusted origins, and parses survey URL.
  * Used by createEnrollmentWithAddons, getFormbricksResponses, getFormbricksAddonSelections,
