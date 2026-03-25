@@ -64,27 +64,3 @@ select_permissions:
               userId:
                 _eq: X-Hasura-User-Id
       allow_aggregations: true
-  - role: admin-ras
-    permission:
-      columns:
-        - courseEnrollmentId
-        - created_at
-        - currency
-        - grossTotal
-        - id
-        - invoiceDate
-        - invoiceNumber
-        - netTotal
-        - notes
-        - organizationId
-        - status
-        - stripeCheckoutSessionId
-        - stripeHostedInvoiceUrl
-        - stripeInvoiceId
-        - stripeInvoicePdfUrl
-        - stripePaymentIntentId
-        - updated_at
-        - userId
-        - vatTotal
-      filter: {}
-      allow_aggregations: true

@@ -1,14 +1,20 @@
 import { useTranslations } from 'next-intl';
-import { FC, useMemo } from 'react';
+import { FC, useEffect, useMemo, useState } from 'react';
 import { ManagedCourse_Course_by_pk_Sessions_SessionAddresses } from '../../../../queries/__generated__/ManagedCourse';
 import { UPDATE_SESSION_ADDRESS } from '../../../../queries/course';
 import { LOCATION_ADDRESS_BY_LOCATION_OPTION, CREATE_LOCATION_ADDRESS } from '../../../../queries/locationAddress';
+import {
+  LocationAddressByLocationOption,
+  LocationAddressByLocationOptionVariables,
+  LocationAddressByLocationOption_LocationAddress,
+} from '../../../../queries/__generated__/LocationAddressByLocationOption';
 import { useRoleQuery } from '../../../../hooks/authedQuery';
 import DropDownSelector from '../../../inputs/DropDownSelector';
 import { isLinkFormat } from '../../../../helpers/util';
 import { LocationOption_enum } from '../../../../__generated__/globalTypes';
 import { Tooltip } from '@mui/material';
 import { HelpOutline } from '@mui/icons-material';
+import { ErrorMessageDialog } from '../../../common/dialogs/ErrorMessageDialog';
 
 interface SessionAddressesIProps {
   address: ManagedCourse_Course_by_pk_Sessions_SessionAddresses | null;
@@ -18,35 +24,50 @@ interface SessionAddressesIProps {
 export const SessionAddresses: FC<SessionAddressesIProps> = ({ address, refetchQueries }) => {
   const t = useTranslations('manageCourse.SessionsTab.sessionAddresses');
   const tCommon = useTranslations('common');
+  const [showAddressLookupError, setShowAddressLookupError] = useState(true);
 
   const defaultSessionAddress = address?.CourseLocation?.defaultSessionAddress;
-  const defaultSessionAddressId = (address?.CourseLocation as any)?.defaultSessionAddressId;
+  const defaultSessionAddressId = address?.CourseLocation?.defaultSessionAddressId;
   const sessionAddress = address?.address || defaultSessionAddress;
   const isOnline = address?.CourseLocation?.locationOption === 'ONLINE';
   const isValidLink = isLinkFormat(sessionAddress ?? '');
   
   // Get the current locationAddressId if it exists
-  const currentLocationAddressId = (address as any)?.locationAddressId || null;
+  const currentLocationAddressId = address?.locationAddressId || null;
 
   const label = isOnline
     ? t('online.label')
     : tCommon('location.' + address?.CourseLocation?.locationOption);
 
   // Query location addresses for the selected location option
-  const { data: addressData } = useRoleQuery(LOCATION_ADDRESS_BY_LOCATION_OPTION, {
-    variables: {
-      locationOption: address?.CourseLocation?.locationOption as LocationOption_enum,
-      searchFilter: '%',
-    },
-    skip: !address?.CourseLocation?.locationOption || isOnline,
-  });
+  const { data: addressData, error: addressDataError, loading: addressLoading } = useRoleQuery<
+    LocationAddressByLocationOption,
+    LocationAddressByLocationOptionVariables
+  >(
+    LOCATION_ADDRESS_BY_LOCATION_OPTION,
+    {
+      variables: {
+        locationOption: address?.CourseLocation?.locationOption ?? LocationOption_enum.ONLINE,
+        searchFilter: '%',
+      },
+      skip: !address?.CourseLocation?.locationOption || isOnline,
+    }
+  );
+
+  useEffect(() => {
+    if (addressDataError) {
+      setShowAddressLookupError(true);
+    }
+  }, [addressDataError]);
+
+  const isAddressLookupUnavailable = addressLoading || !!addressDataError;
 
   // Transform addresses for dropdown options
   const addressOptions = useMemo(() => {
     if (!addressData?.LocationAddress) return [];
-    
-    return addressData.LocationAddress.map((addr: any) => ({
-      label: addr.shortLabel,
+
+    return addressData.LocationAddress.map((addr: LocationAddressByLocationOption_LocationAddress) => ({
+      label: addr.address ? `${addr.shortLabel} (${addr.address})` : addr.shortLabel,
       value: addr.id.toString(),
       aliases: addr.aliases || [],
     }));
@@ -55,8 +76,10 @@ export const SessionAddresses: FC<SessionAddressesIProps> = ({ address, refetchQ
   // Find the default address label for display
   const defaultAddressLabel = useMemo(() => {
     if (!defaultSessionAddressId || !addressData?.LocationAddress) return null;
-    const defaultAddr = addressData.LocationAddress.find((addr: any) => addr.id === defaultSessionAddressId);
-    return defaultAddr ? defaultAddr.shortLabel : null;
+    const defaultAddr = addressData.LocationAddress.find(
+      (addr: LocationAddressByLocationOption_LocationAddress) => addr.id === defaultSessionAddressId
+    );
+    return defaultAddr ? (defaultAddr.address ? `${defaultAddr.shortLabel} (${defaultAddr.address})` : defaultAddr.shortLabel) : null;
   }, [defaultSessionAddressId, addressData]);
 
   // Custom nullable label that shows the default address if one exists
@@ -119,8 +142,14 @@ export const SessionAddresses: FC<SessionAddressesIProps> = ({ address, refetchQ
           refetchQueries={[...refetchQueries, 'LocationAddressByLocationOption']}
           nullable={true}
           nullableLabel={nullableLabel}
+          disabled={isAddressLookupUnavailable}
         />
       </div>
+      <ErrorMessageDialog
+        errorMessage={addressDataError?.message || t('failed_to_load_session_addresses')}
+        open={!!addressDataError && showAddressLookupError}
+        onClose={() => setShowAddressLookupError(false)}
+      />
     </>
   );
 };

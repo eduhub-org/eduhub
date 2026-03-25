@@ -524,6 +524,7 @@ export interface CourseWithEnrollment_Course_by_pk {
    * An array relationship
    */
   CourseAddonMappings: CourseWithEnrollment_Course_by_pk_CourseAddonMappings[];
+  matrixRoomId: string | null;
   /**
    * An array relationship
    */

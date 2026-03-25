@@ -39,6 +39,7 @@
             "CANCELLED",
             "COMPLETED",
             "CONFIRMED",
+            "EXPIRED",
             "INVITED",
             "REGISTERED",
             "REJECTED"

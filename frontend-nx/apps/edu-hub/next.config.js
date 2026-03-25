@@ -1,8 +1,5 @@
 //@ts-check
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const { withNx } = require('@nx/next/plugins/with-nx');
-
 const path = require('path');
 
 /**
@@ -79,14 +76,9 @@ const buildRemotePatterns = () => {
 };
 
 /**
- * @type {import('@nx/next/plugins/with-nx').WithNxOptions}
- **/
+ * @type {import('next').NextConfig}
+ */
 const nextConfig = {
-  nx: {
-    // Set this to true if you would like to to use SVGR
-    // See: https://github.com/gregberge/svgr
-    svgr: true,
-  },
   i18n: {
     locales: ['en', 'de'],
     defaultLocale: 'de',
@@ -133,6 +125,4 @@ const nextConfig = {
   },
 };
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-module.exports = withNx(nextConfig);
+module.exports = nextConfig;

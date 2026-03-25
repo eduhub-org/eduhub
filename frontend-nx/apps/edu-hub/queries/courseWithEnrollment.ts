@@ -14,6 +14,7 @@ export const COURSE_WITH_ENROLLMENT = gql`
     Course_by_pk(id: $id) {
       ...CourseFragment
       chatLink
+      matrixRoomId
       # LinkVideoCall
       CourseEnrollments {
         ...EnrollmentFragment

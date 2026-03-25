@@ -20,7 +20,7 @@ body.widget-page.bg-edu-bg-gray {
 }
 
 /* Ensure all container divs are transparent on widget pages */
-body.widget-page div[class*="bg-"]:not([class*="bg-white"]):not([class*="bg-transparent"]) {
+body.widget-page div[class*="bg-"]:not([class*="bg-white"]):not([class*="bg-transparent"]):not(.bg-fill-primary) {
   background-color: transparent !important;
 }
 
@@ -72,5 +72,10 @@ body.widget-page .swiper-slide > a > div,
 body.widget-page .swiper-slide a > div,
 body.widget-page .swiper-slide a div.rounded-2xl {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Keep tile info section opaque; only outer widget background stays transparent */
+body.widget-page .swiper-slide a div.bg-fill-primary {
+  background-color: var(--eduhub-fill-primary) !important;
 }
 

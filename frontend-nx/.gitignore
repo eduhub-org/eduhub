@@ -51,6 +51,5 @@ Thumbs.db
 # Next.js
 .next
 
-# nx
-.nx/cache
-.nx/workspace-data
+# Nx (legacy; no longer used)
+.nx

@@ -26,6 +26,7 @@ const GET_COURSE_AND_ADDONS = `
 const GET_ENROLLMENT_USER = `
   query GetEnrollmentUser($enrollmentId: Int!) {
     CourseEnrollment_by_pk(id: $enrollmentId) {
+      courseId
       userId
       User {
         email
@@ -69,6 +70,7 @@ export default async function createStripeCheckout(req, logger) {
   logger.debug(`Request body: ${JSON.stringify(req.body)}`);
 
   try {
+    const sessionUserId = req.body?.session_variables?.['x-hasura-user-id'];
     const {
       courseId,
       enrollmentId,
@@ -89,6 +91,14 @@ export default async function createStripeCheckout(req, logger) {
         success: false,
         error: 'Enrollment ID is required',
         messageKey: 'MISSING_ENROLLMENT_ID'
+      };
+    }
+
+    if (!sessionUserId) {
+      return {
+        success: false,
+        error: 'Missing authenticated session user',
+        messageKey: 'UNAUTHORIZED'
       };
     }
 
@@ -137,19 +147,45 @@ export default async function createStripeCheckout(req, logger) {
       };
     }
 
-    // Fetch enrollment to get user email if not provided
+    // Fetch enrollment once to verify ownership and get user email if needed.
     let emailToUse = userEmail;
-    if (!emailToUse || emailToUse.trim() === '') {
-      try {
-        const enrollmentData = await client.request(GET_ENROLLMENT_USER, { enrollmentId });
-        const enrollment = enrollmentData.CourseEnrollment_by_pk;
-        if (enrollment?.User?.email) {
-          emailToUse = enrollment.User.email;
-        }
-      } catch (error) {
-        logger.warn('Could not fetch user email from enrollment', { error: error.message });
-        // Continue without email - Stripe will prompt for it during checkout
+    try {
+      const enrollmentData = await client.request(GET_ENROLLMENT_USER, { enrollmentId });
+      const enrollment = enrollmentData.CourseEnrollment_by_pk;
+      if (!enrollment) {
+        return {
+          success: false,
+          error: 'Enrollment not found',
+          messageKey: 'ENROLLMENT_NOT_FOUND'
+        };
       }
+
+      if (String(enrollment.userId) !== String(sessionUserId)) {
+        return {
+          success: false,
+          error: 'Enrollment does not belong to authenticated user',
+          messageKey: 'UNAUTHORIZED'
+        };
+      }
+
+      if (Number(enrollment.courseId) !== Number(courseId)) {
+        return {
+          success: false,
+          error: 'Enrollment course mismatch',
+          messageKey: 'INVALID_ENROLLMENT'
+        };
+      }
+
+      if ((!emailToUse || emailToUse.trim() === '') && enrollment?.User?.email) {
+        emailToUse = enrollment.User.email;
+      }
+    } catch (error) {
+      logger.warn('Could not verify enrollment ownership', { error: error.message });
+      return {
+        success: false,
+        error: 'Unable to verify enrollment ownership',
+        messageKey: 'UNAUTHORIZED'
+      };
     }
 
     // Fetch selected addons from CourseEnrollmentAddon table

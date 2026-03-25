@@ -72,7 +72,7 @@ module "lb-http" {
 
   # Create Google-managed SSL certificates for the specified domains. 
   ssl                             = "true"
-  managed_ssl_certificate_domains = ["${local.keycloak_service_name}.opencampus.sh", "${local.hasura_service_name}.opencampus.sh", "${local.eduhub_service_name}.opencampus.sh", "${local.rent_a_scientist_service_name}.opencampus.sh", "${local.eduhub_api_service_name}.opencampus.sh"]
+  managed_ssl_certificate_domains = ["${local.keycloak_service_name}.opencampus.sh", "${local.hasura_service_name}.opencampus.sh", "${local.eduhub_service_name}.opencampus.sh", "${local.eduhub_api_service_name}.opencampus.sh"]
   https_redirect                  = "true"
   random_certificate_suffix       = "true"
 
@@ -130,14 +130,6 @@ resource "cloudflare_record" "hasura" {
 resource "cloudflare_record" "eduhub" {
   zone_id = var.cloudflare_zone_id
   name    = local.eduhub_service_name
-  type    = "A"
-  value   = module.lb-http.external_ip
-}
-
-# Add a domain record for the Hasura service
-resource "cloudflare_record" "rent_a_scientist" {
-  zone_id = var.cloudflare_zone_id
-  name    = local.rent_a_scientist_service_name
   type    = "A"
   value   = module.lb-http.external_ip
 }

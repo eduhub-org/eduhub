@@ -1,38 +1,25 @@
 {
   "root": true,
-  "ignorePatterns": ["**/*"],
-  "extends": [
-    "eslint:recommended",
-    "plugin:react/recommended",
-    "plugin:@typescript-eslint/recommended",
-    "plugin:@nx/typescript",
-    "plugin:@nx/javascript"
-  ],
-  "plugins": ["@nx", "react", "@typescript-eslint"],
+  "ignorePatterns": [".next", "node_modules"],
+  "extends": ["eslint:recommended", "plugin:react/recommended", "plugin:@typescript-eslint/recommended"],
+  "plugins": ["react", "@typescript-eslint"],
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  },
   "overrides": [
     {
       "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
       "rules": {
-        "@nx/enforce-module-boundaries": [
-          "error",
-          {
-            "enforceBuildableLibDependency": true,
-            "allow": [],
-            "depConstraints": [
-              {
-                "sourceTag": "*",
-                "onlyDependOnLibsWithTags": ["*"]
-              }
-            ]
-          }
-        ]
+        // Nx module boundary checks were removed after decommissioning the monorepo setup.
+        // Keep import boundaries disciplined via code review unless multi-app structure returns.
       }
     },
     {
       "files": ["*.ts", "*.tsx"],
       "rules": {
         "@typescript-eslint/no-explicit-any": "off",
-        "@next/next/no-img-element": "off",
         "no-extra-semi": "error", // Use the standard rule
         "react/react-in-jsx-scope": "off" // Disable rule for React 17+ JSX transform
       }

@@ -215,6 +215,7 @@ export interface ManagedCourse_Course_by_pk_Program {
    * Default Formbricks survey URL for course enrollments/applications. Courses can override this with their own formbricksEnrollmentSurveyUrl.
    */
   defaultFormbricksEnrollmentSurveyUrl: string | null;
+  matrixSpaceId: string | null;
 }
 
 export interface ManagedCourse_Course_by_pk_CourseGroups_CourseGroupOption {
@@ -694,6 +695,7 @@ export interface ManagedCourse_Course_by_pk {
    * Shows whether the current status is DRAFT, READY_FOR_PUBLICATION, READY_FOR_APPLICATION, APPLICANTS_INVITED, or PARTICIPANTS_RATED, which is set in correspondance to the tabs completed on the course administration page
    */
   status: CourseStatus_enum;
+  matrixRoomId: string | null;
   /**
    * Stripe Product ID for the base course price
    */

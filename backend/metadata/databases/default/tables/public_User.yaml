@@ -72,28 +72,6 @@ array_relationships:
           name: OrganizationNewsletterSubscription
           schema: public
 select_permissions:
-  - role: admin-ras
-    permission:
-      columns:
-        - addressLine1
-        - addressLine2
-        - anonymousId
-        - city
-        - country
-        - created_at
-        - email
-        - externalProfile
-        - firstName
-        - id
-        - lastName
-        - matriculationNumber
-        - matrixUserHandle
-        - newsletterRegistration
-        - occupation
-        - picture
-        - updated_at
-        - zipCode
-      filter: {}
   - role: anonymous
     permission:
       columns:

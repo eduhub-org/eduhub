@@ -1,6 +1,19 @@
 const KcAdminClient = require("@keycloak/keycloak-admin-client").default;
 
+let mergeUserPutPayload;
+try {
+  ({ mergeUserPutPayload } = require("./shared_libs/node/keycloakUserMerge.cjs"));
+} catch {
+  ({ mergeUserPutPayload } = require("../shared_libs/node/keycloakUserMerge.cjs"));
+}
+
 const { createClient } = require("graphqurl");
+let secretsMatch;
+try {
+  ({ secretsMatch } = require("./shared_libs/node/security.cjs"));
+} catch {
+  ({ secretsMatch } = require("../shared_libs/node/security.cjs"));
+}
 
 function computeMatrixHandle(firstName, lastName, userId) {
   const sanitize = (input) => {
@@ -14,7 +27,12 @@ function computeMatrixHandle(firstName, lastName, userId) {
 }
 
 exports.updateFromKeycloak = async (req, res) => {
-  if (process.env.HASURA_CLOUD_FUNCTION_SECRET == req.headers.secret) {
+  const expectedSecret = process.env.HASURA_CLOUD_FUNCTION_SECRET;
+  if (!expectedSecret) {
+    return res.status(500).json({ error: "Server secret not configured" });
+  }
+
+  if (secretsMatch(req.headers.secret, expectedSecret)) {
     const kcAdminClient = new KcAdminClient({
       baseUrl: process.env.KEYCLOAK_URL,
       realmName: "master",
@@ -74,7 +92,9 @@ exports.updateFromKeycloak = async (req, res) => {
         try {
           await kcAdminClient.users.update(
             { id: userid },
-            { attributes: { ...user.attributes, matrix_user_handle: [matrixHandle] } }
+            mergeUserPutPayload(user, {
+              attributes: { ...(user.attributes || {}), matrix_user_handle: [matrixHandle] },
+            })
           );
           console.log(`Backfilled matrix_user_handle=${matrixHandle} for user ${userid}`);
         } catch (err) {
@@ -151,4 +171,6 @@ exports.updateFromKeycloak = async (req, res) => {
       });
     }
   }
+
+  return res.status(401).json({ error: "Unauthorized" });
 };

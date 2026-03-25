@@ -1,8 +1,7 @@
 import React, { FC, useRef, useState, memo, useEffect } from 'react';
-import { Navigation, Mousewheel } from 'swiper/modules';
+import { Mousewheel } from 'swiper/modules';
 import { Swiper, SwiperSlide, SwiperRef } from 'swiper/react';
 import 'swiper/css';
-import 'swiper/css/navigation';
 import 'swiper/css/mousewheel';
 import { useTranslations } from 'next-intl';
 
@@ -11,9 +10,6 @@ import { CourseTiles_Course } from '../../../queries/__generated__/CourseTiles';
 import { CoursesEnrolledByUser_Course } from '../../../queries/__generated__/CoursesEnrolledByUser';
 import { Tile } from './Tile';
 import { TileWidget } from './TileWidget';
-
-import sliderNextArrow from '../../../public/images/common/slider-next-arrow.svg';
-import sliderPreviousArrow from '../../../public/images/common/slider-previous-arrow.svg';
 
 export type CourseType = CourseList_Course | CourseTiles_Course | CoursesEnrolledByUser_Course;
 
@@ -187,14 +183,13 @@ const TileSlider: FC<TileSliderProps> = ({ courses, isManage, isWidget = false }
       <Swiper
         className={isWidget ? '!overflow-visible' : ''}
         ref={swiperRef}
-        modules={[Navigation, Mousewheel]}
+        modules={[Mousewheel]}
         breakpoints={breakpoints}
         spaceBetween={COMMON_SPACE_BETWEEN}
         slidesPerView={'auto'}
         slidesOffsetBefore={13}
         slidesOffsetAfter={13}
         onSlideChange={handleSlideChange}
-        navigation
         mousewheel={{
           forceToAxis: true,
           sensitivity: 1,
@@ -246,7 +241,7 @@ const TileSlider: FC<TileSliderProps> = ({ courses, isManage, isWidget = false }
             className="absolute top-0 left-0 z-10"
             visible={prevVisible}
             onClick={swiperPrev}
-            imgSrc={sliderPreviousArrow}
+            imgSrc="/images/common/slider-previous-arrow.svg"
             imgAlt="Previous"
             isWidget={isWidget}
           />
@@ -255,7 +250,7 @@ const TileSlider: FC<TileSliderProps> = ({ courses, isManage, isWidget = false }
             className="absolute top-0 right-0 z-10"
             visible={nextVisible}
             onClick={swiperNext}
-            imgSrc={sliderNextArrow}
+            imgSrc="/images/common/slider-next-arrow.svg"
             imgAlt="Next"
             isWidget={isWidget}
           />

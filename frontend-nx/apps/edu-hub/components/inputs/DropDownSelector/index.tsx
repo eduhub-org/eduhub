@@ -27,6 +27,7 @@ const DropDownSelector: React.FC<DropDownSelectorProps> = ({
   createOptionMutation,
   nullable = false,
   nullableLabel,
+  disabled = false,
 }) => {
   const t = useTranslations('common');
   const [inputValue, setInputValue] = useState('');
@@ -105,6 +106,7 @@ const DropDownSelector: React.FC<DropDownSelectorProps> = ({
   );
 
   const handleCreateOption = useCallback(() => {
+    if (disabled) return;
     if (inputValue && !localOptions.some((option) => option.value === inputValue)) {
       if (createOptionMutation) {
         createValue({
@@ -143,6 +145,7 @@ const DropDownSelector: React.FC<DropDownSelectorProps> = ({
     debouncedUpdateValue,
     handleError,
     t,
+    disabled,
   ]);
 
   return (
@@ -163,6 +166,7 @@ const DropDownSelector: React.FC<DropDownSelectorProps> = ({
           onBlur={() => handleBlur(variant, isMandatory)}
           onCreateOption={handleCreateOption}
           getLabelForValue={getLabelForValue}
+          disabled={disabled}
         />
       ) : (
         <EduhubDropDown
@@ -180,6 +184,7 @@ const DropDownSelector: React.FC<DropDownSelectorProps> = ({
           onBlur={() => handleBlur(variant, isMandatory)}
           onCreateOption={handleCreateOption}
           getLabelForValue={getLabelForValue}
+          disabled={disabled}
         />
       )}
       <NotificationSnackbar

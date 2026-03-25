@@ -45,6 +45,16 @@ export const ORGANIZATION_LIST = gql`
   }
 `;
 
+export const ORGANIZATION_OPTIONS = gql`
+  query OrganizationOptions($limit: Int = 10000, $order_by: [Organization_order_by!] = { name: asc }) {
+    Organization(limit: $limit, order_by: $order_by) {
+      id
+      name
+      aliases
+    }
+  }
+`;
+
 export const INSERT_ORGANIZATION = gql`
   mutation InsertOrganization($insertInput: Organization_insert_input!) {
     insert_Organization_one(object: $insertInput) {

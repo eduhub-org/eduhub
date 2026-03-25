@@ -48,6 +48,7 @@
       "location_addresses": "Location Addresses",
       "email_templates": "Email Templates",
       "app_settings": "App Settings",
+      "calendar": "Calendar",
       "statistics": "Statistics",
       "course_instructor_manual": "Course Instructor Manual",
       "logout": "Logout"
@@ -122,7 +123,8 @@
     "location": {
       "ONLINE": "Online",
       "KIEL": "Kiel",
-      "HEIDE": "Heide"
+      "HEIDE": "Heide",
+      "HAMBURG": "Hamburg"
     },
     "type_name_or_email_minimum_3_letters": "Type a name or email (minimum 3 letters).",
     "select_user_dialog": {
@@ -335,9 +337,10 @@
       "general_achievement_certificate_conditions": "**Online Participation:**\nIf online participation is possible, attendances are only counted as present if the camera is continuously turned on!"
     },
     "sessions": {
-      "show_all_sessions": "Show all sessions",
-      "hide_sessions": "Collapse sessions",
-      "course_sessions": "Course Sessions"
+      "show_all_dates": "Show all dates",
+      "hide_dates": "Collapse dates",
+      "date_singular": "Date",
+      "date_plural": "Dates"
     },
     "attendances": {
       "attendances": "Attendances",
@@ -445,7 +448,8 @@
       "motivation_letter_required": "Please provide a motivation letter",
       "terms_required": "Please accept the Terms and Conditions",
       "registration_failed": "Registration failed. Please try again.",
-      "complete_survey_first": "Please complete the questionnaire first."
+      "complete_survey_first": "Please complete the questionnaire first.",
+      "failed_to_load_organization_options": "Failed to load organization options."
     },
     "formbricks": {
       "survey_title": "Application Questionnaire",
@@ -589,7 +593,8 @@
       "label": "Location",
       "ONLINE": "Online",
       "KIEL": "Kiel",
-      "HEIDE": "Heide"
+      "HEIDE": "Heide",
+      "HAMBURG": "Hamburg"
     },
     "address": {
       "label": "Link or Address",
@@ -942,13 +947,31 @@
       "label": "External Registration Link",
       "help_text": "URL where participants can register externally"
     },
-    "chat_link": {
-      "label": "Course Chat Link",
-      "help_text": "Link to the course chat or communication platform"
+    "participant_chat": {
+      "title": "Participant chat",
+      "button_open_element": "To Element room",
+      "button_open_mattermost": "To Mattermost channel",
+      "button_open_chat": "Open chat"
+    },
+    "matrix_room": {
+      "button_create": "Create Matrix Room",
+      "button_creating": "Creating Matrix room …",
+      "button_open_details": "Matrix room details",
+      "dialog_title": "Create Matrix Room",
+      "dialog_title_existing": "Matrix room",
+      "room_name_label": "Room Name",
+      "description_label": "Topic / Description",
+      "space_name_label": "Program Space Name",
+      "space_will_be_created_hint": "No program Space exists yet — it will be created automatically.",
+      "error_no_config": "Matrix configuration is incomplete. Please contact an administrator.",
+      "error_invalid_input": "Please check your input values.",
+      "error_creation_failed": "Matrix room creation failed",
+      "error_unknown": "An unknown error occurred while creating the Matrix room.",
+      "success_created": "Matrix room created successfully.",
+      "open_in_element": "Open in Element"
     },
     "email_templates": {
       "label": "Email Templates",
-      "manage_button": "Manage Email Templates",
       "create_button": "Create Email Templates",
       "edit_button": "Edit Email Templates",
       "external_registration_note": "Email templates are not available for external registration courses."
@@ -1095,6 +1118,7 @@
     "uploaded_by": "Uploaded by",
     "co_authors": "Co-authors",
     "download_documentation": "Download Documentation",
+    "download_documentation_error": "Failed to load project documentation. Please try again.",
     "generate_achievement_certificates": "Generate Achievement Certificates",
     "delete_achievement_certificates": "Delete Achievement Certificates",
     "no_certificates_deleted": "No certificates were deleted",
@@ -1232,7 +1256,8 @@
         "aliases_help": "Enter aliases and press Enter to add them",
         "legacy_address": "Legacy Address (read-only)",
         "select_location_option_first": "Please select a location option first",
-        "location_mismatch_error": "The selected address does not match the location option for this session. Please select an address that belongs to the correct location."
+        "location_mismatch_error": "The selected address does not match the location option for this session. Please select an address that belongs to the correct location.",
+        "failed_to_load_session_addresses": "Failed to load session addresses."
       },
       "session_description": {
         "label": "Description",
@@ -1244,7 +1269,8 @@
       "label": "Location",
       "ONLINE": "Online",
       "KIEL": "Kiel",
-      "HEIDE": "Heide"
+      "HEIDE": "Heide",
+      "HAMBURG": "Hamburg"
     },
     "address": {
       "label": "Link or Address",
@@ -1305,7 +1331,10 @@
     "not_submitted": "not submitted",
     "confirmation_push_course_to_next_status": "Do you want to send the course to its next state?",
     "set_status_high": "increase status",
-    "please_fill_all_fields": "Please fill out all fields to proceed!"
+    "please_fill_all_fields": "Please fill out all fields to proceed!",
+    "errors": {
+      "failed_to_load_location_addresses": "Failed to load location addresses."
+    }
   },
   "managePrograms": {
     "headline": "Programs",
@@ -1703,7 +1732,8 @@
     "type_selection": {
       "KIEL": "Kiel",
       "ONLINE": "Online",
-      "HEIDE": "Heide"
+      "HEIDE": "Heide",
+      "HAMBURG": "Hamburg"
     }
   },
   "manageEmailTemplates": {
@@ -1769,6 +1799,18 @@
     "delete": "Delete",
     "upload": "Upload"
   },
+  "AddonValidationDialog": {
+    "title": "Add-on Validation",
+    "close": "Close",
+    "no_addons_found": "No add-ons found.",
+    "price_label": "Price",
+    "description_label": "Description",
+    "question_id": "Question ID",
+    "choice_id": "Choice ID",
+    "cancel": "Cancel",
+    "saving": "Saving...",
+    "save_and_create_stripe": "Save and create Stripe products"
+  },
   "pricing_summary": {
     "title": "Pricing Summary",
     "base_price": "Course Fee",
@@ -1777,6 +1819,27 @@
     "no_pricing": "No pricing configured.",
     "synced": "Synced",
     "not_synced": "Not synced"
+  },
+  "calendar": {
+    "title": "Calendar",
+    "export_ical": "Export Calendar (.ics)",
+    "filter_type": "Type",
+    "filter_type_all": "All",
+    "filter_courses": "Courses",
+    "filter_events": "Events",
+    "filter_location": "Location",
+    "filter_location_all": "All Locations",
+    "filter_course": "Course",
+    "filter_course_all": "All Courses",
+    "select_all": "Select all",
+    "deselect_all": "Deselect all",
+    "month_view": "Month View",
+    "week_view": "Week View",
+    "day_view": "Day View",
+    "today": "Today",
+    "no_sessions": "No sessions available.",
+    "session_details": "Session Details",
+    "error_loading": "Error loading calendar data."
   },
   "footer": {
     "imprint": "Imprint",

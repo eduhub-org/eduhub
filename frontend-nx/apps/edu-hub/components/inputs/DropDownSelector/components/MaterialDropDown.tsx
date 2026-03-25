@@ -24,6 +24,7 @@ type MaterialDropDownProps = {
   onBlur: () => void;
   onCreateOption?: () => void;
   getLabelForValue?: (value?: string) => string;
+  disabled?: boolean;
 };
 
 export const MaterialDropDown: React.FC<MaterialDropDownProps> = ({
@@ -41,6 +42,7 @@ export const MaterialDropDown: React.FC<MaterialDropDownProps> = ({
   onBlur,
   onCreateOption,
   getLabelForValue,
+  disabled = false,
 }) => {
   const handleChange = (event: SelectChangeEvent<string>) => {
     onValueChange(event);
@@ -68,6 +70,7 @@ export const MaterialDropDown: React.FC<MaterialDropDownProps> = ({
             onValueChange={onValueChange}
             onCreateOption={onCreateOption}
             getLabelForValue={getLabelForValue}
+            disabled={disabled}
           />
         ) : (
           <Select
@@ -77,6 +80,7 @@ export const MaterialDropDown: React.FC<MaterialDropDownProps> = ({
             onBlur={onBlur}
             placeholder={placeholder}
             displayEmpty
+            disabled={disabled}
             sx={{
               minHeight: '32px',
               padding: '4px',
