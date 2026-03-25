@@ -1,4 +1,4 @@
-import { validateAndExtractFormbricksSurvey } from '../lib/formbricks.js';
+import { validateAndExtractFormbricksSurvey, fetchAllFormbricksResponses } from '../lib/formbricks.js';
 
 /**
  * Fetches Formbricks survey responses for a specific enrollment.
@@ -122,36 +122,20 @@ export default async function getFormbricksResponses(req, logger) {
     
     const surveyData = await surveyResponse.json();
     
-    // Fetch responses filtered by surveyId
-    const responsesUrl = new URL(`${formbricksApiUrl}/api/v1/management/responses`);
-    responsesUrl.searchParams.append('surveyId', formbricksSurveyId);
-    responsesUrl.searchParams.append('limit', '100');
-    
-    const responsesResponse = await fetch(responsesUrl.toString(), {
-      method: 'GET',
-      headers: {
-        'x-api-key': formbricksApiKey,
-        'Content-Type': 'application/json'
-      }
-    });
-    
-    if (!responsesResponse.ok) {
-      const errorText = await responsesResponse.text();
-      logger.error(`Failed to fetch responses: ${responsesResponse.status}`, { errorText });
-      throw new Error(`Failed to fetch responses: ${responsesResponse.status} - ${errorText}`);
-    }
-    
-    const responsesData = await responsesResponse.json();
+    // Fetch all responses for the survey (paginated)
+    const allResponseData = await fetchAllFormbricksResponses(
+      formbricksApiUrl, formbricksSurveyId, formbricksApiKey, logger
+    );
     
     logger.debug('Fetched responses from Formbricks', {
-      totalResponses: responsesData.data?.length || 0,
+      totalResponses: allResponseData.length,
       lookingFor: { userId, courseId, enrollmentId }
     });
     
     // Filter responses by eduhub* hidden fields
     // Hidden fields are stored directly in response.data (not in response.data.hiddenFields)
     // Note: We use 'eduhub*' prefix to avoid conflicts with Formbricks internal variables
-    const userResponses = (responsesData.data || []).filter(response => {
+    const userResponses = allResponseData.filter(response => {
       // Hidden fields are stored directly in response.data alongside question answers
       const responseData = response.data || {};
       
@@ -196,7 +180,7 @@ export default async function getFormbricksResponses(req, logger) {
     
     logger.debug('Filtered responses', {
       matchedCount: userResponses.length,
-      totalChecked: responsesData.data?.length || 0
+      totalChecked: allResponseData.length
     });
     
     // Transform responses to include question labels

@@ -1,5 +1,5 @@
 import { GraphQLClient } from 'graphql-request';
-import { validateAndExtractFormbricksSurvey, buildLabelToChoiceIdMap, matchAddonsFromResponse } from '../lib/formbricks.js';
+import { validateAndExtractFormbricksSurvey, buildLabelToChoiceIdMap, matchAddonsFromResponse, fetchAllFormbricksResponses } from '../lib/formbricks.js';
 
 const normalizeUserId = (value) => String(value ?? '').trim().toLowerCase();
 
@@ -113,9 +113,6 @@ async function fetchFormbricksResponseWithRetry(
   retryDelayMs = 2000
 ) {
   const normalizedUserId = normalizeUserId(userId);
-  const responsesUrl = new URL(`${formbricksApiUrl}/api/v1/management/responses`);
-  responsesUrl.searchParams.append('surveyId', formbricksSurveyId);
-  responsesUrl.searchParams.append('limit', '100');
 
   // Initial delay before first attempt - Formbricks needs time to persist the response
   // The survey completion event can fire before Formbricks has saved the response
@@ -133,27 +130,19 @@ async function fetchFormbricksResponseWithRetry(
         courseId: String(courseId)
       });
 
-      const responsesResponse = await fetch(responsesUrl.toString(), {
-        method: 'GET',
-        headers: {
-          'x-api-key': formbricksApiKey,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (!responsesResponse.ok) {
-        const errorText = await responsesResponse.text();
-        logger.error(`Failed to fetch responses: ${responsesResponse.status}`, { errorText });
+      let allResponses;
+      try {
+        allResponses = await fetchAllFormbricksResponses(
+          formbricksApiUrl, formbricksSurveyId, formbricksApiKey, logger
+        );
+      } catch (fetchError) {
+        logger.error(`Failed to fetch responses: ${fetchError.message}`);
         if (attempt === maxRetries) {
-          throw new Error(`Failed to fetch Formbricks responses: ${responsesResponse.status}`);
+          throw fetchError;
         }
-        // Wait before retrying on API error
         await new Promise(resolve => setTimeout(resolve, retryDelayMs));
         continue;
       }
-
-      const responsesData = await responsesResponse.json();
-      const allResponses = responsesData.data || [];
 
       logger.info(`Formbricks API returned ${allResponses.length} total responses`, {
         attempt,

@@ -15,7 +15,7 @@ const GET_COURSE_ADDONS = `
   }
 `;
 
-import { validateAndExtractFormbricksSurvey, buildLabelToChoiceIdMap, matchAddonsFromResponse } from '../lib/formbricks.js';
+import { validateAndExtractFormbricksSurvey, buildLabelToChoiceIdMap, matchAddonsFromResponse, fetchAllFormbricksResponses } from '../lib/formbricks.js';
 
 /**
  * Fetches selected addons from the latest Formbricks response for a user/course.
@@ -124,54 +124,30 @@ export default async function getFormbricksAddonSelections(req, logger) {
       });
     }
     
-    // Fetch the latest Formbricks response for this user/course
-    const responsesUrl = new URL(`${formbricksApiUrl}/api/v1/management/responses`);
-    responsesUrl.searchParams.append('surveyId', formbricksSurveyId);
-    responsesUrl.searchParams.append('limit', '100');
-    
-    const responsesResponse = await fetch(responsesUrl.toString(), {
-      method: 'GET',
-      headers: {
-        'x-api-key': formbricksApiKey,
-        'Content-Type': 'application/json'
-      }
-    });
-    
-    if (!responsesResponse.ok) {
-      const errorText = await responsesResponse.text();
-      logger.error(`Failed to fetch responses: ${responsesResponse.status}`, { errorText });
+    // Fetch all Formbricks responses for this survey (paginated)
+    let allResponseData;
+    try {
+      allResponseData = await fetchAllFormbricksResponses(
+        formbricksApiUrl, formbricksSurveyId, formbricksApiKey, logger
+      );
+    } catch (fetchError) {
+      logger.error('Failed to fetch Formbricks responses', { error: fetchError.message });
       return {
         success: false,
         selectedAddons: [],
-        error: `Failed to fetch Formbricks responses: ${responsesResponse.status}`,
+        error: `Failed to fetch Formbricks responses: ${fetchError.message}`,
         messageKey: 'FORMBRICKS_FETCH_ERROR'
       };
     }
     
-    const responsesData = await responsesResponse.json();
-    
     logger.info('Formbricks API response', {
-      totalResponses: responsesData.data?.length || 0,
+      totalResponses: allResponseData.length,
       lookingFor: { userId, courseId }
     });
     
-    // Log all responses for debugging
-    if (responsesData.data && responsesData.data.length > 0) {
-      responsesData.data.forEach((response, index) => {
-        const rd = response.data || {};
-        logger.debug(`Response ${index}`, {
-          id: response.id,
-          finished: response.finished,
-          eduhubUserId: rd.eduhubUserId,
-          eduhubCourseId: rd.eduhubCourseId,
-          dataKeys: Object.keys(rd)
-        });
-      });
-    }
-    
     // Filter responses by userId and courseId (from hidden fields)
     // Note: Convert to String for comparison as Formbricks stores these as strings
-    const userResponses = (responsesData.data || []).filter(response => {
+    const userResponses = allResponseData.filter(response => {
       const responseData = response.data || {};
       const responseUserId = responseData.eduhubUserId;
       const responseCourseId = responseData.eduhubCourseId;
@@ -196,7 +172,7 @@ export default async function getFormbricksAddonSelections(req, logger) {
     });
     
     // Also check for unfinished responses that match (to detect timing issues)
-    const unfinishedMatchingResponses = (responsesData.data || []).filter(response => {
+    const unfinishedMatchingResponses = allResponseData.filter(response => {
       const responseData = response.data || {};
       const matchesUser = String(responseData.eduhubUserId) === String(userId);
       const matchesCourse = String(responseData.eduhubCourseId) === String(courseId);
@@ -233,7 +209,7 @@ export default async function getFormbricksAddonSelections(req, logger) {
         logger.warn('No responses found for user/course', {
           userId: String(userId),
           courseId: String(courseId),
-          totalResponsesFromApi: responsesData.data?.length || 0
+          totalResponsesFromApi: allResponseData.length
         });
         return {
           success: true,
