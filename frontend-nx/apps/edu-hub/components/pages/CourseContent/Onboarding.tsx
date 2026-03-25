@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from 'react';
+import { FC, ReactNode, useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { CircularProgress } from '@mui/material';
 import Link from 'next/link';
@@ -13,7 +13,7 @@ import {
 } from '../../../queries/updateUser';
 import { UPDATE_ENROLLMENT_STATUS } from '../../../queries/insertEnrollment';
 import { CourseEnrollmentStatus_enum } from '../../../__generated__/globalTypes';
-import { USER_OCCUPATION } from '../../../queries/user';
+import { USER, USER_OCCUPATION } from '../../../queries/user';
 import {
   CREATE_ORGANIZATION,
   ORGANIZATION_OPTIONS,
@@ -43,7 +43,6 @@ import {
   UpdateEnrollmentStatus,
   UpdateEnrollmentStatusVariables,
 } from '../../../queries/__generated__/UpdateEnrollmentStatus';
-import { USER } from '../../../queries/user';
 import { User } from '../../../queries/__generated__/User';
 import { useSession } from 'next-auth/react';
 
@@ -63,6 +62,12 @@ interface OrganizationWithNewsletter {
   ghostNewsletterDoubleOptInEnabled?: boolean | null;
   newsletterDescription?: string | null;
 }
+
+const renderPrivacyLink = (chunks: ReactNode) => (
+  <Link href="/privacy" target="_blank" rel="noopener noreferrer" className="underline">
+    {chunks}
+  </Link>
+);
 
 const Onboarding: FC<OnboardingProps> = ({ course, enrollmentId, refetchCourse, setResetValues }) => {
   const tCourse = useTranslations('course');
@@ -321,11 +326,7 @@ const Onboarding: FC<OnboardingProps> = ({ course, enrollmentId, refetchCourse, 
               )}
               <p className="mt-2 text-xs text-label-secondary">
                 {tCourse.rich('onboarding_modal.newsletter_legal', {
-                  privacy: (chunks) => (
-                    <Link href="/privacy" target="_blank" rel="noopener noreferrer" className="underline">
-                      {chunks}
-                    </Link>
-                  ),
+                  privacy: renderPrivacyLink,
                 })}
               </p>
               {organizationWithNewsletter.ghostNewsletterDoubleOptInEnabled && (

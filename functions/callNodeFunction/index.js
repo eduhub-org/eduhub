@@ -1,5 +1,5 @@
 import winston from "winston";
-import { createRequire } from "module";
+import { createRequire } from "node:module";
 import createCertificate from "./createCertificate/index.js";
 import getSignedUrl from "./getSignedUrl/index.js";
 import saveFile from "./saveFile/index.js";
