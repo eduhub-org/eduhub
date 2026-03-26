@@ -70,6 +70,8 @@ export default async function manageGhostNewsletterCredential(
     const accessClient = new GraphQLClient(GRAPHQL_URI, {
       headers: {
         Authorization: authHeader,
+        // JWT allowed roles are user/instructor/admin (see Keycloak hasura client roles). Use `user` so the
+        // token validates; Hasura expands inherited roles to include `user_access` (Organization permissions).
         'x-hasura-role': 'user',
       },
     });
@@ -101,9 +103,10 @@ export default async function manageGhostNewsletterCredential(
 
     return res.status(200).json({ success: true, configured: shouldConfigure });
   } catch (error) {
+    console.error('manageGhostNewsletterCredential: credential update failed', error);
     return res.status(500).json({
       success: false,
-      error: error instanceof Error ? error.message : 'Unexpected credential update error.',
+      error: 'Could not update credentials. Please try again.',
     });
   }
 }

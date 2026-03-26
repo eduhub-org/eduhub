@@ -206,6 +206,8 @@
       }
     },
     "input_field": {
+      "language_de": "Deutsch",
+      "language_en": "English",
       "invalid_link_format": "Invalid link format",
       "invalid_email_format": "Invalid email format",
       "invalid_ects_format": "Invalid ECTS format",
@@ -869,7 +871,10 @@
       "legal": "You can revoke your consent at any time. Processing is based on our <privacy>Privacy Policy</privacy>.",
       "double_opt_in_notice": "Subscription activation may require an additional confirmation email (double opt-in).",
       "sync_error": "The last synchronization with the newsletter provider failed.",
-      "error": "Your newsletter preference could not be saved. Please try again."
+      "error": "Your newsletter preference could not be saved. Please try again.",
+      "loading": "Loading…",
+      "load_error": "Newsletter options could not be loaded.",
+      "retry": "Retry"
     }
   },
   "programs": {
@@ -1487,7 +1492,17 @@
       "America/Los_Angeles": "Los Angeles",
       "Asia/Tokyo": "Tokio"
     },
-    "timeZoneHelpText": "The time zone is used to display dates and times in the application. General times like the recurring course time, which are not bound to a specific day, will always be displayed in the original time and not adjusted."
+    "timeZoneHelpText": "The time zone is used to display dates and times in the application. General times like the recurring course time, which are not bound to a specific day, will always be displayed in the original time and not adjusted.",
+    "onboarding": {
+      "label": "Onboarding Texts",
+      "courses_label": "Courses",
+      "events_label": "Events",
+      "degrees_label": "Degree Programs",
+      "text_de": "Text (German)",
+      "text_en": "Text (English)",
+      "preview": "Preview",
+      "generic_help": "This text is shown to participants during onboarding when the corresponding registration type is selected."
+    }
   },
   "manageExperts": {
     "headline": "Experts",
@@ -1513,7 +1528,7 @@
       "description": "Description",
       "logo": "Logo",
       "new_organization": "New Organization",
-      "default_description": "Description",
+      "default_description": "",
       "newsletter_title": "Newsletter configuration (Ghost)",
       "newsletter_api_url": "Ghost API URL",
       "newsletter_api_url_placeholder": "https://your-ghost-site/ghost/api/admin",
@@ -1522,6 +1537,8 @@
       "newsletter_api_key_set": "Save credential",
       "newsletter_api_key_rotate": "Replace credential",
       "newsletter_api_key_remove": "Remove credential",
+      "newsletter_api_key_remove_confirm": "Remove the organization-wide Ghost Admin API credential? Newsletter sync will stop until a new credential is saved.",
+      "newsletter_api_key_save_success": "Ghost credential updated.",
       "newsletter_api_key_status_configured": "Credential configured",
       "newsletter_api_key_status_missing": "No credential configured",
       "newsletter_api_key_error_auth": "Your session has expired. Please log in again.",

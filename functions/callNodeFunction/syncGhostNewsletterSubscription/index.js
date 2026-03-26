@@ -77,39 +77,78 @@ const buildGhostPayload = ({ subscription, userEmail, subscribe }) => {
   };
 };
 
+const MAX_GHOST_SYNC_RETRIES = 3;
+
+const extractGhostHttpError = (response) =>
+  response.data?.errors?.[0]?.message ||
+  response.data?.message ||
+  `Ghost sync request failed with status ${response.status}`;
+
 const callGhostSyncEndpoint = async ({ subscription, userEmail, subscribe }) => {
   const apiUrl = normalize(subscription.Organization.ghostNewsletterApiUrl).replace(/\/+$/, '');
   const ghostCredential = decryptGhostCredential(subscription.Organization.ghostNewsletterApiKeyEncrypted);
   const endpoint = `${apiUrl}/members/`;
   const payload = buildGhostPayload({ subscription, userEmail, subscribe });
 
-  const response = await axios.post(endpoint, payload, {
-    timeout: 15000,
-    validateStatus: () => true,
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Ghost ${ghostCredential}`,
-      'x-ghost-api-key': ghostCredential,
-    },
-  });
+  let lastError;
+  for (let attempt = 0; attempt < MAX_GHOST_SYNC_RETRIES; attempt += 1) {
+    try {
+      const response = await axios.post(endpoint, payload, {
+        timeout: 15000,
+        validateStatus: () => true,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Ghost ${ghostCredential}`,
+          'x-ghost-api-key': ghostCredential,
+        },
+      });
 
-  if (response.status < 200 || response.status >= 300) {
-    const responseError =
-      response.data?.errors?.[0]?.message ||
-      response.data?.message ||
-      `Ghost sync request failed with status ${response.status}`;
-    throw new Error(responseError);
+      if (response.status < 200 || response.status >= 300) {
+        const responseError = extractGhostHttpError(response);
+        const retriable = response.status >= 500 || response.status === 429;
+        if (retriable && attempt < MAX_GHOST_SYNC_RETRIES - 1) {
+          await new Promise((r) => setTimeout(r, 1000 * 2 ** attempt));
+          lastError = new Error(responseError);
+          continue;
+        }
+        throw new Error(responseError);
+      }
+
+      return {
+        externalSubscriberId:
+          response.data?.member?.id ||
+          response.data?.id ||
+          response.data?.externalSubscriberId ||
+          payload.externalSubscriberId ||
+          null,
+        remoteStatus: response.data?.status || null,
+      };
+    } catch (err) {
+      const isNetwork =
+        !err.response &&
+        (err.code === 'ECONNABORTED' ||
+          err.code === 'ETIMEDOUT' ||
+          err.code === 'ECONNRESET' ||
+          err.message === 'Network Error');
+      if (isNetwork && attempt < MAX_GHOST_SYNC_RETRIES - 1) {
+        await new Promise((r) => setTimeout(r, 1000 * 2 ** attempt));
+        lastError = err;
+        continue;
+      }
+      throw err;
+    }
   }
+  throw lastError || new Error('Ghost sync failed after retries');
+};
 
-  return {
-    externalSubscriberId:
-      response.data?.member?.id ||
-      response.data?.id ||
-      response.data?.externalSubscriberId ||
-      payload.externalSubscriberId ||
-      null,
-    remoteStatus: response.data?.status || null,
-  };
+const ALLOWED_REMOTE_STATUSES = new Set(['SUBSCRIBED', 'UNSUBSCRIBED', 'PENDING', 'ERROR']);
+
+const normalizeRemoteSubscriptionStatus = (remoteStatus, fallbackStatus) => {
+  const normalized = typeof remoteStatus === 'string' ? remoteStatus.trim().toUpperCase() : '';
+  if (normalized && ALLOWED_REMOTE_STATUSES.has(normalized)) {
+    return normalized;
+  }
+  return fallbackStatus;
 };
 
 const getRequiredEnv = (name) => {
@@ -188,7 +227,13 @@ const updateSubscriptionState = async (client, payload) =>
   });
 
 export default async function syncGhostNewsletterSubscription(req, logger) {
-  logger.info('########## Sync Ghost Newsletter Subscription ##########');
+  const startedAt = Date.now();
+  const logContext = (extra = {}) => ({
+    function: 'syncGhostNewsletterSubscription',
+    timestamp: new Date().toISOString(),
+    durationMs: Date.now() - startedAt,
+    ...extra,
+  });
 
   try {
     const event = req.body?.event;
@@ -307,30 +352,51 @@ export default async function syncGhostNewsletterSubscription(req, logger) {
         : 'SUBSCRIBED'
       : 'UNSUBSCRIBED';
 
+    const sanitizedRemoteStatus = normalizeRemoteSubscriptionStatus(ghostResult.remoteStatus, syncedStatus);
+
     await updateSubscriptionState(client, {
       userId: subscription.userId,
       organizationId: subscription.organizationId,
-      status: ghostResult.remoteStatus || syncedStatus,
+      status: sanitizedRemoteStatus,
       source: 'WEBHOOK',
       externalSubscriberId: ghostResult.externalSubscriberId,
       errorMessage: null,
     });
+
+    logger.info(
+      logContext({
+        success: true,
+        messageKey: 'GHOST_SYNC_SUCCESS',
+        recipientEmail: subscription.User.email,
+        organizationName: subscription.Organization?.name,
+        organizationId: subscription.organizationId,
+        userId: subscription.userId,
+        newsletterProvider: subscription.Organization?.newsletterProvider,
+        subscriptionStatus: sanitizedRemoteStatus,
+      })
+    );
 
     return {
       success: true,
       messageKey: 'GHOST_SYNC_SUCCESS',
       userId: subscription.userId,
       organizationId: subscription.organizationId,
-      status: ghostResult.remoteStatus || syncedStatus,
+      status: sanitizedRemoteStatus,
     };
   } catch (error) {
-    logger.error('Ghost newsletter sync failed', {
-      message: error.message,
-      stack: error.stack,
-    });
-
     const userId = req.body?.event?.data?.new?.userId;
     const organizationId = req.body?.event?.data?.new?.organizationId;
+
+    logger.error(
+      logContext({
+        success: false,
+        messageKey: 'GHOST_SYNC_FAILED',
+        userId,
+        organizationId,
+        errorMessage: error.message,
+        errorStack: error.stack,
+      })
+    );
 
     if (userId && organizationId) {
       try {
@@ -344,9 +410,14 @@ export default async function syncGhostNewsletterSubscription(req, logger) {
           errorMessage: error.message || 'Unexpected synchronization error',
         });
       } catch (updateError) {
-        logger.error('Failed to persist Ghost sync error state', {
-          message: updateError.message,
-        });
+        logger.error(
+          logContext({
+            success: false,
+            messageKey: 'GHOST_SYNC_ERROR_PERSIST_FAILED',
+            errorMessage: updateError.message,
+            errorStack: updateError.stack,
+          })
+        );
       }
     }
 

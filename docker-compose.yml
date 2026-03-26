@@ -30,7 +30,8 @@ services:
       # Hasura configuration
       HASURA_ADMIN_SECRET: myadminsecretkey
       GRAPHQL_URI: http://hasura:8080/v1/graphql
-      GHOST_NEWSLETTER_CREDENTIALS_ENCRYPTION_KEY: ${GHOST_NEWSLETTER_CREDENTIALS_ENCRYPTION_KEY:-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef}
+      # Optional for local dev; required to encrypt Ghost newsletter credentials (see .env.example)
+      GHOST_NEWSLETTER_CREDENTIALS_ENCRYPTION_KEY: ${GHOST_NEWSLETTER_CREDENTIALS_ENCRYPTION_KEY:-}
 
   node_functions:
     container_name: eduhub-node-functions
@@ -66,7 +67,8 @@ services:
       MATRIX_ADMIN_ACCESS_TOKEN: ${MATRIX_ADMIN_ACCESS_TOKEN:-}
       FRONTEND_URL: http://localhost:5000
       STORAGE_BUCKET_PUBLIC_URL: ${GITPOD_WORKSPACE_URL:-http://localhost}:4001/emulated-bucket
-      GHOST_NEWSLETTER_CREDENTIALS_ENCRYPTION_KEY: ${GHOST_NEWSLETTER_CREDENTIALS_ENCRYPTION_KEY:-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef}
+      # Optional for local dev; required to encrypt Ghost newsletter credentials (see .env.example)
+      GHOST_NEWSLETTER_CREDENTIALS_ENCRYPTION_KEY: ${GHOST_NEWSLETTER_CREDENTIALS_ENCRYPTION_KEY:-}
 
   python_functions:
     container_name: eduhub-python-functions

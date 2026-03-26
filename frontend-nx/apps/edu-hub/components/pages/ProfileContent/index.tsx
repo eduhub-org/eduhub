@@ -99,6 +99,8 @@ const ProfileContent: FC = () => {
 
   const {
     data: newsletterOptionsData,
+    error: newsletterOptionsError,
+    loading: newsletterOptionsLoading,
     refetch: refetchNewsletterOptions,
   } = useRoleQuery(MY_ORGANIZATION_NEWSLETTER_OPTIONS, {
     variables: {
@@ -109,7 +111,11 @@ const ProfileContent: FC = () => {
 
   const newsletterOptions = useMemo<NewsletterOrganizationOption[]>(() => {
     const hasConfiguredNewsletter = (organization: any): boolean =>
-      !!organization?.ghostNewsletterListId || !!organization?.ghostNewsletterSlug;
+      Boolean(
+        (organization?.ghostNewsletterListId || organization?.ghostNewsletterSlug) &&
+          organization?.ghostNewsletterApiUrl &&
+          organization?.ghostNewsletterApiKeyConfigured
+      );
 
     const options = new Map<number, NewsletterOrganizationOption>();
 
@@ -355,7 +361,24 @@ const ProfileContent: FC = () => {
           </div>
         </div>
 
-        {newsletterOptions.length > 0 && (
+        {newsletterOptionsLoading && (
+          <div className="mt-8 text-sm text-label-secondary">{t('newsletter_preferences.loading')}</div>
+        )}
+
+        {newsletterOptionsError && !newsletterOptionsLoading && (
+          <div className="mt-8 rounded-xl border border-border-primary/40 bg-fill-primary p-4">
+            <p className="text-sm text-red-700">{t('newsletter_preferences.load_error')}</p>
+            <button
+              type="button"
+              className="mt-2 text-sm font-medium text-brand underline"
+              onClick={() => void refetchNewsletterOptions()}
+            >
+              {t('newsletter_preferences.retry')}
+            </button>
+          </div>
+        )}
+
+        {!newsletterOptionsLoading && !newsletterOptionsError && newsletterOptions.length > 0 && (
           <div className="mt-8 rounded-xl border border-border-primary/40 bg-fill-primary p-4">
             <h2 className="text-lg font-semibold text-label-primary">{t('newsletter_preferences.title')}</h2>
             <p className="mt-1 text-sm text-label-secondary">{t('newsletter_preferences.description')}</p>

@@ -32,6 +32,7 @@ import {
   UPDATE_ORGANIZATION_GHOST_NEWSLETTER_LABEL,
   UPDATE_ORGANIZATION_GHOST_NEWSLETTER_DOUBLE_OPT_IN_ENABLED,
   UPDATE_ORGANIZATION_NEWSLETTER_DESCRIPTION,
+  UPDATE_ORGANIZATION_NEWSLETTER_PROVIDER,
 } from '../../../queries/organization';
 import { UPDATE_ORGANIZATION_LOGO } from '../../../queries/updateOrganization';
 import { UPDATE_USER_ORGANIZATION_ID } from '../../../queries/updateUser';
@@ -62,6 +63,15 @@ type ExpandableRowProps = {
 const ExpandableOrganizationRow: React.FC<ExpandableRowProps> = ({ row, onError }): React.ReactElement => {
   const t = useTranslations('manageOrganizations');
   const { refetch } = useRoleQuery(ORGANIZATION_LIST);
+  const [updateOrganizationNewsletterProvider] = useRoleMutation(UPDATE_ORGANIZATION_NEWSLETTER_PROVIDER, {
+    refetchQueries: ['OrganizationList'],
+  });
+
+  const syncGhostNewsletterProvider = useCallback(async () => {
+    await updateOrganizationNewsletterProvider({
+      variables: { id: row.id, value: 'GHOST' },
+    });
+  }, [row.id, updateOrganizationNewsletterProvider]);
 
   // Handle organization alias errors specifically
   const handleAliasError = useCallback(
@@ -151,10 +161,16 @@ const ExpandableOrganizationRow: React.FC<ExpandableRowProps> = ({ row, onError 
           updateValueMutation={UPDATE_ORGANIZATION_GHOST_NEWSLETTER_API_URL}
           refetchQueries={['OrganizationList']}
           showCharacterCount={false}
+          onValueUpdated={() => {
+            void syncGhostNewsletterProvider();
+          }}
         />
         <GhostNewsletterCredentialManager
           organizationId={row.id}
           initiallyConfigured={Boolean(row.ghostNewsletterApiKeyConfigured)}
+          onCredentialSaved={() => {
+            void syncGhostNewsletterProvider();
+          }}
         />
         <InputField
           variant="material"
@@ -167,6 +183,9 @@ const ExpandableOrganizationRow: React.FC<ExpandableRowProps> = ({ row, onError 
           updateValueMutation={UPDATE_ORGANIZATION_GHOST_NEWSLETTER_LIST_ID}
           refetchQueries={['OrganizationList']}
           showCharacterCount={false}
+          onValueUpdated={() => {
+            void syncGhostNewsletterProvider();
+          }}
         />
         <InputField
           variant="material"
@@ -179,6 +198,9 @@ const ExpandableOrganizationRow: React.FC<ExpandableRowProps> = ({ row, onError 
           updateValueMutation={UPDATE_ORGANIZATION_GHOST_NEWSLETTER_SLUG}
           refetchQueries={['OrganizationList']}
           showCharacterCount={false}
+          onValueUpdated={() => {
+            void syncGhostNewsletterProvider();
+          }}
         />
         <InputField
           variant="material"
@@ -191,6 +213,9 @@ const ExpandableOrganizationRow: React.FC<ExpandableRowProps> = ({ row, onError 
           updateValueMutation={UPDATE_ORGANIZATION_GHOST_NEWSLETTER_LABEL}
           refetchQueries={['OrganizationList']}
           showCharacterCount={false}
+          onValueUpdated={() => {
+            void syncGhostNewsletterProvider();
+          }}
         />
         <CheckboxSelector
           variant="material"
@@ -201,6 +226,9 @@ const ExpandableOrganizationRow: React.FC<ExpandableRowProps> = ({ row, onError 
           identifierVariables={{ id: row.id }}
           refetchQueries={['OrganizationList']}
           className="mt-2"
+          onValueUpdated={() => {
+            void syncGhostNewsletterProvider();
+          }}
         />
       </div>
       <div className="mt-6">

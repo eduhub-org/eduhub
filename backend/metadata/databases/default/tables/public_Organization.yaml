@@ -75,7 +75,6 @@ insert_permissions:
         - registerCourt
         - registerNumber
         - ghostNewsletterApiUrl
-        - ghostNewsletterApiKeyConfigured
         - ghostNewsletterListId
         - ghostNewsletterSlug
         - ghostNewsletterLabel

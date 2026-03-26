@@ -206,6 +206,8 @@
       }
     },
     "input_field": {
+      "language_de": "Deutsch",
+      "language_en": "Englisch",
       "invalid_link_format": "Ungültiges Link-Format",
       "invalid_email_format": "Ungültiges E-Mail-Format",
       "invalid_ects_format": "Ungültiges ECTS-Format",
@@ -853,7 +855,10 @@
       "legal": "Du kannst deine Einwilligung jederzeit widerrufen. Die Verarbeitung erfolgt gemäß unserer <privacy>Datenschutzerklärung</privacy>.",
       "double_opt_in_notice": "Für die Aktivierung kann eine zusätzliche Bestätigung per E-Mail (Double-Opt-In) erforderlich sein.",
       "sync_error": "Die letzte Synchronisierung mit dem Newsletter-Anbieter ist fehlgeschlagen.",
-      "error": "Deine Newsletter-Einstellung konnte nicht gespeichert werden. Bitte versuche es erneut."
+      "error": "Deine Newsletter-Einstellung konnte nicht gespeichert werden. Bitte versuche es erneut.",
+      "loading": "Wird geladen…",
+      "load_error": "Newsletter-Optionen konnten nicht geladen werden.",
+      "retry": "Erneut versuchen"
     }
   },
   "programs": {
@@ -1482,6 +1487,16 @@
         "Asia/Tokyo": "Tokio"
       },
       "help_text": "Die Zeitzone wird verwendet, um die Datums- und Uhrzeiten in der Anwendung anzuzeigen. Generelle Zeiten wie die wiederkehrende Kurszeit, die nicht an einen konkreten Tag gebunden sind, werden immer in der ursprünglich angelegten Zeit angezeigt und nicht angepasst."
+    },
+    "onboarding": {
+      "label": "Onboarding-Texte",
+      "courses_label": "Kurse",
+      "events_label": "Veranstaltungen",
+      "degrees_label": "Degrees",
+      "text_de": "Text (Deutsch)",
+      "text_en": "Text (Englisch)",
+      "preview": "Vorschau",
+      "generic_help": "Dieser Text wird Teilnehmenden im Onboarding angezeigt, wenn der entsprechende Registrierungstyp ausgewählt ist."
     }
   },
   "manageExperts": {
@@ -1508,7 +1523,7 @@
       "description": "Beschreibung",
       "logo": "Logo",
       "new_organization": "Neue Organisation",
-      "default_description": "Beschreibung",
+      "default_description": "",
       "newsletter_title": "Newsletter-Konfiguration (Ghost)",
       "newsletter_api_url": "Ghost API-URL",
       "newsletter_api_url_placeholder": "https://deine-ghost-site/ghost/api/admin",
@@ -1517,6 +1532,8 @@
       "newsletter_api_key_set": "Zugangsdaten speichern",
       "newsletter_api_key_rotate": "Zugangsdaten ersetzen",
       "newsletter_api_key_remove": "Zugangsdaten entfernen",
+      "newsletter_api_key_remove_confirm": "Den organisationsweiten Ghost-Admin-API-Zugang entfernen? Die Newsletter-Synchronisation stoppt, bis ein neuer Zugang gespeichert wird.",
+      "newsletter_api_key_save_success": "Ghost-Zugang wurde aktualisiert.",
       "newsletter_api_key_status_configured": "Zugangsdaten konfiguriert",
       "newsletter_api_key_status_missing": "Keine Zugangsdaten konfiguriert",
       "newsletter_api_key_error_auth": "Deine Sitzung ist abgelaufen. Bitte melde dich erneut an.",

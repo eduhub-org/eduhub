@@ -49,6 +49,8 @@ export const MY_ORGANIZATION_NEWSLETTER_OPTIONS = gql`
       where: {
         Courses: { CourseEnrollments: { userId: { _eq: $userId } } }
         Organization: {
+          ghostNewsletterApiUrl: { _is_null: false, _neq: "" }
+          ghostNewsletterApiKeyConfigured: { _eq: true }
           _or: [{ ghostNewsletterListId: { _is_null: false } }, { ghostNewsletterSlug: { _is_null: false } }]
         }
       }
@@ -64,6 +66,8 @@ export const MY_ORGANIZATION_NEWSLETTER_OPTIONS = gql`
         ghostNewsletterDoubleOptInEnabled
         ghostNewsletterListId
         ghostNewsletterSlug
+        ghostNewsletterApiUrl
+        ghostNewsletterApiKeyConfigured
       }
     }
 
@@ -82,6 +86,8 @@ export const MY_ORGANIZATION_NEWSLETTER_OPTIONS = gql`
         ghostNewsletterDoubleOptInEnabled
         ghostNewsletterListId
         ghostNewsletterSlug
+        ghostNewsletterApiUrl
+        ghostNewsletterApiKeyConfigured
       }
     }
   }

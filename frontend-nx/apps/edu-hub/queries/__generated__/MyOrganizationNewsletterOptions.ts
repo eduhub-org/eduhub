@@ -35,6 +35,14 @@ export interface MyOrganizationNewsletterOptions_Program_Organization {
    * Optional Ghost newsletter slug when list ID is not used.
    */
   ghostNewsletterSlug: string | null;
+  /**
+   * Ghost members API URL used to synchronize newsletter subscriptions.
+   */
+  ghostNewsletterApiUrl: string | null;
+  /**
+   * Flag indicating whether an encrypted Ghost newsletter API credential is configured.
+   */
+  ghostNewsletterApiKeyConfigured: boolean;
 }
 
 export interface MyOrganizationNewsletterOptions_Program {
@@ -77,6 +85,14 @@ export interface MyOrganizationNewsletterOptions_OrganizationNewsletterSubscript
    * Optional Ghost newsletter slug when list ID is not used.
    */
   ghostNewsletterSlug: string | null;
+  /**
+   * Ghost members API URL used to synchronize newsletter subscriptions.
+   */
+  ghostNewsletterApiUrl: string | null;
+  /**
+   * Flag indicating whether an encrypted Ghost newsletter API credential is configured.
+   */
+  ghostNewsletterApiKeyConfigured: boolean;
 }
 
 export interface MyOrganizationNewsletterOptions_OrganizationNewsletterSubscription {
