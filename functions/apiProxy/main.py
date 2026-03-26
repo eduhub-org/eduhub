@@ -116,12 +116,16 @@ def _moochub_include_course(course):
     EVENTS programs only when DLC is a funding organization.
     """
     program = course.get("Program") or {}
-    program_type = program.get("type") or program.get("shortTitle")
-    if program_type == "DEGREES":
+    raw_type = program.get("type") or program.get("shortTitle")
+    if raw_type is None:
+        program_type_normalized = ""
+    else:
+        program_type_normalized = str(raw_type).strip().upper()
+    if program_type_normalized == "DEGREES":
         return False
-    if program_type == "COURSES":
+    if program_type_normalized == "COURSES":
         return True
-    if program_type == "EVENTS":
+    if program_type_normalized == "EVENTS":
         return _course_has_dlc_funding(course)
     return False
 
