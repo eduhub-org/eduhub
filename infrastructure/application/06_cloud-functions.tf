@@ -359,6 +359,13 @@ resource "google_cloudfunctions2_function" "call_node_function" {
       version    = "latest"
     }
 
+    secret_environment_variables {
+      key        = "GHOST_NEWSLETTER_CREDENTIALS_ENCRYPTION_KEY"
+      project_id = var.project_id
+      secret     = google_secret_manager_secret.ghost_newsletter_credentials_encryption_key.secret_id
+      version    = "latest"
+    }
+
     max_instance_count    = 20
     available_memory      = "512M"
     timeout_seconds       = 60
@@ -401,6 +408,13 @@ resource "google_secret_manager_secret_iam_member" "call_node_function_matrix_ad
   role       = "roles/secretmanager.secretAccessor"
   member     = "serviceAccount:${google_service_account.custom_cloud_function_account.email}"
   depends_on = [google_secret_manager_secret.matrix_admin_access_token]
+}
+
+resource "google_secret_manager_secret_iam_member" "call_node_function_ghost_encryption_key" {
+  secret_id  = google_secret_manager_secret.ghost_newsletter_credentials_encryption_key.id
+  role       = "roles/secretmanager.secretAccessor"
+  member     = "serviceAccount:${google_service_account.custom_cloud_function_account.email}"
+  depends_on = [google_secret_manager_secret.ghost_newsletter_credentials_encryption_key]
 }
 
 

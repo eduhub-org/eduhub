@@ -91,6 +91,15 @@ resource "google_cloud_run_service" "eduhub" {
           name  = "NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL"
           value = var.matrix_element_client_url
         }
+        env {
+          name = "GHOST_NEWSLETTER_CREDENTIALS_ENCRYPTION_KEY"
+          value_from {
+            secret_key_ref {
+              name = google_secret_manager_secret.ghost_newsletter_credentials_encryption_key.secret_id
+              key  = "latest"
+            }
+          }
+        }
       }
     }
 

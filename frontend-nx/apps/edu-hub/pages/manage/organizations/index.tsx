@@ -2,8 +2,11 @@ import Head from 'next/head';
 import { FC } from 'react';
 import { Page } from '../../../components/layout/Page';
 import ManageOrganizationsContent from '../../../components/pages/ManageOrganizationsContent';
+import { useIsAdmin } from '../../../hooks/authentication';
 
 const Organizations: FC = () => {
+  const isAdmin = useIsAdmin();
+
   return (
     <>
       <Head>
@@ -11,7 +14,7 @@ const Organizations: FC = () => {
         <link rel="icon" href="/favicon.png" />
       </Head>
       <Page>
-        <ManageOrganizationsContent />
+        {isAdmin && <ManageOrganizationsContent />}
       </Page>
     </>
   );

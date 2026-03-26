@@ -206,6 +206,8 @@
       }
     },
     "input_field": {
+      "language_de": "Deutsch",
+      "language_en": "English",
       "invalid_link_format": "Invalid link format",
       "invalid_email_format": "Invalid email format",
       "invalid_ects_format": "Invalid ECTS format",
@@ -461,12 +463,22 @@
       "decline_confirm_text": "Do you really want to decline the invitation to this course?",
       "decline_button_text": "Yes",
       "title": "Onboarding for your Course Participation",
+      "badge": "Action required",
       "congratulation": "Congratulations, you are invited to participate in this course!",
-      "form_intro": "Please, update you current employment status:",
+      "intro_copy": "Before confirming your participation, please review and update your personal details. This helps us personalize communication and course support.",
+      "form_intro": "Please update your current employment status:",
       "confirm_sufficient_time": "Finally, confirm your course participation only if you have the time to fully attend the course until the end.",
       "important": "IMPORTANT: CONFIRM COURSE INVITATION!",
       "mattermost_info_1": "After confirmation, please click directly on the button to go to the course chat.",
-      "mattermost_info_2": "If you don't have an account in our chat yet, you will need to sign up there first. The course chat is our central communication tool for the courses."
+      "mattermost_info_2": "If you don't have an account in our chat yet, you will need to sign up there first. The course chat is our central communication tool for the courses.",
+      "newsletter_title": "Subscribe to updates from {organization}",
+      "newsletter_description": "Receive news on upcoming courses, learning opportunities, and program updates from {organization}.",
+      "newsletter_legal": "You can revoke your consent at any time in your profile. Processing is based on our <privacy>Privacy Policy</privacy>.",
+      "newsletter_double_opt_in": "You may receive a confirmation email (double opt-in) before your subscription becomes active.",
+      "newsletter_sync_issue": "Your last newsletter synchronization could not be completed. You can update your preference in your profile.",
+      "errors": {
+        "confirmation_failed": "We could not confirm your participation at the moment. Please try again."
+      }
     },
     "success_messages": {
       "success_title": "You have successfully applied",
@@ -851,7 +863,19 @@
     "country_none": "-- Select Country --",
     "occupation_none": "-- Select Occupation --",
     "external_profile_placeholder": "e.g., https://linkedin.com/in/yourname",
-    "change_password_or_email": "Change password or email"
+    "change_password_or_email": "Change password or email",
+    "newsletter_preferences": {
+      "title": "Newsletter preferences",
+      "description": "Manage newsletter subscriptions for organizations connected to your enrolled programs.",
+      "checkbox_label": "I want to receive the newsletter from {organization}",
+      "legal": "You can revoke your consent at any time. Processing is based on our <privacy>Privacy Policy</privacy>.",
+      "double_opt_in_notice": "Subscription activation may require an additional confirmation email (double opt-in).",
+      "sync_error": "The last synchronization with the newsletter provider failed.",
+      "error": "Your newsletter preference could not be saved. Please try again.",
+      "loading": "Loading…",
+      "load_error": "Newsletter options could not be loaded.",
+      "retry": "Retry"
+    }
   },
   "programs": {
     "add": "Add programm",
@@ -1468,7 +1492,17 @@
       "America/Los_Angeles": "Los Angeles",
       "Asia/Tokyo": "Tokio"
     },
-    "timeZoneHelpText": "The time zone is used to display dates and times in the application. General times like the recurring course time, which are not bound to a specific day, will always be displayed in the original time and not adjusted."
+    "timeZoneHelpText": "The time zone is used to display dates and times in the application. General times like the recurring course time, which are not bound to a specific day, will always be displayed in the original time and not adjusted.",
+    "onboarding": {
+      "label": "Onboarding Texts",
+      "courses_label": "Courses",
+      "events_label": "Events",
+      "degrees_label": "Degree Programs",
+      "text_de": "Text (German)",
+      "text_en": "Text (English)",
+      "preview": "Preview",
+      "generic_help": "This text is shown to participants during onboarding when the corresponding registration type is selected."
+    }
   },
   "manageExperts": {
     "headline": "Experts",
@@ -1494,7 +1528,30 @@
       "description": "Description",
       "logo": "Logo",
       "new_organization": "New Organization",
-      "default_description": "Description"
+      "default_description": "",
+      "newsletter_title": "Newsletter configuration (Ghost)",
+      "newsletter_api_url": "Ghost API URL",
+      "newsletter_api_url_placeholder": "https://your-ghost-site/ghost/api/admin",
+      "newsletter_api_key": "Ghost API key",
+      "newsletter_api_key_placeholder": "Paste Ghost credential (stored encrypted)",
+      "newsletter_api_key_set": "Save credential",
+      "newsletter_api_key_rotate": "Replace credential",
+      "newsletter_api_key_remove": "Remove credential",
+      "newsletter_api_key_remove_confirm": "Remove the organization-wide Ghost Admin API credential? Newsletter sync will stop until a new credential is saved.",
+      "newsletter_api_key_save_success": "Ghost credential updated.",
+      "newsletter_api_key_status_configured": "Credential configured",
+      "newsletter_api_key_status_missing": "No credential configured",
+      "newsletter_api_key_error_auth": "Your session has expired. Please log in again.",
+      "newsletter_api_key_error_generic": "Ghost credential could not be saved.",
+      "newsletter_list_id": "Ghost newsletter list ID",
+      "newsletter_list_id_placeholder": "Optional list ID",
+      "newsletter_slug": "Ghost newsletter slug",
+      "newsletter_slug_placeholder": "Optional slug, e.g. weekly-updates",
+      "newsletter_label": "Participant-facing newsletter label",
+      "newsletter_label_placeholder": "Optional display label",
+      "newsletter_description": "Newsletter description",
+      "newsletter_description_placeholder": "Short participant-facing description",
+      "newsletter_double_opt_in": "Double opt-in confirmation is enabled in Ghost"
     },
     "api_key": {
       "title": "API Key Management",
@@ -1575,6 +1632,19 @@
       "enter_alias": "Enter organization alias",
       "enter_description": "Enter organization description",
       "enter_name": "Enter organization name"
+    },
+    "help": {
+      "name": "Official organization name shown across the platform.",
+      "type": "Used for categorization, filtering, and profile context.",
+      "aliases": "Alternative organization names that improve search and matching.",
+      "description": "Short organization text shown in context where available.",
+      "newsletter_description": "Additional newsletter text shown to participants in onboarding and profile.",
+      "newsletter_api_url": "Ghost Admin API base URL used for newsletter synchronization.",
+      "newsletter_api_key": "Ghost credential for authenticated newsletter sync calls. Stored encrypted and never shown again.",
+      "newsletter_list_id": "Optional Ghost newsletter/list ID. Use this or the slug field.",
+      "newsletter_slug": "Optional Ghost newsletter slug. Use this or the list ID field.",
+      "newsletter_label": "Optional participant-facing newsletter title overriding the organization name.",
+      "newsletter_double_opt_in": "If enabled, users must confirm by email before the subscription becomes active."
     },
     "error": {
       "loading": "Error loading organizations",

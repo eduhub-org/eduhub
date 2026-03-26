@@ -1,0 +1,22 @@
+table:
+  name: OnboardingText
+  schema: public
+object_relationships:
+  - name: Language
+    using:
+      foreign_key_constraint_on: lang
+  - name: ProgramType
+    using:
+      foreign_key_constraint_on: programType
+select_permissions:
+  - role: user_access
+    permission:
+      columns:
+        - id
+        - programType
+        - lang
+        - text
+        - created_at
+        - updated_at
+      filter: {}
+      allow_aggregations: true

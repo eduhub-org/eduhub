@@ -1,5 +1,5 @@
 import winston from "winston";
-import { createRequire } from "module";
+import { createRequire } from "node:module";
 import createCertificate from "./createCertificate/index.js";
 import getSignedUrl from "./getSignedUrl/index.js";
 import saveFile from "./saveFile/index.js";
@@ -20,6 +20,7 @@ import createStripeCheckout from "./createStripeCheckout/index.js";
 import createStripeBasePrice from "./createStripeBasePrice/index.js";
 import createStripeAddonPrices from "./createStripeAddonPrices/index.js";
 import createEnrollmentWithAddons from "./createEnrollmentWithAddons/index.js";
+import syncGhostNewsletterSubscription from "./syncGhostNewsletterSubscription/index.js";
 import createMatrixRoom from "./createMatrixRoom/index.js";
 import updateMatrixInstructorPowerLevel from "./updateMatrixInstructorPowerLevel/index.js";
 
@@ -71,7 +72,8 @@ const functionMap = {
   createStripeAddonPrices,
   createEnrollmentWithAddons,
   createMatrixRoom,
-  updateMatrixInstructorPowerLevel
+  updateMatrixInstructorPowerLevel,
+  syncGhostNewsletterSubscription
 };
 
 const constantTimeEquals = (providedSecret, expectedSecret) => {
