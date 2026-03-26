@@ -29,6 +29,38 @@ export interface OrganizationList_Organization {
    * SHA-256 hash of the organization API key for participant data access. Plain text keys are never stored.
    */
   apiKeyHash: string | null;
+  /**
+   * Short organization newsletter description shown to participants in onboarding and profile preferences.
+   */
+  newsletterDescription: string | null;
+  /**
+   * Newsletter provider for this organization. Currently only GHOST is supported.
+   */
+  newsletterProvider: string;
+  /**
+   * Ghost members API URL used to synchronize newsletter subscriptions.
+   */
+  ghostNewsletterApiUrl: string | null;
+  /**
+   * Flag indicating whether an encrypted Ghost newsletter API credential is configured.
+   */
+  ghostNewsletterApiKeyConfigured: boolean;
+  /**
+   * Optional Ghost newsletter list identifier.
+   */
+  ghostNewsletterListId: string | null;
+  /**
+   * Optional Ghost newsletter slug when list ID is not used.
+   */
+  ghostNewsletterSlug: string | null;
+  /**
+   * Optional custom newsletter label shown in participant-facing UIs.
+   */
+  ghostNewsletterLabel: string | null;
+  /**
+   * Whether Ghost double opt-in should be used for this organization newsletter.
+   */
+  ghostNewsletterDoubleOptInEnabled: boolean;
   created_at: any;
   updated_at: any;
   /**

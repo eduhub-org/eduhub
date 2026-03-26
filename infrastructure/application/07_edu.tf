@@ -91,6 +91,15 @@ resource "google_cloud_run_service" "eduhub" {
           name  = "NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL"
           value = var.matrix_element_client_url
         }
+        env {
+          name = "GHOST_NEWSLETTER_CREDENTIALS_ENCRYPTION_KEY"
+          value_from {
+            secret_key_ref {
+              name = google_secret_manager_secret.ghost_newsletter_credentials_encryption_key.secret_id
+              key  = "latest"
+            }
+          }
+        }
       }
     }
 
@@ -116,5 +125,10 @@ resource "google_cloud_run_service" "eduhub" {
   }
 
   autogenerate_revision_name = true
-  depends_on                 = [google_secret_manager_secret_version.hasura_graphql_admin_key]
+  depends_on = [
+    google_secret_manager_secret_version.hasura_graphql_admin_key,
+    google_secret_manager_secret_version.nextauth_secret,
+    google_secret_manager_secret_version.keycloak_hasura_client_secret,
+    google_secret_manager_secret_version.ghost_newsletter_credentials_encryption_key,
+  ]
 }

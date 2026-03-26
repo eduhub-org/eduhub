@@ -9,6 +9,36 @@ import { ProgramType_enum } from "./../../__generated__/globalTypes";
 // GraphQL fragment: ProgramFragment
 // ====================================================
 
+export interface ProgramFragment_Organization {
+  __typename: "Organization";
+  id: number;
+  name: string;
+  /**
+   * Short organization newsletter description shown to participants in onboarding and profile preferences.
+   */
+  newsletterDescription: string | null;
+  /**
+   * Newsletter provider for this organization. Currently only GHOST is supported.
+   */
+  newsletterProvider: string;
+  /**
+   * Optional custom newsletter label shown in participant-facing UIs.
+   */
+  ghostNewsletterLabel: string | null;
+  /**
+   * Whether Ghost double opt-in should be used for this organization newsletter.
+   */
+  ghostNewsletterDoubleOptInEnabled: boolean;
+  /**
+   * Optional Ghost newsletter list identifier.
+   */
+  ghostNewsletterListId: string | null;
+  /**
+   * Optional Ghost newsletter slug when list ID is not used.
+   */
+  ghostNewsletterSlug: string | null;
+}
+
 export interface ProgramFragment {
   __typename: "Program";
   id: number;
@@ -49,4 +79,8 @@ export interface ProgramFragment {
    * The day the application for all courses of the program start.
    */
   applicationStart: any | null;
+  /**
+   * An object relationship
+   */
+  Organization: ProgramFragment_Organization;
 }

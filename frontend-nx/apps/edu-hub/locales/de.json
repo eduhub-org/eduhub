@@ -206,6 +206,8 @@
       }
     },
     "input_field": {
+      "language_de": "Deutsch",
+      "language_en": "Englisch",
       "invalid_link_format": "Ungültiges Link-Format",
       "invalid_email_format": "Ungültiges E-Mail-Format",
       "invalid_ects_format": "Ungültiges ECTS-Format",
@@ -461,12 +463,22 @@
       "decline_confirm_text": "Möchtest du die Einladung zu diesem Kurs wirklich ablehnen?",
       "decline_button_text": "Ja",
       "title": "Onboarding für Deine Kursteilnahme",
+      "badge": "Aktion erforderlich",
       "congratulation": "Herzlichen Glückwunsch zur Einladung für die Teilnahme an diesem Kurs!",
+      "intro_copy": "Bitte prüfe und aktualisiere vor der Teilnahmebestätigung kurz deine Angaben. So können wir dich passend informieren und im Kurs optimal unterstützen.",
       "form_intro": "Bitte aktualisiere Deinen aktuellen Beschäftigungsstatus:",
       "confirm_sufficient_time": "Bitte bestätige die Kursteilnahme nur, wenn Du Zeit hast, bis zum Ende am Kurs teilzunehmen.",
       "important": "WICHTIG: KURSEINLADUNG BESTÄTIGEN!",
       "mattermost_info_1": "Nach der Bestätigung gehe bitte direkt auf den Button zum Kurs-Chat.",
-      "mattermost_info_2": "Falls Du noch keinen Account in unserem Chat hast, musst Du Dich dort zunächst noch einmal anmelden.\nDer Kurs-Chat ist unser zentrales Kommunikationstool für die Kurse."
+      "mattermost_info_2": "Falls Du noch keinen Account in unserem Chat hast, musst Du Dich dort zunächst noch einmal anmelden.\nDer Kurs-Chat ist unser zentrales Kommunikationstool für die Kurse.",
+      "newsletter_title": "Updates von {organization} abonnieren",
+      "newsletter_description": "Erhalte Infos zu neuen Kursen, Lernangeboten und Programm-Neuigkeiten von {organization}.",
+      "newsletter_legal": "Du kannst deine Einwilligung jederzeit in deinem Profil widerrufen. Die Verarbeitung erfolgt gemäß unserer <privacy>Datenschutzerklärung</privacy>.",
+      "newsletter_double_opt_in": "Vor der Aktivierung kann eine zusätzliche Bestätigungs-E-Mail (Double-Opt-In) erforderlich sein.",
+      "newsletter_sync_issue": "Deine letzte Newsletter-Synchronisierung konnte nicht abgeschlossen werden. Du kannst deine Präferenz in deinem Profil aktualisieren.",
+      "errors": {
+        "confirmation_failed": "Deine Teilnahme konnte gerade nicht bestätigt werden. Bitte versuche es erneut."
+      }
     },
     "success_messages": {
       "success_title": "Bewerbung erfolgreich eingereicht!",
@@ -835,7 +847,19 @@
     "country_none": "-- Land auswählen --",
     "occupation_none": "-- Beschäftigung auswählen --",
     "external_profile_placeholder": "z.B. https://linkedin.com/in/deinname",
-    "change_password_or_email": "Passwort oder E-Mail ändern"
+    "change_password_or_email": "Passwort oder E-Mail ändern",
+    "newsletter_preferences": {
+      "title": "Newsletter-Einstellungen",
+      "description": "Verwalte Newsletter-Abos für Organisationen, die mit deinen belegten Programmen verknüpft sind.",
+      "checkbox_label": "Ich möchte den Newsletter von {organization} erhalten",
+      "legal": "Du kannst deine Einwilligung jederzeit widerrufen. Die Verarbeitung erfolgt gemäß unserer <privacy>Datenschutzerklärung</privacy>.",
+      "double_opt_in_notice": "Für die Aktivierung kann eine zusätzliche Bestätigung per E-Mail (Double-Opt-In) erforderlich sein.",
+      "sync_error": "Die letzte Synchronisierung mit dem Newsletter-Anbieter ist fehlgeschlagen.",
+      "error": "Deine Newsletter-Einstellung konnte nicht gespeichert werden. Bitte versuche es erneut.",
+      "loading": "Wird geladen…",
+      "load_error": "Newsletter-Optionen konnten nicht geladen werden.",
+      "retry": "Erneut versuchen"
+    }
   },
   "programs": {
     "add": "Programm hinzufügen",
@@ -1463,6 +1487,16 @@
         "Asia/Tokyo": "Tokio"
       },
       "help_text": "Die Zeitzone wird verwendet, um die Datums- und Uhrzeiten in der Anwendung anzuzeigen. Generelle Zeiten wie die wiederkehrende Kurszeit, die nicht an einen konkreten Tag gebunden sind, werden immer in der ursprünglich angelegten Zeit angezeigt und nicht angepasst."
+    },
+    "onboarding": {
+      "label": "Onboarding-Texte",
+      "courses_label": "Kurse",
+      "events_label": "Veranstaltungen",
+      "degrees_label": "Degrees",
+      "text_de": "Text (Deutsch)",
+      "text_en": "Text (Englisch)",
+      "preview": "Vorschau",
+      "generic_help": "Dieser Text wird Teilnehmenden im Onboarding angezeigt, wenn der entsprechende Registrierungstyp ausgewählt ist."
     }
   },
   "manageExperts": {
@@ -1489,7 +1523,30 @@
       "description": "Beschreibung",
       "logo": "Logo",
       "new_organization": "Neue Organisation",
-      "default_description": "Beschreibung"
+      "default_description": "",
+      "newsletter_title": "Newsletter-Konfiguration (Ghost)",
+      "newsletter_api_url": "Ghost API-URL",
+      "newsletter_api_url_placeholder": "https://deine-ghost-site/ghost/api/admin",
+      "newsletter_api_key": "Ghost API-Schlüssel",
+      "newsletter_api_key_placeholder": "Ghost-Zugangsdaten einfügen (verschlüsselt gespeichert)",
+      "newsletter_api_key_set": "Zugangsdaten speichern",
+      "newsletter_api_key_rotate": "Zugangsdaten ersetzen",
+      "newsletter_api_key_remove": "Zugangsdaten entfernen",
+      "newsletter_api_key_remove_confirm": "Den organisationsweiten Ghost-Admin-API-Zugang entfernen? Die Newsletter-Synchronisation stoppt, bis ein neuer Zugang gespeichert wird.",
+      "newsletter_api_key_save_success": "Ghost-Zugang wurde aktualisiert.",
+      "newsletter_api_key_status_configured": "Zugangsdaten konfiguriert",
+      "newsletter_api_key_status_missing": "Keine Zugangsdaten konfiguriert",
+      "newsletter_api_key_error_auth": "Deine Sitzung ist abgelaufen. Bitte melde dich erneut an.",
+      "newsletter_api_key_error_generic": "Ghost-Zugangsdaten konnten nicht gespeichert werden.",
+      "newsletter_list_id": "Ghost Newsletter-Listen-ID",
+      "newsletter_list_id_placeholder": "Optionale Listen-ID",
+      "newsletter_slug": "Ghost Newsletter-Slug",
+      "newsletter_slug_placeholder": "Optionaler Slug, z.B. weekly-updates",
+      "newsletter_label": "Anzeigetitel für Teilnehmende",
+      "newsletter_label_placeholder": "Optionales Anzeige-Label",
+      "newsletter_description": "Newsletter-Beschreibung",
+      "newsletter_description_placeholder": "Kurze Beschreibung für Teilnehmende",
+      "newsletter_double_opt_in": "Double-Opt-In-Bestätigung ist in Ghost aktiviert"
     },
     "api_key": {
       "title": "API-Schlüssel Verwaltung",
@@ -1570,6 +1627,19 @@
       "enter_alias": "Organisationsalias eingeben",
       "enter_description": "Organisationsbeschreibung eingeben",
       "enter_name": "Organisationsname eingeben"
+    },
+    "help": {
+      "name": "Offizieller Organisationsname, der in der Plattform angezeigt wird.",
+      "type": "Wird für Kategorisierung, Filter und Profilkontext verwendet.",
+      "aliases": "Alternative Namen der Organisation zur besseren Suche und Zuordnung.",
+      "description": "Kurzer Organisationstext, der an geeigneten Stellen angezeigt wird.",
+      "newsletter_description": "Zusätzlicher Newsletter-Text für Teilnehmende im Onboarding und Profil.",
+      "newsletter_api_url": "Ghost-Admin-API-Basis-URL für die Newsletter-Synchronisierung.",
+      "newsletter_api_key": "Ghost-Zugangsdaten für authentifizierte Newsletter-Synchronisierung. Werden verschlüsselt gespeichert und nicht wieder angezeigt.",
+      "newsletter_list_id": "Optionale Ghost-Newsletter-/Listen-ID. Nutze dieses Feld oder den Slug.",
+      "newsletter_slug": "Optionaler Ghost-Newsletter-Slug. Nutze dieses Feld oder die Listen-ID.",
+      "newsletter_label": "Optionaler Newsletter-Titel für Teilnehmende statt des Organisationsnamens.",
+      "newsletter_double_opt_in": "Wenn aktiviert, müssen Nutzer das Abo zusätzlich per E-Mail bestätigen."
     },
     "error": {
       "loading": "Fehler beim Laden der Organisationen",

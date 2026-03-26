@@ -10,6 +10,7 @@ import Loading from '../../common/Loading';
 import InputField from '../../inputs/InputField';
 import DropDownSelector from '../../inputs/DropDownSelector';
 import ImageUploader from '../../inputs/ImageUploader';
+import CheckboxSelector from '../../inputs/CheckboxSelector';
 import { useRoleQuery, useLazyRoleQuery } from '../../../hooks/authedQuery';
 import { useRoleMutation } from '../../../hooks/authedMutation';
 import { PageBlock } from '../../common/PageBlock';
@@ -25,6 +26,13 @@ import {
   DELETE_ORGANIZATION,
   UPDATE_ORGANIZATION_ALIASES,
   UPDATE_ORGANIZATION_API_KEY_HASH,
+  UPDATE_ORGANIZATION_GHOST_NEWSLETTER_API_URL,
+  UPDATE_ORGANIZATION_GHOST_NEWSLETTER_LIST_ID,
+  UPDATE_ORGANIZATION_GHOST_NEWSLETTER_SLUG,
+  UPDATE_ORGANIZATION_GHOST_NEWSLETTER_LABEL,
+  UPDATE_ORGANIZATION_GHOST_NEWSLETTER_DOUBLE_OPT_IN_ENABLED,
+  UPDATE_ORGANIZATION_NEWSLETTER_DESCRIPTION,
+  UPDATE_ORGANIZATION_NEWSLETTER_PROVIDER,
 } from '../../../queries/organization';
 import { UPDATE_ORGANIZATION_LOGO } from '../../../queries/updateOrganization';
 import { UPDATE_USER_ORGANIZATION_ID } from '../../../queries/updateUser';
@@ -42,6 +50,7 @@ import CreatableTagSelector from '../../inputs/CreatableTagSelector';
 import { OrganizationType_enum } from '../../../__generated__/globalTypes';
 import { MergeOrganizationsDialog } from './MergeOrganizationsDialog';
 import { ApiKeyManager } from './ApiKeyManager';
+import { GhostNewsletterCredentialManager } from './GhostNewsletterCredentialManager';
 import CommonPageHeader from '../../common/CommonPageHeader';
 import { useTableGrid } from '../../common/TableGrid/hooks';
 import { createMultiWordSearchCondition } from '../../common/TableGrid/utils';
@@ -54,6 +63,15 @@ type ExpandableRowProps = {
 const ExpandableOrganizationRow: React.FC<ExpandableRowProps> = ({ row, onError }): React.ReactElement => {
   const t = useTranslations('manageOrganizations');
   const { refetch } = useRoleQuery(ORGANIZATION_LIST);
+  const [updateOrganizationNewsletterProvider] = useRoleMutation(UPDATE_ORGANIZATION_NEWSLETTER_PROVIDER, {
+    refetchQueries: ['OrganizationList'],
+  });
+
+  const syncGhostNewsletterProvider = useCallback(async () => {
+    await updateOrganizationNewsletterProvider({
+      variables: { id: row.id, value: 'GHOST' },
+    });
+  }, [row.id, updateOrganizationNewsletterProvider]);
 
   // Handle organization alias errors specifically
   const handleAliasError = useCallback(
@@ -102,6 +120,7 @@ const ExpandableOrganizationRow: React.FC<ExpandableRowProps> = ({ row, onError 
         itemId={row.id}
         values={currentTags}
         options={[]}
+        helpText={t('help.aliases')}
         updateValuesMutation={UPDATE_ORGANIZATION_ALIASES}
         onError={handleAliasError}
         refetchQueries={['OrganizationList']}
@@ -113,9 +132,105 @@ const ExpandableOrganizationRow: React.FC<ExpandableRowProps> = ({ row, onError 
         placeholder={t('input.enter_description')}
         itemId={row.id}
         value={row.description || ''}
+        helpText={t('help.description')}
         updateValueMutation={UPDATE_ORGANIZATION_DESCRIPTION}
         refetchQueries={['OrganizationList']}
       />
+      <div className="mt-4 rounded-lg border border-border-primary/30 p-3">
+        <p className="text-sm font-semibold mb-2">{t('organization.newsletter_title')}</p>
+        <InputField
+          variant="material"
+          type="input"
+          label={t('organization.newsletter_description')}
+          placeholder={t('organization.newsletter_description_placeholder')}
+          itemId={row.id}
+          value={row.newsletterDescription || ''}
+          helpText={t('help.newsletter_description')}
+          updateValueMutation={UPDATE_ORGANIZATION_NEWSLETTER_DESCRIPTION}
+          refetchQueries={['OrganizationList']}
+          showCharacterCount={false}
+        />
+        <InputField
+          variant="material"
+          type="input"
+          label={t('organization.newsletter_api_url')}
+          placeholder={t('organization.newsletter_api_url_placeholder')}
+          itemId={row.id}
+          value={row.ghostNewsletterApiUrl || ''}
+          helpText={t('help.newsletter_api_url')}
+          updateValueMutation={UPDATE_ORGANIZATION_GHOST_NEWSLETTER_API_URL}
+          refetchQueries={['OrganizationList']}
+          showCharacterCount={false}
+          onValueUpdated={() => {
+            void syncGhostNewsletterProvider();
+          }}
+        />
+        <GhostNewsletterCredentialManager
+          organizationId={row.id}
+          initiallyConfigured={Boolean(row.ghostNewsletterApiKeyConfigured)}
+          onCredentialSaved={() => {
+            void syncGhostNewsletterProvider();
+          }}
+        />
+        <InputField
+          variant="material"
+          type="input"
+          label={t('organization.newsletter_list_id')}
+          placeholder={t('organization.newsletter_list_id_placeholder')}
+          itemId={row.id}
+          value={row.ghostNewsletterListId || ''}
+          helpText={t('help.newsletter_list_id')}
+          updateValueMutation={UPDATE_ORGANIZATION_GHOST_NEWSLETTER_LIST_ID}
+          refetchQueries={['OrganizationList']}
+          showCharacterCount={false}
+          onValueUpdated={() => {
+            void syncGhostNewsletterProvider();
+          }}
+        />
+        <InputField
+          variant="material"
+          type="input"
+          label={t('organization.newsletter_slug')}
+          placeholder={t('organization.newsletter_slug_placeholder')}
+          itemId={row.id}
+          value={row.ghostNewsletterSlug || ''}
+          helpText={t('help.newsletter_slug')}
+          updateValueMutation={UPDATE_ORGANIZATION_GHOST_NEWSLETTER_SLUG}
+          refetchQueries={['OrganizationList']}
+          showCharacterCount={false}
+          onValueUpdated={() => {
+            void syncGhostNewsletterProvider();
+          }}
+        />
+        <InputField
+          variant="material"
+          type="input"
+          label={t('organization.newsletter_label')}
+          placeholder={t('organization.newsletter_label_placeholder')}
+          itemId={row.id}
+          value={row.ghostNewsletterLabel || ''}
+          helpText={t('help.newsletter_label')}
+          updateValueMutation={UPDATE_ORGANIZATION_GHOST_NEWSLETTER_LABEL}
+          refetchQueries={['OrganizationList']}
+          showCharacterCount={false}
+          onValueUpdated={() => {
+            void syncGhostNewsletterProvider();
+          }}
+        />
+        <CheckboxSelector
+          variant="material"
+          label={t('organization.newsletter_double_opt_in')}
+          helpText={t('help.newsletter_double_opt_in')}
+          checked={Boolean(row.ghostNewsletterDoubleOptInEnabled)}
+          updateValueMutation={UPDATE_ORGANIZATION_GHOST_NEWSLETTER_DOUBLE_OPT_IN_ENABLED}
+          identifierVariables={{ id: row.id }}
+          refetchQueries={['OrganizationList']}
+          className="mt-2"
+          onValueUpdated={() => {
+            void syncGhostNewsletterProvider();
+          }}
+        />
+      </div>
       <div className="mt-6">
         <ImageUploader
           variant="material"
@@ -220,6 +335,7 @@ const ManageOrganizationsContent: FC = () => {
             placeholder={t('input.enter_name')}
             itemId={row.original.id}
             value={getValue<string>()}
+            helpText={t('help.name')}
             updateValueMutation={UPDATE_ORGANIZATION_NAME}
             refetchQueries={['OrganizationList']}
           />
@@ -235,6 +351,7 @@ const ManageOrganizationsContent: FC = () => {
             identifierVariables={{ id: row.original.id }}
             value={getValue<string>()}
             options={organizationTypes}
+            helpText={t('help.type')}
             updateValueMutation={UPDATE_ORGANIZATION_TYPE}
             refetchQueries={['OrganizationList']}
           />

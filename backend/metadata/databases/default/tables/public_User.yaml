@@ -64,6 +64,13 @@ array_relationships:
         table:
           name: SessionSpeaker
           schema: public
+  - name: OrganizationNewsletterSubscriptions
+    using:
+      foreign_key_constraint_on:
+        column: userId
+        table:
+          name: OrganizationNewsletterSubscription
+          schema: public
 select_permissions:
   - role: anonymous
     permission:
