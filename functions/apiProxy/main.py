@@ -93,6 +93,39 @@ def get_cors_headers():
     }
     return headers
 
+
+def _course_has_dlc_funding(course):
+    """True if the course lists Digital Learning Campus (DLC) as a funding organization."""
+    for funding_org in course.get("CourseFundingOrganizations", []):
+        organization = funding_org.get("Organization", {})
+        org_name_normalized = organization.get("name", "").strip().upper()
+        if org_name_normalized in ("DIGITAL LEARNING CAMPUS", "DLC"):
+            return True
+        aliases = organization.get("aliases")
+        if aliases and isinstance(aliases, list):
+            for alias in aliases:
+                alias_normalized = str(alias).strip().upper() if alias else ""
+                if alias_normalized in ("DIGITAL LEARNING CAMPUS", "DLC"):
+                    return True
+    return False
+
+
+def _moochub_include_course(course):
+    """
+    Include published courses from COURSES programs, exclude DEGREES, and include
+    EVENTS programs only when DLC is a funding organization.
+    """
+    program = course.get("Program") or {}
+    program_type = program.get("type") or program.get("shortTitle")
+    if program_type == "DEGREES":
+        return False
+    if program_type == "COURSES":
+        return True
+    if program_type == "EVENTS":
+        return _course_has_dlc_funding(course)
+    return False
+
+
 def handle_moochub_data(page=1, per_page=25):
     try:
         # Use the existing EduHubClient
@@ -127,6 +160,7 @@ def handle_moochub_data(page=1, per_page=25):
                 Program {
                     id
                     shortTitle
+                    type
                     applicationStart
                 }
                 Sessions(order_by: { startDateTime: asc }) {
@@ -171,10 +205,10 @@ def handle_moochub_data(page=1, per_page=25):
         if not isinstance(courses, dict) or "data" not in courses:
             return {'error': 'Failed to fetch data from EduHub'}, 500
 
-        # Filter courses
+        # Filter courses: COURSES programs; EVENTS only with DLC funding; exclude DEGREES
         courses["data"]["Course"] = [
             course for course in courses["data"]["Course"]
-            if course["Program"]["shortTitle"] not in ["EVENTS", "DEGREES"]
+            if _moochub_include_course(course)
         ]
 
         # Transform to MOOCHub schema - one entry per course location
@@ -217,28 +251,8 @@ def handle_moochub_data(page=1, per_page=25):
                 html_content = markdown.markdown(course["contentDescriptionField2"])
                 description_parts.append(html_content)
 
-            # Check for Digital Learning Campus funding organization to add keywords
-            # Matches organization name or aliases that normalize to "DLC" or "DIGITAL LEARNING CAMPUS"
-            has_dlc_funding = False
-            for funding_org in course.get("CourseFundingOrganizations", []):
-                organization = funding_org.get("Organization", {})
-                
-                # Normalize organization name
-                org_name_normalized = organization.get("name", "").strip().upper()
-                if org_name_normalized in ("DIGITAL LEARNING CAMPUS", "DLC"):
-                    has_dlc_funding = True
-                    break
-                
-                # Check aliases if present
-                aliases = organization.get("aliases")
-                if aliases and isinstance(aliases, list):
-                    for alias in aliases:
-                        alias_normalized = str(alias).strip().upper() if alias else ""
-                        if alias_normalized in ("DIGITAL LEARNING CAMPUS", "DLC"):
-                            has_dlc_funding = True
-                            break
-                    if has_dlc_funding:
-                        break
+            # Keywords for DLC-funded courses (same logic as EVENTS inclusion filter)
+            has_dlc_funding = _course_has_dlc_funding(course)
 
             # Build start/end date arrays from all sessions (irregular series per MOOCHub schema)
             # Deduplicate by (start, end) pair - schema requires uniqueItems for startDate/endDate
