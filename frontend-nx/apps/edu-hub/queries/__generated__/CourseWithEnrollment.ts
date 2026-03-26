@@ -167,6 +167,36 @@ export interface CourseWithEnrollment_Course_by_pk_CourseLocations {
   locationOption: LocationOption_enum | null;
 }
 
+export interface CourseWithEnrollment_Course_by_pk_Program_Organization {
+  __typename: "Organization";
+  id: number;
+  name: string;
+  /**
+   * Short organization newsletter description shown to participants in onboarding and profile preferences.
+   */
+  newsletterDescription: string | null;
+  /**
+   * Newsletter provider for this organization. Currently only GHOST is supported.
+   */
+  newsletterProvider: string;
+  /**
+   * Optional custom newsletter label shown in participant-facing UIs.
+   */
+  ghostNewsletterLabel: string | null;
+  /**
+   * Whether Ghost double opt-in should be used for this organization newsletter.
+   */
+  ghostNewsletterDoubleOptInEnabled: boolean;
+  /**
+   * Optional Ghost newsletter list identifier.
+   */
+  ghostNewsletterListId: string | null;
+  /**
+   * Optional Ghost newsletter slug when list ID is not used.
+   */
+  ghostNewsletterSlug: string | null;
+}
+
 export interface CourseWithEnrollment_Course_by_pk_Program {
   __typename: "Program";
   id: number;
@@ -207,6 +237,10 @@ export interface CourseWithEnrollment_Course_by_pk_Program {
    * The day the application for all courses of the program start.
    */
   applicationStart: any | null;
+  /**
+   * An object relationship
+   */
+  Organization: CourseWithEnrollment_Course_by_pk_Program_Organization;
 }
 
 export interface CourseWithEnrollment_Course_by_pk_CourseGroups_CourseGroupOption {

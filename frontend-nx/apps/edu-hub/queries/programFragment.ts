@@ -27,6 +27,16 @@ export const USER_PROGRAM_FRAGMENT = gql`
     shortTitle
     achievementRecordUploadDeadline
     published
+    Organization {
+      id
+      name
+      newsletterDescription
+      newsletterProvider
+      ghostNewsletterLabel
+      ghostNewsletterDoubleOptInEnabled
+      ghostNewsletterListId
+      ghostNewsletterSlug
+    }
   }
 `;
 

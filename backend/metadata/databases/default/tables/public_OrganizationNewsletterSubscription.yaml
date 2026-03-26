@@ -1,0 +1,68 @@
+table:
+  name: OrganizationNewsletterSubscription
+  schema: public
+object_relationships:
+  - name: Organization
+    using:
+      foreign_key_constraint_on: organizationId
+  - name: User
+    using:
+      foreign_key_constraint_on: userId
+insert_permissions:
+  - role: user_access
+    permission:
+      check:
+        userId:
+          _eq: X-Hasura-User-Id
+      columns:
+        - organizationId
+        - source
+        - status
+        - userId
+select_permissions:
+  - role: user_access
+    permission:
+      columns:
+        - userId
+        - organizationId
+        - status
+        - externalSubscriberId
+        - lastSyncedAt
+        - source
+        - errorMessage
+        - created_at
+        - updated_at
+      filter:
+        userId:
+          _eq: X-Hasura-User-Id
+      allow_aggregations: true
+update_permissions:
+  - role: user_access
+    permission:
+      columns:
+        - source
+        - status
+      filter:
+        userId:
+          _eq: X-Hasura-User-Id
+      check: {}
+event_triggers:
+  - name: sync_organization_newsletter_subscription
+    definition:
+      enable_manual: true
+      insert:
+        columns: '*'
+      update:
+        columns:
+          - source
+          - status
+    retry_conf:
+      interval_sec: 300
+      num_retries: 5
+      timeout_sec: 120
+    webhook: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+    headers:
+      - name: name
+        value: syncGhostNewsletterSubscription
+      - name: secret
+        value_from_env: HASURA_CLOUD_FUNCTION_SECRET

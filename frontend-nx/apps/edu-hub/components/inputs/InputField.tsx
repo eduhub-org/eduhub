@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent, useEffect, useCallback, useRef } from 'react';
+import React, { useState, ChangeEvent, useEffect, useCallback, useRef, useMemo } from 'react';
 import { DocumentNode } from 'graphql';
 import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
@@ -50,7 +50,20 @@ import { gql } from 'graphql-tag';
  * stale (from before the user resumed typing). We only sync `localText` from `value` when it is
  * safe: when local state matches what we last sent, so we never overwrite in-progress edits.
  * Focus is preserved by avoiding unnecessary state updates during typing/save cycles.
+ *
+ * Translation tabs: pass `translationTabs` with two or more entries (e.g. DE + EN). Tab labels use
+ * `common.input_field.language_de` / `language_en`, or optional `label` per tab. When set,
+ * `itemId` / `value` are ignored (use dummy values at the call site if required by TypeScript).
  */
+
+export type InputFieldTranslationTab = {
+  /** Language code, e.g. DE / EN — used for tab labels unless `label` is set */
+  lang: string;
+  itemId: number;
+  value: string;
+  /** Override for the tab button text */
+  label?: string;
+};
 
 type InputFieldProps = {
   /**
@@ -79,14 +92,19 @@ type InputFieldProps = {
   placeholder?: string;
 
   /**
-   * Unique identifier for the item being edited.
+   * Unique identifier for the item being edited (ignored when `translationTabs` has 2+ tabs).
    */
   itemId: number;
 
   /**
-   * The current value of the input field.
+   * The current value of the input field (ignored when `translationTabs` has 2+ tabs).
    */
   value: string;
+
+  /**
+   * When set with at least two entries, shows language tabs and edits each row’s `itemId` / `value`.
+   */
+  translationTabs?: InputFieldTranslationTab[];
 
   /**
    * GraphQL mutation to update the text.
@@ -185,6 +203,7 @@ const InputField: React.FC<InputFieldProps> = ({
   placeholder,
   itemId,
   value,
+  translationTabs,
   updateValueMutation,
   onValueUpdated,
   refetchQueries = [],
@@ -204,30 +223,74 @@ const InputField: React.FC<InputFieldProps> = ({
   ...props
 }) => {
   const t = useTranslations('common');
-  const [localText, setLocalText] = useState(value);
+  const isTranslationMode = Boolean(translationTabs && translationTabs.length >= 2);
+
+  const [activeLang, setActiveLang] = useState(() => translationTabs?.[0]?.lang ?? '');
+
+  const currentTab = useMemo(() => {
+    if (!translationTabs?.length) return null;
+    return translationTabs.find((tab) => tab.lang === activeLang) ?? translationTabs[0];
+  }, [translationTabs, activeLang]);
+
+  const effectiveItemId = isTranslationMode && currentTab ? currentTab.itemId : itemId;
+  const effectiveValue = isTranslationMode && currentTab ? currentTab.value : value;
+
+  const [localText, setLocalText] = useState(() =>
+    translationTabs && translationTabs.length >= 2 ? translationTabs[0].value : value
+  );
   const [hasBlurred, setHasBlurred] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const { error, handleError, resetError } = useErrorHandler();
   const [showSavedNotification, setShowSavedNotification] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
+  const togglePreview = () => setShowPreview((prev) => !prev);
+
+  const tabButtonLabel = useCallback(
+    (tab: InputFieldTranslationTab) => {
+      if (tab.label) return tab.label;
+      const code = tab.lang.toUpperCase();
+      if (code === 'DE') return t('input_field.language_de');
+      if (code === 'EN') return t('input_field.language_en');
+      return tab.lang;
+    },
+    [t]
+  );
 
   // Conflict-safe sync: only accept server value when we're not mid-edit (local matches last sent).
   // Prevents stale refetch responses from overwriting text typed after a save.
-  const lastSentValueRef = useRef(value);
-  const prevItemIdRef = useRef(itemId);
+  const lastSentValueRef = useRef(effectiveValue);
+  const prevItemIdRef = useRef(effectiveItemId);
+  const effectiveItemIdRef = useRef(effectiveItemId);
+  const localTextRef = useRef(localText);
 
   useEffect(() => {
-    if (prevItemIdRef.current !== itemId) {
-      prevItemIdRef.current = itemId;
-      setLocalText(value);
-      lastSentValueRef.current = value;
+    localTextRef.current = localText;
+  }, [localText]);
+
+  useEffect(() => {
+    effectiveItemIdRef.current = effectiveItemId;
+  }, [effectiveItemId]);
+
+  useEffect(() => {
+    if (!translationTabs?.length) return;
+    if (!translationTabs.some((tab) => tab.lang === activeLang)) {
+      setActiveLang(translationTabs[0].lang);
+    }
+  }, [translationTabs, activeLang]);
+
+  useEffect(() => {
+    if (prevItemIdRef.current !== effectiveItemId) {
+      prevItemIdRef.current = effectiveItemId;
+      setLocalText(effectiveValue);
+      lastSentValueRef.current = effectiveValue;
       return;
     }
     const isDirty = localText !== lastSentValueRef.current;
     if (!isDirty) {
-      setLocalText(value);
-      lastSentValueRef.current = value;
+      setLocalText(effectiveValue);
+      lastSentValueRef.current = effectiveValue;
     }
-  }, [value, localText, itemId]);
+  }, [effectiveValue, localText, effectiveItemId]);
 
   const [updateText] = useRoleMutation(
     updateValueMutation ||
@@ -241,14 +304,6 @@ const InputField: React.FC<InputFieldProps> = ({
       onCompleted: (data) => {
         if (onValueUpdated) onValueUpdated(data);
         setShowSavedNotification(true);
-      },
-      variables: {
-        itemId,
-        // If type is number, convert the text to number
-        ...(type === 'number' 
-          ? { text: Number.parseInt(localText, 10) }
-          : { text: localText }
-        )
       },
       refetchQueries,
     }
@@ -292,7 +347,7 @@ const InputField: React.FC<InputFieldProps> = ({
         case 'ects':
           return t('input_field.invalid_ects_format');
         case 'number': {
-          if (!Number.isInteger(Number.parseInt(value, 10))) {
+          if (!Number.isInteger(Number.parseInt(localText, 10))) {
             return t('input_field.invalid_integer_format');
           }
           if (min !== undefined && max !== undefined) {
@@ -310,7 +365,7 @@ const InputField: React.FC<InputFieldProps> = ({
           return t('input_field.invalid_input');
       }
     },
-    [t, value, min, max]
+    [t, min, max]
   );
 
   const debouncedUpdateText = useDebouncedCallback((newText: string) => {
@@ -318,7 +373,7 @@ const InputField: React.FC<InputFieldProps> = ({
       lastSentValueRef.current = newText;
       if (updateValueMutation) {
         const textValue = type === 'number' ? Number.parseInt(newText, 10) : newText;
-        updateText({ variables: { itemId, text: String(textValue) } });
+        updateText({ variables: { itemId: effectiveItemIdRef.current, text: String(textValue) } });
       } else if (onValueUpdated) {
         onValueUpdated({ text: newText });
       }
@@ -329,6 +384,16 @@ const InputField: React.FC<InputFieldProps> = ({
     }
     setHasBlurred(false);
   }, debounceTimeout);
+
+  const handleTranslationTabChange = useCallback(
+    (nextLang: string) => {
+      if (!isTranslationMode || !translationTabs || nextLang === activeLang) return;
+      debouncedUpdateText.flush();
+      setShowPreview(false);
+      setActiveLang(nextLang);
+    },
+    [isTranslationMode, translationTabs, activeLang, debouncedUpdateText]
+  );
 
   const handleTextChange = useCallback(
     (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -354,9 +419,6 @@ const InputField: React.FC<InputFieldProps> = ({
     }
     debouncedUpdateText.flush();
   }, [variant, localText, validateInput, debouncedUpdateText, type, handleError, resetError, getErrorMessage]);
-
-  const [showPreview, setShowPreview] = useState(false);
-  const togglePreview = () => setShowPreview(!showPreview);
 
   const [syncedHeight, setSyncedHeight] = useState<number | null>(null);
   const observerRef = useRef<ResizeObserver | null>(null);
@@ -412,23 +474,54 @@ const InputField: React.FC<InputFieldProps> = ({
 
   const renderEduHub = () => (
     <div className="px-2">
-      <div className="text-label-primary">
-        <div className="flex justify-between mb-2">
-          <div className="flex items-center">
-            {helpText && (
-              <Tooltip title={helpText} placement="top">
-                <HelpOutline style={{ cursor: 'pointer', marginRight: '5px' }} />
-              </Tooltip>
-            )}
-            {label}
-          </div>
-          {type === 'markdown' && (
-            <button className="text-white text-xs px-3 pt-2" onClick={togglePreview}>
-              {showPreview ? <u>{t('edit_markdown')}</u> : <u>{t('preview')}</u>}
-            </button>
+      {(label || helpText) && (
+        <div className="mb-2 flex items-center gap-2 text-label-primary">
+          {helpText && (
+            <Tooltip title={helpText} placement="top">
+              <HelpOutline style={{ cursor: 'pointer' }} />
+            </Tooltip>
           )}
+          {label && <span>{label}</span>}
         </div>
-        <div className={`light ${type === 'markdown' ? 'min-h-0' : ''}`}>
+      )}
+      {/* Translation mode keeps a larger shared surface for tabs + editor; regular inputs stay compact */}
+      <div className={isTranslationMode ? 'rounded-lg border border-border-primary/40 bg-fill-primary p-3 light' : 'light'}>
+        {(isTranslationMode || type === 'markdown') && (
+          <div className="flex justify-between mb-2 items-start gap-2">
+            <div className="flex items-center flex-wrap gap-2 min-w-0">
+              {isTranslationMode && translationTabs && (
+                <div className="flex flex-wrap gap-1 border-b border-border-primary w-full sm:w-auto">
+                  {translationTabs.map((tab) => (
+                    <button
+                      key={tab.lang}
+                      type="button"
+                      onClick={() => handleTranslationTabChange(tab.lang)}
+                      className={`px-3 py-1.5 text-sm rounded-t border-b-2 -mb-px transition-colors ${
+                        activeLang === tab.lang
+                          ? 'border-brand text-brand font-semibold'
+                          : 'border-transparent text-label-secondary hover:text-label-primary'
+                      }`}
+                    >
+                      {tabButtonLabel(tab)}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            {type === 'markdown' && (
+              <button
+                type="button"
+                className={`text-xs px-3 pt-2 shrink-0 hover:text-brand ${
+                  isTranslationMode ? 'text-label-primary' : 'text-white'
+                }`}
+                onClick={togglePreview}
+              >
+                {showPreview ? <u>{t('edit_markdown')}</u> : <u>{t('preview')}</u>}
+              </button>
+            )}
+          </div>
+        )}
+        <div className={type === 'markdown' ? 'min-h-0' : ''}>
           {type === 'markdown' && showPreview ? (
             <div
               ref={resizableRef}

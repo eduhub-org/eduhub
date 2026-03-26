@@ -1,9 +1,12 @@
-import { FC, useEffect, useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { FC, ReactNode, useEffect, useState } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 import { CircularProgress } from '@mui/material';
+import Link from 'next/link';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
-import { useAuthedMutation } from '../../../hooks/authedMutation';
-import { useAuthedQuery, useRoleQuery } from '../../../hooks/authedQuery';
+import { useRoleMutation } from '../../../hooks/authedMutation';
+import { useRoleQuery } from '../../../hooks/authedQuery';
 import { useUserId } from '../../../hooks/user';
 import {
   UPDATE_USER_OCCUPATION,
@@ -11,13 +14,21 @@ import {
   UPDATE_USER_MATRICULATION_NUMBER,
 } from '../../../queries/updateUser';
 import { UPDATE_ENROLLMENT_STATUS } from '../../../queries/insertEnrollment';
-import { CourseEnrollmentStatus_enum } from '../../../__generated__/globalTypes';
-import { USER_OCCUPATION } from '../../../queries/user';
-import { CREATE_ORGANIZATION, ORGANIZATION_OPTIONS } from '../../../queries/organization';
+import { CourseEnrollmentStatus_enum, ProgramType_enum } from '../../../__generated__/globalTypes';
+import { USER, USER_OCCUPATION } from '../../../queries/user';
+import {
+  CREATE_ORGANIZATION,
+  ORGANIZATION_OPTIONS,
+} from '../../../queries/organization';
 import {
   OrganizationOptions as OrganizationOptionsQuery,
   OrganizationOptionsVariables,
 } from '../../../queries/__generated__/OrganizationOptions';
+import {
+  ORGANIZATION_NEWSLETTER_SUBSCRIPTION_BY_PK,
+  UPSERT_ORGANIZATION_NEWSLETTER_SUBSCRIPTION,
+} from '../../../queries/newsletterSubscription';
+import { ONBOARDING_TEXT_BY_TYPE } from '../../../queries/onboardingText';
 import { UserOccupation } from '../../../queries/__generated__/UserOccupation';
 import { Button } from '../../common/Button';
 import { QuestionConfirmationDialog } from '../../common/dialogs/QuestionConfirmationDialog';
@@ -35,7 +46,6 @@ import {
   UpdateEnrollmentStatus,
   UpdateEnrollmentStatusVariables,
 } from '../../../queries/__generated__/UpdateEnrollmentStatus';
-import { USER } from '../../../queries/user';
 import { User } from '../../../queries/__generated__/User';
 import { useSession } from 'next-auth/react';
 
@@ -46,15 +56,44 @@ interface OnboardingProps {
   setResetValues: (value: boolean) => void;
 }
 
+interface OrganizationWithNewsletter {
+  id: number;
+  name: string;
+  ghostNewsletterListId?: string | null;
+  ghostNewsletterSlug?: string | null;
+  ghostNewsletterLabel?: string | null;
+  ghostNewsletterDoubleOptInEnabled?: boolean | null;
+  newsletterDescription?: string | null;
+}
+
+type OnboardingTextByType = {
+  OnboardingText: Array<{
+    id: number;
+    programType: string;
+    lang: string;
+    text: string;
+  }>;
+};
+
+const renderPrivacyLink = (chunks: ReactNode) => (
+  <Link href="/privacy" target="_blank" rel="noopener noreferrer" className="underline">
+    {chunks}
+  </Link>
+);
+
 const Onboarding: FC<OnboardingProps> = ({ course, enrollmentId, refetchCourse, setResetValues }) => {
-  const t = useTranslations('course');
+  const tCourse = useTranslations('course');
+  const tProfile = useTranslations('profile');
+  const locale = useLocale();
   const userId = useUserId();
   const [showDeclineDialog, setShowDeclineDialog] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showOrganizationOptionsError, setShowOrganizationOptionsError] = useState(true);
+  const [newsletterOptIn, setNewsletterOptIn] = useState(false);
+  const [submissionError, setSubmissionError] = useState<string | null>(null);
   const { status: sessionStatus } = useSession();
 
-  const { data: userData } = useAuthedQuery<User>(USER, {
+  const { data: userData } = useRoleQuery<User>(USER, {
     variables: { userId },
   });
 
@@ -71,19 +110,75 @@ const Onboarding: FC<OnboardingProps> = ({ course, enrollmentId, refetchCourse, 
     skip: sessionStatus === 'loading',
   });
 
-  const [updateEnrollmentStatus] = useAuthedMutation<UpdateEnrollmentStatus, UpdateEnrollmentStatusVariables>(
+  const [updateEnrollmentStatus] = useRoleMutation<UpdateEnrollmentStatus, UpdateEnrollmentStatusVariables>(
     UPDATE_ENROLLMENT_STATUS
   );
 
+  const organizationWithNewsletter = (course?.Program as
+    | {
+        Organization?: OrganizationWithNewsletter | null;
+      }
+    | null
+    | undefined)?.Organization;
+  const organizationId = organizationWithNewsletter?.id;
+  const hasOrganizationId = organizationId !== null && organizationId !== undefined;
+  const hasOrganizationNewsletter =
+    !!organizationWithNewsletter &&
+    (!!organizationWithNewsletter.ghostNewsletterListId || !!organizationWithNewsletter.ghostNewsletterSlug);
+  const newsletterDescription = organizationWithNewsletter?.newsletterDescription?.trim() || '';
+
+  const { data: newsletterSubscriptionData } = useRoleQuery(ORGANIZATION_NEWSLETTER_SUBSCRIPTION_BY_PK, {
+    skip: !hasOrganizationNewsletter || !hasOrganizationId || !userId,
+    variables: {
+      userId,
+      organizationId: organizationId ?? -1,
+    },
+    fetchPolicy: 'cache-and-network',
+  });
+
+  const [upsertNewsletterSubscription] = useRoleMutation(UPSERT_ORGANIZATION_NEWSLETTER_SUBSCRIPTION);
+
+  const rawProgramType = (course?.Program as { type?: ProgramType_enum } | null | undefined)?.type;
+  let programTypeForText = ProgramType_enum.COURSES;
+  if (rawProgramType === ProgramType_enum.EVENTS) {
+    programTypeForText = ProgramType_enum.EVENTS;
+  } else if (rawProgramType === ProgramType_enum.DEGREES) {
+    programTypeForText = ProgramType_enum.DEGREES;
+  }
+
+  const { data: onboardingTextData } = useRoleQuery<OnboardingTextByType>(ONBOARDING_TEXT_BY_TYPE, {
+    variables: {
+      programType: programTypeForText,
+    },
+    skip: sessionStatus === 'loading',
+  });
+
+  const languageForText = locale.toUpperCase() === 'DE' ? 'DE' : 'EN';
+  const onboardingText =
+    onboardingTextData?.OnboardingText.find((entry) => entry.lang === languageForText)?.text ??
+    onboardingTextData?.OnboardingText.find((entry) => entry.lang === 'EN')?.text ??
+    '';
+
+  useEffect(() => {
+    const currentStatus = newsletterSubscriptionData?.OrganizationNewsletterSubscription_by_pk?.status;
+    if (currentStatus === 'SUBSCRIBED' || currentStatus === 'PENDING') {
+      setNewsletterOptIn(true);
+      return;
+    }
+    if (currentStatus === 'UNSUBSCRIBED' || currentStatus === 'ERROR') {
+      setNewsletterOptIn(false);
+    }
+  }, [newsletterSubscriptionData?.OrganizationNewsletterSubscription_by_pk?.status]);
+
   // Occupation enums and their translated labels
-  const occupationOptions = (queryOccupationOptions.data?.UserOccupation || []).map((x) => ({
-    label: t(`profile:occupation.${x.value}`), // Apply translation here
+  const occupationOptions = (queryOccupationOptions.data?.UserOccupation || []).map((x: { value: string }) => ({
+    label: tProfile(`occupation.${x.value}`),
     value: x.value,
   }));
 
   // Organization ids and their corresponding names
   const organizationOptions =
-    organizationData?.Organization?.map((org) => ({
+    organizationData?.Organization?.map((org: { name: string; id: number; aliases: string[] | null }) => ({
       label: org.name,
       value: org.id.toString(),
       aliases: org.aliases,
@@ -106,19 +201,19 @@ const Onboarding: FC<OnboardingProps> = ({ course, enrollmentId, refetchCourse, 
   const getOrganizationLabel = (occupation: string) => {
     switch (occupation) {
       case 'HIGH_SCHOOL_STUDENT':
-        return t('profile.organization.label_school');
+        return tProfile('organization.label_school');
       case 'UNIVERSITY_STUDENT':
-        return t('profile.organization.label_university');
+        return tProfile('organization.label_university');
       case 'EMPLOYED_FULL_TIME':
       case 'EMPLOYED_PART_TIME':
       case 'SELF_EMPLOYED':
-        return t('profile.organization.label_company');
+        return tProfile('organization.label_company');
       case 'RESEARCHER':
-        return t('profile.organization.label_research');
+        return tProfile('organization.label_research');
       case 'EDUCATOR':
-        return t('profile.organization.label_education');
+        return tProfile('organization.label_education');
       default:
-        return t('profile.organization.label_base');
+        return tProfile('organization.label_base');
     }
   };
 
@@ -142,36 +237,61 @@ const Onboarding: FC<OnboardingProps> = ({ course, enrollmentId, refetchCourse, 
 
   const handleEnrollmentConfirmation = async () => {
     try {
+      setSubmissionError(null);
       setIsSubmitting(true);
+
+      // Confirm enrollment first so newsletter preference changes are only applied after successful enrollment.
       await updateEnrollmentStatus({
         variables: {
           enrollmentId,
           status: CourseEnrollmentStatus_enum.CONFIRMED,
         },
       });
+
+      if (hasOrganizationNewsletter && hasOrganizationId && userId) {
+        try {
+          await upsertNewsletterSubscription({
+            variables: {
+              userId,
+              organizationId,
+              status: newsletterOptIn ? 'SUBSCRIBED' : 'UNSUBSCRIBED',
+              source: 'CHECKBOX',
+            },
+          });
+        } catch (newsletterError) {
+          console.log('Newsletter preference update failed after enrollment confirmation', newsletterError);
+        }
+      }
       await refetchCourse();
       setResetValues(false);
     } catch (error) {
       console.log(error);
+      setSubmissionError(tCourse('onboarding_modal.errors.confirmation_failed'));
     } finally {
       setIsSubmitting(false);
     }
   };
 
   if (!course) {
-    return <div>{t('general.course_not_available')}</div>;
+    return <div>{tCourse('general.course_not_available')}</div>;
   }
 
   return (
-    <div className="bg-edu-course-invited rounded-2xl p-6 text-label-primary light mb-12">
-      <div className="pb-5 text-2xl font-bold">{t('onboarding_modal.important')}</div>
-      <div className="pb-5 text-xl font-bold">{t('onboarding_modal.congratulation')}</div>
-      <div className="pb-4">{t('onboarding_modal.form_intro')}</div>
-      <div className="flex flex-wrap">
+    <div className="bg-edu-course-invited rounded-2xl p-6 text-label-primary light mb-12 border border-border-primary/30 shadow-lg">
+      <div className="mb-6 rounded-xl bg-fill-primary p-4">
+        <ReactMarkdown
+          className="prose max-w-none text-label-primary prose-headings:font-bold prose-headings:text-label-primary prose-p:text-label-secondary prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg"
+          remarkPlugins={[remarkGfm]}
+        >
+          {onboardingText}
+        </ReactMarkdown>
+      </div>
+
+      <div className="flex flex-wrap gap-y-1">
         <div className="w-full lg:w-1/2 lg:pr-3">
           <DropDownSelector
             variant="eduhub"
-            label={t('profile.occupation.label')}
+            label={tProfile('occupation.label')}
             value={userData?.User_by_pk?.occupation || ''}
             options={occupationOptions}
             updateValueMutation={UPDATE_USER_OCCUPATION}
@@ -185,7 +305,7 @@ const Onboarding: FC<OnboardingProps> = ({ course, enrollmentId, refetchCourse, 
             creatable={!isOrganizationLookupUnavailable}
             label={getOrganizationLabel(userData?.User_by_pk?.occupation ?? '')}
             value={userData?.User_by_pk?.Organization?.id?.toString() || ''}
-            placeholder={t('profile.organization.placeholder')}
+            placeholder={tProfile('organization.placeholder')}
             options={organizationOptions}
             updateValueMutation={UPDATE_USER_ORGANIZATION_ID}
             identifierVariables={{ userId }}
@@ -195,12 +315,13 @@ const Onboarding: FC<OnboardingProps> = ({ course, enrollmentId, refetchCourse, 
           />
         </div>
       </div>
+
       {userData?.User_by_pk?.occupation === 'UNIVERSITY_STUDENT' && (
-        <div className="w-full lg:w-1/2  lg:pr-3">
+        <div className="w-full lg:w-1/2 lg:pr-3">
           <InputField
             variant="eduhub"
             type="number"
-            label={t('profile.matriculation_number')}
+            label={tProfile('matriculation_number')}
             itemId={userData?.User_by_pk?.id}
             value={userData?.User_by_pk?.matriculationNumber || ''}
             updateValueMutation={UPDATE_USER_MATRICULATION_NUMBER}
@@ -209,32 +330,74 @@ const Onboarding: FC<OnboardingProps> = ({ course, enrollmentId, refetchCourse, 
           />
         </div>
       )}
-      <div className="pb-3">{t('onboarding_modal.confirm_sufficient_time')}</div>
-      <div className="pb-3">
-        <b>{t('onboarding_modal.mattermost_info_1')}</b>
-      </div>
-      <div className="pb-0">{t('onboarding_modal.mattermost_info_2')}</div>
+
+      {hasOrganizationNewsletter && hasOrganizationId && (
+        <div className="mt-5 rounded-xl border border-border-primary/40 bg-fill-primary p-4">
+          <div className="flex items-start gap-3">
+            <input
+              id="newsletter-onboarding-optin"
+              type="checkbox"
+              checked={newsletterOptIn}
+              onChange={(event) => setNewsletterOptIn(event.target.checked)}
+              className="mt-1 h-4 w-4 rounded border-gray-300 text-brand focus:ring-brand"
+              disabled={isSubmitting}
+            />
+            <div>
+              <label htmlFor="newsletter-onboarding-optin" className="text-sm font-semibold cursor-pointer">
+                {tCourse('onboarding_modal.newsletter_title', {
+                  organization: organizationWithNewsletter.ghostNewsletterLabel || organizationWithNewsletter.name,
+                })}
+              </label>
+              <p className="mt-1 text-sm text-label-secondary">
+                {tCourse('onboarding_modal.newsletter_description', {
+                  organization: organizationWithNewsletter.name,
+                })}
+              </p>
+              {newsletterDescription && (
+                <p className="mt-1 text-sm text-label-secondary">{newsletterDescription}</p>
+              )}
+              <p className="mt-2 text-xs text-label-secondary">
+                {tCourse.rich('onboarding_modal.newsletter_legal', {
+                  privacy: renderPrivacyLink,
+                })}
+              </p>
+              {organizationWithNewsletter.ghostNewsletterDoubleOptInEnabled && (
+                <p className="mt-1 text-xs text-label-secondary">
+                  {tCourse('onboarding_modal.newsletter_double_opt_in')}
+                </p>
+              )}
+            </div>
+          </div>
+          {newsletterSubscriptionData?.OrganizationNewsletterSubscription_by_pk?.status === 'ERROR' && (
+            <p className="mt-3 text-xs text-red-700">
+              {tCourse('onboarding_modal.newsletter_sync_issue')}
+            </p>
+          )}
+        </div>
+      )}
+
+      {submissionError && (
+        <div className="mt-4 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">{submissionError}</div>
+      )}
+
       <div className="flex flex-col lg:flex-row lg:gap-5">
         <Button
           as="button"
           type="button"
           disabled={isSubmitting}
-          filled
-          inverted
-          className="mt-8 block mx-auto lg:mb-5 disabled:bg-slate-500"
+          className="mt-8 block mx-auto lg:mb-5 bg-error text-fill-primary border-error hover:bg-error hover:border-error hover:opacity-90 disabled:bg-fill-disabled disabled:text-label-disabled"
           onClick={() => setShowDeclineDialog(true)}
         >
-          {isSubmitting ? <CircularProgress /> : t('general.reject')}
+          {isSubmitting ? <CircularProgress /> : tCourse('general.reject')}
         </Button>
         <Button
           as="button"
           type="button"
           disabled={isSubmitting}
-          filled
-          className="mt-4 lg:mt-8 block mx-auto lg:mb-5 disabled:bg-slate-500"
+          className="mt-4 lg:mt-8 block mx-auto lg:mb-5 bg-success text-fill-primary border-success hover:bg-success hover:border-success hover:opacity-90 disabled:bg-fill-disabled disabled:text-label-disabled"
           onClick={handleEnrollmentConfirmation}
         >
-          {isSubmitting ? <CircularProgress /> : t('general.confirm')}
+          {isSubmitting ? <CircularProgress /> : tCourse('general.confirm')}
         </Button>
       </div>
 
@@ -242,11 +405,11 @@ const Onboarding: FC<OnboardingProps> = ({ course, enrollmentId, refetchCourse, 
         open={showDeclineDialog}
         onClose={() => setShowDeclineDialog(false)}
         onConfirm={handleEnrollmentCancellation}
-        question={t('onboarding_modal.decline_confirm_text')}
-        confirmationText={t('onboarding_modal.decline_button_text')}
+        question={tCourse('onboarding_modal.decline_confirm_text')}
+        confirmationText={tCourse('onboarding_modal.decline_button_text')}
       />
       <ErrorMessageDialog
-        errorMessage={t('errors.failed_to_load_organization_options')}
+        errorMessage={tCourse('errors.failed_to_load_organization_options')}
         open={!!organizationOptionsError && showOrganizationOptionsError}
         onClose={() => setShowOrganizationOptionsError(false)}
       />

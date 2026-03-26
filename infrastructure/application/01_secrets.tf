@@ -234,6 +234,21 @@ resource "google_secret_manager_secret_version" "formbricks_api_key" {
   secret_data = var.formbricks_api_key
 }
 
+# ===== Ghost Newsletter Credentials Encryption Key =====
+resource "google_secret_manager_secret" "ghost_newsletter_credentials_encryption_key" {
+  provider  = google-beta
+  secret_id = "ghost-newsletter-credentials-encryption-key"
+  replication {
+    auto {}
+  }
+}
+
+resource "google_secret_manager_secret_version" "ghost_newsletter_credentials_encryption_key" {
+  provider    = google-beta
+  secret      = google_secret_manager_secret.ghost_newsletter_credentials_encryption_key.name
+  secret_data = var.ghost_newsletter_credentials_encryption_key
+}
+
 # ===== Stripe Secret Key =====
 resource "google_secret_manager_secret" "stripe_secret_key" {
   provider  = google-beta
@@ -350,6 +365,13 @@ resource "google_secret_manager_secret_iam_member" "formbricks_api_key" {
   role       = "roles/secretmanager.secretAccessor"
   member     = "serviceAccount:${data.google_project.eduhub.number}-compute@developer.gserviceaccount.com"
   depends_on = [google_secret_manager_secret.formbricks_api_key]
+}
+
+resource "google_secret_manager_secret_iam_member" "ghost_newsletter_credentials_encryption_key" {
+  secret_id  = google_secret_manager_secret.ghost_newsletter_credentials_encryption_key.id
+  role       = "roles/secretmanager.secretAccessor"
+  member     = "serviceAccount:${data.google_project.eduhub.number}-compute@developer.gserviceaccount.com"
+  depends_on = [google_secret_manager_secret.ghost_newsletter_credentials_encryption_key]
 }
 
 resource "google_secret_manager_secret_iam_member" "stripe_secret_key" {

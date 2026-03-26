@@ -319,3 +319,9 @@ variable "stripe_publishable_key" {
   description = "Stripe publishable API key (safe for frontend)"
   type        = string
 }
+
+variable "ghost_newsletter_credentials_encryption_key" {
+  description = "AES-256 key used to encrypt/decrypt Ghost newsletter API credentials at rest"
+  type        = string
+  sensitive   = true
+}
