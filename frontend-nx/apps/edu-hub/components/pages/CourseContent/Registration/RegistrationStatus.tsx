@@ -69,8 +69,13 @@ const CourseLinkInfos: FC<{ course: Course_Course_by_pk }> = ({ course }) => {
   return (
     <div className="flex flex-col justify-between items-center w-full">
       {chatLink && (
-        <div className="mb-10">
-          <Button className="bg-blue-200" as="a" href={chatLink} filled inverted>
+        <div className="mb-10 w-full flex justify-center">
+          <Button
+            className="!bg-brand !text-white !border-brand hover:!bg-brand-light hover:!border-brand-light px-8 py-3.5 sm:px-10 sm:py-4 text-base sm:text-lg font-semibold uppercase tracking-wide shadow-md hover:shadow-lg transition-shadow"
+            as="a"
+            href={chatLink}
+            filled
+          >
             {t('general.to_course_chat')}
           </Button>
         </div>
