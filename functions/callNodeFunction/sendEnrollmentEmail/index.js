@@ -41,9 +41,11 @@ export default async function sendEnrollmentEmail(req, logger) {
         CourseEnrollment_by_pk(id: $enrollmentId) {
           id
           status
-          paymentStatus
           created_at
           invitationExpirationDate
+          Invoices(limit: 1, order_by: { created_at: desc }) {
+            status
+          }
           User {
             id
             firstName
@@ -138,10 +140,11 @@ export default async function sendEnrollmentEmail(req, logger) {
         };
     }
     
-    // Select paid template variant if payment is completed
-    // Only for APPLICATION_RECEIVED and REGISTRATION_CONFIRMED
+    // Select paid template variant if latest invoice is paid
+    // (CourseEnrollment.paymentStatus was removed in favor of Invoice.status)
     let templateType = baseTemplateType;
-    const isPaid = enrollmentDetails.paymentStatus === 'COMPLETED';
+    const latestInvoiceStatus = enrollmentDetails.Invoices?.[0]?.status;
+    const isPaid = latestInvoiceStatus === 'PAID';
     if (isPaid) {
       if (baseTemplateType === 'REGISTRATION_CONFIRMED') {
         templateType = 'REGISTRATION_CONFIRMED_PAID';
