@@ -1,16 +1,7 @@
 import logging
 from datetime import datetime, timedelta, timezone
 from api_clients import EduHubClient
-
-# Mapping from LimeSurvey Place values to LocationOption values
-LIMESURVEY_LOCATION_MAPPING = {
-    "Starterkitchen": "KIEL",
-    "Legienstraße 40": "KIEL",
-    "Waterkant": "KIEL",
-    "Kosmos": "KIEL",
-    "KIEL": "KIEL",
-    "HEIDE": "HEIDE",
-}
+from pythonFunctions.limesurvey_location_mapping import LIMESURVEY_LOCATION_MAPPING
 
 
 def update_enrollment_locations(arguments):
