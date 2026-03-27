@@ -23,6 +23,7 @@ import {
   UserSelectionWithFilter_User,
 } from '../../../queries/__generated__/UserSelectionWithFilter';
 import { CourseRegistrationType_enum, order_by } from '../../../__generated__/globalTypes';
+import { getEmailTemplateTypesForCourseRegistration } from '../../../utils/getEmailTemplateTypesForCourseRegistration';
 import { SelectUserDialog } from '../../common/dialogs/SelectUserDialog';
 import { SelectOrganizationDialog } from '../../common/dialogs/SelectOrganizationDialog';
 import { CreateUserDialog } from '../../common/dialogs/CreateUserDialog';
@@ -272,35 +273,6 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
     return undefined;
   }, [course, requiresPayment, stripeSyncStatus, isStripeSyncing, handleSyncStripeBasePrice]);
 
-  // Determine available template types based on registration type
-  const getAvailableTemplates = useCallback((): string[] => {
-    const allTemplates = [
-      'APPLICATION_RECEIVED',
-      'APPLICATION_CONFIRMED',
-      'SESSION_REMINDER',
-      'INVITE',
-      'DECLINE',
-      'REGISTRATION_CONFIRMED',
-    ];
-
-    if (!course.registrationType || course.registrationType === CourseRegistrationType_enum.EXTERNAL_REGISTRATION) {
-      return []; // No templates for external registration
-    }
-
-    if (
-      course.registrationType === CourseRegistrationType_enum.DIRECT_WITH_INPUT ||
-      course.registrationType === CourseRegistrationType_enum.DIRECT_CONFIRMATION
-    ) {
-      return ['REGISTRATION_CONFIRMED', 'SESSION_REMINDER'];
-    }
-
-    if (course.registrationType === CourseRegistrationType_enum.APPROVAL_WITH_INPUT) {
-      return allTemplates.filter((t) => t !== 'REGISTRATION_CONFIRMED');
-    }
-
-    return [];
-  }, [course.registrationType]);
-
   // Handle button click - create templates if needed, then navigate
   const handleManageEmailTemplates = useCallback(async () => {
     if (isExternalRegistration) {
@@ -309,7 +281,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
 
     // If templates don't exist, create them from defaults
     if (!hasCustomTemplates && defaultTemplatesData?.MailTemplate) {
-      const availableTemplateTypes = getAvailableTemplates();
+      const availableTemplateTypes = getEmailTemplateTypesForCourseRegistration(course.registrationType);
       if (availableTemplateTypes.length > 0) {
         try {
           // Create templates for available types from defaults
@@ -360,7 +332,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
     isExternalRegistration,
     hasCustomTemplates,
     defaultTemplatesData,
-    getAvailableTemplates,
+    course.registrationType,
     insertEmailTemplate,
     course.id,
     refetchTemplatesCount,

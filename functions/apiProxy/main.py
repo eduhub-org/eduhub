@@ -58,6 +58,12 @@ LOCATION_ADDRESS_MAPPING = {
         "streetAddress": "Fraunhoferstraße 2-4",
         "city": "Kiel",
         "description": "FabLab.SH by opencampus.sh"
+    },
+    340: {
+       "name": "H-Raum",
+       "streetAddress": "Fritz-Thiedemann-Ring 20",
+       "city": "Heide",
+       "description": "Raum H04 im Erdgeschoss des Gebäudes 2.4 der FH Westküste"
     }
 }
 

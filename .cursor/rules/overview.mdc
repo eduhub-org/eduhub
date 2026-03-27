@@ -84,8 +84,11 @@ When ANY task involves database schema changes (adding/removing columns, tables,
    ```bash
    cd frontend-nx && GRAPHQL_URI=http://localhost:8080/v1/graphql yarn apollo
    ```
+5. **Function Impact Scan (MANDATORY)**: For every schema change, scan serverless consumers in \functions/`.`
+   - Run: \rg "<table_or_column_name>" functions/` for each changed table/column.`
+   - If matches exist, update affected function GraphQL queries/business logic in \functions/callNodeFunction/`, `functions/sendMail/`, and related modules.`
 
-**IMPORTANT**: Never consider a schema-change task complete until migrations are created AND types are regenerated.
+**IMPORTANT**: Never consider a schema-change task complete until migrations are created AND types are regenerated, AND function impact scan is completed.
 
 ### Essentials for every prompt
 

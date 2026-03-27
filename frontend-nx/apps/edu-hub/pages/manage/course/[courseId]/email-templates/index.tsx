@@ -1,5 +1,5 @@
 import Head from 'next/head';
-import { FC, useEffect, useState, useCallback } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { Page } from '../../../../../components/layout/Page';
 import { useIsAdmin, useIsLoggedIn } from '../../../../../hooks/authentication';
@@ -10,7 +10,7 @@ import Loading from '../../../../../components/common/Loading';
 import { MANAGED_COURSE } from '../../../../../queries/course';
 import { ManagedCourse } from '../../../../../queries/__generated__/ManagedCourse';
 import ManageEmailTemplatesContent from '../../../../../components/pages/ManageEmailTemplatesContent';
-import { CourseRegistrationType_enum } from '../../../../../__generated__/globalTypes';
+import { getEmailTemplateTypesForCourseRegistration } from '../../../../../utils/getEmailTemplateTypesForCourseRegistration';
 import {
   GET_DEFAULT_TEMPLATES,
   GET_COURSE_TEMPLATES_COUNT,
@@ -52,38 +52,6 @@ const CourseEmailTemplates: FC = () => {
     INSERT_EMAIL_TEMPLATE
   );
 
-  // Determine available template types based on registration type
-  const getAvailableTemplates = useCallback((registrationType: CourseRegistrationType_enum | null): string[] => {
-    const allTemplates = [
-      'APPLICATION_RECEIVED',
-      'APPLICATION_CONFIRMED',
-      'SESSION_REMINDER',
-      'INVITE',
-      'DECLINE',
-      'REGISTRATION_CONFIRMED',
-      'ORGANIZER_ADDED',
-    ];
-
-    if (!registrationType || registrationType === CourseRegistrationType_enum.EXTERNAL_REGISTRATION) {
-      return []; // No templates for external registration
-    }
-
-    if (
-      registrationType === CourseRegistrationType_enum.DIRECT_WITH_INPUT ||
-      registrationType === CourseRegistrationType_enum.DIRECT_CONFIRMATION ||
-      registrationType === CourseRegistrationType_enum.DIRECT_WITH_INPUT_AND_PAYMENT ||
-      registrationType === CourseRegistrationType_enum.DIRECT_CONFIRMATION_AND_PAYMENT
-    ) {
-      return ['REGISTRATION_CONFIRMED', 'SESSION_REMINDER', 'ORGANIZER_ADDED'];
-    }
-
-    if (registrationType === CourseRegistrationType_enum.APPROVAL_WITH_INPUT) {
-      return allTemplates.filter((t) => t !== 'REGISTRATION_CONFIRMED');
-    }
-
-    return [];
-  }, []);
-
   // Create templates from defaults if they don't exist
   useEffect(() => {
     const createTemplatesFromDefaults = async () => {
@@ -100,7 +68,7 @@ const CourseEmailTemplates: FC = () => {
       const course = data?.Course_by_pk;
       if (!course) return;
 
-      const availableTemplateTypes = getAvailableTemplates(course.registrationType);
+      const availableTemplateTypes = getEmailTemplateTypesForCourseRegistration(course.registrationType);
       if (availableTemplateTypes.length === 0) return;
 
       try {
@@ -154,7 +122,6 @@ const CourseEmailTemplates: FC = () => {
     data,
     insertEmailTemplate,
     refetchTemplatesCount,
-    getAvailableTemplates,
   ]);
 
   if (!isLoggedIn || !isAdmin) {
@@ -183,7 +150,7 @@ const CourseEmailTemplates: FC = () => {
   }
 
   const course = data.Course_by_pk;
-  const availableTemplateTypes = getAvailableTemplates(course.registrationType);
+  const availableTemplateTypes = getEmailTemplateTypesForCourseRegistration(course.registrationType);
 
   return (
     <>

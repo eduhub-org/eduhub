@@ -3,6 +3,7 @@ import logging
 import pandas as pd
 from thefuzz import fuzz
 from api_clients import EduHubClient, ZoomClient, LimeSurveyClient
+from pythonFunctions.limesurvey_location_mapping import place_keys_for_location_option
 
 
 def check_attendance(arguments):
@@ -79,7 +80,7 @@ def check_attendance(arguments):
                         logging.error(f"Error while getting Zoom attendance: {e}")
 
                 # Checking offline attendance
-                elif location["locationOption"] == "KIEL":
+                elif location["locationOption"] in ["KIEL", "HEIDE"]:
                     logging.info("Getting offline attendances from LimeSurvey")
                     offline_attendance = get_offline_session_attendance(session, location)
                     offline_attendance["source"] = "LIMESURVEY"
@@ -196,8 +197,14 @@ def get_offline_session_attendance(session, location):
         ].copy()
         logging.debug("############# Session Attendances\n%s", session_attendances)
 
-        # TODO If offline address is provided in the session filter the attendances
-        # additionally according to the given location
+        # Filter Place values to the current location option using shared mapping
+        location_option = location.get("locationOption")
+        allowed_places = place_keys_for_location_option(location_option)
+        if allowed_places:
+            session_attendances["location"] = session_attendances["location"].astype(str).str.strip()
+            session_attendances = session_attendances[
+                session_attendances["location"].isin(allowed_places)
+            ].copy()
 
         # Add interruption count, duration and leaveDateTime of None since not available for offline sessions
         session_attendances["interruptionCount"] = None
