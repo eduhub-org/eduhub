@@ -838,6 +838,22 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
         <AddParticipantsForm courseId={course.id} onSubmit={closeAddParticipantsModal} />
       </Modal>
 
+      <OnlyInstructor>
+        {organizerCourseChatLink && (
+          <div className="mb-6 flex items-center justify-center gap-3 rounded-lg border border-border-primary bg-bg-secondary p-4">
+            <p className="text-sm text-label-primary">{t('element_chat_welcome_prompt')}</p>
+            <OldButton
+              className="!bg-brand !text-white !border-brand hover:!bg-brand-light hover:!border-brand-light whitespace-nowrap"
+              as="a"
+              href={organizerCourseChatLink}
+              filled
+            >
+              {tCourse('general.to_course_chat')}
+            </OldButton>
+          </div>
+        )}
+      </OnlyInstructor>
+
       {/* Statistics Cards */}
       {courseEnrollments.length > 0 && (
         <div className={`grid grid-cols-1 md:grid-cols-2 ${features.hasApplicationProcess ? 'lg:grid-cols-4' : 'lg:grid-cols-2'} gap-4 mb-6`}>
@@ -879,19 +895,6 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
 
       <div>
         <OnlyInstructor>
-          {organizerCourseChatLink && (
-            <div className="mb-4 flex flex-col gap-3 rounded-lg border border-border-primary bg-bg-secondary p-4 sm:flex-row sm:items-center sm:justify-between">
-              <p className="text-sm text-label-primary">{t('element_chat_welcome_prompt')}</p>
-              <OldButton
-                className="!bg-brand !text-white !border-brand hover:!bg-brand-light hover:!border-brand-light whitespace-nowrap"
-                as="a"
-                href={organizerCourseChatLink}
-                filled
-              >
-                {tCourse('general.to_course_chat')}
-              </OldButton>
-            </div>
-          )}
           <TableGrid<ManagedCourse_Course_by_pk_CourseEnrollments>
             columns={columns}
             data={filteredEnrollments}
