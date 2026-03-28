@@ -1057,6 +1057,7 @@
     "application": "Application",
     "evaluation": "Evaluation",
     "send_email_to_applicants": "Send Email to Applicants",
+    "element_chat_welcome_prompt": "Please enter the Element chat and welcome your course participants.",
     "select_applicants_first": "Please select applicants first",
     "bulk_actions": {
       "expand_collapse_rows": "Expand/Collapse Rows",

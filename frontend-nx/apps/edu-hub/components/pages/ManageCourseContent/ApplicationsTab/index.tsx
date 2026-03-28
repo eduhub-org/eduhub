@@ -60,11 +60,15 @@ const isExpired = (enrollment: ManagedCourse_Course_by_pk_CourseEnrollments) => 
 export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
   const t = useTranslations('manageCourse');
   const tCommon = useTranslations('common');
+  const tCourse = useTranslations('course');
   const locale = useLocale();
   const displayDate = useDisplayDate();
   const isInstructor = useIsInstructor();
   const isAdmin = useIsAdmin();
   const theme = useTheme();
+  const matrixRoomId = course.matrixRoomId?.trim();
+  const elementBaseUrl = process.env.NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL?.replace(/\/+$/, '');
+  const organizerCourseChatLink = matrixRoomId && elementBaseUrl ? `${elementBaseUrl}/#/room/${matrixRoomId}` : null;
 
   const features = useMemo(
     () => getRegistrationFeatures(course.registrationType),
@@ -834,6 +838,20 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
         <AddParticipantsForm courseId={course.id} onSubmit={closeAddParticipantsModal} />
       </Modal>
 
+      {organizerCourseChatLink ? (
+        <div className="mb-6 flex items-center justify-center gap-3 rounded-lg border border-border-primary bg-bg-secondary p-4">
+          <p className="text-sm text-label-primary">{t('element_chat_welcome_prompt')}</p>
+          <OldButton
+            className="!bg-brand !text-white !border-brand hover:!bg-brand-light hover:!border-brand-light whitespace-nowrap"
+            as="a"
+            href={organizerCourseChatLink}
+            filled
+          >
+            {tCourse('general.to_course_chat')}
+          </OldButton>
+        </div>
+      ) : null}
+
       {/* Statistics Cards */}
       {courseEnrollments.length > 0 && (
         <div className={`grid grid-cols-1 md:grid-cols-2 ${features.hasApplicationProcess ? 'lg:grid-cols-4' : 'lg:grid-cols-2'} gap-4 mb-6`}>
@@ -874,35 +892,34 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
       )}
 
       <div>
-            <OnlyInstructor>
-              <TableGrid<ManagedCourse_Course_by_pk_CourseEnrollments>
-                columns={columns}
-                data={filteredEnrollments}
-                loading={false}
-                error={null as unknown as ApolloError}
-                expandableRowComponent={ExpandableApplicationRow}
-                bulkActions={bulkActions}
-                onBulkAction={handleBulkEmailAction}
-                enablePagination={true}
-                totalCount={filteredEnrollments.length}
-                pageIndex={pageIndex}
-                onPageChange={setPageIndex}
-                pageSize={pageSize}
-                onPageSizeChange={handlePageSizeChange}
-                searchFilter={searchFilter}
-                onSearchFilterChange={setSearchFilter}
-                refetchQueries={[]}
-                {...(isAdmin && {
-                  addButtonText: t('add_participants'),
-                  onAddButtonClick: openAddParticipantsModal,
-                })}
-              />
-            </OnlyInstructor>
+        <OnlyInstructor>
+          <TableGrid<ManagedCourse_Course_by_pk_CourseEnrollments>
+            columns={columns}
+            data={filteredEnrollments}
+            loading={false}
+            error={null as unknown as ApolloError}
+            expandableRowComponent={ExpandableApplicationRow}
+            bulkActions={bulkActions}
+            onBulkAction={handleBulkEmailAction}
+            enablePagination={true}
+            totalCount={filteredEnrollments.length}
+            pageIndex={pageIndex}
+            onPageChange={setPageIndex}
+            pageSize={pageSize}
+            onPageSizeChange={handlePageSizeChange}
+            searchFilter={searchFilter}
+            onSearchFilterChange={setSearchFilter}
+            refetchQueries={[]}
+            {...(isAdmin && {
+              addButtonText: t('add_participants'),
+              onAddButtonClick: openAddParticipantsModal,
+            })}
+          />
+        </OnlyInstructor>
 
-            {filteredEnrollments.length > 0 && features.hasApplicationProcess && (
-              <div className="-mt-8 mb-3">{infoDots}</div>
-            )}
-
+        {filteredEnrollments.length > 0 && features.hasApplicationProcess && (
+          <div className="-mt-8 mb-3">{infoDots}</div>
+        )}
       </div>
 
       {/* Invitation Dialog */}
