@@ -839,7 +839,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
       </Modal>
 
       <OnlyInstructor>
-        {organizerCourseChatLink && (
+        {organizerCourseChatLink ? (
           <div className="mb-6 flex items-center justify-center gap-3 rounded-lg border border-border-primary bg-bg-secondary p-4">
             <p className="text-sm text-label-primary">{t('element_chat_welcome_prompt')}</p>
             <OldButton
@@ -851,7 +851,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
               {tCourse('general.to_course_chat')}
             </OldButton>
           </div>
-        )}
+        ) : undefined}
       </OnlyInstructor>
 
       {/* Statistics Cards */}
