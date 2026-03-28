@@ -883,7 +883,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
             <div className="mb-4 flex flex-col gap-3 rounded-lg border border-border-primary bg-bg-secondary p-4 sm:flex-row sm:items-center sm:justify-between">
               <p className="text-sm text-label-primary">{t('element_chat_welcome_prompt')}</p>
               <OldButton
-                className="!bg-brand !text-white !border-brand hover:!bg-brand-light hover:!border-brand-light px-8 py-3.5 sm:px-10 sm:py-4 text-base sm:text-lg font-semibold uppercase tracking-wide shadow-md hover:shadow-lg transition-shadow whitespace-nowrap"
+                className="!bg-brand !text-white !border-brand hover:!bg-brand-light hover:!border-brand-light whitespace-nowrap"
                 as="a"
                 href={organizerCourseChatLink}
                 filled
