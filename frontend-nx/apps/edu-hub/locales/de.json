@@ -1039,6 +1039,7 @@
     "application": "Bewerbung",
     "evaluation": "Beurteilung",
     "send_email_to_applicants": "E-Mail an Bewerber senden",
+    "element_chat_welcome_prompt": "Bitte begrüße deine Teilnehmenden im Element-Chat.",
     "select_applicants_first": "Bitte wähle zuerst Bewerber aus",
     "bulk_actions": {
       "expand_collapse_rows": "Zeilen aus-/einklappen",
