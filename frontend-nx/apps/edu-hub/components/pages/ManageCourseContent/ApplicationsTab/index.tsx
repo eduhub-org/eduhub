@@ -838,21 +838,19 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
         <AddParticipantsForm courseId={course.id} onSubmit={closeAddParticipantsModal} />
       </Modal>
 
-      <OnlyInstructor>
-        {organizerCourseChatLink ? (
-          <div className="mb-6 flex items-center justify-center gap-3 rounded-lg border border-border-primary bg-bg-secondary p-4">
-            <p className="text-sm text-label-primary">{t('element_chat_welcome_prompt')}</p>
-            <OldButton
-              className="!bg-brand !text-white !border-brand hover:!bg-brand-light hover:!border-brand-light whitespace-nowrap"
-              as="a"
-              href={organizerCourseChatLink}
-              filled
-            >
-              {tCourse('general.to_course_chat')}
-            </OldButton>
-          </div>
-        ) : undefined}
-      </OnlyInstructor>
+      {organizerCourseChatLink ? (
+        <div className="mb-6 flex items-center justify-center gap-3 rounded-lg border border-border-primary bg-bg-secondary p-4">
+          <p className="text-sm text-label-primary">{t('element_chat_welcome_prompt')}</p>
+          <OldButton
+            className="!bg-brand !text-white !border-brand hover:!bg-brand-light hover:!border-brand-light whitespace-nowrap"
+            as="a"
+            href={organizerCourseChatLink}
+            filled
+          >
+            {tCourse('general.to_course_chat')}
+          </OldButton>
+        </div>
+      ) : null}
 
       {/* Statistics Cards */}
       {courseEnrollments.length > 0 && (
