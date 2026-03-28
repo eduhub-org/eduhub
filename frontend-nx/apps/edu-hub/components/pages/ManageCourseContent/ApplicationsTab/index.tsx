@@ -60,11 +60,15 @@ const isExpired = (enrollment: ManagedCourse_Course_by_pk_CourseEnrollments) => 
 export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
   const t = useTranslations('manageCourse');
   const tCommon = useTranslations('common');
+  const tCourse = useTranslations('course');
   const locale = useLocale();
   const displayDate = useDisplayDate();
   const isInstructor = useIsInstructor();
   const isAdmin = useIsAdmin();
   const theme = useTheme();
+  const matrixRoomId = course.matrixRoomId?.trim();
+  const elementBaseUrl = process.env.NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL?.replace(/\/+$/, '');
+  const organizerCourseChatLink = matrixRoomId && elementBaseUrl ? `${elementBaseUrl}/#/room/${matrixRoomId}` : null;
 
   const features = useMemo(
     () => getRegistrationFeatures(course.registrationType),
@@ -874,35 +878,47 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
       )}
 
       <div>
-            <OnlyInstructor>
-              <TableGrid<ManagedCourse_Course_by_pk_CourseEnrollments>
-                columns={columns}
-                data={filteredEnrollments}
-                loading={false}
-                error={null as unknown as ApolloError}
-                expandableRowComponent={ExpandableApplicationRow}
-                bulkActions={bulkActions}
-                onBulkAction={handleBulkEmailAction}
-                enablePagination={true}
-                totalCount={filteredEnrollments.length}
-                pageIndex={pageIndex}
-                onPageChange={setPageIndex}
-                pageSize={pageSize}
-                onPageSizeChange={handlePageSizeChange}
-                searchFilter={searchFilter}
-                onSearchFilterChange={setSearchFilter}
-                refetchQueries={[]}
-                {...(isAdmin && {
-                  addButtonText: t('add_participants'),
-                  onAddButtonClick: openAddParticipantsModal,
-                })}
-              />
-            </OnlyInstructor>
+        <OnlyInstructor>
+          {organizerCourseChatLink && (
+            <div className="mb-4 flex flex-col gap-3 rounded-lg border border-border-primary bg-bg-secondary p-4 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-sm text-label-primary">{t('element_chat_welcome_prompt')}</p>
+              <OldButton
+                className="!bg-brand !text-white !border-brand hover:!bg-brand-light hover:!border-brand-light px-8 py-3.5 sm:px-10 sm:py-4 text-base sm:text-lg font-semibold uppercase tracking-wide shadow-md hover:shadow-lg transition-shadow whitespace-nowrap"
+                as="a"
+                href={organizerCourseChatLink}
+                filled
+              >
+                {tCourse('general.to_course_chat')}
+              </OldButton>
+            </div>
+          )}
+          <TableGrid<ManagedCourse_Course_by_pk_CourseEnrollments>
+            columns={columns}
+            data={filteredEnrollments}
+            loading={false}
+            error={null as unknown as ApolloError}
+            expandableRowComponent={ExpandableApplicationRow}
+            bulkActions={bulkActions}
+            onBulkAction={handleBulkEmailAction}
+            enablePagination={true}
+            totalCount={filteredEnrollments.length}
+            pageIndex={pageIndex}
+            onPageChange={setPageIndex}
+            pageSize={pageSize}
+            onPageSizeChange={handlePageSizeChange}
+            searchFilter={searchFilter}
+            onSearchFilterChange={setSearchFilter}
+            refetchQueries={[]}
+            {...(isAdmin && {
+              addButtonText: t('add_participants'),
+              onAddButtonClick: openAddParticipantsModal,
+            })}
+          />
+        </OnlyInstructor>
 
-            {filteredEnrollments.length > 0 && features.hasApplicationProcess && (
-              <div className="-mt-8 mb-3">{infoDots}</div>
-            )}
-
+        {filteredEnrollments.length > 0 && features.hasApplicationProcess && (
+          <div className="-mt-8 mb-3">{infoDots}</div>
+        )}
       </div>
 
       {/* Invitation Dialog */}
