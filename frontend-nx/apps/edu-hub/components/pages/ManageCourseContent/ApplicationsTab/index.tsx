@@ -316,7 +316,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
           return;
         }
         const enrollmentsToSend = selectedRows.filter(
-          (e) => e.motivationRating === 'INVITE' && ['APPLIED', 'INVITED', 'REJECTED'].includes(e.status)
+          (e) => e.motivationRating === 'INVITE' && e.status === 'APPLIED'
         );
         if (enrollmentsToSend.length > 0) {
           handleOpenInviteDialog(enrollmentsToSend, selectedRows.length, enrollmentsToSend.length, 'selected');
@@ -324,7 +324,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
         return;
       } else if (action === 'send_invitations_all') {
         const enrollmentsToSend = courseEnrollments.filter(
-          (e) => e.motivationRating === 'INVITE' && ['APPLIED', 'INVITED', 'REJECTED'].includes(e.status)
+          (e) => e.motivationRating === 'INVITE' && e.status === 'APPLIED'
         );
         if (enrollmentsToSend.length > 0) {
           handleOpenInviteDialog(enrollmentsToSend, undefined, enrollmentsToSend.length, 'all');
@@ -339,7 +339,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
           return;
         }
         const enrollmentsToSend = selectedRows.filter(
-          (e) => e.motivationRating === 'DECLINE' && ['APPLIED', 'INVITED', 'REJECTED'].includes(e.status)
+          (e) => e.motivationRating === 'DECLINE' && e.status === 'APPLIED'
         );
         if (enrollmentsToSend.length > 0) {
           handleOpenRejectionDialog(enrollmentsToSend, selectedRows.length, enrollmentsToSend.length, 'selected');
@@ -347,7 +347,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
         return;
       } else if (action === 'send_rejections_all') {
         const enrollmentsToSend = courseEnrollments.filter(
-          (e) => e.motivationRating === 'DECLINE' && ['APPLIED', 'INVITED', 'REJECTED'].includes(e.status)
+          (e) => e.motivationRating === 'DECLINE' && e.status === 'APPLIED'
         );
         if (enrollmentsToSend.length > 0) {
           handleOpenRejectionDialog(enrollmentsToSend, undefined, enrollmentsToSend.length, 'all');
