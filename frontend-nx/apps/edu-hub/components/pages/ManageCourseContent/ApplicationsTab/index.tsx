@@ -922,12 +922,18 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
         )}
       </div>
 
-      {/* Invitation Dialog */}
-      <Dialog open={isInviteDialogOpen} onClose={handleCloseInviteDialog} maxWidth="sm" fullWidth>
+      {/* Invitation Dialog — Paper uses .light so semantic button/text colors match white surface */}
+      <Dialog
+        open={isInviteDialogOpen}
+        onClose={handleCloseInviteDialog}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{ className: 'light' }}
+      >
         <DialogTitle>
           <div className="flex justify-between items-center">
-            <div className="text-xl font-semibold">{t('bulk_actions.send_invitations_dialog_title')}</div>
-            <div className="cursor-pointer" onClick={handleCloseInviteDialog}>
+            <div className="text-xl font-semibold text-label-primary">{t('bulk_actions.send_invitations_dialog_title')}</div>
+            <div className="cursor-pointer text-label-primary" onClick={handleCloseInviteDialog}>
               <MdClose className="w-6 h-6" />
             </div>
           </div>
@@ -936,7 +942,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
           {inviteDialogData && (
             <>
               <div className="mb-6">
-                <p className="text-gray-700 mb-4">
+                <p className="text-label-primary mb-4">
                   {inviteDialogData.actionType === 'selected' ? (
                     inviteDialogData.selectedCount !== undefined && inviteDialogData.selectedCount > 0 ? (
                       inviteDialogData.identifiedCount === 1
@@ -952,7 +958,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
                   )}
                 </p>
                 <div className="flex flex-col gap-4">
-                  <label className="text-sm font-medium text-gray-700">
+                  <label className="text-sm font-medium text-label-primary">
                     {t('invitation_deadline')}
                   </label>
                   <DatePicker
@@ -961,7 +967,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
                     onChange={handleSetInviteExpireDate}
                     minDate={new Date()}
                     locale={locale}
-                    className="w-full p-2 border border-gray-300 rounded"
+                    className="w-full p-2 rounded border border-border-primary bg-fill-primary text-label-primary"
                   />
                 </div>
               </div>
@@ -979,11 +985,17 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
       </Dialog>
 
       {/* Rejection Dialog */}
-      <Dialog open={isRejectionDialogOpen} onClose={handleCloseRejectionDialog} maxWidth="sm" fullWidth>
+      <Dialog
+        open={isRejectionDialogOpen}
+        onClose={handleCloseRejectionDialog}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{ className: 'light' }}
+      >
         <DialogTitle>
           <div className="flex justify-between items-center">
-            <div className="text-xl font-semibold">{t('bulk_actions.send_rejections_dialog_title')}</div>
-            <div className="cursor-pointer" onClick={handleCloseRejectionDialog}>
+            <div className="text-xl font-semibold text-label-primary">{t('bulk_actions.send_rejections_dialog_title')}</div>
+            <div className="cursor-pointer text-label-primary" onClick={handleCloseRejectionDialog}>
               <MdClose className="w-6 h-6" />
             </div>
           </div>
@@ -992,7 +1004,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
           {rejectionDialogData && (
             <>
               <div className="mb-6">
-                <p className="text-gray-700">
+                <p className="text-label-primary">
                   {rejectionDialogData.actionType === 'selected' ? (
                     rejectionDialogData.selectedCount !== undefined && rejectionDialogData.selectedCount > 0 ? (
                       rejectionDialogData.identifiedCount === 1
@@ -1022,18 +1034,24 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
       </Dialog>
 
       {/* No Selection Dialog */}
-      <Dialog open={isNoSelectionDialogOpen} onClose={handleCloseNoSelectionDialog} maxWidth="sm" fullWidth>
+      <Dialog
+        open={isNoSelectionDialogOpen}
+        onClose={handleCloseNoSelectionDialog}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{ className: 'light' }}
+      >
         <DialogTitle>
           <div className="flex justify-between items-center">
-            <div className="text-xl font-semibold">{t('bulk_actions.no_selection_dialog_title')}</div>
-            <div className="cursor-pointer" onClick={handleCloseNoSelectionDialog}>
+            <div className="text-xl font-semibold text-label-primary">{t('bulk_actions.no_selection_dialog_title')}</div>
+            <div className="cursor-pointer text-label-primary" onClick={handleCloseNoSelectionDialog}>
               <MdClose className="w-6 h-6" />
             </div>
           </div>
         </DialogTitle>
         <div className="px-6 pb-6">
           <div className="mb-6">
-            <p className="text-gray-700">{t('select_applicants_first')}</p>
+            <p className="text-label-primary">{t('select_applicants_first')}</p>
           </div>
           <div className="flex justify-end gap-3">
             <OldButton onClick={handleCloseNoSelectionDialog} filled>
