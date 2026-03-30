@@ -1093,6 +1093,8 @@
       "send_rejections_confirm": "Send Rejections",
       "send_invitations_error": "Failed to send invitations: {error}",
       "send_rejections_error": "Failed to send rejections: {error}",
+      "no_eligible_invitations": "No applicants are eligible for an invitation right now (green rating and applied status only).",
+      "no_eligible_rejections": "No applicants are eligible for a decline email right now (red rating and applied status only).",
       "no_selection_dialog_title": "No Selection"
     },
     "statistics_applications_total": "Total Applications",
