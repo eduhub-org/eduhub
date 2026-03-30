@@ -220,6 +220,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
       return;
     }
 
+    let invitedCount = 0;
     try {
       const result = await updateEnrollmentStatusWhenApplied({
         variables: {
@@ -228,21 +229,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
           expire: inviteExpireDate,
         },
       });
-      const invitedCount = result.data?.update_CourseEnrollment?.affected_rows ?? 0;
-      if (invitedCount === 0) {
-        showBulkNotice(t('bulk_actions.no_eligible_invitations'));
-        await qResult.refetch();
-        handleCloseInviteDialog();
-        return;
-      }
-      showBulkNotice(
-        invitedCount === 1
-          ? t('bulk_actions.invitations_sent_singular', { count: invitedCount })
-          : t('bulk_actions.invitations_sent_plural', { count: invitedCount }),
-        4000
-      );
-      await qResult.refetch();
-      handleCloseInviteDialog();
+      invitedCount = result.data?.update_CourseEnrollment?.affected_rows ?? 0;
     } catch (error) {
       const errorMessage = error instanceof ApolloError 
         ? error.message 
@@ -253,6 +240,25 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
         t('bulk_actions.send_invitations_error', { error: errorMessage }) || 
         `Failed to send invitations: ${errorMessage}`
       );
+      return;
+    }
+
+    if (invitedCount === 0) {
+      showBulkNotice(t('bulk_actions.no_eligible_invitations'));
+    } else {
+      showBulkNotice(
+        invitedCount === 1
+          ? t('bulk_actions.invitations_queued_singular', { count: invitedCount })
+          : t('bulk_actions.invitations_queued_plural', { count: invitedCount }),
+        4000
+      );
+    }
+    handleCloseInviteDialog();
+
+    try {
+      await qResult.refetch();
+    } catch (refetchError) {
+      console.error('ApplicationsTab: refetch after bulk invite failed', refetchError);
     }
   }, [
     inviteDialogData,
@@ -323,6 +329,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
       return;
     }
 
+    let declinedCount = 0;
     try {
       const result = await updateEnrollmentStatusWhenApplied({
         variables: {
@@ -331,21 +338,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
           expire: null,
         },
       });
-      const declinedCount = result.data?.update_CourseEnrollment?.affected_rows ?? 0;
-      if (declinedCount === 0) {
-        showBulkNotice(t('bulk_actions.no_eligible_rejections'));
-        await qResult.refetch();
-        handleCloseRejectionDialog();
-        return;
-      }
-      showBulkNotice(
-        declinedCount === 1
-          ? t('bulk_actions.declines_sent_singular', { count: declinedCount })
-          : t('bulk_actions.declines_sent_plural', { count: declinedCount }),
-        4000
-      );
-      await qResult.refetch();
-      handleCloseRejectionDialog();
+      declinedCount = result.data?.update_CourseEnrollment?.affected_rows ?? 0;
     } catch (error) {
       const errorMessage = error instanceof ApolloError 
         ? error.message 
@@ -356,6 +349,25 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
         t('bulk_actions.send_rejections_error', { error: errorMessage }) || 
         `Failed to send rejections: ${errorMessage}`
       );
+      return;
+    }
+
+    if (declinedCount === 0) {
+      showBulkNotice(t('bulk_actions.no_eligible_rejections'));
+    } else {
+      showBulkNotice(
+        declinedCount === 1
+          ? t('bulk_actions.declines_queued_singular', { count: declinedCount })
+          : t('bulk_actions.declines_queued_plural', { count: declinedCount }),
+        4000
+      );
+    }
+    handleCloseRejectionDialog();
+
+    try {
+      await qResult.refetch();
+    } catch (refetchError) {
+      console.error('ApplicationsTab: refetch after bulk decline failed', refetchError);
     }
   }, [
     rejectionDialogData,
