@@ -15,6 +15,7 @@ import NotificationSnackbar from '../components/common/dialogs/NotificationSnack
 import { useAuthedQuery, useInstructorQuery } from '../hooks/authedQuery';
 import { useIsLoggedIn, useIsInstructor, useIsAdmin } from '../hooks/authentication';
 import { useUserId } from '../hooks/user';
+import { AuthRoles } from '../types/enums';
 
 import { COURSE_GROUP_OPTIONS } from '../queries/courseGroupOptions';
 import { COURSE_TILES, COURSES_BY_INSTRUCTOR, COURSES_ENROLLED_BY_USER } from '../queries/courseQueries';
@@ -71,7 +72,9 @@ const Home: FC = () => {
     }
   );
 
-  const { data: coursesData, loading: coursesLoading } = useQuery<CourseTiles>(COURSE_TILES);
+  const { data: coursesData, loading: coursesLoading } = useQuery<CourseTiles>(COURSE_TILES, {
+    context: { role: AuthRoles.anonymous },
+  });
 
   const { data: courseGroupOptionsData } = useAuthedQuery<CourseGroupOptions>(COURSE_GROUP_OPTIONS);
 
@@ -81,7 +84,10 @@ const Home: FC = () => {
 
   const myAdminCourses = useMemo(() => adminCoursesData?.Course ?? [], [adminCoursesData]);
   const myCourses = useMemo(() => enrolledCoursesData?.Course ?? [], [enrolledCoursesData]);
-  const publishedCourses = useMemo(() => coursesData?.Course ?? [], [coursesData]);
+  const publishedCourses = useMemo(
+    () => (coursesData?.Course ?? []).filter((course) => course.published && course.Program.published),
+    [coursesData]
+  );
 
   const coursesGroupsAuthenticated = useMemo(
     () => [

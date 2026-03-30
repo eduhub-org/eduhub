@@ -100,3 +100,27 @@ export const UPDATE_ENROLLMENT_STATUS = gql`
     }
   }
 `;
+
+/** Bulk status change only for rows still in APPLIED (avoids duplicate invite/decline emails on race). */
+export const UPDATE_ENROLLMENT_STATUS_WHEN_APPLIED = gql`
+  mutation UpdateEnrollmentStatusWhenApplied(
+    $enrollmentIds: [Int!]!
+    $status: CourseEnrollmentStatus_enum!
+    $expire: date
+  ) {
+    update_CourseEnrollment(
+      where: {
+        _and: [
+          { id: { _in: $enrollmentIds } }
+          { status: { _eq: APPLIED } }
+        ]
+      }
+      _set: { status: $status, invitationExpirationDate: $expire }
+    ) {
+      affected_rows
+      returning {
+        id
+      }
+    }
+  }
+`;
