@@ -171,12 +171,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
   } | null>(null);
 
   const handleOpenInviteDialog = useCallback(
-    (
-      enrollmentIds: number[],
-      selectedCount: number | undefined,
-      identifiedCount: number,
-      actionType: 'selected' | 'all'
-    ) => {
+    (enrollmentIds: number[], selectedCount: number | undefined, actionType: 'selected' | 'all') => {
       const idToRow = new Map(courseEnrollments.map((e) => [e.id, e]));
       const enrollmentsToSend = enrollmentIds
         .map((id) => idToRow.get(id))
@@ -280,12 +275,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
   } | null>(null);
 
   const handleOpenRejectionDialog = useCallback(
-    (
-      enrollmentIds: number[],
-      selectedCount: number | undefined,
-      identifiedCount: number,
-      actionType: 'selected' | 'all'
-    ) => {
+    (enrollmentIds: number[], selectedCount: number | undefined, actionType: 'selected' | 'all') => {
       const idToRow = new Map(courseEnrollments.map((e) => [e.id, e]));
       const enrollmentsToSend = enrollmentIds
         .map((id) => idToRow.get(id))
@@ -446,12 +436,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
           showBulkNotice(t('bulk_actions.no_eligible_invitations'));
           return;
         }
-        handleOpenInviteDialog(
-          enrollmentsToSend.map((e) => e.id),
-          selectedRows.length,
-          enrollmentsToSend.length,
-          'selected'
-        );
+        handleOpenInviteDialog(enrollmentsToSend.map((e) => e.id), selectedRows.length, 'selected');
         return;
       } else if (action === 'send_invitations_all') {
         const enrollmentsToSend = courseEnrollments.filter(
@@ -461,12 +446,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
           showBulkNotice(t('bulk_actions.no_eligible_invitations'));
           return;
         }
-        handleOpenInviteDialog(
-          enrollmentsToSend.map((e) => e.id),
-          undefined,
-          enrollmentsToSend.length,
-          'all'
-        );
+        handleOpenInviteDialog(enrollmentsToSend.map((e) => e.id), undefined, 'all');
         return;
       }
 
@@ -483,12 +463,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
           showBulkNotice(t('bulk_actions.no_eligible_rejections'));
           return;
         }
-        handleOpenRejectionDialog(
-          enrollmentsToSend.map((e) => e.id),
-          selectedRows.length,
-          enrollmentsToSend.length,
-          'selected'
-        );
+        handleOpenRejectionDialog(enrollmentsToSend.map((e) => e.id), selectedRows.length, 'selected');
         return;
       } else if (action === 'send_rejections_all') {
         const enrollmentsToSend = courseEnrollments.filter(
@@ -498,12 +473,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
           showBulkNotice(t('bulk_actions.no_eligible_rejections'));
           return;
         }
-        handleOpenRejectionDialog(
-          enrollmentsToSend.map((e) => e.id),
-          undefined,
-          enrollmentsToSend.length,
-          'all'
-        );
+        handleOpenRejectionDialog(enrollmentsToSend.map((e) => e.id), undefined, 'all');
         return;
       }
 
