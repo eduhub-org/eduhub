@@ -1075,6 +1075,12 @@
       "send_rejections_confirm": "Ablehnungen senden",
       "send_invitations_error": "Fehler beim Senden der Einladungen: {error}",
       "send_rejections_error": "Fehler beim Senden der Ablehnungen: {error}",
+      "no_eligible_invitations": "Gerade gibt es niemanden mit grüner Bewertung und Status „beworben“, den du einladen könntest.",
+      "no_eligible_rejections": "Gerade gibt es niemanden mit roter Bewertung und Status „beworben“, dem du eine Ablehnung schicken könntest.",
+      "invitations_sent_singular": "{count} Einladung wurde verschickt.",
+      "invitations_sent_plural": "{count} Einladungen wurden verschickt.",
+      "declines_sent_singular": "{count} Ablehnung wurde verschickt.",
+      "declines_sent_plural": "{count} Ablehnungen wurden verschickt.",
       "no_selection_dialog_title": "Keine Auswahl"
     },
     "statistics_applications_total": "Bewerbungen gesamt",

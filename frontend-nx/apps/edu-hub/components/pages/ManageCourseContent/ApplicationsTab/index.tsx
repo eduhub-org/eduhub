@@ -17,7 +17,10 @@ import {
   UpdateEnrollmentRating,
   UpdateEnrollmentRatingVariables,
 } from '../../../../queries/__generated__/UpdateEnrollmentRating';
-import { UPDATE_ENROLLMENT_STATUS, UPDATE_ENROLLMENT_RATING } from '../../../../queries/insertEnrollment';
+import {
+  UPDATE_ENROLLMENT_STATUS_WHEN_APPLIED,
+  UPDATE_ENROLLMENT_RATING,
+} from '../../../../queries/insertEnrollment';
 import { Button as OldButton } from '../../../common/Button';
 import { Dialog, DialogTitle, Tooltip } from '@mui/material';
 import { HelpOutline } from '@mui/icons-material';
@@ -26,9 +29,9 @@ import { MdClose } from 'react-icons/md';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import {
-  UpdateEnrollmentStatus,
-  UpdateEnrollmentStatusVariables,
-} from '../../../../queries/__generated__/UpdateEnrollmentStatus';
+  UpdateEnrollmentStatusWhenApplied,
+  UpdateEnrollmentStatusWhenAppliedVariables,
+} from '../../../../queries/__generated__/UpdateEnrollmentStatusWhenApplied';
 import { useTranslations, useLocale } from 'next-intl';
 import Modal from '../../../common/Modal';
 import AddParticipantsForm from './AddParticipantsForm';
@@ -44,6 +47,7 @@ import { ApolloError } from '@apollo/client';
 import { ErrorMessageDialog } from '../../../common/dialogs/ErrorMessageDialog';
 import { FormbricksResponsesDisplay } from './FormbricksResponsesDisplay';
 import { getRegistrationFeatures } from './registrationConfig';
+import NotificationSnackbar from '../../../common/dialogs/NotificationSnackbar';
 
 interface IProps {
   course: ManagedCourse_Course_by_pk;
@@ -89,6 +93,12 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
     return { totalApplications, approvedApplications, invitedApplicants, confirmedApplicants };
   }, [course.CourseEnrollments]);
 
+  const courseEnrollments = useMemo(() => {
+    const result = [...course.CourseEnrollments];
+    result.sort((a, b) => a.id - b.id);
+    return result;
+  }, [course]);
+
   const infoDots = (
     <div className="text-gray-400 text-sm">
       <div className="mb-1">{t('rating.label')}</div>
@@ -109,9 +119,22 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
     </div>
   );
 
-  const [updateEnrollmentStatus] = useRoleMutation<UpdateEnrollmentStatus, UpdateEnrollmentStatusVariables>(
-    UPDATE_ENROLLMENT_STATUS
-  );
+  const [updateEnrollmentStatusWhenApplied] = useRoleMutation<
+    UpdateEnrollmentStatusWhenApplied,
+    UpdateEnrollmentStatusWhenAppliedVariables
+  >(UPDATE_ENROLLMENT_STATUS_WHEN_APPLIED);
+
+  const [bulkNoticeOpen, setBulkNoticeOpen] = useState(false);
+  const [bulkNoticeMessage, setBulkNoticeMessage] = useState('');
+  const [bulkNoticeDurationMs, setBulkNoticeDurationMs] = useState(2000);
+  const showBulkNotice = useCallback((message: string, durationMs = 2000) => {
+    setBulkNoticeMessage(message);
+    setBulkNoticeDurationMs(durationMs);
+    setBulkNoticeOpen(true);
+  }, []);
+  const handleCloseBulkNotice = useCallback(() => {
+    setBulkNoticeOpen(false);
+  }, []);
 
   // Calculate default invitation expiration date (3 days before first session, or 3 days from now)
   const getDefaultInviteExpireDate = useCallback(() => {
@@ -148,12 +171,28 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
   } | null>(null);
 
   const handleOpenInviteDialog = useCallback(
-    (enrollmentsToSend: ManagedCourse_Course_by_pk_CourseEnrollments[], selectedCount: number | undefined, identifiedCount: number, actionType: 'selected' | 'all') => {
-      setInviteDialogData({ enrollmentsToSend, selectedCount, identifiedCount, actionType });
+    (enrollmentIds: number[], selectedCount: number | undefined, actionType: 'selected' | 'all') => {
+      const idToRow = new Map(courseEnrollments.map((e) => [e.id, e]));
+      const enrollmentsToSend = enrollmentIds
+        .map((id) => idToRow.get(id))
+        .filter(
+          (e): e is ManagedCourse_Course_by_pk_CourseEnrollments =>
+            !!e && e.motivationRating === 'INVITE' && e.status === 'APPLIED'
+        );
+      if (enrollmentsToSend.length === 0) {
+        showBulkNotice(t('bulk_actions.no_eligible_invitations'));
+        return;
+      }
+      setInviteDialogData({
+        enrollmentsToSend,
+        selectedCount,
+        identifiedCount: enrollmentsToSend.length,
+        actionType,
+      });
       setInviteExpireDate(getDefaultInviteExpireDate());
       setIsInviteDialogOpen(true);
     },
-    [getDefaultInviteExpireDate]
+    [courseEnrollments, getDefaultInviteExpireDate, showBulkNotice, t]
   );
 
   const [inviteError, setInviteError] = useState<string | null>(null);
@@ -167,18 +206,42 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
   const handleSendInvitations = useCallback(async () => {
     if (!inviteDialogData) return;
 
+    const idToRow = new Map(courseEnrollments.map((e) => [e.id, e]));
+    const enrollmentIds = inviteDialogData.enrollmentsToSend
+      .map((e) => e.id)
+      .filter((id) => {
+        const row = idToRow.get(id);
+        return row?.motivationRating === 'INVITE' && row.status === 'APPLIED';
+      });
+
+    if (enrollmentIds.length === 0) {
+      showBulkNotice(t('bulk_actions.no_eligible_invitations'));
+      handleCloseInviteDialog();
+      return;
+    }
+
     try {
-      for (const enrollment of inviteDialogData.enrollmentsToSend) {
-        await updateEnrollmentStatus({
-          variables: {
-            enrollmentId: enrollment.id,
-            expire: inviteExpireDate,
-            status: CourseEnrollmentStatus_enum.INVITED,
-          },
-        });
+      const result = await updateEnrollmentStatusWhenApplied({
+        variables: {
+          enrollmentIds,
+          status: CourseEnrollmentStatus_enum.INVITED,
+          expire: inviteExpireDate,
+        },
+      });
+      const invitedCount = result.data?.update_CourseEnrollment?.affected_rows ?? 0;
+      if (invitedCount === 0) {
+        showBulkNotice(t('bulk_actions.no_eligible_invitations'));
+        await qResult.refetch();
+        handleCloseInviteDialog();
+        return;
       }
-      // Only refetch and close on success
-      qResult.refetch();
+      showBulkNotice(
+        invitedCount === 1
+          ? t('bulk_actions.invitations_sent_singular', { count: invitedCount })
+          : t('bulk_actions.invitations_sent_plural', { count: invitedCount }),
+        4000
+      );
+      await qResult.refetch();
       handleCloseInviteDialog();
     } catch (error) {
       const errorMessage = error instanceof ApolloError 
@@ -191,7 +254,16 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
         `Failed to send invitations: ${errorMessage}`
       );
     }
-  }, [inviteDialogData, inviteExpireDate, updateEnrollmentStatus, qResult, handleCloseInviteDialog, t]);
+  }, [
+    inviteDialogData,
+    inviteExpireDate,
+    courseEnrollments,
+    updateEnrollmentStatusWhenApplied,
+    qResult,
+    handleCloseInviteDialog,
+    showBulkNotice,
+    t,
+  ]);
 
   // Dialog state for rejections
   const [isRejectionDialogOpen, setIsRejectionDialogOpen] = useState(false);
@@ -203,11 +275,27 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
   } | null>(null);
 
   const handleOpenRejectionDialog = useCallback(
-    (enrollmentsToSend: ManagedCourse_Course_by_pk_CourseEnrollments[], selectedCount: number | undefined, identifiedCount: number, actionType: 'selected' | 'all') => {
-      setRejectionDialogData({ enrollmentsToSend, selectedCount, identifiedCount, actionType });
+    (enrollmentIds: number[], selectedCount: number | undefined, actionType: 'selected' | 'all') => {
+      const idToRow = new Map(courseEnrollments.map((e) => [e.id, e]));
+      const enrollmentsToSend = enrollmentIds
+        .map((id) => idToRow.get(id))
+        .filter(
+          (e): e is ManagedCourse_Course_by_pk_CourseEnrollments =>
+            !!e && e.motivationRating === 'DECLINE' && e.status === 'APPLIED'
+        );
+      if (enrollmentsToSend.length === 0) {
+        showBulkNotice(t('bulk_actions.no_eligible_rejections'));
+        return;
+      }
+      setRejectionDialogData({
+        enrollmentsToSend,
+        selectedCount,
+        identifiedCount: enrollmentsToSend.length,
+        actionType,
+      });
       setIsRejectionDialogOpen(true);
     },
-    []
+    [courseEnrollments, showBulkNotice, t]
   );
 
   const [rejectionError, setRejectionError] = useState<string | null>(null);
@@ -221,18 +309,42 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
   const handleSendRejections = useCallback(async () => {
     if (!rejectionDialogData) return;
 
+    const idToRow = new Map(courseEnrollments.map((e) => [e.id, e]));
+    const enrollmentIds = rejectionDialogData.enrollmentsToSend
+      .map((e) => e.id)
+      .filter((id) => {
+        const row = idToRow.get(id);
+        return row?.motivationRating === 'DECLINE' && row.status === 'APPLIED';
+      });
+
+    if (enrollmentIds.length === 0) {
+      showBulkNotice(t('bulk_actions.no_eligible_rejections'));
+      handleCloseRejectionDialog();
+      return;
+    }
+
     try {
-      for (const enrollment of rejectionDialogData.enrollmentsToSend) {
-        await updateEnrollmentStatus({
-          variables: {
-            enrollmentId: enrollment.id,
-            expire: null,
-            status: CourseEnrollmentStatus_enum.REJECTED,
-          },
-        });
+      const result = await updateEnrollmentStatusWhenApplied({
+        variables: {
+          enrollmentIds,
+          status: CourseEnrollmentStatus_enum.REJECTED,
+          expire: null,
+        },
+      });
+      const declinedCount = result.data?.update_CourseEnrollment?.affected_rows ?? 0;
+      if (declinedCount === 0) {
+        showBulkNotice(t('bulk_actions.no_eligible_rejections'));
+        await qResult.refetch();
+        handleCloseRejectionDialog();
+        return;
       }
-      // Only refetch and close on success
-      qResult.refetch();
+      showBulkNotice(
+        declinedCount === 1
+          ? t('bulk_actions.declines_sent_singular', { count: declinedCount })
+          : t('bulk_actions.declines_sent_plural', { count: declinedCount }),
+        4000
+      );
+      await qResult.refetch();
       handleCloseRejectionDialog();
     } catch (error) {
       const errorMessage = error instanceof ApolloError 
@@ -245,7 +357,15 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
         `Failed to send rejections: ${errorMessage}`
       );
     }
-  }, [rejectionDialogData, updateEnrollmentStatus, qResult, handleCloseRejectionDialog, t]);
+  }, [
+    rejectionDialogData,
+    courseEnrollments,
+    updateEnrollmentStatusWhenApplied,
+    qResult,
+    handleCloseRejectionDialog,
+    showBulkNotice,
+    t,
+  ]);
 
   // Dialog state for "no selection" warning
   const [isNoSelectionDialogOpen, setIsNoSelectionDialogOpen] = useState(false);
@@ -261,12 +381,6 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
     identityEventMapper,
     qResult
   );
-
-  const courseEnrollments = useMemo(() => {
-    const result = [...course.CourseEnrollments];
-    result.sort((a, b) => a.id - b.id);
-    return result;
-  }, [course]);
 
   const [isAddParticipantsModalOpen, setAddParticipantsModalOpen] = useState(false);
   const [pageIndex, setPageIndex] = useState(0);
@@ -316,19 +430,23 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
           return;
         }
         const enrollmentsToSend = selectedRows.filter(
-          (e) => e.motivationRating === 'INVITE' && ['APPLIED', 'INVITED', 'REJECTED'].includes(e.status)
+          (e) => e.motivationRating === 'INVITE' && e.status === 'APPLIED'
         );
-        if (enrollmentsToSend.length > 0) {
-          handleOpenInviteDialog(enrollmentsToSend, selectedRows.length, enrollmentsToSend.length, 'selected');
+        if (enrollmentsToSend.length === 0) {
+          showBulkNotice(t('bulk_actions.no_eligible_invitations'));
+          return;
         }
+        handleOpenInviteDialog(enrollmentsToSend.map((e) => e.id), selectedRows.length, 'selected');
         return;
       } else if (action === 'send_invitations_all') {
         const enrollmentsToSend = courseEnrollments.filter(
-          (e) => e.motivationRating === 'INVITE' && ['APPLIED', 'INVITED', 'REJECTED'].includes(e.status)
+          (e) => e.motivationRating === 'INVITE' && e.status === 'APPLIED'
         );
-        if (enrollmentsToSend.length > 0) {
-          handleOpenInviteDialog(enrollmentsToSend, undefined, enrollmentsToSend.length, 'all');
+        if (enrollmentsToSend.length === 0) {
+          showBulkNotice(t('bulk_actions.no_eligible_invitations'));
+          return;
         }
+        handleOpenInviteDialog(enrollmentsToSend.map((e) => e.id), undefined, 'all');
         return;
       }
 
@@ -339,19 +457,23 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
           return;
         }
         const enrollmentsToSend = selectedRows.filter(
-          (e) => e.motivationRating === 'DECLINE' && ['APPLIED', 'INVITED', 'REJECTED'].includes(e.status)
+          (e) => e.motivationRating === 'DECLINE' && e.status === 'APPLIED'
         );
-        if (enrollmentsToSend.length > 0) {
-          handleOpenRejectionDialog(enrollmentsToSend, selectedRows.length, enrollmentsToSend.length, 'selected');
+        if (enrollmentsToSend.length === 0) {
+          showBulkNotice(t('bulk_actions.no_eligible_rejections'));
+          return;
         }
+        handleOpenRejectionDialog(enrollmentsToSend.map((e) => e.id), selectedRows.length, 'selected');
         return;
       } else if (action === 'send_rejections_all') {
         const enrollmentsToSend = courseEnrollments.filter(
-          (e) => e.motivationRating === 'DECLINE' && ['APPLIED', 'INVITED', 'REJECTED'].includes(e.status)
+          (e) => e.motivationRating === 'DECLINE' && e.status === 'APPLIED'
         );
-        if (enrollmentsToSend.length > 0) {
-          handleOpenRejectionDialog(enrollmentsToSend, undefined, enrollmentsToSend.length, 'all');
+        if (enrollmentsToSend.length === 0) {
+          showBulkNotice(t('bulk_actions.no_eligible_rejections'));
+          return;
         }
+        handleOpenRejectionDialog(enrollmentsToSend.map((e) => e.id), undefined, 'all');
         return;
       }
 
@@ -375,7 +497,14 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
         window.location.href = `mailto:?bcc=${emails}`;
       }
     },
-    [courseEnrollments, handleOpenInviteDialog, handleOpenRejectionDialog, setIsNoSelectionDialogOpen]
+    [
+      courseEnrollments,
+      handleOpenInviteDialog,
+      handleOpenRejectionDialog,
+      setIsNoSelectionDialogOpen,
+      showBulkNotice,
+      t,
+    ]
   );
 
   const bulkActions: BulkAction[] = useMemo(() => {
@@ -393,8 +522,11 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
       { value: 'email_selected', label: t('bulk_actions.email_selected') },
     ];
 
-    // Invitation actions - only for instructors
-    if (isInstructor && courseEnrollments.some((e) => e.motivationRating === 'INVITE')) {
+    // Invitation actions - only for instructors (green rating + still applied)
+    if (
+      isInstructor &&
+      courseEnrollments.some((e) => e.motivationRating === 'INVITE' && e.status === 'APPLIED')
+    ) {
       actions.push({
         value: 'send_invitations_selected',
         label: t('bulk_actions.send_invitations_selected'),
@@ -407,8 +539,11 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
       });
     }
 
-    // Rejection actions - only for instructors
-    if (isInstructor && courseEnrollments.some((e) => e.motivationRating === 'DECLINE')) {
+    // Rejection actions - only for instructors (red rating + still applied)
+    if (
+      isInstructor &&
+      courseEnrollments.some((e) => e.motivationRating === 'DECLINE' && e.status === 'APPLIED')
+    ) {
       actions.push({
         value: 'send_rejections_selected',
         label: t('bulk_actions.send_rejections_selected'),
@@ -1071,6 +1206,12 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
         errorMessage={rejectionError || ''}
         open={!!rejectionError}
         onClose={() => setRejectionError(null)}
+      />
+      <NotificationSnackbar
+        open={bulkNoticeOpen}
+        onClose={handleCloseBulkNotice}
+        message={bulkNoticeMessage}
+        duration={bulkNoticeDurationMs}
       />
     </>
   );
