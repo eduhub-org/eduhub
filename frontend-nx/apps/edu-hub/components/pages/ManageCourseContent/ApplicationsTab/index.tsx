@@ -126,8 +126,10 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
 
   const [bulkNoticeOpen, setBulkNoticeOpen] = useState(false);
   const [bulkNoticeMessage, setBulkNoticeMessage] = useState('');
-  const showBulkNotice = useCallback((message: string) => {
+  const [bulkNoticeDurationMs, setBulkNoticeDurationMs] = useState(2000);
+  const showBulkNotice = useCallback((message: string, durationMs = 2000) => {
     setBulkNoticeMessage(message);
+    setBulkNoticeDurationMs(durationMs);
     setBulkNoticeOpen(true);
   }, []);
   const handleCloseBulkNotice = useCallback(() => {
@@ -231,12 +233,19 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
           expire: inviteExpireDate,
         },
       });
-      if ((result.data?.update_CourseEnrollment?.affected_rows ?? 0) === 0) {
+      const invitedCount = result.data?.update_CourseEnrollment?.affected_rows ?? 0;
+      if (invitedCount === 0) {
         showBulkNotice(t('bulk_actions.no_eligible_invitations'));
         await qResult.refetch();
         handleCloseInviteDialog();
         return;
       }
+      showBulkNotice(
+        invitedCount === 1
+          ? t('bulk_actions.invitations_sent_singular', { count: invitedCount })
+          : t('bulk_actions.invitations_sent_plural', { count: invitedCount }),
+        4000
+      );
       await qResult.refetch();
       handleCloseInviteDialog();
     } catch (error) {
@@ -332,12 +341,19 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
           expire: null,
         },
       });
-      if ((result.data?.update_CourseEnrollment?.affected_rows ?? 0) === 0) {
+      const declinedCount = result.data?.update_CourseEnrollment?.affected_rows ?? 0;
+      if (declinedCount === 0) {
         showBulkNotice(t('bulk_actions.no_eligible_rejections'));
         await qResult.refetch();
         handleCloseRejectionDialog();
         return;
       }
+      showBulkNotice(
+        declinedCount === 1
+          ? t('bulk_actions.declines_sent_singular', { count: declinedCount })
+          : t('bulk_actions.declines_sent_plural', { count: declinedCount }),
+        4000
+      );
       await qResult.refetch();
       handleCloseRejectionDialog();
     } catch (error) {
@@ -1207,6 +1223,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
         open={bulkNoticeOpen}
         onClose={handleCloseBulkNotice}
         message={bulkNoticeMessage}
+        duration={bulkNoticeDurationMs}
       />
     </>
   );
