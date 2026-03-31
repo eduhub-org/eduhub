@@ -40,6 +40,7 @@ export const CertificateDownload: FC<IProps> = ({
       path: courseEnrollment?.achievementCertificateURL ?? '',
     },
     skip: !courseEnrollment?.achievementCertificateURL,
+    fetchPolicy: 'network-only',
     onError: () => handleQueryError(t('errorMessages.loadAchievementCertificateError')),
     onCompleted: (data) => {
       console.log('Achievement Certificate Query Completed:', {
@@ -57,6 +58,7 @@ export const CertificateDownload: FC<IProps> = ({
       path: courseEnrollment?.attendanceCertificateURL ?? '',
     },
     skip: !courseEnrollment?.attendanceCertificateURL,
+    fetchPolicy: 'network-only',
     onError: () => handleQueryError(t('errorMessages.loadAttendanceCertificateError')),
     onCompleted: (data) => {
       console.log('Attendance Certificate Query Completed:', {

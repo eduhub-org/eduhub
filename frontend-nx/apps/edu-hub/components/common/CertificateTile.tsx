@@ -24,7 +24,6 @@ export const CertificateTile: FC<CertificateTileProps> = ({ enrollment }) => {
   const course = enrollment.Course;
   const program = course?.Program;
 
-  // Query for achievement certificate URL
   const { data: achievementData, loading: achievementLoading } = useRoleQuery<
     GetSignedUrl,
     GetSignedUrlVariables
@@ -33,9 +32,9 @@ export const CertificateTile: FC<CertificateTileProps> = ({ enrollment }) => {
       path: enrollment.achievementCertificateURL || '',
     },
     skip: !enrollment.achievementCertificateURL,
+    fetchPolicy: 'network-only',
   });
 
-  // Query for attendance certificate URL
   const { data: attendanceData, loading: attendanceLoading } = useRoleQuery<
     GetSignedUrl,
     GetSignedUrlVariables
@@ -44,6 +43,7 @@ export const CertificateTile: FC<CertificateTileProps> = ({ enrollment }) => {
       path: enrollment.attendanceCertificateURL || '',
     },
     skip: !enrollment.attendanceCertificateURL,
+    fetchPolicy: 'network-only',
   });
 
   // Mutation for making certificate public
