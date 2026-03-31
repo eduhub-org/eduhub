@@ -822,6 +822,7 @@
     "not_authenticated": "You need to be logged in to view your certificates.",
     "errorMessages": {
       "certificate_not_found": "Certificate not found",
+      "certificate_download_error": "Failed to download certificate. Please try again.",
       "linkedin_share_error": "Failed to share certificate on LinkedIn. Please try again later."
     }
   },
