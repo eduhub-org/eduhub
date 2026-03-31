@@ -806,6 +806,7 @@
     "not_authenticated": "Du musst angemeldet sein, um Deine Zertifikate anzusehen.",
     "errorMessages": {
       "certificate_not_found": "Zertifikat nicht gefunden",
+      "certificate_download_error": "Zertifikat konnte nicht heruntergeladen werden. Bitte versuche es erneut.",
       "linkedin_share_error": "Zertifikat konnte nicht auf LinkedIn geteilt werden. Bitte versuche es später erneut."
     }
   },
