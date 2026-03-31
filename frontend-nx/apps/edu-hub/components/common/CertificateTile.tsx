@@ -4,7 +4,11 @@ import { GetApp } from '@mui/icons-material';
 import { TileBase } from './TileSlider/TileBase';
 import { useRoleQuery } from '../../hooks/authedQuery';
 import { useRoleMutation } from '../../hooks/authedMutation';
-import { GET_SIGNED_URL, MAKE_CERTIFICATE_PUBLIC } from '../../queries/actions';
+import {
+  GET_SIGNED_URL,
+  GET_SIGNED_URL_QUERY_OPTIONS,
+  MAKE_CERTIFICATE_PUBLIC,
+} from '../../queries/actions';
 import { GetSignedUrl, GetSignedUrlVariables } from '../../queries/__generated__/GetSignedUrl';
 import { MakeCertificatePublic, MakeCertificatePublicVariables } from '../../queries/__generated__/MakeCertificatePublic';
 import { Button } from './Button';
@@ -29,6 +33,7 @@ export const CertificateTile: FC<CertificateTileProps> = ({ enrollment }) => {
     GetSignedUrl,
     GetSignedUrlVariables
   >(GET_SIGNED_URL, {
+    ...GET_SIGNED_URL_QUERY_OPTIONS,
     variables: {
       path: enrollment.achievementCertificateURL || '',
     },
@@ -40,6 +45,7 @@ export const CertificateTile: FC<CertificateTileProps> = ({ enrollment }) => {
     GetSignedUrl,
     GetSignedUrlVariables
   >(GET_SIGNED_URL, {
+    ...GET_SIGNED_URL_QUERY_OPTIONS,
     variables: {
       path: enrollment.attendanceCertificateURL || '',
     },

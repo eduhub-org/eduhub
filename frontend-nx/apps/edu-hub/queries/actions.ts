@@ -124,6 +124,11 @@ export const GET_SIGNED_URL = gql`
   }
 `;
 
+/** GCS signed URLs expire; Apollo must not return cached links after they are invalid. */
+export const GET_SIGNED_URL_QUERY_OPTIONS = {
+  fetchPolicy: 'network-only' as const,
+};
+
 export const MAKE_CERTIFICATE_PUBLIC = gql`
   mutation MakeCertificatePublic($certificatePath: String!) {
     makeCertificatePublic(certificatePath: $certificatePath) {

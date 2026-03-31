@@ -1,12 +1,13 @@
 import { useLazyRoleQuery } from "./authedQuery";
 import { GetSignedUrl, GetSignedUrlVariables } from "../queries/__generated__/GetSignedUrl";
-import { GET_SIGNED_URL } from "../queries/actions";
+import { GET_SIGNED_URL, GET_SIGNED_URL_QUERY_OPTIONS } from "../queries/actions";
 import { useCallback, useState } from 'react';
 import { getPublicUrl } from "../helpers/filehandling";
 
 export const useSignedUrl = (filePath: string): { getSignedUrl: () => Promise<{ url: string | null }>; loading: boolean; error: any; } => {
-  const [getFileSignedUrl, { data, loading }] = useLazyRoleQuery<GetSignedUrl, GetSignedUrlVariables>(GET_SIGNED_URL, {
+  const [getFileSignedUrl, { loading }] = useLazyRoleQuery<GetSignedUrl, GetSignedUrlVariables>(GET_SIGNED_URL, {
     variables: { path: filePath },
+    ...GET_SIGNED_URL_QUERY_OPTIONS,
   });
   const [error, setError] = useState<unknown>(null);
 
@@ -19,20 +20,22 @@ export const useSignedUrl = (filePath: string): { getSignedUrl: () => Promise<{ 
       return { url: publicUrl };
     }
     try {
-      await getFileSignedUrl();
-      if (data?.getSignedUrl?.link) {
-        console.log(`Returning signed file URL: ${data.getSignedUrl.link}`); // Debugging log
-        return { url: data.getSignedUrl.link };
-      } else {
-        throw new Error('Signed URL not found in the response');
+      const result = await getFileSignedUrl({
+        variables: { path: filePath },
+        ...GET_SIGNED_URL_QUERY_OPTIONS,
+      });
+      const link = result.data?.getSignedUrl?.link;
+      if (link) {
+        return { url: link };
       }
+      throw new Error('Signed URL not found in the response');
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err);
       console.error(`Error in getSignedUrl: ${message}`, err);
       setError(err);
       return { url: null };
     }
-  }, [getFileSignedUrl, data, publicUrl]);
+  }, [getFileSignedUrl, filePath, publicUrl]);
 
   return { getSignedUrl, loading, error };
 };

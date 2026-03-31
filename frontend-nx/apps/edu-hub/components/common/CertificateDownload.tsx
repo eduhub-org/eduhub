@@ -4,7 +4,7 @@ import { Dispatch, SetStateAction } from 'react';
 import { useEffect } from 'react';
 import { useRoleQuery } from '../../hooks/authedQuery';
 import { CourseWithEnrollment_Course_by_pk_CourseEnrollments } from '../../queries/__generated__/CourseWithEnrollment';
-import { GET_SIGNED_URL } from '../../queries/actions';
+import { GET_SIGNED_URL, GET_SIGNED_URL_QUERY_OPTIONS } from '../../queries/actions';
 import { GetSignedUrl, GetSignedUrlVariables } from '../../queries/__generated__/GetSignedUrl';
 import { Button } from './Button';
 import { ExtendedDegreeParticipantsEnrollment } from '../pages/ManageCourseContent/DegreeParticipationsTab';
@@ -36,6 +36,7 @@ export const CertificateDownload: FC<IProps> = ({
     GetSignedUrl,
     GetSignedUrlVariables
   >(GET_SIGNED_URL, {
+    ...GET_SIGNED_URL_QUERY_OPTIONS,
     variables: {
       path: courseEnrollment?.achievementCertificateURL ?? '',
     },
@@ -53,6 +54,7 @@ export const CertificateDownload: FC<IProps> = ({
     GetSignedUrl,
     GetSignedUrlVariables
   >(GET_SIGNED_URL, {
+    ...GET_SIGNED_URL_QUERY_OPTIONS,
     variables: {
       path: courseEnrollment?.attendanceCertificateURL ?? '',
     },

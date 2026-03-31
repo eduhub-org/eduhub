@@ -13,7 +13,11 @@ import {
   REMOVE_ACHIEVEMENT_CERTIFICATES,
   REMOVE_ATTENDANCE_CERTIFICATES,
 } from '../../../../queries/courseEnrollment';
-import { CREATE_CERTIFICATES, GET_SIGNED_URL } from '../../../../queries/actions';
+import {
+  CREATE_CERTIFICATES,
+  GET_SIGNED_URL,
+  GET_SIGNED_URL_QUERY_OPTIONS,
+} from '../../../../queries/actions';
 import { COURSE_PARTICIPATIONS } from '../../../../queries/courseParticipation';
 import {
   CourseParticipations_Course_by_pk_AchievementOptionCourses,
@@ -830,7 +834,10 @@ function ExpandableRowContent({
   locale: string;
 }) {
   const [downloadError, setDownloadError] = useState<string | null>(null);
-  const [getDoc, docResult] = useLazyRoleQuery<GetSignedUrl, GetSignedUrlVariables>(GET_SIGNED_URL);
+  const [getDoc, docResult] = useLazyRoleQuery<GetSignedUrl, GetSignedUrlVariables>(
+    GET_SIGNED_URL,
+    GET_SIGNED_URL_QUERY_OPTIONS
+  );
   const [setAchievementRecord] = useRoleMutation<
     UpdateAchievementRecordByPk,
     UpdateAchievementRecordByPkVariables
@@ -848,7 +855,10 @@ function ExpandableRowContent({
 
       setDownloadError(null);
       try {
-        const result = await getDoc({ variables: { path: docPath } });
+        const result = await getDoc({
+          variables: { path: docPath },
+          ...GET_SIGNED_URL_QUERY_OPTIONS,
+        });
         const signedUrl = result.data?.getSignedUrl?.link;
         if (signedUrl) {
           window.open(signedUrl, '_blank', 'noopener,noreferrer');

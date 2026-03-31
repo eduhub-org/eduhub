@@ -5,7 +5,7 @@ import { CircularProgress, IconButton, Tooltip, LinearProgress } from '@mui/mate
 import { useAdminMutation } from '../../../hooks/authedMutation';
 import { useLazyRoleQuery } from '../../../hooks/authedQuery';
 import { getPublicImageUrl, parseFileUploadEvent, getPublicUrl, UploadFile } from '../../../helpers/filehandling';
-import { GET_SIGNED_URL } from '../../../queries/actions';
+import { GET_SIGNED_URL, GET_SIGNED_URL_QUERY_OPTIONS } from '../../../queries/actions';
 import { GetSignedUrl, GetSignedUrlVariables } from '../../../queries/__generated__/GetSignedUrl';
 import {
   detectFileType,
@@ -50,7 +50,7 @@ export const FileUploadField: FC<FileUploadFieldProps> = ({
   const dragCounterRef = useRef(0);
 
   const [getFileSignedUrl, { data: signedUrlData }] =
-    useLazyRoleQuery<GetSignedUrl, GetSignedUrlVariables>(GET_SIGNED_URL);
+    useLazyRoleQuery<GetSignedUrl, GetSignedUrlVariables>(GET_SIGNED_URL, GET_SIGNED_URL_QUERY_OPTIONS);
 
   // Always auto-detect file type from URL
   // This ensures the component always shows the correct icon/preview for the actual file
@@ -61,7 +61,10 @@ export const FileUploadField: FC<FileUploadFieldProps> = ({
   const needsSignedUrlForDisplay = detectedType === 'image' && !!isPrivateFile;
   useEffect(() => {
     if (needsSignedUrlForDisplay && currentFileUrl) {
-      getFileSignedUrl({ variables: { path: currentFileUrl } });
+      getFileSignedUrl({
+        variables: { path: currentFileUrl },
+        ...GET_SIGNED_URL_QUERY_OPTIONS,
+      });
     }
   }, [currentFileUrl, needsSignedUrlForDisplay, getFileSignedUrl]);
 
@@ -355,7 +358,10 @@ export const FileUploadField: FC<FileUploadFieldProps> = ({
 
     // For private files (e.g. certificate templates), fetch authenticated signed URL
     try {
-      const result = await getFileSignedUrl({ variables: { path: currentFileUrl } });
+      const result = await getFileSignedUrl({
+        variables: { path: currentFileUrl },
+        ...GET_SIGNED_URL_QUERY_OPTIONS,
+      });
       const signedUrl = result.data?.getSignedUrl?.link;
       if (signedUrl) {
         window.open(signedUrl, '_blank');
