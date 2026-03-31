@@ -4,7 +4,10 @@ import { COURSE_TILE_FRAGMENT } from "./courseFragements";
 export const COURSE_TILES = gql`
   ${COURSE_TILE_FRAGMENT}
   query CourseTiles {
-    Course(order_by: { updated_at: desc }) {
+    Course(
+      order_by: { updated_at: desc }
+      where: { published: { _eq: true }, Program: { published: { _eq: true } } }
+    ) {
       ...CourseTileFragment
       CourseGroups {
         CourseGroupOption {
@@ -22,6 +25,8 @@ export const COURSE_TILES_BY_ORGANIZATION = gql`
     Course(
       order_by: { updated_at: desc }
       where: {
+        published: { _eq: true }
+        Program: { published: { _eq: true } }
         CourseFundingOrganizations: {
           organizationId: { _eq: $organizationId }
         }
