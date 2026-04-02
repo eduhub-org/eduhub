@@ -451,6 +451,10 @@ export interface MyCourses_User_by_pk_CourseEnrollments_Course {
    */
   maxParticipants: number | null;
   /**
+   * A computed field, executes function "course_active_participant_count"
+   */
+  activeParticipantCount: any | null;
+  /**
    * An array of texts including the learning goals for the course
    */
   learningGoals: string | null;

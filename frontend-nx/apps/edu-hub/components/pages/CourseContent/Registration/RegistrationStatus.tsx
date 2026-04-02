@@ -205,6 +205,13 @@ export const RegistrationStatus: FC<RegistrationStatusProps> = ({ courseEnrollme
     case CourseEnrollmentStatus_enum.COMPLETED: {
       return <CourseLinkInfos course={course} />;
     }
+    case CourseEnrollmentStatus_enum.WAITLIST: {
+      return (
+        <StatusCard status="info" icon={<MdHourglassEmpty />}>
+          {t('status.waitlist')}
+        </StatusCard>
+      );
+    }
     default: {
       return null;
     }

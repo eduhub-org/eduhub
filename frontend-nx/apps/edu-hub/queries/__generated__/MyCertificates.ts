@@ -132,6 +132,10 @@ export interface MyCertificates_CourseEnrollment_Course {
    */
   maxParticipants: number | null;
   /**
+   * A computed field, executes function "course_active_participant_count"
+   */
+  activeParticipantCount: any | null;
+  /**
    * The time the course ends each week.
    */
   endTime: any | null;

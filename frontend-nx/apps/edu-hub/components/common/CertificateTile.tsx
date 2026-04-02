@@ -1,8 +1,8 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useCallback, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { GetApp } from '@mui/icons-material';
 import { TileBase } from './TileSlider/TileBase';
-import { useRoleQuery } from '../../hooks/authedQuery';
+import { useLazyRoleQuery } from '../../hooks/authedQuery';
 import { useRoleMutation } from '../../hooks/authedMutation';
 import { GET_SIGNED_URL, MAKE_CERTIFICATE_PUBLIC } from '../../queries/actions';
 import { GetSignedUrl, GetSignedUrlVariables } from '../../queries/__generated__/GetSignedUrl';
@@ -11,6 +11,7 @@ import { Button } from './Button';
 import { LinkedInSharingDialog } from './dialogs/LinkedInSharingDialog';
 import { ErrorMessageDialog } from './dialogs/ErrorMessageDialog';
 import { MyCertificates_CourseEnrollment } from '../../queries/__generated__/MyCertificates';
+import { CircularProgress } from '@mui/material';
 
 interface CertificateTileProps {
   enrollment: MyCertificates_CourseEnrollment;
@@ -24,42 +25,39 @@ export const CertificateTile: FC<CertificateTileProps> = ({ enrollment }) => {
   const course = enrollment.Course;
   const program = course?.Program;
 
-  // Query for achievement certificate URL
-  const { data: achievementData, loading: achievementLoading } = useRoleQuery<
+  const [getAchievementUrl, { loading: achievementLoading }] = useLazyRoleQuery<
     GetSignedUrl,
     GetSignedUrlVariables
-  >(GET_SIGNED_URL, {
-    variables: {
-      path: enrollment.achievementCertificateURL || '',
-    },
-    skip: !enrollment.achievementCertificateURL,
-  });
+  >(GET_SIGNED_URL, { fetchPolicy: 'network-only' });
 
-  // Query for attendance certificate URL
-  const { data: attendanceData, loading: attendanceLoading } = useRoleQuery<
+  const [getAttendanceUrl, { loading: attendanceLoading }] = useLazyRoleQuery<
     GetSignedUrl,
     GetSignedUrlVariables
-  >(GET_SIGNED_URL, {
-    variables: {
-      path: enrollment.attendanceCertificateURL || '',
-    },
-    skip: !enrollment.attendanceCertificateURL,
-  });
+  >(GET_SIGNED_URL, { fetchPolicy: 'network-only' });
 
-  // Mutation for making certificate public
   const [makeCertificatePublic, { loading: makingPublic }] = useRoleMutation<MakeCertificatePublic, MakeCertificatePublicVariables>(
     MAKE_CERTIFICATE_PUBLIC
   );
 
-  const handleCertificateClick = (type: 'achievement' | 'attendance') => {
-    const url = type === 'achievement' 
-      ? achievementData?.getSignedUrl?.link 
-      : attendanceData?.getSignedUrl?.link;
-    
-    if (url) {
-      window.open(url, '_blank', 'noopener,noreferrer');
+  const handleCertificateClick = useCallback(async (type: 'achievement' | 'attendance') => {
+    const path = type === 'achievement'
+      ? enrollment.achievementCertificateURL
+      : enrollment.attendanceCertificateURL;
+    if (!path) return;
+
+    const fetchUrl = type === 'achievement' ? getAchievementUrl : getAttendanceUrl;
+    try {
+      const result = await fetchUrl({ variables: { path } });
+      const link = result.data?.getSignedUrl?.link;
+      if (link) {
+        window.open(link, '_blank', 'noopener,noreferrer');
+      } else {
+        setErrorMessage(t('errorMessages.certificate_download_error'));
+      }
+    } catch {
+      setErrorMessage(t('errorMessages.certificate_download_error'));
     }
-  };
+  }, [enrollment.achievementCertificateURL, enrollment.attendanceCertificateURL, getAchievementUrl, getAttendanceUrl, t]);
 
   const handleLinkedInClick = () => {
     setLinkedInDialogOpen(true);
@@ -108,7 +106,6 @@ export const CertificateTile: FC<CertificateTileProps> = ({ enrollment }) => {
       >
         <div className="flex flex-col h-full justify-between">
           <div className="flex flex-col gap-3">
-            {/* Download Certificate Buttons */}
             {hasAchievement && (
               <Button
                 filled
@@ -116,7 +113,11 @@ export const CertificateTile: FC<CertificateTileProps> = ({ enrollment }) => {
                 disabled={achievementLoading}
                 className="flex items-center justify-center gap-2 text-sm py-2 px-3"
               >
-                <GetApp fontSize="small" />
+                {achievementLoading ? (
+                  <CircularProgress size={16} />
+                ) : (
+                  <GetApp fontSize="small" />
+                )}
                 {t('achievement_certificate')}
               </Button>
             )}
@@ -127,12 +128,15 @@ export const CertificateTile: FC<CertificateTileProps> = ({ enrollment }) => {
                 disabled={attendanceLoading}
                 className="flex items-center justify-center gap-2 text-sm py-2 px-3"
               >
-                <GetApp fontSize="small" />
+                {attendanceLoading ? (
+                  <CircularProgress size={16} />
+                ) : (
+                  <GetApp fontSize="small" />
+                )}
                 {t('attendance_certificate')}
               </Button>
             )}
 
-            {/* Single LinkedIn Share Button */}
             {hasAnyCertificate && (
               <Button
                 onClick={handleLinkedInClick}
@@ -144,7 +148,6 @@ export const CertificateTile: FC<CertificateTileProps> = ({ enrollment }) => {
             )}
           </div>
 
-          {/* Program Title at bottom */}
           {program && program.title && (
             <div className="text-xs tracking-wider mt-auto text-right">
               {program.title}

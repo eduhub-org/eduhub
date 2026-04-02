@@ -105,6 +105,7 @@
     "ABORTED": "aborted",
     "COMPLETED": "completed",
     "CANCELLED": "canceled",
+    "WAITLIST": "waitlist",
     "password": "Password",
     "employmentStatus": "Employment Status",
     "nameOfUniversity": "Name of University",
@@ -384,6 +385,7 @@
       "application_deadline": "Application deadline: ",
       "registration_deadline": "Registration deadline: ",
       "apply_now": "Apply now",
+      "join_waitlist": "Join Waitlist",
       "register_external": "Register via External Link",
       "register_with_payment": "Register Now",
       "register_now": "Register Now",
@@ -400,6 +402,8 @@
       "invitation_expired": "Your invitation has expired",
       "payment_pending": "Your payment has not been completed yet. You can review your selections and try again.",
       "payment_failed": "Your payment could not be processed. You can review your selections and try again.",
+      "waitlist": "You are on the waitlist. The course is currently full. We will inform you if a spot becomes available.",
+      "course_full_notice": "This course is currently full. You can join the waitlist.",
       "application_period_ended": "Unfortunately, the application period has ended. You can subscribe to our <a>newsletter</a> to stay informed about new offers.",
       "application_period_ended_title": "Application Period Ended",
       "registration_period_ended": "Unfortunately, the registration period has ended. You can subscribe to our <a>newsletter</a> to stay informed about new offers.",
@@ -822,6 +826,7 @@
     "not_authenticated": "You need to be logged in to view your certificates.",
     "errorMessages": {
       "certificate_not_found": "Certificate not found",
+      "certificate_download_error": "Failed to download certificate. Please try again.",
       "linkedin_share_error": "Failed to share certificate on LinkedIn. Please try again later."
     }
   },
@@ -1068,6 +1073,7 @@
       "email_all_invited": "Email all Invited",
       "email_all_applied": "Email all Applied",
       "email_all_rejected": "Email all Rejected",
+      "email_all_waitlist": "Email all on Waitlist",
       "email_all_invite_rating": "Email all with Rating 'Invite'",
       "email_all_decline_rating": "Email all with Rating 'Decline'",
       "email_all_review_rating": "Email all with Rating 'Review'",
@@ -1164,7 +1170,7 @@
     "max_participants": {
       "label": "Maximum number of participants",
       "placeholder": "Maximum number of participants",
-      "help_text": "The maximum number of participants is used as information for admission."
+      "help_text": "After the maximum number of participants is reached, users can only join the waitlist."
     },
     "formbricks": {
       "title": "Enrollment Questionnaire",
@@ -1234,6 +1240,7 @@
       "invited": "Invited",
       "invitation_confirmed": "invitation confirmed",
       "registered": "Registered",
+      "waitlist": "Waitlist",
       "aborted": "aborted",
       "rejected": "Rejected",
       "cancelled": "Cancelled",

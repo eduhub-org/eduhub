@@ -558,6 +558,7 @@ export enum CourseEnrollmentStatus_enum {
   INVITED = "INVITED",
   REGISTERED = "REGISTERED",
   REJECTED = "REJECTED",
+  WAITLIST = "WAITLIST",
 }
 
 /**
@@ -5445,6 +5446,7 @@ export interface Course_bool_exp {
   _not?: Course_bool_exp | null;
   _or?: Course_bool_exp[] | null;
   achievementCertificatePossible?: Boolean_comparison_exp | null;
+  activeParticipantCount?: bigint_comparison_exp | null;
   applicationEnd?: date_comparison_exp | null;
   attendanceCertificatePossible?: Boolean_comparison_exp | null;
   basePrice?: Int_comparison_exp | null;
@@ -5636,6 +5638,7 @@ export interface Course_order_by {
   Sessions_aggregate?: Session_aggregate_order_by | null;
   Weekday?: Weekday_order_by | null;
   achievementCertificatePossible?: order_by | null;
+  activeParticipantCount?: order_by | null;
   applicationEnd?: order_by | null;
   attendanceCertificatePossible?: order_by | null;
   basePrice?: order_by | null;
@@ -8777,6 +8780,21 @@ export interface Weekday_on_conflict {
 export interface Weekday_order_by {
   comment?: order_by | null;
   value?: order_by | null;
+}
+
+/**
+ * Boolean expression to compare columns of type "bigint". All fields are combined with logical 'AND'.
+ */
+export interface bigint_comparison_exp {
+  _eq?: any | null;
+  _gt?: any | null;
+  _gte?: any | null;
+  _in?: any[] | null;
+  _is_null?: boolean | null;
+  _lt?: any | null;
+  _lte?: any | null;
+  _neq?: any | null;
+  _nin?: any[] | null;
 }
 
 /**

@@ -50,7 +50,9 @@ export const FileUploadField: FC<FileUploadFieldProps> = ({
   const dragCounterRef = useRef(0);
 
   const [getFileSignedUrl, { data: signedUrlData }] =
-    useLazyRoleQuery<GetSignedUrl, GetSignedUrlVariables>(GET_SIGNED_URL);
+    useLazyRoleQuery<GetSignedUrl, GetSignedUrlVariables>(GET_SIGNED_URL, {
+      fetchPolicy: 'network-only',
+    });
 
   // Always auto-detect file type from URL
   // This ensures the component always shows the correct icon/preview for the actual file
