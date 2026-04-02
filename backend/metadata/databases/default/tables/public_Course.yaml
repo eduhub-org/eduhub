@@ -88,6 +88,13 @@ array_relationships:
         table:
           name: CourseAddonMapping
           schema: public
+computed_fields:
+  - name: activeParticipantCount
+    definition:
+      function:
+        name: course_active_participant_count
+        schema: public
+      table_argument: course_row
 select_permissions:
   - role: anonymous
     permission:
@@ -124,6 +131,8 @@ select_permissions:
         - currency
         - stripeProductId
         - stripePriceId
+      computed_fields:
+        - activeParticipantCount
       filter:
         _and:
           - Program:
@@ -167,6 +176,8 @@ select_permissions:
         - stripeProductId
         - stripePriceId
         - matrixRoomId
+      computed_fields:
+        - activeParticipantCount
       filter: {}
   - role: user_access
     permission:
@@ -203,6 +214,8 @@ select_permissions:
         - stripeProductId
         - stripePriceId
         - matrixRoomId
+      computed_fields:
+        - activeParticipantCount
       filter:
         CourseEnrollments:
           User:

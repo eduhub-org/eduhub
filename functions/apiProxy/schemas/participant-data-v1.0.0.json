@@ -42,7 +42,8 @@
             "EXPIRED",
             "INVITED",
             "REGISTERED",
-            "REJECTED"
+            "REJECTED",
+            "WAITLIST"
           ]
         },
         "enrollmentDate": { "type": "string", "format": "date-time" },

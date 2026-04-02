@@ -17,6 +17,7 @@ export function getEmailTemplateTypesForCourseRegistration(
     'DECLINE',
     'REGISTRATION_CONFIRMED',
     'REGISTRATION_CONFIRMED_PAID',
+    'WAITLIST_NOTICE',
     'ORGANIZER_ADDED',
   ];
 
