@@ -139,6 +139,13 @@ export const ApplicationStatistics: FC = () => {
       const maxDays = Math.max(...allDays);
       const minDays = Math.min(...allDays, 0);
 
+      // "Today" on the X-axis (days until application end) per program — hide points in the calendar future
+      const todayStr = new Date().toISOString().split('T')[0];
+      const programDaysUntilEndToday = new Map<string, number>();
+      data.Program.forEach((p) => {
+        programDaysUntilEndToday.set(p.title, calculateDaysUntilEnd(todayStr, p.defaultApplicationEnd));
+      });
+
       // Build cumulative counts from max days down to min days
       const programCumulativeCounts = new Map<string, number>();
       const result: Array<{ date: string; [key: string]: any }> = [];
@@ -163,7 +170,9 @@ export const ApplicationStatistics: FC = () => {
         // Create entry with all cumulative counts (even if no change for this day)
         const entry: { date: string; [key: string]: any } = { date: days.toString() };
         programCumulativeCounts.forEach((count, program) => {
-          entry[program] = count;
+          const todayDU = programDaysUntilEndToday.get(program) ?? 0;
+          // X-axis decreases toward the deadline; days < todayDU are still in the future — omit series value
+          entry[program] = days < todayDU ? null : count;
         });
 
         result.push(entry);
@@ -236,14 +245,25 @@ export const ApplicationStatistics: FC = () => {
       const maxDays = Math.max(...allDays);
       const minDays = Math.min(...allDays, 0);
 
+      const todayStr = new Date().toISOString().split('T')[0];
+      const programDaysUntilEndToday = new Map<string, number>();
+      data.Program.forEach((p) => {
+        programDaysUntilEndToday.set(p.title, calculateDaysUntilEnd(todayStr, p.defaultApplicationEnd));
+      });
+
       // Build result with all days from max to min, filling zeros where needed
       const result: Array<{ date: string; [key: string]: any }> = [];
 
       for (let days = maxDays; days >= minDays; days--) {
         const entry: { date: string; [key: string]: any } = { date: days.toString() };
-        
+
         // Fill in counts for each program (0 if no enrollments for this day)
         allPrograms.forEach((program) => {
+          const todayDU = programDaysUntilEndToday.get(program) ?? 0;
+          if (days < todayDU) {
+            entry[program] = null;
+            return;
+          }
           const counts = daysMap.get(days);
           entry[program] = counts?.[program] || 0;
         });
