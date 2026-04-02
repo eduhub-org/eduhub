@@ -105,6 +105,7 @@
     "ABORTED": "abgebrochen",
     "COMPLETED": "abgeschlossen",
     "CANCELLED": "abgesagt",
+    "WAITLIST": "warteliste",
     "password": "Password",
     "employmentStatus": "Aktuelle Tätigkeit",
     "nameOfUniversity": "Name der Universität",
@@ -384,6 +385,7 @@
       "application_deadline": "Bewerbungsschluss: ",
       "registration_deadline": "Anmeldeschluss: ",
       "apply_now": "Jetzt anmelden",
+      "join_waitlist": "Auf die Warteliste setzen",
       "register_external": "Über externen Link registrieren",
       "register_with_payment": "Jetzt Registrieren",
       "register_now": "Jetzt registrieren",
@@ -400,6 +402,8 @@
       "invitation_expired": "Deine Einladung ist abgelaufen",
       "payment_pending": "Deine Zahlung wurde noch nicht abgeschlossen. Du kannst deine Auswahl überprüfen und es erneut versuchen.",
       "payment_failed": "Deine Zahlung konnte nicht verarbeitet werden. Du kannst deine Auswahl überprüfen und es erneut versuchen.",
+      "waitlist": "Du stehst auf der Warteliste. Der Kurs ist derzeit voll. Wir informieren dich, falls ein Platz frei wird.",
+      "course_full_notice": "Dieser Kurs ist derzeit voll. Du kannst dich auf die Warteliste setzen lassen.",
       "application_period_ended": "Die Bewerbungsfrist  ist leider abgelaufen. Du kannst unseren <a>Newsletter</a> abonnieren, um über neue Angebote informiert zu bleiben.",
       "application_period_ended_title": "Bewerbungsfrist abgelaufen",
       "registration_period_ended": "Die Anmeldefrist ist leider abgelaufen. Du kannst unseren <a>Newsletter</a> abonnieren, um über neue Angebote informiert zu bleiben.",
@@ -1051,6 +1055,7 @@
       "email_all_invited": "E-Mail an alle Eingeladenen",
       "email_all_applied": "E-Mail an alle Beworbenen",
       "email_all_rejected": "E-Mail an alle Abgelehnten",
+      "email_all_waitlist": "E-Mail an alle auf der Warteliste",
       "email_all_invite_rating": "E-Mail an alle mit Bewertung 'Einladen'",
       "email_all_decline_rating": "E-Mail an alle mit Bewertung 'Ablehnen'",
       "email_all_review_rating": "E-Mail an alle mit Bewertung 'Unklar'",
@@ -1147,7 +1152,7 @@
     "max_participants": {
       "label": "Max. Teilnehmendenanzahl",
       "placeholder": "Max. Teilnehmendenanzahl",
-      "help_text": "Die maximale Teilnehmendenanzahl diesnt als Information zur Zulassung."
+      "help_text": "Sobald die maximale Teilnehmendenanzahl erreicht ist, können sich Nutzer nur noch auf die Warteliste setzen."
     },
     "formbricks": {
       "title": "Fragebogen URL",
@@ -1217,6 +1222,7 @@
       "invited": "Eingeladen",
       "invitation_confirmed": "Einladung bestätigt",
       "registered": "Registriert",
+      "waitlist": "Warteliste",
       "aborted": "Abgebrochen",
       "rejected": "Bewerbung abgelehnt",
       "cancelled": "Einladung abgelehnt",

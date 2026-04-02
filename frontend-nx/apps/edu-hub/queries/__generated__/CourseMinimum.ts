@@ -115,6 +115,10 @@ export interface CourseMinimum_Course_by_pk {
    */
   maxParticipants: number | null;
   /**
+   * A computed field, executes function "course_active_participant_count"
+   */
+  activeParticipantCount: any | null;
+  /**
    * The time the course ends each week.
    */
   endTime: any | null;

@@ -378,7 +378,6 @@ const InputField: React.FC<InputFieldProps> = ({
         onValueUpdated({ text: newText });
       }
       setErrorMessage('');
-      setShowSavedNotification(!!updateValueMutation);
     } else {
       setErrorMessage(getErrorMessage(type));
     }
@@ -398,10 +397,16 @@ const InputField: React.FC<InputFieldProps> = ({
   const handleTextChange = useCallback(
     (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       const newText = event.target.value;
+      if (type === 'number') {
+        const numberPattern = min !== undefined && min >= 0 ? /^\d*$/ : /^-?\d*$/;
+        if (!numberPattern.test(newText)) {
+          return;
+        }
+      }
       setLocalText(newText);
       debouncedUpdateText(newText);
     },
-    [debouncedUpdateText]
+    [debouncedUpdateText, type, min]
   );
 
   const handleBlur = useCallback(() => {
@@ -553,9 +558,11 @@ const InputField: React.FC<InputFieldProps> = ({
                 min={type === 'number' ? min : undefined}
                 max={type === 'number' ? max : undefined}
                 step={type === 'number' ? 1 : undefined}
+                inputMode={type === 'number' ? 'numeric' : undefined}
+                pattern={type === 'number' ? '[0-9]*' : undefined}
                 {...props}
               />
-              {showCharacterCount && type !== 'ects' && (
+              {showCharacterCount && type !== 'ects' && type !== 'number' && (
                 <div className="absolute top-0 right-0 mr-2 mt-1 text-xs text-label-secondary">
                   {`${localText.length}/${maxLength}`}
                 </div>

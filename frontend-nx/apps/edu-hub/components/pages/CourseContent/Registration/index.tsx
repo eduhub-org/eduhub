@@ -49,9 +49,13 @@ interface RegistrationProps {
  */
 export const Registration: FC<RegistrationProps> = ({ course, courseEnrollment, onRegistrationSuccess }) => {
   const isLoggedIn = useIsLoggedIn();
+  const isCourseFull =
+    course.maxParticipants != null &&
+    (course.activeParticipantCount ?? 0) >= course.maxParticipants;
 
   const registrationHandler = useRegistrationHandler({
     course,
+    isCourseFull,
     onSuccess: onRegistrationSuccess,
   });
 
@@ -84,12 +88,13 @@ export const Registration: FC<RegistrationProps> = ({ course, courseEnrollment, 
   // If not logged in: for external link registration, open link directly; otherwise prompt login
   if (!isLoggedIn) {
     const isExternalWithLink =
-      registrationHandler.config.isExternal && course.externalRegistrationLink;
+      !isCourseFull && registrationHandler.config.isExternal && course.externalRegistrationLink;
     return (
       <div className="w-full">
         <RegistrationButton
           course={course}
           registrationType={course.registrationType || CourseRegistrationType_enum.APPROVAL_WITH_INPUT}
+          isCourseFull={isCourseFull}
           onClick={
             isExternalWithLink
               ? registrationHandler.handleExternalRegistration
@@ -106,6 +111,7 @@ export const Registration: FC<RegistrationProps> = ({ course, courseEnrollment, 
       <RegistrationButton
         course={course}
         registrationType={course.registrationType || CourseRegistrationType_enum.APPROVAL_WITH_INPUT}
+        isCourseFull={isCourseFull}
         onClick={registrationHandler.handleRegistration}
       />
       <RegistrationModal

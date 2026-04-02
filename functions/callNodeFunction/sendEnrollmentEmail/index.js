@@ -131,6 +131,9 @@ export default async function sendEnrollmentEmail(req, logger) {
       case 'REGISTERED':
         baseTemplateType = 'REGISTRATION_CONFIRMED';
         break;
+      case 'WAITLIST':
+        baseTemplateType = 'WAITLIST_NOTICE';
+        break;
       default:
         // Don't send emails for other status changes
         return {

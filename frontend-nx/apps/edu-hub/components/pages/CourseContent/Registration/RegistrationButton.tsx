@@ -17,6 +17,8 @@ interface RegistrationButtonProps {
   registrationType: CourseRegistrationType_enum;
   /** Callback function triggered when the registration button is clicked */
   onClick: () => void;
+  /** Whether active participants reached the maximum for the course */
+  isCourseFull: boolean;
 }
 
 /**
@@ -40,7 +42,7 @@ interface RegistrationButtonProps {
  * @param props - The component props
  * @returns JSX element representing the registration button and deadline info
  */
-export const RegistrationButton: FC<RegistrationButtonProps> = ({ course, registrationType, onClick }) => {
+export const RegistrationButton: FC<RegistrationButtonProps> = ({ course, registrationType, onClick, isCourseFull }) => {
   const t = useTranslations('course');
   const locale = useLocale();
   const config = getRegistrationTypeConfig(registrationType);
@@ -86,6 +88,10 @@ export const RegistrationButton: FC<RegistrationButtonProps> = ({ course, regist
 
   // Get button text based on registration type and login status
   const getButtonText = () => {
+    if (isCourseFull) {
+      return t('registration.join_waitlist');
+    }
+
     if (course.externalRegistrationLink) {
       return t('registration.register_external');
     }
@@ -103,6 +109,11 @@ export const RegistrationButton: FC<RegistrationButtonProps> = ({ course, regist
 
   return (
     <div className="flex flex-1 flex-col justify-center items-center space-y-4 w-full">
+      {isCourseFull && (
+        <div className="bg-amber-50 rounded-lg p-4 w-full text-amber-800 text-sm">
+          {t('status.course_full_notice')}
+        </div>
+      )}
       <Button
         filled
         onClick={onClick}

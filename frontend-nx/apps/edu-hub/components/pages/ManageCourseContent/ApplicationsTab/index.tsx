@@ -597,6 +597,13 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
         group: t('bulk_actions.email_all_by_status'),
       });
     }
+    if (courseEnrollments.some((e) => e.status === 'WAITLIST')) {
+      actions.push({
+        value: 'email_status_WAITLIST',
+        label: t('bulk_actions.email_all_waitlist'),
+        group: t('bulk_actions.email_all_by_status'),
+      });
+    }
 
     // Email by rating
     if (courseEnrollments.some((e) => e.motivationRating === 'INVITE')) {
@@ -646,6 +653,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
       ABORTED: 5,
       CANCELLED: 6,
       REGISTERED: 7,
+      WAITLIST: 8,
     };
     return order[a] - order[b];
   }, []);
@@ -775,6 +783,9 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
               )}
               {enrollment.status === 'CANCELLED' && (
                 <IoIosCloseCircle title={t('status.cancelled')} color="red" size="1.5em" className="inline" />
+              )}
+              {enrollment.status === 'WAITLIST' && (
+                <GoDotFill className="inline" title={t('status.waitlist')} color="orange" size="1.5em" />
               )}
               {expired && (enrollment.status === 'APPLIED' || enrollment.status === 'INVITED') && (
                 <IoIosCloseCircle
