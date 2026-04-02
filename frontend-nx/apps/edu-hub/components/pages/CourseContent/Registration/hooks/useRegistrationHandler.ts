@@ -196,7 +196,9 @@ export const useRegistrationHandler = ({
     }
 
     if (isCourseFull) {
-      if (config.requiresInput || config.requiresPayment) {
+      // Waitlist: only open the modal when there is an application form (survey or motivation letter).
+      // Payment UI and createEnrollmentWithAddons must not run for full courses; submit goes to WAITLIST.
+      if (config.requiresInput) {
         setIsModalOpen(true);
         return;
       }

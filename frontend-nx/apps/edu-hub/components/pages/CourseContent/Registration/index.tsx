@@ -80,6 +80,7 @@ export const Registration: FC<RegistrationProps> = ({ course, courseEnrollment, 
           onSubmit={registrationHandler.submitRegistration}
           isLoading={registrationHandler.isLoading}
           retryEnrollmentId={registrationHandler.retryEnrollmentId}
+          isCourseFull={isCourseFull && !registrationHandler.retryEnrollmentId}
         />
       </div>
     );
@@ -122,6 +123,7 @@ export const Registration: FC<RegistrationProps> = ({ course, courseEnrollment, 
         onSubmit={registrationHandler.submitRegistration}
         isLoading={registrationHandler.isLoading}
         retryEnrollmentId={registrationHandler.retryEnrollmentId}
+        isCourseFull={isCourseFull && !registrationHandler.retryEnrollmentId}
       />
     </div>
   );
