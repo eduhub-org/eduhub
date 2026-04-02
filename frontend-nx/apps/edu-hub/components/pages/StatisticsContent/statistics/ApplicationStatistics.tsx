@@ -61,6 +61,17 @@ export const ApplicationStatistics: FC = () => {
     return diffDays;
   }, []);
 
+  /** X-axis "today" (days until application end) per program — used to omit future points in relative-deadline charts */
+  const programDaysUntilEndToday = useMemo(() => {
+    if (!data?.Program.length) return new Map<string, number>();
+    const todayStr = new Date().toISOString().split('T')[0];
+    const map = new Map<string, number>();
+    data.Program.forEach((p) => {
+      map.set(p.title, calculateDaysUntilEnd(todayStr, p.defaultApplicationEnd));
+    });
+    return map;
+  }, [data?.Program, calculateDaysUntilEnd]);
+
   // Process data for cumulative chart
   const cumulativeChartData = useMemo(() => {
     if (!data?.Program.length) return [];
@@ -139,13 +150,6 @@ export const ApplicationStatistics: FC = () => {
       const maxDays = Math.max(...allDays);
       const minDays = Math.min(...allDays, 0);
 
-      // "Today" on the X-axis (days until application end) per program — hide points in the calendar future
-      const todayStr = new Date().toISOString().split('T')[0];
-      const programDaysUntilEndToday = new Map<string, number>();
-      data.Program.forEach((p) => {
-        programDaysUntilEndToday.set(p.title, calculateDaysUntilEnd(todayStr, p.defaultApplicationEnd));
-      });
-
       // Build cumulative counts from max days down to min days
       const programCumulativeCounts = new Map<string, number>();
       const result: Array<{ date: string; [key: string]: any }> = [];
@@ -180,7 +184,7 @@ export const ApplicationStatistics: FC = () => {
 
       return result;
     }
-  }, [data, useActualDates, calculateDaysUntilEnd]);
+  }, [data, useActualDates, calculateDaysUntilEnd, programDaysUntilEndToday]);
 
   // Process data for daily chart
   const dailyChartData = useMemo(() => {
@@ -245,12 +249,6 @@ export const ApplicationStatistics: FC = () => {
       const maxDays = Math.max(...allDays);
       const minDays = Math.min(...allDays, 0);
 
-      const todayStr = new Date().toISOString().split('T')[0];
-      const programDaysUntilEndToday = new Map<string, number>();
-      data.Program.forEach((p) => {
-        programDaysUntilEndToday.set(p.title, calculateDaysUntilEnd(todayStr, p.defaultApplicationEnd));
-      });
-
       // Build result with all days from max to min, filling zeros where needed
       const result: Array<{ date: string; [key: string]: any }> = [];
 
@@ -273,7 +271,7 @@ export const ApplicationStatistics: FC = () => {
 
       return result;
     }
-  }, [data, useActualDates, calculateDaysUntilEnd]);
+  }, [data, useActualDates, calculateDaysUntilEnd, programDaysUntilEndToday]);
 
   // Create series configuration for charts
   const series = useMemo(
