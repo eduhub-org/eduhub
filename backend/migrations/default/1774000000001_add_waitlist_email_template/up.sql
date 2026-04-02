@@ -11,7 +11,7 @@ SELECT
       <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
     </head>
     <body>
-      <p>Hello [User:Firstname] [User:LastName],</p>
+      <p>Hello [User:FirstName] [User:LastName],</p>
       <p>Thank you for your interest in <strong>[Enrollment:CourseId--Course:Name]</strong>.</p>
       <p>The course is currently full. We have placed you on the waitlist.</p>
       <p>You can only participate if a spot becomes available. If that happens, we will contact you with further information.</p>

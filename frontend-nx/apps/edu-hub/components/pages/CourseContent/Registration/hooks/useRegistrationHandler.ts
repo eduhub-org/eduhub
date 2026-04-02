@@ -125,7 +125,7 @@ export const useRegistrationHandler = ({
         setIsLoading(false);
       }
     },
-    [course.id, updateEnrollmentMutation, userId, onSuccess, config.isDirect]
+    [course.id, updateEnrollmentMutation, userId, onSuccess, config.isDirect, isCourseFull]
   );
 
   const handlePaymentRegistration = useCallback(

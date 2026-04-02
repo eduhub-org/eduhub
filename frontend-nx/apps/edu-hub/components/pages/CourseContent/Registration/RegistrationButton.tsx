@@ -110,7 +110,7 @@ export const RegistrationButton: FC<RegistrationButtonProps> = ({ course, regist
   return (
     <div className="flex flex-1 flex-col justify-center items-center space-y-4 w-full">
       {isCourseFull && (
-        <div className="bg-amber-50 rounded-lg p-4 w-full text-amber-800 text-sm">
+        <div className="bg-warning/20 rounded-lg p-4 w-full text-label-primary text-sm">
           {t('status.course_full_notice')}
         </div>
       )}
