@@ -46,8 +46,55 @@ import { BulkAction } from '../../../common/TableGrid/types';
 import { ApolloError } from '@apollo/client';
 import { ErrorMessageDialog } from '../../../common/dialogs/ErrorMessageDialog';
 import { FormbricksResponsesDisplay } from './FormbricksResponsesDisplay';
-import { getRegistrationFeatures } from './registrationConfig';
+import { getRegistrationFeatures, type RegistrationFeatures } from './registrationConfig';
 import NotificationSnackbar from '../../../common/dialogs/NotificationSnackbar';
+
+/** Matches TableGrid `gap-3` between columns; keep in sync with expandable row width math. */
+const APPLICATION_TABLE_GAP_PX = 12;
+
+/**
+ * Default pixel widths for Applications tab columns (accessorKey → size).
+ * Used by both TableGrid column defs and ExpandableApplicationRow alignment.
+ */
+const APPLICATION_TABLE_COLUMN_SIZES = {
+  'User.firstName': 200,
+  'User.lastName': 200,
+  'User.Organization.name': 300,
+  created_at: 104,
+  motivationRating: 100,
+  Invoices: 120,
+  status: 120,
+} as const;
+
+function sumColumnWidthsWithGaps(widths: number[]): number {
+  if (widths.length === 0) {
+    return 0;
+  }
+  return widths.reduce((acc, w, i) => (i === 0 ? w : acc + APPLICATION_TABLE_GAP_PX + w), 0);
+}
+
+/** Widths for the three expandable blocks so they line up with the table columns above. */
+function getExpandableRowWidths(features: RegistrationFeatures) {
+  const s = APPLICATION_TABLE_COLUMN_SIZES;
+  const emailWidth = sumColumnWidthsWithGaps([s['User.firstName'], s['User.lastName']]);
+
+  // Questionnaire / motivation: columns from organization up to (but not including) motivationRating.
+  // With application process: org + created_at. Without: org, and if payment-only flow includes payment before status.
+  let middleParts: number[];
+  if (features.hasApplicationProcess) {
+    middleParts = [s['User.Organization.name'], s.created_at];
+  } else {
+    middleParts = [s['User.Organization.name']];
+    if (features.hasPayment) {
+      middleParts.push(s.Invoices);
+    }
+  }
+  const questionnaireWidth = sumColumnWidthsWithGaps(middleParts);
+
+  const ratingWidth = s.motivationRating;
+
+  return { emailWidth, questionnaireWidth, ratingWidth };
+}
 
 interface IProps {
   course: ManagedCourse_Course_by_pk;
@@ -78,6 +125,8 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
     () => getRegistrationFeatures(course.registrationType),
     [course.registrationType]
   );
+
+  const expandableRowWidths = useMemo(() => getExpandableRowWidths(features), [features]);
   
   const applicationStats = useMemo(() => {
     const totalApplications = course.CourseEnrollments.length;
@@ -665,21 +714,21 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
         {
           header: t('first_name'),
           accessorKey: 'User.firstName',
-          size: 200,
+          size: APPLICATION_TABLE_COLUMN_SIZES['User.firstName'],
           enableSorting: true,
           cell: ({ row }) => row.original.User.firstName,
         },
         {
           header: t('last_name'),
           accessorKey: 'User.lastName',
-          size: 200,
+          size: APPLICATION_TABLE_COLUMN_SIZES['User.lastName'],
           enableSorting: true,
           cell: ({ row }) => row.original.User.lastName,
         },
         {
           header: t('organization'),
           accessorKey: 'User.Organization.name',
-          size: 300,
+          size: APPLICATION_TABLE_COLUMN_SIZES['User.Organization.name'],
           enableSorting: true,
           cell: ({ row }) => {
             const orgName = row.original.User.Organization?.name;
@@ -697,7 +746,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
         baseColumns.push({
           header: t('application_submitted_at'),
           accessorKey: 'created_at',
-          size: 104,
+          size: APPLICATION_TABLE_COLUMN_SIZES.created_at,
           enableSorting: true,
           sortingFn: (rowA, rowB) => {
             const ta = rowA.original.created_at
@@ -723,7 +772,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
         baseColumns.push({
           header: t('evaluation'),
           accessorKey: 'motivationRating',
-          size: 100,
+          size: APPLICATION_TABLE_COLUMN_SIZES.motivationRating,
           enableSorting: true,
           meta: { align: 'center' },
           sortingFn: (rowA, rowB) => {
@@ -751,7 +800,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
         baseColumns.push({
           header: t('payment_status'),
           accessorKey: 'Invoices',
-          size: 120,
+          size: APPLICATION_TABLE_COLUMN_SIZES.Invoices,
           enableSorting: true,
           cell: ({ row }) => {
             const paymentStatus = getPaymentStatusFromInvoices(row.original.Invoices);
@@ -770,7 +819,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
       baseColumns.push({
         header: t('status_label'),
         accessorKey: 'status',
-        size: 120,
+        size: APPLICATION_TABLE_COLUMN_SIZES.status,
         enableSorting: true,
         sortingFn: (rowA, rowB) => {
           return statusSortFn(rowA.original.status, rowB.original.status);
@@ -868,8 +917,8 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
     return (
       <div className="pt-5 pb-5 text-label-primary">
         <div className="flex items-start gap-3 pl-3">
-          {/* Email and Application History - aligned with firstName/lastName columns (400px total) */}
-          <div style={{ width: '400px', flexShrink: 0 }}>
+          {/* Email and Application History — width matches firstName + gap + lastName (see APPLICATION_TABLE_COLUMN_SIZES) */}
+          <div style={{ width: expandableRowWidths.emailWidth, flexShrink: 0 }}>
             <div className="mb-4">
               <div className="text-sm font-medium text-label-primary mb-1">{t('email')}</div>
               <div className="text-label-primary break-words font-medium pl-4" title={enrollment.User.email}>
@@ -908,10 +957,9 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
             </div>
           </div>
 
-          {/* Application Content - Formbricks or Motivation Letter */}
-          {/* Total available: 960px (mainRowContentWidth), minus: 400px (email) + 100px (rating) + 24px (2 gaps) + 12px (padding) = 424px */}
+          {/* Application Content — spans org (+ created_at when application process) columns; width from APPLICATION_TABLE_COLUMN_SIZES */}
           {features.hasQuestionnaire && (
-            <div style={{ width: '424px', flexShrink: 0 }}>
+            <div style={{ width: expandableRowWidths.questionnaireWidth, flexShrink: 0 }}>
               <div className="mb-4">
                 {hasFormbricksSurvey ? (
                   <FormbricksResponsesDisplay
@@ -932,9 +980,9 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
             </div>
           )}
 
-          {/* Rating Controls - aligned with motivationRating column (100px) - only show for application process */}
+          {/* Rating Controls — width matches motivationRating column */}
           {features.hasApplicationProcess && (
-            <div style={{ width: '100px', flexShrink: 0 }}>
+            <div style={{ width: expandableRowWidths.ratingWidth, flexShrink: 0 }}>
               <div className="mb-4">
                 <div className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-1">
                   {t('evaluation')}
