@@ -459,6 +459,7 @@ export interface ManagedCourse_Course_by_pk_CourseEnrollments {
    */
   invitationExpirationDate: any | null;
   id: number;
+  created_at: any | null;
   /**
    * The users current enrollment status to this course
    */

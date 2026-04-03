@@ -1043,6 +1043,7 @@
     },
     "email": "E-Mail",
     "application": "Bewerbung",
+    "application_submitted_at": "Datum",
     "evaluation": "Beurteilung",
     "send_email_to_applicants": "E-Mail an Bewerber senden",
     "element_chat_welcome_prompt": "Bitte begrüße deine Teilnehmenden im Element-Chat.",

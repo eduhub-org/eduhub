@@ -11,6 +11,7 @@
  * - useFormatDateTime: Formats and optionally rounds time, returns a Date object
  */
 
+import { useCallback } from 'react';
 import { parseISO } from 'date-fns';
 import { formatInTimeZone } from 'date-fns-tz';
 import { useAppSettings } from '../contexts/AppSettingsContext';
@@ -30,15 +31,15 @@ export const format2Digits = (n: number) => {
  */
 export const useDisplayDate = () => {
   const { timeZone } = useAppSettings();
-  
-  return (date: Date | string | null) => {
+
+  return useCallback((date: Date | string | null) => {
     if (date == null) {
       return '';
     }
 
     const zonedDate = typeof date === 'string' ? parseISO(date) : date;
     return formatInTimeZone(zonedDate, timeZone, 'dd.MM.yyyy');
-  };
+  }, [timeZone]);
 };
 
 /**
