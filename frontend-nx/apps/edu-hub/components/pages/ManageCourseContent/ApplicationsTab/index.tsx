@@ -743,7 +743,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
       baseColumns.push({
         header: t('status_label'),
         accessorKey: 'status',
-        size: 100,
+        size: 120,
         enableSorting: true,
         sortingFn: (rowA, rowB) => {
           return statusSortFn(rowA.original.status, rowB.original.status);
@@ -785,7 +785,12 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
                 <IoIosCloseCircle title={t('status.cancelled')} color="red" size="1.5em" className="inline" />
               )}
               {enrollment.status === 'WAITLIST' && (
-                <GoDotFill className="inline" title={t('status.waitlist')} color="orange" size="1.5em" />
+                <span
+                  className="inline-block max-w-full truncate text-[11px] font-semibold text-label-primary bg-bg-secondary px-1.5 py-0.5 rounded border border-border-primary"
+                  title={t('status.waitlist')}
+                >
+                  {t('status.waitlist_badge')}
+                </span>
               )}
               {expired && (enrollment.status === 'APPLIED' || enrollment.status === 'INVITED') && (
                 <IoIosCloseCircle

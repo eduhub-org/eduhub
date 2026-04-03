@@ -1241,6 +1241,7 @@
       "invitation_confirmed": "invitation confirmed",
       "registered": "Registered",
       "waitlist": "Waitlist",
+      "waitlist_badge": "WAITLIST",
       "aborted": "aborted",
       "rejected": "Rejected",
       "cancelled": "Cancelled",
