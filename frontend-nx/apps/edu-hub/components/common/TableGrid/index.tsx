@@ -297,6 +297,12 @@ const TableGrid = <T extends BaseRow,>({
     return totalColumnWidth + totalGapWidth + leftPadding + expandButtonWidth + deleteButtonWidth;
   })();
 
+  /** Data columns grow to fill available width; checkbox column stays fixed. */
+  const getDataColumnStyle = (columnId: string, size: number): React.CSSProperties =>
+    columnId === 'selection'
+      ? { width: `${size}px`, flexShrink: 0 }
+      : { flex: '1 1 0%', minWidth: `${size}px`, flexShrink: 0 };
+
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
@@ -410,25 +416,30 @@ const TableGrid = <T extends BaseRow,>({
 
       {/* Table Container with horizontal scroll */}
       <div className="overflow-x-auto">
-        <div style={{ minWidth: `${mainRowContentWidth}px` }}>
+        <div className="w-full" style={{ minWidth: `${mainRowContentWidth}px` }}>
           {/* Header row */}
           <div className="flex items-center mb-1 bg-bg-primary text-label-primary py-2">
-        <div className={`flex-grow flex gap-3 ${!showCheckbox ? 'pl-3' : ''}`} style={{ minWidth: `${mainRowContentWidth - (expandableRowComponent != null ? 40 : 0) - (deleteMutation != null ? 80 : 0)}px` }}>
+        <div
+          className={`flex-grow flex gap-3 ${!showCheckbox ? 'pl-3' : ''}`}
+          style={{
+            minWidth: `${mainRowContentWidth - (expandableRowComponent != null ? 40 : 0) - (deleteMutation != null ? 80 : 0)}px`,
+            width: '100%',
+          }}
+        >
           {table.getHeaderGroups().map((headerGroup) => (
             <React.Fragment key={headerGroup.id}>
-              {headerGroup.headers.map((header) => (
+              {headerGroup.headers.map((header) => {
+                const headerAlignCenter = header.column.columnDef.meta?.align === 'center';
+                return (
                 <div
                   key={header.id}
-                  className={`${header.column.columnDef.meta?.className || ''} relative flex items-center h-12 ${header.column.getCanSort() ? 'cursor-pointer' : ''}`}
-                  style={{
-                    width: `${header.getSize()}px`,
-                    flexShrink: 0,
-                  }}
+                  className={`${header.column.columnDef.meta?.className || ''} ${header.column.id === 'selection' ? '' : 'min-w-0'} relative flex items-center h-12 ${header.column.getCanSort() ? 'cursor-pointer' : ''}`}
+                  style={getDataColumnStyle(header.column.id, header.getSize())}
                   onClick={header.column.getCanSort() ? header.column.getToggleSortingHandler() : undefined}
                 >
                   {header.column.columnDef.header === '' ? null : (
-                    <div className="flex items-center w-full">
-                      <span className="flex-1 min-w-0">
+                    <div className={`flex items-center w-full ${headerAlignCenter ? 'justify-center' : ''}`}>
+                      <span className={headerAlignCenter ? 'min-w-0 text-center' : 'flex-1 min-w-0'}>
                         {header.column.id === 'selection'
                           ? flexRender(header.column.columnDef.header, header.getContext())
                           : typeof header.column.columnDef.header === 'string'
@@ -444,7 +455,8 @@ const TableGrid = <T extends BaseRow,>({
                     </div>
                   )}
                 </div>
-              ))}
+                );
+              })}
             </React.Fragment>
           ))}
         </div>
@@ -469,19 +481,24 @@ const TableGrid = <T extends BaseRow,>({
             return (
               <div className="flex items-stretch mb-1">
                 <div className={`flex-grow bg-bg-secondary text-label-primary light ${compactRows ? 'py-1' : 'py-2'}`}>
-                  <div className={`flex items-center gap-3 ${!showCheckbox ? 'pl-3' : ''}`} style={{ minWidth: `${mainRowContentWidth - (expandableRowComponent != null ? 40 : 0) - (deleteMutation != null ? 80 : 0)}px` }}>
-                    {table.getHeaderGroups()[0]?.headers.map((header) => (
+                  <div
+                    className={`flex items-center gap-3 ${!showCheckbox ? 'pl-3' : ''}`}
+                    style={{
+                      minWidth: `${mainRowContentWidth - (expandableRowComponent != null ? 40 : 0) - (deleteMutation != null ? 80 : 0)}px`,
+                      width: '100%',
+                    }}
+                  >
+                    {table.getHeaderGroups()[0]?.headers.map((header) => {
+                      const emptyAlignCenter = header.column.columnDef.meta?.align === 'center';
+                      return (
                       <div
                         key={header.id}
-                        className={`flex items-center min-h-0 ${header.column.columnDef.meta?.className || ''}`}
-                        style={{
-                          width: `${header.getSize()}px`,
-                          flexShrink: 0,
-                        }}
+                        className={`flex items-center min-h-0 ${header.column.id === 'selection' ? '' : 'min-w-0'} ${emptyAlignCenter ? 'justify-center' : ''} ${header.column.columnDef.meta?.className || ''}`}
+                        style={getDataColumnStyle(header.column.id, header.getSize())}
                       >
                         <span className="text-label-secondary">-</span>
                       </div>
-                    ))}
+                    );})}
                   </div>
                 </div>
                 {expandableRowComponent && <div className="w-10 flex-shrink-0 bg-gray-300"></div>}
@@ -496,19 +513,24 @@ const TableGrid = <T extends BaseRow,>({
               {/* Primary Row */}
               <div className={`flex items-stretch ${expandedRows.has(row.original.id) ? 'mb-0' : 'mb-1'}`}>
                 <div className={`flex-grow bg-bg-secondary text-label-primary light ${compactRows ? 'py-1' : 'py-2'}`}>
-                  <div className={`flex items-center gap-3 ${!showCheckbox ? 'pl-3' : ''}`} style={{ minWidth: `${mainRowContentWidth - (expandableRowComponent != null ? 40 : 0) - (deleteMutation != null ? 80 : 0)}px` }}>
-                    {row.getVisibleCells().map((cell) => (
+                  <div
+                    className={`flex items-center gap-3 ${!showCheckbox ? 'pl-3' : ''}`}
+                    style={{
+                      minWidth: `${mainRowContentWidth - (expandableRowComponent != null ? 40 : 0) - (deleteMutation != null ? 80 : 0)}px`,
+                      width: '100%',
+                    }}
+                  >
+                    {row.getVisibleCells().map((cell) => {
+                      const cellAlignCenter = cell.column.columnDef.meta?.align === 'center';
+                      return (
                       <div
                         key={cell.id}
-                        className={`flex items-center min-h-0 ${cell.column.columnDef.meta?.className || ''}`}
-                        style={{
-                          width: `${cell.column.getSize()}px`,
-                          flexShrink: 0,
-                        }}
+                        className={`flex items-center min-h-0 ${cell.column.id === 'selection' ? '' : 'min-w-0'} ${cellAlignCenter ? 'justify-center' : ''} ${cell.column.columnDef.meta?.className || ''}`}
+                        style={getDataColumnStyle(cell.column.id, cell.column.getSize())}
                       >
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
                       </div>
-                    ))}
+                    );})}
                   </div>
                 </div>
                 {/* Add expand/collapse button here */}
@@ -542,7 +564,13 @@ const TableGrid = <T extends BaseRow,>({
               {expandableRowComponent && expandedRows.has(row.original.id) && (
                 <div className="flex items-stretch mb-1">
                   <div className="flex-grow bg-bg-secondary text-label-primary py-2 overflow-x-auto light">
-                    <div className={`flex items-center gap-3 ${!showCheckbox ? 'pl-3' : ''}`} style={{ minWidth: `${mainRowContentWidth - (expandableRowComponent != null ? 40 : 0) - (deleteMutation != null ? 80 : 0)}px` }}>
+                    <div
+                      className={`flex items-center gap-3 ${!showCheckbox ? 'pl-3' : ''}`}
+                      style={{
+                        minWidth: `${mainRowContentWidth - (expandableRowComponent != null ? 40 : 0) - (deleteMutation != null ? 80 : 0)}px`,
+                        width: '100%',
+                      }}
+                    >
                       <ExpandableRowWrapper
                         key={`expandableRow-${row.id}`}
                         renderFn={expandableRowComponent}

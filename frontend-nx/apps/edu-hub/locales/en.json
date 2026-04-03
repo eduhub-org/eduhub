@@ -448,7 +448,8 @@
       "proceed_to_payment": "Proceed to Payment",
       "submitting": "Submitting...",
       "success_message_approval": "Your application has been submitted successfully. You will receive an email notification once your application has been reviewed.",
-      "success_message_direct": "You have been successfully registered for this course. You will receive a confirmation email shortly."
+      "success_message_direct": "You have been successfully registered for this course. You will receive a confirmation email shortly.",
+      "success_message_waitlist": "You are on the waitlist for this course."
     },
     "errors": {
       "motivation_letter_required": "Please provide a motivation letter",
@@ -1060,6 +1061,7 @@
     },
     "email": "Email",
     "application": "Application",
+    "application_submitted_at": "Date",
     "evaluation": "Evaluation",
     "send_email_to_applicants": "Send Email to Applicants",
     "element_chat_welcome_prompt": "Please enter the Element chat and welcome your course participants.",
@@ -1241,6 +1243,7 @@
       "invitation_confirmed": "invitation confirmed",
       "registered": "Registered",
       "waitlist": "Waitlist",
+      "waitlist_badge": "WAITLIST",
       "aborted": "aborted",
       "rejected": "Rejected",
       "cancelled": "Cancelled",

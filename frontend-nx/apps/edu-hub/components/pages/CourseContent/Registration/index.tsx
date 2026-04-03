@@ -23,10 +23,10 @@ interface RegistrationProps {
    */
   courseEnrollment?: CourseWithEnrollment_Course_by_pk_CourseEnrollments;
   /**
-   * Optional callback function called after successful registration.
-   * Typically used to refetch course data and update the UI.
+   * Optional callback after successful enrollment creation.
+   * `waitlist` is true when the user was placed on the course waitlist (course full).
    */
-  onRegistrationSuccess?: () => void;
+  onRegistrationSuccess?: (info?: { waitlist: boolean }) => void;
 }
 
 /**
