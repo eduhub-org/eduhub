@@ -692,13 +692,40 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
         },
       ];
 
-      // Only include evaluation column for application process types
+      // Only include application date + evaluation columns for application process types
       if (features.hasApplicationProcess) {
+        baseColumns.push({
+          header: t('application_submitted_at'),
+          accessorKey: 'created_at',
+          size: 104,
+          enableSorting: true,
+          sortingFn: (rowA, rowB) => {
+            const ta = rowA.original.created_at
+              ? new Date(rowA.original.created_at as string).getTime()
+              : 0;
+            const tb = rowB.original.created_at
+              ? new Date(rowB.original.created_at as string).getTime()
+              : 0;
+            return ta - tb;
+          },
+          cell: ({ row }) => {
+            const raw = row.original.created_at;
+            if (raw == null) {
+              return <span className="text-label-secondary">—</span>;
+            }
+            return (
+              <span className="text-sm tabular-nums" title={String(raw)}>
+                {displayDate(raw)}
+              </span>
+            );
+          },
+        });
         baseColumns.push({
           header: t('evaluation'),
           accessorKey: 'motivationRating',
           size: 100,
           enableSorting: true,
+          meta: { align: 'center' },
           sortingFn: (rowA, rowB) => {
             return ratingSortFn(
               rowA.original.motivationRating,
@@ -708,7 +735,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
           cell: ({ row }) => {
             const rating = row.original.motivationRating;
             return (
-              <div className="text-center">
+              <div>
                 {rating === 'UNRATED' && <Dot color="grey" title={t('rating.not_rated')} />}
                 {rating === 'INVITE' && <Dot color="lightgreen" title={t('rating.invite')} />}
                 {rating === 'REVIEW' && <Dot color="orange" title={t('rating.unclear')} />}
@@ -748,11 +775,14 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
         sortingFn: (rowA, rowB) => {
           return statusSortFn(rowA.original.status, rowB.original.status);
         },
+        meta: {
+          align: 'center',
+        },
         cell: ({ row }) => {
           const enrollment = row.original;
           const expired = isExpired(enrollment);
           return (
-            <div className="text-center">
+            <div>
               {!expired && enrollment.status === 'APPLIED' && (
                 <GoDotFill className="inline" title={t('status.applied')} color="grey" size="1.5em" />
               )}
@@ -803,14 +833,11 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
             </div>
           );
         },
-        meta: {
-          className: 'ml-auto',
-        },
       });
 
       return baseColumns;
     },
-    [t, ratingSortFn, statusSortFn, features]
+    [t, ratingSortFn, statusSortFn, features, displayDate]
   );
 
   // Expandable row component

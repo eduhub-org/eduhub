@@ -331,6 +331,7 @@ export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_Cours
    */
   invitationExpirationDate: any | null;
   id: number;
+  created_at: any | null;
   /**
    * The users current enrollment status to this course
    */
@@ -514,6 +515,7 @@ export interface InsertEnrollment_insert_CourseEnrollment_returning {
    */
   invitationExpirationDate: any | null;
   id: number;
+  created_at: any | null;
   /**
    * The users current enrollment status to this course
    */

@@ -1061,6 +1061,7 @@
     },
     "email": "Email",
     "application": "Application",
+    "application_submitted_at": "Date",
     "evaluation": "Evaluation",
     "send_email_to_applicants": "Send Email to Applicants",
     "element_chat_welcome_prompt": "Please enter the Element chat and welcome your course participants.",
