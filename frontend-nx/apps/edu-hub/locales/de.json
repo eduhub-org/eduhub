@@ -448,7 +448,8 @@
       "proceed_to_payment": "Zur Zahlung",
       "submitting": "Wird gesendet...",
       "success_message_approval": "Deine Bewerbung wurde erfolgreich eingereicht. Du erhältst eine E-Mail-Benachrichtigung, sobald deine Bewerbung geprüft wurde.",
-      "success_message_direct": "Du wurdest erfolgreich für diesen Kurs registriert. Du erhältst in Kürze eine Bestätigungs-E-Mail."
+      "success_message_direct": "Du wurdest erfolgreich für diesen Kurs registriert. Du erhältst in Kürze eine Bestätigungs-E-Mail.",
+      "success_message_waitlist": "Du stehst auf der Warteliste für diesen Kurs."
     },
     "errors": {
       "motivation_letter_required": "Bitte schreib uns, warum du an diesem Kurs teilnehmen möchtest",

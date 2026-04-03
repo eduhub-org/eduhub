@@ -19,8 +19,8 @@ interface UseRegistrationHandlerProps {
   course: Course_Course_by_pk;
   /** Whether active participants reached the course capacity */
   isCourseFull: boolean;
-  /** Optional callback function called after successful registration */
-  onSuccess?: () => void;
+  /** Optional callback after successful enrollment creation; `waitlist` when the course was full */
+  onSuccess?: (info?: { waitlist: boolean }) => void;
 }
 
 /**
@@ -110,7 +110,7 @@ export const useRegistrationHandler = ({
         });
 
         if (result.data?.insert_CourseEnrollment?.affected_rows && result.data.insert_CourseEnrollment.affected_rows > 0) {
-          onSuccess?.();
+          onSuccess?.({ waitlist: status === CourseEnrollmentStatus_enum.WAITLIST });
           return {
             success: true,
             enrollmentId: result.data.insert_CourseEnrollment.returning?.[0]?.id,

@@ -39,6 +39,7 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
   const userId = useUserId();
   const [resetValues, setResetValues] = useState<boolean | null>(null);
   const [showSuccessSnackbar, setShowSuccessSnackbar] = useState(false);
+  const [registrationSuccessWaitlist, setRegistrationSuccessWaitlist] = useState(false);
   const getWeekdayStartAndEndString = useWeekdayStartAndEndString();
 
   // Query for authorized course data
@@ -100,13 +101,17 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
   }, [course?.coverImage]);
 
   // Handle registration success
-  const handleRegistrationSuccess = () => {
+  const handleRegistrationSuccess = (info?: { waitlist: boolean }) => {
+    setRegistrationSuccessWaitlist(!!info?.waitlist);
     setShowSuccessSnackbar(true);
     refetchCourse();
   };
 
-  // Get success message based on registration type
+  // Get success message based on registration type (waitlist vs approval vs direct)
   const getSuccessMessage = () => {
+    if (registrationSuccessWaitlist) {
+      return t('modal.success_message_waitlist');
+    }
     if (!course?.registrationType) return '';
 
     const registrationType = course.registrationType || CourseRegistrationType_enum.APPROVAL_WITH_INPUT;
@@ -264,7 +269,10 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
 
       <NotificationSnackbar
         open={showSuccessSnackbar}
-        onClose={() => setShowSuccessSnackbar(false)}
+        onClose={() => {
+          setShowSuccessSnackbar(false);
+          setRegistrationSuccessWaitlist(false);
+        }}
         message={getSuccessMessage()}
         duration={4000}
       />

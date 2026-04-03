@@ -448,7 +448,8 @@
       "proceed_to_payment": "Proceed to Payment",
       "submitting": "Submitting...",
       "success_message_approval": "Your application has been submitted successfully. You will receive an email notification once your application has been reviewed.",
-      "success_message_direct": "You have been successfully registered for this course. You will receive a confirmation email shortly."
+      "success_message_direct": "You have been successfully registered for this course. You will receive a confirmation email shortly.",
+      "success_message_waitlist": "You are on the waitlist for this course."
     },
     "errors": {
       "motivation_letter_required": "Please provide a motivation letter",
