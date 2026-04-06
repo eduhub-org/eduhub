@@ -8,16 +8,22 @@
 // ====================================================
 
 export interface UpdateProgramMatrixInstructorRoom_update_Program_by_pk {
-  __typename: 'Program';
+  __typename: "Program";
   id: number;
+  /**
+   * Matrix room id for the program-wide instructor Element chat (!room:server); invites are sent via admin API.
+   */
   matrixInstructorRoomId: string | null;
 }
 
 export interface UpdateProgramMatrixInstructorRoom {
+  /**
+   * update single row of the table: "Program"
+   */
   update_Program_by_pk: UpdateProgramMatrixInstructorRoom_update_Program_by_pk | null;
 }
 
 export interface UpdateProgramMatrixInstructorRoomVariables {
   itemId: number;
-  text: string | null;
+  text?: string | null;
 }

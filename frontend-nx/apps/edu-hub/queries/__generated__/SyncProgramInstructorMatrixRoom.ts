@@ -8,7 +8,7 @@
 // ====================================================
 
 export interface SyncProgramInstructorMatrixRoom_syncProgramInstructorMatrixRoom {
-  __typename: 'SyncProgramInstructorMatrixRoomResult';
+  __typename: "SyncProgramInstructorMatrixRoomResult";
   success: boolean;
   messageKey: string;
   invitedCount: number | null;
@@ -18,6 +18,9 @@ export interface SyncProgramInstructorMatrixRoom_syncProgramInstructorMatrixRoom
 }
 
 export interface SyncProgramInstructorMatrixRoom {
+  /**
+   * Invites all program course instructors to the configured Matrix instructor room
+   */
   syncProgramInstructorMatrixRoom: SyncProgramInstructorMatrixRoom_syncProgramInstructorMatrixRoom;
 }
 
