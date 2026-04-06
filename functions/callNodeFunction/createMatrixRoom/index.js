@@ -73,7 +73,7 @@ const SET_COURSE_ROOM_IF_EMPTY = `
   }
 `;
 
-const ALLOWED_ROLES = new Set(["admin", "admin-ras", "instructor_access", "instructor"]);
+const ALLOWED_ROLES = new Set(["admin", "instructor_access", "instructor"]);
 
 const trimAndNull = (value) => {
   if (value == null) return null;
@@ -299,7 +299,7 @@ const buildInstructorUsersMap = async ({ hasuraClient, courseId, serverName, log
 
 const MATRIX_FETCH_TIMEOUT_MS = 30_000;
 
-const ADMIN_ROLES = new Set(["admin", "admin-ras"]);
+const ADMIN_ROLES = new Set(["admin"]);
 
 const CHECK_INSTRUCTOR_ASSIGNMENT = `
   query CheckInstructorAssignment($courseId: Int!, $userId: uuid!) {

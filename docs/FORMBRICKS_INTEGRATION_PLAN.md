@@ -121,11 +121,11 @@ Add to `update_permissions` for `instructor_access`:
 Add to `select_permissions` for all roles that need it:
 
 ```yaml
-# Add this column to select_permissions for anonymous, instructor_access, admin-ras
+# Add this column to select_permissions for anonymous, instructor_access
 - defaultFormbricksEnrollmentSurveyUrl
 ```
 
-Add to `update_permissions` for `admin-ras`:
+Add to `update_permissions` for admin (as appropriate for your deployment):
 
 ```yaml
 # Add to update_permissions columns

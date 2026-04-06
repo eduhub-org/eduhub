@@ -23,6 +23,7 @@ import createEnrollmentWithAddons from "./createEnrollmentWithAddons/index.js";
 import syncGhostNewsletterSubscription from "./syncGhostNewsletterSubscription/index.js";
 import createMatrixRoom from "./createMatrixRoom/index.js";
 import updateMatrixInstructorPowerLevel from "./updateMatrixInstructorPowerLevel/index.js";
+import syncProgramInstructorMatrixRoom from "./syncProgramInstructorMatrixRoom/index.js";
 
 const require = createRequire(import.meta.url);
 let constantTimeSecretsEqual;
@@ -73,6 +74,7 @@ const functionMap = {
   createEnrollmentWithAddons,
   createMatrixRoom,
   updateMatrixInstructorPowerLevel,
+  syncProgramInstructorMatrixRoom,
   syncGhostNewsletterSubscription
 };
 
