@@ -1047,6 +1047,7 @@
     "evaluation": "Beurteilung",
     "send_email_to_applicants": "E-Mail an Bewerber senden",
     "element_chat_welcome_prompt": "Bitte begrüße deine Teilnehmenden im Element-Chat.",
+    "element_program_instructor_chat_prompt": "Tritt dem Programm-Instructor-Raum in Element bei, um dich mit anderen Instructor:innen abzustimmen.",
     "select_applicants_first": "Bitte wähle zuerst Bewerber aus",
     "bulk_actions": {
       "expand_collapse_rows": "Zeilen aus-/einklappen",
@@ -1409,6 +1410,14 @@
     "bulk_action": {
       "publish": "Ausgewählte veröffentlichen",
       "unpublish": "Ausgewählte zurückziehen"
+    },
+    "instructor_element_room": {
+      "label": "Element-Raum für Instructor:innen",
+      "placeholder": "Element-Raum-Link oder Matrix-Raum-ID einfügen (!raum:server)",
+      "help_text": "Alle Instructor:innen der Kurse dieses Programms werden zu diesem Raum eingeladen. Du kannst einen vollen Element-Link oder die Raum-ID einfügen; sie wird normalisiert gespeichert.",
+      "sync_in_progress": "Matrix-Einladungen werden gesendet…",
+      "sync_success": "Einladungen verarbeitet: {invited} gesendet, {skipped} übersprungen (bereits im Raum oder kein Matrix-Handle).",
+      "sync_error": "Nicht alle Matrix-Einladungen konnten gesendet werden. Prüfe die Server-Logs und die Raum-ID."
     },
     "notifications": {
       "programs_published_success_singular": "Programm wurde erfolgreich veröffentlicht",

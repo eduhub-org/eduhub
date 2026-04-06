@@ -122,6 +122,13 @@ type InputFieldProps = {
   updateValueMutation?: DocumentNode;
 
   /**
+   * Applied to the debounced text before sending `text` to `updateValueMutation` (e.g. normalize URLs).
+   * Does not change what the user sees in the field.
+   * Return `null` to persist an empty/cleared value when the mutation accepts nullable `String`.
+   */
+  transformMutationText?: (text: string) => string | null;
+
+  /**
    * Callback function called after successful text update.
    * @param data - The data returned from the mutation.
    */
@@ -205,6 +212,7 @@ const InputField: React.FC<InputFieldProps> = ({
   value,
   translationTabs,
   updateValueMutation,
+  transformMutationText,
   onValueUpdated,
   refetchQueries = [],
   helpText,
@@ -370,10 +378,16 @@ const InputField: React.FC<InputFieldProps> = ({
 
   const debouncedUpdateText = useDebouncedCallback((newText: string) => {
     if (validateInput(newText)) {
-      lastSentValueRef.current = newText;
       if (updateValueMutation) {
-        const textValue = type === 'number' ? Number.parseInt(newText, 10) : newText;
-        updateText({ variables: { itemId: effectiveItemIdRef.current, text: String(textValue) } });
+        const raw = type === 'number' ? Number.parseInt(newText, 10) : newText;
+        const asString = String(raw);
+        const transformed = transformMutationText ? transformMutationText(asString) : asString;
+        const textValue =
+          transformMutationText && (transformed === null || transformed === undefined)
+            ? null
+            : transformed ?? asString;
+        lastSentValueRef.current = textValue === null ? '' : String(textValue);
+        updateText({ variables: { itemId: effectiveItemIdRef.current, text: textValue } });
       } else if (onValueUpdated) {
         onValueUpdated({ text: newText });
       }

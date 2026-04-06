@@ -83,6 +83,7 @@ export interface ProgramList_Program {
    */
   visibility: boolean;
   matrixSpaceId: string | null;
+  matrixInstructorRoomId: string | null;
   /**
    * An array relationship
    */

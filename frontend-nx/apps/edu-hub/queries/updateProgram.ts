@@ -75,6 +75,18 @@ export const UPDATE_PROGRAM_SHORT_TITLE = gql`
   }
 `;
 
+export const UPDATE_PROGRAM_MATRIX_INSTRUCTOR_ROOM = gql`
+  mutation UpdateProgramMatrixInstructorRoom($itemId: Int!, $text: String) {
+    update_Program_by_pk(
+      pk_columns: { id: $itemId }
+      _set: { matrixInstructorRoomId: $text }
+    ) {
+      id
+      matrixInstructorRoomId
+    }
+  }
+`;
+
 export const UPDATE_ATTENDANCE_CERTIFICATE_TEMPLATE = gql`
   mutation UpdateProgramParticipationTemplate(
     $programId: Int!

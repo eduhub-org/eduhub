@@ -138,6 +138,7 @@ export const ADMIN_COURSE_FRAGMENT = gql`
     Program {
       ...ProgramFragmentMinimumProperties
       matrixSpaceId
+      matrixInstructorRoomId
     }
   }
 `;

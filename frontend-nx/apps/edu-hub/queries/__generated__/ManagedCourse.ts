@@ -216,6 +216,7 @@ export interface ManagedCourse_Course_by_pk_Program {
    */
   defaultFormbricksEnrollmentSurveyUrl: string | null;
   matrixSpaceId: string | null;
+  matrixInstructorRoomId: string | null;
 }
 
 export interface ManagedCourse_Course_by_pk_CourseGroups_CourseGroupOption {

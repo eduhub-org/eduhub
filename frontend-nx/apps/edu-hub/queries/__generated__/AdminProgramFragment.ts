@@ -78,4 +78,5 @@ export interface AdminProgramFragment {
    */
   visibility: boolean;
   matrixSpaceId: string | null;
+  matrixInstructorRoomId: string | null;
 }

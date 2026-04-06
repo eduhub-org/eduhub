@@ -1065,6 +1065,7 @@
     "evaluation": "Evaluation",
     "send_email_to_applicants": "Send Email to Applicants",
     "element_chat_welcome_prompt": "Please enter the Element chat and welcome your course participants.",
+    "element_program_instructor_chat_prompt": "Join the program instructor room in Element to coordinate with other instructors.",
     "select_applicants_first": "Please select applicants first",
     "bulk_actions": {
       "expand_collapse_rows": "Expand/Collapse Rows",
@@ -1424,6 +1425,14 @@
     "bulk_action": {
       "publish": "Publish Selected",
       "unpublish": "Unpublish Selected"
+    },
+    "instructor_element_room": {
+      "label": "Instructor Element room",
+      "placeholder": "Paste Element room link or Matrix room id (!room:server)",
+      "help_text": "All instructors of courses in this program are invited to this room. Paste a full Element URL or the room id; it is stored in normalized form.",
+      "sync_in_progress": "Sending Matrix invites…",
+      "sync_success": "Invites processed: {invited} sent, {skipped} skipped (already in room or no Matrix handle).",
+      "sync_error": "Could not send all Matrix invites. Check server logs and room id."
     },
     "notifications": {
       "programs_published_success_singular": "Program was successfully published",
