@@ -17,8 +17,10 @@ import { getRegistrationTypeConfig, RegistrationFormData, RegistrationResult } f
 interface UseRegistrationHandlerProps {
   /** Course data containing registration configuration and details */
   course: Course_Course_by_pk;
-  /** Optional callback function called after successful registration */
-  onSuccess?: () => void;
+  /** Whether active participants reached the course capacity */
+  isCourseFull: boolean;
+  /** Optional callback after successful enrollment creation; `waitlist` when the course was full */
+  onSuccess?: (info?: { waitlist: boolean }) => void;
 }
 
 /**
@@ -50,6 +52,7 @@ interface UseRegistrationHandlerProps {
  */
 export const useRegistrationHandler = ({
   course,
+  isCourseFull,
   onSuccess,
 }: UseRegistrationHandlerProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -87,9 +90,14 @@ export const useRegistrationHandler = ({
       setIsLoading(true);
       try {
         // Determine the correct status based on registration type
-        const status = config.isDirect 
-          ? CourseEnrollmentStatus_enum.CONFIRMED 
-          : CourseEnrollmentStatus_enum.APPLIED;
+        let status: CourseEnrollmentStatus_enum;
+        if (isCourseFull) {
+          status = CourseEnrollmentStatus_enum.WAITLIST;
+        } else if (config.isDirect) {
+          status = CourseEnrollmentStatus_enum.CONFIRMED;
+        } else {
+          status = CourseEnrollmentStatus_enum.APPLIED;
+        }
 
         const result = await updateEnrollmentMutation({
           variables: {
@@ -102,7 +110,7 @@ export const useRegistrationHandler = ({
         });
 
         if (result.data?.insert_CourseEnrollment?.affected_rows && result.data.insert_CourseEnrollment.affected_rows > 0) {
-          onSuccess?.();
+          onSuccess?.({ waitlist: status === CourseEnrollmentStatus_enum.WAITLIST });
           return {
             success: true,
             enrollmentId: result.data.insert_CourseEnrollment.returning?.[0]?.id,
@@ -117,7 +125,7 @@ export const useRegistrationHandler = ({
         setIsLoading(false);
       }
     },
-    [course.id, updateEnrollmentMutation, userId, onSuccess, config.isDirect]
+    [course.id, updateEnrollmentMutation, userId, onSuccess, config.isDirect, isCourseFull]
   );
 
   const handlePaymentRegistration = useCallback(
@@ -187,6 +195,17 @@ export const useRegistrationHandler = ({
       return;
     }
 
+    if (isCourseFull) {
+      // Waitlist: only open the modal when there is an application form (survey or motivation letter).
+      // Payment UI and createEnrollmentWithAddons must not run for full courses; submit goes to WAITLIST.
+      if (config.requiresInput) {
+        setIsModalOpen(true);
+        return;
+      }
+      handleDirectRegistration();
+      return;
+    }
+
     if (config.isExternal) {
       handleExternalRegistration();
       return;
@@ -202,17 +221,21 @@ export const useRegistrationHandler = ({
     if (config.isDirect) {
       handleDirectRegistration();
     }
-  }, [userId, handleLogin, config, handleExternalRegistration, handleDirectRegistration]);
+  }, [userId, handleLogin, config, handleExternalRegistration, handleDirectRegistration, isCourseFull]);
 
   const submitRegistration = useCallback(
     async (formData: RegistrationFormData): Promise<RegistrationResult> => {
+      if (isCourseFull) {
+        return handleDirectRegistration(formData);
+      }
+
       if (config.requiresPayment) {
         return handlePaymentRegistration(formData);
       }
 
       return handleDirectRegistration(formData);
     },
-    [config.requiresPayment, handlePaymentRegistration, handleDirectRegistration]
+    [config.requiresPayment, handlePaymentRegistration, handleDirectRegistration, isCourseFull]
   );
 
   const retryPayment = useCallback(

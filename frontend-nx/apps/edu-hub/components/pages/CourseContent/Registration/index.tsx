@@ -23,10 +23,10 @@ interface RegistrationProps {
    */
   courseEnrollment?: CourseWithEnrollment_Course_by_pk_CourseEnrollments;
   /**
-   * Optional callback function called after successful registration.
-   * Typically used to refetch course data and update the UI.
+   * Optional callback after successful enrollment creation.
+   * `waitlist` is true when the user was placed on the course waitlist (course full).
    */
-  onRegistrationSuccess?: () => void;
+  onRegistrationSuccess?: (info?: { waitlist: boolean }) => void;
 }
 
 /**
@@ -49,9 +49,13 @@ interface RegistrationProps {
  */
 export const Registration: FC<RegistrationProps> = ({ course, courseEnrollment, onRegistrationSuccess }) => {
   const isLoggedIn = useIsLoggedIn();
+  const isCourseFull =
+    course.maxParticipants != null &&
+    (course.activeParticipantCount ?? 0) >= course.maxParticipants;
 
   const registrationHandler = useRegistrationHandler({
     course,
+    isCourseFull,
     onSuccess: onRegistrationSuccess,
   });
 
@@ -76,6 +80,7 @@ export const Registration: FC<RegistrationProps> = ({ course, courseEnrollment, 
           onSubmit={registrationHandler.submitRegistration}
           isLoading={registrationHandler.isLoading}
           retryEnrollmentId={registrationHandler.retryEnrollmentId}
+          isCourseFull={isCourseFull && !registrationHandler.retryEnrollmentId}
         />
       </div>
     );
@@ -84,12 +89,13 @@ export const Registration: FC<RegistrationProps> = ({ course, courseEnrollment, 
   // If not logged in: for external link registration, open link directly; otherwise prompt login
   if (!isLoggedIn) {
     const isExternalWithLink =
-      registrationHandler.config.isExternal && course.externalRegistrationLink;
+      !isCourseFull && registrationHandler.config.isExternal && course.externalRegistrationLink;
     return (
       <div className="w-full">
         <RegistrationButton
           course={course}
           registrationType={course.registrationType || CourseRegistrationType_enum.APPROVAL_WITH_INPUT}
+          isCourseFull={isCourseFull}
           onClick={
             isExternalWithLink
               ? registrationHandler.handleExternalRegistration
@@ -106,6 +112,7 @@ export const Registration: FC<RegistrationProps> = ({ course, courseEnrollment, 
       <RegistrationButton
         course={course}
         registrationType={course.registrationType || CourseRegistrationType_enum.APPROVAL_WITH_INPUT}
+        isCourseFull={isCourseFull}
         onClick={registrationHandler.handleRegistration}
       />
       <RegistrationModal
@@ -116,6 +123,7 @@ export const Registration: FC<RegistrationProps> = ({ course, courseEnrollment, 
         onSubmit={registrationHandler.submitRegistration}
         isLoading={registrationHandler.isLoading}
         retryEnrollmentId={registrationHandler.retryEnrollmentId}
+        isCourseFull={isCourseFull && !registrationHandler.retryEnrollmentId}
       />
     </div>
   );

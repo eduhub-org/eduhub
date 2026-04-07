@@ -558,6 +558,7 @@ export enum CourseEnrollmentStatus_enum {
   INVITED = "INVITED",
   REGISTERED = "REGISTERED",
   REJECTED = "REJECTED",
+  WAITLIST = "WAITLIST",
 }
 
 /**
@@ -1377,6 +1378,7 @@ export enum Program_select_column {
   id = "id",
   lectureEnd = "lectureEnd",
   lectureStart = "lectureStart",
+  matrixInstructorRoomId = "matrixInstructorRoomId",
   matrixSpaceId = "matrixSpaceId",
   organizationId = "organizationId",
   published = "published",
@@ -1421,6 +1423,7 @@ export enum Program_update_column {
   id = "id",
   lectureEnd = "lectureEnd",
   lectureStart = "lectureStart",
+  matrixInstructorRoomId = "matrixInstructorRoomId",
   matrixSpaceId = "matrixSpaceId",
   organizationId = "organizationId",
   published = "published",
@@ -5445,6 +5448,7 @@ export interface Course_bool_exp {
   _not?: Course_bool_exp | null;
   _or?: Course_bool_exp[] | null;
   achievementCertificatePossible?: Boolean_comparison_exp | null;
+  activeParticipantCount?: bigint_comparison_exp | null;
   applicationEnd?: date_comparison_exp | null;
   attendanceCertificatePossible?: Boolean_comparison_exp | null;
   basePrice?: Int_comparison_exp | null;
@@ -5636,6 +5640,7 @@ export interface Course_order_by {
   Sessions_aggregate?: Session_aggregate_order_by | null;
   Weekday?: Weekday_order_by | null;
   achievementCertificatePossible?: order_by | null;
+  activeParticipantCount?: order_by | null;
   applicationEnd?: order_by | null;
   attendanceCertificatePossible?: order_by | null;
   basePrice?: order_by | null;
@@ -7498,6 +7503,7 @@ export interface Program_bool_exp {
   id?: Int_comparison_exp | null;
   lectureEnd?: date_comparison_exp | null;
   lectureStart?: date_comparison_exp | null;
+  matrixInstructorRoomId?: String_comparison_exp | null;
   matrixSpaceId?: String_comparison_exp | null;
   organizationId?: Int_comparison_exp | null;
   published?: Boolean_comparison_exp | null;
@@ -7530,6 +7536,7 @@ export interface Program_insert_input {
   id?: number | null;
   lectureEnd?: any | null;
   lectureStart?: any | null;
+  matrixInstructorRoomId?: string | null;
   matrixSpaceId?: string | null;
   organizationId?: number | null;
   published?: boolean | null;
@@ -7558,6 +7565,7 @@ export interface Program_max_order_by {
   id?: order_by | null;
   lectureEnd?: order_by | null;
   lectureStart?: order_by | null;
+  matrixInstructorRoomId?: order_by | null;
   matrixSpaceId?: order_by | null;
   organizationId?: order_by | null;
   shortTitle?: order_by | null;
@@ -7583,6 +7591,7 @@ export interface Program_min_order_by {
   id?: order_by | null;
   lectureEnd?: order_by | null;
   lectureStart?: order_by | null;
+  matrixInstructorRoomId?: order_by | null;
   matrixSpaceId?: order_by | null;
   organizationId?: order_by | null;
   shortTitle?: order_by | null;
@@ -7629,6 +7638,7 @@ export interface Program_order_by {
   id?: order_by | null;
   lectureEnd?: order_by | null;
   lectureStart?: order_by | null;
+  matrixInstructorRoomId?: order_by | null;
   matrixSpaceId?: order_by | null;
   organizationId?: order_by | null;
   published?: order_by | null;
@@ -8777,6 +8787,21 @@ export interface Weekday_on_conflict {
 export interface Weekday_order_by {
   comment?: order_by | null;
   value?: order_by | null;
+}
+
+/**
+ * Boolean expression to compare columns of type "bigint". All fields are combined with logical 'AND'.
+ */
+export interface bigint_comparison_exp {
+  _eq?: any | null;
+  _gt?: any | null;
+  _gte?: any | null;
+  _in?: any[] | null;
+  _is_null?: boolean | null;
+  _lt?: any | null;
+  _lte?: any | null;
+  _neq?: any | null;
+  _nin?: any[] | null;
 }
 
 /**

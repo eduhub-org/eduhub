@@ -1,7 +1,8 @@
-import { FC } from 'react';
+import { FC, useCallback, useState } from 'react';
 import { CircularProgress } from '@mui/material';
 import { useTranslations } from 'next-intl';
 import { useLazyRoleQuery } from '../../../hooks/authedQuery';
+import { useAdminMutation } from '../../../hooks/authedMutation';
 import { ProgramList_Program } from '../../../queries/__generated__/ProgramList';
 import {
   SAVE_ACHIEVEMENT_CERTIFICATE_TEMPLATE,
@@ -16,7 +17,14 @@ import {
   UPDATE_ClOSING_QUESTIONAIRE,
   UPDATE_DEFAULT_ENROLLMENT_SURVEY,
   UPDATE_PROGRAM_SHORT_TITLE,
+  UPDATE_PROGRAM_MATRIX_INSTRUCTOR_ROOM,
 } from '../../../queries/updateProgram';
+import { SYNC_PROGRAM_INSTRUCTOR_MATRIX_ROOM } from '../../../queries/syncProgramInstructorMatrixRoom';
+import {
+  SyncProgramInstructorMatrixRoom,
+  SyncProgramInstructorMatrixRoomVariables,
+} from '../../../queries/__generated__/SyncProgramInstructorMatrixRoom';
+import { normalizeMatrixRoomId, isValidMatrixRoomId } from '../../../utils/matrixRoom';
 import {
   loadParticipationData,
   loadParticipationDataVariables,
@@ -24,13 +32,70 @@ import {
 import InputField from '../../inputs/InputField';
 import { Button } from '../../common/Button';
 import FileUploadField from '../../inputs/FileUploadField';
+import NotificationSnackbar from '../../common/dialogs/NotificationSnackbar';
 interface ExpandableProgramRowProps {
   program: ProgramList_Program;
 }
 
 const ExpandableProgramRow: FC<ExpandableProgramRowProps> = ({ program }) => {
   const t = useTranslations('managePrograms');
+  const [syncNotice, setSyncNotice] = useState<{ open: boolean; message: string }>({
+    open: false,
+    message: '',
+  });
 
+  const [syncProgramInstructorRoom, { loading: syncLoading }] = useAdminMutation<
+    SyncProgramInstructorMatrixRoom,
+    SyncProgramInstructorMatrixRoomVariables
+  >(SYNC_PROGRAM_INSTRUCTOR_MATRIX_ROOM);
+
+  const transformMatrixInstructorRoomInput = useCallback((raw: string): string | null => {
+    const trimmed = raw.trim();
+    if (!trimmed) return null;
+    const normalized = normalizeMatrixRoomId(trimmed);
+    if (!normalized || !isValidMatrixRoomId(normalized)) return null;
+    return normalized;
+  }, []);
+
+  const handleMatrixInstructorRoomSaved = useCallback(
+    async (data: { update_Program_by_pk?: { matrixInstructorRoomId?: string | null } | null }) => {
+      const roomId = data?.update_Program_by_pk?.matrixInstructorRoomId?.trim() ?? '';
+      if (!roomId) {
+        return;
+      }
+      if (!isValidMatrixRoomId(roomId)) {
+        setSyncNotice({
+          open: true,
+          message: t('instructor_element_room.invalid_room_id'),
+        });
+        return;
+      }
+      try {
+        const res = await syncProgramInstructorRoom({ variables: { programId: program.id } });
+        const payload = res.data?.syncProgramInstructorMatrixRoom;
+        if (payload?.success) {
+          setSyncNotice({
+            open: true,
+            message: t('instructor_element_room.sync_success', {
+              invited: payload.invitedCount ?? 0,
+              skipped: payload.skippedCount ?? 0,
+            }),
+          });
+        } else {
+          setSyncNotice({
+            open: true,
+            message: payload?.error || t('instructor_element_room.sync_error'),
+          });
+        }
+      } catch (e) {
+        setSyncNotice({
+          open: true,
+          message: e instanceof Error ? e.message : t('instructor_element_room.sync_error'),
+        });
+      }
+    },
+    [program.id, syncProgramInstructorRoom, t]
+  );
 
   const [
     loadParticipationData,
@@ -49,6 +114,12 @@ const ExpandableProgramRow: FC<ExpandableProgramRowProps> = ({ program }) => {
 
   return (
     <div className="w-full flex-1 min-w-0">
+      <NotificationSnackbar
+        open={syncNotice.open}
+        message={syncNotice.message}
+        duration={6000}
+        onClose={() => setSyncNotice((s) => ({ ...s, open: false }))}
+      />
       <div className="bg-fill-primary text-label-primary p-6 w-full">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
           {/* Left Column */}
@@ -66,6 +137,31 @@ const ExpandableProgramRow: FC<ExpandableProgramRowProps> = ({ program }) => {
                 updateValueMutation={UPDATE_PROGRAM_SHORT_TITLE}
                 refetchQueries={['ProgramList']}
               />
+            </div>
+
+            {/* Instructor Element room (program-wide) */}
+            <div className="bg-fill-primary border border-border-primary rounded-lg p-4">
+              <InputField
+                variant="material"
+                type="input"
+                maxLength={500}
+                label={t('instructor_element_room.label')}
+                placeholder={t('instructor_element_room.placeholder')}
+                helpText={t('instructor_element_room.help_text')}
+                itemId={program.id}
+                value={program.matrixInstructorRoomId ?? ''}
+                updateValueMutation={UPDATE_PROGRAM_MATRIX_INSTRUCTOR_ROOM}
+                transformMutationText={transformMatrixInstructorRoomInput}
+                transformRejectedMessage={t('instructor_element_room.invalid_room_id')}
+                onValueUpdated={handleMatrixInstructorRoomSaved}
+                refetchQueries={['ProgramList']}
+              />
+              {syncLoading ? (
+                <div className="mt-2 flex items-center gap-2 text-sm text-label-secondary">
+                  <CircularProgress size={18} />
+                  {t('instructor_element_room.sync_in_progress')}
+                </div>
+              ) : null}
             </div>
 
             {/* 1. Questionnaires Card */}

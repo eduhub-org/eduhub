@@ -105,6 +105,7 @@
     "ABORTED": "aborted",
     "COMPLETED": "completed",
     "CANCELLED": "canceled",
+    "WAITLIST": "waitlist",
     "password": "Password",
     "employmentStatus": "Employment Status",
     "nameOfUniversity": "Name of University",
@@ -215,7 +216,8 @@
       "invalid_maximum_integer": "The value must be at most {max}",
       "invalid_minimum_maximum_integer": "The value must be at least {min} and at most {max}",
       "invalid_integer_format": "The value must be an integer",
-      "invalid_input": "Invalid input"
+      "invalid_input": "Invalid input",
+      "transform_rejected": "This value could not be saved in the expected format."
     },
     "server_side_combobox": {
       "create_option": "Create new entry \"{option}\"",
@@ -384,6 +386,7 @@
       "application_deadline": "Application deadline: ",
       "registration_deadline": "Registration deadline: ",
       "apply_now": "Apply now",
+      "join_waitlist": "Join Waitlist",
       "register_external": "Register via External Link",
       "register_with_payment": "Register Now",
       "register_now": "Register Now",
@@ -400,6 +403,8 @@
       "invitation_expired": "Your invitation has expired",
       "payment_pending": "Your payment has not been completed yet. You can review your selections and try again.",
       "payment_failed": "Your payment could not be processed. You can review your selections and try again.",
+      "waitlist": "You are on the waitlist. The course is currently full. We will inform you if a spot becomes available.",
+      "course_full_notice": "This course is currently full. You can join the waitlist.",
       "application_period_ended": "Unfortunately, the application period has ended. You can subscribe to our <a>newsletter</a> to stay informed about new offers.",
       "application_period_ended_title": "Application Period Ended",
       "registration_period_ended": "Unfortunately, the registration period has ended. You can subscribe to our <a>newsletter</a> to stay informed about new offers.",
@@ -444,7 +449,8 @@
       "proceed_to_payment": "Proceed to Payment",
       "submitting": "Submitting...",
       "success_message_approval": "Your application has been submitted successfully. You will receive an email notification once your application has been reviewed.",
-      "success_message_direct": "You have been successfully registered for this course. You will receive a confirmation email shortly."
+      "success_message_direct": "You have been successfully registered for this course. You will receive a confirmation email shortly.",
+      "success_message_waitlist": "You are on the waitlist for this course."
     },
     "errors": {
       "motivation_letter_required": "Please provide a motivation letter",
@@ -822,6 +828,7 @@
     "not_authenticated": "You need to be logged in to view your certificates.",
     "errorMessages": {
       "certificate_not_found": "Certificate not found",
+      "certificate_download_error": "Failed to download certificate. Please try again.",
       "linkedin_share_error": "Failed to share certificate on LinkedIn. Please try again later."
     }
   },
@@ -1055,9 +1062,11 @@
     },
     "email": "Email",
     "application": "Application",
+    "application_submitted_at": "Date",
     "evaluation": "Evaluation",
     "send_email_to_applicants": "Send Email to Applicants",
     "element_chat_welcome_prompt": "Please enter the Element chat and welcome your course participants.",
+    "element_program_instructor_chat_prompt": "Join the program instructor room in Element to coordinate with other instructors.",
     "select_applicants_first": "Please select applicants first",
     "bulk_actions": {
       "expand_collapse_rows": "Expand/Collapse Rows",
@@ -1068,6 +1077,7 @@
       "email_all_invited": "Email all Invited",
       "email_all_applied": "Email all Applied",
       "email_all_rejected": "Email all Rejected",
+      "email_all_waitlist": "Email all on Waitlist",
       "email_all_invite_rating": "Email all with Rating 'Invite'",
       "email_all_decline_rating": "Email all with Rating 'Decline'",
       "email_all_review_rating": "Email all with Rating 'Review'",
@@ -1164,7 +1174,7 @@
     "max_participants": {
       "label": "Maximum number of participants",
       "placeholder": "Maximum number of participants",
-      "help_text": "The maximum number of participants is used as information for admission."
+      "help_text": "After the maximum number of participants is reached, users can only join the waitlist."
     },
     "formbricks": {
       "title": "Enrollment Questionnaire",
@@ -1234,6 +1244,8 @@
       "invited": "Invited",
       "invitation_confirmed": "invitation confirmed",
       "registered": "Registered",
+      "waitlist": "Waitlist",
+      "waitlist_badge": "WAITLIST",
       "aborted": "aborted",
       "rejected": "Rejected",
       "cancelled": "Cancelled",
@@ -1414,6 +1426,15 @@
     "bulk_action": {
       "publish": "Publish Selected",
       "unpublish": "Unpublish Selected"
+    },
+    "instructor_element_room": {
+      "label": "Instructor Element room",
+      "placeholder": "Paste Element room link or Matrix room id (!room:server)",
+      "help_text": "All instructors of courses in this program are invited to this room. Paste a full Element URL or the room id; it is stored in normalized form.",
+      "sync_in_progress": "Sending Matrix invites…",
+      "sync_success": "Invites processed: {invited} sent, {skipped} skipped (already in room or no Matrix handle).",
+      "sync_error": "Could not send all Matrix invites. Check server logs and room id.",
+      "invalid_room_id": "The input could not be recognized as a valid Matrix room id (!room:server). Please check the value and try again."
     },
     "notifications": {
       "programs_published_success_singular": "Program was successfully published",

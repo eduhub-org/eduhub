@@ -848,7 +848,10 @@ function ExpandableRowContent({
 
       setDownloadError(null);
       try {
-        const result = await getDoc({ variables: { path: docPath } });
+        const result = await getDoc({
+          variables: { path: docPath },
+          fetchPolicy: 'network-only',
+        });
         const signedUrl = result.data?.getSignedUrl?.link;
         if (signedUrl) {
           window.open(signedUrl, '_blank', 'noopener,noreferrer');

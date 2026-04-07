@@ -49,6 +49,7 @@ export const COURSE_FRAGMENT = gql`
     attendanceCertificatePossible
     programId
     maxParticipants
+    activeParticipantCount
     learningGoals
     headingDescriptionField1
     contentDescriptionField1
@@ -137,6 +138,7 @@ export const ADMIN_COURSE_FRAGMENT = gql`
     Program {
       ...ProgramFragmentMinimumProperties
       matrixSpaceId
+      matrixInstructorRoomId
     }
   }
 `;
@@ -160,6 +162,7 @@ export const COURSE_FRAGMENT_MINIMUM = gql`
     chatLink
     published
     maxParticipants
+    activeParticipantCount
     endTime
     startTime
     registrationType
@@ -188,6 +191,7 @@ export const COURSE_FRAGMENT_ANONYMOUS = gql`
     attendanceCertificatePossible
     programId
     maxParticipants
+    activeParticipantCount
     learningGoals
     headingDescriptionField1
     contentDescriptionField1

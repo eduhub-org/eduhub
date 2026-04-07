@@ -331,6 +331,7 @@ export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_Cours
    */
   invitationExpirationDate: any | null;
   id: number;
+  created_at: any | null;
   /**
    * The users current enrollment status to this course
    */
@@ -412,6 +413,10 @@ export interface InsertEnrollment_insert_CourseEnrollment_returning_Course {
    * The number of maximum participants in the course.
    */
   maxParticipants: number | null;
+  /**
+   * A computed field, executes function "course_active_participant_count"
+   */
+  activeParticipantCount: any | null;
   /**
    * An array of texts including the learning goals for the course
    */
@@ -510,6 +515,7 @@ export interface InsertEnrollment_insert_CourseEnrollment_returning {
    */
   invitationExpirationDate: any | null;
   id: number;
+  created_at: any | null;
   /**
    * The users current enrollment status to this course
    */

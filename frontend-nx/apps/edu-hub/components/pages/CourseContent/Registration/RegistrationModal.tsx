@@ -39,6 +39,12 @@ interface RegistrationModalProps {
   isLoading: boolean;
   /** Optional enrollment ID for retry payment flow - triggers prefilled survey */
   retryEnrollmentId?: number | null;
+  /**
+   * When the course is at capacity, registration must go to the waitlist: skip payment enrollment
+   * creation, summary step, and payment-only validation; submit uses the same handler as normal
+   * but the parent resolves to WAITLIST.
+   */
+  isCourseFull?: boolean;
 }
 
 /**
@@ -73,6 +79,7 @@ export const RegistrationModal: FC<RegistrationModalProps> = ({
   onSubmit,
   isLoading,
   retryEnrollmentId,
+  isCourseFull = false,
 }) => {
   const t = useTranslations('course');
   const router = useRouter();
@@ -183,6 +190,10 @@ export const RegistrationModal: FC<RegistrationModalProps> = ({
 
   // Determine current step for payment flows
   const currentStep: ModalStep = useMemo(() => {
+    // Full course / waitlist: never show the payment summary step
+    if (isCourseFull) {
+      return 'questionnaire';
+    }
     if (!config.requiresPayment) {
       // Non-payment flows don't use steps
       return 'questionnaire';
@@ -192,7 +203,7 @@ export const RegistrationModal: FC<RegistrationModalProps> = ({
       return 'questionnaire';
     }
     return 'summary';
-  }, [config, useFormbricks, formbricksSurveyCompleted]);
+  }, [config, useFormbricks, formbricksSurveyCompleted, isCourseFull]);
 
   // Format price helper
   const formatPrice = useCallback((priceInCents: number, currency: string): string => {
@@ -223,7 +234,26 @@ export const RegistrationModal: FC<RegistrationModalProps> = ({
     }
     
     setFormbricksSurveyCompleted(true);
-    
+
+    // Waitlist: same as non-payment — submit once; do not create APPLIED enrollment for Stripe flow
+    if (isCourseFull) {
+      setIsFetchingAddons(false);
+      try {
+        const result = await onSubmit({
+          motivationLetter: '[Formbricks Survey Completed]',
+          acceptTerms: false,
+        });
+        if (result.success) {
+          closeModal();
+        } else {
+          setError(result.error || t('errors.registration_failed'));
+        }
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : t('errors.registration_failed'));
+      }
+      return;
+    }
+
     // For payment flows, create enrollment with addons and show summary
     if (config.requiresPayment && effectiveSurveyUrl && userId) {
       setIsFetchingAddons(true);
@@ -277,7 +307,19 @@ export const RegistrationModal: FC<RegistrationModalProps> = ({
       // Payment flow but no survey URL - proceed with empty addons
       setSelectedAddons([]);
     }
-  }, [onSubmit, closeModal, t, isLoading, formbricksSurveyCompleted, config, effectiveSurveyUrl, userId, course.id, createEnrollmentWithAddons]);
+  }, [
+    onSubmit,
+    closeModal,
+    t,
+    isLoading,
+    formbricksSurveyCompleted,
+    config,
+    effectiveSurveyUrl,
+    userId,
+    course.id,
+    createEnrollmentWithAddons,
+    isCourseFull,
+  ]);
 
   const handleSubmit = useCallback(async () => {
     // If using Formbricks and survey not completed, don't allow submit
@@ -291,34 +333,38 @@ export const RegistrationModal: FC<RegistrationModalProps> = ({
       return;
     }
 
-    if (config.requiresPayment && !acceptTerms) {
-      setError(t('errors.terms_required'));
-      return;
-    }
-
-    // Validate that there's something to charge for payment flows
-    if (config.requiresPayment) {
-      const hasBasePrice = basePrice > 0;
-      const hasAddons = selectedAddons.length > 0 && selectedAddons.some(addon => addon.validatedPrice > 0);
-      
-      if (!hasBasePrice && !hasAddons) {
-        setError(t('errors.no_items_to_charge'));
+    if (!isCourseFull) {
+      if (config.requiresPayment && !acceptTerms) {
+        setError(t('errors.terms_required'));
         return;
       }
 
-      // Validate currency consistency
-      if (currencyMismatch) {
-        setError(t('errors.currency_mismatch') || 'All add-ons must use the same currency as the course');
-        return;
+      // Validate that there's something to charge for payment flows
+      if (config.requiresPayment) {
+        const hasBasePrice = basePrice > 0;
+        const hasAddons = selectedAddons.length > 0 && selectedAddons.some((addon) => addon.validatedPrice > 0);
+
+        if (!hasBasePrice && !hasAddons) {
+          setError(t('errors.no_items_to_charge'));
+          return;
+        }
+
+        // Validate currency consistency
+        if (currencyMismatch) {
+          setError(t('errors.currency_mismatch') || 'All add-ons must use the same currency as the course');
+          return;
+        }
       }
     }
 
     setError(null);
 
     const result = await onSubmit({
-      motivationLetter: motivationLetter.trim(),
-      acceptTerms,
-      enrollmentId: config.requiresPayment ? (enrollmentId ?? undefined) : undefined,
+      motivationLetter: useFormbricks
+        ? '[Formbricks Survey Completed]'
+        : motivationLetter.trim(),
+      acceptTerms: isCourseFull ? false : acceptTerms,
+      enrollmentId: !isCourseFull && config.requiresPayment ? (enrollmentId ?? undefined) : undefined,
     });
 
     if (result.success) {
@@ -327,7 +373,22 @@ export const RegistrationModal: FC<RegistrationModalProps> = ({
     } else {
       setError(result.error || t('errors.registration_failed'));
     }
-  }, [config, motivationLetter, acceptTerms, onSubmit, t, closeModal, useFormbricks, formbricksSurveyCompleted, currentStep, basePrice, enrollmentId, selectedAddons, currencyMismatch]);
+  }, [
+    config,
+    motivationLetter,
+    acceptTerms,
+    onSubmit,
+    t,
+    closeModal,
+    useFormbricks,
+    formbricksSurveyCompleted,
+    currentStep,
+    basePrice,
+    enrollmentId,
+    selectedAddons,
+    currencyMismatch,
+    isCourseFull,
+  ]);
 
   const handleClose = useCallback(() => {
     if (!isLoading) {
@@ -356,21 +417,42 @@ export const RegistrationModal: FC<RegistrationModalProps> = ({
   const isSubmitDisabled = useMemo(() => {
     if (isLoading) return true;
     if (isFetchingAddons) return true;
-    
+
+    if (isCourseFull) {
+      if (useFormbricks) {
+        return !formbricksSurveyCompleted;
+      }
+      if (config.requiresInput) {
+        return !motivationLetter.trim();
+      }
+      return false;
+    }
+
     if (config.requiresPayment && currentStep === 'summary') {
       return !acceptTerms || currencyMismatch;
     }
-    
+
     if (useFormbricks) {
       return !formbricksSurveyCompleted;
     }
-    
+
     if (config.requiresInput) {
       return !motivationLetter.trim();
     }
-    
+
     return false;
-  }, [isLoading, isFetchingAddons, config, currentStep, acceptTerms, currencyMismatch, useFormbricks, formbricksSurveyCompleted, motivationLetter]);
+  }, [
+    isLoading,
+    isFetchingAddons,
+    config,
+    currentStep,
+    acceptTerms,
+    currencyMismatch,
+    useFormbricks,
+    formbricksSurveyCompleted,
+    motivationLetter,
+    isCourseFull,
+  ]);
 
   const renderQuestionnaireStep = () => (
     <>
@@ -562,8 +644,13 @@ export const RegistrationModal: FC<RegistrationModalProps> = ({
         {currentStep === 'summary' && renderSummaryStep()}
       </DialogContent>
 
-      {/* Submit button - show for summary step or non-payment flows */}
-      {(currentStep === 'summary' || (!config.requiresPayment && (!useFormbricks || formbricksSurveyCompleted))) && (
+      {/* Submit button - show for summary step or non-payment flows; waitlist shows actions on questionnaire after survey or with motivation text */}
+      {(currentStep === 'summary' ||
+        (!config.requiresPayment && (!useFormbricks || formbricksSurveyCompleted)) ||
+        (isCourseFull &&
+          currentStep === 'questionnaire' &&
+          ((!useFormbricks && config.requiresInput && motivationLetter.trim().length > 0) ||
+            (useFormbricks && formbricksSurveyCompleted)))) && (
         <DialogActions sx={{ padding: { xs: '16px', sm: '24px' }, paddingTop: 0 }} className="light">
           <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-3 w-full">
             <Button onClick={handleClose} disabled={isLoading} className="px-6 py-3 w-full sm:w-auto order-2 sm:order-1">
@@ -580,7 +667,7 @@ export const RegistrationModal: FC<RegistrationModalProps> = ({
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-label-primary"></div>
                   <span>{t('modal.submitting')}</span>
                 </div>
-              ) : config.requiresPayment ? (
+              ) : config.requiresPayment && !isCourseFull ? (
                 t('modal.proceed_to_payment')
               ) : (
                 t('modal.submit')

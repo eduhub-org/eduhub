@@ -48,6 +48,7 @@ export const TimeSeriesLineChart: FC<TimeSeriesLineChartProps> = ({ data, series
               name={serie.label}
               stroke={`hsl(${(index * 137.5) % 360}, 70%, 50%)`}
               strokeWidth={2}
+              connectNulls={false}
             />
           ))}
         </LineChart>

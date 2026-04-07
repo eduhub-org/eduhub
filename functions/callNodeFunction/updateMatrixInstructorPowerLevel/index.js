@@ -1,4 +1,11 @@
 import { GraphQLClient } from "graphql-request";
+import { trimAndNull, normalizeMatrixRoomId, isValidMatrixRoomId } from "../lib/matrixRoomUtils.js";
+import {
+  ensureBotJoinedMatrixRoom,
+  getMatrixInviteConfig,
+  inviteUserToMatrixRoom,
+  toMatrixUserId,
+} from "../lib/matrixInvite.js";
 
 const GRAPHQL_TIMEOUT_MS = 30_000;
 const MATRIX_TIMEOUT_MS = 30_000;
@@ -18,11 +25,15 @@ const withRoomLock = (roomId, fn) => {
 // Tracks previous power levels we displaced so DELETE can restore them.
 const prevInstructorPowerLevels = new Map();
 
-const GET_COURSE_MATRIX_ROOM = `
-  query GetCourseMatrixRoom($courseId: Int!) {
+const GET_COURSE_MATRIX_AND_PROGRAM = `
+  query GetCourseMatrixAndProgram($courseId: Int!) {
     Course_by_pk(id: $courseId) {
       id
       matrixRoomId
+      Program {
+        id
+        matrixInstructorRoomId
+      }
     }
   }
 `;
@@ -35,41 +46,6 @@ const GET_USER_MATRIX_HANDLE = `
     }
   }
 `;
-
-const trimAndNull = (value) => {
-  if (value == null) return null;
-  const trimmed = String(value).trim();
-  return trimmed.length === 0 ? null : trimmed;
-};
-
-const normalizeBaseUrl = (url) => url.replace(/\/+$/, "");
-
-const deriveServerName = ({ explicitServerName, mainSpaceId, adminUserId }) => {
-  if (explicitServerName) return explicitServerName;
-  if (mainSpaceId && mainSpaceId.includes(":")) {
-    return mainSpaceId.split(":").slice(1).join(":");
-  }
-  if (adminUserId && adminUserId.includes(":")) {
-    return adminUserId.split(":").slice(1).join(":");
-  }
-  return null;
-};
-
-const toMatrixUserId = (matrixUserHandle, serverName) => {
-  const trimmed = trimAndNull(matrixUserHandle);
-  if (!trimmed) return null;
-  const withoutSigil = trimmed.startsWith("@") ? trimmed.slice(1) : trimmed;
-  if (withoutSigil.includes(":")) {
-    const [localpartRaw, ...domainParts] = withoutSigil.split(":");
-    const localpart = trimAndNull(localpartRaw);
-    const domain = trimAndNull(domainParts.join(":"));
-    if (!localpart || !domain) return null;
-    return `@${localpart}:${domain}`;
-  }
-  const localpart = trimAndNull(withoutSigil);
-  if (!localpart) return null;
-  return `@${localpart}:${serverName}`;
-};
 
 const matrixHeaders = (token) => ({
   Authorization: `Bearer ${token}`,
@@ -101,23 +77,6 @@ const ensureHasuraClient = () => {
       "x-hasura-admin-secret": process.env.HASURA_ADMIN_SECRET,
     },
   });
-};
-
-const getMatrixConfig = () => {
-  const homeserverUrl = trimAndNull(process.env.MATRIX_HOMESERVER_URL);
-  const token = trimAndNull(process.env.MATRIX_ADMIN_ACCESS_TOKEN);
-  const mainSpaceId = trimAndNull(process.env.MATRIX_MAIN_SPACE_ID);
-  const adminUserId = trimAndNull(process.env.MATRIX_ADMIN_USER_ID);
-  const explicitServerName = trimAndNull(process.env.MATRIX_SERVER_NAME);
-  const serverName = deriveServerName({ explicitServerName, mainSpaceId, adminUserId });
-
-  if (!homeserverUrl || !token || !serverName) return null;
-
-  return {
-    homeserverUrl: normalizeBaseUrl(homeserverUrl),
-    token,
-    serverName,
-  };
 };
 
 const getCurrentPowerLevels = async ({ roomId, matrixConfig, signal }) => {
@@ -182,18 +141,12 @@ export default async function updateMatrixInstructorPowerLevel(req, logger) {
 
   try {
     const courseResult = await hasuraClient.request({
-      document: GET_COURSE_MATRIX_ROOM,
+      document: GET_COURSE_MATRIX_AND_PROGRAM,
       variables: { courseId },
       signal: gqlController.signal,
     });
-    const roomId = trimAndNull(courseResult?.Course_by_pk?.matrixRoomId);
-    if (!roomId) {
-      return {
-        success: true,
-        messageKey: "MATRIX_ROOM_NOT_FOUND",
-        details: "Course has no matrixRoomId yet. Skipping power-level update.",
-      };
-    }
+    const course = courseResult?.Course_by_pk;
+    const roomId = trimAndNull(course?.matrixRoomId);
 
     const userResult = await hasuraClient.request({
       document: GET_USER_MATRIX_HANDLE,
@@ -209,7 +162,7 @@ export default async function updateMatrixInstructorPowerLevel(req, logger) {
       };
     }
 
-    const matrixConfig = getMatrixConfig();
+    const matrixConfig = getMatrixInviteConfig();
     if (!matrixConfig) {
       return {
         success: false,
@@ -224,6 +177,44 @@ export default async function updateMatrixInstructorPowerLevel(req, logger) {
         success: true,
         messageKey: "MATRIX_USER_HANDLE_INVALID",
         details: "Could not derive a valid Matrix user ID from matrixUserHandle",
+      };
+    }
+
+    if (op === "INSERT") {
+      const rawProgRoom = trimAndNull(course?.Program?.matrixInstructorRoomId);
+      const programRoomId = normalizeMatrixRoomId(rawProgRoom);
+      if (programRoomId && isValidMatrixRoomId(programRoomId)) {
+        try {
+          await ensureBotJoinedMatrixRoom({
+            homeserverUrl: matrixConfig.homeserverUrl,
+            token: matrixConfig.token,
+            roomId: programRoomId,
+            signal: gqlController.signal,
+          });
+          await inviteUserToMatrixRoom({
+            homeserverUrl: matrixConfig.homeserverUrl,
+            token: matrixConfig.token,
+            roomId: programRoomId,
+            matrixUserId,
+            signal: gqlController.signal,
+          });
+        } catch (inviteErr) {
+          logger.warn("Program instructor Matrix room invite failed", {
+            courseId,
+            userId,
+            programRoomId,
+            message: inviteErr.message,
+            errcode: inviteErr.errcode,
+          });
+        }
+      }
+    }
+
+    if (!roomId) {
+      return {
+        success: true,
+        messageKey: "MATRIX_ROOM_NOT_FOUND",
+        details: "Course has no matrixRoomId yet. Skipping power-level update.",
       };
     }
 

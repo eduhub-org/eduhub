@@ -5,24 +5,23 @@ import { useCallback, useState } from 'react';
 import { getPublicUrl } from "../helpers/filehandling";
 
 export const useSignedUrl = (filePath: string): { getSignedUrl: () => Promise<{ url: string | null }>; loading: boolean; error: any; } => {
-  const [getFileSignedUrl, { data, loading }] = useLazyRoleQuery<GetSignedUrl, GetSignedUrlVariables>(GET_SIGNED_URL, {
+  const [getFileSignedUrl, { loading }] = useLazyRoleQuery<GetSignedUrl, GetSignedUrlVariables>(GET_SIGNED_URL, {
     variables: { path: filePath },
+    fetchPolicy: 'network-only',
   });
   const [error, setError] = useState<unknown>(null);
 
-  // Sets publicUrl to null if file is not public
   const publicUrl = getPublicUrl(filePath)
 
   const getSignedUrl = useCallback(async () => {
-    // If the file is public, directly return the public URL
     if (publicUrl) {
       return { url: publicUrl };
     }
     try {
-      await getFileSignedUrl();
-      if (data?.getSignedUrl?.link) {
-        console.log(`Returning signed file URL: ${data.getSignedUrl.link}`); // Debugging log
-        return { url: data.getSignedUrl.link };
+      const result = await getFileSignedUrl();
+      const link = result.data?.getSignedUrl?.link;
+      if (link) {
+        return { url: link };
       } else {
         throw new Error('Signed URL not found in the response');
       }
@@ -32,7 +31,7 @@ export const useSignedUrl = (filePath: string): { getSignedUrl: () => Promise<{ 
       setError(err);
       return { url: null };
     }
-  }, [getFileSignedUrl, data, publicUrl]);
+  }, [getFileSignedUrl, publicUrl]);
 
   return { getSignedUrl, loading, error };
 };

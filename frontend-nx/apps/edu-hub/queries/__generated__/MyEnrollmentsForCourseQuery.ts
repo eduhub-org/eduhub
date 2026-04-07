@@ -359,6 +359,10 @@ export interface MyEnrollmentsForCourseQuery_CourseEnrollment_Course {
    */
   maxParticipants: number | null;
   /**
+   * A computed field, executes function "course_active_participant_count"
+   */
+  activeParticipantCount: any | null;
+  /**
    * An array of texts including the learning goals for the course
    */
   learningGoals: string | null;
@@ -452,6 +456,7 @@ export interface MyEnrollmentsForCourseQuery_CourseEnrollment {
    */
   invitationExpirationDate: any | null;
   id: number;
+  created_at: any | null;
   /**
    * The users current enrollment status to this course
    */

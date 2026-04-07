@@ -190,6 +190,10 @@ export interface AdminCourseFragment_Program {
    */
   defaultFormbricksEnrollmentSurveyUrl: string | null;
   matrixSpaceId: string | null;
+  /**
+   * Matrix room id for the program-wide instructor Element chat (!room:server); invites are sent via admin API.
+   */
+  matrixInstructorRoomId: string | null;
 }
 
 export interface AdminCourseFragment_CourseGroups_CourseGroupOption {
@@ -342,6 +346,10 @@ export interface AdminCourseFragment {
    * The number of maximum participants in the course.
    */
   maxParticipants: number | null;
+  /**
+   * A computed field, executes function "course_active_participant_count"
+   */
+  activeParticipantCount: any | null;
   /**
    * An array of texts including the learning goals for the course
    */

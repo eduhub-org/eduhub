@@ -5,5 +5,7 @@ declare module '@tanstack/table-core' {
   interface ColumnMeta<TData extends RowData, TValue> {
     width?: number;
     className?: string;
+    /** When set, header and cell content are centered in the column (e.g. icon columns). */
+    align?: 'center';
   }
 }

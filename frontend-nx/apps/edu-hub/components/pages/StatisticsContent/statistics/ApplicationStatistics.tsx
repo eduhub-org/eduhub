@@ -61,6 +61,17 @@ export const ApplicationStatistics: FC = () => {
     return diffDays;
   }, []);
 
+  /** X-axis "today" (days until application end) per program — used to omit future points in relative-deadline charts */
+  const programDaysUntilEndToday = useMemo(() => {
+    if (!data?.Program.length) return new Map<string, number>();
+    const todayStr = new Date().toISOString().split('T')[0];
+    const map = new Map<string, number>();
+    data.Program.forEach((p) => {
+      map.set(p.title, calculateDaysUntilEnd(todayStr, p.defaultApplicationEnd));
+    });
+    return map;
+  }, [data?.Program, calculateDaysUntilEnd]);
+
   // Process data for cumulative chart
   const cumulativeChartData = useMemo(() => {
     if (!data?.Program.length) return [];
@@ -163,7 +174,9 @@ export const ApplicationStatistics: FC = () => {
         // Create entry with all cumulative counts (even if no change for this day)
         const entry: { date: string; [key: string]: any } = { date: days.toString() };
         programCumulativeCounts.forEach((count, program) => {
-          entry[program] = count;
+          const todayDU = programDaysUntilEndToday.get(program) ?? 0;
+          // X-axis decreases toward the deadline; days < todayDU are still in the future — omit series value
+          entry[program] = days < todayDU ? null : count;
         });
 
         result.push(entry);
@@ -171,7 +184,7 @@ export const ApplicationStatistics: FC = () => {
 
       return result;
     }
-  }, [data, useActualDates, calculateDaysUntilEnd]);
+  }, [data, useActualDates, calculateDaysUntilEnd, programDaysUntilEndToday]);
 
   // Process data for daily chart
   const dailyChartData = useMemo(() => {
@@ -241,9 +254,14 @@ export const ApplicationStatistics: FC = () => {
 
       for (let days = maxDays; days >= minDays; days--) {
         const entry: { date: string; [key: string]: any } = { date: days.toString() };
-        
+
         // Fill in counts for each program (0 if no enrollments for this day)
         allPrograms.forEach((program) => {
+          const todayDU = programDaysUntilEndToday.get(program) ?? 0;
+          if (days < todayDU) {
+            entry[program] = null;
+            return;
+          }
           const counts = daysMap.get(days);
           entry[program] = counts?.[program] || 0;
         });
@@ -253,7 +271,7 @@ export const ApplicationStatistics: FC = () => {
 
       return result;
     }
-  }, [data, useActualDates, calculateDaysUntilEnd]);
+  }, [data, useActualDates, calculateDaysUntilEnd, programDaysUntilEndToday]);
 
   // Create series configuration for charts
   const series = useMemo(

@@ -333,14 +333,6 @@
           "clientRole": true,
           "containerId": "56fe245f-6424-48b3-9118-936e3cc30671",
           "attributes": {}
-        },
-        {
-          "id": "d8e9bdab-3621-416c-97b9-2ea395d6b714",
-          "name": "admin-ras",
-          "composite": false,
-          "clientRole": true,
-          "containerId": "56fe245f-6424-48b3-9118-936e3cc30671",
-          "attributes": {}
         }
       ],
       "security-admin-console": [],

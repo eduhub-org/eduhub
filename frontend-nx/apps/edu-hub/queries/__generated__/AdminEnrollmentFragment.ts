@@ -41,6 +41,7 @@ export interface AdminEnrollmentFragment {
    */
   invitationExpirationDate: any | null;
   id: number;
+  created_at: any | null;
   /**
    * The users current enrollment status to this course
    */

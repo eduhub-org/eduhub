@@ -366,6 +366,7 @@ export interface CourseWithEnrollment_Course_by_pk_CourseEnrollments {
    */
   invitationExpirationDate: any | null;
   id: number;
+  created_at: any | null;
   /**
    * The users current enrollment status to this course
    */
@@ -447,6 +448,10 @@ export interface CourseWithEnrollment_Course_by_pk {
    * The number of maximum participants in the course.
    */
   maxParticipants: number | null;
+  /**
+   * A computed field, executes function "course_active_participant_count"
+   */
+  activeParticipantCount: any | null;
   /**
    * An array of texts including the learning goals for the course
    */
