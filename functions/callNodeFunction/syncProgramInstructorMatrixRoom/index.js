@@ -138,6 +138,8 @@ export default async function syncProgramInstructorMatrixRoom(req, logger) {
 
     let invitedCount = 0;
     let skippedCount = userIds.length - userHandleMap.size;
+    let failedCount = 0;
+    const failures = [];
 
     const CONCURRENCY = 5;
     const entries = [...userHandleMap.entries()];
@@ -154,13 +156,18 @@ export default async function syncProgramInstructorMatrixRoom(req, logger) {
         if (inv.skipped) skippedCount += 1;
         else invitedCount += 1;
       } catch (err) {
+        failedCount += 1;
+        failures.push({
+          userId: uid,
+          message: err.message,
+          errcode: err.errcode,
+        });
         logger.warn("Matrix invite failed for program instructor", {
           programId,
           userId: uid,
           errcode: err.errcode,
           message: err.message,
         });
-        skippedCount += 1;
       }
     };
 
@@ -169,20 +176,29 @@ export default async function syncProgramInstructorMatrixRoom(req, logger) {
       await Promise.all(batch.map(processInvite));
     }
 
+    const success = failedCount === 0;
+
     logger.info("Program instructor Matrix sync completed", {
       programId,
       roomId,
       invitedCount,
       skippedCount,
+      failedCount,
       userCount: userIds.length,
     });
 
     return {
-      success: true,
-      messageKey: "MATRIX_PROGRAM_INSTRUCTOR_SYNC_DONE",
+      success,
+      messageKey: success
+        ? "MATRIX_PROGRAM_INSTRUCTOR_SYNC_DONE"
+        : "MATRIX_PROGRAM_INSTRUCTOR_SYNC_INVITES_FAILED",
       invitedCount,
       skippedCount,
-      details: `Processed ${userIds.length} instructor(s)`,
+      failedCount,
+      ...(failures.length ? { failures } : {}),
+      details: success
+        ? `Processed ${userIds.length} instructor(s)`
+        : `${failedCount} Matrix invite(s) failed`,
     };
   } catch (error) {
     logger.error("syncProgramInstructorMatrixRoom failed", {

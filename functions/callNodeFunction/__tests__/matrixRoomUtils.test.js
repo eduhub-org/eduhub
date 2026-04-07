@@ -29,7 +29,20 @@ test("normalizeMatrixRoomId from matrix.to permalink", () => {
   );
 });
 
+test("normalizeMatrixRoomId from percent-encoded matrix.to hash", () => {
+  assert.equal(
+    normalizeMatrixRoomId(
+      "https://matrix.to/#/%21uDGcWwlZAIdpXeaMsX%3Aopencampus.sh?via=opencampus.sh"
+    ),
+    "!uDGcWwlZAIdpXeaMsX:opencampus.sh"
+  );
+});
+
 test("isValidMatrixRoomId", () => {
   assert.equal(isValidMatrixRoomId("!abc:example.org"), true);
+  assert.equal(isValidMatrixRoomId("!localopaque"), true);
+  assert.equal(isValidMatrixRoomId("!abc:example.org:443"), true);
+  assert.equal(isValidMatrixRoomId("!abc:[2001:db8::1]:8448"), true);
+  assert.equal(isValidMatrixRoomId("!abc:192.168.0.1"), true);
   assert.equal(isValidMatrixRoomId("not-a-room"), false);
 });
