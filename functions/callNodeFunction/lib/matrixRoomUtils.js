@@ -16,13 +16,31 @@ export const normalizeMatrixRoomId = (input) => {
     try {
       const u = new URL(trimmed);
       const hash = u.hash || "";
-      const hashMatch = hash.match(/#\/room\/([^?#/]+)/);
-      if (hashMatch) {
-        return decodeURIComponent(hashMatch[1]);
+      const hashNoQuery = hash.split("?")[0];
+      const elementRoom = hashNoQuery.match(/^#\/room\/([^/#]+)/);
+      if (elementRoom) {
+        try {
+          return decodeURIComponent(elementRoom[1]);
+        } catch (_e) {
+          return elementRoom[1];
+        }
+      }
+      // matrix.to: https://matrix.to/#/!room:server?via=…
+      const matrixToRoom = hashNoQuery.match(/^#\/?(![^:#?]+:[^?#/]+)/);
+      if (matrixToRoom) {
+        try {
+          return decodeURIComponent(matrixToRoom[1]);
+        } catch (_e) {
+          return matrixToRoom[1];
+        }
       }
       const pathMatch = u.pathname.match(/\/room\/([^/?#]+)/);
       if (pathMatch) {
-        return decodeURIComponent(pathMatch[1]);
+        try {
+          return decodeURIComponent(pathMatch[1]);
+        } catch (_e) {
+          return pathMatch[1];
+        }
       }
     } catch (_e) {
       /* fall through */
@@ -38,7 +56,11 @@ export const normalizeMatrixRoomId = (input) => {
 
   const slashRoom = withoutQuery.match(/(?:^|\/)room\/([^/?#]+)/i);
   if (slashRoom) {
-    return decodeURIComponent(slashRoom[1]);
+    try {
+      return decodeURIComponent(slashRoom[1]);
+    } catch (_e) {
+      return slashRoom[1];
+    }
   }
 
   return withoutQuery;

@@ -53,13 +53,21 @@ const ExpandableProgramRow: FC<ExpandableProgramRowProps> = ({ program }) => {
     const trimmed = raw.trim();
     if (!trimmed) return null;
     const normalized = normalizeMatrixRoomId(trimmed);
-    return (normalized ?? trimmed).trim() || null;
+    if (!normalized || !isValidMatrixRoomId(normalized)) return null;
+    return normalized;
   }, []);
 
   const handleMatrixInstructorRoomSaved = useCallback(
     async (data: { update_Program_by_pk?: { matrixInstructorRoomId?: string | null } | null }) => {
       const roomId = data?.update_Program_by_pk?.matrixInstructorRoomId?.trim() ?? '';
-      if (!roomId || !isValidMatrixRoomId(roomId)) {
+      if (!roomId) {
+        return;
+      }
+      if (!isValidMatrixRoomId(roomId)) {
+        setSyncNotice({
+          open: true,
+          message: t('instructor_element_room.invalid_room_id'),
+        });
         return;
       }
       try {
@@ -144,6 +152,7 @@ const ExpandableProgramRow: FC<ExpandableProgramRowProps> = ({ program }) => {
                 value={program.matrixInstructorRoomId ?? ''}
                 updateValueMutation={UPDATE_PROGRAM_MATRIX_INSTRUCTOR_ROOM}
                 transformMutationText={transformMatrixInstructorRoomInput}
+                transformRejectedMessage={t('instructor_element_room.invalid_room_id')}
                 onValueUpdated={handleMatrixInstructorRoomSaved}
                 refetchQueries={['ProgramList']}
               />

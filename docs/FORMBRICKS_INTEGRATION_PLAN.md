@@ -125,12 +125,7 @@ Add to `select_permissions` for all roles that need it:
 - defaultFormbricksEnrollmentSurveyUrl
 ```
 
-Add to `update_permissions` for admin (as appropriate for your deployment):
-
-```yaml
-# Add to update_permissions columns
-- defaultFormbricksEnrollmentSurveyUrl
-```
+Note: Hasura's built-in `admin` role bypasses all table/column permissions, so no explicit `update_permissions` entry is needed for `admin`. If your deployment uses a custom elevated role (e.g. `program_manager`) that is *not* `admin`, add `defaultFormbricksEnrollmentSurveyUrl` to that role's `update_permissions` columns.
 
 **File:** `backend/metadata/databases/default/tables/public_CourseEnrollment.yaml`
 

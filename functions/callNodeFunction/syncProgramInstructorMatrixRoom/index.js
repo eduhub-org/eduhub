@@ -25,9 +25,9 @@ const GET_PROGRAM_INSTRUCTOR_ROWS = `
   }
 `;
 
-const GET_USER_MATRIX_HANDLE = `
-  query GetUserMatrixHandle($userId: uuid!) {
-    User_by_pk(id: $userId) {
+const GET_USERS_MATRIX_HANDLES = `
+  query GetUsersMatrixHandles($userIds: [uuid!]!) {
+    User(where: { id: { _in: $userIds } }) {
       id
       matrixUserHandle
     }
@@ -121,27 +121,28 @@ export default async function syncProgramInstructorMatrixRoom(req, logger) {
       ...new Set((rows?.CourseInstructor || []).map((r) => r?.userId).filter(Boolean)),
     ];
 
+    const usersResult = await hasuraClient.request({
+      document: GET_USERS_MATRIX_HANDLES,
+      variables: { userIds },
+      signal: controller.signal,
+    });
+
+    const userHandleMap = new Map();
+    for (const u of usersResult?.User || []) {
+      const handle = trimAndNull(u?.matrixUserHandle);
+      if (handle) {
+        const matrixUserId = toMatrixUserId(handle, matrixConfig.serverName);
+        if (matrixUserId) userHandleMap.set(u.id, matrixUserId);
+      }
+    }
+
     let invitedCount = 0;
-    let skippedCount = 0;
+    let skippedCount = userIds.length - userHandleMap.size;
 
-    for (const uid of userIds) {
-      const userResult = await hasuraClient.request({
-        document: GET_USER_MATRIX_HANDLE,
-        variables: { userId: uid },
-        signal: controller.signal,
-      });
-      const matrixUserHandle = trimAndNull(userResult?.User_by_pk?.matrixUserHandle);
-      if (!matrixUserHandle) {
-        skippedCount += 1;
-        continue;
-      }
+    const CONCURRENCY = 5;
+    const entries = [...userHandleMap.entries()];
 
-      const matrixUserId = toMatrixUserId(matrixUserHandle, matrixConfig.serverName);
-      if (!matrixUserId) {
-        skippedCount += 1;
-        continue;
-      }
-
+    const processInvite = async ([uid, matrixUserId]) => {
       try {
         const inv = await inviteUserToMatrixRoom({
           homeserverUrl: matrixConfig.homeserverUrl,
@@ -161,6 +162,11 @@ export default async function syncProgramInstructorMatrixRoom(req, logger) {
         });
         skippedCount += 1;
       }
+    };
+
+    for (let i = 0; i < entries.length; i += CONCURRENCY) {
+      const batch = entries.slice(i, i + CONCURRENCY);
+      await Promise.all(batch.map(processInvite));
     }
 
     logger.info("Program instructor Matrix sync completed", {

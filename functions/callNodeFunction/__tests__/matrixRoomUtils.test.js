@@ -13,6 +13,22 @@ test("normalizeMatrixRoomId from raw id", () => {
   assert.equal(normalizeMatrixRoomId("!xyz:domain.tld"), "!xyz:domain.tld");
 });
 
+test("normalizeMatrixRoomId strips query params from Element URL", () => {
+  assert.equal(
+    normalizeMatrixRoomId("https://matrix.example.com/#/room/!abc:example.org?via=example.org"),
+    "!abc:example.org"
+  );
+});
+
+test("normalizeMatrixRoomId from matrix.to permalink", () => {
+  assert.equal(
+    normalizeMatrixRoomId(
+      "https://matrix.to/#/!uDGcWwlZAIdpXeaMsX:opencampus.sh?via=opencampus.sh"
+    ),
+    "!uDGcWwlZAIdpXeaMsX:opencampus.sh"
+  );
+});
+
 test("isValidMatrixRoomId", () => {
   assert.equal(isValidMatrixRoomId("!abc:example.org"), true);
   assert.equal(isValidMatrixRoomId("not-a-room"), false);

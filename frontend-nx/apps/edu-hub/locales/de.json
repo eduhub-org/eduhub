@@ -216,7 +216,8 @@
       "invalid_maximum_integer": "Der Wert muss höchstens {max} sein",
       "invalid_minimum_maximum_integer": "Der Wert muss mindestens {min} und höchstens {max} sein",
       "invalid_integer_format": "Der Wert muss eine ganze Zahl sein",
-      "invalid_input": "Ungültige Eingabe"
+      "invalid_input": "Ungültige Eingabe",
+      "transform_rejected": "Dieser Wert konnte nicht im erwarteten Format gespeichert werden."
     },
     "server_side_combobox": {
       "create_option": "\"{option}\" neu hinzufügen",
@@ -1417,7 +1418,8 @@
       "help_text": "Alle Instructor:innen der Kurse dieses Programms werden zu diesem Raum eingeladen. Du kannst einen vollen Element-Link oder die Raum-ID einfügen; sie wird normalisiert gespeichert.",
       "sync_in_progress": "Matrix-Einladungen werden gesendet…",
       "sync_success": "Einladungen verarbeitet: {invited} gesendet, {skipped} übersprungen (bereits im Raum oder kein Matrix-Handle).",
-      "sync_error": "Nicht alle Matrix-Einladungen konnten gesendet werden. Prüfe die Server-Logs und die Raum-ID."
+      "sync_error": "Nicht alle Matrix-Einladungen konnten gesendet werden. Prüfe die Server-Logs und die Raum-ID.",
+      "invalid_room_id": "Die Eingabe konnte nicht als gültige Matrix-Raum-ID erkannt werden (!raum:server). Bitte prüfe den Wert und versuche es erneut."
     },
     "notifications": {
       "programs_published_success_singular": "Programm wurde erfolgreich veröffentlicht",

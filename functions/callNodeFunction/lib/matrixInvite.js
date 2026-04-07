@@ -90,13 +90,13 @@ export const inviteUserToMatrixRoom = async ({ homeserverUrl, token, roomId, mat
   const errcode = payload?.errcode;
   const errMsg = (payload?.error || "").toString();
 
-  const ignorable =
-    errcode === "M_UNKNOWN" ||
-    errcode === "M_FORBIDDEN" ||
-    /already/i.test(errMsg) ||
-    /member/i.test(errMsg);
+  const alreadyInRoom =
+    /already invited/i.test(errMsg) ||
+    /already in the room/i.test(errMsg) ||
+    /already joined/i.test(errMsg) ||
+    errcode === "M_ALREADY_JOINED";
 
-  if (ignorable) {
+  if (alreadyInRoom) {
     return { invited: false, skipped: true };
   }
 
