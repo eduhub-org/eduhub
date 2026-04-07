@@ -1,6 +1,7 @@
 import { GraphQLClient } from "graphql-request";
 import { trimAndNull, normalizeMatrixRoomId, isValidMatrixRoomId } from "../lib/matrixRoomUtils.js";
 import {
+  ensureBotJoinedMatrixRoom,
   getMatrixInviteConfig,
   inviteUserToMatrixRoom,
   toMatrixUserId,
@@ -117,6 +118,28 @@ export default async function syncProgramInstructorMatrixRoom(req, logger) {
         success: false,
         messageKey: "MATRIX_INVALID_ROOM_ID",
         error: "matrixInstructorRoomId is not a valid Matrix room id",
+      };
+    }
+
+    try {
+      await ensureBotJoinedMatrixRoom({
+        homeserverUrl: matrixConfig.homeserverUrl,
+        token: matrixConfig.token,
+        roomId,
+        signal: controller.signal,
+      });
+    } catch (joinErr) {
+      const who = matrixConfig.botUserId || "the Matrix bot account (MATRIX_ADMIN_USER_ID)";
+      logger.warn("Matrix bot could not join instructor room before sync", {
+        programId,
+        roomId,
+        message: joinErr.message,
+        errcode: joinErr.errcode,
+      });
+      return {
+        success: false,
+        messageKey: "MATRIX_BOT_NOT_IN_ROOM",
+        error: `${joinErr.message} Invite ${who} to this room in Element (members list → Invite), give it permission to invite others if needed, then retry sync.`,
       };
     }
 
