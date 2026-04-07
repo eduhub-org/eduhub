@@ -1,6 +1,7 @@
 import { GraphQLClient } from "graphql-request";
 import { trimAndNull, normalizeMatrixRoomId, isValidMatrixRoomId } from "../lib/matrixRoomUtils.js";
 import {
+  ensureBotJoinedMatrixRoom,
   getMatrixInviteConfig,
   inviteUserToMatrixRoom,
   toMatrixUserId,
@@ -184,6 +185,12 @@ export default async function updateMatrixInstructorPowerLevel(req, logger) {
       const programRoomId = normalizeMatrixRoomId(rawProgRoom);
       if (programRoomId && isValidMatrixRoomId(programRoomId)) {
         try {
+          await ensureBotJoinedMatrixRoom({
+            homeserverUrl: matrixConfig.homeserverUrl,
+            token: matrixConfig.token,
+            roomId: programRoomId,
+            signal: gqlController.signal,
+          });
           await inviteUserToMatrixRoom({
             homeserverUrl: matrixConfig.homeserverUrl,
             token: matrixConfig.token,
