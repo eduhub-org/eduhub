@@ -38,6 +38,13 @@ test("normalizeMatrixRoomId from percent-encoded matrix.to hash", () => {
   );
 });
 
+test("normalizeMatrixRoomId from matrix.to v12 local-only room in hash", () => {
+  assert.equal(
+    normalizeMatrixRoomId("https://matrix.to/#/!localopaque123?via=example.org"),
+    "!localopaque123"
+  );
+});
+
 test("isValidMatrixRoomId", () => {
   assert.equal(isValidMatrixRoomId("!abc:example.org"), true);
   assert.equal(isValidMatrixRoomId("!localopaque"), true);

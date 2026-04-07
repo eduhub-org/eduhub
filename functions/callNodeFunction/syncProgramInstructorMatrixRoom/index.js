@@ -79,18 +79,27 @@ export default async function syncProgramInstructorMatrixRoom(req, logger) {
     };
   }
 
-  const hasuraClient = ensureHasuraClient();
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), MATRIX_TIMEOUT_MS);
-
+  let timeout;
   try {
+    const hasuraClient = ensureHasuraClient();
+    const controller = new AbortController();
+    timeout = setTimeout(() => controller.abort(), MATRIX_TIMEOUT_MS);
+
     const programResult = await hasuraClient.request({
       document: GET_PROGRAM_INSTRUCTOR_ROOM,
       variables: { programId },
       signal: controller.signal,
     });
 
-    const rawRoom = trimAndNull(programResult?.Program_by_pk?.matrixInstructorRoomId);
+    if (programResult?.Program_by_pk == null) {
+      return {
+        success: false,
+        messageKey: "PROGRAM_NOT_FOUND",
+        error: "Program not found",
+      };
+    }
+
+    const rawRoom = trimAndNull(programResult.Program_by_pk.matrixInstructorRoomId);
     const roomId = normalizeMatrixRoomId(rawRoom);
 
     if (!roomId) {

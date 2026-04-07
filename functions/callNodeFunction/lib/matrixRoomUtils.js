@@ -34,8 +34,8 @@ export const normalizeMatrixRoomId = (input) => {
           return elementRoom[1];
         }
       }
-      // matrix.to: https://matrix.to/#/!room:server?via=… (fragment may be percent-encoded)
-      const matrixToRoom = decodedHash.match(/^#\/?(![^:#?]+:[^?#/]+)/);
+      // matrix.to: https://matrix.to/#/!room?via=… or !room:server (fragment may be percent-encoded)
+      const matrixToRoom = decodedHash.match(/^#\/?(![^:#?]+(?::[^?#/]+)?)/);
       if (matrixToRoom) {
         try {
           return decodeURIComponent(matrixToRoom[1]);
