@@ -122,6 +122,21 @@ type InputFieldProps = {
   updateValueMutation?: DocumentNode;
 
   /**
+   * Applied to the debounced text before sending `text` to `updateValueMutation` (e.g. normalize URLs).
+   * Does not change what the user sees in the field.
+   * Return `null` for empty/cleared input to persist null when the mutation accepts nullable `String`.
+   * If the user entered non-empty text and you return `null`, the mutation is skipped and an error is shown
+   * (see `transformRejectedMessage`).
+   */
+  transformMutationText?: (text: string) => string | null;
+
+  /**
+   * Shown when `transformMutationText` returns `null` but the trimmed input is not empty (reject invalid paste).
+   * Falls back to `common.input_field.transform_rejected` when omitted.
+   */
+  transformRejectedMessage?: string;
+
+  /**
    * Callback function called after successful text update.
    * @param data - The data returned from the mutation.
    */
@@ -205,6 +220,8 @@ const InputField: React.FC<InputFieldProps> = ({
   value,
   translationTabs,
   updateValueMutation,
+  transformMutationText,
+  transformRejectedMessage,
   onValueUpdated,
   refetchQueries = [],
   helpText,
@@ -370,10 +387,36 @@ const InputField: React.FC<InputFieldProps> = ({
 
   const debouncedUpdateText = useDebouncedCallback((newText: string) => {
     if (validateInput(newText)) {
-      lastSentValueRef.current = newText;
       if (updateValueMutation) {
-        const textValue = type === 'number' ? Number.parseInt(newText, 10) : newText;
-        updateText({ variables: { itemId: effectiveItemIdRef.current, text: String(textValue) } });
+        let textValue: string | number | null;
+        if (type === 'number') {
+          const parsed = newText === '' ? null : Number.parseInt(newText, 10);
+          const numericValue = parsed !== null && !Number.isNaN(parsed) ? parsed : null;
+          if (transformMutationText) {
+            const transformed = transformMutationText(numericValue === null ? '' : String(numericValue));
+            textValue = transformed ?? null;
+          } else {
+            textValue = numericValue;
+          }
+        } else {
+          const transformed = transformMutationText ? transformMutationText(newText) : newText;
+          textValue =
+            transformMutationText && (transformed === null || transformed === undefined)
+              ? null
+              : transformed ?? newText;
+        }
+
+        const transformRejected =
+          Boolean(transformMutationText) && newText.trim() !== '' && textValue === null;
+        if (transformRejected) {
+          const msg = transformRejectedMessage ?? t('input_field.transform_rejected');
+          setErrorMessage(msg);
+          setHasBlurred(true);
+          return;
+        }
+
+        lastSentValueRef.current = newText;
+        updateText({ variables: { itemId: effectiveItemIdRef.current, text: textValue } });
       } else if (onValueUpdated) {
         onValueUpdated({ text: newText });
       }

@@ -1,5 +1,5 @@
 import { QueryResult } from '@apollo/client';
-import { FC } from 'react';
+import { FC, useMemo } from 'react';
 import Tooltip from '@mui/material/Tooltip';
 import { HelpOutline } from '@mui/icons-material';
 import { useRoleMutation } from '../../../../hooks/authedMutation';
@@ -46,6 +46,7 @@ import {
   InsertSessionAddressVariables,
 } from '../../../../queries/__generated__/InsertSessionAddress';
 import InputField from '../../../inputs/InputField';
+import { Button as ChatLinkButton } from '../../../common/Button';
 interface IProps {
   course: ManagedCourse_Course_by_pk;
   qResult: QueryResult<any, any>;
@@ -54,6 +55,14 @@ interface IProps {
 export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
   const { error, handleError, resetError } = useErrorHandler();
   const t = useTranslations('manageCourse');
+  const tCourse = useTranslations('course');
+
+  const programInstructorRoomId = course.Program?.matrixInstructorRoomId?.trim();
+  const elementBaseUrl = process.env.NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL?.replace(/\/+$/, '');
+  const programOrganizerChatLink = useMemo(() => {
+    if (!programInstructorRoomId || !elementBaseUrl) return null;
+    return `${elementBaseUrl}/#/room/${programInstructorRoomId}`;
+  }, [programInstructorRoomId, elementBaseUrl]);
 
   const [insertCourseLocation] = useRoleMutation<InsertCourseLocation, InsertCourseLocationVariables>(
     INSERT_COURSE_LOCATION,
@@ -167,6 +176,19 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
 
   return (
     <div>
+      {programOrganizerChatLink ? (
+        <div className="mb-6 flex items-center justify-center gap-3 rounded-lg border border-border-primary bg-bg-secondary p-4">
+          <p className="text-sm text-label-primary">{t('element_program_instructor_chat_prompt')}</p>
+          <ChatLinkButton
+            className="!bg-brand !text-white !border-brand hover:!bg-brand-light hover:!border-brand-light whitespace-nowrap"
+            as="a"
+            href={programOrganizerChatLink}
+            filled
+          >
+            {tCourse('general.to_course_chat')}
+          </ChatLinkButton>
+        </div>
+      ) : null}
       <div className="grid grid-cols-1 md:grid-cols-2">
         <InputField
           variant="eduhub"

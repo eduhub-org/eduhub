@@ -78,4 +78,8 @@ export interface AdminProgramFragment {
    */
   visibility: boolean;
   matrixSpaceId: string | null;
+  /**
+   * Matrix room id for the program-wide instructor Element chat (!room:server); invites are sent via admin API.
+   */
+  matrixInstructorRoomId: string | null;
 }

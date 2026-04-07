@@ -39,6 +39,12 @@ type Mutation {
 }
 
 type Mutation {
+  syncProgramInstructorMatrixRoom(
+    programId: Int!
+  ): SyncProgramInstructorMatrixRoomResult!
+}
+
+type Mutation {
   createEnrollmentWithAddons(
     courseId: Int!
     userId: uuid!
@@ -530,6 +536,15 @@ type CreateMatrixRoomResult {
   error: String
   partialSpaceId: String
   partialRoomId: String
+}
+
+type SyncProgramInstructorMatrixRoomResult {
+  success: Boolean!
+  messageKey: String!
+  invitedCount: Int
+  skippedCount: Int
+  details: String
+  error: String
 }
 
 type CreateEnrollmentWithAddonsResult {
