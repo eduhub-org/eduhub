@@ -55,5 +55,6 @@ export const ADMIN_PROGRAM_FRAGMENT = gql`
     visibility
     defaultFormbricksEnrollmentSurveyUrl
     matrixSpaceId
+    matrixInstructorRoomId
   }
 `;
