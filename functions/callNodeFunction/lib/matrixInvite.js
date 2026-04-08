@@ -34,6 +34,69 @@ const matrixHeaders = (token) => ({
   "Content-Type": "application/json",
 });
 
+const MAX_MATRIX_FETCH_RETRIES = 5;
+const BASE_BACKOFF_MS = 800;
+/** Cap each backoff so one Retry-After does not exhaust the whole function timeout. */
+const MAX_BACKOFF_MS = 15_000;
+
+const sleepMs = (ms, signal) =>
+  new Promise((resolve, reject) => {
+    if (signal?.aborted) {
+      reject(Object.assign(new Error("Aborted"), { name: "AbortError" }));
+      return;
+    }
+    let tid;
+    const onAbort = () => {
+      clearTimeout(tid);
+      signal?.removeEventListener("abort", onAbort);
+      reject(Object.assign(new Error("Aborted"), { name: "AbortError" }));
+    };
+    signal?.addEventListener("abort", onAbort);
+    tid = setTimeout(() => {
+      signal?.removeEventListener("abort", onAbort);
+      resolve();
+    }, ms);
+  });
+
+/** @param {string | null} header */
+const parseRetryAfterMs = (header) => {
+  if (!header) return 0;
+  const trimmed = header.trim();
+  if (/^\d+$/.test(trimmed)) {
+    return Math.min(60_000, Number.parseInt(trimmed, 10) * 1000);
+  }
+  const when = Date.parse(trimmed);
+  if (!Number.isNaN(when)) {
+    return Math.min(60_000, Math.max(0, when - Date.now()));
+  }
+  return 0;
+};
+
+/**
+ * Matrix homeservers (Synapse, etc.) often return 429 under burst traffic. Retry with backoff + Retry-After.
+ */
+const fetchMatrixWithRateLimitRetry = async (url, init, signal) => {
+  let lastResponse;
+  for (let attempt = 0; attempt <= MAX_MATRIX_FETCH_RETRIES; attempt++) {
+    lastResponse = await fetch(url, { ...init, signal });
+    if (lastResponse.ok) return lastResponse;
+
+    const retriable =
+      (lastResponse.status === 429 || lastResponse.status === 503) && attempt < MAX_MATRIX_FETCH_RETRIES;
+    if (!retriable) return lastResponse;
+
+    const fromHeader = parseRetryAfterMs(lastResponse.headers.get("Retry-After"));
+    const exponential = BASE_BACKOFF_MS * 2 ** attempt;
+    const jitter = Math.floor(Math.random() * 250);
+    const waitMs = Math.min(
+      MAX_BACKOFF_MS,
+      Math.max(fromHeader, exponential + jitter)
+    );
+    await sleepMs(waitMs, signal);
+  }
+  return lastResponse;
+};
+
 const parseMatrixResponse = async (response) => {
   let payload = null;
   try {
@@ -75,12 +138,15 @@ export const getMatrixInviteConfig = () => {
  */
 export const ensureBotJoinedMatrixRoom = async ({ homeserverUrl, token, roomId, signal }) => {
   const url = `${homeserverUrl}/_matrix/client/v3/join/${encodeURIComponent(roomId)}`;
-  const response = await fetch(url, {
-    method: "POST",
-    headers: matrixHeaders(token),
-    body: JSON.stringify({}),
-    signal,
-  });
+  const response = await fetchMatrixWithRateLimitRetry(
+    url,
+    {
+      method: "POST",
+      headers: matrixHeaders(token),
+      body: JSON.stringify({}),
+    },
+    signal
+  );
 
   if (response.ok) return { joined: true };
 
@@ -116,12 +182,15 @@ export const ensureBotJoinedMatrixRoom = async ({ homeserverUrl, token, roomId, 
  */
 export const inviteUserToMatrixRoom = async ({ homeserverUrl, token, roomId, matrixUserId, signal }) => {
   const url = `${homeserverUrl}/_matrix/client/v3/rooms/${encodeURIComponent(roomId)}/invite`;
-  const response = await fetch(url, {
-    method: "POST",
-    headers: matrixHeaders(token),
-    body: JSON.stringify({ user_id: matrixUserId }),
-    signal,
-  });
+  const response = await fetchMatrixWithRateLimitRetry(
+    url,
+    {
+      method: "POST",
+      headers: matrixHeaders(token),
+      body: JSON.stringify({ user_id: matrixUserId }),
+    },
+    signal
+  );
 
   if (response.ok) return { invited: true };
 
