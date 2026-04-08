@@ -14,7 +14,9 @@ actions:
   - name: createCertificate
     definition:
       kind: synchronous
+      # Default Hasura action timeout (60s) causes 504 while many PDFs are generated in parallel.
       handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      timeout: 180
       headers:
         - name: secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
@@ -26,7 +28,9 @@ actions:
   - name: createCertificates
     definition:
       kind: synchronous
+      # Python handler generates certificates sequentially per enrollment; large batches need >60s.
       handler: '{{CLOUD_FUNCTION_LINK_CALL_PYTHON_FUNCTION}}'
+      timeout: 300
       headers:
         - name: Hasura-Secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
