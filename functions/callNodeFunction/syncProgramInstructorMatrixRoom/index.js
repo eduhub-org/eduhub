@@ -7,7 +7,8 @@ import {
   toMatrixUserId,
 } from "../lib/matrixInvite.js";
 
-const MATRIX_TIMEOUT_MS = 30_000;
+/** Room for 429 retries (backoff in matrixInvite.js) when many instructors sync at once. */
+const MATRIX_TIMEOUT_MS = 120_000;
 
 const GET_PROGRAM_INSTRUCTOR_ROOM = `
   query GetProgramInstructorRoom($programId: Int!) {
@@ -173,7 +174,8 @@ export default async function syncProgramInstructorMatrixRoom(req, logger) {
     let failedCount = 0;
     const failures = [];
 
-    const CONCURRENCY = 5;
+    // Keep low: Matrix homeservers rate-limit client API (429) under parallel invites.
+    const CONCURRENCY = 2;
     const entries = [...userHandleMap.entries()];
 
     const processInvite = async ([uid, matrixUserId]) => {

@@ -1413,9 +1413,9 @@
       "unpublish": "Ausgewählte zurückziehen"
     },
     "instructor_element_room": {
-      "label": "Element-Raum für Instructor:innen",
+      "label": "Element-Raum für Kursleitungen",
       "placeholder": "Element-Raum-Link oder Matrix-Raum-ID einfügen (!raum:server)",
-      "help_text": "Alle Instructor:innen der Kurse dieses Programms werden zu diesem Raum eingeladen. Du kannst einen vollen Element-Link oder die Raum-ID einfügen; sie wird normalisiert gespeichert.",
+      "help_text": "Alle Kursleitungen dieses Programms werden zu diesem Raum eingeladen. Du kannst einen vollen Element-Link oder die Raum-ID einfügen; sie wird normalisiert gespeichert.",
       "sync_in_progress": "Matrix-Einladungen werden gesendet…",
       "sync_success": "Einladungen verarbeitet: {invited} gesendet, {skipped} übersprungen (bereits im Raum oder kein Matrix-Handle).",
       "sync_error": "Nicht alle Matrix-Einladungen konnten gesendet werden. Prüfe die Server-Logs und die Raum-ID.",
