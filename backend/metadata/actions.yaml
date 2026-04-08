@@ -62,7 +62,9 @@ actions:
   - name: syncProgramInstructorMatrixRoom
     definition:
       kind: synchronous
+      # Must exceed call-node-function Matrix phase (120s) + 429 backoff; default Hasura timeout is 60s → 504.
       handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      timeout: 180
       headers:
         - name: secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
