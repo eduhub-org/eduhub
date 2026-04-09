@@ -1,6 +1,6 @@
 import { BaseRow, TableGridProps } from './types';
 import React, { useState, useMemo, useCallback } from 'react';
-import { TextField, Checkbox, Select, MenuItem, FormControl, InputLabel, SelectChangeEvent, ListSubheader, Divider } from '@mui/material';
+import { TextField, Checkbox, Select, MenuItem, FormControl, InputLabel, SelectChangeEvent, ListSubheader, Divider, Tooltip } from '@mui/material';
 import { useTranslations } from 'next-intl';
 import { ArrowDropUp, ArrowDropDown } from '@mui/icons-material';
 import { MdArrowBack, MdArrowForward } from 'react-icons/md';
@@ -143,6 +143,13 @@ const TableGrid = <T extends BaseRow,>({
   // Add this new function to handle the Select onChange event
   const handleSelectChange = (event: SelectChangeEvent<string>) => {
     const selectedAction = event.target.value;
+    const actionConfig = bulkActions.find((action) => action.value === selectedAction);
+    const isDisabled =
+      !!actionConfig?.disabled ||
+      (!!actionConfig?.requiresSelection && selectedRowIds.size === 0);
+    if (isDisabled) {
+      return;
+    }
     setBulkAction(selectedAction);
     if (handleRowExpansionBulkAction(selectedAction)) {
       return;
@@ -363,9 +370,35 @@ const TableGrid = <T extends BaseRow,>({
                       </ListSubheader>
                     );
                   }
+                  const isActionDisabled =
+                    !!action.disabled ||
+                    (!!action.requiresSelection && selectedRowIds.size === 0);
+                  const disabledReason = isActionDisabled ? action.disabledReason : undefined;
                   acc.push(
-                    <MenuItem key={action.value} value={action.value} sx={{ pl: action.group ? 3 : 1, color: 'var(--eduhub-label-primary)' }}>
-                      {action.label}
+                    <MenuItem
+                      key={action.value}
+                      value={action.value}
+                      disabled={isActionDisabled}
+                      sx={{
+                        pl: action.group ? 3 : 1,
+                        color: isActionDisabled
+                          ? 'var(--eduhub-label-secondary)'
+                          : 'var(--eduhub-label-primary)',
+                        '&.Mui-disabled': {
+                          color: 'var(--eduhub-label-secondary)',
+                          opacity: 0.7,
+                          pointerEvents: 'auto',
+                          cursor: 'not-allowed',
+                        },
+                      }}
+                    >
+                      <Tooltip
+                        title={disabledReason ?? ''}
+                        placement="right"
+                        disableHoverListener={!isActionDisabled || !disabledReason}
+                      >
+                        <span>{action.label}</span>
+                      </Tooltip>
                     </MenuItem>
                   );
                   return acc;

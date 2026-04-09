@@ -323,7 +323,7 @@ const ProfileContent: FC = () => {
             <div className="w-full md:w-1/2 pr-0 md:p-0">
               <InputField
                 variant="eduhub"
-                type="number"
+                type="input"
                 label={t('matriculation_number')}
                 placeholder={t('matriculation_number_placeholder')}
                 itemId={userData?.User_by_pk?.id}

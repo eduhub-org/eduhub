@@ -18,6 +18,7 @@ import {
   UpdateEnrollmentRatingVariables,
 } from '../../../../queries/__generated__/UpdateEnrollmentRating';
 import {
+  UPDATE_ENROLLMENT_STATUS_FOR_INVITE,
   UPDATE_ENROLLMENT_STATUS_WHEN_APPLIED,
   UPDATE_ENROLLMENT_RATING,
 } from '../../../../queries/insertEnrollment';
@@ -108,6 +109,13 @@ const isExpired = (enrollment: ManagedCourse_Course_by_pk_CourseEnrollments) => 
   return new Date(enrollment.invitationExpirationDate).setHours(0, 0, 0, 0) < new Date().setHours(0, 0, 0, 0);
 };
 
+const isInviteEligibleEnrollment = (enrollment: ManagedCourse_Course_by_pk_CourseEnrollments) =>
+  enrollment.motivationRating === 'INVITE' &&
+  (enrollment.status === 'APPLIED' || enrollment.status === 'INVITED');
+
+const isRejectionEligibleEnrollment = (enrollment: ManagedCourse_Course_by_pk_CourseEnrollments) =>
+  enrollment.motivationRating === 'DECLINE' && enrollment.status === 'APPLIED';
+
 export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
   const t = useTranslations('manageCourse');
   const tCommon = useTranslations('common');
@@ -168,6 +176,11 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
     </div>
   );
 
+  const [updateEnrollmentStatusForInvite] = useRoleMutation<
+    UpdateEnrollmentStatusWhenApplied,
+    UpdateEnrollmentStatusWhenAppliedVariables
+  >(UPDATE_ENROLLMENT_STATUS_FOR_INVITE);
+
   const [updateEnrollmentStatusWhenApplied] = useRoleMutation<
     UpdateEnrollmentStatusWhenApplied,
     UpdateEnrollmentStatusWhenAppliedVariables
@@ -226,7 +239,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
         .map((id) => idToRow.get(id))
         .filter(
           (e): e is ManagedCourse_Course_by_pk_CourseEnrollments =>
-            !!e && e.motivationRating === 'INVITE' && e.status === 'APPLIED'
+            !!e && isInviteEligibleEnrollment(e)
         );
       if (enrollmentsToSend.length === 0) {
         showBulkNotice(t('bulk_actions.no_eligible_invitations'));
@@ -260,7 +273,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
       .map((e) => e.id)
       .filter((id) => {
         const row = idToRow.get(id);
-        return row?.motivationRating === 'INVITE' && row.status === 'APPLIED';
+        return !!row && isInviteEligibleEnrollment(row);
       });
 
     if (enrollmentIds.length === 0) {
@@ -271,7 +284,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
 
     let invitedCount = 0;
     try {
-      const result = await updateEnrollmentStatusWhenApplied({
+      const result = await updateEnrollmentStatusForInvite({
         variables: {
           enrollmentIds,
           status: CourseEnrollmentStatus_enum.INVITED,
@@ -313,7 +326,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
     inviteDialogData,
     inviteExpireDate,
     courseEnrollments,
-    updateEnrollmentStatusWhenApplied,
+    updateEnrollmentStatusForInvite,
     qResult,
     handleCloseInviteDialog,
     showBulkNotice,
@@ -470,9 +483,50 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
     return filtered;
   }, [courseEnrollments, searchFilter]);
 
+  const hasStatus = useMemo(
+    () => ({
+      CONFIRMED: courseEnrollments.some((e) => e.status === 'CONFIRMED'),
+      INVITED: courseEnrollments.some((e) => e.status === 'INVITED'),
+      APPLIED: courseEnrollments.some((e) => e.status === 'APPLIED'),
+      REJECTED: courseEnrollments.some((e) => e.status === 'REJECTED'),
+      WAITLIST: courseEnrollments.some((e) => e.status === 'WAITLIST'),
+    }),
+    [courseEnrollments]
+  );
+
+  const hasRating = useMemo(
+    () => ({
+      INVITE: courseEnrollments.some((e) => e.motivationRating === 'INVITE'),
+      DECLINE: courseEnrollments.some((e) => e.motivationRating === 'DECLINE'),
+      REVIEW: courseEnrollments.some((e) => e.motivationRating === 'REVIEW'),
+    }),
+    [courseEnrollments]
+  );
+
+  const bulkActionDisabledMap = useMemo(
+    () => ({
+      email_status_CONFIRMED: !hasStatus.CONFIRMED,
+      email_status_INVITED: !hasStatus.INVITED,
+      email_status_APPLIED: !hasStatus.APPLIED,
+      email_status_REJECTED: !hasStatus.REJECTED,
+      email_status_WAITLIST: !hasStatus.WAITLIST,
+      email_rating_INVITE: !hasRating.INVITE,
+      email_rating_DECLINE: !hasRating.DECLINE,
+      email_rating_REVIEW: !hasRating.REVIEW,
+    }),
+    [hasRating, hasStatus]
+  );
+
   // Bulk actions handler
   const handleBulkEmailAction = useCallback(
     (action: string, selectedRows: ManagedCourse_Course_by_pk_CourseEnrollments[]) => {
+      if (
+        action in bulkActionDisabledMap &&
+        bulkActionDisabledMap[action as keyof typeof bulkActionDisabledMap]
+      ) {
+        return;
+      }
+
       let targetEnrollments: ManagedCourse_Course_by_pk_CourseEnrollments[] = [];
 
       // Row expansion actions are handled directly in TableGrid.
@@ -490,24 +544,12 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
           setIsNoSelectionDialogOpen(true);
           return;
         }
-        const enrollmentsToSend = selectedRows.filter(
-          (e) => e.motivationRating === 'INVITE' && e.status === 'APPLIED'
-        );
+        const enrollmentsToSend = selectedRows.filter((e) => isInviteEligibleEnrollment(e));
         if (enrollmentsToSend.length === 0) {
           showBulkNotice(t('bulk_actions.no_eligible_invitations'));
           return;
         }
         handleOpenInviteDialog(enrollmentsToSend.map((e) => e.id), selectedRows.length, 'selected');
-        return;
-      } else if (action === 'send_invitations_all') {
-        const enrollmentsToSend = courseEnrollments.filter(
-          (e) => e.motivationRating === 'INVITE' && e.status === 'APPLIED'
-        );
-        if (enrollmentsToSend.length === 0) {
-          showBulkNotice(t('bulk_actions.no_eligible_invitations'));
-          return;
-        }
-        handleOpenInviteDialog(enrollmentsToSend.map((e) => e.id), undefined, 'all');
         return;
       }
 
@@ -517,24 +559,12 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
           setIsNoSelectionDialogOpen(true);
           return;
         }
-        const enrollmentsToSend = selectedRows.filter(
-          (e) => e.motivationRating === 'DECLINE' && e.status === 'APPLIED'
-        );
+        const enrollmentsToSend = selectedRows.filter((e) => isRejectionEligibleEnrollment(e));
         if (enrollmentsToSend.length === 0) {
           showBulkNotice(t('bulk_actions.no_eligible_rejections'));
           return;
         }
         handleOpenRejectionDialog(enrollmentsToSend.map((e) => e.id), selectedRows.length, 'selected');
-        return;
-      } else if (action === 'send_rejections_all') {
-        const enrollmentsToSend = courseEnrollments.filter(
-          (e) => e.motivationRating === 'DECLINE' && e.status === 'APPLIED'
-        );
-        if (enrollmentsToSend.length === 0) {
-          showBulkNotice(t('bulk_actions.no_eligible_rejections'));
-          return;
-        }
-        handleOpenRejectionDialog(enrollmentsToSend.map((e) => e.id), undefined, 'all');
         return;
       }
 
@@ -559,6 +589,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
       }
     },
     [
+      bulkActionDisabledMap,
       courseEnrollments,
       handleOpenInviteDialog,
       handleOpenRejectionDialog,
@@ -574,111 +605,102 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
         value: 'expand_selected_rows',
         label: t('bulk_actions.expand_selected_rows'),
         group: t('bulk_actions.expand_collapse_rows'),
+        requiresSelection: true,
+        disabledReason: t('bulk_actions.disabled_reasons.select_participants_first'),
       },
       {
         value: 'collapse_selected_rows',
         label: t('bulk_actions.collapse_selected_rows'),
         group: t('bulk_actions.expand_collapse_rows'),
+        requiresSelection: true,
+        disabledReason: t('bulk_actions.disabled_reasons.select_participants_first'),
       },
-      { value: 'email_selected', label: t('bulk_actions.email_selected') },
-    ];
-
-    // Invitation actions - only for instructors (green rating + still applied)
-    if (
-      isInstructor &&
-      courseEnrollments.some((e) => e.motivationRating === 'INVITE' && e.status === 'APPLIED')
-    ) {
-      actions.push({
+      {
+        value: 'email_selected',
+        label: t('bulk_actions.email_selected'),
+        requiresSelection: true,
+        disabledReason: t('bulk_actions.disabled_reasons.select_participants_first'),
+      },
+      {
         value: 'send_invitations_selected',
         label: t('bulk_actions.send_invitations_selected'),
-        group: t('bulk_actions.send_invitations'),
-      });
-      actions.push({
-        value: 'send_invitations_all',
-        label: t('bulk_actions.send_invitations_all'),
-        group: t('bulk_actions.send_invitations'),
-      });
-    }
-
-    // Rejection actions - only for instructors (red rating + still applied)
-    if (
-      isInstructor &&
-      courseEnrollments.some((e) => e.motivationRating === 'DECLINE' && e.status === 'APPLIED')
-    ) {
-      actions.push({
+        group: t('bulk_actions.send_decisions'),
+        requiresSelection: true,
+        disabled: !isInstructor,
+        disabledReason: !isInstructor
+          ? t('bulk_actions.disabled_reasons.instructors_only')
+          : t('bulk_actions.disabled_reasons.select_participants_first'),
+      },
+      {
         value: 'send_rejections_selected',
         label: t('bulk_actions.send_rejections_selected'),
-        group: t('bulk_actions.send_rejections'),
-      });
-      actions.push({
-        value: 'send_rejections_all',
-        label: t('bulk_actions.send_rejections_all'),
-        group: t('bulk_actions.send_rejections'),
-      });
-    }
-
-    // Email by status
-    if (courseEnrollments.some((e) => e.status === 'CONFIRMED')) {
-      actions.push({
+        group: t('bulk_actions.send_decisions'),
+        requiresSelection: true,
+        disabled: !isInstructor,
+        disabledReason: !isInstructor
+          ? t('bulk_actions.disabled_reasons.instructors_only')
+          : t('bulk_actions.disabled_reasons.select_participants_first'),
+      },
+      {
         value: 'email_status_CONFIRMED',
         label: t('bulk_actions.email_all_confirmed'),
         group: t('bulk_actions.email_all_by_status'),
-      });
-    }
-    if (courseEnrollments.some((e) => e.status === 'INVITED')) {
-      actions.push({
+        disabled: bulkActionDisabledMap.email_status_CONFIRMED,
+        disabledReason: t('bulk_actions.disabled_reasons.no_confirmed'),
+      },
+      {
         value: 'email_status_INVITED',
         label: t('bulk_actions.email_all_invited'),
         group: t('bulk_actions.email_all_by_status'),
-      });
-    }
-    if (courseEnrollments.some((e) => e.status === 'APPLIED')) {
-      actions.push({
+        disabled: bulkActionDisabledMap.email_status_INVITED,
+        disabledReason: t('bulk_actions.disabled_reasons.no_invited'),
+      },
+      {
         value: 'email_status_APPLIED',
         label: t('bulk_actions.email_all_applied'),
         group: t('bulk_actions.email_all_by_status'),
-      });
-    }
-    if (courseEnrollments.some((e) => e.status === 'REJECTED')) {
-      actions.push({
+        disabled: bulkActionDisabledMap.email_status_APPLIED,
+        disabledReason: t('bulk_actions.disabled_reasons.no_applied'),
+      },
+      {
         value: 'email_status_REJECTED',
         label: t('bulk_actions.email_all_rejected'),
         group: t('bulk_actions.email_all_by_status'),
-      });
-    }
-    if (courseEnrollments.some((e) => e.status === 'WAITLIST')) {
-      actions.push({
+        disabled: bulkActionDisabledMap.email_status_REJECTED,
+        disabledReason: t('bulk_actions.disabled_reasons.no_rejected'),
+      },
+      {
         value: 'email_status_WAITLIST',
         label: t('bulk_actions.email_all_waitlist'),
         group: t('bulk_actions.email_all_by_status'),
-      });
-    }
-
-    // Email by rating
-    if (courseEnrollments.some((e) => e.motivationRating === 'INVITE')) {
-      actions.push({
+        disabled: bulkActionDisabledMap.email_status_WAITLIST,
+        disabledReason: t('bulk_actions.disabled_reasons.no_waitlist'),
+      },
+      {
         value: 'email_rating_INVITE',
         label: t('bulk_actions.email_all_invite_rating'),
         group: t('bulk_actions.email_all_by_rating'),
-      });
-    }
-    if (courseEnrollments.some((e) => e.motivationRating === 'DECLINE')) {
-      actions.push({
+        disabled: bulkActionDisabledMap.email_rating_INVITE,
+        disabledReason: t('bulk_actions.disabled_reasons.no_invite_rating'),
+      },
+      {
         value: 'email_rating_DECLINE',
         label: t('bulk_actions.email_all_decline_rating'),
         group: t('bulk_actions.email_all_by_rating'),
-      });
-    }
-    if (courseEnrollments.some((e) => e.motivationRating === 'REVIEW')) {
-      actions.push({
+        disabled: bulkActionDisabledMap.email_rating_DECLINE,
+        disabledReason: t('bulk_actions.disabled_reasons.no_decline_rating'),
+      },
+      {
         value: 'email_rating_REVIEW',
         label: t('bulk_actions.email_all_review_rating'),
         group: t('bulk_actions.email_all_by_rating'),
-      });
-    }
+        disabled: bulkActionDisabledMap.email_rating_REVIEW,
+        disabledReason: t('bulk_actions.disabled_reasons.no_review_rating'),
+      },
+    ];
 
     return actions;
-  }, [courseEnrollments, t, isInstructor]);
+  }, [bulkActionDisabledMap, isInstructor, t]);
 
   // Rating sort function
   const ratingSortFn = useCallback((a: MotivationRating_enum, b: MotivationRating_enum) => {
