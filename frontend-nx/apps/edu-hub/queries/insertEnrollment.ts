@@ -124,3 +124,27 @@ export const UPDATE_ENROLLMENT_STATUS_WHEN_APPLIED = gql`
     }
   }
 `;
+
+/** Bulk invite update for APPLIED or already INVITED rows (supports invite resend/deadline changes). */
+export const UPDATE_ENROLLMENT_STATUS_FOR_INVITE = gql`
+  mutation UpdateEnrollmentStatusForInvite(
+    $enrollmentIds: [Int!]!
+    $status: CourseEnrollmentStatus_enum!
+    $expire: date
+  ) {
+    update_CourseEnrollment(
+      where: {
+        _and: [
+          { id: { _in: $enrollmentIds } }
+          { status: { _in: [APPLIED, INVITED] } }
+        ]
+      }
+      _set: { status: $status, invitationExpirationDate: $expire }
+    ) {
+      affected_rows
+      returning {
+        id
+      }
+    }
+  }
+`;

@@ -10,6 +10,9 @@ export interface BulkAction {
   value: string;
   label: string;
   group?: string; // Optional group name for grouping menu items
+  disabled?: boolean;
+  disabledReason?: string;
+  requiresSelection?: boolean;
 }
 
 export interface TableGridProps<T extends BaseRow> {
