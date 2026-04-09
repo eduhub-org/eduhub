@@ -320,7 +320,7 @@ const Onboarding: FC<OnboardingProps> = ({ course, enrollmentId, refetchCourse, 
         <div className="w-full lg:w-1/2 lg:pr-3">
           <InputField
             variant="eduhub"
-            type="number"
+            type="input"
             label={tProfile('matriculation_number')}
             itemId={userData?.User_by_pk?.id}
             value={userData?.User_by_pk?.matriculationNumber || ''}
