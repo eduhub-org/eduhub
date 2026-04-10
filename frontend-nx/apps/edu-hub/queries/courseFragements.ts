@@ -10,10 +10,13 @@ export const COURSE_TILE_FRAGMENT = gql`
     weekDay
     startTime
     endTime
+    applicationEnd
     published
     Program {
       published
       title
+      defaultApplicationEnd
+      showExtendedApplicationBanner
     }
     CourseLocations {
       locationOption

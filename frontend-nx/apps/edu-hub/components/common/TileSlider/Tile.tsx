@@ -8,6 +8,7 @@ import { CourseTiles_Course } from '../../../queries/__generated__/CourseTiles';
 import {
   useWeekdayStartAndEndString,
 } from '../../../helpers/dateTimeHelpers';
+import { shouldShowExtendedApplicationBanner } from '../../../helpers/courseTileExtendedApplication';
 import React from 'react';
 import { TileBase } from './TileBase';
 
@@ -22,9 +23,26 @@ export const Tile: FC<TileProps> = ({ course, isManage }) => {
   const t = useTranslations('common');
   const getWeekdayStartAndEndString = useWeekdayStartAndEndString();
 
+  const showExtendedBanner = shouldShowExtendedApplicationBanner(course);
+
+  const extendedBannerOverlay = showExtendedBanner ? (
+    <div
+      className="rounded-full border-2 border-[var(--eduhub-label-primary,#111)] bg-[#ffd6dc] px-2.5 py-1 text-center shadow-sm"
+      role="status"
+      aria-label={`${t('course_tile.extended_application_banner_en')} / ${t('course_tile.extended_application_banner_de')}`}
+    >
+      <span className="block text-[10px] font-semibold uppercase leading-tight tracking-wide text-[#b00020]">
+        {t('course_tile.extended_application_banner_en')}
+      </span>
+      <span className="mt-0.5 block text-[10px] font-semibold uppercase leading-tight tracking-wide text-[#b00020]">
+        {t('course_tile.extended_application_banner_de')}
+      </span>
+    </div>
+  ) : null;
+
   return (
     <Link href={isManage ? `/manage/course/${course.id}` : `/course/${course.id}`}>
-      <TileBase coverImage={course?.coverImage ?? null} title={course.title}>
+      <TileBase coverImage={course?.coverImage ?? null} title={course.title} imageOverlay={extendedBannerOverlay}>
         <div className="flex justify-between mb-3 text-sm tracking-wider text-label-primary">
           {course.weekDay !== 'NONE' && course.startTime && course.endTime
             ? getWeekdayStartAndEndString(course, t)

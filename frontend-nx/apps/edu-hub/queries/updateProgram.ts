@@ -41,6 +41,15 @@ export const UPDATE_PROGRAM_VISIBILITY = gql`
   }
 `;
 
+export const UPDATE_PROGRAM_SHOW_EXTENDED_APPLICATION_BANNER = gql`
+  mutation UpdateProgramShowExtendedApplicationBanner($programId: Int!, $value: Boolean!) {
+    update_Program_by_pk(pk_columns: { id: $programId }, _set: { showExtendedApplicationBanner: $value }) {
+      id
+      showExtendedApplicationBanner
+    }
+  }
+`;
+
 export const UPDATE_PROGRAM_PUBLISHED = gql`
   mutation UpdateProgramPublished($programId: Int!, $published: Boolean!) {
     update_Program_by_pk(

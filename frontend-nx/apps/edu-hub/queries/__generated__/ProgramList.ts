@@ -88,6 +88,10 @@ export interface ProgramList_Program {
    */
   matrixInstructorRoomId: string | null;
   /**
+   * When true, course tiles may show a notice when the program default application end has passed but a course still accepts applications.
+   */
+  showExtendedApplicationBanner: boolean;
+  /**
    * An array relationship
    */
   Courses: ProgramList_Program_Courses[];

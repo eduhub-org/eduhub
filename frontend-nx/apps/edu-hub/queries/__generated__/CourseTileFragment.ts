@@ -19,6 +19,14 @@ export interface CourseTileFragment_Program {
    * The title of the program
    */
   title: string;
+  /**
+   * The default application deadline for a course. It can be changed on the course level.
+   */
+  defaultApplicationEnd: any | null;
+  /**
+   * When true, course tiles may show a notice when the program default application end has passed but a course still accepts applications.
+   */
+  showExtendedApplicationBanner: boolean;
 }
 
 export interface CourseTileFragment_CourseLocations {
@@ -60,6 +68,10 @@ export interface CourseTileFragment {
    * The time the course ends each week.
    */
   endTime: any | null;
+  /**
+   * Last day before applications are closed. (Set to the program's default value when the course is created.)
+   */
+  applicationEnd: any | null;
   /**
    * Decides whether the course is published for all users or not.
    */

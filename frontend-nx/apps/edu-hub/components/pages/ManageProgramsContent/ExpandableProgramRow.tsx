@@ -18,7 +18,9 @@ import {
   UPDATE_DEFAULT_ENROLLMENT_SURVEY,
   UPDATE_PROGRAM_SHORT_TITLE,
   UPDATE_PROGRAM_MATRIX_INSTRUCTOR_ROOM,
+  UPDATE_PROGRAM_SHOW_EXTENDED_APPLICATION_BANNER,
 } from '../../../queries/updateProgram';
+import CheckboxSelector from '../../inputs/CheckboxSelector';
 import { SYNC_PROGRAM_INSTRUCTOR_MATRIX_ROOM } from '../../../queries/syncProgramInstructorMatrixRoom';
 import {
   SyncProgramInstructorMatrixRoom,
@@ -124,6 +126,19 @@ const ExpandableProgramRow: FC<ExpandableProgramRowProps> = ({ program }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
           {/* Left Column */}
           <div className="space-y-4 w-full min-w-0">
+            {/* Extended application banner (course tiles) */}
+            <div className="bg-fill-primary border border-border-primary rounded-lg p-4">
+              <CheckboxSelector
+                variant="material"
+                label={t('extended_application_banner.label')}
+                helpText={t('extended_application_banner.help_text')}
+                checked={program.showExtendedApplicationBanner ?? false}
+                updateValueMutation={UPDATE_PROGRAM_SHOW_EXTENDED_APPLICATION_BANNER}
+                identifierVariables={{ programId: program.id }}
+                refetchQueries={['ProgramList']}
+              />
+            </div>
+
             {/* 0. Short Title */}
             <div className="bg-fill-primary border border-border-primary rounded-lg p-4">
               <InputField

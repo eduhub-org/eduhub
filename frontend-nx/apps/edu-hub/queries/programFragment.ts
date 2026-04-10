@@ -44,6 +44,7 @@ export const ADMIN_PROGRAM_FRAGMENT = gql`
   ${PROGRAM_FRAGMENT_MINIMUM_PROPERTIES}
   fragment AdminProgramFragment on Program {
     ...ProgramFragmentMinimumProperties
+    showExtendedApplicationBanner
     applicationStart
     closingQuestionnaire
     defaultApplicationEnd

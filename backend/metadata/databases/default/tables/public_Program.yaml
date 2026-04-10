@@ -40,6 +40,7 @@ select_permissions:
         - type
         - visibility
         - defaultFormbricksEnrollmentSurveyUrl
+        - showExtendedApplicationBanner
       filter: {}
   - role: instructor_access
     permission:
@@ -64,5 +65,12 @@ select_permissions:
         - defaultFormbricksEnrollmentSurveyUrl
         - matrixSpaceId
         - matrixInstructorRoomId
+        - showExtendedApplicationBanner
       filter: {}
 update_permissions:
+  - role: admin
+    permission:
+      columns:
+        - showExtendedApplicationBanner
+      filter: {}
+      check: null

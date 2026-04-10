@@ -82,4 +82,8 @@ export interface AdminProgramFragment {
    * Matrix room id for the program-wide instructor Element chat (!room:server); invites are sent via admin API.
    */
   matrixInstructorRoomId: string | null;
+  /**
+   * When true, course tiles may show a notice when the program default application end has passed but a course still accepts applications.
+   */
+  showExtendedApplicationBanner: boolean;
 }

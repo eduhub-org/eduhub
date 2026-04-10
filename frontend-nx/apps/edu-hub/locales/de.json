@@ -25,6 +25,10 @@
     "SATURDAY": "SAMSTAG",
     "SUNDAY": "SONNTAG",
     "place": "Ort",
+    "course_tile": {
+      "extended_application_banner_en": "Extended application period",
+      "extended_application_banner_de": "Verlängerte Bewerbungsfrist"
+    },
     "addresses": "Adressen",
     "date": "Datum",
     "start-time": "Startzeit",
@@ -1426,6 +1430,10 @@
     "bulk_action": {
       "publish": "Ausgewählte veröffentlichen",
       "unpublish": "Ausgewählte zurückziehen"
+    },
+    "extended_application_banner": {
+      "label": "Verlängerte Kurs-Bewerbungsfristen hervorheben",
+      "help_text": "Wenn aktiviert, erscheint auf Kurskacheln ein zweisprachiger Hinweis, solange die Standard-Bewerbungsfrist des Programms vorbei ist, der Kurs aber noch eine spätere Bewerbungsfrist hat."
     },
     "instructor_element_room": {
       "label": "Element-Raum für Kursleitungen",

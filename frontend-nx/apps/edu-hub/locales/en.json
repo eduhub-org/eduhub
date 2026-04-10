@@ -25,6 +25,10 @@
     "SATURDAY": "SATURDAY",
     "SUNDAY": "SUNDAY",
     "place": "Location",
+    "course_tile": {
+      "extended_application_banner_en": "Extended application period",
+      "extended_application_banner_de": "Verlängerte Bewerbungsfrist"
+    },
     "addresses": "Addresses",
     "date": "Date",
     "start-time": "Start time",
@@ -1441,6 +1445,10 @@
     "bulk_action": {
       "publish": "Publish Selected",
       "unpublish": "Unpublish Selected"
+    },
+    "extended_application_banner": {
+      "label": "Highlight extended course application periods",
+      "help_text": "When enabled, a bilingual notice appears on course tiles while the program’s default application deadline has passed but a course still has a later application deadline."
     },
     "instructor_element_room": {
       "label": "Instructor Element room",

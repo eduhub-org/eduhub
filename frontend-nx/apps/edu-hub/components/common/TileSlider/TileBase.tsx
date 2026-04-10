@@ -5,12 +5,22 @@ interface TileBaseProps {
   coverImage: string | null;
   title: string;
   children: ReactNode;
+  /** Optional overlay on the image area (e.g. deadline notice) */
+  imageOverlay?: ReactNode;
   onClick?: () => void;
   className?: string;
   style?: React.CSSProperties;
 }
 
-const TileBaseComponent: FC<TileBaseProps> = ({ coverImage: coverImageProp, title, children, onClick, className = '', style }) => {
+const TileBaseComponent: FC<TileBaseProps> = ({
+  coverImage: coverImageProp,
+  title,
+  children,
+  imageOverlay,
+  onClick,
+  className = '',
+  style,
+}) => {
   // Initialize with placeholder immediately to prevent layout shifts
   const [coverImage, setCoverImage] = useState<string>('https://picsum.photos/240/144');
 
@@ -57,6 +67,11 @@ const TileBaseComponent: FC<TileBaseProps> = ({ coverImage: coverImageProp, titl
             background: 'linear-gradient(51.32deg, rgba(0, 0, 0, 0.7) 17.57%, rgba(0, 0, 0, 0) 85.36%)',
           }}
         ></div>
+        {imageOverlay ? (
+          <div className="absolute top-3 right-3 z-[1] max-w-[min(100%-1.5rem,14rem)] pointer-events-none">
+            {imageOverlay}
+          </div>
+        ) : null}
         <div className="absolute inset-0 flex justify-start items-end p-3">
           <span className="text-3xl text-white">{title}</span>
         </div>
