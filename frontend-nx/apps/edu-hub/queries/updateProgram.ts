@@ -52,6 +52,18 @@ export const UPDATE_PROGRAM_PUBLISHED = gql`
   }
 `;
 
+export const UPDATE_PROGRAM_SHOW_EXTENDED_APPLICATION_PERIOD_BANNER = gql`
+  mutation UpdateProgramShowExtendedApplicationPeriodBanner($programId: Int!, $value: Boolean!) {
+    update_Program_by_pk(
+      pk_columns: { id: $programId }
+      _set: { showExtendedApplicationPeriodBanner: $value }
+    ) {
+      id
+      showExtendedApplicationPeriodBanner
+    }
+  }
+`;
+
 
 export const UPDATE_PROGRAM_TITLE = gql`
   mutation UpdateProgramTitle($itemId: Int!, $text: String!) {

@@ -244,6 +244,9 @@
     },
     "session_expired_notification": "Deine Sitzung ist abgelaufen. Bitte melde dich erneut an, um fortzufahren.",
     "tile_slider_unavailable": "Kachel-Slider vorübergehend nicht verfügbar",
+    "course_tile": {
+      "extended_application_period_badge": "Verlängerte Anmeldefrist"
+    },
     "no_description_available": "Keine Beschreibung verfügbar",
     "error_handling": {
       "certificate_generation_failed": "Fehler beim Erstellen der Leistungsnachweise. Bitte versuche es erneut.",
@@ -1435,6 +1438,10 @@
       "sync_success": "Einladungen verarbeitet: {invited} gesendet, {skipped} übersprungen (bereits im Raum oder kein Matrix-Handle).",
       "sync_error": "Nicht alle Matrix-Einladungen konnten gesendet werden. Prüfe die Server-Logs und die Raum-ID.",
       "invalid_room_id": "Die Eingabe konnte nicht als gültige Matrix-Raum-ID erkannt werden (!raum:server). Bitte prüfe den Wert und versuche es erneut."
+    },
+    "extended_application_banner": {
+      "label": "Badge „Verlängerte Anmeldefrist“ auf Kurskacheln anzeigen",
+      "help_text": "Wenn diese Option aktiv ist, wird auf allen Kurskacheln dieses Programms ein Badge angezeigt, sobald das Bewerbungsende des Programms überschritten ist – aber nur solange das individuelle Bewerbungsende des jeweiligen Kurses noch in der Zukunft liegt."
     },
     "notifications": {
       "programs_published_success_singular": "Programm wurde erfolgreich veröffentlicht",
