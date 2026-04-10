@@ -208,6 +208,13 @@ type Mutation {
   ): ValidateFormbricksSurveyResult!
 }
 
+type Mutation {
+  saveCourseFormbricksEnrollmentSurvey(
+    itemId: Int!
+    text: String!
+  ): SaveCourseFormbricksEnrollmentSurveyResult!
+}
+
 input AddonMappingInput {
   questionId: String!
   choiceId: String!
@@ -492,6 +499,15 @@ type SaveAddonMappingsResult {
   messageKey: String!
   error: String
   stripeResults: StripePriceCreationResult
+}
+
+type SaveCourseFormbricksEnrollmentSurveyResult {
+  success: Boolean!
+  messageKey: String!
+  error: String
+  courseId: Int
+  surveyId: String
+  formbricksEnrollmentSurveyUrl: String
 }
 
 type StripePriceCreationResult {

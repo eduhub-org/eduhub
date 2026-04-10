@@ -48,7 +48,7 @@ import {
   UPDATE_COURSE_MAX_MISSED_SESSION,
   UPDATE_COURSE_REGISTRATION_TYPE,
   UPDATE_COURSE_LEARNING_GOALS,
-  UPDATE_COURSE_FORMBRICKS_ENROLLMENT_SURVEY,
+  SAVE_COURSE_FORMBRICKS_ENROLLMENT_SURVEY,
   UPDATE_COURSE_BASE_PRICE,
   UPDATE_COURSE_CURRENCY,
 } from '../../../queries/course';
@@ -682,7 +682,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                       placeholder={course.Program?.defaultFormbricksEnrollmentSurveyUrl || t('manageCourse.formbricks.survey_url_helper')}
                       itemId={course.id}
                       value={course.formbricksEnrollmentSurveyUrl || ''}
-                      updateValueMutation={UPDATE_COURSE_FORMBRICKS_ENROLLMENT_SURVEY}
+                      updateValueMutation={SAVE_COURSE_FORMBRICKS_ENROLLMENT_SURVEY}
                       refetchQueries={['AdminCourseList']}
                       helpText={t('manageCourse.formbricks.help_text')}
                       onValueUpdated={() => {

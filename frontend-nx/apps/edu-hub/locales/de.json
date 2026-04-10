@@ -217,7 +217,8 @@
       "invalid_minimum_maximum_integer": "Der Wert muss mindestens {min} und höchstens {max} sein",
       "invalid_integer_format": "Der Wert muss eine ganze Zahl sein",
       "invalid_input": "Ungültige Eingabe",
-      "transform_rejected": "Dieser Wert konnte nicht im erwarteten Format gespeichert werden."
+      "transform_rejected": "Dieser Wert konnte nicht im erwarteten Format gespeichert werden.",
+      "save_failed": "Speichern fehlgeschlagen."
     },
     "server_side_combobox": {
       "create_option": "\"{option}\" neu hinzufügen",

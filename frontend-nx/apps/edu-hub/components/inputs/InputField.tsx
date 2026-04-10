@@ -309,6 +309,28 @@ const InputField: React.FC<InputFieldProps> = ({
     }
   }, [effectiveValue, localText, effectiveItemId]);
 
+  const extractMutationFailureMessage = useCallback(
+    (resultData: unknown): string | null => {
+      if (!resultData || typeof resultData !== 'object') return null;
+
+      for (const value of Object.values(resultData as Record<string, unknown>)) {
+        if (!value || typeof value !== 'object' || !('success' in value)) continue;
+        const actionResult = value as { success?: boolean; error?: unknown; message?: unknown };
+        if (actionResult.success === false) {
+          if (typeof actionResult.error === 'string' && actionResult.error.trim()) {
+            return actionResult.error;
+          }
+          if (typeof actionResult.message === 'string' && actionResult.message.trim()) {
+            return actionResult.message;
+          }
+          return t('input_field.save_failed');
+        }
+      }
+      return null;
+    },
+    [t]
+  );
+
   const [updateText] = useRoleMutation(
     updateValueMutation ||
       gql`
@@ -319,6 +341,12 @@ const InputField: React.FC<InputFieldProps> = ({
     {
       onError: (error) => handleError(t(error.message)),
       onCompleted: (data) => {
+        const failureMessage = extractMutationFailureMessage(data);
+        if (failureMessage) {
+          handleError(failureMessage);
+          return;
+        }
+
         if (onValueUpdated) onValueUpdated(data);
         setShowSavedNotification(true);
       },
@@ -355,7 +383,7 @@ const InputField: React.FC<InputFieldProps> = ({
   );
 
   const getErrorMessage = useCallback(
-    (inputType: string): string => {
+    (inputType: string, numberText?: string): string => {
       switch (inputType) {
         case 'link':
           return t('input_field.invalid_link_format');
@@ -364,7 +392,7 @@ const InputField: React.FC<InputFieldProps> = ({
         case 'ects':
           return t('input_field.invalid_ects_format');
         case 'number': {
-          if (!Number.isInteger(Number.parseInt(localText, 10))) {
+          if (!Number.isInteger(Number.parseInt(numberText ?? '', 10))) {
             return t('input_field.invalid_integer_format');
           }
           if (min !== undefined && max !== undefined) {
@@ -422,7 +450,7 @@ const InputField: React.FC<InputFieldProps> = ({
       }
       setErrorMessage('');
     } else {
-      setErrorMessage(getErrorMessage(type));
+      setErrorMessage(getErrorMessage(type, newText));
     }
     setHasBlurred(false);
   }, debounceTimeout);
@@ -455,9 +483,10 @@ const InputField: React.FC<InputFieldProps> = ({
   const handleBlur = useCallback(() => {
     setHasBlurred(true);
     if (!validateInput(localText)) {
-      setErrorMessage(getErrorMessage(type));
+      const currentErrorMessage = getErrorMessage(type, localText);
+      setErrorMessage(currentErrorMessage);
       if (variant === 'eduhub') {
-        handleError(getErrorMessage(type));
+        handleError(currentErrorMessage);
       }
     } else {
       setErrorMessage('');

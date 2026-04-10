@@ -16,6 +16,7 @@ import createUser from "./createUser/index.js";
 import getFormbricksResponses from "./getFormbricksResponses/index.js";
 import getFormbricksAddonSelections from "./getFormbricksAddonSelections/index.js";
 import validateFormbricksSurvey from "./validateFormbricksSurvey/index.js";
+import saveCourseFormbricksEnrollmentSurvey from "./saveCourseFormbricksEnrollmentSurvey/index.js";
 import createStripeCheckout from "./createStripeCheckout/index.js";
 import createStripeBasePrice from "./createStripeBasePrice/index.js";
 import createStripeAddonPrices from "./createStripeAddonPrices/index.js";
@@ -68,6 +69,7 @@ const functionMap = {
   getFormbricksResponses,
   getFormbricksAddonSelections,
   validateFormbricksSurvey,
+  saveCourseFormbricksEnrollmentSurvey,
   createStripeCheckout,
   createStripeBasePrice,
   createStripeAddonPrices,
