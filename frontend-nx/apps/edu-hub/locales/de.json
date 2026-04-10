@@ -26,8 +26,7 @@
     "SUNDAY": "SONNTAG",
     "place": "Ort",
     "course_tile": {
-      "extended_application_banner_en": "Extended application period",
-      "extended_application_banner_de": "Verlängerte Bewerbungsfrist"
+      "extended_application_period": "Verlängerte Bewerbungsfrist"
     },
     "addresses": "Adressen",
     "date": "Datum",

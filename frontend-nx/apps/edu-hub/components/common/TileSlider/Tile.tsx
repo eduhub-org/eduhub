@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { FC } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { CourseList_Course } from '../../../queries/__generated__/CourseList';
 import { CoursesEnrolledByUser_Course } from '../../../queries/__generated__/CoursesEnrolledByUser';
 import { CourseTiles_Course } from '../../../queries/__generated__/CourseTiles';
@@ -21,21 +21,22 @@ interface TileProps {
 
 export const Tile: FC<TileProps> = ({ course, isManage }) => {
   const t = useTranslations('common');
+  const locale = useLocale();
   const getWeekdayStartAndEndString = useWeekdayStartAndEndString();
 
   const showExtendedBanner = shouldShowExtendedApplicationBanner(course);
+
+  const extendedBannerLabel = t('course_tile.extended_application_period');
 
   const extendedBannerOverlay = showExtendedBanner ? (
     <div
       className="rounded-full border-2 border-[var(--eduhub-label-primary,#111)] bg-[#ffd6dc] px-2.5 py-1 text-center shadow-sm"
       role="status"
-      aria-label={`${t('course_tile.extended_application_banner_en')} / ${t('course_tile.extended_application_banner_de')}`}
+      lang={locale}
+      aria-label={extendedBannerLabel}
     >
       <span className="block text-[10px] font-semibold uppercase leading-tight tracking-wide text-[#b00020]">
-        {t('course_tile.extended_application_banner_en')}
-      </span>
-      <span className="mt-0.5 block text-[10px] font-semibold uppercase leading-tight tracking-wide text-[#b00020]">
-        {t('course_tile.extended_application_banner_de')}
+        {extendedBannerLabel}
       </span>
     </div>
   ) : null;

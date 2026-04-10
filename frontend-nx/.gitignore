@@ -48,6 +48,10 @@ testem.log
 .DS_Store
 Thumbs.db
 
+# Playwright (local e2e)
+/e2e/e2e-output
+/test-results
+
 # Next.js
 .next
 
