@@ -61,7 +61,7 @@ const TileBaseComponent: FC<TileBaseProps> = ({
           }}
         ></div>
         {bannerText ? (
-          <div className="absolute right-3 top-3 z-20 max-w-[80%] rounded-full border border-[#222222] bg-warning px-3 py-1 text-xs font-semibold text-[#222222] shadow-sm">
+          <div className="absolute right-3 top-3 z-20 max-w-[80%] rounded-full border border-border-primary bg-warning px-3 py-1 text-xs font-semibold text-label-primary shadow-sm">
             {bannerText}
           </div>
         ) : null}

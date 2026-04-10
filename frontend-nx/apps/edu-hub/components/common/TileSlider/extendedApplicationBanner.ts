@@ -7,14 +7,12 @@ export const shouldShowExtendedApplicationBanner = (
     return false;
   }
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const toUtcDayStart = (date: Date): number =>
+    Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
 
-  const normalizedCourseEnd = new Date(applicationEnd);
-  normalizedCourseEnd.setHours(0, 0, 0, 0);
+  const todayUtc = toUtcDayStart(new Date());
+  const normalizedCourseEndUtc = toUtcDayStart(new Date(applicationEnd));
+  const normalizedProgramEndUtc = toUtcDayStart(new Date(programApplicationEnd));
 
-  const normalizedProgramEnd = new Date(programApplicationEnd);
-  normalizedProgramEnd.setHours(0, 0, 0, 0);
-
-  return normalizedProgramEnd <= today && normalizedCourseEnd > today;
+  return normalizedProgramEndUtc <= todayUtc && normalizedCourseEndUtc > todayUtc;
 };
