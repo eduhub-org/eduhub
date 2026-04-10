@@ -244,6 +244,9 @@
     },
     "session_expired_notification": "Your session has expired. Please log in again to continue.",
     "tile_slider_unavailable": "Tile slider temporarily unavailable",
+    "course_tile": {
+      "extended_application_period_badge": "Extended application period"
+    },
     "no_description_available": "No description available",
     "error_handling": {
       "certificate_generation_failed": "Failed to generate achievement certificates. Please try again.",
@@ -1450,6 +1453,10 @@
       "sync_success": "Invites processed: {invited} sent, {skipped} skipped (already in room or no Matrix handle).",
       "sync_error": "Could not send all Matrix invites. Check server logs and room id.",
       "invalid_room_id": "The input could not be recognized as a valid Matrix room id (!room:server). Please check the value and try again."
+    },
+    "extended_application_banner": {
+      "label": "Show 'Extended application period' badge on course tiles",
+      "help_text": "When enabled, a badge is shown on all course tiles in this program after the program application deadline has passed, but only while the individual course application deadline is still in the future."
     },
     "notifications": {
       "programs_published_success_singular": "Program was successfully published",

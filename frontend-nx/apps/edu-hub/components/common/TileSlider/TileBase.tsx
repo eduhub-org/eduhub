@@ -5,12 +5,21 @@ interface TileBaseProps {
   coverImage: string | null;
   title: string;
   children: ReactNode;
+  bannerText?: string | null;
   onClick?: () => void;
   className?: string;
   style?: React.CSSProperties;
 }
 
-const TileBaseComponent: FC<TileBaseProps> = ({ coverImage: coverImageProp, title, children, onClick, className = '', style }) => {
+const TileBaseComponent: FC<TileBaseProps> = ({
+  coverImage: coverImageProp,
+  title,
+  children,
+  bannerText,
+  onClick,
+  className = '',
+  style,
+}) => {
   // Initialize with placeholder immediately to prevent layout shifts
   const [coverImage, setCoverImage] = useState<string>('https://picsum.photos/240/144');
 
@@ -51,6 +60,11 @@ const TileBaseComponent: FC<TileBaseProps> = ({ coverImage: coverImageProp, titl
             backgroundImage: `url("${coverImage}")`,
           }}
         ></div>
+        {bannerText ? (
+          <div className="absolute right-3 top-3 z-20 max-w-[80%] rounded-full border border-[#222222] bg-warning px-3 py-1 text-xs font-semibold text-[#222222] shadow-sm">
+            {bannerText}
+          </div>
+        ) : null}
         <div
           className="absolute inset-0"
           style={{

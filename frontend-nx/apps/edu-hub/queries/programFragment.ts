@@ -8,6 +8,7 @@ export const PROGRAM_FRAGMENT_MINIMUM_PROPERTIES = gql`
     lectureStart
     lectureEnd
     defaultApplicationEnd
+    showExtendedApplicationPeriodBanner
     achievementRecordUploadDeadline
     published
     type
@@ -56,5 +57,6 @@ export const ADMIN_PROGRAM_FRAGMENT = gql`
     defaultFormbricksEnrollmentSurveyUrl
     matrixSpaceId
     matrixInstructorRoomId
+    showExtendedApplicationPeriodBanner
   }
 `;

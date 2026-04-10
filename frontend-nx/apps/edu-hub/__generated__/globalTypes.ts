@@ -1383,6 +1383,7 @@ export enum Program_select_column {
   organizationId = "organizationId",
   published = "published",
   shortTitle = "shortTitle",
+  showExtendedApplicationPeriodBanner = "showExtendedApplicationPeriodBanner",
   speakerQuestionnaire = "speakerQuestionnaire",
   startQuestionnaire = "startQuestionnaire",
   title = "title",
@@ -1395,6 +1396,7 @@ export enum Program_select_column {
  */
 export enum Program_select_column_Program_aggregate_bool_exp_bool_and_arguments_columns {
   published = "published",
+  showExtendedApplicationPeriodBanner = "showExtendedApplicationPeriodBanner",
   visibility = "visibility",
 }
 
@@ -1403,6 +1405,7 @@ export enum Program_select_column_Program_aggregate_bool_exp_bool_and_arguments_
  */
 export enum Program_select_column_Program_aggregate_bool_exp_bool_or_arguments_columns {
   published = "published",
+  showExtendedApplicationPeriodBanner = "showExtendedApplicationPeriodBanner",
   visibility = "visibility",
 }
 
@@ -1428,6 +1431,7 @@ export enum Program_update_column {
   organizationId = "organizationId",
   published = "published",
   shortTitle = "shortTitle",
+  showExtendedApplicationPeriodBanner = "showExtendedApplicationPeriodBanner",
   speakerQuestionnaire = "speakerQuestionnaire",
   startQuestionnaire = "startQuestionnaire",
   title = "title",
@@ -7508,6 +7512,7 @@ export interface Program_bool_exp {
   organizationId?: Int_comparison_exp | null;
   published?: Boolean_comparison_exp | null;
   shortTitle?: String_comparison_exp | null;
+  showExtendedApplicationPeriodBanner?: Boolean_comparison_exp | null;
   speakerQuestionnaire?: String_comparison_exp | null;
   startQuestionnaire?: String_comparison_exp | null;
   title?: String_comparison_exp | null;
@@ -7541,6 +7546,7 @@ export interface Program_insert_input {
   organizationId?: number | null;
   published?: boolean | null;
   shortTitle?: string | null;
+  showExtendedApplicationPeriodBanner?: boolean | null;
   speakerQuestionnaire?: string | null;
   startQuestionnaire?: string | null;
   title?: string | null;
@@ -7643,6 +7649,7 @@ export interface Program_order_by {
   organizationId?: order_by | null;
   published?: order_by | null;
   shortTitle?: order_by | null;
+  showExtendedApplicationPeriodBanner?: order_by | null;
   speakerQuestionnaire?: order_by | null;
   startQuestionnaire?: order_by | null;
   title?: order_by | null;
