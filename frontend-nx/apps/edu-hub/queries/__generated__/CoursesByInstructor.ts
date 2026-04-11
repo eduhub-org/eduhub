@@ -19,6 +19,14 @@ export interface CoursesByInstructor_Course_Program {
    * The title of the program
    */
   title: string;
+  /**
+   * The default application deadline for a course. It can be changed on the course level.
+   */
+  defaultApplicationEnd: any | null;
+  /**
+   * Controls whether course tiles should show an extended application period banner after the program deadline has passed while individual course deadlines are still open.
+   */
+  showExtendedApplicationPeriodBanner: boolean;
 }
 
 export interface CoursesByInstructor_Course_CourseLocations {
@@ -60,6 +68,10 @@ export interface CoursesByInstructor_Course {
    * The time the course ends each week.
    */
   endTime: any | null;
+  /**
+   * Last day before applications are closed. (Set to the program's default value when the course is created.)
+   */
+  applicationEnd: any;
   /**
    * Decides whether the course is published for all users or not.
    */

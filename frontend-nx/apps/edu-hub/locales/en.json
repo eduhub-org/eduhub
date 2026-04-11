@@ -217,7 +217,8 @@
       "invalid_minimum_maximum_integer": "The value must be at least {min} and at most {max}",
       "invalid_integer_format": "The value must be an integer",
       "invalid_input": "Invalid input",
-      "transform_rejected": "This value could not be saved in the expected format."
+      "transform_rejected": "This value could not be saved in the expected format.",
+      "save_failed": "Saving failed."
     },
     "server_side_combobox": {
       "create_option": "Create new entry \"{option}\"",
@@ -244,6 +245,9 @@
     },
     "session_expired_notification": "Your session has expired. Please log in again to continue.",
     "tile_slider_unavailable": "Tile slider temporarily unavailable",
+    "course_tile": {
+      "extended_application_period_badge": "Extended application period"
+    },
     "no_description_available": "No description available",
     "error_handling": {
       "certificate_generation_failed": "Failed to generate achievement certificates. Please try again.",
@@ -1212,7 +1216,19 @@
       "error_loading_responses": "Error loading questionnaire responses",
       "no_responses": "No questionnaire responses available",
       "questionnaire_responses": "Questionnaire Responses",
-      "incomplete_response": "Questionnaire not fully completed"
+      "incomplete_response": "Questionnaire not fully completed",
+      "errors": {
+        "FORMBRICKS_NOT_CONFIGURED": "Formbricks integration is not configured correctly.",
+        "INVALID_SURVEY_URL": "Please enter a valid Formbricks Link Survey URL from a trusted origin.",
+        "FORMBRICKS_AUTH_ERROR": "The configured Formbricks API token cannot access this survey.",
+        "FORMBRICKS_SURVEY_NOT_FOUND": "The Formbricks survey could not be found or is not accessible with the configured API token.",
+        "FORMBRICKS_TIMEOUT": "Validation request to Formbricks timed out. Please try again.",
+        "FORMBRICKS_FETCH_ERROR": "Could not validate the Formbricks survey. Please try again.",
+        "FORMBRICKS_REQUIRED_HIDDEN_FIELDS_MISSING": "The survey must define hidden fields eduhubUserId and eduhubCourseId.",
+        "FORMBRICKS_SURVEY_SAVE_ERROR": "Saving the Formbricks survey URL failed. Please try again.",
+        "HASURA_NOT_CONFIGURED": "The server configuration is incomplete. Please contact support.",
+        "COURSE_NOT_FOUND": "The selected course no longer exists."
+      }
     },
     "pricing": {
       "title": "Pricing Settings",
@@ -1450,6 +1466,10 @@
       "sync_success": "Invites processed: {invited} sent, {skipped} skipped (already in room or no Matrix handle).",
       "sync_error": "Could not send all Matrix invites. Check server logs and room id.",
       "invalid_room_id": "The input could not be recognized as a valid Matrix room id (!room:server). Please check the value and try again."
+    },
+    "extended_application_banner": {
+      "label": "Show 'Extended application period' badge on course tiles",
+      "help_text": "When enabled, a badge is shown on all course tiles in this program after the program application deadline has passed, but only while the individual course application deadline is still in the future."
     },
     "notifications": {
       "programs_published_success_singular": "Program was successfully published",

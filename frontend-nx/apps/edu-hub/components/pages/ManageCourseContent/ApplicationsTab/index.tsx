@@ -111,10 +111,13 @@ const isExpired = (enrollment: ManagedCourse_Course_by_pk_CourseEnrollments) => 
 
 const isInviteEligibleEnrollment = (enrollment: ManagedCourse_Course_by_pk_CourseEnrollments) =>
   enrollment.motivationRating === 'INVITE' &&
-  (enrollment.status === 'APPLIED' || enrollment.status === 'INVITED');
+  (enrollment.status === 'APPLIED' ||
+    enrollment.status === 'INVITED' ||
+    enrollment.status === 'WAITLIST');
 
 const isRejectionEligibleEnrollment = (enrollment: ManagedCourse_Course_by_pk_CourseEnrollments) =>
-  enrollment.motivationRating === 'DECLINE' && enrollment.status === 'APPLIED';
+  enrollment.motivationRating === 'DECLINE' &&
+  (enrollment.status === 'APPLIED' || enrollment.status === 'WAITLIST');
 
 export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
   const t = useTranslations('manageCourse');
@@ -238,8 +241,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
       const enrollmentsToSend = enrollmentIds
         .map((id) => idToRow.get(id))
         .filter(
-          (e): e is ManagedCourse_Course_by_pk_CourseEnrollments =>
-            !!e && isInviteEligibleEnrollment(e)
+          (e): e is ManagedCourse_Course_by_pk_CourseEnrollments => !!e && isInviteEligibleEnrollment(e)
         );
       if (enrollmentsToSend.length === 0) {
         showBulkNotice(t('bulk_actions.no_eligible_invitations'));
@@ -349,7 +351,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
         .map((id) => idToRow.get(id))
         .filter(
           (e): e is ManagedCourse_Course_by_pk_CourseEnrollments =>
-            !!e && e.motivationRating === 'DECLINE' && e.status === 'APPLIED'
+            !!e && isRejectionEligibleEnrollment(e)
         );
       if (enrollmentsToSend.length === 0) {
         showBulkNotice(t('bulk_actions.no_eligible_rejections'));
@@ -382,7 +384,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
       .map((e) => e.id)
       .filter((id) => {
         const row = idToRow.get(id);
-        return row?.motivationRating === 'DECLINE' && row.status === 'APPLIED';
+        return !!row && isRejectionEligibleEnrollment(row);
       });
 
     if (enrollmentIds.length === 0) {

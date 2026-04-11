@@ -101,7 +101,7 @@ export const UPDATE_ENROLLMENT_STATUS = gql`
   }
 `;
 
-/** Bulk status change only for rows still in APPLIED (avoids duplicate invite/decline emails on race). */
+/** Bulk status change only for rows still APPLIED or WAITLIST (avoids duplicate invite/decline emails on race). */
 export const UPDATE_ENROLLMENT_STATUS_WHEN_APPLIED = gql`
   mutation UpdateEnrollmentStatusWhenApplied(
     $enrollmentIds: [Int!]!
@@ -112,7 +112,7 @@ export const UPDATE_ENROLLMENT_STATUS_WHEN_APPLIED = gql`
       where: {
         _and: [
           { id: { _in: $enrollmentIds } }
-          { status: { _eq: APPLIED } }
+          { status: { _in: [APPLIED, WAITLIST] } }
         ]
       }
       _set: { status: $status, invitationExpirationDate: $expire }
@@ -125,7 +125,7 @@ export const UPDATE_ENROLLMENT_STATUS_WHEN_APPLIED = gql`
   }
 `;
 
-/** Bulk invite update for APPLIED or already INVITED rows (supports invite resend/deadline changes). */
+/** Bulk invite update for APPLIED, WAITLIST, or already INVITED rows (supports invite resend/deadline changes). */
 export const UPDATE_ENROLLMENT_STATUS_FOR_INVITE = gql`
   mutation UpdateEnrollmentStatusForInvite(
     $enrollmentIds: [Int!]!
@@ -136,7 +136,7 @@ export const UPDATE_ENROLLMENT_STATUS_FOR_INVITE = gql`
       where: {
         _and: [
           { id: { _in: $enrollmentIds } }
-          { status: { _in: [APPLIED, INVITED] } }
+          { status: { _in: [APPLIED, INVITED, WAITLIST] } }
         ]
       }
       _set: { status: $status, invitationExpirationDate: $expire }
