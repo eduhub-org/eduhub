@@ -37,6 +37,52 @@ const updateCourseSurveyUrl = async (client, courseId, surveyUrl) => {
   return result?.update_Course_by_pk ?? null;
 };
 
+const REQUIRED_HIDDEN_FIELD_IDS = ['eduhubUserId', 'eduhubCourseId'];
+
+const collectConfiguredHiddenFieldIds = (survey) => {
+  if (!survey || typeof survey !== 'object') return [];
+
+  const configuredFieldIds = new Set();
+  const rawHiddenFields = survey.hiddenFields;
+
+  const addFieldId = (value) => {
+    if (typeof value !== 'string') return;
+    const normalized = value.trim();
+    if (normalized) configuredFieldIds.add(normalized);
+  };
+
+  if (Array.isArray(rawHiddenFields)) {
+    for (const hiddenField of rawHiddenFields) {
+      if (typeof hiddenField === 'string') {
+        addFieldId(hiddenField);
+      } else if (hiddenField && typeof hiddenField === 'object') {
+        addFieldId(hiddenField.id);
+        addFieldId(hiddenField.key);
+        addFieldId(hiddenField.name);
+      }
+    }
+  } else if (rawHiddenFields && typeof rawHiddenFields === 'object') {
+    const hiddenFieldIds = rawHiddenFields.fieldIds;
+    if (Array.isArray(hiddenFieldIds)) {
+      hiddenFieldIds.forEach((fieldId) => addFieldId(fieldId));
+    }
+
+    if (Array.isArray(rawHiddenFields.fields)) {
+      for (const field of rawHiddenFields.fields) {
+        if (typeof field === 'string') {
+          addFieldId(field);
+        } else if (field && typeof field === 'object') {
+          addFieldId(field.id);
+          addFieldId(field.key);
+          addFieldId(field.name);
+        }
+      }
+    }
+  }
+
+  return [...configuredFieldIds];
+};
+
 export default async function saveCourseFormbricksEnrollmentSurvey(req, logger) {
   logger.info('########## Save Course Formbricks Enrollment Survey ##########');
   logger.debug(`Request body: ${JSON.stringify(req.body)}`);
@@ -179,6 +225,26 @@ export default async function saveCourseFormbricksEnrollmentSurvey(req, logger) 
         success: false,
         messageKey: 'FORMBRICKS_FETCH_ERROR',
         error: `Failed to validate Formbricks survey access: ${surveyResponse.status} - ${errorText}`,
+      };
+    }
+
+    const surveyPayload = await surveyResponse.json();
+    const survey = surveyPayload?.data ?? surveyPayload;
+    const configuredHiddenFieldIds = collectConfiguredHiddenFieldIds(survey);
+    const missingHiddenFields = REQUIRED_HIDDEN_FIELD_IDS.filter(
+      (requiredField) => !configuredHiddenFieldIds.includes(requiredField)
+    );
+
+    if (missingHiddenFields.length > 0) {
+      logger.warn('Formbricks survey is missing required hidden fields', {
+        surveyId,
+        configuredHiddenFieldIds,
+        missingHiddenFields,
+      });
+      return {
+        success: false,
+        messageKey: 'FORMBRICKS_REQUIRED_HIDDEN_FIELDS_MISSING',
+        error: `The Formbricks survey is missing required hidden fields: ${missingHiddenFields.join(', ')}.`,
       };
     }
 

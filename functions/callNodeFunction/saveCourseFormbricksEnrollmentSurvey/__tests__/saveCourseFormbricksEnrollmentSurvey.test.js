@@ -88,11 +88,70 @@ describe('saveCourseFormbricksEnrollmentSurvey', () => {
     expect(mockGraphqlRequest).not.toHaveBeenCalled();
   });
 
+  it('rejects survey when mandatory hidden fields are missing', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: jest.fn().mockResolvedValue({
+        data: {
+          id: 'survey_123',
+          hiddenFields: {
+            enabled: true,
+            fieldIds: ['eduhubEnrollmentId'],
+          },
+        },
+      }),
+    });
+
+    const req = { body: { input: { itemId: 42, text: 'https://formbricks.example.com/s/survey_123' } } };
+    const result = await saveCourseFormbricksEnrollmentSurvey(req, mockLogger);
+
+    expect(result.success).toBe(false);
+    expect(result.messageKey).toBe('FORMBRICKS_REQUIRED_HIDDEN_FIELDS_MISSING');
+    expect(result.error).toContain('eduhubUserId');
+    expect(result.error).toContain('eduhubCourseId');
+    expect(mockGraphqlRequest).not.toHaveBeenCalled();
+  });
+
+  it('accepts survey when mandatory hidden fields are configured', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: jest.fn().mockResolvedValue({
+        data: {
+          id: 'survey_123',
+          hiddenFields: {
+            enabled: true,
+            fieldIds: ['eduhubUserId', 'eduhubCourseId', 'eduhubEnrollmentId'],
+          },
+        },
+      }),
+    });
+    mockGraphqlRequest.mockResolvedValueOnce({
+      update_Course_by_pk: { id: 42, formbricksEnrollmentSurveyUrl: 'https://formbricks.example.com/s/survey_123' },
+    });
+
+    const req = { body: { input: { itemId: 42, text: 'https://formbricks.example.com/s/survey_123' } } };
+    const result = await saveCourseFormbricksEnrollmentSurvey(req, mockLogger);
+
+    expect(result.success).toBe(true);
+    expect(result.formbricksEnrollmentSurveyUrl).toBe('https://formbricks.example.com/s/survey_123');
+    expect(mockGraphqlRequest).toHaveBeenCalledTimes(1);
+  });
+
   it('saves canonical survey url after successful access validation', async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
       status: 200,
-      text: jest.fn(),
+      json: jest.fn().mockResolvedValue({
+        data: {
+          id: 'survey_123',
+          hiddenFields: {
+            enabled: true,
+            fieldIds: ['eduhubUserId', 'eduhubCourseId'],
+          },
+        },
+      }),
     });
     mockGraphqlRequest.mockResolvedValueOnce({
       update_Course_by_pk: { id: 42, formbricksEnrollmentSurveyUrl: 'https://formbricks.example.com/s/survey_123' },
