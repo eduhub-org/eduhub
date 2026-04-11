@@ -10,6 +10,7 @@ import {
 } from '../../../helpers/dateTimeHelpers';
 import React from 'react';
 import { TileBase } from './TileBase';
+import { shouldShowExtendedApplicationBanner } from './extendedApplicationBanner';
 
 type CourseType = CourseList_Course | CoursesEnrolledByUser_Course | CourseTiles_Course;
 
@@ -21,10 +22,19 @@ interface TileProps {
 export const Tile: FC<TileProps> = ({ course, isManage }) => {
   const t = useTranslations('common');
   const getWeekdayStartAndEndString = useWeekdayStartAndEndString();
+  const showExtendedApplicationBanner = shouldShowExtendedApplicationBanner(
+    course.applicationEnd ? new Date(course.applicationEnd) : null,
+    course.Program.defaultApplicationEnd ? new Date(course.Program.defaultApplicationEnd) : null,
+    Boolean(course.Program.showExtendedApplicationPeriodBanner)
+  );
 
   return (
     <Link href={isManage ? `/manage/course/${course.id}` : `/course/${course.id}`}>
-      <TileBase coverImage={course?.coverImage ?? null} title={course.title}>
+      <TileBase
+        coverImage={course?.coverImage ?? null}
+        title={course.title}
+        bannerText={showExtendedApplicationBanner ? t('course_tile.extended_application_period_badge') : null}
+      >
         <div className="flex justify-between mb-3 text-sm tracking-wider text-label-primary">
           {course.weekDay !== 'NONE' && course.startTime && course.endTime
             ? getWeekdayStartAndEndString(course, t)

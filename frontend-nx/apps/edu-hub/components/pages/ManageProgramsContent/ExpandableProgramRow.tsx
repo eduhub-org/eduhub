@@ -18,7 +18,9 @@ import {
   UPDATE_DEFAULT_ENROLLMENT_SURVEY,
   UPDATE_PROGRAM_SHORT_TITLE,
   UPDATE_PROGRAM_MATRIX_INSTRUCTOR_ROOM,
+  UPDATE_PROGRAM_SHOW_EXTENDED_APPLICATION_PERIOD_BANNER,
 } from '../../../queries/updateProgram';
+import CheckboxSelector from '../../inputs/CheckboxSelector';
 import { SYNC_PROGRAM_INSTRUCTOR_MATRIX_ROOM } from '../../../queries/syncProgramInstructorMatrixRoom';
 import {
   SyncProgramInstructorMatrixRoom,
@@ -162,6 +164,19 @@ const ExpandableProgramRow: FC<ExpandableProgramRowProps> = ({ program }) => {
                   {t('instructor_element_room.sync_in_progress')}
                 </div>
               ) : null}
+            </div>
+
+            {/* Extended application period banner */}
+            <div className="bg-fill-primary border border-border-primary rounded-lg p-4">
+              <CheckboxSelector
+                variant="material"
+                label={t('extended_application_banner.label')}
+                helpText={t('extended_application_banner.help_text')}
+                checked={Boolean(program.showExtendedApplicationPeriodBanner)}
+                updateValueMutation={UPDATE_PROGRAM_SHOW_EXTENDED_APPLICATION_PERIOD_BANNER}
+                identifierVariables={{ programId: program.id }}
+                refetchQueries={['ProgramList']}
+              />
             </div>
 
             {/* 1. Questionnaires Card */}

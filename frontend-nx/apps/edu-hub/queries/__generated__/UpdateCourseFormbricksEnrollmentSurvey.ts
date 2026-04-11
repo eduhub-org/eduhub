@@ -7,20 +7,21 @@
 // GraphQL mutation operation: UpdateCourseFormbricksEnrollmentSurvey
 // ====================================================
 
-export interface UpdateCourseFormbricksEnrollmentSurvey_update_Course_by_pk {
-  __typename: "Course";
-  id: number;
-  /**
-   * Full URL to the Formbricks survey for course enrollment/application (for iframe embedding). Overrides program default if set.
-   */
+export interface UpdateCourseFormbricksEnrollmentSurvey_saveCourseFormbricksEnrollmentSurvey {
+  __typename: "SaveCourseFormbricksEnrollmentSurveyResult";
+  success: boolean;
+  error: string | null;
+  messageKey: string;
+  courseId: number | null;
+  surveyId: string | null;
   formbricksEnrollmentSurveyUrl: string | null;
 }
 
 export interface UpdateCourseFormbricksEnrollmentSurvey {
   /**
-   * update single row of the table: "Course"
+   * Saves a course Formbricks survey URL after validating URL format and API token access
    */
-  update_Course_by_pk: UpdateCourseFormbricksEnrollmentSurvey_update_Course_by_pk | null;
+  saveCourseFormbricksEnrollmentSurvey: UpdateCourseFormbricksEnrollmentSurvey_saveCourseFormbricksEnrollmentSurvey;
 }
 
 export interface UpdateCourseFormbricksEnrollmentSurveyVariables {
