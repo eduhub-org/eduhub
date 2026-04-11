@@ -1216,7 +1216,19 @@
       "error_loading_responses": "Error loading questionnaire responses",
       "no_responses": "No questionnaire responses available",
       "questionnaire_responses": "Questionnaire Responses",
-      "incomplete_response": "Questionnaire not fully completed"
+      "incomplete_response": "Questionnaire not fully completed",
+      "errors": {
+        "FORMBRICKS_NOT_CONFIGURED": "Formbricks integration is not configured correctly.",
+        "INVALID_SURVEY_URL": "Please enter a valid Formbricks Link Survey URL from a trusted origin.",
+        "FORMBRICKS_AUTH_ERROR": "The configured Formbricks API token cannot access this survey.",
+        "FORMBRICKS_SURVEY_NOT_FOUND": "The Formbricks survey could not be found or is not accessible with the configured API token.",
+        "FORMBRICKS_TIMEOUT": "Validation request to Formbricks timed out. Please try again.",
+        "FORMBRICKS_FETCH_ERROR": "Could not validate the Formbricks survey. Please try again.",
+        "FORMBRICKS_REQUIRED_HIDDEN_FIELDS_MISSING": "The survey must define hidden fields eduhubUserId and eduhubCourseId.",
+        "FORMBRICKS_SURVEY_SAVE_ERROR": "Saving the Formbricks survey URL failed. Please try again.",
+        "HASURA_NOT_CONFIGURED": "The server configuration is incomplete. Please contact support.",
+        "COURSE_NOT_FOUND": "The selected course no longer exists."
+      }
     },
     "pricing": {
       "title": "Pricing Settings",

@@ -313,10 +313,27 @@ const InputField: React.FC<InputFieldProps> = ({
     (resultData: unknown): string | null => {
       if (!resultData || typeof resultData !== 'object') return null;
 
+      const translateMessageKey = (messageKey: unknown): string | null => {
+        if (typeof messageKey !== 'string' || !messageKey.trim()) return null;
+        const translationKey = `input_field.message_key.${messageKey}`;
+        const translated = t(translationKey);
+        return translated === translationKey ? null : translated;
+      };
+
       for (const value of Object.values(resultData as Record<string, unknown>)) {
         if (!value || typeof value !== 'object' || !('success' in value)) continue;
-        const actionResult = value as { success?: boolean; error?: unknown; message?: unknown };
+        const actionResult = value as {
+          success?: boolean;
+          error?: unknown;
+          message?: unknown;
+          messageKey?: unknown;
+        };
         if (actionResult.success === false) {
+          const translatedByMessageKey = translateMessageKey(actionResult.messageKey);
+          if (translatedByMessageKey) {
+            return translatedByMessageKey;
+          }
+
           if (typeof actionResult.error === 'string' && actionResult.error.trim()) {
             return actionResult.error;
           }
