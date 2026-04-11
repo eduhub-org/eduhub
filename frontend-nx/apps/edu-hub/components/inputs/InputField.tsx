@@ -240,6 +240,7 @@ const InputField: React.FC<InputFieldProps> = ({
   ...props
 }) => {
   const t = useTranslations('common');
+  const tManageCourse = useTranslations('manageCourse');
   const isTranslationMode = Boolean(translationTabs && translationTabs.length >= 2);
 
   const [activeLang, setActiveLang] = useState(() => translationTabs?.[0]?.lang ?? '');
@@ -315,9 +316,9 @@ const InputField: React.FC<InputFieldProps> = ({
 
       const translateMessageKey = (messageKey: unknown): string | null => {
         if (typeof messageKey !== 'string' || !messageKey.trim()) return null;
-        const translationKey = `input_field.message_key.${messageKey}`;
-        const translated = t(translationKey);
-        return translated === translationKey ? null : translated;
+        const translationKey = `formbricks.errors.${messageKey}`;
+        if (!tManageCourse.has(translationKey)) return null;
+        return tManageCourse(translationKey);
       };
 
       for (const value of Object.values(resultData as Record<string, unknown>)) {
@@ -345,7 +346,7 @@ const InputField: React.FC<InputFieldProps> = ({
       }
       return null;
     },
-    [t]
+    [t, tManageCourse]
   );
 
   const [updateText] = useRoleMutation(
