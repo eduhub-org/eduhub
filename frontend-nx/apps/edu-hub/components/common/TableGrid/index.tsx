@@ -308,7 +308,12 @@ const TableGrid = <T extends BaseRow,>({
   const getDataColumnStyle = (columnId: string, size: number): React.CSSProperties =>
     columnId === 'selection'
       ? { width: `${size}px`, flexShrink: 0 }
-      : { flex: '1 1 0%', minWidth: `${size}px`, flexShrink: 0 };
+      : {
+          flex: '1 1 0%',
+          minWidth: `${size}px`,
+          flexShrink: 0,
+          overflow: 'hidden',
+        };
 
   return (
     <div>
@@ -453,7 +458,7 @@ const TableGrid = <T extends BaseRow,>({
           {/* Header row */}
           <div className="flex items-center mb-1 bg-bg-primary text-label-primary py-2">
         <div
-          className={`flex-grow flex gap-3 ${!showCheckbox ? 'pl-3' : ''}`}
+          className={`flex-grow min-w-0 flex gap-3 ${!showCheckbox ? 'pl-3' : ''}`}
           style={{
             minWidth: `${mainRowContentWidth - (expandableRowComponent != null ? 40 : 0) - (deleteMutation != null ? 80 : 0)}px`,
             width: '100%',
@@ -513,7 +518,7 @@ const TableGrid = <T extends BaseRow,>({
           if (rowsToDisplay.length === 0) {
             return (
               <div className="flex items-stretch mb-1">
-                <div className={`flex-grow bg-bg-secondary text-label-primary light ${compactRows ? 'py-1' : 'py-2'}`}>
+                <div className={`flex-grow min-w-0 overflow-hidden bg-bg-secondary text-label-primary light ${compactRows ? 'py-1' : 'py-2'}`}>
                   <div
                     className={`flex items-center gap-3 ${!showCheckbox ? 'pl-3' : ''}`}
                     style={{
@@ -545,7 +550,7 @@ const TableGrid = <T extends BaseRow,>({
             <React.Fragment key={row.id}>
               {/* Primary Row */}
               <div className={`flex items-stretch ${expandedRows.has(row.original.id) ? 'mb-0' : 'mb-1'}`}>
-                <div className={`flex-grow bg-bg-secondary text-label-primary light ${compactRows ? 'py-1' : 'py-2'}`}>
+                <div className={`flex-grow min-w-0 overflow-hidden bg-bg-secondary text-label-primary light ${compactRows ? 'py-1' : 'py-2'}`}>
                   <div
                     className={`flex items-center gap-3 ${!showCheckbox ? 'pl-3' : ''}`}
                     style={{
