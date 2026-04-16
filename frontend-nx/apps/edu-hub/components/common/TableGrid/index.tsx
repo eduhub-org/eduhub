@@ -13,6 +13,7 @@ import {
   SortingState,
   useReactTable,
   FilterFn,
+  SortingFn,
 } from '@tanstack/react-table';
 import { rankItem } from '@tanstack/match-sorter-utils';
 
@@ -24,7 +25,59 @@ import TableGridDeleteButton from './components/TableGridDeleteButton';
 const ExpandableRowWrapper: React.FC<{
   renderFn: (props: { row: any }) => React.ReactElement | null;
   row: any;
-}> = ({ renderFn, row }) => renderFn({ row });
+}> = ({ renderFn, row }) => {
+  try {
+    return renderFn({ row });
+  } catch (error) {
+    console.error('TableGrid: Failed to render expandable row', error);
+    return null;
+  }
+};
+
+const toSearchableText = (value: unknown): string => {
+  if (value == null) return '';
+  if (typeof value === 'string') return value;
+  if (typeof value === 'number' || typeof value === 'boolean' || typeof value === 'bigint') {
+    return String(value);
+  }
+  if (value instanceof Date) {
+    return Number.isNaN(value.getTime()) ? '' : value.toISOString();
+  }
+  if (Array.isArray(value)) {
+    return value.map((item) => toSearchableText(item)).join(' ');
+  }
+  if (typeof value === 'object') {
+    try {
+      return JSON.stringify(value);
+    } catch {
+      return '';
+    }
+  }
+  return '';
+};
+
+const normalizeSortValue = (value: unknown): number | string => {
+  if (value == null) return '';
+  if (typeof value === 'number') return Number.isFinite(value) ? value : 0;
+  if (typeof value === 'boolean') return value ? 1 : 0;
+  if (typeof value === 'bigint') return Number(value);
+  if (value instanceof Date) return Number.isNaN(value.getTime()) ? 0 : value.getTime();
+  return toSearchableText(value).toLowerCase();
+};
+
+const safeFlexRender = (
+  renderable: unknown,
+  context: unknown,
+  fallback: React.ReactNode,
+  details: { type: 'header' | 'cell'; columnId: string }
+) => {
+  try {
+    return flexRender(renderable as never, context as never);
+  } catch (error) {
+    console.error(`TableGrid: Failed to render ${details.type} for column "${details.columnId}"`, error);
+    return fallback;
+  }
+};
 
 const TableGrid = <T extends BaseRow,>({
   addButtonText,
@@ -181,10 +234,32 @@ const TableGrid = <T extends BaseRow,>({
   );
 
   const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
-    const itemRank = rankItem(row.getValue(columnId), value);
+    const itemRank = rankItem(
+      toSearchableText(row.getValue(columnId)),
+      toSearchableText(value)
+    );
     addMeta({ itemRank });
     return itemRank.passed;
   };
+
+  const safeAutoSortingFn = useCallback<SortingFn<T>>((rowA, rowB, columnId) => {
+    try {
+      const valueA = normalizeSortValue(rowA.getValue(columnId));
+      const valueB = normalizeSortValue(rowB.getValue(columnId));
+
+      if (typeof valueA === 'number' && typeof valueB === 'number') {
+        return valueA - valueB;
+      }
+
+      return String(valueA).localeCompare(String(valueB), undefined, {
+        numeric: true,
+        sensitivity: 'base',
+      });
+    } catch (error) {
+      console.error(`TableGrid: Failed to sort column "${columnId}"`, error);
+      return 0;
+    }
+  }, []);
 
   const memoizedColumns = useMemo(() => {
     const selectionColumn: ColumnDef<T>[] = showCheckbox
@@ -224,13 +299,45 @@ const TableGrid = <T extends BaseRow,>({
         ]
       : [];
 
-    const dataColumns = columns.map((col) => ({
-      ...col,
-      // Backward compatibility: convert meta.width to size if size is not specified
-      size: col.size || (col.meta?.width ? col.meta.width * 100 : undefined),
-    }));
+    const dataColumns = columns.map((col) => {
+      const nextColumn = {
+        ...col,
+        // Backward compatibility: convert meta.width to size if size is not specified
+        size: col.size || (col.meta?.width ? col.meta.width * 100 : undefined),
+      } as ColumnDef<T>;
+
+      if (typeof col.accessorFn === 'function') {
+        const accessorFn = col.accessorFn;
+        nextColumn.accessorFn = (row, index) => {
+          try {
+            return accessorFn(row, index);
+          } catch (error) {
+            console.error(
+              `TableGrid: Failed to access value for column "${col.id ?? String(col.accessorKey ?? 'unknown')}"`,
+              error
+            );
+            return null;
+          }
+        };
+      }
+
+      if (typeof col.sortingFn === 'function') {
+        const sortingFn = col.sortingFn;
+        nextColumn.sortingFn = (rowA, rowB, columnId) => {
+          try {
+            const result = sortingFn(rowA, rowB, columnId);
+            return Number.isFinite(result) ? result : safeAutoSortingFn(rowA, rowB, columnId);
+          } catch (error) {
+            console.error(`TableGrid: Custom sort failed for column "${columnId}"`, error);
+            return safeAutoSortingFn(rowA, rowB, columnId);
+          }
+        };
+      }
+
+      return nextColumn;
+    });
     return [...selectionColumn, ...dataColumns];
-  }, [columns, showCheckbox, toggleRowSelection, selectedRowIds, toggleAllRows, data, isAllSelected, isSomeSelected]);
+  }, [columns, showCheckbox, toggleRowSelection, selectedRowIds, toggleAllRows, data, isAllSelected, isSomeSelected, safeAutoSortingFn]);
 
 
   const table = useReactTable({
@@ -240,6 +347,7 @@ const TableGrid = <T extends BaseRow,>({
       size: 150, // Default column width
       minSize: 50, // Minimum column width
       maxSize: 800, // Maximum column width
+      sortingFn: safeAutoSortingFn,
     },
     columns: memoizedColumns,
     filterFns: { fuzzy: fuzzyFilter },
@@ -474,10 +582,20 @@ const TableGrid = <T extends BaseRow,>({
                     <div className={`flex items-center w-full ${headerAlignCenter ? 'justify-center' : ''}`}>
                       <span className={headerAlignCenter ? 'min-w-0 text-center' : 'flex-1 min-w-0'}>
                         {header.column.id === 'selection'
-                          ? flexRender(header.column.columnDef.header, header.getContext())
+                          ? safeFlexRender(
+                              header.column.columnDef.header,
+                              header.getContext(),
+                              <span className="text-label-secondary">-</span>,
+                              { type: 'header', columnId: header.column.id }
+                            )
                           : typeof header.column.columnDef.header === 'string'
                             ? header.column.columnDef.header
-                            : flexRender(header.column.columnDef.header, header.getContext())}
+                            : safeFlexRender(
+                                header.column.columnDef.header,
+                                header.getContext(),
+                                <span className="text-label-secondary">-</span>,
+                                { type: 'header', columnId: header.column.id }
+                              )}
                       </span>
                       {header.column.getCanSort() && (
                         <div className="flex flex-col items-center ml-1 flex-shrink-0">
@@ -561,7 +679,12 @@ const TableGrid = <T extends BaseRow,>({
                         className={`flex items-center min-h-0 ${cell.column.id === 'selection' ? '' : 'min-w-0'} ${cellAlignCenter ? 'justify-center' : ''} ${cell.column.columnDef.meta?.className || ''}`}
                         style={getDataColumnStyle(cell.column.id, cell.column.getSize())}
                       >
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        {safeFlexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext(),
+                          <span className="text-label-secondary">—</span>,
+                          { type: 'cell', columnId: cell.column.id }
+                        )}
                       </div>
                     );})}
                   </div>
