@@ -285,7 +285,8 @@ class EduHubClient:
         variables = {
             "leaveDateTime": self._safe_iloc(col("leaveDateTime")),
             "interruptionCount": self._safe_iloc(col("interruptionCount"), cast=int),
-            "recordedName": self._safe_iloc(col("recordedName")),
+            "recordedIdentifier": self._safe_iloc(col("recordedIdentifier")),
+            "matchType": self._safe_iloc(col("matchType")),
             "sessionId": self._safe_iloc(col("sessionId"), cast=int),
             "source": self._safe_iloc(col("source")),
             "joinDateTime": self._safe_iloc(col("joinDateTime")),
@@ -294,18 +295,20 @@ class EduHubClient:
             "userId": self._safe_iloc(col("userId")),
             "location": self._safe_iloc(col("location"), cast=str),
         }
-        mutation = """mutation($leaveDateTime: timestamptz, $interruptionCount: Int, $recordedName: String,
-                               $sessionId: Int, $source: String, $joinDateTime: timestamptz, $status: AttendanceStatus_enum,
-                               $totalAttendanceTime: Int, $userId: uuid, $location: String) {
+        mutation = """mutation($leaveDateTime: timestamptz, $interruptionCount: Int, $recordedIdentifier: String,
+                               $matchType: String, $sessionId: Int, $source: String, $joinDateTime: timestamptz,
+                               $status: AttendanceStatus_enum, $totalAttendanceTime: Int, $userId: uuid, $location: String) {
             insert_Attendance(objects: {endDateTime: $leaveDateTime, interruptionCount: $interruptionCount,
-            recordedName: $recordedName, sessionId: $sessionId, source: $source, startDateTime: $joinDateTime,
-            status: $status, totalAttendanceTime: $totalAttendanceTime, userId: $userId, location: $location}) {
+            recordedIdentifier: $recordedIdentifier, matchType: $matchType, sessionId: $sessionId, source: $source,
+            startDateTime: $joinDateTime, status: $status, totalAttendanceTime: $totalAttendanceTime, userId: $userId,
+            location: $location}) {
                 returning {
                     id
                     created_at
                     endDateTime
                     interruptionCount
-                    recordedName
+                    recordedIdentifier
+                    matchType
                     sessionId
                     source
                     startDateTime

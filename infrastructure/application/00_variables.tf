@@ -264,6 +264,16 @@ variable "zoom_api_secret" {
   description = "Secret to the the Zoom API access with the given key identifier"
   type        = string
 }
+variable "zoom_attendance_pre_buffer_min" {
+  description = "Minutes before Session.startDateTime to still accept a Zoom instance for attendance aggregation."
+  type        = number
+  default     = 30
+}
+variable "zoom_attendance_post_buffer_min" {
+  description = "Minutes after Session.endDateTime to still accept a Zoom instance (captures reconnects right after class)."
+  type        = number
+  default     = 120
+}
 variable "lms_url" {
   description = "URL to the LimeSurvey instance"
   type        = string
