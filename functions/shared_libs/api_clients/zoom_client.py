@@ -33,6 +33,27 @@ import requests
 DEFAULT_PRE_BUFFER_MIN = 30
 DEFAULT_POST_BUFFER_MIN = 120
 
+# Default HTTP timeout for all Zoom API calls. A hang on any endpoint would
+# stall the daily attendance cron and block subsequent sessions from being
+# processed, so every ``requests`` call in this module must pass a timeout.
+# Tuple = (connect_timeout, read_timeout) in seconds. Overridable via the
+# ``ZOOM_HTTP_TIMEOUT_SEC`` env var which, if set, applies to both values.
+DEFAULT_TIMEOUT = (10, 30)
+
+
+def _resolve_default_timeout():
+    raw = os.getenv("ZOOM_HTTP_TIMEOUT_SEC")
+    if raw is None or str(raw).strip() == "":
+        return DEFAULT_TIMEOUT
+    try:
+        seconds = float(raw)
+    except ValueError:
+        logging.warning(
+            "Invalid ZOOM_HTTP_TIMEOUT_SEC=%r; using default %s.", raw, DEFAULT_TIMEOUT
+        )
+        return DEFAULT_TIMEOUT
+    return (seconds, seconds)
+
 
 class ZoomClient:
     def __init__(self):
@@ -42,6 +63,11 @@ class ZoomClient:
         self.base_url = "https://api.zoom.us/v2"
         self.reports_url = f"{self.base_url}/report/meetings"
         self.past_meetings_url = f"{self.base_url}/past_meetings"
+        # Single source of truth for HTTP timeouts across every Zoom call
+        # (OAuth, report, past_meetings, future endpoints). Kept as an
+        # instance attribute so tests can override without touching the
+        # module-level default.
+        self._timeout = _resolve_default_timeout()
         self.access_token, self.token_expiration = self.fetch_access_token()
 
     # ------------------------------------------------------------------
@@ -75,7 +101,10 @@ class ZoomClient:
             "Authorization": f"Basic {base64.b64encode(f'{self.api_key}:{self.api_secret}'.encode()).decode()}"
         }
         body = {"grant_type": "account_credentials", "account_id": self.account_id}
-        response = requests.post(url, headers=auth_header, data=body)
+        # ``_timeout`` is not yet set when this runs from ``__init__``, so
+        # fall back to the module default for the very first token fetch.
+        timeout = getattr(self, "_timeout", None) or _resolve_default_timeout()
+        response = requests.post(url, headers=auth_header, data=body, timeout=timeout)
 
         if response.status_code == 200:
             response_data = json.loads(response.text)
@@ -110,7 +139,12 @@ class ZoomClient:
         self, url: str, params: Optional[Dict[str, Any]] = None
     ) -> requests.Response:
         self.validate_token()
-        return requests.get(url, headers=self._auth_headers(), params=params)
+        return requests.get(
+            url,
+            headers=self._auth_headers(),
+            params=params,
+            timeout=self._timeout,
+        )
 
     @staticmethod
     def _encode_meeting_uuid(meeting_uuid: str) -> str:
@@ -226,12 +260,17 @@ class ZoomClient:
         query_params: Dict[str, Union[int, str]] = {"page_size": 3000}
         if next_page_token:
             query_params.update({"next_page_token": next_page_token})
-        return requests.get(url, headers=self._auth_headers(), params=query_params)
+        return requests.get(
+            url,
+            headers=self._auth_headers(),
+            params=query_params,
+            timeout=self._timeout,
+        )
 
     def zoom_get_meeting_report(self, meeting_id: str) -> requests.Response:
         self.validate_token()
         url = f"{self.reports_url}/{meeting_id}"
-        return requests.get(url, headers=self._auth_headers())
+        return requests.get(url, headers=self._auth_headers(), timeout=self._timeout)
 
     # ------------------------------------------------------------------
     # Meeting URL / id utilities

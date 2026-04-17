@@ -23,6 +23,7 @@ def _make_client():
     client.access_token = "token"
     # Far future so validate_token() never triggers a refresh during tests.
     client.token_expiration = 10_000_000_000
+    client._timeout = (1, 5)
     return client
 
 
@@ -221,6 +222,101 @@ class TestAggregation:
 # ----------------------------------------------------------------------
 # Pagination
 # ----------------------------------------------------------------------
+
+
+class TestHttpTimeouts:
+    """Every outbound Zoom HTTP call must pass a timeout so the daily
+    attendance cron cannot hang on a stalled socket. A regression here
+    would silently stall the entire job; these tests lock the contract
+    in place for current and future endpoints.
+    """
+
+    def _timeout_from_call(self, call):
+        if "timeout" in call.kwargs:
+            return call.kwargs["timeout"]
+        # requests.get/post signature: (url, params=..., data=..., headers=...,
+        # timeout=...) — timeout is always a keyword in this module.
+        return None
+
+    def test_get_wrapper_passes_instance_timeout(self):
+        client = _make_client()
+        client._timeout = (3, 7)
+        resp = MagicMock(status_code=200, json=lambda: {"meetings": []})
+        with patch(
+            "api_clients.zoom_client.requests.get", return_value=resp
+        ) as mock_get:
+            client._get("https://example/url", params={"x": 1})
+        assert mock_get.call_count == 1
+        assert self._timeout_from_call(mock_get.call_args) == (3, 7)
+
+    def test_legacy_get_last_meeting_session_passes_timeout(self):
+        client = _make_client()
+        client._timeout = (3, 7)
+        resp = MagicMock(status_code=200, json=lambda: {})
+        with patch(
+            "api_clients.zoom_client.requests.get", return_value=resp
+        ) as mock_get:
+            client.get_last_meeting_session("123456")
+        assert self._timeout_from_call(mock_get.call_args) == (3, 7)
+
+    def test_zoom_get_meeting_report_passes_timeout(self):
+        client = _make_client()
+        client._timeout = (3, 7)
+        resp = MagicMock(status_code=200, json=lambda: {})
+        with patch(
+            "api_clients.zoom_client.requests.get", return_value=resp
+        ) as mock_get:
+            client.zoom_get_meeting_report("123456")
+        assert self._timeout_from_call(mock_get.call_args) == (3, 7)
+
+    def test_fetch_access_token_passes_timeout(self):
+        from api_clients.zoom_client import ZoomClient as ZC
+
+        client = ZC.__new__(ZC)
+        client.api_key = "k"
+        client.api_secret = "s"
+        client.account_id = "a"
+        client._timeout = (3, 7)
+
+        token_resp = MagicMock(status_code=200)
+        token_resp.text = '{"access_token": "abc", "expires_in": 3600}'
+        with patch(
+            "api_clients.zoom_client.requests.post", return_value=token_resp
+        ) as mock_post:
+            client.fetch_access_token()
+        assert mock_post.call_count == 1
+        assert self._timeout_from_call(mock_post.call_args) == (3, 7)
+
+    def test_fetch_access_token_uses_default_when_instance_timeout_unset(self):
+        """``fetch_access_token`` is invoked from ``__init__`` before
+        ``_timeout`` is assigned; it must still pass a timeout."""
+        from api_clients.zoom_client import DEFAULT_TIMEOUT, ZoomClient as ZC
+
+        client = ZC.__new__(ZC)
+        client.api_key = "k"
+        client.api_secret = "s"
+        client.account_id = "a"
+        # Intentionally no _timeout attribute.
+
+        token_resp = MagicMock(status_code=200)
+        token_resp.text = '{"access_token": "abc", "expires_in": 3600}'
+        with patch(
+            "api_clients.zoom_client.requests.post", return_value=token_resp
+        ) as mock_post:
+            client.fetch_access_token()
+        assert self._timeout_from_call(mock_post.call_args) == DEFAULT_TIMEOUT
+
+    def test_env_override_applies_to_resolved_default(self, monkeypatch):
+        from api_clients.zoom_client import _resolve_default_timeout
+
+        monkeypatch.setenv("ZOOM_HTTP_TIMEOUT_SEC", "12.5")
+        assert _resolve_default_timeout() == (12.5, 12.5)
+
+    def test_env_override_falls_back_on_invalid_value(self, monkeypatch):
+        from api_clients.zoom_client import DEFAULT_TIMEOUT, _resolve_default_timeout
+
+        monkeypatch.setenv("ZOOM_HTTP_TIMEOUT_SEC", "not-a-number")
+        assert _resolve_default_timeout() == DEFAULT_TIMEOUT
 
 
 class TestPagination:
