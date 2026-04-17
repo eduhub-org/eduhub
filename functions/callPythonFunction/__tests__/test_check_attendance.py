@@ -158,3 +158,126 @@ class TestPrepareParticipantAttendanceData:
         assert row["matchType"] == MATCH_TYPE_NONE
         assert row["recordedIdentifier"] is None
         assert row["sessionId"] == SESSION_ID
+
+
+# ----------------------------------------------------------------------
+# End-to-end orchestration (mocked dependencies)
+# ----------------------------------------------------------------------
+
+
+class TestCheckAttendanceOrchestration:
+    def test_email_and_fuzzy_matches_are_inserted_with_correct_match_types(
+        self, monkeypatch
+    ):
+        """End-to-end-ish smoke: one ATTENDED-via-email, one
+        ATTENDED-via-name, one MISSED (no match)."""
+        from pythonFunctions import check_attendance as mod
+
+        session = {
+            "id": 1,
+            "title": "Demo session",
+            "startDateTime": pd.Timestamp("2026-01-01T10:00:00Z"),
+            "endDateTime": pd.Timestamp("2026-01-01T11:30:00Z"),
+            "Course": {
+                "CourseLocations": [
+                    {
+                        "locationOption": "ONLINE",
+                        "defaultSessionAddress": "https://zoom.us/j/123",
+                    }
+                ]
+            },
+            "SessionAddresses": [],
+        }
+
+        zoom_df = pd.DataFrame(
+            [
+                # Alice matches by email despite a completely different
+                # display name.
+                {
+                    "name": "Work Laptop",
+                    "email": "alice@example.com",
+                    "joinDateTime": "2026-01-01T10:05:00+00:00",
+                    "leaveDateTime": "2026-01-01T11:25:00+00:00",
+                    "duration": 4800,
+                    "interruptionCount": 0,
+                },
+                # Bob matches by fuzzy name (no email on the source row).
+                {
+                    "name": "Bob Builder",
+                    "email": None,
+                    "joinDateTime": "2026-01-01T10:10:00+00:00",
+                    "leaveDateTime": "2026-01-01T11:20:00+00:00",
+                    "duration": 4200,
+                    "interruptionCount": 0,
+                },
+            ]
+        )
+
+        participants_df = pd.DataFrame(
+            [
+                {
+                    "id": "u-alice",
+                    "firstName": "Alice",
+                    "lastName": "Wonderland",
+                    "email": "alice@example.com",
+                },
+                {
+                    "id": "u-bob",
+                    "firstName": "Bob",
+                    "lastName": "Builder",
+                    "email": "bob@example.com",
+                },
+                {
+                    "id": "u-carol",
+                    "firstName": "Carol",
+                    "lastName": "Noshow",
+                    "email": "carol@example.com",
+                },
+            ]
+        )
+
+        class FakeEduHub:
+            def __init__(self):
+                self.url = "http://fake"
+                self.inserts = []
+                self.session_updates = []
+
+            def get_finished_sessions_without_attendance_check(self):
+                return [session]
+
+            def get_course_participants_from_session_id(self, _sid):
+                return participants_df
+
+            def insert_attendance(self, df):
+                self.inserts.append(df.iloc[0].to_dict())
+
+            def update_session_attendanceData(self, df, sid):
+                self.session_updates.append((sid, df))
+
+        class FakeZoom:
+            def get_session_attendance(
+                self, url, session_start=None, session_end=None
+            ):
+                return zoom_df.copy()
+
+        fake_eduhub = FakeEduHub()
+        monkeypatch.setattr(mod, "EduHubClient", lambda: fake_eduhub)
+        monkeypatch.setattr(mod, "ZoomClient", lambda: FakeZoom())
+
+        result = mod.check_attendance({})
+
+        assert result["success"] is True
+        assert len(fake_eduhub.inserts) == 3
+
+        inserts_by_user = {row["userId"]: row for row in fake_eduhub.inserts}
+
+        assert inserts_by_user["u-alice"]["status"] == "ATTENDED"
+        assert inserts_by_user["u-alice"]["matchType"] == MATCH_TYPE_EMAIL
+        assert inserts_by_user["u-alice"]["recordedIdentifier"] == "alice@example.com"
+
+        assert inserts_by_user["u-bob"]["status"] == "ATTENDED"
+        assert inserts_by_user["u-bob"]["matchType"] == MATCH_TYPE_NAME
+        assert inserts_by_user["u-bob"]["recordedIdentifier"] == "Bob Builder"
+
+        assert inserts_by_user["u-carol"]["status"] == "MISSED"
+        assert inserts_by_user["u-carol"]["matchType"] == MATCH_TYPE_NONE
