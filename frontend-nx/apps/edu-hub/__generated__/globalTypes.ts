@@ -302,7 +302,8 @@ export enum Attendance_select_column {
   id = "id",
   interruptionCount = "interruptionCount",
   location = "location",
-  recordedName = "recordedName",
+  matchType = "matchType",
+  recordedIdentifier = "recordedIdentifier",
   sessionId = "sessionId",
   source = "source",
   startDateTime = "startDateTime",
@@ -321,7 +322,8 @@ export enum Attendance_update_column {
   id = "id",
   interruptionCount = "interruptionCount",
   location = "location",
-  recordedName = "recordedName",
+  matchType = "matchType",
+  recordedIdentifier = "recordedIdentifier",
   sessionId = "sessionId",
   source = "source",
   startDateTime = "startDateTime",
@@ -3090,7 +3092,8 @@ export interface Attendance_bool_exp {
   id?: Int_comparison_exp | null;
   interruptionCount?: Int_comparison_exp | null;
   location?: String_comparison_exp | null;
-  recordedName?: String_comparison_exp | null;
+  matchType?: String_comparison_exp | null;
+  recordedIdentifier?: String_comparison_exp | null;
   sessionId?: Int_comparison_exp | null;
   source?: String_comparison_exp | null;
   startDateTime?: timestamptz_comparison_exp | null;
@@ -3113,7 +3116,8 @@ export interface Attendance_insert_input {
   id?: number | null;
   interruptionCount?: number | null;
   location?: string | null;
-  recordedName?: string | null;
+  matchType?: string | null;
+  recordedIdentifier?: string | null;
   sessionId?: number | null;
   source?: string | null;
   startDateTime?: any | null;
@@ -3132,7 +3136,8 @@ export interface Attendance_max_order_by {
   id?: order_by | null;
   interruptionCount?: order_by | null;
   location?: order_by | null;
-  recordedName?: order_by | null;
+  matchType?: order_by | null;
+  recordedIdentifier?: order_by | null;
   sessionId?: order_by | null;
   source?: order_by | null;
   startDateTime?: order_by | null;
@@ -3150,7 +3155,8 @@ export interface Attendance_min_order_by {
   id?: order_by | null;
   interruptionCount?: order_by | null;
   location?: order_by | null;
-  recordedName?: order_by | null;
+  matchType?: order_by | null;
+  recordedIdentifier?: order_by | null;
   sessionId?: order_by | null;
   source?: order_by | null;
   startDateTime?: order_by | null;
@@ -3177,7 +3183,8 @@ export interface Attendance_set_input {
   id?: number | null;
   interruptionCount?: number | null;
   location?: string | null;
-  recordedName?: string | null;
+  matchType?: string | null;
+  recordedIdentifier?: string | null;
   sessionId?: number | null;
   source?: string | null;
   startDateTime?: any | null;

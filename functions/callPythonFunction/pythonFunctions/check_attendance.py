@@ -3,7 +3,18 @@ import logging
 import pandas as pd
 from thefuzz import fuzz
 from api_clients import EduHubClient, ZoomClient, LimeSurveyClient
+from api_clients.zoom_client import ZoomAttendanceError
 from pythonFunctions.limesurvey_location_mapping import place_keys_for_location_option
+
+
+# Match types persisted to Attendance.matchType. Keep in sync with the
+# comment on the column in the migration that introduced it.
+MATCH_TYPE_EMAIL = "EMAIL"
+MATCH_TYPE_NAME = "NAME"
+MATCH_TYPE_NONE = "NONE"
+
+# Fuzzy name match threshold; below this score the row is treated as MISSED.
+NAME_MATCH_THRESHOLD = 80
 
 
 def check_attendance(arguments):
@@ -13,11 +24,11 @@ def check_attendance(arguments):
     attandance table (for each registered and correctly identified person)
     and the Session table (a JSON including all recorded participants of the
     session).
-    
+
     Args:
         hasura_secret (str): Secret to authenticate the user
         arguments (dict): Payload potentially containing function parameters (in this case none)
-        
+
     Returns:
         dict: Response containing:
             - success (bool): Whether the operation was successful
@@ -32,7 +43,6 @@ def check_attendance(arguments):
         logging.debug(f"eduhub_client.url:  {eduhub_client.url}")
         sessions = eduhub_client.get_finished_sessions_without_attendance_check()
 
-        # test if session is null
         if len(sessions) == 0:
             logging.info("No finished sessions without attendance check found")
             return {
@@ -52,34 +62,67 @@ def check_attendance(arguments):
 
         zoom_client = ZoomClient()
 
-        # iterate over all elements in the sessions dictionary
         for session in sessions:
             logging.info(
                 f"########## Checking session {session['title']} from {session['startDateTime']} to {session['endDateTime']}"
             )
 
             attendance_data = pd.DataFrame()
+            # Flip to True as soon as any source for this session fails to
+            # return complete data. We then skip the Attendance inserts and
+            # the Session.attendanceData write entirely so the session
+            # remains eligible for retry on the next cron run.
+            attendance_incomplete = False
+            incomplete_reason = None
 
-            # iterate over all location options in the session and get the corresponding attendance data
             for location in session["Course"]["CourseLocations"]:
                 logging.info("### Getting attendances for %s", location["locationOption"])
 
-                # Checking zoom attendance
                 if location["locationOption"] == "ONLINE":
                     try:
+                        # Pass the session window so the Zoom client can pick
+                        # only the occurrences that actually ran for this
+                        # session (not stray reconnects after class).
                         zoom_attendance = zoom_client.get_session_attendance(
-                            location["defaultSessionAddress"]
+                            location["defaultSessionAddress"],
+                            session_start=session["startDateTime"],
+                            session_end=session["endDateTime"],
                         )
                         logging.debug(
                             f"############# Zoom Attendance Data\n{zoom_attendance}"
                         )
+                        if zoom_attendance is None or len(zoom_attendance) == 0:
+                            logging.info(
+                                "No Zoom participants recorded for session %s",
+                                session.get("title"),
+                            )
+                            continue
                         zoom_attendance["source"] = "ZOOM"
-                        zoom_attendance["location"] = "ZOOM"  # Store ZOOM as location, will be mapped to ONLINE later
+                        zoom_attendance["location"] = "ZOOM"
                         attendance_data = pd.concat([attendance_data, zoom_attendance])
+                    except ZoomAttendanceError as exc:
+                        # Partial Zoom data => aggregated totals would be
+                        # wrong for affected participants. Leave the session
+                        # unmarked so the next cron run can retry.
+                        logging.error(
+                            "Zoom attendance incomplete for session %s "
+                            "(meeting %s, failed instances %s): %s",
+                            session.get("title"),
+                            exc.meeting_id,
+                            exc.failed_uuids,
+                            exc,
+                        )
+                        attendance_incomplete = True
+                        incomplete_reason = str(exc)
                     except Exception as e:
-                        logging.error(f"Error while getting Zoom attendance: {e}")
+                        logging.error(
+                            "Error while getting Zoom attendance for session %s: %s",
+                            session.get("title"),
+                            e,
+                        )
+                        attendance_incomplete = True
+                        incomplete_reason = str(e)
 
-                # Checking offline attendance
                 elif location["locationOption"] in ["KIEL", "HEIDE"]:
                     logging.info("Getting offline attendances from LimeSurvey")
                     offline_attendance = get_offline_session_attendance(session, location)
@@ -91,12 +134,23 @@ def check_attendance(arguments):
 
             logging.debug(f"############# Attendance Data\n{attendance_data}")
 
-            # attendance_data['sessionId'] = session['id']
-            # reset the index for later argmax search in `prepare_participant_attendance_data()`
             attendance_data.reset_index(drop=True, inplace=True)
             logging.debug(f"############# Attendance Data\n{attendance_data}")
 
-            # Get course participants
+            if attendance_incomplete:
+                # Leave Session.attendanceData NULL and skip Attendance
+                # inserts so the daily cron picks this session up again
+                # next time (the Hasura query filters on
+                # attendanceData IS NULL).
+                logging.warning(
+                    "Skipping attendance writes for session %s (id=%s): %s. "
+                    "Session remains eligible for retry on next cron run.",
+                    session.get("title"),
+                    session.get("id"),
+                    incomplete_reason,
+                )
+                continue
+
             course_participants = eduhub_client.get_course_participants_from_session_id(
                 session["id"]
             )
@@ -104,36 +158,35 @@ def check_attendance(arguments):
                 "########## Checking attendances for the %s confirmed participants in the session's course",
                 len(course_participants),
             )
-            # Matching each course participant with the names in the attendance data
-            # and storing the partipant's attendance in the Attendance table
             pd.options.mode.chained_assignment = None  # default='warn'
 
             for p in range(len(course_participants)):
                 try:
+                    participant_row = course_participants.iloc[p, :]
                     logging.debug(
-                        f"############# Preparation of attendance data for participant {course_participants.iloc[p, :]['firstName']} {course_participants.iloc[p, :]['lastName']}"
+                        f"############# Preparation of attendance data for participant {participant_row['firstName']} {participant_row['lastName']}"
                     )
                     course_participant_attendance = prepare_participant_attendance_data(
-                        course_participants.iloc[p, :], attendance_data, session["id"]
+                        participant_row, attendance_data, session["id"]
                     )
                     logging.debug(
                         f"############# Course Participant Attendance\n{course_participant_attendance}"
                     )
                     eduhub_client.insert_attendance(course_participant_attendance)
                     logging.info(
-                        "### %s: %s [%s: %s to %s; recorded name: %s]",
-                        course_participants.iloc[p, :]["email"],
+                        "### %s: %s via %s [%s: %s to %s; recorded identifier: %s]",
+                        participant_row["email"],
                         course_participant_attendance["status"][0],
+                        course_participant_attendance["matchType"][0],
                         course_participant_attendance["source"][0],
                         course_participant_attendance["joinDateTime"][0],
                         course_participant_attendance["leaveDateTime"][0],
-                        course_participant_attendance["recordedName"][0],
+                        course_participant_attendance["recordedIdentifier"][0],
                     )
                 except Exception as e:
                     logging.error(
                         f"Error while preparing attendance data for participant {course_participants.iloc[p, :]['firstName']} {course_participants.iloc[p, :]['lastName']}: {e}"
                     )
-            # Storing JSON of complete attendance_data in Session table
             eduhub_client.update_session_attendanceData(attendance_data, session["id"])
             logging.info("Attendance data updated for session %s", session["title"])
 
@@ -161,7 +214,6 @@ def get_offline_session_attendance(session, location):
     if session.get("startDateTime") is None or session.get("endDateTime") is None:
         return "Error: Attendances cannot be checked since start or end time of the meeting was not provided"
     else:
-        # Retrieve survey data from LimeSurvey
         limesurvey_client = LimeSurveyClient(sid=os.getenv("LMS_ATTENDANCE_SURVEY_ID"))
         logging.debug(
             "############# LMS_ATTENDANCE_SURVEY_ID:\n%s",
@@ -170,7 +222,6 @@ def get_offline_session_attendance(session, location):
         limesurvey_client.set_key(limesurvey_client.get_session_key())
         survey_answers = limesurvey_client.get_responses()
         logging.debug("############# Survey Answers\n%s", survey_answers)
-        # Rename variables from LimeSurvey
         survey_answers.rename(
             columns={
                 "datestamp": "joinDateTime",
@@ -180,24 +231,18 @@ def get_offline_session_attendance(session, location):
             },
             inplace=True,
         )
-        # New column for full name
         survey_answers["name"] = (
             survey_answers["firstName"] + " " + survey_answers["lastName"]
         )
-        # Format time variable
         survey_answers["joinDateTime"] = limesurvey_client.to_datetime(
             survey_answers["joinDateTime"]
         )
         logging.debug("############# Survey Answers\n%s", survey_answers)
-        # Filter to only those answers who registered during the correct time
-        # session_attendances = survey_answers[(survey_answers['joinDateTime'] >= (session['startDateTime'] - pd.Timedelta(hours=1))) & (
-        #     survey_answers['joinDateTime'] <= (session['endDateTime'] + pd.Timedelta(hours=1)))]
         session_attendances = survey_answers[
             (survey_answers["joinDateTime"] >= (session["startDateTime"]))
         ].copy()
         logging.debug("############# Session Attendances\n%s", session_attendances)
 
-        # Filter Place values to the current location option using shared mapping
         location_option = location.get("locationOption")
         allowed_places = place_keys_for_location_option(location_option)
         if allowed_places:
@@ -206,85 +251,144 @@ def get_offline_session_attendance(session, location):
                 session_attendances["location"].isin(allowed_places)
             ].copy()
 
-        # Add interruption count, duration and leaveDateTime of None since not available for offline sessions
         session_attendances["interruptionCount"] = None
         session_attendances["duration"] = None
         session_attendances["leaveDateTime"] = None
-        
-        # Store raw LimeSurvey Place values (mapping to LocationOption will be done in update_enrollment_locations)
-        # Location column already contains the Place value from LimeSurvey (renamed from "Place" to "location" above)
+        # LimeSurvey answers have no email; callers use name-matching only.
+        if "email" not in session_attendances.columns:
+            session_attendances["email"] = None
 
         return session_attendances
 
 
-def prepare_participant_attendance_data(participant, attendance_data, session_id):
-    """Prepares the attendance data for each participant by matching the participant's name"""
-    logging.debug("############# Participant\n%s", participant)
-    participant_full_name = participant["firstName"] + " " + participant["lastName"]
-    # If no attendance data is available for the session, the participant is marked as MISSED
-    if len(attendance_data) == 0:
-        participant_attendance = pd.DataFrame(
-            [
-                {
-                    "userId": participant["id"],
-                    "sessionId": int(session_id),
-                    "interruptionCount": None,
-                    "duration": None,
-                    "joinDateTime": None,
-                    "leaveDateTime": None,
-                    "score": None,
-                    "status": "MISSED",
-                    "recordedName": None,
-                    "source": None,
-                    "location": None,
-                }
-            ]
-        )
-        # participant_attendance is already a DataFrame (MISSED case), return it directly
-        return participant_attendance
-    else:
-        # Matching participant's name with the names in the attendance data
-        attendance_data["score"] = [
-            fuzz.token_sort_ratio(participant_full_name.lower(), str(name).lower())
-            for name in attendance_data["name"]
+def _missed_attendance_row(user_id, session_id):
+    """Construct a MISSED attendance row for a participant when no source
+    attendance data exists at all for the session."""
+    return pd.DataFrame(
+        [
+            {
+                "userId": user_id,
+                "sessionId": int(session_id),
+                "interruptionCount": None,
+                "duration": None,
+                "joinDateTime": None,
+                "leaveDateTime": None,
+                "score": None,
+                "status": "MISSED",
+                "recordedIdentifier": None,
+                "matchType": MATCH_TYPE_NONE,
+                "source": None,
+                "location": None,
+            }
         ]
-        logging.debug("############# Attendance Data\n%s", attendance_data)
-        participant_attendance = attendance_data.iloc[attendance_data["score"].idxmax()]
-        participant_attendance["userId"] = participant["id"]
-        # Formatting of the missing/ null values to None for GraphQL
-        participant_attendance = participant_attendance.where(
-            pd.notnull(participant_attendance), None
-        )
-        # Formatting of the int variables for GraphQL
-        participant_attendance["sessionId"] = int(session_id)
-        if participant_attendance["interruptionCount"] is not None:
-            participant_attendance["interruptionCount"] = int(
-                participant_attendance["interruptionCount"]
-            )
-        if participant_attendance["duration"] is not None:
-            participant_attendance["duration"] = int(participant_attendance["duration"])
-        # Formatting of the datetime variables for GraphQL
-        if participant_attendance["joinDateTime"] is not None:
-            participant_attendance["joinDateTime"] = str(
-                participant_attendance["joinDateTime"]
-            )
-        if participant_attendance["leaveDateTime"] is not None:
-            participant_attendance["leaveDateTime"] = str(
-                participant_attendance["leaveDateTime"]
-            )
+    )
 
-        if participant_attendance["score"] >= 80:
-            participant_attendance["status"] = "ATTENDED"
-            participant_attendance["recordedName"] = participant_attendance["name"]
+
+def _recorded_identifier(row):
+    """Prefer the matched row's email over its display name so admins have
+    a durable identifier; fall back to None if neither is present."""
+    email = row.get("email")
+    if email is not None and str(email).strip() != "" and not pd.isna(email):
+        return str(email).strip().lower()
+    name = row.get("name")
+    if name is not None and not pd.isna(name):
+        name_str = str(name).strip()
+        if name_str:
+            return name_str
+    return None
+
+
+def _format_datetime(value):
+    if value is None or pd.isna(value):
+        return None
+    return str(value)
+
+
+def prepare_participant_attendance_data(participant, attendance_data, session_id):
+    """Match an enrolled participant against the aggregated source attendance
+    data. Tries an exact email match first and falls back to fuzzy name
+    matching. The resulting row always carries an explicit ``matchType``.
+    """
+    logging.debug("############# Participant\n%s", participant)
+    participant_full_name = f"{participant['firstName']} {participant['lastName']}"
+
+    if len(attendance_data) == 0:
+        return _missed_attendance_row(participant["id"], session_id)
+
+    working = attendance_data.copy()
+    working.reset_index(drop=True, inplace=True)
+
+    matched_row = None
+    match_type = None
+    status = "MISSED"
+
+    # -- 1. Email match ------------------------------------------------
+    participant_email = participant.get("email")
+    if (
+        participant_email is not None
+        and str(participant_email).strip() != ""
+        and "email" in working.columns
+    ):
+        participant_email_key = str(participant_email).strip().lower()
+        email_column = working["email"].fillna("").astype(str).str.strip().str.lower()
+        email_matches = working[email_column == participant_email_key]
+        if len(email_matches) > 0:
+            matched_row = email_matches.iloc[0]
+            match_type = MATCH_TYPE_EMAIL
+            status = "ATTENDED"
+
+    # -- 2. Fuzzy name fallback ---------------------------------------
+    if matched_row is None:
+        working["score"] = [
+            fuzz.token_sort_ratio(
+                participant_full_name.lower(),
+                "" if name is None or pd.isna(name) else str(name).lower(),
+            )
+            for name in working["name"]
+        ]
+        logging.debug("############# Attendance Data with scores\n%s", working)
+        best_idx = working["score"].idxmax()
+        best_row = working.iloc[best_idx]
+        if best_row["score"] >= NAME_MATCH_THRESHOLD:
+            matched_row = best_row
+            match_type = MATCH_TYPE_NAME
+            status = "ATTENDED"
         else:
-            participant_attendance["status"] = "MISSED"
-            participant_attendance["recordedName"] = participant_attendance["name"]
-        # Convert Series to dict and wrap in DataFrame
-        return pd.DataFrame([participant_attendance.to_dict()])
+            # Keep the best candidate around so admins can see the closest
+            # miss, but record it as NO match.
+            matched_row = best_row
+            match_type = MATCH_TYPE_NONE
+            status = "MISSED"
 
-    # Other potential functions are fuzz.ratio() and fuzz.partial_ratio()
-    # For testing purposes:
-    # data = [[fuzz.token_sort_ratio(participant_full_name.lower(), name.lower()), name]
-    #        for name in attendance_data['name']]
-    # m = pd.DataFrame(data=data, columns={'score', 'name'})
-    # mlist = list(m.iloc[m['score'].idxmax()])
+    interruption_count = matched_row.get("interruptionCount")
+    if interruption_count is not None and not pd.isna(interruption_count):
+        interruption_count = int(interruption_count)
+    else:
+        interruption_count = None
+
+    duration = matched_row.get("duration")
+    if duration is not None and not pd.isna(duration):
+        duration = int(duration)
+    else:
+        duration = None
+
+    row = {
+        "userId": participant["id"],
+        "sessionId": int(session_id),
+        "interruptionCount": interruption_count,
+        "duration": duration,
+        "joinDateTime": _format_datetime(matched_row.get("joinDateTime")),
+        "leaveDateTime": _format_datetime(matched_row.get("leaveDateTime")),
+        "score": None
+        if matched_row.get("score") is None or pd.isna(matched_row.get("score"))
+        else int(matched_row["score"])
+        if match_type != MATCH_TYPE_EMAIL
+        else None,
+        "status": status,
+        "recordedIdentifier": _recorded_identifier(matched_row),
+        "matchType": match_type,
+        "source": matched_row.get("source"),
+        "location": matched_row.get("location"),
+    }
+
+    return pd.DataFrame([row])
