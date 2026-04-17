@@ -281,3 +281,83 @@ class TestCheckAttendanceOrchestration:
 
         assert inserts_by_user["u-carol"]["status"] == "MISSED"
         assert inserts_by_user["u-carol"]["matchType"] == MATCH_TYPE_NONE
+        # Session.attendanceData was written exactly once for the session,
+        # so the cron won't re-process it.
+        assert len(fake_eduhub.session_updates) == 1
+
+    def test_zoom_attendance_error_skips_session_for_retry(self, monkeypatch):
+        """When Zoom raises ZoomAttendanceError (partial instance data),
+        check_attendance must NOT insert Attendance rows and must NOT
+        write Session.attendanceData, so the session stays eligible for
+        retry on the next cron run."""
+        from pythonFunctions import check_attendance as mod
+        from api_clients.zoom_client import ZoomAttendanceError
+
+        session = {
+            "id": 7,
+            "title": "Flaky Zoom session",
+            "startDateTime": pd.Timestamp("2026-01-01T10:00:00Z"),
+            "endDateTime": pd.Timestamp("2026-01-01T11:30:00Z"),
+            "Course": {
+                "CourseLocations": [
+                    {
+                        "locationOption": "ONLINE",
+                        "defaultSessionAddress": "https://zoom.us/j/123",
+                    }
+                ]
+            },
+            "SessionAddresses": [],
+        }
+
+        class FakeEduHub:
+            def __init__(self):
+                self.url = "http://fake"
+                self.inserts = []
+                self.session_updates = []
+                self.participants_calls = 0
+
+            def get_finished_sessions_without_attendance_check(self):
+                return [session]
+
+            def get_course_participants_from_session_id(self, _sid):
+                self.participants_calls += 1
+                return pd.DataFrame(
+                    [
+                        {
+                            "id": "u-alice",
+                            "firstName": "Alice",
+                            "lastName": "A",
+                            "email": "a@example.com",
+                        }
+                    ]
+                )
+
+            def insert_attendance(self, df):
+                self.inserts.append(df.iloc[0].to_dict())
+
+            def update_session_attendanceData(self, df, sid):
+                self.session_updates.append((sid, df))
+
+        class FakeZoom:
+            def get_session_attendance(
+                self, url, session_start=None, session_end=None
+            ):
+                raise ZoomAttendanceError(
+                    "simulated partial instance failure",
+                    meeting_id="123",
+                    failed_uuids=["bad-uuid"],
+                )
+
+        fake_eduhub = FakeEduHub()
+        monkeypatch.setattr(mod, "EduHubClient", lambda: fake_eduhub)
+        monkeypatch.setattr(mod, "ZoomClient", lambda: FakeZoom())
+
+        result = mod.check_attendance({})
+
+        assert result["success"] is True
+        # No Attendance rows inserted for this session.
+        assert fake_eduhub.inserts == []
+        # Session.attendanceData not touched -> still NULL -> retry next run.
+        assert fake_eduhub.session_updates == []
+        # And we never even queried participants (short-circuit before).
+        assert fake_eduhub.participants_calls == 0

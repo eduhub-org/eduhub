@@ -55,6 +55,27 @@ def _resolve_default_timeout():
     return (seconds, seconds)
 
 
+class ZoomAttendanceError(Exception):
+    """Raised when Zoom attendance for a session cannot be fully
+    collected (e.g. one or more meeting-instance participant fetches
+    failed).
+
+    Callers should treat the session as *not yet processed* — i.e. not
+    write ``Session.attendanceData`` and not insert partial ``Attendance``
+    rows — so the session remains eligible for retry on the next cron
+    run instead of being silently recorded as processed with holes in
+    the data.
+
+    Carries the offending ``meeting_id`` and the list of ``failed_uuids``
+    so operators can correlate logs with Zoom meeting occurrences.
+    """
+
+    def __init__(self, message, meeting_id=None, failed_uuids=None):
+        super().__init__(message)
+        self.meeting_id = meeting_id
+        self.failed_uuids = list(failed_uuids) if failed_uuids else []
+
+
 class ZoomClient:
     def __init__(self):
         self.api_key = os.getenv("ZOOM_API_KEY")
@@ -96,6 +117,16 @@ class ZoomClient:
         )
 
     def fetch_access_token(self):
+        """Fetch a new Server-to-Server OAuth access token from Zoom.
+
+        Returns ``(access_token, token_expiration_epoch)``. The second
+        element is an *absolute* epoch timestamp (seconds since the unix
+        epoch), not a relative TTL. Callers — including ``validate_token``
+        and the constructor — store it on ``self.token_expiration`` and
+        later compare ``time.time()`` against it directly, so returning
+        anything other than an absolute epoch would make the cache check
+        always trigger a refresh.
+        """
         url = "https://zoom.us/oauth/token"
         auth_header = {
             "Authorization": f"Basic {base64.b64encode(f'{self.api_key}:{self.api_secret}'.encode()).decode()}"
@@ -114,8 +145,9 @@ class ZoomClient:
             if not access_token or not expires_in:
                 raise Exception("Invalid OAuth token response")
 
-            self.token_expiration = time.time() + expires_in
-            return access_token, expires_in
+            token_expiration = time.time() + expires_in
+            self.token_expiration = token_expiration
+            return access_token, token_expiration
         else:
             raise Exception(f"Failed to fetch OAuth token: {response.text}")
 
@@ -126,6 +158,7 @@ class ZoomClient:
             or not self.token_expiration
             or time.time() > (self.token_expiration - buffer_time)
         ):
+            # fetch_access_token returns (token, absolute_expiration_epoch).
             self.access_token, self.token_expiration = self.fetch_access_token()
 
     # ------------------------------------------------------------------
@@ -548,13 +581,27 @@ class ZoomClient:
                 [dict(p, _meeting_uuid=None, _instance_start=None) for p in participants]
             )
 
-        try:
-            instances = self.list_past_meeting_instances(meeting_id)
-        except Exception as exc:
-            logging.error(
-                "Failed to list past meeting instances for %s: %s", meeting_id, exc
+        # Deliberately do NOT swallow exceptions from
+        # list_past_meeting_instances: a transient Zoom / network error
+        # must propagate so check_attendance can leave Session.attendanceData
+        # untouched and retry on the next cron run, rather than writing
+        # partial or blank attendance and marking the session processed.
+        instances = self.list_past_meeting_instances(meeting_id)
+
+        # Legacy fallback applies *only* when Zoom reports no past
+        # instances at all for the meeting id. In that case the numeric
+        # report endpoint is the best signal we have (used historically
+        # before this rework).
+        if not instances:
+            logging.warning(
+                "Zoom meeting %s has no past instances; falling back to "
+                "report-by-id behaviour.",
+                meeting_id,
             )
-            instances = []
+            participants = self.get_meeting_participants_by_id(meeting_id)
+            return self.aggregate_participants(
+                [dict(p, _meeting_uuid=None, _instance_start=None) for p in participants]
+            )
 
         relevant = self.filter_instances_by_session_window(
             instances, session_start, session_end
@@ -567,40 +614,62 @@ class ZoomClient:
             len(relevant),
         )
 
+        # Instances exist but none overlap the session window: returning
+        # the legacy "last call" would pull an unrelated meeting's
+        # participants (the exact failure mode this rework fixes).
+        # Produce an empty aggregation instead and let check_attendance
+        # record a clean "no attendance" session.
         if not relevant:
-            # Fallback: the meeting either has no tracked instances yet (Zoom's
-            # past_meetings endpoint can lag for freshly-ended meetings) or the
-            # account stores only the last occurrence. Fall back to the
-            # legacy report-by-id path so we still write *something*, and
-            # log loudly so it can be investigated.
             logging.warning(
                 "No Zoom instances for meeting %s overlap session window "
-                "%s .. %s; falling back to report-by-id.",
+                "%s .. %s; recording empty attendance.",
                 meeting_id,
                 session_start,
                 session_end,
             )
-            participants = self.get_meeting_participants_by_id(meeting_id)
-            return self.aggregate_participants(
-                [dict(p, _meeting_uuid=None, _instance_start=None) for p in participants]
-            )
+            return self.aggregate_participants([])
 
         all_rows: List[Dict[str, Any]] = []
+        failed_uuids: List[str] = []
         for inst in relevant:
             uuid = inst.get("uuid")
             if not uuid:
+                logging.warning(
+                    "Skipping Zoom instance for meeting %s without uuid: %s",
+                    meeting_id,
+                    inst,
+                )
                 continue
             try:
                 participants = self.get_meeting_instance_participants(uuid)
             except Exception as exc:
                 logging.error(
-                    "Failed to fetch participants for instance %s: %s", uuid, exc
+                    "Failed to fetch participants for instance %s of meeting %s: %s",
+                    uuid,
+                    meeting_id,
+                    exc,
                 )
+                failed_uuids.append(uuid)
                 continue
             for p in participants:
                 all_rows.append(
                     dict(p, _meeting_uuid=uuid, _instance_start=inst.get("start_time"))
                 )
+
+        # Any per-instance failure means the aggregated totals
+        # (totalAttendanceTime, interruptionCount, etc.) would be wrong
+        # for participants who were present in the failed instance.
+        # Surface the failure so the caller can skip this session and
+        # retry on the next run, rather than silently writing partial
+        # attendance.
+        if failed_uuids:
+            raise ZoomAttendanceError(
+                f"Failed to fetch participants for {len(failed_uuids)} of "
+                f"{len(relevant)} Zoom instance(s) for meeting {meeting_id}: "
+                f"{failed_uuids}",
+                meeting_id=meeting_id,
+                failed_uuids=failed_uuids,
+            )
 
         if not all_rows:
             logging.warning(

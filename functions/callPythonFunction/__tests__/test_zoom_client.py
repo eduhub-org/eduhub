@@ -319,6 +319,89 @@ class TestHttpTimeouts:
         assert _resolve_default_timeout() == DEFAULT_TIMEOUT
 
 
+class TestTokenCaching:
+    """fetch_access_token must return an absolute expiry epoch (not the
+    relative TTL) so validate_token can cache the token and avoid a fresh
+    OAuth round-trip on every request. A regression here would re-enable
+    the original bug where Zoom returned expires_in=3600 and the cache
+    check (time.time() > 3600-10) always fired.
+    """
+
+    def _patch_token_response(self, expires_in=3600):
+        token_resp = MagicMock(status_code=200)
+        token_resp.text = (
+            '{"access_token": "abc123", "expires_in": ' + str(expires_in) + "}"
+        )
+        return patch(
+            "api_clients.zoom_client.requests.post", return_value=token_resp
+        )
+
+    def test_fetch_access_token_returns_absolute_epoch(self):
+        from api_clients.zoom_client import ZoomClient as ZC
+
+        client = ZC.__new__(ZC)
+        client.api_key = "k"
+        client.api_secret = "s"
+        client.account_id = "a"
+        client._timeout = (1, 5)
+
+        before = __import__("time").time()
+        with self._patch_token_response(expires_in=3600):
+            token, expiration = client.fetch_access_token()
+        after = __import__("time").time()
+
+        assert token == "abc123"
+        # Expiration is an absolute epoch ~ now + 3600, not 3600.
+        assert before + 3600 - 1 <= expiration <= after + 3600 + 1
+        assert client.token_expiration == expiration
+
+    def test_validate_token_caches_across_calls(self):
+        """Given a freshly-issued token with plenty of life left,
+        validate_token must be a no-op and NOT hit the network again."""
+        from api_clients.zoom_client import ZoomClient as ZC
+        import time as _time
+
+        client = ZC.__new__(ZC)
+        client.api_key = "k"
+        client.api_secret = "s"
+        client.account_id = "a"
+        client._timeout = (1, 5)
+
+        with self._patch_token_response(expires_in=3600) as mock_post:
+            # First call triggers a fetch.
+            client.access_token = None
+            client.token_expiration = None
+            client.validate_token()
+            assert mock_post.call_count == 1
+            first_token = client.access_token
+
+            # Second call immediately after must not refresh.
+            client.validate_token()
+            assert mock_post.call_count == 1
+            assert client.access_token == first_token
+            # Token expiration is a future epoch, well past the 10s buffer.
+            assert client.token_expiration > _time.time() + 60
+
+    def test_validate_token_refreshes_when_expired(self):
+        from api_clients.zoom_client import ZoomClient as ZC
+        import time as _time
+
+        client = ZC.__new__(ZC)
+        client.api_key = "k"
+        client.api_secret = "s"
+        client.account_id = "a"
+        client._timeout = (1, 5)
+        client.access_token = "old"
+        # Already past expiration.
+        client.token_expiration = _time.time() - 5
+
+        with self._patch_token_response(expires_in=3600) as mock_post:
+            client.validate_token()
+
+        assert mock_post.call_count == 1
+        assert client.access_token == "abc123"
+
+
 class TestPagination:
     def test_fetch_participants_follows_next_page_token(self):
         client = _make_client()
@@ -391,7 +474,9 @@ class TestGetSessionAttendance:
         assert len(df) == 1
         assert df.iloc[0]["email"] == "jane@example.com"
 
-    def test_falls_back_when_no_instances_match_window(self):
+    def test_falls_back_to_report_by_id_when_no_past_instances(self):
+        """With zero past instances Zoom has no richer data available;
+        the legacy endpoint is the best signal we have."""
         client = _make_client()
 
         participants = [
@@ -417,3 +502,90 @@ class TestGetSessionAttendance:
         mock_fallback.assert_called_once()
         assert len(df) == 1
         assert df.iloc[0]["email"] == "legacy@example.com"
+
+    def test_does_not_fall_back_when_instances_exist_but_none_in_window(self):
+        """Regression guard: if Zoom has tracked instances for the
+        meeting but none overlap the session window, we must NOT pull
+        the "last call" (which was the original bug) — return empty
+        aggregation instead."""
+        client = _make_client()
+
+        instances = [
+            {"uuid": "way_after", "start_time": "2026-01-02T15:00:00Z"},
+        ]
+
+        with patch.object(
+            client, "list_past_meeting_instances", return_value=instances
+        ), patch.object(
+            client, "get_meeting_participants_by_id"
+        ) as mock_fallback, patch.object(
+            client, "get_meeting_instance_participants"
+        ) as mock_parts:
+            df = client.get_session_attendance(
+                "https://zoom.us/j/77",
+                session_start="2026-01-01T10:00:00Z",
+                session_end="2026-01-01T11:00:00Z",
+            )
+
+        mock_fallback.assert_not_called()
+        mock_parts.assert_not_called()
+        assert len(df) == 0
+
+    def test_list_past_meeting_instances_error_propagates(self):
+        """list_past_meeting_instances failures must not be swallowed —
+        check_attendance relies on them to skip the session for retry."""
+        client = _make_client()
+
+        with patch.object(
+            client,
+            "list_past_meeting_instances",
+            side_effect=RuntimeError("Zoom 503"),
+        ), patch.object(
+            client, "get_meeting_participants_by_id"
+        ) as mock_fallback:
+            with pytest.raises(RuntimeError, match="Zoom 503"):
+                client.get_session_attendance(
+                    "https://zoom.us/j/77",
+                    session_start="2026-01-01T10:00:00Z",
+                    session_end="2026-01-01T11:00:00Z",
+                )
+        mock_fallback.assert_not_called()
+
+    def test_per_instance_failure_raises_zoom_attendance_error(self):
+        """When one of several instance fetches fails, aggregation must
+        stop with ZoomAttendanceError carrying meeting_id + failed uuids."""
+        from api_clients.zoom_client import ZoomAttendanceError
+
+        client = _make_client()
+
+        instances = [
+            {"uuid": "inst_ok", "start_time": "2026-01-01T10:05:00Z"},
+            {"uuid": "inst_bad", "start_time": "2026-01-01T10:45:00Z"},
+        ]
+
+        def _side_effect(uuid):
+            if uuid == "inst_bad":
+                raise RuntimeError("Zoom 500 on this instance")
+            return [
+                {
+                    "name": "Jane",
+                    "user_email": "jane@example.com",
+                    "join_time": "2026-01-01T10:05:00Z",
+                    "leave_time": "2026-01-01T10:40:00Z",
+                }
+            ]
+
+        with patch.object(
+            client, "list_past_meeting_instances", return_value=instances
+        ), patch.object(
+            client, "get_meeting_instance_participants", side_effect=_side_effect
+        ):
+            with pytest.raises(ZoomAttendanceError) as err:
+                client.get_session_attendance(
+                    "https://zoom.us/j/77",
+                    session_start="2026-01-01T10:00:00Z",
+                    session_end="2026-01-01T11:00:00Z",
+                )
+
+        assert err.value.meeting_id == "77"
+        assert err.value.failed_uuids == ["inst_bad"]

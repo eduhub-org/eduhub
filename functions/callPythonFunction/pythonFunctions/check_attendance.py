@@ -3,6 +3,7 @@ import logging
 import pandas as pd
 from thefuzz import fuzz
 from api_clients import EduHubClient, ZoomClient, LimeSurveyClient
+from api_clients.zoom_client import ZoomAttendanceError
 from pythonFunctions.limesurvey_location_mapping import place_keys_for_location_option
 
 
@@ -67,6 +68,12 @@ def check_attendance(arguments):
             )
 
             attendance_data = pd.DataFrame()
+            # Flip to True as soon as any source for this session fails to
+            # return complete data. We then skip the Attendance inserts and
+            # the Session.attendanceData write entirely so the session
+            # remains eligible for retry on the next cron run.
+            attendance_incomplete = False
+            incomplete_reason = None
 
             for location in session["Course"]["CourseLocations"]:
                 logging.info("### Getting attendances for %s", location["locationOption"])
@@ -93,8 +100,28 @@ def check_attendance(arguments):
                         zoom_attendance["source"] = "ZOOM"
                         zoom_attendance["location"] = "ZOOM"
                         attendance_data = pd.concat([attendance_data, zoom_attendance])
+                    except ZoomAttendanceError as exc:
+                        # Partial Zoom data => aggregated totals would be
+                        # wrong for affected participants. Leave the session
+                        # unmarked so the next cron run can retry.
+                        logging.error(
+                            "Zoom attendance incomplete for session %s "
+                            "(meeting %s, failed instances %s): %s",
+                            session.get("title"),
+                            exc.meeting_id,
+                            exc.failed_uuids,
+                            exc,
+                        )
+                        attendance_incomplete = True
+                        incomplete_reason = str(exc)
                     except Exception as e:
-                        logging.error(f"Error while getting Zoom attendance: {e}")
+                        logging.error(
+                            "Error while getting Zoom attendance for session %s: %s",
+                            session.get("title"),
+                            e,
+                        )
+                        attendance_incomplete = True
+                        incomplete_reason = str(e)
 
                 elif location["locationOption"] in ["KIEL", "HEIDE"]:
                     logging.info("Getting offline attendances from LimeSurvey")
@@ -109,6 +136,20 @@ def check_attendance(arguments):
 
             attendance_data.reset_index(drop=True, inplace=True)
             logging.debug(f"############# Attendance Data\n{attendance_data}")
+
+            if attendance_incomplete:
+                # Leave Session.attendanceData NULL and skip Attendance
+                # inserts so the daily cron picks this session up again
+                # next time (the Hasura query filters on
+                # attendanceData IS NULL).
+                logging.warning(
+                    "Skipping attendance writes for session %s (id=%s): %s. "
+                    "Session remains eligible for retry on next cron run.",
+                    session.get("title"),
+                    session.get("id"),
+                    incomplete_reason,
+                )
+                continue
 
             course_participants = eduhub_client.get_course_participants_from_session_id(
                 session["id"]
