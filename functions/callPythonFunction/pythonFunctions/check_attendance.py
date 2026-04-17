@@ -235,6 +235,7 @@ def prepare_participant_attendance_data(participant, attendance_data, session_id
                     "score": None,
                     "status": "MISSED",
                     "recordedName": None,
+                    "source": None,
                     "location": None,
                 }
             ]
