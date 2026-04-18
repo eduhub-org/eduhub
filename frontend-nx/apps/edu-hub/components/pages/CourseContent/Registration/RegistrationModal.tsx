@@ -258,14 +258,16 @@ export const RegistrationModal: FC<RegistrationModalProps> = ({
     if (config.requiresPayment && effectiveSurveyUrl && userId) {
       setIsFetchingAddons(true);
       try {
+        // Terms acceptance is intentionally not part of this call: the
+        // user has only completed the survey at this point. Acceptance
+        // (with its authoritative timestamp) is recorded in the summary
+        // step right before Stripe checkout via UPDATE_ENROLLMENT_TERMS_ACCEPTED.
         const result = await createEnrollmentWithAddons({
           variables: {
             courseId: course.id,
             userId: userId,
             motivationLetter: '[Formbricks Survey Completed]',
             formbricksSurveyUrl: effectiveSurveyUrl,
-            // Terms not accepted yet - will be accepted in summary step
-            // termsAcceptedAt is set when user accepts terms in handleSubmit
           },
         });
 

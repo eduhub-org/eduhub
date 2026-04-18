@@ -18,13 +18,17 @@ const GET_COURSE_ADDONS = `
   }
 `;
 
+// NOTE: termsAcceptedAt is intentionally NOT set here and NOT included in
+// on_conflict.update_columns. Terms acceptance happens later in the UI
+// (summary step before Stripe checkout) and is recorded by a dedicated
+// mutation. Excluding it from update_columns guarantees that a retry of
+// createEnrollmentWithAddons cannot clear a previously recorded acceptance.
 const CREATE_ENROLLMENT = `
   mutation CreateEnrollment(
     $courseId: Int!
     $userId: uuid!
     $motivationLetter: String!
     $status: CourseEnrollmentStatus_enum!
-    $termsAcceptedAt: timestamptz
     $paymentStatus: PaymentStatus_enum
   ) {
     insert_CourseEnrollment(
@@ -33,12 +37,11 @@ const CREATE_ENROLLMENT = `
         userId: $userId
         motivationLetter: $motivationLetter
         status: $status
-        termsAcceptedAt: $termsAcceptedAt
         paymentStatus: $paymentStatus
       }
       on_conflict: {
         constraint: uniqueUserCourse
-        update_columns: [status, termsAcceptedAt, motivationLetter, paymentStatus]
+        update_columns: [status, motivationLetter, paymentStatus]
       }
     ) {
       affected_rows
@@ -307,7 +310,7 @@ async function fetchFormbricksResponseWithRetry(
  * Creates a course enrollment and saves selected addons from Formbricks survey to the database.
  * Handles Formbricks timing issues with retry logic.
  * 
- * @param {Object} req - Request object containing body with courseId, userId, motivationLetter, formbricksSurveyUrl, acceptTerms
+ * @param {Object} req - Request object containing body with courseId, userId, motivationLetter, formbricksSurveyUrl
  * @param {Object} logger - Winston logger instance
  * @returns {Object} Result with success, enrollmentId, selectedAddons, or error
  */
@@ -322,7 +325,6 @@ export default async function createEnrollmentWithAddons(req, logger) {
       userId,
       motivationLetter,
       formbricksSurveyUrl,
-      acceptTerms
     } = req.body.input || req.body;
 
     // Validate required inputs
@@ -367,18 +369,16 @@ export default async function createEnrollmentWithAddons(req, logger) {
       },
     });
 
-    // Step 1: Create CourseEnrollment with status APPLIED and paymentStatus PENDING
+    // Step 1: Create CourseEnrollment with status APPLIED and paymentStatus PENDING.
+    // termsAcceptedAt is set later, by a separate mutation, when the user
+    // explicitly accepts terms in the summary step before Stripe checkout.
     logger.info('Creating enrollment', { courseId, userId: effectiveUserId });
-    
-    // Set termsAcceptedAt server-side when acceptTerms is true (authoritative timestamp)
-    const termsAcceptedAt = acceptTerms === true ? new Date().toISOString() : null;
-    
+
     const enrollmentResult = await client.request(CREATE_ENROLLMENT, {
       courseId,
       userId: effectiveUserId,
       motivationLetter: motivationLetter || '[Formbricks Survey Completed]',
       status: 'APPLIED',
-      termsAcceptedAt: termsAcceptedAt,
       paymentStatus: 'PENDING' // Set to PENDING for payment flows - will be updated by webhook on success/failure
     });
 

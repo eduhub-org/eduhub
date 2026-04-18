@@ -61,6 +61,38 @@ export const INSERT_ENROLLMENT = gql`
   }
 `;
 
+/**
+ * Records the user's acceptance of Terms & Conditions and Privacy Policy
+ * for an existing enrollment. The timestamp is captured client-side at the
+ * exact moment the user clicks the consent control.
+ *
+ * Legal note: the column is only set when it is currently NULL — once an
+ * acceptance is recorded it is immutable from this mutation, which prevents
+ * the audit trail from being overwritten on retries.
+ */
+export const UPDATE_ENROLLMENT_TERMS_ACCEPTED = gql`
+  mutation UpdateEnrollmentTermsAccepted(
+    $enrollmentId: Int!
+    $termsAcceptedAt: timestamptz!
+  ) {
+    update_CourseEnrollment(
+      where: {
+        _and: [
+          { id: { _eq: $enrollmentId } }
+          { termsAcceptedAt: { _is_null: true } }
+        ]
+      }
+      _set: { termsAcceptedAt: $termsAcceptedAt }
+    ) {
+      affected_rows
+      returning {
+        id
+        termsAcceptedAt
+      }
+    }
+  }
+`;
+
 export const UPDATE_ENROLLMENT_RATING = gql`
   mutation UpdateEnrollmentRating(
     $enrollmentId: Int!

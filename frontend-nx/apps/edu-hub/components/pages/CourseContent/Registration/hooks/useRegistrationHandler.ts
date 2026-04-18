@@ -5,8 +5,12 @@ import { CourseRegistrationType_enum, CourseEnrollmentStatus_enum } from '../../
 import { Course_Course_by_pk } from '../../../../../queries/__generated__/Course';
 import { useAuthedMutation } from '../../../../../hooks/authedMutation';
 import { useUserId } from '../../../../../hooks/user';
-import { UPDATE_ENROLLMENT } from '../../../../../queries/insertEnrollment';
+import { UPDATE_ENROLLMENT, UPDATE_ENROLLMENT_TERMS_ACCEPTED } from '../../../../../queries/insertEnrollment';
 import { UpdateEnrollment, UpdateEnrollmentVariables } from '../../../../../queries/__generated__/UpdateEnrollment';
+import {
+  UpdateEnrollmentTermsAccepted,
+  UpdateEnrollmentTermsAcceptedVariables,
+} from '../../../../../queries/__generated__/UpdateEnrollmentTermsAccepted';
 import { CREATE_STRIPE_CHECKOUT } from '../../../../../queries/stripe';
 import { CreateStripeCheckout, CreateStripeCheckoutVariables } from '../../../../../queries/__generated__/CreateStripeCheckout';
 import { getRegistrationTypeConfig, RegistrationFormData, RegistrationResult } from '../types';
@@ -67,6 +71,11 @@ export const useRegistrationHandler = ({
   const [createStripeCheckoutMutation] = useAuthedMutation<CreateStripeCheckout, CreateStripeCheckoutVariables>(
     CREATE_STRIPE_CHECKOUT
   );
+
+  const [updateEnrollmentTermsAcceptedMutation] = useAuthedMutation<
+    UpdateEnrollmentTermsAccepted,
+    UpdateEnrollmentTermsAcceptedVariables
+  >(UPDATE_ENROLLMENT_TERMS_ACCEPTED);
 
   const registrationType = course.registrationType || CourseRegistrationType_enum.APPROVAL_WITH_INPUT;
   const config = getRegistrationTypeConfig(registrationType);
@@ -144,8 +153,35 @@ export const useRegistrationHandler = ({
         return { success: false, error: 'Enrollment ID is required. Enrollment should be created before payment.' };
       }
 
+      // Terms & Conditions / Privacy Policy must be accepted before we
+      // initiate the paid checkout. We require this at the application
+      // boundary so the legal record is captured even if Stripe redirect
+      // fails afterwards.
+      if (!formData?.acceptTerms) {
+        return { success: false, error: 'Terms & Conditions must be accepted before payment.' };
+      }
+
       setIsLoading(true);
       try {
+        // Persist terms acceptance with a timestamp BEFORE creating the
+        // Stripe Checkout session. The Hasura mutation only writes when
+        // termsAcceptedAt is currently NULL, so re-running this for a
+        // retry never overwrites the original acceptance timestamp.
+        try {
+          await updateEnrollmentTermsAcceptedMutation({
+            variables: {
+              enrollmentId,
+              termsAcceptedAt: new Date().toISOString(),
+            },
+          });
+        } catch (termsError) {
+          console.error('Failed to record terms acceptance:', termsError);
+          return {
+            success: false,
+            error: 'Could not record terms acceptance. Please try again.',
+          };
+        }
+
         // Create Stripe Checkout session
         // Server will read addons from CourseEnrollmentAddon table using enrollmentId
         // URLs are built server-side from FRONTEND_URL for security
@@ -185,7 +221,7 @@ export const useRegistrationHandler = ({
         setIsLoading(false);
       }
     },
-    [course?.id, userId, createStripeCheckoutMutation]
+    [course?.id, userId, createStripeCheckoutMutation, updateEnrollmentTermsAcceptedMutation]
   );
 
   const handleRegistration = useCallback(() => {
