@@ -459,6 +459,7 @@
     "errors": {
       "motivation_letter_required": "Please provide a motivation letter",
       "terms_required": "Please accept the Terms and Conditions",
+      "terms_record_failed": "We could not record your acceptance of the Terms and Conditions. Please try again.",
       "registration_failed": "Registration failed. Please try again.",
       "complete_survey_first": "Please complete the questionnaire first.",
       "failed_to_load_organization_options": "Failed to load organization options."
