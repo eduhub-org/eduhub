@@ -495,7 +495,7 @@ const ExpandableSessionRowContent: FC<ExpandableSessionRowContentProps> = ({ ses
                 <button
                   type="button"
                   onClick={() => setAttendanceOpen(true)}
-                  className="px-3 py-1.5 rounded bg-fill-secondary text-label-primary disabled:opacity-50"
+                  className="px-3 py-1.5 rounded bg-brand hover:bg-brand-dark text-fill-primary font-medium disabled:opacity-50"
                 >
                   {t('SessionsTab.attendance_data.review_button')}
                 </button>
