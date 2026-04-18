@@ -18,11 +18,23 @@ const GET_COURSE_ADDONS = `
   }
 `;
 
-// NOTE: termsAcceptedAt is intentionally NOT set here and NOT included in
-// on_conflict.update_columns. Terms acceptance happens later in the UI
-// (summary step before Stripe checkout) and is recorded by a dedicated
-// mutation. Excluding it from update_columns guarantees that a retry of
-// createEnrollmentWithAddons cannot clear a previously recorded acceptance.
+// IMPORTANT — on_conflict.update_columns intentionally only contains
+// motivationLetter:
+//
+// - status / paymentStatus are state-machine fields. If the user already
+//   has a CONFIRMED + PAID enrollment and somehow re-triggers this action
+//   (stale UI, retried network call, direct API call), upserting them
+//   back to APPLIED + PENDING would silently regress a paid enrollment.
+//   Excluding them from update_columns makes this mutation a true no-op
+//   for the state of an existing row and lets the dedicated status /
+//   payment-status workflows remain the single source of truth.
+// - termsAcceptedAt is excluded because terms are accepted later in the
+//   UI (summary step before Stripe checkout) and recorded by a dedicated
+//   mutation; excluding it here guarantees that a retry of
+//   createEnrollmentWithAddons cannot clear a previously recorded
+//   acceptance timestamp.
+// - motivationLetter is the only field that may legitimately change on a
+//   retry of this same flow.
 const CREATE_ENROLLMENT = `
   mutation CreateEnrollment(
     $courseId: Int!
@@ -41,7 +53,7 @@ const CREATE_ENROLLMENT = `
       }
       on_conflict: {
         constraint: uniqueUserCourse
-        update_columns: [status, motivationLetter, paymentStatus]
+        update_columns: [motivationLetter]
       }
     ) {
       affected_rows

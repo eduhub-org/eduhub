@@ -1,16 +1,28 @@
 import { useCallback, useState } from 'react';
-import { signIn } from 'next-auth/react';
+import { signIn, useSession } from 'next-auth/react';
+import { useApolloClient } from '@apollo/client';
+import { useTranslations } from 'next-intl';
 
 import { CourseRegistrationType_enum, CourseEnrollmentStatus_enum } from '../../../../../__generated__/globalTypes';
 import { Course_Course_by_pk } from '../../../../../queries/__generated__/Course';
 import { useAuthedMutation } from '../../../../../hooks/authedMutation';
+import { useCurrentRole } from '../../../../../hooks/authentication';
 import { useUserId } from '../../../../../hooks/user';
-import { UPDATE_ENROLLMENT, UPDATE_ENROLLMENT_TERMS_ACCEPTED } from '../../../../../queries/insertEnrollment';
+import { AuthRoles } from '../../../../../types/enums';
+import {
+  UPDATE_ENROLLMENT,
+  UPDATE_ENROLLMENT_TERMS_ACCEPTED,
+  GET_ENROLLMENT_TERMS_ACCEPTED_AT,
+} from '../../../../../queries/insertEnrollment';
 import { UpdateEnrollment, UpdateEnrollmentVariables } from '../../../../../queries/__generated__/UpdateEnrollment';
 import {
   UpdateEnrollmentTermsAccepted,
   UpdateEnrollmentTermsAcceptedVariables,
 } from '../../../../../queries/__generated__/UpdateEnrollmentTermsAccepted';
+import {
+  GetEnrollmentTermsAcceptedAt,
+  GetEnrollmentTermsAcceptedAtVariables,
+} from '../../../../../queries/__generated__/GetEnrollmentTermsAcceptedAt';
 import { CREATE_STRIPE_CHECKOUT } from '../../../../../queries/stripe';
 import { CreateStripeCheckout, CreateStripeCheckoutVariables } from '../../../../../queries/__generated__/CreateStripeCheckout';
 import { getRegistrationTypeConfig, RegistrationFormData, RegistrationResult } from '../types';
@@ -63,7 +75,11 @@ export const useRegistrationHandler = ({
   const [isLoading, setIsLoading] = useState(false);
   const [retryEnrollmentId, setRetryEnrollmentId] = useState<number | null>(null);
   const userId = useUserId();
-  
+  const t = useTranslations('course');
+  const apolloClient = useApolloClient();
+  const { data: sessionData } = useSession();
+  const currentRole = useCurrentRole();
+
   const [updateEnrollmentMutation] = useAuthedMutation<UpdateEnrollment, UpdateEnrollmentVariables>(
     UPDATE_ENROLLMENT
   );
@@ -76,6 +92,79 @@ export const useRegistrationHandler = ({
     UpdateEnrollmentTermsAccepted,
     UpdateEnrollmentTermsAcceptedVariables
   >(UPDATE_ENROLLMENT_TERMS_ACCEPTED);
+
+  /**
+   * Persists the user's acceptance of the Terms & Conditions / Privacy
+   * Policy against an existing enrollment and confirms it landed in the
+   * database before the caller proceeds to checkout.
+   *
+   * Because UPDATE_ENROLLMENT_TERMS_ACCEPTED only writes when the column
+   * is currently NULL, `affected_rows: 0` is the *expected* response on
+   * a legitimate retry where consent is already on record. We therefore
+   * disambiguate the zero-rows case with an authoritative network read
+   * and treat a still-null value as a hard failure.
+   *
+   * @returns true when the database holds a non-null termsAcceptedAt for
+   *          this enrollment, false otherwise (callers must abort).
+   */
+  const recordTermsAcceptance = useCallback(
+    async (enrollmentId: number, termsAcceptedAt: string): Promise<boolean> => {
+      try {
+        const updateResult = await updateEnrollmentTermsAcceptedMutation({
+          variables: { enrollmentId, termsAcceptedAt },
+        });
+
+        const affectedRows =
+          updateResult.data?.update_CourseEnrollment?.affected_rows ?? 0;
+
+        if (affectedRows > 0) {
+          return true;
+        }
+
+        const accessToken = sessionData?.accessToken;
+        const role =
+          currentRole === AuthRoles.anonymous ? AuthRoles.user : currentRole;
+        const verifyResult = await apolloClient.query<
+          GetEnrollmentTermsAcceptedAt,
+          GetEnrollmentTermsAcceptedAtVariables
+        >({
+          query: GET_ENROLLMENT_TERMS_ACCEPTED_AT,
+          variables: { enrollmentId },
+          fetchPolicy: 'network-only',
+          context: accessToken
+            ? {
+                headers: {
+                  'x-hasura-role': role,
+                  Authorization: `Bearer ${accessToken}`,
+                },
+              }
+            : undefined,
+        });
+
+        const recordedAt =
+          verifyResult.data?.CourseEnrollment_by_pk?.termsAcceptedAt ?? null;
+
+        if (!recordedAt) {
+          console.error(
+            'Terms acceptance verification failed: enrollment has no termsAcceptedAt on record',
+            { enrollmentId }
+          );
+          return false;
+        }
+
+        return true;
+      } catch (termsError) {
+        console.error('Failed to record terms acceptance:', termsError);
+        return false;
+      }
+    },
+    [
+      updateEnrollmentTermsAcceptedMutation,
+      apolloClient,
+      sessionData?.accessToken,
+      currentRole,
+    ]
+  );
 
   const registrationType = course.registrationType || CourseRegistrationType_enum.APPROVAL_WITH_INPUT;
   const config = getRegistrationTypeConfig(registrationType);
@@ -163,23 +252,14 @@ export const useRegistrationHandler = ({
 
       setIsLoading(true);
       try {
-        // Persist terms acceptance with a timestamp BEFORE creating the
-        // Stripe Checkout session. The Hasura mutation only writes when
-        // termsAcceptedAt is currently NULL, so re-running this for a
-        // retry never overwrites the original acceptance timestamp.
-        try {
-          await updateEnrollmentTermsAcceptedMutation({
-            variables: {
-              enrollmentId,
-              termsAcceptedAt: new Date().toISOString(),
-            },
-          });
-        } catch (termsError) {
-          console.error('Failed to record terms acceptance:', termsError);
-          return {
-            success: false,
-            error: 'Could not record terms acceptance. Please try again.',
-          };
+        // Persist terms acceptance with a server-verified timestamp BEFORE
+        // creating the Stripe Checkout session. recordTermsAcceptance handles
+        // the idempotency / verification semantics; we only need to abort
+        // with a localized error if it returns false.
+        const termsAcceptedAt = new Date().toISOString();
+        const consentRecorded = await recordTermsAcceptance(enrollmentId, termsAcceptedAt);
+        if (!consentRecorded) {
+          return { success: false, error: t('errors.terms_record_failed') };
         }
 
         // Create Stripe Checkout session
@@ -221,7 +301,13 @@ export const useRegistrationHandler = ({
         setIsLoading(false);
       }
     },
-    [course?.id, userId, createStripeCheckoutMutation, updateEnrollmentTermsAcceptedMutation]
+    [
+      course?.id,
+      userId,
+      createStripeCheckoutMutation,
+      recordTermsAcceptance,
+      t,
+    ]
   );
 
   const handleRegistration = useCallback(() => {

@@ -63,12 +63,21 @@ export const INSERT_ENROLLMENT = gql`
 
 /**
  * Records the user's acceptance of Terms & Conditions and Privacy Policy
- * for an existing enrollment. The timestamp is captured client-side at the
- * exact moment the user clicks the consent control.
+ * for an existing enrollment.
+ *
+ * Timestamp semantics: callers pass a client-generated ISO timestamp that
+ * is captured at summary submission, immediately before the Stripe
+ * checkout session is created. The user must have ticked the consent
+ * checkbox earlier in the same submit handler; this mutation records the
+ * moment that consent is acted upon.
  *
  * Legal note: the column is only set when it is currently NULL — once an
  * acceptance is recorded it is immutable from this mutation, which prevents
- * the audit trail from being overwritten on retries.
+ * the audit trail from being overwritten on retries. As a consequence,
+ * `affected_rows: 0` is the *expected* response for an idempotent retry
+ * after the row already has a value; callers must therefore distinguish
+ * "no-op because already recorded" from "no row matched at all" by
+ * issuing GET_ENROLLMENT_TERMS_ACCEPTED_AT as a follow-up read.
  */
 export const UPDATE_ENROLLMENT_TERMS_ACCEPTED = gql`
   mutation UpdateEnrollmentTermsAccepted(
@@ -89,6 +98,21 @@ export const UPDATE_ENROLLMENT_TERMS_ACCEPTED = gql`
         id
         termsAcceptedAt
       }
+    }
+  }
+`;
+
+/**
+ * Verification read used after UPDATE_ENROLLMENT_TERMS_ACCEPTED reports
+ * `affected_rows: 0`. A null value means we must NOT proceed to checkout
+ * (no consent on record); a non-null value means consent was already
+ * recorded on a previous attempt and it is safe to proceed.
+ */
+export const GET_ENROLLMENT_TERMS_ACCEPTED_AT = gql`
+  query GetEnrollmentTermsAcceptedAt($enrollmentId: Int!) {
+    CourseEnrollment_by_pk(id: $enrollmentId) {
+      id
+      termsAcceptedAt
     }
   }
 `;
