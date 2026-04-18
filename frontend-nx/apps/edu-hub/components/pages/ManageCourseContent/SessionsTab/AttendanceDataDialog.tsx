@@ -1,6 +1,6 @@
 import { FC, useCallback, useMemo, useState } from 'react';
-import { useTranslations } from 'next-intl';
-import { ColumnDef } from '@tanstack/react-table';
+import { useLocale, useTranslations } from 'next-intl';
+import { ColumnDef, Row } from '@tanstack/react-table';
 
 import { DialogShell } from '../../../common/dialogs/DialogShell';
 import TableGrid from '../../../common/TableGrid';
@@ -56,42 +56,57 @@ export const parseAttendanceData = (raw: string | null | undefined): AttendanceR
 };
 
 const isDateTimeKey = (key: string) => key === 'joinDateTime' || key === 'leaveDateTime';
+const isDurationKey = (key: string) => key === 'duration';
 
-const formatDateTime = (value: unknown): string => {
-  if (value == null) return '';
-  let date: Date | null = null;
-  if (typeof value === 'number') {
-    date = new Date(value);
-  } else if (typeof value === 'string') {
+/**
+ * Coerces a raw attendance value to a millisecond timestamp.
+ * Returns NaN when the value cannot be interpreted as a date so callers can
+ * decide how to order unparsable rows.
+ */
+const toDateMs = (value: unknown): number => {
+  if (value == null) return Number.NaN;
+  if (typeof value === 'number') return value;
+  if (typeof value === 'string') {
     const numeric = Number(value);
-    date = Number.isFinite(numeric) ? new Date(numeric) : new Date(value);
+    if (Number.isFinite(numeric)) return numeric;
+    const parsed = new Date(value).getTime();
+    return Number.isNaN(parsed) ? Number.NaN : parsed;
   }
-  if (!date || Number.isNaN(date.getTime())) {
-    return String(value);
-  }
-  return new Intl.DateTimeFormat(undefined, {
+  return Number.NaN;
+};
+
+const toDurationSeconds = (value: unknown): number => {
+  if (value == null || value === '') return Number.NaN;
+  const seconds = typeof value === 'number' ? value : Number(value);
+  return Number.isFinite(seconds) ? seconds : Number.NaN;
+};
+
+const formatDateTime = (locale: string, value: unknown): string => {
+  if (value == null) return '';
+  const ms = toDateMs(value);
+  if (Number.isNaN(ms)) return String(value);
+  return new Intl.DateTimeFormat(locale, {
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
     hour: '2-digit',
     minute: '2-digit',
-  }).format(date);
+  }).format(new Date(ms));
 };
 
 const formatDuration = (value: unknown): string => {
-  if (value == null || value === '') return '';
-  const seconds = typeof value === 'number' ? value : Number(value);
-  if (!Number.isFinite(seconds)) return String(value);
+  const seconds = toDurationSeconds(value);
+  if (Number.isNaN(seconds)) return value == null || value === '' ? '' : String(value);
   const total = Math.max(0, Math.floor(seconds));
   const minutes = Math.floor(total / 60);
   const secs = total % 60;
   return `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
 };
 
-const formatCellValue = (key: string, value: unknown): string => {
+const formatCellValue = (locale: string, key: string, value: unknown): string => {
   if (value == null) return '';
-  if (isDateTimeKey(key)) return formatDateTime(value);
-  if (key === 'duration') return formatDuration(value);
+  if (isDateTimeKey(key)) return formatDateTime(locale, value);
+  if (isDurationKey(key)) return formatDuration(value);
   if (typeof value === 'object') {
     try {
       return JSON.stringify(value);
@@ -100,6 +115,20 @@ const formatCellValue = (key: string, value: unknown): string => {
     }
   }
   return String(value);
+};
+
+/**
+ * Compares two numeric values placing NaN entries last regardless of sort
+ * direction. TanStack inverts the result for descending order, so returning a
+ * direction-aware fallback keeps unparsable rows pinned to the bottom.
+ */
+const compareNumeric = (a: number, b: number): number => {
+  const aMissing = Number.isNaN(a);
+  const bMissing = Number.isNaN(b);
+  if (aMissing && bMissing) return 0;
+  if (aMissing) return 1;
+  if (bMissing) return -1;
+  return a - b;
 };
 
 const orderColumns = (keys: string[]): string[] => {
@@ -129,6 +158,7 @@ const AttendanceDataDialog: FC<AttendanceDataDialogProps> = ({
   sessionTitle,
 }) => {
   const t = useTranslations('manageCourse.SessionsTab.attendance_data');
+  const locale = useLocale();
 
   const rows = useMemo(() => parseAttendanceData(attendanceData), [attendanceData]);
 
@@ -154,15 +184,30 @@ const AttendanceDataDialog: FC<AttendanceDataDialogProps> = ({
         if (key !== 'id' && key !== '_idx') keySet.add(key);
       });
     });
-    return orderColumns(Array.from(keySet)).map<ColumnDef<AttendanceRow>>((key) => ({
-      id: key,
-      header: key,
-      accessorFn: (row) => formatCellValue(key, row[key]),
-      enableSorting: true,
-      size: isDateTimeKey(key) ? 170 : 140,
-      cell: ({ getValue }) => <span>{String(getValue() ?? '')}</span>,
-    }));
-  }, [rows]);
+    return orderColumns(Array.from(keySet)).map<ColumnDef<AttendanceRow>>((key) => {
+      // Sort by the underlying raw value (chronological for dates, numeric for
+      // durations) instead of the localized display string, which would
+      // otherwise yield lexicographic ordering.
+      let sortingFn: ColumnDef<AttendanceRow>['sortingFn'];
+      if (isDateTimeKey(key)) {
+        sortingFn = (rowA: Row<AttendanceRow>, rowB: Row<AttendanceRow>) =>
+          compareNumeric(toDateMs(rowA.original[key]), toDateMs(rowB.original[key]));
+      } else if (isDurationKey(key)) {
+        sortingFn = (rowA: Row<AttendanceRow>, rowB: Row<AttendanceRow>) =>
+          compareNumeric(toDurationSeconds(rowA.original[key]), toDurationSeconds(rowB.original[key]));
+      }
+
+      return {
+        id: key,
+        header: key,
+        accessorFn: (row) => formatCellValue(locale, key, row[key]),
+        enableSorting: true,
+        size: isDateTimeKey(key) ? 170 : 140,
+        cell: ({ getValue }) => <span>{String(getValue() ?? '')}</span>,
+        ...(sortingFn ? { sortingFn } : {}),
+      };
+    });
+  }, [rows, locale]);
 
   const filteredRows = useMemo(() => {
     if (!searchFilter.trim()) return rows;
@@ -170,10 +215,10 @@ const AttendanceDataDialog: FC<AttendanceDataDialogProps> = ({
     return rows.filter((row) =>
       Object.entries(row).some(([key, val]) => {
         if (key === 'id' || key === '_idx') return false;
-        return formatCellValue(key, val).toLowerCase().includes(needle);
+        return formatCellValue(locale, key, val).toLowerCase().includes(needle);
       })
     );
-  }, [rows, searchFilter]);
+  }, [rows, searchFilter, locale]);
 
   const title = sessionTitle ? `${t('dialog_title')} – ${sessionTitle}` : t('dialog_title');
 
