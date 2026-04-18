@@ -114,6 +114,10 @@ export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_Sessi
    */
   title: string;
   /**
+   * JSON string including all recorded participations for the session (also those that were not matched to registered participants)
+   */
+  attendanceData: string | null;
+  /**
    * An array relationship
    */
   SessionAddresses: InsertEnrollment_insert_CourseEnrollment_returning_Course_Sessions_SessionAddresses[];

@@ -10,6 +10,7 @@ export const SESSION_FRAGMENT = gql`
     description
     startDateTime
     title
+    attendanceData
     SessionAddresses {
       id
       address

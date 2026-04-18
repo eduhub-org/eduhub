@@ -1300,6 +1300,12 @@
         "label": "Beschreibung",
         "help_text": "Beschreibe hier den Inhalt des Termins.",
         "placeholder": "Beschreibe den Inhalt der Session, z.B. Ablauf, Themen oder Hinweise für Teilnehmende..."
+      },
+      "attendance_data": {
+        "label": "Anwesenheitsdaten",
+        "review_button": "Anwesenheitsdaten ansehen",
+        "no_data": "Keine Anwesenheitsdaten vorhanden",
+        "dialog_title": "Anwesenheitsdaten"
       }
     },
     "location": {

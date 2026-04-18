@@ -1318,6 +1318,12 @@
         "label": "Description",
         "help_text": "Describe the content of the session here.",
         "placeholder": "Describe the session content, e.g. schedule, topics or notes for participants..."
+      },
+      "attendance_data": {
+        "label": "Attendance data",
+        "review_button": "Review attendance data",
+        "no_data": "No attendance data available",
+        "dialog_title": "Attendance data"
       }
     },
     "location": {

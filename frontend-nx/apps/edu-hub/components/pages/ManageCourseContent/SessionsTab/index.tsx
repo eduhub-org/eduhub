@@ -55,6 +55,7 @@ import ManagedItemList from '../../../common/ManagedItemList';
 import { Card } from '../../../common/Card';
 import { SelectUserDialog } from '../../../common/dialogs/SelectUserDialog';
 import { CreateUserDialog } from '../../../common/dialogs/CreateUserDialog';
+import AttendanceDataDialog from './AttendanceDataDialog';
 
 interface IProps {
   course: ManagedCourse_Course_by_pk;
@@ -351,6 +352,10 @@ const ExpandableSessionRowContent: FC<ExpandableSessionRowContentProps> = ({ ses
 
   const [createUserDialogOpen, setCreateUserDialogOpen] = useState(false);
   const [searchValueForNewUser, setSearchValueForNewUser] = useState('');
+  const [attendanceOpen, setAttendanceOpen] = useState(false);
+
+  const hasAttendanceData =
+    Boolean(session.attendanceData) && session.attendanceData !== 'true';
 
   const [insertSessionSpeaker] = useRoleMutation<InsertNewSessionSpeaker, InsertNewSessionSpeakerVariables>(
     INSERT_NEW_SESSION_SPEAKER
@@ -484,9 +489,28 @@ const ExpandableSessionRowContent: FC<ExpandableSessionRowContentProps> = ({ ses
                 showAddNewUserOption: true,
               }}
             />
+
+            {hasAttendanceData && (
+              <Card title={t('SessionsTab.attendance_data.label')}>
+                <button
+                  type="button"
+                  onClick={() => setAttendanceOpen(true)}
+                  className="px-3 py-1.5 rounded bg-fill-secondary text-label-primary disabled:opacity-50"
+                >
+                  {t('SessionsTab.attendance_data.review_button')}
+                </button>
+              </Card>
+            )}
           </div>
         </div>
       </div>
+
+      <AttendanceDataDialog
+        open={attendanceOpen}
+        onClose={() => setAttendanceOpen(false)}
+        attendanceData={session.attendanceData}
+        sessionTitle={session.title ?? undefined}
+      />
 
       <CreateUserDialog
         open={createUserDialogOpen}
