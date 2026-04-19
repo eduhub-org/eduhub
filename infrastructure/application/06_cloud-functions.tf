@@ -162,14 +162,19 @@ resource "google_cloudfunctions2_function" "call_python_function" {
 
   service_config {
     environment_variables = {
-      ENVIRONMENT              = var.environment
-      BUCKET_NAME              = var.project_id
-      HASURA_ENDPOINT          = "https://${local.hasura_service_name}.opencampus.sh/v1/graphql"
-      ZOOM_ACCOUNT_ID          = var.zoom_account_id
-      LMS_URL                  = var.lms_url
-      LMS_USER                 = var.lms_user
-      LMS_ATTENDANCE_SURVEY_ID = var.lms_attendance_survey_id
-      MM_URL                   = var.mm_url
+      ENVIRONMENT     = var.environment
+      BUCKET_NAME     = var.project_id
+      HASURA_ENDPOINT = "https://${local.hasura_service_name}.opencampus.sh/v1/graphql"
+      ZOOM_ACCOUNT_ID = var.zoom_account_id
+      # Grace buffers (in minutes) used by check_attendance to match Zoom
+      # meeting occurrences to the EduHub session window. Optional — the
+      # ZoomClient has sane defaults (30 min pre, 120 min post) when unset.
+      ZOOM_ATTENDANCE_PRE_BUFFER_MIN  = var.zoom_attendance_pre_buffer_min
+      ZOOM_ATTENDANCE_POST_BUFFER_MIN = var.zoom_attendance_post_buffer_min
+      LMS_URL                         = var.lms_url
+      LMS_USER                        = var.lms_user
+      LMS_ATTENDANCE_SURVEY_ID        = var.lms_attendance_survey_id
+      MM_URL                          = var.mm_url
     }
 
     secret_environment_variables {

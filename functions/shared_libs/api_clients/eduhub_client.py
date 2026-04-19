@@ -268,43 +268,47 @@ class EduHubClient:
             raise
         
 
-    def insert_attendance(self, course_participant_attendance):
-        # Safely extract location value with fallback to None
-        location_value = None
-        location_series = course_participant_attendance.get("location")
-        if location_series is not None and not location_series.empty:
-            raw_location = location_series.iloc[0]
-            if pd.notnull(raw_location):
-                location_value = str(raw_location)
+    def _safe_iloc(self, series, cast=None):
+        """Safely extract the first value from a DataFrame column (Series).
+        Returns None when the column is missing or empty."""
+        if series is None:
+            return None
+        if hasattr(series, "empty") and series.empty:
+            return None
+        val = series.iloc[0]
+        if pd.isnull(val):
+            return None
+        return cast(val) if cast else val
 
+    def insert_attendance(self, course_participant_attendance):
+        col = course_participant_attendance.get
         variables = {
-            "leaveDateTime": course_participant_attendance.get("leaveDateTime").iloc[0],
-            "interruptionCount": None
-            if course_participant_attendance.get("interruptionCount").iloc[0] is None
-            else int(course_participant_attendance.get("interruptionCount").iloc[0]),
-            "recordedName": course_participant_attendance.get("recordedName").iloc[0],
-            "sessionId": int(course_participant_attendance.get("sessionId").iloc[0]),
-            "source": course_participant_attendance.get("source").iloc[0],
-            "joinDateTime": course_participant_attendance.get("joinDateTime").iloc[0],
-            "status": course_participant_attendance.get("status").iloc[0],
-            "totalAttendanceTime": None
-            if course_participant_attendance.get("duration").iloc[0] is None
-            else int(course_participant_attendance.get("duration").iloc[0]),
-            "userId": course_participant_attendance.get("userId").iloc[0],
-            "location": location_value,
+            "leaveDateTime": self._safe_iloc(col("leaveDateTime")),
+            "interruptionCount": self._safe_iloc(col("interruptionCount"), cast=int),
+            "recordedIdentifier": self._safe_iloc(col("recordedIdentifier")),
+            "matchType": self._safe_iloc(col("matchType")),
+            "sessionId": self._safe_iloc(col("sessionId"), cast=int),
+            "source": self._safe_iloc(col("source")),
+            "joinDateTime": self._safe_iloc(col("joinDateTime")),
+            "status": self._safe_iloc(col("status")),
+            "totalAttendanceTime": self._safe_iloc(col("duration"), cast=int),
+            "userId": self._safe_iloc(col("userId")),
+            "location": self._safe_iloc(col("location"), cast=str),
         }
-        mutation = """mutation($leaveDateTime: timestamptz, $interruptionCount: Int, $recordedName: String,
-                               $sessionId: Int, $source: String, $joinDateTime: timestamptz, $status: AttendanceStatus_enum,
-                               $totalAttendanceTime: Int, $userId: uuid, $location: String) {
+        mutation = """mutation($leaveDateTime: timestamptz, $interruptionCount: Int, $recordedIdentifier: String,
+                               $matchType: String, $sessionId: Int, $source: String, $joinDateTime: timestamptz,
+                               $status: AttendanceStatus_enum, $totalAttendanceTime: Int, $userId: uuid, $location: String) {
             insert_Attendance(objects: {endDateTime: $leaveDateTime, interruptionCount: $interruptionCount,
-            recordedName: $recordedName, sessionId: $sessionId, source: $source, startDateTime: $joinDateTime,
-            status: $status, totalAttendanceTime: $totalAttendanceTime, userId: $userId, location: $location}) {
+            recordedIdentifier: $recordedIdentifier, matchType: $matchType, sessionId: $sessionId, source: $source,
+            startDateTime: $joinDateTime, status: $status, totalAttendanceTime: $totalAttendanceTime, userId: $userId,
+            location: $location}) {
                 returning {
                     id
                     created_at
                     endDateTime
                     interruptionCount
-                    recordedName
+                    recordedIdentifier
+                    matchType
                     sessionId
                     source
                     startDateTime

@@ -459,6 +459,7 @@
     "errors": {
       "motivation_letter_required": "Bitte schreib uns, warum du an diesem Kurs teilnehmen möchtest",
       "terms_required": "Bitte akzeptiere die Allgemeinen Geschäftsbedingungen",
+      "terms_record_failed": "Deine Zustimmung zu den Allgemeinen Geschäftsbedingungen konnte nicht gespeichert werden. Bitte versuche es erneut.",
       "registration_failed": "Registrierung fehlgeschlagen. Bitte versuche es erneut.",
       "complete_survey_first": "Bitte fülle zuerst den Fragebogen vollständig aus.",
       "failed_to_load_organization_options": "Organisationsoptionen konnten nicht geladen werden."
@@ -1300,6 +1301,12 @@
         "label": "Beschreibung",
         "help_text": "Beschreibe hier den Inhalt des Termins.",
         "placeholder": "Beschreibe den Inhalt der Session, z.B. Ablauf, Themen oder Hinweise für Teilnehmende..."
+      },
+      "attendance_data": {
+        "label": "Anwesenheitsdaten",
+        "review_button": "Anwesenheitsdaten ansehen",
+        "no_data": "Keine Anwesenheitsdaten vorhanden",
+        "dialog_title": "Anwesenheitsdaten"
       }
     },
     "location": {

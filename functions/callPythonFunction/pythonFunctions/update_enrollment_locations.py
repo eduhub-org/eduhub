@@ -232,11 +232,13 @@ def update_enrollment_locations(arguments):
                 )
                 continue
             
-            # Check if location needs to be updated
+            # Only update enrollments that have no location set yet.
+            # This preserves manually curated values.
             current_location = enrollment.get("location")
-            if current_location == location:
+            if current_location is not None:
                 logging.debug(
-                    f"Enrollment {enrollment['id']} already has location {location}, skipping"
+                    f"Enrollment {enrollment['id']} already has location "
+                    f"{current_location}, skipping (preserving existing value)"
                 )
                 continue
             
@@ -252,7 +254,7 @@ def update_enrollment_locations(arguments):
         # Update enrollments
         for update in updates:
             update_mutation = """
-            mutation UpdateEnrollmentLocation($enrollmentId: Int!, $location: String!) {
+            mutation UpdateEnrollmentLocation($enrollmentId: Int!, $location: LocationOption_enum!) {
                 update_CourseEnrollment(
                     where: { id: { _eq: $enrollmentId } },
                     _set: { location: $location }

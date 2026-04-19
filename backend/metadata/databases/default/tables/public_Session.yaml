@@ -56,6 +56,24 @@ select_permissions:
         - title
         - updated_at
       filter: {}
+  - role: instructor_access
+    permission:
+      columns:
+        - attendanceData
+        - courseId
+        - created_at
+        - description
+        - endDateTime
+        - id
+        - startDateTime
+        - title
+        - updated_at
+      filter:
+        Course:
+          CourseInstructors:
+            User:
+              id:
+                _eq: X-Hasura-User-Id
 update_permissions:
   - role: instructor_access
     permission:
