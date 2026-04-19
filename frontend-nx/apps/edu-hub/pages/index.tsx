@@ -198,8 +198,9 @@ const Home: FC = () => {
                 "addressCountry": "DE"
               },
               "sameAs": [
-                "https://www.instagram.com/opencampus_sh/",
-                "https://de-de.facebook.com/opencampus.sh/",
+                "https://norden.social/@opencampus_sh",
+                "https://www.linkedin.com/school/opencampus-sh",
+                "https://www.instagram.com/opencampus.sh?igsh=a3dlN2J4bXo2ejM0",
                 "https://twitter.com/opencampus_sh"
               ],
               "offers": {
