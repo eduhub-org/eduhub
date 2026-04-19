@@ -33,7 +33,7 @@ export const Footer: FC = () => {
               </a>
             </p>
             <p>
-              <a href="https://opencampus.substack.com" target="_blank" rel="noopener noreferrer">
+              <a href="https://opencampus.substack.com/" target="_blank" rel="noopener noreferrer">
                 {t('newsletter')}
               </a>
             </p>
@@ -73,14 +73,19 @@ export const Footer: FC = () => {
         <div className="flex justify-between items-end mt-8">
           <span className="text-sm font-light">© 2010 — {new Date().getFullYear()}</span>
           <div className="flex items-center">
-            <a href="https://www.instagram.com/opencampus_sh/" target="_blank" rel="noopener noreferrer">
+            <a href="https://norden.social/@opencampus_sh" target="_blank" rel="noopener noreferrer">
               <div className="flex items-center w-[23px] h-[23px]">
-                <Image src="/images/share/instagram-icon.svg" alt="Instagram" width={23} height={23} unoptimized className="w-full h-full object-contain" />
+                <Image src="/images/share/mastodon-icon.svg" alt="Mastodon" width={23} height={23} unoptimized className="w-full h-full object-contain" />
               </div>
             </a>
-            <a href="https://de-de.facebook.com/opencampus.sh/" target="_blank" rel="noopener noreferrer">
-              <div className="ml-6 sm:ml-20 sm:mr-10 flex items-center w-[23px] h-[23px]">
-                <Image src="/images/share/facebook-icon.svg" alt="Facebook" width={23} height={23} unoptimized className="w-full h-full object-contain" />
+            <a href="https://www.linkedin.com/school/opencampus-sh" target="_blank" rel="noopener noreferrer">
+              <div className="ml-6 sm:ml-20 flex items-center w-[23px] h-[23px]">
+                <Image src="/images/share/linkedin-icon.svg" alt="LinkedIn" width={23} height={23} unoptimized className="w-full h-full object-contain" />
+              </div>
+            </a>
+            <a href="https://www.instagram.com/opencampus.sh?igsh=a3dlN2J4bXo2ejM0" target="_blank" rel="noopener noreferrer">
+              <div className="ml-6 sm:ml-20 flex items-center w-[23px] h-[23px]">
+                <Image src="/images/share/instagram-icon.svg" alt="Instagram" width={23} height={23} unoptimized className="w-full h-full object-contain" />
               </div>
             </a>
           </div>
