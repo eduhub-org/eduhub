@@ -126,6 +126,10 @@ export interface ManagedCourse_Course_by_pk_Sessions {
    * An array relationship
    */
   SessionSpeakers: ManagedCourse_Course_by_pk_Sessions_SessionSpeakers[];
+  /**
+   * JSON string including all recorded participations for the session (also those that were not matched to registered participants)
+   */
+  attendanceData: string | null;
 }
 
 export interface ManagedCourse_Course_by_pk_CourseInstructors_User {
