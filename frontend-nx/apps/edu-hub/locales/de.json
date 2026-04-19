@@ -658,6 +658,7 @@
     "title": "Titel",
     "external_speakers": "Externe Referenten",
     "add_external_speaker": "Externen Referenten hinzufügen",
+    "remove_external_speaker": "Externen Referenten entfernen",
     "session_title": "Titel des Termins",
     "confirmDeleteSession": "Möchtest du den Termin wirklich löschen?",
     "cannotDeletePastSession": "Du kannst keinen Termin der in der Vergangenheit liegt löschen! Solltest du den Termin wirklich löschen wollen, kontaktiere bitte einen Administrator.",
