@@ -55,6 +55,7 @@ import ManagedItemList from '../../../common/ManagedItemList';
 import { Card } from '../../../common/Card';
 import { SelectUserDialog } from '../../../common/dialogs/SelectUserDialog';
 import { CreateUserDialog } from '../../../common/dialogs/CreateUserDialog';
+import AttendanceDataDialog from './AttendanceDataDialog';
 
 interface IProps {
   course: ManagedCourse_Course_by_pk;
@@ -351,6 +352,10 @@ const ExpandableSessionRowContent: FC<ExpandableSessionRowContentProps> = ({ ses
 
   const [createUserDialogOpen, setCreateUserDialogOpen] = useState(false);
   const [searchValueForNewUser, setSearchValueForNewUser] = useState('');
+  const [attendanceOpen, setAttendanceOpen] = useState(false);
+
+  const hasAttendanceData =
+    Boolean(session.attendanceData) && session.attendanceData !== 'true';
 
   const [insertSessionSpeaker] = useRoleMutation<InsertNewSessionSpeaker, InsertNewSessionSpeakerVariables>(
     INSERT_NEW_SESSION_SPEAKER
@@ -484,9 +489,39 @@ const ExpandableSessionRowContent: FC<ExpandableSessionRowContentProps> = ({ ses
                 showAddNewUserOption: true,
               }}
             />
+
+            <Card title={t('SessionsTab.attendance_data.label')}>
+              <div className="flex flex-col gap-2">
+                <button
+                  type="button"
+                  disabled={!hasAttendanceData}
+                  onClick={hasAttendanceData ? () => setAttendanceOpen(true) : undefined}
+                  // `onTouchStart` ensures the dialog opens on the initial tap on
+                  // touch devices that delay the synthetic `click` event.
+                  onTouchStart={hasAttendanceData ? () => setAttendanceOpen(true) : undefined}
+                  aria-label={t('SessionsTab.attendance_data.review_button')}
+                  // 44px minimum height meets WCAG 2.5.5 / iOS HIG touch-target guidance.
+                  className="self-start inline-flex items-center justify-center min-h-[44px] px-4 py-2 rounded bg-brand hover:bg-brand-dark text-fill-primary font-medium disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-brand"
+                >
+                  {t('SessionsTab.attendance_data.review_button')}
+                </button>
+                {!hasAttendanceData && (
+                  <output className="text-sm text-label-secondary">
+                    {t('SessionsTab.attendance_data.no_data')}
+                  </output>
+                )}
+              </div>
+            </Card>
           </div>
         </div>
       </div>
+
+      <AttendanceDataDialog
+        open={attendanceOpen}
+        onClose={() => setAttendanceOpen(false)}
+        attendanceData={session.attendanceData}
+        sessionTitle={session.title ?? undefined}
+      />
 
       <CreateUserDialog
         open={createUserDialogOpen}

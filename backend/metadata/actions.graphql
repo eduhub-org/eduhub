@@ -50,7 +50,6 @@ type Mutation {
     userId: uuid!
     motivationLetter: String
     formbricksSurveyUrl: String
-    termsAcceptedAt: timestamptz
   ): CreateEnrollmentWithAddonsResult!
 }
 

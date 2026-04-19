@@ -50,7 +50,8 @@ select_permissions:
         - startDateTime
         - sessionId
         - userId
-        - recordedName
+        - recordedIdentifier
+        - matchType
         - source
         - location
       filter:
@@ -73,7 +74,8 @@ select_permissions:
         - startDateTime
         - sessionId
         - userId
-        - recordedName
+        - recordedIdentifier
+        - matchType
         - source
         - location
       filter:
@@ -86,7 +88,8 @@ update_permissions:
       columns:
         - endDateTime
         - interruptionCount
-        - recordedName
+        - recordedIdentifier
+        - matchType
         - source
         - startDateTime
         - status

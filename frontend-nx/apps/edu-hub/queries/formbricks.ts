@@ -60,20 +60,23 @@ export const GET_FORMBRICKS_ADDON_SELECTIONS = gql`
   }
 `;
 
+// Terms & Conditions / Privacy Policy acceptance is intentionally NOT a
+// parameter of this mutation: at this point in the registration flow the
+// user has only completed the Formbricks survey and has not yet seen or
+// accepted the terms (that happens in the summary step before Stripe
+// checkout). Acceptance is recorded separately via UPDATE_ENROLLMENT_TERMS_ACCEPTED.
 export const CREATE_ENROLLMENT_WITH_ADDONS = gql`
   mutation CreateEnrollmentWithAddons(
     $courseId: Int!
     $userId: uuid!
     $motivationLetter: String
     $formbricksSurveyUrl: String
-    $acceptTerms: Boolean
   ) {
     createEnrollmentWithAddons(
       courseId: $courseId
       userId: $userId
       motivationLetter: $motivationLetter
       formbricksSurveyUrl: $formbricksSurveyUrl
-      acceptTerms: $acceptTerms
     ) {
       success
       error

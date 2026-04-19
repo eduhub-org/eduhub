@@ -459,6 +459,7 @@
     "errors": {
       "motivation_letter_required": "Please provide a motivation letter",
       "terms_required": "Please accept the Terms and Conditions",
+      "terms_record_failed": "We could not record your acceptance of the Terms and Conditions. Please try again.",
       "registration_failed": "Registration failed. Please try again.",
       "complete_survey_first": "Please complete the questionnaire first.",
       "failed_to_load_organization_options": "Failed to load organization options."
@@ -1318,6 +1319,12 @@
         "label": "Description",
         "help_text": "Describe the content of the session here.",
         "placeholder": "Describe the session content, e.g. schedule, topics or notes for participants..."
+      },
+      "attendance_data": {
+        "label": "Attendance data",
+        "review_button": "Review attendance data",
+        "no_data": "No attendance data available",
+        "dialog_title": "Attendance data"
       }
     },
     "location": {
