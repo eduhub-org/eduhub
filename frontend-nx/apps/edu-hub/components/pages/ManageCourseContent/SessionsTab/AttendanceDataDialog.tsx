@@ -44,8 +44,14 @@ export const parseAttendanceData = (raw: string | null | undefined): AttendanceR
 
     const indices = Array.from(indexSet);
     return indices.map((idx, i) => {
+      // Build the row from the data columns first, then overwrite the
+      // synthetic `id`/`_idx` to guarantee they survive even when the
+      // attendance dataset itself contains an `id` column (e.g. Zoom
+      // participant exports). TableGrid relies on a non-nullable `id`
+      // because `getRowId` calls `row.id.toString()`.
       const row: AttendanceRow = { id: i, _idx: idx };
       cols.forEach((c) => {
+        if (c === 'id' || c === '_idx') return;
         row[c] = parsed[c]?.[idx];
       });
       return row;
