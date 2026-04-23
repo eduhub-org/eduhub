@@ -96,6 +96,17 @@ services:
       HASURA_CLOUD_FUNCTION_SECRET: test1234
       BUCKET_NAME: emulated-bucket
       LOCAL_STORAGE_PORT: 4001
+      # From repo-root .env (optional; see .env.example → Python serverless functions)
+      ZOOM_API_KEY: ${ZOOM_API_KEY:-}
+      ZOOM_API_SECRET: ${ZOOM_API_SECRET:-}
+      ZOOM_ACCOUNT_ID: ${ZOOM_ACCOUNT_ID:-}
+      ZOOM_HTTP_TIMEOUT_SEC: ${ZOOM_HTTP_TIMEOUT_SEC:-}
+      LMS_URL: ${LMS_URL:-}
+      LMS_USER: ${LMS_USER:-}
+      LMS_PASSWORD: ${LMS_PASSWORD:-}
+      LMS_ATTENDANCE_SURVEY_ID: ${LMS_ATTENDANCE_SURVEY_ID:-}
+      MM_URL: ${MM_URL:-}
+      MM_TOKEN: ${MM_TOKEN:-}
       
 
   hasura:
