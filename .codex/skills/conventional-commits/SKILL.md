@@ -10,6 +10,7 @@ Use this skill when the task involves commit messages, release impact, or merge-
 
 - Produce a conventional-commit subject line that matches the actual change.
 - Add a useful body for non-trivial changes.
+- Keep every commit-message line under 80 characters.
 - Avoid merge messages that hide release intent.
 - Keep guidance aligned with the repo's real semantic-release configuration.
 
@@ -29,6 +30,12 @@ Use:
 ```text
 <type>[optional scope]: <description>
 ```
+
+Length rule:
+
+- every line in the commit message must be fewer than 80 characters
+- this includes the subject, body paragraphs, bullets, and footers
+- wrap body text manually instead of leaving long prose on one line
 
 Examples:
 
@@ -125,6 +132,13 @@ Good body styles in this repo include:
 - one short explanatory paragraph plus one short fix paragraph
 - a compact bullet list for several coordinated changes
 - numbered sections when describing multiple related bugs in one fix
+- wrapped prose with each line kept under 80 characters
+
+If a body is present:
+
+- leave exactly one blank line between the subject and the body
+- keep every body line under 80 characters
+- wrap explanatory paragraphs rather than using one long line
 
 Avoid filler. The body should add debugging or review value, not restate the title.
 
@@ -135,6 +149,8 @@ Use footers for formal metadata:
 - `BREAKING CHANGE: ...`
 - `Co-authored-by: ...`
 - other standard trailers when needed
+
+Keep footer lines under 80 characters too.
 
 Do not put ordinary explanation into footers.
 
@@ -165,6 +181,9 @@ When the user asks for a commit message, return:
 1. the proposed subject line
 2. an optional body if the change is non-trivial
 3. a one-line note on release impact when relevant
+
+Before finalizing a commit message, check that every line is under 80
+characters.
 
 When the diff is ambiguous, explain the tradeoff briefly, then recommend one message.
 
