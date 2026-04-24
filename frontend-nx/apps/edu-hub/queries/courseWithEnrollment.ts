@@ -32,6 +32,7 @@ export const COURSE_WITH_ENROLLMENT = gql`
         Attendances(where: { User: { id: { _eq: $userId } } }) {
           id
           status
+          source
           updated_at
         }
       }
