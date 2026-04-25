@@ -471,7 +471,7 @@ const TableGrid = <T extends BaseRow,>({
                 return (
                 <div
                   key={header.id}
-                  className={`${header.column.columnDef.meta?.className || ''} ${header.column.id === 'selection' ? '' : 'min-w-0'} relative flex items-center h-12 ${header.column.getCanSort() ? 'cursor-pointer' : ''}`}
+                  className={`${header.column.columnDef.meta?.className || ''} ${header.column.id === 'selection' ? '' : 'min-w-0'} relative flex items-center min-h-12 ${header.column.getCanSort() ? 'cursor-pointer' : ''}`}
                   style={getDataColumnStyle(header.column.id, header.getSize())}
                   onClick={header.column.getCanSort() ? header.column.getToggleSortingHandler() : undefined}
                 >
