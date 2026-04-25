@@ -1,3 +1,4 @@
+import ast
 import os
 import subprocess
 from flask import Flask, request, jsonify
@@ -12,7 +13,6 @@ def load_env_vars(file_path):
     if not os.path.exists(file_path):
         return
 
-    print(f"Environment variables loaded from {file_path}")
     with open(file_path, "r", encoding="utf-8") as f:
         for line in f:
             line = line.strip()
@@ -25,11 +25,17 @@ def load_env_vars(file_path):
             key, value = line.split("=", 1)
             key = key.strip()
             value = value.strip()
-            if (value.startswith('"') and value.endswith('"')) or (
-                value.startswith("'") and value.endswith("'")
+            if (
+                len(value) >= 2
+                and value[0] == value[-1]
+                and value[0] in ('"', "'")
             ):
-                value = value[1:-1]
+                try:
+                    value = ast.literal_eval(value)
+                except (ValueError, SyntaxError):
+                    value = value[1:-1]
             os.environ[key] = value
+    print(f"Environment variables loaded from {file_path}")
 
 
 # Change working directory to callPythonFunction

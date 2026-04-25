@@ -115,13 +115,11 @@ function collapseAttendancesBySession(
   return result;
 }
 
-function getAttendanceStatus(
-  enrollment: ExtendedEnrollment,
+function getAttendanceStatusFromMap(
+  attendanceBySession: Record<number, CourseParticipations_Course_by_pk_CourseEnrollments_User_Attendances>,
   sessions: CourseParticipations_Course_by_pk_Sessions[],
   maxMissedSessions: number
 ): AttendanceOverallStatus {
-  const attendanceBySession = collapseAttendancesBySession(enrollment.User.Attendances);
-
   let missed = 0;
   let unchecked = 0;
   for (const session of sessions) {
@@ -139,6 +137,15 @@ function getAttendanceStatus(
   if (missed > maxMissedSessions) return 'failed';
   if (missed + unchecked <= maxMissedSessions) return 'passed';
   return 'uncertain';
+}
+
+function getAttendanceStatus(
+  enrollment: ExtendedEnrollment,
+  sessions: CourseParticipations_Course_by_pk_Sessions[],
+  maxMissedSessions: number
+): AttendanceOverallStatus {
+  const attendanceBySession = collapseAttendancesBySession(enrollment.User.Attendances);
+  return getAttendanceStatusFromMap(attendanceBySession, sessions, maxMissedSessions);
 }
 
 export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ course, qResult }) => {
@@ -426,7 +433,7 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
       const missed = dotsData.filter((d) => d.color === 'red').length;
       const attended = dotsData.filter((d) => d.color === 'lightgreen').length;
       const total = attended + missed;
-      const status = getAttendanceStatus(enrollment, sessions, maxMissedSessions);
+      const status = getAttendanceStatusFromMap(attendanceBySession, sessions, maxMissedSessions);
       const statusDotColor: DotColor =
         status === 'passed' ? 'lightgreen' : status === 'failed' ? 'red' : 'grey';
       const statusTooltip =

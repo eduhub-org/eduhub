@@ -21,7 +21,7 @@ services:
       NEXT_PUBLIC_STORAGE_BUCKET_URL: ${GITPOD_WORKSPACE_URL:-http://localhost}:4001/emulated-bucket
       NEXT_PUBLIC_ENVIRONMENT: development
       NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL: ${NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL:-}
-      MM_URL: "https://chat.opencampus.sh"
+      MM_URL: ${MM_URL:-https://chat.opencampus.sh}
       # Enable file watching in Docker environment
       CHOKIDAR_USEPOLLING: "true"
       WATCHPACK_POLLING: "true"

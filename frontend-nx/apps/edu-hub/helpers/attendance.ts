@@ -36,8 +36,13 @@ export function pickEffectiveAttendance<T extends AttendanceLike>(
   );
   const pool = instructorRows.length > 0 ? instructorRows : attendances;
 
-  return pool.reduce<T | undefined>((best, current) => {
-    if (best === undefined) return current;
-    return getTieBreak(best) < getTieBreak(current) ? current : best;
-  }, undefined);
+  let bestScore = getTieBreak(pool[0]);
+  return pool.reduce((best, current) => {
+    const currentScore = getTieBreak(current);
+    if (bestScore < currentScore) {
+      bestScore = currentScore;
+      return current;
+    }
+    return best;
+  });
 }
