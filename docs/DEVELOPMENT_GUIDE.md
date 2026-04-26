@@ -27,10 +27,9 @@ For local development with Docker Compose, create a `.env` file in the project r
 
 ### Available Environment Variables
 
-- **Formbricks Integration:**
-  - `FORMBRICKS_API_KEY` - API key for Formbricks Management API (get from Formbricks → Settings → Organization → API Keys)
+See the sections in **`.env.example`** (Matrix, Formbricks, Stripe, Ghost, and **Python serverless functions** for Zoom, LimeSurvey, and Mattermost used by `python_functions`).
 
-See `docs/FORMBRICKS_IMPLEMENTATION_SUMMARY.md` for detailed setup instructions.
+- **Formbricks Integration:** `FORMBRICKS_API_KEY` — get from Formbricks → Settings → Organization → API Keys. Details: `docs/FORMBRICKS_IMPLEMENTATION_SUMMARY.md`.
 
 ## Ports
 

@@ -7,6 +7,7 @@ import Dot from '../../common/Dot';
 
 import { AttendanceStatus_enum } from '../../../__generated__/globalTypes';
 import { CourseWithEnrollment_Course_by_pk_Sessions } from '../../../queries/__generated__/CourseWithEnrollment';
+import { pickEffectiveAttendance } from '../../../helpers/attendance';
 
 const getBgColor = (status: AttendanceStatus_enum | string) => {
   if (status === NO_INFO) {
@@ -46,17 +47,13 @@ const { NO_INFO, ATTENDED, MISSED } = AttendanceStatus_enum;
 const AttendanceEntry: FC<AttendanceEntryProps> = ({ session }) => {
   const locale = useLocale();
 
-  const lastAttendanceRecord =
-    session.Attendances.length > 0
-      ? session.Attendances.reduce(
-          (prev, current) => {
-            return prev.updated_at > current.updated_at ? prev : current;
-          },
-          { updated_at: 0, status: NO_INFO }
-        )
-      : { updated_at: 0, status: NO_INFO };
-
-  const status = lastAttendanceRecord.status;
+  // Prefer INSTRUCTOR-sourced rows over automated ones; within the pool, pick
+  // the most recently updated row. `updated_at` can be null for freshly
+  // inserted rows; treat null as epoch 0 so it never wins over a timestamp.
+  const effective = pickEffectiveAttendance(session.Attendances, (a) =>
+    a.updated_at ? new Date(a.updated_at).getTime() : 0
+  );
+  const status = effective?.status ?? NO_INFO;
 
   const bgColor = getBgColor(status);
 

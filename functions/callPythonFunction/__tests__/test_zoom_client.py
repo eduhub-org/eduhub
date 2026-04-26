@@ -218,6 +218,97 @@ class TestAggregation:
         df = client.aggregate_participants([])
         assert len(df) == 0
 
+    def test_guest_reconnect_with_same_name_is_merged_across_identity_keys(self):
+        """Logged-in join (email set) followed by a wifi-drop reconnect as a
+        guest (fresh user_id, blank email) with the same display name lands
+        in different identity-key buckets today. The second-pass display-name
+        merge must collapse them so the dialog shows one row with
+        ``interruptionCount = 1``, the summed duration and the first/last
+        timestamps across both chunks."""
+        client = _make_client()
+        rows = [
+            {
+                "name": "Jane Doe",
+                "user_email": "jane@example.com",
+                "user_id": "stable-123",
+                "join_time": "2026-01-01T10:00:00Z",
+                "leave_time": "2026-01-01T10:40:00Z",
+                "_meeting_uuid": "inst1",
+                "_instance_start": "2026-01-01T10:00:00Z",
+            },
+            {
+                "name": "Jane Doe",
+                "user_email": None,
+                "user_id": "guest-87654321",
+                "join_time": "2026-01-01T10:50:00Z",
+                "leave_time": "2026-01-01T11:20:00Z",
+                "_meeting_uuid": "inst1",
+                "_instance_start": "2026-01-01T10:00:00Z",
+            },
+        ]
+
+        df = client.aggregate_participants(rows)
+        assert len(df) == 1
+        row = df.iloc[0]
+        assert row["email"] == "jane@example.com"
+        assert row["joinDateTime"] == pd.Timestamp("2026-01-01T10:00:00Z")
+        assert row["leaveDateTime"] == pd.Timestamp("2026-01-01T11:20:00Z")
+        assert row["interruptionCount"] == 1
+        assert row["duration"] == (40 + 30) * 60
+
+    def test_two_guests_same_name_different_user_ids_are_merged(self):
+        """Reconnect from a second device with no login: both rows have no
+        email but different Zoom user_ids and the same display name. Today
+        they hit the ``user_id`` fallback with different keys and emit two
+        output rows; after the fix they collapse into one."""
+        client = _make_client()
+        rows = [
+            {
+                "name": "Anonymous",
+                "user_id": "device-A",
+                "join_time": "2026-01-01T10:00:00Z",
+                "leave_time": "2026-01-01T10:15:00Z",
+            },
+            {
+                "name": "Anonymous",
+                "user_id": "device-B",
+                "join_time": "2026-01-01T10:30:00Z",
+                "leave_time": "2026-01-01T11:00:00Z",
+            },
+        ]
+
+        df = client.aggregate_participants(rows)
+        assert len(df) == 1
+        row = df.iloc[0]
+        assert row["interruptionCount"] == 1
+        assert row["duration"] == (15 + 30) * 60
+        assert row["joinDateTime"] == pd.Timestamp("2026-01-01T10:00:00Z")
+        assert row["leaveDateTime"] == pd.Timestamp("2026-01-01T11:00:00Z")
+
+    def test_same_display_name_different_emails_is_not_merged(self):
+        """Two different people who happen to share a display name must NOT
+        be collapsed. The conflicting-email guard keeps them separate."""
+        client = _make_client()
+        rows = [
+            {
+                "name": "Alex Mueller",
+                "user_email": "alex1@example.com",
+                "join_time": "2026-01-01T10:00:00Z",
+                "leave_time": "2026-01-01T10:40:00Z",
+            },
+            {
+                "name": "Alex Mueller",
+                "user_email": "alex2@example.com",
+                "join_time": "2026-01-01T10:50:00Z",
+                "leave_time": "2026-01-01T11:30:00Z",
+            },
+        ]
+
+        df = client.aggregate_participants(rows)
+        assert len(df) == 2
+        emails = set(df["email"].tolist())
+        assert emails == {"alex1@example.com", "alex2@example.com"}
+
 
 # ----------------------------------------------------------------------
 # Pagination

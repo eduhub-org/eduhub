@@ -19,6 +19,7 @@ import {
   CourseParticipations_Course_by_pk_AchievementOptionCourses,
   CourseParticipations_Course_by_pk_AchievementOptionCourses_AchievementOption_AchievementRecords,
   CourseParticipations_Course_by_pk_CourseEnrollments,
+  CourseParticipations_Course_by_pk_CourseEnrollments_User_Attendances,
   CourseParticipations_Course_by_pk_Sessions,
   CourseParticipationsVariables,
 } from '../../../../queries/__generated__/CourseParticipations';
@@ -36,6 +37,7 @@ import { AchievementRecordRating_enum, AttendanceStatus_enum } from '../../../..
 import { Button } from '../../../common/Button';
 import { CircularProgress, Tooltip } from '@mui/material';
 import { formattedDateWithTime, makeFullName } from '../../../../helpers/util';
+import { pickEffectiveAttendance } from '../../../../helpers/attendance';
 import { IoIosCheckmarkCircle } from 'react-icons/io';
 import { GoDotFill } from 'react-icons/go';
 import { ColumnDef, Row } from '@tanstack/react-table';
@@ -91,20 +93,33 @@ function flattenAchievementRecords(
 
 type AttendanceOverallStatus = 'passed' | 'failed' | 'uncertain';
 
-function getAttendanceStatus(
-  enrollment: ExtendedEnrollment,
-  sessions: CourseParticipations_Course_by_pk_Sessions[],
-  maxMissedSessions: number
-): AttendanceOverallStatus {
-  const attendanceBySession = enrollment.User.Attendances.reduce<
-    Record<number, { id: number; status: AttendanceStatus_enum }>
+function collapseAttendancesBySession(
+  attendances: readonly CourseParticipations_Course_by_pk_CourseEnrollments_User_Attendances[]
+): Record<number, CourseParticipations_Course_by_pk_CourseEnrollments_User_Attendances> {
+  const bySession = attendances.reduce<
+    Record<number, CourseParticipations_Course_by_pk_CourseEnrollments_User_Attendances[]>
   >((prev, curr) => {
-    if (!prev[curr.Session.id] || prev[curr.Session.id].id < curr.id) {
-      prev[curr.Session.id] = { id: curr.id, status: curr.status };
-    }
+    const bucket = prev[curr.Session.id] ?? [];
+    bucket.push(curr);
+    prev[curr.Session.id] = bucket;
     return prev;
   }, {});
 
+  const result: Record<number, CourseParticipations_Course_by_pk_CourseEnrollments_User_Attendances> = {};
+  for (const [sessionId, rows] of Object.entries(bySession)) {
+    const effective = pickEffectiveAttendance(rows, (a) => a.id);
+    if (effective !== undefined) {
+      result[Number(sessionId)] = effective;
+    }
+  }
+  return result;
+}
+
+function getAttendanceStatusFromMap(
+  attendanceBySession: Record<number, CourseParticipations_Course_by_pk_CourseEnrollments_User_Attendances>,
+  sessions: CourseParticipations_Course_by_pk_Sessions[],
+  maxMissedSessions: number
+): AttendanceOverallStatus {
   let missed = 0;
   let unchecked = 0;
   for (const session of sessions) {
@@ -122,6 +137,15 @@ function getAttendanceStatus(
   if (missed > maxMissedSessions) return 'failed';
   if (missed + unchecked <= maxMissedSessions) return 'passed';
   return 'uncertain';
+}
+
+function getAttendanceStatus(
+  enrollment: ExtendedEnrollment,
+  sessions: CourseParticipations_Course_by_pk_Sessions[],
+  maxMissedSessions: number
+): AttendanceOverallStatus {
+  const attendanceBySession = collapseAttendancesBySession(enrollment.User.Attendances);
+  return getAttendanceStatusFromMap(attendanceBySession, sessions, maxMissedSessions);
 }
 
 export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ course, qResult }) => {
@@ -395,14 +419,7 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
       onDotClick: (session: CourseParticipations_Course_by_pk_Sessions, userId: string) => void;
     }) {
       const enrollment = row.original;
-      const attendanceBySession = enrollment.User.Attendances.reduce<
-        Record<number, { id: number; status: AttendanceStatus_enum }>
-      >((prev, curr) => {
-        if (!prev[curr.Session.id] || prev[curr.Session.id].id < curr.id) {
-          prev[curr.Session.id] = { id: curr.id, status: curr.status };
-        }
-        return prev;
-      }, {});
+      const attendanceBySession = collapseAttendancesBySession(enrollment.User.Attendances);
 
       const dotColor = (sn: CourseParticipations_Course_by_pk_Sessions): DotColor => {
         const att = attendanceBySession[sn.id];
@@ -416,7 +433,7 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
       const missed = dotsData.filter((d) => d.color === 'red').length;
       const attended = dotsData.filter((d) => d.color === 'lightgreen').length;
       const total = attended + missed;
-      const status = getAttendanceStatus(enrollment, sessions, maxMissedSessions);
+      const status = getAttendanceStatusFromMap(attendanceBySession, sessions, maxMissedSessions);
       const statusDotColor: DotColor =
         status === 'passed' ? 'lightgreen' : status === 'failed' ? 'red' : 'grey';
       const statusTooltip =
@@ -460,14 +477,7 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
     async (session: CourseParticipations_Course_by_pk_Sessions, userId: string) => {
       const enrollment = extendedEnrollments.find((e) => e.userId === userId);
       if (!enrollment) return;
-      const attBySession = enrollment.User.Attendances.reduce<
-        Record<number, { id: number; status: AttendanceStatus_enum }>
-      >((prev, curr) => {
-        if (!prev[curr.Session.id] || prev[curr.Session.id].id < curr.id) {
-          prev[curr.Session.id] = { id: curr.id, status: curr.status };
-        }
-        return prev;
-      }, {});
+      const attBySession = collapseAttendancesBySession(enrollment.User.Attendances);
       const att = attBySession[session.id];
       let status: AttendanceStatus_enum;
       if (

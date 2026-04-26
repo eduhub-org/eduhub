@@ -26,7 +26,7 @@ Before integrating your function into the main server, start by testing your fun
      - Once verified, add your code as a new method to the `EduHubClient`.
      - Update the `EduHubClient` library (e.g., easiest is selecting the complete code in the file and executing it).
 
-3. **Note on External Services**: If you're using Mattermost, LimeSurvey, or ZoomClient, remember that development and testing require access to production instances. Provide local access data by updating the environment variables in `start-python.env` (this file is git-ignored).
+3. **Note on External Services**: If you're using Mattermost, LimeSurvey, or ZoomClient, set the variables in the **repo root** `.env` (see `.env.example`, section *Python serverless functions*). Docker Compose passes them into `python_functions`. For host-only runs of `python dev.py`, the same file is loaded from `../.env`.
 
 ## **Step 2: Local Testing of the Serverless Function**
 

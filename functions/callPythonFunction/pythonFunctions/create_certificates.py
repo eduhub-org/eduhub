@@ -8,6 +8,24 @@ from jinja2 import Environment, DictLoader
 from xhtml2pdf import pisa 
 
 
+ATTENDANCE_SOURCE_INSTRUCTOR = "INSTRUCTOR"
+
+
+def pick_effective_attendance(attendances):
+    """Pick the effective Attendance row from a list of rows for the same
+    (user, session). INSTRUCTOR-sourced rows always win over automated rows;
+    within the chosen pool, the row with the highest ``id`` wins (handles
+    repeated toggles). Returns ``None`` if the list is empty.
+    """
+    if not attendances:
+        return None
+    instructor_rows = [
+        a for a in attendances if a.get("source") == ATTENDANCE_SOURCE_INSTRUCTOR
+    ]
+    pool = instructor_rows if instructor_rows else attendances
+    return max(pool, key=lambda a: a.get("id") or 0)
+
+
 class CertificateError(Exception):
     """Exception class for certificate generation errors with message keys"""
     def __init__(self, message, message_key):
@@ -512,20 +530,18 @@ class CertificateCreator:
                 if attendance.get("Session", {}).get("id") == session.get("id")
             ]
 
-            # Choosing the newest attendance record by highest ID
-            if attendances_for_session:
-                attendances_for_session.sort(key=lambda x: x.get("id"), reverse=True)
-                last_attendance = attendances_for_session[0]
+            # INSTRUCTOR-sourced rows win over automated ones (ZOOM /
+            # LIMESURVEY / NULL); within the chosen pool, highest id wins.
+            last_attendance = pick_effective_attendance(attendances_for_session)
 
-                # Add attendance if Status attended
-                if last_attendance.get("status") == "ATTENDED":
-                    attended_sessions.append(
-                        {
-                            "sessionTitle": session.get("title"),
-                            "date": session.get("startDateTime"),  # Optional, fals Date is needed
-                            "status": last_attendance.get("status", "NO_INFO"),  # Optional, if state is needed
-                        }
-                    )
+            if last_attendance is not None and last_attendance.get("status") == "ATTENDED":
+                attended_sessions.append(
+                    {
+                        "sessionTitle": session.get("title"),
+                        "date": session.get("startDateTime"),  # Optional, fals Date is needed
+                        "status": last_attendance.get("status", "NO_INFO"),  # Optional, if state is needed
+                    }
+                )
         # Sorting the Sessions by start Date 
         # Attention: Date must have the correct format!
         attended_sessions.sort(key=lambda x: x.get("date"))

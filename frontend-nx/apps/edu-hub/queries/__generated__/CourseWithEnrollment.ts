@@ -80,6 +80,10 @@ export interface CourseWithEnrollment_Course_by_pk_Sessions_Attendances {
    * The attendance status: MISSED for a user registered for the session but not recorded (or recognized), otherwise ATTENDED
    */
   status: AttendanceStatus_enum;
+  /**
+   * The source that provided the recorded names of the attendees.
+   */
+  source: string;
   updated_at: any | null;
 }
 
