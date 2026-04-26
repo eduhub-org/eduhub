@@ -22,6 +22,10 @@ export interface CourseParticipations_Course_by_pk_CourseEnrollments_User_Attend
    */
   status: AttendanceStatus_enum;
   /**
+   * The source that provided the recorded names of the attendees.
+   */
+  source: string;
+  /**
    * An object relationship
    */
   Session: CourseParticipations_Course_by_pk_CourseEnrollments_User_Attendances_Session;

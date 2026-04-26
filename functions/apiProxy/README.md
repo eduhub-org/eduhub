@@ -148,7 +148,7 @@ Wait until the container is healthy, then open `http://localhost:42026/health`.
 cd functions
 python3 -m pip install -r callPythonFunction/requirements.txt -r apiProxy/requirements.txt
 # On PEP 668–managed Python (e.g. many Linux distros), use a venv instead, or pass --break-system-packages if you accept the risk.
-cp -n start-python.env.example start-python.env   # once, if start-python.env is missing
+# Secrets (Zoom, LimeSurvey, …) live in the repo-root .env — copy from .env.example if needed
 python3 dev.py
 ```
 

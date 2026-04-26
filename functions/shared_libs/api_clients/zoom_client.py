@@ -22,7 +22,7 @@ import logging
 import os
 import time
 import urllib.parse
-from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
+from typing import Any, Dict, Iterable, List, Optional, Set, Tuple, Union
 
 import pandas as pd
 import requests
@@ -466,6 +466,79 @@ class ZoomClient:
                 merged.append((start, end))
         return merged
 
+    @classmethod
+    def _merge_groups_by_display_name(
+        cls,
+        groups: Dict[Tuple[str, str], List[Dict[str, Any]]],
+    ) -> List[List[Dict[str, Any]]]:
+        """Second-pass group union: collapse identity-key groups that share
+        an identical (normalised) display name, unless they carry
+        conflicting non-empty emails.
+
+        :py:meth:`_identity_key` falls back ``email`` -> ``user_id`` ->
+        normalised name. That cannot bridge the case where the same
+        person's raw rows spill across multiple keys -- e.g. a logged-in
+        join (email set) followed by a wifi-drop reconnect as a guest
+        (fresh ``user_id``, no email). Both carry the same display name;
+        this pass unions them so the caller can recompute
+        ``interruptionCount`` and the total duration across the combined
+        interval list instead of emitting two output rows that the UI
+        then renders as duplicates.
+
+        Safety guard: if the groups that share a display name carry more
+        than one distinct non-empty email, they are NOT merged (two
+        different people who happen to share a display name).
+
+        Groups whose rows carry no non-empty display name are passed
+        through untouched so "unknown" guests are never fused together.
+
+        Returns a list of row bundles in the order the first contributing
+        group was seen in ``groups``, preserving the existing iteration
+        order.
+        """
+        name_index: Dict[str, List[Tuple[str, str]]] = {}
+        for key, rows in groups.items():
+            names = [
+                str(r.get("name")).strip()
+                for r in rows
+                if r.get("name") is not None and str(r.get("name")).strip() != ""
+            ]
+            if not names:
+                continue
+            most_common = max(set(names), key=names.count)
+            normalised = cls._normalise_name(most_common)
+            if normalised:
+                name_index.setdefault(normalised, []).append(key)
+
+        bundle_of: Dict[Tuple[str, str], Tuple[str, str]] = {}
+        for _normalised, keys in name_index.items():
+            if len(keys) < 2:
+                continue
+            distinct_emails: Set[str] = set()
+            for k in keys:
+                for r in groups[k]:
+                    email_value = r.get("user_email") or r.get("email")
+                    if email_value:
+                        cleaned = str(email_value).strip().lower()
+                        if cleaned:
+                            distinct_emails.add(cleaned)
+            if len(distinct_emails) > 1:
+                continue
+            representative = keys[0]
+            for k in keys:
+                bundle_of[k] = representative
+
+        bundles: Dict[Tuple[str, str], List[Dict[str, Any]]] = {}
+        order: List[Tuple[str, str]] = []
+        for key, rows in groups.items():
+            representative = bundle_of.get(key, key)
+            if representative not in bundles:
+                bundles[representative] = []
+                order.append(representative)
+            bundles[representative].extend(rows)
+
+        return [bundles[representative] for representative in order]
+
     def aggregate_participants(
         self, instance_rows: List[Dict[str, Any]]
     ) -> pd.DataFrame:
@@ -495,8 +568,16 @@ class ZoomClient:
             key = self._identity_key(row)
             groups.setdefault(key, []).append(row)
 
+        # Second pass: fuse identity-key groups that clearly belong to the
+        # same person (identical normalised display name, no conflicting
+        # emails). Must run before interval aggregation so the recomputed
+        # interruptionCount reflects the union of raw intervals rather
+        # than a naive sum of per-group counts (which would yield 0+0=0
+        # for two disjoint continuous chunks and lose the interruption).
+        final_groups = self._merge_groups_by_display_name(groups)
+
         aggregated = []
-        for (_key_kind, _key_value), rows in groups.items():
+        for rows in final_groups:
             intervals: List[Tuple[pd.Timestamp, pd.Timestamp]] = []
             emails = []
             names = []

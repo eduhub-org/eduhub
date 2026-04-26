@@ -139,7 +139,7 @@ curl "https://api.edu.opencampus.sh/moochub?page=1&per_page=10"
 ### Development Setup
 
 ```bash
-# Environment variables in functions/start-python.env
+# Optional integration secrets: repo root .env (see .env.example, Python serverless section)
 export API_BASE_URL="http://localhost:42026"
 export ENVIRONMENT="development"
 export BUCKET_NAME="emulated-bucket"

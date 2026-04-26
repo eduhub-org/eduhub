@@ -29,6 +29,7 @@ export const COURSE_PARTICIPATIONS = gql`
           Attendances(where: { Session: { courseId: { _eq: $courseId } } }) {
             id
             status
+            source
             Session {
               id
             }
