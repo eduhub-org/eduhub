@@ -361,3 +361,105 @@ class TestCheckAttendanceOrchestration:
         assert fake_eduhub.session_updates == []
         # And we never even queried participants (short-circuit before).
         assert fake_eduhub.participants_calls == 0
+
+    def test_missing_zoom_credentials_skips_online_but_keeps_offline(
+        self, monkeypatch, caplog
+    ):
+        """When Zoom credentials are missing we must not abort the cron
+        run. ONLINE attendance collection is skipped with a clear log
+        message; LimeSurvey / offline attendance collection continues
+        normally for all sessions."""
+        from pythonFunctions import check_attendance as mod
+
+        session = {
+            "id": 9,
+            "title": "Mixed location session",
+            "startDateTime": pd.Timestamp("2026-01-01T10:00:00Z"),
+            "endDateTime": pd.Timestamp("2026-01-01T11:30:00Z"),
+            "Course": {
+                "CourseLocations": [
+                    {
+                        "locationOption": "ONLINE",
+                        "defaultSessionAddress": "https://zoom.us/j/123",
+                    },
+                    {
+                        "locationOption": "KIEL",
+                        "defaultSessionAddress": None,
+                    },
+                ]
+            },
+            "SessionAddresses": [],
+        }
+
+        offline_df = pd.DataFrame(
+            [
+                {
+                    "name": "Bob Builder",
+                    "firstName": "Bob",
+                    "lastName": "Builder",
+                    "email": None,
+                    "joinDateTime": pd.Timestamp("2026-01-01T10:05:00Z"),
+                    "leaveDateTime": None,
+                    "duration": None,
+                    "interruptionCount": None,
+                    "location": "KI1",
+                }
+            ]
+        )
+
+        class FakeEduHub:
+            def __init__(self):
+                self.url = "http://fake"
+                self.inserts = []
+                self.session_updates = []
+
+            def get_finished_sessions_without_attendance_check(self):
+                return [session]
+
+            def get_course_participants_from_session_id(self, _sid):
+                return pd.DataFrame(
+                    [
+                        {
+                            "id": "u-bob",
+                            "firstName": "Bob",
+                            "lastName": "Builder",
+                            "email": "bob@example.com",
+                        }
+                    ]
+                )
+
+            def insert_attendance(self, df):
+                self.inserts.append(df.iloc[0].to_dict())
+
+            def update_session_attendanceData(self, df, sid):
+                self.session_updates.append((sid, df))
+
+        fake_eduhub = FakeEduHub()
+        monkeypatch.setattr(mod, "EduHubClient", lambda: fake_eduhub)
+
+        for var in ("ZOOM_API_KEY", "ZOOM_API_SECRET", "ZOOM_ACCOUNT_ID"):
+            monkeypatch.delenv(var, raising=False)
+
+        def _boom():
+            raise AssertionError("ZoomClient must not be instantiated when credentials are missing")
+
+        monkeypatch.setattr(mod, "ZoomClient", _boom)
+        monkeypatch.setattr(
+            mod, "get_offline_session_attendance", lambda s, loc: offline_df.copy()
+        )
+
+        import logging as _logging
+
+        with caplog.at_level(_logging.WARNING):
+            result = mod.check_attendance({})
+
+        assert result["success"] is True
+        assert any(
+            "Zoom API credentials not configured" in rec.getMessage()
+            for rec in caplog.records
+        )
+        assert len(fake_eduhub.inserts) == 1
+        assert fake_eduhub.inserts[0]["status"] == "ATTENDED"
+        assert fake_eduhub.inserts[0]["matchType"] == MATCH_TYPE_NAME
+        assert fake_eduhub.inserts[0]["source"] == "LIMESURVEY"
+        assert len(fake_eduhub.session_updates) == 1

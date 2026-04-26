@@ -4,7 +4,6 @@ import pandas as pd
 from thefuzz import fuzz
 from api_clients import EduHubClient, ZoomClient, LimeSurveyClient
 from api_clients.zoom_client import ZoomAttendanceError
-from pythonFunctions.limesurvey_location_mapping import place_keys_for_location_option
 
 
 # Match types persisted to Attendance.matchType. Keep in sync with the
@@ -15,6 +14,48 @@ MATCH_TYPE_NONE = "NONE"
 
 # Fuzzy name match threshold; below this score the row is treated as MISSED.
 NAME_MATCH_THRESHOLD = 80
+
+# Env vars required to talk to the Zoom API. When any of these is missing
+# we skip ONLINE attendance collection but still process LimeSurvey /
+# offline attendances so the cron run remains useful in environments
+# where Zoom is not configured (e.g. local dev, test instances).
+ZOOM_REQUIRED_ENV_VARS = ("ZOOM_API_KEY", "ZOOM_API_SECRET", "ZOOM_ACCOUNT_ID")
+
+
+def _zoom_credentials_configured():
+    """Return True iff all Zoom env vars are set to a non-empty value."""
+    return all(
+        os.getenv(name) not in (None, "") for name in ZOOM_REQUIRED_ENV_VARS
+    )
+
+
+def _init_zoom_client():
+    """Instantiate a ``ZoomClient`` if credentials are configured.
+
+    Returns ``None`` when credentials are missing or initialisation fails
+    (e.g. Zoom rejects the OAuth request). The caller is expected to fall
+    back to offline-only attendance collection in that case and to log a
+    clear message explaining why ONLINE attendances are not collected.
+    """
+    if not _zoom_credentials_configured():
+        missing = [n for n in ZOOM_REQUIRED_ENV_VARS if not os.getenv(n)]
+        logging.warning(
+            "Zoom API credentials not configured (missing: %s). "
+            "ONLINE attendances will NOT be collected in this run. "
+            "LimeSurvey / offline attendances will still be collected.",
+            ", ".join(missing),
+        )
+        return None
+    try:
+        return ZoomClient()
+    except Exception as exc:
+        logging.error(
+            "Failed to initialise Zoom client: %s. "
+            "ONLINE attendances will NOT be collected in this run. "
+            "LimeSurvey / offline attendances will still be collected.",
+            exc,
+        )
+        return None
 
 
 def check_attendance(arguments):
@@ -60,7 +101,7 @@ def check_attendance(arguments):
         ):
             logging.debug("########## Full DataFrame:\n%s", sessions)
 
-        zoom_client = ZoomClient()
+        zoom_client = _init_zoom_client()
 
         for session in sessions:
             logging.info(
@@ -79,6 +120,20 @@ def check_attendance(arguments):
                 logging.info("### Getting attendances for %s", location["locationOption"])
 
                 if location["locationOption"] == "ONLINE":
+                    if zoom_client is None:
+                        # Zoom not configured / unreachable this run.
+                        # Skip ONLINE collection for this session but keep
+                        # processing other (offline) locations so their
+                        # attendances are still recorded.
+                        logging.warning(
+                            "Skipping ONLINE attendance collection for "
+                            "session %s (id=%s): Zoom client unavailable. "
+                            "Offline attendances for this session (if any) "
+                            "will still be collected.",
+                            session.get("title"),
+                            session.get("id"),
+                        )
+                        continue
                     try:
                         # Pass the session window so the Zoom client can pick
                         # only the occurrences that actually ran for this
@@ -243,13 +298,17 @@ def get_offline_session_attendance(session, location):
         ].copy()
         logging.debug("############# Session Attendances\n%s", session_attendances)
 
-        location_option = location.get("locationOption")
-        allowed_places = place_keys_for_location_option(location_option)
-        if allowed_places:
-            session_attendances["location"] = session_attendances["location"].astype(str).str.strip()
-            session_attendances = session_attendances[
-                session_attendances["location"].isin(allowed_places)
-            ].copy()
+        # NOTE: We intentionally do not filter LimeSurvey responses by
+        # ``location`` (the raw Place value) here. The Place answer codes
+        # configured in LimeSurvey don't line up cleanly with
+        # LocationOption, and an overly strict filter was silently
+        # dropping every offline response. The raw Place value is still
+        # persisted on each Attendance row (via the ``location`` column
+        # below) so downstream consumers (e.g. update_enrollment_locations)
+        # can interpret it.
+        session_attendances["location"] = (
+            session_attendances["location"].astype(str).str.strip()
+        )
 
         session_attendances["interruptionCount"] = None
         session_attendances["duration"] = None
