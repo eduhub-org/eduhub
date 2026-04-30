@@ -39,7 +39,7 @@ export const EduhubDropDown: React.FC<EduhubDropDownProps> = ({
   getLabelForValue,
   disabled = false,
 }) => {
-  const baseClass = 'w-full pl-3 pr-10 py-3 text-label-primary rounded bg-fill-primary';
+  const baseClass = 'w-full h-12 pl-3 pr-10 py-3 text-label-primary rounded bg-fill-primary';
   const finalClassName = `${baseClass} ${className}`;
 
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
