@@ -1,11 +1,34 @@
 table:
-  schema: public
   name: ProjectType
-is_enum: true
+  schema: public
+array_relationships:
+  - name: Projects
+    using:
+      foreign_key_constraint_on:
+        column: type
+        table:
+          name: Project
+          schema: public
 select_permissions:
   - role: anonymous
     permission:
       columns:
         - value
         - comment
+        - requiresDocumentation
+        - requiresPresentation
+        - requiresExternalUrl
+        - requiresCoverImage
+        - requiresEvaluationScript
+      filter: {}
+  - role: user_access
+    permission:
+      columns:
+        - value
+        - comment
+        - requiresDocumentation
+        - requiresPresentation
+        - requiresExternalUrl
+        - requiresCoverImage
+        - requiresEvaluationScript
       filter: {}

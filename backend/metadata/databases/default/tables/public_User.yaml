@@ -71,6 +71,27 @@ array_relationships:
         table:
           name: OrganizationNewsletterSubscription
           schema: public
+  - name: ProjectAuthors
+    using:
+      foreign_key_constraint_on:
+        column: userId
+        table:
+          name: ProjectAuthor
+          schema: public
+  - name: ProjectMentors
+    using:
+      foreign_key_constraint_on:
+        column: userId
+        table:
+          name: ProjectMentor
+          schema: public
+  - name: ProposedProjects
+    using:
+      foreign_key_constraint_on:
+        column: proposedByUserId
+        table:
+          name: Project
+          schema: public
 select_permissions:
   - role: anonymous
     permission:

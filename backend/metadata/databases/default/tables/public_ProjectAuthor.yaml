@@ -1,0 +1,109 @@
+table:
+  name: ProjectAuthor
+  schema: public
+object_relationships:
+  - name: Project
+    using:
+      foreign_key_constraint_on: projectId
+  - name: ProjectParticipationStatus
+    using:
+      foreign_key_constraint_on: participationStatus
+  - name: User
+    using:
+      foreign_key_constraint_on: userId
+insert_permissions:
+  - role: user_access
+    permission:
+      check:
+        _or:
+          - userId:
+              _eq: X-Hasura-User-Id
+          - Project:
+              ProjectAuthors:
+                _and:
+                  - participationStatus:
+                      _eq: ACCEPTED
+                  - User:
+                      id:
+                        _eq: X-Hasura-User-Id
+      columns:
+        - id
+        - participationStatus
+        - projectId
+        - userId
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - created_at
+        - id
+        - participationStatus
+        - projectId
+        - updated_at
+        - userId
+      filter:
+        Project:
+          status:
+            _eq: PUBLISHED
+  - role: instructor_access
+    permission:
+      columns:
+        - created_at
+        - id
+        - participationStatus
+        - projectId
+        - updated_at
+        - userId
+      filter:
+        Project:
+          _or:
+            - ProjectCourses:
+                Course:
+                  CourseInstructors:
+                    User:
+                      id:
+                        _eq: X-Hasura-User-Id
+            - ProjectMentors:
+                User:
+                  id:
+                    _eq: X-Hasura-User-Id
+  - role: user_access
+    permission:
+      columns:
+        - created_at
+        - id
+        - participationStatus
+        - projectId
+        - updated_at
+        - userId
+      filter: {}
+update_permissions:
+  - role: user_access
+    permission:
+      columns:
+        - participationStatus
+      filter:
+        Project:
+          ProjectAuthors:
+            _and:
+              - participationStatus:
+                  _eq: ACCEPTED
+              - User:
+                  id:
+                    _eq: X-Hasura-User-Id
+      check: null
+delete_permissions:
+  - role: user_access
+    permission:
+      filter:
+        _or:
+          - userId:
+              _eq: X-Hasura-User-Id
+          - Project:
+              ProjectAuthors:
+                _and:
+                  - participationStatus:
+                      _eq: ACCEPTED
+                  - User:
+                      id:
+                        _eq: X-Hasura-User-Id
