@@ -1,0 +1,145 @@
+table:
+  name: ProjectAuthor
+  schema: public
+object_relationships:
+  - name: Project
+    using:
+      foreign_key_constraint_on: projectId
+  - name: ProjectParticipationStatus
+    using:
+      foreign_key_constraint_on: participationStatus
+  - name: User
+    using:
+      foreign_key_constraint_on: userId
+insert_permissions:
+  - role: instructor_access
+    permission:
+      check:
+        Project:
+          ProjectCourses:
+            Course:
+              CourseInstructors:
+                User:
+                  id:
+                    _eq: X-Hasura-User-Id
+      columns:
+        - participationStatus
+        - projectId
+        - userId
+  - role: user_access
+    permission:
+      check:
+        Project:
+          acceptingParticipants:
+            _eq: true
+      set:
+        userId: x-hasura-user-id
+        participationStatus: REQUESTED
+      columns:
+        - projectId
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - created_at
+        - id
+        - participationStatus
+        - projectId
+        - updated_at
+        - userId
+      filter:
+        Project:
+          status:
+            _eq: PUBLISHED
+  - role: instructor_access
+    permission:
+      columns:
+        - created_at
+        - id
+        - participationStatus
+        - projectId
+        - updated_at
+        - userId
+      filter:
+        Project:
+          _or:
+            - ProjectCourses:
+                Course:
+                  CourseInstructors:
+                    User:
+                      id:
+                        _eq: X-Hasura-User-Id
+            - ProjectMentors:
+                User:
+                  id:
+                    _eq: X-Hasura-User-Id
+  - role: user_access
+    permission:
+      columns:
+        - created_at
+        - id
+        - participationStatus
+        - projectId
+        - updated_at
+        - userId
+      filter:
+        _or:
+          - userId:
+              _eq: X-Hasura-User-Id
+          - Project:
+              ProjectAuthors:
+                _and:
+                  - participationStatus:
+                      _eq: ACCEPTED
+                  - User:
+                      id:
+                        _eq: X-Hasura-User-Id
+          - Project:
+              ProjectCourses:
+                Course:
+                  CourseEnrollments:
+                    User:
+                      id:
+                        _eq: X-Hasura-User-Id
+update_permissions:
+  - role: user_access
+    permission:
+      columns:
+        - participationStatus
+      filter:
+        _or:
+          - Project:
+              ProjectAuthors:
+                _and:
+                  - participationStatus:
+                      _eq: ACCEPTED
+                  - User:
+                      id:
+                        _eq: X-Hasura-User-Id
+          - _and:
+              - userId:
+                  _eq: X-Hasura-User-Id
+              - Project:
+                  proposedByUserId:
+                    _eq: X-Hasura-User-Id
+              - _not:
+                  Project:
+                    ProjectAuthors:
+                      participationStatus:
+                        _eq: ACCEPTED
+      check: null
+delete_permissions:
+  - role: user_access
+    permission:
+      filter:
+        _or:
+          - userId:
+              _eq: X-Hasura-User-Id
+          - Project:
+              ProjectAuthors:
+                _and:
+                  - participationStatus:
+                      _eq: ACCEPTED
+                  - User:
+                      id:
+                        _eq: X-Hasura-User-Id

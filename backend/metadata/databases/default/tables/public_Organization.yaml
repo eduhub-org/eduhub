@@ -37,6 +37,13 @@ array_relationships:
         table:
           name: Program
           schema: public
+  - name: Projects
+    using:
+      foreign_key_constraint_on:
+        column: organizationId
+        table:
+          name: Project
+          schema: public
   - name: OrganizationNewsletterSubscriptions
     using:
       foreign_key_constraint_on:

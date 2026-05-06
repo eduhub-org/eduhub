@@ -1,14 +1,14 @@
 table:
-  name: ProjectRating
+  name: ProjectParticipationStatus
   schema: public
 is_enum: true
 array_relationships:
-  - name: Projects
+  - name: ProjectAuthors
     using:
       foreign_key_constraint_on:
-        column: rating
+        column: participationStatus
         table:
-          name: Project
+          name: ProjectAuthor
           schema: public
 select_permissions:
   - role: anonymous
