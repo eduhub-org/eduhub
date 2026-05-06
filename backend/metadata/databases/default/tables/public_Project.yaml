@@ -59,8 +59,11 @@ insert_permissions:
   - role: user_access
     permission:
       check:
-        proposedByUserId:
-          _eq: X-Hasura-User-Id
+        _and:
+          - proposedByUserId:
+              _eq: X-Hasura-User-Id
+          - status:
+              _eq: PROPOSED
       columns:
         - achievementCertificateType
         - acceptingParticipants
@@ -69,7 +72,6 @@ insert_permissions:
         - documentationTemplateId
         - documentationUrl
         - externalUrl
-        - id
         - organizationId
         - parentProjectId
         - presentationUrl
@@ -96,8 +98,16 @@ select_permissions:
         - title
         - type
       filter:
-        status:
-          _eq: PUBLISHED
+        _or:
+          - status:
+              _eq: PUBLISHED
+          - _and:
+              - status:
+                  _eq: PROPOSED
+              - _not:
+                  ProjectAuthors:
+                    participationStatus:
+                      _eq: ACCEPTED
   - role: instructor_access
     permission:
       columns:
@@ -162,15 +172,37 @@ select_permissions:
         - updated_at
       filter:
         _or:
-          - status:
-              _eq: PROPOSED
           - ProjectAuthors:
               User:
                 id:
                   _eq: X-Hasura-User-Id
           - proposedByUserId:
               _eq: X-Hasura-User-Id
+          - ProjectCourses:
+              Course:
+                CourseEnrollments:
+                  User:
+                    id:
+                      _eq: X-Hasura-User-Id
 update_permissions:
+  - role: instructor_access
+    permission:
+      columns:
+        - rating
+        - score
+      filter:
+        _or:
+          - ProjectCourses:
+              Course:
+                CourseInstructors:
+                  User:
+                    id:
+                      _eq: X-Hasura-User-Id
+          - ProjectMentors:
+              User:
+                id:
+                  _eq: X-Hasura-User-Id
+      check: {}
   - role: user_access
     permission:
       columns:
@@ -182,8 +214,6 @@ update_permissions:
         - documentationUrl
         - externalUrl
         - presentationUrl
-        - rating
-        - score
         - status
         - tagline
         - title

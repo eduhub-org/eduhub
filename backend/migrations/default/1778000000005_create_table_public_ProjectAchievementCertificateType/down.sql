@@ -1,1 +1,1 @@
-DROP TABLE "public"."ProjectAchievementCertificateType";
+DROP TABLE IF EXISTS "public"."ProjectAchievementCertificateType";

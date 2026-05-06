@@ -3,3 +3,5 @@ alter table "public"."Project"
   foreign key ("proposedByUserId")
   references "public"."User"
   ("id") on update restrict on delete restrict;
+
+CREATE INDEX "Project_proposedByUserId_idx" ON "public"."Project" ("proposedByUserId");

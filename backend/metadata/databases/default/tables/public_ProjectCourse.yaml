@@ -64,7 +64,12 @@ update_permissions:
             User:
               id:
                 _eq: X-Hasura-User-Id
-      check: null
+      check:
+        Course:
+          CourseInstructors:
+            User:
+              id:
+                _eq: X-Hasura-User-Id
 delete_permissions:
   - role: instructor_access
     permission:

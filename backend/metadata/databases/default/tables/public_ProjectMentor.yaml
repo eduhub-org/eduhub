@@ -34,7 +34,10 @@ select_permissions:
         - projectId
         - updated_at
         - userId
-      filter: {}
+      filter:
+        Project:
+          status:
+            _eq: PUBLISHED
 update_permissions:
   - role: instructor_access
     permission:

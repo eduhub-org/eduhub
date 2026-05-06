@@ -1,1 +1,1 @@
-DROP TABLE "public"."Project";
+DROP TABLE IF EXISTS "public"."Project";

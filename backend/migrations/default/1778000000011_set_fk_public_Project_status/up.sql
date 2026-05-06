@@ -3,3 +3,5 @@ alter table "public"."Project"
   foreign key ("status")
   references "public"."ProjectStatus"
   ("value") on update restrict on delete restrict;
+
+CREATE INDEX "Project_status_idx" ON "public"."Project" ("status");

@@ -12,25 +12,28 @@ object_relationships:
     using:
       foreign_key_constraint_on: userId
 insert_permissions:
-  - role: user_access
+  - role: instructor_access
     permission:
       check:
-        _or:
-          - userId:
-              _eq: X-Hasura-User-Id
-          - Project:
-              ProjectAuthors:
-                _and:
-                  - participationStatus:
-                      _eq: ACCEPTED
-                  - User:
-                      id:
-                        _eq: X-Hasura-User-Id
+        Project:
+          ProjectCourses:
+            Course:
+              CourseInstructors:
+                User:
+                  id:
+                    _eq: X-Hasura-User-Id
       columns:
-        - id
         - participationStatus
         - projectId
         - userId
+  - role: user_access
+    permission:
+      check: {}
+      set:
+        userId: x-hasura-user-id
+      columns:
+        - participationStatus
+        - projectId
 select_permissions:
   - role: anonymous
     permission:
@@ -76,7 +79,25 @@ select_permissions:
         - projectId
         - updated_at
         - userId
-      filter: {}
+      filter:
+        _or:
+          - userId:
+              _eq: X-Hasura-User-Id
+          - Project:
+              ProjectAuthors:
+                _and:
+                  - participationStatus:
+                      _eq: ACCEPTED
+                  - User:
+                      id:
+                        _eq: X-Hasura-User-Id
+          - Project:
+              ProjectCourses:
+                Course:
+                  CourseEnrollments:
+                    User:
+                      id:
+                        _eq: X-Hasura-User-Id
 update_permissions:
   - role: user_access
     permission:
