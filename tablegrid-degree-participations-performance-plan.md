@@ -9,7 +9,7 @@ This file contains implementation notes that are useful for planning, but too de
 ## Progress checklist
 
 - [x] Scope the current Degree Participations flow.
-- [ ] Define and add realistic development seed data.
+- [x] Define and add realistic development seed data.
 - [ ] Capture the current baseline behavior with the larger dataset.
 - [ ] Fix full-dataset sorting for attended events and total ECTS.
 - [ ] Defer Degree Participations loading until the tab is opened.
@@ -132,6 +132,31 @@ This file contains implementation notes that are useful for planning, but too de
   the same performance dataset.
 - Existing sequence resets at the end of `initial_seeds.sql` must be updated if
   explicit ids are added.
+- Added deterministic performance seed data to
+  `backend/seeds/default/initial_seeds.sql` for a new `Machine Learning Degree`
+  with id `7000`.
+- The new degree links 12 ML course/course-like offerings and 5 event offerings
+  that mirror the production examples, including `Applied Machine Learning`,
+  `From LLMs to AI Agents`, `Scientific Machine Learning`,
+  `Fine-Tuning and Deployment of Large Language Models`, and
+  `Coding.Waterkant` events.
+- Added 300 deterministic users with a broad mix of German and international
+  first/last-name combinations, using enough surname variety to avoid obvious
+  repeated-family clusters in demo data.
+- Added 300 degree enrollments and 1,468 related ML-degree course/event
+  enrollments so the Degree Participations tab has a production-like nested data
+  shape.
+- Added 225 event attendance rows for linked event sessions.
+- The generated data covers the requested edge cases:
+  - zero ECTS,
+  - below `12.5` ECTS,
+  - exactly `12.5` ECTS,
+  - above `12.5` ECTS,
+  - zero attended events,
+  - one attended event,
+  - and many attended events.
+- The full updated seed file was validated against local Postgres in a rolled
+  back transaction.
 
 ## 3. Capture baseline behavior
 
