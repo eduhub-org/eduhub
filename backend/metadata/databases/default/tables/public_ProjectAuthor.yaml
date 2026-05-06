@@ -28,11 +28,14 @@ insert_permissions:
         - userId
   - role: user_access
     permission:
-      check: {}
+      check:
+        Project:
+          acceptingParticipants:
+            _eq: true
       set:
         userId: x-hasura-user-id
+        participationStatus: REQUESTED
       columns:
-        - participationStatus
         - projectId
 select_permissions:
   - role: anonymous
@@ -104,14 +107,26 @@ update_permissions:
       columns:
         - participationStatus
       filter:
-        Project:
-          ProjectAuthors:
-            _and:
-              - participationStatus:
-                  _eq: ACCEPTED
-              - User:
-                  id:
+        _or:
+          - Project:
+              ProjectAuthors:
+                _and:
+                  - participationStatus:
+                      _eq: ACCEPTED
+                  - User:
+                      id:
+                        _eq: X-Hasura-User-Id
+          - _and:
+              - userId:
+                  _eq: X-Hasura-User-Id
+              - Project:
+                  proposedByUserId:
                     _eq: X-Hasura-User-Id
+              - _not:
+                  Project:
+                    ProjectAuthors:
+                      participationStatus:
+                        _eq: ACCEPTED
       check: null
 delete_permissions:
   - role: user_access

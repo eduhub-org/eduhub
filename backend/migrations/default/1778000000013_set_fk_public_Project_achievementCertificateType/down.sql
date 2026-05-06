@@ -1,1 +1,1 @@
-alter table "public"."Project" drop constraint "Project_achievementCertificateType_fkey";
+alter table "public"."Project" drop constraint if exists "Project_achievementCertificateType_fkey";

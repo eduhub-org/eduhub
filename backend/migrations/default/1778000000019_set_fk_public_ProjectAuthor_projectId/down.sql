@@ -1,1 +1,1 @@
-alter table "public"."ProjectAuthor" drop constraint "ProjectAuthor_projectId_fkey";
+alter table "public"."ProjectAuthor" drop constraint if exists "ProjectAuthor_projectId_fkey";

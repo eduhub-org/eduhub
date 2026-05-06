@@ -1,1 +1,1 @@
-alter table "public"."ProjectCourse" drop constraint "ProjectCourse_projectId_fkey";
+alter table "public"."ProjectCourse" drop constraint if exists "ProjectCourse_projectId_fkey";
