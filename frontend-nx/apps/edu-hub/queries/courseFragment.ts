@@ -47,6 +47,8 @@ export const COURSE_FRAGMENT = gql`
     title
     achievementCertificatePossible
     attendanceCertificatePossible
+    projectProposalsEnabled
+    projectSubmissionDeadline
     programId
     maxParticipants
     activeParticipantCount
@@ -127,6 +129,8 @@ export const ADMIN_COURSE_FRAGMENT = gql`
     published
     achievementCertificatePossible
     attendanceCertificatePossible
+    projectProposalsEnabled
+    projectSubmissionDeadline
     chatLink
     matrixRoomId
     registrationType

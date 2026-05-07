@@ -47,6 +47,7 @@ import { createMultiWordSearchCondition } from '../../../common/TableGrid/utils'
 import { BulkAction } from '../../../common/TableGrid/types';
 import NotificationSnackbar from '../../../common/dialogs/NotificationSnackbar';
 import { ErrorMessageDialog } from '../../../common/dialogs/ErrorMessageDialog';
+import ProjectsManagementGrid from './projects/ProjectsManagementGrid';
 
 interface CourseParticipationsTabIProps {
   course: ManagedCourse_Course_by_pk;
@@ -658,8 +659,6 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
     [refetch, qResult, t, locale]
   );
 
-  const achievementOptionsForSection = courseData?.AchievementOptionCourses ?? [];
-
   if (!course.achievementCertificatePossible) {
     return (
       <div className="flex flex-col space-y-4">
@@ -700,9 +699,9 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
 
   return (
     <div className="flex flex-col space-y-4">
-      <AvailableProjectOptionsSection
-        achievementOptions={achievementOptionsForSection}
-        t={t}
+      <ProjectsManagementGrid
+        courseId={course.id}
+        programDefaultProjectType={course.Program?.defaultProjectType ?? null}
       />
       <ParticipationTable
         columns={columns}
@@ -738,36 +737,6 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
     </div>
   );
 };
-
-function AvailableProjectOptionsSection({
-  achievementOptions,
-  t,
-}: {
-  achievementOptions: { AchievementOption: { id: number; title: string } }[];
-  t: (key: string) => string;
-}) {
-  return (
-    <div className="mb-6">
-      <h3 className="text-sm font-medium text-label-secondary uppercase mb-3">
-        {t('available_project_options')}
-      </h3>
-      {achievementOptions.length === 0 ? (
-        <p className="text-label-secondary text-sm">{t('no_project_options_available')}</p>
-      ) : (
-        <div className="flex gap-2 flex-wrap">
-          {achievementOptions.map((opt) => (
-            <div
-              key={opt.AchievementOption.id}
-              className="bg-white text-black text-sm px-3 py-1.5 rounded-md border border-gray-200"
-            >
-              {opt.AchievementOption.title}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
 
 function ParticipationTable({
   columns,

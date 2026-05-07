@@ -3,6 +3,8 @@
     "confirmation": "Confirmation",
     "warning": "Warning",
     "delete": "Delete",
+    "unknown_user": "Unknown user",
+    "error": "An error occurred",
     "loginButton": "Login",
     "registerButton": "Register",
     "language": "Language",
@@ -384,6 +386,97 @@
       "max_file_size": "Maximum file size: {size} MB",
       "upload_achievement_record_modal": {
         "file_too_large": "The file is too large. The maximum size is {size} MB."
+      }
+    },
+    "projects": {
+      "section_heading": "Projects in this course",
+      "action_failed": "Action failed",
+      "status": {
+        "PROPOSED": "Proposed",
+        "ONGOING": "In progress",
+        "SUBMITTED": "Submitted",
+        "COMPLETED": "Completed",
+        "INCOMPLETE": "Incomplete",
+        "PUBLISHED": "Published"
+      },
+      "type_label": {
+        "DOCUMENTATION": "Documentation only",
+        "ONLINE_COURSE": "Online course",
+        "DOCUMENTATION_AND_PRESENTATION": "Documentation and presentation",
+        "PROJECT": "Project",
+        "OPEN_PROJECT": "Open project"
+      },
+      "table": {
+        "title": "Title",
+        "authors": "Authors",
+        "no_authors": "Open template",
+        "form_new_group": "Form new group",
+        "request_joining": "Request joining",
+        "request_pending": "Request pending",
+        "propose_button": "Propose new project",
+        "documentation_link": "Open documentation",
+        "presentation_link": "Open presentation",
+        "external_link": "Open project link"
+      },
+      "checklist": {
+        "documentation": "Documentation uploaded",
+        "presentation": "Presentation uploaded",
+        "external_url": "External link added",
+        "cover_image": "Cover image uploaded",
+        "authors_accepted": "All authors accepted",
+        "type_required": "Project type to be set by the instructor"
+      },
+      "my_project": {
+        "heading": "My project",
+        "title_label": "Title",
+        "tagline_label": "Tagline",
+        "description_label": "Description",
+        "documentation_url_label": "Documentation URL",
+        "documentation_url_placeholder": "https://...",
+        "presentation_url_label": "Presentation URL",
+        "presentation_url_placeholder": "https://...",
+        "external_url_label": "External URL",
+        "external_url_placeholder": "https://...",
+        "cover_image_url_label": "Cover image URL",
+        "cover_image_url_placeholder": "https://...",
+        "documentation_template_label": "Documentation template",
+        "documentation_template_none": "None",
+        "accepting_participants_label": "Accept additional co-authors",
+        "checklist_heading": "Submission checklist",
+        "submit_button": "Submit for review",
+        "leave_button": "Leave project",
+        "leave_dialog_question": "Are you sure you want to remove yourself as an author of this project?",
+        "leave_dialog_last_question": "You are the only accepted author. Leaving will leave the project without authors and the row remains visible to your instructor. Continue?",
+        "leave_dialog_confirm": "Leave project",
+        "requests_button": "{count} join request(s)",
+        "submitted_banner": "Submitted on {date} by {name}. The team has been locked from changes.",
+        "sent_back_banner": "Your project was sent back for revisions. Please update it and submit again.",
+        "deadline_passed_banner": "The submission deadline passed on {date}."
+      },
+      "submit_dialog": {
+        "title": "Submit project for review",
+        "body_main": "Once submitted, the project enters review and the team is locked.",
+        "body_co_authors": "All co-authors will lose edit access too.",
+        "body_irreversible": "An instructor can send it back for revisions if needed.",
+        "confirm_button": "Submit"
+      },
+      "manage_requests": {
+        "title": "Co-author requests",
+        "empty": "No pending requests.",
+        "accept": "Accept",
+        "decline": "Decline"
+      },
+      "propose_dialog": {
+        "title": "Propose a new project",
+        "title_label": "Title",
+        "title_placeholder": "Project title",
+        "tagline_label": "Tagline (optional)",
+        "tagline_placeholder": "Short subtitle",
+        "description_label": "Short description (optional)",
+        "description_placeholder": "What is the project about?",
+        "accepting_participants_label": "Allow other students to request joining",
+        "submit_button": "Create project",
+        "error_title_required": "Please enter a project title."
       }
     },
     "registration": {
@@ -949,6 +1042,20 @@
       "attendance_certificate": "Attendance Certificate",
       "achievement_certificate": "Achievement Certificate"
     },
+    "project_options": {
+      "proposals_enabled": {
+        "label": "Allow course participants to propose projects",
+        "help_text": "Controls whether participants can propose new projects for this course. Only effective when the course also offers an achievement certificate.",
+        "option_inherit_yes": "Use program default (Yes)",
+        "option_inherit_no": "Use program default (No)",
+        "option_enabled": "Yes",
+        "option_disabled": "No"
+      },
+      "submission_deadline": {
+        "label": "Project submission deadline",
+        "help_text": "Per-course override. Leave empty to inherit the program default."
+      }
+    },
     "registration_type": {
       "label": "Registration Type",
       "help_text": "Select how participants can register for this course",
@@ -1169,6 +1276,79 @@
     "certificates_deleted_plural": "{count} achievement certificates were deleted",
     "available_project_options": "Available Project Options for this Course",
     "no_project_options_available": "There are currently no project options available for this course. Participants cannot upload project documentation. Please contact a program admin to configure project options.",
+    "projects": {
+      "filter_label": "Status",
+      "filter_all": "All",
+      "add_button": "Add project",
+      "select_author_title": "Select author",
+      "select_mentor_title": "Select mentor",
+      "remove_author_confirmation": "Remove {name} as an author of this project?",
+      "table": {
+        "title": "Title",
+        "authors": "Authors",
+        "mentors": "Mentors",
+        "type": "Type",
+        "last_update": "Last update",
+        "no_authors": "No authors yet"
+      },
+      "actions": {
+        "confirm_team": "Confirm team",
+        "review": "Review",
+        "publish": "Publish for showcase"
+      },
+      "expanded": {
+        "tagline": "Tagline",
+        "documentation_link": "Open documentation",
+        "presentation_link": "Open presentation",
+        "external_link": "Open project link",
+        "score": "Score",
+        "rating": "Rating",
+        "authors_heading": "Authors",
+        "add_author": "Add author",
+        "no_authors": "No authors yet.",
+        "remove_author_aria": "Remove author",
+        "requested": "requested",
+        "mentors_heading": "Mentors",
+        "add_mentor": "Add mentor",
+        "no_mentors": "No mentors yet.",
+        "remove_mentor_aria": "Remove mentor"
+      },
+      "bulk": {
+        "publish": "Publish selected (completed only)",
+        "no_eligible": "None of the selected projects are completed."
+      },
+      "confirm_team_dialog": {
+        "title": "Confirm team and start project",
+        "authors_label": "Accepted authors",
+        "no_authors": "No accepted authors yet.",
+        "type_label": "Project type",
+        "type_placeholder": "Select a project type",
+        "template_label": "Documentation template",
+        "template_placeholder": "Select a documentation template",
+        "confirm_button": "Start project"
+      },
+      "review_dialog": {
+        "title": "Review submitted project",
+        "title_label": "Title",
+        "tagline_label": "Tagline",
+        "documentation_link": "Open documentation",
+        "presentation_link": "Open presentation",
+        "external_link": "Open project link",
+        "score_label": "Score",
+        "approve_button": "Approve & complete",
+        "send_back_button": "Send back for revisions",
+        "reject_button": "Reject as incomplete",
+        "invalid_score": "Score must be a number."
+      },
+      "add_dialog": {
+        "title": "Add project",
+        "helper": "Creates a project on this course with you as proposer and no implementing authors yet.",
+        "title_label": "Title",
+        "title_placeholder": "Project title",
+        "submit_button": "Create",
+        "error_title_required": "Please enter a project title."
+      }
+    },
     "attendance_cert_issued": "Attendance certificate issued",
     "attendance_cert_not_issued": "No attendance certificate issued",
     "achievement_cert_issued": "Achievement certificate issued",
@@ -1408,6 +1588,7 @@
       "course_start": "Course Start",
       "course_end": "Course End",
       "achievement_upload_deadline": "Deadline Perf. Record Upload",
+      "project_submission_deadline": "Project Submission Deadline",
       "not_published": "Not Published"
     },
     "title": {
@@ -1478,6 +1659,29 @@
     "extended_application_banner": {
       "label": "Show 'Extended application period' badge on course tiles",
       "help_text": "When enabled, a badge is shown on all course tiles in this program after the program application deadline has passed, but only while the individual course application deadline is still in the future."
+    },
+    "project_defaults": {
+      "section_title": "Project defaults",
+      "proposals_enabled_by_default": {
+        "label": "Allow course participants to propose projects (default for new courses)",
+        "help_text": "When enabled, courses in this program default to letting participants propose projects. Only takes effect on courses that also offer an achievement certificate. Each course can override this setting individually."
+      },
+      "default_project_type": {
+        "label": "Default project type",
+        "help_text": "New projects in this program inherit this type. Students never pick the type; instructors finalize it when confirming a team.",
+        "none_option": "Not set"
+      },
+      "default_submission_deadline": {
+        "label": "Default project submission deadline",
+        "help_text": "Used as the deadline whenever a course in this program does not set its own."
+      },
+      "type_options": {
+        "DOCUMENTATION": "Documentation only",
+        "ONLINE_COURSE": "Online course",
+        "DOCUMENTATION_AND_PRESENTATION": "Documentation and presentation",
+        "PROJECT": "Project (documentation, presentation, cover image)",
+        "OPEN_PROJECT": "Open project (documentation, presentation, external URL, cover image)"
+      }
     },
     "notifications": {
       "programs_published_success_singular": "Program was successfully published",

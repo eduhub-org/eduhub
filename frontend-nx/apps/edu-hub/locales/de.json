@@ -3,6 +3,8 @@
     "confirmation": "Bestätigung",
     "warning": "Warnung",
     "delete": "Löschen",
+    "unknown_user": "Unbekannte Person",
+    "error": "Ein Fehler ist aufgetreten",
     "loginButton": "Anmelden",
     "registerButton": "Registrieren",
     "language": "Sprache",
@@ -384,6 +386,97 @@
       "max_file_size": "Maximale Dateigröße: {size} MB",
       "upload_achievement_record_modal": {
         "file_too_large": "Die Datei ist zu groß. Die maximale Größe beträgt {size} MB."
+      }
+    },
+    "projects": {
+      "section_heading": "Projekte in diesem Kurs",
+      "action_failed": "Aktion fehlgeschlagen",
+      "status": {
+        "PROPOSED": "Vorgeschlagen",
+        "ONGOING": "In Bearbeitung",
+        "SUBMITTED": "Eingereicht",
+        "COMPLETED": "Abgeschlossen",
+        "INCOMPLETE": "Nicht abgeschlossen",
+        "PUBLISHED": "Veröffentlicht"
+      },
+      "type_label": {
+        "DOCUMENTATION": "Nur Dokumentation",
+        "ONLINE_COURSE": "Online-Kurs",
+        "DOCUMENTATION_AND_PRESENTATION": "Dokumentation und Präsentation",
+        "PROJECT": "Projekt",
+        "OPEN_PROJECT": "Open Project"
+      },
+      "table": {
+        "title": "Titel",
+        "authors": "Autor:innen",
+        "no_authors": "Offene Vorlage",
+        "form_new_group": "Neue Gruppe bilden",
+        "request_joining": "Mitarbeit anfragen",
+        "request_pending": "Anfrage offen",
+        "propose_button": "Neues Projekt vorschlagen",
+        "documentation_link": "Dokumentation öffnen",
+        "presentation_link": "Präsentation öffnen",
+        "external_link": "Projektlink öffnen"
+      },
+      "checklist": {
+        "documentation": "Dokumentation hochgeladen",
+        "presentation": "Präsentation hochgeladen",
+        "external_url": "Externer Link ergänzt",
+        "cover_image": "Titelbild hochgeladen",
+        "authors_accepted": "Alle Autor:innen bestätigt",
+        "type_required": "Projekttyp wird durch die Kursleitung gesetzt"
+      },
+      "my_project": {
+        "heading": "Mein Projekt",
+        "title_label": "Titel",
+        "tagline_label": "Untertitel",
+        "description_label": "Beschreibung",
+        "documentation_url_label": "Link zur Dokumentation",
+        "documentation_url_placeholder": "https://...",
+        "presentation_url_label": "Link zur Präsentation",
+        "presentation_url_placeholder": "https://...",
+        "external_url_label": "Externer Link",
+        "external_url_placeholder": "https://...",
+        "cover_image_url_label": "Link zum Titelbild",
+        "cover_image_url_placeholder": "https://...",
+        "documentation_template_label": "Dokumentationsvorlage",
+        "documentation_template_none": "Keine",
+        "accepting_participants_label": "Weitere Mitautor:innen zulassen",
+        "checklist_heading": "Abgabe-Checkliste",
+        "submit_button": "Zur Bewertung einreichen",
+        "leave_button": "Projekt verlassen",
+        "leave_dialog_question": "Möchtest du dich wirklich als Autor:in von diesem Projekt entfernen?",
+        "leave_dialog_last_question": "Du bist die einzige bestätigte autor:in. Wenn du gehst, bleibt das Projekt ohne Autor:innen und ist weiterhin für deine Kursleitung sichtbar. Fortfahren?",
+        "leave_dialog_confirm": "Projekt verlassen",
+        "requests_button": "{count} offene Anfrage(n)",
+        "submitted_banner": "Am {date} eingereicht von {name}. Das Team ist nun für Änderungen gesperrt.",
+        "sent_back_banner": "Dein Projekt wurde zur Überarbeitung zurückgegeben. Bitte aktualisiere es und reiche erneut ein.",
+        "deadline_passed_banner": "Die Abgabefrist ist am {date} abgelaufen."
+      },
+      "submit_dialog": {
+        "title": "Projekt zur Bewertung einreichen",
+        "body_main": "Nach dem Einreichen geht das Projekt in die Bewertung und das Team wird gesperrt.",
+        "body_co_authors": "Alle Mitautor:innen verlieren ebenfalls die Bearbeitungsrechte.",
+        "body_irreversible": "Eine Kursleitung kann das Projekt bei Bedarf zur Überarbeitung zurückgeben.",
+        "confirm_button": "Einreichen"
+      },
+      "manage_requests": {
+        "title": "Mitautor:innen-Anfragen",
+        "empty": "Keine offenen Anfragen.",
+        "accept": "Annehmen",
+        "decline": "Ablehnen"
+      },
+      "propose_dialog": {
+        "title": "Neues Projekt vorschlagen",
+        "title_label": "Titel",
+        "title_placeholder": "Projekttitel",
+        "tagline_label": "Untertitel (optional)",
+        "tagline_placeholder": "Kurzer Untertitel",
+        "description_label": "Kurzbeschreibung (optional)",
+        "description_placeholder": "Worum geht es im Projekt?",
+        "accepting_participants_label": "Anderen Studierenden Mitarbeit erlauben",
+        "submit_button": "Projekt anlegen",
+        "error_title_required": "Bitte gib einen Projekttitel an."
       }
     },
     "registration": {
@@ -933,6 +1026,20 @@
       "attendance_certificate": "Teilnahmenachweis",
       "achievement_certificate": "Leistungszertifikat"
     },
+    "project_options": {
+      "proposals_enabled": {
+        "label": "Kursteilnehmenden erlauben, Projekte vorzuschlagen",
+        "help_text": "Steuert, ob Teilnehmende neue Projekte für diesen Kurs vorschlagen dürfen. Wirkt nur, wenn der Kurs zusätzlich einen Leistungsnachweis ermöglicht.",
+        "option_inherit_yes": "Programm-Voreinstellung verwenden (Ja)",
+        "option_inherit_no": "Programm-Voreinstellung verwenden (Nein)",
+        "option_enabled": "Ja",
+        "option_disabled": "Nein"
+      },
+      "submission_deadline": {
+        "label": "Projekt-Abgabefrist",
+        "help_text": "Pro-Kurs-Überschreibung. Leer lassen, um die Programm-Voreinstellung zu übernehmen."
+      }
+    },
     "registration_type": {
       "label": "Anmeldeart",
       "help_text": "Wähle aus, wie sich Teilnehmer für diesen Kurs anmelden können",
@@ -1151,6 +1258,79 @@
     "certificates_deleted_plural": "{count} Leistungsnachweise wurden gelöscht",
     "available_project_options": "Verfügbare Projektoptionen für diesen Kurs",
     "no_project_options_available": "Es sind derzeit keine Projektoptionen für diesen Kurs verfügbar. Teilnehmende können keine Projektdokumentation hochladen. Bitte wende dich an einen Programmadmin, um Projektoptionen zu konfigurieren.",
+    "projects": {
+      "filter_label": "Status",
+      "filter_all": "Alle",
+      "add_button": "Projekt hinzufügen",
+      "select_author_title": "Autor:in auswählen",
+      "select_mentor_title": "Mentor:in auswählen",
+      "remove_author_confirmation": "{name} aus diesem Projekt entfernen?",
+      "table": {
+        "title": "Titel",
+        "authors": "Autor:innen",
+        "mentors": "Mentor:innen",
+        "type": "Typ",
+        "last_update": "Letzte Änderung",
+        "no_authors": "Noch keine Autor:innen"
+      },
+      "actions": {
+        "confirm_team": "Team bestätigen",
+        "review": "Bewerten",
+        "publish": "Im Showcase veröffentlichen"
+      },
+      "expanded": {
+        "tagline": "Untertitel",
+        "documentation_link": "Dokumentation öffnen",
+        "presentation_link": "Präsentation öffnen",
+        "external_link": "Projektlink öffnen",
+        "score": "Punkte",
+        "rating": "Bewertung",
+        "authors_heading": "Autor:innen",
+        "add_author": "Autor:in hinzufügen",
+        "no_authors": "Noch keine Autor:innen.",
+        "remove_author_aria": "Autor:in entfernen",
+        "requested": "angefragt",
+        "mentors_heading": "Mentor:innen",
+        "add_mentor": "Mentor:in hinzufügen",
+        "no_mentors": "Noch keine Mentor:innen.",
+        "remove_mentor_aria": "Mentor:in entfernen"
+      },
+      "bulk": {
+        "publish": "Ausgewählte veröffentlichen (nur abgeschlossene)",
+        "no_eligible": "Keines der ausgewählten Projekte ist abgeschlossen."
+      },
+      "confirm_team_dialog": {
+        "title": "Team bestätigen und Projekt starten",
+        "authors_label": "Bestätigte Autor:innen",
+        "no_authors": "Noch keine bestätigten Autor:innen.",
+        "type_label": "Projekttyp",
+        "type_placeholder": "Projekttyp auswählen",
+        "template_label": "Dokumentationsvorlage",
+        "template_placeholder": "Dokumentationsvorlage auswählen",
+        "confirm_button": "Projekt starten"
+      },
+      "review_dialog": {
+        "title": "Eingereichtes Projekt bewerten",
+        "title_label": "Titel",
+        "tagline_label": "Untertitel",
+        "documentation_link": "Dokumentation öffnen",
+        "presentation_link": "Präsentation öffnen",
+        "external_link": "Projektlink öffnen",
+        "score_label": "Punkte",
+        "approve_button": "Genehmigen & abschließen",
+        "send_back_button": "Zur Überarbeitung zurückgeben",
+        "reject_button": "Als nicht abgeschlossen ablehnen",
+        "invalid_score": "Punkte müssen eine Zahl sein."
+      },
+      "add_dialog": {
+        "title": "Projekt hinzufügen",
+        "helper": "Legt ein Projekt für diesen Kurs an, mit dir als Initiator:in und ohne ausführende Autor:innen.",
+        "title_label": "Titel",
+        "title_placeholder": "Projekttitel",
+        "submit_button": "Anlegen",
+        "error_title_required": "Bitte gib einen Projekttitel an."
+      }
+    },
     "attendance_cert_issued": "Teilnahmebescheinigung ausgestellt",
     "attendance_cert_not_issued": "Keine Teilnahmebescheinigung ausgestellt",
     "achievement_cert_issued": "Leistungszertifikat ausgestellt",
@@ -1393,6 +1573,7 @@
       "course_start": "Kursstart",
       "course_end": "Kursende",
       "achievement_upload_deadline": "Abgabeschluss Leistungs- nachweise",
+      "project_submission_deadline": "Projekt-Abgabe- frist",
       "not_published": "Nicht veröffentlicht"
     },
     "title": {
@@ -1463,6 +1644,29 @@
     "extended_application_banner": {
       "label": "Badge „Verlängerte Anmeldefrist“ auf Kurskacheln anzeigen",
       "help_text": "Wenn diese Option aktiv ist, wird auf allen Kurskacheln dieses Programms ein Badge angezeigt, sobald das Bewerbungsende des Programms überschritten ist – aber nur solange das individuelle Bewerbungsende des jeweiligen Kurses noch in der Zukunft liegt."
+    },
+    "project_defaults": {
+      "section_title": "Projekt-Standardwerte",
+      "proposals_enabled_by_default": {
+        "label": "Kursteilnehmenden erlauben, Projekte vorzuschlagen (Voreinstellung für neue Kurse)",
+        "help_text": "Wenn aktiviert, dürfen in den Kursen dieses Programms standardmäßig Projekte vorgeschlagen werden. Wirkt nur für Kurse, die zusätzlich einen Leistungsnachweis ermöglichen. Jeder Kurs kann diese Einstellung individuell überschreiben."
+      },
+      "default_project_type": {
+        "label": "Standard-Projekttyp",
+        "help_text": "Neue Projekte in diesem Programm übernehmen diesen Typ. Studierende wählen den Typ nicht selbst; die Kursleitung legt ihn beim Bestätigen des Teams endgültig fest.",
+        "none_option": "Nicht festgelegt"
+      },
+      "default_submission_deadline": {
+        "label": "Standard-Abgabefrist für Projekte",
+        "help_text": "Wird als Frist verwendet, sofern ein Kurs in diesem Programm keine eigene Frist setzt."
+      },
+      "type_options": {
+        "DOCUMENTATION": "Nur Dokumentation",
+        "ONLINE_COURSE": "Online-Kurs",
+        "DOCUMENTATION_AND_PRESENTATION": "Dokumentation und Präsentation",
+        "PROJECT": "Projekt (Dokumentation, Präsentation, Titelbild)",
+        "OPEN_PROJECT": "Open Project (Dokumentation, Präsentation, externer Link, Titelbild)"
+      }
     },
     "notifications": {
       "programs_published_success_singular": "Programm wurde erfolgreich veröffentlicht",

@@ -28,6 +28,7 @@ import { getBackgroundImage } from '../../../helpers/imageHandling';
 import { Attendances } from './Attendances';
 import { CertificateDownload } from '../../common/CertificateDownload';
 import AchievementRecord from './AchievementRecord';
+import Projects from './Projects';
 import { useIsCourseWithEnrollment } from '../../../hooks/course';
 import NotificationSnackbar from '../../common/dialogs/NotificationSnackbar';
 
@@ -204,6 +205,22 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                 (course.achievementCertificatePossible || course.attendanceCertificatePossible) && (
                   <ContentRow className="my-24 text-label-primary bg-fill-primary light px-8 py-8">
                     <div className="flex flex-col w-full min-w-0">
+                      {!isDegreeCourse &&
+                        course.achievementCertificatePossible &&
+                        (course.projectProposalsEnabled ??
+                          course.Program?.projectProposalsEnabledByDefault) && (
+                          <Projects
+                            courseId={course.id}
+                            defaultProjectType={course.Program?.defaultProjectType ?? null}
+                            effectiveSubmissionDeadline={
+                              course.projectSubmissionDeadline ??
+                              course.Program?.defaultProjectSubmissionDeadline ??
+                              course.Program?.achievementRecordUploadDeadline ??
+                              null
+                            }
+                            proposalsEnabled
+                          />
+                        )}
                       {!isDegreeCourse && (
                         <div className="flex flex-col md:flex-row gap-12 md:gap-24 w-full">
                           <Attendances course={course} />
@@ -211,7 +228,10 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                             {!courseEnrollment?.achievementCertificateURL && (
                               <AchievementRecord
                                 courseId={course.id}
-                                achievementRecordUploadDeadline={course.Program?.achievementRecordUploadDeadline}
+                                achievementRecordUploadDeadline={
+                                  course.Program?.defaultProjectSubmissionDeadline ??
+                                  course.Program?.achievementRecordUploadDeadline
+                                }
                                 courseTitle={course.title}
                               />
                             )}

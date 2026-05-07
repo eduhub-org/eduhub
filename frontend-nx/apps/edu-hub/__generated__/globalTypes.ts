@@ -843,6 +843,8 @@ export enum Course_select_column {
   maxMissedSessions = "maxMissedSessions",
   maxParticipants = "maxParticipants",
   programId = "programId",
+  projectProposalsEnabled = "projectProposalsEnabled",
+  projectSubmissionDeadline = "projectSubmissionDeadline",
   published = "published",
   registrationType = "registrationType",
   startTime = "startTime",
@@ -861,6 +863,7 @@ export enum Course_select_column {
 export enum Course_select_column_Course_aggregate_bool_exp_bool_and_arguments_columns {
   achievementCertificatePossible = "achievementCertificatePossible",
   attendanceCertificatePossible = "attendanceCertificatePossible",
+  projectProposalsEnabled = "projectProposalsEnabled",
   published = "published",
 }
 
@@ -870,6 +873,7 @@ export enum Course_select_column_Course_aggregate_bool_exp_bool_and_arguments_co
 export enum Course_select_column_Course_aggregate_bool_exp_bool_or_arguments_columns {
   achievementCertificatePossible = "achievementCertificatePossible",
   attendanceCertificatePossible = "attendanceCertificatePossible",
+  projectProposalsEnabled = "projectProposalsEnabled",
   published = "published",
 }
 
@@ -901,6 +905,8 @@ export enum Course_update_column {
   maxMissedSessions = "maxMissedSessions",
   maxParticipants = "maxParticipants",
   programId = "programId",
+  projectProposalsEnabled = "projectProposalsEnabled",
+  projectSubmissionDeadline = "projectSubmissionDeadline",
   published = "published",
   registrationType = "registrationType",
   startTime = "startTime",
@@ -1377,12 +1383,15 @@ export enum Program_select_column {
   defaultApplicationEnd = "defaultApplicationEnd",
   defaultFormbricksEnrollmentSurveyUrl = "defaultFormbricksEnrollmentSurveyUrl",
   defaultMaxMissedSessions = "defaultMaxMissedSessions",
+  defaultProjectSubmissionDeadline = "defaultProjectSubmissionDeadline",
+  defaultProjectType = "defaultProjectType",
   id = "id",
   lectureEnd = "lectureEnd",
   lectureStart = "lectureStart",
   matrixInstructorRoomId = "matrixInstructorRoomId",
   matrixSpaceId = "matrixSpaceId",
   organizationId = "organizationId",
+  projectProposalsEnabledByDefault = "projectProposalsEnabledByDefault",
   published = "published",
   shortTitle = "shortTitle",
   showExtendedApplicationPeriodBanner = "showExtendedApplicationPeriodBanner",
@@ -1397,6 +1406,7 @@ export enum Program_select_column {
  * select "Program_aggregate_bool_exp_bool_and_arguments_columns" columns of table "Program"
  */
 export enum Program_select_column_Program_aggregate_bool_exp_bool_and_arguments_columns {
+  projectProposalsEnabledByDefault = "projectProposalsEnabledByDefault",
   published = "published",
   showExtendedApplicationPeriodBanner = "showExtendedApplicationPeriodBanner",
   visibility = "visibility",
@@ -1406,6 +1416,7 @@ export enum Program_select_column_Program_aggregate_bool_exp_bool_and_arguments_
  * select "Program_aggregate_bool_exp_bool_or_arguments_columns" columns of table "Program"
  */
 export enum Program_select_column_Program_aggregate_bool_exp_bool_or_arguments_columns {
+  projectProposalsEnabledByDefault = "projectProposalsEnabledByDefault",
   published = "published",
   showExtendedApplicationPeriodBanner = "showExtendedApplicationPeriodBanner",
   visibility = "visibility",
@@ -1425,12 +1436,15 @@ export enum Program_update_column {
   defaultApplicationEnd = "defaultApplicationEnd",
   defaultFormbricksEnrollmentSurveyUrl = "defaultFormbricksEnrollmentSurveyUrl",
   defaultMaxMissedSessions = "defaultMaxMissedSessions",
+  defaultProjectSubmissionDeadline = "defaultProjectSubmissionDeadline",
+  defaultProjectType = "defaultProjectType",
   id = "id",
   lectureEnd = "lectureEnd",
   lectureStart = "lectureStart",
   matrixInstructorRoomId = "matrixInstructorRoomId",
   matrixSpaceId = "matrixSpaceId",
   organizationId = "organizationId",
+  projectProposalsEnabledByDefault = "projectProposalsEnabledByDefault",
   published = "published",
   shortTitle = "shortTitle",
   showExtendedApplicationPeriodBanner = "showExtendedApplicationPeriodBanner",
@@ -1686,6 +1700,8 @@ export enum Project_select_column {
   rating = "rating",
   score = "score",
   status = "status",
+  submittedAt = "submittedAt",
+  submittedBy = "submittedBy",
   tagline = "tagline",
   title = "title",
   type = "type",
@@ -1728,6 +1744,8 @@ export enum Project_update_column {
   rating = "rating",
   score = "score",
   status = "status",
+  submittedAt = "submittedAt",
+  submittedBy = "submittedBy",
   tagline = "tagline",
   title = "title",
   type = "type",
@@ -5778,6 +5796,8 @@ export interface Course_bool_exp {
   maxMissedSessions?: Int_comparison_exp | null;
   maxParticipants?: Int_comparison_exp | null;
   programId?: Int_comparison_exp | null;
+  projectProposalsEnabled?: Boolean_comparison_exp | null;
+  projectSubmissionDeadline?: timestamptz_comparison_exp | null;
   published?: Boolean_comparison_exp | null;
   registrationType?: CourseRegistrationType_enum_comparison_exp | null;
   startTime?: time_comparison_exp | null;
@@ -5834,6 +5854,8 @@ export interface Course_insert_input {
   maxMissedSessions?: number | null;
   maxParticipants?: number | null;
   programId?: number | null;
+  projectProposalsEnabled?: boolean | null;
+  projectSubmissionDeadline?: any | null;
   published?: boolean | null;
   registrationType?: CourseRegistrationType_enum | null;
   startTime?: any | null;
@@ -5871,6 +5893,7 @@ export interface Course_max_order_by {
   maxMissedSessions?: order_by | null;
   maxParticipants?: order_by | null;
   programId?: order_by | null;
+  projectSubmissionDeadline?: order_by | null;
   stripePriceId?: order_by | null;
   stripeProductId?: order_by | null;
   tagline?: order_by | null;
@@ -5903,6 +5926,7 @@ export interface Course_min_order_by {
   maxMissedSessions?: order_by | null;
   maxParticipants?: order_by | null;
   programId?: order_by | null;
+  projectSubmissionDeadline?: order_by | null;
   stripePriceId?: order_by | null;
   stripeProductId?: order_by | null;
   tagline?: order_by | null;
@@ -5972,6 +5996,8 @@ export interface Course_order_by {
   maxMissedSessions?: order_by | null;
   maxParticipants?: order_by | null;
   programId?: order_by | null;
+  projectProposalsEnabled?: order_by | null;
+  projectSubmissionDeadline?: order_by | null;
   published?: order_by | null;
   registrationType?: order_by | null;
   startTime?: order_by | null;
@@ -6012,6 +6038,8 @@ export interface Course_set_input {
   maxMissedSessions?: number | null;
   maxParticipants?: number | null;
   programId?: number | null;
+  projectProposalsEnabled?: boolean | null;
+  projectSubmissionDeadline?: any | null;
   published?: boolean | null;
   registrationType?: CourseRegistrationType_enum | null;
   startTime?: any | null;
@@ -7797,6 +7825,7 @@ export interface Program_bool_exp {
   CertificateTemplatePrograms_aggregate?: CertificateTemplateProgram_aggregate_bool_exp | null;
   Courses?: Course_bool_exp | null;
   Courses_aggregate?: Course_aggregate_bool_exp | null;
+  DefaultProjectType?: ProjectType_bool_exp | null;
   Organization?: Organization_bool_exp | null;
   ProgramType?: ProgramType_bool_exp | null;
   _and?: Program_bool_exp[] | null;
@@ -7812,12 +7841,15 @@ export interface Program_bool_exp {
   defaultApplicationEnd?: date_comparison_exp | null;
   defaultFormbricksEnrollmentSurveyUrl?: String_comparison_exp | null;
   defaultMaxMissedSessions?: Int_comparison_exp | null;
+  defaultProjectSubmissionDeadline?: timestamptz_comparison_exp | null;
+  defaultProjectType?: String_comparison_exp | null;
   id?: Int_comparison_exp | null;
   lectureEnd?: date_comparison_exp | null;
   lectureStart?: date_comparison_exp | null;
   matrixInstructorRoomId?: String_comparison_exp | null;
   matrixSpaceId?: String_comparison_exp | null;
   organizationId?: Int_comparison_exp | null;
+  projectProposalsEnabledByDefault?: Boolean_comparison_exp | null;
   published?: Boolean_comparison_exp | null;
   shortTitle?: String_comparison_exp | null;
   showExtendedApplicationPeriodBanner?: Boolean_comparison_exp | null;
@@ -7834,6 +7866,7 @@ export interface Program_bool_exp {
 export interface Program_insert_input {
   CertificateTemplatePrograms?: CertificateTemplateProgram_arr_rel_insert_input | null;
   Courses?: Course_arr_rel_insert_input | null;
+  DefaultProjectType?: ProjectType_obj_rel_insert_input | null;
   Organization?: Organization_obj_rel_insert_input | null;
   ProgramType?: ProgramType_obj_rel_insert_input | null;
   achievementCertificateTemplateTextId?: number | null;
@@ -7846,12 +7879,15 @@ export interface Program_insert_input {
   defaultApplicationEnd?: any | null;
   defaultFormbricksEnrollmentSurveyUrl?: string | null;
   defaultMaxMissedSessions?: number | null;
+  defaultProjectSubmissionDeadline?: any | null;
+  defaultProjectType?: string | null;
   id?: number | null;
   lectureEnd?: any | null;
   lectureStart?: any | null;
   matrixInstructorRoomId?: string | null;
   matrixSpaceId?: string | null;
   organizationId?: number | null;
+  projectProposalsEnabledByDefault?: boolean | null;
   published?: boolean | null;
   shortTitle?: string | null;
   showExtendedApplicationPeriodBanner?: boolean | null;
@@ -7876,6 +7912,8 @@ export interface Program_max_order_by {
   defaultApplicationEnd?: order_by | null;
   defaultFormbricksEnrollmentSurveyUrl?: order_by | null;
   defaultMaxMissedSessions?: order_by | null;
+  defaultProjectSubmissionDeadline?: order_by | null;
+  defaultProjectType?: order_by | null;
   id?: order_by | null;
   lectureEnd?: order_by | null;
   lectureStart?: order_by | null;
@@ -7902,6 +7940,8 @@ export interface Program_min_order_by {
   defaultApplicationEnd?: order_by | null;
   defaultFormbricksEnrollmentSurveyUrl?: order_by | null;
   defaultMaxMissedSessions?: order_by | null;
+  defaultProjectSubmissionDeadline?: order_by | null;
+  defaultProjectType?: order_by | null;
   id?: order_by | null;
   lectureEnd?: order_by | null;
   lectureStart?: order_by | null;
@@ -7937,6 +7977,7 @@ export interface Program_on_conflict {
 export interface Program_order_by {
   CertificateTemplatePrograms_aggregate?: CertificateTemplateProgram_aggregate_order_by | null;
   Courses_aggregate?: Course_aggregate_order_by | null;
+  DefaultProjectType?: ProjectType_order_by | null;
   Organization?: Organization_order_by | null;
   ProgramType?: ProgramType_order_by | null;
   achievementCertificateTemplateTextId?: order_by | null;
@@ -7949,12 +7990,15 @@ export interface Program_order_by {
   defaultApplicationEnd?: order_by | null;
   defaultFormbricksEnrollmentSurveyUrl?: order_by | null;
   defaultMaxMissedSessions?: order_by | null;
+  defaultProjectSubmissionDeadline?: order_by | null;
+  defaultProjectType?: order_by | null;
   id?: order_by | null;
   lectureEnd?: order_by | null;
   lectureStart?: order_by | null;
   matrixInstructorRoomId?: order_by | null;
   matrixSpaceId?: order_by | null;
   organizationId?: order_by | null;
+  projectProposalsEnabledByDefault?: order_by | null;
   published?: order_by | null;
   shortTitle?: order_by | null;
   showExtendedApplicationPeriodBanner?: order_by | null;
@@ -8828,6 +8872,20 @@ export interface ProjectType_on_conflict {
   where?: ProjectType_bool_exp | null;
 }
 
+/**
+ * Ordering options when selecting data from "ProjectType".
+ */
+export interface ProjectType_order_by {
+  Projects_aggregate?: Project_aggregate_order_by | null;
+  comment?: order_by | null;
+  requiresCoverImage?: order_by | null;
+  requiresDocumentation?: order_by | null;
+  requiresEvaluationScript?: order_by | null;
+  requiresExternalUrl?: order_by | null;
+  requiresPresentation?: order_by | null;
+  value?: order_by | null;
+}
+
 export interface Project_aggregate_bool_exp {
   bool_and?: Project_aggregate_bool_exp_bool_and | null;
   bool_or?: Project_aggregate_bool_exp_bool_or | null;
@@ -8911,6 +8969,7 @@ export interface Project_bool_exp {
   ProjectStatus?: ProjectStatus_bool_exp | null;
   ProjectType?: ProjectType_bool_exp | null;
   ProposedByUser?: User_bool_exp | null;
+  SubmittedByUser?: User_bool_exp | null;
   _and?: Project_bool_exp[] | null;
   _not?: Project_bool_exp | null;
   _or?: Project_bool_exp[] | null;
@@ -8932,6 +8991,8 @@ export interface Project_bool_exp {
   rating?: ProjectRating_enum_comparison_exp | null;
   score?: numeric_comparison_exp | null;
   status?: ProjectStatus_enum_comparison_exp | null;
+  submittedAt?: timestamptz_comparison_exp | null;
+  submittedBy?: uuid_comparison_exp | null;
   tagline?: String_comparison_exp | null;
   title?: String_comparison_exp | null;
   type?: String_comparison_exp | null;
@@ -8954,6 +9015,7 @@ export interface Project_insert_input {
   ProjectStatus?: ProjectStatus_obj_rel_insert_input | null;
   ProjectType?: ProjectType_obj_rel_insert_input | null;
   ProposedByUser?: User_obj_rel_insert_input | null;
+  SubmittedByUser?: User_obj_rel_insert_input | null;
   acceptingParticipants?: boolean | null;
   achievementCertificateType?: ProjectAchievementCertificateType_enum | null;
   coverImageUrl?: string | null;
@@ -8972,6 +9034,8 @@ export interface Project_insert_input {
   rating?: ProjectRating_enum | null;
   score?: any | null;
   status?: ProjectStatus_enum | null;
+  submittedAt?: any | null;
+  submittedBy?: any | null;
   tagline?: string | null;
   title?: string | null;
   type?: string | null;
@@ -8996,6 +9060,8 @@ export interface Project_max_order_by {
   presentationUrl?: order_by | null;
   proposedByUserId?: order_by | null;
   score?: order_by | null;
+  submittedAt?: order_by | null;
+  submittedBy?: order_by | null;
   tagline?: order_by | null;
   title?: order_by | null;
   type?: order_by | null;
@@ -9020,6 +9086,8 @@ export interface Project_min_order_by {
   presentationUrl?: order_by | null;
   proposedByUserId?: order_by | null;
   score?: order_by | null;
+  submittedAt?: order_by | null;
+  submittedBy?: order_by | null;
   tagline?: order_by | null;
   title?: order_by | null;
   type?: order_by | null;

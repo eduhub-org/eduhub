@@ -127,6 +127,13 @@ update_permissions:
                     ProjectAuthors:
                       participationStatus:
                         _eq: ACCEPTED
+          - Project:
+              ProjectCourses:
+                Course:
+                  CourseInstructors:
+                    User:
+                      id:
+                        _eq: X-Hasura-User-Id
       check: null
 delete_permissions:
   - role: user_access
@@ -141,5 +148,12 @@ delete_permissions:
                   - participationStatus:
                       _eq: ACCEPTED
                   - User:
+                      id:
+                        _eq: X-Hasura-User-Id
+          - Project:
+              ProjectCourses:
+                Course:
+                  CourseInstructors:
+                    User:
                       id:
                         _eq: X-Hasura-User-Id
