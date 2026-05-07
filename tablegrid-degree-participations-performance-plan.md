@@ -11,6 +11,7 @@ This file contains implementation notes that are useful for planning, but too de
 - [x] Scope the current Degree Participations flow.
 - [x] Define and add realistic development seed data.
 - [ ] Capture the current baseline behavior with the larger dataset.
+- [ ] Fix server-paginated Degree Participations pages being sliced a second time.
 - [ ] Fix full-dataset sorting for attended events and total ECTS.
 - [ ] Defer Degree Participations loading until the tab is opened.
 - [ ] Improve loading and rendering performance.
@@ -56,6 +57,11 @@ This file contains implementation notes that are useful for planning, but too de
 - The query fetches a paginated slice of `Course_by_pk.CourseEnrollments` for
   the degree course using `$limit`, `$offset`, `$filter`, and `$order_by`.
   Search is server-side because `useTableGrid` sends a GraphQL `filter`.
+- `TableGrid` currently slices rows again when pagination is enabled but
+  server-side sorting is not configured. Degree Participations already receives
+  one page from Hasura through `useTableGrid`, so page 2 is sliced from a
+  page-sized response and renders as empty. This is a production bug and is
+  unrelated to the `python-functions` container.
 - For each visible degree enrollment, the query also fetches that user's
   related course enrollments for courses belonging to the degree. The UI derives
   `name`, `lastApplication`, `ectsTotal`, `attendedEvents`, and
@@ -170,6 +176,44 @@ This file contains implementation notes that are useful for planning, but too de
 - Record table width and readability issues before layout changes.
 
 ## 4. Fix full-dataset sorting
+
+Degree Participations pagination should be fixed as part of the server-side
+sorting work, not as a standalone shared `TableGrid` behavior change:
+
+- Keep the existing `TableGrid` local slicing behavior for callers that still
+  pass a full local dataset.
+- Convert Degree Participations to the existing server-side sorting pattern:
+  destructure `sorting` and `setSorting` from `useTableGrid`, pass them to
+  `TableGrid`, and provide a correct `sortColumnMapper` or equivalent query
+  behavior.
+- Once server-side sorting is enabled for Degree Participations,
+  `TableGrid` will no longer slice its already page-sized Hasura response a
+  second time because the current shared component skips local slicing when
+  `isServerSideSorting` is true.
+- Verify Degree Participations can navigate to page 2 and later as part of the
+  sorting fix.
+
+### Pagination decision notes
+
+- The temporary approach of removing local row slicing from `TableGrid` was
+  reverted. It fixed Degree Participations page 2, but it would break legacy
+  local-data callers that rely on TableGrid for client-side pagination.
+- The known local-data callers are:
+  - `SessionsTab`, which receives all `course.Sessions` from `MANAGED_COURSE`,
+    filters locally, sorts locally, and paginates locally.
+  - `ApplicationsTab`, which receives all course enrollments from
+    `MANAGED_COURSE`, filters locally, sorts locally, and paginates locally.
+  - `AttendanceDataDialog`, which parses all attendance JSON rows, filters
+    locally, sorts locally, and paginates locally.
+- The team preference is still to move new TableGrid work toward server-side
+  pagination, using pages such as `ManageOrganizationsContent` as the template.
+  For this issue, avoid changing the shared TableGrid pagination contract until
+  legacy local-data callers are migrated or given an explicit local-pagination
+  compatibility path.
+- Do not fix Degree Participations pagination by pretending sorting is
+  server-side. It is acceptable to rely on `isServerSideSorting` only once the
+  Degree Participations query really implements server-side sorting for the
+  relevant columns.
 
 - Add ascending and descending sorting for the `Attended Events` / `Besuchte Events` column.
 - Confirm whether the column value is best represented as a numeric attended-event count, a boolean attendance indicator, or a derived display value.
