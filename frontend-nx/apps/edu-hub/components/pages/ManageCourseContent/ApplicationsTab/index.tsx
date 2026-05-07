@@ -1089,6 +1089,11 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
     setPageIndex(0);
   }, []);
 
+  const handleSearchFilterChange = useCallback((value: string) => {
+    setSearchFilter(value);
+    setPageIndex(0);
+  }, []);
+
   return (
     <>
       {/* Add Participants Modal - accessible to all, but button only shown to admins */}
@@ -1170,7 +1175,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
             pageSize={pageSize}
             onPageSizeChange={handlePageSizeChange}
             searchFilter={searchFilter}
-            onSearchFilterChange={setSearchFilter}
+            onSearchFilterChange={handleSearchFilterChange}
             refetchQueries={[]}
             {...(isAdmin && {
               addButtonText: t('add_participants'),
