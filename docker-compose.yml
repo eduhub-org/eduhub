@@ -82,7 +82,7 @@ services:
     ports:
       - "42025:42025"
       - "42026:42026"
-    command: sh -c "pip install -r /functions/callPythonFunction/requirements.txt && pip install -r /functions/apiProxy/requirements.txt && /functions/start-python.sh"
+    command: sh -c "pip install -r /functions/apiProxy/requirements.txt && pip install -r /functions/callPythonFunction/requirements.txt && /functions/start-python.sh"
     environment:
       ENVIRONMENT: development
       KEYCLOAK_URL: http://keycloak:8080
