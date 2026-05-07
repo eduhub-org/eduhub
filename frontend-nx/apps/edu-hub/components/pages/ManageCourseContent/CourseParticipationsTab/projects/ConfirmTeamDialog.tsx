@@ -54,8 +54,10 @@ const ConfirmTeamDialog: FC<ConfirmTeamDialogProps> = ({
       .map((a) => `${a.User?.firstName ?? ''} ${a.User?.lastName ?? ''}`.trim());
   }, [project]);
 
+  const hasAcceptedAuthor = acceptedAuthorNames.length > 0;
+
   const handleConfirm = async () => {
-    if (!project || !type || !templateId) {
+    if (!project || !type || !templateId || !hasAcceptedAuthor) {
       return;
     }
     try {
@@ -87,7 +89,7 @@ const ConfirmTeamDialog: FC<ConfirmTeamDialogProps> = ({
           <Button
             filled
             onClick={handleConfirm}
-            disabled={loading || !type || !templateId}
+            disabled={loading || !type || !templateId || !hasAcceptedAuthor}
           >
             {t('projects.confirm_team_dialog.confirm_button')}
           </Button>
@@ -98,12 +100,12 @@ const ConfirmTeamDialog: FC<ConfirmTeamDialogProps> = ({
         <div className="space-y-4">
           <div>
             <p className="text-sm font-medium mb-1">{t('projects.confirm_team_dialog.authors_label')}</p>
-            {acceptedAuthorNames.length === 0 ? (
-              <p className="text-sm text-label-secondary">
-                {t('projects.confirm_team_dialog.no_authors')}
-              </p>
-            ) : (
+            {hasAcceptedAuthor ? (
               <p className="text-sm">{acceptedAuthorNames.join(', ')}</p>
+            ) : (
+              <p className="text-sm text-error">
+                {t('projects.confirm_team_dialog.no_authors_blocking')}
+              </p>
             )}
           </div>
           <label className="block">
