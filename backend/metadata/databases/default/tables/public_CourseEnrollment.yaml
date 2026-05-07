@@ -35,6 +35,19 @@ array_relationships:
         table:
           name: Invoice
           schema: public
+computed_fields:
+  - name: degreeParticipationAttendedEventCount
+    definition:
+      function:
+        name: degree_participation_attended_event_count
+        schema: public
+      table_argument: enrollment_row
+  - name: degreeParticipationEctsTotal
+    definition:
+      function:
+        name: degree_participation_ects_total
+        schema: public
+      table_argument: enrollment_row
 insert_permissions:
   - role: user_access
     permission:
@@ -65,6 +78,9 @@ select_permissions:
         - invitationExpirationDate
         - location
         - termsAcceptedAt
+      computed_fields:
+        - degreeParticipationAttendedEventCount
+        - degreeParticipationEctsTotal
       filter: {}
       allow_aggregations: true
   - role: user_access
@@ -83,6 +99,9 @@ select_permissions:
         - userId
         - location
         - termsAcceptedAt
+      computed_fields:
+        - degreeParticipationAttendedEventCount
+        - degreeParticipationEctsTotal
       filter:
         _and:
           - userId:

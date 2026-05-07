@@ -6,6 +6,12 @@ export interface BaseRow {
   id: number;
 }
 
+export type TableGridSortMapping =
+  | string
+  | Record<string, any>
+  | Array<string | Record<string, any>>
+  | null;
+
 export interface BulkAction {
   value: string;
   label: string;
@@ -53,7 +59,7 @@ export interface UseTableGridProps<V> {
   pageSize?: number;
   debounceMs?: number; // Configurable debounce time in milliseconds
   refetchFilter?: (searchFilter: string) => Record<string, any>;
-  sortColumnMapper?: (columnId: string) => string | Record<string, any> | null;
+  sortColumnMapper?: (columnId: string) => TableGridSortMapping;
   defaultSort?: Record<string, any>[]; // Default sort when no user sorting is applied
 } 
 

@@ -11,8 +11,8 @@ This file contains implementation notes that are useful for planning, but too de
 - [x] Scope the current Degree Participations flow.
 - [x] Define and add realistic development seed data.
 - [ ] Capture the current baseline behavior with the larger dataset.
-- [ ] Fix server-paginated Degree Participations pages being sliced a second time.
-- [ ] Fix full-dataset sorting for attended events and total ECTS.
+- [x] Fix server-paginated Degree Participations pages being sliced a second time.
+- [x] Fix full-dataset sorting for attended events and total ECTS.
 - [ ] Defer Degree Participations loading until the tab is opened.
 - [ ] Improve loading and rendering performance.
 - [ ] Clean up loading states and misleading transient errors.
@@ -214,6 +214,36 @@ sorting work, not as a standalone shared `TableGrid` behavior change:
   server-side. It is acceptable to rely on `isServerSideSorting` only once the
   Degree Participations query really implements server-side sorting for the
   relevant columns.
+- Chosen implementation path: add scalar computed fields to
+  `CourseEnrollment` for Degree Participation rows:
+  `degreeParticipationEctsTotal` and
+  `degreeParticipationAttendedEventCount`.
+- The computed fields intentionally do not take a `degreeCourseId` GraphQL
+  argument. They derive the degree course from the current enrollment row's
+  `courseId`, which is correct for the `Course_by_pk(id: degree).CourseEnrollments`
+  rows used by Degree Participations and keeps the fields usable in Hasura
+  `order_by`.
+- Degree Participations now follows the existing server-side sorting pattern:
+  `useTableGrid` owns `sorting` / `setSorting`, the page passes them to
+  `TableGrid`, and `sortColumnMapper` maps only supported sortable columns.
+- The displayed `Total ECTS` and `Attended Events` values are read from the same
+  computed fields used for sorting, so the rendered values and sort order stay
+  aligned.
+- The status exclusions for `REJECTED`, `APPLIED`, and `INVITED` moved into the
+  server filter. This keeps the aggregate count, pagination, search, and
+  rendered rows aligned instead of filtering out rows after pagination.
+- `useTableGrid` now allows one sortable column to map to multiple Hasura
+  `order_by` entries. Degree Participations uses this for deterministic
+  tie-breakers after metric sorts, because many rows share the same ECTS or
+  event count.
+- Local verification so far: Hasura exposed the new computed fields in
+  `CourseEnrollment_order_by`, Apollo codegen ran successfully, `git diff
+  --check`, `yarn lint`, and `yarn type-check` passed. Lint still reports the
+  pre-existing `useTableGrid` hook dependency warning.
+- Direct Hasura checks against Machine Learning Degree id `7000` returned
+  visible rows on offset `20`, a visible aggregate count of `290` after status
+  filtering, and ordered results for both `degreeParticipationEctsTotal` and
+  `degreeParticipationAttendedEventCount`.
 
 - Add ascending and descending sorting for the `Attended Events` / `Besuchte Events` column.
 - Confirm whether the column value is best represented as a numeric attended-event count, a boolean attendance indicator, or a derived display value.

@@ -98,6 +98,14 @@ export interface DegreeParticipantsWithDegreeEnrollments_Course_by_pk_CourseEnro
    */
   attendanceCertificateURL: string | null;
   /**
+   * A computed field, executes function "degree_participation_ects_total"
+   */
+  degreeParticipationEctsTotal: any | null;
+  /**
+   * A computed field, executes function "degree_participation_attended_event_count"
+   */
+  degreeParticipationAttendedEventCount: any | null;
+  /**
    * An object relationship
    */
   User: DegreeParticipantsWithDegreeEnrollments_Course_by_pk_CourseEnrollments_User;

@@ -4328,6 +4328,8 @@ export interface CourseEnrollment_bool_exp {
   billingOrganizationId?: Int_comparison_exp | null;
   courseId?: Int_comparison_exp | null;
   created_at?: timestamptz_comparison_exp | null;
+  degreeParticipationAttendedEventCount?: bigint_comparison_exp | null;
+  degreeParticipationEctsTotal?: numeric_comparison_exp | null;
   id?: Int_comparison_exp | null;
   invitationExpirationDate?: date_comparison_exp | null;
   location?: LocationOption_enum_comparison_exp | null;
@@ -4435,6 +4437,8 @@ export interface CourseEnrollment_order_by {
   billingOrganizationId?: order_by | null;
   courseId?: order_by | null;
   created_at?: order_by | null;
+  degreeParticipationAttendedEventCount?: order_by | null;
+  degreeParticipationEctsTotal?: order_by | null;
   id?: order_by | null;
   invitationExpirationDate?: order_by | null;
   location?: order_by | null;
