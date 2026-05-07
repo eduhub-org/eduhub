@@ -1302,7 +1302,7 @@
       "confirm_team_dialog": {
         "title": "Team bestätigen und Projekt starten",
         "authors_label": "Bestätigte Autor:innen",
-        "no_authors": "Noch keine bestätigten Autor:innen.",
+        "no_authors_blocking": "Füge mindestens eine:n bestätigte:n Autor:in hinzu, bevor Du das Team bestätigst.",
         "type_label": "Projekttyp",
         "type_placeholder": "Projekttyp auswählen",
         "template_label": "Dokumentationsvorlage",

@@ -1320,7 +1320,7 @@
       "confirm_team_dialog": {
         "title": "Confirm team and start project",
         "authors_label": "Accepted authors",
-        "no_authors": "No accepted authors yet.",
+        "no_authors_blocking": "Add at least one accepted author before confirming the team.",
         "type_label": "Project type",
         "type_placeholder": "Select a project type",
         "template_label": "Documentation template",
