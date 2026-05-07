@@ -26,6 +26,9 @@ object_relationships:
   - name: ProposedByUser
     using:
       foreign_key_constraint_on: proposedByUserId
+  - name: SubmittedByUser
+    using:
+      foreign_key_constraint_on: submittedBy
 array_relationships:
   - name: ChildProjects
     using:
@@ -94,6 +97,8 @@ select_permissions:
         - organizationId
         - presentationUrl
         - status
+        - submittedAt
+        - submittedBy
         - tagline
         - title
         - type
@@ -129,6 +134,8 @@ select_permissions:
         - rating
         - score
         - status
+        - submittedAt
+        - submittedBy
         - tagline
         - title
         - type
@@ -166,6 +173,8 @@ select_permissions:
         - rating
         - score
         - status
+        - submittedAt
+        - submittedBy
         - tagline
         - title
         - type
@@ -215,6 +224,7 @@ update_permissions:
         - externalUrl
         - presentationUrl
         - status
+        - submittedBy
         - tagline
         - title
         - type

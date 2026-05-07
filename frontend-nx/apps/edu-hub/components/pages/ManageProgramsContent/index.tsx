@@ -19,7 +19,7 @@ import {
   UPDATE_PROGRAM_APPLICATION_END,
   UPDATE_PROGRAM_LECTURE_START,
   UPDATE_PROGRAM_LECTURE_END,
-  UPDATE_PROGRAM_UPLOAD_DEADLINE,
+  UPDATE_PROGRAM_DEFAULT_PROJECT_SUBMISSION_DEADLINE,
   UPDATE_PROGRAM_TITLE,
 } from '../../../queries/updateProgram';
 import { InsertProgram, InsertProgramVariables } from '../../../queries/__generated__/InsertProgram';
@@ -61,7 +61,7 @@ export const ManageProgramsContent: FC = () => {
         'applicationEnd': 'defaultApplicationEnd',
         'lectureStart': 'lectureStart',
         'lectureEnd': 'lectureEnd',
-        'achievementRecordUploadDeadline': 'achievementRecordUploadDeadline',
+        'defaultProjectSubmissionDeadline': 'defaultProjectSubmissionDeadline',
         'published': 'published'
       };
       return mapping[columnId] || null;
@@ -311,15 +311,15 @@ export const ManageProgramsContent: FC = () => {
         },
       },
       {
-        header: t('table_header.achievement_upload_deadline'),
-        accessorKey: 'achievementRecordUploadDeadline',
+        header: t('table_header.project_submission_deadline'),
+        accessorKey: 'defaultProjectSubmissionDeadline',
         size: 130,
         minSize: 130,
         enableSorting: true,
         meta: { className: 'text-center' },
         cell: ({ row }) => {
-          const deadline = row.original.achievementRecordUploadDeadline
-            ? new Date(row.original.achievementRecordUploadDeadline)
+          const deadline = row.original.defaultProjectSubmissionDeadline
+            ? new Date(row.original.defaultProjectSubmissionDeadline)
             : null;
           return (
             <div className="text-center w-full">
@@ -327,10 +327,10 @@ export const ManageProgramsContent: FC = () => {
                 variant="material"
                 itemId={row.original.id}
                 value={deadline}
-                updateValueMutation={UPDATE_PROGRAM_UPLOAD_DEADLINE}
+                updateValueMutation={UPDATE_PROGRAM_DEFAULT_PROJECT_SUBMISSION_DEADLINE}
                 refetchQueries={['ProgramList']}
-                dateFieldName="deadline"
-                identifierVariables={{ programId: row.original.id }}
+                dateFieldName="value"
+                identifierVariables={{ itemId: row.original.id }}
               />
             </div>
           );

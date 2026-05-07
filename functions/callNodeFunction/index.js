@@ -25,6 +25,7 @@ import syncGhostNewsletterSubscription from "./syncGhostNewsletterSubscription/i
 import createMatrixRoom from "./createMatrixRoom/index.js";
 import updateMatrixInstructorPowerLevel from "./updateMatrixInstructorPowerLevel/index.js";
 import syncProgramInstructorMatrixRoom from "./syncProgramInstructorMatrixRoom/index.js";
+import copyProjectFromTemplate from "./copyProjectFromTemplate/index.js";
 
 const require = createRequire(import.meta.url);
 let constantTimeSecretsEqual;
@@ -77,7 +78,8 @@ const functionMap = {
   createMatrixRoom,
   updateMatrixInstructorPowerLevel,
   syncProgramInstructorMatrixRoom,
-  syncGhostNewsletterSubscription
+  syncGhostNewsletterSubscription,
+  copyProjectFromTemplate
 };
 
 const constantTimeEquals = (providedSecret, expectedSecret) => {

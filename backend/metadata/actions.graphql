@@ -5,6 +5,20 @@ type Mutation {
 }
 
 type Mutation {
+  copyProjectFromTemplate(
+    parentProjectId: Int!
+    courseId: Int!
+  ): CopyProjectFromTemplateResult!
+}
+
+type CopyProjectFromTemplateResult {
+  success: Boolean!
+  messageKey: String!
+  error: String
+  projectId: Int
+}
+
+type Mutation {
   createCertificate(
     userIds: [uuid!]!
     courseId: Int!

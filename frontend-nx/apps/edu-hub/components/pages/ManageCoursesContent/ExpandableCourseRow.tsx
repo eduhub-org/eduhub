@@ -1,4 +1,4 @@
-import { FC, Fragment, useCallback, useState, useEffect } from 'react';
+import { FC, Fragment, useCallback, useMemo, useState, useEffect } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
 import { MdCheckBox, MdOutlineCheckBoxOutlineBlank, MdAddCircle, MdEmail, MdForum } from 'react-icons/md';
 import { useRouter } from 'next/router';
@@ -42,6 +42,7 @@ import TagSelector from '../../inputs/TagSelector';
 import InputField from '../../inputs/InputField';
 import DropDownSelector from '../../inputs/DropDownSelector';
 import FileUploadField from '../../inputs/FileUploadField';
+import DatePicker from '../../inputs/DatePicker';
 import {
   UPDATE_COURSE_ECTS,
   UPDATE_COURSE_EXTERNAL_REGISTRATION_LINK,
@@ -51,6 +52,8 @@ import {
   SAVE_COURSE_FORMBRICKS_ENROLLMENT_SURVEY,
   UPDATE_COURSE_BASE_PRICE,
   UPDATE_COURSE_CURRENCY,
+  UPDATE_COURSE_PROJECT_PROPOSALS_ENABLED,
+  UPDATE_COURSE_PROJECT_SUBMISSION_DEADLINE,
 } from '../../../queries/course';
 import { VALIDATE_FORMBRICKS_SURVEY, SAVE_ADDON_MAPPINGS, CREATE_STRIPE_BASE_PRICE, GET_COURSE_ADDON_MAPPINGS } from '../../../queries/stripe';
 import { AddonValidationDialog } from './AddonValidationDialog';
@@ -108,6 +111,31 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
   );
 
   const isExternalRegistration = course.registrationType === CourseRegistrationType_enum.EXTERNAL_REGISTRATION;
+
+  const [updateProjectProposalsEnabled] = useAdminMutation(UPDATE_COURSE_PROJECT_PROPOSALS_ENABLED, {
+    refetchQueries: ['AdminCourseList'],
+  });
+
+  const handleSetProjectProposalsEnabled = useCallback(
+    (next: boolean | null) => {
+      updateProjectProposalsEnabled({
+        variables: { itemId: course.id, value: next },
+      });
+    },
+    [course.id, updateProjectProposalsEnabled]
+  );
+
+  const projectSubmissionDeadlineValue = useMemo(
+    () =>
+      course.projectSubmissionDeadline
+        ? new Date(course.projectSubmissionDeadline)
+        : null,
+    [course.projectSubmissionDeadline]
+  );
+
+  const programDefaultProjectsEnabled = Boolean(
+    course.Program?.projectProposalsEnabledByDefault
+  );
   
   // Check if course requires payment
   const requiresPayment = course.registrationType === 'DIRECT_WITH_INPUT_AND_PAYMENT' ||
@@ -1015,7 +1043,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                   <span>{t('manageCourses.possible_certificates.achievement_certificate')}</span>
                 </div>
                 {course.achievementCertificatePossible && (
-                  <div className="ml-8 mt-2">
+                  <div className="ml-8 mt-2 space-y-4">
                     <InputField
                       variant="material"
                       type="ects"
@@ -1026,6 +1054,67 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                       updateValueMutation={UPDATE_COURSE_ECTS}
                       refetchQueries={['AdminCourseList']}
                       helpText={t('manageCourses.ects.help_text')}
+                    />
+
+                    <div>
+                      <p className="text-sm font-medium text-label-primary mb-1">
+                        {t('manageCourses.project_options.proposals_enabled.label')}
+                      </p>
+                      <p className="text-xs text-label-secondary mb-2">
+                        {t('manageCourses.project_options.proposals_enabled.help_text')}
+                      </p>
+                      <div className="flex flex-col space-y-1">
+                        {[
+                          {
+                            id: 'inherit',
+                            isActive: course.projectProposalsEnabled === null || course.projectProposalsEnabled === undefined,
+                            onClick: () => handleSetProjectProposalsEnabled(null),
+                            label: t(
+                              programDefaultProjectsEnabled
+                                ? 'manageCourses.project_options.proposals_enabled.option_inherit_yes'
+                                : 'manageCourses.project_options.proposals_enabled.option_inherit_no'
+                            ),
+                          },
+                          {
+                            id: 'enabled',
+                            isActive: course.projectProposalsEnabled === true,
+                            onClick: () => handleSetProjectProposalsEnabled(true),
+                            label: t('manageCourses.project_options.proposals_enabled.option_enabled'),
+                          },
+                          {
+                            id: 'disabled',
+                            isActive: course.projectProposalsEnabled === false,
+                            onClick: () => handleSetProjectProposalsEnabled(false),
+                            label: t('manageCourses.project_options.proposals_enabled.option_disabled'),
+                          },
+                        ].map((option) => (
+                          <label
+                            key={option.id}
+                            className="inline-flex items-center space-x-2 cursor-pointer"
+                          >
+                            <input
+                              type="radio"
+                              name={`project-proposals-${course.id}`}
+                              className="cursor-pointer"
+                              checked={option.isActive}
+                              onChange={option.onClick}
+                            />
+                            <span className="text-sm">{option.label}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+
+                    <DatePicker
+                      variant="material"
+                      label={t('manageCourses.project_options.submission_deadline.label')}
+                      helpText={t('manageCourses.project_options.submission_deadline.help_text')}
+                      itemId={course.id}
+                      value={projectSubmissionDeadlineValue}
+                      updateValueMutation={UPDATE_COURSE_PROJECT_SUBMISSION_DEADLINE}
+                      identifierVariables={{ itemId: course.id }}
+                      dateFieldName="value"
+                      refetchQueries={['AdminCourseList']}
                     />
                   </div>
                 )}

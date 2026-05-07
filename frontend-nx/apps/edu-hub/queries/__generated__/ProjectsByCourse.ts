@@ -1,0 +1,164 @@
+/* tslint:disable */
+/* eslint-disable */
+// @generated
+// This file was automatically generated and should not be edited.
+
+import { ProjectStatus_enum, ProjectAchievementCertificateType_enum, ProjectRating_enum, ProjectParticipationStatus_enum } from "./../../__generated__/globalTypes";
+
+// ====================================================
+// GraphQL query operation: ProjectsByCourse
+// ====================================================
+
+export interface ProjectsByCourse_Project_Organization {
+  __typename: "Organization";
+  id: number;
+  name: string;
+}
+
+export interface ProjectsByCourse_Project_ProjectType {
+  __typename: "ProjectType";
+  value: string;
+  requiresDocumentation: boolean;
+  requiresPresentation: boolean;
+  requiresExternalUrl: boolean;
+  requiresCoverImage: boolean;
+  requiresEvaluationScript: boolean;
+}
+
+export interface ProjectsByCourse_Project_ProjectDocumentationTemplate {
+  __typename: "ProjectDocumentationTemplate";
+  id: number;
+  title: string;
+  url: string;
+}
+
+export interface ProjectsByCourse_Project_SubmittedByUser {
+  __typename: "User";
+  id: any;
+  /**
+   * The user's first name
+   */
+  firstName: string;
+  /**
+   * The user's last name
+   */
+  lastName: string;
+}
+
+export interface ProjectsByCourse_Project_ProjectAuthors_User {
+  __typename: "User";
+  id: any;
+  /**
+   * The user's first name
+   */
+  firstName: string;
+  /**
+   * The user's last name
+   */
+  lastName: string;
+  /**
+   * The user's profile picture
+   */
+  picture: string | null;
+}
+
+export interface ProjectsByCourse_Project_ProjectAuthors {
+  __typename: "ProjectAuthor";
+  id: number;
+  userId: any;
+  participationStatus: ProjectParticipationStatus_enum;
+  /**
+   * An object relationship
+   */
+  User: ProjectsByCourse_Project_ProjectAuthors_User;
+}
+
+export interface ProjectsByCourse_Project_ProjectMentors_User {
+  __typename: "User";
+  id: any;
+  /**
+   * The user's first name
+   */
+  firstName: string;
+  /**
+   * The user's last name
+   */
+  lastName: string;
+}
+
+export interface ProjectsByCourse_Project_ProjectMentors {
+  __typename: "ProjectMentor";
+  id: number;
+  userId: any;
+  /**
+   * An object relationship
+   */
+  User: ProjectsByCourse_Project_ProjectMentors_User;
+}
+
+export interface ProjectsByCourse_Project {
+  __typename: "Project";
+  id: number;
+  title: string;
+  tagline: string | null;
+  description: string | null;
+  coverImageUrl: string | null;
+  documentationUrl: string | null;
+  presentationUrl: string | null;
+  externalUrl: string | null;
+  documentationTemplateId: number | null;
+  status: ProjectStatus_enum;
+  type: string | null;
+  achievementCertificateType: ProjectAchievementCertificateType_enum | null;
+  rating: ProjectRating_enum | null;
+  score: any | null;
+  acceptingParticipants: boolean;
+  organizationId: number | null;
+  proposedByUserId: any;
+  parentProjectId: number | null;
+  /**
+   * Timestamp at which the project most recently transitioned to SUBMITTED. Cleared when a reviewer sends the project back to ONGOING so the student-side "sent back for revisions" banner remains accurate.
+   */
+  submittedAt: any | null;
+  /**
+   * User who issued the most recent SUBMITTED transition. Set via a Hasura permission preset (x-hasura-user-id) so the client cannot impersonate another author.
+   */
+  submittedBy: any | null;
+  created_at: any;
+  updated_at: any;
+  /**
+   * An object relationship
+   */
+  Organization: ProjectsByCourse_Project_Organization | null;
+  /**
+   * An object relationship
+   */
+  ProjectType: ProjectsByCourse_Project_ProjectType | null;
+  /**
+   * An object relationship
+   */
+  ProjectDocumentationTemplate: ProjectsByCourse_Project_ProjectDocumentationTemplate | null;
+  /**
+   * An object relationship
+   */
+  SubmittedByUser: ProjectsByCourse_Project_SubmittedByUser | null;
+  /**
+   * An array relationship
+   */
+  ProjectAuthors: ProjectsByCourse_Project_ProjectAuthors[];
+  /**
+   * An array relationship
+   */
+  ProjectMentors: ProjectsByCourse_Project_ProjectMentors[];
+}
+
+export interface ProjectsByCourse {
+  /**
+   * fetch data from the table: "Project"
+   */
+  Project: ProjectsByCourse_Project[];
+}
+
+export interface ProjectsByCourseVariables {
+  courseId: number;
+}

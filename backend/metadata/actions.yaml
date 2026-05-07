@@ -63,6 +63,18 @@ actions:
     permissions:
       - role: instructor_access
     comment: Creates Matrix program space and course room, then stores matrix ids in Hasura
+  - name: copyProjectFromTemplate
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: name
+          value: copyProjectFromTemplate
+    permissions:
+      - role: user_access
+    comment: Claims an open Project template by copying it for the current user. Inserts ProjectAuthor (ACCEPTED), copies ProjectMentor rows from the parent, and links the new project to the requested course.
   - name: syncProgramInstructorMatrixRoom
     definition:
       kind: synchronous
