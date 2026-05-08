@@ -16,11 +16,14 @@ AS $function$
   FROM "public"."CourseEnrollment" related_enrollment
   JOIN "public"."Course" course_row
     ON course_row.id = related_enrollment."courseId"
-  JOIN "public"."CourseDegree" degree_course
-    ON degree_course."courseId" = course_row.id
   WHERE related_enrollment."userId" = enrollment_row."userId"
     AND related_enrollment."achievementCertificateURL" IS NOT NULL
-    AND degree_course."degreeCourseId" = enrollment_row."courseId";
+    AND EXISTS (
+      SELECT 1
+      FROM "public"."CourseDegree" degree_course
+      WHERE degree_course."courseId" = course_row.id
+        AND degree_course."degreeCourseId" = enrollment_row."courseId"
+    );
 $function$;
 
 CREATE FUNCTION "public"."degree_participation_attended_event_count"(enrollment_row "public"."CourseEnrollment")
@@ -34,9 +37,12 @@ AS $function$
     ON course_row.id = related_enrollment."courseId"
   JOIN "public"."Program" program_row
     ON program_row.id = course_row."programId"
-  JOIN "public"."CourseDegree" degree_course
-    ON degree_course."courseId" = course_row.id
   WHERE related_enrollment."userId" = enrollment_row."userId"
     AND program_row."shortTitle" = 'EVENTS'
-    AND degree_course."degreeCourseId" = enrollment_row."courseId";
+    AND EXISTS (
+      SELECT 1
+      FROM "public"."CourseDegree" degree_course
+      WHERE degree_course."courseId" = course_row.id
+        AND degree_course."degreeCourseId" = enrollment_row."courseId"
+    );
 $function$;
