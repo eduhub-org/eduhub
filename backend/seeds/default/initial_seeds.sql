@@ -1333,10 +1333,11 @@ DECLARE
   status_value text;
   generated_first_name text;
   generated_last_name text;
+  pattern_variant integer;
 BEGIN
   INSERT INTO public."Course" (id, title, status, ects, tagline, language, "applicationEnd", cost, "achievementCertificatePossible", "attendanceCertificatePossible", "maxMissedSessions", "weekDay", "coverImage", created_at, updated_at, "programId", "headingDescriptionField1", "headingDescriptionField2", "contentDescriptionField1", "contentDescriptionField2", "learningGoals", "chatLink", "maxParticipants", "endTime", "startTime", published, "externalRegistrationLink", "registrationType") VALUES
     (7000, 'Machine Learning Degree', 'APPLICANTS_INVITED', '12.5', 'Production-like seed degree for performance checks of degree participations.', 'EN', '2026-04-30', '0', true, false, 2, 'NONE', NULL, '2025-11-13 11:00:00+00', '2026-04-20 05:00:00+00', 2, 'Machine Learning portfolio', 'Certificate requirements', 'Complete a realistic mix of ML courses and events.', 'Used for local performance testing.', 'Build, evaluate, and deploy machine learning systems.', 'https://chat.opencampus.sh', 350, '18:00:00', '16:00:00', true, NULL, 'APPROVAL_WITH_INPUT'),
-    (7001, 'Einführung in Data Science & maschinelles Lernen', 'APPLICANTS_INVITED', '5', 'Core data science and machine learning foundations.', 'DE', '2024-03-31', '0', true, true, 2, 'TUESDAY', NULL, '2024-01-15 10:00:00+00', '2024-09-04 12:00:00+00', 4, NULL, NULL, NULL, NULL, NULL, NULL, 120, '18:00:00', '16:00:00', true, NULL, 'APPROVAL_WITH_INPUT'),
+    (7001, 'Data Science and Machine Learning Foundations', 'APPLICANTS_INVITED', '5', 'Core data science and machine learning foundations.', 'EN', '2024-03-31', '0', true, true, 2, 'TUESDAY', NULL, '2024-01-15 10:00:00+00', '2024-09-04 12:00:00+00', 4, NULL, NULL, NULL, NULL, NULL, NULL, 120, '18:00:00', '16:00:00', true, NULL, 'APPROVAL_WITH_INPUT'),
     (7002, 'Machine Learning with TensorFlow', 'APPLICANTS_INVITED', '5', 'Applied neural network modeling with TensorFlow.', 'EN', '2024-03-31', '0', true, true, 2, 'WEDNESDAY', NULL, '2024-01-15 10:00:00+00', '2024-09-04 12:00:00+00', 4, NULL, NULL, NULL, NULL, NULL, NULL, 120, '18:00:00', '16:00:00', true, NULL, 'APPROVAL_WITH_INPUT'),
     (7003, 'Intermediate Machine Learning', 'APPLICANTS_INVITED', '5', 'Model selection, feature engineering, and validation.', 'EN', '2024-09-30', '0', true, true, 2, 'THURSDAY', NULL, '2024-08-15 10:00:00+00', '2025-03-25 12:00:00+00', 5, NULL, NULL, NULL, NULL, NULL, NULL, 120, '18:00:00', '16:00:00', true, NULL, 'APPROVAL_WITH_INPUT'),
     (7004, 'From LLMs to AI Agents', 'APPLICANTS_INVITED', '5', 'Design patterns for agentic AI systems.', 'EN', '2025-03-31', '0', true, true, 2, 'MONDAY', NULL, '2025-01-15 10:00:00+00', '2025-11-13 11:30:00+00', 5, NULL, NULL, NULL, NULL, NULL, NULL, 160, '18:00:00', '16:00:00', true, NULL, 'APPROVAL_WITH_INPUT'),
@@ -1376,34 +1377,108 @@ BEGIN
 
   FOR user_index IN 1..300 LOOP
     generated_user_id := format('90000000-0000-0000-0000-%s', lpad(user_index::text, 12, '0'))::uuid;
-    generated_first_name := first_names[((user_index - 1) % array_length(first_names, 1)) + 1];
-    generated_last_name := last_names[((user_index * 37 - 1) % array_length(last_names, 1)) + 1];
+    generated_first_name := first_names[
+      (
+        (user_index - 1)
+        + ((user_index - 1) / array_length(first_names, 1))
+      ) % array_length(first_names, 1) + 1
+    ];
+    generated_last_name := last_names[
+      (
+        (user_index - 1)
+        + ((user_index - 1) / array_length(last_names, 1))
+      ) % array_length(last_names, 1) + 1
+    ];
+    pattern_variant := ((user_index - 1) / 12) % 6;
     passed_courses := CASE ((user_index - 1) % 12)
       WHEN 0 THEN ARRAY[]::integer[]
-      WHEN 1 THEN ARRAY[7001]
-      WHEN 2 THEN ARRAY[7001, 7002]
-      WHEN 3 THEN ARRAY[7001, 7002, 7008]
-      WHEN 4 THEN ARRAY[7001, 7002, 7003]
-      WHEN 5 THEN ARRAY[7002, 7003, 7004]
-      WHEN 6 THEN ARRAY[7001, 7002, 7003, 7004, 7005]
+      WHEN 1 THEN CASE pattern_variant
+        WHEN 0 THEN ARRAY[7001]
+        WHEN 1 THEN ARRAY[7002]
+        WHEN 2 THEN ARRAY[7003]
+        WHEN 3 THEN ARRAY[7004]
+        WHEN 4 THEN ARRAY[7005]
+        ELSE ARRAY[7006]
+      END
+      WHEN 2 THEN CASE pattern_variant
+        WHEN 0 THEN ARRAY[7001, 7002]
+        WHEN 1 THEN ARRAY[7003, 7004]
+        WHEN 2 THEN ARRAY[7005, 7006]
+        WHEN 3 THEN ARRAY[7007, 7009]
+        WHEN 4 THEN ARRAY[7010, 7011]
+        ELSE ARRAY[7002, 7005]
+      END
+      WHEN 3 THEN CASE pattern_variant
+        WHEN 0 THEN ARRAY[7001, 7002, 7008]
+        WHEN 1 THEN ARRAY[7003, 7004, 7008]
+        WHEN 2 THEN ARRAY[7005, 7006, 7008]
+        WHEN 3 THEN ARRAY[7007, 7009, 7008]
+        WHEN 4 THEN ARRAY[7010, 7011, 7008]
+        ELSE ARRAY[7001, 7005, 7008]
+      END
+      WHEN 4 THEN CASE pattern_variant
+        WHEN 0 THEN ARRAY[7001, 7002, 7003]
+        WHEN 1 THEN ARRAY[7004, 7005, 7006]
+        WHEN 2 THEN ARRAY[7007, 7009, 7010]
+        WHEN 3 THEN ARRAY[7002, 7005, 7011]
+        WHEN 4 THEN ARRAY[7001, 7006, 7009]
+        ELSE ARRAY[7003, 7007, 7010]
+      END
+      WHEN 5 THEN CASE pattern_variant
+        WHEN 0 THEN ARRAY[7002, 7003, 7004]
+        WHEN 1 THEN ARRAY[7005, 7006, 7007]
+        WHEN 2 THEN ARRAY[7009, 7010, 7011]
+        WHEN 3 THEN ARRAY[7001, 7004, 7007]
+        WHEN 4 THEN ARRAY[7002, 7006, 7010]
+        ELSE ARRAY[7003, 7005, 7011]
+      END
+      WHEN 6 THEN CASE pattern_variant
+        WHEN 0 THEN ARRAY[7001, 7002, 7003, 7004, 7005]
+        WHEN 1 THEN ARRAY[7002, 7003, 7004, 7005, 7006]
+        WHEN 2 THEN ARRAY[7003, 7004, 7005, 7006, 7007]
+        WHEN 3 THEN ARRAY[7004, 7005, 7006, 7007, 7009]
+        WHEN 4 THEN ARRAY[7005, 7006, 7007, 7009, 7010]
+        ELSE ARRAY[7006, 7007, 7009, 7010, 7011]
+      END
       WHEN 7 THEN ARRAY[]::integer[]
-      WHEN 8 THEN ARRAY[7002, 7008]
-      WHEN 9 THEN ARRAY[7005, 7006]
-      WHEN 10 THEN ARRAY[7001, 7003, 7007]
+      WHEN 8 THEN CASE pattern_variant
+        WHEN 0 THEN ARRAY[7002, 7008]
+        WHEN 1 THEN ARRAY[7004, 7008]
+        WHEN 2 THEN ARRAY[7006, 7008]
+        WHEN 3 THEN ARRAY[7009, 7008]
+        WHEN 4 THEN ARRAY[7011, 7008]
+        ELSE ARRAY[7001, 7008]
+      END
+      WHEN 9 THEN CASE pattern_variant
+        WHEN 0 THEN ARRAY[7005, 7006]
+        WHEN 1 THEN ARRAY[7007, 7009]
+        WHEN 2 THEN ARRAY[7010, 7011]
+        WHEN 3 THEN ARRAY[7001, 7004]
+        WHEN 4 THEN ARRAY[7002, 7006]
+        ELSE ARRAY[7003, 7009]
+      END
+      WHEN 10 THEN CASE pattern_variant
+        WHEN 0 THEN ARRAY[7001, 7003, 7007]
+        WHEN 1 THEN ARRAY[7002, 7004, 7009]
+        WHEN 2 THEN ARRAY[7005, 7010, 7011]
+        WHEN 3 THEN ARRAY[7001, 7006, 7009]
+        WHEN 4 THEN ARRAY[7002, 7007, 7010]
+        ELSE ARRAY[7003, 7005, 7011]
+      END
       ELSE ARRAY[]::integer[]
     END;
     enrolled_courses := CASE ((user_index - 1) % 12)
-      WHEN 0 THEN ARRAY[7009]
-      WHEN 1 THEN ARRAY[7009]
-      WHEN 2 THEN ARRAY[7009, 7010]
-      WHEN 3 THEN ARRAY[7011]
-      WHEN 4 THEN ARRAY[7009]
-      WHEN 5 THEN ARRAY[7006]
-      WHEN 6 THEN ARRAY[7010, 7011]
-      WHEN 7 THEN ARRAY[7009]
-      WHEN 8 THEN ARRAY[7010]
+      WHEN 0 THEN ARRAY[7009 + (pattern_variant % 3)]
+      WHEN 1 THEN ARRAY[7007 + (pattern_variant % 5)]
+      WHEN 2 THEN ARRAY[7009 + (pattern_variant % 3), 7012]
+      WHEN 3 THEN ARRAY[7005 + (pattern_variant % 5)]
+      WHEN 4 THEN ARRAY[7009 + (pattern_variant % 3)]
+      WHEN 5 THEN ARRAY[7004 + (pattern_variant % 6)]
+      WHEN 6 THEN ARRAY[7009 + (pattern_variant % 3), 7012]
+      WHEN 7 THEN ARRAY[7009 + (pattern_variant % 3)]
+      WHEN 8 THEN ARRAY[7010 + (pattern_variant % 2)]
       WHEN 9 THEN ARRAY[7009, 7010, 7011, 7012]
-      WHEN 10 THEN ARRAY[7009]
+      WHEN 10 THEN ARRAY[7006 + (pattern_variant % 6)]
       ELSE ARRAY[]::integer[]
     END;
     status_value := CASE
@@ -1471,21 +1546,23 @@ BEGIN
     END LOOP;
 
     FOREACH course_id IN ARRAY enrolled_courses LOOP
-      INSERT INTO public."CourseEnrollment" (id, "courseId", "userId", status, "motivationLetter", "motivationRating", "achievementCertificateURL", "attendanceCertificateURL", created_at, updated_at, "invitationExpirationDate")
-      VALUES (
-        720000 + (user_index * 100) + course_id - 7000,
-        course_id,
-        generated_user_id,
-        'CONFIRMED',
-        'Seeded current enrollment for degree performance checks.',
-        'UNRATED',
-        NULL,
-        NULL,
-        '2026-04-20 05:00:00+00'::timestamptz + (user_index * interval '1 second'),
-        '2026-04-20 05:00:00+00'::timestamptz + (user_index * interval '1 second'),
-        NULL
-      )
-      ON CONFLICT (id) DO NOTHING;
+      IF NOT course_id = ANY(passed_courses) THEN
+        INSERT INTO public."CourseEnrollment" (id, "courseId", "userId", status, "motivationLetter", "motivationRating", "achievementCertificateURL", "attendanceCertificateURL", created_at, updated_at, "invitationExpirationDate")
+        VALUES (
+          720000 + (user_index * 100) + course_id - 7000,
+          course_id,
+          generated_user_id,
+          'CONFIRMED',
+          'Seeded current enrollment for degree performance checks.',
+          'UNRATED',
+          NULL,
+          NULL,
+          '2026-04-20 05:00:00+00'::timestamptz + (user_index * interval '1 second'),
+          '2026-04-20 05:00:00+00'::timestamptz + (user_index * interval '1 second'),
+          NULL
+        )
+        ON CONFLICT (id) DO NOTHING;
+      END IF;
     END LOOP;
 
     FOR event_index IN 1..event_count_patterns[((user_index - 1) % array_length(event_count_patterns, 1)) + 1] LOOP
