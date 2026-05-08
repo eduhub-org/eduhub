@@ -120,10 +120,10 @@ const AchievementRecord: FC<IProps> = ({ courseId, achievementRecordUploadDeadli
           <BlockTitle>{t('achievement.achievement_option')}</BlockTitle>
         </div>
 
-        {!query.loading && achievementOptions.length > 0 && (
+        {!query.loading && achievementOptions.length > 0 && achievementRecordUploadDeadline && (
           <span className="text-lg mb-4">
             {t('achievement.achievement_record_upload_dead_line_text', {
-              date: formattedDate(achievementRecordUploadDeadline),
+              date: formattedDate(new Date(achievementRecordUploadDeadline)),
             })}
           </span>
         )}

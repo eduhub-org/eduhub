@@ -1,4 +1,5 @@
 import { FC, useCallback, useMemo } from 'react';
+import { ApolloError } from '@apollo/client';
 import { ColumnDef } from '@tanstack/react-table';
 import { useTranslations } from 'next-intl';
 import { useRoleMutation } from '../../../../hooks/authedMutation';
@@ -14,6 +15,7 @@ import {
 } from '../../../../__generated__/globalTypes';
 import { formatTruncatedList, makeFullName } from '../../../../helpers/util';
 import StatusChip from './StatusChip';
+import ProjectPreviewLayout from './ProjectPreviewLayout';
 import { ProjectRow } from './types';
 
 interface ProjectsTableProps {
@@ -77,8 +79,17 @@ const ProjectsTable: FC<ProjectsTableProps> = ({
     async (projectId: number) => {
       try {
         await insertRequest({ variables: { projectId } });
-      } catch (err) {
-        onActionError(err instanceof Error ? err.message : t('projects.action_failed'));
+      } catch (err: unknown) {
+        const raw =
+          err instanceof ApolloError
+            ? [err.message, ...(err.graphQLErrors?.map((e) => e.message) ?? [])].join(' ')
+            : err instanceof Error
+              ? err.message
+              : '';
+        const maybeDuplicate = /unique|duplicate key|violates unique constraint/i.test(raw);
+        onActionError(
+          maybeDuplicate ? t('projects.table.request_blocked_duplicate') : raw || t('projects.action_failed')
+        );
       }
     },
     [insertRequest, onActionError, t]
@@ -143,6 +154,13 @@ const ProjectsTable: FC<ProjectsTableProps> = ({
               </Button>
             );
           }
+          if (myAuthorRow?.participationStatus === ProjectParticipationStatus_enum.DECLINED) {
+            return (
+              <Button disabled className="w-full">
+                {t('projects.table.request_declined')}
+              </Button>
+            );
+          }
           if (acceptedCount === 0) {
             return (
               <Button
@@ -183,58 +201,15 @@ const ProjectsTable: FC<ProjectsTableProps> = ({
         return null;
       }
       return (
-        <div className="p-4 space-y-3">
-          {row.coverImageUrl ? (
-            <img
-              src={row.coverImageUrl}
-              alt=""
-              className="max-h-48 w-auto rounded object-cover"
-            />
-          ) : null}
-          {row.tagline ? (
-            <p className="text-sm font-medium">{row.tagline}</p>
-          ) : null}
-          {row.description ? (
-            <p className="text-sm whitespace-pre-line">{row.description}</p>
-          ) : null}
-          {showFullDetails ? (
-            <div className="space-y-1 text-sm">
-              {row.documentationUrl ? (
-                <a
-                  href={row.documentationUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-status-confirmed underline block"
-                >
-                  {t('projects.table.documentation_link')}
-                </a>
-              ) : null}
-              {row.presentationUrl ? (
-                <a
-                  href={row.presentationUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-status-confirmed underline block"
-                >
-                  {t('projects.table.presentation_link')}
-                </a>
-              ) : null}
-              {row.externalUrl ? (
-                <a
-                  href={row.externalUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-status-confirmed underline block"
-                >
-                  {t('projects.table.external_link')}
-                </a>
-              ) : null}
-            </div>
-          ) : null}
+        <div className="p-4">
+          <ProjectPreviewLayout
+            project={row}
+            showResourceLinks={showFullDetails}
+          />
         </div>
       );
     },
-    [t]
+    []
   );
 
   const showAddButton = proposalsEnabled && !hasMyProject && Boolean(userId);

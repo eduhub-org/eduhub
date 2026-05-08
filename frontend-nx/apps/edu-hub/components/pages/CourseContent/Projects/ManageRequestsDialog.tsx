@@ -1,12 +1,11 @@
-import { FC, useCallback } from 'react';
+import { FC, useCallback, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { useRoleMutation } from '../../../../hooks/authedMutation';
 import { DialogShell } from '../../../common/dialogs/DialogShell';
 import { Button } from '../../../common/Button';
-import { makeFullName } from '../../../../helpers/util';
+import UserCard from '../../../common/UserCard';
 import {
   UPDATE_PROJECT_AUTHOR_PARTICIPATION_STATUS,
-  DELETE_PROJECT_AUTHOR,
 } from '../../../../queries/project';
 import { ProjectParticipationStatus_enum } from '../../../../__generated__/globalTypes';
 import { ProjectRow } from './types';
@@ -16,6 +15,7 @@ interface ManageRequestsDialogProps {
   onClose: () => void;
   project: ProjectRow;
   refetchQueries: string[];
+  onActionError: (message: string) => void;
 }
 
 const ManageRequestsDialog: FC<ManageRequestsDialogProps> = ({
@@ -23,6 +23,7 @@ const ManageRequestsDialog: FC<ManageRequestsDialogProps> = ({
   onClose,
   project,
   refetchQueries,
+  onActionError,
 }) => {
   const t = useTranslations('course');
   const tCommon = useTranslations('common');
@@ -31,28 +32,50 @@ const ManageRequestsDialog: FC<ManageRequestsDialogProps> = ({
     UPDATE_PROJECT_AUTHOR_PARTICIPATION_STATUS,
     { refetchQueries }
   );
-  const [deleteAuthor, { loading: deleting }] = useRoleMutation(DELETE_PROJECT_AUTHOR, {
-    refetchQueries,
-  });
 
   const requested = (project.ProjectAuthors ?? []).filter(
     (a) => a.participationStatus === ProjectParticipationStatus_enum.REQUESTED
   );
 
+  useEffect(() => {
+    if (open && requested.length === 0) {
+      onClose();
+    }
+  }, [open, requested.length, onClose]);
+
   const handleAccept = useCallback(
-    (id: number) =>
-      updateParticipation({
-        variables: { id, value: ProjectParticipationStatus_enum.ACCEPTED },
-      }),
-    [updateParticipation]
+    async (id: number) => {
+      try {
+        const result = await updateParticipation({
+          variables: { id, value: ProjectParticipationStatus_enum.ACCEPTED },
+        });
+        if (!result.data?.update_ProjectAuthor_by_pk) {
+          onActionError(t('projects.action_failed'));
+        }
+      } catch (err) {
+        onActionError(err instanceof Error ? err.message : t('projects.action_failed'));
+      }
+    },
+    [onActionError, t, updateParticipation]
   );
 
   const handleReject = useCallback(
-    (id: number) => deleteAuthor({ variables: { id } }),
-    [deleteAuthor]
+    async (id: number) => {
+      try {
+        const result = await updateParticipation({
+          variables: { id, value: ProjectParticipationStatus_enum.DECLINED },
+        });
+        if (!result.data?.update_ProjectAuthor_by_pk) {
+          onActionError(t('projects.action_failed'));
+        }
+      } catch (err) {
+        onActionError(err instanceof Error ? err.message : t('projects.action_failed'));
+      }
+    },
+    [onActionError, t, updateParticipation]
   );
 
-  const busy = updating || deleting;
+  const busy = updating;
 
   return (
     <DialogShell
@@ -72,28 +95,29 @@ const ManageRequestsDialog: FC<ManageRequestsDialogProps> = ({
       ) : (
         <ul className="space-y-3">
           {requested.map((request) => {
-            const fullName = makeFullName(
-              request.User?.firstName ?? '',
-              request.User?.lastName ?? ''
-            );
+            const user = request.User;
             return (
               <li
                 key={request.id}
                 className="flex items-center justify-between gap-3 border border-border-primary rounded p-2"
               >
-                <div className="flex items-center gap-3 min-w-0">
-                  {request.User?.picture ? (
-                    <img
-                      src={request.User.picture}
-                      alt=""
-                      className="w-9 h-9 rounded-full object-cover"
+                <div className="min-w-0 flex-1">
+                  {user ? (
+                    <UserCard
+                      className="flex items-start"
+                      user={{
+                        id: user.id,
+                        firstName: user.firstName ?? '',
+                        lastName: user.lastName ?? '',
+                        picture: user.picture ?? null,
+                        externalProfile: user.externalProfile ?? null,
+                        organizationName: user.Organization?.name?.trim() || null,
+                      }}
+                      size="compact"
                     />
                   ) : (
-                    <div className="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center text-sm">
-                      {(fullName || '?').slice(0, 1)}
-                    </div>
+                    <span className="text-sm text-label-secondary">{tCommon('unknown_user')}</span>
                   )}
-                  <span className="truncate">{fullName || tCommon('unknown_user')}</span>
                 </div>
                 <div className="flex gap-2 flex-shrink-0">
                   <Button onClick={() => handleReject(request.id)} disabled={busy}>

@@ -45,6 +45,12 @@ export interface ProjectsByCourse_Project_SubmittedByUser {
   lastName: string;
 }
 
+export interface ProjectsByCourse_Project_ProjectAuthors_User_Organization {
+  __typename: "Organization";
+  id: number;
+  name: string;
+}
+
 export interface ProjectsByCourse_Project_ProjectAuthors_User {
   __typename: "User";
   id: any;
@@ -60,6 +66,14 @@ export interface ProjectsByCourse_Project_ProjectAuthors_User {
    * The user's profile picture
    */
   picture: string | null;
+  /**
+   * A link to an external profile, for example in LinkedIn or Xing
+   */
+  externalProfile: string | null;
+  /**
+   * An object relationship
+   */
+  Organization: ProjectsByCourse_Project_ProjectAuthors_User_Organization | null;
 }
 
 export interface ProjectsByCourse_Project_ProjectAuthors {

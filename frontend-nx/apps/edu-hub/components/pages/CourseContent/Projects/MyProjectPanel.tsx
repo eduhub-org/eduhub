@@ -1,4 +1,5 @@
 import { FC, useCallback, useMemo, useState } from 'react';
+import Tooltip from '@mui/material/Tooltip';
 import { useTranslations, useLocale } from 'next-intl';
 import { useRoleMutation } from '../../../../hooks/authedMutation';
 import InputField from '../../../inputs/InputField';
@@ -28,6 +29,7 @@ import StatusChip from './StatusChip';
 import SubmissionChecklist, { isChecklistComplete } from './SubmissionChecklist';
 import SubmitConfirmationDialog from './SubmitConfirmationDialog';
 import ManageRequestsDialog from './ManageRequestsDialog';
+import ProjectPreviewLayout from './ProjectPreviewLayout';
 import { ProjectRow, ProjectTypeRow } from './types';
 
 interface MyProjectPanelProps {
@@ -57,6 +59,10 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
   const [requestsDialogOpen, setRequestsDialogOpen] = useState(false);
   const [leaveDialogOpen, setLeaveDialogOpen] = useState(false);
 
+  const closeRequestsDialog = useCallback(() => {
+    setRequestsDialogOpen(false);
+  }, []);
+
   const [submitProject, { loading: submitting }] = useRoleMutation(SUBMIT_PROJECT, {
     refetchQueries,
   });
@@ -82,7 +88,56 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
       ).length,
     [project.ProjectAuthors]
   );
-  const isLastAcceptedAuthor = acceptedAuthors.length <= 1;
+  const isLastAcceptedAuthor = useMemo(
+    () =>
+      acceptedAuthors.length === 1 && acceptedAuthors[0]?.userId === userId,
+    [acceptedAuthors, userId]
+  );
+
+  const cannotLeaveWhileRequestsPending =
+    isLastAcceptedAuthor && requestedCount > 0;
+
+  const canLeaveProject = useMemo(
+    () =>
+      project.status !== ProjectStatus_enum.INCOMPLETE &&
+      project.status !== ProjectStatus_enum.COMPLETED &&
+      project.status !== ProjectStatus_enum.PUBLISHED,
+    [project.status]
+  );
+
+  const leaveDialogMessageKey = useMemo(() => {
+    if (isLastAcceptedAuthor) {
+      if (
+        project.status === ProjectStatus_enum.PROPOSED ||
+        project.status === ProjectStatus_enum.ONGOING
+      ) {
+        return 'leave_dialog_last_deletes_project' as const;
+      }
+      if (project.status === ProjectStatus_enum.SUBMITTED) {
+        return 'leave_dialog_last_submitted' as const;
+      }
+      return 'leave_dialog_fallback' as const;
+    }
+
+    switch (project.status) {
+      case ProjectStatus_enum.PROPOSED:
+        return 'leave_dialog_coauthors_proposed' as const;
+      case ProjectStatus_enum.ONGOING:
+        return 'leave_dialog_coauthors_ongoing' as const;
+      case ProjectStatus_enum.SUBMITTED:
+        return 'leave_dialog_coauthors_submitted' as const;
+      default:
+        return 'leave_dialog_fallback' as const;
+    }
+  }, [isLastAcceptedAuthor, project.status]);
+
+  const handleOpenLeaveDialog = useCallback(() => {
+    if (cannotLeaveWhileRequestsPending) {
+      onActionError(t('projects.my_project.must_resolve_requests_before_leave_snackbar'));
+      return;
+    }
+    setLeaveDialogOpen(true);
+  }, [cannotLeaveWhileRequestsPending, onActionError, t]);
 
   const projectType = useMemo(
     () => projectTypes.find((pt) => pt.value === project.type) ?? null,
@@ -92,6 +147,9 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
   const isContentEditable =
     project.status === ProjectStatus_enum.PROPOSED ||
     project.status === ProjectStatus_enum.ONGOING;
+
+  /** Copies from a course template (Neue Gruppe bilden) keep the template title. */
+  const canEditProjectTitle = project.parentProjectId == null;
 
   const isSubmitted = project.status === ProjectStatus_enum.SUBMITTED;
   const isDeadlinePassed = useMemo(
@@ -155,19 +213,24 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
   return (
     <div className="bg-fill-primary text-label-primary border border-status-confirmed rounded-lg p-6 space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <h3 className="text-lg font-semibold">{t('projects.my_project.heading')}</h3>
-          <StatusChip status={project.status} />
-        </div>
+        <h3 className="text-lg font-semibold">{t('projects.my_project.heading')}</h3>
         <div className="flex flex-wrap items-center gap-2">
           {requestedCount > 0 ? (
             <Button onClick={() => setRequestsDialogOpen(true)}>
               {t('projects.my_project.requests_button', { count: requestedCount })}
             </Button>
           ) : null}
-          <Button onClick={() => setLeaveDialogOpen(true)} disabled={leaving}>
-            {t('projects.my_project.leave_button')}
-          </Button>
+          {canLeaveProject ? (
+            <Button onClick={handleOpenLeaveDialog} disabled={leaving}>
+              {t('projects.my_project.leave_button')}
+            </Button>
+          ) : (
+            <Tooltip title={t('projects.my_project.leave_disabled_tooltip')}>
+              <span className="inline-flex">
+                <Button disabled>{t('projects.my_project.leave_button')}</Button>
+              </span>
+            </Tooltip>
+          )}
         </div>
       </div>
 
@@ -198,18 +261,49 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
         </div>
       ) : null}
 
+      <div className="rounded-lg border border-border-primary p-4 bg-bg-secondary/30">
+        <ProjectPreviewLayout
+          project={project}
+          showResourceLinks={Boolean(
+            project.documentationUrl?.trim() ||
+              project.presentationUrl?.trim() ||
+              project.externalUrl?.trim()
+          )}
+          titleRow={
+            <div className="flex flex-wrap items-center gap-2 mb-1">
+              <h4 className="text-xl font-semibold text-label-primary min-w-0 break-words">
+                {project.title}
+              </h4>
+              <StatusChip status={project.status} />
+            </div>
+          }
+        />
+      </div>
+
       {isContentEditable ? (
-        <div className="space-y-3">
-          <InputField
-            variant="material"
-            type="input"
-            label={t('projects.my_project.title_label')}
-            placeholder={t('projects.my_project.title_label')}
-            itemId={project.id}
-            value={project.title}
-            updateValueMutation={UPDATE_PROJECT_TITLE}
-            refetchQueries={refetchQueries}
-          />
+        <div className="space-y-3 pt-2 border-t border-border-primary">
+          {canEditProjectTitle ? (
+            <InputField
+              variant="material"
+              type="input"
+              label={t('projects.my_project.title_label')}
+              placeholder={t('projects.my_project.title_label')}
+              itemId={project.id}
+              value={project.title}
+              updateValueMutation={UPDATE_PROJECT_TITLE}
+              refetchQueries={refetchQueries}
+            />
+          ) : (
+            <div className="space-y-1">
+              <div className="text-xs font-medium text-label-secondary uppercase tracking-wide">
+                {t('projects.my_project.title_label')}
+              </div>
+              <p className="text-sm text-label-primary">{project.title}</p>
+              <p className="text-xs text-label-secondary">
+                {t('projects.my_project.title_locked_hint')}
+              </p>
+            </div>
+          )}
           <InputField
             variant="material"
             type="input"
@@ -292,9 +386,7 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
             refetchQueries={refetchQueries}
           />
         </div>
-      ) : (
-        <ReadOnlyProjectDetails project={project} />
-      )}
+      ) : null}
 
       <div className="border-t border-border-primary pt-4 space-y-2">
         <h4 className="text-sm font-medium text-label-primary">
@@ -319,78 +411,21 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
 
       <ManageRequestsDialog
         open={requestsDialogOpen}
-        onClose={() => setRequestsDialogOpen(false)}
+        onClose={closeRequestsDialog}
         project={project}
         refetchQueries={refetchQueries}
+        onActionError={onActionError}
       />
 
       <QuestionConfirmationDialog
         open={leaveDialogOpen}
-        question={
-          isLastAcceptedAuthor
-            ? t('projects.my_project.leave_dialog_last_question')
-            : t('projects.my_project.leave_dialog_question')
-        }
+        title={t('projects.my_project.leave_dialog_title')}
+        question={t(`projects.my_project.${leaveDialogMessageKey}`)}
         confirmationText={t('projects.my_project.leave_dialog_confirm')}
+        confirmDisabled={leaving}
         onClose={() => setLeaveDialogOpen(false)}
         onConfirm={handleLeaveConfirm}
       />
-    </div>
-  );
-};
-
-interface ReadOnlyProjectDetailsProps {
-  project: ProjectRow;
-}
-
-const ReadOnlyProjectDetails: FC<ReadOnlyProjectDetailsProps> = ({ project }) => {
-  const t = useTranslations('course');
-
-  return (
-    <div className="space-y-2 text-sm">
-      <div>
-        <span className="font-medium">{t('projects.my_project.title_label')}: </span>
-        <span>{project.title}</span>
-      </div>
-      {project.tagline ? (
-        <div>
-          <span className="font-medium">{t('projects.my_project.tagline_label')}: </span>
-          <span>{project.tagline}</span>
-        </div>
-      ) : null}
-      {project.description ? (
-        <p className="whitespace-pre-line">{project.description}</p>
-      ) : null}
-      {project.documentationUrl ? (
-        <a
-          href={project.documentationUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="block text-status-confirmed underline"
-        >
-          {t('projects.table.documentation_link')}
-        </a>
-      ) : null}
-      {project.presentationUrl ? (
-        <a
-          href={project.presentationUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="block text-status-confirmed underline"
-        >
-          {t('projects.table.presentation_link')}
-        </a>
-      ) : null}
-      {project.externalUrl ? (
-        <a
-          href={project.externalUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="block text-status-confirmed underline"
-        >
-          {t('projects.table.external_link')}
-        </a>
-      ) : null}
     </div>
   );
 };

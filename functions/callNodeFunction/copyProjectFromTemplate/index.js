@@ -58,7 +58,7 @@ const INSERT_COPY = `
     $coverImageUrl: String
     $type: String
     $documentationTemplateId: Int
-    $achievementCertificateType: String
+    $achievementCertificateType: ProjectAchievementCertificateType_enum
     $organizationId: Int
     $proposedByUserId: uuid!
     $parentProjectId: Int!

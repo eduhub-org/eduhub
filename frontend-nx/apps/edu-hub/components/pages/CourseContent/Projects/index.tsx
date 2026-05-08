@@ -21,6 +21,7 @@ import { ProjectTypes } from '../../../../queries/__generated__/ProjectTypes';
 import { ProjectDocumentationTemplates } from '../../../../queries/__generated__/ProjectDocumentationTemplates';
 import { ProjectParticipationStatus_enum } from '../../../../__generated__/globalTypes';
 import NotificationSnackbar from '../../../common/dialogs/NotificationSnackbar';
+import { ContentRow } from '../../../common/ContentRow';
 import MyProjectPanel from './MyProjectPanel';
 import ProjectsTable from './ProjectsTable';
 import ProposeProjectDialog from './ProposeProjectDialog';
@@ -111,38 +112,44 @@ const Projects: FC<ProjectsProps> = ({
   const documentationTemplates =
     documentationTemplatesQuery.data?.ProjectDocumentationTemplate ?? [];
 
-  return (
-    <div className="space-y-6 my-12">
-      <div>
-        <h2 className="text-2xl font-semibold text-white">
-          {t('projects.section_heading')}
-        </h2>
-      </div>
+  const showMyProjectPanel =
+    Boolean(myProject && myProjectAcceptedAuthor && userId);
 
-      {myProject && myProjectAcceptedAuthor && userId ? (
-        <MyProjectPanel
-          project={myProject}
-          userId={userId}
-          projectTypes={projectTypes}
-          documentationTemplates={documentationTemplates}
-          submissionDeadline={submissionDeadline}
-          refetchQueries={REFETCH_QUERIES}
-          onActionError={handleActionError}
-        />
+  return (
+    <div className="w-full mt-24 mb-24 min-w-0">
+      {showMyProjectPanel && userId ? (
+        <ContentRow className="mb-8 text-label-primary bg-fill-primary light px-8 py-8 w-full min-w-0">
+          <div className="flex flex-col w-full min-w-0">
+            <MyProjectPanel
+              project={myProject!}
+              userId={userId}
+              projectTypes={projectTypes}
+              documentationTemplates={documentationTemplates}
+              submissionDeadline={submissionDeadline}
+              refetchQueries={REFETCH_QUERIES}
+              onActionError={handleActionError}
+            />
+          </div>
+        </ContentRow>
       ) : null}
 
-      <ProjectsTable
-        projects={tableProjects}
-        loading={projectsQuery.loading}
-        error={projectsQuery.error}
-        courseId={courseId}
-        userId={userId ?? undefined}
-        proposalsEnabled={proposalsEnabled}
-        hasMyProject={Boolean(myProject)}
-        refetchQueries={REFETCH_QUERIES}
-        onProposeClick={() => setProposeDialogOpen(true)}
-        onActionError={handleActionError}
-      />
+      <div className="w-full min-w-0 px-8">
+        <h2 className="text-2xl font-semibold text-label-primary mb-6">
+          {t('projects.section_heading')}
+        </h2>
+        <ProjectsTable
+          projects={tableProjects}
+          loading={projectsQuery.loading}
+          error={projectsQuery.error}
+          courseId={courseId}
+          userId={userId ?? undefined}
+          proposalsEnabled={proposalsEnabled}
+          hasMyProject={Boolean(myProject)}
+          refetchQueries={REFETCH_QUERIES}
+          onProposeClick={() => setProposeDialogOpen(true)}
+          onActionError={handleActionError}
+        />
+      </div>
 
       {userId ? (
         <ProposeProjectDialog

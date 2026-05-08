@@ -83,6 +83,31 @@ insert_permissions:
         - tagline
         - title
         - type
+  # Same rules as user_access self-propose; instructors no longer inherit user_access (see inherited_roles).
+  - role: instructor_access
+    permission:
+      check:
+        _and:
+          - proposedByUserId:
+              _eq: X-Hasura-User-Id
+          - status:
+              _eq: PROPOSED
+      columns:
+        - achievementCertificateType
+        - acceptingParticipants
+        - coverImageUrl
+        - description
+        - documentationTemplateId
+        - documentationUrl
+        - externalUrl
+        - organizationId
+        - parentProjectId
+        - presentationUrl
+        - proposedByUserId
+        - status
+        - tagline
+        - title
+        - type
 select_permissions:
   - role: anonymous
     permission:
@@ -194,11 +219,25 @@ select_permissions:
                     id:
                       _eq: X-Hasura-User-Id
 update_permissions:
+  # Covers grading plus the same project fields instructors previously reached via merged user_access.
   - role: instructor_access
     permission:
       columns:
+        - acceptingParticipants
+        - achievementCertificateType
+        - coverImageUrl
+        - description
+        - documentationTemplateId
+        - documentationUrl
+        - externalUrl
+        - presentationUrl
         - rating
         - score
+        - status
+        - submittedBy
+        - tagline
+        - title
+        - type
       filter:
         _or:
           - ProjectCourses:
@@ -211,6 +250,18 @@ update_permissions:
               User:
                 id:
                   _eq: X-Hasura-User-Id
+          - _and:
+              - status:
+                  _in:
+                    - PROPOSED
+                    - ONGOING
+              - ProjectAuthors:
+                  _and:
+                    - participationStatus:
+                        _eq: ACCEPTED
+                    - User:
+                        id:
+                          _eq: X-Hasura-User-Id
       check: {}
   - role: user_access
     permission:

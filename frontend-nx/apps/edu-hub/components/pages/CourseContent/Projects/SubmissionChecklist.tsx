@@ -29,9 +29,10 @@ const SubmissionChecklist: FC<SubmissionChecklistProps> = ({ project, projectTyp
         },
       ];
     }
-    const allAuthorsAccepted =
-      (project.ProjectAuthors ?? []).length > 0 &&
-      (project.ProjectAuthors ?? []).every((a) => a.participationStatus === 'ACCEPTED');
+    const authors = project.ProjectAuthors ?? [];
+    const hasPendingJoinRequest = authors.some((a) => a.participationStatus === 'REQUESTED');
+    const hasAcceptedAuthor = authors.some((a) => a.participationStatus === 'ACCEPTED');
+    const allAuthorsAccepted = hasAcceptedAuthor && !hasPendingJoinRequest;
     return [
       projectType.requiresDocumentation && {
         id: 'documentation',
@@ -100,8 +101,8 @@ export const isChecklistComplete = (
   if (projectType.requiresExternalUrl && !project.externalUrl) return false;
   if (projectType.requiresCoverImage && !project.coverImageUrl) return false;
   const authors = project.ProjectAuthors ?? [];
-  if (authors.length === 0) return false;
-  if (!authors.every((a) => a.participationStatus === 'ACCEPTED')) return false;
+  if (authors.some((a) => a.participationStatus === 'REQUESTED')) return false;
+  if (!authors.some((a) => a.participationStatus === 'ACCEPTED')) return false;
   return true;
 };
 

@@ -79,6 +79,11 @@ export const PROJECT_FRAGMENT_DETAILED = gql`
         firstName
         lastName
         picture
+        externalProfile
+        Organization {
+          id
+          name
+        }
       }
     }
     ProjectMentors {

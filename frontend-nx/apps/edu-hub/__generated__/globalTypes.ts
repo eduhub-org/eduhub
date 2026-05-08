@@ -1595,6 +1595,7 @@ export enum ProjectParticipationStatus_constraint {
 
 export enum ProjectParticipationStatus_enum {
   ACCEPTED = "ACCEPTED",
+  DECLINED = "DECLINED",
   REQUESTED = "REQUESTED",
 }
 

@@ -203,24 +203,25 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                 isCourseWithEnrollment && // needed to assure the type of the course object
                 courseEnrollment?.status === CourseEnrollmentStatus_enum.CONFIRMED &&
                 (course.achievementCertificatePossible || course.attendanceCertificatePossible) && (
-                  <ContentRow className="my-24 text-label-primary bg-fill-primary light px-8 py-8">
-                    <div className="flex flex-col w-full min-w-0">
-                      {!isDegreeCourse &&
-                        course.achievementCertificatePossible &&
-                        (course.projectProposalsEnabled ??
-                          course.Program?.projectProposalsEnabledByDefault) && (
-                          <Projects
-                            courseId={course.id}
-                            defaultProjectType={course.Program?.defaultProjectType ?? null}
-                            effectiveSubmissionDeadline={
-                              course.projectSubmissionDeadline ??
-                              course.Program?.defaultProjectSubmissionDeadline ??
-                              course.Program?.achievementRecordUploadDeadline ??
-                              null
-                            }
-                            proposalsEnabled
-                          />
+                  <>
+                    {!isDegreeCourse && course.achievementCertificatePossible && (
+                      <Projects
+                        courseId={course.id}
+                        defaultProjectType={course.Program?.defaultProjectType ?? null}
+                        effectiveSubmissionDeadline={
+                          course.projectSubmissionDeadline ??
+                          course.Program?.defaultProjectSubmissionDeadline ??
+                          course.Program?.achievementRecordUploadDeadline ??
+                          null
+                        }
+                        proposalsEnabled={Boolean(
+                          course.projectProposalsEnabled ??
+                            course.Program?.projectProposalsEnabledByDefault
                         )}
+                      />
+                    )}
+                    <ContentRow className="my-24 text-label-primary bg-fill-primary light px-8 py-8">
+                      <div className="flex flex-col w-full min-w-0">
                       {!isDegreeCourse && (
                         <div className="flex flex-col md:flex-row gap-12 md:gap-24 w-full">
                           <Attendances course={course} />
@@ -249,6 +250,7 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                       )}
                     </div>
                   </ContentRow>
+                  </>
                 )}
               <ContentRow className="flex">
                 <PageBlock classname="flex-1 text-white space-y-6">

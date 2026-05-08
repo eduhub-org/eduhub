@@ -108,14 +108,22 @@ update_permissions:
         - participationStatus
       filter:
         _or:
-          - Project:
-              ProjectAuthors:
+          # Same correlated EXISTS pattern as delete_permissions (Hasura v2.19 nested bug).
+          # Use _ceq + [$ , column]: plain _eq + {$: column} is rejected as PGInteger parse error.
+          - _exists:
+              _table:
+                name: ProjectAuthor
+                schema: public
+              _where:
                 _and:
+                  - projectId:
+                      _ceq:
+                        - $
+                        - projectId
                   - participationStatus:
                       _eq: ACCEPTED
-                  - User:
-                      id:
-                        _eq: X-Hasura-User-Id
+                  - userId:
+                      _eq: X-Hasura-User-Id
           - _and:
               - userId:
                   _eq: X-Hasura-User-Id
@@ -140,16 +148,31 @@ delete_permissions:
     permission:
       filter:
         _or:
-          - userId:
-              _eq: X-Hasura-User-Id
-          - Project:
-              ProjectAuthors:
+          - _and:
+              - userId:
+                  _eq: X-Hasura-User-Id
+              - Project:
+                  status:
+                    _nin:
+                      - COMPLETED
+                      - INCOMPLETE
+                      - PUBLISHED
+          # Nested Project→ProjectAuthors correlation broke on Hasura v2.19 for deletes.
+          # Correlate EXISTS row via _ceq + [$ , column]: {_eq: {$: column}} hits PGInteger parse error.
+          - _exists:
+              _table:
+                name: ProjectAuthor
+                schema: public
+              _where:
                 _and:
+                  - projectId:
+                      _ceq:
+                        - $
+                        - projectId
                   - participationStatus:
                       _eq: ACCEPTED
-                  - User:
-                      id:
-                        _eq: X-Hasura-User-Id
+                  - userId:
+                      _eq: X-Hasura-User-Id
           - Project:
               ProjectCourses:
                 Course:
