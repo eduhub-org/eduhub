@@ -4315,6 +4315,7 @@ export interface CourseEnrollment_bool_exp {
   CourseEnrollmentAddons?: CourseEnrollmentAddon_bool_exp | null;
   CourseEnrollmentAddons_aggregate?: CourseEnrollmentAddon_aggregate_bool_exp | null;
   CourseEnrollmentStatus?: CourseEnrollmentStatus_bool_exp | null;
+  DegreeParticipationStats?: DegreeParticipationStats_bool_exp | null;
   Invoices?: Invoice_bool_exp | null;
   Invoices_aggregate?: Invoice_aggregate_bool_exp | null;
   LocationOption?: LocationOption_bool_exp | null;
@@ -4328,8 +4329,6 @@ export interface CourseEnrollment_bool_exp {
   billingOrganizationId?: Int_comparison_exp | null;
   courseId?: Int_comparison_exp | null;
   created_at?: timestamptz_comparison_exp | null;
-  degreeParticipationAttendedEventCount?: bigint_comparison_exp | null;
-  degreeParticipationEctsTotal?: numeric_comparison_exp | null;
   id?: Int_comparison_exp | null;
   invitationExpirationDate?: date_comparison_exp | null;
   location?: LocationOption_enum_comparison_exp | null;
@@ -4349,6 +4348,7 @@ export interface CourseEnrollment_insert_input {
   Course?: Course_obj_rel_insert_input | null;
   CourseEnrollmentAddons?: CourseEnrollmentAddon_arr_rel_insert_input | null;
   CourseEnrollmentStatus?: CourseEnrollmentStatus_obj_rel_insert_input | null;
+  DegreeParticipationStats?: DegreeParticipationStats_obj_rel_insert_input | null;
   Invoices?: Invoice_arr_rel_insert_input | null;
   LocationOption?: LocationOption_obj_rel_insert_input | null;
   MotivationRating?: MotivationRating_obj_rel_insert_input | null;
@@ -4428,6 +4428,7 @@ export interface CourseEnrollment_order_by {
   Course?: Course_order_by | null;
   CourseEnrollmentAddons_aggregate?: CourseEnrollmentAddon_aggregate_order_by | null;
   CourseEnrollmentStatus?: CourseEnrollmentStatus_order_by | null;
+  DegreeParticipationStats?: DegreeParticipationStats_order_by | null;
   Invoices_aggregate?: Invoice_aggregate_order_by | null;
   LocationOption?: LocationOption_order_by | null;
   MotivationRating?: MotivationRating_order_by | null;
@@ -4437,8 +4438,6 @@ export interface CourseEnrollment_order_by {
   billingOrganizationId?: order_by | null;
   courseId?: order_by | null;
   created_at?: order_by | null;
-  degreeParticipationAttendedEventCount?: order_by | null;
-  degreeParticipationEctsTotal?: order_by | null;
   id?: order_by | null;
   invitationExpirationDate?: order_by | null;
   location?: order_by | null;
@@ -5806,6 +5805,46 @@ export interface Course_variance_order_by {
   maxMissedSessions?: order_by | null;
   maxParticipants?: order_by | null;
   programId?: order_by | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "DegreeParticipationStats". All fields are combined with a logical 'AND'.
+ */
+export interface DegreeParticipationStats_bool_exp {
+  _and?: DegreeParticipationStats_bool_exp[] | null;
+  _not?: DegreeParticipationStats_bool_exp | null;
+  _or?: DegreeParticipationStats_bool_exp[] | null;
+  attendedEventCount?: bigint_comparison_exp | null;
+  degreeCourseId?: Int_comparison_exp | null;
+  ectsTotal?: numeric_comparison_exp | null;
+  userId?: uuid_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "DegreeParticipationStats"
+ */
+export interface DegreeParticipationStats_insert_input {
+  attendedEventCount?: any | null;
+  degreeCourseId?: number | null;
+  ectsTotal?: any | null;
+  userId?: any | null;
+}
+
+/**
+ * input type for inserting object relation for remote table "DegreeParticipationStats"
+ */
+export interface DegreeParticipationStats_obj_rel_insert_input {
+  data: DegreeParticipationStats_insert_input;
+}
+
+/**
+ * Ordering options when selecting data from "DegreeParticipationStats".
+ */
+export interface DegreeParticipationStats_order_by {
+  attendedEventCount?: order_by | null;
+  degreeCourseId?: order_by | null;
+  ectsTotal?: order_by | null;
+  userId?: order_by | null;
 }
 
 /**

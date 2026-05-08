@@ -20,6 +20,16 @@ object_relationships:
   - name: User
     using:
       foreign_key_constraint_on: userId
+  - name: DegreeParticipationStats
+    using:
+      manual_configuration:
+        column_mapping:
+          courseId: degreeCourseId
+          userId: userId
+        insertion_order: null
+        remote_table:
+          name: DegreeParticipationStats
+          schema: public
 array_relationships:
   - name: CourseEnrollmentAddons
     using:
@@ -35,19 +45,6 @@ array_relationships:
         table:
           name: Invoice
           schema: public
-computed_fields:
-  - name: degreeParticipationAttendedEventCount
-    definition:
-      function:
-        name: degree_participation_attended_event_count
-        schema: public
-      table_argument: enrollment_row
-  - name: degreeParticipationEctsTotal
-    definition:
-      function:
-        name: degree_participation_ects_total
-        schema: public
-      table_argument: enrollment_row
 insert_permissions:
   - role: user_access
     permission:
@@ -78,9 +75,6 @@ select_permissions:
         - invitationExpirationDate
         - location
         - termsAcceptedAt
-      computed_fields:
-        - degreeParticipationAttendedEventCount
-        - degreeParticipationEctsTotal
       filter: {}
       allow_aggregations: true
   - role: user_access
@@ -99,9 +93,6 @@ select_permissions:
         - userId
         - location
         - termsAcceptedAt
-      computed_fields:
-        - degreeParticipationAttendedEventCount
-        - degreeParticipationEctsTotal
       filter:
         _and:
           - userId:

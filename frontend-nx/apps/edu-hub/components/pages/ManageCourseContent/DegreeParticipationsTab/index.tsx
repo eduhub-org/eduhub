@@ -104,12 +104,12 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
           ];
         case 'ectsTotal':
           return [
-            { degreeParticipationEctsTotal: null },
+            { DegreeParticipationStats: { ectsTotal: null } },
             ...stableNameSort,
           ];
         case 'attendedEvents':
           return [
-            { degreeParticipationAttendedEventCount: null },
+            { DegreeParticipationStats: { attendedEventCount: null } },
             ...stableNameSort,
           ];
         default:
@@ -192,8 +192,8 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
     degreeParticipantsEnrollments.map((enrollment: DegreeParticipantsWithDegreeEnrollments_Course_by_pk_CourseEnrollments) => {
       const name = `${enrollment.User.firstName} ${enrollment.User.lastName}`;
       const lastApplication = getMaxUpdatedAt(enrollment.User.CourseEnrollments) || 'N/A';
-      const ectsTotal = formatTotalECTS(enrollment.degreeParticipationEctsTotal);
-      const attendedEvents = Number(enrollment.degreeParticipationAttendedEventCount ?? 0);
+      const ectsTotal = formatTotalECTS(enrollment.DegreeParticipationStats?.ectsTotal);
+      const attendedEvents = Number(enrollment.DegreeParticipationStats?.attendedEventCount ?? 0);
       const participations = formatParticipations(enrollment.User.CourseEnrollments);
 
       return {

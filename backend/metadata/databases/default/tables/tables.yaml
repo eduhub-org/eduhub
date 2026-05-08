@@ -21,6 +21,7 @@
 - "!include public_CourseEnrollmentAddon.yaml"
 - "!include public_CourseEnrollmentStatus.yaml"
 - "!include public_CourseFundingOrganization.yaml"
+- "!include public_DegreeParticipationStats.yaml"
 - "!include public_CourseGroup.yaml"
 - "!include public_CourseGroupOption.yaml"
 - "!include public_CourseInstructor.yaml"

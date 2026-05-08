@@ -61,8 +61,10 @@ export const DEGREE_PARTICIPANTS_WITH_DEGREE_ENROLLMENTS = gql`
         status
         achievementCertificateURL
         attendanceCertificateURL
-        degreeParticipationEctsTotal
-        degreeParticipationAttendedEventCount
+        DegreeParticipationStats {
+          ectsTotal
+          attendedEventCount
+        }
         User {
           id
           firstName

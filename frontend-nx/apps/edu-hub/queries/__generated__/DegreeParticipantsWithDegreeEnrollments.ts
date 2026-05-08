@@ -9,6 +9,12 @@ import { CourseEnrollment_bool_exp, CourseEnrollment_order_by, CourseEnrollmentS
 // GraphQL query operation: DegreeParticipantsWithDegreeEnrollments
 // ====================================================
 
+export interface DegreeParticipantsWithDegreeEnrollments_Course_by_pk_CourseEnrollments_DegreeParticipationStats {
+  __typename: "DegreeParticipationStats";
+  ectsTotal: any | null;
+  attendedEventCount: any | null;
+}
+
 export interface DegreeParticipantsWithDegreeEnrollments_Course_by_pk_CourseEnrollments_User_CourseEnrollments_Course_Program {
   __typename: "Program";
   id: number;
@@ -98,13 +104,9 @@ export interface DegreeParticipantsWithDegreeEnrollments_Course_by_pk_CourseEnro
    */
   attendanceCertificateURL: string | null;
   /**
-   * A computed field, executes function "degree_participation_ects_total"
+   * An object relationship
    */
-  degreeParticipationEctsTotal: any | null;
-  /**
-   * A computed field, executes function "degree_participation_attended_event_count"
-   */
-  degreeParticipationAttendedEventCount: any | null;
+  DegreeParticipationStats: DegreeParticipantsWithDegreeEnrollments_Course_by_pk_CourseEnrollments_DegreeParticipationStats | null;
   /**
    * An object relationship
    */
