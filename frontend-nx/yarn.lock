@@ -12277,11 +12277,11 @@ __metadata:
   linkType: hard
 
 "icu-minify@npm:^4.9.1":
-  version: 4.9.1
-  resolution: "icu-minify@npm:4.9.1"
+  version: 4.11.0
+  resolution: "icu-minify@npm:4.11.0"
   dependencies:
     "@formatjs/icu-messageformat-parser": ^3.4.0
-  checksum: 216fb791df5c41572b135246840b6d48d1081ecca173690f0a66691a82504cd4f9f8c163b9a8f6207bc94af706be1752e7811711f0070d162ceeaa4ca1b3ee61
+  checksum: 5a9ee85326c936b25de8dcb2c44d48958fe78ea4f3db7084f0c250a780d398cc47394a9da20b24a3c8664b8f59640ce407f5e8625f266a3a4b95ceb2ff978c6f
   languageName: node
   linkType: hard
 
