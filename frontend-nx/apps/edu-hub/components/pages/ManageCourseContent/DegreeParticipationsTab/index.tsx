@@ -20,9 +20,42 @@ import { BulkAction } from '../../../common/TableGrid/types';
 import NotificationSnackbar from '../../../common/dialogs/NotificationSnackbar';
 import { ErrorMessageDialog } from '../../../common/dialogs/ErrorMessageDialog';
 import { CourseEnrollmentStatus_enum } from '../../../../__generated__/globalTypes';
+import Card from '../../../common/Card';
 
 interface DegreeParticipationsTabIProps {
   course: ManagedCourse_Course_by_pk;
+}
+
+interface DegreeParticipationListItem {
+  id: number;
+  title: string;
+  programShortTitle: string;
+  ects?: string;
+}
+
+interface DegreeParticipationGroups {
+  passed: DegreeParticipationListItem[];
+  attended: DegreeParticipationListItem[];
+  enrolled: DegreeParticipationListItem[];
+}
+
+interface ParticipationGroupCardProps {
+  title: string;
+  countLabel: string;
+  emptyLabel: string;
+  items: DegreeParticipationListItem[];
+  showEcts?: boolean;
+}
+
+interface ExpandableDegreeParticipationRowProps {
+  row: ExtendedDegreeParticipantsEnrollment;
+  titles: {
+    passed: string;
+    attended: string;
+    enrolled: string;
+  };
+  getCountLabel: (count: number) => string;
+  emptyLabel: string;
 }
 
 export interface ExtendedDegreeParticipantsEnrollment
@@ -31,7 +64,77 @@ export interface ExtendedDegreeParticipantsEnrollment
   lastApplication?: string;
   ectsTotal?: string;
   attendedEvents?: number;
+  participationGroups?: DegreeParticipationGroups;
 }
+
+const EMPTY_PARTICIPATION_GROUPS: DegreeParticipationGroups = {
+  passed: [],
+  attended: [],
+  enrolled: [],
+};
+
+const ParticipationGroupCard: FC<ParticipationGroupCardProps> = ({
+  title,
+  countLabel,
+  emptyLabel,
+  items,
+  showEcts,
+}) => (
+  <Card title={title} className="h-full">
+    <div className="mb-3 text-sm font-medium text-label-secondary">
+      {countLabel}
+    </div>
+    {items.length > 0 ? (
+      <ul className="space-y-2 text-sm text-label-primary">
+        {items.map((item) => (
+          <li key={item.id} className="break-words">
+            {item.title} ({item.programShortTitle}
+            {showEcts && item.ects ? `; ${item.ects} ECTS` : ''})
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <div className="text-sm text-label-secondary italic">
+        {emptyLabel}
+      </div>
+    )}
+  </Card>
+);
+
+const ExpandableDegreeParticipationRow: FC<ExpandableDegreeParticipationRowProps> = ({
+  row,
+  titles,
+  getCountLabel,
+  emptyLabel,
+}) => {
+  const participationGroups = row.participationGroups ?? EMPTY_PARTICIPATION_GROUPS;
+
+  return (
+    <div className="bg-fill-primary text-label-primary light p-6 w-full">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+        <ParticipationGroupCard
+          title={titles.passed}
+          countLabel={getCountLabel(participationGroups.passed.length)}
+          emptyLabel={emptyLabel}
+          items={participationGroups.passed}
+          showEcts
+        />
+        <ParticipationGroupCard
+          title={titles.attended}
+          countLabel={getCountLabel(participationGroups.attended.length)}
+          emptyLabel={emptyLabel}
+          items={participationGroups.attended}
+        />
+        <ParticipationGroupCard
+          title={titles.enrolled}
+          countLabel={getCountLabel(participationGroups.enrolled.length)}
+          emptyLabel={emptyLabel}
+          items={participationGroups.enrolled}
+        />
+      </div>
+    </div>
+  );
+};
 
 export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ course }) => {
   const t = useTranslations('manageCourse');
@@ -144,9 +247,14 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
     return formattedEcts;
   };
 
-  const formatParticipations = (courseEnrollments: DegreeParticipantsWithDegreeEnrollments_Course_by_pk_CourseEnrollments_User_CourseEnrollments[]) => {
-    if (!courseEnrollments || courseEnrollments.length === 0) return '';
+  const formatCourseEcts = (ects: string | null | undefined) => {
+    const parsedEcts = Number.parseFloat((ects ?? '0').replace(',', '.'));
+    return Number.isNaN(parsedEcts)
+      ? '0'
+      : parsedEcts.toLocaleString(locale, { maximumFractionDigits: 1 });
+  };
 
+  const getParticipationGroups = (courseEnrollments: DegreeParticipantsWithDegreeEnrollments_Course_by_pk_CourseEnrollments_User_CourseEnrollments[]) => {
     type CeType = DegreeParticipantsWithDegreeEnrollments_Course_by_pk_CourseEnrollments_User_CourseEnrollments;
     // Passed courses (achievement certificate - highest priority)
     const passedEnrollments = courseEnrollments.filter((ce: CeType) => ce.achievementCertificateURL);
@@ -162,30 +270,18 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
       (ce: CeType) => !ce.achievementCertificateURL && !ce.attendanceCertificateURL && ce.Course.Program.shortTitle !== 'EVENTS'
     );
 
-    const passed = passedEnrollments.map((ce: CeType) => {
-      let ects = ce.Course.ects ? ce.Course.ects.replace(',', '.') : '0';
-      const parsedEcts = Number.parseFloat(ects);
-      ects = Number.isNaN(parsedEcts) ? '0' : parsedEcts.toString();
-      return `${ce.Course.title} (${ce.Course.Program.shortTitle}; ${ects} ECTS)`;
+    const mapParticipation = (ce: CeType): DegreeParticipationListItem => ({
+      id: ce.id,
+      title: ce.Course.title ?? '-',
+      programShortTitle: ce.Course.Program.shortTitle ?? '-',
+      ects: ce.Course.ects ? formatCourseEcts(ce.Course.ects) : undefined,
     });
 
-    const attended = attendedEnrollments.map((ce: CeType) => `${ce.Course.title} (${ce.Course.Program.shortTitle})`);
-
-    const enrolled = enrolledEnrollments.map((ce: CeType) => `${ce.Course.title} (${ce.Course.Program.shortTitle})`);
-
-    let result = '';
-    if (passed.length > 0) {
-      result += 'Passed: ' + passed.join(', ');
-    }
-    if (attended.length > 0) {
-      if (result) result += '\n';
-      result += 'Attended: ' + attended.join(', ');
-    }
-    if (enrolled.length > 0) {
-      if (result) result += '\n';
-      result += 'Enrolled: ' + enrolled.join(', ');
-    }
-    return result;
+    return {
+      passed: passedEnrollments.map(mapParticipation),
+      attended: attendedEnrollments.map(mapParticipation),
+      enrolled: enrolledEnrollments.map(mapParticipation),
+    };
   };
 
   const extendedDegreeParticipantsEnrollments: ExtendedDegreeParticipantsEnrollment[] =
@@ -194,7 +290,7 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
       const lastApplication = getMaxUpdatedAt(enrollment.User.CourseEnrollments) || 'N/A';
       const ectsTotal = formatTotalECTS(enrollment.DegreeParticipationStats?.ectsTotal);
       const attendedEvents = Number(enrollment.DegreeParticipationStats?.attendedEventCount ?? 0);
-      const participations = formatParticipations(enrollment.User.CourseEnrollments);
+      const participationGroups = getParticipationGroups(enrollment.User.CourseEnrollments);
 
       return {
         ...enrollment,
@@ -202,7 +298,7 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
         lastApplication,
         ectsTotal,
         attendedEvents,
-        participations,
+        participationGroups,
       };
     });
 
@@ -308,14 +404,6 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
         cell: ({ getValue }) => <div className="uppercase">{getValue<string>()}</div>,
       },
       {
-        header: t('participations'),
-        accessorKey: 'participations',
-        size: 400,
-        minSize: 300,
-        maxSize: 600,
-        cell: ({ getValue }) => <div style={{ whiteSpace: 'pre-line' }}>{getValue<string>()}</div>,
-      },
-      {
         header: t('lastApplication'),
         accessorKey: 'lastApplication',
         size: 150,
@@ -357,6 +445,37 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
     [t]
   );
 
+  const participationGroupTitles = useMemo(
+    () => ({
+      passed: t('participation_groups.passed'),
+      attended: t('participation_groups.attended'),
+      enrolled: t('participation_groups.enrolled'),
+    }),
+    [t]
+  );
+
+  const getParticipationGroupCountLabel = useCallback(
+    (count: number) => t(
+      count === 1
+        ? 'participation_groups.count_singular'
+        : 'participation_groups.count_plural',
+      { count }
+    ),
+    [t]
+  );
+
+  const expandableDegreeParticipationRow = useCallback(
+    ({ row }: { row: ExtendedDegreeParticipantsEnrollment }) => (
+      <ExpandableDegreeParticipationRow
+        row={row}
+        titles={participationGroupTitles}
+        getCountLabel={getParticipationGroupCountLabel}
+        emptyLabel={t('participation_groups.empty')}
+      />
+    ),
+    [getParticipationGroupCountLabel, participationGroupTitles, t]
+  );
+
   return (
     <>
       <TableGrid
@@ -376,6 +495,7 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
         showCheckbox={true}
         bulkActions={bulkActions}
         onBulkAction={handleBulkAction}
+        expandableRowComponent={expandableDegreeParticipationRow}
         refetchQueries={['DegreeParticipantsWithDegreeEnrollments']}
       />
       <NotificationSnackbar

@@ -1133,6 +1133,14 @@
     "last_name": "Nachname",
     "organization": "Organisation",
     "participations": "Teilnahmen",
+    "participation_groups": {
+      "passed": "Bestanden",
+      "attended": "Besucht",
+      "enrolled": "Eingeschrieben",
+      "count_singular": "{count} Eintrag",
+      "count_plural": "{count} Einträge",
+      "empty": "Keine Einträge"
+    },
     "lastApplication": "Letzte Aktivität",
     "status_label": "Status",
     "ectsTotal": "ECTS Gesamt",

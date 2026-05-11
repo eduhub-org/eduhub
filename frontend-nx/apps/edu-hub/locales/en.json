@@ -1151,6 +1151,14 @@
     "last_name": "Last Name",
     "organization": "Organization",
     "participations": "Participations",
+    "participation_groups": {
+      "passed": "Passed",
+      "attended": "Attended",
+      "enrolled": "Enrolled",
+      "count_singular": "{count} entry",
+      "count_plural": "{count} entries",
+      "empty": "No entries"
+    },
     "lastApplication": "Last Activity",
     "status_label": "Status",
     "ectsTotal": "Total ECTS",
