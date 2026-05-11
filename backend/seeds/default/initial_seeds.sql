@@ -1328,6 +1328,10 @@ DECLARE
   event_count_patterns integer[] := ARRAY[0, 0, 0, 0, 1, 2, 4, 1, 1, 0, 0, 0];
   passed_courses integer[];
   enrolled_courses integer[];
+  passed_ects_total numeric;
+  attended_event_count integer;
+  event_course_ids integer[] := ARRAY[7101, 7102, 7103, 7104, 7105];
+  event_position integer;
   course_id integer;
   event_index integer;
   status_value text;
@@ -1467,6 +1471,24 @@ BEGIN
       END
       ELSE ARRAY[]::integer[]
     END;
+    attended_event_count := CASE
+      WHEN ((user_index - 1) % 12) = 6 THEN 1 + (pattern_variant % 4)
+      ELSE event_count_patterns[((user_index - 1) % array_length(event_count_patterns, 1)) + 1]
+    END;
+    passed_ects_total := (
+      SELECT COALESCE(
+        SUM(
+          CASE
+            WHEN course.ects ~ '^[0-9]+([,.][0-9]+)?$'
+              THEN replace(course.ects, ',', '.')::numeric
+            ELSE 0
+          END
+        ),
+        0
+      )
+      FROM public."Course" course
+      WHERE course.id = ANY(passed_courses)
+    );
     enrolled_courses := CASE ((user_index - 1) % 12)
       WHEN 0 THEN ARRAY[7009 + (pattern_variant % 3)]
       WHEN 1 THEN ARRAY[7007 + (pattern_variant % 5)]
@@ -1519,7 +1541,11 @@ BEGIN
       status_value,
       'I want to complete the Machine Learning Degree and document my learning path.',
       'UNRATED',
-      NULL,
+      CASE
+        WHEN passed_ects_total >= 12.5 AND attended_event_count >= 1
+          THEN generated_user_id || '/' || degree_id || '/achievement_certificate.pdf'
+        ELSE NULL
+      END,
       NULL,
       '2025-11-13 11:00:00+00'::timestamptz + (user_index * interval '1 minute'),
       '2026-04-20 05:00:00+00'::timestamptz + (user_index * interval '1 second'),
@@ -1565,8 +1591,15 @@ BEGIN
       END IF;
     END LOOP;
 
-    FOR event_index IN 1..event_count_patterns[((user_index - 1) % array_length(event_count_patterns, 1)) + 1] LOOP
-      course_id := 7100 + event_index;
+    FOR event_index IN 1..attended_event_count LOOP
+      event_position := (
+        (
+          (user_index - 1)
+          + pattern_variant
+          + ((event_index - 1) * 2)
+        ) % array_length(event_course_ids, 1)
+      ) + 1;
+      course_id := event_course_ids[event_position];
 
       INSERT INTO public."CourseEnrollment" (id, "courseId", "userId", status, "motivationLetter", "motivationRating", "achievementCertificateURL", "attendanceCertificateURL", created_at, updated_at, "invitationExpirationDate")
       VALUES (
@@ -1578,7 +1611,7 @@ BEGIN
         'UNRATED',
         NULL,
         generated_user_id || '/' || course_id || '/attendance_certificate.pdf',
-        '2025-11-13 11:26:00+00'::timestamptz + (event_index * interval '1 minute'),
+        '2025-11-13 11:26:00+00'::timestamptz + (event_position * interval '1 minute'),
         '2025-11-13 11:26:00+00'::timestamptz + (user_index * interval '1 second'),
         NULL
       )
@@ -1587,15 +1620,15 @@ BEGIN
       INSERT INTO public."Attendance" (id, "sessionId", "userId", status, created_at, updated_at, "recordedIdentifier", source, "startDateTime", "endDateTime", "totalAttendanceTime", "interruptionCount")
       VALUES (
         700000 + (user_index * 10) + event_index,
-        71000 + event_index,
+        71000 + event_position,
         generated_user_id,
         'ATTENDED',
         '2025-11-13 11:26:00+00'::timestamptz + (user_index * interval '1 second'),
         '2025-11-13 11:26:00+00'::timestamptz + (user_index * interval '1 second'),
         lower(generated_first_name || '.' || generated_last_name || '.ml' || user_index || '@example.com'),
         'INSTRUCTOR',
-        '2025-10-01 10:00:00+00'::timestamptz + ((event_index - 1) * interval '30 days'),
-        '2025-10-01 18:00:00+00'::timestamptz + ((event_index - 1) * interval '30 days'),
+        '2025-10-01 10:00:00+00'::timestamptz + ((event_position - 1) * interval '30 days'),
+        '2025-10-01 18:00:00+00'::timestamptz + ((event_position - 1) * interval '30 days'),
         28800,
         0
       )
