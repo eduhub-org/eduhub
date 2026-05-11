@@ -70,11 +70,14 @@ export const CertificateDownload: FC<IProps> = ({
 
   const hasAchievement = !!courseEnrollment?.achievementCertificateURL;
   const hasAttendance = !!courseEnrollment?.attendanceCertificateURL;
+  const manageViewButtonClassName = manageView
+    ? 'max-w-full min-w-0 whitespace-normal text-center leading-tight break-words'
+    : 'w-full';
 
   return (
     <div className={!manageView ? 'mt-4' : ''}>
       <div
-        className={`flex flex-wrap gap-4 min-w-0 items-center ${!manageView ? 'flex-col w-full' : ''}`}
+        className={`flex flex-wrap min-w-0 items-center ${manageView ? 'gap-2' : 'gap-4 flex-col w-full'}`}
       >
         {hasAchievement && (
           <>
@@ -83,7 +86,7 @@ export const CertificateDownload: FC<IProps> = ({
               as="button"
               type="button"
               filled
-              className={`flex justify-center items-center ${!manageView ? 'w-full' : ''}`}
+              className={`flex justify-center items-center ${manageViewButtonClassName}`}
               disabled={achievementLoading}
               onClick={handleAchievementDownload}
             >
@@ -102,7 +105,7 @@ export const CertificateDownload: FC<IProps> = ({
             as="button"
             type="button"
             filled
-            className={`flex justify-center items-center ${!manageView ? 'w-full' : ''}`}
+            className={`flex justify-center items-center ${manageViewButtonClassName}`}
             disabled={attendanceLoading}
             onClick={handleAttendanceDownload}
           >

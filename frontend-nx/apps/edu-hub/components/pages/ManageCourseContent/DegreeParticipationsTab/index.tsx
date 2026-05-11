@@ -406,26 +406,26 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
       {
         header: t('lastApplication'),
         accessorKey: 'lastApplication',
-        size: 150,
-        minSize: 120,
+        size: 220,
+        minSize: 150,
       },
       {
         header: t('status_label'),
         accessorKey: 'status',
-        size: 120,
-        minSize: 100,
+        size: 90,
+        minSize: 75,
       },
       {
         header: t('ectsTotal'),
         accessorKey: 'ectsTotal',
-        size: 120,
-        minSize: 100,
+        size: 90,
+        minSize: 75,
         enableSorting: true,
       },
       {
         header: t('attendedEvents'),
         accessorKey: 'attendedEvents',
-        size: 150,
+        size: 180,
         minSize: 120,
         enableSorting: true,
       },
@@ -433,10 +433,10 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
         header: t('certificate'),
         accessorKey: 'certificate',
         accessorFn: (row) => row,
-        size: 150,
-        minSize: 120,
+        size: 200,
+        minSize: 150,
         cell: ({ getValue }) => (
-          <div>
+          <div className="w-full min-w-0 pr-1">
             <CertificateDownload courseEnrollment={getValue<ExtendedDegreeParticipantsEnrollment>()} manageView />
           </div>
         ),
