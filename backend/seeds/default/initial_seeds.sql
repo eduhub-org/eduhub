@@ -1537,7 +1537,7 @@ BEGIN
 
     INSERT INTO public."CourseEnrollment" (id, "courseId", "userId", status, "motivationLetter", "motivationRating", "achievementCertificateURL", "attendanceCertificateURL", created_at, updated_at, "invitationExpirationDate")
     VALUES (
-      700000 + user_index,
+      700000 + (user_index * 10000),
       degree_id,
       generated_user_id,
       status_value,
@@ -1558,7 +1558,7 @@ BEGIN
     FOREACH course_id IN ARRAY passed_courses LOOP
       INSERT INTO public."CourseEnrollment" (id, "courseId", "userId", status, "motivationLetter", "motivationRating", "achievementCertificateURL", "attendanceCertificateURL", created_at, updated_at, "invitationExpirationDate")
       VALUES (
-        710000 + (user_index * 100) + course_id - 7000,
+        701000 + (user_index * 10000) + course_id - 7000,
         course_id,
         generated_user_id,
         'COMPLETED',
@@ -1577,7 +1577,7 @@ BEGIN
       IF NOT course_id = ANY(passed_courses) THEN
         INSERT INTO public."CourseEnrollment" (id, "courseId", "userId", status, "motivationLetter", "motivationRating", "achievementCertificateURL", "attendanceCertificateURL", created_at, updated_at, "invitationExpirationDate")
         VALUES (
-          720000 + (user_index * 100) + course_id - 7000,
+          702000 + (user_index * 10000) + course_id - 7000,
           course_id,
           generated_user_id,
           'CONFIRMED',
@@ -1605,7 +1605,7 @@ BEGIN
 
       INSERT INTO public."CourseEnrollment" (id, "courseId", "userId", status, "motivationLetter", "motivationRating", "achievementCertificateURL", "attendanceCertificateURL", created_at, updated_at, "invitationExpirationDate")
       VALUES (
-        730000 + (user_index * 100) + event_index,
+        703000 + (user_index * 10000) + event_index,
         course_id,
         generated_user_id,
         'COMPLETED',
