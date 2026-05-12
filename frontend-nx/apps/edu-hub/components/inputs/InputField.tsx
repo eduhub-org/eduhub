@@ -551,13 +551,16 @@ const InputField: React.FC<InputFieldProps> = ({
         onBlur={handleBlur}
         slotProps={{
           input: {
-            endAdornment: (
+            endAdornment: helpText ? (
               <InputAdornment position="end">
-                <Tooltip title={helpText || ''} placement="top">
+                <Tooltip
+                  title={<span className="block max-w-sm whitespace-pre-line text-xs leading-snug">{helpText}</span>}
+                  placement="top"
+                >
                   <HelpOutline style={{ cursor: 'pointer', color: 'var(--eduhub-label-disabled)' }} />
                 </Tooltip>
               </InputAdornment>
-            ),
+            ) : undefined,
           },
         }}
         error={hasBlurred && !!errorMessage}
@@ -572,7 +575,10 @@ const InputField: React.FC<InputFieldProps> = ({
       {(label || helpText) && (
         <div className="mb-2 flex items-center gap-2 text-label-primary">
           {helpText && (
-            <Tooltip title={helpText} placement="top">
+            <Tooltip
+              title={<span className="block max-w-sm whitespace-pre-line text-xs leading-snug">{helpText}</span>}
+              placement="top"
+            >
               <HelpOutline style={{ cursor: 'pointer' }} />
             </Tooltip>
           )}

@@ -53,7 +53,10 @@ export const EduhubDropDown: React.FC<EduhubDropDownProps> = ({
           <div className="flex justify-between mb-2">
             <div className="flex items-center">
               {helpText && (
-                <Tooltip title={helpText} placement="top">
+                <Tooltip
+                  title={<span className="block max-w-sm whitespace-pre-line text-xs leading-snug">{helpText}</span>}
+                  placement="top"
+                >
                   <HelpOutline style={{ cursor: 'pointer', marginRight: '5px' }} />
                 </Tooltip>
               )}
@@ -95,7 +98,10 @@ export const EduhubDropDown: React.FC<EduhubDropDownProps> = ({
           )}
           {!label && helpText && (
             <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
-              <Tooltip title={helpText} placement="top">
+              <Tooltip
+                title={<span className="block max-w-sm whitespace-pre-line text-xs leading-snug">{helpText}</span>}
+                placement="top"
+              >
                 <HelpOutline style={{ cursor: 'pointer', pointerEvents: 'auto' }} />
               </Tooltip>
             </div>

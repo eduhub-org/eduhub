@@ -114,7 +114,10 @@ export const MaterialDropDown: React.FC<MaterialDropDownProps> = ({
             endAdornment={
               helpText && (
                 <InputAdornment position="end">
-                  <Tooltip title={helpText} placement="top">
+                  <Tooltip
+                    title={<span className="block max-w-sm whitespace-pre-line text-xs leading-snug">{helpText}</span>}
+                    placement="top"
+                  >
                     <HelpOutline
                       style={{
                         cursor: 'pointer',
