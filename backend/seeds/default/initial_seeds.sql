@@ -1330,6 +1330,7 @@ DECLARE
   enrolled_courses integer[];
   passed_ects_total numeric;
   attended_event_count integer;
+  completion_requirements_met boolean;
   event_course_ids integer[] := ARRAY[7101, 7102, 7103, 7104, 7105];
   event_position integer;
   course_id integer;
@@ -1489,6 +1490,7 @@ BEGIN
       FROM public."Course" course
       WHERE course.id = ANY(passed_courses)
     );
+    completion_requirements_met := passed_ects_total >= 12.5 AND attended_event_count >= 1;
     enrolled_courses := CASE ((user_index - 1) % 12)
       WHEN 0 THEN ARRAY[7009 + (pattern_variant % 3)]
       WHEN 1 THEN ARRAY[7007 + (pattern_variant % 5)]
@@ -1504,10 +1506,10 @@ BEGIN
       ELSE ARRAY[]::integer[]
     END;
     status_value := CASE
+      WHEN completion_requirements_met THEN 'COMPLETED'
       WHEN user_index % 60 = 0 THEN 'INVITED'
       WHEN user_index % 45 = 0 THEN 'APPLIED'
       WHEN user_index % 37 = 0 THEN 'CANCELLED'
-      WHEN user_index % 19 = 0 THEN 'COMPLETED'
       ELSE 'CONFIRMED'
     END;
 
@@ -1542,7 +1544,7 @@ BEGIN
       'I want to complete the Machine Learning Degree and document my learning path.',
       'UNRATED',
       CASE
-        WHEN passed_ects_total >= 12.5 AND attended_event_count >= 1
+        WHEN status_value = 'COMPLETED' AND completion_requirements_met
           THEN generated_user_id || '/' || degree_id || '/achievement_certificate.pdf'
         ELSE NULL
       END,
