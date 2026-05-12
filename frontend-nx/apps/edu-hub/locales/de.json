@@ -1136,7 +1136,7 @@
     "participation_groups": {
       "passed": "Bestanden",
       "attended": "Besucht",
-      "enrolled": "Eingeschrieben"
+      "not_completed": "Nicht abgeschlossen"
     },
     "lastApplication": "Letzte Aktivität",
     "status_label": "Status",

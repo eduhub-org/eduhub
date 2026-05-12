@@ -36,7 +36,7 @@ interface DegreeParticipationListItem {
 interface DegreeParticipationGroups {
   passed: DegreeParticipationListItem[];
   attended: DegreeParticipationListItem[];
-  enrolled: DegreeParticipationListItem[];
+  not_completed: DegreeParticipationListItem[];
 }
 
 interface ParticipationGroupCardProps {
@@ -50,7 +50,7 @@ interface ExpandableDegreeParticipationRowProps {
   titles: {
     passed: string;
     attended: string;
-    enrolled: string;
+    not_completed: string;
   };
 }
 
@@ -66,7 +66,7 @@ export interface ExtendedDegreeParticipantsEnrollment
 const EMPTY_PARTICIPATION_GROUPS: DegreeParticipationGroups = {
   passed: [],
   attended: [],
-  enrolled: [],
+  not_completed: [],
 };
 
 const ParticipationGroupCard: FC<ParticipationGroupCardProps> = ({
@@ -107,8 +107,8 @@ const ExpandableDegreeParticipationRow: FC<ExpandableDegreeParticipationRowProps
           items={participationGroups.attended}
         />
         <ParticipationGroupCard
-          title={`${titles.enrolled} (${participationGroups.enrolled.length})`}
-          items={participationGroups.enrolled}
+          title={`${titles.not_completed} (${participationGroups.not_completed.length})`}
+          items={participationGroups.not_completed}
         />
       </div>
     </div>
@@ -244,8 +244,8 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
         !ce.achievementCertificateURL && (ce.attendanceCertificateURL || ce.Course.Program.shortTitle === 'EVENTS')
     );
 
-    // Enrolled courses (not passed AND not attended by new definition)
-    const enrolledEnrollments = courseEnrollments.filter(
+    // Not completed courses (not passed AND not attended by new definition)
+    const notCompletedEnrollments = courseEnrollments.filter(
       (ce: CeType) => !ce.achievementCertificateURL && !ce.attendanceCertificateURL && ce.Course.Program.shortTitle !== 'EVENTS'
     );
 
@@ -259,7 +259,7 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
     return {
       passed: passedEnrollments.map(mapParticipation),
       attended: attendedEnrollments.map(mapParticipation),
-      enrolled: enrolledEnrollments.map(mapParticipation),
+      not_completed: notCompletedEnrollments.map(mapParticipation),
     };
   };
 
@@ -428,7 +428,7 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
     () => ({
       passed: t('participation_groups.passed'),
       attended: t('participation_groups.attended'),
-      enrolled: t('participation_groups.enrolled'),
+      not_completed: t('participation_groups.not_completed'),
     }),
     [t]
   );

@@ -1154,7 +1154,7 @@
     "participation_groups": {
       "passed": "Passed",
       "attended": "Attended",
-      "enrolled": "Enrolled"
+      "not_completed": "Not completed"
     },
     "lastApplication": "Last Activity",
     "status_label": "Status",
