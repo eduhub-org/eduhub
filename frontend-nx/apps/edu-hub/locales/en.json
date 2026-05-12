@@ -400,11 +400,11 @@
         "PUBLISHED": "Published"
       },
       "type_label": {
-        "DOCUMENTATION": "Documentation only",
         "ONLINE_COURSE": "Online course",
-        "DOCUMENTATION_AND_PRESENTATION": "Documentation and presentation",
-        "PROJECT": "Project",
-        "OPEN_PROJECT": "Open project"
+        "MINIMAL_PROJECT": "Minimal project",
+        "PROJECT_WITH_LINK": "Project with link",
+        "PROJECT_WITH_PRESENTATION": "Project with presentation",
+        "PROJECT_WITH_LINK_AND_PRESENTATION": "Project with link and presentation"
       },
       "table": {
         "title": "Title",
@@ -1690,11 +1690,11 @@
         "help_text": "Used as the deadline whenever a course in this program does not set its own."
       },
       "type_options": {
-        "DOCUMENTATION": "Documentation only",
-        "ONLINE_COURSE": "Online course",
-        "DOCUMENTATION_AND_PRESENTATION": "Documentation and presentation",
-        "PROJECT": "Project (documentation, presentation, cover image)",
-        "OPEN_PROJECT": "Open project (documentation, presentation, external URL, cover image)"
+        "ONLINE_COURSE": "Online course (documentation only)",
+        "MINIMAL_PROJECT": "Minimal project (documentation only)",
+        "PROJECT_WITH_LINK": "Project with link (documentation, cover image, external link)",
+        "PROJECT_WITH_PRESENTATION": "Project with presentation (documentation, cover image, presentation)",
+        "PROJECT_WITH_LINK_AND_PRESENTATION": "Project with link and presentation (documentation, cover image, external link, presentation)"
       }
     },
     "notifications": {

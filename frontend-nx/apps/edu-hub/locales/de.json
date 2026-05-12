@@ -400,11 +400,11 @@
         "PUBLISHED": "Veröffentlicht"
       },
       "type_label": {
-        "DOCUMENTATION": "Nur Dokumentation",
         "ONLINE_COURSE": "Online-Kurs",
-        "DOCUMENTATION_AND_PRESENTATION": "Dokumentation und Präsentation",
-        "PROJECT": "Projekt",
-        "OPEN_PROJECT": "Open Project"
+        "MINIMAL_PROJECT": "Minimal-Projekt",
+        "PROJECT_WITH_LINK": "Projekt mit Link",
+        "PROJECT_WITH_PRESENTATION": "Projekt mit Präsentation",
+        "PROJECT_WITH_LINK_AND_PRESENTATION": "Projekt mit Link und Präsentation"
       },
       "table": {
         "title": "Titel",
@@ -1675,11 +1675,11 @@
         "help_text": "Wird als Frist verwendet, sofern ein Kurs in diesem Programm keine eigene Frist setzt."
       },
       "type_options": {
-        "DOCUMENTATION": "Nur Dokumentation",
-        "ONLINE_COURSE": "Online-Kurs",
-        "DOCUMENTATION_AND_PRESENTATION": "Dokumentation und Präsentation",
-        "PROJECT": "Projekt (Dokumentation, Präsentation, Titelbild)",
-        "OPEN_PROJECT": "Open Project (Dokumentation, Präsentation, externer Link, Titelbild)"
+        "ONLINE_COURSE": "Online-Kurs (nur Dokumentation)",
+        "MINIMAL_PROJECT": "Minimal-Projekt (nur Dokumentation)",
+        "PROJECT_WITH_LINK": "Projekt mit Link (Dokumentation, Titelbild, externer Link)",
+        "PROJECT_WITH_PRESENTATION": "Projekt mit Präsentation (Dokumentation, Titelbild, Präsentation)",
+        "PROJECT_WITH_LINK_AND_PRESENTATION": "Projekt mit Link und Präsentation (Dokumentation, Titelbild, externer Link, Präsentation)"
       }
     },
     "notifications": {

@@ -22,7 +22,6 @@ export interface ProjectFragmentDetailed_ProjectType {
   requiresPresentation: boolean;
   requiresExternalUrl: boolean;
   requiresCoverImage: boolean;
-  requiresEvaluationScript: boolean;
 }
 
 export interface ProjectFragmentDetailed_ProjectDocumentationTemplate {

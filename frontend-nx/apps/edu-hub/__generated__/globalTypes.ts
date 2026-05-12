@@ -1666,7 +1666,6 @@ export enum ProjectType_update_column {
   comment = "comment",
   requiresCoverImage = "requiresCoverImage",
   requiresDocumentation = "requiresDocumentation",
-  requiresEvaluationScript = "requiresEvaluationScript",
   requiresExternalUrl = "requiresExternalUrl",
   requiresPresentation = "requiresPresentation",
   value = "value",
@@ -1691,7 +1690,6 @@ export enum Project_select_column {
   description = "description",
   documentationTemplateId = "documentationTemplateId",
   documentationUrl = "documentationUrl",
-  evaluationScriptUrl = "evaluationScriptUrl",
   externalUrl = "externalUrl",
   id = "id",
   organizationId = "organizationId",
@@ -1735,7 +1733,6 @@ export enum Project_update_column {
   description = "description",
   documentationTemplateId = "documentationTemplateId",
   documentationUrl = "documentationUrl",
-  evaluationScriptUrl = "evaluationScriptUrl",
   externalUrl = "externalUrl",
   id = "id",
   organizationId = "organizationId",
@@ -8836,7 +8833,6 @@ export interface ProjectType_bool_exp {
   comment?: String_comparison_exp | null;
   requiresCoverImage?: Boolean_comparison_exp | null;
   requiresDocumentation?: Boolean_comparison_exp | null;
-  requiresEvaluationScript?: Boolean_comparison_exp | null;
   requiresExternalUrl?: Boolean_comparison_exp | null;
   requiresPresentation?: Boolean_comparison_exp | null;
   value?: String_comparison_exp | null;
@@ -8850,7 +8846,6 @@ export interface ProjectType_insert_input {
   comment?: string | null;
   requiresCoverImage?: boolean | null;
   requiresDocumentation?: boolean | null;
-  requiresEvaluationScript?: boolean | null;
   requiresExternalUrl?: boolean | null;
   requiresPresentation?: boolean | null;
   value?: string | null;
@@ -8881,7 +8876,6 @@ export interface ProjectType_order_by {
   comment?: order_by | null;
   requiresCoverImage?: order_by | null;
   requiresDocumentation?: order_by | null;
-  requiresEvaluationScript?: order_by | null;
   requiresExternalUrl?: order_by | null;
   requiresPresentation?: order_by | null;
   value?: order_by | null;
@@ -8982,7 +8976,6 @@ export interface Project_bool_exp {
   description?: String_comparison_exp | null;
   documentationTemplateId?: Int_comparison_exp | null;
   documentationUrl?: String_comparison_exp | null;
-  evaluationScriptUrl?: String_comparison_exp | null;
   externalUrl?: String_comparison_exp | null;
   id?: Int_comparison_exp | null;
   organizationId?: Int_comparison_exp | null;
@@ -9025,7 +9018,6 @@ export interface Project_insert_input {
   description?: string | null;
   documentationTemplateId?: number | null;
   documentationUrl?: string | null;
-  evaluationScriptUrl?: string | null;
   externalUrl?: string | null;
   id?: number | null;
   organizationId?: number | null;
@@ -9053,7 +9045,6 @@ export interface Project_max_order_by {
   description?: order_by | null;
   documentationTemplateId?: order_by | null;
   documentationUrl?: order_by | null;
-  evaluationScriptUrl?: order_by | null;
   externalUrl?: order_by | null;
   id?: order_by | null;
   organizationId?: order_by | null;
@@ -9079,7 +9070,6 @@ export interface Project_min_order_by {
   description?: order_by | null;
   documentationTemplateId?: order_by | null;
   documentationUrl?: order_by | null;
-  evaluationScriptUrl?: order_by | null;
   externalUrl?: order_by | null;
   id?: order_by | null;
   organizationId?: order_by | null;

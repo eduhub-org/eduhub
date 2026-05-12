@@ -22,7 +22,6 @@ export interface MyProjectByCourse_Project_ProjectType {
   requiresPresentation: boolean;
   requiresExternalUrl: boolean;
   requiresCoverImage: boolean;
-  requiresEvaluationScript: boolean;
 }
 
 export interface MyProjectByCourse_Project_ProjectDocumentationTemplate {

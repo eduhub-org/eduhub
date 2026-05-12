@@ -9,7 +9,6 @@ export const PROJECT_TYPES = gql`
       requiresPresentation
       requiresExternalUrl
       requiresCoverImage
-      requiresEvaluationScript
     }
   }
 `;
@@ -58,7 +57,6 @@ export const PROJECT_FRAGMENT_DETAILED = gql`
       requiresPresentation
       requiresExternalUrl
       requiresCoverImage
-      requiresEvaluationScript
     }
     ProjectDocumentationTemplate {
       id

@@ -15,7 +15,6 @@ export interface ProjectTypes_ProjectType {
   requiresPresentation: boolean;
   requiresExternalUrl: boolean;
   requiresCoverImage: boolean;
-  requiresEvaluationScript: boolean;
 }
 
 export interface ProjectTypes {

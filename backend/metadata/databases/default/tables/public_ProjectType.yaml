@@ -19,7 +19,6 @@ select_permissions:
         - requiresPresentation
         - requiresExternalUrl
         - requiresCoverImage
-        - requiresEvaluationScript
       filter: {}
   - role: user_access
     permission:
@@ -30,5 +29,4 @@ select_permissions:
         - requiresPresentation
         - requiresExternalUrl
         - requiresCoverImage
-        - requiresEvaluationScript
       filter: {}

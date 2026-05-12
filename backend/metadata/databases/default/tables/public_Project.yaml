@@ -149,7 +149,6 @@ select_permissions:
         - description
         - documentationTemplateId
         - documentationUrl
-        - evaluationScriptUrl
         - externalUrl
         - id
         - organizationId
@@ -188,7 +187,6 @@ select_permissions:
         - description
         - documentationTemplateId
         - documentationUrl
-        - evaluationScriptUrl
         - externalUrl
         - id
         - organizationId
