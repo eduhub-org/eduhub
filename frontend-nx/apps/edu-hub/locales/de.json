@@ -1136,10 +1136,7 @@
     "participation_groups": {
       "passed": "Bestanden",
       "attended": "Besucht",
-      "enrolled": "Eingeschrieben",
-      "count_singular": "{count} Eintrag",
-      "count_plural": "{count} Einträge",
-      "empty": "Keine Einträge"
+      "enrolled": "Eingeschrieben"
     },
     "lastApplication": "Letzte Aktivität",
     "status_label": "Status",

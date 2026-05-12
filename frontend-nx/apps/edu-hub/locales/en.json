@@ -1154,10 +1154,7 @@
     "participation_groups": {
       "passed": "Passed",
       "attended": "Attended",
-      "enrolled": "Enrolled",
-      "count_singular": "{count} entry",
-      "count_plural": "{count} entries",
-      "empty": "No entries"
+      "enrolled": "Enrolled"
     },
     "lastApplication": "Last Activity",
     "status_label": "Status",

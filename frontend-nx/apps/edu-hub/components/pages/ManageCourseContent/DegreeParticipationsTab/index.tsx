@@ -41,8 +41,6 @@ interface DegreeParticipationGroups {
 
 interface ParticipationGroupCardProps {
   title: string;
-  countLabel: string;
-  emptyLabel: string;
   items: DegreeParticipationListItem[];
   showEcts?: boolean;
 }
@@ -54,8 +52,6 @@ interface ExpandableDegreeParticipationRowProps {
     attended: string;
     enrolled: string;
   };
-  getCountLabel: (count: number) => string;
-  emptyLabel: string;
 }
 
 export interface ExtendedDegreeParticipantsEnrollment
@@ -75,16 +71,11 @@ const EMPTY_PARTICIPATION_GROUPS: DegreeParticipationGroups = {
 
 const ParticipationGroupCard: FC<ParticipationGroupCardProps> = ({
   title,
-  countLabel,
-  emptyLabel,
   items,
   showEcts,
 }) => (
   <Card title={title} className="h-full">
-    <div className="mb-3 text-sm font-medium text-label-secondary">
-      {countLabel}
-    </div>
-    {items.length > 0 ? (
+    {items.length > 0 && (
       <ul className="space-y-2 text-sm text-label-primary">
         {items.map((item) => (
           <li key={item.id} className="break-words">
@@ -93,10 +84,6 @@ const ParticipationGroupCard: FC<ParticipationGroupCardProps> = ({
           </li>
         ))}
       </ul>
-    ) : (
-      <div className="text-sm text-label-secondary italic">
-        {emptyLabel}
-      </div>
     )}
   </Card>
 );
@@ -104,8 +91,6 @@ const ParticipationGroupCard: FC<ParticipationGroupCardProps> = ({
 const ExpandableDegreeParticipationRow: FC<ExpandableDegreeParticipationRowProps> = ({
   row,
   titles,
-  getCountLabel,
-  emptyLabel,
 }) => {
   const participationGroups = row.participationGroups ?? EMPTY_PARTICIPATION_GROUPS;
 
@@ -113,22 +98,16 @@ const ExpandableDegreeParticipationRow: FC<ExpandableDegreeParticipationRowProps
     <div className="bg-fill-primary text-label-primary light p-6 w-full">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
         <ParticipationGroupCard
-          title={titles.passed}
-          countLabel={getCountLabel(participationGroups.passed.length)}
-          emptyLabel={emptyLabel}
+          title={`${titles.passed} (${participationGroups.passed.length})`}
           items={participationGroups.passed}
           showEcts
         />
         <ParticipationGroupCard
-          title={titles.attended}
-          countLabel={getCountLabel(participationGroups.attended.length)}
-          emptyLabel={emptyLabel}
+          title={`${titles.attended} (${participationGroups.attended.length})`}
           items={participationGroups.attended}
         />
         <ParticipationGroupCard
-          title={titles.enrolled}
-          countLabel={getCountLabel(participationGroups.enrolled.length)}
-          emptyLabel={emptyLabel}
+          title={`${titles.enrolled} (${participationGroups.enrolled.length})`}
           items={participationGroups.enrolled}
         />
       </div>
@@ -454,26 +433,14 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
     [t]
   );
 
-  const getParticipationGroupCountLabel = useCallback(
-    (count: number) => t(
-      count === 1
-        ? 'participation_groups.count_singular'
-        : 'participation_groups.count_plural',
-      { count }
-    ),
-    [t]
-  );
-
   const expandableDegreeParticipationRow = useCallback(
     ({ row }: { row: ExtendedDegreeParticipantsEnrollment }) => (
       <ExpandableDegreeParticipationRow
         row={row}
         titles={participationGroupTitles}
-        getCountLabel={getParticipationGroupCountLabel}
-        emptyLabel={t('participation_groups.empty')}
       />
     ),
-    [getParticipationGroupCountLabel, participationGroupTitles, t]
+    [participationGroupTitles]
   );
 
   return (
