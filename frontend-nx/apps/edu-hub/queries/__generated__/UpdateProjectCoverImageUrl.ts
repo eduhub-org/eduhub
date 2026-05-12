@@ -22,5 +22,5 @@ export interface UpdateProjectCoverImageUrl {
 
 export interface UpdateProjectCoverImageUrlVariables {
   itemId: number;
-  text: string;
+  text?: string | null;
 }

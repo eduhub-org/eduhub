@@ -7,7 +7,9 @@ import DropDownSelector from '../../../inputs/DropDownSelector';
 import CheckboxSelector from '../../../inputs/CheckboxSelector';
 import { Button } from '../../../common/Button';
 import { QuestionConfirmationDialog } from '../../../common/dialogs/QuestionConfirmationDialog';
+import { SAVE_PROJECT_DOCUMENTATION, SAVE_PROJECT_PRESENTATION, SAVE_PROJECT_IMAGE } from '../../../../queries/actions';
 import {
+  MARK_PROJECT_REVIEW_REQUESTED,
   UPDATE_PROJECT_TITLE,
   UPDATE_PROJECT_TAGLINE,
   UPDATE_PROJECT_DESCRIPTION,
@@ -20,17 +22,43 @@ import {
   SUBMIT_PROJECT,
   DELETE_PROJECT_AUTHOR,
 } from '../../../../queries/project';
+import FileUploadField from '../../../inputs/FileUploadField';
 import {
   ProjectParticipationStatus_enum,
   ProjectStatus_enum,
 } from '../../../../__generated__/globalTypes';
 import { formattedDateWithTime, makeFullName } from '../../../../helpers/util';
+import { translateErrorMessage } from '../../../../helpers/errorHandling';
 import StatusChip from './StatusChip';
-import SubmissionChecklist, { isChecklistComplete } from './SubmissionChecklist';
+import ProjectNextTodos from './ProjectNextTodos';
+import RequestProjectReviewDialog from './RequestProjectReviewDialog';
 import SubmitConfirmationDialog from './SubmitConfirmationDialog';
+import { isChecklistComplete } from './SubmissionChecklist';
 import ManageRequestsDialog from './ManageRequestsDialog';
 import ProjectPreviewLayout from './ProjectPreviewLayout';
 import { ProjectRow, ProjectTypeRow } from './types';
+import { PROJECT_FALLBACK_TITLE } from './projectDefaults';
+
+const PROJECT_DOCUMENTATION_ACCEPT = [
+  '.pdf',
+  '.doc',
+  '.docx',
+  '.odt',
+  'application/pdf',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/vnd.oasis.opendocument.text',
+].join(',');
+const PROJECT_PRESENTATION_ACCEPT = [
+  '.pdf',
+  '.ppt',
+  '.pptx',
+  '.odp',
+  'application/pdf',
+  'application/vnd.ms-powerpoint',
+  'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+  'application/vnd.oasis.opendocument.presentation',
+].join(',');
 
 interface MyProjectPanelProps {
   project: ProjectRow;
@@ -56,6 +84,7 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
   const locale = useLocale();
 
   const [submitDialogOpen, setSubmitDialogOpen] = useState(false);
+  const [requestReviewDialogOpen, setRequestReviewDialogOpen] = useState(false);
   const [requestsDialogOpen, setRequestsDialogOpen] = useState(false);
   const [leaveDialogOpen, setLeaveDialogOpen] = useState(false);
 
@@ -63,9 +92,25 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
     setRequestsDialogOpen(false);
   }, []);
 
+  const handleCoverUploadError = useCallback(
+    (error: string) => {
+      const normalizedKey = error.toLowerCase().replaceAll('.', '_');
+      const fileUploadKey = `file_upload.${normalizedKey}`;
+      const direct = tCommon(fileUploadKey);
+      onActionError(direct !== fileUploadKey ? direct : translateErrorMessage(error, tCommon));
+    },
+    [onActionError, tCommon]
+  );
+
   const [submitProject, { loading: submitting }] = useRoleMutation(SUBMIT_PROJECT, {
     refetchQueries,
   });
+  const [markProjectReviewRequested, { loading: requestingProjectReview }] = useRoleMutation(
+    MARK_PROJECT_REVIEW_REQUESTED,
+    {
+      refetchQueries,
+    }
+  );
   const [deleteAuthor, { loading: leaving }] = useRoleMutation(DELETE_PROJECT_AUTHOR, {
     refetchQueries,
   });
@@ -194,6 +239,37 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
     }
   }, [deleteAuthor, myAuthorRow, onActionError, t]);
 
+  const projectReviewRequestedAt = project.projectReviewRequestedAt ?? null;
+
+  const proposedPrepComplete = useMemo(() => {
+    if (project.status !== ProjectStatus_enum.PROPOSED) return false;
+    const descOk = Boolean(project.description?.trim());
+    const titleOk =
+      !canEditProjectTitle ||
+      (Boolean(project.title?.trim()) && project.title.trim() !== PROJECT_FALLBACK_TITLE);
+    const teamOk = !project.acceptingParticipants || requestedCount === 0;
+    return descOk && titleOk && teamOk;
+  }, [project, canEditProjectTitle, requestedCount]);
+
+  const canRequestProjectReview =
+    project.status === ProjectStatus_enum.PROPOSED &&
+    proposedPrepComplete &&
+    !projectReviewRequestedAt;
+
+  const handleRequestProjectReviewConfirm = useCallback(async () => {
+    try {
+      await markProjectReviewRequested({
+        variables: {
+          itemId: project.id,
+          requestedAt: new Date().toISOString(),
+        },
+      });
+      setRequestReviewDialogOpen(false);
+    } catch (err) {
+      onActionError(err instanceof Error ? err.message : t('projects.action_failed'));
+    }
+  }, [markProjectReviewRequested, project.id, onActionError, t]);
+
   const documentationTemplateOptions = useMemo(
     () =>
       documentationTemplates.map((tpl) => ({
@@ -216,23 +292,85 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
         <h3 className="text-lg font-semibold">{t('projects.my_project.heading')}</h3>
         <div className="flex flex-wrap items-center gap-2">
           {requestedCount > 0 ? (
-            <Button onClick={() => setRequestsDialogOpen(true)}>
-              {t('projects.my_project.requests_button', { count: requestedCount })}
-            </Button>
-          ) : null}
-          {canLeaveProject ? (
-            <Button onClick={handleOpenLeaveDialog} disabled={leaving}>
-              {t('projects.my_project.leave_button')}
-            </Button>
-          ) : (
-            <Tooltip title={t('projects.my_project.leave_disabled_tooltip')}>
+            <Tooltip title={t('projects.my_project.action_tooltip_join_requests')}>
               <span className="inline-flex">
-                <Button disabled>{t('projects.my_project.leave_button')}</Button>
+                <Button onClick={() => setRequestsDialogOpen(true)}>
+                  {t('projects.my_project.requests_button', { count: requestedCount })}
+                </Button>
               </span>
             </Tooltip>
-          )}
+          ) : null}
+          {isContentEditable && project.status === ProjectStatus_enum.PROPOSED ? (
+            projectReviewRequestedAt ? (
+              <Tooltip title={t('projects.my_project.action_tooltip_review_done')}>
+                <span className="inline-flex">
+                  <Button disabled>{t('projects.my_project.project_review_button_done')}</Button>
+                </span>
+              </Tooltip>
+            ) : !canRequestProjectReview ? (
+              <Tooltip title={t('projects.my_project.proposal_action_disabled_tooltip')}>
+                <span className="inline-flex">
+                  <Button filled disabled={!canRequestProjectReview}>
+                    {t('projects.my_project.project_review_button')}
+                  </Button>
+                </span>
+              </Tooltip>
+            ) : (
+              <Tooltip title={t('projects.my_project.action_tooltip_request_review')}>
+                <span className="inline-flex">
+                  <Button filled onClick={() => setRequestReviewDialogOpen(true)}>
+                    {t('projects.my_project.project_review_button')}
+                  </Button>
+                </span>
+              </Tooltip>
+            )
+          ) : null}
+          {isContentEditable && project.status === ProjectStatus_enum.ONGOING ? (
+            !canSubmit && !submitting ? (
+              <Tooltip title={t('projects.my_project.submit_disabled_tooltip')}>
+                <span className="inline-flex">
+                  <Button filled onClick={() => setSubmitDialogOpen(true)} disabled>
+                    {t('projects.my_project.submit_button')}
+                  </Button>
+                </span>
+              </Tooltip>
+            ) : (
+              <Tooltip title={t('projects.my_project.action_tooltip_submit')}>
+                <span className="inline-flex">
+                  <Button filled onClick={() => setSubmitDialogOpen(true)} disabled={!canSubmit || submitting}>
+                    {t('projects.my_project.submit_button')}
+                  </Button>
+                </span>
+              </Tooltip>
+            )
+          ) : null}
         </div>
       </div>
+
+          {isContentEditable ? (
+            <div className="rounded-lg border border-border-primary p-4 bg-bg-secondary/20 space-y-2">
+              <Tooltip title={t('projects.my_project.field_tooltip_next_todos_section')}>
+                <div className="w-fit cursor-help border-b border-dotted border-label-secondary/35">
+                  <h4 className="text-sm font-semibold text-label-primary">
+                    {t('projects.my_project.next_todos_heading')}
+                  </h4>
+                </div>
+              </Tooltip>
+          <ProjectNextTodos
+            project={project}
+            projectType={projectType}
+            canEditProjectTitle={canEditProjectTitle}
+            requestedJoinCount={requestedCount}
+          />
+          {project.status === ProjectStatus_enum.PROPOSED && projectReviewRequestedAt ? (
+            <p className="text-xs text-label-secondary pt-1">
+              {t('projects.my_project.project_review_banner', {
+                date: formattedDateWithTime(new Date(projectReviewRequestedAt), locale),
+              })}
+            </p>
+          ) : null}
+        </div>
+      ) : null}
 
       {isSubmitted ? (
         <div className="rounded border border-purple-200 bg-purple-50 p-3 text-sm text-purple-900">
@@ -270,100 +408,166 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
               project.externalUrl?.trim()
           )}
           titleRow={
-            <div className="flex flex-wrap items-center gap-2 mb-1">
-              <h4 className="text-xl font-semibold text-label-primary min-w-0 break-words">
-                {project.title}
-              </h4>
-              <StatusChip status={project.status} />
-            </div>
+            isContentEditable ? (
+              <div className="flex flex-wrap items-start gap-2 mb-1 w-full">
+                <div className="min-w-0 flex-1">
+                  {canEditProjectTitle ? (
+                    <InputField
+                      variant="material"
+                      type="input"
+                      label={t('projects.my_project.title_label')}
+                      placeholder={t('projects.my_project.title_label')}
+                      itemId={project.id}
+                      value={project.title}
+                      updateValueMutation={UPDATE_PROJECT_TITLE}
+                      refetchQueries={refetchQueries}
+                      helpText={t('projects.my_project.field_tooltip_title')}
+                      className="[&>div]:!mt-0 [&>div]:!mb-2"
+                    />
+                  ) : (
+                    <div className="space-y-1">
+                      <h4 className="text-xl font-semibold text-label-primary min-w-0 break-words">
+                        {project.title}
+                      </h4>
+                      <p className="text-xs text-label-secondary">
+                        {t('projects.my_project.title_locked_hint')}
+                      </p>
+                    </div>
+                  )}
+                </div>
+                <StatusChip status={project.status} />
+              </div>
+            ) : (
+              <div className="flex flex-wrap items-center gap-2 mb-1">
+                <h4 className="text-xl font-semibold text-label-primary min-w-0 break-words">{project.title}</h4>
+                <StatusChip status={project.status} />
+              </div>
+            )
+          }
+          coverSlot={
+            isContentEditable ? (
+              <FileUploadField
+                variant="material"
+                mutationPreset="role"
+                infoTooltip={t('projects.my_project.field_tooltip_cover_image')}
+                currentFileUrl={project.coverImageUrl}
+                uploadMutation={SAVE_PROJECT_IMAGE}
+                updateMutation={UPDATE_PROJECT_COVER_IMAGE_URL}
+                identifierVariables={{ itemId: project.id }}
+                uploadIdentifierVariables={{ projectId: project.id }}
+                updateFieldName="text"
+                acceptedFileTypes="image/*"
+                maxFileSize={5 * 1024 * 1024}
+                imageWidth={160}
+                imageHeight={96}
+                showFileName
+                refetchQueries={refetchQueries}
+                uploadText={t('projects.my_project.cover_image_upload_text')}
+                altText={t('projects.my_project.cover_image_alt')}
+                onUploadError={handleCoverUploadError}
+              />
+            ) : undefined
+          }
+          taglineSlot={
+            isContentEditable ? (
+              <div className="mt-3 rounded border border-border-primary p-3 min-h-[3.5rem] text-sm bg-bg-secondary/50">
+                <InputField
+                  variant="eduhub"
+                  type="input"
+                  placeholder={t('projects.my_project.tagline_label')}
+                  itemId={project.id}
+                  value={project.tagline ?? ''}
+                  updateValueMutation={UPDATE_PROJECT_TAGLINE}
+                  refetchQueries={refetchQueries}
+                  helpText={t('projects.my_project.field_tooltip_tagline')}
+                  maxLength={400}
+                  showCharacterCount={false}
+                  className="!mb-2 border-transparent bg-transparent"
+                />
+              </div>
+            ) : undefined
+          }
+          descriptionSlot={
+            isContentEditable ? (
+              <div className="rounded border border-border-primary p-3 flex-1 min-h-[10rem] text-sm bg-bg-secondary/50">
+                <InputField
+                  variant="eduhub"
+                  type="textarea"
+                  placeholder={t('projects.my_project.description_label')}
+                  itemId={project.id}
+                  value={project.description ?? ''}
+                  updateValueMutation={UPDATE_PROJECT_DESCRIPTION}
+                  refetchQueries={refetchQueries}
+                  helpText={t('projects.my_project.field_tooltip_description')}
+                  maxLength={8000}
+                  showCharacterCount={false}
+                  className="!mb-2 min-h-[9rem] border-transparent bg-transparent"
+                />
+              </div>
+            ) : undefined
           }
         />
       </div>
 
       {isContentEditable ? (
         <div className="space-y-3 pt-2 border-t border-border-primary">
-          {canEditProjectTitle ? (
-            <InputField
-              variant="material"
-              type="input"
-              label={t('projects.my_project.title_label')}
-              placeholder={t('projects.my_project.title_label')}
-              itemId={project.id}
-              value={project.title}
-              updateValueMutation={UPDATE_PROJECT_TITLE}
-              refetchQueries={refetchQueries}
-            />
-          ) : (
-            <div className="space-y-1">
-              <div className="text-xs font-medium text-label-secondary uppercase tracking-wide">
-                {t('projects.my_project.title_label')}
-              </div>
-              <p className="text-sm text-label-primary">{project.title}</p>
-              <p className="text-xs text-label-secondary">
-                {t('projects.my_project.title_locked_hint')}
-              </p>
-            </div>
-          )}
-          <InputField
-            variant="material"
-            type="input"
-            label={t('projects.my_project.tagline_label')}
-            placeholder={t('projects.my_project.tagline_label')}
-            itemId={project.id}
-            value={project.tagline ?? ''}
-            updateValueMutation={UPDATE_PROJECT_TAGLINE}
-            refetchQueries={refetchQueries}
-          />
-          <InputField
-            variant="material"
-            type="textarea"
-            label={t('projects.my_project.description_label')}
-            placeholder={t('projects.my_project.description_label')}
-            itemId={project.id}
-            value={project.description ?? ''}
-            updateValueMutation={UPDATE_PROJECT_DESCRIPTION}
-            refetchQueries={refetchQueries}
-          />
-          <InputField
-            variant="material"
-            type="link"
-            label={t('projects.my_project.documentation_url_label')}
-            placeholder={t('projects.my_project.documentation_url_placeholder')}
-            itemId={project.id}
-            value={project.documentationUrl ?? ''}
-            updateValueMutation={UPDATE_PROJECT_DOCUMENTATION_URL}
-            refetchQueries={refetchQueries}
-          />
-          <InputField
-            variant="material"
-            type="link"
-            label={t('projects.my_project.presentation_url_label')}
-            placeholder={t('projects.my_project.presentation_url_placeholder')}
-            itemId={project.id}
-            value={project.presentationUrl ?? ''}
-            updateValueMutation={UPDATE_PROJECT_PRESENTATION_URL}
-            refetchQueries={refetchQueries}
-          />
-          <InputField
-            variant="material"
-            type="link"
-            label={t('projects.my_project.external_url_label')}
-            placeholder={t('projects.my_project.external_url_placeholder')}
-            itemId={project.id}
-            value={project.externalUrl ?? ''}
-            updateValueMutation={UPDATE_PROJECT_EXTERNAL_URL}
-            refetchQueries={refetchQueries}
-          />
-          <InputField
-            variant="material"
-            type="link"
-            label={t('projects.my_project.cover_image_url_label')}
-            placeholder={t('projects.my_project.cover_image_url_placeholder')}
-            itemId={project.id}
-            value={project.coverImageUrl ?? ''}
-            updateValueMutation={UPDATE_PROJECT_COVER_IMAGE_URL}
-            refetchQueries={refetchQueries}
-          />
+          {project.status === ProjectStatus_enum.ONGOING ? (
+            <>
+              <FileUploadField
+                variant="material"
+                mutationPreset="role"
+                density="compact"
+                infoTooltip={t('projects.my_project.documentation_upload_tooltip')}
+                currentFileUrl={project.documentationUrl}
+                uploadMutation={SAVE_PROJECT_DOCUMENTATION}
+                updateMutation={UPDATE_PROJECT_DOCUMENTATION_URL}
+                identifierVariables={{ itemId: project.id }}
+                uploadIdentifierVariables={{ projectId: project.id }}
+                updateFieldName="text"
+                acceptedFileTypes={PROJECT_DOCUMENTATION_ACCEPT}
+                maxFileSize={25 * 1024 * 1024}
+                imageWidth={52}
+                imageHeight={52}
+                showFileName
+                refetchQueries={refetchQueries}
+                uploadText={t('projects.my_project.documentation_upload_prompt')}
+                altText={t('projects.my_project.documentation_upload_alt')}
+                onUploadError={handleCoverUploadError}
+              />
+              <FileUploadField
+                variant="material"
+                mutationPreset="role"
+                density="compact"
+                infoTooltip={t('projects.my_project.presentation_upload_tooltip')}
+                currentFileUrl={project.presentationUrl}
+                uploadMutation={SAVE_PROJECT_PRESENTATION}
+                updateMutation={UPDATE_PROJECT_PRESENTATION_URL}
+                identifierVariables={{ itemId: project.id }}
+                uploadIdentifierVariables={{ projectId: project.id }}
+                updateFieldName="text"
+                acceptedFileTypes={PROJECT_PRESENTATION_ACCEPT}
+                maxFileSize={25 * 1024 * 1024}
+                imageWidth={52}
+                imageHeight={52}
+                showFileName
+                refetchQueries={refetchQueries}
+                uploadText={t('projects.my_project.presentation_upload_prompt')}
+                altText={t('projects.my_project.presentation_upload_alt')}
+                onUploadError={handleCoverUploadError}
+              />
+              <InputField
+                variant="material"
+                type="link"
+                label={t('projects.my_project.external_url_label')}
+                placeholder={t('projects.my_project.external_url_placeholder')}
+                itemId={project.id}
+                value={project.externalUrl ?? ''}
+                updateValueMutation={UPDATE_PROJECT_EXTERNAL_URL}
+                refetchQueries={refetchQueries}
+                helpText={t('projects.my_project.field_tooltip_external_url')}
+              />
+            </>
+          ) : null}
           {documentationTemplateOptions.length > 0 ? (
             <DropDownSelector
               variant="material"
@@ -375,6 +579,7 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
               updateValueMutation={UPDATE_PROJECT_DOCUMENTATION_TEMPLATE}
               identifierVariables={{ itemId: project.id }}
               refetchQueries={refetchQueries}
+              helpText={t('projects.my_project.field_tooltip_documentation_template')}
             />
           ) : null}
           <CheckboxSelector
@@ -384,22 +589,29 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
             updateValueMutation={UPDATE_PROJECT_ACCEPTING_PARTICIPANTS}
             identifierVariables={{ itemId: project.id }}
             refetchQueries={refetchQueries}
+            helpText={t('projects.my_project.field_tooltip_accepting_participants')}
           />
         </div>
       ) : null}
 
-      <div className="border-t border-border-primary pt-4 space-y-2">
-        <h4 className="text-sm font-medium text-label-primary">
-          {t('projects.my_project.checklist_heading')}
-        </h4>
-        <SubmissionChecklist project={project} projectType={projectType} />
-        <Button
-          filled
-          onClick={() => setSubmitDialogOpen(true)}
-          disabled={!canSubmit || submitting}
-        >
-          {t('projects.my_project.submit_button')}
-        </Button>
+      <div className="border-t border-border-primary pt-4">
+        <div className="flex flex-wrap gap-2">
+          {canLeaveProject ? (
+            <Tooltip title={t('projects.my_project.action_tooltip_leave')}>
+              <span className="inline-flex">
+                <Button onClick={handleOpenLeaveDialog} disabled={leaving}>
+                  {t('projects.my_project.leave_button')}
+                </Button>
+              </span>
+            </Tooltip>
+          ) : (
+            <Tooltip title={t('projects.my_project.leave_disabled_tooltip')}>
+              <span className="inline-flex">
+                <Button disabled>{t('projects.my_project.leave_button')}</Button>
+              </span>
+            </Tooltip>
+          )}
+        </div>
       </div>
 
       <SubmitConfirmationDialog
@@ -407,6 +619,13 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
         onClose={() => setSubmitDialogOpen(false)}
         onConfirm={handleSubmitConfirm}
         loading={submitting}
+      />
+
+      <RequestProjectReviewDialog
+        open={requestReviewDialogOpen}
+        onClose={() => setRequestReviewDialogOpen(false)}
+        onConfirm={handleRequestProjectReviewConfirm}
+        loading={requestingProjectReview}
       />
 
       <ManageRequestsDialog

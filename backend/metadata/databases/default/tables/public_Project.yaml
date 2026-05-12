@@ -160,6 +160,7 @@ select_permissions:
         - status
         - submittedAt
         - submittedBy
+        - projectReviewRequestedAt
         - tagline
         - title
         - type
@@ -198,6 +199,7 @@ select_permissions:
         - status
         - submittedAt
         - submittedBy
+        - projectReviewRequestedAt
         - tagline
         - title
         - type
@@ -275,6 +277,7 @@ update_permissions:
         - status
         - submittedBy
         - tagline
+        - projectReviewRequestedAt
         - title
         - type
       filter:

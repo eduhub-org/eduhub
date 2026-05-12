@@ -1695,6 +1695,7 @@ export enum Project_select_column {
   organizationId = "organizationId",
   parentProjectId = "parentProjectId",
   presentationUrl = "presentationUrl",
+  projectReviewRequestedAt = "projectReviewRequestedAt",
   proposedByUserId = "proposedByUserId",
   rating = "rating",
   score = "score",
@@ -1738,6 +1739,7 @@ export enum Project_update_column {
   organizationId = "organizationId",
   parentProjectId = "parentProjectId",
   presentationUrl = "presentationUrl",
+  projectReviewRequestedAt = "projectReviewRequestedAt",
   proposedByUserId = "proposedByUserId",
   rating = "rating",
   score = "score",
@@ -8981,6 +8983,7 @@ export interface Project_bool_exp {
   organizationId?: Int_comparison_exp | null;
   parentProjectId?: Int_comparison_exp | null;
   presentationUrl?: String_comparison_exp | null;
+  projectReviewRequestedAt?: timestamptz_comparison_exp | null;
   proposedByUserId?: uuid_comparison_exp | null;
   rating?: ProjectRating_enum_comparison_exp | null;
   score?: numeric_comparison_exp | null;
@@ -9023,6 +9026,7 @@ export interface Project_insert_input {
   organizationId?: number | null;
   parentProjectId?: number | null;
   presentationUrl?: string | null;
+  projectReviewRequestedAt?: any | null;
   proposedByUserId?: any | null;
   rating?: ProjectRating_enum | null;
   score?: any | null;
@@ -9050,6 +9054,7 @@ export interface Project_max_order_by {
   organizationId?: order_by | null;
   parentProjectId?: order_by | null;
   presentationUrl?: order_by | null;
+  projectReviewRequestedAt?: order_by | null;
   proposedByUserId?: order_by | null;
   score?: order_by | null;
   submittedAt?: order_by | null;
@@ -9075,6 +9080,7 @@ export interface Project_min_order_by {
   organizationId?: order_by | null;
   parentProjectId?: order_by | null;
   presentationUrl?: order_by | null;
+  projectReviewRequestedAt?: order_by | null;
   proposedByUserId?: order_by | null;
   score?: order_by | null;
   submittedAt?: order_by | null;

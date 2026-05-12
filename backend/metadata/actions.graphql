@@ -182,6 +182,30 @@ type Mutation {
 }
 
 type Mutation {
+  saveProjectImage(
+    base64file: String!
+    filename: String!
+    projectid: Int!
+  ): saveImageResult
+}
+
+type Mutation {
+  saveProjectDocumentation(
+    base64file: String!
+    filename: String!
+    projectid: Int!
+  ): saveFileResult
+}
+
+type Mutation {
+  saveProjectPresentation(
+    base64file: String!
+    filename: String!
+    projectid: Int!
+  ): saveFileResult
+}
+
+type Mutation {
   saveOrganizationLogo(
     base64file: String!
     filename: String!

@@ -1,8 +1,8 @@
 import { FC, useCallback, useMemo, useState, useId, useRef, useEffect } from 'react';
 import Image from 'next/image';
-import { MdUpload, MdDownload, MdCloudUpload, MdDelete } from 'react-icons/md';
+import { MdUpload, MdDownload, MdCloudUpload, MdDelete, MdInfoOutline } from 'react-icons/md';
 import { CircularProgress, IconButton, Tooltip, LinearProgress } from '@mui/material';
-import { useAdminMutation } from '../../../hooks/authedMutation';
+import { useFlexibleMutation } from '../../../hooks/authedMutation';
 import { useLazyRoleQuery } from '../../../hooks/authedQuery';
 import { getPublicImageUrl, parseFileUploadEvent, getPublicUrl, UploadFile } from '../../../helpers/filehandling';
 import { GET_SIGNED_URL } from '../../../queries/actions';
@@ -38,8 +38,12 @@ export const FileUploadField: FC<FileUploadFieldProps> = ({
   onUploadSuccess,
   onUploadError,
   className = '',
+  mutationPreset = 'admin',
+  density = 'default',
+  infoTooltip,
 }) => {
   const t = useTranslations('common');
+  const isCompact = density === 'compact';
   const [isUploading, setIsUploading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
@@ -103,8 +107,8 @@ export const FileUploadField: FC<FileUploadFieldProps> = ({
     return null;
   }, [currentFileUrl, detectedType, accessUrl, signedUrlData]);
 
-  // Mutations
-  const [upload] = useAdminMutation(uploadMutation, {
+  // Mutations (admin manage course vs. participant project cover)
+  const [upload] = useFlexibleMutation(uploadMutation, mutationPreset, {
     refetchQueries,
     onError: (error) => {
       setIsUploading(false);
@@ -116,7 +120,7 @@ export const FileUploadField: FC<FileUploadFieldProps> = ({
     },
   });
 
-  const [update] = useAdminMutation(updateMutation, {
+  const [update] = useFlexibleMutation(updateMutation, mutationPreset, {
     refetchQueries,
     onError: (error) => {
       setIsUploading(false);
@@ -128,7 +132,7 @@ export const FileUploadField: FC<FileUploadFieldProps> = ({
     },
   });
 
-  const [remove] = useAdminMutation(removeMutation ?? updateMutation, {
+  const [remove] = useFlexibleMutation(removeMutation ?? updateMutation, mutationPreset, {
     refetchQueries,
     onError: (error) => {
       const errorMessage = error.message || t('file_upload.upload_error');
@@ -193,6 +197,9 @@ export const FileUploadField: FC<FileUploadFieldProps> = ({
         // Extract upload response - handle different mutation response structures
         const uploadData =
           uploadResult.data?.saveCourseImage ||
+          uploadResult.data?.saveProjectImage ||
+          uploadResult.data?.saveProjectDocumentation ||
+          uploadResult.data?.saveProjectPresentation ||
           uploadResult.data?.saveAttendanceCertificateTemplate ||
           uploadResult.data?.saveAchievementCertificateTemplate ||
           uploadResult.data?.[Object.keys(uploadResult.data || {})[0]];
@@ -443,7 +450,10 @@ export const FileUploadField: FC<FileUploadFieldProps> = ({
 
   // Determine container classes based on state
   const containerClasses = useMemo(() => {
-    const baseClasses = 'border-2 rounded-lg p-4 transition-all duration-200';
+    const densityPad = isCompact ? 'p-2' : 'p-4';
+    const densityRadius = isCompact ? 'rounded-md' : 'rounded-lg';
+    const densityBorder = isCompact ? 'border' : 'border-2';
+    const baseClasses = `${densityBorder} ${densityRadius} ${densityPad} transition-all duration-200`;
     let stateClasses = 'border-dashed border-gray-300 bg-gray-50';
 
     if (isDragging) {
@@ -454,24 +464,38 @@ export const FileUploadField: FC<FileUploadFieldProps> = ({
       stateClasses = 'border-solid border-gray-300 bg-white';
     }
 
-    return `${baseClasses} ${stateClasses} ${className}`;
-  }, [isDragging, isHovering, currentFileUrl, isUploading, className]);
+    const infoInset = infoTooltip ? (isCompact ? ' pr-9' : ' pr-11') : '';
+    return `${baseClasses} ${stateClasses} ${infoInset} ${className}`;
+  }, [isCompact, infoTooltip, isDragging, isHovering, currentFileUrl, isUploading, className]);
+
+  const fileIconBoxPx = isCompact ? 52 : 96;
+
+  const showRestrictionLine =
+    !infoTooltip && (acceptedTypesText !== 'All file types' || maxSizeText);
 
   // Render empty state
   const renderEmptyState = () => (
     <div
-      className="flex flex-col items-center justify-center space-y-3 py-6 cursor-pointer"
+      className={`flex flex-col items-center justify-center cursor-pointer ${
+        isCompact ? 'space-y-1 py-2' : 'space-y-3 py-6'
+      }`}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
       role="button"
       tabIndex={0}
       aria-label={uploadText || t('file_upload.click_or_drag')}
-      aria-describedby={`${inputId}-restrictions`}
+      aria-describedby={showRestrictionLine ? `${inputId}-restrictions` : undefined}
     >
-      <MdCloudUpload className="w-16 h-16 text-gray-400" />
-      <div className="flex flex-col items-center space-y-1">
-        <span className="text-sm font-medium text-gray-700">{uploadText || t('file_upload.click_or_drag')}</span>
-        {(acceptedTypesText !== 'All file types' || maxSizeText) && (
+      <MdCloudUpload className={isCompact ? 'w-8 h-8 text-gray-400' : 'w-16 h-16 text-gray-400'} />
+      <div className={`flex flex-col items-center ${isCompact ? 'space-y-0.5' : 'space-y-1'}`}>
+        <span
+          className={
+            isCompact ? 'text-xs font-medium text-gray-700 text-center px-2' : 'text-sm font-medium text-gray-700'
+          }
+        >
+          {uploadText || t('file_upload.click_or_drag')}
+        </span>
+        {showRestrictionLine && (
           <div id={`${inputId}-restrictions`} className="text-xs text-gray-500 text-center">
             {acceptedTypesText !== 'All file types' && <span>{acceptedTypesText}</span>}
             {acceptedTypesText !== 'All file types' && maxSizeText && <span> • </span>}
@@ -484,13 +508,13 @@ export const FileUploadField: FC<FileUploadFieldProps> = ({
 
   // Render loading state
   const renderLoadingState = () => (
-    <div className="flex flex-col items-center justify-center space-y-3 py-6 w-full">
-      <CircularProgress size={40} />
-      <div className="flex flex-col items-center space-y-2 w-full max-w-xs">
-        <span className="text-sm text-gray-600">{t('file_upload.uploading')}</span>
+    <div className={`flex flex-col items-center justify-center w-full ${isCompact ? 'space-y-2 py-3' : 'space-y-3 py-6'}`}>
+      <CircularProgress size={isCompact ? 28 : 40} />
+      <div className={`flex flex-col items-center w-full max-w-xs ${isCompact ? 'space-y-1' : 'space-y-2'}`}>
+        <span className={isCompact ? 'text-xs text-gray-600' : 'text-sm text-gray-600'}>{t('file_upload.uploading')}</span>
         <div className="w-full">
           <LinearProgress variant="determinate" value={uploadProgress} className="w-full" />
-          <span className="text-xs text-gray-500 mt-1">{uploadProgress}%</span>
+          <span className={`text-xs text-gray-500 ${isCompact ? 'mt-0.5' : 'mt-1'}`}>{uploadProgress}%</span>
         </div>
       </div>
     </div>
@@ -504,8 +528,8 @@ export const FileUploadField: FC<FileUploadFieldProps> = ({
     }
 
     return (
-      <div className="flex flex-col space-y-4 w-full">
-        <div className="flex items-start space-x-4">
+      <div className={`flex flex-col w-full ${isCompact ? 'space-y-2' : 'space-y-4'}`}>
+        <div className={`flex items-start ${isCompact ? 'space-x-2' : 'space-x-4'}`}>
           <div className="relative flex-shrink-0">
             {displayUrl ? (
               <Image
@@ -526,14 +550,20 @@ export const FileUploadField: FC<FileUploadFieldProps> = ({
             )}
           </div>
           <div className="flex-1 flex flex-col justify-between min-w-0">
-            <div className="flex flex-col space-y-1">
+            <div className={`flex flex-col ${isCompact ? 'space-y-0' : 'space-y-1'}`}>
               {showFileName && filename && (
                 <Tooltip title={filename}>
-                  <span className="text-sm font-medium text-gray-900 truncate">{filename}</span>
+                  <span
+                    className={
+                      isCompact ? 'text-xs font-medium text-gray-900 truncate' : 'text-sm font-medium text-gray-900 truncate'
+                    }
+                  >
+                    {filename}
+                  </span>
                 </Tooltip>
               )}
             </div>
-            <div className="flex flex-wrap gap-2 mt-2">
+            <div className={`flex flex-wrap gap-2 ${isCompact ? 'mt-1' : 'mt-2'}`}>
               <Tooltip title={t('file_upload.replace')} placement="top">
                 <IconButton
                   size="small"
@@ -579,22 +609,33 @@ export const FileUploadField: FC<FileUploadFieldProps> = ({
     if (!fileIconInfo) return null;
     const { Icon, color, labelKey } = fileIconInfo;
 
+    const iconClass = isCompact ? 'w-8 h-8' : 'w-16 h-16';
+
     return (
-      <div className="flex flex-col space-y-4 w-full">
-        <div className="flex items-start space-x-4">
-          <div className="flex-shrink-0 flex items-center justify-center bg-gray-50 rounded border border-gray-200" style={{ width: '96px', height: '96px' }}>
-            <Icon className={`w-16 h-16 ${color}`} />
+      <div className={`flex flex-col w-full ${isCompact ? 'space-y-2' : 'space-y-4'}`}>
+        <div className={`flex items-start ${isCompact ? 'space-x-2' : 'space-x-4'}`}>
+          <div
+            className="flex-shrink-0 flex items-center justify-center bg-gray-50 rounded border border-gray-200"
+            style={{ width: `${fileIconBoxPx}px`, height: `${fileIconBoxPx}px` }}
+          >
+            <Icon className={`${iconClass} ${color}`} />
           </div>
           <div className="flex-1 flex flex-col justify-between min-w-0">
-            <div className="flex flex-col space-y-1">
+            <div className={`flex flex-col ${isCompact ? 'space-y-0' : 'space-y-1'}`}>
               {showFileName && filename && (
                 <Tooltip title={filename}>
-                  <span className="text-sm font-medium text-gray-900 truncate">{filename}</span>
+                  <span
+                    className={
+                      isCompact ? 'text-xs font-medium text-gray-900 truncate' : 'text-sm font-medium text-gray-900 truncate'
+                    }
+                  >
+                    {filename}
+                  </span>
                 </Tooltip>
               )}
-              <span className="text-xs text-gray-500">{t(labelKey)}</span>
+              <span className={isCompact ? 'text-[10px] text-gray-500' : 'text-xs text-gray-500'}>{t(labelKey)}</span>
             </div>
-            <div className="flex flex-wrap gap-2 mt-2">
+            <div className={`flex flex-wrap gap-2 ${isCompact ? 'mt-1' : 'mt-2'}`}>
               <Tooltip title={t('file_upload.replace')} placement="top">
                 <IconButton
                   size="small"
@@ -635,19 +676,33 @@ export const FileUploadField: FC<FileUploadFieldProps> = ({
     );
   };
 
+  const infoTooltipTitle = infoTooltip ? (
+    <span className="block max-w-sm whitespace-pre-line text-xs leading-snug">{infoTooltip}</span>
+  ) : null;
+
   // Main render
   return (
-    <div
-      className={containerClasses}
-      onDragEnter={handleDragEnter}
-      onDragOver={handleDragOver}
-      onDragLeave={handleDragLeave}
-      onDrop={handleDrop}
-      onMouseEnter={() => setIsHovering(true)}
-      onMouseLeave={() => setIsHovering(false)}
-      role="region"
-      aria-label={t('file_upload.upload_text')}
-    >
+    <div className="relative">
+      {infoTooltip && infoTooltipTitle ? (
+        <div className="absolute top-1 right-1 z-[1]" onClick={(e) => e.stopPropagation()}>
+          <Tooltip title={infoTooltipTitle} placement="left" enterTouchDelay={0}>
+            <IconButton size="small" aria-label={t('file_upload.info_tooltip_label')} edge="end" className="text-gray-500">
+              <MdInfoOutline className={isCompact ? 'text-base' : 'text-lg'} />
+            </IconButton>
+          </Tooltip>
+        </div>
+      ) : null}
+      <div
+        className={containerClasses}
+        onDragEnter={handleDragEnter}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+        onMouseEnter={() => setIsHovering(true)}
+        onMouseLeave={() => setIsHovering(false)}
+        role="region"
+        aria-label={t('file_upload.upload_text')}
+      >
       {isUploading ? (
         renderLoadingState()
       ) : currentFileUrl ? (
@@ -669,6 +724,7 @@ export const FileUploadField: FC<FileUploadFieldProps> = ({
         disabled={isUploading}
         aria-hidden="true"
       />
+      </div>
     </div>
   );
 };

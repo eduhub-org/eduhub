@@ -300,6 +300,66 @@ actions:
           value: '[460, 640, 768, 1024, 1280, 1536]'
     permissions:
       - role: instructor_access
+  - name: saveProjectImage
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: bucket
+          value_from_env: HASURA_BUCKET
+        - name: name
+          value: saveImage
+        - name: file-path
+          value: projects/project-${projectid}/public/cover-image/${filename}
+        - name: is-public
+          value: "true"
+        - name: sizes
+          value: '[460, 640, 768, 1024, 1280, 1536]'
+    permissions:
+      - role: instructor_access
+      - role: user_access
+  - name: saveProjectDocumentation
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: bucket
+          value_from_env: HASURA_BUCKET
+        - name: name
+          value: saveFile
+        - name: file-path
+          value: projects/project-${projectid}/public/documentation/${filename}
+        - name: is-public
+          value: "true"
+        - name: max-file-size-mb
+          value: "25"
+    permissions:
+      - role: instructor_access
+      - role: user_access
+  - name: saveProjectPresentation
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: bucket
+          value_from_env: HASURA_BUCKET
+        - name: name
+          value: saveFile
+        - name: file-path
+          value: projects/project-${projectid}/public/presentation/${filename}
+        - name: is-public
+          value: "true"
+        - name: max-file-size-mb
+          value: "25"
+    permissions:
+      - role: instructor_access
+      - role: user_access
   - name: saveOrganizationLogo
     definition:
       kind: synchronous

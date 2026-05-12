@@ -224,8 +224,6 @@ const ExpandableProgramRow: FC<ExpandableProgramRowProps> = ({ program }) => {
                 helpText={t('project_defaults.default_project_type.help_text')}
                 value={program.defaultProjectType ?? ''}
                 options={projectTypeOptions}
-                nullable
-                nullableLabel={t('project_defaults.default_project_type.none_option')}
                 updateValueMutation={UPDATE_PROGRAM_DEFAULT_PROJECT_TYPE}
                 identifierVariables={{ itemId: program.id }}
                 refetchQueries={['ProgramList']}

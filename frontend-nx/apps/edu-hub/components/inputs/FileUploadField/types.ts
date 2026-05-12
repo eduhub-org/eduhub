@@ -107,6 +107,11 @@ export interface FileUploadFieldProps {
   refetchQueries?: string[];
 
   /**
+   * Uses admin-only Hasura headers (default) or the current session role (e.g. course participant).
+   */
+  mutationPreset?: 'admin' | 'role';
+
+  /**
    * Callback fired when upload succeeds.
    */
   onUploadSuccess?: (filePath: string) => void;
@@ -120,5 +125,16 @@ export interface FileUploadFieldProps {
    * Additional CSS classes for the container.
    */
   className?: string;
+
+  /**
+   * Visual density. "compact" uses tighter padding, smaller icons, and shorter empty states.
+   */
+  density?: 'default' | 'compact';
+
+  /**
+   * When set, shows an info control that opens a tooltip (e.g. format limits and upload guidance).
+   * Use a multi-sentence string; newlines are preserved in the tooltip.
+   */
+  infoTooltip?: string;
 }
 

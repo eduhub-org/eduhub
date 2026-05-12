@@ -12,12 +12,21 @@ interface ProjectPreviewLayoutProps {
   showResourceLinks: boolean;
   /** Optional row above the main grid (e.g. project title + status chip). */
   titleRow?: ReactNode;
+  /** Optional: replace cover preview (e.g. upload field). */
+  coverSlot?: ReactNode;
+  /** Optional: replace tagline area (e.g. inline InputField). */
+  taglineSlot?: ReactNode;
+  /** Optional: replace description panel (e.g. inline InputField). */
+  descriptionSlot?: ReactNode;
 }
 
 const ProjectPreviewLayout: FC<ProjectPreviewLayoutProps> = ({
   project,
   showResourceLinks,
   titleRow,
+  coverSlot,
+  taglineSlot,
+  descriptionSlot,
 }) => {
   const t = useTranslations('course');
 
@@ -41,34 +50,46 @@ const ProjectPreviewLayout: FC<ProjectPreviewLayoutProps> = ({
 
       <div className="flex flex-col lg:flex-row lg:items-stretch gap-6">
         <div className="shrink-0 w-full lg:w-56">
-          <div className="overflow-hidden rounded-lg border border-border-primary bg-bg-secondary">
-            <img
-              src={coverSrc}
-              alt=""
-              className="w-full aspect-video object-cover max-h-48"
-            />
-          </div>
-          <div className="mt-3 rounded border border-border-primary p-3 min-h-[3.5rem] text-sm bg-bg-secondary/50">
-            {hasTagline ? (
-              <p className="font-medium text-label-primary whitespace-pre-line">{project.tagline}</p>
-            ) : (
-              <p className="text-label-secondary italic">
-                {t('projects.table.expandable_tagline_missing')}
-              </p>
-            )}
-          </div>
+          {coverSlot ? (
+            <div className="w-full">{coverSlot}</div>
+          ) : (
+            <div className="overflow-hidden rounded-lg border border-border-primary bg-bg-secondary">
+              <img
+                src={coverSrc}
+                alt=""
+                className="w-full aspect-video object-cover max-h-48"
+              />
+            </div>
+          )}
+          {taglineSlot ? (
+            taglineSlot
+          ) : (
+            <div className="mt-3 rounded border border-border-primary p-3 min-h-[3.5rem] text-sm bg-bg-secondary/50">
+              {hasTagline ? (
+                <p className="font-medium text-label-primary whitespace-pre-line">{project.tagline}</p>
+              ) : (
+                <p className="text-label-secondary italic">
+                  {t('projects.table.expandable_tagline_missing')}
+                </p>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="min-w-0 flex-1 flex flex-col">
-          <div className="rounded border border-border-primary p-3 flex-1 min-h-[10rem] text-sm bg-bg-secondary/50">
-            {hasDescription ? (
-              <p className="whitespace-pre-line text-label-primary">{project.description}</p>
-            ) : (
-              <p className="text-label-secondary italic">
-                {t('projects.table.expandable_description_missing')}
-              </p>
-            )}
-          </div>
+          {descriptionSlot ? (
+            descriptionSlot
+          ) : (
+            <div className="rounded border border-border-primary p-3 flex-1 min-h-[10rem] text-sm bg-bg-secondary/50">
+              {hasDescription ? (
+                <p className="whitespace-pre-line text-label-primary">{project.description}</p>
+              ) : (
+                <p className="text-label-secondary italic">
+                  {t('projects.table.expandable_description_missing')}
+                </p>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="shrink-0 w-full lg:w-64 lg:max-w-xs lg:border-l lg:border-border-primary lg:pl-6">

@@ -137,6 +137,10 @@ export interface MyProjectByCourse_Project {
    * User who issued the most recent SUBMITTED transition. Set via a Hasura permission preset (x-hasura-user-id) so the client cannot impersonate another author.
    */
   submittedBy: any | null;
+  /**
+   * Timestamp when project authors asked course staff to review the proposed project (still PROPOSED until staff confirm the team).
+   */
+  projectReviewRequestedAt: any | null;
   created_at: any;
   updated_at: any;
   /**

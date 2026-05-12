@@ -26,16 +26,39 @@ insert_permissions:
         - participationStatus
         - projectId
         - userId
+  # Single user_access rule covers two flows; Hasura allows only one insert permission per role.
+  # 1) Self-proposed author: course participant proposes their own project and is added ACCEPTED in the
+  #    same nested insert (InsertSelfProposedProject).
+  # 2) Join request: course participant asks to join another user's open project as REQUESTED
+  #    (InsertProjectAuthorRequest).
+  # participationStatus must be supplied by the client; the check gates each branch so a user cannot
+  # claim ACCEPTED on a project they did not propose.
   - role: user_access
     permission:
       check:
-        Project:
-          acceptingParticipants:
-            _eq: true
+        _or:
+          - _and:
+              - participationStatus:
+                  _eq: ACCEPTED
+              - Project:
+                  _and:
+                    - proposedByUserId:
+                        _eq: X-Hasura-User-Id
+                    - status:
+                        _eq: PROPOSED
+          - _and:
+              - participationStatus:
+                  _eq: REQUESTED
+              - Project:
+                  _and:
+                    - acceptingParticipants:
+                        _eq: true
+                    - proposedByUserId:
+                        _neq: X-Hasura-User-Id
       set:
         userId: x-hasura-user-id
-        participationStatus: REQUESTED
       columns:
+        - participationStatus
         - projectId
 select_permissions:
   - role: anonymous

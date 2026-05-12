@@ -45,6 +45,7 @@ export const PROJECT_FRAGMENT_DETAILED = gql`
     parentProjectId
     submittedAt
     submittedBy
+    projectReviewRequestedAt
     created_at
     updated_at
     Organization {
@@ -134,6 +135,10 @@ export const MY_PROJECT_BY_COURSE = gql`
 `;
 
 export const INSERT_SELF_PROPOSED_PROJECT = gql`
+  # Course participants only (JWT role user → user_access). The nested ProjectAuthor row is
+  # inserted with participationStatus: ACCEPTED; the ProjectAuthor insert_permission for user_access
+  # gates this on Project.proposedByUserId = self AND Project.status = PROPOSED, and presets
+  # userId to the session user.
   mutation InsertSelfProposedProject(
     $title: String!
     $tagline: String
@@ -154,13 +159,23 @@ export const INSERT_SELF_PROPOSED_PROJECT = gql`
         acceptingParticipants: $acceptingParticipants
         proposedByUserId: $proposedByUserId
         status: PROPOSED
-        ProjectAuthors: {
-          data: { participationStatus: ACCEPTED }
-        }
+        ProjectAuthors: { data: { participationStatus: ACCEPTED } }
         ProjectCourses: { data: { courseId: $courseId } }
       }
     ) {
       id
+    }
+  }
+`;
+
+export const MARK_PROJECT_REVIEW_REQUESTED = gql`
+  mutation MarkProjectReviewRequested($itemId: Int!, $requestedAt: timestamptz!) {
+    update_Project_by_pk(
+      pk_columns: { id: $itemId }
+      _set: { projectReviewRequestedAt: $requestedAt }
+    ) {
+      id
+      projectReviewRequestedAt
     }
   }
 `;
@@ -202,7 +217,7 @@ export const UPDATE_PROJECT_DESCRIPTION = gql`
 `;
 
 export const UPDATE_PROJECT_DOCUMENTATION_URL = gql`
-  mutation UpdateProjectDocumentationUrl($itemId: Int!, $text: String!) {
+  mutation UpdateProjectDocumentationUrl($itemId: Int!, $text: String) {
     update_Project_by_pk(
       pk_columns: { id: $itemId }
       _set: { documentationUrl: $text }
@@ -214,7 +229,7 @@ export const UPDATE_PROJECT_DOCUMENTATION_URL = gql`
 `;
 
 export const UPDATE_PROJECT_PRESENTATION_URL = gql`
-  mutation UpdateProjectPresentationUrl($itemId: Int!, $text: String!) {
+  mutation UpdateProjectPresentationUrl($itemId: Int!, $text: String) {
     update_Project_by_pk(
       pk_columns: { id: $itemId }
       _set: { presentationUrl: $text }
@@ -238,7 +253,7 @@ export const UPDATE_PROJECT_EXTERNAL_URL = gql`
 `;
 
 export const UPDATE_PROJECT_COVER_IMAGE_URL = gql`
-  mutation UpdateProjectCoverImageUrl($itemId: Int!, $text: String!) {
+  mutation UpdateProjectCoverImageUrl($itemId: Int!, $text: String) {
     update_Project_by_pk(
       pk_columns: { id: $itemId }
       _set: { coverImageUrl: $text }
@@ -288,8 +303,13 @@ export const SUBMIT_PROJECT = gql`
 `;
 
 export const INSERT_PROJECT_AUTHOR_REQUEST = gql`
+  # Join request from a course participant on another user's project. The ProjectAuthor insert
+  # permission for user_access gates this on Project.acceptingParticipants AND proposedByUserId ≠ self,
+  # and presets userId to the session user. participationStatus must be passed explicitly.
   mutation InsertProjectAuthorRequest($projectId: Int!) {
-    insert_ProjectAuthor_one(object: { projectId: $projectId }) {
+    insert_ProjectAuthor_one(
+      object: { projectId: $projectId, participationStatus: REQUESTED }
+    ) {
       id
       participationStatus
       userId

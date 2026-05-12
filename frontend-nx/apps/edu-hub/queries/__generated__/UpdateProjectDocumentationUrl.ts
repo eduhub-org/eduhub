@@ -22,5 +22,5 @@ export interface UpdateProjectDocumentationUrl {
 
 export interface UpdateProjectDocumentationUrlVariables {
   itemId: number;
-  text: string;
+  text?: string | null;
 }
