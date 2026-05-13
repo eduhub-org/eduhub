@@ -12276,12 +12276,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"icu-minify@npm:^4.9.1":
-  version: 4.9.1
-  resolution: "icu-minify@npm:4.9.1"
+"icu-minify@npm:^4.11.2":
+  version: 4.11.2
+  resolution: "icu-minify@npm:4.11.2"
   dependencies:
     "@formatjs/icu-messageformat-parser": ^3.4.0
-  checksum: 216fb791df5c41572b135246840b6d48d1081ecca173690f0a66691a82504cd4f9f8c163b9a8f6207bc94af706be1752e7811711f0070d162ceeaa4ca1b3ee61
+  checksum: bfc50ea29aa45770d27597b6889be4a62b59121b0685d34a49f27ddf1641ddfb042073488a22d9344b9160f9643c15ee5dec93d527617a536920be3f0155f1be
   languageName: node
   linkType: hard
 
@@ -16159,32 +16159,32 @@ __metadata:
   languageName: node
   linkType: hard
 
-"next-intl-swc-plugin-extractor@npm:^4.9.1":
-  version: 4.9.1
-  resolution: "next-intl-swc-plugin-extractor@npm:4.9.1"
-  checksum: b7b5c9f2ea8d12b5ff6c24dd3d5993ef011a98f915eed825471fded873063fb2b1d3a8e0a47de92e117063b6f6c17b989be8744135b82d537b62c9948a9ed2e5
+"next-intl-swc-plugin-extractor@npm:^4.11.2":
+  version: 4.11.2
+  resolution: "next-intl-swc-plugin-extractor@npm:4.11.2"
+  checksum: 622e88e10bc0aafe37edd941f16de291e5aa44afd891ff871c2bb836483f821e4866c676f7ffe9365384248e67d6ddd01ddb42aa15d5d7e9279ad09535c72f52
   languageName: node
   linkType: hard
 
-"next-intl@npm:^4.9.1":
-  version: 4.9.1
-  resolution: "next-intl@npm:4.9.1"
+"next-intl@npm:^4.9.2":
+  version: 4.11.2
+  resolution: "next-intl@npm:4.11.2"
   dependencies:
     "@formatjs/intl-localematcher": ^0.8.1
     "@parcel/watcher": ^2.4.1
     "@swc/core": ^1.15.2
-    icu-minify: ^4.9.1
+    icu-minify: ^4.11.2
     negotiator: ^1.0.0
-    next-intl-swc-plugin-extractor: ^4.9.1
+    next-intl-swc-plugin-extractor: ^4.11.2
     po-parser: ^2.1.1
-    use-intl: ^4.9.1
+    use-intl: ^4.11.2
   peerDependencies:
     next: ^12.0.0 || ^13.0.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
     react: ^16.8.0 || ^17.0.0 || ^18.0.0 || >=19.0.0-rc <19.0.0 || ^19.0.0
   peerDependenciesMeta:
     typescript:
       optional: true
-  checksum: edede12b6847f9950ee957716c969faba61ac6860b589cd4c1e5804df1e4f1ac08b48776adf759c319d73d60c89131ec1db062e520799609b28fa32768c3b4d0
+  checksum: 8df6963131fcbd57d245184650bce029a5eb1dc9ac985b97b6879dc539e27f690202682d39a8ae6efc6aec3156cb03f71275cae3c36240dcfc79c51b94e8bb8c
   languageName: node
   linkType: hard
 
@@ -17035,7 +17035,7 @@ __metadata:
     lucide-react: ^0.456.0
     next: ^15.5.18
     next-auth: ^4.24.7
-    next-intl: ^4.9.1
+    next-intl: ^4.9.2
     papaparse: ^5.4.1
     playwright: ^1.55.0
     postcss: 8.5.10
@@ -22061,17 +22061,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"use-intl@npm:^4.9.1":
-  version: 4.9.1
-  resolution: "use-intl@npm:4.9.1"
+"use-intl@npm:^4.11.2":
+  version: 4.11.2
+  resolution: "use-intl@npm:4.11.2"
   dependencies:
     "@formatjs/fast-memoize": ^3.1.0
     "@schummar/icu-type-parser": 1.21.5
-    icu-minify: ^4.9.1
+    icu-minify: ^4.11.2
     intl-messageformat: ^11.1.0
   peerDependencies:
     react: ^17.0.0 || ^18.0.0 || >=19.0.0-rc <19.0.0 || ^19.0.0
-  checksum: 0b73a121a77d7a3b514b1dfef17e4754267439bbacd0e901cf1bb3f03cf64e266fae438a2e797821f8ea94a5fe7de927a248d7d618952e8470507f1c79297227
+  checksum: 588870ad1fe59abe8f29f797c2e838c7b9f5bf438029a5c477b433b1dc11ac871ffe727fbc14f7abbedcf71275ff94168fd2ca2865bf38b2c65838b7bb88d396
   languageName: node
   linkType: hard
 
