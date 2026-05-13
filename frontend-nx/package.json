@@ -62,7 +62,7 @@
     "lodash": "^4.18.1",
     "loglevel": "^1.9.1",
     "lucide-react": "^0.456.0",
-    "next": "^15.5.14",
+    "next": "^15.5.18",
     "next-auth": "^4.24.7",
     "next-intl": "^4.9.1",
     "papaparse": "^5.4.1",
