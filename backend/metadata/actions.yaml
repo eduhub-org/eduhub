@@ -122,6 +122,8 @@ actions:
           value_from_env: HASURA_BUCKET
         - name: name
           value: getAdminUsers
+    permissions:
+      - role: instructor_access
   - name: getFormbricksResponses
     definition:
       kind: ""
@@ -359,7 +361,9 @@ actions:
         - name: bucket
           value_from_env: HASURA_BUCKET
         - name: name
-          value: setUserAdmin
+          value: updateAdminUser
+    permissions:
+      - role: instructor_access
   - name: validateFormbricksSurvey
     definition:
       kind: synchronous

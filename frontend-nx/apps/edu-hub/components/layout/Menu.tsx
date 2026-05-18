@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { FC, useCallback } from 'react';
 import { useIsAdmin, useIsInstructor } from '../../hooks/authentication';
+import { useCanManageOrganizationAdmins } from '../../hooks/useOrganizationAdminAccess';
 import { useTranslations } from 'next-intl';
 import useLogout from '../../hooks/logout';
 
@@ -53,6 +54,7 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
 
   const isAdmin = useIsAdmin();
   const isInstructor = useIsInstructor();
+  const canManageAdmins = useCanManageOrganizationAdmins();
   const isInstructorOrAdmin = isAdmin || isInstructor;
 
   const t = useTranslations('common');
@@ -115,6 +117,14 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
         <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/users')}>
           <Link className="w-full text-lg" href="/manage/users">
             {t('menu.user')}
+          </Link>
+        </MenuItem>
+      )}
+
+      {canManageAdmins && (
+        <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/admin-users')}>
+          <Link className="w-full text-lg" href="/manage/admin-users">
+            {t('menu.manage_admins')}
           </Link>
         </MenuItem>
       )}

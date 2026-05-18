@@ -51,6 +51,7 @@
       "calendar": "Calendar",
       "statistics": "Statistics",
       "course_instructor_manual": "Course Instructor Manual",
+      "manage_admins": "Manage admins",
       "logout": "Logout"
     },
     "change-password": "Change email or password",
@@ -1530,12 +1531,32 @@
     }
   },
   "manageAdminUsers": {
-    "headline": "Admin Users",
+    "headline": "Manage admins",
     "first_name": "First Name",
     "last_name": "Last Name",
     "email": "Email",
     "organization": "Organization",
-    "deletion_confirmation_question": "Are you sure you want to delete the admin rights of {firstName} {lastName} for the organization {organization}?"
+    "is_super_admin": "EduHub super admin",
+    "can_manage_events": "Can manage events",
+    "can_manage_courses": "Can manage courses",
+    "can_manage_users_and_settings": "Can manage users and settings",
+    "error_loading_admin_users": "Could not load super admin users.",
+    "access_denied": "You do not have permission to manage organization admins.",
+    "deletion_confirmation_question": "Are you sure you want to remove the admin rights of {firstName} {lastName} for the organization {organization}?",
+    "add_admin": {
+      "button": "Add organization admin",
+      "title": "Add organization admin",
+      "user_label": "User",
+      "select_user": "Select user",
+      "change_user": "Change user",
+      "cancel": "Cancel",
+      "save": "Add admin",
+      "saving": "Adding...",
+      "success": "Organization admin added.",
+      "error": "Could not add organization admin.",
+      "validation_user_required": "Please select a user.",
+      "validation_organization_required": "Please select an organization."
+    }
   },
   "manageAppSettings": {
     "backgroundImageURL": "Background image URL",

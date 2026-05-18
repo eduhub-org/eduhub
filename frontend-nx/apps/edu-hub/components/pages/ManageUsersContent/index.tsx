@@ -14,6 +14,7 @@ import { PageBlock } from '../../common/PageBlock';
 import CommonPageHeader from '../../common/CommonPageHeader';
 import NavigationButton from '../../common/NavigationButton';
 import { CreateUserDialog } from '../../common/dialogs/CreateUserDialog';
+import { useCanManageOrganizationAdmins } from '../../../hooks/useOrganizationAdminAccess';
 
 const ExpandableUserRow: FC<{ row: UsersByLastName_User }> = ({ row }) => {
   const t = useTranslations('manageUsers');
@@ -52,6 +53,7 @@ const ExpandableUserRow: FC<{ row: UsersByLastName_User }> = ({ row }) => {
 
 const ManageUsersContent: FC = () => {
   const t = useTranslations('manageUsers');
+  const canManageAdmins = useCanManageOrganizationAdmins();
   const [pageSize, setPageSize] = useState(20);
   const [createUserDialogOpen, setCreateUserDialogOpen] = useState(false);
 
@@ -127,9 +129,11 @@ const ManageUsersContent: FC = () => {
           <div>
             <div className="flex justify-between items-center mb-4">
               <CommonPageHeader headline={t('headline')} />
-              <NavigationButton href="/manage/admin-users" filled inverted>
-                {t('manage_admins')}
-              </NavigationButton>
+              {canManageAdmins && (
+                <NavigationButton href="/manage/admin-users" filled inverted>
+                  {t('manage_admins')}
+                </NavigationButton>
+              )}
             </div>
             <TableGrid
               columns={columns}

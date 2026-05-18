@@ -8,3 +8,109 @@ object_relationships:
   - name: User
     using:
       foreign_key_constraint_on: userId
+select_permissions:
+  - role: instructor_access
+    permission:
+      columns:
+        - canManageCourses
+        - canManageEvents
+        - canManageSettings
+        - created_at
+        - id
+        - organizationId
+        - updated_at
+        - userId
+      filter: {}
+      allow_aggregations: true
+  - role: user_access
+    permission:
+      columns:
+        - canManageCourses
+        - canManageEvents
+        - canManageSettings
+        - created_at
+        - id
+        - organizationId
+        - updated_at
+        - userId
+      filter:
+        Organization:
+          OrganizationAdmins:
+            _and:
+              - userId:
+                  _eq: X-Hasura-User-Id
+              - canManageSettings:
+                  _eq: true
+      allow_aggregations: true
+insert_permissions:
+  - role: instructor_access
+    permission:
+      check: {}
+      columns:
+        - canManageCourses
+        - canManageEvents
+        - canManageSettings
+        - organizationId
+        - userId
+  - role: user_access
+    permission:
+      check:
+        Organization:
+          OrganizationAdmins:
+            _and:
+              - userId:
+                  _eq: X-Hasura-User-Id
+              - canManageSettings:
+                  _eq: true
+      columns:
+        - canManageCourses
+        - canManageEvents
+        - canManageSettings
+        - organizationId
+        - userId
+update_permissions:
+  - role: instructor_access
+    permission:
+      columns:
+        - canManageCourses
+        - canManageEvents
+        - canManageSettings
+        - organizationId
+      filter: {}
+      check: {}
+  - role: user_access
+    permission:
+      columns:
+        - canManageCourses
+        - canManageEvents
+        - canManageSettings
+      filter:
+        Organization:
+          OrganizationAdmins:
+            _and:
+              - userId:
+                  _eq: X-Hasura-User-Id
+              - canManageSettings:
+                  _eq: true
+      check:
+        Organization:
+          OrganizationAdmins:
+            _and:
+              - userId:
+                  _eq: X-Hasura-User-Id
+              - canManageSettings:
+                  _eq: true
+delete_permissions:
+  - role: instructor_access
+    permission:
+      filter: {}
+  - role: user_access
+    permission:
+      filter:
+        Organization:
+          OrganizationAdmins:
+            _and:
+              - userId:
+                  _eq: X-Hasura-User-Id
+              - canManageSettings:
+                  _eq: true

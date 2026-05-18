@@ -1,3 +1,6 @@
+- role_name: admin
+  role_set:
+    - instructor
 - role_name: instructor
   role_set:
     - user_access

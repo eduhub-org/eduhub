@@ -53,3 +53,5 @@ export const useCurrentRole = (): AuthRoles => {
       return AuthRoles.anonymous;
   }
 };
+
+export { useCanManageOrganizationAdmins, useManageableOrganizationIds } from './useOrganizationAdminAccess';

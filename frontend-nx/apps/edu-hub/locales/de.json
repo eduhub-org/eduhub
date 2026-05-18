@@ -51,6 +51,7 @@
       "calendar": "Kalender",
       "statistics": "Statistiken",
       "course_instructor_manual": "Kursleitungshandbuch",
+      "manage_admins": "Admins verwalten",
       "logout": "Logout"
     },
     "change-password": "Passwort oder E-Mail ändern",
@@ -1515,16 +1516,32 @@
     }
   },
   "manageAdminUsers": {
-    "headline": "Admin-Benutzer",
+    "headline": "Admins verwalten",
     "first_name": "Vorname",
     "last_name": "Nachname",
     "email": "E-Mail",
     "organization": "Organisation",
-    "deletion_confirmation_question": "Bist du sicher, dass du die Administrationsrechte von {firstName} {lastName} für die Organisation {organization} löschen möchtest?",
-    "is_super_admin": "Ist Super-Admin",
+    "deletion_confirmation_question": "Bist du sicher, dass du die Administrationsrechte von {firstName} {lastName} für die Organisation {organization} entfernen möchtest?",
+    "is_super_admin": "EduHub-Super-Admin",
     "can_manage_events": "Kann Events verwalten",
     "can_manage_courses": "Kann Kurse verwalten",
-    "can_manage_users_and_settings": "Kann Benutzer und Einstellungen verwalten"
+    "can_manage_users_and_settings": "Kann Benutzer und Einstellungen verwalten",
+    "error_loading_admin_users": "Super-Admins konnten nicht geladen werden.",
+    "access_denied": "Du hast keine Berechtigung, Organisationsadmins zu verwalten.",
+    "add_admin": {
+      "button": "Organisationsadmin hinzufügen",
+      "title": "Organisationsadmin hinzufügen",
+      "user_label": "Benutzer",
+      "select_user": "Benutzer auswählen",
+      "change_user": "Benutzer ändern",
+      "cancel": "Abbrechen",
+      "save": "Admin hinzufügen",
+      "saving": "Wird hinzugefügt...",
+      "success": "Organisationsadmin wurde hinzugefügt.",
+      "error": "Organisationsadmin konnte nicht hinzugefügt werden.",
+      "validation_user_required": "Bitte wähle einen Benutzer aus.",
+      "validation_organization_required": "Bitte wähle eine Organisation aus."
+    }
   },
   "manageAppSettings": {
     "app_settings": "App Einstellungen",

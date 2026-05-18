@@ -22,5 +22,5 @@ export interface UpdateOrganizationAdminCanManageEvents {
 
 export interface UpdateOrganizationAdminCanManageEventsVariables {
   id: number;
-  canManageEvents: boolean;
+  value: boolean;
 }

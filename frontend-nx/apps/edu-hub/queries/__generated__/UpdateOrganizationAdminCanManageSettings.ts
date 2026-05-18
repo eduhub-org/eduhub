@@ -22,5 +22,5 @@ export interface UpdateOrganizationAdminCanManageSettings {
 
 export interface UpdateOrganizationAdminCanManageSettingsVariables {
   id: number;
-  canManageSettings: boolean;
+  value: boolean;
 }

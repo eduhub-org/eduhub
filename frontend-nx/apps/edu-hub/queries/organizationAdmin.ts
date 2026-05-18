@@ -36,6 +36,50 @@ export const ORGANIZATION_ADMIN_LIST = gql`
   }
 `;
 
+export const MY_MANAGEABLE_ORGANIZATION_ADMINS = gql`
+  query MyManageableOrganizationAdmins($userId: uuid!) {
+    OrganizationAdmin(
+      where: {
+        userId: { _eq: $userId }
+        canManageSettings: { _eq: true }
+      }
+    ) {
+      organizationId
+      Organization {
+        id
+        name
+      }
+    }
+  }
+`;
+
+export const INSERT_ORGANIZATION_ADMIN = gql`
+  mutation InsertOrganizationAdmin(
+    $userId: uuid!
+    $organizationId: Int!
+    $canManageCourses: Boolean! = false
+    $canManageEvents: Boolean! = false
+    $canManageSettings: Boolean! = false
+  ) {
+    insert_OrganizationAdmin_one(
+      object: {
+        userId: $userId
+        organizationId: $organizationId
+        canManageCourses: $canManageCourses
+        canManageEvents: $canManageEvents
+        canManageSettings: $canManageSettings
+      }
+    ) {
+      id
+      userId
+      organizationId
+      canManageCourses
+      canManageEvents
+      canManageSettings
+    }
+  }
+`;
+
 export const DELETE_ORGANIZATION_ADMIN = gql`
   mutation DeleteOrganizationAdmin($id: Int!) {
     delete_OrganizationAdmin_by_pk(id: $id) {
@@ -54,10 +98,10 @@ export const DELETE_ORGANIZATION_ADMIN = gql`
 `;
 
 export const UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_EVENTS = gql`
-  mutation UpdateOrganizationAdminCanManageEvents($id: Int!, $canManageEvents: Boolean!) {
+  mutation UpdateOrganizationAdminCanManageEvents($id: Int!, $value: Boolean!) {
     update_OrganizationAdmin_by_pk(
       pk_columns: { id: $id },
-      _set: { canManageEvents: $canManageEvents }
+      _set: { canManageEvents: $value }
     ) {
       id
       canManageEvents
@@ -66,10 +110,10 @@ export const UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_EVENTS = gql`
 `;
 
 export const UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_COURSES = gql`
-  mutation UpdateOrganizationAdminCanManageCourses($id: Int!, $canManageCourses: Boolean!) {
+  mutation UpdateOrganizationAdminCanManageCourses($id: Int!, $value: Boolean!) {
     update_OrganizationAdmin_by_pk(
       pk_columns: { id: $id },
-      _set: { canManageCourses: $canManageCourses }
+      _set: { canManageCourses: $value }
     ) {
       id
       canManageCourses
@@ -78,10 +122,10 @@ export const UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_COURSES = gql`
 `;
 
 export const UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_SETTINGS = gql`
-  mutation UpdateOrganizationAdminCanManageSettings($id: Int!, $canManageSettings: Boolean!) {
+  mutation UpdateOrganizationAdminCanManageSettings($id: Int!, $value: Boolean!) {
     update_OrganizationAdmin_by_pk(
       pk_columns: { id: $id },
-      _set: { canManageSettings: $canManageSettings }
+      _set: { canManageSettings: $value }
     ) {
       id
       canManageSettings

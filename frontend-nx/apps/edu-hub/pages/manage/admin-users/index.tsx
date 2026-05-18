@@ -5,13 +5,16 @@ path.resolve('./next.config.js');
 import Head from 'next/head';
 import { FC } from 'react';
 import { Page } from '../../../components/layout/Page';
-import { useIsAdmin, useIsLoggedIn } from '../../../hooks/authentication';
+import { useIsLoggedIn } from '../../../hooks/authentication';
+import { useCanManageOrganizationAdmins } from '../../../hooks/useOrganizationAdminAccess';
+import { useTranslations } from 'next-intl';
 
 import ManageAdminUsersContent from '../../../components/pages/ManageAdminUsersContent';
 
 const ManageAdminUsers: FC = () => {
-  const isAdmin = useIsAdmin();
   const isLoggedIn = useIsLoggedIn();
+  const canManageAdmins = useCanManageOrganizationAdmins();
+  const t = useTranslations('manageAdminUsers');
 
   return (
     <>
@@ -21,7 +24,13 @@ const ManageAdminUsers: FC = () => {
       </Head>
       <div className="max-w-screen-xl mx-auto">
         <Page>
-          <div className="min-h-[77vh]">{isLoggedIn && isAdmin && <ManageAdminUsersContent />}</div>
+          <div className="min-h-[77vh]">
+            {isLoggedIn && canManageAdmins ? (
+              <ManageAdminUsersContent />
+            ) : (
+              isLoggedIn && <p className="p-8 text-label-primary">{t('access_denied')}</p>
+            )}
+          </div>
         </Page>
       </div>
     </>
