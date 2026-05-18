@@ -11,6 +11,9 @@ import { CoursesEnrolledByUser_Course } from '../../../queries/__generated__/Cou
 import { Tile } from './Tile';
 import { TileWidget } from './TileWidget';
 
+export { EventTile } from './EventTile';
+export type { PublicEventSession } from './EventTile';
+
 export type CourseType = CourseList_Course | CourseTiles_Course | CoursesEnrolledByUser_Course;
 
 interface TileSliderProps {

@@ -15,7 +15,9 @@ import {
   UPDATE_SESSION_END_TIME,
   UPDATE_SESSION_START_TIME,
   UPDATE_SESSION_TITLE,
+  UPDATE_SESSION_IS_PUBLIC_EVENT,
 } from '../../../../queries/course';
+import CheckboxSelector from '../../../inputs/CheckboxSelector';
 import {
   ManagedCourse,
   ManagedCourseVariables,
@@ -349,6 +351,7 @@ const ExpandableSessionRowContent: FC<ExpandableSessionRowContentProps> = ({ ses
   const t = useTranslations('manageCourse');
   const tCoursePage = useTranslations('coursePage');
   const tCommon = useTranslations('common');
+  const isAdmin = useIsAdmin();
 
   const [createUserDialogOpen, setCreateUserDialogOpen] = useState(false);
   const [searchValueForNewUser, setSearchValueForNewUser] = useState('');
@@ -446,6 +449,19 @@ const ExpandableSessionRowContent: FC<ExpandableSessionRowContentProps> = ({ ses
                     <SessionAddresses key={address.id} address={address} refetchQueries={['ManagedCourse']} />
                   ))}
               </div>
+            </Card>
+
+            <Card title={t('SessionsTab.public_event.label')} helpText={t('SessionsTab.public_event.help_text')}>
+              <CheckboxSelector
+                variant="eduhub"
+                label={t('SessionsTab.public_event.label')}
+                helpText={t('SessionsTab.public_event.help_text')}
+                checked={Boolean(session.isPublicEvent)}
+                updateValueMutation={isAdmin ? UPDATE_SESSION_IS_PUBLIC_EVENT : undefined}
+                identifierVariables={{ sessionId: session.id }}
+                refetchQueries={['ManagedCourse']}
+                disabled={!isAdmin}
+              />
             </Card>
 
             <Card
