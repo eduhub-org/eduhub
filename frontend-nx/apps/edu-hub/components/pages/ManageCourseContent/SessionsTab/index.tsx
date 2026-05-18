@@ -304,8 +304,28 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
           </span>
         ),
       },
+      {
+        id: 'publicEvent',
+        header: t('SessionsTab.public_event.label'),
+        accessorKey: 'isPublicEvent',
+        size: 160,
+        enableSorting: false,
+        cell: ({ row }) => (
+          <div className="light flex items-center min-w-[140px]">
+            <CheckboxSelector
+              variant="eduhub"
+              label=""
+              checked={Boolean(row.original.isPublicEvent)}
+              updateValueMutation={isAdmin ? UPDATE_SESSION_IS_PUBLIC_EVENT : undefined}
+              identifierVariables={{ sessionId: row.original.id }}
+              refetchQueries={['ManagedCourse']}
+              disabled={!isAdmin}
+            />
+          </div>
+        ),
+      },
     ],
-    [tCoursePage, lectureStart, lectureEnd, handleSetDate]
+    [t, tCoursePage, lectureStart, lectureEnd, handleSetDate, isAdmin]
   );
 
   return (
@@ -351,7 +371,6 @@ const ExpandableSessionRowContent: FC<ExpandableSessionRowContentProps> = ({ ses
   const t = useTranslations('manageCourse');
   const tCoursePage = useTranslations('coursePage');
   const tCommon = useTranslations('common');
-  const isAdmin = useIsAdmin();
 
   const [createUserDialogOpen, setCreateUserDialogOpen] = useState(false);
   const [searchValueForNewUser, setSearchValueForNewUser] = useState('');
@@ -449,19 +468,6 @@ const ExpandableSessionRowContent: FC<ExpandableSessionRowContentProps> = ({ ses
                     <SessionAddresses key={address.id} address={address} refetchQueries={['ManagedCourse']} />
                   ))}
               </div>
-            </Card>
-
-            <Card title={t('SessionsTab.public_event.label')} helpText={t('SessionsTab.public_event.help_text')}>
-              <CheckboxSelector
-                variant="eduhub"
-                label={t('SessionsTab.public_event.label')}
-                helpText={t('SessionsTab.public_event.help_text')}
-                checked={Boolean(session.isPublicEvent)}
-                updateValueMutation={isAdmin ? UPDATE_SESSION_IS_PUBLIC_EVENT : undefined}
-                identifierVariables={{ sessionId: session.id }}
-                refetchQueries={['ManagedCourse']}
-                disabled={!isAdmin}
-              />
             </Card>
 
             <Card
