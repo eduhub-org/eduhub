@@ -1410,6 +1410,18 @@
     "no_attendance_certificates_deleted": "No attendance certificates were deleted",
     "attendance_certificate_deleted_singular": "{count} attendance certificate was deleted",
     "attendance_certificates_deleted_plural": "{count} attendance certificates were deleted",
+    "participations_bulk_actions": {
+      "mark_aborted_selected": "Mark participation as aborted",
+      "mark_aborted_dialog_title": "Mark participation as aborted",
+      "mark_aborted_confirm_singular": "Mark the selected person as aborted? They will be removed from the participants list but remain visible under applications. You can change the status there later.",
+      "mark_aborted_confirm_plural": "Mark {count} selected people as aborted? They will be removed from the participants list but remain visible under applications. You can change the status there later.",
+      "mark_aborted_success_singular": "{count} participation was marked as aborted.",
+      "mark_aborted_success_plural": "{count} participations were marked as aborted.",
+      "mark_aborted_error": "Could not mark participations as aborted: {error}",
+      "disabled_reasons": {
+        "instructors_only": "Only instructors can run this bulk action."
+      }
+    },
     "certificates_group": "Certificates",
     "application_status_tooltip": "Click on the circles to change the rating",
     "application_deadline_tooltip": "If you want to change the date for the Confirmation deadline you can resend the invitation.",
