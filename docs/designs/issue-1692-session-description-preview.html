@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Issue #1692 — Session description designs</title>
+  <style>
+    :root {
+      --eduhub-brand: #00A398;
+      --eduhub-fill-primary: #222222;
+      --eduhub-label-primary: #F2F2F2;
+      --eduhub-label-secondary: #D8D8D8;
+      --eduhub-border-primary: #444444;
+      --eduhub-bg-secondary: #333333;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #111;
+      color: var(--eduhub-label-primary);
+      padding: 2rem 1rem;
+    }
+    h1 { font-size: 1.25rem; margin: 0 0 0.5rem; }
+    .intro { color: var(--eduhub-label-secondary); font-size: 0.9rem; max-width: 52rem; margin-bottom: 2rem; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      max-width: 1200px;
+    }
+    .panel {
+      background: var(--eduhub-fill-primary);
+      border: 1px solid var(--eduhub-border-primary);
+      border-radius: 8px;
+      padding: 1rem;
+    }
+    .panel h2 {
+      margin: 0 0 1rem;
+      font-size: 1rem;
+      color: var(--eduhub-brand);
+    }
+    .panel p.tagline { margin: 0 0 1rem; font-size: 0.75rem; color: var(--eduhub-label-secondary); }
+    .session {
+      display: flex;
+      gap: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .date-col { flex-shrink: 0; }
+    .date-col .date { font-weight: 600; font-size: 1rem; display: block; }
+    .date-col .time { font-size: 0.875rem; white-space: nowrap; }
+    .content-col { flex: 1; min-width: 0; }
+    .title { font-size: 1rem; font-weight: 400; display: block; margin-bottom: 0.25rem; }
+    .location { font-size: 0.875rem; color: #9ca3af; }
+    .desc-inline { font-size: 0.875rem; color: var(--eduhub-label-secondary); margin: 0.25rem 0; line-height: 1.4; }
+    .desc-clamp {
+      font-size: 0.875rem;
+      color: var(--eduhub-label-secondary);
+      margin: 0.25rem 0;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      line-height: 1.4;
+    }
+    .link-btn {
+      background: none;
+      border: none;
+      color: var(--eduhub-brand);
+      font-size: 0.8rem;
+      padding: 0;
+      cursor: pointer;
+      text-decoration: underline;
+      font-style: italic;
+    }
+    .callout {
+      margin: 0.5rem 0;
+      padding: 0.5rem 0.75rem;
+      background: var(--eduhub-bg-secondary);
+      border-left: 3px solid var(--eduhub-brand);
+      border-radius: 0 4px 4px 0;
+      font-size: 0.875rem;
+      color: var(--eduhub-label-secondary);
+      line-height: 1.4;
+    }
+    .callout-label { font-size: 0.7rem; font-weight: 600; color: var(--eduhub-brand); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem; }
+    .speaker {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+      font-size: 0.875rem;
+    }
+    .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--eduhub-border-primary);
+    }
+    .collapsed .desc-expanded { display: none; }
+    .expanded .desc-collapsed { display: none; }
+    .vote { margin-top: 2rem; font-size: 0.9rem; color: var(--eduhub-label-secondary); }
+  </style>
+</head>
+<body>
+  <h1>Session description — design options (Issue #1692)</h1>
+  <p class="intro">
+    Sample session with description. Compare A–D on the course page “Termine” list.
+    Open this file in a browser: <code>docs/designs/issue-1692-session-description-preview.html</code>
+  </p>
+
+  <div class="grid">
+    <section class="panel">
+      <h2>Option A — Inline subtitle</h2>
+      <p class="tagline">Minimal; description under title</p>
+      <div class="session">
+        <div class="date-col">
+          <span class="date">15. Mai 2026</span>
+          <span class="time">18:00 - 20:00</span>
+        </div>
+        <div class="content-col">
+          <span class="title">Workshop: Prototyping</span>
+          <p class="desc-inline">Bitte Laptop und Sketch-Dateien mitbringen. Wir starten mit einer kurzen Einführung.</p>
+          <span class="location">ONLINE</span>
+          <div class="speaker"><span class="avatar"></span> Referent:in</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Option B — Truncated + expand</h2>
+      <p class="tagline">2-line clamp; “Mehr anzeigen”</p>
+      <div class="session">
+        <div class="date-col">
+          <span class="date">15. Mai 2026</span>
+          <span class="time">18:00 - 20:00</span>
+        </div>
+        <div class="content-col">
+          <span class="title">Workshop: Prototyping</span>
+          <p class="desc-clamp">Bitte Laptop und Sketch-Dateien mitbringen. Wir starten mit einer kurzen Einführung in Figma, danach arbeiten wir in Kleingruppen an euren Projekten. Snacks werden gestellt.</p>
+          <button type="button" class="link-btn">Mehr anzeigen</button>
+          <span class="location">ONLINE</span>
+          <div class="speaker"><span class="avatar"></span> Referent:in</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Option C — Info callout</h2>
+      <p class="tagline">Bordered “Hinweis” box</p>
+      <div class="session">
+        <div class="date-col">
+          <span class="date">15. Mai 2026</span>
+          <span class="time">18:00 - 20:00</span>
+        </div>
+        <div class="content-col">
+          <span class="title">Workshop: Prototyping</span>
+          <div class="callout">
+            <div class="callout-label">Hinweis</div>
+            Bitte Laptop und Sketch-Dateien mitbringen.
+          </div>
+          <span class="location">ONLINE</span>
+          <div class="speaker"><span class="avatar"></span> Referent:in</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Option D — Collapsed by default</h2>
+      <p class="tagline">“Details anzeigen” toggle</p>
+      <div class="session collapsed" id="session-d">
+        <div class="date-col">
+          <span class="date">15. Mai 2026</span>
+          <span class="time">18:00 - 20:00</span>
+        </div>
+        <div class="content-col">
+          <span class="title">Workshop: Prototyping</span>
+          <div class="desc-collapsed">
+            <button type="button" class="link-btn" onclick="toggleD()">Details anzeigen ▾</button>
+          </div>
+          <div class="desc-expanded">
+            <p class="desc-inline">Bitte Laptop und Sketch-Dateien mitbringen.</p>
+            <button type="button" class="link-btn" onclick="toggleD()">Details ausblenden ▴</button>
+          </div>
+          <span class="location">ONLINE</span>
+          <div class="speaker"><span class="avatar"></span> Referent:in</div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <p class="vote">Pick <strong>A</strong>, <strong>B</strong>, <strong>C</strong>, or <strong>D</strong> in the GitHub issue or PR comment.</p>
+
+  <script>
+    function toggleD() {
+      const el = document.getElementById('session-d');
+      el.classList.toggle('collapsed');
+      el.classList.toggle('expanded');
+    }
+  </script>
+</body>
+</html>
