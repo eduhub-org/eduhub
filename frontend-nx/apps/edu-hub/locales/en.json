@@ -1496,6 +1496,7 @@
     "attendance_status_passed": "Attendance requirement met",
     "attendance_status_failed": "Attendance requirement not met",
     "attendance_status_uncertain": "Attendance status pending",
+    "attendance_update_failed": "Could not save attendance. Please try again.",
     "certificates_skipped_singular": "1 participant skipped (requirements not met)",
     "certificates_skipped_plural": "{count} participants skipped (requirements not met)",
     "achievement_not_submitted": "No documentation uploaded",
