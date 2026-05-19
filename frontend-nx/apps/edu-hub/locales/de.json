@@ -348,7 +348,9 @@
       "show_all_dates": "Alle Termine anzeigen",
       "hide_dates": "Termine einklappen",
       "date_singular": "Termin",
-      "date_plural": "Termine"
+      "date_plural": "Termine",
+      "description_show_more": "Mehr anzeigen",
+      "description_show_less": "Weniger anzeigen"
     },
     "attendances": {
       "attendances": "Anwesenheiten",
@@ -1300,7 +1302,7 @@
       },
       "session_description": {
         "label": "Beschreibung",
-        "help_text": "Beschreibe hier den Inhalt des Termins.",
+        "help_text": "Beschreibe hier den Inhalt des Termins. Du kannst **fett**, *kursiv* und [Links](https://beispiel.de) verwenden.",
         "placeholder": "Beschreibe den Inhalt der Session, z.B. Ablauf, Themen oder Hinweise für Teilnehmende..."
       },
       "attendance_data": {

@@ -348,7 +348,9 @@
       "show_all_dates": "Show all dates",
       "hide_dates": "Collapse dates",
       "date_singular": "Date",
-      "date_plural": "Dates"
+      "date_plural": "Dates",
+      "description_show_more": "Show more",
+      "description_show_less": "Show less"
     },
     "attendances": {
       "attendances": "Attendances",
@@ -1318,7 +1320,7 @@
       },
       "session_description": {
         "label": "Description",
-        "help_text": "Describe the content of the session here.",
+        "help_text": "Describe the session content here. You can use **bold**, *italic*, and [links](https://example.com).",
         "placeholder": "Describe the session content, e.g. schedule, topics or notes for participants..."
       },
       "attendance_data": {

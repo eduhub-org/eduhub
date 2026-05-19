@@ -4,6 +4,7 @@ import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
 
 import { Course_Course_by_pk_Sessions as Session, Course_Course_by_pk_CourseLocations as CourseLocation } from '../../../queries/__generated__/Course';
 import UserCard from '../../common/UserCard';
+import { SessionDescription } from './SessionDescription';
 import { useDisplayDate, useFormatTimeString } from '../../../helpers/dateTimeHelpers';
 import { isLinkFormat } from '../../../helpers/util';
 import { useIsAdmin, useIsInstructor } from '../../../hooks/authentication';
@@ -70,8 +71,8 @@ export const Sessions: FC<SessionsProps> = ({ sessions, courseLocations, isLogge
             {sessions.length === 1 ? t('sessions.date_singular') : t('sessions.date_plural')}
           </span>
           <ul className="max-w-2xl">
-            {visibleSessions.map(({ startDateTime, endDateTime, title, SessionSpeakers, SessionAddresses }, index) => (
-              <li key={index} className="flex mb-4">
+            {visibleSessions.map(({ id, startDateTime, endDateTime, title, description, SessionSpeakers, SessionAddresses }) => (
+              <li key={id} className="flex mb-4">
                 <div className="flex flex-wrap items-start flex-shrink-0 mb-2">
                   <div className="flex flex-col mr-6">
                     <span className="block text-sm sm:text-lg font-semibold">{displayDate(startDateTime)}</span>
@@ -84,6 +85,7 @@ export const Sessions: FC<SessionsProps> = ({ sessions, courseLocations, isLogge
                 </div>
                 <div className="flex flex-col flex-1">
                   <span className="block text-sm sm:text-lg break-words">{title}</span>
+                  <SessionDescription description={description ?? ''} />
                   <div className="break-words">
                     {/* Sort SessionAddresses by CourseLocations order */}
                     {(() => {
