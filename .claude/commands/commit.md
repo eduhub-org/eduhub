@@ -88,7 +88,7 @@ After a successful commit and push, create a PR with:
 
 ```
 gh pr create \
-  --title "<same as commit subject>" \
+  --title "<short descriptive title — NO type prefix, just plain English>" \
   --body "$(cat <<'EOF'
 ## Summary
 
@@ -107,8 +107,12 @@ EOF
 )"
 ```
 
-PR title must follow the same ≤ 72-character, conventional-commit subject
-format as the commit itself.
+PR title conventions in this repo (derived from branch-name style):
+- Plain English, no `feat:` / `fix:` prefix — that belongs in commit messages
+- ≤ 72 characters, sentence case, no trailing period
+- Examples: "Add OAuth2 integration with Keycloak",
+  "Fix table pagination on manage courses page",
+  "Refactor project schema step 1"
 
 ## Output style
 
