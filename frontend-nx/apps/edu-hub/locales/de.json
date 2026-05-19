@@ -1524,7 +1524,26 @@
     "is_super_admin": "Ist Super-Admin",
     "can_manage_events": "Kann Events verwalten",
     "can_manage_courses": "Kann Kurse verwalten",
-    "can_manage_users_and_settings": "Kann Benutzer und Einstellungen verwalten"
+    "can_manage_users_and_settings": "Kann Benutzer und Einstellungen verwalten",
+    "error_loading_admin_users": "Admin-Benutzer konnten nicht geladen werden.",
+    "create_admin": {
+      "button": "Admin hinzufügen",
+      "dialog_title": "Organisations-Adminrechte vergeben",
+      "user_label": "Benutzer",
+      "user_placeholder": "Kein Benutzer ausgewählt",
+      "select_user": "Benutzer auswählen",
+      "select_user_title": "Benutzer auswählen",
+      "organization_label": "Organisation",
+      "organization_placeholder": "Keine Organisation ausgewählt",
+      "select_organization": "Organisation auswählen",
+      "select_organization_title": "Organisation auswählen",
+      "permissions_label": "Berechtigungen",
+      "submit": "Adminrechte vergeben",
+      "creating": "Speichern...",
+      "success": "Adminrechte wurden erfolgreich vergeben.",
+      "error": "Adminrechte konnten nicht vergeben werden.",
+      "error_already_exists": "Dieser Benutzer ist bereits Admin der ausgewählten Organisation."
+    }
   },
   "manageAppSettings": {
     "app_settings": "App Einstellungen",

@@ -22,6 +22,7 @@ import { PageBlock } from '../../common/PageBlock';
 import CommonPageHeader from '../../common/CommonPageHeader';
 import { useIsAdmin } from '../../../hooks/authentication';
 import { OrganizationAdminList_OrganizationAdmin } from '../../../queries/__generated__/OrganizationAdminList';
+import { CreateOrganizationAdminDialog } from '../../common/dialogs/CreateOrganizationAdminDialog';
 
 const ExpandableUserRow: FC<{
   row: OrganizationAdminList_OrganizationAdmin;
@@ -34,15 +35,16 @@ const ExpandableUserRow: FC<{
   const [setAdminStatus] = useAdminMutation(UPDATE_USER_ADMIN_STATUS);
 
   const handleAdminToggle = async (checked: boolean) => {
+    if (!row.User?.id) return;
     try {
       const response = await setAdminStatus({
         variables: {
-          userId: row.id,
+          userId: row.User.id,
           isAdmin: checked,
         },
       });
 
-      if (response.data?.success) {
+      if (response.data?.updateUserAdminStatus?.success) {
         onAdminStatusChange();
       }
     } catch (error) {
@@ -60,7 +62,7 @@ const ExpandableUserRow: FC<{
             checked={row.canManageEvents}
             updateValueMutation={UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_EVENTS}
             identifierVariables={{ itemId: row.id }}
-            refetchQueries={['GetAdminUsers']}
+            refetchQueries={['OrganizationAdminList']}
           />
         </div>
         <div className="pl-3 col-span-3">
@@ -70,7 +72,7 @@ const ExpandableUserRow: FC<{
             checked={row.canManageCourses}
             updateValueMutation={UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_COURSES}
             identifierVariables={{ itemId: row.id }}
-            refetchQueries={['GetAdminUsers']}
+            refetchQueries={['OrganizationAdminList']}
           />
         </div>
         <div className="pl-3 col-span-4">
@@ -80,7 +82,7 @@ const ExpandableUserRow: FC<{
             checked={row.canManageSettings}
             updateValueMutation={UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_SETTINGS}
             identifierVariables={{ itemId: row.id }}
-            refetchQueries={['GetAdminUsers']}
+            refetchQueries={['OrganizationAdminList']}
           />
         </div>
       </div>
@@ -91,7 +93,7 @@ const ExpandableUserRow: FC<{
             label={t('is_super_admin')}
             checked={isSuperAdmin}
             onValueUpdated={handleAdminToggle}
-            refetchQueries={['GetAdminUsers']}
+            refetchQueries={['AdminUsers']}
           />
         </div>
       )}
@@ -103,6 +105,7 @@ const ManageAdminUsersContent: FC = () => {
   const t = useTranslations('manageAdminUsers');
   const [adminUserIds, setAdminUserIds] = useState<string[]>([]);
   const [adminError, setAdminError] = useState<Error | null>(null);
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
 
   useAdminQuery(ADMIN_USERS, {
     onCompleted: (data) => {
@@ -195,10 +198,10 @@ const ManageAdminUsersContent: FC = () => {
               searchFilter={searchFilter}
               onSearchFilterChange={setSearchFilter}
               deleteMutation={DELETE_ORGANIZATION_ADMIN}
-              deleteIdType="uuidString"
+              deleteIdType="number"
               error={error}
               loading={loading}
-              refetchQueries={['UsersByLastName', 'GetAdminUsers']}
+              refetchQueries={['OrganizationAdminList', 'AdminUsers']}
               generateDeletionConfirmationQuestion={generateDeletionConfirmation}
               expandableRowComponent={({ row }) => (
                 <ExpandableUserRow
@@ -207,10 +210,17 @@ const ManageAdminUsersContent: FC = () => {
                   onAdminStatusChange={() => refetch()}
                 />
               )}
+              addButtonText={t('create_admin.button')}
+              onAddButtonClick={() => setCreateDialogOpen(true)}
             />
           </div>
         )}
       </div>
+      <CreateOrganizationAdminDialog
+        open={createDialogOpen}
+        onClose={() => setCreateDialogOpen(false)}
+        onSuccess={() => refetch()}
+      />
     </PageBlock>
   );
 };

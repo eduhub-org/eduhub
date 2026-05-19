@@ -36,6 +36,41 @@ export const ORGANIZATION_ADMIN_LIST = gql`
   }
 `;
 
+export const INSERT_ORGANIZATION_ADMIN = gql`
+  mutation InsertOrganizationAdmin(
+    $userId: uuid!
+    $organizationId: Int!
+    $canManageCourses: Boolean = false
+    $canManageEvents: Boolean = false
+    $canManageSettings: Boolean = false
+  ) {
+    insert_OrganizationAdmin_one(
+      object: {
+        userId: $userId
+        organizationId: $organizationId
+        canManageCourses: $canManageCourses
+        canManageEvents: $canManageEvents
+        canManageSettings: $canManageSettings
+      }
+    ) {
+      id
+      User {
+        id
+        firstName
+        lastName
+        email
+      }
+      Organization {
+        id
+        name
+      }
+      canManageCourses
+      canManageEvents
+      canManageSettings
+    }
+  }
+`;
+
 export const DELETE_ORGANIZATION_ADMIN = gql`
   mutation DeleteOrganizationAdmin($id: Int!) {
     delete_OrganizationAdmin_by_pk(id: $id) {

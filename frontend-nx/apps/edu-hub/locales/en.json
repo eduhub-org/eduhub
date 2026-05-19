@@ -1535,7 +1535,30 @@
     "last_name": "Last Name",
     "email": "Email",
     "organization": "Organization",
-    "deletion_confirmation_question": "Are you sure you want to delete the admin rights of {firstName} {lastName} for the organization {organization}?"
+    "deletion_confirmation_question": "Are you sure you want to delete the admin rights of {firstName} {lastName} for the organization {organization}?",
+    "is_super_admin": "Is super admin",
+    "can_manage_events": "Can manage events",
+    "can_manage_courses": "Can manage courses",
+    "can_manage_users_and_settings": "Can manage users and settings",
+    "error_loading_admin_users": "Could not load admin users.",
+    "create_admin": {
+      "button": "Add admin",
+      "dialog_title": "Grant organization admin rights",
+      "user_label": "User",
+      "user_placeholder": "No user selected",
+      "select_user": "Select user",
+      "select_user_title": "Select a user",
+      "organization_label": "Organization",
+      "organization_placeholder": "No organization selected",
+      "select_organization": "Select organization",
+      "select_organization_title": "Select an organization",
+      "permissions_label": "Permissions",
+      "submit": "Grant admin rights",
+      "creating": "Saving...",
+      "success": "Admin rights granted successfully.",
+      "error": "Could not grant admin rights.",
+      "error_already_exists": "This user is already an admin of the selected organization."
+    }
   },
   "manageAppSettings": {
     "backgroundImageURL": "Background image URL",
