@@ -310,6 +310,10 @@
     "auth": {
       "please_log_in": "Please log in to access this page.",
       "access_denied": "You do not have permission to access this page."
+    },
+    "event_tile": {
+      "badge": "Event",
+      "see_details": "View details →"
     }
   },
   "course": {
@@ -348,7 +352,8 @@
       "show_all_dates": "Show all dates",
       "hide_dates": "Collapse dates",
       "date_singular": "Date",
-      "date_plural": "Dates"
+      "date_plural": "Dates",
+      "public_event_badge": "Public event"
     },
     "attendances": {
       "attendances": "Attendances",
@@ -683,7 +688,8 @@
     "confirmed": "Confirmed",
     "unrated_rated_not_informed": "Unrated / Rated but not informed",
     "bulk_action_copy": "Copy to Program",
-    "Uniqueness violation_ duplicate key value violates unique constraint \"CourseAddress_pkey\"": "A location address with this configuration already exists for this course."
+    "Uniqueness violation_ duplicate key value violates unique constraint \"CourseAddress_pkey\"": "A location address with this configuration already exists for this course.",
+    "public_event_short": "Event"
   },
   "courseAdminPage": {
     "pageTitle": "Opencampus Course Instructor View",
@@ -1326,6 +1332,11 @@
         "review_button": "Review attendance data",
         "no_data": "No attendance data available",
         "dialog_title": "Attendance data"
+      },
+      "public_event": {
+        "toggle_label": "Mark this session as a public event",
+        "read_only_hint": "Only an admin can mark a session as a public event",
+        "view_link": "View"
       }
     },
     "location": {
@@ -1935,5 +1946,14 @@
     "faq": "FAQ",
     "newsletter": "Newsletter",
     "sponsored_by": "Sponsored by:"
+  },
+  "event": {
+    "when": "When",
+    "where": "Where",
+    "description": "About this event",
+    "speakers": "Speakers",
+    "part_of_course": "Part of course",
+    "online_link": "Join online",
+    "not_available": "This event is not available."
   }
 }

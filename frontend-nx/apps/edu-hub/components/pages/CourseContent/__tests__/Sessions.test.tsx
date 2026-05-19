@@ -39,6 +39,7 @@ const mockSessions: Course_Course_by_pk_Sessions[] = [
     startDateTime: '2024-01-15T10:00:00Z',
     endDateTime: '2024-01-15T12:00:00Z',
     title: 'Test Session',
+    isPublicEvent: false,
     SessionSpeakers: [],
     SessionAddresses: [
       {

@@ -188,6 +188,18 @@ export const UPDATE_SESSION_DESCRIPTION = gql`
   }
 `;
 
+export const UPDATE_SESSION_IS_PUBLIC_EVENT = gql`
+  mutation UpdateSessionIsPublicEvent($sessionId: Int!, $isPublicEvent: Boolean!) {
+    update_Session_by_pk(
+      pk_columns: { id: $sessionId }
+      _set: { isPublicEvent: $isPublicEvent }
+    ) {
+      id
+      isPublicEvent
+    }
+  }
+`;
+
 export const INSERT_NEW_SESSION_SPEAKER = gql`
   mutation InsertNewSessionSpeaker($sessionId: Int!, $userId: uuid!) {
     insert_SessionSpeaker(

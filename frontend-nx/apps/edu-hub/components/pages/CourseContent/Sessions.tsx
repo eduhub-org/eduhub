@@ -1,4 +1,5 @@
 import { FC, useMemo, useState } from 'react';
+import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
 
@@ -70,7 +71,7 @@ export const Sessions: FC<SessionsProps> = ({ sessions, courseLocations, isLogge
             {sessions.length === 1 ? t('sessions.date_singular') : t('sessions.date_plural')}
           </span>
           <ul className="max-w-2xl">
-            {visibleSessions.map(({ startDateTime, endDateTime, title, SessionSpeakers, SessionAddresses }, index) => (
+            {visibleSessions.map(({ id, startDateTime, endDateTime, title, isPublicEvent, SessionSpeakers, SessionAddresses }, index) => (
               <li key={index} className="flex mb-4">
                 <div className="flex flex-wrap items-start flex-shrink-0 mb-2">
                   <div className="flex flex-col mr-6">
@@ -83,7 +84,17 @@ export const Sessions: FC<SessionsProps> = ({ sessions, courseLocations, isLogge
                   </div>
                 </div>
                 <div className="flex flex-col flex-1">
-                  <span className="block text-sm sm:text-lg break-words">{title}</span>
+                  <span className="block text-sm sm:text-lg break-words">
+                    {title}
+                    {isPublicEvent && (
+                      <Link
+                        href={`/event/${id}`}
+                        className="ml-2 inline-flex items-center rounded-full bg-brand/20 px-2 py-0.5 text-xs font-semibold text-brand hover:bg-brand/30 align-middle"
+                      >
+                        {t('sessions.public_event_badge')}
+                      </Link>
+                    )}
+                  </span>
                   <div className="break-words">
                     {/* Sort SessionAddresses by CourseLocations order */}
                     {(() => {

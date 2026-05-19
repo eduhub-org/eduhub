@@ -310,6 +310,10 @@
     "auth": {
       "please_log_in": "Bitte melde dich an, um auf diese Seite zuzugreifen.",
       "access_denied": "Du hast keine Berechtigung, auf diese Seite zuzugreifen."
+    },
+    "event_tile": {
+      "badge": "Event",
+      "see_details": "Mehr ansehen →"
     }
   },
   "course": {
@@ -348,7 +352,8 @@
       "show_all_dates": "Alle Termine anzeigen",
       "hide_dates": "Termine einklappen",
       "date_singular": "Termin",
-      "date_plural": "Termine"
+      "date_plural": "Termine",
+      "public_event_badge": "Öffentliches Event"
     },
     "attendances": {
       "attendances": "Anwesenheiten",
@@ -667,7 +672,8 @@
     "accepted_applications": "Bewerbungen (angenommen):",
     "total_invitations": "Einladungen (gesamt):",
     "confirmed_invitations": "Einladungen (bestätigt):",
-    "Uniqueness violation_ duplicate key value violates unique constraint \"CourseAddress_pkey\"": "Eine Standortadresse mit dieser Konfiguration existiert bereits für diesen Kurs."
+    "Uniqueness violation_ duplicate key value violates unique constraint \"CourseAddress_pkey\"": "Eine Standortadresse mit dieser Konfiguration existiert bereits für diesen Kurs.",
+    "public_event_short": "Event"
   },
   "courseAdminPage": {
     "pageTitle": "Opencampus Kurse Kursleiter Sicht",
@@ -1044,7 +1050,7 @@
     "add_as_aborted": "als abgebrochen hinzufügen oder ändern",
     "add_user_error": "Bitte mindestens einen User auswählen!",
     "submit": "Absenden",
-    "application_history":  {
+    "application_history": {
       "label": "Bisherige Bewerbungen und Teilnahmen",
       "no_applications_present": "Keine Bewerbungen vorhanden"
     },
@@ -1308,6 +1314,11 @@
         "review_button": "Anwesenheitsdaten ansehen",
         "no_data": "Keine Anwesenheitsdaten vorhanden",
         "dialog_title": "Anwesenheitsdaten"
+      },
+      "public_event": {
+        "toggle_label": "Diese Session als öffentliches Event markieren",
+        "read_only_hint": "Nur Admins können eine Session als öffentliches Event markieren",
+        "view_link": "Ansehen"
       }
     },
     "location": {
@@ -1930,5 +1941,14 @@
     "faq": "FAQ",
     "newsletter": "Newsletter",
     "sponsored_by": "Gefördert durch:"
+  },
+  "event": {
+    "when": "Wann",
+    "where": "Wo",
+    "description": "Worum es geht",
+    "speakers": "Sprecher:innen",
+    "part_of_course": "Teil des Kurses",
+    "online_link": "Online teilnehmen",
+    "not_available": "Dieses Event ist nicht verfügbar."
   }
 }

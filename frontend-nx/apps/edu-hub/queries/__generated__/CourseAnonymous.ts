@@ -97,6 +97,10 @@ export interface CourseAnonymous_Course_by_pk_Sessions {
    */
   title: string;
   /**
+   * When true, this session is promoted as a standalone public event. Anonymous users can view a dedicated public detail page at /event/[sessionId] and the session can appear in events sliders. Only admins can toggle this flag; instructors can read but not write it.
+   */
+  isPublicEvent: boolean;
+  /**
    * An array relationship
    */
   SessionAddresses: CourseAnonymous_Course_by_pk_Sessions_SessionAddresses[];

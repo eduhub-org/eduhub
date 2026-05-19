@@ -3,6 +3,7 @@ import { FC, useCallback, useMemo, useState } from 'react';
 import { ColumnDef } from '@tanstack/react-table';
 import {
   identityEventMapper,
+  useAdminMutation,
   useRoleMutation,
   useDeleteCallback,
 } from '../../../../hooks/authedMutation';
@@ -13,9 +14,14 @@ import {
   INSERT_SESSION_WITH_ADDRESSES,
   UPDATE_SESSION_DESCRIPTION,
   UPDATE_SESSION_END_TIME,
+  UPDATE_SESSION_IS_PUBLIC_EVENT,
   UPDATE_SESSION_START_TIME,
   UPDATE_SESSION_TITLE,
 } from '../../../../queries/course';
+import {
+  UpdateSessionIsPublicEvent,
+  UpdateSessionIsPublicEventVariables,
+} from '../../../../queries/__generated__/UpdateSessionIsPublicEvent';
 import {
   ManagedCourse,
   ManagedCourseVariables,
@@ -302,8 +308,22 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
           </span>
         ),
       },
+      {
+        id: 'publicEvent',
+        header: tCoursePage('public_event_short'),
+        accessorKey: 'isPublicEvent',
+        size: 110,
+        enableSorting: false,
+        cell: ({ row }) => (
+          <PublicEventToggle
+            sessionId={row.original.id}
+            isPublicEvent={row.original.isPublicEvent}
+            canEdit={isAdmin}
+          />
+        ),
+      },
     ],
-    [tCoursePage, lectureStart, lectureEnd, handleSetDate]
+    [tCoursePage, lectureStart, lectureEnd, handleSetDate, isAdmin]
   );
 
   return (
@@ -538,5 +558,53 @@ const ExpandableSessionRowContent: FC<ExpandableSessionRowContentProps> = ({ ses
         initialEmail={parsedSearchValues.email}
       />
     </div>
+  );
+};
+
+interface PublicEventToggleProps {
+  sessionId: number;
+  isPublicEvent: boolean;
+  canEdit: boolean;
+}
+
+const PublicEventToggle: FC<PublicEventToggleProps> = ({ sessionId, isPublicEvent, canEdit }) => {
+  const t = useTranslations('manageCourse');
+  const [updateIsPublicEvent, { loading }] = useAdminMutation<
+    UpdateSessionIsPublicEvent,
+    UpdateSessionIsPublicEventVariables
+  >(UPDATE_SESSION_IS_PUBLIC_EVENT, { refetchQueries: ['ManagedCourse'] });
+
+  const label = t('SessionsTab.public_event.toggle_label');
+  const readOnlyHint = t('SessionsTab.public_event.read_only_hint');
+
+  return (
+    <label
+      className="flex items-center gap-2 text-sm"
+      title={canEdit ? label : readOnlyHint}
+    >
+      <input
+        type="checkbox"
+        checked={isPublicEvent}
+        disabled={!canEdit || loading}
+        aria-label={label}
+        onChange={(e) => {
+          if (!canEdit) return;
+          updateIsPublicEvent({
+            variables: { sessionId, isPublicEvent: e.target.checked },
+          });
+        }}
+      />
+      {isPublicEvent && (
+        <a
+          href={`/event/${sessionId}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline text-brand text-xs"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {t('SessionsTab.public_event.view_link')}
+        </a>
+      )}
+    </label>
   );
 };
