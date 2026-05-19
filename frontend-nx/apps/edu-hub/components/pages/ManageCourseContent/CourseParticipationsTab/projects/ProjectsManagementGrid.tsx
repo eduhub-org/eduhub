@@ -1,7 +1,8 @@
 import { FC, useCallback, useMemo, useState } from 'react';
 import { ColumnDef } from '@tanstack/react-table';
-import { CircularProgress } from '@mui/material';
-import { useTranslations, useLocale } from 'next-intl';
+import { CircularProgress, Tooltip } from '@mui/material';
+import { HelpOutline } from '@mui/icons-material';
+import { useTranslations } from 'next-intl';
 import { MdAddCircle, MdClose } from 'react-icons/md';
 import { useRoleQuery, useAuthedQuery } from '../../../../../hooks/authedQuery';
 import { useRoleMutation } from '../../../../../hooks/authedMutation';
@@ -11,66 +12,76 @@ import { Button } from '../../../../common/Button';
 import NotificationSnackbar from '../../../../common/dialogs/NotificationSnackbar';
 import { QuestionConfirmationDialog } from '../../../../common/dialogs/QuestionConfirmationDialog';
 import { SelectUserDialog } from '../../../../common/dialogs/SelectUserDialog';
+import InputField from '../../../../inputs/InputField';
+import DropDownSelector from '../../../../inputs/DropDownSelector';
+import CheckboxSelector from '../../../../inputs/CheckboxSelector';
+import FileUploadField from '../../../../inputs/FileUploadField';
 import { UserSelectionWithFilter_User } from '../../../../../queries/__generated__/UserSelectionWithFilter';
+import { SAVE_PROJECT_IMAGE } from '../../../../../queries/actions';
 import {
   PROJECTS_BY_COURSE,
   PROJECT_TYPES,
-  PROJECT_DOCUMENTATION_TEMPLATES,
+  PROJECT_DOCUMENTATION_INSTRUCTIONS,
   DELETE_PROJECT_AUTHOR,
+  UPDATE_PROJECT_TITLE,
+  UPDATE_PROJECT_TAGLINE,
+  UPDATE_PROJECT_DESCRIPTION,
+  UPDATE_PROJECT_COVER_IMAGE_URL,
+  UPDATE_PROJECT_DOCUMENTATION_INSTRUCTION,
+  UPDATE_PROJECT_ACCEPTING_PARTICIPANTS,
 } from '../../../../../queries/project';
 import {
   INSTRUCTOR_INSERT_PROJECT_AUTHOR,
   INSERT_PROJECT_MENTOR,
   DELETE_PROJECT_MENTOR,
+  DELETE_PROJECT,
   UPDATE_PROJECT_PUBLISH,
+  UPDATE_PROJECT_TYPE,
 } from '../../../../../queries/projectInstructor';
 import {
   ProjectsByCourse,
   ProjectsByCourseVariables,
 } from '../../../../../queries/__generated__/ProjectsByCourse';
 import { ProjectTypes } from '../../../../../queries/__generated__/ProjectTypes';
-import { ProjectDocumentationTemplates } from '../../../../../queries/__generated__/ProjectDocumentationTemplates';
+import { ProjectDocumentationInstructions } from '../../../../../queries/__generated__/ProjectDocumentationInstructions';
 import {
   ProjectParticipationStatus_enum,
   ProjectStatus_enum,
 } from '../../../../../__generated__/globalTypes';
-import { formattedDateWithTime, makeFullName } from '../../../../../helpers/util';
+import { makeFullName } from '../../../../../helpers/util';
+import { translateErrorMessage } from '../../../../../helpers/errorHandling';
 import StatusChip from '../../../CourseContent/Projects/StatusChip';
+import ProjectPreviewLayout from '../../../CourseContent/Projects/ProjectPreviewLayout';
+import ProjectSubmissionDeadlineBelowTitle from '../../../CourseContent/Projects/ProjectSubmissionDeadlineBelowTitle';
+import type { CourseProjectSubmissionDefaultSource } from '../../../CourseContent/Projects/projectEffectiveSubmissionDeadline';
 import { ProjectRow } from '../../../CourseContent/Projects/types';
-import ConfirmTeamDialog from './ConfirmTeamDialog';
+import ConfirmProjectDialog from './ConfirmProjectDialog';
 import ReviewProjectDialog from './ReviewProjectDialog';
 import AddProjectDialog from './AddProjectDialog';
 
 interface ProjectsManagementGridProps {
   courseId: number;
   programDefaultProjectType: string | null;
+  /** Course / program fallback when `Project.submissionDeadline` is null. */
+  courseDefaultProjectSubmissionDeadline: string | null | undefined;
+  courseSubmissionDeadlineDefaultSource: CourseProjectSubmissionDefaultSource;
 }
 
 const REFETCH_QUERIES = ['ProjectsByCourse'];
 
-const STATUS_FILTER_VALUES: (ProjectStatus_enum | 'ALL')[] = [
-  'ALL',
-  ProjectStatus_enum.PROPOSED,
-  ProjectStatus_enum.ONGOING,
-  ProjectStatus_enum.SUBMITTED,
-  ProjectStatus_enum.COMPLETED,
-  ProjectStatus_enum.INCOMPLETE,
-  ProjectStatus_enum.PUBLISHED,
-];
-
 const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
   courseId,
   programDefaultProjectType,
+  courseDefaultProjectSubmissionDeadline,
+  courseSubmissionDeadlineDefaultSource,
 }) => {
   const t = useTranslations('manageCourse');
   const tCourse = useTranslations('course');
   const tCommon = useTranslations('common');
-  const locale = useLocale();
   const instructorUserId = useUserId();
 
-  const [statusFilter, setStatusFilter] = useState<(ProjectStatus_enum | 'ALL')>('ALL');
   const [errorMessage, setErrorMessage] = useState('');
-  const [confirmTeamProject, setConfirmTeamProject] = useState<ProjectRow | null>(null);
+  const [confirmProject, setConfirmProject] = useState<ProjectRow | null>(null);
   const [reviewProject, setReviewProject] = useState<ProjectRow | null>(null);
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [selectAuthorTarget, setSelectAuthorTarget] = useState<ProjectRow | null>(null);
@@ -79,14 +90,15 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
     id: number;
     name: string;
   } | null>(null);
+  const [deleteTemplateTarget, setDeleteTemplateTarget] = useState<ProjectRow | null>(null);
 
   const projectsQuery = useRoleQuery<ProjectsByCourse, ProjectsByCourseVariables>(
     PROJECTS_BY_COURSE,
     { variables: { courseId } }
   );
   const projectTypesQuery = useAuthedQuery<ProjectTypes>(PROJECT_TYPES);
-  const documentationTemplatesQuery = useAuthedQuery<ProjectDocumentationTemplates>(
-    PROJECT_DOCUMENTATION_TEMPLATES
+  const documentationInstructionsQuery = useAuthedQuery<ProjectDocumentationInstructions>(
+    PROJECT_DOCUMENTATION_INSTRUCTIONS
   );
 
   const [insertAuthor] = useRoleMutation(INSTRUCTOR_INSERT_PROJECT_AUTHOR, {
@@ -104,13 +116,68 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
   const [publishProject] = useRoleMutation(UPDATE_PROJECT_PUBLISH, {
     refetchQueries: REFETCH_QUERIES,
   });
+  const [deleteProject, { loading: deleteProjectLoading }] = useRoleMutation(DELETE_PROJECT, {
+    refetchQueries: REFETCH_QUERIES,
+  });
 
-  const filteredProjects = useMemo(() => {
-    const projects = projectsQuery.data?.Project ?? [];
-    return statusFilter === 'ALL'
-      ? projects
-      : projects.filter((p) => p.status === statusFilter);
-  }, [projectsQuery.data?.Project, statusFilter]);
+  const allProjects = projectsQuery.data?.Project ?? [];
+
+  /** Counts course projects whose parentProjectId points at a template (same course list). */
+  const templateCopyCountByParentId = useMemo(() => {
+    const counts = new Map<number, number>();
+    for (const p of projectsQuery.data?.Project ?? []) {
+      if (p.parentProjectId != null) {
+        const parentId = p.parentProjectId;
+        counts.set(parentId, (counts.get(parentId) ?? 0) + 1);
+      }
+    }
+    return counts;
+  }, [projectsQuery.data?.Project]);
+
+  const projectTypesList = useMemo(
+    () => projectTypesQuery.data?.ProjectType ?? [],
+    [projectTypesQuery.data?.ProjectType]
+  );
+
+  const typeDescriptionsTooltip = useMemo(
+    () =>
+      projectTypesList
+        .map(
+          (pt) =>
+            `${tCourse(`projects.type_label.${pt.value}` as never)}\n${tCourse(`projects.type_description.${pt.value}` as never)}`
+        )
+        .join('\n\n'),
+    [projectTypesList, tCourse]
+  );
+
+  const typeDropdownOptions = useMemo(
+    () =>
+      projectTypesList.map((pt) => ({
+        value: pt.value,
+        label: tCourse(`projects.type_label.${pt.value}` as never),
+      })),
+    [projectTypesList, tCourse]
+  );
+
+  const documentationInstructionOptions = useMemo(
+    () =>
+      (documentationInstructionsQuery.data?.ProjectDocumentationInstruction ?? []).map(
+        (tpl) => ({ value: String(tpl.id), label: tpl.title })
+      ),
+    [documentationInstructionsQuery.data?.ProjectDocumentationInstruction]
+  );
+
+  const handleCoverUploadError = useCallback(
+    (error: string) => {
+      const normalizedKey = error.toLowerCase().replaceAll('.', '_');
+      const fileUploadKey = `file_upload.${normalizedKey}`;
+      const direct = tCommon(fileUploadKey);
+      setErrorMessage(
+        direct !== fileUploadKey ? direct : translateErrorMessage(error, tCommon)
+      );
+    },
+    [tCommon]
+  );
 
   const handleAuthorSelected = useCallback(
     async (
@@ -165,6 +232,17 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
     }
   }, [deleteAuthor, removeAuthorContext, tCommon]);
 
+  const handleConfirmDeleteTemplate = useCallback(async () => {
+    const target = deleteTemplateTarget;
+    setDeleteTemplateTarget(null);
+    if (!target) return;
+    try {
+      await deleteProject({ variables: { id: target.id } });
+    } catch (err) {
+      setErrorMessage(err instanceof Error ? err.message : tCommon('error'));
+    }
+  }, [deleteProject, deleteTemplateTarget, tCommon]);
+
   const handleRemoveMentor = useCallback(
     async (id: number) => {
       try {
@@ -187,39 +265,21 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
     [publishProject, tCommon]
   );
 
-  const handleBulkAction = useCallback(
-    async (action: string, rows: ProjectRow[]) => {
-      if (action !== 'PUBLISH') return;
-      const eligible = rows.filter((r) => r.status === ProjectStatus_enum.COMPLETED);
-      if (eligible.length === 0) {
-        setErrorMessage(t('projects.bulk.no_eligible'));
-        return;
-      }
-      try {
-        await Promise.all(
-          eligible.map((row) =>
-            publishProject({ variables: { itemId: row.id } })
-          )
-        );
-      } catch (err) {
-        setErrorMessage(err instanceof Error ? err.message : tCommon('error'));
-      }
-    },
-    [publishProject, t, tCommon]
-  );
-
   const columns = useMemo<ColumnDef<ProjectRow>[]>(
     () => [
+      {
+        id: 'status',
+        header: t('projects.table.status'),
+        enableSorting: false,
+        cell: ({ row }) => <StatusChip status={row.original.status} />,
+      },
       {
         id: 'title',
         header: t('projects.table.title'),
         accessorKey: 'title',
         enableSorting: true,
         cell: ({ row }) => (
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="font-medium">{row.original.title}</span>
-            <StatusChip status={row.original.status} />
-          </div>
+          <span className="font-medium text-label-primary">{row.original.title}</span>
         ),
       },
       {
@@ -249,47 +309,29 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
         },
       },
       {
-        id: 'mentors',
-        header: t('projects.table.mentors'),
-        cell: ({ row }) => {
-          const mentors = row.original.ProjectMentors ?? [];
-          if (mentors.length === 0) {
-            return <span className="text-label-secondary">-</span>;
-          }
-          return (
-            <span>
-              {mentors
-                .map((m) =>
-                  makeFullName(m.User?.firstName ?? '', m.User?.lastName ?? '')
-                )
-                .filter(Boolean)
-                .join(', ')}
-            </span>
-          );
-        },
-      },
-      {
         id: 'type',
         header: t('projects.table.type'),
-        cell: ({ row }) =>
-          row.original.type ? (
-            <span>{tCourse(`projects.type_label.${row.original.type}` as never)}</span>
-          ) : (
-            <span className="text-label-secondary">-</span>
-          ),
-      },
-      {
-        id: 'updated_at',
-        header: t('projects.table.last_update'),
-        enableSorting: true,
-        cell: ({ row }) =>
-          row.original.updated_at ? (
-            <span className="text-sm">
-              {formattedDateWithTime(new Date(row.original.updated_at), locale)}
-            </span>
-          ) : (
-            '-'
-          ),
+        meta: { className: 'max-w-[14rem]' },
+        cell: ({ row }) => (
+          <div
+            className="min-w-0 w-full [&_.col-span-10]:!mt-0"
+            onMouseDown={(e) => e.stopPropagation()}
+            role="presentation"
+          >
+            <DropDownSelector
+              variant="material"
+              value={projectTypesQuery.loading ? '' : row.original.type ?? ''}
+              options={typeDropdownOptions}
+              updateValueMutation={UPDATE_PROJECT_TYPE}
+              identifierVariables={{ itemId: row.original.id }}
+              refetchQueries={REFETCH_QUERIES}
+              helpText={typeDescriptionsTooltip}
+              nullable
+              nullableLabel={t('projects.type_select_placeholder')}
+              disabled={projectTypesQuery.loading}
+            />
+          </div>
+        ),
       },
       {
         id: 'action',
@@ -297,16 +339,52 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
         cell: ({ row }) => {
           const project = row.original;
           if (project.status === ProjectStatus_enum.PROPOSED) {
+            const hasAcceptedAuthor = (project.ProjectAuthors ?? []).some(
+              (a) =>
+                a.participationStatus === ProjectParticipationStatus_enum.ACCEPTED
+            );
+            if (!hasAcceptedAuthor) {
+              const copyCount = templateCopyCountByParentId.get(project.id) ?? 0;
+              const deleteDisabled = copyCount > 0 || deleteProjectLoading;
+              const deleteButton = (
+                <Button
+                  className="w-full"
+                  onClick={() => setDeleteTemplateTarget(project)}
+                  disabled={deleteDisabled}
+                >
+                  {t('projects.actions.delete_template')}
+                </Button>
+              );
+              return copyCount > 0 ? (
+                <Tooltip title={t('projects.delete_template_disabled_tooltip')}>
+                  <span className="block w-full">{deleteButton}</span>
+                </Tooltip>
+              ) : (
+                deleteButton
+              );
+            }
             return (
-              <Button onClick={() => setConfirmTeamProject(project)} className="w-full">
-                {t('projects.actions.confirm_team')}
+              <Button onClick={() => setConfirmProject(project)} className="w-full">
+                {t('projects.actions.confirm_project')}
               </Button>
+            );
+          }
+          if (project.status === ProjectStatus_enum.ONGOING) {
+            const evaluateBtn = (
+              <Button disabled className="w-full">
+                {t('projects.actions.evaluate_project')}
+              </Button>
+            );
+            return (
+              <Tooltip title={t('projects.actions.evaluate_disabled_tooltip')}>
+                <span className="block w-full">{evaluateBtn}</span>
+              </Tooltip>
             );
           }
           if (project.status === ProjectStatus_enum.SUBMITTED) {
             return (
               <Button filled onClick={() => setReviewProject(project)} className="w-full">
-                {t('projects.actions.review')}
+                {t('projects.actions.evaluate_project')}
               </Button>
             );
           }
@@ -321,7 +399,15 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
         },
       },
     ],
-    [handlePublish, locale, t, tCourse]
+    [
+      deleteProjectLoading,
+      handlePublish,
+      projectTypesQuery.loading,
+      t,
+      templateCopyCountByParentId,
+      typeDescriptionsTooltip,
+      typeDropdownOptions,
+    ]
   );
 
   const expandableRowComponent = useCallback(
@@ -332,157 +418,312 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
       const requested = (row.ProjectAuthors ?? []).filter(
         (a) => a.participationStatus === ProjectParticipationStatus_enum.REQUESTED
       );
+      const hasAcceptedAuthor = accepted.length > 0;
+
+      const showFullDetails =
+        row.status === ProjectStatus_enum.COMPLETED ||
+        row.status === ProjectStatus_enum.PUBLISHED;
+      const hasResourceUrl =
+        Boolean(row.documentationUrl?.trim()) ||
+        Boolean(row.presentationUrl?.trim()) ||
+        Boolean(row.externalUrl?.trim());
+      const showResourceLinks = showFullDetails || hasResourceUrl;
+
+      const authorMentorSection = (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 w-full">
+          <div className="min-w-0">
+            <div className="flex items-center justify-between mb-1 gap-2">
+              <span className="text-sm font-medium">
+                {t('projects.expanded.authors_heading')}
+              </span>
+              <Button onClick={() => setSelectAuthorTarget(row)}>
+                <MdAddCircle className="inline align-text-bottom" />{' '}
+                {t('projects.expanded.add_author')}
+              </Button>
+            </div>
+            <ul className="space-y-1">
+              {accepted.length === 0 ? (
+                <li className="text-sm text-label-secondary">
+                  {t('projects.expanded.no_authors')}
+                </li>
+              ) : (
+                accepted.map((a) => (
+                  <li
+                    key={a.id}
+                    className="flex items-center justify-between text-sm"
+                  >
+                    <span>
+                      {makeFullName(a.User?.firstName ?? '', a.User?.lastName ?? '')}
+                    </span>
+                    <button
+                      type="button"
+                      aria-label={t('projects.expanded.remove_author_aria')}
+                      onClick={() =>
+                        setRemoveAuthorContext({
+                          id: a.id,
+                          name: makeFullName(
+                            a.User?.firstName ?? '',
+                            a.User?.lastName ?? ''
+                          ),
+                        })
+                      }
+                      className="p-1 rounded hover:bg-gray-200"
+                    >
+                      <MdClose />
+                    </button>
+                  </li>
+                ))
+              )}
+              {requested.map((a) => (
+                <li key={a.id} className="text-sm text-label-secondary italic">
+                  {makeFullName(a.User?.firstName ?? '', a.User?.lastName ?? '')}{' '}
+                  ({t('projects.expanded.requested')})
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="min-w-0 md:border-l md:border-border-primary md:pl-4">
+            <div className="flex items-center justify-between mb-1 gap-2">
+              <div className="flex items-center gap-1 min-w-0">
+                <span className="text-sm font-medium">
+                  {t('projects.expanded.mentors_heading')}
+                </span>
+                <Tooltip title={t('projects.expanded.mentors_heading_tooltip')}>
+                  <button
+                    type="button"
+                    className="inline-flex shrink-0 cursor-help rounded p-0.5 text-label-secondary border-0 bg-transparent hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                    aria-label={t('projects.expanded.mentors_heading_tooltip')}
+                  >
+                    <HelpOutline fontSize="small" />
+                  </button>
+                </Tooltip>
+              </div>
+              <Button onClick={() => setSelectMentorTarget(row)}>
+                <MdAddCircle className="inline align-text-bottom" />{' '}
+                {t('projects.expanded.add_mentor')}
+              </Button>
+            </div>
+            <ul className="space-y-1">
+              {(row.ProjectMentors ?? []).length === 0 ? (
+                <li className="text-sm text-label-secondary">
+                  {t('projects.expanded.no_mentors')}
+                </li>
+              ) : (
+                (row.ProjectMentors ?? []).map((m) => (
+                  <li
+                    key={m.id}
+                    className="flex items-center justify-between text-sm"
+                  >
+                    <span>
+                      {makeFullName(m.User?.firstName ?? '', m.User?.lastName ?? '')}
+                    </span>
+                    <button
+                      type="button"
+                      aria-label={t('projects.expanded.remove_mentor_aria')}
+                      onClick={() => handleRemoveMentor(m.id)}
+                      className="p-1 rounded hover:bg-gray-200"
+                    >
+                      <MdClose />
+                    </button>
+                  </li>
+                ))
+              )}
+            </ul>
+          </div>
+        </div>
+      );
+
+      const documentationInstructionSelector =
+        documentationInstructionOptions.length > 0 ? (
+          <div className="[&_.col-span-10]:!mt-0">
+            <DropDownSelector
+              variant="material"
+              label={tCourse('projects.my_project.documentation_instruction_label')}
+              value={
+                row.documentationInstructionId
+                  ? String(row.documentationInstructionId)
+                  : ''
+              }
+              options={documentationInstructionOptions}
+              nullable
+              nullableLabel={tCourse('projects.my_project.documentation_instruction_none')}
+              updateValueMutation={UPDATE_PROJECT_DOCUMENTATION_INSTRUCTION}
+              identifierVariables={{ itemId: row.id }}
+              refetchQueries={REFETCH_QUERIES}
+              helpText={t('projects.add_dialog.instruction_info')}
+            />
+          </div>
+        ) : null;
+
+      if (!hasAcceptedAuthor) {
+        const canEditProjectTitle = row.parentProjectId == null;
+        return (
+          <div className="bg-fill-primary text-label-primary p-4 space-y-6 light">
+            <ProjectSubmissionDeadlineBelowTitle
+              mode="instructor"
+              project={row}
+              courseDefaultSubmissionDeadline={courseDefaultProjectSubmissionDeadline}
+              defaultDeadlineSource={courseSubmissionDeadlineDefaultSource}
+              refetchQueries={REFETCH_QUERIES}
+            />
+            <div className="rounded-lg border border-border-primary p-4 bg-bg-secondary/30 space-y-3">
+              <ProjectPreviewLayout
+                project={row}
+                showResourceLinks={showResourceLinks}
+                titleRow={
+                  <div className="flex flex-wrap items-start gap-2 mb-1 w-full">
+                    <div className="min-w-0 flex-1">
+                      {canEditProjectTitle ? (
+                        <InputField
+                          variant="material"
+                          type="input"
+                          label={tCourse('projects.my_project.title_label')}
+                          placeholder={tCourse('projects.my_project.title_label')}
+                          itemId={row.id}
+                          value={row.title}
+                          updateValueMutation={UPDATE_PROJECT_TITLE}
+                          refetchQueries={REFETCH_QUERIES}
+                          helpText={tCourse('projects.my_project.field_tooltip_title')}
+                          className="[&>div]:!mt-0 [&>div]:!mb-2"
+                        />
+                      ) : (
+                        <div className="space-y-1">
+                          <h4 className="text-xl font-semibold text-label-primary min-w-0 break-words">
+                            {row.title}
+                          </h4>
+                          <p className="text-xs text-label-secondary">
+                            {tCourse('projects.my_project.title_locked_hint')}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                    <StatusChip status={row.status} />
+                  </div>
+                }
+                coverSlot={
+                  <FileUploadField
+                    variant="material"
+                    mutationPreset="role"
+                    infoTooltip={tCourse('projects.my_project.field_tooltip_cover_image')}
+                    currentFileUrl={row.coverImageUrl}
+                    uploadMutation={SAVE_PROJECT_IMAGE}
+                    updateMutation={UPDATE_PROJECT_COVER_IMAGE_URL}
+                    identifierVariables={{ itemId: row.id }}
+                    uploadIdentifierVariables={{ projectId: row.id }}
+                    updateFieldName="text"
+                    acceptedFileTypes="image/*"
+                    maxFileSize={5 * 1024 * 1024}
+                    imageWidth={160}
+                    imageHeight={96}
+                    showFileName
+                    refetchQueries={REFETCH_QUERIES}
+                    uploadText={tCourse('projects.my_project.cover_image_upload_text')}
+                    altText={tCourse('projects.my_project.cover_image_alt')}
+                    onUploadError={handleCoverUploadError}
+                  />
+                }
+                taglineSlot={
+                  <div className="mt-3 rounded border border-border-primary p-3 min-h-[3.5rem] text-sm bg-bg-secondary/50">
+                    <InputField
+                      variant="eduhub"
+                      type="input"
+                      placeholder={tCourse('projects.my_project.tagline_label')}
+                      itemId={row.id}
+                      value={row.tagline ?? ''}
+                      updateValueMutation={UPDATE_PROJECT_TAGLINE}
+                      refetchQueries={REFETCH_QUERIES}
+                      helpText={tCourse('projects.my_project.field_tooltip_tagline')}
+                      maxLength={400}
+                      showCharacterCount={false}
+                      className="!mb-2 border-transparent bg-transparent"
+                    />
+                  </div>
+                }
+                descriptionSlot={
+                  <div className="rounded border border-border-primary p-3 flex-1 min-h-[10rem] text-sm bg-bg-secondary/50">
+                    <InputField
+                      variant="eduhub"
+                      type="textarea"
+                      placeholder={tCourse('projects.my_project.description_label')}
+                      itemId={row.id}
+                      value={row.description ?? ''}
+                      updateValueMutation={UPDATE_PROJECT_DESCRIPTION}
+                      refetchQueries={REFETCH_QUERIES}
+                      helpText={tCourse('projects.my_project.field_tooltip_description')}
+                      maxLength={8000}
+                      showCharacterCount={false}
+                      className="!mb-2 min-h-[9rem] border-transparent bg-transparent"
+                    />
+                  </div>
+                }
+              />
+              {documentationInstructionSelector}
+              <CheckboxSelector
+                variant="material"
+                label={tCourse('projects.my_project.accepting_participants_label')}
+                checked={Boolean(row.acceptingParticipants)}
+                updateValueMutation={UPDATE_PROJECT_ACCEPTING_PARTICIPANTS}
+                identifierVariables={{ itemId: row.id }}
+                refetchQueries={REFETCH_QUERIES}
+                helpText={tCourse('projects.my_project.field_tooltip_accepting_participants')}
+              />
+            </div>
+
+            <div className="border-t border-border-primary pt-4">
+              {authorMentorSection}
+            </div>
+          </div>
+        );
+      }
+
       return (
         <div className="bg-fill-primary text-label-primary p-4 space-y-4 light">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2 text-sm">
-              {row.tagline ? (
-                <p>
-                  <span className="font-medium">{t('projects.expanded.tagline')}: </span>
-                  {row.tagline}
-                </p>
-              ) : null}
-              {row.description ? (
-                <p className="whitespace-pre-line">{row.description}</p>
-              ) : null}
-              {row.documentationUrl ? (
-                <a
-                  href={row.documentationUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block text-status-confirmed underline"
-                >
-                  {t('projects.expanded.documentation_link')}
-                </a>
-              ) : null}
-              {row.presentationUrl ? (
-                <a
-                  href={row.presentationUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block text-status-confirmed underline"
-                >
-                  {t('projects.expanded.presentation_link')}
-                </a>
-              ) : null}
-              {row.externalUrl ? (
-                <a
-                  href={row.externalUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block text-status-confirmed underline"
-                >
-                  {t('projects.expanded.external_link')}
-                </a>
-              ) : null}
-              {row.score != null ? (
-                <p>
-                  <span className="font-medium">{t('projects.expanded.score')}: </span>
-                  {row.score}
-                </p>
-              ) : null}
-              {row.rating ? (
-                <p>
-                  <span className="font-medium">{t('projects.expanded.rating')}: </span>
-                  {row.rating}
+          <ProjectSubmissionDeadlineBelowTitle
+            mode="instructor"
+            project={row}
+            courseDefaultSubmissionDeadline={courseDefaultProjectSubmissionDeadline}
+            defaultDeadlineSource={courseSubmissionDeadlineDefaultSource}
+            refetchQueries={REFETCH_QUERIES}
+          />
+          <div className="rounded-lg border border-border-primary p-3 bg-bg-secondary/20">
+            <ProjectPreviewLayout project={row} showResourceLinks={showResourceLinks} />
+          </div>
+          {documentationInstructionSelector}
+          {(row.rating != null || row.ratingComment?.trim()) && (
+            <div className="text-sm space-y-2 border-t border-border-primary pt-3">
+              <div className="flex flex-wrap gap-4">
+                {row.rating != null ? (
+                  <p>
+                    <span className="font-medium">{t('projects.expanded.rating')}: </span>
+                    {row.rating}
+                  </p>
+                ) : null}
+              </div>
+              {row.ratingComment?.trim() ? (
+                <p className="text-label-secondary whitespace-pre-line">
+                  <span className="font-medium text-label-primary">
+                    {t('projects.expanded.rating_comment_label')}:{' '}
+                  </span>
+                  {row.ratingComment.trim()}
                 </p>
               ) : null}
             </div>
-            <div className="space-y-3">
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-sm font-medium">
-                    {t('projects.expanded.authors_heading')}
-                  </span>
-                  <Button onClick={() => setSelectAuthorTarget(row)}>
-                    <MdAddCircle className="inline align-text-bottom" />{' '}
-                    {t('projects.expanded.add_author')}
-                  </Button>
-                </div>
-                <ul className="space-y-1">
-                  {accepted.length === 0 ? (
-                    <li className="text-sm text-label-secondary">
-                      {t('projects.expanded.no_authors')}
-                    </li>
-                  ) : (
-                    accepted.map((a) => (
-                      <li
-                        key={a.id}
-                        className="flex items-center justify-between text-sm"
-                      >
-                        <span>
-                          {makeFullName(a.User?.firstName ?? '', a.User?.lastName ?? '')}
-                        </span>
-                        <button
-                          type="button"
-                          aria-label={t('projects.expanded.remove_author_aria')}
-                          onClick={() =>
-                            setRemoveAuthorContext({
-                              id: a.id,
-                              name: makeFullName(
-                                a.User?.firstName ?? '',
-                                a.User?.lastName ?? ''
-                              ),
-                            })
-                          }
-                          className="p-1 rounded hover:bg-gray-200"
-                        >
-                          <MdClose />
-                        </button>
-                      </li>
-                    ))
-                  )}
-                  {requested.map((a) => (
-                    <li key={a.id} className="text-sm text-label-secondary italic">
-                      {makeFullName(a.User?.firstName ?? '', a.User?.lastName ?? '')}{' '}
-                      ({t('projects.expanded.requested')})
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-sm font-medium">
-                    {t('projects.expanded.mentors_heading')}
-                  </span>
-                  <Button onClick={() => setSelectMentorTarget(row)}>
-                    <MdAddCircle className="inline align-text-bottom" />{' '}
-                    {t('projects.expanded.add_mentor')}
-                  </Button>
-                </div>
-                <ul className="space-y-1">
-                  {(row.ProjectMentors ?? []).length === 0 ? (
-                    <li className="text-sm text-label-secondary">
-                      {t('projects.expanded.no_mentors')}
-                    </li>
-                  ) : (
-                    (row.ProjectMentors ?? []).map((m) => (
-                      <li
-                        key={m.id}
-                        className="flex items-center justify-between text-sm"
-                      >
-                        <span>
-                          {makeFullName(m.User?.firstName ?? '', m.User?.lastName ?? '')}
-                        </span>
-                        <button
-                          type="button"
-                          aria-label={t('projects.expanded.remove_mentor_aria')}
-                          onClick={() => handleRemoveMentor(m.id)}
-                          className="p-1 rounded hover:bg-gray-200"
-                        >
-                          <MdClose />
-                        </button>
-                      </li>
-                    ))
-                  )}
-                </ul>
-              </div>
-            </div>
+          )}
+          <div className="border-t border-border-primary pt-3">
+            {authorMentorSection}
           </div>
         </div>
       );
     },
-    [handleRemoveMentor, t]
+    [
+      documentationInstructionOptions,
+      handleCoverUploadError,
+      handleRemoveMentor,
+      courseDefaultProjectSubmissionDeadline,
+      courseSubmissionDeadlineDefaultSource,
+      t,
+      tCourse,
+    ]
   );
 
   const initialLoading = projectsQuery.loading && !projectsQuery.data;
@@ -496,31 +737,9 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-2 flex-wrap">
-        <span className="text-sm font-medium text-label-secondary uppercase">
-          {t('projects.filter_label')}
-        </span>
-        {STATUS_FILTER_VALUES.map((value) => (
-          <button
-            key={value}
-            type="button"
-            onClick={() => setStatusFilter(value)}
-            className={`px-2 py-1 rounded text-xs ${
-              statusFilter === value
-                ? 'bg-status-confirmed text-label-primary'
-                : 'bg-bg-secondary text-label-secondary'
-            }`}
-          >
-            {value === 'ALL'
-              ? t('projects.filter_all')
-              : tCourse(`projects.status.${value}` as never)}
-          </button>
-        ))}
-      </div>
-
       <TableGrid<ProjectRow>
         columns={columns}
-        data={filteredProjects}
+        data={allProjects}
         loading={projectsQuery.loading}
         error={projectsQuery.error}
         enablePagination={false}
@@ -530,27 +749,18 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
         searchFilter=""
         onSearchFilterChange={() => undefined}
         refetchQueries={REFETCH_QUERIES}
-        showCheckbox
-        bulkActions={[
-          {
-            value: 'PUBLISH',
-            label: t('projects.bulk.publish'),
-            requiresSelection: true,
-          },
-        ]}
-        onBulkAction={handleBulkAction}
         addButtonText={t('projects.add_button')}
         onAddButtonClick={() => setAddDialogOpen(true)}
         expandableRowComponent={expandableRowComponent}
       />
 
-      <ConfirmTeamDialog
-        open={Boolean(confirmTeamProject)}
-        onClose={() => setConfirmTeamProject(null)}
-        project={confirmTeamProject}
+      <ConfirmProjectDialog
+        open={Boolean(confirmProject)}
+        onClose={() => setConfirmProject(null)}
+        project={confirmProject}
         projectTypes={projectTypesQuery.data?.ProjectType ?? []}
-        documentationTemplates={
-          documentationTemplatesQuery.data?.ProjectDocumentationTemplate ?? []
+        documentationInstructions={
+          documentationInstructionsQuery.data?.ProjectDocumentationInstruction ?? []
         }
         programDefaultProjectType={programDefaultProjectType}
         refetchQueries={REFETCH_QUERIES}
@@ -596,6 +806,16 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
         })}
         onClose={() => setRemoveAuthorContext(null)}
         onConfirm={handleConfirmRemoveAuthor}
+      />
+
+      <QuestionConfirmationDialog
+        open={Boolean(deleteTemplateTarget)}
+        question={t('projects.delete_template_confirmation', {
+          title: deleteTemplateTarget?.title ?? '',
+        })}
+        onClose={() => setDeleteTemplateTarget(null)}
+        onConfirm={handleConfirmDeleteTemplate}
+        confirmDisabled={deleteProjectLoading}
       />
 
       <NotificationSnackbar

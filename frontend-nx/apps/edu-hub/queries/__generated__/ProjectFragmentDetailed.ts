@@ -24,8 +24,8 @@ export interface ProjectFragmentDetailed_ProjectType {
   requiresCoverImage: boolean;
 }
 
-export interface ProjectFragmentDetailed_ProjectDocumentationTemplate {
-  __typename: "ProjectDocumentationTemplate";
+export interface ProjectFragmentDetailed_ProjectDocumentationInstruction {
+  __typename: "ProjectDocumentationInstruction";
   id: number;
   title: string;
   url: string;
@@ -119,12 +119,15 @@ export interface ProjectFragmentDetailed {
   documentationUrl: string | null;
   presentationUrl: string | null;
   externalUrl: string | null;
-  documentationTemplateId: number | null;
+  documentationInstructionId: number | null;
   status: ProjectStatus_enum;
   type: string | null;
   achievementCertificateType: ProjectAchievementCertificateType_enum | null;
   rating: ProjectRating_enum | null;
-  score: any | null;
+  /**
+   * Optional instructor comment accompanying the project rating (UNRATED/PASSED/FAILED).
+   */
+  ratingComment: string | null;
   acceptingParticipants: boolean;
   organizationId: number | null;
   proposedByUserId: any;
@@ -141,6 +144,10 @@ export interface ProjectFragmentDetailed {
    * Timestamp when project authors asked course staff to review the proposed project (still PROPOSED until staff confirm the team).
    */
   projectReviewRequestedAt: any | null;
+  /**
+   * Optional per-project submission deadline. When null, the effective deadline is taken from the course (projectSubmissionDeadline) or program defaults.
+   */
+  submissionDeadline: any | null;
   created_at: any;
   updated_at: any;
   /**
@@ -154,7 +161,7 @@ export interface ProjectFragmentDetailed {
   /**
    * An object relationship
    */
-  ProjectDocumentationTemplate: ProjectFragmentDetailed_ProjectDocumentationTemplate | null;
+  ProjectDocumentationInstruction: ProjectFragmentDetailed_ProjectDocumentationInstruction | null;
   /**
    * An object relationship
    */

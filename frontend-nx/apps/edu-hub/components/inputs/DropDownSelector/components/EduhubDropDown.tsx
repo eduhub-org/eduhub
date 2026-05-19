@@ -89,6 +89,11 @@ export const EduhubDropDown: React.FC<EduhubDropDownProps> = ({
               disabled={disabled}
               className={`${finalClassName} ${errorMessage ? 'border-red-500' : ''}`}
             >
+              {placeholder && !localOptions.some((o) => o.value === '') ? (
+                <option value="" disabled>
+                  {placeholder}
+                </option>
+              ) : null}
               {localOptions.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}

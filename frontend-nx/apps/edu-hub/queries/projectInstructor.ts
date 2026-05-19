@@ -1,23 +1,40 @@
 import { gql } from '@apollo/client';
 
 export const INSTRUCTOR_INSERT_PROJECT = gql`
+  # Atomic create-project flow for instructors. Passing an empty $authors array yields a
+  # template-style project (PROPOSED status with no ACCEPTED authors) that course participants
+  # can claim via copyProjectFromTemplate; passing one or more authors creates a regular team
+  # project owned by those users.
   mutation InstructorInsertProject(
     $title: String!
     $type: String
+    $documentationInstructionId: Int
     $proposedByUserId: uuid!
     $courseId: Int!
+    $authors: [ProjectAuthor_insert_input!]!
   ) {
     insert_Project_one(
       object: {
         title: $title
         type: $type
+        documentationInstructionId: $documentationInstructionId
         proposedByUserId: $proposedByUserId
         status: PROPOSED
         acceptingParticipants: true
         ProjectCourses: { data: { courseId: $courseId } }
+        ProjectAuthors: { data: $authors }
       }
     ) {
       id
+    }
+  }
+`;
+
+export const UPDATE_PROJECT_TYPE = gql`
+  mutation UpdateProjectType($itemId: Int!, $value: String) {
+    update_Project_by_pk(pk_columns: { id: $itemId }, _set: { type: $value }) {
+      id
+      type
     }
   }
 `;
@@ -26,37 +43,50 @@ export const UPDATE_PROJECT_CONFIRM_TEAM = gql`
   mutation UpdateProjectConfirmTeam(
     $itemId: Int!
     $type: String!
-    $documentationTemplateId: Int!
+    $documentationInstructionId: Int!
   ) {
     update_Project_by_pk(
       pk_columns: { id: $itemId }
       _set: {
         type: $type
-        documentationTemplateId: $documentationTemplateId
+        documentationInstructionId: $documentationInstructionId
         status: ONGOING
       }
     ) {
       id
       status
       type
-      documentationTemplateId
+      documentationInstructionId
+    }
+  }
+`;
+
+export const UPDATE_PROJECT_RATING_AND_COMMENT = gql`
+  mutation UpdateProjectRatingAndComment(
+    $itemId: Int!
+    $rating: ProjectRating_enum!
+    $ratingComment: String
+  ) {
+    update_Project_by_pk(
+      pk_columns: { id: $itemId }
+      _set: { rating: $rating, ratingComment: $ratingComment }
+    ) {
+      id
+      rating
+      ratingComment
     }
   }
 `;
 
 export const UPDATE_PROJECT_APPROVE = gql`
-  mutation UpdateProjectApprove(
-    $itemId: Int!
-    $score: numeric
-  ) {
+  mutation UpdateProjectApprove($itemId: Int!) {
     update_Project_by_pk(
       pk_columns: { id: $itemId }
-      _set: { status: COMPLETED, rating: PASSED, score: $score }
+      _set: { status: COMPLETED, rating: PASSED }
     ) {
       id
       status
       rating
-      score
     }
   }
 `;
@@ -130,6 +160,14 @@ export const INSERT_PROJECT_MENTOR = gql`
 export const DELETE_PROJECT_MENTOR = gql`
   mutation DeleteProjectMentor($id: Int!) {
     delete_ProjectMentor_by_pk(id: $id) {
+      id
+    }
+  }
+`;
+
+export const DELETE_PROJECT = gql`
+  mutation DeleteProject($id: Int!) {
+    delete_Project_by_pk(id: $id) {
       id
     }
   }

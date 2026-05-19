@@ -3,6 +3,8 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
+import { ProjectAuthor_insert_input } from "./../../__generated__/globalTypes";
+
 // ====================================================
 // GraphQL mutation operation: InstructorInsertProject
 // ====================================================
@@ -22,6 +24,8 @@ export interface InstructorInsertProject {
 export interface InstructorInsertProjectVariables {
   title: string;
   type?: string | null;
+  documentationInstructionId?: number | null;
   proposedByUserId: any;
   courseId: number;
+  authors: ProjectAuthor_insert_input[];
 }

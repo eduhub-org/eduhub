@@ -1538,17 +1538,17 @@ export enum ProjectCourse_update_column {
 }
 
 /**
- * unique or primary key constraints on table "ProjectDocumentationTemplate"
+ * unique or primary key constraints on table "ProjectDocumentationInstruction"
  */
-export enum ProjectDocumentationTemplate_constraint {
-  ProjectDocumentationTemplate_pkey = "ProjectDocumentationTemplate_pkey",
-  ProjectDocumentationTemplate_title_key = "ProjectDocumentationTemplate_title_key",
+export enum ProjectDocumentationInstruction_constraint {
+  ProjectDocumentationInstruction_pkey = "ProjectDocumentationInstruction_pkey",
+  ProjectDocumentationInstruction_title_key = "ProjectDocumentationInstruction_title_key",
 }
 
 /**
- * update columns of table "ProjectDocumentationTemplate"
+ * update columns of table "ProjectDocumentationInstruction"
  */
-export enum ProjectDocumentationTemplate_update_column {
+export enum ProjectDocumentationInstruction_update_column {
   created_at = "created_at",
   id = "id",
   title = "title",
@@ -1688,7 +1688,7 @@ export enum Project_select_column {
   created_at = "created_at",
   csvResults = "csvResults",
   description = "description",
-  documentationTemplateId = "documentationTemplateId",
+  documentationInstructionId = "documentationInstructionId",
   documentationUrl = "documentationUrl",
   externalUrl = "externalUrl",
   id = "id",
@@ -1698,8 +1698,9 @@ export enum Project_select_column {
   projectReviewRequestedAt = "projectReviewRequestedAt",
   proposedByUserId = "proposedByUserId",
   rating = "rating",
-  score = "score",
+  ratingComment = "ratingComment",
   status = "status",
+  submissionDeadline = "submissionDeadline",
   submittedAt = "submittedAt",
   submittedBy = "submittedBy",
   tagline = "tagline",
@@ -1732,7 +1733,7 @@ export enum Project_update_column {
   created_at = "created_at",
   csvResults = "csvResults",
   description = "description",
-  documentationTemplateId = "documentationTemplateId",
+  documentationInstructionId = "documentationInstructionId",
   documentationUrl = "documentationUrl",
   externalUrl = "externalUrl",
   id = "id",
@@ -1742,8 +1743,9 @@ export enum Project_update_column {
   projectReviewRequestedAt = "projectReviewRequestedAt",
   proposedByUserId = "proposedByUserId",
   rating = "rating",
-  score = "score",
+  ratingComment = "ratingComment",
   status = "status",
+  submissionDeadline = "submissionDeadline",
   submittedAt = "submittedAt",
   submittedBy = "submittedBy",
   tagline = "tagline",
@@ -8469,14 +8471,14 @@ export interface ProjectCourse_variance_order_by {
 }
 
 /**
- * Boolean expression to filter rows from the table "ProjectDocumentationTemplate". All fields are combined with a logical 'AND'.
+ * Boolean expression to filter rows from the table "ProjectDocumentationInstruction". All fields are combined with a logical 'AND'.
  */
-export interface ProjectDocumentationTemplate_bool_exp {
+export interface ProjectDocumentationInstruction_bool_exp {
   Projects?: Project_bool_exp | null;
   Projects_aggregate?: Project_aggregate_bool_exp | null;
-  _and?: ProjectDocumentationTemplate_bool_exp[] | null;
-  _not?: ProjectDocumentationTemplate_bool_exp | null;
-  _or?: ProjectDocumentationTemplate_bool_exp[] | null;
+  _and?: ProjectDocumentationInstruction_bool_exp[] | null;
+  _not?: ProjectDocumentationInstruction_bool_exp | null;
+  _or?: ProjectDocumentationInstruction_bool_exp[] | null;
   created_at?: timestamptz_comparison_exp | null;
   id?: Int_comparison_exp | null;
   title?: String_comparison_exp | null;
@@ -8485,9 +8487,9 @@ export interface ProjectDocumentationTemplate_bool_exp {
 }
 
 /**
- * input type for inserting data into table "ProjectDocumentationTemplate"
+ * input type for inserting data into table "ProjectDocumentationInstruction"
  */
-export interface ProjectDocumentationTemplate_insert_input {
+export interface ProjectDocumentationInstruction_insert_input {
   Projects?: Project_arr_rel_insert_input | null;
   created_at?: any | null;
   id?: number | null;
@@ -8497,20 +8499,20 @@ export interface ProjectDocumentationTemplate_insert_input {
 }
 
 /**
- * input type for inserting object relation for remote table "ProjectDocumentationTemplate"
+ * input type for inserting object relation for remote table "ProjectDocumentationInstruction"
  */
-export interface ProjectDocumentationTemplate_obj_rel_insert_input {
-  data: ProjectDocumentationTemplate_insert_input;
-  on_conflict?: ProjectDocumentationTemplate_on_conflict | null;
+export interface ProjectDocumentationInstruction_obj_rel_insert_input {
+  data: ProjectDocumentationInstruction_insert_input;
+  on_conflict?: ProjectDocumentationInstruction_on_conflict | null;
 }
 
 /**
- * on_conflict condition type for table "ProjectDocumentationTemplate"
+ * on_conflict condition type for table "ProjectDocumentationInstruction"
  */
-export interface ProjectDocumentationTemplate_on_conflict {
-  constraint: ProjectDocumentationTemplate_constraint;
-  update_columns: ProjectDocumentationTemplate_update_column[];
-  where?: ProjectDocumentationTemplate_bool_exp | null;
+export interface ProjectDocumentationInstruction_on_conflict {
+  constraint: ProjectDocumentationInstruction_constraint;
+  update_columns: ProjectDocumentationInstruction_update_column[];
+  where?: ProjectDocumentationInstruction_bool_exp | null;
 }
 
 export interface ProjectMentor_aggregate_bool_exp {
@@ -8939,11 +8941,10 @@ export interface Project_arr_rel_insert_input {
  * order by avg() on columns of table "Project"
  */
 export interface Project_avg_order_by {
-  documentationTemplateId?: order_by | null;
+  documentationInstructionId?: order_by | null;
   id?: order_by | null;
   organizationId?: order_by | null;
   parentProjectId?: order_by | null;
-  score?: order_by | null;
 }
 
 /**
@@ -8959,7 +8960,7 @@ export interface Project_bool_exp {
   ProjectAuthors_aggregate?: ProjectAuthor_aggregate_bool_exp | null;
   ProjectCourses?: ProjectCourse_bool_exp | null;
   ProjectCourses_aggregate?: ProjectCourse_aggregate_bool_exp | null;
-  ProjectDocumentationTemplate?: ProjectDocumentationTemplate_bool_exp | null;
+  ProjectDocumentationInstruction?: ProjectDocumentationInstruction_bool_exp | null;
   ProjectMentors?: ProjectMentor_bool_exp | null;
   ProjectMentors_aggregate?: ProjectMentor_aggregate_bool_exp | null;
   ProjectRating?: ProjectRating_bool_exp | null;
@@ -8976,7 +8977,7 @@ export interface Project_bool_exp {
   created_at?: timestamptz_comparison_exp | null;
   csvResults?: String_comparison_exp | null;
   description?: String_comparison_exp | null;
-  documentationTemplateId?: Int_comparison_exp | null;
+  documentationInstructionId?: Int_comparison_exp | null;
   documentationUrl?: String_comparison_exp | null;
   externalUrl?: String_comparison_exp | null;
   id?: Int_comparison_exp | null;
@@ -8986,8 +8987,9 @@ export interface Project_bool_exp {
   projectReviewRequestedAt?: timestamptz_comparison_exp | null;
   proposedByUserId?: uuid_comparison_exp | null;
   rating?: ProjectRating_enum_comparison_exp | null;
-  score?: numeric_comparison_exp | null;
+  ratingComment?: String_comparison_exp | null;
   status?: ProjectStatus_enum_comparison_exp | null;
+  submissionDeadline?: timestamptz_comparison_exp | null;
   submittedAt?: timestamptz_comparison_exp | null;
   submittedBy?: uuid_comparison_exp | null;
   tagline?: String_comparison_exp | null;
@@ -9006,7 +9008,7 @@ export interface Project_insert_input {
   ProjectAchievementCertificateType?: ProjectAchievementCertificateType_obj_rel_insert_input | null;
   ProjectAuthors?: ProjectAuthor_arr_rel_insert_input | null;
   ProjectCourses?: ProjectCourse_arr_rel_insert_input | null;
-  ProjectDocumentationTemplate?: ProjectDocumentationTemplate_obj_rel_insert_input | null;
+  ProjectDocumentationInstruction?: ProjectDocumentationInstruction_obj_rel_insert_input | null;
   ProjectMentors?: ProjectMentor_arr_rel_insert_input | null;
   ProjectRating?: ProjectRating_obj_rel_insert_input | null;
   ProjectStatus?: ProjectStatus_obj_rel_insert_input | null;
@@ -9019,7 +9021,7 @@ export interface Project_insert_input {
   created_at?: any | null;
   csvResults?: string | null;
   description?: string | null;
-  documentationTemplateId?: number | null;
+  documentationInstructionId?: number | null;
   documentationUrl?: string | null;
   externalUrl?: string | null;
   id?: number | null;
@@ -9029,8 +9031,9 @@ export interface Project_insert_input {
   projectReviewRequestedAt?: any | null;
   proposedByUserId?: any | null;
   rating?: ProjectRating_enum | null;
-  score?: any | null;
+  ratingComment?: string | null;
   status?: ProjectStatus_enum | null;
+  submissionDeadline?: any | null;
   submittedAt?: any | null;
   submittedBy?: any | null;
   tagline?: string | null;
@@ -9047,7 +9050,7 @@ export interface Project_max_order_by {
   created_at?: order_by | null;
   csvResults?: order_by | null;
   description?: order_by | null;
-  documentationTemplateId?: order_by | null;
+  documentationInstructionId?: order_by | null;
   documentationUrl?: order_by | null;
   externalUrl?: order_by | null;
   id?: order_by | null;
@@ -9056,7 +9059,8 @@ export interface Project_max_order_by {
   presentationUrl?: order_by | null;
   projectReviewRequestedAt?: order_by | null;
   proposedByUserId?: order_by | null;
-  score?: order_by | null;
+  ratingComment?: order_by | null;
+  submissionDeadline?: order_by | null;
   submittedAt?: order_by | null;
   submittedBy?: order_by | null;
   tagline?: order_by | null;
@@ -9073,7 +9077,7 @@ export interface Project_min_order_by {
   created_at?: order_by | null;
   csvResults?: order_by | null;
   description?: order_by | null;
-  documentationTemplateId?: order_by | null;
+  documentationInstructionId?: order_by | null;
   documentationUrl?: order_by | null;
   externalUrl?: order_by | null;
   id?: order_by | null;
@@ -9082,7 +9086,8 @@ export interface Project_min_order_by {
   presentationUrl?: order_by | null;
   projectReviewRequestedAt?: order_by | null;
   proposedByUserId?: order_by | null;
-  score?: order_by | null;
+  ratingComment?: order_by | null;
+  submissionDeadline?: order_by | null;
   submittedAt?: order_by | null;
   submittedBy?: order_by | null;
   tagline?: order_by | null;
@@ -9112,77 +9117,70 @@ export interface Project_on_conflict {
  * order by stddev() on columns of table "Project"
  */
 export interface Project_stddev_order_by {
-  documentationTemplateId?: order_by | null;
+  documentationInstructionId?: order_by | null;
   id?: order_by | null;
   organizationId?: order_by | null;
   parentProjectId?: order_by | null;
-  score?: order_by | null;
 }
 
 /**
  * order by stddev_pop() on columns of table "Project"
  */
 export interface Project_stddev_pop_order_by {
-  documentationTemplateId?: order_by | null;
+  documentationInstructionId?: order_by | null;
   id?: order_by | null;
   organizationId?: order_by | null;
   parentProjectId?: order_by | null;
-  score?: order_by | null;
 }
 
 /**
  * order by stddev_samp() on columns of table "Project"
  */
 export interface Project_stddev_samp_order_by {
-  documentationTemplateId?: order_by | null;
+  documentationInstructionId?: order_by | null;
   id?: order_by | null;
   organizationId?: order_by | null;
   parentProjectId?: order_by | null;
-  score?: order_by | null;
 }
 
 /**
  * order by sum() on columns of table "Project"
  */
 export interface Project_sum_order_by {
-  documentationTemplateId?: order_by | null;
+  documentationInstructionId?: order_by | null;
   id?: order_by | null;
   organizationId?: order_by | null;
   parentProjectId?: order_by | null;
-  score?: order_by | null;
 }
 
 /**
  * order by var_pop() on columns of table "Project"
  */
 export interface Project_var_pop_order_by {
-  documentationTemplateId?: order_by | null;
+  documentationInstructionId?: order_by | null;
   id?: order_by | null;
   organizationId?: order_by | null;
   parentProjectId?: order_by | null;
-  score?: order_by | null;
 }
 
 /**
  * order by var_samp() on columns of table "Project"
  */
 export interface Project_var_samp_order_by {
-  documentationTemplateId?: order_by | null;
+  documentationInstructionId?: order_by | null;
   id?: order_by | null;
   organizationId?: order_by | null;
   parentProjectId?: order_by | null;
-  score?: order_by | null;
 }
 
 /**
  * order by variance() on columns of table "Project"
  */
 export interface Project_variance_order_by {
-  documentationTemplateId?: order_by | null;
+  documentationInstructionId?: order_by | null;
   id?: order_by | null;
   organizationId?: order_by | null;
   parentProjectId?: order_by | null;
-  score?: order_by | null;
 }
 
 export interface SessionAddress_aggregate_bool_exp {

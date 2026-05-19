@@ -22,7 +22,7 @@ const GET_TEMPLATE = `
       description
       coverImageUrl
       type
-      documentationTemplateId
+      documentationInstructionId
       achievementCertificateType
       organizationId
       proposedByUserId
@@ -57,7 +57,7 @@ const INSERT_COPY = `
     $description: String
     $coverImageUrl: String
     $type: String
-    $documentationTemplateId: Int
+    $documentationInstructionId: Int
     $achievementCertificateType: ProjectAchievementCertificateType_enum
     $organizationId: Int
     $proposedByUserId: uuid!
@@ -65,6 +65,8 @@ const INSERT_COPY = `
     $authorUserId: uuid!
     $courseId: Int!
     $mentorRows: [ProjectMentor_insert_input!]!
+    $status: ProjectStatus_enum!
+    $acceptingParticipants: Boolean!
   ) {
     insert_Project_one(
       object: {
@@ -73,13 +75,13 @@ const INSERT_COPY = `
         description: $description
         coverImageUrl: $coverImageUrl
         type: $type
-        documentationTemplateId: $documentationTemplateId
+        documentationInstructionId: $documentationInstructionId
         achievementCertificateType: $achievementCertificateType
         organizationId: $organizationId
         proposedByUserId: $proposedByUserId
         parentProjectId: $parentProjectId
-        status: PROPOSED
-        acceptingParticipants: true
+        status: $status
+        acceptingParticipants: $acceptingParticipants
         ProjectAuthors: {
           data: {
             userId: $authorUserId
@@ -218,6 +220,10 @@ export default async function copyProjectFromTemplate(req, logger) {
     userId: mentor.userId,
   }));
 
+  const isOnlineCourseTemplate = parent.type === "ONLINE_COURSE";
+  const copyStatus = isOnlineCourseTemplate ? "ONGOING" : "PROPOSED";
+  const copyAcceptingParticipants = !isOnlineCourseTemplate;
+
   try {
     const insertResult = await hasuraClient.request({
       document: INSERT_COPY,
@@ -227,7 +233,7 @@ export default async function copyProjectFromTemplate(req, logger) {
         description: parent.description ?? null,
         coverImageUrl: parent.coverImageUrl ?? null,
         type: parent.type ?? null,
-        documentationTemplateId: parent.documentationTemplateId ?? null,
+        documentationInstructionId: parent.documentationInstructionId ?? null,
         achievementCertificateType: parent.achievementCertificateType ?? null,
         organizationId: parent.organizationId ?? null,
         proposedByUserId: parent.proposedByUserId,
@@ -235,6 +241,8 @@ export default async function copyProjectFromTemplate(req, logger) {
         authorUserId: userId,
         courseId,
         mentorRows,
+        status: copyStatus,
+        acceptingParticipants: copyAcceptingParticipants,
       },
     });
 

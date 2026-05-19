@@ -30,3 +30,13 @@ select_permissions:
         - requiresExternalUrl
         - requiresCoverImage
       filter: {}
+  - role: instructor_access
+    permission:
+      columns:
+        - value
+        - comment
+        - requiresDocumentation
+        - requiresPresentation
+        - requiresExternalUrl
+        - requiresCoverImage
+      filter: {}

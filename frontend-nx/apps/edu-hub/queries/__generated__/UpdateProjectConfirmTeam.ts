@@ -14,7 +14,7 @@ export interface UpdateProjectConfirmTeam_update_Project_by_pk {
   id: number;
   status: ProjectStatus_enum;
   type: string | null;
-  documentationTemplateId: number | null;
+  documentationInstructionId: number | null;
 }
 
 export interface UpdateProjectConfirmTeam {
@@ -27,5 +27,5 @@ export interface UpdateProjectConfirmTeam {
 export interface UpdateProjectConfirmTeamVariables {
   itemId: number;
   type: string;
-  documentationTemplateId: number;
+  documentationInstructionId: number;
 }

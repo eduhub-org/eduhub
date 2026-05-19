@@ -17,7 +17,7 @@ import {
   UPDATE_PROJECT_PRESENTATION_URL,
   UPDATE_PROJECT_EXTERNAL_URL,
   UPDATE_PROJECT_COVER_IMAGE_URL,
-  UPDATE_PROJECT_DOCUMENTATION_TEMPLATE,
+  UPDATE_PROJECT_DOCUMENTATION_INSTRUCTION,
   UPDATE_PROJECT_ACCEPTING_PARTICIPANTS,
   SUBMIT_PROJECT,
   DELETE_PROJECT_AUTHOR,
@@ -36,8 +36,10 @@ import SubmitConfirmationDialog from './SubmitConfirmationDialog';
 import { isChecklistComplete } from './SubmissionChecklist';
 import ManageRequestsDialog from './ManageRequestsDialog';
 import ProjectPreviewLayout from './ProjectPreviewLayout';
+import ProjectSubmissionDeadlineBelowTitle from './ProjectSubmissionDeadlineBelowTitle';
 import { ProjectRow, ProjectTypeRow } from './types';
 import { PROJECT_FALLBACK_TITLE } from './projectDefaults';
+import { CourseProjectSubmissionDefaultSource } from './projectEffectiveSubmissionDeadline';
 
 const PROJECT_DOCUMENTATION_ACCEPT = [
   '.pdf',
@@ -64,8 +66,11 @@ interface MyProjectPanelProps {
   project: ProjectRow;
   userId: string;
   projectTypes: ProjectTypeRow[];
-  documentationTemplates: { id: number; title: string }[];
+  documentationInstructions: { id: number; title: string }[];
   submissionDeadline: Date | null;
+  /** Course/program fallback when `project.submissionDeadline` is null (for deadline display under title). */
+  courseDefaultSubmissionDeadline: string | null | undefined;
+  submissionDeadlineDefaultSource: CourseProjectSubmissionDefaultSource;
   refetchQueries: string[];
   onActionError: (message: string) => void;
 }
@@ -74,8 +79,10 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
   project,
   userId,
   projectTypes,
-  documentationTemplates,
+  documentationInstructions,
   submissionDeadline,
+  courseDefaultSubmissionDeadline,
+  submissionDeadlineDefaultSource,
   refetchQueries,
   onActionError,
 }) => {
@@ -193,7 +200,7 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
     project.status === ProjectStatus_enum.PROPOSED ||
     project.status === ProjectStatus_enum.ONGOING;
 
-  /** Copies from a course template (Neue Gruppe bilden) keep the template title. */
+  /** Copies from a course template (Neues Projektteam bilden) keep the template title. */
   const canEditProjectTitle = project.parentProjectId == null;
 
   const isSubmitted = project.status === ProjectStatus_enum.SUBMITTED;
@@ -270,13 +277,13 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
     }
   }, [markProjectReviewRequested, project.id, onActionError, t]);
 
-  const documentationTemplateOptions = useMemo(
+  const documentationInstructionOptions = useMemo(
     () =>
-      documentationTemplates.map((tpl) => ({
+      documentationInstructions.map((tpl) => ({
         value: String(tpl.id),
         label: tpl.title,
       })),
-    [documentationTemplates]
+    [documentationInstructions]
   );
 
   const submittedByName = project.SubmittedByUser
@@ -399,15 +406,22 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
         </div>
       ) : null}
 
-      <div className="rounded-lg border border-border-primary p-4 bg-bg-secondary/30">
-        <ProjectPreviewLayout
+      <div className="space-y-3 min-w-0">
+        <ProjectSubmissionDeadlineBelowTitle
+          mode="readonly"
           project={project}
-          showResourceLinks={Boolean(
-            project.documentationUrl?.trim() ||
-              project.presentationUrl?.trim() ||
-              project.externalUrl?.trim()
-          )}
-          titleRow={
+          courseDefaultSubmissionDeadline={courseDefaultSubmissionDeadline}
+          defaultDeadlineSource={submissionDeadlineDefaultSource}
+        />
+        <div className="rounded-lg border border-border-primary p-4 bg-bg-secondary/30">
+          <ProjectPreviewLayout
+            project={project}
+            showResourceLinks={Boolean(
+              project.documentationUrl?.trim() ||
+                project.presentationUrl?.trim() ||
+                project.externalUrl?.trim()
+            )}
+            titleRow={
             isContentEditable ? (
               <div className="flex flex-wrap items-start gap-2 mb-1 w-full">
                 <div className="min-w-0 flex-1">
@@ -507,6 +521,7 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
             ) : undefined
           }
         />
+        </div>
       </div>
 
       {isContentEditable ? (
@@ -568,18 +583,18 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
               />
             </>
           ) : null}
-          {documentationTemplateOptions.length > 0 ? (
+          {documentationInstructionOptions.length > 0 ? (
             <DropDownSelector
               variant="material"
-              label={t('projects.my_project.documentation_template_label')}
-              value={project.documentationTemplateId ? String(project.documentationTemplateId) : ''}
-              options={documentationTemplateOptions}
+              label={t('projects.my_project.documentation_instruction_label')}
+              value={project.documentationInstructionId ? String(project.documentationInstructionId) : ''}
+              options={documentationInstructionOptions}
               nullable
-              nullableLabel={t('projects.my_project.documentation_template_none')}
-              updateValueMutation={UPDATE_PROJECT_DOCUMENTATION_TEMPLATE}
+              nullableLabel={t('projects.my_project.documentation_instruction_none')}
+              updateValueMutation={UPDATE_PROJECT_DOCUMENTATION_INSTRUCTION}
               identifierVariables={{ itemId: project.id }}
               refetchQueries={refetchQueries}
-              helpText={t('projects.my_project.field_tooltip_documentation_template')}
+              helpText={t('projects.my_project.field_tooltip_documentation_instruction')}
             />
           ) : null}
           <CheckboxSelector

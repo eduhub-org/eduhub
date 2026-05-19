@@ -48,6 +48,7 @@ import { BulkAction } from '../../../common/TableGrid/types';
 import NotificationSnackbar from '../../../common/dialogs/NotificationSnackbar';
 import { ErrorMessageDialog } from '../../../common/dialogs/ErrorMessageDialog';
 import ProjectsManagementGrid from './projects/ProjectsManagementGrid';
+import { resolveEffectiveCourseProjectSubmissionDeadline, getCourseProjectSubmissionDefaultSource } from '../../CourseContent/Projects/projectEffectiveSubmissionDeadline';
 
 interface CourseParticipationsTabIProps {
   course: ManagedCourse_Course_by_pk;
@@ -661,25 +662,35 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
 
   if (!course.achievementCertificatePossible) {
     return (
-      <div className="flex flex-col space-y-4">
-        <ParticipationTable
-          columns={columns}
-          data={extendedEnrollments}
-          totalCount={totalCount}
-          pageIndex={pageIndex}
-          setPageIndex={setPageIndex}
-          pageSize={pageSize}
-          onPageSizeChange={handlePageSizeChange}
-          searchFilter={searchFilter}
-          setSearchFilter={setSearchFilter}
-          sorting={sorting}
-          setSorting={setSorting}
-          loading={loading}
-          error={error}
-          bulkActions={bulkActions}
-          onBulkAction={handleBulkAction}
-          expandableRowComponent={ExpandableParticipationRow}
-        />
+      <div className="flex flex-col gap-8">
+        <section className="space-y-3 rounded-lg border border-border-primary bg-bg-secondary/40 p-4 sm:p-5">
+          <header className="border-b border-border-primary pb-3">
+            <h2 className="text-lg font-semibold text-label-primary tracking-tight">
+              {t('participations_tab_enrollments_heading')}
+            </h2>
+            <p className="mt-1 text-sm text-label-secondary max-w-3xl">
+              {t('participations_tab_enrollments_subtitle')}
+            </p>
+          </header>
+          <ParticipationTable
+            columns={columns}
+            data={extendedEnrollments}
+            totalCount={totalCount}
+            pageIndex={pageIndex}
+            setPageIndex={setPageIndex}
+            pageSize={pageSize}
+            onPageSizeChange={handlePageSizeChange}
+            searchFilter={searchFilter}
+            setSearchFilter={setSearchFilter}
+            sorting={sorting}
+            setSorting={setSorting}
+            loading={loading}
+            error={error}
+            bulkActions={bulkActions}
+            onBulkAction={handleBulkAction}
+            expandableRowComponent={ExpandableParticipationRow}
+          />
+        </section>
         <NotificationSnackbar
           open={snackbarOpen}
           onClose={() => setSnackbarOpen(false)}
@@ -698,29 +709,52 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
   }
 
   return (
-    <div className="flex flex-col space-y-4">
-      <ProjectsManagementGrid
-        courseId={course.id}
-        programDefaultProjectType={course.Program?.defaultProjectType ?? null}
-      />
-      <ParticipationTable
-        columns={columns}
-        data={extendedEnrollments}
-        totalCount={totalCount}
-        pageIndex={pageIndex}
-        setPageIndex={setPageIndex}
-        pageSize={pageSize}
-        onPageSizeChange={handlePageSizeChange}
-        searchFilter={searchFilter}
-        setSearchFilter={setSearchFilter}
-        sorting={sorting}
-        setSorting={setSorting}
-        loading={loading}
-        error={error}
-        bulkActions={bulkActions}
-        onBulkAction={handleBulkAction}
-        expandableRowComponent={ExpandableParticipationRow}
-      />
+    <div className="flex flex-col gap-10">
+      <section className="space-y-3 rounded-lg border border-border-primary bg-bg-secondary/40 p-4 sm:p-5">
+        <header className="border-b border-border-primary pb-3">
+          <h2 className="text-lg font-semibold text-label-primary tracking-tight">
+            {t('participations_tab_projects_heading')}
+          </h2>
+          <p className="mt-1 text-sm text-label-secondary max-w-3xl">
+            {t('participations_tab_projects_subtitle')}
+          </p>
+        </header>
+        <ProjectsManagementGrid
+          courseId={course.id}
+          programDefaultProjectType={course.Program?.defaultProjectType ?? null}
+          courseDefaultProjectSubmissionDeadline={resolveEffectiveCourseProjectSubmissionDeadline(course)}
+          courseSubmissionDeadlineDefaultSource={getCourseProjectSubmissionDefaultSource(course)}
+        />
+      </section>
+
+      <section className="space-y-3 rounded-lg border border-border-primary bg-bg-secondary/40 p-4 sm:p-5">
+        <header className="border-b border-border-primary pb-3">
+          <h2 className="text-lg font-semibold text-label-primary tracking-tight">
+            {t('participations_tab_enrollments_heading')}
+          </h2>
+          <p className="mt-1 text-sm text-label-secondary max-w-3xl">
+            {t('participations_tab_enrollments_subtitle')}
+          </p>
+        </header>
+        <ParticipationTable
+          columns={columns}
+          data={extendedEnrollments}
+          totalCount={totalCount}
+          pageIndex={pageIndex}
+          setPageIndex={setPageIndex}
+          pageSize={pageSize}
+          onPageSizeChange={handlePageSizeChange}
+          searchFilter={searchFilter}
+          setSearchFilter={setSearchFilter}
+          sorting={sorting}
+          setSorting={setSorting}
+          loading={loading}
+          error={error}
+          bulkActions={bulkActions}
+          onBulkAction={handleBulkAction}
+          expandableRowComponent={ExpandableParticipationRow}
+        />
+      </section>
       <NotificationSnackbar
         open={snackbarOpen}
         onClose={() => setSnackbarOpen(false)}

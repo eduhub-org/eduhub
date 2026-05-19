@@ -40,6 +40,13 @@ export const client = new ApolloClient({
     typePolicies: {
       Query: {
         fields: {
+          // ManagedCourse, participation counts, etc. can each refetch Course_by_pk; replace
+          // with the latest payload to avoid Apollo cache merge warnings on nested arrays.
+          Course_by_pk: {
+            merge(_existing: unknown, incoming: unknown) {
+              return incoming;
+            },
+          },
           Course: {
             merge: (_, incoming) => incoming,
           },

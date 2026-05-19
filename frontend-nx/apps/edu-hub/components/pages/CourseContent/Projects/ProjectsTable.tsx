@@ -16,7 +16,9 @@ import {
 import { formatTruncatedList, makeFullName } from '../../../../helpers/util';
 import StatusChip from './StatusChip';
 import ProjectPreviewLayout from './ProjectPreviewLayout';
+import ProjectSubmissionDeadlineBelowTitle from './ProjectSubmissionDeadlineBelowTitle';
 import { ProjectRow } from './types';
+import { CourseProjectSubmissionDefaultSource } from './projectEffectiveSubmissionDeadline';
 
 interface ProjectsTableProps {
   projects: ProjectRow[];
@@ -26,6 +28,8 @@ interface ProjectsTableProps {
   userId: string | undefined;
   proposalsEnabled: boolean;
   hasMyProject: boolean;
+  courseDefaultSubmissionDeadline: string | null | undefined;
+  submissionDeadlineDefaultSource: CourseProjectSubmissionDefaultSource;
   refetchQueries: string[];
   onProposeClick: () => void;
   onActionError: (message: string) => void;
@@ -44,6 +48,8 @@ const ProjectsTable: FC<ProjectsTableProps> = ({
   userId,
   proposalsEnabled,
   hasMyProject,
+  courseDefaultSubmissionDeadline,
+  submissionDeadlineDefaultSource,
   refetchQueries,
   onProposeClick,
   onActionError,
@@ -162,6 +168,11 @@ const ProjectsTable: FC<ProjectsTableProps> = ({
             );
           }
           if (acceptedCount === 0) {
+            const templateClaimLabel =
+              project.type === 'ONLINE_COURSE' ||
+              project.ProjectType?.value === 'ONLINE_COURSE'
+                ? t('projects.table.form_new_group_online_course')
+                : t('projects.table.form_new_group');
             return (
               <Button
                 filled
@@ -169,7 +180,7 @@ const ProjectsTable: FC<ProjectsTableProps> = ({
                 onClick={() => handleClaimTemplate(project.id)}
                 className="w-full"
               >
-                {t('projects.table.form_new_group')}
+                {templateClaimLabel}
               </Button>
             );
           }
@@ -196,20 +207,35 @@ const ProjectsTable: FC<ProjectsTableProps> = ({
       const showFullDetails =
         row.status === ProjectStatus_enum.COMPLETED ||
         row.status === ProjectStatus_enum.PUBLISHED;
-      const showSummary = row.status === ProjectStatus_enum.PROPOSED || showFullDetails;
-      if (!showSummary) {
+      const showExpandedLayout =
+        row.status === ProjectStatus_enum.PROPOSED ||
+        row.status === ProjectStatus_enum.ONGOING ||
+        showFullDetails;
+      if (!showExpandedLayout) {
         return null;
       }
       return (
-        <div className="p-4">
+        <div className="p-4 space-y-3">
+          <ProjectSubmissionDeadlineBelowTitle
+            mode="readonly"
+            project={row}
+            courseDefaultSubmissionDeadline={courseDefaultSubmissionDeadline}
+            defaultDeadlineSource={submissionDeadlineDefaultSource}
+          />
           <ProjectPreviewLayout
             project={row}
             showResourceLinks={showFullDetails}
+            titleRow={
+              <div className="flex flex-wrap items-center gap-2 mb-1">
+                <h4 className="text-xl font-semibold text-label-primary min-w-0 break-words">{row.title}</h4>
+                <StatusChip status={row.status} />
+              </div>
+            }
           />
         </div>
       );
     },
-    []
+    [courseDefaultSubmissionDeadline, submissionDeadlineDefaultSource]
   );
 
   const showAddButton = proposalsEnabled && !hasMyProject && Boolean(userId);

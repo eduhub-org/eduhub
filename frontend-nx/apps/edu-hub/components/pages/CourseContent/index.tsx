@@ -29,6 +29,7 @@ import { Attendances } from './Attendances';
 import { CertificateDownload } from '../../common/CertificateDownload';
 import AchievementRecord from './AchievementRecord';
 import Projects from './Projects';
+import { resolveEffectiveCourseProjectSubmissionDeadline, getCourseProjectSubmissionDefaultSource } from './Projects/projectEffectiveSubmissionDeadline';
 import { useIsCourseWithEnrollment } from '../../../hooks/course';
 import NotificationSnackbar from '../../common/dialogs/NotificationSnackbar';
 
@@ -208,12 +209,8 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                       <Projects
                         courseId={course.id}
                         defaultProjectType={course.Program?.defaultProjectType ?? null}
-                        effectiveSubmissionDeadline={
-                          course.projectSubmissionDeadline ??
-                          course.Program?.defaultProjectSubmissionDeadline ??
-                          course.Program?.achievementRecordUploadDeadline ??
-                          null
-                        }
+                        effectiveSubmissionDeadline={resolveEffectiveCourseProjectSubmissionDeadline(course)}
+                        submissionDeadlineDefaultSource={getCourseProjectSubmissionDefaultSource(course)}
                         proposalsEnabled={Boolean(
                           course.projectProposalsEnabled ??
                             course.Program?.projectProposalsEnabledByDefault
@@ -229,10 +226,9 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                             {!courseEnrollment?.achievementCertificateURL && (
                               <AchievementRecord
                                 courseId={course.id}
-                                achievementRecordUploadDeadline={
-                                  course.Program?.defaultProjectSubmissionDeadline ??
-                                  course.Program?.achievementRecordUploadDeadline
-                                }
+                                achievementRecordUploadDeadline={resolveEffectiveCourseProjectSubmissionDeadline(
+                                  course
+                                )}
                                 courseTitle={course.title}
                               />
                             )}

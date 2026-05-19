@@ -13,9 +13,9 @@ export const PROJECT_TYPES = gql`
   }
 `;
 
-export const PROJECT_DOCUMENTATION_TEMPLATES = gql`
-  query ProjectDocumentationTemplates {
-    ProjectDocumentationTemplate(order_by: { title: asc }) {
+export const PROJECT_DOCUMENTATION_INSTRUCTIONS = gql`
+  query ProjectDocumentationInstructions {
+    ProjectDocumentationInstruction(order_by: { title: asc }) {
       id
       title
       url
@@ -33,12 +33,12 @@ export const PROJECT_FRAGMENT_DETAILED = gql`
     documentationUrl
     presentationUrl
     externalUrl
-    documentationTemplateId
+    documentationInstructionId
     status
     type
     achievementCertificateType
     rating
-    score
+    ratingComment
     acceptingParticipants
     organizationId
     proposedByUserId
@@ -46,6 +46,7 @@ export const PROJECT_FRAGMENT_DETAILED = gql`
     submittedAt
     submittedBy
     projectReviewRequestedAt
+    submissionDeadline
     created_at
     updated_at
     Organization {
@@ -59,7 +60,7 @@ export const PROJECT_FRAGMENT_DETAILED = gql`
       requiresExternalUrl
       requiresCoverImage
     }
-    ProjectDocumentationTemplate {
+    ProjectDocumentationInstruction {
       id
       title
       url
@@ -264,14 +265,14 @@ export const UPDATE_PROJECT_COVER_IMAGE_URL = gql`
   }
 `;
 
-export const UPDATE_PROJECT_DOCUMENTATION_TEMPLATE = gql`
-  mutation UpdateProjectDocumentationTemplate($itemId: Int!, $value: Int) {
+export const UPDATE_PROJECT_DOCUMENTATION_INSTRUCTION = gql`
+  mutation UpdateProjectDocumentationInstruction($itemId: Int!, $value: Int) {
     update_Project_by_pk(
       pk_columns: { id: $itemId }
-      _set: { documentationTemplateId: $value }
+      _set: { documentationInstructionId: $value }
     ) {
       id
-      documentationTemplateId
+      documentationInstructionId
     }
   }
 `;
@@ -284,6 +285,15 @@ export const UPDATE_PROJECT_ACCEPTING_PARTICIPANTS = gql`
     ) {
       id
       acceptingParticipants
+    }
+  }
+`;
+
+export const UPDATE_PROJECT_SUBMISSION_DEADLINE = gql`
+  mutation UpdateProjectSubmissionDeadline($itemId: Int!, $value: timestamptz) {
+    update_Project_by_pk(pk_columns: { id: $itemId }, _set: { submissionDeadline: $value }) {
+      id
+      submissionDeadline
     }
   }
 `;
@@ -353,3 +363,9 @@ export const COPY_PROJECT_FROM_TEMPLATE = gql`
     }
   }
 `;
+
+`;
+
+
+
+

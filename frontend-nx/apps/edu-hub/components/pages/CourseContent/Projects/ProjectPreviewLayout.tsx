@@ -1,14 +1,25 @@
 import { FC, ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
+import { MdDownload, MdOpenInNew } from 'react-icons/md';
 import { ProjectParticipationStatus_enum } from '../../../../__generated__/globalTypes';
 import UserCard from '../../../common/UserCard';
+import { Button } from '../../../common/Button';
 import { ProjectRow } from './types';
 
-export const PROJECT_COVER_PLACEHOLDER_SRC = '/images/common/mystery.svg';
+export const PROJECT_COVER_PLACEHOLDER_SRC = '/images/common/project-cover-placeholder.svg';
+
+function resourceUrlPresent(url?: string | null): boolean {
+  const u = url?.trim();
+  return Boolean(u && u !== 'pending_upload');
+}
 
 interface ProjectPreviewLayoutProps {
   project: ProjectRow;
-  /** Show documentation / presentation / external links when URLs are set. */
+  /**
+   * When no project type is configured, gates the whole resource block (legacy).
+   * When a type is configured, mandatory link rows are shown regardless of this flag;
+   * optional rows still appear only when a URL is set.
+   */
   showResourceLinks: boolean;
   /** Optional row above the main grid (e.g. project title + status chip). */
   titleRow?: ReactNode;
@@ -18,6 +29,8 @@ interface ProjectPreviewLayoutProps {
   taglineSlot?: ReactNode;
   /** Optional: replace description panel (e.g. inline InputField). */
   descriptionSlot?: ReactNode;
+  /** Rendered directly under `titleRow` (e.g. submission deadline). */
+  belowTitleRow?: ReactNode;
 }
 
 const ProjectPreviewLayout: FC<ProjectPreviewLayoutProps> = ({
@@ -27,6 +40,7 @@ const ProjectPreviewLayout: FC<ProjectPreviewLayoutProps> = ({
   coverSlot,
   taglineSlot,
   descriptionSlot,
+  belowTitleRow,
 }) => {
   const t = useTranslations('course');
 
@@ -38,15 +52,34 @@ const ProjectPreviewLayout: FC<ProjectPreviewLayoutProps> = ({
   const hasTagline = Boolean(project.tagline?.trim());
   const hasDescription = Boolean(project.description?.trim());
 
-  const hasAnyResourceLink = Boolean(
-    project.documentationUrl?.trim() ||
-      project.presentationUrl?.trim() ||
-      project.externalUrl?.trim()
-  );
+  const hasConfiguredType = Boolean(project.ProjectType);
+  const pt = project.ProjectType;
+
+  const docProvided = resourceUrlPresent(project.documentationUrl);
+  const presProvided = resourceUrlPresent(project.presentationUrl);
+  const extProvided = resourceUrlPresent(project.externalUrl);
+
+  const hasAnyResourceLink = docProvided || presProvided || extProvided;
+
+  const showDocumentationRow = hasConfiguredType
+    ? Boolean(pt?.requiresDocumentation || docProvided)
+    : showResourceLinks && hasAnyResourceLink && docProvided;
+
+  const showPresentationRow = hasConfiguredType
+    ? Boolean(pt?.requiresPresentation || presProvided)
+    : showResourceLinks && hasAnyResourceLink && presProvided;
+
+  const showExternalRow = hasConfiguredType
+    ? Boolean(pt?.requiresExternalUrl || extProvided)
+    : showResourceLinks && hasAnyResourceLink && extProvided;
+
+  const showResourceBlock =
+    showDocumentationRow || showPresentationRow || showExternalRow;
 
   return (
     <div className="space-y-4">
       {titleRow ? <div className="min-w-0">{titleRow}</div> : null}
+      {belowTitleRow ? <div className="min-w-0">{belowTitleRow}</div> : null}
 
       <div className="flex flex-col lg:flex-row lg:items-stretch gap-6">
         <div className="shrink-0 w-full lg:w-56">
@@ -126,37 +159,68 @@ const ProjectPreviewLayout: FC<ProjectPreviewLayoutProps> = ({
         </div>
       </div>
 
-      {showResourceLinks && hasAnyResourceLink ? (
-        <div className="space-y-1 text-sm pt-2 border-t border-border-primary">
-          {project.documentationUrl ? (
-            <a
-              href={project.documentationUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-status-confirmed underline block"
-            >
-              {t('projects.table.documentation_link')}
-            </a>
+      {showResourceBlock ? (
+        <div className="flex flex-col gap-3 text-sm pt-2 border-t border-border-primary">
+          {showDocumentationRow ? (
+            docProvided ? (
+              <Button
+                as="a"
+                href={project.documentationUrl?.trim() ?? ''}
+                target="_blank"
+                rel="noopener noreferrer"
+                download
+                filled
+                className="inline-flex w-fit max-w-full items-center gap-2 no-underline text-sm font-medium"
+                aria-label={t('projects.table.documentation_download')}
+              >
+                <MdDownload className="text-xl shrink-0" aria-hidden />
+                {t('projects.table.documentation_download')}
+              </Button>
+            ) : (
+              <p className="text-label-secondary italic m-0">
+                {t('projects.table.resource_pending_documentation')}
+              </p>
+            )
           ) : null}
-          {project.presentationUrl ? (
-            <a
-              href={project.presentationUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-status-confirmed underline block"
-            >
-              {t('projects.table.presentation_link')}
-            </a>
+          {showPresentationRow ? (
+            presProvided ? (
+              <Button
+                as="a"
+                href={project.presentationUrl?.trim() ?? ''}
+                target="_blank"
+                rel="noopener noreferrer"
+                download
+                filled
+                className="inline-flex w-fit max-w-full items-center gap-2 no-underline text-sm font-medium"
+                aria-label={t('projects.table.presentation_download')}
+              >
+                <MdDownload className="text-xl shrink-0" aria-hidden />
+                {t('projects.table.presentation_download')}
+              </Button>
+            ) : (
+              <p className="text-label-secondary italic m-0">
+                {t('projects.table.resource_pending_presentation')}
+              </p>
+            )
           ) : null}
-          {project.externalUrl ? (
-            <a
-              href={project.externalUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-status-confirmed underline block"
-            >
-              {t('projects.table.external_link')}
-            </a>
+          {showExternalRow ? (
+            extProvided ? (
+              <Button
+                as="a"
+                href={project.externalUrl?.trim() ?? ''}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex w-fit max-w-full items-center gap-2 no-underline text-sm font-medium"
+                aria-label={t('projects.table.external_link')}
+              >
+                <MdOpenInNew className="text-lg shrink-0" aria-hidden />
+                {t('projects.table.external_link')}
+              </Button>
+            ) : (
+              <p className="text-label-secondary italic m-0">
+                {t('projects.table.resource_pending_external')}
+              </p>
+            )
           ) : null}
         </div>
       ) : null}

@@ -7,7 +7,7 @@ import {
   PROJECTS_BY_COURSE,
   MY_PROJECT_BY_COURSE,
   PROJECT_TYPES,
-  PROJECT_DOCUMENTATION_TEMPLATES,
+  PROJECT_DOCUMENTATION_INSTRUCTIONS,
 } from '../../../../queries/project';
 import {
   ProjectsByCourse,
@@ -18,18 +18,20 @@ import {
   MyProjectByCourseVariables,
 } from '../../../../queries/__generated__/MyProjectByCourse';
 import { ProjectTypes } from '../../../../queries/__generated__/ProjectTypes';
-import { ProjectDocumentationTemplates } from '../../../../queries/__generated__/ProjectDocumentationTemplates';
+import { ProjectDocumentationInstructions } from '../../../../queries/__generated__/ProjectDocumentationInstructions';
 import { ProjectParticipationStatus_enum } from '../../../../__generated__/globalTypes';
 import NotificationSnackbar from '../../../common/dialogs/NotificationSnackbar';
 import { ContentRow } from '../../../common/ContentRow';
 import MyProjectPanel from './MyProjectPanel';
 import ProjectsTable from './ProjectsTable';
 import ProposeProjectDialog from './ProposeProjectDialog';
+import { submissionDeadlineToIsoString, CourseProjectSubmissionDefaultSource } from './projectEffectiveSubmissionDeadline';
 
 interface ProjectsProps {
   courseId: number;
   defaultProjectType: string | null;
   effectiveSubmissionDeadline: string | null | undefined;
+  submissionDeadlineDefaultSource: CourseProjectSubmissionDefaultSource;
   proposalsEnabled: boolean;
 }
 
@@ -39,6 +41,7 @@ const Projects: FC<ProjectsProps> = ({
   courseId,
   defaultProjectType,
   effectiveSubmissionDeadline,
+  submissionDeadlineDefaultSource,
   proposalsEnabled,
 }) => {
   const t = useTranslations('course');
@@ -61,22 +64,25 @@ const Projects: FC<ProjectsProps> = ({
   );
 
   const projectTypesQuery = useAuthedQuery<ProjectTypes>(PROJECT_TYPES);
-  const documentationTemplatesQuery = useAuthedQuery<ProjectDocumentationTemplates>(
-    PROJECT_DOCUMENTATION_TEMPLATES
+  const documentationInstructionsQuery = useAuthedQuery<ProjectDocumentationInstructions>(
+    PROJECT_DOCUMENTATION_INSTRUCTIONS
   );
 
   const myProject = myProjectQuery.data?.Project?.[0] ?? null;
+
+  const mergedSubmissionDeadline = useMemo(() => {
+    const ownIso = submissionDeadlineToIsoString(myProject?.submissionDeadline);
+    if (ownIso) return new Date(ownIso);
+    const courseIso = submissionDeadlineToIsoString(effectiveSubmissionDeadline);
+    if (courseIso) return new Date(courseIso);
+    return null;
+  }, [myProject?.submissionDeadline, effectiveSubmissionDeadline]);
 
   const tableProjects = useMemo(() => {
     const all = projectsQuery.data?.Project ?? [];
     if (!myProject) return all;
     return all.filter((p) => p.id !== myProject.id);
   }, [projectsQuery.data?.Project, myProject]);
-
-  const submissionDeadline = useMemo(
-    () => (effectiveSubmissionDeadline ? new Date(effectiveSubmissionDeadline) : null),
-    [effectiveSubmissionDeadline]
-  );
 
   const handleProposeSuccess = useCallback(() => {
     setProposeDialogOpen(false);
@@ -109,8 +115,8 @@ const Projects: FC<ProjectsProps> = ({
     ) ?? null;
 
   const projectTypes = projectTypesQuery.data?.ProjectType ?? [];
-  const documentationTemplates =
-    documentationTemplatesQuery.data?.ProjectDocumentationTemplate ?? [];
+  const documentationInstructions =
+    documentationInstructionsQuery.data?.ProjectDocumentationInstruction ?? [];
 
   const showMyProjectPanel =
     Boolean(myProject && myProjectAcceptedAuthor && userId);
@@ -124,8 +130,10 @@ const Projects: FC<ProjectsProps> = ({
               project={myProject!}
               userId={userId}
               projectTypes={projectTypes}
-              documentationTemplates={documentationTemplates}
-              submissionDeadline={submissionDeadline}
+              documentationInstructions={documentationInstructions}
+              submissionDeadline={mergedSubmissionDeadline}
+              courseDefaultSubmissionDeadline={effectiveSubmissionDeadline}
+              submissionDeadlineDefaultSource={submissionDeadlineDefaultSource}
               refetchQueries={REFETCH_QUERIES}
               onActionError={handleActionError}
             />
@@ -145,6 +153,8 @@ const Projects: FC<ProjectsProps> = ({
           userId={userId ?? undefined}
           proposalsEnabled={proposalsEnabled}
           hasMyProject={Boolean(myProject)}
+          courseDefaultSubmissionDeadline={effectiveSubmissionDeadline}
+          submissionDeadlineDefaultSource={submissionDeadlineDefaultSource}
           refetchQueries={REFETCH_QUERIES}
           onProposeClick={() => setProposeDialogOpen(true)}
           onActionError={handleActionError}

@@ -50,7 +50,7 @@
 - "!include public_ProjectAchievementCertificateType.yaml"
 - "!include public_ProjectAuthor.yaml"
 - "!include public_ProjectCourse.yaml"
-- "!include public_ProjectDocumentationTemplate.yaml"
+- "!include public_ProjectDocumentationInstruction.yaml"
 - "!include public_ProjectMentor.yaml"
 - "!include public_ProjectParticipationStatus.yaml"
 - "!include public_ProjectRating.yaml"

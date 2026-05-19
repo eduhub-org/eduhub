@@ -14,7 +14,6 @@ export interface UpdateProjectApprove_update_Project_by_pk {
   id: number;
   status: ProjectStatus_enum;
   rating: ProjectRating_enum | null;
-  score: any | null;
 }
 
 export interface UpdateProjectApprove {
@@ -26,5 +25,4 @@ export interface UpdateProjectApprove {
 
 export interface UpdateProjectApproveVariables {
   itemId: number;
-  score?: any | null;
 }

@@ -11,9 +11,9 @@ object_relationships:
   - name: ProjectAchievementCertificateType
     using:
       foreign_key_constraint_on: achievementCertificateType
-  - name: ProjectDocumentationTemplate
+  - name: ProjectDocumentationInstruction
     using:
-      foreign_key_constraint_on: documentationTemplateId
+      foreign_key_constraint_on: documentationInstructionId
   - name: ProjectRating
     using:
       foreign_key_constraint_on: rating
@@ -72,7 +72,7 @@ insert_permissions:
         - acceptingParticipants
         - coverImageUrl
         - description
-        - documentationTemplateId
+        - documentationInstructionId
         - documentationUrl
         - externalUrl
         - organizationId
@@ -97,7 +97,7 @@ insert_permissions:
         - acceptingParticipants
         - coverImageUrl
         - description
-        - documentationTemplateId
+        - documentationInstructionId
         - documentationUrl
         - externalUrl
         - organizationId
@@ -122,6 +122,7 @@ select_permissions:
         - organizationId
         - presentationUrl
         - status
+        - submissionDeadline
         - submittedAt
         - submittedBy
         - tagline
@@ -147,7 +148,7 @@ select_permissions:
         - created_at
         - csvResults
         - description
-        - documentationTemplateId
+        - documentationInstructionId
         - documentationUrl
         - externalUrl
         - id
@@ -156,8 +157,9 @@ select_permissions:
         - presentationUrl
         - proposedByUserId
         - rating
-        - score
+        - ratingComment
         - status
+        - submissionDeadline
         - submittedAt
         - submittedBy
         - projectReviewRequestedAt
@@ -186,7 +188,7 @@ select_permissions:
         - created_at
         - csvResults
         - description
-        - documentationTemplateId
+        - documentationInstructionId
         - documentationUrl
         - externalUrl
         - id
@@ -195,8 +197,9 @@ select_permissions:
         - presentationUrl
         - proposedByUserId
         - rating
-        - score
+        - ratingComment
         - status
+        - submissionDeadline
         - submittedAt
         - submittedBy
         - projectReviewRequestedAt
@@ -227,13 +230,14 @@ update_permissions:
         - achievementCertificateType
         - coverImageUrl
         - description
-        - documentationTemplateId
+        - documentationInstructionId
         - documentationUrl
         - externalUrl
         - presentationUrl
         - rating
-        - score
+        - ratingComment
         - status
+        - submissionDeadline
         - submittedBy
         - tagline
         - title
@@ -270,7 +274,7 @@ update_permissions:
         - achievementCertificateType
         - coverImageUrl
         - description
-        - documentationTemplateId
+        - documentationInstructionId
         - documentationUrl
         - externalUrl
         - presentationUrl
