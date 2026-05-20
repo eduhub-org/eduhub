@@ -7,18 +7,12 @@ on:
       - docker-compose.yml
       - keycloak/**
       - scripts/rebuild-keycloak-matrix-handle-listener.sh
-    branches:
-      - "**"
-      - "!staging"
-      - "!production"
   pull_request:
     paths:
       - .github/workflows/keycloak-code-checks.yml
       - docker-compose.yml
       - keycloak/**
       - scripts/rebuild-keycloak-matrix-handle-listener.sh
-    branches:
-      - develop
     types: [opened, synchronize, reopened]
 
 jobs:
