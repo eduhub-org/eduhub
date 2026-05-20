@@ -8,7 +8,19 @@ const isPublic = (filePath) => filePath.includes("/public/");
 const isPdf = (filePath) => filePath.split("?")[0].toLowerCase().endsWith(".pdf");
 
 const getDownloadFileName = (filePath) => {
-  const fileName = decodeURIComponent(filePath.split("?")[0].split("/").pop() || "certificate.pdf");
+  const rawPathSegment = filePath.split("?")[0].split("/").pop() || "certificate.pdf";
+  let fileName = rawPathSegment;
+
+  try {
+    fileName = decodeURIComponent(rawPathSegment);
+  } catch (error) {
+    logger.warn("Failed to decode download file name, using raw path segment", {
+      filePath,
+      rawPathSegment,
+      error: error.message,
+    });
+  }
+
   return fileName.replace(/["\\\r\n]/g, "_");
 };
 

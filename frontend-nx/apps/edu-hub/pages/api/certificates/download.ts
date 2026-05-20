@@ -38,8 +38,18 @@ const getSingleQueryParam = (value: string | string[] | undefined) => (
   Array.isArray(value) ? value[0] : value
 );
 
+const CERTIFICATE_PATH_PATTERN = /^[A-Za-z0-9/_-]+\.pdf$/i;
+
 const isPdfPath = (path: string) => (
   path.split('?')[0].toLowerCase().endsWith('.pdf')
+);
+
+const isSafeStoragePath = (path: string) => (
+  !path.startsWith('/') &&
+  !path.includes('\0') &&
+  !path.includes('..') &&
+  !/^[a-z][a-z0-9+.-]*:\/\//i.test(path) &&
+  CERTIFICATE_PATH_PATTERN.test(path)
 );
 
 const getPreferredRole = (claims?: HasuraClaims): AuthRoles | null => {
@@ -61,7 +71,7 @@ export default async function certificateDownload(
   }
 
   const certificatePath = getSingleQueryParam(req.query.path);
-  if (!certificatePath || !isPdfPath(certificatePath)) {
+  if (!certificatePath || !isPdfPath(certificatePath) || !isSafeStoragePath(certificatePath)) {
     return res.status(400).json({ error: 'Invalid certificate path.' });
   }
 
