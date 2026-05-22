@@ -173,10 +173,11 @@ export const MARK_PROJECT_REVIEW_REQUESTED = gql`
   mutation MarkProjectReviewRequested($itemId: Int!, $requestedAt: timestamptz!) {
     update_Project_by_pk(
       pk_columns: { id: $itemId }
-      _set: { projectReviewRequestedAt: $requestedAt }
+      _set: { projectReviewRequestedAt: $requestedAt, acceptingParticipants: false }
     ) {
       id
       projectReviewRequestedAt
+      acceptingParticipants
     }
   }
 `;
@@ -327,6 +328,22 @@ export const INSERT_PROJECT_AUTHOR_REQUEST = gql`
   }
 `;
 
+export const INSERT_PROJECT_AUTHOR_REQUEST_AS_ADMIN = gql`
+  mutation InsertProjectAuthorRequestAsAdmin($projectId: Int!, $userId: uuid!) {
+    insert_ProjectAuthor_one(
+      object: {
+        projectId: $projectId
+        participationStatus: REQUESTED
+        userId: $userId
+      }
+    ) {
+      id
+      participationStatus
+      userId
+    }
+  }
+`;
+
 export const UPDATE_PROJECT_AUTHOR_PARTICIPATION_STATUS = gql`
   mutation UpdateProjectAuthorParticipationStatus(
     $id: Int!
@@ -363,9 +380,3 @@ export const COPY_PROJECT_FROM_TEMPLATE = gql`
     }
   }
 `;
-
-`;
-
-
-
-

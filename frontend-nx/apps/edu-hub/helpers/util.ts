@@ -60,17 +60,15 @@ export const formattedDateWithTime = (date: Date, language = 'de') => {
     date
   );
 
-  const hour = new Intl.DateTimeFormat(language, { hour: '2-digit' }).format(
-    date
-  );
-  const minute = new Intl.DateTimeFormat(language, {
+  const time = new Intl.DateTimeFormat(language, {
+    hour: '2-digit',
     minute: '2-digit',
+    hour12: language === 'en',
   }).format(date);
 
-  return `${[day, m, y].join('.')} ${at} ${hour.replace(
-    ' ',
-    ':' + minute + ' '
-  )}`;
+  const timeSuffix = language === 'de' ? ' Uhr' : '';
+
+  return `${[day, m, y].join('.')} ${at} ${time}${timeSuffix}`;
 };
 
 export const downloadCSVFileFromBase64String = (base64File: string) => {

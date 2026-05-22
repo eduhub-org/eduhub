@@ -27,6 +27,7 @@ const GET_TEMPLATE = `
       organizationId
       proposedByUserId
       status
+      submissionDeadline
       ProjectAuthors(where: { participationStatus: { _eq: ACCEPTED } }) {
         id
       }
@@ -36,6 +37,61 @@ const GET_TEMPLATE = `
     }
   }
 `;
+
+const GET_COURSE_SUBMISSION_DEADLINE = `
+  query GetCourseSubmissionDeadline($courseId: Int!) {
+    Course_by_pk(id: $courseId) {
+      projectSubmissionDeadline
+      Program {
+        defaultProjectSubmissionDeadline
+        achievementRecordUploadDeadline
+      }
+    }
+  }
+`;
+
+function resolveEffectiveSubmissionDeadlineIso(projectDeadline, course) {
+  const projectIso =
+    projectDeadline != null && String(projectDeadline).trim() !== ""
+      ? String(projectDeadline).trim()
+      : null;
+  if (projectIso) return projectIso;
+  if (!course) return null;
+  const courseDeadline = course.projectSubmissionDeadline;
+  if (courseDeadline != null && String(courseDeadline).trim() !== "") {
+    return String(courseDeadline).trim();
+  }
+  const programDefault = course.Program?.defaultProjectSubmissionDeadline;
+  if (programDefault != null && String(programDefault).trim() !== "") {
+    return String(programDefault).trim();
+  }
+  const programLegacy = course.Program?.achievementRecordUploadDeadline;
+  if (programLegacy != null && String(programLegacy).trim() !== "") {
+    return String(programLegacy).trim();
+  }
+  return null;
+}
+
+function submissionDeadlineCalendarDate(iso) {
+  if (!iso) return null;
+  const datePart = String(iso).trim().slice(0, 10);
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(datePart);
+  if (match) {
+    return new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+  }
+  const parsed = new Date(iso);
+  if (Number.isNaN(parsed.getTime())) return null;
+  return new Date(parsed.getFullYear(), parsed.getMonth(), parsed.getDate());
+}
+
+/** Inclusive through the deadline calendar day (same as course applicationEnd). */
+function isSubmissionDeadlinePassed(iso) {
+  const deadline = submissionDeadlineCalendarDate(iso);
+  if (!deadline) return false;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return deadline < today;
+}
 
 const GET_COURSE_ENROLLMENT = `
   query GetCourseEnrollment($courseId: Int!, $userId: uuid!) {
@@ -67,6 +123,7 @@ const INSERT_COPY = `
     $mentorRows: [ProjectMentor_insert_input!]!
     $status: ProjectStatus_enum!
     $acceptingParticipants: Boolean!
+    $submissionDeadline: timestamptz
   ) {
     insert_Project_one(
       object: {
@@ -82,6 +139,7 @@ const INSERT_COPY = `
         parentProjectId: $parentProjectId
         status: $status
         acceptingParticipants: $acceptingParticipants
+        submissionDeadline: $submissionDeadline
         ProjectAuthors: {
           data: {
             userId: $authorUserId
@@ -216,6 +274,34 @@ export default async function copyProjectFromTemplate(req, logger) {
     };
   }
 
+  let course;
+  try {
+    const courseResult = await hasuraClient.request({
+      document: GET_COURSE_SUBMISSION_DEADLINE,
+      variables: { courseId },
+    });
+    course = courseResult?.Course_by_pk;
+  } catch (error) {
+    logger.error("Failed to load course submission deadline", { error: error.message });
+    return {
+      success: false,
+      messageKey: "COPY_PROJECT_LOOKUP_FAILED",
+      error: "Could not load course settings",
+    };
+  }
+
+  const effectiveDeadlineIso = resolveEffectiveSubmissionDeadlineIso(
+    parent.submissionDeadline,
+    course
+  );
+  if (isSubmissionDeadlinePassed(effectiveDeadlineIso)) {
+    return {
+      success: false,
+      messageKey: "COPY_PROJECT_DEADLINE_PASSED",
+      error: "The submission deadline for this project has passed",
+    };
+  }
+
   const mentorRows = (parent.ProjectMentors || []).map((mentor) => ({
     userId: mentor.userId,
   }));
@@ -223,6 +309,11 @@ export default async function copyProjectFromTemplate(req, logger) {
   const isOnlineCourseTemplate = parent.type === "ONLINE_COURSE";
   const copyStatus = isOnlineCourseTemplate ? "ONGOING" : "PROPOSED";
   const copyAcceptingParticipants = !isOnlineCourseTemplate;
+
+  const templateSubmissionDeadline =
+    parent.submissionDeadline != null && String(parent.submissionDeadline).trim() !== ""
+      ? parent.submissionDeadline
+      : null;
 
   try {
     const insertResult = await hasuraClient.request({
@@ -243,6 +334,7 @@ export default async function copyProjectFromTemplate(req, logger) {
         mentorRows,
         status: copyStatus,
         acceptingParticipants: copyAcceptingParticipants,
+        submissionDeadline: templateSubmissionDeadline,
       },
     });
 

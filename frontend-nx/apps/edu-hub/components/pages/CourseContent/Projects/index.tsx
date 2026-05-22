@@ -7,7 +7,6 @@ import {
   PROJECTS_BY_COURSE,
   MY_PROJECT_BY_COURSE,
   PROJECT_TYPES,
-  PROJECT_DOCUMENTATION_INSTRUCTIONS,
 } from '../../../../queries/project';
 import {
   ProjectsByCourse,
@@ -18,14 +17,13 @@ import {
   MyProjectByCourseVariables,
 } from '../../../../queries/__generated__/MyProjectByCourse';
 import { ProjectTypes } from '../../../../queries/__generated__/ProjectTypes';
-import { ProjectDocumentationInstructions } from '../../../../queries/__generated__/ProjectDocumentationInstructions';
 import { ProjectParticipationStatus_enum } from '../../../../__generated__/globalTypes';
 import NotificationSnackbar from '../../../common/dialogs/NotificationSnackbar';
 import { ContentRow } from '../../../common/ContentRow';
 import MyProjectPanel from './MyProjectPanel';
 import ProjectsTable from './ProjectsTable';
 import ProposeProjectDialog from './ProposeProjectDialog';
-import { submissionDeadlineToIsoString, CourseProjectSubmissionDefaultSource } from './projectEffectiveSubmissionDeadline';
+import { CourseProjectSubmissionDefaultSource } from './projectEffectiveSubmissionDeadline';
 
 interface ProjectsProps {
   courseId: number;
@@ -64,19 +62,8 @@ const Projects: FC<ProjectsProps> = ({
   );
 
   const projectTypesQuery = useAuthedQuery<ProjectTypes>(PROJECT_TYPES);
-  const documentationInstructionsQuery = useAuthedQuery<ProjectDocumentationInstructions>(
-    PROJECT_DOCUMENTATION_INSTRUCTIONS
-  );
 
   const myProject = myProjectQuery.data?.Project?.[0] ?? null;
-
-  const mergedSubmissionDeadline = useMemo(() => {
-    const ownIso = submissionDeadlineToIsoString(myProject?.submissionDeadline);
-    if (ownIso) return new Date(ownIso);
-    const courseIso = submissionDeadlineToIsoString(effectiveSubmissionDeadline);
-    if (courseIso) return new Date(courseIso);
-    return null;
-  }, [myProject?.submissionDeadline, effectiveSubmissionDeadline]);
 
   const tableProjects = useMemo(() => {
     const all = projectsQuery.data?.Project ?? [];
@@ -115,8 +102,6 @@ const Projects: FC<ProjectsProps> = ({
     ) ?? null;
 
   const projectTypes = projectTypesQuery.data?.ProjectType ?? [];
-  const documentationInstructions =
-    documentationInstructionsQuery.data?.ProjectDocumentationInstruction ?? [];
 
   const showMyProjectPanel =
     Boolean(myProject && myProjectAcceptedAuthor && userId);
@@ -130,8 +115,6 @@ const Projects: FC<ProjectsProps> = ({
               project={myProject!}
               userId={userId}
               projectTypes={projectTypes}
-              documentationInstructions={documentationInstructions}
-              submissionDeadline={mergedSubmissionDeadline}
               courseDefaultSubmissionDeadline={effectiveSubmissionDeadline}
               submissionDeadlineDefaultSource={submissionDeadlineDefaultSource}
               refetchQueries={REFETCH_QUERIES}

@@ -28,6 +28,7 @@ export const FileUploadField: FC<FileUploadFieldProps> = ({
   updateFieldName = 'templatePath',
   useChangesObject = false,
   acceptedFileTypes = '*',
+  acceptedTypesDisplay,
   maxFileSize,
   uploadText,
   altText = 'File preview',
@@ -445,7 +446,10 @@ export const FileUploadField: FC<FileUploadFieldProps> = ({
   }, [currentFileUrl]);
 
   // Format accepted types and max size for display
-  const acceptedTypesText = useMemo(() => formatAcceptedTypes(acceptedFileTypes), [acceptedFileTypes]);
+  const acceptedTypesText = useMemo(
+    () => acceptedTypesDisplay ?? formatAcceptedTypes(acceptedFileTypes),
+    [acceptedTypesDisplay, acceptedFileTypes]
+  );
   const maxSizeText = useMemo(() => formatMaxSize(maxFileSize), [maxFileSize]);
 
   // Determine container classes based on state

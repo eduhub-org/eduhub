@@ -51,6 +51,7 @@ export const UPDATE_PROJECT_CONFIRM_TEAM = gql`
         type: $type
         documentationInstructionId: $documentationInstructionId
         status: ONGOING
+        acceptingParticipants: false
       }
     ) {
       id

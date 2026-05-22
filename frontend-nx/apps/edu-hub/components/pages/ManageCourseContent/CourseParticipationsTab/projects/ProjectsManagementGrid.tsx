@@ -52,6 +52,7 @@ import { makeFullName } from '../../../../../helpers/util';
 import { translateErrorMessage } from '../../../../../helpers/errorHandling';
 import StatusChip from '../../../CourseContent/Projects/StatusChip';
 import ProjectPreviewLayout from '../../../CourseContent/Projects/ProjectPreviewLayout';
+import ProjectFormFieldSection from '../../../CourseContent/Projects/ProjectFormFieldSection';
 import ProjectSubmissionDeadlineBelowTitle from '../../../CourseContent/Projects/ProjectSubmissionDeadlineBelowTitle';
 import type { CourseProjectSubmissionDefaultSource } from '../../../CourseContent/Projects/projectEffectiveSubmissionDeadline';
 import { ProjectRow } from '../../../CourseContent/Projects/types';
@@ -601,10 +602,13 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
                   </div>
                 }
                 coverSlot={
+                  <ProjectFormFieldSection
+                    title={tCourse('projects.my_project.cover_image_section_label')}
+                    tooltip={tCourse('projects.my_project.field_tooltip_cover_image')}
+                  >
                   <FileUploadField
                     variant="material"
                     mutationPreset="role"
-                    infoTooltip={tCourse('projects.my_project.field_tooltip_cover_image')}
                     currentFileUrl={row.coverImageUrl}
                     uploadMutation={SAVE_PROJECT_IMAGE}
                     updateMutation={UPDATE_PROJECT_COVER_IMAGE_URL}
@@ -621,40 +625,51 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
                     altText={tCourse('projects.my_project.cover_image_alt')}
                     onUploadError={handleCoverUploadError}
                   />
+                  </ProjectFormFieldSection>
                 }
                 taglineSlot={
-                  <div className="mt-3 rounded border border-border-primary p-3 min-h-[3.5rem] text-sm bg-bg-secondary/50">
-                    <InputField
-                      variant="eduhub"
-                      type="input"
-                      placeholder={tCourse('projects.my_project.tagline_label')}
-                      itemId={row.id}
-                      value={row.tagline ?? ''}
-                      updateValueMutation={UPDATE_PROJECT_TAGLINE}
-                      refetchQueries={REFETCH_QUERIES}
-                      helpText={tCourse('projects.my_project.field_tooltip_tagline')}
-                      maxLength={400}
-                      showCharacterCount={false}
-                      className="!mb-2 border-transparent bg-transparent"
-                    />
-                  </div>
+                  <ProjectFormFieldSection
+                    className="mt-3"
+                    title={tCourse('projects.my_project.tagline_label')}
+                    tooltip={tCourse('projects.my_project.field_tooltip_tagline')}
+                  >
+                    <div className="rounded border border-border-primary p-3 min-h-[3.5rem] text-sm bg-bg-secondary/50">
+                      <InputField
+                        variant="eduhub"
+                        type="input"
+                        placeholder={tCourse('projects.my_project.tagline_placeholder')}
+                        itemId={row.id}
+                        value={row.tagline ?? ''}
+                        updateValueMutation={UPDATE_PROJECT_TAGLINE}
+                        refetchQueries={REFETCH_QUERIES}
+                        maxLength={400}
+                        showCharacterCount={false}
+                        className="!mb-0 border-transparent bg-transparent [&>div]:!px-0"
+                      />
+                    </div>
+                  </ProjectFormFieldSection>
                 }
                 descriptionSlot={
-                  <div className="rounded border border-border-primary p-3 flex-1 min-h-[10rem] text-sm bg-bg-secondary/50">
-                    <InputField
-                      variant="eduhub"
-                      type="textarea"
-                      placeholder={tCourse('projects.my_project.description_label')}
-                      itemId={row.id}
-                      value={row.description ?? ''}
-                      updateValueMutation={UPDATE_PROJECT_DESCRIPTION}
-                      refetchQueries={REFETCH_QUERIES}
-                      helpText={tCourse('projects.my_project.field_tooltip_description')}
-                      maxLength={8000}
-                      showCharacterCount={false}
-                      className="!mb-2 min-h-[9rem] border-transparent bg-transparent"
-                    />
-                  </div>
+                  <ProjectFormFieldSection
+                    className="flex flex-col flex-1 min-h-0"
+                    title={tCourse('projects.my_project.description_label')}
+                    tooltip={tCourse('projects.my_project.field_tooltip_description')}
+                  >
+                    <div className="rounded border border-border-primary p-3 flex-1 min-h-[10rem] text-sm bg-bg-secondary/50">
+                      <InputField
+                        variant="eduhub"
+                        type="textarea"
+                        placeholder={tCourse('projects.my_project.description_placeholder')}
+                        itemId={row.id}
+                        value={row.description ?? ''}
+                        updateValueMutation={UPDATE_PROJECT_DESCRIPTION}
+                        refetchQueries={REFETCH_QUERIES}
+                        maxLength={8000}
+                        showCharacterCount={false}
+                        className="!mb-0 min-h-[9rem] border-transparent bg-transparent [&>div]:!px-0"
+                      />
+                    </div>
+                  </ProjectFormFieldSection>
                 }
               />
               {documentationInstructionSelector}

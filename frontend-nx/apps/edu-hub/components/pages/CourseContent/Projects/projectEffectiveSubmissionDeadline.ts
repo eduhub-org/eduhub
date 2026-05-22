@@ -14,6 +14,44 @@ export function submissionDeadlineToIsoString(
   return t || null;
 }
 
+/**
+ * Calendar date (local midnight) for a submission deadline.
+ * Uses the date portion only — same semantics as course applicationEnd (no time-of-day).
+ */
+export function submissionDeadlineToCalendarDate(
+  v: string | Date | null | undefined
+): Date | null {
+  const iso = submissionDeadlineToIsoString(v);
+  if (!iso) return null;
+
+  const datePart = iso.slice(0, 10);
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(datePart);
+  if (match) {
+    const y = Number(match[1]);
+    const m = Number(match[2]) - 1;
+    const day = Number(match[3]);
+    return new Date(y, m, day);
+  }
+
+  const parsed = new Date(iso);
+  if (Number.isNaN(parsed.getTime())) return null;
+  return new Date(parsed.getFullYear(), parsed.getMonth(), parsed.getDate());
+}
+
+/** Localized date-only label for UI (no time). */
+export function formatSubmissionDeadlineDate(
+  v: string | Date | null | undefined,
+  locale: string
+): string | null {
+  const calendarDate = submissionDeadlineToCalendarDate(v);
+  if (!calendarDate) return null;
+  return calendarDate.toLocaleDateString(locale, {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  });
+}
+
 /** Minimal course shape needed to resolve the effective project submission deadline. */
 export type CourseProjectSubmissionDeadlineSource = {
   projectSubmissionDeadline?: string | Date | null;
@@ -72,4 +110,27 @@ export function getEffectiveProjectSubmissionDeadlineIso(
   const own = submissionDeadlineToIsoString(projectSubmissionDeadline);
   if (own) return own;
   return submissionDeadlineToIsoString(courseDefaultDeadline);
+}
+
+/**
+ * True when the deadline calendar day is before today (local).
+ * The deadline date itself remains open all day — like applicationEnd on courses.
+ */
+export function isProjectSubmissionDeadlinePassed(
+  projectSubmissionDeadline: string | Date | null | undefined,
+  courseDefaultDeadline: string | Date | null | undefined,
+  now: Date = new Date()
+): boolean {
+  const effectiveIso = getEffectiveProjectSubmissionDeadlineIso(
+    projectSubmissionDeadline,
+    courseDefaultDeadline
+  );
+  if (!effectiveIso) return false;
+
+  const deadline = submissionDeadlineToCalendarDate(effectiveIso);
+  if (!deadline) return false;
+
+  const today = new Date(now);
+  today.setHours(0, 0, 0, 0);
+  return deadline < today;
 }

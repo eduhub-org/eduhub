@@ -189,7 +189,8 @@ export const formatAcceptedTypes = (acceptedFileTypes: string): string => {
     }
   }
 
-  return types.length > 0 ? types.join(', ') : 'All file types';
+  const unique = [...new Set(types)];
+  return unique.length > 0 ? unique.join(', ') : 'All file types';
 };
 
 /**

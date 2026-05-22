@@ -64,6 +64,7 @@ import useErrorHandler from '../../../hooks/useErrorHandler';
 import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
 import { InfoDialog } from '../../common/dialogs/InfoDialog';
 import { translateErrorMessage } from '../../../helpers/errorHandling';
+import { submissionDeadlineToCalendarDate } from '../CourseContent/Projects/projectEffectiveSubmissionDeadline';
 import { useRoleQuery, useLazyRoleQuery } from '../../../hooks/authedQuery';
 import PricingSummary from '../../common/PricingSummary';
 import {
@@ -126,10 +127,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
   );
 
   const projectSubmissionDeadlineValue = useMemo(
-    () =>
-      course.projectSubmissionDeadline
-        ? new Date(course.projectSubmissionDeadline)
-        : null,
+    () => submissionDeadlineToCalendarDate(course.projectSubmissionDeadline),
     [course.projectSubmissionDeadline]
   );
 

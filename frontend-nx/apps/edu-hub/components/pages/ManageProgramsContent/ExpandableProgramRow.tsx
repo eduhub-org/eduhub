@@ -42,6 +42,7 @@ import InputField from '../../inputs/InputField';
 import { Button } from '../../common/Button';
 import FileUploadField from '../../inputs/FileUploadField';
 import NotificationSnackbar from '../../common/dialogs/NotificationSnackbar';
+import { submissionDeadlineToCalendarDate } from '../CourseContent/Projects/projectEffectiveSubmissionDeadline';
 interface ExpandableProgramRowProps {
   program: ProgramList_Program;
 }
@@ -64,10 +65,7 @@ const ExpandableProgramRow: FC<ExpandableProgramRowProps> = ({ program }) => {
   );
 
   const defaultProjectSubmissionDeadline = useMemo(
-    () =>
-      program.defaultProjectSubmissionDeadline
-        ? new Date(program.defaultProjectSubmissionDeadline)
-        : null,
+    () => submissionDeadlineToCalendarDate(program.defaultProjectSubmissionDeadline),
     [program.defaultProjectSubmissionDeadline]
   );
 

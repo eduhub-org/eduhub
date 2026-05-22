@@ -1,12 +1,13 @@
 import { FC } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import DatePicker from '../../../inputs/DatePicker';
-import { formattedDateWithTime } from '../../../../helpers/util';
 import { UPDATE_PROJECT_SUBMISSION_DEADLINE } from '../../../../queries/project';
 import { ProjectStatus_enum } from '../../../../__generated__/globalTypes';
 import {
   CourseProjectSubmissionDefaultSource,
+  formatSubmissionDeadlineDate,
   getEffectiveProjectSubmissionDeadlineIso,
+  submissionDeadlineToCalendarDate,
   submissionDeadlineToIsoString,
 } from './projectEffectiveSubmissionDeadline';
 
@@ -15,26 +16,6 @@ type ProjectDeadlinePick = {
   status: ProjectStatus_enum;
   submissionDeadline?: string | Date | null;
 };
-
-function deadlineSourceCaption(
-  projectHasOwnDeadline: boolean,
-  defaultSource: CourseProjectSubmissionDefaultSource,
-  t: (key: string) => string
-): string | null {
-  if (projectHasOwnDeadline) {
-    return t('projects.table.submission_deadline_source_project');
-  }
-  if (defaultSource === 'course') {
-    return t('projects.table.submission_deadline_source_course');
-  }
-  if (defaultSource === 'program_default') {
-    return t('projects.table.submission_deadline_source_program');
-  }
-  if (defaultSource === 'program_legacy') {
-    return t('projects.table.submission_deadline_source_program_legacy');
-  }
-  return null;
-}
 
 function instructorDefaultOriginSuffix(
   defaultSource: CourseProjectSubmissionDefaultSource,
@@ -80,13 +61,10 @@ const ProjectSubmissionDeadlineBelowTitle: FC<ProjectSubmissionDeadlineBelowTitl
   }
 
   const projectDeadlineIso = submissionDeadlineToIsoString(project.submissionDeadline);
-  const projectHasOwnDeadline = Boolean(projectDeadlineIso);
   const effectiveIso = getEffectiveProjectSubmissionDeadlineIso(
     project.submissionDeadline,
     courseDefaultSubmissionDeadline
   );
-
-  const sourceCaption = deadlineSourceCaption(projectHasOwnDeadline, defaultDeadlineSource, t);
 
   if (mode === 'readonly') {
     return (
@@ -95,14 +73,9 @@ const ProjectSubmissionDeadlineBelowTitle: FC<ProjectSubmissionDeadlineBelowTitl
           {t('projects.table.submission_deadline_label')}:
         </span>
         {effectiveIso ? (
-          <>
-            <span className="text-label-primary">
-              {formattedDateWithTime(new Date(effectiveIso), locale)}
-            </span>
-            {sourceCaption ? (
-              <span className="text-label-secondary shrink-0">({sourceCaption})</span>
-            ) : null}
-          </>
+          <span className="text-label-primary">
+            {formatSubmissionDeadlineDate(effectiveIso, locale)}
+          </span>
         ) : (
           <span className="italic">{t('projects.table.submission_deadline_none')}</span>
         )}
@@ -120,7 +93,7 @@ const ProjectSubmissionDeadlineBelowTitle: FC<ProjectSubmissionDeadlineBelowTitl
       <p className="m-0 leading-relaxed">
         {resolvedDefaultIso ? (
           tManage('projects.expanded.submission_deadline_instructor_intro_default', {
-            date: formattedDateWithTime(new Date(resolvedDefaultIso), locale),
+            date: formatSubmissionDeadlineDate(resolvedDefaultIso, locale) ?? '',
             origin: originSuffix,
           })
         ) : (
@@ -136,7 +109,7 @@ const ProjectSubmissionDeadlineBelowTitle: FC<ProjectSubmissionDeadlineBelowTitl
             variant="material"
             helpText={tManage('projects.expanded.submission_deadline_instructor_picker_help')}
             itemId={project.id}
-            value={projectDeadlineIso ? new Date(projectDeadlineIso) : null}
+            value={submissionDeadlineToCalendarDate(projectDeadlineIso)}
             updateValueMutation={UPDATE_PROJECT_SUBMISSION_DEADLINE}
             identifierVariables={{ itemId: project.id }}
             dateFieldName="value"

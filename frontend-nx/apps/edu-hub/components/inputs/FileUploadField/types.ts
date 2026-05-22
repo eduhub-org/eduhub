@@ -69,6 +69,11 @@ export interface FileUploadFieldProps {
   acceptedFileTypes?: string;
 
   /**
+   * Localized label for accepted types shown under the upload prompt (overrides auto-formatting).
+   */
+  acceptedTypesDisplay?: string;
+
+  /**
    * Maximum file size in bytes.
    */
   maxFileSize?: number;

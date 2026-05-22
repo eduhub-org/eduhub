@@ -3,6 +3,7 @@ import { useTranslations } from 'next-intl';
 import { ProjectStatus_enum } from '../../../../__generated__/globalTypes';
 
 const STATUS_CLASSES: Record<string, string> = {
+  TEMPLATE: 'bg-gray-100 text-gray-700 border border-gray-300',
   PROPOSED: 'bg-gray-200 text-gray-800',
   ONGOING: 'bg-blue-100 text-blue-800',
   SUBMITTED: 'bg-purple-100 text-purple-800',

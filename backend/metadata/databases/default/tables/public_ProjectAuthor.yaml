@@ -15,13 +15,33 @@ insert_permissions:
   - role: instructor_access
     permission:
       check:
-        Project:
-          ProjectCourses:
-            Course:
-              CourseInstructors:
-                User:
-                  id:
-                    _eq: X-Hasura-User-Id
+        _or:
+          - Project:
+              ProjectCourses:
+                Course:
+                  CourseInstructors:
+                    User:
+                      id:
+                        _eq: X-Hasura-User-Id
+          - _and:
+              - participationStatus:
+                  _eq: REQUESTED
+              - Project:
+                  _and:
+                    - status:
+                        _eq: PROPOSED
+                    - acceptingParticipants:
+                        _eq: true
+                    - proposedByUserId:
+                        _neq: X-Hasura-User-Id
+                    - ProjectCourses:
+                        Course:
+                          CourseEnrollments:
+                            User:
+                              id:
+                                _eq: X-Hasura-User-Id
+      set:
+        userId: x-hasura-user-id
       columns:
         - participationStatus
         - projectId
@@ -51,6 +71,8 @@ insert_permissions:
                   _eq: REQUESTED
               - Project:
                   _and:
+                    - status:
+                        _eq: PROPOSED
                     - acceptingParticipants:
                         _eq: true
                     - proposedByUserId:

@@ -3,7 +3,6 @@ import Tooltip from '@mui/material/Tooltip';
 import { useTranslations, useLocale } from 'next-intl';
 import { useRoleMutation } from '../../../../hooks/authedMutation';
 import InputField from '../../../inputs/InputField';
-import DropDownSelector from '../../../inputs/DropDownSelector';
 import CheckboxSelector from '../../../inputs/CheckboxSelector';
 import { Button } from '../../../common/Button';
 import { QuestionConfirmationDialog } from '../../../common/dialogs/QuestionConfirmationDialog';
@@ -17,7 +16,6 @@ import {
   UPDATE_PROJECT_PRESENTATION_URL,
   UPDATE_PROJECT_EXTERNAL_URL,
   UPDATE_PROJECT_COVER_IMAGE_URL,
-  UPDATE_PROJECT_DOCUMENTATION_INSTRUCTION,
   UPDATE_PROJECT_ACCEPTING_PARTICIPANTS,
   SUBMIT_PROJECT,
   DELETE_PROJECT_AUTHOR,
@@ -30,45 +28,42 @@ import {
 import { formattedDateWithTime, makeFullName } from '../../../../helpers/util';
 import { translateErrorMessage } from '../../../../helpers/errorHandling';
 import StatusChip from './StatusChip';
+import {
+  CourseProjectSubmissionDefaultSource,
+  formatSubmissionDeadlineDate,
+  getEffectiveProjectSubmissionDeadlineIso,
+  isProjectSubmissionDeadlinePassed,
+} from './projectEffectiveSubmissionDeadline';
+import {
+  isOnlineCourseProject,
+  shouldShowProjectResourceDownloadLinks,
+} from './projectStatusDisplay';
 import ProjectNextTodos from './ProjectNextTodos';
 import RequestProjectReviewDialog from './RequestProjectReviewDialog';
 import SubmitConfirmationDialog from './SubmitConfirmationDialog';
 import { isChecklistComplete } from './SubmissionChecklist';
+import {
+  isProjectCoverImageIncomplete,
+  isProjectDocumentationIncomplete,
+  isProjectExternalUrlIncomplete,
+  isProjectPresentationIncomplete,
+  MANDATORY_INCOMPLETE_HIGHLIGHT_CLASS,
+} from './projectMandatory';
 import ManageRequestsDialog from './ManageRequestsDialog';
 import ProjectPreviewLayout from './ProjectPreviewLayout';
+import ProjectFormFieldSection from './ProjectFormFieldSection';
 import ProjectSubmissionDeadlineBelowTitle from './ProjectSubmissionDeadlineBelowTitle';
 import { ProjectRow, ProjectTypeRow } from './types';
 import { PROJECT_FALLBACK_TITLE } from './projectDefaults';
-import { CourseProjectSubmissionDefaultSource } from './projectEffectiveSubmissionDeadline';
-
-const PROJECT_DOCUMENTATION_ACCEPT = [
-  '.pdf',
-  '.doc',
-  '.docx',
-  '.odt',
-  'application/pdf',
-  'application/msword',
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-  'application/vnd.oasis.opendocument.text',
-].join(',');
-const PROJECT_PRESENTATION_ACCEPT = [
-  '.pdf',
-  '.ppt',
-  '.pptx',
-  '.odp',
-  'application/pdf',
-  'application/vnd.ms-powerpoint',
-  'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-  'application/vnd.oasis.opendocument.presentation',
-].join(',');
+/** Extensions only — MIME variants are derived for validation; avoids raw MIME labels in the UI. */
+const PROJECT_DOCUMENTATION_ACCEPT = '.pdf,.doc,.docx,.odt';
+const PROJECT_PRESENTATION_ACCEPT = '.pdf,.ppt,.pptx,.odp';
 
 interface MyProjectPanelProps {
   project: ProjectRow;
   userId: string;
   projectTypes: ProjectTypeRow[];
-  documentationInstructions: { id: number; title: string }[];
-  submissionDeadline: Date | null;
-  /** Course/program fallback when `project.submissionDeadline` is null (for deadline display under title). */
+  /** Course/program fallback when `project.submissionDeadline` is null. */
   courseDefaultSubmissionDeadline: string | null | undefined;
   submissionDeadlineDefaultSource: CourseProjectSubmissionDefaultSource;
   refetchQueries: string[];
@@ -79,8 +74,6 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
   project,
   userId,
   projectTypes,
-  documentationInstructions,
-  submissionDeadline,
   courseDefaultSubmissionDeadline,
   submissionDeadlineDefaultSource,
   refetchQueries,
@@ -200,14 +193,40 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
     project.status === ProjectStatus_enum.PROPOSED ||
     project.status === ProjectStatus_enum.ONGOING;
 
+  const isSubmitted = project.status === ProjectStatus_enum.SUBMITTED;
+  const effectiveSubmissionDeadlineIso = useMemo(
+    () =>
+      getEffectiveProjectSubmissionDeadlineIso(
+        project.submissionDeadline,
+        courseDefaultSubmissionDeadline
+      ),
+    [project.submissionDeadline, courseDefaultSubmissionDeadline]
+  );
+
+  const isDeadlinePassed = useMemo(
+    () =>
+      isProjectSubmissionDeadlinePassed(
+        project.submissionDeadline,
+        courseDefaultSubmissionDeadline
+      ),
+    [project.submissionDeadline, courseDefaultSubmissionDeadline]
+  );
+
+  const submissionDeadlineDisplay = useMemo(
+    () => formatSubmissionDeadlineDate(effectiveSubmissionDeadlineIso, locale),
+    [effectiveSubmissionDeadlineIso, locale]
+  );
+
+  /** Inputs and uploads are locked once the submission deadline has passed. */
+  const canEditFields = isContentEditable && !isDeadlinePassed;
+
+  const isOnlineCourse = isOnlineCourseProject(project);
+
+  /** Online-course projects: metadata comes from the template; only documentation etc. remain editable. */
+  const canEditProjectMetadata = canEditFields && !isOnlineCourse;
+
   /** Copies from a course template (Neues Projektteam bilden) keep the template title. */
   const canEditProjectTitle = project.parentProjectId == null;
-
-  const isSubmitted = project.status === ProjectStatus_enum.SUBMITTED;
-  const isDeadlinePassed = useMemo(
-    () => Boolean(submissionDeadline && submissionDeadline.getTime() < Date.now()),
-    [submissionDeadline]
-  );
 
   const checklistComplete = useMemo(
     () => isChecklistComplete(project, projectType),
@@ -250,18 +269,20 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
 
   const proposedPrepComplete = useMemo(() => {
     if (project.status !== ProjectStatus_enum.PROPOSED) return false;
-    const descOk = Boolean(project.description?.trim());
+    const descOk = isOnlineCourse || Boolean(project.description?.trim());
     const titleOk =
+      isOnlineCourse ||
       !canEditProjectTitle ||
       (Boolean(project.title?.trim()) && project.title.trim() !== PROJECT_FALLBACK_TITLE);
     const teamOk = !project.acceptingParticipants || requestedCount === 0;
     return descOk && titleOk && teamOk;
-  }, [project, canEditProjectTitle, requestedCount]);
+  }, [project, canEditProjectTitle, isOnlineCourse, requestedCount]);
 
   const canRequestProjectReview =
     project.status === ProjectStatus_enum.PROPOSED &&
     proposedPrepComplete &&
-    !projectReviewRequestedAt;
+    !projectReviewRequestedAt &&
+    !isDeadlinePassed;
 
   const handleRequestProjectReviewConfirm = useCallback(async () => {
     try {
@@ -277,14 +298,19 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
     }
   }, [markProjectReviewRequested, project.id, onActionError, t]);
 
-  const documentationInstructionOptions = useMemo(
-    () =>
-      documentationInstructions.map((tpl) => ({
-        value: String(tpl.id),
-        label: tpl.title,
-      })),
-    [documentationInstructions]
-  );
+  const highlightDocumentation = isProjectDocumentationIncomplete(project, projectType);
+  const highlightPresentation = isProjectPresentationIncomplete(project, projectType);
+  const highlightExternalUrl = isProjectExternalUrlIncomplete(project, projectType);
+  const highlightCoverImage = isProjectCoverImageIncomplete(project, projectType);
+  const highlightDescription =
+    canEditProjectMetadata &&
+    project.status === ProjectStatus_enum.PROPOSED &&
+    !project.description?.trim();
+  const highlightTitle =
+    canEditProjectMetadata &&
+    project.status === ProjectStatus_enum.PROPOSED &&
+    canEditProjectTitle &&
+    (!project.title?.trim() || project.title.trim() === PROJECT_FALLBACK_TITLE);
 
   const submittedByName = project.SubmittedByUser
     ? makeFullName(
@@ -293,16 +319,42 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
       )
     : null;
 
+  const acceptingParticipantsCheckbox =
+    project.status === ProjectStatus_enum.PROPOSED ? (
+      <CheckboxSelector
+        variant="material"
+        label={t('projects.my_project.accepting_participants_label')}
+        checked={Boolean(project.acceptingParticipants)}
+        updateValueMutation={UPDATE_PROJECT_ACCEPTING_PARTICIPANTS}
+        identifierVariables={{ itemId: project.id }}
+        refetchQueries={refetchQueries}
+        helpText={t('projects.my_project.field_tooltip_accepting_participants')}
+        disabled={Boolean(projectReviewRequestedAt)}
+        className="w-full"
+      />
+    ) : null;
+
   return (
     <div className="bg-fill-primary text-label-primary border border-status-confirmed rounded-lg p-6 space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h3 className="text-lg font-semibold">{t('projects.my_project.heading')}</h3>
         <div className="flex flex-wrap items-center gap-2">
-          {requestedCount > 0 ? (
-            <Tooltip title={t('projects.my_project.action_tooltip_join_requests')}>
+          {project.status === ProjectStatus_enum.PROPOSED ? (
+            <Tooltip
+              title={
+                requestedCount > 0
+                  ? t('projects.my_project.action_tooltip_join_requests')
+                  : t('projects.my_project.action_tooltip_join_requests_none')
+              }
+            >
               <span className="inline-flex">
-                <Button onClick={() => setRequestsDialogOpen(true)}>
-                  {t('projects.my_project.requests_button', { count: requestedCount })}
+                <Button
+                  onClick={() => setRequestsDialogOpen(true)}
+                  disabled={requestedCount === 0}
+                >
+                  {requestedCount > 0
+                    ? t('projects.my_project.requests_button', { count: requestedCount })
+                    : t('projects.my_project.requests_button_idle')}
                 </Button>
               </span>
             </Tooltip>
@@ -314,10 +366,18 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
                   <Button disabled>{t('projects.my_project.project_review_button_done')}</Button>
                 </span>
               </Tooltip>
+            ) : isDeadlinePassed ? (
+              <Tooltip title={t('projects.my_project.project_review_disabled_deadline_tooltip')}>
+                <span className="inline-flex">
+                  <Button filled disabled>
+                    {t('projects.my_project.project_review_button')}
+                  </Button>
+                </span>
+              </Tooltip>
             ) : !canRequestProjectReview ? (
               <Tooltip title={t('projects.my_project.proposal_action_disabled_tooltip')}>
                 <span className="inline-flex">
-                  <Button filled disabled={!canRequestProjectReview}>
+                  <Button filled disabled>
                     {t('projects.my_project.project_review_button')}
                   </Button>
                 </span>
@@ -368,6 +428,7 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
             projectType={projectType}
             canEditProjectTitle={canEditProjectTitle}
             requestedJoinCount={requestedCount}
+            isSubmissionDeadlinePassed={isDeadlinePassed}
           />
           {project.status === ProjectStatus_enum.PROPOSED && projectReviewRequestedAt ? (
             <p className="text-xs text-label-secondary pt-1">
@@ -396,35 +457,44 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
         </div>
       ) : null}
 
-      {isDeadlinePassed && project.status === ProjectStatus_enum.ONGOING ? (
+      {isDeadlinePassed &&
+      (project.status === ProjectStatus_enum.ONGOING ||
+        project.status === ProjectStatus_enum.PROPOSED) ? (
         <div className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-900">
           {t('projects.my_project.deadline_passed_banner', {
-            date: submissionDeadline
-              ? formattedDateWithTime(submissionDeadline, locale)
-              : '',
+            date: submissionDeadlineDisplay ?? '',
           })}
         </div>
       ) : null}
 
       <div className="space-y-3 min-w-0">
-        <ProjectSubmissionDeadlineBelowTitle
-          mode="readonly"
-          project={project}
-          courseDefaultSubmissionDeadline={courseDefaultSubmissionDeadline}
-          defaultDeadlineSource={submissionDeadlineDefaultSource}
-        />
+        {!isDeadlinePassed &&
+        (project.status === ProjectStatus_enum.PROPOSED ||
+          project.status === ProjectStatus_enum.ONGOING) ? (
+          <ProjectSubmissionDeadlineBelowTitle
+            mode="readonly"
+            project={project}
+            courseDefaultSubmissionDeadline={courseDefaultSubmissionDeadline}
+            defaultDeadlineSource={submissionDeadlineDefaultSource}
+          />
+        ) : null}
         <div className="rounded-lg border border-border-primary p-4 bg-bg-secondary/30">
           <ProjectPreviewLayout
             project={project}
-            showResourceLinks={Boolean(
-              project.documentationUrl?.trim() ||
-                project.presentationUrl?.trim() ||
-                project.externalUrl?.trim()
-            )}
+            showResourceLinks={
+              shouldShowProjectResourceDownloadLinks(project.status) &&
+              Boolean(
+                project.documentationUrl?.trim() ||
+                  project.presentationUrl?.trim() ||
+                  project.externalUrl?.trim()
+              )
+            }
             titleRow={
-            isContentEditable ? (
+            canEditProjectMetadata ? (
               <div className="flex flex-wrap items-start gap-2 mb-1 w-full">
-                <div className="min-w-0 flex-1">
+                <div
+                  className={`min-w-0 flex-1 ${highlightTitle ? MANDATORY_INCOMPLETE_HIGHLIGHT_CLASS : ''}`}
+                >
                   {canEditProjectTitle ? (
                     <InputField
                       variant="material"
@@ -459,11 +529,15 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
             )
           }
           coverSlot={
-            isContentEditable ? (
+            canEditProjectMetadata ? (
+              <ProjectFormFieldSection
+                className={highlightCoverImage ? MANDATORY_INCOMPLETE_HIGHLIGHT_CLASS : ''}
+                title={t('projects.my_project.cover_image_section_label')}
+                tooltip={t('projects.my_project.field_tooltip_cover_image')}
+              >
               <FileUploadField
                 variant="material"
                 mutationPreset="role"
-                infoTooltip={t('projects.my_project.field_tooltip_cover_image')}
                 currentFileUrl={project.coverImageUrl}
                 uploadMutation={SAVE_PROJECT_IMAGE}
                 updateMutation={UPDATE_PROJECT_COVER_IMAGE_URL}
@@ -480,59 +554,77 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
                 altText={t('projects.my_project.cover_image_alt')}
                 onUploadError={handleCoverUploadError}
               />
+              </ProjectFormFieldSection>
             ) : undefined
           }
           taglineSlot={
-            isContentEditable ? (
-              <div className="mt-3 rounded border border-border-primary p-3 min-h-[3.5rem] text-sm bg-bg-secondary/50">
-                <InputField
-                  variant="eduhub"
-                  type="input"
-                  placeholder={t('projects.my_project.tagline_label')}
-                  itemId={project.id}
-                  value={project.tagline ?? ''}
-                  updateValueMutation={UPDATE_PROJECT_TAGLINE}
-                  refetchQueries={refetchQueries}
-                  helpText={t('projects.my_project.field_tooltip_tagline')}
-                  maxLength={400}
-                  showCharacterCount={false}
-                  className="!mb-2 border-transparent bg-transparent"
-                />
-              </div>
+            canEditProjectMetadata ? (
+              <ProjectFormFieldSection
+                className="mt-3"
+                title={t('projects.my_project.tagline_label')}
+                tooltip={t('projects.my_project.field_tooltip_tagline')}
+              >
+                <div className="rounded border border-border-primary p-3 min-h-[3.5rem] text-sm bg-bg-secondary/50">
+                  <InputField
+                    variant="eduhub"
+                    type="input"
+                    placeholder={t('projects.my_project.tagline_placeholder')}
+                    itemId={project.id}
+                    value={project.tagline ?? ''}
+                    updateValueMutation={UPDATE_PROJECT_TAGLINE}
+                    refetchQueries={refetchQueries}
+                    maxLength={400}
+                    showCharacterCount={false}
+                    className="!mb-0 border-transparent bg-transparent [&>div]:!px-0"
+                  />
+                </div>
+              </ProjectFormFieldSection>
             ) : undefined
           }
           descriptionSlot={
-            isContentEditable ? (
-              <div className="rounded border border-border-primary p-3 flex-1 min-h-[10rem] text-sm bg-bg-secondary/50">
-                <InputField
-                  variant="eduhub"
-                  type="textarea"
-                  placeholder={t('projects.my_project.description_label')}
-                  itemId={project.id}
-                  value={project.description ?? ''}
-                  updateValueMutation={UPDATE_PROJECT_DESCRIPTION}
-                  refetchQueries={refetchQueries}
-                  helpText={t('projects.my_project.field_tooltip_description')}
-                  maxLength={8000}
-                  showCharacterCount={false}
-                  className="!mb-2 min-h-[9rem] border-transparent bg-transparent"
-                />
-              </div>
+            canEditProjectMetadata ? (
+              <ProjectFormFieldSection
+                className={`flex flex-col flex-1 min-h-0 ${
+                  highlightDescription ? MANDATORY_INCOMPLETE_HIGHLIGHT_CLASS : ''
+                }`}
+                title={t('projects.my_project.description_label')}
+                tooltip={t('projects.my_project.field_tooltip_description')}
+              >
+                <div className="rounded border border-border-primary p-3 flex-1 min-h-[10rem] text-sm bg-bg-secondary/50">
+                  <InputField
+                    variant="eduhub"
+                    type="textarea"
+                    placeholder={t('projects.my_project.description_placeholder')}
+                    itemId={project.id}
+                    value={project.description ?? ''}
+                    updateValueMutation={UPDATE_PROJECT_DESCRIPTION}
+                    refetchQueries={refetchQueries}
+                    maxLength={8000}
+                    showCharacterCount={false}
+                    className="!mb-0 min-h-[9rem] border-transparent bg-transparent [&>div]:!px-0"
+                  />
+                </div>
+              </ProjectFormFieldSection>
             ) : undefined
           }
         />
         </div>
       </div>
 
-      {isContentEditable ? (
+      {canEditFields ? (
         <div className="space-y-3 pt-2 border-t border-border-primary">
           {project.status === ProjectStatus_enum.ONGOING ? (
             <>
+              <ProjectFormFieldSection
+                className={highlightDocumentation ? MANDATORY_INCOMPLETE_HIGHLIGHT_CLASS : ''}
+                title={t('projects.my_project.documentation_upload_section_label')}
+                tooltip={t('projects.my_project.documentation_upload_tooltip')}
+              >
               <FileUploadField
                 variant="material"
                 mutationPreset="role"
                 density="compact"
-                infoTooltip={t('projects.my_project.documentation_upload_tooltip')}
+                acceptedTypesDisplay={t('projects.my_project.documentation_accepted_types_display')}
                 currentFileUrl={project.documentationUrl}
                 uploadMutation={SAVE_PROJECT_DOCUMENTATION}
                 updateMutation={UPDATE_PROJECT_DOCUMENTATION_URL}
@@ -549,11 +641,18 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
                 altText={t('projects.my_project.documentation_upload_alt')}
                 onUploadError={handleCoverUploadError}
               />
+              </ProjectFormFieldSection>
+              {!isOnlineCourse ? (
+              <ProjectFormFieldSection
+                className={highlightPresentation ? MANDATORY_INCOMPLETE_HIGHLIGHT_CLASS : ''}
+                title={t('projects.my_project.presentation_upload_section_label')}
+                tooltip={t('projects.my_project.presentation_upload_tooltip')}
+              >
               <FileUploadField
                 variant="material"
                 mutationPreset="role"
                 density="compact"
-                infoTooltip={t('projects.my_project.presentation_upload_tooltip')}
+                acceptedTypesDisplay={t('projects.my_project.presentation_accepted_types_display')}
                 currentFileUrl={project.presentationUrl}
                 uploadMutation={SAVE_PROJECT_PRESENTATION}
                 updateMutation={UPDATE_PROJECT_PRESENTATION_URL}
@@ -570,51 +669,60 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
                 altText={t('projects.my_project.presentation_upload_alt')}
                 onUploadError={handleCoverUploadError}
               />
-              <InputField
-                variant="material"
-                type="link"
-                label={t('projects.my_project.external_url_label')}
-                placeholder={t('projects.my_project.external_url_placeholder')}
-                itemId={project.id}
-                value={project.externalUrl ?? ''}
-                updateValueMutation={UPDATE_PROJECT_EXTERNAL_URL}
-                refetchQueries={refetchQueries}
-                helpText={t('projects.my_project.field_tooltip_external_url')}
-              />
+              </ProjectFormFieldSection>
+              ) : null}
+              {!isOnlineCourse ? (
+              <ProjectFormFieldSection
+                className={highlightExternalUrl ? MANDATORY_INCOMPLETE_HIGHLIGHT_CLASS : ''}
+                title={t('projects.my_project.external_url_label')}
+                tooltip={t('projects.my_project.field_tooltip_external_url')}
+              >
+                <div className="rounded border border-border-primary p-3 text-sm bg-bg-secondary/50">
+                  <InputField
+                    variant="eduhub"
+                    type="link"
+                    placeholder={t('projects.my_project.external_url_placeholder')}
+                    itemId={project.id}
+                    value={project.externalUrl ?? ''}
+                    updateValueMutation={UPDATE_PROJECT_EXTERNAL_URL}
+                    refetchQueries={refetchQueries}
+                    showCharacterCount={false}
+                    className="!mb-0 border-transparent bg-transparent [&>div]:!px-0"
+                  />
+                </div>
+              </ProjectFormFieldSection>
+              ) : null}
             </>
           ) : null}
-          {documentationInstructionOptions.length > 0 ? (
-            <DropDownSelector
-              variant="material"
-              label={t('projects.my_project.documentation_instruction_label')}
-              value={project.documentationInstructionId ? String(project.documentationInstructionId) : ''}
-              options={documentationInstructionOptions}
-              nullable
-              nullableLabel={t('projects.my_project.documentation_instruction_none')}
-              updateValueMutation={UPDATE_PROJECT_DOCUMENTATION_INSTRUCTION}
-              identifierVariables={{ itemId: project.id }}
-              refetchQueries={refetchQueries}
-              helpText={t('projects.my_project.field_tooltip_documentation_instruction')}
-            />
-          ) : null}
-          <CheckboxSelector
-            variant="material"
-            label={t('projects.my_project.accepting_participants_label')}
-            checked={Boolean(project.acceptingParticipants)}
-            updateValueMutation={UPDATE_PROJECT_ACCEPTING_PARTICIPANTS}
-            identifierVariables={{ itemId: project.id }}
-            refetchQueries={refetchQueries}
-            helpText={t('projects.my_project.field_tooltip_accepting_participants')}
-          />
+          {acceptingParticipantsCheckbox
+            ? projectReviewRequestedAt
+              ? (
+                <Tooltip
+                  title={t('projects.my_project.accepting_participants_disabled_review_tooltip')}
+                >
+                  <span className="inline-flex w-full">{acceptingParticipantsCheckbox}</span>
+                </Tooltip>
+              )
+              : acceptingParticipantsCheckbox
+            : null}
         </div>
       ) : null}
 
       <div className="border-t border-border-primary pt-4">
         <div className="flex flex-wrap gap-2">
           {canLeaveProject ? (
-            <Tooltip title={t('projects.my_project.action_tooltip_leave')}>
+            <Tooltip
+              title={
+                isDeadlinePassed
+                  ? t('projects.my_project.leave_disabled_deadline_tooltip')
+                  : t('projects.my_project.action_tooltip_leave')
+              }
+            >
               <span className="inline-flex">
-                <Button onClick={handleOpenLeaveDialog} disabled={leaving}>
+                <Button
+                  onClick={handleOpenLeaveDialog}
+                  disabled={leaving || isDeadlinePassed}
+                >
                   {t('projects.my_project.leave_button')}
                 </Button>
               </span>

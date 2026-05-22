@@ -1,13 +1,18 @@
-import { FC, useCallback, useMemo } from 'react';
+import { FC, ReactElement, useCallback, useMemo } from 'react';
 import { ApolloError } from '@apollo/client';
 import { ColumnDef } from '@tanstack/react-table';
-import { useTranslations } from 'next-intl';
+import Tooltip from '@mui/material/Tooltip';
+import { useLocale, useTranslations } from 'next-intl';
 import { useRoleMutation } from '../../../../hooks/authedMutation';
+import { useIsAdmin, useIsUser } from '../../../../hooks/authentication';
+import { useUserId } from '../../../../hooks/user';
+import { AuthRoles } from '../../../../types/enums';
 import TableGrid from '../../../common/TableGrid';
 import { Button } from '../../../common/Button';
 import {
   COPY_PROJECT_FROM_TEMPLATE,
   INSERT_PROJECT_AUTHOR_REQUEST,
+  INSERT_PROJECT_AUTHOR_REQUEST_AS_ADMIN,
 } from '../../../../queries/project';
 import {
   ProjectParticipationStatus_enum,
@@ -15,6 +20,16 @@ import {
 } from '../../../../__generated__/globalTypes';
 import { formatTruncatedList, makeFullName } from '../../../../helpers/util';
 import StatusChip from './StatusChip';
+import {
+  formatSubmissionDeadlineDate,
+  getEffectiveProjectSubmissionDeadlineIso,
+  isProjectSubmissionDeadlinePassed,
+} from './projectEffectiveSubmissionDeadline';
+import {
+  getProjectStatusChipKey,
+  isOnlineCourseProject,
+  shouldShowProjectResourceDownloadLinks,
+} from './projectStatusDisplay';
 import ProjectPreviewLayout from './ProjectPreviewLayout';
 import ProjectSubmissionDeadlineBelowTitle from './ProjectSubmissionDeadlineBelowTitle';
 import { ProjectRow } from './types';
@@ -55,14 +70,53 @@ const ProjectsTable: FC<ProjectsTableProps> = ({
   onActionError,
 }) => {
   const t = useTranslations('course');
+  const locale = useLocale();
+  const sessionUserId = useUserId();
+  const isUser = useIsUser();
+  const isAdmin = useIsAdmin();
+
+  const useAdminJoin = isAdmin && !isUser;
+
+  const getEnterProjectDisabledTooltip = useCallback(
+    (project: ProjectRow): string => {
+      const effectiveIso = getEffectiveProjectSubmissionDeadlineIso(
+        project.submissionDeadline,
+        courseDefaultSubmissionDeadline
+      );
+      if (
+        isProjectSubmissionDeadlinePassed(
+          project.submissionDeadline,
+          courseDefaultSubmissionDeadline
+        ) &&
+        effectiveIso
+      ) {
+        return t('projects.table.enter_project_disabled_project_deadline', {
+          date: formatSubmissionDeadlineDate(effectiveIso, locale) ?? '',
+        });
+      }
+      if (hasMyProject) {
+        return t('projects.table.enter_project_disabled_has_project');
+      }
+      return '';
+    },
+    [courseDefaultSubmissionDeadline, hasMyProject, locale, t]
+  );
 
   const [copyTemplate, { loading: copying }] = useRoleMutation(COPY_PROJECT_FROM_TEMPLATE, {
     refetchQueries,
   });
-  const [insertRequest, { loading: requesting }] = useRoleMutation(
+  const [insertRequest, { loading: requestingParticipant }] = useRoleMutation(
     INSERT_PROJECT_AUTHOR_REQUEST,
-    { refetchQueries }
+    {
+      refetchQueries,
+      ...(isUser ? { context: { role: AuthRoles.user } } : {}),
+    }
   );
+  const [insertRequestAsAdmin, { loading: requestingAdmin }] = useRoleMutation(
+    INSERT_PROJECT_AUTHOR_REQUEST_AS_ADMIN,
+    { refetchQueries, context: { role: AuthRoles.admin } }
+  );
+  const requesting = requestingParticipant || requestingAdmin;
 
   const handleClaimTemplate = useCallback(
     async (projectId: number) => {
@@ -84,7 +138,17 @@ const ProjectsTable: FC<ProjectsTableProps> = ({
   const handleRequestJoin = useCallback(
     async (projectId: number) => {
       try {
-        await insertRequest({ variables: { projectId } });
+        if (useAdminJoin) {
+          if (!sessionUserId) {
+            onActionError(t('projects.action_failed'));
+            return;
+          }
+          await insertRequestAsAdmin({
+            variables: { projectId, userId: sessionUserId },
+          });
+        } else {
+          await insertRequest({ variables: { projectId } });
+        }
       } catch (err: unknown) {
         const raw =
           err instanceof ApolloError
@@ -93,12 +157,36 @@ const ProjectsTable: FC<ProjectsTableProps> = ({
               ? err.message
               : '';
         const maybeDuplicate = /unique|duplicate key|violates unique constraint/i.test(raw);
+        const deadlinePassed = /project_submission_deadline_passed/i.test(raw);
         onActionError(
-          maybeDuplicate ? t('projects.table.request_blocked_duplicate') : raw || t('projects.action_failed')
+          maybeDuplicate
+            ? t('projects.table.request_blocked_duplicate')
+            : deadlinePassed
+              ? t('projects.table.request_blocked_deadline')
+              : raw || t('projects.action_failed')
         );
       }
     },
-    [insertRequest, onActionError, t]
+    [
+      insertRequest,
+      insertRequestAsAdmin,
+      onActionError,
+      sessionUserId,
+      t,
+      useAdminJoin,
+    ]
+  );
+
+  const wrapDisabledActionButton = useCallback(
+    (button: ReactElement, tooltip: string) =>
+      tooltip ? (
+        <Tooltip title={tooltip}>
+          <span className="inline-flex w-full">{button}</span>
+        </Tooltip>
+      ) : (
+        button
+      ),
+    []
   );
 
   const columns = useMemo<ColumnDef<ProjectRow>[]>(
@@ -111,7 +199,7 @@ const ProjectsTable: FC<ProjectsTableProps> = ({
         cell: ({ row }) => (
           <div className="flex items-center gap-2 flex-wrap">
             <span className="font-medium">{row.original.title}</span>
-            <StatusChip status={row.original.status} />
+            <StatusChip status={getProjectStatusChipKey(row.original)} />
           </div>
         ),
       },
@@ -149,6 +237,11 @@ const ProjectsTable: FC<ProjectsTableProps> = ({
           const myAuthorRow = userId
             ? (project.ProjectAuthors ?? []).find((a) => a.userId === userId)
             : undefined;
+          const projectDeadlinePassed = isProjectSubmissionDeadlinePassed(
+            project.submissionDeadline,
+            courseDefaultSubmissionDeadline
+          );
+          const enterDisabledTooltip = getEnterProjectDisabledTooltip(project);
 
           if (myAuthorRow?.participationStatus === ProjectParticipationStatus_enum.ACCEPTED) {
             return null;
@@ -169,44 +262,61 @@ const ProjectsTable: FC<ProjectsTableProps> = ({
           }
           if (acceptedCount === 0) {
             const templateClaimLabel =
-              project.type === 'ONLINE_COURSE' ||
-              project.ProjectType?.value === 'ONLINE_COURSE'
+              isOnlineCourseProject(project)
                 ? t('projects.table.form_new_group_online_course')
                 : t('projects.table.form_new_group');
-            return (
+            const claimDisabled =
+              copying || hasMyProject || projectDeadlinePassed;
+            return wrapDisabledActionButton(
               <Button
                 filled
-                disabled={copying || hasMyProject}
+                disabled={claimDisabled}
                 onClick={() => handleClaimTemplate(project.id)}
                 className="w-full"
               >
                 {templateClaimLabel}
-              </Button>
+              </Button>,
+              claimDisabled ? enterDisabledTooltip : ''
             );
           }
-          if (project.acceptingParticipants && !hasMyProject) {
-            return (
+          if (
+            project.acceptingParticipants &&
+            !hasMyProject &&
+            !project.projectReviewRequestedAt
+          ) {
+            const joinDisabled = requesting || projectDeadlinePassed;
+            return wrapDisabledActionButton(
               <Button
-                disabled={requesting}
+                disabled={joinDisabled}
                 onClick={() => handleRequestJoin(project.id)}
                 className="w-full"
               >
                 {t('projects.table.request_joining')}
-              </Button>
+              </Button>,
+              joinDisabled ? enterDisabledTooltip : ''
             );
           }
           return null;
         },
       },
     ],
-    [copying, handleClaimTemplate, handleRequestJoin, hasMyProject, requesting, t, userId]
+    [
+      copying,
+      courseDefaultSubmissionDeadline,
+      getEnterProjectDisabledTooltip,
+      handleClaimTemplate,
+      handleRequestJoin,
+      hasMyProject,
+      requesting,
+      t,
+      userId,
+      wrapDisabledActionButton,
+    ]
   );
 
   const expandableRowComponent = useCallback(
     ({ row }: { row: ProjectRow }) => {
-      const showFullDetails =
-        row.status === ProjectStatus_enum.COMPLETED ||
-        row.status === ProjectStatus_enum.PUBLISHED;
+      const showFullDetails = shouldShowProjectResourceDownloadLinks(row.status);
       const showExpandedLayout =
         row.status === ProjectStatus_enum.PROPOSED ||
         row.status === ProjectStatus_enum.ONGOING ||
@@ -228,7 +338,7 @@ const ProjectsTable: FC<ProjectsTableProps> = ({
             titleRow={
               <div className="flex flex-wrap items-center gap-2 mb-1">
                 <h4 className="text-xl font-semibold text-label-primary min-w-0 break-words">{row.title}</h4>
-                <StatusChip status={row.status} />
+                <StatusChip status={getProjectStatusChipKey(row)} />
               </div>
             }
           />
