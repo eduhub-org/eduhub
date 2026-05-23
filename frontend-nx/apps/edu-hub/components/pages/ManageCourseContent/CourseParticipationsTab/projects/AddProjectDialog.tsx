@@ -1,4 +1,4 @@
-import { FC, useCallback, useMemo, useState } from 'react';
+import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { MdAddCircle, MdClose } from 'react-icons/md';
 import { useRoleMutation } from '../../../../../hooks/authedMutation';
@@ -83,16 +83,61 @@ const AddProjectDialog: FC<AddProjectDialogProps> = ({
     [projectTypes, tCourse]
   );
 
+  const instructionsForSelectedType = useMemo(
+    () =>
+      documentationInstructions.filter(
+        (inst) => inst.projectTypeValue === type
+      ),
+    [documentationInstructions, type]
+  );
+
+  const defaultInstructionIdForType = useMemo(
+    () =>
+      instructionsForSelectedType.find((inst) => inst.isDefault)?.id ?? null,
+    [instructionsForSelectedType]
+  );
+
+  const defaultSuffix = tCourse('projects.instruction_dropdown.default_suffix');
+
   const instructionDropdownOptions = useMemo(
     () =>
-      documentationInstructions.map((inst) => ({
-        value: String(inst.id),
-        label: inst.title,
-      })),
-    [documentationInstructions]
+      [...instructionsForSelectedType]
+        .sort((a, b) => {
+          if (a.isDefault === b.isDefault) return a.title.localeCompare(b.title);
+          return a.isDefault ? -1 : 1;
+        })
+        .map((inst) => ({
+          value: String(inst.id),
+          label: inst.isDefault ? `${inst.title}${defaultSuffix}` : inst.title,
+        })),
+    [instructionsForSelectedType, defaultSuffix]
   );
 
   const instructionHelpText = t('projects.add_dialog.instruction_info');
+
+  // Always overwrite the instruction selection when the project type changes
+  // so the dropdown filter (scoped to projectTypeValue === type) is never
+  // stuck on a stale value from the previous type.
+  const handleTypeChange = useCallback(
+    (nextType: string) => {
+      setType(nextType);
+      const nextDefault = documentationInstructions.find(
+        (inst) => inst.projectTypeValue === nextType && inst.isDefault
+      );
+      setInstructionId(nextDefault ? String(nextDefault.id) : '');
+    },
+    [documentationInstructions]
+  );
+
+  // First load (and subsequent reloads of the instructions list) seeds the
+  // instructionId with the default for the currently selected type when none
+  // has been picked yet.
+  useEffect(() => {
+    if (instructionId || !type) return;
+    if (defaultInstructionIdForType != null) {
+      setInstructionId(String(defaultInstructionIdForType));
+    }
+  }, [defaultInstructionIdForType, instructionId, type]);
 
   const [insertProject, { loading }] = useRoleMutation(INSTRUCTOR_INSERT_PROJECT, {
     refetchQueries,
@@ -105,11 +150,17 @@ const AddProjectDialog: FC<AddProjectDialogProps> = ({
 
   const reset = useCallback(() => {
     setTitle('');
-    setType(defaultProjectType ?? '');
-    setInstructionId('');
+    const nextType = defaultProjectType ?? '';
+    setType(nextType);
+    const nextDefault = nextType
+      ? documentationInstructions.find(
+          (inst) => inst.projectTypeValue === nextType && inst.isDefault
+        )
+      : null;
+    setInstructionId(nextDefault ? String(nextDefault.id) : '');
     setAuthors([]);
     setSelectAuthorOpen(false);
-  }, [defaultProjectType]);
+  }, [defaultProjectType, documentationInstructions]);
 
   const handleClose = useCallback(() => {
     reset();
@@ -226,9 +277,7 @@ const AddProjectDialog: FC<AddProjectDialogProps> = ({
                 helpText={typeHelpText}
                 isMandatory
                 disabled={loading || projectTypesQuery.loading}
-                onValueUpdated={(v: string) => {
-                  setType(v);
-                }}
+                onValueUpdated={handleTypeChange}
                 identifierVariables={{}}
                 refetchQueries={[]}
               />

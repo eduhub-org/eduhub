@@ -4,14 +4,13 @@
 // This file was automatically generated and should not be edited.
 
 // ====================================================
-// GraphQL query operation: ProjectDocumentationInstructions
+// GraphQL mutation operation: InsertProjectDocumentationInstruction
 // ====================================================
 
-export interface ProjectDocumentationInstructions_ProjectDocumentationInstruction {
+export interface InsertProjectDocumentationInstruction_insert_ProjectDocumentationInstruction_one {
   __typename: "ProjectDocumentationInstruction";
   id: number;
   title: string;
-  url: string | null;
   /**
    * The single project type this instruction is suitable for.
    */
@@ -22,9 +21,14 @@ export interface ProjectDocumentationInstructions_ProjectDocumentationInstructio
   isDefault: boolean;
 }
 
-export interface ProjectDocumentationInstructions {
+export interface InsertProjectDocumentationInstruction {
   /**
-   * fetch data from the table: "ProjectDocumentationInstruction"
+   * insert a single row into the table: "ProjectDocumentationInstruction"
    */
-  ProjectDocumentationInstruction: ProjectDocumentationInstructions_ProjectDocumentationInstruction[];
+  insert_ProjectDocumentationInstruction_one: InsertProjectDocumentationInstruction_insert_ProjectDocumentationInstruction_one | null;
+}
+
+export interface InsertProjectDocumentationInstructionVariables {
+  title: string;
+  projectTypeValue: string;
 }

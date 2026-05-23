@@ -28,7 +28,7 @@ export interface MyProjectByCourse_Project_ProjectDocumentationInstruction {
   __typename: "ProjectDocumentationInstruction";
   id: number;
   title: string;
-  url: string;
+  url: string | null;
 }
 
 export interface MyProjectByCourse_Project_SubmittedByUser {

@@ -405,17 +405,24 @@
       },
       "type_label": {
         "ONLINE_COURSE": "Online course",
-        "MINIMAL_PROJECT": "Minimal project",
+        "CLASSIC_PROJECT": "Classic project",
         "PROJECT_WITH_LINK": "Project with link",
         "PROJECT_WITH_PRESENTATION": "Project with presentation",
-        "PROJECT_WITH_LINK_AND_PRESENTATION": "Project with link and presentation"
+        "PROJECT_WITH_LINK_AND_PRESENTATION": "Project with link and presentation",
+        "PRESENTATION_WITHOUT_DOCUMENTATION": "Presentation (without documentation)",
+        "PRESENTATION_AND_LINK_WITHOUT_DOCUMENTATION": "Presentation with link (without documentation)"
       },
       "type_description": {
         "ONLINE_COURSE": "Completion of an online course – only a documentation upload is required (e.g. a reflection questionnaire / Reflexionsfragebogen).",
-        "MINIMAL_PROJECT": "Minimal project – only a documentation upload is required.",
+        "CLASSIC_PROJECT": "Classic project – only a documentation upload is required.",
         "PROJECT_WITH_LINK": "Publishable project – requires documentation, cover image and an external link (e.g. repository or live demo).",
         "PROJECT_WITH_PRESENTATION": "Publishable project – requires documentation, cover image and a presentation upload.",
-        "PROJECT_WITH_LINK_AND_PRESENTATION": "Publishable project – requires documentation, cover image, presentation upload and an external link."
+        "PROJECT_WITH_LINK_AND_PRESENTATION": "Publishable project – requires documentation, cover image, presentation upload and an external link.",
+        "PRESENTATION_WITHOUT_DOCUMENTATION": "Publishable project – requires a presentation and cover image. Uploading a written documentation is optional.",
+        "PRESENTATION_AND_LINK_WITHOUT_DOCUMENTATION": "Publishable project – requires a presentation, cover image and external link. Uploading a written documentation is optional."
+      },
+      "instruction_dropdown": {
+        "default_suffix": " (default)"
       },
       "table": {
         "title": "Title",
@@ -1806,10 +1813,12 @@
       },
       "type_options": {
         "ONLINE_COURSE": "Online course (documentation only)",
-        "MINIMAL_PROJECT": "Minimal project (documentation only)",
+        "CLASSIC_PROJECT": "Classic project (documentation only)",
         "PROJECT_WITH_LINK": "Project with link (documentation, cover image, external link)",
         "PROJECT_WITH_PRESENTATION": "Project with presentation (documentation, cover image, presentation)",
-        "PROJECT_WITH_LINK_AND_PRESENTATION": "Project with link and presentation (documentation, cover image, external link, presentation)"
+        "PROJECT_WITH_LINK_AND_PRESENTATION": "Project with link and presentation (documentation, cover image, external link, presentation)",
+        "PRESENTATION_WITHOUT_DOCUMENTATION": "Presentation (presentation, cover image; documentation optional)",
+        "PRESENTATION_AND_LINK_WITHOUT_DOCUMENTATION": "Presentation with link (presentation, cover image, external link; documentation optional)"
       }
     },
     "notifications": {
@@ -1897,6 +1906,48 @@
       "Asia/Tokyo": "Tokio"
     },
     "timeZoneHelpText": "The time zone is used to display dates and times in the application. General times like the recurring course time, which are not bound to a specific day, will always be displayed in the original time and not adjusted.",
+    "projectDocumentationInstructions": {
+      "section_label": "Project Documentation Instructions",
+      "section_help": "Manage the documentation instruction PDFs that students see when they propose or work on a project. Entries without a PDF stay visible here so you can upload or delete them; they are hidden from course project dialogs until a PDF is stored. Exactly one instruction per project type is the default; the default is auto-selected whenever an instructor changes a project's type.",
+      "add_button": "Add new instruction",
+      "default_badge": "Default",
+      "set_default_button": "Set as default",
+      "set_default_tooltip": "Promote this instruction to be the default for its project type. The current default for that type is demoted automatically.",
+      "set_default_disabled_no_pdf_tooltip": "Upload a PDF first before this instruction can be used as the default.",
+      "delete_tooltip": "Delete this instruction.",
+      "delete_disabled_default_tooltip": "Default instructions cannot be deleted. Promote a different instruction first.",
+      "pdf_not_uploaded": "No PDF uploaded yet",
+      "column": {
+        "project_type": "Project type",
+        "title": "Title",
+        "pdf": "PDF",
+        "upload": "Upload",
+        "default": "Default",
+        "actions": "Actions"
+      },
+      "add_dialog": {
+        "title": "Add new documentation instruction",
+        "title_label": "Instruction title",
+        "title_placeholder": "e.g. Reflection questionnaire for online courses",
+        "project_type_label": "Project type",
+        "pdf_label": "Instruction PDF",
+        "pdf_required": "A PDF is required. The instruction is only created after a successful upload.",
+        "pdf_choose": "Choose PDF",
+        "pdf_selected": "Selected: {fileName}",
+        "submit": "Create"
+      },
+      "delete_dialog": {
+        "title": "Delete documentation instruction",
+        "question": "Delete \"{title}\"? Any project still referencing it must be edited first.",
+        "confirm": "Delete"
+      },
+      "error": {
+        "duplicate_title": "An instruction with this title already exists.",
+        "set_default_failed": "Could not change the default. Please try again.",
+        "pdf_upload_failed": "The PDF could not be uploaded. The instruction was not saved.",
+        "create_failed": "The instruction could not be created."
+      }
+    },
     "onboarding": {
       "label": "Onboarding Texts",
       "courses_label": "Courses",

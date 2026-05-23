@@ -49,6 +49,9 @@ import {
   ProjectStatus_enum,
 } from '../../../../../__generated__/globalTypes';
 import { makeFullName } from '../../../../../helpers/util';
+import {
+  filterProjectDocumentationInstructionsWithPdf,
+} from '../../../CourseContent/Projects/projectDocumentationInstruction';
 import { translateErrorMessage } from '../../../../../helpers/errorHandling';
 import StatusChip from '../../../CourseContent/Projects/StatusChip';
 import ProjectPreviewLayout from '../../../CourseContent/Projects/ProjectPreviewLayout';
@@ -162,9 +165,9 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
 
   const documentationInstructionOptions = useMemo(
     () =>
-      (documentationInstructionsQuery.data?.ProjectDocumentationInstruction ?? []).map(
-        (tpl) => ({ value: String(tpl.id), label: tpl.title })
-      ),
+      filterProjectDocumentationInstructionsWithPdf(
+        documentationInstructionsQuery.data?.ProjectDocumentationInstruction ?? []
+      ).map((tpl) => ({ value: String(tpl.id), label: tpl.title })),
     [documentationInstructionsQuery.data?.ProjectDocumentationInstruction]
   );
 

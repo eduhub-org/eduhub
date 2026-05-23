@@ -1541,8 +1541,36 @@ export enum ProjectCourse_update_column {
  * unique or primary key constraints on table "ProjectDocumentationInstruction"
  */
 export enum ProjectDocumentationInstruction_constraint {
+  ProjectDocumentationInstruction_one_default_per_type = "ProjectDocumentationInstruction_one_default_per_type",
   ProjectDocumentationInstruction_pkey = "ProjectDocumentationInstruction_pkey",
   ProjectDocumentationInstruction_title_key = "ProjectDocumentationInstruction_title_key",
+}
+
+/**
+ * select columns of table "ProjectDocumentationInstruction"
+ */
+export enum ProjectDocumentationInstruction_select_column {
+  created_at = "created_at",
+  id = "id",
+  isDefault = "isDefault",
+  projectTypeValue = "projectTypeValue",
+  title = "title",
+  updated_at = "updated_at",
+  url = "url",
+}
+
+/**
+ * select "ProjectDocumentationInstruction_aggregate_bool_exp_bool_and_arguments_columns" columns of table "ProjectDocumentationInstruction"
+ */
+export enum ProjectDocumentationInstruction_select_column_ProjectDocumentationInstruction_aggregate_bool_exp_bool_and_arguments_columns {
+  isDefault = "isDefault",
+}
+
+/**
+ * select "ProjectDocumentationInstruction_aggregate_bool_exp_bool_or_arguments_columns" columns of table "ProjectDocumentationInstruction"
+ */
+export enum ProjectDocumentationInstruction_select_column_ProjectDocumentationInstruction_aggregate_bool_exp_bool_or_arguments_columns {
+  isDefault = "isDefault",
 }
 
 /**
@@ -1551,6 +1579,8 @@ export enum ProjectDocumentationInstruction_constraint {
 export enum ProjectDocumentationInstruction_update_column {
   created_at = "created_at",
   id = "id",
+  isDefault = "isDefault",
+  projectTypeValue = "projectTypeValue",
   title = "title",
   updated_at = "updated_at",
   url = "url",
@@ -8470,10 +8500,70 @@ export interface ProjectCourse_variance_order_by {
   projectId?: order_by | null;
 }
 
+export interface ProjectDocumentationInstruction_aggregate_bool_exp {
+  bool_and?: ProjectDocumentationInstruction_aggregate_bool_exp_bool_and | null;
+  bool_or?: ProjectDocumentationInstruction_aggregate_bool_exp_bool_or | null;
+  count?: ProjectDocumentationInstruction_aggregate_bool_exp_count | null;
+}
+
+export interface ProjectDocumentationInstruction_aggregate_bool_exp_bool_and {
+  arguments: ProjectDocumentationInstruction_select_column_ProjectDocumentationInstruction_aggregate_bool_exp_bool_and_arguments_columns;
+  distinct?: boolean | null;
+  filter?: ProjectDocumentationInstruction_bool_exp | null;
+  predicate: Boolean_comparison_exp;
+}
+
+export interface ProjectDocumentationInstruction_aggregate_bool_exp_bool_or {
+  arguments: ProjectDocumentationInstruction_select_column_ProjectDocumentationInstruction_aggregate_bool_exp_bool_or_arguments_columns;
+  distinct?: boolean | null;
+  filter?: ProjectDocumentationInstruction_bool_exp | null;
+  predicate: Boolean_comparison_exp;
+}
+
+export interface ProjectDocumentationInstruction_aggregate_bool_exp_count {
+  arguments?: ProjectDocumentationInstruction_select_column[] | null;
+  distinct?: boolean | null;
+  filter?: ProjectDocumentationInstruction_bool_exp | null;
+  predicate: Int_comparison_exp;
+}
+
+/**
+ * order by aggregate values of table "ProjectDocumentationInstruction"
+ */
+export interface ProjectDocumentationInstruction_aggregate_order_by {
+  avg?: ProjectDocumentationInstruction_avg_order_by | null;
+  count?: order_by | null;
+  max?: ProjectDocumentationInstruction_max_order_by | null;
+  min?: ProjectDocumentationInstruction_min_order_by | null;
+  stddev?: ProjectDocumentationInstruction_stddev_order_by | null;
+  stddev_pop?: ProjectDocumentationInstruction_stddev_pop_order_by | null;
+  stddev_samp?: ProjectDocumentationInstruction_stddev_samp_order_by | null;
+  sum?: ProjectDocumentationInstruction_sum_order_by | null;
+  var_pop?: ProjectDocumentationInstruction_var_pop_order_by | null;
+  var_samp?: ProjectDocumentationInstruction_var_samp_order_by | null;
+  variance?: ProjectDocumentationInstruction_variance_order_by | null;
+}
+
+/**
+ * input type for inserting array relation for remote table "ProjectDocumentationInstruction"
+ */
+export interface ProjectDocumentationInstruction_arr_rel_insert_input {
+  data: ProjectDocumentationInstruction_insert_input[];
+  on_conflict?: ProjectDocumentationInstruction_on_conflict | null;
+}
+
+/**
+ * order by avg() on columns of table "ProjectDocumentationInstruction"
+ */
+export interface ProjectDocumentationInstruction_avg_order_by {
+  id?: order_by | null;
+}
+
 /**
  * Boolean expression to filter rows from the table "ProjectDocumentationInstruction". All fields are combined with a logical 'AND'.
  */
 export interface ProjectDocumentationInstruction_bool_exp {
+  ProjectType?: ProjectType_bool_exp | null;
   Projects?: Project_bool_exp | null;
   Projects_aggregate?: Project_aggregate_bool_exp | null;
   _and?: ProjectDocumentationInstruction_bool_exp[] | null;
@@ -8481,6 +8571,8 @@ export interface ProjectDocumentationInstruction_bool_exp {
   _or?: ProjectDocumentationInstruction_bool_exp[] | null;
   created_at?: timestamptz_comparison_exp | null;
   id?: Int_comparison_exp | null;
+  isDefault?: Boolean_comparison_exp | null;
+  projectTypeValue?: String_comparison_exp | null;
   title?: String_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
   url?: String_comparison_exp | null;
@@ -8490,12 +8582,39 @@ export interface ProjectDocumentationInstruction_bool_exp {
  * input type for inserting data into table "ProjectDocumentationInstruction"
  */
 export interface ProjectDocumentationInstruction_insert_input {
+  ProjectType?: ProjectType_obj_rel_insert_input | null;
   Projects?: Project_arr_rel_insert_input | null;
   created_at?: any | null;
   id?: number | null;
+  isDefault?: boolean | null;
+  projectTypeValue?: string | null;
   title?: string | null;
   updated_at?: any | null;
   url?: string | null;
+}
+
+/**
+ * order by max() on columns of table "ProjectDocumentationInstruction"
+ */
+export interface ProjectDocumentationInstruction_max_order_by {
+  created_at?: order_by | null;
+  id?: order_by | null;
+  projectTypeValue?: order_by | null;
+  title?: order_by | null;
+  updated_at?: order_by | null;
+  url?: order_by | null;
+}
+
+/**
+ * order by min() on columns of table "ProjectDocumentationInstruction"
+ */
+export interface ProjectDocumentationInstruction_min_order_by {
+  created_at?: order_by | null;
+  id?: order_by | null;
+  projectTypeValue?: order_by | null;
+  title?: order_by | null;
+  updated_at?: order_by | null;
+  url?: order_by | null;
 }
 
 /**
@@ -8513,6 +8632,70 @@ export interface ProjectDocumentationInstruction_on_conflict {
   constraint: ProjectDocumentationInstruction_constraint;
   update_columns: ProjectDocumentationInstruction_update_column[];
   where?: ProjectDocumentationInstruction_bool_exp | null;
+}
+
+/**
+ * Ordering options when selecting data from "ProjectDocumentationInstruction".
+ */
+export interface ProjectDocumentationInstruction_order_by {
+  ProjectType?: ProjectType_order_by | null;
+  Projects_aggregate?: Project_aggregate_order_by | null;
+  created_at?: order_by | null;
+  id?: order_by | null;
+  isDefault?: order_by | null;
+  projectTypeValue?: order_by | null;
+  title?: order_by | null;
+  updated_at?: order_by | null;
+  url?: order_by | null;
+}
+
+/**
+ * order by stddev() on columns of table "ProjectDocumentationInstruction"
+ */
+export interface ProjectDocumentationInstruction_stddev_order_by {
+  id?: order_by | null;
+}
+
+/**
+ * order by stddev_pop() on columns of table "ProjectDocumentationInstruction"
+ */
+export interface ProjectDocumentationInstruction_stddev_pop_order_by {
+  id?: order_by | null;
+}
+
+/**
+ * order by stddev_samp() on columns of table "ProjectDocumentationInstruction"
+ */
+export interface ProjectDocumentationInstruction_stddev_samp_order_by {
+  id?: order_by | null;
+}
+
+/**
+ * order by sum() on columns of table "ProjectDocumentationInstruction"
+ */
+export interface ProjectDocumentationInstruction_sum_order_by {
+  id?: order_by | null;
+}
+
+/**
+ * order by var_pop() on columns of table "ProjectDocumentationInstruction"
+ */
+export interface ProjectDocumentationInstruction_var_pop_order_by {
+  id?: order_by | null;
+}
+
+/**
+ * order by var_samp() on columns of table "ProjectDocumentationInstruction"
+ */
+export interface ProjectDocumentationInstruction_var_samp_order_by {
+  id?: order_by | null;
+}
+
+/**
+ * order by variance() on columns of table "ProjectDocumentationInstruction"
+ */
+export interface ProjectDocumentationInstruction_variance_order_by {
+  id?: order_by | null;
 }
 
 export interface ProjectMentor_aggregate_bool_exp {
@@ -8829,6 +9012,8 @@ export interface ProjectStatus_on_conflict {
  * Boolean expression to filter rows from the table "ProjectType". All fields are combined with a logical 'AND'.
  */
 export interface ProjectType_bool_exp {
+  ProjectDocumentationInstructions?: ProjectDocumentationInstruction_bool_exp | null;
+  ProjectDocumentationInstructions_aggregate?: ProjectDocumentationInstruction_aggregate_bool_exp | null;
   Projects?: Project_bool_exp | null;
   Projects_aggregate?: Project_aggregate_bool_exp | null;
   _and?: ProjectType_bool_exp[] | null;
@@ -8846,6 +9031,7 @@ export interface ProjectType_bool_exp {
  * input type for inserting data into table "ProjectType"
  */
 export interface ProjectType_insert_input {
+  ProjectDocumentationInstructions?: ProjectDocumentationInstruction_arr_rel_insert_input | null;
   Projects?: Project_arr_rel_insert_input | null;
   comment?: string | null;
   requiresCoverImage?: boolean | null;
@@ -8876,6 +9062,7 @@ export interface ProjectType_on_conflict {
  * Ordering options when selecting data from "ProjectType".
  */
 export interface ProjectType_order_by {
+  ProjectDocumentationInstructions_aggregate?: ProjectDocumentationInstruction_aggregate_order_by | null;
   Projects_aggregate?: Project_aggregate_order_by | null;
   comment?: order_by | null;
   requiresCoverImage?: order_by | null;

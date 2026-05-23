@@ -1,4 +1,4 @@
-import { FC, useEffect, useMemo, useState } from 'react';
+import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useRoleMutation } from '../../../../../hooks/authedMutation';
 import { DialogShell } from '../../../../common/dialogs/DialogShell';
@@ -7,12 +7,19 @@ import DropDownSelector from '../../../../inputs/DropDownSelector';
 import { UPDATE_PROJECT_CONFIRM_TEAM } from '../../../../../queries/projectInstructor';
 import { ProjectRow, ProjectTypeRow } from '../../../CourseContent/Projects/types';
 
+interface ConfirmProjectDocumentationInstruction {
+  id: number;
+  title: string;
+  projectTypeValue: string;
+  isDefault: boolean;
+}
+
 interface ConfirmProjectDialogProps {
   open: boolean;
   onClose: () => void;
   project: ProjectRow | null;
   projectTypes: ProjectTypeRow[];
-  documentationInstructions: { id: number; title: string }[];
+  documentationInstructions: ConfirmProjectDocumentationInstruction[];
   programDefaultProjectType: string | null;
   refetchQueries: string[];
   onError: (msg: string) => void;
@@ -38,15 +45,42 @@ const ConfirmProjectDialog: FC<ConfirmProjectDialogProps> = ({
     refetchQueries,
   });
 
+  const findDefaultInstructionIdForType = useCallback(
+    (forType: string): number | null => {
+      if (!forType) return null;
+      return (
+        documentationInstructions.find(
+          (inst) => inst.projectTypeValue === forType && inst.isDefault
+        )?.id ?? null
+      );
+    },
+    [documentationInstructions]
+  );
+
   useEffect(() => {
     if (!project) return;
-    setType(project.type ?? programDefaultProjectType ?? projectTypes[0]?.value ?? '');
-    setInstructionId(
-      project.documentationInstructionId
-        ? String(project.documentationInstructionId)
-        : ''
-    );
-  }, [open, project, programDefaultProjectType, projectTypes]);
+    const initialType =
+      project.type ?? programDefaultProjectType ?? projectTypes[0]?.value ?? '';
+    setType(initialType);
+    if (project.documentationInstructionId) {
+      setInstructionId(String(project.documentationInstructionId));
+    } else {
+      const defaultId = findDefaultInstructionIdForType(initialType);
+      setInstructionId(defaultId == null ? '' : String(defaultId));
+    }
+  }, [open, project, programDefaultProjectType, projectTypes, findDefaultInstructionIdForType]);
+
+  // Always overwrite the instruction on type change so the filtered dropdown
+  // (projectTypeValue === type) never carries a stale value from the prior
+  // type. Matches AddProjectDialog behaviour.
+  const handleTypeChange = useCallback(
+    (nextType: string) => {
+      setType(nextType);
+      const defaultId = findDefaultInstructionIdForType(nextType);
+      setInstructionId(defaultId == null ? '' : String(defaultId));
+    },
+    [findDefaultInstructionIdForType]
+  );
 
   const acceptedAuthorNames = useMemo(() => {
     if (!project) return [];
@@ -66,13 +100,22 @@ const ConfirmProjectDialog: FC<ConfirmProjectDialogProps> = ({
     [projectTypes, tCourse]
   );
 
+  const defaultSuffix = tCourse('projects.instruction_dropdown.default_suffix');
+
   const instructionDropdownOptions = useMemo(
     () =>
-      documentationInstructions.map((tpl) => ({
-        value: String(tpl.id),
-        label: tpl.title,
-      })),
-    [documentationInstructions]
+      documentationInstructions
+        .filter((inst) => inst.projectTypeValue === type)
+        .slice()
+        .sort((a, b) => {
+          if (a.isDefault === b.isDefault) return a.title.localeCompare(b.title);
+          return a.isDefault ? -1 : 1;
+        })
+        .map((inst) => ({
+          value: String(inst.id),
+          label: inst.isDefault ? `${inst.title}${defaultSuffix}` : inst.title,
+        })),
+    [documentationInstructions, type, defaultSuffix]
   );
 
   const instructionHelpText = t('projects.add_dialog.instruction_info');
@@ -149,9 +192,7 @@ const ConfirmProjectDialog: FC<ConfirmProjectDialogProps> = ({
                 options={typeDropdownOptions}
                 isMandatory
                 disabled={loading}
-                onValueUpdated={(v: string) => {
-                  setType(v);
-                }}
+                onValueUpdated={handleTypeChange}
                 identifierVariables={{}}
                 refetchQueries={[]}
               />

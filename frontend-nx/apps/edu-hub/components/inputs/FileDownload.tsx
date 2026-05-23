@@ -12,8 +12,16 @@ interface IProps {
   type?: 'button' | 'icon';
 }
 
+// Paths starting with `/` are served from the Next.js `public/` folder and
+// paths starting with `http(s)://` are already absolute; both should be
+// opened directly without going through the GCS signing action.
+const isDirectAssetUrl = (path: string): boolean =>
+  path.startsWith('/') || path.startsWith('http://') || path.startsWith('https://');
+
 const FileDownload: FC<IProps> = ({ filePath, className, label, type = 'icon' }) => {
   const t = useTranslations();
+
+  const directAsset = isDirectAssetUrl(filePath);
 
   const { getSignedUrl, loading, error } = useSignedUrl(filePath);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
@@ -27,12 +35,16 @@ const FileDownload: FC<IProps> = ({ filePath, className, label, type = 'icon' })
   }, [downloadUrl]);
 
   useEffect(() => {
-    if (error) {
+    if (!directAsset && error) {
       setIsErrorDialogOpen(true);
     }
-  }, [error]);
+  }, [error, directAsset]);
 
   const handleDownload = async () => {
+    if (directAsset) {
+      window.open(filePath, '_blank');
+      return;
+    }
     if (!loading && !error) {
       const result = await getSignedUrl();
       const url = result.url;
@@ -52,11 +64,11 @@ const FileDownload: FC<IProps> = ({ filePath, className, label, type = 'icon' })
   return (
     <>
       {type === 'button' ? (
-        <Button onClick={handleDownload} disabled={loading} className={className} inverted>
+        <Button onClick={handleDownload} disabled={!directAsset && loading} className={className} inverted>
           <GetApp /> {label ? label : t('common.download')}
         </Button>
       ) : (
-        <button onClick={handleDownload} disabled={loading} className={className}>
+        <button onClick={handleDownload} disabled={!directAsset && loading} className={className}>
           <GetApp />
         </button>
       )}

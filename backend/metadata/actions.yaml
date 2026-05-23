@@ -300,6 +300,31 @@ actions:
           value: '[460, 640, 768, 1024, 1280, 1536]'
     permissions:
       - role: instructor_access
+  - name: saveProjectDocumentationInstruction
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: bucket
+          value_from_env: HASURA_BUCKET
+        - name: name
+          value: saveFile
+        - name: file-path
+          value: project-docs-instructions/public/instruction-${projectDocumentationInstructionId}/${filename}
+        - name: is-public
+          value: "true"
+  - name: setProjectDocumentationInstructionDefault
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: name
+          value: setProjectDocumentationInstructionDefault
+    comment: Atomically promotes one ProjectDocumentationInstruction to the default for its projectTypeValue, demoting whichever row was previously default for the same type.
   - name: saveProjectImage
     definition:
       kind: synchronous
@@ -513,4 +538,5 @@ custom_types:
     - name: CourseAddonMapping
     - name: GetFormbricksAddonSelectionsResult
     - name: SelectedAddon
+    - name: SetProjectDocumentationInstructionDefaultResult
   scalars: []

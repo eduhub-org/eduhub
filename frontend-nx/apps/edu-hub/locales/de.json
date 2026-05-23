@@ -405,17 +405,24 @@
       },
       "type_label": {
         "ONLINE_COURSE": "Online-Kurs",
-        "MINIMAL_PROJECT": "Minimal-Projekt",
+        "CLASSIC_PROJECT": "Klassisches Projekt",
         "PROJECT_WITH_LINK": "Projekt mit Link",
         "PROJECT_WITH_PRESENTATION": "Projekt mit Präsentation",
-        "PROJECT_WITH_LINK_AND_PRESENTATION": "Projekt mit Link und Präsentation"
+        "PROJECT_WITH_LINK_AND_PRESENTATION": "Projekt mit Link und Präsentation",
+        "PRESENTATION_WITHOUT_DOCUMENTATION": "Präsentation (ohne Dokumentation)",
+        "PRESENTATION_AND_LINK_WITHOUT_DOCUMENTATION": "Präsentation mit Link (ohne Dokumentation)"
       },
       "type_description": {
         "ONLINE_COURSE": "Abschluss eines Online-Kurses – nur eine Dokumentation muss hochgeladen werden (z. B. ein Reflexionsfragebogen).",
-        "MINIMAL_PROJECT": "Minimal-Projekt – nur eine Dokumentation muss hochgeladen werden.",
+        "CLASSIC_PROJECT": "Klassisches Projekt – nur eine Dokumentation muss hochgeladen werden.",
         "PROJECT_WITH_LINK": "Veröffentlichbares Projekt – benötigt Dokumentation, Titelbild und einen externen Link (z. B. Repository oder Live-Demo).",
         "PROJECT_WITH_PRESENTATION": "Veröffentlichbares Projekt – benötigt Dokumentation, Titelbild und eine Präsentation.",
-        "PROJECT_WITH_LINK_AND_PRESENTATION": "Veröffentlichbares Projekt – benötigt Dokumentation, Titelbild, Präsentation und einen externen Link."
+        "PROJECT_WITH_LINK_AND_PRESENTATION": "Veröffentlichbares Projekt – benötigt Dokumentation, Titelbild, Präsentation und einen externen Link.",
+        "PRESENTATION_WITHOUT_DOCUMENTATION": "Veröffentlichbares Projekt – benötigt Präsentation und Titelbild. Das Hochladen einer schriftlichen Dokumentation ist optional.",
+        "PRESENTATION_AND_LINK_WITHOUT_DOCUMENTATION": "Veröffentlichbares Projekt – benötigt Präsentation, Titelbild und einen externen Link. Das Hochladen einer schriftlichen Dokumentation ist optional."
+      },
+      "instruction_dropdown": {
+        "default_suffix": " (Standard)"
       },
       "table": {
         "title": "Titel",
@@ -1791,10 +1798,12 @@
       },
       "type_options": {
         "ONLINE_COURSE": "Online-Kurs (nur Dokumentation)",
-        "MINIMAL_PROJECT": "Minimal-Projekt (nur Dokumentation)",
+        "CLASSIC_PROJECT": "Klassisches Projekt (nur Dokumentation)",
         "PROJECT_WITH_LINK": "Projekt mit Link (Dokumentation, Titelbild, externer Link)",
         "PROJECT_WITH_PRESENTATION": "Projekt mit Präsentation (Dokumentation, Titelbild, Präsentation)",
-        "PROJECT_WITH_LINK_AND_PRESENTATION": "Projekt mit Link und Präsentation (Dokumentation, Titelbild, externer Link, Präsentation)"
+        "PROJECT_WITH_LINK_AND_PRESENTATION": "Projekt mit Link und Präsentation (Dokumentation, Titelbild, externer Link, Präsentation)",
+        "PRESENTATION_WITHOUT_DOCUMENTATION": "Präsentation (Präsentation, Titelbild; Dokumentation optional)",
+        "PRESENTATION_AND_LINK_WITHOUT_DOCUMENTATION": "Präsentation mit Link (Präsentation, Titelbild, externer Link; Dokumentation optional)"
       }
     },
     "notifications": {
@@ -1891,6 +1900,48 @@
         "Asia/Tokyo": "Tokio"
       },
       "help_text": "Die Zeitzone wird verwendet, um die Datums- und Uhrzeiten in der Anwendung anzuzeigen. Generelle Zeiten wie die wiederkehrende Kurszeit, die nicht an einen konkreten Tag gebunden sind, werden immer in der ursprünglich angelegten Zeit angezeigt und nicht angepasst."
+    },
+    "projectDocumentationInstructions": {
+      "section_label": "Projekt-Dokumentationsanleitungen",
+      "section_help": "Verwalte die PDF-Anleitungen, die Teilnehmenden beim Vorschlagen und Bearbeiten von Projekten angezeigt werden. Einträge ohne PDF bleiben hier sichtbar, damit du sie hochladen oder löschen kannst; in den Projektdialogen der Kurse sind sie erst nach dem Upload verfügbar. Genau eine Anleitung pro Projekttyp ist die Standard-Anleitung; diese wird automatisch ausgewählt, sobald eine Lehrperson den Projekttyp eines Projekts ändert.",
+      "add_button": "Neue Anleitung anlegen",
+      "default_badge": "Standard",
+      "set_default_button": "Als Standard festlegen",
+      "set_default_tooltip": "Diese Anleitung zur Standard-Anleitung für ihren Projekttyp machen. Die bisherige Standard-Anleitung wird automatisch zurückgestuft.",
+      "set_default_disabled_no_pdf_tooltip": "Lade zuerst ein PDF hoch, bevor diese Anleitung als Standard gesetzt werden kann.",
+      "delete_tooltip": "Anleitung löschen.",
+      "delete_disabled_default_tooltip": "Standard-Anleitungen können nicht gelöscht werden. Lege zuerst eine andere Anleitung als Standard fest.",
+      "pdf_not_uploaded": "Noch kein PDF hochgeladen",
+      "column": {
+        "project_type": "Projekttyp",
+        "title": "Titel",
+        "pdf": "PDF",
+        "upload": "Hochladen",
+        "default": "Standard",
+        "actions": "Aktionen"
+      },
+      "add_dialog": {
+        "title": "Neue Dokumentationsanleitung anlegen",
+        "title_label": "Titel der Anleitung",
+        "title_placeholder": "z. B. Reflexionsfragebogen für Online-Kurse",
+        "project_type_label": "Projekttyp",
+        "pdf_label": "Anleitungs-PDF",
+        "pdf_required": "Ein PDF ist Pflicht. Die Anleitung wird erst nach erfolgreichem Upload angelegt.",
+        "pdf_choose": "PDF auswählen",
+        "pdf_selected": "Ausgewählt: {fileName}",
+        "submit": "Anlegen"
+      },
+      "delete_dialog": {
+        "title": "Dokumentationsanleitung löschen",
+        "question": "„{title}“ löschen? Alle Projekte, die noch darauf verweisen, müssen vorher bearbeitet werden.",
+        "confirm": "Löschen"
+      },
+      "error": {
+        "duplicate_title": "Eine Anleitung mit diesem Titel existiert bereits.",
+        "set_default_failed": "Standard konnte nicht geändert werden. Bitte erneut versuchen.",
+        "pdf_upload_failed": "Das PDF konnte nicht hochgeladen werden. Die Anleitung wurde nicht gespeichert.",
+        "create_failed": "Die Anleitung konnte nicht angelegt werden."
+      }
     },
     "onboarding": {
       "label": "Onboarding-Texte",

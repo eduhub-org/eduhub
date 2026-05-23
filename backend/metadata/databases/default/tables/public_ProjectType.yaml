@@ -2,6 +2,13 @@ table:
   name: ProjectType
   schema: public
 array_relationships:
+  - name: ProjectDocumentationInstructions
+    using:
+      foreign_key_constraint_on:
+        column: projectTypeValue
+        table:
+          name: ProjectDocumentationInstruction
+          schema: public
   - name: Projects
     using:
       foreign_key_constraint_on:

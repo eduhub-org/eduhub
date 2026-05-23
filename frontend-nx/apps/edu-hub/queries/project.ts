@@ -15,10 +15,15 @@ export const PROJECT_TYPES = gql`
 
 export const PROJECT_DOCUMENTATION_INSTRUCTIONS = gql`
   query ProjectDocumentationInstructions {
-    ProjectDocumentationInstruction(order_by: { title: asc }) {
+    ProjectDocumentationInstruction(
+      where: { url: { _is_null: false, _neq: "" } }
+      order_by: [{ projectTypeValue: asc }, { isDefault: desc }, { title: asc }]
+    ) {
       id
       title
       url
+      projectTypeValue
+      isDefault
     }
   }
 `;

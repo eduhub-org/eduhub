@@ -182,6 +182,27 @@ type Mutation {
 }
 
 type Mutation {
+  saveProjectDocumentationInstruction(
+    base64file: String!
+    filename: String!
+    projectDocumentationInstructionId: Int!
+  ): saveFileResult
+}
+
+type Mutation {
+  setProjectDocumentationInstructionDefault(
+    instructionId: Int!
+  ): SetProjectDocumentationInstructionDefaultResult!
+}
+
+type SetProjectDocumentationInstructionDefaultResult {
+  success: Boolean!
+  messageKey: String!
+  error: String
+  projectTypeValue: String
+}
+
+type Mutation {
   saveProjectImage(
     base64file: String!
     filename: String!
