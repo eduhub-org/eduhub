@@ -13,7 +13,7 @@ BEGIN
     SELECT 1
     FROM "ProjectAuthor"
     WHERE "projectId" = OLD."projectId"
-      AND participationStatus = 'ACCEPTED'
+      AND "participationStatus" = 'ACCEPTED'
       AND id IS DISTINCT FROM OLD.id
   ) THEN
     RETURN OLD;
@@ -23,7 +23,7 @@ BEGIN
     SELECT 1
     FROM "ProjectAuthor"
     WHERE "projectId" = OLD."projectId"
-      AND participationStatus = 'REQUESTED'
+      AND "participationStatus" = 'REQUESTED'
   ) THEN
     RAISE EXCEPTION
       'last_accepted_cannot_leave_while_join_requests_pending'
@@ -53,7 +53,7 @@ BEGIN
     SELECT 1
     FROM "ProjectAuthor"
     WHERE "projectId" = OLD."projectId"
-      AND participationStatus = 'ACCEPTED'
+      AND "participationStatus" = 'ACCEPTED'
   ) THEN
     RETURN OLD;
   END IF;
@@ -62,7 +62,7 @@ BEGIN
     SELECT 1
     FROM "ProjectAuthor"
     WHERE "projectId" = OLD."projectId"
-      AND participationStatus = 'REQUESTED'
+      AND "participationStatus" = 'REQUESTED'
   ) THEN
     RAISE EXCEPTION
       'project_has_pending_requests_after_delete'

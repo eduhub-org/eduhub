@@ -39,3 +39,14 @@ BEGIN
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS "project_author_before_insert_reject_join_after_deadline"
+  ON public."ProjectAuthor";
+
+CREATE TRIGGER "project_author_before_insert_reject_join_after_deadline"
+BEFORE INSERT ON public."ProjectAuthor"
+FOR EACH ROW
+EXECUTE PROCEDURE public.reject_project_author_join_after_submission_deadline();
+
+COMMENT ON FUNCTION public.reject_project_author_join_after_submission_deadline()
+  IS 'Blocks ProjectAuthor join requests (REQUESTED) when no linked course still has an open effective submission deadline (inclusive calendar date).';

@@ -3,7 +3,7 @@
 --
 -- New catalog (all rows require documentation):
 --   ONLINE_COURSE                          doc
---   MINIMAL_PROJECT                        doc
+--   CLASSIC_PROJECT                        doc
 --   PROJECT_WITH_LINK                      doc + coverImage + externalUrl
 --   PROJECT_WITH_PRESENTATION              doc + coverImage + presentation
 --   PROJECT_WITH_LINK_AND_PRESENTATION     doc + coverImage + presentation + externalUrl
@@ -26,7 +26,7 @@ WHERE "value" IN ('DOCUMENTATION', 'DOCUMENTATION_AND_PRESENTATION', 'PROJECT', 
 INSERT INTO "public"."ProjectType"
   ("value", "comment", "requiresDocumentation", "requiresPresentation", "requiresExternalUrl", "requiresCoverImage", "requiresEvaluationScript")
 VALUES
-  ('MINIMAL_PROJECT',                    'Minimal project: only a documentation upload is required.',                                              true, false, false, false, false),
+  ('CLASSIC_PROJECT',                    'Classic project: only a documentation upload is required.',                                              true, false, false, false, false),
   ('PROJECT_WITH_LINK',                  'Publishable project: requires documentation, cover image, and an external link (e.g. repository).',     true, false, true,  true,  false),
   ('PROJECT_WITH_PRESENTATION',          'Publishable project: requires documentation, cover image, and a presentation upload.',                  true, true,  false, true,  false),
   ('PROJECT_WITH_LINK_AND_PRESENTATION', 'Publishable project: requires documentation, cover image, presentation upload, and an external link.', true, true,  true,  true,  false);

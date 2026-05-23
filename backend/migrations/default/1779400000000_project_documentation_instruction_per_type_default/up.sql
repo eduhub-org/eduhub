@@ -31,7 +31,7 @@ ALTER TABLE "public"."ProjectDocumentationInstruction"
 -- Staging and production are empty at this point (confirmed by product
 -- owner), but dev environments may have rows referenced by Project. We do
 -- NOT delete those rows; instead we set projectTypeValue from whichever
--- Project type currently uses them (or 'MINIMAL_PROJECT' as a safe fallback
+-- Project type currently uses them (or 'CLASSIC_PROJECT' as a safe fallback
 -- for orphan rows) and mark them as non-default. The seven seed rows below
 -- will be the canonical defaults.
 UPDATE "public"."ProjectDocumentationInstruction" AS pdi
@@ -49,7 +49,7 @@ UPDATE "public"."ProjectDocumentationInstruction" AS pdi
    AND pdi."projectTypeValue" IS NULL;
 
 UPDATE "public"."ProjectDocumentationInstruction"
-   SET "projectTypeValue" = 'MINIMAL_PROJECT'
+   SET "projectTypeValue" = 'CLASSIC_PROJECT'
  WHERE "projectTypeValue" IS NULL;
 
 -- 4. Seed one default instruction per type ---------------------------------
@@ -64,9 +64,9 @@ VALUES
   ('Default: Online course (DE/EN)',
    '/project-documentation-instructions/ONLINE_COURSE.pdf',
    'ONLINE_COURSE', true),
-  ('Default: Minimal project (DE/EN)',
-   '/project-documentation-instructions/MINIMAL_PROJECT.pdf',
-   'MINIMAL_PROJECT', true),
+  ('Default: Classic project (DE/EN)',
+   '/project-documentation-instructions/CLASSIC_PROJECT.pdf',
+   'CLASSIC_PROJECT', true),
   ('Default: Project with link (DE/EN)',
    '/project-documentation-instructions/PROJECT_WITH_LINK.pdf',
    'PROJECT_WITH_LINK', true),
