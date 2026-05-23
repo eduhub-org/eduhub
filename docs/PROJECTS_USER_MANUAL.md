@@ -189,6 +189,47 @@ a small annotation indicates which level the value was inherited from.
 
 ---
 
+## 4a. One active project per course
+
+Each participant can be an **ACCEPTED** author on at most **one active
+project per course**. "Active" means the project is in `PROPOSED`,
+`ONGOING`, or `SUBMITTED` status — projects that have finished
+(`COMPLETED`, `INCOMPLETE`, `PUBLISHED`) do not count.
+
+The rule is enforced by two database triggers on `ProjectAuthor` (see
+migration `1778240513761_project_leave_rules_requests_and_declined`):
+
+- **`enforce_one_active_accepted_project_per_course_per_user`** — rejects
+  any insert or update that would give the user a second ACCEPTED row on
+  a project that shares a course with an existing active ACCEPTED
+  project. This blocks both join-acceptance and the nested ACCEPTED row
+  created when a user proposes a new project.
+- **`decline_pending_requests_on_accepted`** — when a user becomes
+  ACCEPTED on a project, every other `REQUESTED` row that user holds on
+  projects sharing the same course is set to `DECLINED` in the same
+  transaction.
+
+Both triggers are deferred constraint triggers, so nested Hasura
+mutations (Project + ProjectAuthor + ProjectCourse in one request) see
+all rows when the check runs at COMMIT.
+
+Practical consequences:
+
+- Once you are accepted onto a project, the **Propose project** button
+  and every **Request to join** button in that course's project table
+  disappear.
+- If you had pending join requests on other projects in the same course
+  when you were accepted, they are automatically declined. You will see
+  their status flip from "Pending" to "Declined" the next time the list
+  refreshes.
+- When your project reaches a terminal status (`COMPLETED`,
+  `INCOMPLETE`, `PUBLISHED`), the rule lifts and you can propose or
+  request to join another project in the same course.
+- A user can still be active in projects across **different** courses
+  at the same time — the rule is per-course.
+
+---
+
 ## 5. The author workflow
 
 ### 5.1 Proposing a project
@@ -329,17 +370,25 @@ the team:
 
 ### 6.4 Reviewing a submission
 
-Open the project's **Review** dialog. It shows:
+When a project reaches `SUBMITTED`, the row's action column in
+ProjectsManagementGrid shows an **Evaluate project** button. Click it
+to open the **Review project** dialog. The dialog shows:
 
 - Project metadata, author list, and the three artefact links
   (documentation, presentation, external) — all hardened against unsafe
   URL schemes.
 - A **Rating** section (`UNRATED` / `PASSED` / `FAILED`) and a
   **Comment** text area. Both can be saved without changing status.
-- Three terminal actions:
+- Three terminal actions in the dialog footer:
   - **Approve** → status COMPLETED, rating PASSED.
-  - **Send back** → status ONGOING, submission timestamps cleared.
+  - **Send back** → status ONGOING; the
+    `set_project_submitted_metadata` trigger clears both `submittedAt`
+    and `submittedBy` so the next submission re-attributes correctly.
   - **Reject** → status INCOMPLETE, rating FAILED.
+
+Course instructors, project mentors, and admins all share the
+`instructor_access` role for projects they own and therefore all see
+the **Evaluate project** button and the **Send back** action.
 
 ### 6.5 Publishing
 

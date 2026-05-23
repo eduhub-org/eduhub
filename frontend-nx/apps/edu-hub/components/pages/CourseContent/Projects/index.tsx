@@ -17,7 +17,20 @@ import {
   MyProjectByCourseVariables,
 } from '../../../../queries/__generated__/MyProjectByCourse';
 import { ProjectTypes } from '../../../../queries/__generated__/ProjectTypes';
-import { ProjectParticipationStatus_enum } from '../../../../__generated__/globalTypes';
+import {
+  ProjectParticipationStatus_enum,
+  ProjectStatus_enum,
+} from '../../../../__generated__/globalTypes';
+
+// User can only hold one ACCEPTED project per course while it is in flight.
+// Completed / incomplete / published projects do not block proposing or
+// requesting to join another project (mirrors the DB trigger
+// enforce_one_active_accepted_project_per_course_per_user).
+const ACTIVE_PROJECT_STATUSES = new Set<ProjectStatus_enum>([
+  ProjectStatus_enum.PROPOSED,
+  ProjectStatus_enum.ONGOING,
+  ProjectStatus_enum.SUBMITTED,
+]);
 import NotificationSnackbar from '../../../common/dialogs/NotificationSnackbar';
 import { ContentRow } from '../../../common/ContentRow';
 import MyProjectPanel from './MyProjectPanel';
@@ -64,6 +77,9 @@ const Projects: FC<ProjectsProps> = ({
   const projectTypesQuery = useRoleQuery<ProjectTypes>(PROJECT_TYPES);
 
   const myProject = myProjectQuery.data?.Project?.[0] ?? null;
+  const hasMyActiveProject = Boolean(
+    myProject && ACTIVE_PROJECT_STATUSES.has(myProject.status as ProjectStatus_enum)
+  );
 
   const tableProjects = useMemo(() => {
     const all = projectsQuery.data?.Project ?? [];
@@ -135,7 +151,7 @@ const Projects: FC<ProjectsProps> = ({
           courseId={courseId}
           userId={userId ?? undefined}
           proposalsEnabled={proposalsEnabled}
-          hasMyProject={Boolean(myProject)}
+          hasMyProject={hasMyActiveProject}
           courseDefaultSubmissionDeadline={effectiveSubmissionDeadline}
           submissionDeadlineDefaultSource={submissionDeadlineDefaultSource}
           refetchQueries={REFETCH_QUERIES}
