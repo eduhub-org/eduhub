@@ -244,13 +244,13 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
   const handleSubmitConfirm = useCallback(async () => {
     try {
       await submitProject({
-        variables: { itemId: project.id, submittedBy: userId },
+        variables: { itemId: project.id },
       });
       setSubmitDialogOpen(false);
     } catch (err) {
       onActionError(err instanceof Error ? err.message : t('projects.action_failed'));
     }
-  }, [submitProject, project.id, userId, onActionError, t]);
+  }, [submitProject, project.id, onActionError, t]);
 
   const handleLeaveConfirm = useCallback(async () => {
     if (!myAuthorRow) {

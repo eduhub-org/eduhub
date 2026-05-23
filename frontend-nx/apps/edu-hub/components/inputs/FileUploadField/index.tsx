@@ -690,7 +690,16 @@ export const FileUploadField: FC<FileUploadFieldProps> = ({
       {infoTooltip && infoTooltipTitle ? (
         <div className="absolute top-1 right-1 z-[1]" onClick={(e) => e.stopPropagation()}>
           <Tooltip title={infoTooltipTitle} placement="left" enterTouchDelay={0}>
-            <IconButton size="small" aria-label={t('file_upload.info_tooltip_label')} edge="end" className="text-gray-500">
+            <IconButton
+              size="small"
+              aria-label={t('file_upload.info_tooltip_label')}
+              edge="end"
+              className="text-gray-500 touch-manipulation"
+              sx={{
+                minWidth: { xs: 44, sm: isCompact ? 28 : 32 },
+                minHeight: { xs: 44, sm: isCompact ? 28 : 32 },
+              }}
+            >
               <MdInfoOutline className={isCompact ? 'text-base' : 'text-lg'} />
             </IconButton>
           </Tooltip>

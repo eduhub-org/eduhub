@@ -77,6 +77,7 @@ export const useFlexibleMutation = <TData = any, TVariables = any>(
             context: {
               ...passedOptions?.context,
               headers: {
+                ...passedOptions?.context?.headers,
                 ...(currentRole !== AuthRoles.anonymous && {
                   'x-hasura-role': passedRole ?? currentRole,
                 }),

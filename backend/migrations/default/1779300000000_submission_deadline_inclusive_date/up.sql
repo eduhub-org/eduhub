@@ -10,7 +10,7 @@ BEGIN
 
   IF NOT EXISTS (
     SELECT 1
-    FROM "ProjectCourses" pc
+    FROM "ProjectCourse" pc
     INNER JOIN "Course" c ON c.id = pc."courseId"
     INNER JOIN "Project" p ON p.id = pc."projectId"
     LEFT JOIN "Program" pr ON pr.id = c."programId"

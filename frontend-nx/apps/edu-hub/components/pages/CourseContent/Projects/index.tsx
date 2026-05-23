@@ -1,7 +1,7 @@
 import { FC, useCallback, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { CircularProgress } from '@mui/material';
-import { useAuthedQuery } from '../../../../hooks/authedQuery';
+import { useRoleQuery } from '../../../../hooks/authedQuery';
 import { useUserId } from '../../../../hooks/user';
 import {
   PROJECTS_BY_COURSE,
@@ -48,12 +48,12 @@ const Projects: FC<ProjectsProps> = ({
   const [proposeDialogOpen, setProposeDialogOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const projectsQuery = useAuthedQuery<ProjectsByCourse, ProjectsByCourseVariables>(
+  const projectsQuery = useRoleQuery<ProjectsByCourse, ProjectsByCourseVariables>(
     PROJECTS_BY_COURSE,
     { variables: { courseId } }
   );
 
-  const myProjectQuery = useAuthedQuery<MyProjectByCourse, MyProjectByCourseVariables>(
+  const myProjectQuery = useRoleQuery<MyProjectByCourse, MyProjectByCourseVariables>(
     MY_PROJECT_BY_COURSE,
     {
       variables: { courseId, userId: userId ?? '' },
@@ -61,7 +61,7 @@ const Projects: FC<ProjectsProps> = ({
     }
   );
 
-  const projectTypesQuery = useAuthedQuery<ProjectTypes>(PROJECT_TYPES);
+  const projectTypesQuery = useRoleQuery<ProjectTypes>(PROJECT_TYPES);
 
   const myProject = myProjectQuery.data?.Project?.[0] ?? null;
 

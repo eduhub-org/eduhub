@@ -14,8 +14,14 @@ const ensureHasuraClient = () => {
 };
 
 const GET_TEMPLATE = `
-  query GetProjectTemplate($parentProjectId: Int!) {
-    Project_by_pk(id: $parentProjectId) {
+  query GetProjectTemplate($parentProjectId: Int!, $courseId: Int!) {
+    Project(
+      where: {
+        id: { _eq: $parentProjectId }
+        ProjectCourses: { courseId: { _eq: $courseId } }
+      }
+      limit: 1
+    ) {
       id
       title
       tagline
@@ -240,9 +246,9 @@ export default async function copyProjectFromTemplate(req, logger) {
   try {
     const templateResult = await hasuraClient.request({
       document: GET_TEMPLATE,
-      variables: { parentProjectId },
+      variables: { parentProjectId, courseId },
     });
-    parent = templateResult?.Project_by_pk;
+    parent = templateResult?.Project?.[0] ?? null;
   } catch (error) {
     logger.error("Failed to load template project", { error: error.message });
     return {

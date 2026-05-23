@@ -9,6 +9,13 @@ BEGIN
     RETURN OLD;
   END IF;
 
+  -- Serialize concurrent ProjectAuthor DELETEs for the same project so the EXISTS
+  -- checks and the AFTER-delete cleanup run under a consistent snapshot.
+  PERFORM pg_advisory_xact_lock(
+    hashtext('public.ProjectAuthor.projectId')::bigint,
+    OLD."projectId"::bigint
+  );
+
   IF EXISTS (
     SELECT 1
     FROM "ProjectAuthor"
@@ -49,6 +56,12 @@ DROP TRIGGER IF EXISTS "project_author_after_delete_cleanup_empty_project" ON pu
 CREATE OR REPLACE FUNCTION public.delete_project_when_no_project_authors_remain()
 RETURNS TRIGGER AS $$
 BEGIN
+  -- Use the same lock key as the BEFORE-delete guard so both run serialized per project.
+  PERFORM pg_advisory_xact_lock(
+    hashtext('public.ProjectAuthor.projectId')::bigint,
+    OLD."projectId"::bigint
+  );
+
   IF EXISTS (
     SELECT 1
     FROM "ProjectAuthor"

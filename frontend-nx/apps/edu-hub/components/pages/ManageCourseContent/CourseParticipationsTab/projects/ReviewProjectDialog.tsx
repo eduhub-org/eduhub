@@ -10,6 +10,7 @@ import {
   UPDATE_PROJECT_RATING_AND_COMMENT,
 } from '../../../../../queries/projectInstructor';
 import { ProjectRow } from '../../../CourseContent/Projects/types';
+import { safeProjectExternalHref } from '../../../CourseContent/Projects/projectMandatory';
 import { ProjectRating_enum } from '../../../../../__generated__/globalTypes';
 
 interface ReviewProjectDialogProps {
@@ -149,36 +150,45 @@ const ReviewProjectDialog: FC<ReviewProjectDialogProps> = ({
             ) : null}
           </div>
           <div className="space-y-1 text-sm">
-            {project.documentationUrl ? (
-              <a
-                href={project.documentationUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block text-status-confirmed underline"
-              >
-                {t('projects.review_dialog.documentation_link')}
-              </a>
-            ) : null}
-            {project.presentationUrl ? (
-              <a
-                href={project.presentationUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block text-status-confirmed underline"
-              >
-                {t('projects.review_dialog.presentation_link')}
-              </a>
-            ) : null}
-            {project.externalUrl ? (
-              <a
-                href={project.externalUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block text-status-confirmed underline"
-              >
-                {t('projects.review_dialog.external_link')}
-              </a>
-            ) : null}
+            {(() => {
+              const docHref = safeProjectExternalHref(project.documentationUrl);
+              return docHref ? (
+                <a
+                  href={docHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block text-status-confirmed underline"
+                >
+                  {t('projects.review_dialog.documentation_link')}
+                </a>
+              ) : null;
+            })()}
+            {(() => {
+              const presHref = safeProjectExternalHref(project.presentationUrl);
+              return presHref ? (
+                <a
+                  href={presHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block text-status-confirmed underline"
+                >
+                  {t('projects.review_dialog.presentation_link')}
+                </a>
+              ) : null;
+            })()}
+            {(() => {
+              const extHref = safeProjectExternalHref(project.externalUrl);
+              return extHref ? (
+                <a
+                  href={extHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block text-status-confirmed underline"
+                >
+                  {t('projects.review_dialog.external_link')}
+                </a>
+              ) : null;
+            })()}
           </div>
 
           <div className="rounded-lg border border-border-primary p-4 space-y-4 bg-bg-secondary/30">

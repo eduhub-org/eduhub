@@ -305,10 +305,13 @@ export const UPDATE_PROJECT_SUBMISSION_DEADLINE = gql`
 `;
 
 export const SUBMIT_PROJECT = gql`
-  mutation SubmitProject($itemId: Int!, $submittedBy: uuid!) {
+  # submittedBy is filled server-side by the user_access update permission preset.
+  # submittedAt is stamped by the set_project_submitted_metadata trigger on the
+  # PROPOSED/ONGOING → SUBMITTED transition.
+  mutation SubmitProject($itemId: Int!) {
     update_Project_by_pk(
       pk_columns: { id: $itemId }
-      _set: { status: SUBMITTED, submittedBy: $submittedBy }
+      _set: { status: SUBMITTED }
     ) {
       id
       status

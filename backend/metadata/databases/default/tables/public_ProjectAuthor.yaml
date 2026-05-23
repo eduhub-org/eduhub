@@ -77,6 +77,12 @@ insert_permissions:
                         _eq: true
                     - proposedByUserId:
                         _neq: X-Hasura-User-Id
+                    - ProjectCourses:
+                        Course:
+                          CourseEnrollments:
+                            User:
+                              id:
+                                _eq: X-Hasura-User-Id
       set:
         userId: x-hasura-user-id
       columns:

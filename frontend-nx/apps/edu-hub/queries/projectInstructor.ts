@@ -93,14 +93,18 @@ export const UPDATE_PROJECT_APPROVE = gql`
 `;
 
 export const UPDATE_PROJECT_SEND_BACK = gql`
+  # The set_project_submitted_metadata trigger nulls both submittedAt and
+  # submittedBy when status transitions out of SUBMITTED, so this mutation only
+  # needs to flip status.
   mutation UpdateProjectSendBack($itemId: Int!) {
     update_Project_by_pk(
       pk_columns: { id: $itemId }
-      _set: { status: ONGOING, submittedAt: null }
+      _set: { status: ONGOING }
     ) {
       id
       status
       submittedAt
+      submittedBy
     }
   }
 `;

@@ -1,4 +1,5 @@
 import { FC, ReactNode } from 'react';
+import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import { HelpOutline } from '@mui/icons-material';
 import { prioritizeClasses } from '../../../../helpers/util';
@@ -26,12 +27,16 @@ const ProjectFormFieldSection: FC<ProjectFormFieldSectionProps> = ({
             <span className="block max-w-sm whitespace-pre-line text-xs leading-snug">{tooltip}</span>
           }
           placement="top"
+          enterTouchDelay={0}
         >
-          <HelpOutline
-            className="!text-base"
-            style={{ cursor: 'pointer', color: 'var(--eduhub-label-disabled)' }}
-            aria-hidden
-          />
+          <IconButton
+            type="button"
+            size="small"
+            aria-label={title}
+            sx={{ padding: 0, color: 'var(--eduhub-label-disabled)' }}
+          >
+            <HelpOutline className="!text-base" />
+          </IconButton>
         </Tooltip>
       ) : null}
     </div>

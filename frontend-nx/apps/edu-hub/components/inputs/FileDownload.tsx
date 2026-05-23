@@ -29,7 +29,8 @@ const FileDownload: FC<IProps> = ({ filePath, className, label, type = 'icon' })
 
   useEffect(() => {
     if (downloadUrl) {
-      window.open(downloadUrl, '_blank');
+      const w = window.open(downloadUrl, '_blank', 'noopener,noreferrer');
+      if (w) w.opener = null;
       setDownloadUrl(null); // Reset the URL after opening
     }
   }, [downloadUrl]);
@@ -42,7 +43,8 @@ const FileDownload: FC<IProps> = ({ filePath, className, label, type = 'icon' })
 
   const handleDownload = async () => {
     if (directAsset) {
-      window.open(filePath, '_blank');
+      const w = window.open(filePath, '_blank', 'noopener,noreferrer');
+      if (w) w.opener = null;
       return;
     }
     if (!loading && !error) {

@@ -118,12 +118,16 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
   });
 
   const handleSetProjectProposalsEnabled = useCallback(
-    (next: boolean | null) => {
-      updateProjectProposalsEnabled({
-        variables: { itemId: course.id, value: next },
-      });
+    async (next: boolean | null) => {
+      try {
+        await updateProjectProposalsEnabled({
+          variables: { itemId: course.id, value: next },
+        });
+      } catch (err) {
+        handleError(err instanceof Error ? err.message : String(err));
+      }
     },
-    [course.id, updateProjectProposalsEnabled]
+    [course.id, updateProjectProposalsEnabled, handleError]
   );
 
   const projectSubmissionDeadlineValue = useMemo(

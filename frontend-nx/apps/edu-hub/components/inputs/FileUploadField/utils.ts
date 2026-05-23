@@ -101,6 +101,8 @@ export const getFileIcon = (fileType: FileTypeCategory): FileIconInfo => {
       return { Icon: MdTableChart, color: 'text-green-600', labelKey: 'file_upload.file_type.spreadsheet' };
     case 'presentation':
       return { Icon: MdSlideshow, color: 'text-orange-600', labelKey: 'file_upload.file_type.powerpoint' };
+    case 'open_document_presentation':
+      return { Icon: MdSlideshow, color: 'text-orange-600', labelKey: 'file_upload.file_type.open_document_presentation' };
     case 'archive':
       return { Icon: MdArchive, color: 'text-amber-600', labelKey: 'file_upload.file_type.archive' };
     case 'code':

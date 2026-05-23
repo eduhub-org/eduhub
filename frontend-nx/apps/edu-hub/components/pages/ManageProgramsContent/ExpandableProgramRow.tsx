@@ -1,7 +1,7 @@
 import { FC, useCallback, useMemo, useState } from 'react';
 import { CircularProgress } from '@mui/material';
 import { useTranslations } from 'next-intl';
-import { useLazyRoleQuery, useAuthedQuery } from '../../../hooks/authedQuery';
+import { useLazyRoleQuery, useRoleQuery } from '../../../hooks/authedQuery';
 import { useAdminMutation } from '../../../hooks/authedMutation';
 import { ProgramList_Program } from '../../../queries/__generated__/ProgramList';
 import { ProjectTypes } from '../../../queries/__generated__/ProjectTypes';
@@ -54,7 +54,7 @@ const ExpandableProgramRow: FC<ExpandableProgramRowProps> = ({ program }) => {
     message: '',
   });
 
-  const { data: projectTypesData } = useAuthedQuery<ProjectTypes>(PROJECT_TYPES);
+  const { data: projectTypesData } = useRoleQuery<ProjectTypes>(PROJECT_TYPES);
   const projectTypeOptions = useMemo(
     () =>
       (projectTypesData?.ProjectType ?? []).map((pt) => ({

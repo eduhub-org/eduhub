@@ -2,7 +2,7 @@ import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { MdAddCircle, MdClose } from 'react-icons/md';
 import { useRoleMutation } from '../../../../../hooks/authedMutation';
-import { useAuthedQuery } from '../../../../../hooks/authedQuery';
+import { useRoleQuery } from '../../../../../hooks/authedQuery';
 import { DialogShell } from '../../../../common/dialogs/DialogShell';
 import { SelectUserDialog } from '../../../../common/dialogs/SelectUserDialog';
 import { Button } from '../../../../common/Button';
@@ -47,8 +47,8 @@ const AddProjectDialog: FC<AddProjectDialogProps> = ({
   const [authors, setAuthors] = useState<UserSelectionWithFilter_User[]>([]);
   const [selectAuthorOpen, setSelectAuthorOpen] = useState(false);
 
-  const projectTypesQuery = useAuthedQuery<ProjectTypes>(PROJECT_TYPES);
-  const documentationInstructionsQuery = useAuthedQuery<ProjectDocumentationInstructions>(
+  const projectTypesQuery = useRoleQuery<ProjectTypes>(PROJECT_TYPES);
+  const documentationInstructionsQuery = useRoleQuery<ProjectDocumentationInstructions>(
     PROJECT_DOCUMENTATION_INSTRUCTIONS
   );
 

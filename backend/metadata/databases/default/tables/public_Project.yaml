@@ -124,7 +124,6 @@ select_permissions:
         - status
         - submissionDeadline
         - submittedAt
-        - submittedBy
         - tagline
         - title
         - type
@@ -238,7 +237,6 @@ update_permissions:
         - ratingComment
         - status
         - submissionDeadline
-        - submittedBy
         - tagline
         - title
         - type
@@ -267,6 +265,8 @@ update_permissions:
                         id:
                           _eq: X-Hasura-User-Id
       check: {}
+  # submittedBy is populated only via the server-side preset below; clients cannot write it.
+  # The set_project_submitted_metadata trigger clears submittedBy when status transitions out of SUBMITTED.
   - role: user_access
     permission:
       columns:
@@ -279,11 +279,12 @@ update_permissions:
         - externalUrl
         - presentationUrl
         - status
-        - submittedBy
         - tagline
         - projectReviewRequestedAt
         - title
         - type
+      set:
+        submittedBy: x-hasura-user-id
       filter:
         _or:
           - ProjectCourses:

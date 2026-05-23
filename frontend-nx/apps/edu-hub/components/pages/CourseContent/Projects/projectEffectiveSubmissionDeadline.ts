@@ -30,7 +30,16 @@ export function submissionDeadlineToCalendarDate(
     const y = Number(match[1]);
     const m = Number(match[2]) - 1;
     const day = Number(match[3]);
-    return new Date(y, m, day);
+    const candidate = new Date(y, m, day);
+    // Reject impossible calendar dates like 2025-02-31 that JS would silently roll forward.
+    if (
+      candidate.getFullYear() !== y ||
+      candidate.getMonth() !== m ||
+      candidate.getDate() !== day
+    ) {
+      return null;
+    }
+    return candidate;
   }
 
   const parsed = new Date(iso);

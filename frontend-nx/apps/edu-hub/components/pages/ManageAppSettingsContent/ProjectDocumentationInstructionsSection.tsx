@@ -397,6 +397,7 @@ const ProjectDocumentationInstructionsSection: FC = () => {
               <span>
                 <IconButton
                   size="small"
+                  aria-label={t('delete_tooltip')}
                   onClick={() => setPendingDelete(row.original)}
                   disabled={blocked || deleting}
                   sx={{

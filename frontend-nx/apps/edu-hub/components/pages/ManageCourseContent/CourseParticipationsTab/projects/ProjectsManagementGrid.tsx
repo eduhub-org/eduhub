@@ -4,7 +4,7 @@ import { CircularProgress, Tooltip } from '@mui/material';
 import { HelpOutline } from '@mui/icons-material';
 import { useTranslations } from 'next-intl';
 import { MdAddCircle, MdClose } from 'react-icons/md';
-import { useRoleQuery, useAuthedQuery } from '../../../../../hooks/authedQuery';
+import { useRoleQuery } from '../../../../../hooks/authedQuery';
 import { useRoleMutation } from '../../../../../hooks/authedMutation';
 import { useUserId } from '../../../../../hooks/user';
 import TableGrid from '../../../../common/TableGrid';
@@ -100,8 +100,8 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
     PROJECTS_BY_COURSE,
     { variables: { courseId } }
   );
-  const projectTypesQuery = useAuthedQuery<ProjectTypes>(PROJECT_TYPES);
-  const documentationInstructionsQuery = useAuthedQuery<ProjectDocumentationInstructions>(
+  const projectTypesQuery = useRoleQuery<ProjectTypes>(PROJECT_TYPES);
+  const documentationInstructionsQuery = useRoleQuery<ProjectDocumentationInstructions>(
     PROJECT_DOCUMENTATION_INSTRUCTIONS
   );
 

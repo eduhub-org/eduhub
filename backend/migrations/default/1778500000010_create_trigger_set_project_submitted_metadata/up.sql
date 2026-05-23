@@ -3,9 +3,15 @@ RETURNS TRIGGER AS $$
 BEGIN
   IF NEW."status" = 'SUBMITTED'
      AND (OLD."status" IS DISTINCT FROM 'SUBMITTED')
-     AND NEW."submittedAt" IS NULL
   THEN
+    -- Always stamp server-side; never trust a client-supplied submittedAt.
     NEW."submittedAt" = now();
+  ELSIF OLD."status" = 'SUBMITTED'
+        AND (NEW."status" IS DISTINCT FROM 'SUBMITTED')
+  THEN
+    -- Clear submission attribution when leaving the SUBMITTED state (e.g. send-back).
+    NEW."submittedAt" = NULL;
+    NEW."submittedBy" = NULL;
   END IF;
   RETURN NEW;
 END;
@@ -18,4 +24,4 @@ FOR EACH ROW
 EXECUTE PROCEDURE "public"."set_project_submitted_metadata"();
 
 COMMENT ON TRIGGER "set_project_submitted_metadata_trigger" ON "public"."Project"
-IS 'Auto-stamps Project.submittedAt = now() when status transitions to SUBMITTED. submittedBy is set separately via a Hasura permission preset because triggers cannot read Hasura session variables.';
+IS 'Stamps Project.submittedAt = now() when status transitions into SUBMITTED (overwrites any client value) and clears submittedAt/submittedBy when status transitions out of SUBMITTED. submittedBy on the way in is set via a Hasura permission preset because triggers cannot read Hasura session variables.';

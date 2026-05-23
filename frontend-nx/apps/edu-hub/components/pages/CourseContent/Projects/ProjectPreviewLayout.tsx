@@ -5,7 +5,7 @@ import { ProjectParticipationStatus_enum } from '../../../../__generated__/globa
 import UserCard from '../../../common/UserCard';
 import { Button } from '../../../common/Button';
 import { ProjectRow } from './types';
-import { isProjectResourceUrlPresent } from './projectMandatory';
+import { isProjectResourceUrlPresent, safeProjectExternalHref } from './projectMandatory';
 
 export const PROJECT_COVER_PLACEHOLDER_SRC = '/images/common/project-cover-placeholder.svg';
 
@@ -48,9 +48,13 @@ const ProjectPreviewLayout: FC<ProjectPreviewLayoutProps> = ({
   const presProvided = isProjectResourceUrlPresent(project.presentationUrl);
   const extProvided = isProjectResourceUrlPresent(project.externalUrl);
 
-  const showDocumentationRow = showResourceLinks && docProvided;
-  const showPresentationRow = showResourceLinks && presProvided;
-  const showExternalRow = showResourceLinks && extProvided;
+  const safeDocumentationHref = safeProjectExternalHref(project.documentationUrl);
+  const safePresentationHref = safeProjectExternalHref(project.presentationUrl);
+  const safeExternalHref = safeProjectExternalHref(project.externalUrl);
+
+  const showDocumentationRow = showResourceLinks && docProvided && safeDocumentationHref !== null;
+  const showPresentationRow = showResourceLinks && presProvided && safePresentationHref !== null;
+  const showExternalRow = showResourceLinks && extProvided && safeExternalHref !== null;
 
   const showResourceBlock =
     showDocumentationRow || showPresentationRow || showExternalRow;
@@ -139,7 +143,7 @@ const ProjectPreviewLayout: FC<ProjectPreviewLayoutProps> = ({
           {showDocumentationRow ? (
             <Button
               as="a"
-              href={project.documentationUrl?.trim() ?? ''}
+              href={safeDocumentationHref ?? ''}
               target="_blank"
               rel="noopener noreferrer"
               download
@@ -154,7 +158,7 @@ const ProjectPreviewLayout: FC<ProjectPreviewLayoutProps> = ({
           {showPresentationRow ? (
             <Button
               as="a"
-              href={project.presentationUrl?.trim() ?? ''}
+              href={safePresentationHref ?? ''}
               target="_blank"
               rel="noopener noreferrer"
               download
@@ -169,7 +173,7 @@ const ProjectPreviewLayout: FC<ProjectPreviewLayoutProps> = ({
           {showExternalRow ? (
             <Button
               as="a"
-              href={project.externalUrl?.trim() ?? ''}
+              href={safeExternalHref ?? ''}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex w-fit max-w-full items-center gap-2 no-underline text-sm font-medium"

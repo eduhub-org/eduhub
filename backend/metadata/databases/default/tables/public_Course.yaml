@@ -250,6 +250,8 @@ update_permissions:
         - learningGoals
         - maxMissedSessions
         - maxParticipants
+        - projectProposalsEnabled
+        - projectSubmissionDeadline
         - startTime
         - status
         - tagline
