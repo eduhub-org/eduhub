@@ -48,7 +48,11 @@ import { BulkAction } from '../../../common/TableGrid/types';
 import NotificationSnackbar from '../../../common/dialogs/NotificationSnackbar';
 import { ErrorMessageDialog } from '../../../common/dialogs/ErrorMessageDialog';
 import ProjectsManagementGrid from './projects/ProjectsManagementGrid';
-import { resolveEffectiveCourseProjectSubmissionDeadline, getCourseProjectSubmissionDefaultSource } from '../../CourseContent/Projects/projectEffectiveSubmissionDeadline';
+import {
+  resolveEffectiveCourseProjectSubmissionDeadline,
+  getCourseProjectSubmissionDefaultSource,
+  submissionDeadlineToIsoString,
+} from '../../CourseContent/Projects/projectEffectiveSubmissionDeadline';
 
 interface CourseParticipationsTabIProps {
   course: ManagedCourse_Course_by_pk;
@@ -722,7 +726,9 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
         <ProjectsManagementGrid
           courseId={course.id}
           programDefaultProjectType={course.Program?.defaultProjectType ?? null}
-          courseDefaultProjectSubmissionDeadline={resolveEffectiveCourseProjectSubmissionDeadline(course)}
+          courseDefaultProjectSubmissionDeadline={submissionDeadlineToIsoString(
+            resolveEffectiveCourseProjectSubmissionDeadline(course)
+          )}
           courseSubmissionDeadlineDefaultSource={getCourseProjectSubmissionDefaultSource(course)}
         />
       </section>

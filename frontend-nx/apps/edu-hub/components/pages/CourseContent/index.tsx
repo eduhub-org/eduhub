@@ -29,7 +29,11 @@ import { Attendances } from './Attendances';
 import { CertificateDownload } from '../../common/CertificateDownload';
 import AchievementRecord from './AchievementRecord';
 import Projects from './Projects';
-import { resolveEffectiveCourseProjectSubmissionDeadline, getCourseProjectSubmissionDefaultSource } from './Projects/projectEffectiveSubmissionDeadline';
+import {
+  resolveEffectiveCourseProjectSubmissionDeadline,
+  getCourseProjectSubmissionDefaultSource,
+  submissionDeadlineToIsoString,
+} from './Projects/projectEffectiveSubmissionDeadline';
 import { useIsCourseWithEnrollment } from '../../../hooks/course';
 import NotificationSnackbar from '../../common/dialogs/NotificationSnackbar';
 
@@ -209,7 +213,9 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                       <Projects
                         courseId={course.id}
                         defaultProjectType={course.Program?.defaultProjectType ?? null}
-                        effectiveSubmissionDeadline={resolveEffectiveCourseProjectSubmissionDeadline(course)}
+                        effectiveSubmissionDeadline={submissionDeadlineToIsoString(
+                          resolveEffectiveCourseProjectSubmissionDeadline(course)
+                        )}
                         submissionDeadlineDefaultSource={getCourseProjectSubmissionDefaultSource(course)}
                         proposalsEnabled={Boolean(
                           course.projectProposalsEnabled ??

@@ -326,7 +326,7 @@ export const OptimisticDatePicker: FC<OptimisticDatePickerProps> = ({
   }, [highlightDates]);
 
   const dayClassName = useCallback(
-    (date: Date): string | null => {
+    (date: Date): string => {
       const custom = lookupCustomHighlight(date);
       if (custom) return custom;
       const holiday = lookupHoliday(date);
@@ -337,7 +337,7 @@ export const OptimisticDatePicker: FC<OptimisticDatePickerProps> = ({
         const day = date.getDay();
         if (day === 0 || day === 6) return 'weekend-day';
       }
-      return null;
+      return '';
     },
     [lookupHoliday, lookupCustomHighlight, showWeekends]
   );

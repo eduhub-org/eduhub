@@ -72,8 +72,9 @@ export const formattedDateWithTime = (date: Date, language = 'de') => {
 };
 
 export const downloadCSVFileFromBase64String = (base64File: string) => {
-  // decode the base-64 string
-  const csvContent = Buffer.from(base64File, 'base64');
+  // decode the base-64 string into a Uint8Array (Buffer's typings are no
+  // longer assignable to BlobPart since the SharedArrayBuffer split).
+  const csvContent = Uint8Array.from(Buffer.from(base64File, 'base64'));
 
   // Creating a Blob for having a csv file format
   // and passing the data with type
