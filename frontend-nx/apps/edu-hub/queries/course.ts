@@ -586,6 +586,30 @@ export const UPDATE_COURSE_ECTS = gql`
   }
 `;
 
+export const UPDATE_COURSE_PROJECT_PROPOSALS_ENABLED = gql`
+  mutation UpdateCourseProjectProposalsEnabled($itemId: Int!, $value: Boolean) {
+    update_Course_by_pk(
+      pk_columns: { id: $itemId }
+      _set: { projectProposalsEnabled: $value }
+    ) {
+      id
+      projectProposalsEnabled
+    }
+  }
+`;
+
+export const UPDATE_COURSE_PROJECT_SUBMISSION_DEADLINE = gql`
+  mutation UpdateCourseProjectSubmissionDeadline($itemId: Int!, $value: timestamptz) {
+    update_Course_by_pk(
+      pk_columns: { id: $itemId }
+      _set: { projectSubmissionDeadline: $value }
+    ) {
+      id
+      projectSubmissionDeadline
+    }
+  }
+`;
+
 export const UPDATE_COURSE_EXTERNAL_REGISTRATION_LINK = gql`
   mutation UpdateCourseExternalRegistrationLink($itemId: Int!, $text: String!) {
     update_Course_by_pk(pk_columns: { id: $itemId }, _set: { externalRegistrationLink: $text }) {

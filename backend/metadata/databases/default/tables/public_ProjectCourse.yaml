@@ -9,6 +9,24 @@ object_relationships:
     using:
       foreign_key_constraint_on: projectId
 insert_permissions:
+  # Students self-proposing a course project: INSERT_SELF_PROPOSED_PROJECT nests ProjectCourses.
+  - role: user_access
+    permission:
+      check:
+        _and:
+          - Course:
+              CourseEnrollments:
+                User:
+                  id:
+                    _eq: X-Hasura-User-Id
+          - Project:
+              proposedByUserId:
+                _eq: X-Hasura-User-Id
+              status:
+                _eq: PROPOSED
+      columns:
+        - courseId
+        - projectId
   - role: instructor_access
     permission:
       check:

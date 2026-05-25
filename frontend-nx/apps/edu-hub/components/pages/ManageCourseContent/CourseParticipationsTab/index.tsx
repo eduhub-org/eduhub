@@ -47,6 +47,12 @@ import { createMultiWordSearchCondition } from '../../../common/TableGrid/utils'
 import { BulkAction } from '../../../common/TableGrid/types';
 import NotificationSnackbar from '../../../common/dialogs/NotificationSnackbar';
 import { ErrorMessageDialog } from '../../../common/dialogs/ErrorMessageDialog';
+import ProjectsManagementGrid from './projects/ProjectsManagementGrid';
+import {
+  resolveEffectiveCourseProjectSubmissionDeadline,
+  getCourseProjectSubmissionDefaultSource,
+  submissionDeadlineToIsoString,
+} from '../../CourseContent/Projects/projectEffectiveSubmissionDeadline';
 
 interface CourseParticipationsTabIProps {
   course: ManagedCourse_Course_by_pk;
@@ -658,29 +664,37 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
     [refetch, qResult, t, locale]
   );
 
-  const achievementOptionsForSection = courseData?.AchievementOptionCourses ?? [];
-
   if (!course.achievementCertificatePossible) {
     return (
-      <div className="flex flex-col space-y-4">
-        <ParticipationTable
-          columns={columns}
-          data={extendedEnrollments}
-          totalCount={totalCount}
-          pageIndex={pageIndex}
-          setPageIndex={setPageIndex}
-          pageSize={pageSize}
-          onPageSizeChange={handlePageSizeChange}
-          searchFilter={searchFilter}
-          setSearchFilter={setSearchFilter}
-          sorting={sorting}
-          setSorting={setSorting}
-          loading={loading}
-          error={error}
-          bulkActions={bulkActions}
-          onBulkAction={handleBulkAction}
-          expandableRowComponent={ExpandableParticipationRow}
-        />
+      <div className="flex flex-col gap-8">
+        <section className="space-y-3 rounded-lg border border-border-primary bg-bg-secondary/40 p-4 sm:p-5">
+          <header className="border-b border-border-primary pb-3">
+            <h2 className="text-lg font-semibold text-label-primary tracking-tight">
+              {t('participations_tab_enrollments_heading')}
+            </h2>
+            <p className="mt-1 text-sm text-label-secondary max-w-3xl">
+              {t('participations_tab_enrollments_subtitle')}
+            </p>
+          </header>
+          <ParticipationTable
+            columns={columns}
+            data={extendedEnrollments}
+            totalCount={totalCount}
+            pageIndex={pageIndex}
+            setPageIndex={setPageIndex}
+            pageSize={pageSize}
+            onPageSizeChange={handlePageSizeChange}
+            searchFilter={searchFilter}
+            setSearchFilter={setSearchFilter}
+            sorting={sorting}
+            setSorting={setSorting}
+            loading={loading}
+            error={error}
+            bulkActions={bulkActions}
+            onBulkAction={handleBulkAction}
+            expandableRowComponent={ExpandableParticipationRow}
+          />
+        </section>
         <NotificationSnackbar
           open={snackbarOpen}
           onClose={() => setSnackbarOpen(false)}
@@ -699,29 +713,54 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
   }
 
   return (
-    <div className="flex flex-col space-y-4">
-      <AvailableProjectOptionsSection
-        achievementOptions={achievementOptionsForSection}
-        t={t}
-      />
-      <ParticipationTable
-        columns={columns}
-        data={extendedEnrollments}
-        totalCount={totalCount}
-        pageIndex={pageIndex}
-        setPageIndex={setPageIndex}
-        pageSize={pageSize}
-        onPageSizeChange={handlePageSizeChange}
-        searchFilter={searchFilter}
-        setSearchFilter={setSearchFilter}
-        sorting={sorting}
-        setSorting={setSorting}
-        loading={loading}
-        error={error}
-        bulkActions={bulkActions}
-        onBulkAction={handleBulkAction}
-        expandableRowComponent={ExpandableParticipationRow}
-      />
+    <div className="flex flex-col gap-10">
+      <section className="space-y-3 rounded-lg border border-border-primary bg-bg-secondary/40 p-4 sm:p-5">
+        <header className="border-b border-border-primary pb-3">
+          <h2 className="text-lg font-semibold text-label-primary tracking-tight">
+            {t('participations_tab_projects_heading')}
+          </h2>
+          <p className="mt-1 text-sm text-label-secondary max-w-3xl">
+            {t('participations_tab_projects_subtitle')}
+          </p>
+        </header>
+        <ProjectsManagementGrid
+          courseId={course.id}
+          programDefaultProjectType={course.Program?.defaultProjectType ?? null}
+          courseDefaultProjectSubmissionDeadline={submissionDeadlineToIsoString(
+            resolveEffectiveCourseProjectSubmissionDeadline(course)
+          )}
+          courseSubmissionDeadlineDefaultSource={getCourseProjectSubmissionDefaultSource(course)}
+        />
+      </section>
+
+      <section className="space-y-3 rounded-lg border border-border-primary bg-bg-secondary/40 p-4 sm:p-5">
+        <header className="border-b border-border-primary pb-3">
+          <h2 className="text-lg font-semibold text-label-primary tracking-tight">
+            {t('participations_tab_enrollments_heading')}
+          </h2>
+          <p className="mt-1 text-sm text-label-secondary max-w-3xl">
+            {t('participations_tab_enrollments_subtitle')}
+          </p>
+        </header>
+        <ParticipationTable
+          columns={columns}
+          data={extendedEnrollments}
+          totalCount={totalCount}
+          pageIndex={pageIndex}
+          setPageIndex={setPageIndex}
+          pageSize={pageSize}
+          onPageSizeChange={handlePageSizeChange}
+          searchFilter={searchFilter}
+          setSearchFilter={setSearchFilter}
+          sorting={sorting}
+          setSorting={setSorting}
+          loading={loading}
+          error={error}
+          bulkActions={bulkActions}
+          onBulkAction={handleBulkAction}
+          expandableRowComponent={ExpandableParticipationRow}
+        />
+      </section>
       <NotificationSnackbar
         open={snackbarOpen}
         onClose={() => setSnackbarOpen(false)}
@@ -738,36 +777,6 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
     </div>
   );
 };
-
-function AvailableProjectOptionsSection({
-  achievementOptions,
-  t,
-}: {
-  achievementOptions: { AchievementOption: { id: number; title: string } }[];
-  t: (key: string) => string;
-}) {
-  return (
-    <div className="mb-6">
-      <h3 className="text-sm font-medium text-label-secondary uppercase mb-3">
-        {t('available_project_options')}
-      </h3>
-      {achievementOptions.length === 0 ? (
-        <p className="text-label-secondary text-sm">{t('no_project_options_available')}</p>
-      ) : (
-        <div className="flex gap-2 flex-wrap">
-          {achievementOptions.map((opt) => (
-            <div
-              key={opt.AchievementOption.id}
-              className="bg-white text-black text-sm px-3 py-1.5 rounded-md border border-gray-200"
-            >
-              {opt.AchievementOption.title}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
 
 function ParticipationTable({
   columns,

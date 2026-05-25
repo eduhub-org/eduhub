@@ -38,7 +38,9 @@ export const useDatePickerLogic = (
   const debouncedUpdateValue = useDebouncedCallback((newValue: Date | null, dateFieldName: string) => {
     if (updateValueMutation) {
       // Convert Date to ISO string format (date only, no time) or null
-      const dateValue = newValue ? newValue.toISOString().split('T')[0] : null;
+      const dateValue = newValue
+        ? `${newValue.getFullYear()}-${String(newValue.getMonth() + 1).padStart(2, '0')}-${String(newValue.getDate()).padStart(2, '0')}`
+        : null;
       
       // Use identifierVariables if provided, otherwise default to { programId: itemId }
       const baseVariables = identifierVariables || { programId: itemId };

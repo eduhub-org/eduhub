@@ -126,6 +126,8 @@ select_permissions:
         - maxMissedSessions
         - maxParticipants
         - programId
+        - projectProposalsEnabled
+        - projectSubmissionDeadline
         - published
         - registrationType
         - startTime
@@ -170,6 +172,8 @@ select_permissions:
         - maxMissedSessions
         - maxParticipants
         - programId
+        - projectProposalsEnabled
+        - projectSubmissionDeadline
         - published
         - startTime
         - status
@@ -208,6 +212,8 @@ select_permissions:
         - maxMissedSessions
         - maxParticipants
         - programId
+        - projectProposalsEnabled
+        - projectSubmissionDeadline
         - published
         - startTime
         - status
@@ -244,6 +250,8 @@ update_permissions:
         - learningGoals
         - maxMissedSessions
         - maxParticipants
+        - projectProposalsEnabled
+        - projectSubmissionDeadline
         - startTime
         - status
         - tagline

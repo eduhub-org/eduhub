@@ -188,6 +188,51 @@ export const UPDATE_PROGRAM_UPLOAD_DEADLINE = gql`
   }
 `;
 
+export const UPDATE_PROGRAM_DEFAULT_PROJECT_SUBMISSION_DEADLINE = gql`
+  mutation UpdateProgramDefaultProjectSubmissionDeadline(
+    $itemId: Int!
+    $value: timestamptz
+  ) {
+    update_Program_by_pk(
+      pk_columns: { id: $itemId }
+      _set: { defaultProjectSubmissionDeadline: $value }
+    ) {
+      id
+      defaultProjectSubmissionDeadline
+    }
+  }
+`;
+
+export const UPDATE_PROGRAM_DEFAULT_PROJECT_TYPE = gql`
+  mutation UpdateProgramDefaultProjectType(
+    $itemId: Int!
+    $value: String
+  ) {
+    update_Program_by_pk(
+      pk_columns: { id: $itemId }
+      _set: { defaultProjectType: $value }
+    ) {
+      id
+      defaultProjectType
+    }
+  }
+`;
+
+export const UPDATE_PROGRAM_PROJECT_PROPOSALS_ENABLED_BY_DEFAULT = gql`
+  mutation UpdateProgramProjectProposalsEnabledByDefault(
+    $programId: Int!
+    $value: Boolean!
+  ) {
+    update_Program_by_pk(
+      pk_columns: { id: $programId }
+      _set: { projectProposalsEnabledByDefault: $value }
+    ) {
+      id
+      projectProposalsEnabledByDefault
+    }
+  }
+`;
+
 export const UPDATE_START_QUESTIONAIRE = gql`
   mutation UpdateProgramStartQuestionaire(
     $itemId: Int!

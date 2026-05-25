@@ -11,9 +11,9 @@ object_relationships:
   - name: ProjectAchievementCertificateType
     using:
       foreign_key_constraint_on: achievementCertificateType
-  - name: ProjectDocumentationTemplate
+  - name: ProjectDocumentationInstruction
     using:
-      foreign_key_constraint_on: documentationTemplateId
+      foreign_key_constraint_on: documentationInstructionId
   - name: ProjectRating
     using:
       foreign_key_constraint_on: rating
@@ -26,6 +26,9 @@ object_relationships:
   - name: ProposedByUser
     using:
       foreign_key_constraint_on: proposedByUserId
+  - name: SubmittedByUser
+    using:
+      foreign_key_constraint_on: submittedBy
 array_relationships:
   - name: ChildProjects
     using:
@@ -69,7 +72,32 @@ insert_permissions:
         - acceptingParticipants
         - coverImageUrl
         - description
-        - documentationTemplateId
+        - documentationInstructionId
+        - documentationUrl
+        - externalUrl
+        - organizationId
+        - parentProjectId
+        - presentationUrl
+        - proposedByUserId
+        - status
+        - tagline
+        - title
+        - type
+  # Same rules as user_access self-propose; instructors no longer inherit user_access (see inherited_roles).
+  - role: instructor_access
+    permission:
+      check:
+        _and:
+          - proposedByUserId:
+              _eq: X-Hasura-User-Id
+          - status:
+              _eq: PROPOSED
+      columns:
+        - achievementCertificateType
+        - acceptingParticipants
+        - coverImageUrl
+        - description
+        - documentationInstructionId
         - documentationUrl
         - externalUrl
         - organizationId
@@ -94,6 +122,8 @@ select_permissions:
         - organizationId
         - presentationUrl
         - status
+        - submissionDeadline
+        - submittedAt
         - tagline
         - title
         - type
@@ -117,9 +147,8 @@ select_permissions:
         - created_at
         - csvResults
         - description
-        - documentationTemplateId
+        - documentationInstructionId
         - documentationUrl
-        - evaluationScriptUrl
         - externalUrl
         - id
         - organizationId
@@ -127,8 +156,12 @@ select_permissions:
         - presentationUrl
         - proposedByUserId
         - rating
-        - score
+        - ratingComment
         - status
+        - submissionDeadline
+        - submittedAt
+        - submittedBy
+        - projectReviewRequestedAt
         - tagline
         - title
         - type
@@ -154,9 +187,8 @@ select_permissions:
         - created_at
         - csvResults
         - description
-        - documentationTemplateId
+        - documentationInstructionId
         - documentationUrl
-        - evaluationScriptUrl
         - externalUrl
         - id
         - organizationId
@@ -164,8 +196,12 @@ select_permissions:
         - presentationUrl
         - proposedByUserId
         - rating
-        - score
+        - ratingComment
         - status
+        - submissionDeadline
+        - submittedAt
+        - submittedBy
+        - projectReviewRequestedAt
         - tagline
         - title
         - type
@@ -185,11 +221,25 @@ select_permissions:
                     id:
                       _eq: X-Hasura-User-Id
 update_permissions:
+  # Covers grading plus the same project fields instructors previously reached via merged user_access.
   - role: instructor_access
     permission:
       columns:
+        - acceptingParticipants
+        - achievementCertificateType
+        - coverImageUrl
+        - description
+        - documentationInstructionId
+        - documentationUrl
+        - externalUrl
+        - presentationUrl
         - rating
-        - score
+        - ratingComment
+        - status
+        - submissionDeadline
+        - tagline
+        - title
+        - type
       filter:
         _or:
           - ProjectCourses:
@@ -202,7 +252,21 @@ update_permissions:
               User:
                 id:
                   _eq: X-Hasura-User-Id
+          - _and:
+              - status:
+                  _in:
+                    - PROPOSED
+                    - ONGOING
+              - ProjectAuthors:
+                  _and:
+                    - participationStatus:
+                        _eq: ACCEPTED
+                    - User:
+                        id:
+                          _eq: X-Hasura-User-Id
       check: {}
+  # submittedBy is populated only via the server-side preset below; clients cannot write it.
+  # The set_project_submitted_metadata trigger clears submittedBy when status transitions out of SUBMITTED.
   - role: user_access
     permission:
       columns:
@@ -210,14 +274,17 @@ update_permissions:
         - achievementCertificateType
         - coverImageUrl
         - description
-        - documentationTemplateId
+        - documentationInstructionId
         - documentationUrl
         - externalUrl
         - presentationUrl
         - status
         - tagline
+        - projectReviewRequestedAt
         - title
         - type
+      set:
+        submittedBy: x-hasura-user-id
       filter:
         _or:
           - ProjectCourses:

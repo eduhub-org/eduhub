@@ -4,7 +4,7 @@ import { isLinkFormat } from '../../helpers/util';
 import { useTranslations } from 'next-intl';
 import { getPublicImageUrl } from '../../helpers/filehandling';
 
-type Size = 'small' | 'medium' | 'large';
+type Size = 'small' | 'compact' | 'medium' | 'large';
 
 interface SizeConfig {
   imageSize: number;
@@ -14,6 +14,7 @@ interface SizeConfig {
 
 const sizeConfigs: Record<Size, SizeConfig> = {
   small: { imageSize: 40, imageSolution: 64, fontSize: 'text-sm' },
+  compact: { imageSize: 48, imageSolution: 64, fontSize: 'text-sm' },
   medium: { imageSize: 75, imageSolution: 400, fontSize: 'text-base' },
   large: { imageSize: 100, imageSolution: 400, fontSize: 'text-lg' },
 };
@@ -25,6 +26,8 @@ interface UserCardUser {
   lastName: string;
   picture: string | null;
   externalProfile: string | null;
+  /** Optional organization label (e.g. employer), shown like instructors' secondary line */
+  organizationName?: string | null;
 }
 
 interface UserCardProps {
@@ -44,6 +47,8 @@ const UserCard: FC<UserCardProps> = ({ user, role, className, size = 'large' }) 
     () => getPublicImageUrl(user?.picture ?? null, imageSolution) || '/images/common/mystery.svg',
     [user?.picture, imageSolution]
   );
+
+  const displayName = `${user?.firstName ?? ''} ${user?.lastName ?? ''}`.trim();
 
   const getProfileLink = (url: string) => {
     const safeUrl = url.startsWith('http://') || url.startsWith('https://') ? url : `https://${url}`;
@@ -68,7 +73,7 @@ const UserCard: FC<UserCardProps> = ({ user, role, className, size = 'large' }) 
     <div className={`flex items-start ${className}`}>
       <Image
         src={userPictureUrl}
-        alt={`${t('image_of')} ${user?.firstName}`}
+        alt={displayName ? `${t('image_of')} ${displayName}` : t('image_of')}
         width={imageSize}
         height={imageSize}
         className="rounded-full object-cover mr-4"
@@ -80,6 +85,9 @@ const UserCard: FC<UserCardProps> = ({ user, role, className, size = 'large' }) 
             {user?.firstName} {user?.lastName}
           </span>
           {role && <span className="text-label-secondary">{role}</span>}
+          {user?.organizationName ? (
+            <span className="text-label-secondary">{user.organizationName}</span>
+          ) : null}
           {user?.externalProfile && isLinkFormat(user.externalProfile) && (
             <span className="text-label-secondary">{getProfileLink(user.externalProfile)}</span>
           )}

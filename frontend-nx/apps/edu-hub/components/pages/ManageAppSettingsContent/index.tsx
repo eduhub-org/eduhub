@@ -33,6 +33,7 @@ import {
 } from '../../../queries/__generated__/UpdateCourseGroupOptionOrder';
 import { useAdminMutation } from '../../../hooks/authedMutation';
 import { ONBOARDING_TEXTS, UPDATE_ONBOARDING_TEXT } from '../../../queries/onboardingText';
+import ProjectDocumentationInstructionsSection from './ProjectDocumentationInstructionsSection';
 
 type OnboardingTextRow = {
   id: number;
@@ -337,6 +338,8 @@ const ManageAppSettingsContent: FC = () => {
               />
             </div>
           </div>
+
+          <ProjectDocumentationInstructionsSection />
 
           <div className="mt-16 border border-gray-300 rounded p-6">
             <label className="text-xs uppercase tracking-widest font-medium text-gray-400 mb-4 block">

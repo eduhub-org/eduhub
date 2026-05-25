@@ -153,6 +153,33 @@ select_permissions:
         id:
           _eq: X-Hasura-User-Id
       limit: 10
+  # Split across inherited roles: `user` JWT inherits both user_access and user_access_others;
+  # Hasura merges union semantics — classmates visible via projects stay limited columns only.
+  - role: user_access_others
+    permission:
+      columns:
+        - externalProfile
+        - firstName
+        - id
+        - lastName
+        - organizationId
+        - picture
+      filter:
+        ProjectAuthors:
+          _and:
+            - participationStatus:
+                _eq: ACCEPTED
+            - Project:
+                ProjectCourses:
+                  Course:
+                    CourseEnrollments:
+                      _and:
+                        - User:
+                            id:
+                              _eq: X-Hasura-User-Id
+                        - status:
+                            _eq: CONFIRMED
+      limit: 100
 update_permissions:
   - role: user_access
     permission:
