@@ -44,6 +44,54 @@ export const useRoleMutation = <TData = any, TVariables = any>(
   return useMutation<TData, TVariables>(mutation, options);
 };
 
+/**
+ * Single hook for mutations that must use either the admin role or the current session role
+ * (e.g. FileUploadField used from admin manage course vs. student project panel).
+ */
+export const useFlexibleMutation = <TData = any, TVariables = any>(
+  mutation: DocumentNode,
+  preset: 'admin' | 'role',
+  passedOptions?: CustomMutationOptions<TData, TVariables>
+) => {
+  const { data } = useSession();
+  const accessToken = data?.accessToken;
+  const currentRole = useCurrentRole();
+  const passedRole: AuthRoles | undefined = passedOptions?.context?.role;
+
+  const options =
+    accessToken && preset === 'admin'
+      ? {
+          ...passedOptions,
+          context: {
+            ...passedOptions?.context,
+            headers: {
+              ...passedOptions?.context?.headers,
+              'x-hasura-role': AuthRoles.admin,
+              Authorization: `Bearer ${accessToken}`,
+            },
+          },
+        }
+      : accessToken && preset === 'role'
+        ? {
+            ...passedOptions,
+            context: {
+              ...passedOptions?.context,
+              headers: {
+                ...passedOptions?.context?.headers,
+                ...(currentRole !== AuthRoles.anonymous && {
+                  'x-hasura-role': passedRole ?? currentRole,
+                }),
+                ...(currentRole !== AuthRoles.anonymous && {
+                  Authorization: `Bearer ${accessToken}`,
+                }),
+              },
+            },
+          }
+        : passedOptions;
+
+  return useMutation<TData, TVariables>(mutation, options);
+};
+
 // Corrected useInstructorMutation hook
 export const useInstructorMutation = <TData = any, TVariables = any>(
   mutation: DocumentNode,

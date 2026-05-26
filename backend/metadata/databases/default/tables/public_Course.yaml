@@ -74,6 +74,13 @@ array_relationships:
         table:
           name: CourseDegree
           schema: public
+  - name: ProjectCourses
+    using:
+      foreign_key_constraint_on:
+        column: courseId
+        table:
+          name: ProjectCourse
+          schema: public
   - name: Sessions
     using:
       foreign_key_constraint_on:
@@ -119,6 +126,8 @@ select_permissions:
         - maxMissedSessions
         - maxParticipants
         - programId
+        - projectProposalsEnabled
+        - projectSubmissionDeadline
         - published
         - registrationType
         - startTime
@@ -163,6 +172,8 @@ select_permissions:
         - maxMissedSessions
         - maxParticipants
         - programId
+        - projectProposalsEnabled
+        - projectSubmissionDeadline
         - published
         - startTime
         - status
@@ -201,6 +212,8 @@ select_permissions:
         - maxMissedSessions
         - maxParticipants
         - programId
+        - projectProposalsEnabled
+        - projectSubmissionDeadline
         - published
         - startTime
         - status
@@ -237,6 +250,8 @@ update_permissions:
         - learningGoals
         - maxMissedSessions
         - maxParticipants
+        - projectProposalsEnabled
+        - projectSubmissionDeadline
         - startTime
         - status
         - tagline

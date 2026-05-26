@@ -1,0 +1,19 @@
+table:
+  name: ProjectParticipationStatus
+  schema: public
+is_enum: true
+array_relationships:
+  - name: ProjectAuthors
+    using:
+      foreign_key_constraint_on:
+        column: participationStatus
+        table:
+          name: ProjectAuthor
+          schema: public
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - value
+        - comment
+      filter: {}

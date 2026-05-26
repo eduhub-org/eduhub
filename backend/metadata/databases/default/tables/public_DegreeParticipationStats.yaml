@@ -1,0 +1,22 @@
+table:
+  name: DegreeParticipationStats
+  schema: public
+select_permissions:
+  - role: instructor_access
+    permission:
+      columns:
+        - degreeCourseId
+        - userId
+        - ectsTotal
+        - attendedEventCount
+      filter: {}
+  - role: user_access
+    permission:
+      columns:
+        - degreeCourseId
+        - userId
+        - ectsTotal
+        - attendedEventCount
+      filter:
+        userId:
+          _eq: X-Hasura-User-Id

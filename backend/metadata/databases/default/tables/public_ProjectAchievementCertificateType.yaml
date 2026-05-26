@@ -1,0 +1,19 @@
+table:
+  name: ProjectAchievementCertificateType
+  schema: public
+is_enum: true
+array_relationships:
+  - name: Projects
+    using:
+      foreign_key_constraint_on:
+        column: achievementCertificateType
+        table:
+          name: Project
+          schema: public
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - value
+        - comment
+      filter: {}

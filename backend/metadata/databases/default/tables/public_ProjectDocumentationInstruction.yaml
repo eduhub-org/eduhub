@@ -1,0 +1,49 @@
+table:
+  name: ProjectDocumentationInstruction
+  schema: public
+object_relationships:
+  - name: ProjectType
+    using:
+      foreign_key_constraint_on: projectTypeValue
+array_relationships:
+  - name: Projects
+    using:
+      foreign_key_constraint_on:
+        column: documentationInstructionId
+        table:
+          name: Project
+          schema: public
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - id
+        - title
+        - url
+        - projectTypeValue
+        - isDefault
+        - created_at
+        - updated_at
+      filter: {}
+  - role: user_access
+    permission:
+      columns:
+        - id
+        - title
+        - url
+        - projectTypeValue
+        - isDefault
+        - created_at
+        - updated_at
+      filter: {}
+  - role: instructor_access
+    permission:
+      columns:
+        - id
+        - title
+        - url
+        - projectTypeValue
+        - isDefault
+        - created_at
+        - updated_at
+      filter: {}

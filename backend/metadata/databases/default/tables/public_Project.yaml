@@ -1,3 +1,327 @@
 table:
-  schema: public
   name: Project
+  schema: public
+object_relationships:
+  - name: Organization
+    using:
+      foreign_key_constraint_on: organizationId
+  - name: ParentProject
+    using:
+      foreign_key_constraint_on: parentProjectId
+  - name: ProjectAchievementCertificateType
+    using:
+      foreign_key_constraint_on: achievementCertificateType
+  - name: ProjectDocumentationInstruction
+    using:
+      foreign_key_constraint_on: documentationInstructionId
+  - name: ProjectRating
+    using:
+      foreign_key_constraint_on: rating
+  - name: ProjectStatus
+    using:
+      foreign_key_constraint_on: status
+  - name: ProjectType
+    using:
+      foreign_key_constraint_on: type
+  - name: ProposedByUser
+    using:
+      foreign_key_constraint_on: proposedByUserId
+  - name: SubmittedByUser
+    using:
+      foreign_key_constraint_on: submittedBy
+array_relationships:
+  - name: ChildProjects
+    using:
+      foreign_key_constraint_on:
+        column: parentProjectId
+        table:
+          name: Project
+          schema: public
+  - name: ProjectAuthors
+    using:
+      foreign_key_constraint_on:
+        column: projectId
+        table:
+          name: ProjectAuthor
+          schema: public
+  - name: ProjectCourses
+    using:
+      foreign_key_constraint_on:
+        column: projectId
+        table:
+          name: ProjectCourse
+          schema: public
+  - name: ProjectMentors
+    using:
+      foreign_key_constraint_on:
+        column: projectId
+        table:
+          name: ProjectMentor
+          schema: public
+insert_permissions:
+  - role: user_access
+    permission:
+      check:
+        _and:
+          - proposedByUserId:
+              _eq: X-Hasura-User-Id
+          - status:
+              _eq: PROPOSED
+      columns:
+        - achievementCertificateType
+        - acceptingParticipants
+        - coverImageUrl
+        - description
+        - documentationInstructionId
+        - documentationUrl
+        - externalUrl
+        - organizationId
+        - parentProjectId
+        - presentationUrl
+        - proposedByUserId
+        - status
+        - tagline
+        - title
+        - type
+  # Same rules as user_access self-propose; instructors no longer inherit user_access (see inherited_roles).
+  - role: instructor_access
+    permission:
+      check:
+        _and:
+          - proposedByUserId:
+              _eq: X-Hasura-User-Id
+          - status:
+              _eq: PROPOSED
+      columns:
+        - achievementCertificateType
+        - acceptingParticipants
+        - coverImageUrl
+        - description
+        - documentationInstructionId
+        - documentationUrl
+        - externalUrl
+        - organizationId
+        - parentProjectId
+        - presentationUrl
+        - proposedByUserId
+        - status
+        - tagline
+        - title
+        - type
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - acceptingParticipants
+        - achievementCertificateType
+        - coverImageUrl
+        - description
+        - documentationUrl
+        - externalUrl
+        - id
+        - organizationId
+        - presentationUrl
+        - status
+        - submissionDeadline
+        - submittedAt
+        - tagline
+        - title
+        - type
+      filter:
+        _or:
+          - status:
+              _eq: PUBLISHED
+          - _and:
+              - status:
+                  _eq: PROPOSED
+              - _not:
+                  ProjectAuthors:
+                    participationStatus:
+                      _eq: ACCEPTED
+  - role: instructor_access
+    permission:
+      columns:
+        - acceptingParticipants
+        - achievementCertificateType
+        - coverImageUrl
+        - created_at
+        - csvResults
+        - description
+        - documentationInstructionId
+        - documentationUrl
+        - externalUrl
+        - id
+        - organizationId
+        - parentProjectId
+        - presentationUrl
+        - proposedByUserId
+        - rating
+        - ratingComment
+        - status
+        - submissionDeadline
+        - submittedAt
+        - submittedBy
+        - projectReviewRequestedAt
+        - tagline
+        - title
+        - type
+        - updated_at
+      filter:
+        _or:
+          - ProjectCourses:
+              Course:
+                CourseInstructors:
+                  User:
+                    id:
+                      _eq: X-Hasura-User-Id
+          - ProjectMentors:
+              User:
+                id:
+                  _eq: X-Hasura-User-Id
+  - role: user_access
+    permission:
+      columns:
+        - acceptingParticipants
+        - achievementCertificateType
+        - coverImageUrl
+        - created_at
+        - csvResults
+        - description
+        - documentationInstructionId
+        - documentationUrl
+        - externalUrl
+        - id
+        - organizationId
+        - parentProjectId
+        - presentationUrl
+        - proposedByUserId
+        - rating
+        - ratingComment
+        - status
+        - submissionDeadline
+        - submittedAt
+        - submittedBy
+        - projectReviewRequestedAt
+        - tagline
+        - title
+        - type
+        - updated_at
+      filter:
+        _or:
+          - ProjectAuthors:
+              User:
+                id:
+                  _eq: X-Hasura-User-Id
+          - proposedByUserId:
+              _eq: X-Hasura-User-Id
+          - ProjectCourses:
+              Course:
+                CourseEnrollments:
+                  User:
+                    id:
+                      _eq: X-Hasura-User-Id
+update_permissions:
+  # Covers grading plus the same project fields instructors previously reached via merged user_access.
+  - role: instructor_access
+    permission:
+      columns:
+        - acceptingParticipants
+        - achievementCertificateType
+        - coverImageUrl
+        - description
+        - documentationInstructionId
+        - documentationUrl
+        - externalUrl
+        - presentationUrl
+        - rating
+        - ratingComment
+        - status
+        - submissionDeadline
+        - tagline
+        - title
+        - type
+      filter:
+        _or:
+          - ProjectCourses:
+              Course:
+                CourseInstructors:
+                  User:
+                    id:
+                      _eq: X-Hasura-User-Id
+          - ProjectMentors:
+              User:
+                id:
+                  _eq: X-Hasura-User-Id
+          - _and:
+              - status:
+                  _in:
+                    - PROPOSED
+                    - ONGOING
+              - ProjectAuthors:
+                  _and:
+                    - participationStatus:
+                        _eq: ACCEPTED
+                    - User:
+                        id:
+                          _eq: X-Hasura-User-Id
+      check: {}
+  # submittedBy is populated only via the server-side preset below; clients cannot write it.
+  # The set_project_submitted_metadata trigger clears submittedBy when status transitions out of SUBMITTED.
+  - role: user_access
+    permission:
+      columns:
+        - acceptingParticipants
+        - achievementCertificateType
+        - coverImageUrl
+        - description
+        - documentationInstructionId
+        - documentationUrl
+        - externalUrl
+        - presentationUrl
+        - status
+        - tagline
+        - projectReviewRequestedAt
+        - title
+        - type
+      set:
+        submittedBy: x-hasura-user-id
+      filter:
+        _or:
+          - ProjectCourses:
+              Course:
+                CourseInstructors:
+                  User:
+                    id:
+                      _eq: X-Hasura-User-Id
+          - ProjectMentors:
+              User:
+                id:
+                  _eq: X-Hasura-User-Id
+          - _and:
+              - status:
+                  _in:
+                    - PROPOSED
+                    - ONGOING
+              - ProjectAuthors:
+                  _and:
+                    - participationStatus:
+                        _eq: ACCEPTED
+                    - User:
+                        id:
+                          _eq: X-Hasura-User-Id
+      check: {}
+delete_permissions:
+  - role: instructor_access
+    permission:
+      filter:
+        _or:
+          - ProjectCourses:
+              Course:
+                CourseInstructors:
+                  User:
+                    id:
+                      _eq: X-Hasura-User-Id
+          - ProjectMentors:
+              User:
+                id:
+                  _eq: X-Hasura-User-Id

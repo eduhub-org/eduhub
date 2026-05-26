@@ -16,6 +16,8 @@ export type FileTypeCategory =
   | 'image'
   | 'pdf'
   | 'document'
+  | 'open_document_text'
+  | 'open_document_presentation'
   | 'spreadsheet'
   | 'csv'
   | 'presentation'
@@ -49,6 +51,7 @@ export const detectFileType = (fileUrl: string | null): FileTypeCategory => {
   if (extension === 'pdf') return 'pdf';
 
   // Documents
+  if (extension === 'odt') return 'open_document_text';
   if (['doc', 'docx'].includes(extension || '')) return 'document';
 
   // CSV files (generic spreadsheet format)
@@ -58,6 +61,7 @@ export const detectFileType = (fileUrl: string | null): FileTypeCategory => {
   if (['xls', 'xlsx'].includes(extension || '')) return 'spreadsheet';
 
   // Presentations
+  if (extension === 'odp') return 'open_document_presentation';
   if (['ppt', 'pptx'].includes(extension || '')) return 'presentation';
 
   // Archives
@@ -89,12 +93,16 @@ export const getFileIcon = (fileType: FileTypeCategory): FileIconInfo => {
       return { Icon: MdPictureAsPdf, color: 'text-red-600', labelKey: 'file_upload.file_type.pdf' };
     case 'document':
       return { Icon: MdDescription, color: 'text-blue-600', labelKey: 'file_upload.file_type.word_document' };
+    case 'open_document_text':
+      return { Icon: MdDescription, color: 'text-blue-600', labelKey: 'file_upload.file_type.open_document_text' };
     case 'spreadsheet':
       return { Icon: MdTableChart, color: 'text-green-600', labelKey: 'file_upload.file_type.excel_spreadsheet' };
     case 'csv':
       return { Icon: MdTableChart, color: 'text-green-600', labelKey: 'file_upload.file_type.spreadsheet' };
     case 'presentation':
       return { Icon: MdSlideshow, color: 'text-orange-600', labelKey: 'file_upload.file_type.powerpoint' };
+    case 'open_document_presentation':
+      return { Icon: MdSlideshow, color: 'text-orange-600', labelKey: 'file_upload.file_type.open_document_presentation' };
     case 'archive':
       return { Icon: MdArchive, color: 'text-amber-600', labelKey: 'file_upload.file_type.archive' };
     case 'code':
@@ -183,7 +191,8 @@ export const formatAcceptedTypes = (acceptedFileTypes: string): string => {
     }
   }
 
-  return types.length > 0 ? types.join(', ') : 'All file types';
+  const unique = [...new Set(types)];
+  return unique.length > 0 ? unique.join(', ') : 'All file types';
 };
 
 /**
@@ -226,6 +235,8 @@ export const normalizeAcceptedTypesToMime = (acceptedFileTypes: string): string[
     '.csv': 'text/csv',
     '.ppt': 'application/vnd.ms-powerpoint',
     '.pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    '.odt': 'application/vnd.oasis.opendocument.text',
+    '.odp': 'application/vnd.oasis.opendocument.presentation',
   };
 
   for (const part of parts) {

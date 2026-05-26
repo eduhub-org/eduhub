@@ -28,6 +28,12 @@ import { getBackgroundImage } from '../../../helpers/imageHandling';
 import { Attendances } from './Attendances';
 import { CertificateDownload } from '../../common/CertificateDownload';
 import AchievementRecord from './AchievementRecord';
+import Projects from './Projects';
+import {
+  resolveEffectiveCourseProjectSubmissionDeadline,
+  getCourseProjectSubmissionDefaultSource,
+  submissionDeadlineToIsoString,
+} from './Projects/projectEffectiveSubmissionDeadline';
 import { useIsCourseWithEnrollment } from '../../../hooks/course';
 import NotificationSnackbar from '../../common/dialogs/NotificationSnackbar';
 
@@ -202,8 +208,23 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                 isCourseWithEnrollment && // needed to assure the type of the course object
                 courseEnrollment?.status === CourseEnrollmentStatus_enum.CONFIRMED &&
                 (course.achievementCertificatePossible || course.attendanceCertificatePossible) && (
-                  <ContentRow className="my-24 text-label-primary bg-fill-primary light px-8 py-8">
-                    <div className="flex flex-col w-full min-w-0">
+                  <>
+                    {!isDegreeCourse && course.achievementCertificatePossible && (
+                      <Projects
+                        courseId={course.id}
+                        defaultProjectType={course.Program?.defaultProjectType ?? null}
+                        effectiveSubmissionDeadline={submissionDeadlineToIsoString(
+                          resolveEffectiveCourseProjectSubmissionDeadline(course)
+                        )}
+                        submissionDeadlineDefaultSource={getCourseProjectSubmissionDefaultSource(course)}
+                        proposalsEnabled={Boolean(
+                          course.projectProposalsEnabled ??
+                            course.Program?.projectProposalsEnabledByDefault
+                        )}
+                      />
+                    )}
+                    <ContentRow className="my-24 text-label-primary bg-fill-primary light px-8 py-8">
+                      <div className="flex flex-col w-full min-w-0">
                       {!isDegreeCourse && (
                         <div className="flex flex-col md:flex-row gap-12 md:gap-24 w-full">
                           <Attendances course={course} />
@@ -211,7 +232,9 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                             {!courseEnrollment?.achievementCertificateURL && (
                               <AchievementRecord
                                 courseId={course.id}
-                                achievementRecordUploadDeadline={course.Program?.achievementRecordUploadDeadline}
+                                achievementRecordUploadDeadline={resolveEffectiveCourseProjectSubmissionDeadline(
+                                  course
+                                )}
                                 courseTitle={course.title}
                               />
                             )}
@@ -229,6 +252,7 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                       )}
                     </div>
                   </ContentRow>
+                  </>
                 )}
               <ContentRow className="flex">
                 <PageBlock classname="flex-1 text-white space-y-6">

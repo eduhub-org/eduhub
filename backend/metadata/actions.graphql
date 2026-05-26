@@ -5,6 +5,20 @@ type Mutation {
 }
 
 type Mutation {
+  copyProjectFromTemplate(
+    parentProjectId: Int!
+    courseId: Int!
+  ): CopyProjectFromTemplateResult!
+}
+
+type CopyProjectFromTemplateResult {
+  success: Boolean!
+  messageKey: String!
+  error: String
+  projectId: Int
+}
+
+type Mutation {
   createCertificate(
     userIds: [uuid!]!
     courseId: Int!
@@ -165,6 +179,51 @@ type Mutation {
     filename: String!
     courseid: Int!
   ): saveImageResult
+}
+
+type Mutation {
+  saveProjectDocumentationInstruction(
+    base64file: String!
+    filename: String!
+    projectDocumentationInstructionId: Int!
+  ): saveFileResult
+}
+
+type Mutation {
+  setProjectDocumentationInstructionDefault(
+    instructionId: Int!
+  ): SetProjectDocumentationInstructionDefaultResult!
+}
+
+type SetProjectDocumentationInstructionDefaultResult {
+  success: Boolean!
+  messageKey: String!
+  error: String
+  projectTypeValue: String
+}
+
+type Mutation {
+  saveProjectImage(
+    base64file: String!
+    filename: String!
+    projectid: Int!
+  ): saveImageResult
+}
+
+type Mutation {
+  saveProjectDocumentation(
+    base64file: String!
+    filename: String!
+    projectid: Int!
+  ): saveFileResult
+}
+
+type Mutation {
+  saveProjectPresentation(
+    base64file: String!
+    filename: String!
+    projectid: Int!
+  ): saveFileResult
 }
 
 type Mutation {
