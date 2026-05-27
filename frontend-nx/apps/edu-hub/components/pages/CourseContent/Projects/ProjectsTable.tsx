@@ -348,7 +348,16 @@ const ProjectsTable: FC<ProjectsTableProps> = ({
     [courseDefaultSubmissionDeadline, submissionDeadlineDefaultSource]
   );
 
-  const showAddButton = proposalsEnabled && !hasMyProject && Boolean(userId);
+  const courseSubmissionDeadlinePassed = isProjectSubmissionDeadlinePassed(
+    null,
+    courseDefaultSubmissionDeadline
+  );
+
+  const showAddButton =
+    proposalsEnabled &&
+    !hasMyProject &&
+    Boolean(userId) &&
+    !courseSubmissionDeadlinePassed;
 
   return (
     <TableGrid<ProjectRow>
