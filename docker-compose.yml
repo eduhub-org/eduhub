@@ -172,6 +172,7 @@ services:
       KC_BOOTSTRAP_ADMIN_USERNAME: admin
       KC_BOOTSTRAP_ADMIN_PASSWORD: admin
       KC_HOSTNAME_STRICT: "false"
+      KC_HTTP_HOST: "0.0.0.0"
     volumes:
       - ./keycloak/imports-dev/master.json:/opt/keycloak/data/import/master.json
       - ./keycloak/imports-dev/edu-hub.json:/opt/keycloak/data/import/edu-hub.json

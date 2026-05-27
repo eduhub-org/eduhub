@@ -58,8 +58,25 @@ const DatePicker: React.FC<DatePickerProps> = ({
     await handleValueChange(date, dateFieldName);
   };
 
+  // Focus the inner input when the user clicks anywhere inside the bordered
+  // wrapper. Without this, clicks landing in the wrapper's padding (between
+  // the visible border and the input) hit a dead zone and the calendar does
+  // not open.
+  const handleWrapperClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (disabled) return;
+    const target = e.target as HTMLElement;
+    if (target.tagName === 'INPUT') return;
+    const input = e.currentTarget.querySelector('input');
+    input?.focus();
+  };
+
   const datePickerComponent = (
-    <div className="w-full inline-flex items-center border border-gray-300 rounded px-2 py-1 bg-white hover:border-gray-400 focus-within:border-blue-500 focus-within:outline-none focus-within:ring-1 focus-within:ring-blue-500 transition-colors">
+    <div
+      onClick={handleWrapperClick}
+      className={`w-full inline-flex items-center border border-gray-300 rounded px-2 py-1 bg-white hover:border-gray-400 focus-within:border-blue-500 focus-within:outline-none focus-within:ring-1 focus-within:ring-blue-500 transition-colors ${
+        disabled ? 'cursor-not-allowed' : 'cursor-text'
+      }`}
+    >
       <OptimisticDatePicker
         value={localValue}
         onChange={handleDateChange}

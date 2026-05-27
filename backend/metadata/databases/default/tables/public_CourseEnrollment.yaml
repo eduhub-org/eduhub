@@ -20,6 +20,16 @@ object_relationships:
   - name: User
     using:
       foreign_key_constraint_on: userId
+  - name: DegreeParticipationStats
+    using:
+      manual_configuration:
+        column_mapping:
+          courseId: degreeCourseId
+          userId: userId
+        insertion_order: null
+        remote_table:
+          name: DegreeParticipationStats
+          schema: public
 array_relationships:
   - name: CourseEnrollmentAddons
     using:

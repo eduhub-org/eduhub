@@ -15,27 +15,78 @@ insert_permissions:
   - role: instructor_access
     permission:
       check:
-        Project:
-          ProjectCourses:
-            Course:
-              CourseInstructors:
-                User:
-                  id:
-                    _eq: X-Hasura-User-Id
+        _or:
+          - Project:
+              ProjectCourses:
+                Course:
+                  CourseInstructors:
+                    User:
+                      id:
+                        _eq: X-Hasura-User-Id
+          - _and:
+              - participationStatus:
+                  _eq: REQUESTED
+              - Project:
+                  _and:
+                    - status:
+                        _eq: PROPOSED
+                    - acceptingParticipants:
+                        _eq: true
+                    - proposedByUserId:
+                        _neq: X-Hasura-User-Id
+                    - ProjectCourses:
+                        Course:
+                          CourseEnrollments:
+                            User:
+                              id:
+                                _eq: X-Hasura-User-Id
+      set:
+        userId: x-hasura-user-id
       columns:
         - participationStatus
         - projectId
         - userId
+  # Single user_access rule covers two flows; Hasura allows only one insert permission per role.
+  # 1) Self-proposed author: course participant proposes their own project and is added ACCEPTED in the
+  #    same nested insert (InsertSelfProposedProject).
+  # 2) Join request: course participant asks to join another user's open project as REQUESTED
+  #    (InsertProjectAuthorRequest).
+  # participationStatus must be supplied by the client; the check gates each branch so a user cannot
+  # claim ACCEPTED on a project they did not propose.
   - role: user_access
     permission:
       check:
-        Project:
-          acceptingParticipants:
-            _eq: true
+        _or:
+          - _and:
+              - participationStatus:
+                  _eq: ACCEPTED
+              - Project:
+                  _and:
+                    - proposedByUserId:
+                        _eq: X-Hasura-User-Id
+                    - status:
+                        _eq: PROPOSED
+          - _and:
+              - participationStatus:
+                  _eq: REQUESTED
+              - Project:
+                  _and:
+                    - status:
+                        _eq: PROPOSED
+                    - acceptingParticipants:
+                        _eq: true
+                    - proposedByUserId:
+                        _neq: X-Hasura-User-Id
+                    - ProjectCourses:
+                        Course:
+                          CourseEnrollments:
+                            User:
+                              id:
+                                _eq: X-Hasura-User-Id
       set:
         userId: x-hasura-user-id
-        participationStatus: REQUESTED
       columns:
+        - participationStatus
         - projectId
 select_permissions:
   - role: anonymous
@@ -108,14 +159,22 @@ update_permissions:
         - participationStatus
       filter:
         _or:
-          - Project:
-              ProjectAuthors:
+          # Same correlated EXISTS pattern as delete_permissions (Hasura v2.19 nested bug).
+          # Use _ceq + [$ , column]: plain _eq + {$: column} is rejected as PGInteger parse error.
+          - _exists:
+              _table:
+                name: ProjectAuthor
+                schema: public
+              _where:
                 _and:
+                  - projectId:
+                      _ceq:
+                        - $
+                        - projectId
                   - participationStatus:
                       _eq: ACCEPTED
-                  - User:
-                      id:
-                        _eq: X-Hasura-User-Id
+                  - userId:
+                      _eq: X-Hasura-User-Id
           - _and:
               - userId:
                   _eq: X-Hasura-User-Id
@@ -127,19 +186,48 @@ update_permissions:
                     ProjectAuthors:
                       participationStatus:
                         _eq: ACCEPTED
+          - Project:
+              ProjectCourses:
+                Course:
+                  CourseInstructors:
+                    User:
+                      id:
+                        _eq: X-Hasura-User-Id
       check: null
 delete_permissions:
   - role: user_access
     permission:
       filter:
         _or:
-          - userId:
-              _eq: X-Hasura-User-Id
-          - Project:
-              ProjectAuthors:
+          - _and:
+              - userId:
+                  _eq: X-Hasura-User-Id
+              - Project:
+                  status:
+                    _nin:
+                      - COMPLETED
+                      - INCOMPLETE
+                      - PUBLISHED
+          # Nested Project→ProjectAuthors correlation broke on Hasura v2.19 for deletes.
+          # Correlate EXISTS row via _ceq + [$ , column]: {_eq: {$: column}} hits PGInteger parse error.
+          - _exists:
+              _table:
+                name: ProjectAuthor
+                schema: public
+              _where:
                 _and:
+                  - projectId:
+                      _ceq:
+                        - $
+                        - projectId
                   - participationStatus:
                       _eq: ACCEPTED
-                  - User:
+                  - userId:
+                      _eq: X-Hasura-User-Id
+          - Project:
+              ProjectCourses:
+                Course:
+                  CourseInstructors:
+                    User:
                       id:
                         _eq: X-Hasura-User-Id

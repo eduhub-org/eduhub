@@ -1,11 +1,15 @@
 table:
-  name: ProjectDocumentationTemplate
+  name: ProjectDocumentationInstruction
   schema: public
+object_relationships:
+  - name: ProjectType
+    using:
+      foreign_key_constraint_on: projectTypeValue
 array_relationships:
   - name: Projects
     using:
       foreign_key_constraint_on:
-        column: documentationTemplateId
+        column: documentationInstructionId
         table:
           name: Project
           schema: public
@@ -16,6 +20,8 @@ select_permissions:
         - id
         - title
         - url
+        - projectTypeValue
+        - isDefault
         - created_at
         - updated_at
       filter: {}
@@ -25,6 +31,19 @@ select_permissions:
         - id
         - title
         - url
+        - projectTypeValue
+        - isDefault
+        - created_at
+        - updated_at
+      filter: {}
+  - role: instructor_access
+    permission:
+      columns:
+        - id
+        - title
+        - url
+        - projectTypeValue
+        - isDefault
         - created_at
         - updated_at
       filter: {}

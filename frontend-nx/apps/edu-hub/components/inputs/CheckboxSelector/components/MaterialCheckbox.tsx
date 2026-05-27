@@ -35,7 +35,10 @@ export const MaterialCheckbox: React.FC<MaterialCheckboxProps> = ({
           {label && <span className="text-base font-medium">{label}</span>}
         </label>
         {helpText && (
-          <Tooltip title={helpText} placement="top">
+          <Tooltip
+            title={<span className="block max-w-sm whitespace-pre-line text-xs leading-snug">{helpText}</span>}
+            placement="top"
+          >
             <IconButton
               size="small"
               aria-label={label ? `${label} help` : 'Field help'}

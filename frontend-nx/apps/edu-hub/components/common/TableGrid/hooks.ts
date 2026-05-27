@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useDebounce } from 'use-debounce';
 import { SortingState } from '@tanstack/react-table';
-import { BaseRow, BulkAction, UseTableGridProps } from './types';
+import { BaseRow, BulkAction, TableGridSortMapping, UseTableGridProps } from './types';
 import { mergeSortDirection } from './utils';
 
 const DEFAULT_SORT: Record<string, any>[] = [{ updated_at: 'desc' }];
@@ -23,9 +23,30 @@ function useStableValue<T>(value: T): T {
  * @param sortColumnMapper - Optional function to map column IDs to GraphQL field names or nested structures
  * @returns Hasura order_by format (e.g., [{ name: 'asc' }] or [{ Users_aggregate: { aggregate: { count: 'asc' } } }]) or empty array to clear sorting
  */
+function convertSortMappingToOrderBy(
+  mappedField: TableGridSortMapping,
+  sortDirection: string
+): Record<string, any>[] {
+  if (!mappedField) {
+    return [];
+  }
+
+  const mappedFields = Array.isArray(mappedField) ? mappedField : [mappedField];
+
+  return mappedFields.map((field) => {
+    if (typeof field === 'string') {
+      return {
+        [field]: sortDirection,
+      };
+    }
+
+    return mergeSortDirection(field, sortDirection);
+  });
+}
+
 function convertSortingToOrderBy(
   sorting: SortingState,
-  sortColumnMapper?: (columnId: string) => string | Record<string, any> | null
+  sortColumnMapper?: (columnId: string) => TableGridSortMapping
 ): Record<string, any>[] {
   if (!sorting || sorting.length === 0) {
     return [];
@@ -34,25 +55,10 @@ function convertSortingToOrderBy(
   const direction = (desc: boolean) => (desc ? 'desc' : 'asc');
 
   const orderBy = sorting
-    .map((sort) => {
+    .flatMap((sort) => {
       const columnId = sort.id;
       const mappedField = sortColumnMapper ? sortColumnMapper(columnId) : columnId;
-      
-      if (!mappedField) {
-        return null;
-      }
-
-      if (typeof mappedField === 'string') {
-        return {
-          [mappedField]: direction(sort.desc),
-        };
-      }
-
-      if (typeof mappedField === 'object' && mappedField !== null) {
-        return mergeSortDirection(mappedField, direction(sort.desc));
-      }
-
-      return null;
+      return convertSortMappingToOrderBy(mappedField, direction(sort.desc));
     })
     .filter((orderBy): orderBy is Record<string, any> => orderBy !== null);
 

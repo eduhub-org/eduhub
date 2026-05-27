@@ -6,8 +6,11 @@ import { useTranslations } from 'next-intl';
 interface QuestionConfirmationDialogProps {
   open: boolean;
   question: string;
+  /** Dialog title (defaults to common.confirmation). */
+  title?: string;
   confirmationText?: string;
   cancelText?: string;
+  confirmDisabled?: boolean;
   onClose: () => void;
   onConfirm: () => void;
   onCancel?: () => void;
@@ -16,8 +19,10 @@ interface QuestionConfirmationDialogProps {
 export const QuestionConfirmationDialog: React.FC<QuestionConfirmationDialogProps> = ({
   open,
   question,
+  title,
   confirmationText,
   cancelText,
+  confirmDisabled,
   onClose,
   onConfirm,
   onCancel,
@@ -30,7 +35,7 @@ export const QuestionConfirmationDialog: React.FC<QuestionConfirmationDialogProp
         <Button onClick={onCancel || onClose}>{cancelText || t('cancel')}</Button>
       </div>
       <div className="flex justify-end">
-        <Button filled onClick={onConfirm}>
+        <Button filled onClick={onConfirm} disabled={confirmDisabled}>
           {confirmationText || t('confirm')}
         </Button>
       </div>
@@ -41,7 +46,7 @@ export const QuestionConfirmationDialog: React.FC<QuestionConfirmationDialogProp
     <DialogShell
       open={open}
       onClose={onClose}
-      title={t('confirmation')}
+      title={title ?? t('confirmation')}
       ariaLabelledBy="confirmation-dialog-title"
       actions={actions}
     >

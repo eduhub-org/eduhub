@@ -2,6 +2,9 @@ table:
   name: Program
   schema: public
 object_relationships:
+  - name: DefaultProjectType
+    using:
+      foreign_key_constraint_on: defaultProjectType
   - name: Organization
     using:
       foreign_key_constraint_on: organizationId
@@ -30,6 +33,9 @@ select_permissions:
         - achievementRecordUploadDeadline
         - applicationStart
         - defaultApplicationEnd
+        - defaultProjectSubmissionDeadline
+        - defaultProjectType
+        - projectProposalsEnabledByDefault
         - showExtendedApplicationPeriodBanner
         - id
         - lectureEnd
@@ -53,6 +59,9 @@ select_permissions:
         - closingQuestionnaire
         - defaultApplicationEnd
         - defaultMaxMissedSessions
+        - defaultProjectSubmissionDeadline
+        - defaultProjectType
+        - projectProposalsEnabledByDefault
         - id
         - lectureEnd
         - lectureStart

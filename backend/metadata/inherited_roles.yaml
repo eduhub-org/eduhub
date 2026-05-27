@@ -1,6 +1,8 @@
+# Instructors must not inherit user_access: Hasura cannot merge inherited permissions when
+# ProjectAuthor insert presets conflict (student join-request vs instructor add-author).
+# Instructors acting as course participants should use JWT role `user` (then user_access applies).
 - role_name: instructor
   role_set:
-    - user_access
     - instructor_access
     - anonymous
 - role_name: user

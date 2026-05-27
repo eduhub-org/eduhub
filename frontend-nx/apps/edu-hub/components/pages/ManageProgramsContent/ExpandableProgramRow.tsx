@@ -1,9 +1,10 @@
-import { FC, useCallback, useState } from 'react';
+import { FC, useCallback, useMemo, useState } from 'react';
 import { CircularProgress } from '@mui/material';
 import { useTranslations } from 'next-intl';
-import { useLazyRoleQuery } from '../../../hooks/authedQuery';
+import { useLazyRoleQuery, useRoleQuery } from '../../../hooks/authedQuery';
 import { useAdminMutation } from '../../../hooks/authedMutation';
 import { ProgramList_Program } from '../../../queries/__generated__/ProgramList';
+import { ProjectTypes } from '../../../queries/__generated__/ProjectTypes';
 import {
   SAVE_ACHIEVEMENT_CERTIFICATE_TEMPLATE,
   SAVE_ATTENDANCE_CERTIFICATE_TEMPLATE,
@@ -19,8 +20,14 @@ import {
   UPDATE_PROGRAM_SHORT_TITLE,
   UPDATE_PROGRAM_MATRIX_INSTRUCTOR_ROOM,
   UPDATE_PROGRAM_SHOW_EXTENDED_APPLICATION_PERIOD_BANNER,
+  UPDATE_PROGRAM_DEFAULT_PROJECT_SUBMISSION_DEADLINE,
+  UPDATE_PROGRAM_DEFAULT_PROJECT_TYPE,
+  UPDATE_PROGRAM_PROJECT_PROPOSALS_ENABLED_BY_DEFAULT,
 } from '../../../queries/updateProgram';
+import { PROJECT_TYPES } from '../../../queries/project';
 import CheckboxSelector from '../../inputs/CheckboxSelector';
+import DropDownSelector from '../../inputs/DropDownSelector';
+import DatePicker from '../../inputs/DatePicker';
 import { SYNC_PROGRAM_INSTRUCTOR_MATRIX_ROOM } from '../../../queries/syncProgramInstructorMatrixRoom';
 import {
   SyncProgramInstructorMatrixRoom,
@@ -35,6 +42,7 @@ import InputField from '../../inputs/InputField';
 import { Button } from '../../common/Button';
 import FileUploadField from '../../inputs/FileUploadField';
 import NotificationSnackbar from '../../common/dialogs/NotificationSnackbar';
+import { submissionDeadlineToCalendarDate } from '../CourseContent/Projects/projectEffectiveSubmissionDeadline';
 interface ExpandableProgramRowProps {
   program: ProgramList_Program;
 }
@@ -45,6 +53,21 @@ const ExpandableProgramRow: FC<ExpandableProgramRowProps> = ({ program }) => {
     open: false,
     message: '',
   });
+
+  const { data: projectTypesData } = useRoleQuery<ProjectTypes>(PROJECT_TYPES);
+  const projectTypeOptions = useMemo(
+    () =>
+      (projectTypesData?.ProjectType ?? []).map((pt) => ({
+        value: pt.value,
+        label: t(`project_defaults.type_options.${pt.value}`),
+      })),
+    [projectTypesData?.ProjectType, t]
+  );
+
+  const defaultProjectSubmissionDeadline = useMemo(
+    () => submissionDeadlineToCalendarDate(program.defaultProjectSubmissionDeadline),
+    [program.defaultProjectSubmissionDeadline]
+  );
 
   const [syncProgramInstructorRoom, { loading: syncLoading }] = useAdminMutation<
     SyncProgramInstructorMatrixRoom,
@@ -175,6 +198,43 @@ const ExpandableProgramRow: FC<ExpandableProgramRowProps> = ({ program }) => {
                 checked={Boolean(program.showExtendedApplicationPeriodBanner)}
                 updateValueMutation={UPDATE_PROGRAM_SHOW_EXTENDED_APPLICATION_PERIOD_BANNER}
                 identifierVariables={{ programId: program.id }}
+                refetchQueries={['ProgramList']}
+              />
+            </div>
+
+            {/* Project defaults */}
+            <div className="bg-fill-primary border border-border-primary rounded-lg p-4 space-y-4">
+              <h4 className="text-sm font-medium text-label-primary mb-1">
+                {t('project_defaults.section_title')}
+              </h4>
+              <CheckboxSelector
+                variant="material"
+                label={t('project_defaults.proposals_enabled_by_default.label')}
+                helpText={t('project_defaults.proposals_enabled_by_default.help_text')}
+                checked={Boolean(program.projectProposalsEnabledByDefault)}
+                updateValueMutation={UPDATE_PROGRAM_PROJECT_PROPOSALS_ENABLED_BY_DEFAULT}
+                identifierVariables={{ programId: program.id }}
+                refetchQueries={['ProgramList']}
+              />
+              <DropDownSelector
+                variant="material"
+                label={t('project_defaults.default_project_type.label')}
+                helpText={t('project_defaults.default_project_type.help_text')}
+                value={program.defaultProjectType ?? ''}
+                options={projectTypeOptions}
+                updateValueMutation={UPDATE_PROGRAM_DEFAULT_PROJECT_TYPE}
+                identifierVariables={{ itemId: program.id }}
+                refetchQueries={['ProgramList']}
+              />
+              <DatePicker
+                variant="material"
+                label={t('project_defaults.default_submission_deadline.label')}
+                helpText={t('project_defaults.default_submission_deadline.help_text')}
+                itemId={program.id}
+                value={defaultProjectSubmissionDeadline}
+                updateValueMutation={UPDATE_PROGRAM_DEFAULT_PROJECT_SUBMISSION_DEADLINE}
+                identifierVariables={{ itemId: program.id }}
+                dateFieldName="value"
                 refetchQueries={['ProgramList']}
               />
             </div>

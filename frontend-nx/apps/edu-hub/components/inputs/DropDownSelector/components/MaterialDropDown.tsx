@@ -52,7 +52,7 @@ export const MaterialDropDown: React.FC<MaterialDropDownProps> = ({
     <div className="col-span-10 flex mt-3">
       <FormControl variant="standard" className={hasBlurred && errorMessage ? 'w-3/4' : 'w-full'}>
         {label && (
-          <InputLabel id={`${label}-label`}>
+          <InputLabel id={`${label}-label`} shrink>
             {label}
           </InputLabel>
         )}
@@ -75,6 +75,7 @@ export const MaterialDropDown: React.FC<MaterialDropDownProps> = ({
         ) : (
           <Select
             labelId={label ? `${label}-label` : undefined}
+            label={label}
             value={localValue}
             onChange={handleChange}
             onBlur={onBlur}
@@ -114,7 +115,10 @@ export const MaterialDropDown: React.FC<MaterialDropDownProps> = ({
             endAdornment={
               helpText && (
                 <InputAdornment position="end">
-                  <Tooltip title={helpText} placement="top">
+                  <Tooltip
+                    title={<span className="block max-w-sm whitespace-pre-line text-xs leading-snug">{helpText}</span>}
+                    placement="top"
+                  >
                     <HelpOutline
                       style={{
                         cursor: 'pointer',

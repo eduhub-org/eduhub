@@ -843,6 +843,8 @@ export enum Course_select_column {
   maxMissedSessions = "maxMissedSessions",
   maxParticipants = "maxParticipants",
   programId = "programId",
+  projectProposalsEnabled = "projectProposalsEnabled",
+  projectSubmissionDeadline = "projectSubmissionDeadline",
   published = "published",
   registrationType = "registrationType",
   startTime = "startTime",
@@ -861,6 +863,7 @@ export enum Course_select_column {
 export enum Course_select_column_Course_aggregate_bool_exp_bool_and_arguments_columns {
   achievementCertificatePossible = "achievementCertificatePossible",
   attendanceCertificatePossible = "attendanceCertificatePossible",
+  projectProposalsEnabled = "projectProposalsEnabled",
   published = "published",
 }
 
@@ -870,6 +873,7 @@ export enum Course_select_column_Course_aggregate_bool_exp_bool_and_arguments_co
 export enum Course_select_column_Course_aggregate_bool_exp_bool_or_arguments_columns {
   achievementCertificatePossible = "achievementCertificatePossible",
   attendanceCertificatePossible = "attendanceCertificatePossible",
+  projectProposalsEnabled = "projectProposalsEnabled",
   published = "published",
 }
 
@@ -901,6 +905,8 @@ export enum Course_update_column {
   maxMissedSessions = "maxMissedSessions",
   maxParticipants = "maxParticipants",
   programId = "programId",
+  projectProposalsEnabled = "projectProposalsEnabled",
+  projectSubmissionDeadline = "projectSubmissionDeadline",
   published = "published",
   registrationType = "registrationType",
   startTime = "startTime",
@@ -1377,12 +1383,15 @@ export enum Program_select_column {
   defaultApplicationEnd = "defaultApplicationEnd",
   defaultFormbricksEnrollmentSurveyUrl = "defaultFormbricksEnrollmentSurveyUrl",
   defaultMaxMissedSessions = "defaultMaxMissedSessions",
+  defaultProjectSubmissionDeadline = "defaultProjectSubmissionDeadline",
+  defaultProjectType = "defaultProjectType",
   id = "id",
   lectureEnd = "lectureEnd",
   lectureStart = "lectureStart",
   matrixInstructorRoomId = "matrixInstructorRoomId",
   matrixSpaceId = "matrixSpaceId",
   organizationId = "organizationId",
+  projectProposalsEnabledByDefault = "projectProposalsEnabledByDefault",
   published = "published",
   shortTitle = "shortTitle",
   showExtendedApplicationPeriodBanner = "showExtendedApplicationPeriodBanner",
@@ -1397,6 +1406,7 @@ export enum Program_select_column {
  * select "Program_aggregate_bool_exp_bool_and_arguments_columns" columns of table "Program"
  */
 export enum Program_select_column_Program_aggregate_bool_exp_bool_and_arguments_columns {
+  projectProposalsEnabledByDefault = "projectProposalsEnabledByDefault",
   published = "published",
   showExtendedApplicationPeriodBanner = "showExtendedApplicationPeriodBanner",
   visibility = "visibility",
@@ -1406,6 +1416,7 @@ export enum Program_select_column_Program_aggregate_bool_exp_bool_and_arguments_
  * select "Program_aggregate_bool_exp_bool_or_arguments_columns" columns of table "Program"
  */
 export enum Program_select_column_Program_aggregate_bool_exp_bool_or_arguments_columns {
+  projectProposalsEnabledByDefault = "projectProposalsEnabledByDefault",
   published = "published",
   showExtendedApplicationPeriodBanner = "showExtendedApplicationPeriodBanner",
   visibility = "visibility",
@@ -1425,12 +1436,15 @@ export enum Program_update_column {
   defaultApplicationEnd = "defaultApplicationEnd",
   defaultFormbricksEnrollmentSurveyUrl = "defaultFormbricksEnrollmentSurveyUrl",
   defaultMaxMissedSessions = "defaultMaxMissedSessions",
+  defaultProjectSubmissionDeadline = "defaultProjectSubmissionDeadline",
+  defaultProjectType = "defaultProjectType",
   id = "id",
   lectureEnd = "lectureEnd",
   lectureStart = "lectureStart",
   matrixInstructorRoomId = "matrixInstructorRoomId",
   matrixSpaceId = "matrixSpaceId",
   organizationId = "organizationId",
+  projectProposalsEnabledByDefault = "projectProposalsEnabledByDefault",
   published = "published",
   shortTitle = "shortTitle",
   showExtendedApplicationPeriodBanner = "showExtendedApplicationPeriodBanner",
@@ -1524,19 +1538,49 @@ export enum ProjectCourse_update_column {
 }
 
 /**
- * unique or primary key constraints on table "ProjectDocumentationTemplate"
+ * unique or primary key constraints on table "ProjectDocumentationInstruction"
  */
-export enum ProjectDocumentationTemplate_constraint {
-  ProjectDocumentationTemplate_pkey = "ProjectDocumentationTemplate_pkey",
-  ProjectDocumentationTemplate_title_key = "ProjectDocumentationTemplate_title_key",
+export enum ProjectDocumentationInstruction_constraint {
+  ProjectDocumentationInstruction_one_default_per_type = "ProjectDocumentationInstruction_one_default_per_type",
+  ProjectDocumentationInstruction_pkey = "ProjectDocumentationInstruction_pkey",
+  ProjectDocumentationInstruction_title_key = "ProjectDocumentationInstruction_title_key",
 }
 
 /**
- * update columns of table "ProjectDocumentationTemplate"
+ * select columns of table "ProjectDocumentationInstruction"
  */
-export enum ProjectDocumentationTemplate_update_column {
+export enum ProjectDocumentationInstruction_select_column {
   created_at = "created_at",
   id = "id",
+  isDefault = "isDefault",
+  projectTypeValue = "projectTypeValue",
+  title = "title",
+  updated_at = "updated_at",
+  url = "url",
+}
+
+/**
+ * select "ProjectDocumentationInstruction_aggregate_bool_exp_bool_and_arguments_columns" columns of table "ProjectDocumentationInstruction"
+ */
+export enum ProjectDocumentationInstruction_select_column_ProjectDocumentationInstruction_aggregate_bool_exp_bool_and_arguments_columns {
+  isDefault = "isDefault",
+}
+
+/**
+ * select "ProjectDocumentationInstruction_aggregate_bool_exp_bool_or_arguments_columns" columns of table "ProjectDocumentationInstruction"
+ */
+export enum ProjectDocumentationInstruction_select_column_ProjectDocumentationInstruction_aggregate_bool_exp_bool_or_arguments_columns {
+  isDefault = "isDefault",
+}
+
+/**
+ * update columns of table "ProjectDocumentationInstruction"
+ */
+export enum ProjectDocumentationInstruction_update_column {
+  created_at = "created_at",
+  id = "id",
+  isDefault = "isDefault",
+  projectTypeValue = "projectTypeValue",
   title = "title",
   updated_at = "updated_at",
   url = "url",
@@ -1581,6 +1625,7 @@ export enum ProjectParticipationStatus_constraint {
 
 export enum ProjectParticipationStatus_enum {
   ACCEPTED = "ACCEPTED",
+  DECLINED = "DECLINED",
   REQUESTED = "REQUESTED",
 }
 
@@ -1651,7 +1696,6 @@ export enum ProjectType_update_column {
   comment = "comment",
   requiresCoverImage = "requiresCoverImage",
   requiresDocumentation = "requiresDocumentation",
-  requiresEvaluationScript = "requiresEvaluationScript",
   requiresExternalUrl = "requiresExternalUrl",
   requiresPresentation = "requiresPresentation",
   value = "value",
@@ -1674,18 +1718,21 @@ export enum Project_select_column {
   created_at = "created_at",
   csvResults = "csvResults",
   description = "description",
-  documentationTemplateId = "documentationTemplateId",
+  documentationInstructionId = "documentationInstructionId",
   documentationUrl = "documentationUrl",
-  evaluationScriptUrl = "evaluationScriptUrl",
   externalUrl = "externalUrl",
   id = "id",
   organizationId = "organizationId",
   parentProjectId = "parentProjectId",
   presentationUrl = "presentationUrl",
+  projectReviewRequestedAt = "projectReviewRequestedAt",
   proposedByUserId = "proposedByUserId",
   rating = "rating",
-  score = "score",
+  ratingComment = "ratingComment",
   status = "status",
+  submissionDeadline = "submissionDeadline",
+  submittedAt = "submittedAt",
+  submittedBy = "submittedBy",
   tagline = "tagline",
   title = "title",
   type = "type",
@@ -1716,18 +1763,21 @@ export enum Project_update_column {
   created_at = "created_at",
   csvResults = "csvResults",
   description = "description",
-  documentationTemplateId = "documentationTemplateId",
+  documentationInstructionId = "documentationInstructionId",
   documentationUrl = "documentationUrl",
-  evaluationScriptUrl = "evaluationScriptUrl",
   externalUrl = "externalUrl",
   id = "id",
   organizationId = "organizationId",
   parentProjectId = "parentProjectId",
   presentationUrl = "presentationUrl",
+  projectReviewRequestedAt = "projectReviewRequestedAt",
   proposedByUserId = "proposedByUserId",
   rating = "rating",
-  score = "score",
+  ratingComment = "ratingComment",
   status = "status",
+  submissionDeadline = "submissionDeadline",
+  submittedAt = "submittedAt",
+  submittedBy = "submittedBy",
   tagline = "tagline",
   title = "title",
   type = "type",
@@ -4608,6 +4658,7 @@ export interface CourseEnrollment_bool_exp {
   CourseEnrollmentAddons?: CourseEnrollmentAddon_bool_exp | null;
   CourseEnrollmentAddons_aggregate?: CourseEnrollmentAddon_aggregate_bool_exp | null;
   CourseEnrollmentStatus?: CourseEnrollmentStatus_bool_exp | null;
+  DegreeParticipationStats?: DegreeParticipationStats_bool_exp | null;
   Invoices?: Invoice_bool_exp | null;
   Invoices_aggregate?: Invoice_aggregate_bool_exp | null;
   LocationOption?: LocationOption_bool_exp | null;
@@ -4640,6 +4691,7 @@ export interface CourseEnrollment_insert_input {
   Course?: Course_obj_rel_insert_input | null;
   CourseEnrollmentAddons?: CourseEnrollmentAddon_arr_rel_insert_input | null;
   CourseEnrollmentStatus?: CourseEnrollmentStatus_obj_rel_insert_input | null;
+  DegreeParticipationStats?: DegreeParticipationStats_obj_rel_insert_input | null;
   Invoices?: Invoice_arr_rel_insert_input | null;
   LocationOption?: LocationOption_obj_rel_insert_input | null;
   MotivationRating?: MotivationRating_obj_rel_insert_input | null;
@@ -4719,6 +4771,7 @@ export interface CourseEnrollment_order_by {
   Course?: Course_order_by | null;
   CourseEnrollmentAddons_aggregate?: CourseEnrollmentAddon_aggregate_order_by | null;
   CourseEnrollmentStatus?: CourseEnrollmentStatus_order_by | null;
+  DegreeParticipationStats?: DegreeParticipationStats_order_by | null;
   Invoices_aggregate?: Invoice_aggregate_order_by | null;
   LocationOption?: LocationOption_order_by | null;
   MotivationRating?: MotivationRating_order_by | null;
@@ -5778,6 +5831,8 @@ export interface Course_bool_exp {
   maxMissedSessions?: Int_comparison_exp | null;
   maxParticipants?: Int_comparison_exp | null;
   programId?: Int_comparison_exp | null;
+  projectProposalsEnabled?: Boolean_comparison_exp | null;
+  projectSubmissionDeadline?: timestamptz_comparison_exp | null;
   published?: Boolean_comparison_exp | null;
   registrationType?: CourseRegistrationType_enum_comparison_exp | null;
   startTime?: time_comparison_exp | null;
@@ -5834,6 +5889,8 @@ export interface Course_insert_input {
   maxMissedSessions?: number | null;
   maxParticipants?: number | null;
   programId?: number | null;
+  projectProposalsEnabled?: boolean | null;
+  projectSubmissionDeadline?: any | null;
   published?: boolean | null;
   registrationType?: CourseRegistrationType_enum | null;
   startTime?: any | null;
@@ -5871,6 +5928,7 @@ export interface Course_max_order_by {
   maxMissedSessions?: order_by | null;
   maxParticipants?: order_by | null;
   programId?: order_by | null;
+  projectSubmissionDeadline?: order_by | null;
   stripePriceId?: order_by | null;
   stripeProductId?: order_by | null;
   tagline?: order_by | null;
@@ -5903,6 +5961,7 @@ export interface Course_min_order_by {
   maxMissedSessions?: order_by | null;
   maxParticipants?: order_by | null;
   programId?: order_by | null;
+  projectSubmissionDeadline?: order_by | null;
   stripePriceId?: order_by | null;
   stripeProductId?: order_by | null;
   tagline?: order_by | null;
@@ -5972,6 +6031,8 @@ export interface Course_order_by {
   maxMissedSessions?: order_by | null;
   maxParticipants?: order_by | null;
   programId?: order_by | null;
+  projectProposalsEnabled?: order_by | null;
+  projectSubmissionDeadline?: order_by | null;
   published?: order_by | null;
   registrationType?: order_by | null;
   startTime?: order_by | null;
@@ -6012,6 +6073,8 @@ export interface Course_set_input {
   maxMissedSessions?: number | null;
   maxParticipants?: number | null;
   programId?: number | null;
+  projectProposalsEnabled?: boolean | null;
+  projectSubmissionDeadline?: any | null;
   published?: boolean | null;
   registrationType?: CourseRegistrationType_enum | null;
   startTime?: any | null;
@@ -6099,6 +6162,46 @@ export interface Course_variance_order_by {
   maxMissedSessions?: order_by | null;
   maxParticipants?: order_by | null;
   programId?: order_by | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "DegreeParticipationStats". All fields are combined with a logical 'AND'.
+ */
+export interface DegreeParticipationStats_bool_exp {
+  _and?: DegreeParticipationStats_bool_exp[] | null;
+  _not?: DegreeParticipationStats_bool_exp | null;
+  _or?: DegreeParticipationStats_bool_exp[] | null;
+  attendedEventCount?: bigint_comparison_exp | null;
+  degreeCourseId?: Int_comparison_exp | null;
+  ectsTotal?: numeric_comparison_exp | null;
+  userId?: uuid_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "DegreeParticipationStats"
+ */
+export interface DegreeParticipationStats_insert_input {
+  attendedEventCount?: any | null;
+  degreeCourseId?: number | null;
+  ectsTotal?: any | null;
+  userId?: any | null;
+}
+
+/**
+ * input type for inserting object relation for remote table "DegreeParticipationStats"
+ */
+export interface DegreeParticipationStats_obj_rel_insert_input {
+  data: DegreeParticipationStats_insert_input;
+}
+
+/**
+ * Ordering options when selecting data from "DegreeParticipationStats".
+ */
+export interface DegreeParticipationStats_order_by {
+  attendedEventCount?: order_by | null;
+  degreeCourseId?: order_by | null;
+  ectsTotal?: order_by | null;
+  userId?: order_by | null;
 }
 
 /**
@@ -7797,6 +7900,7 @@ export interface Program_bool_exp {
   CertificateTemplatePrograms_aggregate?: CertificateTemplateProgram_aggregate_bool_exp | null;
   Courses?: Course_bool_exp | null;
   Courses_aggregate?: Course_aggregate_bool_exp | null;
+  DefaultProjectType?: ProjectType_bool_exp | null;
   Organization?: Organization_bool_exp | null;
   ProgramType?: ProgramType_bool_exp | null;
   _and?: Program_bool_exp[] | null;
@@ -7812,12 +7916,15 @@ export interface Program_bool_exp {
   defaultApplicationEnd?: date_comparison_exp | null;
   defaultFormbricksEnrollmentSurveyUrl?: String_comparison_exp | null;
   defaultMaxMissedSessions?: Int_comparison_exp | null;
+  defaultProjectSubmissionDeadline?: timestamptz_comparison_exp | null;
+  defaultProjectType?: String_comparison_exp | null;
   id?: Int_comparison_exp | null;
   lectureEnd?: date_comparison_exp | null;
   lectureStart?: date_comparison_exp | null;
   matrixInstructorRoomId?: String_comparison_exp | null;
   matrixSpaceId?: String_comparison_exp | null;
   organizationId?: Int_comparison_exp | null;
+  projectProposalsEnabledByDefault?: Boolean_comparison_exp | null;
   published?: Boolean_comparison_exp | null;
   shortTitle?: String_comparison_exp | null;
   showExtendedApplicationPeriodBanner?: Boolean_comparison_exp | null;
@@ -7834,6 +7941,7 @@ export interface Program_bool_exp {
 export interface Program_insert_input {
   CertificateTemplatePrograms?: CertificateTemplateProgram_arr_rel_insert_input | null;
   Courses?: Course_arr_rel_insert_input | null;
+  DefaultProjectType?: ProjectType_obj_rel_insert_input | null;
   Organization?: Organization_obj_rel_insert_input | null;
   ProgramType?: ProgramType_obj_rel_insert_input | null;
   achievementCertificateTemplateTextId?: number | null;
@@ -7846,12 +7954,15 @@ export interface Program_insert_input {
   defaultApplicationEnd?: any | null;
   defaultFormbricksEnrollmentSurveyUrl?: string | null;
   defaultMaxMissedSessions?: number | null;
+  defaultProjectSubmissionDeadline?: any | null;
+  defaultProjectType?: string | null;
   id?: number | null;
   lectureEnd?: any | null;
   lectureStart?: any | null;
   matrixInstructorRoomId?: string | null;
   matrixSpaceId?: string | null;
   organizationId?: number | null;
+  projectProposalsEnabledByDefault?: boolean | null;
   published?: boolean | null;
   shortTitle?: string | null;
   showExtendedApplicationPeriodBanner?: boolean | null;
@@ -7876,6 +7987,8 @@ export interface Program_max_order_by {
   defaultApplicationEnd?: order_by | null;
   defaultFormbricksEnrollmentSurveyUrl?: order_by | null;
   defaultMaxMissedSessions?: order_by | null;
+  defaultProjectSubmissionDeadline?: order_by | null;
+  defaultProjectType?: order_by | null;
   id?: order_by | null;
   lectureEnd?: order_by | null;
   lectureStart?: order_by | null;
@@ -7902,6 +8015,8 @@ export interface Program_min_order_by {
   defaultApplicationEnd?: order_by | null;
   defaultFormbricksEnrollmentSurveyUrl?: order_by | null;
   defaultMaxMissedSessions?: order_by | null;
+  defaultProjectSubmissionDeadline?: order_by | null;
+  defaultProjectType?: order_by | null;
   id?: order_by | null;
   lectureEnd?: order_by | null;
   lectureStart?: order_by | null;
@@ -7937,6 +8052,7 @@ export interface Program_on_conflict {
 export interface Program_order_by {
   CertificateTemplatePrograms_aggregate?: CertificateTemplateProgram_aggregate_order_by | null;
   Courses_aggregate?: Course_aggregate_order_by | null;
+  DefaultProjectType?: ProjectType_order_by | null;
   Organization?: Organization_order_by | null;
   ProgramType?: ProgramType_order_by | null;
   achievementCertificateTemplateTextId?: order_by | null;
@@ -7949,12 +8065,15 @@ export interface Program_order_by {
   defaultApplicationEnd?: order_by | null;
   defaultFormbricksEnrollmentSurveyUrl?: order_by | null;
   defaultMaxMissedSessions?: order_by | null;
+  defaultProjectSubmissionDeadline?: order_by | null;
+  defaultProjectType?: order_by | null;
   id?: order_by | null;
   lectureEnd?: order_by | null;
   lectureStart?: order_by | null;
   matrixInstructorRoomId?: order_by | null;
   matrixSpaceId?: order_by | null;
   organizationId?: order_by | null;
+  projectProposalsEnabledByDefault?: order_by | null;
   published?: order_by | null;
   shortTitle?: order_by | null;
   showExtendedApplicationPeriodBanner?: order_by | null;
@@ -8424,49 +8543,202 @@ export interface ProjectCourse_variance_order_by {
   projectId?: order_by | null;
 }
 
+export interface ProjectDocumentationInstruction_aggregate_bool_exp {
+  bool_and?: ProjectDocumentationInstruction_aggregate_bool_exp_bool_and | null;
+  bool_or?: ProjectDocumentationInstruction_aggregate_bool_exp_bool_or | null;
+  count?: ProjectDocumentationInstruction_aggregate_bool_exp_count | null;
+}
+
+export interface ProjectDocumentationInstruction_aggregate_bool_exp_bool_and {
+  arguments: ProjectDocumentationInstruction_select_column_ProjectDocumentationInstruction_aggregate_bool_exp_bool_and_arguments_columns;
+  distinct?: boolean | null;
+  filter?: ProjectDocumentationInstruction_bool_exp | null;
+  predicate: Boolean_comparison_exp;
+}
+
+export interface ProjectDocumentationInstruction_aggregate_bool_exp_bool_or {
+  arguments: ProjectDocumentationInstruction_select_column_ProjectDocumentationInstruction_aggregate_bool_exp_bool_or_arguments_columns;
+  distinct?: boolean | null;
+  filter?: ProjectDocumentationInstruction_bool_exp | null;
+  predicate: Boolean_comparison_exp;
+}
+
+export interface ProjectDocumentationInstruction_aggregate_bool_exp_count {
+  arguments?: ProjectDocumentationInstruction_select_column[] | null;
+  distinct?: boolean | null;
+  filter?: ProjectDocumentationInstruction_bool_exp | null;
+  predicate: Int_comparison_exp;
+}
+
 /**
- * Boolean expression to filter rows from the table "ProjectDocumentationTemplate". All fields are combined with a logical 'AND'.
+ * order by aggregate values of table "ProjectDocumentationInstruction"
  */
-export interface ProjectDocumentationTemplate_bool_exp {
+export interface ProjectDocumentationInstruction_aggregate_order_by {
+  avg?: ProjectDocumentationInstruction_avg_order_by | null;
+  count?: order_by | null;
+  max?: ProjectDocumentationInstruction_max_order_by | null;
+  min?: ProjectDocumentationInstruction_min_order_by | null;
+  stddev?: ProjectDocumentationInstruction_stddev_order_by | null;
+  stddev_pop?: ProjectDocumentationInstruction_stddev_pop_order_by | null;
+  stddev_samp?: ProjectDocumentationInstruction_stddev_samp_order_by | null;
+  sum?: ProjectDocumentationInstruction_sum_order_by | null;
+  var_pop?: ProjectDocumentationInstruction_var_pop_order_by | null;
+  var_samp?: ProjectDocumentationInstruction_var_samp_order_by | null;
+  variance?: ProjectDocumentationInstruction_variance_order_by | null;
+}
+
+/**
+ * input type for inserting array relation for remote table "ProjectDocumentationInstruction"
+ */
+export interface ProjectDocumentationInstruction_arr_rel_insert_input {
+  data: ProjectDocumentationInstruction_insert_input[];
+  on_conflict?: ProjectDocumentationInstruction_on_conflict | null;
+}
+
+/**
+ * order by avg() on columns of table "ProjectDocumentationInstruction"
+ */
+export interface ProjectDocumentationInstruction_avg_order_by {
+  id?: order_by | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "ProjectDocumentationInstruction". All fields are combined with a logical 'AND'.
+ */
+export interface ProjectDocumentationInstruction_bool_exp {
+  ProjectType?: ProjectType_bool_exp | null;
   Projects?: Project_bool_exp | null;
   Projects_aggregate?: Project_aggregate_bool_exp | null;
-  _and?: ProjectDocumentationTemplate_bool_exp[] | null;
-  _not?: ProjectDocumentationTemplate_bool_exp | null;
-  _or?: ProjectDocumentationTemplate_bool_exp[] | null;
+  _and?: ProjectDocumentationInstruction_bool_exp[] | null;
+  _not?: ProjectDocumentationInstruction_bool_exp | null;
+  _or?: ProjectDocumentationInstruction_bool_exp[] | null;
   created_at?: timestamptz_comparison_exp | null;
   id?: Int_comparison_exp | null;
+  isDefault?: Boolean_comparison_exp | null;
+  projectTypeValue?: String_comparison_exp | null;
   title?: String_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
   url?: String_comparison_exp | null;
 }
 
 /**
- * input type for inserting data into table "ProjectDocumentationTemplate"
+ * input type for inserting data into table "ProjectDocumentationInstruction"
  */
-export interface ProjectDocumentationTemplate_insert_input {
+export interface ProjectDocumentationInstruction_insert_input {
+  ProjectType?: ProjectType_obj_rel_insert_input | null;
   Projects?: Project_arr_rel_insert_input | null;
   created_at?: any | null;
   id?: number | null;
+  isDefault?: boolean | null;
+  projectTypeValue?: string | null;
   title?: string | null;
   updated_at?: any | null;
   url?: string | null;
 }
 
 /**
- * input type for inserting object relation for remote table "ProjectDocumentationTemplate"
+ * order by max() on columns of table "ProjectDocumentationInstruction"
  */
-export interface ProjectDocumentationTemplate_obj_rel_insert_input {
-  data: ProjectDocumentationTemplate_insert_input;
-  on_conflict?: ProjectDocumentationTemplate_on_conflict | null;
+export interface ProjectDocumentationInstruction_max_order_by {
+  created_at?: order_by | null;
+  id?: order_by | null;
+  projectTypeValue?: order_by | null;
+  title?: order_by | null;
+  updated_at?: order_by | null;
+  url?: order_by | null;
 }
 
 /**
- * on_conflict condition type for table "ProjectDocumentationTemplate"
+ * order by min() on columns of table "ProjectDocumentationInstruction"
  */
-export interface ProjectDocumentationTemplate_on_conflict {
-  constraint: ProjectDocumentationTemplate_constraint;
-  update_columns: ProjectDocumentationTemplate_update_column[];
-  where?: ProjectDocumentationTemplate_bool_exp | null;
+export interface ProjectDocumentationInstruction_min_order_by {
+  created_at?: order_by | null;
+  id?: order_by | null;
+  projectTypeValue?: order_by | null;
+  title?: order_by | null;
+  updated_at?: order_by | null;
+  url?: order_by | null;
+}
+
+/**
+ * input type for inserting object relation for remote table "ProjectDocumentationInstruction"
+ */
+export interface ProjectDocumentationInstruction_obj_rel_insert_input {
+  data: ProjectDocumentationInstruction_insert_input;
+  on_conflict?: ProjectDocumentationInstruction_on_conflict | null;
+}
+
+/**
+ * on_conflict condition type for table "ProjectDocumentationInstruction"
+ */
+export interface ProjectDocumentationInstruction_on_conflict {
+  constraint: ProjectDocumentationInstruction_constraint;
+  update_columns: ProjectDocumentationInstruction_update_column[];
+  where?: ProjectDocumentationInstruction_bool_exp | null;
+}
+
+/**
+ * Ordering options when selecting data from "ProjectDocumentationInstruction".
+ */
+export interface ProjectDocumentationInstruction_order_by {
+  ProjectType?: ProjectType_order_by | null;
+  Projects_aggregate?: Project_aggregate_order_by | null;
+  created_at?: order_by | null;
+  id?: order_by | null;
+  isDefault?: order_by | null;
+  projectTypeValue?: order_by | null;
+  title?: order_by | null;
+  updated_at?: order_by | null;
+  url?: order_by | null;
+}
+
+/**
+ * order by stddev() on columns of table "ProjectDocumentationInstruction"
+ */
+export interface ProjectDocumentationInstruction_stddev_order_by {
+  id?: order_by | null;
+}
+
+/**
+ * order by stddev_pop() on columns of table "ProjectDocumentationInstruction"
+ */
+export interface ProjectDocumentationInstruction_stddev_pop_order_by {
+  id?: order_by | null;
+}
+
+/**
+ * order by stddev_samp() on columns of table "ProjectDocumentationInstruction"
+ */
+export interface ProjectDocumentationInstruction_stddev_samp_order_by {
+  id?: order_by | null;
+}
+
+/**
+ * order by sum() on columns of table "ProjectDocumentationInstruction"
+ */
+export interface ProjectDocumentationInstruction_sum_order_by {
+  id?: order_by | null;
+}
+
+/**
+ * order by var_pop() on columns of table "ProjectDocumentationInstruction"
+ */
+export interface ProjectDocumentationInstruction_var_pop_order_by {
+  id?: order_by | null;
+}
+
+/**
+ * order by var_samp() on columns of table "ProjectDocumentationInstruction"
+ */
+export interface ProjectDocumentationInstruction_var_samp_order_by {
+  id?: order_by | null;
+}
+
+/**
+ * order by variance() on columns of table "ProjectDocumentationInstruction"
+ */
+export interface ProjectDocumentationInstruction_variance_order_by {
+  id?: order_by | null;
 }
 
 export interface ProjectMentor_aggregate_bool_exp {
@@ -8783,6 +9055,8 @@ export interface ProjectStatus_on_conflict {
  * Boolean expression to filter rows from the table "ProjectType". All fields are combined with a logical 'AND'.
  */
 export interface ProjectType_bool_exp {
+  ProjectDocumentationInstructions?: ProjectDocumentationInstruction_bool_exp | null;
+  ProjectDocumentationInstructions_aggregate?: ProjectDocumentationInstruction_aggregate_bool_exp | null;
   Projects?: Project_bool_exp | null;
   Projects_aggregate?: Project_aggregate_bool_exp | null;
   _and?: ProjectType_bool_exp[] | null;
@@ -8791,7 +9065,6 @@ export interface ProjectType_bool_exp {
   comment?: String_comparison_exp | null;
   requiresCoverImage?: Boolean_comparison_exp | null;
   requiresDocumentation?: Boolean_comparison_exp | null;
-  requiresEvaluationScript?: Boolean_comparison_exp | null;
   requiresExternalUrl?: Boolean_comparison_exp | null;
   requiresPresentation?: Boolean_comparison_exp | null;
   value?: String_comparison_exp | null;
@@ -8801,11 +9074,11 @@ export interface ProjectType_bool_exp {
  * input type for inserting data into table "ProjectType"
  */
 export interface ProjectType_insert_input {
+  ProjectDocumentationInstructions?: ProjectDocumentationInstruction_arr_rel_insert_input | null;
   Projects?: Project_arr_rel_insert_input | null;
   comment?: string | null;
   requiresCoverImage?: boolean | null;
   requiresDocumentation?: boolean | null;
-  requiresEvaluationScript?: boolean | null;
   requiresExternalUrl?: boolean | null;
   requiresPresentation?: boolean | null;
   value?: string | null;
@@ -8826,6 +9099,20 @@ export interface ProjectType_on_conflict {
   constraint: ProjectType_constraint;
   update_columns: ProjectType_update_column[];
   where?: ProjectType_bool_exp | null;
+}
+
+/**
+ * Ordering options when selecting data from "ProjectType".
+ */
+export interface ProjectType_order_by {
+  ProjectDocumentationInstructions_aggregate?: ProjectDocumentationInstruction_aggregate_order_by | null;
+  Projects_aggregate?: Project_aggregate_order_by | null;
+  comment?: order_by | null;
+  requiresCoverImage?: order_by | null;
+  requiresDocumentation?: order_by | null;
+  requiresExternalUrl?: order_by | null;
+  requiresPresentation?: order_by | null;
+  value?: order_by | null;
 }
 
 export interface Project_aggregate_bool_exp {
@@ -8884,11 +9171,10 @@ export interface Project_arr_rel_insert_input {
  * order by avg() on columns of table "Project"
  */
 export interface Project_avg_order_by {
-  documentationTemplateId?: order_by | null;
+  documentationInstructionId?: order_by | null;
   id?: order_by | null;
   organizationId?: order_by | null;
   parentProjectId?: order_by | null;
-  score?: order_by | null;
 }
 
 /**
@@ -8904,13 +9190,14 @@ export interface Project_bool_exp {
   ProjectAuthors_aggregate?: ProjectAuthor_aggregate_bool_exp | null;
   ProjectCourses?: ProjectCourse_bool_exp | null;
   ProjectCourses_aggregate?: ProjectCourse_aggregate_bool_exp | null;
-  ProjectDocumentationTemplate?: ProjectDocumentationTemplate_bool_exp | null;
+  ProjectDocumentationInstruction?: ProjectDocumentationInstruction_bool_exp | null;
   ProjectMentors?: ProjectMentor_bool_exp | null;
   ProjectMentors_aggregate?: ProjectMentor_aggregate_bool_exp | null;
   ProjectRating?: ProjectRating_bool_exp | null;
   ProjectStatus?: ProjectStatus_bool_exp | null;
   ProjectType?: ProjectType_bool_exp | null;
   ProposedByUser?: User_bool_exp | null;
+  SubmittedByUser?: User_bool_exp | null;
   _and?: Project_bool_exp[] | null;
   _not?: Project_bool_exp | null;
   _or?: Project_bool_exp[] | null;
@@ -8920,18 +9207,21 @@ export interface Project_bool_exp {
   created_at?: timestamptz_comparison_exp | null;
   csvResults?: String_comparison_exp | null;
   description?: String_comparison_exp | null;
-  documentationTemplateId?: Int_comparison_exp | null;
+  documentationInstructionId?: Int_comparison_exp | null;
   documentationUrl?: String_comparison_exp | null;
-  evaluationScriptUrl?: String_comparison_exp | null;
   externalUrl?: String_comparison_exp | null;
   id?: Int_comparison_exp | null;
   organizationId?: Int_comparison_exp | null;
   parentProjectId?: Int_comparison_exp | null;
   presentationUrl?: String_comparison_exp | null;
+  projectReviewRequestedAt?: timestamptz_comparison_exp | null;
   proposedByUserId?: uuid_comparison_exp | null;
   rating?: ProjectRating_enum_comparison_exp | null;
-  score?: numeric_comparison_exp | null;
+  ratingComment?: String_comparison_exp | null;
   status?: ProjectStatus_enum_comparison_exp | null;
+  submissionDeadline?: timestamptz_comparison_exp | null;
+  submittedAt?: timestamptz_comparison_exp | null;
+  submittedBy?: uuid_comparison_exp | null;
   tagline?: String_comparison_exp | null;
   title?: String_comparison_exp | null;
   type?: String_comparison_exp | null;
@@ -8948,30 +9238,34 @@ export interface Project_insert_input {
   ProjectAchievementCertificateType?: ProjectAchievementCertificateType_obj_rel_insert_input | null;
   ProjectAuthors?: ProjectAuthor_arr_rel_insert_input | null;
   ProjectCourses?: ProjectCourse_arr_rel_insert_input | null;
-  ProjectDocumentationTemplate?: ProjectDocumentationTemplate_obj_rel_insert_input | null;
+  ProjectDocumentationInstruction?: ProjectDocumentationInstruction_obj_rel_insert_input | null;
   ProjectMentors?: ProjectMentor_arr_rel_insert_input | null;
   ProjectRating?: ProjectRating_obj_rel_insert_input | null;
   ProjectStatus?: ProjectStatus_obj_rel_insert_input | null;
   ProjectType?: ProjectType_obj_rel_insert_input | null;
   ProposedByUser?: User_obj_rel_insert_input | null;
+  SubmittedByUser?: User_obj_rel_insert_input | null;
   acceptingParticipants?: boolean | null;
   achievementCertificateType?: ProjectAchievementCertificateType_enum | null;
   coverImageUrl?: string | null;
   created_at?: any | null;
   csvResults?: string | null;
   description?: string | null;
-  documentationTemplateId?: number | null;
+  documentationInstructionId?: number | null;
   documentationUrl?: string | null;
-  evaluationScriptUrl?: string | null;
   externalUrl?: string | null;
   id?: number | null;
   organizationId?: number | null;
   parentProjectId?: number | null;
   presentationUrl?: string | null;
+  projectReviewRequestedAt?: any | null;
   proposedByUserId?: any | null;
   rating?: ProjectRating_enum | null;
-  score?: any | null;
+  ratingComment?: string | null;
   status?: ProjectStatus_enum | null;
+  submissionDeadline?: any | null;
+  submittedAt?: any | null;
+  submittedBy?: any | null;
   tagline?: string | null;
   title?: string | null;
   type?: string | null;
@@ -8986,16 +9280,19 @@ export interface Project_max_order_by {
   created_at?: order_by | null;
   csvResults?: order_by | null;
   description?: order_by | null;
-  documentationTemplateId?: order_by | null;
+  documentationInstructionId?: order_by | null;
   documentationUrl?: order_by | null;
-  evaluationScriptUrl?: order_by | null;
   externalUrl?: order_by | null;
   id?: order_by | null;
   organizationId?: order_by | null;
   parentProjectId?: order_by | null;
   presentationUrl?: order_by | null;
+  projectReviewRequestedAt?: order_by | null;
   proposedByUserId?: order_by | null;
-  score?: order_by | null;
+  ratingComment?: order_by | null;
+  submissionDeadline?: order_by | null;
+  submittedAt?: order_by | null;
+  submittedBy?: order_by | null;
   tagline?: order_by | null;
   title?: order_by | null;
   type?: order_by | null;
@@ -9010,16 +9307,19 @@ export interface Project_min_order_by {
   created_at?: order_by | null;
   csvResults?: order_by | null;
   description?: order_by | null;
-  documentationTemplateId?: order_by | null;
+  documentationInstructionId?: order_by | null;
   documentationUrl?: order_by | null;
-  evaluationScriptUrl?: order_by | null;
   externalUrl?: order_by | null;
   id?: order_by | null;
   organizationId?: order_by | null;
   parentProjectId?: order_by | null;
   presentationUrl?: order_by | null;
+  projectReviewRequestedAt?: order_by | null;
   proposedByUserId?: order_by | null;
-  score?: order_by | null;
+  ratingComment?: order_by | null;
+  submissionDeadline?: order_by | null;
+  submittedAt?: order_by | null;
+  submittedBy?: order_by | null;
   tagline?: order_by | null;
   title?: order_by | null;
   type?: order_by | null;
@@ -9047,77 +9347,70 @@ export interface Project_on_conflict {
  * order by stddev() on columns of table "Project"
  */
 export interface Project_stddev_order_by {
-  documentationTemplateId?: order_by | null;
+  documentationInstructionId?: order_by | null;
   id?: order_by | null;
   organizationId?: order_by | null;
   parentProjectId?: order_by | null;
-  score?: order_by | null;
 }
 
 /**
  * order by stddev_pop() on columns of table "Project"
  */
 export interface Project_stddev_pop_order_by {
-  documentationTemplateId?: order_by | null;
+  documentationInstructionId?: order_by | null;
   id?: order_by | null;
   organizationId?: order_by | null;
   parentProjectId?: order_by | null;
-  score?: order_by | null;
 }
 
 /**
  * order by stddev_samp() on columns of table "Project"
  */
 export interface Project_stddev_samp_order_by {
-  documentationTemplateId?: order_by | null;
+  documentationInstructionId?: order_by | null;
   id?: order_by | null;
   organizationId?: order_by | null;
   parentProjectId?: order_by | null;
-  score?: order_by | null;
 }
 
 /**
  * order by sum() on columns of table "Project"
  */
 export interface Project_sum_order_by {
-  documentationTemplateId?: order_by | null;
+  documentationInstructionId?: order_by | null;
   id?: order_by | null;
   organizationId?: order_by | null;
   parentProjectId?: order_by | null;
-  score?: order_by | null;
 }
 
 /**
  * order by var_pop() on columns of table "Project"
  */
 export interface Project_var_pop_order_by {
-  documentationTemplateId?: order_by | null;
+  documentationInstructionId?: order_by | null;
   id?: order_by | null;
   organizationId?: order_by | null;
   parentProjectId?: order_by | null;
-  score?: order_by | null;
 }
 
 /**
  * order by var_samp() on columns of table "Project"
  */
 export interface Project_var_samp_order_by {
-  documentationTemplateId?: order_by | null;
+  documentationInstructionId?: order_by | null;
   id?: order_by | null;
   organizationId?: order_by | null;
   parentProjectId?: order_by | null;
-  score?: order_by | null;
 }
 
 /**
  * order by variance() on columns of table "Project"
  */
 export interface Project_variance_order_by {
-  documentationTemplateId?: order_by | null;
+  documentationInstructionId?: order_by | null;
   id?: order_by | null;
   organizationId?: order_by | null;
   parentProjectId?: order_by | null;
-  score?: order_by | null;
 }
 
 export interface SessionAddress_aggregate_bool_exp {
