@@ -17,11 +17,14 @@ export const CertificateDownload: FC<IProps> = ({
   const t = useTranslations();
   const achievementCertificatePath = courseEnrollment?.achievementCertificateURL;
   const attendanceCertificatePath = courseEnrollment?.attendanceCertificateURL;
+  const manageViewButtonClassName = manageView
+    ? 'max-w-full min-w-0 whitespace-normal text-center leading-tight break-words'
+    : 'w-full';
 
   return (
     <div className={!manageView ? 'mt-4' : ''}>
       <div
-        className={`flex flex-wrap gap-4 min-w-0 items-center ${!manageView ? 'flex-col w-full' : ''}`}
+        className={`flex flex-wrap min-w-0 items-center ${manageView ? 'gap-2' : 'gap-4 flex-col w-full'}`}
       >
         {achievementCertificatePath && (
           <>
@@ -32,7 +35,7 @@ export const CertificateDownload: FC<IProps> = ({
               target="_blank"
               rel="noopener noreferrer"
               filled
-              className={`flex justify-center items-center ${!manageView ? 'w-full' : ''}`}
+              className={`flex justify-center items-center ${manageViewButtonClassName}`}
             >
               {manageView
                 ? t('manageCourse.achievement_certificate_download')
@@ -47,7 +50,7 @@ export const CertificateDownload: FC<IProps> = ({
             target="_blank"
             rel="noopener noreferrer"
             filled
-            className={`flex justify-center items-center ${!manageView ? 'w-full' : ''}`}
+            className={`flex justify-center items-center ${manageViewButtonClassName}`}
           >
             {manageView
               ? t('manageCourse.attendance_certificate_download')
