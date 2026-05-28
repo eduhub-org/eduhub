@@ -496,13 +496,17 @@ REQUESTED rows in that course are auto-DECLINED in the same transaction.
 The restriction lifts once your project reaches a terminal status
 (`COMPLETED`, `INCOMPLETE`, `PUBLISHED`).
 
-**(For proposers) What happens to the pending join requests on my project
-when an instructor confirms the team?**
-At team confirmation (PROPOSED → ONGOING) any `ProjectAuthor` row still
-in REQUESTED status is converted to DECLINED in the same transaction.
-Those applicants will see their request flip from "Pending" to "Declined"
-the next time the project list refreshes, and they regain the ability to
-propose or join another project in the course.
+**(For proposers) I still have pending join requests — what do I need to
+do before I can ask an instructor to confirm my team?**
+Decide every pending request first. The **Request review** button in the
+**My Project** panel stays disabled while any `REQUESTED` row exists on a
+project that is still accepting participants — the proposer must accept
+or decline each applicant via **Manage requests**, or turn off
+**Accepting participants**, before the instructor can be asked to
+confirm the team. (As a safety net, if any REQUESTED rows do reach
+team-confirmation time — e.g. from an instructor override — they are
+automatically set to DECLINED when the project transitions PROPOSED →
+ONGOING.)
 
 **Can I edit my project after it's been submitted?**
 No. Once status is SUBMITTED the project becomes read-only for authors.
