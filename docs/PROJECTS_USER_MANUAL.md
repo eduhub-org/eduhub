@@ -98,7 +98,7 @@ Key transitions in detail:
 | Send back / approve / reject | — | ✓ | ✓ | ✓ |
 | Rate & comment | — | ✓ | ✓ | ✓ |
 | Publish | — | ✓ | ✓ | ✓ |
-| Delete project | — | ✓ (own courses) | — | ✓ |
+| Delete project | ✓ (indirectly, by leaving as the last ACCEPTED author on a PROPOSED/ONGOING project — see §5.4) | ✓ (own courses) | — | ✓ |
 
 ---
 
@@ -485,15 +485,24 @@ project write-up — distinct from the instruction PDF.
 
 ## 9. Frequently asked questions
 
-**Can a participant be in two projects in the same course?**
-Yes — the database has no unique constraint preventing it. In practice,
-an author should usually only be ACCEPTED on a single project per
-course, but you can have one ACCEPTED project and several REQUESTED rows
-on others while you wait for responses.
+**Can I be an author on two projects in the same course at the same time?**
+No. As a participant you can be ACCEPTED on at most one *active* project
+(PROPOSED, ONGOING, or SUBMITTED) per course — the rule is enforced by the
+`enforce_one_active_accepted_project_per_course_per_user` database trigger
+described in §4a. You may, however, hold several REQUESTED rows on other
+projects in the same course while you wait for a response. Once one of
+them accepts you (or you propose your own project), your remaining
+REQUESTED rows in that course are auto-DECLINED in the same transaction.
+The restriction lifts once your project reaches a terminal status
+(`COMPLETED`, `INCOMPLETE`, `PUBLISHED`).
 
-**What happens to my REQUESTED rows if the project's team is confirmed?**
-They are declined automatically. The project disappears from your
-"pending requests" list.
+**(For proposers) What happens to the pending join requests on my project
+when an instructor confirms the team?**
+At team confirmation (PROPOSED → ONGOING) any `ProjectAuthor` row still
+in REQUESTED status is converted to DECLINED in the same transaction.
+Those applicants will see their request flip from "Pending" to "Declined"
+the next time the project list refreshes, and they regain the ability to
+propose or join another project in the course.
 
 **Can I edit my project after it's been submitted?**
 No. Once status is SUBMITTED the project becomes read-only for authors.
