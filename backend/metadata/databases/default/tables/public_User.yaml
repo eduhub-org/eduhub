@@ -124,6 +124,7 @@ select_permissions:
         - newsletterRegistration
         - occupation
         - picture
+        - status
         - updated_at
         - zipCode
       filter: {}
