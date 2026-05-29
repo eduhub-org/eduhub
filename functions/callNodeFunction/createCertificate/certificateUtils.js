@@ -221,25 +221,21 @@ export const fetchEnrollments = async (userIds, courseId) => {
           }
           firstName
           lastName
-          AchievementRecordAuthors(
+          ProjectAuthors(
             where: {
-              AchievementRecord: {
-                AchievementOption: {
-                  AchievementOptionCourses: {
-                    Course: { id: { _eq: $courseId } }
-                  }
-                }
+              participationStatus: { _eq: ACCEPTED }
+              Project: {
+                status: { _eq: COMPLETED }
+                ProjectCourses: { courseId: { _eq: $courseId } }
               }
             }
-            order_by: { AchievementRecord: { updated_at: desc } }
+            order_by: { Project: { updated_at: desc } }
             limit: 1
           ) {
-            AchievementRecord {
-              AchievementOption {
-                title
-                recordType
-              }
-              created_at
+            Project {
+              title
+              type
+              achievementCertificateType
             }
           }
           id

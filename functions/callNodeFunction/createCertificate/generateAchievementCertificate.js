@@ -19,13 +19,18 @@ export const generateAchievementCertificate = async (
   bucket
 ) => {
   try {
-    // Set online_courses and practical_project according to recordType
-    const recordType =
-      courseEnrollment.User.AchievementRecordAuthors[0].AchievementRecord
-        .AchievementOption.recordType;
-    const recordTitle =
-      courseEnrollment.User.AchievementRecordAuthors[0].AchievementRecord
-        .AchievementOption.title;
+    // Resolve the user's completed project for this course and derive the
+    // certificate flavour from its achievementCertificateType (DOCUMENTATION |
+    // ONLINE_COURSE), preserving the existing online_courses / practical_project
+    // template-variable contract.
+    const project = courseEnrollment.User.ProjectAuthors?.[0]?.Project;
+    if (!project) {
+      throw new Error(
+        `No completed project found for user ${courseEnrollment.User.id} in course ${courseEnrollment.Course.id}`
+      );
+    }
+    const recordType = project.achievementCertificateType;
+    const recordTitle = project.title;
     const online_courses = recordType === "ONLINE_COURSE" ? recordTitle : "";
     const practical_project = recordType === "DOCUMENTATION" ? recordTitle : "";
 

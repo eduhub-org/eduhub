@@ -226,9 +226,20 @@ class CertificateCreator:
             logging.error(error_msg)
             raise CertificateError(error_msg, "TEMPLATE_FETCH_ERROR")
 
+    # Project type used as the certificate-template fallback for project types
+    # that have no own certificateTemplateHtml, and for degree certificates,
+    # which are achievement certificates without an underlying project.
+    DEFAULT_ACHIEVEMENT_PROJECT_TYPE = "CLASSIC_PROJECT"
+
     def fetch_template_text(self, enrollment):
         """
         Fetches the HTML template text for the certificate.
+
+        Achievement certificates now read the HTML from ProjectType.certificateTemplateHtml
+        (one template per project type), derived from the user's completed project in this
+        course. Degree certificates have no underlying project and use the
+        CLASSIC_PROJECT template. Attendance certificates still use the per-program
+        CertificateTemplateProgram -> CertificateTemplateText path (unrelated to projects).
 
         Returns:
             str: The HTML template text.
@@ -237,26 +248,24 @@ class CertificateCreator:
             CertificateError: If template text cannot be fetched or is not found
         """
         try:
-            program_id = self.enrollments[0]['Course']['Program']['id']
-            
-            logging.info(f"Certificate Type: {self.certificate_type}")
-            # Determine record_type based on certificate type and whether it's a degree
             if self.certificate_type == "achievement":
                 if self.is_degree:
-                    # For degree certificates, use DOCUMENTATION record type
-                    # (DEGREE is not a valid AchievementRecordType enum value)
-                    record_type = "DOCUMENTATION"
-                    logging.info("Using DOCUMENTATION record type for degree certificate")
+                    # Degree certificates have no project; use the documentation-style template.
+                    project_type = self.DEFAULT_ACHIEVEMENT_PROJECT_TYPE
+                    logging.info("Using CLASSIC_PROJECT certificate template for degree certificate")
                 else:
-                    # Regular achievement certificates
-                    if not self.enrollments[0].get('User', {}).get('AchievementRecordAuthors'):
-                        raise CertificateError("No achievement record found for user", 
+                    project_authors = enrollment.get('User', {}).get('ProjectAuthors') or []
+                    if not project_authors:
+                        raise CertificateError("No completed project found for user",
                                               "ACHIEVEMENT_RECORD_NOT_FOUND")
-                    record_type = enrollment['User']['AchievementRecordAuthors'][0]['AchievementRecord']['AchievementOption']['recordType']
-            else:  # attendance certificate
-                record_type = "DOCUMENTATION"  # or whatever the correct record type is for attendance
-            
-            logging.info(f"Fetching template for record type: {record_type}")
+                    project_type = project_authors[0]['Project'].get('type') \
+                        or self.DEFAULT_ACHIEVEMENT_PROJECT_TYPE
+                return self.fetch_project_type_template_html(project_type)
+
+            # Attendance certificate: still served by the legacy per-program template text.
+            record_type = "DOCUMENTATION"
+            program_id = self.enrollments[0]['Course']['Program']['id']
+            logging.info(f"Fetching attendance template for program {program_id}")
 
             query = """
             query getTemplateHtml($programId: Int!, $certificateType: CertificateType_enum!, $recordType: AchievementRecordType_enum!) {
@@ -264,7 +273,7 @@ class CertificateCreator:
                     CertificateTemplateText {
                         html
                         recordType
-                        certificateType 
+                        certificateType
                     }
                 }
             }
@@ -285,21 +294,21 @@ class CertificateCreator:
                 data = response.json()
 
                 if 'errors' in data:
-                    raise CertificateError(f"GraphQL Error: {data['errors']}", 
+                    raise CertificateError(f"GraphQL Error: {data['errors']}",
                                           "GRAPHQL_ERROR")
 
                 # check if the template is empty or more than one template is found
                 if not data['data']['CertificateTemplateProgram'] or len(data['data']['CertificateTemplateProgram']) > 1:
                     raise CertificateError(
-                        f"No matching template found for recordType: {record_type} and certificateType: {self.certificate_type.upper()}", 
+                        f"No matching template found for recordType: {record_type} and certificateType: {self.certificate_type.upper()}",
                         "CERTIFICATE_TEMPLATE_TEXT_NOT_FOUND"
                     )
-                
+
                 # Get the first template from the list of templates
                 return data['data']['CertificateTemplateProgram'][0]['CertificateTemplateText']['html']
 
             except requests.exceptions.RequestException as e:
-                raise CertificateError(f"GraphQL request failed: {str(e)}", 
+                raise CertificateError(f"GraphQL request failed: {str(e)}",
                                       "API_REQUEST_FAILED")
 
         except CertificateError:
@@ -309,6 +318,50 @@ class CertificateCreator:
             error_msg = f"Unexpected error fetching template text: {str(e)}"
             logging.error(error_msg)
             raise CertificateError(error_msg, "TEMPLATE_TEXT_FETCH_ERROR")
+
+    def fetch_project_type_template_html(self, project_type):
+        """
+        Fetches ProjectType.certificateTemplateHtml for the given project type, falling
+        back to the CLASSIC_PROJECT template when the type has no own template.
+
+        Raises:
+            CertificateError: If the request fails or no template can be resolved.
+        """
+        query = """
+        query getProjectTypeTemplate($value: String!, $fallback: String!) {
+            ProjectType(where: {value: {_in: [$value, $fallback]}}) {
+                value
+                certificateTemplateHtml
+            }
+        }
+        """
+        variables = {"value": project_type, "fallback": self.DEFAULT_ACHIEVEMENT_PROJECT_TYPE}
+        headers = {
+            "Content-Type": "application/json",
+            "x-hasura-admin-secret": self.eduhub_client.hasura_admin_secret
+        }
+        try:
+            response = requests.post(
+                self.eduhub_client.url,
+                json={'query': query, 'variables': variables},
+                headers=headers
+            )
+            response.raise_for_status()
+            data = response.json()
+            if 'errors' in data:
+                raise CertificateError(f"GraphQL Error: {data['errors']}", "GRAPHQL_ERROR")
+
+            rows = {row['value']: row.get('certificateTemplateHtml') for row in data['data']['ProjectType']}
+            html = rows.get(project_type) or rows.get(self.DEFAULT_ACHIEVEMENT_PROJECT_TYPE)
+            if not html:
+                raise CertificateError(
+                    f"No certificateTemplateHtml found for project type {project_type} (or fallback {self.DEFAULT_ACHIEVEMENT_PROJECT_TYPE})",
+                    "CERTIFICATE_TEMPLATE_TEXT_NOT_FOUND"
+                )
+            logging.info(f"Using certificate template for project type: {project_type}")
+            return html
+        except requests.exceptions.RequestException as e:
+            raise CertificateError(f"GraphQL request failed: {str(e)}", "API_REQUEST_FAILED")
 
     def get_successful_degree_participations(self, user_id, degree_course_id):
         """
@@ -465,6 +518,10 @@ class CertificateCreator:
                     else:
                         ects_float = float(ects_value)
                     
+                    project_authors = enrollment["User"].get("ProjectAuthors") or []
+                    if not project_authors:
+                        raise CertificateError("No completed project found for user", "ACHIEVEMENT_RECORD_NOT_FOUND")
+
                     return {
                         "full_name": f"{enrollment['User']['firstName'].upper()} {enrollment['User']['lastName'].upper()}",
                         "course_name": enrollment["Course"]["title"],
@@ -472,7 +529,7 @@ class CertificateCreator:
                         "template": image,
                         "ECTS": str(ects_float * 30),
                         "learningGoalsList": learning_goals,
-                        "praxisprojekt": enrollment["User"]["AchievementRecordAuthors"][0]["AchievementRecord"]["AchievementOption"]["title"]
+                        "praxisprojekt": project_authors[0]["Project"]["title"]
                     }
             
             else:
