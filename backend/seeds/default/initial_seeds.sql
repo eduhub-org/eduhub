@@ -1639,12 +1639,86 @@ BEGIN
   END LOOP;
 END $$;
 
-SELECT pg_catalog.setval('public."AchievementDocumentationTemplate_id_seq"', 1, false);
-SELECT pg_catalog.setval('public."AchievementOptionCourse_id_seq"', 7, true);
-SELECT pg_catalog.setval('public."AchievementOptionMentor_id_seq"', 1, false);
-SELECT pg_catalog.setval('public."AchievementOption_id_seq"', 5, true);
-SELECT pg_catalog.setval('public."AchievementRecordAuthor_id_seq"', 1, true);
-SELECT pg_catalog.setval('public."AchievementRecord_id_seq"', 7, true);
+-- =============================================================================
+-- Dev fixtures for the legacy achievement -> project data migration
+-- (migration 1780045613786_migrate_achievements_to_projects).
+--
+-- Exercises every mapping branch:
+--   - DOCUMENTATION option with a documentation template + mentor + records
+--     (proposer falls back to the mentor; instruction picked up via the
+--      legacyAchievementDocumentationTemplateId index)
+--   - Unpublished DOCUMENTATION option with a record (still migrated)
+--   - Extra ONLINE_COURSE record on an existing option (multi-record per option)
+--   - Multi-author record (two ProjectAuthors emitted)
+--   - PASSED rating carried over to Project.rating, UNRATED record kept as-is
+-- After running the seeds, re-execute the data steps of the migration's up.sql
+-- to convert the seeded legacy rows into Project rows.
+-- =============================================================================
+INSERT INTO public."AchievementDocumentationTemplate" (id, title, url, created_at, updated_at)
+VALUES (1, 'Dev documentation template', 'https://example.com/documentation_template.pdf',
+        '2024-01-15 10:00:00+00', '2024-01-15 10:00:00+00');
+
+INSERT INTO public."AchievementOption" (id, title, description, "recordType", "evaluationScriptUrl", created_at, updated_at, published, "achievementDocumentationTemplateId") VALUES
+  (5, 'documentation project alpha',
+   'A practical documentation project for testing the DOCUMENTATION -> CLASSIC_PROJECT mapping.',
+   'DOCUMENTATION', NULL, '2024-02-01 09:00:00+00', '2024-02-01 09:00:00+00', true, 1),
+  (6, 'documentation project beta (unpublished)',
+   'Unpublished documentation project; should still be migrated as a PROPOSED template.',
+   'DOCUMENTATION', NULL, '2024-02-01 09:00:00+00', '2024-02-01 09:00:00+00', false, NULL);
+
+INSERT INTO public."AchievementOptionCourse" (id, "achievementOptionId", "courseId", created_at, updated_at) VALUES
+  (8,  5, 1, '2024-02-01 09:00:00+00', '2024-02-01 09:00:00+00'),
+  (9,  5, 4, '2024-02-01 09:00:00+00', '2024-02-01 09:00:00+00'),
+  (10, 6, 1, '2024-02-01 09:00:00+00', '2024-02-01 09:00:00+00');
+
+-- Mentor on the documentation option exercises the proposer fallback to mentors.
+INSERT INTO public."AchievementOptionMentor" (id, "achievementOptionId", "userId", created_at, updated_at) VALUES
+  (1, 5, 'cccccccc-cccc-cccc-cccc-cccccccccccc',
+   '2024-02-01 09:00:00+00', '2024-02-01 09:00:00+00');
+
+-- Records: documentation (passed + multi-author + unrated) and an extra online-course submission.
+INSERT INTO public."AchievementRecord" (id, "coverImageUrl", description, rating, score, "achievementOptionId", "documentationUrl", "csvResults", "evaluationScriptUrl", created_at, updated_at, "uploadUserId", "courseId") VALUES
+  (8, NULL, 'A passed documentation submission with two authors.',
+   'PASSED', NULL, 5, 'achievementrecordid_8/documentation/doc.pdf', NULL, NULL,
+   '2024-03-15 12:00:00+00', '2024-03-15 12:00:00+00',
+   '11111111-1111-1111-1111-111111111111', 1),
+  (9, NULL, 'Unrated documentation submission for the unpublished option.',
+   'UNRATED', NULL, 6, 'achievementrecordid_9/documentation/doc.pdf', NULL, NULL,
+   '2024-03-15 14:00:00+00', '2024-03-15 14:00:00+00',
+   '33333333-3333-3333-3333-333333333333', 1),
+  (10, NULL, 'Passed online-course completion submission.',
+   'PASSED', NULL, 1, 'achievementrecordid_10/documentation/doc.pdf', NULL, NULL,
+   '2024-03-16 09:00:00+00', '2024-03-16 09:00:00+00',
+   '44444444-4444-4444-4444-444444444444', 1);
+
+INSERT INTO public."AchievementRecordAuthor" (id, "achievementRecordId", "userId", created_at, updated_at) VALUES
+  (2, 8,  '11111111-1111-1111-1111-111111111111', '2024-03-15 12:00:00+00', '2024-03-15 12:00:00+00'),
+  (3, 8,  '22222222-2222-2222-2222-222222222222', '2024-03-15 12:00:00+00', '2024-03-15 12:00:00+00'),
+  (4, 9,  '33333333-3333-3333-3333-333333333333', '2024-03-15 14:00:00+00', '2024-03-15 14:00:00+00'),
+  (5, 10, '44444444-4444-4444-4444-444444444444', '2024-03-16 09:00:00+00', '2024-03-16 09:00:00+00');
+
+-- =============================================================================
+-- Degree certificate template fixture
+--
+-- Mirrors the manually-inserted production row used for the DEGREES program.
+-- Linked to the DEGREES program (id 2) via CertificateTemplateProgram so the
+-- existing degree-certificate code path resolves it, and serves as a
+-- title-based fallback for environments without the link.
+-- =============================================================================
+INSERT INTO public."CertificateTemplateText" (id, title, html, created_at, updated_at, "certificateType", "recordType") VALUES
+  (3, 'degree certificate example', E'<html> <head> <meta http-equiv="Content-Type" content="text/html; charset=utf-8"> <title>Document Title</title> <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400&display=swap" rel="stylesheet"> <style type="text/css"> @page { size: a4 landscape; background-image: url("{{ template }}"); background-position: center center; background-size: cover; @frame content_frame { left: 85mm; width: 195mm; top: 60mm; height: 140mm; } } body, html { font-family: \'Lato\', sans-serif !important; margin: 0; padding: 0; width: 297mm; height: 210mm; } .big { font-size: 7mm; font-weight: bold; color: #777; } .small { font-size: 4.2mm; color: #777; } p { margin-top: 3mm; margin-bottom: 3mm; } </style> </head> <body> <span class="big">{{ full_name }}</span> <p class="small"> has met the degree''s minimum requirements of completing 12.5 ECTS and participating in at least one hackathon by successfully completing the following degree components: </p> <p class="small"> {% for participation in successful_participations %} // {{ participation }}<br> {% endfor %} </p> </body> </html>',
+   '2024-01-01 00:00:00+00', '2024-01-01 00:00:00+00', 'ACHIEVEMENT', 'DOCUMENTATION');
+
+INSERT INTO public."CertificateTemplateProgram" (id, "programId", "certificateTemplateText") VALUES (3, 2, 3);
+
+SELECT pg_catalog.setval('public."AchievementDocumentationTemplate_id_seq"', 1, true);
+SELECT pg_catalog.setval('public."AchievementOptionCourse_id_seq"', 10, true);
+SELECT pg_catalog.setval('public."AchievementOptionMentor_id_seq"', 1, true);
+SELECT pg_catalog.setval('public."AchievementOption_id_seq"', 6, true);
+SELECT pg_catalog.setval('public."AchievementRecordAuthor_id_seq"', 5, true);
+SELECT pg_catalog.setval('public."AchievementRecord_id_seq"', 10, true);
+SELECT pg_catalog.setval(pg_get_serial_sequence('public."CertificateTemplateText"', 'id'), (SELECT max(id) FROM public."CertificateTemplateText"), true);
+SELECT pg_catalog.setval(pg_get_serial_sequence('public."CertificateTemplateProgram"', 'id'), (SELECT max(id) FROM public."CertificateTemplateProgram"), true);
 SELECT pg_catalog.setval('public."Attendence_Id_seq"', 64, true);
 SELECT pg_catalog.setval('public."CourseAddress_id_seq"', 9, true);
 SELECT pg_catalog.setval('public."CourseDegree_id_seq"', 6, true);

@@ -226,90 +226,45 @@ class CertificateCreator:
             logging.error(error_msg)
             raise CertificateError(error_msg, "TEMPLATE_FETCH_ERROR")
 
-    # Project type used as the certificate-template fallback for project types
-    # that have no own certificateTemplateHtml, and for degree certificates,
-    # which are achievement certificates without an underlying project.
+    # Project type used as the certificate-template fallback when a non-degree
+    # achievement certificate's resolved ProjectType has no certificateTemplateHtml.
     DEFAULT_ACHIEVEMENT_PROJECT_TYPE = "CLASSIC_PROJECT"
+    # Title under which the degree certificate template HTML is seeded into
+    # CertificateTemplateText, used as a final fallback for degree certificates
+    # when no per-program CertificateTemplateProgram row resolves.
+    DEGREE_TEMPLATE_TITLE = "degree certificate example"
 
     def fetch_template_text(self, enrollment):
         """
         Fetches the HTML template text for the certificate.
 
-        Achievement certificates now read the HTML from ProjectType.certificateTemplateHtml
-        (one template per project type), derived from the user's completed project in this
-        course. Degree certificates have no underlying project and use the
-        CLASSIC_PROJECT template. Attendance certificates still use the per-program
-        CertificateTemplateProgram -> CertificateTemplateText path (unrelated to projects).
-
-        Returns:
-            str: The HTML template text.
+        - Achievement (non-degree): ProjectType.certificateTemplateHtml resolved
+          via the user's completed Project (falls back to the CLASSIC_PROJECT
+          template).
+        - Achievement (degree): legacy CertificateTemplateProgram -> CertificateTemplateText
+          lookup keyed by program + recordType=DOCUMENTATION (degree certificates
+          have no underlying project), with a final fallback to the seeded
+          'degree certificate example' CertificateTemplateText row.
+        - Attendance: legacy CertificateTemplateProgram -> CertificateTemplateText
+          lookup; attendance certificates are unrelated to projects.
 
         Raises:
-            CertificateError: If template text cannot be fetched or is not found
+            CertificateError: If template text cannot be fetched or is not found.
         """
         try:
-            if self.certificate_type == "achievement":
-                if self.is_degree:
-                    # Degree certificates have no project; use the documentation-style template.
-                    project_type = self.DEFAULT_ACHIEVEMENT_PROJECT_TYPE
-                    logging.info("Using CLASSIC_PROJECT certificate template for degree certificate")
-                else:
-                    project_authors = enrollment.get('User', {}).get('ProjectAuthors') or []
-                    if not project_authors:
-                        raise CertificateError("No completed project found for user",
-                                              "ACHIEVEMENT_RECORD_NOT_FOUND")
-                    project_type = project_authors[0]['Project'].get('type') \
-                        or self.DEFAULT_ACHIEVEMENT_PROJECT_TYPE
+            if self.certificate_type == "achievement" and not self.is_degree:
+                project_authors = enrollment.get('User', {}).get('ProjectAuthors') or []
+                if not project_authors:
+                    raise CertificateError("No completed project found for user",
+                                          "ACHIEVEMENT_RECORD_NOT_FOUND")
+                project_type = project_authors[0]['Project'].get('type') \
+                    or self.DEFAULT_ACHIEVEMENT_PROJECT_TYPE
                 return self.fetch_project_type_template_html(project_type)
 
-            # Attendance certificate: still served by the legacy per-program template text.
-            record_type = "DOCUMENTATION"
-            program_id = self.enrollments[0]['Course']['Program']['id']
-            logging.info(f"Fetching attendance template for program {program_id}")
-
-            query = """
-            query getTemplateHtml($programId: Int!, $certificateType: CertificateType_enum!, $recordType: AchievementRecordType_enum!) {
-                CertificateTemplateProgram(where: {programId: {_eq: $programId}, CertificateTemplateText: {certificateType: {_eq: $certificateType}, recordType: {_eq: $recordType}}}) {
-                    CertificateTemplateText {
-                        html
-                        recordType
-                        certificateType
-                    }
-                }
-            }
-            """
-            variables = {"programId": program_id, "certificateType": self.certificate_type.upper(), "recordType": record_type}
-            headers = {
-                "Content-Type": "application/json",
-                "x-hasura-admin-secret": self.eduhub_client.hasura_admin_secret
-            }
-
-            try:
-                response = requests.post(
-                    self.eduhub_client.url,
-                    json={'query': query, 'variables': variables},
-                    headers=headers
-                )
-                response.raise_for_status()
-                data = response.json()
-
-                if 'errors' in data:
-                    raise CertificateError(f"GraphQL Error: {data['errors']}",
-                                          "GRAPHQL_ERROR")
-
-                # check if the template is empty or more than one template is found
-                if not data['data']['CertificateTemplateProgram'] or len(data['data']['CertificateTemplateProgram']) > 1:
-                    raise CertificateError(
-                        f"No matching template found for recordType: {record_type} and certificateType: {self.certificate_type.upper()}",
-                        "CERTIFICATE_TEMPLATE_TEXT_NOT_FOUND"
-                    )
-
-                # Get the first template from the list of templates
-                return data['data']['CertificateTemplateProgram'][0]['CertificateTemplateText']['html']
-
-            except requests.exceptions.RequestException as e:
-                raise CertificateError(f"GraphQL request failed: {str(e)}",
-                                      "API_REQUEST_FAILED")
+            # Degree or attendance: legacy per-program HTML lookup.
+            return self._fetch_legacy_program_template_html(
+                fallback_title=self.DEGREE_TEMPLATE_TITLE if self.is_degree else None
+            )
 
         except CertificateError:
             # Re-raise CertificateError directly
@@ -318,6 +273,94 @@ class CertificateCreator:
             error_msg = f"Unexpected error fetching template text: {str(e)}"
             logging.error(error_msg)
             raise CertificateError(error_msg, "TEMPLATE_TEXT_FETCH_ERROR")
+
+    def _fetch_legacy_program_template_html(self, fallback_title=None):
+        """
+        Legacy lookup: CertificateTemplateProgram -> CertificateTemplateText keyed by
+        the enrollment's programId, the current certificate_type, and recordType=DOCUMENTATION.
+        When fallback_title is provided and the join returns nothing, the function falls back
+        to the CertificateTemplateText row with that title (used to ship a working degree
+        template in environments without an explicit CertificateTemplateProgram link).
+        """
+        program_id = self.enrollments[0]['Course']['Program']['id']
+        record_type = "DOCUMENTATION"
+        logging.info(
+            f"Fetching legacy {self.certificate_type} template for program {program_id}"
+        )
+        query = """
+        query getTemplateHtml($programId: Int!, $certificateType: CertificateType_enum!, $recordType: AchievementRecordType_enum!) {
+            CertificateTemplateProgram(where: {programId: {_eq: $programId}, CertificateTemplateText: {certificateType: {_eq: $certificateType}, recordType: {_eq: $recordType}}}) {
+                CertificateTemplateText {
+                    html
+                    recordType
+                    certificateType
+                }
+            }
+        }
+        """
+        variables = {
+            "programId": program_id,
+            "certificateType": self.certificate_type.upper(),
+            "recordType": record_type,
+        }
+        headers = {
+            "Content-Type": "application/json",
+            "x-hasura-admin-secret": self.eduhub_client.hasura_admin_secret,
+        }
+        try:
+            response = requests.post(
+                self.eduhub_client.url,
+                json={"query": query, "variables": variables},
+                headers=headers,
+            )
+            response.raise_for_status()
+            data = response.json()
+            if "errors" in data:
+                raise CertificateError(f"GraphQL Error: {data['errors']}", "GRAPHQL_ERROR")
+
+            rows = data["data"]["CertificateTemplateProgram"]
+            if len(rows) == 1:
+                return rows[0]["CertificateTemplateText"]["html"]
+            if len(rows) > 1:
+                raise CertificateError(
+                    f"Multiple matching templates found for recordType: {record_type} and certificateType: {self.certificate_type.upper()}",
+                    "CERTIFICATE_TEMPLATE_TEXT_NOT_FOUND",
+                )
+            # rows is empty - try the title-based fallback if one was requested.
+            if fallback_title:
+                fallback_html = self._fetch_template_html_by_title(fallback_title)
+                if fallback_html:
+                    logging.info(
+                        f"Using fallback CertificateTemplateText '{fallback_title}'"
+                    )
+                    return fallback_html
+            raise CertificateError(
+                f"No matching template found for recordType: {record_type} and certificateType: {self.certificate_type.upper()}",
+                "CERTIFICATE_TEMPLATE_TEXT_NOT_FOUND",
+            )
+        except requests.exceptions.RequestException as e:
+            raise CertificateError(f"GraphQL request failed: {str(e)}", "API_REQUEST_FAILED")
+
+    def _fetch_template_html_by_title(self, title):
+        """Fetches a CertificateTemplateText.html row by its unique title; returns None when absent."""
+        query = """
+        query getTemplateHtmlByTitle($title: String!) {
+            CertificateTemplateText(where: {title: {_eq: $title}}) { html }
+        }
+        """
+        headers = {
+            "Content-Type": "application/json",
+            "x-hasura-admin-secret": self.eduhub_client.hasura_admin_secret,
+        }
+        response = requests.post(
+            self.eduhub_client.url,
+            json={"query": query, "variables": {"title": title}},
+            headers=headers,
+        )
+        response.raise_for_status()
+        data = response.json()
+        rows = data.get("data", {}).get("CertificateTemplateText") or []
+        return rows[0]["html"] if rows else None
 
     def fetch_project_type_template_html(self, project_type):
         """
