@@ -211,7 +211,6 @@ class EduHubClient:
                 Course {
                     Program {
                         title
-                        shortTitle
                         achievementCertificateTemplateURL
                         attendanceCertificateTemplateURL
                         AttendanceCertificateTemplate { html }

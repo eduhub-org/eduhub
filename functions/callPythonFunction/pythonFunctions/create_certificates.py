@@ -35,7 +35,7 @@ class CertificateError(Exception):
 
 class CertificateCreator:
     """
-    The `CertificateCreator` class generates certificates for course enrollments by retrieving the necessary template images and html-texts, preparing the content for each certificate based on the enrollment data and then converting HTML templates into PDF certificates. These PDFs are then uploaded to Google Cloud Storage (GCS) and the URLs of the created certificates are updated in the course enrollment records. The class handles attendance certificates, achievement certificates, and degree certificates (which are a special type of achievement certificate for Programs with shortTitle "DEGREES").
+    The `CertificateCreator` class generates certificates for course enrollments by retrieving the necessary template images and html-texts, preparing the content for each certificate based on the enrollment data and then converting HTML templates into PDF certificates. These PDFs are then uploaded to Google Cloud Storage (GCS) and the URLs of the created certificates are updated in the course enrollment records. The class handles attendance and achievement certificates. Degree certificates are not special-cased: a degree is simply an achievement certificate whose course carries its own HTML template via Course.achievementCertificateTemplateId.
     """
     def __init__(self, arguments, enrollments=None, edu_hub_client=None):
         """
@@ -63,28 +63,7 @@ class CertificateCreator:
         if not self.enrollments:
             raise CertificateError("No enrollments found", "NO_ENROLLMENTS_FOUND")
 
-        # Check if this is a degree certificate (Program shortTitle "DEGREES")
-        self.is_degree = self._is_degree_certificate()
-        
         logging.info(f"Processing {len(self.enrollments)} enrollments for certificate creation")
-        if self.is_degree:
-            logging.info("Detected degree certificate (Program shortTitle: DEGREES)")
-
-    def _is_degree_certificate(self):
-        """
-        Checks if this is a degree certificate by verifying if the program shortTitle is "DEGREES".
-        
-        Returns:
-            bool: True if this is a degree certificate (Program shortTitle "DEGREES"), False otherwise
-        """
-        try:
-            if self.enrollments and len(self.enrollments) > 0:
-                program_short_title = self.enrollments[0].get('Course', {}).get('Program', {}).get('shortTitle')
-                return program_short_title == "DEGREES"
-            return False
-        except Exception as e:
-            logging.warning(f"Could not determine if this is a degree certificate: {e}")
-            return False
 
     def create_certificates(self,):
         """
@@ -231,14 +210,16 @@ class CertificateCreator:
         Resolves the HTML certificate template via the scope chain populated by
         migration 1780045613786_migrate_achievements_to_projects:
 
-          achievement (project) : Course.AchievementCertificateTemplate
-                              ?? Project.ProjectType.CertificateTemplate
-          achievement (degree)  : Course.AchievementCertificateTemplate
-                                  (each degree course owns its unique HTML)
-          attendance            : Course.AttendanceCertificateTemplate
-                              ?? Program.AttendanceCertificateTemplate
+          achievement : Course.AchievementCertificateTemplate
+                    ?? Project.ProjectType.CertificateTemplate
+          attendance  : Course.AttendanceCertificateTemplate
+                    ?? Program.AttendanceCertificateTemplate
 
-        All four candidate rows are fetched in the bulk enrollment query so this
+        A degree is just an achievement whose course owns its own
+        Course.AchievementCertificateTemplate, so it resolves through the first
+        step of the achievement chain with no special-casing.
+
+        All candidate rows are fetched in the bulk enrollment query so this
         method makes no additional network call.
 
         Raises:
@@ -254,12 +235,6 @@ class CertificateCreator:
                 course_template = course.get("AchievementCertificateTemplate")
                 if course_template and course_template.get("html"):
                     return course_template["html"]
-
-                if self.is_degree:
-                    raise CertificateError(
-                        f"Degree course id={course.get('id')} has no achievementCertificateTemplate configured",
-                        "CERTIFICATE_TEMPLATE_TEXT_NOT_FOUND",
-                    )
 
                 project_authors = enrollment.get("User", {}).get("ProjectAuthors") or []
                 if not project_authors:
@@ -296,103 +271,6 @@ class CertificateCreator:
             logging.error(error_msg)
             raise CertificateError(error_msg, "TEMPLATE_TEXT_FETCH_ERROR")
 
-    def get_successful_degree_participations(self, user_id, degree_course_id):
-        """
-        Fetches all successful course participations (with achievement certificate) 
-        and attended events for a user within a specific degree program.
-
-        Args:
-            user_id (str): The UUID of the user
-            degree_course_id (int): The ID of the degree course
-
-        Returns:
-            list: A list of formatted course participation strings
-                  Format: "Kurstitel (Semester) (ECTS)" for courses or "Event-Titel (Hackathon)" for events
-        """
-        query = """
-        query GetSuccessfulDegreeParticipations($userId: uuid!, $degreeCourseId: Int!) {
-            User_by_pk(id: $userId) {
-                CourseEnrollments(
-                    where: {
-                        Course: {
-                            CourseDegrees: { degreeCourseId: { _eq: $degreeCourseId } }
-                        },
-                        _or: [
-                            { achievementCertificateURL: { _is_null: false } },
-                            {
-                                Course: {
-                                    Program: { shortTitle: { _eq: "EVENTS" } }
-                                }
-                            }
-                        ]
-                    }
-                ) {
-                    Course {
-                        id
-                        title
-                        ects
-                        Program {
-                            title
-                            shortTitle
-                        }
-                    }
-                }
-            }
-        }
-        """
-        
-        variables = {
-            "userId": user_id,
-            "degreeCourseId": degree_course_id
-        }
-        
-        try:
-            result = self.eduhub_client.send_query(query, variables)
-            
-            if result.get("errors"):
-                logging.warning(f"GraphQL errors when fetching degree participations: {result['errors']}")
-                return []
-            
-            user_data = result.get("data", {}).get("User_by_pk")
-            if not user_data:
-                return []
-            
-            enrollments = user_data.get("CourseEnrollments", [])
-            formatted_participations = []
-            events = []
-            
-            for enrollment in enrollments:
-                course = enrollment.get("Course", {})
-                course_title = course.get("title", "")
-                program_title = course.get("Program", {}).get("title", "")
-                program_short_title = course.get("Program", {}).get("shortTitle", "")
-                ects = course.get("ects", "0")
-                
-                # Check if this is an Event
-                if program_short_title == "EVENTS":
-                    # Format: "Event-Titel (Hackathon)"
-                    formatted_entry = f"{course_title} (Hackathon)"
-                    events.append(formatted_entry)
-                else:
-                    # Format ECTS: replace comma with dot and handle formatting
-                    try:
-                        ects_float = float(ects.replace(",", "."))
-                        ects_formatted = f"{ects_float:.1f}"
-                    except (ValueError, AttributeError):
-                        ects_formatted = "0"
-                    
-                    formatted_entry = f"{course_title} ({program_title}) ({ects_formatted} ECTS)"
-                    formatted_participations.append(formatted_entry)
-            
-            # Events are added at the end
-            formatted_participations.extend(events)
-            
-            return formatted_participations
-            
-        except Exception as e:
-            logging.error(f"Error fetching successful degree participations: {e}")
-            return []
-
     def prepare_text_content(self, enrollment, image):
         """
         Prepares the text content for the certificate template.
@@ -423,47 +301,30 @@ class CertificateCreator:
                 }
             
             elif self.certificate_type == "achievement":
-                if self.is_degree:
-                    # Degree certificate - fetch successful participations
-                    user_id = enrollment["User"]["id"]
-                    successful_participations = self.get_successful_degree_participations(user_id, self.course_id)
-                    
+                if not enrollment.get('Course') or not enrollment.get('Course', {}).get('learningGoals'):
+                    raise CertificateError("Missing required course or learning goals data", "MISSING_COURSE_DATA")
 
-                    return {
-                        "full_name": f"{enrollment['User']['firstName'].upper()} {enrollment['User']['lastName'].upper()}",
-                        "course_name": enrollment["Course"]["title"],
-                        "semester": enrollment["Course"]["Program"]["title"],
-                        "template": image,
-                        "ECTS": enrollment["Course"]["ects"],
-                        "program_title": enrollment["Course"]["Program"]["title"],
-                        "successful_participations": successful_participations
-                    }
+                learning_goals = [goal.strip() for goal in enrollment["Course"]["learningGoals"].split("\n") if goal.strip()]
+                # Handle both string and numeric ECTS values
+                ects_value = enrollment["Course"]["ects"]
+                if isinstance(ects_value, str):
+                    ects_float = float(ects_value.replace(",", "."))
                 else:
-                    # Regular achievement certificate
-                    if not enrollment.get('Course') or not enrollment.get('Course', {}).get('learningGoals'):
-                        raise CertificateError("Missing required course or learning goals data", "MISSING_COURSE_DATA")
-                    
-                    learning_goals = [goal.strip() for goal in enrollment["Course"]["learningGoals"].split("\n") if goal.strip()]
-                    # Handle both string and numeric ECTS values
-                    ects_value = enrollment["Course"]["ects"]
-                    if isinstance(ects_value, str):
-                        ects_float = float(ects_value.replace(",", "."))
-                    else:
-                        ects_float = float(ects_value)
-                    
-                    project_authors = enrollment["User"].get("ProjectAuthors") or []
-                    if not project_authors:
-                        raise CertificateError("No completed project found for user", "ACHIEVEMENT_RECORD_NOT_FOUND")
+                    ects_float = float(ects_value)
 
-                    return {
-                        "full_name": f"{enrollment['User']['firstName'].upper()} {enrollment['User']['lastName'].upper()}",
-                        "course_name": enrollment["Course"]["title"],
-                        "semester": enrollment["Course"]["Program"]["title"],
-                        "template": image,
-                        "ECTS": str(ects_float * 30),
-                        "learningGoalsList": learning_goals,
-                        "praxisprojekt": project_authors[0]["Project"]["title"]
-                    }
+                project_authors = enrollment["User"].get("ProjectAuthors") or []
+                if not project_authors:
+                    raise CertificateError("No completed project found for user", "ACHIEVEMENT_RECORD_NOT_FOUND")
+
+                return {
+                    "full_name": f"{enrollment['User']['firstName'].upper()} {enrollment['User']['lastName'].upper()}",
+                    "course_name": enrollment["Course"]["title"],
+                    "semester": enrollment["Course"]["Program"]["title"],
+                    "template": image,
+                    "ECTS": str(ects_float * 30),
+                    "learningGoalsList": learning_goals,
+                    "praxisprojekt": project_authors[0]["Project"]["title"]
+                }
             
             else:
                 raise CertificateError(f"Invalid certificate type: {self.certificate_type}", "INVALID_CERTIFICATE_TYPE")
