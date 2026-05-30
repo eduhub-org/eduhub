@@ -235,7 +235,9 @@ export const fetchEnrollments = async (userIds, courseId) => {
             Project {
               title
               type
-              achievementCertificateType
+              ProjectType {
+                CertificateTemplate { html }
+              }
             }
           }
           id
@@ -245,7 +247,10 @@ export const fetchEnrollments = async (userIds, courseId) => {
             title
             achievementCertificateTemplateURL
             attendanceCertificateTemplateURL
+            AttendanceCertificateTemplate { html }
           }
+          AchievementCertificateTemplate { html }
+          AttendanceCertificateTemplate { html }
           Sessions(order_by: { startDateTime: asc }) {
             id
             title

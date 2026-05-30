@@ -201,7 +201,9 @@ class EduHubClient:
                         Project {
                             title
                             type
-                            achievementCertificateType
+                            ProjectType {
+                                CertificateTemplate { html }
+                            }
                         }
                     }
                 id
@@ -212,10 +214,11 @@ class EduHubClient:
                         shortTitle
                         achievementCertificateTemplateURL
                         attendanceCertificateTemplateURL
-                        attendanceCertificateTemplateTextId
-                        achievementCertificateTemplateTextId
+                        AttendanceCertificateTemplate { html }
                         id
                     }
+                    AchievementCertificateTemplate { html }
+                    AttendanceCertificateTemplate { html }
                     Sessions(order_by: {startDateTime: asc}) {
                         id
                         title
