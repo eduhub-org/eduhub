@@ -91,6 +91,10 @@ export interface ProgramList_Program {
    */
   attendanceCertificateTemplateURL: string | null;
   /**
+   * Default attendance-certificate template for courses in this program. Falls back to NULL when no template is configured.
+   */
+  attendanceCertificateTemplateId: number | null;
+  /**
    * The URL to the pdf template for the attendance certificate
    */
   achievementCertificateTemplateURL: string | null;
