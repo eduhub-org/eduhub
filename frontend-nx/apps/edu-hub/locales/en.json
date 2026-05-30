@@ -1776,7 +1776,9 @@
       "performance_certificate": "Performance certificate",
       "show_certificates": "Show certificate",
       "no_template_uploaded_yet": "No template uploaded yet",
-      "upload_template": "Click to upload template or drag and drop"
+      "upload_template": "Click to upload template or drag and drop",
+      "html_template_label": "HTML template",
+      "html_template_none": "Use app-level default"
     },
     "participation_data": {
       "generate": "Generate Participation Data (CSV)",
@@ -1951,6 +1953,11 @@
         "pdf_upload_failed": "The PDF could not be uploaded. The instruction was not saved.",
         "create_failed": "The instruction could not be created."
       }
+    },
+    "default_attendance_certificate_template": {
+      "label": "Default attendance certificate template",
+      "help_text": "Default HTML template used for attendance certificates. New programs inherit this value automatically; individual programs can override it.",
+      "none_option": "(none)"
     },
     "onboarding": {
       "label": "Onboarding Texts",

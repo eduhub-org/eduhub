@@ -113,6 +113,21 @@ export const UPDATE_ATTENDANCE_CERTIFICATE_TEMPLATE = gql`
   }
 `;
 
+export const UPDATE_PROGRAM_ATTENDANCE_CERTIFICATE_TEMPLATE_ID = gql`
+  mutation UpdateProgramAttendanceCertificateTemplateId(
+    $programId: Int!
+    $value: Int
+  ) {
+    update_Program_by_pk(
+      pk_columns: { id: $programId }
+      _set: { attendanceCertificateTemplateId: $value }
+    ) {
+      id
+      attendanceCertificateTemplateId
+    }
+  }
+`;
+
 export const UPDATE_ACHIEVEMENT_CERTIFICATE_TEMPLATE = gql`
   mutation UpdateProgramAchievementTemplate(
     $programId: Int!

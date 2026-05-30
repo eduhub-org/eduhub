@@ -13,6 +13,7 @@ import {
 import {
   UPDATE_ACHIEVEMENT_CERTIFICATE_TEMPLATE,
   UPDATE_ATTENDANCE_CERTIFICATE_TEMPLATE,
+  UPDATE_PROGRAM_ATTENDANCE_CERTIFICATE_TEMPLATE_ID,
   UPDATE_START_QUESTIONAIRE,
   UPDATE_SPEAKER_QUESTIONAIRE,
   UPDATE_ClOSING_QUESTIONAIRE,
@@ -24,6 +25,12 @@ import {
   UPDATE_PROGRAM_DEFAULT_PROJECT_TYPE,
   UPDATE_PROGRAM_PROJECT_PROPOSALS_ENABLED_BY_DEFAULT,
 } from '../../../queries/updateProgram';
+import { CERTIFICATE_TEMPLATES } from '../../../queries/certificateTemplates';
+import { CertificateTemplates } from '../../../queries/__generated__/CertificateTemplates';
+import {
+  UpdateProgramAttendanceCertificateTemplateId,
+  UpdateProgramAttendanceCertificateTemplateIdVariables,
+} from '../../../queries/__generated__/UpdateProgramAttendanceCertificateTemplateId';
 import { PROJECT_TYPES } from '../../../queries/project';
 import CheckboxSelector from '../../inputs/CheckboxSelector';
 import DropDownSelector from '../../inputs/DropDownSelector';
@@ -55,6 +62,11 @@ const ExpandableProgramRow: FC<ExpandableProgramRowProps> = ({ program }) => {
   });
 
   const { data: projectTypesData } = useRoleQuery<ProjectTypes>(PROJECT_TYPES);
+  const { data: certificateTemplatesData } = useRoleQuery<CertificateTemplates>(CERTIFICATE_TEMPLATES);
+  const [updateAttendanceCertificateTemplateId] = useAdminMutation<
+    UpdateProgramAttendanceCertificateTemplateId,
+    UpdateProgramAttendanceCertificateTemplateIdVariables
+  >(UPDATE_PROGRAM_ATTENDANCE_CERTIFICATE_TEMPLATE_ID, { refetchQueries: ['ProgramList'] });
   const projectTypeOptions = useMemo(
     () =>
       (projectTypesData?.ProjectType ?? []).map((pt) => ({
@@ -299,6 +311,28 @@ const ExpandableProgramRow: FC<ExpandableProgramRowProps> = ({ program }) => {
                 <h4 className="text-sm font-medium text-label-primary mb-3">
                   {`${t('certificates.template')} ${t('certificates.proof_of_participation')}`}
                 </h4>
+                <label className="block text-xs font-medium text-label-secondary mb-1">
+                  {t('certificates.html_template_label')}
+                </label>
+                <select
+                  className="block w-full mb-3 text-sm rounded border border-border-primary bg-fill-primary p-2"
+                  value={program.attendanceCertificateTemplateId ?? ''}
+                  onChange={(e) =>
+                    updateAttendanceCertificateTemplateId({
+                      variables: {
+                        programId: program.id,
+                        value: e.target.value === '' ? null : parseInt(e.target.value, 10),
+                      },
+                    })
+                  }
+                >
+                  <option value="">{t('certificates.html_template_none')}</option>
+                  {(certificateTemplatesData?.CertificateTemplate ?? []).map((tpl) => (
+                    <option key={tpl.id} value={tpl.id}>
+                      {tpl.name}
+                    </option>
+                  ))}
+                </select>
                 <FileUploadField
                   variant="material"
                   currentFileUrl={program.attendanceCertificateTemplateURL}

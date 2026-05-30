@@ -21,9 +21,16 @@ import {
   UPDATE_APP_SETTINGS_TIME_ZONE,
   UPDATE_APP_SETTINGS_FAQ_VISIBILITY,
   UPDATE_APP_SETTINGS_FAQ_COLLECTION,
+  UPDATE_APP_SETTINGS_DEFAULT_ATTENDANCE_CERTIFICATE_TEMPLATE,
   FAQ_COLLECTIONS,
 } from '../../../queries/appSettings';
 import { AppSettings } from '../../../queries/__generated__/AppSettings';
+import { CERTIFICATE_TEMPLATES } from '../../../queries/certificateTemplates';
+import { CertificateTemplates } from '../../../queries/__generated__/CertificateTemplates';
+import {
+  UpdateAppSettingsDefaultAttendanceCertificateTemplate,
+  UpdateAppSettingsDefaultAttendanceCertificateTemplateVariables,
+} from '../../../queries/__generated__/UpdateAppSettingsDefaultAttendanceCertificateTemplate';
 import { COURSE_GROUP_OPTIONS, UPDATE_COURSE_GROUP_OPTION_ORDER } from '../../../queries/courseGroupOptions';
 import { CourseGroupOptions } from '../../../queries/__generated__/CourseGroupOptions';
 import { FaqCollections } from '../../../queries/__generated__/FaqCollections';
@@ -112,7 +119,14 @@ const ManageAppSettingsContent: FC = () => {
 
   const { data: courseGroupOptionsData } = useAdminQuery<CourseGroupOptions>(COURSE_GROUP_OPTIONS);
   const { data: faqCollectionsData } = useAdminQuery<FaqCollections>(FAQ_COLLECTIONS);
+  const { data: certificateTemplatesData } = useAdminQuery<CertificateTemplates>(CERTIFICATE_TEMPLATES);
   const { data: onboardingTextsData } = useAdminQuery<OnboardingTexts>(ONBOARDING_TEXTS);
+  const [updateDefaultAttendanceCertificateTemplate] = useAdminMutation<
+    UpdateAppSettingsDefaultAttendanceCertificateTemplate,
+    UpdateAppSettingsDefaultAttendanceCertificateTemplateVariables
+  >(UPDATE_APP_SETTINGS_DEFAULT_ATTENDANCE_CERTIFICATE_TEMPLATE, {
+    refetchQueries: ['AppSettings'],
+  });
 
   // Filter course group options to only show slider groups
   const sliderGroupOptions = useMemo(() => {
@@ -337,6 +351,34 @@ const ManageAppSettingsContent: FC = () => {
                 refetchQueries={['AppSettings']}
               />
             </div>
+          </div>
+
+          <div className="mt-16 border border-gray-300 rounded p-6">
+            <label className="text-xs uppercase tracking-widest font-medium text-gray-400 mb-4 block">
+              {t('default_attendance_certificate_template.label')}
+            </label>
+            <p className="text-xs text-gray-400 mb-3">
+              {t('default_attendance_certificate_template.help_text')}
+            </p>
+            <select
+              className="block w-full text-sm rounded border border-border-primary bg-fill-primary p-2"
+              value={appSettingsData?.AppSettings[0]?.defaultAttendanceCertificateTemplateId ?? ''}
+              onChange={(e) =>
+                updateDefaultAttendanceCertificateTemplate({
+                  variables: {
+                    appName: 'edu',
+                    value: e.target.value === '' ? null : parseInt(e.target.value, 10),
+                  },
+                })
+              }
+            >
+              <option value="">{t('default_attendance_certificate_template.none_option')}</option>
+              {(certificateTemplatesData?.CertificateTemplate ?? []).map((tpl) => (
+                <option key={tpl.id} value={tpl.id}>
+                  {tpl.name}
+                </option>
+              ))}
+            </select>
           </div>
 
           <ProjectDocumentationInstructionsSection />

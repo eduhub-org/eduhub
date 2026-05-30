@@ -1,6 +1,10 @@
 table:
   name: AppSettings
   schema: public
+object_relationships:
+  - name: DefaultAttendanceCertificateTemplate
+    using:
+      foreign_key_constraint_on: defaultAttendanceCertificateTemplateId
 select_permissions:
   - role: anonymous
     permission:
@@ -12,6 +16,7 @@ select_permissions:
         - bannerTextDe
         - bannerTextEn
         - created_at
+        - defaultAttendanceCertificateTemplateId
         - faqCollectionName
         - previewImageURL
         - showFaqSection

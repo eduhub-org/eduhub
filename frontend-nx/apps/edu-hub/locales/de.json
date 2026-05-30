@@ -1761,7 +1761,9 @@
       "performance_certificate": "Leistungszertifikat",
       "show_certificates": "Bescheinigungen einblenden",
       "no_template_uploaded_yet": "Noch kein Template hochgeladen",
-      "upload_template": "Klicken, um Template hochzuladen oder Datei hier ablegen"
+      "upload_template": "Klicken, um Template hochzuladen oder Datei hier ablegen",
+      "html_template_label": "HTML-Template",
+      "html_template_none": "Standardvorlage der App verwenden"
     },
     "participation_data": {
       "generate": "Teilnehmer:innen Daten generieren (CSV)",
@@ -1946,6 +1948,11 @@
         "pdf_upload_failed": "Das PDF konnte nicht hochgeladen werden. Die Anleitung wurde nicht gespeichert.",
         "create_failed": "Die Anleitung konnte nicht angelegt werden."
       }
+    },
+    "default_attendance_certificate_template": {
+      "label": "Standard-HTML-Template für Teilnahmenachweise",
+      "help_text": "Standard-HTML-Template für Teilnahmenachweise. Neue Programme übernehmen diesen Wert automatisch; einzelne Programme können ihn überschreiben.",
+      "none_option": "(keine)"
     },
     "onboarding": {
       "label": "Onboarding-Texte",
