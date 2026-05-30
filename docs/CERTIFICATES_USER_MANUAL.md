@@ -1,0 +1,251 @@
+# Certificates — User Manual
+
+This manual covers how EduHub produces certificates: the end-to-end creation
+flow, the three certificate variants, and — most importantly — **where the HTML
+templates and the background images are configured**.
+
+It is written for two audiences:
+
+- **Administrators** — configure the HTML templates and background images, and
+  understand how a certificate resolves its template.
+- **Instructors** — trigger certificate generation for the participants of a
+  course.
+
+Participants only ever *download* certificates, so there is no participant-facing
+configuration in this document.
+
+> **Coming soon:** template HTML is currently authored directly in the database
+> (see §6). A dedicated admin page for **creating and editing certificate
+> template HTML** in the browser is planned — once it ships, step §6 will be
+> replaced by "open the template, edit, save". The image upload and the template
+> *selection* dropdowns described below already exist today.
+
+---
+
+## 1. Concepts and vocabulary
+
+- **Certificate** — a PDF generated for one participant in one course. It is
+  rendered from an **HTML template** drawn on top of a **background image**, then
+  stored and linked from the participant's course enrollment.
+- **HTML template** (`CertificateTemplate`) — a reusable, named Jinja2 HTML
+  document. This is the *text and layout* of the certificate. One row per
+  distinct template; referenced by FK from whichever entity owns the variant.
+- **Background image** — the PNG/JPG/PDF that sits *behind* the text (logo,
+  border, signatures). Set as a URL on the **Program**, exposed in the template
+  as the `{{ template }}` variable. This is **separate** from the HTML template.
+- **Certificate variant** — one of three flavours: *attendance*, *achievement*,
+  or *degree* (degree is a special case of achievement).
+
+The key thing to internalise: **a certificate = HTML template + background
+image + per-participant data.** The HTML and the image are configured in
+different places, and either can be overridden independently.
+
+---
+
+## 2. The three certificate variants
+
+| Variant | Who gets it | What it certifies |
+|---|---|---|
+| **Attendance** | Course participants who attended enough sessions | Participation / "Teilnahmenachweis" |
+| **Achievement** | Participants who completed a project in the course | Performance / "Leistungszertifikat" |
+| **Degree** | Participants of a course in a **Degrees** program (`Program.shortTitle = DEGREES`) | Completion of a full degree |
+
+A *degree* certificate is technically an *achievement* certificate whose program
+is a Degrees program. The generator detects this automatically from the program
+short title — instructors do not choose "degree" explicitly.
+
+---
+
+## 3. The end-to-end creation flow
+
+```
+            ┌─────────────────────────────────────────────────────────────┐
+            │ ADMIN (one-time setup, per program)                          │
+            │  • upload background image  → Program.*CertificateTemplateURL │
+            │  • pick HTML template       → *.certificateTemplateId FK      │
+            └─────────────────────────────────────────────────────────────┘
+                                       │
+                                       ▼
+   INSTRUCTOR, in Manage Course → Participations tab:
+     selects participants → clicks "Generate attendance / achievement certificates"
+                                       │
+                                       ▼  (createCertificates mutation,
+                                       │   certificateType = "attendance" | "achievement")
+            ┌─────────────────────────────────────────────────────────────┐
+            │ SERVER (Python certificate function)                         │
+            │  1. resolve HTML template  (the chain in §5)                 │
+            │  2. resolve background image (Program URL, §4)               │
+            │  3. fill per-participant data (full_name, ECTS, …)           │
+            │  4. render Jinja2 HTML → PDF (xhtml2pdf)                     │
+            │  5. upload PDF to Google Cloud Storage                       │
+            │  6. write URL onto CourseEnrollment.*CertificateURL          │
+            └─────────────────────────────────────────────────────────────┘
+                                       │
+                                       ▼
+        PARTICIPANT: sees and downloads the PDF under "My Certificates".
+```
+
+Notes:
+
+- Generation is **batch, per course**: the instructor selects users on the
+  Participations tab and runs it for the whole selection.
+- The generated PDF is stored at
+  `{userId}/{courseId}/{attendance|achievement}_certificate.pdf` in GCS, and its
+  URL is saved to `CourseEnrollment.attendanceCertificateURL` /
+  `achievementCertificateURL`.
+- Re-running generation overwrites the existing PDF for that user + course.
+
+---
+
+## 4. Where the **background image** is set
+
+The background image is the visual backdrop (`{{ template }}` in the HTML). It is
+uploaded **per program** and is unchanged by the recent template restructure.
+
+**Where:** `Manage Programs` → expand a program → **Certificate Templates** card.
+There are two upload fields:
+
+- **Proof of participation** → stored on `Program.attendanceCertificateTemplateURL`
+- **Performance certificate** → stored on `Program.achievementCertificateTemplateURL`
+
+Accepted formats: `.pdf, .jpg, .jpeg, .png` (max 10 MB). Degree certificates use
+the *achievement* image of their Degrees program.
+
+> These image fields are about the **picture behind the text**, not the text
+> itself. Uploading a new image never changes which HTML template is used.
+
+---
+
+## 5. Where the **HTML template** is set, and how it resolves
+
+HTML templates live in the `CertificateTemplate` catalog (each has a unique
+`name` and an `html` body). Owners reference a template by FK, and at render time
+the server walks a **precedence chain**, most-specific first:
+
+### Attendance
+
+```
+Course.attendanceCertificateTemplateId          (per-course override)
+  ↓ if null
+Program.attendanceCertificateTemplateId          (program default)
+```
+
+### Achievement (project-based)
+
+```
+Course.achievementCertificateTemplateId          (per-course override)
+  ↓ if null
+ProjectType.certificateTemplateId                 (default for the completed
+                                                   project's type)
+```
+
+### Degree
+
+```
+Course.achievementCertificateTemplateId           (each degree course owns its
+                                                    own unique template)
+```
+
+Each **degree course** carries its own HTML directly on
+`Course.achievementCertificateTemplateId`, because every degree's wording is
+unique.
+
+### 5.1 Where admins set these today
+
+| Scope | Field | UI location | Status |
+|---|---|---|---|
+| **App-level default (attendance)** | `AppSettings.defaultAttendanceCertificateTemplateId` | `Manage App Settings` → "Default attendance certificate template" dropdown | **Available now** |
+| **Program (attendance)** | `Program.attendanceCertificateTemplateId` | `Manage Programs` → program → Certificate Templates card → "HTML template" dropdown | **Available now** |
+| **Course (attendance / achievement override)** | `Course.{attendance,achievement}CertificateTemplateId` | — | DB-only for now |
+| **Project type (achievement default)** | `ProjectType.certificateTemplateId` | — | DB-only for now |
+
+### 5.2 The app-level attendance default and the snapshot rule
+
+To avoid configuring every program by hand, there is an **app-level default**
+attendance template (`Manage App Settings`). It behaves as a *snapshot*, not a
+live link:
+
+- **On program creation** — a database trigger copies the current app-level
+  default into the new program's `attendanceCertificateTemplateId` (unless one
+  was set explicitly).
+- **In the program dropdown** — choosing **"Apply current app-level default"**
+  copies the *current* default's concrete value into the program.
+
+In both cases the program stores a concrete template id. **Changing the
+app-level default later does not retroactively change existing programs** — past
+programs keep whatever template they were given. This is intentional: a new
+default should only affect programs created (or explicitly re-pointed) after the
+change.
+
+---
+
+## 6. Authoring / editing template HTML (current process)
+
+Today the HTML bodies in `CertificateTemplate` are managed directly in the
+database (via seeds or SQL `INSERT`/`UPDATE`). A template row is just:
+
+- `name` — unique, human-readable (e.g. *"Default achievement certificate"*,
+  *"Degree certificate — Digital Innovation"*).
+- `html` — a Jinja2 document. The background image is referenced as
+  `{{ template }}`; the other variables available depend on the variant (§7).
+
+Once a template row exists, it appears in the selection dropdowns described in
+§5.1 and can be assigned to any program/course/project type.
+
+> **Coming soon:** a dedicated admin page to **create and edit certificate
+> template HTML in the browser** is planned. It will let admins add a new named
+> template, edit its HTML, and preview it — removing the need to touch the
+> database for routine template changes. The selection dropdowns and image
+> uploads in this manual will stay the same; only the authoring step in this
+> section will move into the UI.
+
+---
+
+## 7. Template variables (Jinja2)
+
+The server fills different variables per variant. Common to all:
+`{{ template }}` (background image), `{{ full_name }}`, `{{ course_name }}`,
+`{{ semester }}` (the program title).
+
+| Variant | Additional variables |
+|---|---|
+| **Attendance** | `{{ event_entries }}` (list of attended session titles), `{{ ECTS }}` |
+| **Achievement** | `{{ ECTS }}`, `{{ learningGoalsList }}`, `{{ praxisprojekt }}` (the completed project title), plus `online_courses` / practical-project distinction derived from the project's type |
+| **Degree** | `{{ ECTS }}`, `{{ successful_participations }}` (list of completed degree components) |
+
+Names are rendered upper-cased. ECTS formatting is handled server-side.
+
+---
+
+## 8. Quick reference — "where do I change X?"
+
+| I want to… | Go to | Field |
+|---|---|---|
+| Change the **logo/border/background** of a program's certificates | Manage Programs → program → Certificate Templates card → upload | `Program.{attendance,achievement}CertificateTemplateURL` |
+| Change **which HTML template** a program's attendance certificates use | Manage Programs → program → Certificate Templates card → "HTML template" dropdown | `Program.attendanceCertificateTemplateId` |
+| Set the **default** attendance template new programs inherit | Manage App Settings → "Default attendance certificate template" | `AppSettings.defaultAttendanceCertificateTemplateId` |
+| Override a **single course's** template | (DB for now) | `Course.{attendance,achievement}CertificateTemplateId` |
+| Change the **default achievement template per project type** | (DB for now) | `ProjectType.certificateTemplateId` |
+| Set a **degree's** unique wording | (DB for now) | the degree `Course.achievementCertificateTemplateId` |
+| **Edit the HTML** of a template | (DB for now; dedicated page coming soon) | `CertificateTemplate.html` |
+| **Generate** certificates | Manage Course → Participations tab → generate buttons | — |
+
+---
+
+## 9. Troubleshooting
+
+- **"Template image not found" / generation fails for attendance or achievement**
+  — the program has no background image uploaded for that variant (§4). Upload
+  the corresponding image on the program.
+- **"No template found" / "certificate template not found"** — no HTML template
+  resolves through the chain in §5. Check, in order: the course override, then
+  the program default (attendance) or the project type default (achievement). For
+  a degree course, confirm its `achievementCertificateTemplateId` is set.
+- **A new program got the wrong / no attendance template** — it inherited the
+  app-level default at creation time (§5.2). Pick the right template in the
+  program dropdown; this only affects that program.
+- **Changing the app-level default didn't update existing programs** — that is by
+  design (§5.2). Re-point each program explicitly via its dropdown.
+- **Achievement certificate but the participant has no completed project** —
+  achievement certificates require a `COMPLETED` project authored by the user in
+  that course; without one there is nothing to certify.
