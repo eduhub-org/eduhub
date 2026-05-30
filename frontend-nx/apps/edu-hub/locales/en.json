@@ -1778,7 +1778,7 @@
       "no_template_uploaded_yet": "No template uploaded yet",
       "upload_template": "Click to upload template or drag and drop",
       "html_template_label": "HTML template",
-      "html_template_none": "Use app-level default"
+      "html_template_apply_default": "Apply current app-level default"
     },
     "participation_data": {
       "generate": "Generate Participation Data (CSV)",

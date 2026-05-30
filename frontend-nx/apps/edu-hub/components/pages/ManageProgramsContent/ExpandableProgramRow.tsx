@@ -27,6 +27,8 @@ import {
 } from '../../../queries/updateProgram';
 import { CERTIFICATE_TEMPLATES } from '../../../queries/certificateTemplates';
 import { CertificateTemplates } from '../../../queries/__generated__/CertificateTemplates';
+import { APP_SETTINGS } from '../../../queries/appSettings';
+import { AppSettings } from '../../../queries/__generated__/AppSettings';
 import {
   UpdateProgramAttendanceCertificateTemplateId,
   UpdateProgramAttendanceCertificateTemplateIdVariables,
@@ -63,6 +65,11 @@ const ExpandableProgramRow: FC<ExpandableProgramRowProps> = ({ program }) => {
 
   const { data: projectTypesData } = useRoleQuery<ProjectTypes>(PROJECT_TYPES);
   const { data: certificateTemplatesData } = useRoleQuery<CertificateTemplates>(CERTIFICATE_TEMPLATES);
+  const { data: appSettingsData } = useRoleQuery<AppSettings>(APP_SETTINGS, {
+    variables: { appName: 'edu' },
+  });
+  const defaultAttendanceCertificateTemplateId =
+    appSettingsData?.AppSettings[0]?.defaultAttendanceCertificateTemplateId ?? null;
   const [updateAttendanceCertificateTemplateId] = useAdminMutation<
     UpdateProgramAttendanceCertificateTemplateId,
     UpdateProgramAttendanceCertificateTemplateIdVariables
@@ -321,12 +328,18 @@ const ExpandableProgramRow: FC<ExpandableProgramRowProps> = ({ program }) => {
                     updateAttendanceCertificateTemplateId({
                       variables: {
                         programId: program.id,
-                        value: e.target.value === '' ? null : parseInt(e.target.value, 10),
+                        // Selecting "apply default" snapshots the current app-level default's
+                        // concrete value, so later changes to the default do not retroactively
+                        // affect this program.
+                        value:
+                          e.target.value === ''
+                            ? defaultAttendanceCertificateTemplateId
+                            : parseInt(e.target.value, 10),
                       },
                     })
                   }
                 >
-                  <option value="">{t('certificates.html_template_none')}</option>
+                  <option value="">{t('certificates.html_template_apply_default')}</option>
                   {(certificateTemplatesData?.CertificateTemplate ?? []).map((tpl) => (
                     <option key={tpl.id} value={tpl.id}>
                       {tpl.name}

@@ -1763,7 +1763,7 @@
       "no_template_uploaded_yet": "Noch kein Template hochgeladen",
       "upload_template": "Klicken, um Template hochzuladen oder Datei hier ablegen",
       "html_template_label": "HTML-Template",
-      "html_template_none": "Standardvorlage der App verwenden"
+      "html_template_apply_default": "Aktuellen App-Standard übernehmen"
     },
     "participation_data": {
       "generate": "Teilnehmer:innen Daten generieren (CSV)",
