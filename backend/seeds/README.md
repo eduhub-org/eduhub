@@ -47,6 +47,28 @@ PYTHONDONTWRITEBYTECODE=1 python3 backend/seeds/utils/generate_ml_degree_seed.py
 This dataset is still part of the default seed. Larger performance datasets
 should be kept in a separate opt-in seed profile.
 
+### Loading the Performance Test Degree Seed
+
+The large Performance Test Degree dataset is intentionally separate from the
+default seed so normal `docker compose up` startup stays light.
+
+Generate or refresh the SQL file:
+
+```bash
+PYTHONDONTWRITEBYTECODE=1 python3 backend/seeds/utils/generate_performance_degree_seed.py --users 5000
+```
+
+Load it into a running local Docker database:
+
+```bash
+bash backend/seeds/utils/load_performance_degree_seed.sh
+```
+
+The loader uses the Hasura container and reads
+`/hasura-seeds/performance/performance_degree_seed.sql`, which is available
+through the existing `./backend/seeds:/hasura-seeds` Docker volume. This avoids
+changing Docker Compose for each optional performance dataset.
+
 ## Exporting Current Data as Seeds
 
 You can export the current database state as a seed file using the provided script. This is useful when you've made changes to the database that should become the new initial state for fresh installations.
