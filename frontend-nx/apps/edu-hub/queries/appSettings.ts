@@ -13,22 +13,6 @@ export const APP_SETTINGS = gql`
       timeZone
       showFaqSection
       faqCollectionName
-      defaultAttendanceCertificateTemplateId
-    }
-  }
-`;
-
-export const UPDATE_APP_SETTINGS_DEFAULT_ATTENDANCE_CERTIFICATE_TEMPLATE = gql`
-  mutation UpdateAppSettingsDefaultAttendanceCertificateTemplate(
-    $appName: String!
-    $value: Int
-  ) {
-    update_AppSettings_by_pk(
-      pk_columns: { appName: $appName }
-      _set: { defaultAttendanceCertificateTemplateId: $value }
-    ) {
-      appName
-      defaultAttendanceCertificateTemplateId
     }
   }
 `;

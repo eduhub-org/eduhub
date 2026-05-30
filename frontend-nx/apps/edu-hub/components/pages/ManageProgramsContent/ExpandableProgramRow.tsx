@@ -27,8 +27,8 @@ import {
 } from '../../../queries/updateProgram';
 import { CERTIFICATE_TEMPLATES } from '../../../queries/certificateTemplates';
 import { CertificateTemplates } from '../../../queries/__generated__/CertificateTemplates';
-import { APP_SETTINGS } from '../../../queries/appSettings';
-import { AppSettings } from '../../../queries/__generated__/AppSettings';
+import { PROGRAM_TYPE_DEFAULTS } from '../../../queries/programTypeDefaults';
+import { ProgramTypeDefaults } from '../../../queries/__generated__/ProgramTypeDefaults';
 import {
   UpdateProgramAttendanceCertificateTemplateId,
   UpdateProgramAttendanceCertificateTemplateIdVariables,
@@ -65,11 +65,10 @@ const ExpandableProgramRow: FC<ExpandableProgramRowProps> = ({ program }) => {
 
   const { data: projectTypesData } = useRoleQuery<ProjectTypes>(PROJECT_TYPES);
   const { data: certificateTemplatesData } = useRoleQuery<CertificateTemplates>(CERTIFICATE_TEMPLATES);
-  const { data: appSettingsData } = useRoleQuery<AppSettings>(APP_SETTINGS, {
-    variables: { appName: 'edu' },
-  });
+  const { data: programTypeDefaultsData } = useRoleQuery<ProgramTypeDefaults>(PROGRAM_TYPE_DEFAULTS);
   const defaultAttendanceCertificateTemplateId =
-    appSettingsData?.AppSettings[0]?.defaultAttendanceCertificateTemplateId ?? null;
+    programTypeDefaultsData?.ProgramType.find((pt) => pt.value === program.type)
+      ?.defaultAttendanceCertificateTemplateId ?? null;
   const [updateAttendanceCertificateTemplateId] = useAdminMutation<
     UpdateProgramAttendanceCertificateTemplateId,
     UpdateProgramAttendanceCertificateTemplateIdVariables

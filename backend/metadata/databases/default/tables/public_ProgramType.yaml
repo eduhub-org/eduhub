@@ -2,6 +2,10 @@ table:
   name: ProgramType
   schema: public
 is_enum: true
+object_relationships:
+  - name: DefaultAttendanceCertificateTemplate
+    using:
+      foreign_key_constraint_on: defaultAttendanceCertificateTemplateId
 array_relationships:
   - name: Programs
     using:
@@ -15,4 +19,5 @@ select_permissions:
     permission:
       columns:
         - value
+        - defaultAttendanceCertificateTemplateId
       filter: {}

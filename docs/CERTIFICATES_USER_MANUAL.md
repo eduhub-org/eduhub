@@ -1,7 +1,7 @@
 # Certificates — User Manual
 
 This manual covers how EduHub produces certificates: the end-to-end creation
-flow, the three certificate variants, and — most importantly — **where the HTML
+flow, the two certificate variants, and — most importantly — **where the HTML
 templates and the background images are configured**.
 
 It is written for two audiences:
@@ -42,17 +42,19 @@ different places, and either can be overridden independently.
 
 ---
 
-## 2. The three certificate variants
+## 2. The two certificate variants
 
 | Variant | Who gets it | What it certifies |
 |---|---|---|
 | **Attendance** | Course participants who attended enough sessions | Participation / "Teilnahmenachweis" |
 | **Achievement** | Participants who completed a project in the course | Performance / "Leistungszertifikat" |
-| **Degree** | Participants of a course in a **Degrees** program (`Program.shortTitle = DEGREES`) | Completion of a full degree |
 
-A *degree* certificate is technically an *achievement* certificate whose program
-is a Degrees program. The generator detects this automatically from the program
-short title — instructors do not choose "degree" explicitly.
+**Degrees are not a third variant.** A degree certificate is just an achievement
+certificate whose **course** carries its own HTML template directly on
+`Course.achievementCertificateTemplateId` (each degree's wording is unique). No
+special detection by program type or short title happens at render time — the
+normal achievement resolution chain (§5) walks straight to the course-level
+template.
 
 ---
 
@@ -108,8 +110,8 @@ There are two upload fields:
 - **Proof of participation** → stored on `Program.attendanceCertificateTemplateURL`
 - **Performance certificate** → stored on `Program.achievementCertificateTemplateURL`
 
-Accepted formats: `.pdf, .jpg, .jpeg, .png` (max 10 MB). Degree certificates use
-the *achievement* image of their Degrees program.
+Accepted formats: `.pdf, .jpg, .jpeg, .png` (max 10 MB). Degree courses use
+the *achievement* image of the program they live in.
 
 > These image fields are about the **picture behind the text**, not the text
 > itself. Uploading a new image never changes which HTML template is used.
@@ -141,41 +143,38 @@ ProjectType.certificateTemplateId                 (default for the completed
 
 ### Degree
 
-```
-Course.achievementCertificateTemplateId           (each degree course owns its
-                                                    own unique template)
-```
-
-Each **degree course** carries its own HTML directly on
-`Course.achievementCertificateTemplateId`, because every degree's wording is
-unique.
+A degree certificate is an achievement certificate; the resolution chain above
+applies. In practice it always resolves at the first step because each degree
+**course** has its own HTML on `Course.achievementCertificateTemplateId`.
 
 ### 5.1 Where admins set these today
 
 | Scope | Field | UI location | Status |
 |---|---|---|---|
-| **App-level default (attendance)** | `AppSettings.defaultAttendanceCertificateTemplateId` | `Manage App Settings` → "Default attendance certificate template" dropdown | **Available now** |
+| **App-level default per program type (attendance)** | `ProgramType.defaultAttendanceCertificateTemplateId` | `Manage App Settings` → "Default attendance certificate templates by program type" — one dropdown per ProgramType (`COURSES`, `EVENTS`, `DEGREES`, …) | **Available now** |
 | **Program (attendance)** | `Program.attendanceCertificateTemplateId` | `Manage Programs` → program → Certificate Templates card → "HTML template" dropdown | **Available now** |
 | **Course (attendance / achievement override)** | `Course.{attendance,achievement}CertificateTemplateId` | — | DB-only for now |
 | **Project type (achievement default)** | `ProjectType.certificateTemplateId` | — | DB-only for now |
 
-### 5.2 The app-level attendance default and the snapshot rule
+### 5.2 The per-program-type attendance default and the snapshot rule
 
-To avoid configuring every program by hand, there is an **app-level default**
-attendance template (`Manage App Settings`). It behaves as a *snapshot*, not a
+To avoid configuring every program by hand, the app holds **one default
+attendance template per `ProgramType`** (`COURSES`, `EVENTS`, `DEGREES`, …).
+This is configured in `Manage App Settings` and behaves as a *snapshot*, not a
 live link:
 
-- **On program creation** — a database trigger copies the current app-level
-  default into the new program's `attendanceCertificateTemplateId` (unless one
-  was set explicitly).
+- **On program creation** — a database trigger reads the new program's `type`,
+  looks up the corresponding `ProgramType.defaultAttendanceCertificateTemplateId`,
+  and copies its value into the new program's
+  `attendanceCertificateTemplateId` (unless one was set explicitly).
 - **In the program dropdown** — choosing **"Apply current app-level default"**
-  copies the *current* default's concrete value into the program.
+  copies the *current* default for that program's type into the program.
 
-In both cases the program stores a concrete template id. **Changing the
-app-level default later does not retroactively change existing programs** — past
-programs keep whatever template they were given. This is intentional: a new
-default should only affect programs created (or explicitly re-pointed) after the
-change.
+In both cases the program stores a concrete template id. **Changing a
+ProgramType default later does not retroactively change existing programs** —
+past programs keep whatever template they were given. This is intentional: a
+new default should only affect programs created (or explicitly re-pointed) after
+the change.
 
 ---
 
@@ -210,8 +209,7 @@ The server fills different variables per variant. Common to all:
 | Variant | Additional variables |
 |---|---|
 | **Attendance** | `{{ event_entries }}` (list of attended session titles), `{{ ECTS }}` |
-| **Achievement** | `{{ ECTS }}`, `{{ learningGoalsList }}`, `{{ praxisprojekt }}` (the completed project title), plus `online_courses` / practical-project distinction derived from the project's type |
-| **Degree** | `{{ ECTS }}`, `{{ successful_participations }}` (list of completed degree components) |
+| **Achievement** (including degree) | `{{ ECTS }}`, `{{ learningGoalsList }}`, `{{ praxisprojekt }}` (the completed project title) |
 
 Names are rendered upper-cased. ECTS formatting is handled server-side.
 
@@ -223,7 +221,7 @@ Names are rendered upper-cased. ECTS formatting is handled server-side.
 |---|---|---|
 | Change the **logo/border/background** of a program's certificates | Manage Programs → program → Certificate Templates card → upload | `Program.{attendance,achievement}CertificateTemplateURL` |
 | Change **which HTML template** a program's attendance certificates use | Manage Programs → program → Certificate Templates card → "HTML template" dropdown | `Program.attendanceCertificateTemplateId` |
-| Set the **default** attendance template new programs inherit | Manage App Settings → "Default attendance certificate template" | `AppSettings.defaultAttendanceCertificateTemplateId` |
+| Set the **default** attendance template new programs inherit, **per program type** | Manage App Settings → "Default attendance certificate templates by program type" | `ProgramType.defaultAttendanceCertificateTemplateId` |
 | Override a **single course's** template | (DB for now) | `Course.{attendance,achievement}CertificateTemplateId` |
 | Change the **default achievement template per project type** | (DB for now) | `ProjectType.certificateTemplateId` |
 | Set a **degree's** unique wording | (DB for now) | the degree `Course.achievementCertificateTemplateId` |
@@ -241,11 +239,13 @@ Names are rendered upper-cased. ECTS formatting is handled server-side.
   resolves through the chain in §5. Check, in order: the course override, then
   the program default (attendance) or the project type default (achievement). For
   a degree course, confirm its `achievementCertificateTemplateId` is set.
-- **A new program got the wrong / no attendance template** — it inherited the
-  app-level default at creation time (§5.2). Pick the right template in the
+- **A new program got the wrong / no attendance template** — it inherited
+  whatever the **`ProgramType` default for its `type`** was at creation time
+  (§5.2). If a ProgramType has no default set, new programs of that type start
+  with `attendanceCertificateTemplateId = NULL`. Pick the right template in the
   program dropdown; this only affects that program.
-- **Changing the app-level default didn't update existing programs** — that is by
-  design (§5.2). Re-point each program explicitly via its dropdown.
+- **Changing a ProgramType default didn't update existing programs** — that is
+  by design (§5.2). Re-point each program explicitly via its dropdown.
 - **Achievement certificate but the participant has no completed project** —
   achievement certificates require a `COMPLETED` project authored by the user in
   that course; without one there is nothing to certify.

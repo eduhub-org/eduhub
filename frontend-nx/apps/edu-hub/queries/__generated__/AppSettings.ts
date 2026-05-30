@@ -40,10 +40,6 @@ export interface AppSettings_AppSettings {
   timeZone: string;
   showFaqSection: boolean;
   faqCollectionName: string;
-  /**
-   * App-level default for Program.attendanceCertificateTemplateId. Copied into every newly inserted Program by the set_program_default_attendance_certificate_template_trg trigger when the program's own attendanceCertificateTemplateId is NULL.
-   */
-  defaultAttendanceCertificateTemplateId: number | null;
 }
 
 export interface AppSettings {

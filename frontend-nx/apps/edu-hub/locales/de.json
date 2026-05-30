@@ -1950,8 +1950,8 @@
       }
     },
     "default_attendance_certificate_template": {
-      "label": "Standard-HTML-Template für Teilnahmenachweise",
-      "help_text": "Standard-HTML-Template für Teilnahmenachweise. Neue Programme übernehmen diesen Wert automatisch; einzelne Programme können ihn überschreiben.",
+      "label": "Standard-HTML-Templates für Teilnahmenachweise je Programmtyp",
+      "help_text": "Standard-HTML-Template für Teilnahmenachweise, separat pro Programmtyp einstellbar. Neue Programme eines Typs übernehmen das passende Template automatisch; einzelne Programme können es überschreiben.",
       "none_option": "(keine)"
     },
     "onboarding": {

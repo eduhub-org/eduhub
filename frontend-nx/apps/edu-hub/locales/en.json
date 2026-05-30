@@ -1955,8 +1955,8 @@
       }
     },
     "default_attendance_certificate_template": {
-      "label": "Default attendance certificate template",
-      "help_text": "Default HTML template used for attendance certificates. New programs inherit this value automatically; individual programs can override it.",
+      "label": "Default attendance certificate templates by program type",
+      "help_text": "Default HTML template for attendance certificates, set separately per program type. New programs of a given type inherit the corresponding template automatically; individual programs can override it.",
       "none_option": "(none)"
     },
     "onboarding": {
