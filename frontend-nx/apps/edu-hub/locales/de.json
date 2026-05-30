@@ -1587,6 +1587,8 @@
       "invitation_expired": "Einladung abgelaufen"
     },
     "invitation_deadline": "Ablaufdatum Einladung",
+    "loading_course": "Kurs wird geladen...",
+    "course_load_error": "Der Kurs konnte nicht geladen werden. Bitte versuche es erneut.",
     "course_not_found": "Kurs {courseId} wurde nicht gefunden!",
     "add_session": "Termin hinzufügen",
     "SessionsTab": {

@@ -1605,6 +1605,8 @@
       "invitation_expired": "Invitation expired"
     },
     "invitation_deadline": "Invitation deadline",
+    "loading_course": "Loading course...",
+    "course_load_error": "The course could not be loaded. Please try again.",
     "course_not_found": "Course {courseId} could not be found!",
     "add_session": "Add Session",
     "SessionsTab": {

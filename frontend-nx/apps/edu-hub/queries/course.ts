@@ -42,26 +42,47 @@ export const COURSE_MINIMUM = gql`
   }
 `;
 
-// Query to get all data on a course that is necessary for the manage course page
+// Query to get the shell data needed for the initial manage course page.
 export const MANAGED_COURSE = gql`
   ${ADMIN_COURSE_FRAGMENT}
-  ${ADMIN_ENROLLMENT_FRAGMENT}
   ${ADMIN_SESSION_FRAGMENT}
-  ${USER_FRAGMENT}
   query ManagedCourse($id: Int!) {
     Course_by_pk(id: $id) {
       ...AdminCourseFragment
+      CourseLocations {
+        id
+        defaultSessionAddress
+        defaultSessionAddressId
+        locationOption
+      }
+      Sessions(order_by: { startDateTime: asc }) {
+        ...AdminSessionFragment
+      }
+    }
+  }
+`;
+
+export const MANAGED_COURSE_APPLICATIONS = gql`
+  ${ADMIN_ENROLLMENT_FRAGMENT}
+  ${USER_FRAGMENT}
+  query ManagedCourseApplications($id: Int!) {
+    Course_by_pk(id: $id) {
+      id
+      registrationType
+      matrixRoomId
+      formbricksEnrollmentSurveyUrl
+      Program {
+        id
+        defaultFormbricksEnrollmentSurveyUrl
+      }
+      Sessions(order_by: { startDateTime: asc }) {
+        id
+        startDateTime
+      }
       CourseEnrollments {
         ...AdminEnrollmentFragment
         User {
           ...UserFragment
-          Attendances(where: { Session: { courseId: { _eq: $id } } }) {
-            id
-            status
-            Session {
-              id
-            }
-          }
           CourseEnrollments {
             status
             courseId
@@ -80,33 +101,6 @@ export const MANAGED_COURSE = gql`
             id
             name
           }
-        }
-      }
-      CourseLocations {
-        id
-        defaultSessionAddress
-        defaultSessionAddressId
-        locationOption
-      }
-      Sessions(order_by: { startDateTime: asc }) {
-        ...AdminSessionFragment
-      }
-      AchievementOptionCourses {
-        AchievementOption {
-          AchievementRecords {
-            id
-            courseId
-            documentationUrl
-            rating
-            created_at
-            AchievementRecordAuthors {
-              userId
-            }
-            AchievementOption {
-              title
-            }
-          }
-          recordType
         }
       }
     }

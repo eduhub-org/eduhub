@@ -2,8 +2,15 @@ import { QueryResult } from '@apollo/client';
 import { FC, useCallback, useMemo, useState } from 'react';
 import {
   ManagedCourse_Course_by_pk,
-  ManagedCourse_Course_by_pk_CourseEnrollments,
 } from '../../../../queries/__generated__/ManagedCourse';
+import {
+  ManagedCourseApplications,
+  ManagedCourseApplicationsVariables,
+  ManagedCourseApplications_Course_by_pk,
+  ManagedCourseApplications_Course_by_pk_CourseEnrollments,
+} from '../../../../queries/__generated__/ManagedCourseApplications';
+import { useRoleQuery } from '../../../../hooks/authedQuery';
+import { MANAGED_COURSE_APPLICATIONS } from '../../../../queries/course';
 import Dot from '../../../common/Dot';
 import { OnlyInstructor } from '../../../common/OnlyLoggedIn';
 import { useIsInstructor, useIsAdmin } from '../../../../hooks/authentication';
@@ -40,7 +47,7 @@ import TableGrid from '../../../common/TableGrid';
 import { ColumnDef } from '@tanstack/react-table';
 import { GoDotFill } from 'react-icons/go';
 import { IoIosCheckmarkCircle, IoIosCloseCircle } from 'react-icons/io';
-import { MotivationRating_enum, CourseEnrollmentStatus_enum } from '../../../../__generated__/globalTypes';
+import { CourseEnrollmentStatus_enum, MotivationRating_enum } from '../../../../__generated__/globalTypes';
 import { getPaymentStatusFromInvoices } from '../../../../utils/invoicePaymentStatus';
 import { useDisplayDate } from '../../../../helpers/dateTimeHelpers';
 import { BulkAction } from '../../../common/TableGrid/types';
@@ -49,6 +56,7 @@ import { ErrorMessageDialog } from '../../../common/dialogs/ErrorMessageDialog';
 import { FormbricksResponsesDisplay } from './FormbricksResponsesDisplay';
 import { getRegistrationFeatures, type RegistrationFeatures } from './registrationConfig';
 import NotificationSnackbar from '../../../common/dialogs/NotificationSnackbar';
+import Loading from '../../../common/Loading';
 
 /** Matches TableGrid `gap-3` between columns; keep in sync with expandable row width math. */
 const APPLICATION_TABLE_GAP_PX = 12;
@@ -99,27 +107,58 @@ function getExpandableRowWidths(features: RegistrationFeatures) {
 
 interface IProps {
   course: ManagedCourse_Course_by_pk;
-  qResult: QueryResult<any, any>;
 }
 
-const isExpired = (enrollment: ManagedCourse_Course_by_pk_CourseEnrollments) => {
+type ApplicationCourse = ManagedCourseApplications_Course_by_pk;
+type ApplicationEnrollment = ManagedCourseApplications_Course_by_pk_CourseEnrollments;
+
+interface ApplicationsTabContentProps {
+  course: ApplicationCourse;
+  qResult: QueryResult<ManagedCourseApplications, ManagedCourseApplicationsVariables>;
+}
+
+const isExpired = (enrollment: ApplicationEnrollment) => {
   if (enrollment.invitationExpirationDate == null) {
     return false;
   }
   return new Date(enrollment.invitationExpirationDate).setHours(0, 0, 0, 0) < new Date().setHours(0, 0, 0, 0);
 };
 
-const isInviteEligibleEnrollment = (enrollment: ManagedCourse_Course_by_pk_CourseEnrollments) =>
+const isInviteEligibleEnrollment = (enrollment: ApplicationEnrollment) =>
   enrollment.motivationRating === 'INVITE' &&
   (enrollment.status === 'APPLIED' ||
     enrollment.status === 'INVITED' ||
     enrollment.status === 'WAITLIST');
 
-const isRejectionEligibleEnrollment = (enrollment: ManagedCourse_Course_by_pk_CourseEnrollments) =>
+const isRejectionEligibleEnrollment = (enrollment: ApplicationEnrollment) =>
   enrollment.motivationRating === 'DECLINE' &&
   (enrollment.status === 'APPLIED' || enrollment.status === 'WAITLIST');
 
-export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
+export const ApplicationsTab: FC<IProps> = ({ course }) => {
+  const t = useTranslations('manageCourse');
+  const qResult = useRoleQuery<ManagedCourseApplications, ManagedCourseApplicationsVariables>(
+    MANAGED_COURSE_APPLICATIONS,
+    {
+      variables: { id: course.id },
+    }
+  );
+
+  if (qResult.loading && !qResult.data) {
+    return <Loading />;
+  }
+
+  if (qResult.error) {
+    return <div className="text-error">{qResult.error.message}</div>;
+  }
+
+  if (!qResult.data?.Course_by_pk) {
+    return <div>{t('course_not_found', { courseId: course.id })}</div>;
+  }
+
+  return <ApplicationsTabContent course={qResult.data.Course_by_pk} qResult={qResult} />;
+};
+
+const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({ course, qResult }) => {
   const t = useTranslations('manageCourse');
   const tCommon = useTranslations('common');
   const tCourse = useTranslations('course');
@@ -229,7 +268,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
   // Dialog state for invitations
   const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
   const [inviteDialogData, setInviteDialogData] = useState<{
-    enrollmentsToSend: ManagedCourse_Course_by_pk_CourseEnrollments[];
+    enrollmentsToSend: ApplicationEnrollment[];
     selectedCount?: number;
     identifiedCount: number;
     actionType: 'selected' | 'all';
@@ -241,7 +280,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
       const enrollmentsToSend = enrollmentIds
         .map((id) => idToRow.get(id))
         .filter(
-          (e): e is ManagedCourse_Course_by_pk_CourseEnrollments => !!e && isInviteEligibleEnrollment(e)
+          (e): e is ApplicationEnrollment => !!e && isInviteEligibleEnrollment(e)
         );
       if (enrollmentsToSend.length === 0) {
         showBulkNotice(t('bulk_actions.no_eligible_invitations'));
@@ -338,7 +377,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
   // Dialog state for rejections
   const [isRejectionDialogOpen, setIsRejectionDialogOpen] = useState(false);
   const [rejectionDialogData, setRejectionDialogData] = useState<{
-    enrollmentsToSend: ManagedCourse_Course_by_pk_CourseEnrollments[];
+    enrollmentsToSend: ApplicationEnrollment[];
     selectedCount?: number;
     identifiedCount: number;
     actionType: 'selected' | 'all';
@@ -350,7 +389,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
       const enrollmentsToSend = enrollmentIds
         .map((id) => idToRow.get(id))
         .filter(
-          (e): e is ManagedCourse_Course_by_pk_CourseEnrollments =>
+          (e): e is ApplicationEnrollment =>
             !!e && isRejectionEligibleEnrollment(e)
         );
       if (enrollmentsToSend.length === 0) {
@@ -521,7 +560,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
 
   // Bulk actions handler
   const handleBulkEmailAction = useCallback(
-    (action: string, selectedRows: ManagedCourse_Course_by_pk_CourseEnrollments[]) => {
+    (action: string, selectedRows: ApplicationEnrollment[]) => {
       if (
         action in bulkActionDisabledMap &&
         bulkActionDisabledMap[action as keyof typeof bulkActionDisabledMap]
@@ -529,7 +568,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
         return;
       }
 
-      let targetEnrollments: ManagedCourse_Course_by_pk_CourseEnrollments[] = [];
+      let targetEnrollments: ApplicationEnrollment[] = [];
 
       // Row expansion actions are handled directly in TableGrid.
       // We only show feedback here when no row was selected.
@@ -732,9 +771,9 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
   }, []);
 
   // Columns definition
-  const columns = useMemo<ColumnDef<ManagedCourse_Course_by_pk_CourseEnrollments>[]>(
+  const columns = useMemo<ColumnDef<ApplicationEnrollment>[]>(
     () => {
-      const baseColumns: ColumnDef<ManagedCourse_Course_by_pk_CourseEnrollments>[] = [
+      const baseColumns: ColumnDef<ApplicationEnrollment>[] = [
         {
           header: t('first_name'),
           accessorKey: 'User.firstName',
@@ -914,7 +953,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
   );
 
   // Expandable row component
-  const ExpandableApplicationRow = ({ row: enrollment }: { row: ManagedCourse_Course_by_pk_CourseEnrollments }) => {
+  const ExpandableApplicationRow = ({ row: enrollment }: { row: ApplicationEnrollment }) => {
     const setUnrated = useCallback(() => {
       setEnrollmentRating(enrollment, MotivationRating_enum.UNRATED);
     }, [enrollment]);
@@ -1160,7 +1199,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
 
       <div>
         <OnlyInstructor>
-          <TableGrid<ManagedCourse_Course_by_pk_CourseEnrollments>
+          <TableGrid<ApplicationEnrollment>
             columns={columns}
             data={filteredEnrollments}
             loading={false}
