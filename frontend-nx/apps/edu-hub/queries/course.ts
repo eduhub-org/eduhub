@@ -147,6 +147,38 @@ export const MANAGED_COURSE_APPLICATIONS = gql`
   }
 `;
 
+export const MANAGED_COURSE_APPLICATION_RECIPIENTS = gql`
+  query ManagedCourseApplicationRecipients(
+    $id: Int!
+    $limit: Int!
+    $filter: CourseEnrollment_bool_exp = {}
+  ) {
+    Course_by_pk(id: $id) {
+      id
+      CourseEnrollments(
+        limit: $limit
+        where: $filter
+        order_by: [{ User: { lastName: asc } }, { User: { firstName: asc } }, { id: asc }]
+      ) {
+        id
+        status
+        motivationRating
+        User {
+          id
+          firstName
+          lastName
+          email
+        }
+      }
+      CourseEnrollments_aggregate(where: $filter) {
+        aggregate {
+          count
+        }
+      }
+    }
+  }
+`;
+
 export const INSERT_SESSION = gql`
   mutation InsertSession(
     $courseId: Int!
