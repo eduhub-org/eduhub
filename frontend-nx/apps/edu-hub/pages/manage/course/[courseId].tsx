@@ -4,6 +4,8 @@ import { Page } from '../../../components/layout/Page';
 import { useRouter } from 'next/router';
 import { useSession } from 'next-auth/react';
 import { ManageCourseContent } from '../../../components/pages/ManageCourseContent';
+import Loading from '../../../components/common/Loading';
+import { PageBlock } from '../../../components/common/PageBlock';
 
 const ManageCoursePage: FC = () => {
   const router = useRouter();
@@ -16,19 +18,19 @@ const ManageCoursePage: FC = () => {
   // Keep ManageCourseContent mounted only when authenticated — it handles its own
   // access-control check (admin vs. instructor-of-course). Blocking unauthenticated
   // prevents MANAGED_COURSE from firing and triggering auth-error behavior.
-  if (
-    status !== 'authenticated' ||
-    !courseIdNumber ||
-    Number.isNaN(courseIdNumber)
-  ) {
+  if (status !== 'authenticated' || !courseIdNumber || Number.isNaN(courseIdNumber)) {
     return (
       <>
         <Head>
           <title>EduHub | opencampus.sh</title>
           <link rel="icon" href="/favicon.png" />
         </Head>
-        <Page>
-          <div>Waiting for authentication!</div>
+        <Page className="min-h-screen bg-bg-primary">
+          <PageBlock>
+            <div className="min-h-[50vh] flex items-center justify-center">
+              <Loading />
+            </div>
+          </PageBlock>
         </Page>
       </>
     );
@@ -40,7 +42,7 @@ const ManageCoursePage: FC = () => {
         <title>EduHub | opencampus.sh</title>
         <link rel="icon" href="/favicon.png" />
       </Head>
-      <Page>
+      <Page className="min-h-screen bg-bg-primary">
         <ManageCourseContent courseId={courseIdNumber} />
       </Page>
     </>
