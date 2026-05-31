@@ -50,6 +50,7 @@ class PerfParticipant:
     current_courses: list[int]
     event_courses: list[int]
     degree_status: str
+    degree_motivation_rating: str
     completion_requirements_met: bool
 
 
@@ -125,12 +126,25 @@ def build_participant(index: int) -> PerfParticipant:
     current_courses = current_courses_for(index, passed_courses)
     event_courses = event_courses_for(index)
     completion_requirements_met = len(passed_courses) * 5 >= 12.5 and len(event_courses) >= 1
-    if completion_requirements_met:
+    if passed_courses:
+        degree_motivation_rating = "INVITE"
+    else:
+        application_bucket = index % 10
+        if application_bucket in (8, 9):
+            degree_motivation_rating = "DECLINE"
+        elif application_bucket in (5, 6, 7):
+            degree_motivation_rating = "REVIEW"
+        else:
+            degree_motivation_rating = "UNRATED"
+
+    if degree_motivation_rating == "DECLINE":
+        degree_status = "REJECTED"
+    elif degree_motivation_rating in ("REVIEW", "UNRATED"):
+        degree_status = "APPLIED"
+    elif completion_requirements_met:
         degree_status = "COMPLETED"
     elif index % 70 == 0:
         degree_status = "INVITED"
-    elif index % 53 == 0:
-        degree_status = "APPLIED"
     elif index % 41 == 0:
         degree_status = "CANCELLED"
     else:
@@ -147,6 +161,7 @@ def build_participant(index: int) -> PerfParticipant:
         current_courses=current_courses,
         event_courses=event_courses,
         degree_status=degree_status,
+        degree_motivation_rating=degree_motivation_rating,
         completion_requirements_met=completion_requirements_met,
     )
 
@@ -410,7 +425,7 @@ def build_sql(user_count: int) -> str:
                 participant.user_id,
                 participant.degree_status,
                 "Seeded performance degree participation.",
-                "UNRATED",
+                participant.degree_motivation_rating,
                 f"{participant.user_id}/{DEGREE_ID}/achievement_certificate.pdf"
                 if participant.completion_requirements_met
                 else None,

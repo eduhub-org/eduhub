@@ -210,6 +210,7 @@ class Participant:
     enrolled_courses: list[int]
     attended_event_count: int
     status: str
+    motivation_rating: str
     completion_requirements_met: bool
 
 
@@ -367,12 +368,25 @@ def build_participant(index: int) -> Participant:
     attended_event_count = attended_event_count_for(index, pattern_variant)
     passed_ects_total = sum(COURSE_ECTS[course_id] for course_id in passed_courses)
     completion_requirements_met = passed_ects_total >= 12.5 and attended_event_count >= 1
-    if completion_requirements_met:
+    if passed_courses:
+        motivation_rating = "INVITE"
+    else:
+        application_bucket = index % 10
+        if application_bucket in (8, 9):
+            motivation_rating = "DECLINE"
+        elif application_bucket in (5, 6, 7):
+            motivation_rating = "REVIEW"
+        else:
+            motivation_rating = "UNRATED"
+
+    if motivation_rating == "DECLINE":
+        status = "REJECTED"
+    elif motivation_rating in ("REVIEW", "UNRATED"):
+        status = "APPLIED"
+    elif completion_requirements_met:
         status = "COMPLETED"
     elif index % 60 == 0:
         status = "INVITED"
-    elif index % 45 == 0:
-        status = "APPLIED"
     elif index % 37 == 0:
         status = "CANCELLED"
     else:
@@ -389,6 +403,7 @@ def build_participant(index: int) -> Participant:
         enrolled_courses=enrolled_courses,
         attended_event_count=attended_event_count,
         status=status,
+        motivation_rating=motivation_rating,
         completion_requirements_met=completion_requirements_met,
     )
 
@@ -480,7 +495,7 @@ def build_sql(user_count: int) -> str:
                 participant.user_id,
                 participant.status,
                 "I want to complete the Machine Learning Degree and document my learning path.",
-                "UNRATED",
+                participant.motivation_rating,
                 f"{participant.user_id}/{DEGREE_ID}/achievement_certificate.pdf"
                 if participant.status == "COMPLETED" and participant.completion_requirements_met
                 else None,
