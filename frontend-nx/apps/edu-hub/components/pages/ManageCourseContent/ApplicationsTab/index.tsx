@@ -44,7 +44,9 @@ import { useTranslations, useLocale } from 'next-intl';
 import Modal from '../../../common/Modal';
 import AddParticipantsForm from './AddParticipantsForm';
 import TableGrid from '../../../common/TableGrid';
-import { ColumnDef } from '@tanstack/react-table';
+import { useTableGrid } from '../../../common/TableGrid/hooks';
+import { createMultiWordSearchCondition } from '../../../common/TableGrid/utils';
+import { ColumnDef, SortingState } from '@tanstack/react-table';
 import { GoDotFill } from 'react-icons/go';
 import { IoIosCheckmarkCircle, IoIosCloseCircle } from 'react-icons/io';
 import { CourseEnrollmentStatus_enum, MotivationRating_enum } from '../../../../__generated__/globalTypes';
@@ -115,6 +117,16 @@ type ApplicationEnrollment = ManagedCourseApplications_Course_by_pk_CourseEnroll
 interface ApplicationsTabContentProps {
   course: ApplicationCourse;
   qResult: QueryResult<ManagedCourseApplications, ManagedCourseApplicationsVariables>;
+  loading: boolean;
+  error: ApolloError | undefined;
+  pageIndex: number;
+  setPageIndex: (index: number) => void;
+  pageSize: number;
+  setPageSize: (size: number) => void;
+  searchFilter: string;
+  setSearchFilter: (value: string) => void;
+  sorting: SortingState;
+  setSorting: (sorting: SortingState | ((prev: SortingState) => SortingState)) => void;
 }
 
 const isExpired = (enrollment: ApplicationEnrollment) => {
@@ -136,29 +148,95 @@ const isRejectionEligibleEnrollment = (enrollment: ApplicationEnrollment) =>
 
 export const ApplicationsTab: FC<IProps> = ({ course }) => {
   const t = useTranslations('manageCourse');
-  const qResult = useRoleQuery<ManagedCourseApplications, ManagedCourseApplicationsVariables>(
-    MANAGED_COURSE_APPLICATIONS,
-    {
-      variables: { id: course.id },
-    }
-  );
+  const [pageSize, setPageSize] = useState(20);
+  const {
+    data,
+    loading,
+    error,
+    queryResult,
+    pageIndex,
+    setPageIndex,
+    searchFilter,
+    setSearchFilter,
+    sorting,
+    setSorting,
+  } = useTableGrid<ManagedCourseApplicationsVariables>({
+    queryHook: useRoleQuery,
+    query: MANAGED_COURSE_APPLICATIONS,
+    queryVariables: { id: course.id },
+    pageSize,
+    refetchFilter: (search) => {
+      const searchCondition = createMultiWordSearchCondition(search, [
+        'User.firstName',
+        'User.lastName',
+        'User.email',
+        'motivationLetter',
+      ]);
+      return { filter: searchCondition };
+    },
+    sortColumnMapper: (columnId) => {
+      switch (columnId) {
+        case 'User.firstName':
+          return { User: { firstName: null } };
+        case 'User.lastName':
+          return { User: { lastName: null } };
+        case 'User.Organization.name':
+          return { User: { Organization: { name: null } } };
+        case 'created_at':
+        case 'motivationRating':
+        case 'status':
+          return columnId;
+        default:
+          return null;
+      }
+    },
+    defaultSort: [{ id: 'asc' }],
+  });
 
-  if (qResult.loading && !qResult.data) {
+  if (loading && !data) {
     return <Loading />;
   }
 
-  if (qResult.error) {
-    return <div className="text-error">{qResult.error.message}</div>;
+  if (error) {
+    return <div className="text-error">{error.message}</div>;
   }
 
-  if (!qResult.data?.Course_by_pk) {
+  if (!data?.Course_by_pk) {
     return <div>{t('course_not_found', { courseId: course.id })}</div>;
   }
 
-  return <ApplicationsTabContent course={qResult.data.Course_by_pk} qResult={qResult} />;
+  return (
+    <ApplicationsTabContent
+      course={data.Course_by_pk}
+      qResult={queryResult}
+      loading={loading}
+      error={error}
+      pageIndex={pageIndex}
+      setPageIndex={setPageIndex}
+      pageSize={pageSize}
+      setPageSize={setPageSize}
+      searchFilter={searchFilter}
+      setSearchFilter={setSearchFilter}
+      sorting={sorting}
+      setSorting={setSorting}
+    />
+  );
 };
 
-const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({ course, qResult }) => {
+const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
+  course,
+  qResult,
+  loading,
+  error,
+  pageIndex,
+  setPageIndex,
+  pageSize,
+  setPageSize,
+  searchFilter,
+  setSearchFilter,
+  sorting,
+  setSorting,
+}) => {
   const t = useTranslations('manageCourse');
   const tCommon = useTranslations('common');
   const tCourse = useTranslations('course');
@@ -178,24 +256,23 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({ course, qResu
 
   const expandableRowWidths = useMemo(() => getExpandableRowWidths(features), [features]);
   
-  const applicationStats = useMemo(() => {
-    const totalApplications = course.CourseEnrollments.length;
-    const approvedApplications = course.CourseEnrollments.filter(
-      (enrollment) => enrollment.motivationRating === 'INVITE'
-    ).length;
-    const invitedApplicants = course.CourseEnrollments.filter(
-      (enrollment) => enrollment.status === 'INVITED' || enrollment.status === 'CONFIRMED'
-    ).length;
-    const confirmedApplicants = course.CourseEnrollments.filter(
-      (enrollment) => enrollment.status === 'CONFIRMED' || enrollment.status === 'COMPLETED' || enrollment.status === 'REGISTERED'
-    ).length;
-    return { totalApplications, approvedApplications, invitedApplicants, confirmedApplicants };
-  }, [course.CourseEnrollments]);
+  const applicationStats = useMemo(
+    () => ({
+      totalApplications: course.TotalCourseEnrollments.aggregate?.count ?? 0,
+      approvedApplications: course.ApprovedCourseEnrollments.aggregate?.count ?? 0,
+      invitedApplicants: course.InvitedCourseEnrollments.aggregate?.count ?? 0,
+      confirmedApplicants: course.ConfirmedCourseEnrollments.aggregate?.count ?? 0,
+    }),
+    [
+      course.ApprovedCourseEnrollments.aggregate?.count,
+      course.ConfirmedCourseEnrollments.aggregate?.count,
+      course.InvitedCourseEnrollments.aggregate?.count,
+      course.TotalCourseEnrollments.aggregate?.count,
+    ]
+  );
 
   const courseEnrollments = useMemo(() => {
-    const result = [...course.CourseEnrollments];
-    result.sort((a, b) => a.id - b.id);
-    return result;
+    return course.CourseEnrollments ?? [];
   }, [course]);
 
   const infoDots = (
@@ -498,76 +575,12 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({ course, qResu
   );
 
   const [isAddParticipantsModalOpen, setAddParticipantsModalOpen] = useState(false);
-  const [pageIndex, setPageIndex] = useState(0);
-  const [pageSize, setPageSize] = useState(20);
-  const [searchFilter, setSearchFilter] = useState('');
-
   const openAddParticipantsModal = () => setAddParticipantsModalOpen(true);
   const closeAddParticipantsModal = () => setAddParticipantsModalOpen(false);
-
-  // Filter enrollments (TableGrid will handle sorting and pagination)
-  const filteredEnrollments = useMemo(() => {
-    let filtered = courseEnrollments;
-    
-    if (searchFilter) {
-      const searchLower = searchFilter.toLowerCase();
-      filtered = filtered.filter((enrollment) => {
-        return (
-          enrollment.User.firstName.toLowerCase().includes(searchLower) ||
-          enrollment.User.lastName.toLowerCase().includes(searchLower) ||
-          enrollment.User.email.toLowerCase().includes(searchLower) ||
-          (enrollment.motivationLetter || '').toLowerCase().includes(searchLower)
-        );
-      });
-    }
-    
-    return filtered;
-  }, [courseEnrollments, searchFilter]);
-
-  const hasStatus = useMemo(
-    () => ({
-      CONFIRMED: courseEnrollments.some((e) => e.status === 'CONFIRMED'),
-      INVITED: courseEnrollments.some((e) => e.status === 'INVITED'),
-      APPLIED: courseEnrollments.some((e) => e.status === 'APPLIED'),
-      REJECTED: courseEnrollments.some((e) => e.status === 'REJECTED'),
-      WAITLIST: courseEnrollments.some((e) => e.status === 'WAITLIST'),
-    }),
-    [courseEnrollments]
-  );
-
-  const hasRating = useMemo(
-    () => ({
-      INVITE: courseEnrollments.some((e) => e.motivationRating === 'INVITE'),
-      DECLINE: courseEnrollments.some((e) => e.motivationRating === 'DECLINE'),
-      REVIEW: courseEnrollments.some((e) => e.motivationRating === 'REVIEW'),
-    }),
-    [courseEnrollments]
-  );
-
-  const bulkActionDisabledMap = useMemo(
-    () => ({
-      email_status_CONFIRMED: !hasStatus.CONFIRMED,
-      email_status_INVITED: !hasStatus.INVITED,
-      email_status_APPLIED: !hasStatus.APPLIED,
-      email_status_REJECTED: !hasStatus.REJECTED,
-      email_status_WAITLIST: !hasStatus.WAITLIST,
-      email_rating_INVITE: !hasRating.INVITE,
-      email_rating_DECLINE: !hasRating.DECLINE,
-      email_rating_REVIEW: !hasRating.REVIEW,
-    }),
-    [hasRating, hasStatus]
-  );
 
   // Bulk actions handler
   const handleBulkEmailAction = useCallback(
     (action: string, selectedRows: ApplicationEnrollment[]) => {
-      if (
-        action in bulkActionDisabledMap &&
-        bulkActionDisabledMap[action as keyof typeof bulkActionDisabledMap]
-      ) {
-        return;
-      }
-
       let targetEnrollments: ApplicationEnrollment[] = [];
 
       // Row expansion actions are handled directly in TableGrid.
@@ -612,12 +625,6 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({ course, qResu
       // Handle email actions (existing)
       if (action === 'email_selected') {
         targetEnrollments = selectedRows;
-      } else if (action.startsWith('email_status_')) {
-        const status = action.replace('email_status_', '') as CourseEnrollmentStatus_enum;
-        targetEnrollments = courseEnrollments.filter((e) => e.status === status);
-      } else if (action.startsWith('email_rating_')) {
-        const rating = action.replace('email_rating_', '') as MotivationRating_enum;
-        targetEnrollments = courseEnrollments.filter((e) => e.motivationRating === rating);
       }
 
       if (targetEnrollments.length === 0) {
@@ -630,8 +637,6 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({ course, qResu
       }
     },
     [
-      bulkActionDisabledMap,
-      courseEnrollments,
       handleOpenInviteDialog,
       handleOpenRejectionDialog,
       setIsNoSelectionDialogOpen,
@@ -682,66 +687,10 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({ course, qResu
           ? t('bulk_actions.disabled_reasons.instructors_only')
           : t('bulk_actions.disabled_reasons.select_participants_first'),
       },
-      {
-        value: 'email_status_CONFIRMED',
-        label: t('bulk_actions.email_all_confirmed'),
-        group: t('bulk_actions.email_all_by_status'),
-        disabled: bulkActionDisabledMap.email_status_CONFIRMED,
-        disabledReason: t('bulk_actions.disabled_reasons.no_confirmed'),
-      },
-      {
-        value: 'email_status_INVITED',
-        label: t('bulk_actions.email_all_invited'),
-        group: t('bulk_actions.email_all_by_status'),
-        disabled: bulkActionDisabledMap.email_status_INVITED,
-        disabledReason: t('bulk_actions.disabled_reasons.no_invited'),
-      },
-      {
-        value: 'email_status_APPLIED',
-        label: t('bulk_actions.email_all_applied'),
-        group: t('bulk_actions.email_all_by_status'),
-        disabled: bulkActionDisabledMap.email_status_APPLIED,
-        disabledReason: t('bulk_actions.disabled_reasons.no_applied'),
-      },
-      {
-        value: 'email_status_REJECTED',
-        label: t('bulk_actions.email_all_rejected'),
-        group: t('bulk_actions.email_all_by_status'),
-        disabled: bulkActionDisabledMap.email_status_REJECTED,
-        disabledReason: t('bulk_actions.disabled_reasons.no_rejected'),
-      },
-      {
-        value: 'email_status_WAITLIST',
-        label: t('bulk_actions.email_all_waitlist'),
-        group: t('bulk_actions.email_all_by_status'),
-        disabled: bulkActionDisabledMap.email_status_WAITLIST,
-        disabledReason: t('bulk_actions.disabled_reasons.no_waitlist'),
-      },
-      {
-        value: 'email_rating_INVITE',
-        label: t('bulk_actions.email_all_invite_rating'),
-        group: t('bulk_actions.email_all_by_rating'),
-        disabled: bulkActionDisabledMap.email_rating_INVITE,
-        disabledReason: t('bulk_actions.disabled_reasons.no_invite_rating'),
-      },
-      {
-        value: 'email_rating_DECLINE',
-        label: t('bulk_actions.email_all_decline_rating'),
-        group: t('bulk_actions.email_all_by_rating'),
-        disabled: bulkActionDisabledMap.email_rating_DECLINE,
-        disabledReason: t('bulk_actions.disabled_reasons.no_decline_rating'),
-      },
-      {
-        value: 'email_rating_REVIEW',
-        label: t('bulk_actions.email_all_review_rating'),
-        group: t('bulk_actions.email_all_by_rating'),
-        disabled: bulkActionDisabledMap.email_rating_REVIEW,
-        disabledReason: t('bulk_actions.disabled_reasons.no_review_rating'),
-      },
     ];
 
     return actions;
-  }, [bulkActionDisabledMap, isInstructor, t]);
+  }, [isInstructor, t]);
 
   // Rating sort function
   const ratingSortFn = useCallback((a: MotivationRating_enum, b: MotivationRating_enum) => {
@@ -864,7 +813,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({ course, qResu
           header: t('payment_status'),
           accessorKey: 'Invoices',
           size: APPLICATION_TABLE_COLUMN_SIZES.Invoices,
-          enableSorting: true,
+          enableSorting: false,
           cell: ({ row }) => {
             const paymentStatus = getPaymentStatusFromInvoices(row.original.Invoices);
             return (
@@ -1126,12 +1075,12 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({ course, qResu
   const handlePageSizeChange = useCallback((newSize: number) => {
     setPageSize(newSize);
     setPageIndex(0);
-  }, []);
+  }, [setPageIndex, setPageSize]);
 
   const handleSearchFilterChange = useCallback((value: string) => {
     setSearchFilter(value);
     setPageIndex(0);
-  }, []);
+  }, [setPageIndex, setSearchFilter]);
 
   return (
     <>
@@ -1201,20 +1150,22 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({ course, qResu
         <OnlyInstructor>
           <TableGrid<ApplicationEnrollment>
             columns={columns}
-            data={filteredEnrollments}
-            loading={false}
-            error={null as unknown as ApolloError}
+            data={courseEnrollments}
+            loading={loading}
+            error={error}
             expandableRowComponent={ExpandableApplicationRow}
             bulkActions={bulkActions}
             onBulkAction={handleBulkEmailAction}
             enablePagination={true}
-            totalCount={filteredEnrollments.length}
+            totalCount={course.CourseEnrollments_aggregate.aggregate?.count ?? 0}
             pageIndex={pageIndex}
             onPageChange={setPageIndex}
             pageSize={pageSize}
             onPageSizeChange={handlePageSizeChange}
             searchFilter={searchFilter}
             onSearchFilterChange={handleSearchFilterChange}
+            sorting={sorting}
+            onSortingChange={setSorting}
             refetchQueries={[]}
             {...(isAdmin && {
               addButtonText: t('add_participants'),
@@ -1223,7 +1174,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({ course, qResu
           />
         </OnlyInstructor>
 
-        {filteredEnrollments.length > 0 && features.hasApplicationProcess && (
+        {courseEnrollments.length > 0 && features.hasApplicationProcess && (
           <div className="-mt-8 mb-3">{infoDots}</div>
         )}
       </div>

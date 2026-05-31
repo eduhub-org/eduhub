@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { CourseRegistrationType_enum, CourseEnrollmentStatus_enum, InvoiceStatus_enum, MotivationRating_enum } from "./../../__generated__/globalTypes";
+import { CourseEnrollment_bool_exp, CourseEnrollment_order_by, CourseRegistrationType_enum, CourseEnrollmentStatus_enum, InvoiceStatus_enum, MotivationRating_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: ManagedCourseApplications
@@ -190,6 +190,56 @@ export interface ManagedCourseApplications_Course_by_pk_CourseEnrollments {
   User: ManagedCourseApplications_Course_by_pk_CourseEnrollments_User;
 }
 
+export interface ManagedCourseApplications_Course_by_pk_CourseEnrollments_aggregate_aggregate {
+  __typename: "CourseEnrollment_aggregate_fields";
+  count: number;
+}
+
+export interface ManagedCourseApplications_Course_by_pk_CourseEnrollments_aggregate {
+  __typename: "CourseEnrollment_aggregate";
+  aggregate: ManagedCourseApplications_Course_by_pk_CourseEnrollments_aggregate_aggregate | null;
+}
+
+export interface ManagedCourseApplications_Course_by_pk_TotalCourseEnrollments_aggregate {
+  __typename: "CourseEnrollment_aggregate_fields";
+  count: number;
+}
+
+export interface ManagedCourseApplications_Course_by_pk_TotalCourseEnrollments {
+  __typename: "CourseEnrollment_aggregate";
+  aggregate: ManagedCourseApplications_Course_by_pk_TotalCourseEnrollments_aggregate | null;
+}
+
+export interface ManagedCourseApplications_Course_by_pk_ApprovedCourseEnrollments_aggregate {
+  __typename: "CourseEnrollment_aggregate_fields";
+  count: number;
+}
+
+export interface ManagedCourseApplications_Course_by_pk_ApprovedCourseEnrollments {
+  __typename: "CourseEnrollment_aggregate";
+  aggregate: ManagedCourseApplications_Course_by_pk_ApprovedCourseEnrollments_aggregate | null;
+}
+
+export interface ManagedCourseApplications_Course_by_pk_InvitedCourseEnrollments_aggregate {
+  __typename: "CourseEnrollment_aggregate_fields";
+  count: number;
+}
+
+export interface ManagedCourseApplications_Course_by_pk_InvitedCourseEnrollments {
+  __typename: "CourseEnrollment_aggregate";
+  aggregate: ManagedCourseApplications_Course_by_pk_InvitedCourseEnrollments_aggregate | null;
+}
+
+export interface ManagedCourseApplications_Course_by_pk_ConfirmedCourseEnrollments_aggregate {
+  __typename: "CourseEnrollment_aggregate_fields";
+  count: number;
+}
+
+export interface ManagedCourseApplications_Course_by_pk_ConfirmedCourseEnrollments {
+  __typename: "CourseEnrollment_aggregate";
+  aggregate: ManagedCourseApplications_Course_by_pk_ConfirmedCourseEnrollments_aggregate | null;
+}
+
 export interface ManagedCourseApplications_Course_by_pk {
   __typename: "Course";
   id: number;
@@ -211,6 +261,26 @@ export interface ManagedCourseApplications_Course_by_pk {
    * An array relationship
    */
   CourseEnrollments: ManagedCourseApplications_Course_by_pk_CourseEnrollments[];
+  /**
+   * An aggregate relationship
+   */
+  CourseEnrollments_aggregate: ManagedCourseApplications_Course_by_pk_CourseEnrollments_aggregate;
+  /**
+   * An aggregate relationship
+   */
+  TotalCourseEnrollments: ManagedCourseApplications_Course_by_pk_TotalCourseEnrollments;
+  /**
+   * An aggregate relationship
+   */
+  ApprovedCourseEnrollments: ManagedCourseApplications_Course_by_pk_ApprovedCourseEnrollments;
+  /**
+   * An aggregate relationship
+   */
+  InvitedCourseEnrollments: ManagedCourseApplications_Course_by_pk_InvitedCourseEnrollments;
+  /**
+   * An aggregate relationship
+   */
+  ConfirmedCourseEnrollments: ManagedCourseApplications_Course_by_pk_ConfirmedCourseEnrollments;
 }
 
 export interface ManagedCourseApplications {
@@ -222,4 +292,8 @@ export interface ManagedCourseApplications {
 
 export interface ManagedCourseApplicationsVariables {
   id: number;
+  limit?: number | null;
+  offset?: number | null;
+  filter?: CourseEnrollment_bool_exp | null;
+  order_by?: CourseEnrollment_order_by[] | null;
 }

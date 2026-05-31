@@ -65,7 +65,13 @@ export const MANAGED_COURSE = gql`
 export const MANAGED_COURSE_APPLICATIONS = gql`
   ${ADMIN_ENROLLMENT_FRAGMENT}
   ${USER_FRAGMENT}
-  query ManagedCourseApplications($id: Int!) {
+  query ManagedCourseApplications(
+    $id: Int!
+    $limit: Int = 15
+    $offset: Int = 0
+    $filter: CourseEnrollment_bool_exp = {}
+    $order_by: [CourseEnrollment_order_by!] = [{ id: asc }]
+  ) {
     Course_by_pk(id: $id) {
       id
       registrationType
@@ -79,7 +85,12 @@ export const MANAGED_COURSE_APPLICATIONS = gql`
         id
         startDateTime
       }
-      CourseEnrollments {
+      CourseEnrollments(
+        limit: $limit
+        offset: $offset
+        where: $filter
+        order_by: $order_by
+      ) {
         ...AdminEnrollmentFragment
         User {
           ...UserFragment
@@ -101,6 +112,35 @@ export const MANAGED_COURSE_APPLICATIONS = gql`
             id
             name
           }
+        }
+      }
+      CourseEnrollments_aggregate(where: $filter) {
+        aggregate {
+          count
+        }
+      }
+      TotalCourseEnrollments: CourseEnrollments_aggregate {
+        aggregate {
+          count
+        }
+      }
+      ApprovedCourseEnrollments: CourseEnrollments_aggregate(where: { motivationRating: { _eq: INVITE } }) {
+        aggregate {
+          count
+        }
+      }
+      InvitedCourseEnrollments: CourseEnrollments_aggregate(
+        where: { status: { _in: [INVITED, CONFIRMED] } }
+      ) {
+        aggregate {
+          count
+        }
+      }
+      ConfirmedCourseEnrollments: CourseEnrollments_aggregate(
+        where: { status: { _in: [CONFIRMED, COMPLETED, REGISTERED] } }
+      ) {
+        aggregate {
+          count
         }
       }
     }
