@@ -59,6 +59,16 @@ interface IProps {
   programs: Programs_Program[];
 }
 
+const COURSE_TITLE_INPUT_MIN_WIDTH_PX = 140;
+const COURSE_TITLE_INPUT_MAX_WIDTH_PX = 270;
+const COURSE_TITLE_AVERAGE_CHAR_WIDTH_PX = 9;
+
+const getCourseTitleInputWidth = (title: string) =>
+  Math.min(
+    Math.max(title.length * COURSE_TITLE_AVERAGE_CHAR_WIDTH_PX, COURSE_TITLE_INPUT_MIN_WIDTH_PX),
+    COURSE_TITLE_INPUT_MAX_WIDTH_PX
+  );
+
 const ManageCoursesContent: FC<IProps> = ({ programs }) => {
   const t = useTranslations('manageCourses');
   const tCommon = useTranslations('common');
@@ -601,28 +611,39 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
         size: 320,
         minSize: 250,
         enableSorting: true,
-        cell: ({ row }) => (
-          <div className="flex items-center space-x-2">
-            <div className="flex-1">
-              <InputField
-                variant="material"
-                type="input"
-                placeholder={t('default_course_title')}
-                itemId={row.original.id}
-                value={row.original.title || ''}
-                updateValueMutation={UPDATE_COURSE_TITLE}
-                refetchQueries={['AdminCourseList']}
-              />
+        cell: ({ row }) => {
+          const defaultTitle = t('default_course_title');
+          const courseTitle = row.original.title || defaultTitle;
+
+          return (
+            <div className="flex w-full items-center gap-2">
+              <div
+                className="min-w-0 shrink"
+                style={{
+                  flexBasis: getCourseTitleInputWidth(courseTitle),
+                  maxWidth: '100%',
+                }}
+              >
+                <InputField
+                  variant="material"
+                  type="input"
+                  placeholder={defaultTitle}
+                  itemId={row.original.id}
+                  value={row.original.title || ''}
+                  updateValueMutation={UPDATE_COURSE_TITLE}
+                  refetchQueries={['AdminCourseList']}
+                />
+              </div>
+              <a
+                href={`course/${row.original.id}`}
+                className="shrink-0 whitespace-nowrap text-sm font-medium text-blue-600 underline hover:text-blue-800"
+                title={t('view_course')}
+              >
+                {t('view')}
+              </a>
             </div>
-            <a
-              href={`course/${row.original.id}`}
-              className="text-blue-600 hover:text-blue-800 text-sm font-medium underline whitespace-nowrap"
-              title={t('view_course')}
-            >
-              {t('view')}
-            </a>
-          </div>
-        ),
+          );
+        },
       },
       {
         header: t('table_header.applications'),
@@ -693,7 +714,15 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
         },
       },
     ],
-    [t, handleApplicationEndChange, locale, getApplicationsCount, getConfirmedCount, getUnratedAndRatedButNotInformed, courseTemplateCounts]
+    [
+      t,
+      handleApplicationEndChange,
+      locale,
+      getApplicationsCount,
+      getConfirmedCount,
+      getUnratedAndRatedButNotInformed,
+      courseTemplateCounts,
+    ]
   );
 
   const handlePageSizeChange = useCallback(
