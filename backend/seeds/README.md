@@ -41,7 +41,7 @@ When changing the participant distribution, completion patterns, or number of
 generated users, update the generator and regenerate the SQL:
 
 ```bash
-PYTHONDONTWRITEBYTECODE=1 python3 backend/seeds/utils/generate_ml_degree_seed.py --users 300
+python3 backend/seeds/utils/generate_ml_degree_seed.py --users 300
 ```
 
 This dataset is still part of the default seed. Larger performance datasets
@@ -55,7 +55,7 @@ default seed so normal `docker compose up` startup stays light.
 Generate or refresh the SQL file:
 
 ```bash
-PYTHONDONTWRITEBYTECODE=1 python3 backend/seeds/utils/generate_performance_degree_seed.py --users 5000
+python3 backend/seeds/utils/generate_performance_degree_seed.py --users 5000
 ```
 
 Load it into a running local Docker database:
