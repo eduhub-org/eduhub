@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { FC, useCallback, useMemo, useState } from 'react';
-import { CircularProgress } from '@mui/material';
 import { ColumnDef } from '@tanstack/react-table';
 import { useAdminMutation } from '../../../hooks/authedMutation';
 import { useRoleQuery } from '../../../hooks/authedQuery';
@@ -25,6 +24,7 @@ import { DegreeCourses } from '../../../queries/__generated__/DegreeCourses';
 import { DELETE_A_COURSE } from '../../../queries/mutateCourse';
 
 import TableGrid from '../../common/TableGrid';
+import Loading from '../../common/Loading';
 import { useTableGrid } from '../../common/TableGrid/hooks';
 import { createMultiWordSearchCondition } from '../../common/TableGrid/utils';
 import { useAdminQuery } from '../../../hooks/authedQuery';
@@ -732,10 +732,6 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
     [filter, updateFilter, setPageIndex]
   );
 
-  if (loading) {
-    return <CircularProgress />;
-  }
-
   return (
     <>
       <CommonPageHeader headline={tCoursePage('coursesHeadline')} />
@@ -748,43 +744,49 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
         />
       </div>
 
-      <TableGrid<AdminCourseList_Course>
-        columns={columns}
-        data={courses}
-        loading={loading}
-        error={error}
-        enablePagination={true}
-        totalCount={totalCount}
-        pageIndex={pageIndex}
-        onPageChange={setPageIndex}
-        pageSize={filter.limit ?? QUERY_LIMIT}
-        onPageSizeChange={handlePageSizeChange}
-        searchFilter={searchFilter}
-        onSearchFilterChange={setSearchFilter}
-        sorting={sorting}
-        onSortingChange={setSorting}
-        refetchQueries={['AdminCourseList']}
-        bulkActions={bulkActions}
-        onBulkAction={handleBulkAction}
-        onAddButtonClick={handleAddCourse}
-        addButtonText={t('add_course_button')}
-        expandableRowComponent={(props) => (
-          <ExpandableCourseRow
-            course={props.row}
-            courseGroupOptions={courseGroupOptions}
-            degreeCourses={degreeCourses}
-            onSetAttendanceCertificatePossible={handleAttendanceCertificatePossible}
-            onSetAchievementCertificatePossible={handleAchievementCertificatePossible}
-          />
-        )}
-        deleteMutation={DELETE_A_COURSE}
-        deleteIdType="number"
-        generateDeletionConfirmationQuestion={(row) =>
-          t('delete_button.delete_course_confirmation', {
-            title: row.title || t('delete_button.untitled_course'),
-          })
-        }
-      />
+      {loading ? (
+        <div className="pb-12 pt-16">
+          <Loading />
+        </div>
+      ) : (
+        <TableGrid<AdminCourseList_Course>
+          columns={columns}
+          data={courses}
+          loading={loading}
+          error={error}
+          enablePagination={true}
+          totalCount={totalCount}
+          pageIndex={pageIndex}
+          onPageChange={setPageIndex}
+          pageSize={filter.limit ?? QUERY_LIMIT}
+          onPageSizeChange={handlePageSizeChange}
+          searchFilter={searchFilter}
+          onSearchFilterChange={setSearchFilter}
+          sorting={sorting}
+          onSortingChange={setSorting}
+          refetchQueries={['AdminCourseList']}
+          bulkActions={bulkActions}
+          onBulkAction={handleBulkAction}
+          onAddButtonClick={handleAddCourse}
+          addButtonText={t('add_course_button')}
+          expandableRowComponent={(props) => (
+            <ExpandableCourseRow
+              course={props.row}
+              courseGroupOptions={courseGroupOptions}
+              degreeCourses={degreeCourses}
+              onSetAttendanceCertificatePossible={handleAttendanceCertificatePossible}
+              onSetAchievementCertificatePossible={handleAchievementCertificatePossible}
+            />
+          )}
+          deleteMutation={DELETE_A_COURSE}
+          deleteIdType="number"
+          generateDeletionConfirmationQuestion={(row) =>
+            t('delete_button.delete_course_confirmation', {
+              title: row.title || t('delete_button.untitled_course'),
+            })
+          }
+        />
+      )}
 
       <SelectProgramDialog
         open={showProgramDialog}
