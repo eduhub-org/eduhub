@@ -59,15 +59,10 @@ interface IProps {
   programs: Programs_Program[];
 }
 
-const COURSE_TITLE_INPUT_MIN_WIDTH_PX = 140;
-const COURSE_TITLE_INPUT_MAX_WIDTH_PX = 270;
 const COURSE_TITLE_AVERAGE_CHAR_WIDTH_PX = 9;
+const COURSE_TITLE_VIEW_LINK_RESERVED_WIDTH_PX = 50;
 
-const getCourseTitleInputWidth = (title: string) =>
-  Math.min(
-    Math.max(title.length * COURSE_TITLE_AVERAGE_CHAR_WIDTH_PX, COURSE_TITLE_INPUT_MIN_WIDTH_PX),
-    COURSE_TITLE_INPUT_MAX_WIDTH_PX
-  );
+const getCourseTitleInputWidth = (title: string) => title.length * COURSE_TITLE_AVERAGE_CHAR_WIDTH_PX;
 
 const ManageCoursesContent: FC<IProps> = ({ programs }) => {
   const t = useTranslations('manageCourses');
@@ -621,7 +616,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
                 className="min-w-0 shrink"
                 style={{
                   flexBasis: getCourseTitleInputWidth(courseTitle),
-                  maxWidth: '100%',
+                  maxWidth: `calc(100% - ${COURSE_TITLE_VIEW_LINK_RESERVED_WIDTH_PX}px)`,
                 }}
               >
                 <InputField
