@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { CourseEnrollment_bool_exp, CourseEnrollment_order_by, CourseEnrollmentStatus_enum, AttendanceStatus_enum, AchievementRecordType_enum, AchievementRecordRating_enum } from "./../../__generated__/globalTypes";
+import { CourseEnrollment_bool_exp, CourseEnrollment_order_by, CourseEnrollmentStatus_enum, AttendanceStatus_enum, ProjectStatus_enum, ProjectRating_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: CourseParticipations
@@ -108,91 +108,30 @@ export interface CourseParticipations_Course_by_pk_Sessions {
   title: string;
 }
 
-export interface CourseParticipations_Course_by_pk_AchievementOptionCourses_AchievementOption_AchievementRecords_AchievementRecordAuthors_User {
-  __typename: "User";
-  /**
-   * The user's first name
-   */
-  firstName: string;
-  /**
-   * The user's last name
-   */
-  lastName: string;
-}
-
-export interface CourseParticipations_Course_by_pk_AchievementOptionCourses_AchievementOption_AchievementRecords_AchievementRecordAuthors {
-  __typename: "AchievementRecordAuthor";
-  /**
-   * ID of a user that is author of an uploaded achievement record
-   */
+export interface CourseParticipations_Course_by_pk_ProjectCourses_Project_ProjectAuthors {
+  __typename: "ProjectAuthor";
   userId: any;
-  /**
-   * An object relationship
-   */
-  User: CourseParticipations_Course_by_pk_AchievementOptionCourses_AchievementOption_AchievementRecords_AchievementRecordAuthors_User;
 }
 
-export interface CourseParticipations_Course_by_pk_AchievementOptionCourses_AchievementOption_AchievementRecords_AchievementOption {
-  __typename: "AchievementOption";
-  /**
-   * Title of an offered achievement option
-   */
-  title: string;
-}
-
-export interface CourseParticipations_Course_by_pk_AchievementOptionCourses_AchievementOption_AchievementRecords {
-  __typename: "AchievementRecord";
+export interface CourseParticipations_Course_by_pk_ProjectCourses_Project {
+  __typename: "Project";
   id: number;
-  /**
-   * ID of the course the record was uploaded for.
-   */
-  courseId: number | null;
-  /**
-   * URL to the uploaded file with the documentation of the record.
-   */
-  documentationUrl: string | null;
-  /**
-   * The course instructor's or mentor's rating for the achievement record
-   */
-  rating: AchievementRecordRating_enum;
-  created_at: any | null;
-  /**
-   * ID of the user who uploaded the record
-   */
-  uploadUserId: any;
+  title: string;
+  status: ProjectStatus_enum;
+  rating: ProjectRating_enum | null;
+  ratingComment: string | null;
   /**
    * An array relationship
    */
-  AchievementRecordAuthors: CourseParticipations_Course_by_pk_AchievementOptionCourses_AchievementOption_AchievementRecords_AchievementRecordAuthors[];
+  ProjectAuthors: CourseParticipations_Course_by_pk_ProjectCourses_Project_ProjectAuthors[];
+}
+
+export interface CourseParticipations_Course_by_pk_ProjectCourses {
+  __typename: "ProjectCourse";
   /**
    * An object relationship
    */
-  AchievementOption: CourseParticipations_Course_by_pk_AchievementOptionCourses_AchievementOption_AchievementRecords_AchievementOption;
-}
-
-export interface CourseParticipations_Course_by_pk_AchievementOptionCourses_AchievementOption {
-  __typename: "AchievementOption";
-  id: number;
-  /**
-   * Title of an offered achievement option
-   */
-  title: string;
-  /**
-   * Type of the achivement record that must be uploaded for this option
-   */
-  recordType: AchievementRecordType_enum;
-  /**
-   * An array relationship
-   */
-  AchievementRecords: CourseParticipations_Course_by_pk_AchievementOptionCourses_AchievementOption_AchievementRecords[];
-}
-
-export interface CourseParticipations_Course_by_pk_AchievementOptionCourses {
-  __typename: "AchievementOptionCourse";
-  /**
-   * An object relationship
-   */
-  AchievementOption: CourseParticipations_Course_by_pk_AchievementOptionCourses_AchievementOption;
+  Project: CourseParticipations_Course_by_pk_ProjectCourses_Project;
 }
 
 export interface CourseParticipations_Course_by_pk {
@@ -212,7 +151,7 @@ export interface CourseParticipations_Course_by_pk {
   /**
    * An array relationship
    */
-  AchievementOptionCourses: CourseParticipations_Course_by_pk_AchievementOptionCourses[];
+  ProjectCourses: CourseParticipations_Course_by_pk_ProjectCourses[];
   /**
    * The maximum number of sessions a participant can miss while still receiving a certificate
    */
