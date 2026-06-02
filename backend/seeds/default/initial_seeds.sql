@@ -836,9 +836,13 @@ INSERT INTO public."Attendance" (id, "sessionId", "userId", status, created_at, 
 INSERT INTO public."Attendance" (id, "sessionId", "userId", status, created_at, updated_at, "recordedIdentifier", source, "startDateTime", "endDateTime", "totalAttendanceTime", "interruptionCount") VALUES (62, 77, '66666666-6666-6666-6666-666666666666', 'ATTENDED', '2025-02-28 11:38:59.506369+00', '2025-02-28 11:38:59.506369+00', NULL, 'INSTRUCTOR', NULL, NULL, NULL, NULL);
 INSERT INTO public."Attendance" (id, "sessionId", "userId", status, created_at, updated_at, "recordedIdentifier", source, "startDateTime", "endDateTime", "totalAttendanceTime", "interruptionCount") VALUES (63, 78, '66666666-6666-6666-6666-666666666666', 'ATTENDED', '2025-02-28 11:38:59.822186+00', '2025-02-28 11:38:59.822186+00', NULL, 'INSTRUCTOR', NULL, NULL, NULL, NULL);
 INSERT INTO public."Attendance" (id, "sessionId", "userId", status, created_at, updated_at, "recordedIdentifier", source, "startDateTime", "endDateTime", "totalAttendanceTime", "interruptionCount") VALUES (64, 79, '66666666-6666-6666-6666-666666666666', 'ATTENDED', '2025-02-28 11:39:00.641586+00', '2025-02-28 11:39:00.641586+00', NULL, 'INSTRUCTOR', NULL, NULL, NULL, NULL);
--- Program-level attendance template and per-course achievement template overrides
--- for the 'Current Semester' program (id 5). Mirrors the legacy CertificateTemplateProgram seeds.
-UPDATE public."Program" SET "attendanceCertificateTemplateId" = 2 WHERE id = 5;
+-- Program-level attendance template for programs with attendance-capable courses
+-- (Events id 3, Past Semester id 4, Current Semester id 5). Template id 2 is the
+-- seeded "attendance certificate example" CertificateTemplate row.
+UPDATE public."Program" SET "attendanceCertificateTemplateId" = 2 WHERE id IN (3, 4, 5);
+-- Events (id 3) has no legacy image URL in the Program INSERT; reuse the Past Semester dev asset.
+UPDATE public."Program" SET "attendanceCertificateTemplateURL" = '/programid_4/participation_certificate_template/opencampus_certificate_template_WS2022.png'
+ WHERE id = 3 AND "attendanceCertificateTemplateURL" IS NULL;
 UPDATE public."Course" SET "achievementCertificateTemplateId" = 1
  WHERE "programId" = 5 AND "achievementCertificatePossible" = true;
 INSERT INTO public."CourseDegree" (id, "courseId", "degreeCourseId", created_at, updated_at) VALUES (1, 1, 7, '2022-12-19 13:40:34.079378+00', '2022-12-19 13:55:01.645233+00');
