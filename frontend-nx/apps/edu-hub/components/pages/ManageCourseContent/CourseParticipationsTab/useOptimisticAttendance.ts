@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { QueryResult } from '@apollo/client';
+import { MutationFunction } from '@apollo/client';
 import { AttendanceStatus_enum } from '../../../../__generated__/globalTypes';
 import {
   attendanceOverlayKey,
@@ -10,6 +10,7 @@ import {
 } from '../../../../helpers/courseParticipationAttendance';
 import { ATTENDANCE_SOURCE_INSTRUCTOR } from '../../../../helpers/attendance';
 import {
+  CourseParticipations_Course_by_pk_CourseEnrollments,
   CourseParticipations_Course_by_pk_Sessions,
 } from '../../../../queries/__generated__/CourseParticipations';
 import {
@@ -19,30 +20,23 @@ import {
 
 const REFETCH_DEBOUNCE_MS = 1500;
 
-type EnrollmentWithAttendances = {
-  userId: string;
-  User: { Attendances: AttendanceLike[] };
-};
-
-interface UseOptimisticAttendanceOptions<T extends EnrollmentWithAttendances> {
-  enrollments: readonly T[];
+interface UseOptimisticAttendanceOptions {
+  enrollments: readonly CourseParticipations_Course_by_pk_CourseEnrollments[];
   sessions: readonly CourseParticipations_Course_by_pk_Sessions[];
-  insertAttendance: (options: {
-    variables: InsertSingleAttendanceVariables;
-  }) => Promise<{ data?: InsertSingleAttendance }>;
+  insertAttendance: MutationFunction<InsertSingleAttendance, InsertSingleAttendanceVariables>;
   refetchParticipations: () => Promise<unknown>;
-  qResult: Pick<QueryResult<unknown, unknown>, 'refetch'>;
+  qResult: { refetch: () => Promise<unknown> };
   onError: (message: string) => void;
 }
 
-export function useOptimisticAttendance<T extends EnrollmentWithAttendances>({
+export function useOptimisticAttendance({
   enrollments,
   sessions,
   insertAttendance,
   refetchParticipations,
   qResult,
   onError,
-}: UseOptimisticAttendanceOptions<T>) {
+}: UseOptimisticAttendanceOptions) {
   const [overlay, setOverlay] = useState<Record<string, AttendanceStatus_enum>>({});
   const refetchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pendingMutationsRef = useRef(0);
@@ -80,9 +74,14 @@ export function useOptimisticAttendance<T extends EnrollmentWithAttendances>({
 
       const attBySession = collapseAttendancesBySession(enrollment.User.Attendances);
       const overlayKey = attendanceOverlayKey(userId, session.id);
-      const current =
+      const current: AttendanceLike | undefined =
         overlay[overlayKey] !== undefined
-          ? { status: overlay[overlayKey], source: ATTENDANCE_SOURCE_INSTRUCTOR, Session: session, id: -1 }
+          ? {
+              id: Number.MAX_SAFE_INTEGER,
+              status: overlay[overlayKey],
+              source: ATTENDANCE_SOURCE_INSTRUCTOR,
+              Session: { __typename: 'Session', id: session.id },
+            }
           : attBySession[session.id];
       const nextStatus = getNextAttendanceStatus(current);
 

@@ -93,7 +93,9 @@ export function applyAttendanceOverlay<T extends { userId: string; User: { Atten
 
   return enrollments.map((enrollment) => {
     const additions: AttendanceLike[] = [];
-    let tempId = -1;
+    // Use ids above any real DB id so synthetic rows beat existing INSTRUCTOR
+    // rows in pickEffectiveAttendance's largest-id tie-break.
+    let tempId = Number.MAX_SAFE_INTEGER;
 
     for (const session of sessions) {
       const key = attendanceOverlayKey(enrollment.userId, session.id);
@@ -104,7 +106,7 @@ export function applyAttendanceOverlay<T extends { userId: string; User: { Atten
         id: tempId,
         status,
         source: ATTENDANCE_SOURCE_INSTRUCTOR,
-        Session: { id: session.id },
+        Session: { __typename: 'Session', id: session.id },
       });
       tempId -= 1;
     }

@@ -212,7 +212,10 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
   );
 
   const sessionTooltips = useMemo(
-    () => sessions.map((session) => new Date(session.startDateTime).toLocaleString(locale)),
+    () =>
+      sessions.map((session: CourseParticipations_Course_by_pk_Sessions) =>
+        new Date(session.startDateTime).toLocaleString(locale)
+      ),
     [sessions, locale]
   );
 

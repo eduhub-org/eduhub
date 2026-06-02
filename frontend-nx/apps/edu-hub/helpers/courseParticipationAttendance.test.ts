@@ -8,13 +8,20 @@ import {
   getNextAttendanceStatus,
 } from './courseParticipationAttendance';
 
-type Row = { id: number; status: string; source: string | null; Session: { id: number } };
+type Row = {
+  __typename: 'Attendance';
+  id: number;
+  status: AttendanceStatus_enum;
+  source: string;
+  Session: { __typename: 'Session'; id: number };
+};
 
-const row = (id: number, sessionId: number, status: string, source: string | null): Row => ({
+const row = (id: number, sessionId: number, status: AttendanceStatus_enum, source: string): Row => ({
+  __typename: 'Attendance',
   id,
   status,
   source,
-  Session: { id: sessionId },
+  Session: { __typename: 'Session', id: sessionId },
 });
 
 describe('courseParticipationAttendance', () => {
@@ -26,25 +33,29 @@ describe('courseParticipationAttendance', () => {
 
   it('getNextAttendanceStatus toggles between attended and missed', () => {
     expect(getNextAttendanceStatus(undefined)).toBe(AttendanceStatus_enum.ATTENDED);
-    expect(getNextAttendanceStatus(row(1, 1, 'MISSED', 'INSTRUCTOR'))).toBe(
+    expect(getNextAttendanceStatus(row(1, 1, AttendanceStatus_enum.MISSED, 'INSTRUCTOR'))).toBe(
       AttendanceStatus_enum.ATTENDED
     );
-    expect(getNextAttendanceStatus(row(1, 1, 'ATTENDED', 'INSTRUCTOR'))).toBe(
+    expect(getNextAttendanceStatus(row(1, 1, AttendanceStatus_enum.ATTENDED, 'INSTRUCTOR'))).toBe(
       AttendanceStatus_enum.MISSED
     );
   });
 
   it('getDotColorForAttendance maps status to dot colors', () => {
     expect(getDotColorForAttendance(undefined)).toBe('grey');
-    expect(getDotColorForAttendance(row(1, 1, 'ATTENDED', 'INSTRUCTOR'))).toBe('lightgreen');
-    expect(getDotColorForAttendance(row(1, 1, 'MISSED', 'INSTRUCTOR'))).toBe('red');
+    expect(getDotColorForAttendance(row(1, 1, AttendanceStatus_enum.ATTENDED, 'INSTRUCTOR'))).toBe(
+      'lightgreen'
+    );
+    expect(getDotColorForAttendance(row(1, 1, AttendanceStatus_enum.MISSED, 'INSTRUCTOR'))).toBe(
+      'red'
+    );
   });
 
   it('getAttendanceStatusFromMap respects maxMissedSessions', () => {
     const bySession = {
-      1: row(1, 1, 'ATTENDED', 'INSTRUCTOR'),
-      2: row(2, 2, 'MISSED', 'INSTRUCTOR'),
-      3: row(3, 3, 'MISSED', 'INSTRUCTOR'),
+      1: row(1, 1, AttendanceStatus_enum.ATTENDED, 'INSTRUCTOR'),
+      2: row(2, 2, AttendanceStatus_enum.MISSED, 'INSTRUCTOR'),
+      3: row(3, 3, AttendanceStatus_enum.MISSED, 'INSTRUCTOR'),
     };
     expect(getAttendanceStatusFromMap(bySession, sessions, 1)).toBe('failed');
     expect(getAttendanceStatusFromMap(bySession, sessions, 2)).toBe('passed');
@@ -55,7 +66,7 @@ describe('courseParticipationAttendance', () => {
       {
         userId: 'u1',
         User: {
-          Attendances: [row(5, 1, 'ATTENDED', 'ZOOM')],
+          Attendances: [row(5, 1, AttendanceStatus_enum.ATTENDED, 'ZOOM')],
         },
       },
     ];
@@ -66,12 +77,27 @@ describe('courseParticipationAttendance', () => {
     expect(effective[1]?.source).toBe('INSTRUCTOR');
   });
 
+  it('applyAttendanceOverlay overrides an existing INSTRUCTOR row', () => {
+    const enrollments = [
+      {
+        userId: 'u1',
+        User: {
+          Attendances: [row(42, 1, AttendanceStatus_enum.ATTENDED, 'INSTRUCTOR')],
+        },
+      },
+    ];
+    const overlay = { [attendanceOverlayKey('u1', 1)]: AttendanceStatus_enum.MISSED };
+    const result = applyAttendanceOverlay(enrollments, overlay, sessions);
+    const effective = collapseAttendancesBySession(result[0].User.Attendances);
+    expect(effective[1]?.status).toBe(AttendanceStatus_enum.MISSED);
+  });
+
   it('collapseAttendancesBySession prefers instructor over zoom', () => {
     const attendances = [
-      row(1, 1, 'ATTENDED', 'ZOOM'),
-      row(2, 1, 'MISSED', 'INSTRUCTOR'),
+      row(1, 1, AttendanceStatus_enum.ATTENDED, 'ZOOM'),
+      row(2, 1, AttendanceStatus_enum.MISSED, 'INSTRUCTOR'),
     ];
     const effective = collapseAttendancesBySession(attendances);
-    expect(effective[1]?.status).toBe('MISSED');
+    expect(effective[1]?.status).toBe(AttendanceStatus_enum.MISSED);
   });
 });
