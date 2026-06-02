@@ -41,7 +41,6 @@ export const PROJECT_FRAGMENT_DETAILED = gql`
     documentationInstructionId
     status
     type
-    achievementCertificateType
     rating
     ratingComment
     acceptingParticipants

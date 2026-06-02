@@ -55,6 +55,7 @@ export const ADMIN_PROGRAM_FRAGMENT = gql`
     speakerQuestionnaire
     startQuestionnaire
     attendanceCertificateTemplateURL
+    attendanceCertificateTemplateId
     achievementCertificateTemplateURL
     visibility
     defaultFormbricksEnrollmentSurveyUrl

@@ -32,5 +32,4 @@ export interface SubmitProject {
 
 export interface SubmitProjectVariables {
   itemId: number;
-  submittedBy: any;
 }

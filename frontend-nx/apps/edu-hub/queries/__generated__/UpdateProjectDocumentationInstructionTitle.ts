@@ -10,6 +10,9 @@
 export interface UpdateProjectDocumentationInstructionTitle_update_ProjectDocumentationInstruction_by_pk {
   __typename: "ProjectDocumentationInstruction";
   id: number;
+  /**
+   * Admin-facing label in instruction dropdowns.
+   */
   title: string;
 }
 

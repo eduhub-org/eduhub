@@ -2,6 +2,12 @@ table:
   name: Course
   schema: public
 object_relationships:
+  - name: AchievementCertificateTemplate
+    using:
+      foreign_key_constraint_on: achievementCertificateTemplateId
+  - name: AttendanceCertificateTemplate
+    using:
+      foreign_key_constraint_on: attendanceCertificateTemplateId
   - name: CourseRegistrationType
     using:
       foreign_key_constraint_on: registrationType
@@ -107,6 +113,8 @@ select_permissions:
     permission:
       columns:
         - achievementCertificatePossible
+        - achievementCertificateTemplateId
+        - attendanceCertificateTemplateId
         - applicationEnd
         - attendanceCertificatePossible
         - chatLink
@@ -153,6 +161,8 @@ select_permissions:
     permission:
       columns:
         - achievementCertificatePossible
+        - achievementCertificateTemplateId
+        - attendanceCertificateTemplateId
         - applicationEnd
         - attendanceCertificatePossible
         - chatLink
@@ -194,6 +204,8 @@ select_permissions:
     permission:
       columns:
         - achievementCertificatePossible
+        - achievementCertificateTemplateId
+        - attendanceCertificateTemplateId
         - applicationEnd
         - attendanceCertificatePossible
         - chatLink
@@ -238,6 +250,8 @@ update_permissions:
   - role: instructor_access
     permission:
       columns:
+        - achievementCertificateTemplateId
+        - attendanceCertificateTemplateId
         - chatLink
         - contentDescriptionField1
         - contentDescriptionField2

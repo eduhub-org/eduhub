@@ -1755,13 +1755,16 @@
       "delete_program_confirmation": "Bist du sicher, dass du das Programm '{title}' löschen möchtest?",
       "untitled_program": "Unbenanntes Programm"
     },
-    "certificates": {
+    "Certificates": {
       "template": "Template",
       "proof_of_participation": "Teilnahmenachweis",
       "performance_certificate": "Leistungszertifikat",
       "show_certificates": "Bescheinigungen einblenden",
       "no_template_uploaded_yet": "Noch kein Template hochgeladen",
-      "upload_template": "Klicken, um Template hochzuladen oder Datei hier ablegen"
+      "upload_template": "Klicken, um Template hochzuladen oder Datei hier ablegen",
+      "html_template_label": "HTML-Template",
+      "html_template_apply_default": "Standard für diesen Programmtyp verwenden",
+      "apply_default_unavailable": "Für diesen Programmtyp ist noch kein Standard-Template für Teilnahmenachweise hinterlegt."
     },
     "participation_data": {
       "generate": "Teilnehmer:innen Daten generieren (CSV)",
@@ -1946,6 +1949,16 @@
         "pdf_upload_failed": "Das PDF konnte nicht hochgeladen werden. Die Anleitung wurde nicht gespeichert.",
         "create_failed": "Die Anleitung konnte nicht angelegt werden."
       }
+    },
+    "default_attendance_certificate_template": {
+      "label": "Standard-HTML-Templates für Teilnahmenachweise je Programmtyp",
+      "help_text": "Standard-HTML-Template für Teilnahmenachweise, separat pro Programmtyp einstellbar. Neue Programme eines Typs übernehmen das passende Template automatisch; einzelne Programme können es überschreiben.",
+      "none_option": "(keine)"
+    },
+    "programTypes": {
+      "COURSES": "Kurse",
+      "EVENTS": "Veranstaltungen",
+      "DEGREES": "Degrees"
     },
     "onboarding": {
       "label": "Onboarding-Texte",
