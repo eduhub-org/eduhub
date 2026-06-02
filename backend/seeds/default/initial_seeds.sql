@@ -142,12 +142,11 @@ INSERT INTO public."CertificateTemplate" (id, name, html, created_at, updated_at
     <span class="big bold" style="top: 64mm;">{{course_name}}</span>
     <div class="small" style="top: 90mm;">
       <p>an folgenden Terminen teilgenommen:</p>
-       </ul>
+      <ul>
        {% for entry in event_entries %}
       <li>{{ entry }}</li>
     {% endfor %}
     </ul>
-      <p>
       <p>
         Bei dem Kurs handelt es sich um ein interdisziplinäres Weiterbildungsangebot im
         Rahmen des Kieler Bildungsclusters opencampus.sh.
@@ -840,7 +839,8 @@ INSERT INTO public."Attendance" (id, "sessionId", "userId", status, created_at, 
 -- Program-level attendance template and per-course achievement template overrides
 -- for the 'Current Semester' program (id 5). Mirrors the legacy CertificateTemplateProgram seeds.
 UPDATE public."Program" SET "attendanceCertificateTemplateId" = 2 WHERE id = 5;
-UPDATE public."Course" SET "achievementCertificateTemplateId" = 1 WHERE "programId" = 5;
+UPDATE public."Course" SET "achievementCertificateTemplateId" = 1
+ WHERE "programId" = 5 AND "achievementCertificatePossible" = true;
 INSERT INTO public."CourseDegree" (id, "courseId", "degreeCourseId", created_at, updated_at) VALUES (1, 1, 7, '2022-12-19 13:40:34.079378+00', '2022-12-19 13:55:01.645233+00');
 INSERT INTO public."CourseDegree" (id, "courseId", "degreeCourseId", created_at, updated_at) VALUES (2, 2, 7, '2022-12-19 13:40:34.079378+00', '2022-12-19 13:55:01.645233+00');
 INSERT INTO public."CourseDegree" (id, "courseId", "degreeCourseId", created_at, updated_at) VALUES (3, 4, 7, '2022-12-19 13:40:34.079378+00', '2022-12-19 13:55:01.645233+00');
@@ -1520,7 +1520,14 @@ BEGIN
       generated_user_id,
       generated_first_name,
       generated_last_name,
-      lower(generated_first_name || '.' || generated_last_name || '.ml' || user_index || '@example.com'),
+      lower(
+        regexp_replace(
+          generated_first_name || '.' || generated_last_name || '.ml' || user_index,
+          '[^a-zA-Z0-9._-]',
+          '',
+          'g'
+        ) || '@example.com'
+      ),
       NULL,
       CASE WHEN user_index % 3 = 0 THEN 'https://www.linkedin.com' WHEN user_index % 3 = 1 THEN 'https://www.github.com' ELSE 'https://www.xing.com' END,
       user_index % 2 = 0,
@@ -1629,7 +1636,14 @@ BEGIN
         'ATTENDED',
         '2025-11-13 11:26:00+00'::timestamptz + (user_index * interval '1 second'),
         '2025-11-13 11:26:00+00'::timestamptz + (user_index * interval '1 second'),
-        lower(generated_first_name || '.' || generated_last_name || '.ml' || user_index || '@example.com'),
+        lower(
+        regexp_replace(
+          generated_first_name || '.' || generated_last_name || '.ml' || user_index,
+          '[^a-zA-Z0-9._-]',
+          '',
+          'g'
+        ) || '@example.com'
+      ),
         'INSTRUCTOR',
         '2025-10-01 10:00:00+00'::timestamptz + ((event_position - 1) * interval '30 days'),
         '2025-10-01 18:00:00+00'::timestamptz + ((event_position - 1) * interval '30 days'),
@@ -1713,7 +1727,9 @@ INSERT INTO public."CertificateTemplate" (id, name, html, created_at, updated_at
 -- Wire the degree template to every degree course (identified by program shortTitle).
 UPDATE public."Course" c SET "achievementCertificateTemplateId" = 3
   FROM public."Program" p
- WHERE p.id = c."programId" AND p."shortTitle" = 'DEGREES';
+ WHERE p.id = c."programId"
+   AND p."shortTitle" = 'DEGREES'
+   AND c."achievementCertificatePossible" = true;
 
 -- Default achievement template for every project type (mirrors the migration's data step).
 UPDATE public."ProjectType" SET "certificateTemplateId" = 1

@@ -67,7 +67,11 @@ ALTER TABLE "public"."Program"
 --    migration anyway.
 INSERT INTO "public"."CertificateTemplateText" ("id", "title", "html", "created_at", "updated_at", "certificateType", "recordType")
 SELECT ct."id", ct."name", ct."html", ct."created_at", ct."updated_at", 'ACHIEVEMENT', 'DOCUMENTATION'
-  FROM "public"."CertificateTemplate" ct
+  FROM (
+    SELECT DISTINCT ON (ct."name") ct."id", ct."name", ct."html", ct."created_at", ct."updated_at"
+      FROM "public"."CertificateTemplate" ct
+     ORDER BY ct."name", ct."id" DESC
+  ) ct
 ON CONFLICT ("id") DO NOTHING;
 SELECT setval(pg_get_serial_sequence('public."CertificateTemplateText"','id'), COALESCE((SELECT max(id) FROM "public"."CertificateTemplateText"), 1));
 

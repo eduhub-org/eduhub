@@ -1770,7 +1770,7 @@
       "delete_program_confirmation": "Are you sure you want to delete the program '{title}'?",
       "untitled_program": "Untitled Program"
     },
-    "certificates": {
+    "Certificates": {
       "template": "Template",
       "proof_of_participation": "Proof of participation",
       "performance_certificate": "Performance certificate",
@@ -1778,7 +1778,8 @@
       "no_template_uploaded_yet": "No template uploaded yet",
       "upload_template": "Click to upload template or drag and drop",
       "html_template_label": "HTML template",
-      "html_template_apply_default": "Apply current app-level default"
+      "html_template_apply_default": "Use default for this program type",
+      "apply_default_unavailable": "No attendance template default is configured for this program type yet."
     },
     "participation_data": {
       "generate": "Generate Participation Data (CSV)",
@@ -1958,6 +1959,11 @@
       "label": "Default attendance certificate templates by program type",
       "help_text": "Default HTML template for attendance certificates, set separately per program type. New programs of a given type inherit the corresponding template automatically; individual programs can override it.",
       "none_option": "(none)"
+    },
+    "programTypes": {
+      "COURSES": "Courses",
+      "EVENTS": "Events",
+      "DEGREES": "Degree Programs"
     },
     "onboarding": {
       "label": "Onboarding Texts",

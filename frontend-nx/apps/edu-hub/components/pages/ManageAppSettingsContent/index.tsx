@@ -368,7 +368,9 @@ const ManageAppSettingsContent: FC = () => {
             <div className="space-y-4">
               {(programTypeDefaultsData?.ProgramType ?? []).map((row) => (
                 <div key={row.value}>
-                  <label className="block text-base font-medium text-gray-300 mb-2">{row.value}</label>
+                  <label className="block text-base font-medium text-gray-300 mb-2">
+                    {t(`programTypes.${row.value}`)}
+                  </label>
                   <select
                     className="block w-full text-sm rounded border border-border-primary bg-fill-primary p-2"
                     value={row.defaultAttendanceCertificateTemplateId ?? ''}

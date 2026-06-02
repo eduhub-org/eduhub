@@ -64,15 +64,51 @@ const ExpandableProgramRow: FC<ExpandableProgramRowProps> = ({ program }) => {
   });
 
   const { data: projectTypesData } = useRoleQuery<ProjectTypes>(PROJECT_TYPES);
-  const { data: certificateTemplatesData } = useRoleQuery<CertificateTemplates>(CERTIFICATE_TEMPLATES);
-  const { data: programTypeDefaultsData } = useRoleQuery<ProgramTypeDefaults>(PROGRAM_TYPE_DEFAULTS);
+  const { data: certificateTemplatesData, loading: certificateTemplatesLoading } =
+    useRoleQuery<CertificateTemplates>(CERTIFICATE_TEMPLATES);
+  const { data: programTypeDefaultsData, loading: programTypeDefaultsLoading } =
+    useRoleQuery<ProgramTypeDefaults>(PROGRAM_TYPE_DEFAULTS);
   const defaultAttendanceCertificateTemplateId =
     programTypeDefaultsData?.ProgramType.find((pt) => pt.value === program.type)
       ?.defaultAttendanceCertificateTemplateId ?? null;
+  const canApplyAttendanceTemplateDefault =
+    !programTypeDefaultsLoading &&
+    Boolean(programTypeDefaultsData) &&
+    defaultAttendanceCertificateTemplateId != null;
   const [updateAttendanceCertificateTemplateId] = useAdminMutation<
     UpdateProgramAttendanceCertificateTemplateId,
     UpdateProgramAttendanceCertificateTemplateIdVariables
   >(UPDATE_PROGRAM_ATTENDANCE_CERTIFICATE_TEMPLATE_ID, { refetchQueries: ['ProgramList'] });
+  const attendanceCertificateTemplateOptions = useMemo(
+    () =>
+      (certificateTemplatesData?.CertificateTemplate ?? []).map((tpl) => ({
+        value: String(tpl.id),
+        label: tpl.name,
+      })),
+    [certificateTemplatesData?.CertificateTemplate]
+  );
+  const handleAttendanceCertificateTemplateChange = useCallback(
+    (newValue: string) => {
+      if (newValue === '' && !canApplyAttendanceTemplateDefault) {
+        return newValue;
+      }
+      const templateId =
+        newValue === '' ? defaultAttendanceCertificateTemplateId : parseInt(newValue, 10);
+      void updateAttendanceCertificateTemplateId({
+        variables: {
+          programId: program.id,
+          value: templateId,
+        },
+      });
+      return newValue;
+    },
+    [
+      canApplyAttendanceTemplateDefault,
+      defaultAttendanceCertificateTemplateId,
+      program.id,
+      updateAttendanceCertificateTemplateId,
+    ]
+  );
   const projectTypeOptions = useMemo(
     () =>
       (projectTypesData?.ProjectType ?? []).map((pt) => ({
@@ -315,36 +351,33 @@ const ExpandableProgramRow: FC<ExpandableProgramRowProps> = ({ program }) => {
             <div className="bg-fill-primary border border-border-primary rounded-lg p-4 space-y-4">
               <div>
                 <h4 className="text-sm font-medium text-label-primary mb-3">
-                  {`${t('certificates.template')} ${t('certificates.proof_of_participation')}`}
+                  {`${t('Certificates.template')} ${t('Certificates.proof_of_participation')}`}
                 </h4>
-                <label className="block text-xs font-medium text-label-secondary mb-1">
-                  {t('certificates.html_template_label')}
-                </label>
-                <select
-                  className="block w-full mb-3 text-sm rounded border border-border-primary bg-fill-primary p-2"
-                  value={program.attendanceCertificateTemplateId ?? ''}
-                  onChange={(e) =>
-                    updateAttendanceCertificateTemplateId({
-                      variables: {
-                        programId: program.id,
-                        // Selecting "apply default" snapshots the current app-level default's
-                        // concrete value, so later changes to the default do not retroactively
-                        // affect this program.
-                        value:
-                          e.target.value === ''
-                            ? defaultAttendanceCertificateTemplateId
-                            : parseInt(e.target.value, 10),
-                      },
-                    })
-                  }
-                >
-                  <option value="">{t('certificates.html_template_apply_default')}</option>
-                  {(certificateTemplatesData?.CertificateTemplate ?? []).map((tpl) => (
-                    <option key={tpl.id} value={tpl.id}>
-                      {tpl.name}
-                    </option>
-                  ))}
-                </select>
+                <div className="mb-3 [&_.MuiInputBase-root]:min-h-[44px]">
+                  <DropDownSelector
+                    variant="material"
+                    label={t('Certificates.html_template_label')}
+                    value={
+                      program.attendanceCertificateTemplateId != null
+                        ? String(program.attendanceCertificateTemplateId)
+                        : ''
+                    }
+                    options={attendanceCertificateTemplateOptions}
+                    nullable={canApplyAttendanceTemplateDefault}
+                    nullableLabel={t('Certificates.html_template_apply_default')}
+                    disabled={
+                      certificateTemplatesLoading ||
+                      programTypeDefaultsLoading ||
+                      attendanceCertificateTemplateOptions.length === 0
+                    }
+                    onValueUpdated={handleAttendanceCertificateTemplateChange}
+                  />
+                </div>
+                {!canApplyAttendanceTemplateDefault && !programTypeDefaultsLoading && (
+                  <p className="text-xs text-label-secondary mb-3">
+                    {t('Certificates.apply_default_unavailable')}
+                  </p>
+                )}
                 <FileUploadField
                   variant="material"
                   currentFileUrl={program.attendanceCertificateTemplateURL}
@@ -354,7 +387,7 @@ const ExpandableProgramRow: FC<ExpandableProgramRowProps> = ({ program }) => {
                   updateFieldName="templatePath"
                   acceptedFileTypes=".pdf,.jpg,.jpeg,.png"
                   maxFileSize={10 * 1024 * 1024}
-                  uploadText={t('certificates.upload_template')}
+                  uploadText={t('Certificates.upload_template')}
                   imageWidth={160}
                   imageHeight={96}
                   showFileName={true}
@@ -364,7 +397,7 @@ const ExpandableProgramRow: FC<ExpandableProgramRowProps> = ({ program }) => {
 
               <div>
                 <h4 className="text-sm font-medium text-gray-700 mb-3">
-                  {`${t('certificates.template')} ${t('certificates.performance_certificate')}`}
+                  {`${t('Certificates.template')} ${t('Certificates.performance_certificate')}`}
                 </h4>
                 <FileUploadField
                   variant="material"
@@ -375,7 +408,7 @@ const ExpandableProgramRow: FC<ExpandableProgramRowProps> = ({ program }) => {
                   updateFieldName="templatePath"
                   acceptedFileTypes=".pdf,.jpg,.jpeg,.png"
                   maxFileSize={10 * 1024 * 1024}
-                  uploadText={t('certificates.upload_template')}
+                  uploadText={t('Certificates.upload_template')}
                   imageWidth={160}
                   imageHeight={96}
                   showFileName={true}

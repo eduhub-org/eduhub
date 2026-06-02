@@ -60,7 +60,7 @@ template.
 
 ## 3. The end-to-end creation flow
 
-```
+```text
             ┌─────────────────────────────────────────────────────────────┐
             │ ADMIN (one-time setup, per program)                          │
             │  • upload background image  → Program.*CertificateTemplateURL │
@@ -80,7 +80,7 @@ template.
             │  3. fill per-participant data (full_name, ECTS, …)           │
             │  4. render Jinja2 HTML → PDF (xhtml2pdf)                     │
             │  5. upload PDF to Google Cloud Storage                       │
-            │  6. write URL onto CourseEnrollment.*CertificateURL          │
+            │  6. write storage path onto CourseEnrollment.*CertificateURL │
             └─────────────────────────────────────────────────────────────┘
                                        │
                                        ▼
@@ -91,10 +91,11 @@ Notes:
 
 - Generation is **batch, per course**: the instructor selects users on the
   Participations tab and runs it for the whole selection.
-- The generated PDF is stored at
-  `{userId}/{courseId}/{attendance|achievement}_certificate.pdf` in GCS, and its
-  URL is saved to `CourseEnrollment.attendanceCertificateURL` /
-  `achievementCertificateURL`.
+- The generated PDF is stored in GCS at
+  `{userId}/{courseId}/{attendance|achievement}_certificate.pdf`. The **storage
+  path / blob name** (not the signed upload URL) is persisted on
+  `CourseEnrollment.attendanceCertificateURL` / `achievementCertificateURL`.
+  The upload URL is only written to the server log.
 - Re-running generation overwrites the existing PDF for that user + course.
 
 ---
@@ -126,7 +127,7 @@ the server walks a **precedence chain**, most-specific first:
 
 ### Attendance
 
-```
+```text
 Course.attendanceCertificateTemplateId          (per-course override)
   ↓ if null
 Program.attendanceCertificateTemplateId          (program default)
@@ -134,7 +135,7 @@ Program.attendanceCertificateTemplateId          (program default)
 
 ### Achievement (project-based)
 
-```
+```text
 Course.achievementCertificateTemplateId          (per-course override)
   ↓ if null
 ProjectType.certificateTemplateId                 (default for the completed
