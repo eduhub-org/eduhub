@@ -3,7 +3,7 @@ INSERT INTO public."AchievementOption" (id, title, description, "recordType", "e
 INSERT INTO public."AchievementOption" (id, title, description, "recordType", "evaluationScriptUrl", created_at, updated_at, published, "achievementDocumentationTemplateId") VALUES (2, 'regular project', 'Vivamus rutrum congue volutpat. Fusce quis convallis elit, id dictum lacus. Nam volutpat suscipit dapibus. Aliquam nunc diam, fringilla in laoreet eget, luctus quis libero.', 'ONLINE_COURSE', NULL, '2022-12-19 13:40:34.079378+00', '2022-12-19 13:55:01.645233+00', true, NULL);
 INSERT INTO public."AchievementOption" (id, title, description, "recordType", "evaluationScriptUrl", created_at, updated_at, published, "achievementDocumentationTemplateId") VALUES (3, 'online course project present', 'Vivamus rutrum congue volutpat. Fusce quis convallis elit, id dictum lacus. Nam volutpat suscipit dapibus. Aliquam nunc diam, fringilla in laoreet eget, luctus quis libero.', 'ONLINE_COURSE', NULL, '2022-12-19 13:40:34.079378+00', '2022-12-19 13:55:01.645233+00', true, NULL);
 INSERT INTO public."AchievementOption" (id, title, description, "recordType", "evaluationScriptUrl", created_at, updated_at, published, "achievementDocumentationTemplateId") VALUES (4, 'regular project present', 'Vivamus rutrum congue volutpat. Fusce quis convallis elit, id dictum lacus. Nam volutpat suscipit dapibus. Aliquam nunc diam, fringilla in laoreet eget, luctus quis libero.', 'ONLINE_COURSE', NULL, '2022-12-19 13:40:34.079378+00', '2022-12-19 13:55:01.645233+00', true, NULL);
-INSERT INTO public."CertificateTemplateText" (id, title, html, created_at, updated_at, "certificateType", "recordType") VALUES (1, 'achievement certificate example', '<html>
+INSERT INTO public."CertificateTemplate" (id, name, html, created_at, updated_at) VALUES (1, 'achievement certificate example', '<html>
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
   <title>Document Title</title>
@@ -84,8 +84,8 @@ INSERT INTO public."CertificateTemplateText" (id, title, html, created_at, updat
 </div>
   </div>
 </body>
-</html>', '2023-12-14 13:40:34.079378+00', '2023-12-14 13:55:01.645233+00', 'ACHIEVEMENT', 'DOCUMENTATION');
-INSERT INTO public."CertificateTemplateText" (id, title, html, created_at, updated_at, "certificateType", "recordType") VALUES (2, 'attendance certificate example', '<html>
+</html>', '2023-12-14 13:40:34.079378+00', '2023-12-14 13:55:01.645233+00');
+INSERT INTO public."CertificateTemplate" (id, name, html, created_at, updated_at) VALUES (2, 'attendance certificate example', '<html>
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
   <title>Document Title</title>
@@ -142,12 +142,11 @@ INSERT INTO public."CertificateTemplateText" (id, title, html, created_at, updat
     <span class="big bold" style="top: 64mm;">{{course_name}}</span>
     <div class="small" style="top: 90mm;">
       <p>an folgenden Terminen teilgenommen:</p>
-       </ul>
+      <ul>
        {% for entry in event_entries %}
       <li>{{ entry }}</li>
     {% endfor %}
     </ul>
-      <p>
       <p>
         Bei dem Kurs handelt es sich um ein interdisziplinäres Weiterbildungsangebot im
         Rahmen des Kieler Bildungsclusters opencampus.sh.
@@ -156,13 +155,13 @@ INSERT INTO public."CertificateTemplateText" (id, title, html, created_at, updat
 </div>
   </div>
 </body>
-</html>', '2023-12-14 13:40:34.079378+00', '2023-12-14 13:55:01.645233+00', 'ATTENDANCE', 'DOCUMENTATION');
-INSERT INTO public."Program" (id, title, "lectureStart", "lectureEnd", "applicationStart", "defaultApplicationEnd", "achievementRecordUploadDeadline", visibility, "startQuestionnaire", "speakerQuestionnaire", "closingQuestionnaire", "attendanceCertificateTemplateURL", "achievementCertificateTemplateURL", "shortTitle", "defaultMaxMissedSessions", published, "attendanceCertificateTemplateTextId", "achievementCertificateTemplateTextId", type) VALUES (1, 'Rent-a-Scientist 2023', '2022-09-26', '2022-09-30', NULL, NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, 'RaS 2023', 2, true, NULL, NULL, 'COURSES');
-INSERT INTO public."Program" (id, title, "lectureStart", "lectureEnd", "applicationStart", "defaultApplicationEnd", "achievementRecordUploadDeadline", visibility, "startQuestionnaire", "speakerQuestionnaire", "closingQuestionnaire", "attendanceCertificateTemplateURL", "achievementCertificateTemplateURL", "shortTitle", "defaultMaxMissedSessions", published, "attendanceCertificateTemplateTextId", "achievementCertificateTemplateTextId", type) VALUES (4, 'Past Semester', '2024-05-02', '2024-09-02', NULL, NULL, NULL, true, NULL, NULL, NULL, '/programid_4/participation_certificate_template/opencampus_certificate_template_WS2022.png', '/programid_4/participation_certificate_template/opencampus_attendencecert_template_WS2022.png', 'PAST', 2, false, NULL, NULL, 'COURSES');
-INSERT INTO public."Program" (id, title, "lectureStart", "lectureEnd", "applicationStart", "defaultApplicationEnd", "achievementRecordUploadDeadline", visibility, "startQuestionnaire", "speakerQuestionnaire", "closingQuestionnaire", "attendanceCertificateTemplateURL", "achievementCertificateTemplateURL", "shortTitle", "defaultMaxMissedSessions", published, "attendanceCertificateTemplateTextId", "achievementCertificateTemplateTextId", type) VALUES (6, 'Future Semester', '2025-05-02', '2025-09-02', NULL, NULL, NULL, false, NULL, '', NULL, NULL, NULL, 'FUTURE', 2, false, NULL, NULL, 'COURSES');
-INSERT INTO public."Program" (id, title, "lectureStart", "lectureEnd", "applicationStart", "defaultApplicationEnd", "achievementRecordUploadDeadline", visibility, "startQuestionnaire", "speakerQuestionnaire", "closingQuestionnaire", "attendanceCertificateTemplateURL", "achievementCertificateTemplateURL", "shortTitle", "defaultMaxMissedSessions", published, "attendanceCertificateTemplateTextId", "achievementCertificateTemplateTextId", type) VALUES (3, 'Events', '2023-04-01', '2024-03-13', '2023-03-13', '2023-12-31', '2023-08-01', false, NULL, NULL, NULL, NULL, NULL, 'EVENTS', 2, true, NULL, NULL, 'EVENTS');
-INSERT INTO public."Program" (id, title, "lectureStart", "lectureEnd", "applicationStart", "defaultApplicationEnd", "achievementRecordUploadDeadline", visibility, "startQuestionnaire", "speakerQuestionnaire", "closingQuestionnaire", "attendanceCertificateTemplateURL", "achievementCertificateTemplateURL", "shortTitle", "defaultMaxMissedSessions", published, "attendanceCertificateTemplateTextId", "achievementCertificateTemplateTextId", type) VALUES (2, 'Degrees', '2023-04-17', '2024-06-30', NULL, '2023-04-16', NULL, false, NULL, NULL, NULL, NULL, NULL, 'DEGREES', 2, true, NULL, NULL, 'DEGREES');
-INSERT INTO public."Program" (id, title, "lectureStart", "lectureEnd", "applicationStart", "defaultApplicationEnd", "achievementRecordUploadDeadline", visibility, "startQuestionnaire", "speakerQuestionnaire", "closingQuestionnaire", "attendanceCertificateTemplateURL", "achievementCertificateTemplateURL", "shortTitle", "defaultMaxMissedSessions", published, "attendanceCertificateTemplateTextId", "achievementCertificateTemplateTextId", type) VALUES (5, 'Current Semester', '2024-10-02', '2025-04-02', '2024-09-02', '2024-10-02', '2025-04-02', false, 'https://survey.opencampus.sh/', '', 'https://survey.opencampus.sh/', 'programs/program-5/private/attendance-certificate-template/sprotte.jpg', 'programs/program-5/private/achievement-certificate-template/sprotte.jpg', 'PRESENT', 2, true, NULL, NULL, 'COURSES');
+</html>', '2023-12-14 13:40:34.079378+00', '2023-12-14 13:55:01.645233+00');
+INSERT INTO public."Program" (id, title, "lectureStart", "lectureEnd", "applicationStart", "defaultApplicationEnd", "achievementRecordUploadDeadline", visibility, "startQuestionnaire", "speakerQuestionnaire", "closingQuestionnaire", "attendanceCertificateTemplateURL", "achievementCertificateTemplateURL", "shortTitle", "defaultMaxMissedSessions", published, type) VALUES (1, 'Unpublished Semester 2022', '2022-09-26', '2022-09-30', NULL, NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, 'UNPUB2022', 2, true, 'COURSES');
+INSERT INTO public."Program" (id, title, "lectureStart", "lectureEnd", "applicationStart", "defaultApplicationEnd", "achievementRecordUploadDeadline", visibility, "startQuestionnaire", "speakerQuestionnaire", "closingQuestionnaire", "attendanceCertificateTemplateURL", "achievementCertificateTemplateURL", "shortTitle", "defaultMaxMissedSessions", published, type) VALUES (4, 'Past Semester', '2024-05-02', '2024-09-02', NULL, NULL, NULL, true, NULL, NULL, NULL, '/programid_4/participation_certificate_template/opencampus_certificate_template_WS2022.png', '/programid_4/participation_certificate_template/opencampus_attendencecert_template_WS2022.png', 'PAST', 2, false, 'COURSES');
+INSERT INTO public."Program" (id, title, "lectureStart", "lectureEnd", "applicationStart", "defaultApplicationEnd", "achievementRecordUploadDeadline", visibility, "startQuestionnaire", "speakerQuestionnaire", "closingQuestionnaire", "attendanceCertificateTemplateURL", "achievementCertificateTemplateURL", "shortTitle", "defaultMaxMissedSessions", published, type) VALUES (6, 'Future Semester', '2025-05-02', '2025-09-02', NULL, NULL, NULL, false, NULL, '', NULL, NULL, NULL, 'FUTURE', 2, false, 'COURSES');
+INSERT INTO public."Program" (id, title, "lectureStart", "lectureEnd", "applicationStart", "defaultApplicationEnd", "achievementRecordUploadDeadline", visibility, "startQuestionnaire", "speakerQuestionnaire", "closingQuestionnaire", "attendanceCertificateTemplateURL", "achievementCertificateTemplateURL", "shortTitle", "defaultMaxMissedSessions", published, type) VALUES (3, 'Events', '2023-04-01', '2024-03-13', '2023-03-13', '2023-12-31', '2023-08-01', false, NULL, NULL, NULL, NULL, NULL, 'EVENTS', 2, true, 'EVENTS');
+INSERT INTO public."Program" (id, title, "lectureStart", "lectureEnd", "applicationStart", "defaultApplicationEnd", "achievementRecordUploadDeadline", visibility, "startQuestionnaire", "speakerQuestionnaire", "closingQuestionnaire", "attendanceCertificateTemplateURL", "achievementCertificateTemplateURL", "shortTitle", "defaultMaxMissedSessions", published, type) VALUES (2, 'Degrees', '2023-04-17', '2024-06-30', NULL, '2023-04-16', NULL, false, NULL, NULL, NULL, NULL, NULL, 'DEGREES', 2, true, 'DEGREES');
+INSERT INTO public."Program" (id, title, "lectureStart", "lectureEnd", "applicationStart", "defaultApplicationEnd", "achievementRecordUploadDeadline", visibility, "startQuestionnaire", "speakerQuestionnaire", "closingQuestionnaire", "attendanceCertificateTemplateURL", "achievementCertificateTemplateURL", "shortTitle", "defaultMaxMissedSessions", published, type) VALUES (5, 'Current Semester', '2024-10-02', '2025-04-02', '2024-09-02', '2024-10-02', '2025-04-02', false, 'https://survey.opencampus.sh/', '', 'https://survey.opencampus.sh/', 'programs/program-5/private/attendance-certificate-template/sprotte.jpg', 'programs/program-5/private/achievement-certificate-template/sprotte.jpg', 'PRESENT', 2, true, 'COURSES');
 INSERT INTO public."Course" (id, title, status, ects, tagline, language, "applicationEnd", cost, "achievementCertificatePossible", "attendanceCertificatePossible", "maxMissedSessions", "weekDay", "coverImage", created_at, updated_at, "programId", "headingDescriptionField1", "headingDescriptionField2", "contentDescriptionField1", "contentDescriptionField2", "learningGoals", "chatLink", "maxParticipants", "endTime", "startTime", published, "externalRegistrationLink", "registrationType") VALUES (6, 'Present Course 3', 'APPLICANTS_INVITED', '3', 'Sed leo libero, bibendum non viverra et, suscipit at quam. Fusce augue est, molestie ut dapibus quis, accumsan at lectus. In id malesuada quam', 'DE', '2025-01-02', '120€', true, true, 2, 'MONDAY', NULL, '2022-12-17 22:19:57.676901+00', '2022-12-19 13:55:11.89556+00', 5, 'test', 'test', 'test', 'test', 'test', 'https://chat.opencampus.sh', 20, '14:00:00', '11:45:00', true, NULL, 'APPROVAL_WITH_INPUT');
 INSERT INTO public."Course" (id, title, status, ects, tagline, language, "applicationEnd", cost, "achievementCertificatePossible", "attendanceCertificatePossible", "maxMissedSessions", "weekDay", "coverImage", created_at, updated_at, "programId", "headingDescriptionField1", "headingDescriptionField2", "contentDescriptionField1", "contentDescriptionField2", "learningGoals", "chatLink", "maxParticipants", "endTime", "startTime", published, "externalRegistrationLink", "registrationType") VALUES (7, 'This is a Degree', 'APPLICANTS_INVITED', '12,5', 'Sed leo libero, bibendum non viverra et, suscipit at quam. Fusce augue est, molestie ut dapibus quis, accumsan at lectus. In id malesuada quam', 'DE', '2024-12-02', '0', true, false, 2, 'NONE', NULL, '2022-12-17 22:19:57.676901+00', '2022-12-19 13:55:11.89556+00', 2, 'headingDescriptionField1', 'headingDescriptionField2', 'Content Description Field 1', 'Content Description Field 2', 'Lerning Goal 1\nLerning Goal 2', 'https://chat.opencampus.sh', 200, '18:00:00', '20:00:00', true, NULL, 'APPROVAL_WITH_INPUT');
 INSERT INTO public."Course" (id, title, status, ects, tagline, language, "applicationEnd", cost, "achievementCertificatePossible", "attendanceCertificatePossible", "maxMissedSessions", "weekDay", "coverImage", created_at, updated_at, "programId", "headingDescriptionField1", "headingDescriptionField2", "contentDescriptionField1", "contentDescriptionField2", "learningGoals", "chatLink", "maxParticipants", "endTime", "startTime", published, "externalRegistrationLink", "registrationType") VALUES (8, 'This is an Event', 'APPLICANTS_INVITED', 'NONE', 'Sed leo libero, bibendum non viverra et, suscipit at quam. Fusce augue est, molestie ut dapibus quis, accumsan at lectus. In id malesuada quam', 'DE', '2024-12-02', '0', false, true, 2, 'NONE', NULL, '2022-12-17 22:19:57.676901+00', '2022-12-19 13:55:11.89556+00', 3, 'headingDescriptionField1', 'headingDescriptionField2', 'Content Description Field 1', 'Content Description Field 2', 'Lerning Goal 1\nLerning Goal 2', NULL, 200, '14:00:00', '12:00:00', true, NULL, 'APPROVAL_WITH_INPUT');
@@ -837,8 +836,15 @@ INSERT INTO public."Attendance" (id, "sessionId", "userId", status, created_at, 
 INSERT INTO public."Attendance" (id, "sessionId", "userId", status, created_at, updated_at, "recordedIdentifier", source, "startDateTime", "endDateTime", "totalAttendanceTime", "interruptionCount") VALUES (62, 77, '66666666-6666-6666-6666-666666666666', 'ATTENDED', '2025-02-28 11:38:59.506369+00', '2025-02-28 11:38:59.506369+00', NULL, 'INSTRUCTOR', NULL, NULL, NULL, NULL);
 INSERT INTO public."Attendance" (id, "sessionId", "userId", status, created_at, updated_at, "recordedIdentifier", source, "startDateTime", "endDateTime", "totalAttendanceTime", "interruptionCount") VALUES (63, 78, '66666666-6666-6666-6666-666666666666', 'ATTENDED', '2025-02-28 11:38:59.822186+00', '2025-02-28 11:38:59.822186+00', NULL, 'INSTRUCTOR', NULL, NULL, NULL, NULL);
 INSERT INTO public."Attendance" (id, "sessionId", "userId", status, created_at, updated_at, "recordedIdentifier", source, "startDateTime", "endDateTime", "totalAttendanceTime", "interruptionCount") VALUES (64, 79, '66666666-6666-6666-6666-666666666666', 'ATTENDED', '2025-02-28 11:39:00.641586+00', '2025-02-28 11:39:00.641586+00', NULL, 'INSTRUCTOR', NULL, NULL, NULL, NULL);
-INSERT INTO public."CertificateTemplateProgram" (id, "programId", "certificateTemplateText") VALUES (1, 5, 1);
-INSERT INTO public."CertificateTemplateProgram" (id, "programId", "certificateTemplateText") VALUES (2, 5, 2);
+-- Program-level attendance template for programs with attendance-capable courses
+-- (Events id 3, Past Semester id 4, Current Semester id 5). Template id 2 is the
+-- seeded "attendance certificate example" CertificateTemplate row.
+UPDATE public."Program" SET "attendanceCertificateTemplateId" = 2 WHERE id IN (3, 4, 5);
+-- Events (id 3) has no legacy image URL in the Program INSERT; reuse the Past Semester dev asset.
+UPDATE public."Program" SET "attendanceCertificateTemplateURL" = '/programid_4/participation_certificate_template/opencampus_certificate_template_WS2022.png'
+ WHERE id = 3 AND "attendanceCertificateTemplateURL" IS NULL;
+UPDATE public."Course" SET "achievementCertificateTemplateId" = 1
+ WHERE "programId" = 5 AND "achievementCertificatePossible" = true;
 INSERT INTO public."CourseDegree" (id, "courseId", "degreeCourseId", created_at, updated_at) VALUES (1, 1, 7, '2022-12-19 13:40:34.079378+00', '2022-12-19 13:55:01.645233+00');
 INSERT INTO public."CourseDegree" (id, "courseId", "degreeCourseId", created_at, updated_at) VALUES (2, 2, 7, '2022-12-19 13:40:34.079378+00', '2022-12-19 13:55:01.645233+00');
 INSERT INTO public."CourseDegree" (id, "courseId", "degreeCourseId", created_at, updated_at) VALUES (3, 4, 7, '2022-12-19 13:40:34.079378+00', '2022-12-19 13:55:01.645233+00');
@@ -881,6 +887,7 @@ INSERT INTO public."CourseEnrollment" (id, "courseId", "userId", status, "motiva
 INSERT INTO public."CourseEnrollment" (id, "courseId", "userId", status, "motivationLetter", "motivationRating", "achievementCertificateURL", "attendanceCertificateURL", created_at, updated_at, "invitationExpirationDate") VALUES (453, 302, '66666666-6666-6666-6666-666666666666', 'CONFIRMED', 'Ready to engage with the course material.', 'UNRATED', NULL, '66666666-6666-6666-6666-666666666666/302/attendance_certificate.pdf', '2024-09-20 10:00:00+00', '2025-02-28 11:39:20.990522+00', NULL);
 INSERT INTO public."CourseEnrollment" (id, "courseId", "userId", status, "motivationLetter", "motivationRating", "achievementCertificateURL", "attendanceCertificateURL", created_at, updated_at, "invitationExpirationDate") VALUES (464, 302, '77777777-7777-7777-7777-777777777777', 'CONFIRMED', 'Ready to start this educational experience.', 'UNRATED', NULL, '77777777-7777-7777-7777-777777777777/302/attendance_certificate.pdf', '2024-09-20 09:00:00+00', '2025-02-28 11:39:22.378815+00', NULL);
 INSERT INTO public."CourseEnrollment" (id, "courseId", "userId", status, "motivationLetter", "motivationRating", "achievementCertificateURL", "attendanceCertificateURL", created_at, updated_at, "invitationExpirationDate") VALUES (465, 302, '88888888-8888-8888-8888-888888888888', 'CONFIRMED', 'Looking forward to collaborative learning.', 'UNRATED', 'test.url', '88888888-8888-8888-8888-888888888888/302/attendance_certificate.pdf', '2024-09-20 10:00:00+00', '2025-02-28 11:39:23.151425+00', NULL);
+INSERT INTO public."CourseEnrollment" (id, "courseId", "userId", status, "motivationLetter", "motivationRating", "achievementCertificateURL", "attendanceCertificateURL", created_at, updated_at, "invitationExpirationDate") VALUES (466, 4, '8914bee9-0549-44af-bcae-cafeec5ba92e', 'COMPLETED', 'Admin seed enrollment for certificate download testing.', 'UNRATED', '8914bee9-0549-44af-bcae-cafeec5ba92e/4/achievement_certificate.pdf', '8914bee9-0549-44af-bcae-cafeec5ba92e/4/attendance_certificate.pdf', '2025-05-19 09:00:00+00', '2025-05-19 09:00:00+00', NULL);
 INSERT INTO public."CourseFundingOrganization" (id, "courseId", "organizationId", created_at, updated_at) VALUES (1, 302, 160, '2025-11-28 09:44:09.478479+00', '2025-11-28 09:44:09.478479+00');
 INSERT INTO public."CourseFundingOrganization" (id, "courseId", "organizationId", created_at, updated_at) VALUES (2, 301, 160, '2025-11-28 09:44:33.610791+00', '2025-11-28 09:44:33.610791+00');
 INSERT INTO public."CourseFundingOrganization" (id, "courseId", "organizationId", created_at, updated_at) VALUES (3, 7, 160, '2025-11-28 09:45:16.853692+00', '2025-11-28 09:45:16.853692+00');
@@ -1518,7 +1525,14 @@ BEGIN
       generated_user_id,
       generated_first_name,
       generated_last_name,
-      lower(generated_first_name || '.' || generated_last_name || '.ml' || user_index || '@example.com'),
+      lower(
+        regexp_replace(
+          generated_first_name || '.' || generated_last_name || '.ml' || user_index,
+          '[^a-zA-Z0-9._-]',
+          '',
+          'g'
+        ) || '@example.com'
+      ),
       NULL,
       CASE WHEN user_index % 3 = 0 THEN 'https://www.linkedin.com' WHEN user_index % 3 = 1 THEN 'https://www.github.com' ELSE 'https://www.xing.com' END,
       user_index % 2 = 0,
@@ -1627,7 +1641,14 @@ BEGIN
         'ATTENDED',
         '2025-11-13 11:26:00+00'::timestamptz + (user_index * interval '1 second'),
         '2025-11-13 11:26:00+00'::timestamptz + (user_index * interval '1 second'),
-        lower(generated_first_name || '.' || generated_last_name || '.ml' || user_index || '@example.com'),
+        lower(
+        regexp_replace(
+          generated_first_name || '.' || generated_last_name || '.ml' || user_index,
+          '[^a-zA-Z0-9._-]',
+          '',
+          'g'
+        ) || '@example.com'
+      ),
         'INSTRUCTOR',
         '2025-10-01 10:00:00+00'::timestamptz + ((event_position - 1) * interval '30 days'),
         '2025-10-01 18:00:00+00'::timestamptz + ((event_position - 1) * interval '30 days'),
@@ -1639,12 +1660,97 @@ BEGIN
   END LOOP;
 END $$;
 
-SELECT pg_catalog.setval('public."AchievementDocumentationTemplate_id_seq"', 1, false);
-SELECT pg_catalog.setval('public."AchievementOptionCourse_id_seq"', 7, true);
-SELECT pg_catalog.setval('public."AchievementOptionMentor_id_seq"', 1, false);
-SELECT pg_catalog.setval('public."AchievementOption_id_seq"', 5, true);
-SELECT pg_catalog.setval('public."AchievementRecordAuthor_id_seq"', 1, true);
-SELECT pg_catalog.setval('public."AchievementRecord_id_seq"', 7, true);
+-- =============================================================================
+-- Dev fixtures for the legacy achievement -> project data migration
+-- (migration 1780045613786_migrate_achievements_to_projects).
+--
+-- Exercises every mapping branch:
+--   - DOCUMENTATION option with a documentation template + mentor + records
+--     (proposer falls back to the mentor; instruction picked up via the
+--      legacyAchievementDocumentationTemplateId index)
+--   - Unpublished DOCUMENTATION option with a record (still migrated)
+--   - Extra ONLINE_COURSE record on an existing option (multi-record per option)
+--   - Multi-author record (two ProjectAuthors emitted)
+--   - PASSED rating carried over to Project.rating, UNRATED record kept as-is
+-- After running the seeds, re-execute the data steps of the migration's up.sql
+-- to convert the seeded legacy rows into Project rows.
+-- =============================================================================
+INSERT INTO public."AchievementDocumentationTemplate" (id, title, url, created_at, updated_at)
+VALUES (1, 'Dev documentation template', 'https://example.com/documentation_template.pdf',
+        '2024-01-15 10:00:00+00', '2024-01-15 10:00:00+00');
+
+INSERT INTO public."AchievementOption" (id, title, description, "recordType", "evaluationScriptUrl", created_at, updated_at, published, "achievementDocumentationTemplateId") VALUES
+  (5, 'documentation project alpha',
+   'A practical documentation project for testing the DOCUMENTATION -> CLASSIC_PROJECT mapping.',
+   'DOCUMENTATION', NULL, '2024-02-01 09:00:00+00', '2024-02-01 09:00:00+00', true, 1),
+  (6, 'documentation project beta (unpublished)',
+   'Unpublished documentation project; should still be migrated as a PROPOSED template.',
+   'DOCUMENTATION', NULL, '2024-02-01 09:00:00+00', '2024-02-01 09:00:00+00', false, NULL);
+
+INSERT INTO public."AchievementOptionCourse" (id, "achievementOptionId", "courseId", created_at, updated_at) VALUES
+  (8,  5, 1, '2024-02-01 09:00:00+00', '2024-02-01 09:00:00+00'),
+  (9,  5, 4, '2024-02-01 09:00:00+00', '2024-02-01 09:00:00+00'),
+  (10, 6, 1, '2024-02-01 09:00:00+00', '2024-02-01 09:00:00+00');
+
+-- Mentor on the documentation option exercises the proposer fallback to mentors.
+INSERT INTO public."AchievementOptionMentor" (id, "achievementOptionId", "userId", created_at, updated_at) VALUES
+  (1, 5, 'cccccccc-cccc-cccc-cccc-cccccccccccc',
+   '2024-02-01 09:00:00+00', '2024-02-01 09:00:00+00');
+
+-- Records: documentation (passed + multi-author + unrated) and an extra online-course submission.
+INSERT INTO public."AchievementRecord" (id, "coverImageUrl", description, rating, score, "achievementOptionId", "documentationUrl", "csvResults", "evaluationScriptUrl", created_at, updated_at, "uploadUserId", "courseId") VALUES
+  (8, NULL, 'A passed documentation submission with two authors.',
+   'PASSED', NULL, 5, 'achievementrecordid_8/documentation/doc.pdf', NULL, NULL,
+   '2024-03-15 12:00:00+00', '2024-03-15 12:00:00+00',
+   '11111111-1111-1111-1111-111111111111', 1),
+  (9, NULL, 'Unrated documentation submission for the unpublished option.',
+   'UNRATED', NULL, 6, 'achievementrecordid_9/documentation/doc.pdf', NULL, NULL,
+   '2024-03-15 14:00:00+00', '2024-03-15 14:00:00+00',
+   '33333333-3333-3333-3333-333333333333', 1),
+  (10, NULL, 'Passed online-course completion submission.',
+   'PASSED', NULL, 1, 'achievementrecordid_10/documentation/doc.pdf', NULL, NULL,
+   '2024-03-16 09:00:00+00', '2024-03-16 09:00:00+00',
+   '44444444-4444-4444-4444-444444444444', 1);
+
+INSERT INTO public."AchievementRecordAuthor" (id, "achievementRecordId", "userId", created_at, updated_at) VALUES
+  (2, 8,  '11111111-1111-1111-1111-111111111111', '2024-03-15 12:00:00+00', '2024-03-15 12:00:00+00'),
+  (3, 8,  '22222222-2222-2222-2222-222222222222', '2024-03-15 12:00:00+00', '2024-03-15 12:00:00+00'),
+  (4, 9,  '33333333-3333-3333-3333-333333333333', '2024-03-15 14:00:00+00', '2024-03-15 14:00:00+00'),
+  (5, 10, '44444444-4444-4444-4444-444444444444', '2024-03-16 09:00:00+00', '2024-03-16 09:00:00+00');
+
+-- =============================================================================
+-- Degree certificate template fixture
+--
+-- Mirrors the manually-inserted production row used for the DEGREES program.
+-- Each degree course (Program 'Degrees', shortTitle = 'DEGREES') points its
+-- Course.achievementCertificateTemplateId at this template.
+-- =============================================================================
+INSERT INTO public."CertificateTemplate" (id, name, html, created_at, updated_at) VALUES
+  (3, 'degree certificate example', E'<html><head> <meta http-equiv="Content-Type" content="text/html; charset=utf-8"> <title>Document Title</title> <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400&display=swap" rel="stylesheet"> <style type="text/css"> @page { size: a4 landscape; background-image: url("{{ template }}"); background-position: center center; background-size: cover; @frame content_frame { left: 85mm; width: 195mm; top: 60mm; height: 140mm; } } body, html { font-family: \'Lato\', sans-serif !important; margin: 0; padding: 0; width: 297mm; height: 210mm; } .big { font-size: 7mm; font-weight: bold; color: #777; } .small { font-size: 4.2mm; color: #777; } p { margin-top: 3mm; margin-bottom: 3mm; } </style> </head> <body> <span class="big">{{ full_name }}</span> <p class="small"> has met the degree''s minimum requirements of completing 12.5 ECTS and participating in at least one hackathon by successfully completing the following degree components: </p> <p class="small"> {% for participation in successful_participations %} // {{ participation }}<br> {% endfor %} </p> </body> </html>',
+   '2024-01-01 00:00:00+00', '2024-01-01 00:00:00+00');
+
+-- Wire the degree template to every degree course (identified by program shortTitle).
+UPDATE public."Course" c SET "achievementCertificateTemplateId" = 3
+  FROM public."Program" p
+ WHERE p.id = c."programId"
+   AND p."shortTitle" = 'DEGREES'
+   AND c."achievementCertificatePossible" = true;
+
+-- Default achievement template for every project type (mirrors the migration's data step).
+UPDATE public."ProjectType" SET "certificateTemplateId" = 1
+ WHERE value IN (
+   'CLASSIC_PROJECT', 'ONLINE_COURSE', 'PROJECT_WITH_LINK',
+   'PROJECT_WITH_PRESENTATION', 'PROJECT_WITH_LINK_AND_PRESENTATION',
+   'PRESENTATION_WITHOUT_DOCUMENTATION', 'PRESENTATION_AND_LINK_WITHOUT_DOCUMENTATION'
+ );
+
+SELECT pg_catalog.setval('public."AchievementDocumentationTemplate_id_seq"', 1, true);
+SELECT pg_catalog.setval('public."AchievementOptionCourse_id_seq"', 10, true);
+SELECT pg_catalog.setval('public."AchievementOptionMentor_id_seq"', 1, true);
+SELECT pg_catalog.setval('public."AchievementOption_id_seq"', 6, true);
+SELECT pg_catalog.setval('public."AchievementRecordAuthor_id_seq"', 5, true);
+SELECT pg_catalog.setval('public."AchievementRecord_id_seq"', 10, true);
+SELECT pg_catalog.setval(pg_get_serial_sequence('public."CertificateTemplate"', 'id'), (SELECT max(id) FROM public."CertificateTemplate"), true);
 SELECT pg_catalog.setval('public."Attendence_Id_seq"', 64, true);
 SELECT pg_catalog.setval('public."CourseAddress_id_seq"', 9, true);
 SELECT pg_catalog.setval('public."CourseDegree_id_seq"', 6, true);

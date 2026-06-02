@@ -14,7 +14,8 @@ import {
   UPDATE_USER_MATRICULATION_NUMBER,
 } from '../../../queries/updateUser';
 import { UPDATE_ENROLLMENT_STATUS } from '../../../queries/insertEnrollment';
-import { CourseEnrollmentStatus_enum, ProgramType_enum } from '../../../__generated__/globalTypes';
+import { CourseEnrollmentStatus_enum } from '../../../__generated__/globalTypes';
+import { ProgramType } from '../../../types/enums';
 import { USER, USER_OCCUPATION } from '../../../queries/user';
 import {
   CREATE_ORGANIZATION,
@@ -138,12 +139,12 @@ const Onboarding: FC<OnboardingProps> = ({ course, enrollmentId, refetchCourse, 
 
   const [upsertNewsletterSubscription] = useRoleMutation(UPSERT_ORGANIZATION_NEWSLETTER_SUBSCRIPTION);
 
-  const rawProgramType = (course?.Program as { type?: ProgramType_enum } | null | undefined)?.type;
-  let programTypeForText = ProgramType_enum.COURSES;
-  if (rawProgramType === ProgramType_enum.EVENTS) {
-    programTypeForText = ProgramType_enum.EVENTS;
-  } else if (rawProgramType === ProgramType_enum.DEGREES) {
-    programTypeForText = ProgramType_enum.DEGREES;
+  const rawProgramType = (course?.Program as { type?: string } | null | undefined)?.type;
+  let programTypeForText: ProgramType = ProgramType.COURSES;
+  if (rawProgramType === ProgramType.EVENTS) {
+    programTypeForText = ProgramType.EVENTS;
+  } else if (rawProgramType === ProgramType.DEGREES) {
+    programTypeForText = ProgramType.DEGREES;
   }
 
   const { data: onboardingTextData } = useRoleQuery<OnboardingTextByType>(ONBOARDING_TEXT_BY_TYPE, {

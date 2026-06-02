@@ -1,0 +1,42 @@
+table:
+  name: CertificateTemplate
+  schema: public
+array_relationships:
+  - name: AchievementCourses
+    using:
+      foreign_key_constraint_on:
+        column: achievementCertificateTemplateId
+        table:
+          name: Course
+          schema: public
+  - name: AttendanceCourses
+    using:
+      foreign_key_constraint_on:
+        column: attendanceCertificateTemplateId
+        table:
+          name: Course
+          schema: public
+  - name: AttendancePrograms
+    using:
+      foreign_key_constraint_on:
+        column: attendanceCertificateTemplateId
+        table:
+          name: Program
+          schema: public
+  - name: ProjectTypes
+    using:
+      foreign_key_constraint_on:
+        column: certificateTemplateId
+        table:
+          name: ProjectType
+          schema: public
+select_permissions:
+  - role: instructor_access
+    permission:
+      columns:
+        - id
+        - name
+        - html
+        - created_at
+        - updated_at
+      filter: {}

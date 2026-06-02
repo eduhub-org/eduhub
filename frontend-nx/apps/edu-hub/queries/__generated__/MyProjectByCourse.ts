@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { ProjectStatus_enum, ProjectAchievementCertificateType_enum, ProjectRating_enum, ProjectParticipationStatus_enum } from "./../../__generated__/globalTypes";
+import { ProjectStatus_enum, ProjectRating_enum, ProjectParticipationStatus_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: MyProjectByCourse
@@ -18,16 +18,34 @@ export interface MyProjectByCourse_Project_Organization {
 export interface MyProjectByCourse_Project_ProjectType {
   __typename: "ProjectType";
   value: string;
+  /**
+   * When true, project.documentationUrl must be present before the project can be submitted.
+   */
   requiresDocumentation: boolean;
+  /**
+   * When true, project.presentationUrl must be present before the project can be submitted.
+   */
   requiresPresentation: boolean;
+  /**
+   * When true, project.externalUrl must be present before the project can be submitted (e.g. repository or live demo).
+   */
   requiresExternalUrl: boolean;
+  /**
+   * When true, project.coverImageUrl must be present before submission and for showcase publication.
+   */
   requiresCoverImage: boolean;
 }
 
 export interface MyProjectByCourse_Project_ProjectDocumentationInstruction {
   __typename: "ProjectDocumentationInstruction";
   id: number;
+  /**
+   * Admin-facing label in instruction dropdowns.
+   */
   title: string;
+  /**
+   * Instruction PDF location: static app path (e.g. /project-documentation-instructions/…) or GCS object path after admin upload. Nullable until a file is attached.
+   */
   url: string | null;
 }
 
@@ -102,6 +120,9 @@ export interface MyProjectByCourse_Project_ProjectMentors_User {
 export interface MyProjectByCourse_Project_ProjectMentors {
   __typename: "ProjectMentor";
   id: number;
+  /**
+   * FK to User.id of the mentor.
+   */
   userId: any;
   /**
    * An object relationship
@@ -119,13 +140,18 @@ export interface MyProjectByCourse_Project {
   documentationUrl: string | null;
   presentationUrl: string | null;
   externalUrl: string | null;
+  /**
+   * FK to ProjectDocumentationInstruction.id. Must match Project.type (trigger Project_instruction_matches_type_trg). Instruction PDF describes deliverable composition; enforced uploads are only those required by the project type.
+   */
   documentationInstructionId: number | null;
   status: ProjectStatus_enum;
+  /**
+   * FK to ProjectType.value. Required with documentationInstructionId before leaving PROPOSED (check constraint). Drives mandatory deliverables and workflow (e.g. ONLINE_COURSE template claim may insert ONGOING directly).
+   */
   type: string | null;
-  achievementCertificateType: ProjectAchievementCertificateType_enum | null;
   rating: ProjectRating_enum | null;
   /**
-   * Optional instructor comment accompanying the project rating (UNRATED/PASSED/FAILED).
+   * Optional comment from course staff or project mentor accompanying rating (UNRATED/PASSED/FAILED).
    */
   ratingComment: string | null;
   acceptingParticipants: boolean;

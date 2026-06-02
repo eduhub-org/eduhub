@@ -1,17 +1,15 @@
-import React, { FC, useCallback, useState } from 'react';
+import React, { FC, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { GetApp } from '@mui/icons-material';
 import { TileBase } from './TileSlider/TileBase';
-import { useLazyRoleQuery } from '../../hooks/authedQuery';
 import { useRoleMutation } from '../../hooks/authedMutation';
-import { GET_SIGNED_URL, MAKE_CERTIFICATE_PUBLIC } from '../../queries/actions';
-import { GetSignedUrl, GetSignedUrlVariables } from '../../queries/__generated__/GetSignedUrl';
+import { MAKE_CERTIFICATE_PUBLIC } from '../../queries/actions';
 import { MakeCertificatePublic, MakeCertificatePublicVariables } from '../../queries/__generated__/MakeCertificatePublic';
 import { Button } from './Button';
 import { LinkedInSharingDialog } from './dialogs/LinkedInSharingDialog';
 import { ErrorMessageDialog } from './dialogs/ErrorMessageDialog';
 import { MyCertificates_CourseEnrollment } from '../../queries/__generated__/MyCertificates';
-import { CircularProgress } from '@mui/material';
+import { getCertificateDownloadUrl } from '../../helpers/certificateDownload';
 
 interface CertificateTileProps {
   enrollment: MyCertificates_CourseEnrollment;
@@ -25,39 +23,9 @@ export const CertificateTile: FC<CertificateTileProps> = ({ enrollment }) => {
   const course = enrollment.Course;
   const program = course?.Program;
 
-  const [getAchievementUrl, { loading: achievementLoading }] = useLazyRoleQuery<
-    GetSignedUrl,
-    GetSignedUrlVariables
-  >(GET_SIGNED_URL, { fetchPolicy: 'network-only' });
-
-  const [getAttendanceUrl, { loading: attendanceLoading }] = useLazyRoleQuery<
-    GetSignedUrl,
-    GetSignedUrlVariables
-  >(GET_SIGNED_URL, { fetchPolicy: 'network-only' });
-
   const [makeCertificatePublic, { loading: makingPublic }] = useRoleMutation<MakeCertificatePublic, MakeCertificatePublicVariables>(
     MAKE_CERTIFICATE_PUBLIC
   );
-
-  const handleCertificateClick = useCallback(async (type: 'achievement' | 'attendance') => {
-    const path = type === 'achievement'
-      ? enrollment.achievementCertificateURL
-      : enrollment.attendanceCertificateURL;
-    if (!path) return;
-
-    const fetchUrl = type === 'achievement' ? getAchievementUrl : getAttendanceUrl;
-    try {
-      const result = await fetchUrl({ variables: { path } });
-      const link = result.data?.getSignedUrl?.link;
-      if (link) {
-        window.open(link, '_blank', 'noopener,noreferrer');
-      } else {
-        setErrorMessage(t('errorMessages.certificate_download_error'));
-      }
-    } catch {
-      setErrorMessage(t('errorMessages.certificate_download_error'));
-    }
-  }, [enrollment.achievementCertificateURL, enrollment.attendanceCertificateURL, getAchievementUrl, getAttendanceUrl, t]);
 
   const handleLinkedInClick = () => {
     setLinkedInDialogOpen(true);
@@ -94,8 +62,10 @@ export const CertificateTile: FC<CertificateTileProps> = ({ enrollment }) => {
     }
   };
 
-  const hasAchievement = !!enrollment.achievementCertificateURL;
-  const hasAttendance = !!enrollment.attendanceCertificateURL;
+  const achievementCertificatePath = enrollment.achievementCertificateURL;
+  const attendanceCertificatePath = enrollment.attendanceCertificateURL;
+  const hasAchievement = !!achievementCertificatePath;
+  const hasAttendance = !!attendanceCertificatePath;
   const hasAnyCertificate = hasAchievement || hasAttendance;
 
   return (
@@ -106,33 +76,29 @@ export const CertificateTile: FC<CertificateTileProps> = ({ enrollment }) => {
       >
         <div className="flex flex-col h-full justify-between">
           <div className="flex flex-col gap-3">
-            {hasAchievement && (
+            {achievementCertificatePath && (
               <Button
+                as="a"
+                href={getCertificateDownloadUrl(achievementCertificatePath)}
+                target="_blank"
+                rel="noopener noreferrer"
                 filled
-                onClick={() => handleCertificateClick('achievement')}
-                disabled={achievementLoading}
                 className="flex items-center justify-center gap-2 text-sm py-2 px-3"
               >
-                {achievementLoading ? (
-                  <CircularProgress size={16} />
-                ) : (
-                  <GetApp fontSize="small" />
-                )}
+                <GetApp fontSize="small" />
                 {t('achievement_certificate')}
               </Button>
             )}
-            {hasAttendance && (
+            {attendanceCertificatePath && (
               <Button
+                as="a"
+                href={getCertificateDownloadUrl(attendanceCertificatePath)}
+                target="_blank"
+                rel="noopener noreferrer"
                 filled
-                onClick={() => handleCertificateClick('attendance')}
-                disabled={attendanceLoading}
                 className="flex items-center justify-center gap-2 text-sm py-2 px-3"
               >
-                {attendanceLoading ? (
-                  <CircularProgress size={16} />
-                ) : (
-                  <GetApp fontSize="small" />
-                )}
+                <GetApp fontSize="small" />
                 {t('attendance_certificate')}
               </Button>
             )}

@@ -221,25 +221,23 @@ export const fetchEnrollments = async (userIds, courseId) => {
           }
           firstName
           lastName
-          AchievementRecordAuthors(
+          ProjectAuthors(
             where: {
-              AchievementRecord: {
-                AchievementOption: {
-                  AchievementOptionCourses: {
-                    Course: { id: { _eq: $courseId } }
-                  }
-                }
+              participationStatus: { _eq: ACCEPTED }
+              Project: {
+                status: { _eq: COMPLETED }
+                ProjectCourses: { courseId: { _eq: $courseId } }
               }
             }
-            order_by: { AchievementRecord: { updated_at: desc } }
+            order_by: { Project: { updated_at: desc } }
             limit: 1
           ) {
-            AchievementRecord {
-              AchievementOption {
-                title
-                recordType
+            Project {
+              title
+              type
+              ProjectType {
+                CertificateTemplate { html }
               }
-              created_at
             }
           }
           id
@@ -249,7 +247,10 @@ export const fetchEnrollments = async (userIds, courseId) => {
             title
             achievementCertificateTemplateURL
             attendanceCertificateTemplateURL
+            AttendanceCertificateTemplate { html }
           }
+          AchievementCertificateTemplate { html }
+          AttendanceCertificateTemplate { html }
           Sessions(order_by: { startDateTime: asc }) {
             id
             title

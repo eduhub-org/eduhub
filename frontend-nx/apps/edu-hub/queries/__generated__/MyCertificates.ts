@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { CourseEnrollmentStatus_enum, InvoiceStatus_enum, CourseStatus_enum, Weekday_enum, CourseRegistrationType_enum, ProgramType_enum } from "./../../__generated__/globalTypes";
+import { CourseEnrollmentStatus_enum, InvoiceStatus_enum, CourseStatus_enum, Weekday_enum, CourseRegistrationType_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: MyCertificates
@@ -73,7 +73,7 @@ export interface MyCertificates_CourseEnrollment_Course_Program {
    * Decides whether the courses of this program can be published or not. (Courses are ony published if the filed publised in the Course table is also set to true.)
    */
   published: boolean;
-  type: ProgramType_enum;
+  type: string;
   /**
    * Default Formbricks survey URL for course enrollments/applications. Courses can override this with their own formbricksEnrollmentSurveyUrl.
    */

@@ -67,9 +67,6 @@
             "uma_authorization"
           ],
           "client": {
-            "rent-a-scientist": [
-              "user"
-            ],
             "account": [
               "manage-account",
               "view-profile"
@@ -313,25 +310,6 @@
           "composite": false,
           "clientRole": true,
           "containerId": "24062e0f-b71b-4014-8177-0e908d5c5535",
-          "attributes": {}
-        }
-      ],
-      "rent-a-scientist": [
-        {
-          "id": "1837bb61-7fcd-4f60-b041-437f5ee97825",
-          "name": "user",
-          "description": "",
-          "composite": false,
-          "clientRole": true,
-          "containerId": "56fe245f-6424-48b3-9118-936e3cc30671",
-          "attributes": {}
-        },
-        {
-          "id": "a86386e9-284b-49f0-82ac-a54a7a791125",
-          "name": "uma_protection",
-          "composite": false,
-          "clientRole": true,
-          "containerId": "56fe245f-6424-48b3-9118-936e3cc30671",
           "attributes": {}
         }
       ],
@@ -610,27 +588,6 @@
       ],
       "clientRoles": {
         "edu-old": [
-          "uma_protection"
-        ]
-      },
-      "notBefore": 0,
-      "groups": []
-    },
-    {
-      "id": "2beb5096-d417-472e-9e59-976b71050ae5",
-      "createdTimestamp": 1682421503084,
-      "username": "service-account-rent-a-scientist",
-      "enabled": true,
-      "totp": false,
-      "emailVerified": false,
-      "serviceAccountClientId": "rent-a-scientist",
-      "disableableCredentialTypes": [],
-      "requiredActions": [],
-      "realmRoles": [
-        "default-roles-edu-hub"
-      ],
-      "clientRoles": {
-        "rent-a-scientist": [
           "uma_protection"
         ]
       },
@@ -1246,160 +1203,6 @@
         ],
         "decisionStrategy": "UNANIMOUS"
       }
-    },
-    {
-      "id": "56fe245f-6424-48b3-9118-936e3cc30671",
-      "clientId": "rent-a-scientist",
-      "name": "rent-a-scientist",
-      "description": "",
-      "rootUrl": "",
-      "adminUrl": "",
-      "baseUrl": "",
-      "surrogateAuthRequired": false,
-      "enabled": true,
-      "alwaysDisplayInConsole": false,
-      "clientAuthenticatorType": "client-secret",
-      "secret": "cNyPqZLHwZcz1fqy9hWfrjwbPBqXrKiD",
-      "redirectUris": [
-        "http://localhost:5001/*"
-      ],
-      "webOrigins": [
-        "+"
-      ],
-      "notBefore": 0,
-      "bearerOnly": false,
-      "consentRequired": false,
-      "standardFlowEnabled": true,
-      "implicitFlowEnabled": true,
-      "directAccessGrantsEnabled": true,
-      "serviceAccountsEnabled": true,
-      "authorizationServicesEnabled": true,
-      "publicClient": false,
-      "frontchannelLogout": false,
-      "protocol": "openid-connect",
-      "attributes": {
-        "client.secret.creation.time": "1682421503",
-        "login_theme": "edu-hub",
-        "post.logout.redirect.uris": "+",
-        "oauth2.device.authorization.grant.enabled": "false",
-        "backchannel.logout.revoke.offline.tokens": "false",
-        "use.refresh.tokens": "true",
-        "tls-client-certificate-bound-access-tokens": "false",
-        "oidc.ciba.grant.enabled": "false",
-        "backchannel.logout.session.required": "true",
-        "client_credentials.use_refresh_token": "false",
-        "acr.loa.map": "{}",
-        "require.pushed.authorization.requests": "false",
-        "display.on.consent.screen": "false",
-        "token.response.type.bearer.lower-case": "false"
-      },
-      "authenticationFlowBindingOverrides": {},
-      "fullScopeAllowed": true,
-      "nodeReRegistrationTimeout": -1,
-      "protocolMappers": [
-        {
-          "id": "6e8ff3d1-569f-4d20-afe7-215fe30b3bdf",
-          "name": "Client IP Address",
-          "protocol": "openid-connect",
-          "protocolMapper": "oidc-usersessionmodel-note-mapper",
-          "consentRequired": false,
-          "config": {
-            "user.session.note": "clientAddress",
-            "id.token.claim": "true",
-            "access.token.claim": "true",
-            "claim.name": "clientAddress",
-            "jsonType.label": "String"
-          }
-        },
-        {
-          "id": "de170661-131e-490b-b6e9-3ab002ffb405",
-          "name": "Client ID",
-          "protocol": "openid-connect",
-          "protocolMapper": "oidc-usersessionmodel-note-mapper",
-          "consentRequired": false,
-          "config": {
-            "user.session.note": "clientId",
-            "id.token.claim": "true",
-            "access.token.claim": "true",
-            "claim.name": "clientId",
-            "jsonType.label": "String"
-          }
-        },
-        {
-          "id": "f5fae99e-1d16-40a0-ae47-8f0ecd2e2e62",
-          "name": "Client Host",
-          "protocol": "openid-connect",
-          "protocolMapper": "oidc-usersessionmodel-note-mapper",
-          "consentRequired": false,
-          "config": {
-            "user.session.note": "clientHost",
-            "id.token.claim": "true",
-            "access.token.claim": "true",
-            "claim.name": "clientHost",
-            "jsonType.label": "String"
-          }
-        },
-        {
-          "id": "82664155-996e-4c65-96e1-c812cbff09ad",
-          "name": "x-hasura-user-id",
-          "protocol": "openid-connect",
-          "protocolMapper": "oidc-usermodel-property-mapper",
-          "consentRequired": false,
-          "config": {
-            "userinfo.token.claim": "true",
-            "user.attribute": "id",
-            "id.token.claim": "true",
-            "access.token.claim": "true",
-            "claim.name": "https://hasura\\.io/jwt/claims.x-hasura-user-id",
-            "jsonType.label": "String"
-          }
-        },
-        {
-          "id": "20a760fd-a7f0-4463-b49a-830cc4922d24",
-          "name": "x-hasura-default-role",
-          "protocol": "openid-connect",
-          "protocolMapper": "oidc-hardcoded-claim-mapper",
-          "consentRequired": false,
-          "config": {
-            "claim.value": "user",
-            "userinfo.token.claim": "true",
-            "id.token.claim": "true",
-            "access.token.claim": "true",
-            "claim.name": "https://hasura\\.io/jwt/claims.x-hasura-default-role",
-            "jsonType.label": "String",
-            "access.tokenResponse.claim": "false"
-          }
-        },
-        {
-          "id": "9e502146-c7f5-418c-aa7a-a26932d36512",
-          "name": "x-hasura-allowed-roles",
-          "protocol": "openid-connect",
-          "protocolMapper": "oidc-usermodel-client-role-mapper",
-          "consentRequired": false,
-          "config": {
-            "multivalued": "true",
-            "userinfo.token.claim": "true",
-            "id.token.claim": "true",
-            "access.token.claim": "true",
-            "claim.name": "https://hasura\\.io/jwt/claims.x-hasura-allowed-roles",
-            "jsonType.label": "String",
-            "usermodel.clientRoleMapping.clientId": "rent-a-scientist"
-          }
-        }
-      ],
-      "defaultClientScopes": [
-        "web-origins",
-        "acr",
-        "roles",
-        "profile",
-        "email"
-      ],
-      "optionalClientScopes": [
-        "address",
-        "phone",
-        "offline_access",
-        "microprofile-jwt"
-      ]
     },
     {
       "id": "4dce9ad4-3df6-419e-b8db-aeaf50113b5d",

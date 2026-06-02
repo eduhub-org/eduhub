@@ -12,14 +12,20 @@ import { ProjectDocumentationInstruction_bool_exp, ProjectDocumentationInstructi
 export interface ProjectDocumentationInstructionsTable_ProjectDocumentationInstruction {
   __typename: "ProjectDocumentationInstruction";
   id: number;
+  /**
+   * Admin-facing label in instruction dropdowns.
+   */
   title: string;
+  /**
+   * Instruction PDF location: static app path (e.g. /project-documentation-instructions/…) or GCS object path after admin upload. Nullable until a file is attached.
+   */
   url: string | null;
   /**
-   * The single project type this instruction is suitable for.
+   * FK to ProjectType.value. Every instruction belongs to exactly one type; must match Project.type when linked (see Project_instruction_matches_type_trg).
    */
   projectTypeValue: string;
   /**
-   * Exactly one instruction per projectTypeValue is marked default; admin UI swaps defaults atomically.
+   * When true, this instruction is the default for its projectTypeValue (at most one per type; partial unique index). Shown first in dropdowns and applied when the project type changes.
    */
   isDefault: boolean;
   updated_at: any;

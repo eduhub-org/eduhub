@@ -12,7 +12,7 @@ export const ONBOARDING_TEXTS = gql`
 `;
 
 export const ONBOARDING_TEXT_BY_TYPE = gql`
-  query OnboardingTextByType($programType: ProgramType_enum!) {
+  query OnboardingTextByType($programType: String!) {
     OnboardingText(where: { programType: { _eq: $programType } }) {
       id
       programType

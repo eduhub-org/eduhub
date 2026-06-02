@@ -11,14 +11,10 @@ object_relationships:
   - name: ProgramType
     using:
       foreign_key_constraint_on: type
-array_relationships:
-  - name: CertificateTemplatePrograms
+  - name: AttendanceCertificateTemplate
     using:
-      foreign_key_constraint_on:
-        column: programId
-        table:
-          name: CertificateTemplateProgram
-          schema: public
+      foreign_key_constraint_on: attendanceCertificateTemplateId
+array_relationships:
   - name: Courses
     using:
       foreign_key_constraint_on:
@@ -55,6 +51,7 @@ select_permissions:
         - visibility
         - applicationStart
         - organizationId
+        - attendanceCertificateTemplateId
         - attendanceCertificateTemplateURL
         - closingQuestionnaire
         - defaultApplicationEnd
