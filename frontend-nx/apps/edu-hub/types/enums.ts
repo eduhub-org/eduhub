@@ -10,5 +10,4 @@ export enum ProgramType {
   COURSES = 'COURSES',
   DEGREES = 'DEGREES',
   EVENTS = 'EVENTS',
-  RENT_A_SCIENTIST = 'RENT_A_SCIENTIST',
 }
