@@ -181,6 +181,31 @@ export const UPDATE_ENROLLMENT_STATUS_WHEN_APPLIED = gql`
   }
 `;
 
+/** Bulk status change only for rows still CONFIRMED (participations list → mark as aborted). */
+export const UPDATE_ENROLLMENT_STATUS_WHEN_CONFIRMED = gql`
+  mutation UpdateEnrollmentStatusWhenConfirmed(
+    $enrollmentIds: [Int!]!
+    $status: CourseEnrollmentStatus_enum!
+    $courseId: Int!
+  ) {
+    update_CourseEnrollment(
+      where: {
+        _and: [
+          { id: { _in: $enrollmentIds } }
+          { status: { _eq: CONFIRMED } }
+          { courseId: { _eq: $courseId } }
+        ]
+      }
+      _set: { status: $status }
+    ) {
+      affected_rows
+      returning {
+        id
+      }
+    }
+  }
+`;
+
 /** Bulk invite update for APPLIED, WAITLIST, or already INVITED rows (supports invite resend/deadline changes). */
 export const UPDATE_ENROLLMENT_STATUS_FOR_INVITE = gql`
   mutation UpdateEnrollmentStatusForInvite(

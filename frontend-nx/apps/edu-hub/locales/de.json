@@ -1392,6 +1392,18 @@
     "no_attendance_certificates_deleted": "Es wurden keine Teilnahmebescheinigungen gelöscht",
     "attendance_certificate_deleted_singular": "{count} Teilnahmebescheinigung wurde gelöscht",
     "attendance_certificates_deleted_plural": "{count} Teilnahmebescheinigungen wurden gelöscht",
+    "participations_bulk_actions": {
+      "mark_aborted_selected": "Teilnahme als abgebrochen markieren",
+      "mark_aborted_dialog_title": "Teilnahme als abgebrochen markieren",
+      "mark_aborted_confirm_singular": "Möchtest du die ausgewählte Person als abgebrochen markieren? Sie verschwindet aus der Teilnehmenden-Liste, bleibt aber unter Bewerbungen sichtbar. Du kannst den Status dort später wieder ändern.",
+      "mark_aborted_confirm_plural": "Möchtest du {count} ausgewählte Personen als abgebrochen markieren? Sie verschwinden aus der Teilnehmenden-Liste, bleiben aber unter Bewerbungen sichtbar. Du kannst den Status dort später wieder ändern.",
+      "mark_aborted_success_singular": "{count} Teilnahme wurde als abgebrochen markiert.",
+      "mark_aborted_success_plural": "{count} Teilnahmen wurden als abgebrochen markiert.",
+      "mark_aborted_error": "Teilnahmen konnten nicht als abgebrochen markiert werden: {error}",
+      "disabled_reasons": {
+        "instructors_only": "Diese Sammelaktion können nur Instructor:innen ausführen."
+      }
+    },
     "certificates_group": "Zertifikate",
     "application_status_tooltip": "Klicke auf die Kreise, um die Bewertung zu ändern",
     "application_deadline_tooltip": "Wenn du das Datum für die Bestätigungsfrist ändern möchtest, kannst du die Einladung erneut senden.",

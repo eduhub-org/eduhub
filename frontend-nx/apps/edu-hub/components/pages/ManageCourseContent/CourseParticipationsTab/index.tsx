@@ -1,7 +1,7 @@
 import { ApolloError, QueryResult } from '@apollo/client';
 import { useTranslations } from 'next-intl';
 import { FC, useCallback, useMemo, useState } from 'react';
-import { useIsAdmin } from '../../../../hooks/authentication';
+import { useIsAdmin, useIsInstructor } from '../../../../hooks/authentication';
 import { useRoleMutation } from '../../../../hooks/authedMutation';
 import Dot, { DotColor } from '../../../common/Dot';
 import { CertificateDownload } from '../../../common/CertificateDownload';
@@ -27,7 +27,16 @@ import {
   InsertSingleAttendanceVariables,
 } from '../../../../queries/__generated__/InsertSingleAttendance';
 import { ManagedCourse_Course_by_pk } from '../../../../queries/__generated__/ManagedCourse';
-import { AttendanceStatus_enum, ProjectRating_enum } from '../../../../__generated__/globalTypes';
+import {
+  AttendanceStatus_enum,
+  CourseEnrollmentStatus_enum,
+  ProjectRating_enum,
+} from '../../../../__generated__/globalTypes';
+import { UPDATE_ENROLLMENT_STATUS_WHEN_CONFIRMED } from '../../../../queries/insertEnrollment';
+import {
+  UpdateEnrollmentStatusWhenConfirmed,
+  UpdateEnrollmentStatusWhenConfirmedVariables,
+} from '../../../../queries/__generated__/UpdateEnrollmentStatusWhenConfirmed';
 import { Tooltip } from '@mui/material';
 import { pickEffectiveAttendance } from '../../../../helpers/attendance';
 import { IoIosCheckmarkCircle } from 'react-icons/io';
@@ -45,6 +54,7 @@ import {
   getCourseProjectSubmissionDefaultSource,
   submissionDeadlineToIsoString,
 } from '../../CourseContent/Projects/projectEffectiveSubmissionDeadline';
+import { QuestionConfirmationDialog } from '../../../common/dialogs/QuestionConfirmationDialog';
 
 interface CourseParticipationsTabIProps {
   course: ManagedCourse_Course_by_pk;
@@ -131,15 +141,23 @@ function getAttendanceStatus(
 
 export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ course, qResult }) => {
   const t = useTranslations('manageCourse');
+  const tCommon = useTranslations('common');
   const tCoursePage = useTranslations('coursePage');
   const isAdmin = useIsAdmin();
+  const isInstructor = useIsInstructor();
 
   const [pageSize, setPageSize] = useState(20);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [bulkActionError, setBulkActionError] = useState<string | null>(null);
+  const [abortDialogOpen, setAbortDialogOpen] = useState(false);
+  const [pendingAbortRows, setPendingAbortRows] = useState<ExtendedEnrollment[]>([]);
 
   const [createCertificates] = useRoleMutation(CREATE_CERTIFICATES);
+  const [updateEnrollmentStatusWhenConfirmed] = useRoleMutation<
+    UpdateEnrollmentStatusWhenConfirmed,
+    UpdateEnrollmentStatusWhenConfirmedVariables
+  >(UPDATE_ENROLLMENT_STATUS_WHEN_CONFIRMED);
   const [removeAchievementCertificates] = useRoleMutation(REMOVE_ACHIEVEMENT_CERTIFICATES);
   const [removeAttendanceCertificates] = useRoleMutation(REMOVE_ATTENDANCE_CERTIFICATES);
 
@@ -221,8 +239,55 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
     [setPageIndex]
   );
 
+  const handleConfirmAbortParticipations = useCallback(async () => {
+    const enrollmentIds = pendingAbortRows.map((r) => r.id);
+    setAbortDialogOpen(false);
+    setBulkActionError(null);
+    try {
+      const result = await updateEnrollmentStatusWhenConfirmed({
+        variables: {
+          enrollmentIds,
+          status: CourseEnrollmentStatus_enum.ABORTED,
+          courseId: course.id,
+        },
+      });
+      const affectedRows = result.data?.update_CourseEnrollment?.affected_rows ?? 0;
+      const messageKey =
+        affectedRows === 1
+          ? 'participations_bulk_actions.mark_aborted_success_singular'
+          : 'participations_bulk_actions.mark_aborted_success_plural';
+      setSnackbarMessage(t(messageKey, { count: affectedRows }));
+      setSnackbarOpen(true);
+      setPendingAbortRows([]);
+      refetch();
+      qResult.refetch();
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      setBulkActionError(t('participations_bulk_actions.mark_aborted_error', { error: errorMessage }));
+      setPendingAbortRows([]);
+      refetch();
+      qResult.refetch();
+    }
+  }, [
+    pendingAbortRows,
+    updateEnrollmentStatusWhenConfirmed,
+    course.id,
+    t,
+    refetch,
+    qResult,
+  ]);
+
   const handleBulkAction = useCallback(
     async (action: string, selectedRows: ExtendedEnrollment[]) => {
+      if (action === 'mark_participation_aborted') {
+        if (selectedRows.length === 0) {
+          return;
+        }
+        setPendingAbortRows(selectedRows);
+        setAbortDialogOpen(true);
+        return;
+      }
+
       try {
         if (action === 'generate_attendance_certificates') {
           const qualifyingRows = selectedRows.filter(
@@ -386,8 +451,20 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
       value: 'email_selected',
       label: t('bulk_actions.email_selected'),
     });
+    if (isInstructor) {
+      actions.push({
+        value: 'mark_participation_aborted',
+        label: t('participations_bulk_actions.mark_aborted_selected'),
+      });
+    }
     return actions;
-  }, [isAdmin, course.attendanceCertificatePossible, course.achievementCertificatePossible, t]);
+  }, [
+    isAdmin,
+    isInstructor,
+    course.attendanceCertificatePossible,
+    course.achievementCertificatePossible,
+    t,
+  ]);
 
   const AttendanceDotsCell = useMemo(() => {
     return function AttendanceDotsCellInner({
@@ -626,6 +703,30 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
     [t]
   );
 
+  const abortConfirmationDialog = (
+    <QuestionConfirmationDialog
+      open={abortDialogOpen}
+      question={
+        pendingAbortRows.length === 1
+          ? t('participations_bulk_actions.mark_aborted_confirm_singular')
+          : t('participations_bulk_actions.mark_aborted_confirm_plural', {
+              count: pendingAbortRows.length,
+            })
+      }
+      confirmationText={tCommon('confirm')}
+      cancelText={tCommon('cancel')}
+      onClose={() => {
+        setAbortDialogOpen(false);
+        setPendingAbortRows([]);
+      }}
+      onCancel={() => {
+        setAbortDialogOpen(false);
+        setPendingAbortRows([]);
+      }}
+      onConfirm={handleConfirmAbortParticipations}
+    />
+  );
+
   if (!course.achievementCertificatePossible) {
     return (
       <div className="flex flex-col gap-8">
@@ -670,6 +771,7 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
             onClose={() => setBulkActionError(null)}
           />
         )}
+        {abortConfirmationDialog}
       </div>
     );
   }
@@ -736,6 +838,7 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
           onClose={() => setBulkActionError(null)}
         />
       )}
+      {abortConfirmationDialog}
     </div>
   );
 };
