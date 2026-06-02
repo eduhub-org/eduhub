@@ -3,8 +3,6 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { ProgramType_enum } from "./../../__generated__/globalTypes";
-
 // ====================================================
 // GraphQL query operation: OnboardingTextByType
 // ====================================================
@@ -12,7 +10,7 @@ import { ProgramType_enum } from "./../../__generated__/globalTypes";
 export interface OnboardingTextByType_OnboardingText {
   __typename: "OnboardingText";
   id: number;
-  programType: ProgramType_enum;
+  programType: string;
   lang: string;
   text: string;
 }
@@ -25,5 +23,5 @@ export interface OnboardingTextByType {
 }
 
 export interface OnboardingTextByTypeVariables {
-  programType: ProgramType_enum;
+  programType: string;
 }

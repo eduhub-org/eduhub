@@ -14,7 +14,7 @@ export interface UpdateProjectRatingAndComment_update_Project_by_pk {
   id: number;
   rating: ProjectRating_enum | null;
   /**
-   * Optional instructor comment accompanying the project rating (UNRATED/PASSED/FAILED).
+   * Optional comment from course staff or project mentor accompanying rating (UNRATED/PASSED/FAILED).
    */
   ratingComment: string | null;
 }

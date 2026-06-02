@@ -1,7 +1,6 @@
 table:
   name: ProgramType
   schema: public
-is_enum: true
 object_relationships:
   - name: DefaultAttendanceCertificateTemplate
     using:
