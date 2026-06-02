@@ -49,28 +49,15 @@ export const COURSE_PARTICIPATIONS = gql`
         endDateTime
         title
       }
-      AchievementOptionCourses {
-        AchievementOption {
+      ProjectCourses {
+        Project {
           id
           title
-          recordType
-          AchievementRecords(where: { courseId: { _eq: $courseId } }) {
-            id
-            courseId
-            documentationUrl
-            rating
-            created_at
-            uploadUserId
-            AchievementRecordAuthors {
-              userId
-              User {
-                firstName
-                lastName
-              }
-            }
-            AchievementOption {
-              title
-            }
+          status
+          rating
+          ratingComment
+          ProjectAuthors(where: { participationStatus: { _eq: ACCEPTED } }) {
+            userId
           }
         }
       }

@@ -27,7 +27,6 @@ import { getRegistrationTypeConfig } from './Registration/types';
 import { getBackgroundImage } from '../../../helpers/imageHandling';
 import { Attendances } from './Attendances';
 import { CertificateDownload } from '../../common/CertificateDownload';
-import AchievementRecord from './AchievementRecord';
 import Projects from './Projects';
 import {
   resolveEffectiveCourseProjectSubmissionDeadline,
@@ -226,21 +225,10 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                     <ContentRow className="my-24 text-label-primary bg-fill-primary light px-8 py-8">
                       <div className="flex flex-col w-full min-w-0">
                       {!isDegreeCourse && (
-                        <div className="flex flex-col md:flex-row gap-12 md:gap-24 w-full">
+                        <>
                           <Attendances course={course} />
-                          <div className="flex flex-col w-full md:w-1/2">
-                            {!courseEnrollment?.achievementCertificateURL && (
-                              <AchievementRecord
-                                courseId={course.id}
-                                achievementRecordUploadDeadline={resolveEffectiveCourseProjectSubmissionDeadline(
-                                  course
-                                )}
-                                courseTitle={course.title}
-                              />
-                            )}
-                            {courseEnrollment && <CertificateDownload courseEnrollment={courseEnrollment} />}
-                          </div>
-                        </div>
+                          {courseEnrollment && <CertificateDownload courseEnrollment={courseEnrollment} />}
+                        </>
                       )}
                       {isDegreeCourse && (
                         <>

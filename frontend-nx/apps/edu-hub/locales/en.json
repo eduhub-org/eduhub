@@ -43,8 +43,6 @@
       "user": "User",
       "experts": "Experts",
       "courses": "Courses",
-      "achievements": "Achievement Records",
-      "achievement_templates": "Achievement Record Templates",
       "programs": "Programs",
       "organizations": "Organizations",
       "location_addresses": "Location Addresses",
@@ -89,7 +87,6 @@
     "project-description": "Projekt description",
     "project-new-button": "New project",
     "courses": "Courses",
-    "achievement-record-type": "Achievement record type",
     "authors": "Authors",
     "mentors": "Mentors",
     "documentation": "Documentation",
@@ -118,7 +115,6 @@
       "other": "Other",
       "teacher": "Name of the school"
     },
-    "achievement-documentation-template": "Achievement Record Documentation Template",
     "preview": "Preview",
     "edit_markdown": "Edit",
     "markdown_info": "Markdown formatting is supported.",
@@ -265,7 +261,6 @@
         "coursegroup": "Course groups",
         "organization": "Organizations",
         "program": "Programs",
-        "achievement": "Achievement records",
         "locationaddress": "Location addresses",
         "session_addresses": "session addresses",
         "courses": "courses",
@@ -363,31 +358,6 @@
         "MISSED": "Missed",
         "NO_INFO": "Under Review",
         "PENDING": "Review Pending"
-      }
-    },
-    "achievement": {
-      "achievement_option": "Achievement Option",
-      "achievement_record_upload_dead_line_text": "You have until {date} to upload an achievement record.",
-      "choose_achievement_option": "Choose the title of your achievement record.",
-      "selected_achievement_option": "Selected Achievement Option",
-      "no_current_achievement_option": "No achievement record has been submitted yet.",
-      "no_achievement_option": "Currently no achievement option is available for this course.",
-      "upload_achievement_record": "Upload new record",
-      "download_template": "Download template",
-      "last_record_upload": "The last record with you as author was uploaded on {dateTime} by {fullName} for \"{achievementRecordTitle}\": {achievementRecordFileName}",
-      "no_existing_record_upload": "No record with you as author has been uploaded yet.",
-      "use_documentation_template": "Use the following template for documentation:",
-      "achievement_option_not_selected": "Please select an achievement option.",
-      "authors": "Authors",
-      "documentation": "Documentation",
-      "upload": "Upload",
-      "authors_missing": "Please add authors!",
-      "documentation_missing": "Please upload documentation!",
-      "file_name": "File name",
-      "operation_failed": "Operation failed",
-      "max_file_size": "Maximum file size: {size} MB",
-      "upload_achievement_record_modal": {
-        "file_too_large": "The file is too large. The maximum size is {size} MB."
       }
     },
     "projects": {
@@ -795,7 +765,6 @@
     "confirm-online-course-description": "Hereby you confirm that you have participated in the required online courses. Your record of performance is your reflection sheet. You can find it <component>HERE</component>. If you have any questions, please contact your course leader.",
     "confirm-online-course": "Confirm",
     "online-course-confirmed": "You have confirmed on {dateTime} that you have participated in the required online courses.",
-    "achievement-certificate-generation": "Generate Achievement Certificates",
     "attendance-certificate-generation": "Generate Attendance Certificates",
     "certificates-generated": "{number} certificates have been generated.",
     "1-certificate-generated": "One certificate has been generated.",
@@ -901,66 +870,6 @@
       "ogDescription": "Start your learning journey with EduHub by opencampus.sh! Join an active community and explore expert-led courses in tech, business, and creativity.",
       "twitterDescription": "Learn coding, business & creativity with EduHub by opencampus.sh. Join our community and start today!",
       "keywords": "online courses, tech courses, business courses, creative courses, programming, coding, entrepreneurship, startups, sustainability, lifelong learning, opencampus, EduHub, learning platform"
-    }
-  },
-  "achievementsPage": {
-    "title": "Achievements",
-    "page-header": "Performance records",
-    "achievement-record": "Performance records",
-    "achievement-record-admin": "Administration performance records",
-    "results": "Results",
-    "upload": "↑ Upload",
-    "description": "Description",
-    "mentors": "Mentors",
-    "result": "Result",
-    "documentation": "Documentation",
-    "deadline": "Deadline",
-    "results-so-far": "Current results",
-    "rank": "rank",
-    "last-upload": "Last upload",
-    "file-name": "Filename",
-    "last-submitted-documentation": "Last submitted documentation",
-    "cover-image-required": "Cover image required",
-    "csv-file-missing": "CSV file missing!",
-    "documentation-missing": "Please upload documentation!",
-    "authors-missing": "Please add some authors!",
-    "upload-proof": "Upload proof",
-    "form-info-cover-image-size": "Optimal size: {width} x {height} Pixel.",
-    "form-info-documentations": "<component>Use this template to upload the documentation!</component>",
-    "uploadDocumentationTemplate": "Upload documentation template"
-  },
-  "manageAchievementOptions": {
-    "manage_templates_button": "Manage templates",
-    "table_header": {
-      "title": "Title",
-      "record_type": "Type",
-      "mentors": "Mentors",
-      "courses": "Courses"
-    },
-    "record_type": {
-      "DOCUMENTATION": "Documentation",
-      "ONLINE_COURSE": "Online course"
-    },
-    "title": {
-      "placeholder": "Enter project title"
-    },
-    "description": {
-      "placeholder": "Enter description"
-    },
-    "documentation_template": {
-      "placeholder": "Select template",
-      "help_text": "Select a documentation template for this achievement option"
-    },
-    "add_mentor": "Add mentor",
-    "remove_mentor": "Remove mentor",
-    "add_course": "Add course",
-    "delete_button": {
-      "untitled_achievement_option": "Untitled achievement option",
-      "delete_achievement_option_confirmation": "Are you sure you want to delete the achievement option \"{title}\"?"
-    },
-    "notifications": {
-      "achievement_option_added": "Achievement option was added",
-      "add_failed": "Failed to add achievement option"
     }
   },
   "statistics": {
@@ -1097,8 +1006,7 @@
     "application-start": "Application start",
     "application-end": "Application deadline",
     "course-start": "Course start",
-    "course-end": "Course end",
-    "achievement-upload-deadline": "Deadline achievement upload"
+    "course-end": "Course end"
   },
   "manageCourses": {
     "table_header": {
@@ -1378,12 +1286,6 @@
     "ectsTotal": "Total ECTS",
     "attendedEvents": "Attended Events",
     "certificate": "Certificate",
-    "projectTitle": "Project title",
-    "lastRecordUpload": "Upload Date",
-    "uploaded_by": "Uploaded by",
-    "co_authors": "Co-authors",
-    "download_documentation": "Download Documentation",
-    "download_documentation_error": "Failed to load project documentation. Please try again.",
     "generate_achievement_certificates": "Generate Achievement Certificates",
     "delete_achievement_certificates": "Delete Achievement Certificates",
     "no_certificates_deleted": "No certificates were deleted",
@@ -1503,7 +1405,6 @@
     "achievement_passed": "Documentation submitted – passed",
     "achievement_failed": "Documentation submitted – failed",
     "certificates_section": "Certificates",
-    "documentation_section": "Project Documentation",
     "generate_attendance_certificates": "Generate Attendance Certificates",
     "delete_attendance_certificates": "Delete Attendance Certificates",
     "no_attendance_certificates_deleted": "No attendance certificates were deleted",
