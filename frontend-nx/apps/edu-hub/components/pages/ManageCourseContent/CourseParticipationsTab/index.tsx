@@ -242,6 +242,7 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
   const handleConfirmAbortParticipations = useCallback(async () => {
     const enrollmentIds = pendingAbortRows.map((r) => r.id);
     setAbortDialogOpen(false);
+    setBulkActionError(null);
     try {
       const result = await updateEnrollmentStatusWhenConfirmed({
         variables: {
