@@ -43,8 +43,6 @@
       "user": "Benutzer",
       "experts": "Experten",
       "courses": "Kurse",
-      "achievements": "Leistungsnachweise",
-      "achievement_templates": "Leistungsnachweisvorlagen",
       "programs": "Programme",
       "organizations": "Organisationen",
       "location_addresses": "Veranstaltungsadressen",
@@ -89,7 +87,6 @@
     "project-description": "Projektbeschreibung",
     "project-new-button": "Neues Projekt",
     "courses": "Kurse",
-    "achievement-record-type": "Typ der Projektdokumentation",
     "authors": "Autoren",
     "mentors": "Mentoren",
     "documentation": "Dokumentation",
@@ -118,7 +115,6 @@
       "other": "Andere Beschäftigung",
       "teacher": "Name der Schule"
     },
-    "achievement-documentation-template": "Leistungsnachweisvorlage",
     "preview": "Vorschau",
     "edit_markdown": "Bearbeiten",
     "markdown_info": "Markdown-Formatierung wird unterstützt.",
@@ -265,7 +261,6 @@
         "coursegroup": "Kursgruppen",
         "organization": "Organisationen",
         "program": "Programme",
-        "achievement": "Leistungsnachweise",
         "locationaddress": "Veranstaltungsadressen",
         "session_addresses": "Adressen von Veranstaltungsterminen",
         "courses": "Kursen",
@@ -363,31 +358,6 @@
         "MISSED": "Nicht teilgenommen",
         "NO_INFO": "In Prüfung",
         "PENDING": "Überprüfung ausstehend"
-      }
-    },
-    "achievement": {
-      "achievement_option": "Leistungsnachweis",
-      "achievement_record_upload_dead_line_text": "Du hast bis zum {date} Zeit einen Leistungsnachweis hochzuladen.",
-      "choose_achievement_option": "Wähle den Titel deines Leistungsnachweises aus.",
-      "selected_achievement_option": "Gewählter Leistungsnachweis",
-      "no_current_achievement_option": "Bisher wurde kein Leistungsnachweis eingreicht.",
-      "no_achievement_option": "Aktuell steht kein Leistungsnachweis für diesen Kurs zur Verfügung.",
-      "upload_achievement_record": "Neuen Nachweis hochladen",
-      "download_template": "Vorlage herunterladen",
-      "last_record_upload": "Der letzte Nachweis mit Dir als Autor wurde am {dateTime} von {fullName} zu \"{achievementRecordTitle}\" hochgeladen: {achievementRecordFileName}",
-      "no_existing_record_upload": "Es wurde bisher kein Nachweis mit Dir als Autor hochgeladen.",
-      "use_documentation_template": "Nutze folgende Vorlage zur Dokumentation:",
-      "achievement_option_not_selected": "Bitte wähle einen Leistungsnachweis aus.",
-      "authors": "Autoren",
-      "documentation": "Dokumentation",
-      "upload": "Hochladen",
-      "authors_missing": "Bitte Autoren hinzufügen!",
-      "documentation_missing": "Bitte Dokumentation hochladen!",
-      "file_name": "Dateiname",
-      "operation_failed": "Vorgang fehlgeschlagen",
-      "max_file_size": "Maximale Dateigröße: {size} MB",
-      "upload_achievement_record_modal": {
-        "file_too_large": "Die Datei ist zu groß. Die maximale Größe beträgt {size} MB."
       }
     },
     "projects": {
@@ -785,7 +755,6 @@
     "confirm-online-course-description": "Hiermit bestätigst du an den erforderlichen Online-Kursen teilgenommen zu haben. Dein Leistungsnachweis ist dein Reflexionsbogen. Bitte klicke <component>HIER</component>, um ihn auszufüllen. Bei Fragen wende dich bitte an deine Kursleitung.",
     "confirm-online-course": "Bestätigen",
     "online-course-confirmed": "Du hast am {dateTime} bestätigt an den erforderlichen Online-Kursen teilgenommen zu haben.",
-    "achievement-certificate-generation": "Leistungszertifikate ausstellen",
     "attendance-certificate-generation": "Teilnahmenachweise ausstellen",
     "no-certificate-generated": "Es wurden keine Zertifikate generiert.",
     "certificates-generated": "Es wurden {number} Zertifikate generiert.",
@@ -885,66 +854,6 @@
       "ogDescription": "Starte deine Lernreise mit EduHub von opencampus.sh! Werde Teil einer aktiven Community und entdecke Expertenkurse in Tech, Business und Kreativität.",
       "twitterDescription": "Lerne Programmierung, Business & Kreativität mit EduHub von opencampus.sh. Werde Teil unserer Community und starte noch heute!",
       "keywords": "Online-Kurse, Tech-Kurse, Business-Kurse, Kreativkurse, Programmierung, Coding, Unternehmertum, Startup, Nachhaltigkeit, Weiterbildung, opencampus, EduHub, Lernplattform"
-    }
-  },
-  "achievementsPage": {
-    "title": "Achievements",
-    "page-header": "Leistungsnachweise",
-    "achievement-record": "Leistungsnachweise",
-    "achievement-record-admin": "Administration Leistungsnachweise",
-    "results": "Ergebnis",
-    "upload": "↑ Hochladen",
-    "description": "Beschreibung",
-    "mentors": "Mentor(en)",
-    "result": "Ergebnis",
-    "documentation": "Dokumentation",
-    "deadline": "Abgabeschluss",
-    "results-so-far": "Bisherige Ergebnisse",
-    "rank": "Rang",
-    "last-upload": "Letzter Upload",
-    "file-name": "Dateiname",
-    "last-submitted-documentation": "Zuletzt eingereichte Unterlagen",
-    "cover-image-required": "Deckblatt erforderlich",
-    "csv-file-missing": "CSV datei fehlt!",
-    "documentation-missing": "Bitte Dokumentation hochladen!",
-    "authors-missing": "Bitte Autoren hinzufügen!",
-    "upload-proof": "Leistungsnachweis hochladen",
-    "form-info-cover-image-size": "Optimal ist eine Größe von {width} x {height} Pixel.",
-    "form-info-documentations": "<component>Benutze diese Vorlage zum Hochladen der Dokumentation!</component>",
-    "uploadDocumentationTemplate": "Dokumentationsvorlage hochladen"
-  },
-  "manageAchievementOptions": {
-    "manage_templates_button": "Vorlagen verwalten",
-    "table_header": {
-      "title": "Titel",
-      "record_type": "Typ",
-      "mentors": "Mentor:innen",
-      "courses": "Kurse"
-    },
-    "record_type": {
-      "DOCUMENTATION": "Dokumentation",
-      "ONLINE_COURSE": "Online-Kurs"
-    },
-    "title": {
-      "placeholder": "Projekttitel eingeben"
-    },
-    "description": {
-      "placeholder": "Beschreibung eingeben"
-    },
-    "documentation_template": {
-      "placeholder": "Vorlage auswählen",
-      "help_text": "Wähle eine Dokumentationsvorlage für diesen Leistungsnachweis"
-    },
-    "add_mentor": "Mentor:in hinzufügen",
-    "remove_mentor": "Mentor:in entfernen",
-    "add_course": "Kurs hinzufügen",
-    "delete_button": {
-      "untitled_achievement_option": "Unbenannter Leistungsnachweis",
-      "delete_achievement_option_confirmation": "Bist du sicher, dass du den Leistungsnachweis „{title}“ löschen möchtest?"
-    },
-    "notifications": {
-      "achievement_option_added": "Leistungsnachweis wurde hinzugefügt",
-      "add_failed": "Leistungsnachweis konnte nicht hinzugefügt werden"
     }
   },
   "statistics": {
@@ -1081,8 +990,7 @@
     "application-start": "Bewerbungsanfang",
     "application-end": "Bewerbungsende",
     "course-start": "Kursstart",
-    "course-end": "Kursende",
-    "achievement-upload-deadline": "Abgabeschluss Leistungsnachweise"
+    "course-end": "Kursende"
   },
   "manageCourses": {
     "table_header": {
@@ -1360,12 +1268,6 @@
     "ectsTotal": "ECTS Gesamt",
     "attendedEvents": "Besuchte Events",
     "certificate": "Zertifikat",
-    "projectTitle": "Projekttitel",
-    "lastRecordUpload": "Upload Datum",
-    "uploaded_by": "Hochgeladen von",
-    "co_authors": "Co-Autoren",
-    "download_documentation": "Dokumentation herunterladen",
-    "download_documentation_error": "Projektdokumentation konnte nicht geladen werden. Bitte versuche es erneut.",
     "generate_achievement_certificates": "Leistungsnachweise generieren",
     "delete_achievement_certificates": "Leistungsnachweise löschen",
     "no_certificates_deleted": "Es wurden keine Zertifikate gelöscht",
@@ -1485,12 +1387,23 @@
     "achievement_passed": "Dokumentation eingereicht – bestanden",
     "achievement_failed": "Dokumentation eingereicht – nicht bestanden",
     "certificates_section": "Zertifikate",
-    "documentation_section": "Projektdokumentation",
     "generate_attendance_certificates": "Teilnahmebescheinigungen generieren",
     "delete_attendance_certificates": "Teilnahmebescheinigungen löschen",
     "no_attendance_certificates_deleted": "Es wurden keine Teilnahmebescheinigungen gelöscht",
     "attendance_certificate_deleted_singular": "{count} Teilnahmebescheinigung wurde gelöscht",
     "attendance_certificates_deleted_plural": "{count} Teilnahmebescheinigungen wurden gelöscht",
+    "participations_bulk_actions": {
+      "mark_aborted_selected": "Teilnahme als abgebrochen markieren",
+      "mark_aborted_dialog_title": "Teilnahme als abgebrochen markieren",
+      "mark_aborted_confirm_singular": "Möchtest du die ausgewählte Person als abgebrochen markieren? Sie verschwindet aus der Teilnehmenden-Liste, bleibt aber unter Bewerbungen sichtbar. Du kannst den Status dort später wieder ändern.",
+      "mark_aborted_confirm_plural": "Möchtest du {count} ausgewählte Personen als abgebrochen markieren? Sie verschwinden aus der Teilnehmenden-Liste, bleiben aber unter Bewerbungen sichtbar. Du kannst den Status dort später wieder ändern.",
+      "mark_aborted_success_singular": "{count} Teilnahme wurde als abgebrochen markiert.",
+      "mark_aborted_success_plural": "{count} Teilnahmen wurden als abgebrochen markiert.",
+      "mark_aborted_error": "Teilnahmen konnten nicht als abgebrochen markiert werden: {error}",
+      "disabled_reasons": {
+        "instructors_only": "Diese Sammelaktion können nur Instructor:innen ausführen."
+      }
+    },
     "certificates_group": "Zertifikate",
     "application_status_tooltip": "Klicke auf die Kreise, um die Bewertung zu ändern",
     "application_deadline_tooltip": "Wenn du das Datum für die Bestätigungsfrist ändern möchtest, kannst du die Einladung erneut senden.",

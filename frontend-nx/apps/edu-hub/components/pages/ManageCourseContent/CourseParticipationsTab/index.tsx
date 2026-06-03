@@ -1,42 +1,43 @@
 import { ApolloError, QueryResult } from '@apollo/client';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { FC, useCallback, useMemo, useState } from 'react';
-import { useIsAdmin } from '../../../../hooks/authentication';
+import { useIsAdmin, useIsInstructor } from '../../../../hooks/authentication';
 import { useRoleMutation } from '../../../../hooks/authedMutation';
 import Dot, { DotColor } from '../../../common/Dot';
 import { CertificateDownload } from '../../../common/CertificateDownload';
 import { Card } from '../../../common/Card';
-import { useLazyRoleQuery, useRoleQuery } from '../../../../hooks/authedQuery';
-import { UPDATE_AN_ACHIEVEMENT_RECORD } from '../../../../queries/achievementRecord';
+import { useRoleQuery } from '../../../../hooks/authedQuery';
 import {
   INSERT_SINGLE_ATTENDANCE,
   REMOVE_ACHIEVEMENT_CERTIFICATES,
   REMOVE_ATTENDANCE_CERTIFICATES,
 } from '../../../../queries/courseEnrollment';
-import { CREATE_CERTIFICATES, GET_SIGNED_URL } from '../../../../queries/actions';
+import { CREATE_CERTIFICATES } from '../../../../queries/actions';
 import { COURSE_PARTICIPATIONS } from '../../../../queries/courseParticipation';
 import {
-  CourseParticipations_Course_by_pk_AchievementOptionCourses,
-  CourseParticipations_Course_by_pk_AchievementOptionCourses_AchievementOption_AchievementRecords,
   CourseParticipations_Course_by_pk_CourseEnrollments,
   CourseParticipations_Course_by_pk_CourseEnrollments_User_Attendances,
+  CourseParticipations_Course_by_pk_ProjectCourses,
+  CourseParticipations_Course_by_pk_ProjectCourses_Project,
   CourseParticipations_Course_by_pk_Sessions,
   CourseParticipationsVariables,
 } from '../../../../queries/__generated__/CourseParticipations';
 import {
-  UpdateAchievementRecordByPk,
-  UpdateAchievementRecordByPkVariables,
-} from '../../../../queries/__generated__/UpdateAchievementRecordByPk';
-import {
   InsertSingleAttendance,
   InsertSingleAttendanceVariables,
 } from '../../../../queries/__generated__/InsertSingleAttendance';
-import { GetSignedUrl, GetSignedUrlVariables } from '../../../../queries/__generated__/GetSignedUrl';
 import { ManagedCourse_Course_by_pk } from '../../../../queries/__generated__/ManagedCourse';
-import { AchievementRecordRating_enum, AttendanceStatus_enum } from '../../../../__generated__/globalTypes';
-import { Button } from '../../../common/Button';
-import { CircularProgress, Tooltip } from '@mui/material';
-import { formattedDateWithTime, makeFullName } from '../../../../helpers/util';
+import {
+  AttendanceStatus_enum,
+  CourseEnrollmentStatus_enum,
+  ProjectRating_enum,
+} from '../../../../__generated__/globalTypes';
+import { UPDATE_ENROLLMENT_STATUS_WHEN_CONFIRMED } from '../../../../queries/insertEnrollment';
+import {
+  UpdateEnrollmentStatusWhenConfirmed,
+  UpdateEnrollmentStatusWhenConfirmedVariables,
+} from '../../../../queries/__generated__/UpdateEnrollmentStatusWhenConfirmed';
+import { Tooltip } from '@mui/material';
 import { pickEffectiveAttendance } from '../../../../helpers/attendance';
 import { IoIosCheckmarkCircle } from 'react-icons/io';
 import { GoDotFill } from 'react-icons/go';
@@ -53,6 +54,7 @@ import {
   getCourseProjectSubmissionDefaultSource,
   submissionDeadlineToIsoString,
 } from '../../CourseContent/Projects/projectEffectiveSubmissionDeadline';
+import { QuestionConfirmationDialog } from '../../../common/dialogs/QuestionConfirmationDialog';
 
 interface CourseParticipationsTabIProps {
   course: ManagedCourse_Course_by_pk;
@@ -60,41 +62,24 @@ interface CourseParticipationsTabIProps {
 }
 
 type ExtendedEnrollment = CourseParticipations_Course_by_pk_CourseEnrollments & {
-  mostRecentRecord?: CourseParticipations_Course_by_pk_AchievementOptionCourses_AchievementOption_AchievementRecords;
+  userProject?: CourseParticipations_Course_by_pk_ProjectCourses_Project;
 };
 
 const EMPTY_ENROLLMENTS: CourseParticipations_Course_by_pk_CourseEnrollments[] = [];
 const EMPTY_SESSIONS: CourseParticipations_Course_by_pk_Sessions[] = [];
-const EMPTY_ACHIEVEMENT_OPTION_COURSES: CourseParticipations_Course_by_pk_AchievementOptionCourses[] = [];
 
 interface IDotData {
   color: DotColor;
   session: CourseParticipations_Course_by_pk_Sessions;
 }
 
-function computeMostRecentRecord(
+function findUserProject(
   enrollment: CourseParticipations_Course_by_pk_CourseEnrollments,
-  courseId: number,
-  achievementOptionCourses: CourseParticipations_Course_by_pk_AchievementOptionCourses_AchievementOption_AchievementRecords[]
-): CourseParticipations_Course_by_pk_AchievementOptionCourses_AchievementOption_AchievementRecords | undefined {
-  const allRecords = achievementOptionCourses.filter(
-    (record) =>
-      record.AchievementRecordAuthors.some((author) => author.userId === enrollment.User.id) &&
-      record.courseId === courseId
+  projects: CourseParticipations_Course_by_pk_ProjectCourses_Project[]
+): CourseParticipations_Course_by_pk_ProjectCourses_Project | undefined {
+  return projects.find((p) =>
+    p.ProjectAuthors.some((author) => author.userId === enrollment.User.id)
   );
-  if (allRecords.length === 0) return undefined;
-  const sorted = [...allRecords].sort(
-    (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-  );
-  return sorted[0];
-}
-
-function flattenAchievementRecords(
-  achievementOptionCourses: {
-    AchievementOption: { AchievementRecords: CourseParticipations_Course_by_pk_AchievementOptionCourses_AchievementOption_AchievementRecords[] };
-  }[]
-): CourseParticipations_Course_by_pk_AchievementOptionCourses_AchievementOption_AchievementRecords[] {
-  return achievementOptionCourses.flatMap((opt) => opt.AchievementOption.AchievementRecords);
 }
 
 type AttendanceOverallStatus = 'passed' | 'failed' | 'uncertain';
@@ -156,16 +141,23 @@ function getAttendanceStatus(
 
 export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ course, qResult }) => {
   const t = useTranslations('manageCourse');
+  const tCommon = useTranslations('common');
   const tCoursePage = useTranslations('coursePage');
-  const locale = useLocale();
   const isAdmin = useIsAdmin();
+  const isInstructor = useIsInstructor();
 
   const [pageSize, setPageSize] = useState(20);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [bulkActionError, setBulkActionError] = useState<string | null>(null);
+  const [abortDialogOpen, setAbortDialogOpen] = useState(false);
+  const [pendingAbortRows, setPendingAbortRows] = useState<ExtendedEnrollment[]>([]);
 
   const [createCertificates] = useRoleMutation(CREATE_CERTIFICATES);
+  const [updateEnrollmentStatusWhenConfirmed] = useRoleMutation<
+    UpdateEnrollmentStatusWhenConfirmed,
+    UpdateEnrollmentStatusWhenConfirmedVariables
+  >(UPDATE_ENROLLMENT_STATUS_WHEN_CONFIRMED);
   const [removeAchievementCertificates] = useRoleMutation(REMOVE_ACHIEVEMENT_CERTIFICATES);
   const [removeAttendanceCertificates] = useRoleMutation(REMOVE_ATTENDANCE_CERTIFICATES);
 
@@ -209,7 +201,7 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
   const courseData = data?.Course_by_pk;
   const courseEnrollments = courseData?.CourseEnrollments;
   const courseSessions = courseData?.Sessions;
-  const courseAchievementOptionCourses = courseData?.AchievementOptionCourses;
+  const courseProjectCourses = courseData?.ProjectCourses;
 
   const enrollments = useMemo(
     () => courseEnrollments ?? EMPTY_ENROLLMENTS,
@@ -219,13 +211,12 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
     () => courseSessions ?? EMPTY_SESSIONS,
     [courseSessions]
   );
-  const achievementOptionCourses = useMemo(
-    () => courseAchievementOptionCourses ?? EMPTY_ACHIEVEMENT_OPTION_COURSES,
-    [courseAchievementOptionCourses]
-  );
-  const allRecords = useMemo(
-    () => flattenAchievementRecords(achievementOptionCourses),
-    [achievementOptionCourses]
+  const projects = useMemo<CourseParticipations_Course_by_pk_ProjectCourses_Project[]>(
+    () =>
+      ((courseProjectCourses ?? []) as CourseParticipations_Course_by_pk_ProjectCourses[])
+        .map((pc) => pc.Project)
+        .filter(Boolean),
+    [courseProjectCourses]
   );
   const maxMissedSessions = courseData?.maxMissedSessions ?? course.maxMissedSessions;
 
@@ -233,9 +224,9 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
     () =>
       enrollments.map((enrollment: CourseParticipations_Course_by_pk_CourseEnrollments) => ({
         ...enrollment,
-        mostRecentRecord: computeMostRecentRecord(enrollment, course.id, allRecords),
+        userProject: findUserProject(enrollment, projects),
       })),
-    [enrollments, course.id, allRecords]
+    [enrollments, projects]
   );
 
   const totalCount = courseData?.CourseEnrollments_aggregate?.aggregate?.count ?? 0;
@@ -248,8 +239,55 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
     [setPageIndex]
   );
 
+  const handleConfirmAbortParticipations = useCallback(async () => {
+    const enrollmentIds = pendingAbortRows.map((r) => r.id);
+    setAbortDialogOpen(false);
+    setBulkActionError(null);
+    try {
+      const result = await updateEnrollmentStatusWhenConfirmed({
+        variables: {
+          enrollmentIds,
+          status: CourseEnrollmentStatus_enum.ABORTED,
+          courseId: course.id,
+        },
+      });
+      const affectedRows = result.data?.update_CourseEnrollment?.affected_rows ?? 0;
+      const messageKey =
+        affectedRows === 1
+          ? 'participations_bulk_actions.mark_aborted_success_singular'
+          : 'participations_bulk_actions.mark_aborted_success_plural';
+      setSnackbarMessage(t(messageKey, { count: affectedRows }));
+      setSnackbarOpen(true);
+      setPendingAbortRows([]);
+      refetch();
+      qResult.refetch();
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      setBulkActionError(t('participations_bulk_actions.mark_aborted_error', { error: errorMessage }));
+      setPendingAbortRows([]);
+      refetch();
+      qResult.refetch();
+    }
+  }, [
+    pendingAbortRows,
+    updateEnrollmentStatusWhenConfirmed,
+    course.id,
+    t,
+    refetch,
+    qResult,
+  ]);
+
   const handleBulkAction = useCallback(
     async (action: string, selectedRows: ExtendedEnrollment[]) => {
+      if (action === 'mark_participation_aborted') {
+        if (selectedRows.length === 0) {
+          return;
+        }
+        setPendingAbortRows(selectedRows);
+        setAbortDialogOpen(true);
+        return;
+      }
+
       try {
         if (action === 'generate_attendance_certificates') {
           const qualifyingRows = selectedRows.filter(
@@ -286,7 +324,7 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
           const qualifyingRows = selectedRows.filter(
             (r) =>
               getAttendanceStatus(r, sessions, maxMissedSessions) === 'passed' &&
-              r.mostRecentRecord?.rating === AchievementRecordRating_enum.PASSED
+              r.userProject?.rating === ProjectRating_enum.PASSED
           );
           const skippedCount = selectedRows.length - qualifyingRows.length;
           const userIds = qualifyingRows.map((r) => r.userId);
@@ -413,8 +451,20 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
       value: 'email_selected',
       label: t('bulk_actions.email_selected'),
     });
+    if (isInstructor) {
+      actions.push({
+        value: 'mark_participation_aborted',
+        label: t('participations_bulk_actions.mark_aborted_selected'),
+      });
+    }
     return actions;
-  }, [isAdmin, course.attendanceCertificatePossible, course.achievementCertificatePossible, t]);
+  }, [
+    isAdmin,
+    isInstructor,
+    course.attendanceCertificatePossible,
+    course.achievementCertificatePossible,
+    t,
+  ]);
 
   const AttendanceDotsCell = useMemo(() => {
     return function AttendanceDotsCellInner({
@@ -547,11 +597,8 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
         size: 120,
         meta: { className: 'justify-center' },
         cell: ({ row }) => {
-          const rec = row.original.mostRecentRecord;
-          if (
-            !rec?.documentationUrl ||
-            rec.documentationUrl === 'pending_upload'
-          ) {
+          const project = row.original.userProject;
+          if (!project) {
             return (
               <Tooltip title={t('achievement_not_submitted')}>
                 <div className="flex items-center justify-center">
@@ -567,15 +614,15 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
             );
           }
           const tooltipKey =
-            rec.rating === AchievementRecordRating_enum.PASSED
+            project.rating === ProjectRating_enum.PASSED
               ? 'achievement_passed'
-              : rec.rating === AchievementRecordRating_enum.FAILED
+              : project.rating === ProjectRating_enum.FAILED
                 ? 'achievement_failed'
                 : 'achievement_unrated';
           const dotColor: DotColor =
-            rec.rating === AchievementRecordRating_enum.PASSED
+            project.rating === ProjectRating_enum.PASSED
               ? 'lightgreen'
-              : rec.rating === AchievementRecordRating_enum.FAILED
+              : project.rating === ProjectRating_enum.FAILED
                 ? 'red'
                 : 'grey';
           return (
@@ -651,17 +698,33 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
 
   const ExpandableParticipationRow = useCallback(
     ({ row }: { row: ExtendedEnrollment }) => (
-      <ExpandableRowContent
-        enrollment={row}
-        onRefetch={() => {
-          refetch();
-          qResult.refetch();
-        }}
-        t={t}
-        locale={locale}
-      />
+      <ExpandableRowContent enrollment={row} t={t} />
     ),
-    [refetch, qResult, t, locale]
+    [t]
+  );
+
+  const abortConfirmationDialog = (
+    <QuestionConfirmationDialog
+      open={abortDialogOpen}
+      question={
+        pendingAbortRows.length === 1
+          ? t('participations_bulk_actions.mark_aborted_confirm_singular')
+          : t('participations_bulk_actions.mark_aborted_confirm_plural', {
+              count: pendingAbortRows.length,
+            })
+      }
+      confirmationText={tCommon('confirm')}
+      cancelText={tCommon('cancel')}
+      onClose={() => {
+        setAbortDialogOpen(false);
+        setPendingAbortRows([]);
+      }}
+      onCancel={() => {
+        setAbortDialogOpen(false);
+        setPendingAbortRows([]);
+      }}
+      onConfirm={handleConfirmAbortParticipations}
+    />
   );
 
   if (!course.achievementCertificatePossible) {
@@ -708,6 +771,7 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
             onClose={() => setBulkActionError(null)}
           />
         )}
+        {abortConfirmationDialog}
       </div>
     );
   }
@@ -774,6 +838,7 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
           onClose={() => setBulkActionError(null)}
         />
       )}
+      {abortConfirmationDialog}
     </div>
   );
 };
@@ -839,70 +904,11 @@ function ParticipationTable({
 
 function ExpandableRowContent({
   enrollment,
-  onRefetch,
   t,
-  locale,
 }: {
   enrollment: ExtendedEnrollment;
-  onRefetch: () => void;
   t: (key: string) => string;
-  locale: string;
 }) {
-  const [downloadError, setDownloadError] = useState<string | null>(null);
-  const [getDoc, docResult] = useLazyRoleQuery<GetSignedUrl, GetSignedUrlVariables>(GET_SIGNED_URL);
-  const [setAchievementRecord] = useRoleMutation<
-    UpdateAchievementRecordByPk,
-    UpdateAchievementRecordByPkVariables
-  >(UPDATE_AN_ACHIEVEMENT_RECORD);
-
-  const handleDownloadClick = useCallback(
-    async (e: React.MouseEvent) => {
-      e.preventDefault();
-      const docPath =
-        enrollment.mostRecentRecord?.documentationUrl &&
-        enrollment.mostRecentRecord.documentationUrl !== 'pending_upload'
-          ? enrollment.mostRecentRecord.documentationUrl
-          : null;
-      if (!docPath) return;
-
-      setDownloadError(null);
-      try {
-        const result = await getDoc({
-          variables: { path: docPath },
-          fetchPolicy: 'network-only',
-        });
-        const signedUrl = result.data?.getSignedUrl?.link;
-        if (signedUrl) {
-          window.open(signedUrl, '_blank', 'noopener,noreferrer');
-        } else {
-          setDownloadError(t('download_documentation_error') || 'Failed to get download URL');
-        }
-      } catch (err) {
-        const msg = err instanceof Error ? err.message : String(err);
-        setDownloadError(t('download_documentation_error') || msg);
-      }
-    },
-    [enrollment.mostRecentRecord?.documentationUrl, getDoc, t]
-  );
-
-  const onSetRating = useCallback(
-    async (rating: AchievementRecordRating_enum) => {
-      if (!enrollment.mostRecentRecord) return;
-      await setAchievementRecord({
-        variables: {
-          id: enrollment.mostRecentRecord.id,
-          setInput: { rating },
-        },
-      });
-      onRefetch();
-    },
-    [enrollment.mostRecentRecord, setAchievementRecord, onRefetch]
-  );
-
-  const hasDocumentation =
-    !!enrollment.mostRecentRecord?.documentationUrl &&
-    enrollment.mostRecentRecord.documentationUrl !== 'pending_upload';
-
   const hasCertificates =
     !!enrollment.attendanceCertificateURL || !!enrollment.achievementCertificateURL;
 
@@ -914,106 +920,6 @@ function ExpandableRowContent({
             {enrollment.User?.email ?? '-'}
           </div>
         </Card>
-
-        {hasDocumentation && enrollment.mostRecentRecord && (() => {
-          const record = enrollment.mostRecentRecord;
-          if (!record) return null;
-          return (
-          <Card title={t('documentation_section')}>
-            <div className="flex items-center gap-2 mb-4">
-              <Dot
-                onClick={() => onSetRating(AchievementRecordRating_enum.UNRATED)}
-                className="cursor-pointer"
-                color="grey"
-                size={
-                  record.rating === AchievementRecordRating_enum.UNRATED
-                    ? 'LARGE'
-                    : 'DEFAULT'
-                }
-              />
-              <Dot
-                onClick={() => onSetRating(AchievementRecordRating_enum.PASSED)}
-                className="cursor-pointer"
-                color="lightgreen"
-                size={
-                  record.rating === AchievementRecordRating_enum.PASSED
-                    ? 'LARGE'
-                    : 'DEFAULT'
-                }
-              />
-              <Dot
-                onClick={() => onSetRating(AchievementRecordRating_enum.FAILED)}
-                className="cursor-pointer"
-                color="red"
-                size={
-                  record.rating === AchievementRecordRating_enum.FAILED
-                    ? 'LARGE'
-                    : 'DEFAULT'
-                }
-              />
-            </div>
-            <div className="space-y-1 mb-4 text-sm">
-              <div>
-                <span className="text-label-secondary">{t('projectTitle')}: </span>
-                {record.AchievementOption?.title ?? '-'}
-              </div>
-              <div>
-                <span className="text-label-secondary">{t('uploaded_by')}: </span>
-                {(() => {
-                  const uploader = (record.AchievementRecordAuthors ?? []).find(
-                    (a) => a.userId === record.uploadUserId && a.User
-                  );
-                  return uploader
-                    ? makeFullName(uploader.User?.firstName ?? '', uploader.User?.lastName ?? '')
-                    : '-';
-                })()}
-              </div>
-              {(() => {
-                const uploadUserId = record.uploadUserId;
-                const coAuthors = (record.AchievementRecordAuthors ?? [])
-                  .filter((a) => a.userId !== uploadUserId && a.User)
-                  .map((a) =>
-                    makeFullName(a.User?.firstName ?? '', a.User?.lastName ?? '')
-                  );
-                if (coAuthors.length === 0) return null;
-                return (
-                  <div>
-                    <span className="text-label-secondary">{t('co_authors')}: </span>
-                    {coAuthors.join(', ')}
-                  </div>
-                );
-              })()}
-              <div>
-                <span className="text-label-secondary">{t('lastRecordUpload')}: </span>
-                {formattedDateWithTime(
-                  new Date(record.created_at),
-                  locale
-                )}
-              </div>
-            </div>
-            <Button
-              as="button"
-              type="button"
-              filled
-              disabled={docResult.loading}
-              onClick={handleDownloadClick}
-            >
-              {docResult.loading ? (
-                <CircularProgress size={20} />
-              ) : (
-                t('download_documentation')
-              )}
-            </Button>
-            {downloadError && (
-              <ErrorMessageDialog
-                errorMessage={downloadError}
-                open={!!downloadError}
-                onClose={() => setDownloadError(null)}
-              />
-            )}
-          </Card>
-          );
-        })()}
 
         {hasCertificates && (
           <Card title={t('certificates_section')}>
