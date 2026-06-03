@@ -2,7 +2,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import { FC } from 'react';
 
 import { CourseWithEnrollment_Course_by_pk } from '../../../queries/__generated__/CourseWithEnrollment';
-import { BlockTitle } from '@opencampus/shared-components';
+import { SectionTitle } from '../../common/SectionTitle';
 import Dot from '../../common/Dot';
 
 import { AttendanceStatus_enum } from '../../../__generated__/globalTypes';
@@ -84,9 +84,7 @@ export const Attendances: FC<AttendancesProps> = ({ course }) => {
 
   return (
     <div className="flex flex-col w-full mb-4 md:mb-0">
-      <div className="mb-2">
-        <BlockTitle>{t('attendances.attendances')}</BlockTitle>
-      </div>
+      <SectionTitle>{t('attendances.attendances')}</SectionTitle>
       <span className="text-lg mb-4">
         {t('attendances.max_missed_sessions_plural', {
           count: course.maxMissedSessions,

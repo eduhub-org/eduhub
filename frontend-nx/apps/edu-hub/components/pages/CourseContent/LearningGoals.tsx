@@ -1,5 +1,6 @@
 import { FC } from 'react';
 import { useTranslations } from 'next-intl';
+import { SectionTitle } from '../../common/SectionTitle';
 
 interface LearningGoalsProps {
   learningGoals: string | null;
@@ -12,7 +13,7 @@ export const LearningGoals: FC<LearningGoalsProps> = ({ learningGoals }) => {
     <>
       {learningGoals !== null && learningGoals.trim() !== '' && (
         <>
-          <span className="text-3xl font-semibold mb-9">{t('learning.you_will_learn')}</span>
+          <SectionTitle className="mb-9">{t('learning.you_will_learn')}</SectionTitle>
           <ul className="list-disc pb-12">
             {learningGoals
               .split('\n')

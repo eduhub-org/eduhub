@@ -33,6 +33,7 @@ const ACTIVE_PROJECT_STATUSES = new Set<ProjectStatus_enum>([
 ]);
 import NotificationSnackbar from '../../../common/dialogs/NotificationSnackbar';
 import { ContentRow } from '../../../common/ContentRow';
+import { SectionTitle } from '../../../common/SectionTitle';
 import MyProjectPanel from './MyProjectPanel';
 import ProjectsTable from './ProjectsTable';
 import ProposeProjectDialog from './ProposeProjectDialog';
@@ -125,25 +126,26 @@ const Projects: FC<ProjectsProps> = ({
   return (
     <div className="w-full mt-24 mb-24 min-w-0">
       {showMyProjectPanel && userId ? (
-        <ContentRow className="mb-8 text-label-primary bg-fill-primary light px-8 py-8 w-full min-w-0">
-          <div className="flex flex-col w-full min-w-0">
-            <MyProjectPanel
-              project={myProject!}
-              userId={userId}
-              projectTypes={projectTypes}
-              courseDefaultSubmissionDeadline={effectiveSubmissionDeadline}
-              submissionDeadlineDefaultSource={submissionDeadlineDefaultSource}
-              refetchQueries={REFETCH_QUERIES}
-              onActionError={handleActionError}
-            />
-          </div>
-        </ContentRow>
+        <>
+          <SectionTitle>{t('projects.my_project.heading')}</SectionTitle>
+          <ContentRow className="mb-12 text-label-primary bg-fill-primary light px-8 py-8 w-full min-w-0">
+            <div className="flex flex-col w-full min-w-0">
+              <MyProjectPanel
+                project={myProject!}
+                userId={userId}
+                projectTypes={projectTypes}
+                courseDefaultSubmissionDeadline={effectiveSubmissionDeadline}
+                submissionDeadlineDefaultSource={submissionDeadlineDefaultSource}
+                refetchQueries={REFETCH_QUERIES}
+                onActionError={handleActionError}
+              />
+            </div>
+          </ContentRow>
+        </>
       ) : null}
 
-      <div className="w-full min-w-0 px-8">
-        <h2 className="text-2xl font-semibold text-label-primary mb-6">
-          {t('projects.section_heading')}
-        </h2>
+      <div className="w-full min-w-0">
+        <SectionTitle>{t('projects.section_heading')}</SectionTitle>
         <ProjectsTable
           projects={tableProjects}
           loading={projectsQuery.loading}
