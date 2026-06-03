@@ -52,6 +52,10 @@ import { makeFullName } from '../../../../../helpers/util';
 import {
   filterProjectDocumentationInstructionsWithPdf,
 } from '../../../CourseContent/Projects/projectDocumentationInstruction';
+import {
+  getDisplayAuthors,
+  isExcludedAuthor,
+} from '../../../CourseContent/Projects/projectAuthors';
 import { translateErrorMessage } from '../../../../../helpers/errorHandling';
 import StatusChip from '../../../CourseContent/Projects/StatusChip';
 import ProjectPreviewLayout from '../../../CourseContent/Projects/ProjectPreviewLayout';
@@ -290,10 +294,11 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
         id: 'authors',
         header: t('projects.table.authors'),
         cell: ({ row }) => {
-          const accepted = (row.original.ProjectAuthors ?? []).filter(
-            (a) => a.participationStatus === ProjectParticipationStatus_enum.ACCEPTED
-          );
-          if (accepted.length === 0) {
+          // Instructors/admins see EXCLUDED authors too, marked as excluded.
+          const authors = getDisplayAuthors(row.original.ProjectAuthors, {
+            includeExcluded: true,
+          });
+          if (authors.length === 0) {
             return (
               <span className="text-label-secondary">
                 {t('projects.table.no_authors')}
@@ -302,10 +307,17 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
           }
           return (
             <span>
-              {accepted
-                .map((a) =>
-                  makeFullName(a.User?.firstName ?? '', a.User?.lastName ?? '')
-                )
+              {authors
+                .map((a) => {
+                  const name = makeFullName(
+                    a.User?.firstName ?? '',
+                    a.User?.lastName ?? ''
+                  );
+                  if (!name) return '';
+                  return isExcludedAuthor(a)
+                    ? t('projects.table.author_excluded_inline', { name })
+                    : name;
+                })
                 .filter(Boolean)
                 .join(', ')}
             </span>
@@ -419,6 +431,7 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
       const accepted = (row.ProjectAuthors ?? []).filter(
         (a) => a.participationStatus === ProjectParticipationStatus_enum.ACCEPTED
       );
+      const excluded = (row.ProjectAuthors ?? []).filter(isExcludedAuthor);
       const requested = (row.ProjectAuthors ?? []).filter(
         (a) => a.participationStatus === ProjectParticipationStatus_enum.REQUESTED
       );
@@ -446,7 +459,7 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
               </Button>
             </div>
             <ul className="space-y-1">
-              {accepted.length === 0 ? (
+              {accepted.length === 0 && excluded.length === 0 ? (
                 <li className="text-sm text-label-secondary">
                   {t('projects.expanded.no_authors')}
                 </li>
@@ -478,6 +491,35 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
                   </li>
                 ))
               )}
+              {excluded.map((a) => (
+                <li
+                  key={a.id}
+                  className="flex items-center justify-between text-sm opacity-60"
+                >
+                  <span>
+                    {makeFullName(a.User?.firstName ?? '', a.User?.lastName ?? '')}{' '}
+                    <span className="italic text-label-secondary">
+                      ({t('projects.expanded.excluded')})
+                    </span>
+                  </span>
+                  <button
+                    type="button"
+                    aria-label={t('projects.expanded.remove_author_aria')}
+                    onClick={() =>
+                      setRemoveAuthorContext({
+                        id: a.id,
+                        name: makeFullName(
+                          a.User?.firstName ?? '',
+                          a.User?.lastName ?? ''
+                        ),
+                      })
+                    }
+                    className="p-1 rounded hover:bg-gray-200"
+                  >
+                    <MdClose />
+                  </button>
+                </li>
+              ))}
               {requested.map((a) => (
                 <li key={a.id} className="text-sm text-label-secondary italic">
                   {makeFullName(a.User?.firstName ?? '', a.User?.lastName ?? '')}{' '}
@@ -574,6 +616,7 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
               <ProjectPreviewLayout
                 project={row}
                 showResourceLinks={showResourceLinks}
+                includeExcludedAuthors
                 titleRow={
                   <div className="flex flex-wrap items-start gap-2 mb-1 w-full">
                     <div className="min-w-0 flex-1">
@@ -704,7 +747,7 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
             refetchQueries={REFETCH_QUERIES}
           />
           <div className="rounded-lg border border-border-primary p-3 bg-bg-secondary/20">
-            <ProjectPreviewLayout project={row} showResourceLinks={showResourceLinks} />
+            <ProjectPreviewLayout project={row} showResourceLinks={showResourceLinks} includeExcludedAuthors />
           </div>
           {documentationInstructionSelector}
           {(row.rating != null || row.ratingComment?.trim()) && (

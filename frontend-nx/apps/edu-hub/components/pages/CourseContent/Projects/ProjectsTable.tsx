@@ -4,7 +4,7 @@ import { ColumnDef } from '@tanstack/react-table';
 import Tooltip from '@mui/material/Tooltip';
 import { useLocale, useTranslations } from 'next-intl';
 import { useRoleMutation } from '../../../../hooks/authedMutation';
-import { useIsAdmin, useIsUser } from '../../../../hooks/authentication';
+import { useIsAdmin, useIsInstructor, useIsUser } from '../../../../hooks/authentication';
 import { useUserId } from '../../../../hooks/user';
 import { AuthRoles } from '../../../../types/enums';
 import TableGrid from '../../../common/TableGrid';
@@ -20,6 +20,7 @@ import {
 } from '../../../../__generated__/globalTypes';
 import { formatTruncatedList, makeFullName } from '../../../../helpers/util';
 import StatusChip from './StatusChip';
+import { getDisplayAuthors, isExcludedAuthor } from './projectAuthors';
 import {
   formatSubmissionDeadlineDate,
   getEffectiveProjectSubmissionDeadlineIso,
@@ -74,8 +75,13 @@ const ProjectsTable: FC<ProjectsTableProps> = ({
   const sessionUserId = useUserId();
   const isUser = useIsUser();
   const isAdmin = useIsAdmin();
+  const isInstructor = useIsInstructor();
 
   const useAdminJoin = isAdmin && !isUser;
+
+  // Excluded authors stay hidden from peers but remain visible to instructors
+  // and admins so they can audit who was dropped from the final submission.
+  const canViewExcludedAuthors = isAdmin || isInstructor;
 
   const getEnterProjectDisabledTooltip = useCallback(
     (project: ProjectRow): string => {
@@ -208,16 +214,20 @@ const ProjectsTable: FC<ProjectsTableProps> = ({
         header: t('projects.table.authors'),
         enableSorting: false,
         cell: ({ row }) => {
-          const authors = (row.original.ProjectAuthors ?? []).filter(
-            (a) => a.participationStatus === ProjectParticipationStatus_enum.ACCEPTED
-          );
+          const authors = getDisplayAuthors(row.original.ProjectAuthors, {
+            includeExcluded: canViewExcludedAuthors,
+          });
           if (authors.length === 0) {
             return <span className="text-label-secondary">{t('projects.table.no_authors')}</span>;
           }
           return (
             <span>
               {formatTruncatedList(authors, (a) =>
-                makeFullName(a.User?.firstName ?? '', a.User?.lastName ?? '')
+                isExcludedAuthor(a)
+                  ? t('projects.table.author_excluded_inline', {
+                      name: makeFullName(a.User?.firstName ?? '', a.User?.lastName ?? ''),
+                    })
+                  : makeFullName(a.User?.firstName ?? '', a.User?.lastName ?? '')
               )}
             </span>
           );
@@ -301,6 +311,7 @@ const ProjectsTable: FC<ProjectsTableProps> = ({
       },
     ],
     [
+      canViewExcludedAuthors,
       copying,
       courseDefaultSubmissionDeadline,
       getEnterProjectDisabledTooltip,
@@ -335,6 +346,7 @@ const ProjectsTable: FC<ProjectsTableProps> = ({
           <ProjectPreviewLayout
             project={row}
             showResourceLinks={showFullDetails}
+            includeExcludedAuthors={canViewExcludedAuthors}
             titleRow={
               <div className="flex flex-wrap items-center gap-2 mb-1">
                 <h4 className="text-xl font-semibold text-label-primary min-w-0 break-words">{row.title}</h4>
@@ -345,7 +357,7 @@ const ProjectsTable: FC<ProjectsTableProps> = ({
         </div>
       );
     },
-    [courseDefaultSubmissionDeadline, submissionDeadlineDefaultSource]
+    [canViewExcludedAuthors, courseDefaultSubmissionDeadline, submissionDeadlineDefaultSource]
   );
 
   const courseSubmissionDeadlinePassed = isProjectSubmissionDeadlinePassed(

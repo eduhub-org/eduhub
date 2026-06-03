@@ -77,9 +77,38 @@ const Projects: FC<ProjectsProps> = ({
 
   const projectTypesQuery = useRoleQuery<ProjectTypes>(PROJECT_TYPES);
 
-  const myProject = myProjectQuery.data?.Project?.[0] ?? null;
+  const myAcceptedProject = useMemo(
+    () =>
+      (myProjectQuery.data?.Project ?? []).find((p) =>
+        p.ProjectAuthors?.some(
+          (a) =>
+            a.userId === userId &&
+            a.participationStatus === ProjectParticipationStatus_enum.ACCEPTED
+        )
+      ) ?? null,
+    [myProjectQuery.data?.Project, userId]
+  );
+  const myExcludedProject = useMemo(
+    () =>
+      (myProjectQuery.data?.Project ?? []).find((p) =>
+        p.ProjectAuthors?.some(
+          (a) =>
+            a.userId === userId &&
+            a.participationStatus === ProjectParticipationStatus_enum.EXCLUDED
+        )
+      ) ?? null,
+    [myProjectQuery.data?.Project, userId]
+  );
+  // Prefer an active ACCEPTED project; otherwise surface the project the user
+  // was excluded from so they still get the "you were excluded" notice.
+  const myProject = myAcceptedProject ?? myExcludedProject;
+  const isExcludedFromMyProject = !myAcceptedProject && Boolean(myExcludedProject);
+
+  // Only an ACCEPTED author occupies the one-active-project slot (mirrors the
+  // DB trigger); an excluded author may freely propose or join another project.
   const hasMyActiveProject = Boolean(
-    myProject && ACTIVE_PROJECT_STATUSES.has(myProject.status as ProjectStatus_enum)
+    myAcceptedProject &&
+      ACTIVE_PROJECT_STATUSES.has(myAcceptedProject.status as ProjectStatus_enum)
   );
 
   const tableProjects = useMemo(() => {
@@ -111,17 +140,9 @@ const Projects: FC<ProjectsProps> = ({
     );
   }
 
-  const myProjectAcceptedAuthor =
-    myProject?.ProjectAuthors?.find(
-      (a) =>
-        a.userId === userId &&
-        a.participationStatus === ProjectParticipationStatus_enum.ACCEPTED
-    ) ?? null;
-
   const projectTypes = projectTypesQuery.data?.ProjectType ?? [];
 
-  const showMyProjectPanel =
-    Boolean(myProject && myProjectAcceptedAuthor && userId);
+  const showMyProjectPanel = Boolean(myProject && userId);
 
   return (
     <div className="w-full mt-24 mb-24 min-w-0">
@@ -133,6 +154,7 @@ const Projects: FC<ProjectsProps> = ({
               <MyProjectPanel
                 project={myProject!}
                 userId={userId}
+                isExcludedAuthor={isExcludedFromMyProject}
                 projectTypes={projectTypes}
                 courseDefaultSubmissionDeadline={effectiveSubmissionDeadline}
                 submissionDeadlineDefaultSource={submissionDeadlineDefaultSource}

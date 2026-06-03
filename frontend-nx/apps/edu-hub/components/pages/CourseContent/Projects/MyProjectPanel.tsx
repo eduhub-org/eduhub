@@ -17,6 +17,7 @@ import {
   UPDATE_PROJECT_EXTERNAL_URL,
   UPDATE_PROJECT_COVER_IMAGE_URL,
   UPDATE_PROJECT_ACCEPTING_PARTICIPANTS,
+  UPDATE_PROJECT_AUTHOR_PARTICIPATION_STATUS,
   SUBMIT_PROJECT,
   DELETE_PROJECT_AUTHOR,
 } from '../../../../queries/project';
@@ -40,7 +41,7 @@ import {
 } from './projectStatusDisplay';
 import ProjectNextTodos from './ProjectNextTodos';
 import RequestProjectReviewDialog from './RequestProjectReviewDialog';
-import SubmitConfirmationDialog from './SubmitConfirmationDialog';
+import SubmitConfirmationDialog, { SubmitAuthorOption } from './SubmitConfirmationDialog';
 import { isChecklistComplete } from './SubmissionChecklist';
 import {
   isProjectCoverImageIncomplete,
@@ -62,6 +63,8 @@ const PROJECT_PRESENTATION_ACCEPT = '.pdf,.ppt,.pptx,.odp';
 interface MyProjectPanelProps {
   project: ProjectRow;
   userId: string;
+  /** The viewer was EXCLUDED from this project's final submission (read-only view). */
+  isExcludedAuthor?: boolean;
   projectTypes: ProjectTypeRow[];
   /** Course/program fallback when `project.submissionDeadline` is null. */
   courseDefaultSubmissionDeadline: string | null | undefined;
@@ -73,6 +76,7 @@ interface MyProjectPanelProps {
 const MyProjectPanel: FC<MyProjectPanelProps> = ({
   project,
   userId,
+  isExcludedAuthor = false,
   projectTypes,
   courseDefaultSubmissionDeadline,
   submissionDeadlineDefaultSource,
@@ -84,6 +88,7 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
   const locale = useLocale();
 
   const [submitDialogOpen, setSubmitDialogOpen] = useState(false);
+  const [submitInProgress, setSubmitInProgress] = useState(false);
   const [requestReviewDialogOpen, setRequestReviewDialogOpen] = useState(false);
   const [requestsDialogOpen, setRequestsDialogOpen] = useState(false);
   const [leaveDialogOpen, setLeaveDialogOpen] = useState(false);
@@ -105,6 +110,10 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
   const [submitProject, { loading: submitting }] = useRoleMutation(SUBMIT_PROJECT, {
     refetchQueries,
   });
+  const [updateAuthorParticipationStatus] = useRoleMutation(
+    UPDATE_PROJECT_AUTHOR_PARTICIPATION_STATUS,
+    { refetchQueries }
+  );
   const [markProjectReviewRequested, { loading: requestingProjectReview }] = useRoleMutation(
     MARK_PROJECT_REVIEW_REQUESTED,
     {
@@ -125,6 +134,20 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
         (a) => a.participationStatus === ProjectParticipationStatus_enum.ACCEPTED
       ),
     [project.ProjectAuthors]
+  );
+  // Contributor checklist shown in the submit dialog: every confirmed author,
+  // with the submitter pre-checked and locked (you cannot exclude yourself).
+  const submitAuthorOptions = useMemo<SubmitAuthorOption[]>(
+    () =>
+      acceptedAuthors.map((a) => ({
+        id: a.id,
+        userId: a.userId,
+        name:
+          makeFullName(a.User?.firstName ?? '', a.User?.lastName ?? '') ||
+          tCommon('unknown_user'),
+        isSelf: a.userId === userId,
+      })),
+    [acceptedAuthors, userId, tCommon]
   );
   const requestedCount = useMemo(
     () =>
@@ -241,16 +264,33 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
   const wasSentBack =
     project.status === ProjectStatus_enum.ONGOING && Boolean(project.submittedAt);
 
-  const handleSubmitConfirm = useCallback(async () => {
-    try {
-      await submitProject({
-        variables: { itemId: project.id },
-      });
-      setSubmitDialogOpen(false);
-    } catch (err) {
-      onActionError(err instanceof Error ? err.message : t('projects.action_failed'));
-    }
-  }, [submitProject, project.id, onActionError, t]);
+  const handleSubmitConfirm = useCallback(
+    async (excludedAuthorIds: number[]) => {
+      setSubmitInProgress(true);
+      try {
+        // Mark unchecked co-authors EXCLUDED first (while still an ACCEPTED
+        // author of an ONGOING project, which the Hasura permission requires),
+        // then transition the project to SUBMITTED.
+        for (const authorId of excludedAuthorIds) {
+          await updateAuthorParticipationStatus({
+            variables: {
+              id: authorId,
+              value: ProjectParticipationStatus_enum.EXCLUDED,
+            },
+          });
+        }
+        await submitProject({
+          variables: { itemId: project.id },
+        });
+        setSubmitDialogOpen(false);
+      } catch (err) {
+        onActionError(err instanceof Error ? err.message : t('projects.action_failed'));
+      } finally {
+        setSubmitInProgress(false);
+      }
+    },
+    [updateAuthorParticipationStatus, submitProject, project.id, onActionError, t]
+  );
 
   const handleLeaveConfirm = useCallback(async () => {
     if (!myAuthorRow) {
@@ -334,6 +374,41 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
       />
     ) : null;
 
+  // An author the submitting author dropped from the final submission gets a
+  // read-only panel: the exclusion notice plus the (complete) project preview,
+  // with themselves marked as excluded among the authors.
+  if (isExcludedAuthor) {
+    return (
+      <div className="bg-fill-primary text-label-primary border border-status-confirmed rounded-lg p-6 space-y-4">
+        <div className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-900">
+          {t('projects.my_project.excluded_banner')}
+        </div>
+        <div className="rounded-lg border border-border-primary p-4 bg-bg-secondary/30">
+          <ProjectPreviewLayout
+            project={project}
+            includeExcludedAuthors
+            showResourceLinks={
+              shouldShowProjectResourceDownloadLinks(project.status) &&
+              Boolean(
+                project.documentationUrl?.trim() ||
+                  project.presentationUrl?.trim() ||
+                  project.externalUrl?.trim()
+              )
+            }
+            titleRow={
+              <div className="flex flex-wrap items-center gap-2 mb-1">
+                <h4 className="text-xl font-semibold text-label-primary min-w-0 break-words">
+                  {project.title}
+                </h4>
+                <StatusChip status={project.status} />
+              </div>
+            }
+          />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-fill-primary text-label-primary border border-status-confirmed rounded-lg p-6 space-y-4">
       <div className="flex flex-wrap items-center justify-end gap-3">
@@ -403,7 +478,7 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
             ) : (
               <Tooltip title={t('projects.my_project.action_tooltip_submit')}>
                 <span className="inline-flex">
-                  <Button filled onClick={() => setSubmitDialogOpen(true)} disabled={!canSubmit || submitting}>
+                  <Button filled onClick={() => setSubmitDialogOpen(true)} disabled={!canSubmit || submitting || submitInProgress}>
                     {t('projects.my_project.submit_button')}
                   </Button>
                 </span>
@@ -480,6 +555,7 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
         <div className="rounded-lg border border-border-primary p-4 bg-bg-secondary/30">
           <ProjectPreviewLayout
             project={project}
+            includeExcludedAuthors
             showResourceLinks={
               shouldShowProjectResourceDownloadLinks(project.status) &&
               Boolean(
@@ -740,7 +816,8 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
         open={submitDialogOpen}
         onClose={() => setSubmitDialogOpen(false)}
         onConfirm={handleSubmitConfirm}
-        loading={submitting}
+        loading={submitting || submitInProgress}
+        authors={submitAuthorOptions}
       />
 
       <RequestProjectReviewDialog
