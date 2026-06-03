@@ -267,6 +267,9 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
   const handleSubmitConfirm = useCallback(
     async (excludedAuthorIds: number[]) => {
       setSubmitInProgress(true);
+      // Track which co-authors we actually moved to EXCLUDED so we can roll
+      // them back if a later step fails (these mutations are not in one tx).
+      const applied: number[] = [];
       try {
         // Mark unchecked co-authors EXCLUDED first (while still an ACCEPTED
         // author of an ONGOING project, which the Hasura permission requires),
@@ -278,12 +281,26 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
               value: ProjectParticipationStatus_enum.EXCLUDED,
             },
           });
+          applied.push(authorId);
         }
         await submitProject({
           variables: { itemId: project.id },
         });
         setSubmitDialogOpen(false);
       } catch (err) {
+        // Submission (or one of the exclusions) failed partway. Restore the
+        // co-authors we already excluded back to ACCEPTED so we never leave a
+        // team member excluded on a project that was not actually submitted.
+        await Promise.all(
+          applied.map((authorId) =>
+            updateAuthorParticipationStatus({
+              variables: {
+                id: authorId,
+                value: ProjectParticipationStatus_enum.ACCEPTED,
+              },
+            }).catch(() => undefined)
+          )
+        );
         onActionError(err instanceof Error ? err.message : t('projects.action_failed'));
       } finally {
         setSubmitInProgress(false);
