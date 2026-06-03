@@ -336,8 +336,7 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
 
   return (
     <div className="bg-fill-primary text-label-primary border border-status-confirmed rounded-lg p-6 space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h3 className="text-lg font-semibold">{t('projects.my_project.heading')}</h3>
+      <div className="flex flex-wrap items-center justify-end gap-3">
         <div className="flex flex-wrap items-center gap-2">
           {project.status === ProjectStatus_enum.PROPOSED ? (
             <Tooltip

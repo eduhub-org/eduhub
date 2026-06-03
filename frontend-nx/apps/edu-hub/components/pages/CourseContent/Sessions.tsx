@@ -3,6 +3,7 @@ import { useTranslations } from 'next-intl';
 import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
 
 import { Course_Course_by_pk_Sessions as Session, Course_Course_by_pk_CourseLocations as CourseLocation } from '../../../queries/__generated__/Course';
+import { SectionTitle } from '../../common/SectionTitle';
 import UserCard from '../../common/UserCard';
 import { useDisplayDate, useFormatTimeString } from '../../../helpers/dateTimeHelpers';
 import { isLinkFormat } from '../../../helpers/util';
@@ -66,9 +67,9 @@ export const Sessions: FC<SessionsProps> = ({ sessions, courseLocations, isLogge
     <>
       {visibleSessions.length > 0 && (
         <>
-          <span className="text-3xl font-semibold mt-24">
+          <SectionTitle className="mt-24">
             {sessions.length === 1 ? t('sessions.date_singular') : t('sessions.date_plural')}
-          </span>
+          </SectionTitle>
           <ul className="max-w-2xl">
             {visibleSessions.map(({ startDateTime, endDateTime, title, SessionSpeakers, SessionAddresses }, index) => (
               <li key={index} className="flex mb-4">
