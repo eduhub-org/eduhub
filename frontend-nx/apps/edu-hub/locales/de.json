@@ -363,6 +363,7 @@
     },
     "projects": {
       "section_heading": "Andere Projekte in diesem Kurs",
+      "section_heading_all": "Projekte in diesem Kurs",
       "action_failed": "Aktion fehlgeschlagen",
       "status": {
         "TEMPLATE": "Projektvorlage",
