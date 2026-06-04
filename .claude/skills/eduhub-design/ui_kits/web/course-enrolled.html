@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EduHub — Kursseite (eingeloggt)</title>
+<link rel="icon" href="../../assets/favicon.png">
+<link rel="stylesheet" href="../../colors_and_type.css">
+<style>
+/* === Logged-in course page — consumes --eduhub-* tokens per theme-and-styling.mdc === */
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:var(--font-body);font-weight:var(--fw-medium);background:var(--eduhub-bg-primary);color:var(--eduhub-label-primary);-webkit-font-smoothing:antialiased}
+img,svg{display:block}
+a{color:inherit}
+
+/* shared container — every section uses THIS, so all share one left edge + width */
+.container{max-width:1280px;margin:0 auto;padding:0 64px;width:100%}
+@media(max-width:768px){.container{padding:0 20px}}
+
+/* ===== FIX (1): one section-title style, same size, same left edge for ALL sections ===== */
+.ce-section-title{font-size:30px;line-height:1.1;font-weight:var(--fw-semibold);color:var(--eduhub-label-primary);margin:0 0 18px}
+.ce-section-sub{font-size:15px;color:var(--eduhub-label-secondary);margin:-8px 0 18px}
+.ce-section{margin-bottom:72px}
+
+/* header */
+.ce-header{position:absolute;top:0;left:0;right:0;z-index:40;background:rgba(34,34,34,.5)}
+.ce-header .inner{display:flex;align-items:center;justify-content:space-between;padding:16px 0}
+.ce-logo{display:flex;align-items:center;gap:10px}
+.ce-logo .ring{width:34px;height:34px}
+.ce-logo .word{height:28px;filter:brightness(0) invert(1)}
+.ce-header .right{display:flex;align-items:center;gap:18px;color:#fff;font-size:15px}
+.ce-header .right .off{font-weight:var(--fw-thin);opacity:.8}
+.ce-avatar-sm{width:38px;height:38px;border-radius:50%;background:var(--eduhub-fill-disabled);border:2px solid rgba(255,255,255,.4)}
+
+/* hero */
+.ce-hero{height:300px;display:flex;align-items:flex-end;color:#fff;background-image:linear-gradient(51deg,rgba(0,0,0,.75) 17%,rgba(0,0,0,.15) 85%),url('../../assets/coworking-1280.jpg');background-size:cover;background-position:center}
+.ce-hero .container{padding-bottom:26px;font-size:clamp(30px,4vw,44px);font-weight:var(--fw-medium)}
+
+/* tagline */
+.ce-lead{padding:44px 0 8px}
+.ce-lead .day{font-size:13px;letter-spacing:.04em;color:var(--eduhub-label-secondary)}
+.ce-lead .tag{font-size:24px;margin-top:8px}
+
+/* white card (.light flips tokens → white bg / dark text) */
+.ce-card{background:var(--eduhub-fill-primary);color:var(--eduhub-label-primary);border-radius:16px;padding:32px}
+
+/* buttons */
+.btn{border-radius:9999px;padding:9px 18px;font-family:var(--font-body);font-weight:var(--fw-medium);font-size:14px;border:2px solid var(--eduhub-border-secondary);background:transparent;color:var(--eduhub-label-primary);cursor:pointer;transition:border-color .2s}
+.btn:hover{border-color:var(--eduhub-brand)}
+.btn--disabled{background:var(--eduhub-fill-disabled);color:var(--eduhub-label-disabled);border-color:var(--eduhub-fill-disabled);cursor:not-allowed}
+
+/* ---- Mein Projekt form ---- */
+.mp-actions{display:flex;gap:12px;justify-content:flex-end;flex-wrap:wrap;margin-bottom:24px}
+.mp-steps{list-style:none;margin:0 0 20px;padding:0;font-size:15px}
+.mp-steps li{display:flex;align-items:center;gap:10px;padding:5px 0}
+.mp-steps .dot{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--eduhub-border-primary);flex:none}
+.mp-steps .done{background:var(--eduhub-brand);border-color:var(--eduhub-brand);display:flex;align-items:center;justify-content:center}
+.mp-steps .done svg{width:12px;height:12px;stroke:#fff}
+.mp-deadline{font-size:14px;font-style:italic;color:var(--eduhub-label-secondary);margin-bottom:24px}
+.mp-deadline b{font-style:normal;font-weight:var(--fw-semibold);color:var(--eduhub-label-primary)}
+
+.fieldlabel{font-size:13px;color:var(--eduhub-label-secondary);margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.input{width:100%;padding:11px 14px;border:1.5px solid var(--eduhub-border-primary);border-radius:8px;font-family:var(--font-body);font-size:15px;background:var(--eduhub-fill-primary);color:var(--eduhub-label-primary)}
+.input::placeholder{color:var(--eduhub-label-disabled)}
+.help{width:16px;height:16px;color:var(--eduhub-label-disabled)}
+
+.mp-title-row{position:relative;margin-bottom:22px}
+.mp-title-row .suggest{position:absolute;right:8px;top:6px}
+.mp-grid{display:grid;grid-template-columns:1fr 1.3fr 0.9fr;gap:28px}
+@media(max-width:860px){.mp-grid{grid-template-columns:1fr}}
+.dropzone{border:1.5px dashed var(--eduhub-error);border-radius:8px;padding:24px 16px;text-align:center;color:var(--eduhub-label-secondary);font-size:13px}
+.dropzone .cloud{width:46px;height:46px;margin:0 auto 14px;color:var(--eduhub-label-disabled)}
+.dropzone .sz{font-size:11px;color:var(--eduhub-label-disabled);margin-top:6px}
+.textarea{min-height:210px;border:1.5px solid var(--eduhub-error);border-radius:8px;padding:14px;font-family:var(--font-body);font-size:14px;color:var(--eduhub-label-disabled);resize:vertical;width:100%}
+.authors{display:flex;flex-direction:column;gap:16px}
+.author{display:flex;gap:10px;align-items:flex-start}
+.author .pic{width:34px;height:34px;border-radius:50%;background:var(--eduhub-fill-disabled);flex:none}
+.author .nm{font-size:14px;font-weight:var(--fw-semibold)}
+.author .ln{font-size:13px;color:var(--eduhub-brand-dark);text-decoration:underline}
+.author .org{font-size:13px;color:var(--eduhub-label-secondary)}
+.mp-foot{display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--eduhub-fill-disabled);margin-top:26px;padding-top:20px}
+.checkrow{display:flex;align-items:center;gap:10px;font-size:15px}
+.checkbox{width:20px;height:20px;border-radius:4px;background:var(--eduhub-warning);display:flex;align-items:center;justify-content:center}
+.checkbox svg{width:13px;height:13px;stroke:#fff}
+
+/* ===== FIX (2): table spans full section width (same as the cards) ===== */
+.ce-table{width:100%}
+.ce-thead{display:grid;grid-template-columns:1fr 1fr auto;gap:16px;padding:0 24px 12px;font-size:14px;color:var(--eduhub-label-secondary)}
+.ce-thead .sortable{display:inline-flex;align-items:center;gap:6px}
+.ce-thead svg{width:14px;height:14px;opacity:.7}
+.ce-row{width:100%;display:grid;grid-template-columns:1fr 1fr auto;gap:16px;align-items:center;background:var(--edu-row-color);border-radius:10px;padding:16px 24px;color:var(--eduhub-fill-primary)}
+.ce-row .title{display:flex;align-items:center;gap:10px;font-weight:var(--fw-semibold);font-size:16px;color:#222}
+.ce-row .badge{font-size:12px;font-weight:var(--fw-medium);background:#cfcfcf;color:#333;border-radius:9999px;padding:3px 10px}
+.ce-row .auth{font-size:15px;color:#444}
+.ce-row .act{display:flex;align-items:center;gap:6px}
+.ce-row .chev{width:34px;height:34px;border-radius:8px;background:#cfcfcf;display:flex;align-items:center;justify-content:center}
+.ce-row .chev svg{width:16px;height:16px;color:#555}
+
+/* attendances */
+.att-chips{display:flex;gap:12px;margin:18px 0}
+.att-chip{background:var(--eduhub-bg-secondary);color:var(--eduhub-label-primary);border-radius:8px;padding:9px 16px;font-size:14px}
+.att-legend{display:flex;gap:24px;font-size:14px;color:var(--eduhub-label-secondary);flex-wrap:wrap}
+.att-legend span{display:flex;align-items:center;gap:7px}
+.att-legend .d{width:12px;height:12px;border-radius:50%}
+
+/* sessions + info */
+.ce-two{display:grid;grid-template-columns:1fr 360px;gap:48px}
+@media(max-width:860px){.ce-two{grid-template-columns:1fr}}
+.session{padding:14px 0 22px;border-bottom:1px solid var(--eduhub-bg-secondary)}
+.session .head{display:flex;gap:18px;align-items:baseline}
+.session .date{font-size:15px;font-weight:var(--fw-semibold)}
+.session .time{font-size:13px;color:var(--eduhub-label-secondary)}
+.session .name{font-size:15px;white-space:nowrap}
+.session .head .date{min-width:96px}
+.session .ref{font-size:13px;color:var(--eduhub-label-secondary)}
+.session .ln{font-size:13px;color:var(--eduhub-brand-light);text-decoration:underline}
+.session .who{display:flex;gap:12px;align-items:center;margin-top:14px;margin-left:78px}
+.session .who .pic{width:42px;height:42px;border-radius:50%;background:var(--eduhub-fill-disabled)}
+.infopanel{background:var(--eduhub-fill-primary);color:var(--eduhub-label-primary);border-radius:16px;padding:32px;text-align:center}
+.infopanel .row{display:flex;justify-content:space-around;margin-bottom:24px}
+.infopanel .k{font-size:13px;letter-spacing:.06em;color:var(--eduhub-label-secondary)}
+.infopanel .v{font-size:15px;margin-top:4px}
+.infopanel .lang{width:42px;height:42px;margin:8px auto 4px;color:var(--eduhub-label-primary)}
+.infopanel .inst{display:flex;gap:12px;align-items:center;justify-content:center;margin-top:24px}
+.infopanel .inst .pic{width:56px;height:56px;border-radius:50%;background:var(--eduhub-fill-disabled)}
+
+/* what you get */
+.ce-orange{background:var(--eduhub-warning);color:#3a2400;border-radius:16px;padding:40px 48px;display:grid;grid-template-columns:1fr 1fr;gap:24px}
+@media(max-width:768px){.ce-orange{grid-template-columns:1fr}}
+.ce-orange h3{font-size:26px;font-weight:var(--fw-semibold);margin:0 0 14px}
+.ce-orange ul{margin:0;padding-left:18px;font-size:15px}
+.ce-orange li{margin:6px 0}
+.ce-note{background:var(--eduhub-fill-primary);color:var(--eduhub-label-primary);border-radius:12px;padding:22px 28px;font-size:14px}
+.ce-note b{font-weight:var(--fw-semibold)}
+
+/* footer */
+.ce-footer{background:var(--eduhub-bg-deep);color:#fff;padding:48px 0 60px;margin-top:40px}
+.ce-footer .a{font-size:24px;font-weight:var(--fw-medium)}
+.ce-footer .b{font-size:20px;font-weight:var(--fw-thin)}
+.ce-footer .links{margin-top:24px;font-size:14px;font-weight:var(--fw-thin);display:flex;flex-direction:column;gap:6px}
+.ce-footer .social{display:flex;gap:24px;margin-top:30px}
+.ce-footer .social img{width:22px;height:22px;filter:brightness(0) invert(1)}
+
+/* annotation flag */
+.fix-flag{display:inline-block;background:var(--eduhub-brand);color:#fff;font-size:11px;font-weight:var(--fw-semibold);border-radius:9999px;padding:3px 10px;margin-left:10px;vertical-align:middle;letter-spacing:.02em}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="ce-header">
+  <div class="container inner">
+    <div class="ce-logo">
+      <img class="ring" src="../../assets/oc-logo.svg" alt="opencampus">
+      <img class="word" src="../../assets/eduhub-logo.svg" alt="EduHub">
+    </div>
+    <div class="right">
+      <span><b style="font-weight:700">EN</b> <span style="opacity:.5">|</span> <span class="off">DE</span></span>
+      <div class="ce-avatar-sm"></div>
+    </div>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="ce-hero">
+  <div class="container">Applied Machine Learning</div>
+</section>
+
+<!-- TAGLINE -->
+<div class="container ce-lead">
+  <div class="day">MONTAG 16:00 – 18:00</div>
+  <div class="tag">Current applied ML project course.</div>
+</div>
+
+<div style="height:36px"></div>
+
+<!-- ===== MEIN PROJEKT ===== -->
+<section class="container ce-section">
+  <h2 class="ce-section-title">Mein Projekt</h2>
+  <div class="ce-card light">
+    <div class="mp-actions">
+      <button class="btn btn--disabled">Beitrittsanfragen</button>
+      <button class="btn btn--disabled">Freigabe bei Mentor:in oder Kursleitung anfragen</button>
+    </div>
+
+    <div style="font-weight:600;margin-bottom:8px">Nächste Schritte</div>
+    <ul class="mp-steps">
+      <li><span class="dot"></span> Ergänze die Projektbeschreibung.</li>
+      <li><span class="dot done"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></span> Gib dem Projekt einen klaren, aussagekräftigen Titel.</li>
+      <li><span class="dot done"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></span> Beantworte alle Anfragen zur Mitarbeit.</li>
+      <li><span class="dot"></span> Nutze den Button oben, um Mentor:in oder Kursleitung um die Bestätigung des Projekts zu bitten.</li>
+    </ul>
+
+    <div class="mp-deadline">Abgabefrist: Für diesen Kurs oder dieses Projekt ist noch keine Abgabefrist hinterlegt.</div>
+
+    <div class="mp-title-row">
+      <div class="fieldlabel">Titel</div>
+      <input class="input" value="noch ein testprokekt">
+      <button class="btn suggest" style="padding:6px 14px">Vorgeschlagen</button>
+    </div>
+
+    <div class="mp-grid">
+      <div>
+        <div class="fieldlabel">Titelbild
+          <svg class="help" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12" y2="17"></line></svg>
+        </div>
+        <div class="dropzone">
+          <svg class="cloud" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 16l-4-4-4 4"></path><path d="M12 12v9"></path><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"></path><path d="M16 16l-4-4-4 4"></path></svg>
+          Klicke oder ziehe das<br>Titelbild hierher
+          <div class="sz">Images • Max. Größe: 5 MB</div>
+        </div>
+        <div style="margin-top:18px">
+          <div class="fieldlabel">Untertitel
+            <svg class="help" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12" y2="17"></line></svg>
+          </div>
+          <input class="input" placeholder="z. B. Thema, Perspektive">
+        </div>
+      </div>
+      <div>
+        <div class="fieldlabel">Beschreibung
+          <svg class="help" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12" y2="17"></line></svg>
+        </div>
+        <textarea class="textarea" placeholder="z. B. Projektziel, Vorgehen, Umfang und erwartete Ergebnisse für die Freigabe durch die Kursleitung"></textarea>
+      </div>
+      <div>
+        <div class="fieldlabel">Autor:innen</div>
+        <div class="authors">
+          <div class="author"><div class="pic"></div><div><div class="nm">Leila Ahmed</div><a class="ln">Homepage</a></div></div>
+          <div class="author"><div class="pic"></div><div><div class="nm">Theo Ahmed</div><a class="ln">Xing-Profil</a></div></div>
+          <div class="author"><div class="pic"></div><div><div class="nm">Admin Admin</div><div class="org">Independent Consulting Studio</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mp-foot">
+      <div class="checkrow"><span class="checkbox"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></span> Weitere Mitautor:innen zulassen</div>
+      <svg class="help" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12" y2="17"></line></svg>
+    </div>
+    <button class="btn" style="margin-top:20px">Projekt verlassen</button>
+  </div>
+</section>
+
+<!-- ===== PROJEKTE IN DIESEM KURS (table) ===== -->
+<section class="container ce-section">
+  <h2 class="ce-section-title">Projekte in diesem Kurs</h2>
+  <div class="ce-table">
+    <div class="ce-thead">
+      <span class="sortable">Titel
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 15l5 5 5-5"></path><path d="M7 9l5-5 5 5"></path></svg>
+      </span>
+      <span class="sortable">Autor:innen
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 15l5 5 5-5"></path><path d="M7 9l5-5 5 5"></path></svg>
+      </span>
+      <span></span>
+    </div>
+    <div class="ce-row">
+      <div class="title">Testprojekt <span class="badge">Projektvorlage</span></div>
+      <div class="auth">Offene Vorlage</div>
+      <div class="act">
+        <button class="btn btn--disabled" style="min-width:240px">Neues Projektteam bilden</button>
+        <span class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== ANWESENHEITEN ===== -->
+<section class="container ce-section">
+  <h2 class="ce-section-title">Anwesenheiten</h2>
+  <div class="ce-card light">
+    <div style="font-size:15px;color:var(--eduhub-label-secondary);margin-bottom:6px">Du darfst an maximal 2 Terminen fehlen</div>
+    <div class="att-chips">
+      <div class="att-chip">03.06.2026</div>
+      <div class="att-chip">10.06.2026</div>
+    </div>
+    <div class="att-legend">
+      <span><span class="d" style="background:var(--eduhub-success)"></span> Teilgenommen</span>
+      <span><span class="d" style="background:var(--eduhub-error)"></span> Nicht teilgenommen</span>
+      <span><span class="d" style="background:var(--eduhub-fill-disabled)"></span> Überprüfung ausstehend</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===== TERMINE ===== -->
+<section class="container ce-section">
+  <h2 class="ce-section-title">Termine</h2>
+  <div class="ce-two">
+    <div>
+      <div class="session">
+        <div class="head"><span class="date">03.06.2026</span><span class="name">Termin 1</span></div>
+        <div class="time">16:00 – 18:00</div>
+        <div class="who"><div class="pic"></div><div><div class="name">Samir Adebayo</div><div class="ref">Referent:in</div><a class="ln">Xing-Profil</a></div></div>
+      </div>
+      <div class="session">
+        <div class="head"><span class="date">10.06.2026</span><span class="name">Termin 2</span></div>
+        <div class="time">16:00 – 18:00</div>
+      </div>
+    </div>
+    <div class="infopanel light">
+      <div class="row">
+        <div><div class="k">MONTAG</div><div class="v">16:00 – 18:00</div></div>
+        <div><div class="k">ECTS</div><div class="v">5</div></div>
+      </div>
+      <svg class="lang" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h7"></path><path d="M9 3v2c0 4-2 7-5 9"></path><path d="M5 9c0 2 2 4 6 5"></path><path d="M14 19l3-7 3 7"></path><path d="M15.5 16h3"></path></svg>
+      <div class="k">ENGLISCH</div>
+      <div class="inst"><div class="pic"></div><div style="text-align:left"><div class="v" style="font-weight:600">Instructor</div><div class="k">Instructor</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== WHAT YOU GET ===== -->
+<section class="container ce-section">
+  <div class="ce-orange">
+    <div><h3>What you get</h3><ul><li>(1) Lot of Fun!! (2) Lot of Goodies!</li></ul></div>
+    <div><h3>What you must bring</h3><ul><li>discipline</li><li>time</li></ul></div>
+  </div>
+</section>
+
+<!-- ===== ONLINE NOTE ===== -->
+<section class="container ce-section">
+  <div class="ce-note">
+    <b>Online-Teilnahme:</b><br>
+    Wenn eine Online-Teilnahme möglich ist, wird die Teilnahme nur dann als anwesend gewertet, wenn die Kamera eingeschaltet ist.
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="ce-footer">
+  <div class="container">
+    <div><span class="a">EDU HUB</span><br><span class="b">by opencampus.sh</span></div>
+    <div class="links">
+      <a>Impressum</a><a>Datenschutz</a><a>FAQ</a><a>Newsletter</a>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:30px">
+      <span style="font-size:14px;font-weight:var(--fw-thin)">© 2010 — 2026</span>
+      <div class="social">
+        <img src="../../assets/social-mastodon.svg" alt="Mastodon">
+        <img src="../../assets/social-linkedin.svg" alt="LinkedIn">
+        <img src="../../assets/social-instagram.svg" alt="Instagram">
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

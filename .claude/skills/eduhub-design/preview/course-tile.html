@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html,body{margin:0}
+  body{font-family:var(--font-body);background:#222222;padding:24px;display:flex;gap:26px;align-items:center}
+  .tile{width:325px;height:431px;border-radius:16px;overflow:hidden;display:flex;flex-direction:column;font-weight:500}
+  .cover{position:relative;height:230px;background:url('../assets/coworking-1280.jpg') center/cover}
+  .cover::after{content:"";position:absolute;inset:0;background:linear-gradient(51.32deg, rgba(0,0,0,.7) 17%, rgba(0,0,0,0) 85%)}
+  .title{position:absolute;left:14px;bottom:12px;color:#fff;font-size:30px;line-height:1.05;z-index:2}
+  .badge{position:absolute;right:12px;top:12px;background:#FFA665;color:#222;font-size:11px;font-weight:600;border-radius:9999px;padding:4px 10px;z-index:2}
+  .body{flex:1;background:#fff;color:#222;padding:20px;display:flex;flex-direction:column;justify-content:space-between}
+  .meta{display:flex;justify-content:space-between;font-size:13px;letter-spacing:.03em}
+  .tagline{font-size:18px;line-height:1.35}
+  .loc{display:flex;gap:6px;font-size:12px;text-transform:uppercase;letter-spacing:.06em;align-items:center}
+  .loc img{width:12px;height:12px}
+  .note{color:#888;font-size:13px;max-width:230px;line-height:1.5}
+  .note b{color:#D8D8D8;font-weight:600}
+</style>
+</head>
+<body>
+  <div class="tile">
+    <div class="cover">
+      <span class="badge">Extended application</span>
+      <div class="title">Intro to Data Science</div>
+    </div>
+    <div class="body">
+      <div class="meta"><span>MON · 18:00–20:00</span><span>English</span></div>
+      <div class="tagline">Build real ML projects with mentors in a vibrant community of learning.</div>
+      <div class="loc"><img src="../assets/icon-pin.svg" alt=""> Kiel + Online</div>
+    </div>
+  </div>
+  <div class="note"><b>Course tile</b> — 325×431, rounded-2xl. Photo top with diagonal protection gradient + title overlaid bottom-left. Body flips to <b>.light</b> (white). Meta row, 3-line tagline, location pill.</div>
+</body>
+</html>
