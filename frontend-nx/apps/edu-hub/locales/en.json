@@ -363,6 +363,7 @@
     },
     "projects": {
       "section_heading": "Other projects in this course",
+      "section_heading_all": "Projects in this course",
       "action_failed": "Action failed",
       "status": {
         "TEMPLATE": "Project template",
