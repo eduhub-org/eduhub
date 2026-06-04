@@ -629,6 +629,7 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
               >
               <FileUploadField
                 variant="material"
+                layout="stacked"
                 mutationPreset="role"
                 currentFileUrl={project.coverImageUrl}
                 uploadMutation={SAVE_PROJECT_IMAGE}
@@ -640,7 +641,6 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
                 maxFileSize={5 * 1024 * 1024}
                 imageWidth={160}
                 imageHeight={96}
-                showFileName
                 refetchQueries={refetchQueries}
                 uploadText={t('projects.my_project.cover_image_upload_text')}
                 altText={t('projects.my_project.cover_image_alt')}

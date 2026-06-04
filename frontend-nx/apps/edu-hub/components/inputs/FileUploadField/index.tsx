@@ -1,4 +1,4 @@
-import { FC, useCallback, useMemo, useState, useId, useRef, useEffect } from 'react';
+import { FC, ReactNode, useCallback, useMemo, useState, useId, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { MdUpload, MdDownload, MdCloudUpload, MdDelete, MdInfoOutline } from 'react-icons/md';
 import { CircularProgress, IconButton, Tooltip, LinearProgress } from '@mui/material';
@@ -41,10 +41,12 @@ export const FileUploadField: FC<FileUploadFieldProps> = ({
   className = '',
   mutationPreset = 'admin',
   density = 'default',
+  layout = 'default',
   infoTooltip,
 }) => {
   const t = useTranslations('common');
-  const isCompact = density === 'compact';
+  const isStackedLayout = layout === 'stacked';
+  const isCompact = density === 'compact' || isStackedLayout;
   const [isUploading, setIsUploading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
@@ -477,6 +479,52 @@ export const FileUploadField: FC<FileUploadFieldProps> = ({
   const showRestrictionLine =
     !infoTooltip && (acceptedTypesText !== 'All file types' || maxSizeText);
 
+  const renderActionButtons = (vertical: boolean, inlineBesideMeta = false) => (
+    <div
+      className={
+        vertical
+          ? 'flex flex-col gap-0.5 shrink-0 justify-center'
+          : inlineBesideMeta
+            ? 'flex shrink-0 flex-wrap items-center justify-center gap-0.5 sm:justify-end'
+            : `flex flex-wrap gap-2 ${isCompact ? 'mt-1' : 'mt-2'}`
+      }
+    >
+      <Tooltip title={t('file_upload.replace')} placement={vertical ? 'left' : 'top'}>
+        <IconButton
+          size="small"
+          onClick={handleClick}
+          disabled={isUploading}
+          aria-label={t('file_upload.replace')}
+          className="text-gray-700 hover:bg-gray-100"
+        >
+          <MdUpload />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title={t('file_upload.download')} placement={vertical ? 'left' : 'top'}>
+        <IconButton
+          size="small"
+          onClick={handleDownloadClick}
+          disabled={isUploading}
+          aria-label={t('file_upload.download')}
+          className="border border-gray-300 text-gray-700 hover:bg-gray-100"
+        >
+          <MdDownload />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title={t('file_upload.remove')} placement={vertical ? 'left' : 'top'}>
+        <IconButton
+          size="small"
+          onClick={handleRemoveClick}
+          disabled={isUploading}
+          aria-label={t('file_upload.remove')}
+          className="text-red-600 hover:text-red-700"
+        >
+          <MdDelete />
+        </IconButton>
+      </Tooltip>
+    </div>
+  );
+
   // Render empty state
   const renderEmptyState = () => (
     <div
@@ -524,6 +572,34 @@ export const FileUploadField: FC<FileUploadFieldProps> = ({
     </div>
   );
 
+  const renderDefaultUploadedLayout = (preview: ReactNode, meta: ReactNode | null) => (
+    <div className="flex w-full justify-center">
+      <div
+        className={`flex w-full max-w-full flex-col items-center ${
+          isCompact ? 'gap-2' : 'gap-3'
+        } sm:flex-row sm:items-center sm:justify-center ${isCompact ? 'sm:gap-3' : 'sm:gap-4'}`}
+      >
+        <div className="shrink-0">{preview}</div>
+        {meta ? (
+          <div
+            className={`flex min-w-0 w-full max-w-full flex-col items-center ${
+              isCompact ? 'gap-2' : 'gap-3'
+            } sm:w-auto sm:max-w-md sm:flex-1 sm:flex-row sm:items-center sm:justify-between ${
+              isCompact ? 'sm:gap-3' : 'sm:gap-4'
+            }`}
+          >
+            <div className="flex min-w-0 flex-col items-center text-center sm:items-start sm:text-left sm:pr-2">
+              {meta}
+            </div>
+            {renderActionButtons(false, true)}
+          </div>
+        ) : (
+          renderActionButtons(false, true)
+        )}
+      </div>
+    </div>
+  );
+
   // Render uploaded state - image
   const renderImageState = () => {
     // If we don't have a display URL and the file is not actually an image, show file icon instead
@@ -531,81 +607,61 @@ export const FileUploadField: FC<FileUploadFieldProps> = ({
       return renderFileState();
     }
 
-    return (
-      <div className={`flex flex-col w-full ${isCompact ? 'space-y-2' : 'space-y-4'}`}>
-        <div className={`flex items-start ${isCompact ? 'space-x-2' : 'space-x-4'}`}>
-          <div className="relative flex-shrink-0">
+    if (isStackedLayout) {
+      return (
+        <div className="flex w-full min-w-0 items-stretch gap-2">
+          <div className="relative min-w-0 flex-1 overflow-hidden rounded-lg border border-gray-200 bg-gray-100">
             {displayUrl ? (
               <Image
                 src={displayUrl}
                 alt={altText}
                 width={imageWidth}
                 height={imageHeight}
-                className="object-contain rounded bg-gray-100 border border-gray-200"
-                style={{ width: `${imageWidth}px`, height: `${imageHeight}px` }}
+                className="w-full aspect-video max-h-48 object-cover"
               />
             ) : (
-              <div
-                className="bg-gray-100 rounded border border-gray-200 flex items-center justify-center text-gray-400 text-xs"
-                style={{ width: `${imageWidth}px`, height: `${imageHeight}px` }}
-              >
-                {filename || t('file_upload.upload_image_text')}
+              <div className="flex aspect-video max-h-48 w-full items-center justify-center text-xs text-gray-400">
+                {t('file_upload.upload_image_text')}
               </div>
             )}
           </div>
-          <div className="flex-1 flex flex-col justify-between min-w-0">
-            <div className={`flex flex-col ${isCompact ? 'space-y-0' : 'space-y-1'}`}>
-              {showFileName && filename && (
-                <Tooltip title={filename}>
-                  <span
-                    className={
-                      isCompact ? 'text-xs font-medium text-gray-900 truncate' : 'text-sm font-medium text-gray-900 truncate'
-                    }
-                  >
-                    {filename}
-                  </span>
-                </Tooltip>
-              )}
-            </div>
-            <div className={`flex flex-wrap gap-2 ${isCompact ? 'mt-1' : 'mt-2'}`}>
-              <Tooltip title={t('file_upload.replace')} placement="top">
-                <IconButton
-                  size="small"
-                  onClick={handleClick}
-                  disabled={isUploading}
-                  aria-label={t('file_upload.replace')}
-                  className="text-gray-700 hover:bg-gray-100"
-                >
-                  <MdUpload />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title={t('file_upload.download')} placement="top">
-                <IconButton
-                  size="small"
-                  onClick={handleDownloadClick}
-                  disabled={isUploading}
-                  aria-label={t('file_upload.download')}
-                  className="border border-gray-300 text-gray-700 hover:bg-gray-100"
-                >
-                  <MdDownload />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title={t('file_upload.remove')} placement="top">
-                <IconButton
-                  size="small"
-                  onClick={handleRemoveClick}
-                  disabled={isUploading}
-                  aria-label={t('file_upload.remove')}
-                  className="text-red-600 hover:text-red-700"
-                >
-                  <MdDelete />
-                </IconButton>
-              </Tooltip>
-            </div>
-          </div>
+          {renderActionButtons(true)}
         </div>
+      );
+    }
+
+    const preview = displayUrl ? (
+      <Image
+        src={displayUrl}
+        alt={altText}
+        width={imageWidth}
+        height={imageHeight}
+        className="rounded border border-gray-200 bg-gray-100 object-contain"
+        style={{ width: `${imageWidth}px`, height: `${imageHeight}px` }}
+      />
+    ) : (
+      <div
+        className="flex items-center justify-center rounded border border-gray-200 bg-gray-100 text-xs text-gray-400"
+        style={{ width: `${imageWidth}px`, height: `${imageHeight}px` }}
+      >
+        {filename || t('file_upload.upload_image_text')}
       </div>
     );
+
+    const meta =
+      showFileName && filename ? (
+        <Tooltip title={filename}>
+          <span
+            className={`block max-w-full truncate font-medium text-gray-900 ${
+              isCompact ? 'text-xs' : 'text-sm'
+            }`}
+          >
+            {filename}
+          </span>
+        </Tooltip>
+      ) : null;
+
+    return renderDefaultUploadedLayout(preview, meta ?? null);
   };
 
   // Render uploaded state - non-image file
@@ -615,69 +671,48 @@ export const FileUploadField: FC<FileUploadFieldProps> = ({
 
     const iconClass = isCompact ? 'w-8 h-8' : 'w-16 h-16';
 
-    return (
-      <div className={`flex flex-col w-full ${isCompact ? 'space-y-2' : 'space-y-4'}`}>
-        <div className={`flex items-start ${isCompact ? 'space-x-2' : 'space-x-4'}`}>
+    if (isStackedLayout) {
+      return (
+        <div className="flex w-full min-w-0 items-stretch gap-2">
           <div
-            className="flex-shrink-0 flex items-center justify-center bg-gray-50 rounded border border-gray-200"
-            style={{ width: `${fileIconBoxPx}px`, height: `${fileIconBoxPx}px` }}
+            className="flex min-w-0 flex-1 items-center justify-center rounded-lg border border-gray-200 bg-gray-50 aspect-video max-h-48"
           >
             <Icon className={`${iconClass} ${color}`} />
           </div>
-          <div className="flex-1 flex flex-col justify-between min-w-0">
-            <div className={`flex flex-col ${isCompact ? 'space-y-0' : 'space-y-1'}`}>
-              {showFileName && filename && (
-                <Tooltip title={filename}>
-                  <span
-                    className={
-                      isCompact ? 'text-xs font-medium text-gray-900 truncate' : 'text-sm font-medium text-gray-900 truncate'
-                    }
-                  >
-                    {filename}
-                  </span>
-                </Tooltip>
-              )}
-              <span className={isCompact ? 'text-[10px] text-gray-500' : 'text-xs text-gray-500'}>{t(labelKey)}</span>
-            </div>
-            <div className={`flex flex-wrap gap-2 ${isCompact ? 'mt-1' : 'mt-2'}`}>
-              <Tooltip title={t('file_upload.replace')} placement="top">
-                <IconButton
-                  size="small"
-                  onClick={handleClick}
-                  disabled={isUploading}
-                  aria-label={t('file_upload.replace')}
-                  className="text-gray-700 hover:bg-gray-100"
-                >
-                  <MdUpload />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title={t('file_upload.download')} placement="top">
-                <IconButton
-                  size="small"
-                  onClick={handleDownloadClick}
-                  disabled={isUploading}
-                  aria-label={t('file_upload.download')}
-                  className="border border-gray-300 text-gray-700 hover:bg-gray-100"
-                >
-                  <MdDownload />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title={t('file_upload.remove')} placement="top">
-                <IconButton
-                  size="small"
-                  onClick={handleRemoveClick}
-                  disabled={isUploading}
-                  aria-label={t('file_upload.remove')}
-                  className="text-red-600 hover:text-red-700"
-                >
-                  <MdDelete />
-                </IconButton>
-              </Tooltip>
-            </div>
-          </div>
+          {renderActionButtons(true)}
         </div>
+      );
+    }
+
+    const preview = (
+      <div
+        className="flex shrink-0 items-center justify-center rounded border border-gray-200 bg-gray-50"
+        style={{ width: `${fileIconBoxPx}px`, height: `${fileIconBoxPx}px` }}
+      >
+        <Icon className={`${iconClass} ${color}`} />
       </div>
     );
+
+    const meta = (
+      <div className={`flex flex-col ${isCompact ? 'gap-0' : 'gap-0.5'}`}>
+        {showFileName && filename ? (
+          <Tooltip title={filename}>
+            <span
+              className={`block max-w-full truncate font-medium text-gray-900 ${
+                isCompact ? 'text-xs' : 'text-sm'
+              }`}
+            >
+              {filename}
+            </span>
+          </Tooltip>
+        ) : null}
+        <span className={isCompact ? 'text-[10px] text-gray-500' : 'text-xs text-gray-500'}>
+          {t(labelKey)}
+        </span>
+      </div>
+    );
+
+    return renderDefaultUploadedLayout(preview, meta);
   };
 
   const infoTooltipTitle = infoTooltip ? (

@@ -534,12 +534,11 @@
       },
       "submit_dialog": {
         "title": "Submit project for review",
-        "body_main": "Once submitted, the project enters review and the team is locked.",
+        "body_main": "Once submitted, the project enters review and is locked from further changes.",
         "body_co_authors": "All co-authors will lose edit access too.",
         "body_irreversible": "An instructor can send it back for revisions if needed.",
-        "contributors_intro": "Mark who actively contributed to this submission. Everyone is selected by default.",
+        "contributors_intro": "Select every author who actively and substantially worked on the project.",
         "contributor_self_suffix": "(you)",
-        "contributors_hint": "Anyone you deselect is excluded from the final submission and no longer appears in the public author list.",
         "confirm_button": "Submit"
       },
       "manage_requests": {

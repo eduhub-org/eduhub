@@ -20,15 +20,19 @@ export const EduhubCheckbox: React.FC<EduhubCheckboxProps> = ({
 }) => {
   return (
     <div className={`relative ${className}`}>
-      <label className="flex items-center cursor-pointer">
+      <label
+        className={`flex items-center ${disabled ? 'cursor-default' : 'cursor-pointer'}`}
+      >
         <input
           type="checkbox"
           checked={localChecked}
           onChange={handleValueChange}
           disabled={disabled}
-          className="mr-3 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="mr-3 h-4 w-4 shrink-0 rounded border-border-primary bg-fill-primary text-brand focus:ring-brand focus:ring-2 disabled:cursor-not-allowed disabled:opacity-50"
         />
-        {label && <span className="text-sm font-medium">{label}</span>}
+        {label ? (
+          <span className="text-sm font-medium text-label-primary">{label}</span>
+        ) : null}
       </label>
 
       {helpText && <p className="mt-1 text-xs text-gray-600">{helpText}</p>}

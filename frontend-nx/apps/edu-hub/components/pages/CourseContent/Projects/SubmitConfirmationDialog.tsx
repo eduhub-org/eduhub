@@ -1,8 +1,8 @@
 import { FC, useEffect, useState } from 'react';
-import { Checkbox, FormControlLabel } from '@mui/material';
 import { useTranslations } from 'next-intl';
 import { DialogShell } from '../../../common/dialogs/DialogShell';
 import { Button } from '../../../common/Button';
+import CheckboxSelector from '../../../inputs/CheckboxSelector';
 
 export interface SubmitAuthorOption {
   /** ProjectAuthor.id */
@@ -41,9 +41,6 @@ const SubmitConfirmationDialog: FC<SubmitConfirmationDialogProps> = ({
     }
   }, [open, authors]);
 
-  const handleToggle = (id: number) =>
-    setChecked((prev) => ({ ...prev, [id]: !prev[id] }));
-
   const handleConfirm = () => {
     const excludedAuthorIds = authors
       .filter((a) => !a.isSelf && checked[a.id] === false)
@@ -76,32 +73,23 @@ const SubmitConfirmationDialog: FC<SubmitConfirmationDialogProps> = ({
       <ul className="list-none p-0 m-0 mb-3 space-y-1">
         {authors.map((author) => (
           <li key={author.id}>
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={checked[author.id] ?? true}
-                  disabled={author.isSelf || loading}
-                  onChange={() => handleToggle(author.id)}
-                  color="primary"
-                />
-              }
+            <CheckboxSelector
+              variant="material"
+              suppressFeedback
+              checked={checked[author.id] ?? true}
+              disabled={author.isSelf || loading}
+              onValueUpdated={(newChecked) => {
+                setChecked((prev) => ({ ...prev, [author.id]: newChecked }));
+              }}
               label={
-                <span>
-                  {author.name}
-                  {author.isSelf ? (
-                    <span className="ml-1 text-xs text-label-secondary">
-                      {t('projects.submit_dialog.contributor_self_suffix')}
-                    </span>
-                  ) : null}
-                </span>
+                author.isSelf
+                  ? `${author.name} ${t('projects.submit_dialog.contributor_self_suffix')}`
+                  : author.name
               }
             />
           </li>
         ))}
       </ul>
-      <p className="mb-2 text-sm text-label-secondary">
-        {t('projects.submit_dialog.contributors_hint')}
-      </p>
       <p className="text-sm text-label-secondary">
         {t('projects.submit_dialog.body_irreversible')}
       </p>

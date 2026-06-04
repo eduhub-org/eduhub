@@ -534,12 +534,11 @@
       },
       "submit_dialog": {
         "title": "Projekt zur Bewertung einreichen",
-        "body_main": "Nach dem Einreichen geht das Projekt in die Bewertung und das Team wird gesperrt.",
+        "body_main": "Nach dem Einreichen geht das Projekt in die Bewertung und ist für Änderungen gesperrt.",
         "body_co_authors": "Alle Mitautor:innen verlieren ebenfalls die Bearbeitungsrechte.",
         "body_irreversible": "Eine Kursleitung kann das Projekt bei Bedarf zur Überarbeitung zurückgeben.",
-        "contributors_intro": "Markiere, wer aktiv zu dieser Einreichung beigetragen hat. Standardmäßig sind alle ausgewählt.",
+        "contributors_intro": "Wähle alle Autor:innen aus, die aktiv und substanziell am Projekt mitgearbeitet haben.",
         "contributor_self_suffix": "(Du)",
-        "contributors_hint": "Wen Du abwählst, wird aus der finalen Einreichung ausgeschlossen und erscheint nicht mehr in der öffentlichen Autor:innenliste.",
         "confirm_button": "Einreichen"
       },
       "manage_requests": {

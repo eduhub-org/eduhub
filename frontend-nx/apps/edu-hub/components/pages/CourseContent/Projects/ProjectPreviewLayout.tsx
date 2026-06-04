@@ -6,8 +6,9 @@ import { Button } from '../../../common/Button';
 import { ProjectRow } from './types';
 import { getDisplayAuthors, isExcludedAuthor } from './projectAuthors';
 import { isProjectResourceUrlPresent, safeProjectExternalHref } from './projectMandatory';
+import { resolveProjectCoverImageSrc } from './projectCoverImage';
 
-export const PROJECT_COVER_PLACEHOLDER_SRC = '/images/common/project-cover-placeholder.svg';
+export { PROJECT_COVER_PLACEHOLDER_SRC } from './projectCoverImage';
 
 interface ProjectPreviewLayoutProps {
   project: ProjectRow;
@@ -45,8 +46,7 @@ const ProjectPreviewLayout: FC<ProjectPreviewLayoutProps> = ({
   const displayAuthors = getDisplayAuthors(project.ProjectAuthors, {
     includeExcluded: includeExcludedAuthors,
   });
-  const coverSrc =
-    project.coverImageUrl?.trim() ? project.coverImageUrl.trim() : PROJECT_COVER_PLACEHOLDER_SRC;
+  const coverSrc = resolveProjectCoverImageSrc(project.coverImageUrl);
   const hasTagline = Boolean(project.tagline?.trim());
   const hasDescription = Boolean(project.description?.trim());
 

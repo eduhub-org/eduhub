@@ -654,6 +654,7 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
                   >
                   <FileUploadField
                     variant="material"
+                    layout="stacked"
                     mutationPreset="role"
                     currentFileUrl={row.coverImageUrl}
                     uploadMutation={SAVE_PROJECT_IMAGE}
@@ -665,7 +666,6 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
                     maxFileSize={5 * 1024 * 1024}
                     imageWidth={160}
                     imageHeight={96}
-                    showFileName
                     refetchQueries={REFETCH_QUERIES}
                     uploadText={tCourse('projects.my_project.cover_image_upload_text')}
                     altText={tCourse('projects.my_project.cover_image_alt')}

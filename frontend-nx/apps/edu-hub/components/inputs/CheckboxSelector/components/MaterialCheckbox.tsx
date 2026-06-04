@@ -24,15 +24,21 @@ export const MaterialCheckbox: React.FC<MaterialCheckboxProps> = ({
   return (
     <div className={`relative ${className}`}>
       <div className="flex items-center">
-        <label className="flex flex-1 items-center cursor-pointer">
+        <label
+          className={`flex flex-1 items-center ${
+            disabled ? 'cursor-default' : 'cursor-pointer'
+          }`}
+        >
           <input
             type="checkbox"
             checked={localChecked}
             onChange={handleValueChange}
             disabled={disabled}
-            className="mr-3 w-5 h-5 text-blue-600 bg-white border-gray-300 rounded focus:ring-blue-500 focus:ring-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="mr-3 h-5 w-5 shrink-0 rounded border-border-primary bg-fill-primary text-brand focus:ring-brand focus:ring-2 disabled:cursor-not-allowed disabled:opacity-50"
           />
-          {label && <span className="text-base font-medium">{label}</span>}
+          {label ? (
+            <span className="text-base font-medium text-label-primary">{label}</span>
+          ) : null}
         </label>
         {helpText && (
           <Tooltip
