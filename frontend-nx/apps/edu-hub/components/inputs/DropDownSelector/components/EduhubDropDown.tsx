@@ -39,7 +39,7 @@ export const EduhubDropDown: React.FC<EduhubDropDownProps> = ({
   getLabelForValue,
   disabled = false,
 }) => {
-  const baseClass = 'w-full pl-3 pr-10 py-3 text-label-primary rounded bg-fill-primary';
+  const baseClass = 'w-full h-12 pl-3 pr-10 py-3 text-label-primary rounded bg-fill-primary';
   const finalClassName = `${baseClass} ${className}`;
 
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -53,7 +53,10 @@ export const EduhubDropDown: React.FC<EduhubDropDownProps> = ({
           <div className="flex justify-between mb-2">
             <div className="flex items-center">
               {helpText && (
-                <Tooltip title={helpText} placement="top">
+                <Tooltip
+                  title={<span className="block max-w-sm whitespace-pre-line text-xs leading-snug">{helpText}</span>}
+                  placement="top"
+                >
                   <HelpOutline style={{ cursor: 'pointer', marginRight: '5px' }} />
                 </Tooltip>
               )}
@@ -86,6 +89,11 @@ export const EduhubDropDown: React.FC<EduhubDropDownProps> = ({
               disabled={disabled}
               className={`${finalClassName} ${errorMessage ? 'border-red-500' : ''}`}
             >
+              {placeholder && !localOptions.some((o) => o.value === '') ? (
+                <option value="" disabled>
+                  {placeholder}
+                </option>
+              ) : null}
               {localOptions.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}
@@ -95,7 +103,10 @@ export const EduhubDropDown: React.FC<EduhubDropDownProps> = ({
           )}
           {!label && helpText && (
             <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
-              <Tooltip title={helpText} placement="top">
+              <Tooltip
+                title={<span className="block max-w-sm whitespace-pre-line text-xs leading-snug">{helpText}</span>}
+                placement="top"
+              >
                 <HelpOutline style={{ cursor: 'pointer', pointerEvents: 'auto' }} />
               </Tooltip>
             </div>

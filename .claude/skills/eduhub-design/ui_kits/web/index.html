@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EduHub — UI Kit</title>
+<link rel="icon" href="../../assets/favicon.png">
+<link rel="stylesheet" href="../../colors_and_type.css">
+<link rel="stylesheet" href="styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="data.js"></script>
+<script type="text/babel" src="Components.jsx"></script>
+<script type="text/babel" src="Landing.jsx"></script>
+<script type="text/babel" src="CourseDetail.jsx"></script>
+<script type="text/babel">
+const { useState } = React;
+
+function App() {
+  const [route, setRoute] = useState({ name: 'landing' });
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [modal, setModal] = useState(null);        // 'login' | 'register' | null
+  const [lang, setLang] = useState('EN');
+  const [enrolledIds, setEnrolledIds] = useState([]);
+  const [toast, setToast] = useState(null);
+
+  const user = window.EH_DATA.user;
+
+  function showToast(msg) {
+    setToast(msg);
+    clearTimeout(window.__ehToast);
+    window.__ehToast = setTimeout(() => setToast(null), 2800);
+  }
+
+  function openCourse(course) {
+    window.scrollTo(0, 0);
+    setRoute({ name: 'course', course });
+  }
+  function goHome() {
+    window.scrollTo(0, 0);
+    setRoute({ name: 'landing' });
+  }
+
+  function handleAuth() {
+    setLoggedIn(true);
+    setModal(null);
+    showToast('Welcome to EduHub, ' + user.name.split(' ')[0] + '!');
+  }
+
+  function handleRegisterCourse(course) {
+    if (!loggedIn) { setModal('login'); return; }
+    if (!enrolledIds.includes(course.id)) {
+      setEnrolledIds(ids => [...ids, course.id]);
+      showToast('Application sent — check your email for next steps.');
+    }
+  }
+
+  return (
+    <React.Fragment>
+      <Header
+        loggedIn={loggedIn} user={user}
+        onLogin={() => setModal('login')}
+        onRegister={() => setModal('register')}
+        onLogout={() => { setLoggedIn(false); goHome(); }}
+        onHome={goHome}
+        lang={lang} setLang={setLang}
+      />
+
+      {route.name === 'landing' && <Landing onOpen={openCourse} />}
+      {route.name === 'course' && (
+        <CourseDetail
+          course={route.course}
+          enrolled={enrolledIds.includes(route.course.id)}
+          onBack={goHome}
+          onRegister={() => handleRegisterCourse(route.course)}
+        />
+      )}
+
+      <Footer />
+
+      {modal && <LoginModal mode={modal} onClose={() => setModal(null)} onSubmit={handleAuth} />}
+      {toast && <div className="eh-toast">{toast}</div>}
+    </React.Fragment>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

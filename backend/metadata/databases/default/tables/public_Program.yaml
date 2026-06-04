@@ -2,20 +2,19 @@ table:
   name: Program
   schema: public
 object_relationships:
+  - name: DefaultProjectType
+    using:
+      foreign_key_constraint_on: defaultProjectType
   - name: Organization
     using:
       foreign_key_constraint_on: organizationId
   - name: ProgramType
     using:
       foreign_key_constraint_on: type
-array_relationships:
-  - name: CertificateTemplatePrograms
+  - name: AttendanceCertificateTemplate
     using:
-      foreign_key_constraint_on:
-        column: programId
-        table:
-          name: CertificateTemplateProgram
-          schema: public
+      foreign_key_constraint_on: attendanceCertificateTemplateId
+array_relationships:
   - name: Courses
     using:
       foreign_key_constraint_on:
@@ -30,6 +29,9 @@ select_permissions:
         - achievementRecordUploadDeadline
         - applicationStart
         - defaultApplicationEnd
+        - defaultProjectSubmissionDeadline
+        - defaultProjectType
+        - projectProposalsEnabledByDefault
         - showExtendedApplicationPeriodBanner
         - id
         - lectureEnd
@@ -49,10 +51,14 @@ select_permissions:
         - visibility
         - applicationStart
         - organizationId
+        - attendanceCertificateTemplateId
         - attendanceCertificateTemplateURL
         - closingQuestionnaire
         - defaultApplicationEnd
         - defaultMaxMissedSessions
+        - defaultProjectSubmissionDeadline
+        - defaultProjectType
+        - projectProposalsEnabledByDefault
         - id
         - lectureEnd
         - lectureStart

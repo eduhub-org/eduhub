@@ -6,6 +6,19 @@ import { getHolidaysByLocale } from './holidayUtils';
 
 // Beautiful highlighting styles for calendar days
 const defaultHighlightingStyles = `
+  /*
+   * react-datepicker wraps the input in two inline-block divs, which causes
+   * the input to keep its natural width even when the surrounding container
+   * is wider. That leaves a visible "dead zone" between the input edge and
+   * any styled wrapper around it. Force the wrappers to fill the available
+   * width so the input expands with the parent container.
+   */
+  .optimistic-datepicker .react-datepicker-wrapper,
+  .optimistic-datepicker .react-datepicker__input-container {
+    display: block;
+    width: 100%;
+  }
+
   .holiday-day {
     background-color: #ecfdf5 !important;
     color: #065f46 !important;
@@ -53,6 +66,17 @@ const injectHighlightingStyles = () => {
     styleSheet.id = 'optimistic-datepicker-highlighting-styles';
     styleSheet.textContent = defaultHighlightingStyles;
     document.head.appendChild(styleSheet);
+  }
+};
+
+// Ensure a portal target exists at body level so the popper isn't clipped by
+// ancestors that establish overflow/stacking contexts (e.g. table containers).
+const ensurePortalContainer = (id: string) => {
+  if (typeof document === 'undefined' || !id) return;
+  if (!document.getElementById(id)) {
+    const container = document.createElement('div');
+    container.id = id;
+    document.body.appendChild(container);
   }
 };
 
@@ -115,6 +139,12 @@ export interface OptimisticDatePickerProps {
   readOnly?: boolean;
   required?: boolean;
   tabIndex?: number;
+  /**
+   * Render the calendar popper inside a portal at body level. Prevents the
+   * calendar from being clipped by ancestor `overflow: hidden`/`auto` (e.g. inside table cells).
+   * Defaults to the shared "optimistic-datepicker-portal" id.
+   */
+  portalId?: string;
   // Add more DatePicker props as needed
 }
 
@@ -137,7 +167,7 @@ export interface OptimisticDatePickerProps {
  * - **Weekend Highlighting**: Optional light blue highlighting for weekends
  * - **Holiday Tooltips**: Native browser tooltips showing holiday names on hover
  * - **Outside-Month Days**: Highlights weekends/holidays even in previous/next month days
- * - **Dynamic Styling**: Survives calendar navigation and reopen events
+ * - **Locale-Safe**: Works across any displayed month/year regardless of UI language
  *
  * ### Styling Classes
  * - `.holiday-day`: Regular holidays (green styling)
@@ -207,14 +237,14 @@ export interface OptimisticDatePickerProps {
  * - **German locale (lang='de')**: German holidays (Pfingstmontag, Fronleichnam, etc.)
  * - **Other locales**: US holidays (Independence Day, Thanksgiving, etc.)
  *
- * Holiday coverage includes current year + next year to handle academic terms.
+ * Holidays are resolved lazily per displayed year, so any month the user
+ * navigates to is highlighted correctly.
  *
  * ## Implementation Notes
  *
- * - Uses direct DOM manipulation for reliable highlighting across calendar navigation
- * - MutationObserver ensures highlighting persists during month changes and reopen events
+ * - Uses react-datepicker's `dayClassName` and `renderDayContents` props to drive
+ *   highlighting and tooltips (no DOM scraping, so it works in any UI locale)
  * - Optimistic state is automatically cleared on successful mutations or errors
- * - Memory efficient with proper observer cleanup on component unmount
  * - TypeScript compatible with full type safety
  */
 export const OptimisticDatePicker: FC<OptimisticDatePickerProps> = ({
@@ -242,381 +272,83 @@ export const OptimisticDatePicker: FC<OptimisticDatePickerProps> = ({
   readOnly,
   required,
   tabIndex,
+  portalId = 'optimistic-datepicker-portal',
 }) => {
   const locale = useLocale();
 
-  // Inject styles when component mounts
+  // Inject styles and ensure portal container when component mounts
   useEffect(() => {
     injectHighlightingStyles();
-  }, []);
-
-  // Auto-generate holidays based on app locale if enabled
-  const autoHolidays = useMemo(() => {
-    if (!showHolidays) {
-      return []; // No holidays if disabled
-    }
-
-    // Auto-generate holidays for current and next year based on app's configured locale
-    // locale comes from useLocale and represents the app's language setting
-    const currentYear = new Date().getFullYear();
-    const holidayLocale = locale === 'de' ? 'de' : 'us'; // Map app locale to holiday locale
-
-    return [
-      ...getHolidaysByLocale({ year: currentYear, locale: holidayLocale }),
-      ...getHolidaysByLocale({ year: currentYear + 1, locale: holidayLocale }),
-    ];
-  }, [showHolidays, locale]);
+    ensurePortalContainer(portalId);
+  }, [portalId]);
 
   // Local optimistic state
   const [optimisticValue, setOptimisticValue] = useState<Date | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
 
-  // Combine holidays and weekends into a single highlighting array
-  const allHighlights = useMemo(() => {
-    const highlights = [...autoHolidays];
+  // Lazy per-year holiday lookup. Built on first access for a given year so any
+  // navigated month resolves correctly (not just current/next year).
+  const lookupHoliday = useMemo(() => {
+    if (!showHolidays) return () => undefined;
+    const holidayLocale = locale === 'de' ? 'de' : 'us';
+    const cache = new Map<number, Map<string, Holiday>>();
 
-    // Add weekends if enabled
-    if (showWeekends) {
-      const currentYear = new Date().getFullYear();
+    const keyFor = (d: Date) => `${d.getMonth()}-${d.getDate()}`;
 
-      for (const year of [currentYear, currentYear + 1]) {
-        for (let month = 0; month < 12; month++) {
-          const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-          for (let day = 1; day <= daysInMonth; day++) {
-            const date = new Date(year, month, day);
-            const dayOfWeek = date.getDay();
-
-            if (dayOfWeek === 0 || dayOfWeek === 6) {
-              // Sunday = 0, Saturday = 6
-              highlights.push({
-                date,
-                name: dayOfWeek === 0 ? 'Sunday' : 'Saturday',
-                className: 'weekend-day',
-              });
-            }
-          }
-        }
-      }
-    }
-
-    return highlights;
-  }, [autoHolidays, showWeekends]);
-
-  // Process all highlights into highlight dates format that react-datepicker expects
-  React.useMemo(() => {
-    const processed: any[] = [...highlightDates];
-
-    if (allHighlights.length > 0) {
-      // Group highlights by className
-      const highlightGroups = allHighlights.reduce(
-        (groups, highlight) => {
-          const className = highlight.className || 'holiday';
-          if (!groups[className]) {
-            groups[className] = [];
-          }
-          groups[className].push(highlight.date);
-          return groups;
-        },
-        {} as { [key: string]: Date[] }
-      );
-
-      // Convert to react-datepicker highlightDates format
-      // react-datepicker expects: [{ "css-class-name": [date1, date2] }]
-      Object.entries(highlightGroups).forEach(([className, dates]) => {
-        processed.push({ [className]: dates });
-      });
-    }
-
-    return processed;
-  }, [allHighlights, highlightDates]);
-
-  // Apply highlighting styles via direct DOM manipulation after calendar renders
-  useEffect(() => {
-    const applyHighlightingStyles = () => {
-      const calendar = document.querySelector('.react-datepicker');
-      if (!calendar) {
-        return false; // Calendar not ready yet
-      }
-
-      if (allHighlights.length === 0) {
-        return true; // Calendar found but no highlights
-      }
-
-      const dayElements = calendar.querySelectorAll('.react-datepicker__day');
-
-      if (dayElements.length === 0) {
-        return false; // Calendar found but days not rendered yet
-      }
-
-      dayElements.forEach((el) => {
-        // Clear any existing highlighting styles
-        el.classList.remove('holiday-day', 'national-holiday-day', 'weekend-day');
-
-        // Get the date from the element
-        const dayNumber = parseInt(el.textContent || '0', 10);
-        if (dayNumber === 0) return;
-
-        // Find the corresponding date - we need to determine month/year from calendar context
-        const monthElement = calendar.querySelector('.react-datepicker__current-month');
-        if (!monthElement) return;
-
-        const monthYearText = monthElement.textContent;
-        if (!monthYearText) return;
-
-        // Parse month and year from the header (format like "June 2025")
-        const [monthName, year] = monthYearText.split(' ');
-        const calendarMonth = new Date(`${monthName} 1, ${year}`).getMonth();
-        const calendarYear = parseInt(year);
-
-        // For outside-month days, we need to determine if they're from previous or next month
-        let elementDate: Date;
-        if (el.classList.contains('react-datepicker__day--outside-month')) {
-          // Determine if this is from previous or next month based on position
-          const weekElement = el.parentElement;
-          const monthContainer = weekElement?.parentElement;
-          if (!weekElement || !monthContainer) return;
-
-          const allWeeks = Array.from(monthContainer.children);
-          const weekIndex = allWeeks.indexOf(weekElement);
-
-          if (weekIndex === 0) {
-            // First week - likely previous month
-            elementDate = new Date(calendarYear, calendarMonth - 1, dayNumber);
-          } else {
-            // Last week - likely next month
-            elementDate = new Date(calendarYear, calendarMonth + 1, dayNumber);
-          }
-        } else {
-          // Current month day
-          elementDate = new Date(calendarYear, calendarMonth, dayNumber);
-        }
-
-        // Check if this date should be highlighted (holiday or weekend)
-        const highlight = allHighlights.find(
-          (h) =>
-            h.date.getFullYear() === elementDate.getFullYear() &&
-            h.date.getMonth() === elementDate.getMonth() &&
-            h.date.getDate() === elementDate.getDate()
-        );
-
-        // Apply highlighting styles and tooltips
-        if (highlight) {
-          if (highlight.className === 'national-holiday') {
-            el.classList.add('national-holiday-day');
-            el.setAttribute('title', highlight.name || 'National Holiday');
-          } else if (highlight.className === 'weekend-day') {
-            el.classList.add('weekend-day');
-            // Optional: Add weekend tooltips
-            // el.setAttribute('title', highlight.name || 'Weekend');
-          } else {
-            el.classList.add('holiday-day');
-            el.setAttribute('title', highlight.name || 'Holiday');
-          }
-        } else {
-          // Clear any existing tooltip when no highlight
-          el.removeAttribute('title');
-        }
-      });
-
-      return true; // Successfully applied styles
-    };
-
-    // Keep trying until calendar is ready
-    let attempts = 0;
-    const maxAttempts = 20;
-
-    const tryApplyStyles = () => {
-      attempts++;
-      const success = applyHighlightingStyles();
-
-      if (!success && attempts < maxAttempts) {
-        setTimeout(tryApplyStyles, 100);
-      }
-    };
-
-    tryApplyStyles();
-  }, [allHighlights, optimisticValue, value]); // Re-run when highlights or displayed date changes
-
-  // Re-apply styles when calendar changes (month navigation, open/close)
-  useEffect(() => {
-    let currentObserver: MutationObserver | null = null;
-
-    const applyHighlightingStylesToCalendar = () => {
-      const calendar = document.querySelector('.react-datepicker');
-      if (!calendar || allHighlights.length === 0) {
-        return false;
-      }
-
-      const dayElements = calendar.querySelectorAll('.react-datepicker__day');
-
-      if (dayElements.length === 0) {
-        return false;
-      }
-
-      dayElements.forEach((el) => {
-        el.classList.remove('holiday-day', 'national-holiday-day', 'weekend-day');
-
-        const dayNumber = parseInt(el.textContent || '0', 10);
-        if (dayNumber === 0) return;
-
-        const monthElement = calendar.querySelector('.react-datepicker__current-month');
-        if (!monthElement) return;
-
-        const monthYearText = monthElement.textContent;
-        if (!monthYearText) return;
-
-        const [monthName, year] = monthYearText.split(' ');
-        const calendarMonth = new Date(`${monthName} 1, ${year}`).getMonth();
-        const calendarYear = parseInt(year);
-
-        // For outside-month days, we need to determine if they're from previous or next month
-        let elementDate: Date;
-        if (el.classList.contains('react-datepicker__day--outside-month')) {
-          // Determine if this is from previous or next month based on position
-          const weekElement = el.parentElement;
-          const monthContainer = weekElement?.parentElement;
-          if (!weekElement || !monthContainer) return;
-
-          const allWeeks = Array.from(monthContainer.children);
-          const weekIndex = allWeeks.indexOf(weekElement);
-
-          if (weekIndex === 0) {
-            // First week - likely previous month
-            elementDate = new Date(calendarYear, calendarMonth - 1, dayNumber);
-          } else {
-            // Last week - likely next month
-            elementDate = new Date(calendarYear, calendarMonth + 1, dayNumber);
-          }
-        } else {
-          // Current month day
-          elementDate = new Date(calendarYear, calendarMonth, dayNumber);
-        }
-
-        const highlight = allHighlights.find(
-          (h) =>
-            h.date.getFullYear() === elementDate.getFullYear() &&
-            h.date.getMonth() === elementDate.getMonth() &&
-            h.date.getDate() === elementDate.getDate()
-        );
-
-        if (highlight) {
-          if (highlight.className === 'national-holiday') {
-            el.classList.add('national-holiday-day');
-            el.setAttribute('title', highlight.name || 'National Holiday');
-          } else if (highlight.className === 'weekend-day') {
-            el.classList.add('weekend-day');
-            // Optional: Add weekend tooltips
-            // el.setAttribute('title', highlight.name || 'Weekend');
-          } else {
-            el.classList.add('holiday-day');
-            el.setAttribute('title', highlight.name || 'Holiday');
-          }
-        } else {
-          // Clear any existing tooltip when no highlight
-          el.removeAttribute('title');
-        }
-      });
-
-      return true;
-    };
-
-    const setupCalendarObserver = () => {
-      const calendar = document.querySelector('.react-datepicker');
-      if (!calendar) {
-        return null;
-      }
-
-      const observer = new MutationObserver((mutations) => {
-        let shouldReapply = false;
-
-        mutations.forEach((mutation) => {
-          // Check if month header changed (month navigation)
-          if (
-            mutation.target instanceof Element &&
-            mutation.target.classList?.contains('react-datepicker__current-month')
-          ) {
-            shouldReapply = true;
-          }
-          // Check if day elements were added/removed
-          if (
-            mutation.target instanceof Element &&
-            (mutation.target.classList?.contains('react-datepicker__month') ||
-              mutation.target.classList?.contains('react-datepicker__week'))
-          ) {
-            shouldReapply = true;
-          }
-          // Check for any day element changes
-          mutation.addedNodes.forEach((node) => {
-            if (node.nodeType === 1 && node instanceof Element && node.classList?.contains('react-datepicker__day')) {
-              shouldReapply = true;
-            }
-          });
+    const getYearMap = (year: number): Map<string, Holiday> => {
+      let yearMap = cache.get(year);
+      if (!yearMap) {
+        yearMap = new Map();
+        getHolidaysByLocale({ year, locale: holidayLocale }).forEach((h) => {
+          yearMap!.set(keyFor(h.date), h);
         });
-
-        if (shouldReapply) {
-          setTimeout(() => {
-            applyHighlightingStylesToCalendar();
-          }, 50);
-        }
-      });
-
-      observer.observe(calendar, {
-        childList: true,
-        subtree: true,
-        characterData: true,
-      });
-
-      return observer;
+        cache.set(year, yearMap);
+      }
+      return yearMap;
     };
 
-    // Watch for calendar appearance/disappearance (open/close)
-    const documentObserver = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        mutation.addedNodes.forEach((node) => {
-          if (node.nodeType === 1 && node instanceof Element) {
-            // Check if a new calendar was added
-            const calendar = node.classList?.contains('react-datepicker')
-              ? node
-              : node.querySelector?.('.react-datepicker');
+    return (date: Date): Holiday | undefined => getYearMap(date.getFullYear()).get(keyFor(date));
+  }, [showHolidays, locale]);
 
-            if (calendar) {
-              // Disconnect previous observer if exists
-              if (currentObserver) {
-                currentObserver.disconnect();
-              }
-
-              // Apply styles to the new calendar
-              setTimeout(() => {
-                applyHighlightingStylesToCalendar();
-                // Set up new observer for this calendar
-                currentObserver = setupCalendarObserver();
-              }, 100);
-            }
-          }
-        });
+  // Lookup for caller-supplied custom highlight dates. Flattens the
+  // [{ className: Date[] }] structure into a single map keyed by date.
+  const lookupCustomHighlight = useMemo(() => {
+    if (highlightDates.length === 0) return () => undefined;
+    const map = new Map<string, string>();
+    const keyFor = (d: Date) => `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+    highlightDates.forEach((group) => {
+      Object.entries(group).forEach(([className, dates]) => {
+        dates.forEach((d) => map.set(keyFor(d), className));
       });
     });
+    return (date: Date): string | undefined => map.get(keyFor(date));
+  }, [highlightDates]);
 
-    // Observe the entire document for calendar additions
-    documentObserver.observe(document.body, {
-      childList: true,
-      subtree: true,
-    });
-
-    // Initial setup if calendar already exists
-    if (document.querySelector('.react-datepicker')) {
-      currentObserver = setupCalendarObserver();
-    }
-
-    return () => {
-      if (currentObserver) {
-        currentObserver.disconnect();
+  const dayClassName = useCallback(
+    (date: Date): string => {
+      const custom = lookupCustomHighlight(date);
+      if (custom) return custom;
+      const holiday = lookupHoliday(date);
+      if (holiday) {
+        return holiday.className === 'national-holiday' ? 'national-holiday-day' : 'holiday-day';
       }
-      documentObserver.disconnect();
-    };
-  }, [allHighlights]);
+      if (showWeekends) {
+        const day = date.getDay();
+        if (day === 0 || day === 6) return 'weekend-day';
+      }
+      return '';
+    },
+    [lookupHoliday, lookupCustomHighlight, showWeekends]
+  );
+
+  const renderDayContents = useCallback(
+    (day: number, date?: Date) => {
+      const holiday = date ? lookupHoliday(date) : undefined;
+      return holiday?.name ? <span title={holiday.name}>{day}</span> : <>{day}</>;
+    },
+    [lookupHoliday]
+  );
 
   // Reset optimistic state when server value changes
   useEffect(() => {
@@ -664,7 +396,7 @@ export const OptimisticDatePicker: FC<OptimisticDatePickerProps> = ({
     .join(' ');
 
   return (
-    <div className="relative w-full">
+    <div className="optimistic-datepicker relative w-full">
       <DatePicker
         selected={displayValue}
         onChange={handleDateChange as any}
@@ -676,6 +408,8 @@ export const OptimisticDatePicker: FC<OptimisticDatePickerProps> = ({
         maxDate={maxDate}
         placeholderText={placeholderText}
         excludeDates={excludeDates}
+        dayClassName={dayClassName}
+        renderDayContents={renderDayContents}
         id={id}
         name={name}
         title={title}
@@ -685,6 +419,7 @@ export const OptimisticDatePicker: FC<OptimisticDatePickerProps> = ({
         required={required}
         tabIndex={tabIndex}
         popperPlacement="bottom-start"
+        portalId={portalId}
       />
 
       {/* Loading indicator */}

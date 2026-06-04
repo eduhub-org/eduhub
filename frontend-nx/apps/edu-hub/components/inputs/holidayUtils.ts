@@ -32,42 +32,44 @@ export const getEasterSunday = (year: number): Date => {
 };
 
 /**
- * Generate German holidays for a given year
+ * Buß- und Bettag falls on the Wednesday between Nov 16 and Nov 22
+ * (the Wednesday before Nov 23). Public holiday in Sachsen.
+ */
+const getBussUndBettag = (year: number): Date => {
+  const nov22 = new Date(year, 10, 22);
+  const daysToSubtract = (nov22.getDay() - 3 + 7) % 7;
+  return new Date(year, 10, 22 - daysToSubtract);
+};
+
+/**
+ * Generate German holidays for a given year.
+ *
+ * Includes all nine nationwide federal holidays (className 'national-holiday')
+ * plus regional public holidays that are officially recognized in at least one
+ * federal state (className 'holiday').
  */
 export const getGermanHolidays = (year: number): Holiday[] => {
   const easter = getEasterSunday(year);
-  
+  const easterY = easter.getFullYear();
+  const easterM = easter.getMonth();
+  const easterD = easter.getDate();
+
   return [
     { date: new Date(year, 0, 1), name: 'Neujahr', className: 'national-holiday' },
     { date: new Date(year, 0, 6), name: 'Heilige Drei Könige', className: 'holiday' },
-    { 
-      date: new Date(easter.getFullYear(), easter.getMonth(), easter.getDate() - 2), 
-      name: 'Karfreitag', 
-      className: 'national-holiday' 
-    },
-    { 
-      date: new Date(easter.getFullYear(), easter.getMonth(), easter.getDate() + 1), 
-      name: 'Ostermontag', 
-      className: 'national-holiday' 
-    },
+    { date: new Date(year, 2, 8), name: 'Internationaler Frauentag', className: 'holiday' },
+    { date: new Date(easterY, easterM, easterD - 2), name: 'Karfreitag', className: 'national-holiday' },
+    { date: new Date(easterY, easterM, easterD + 1), name: 'Ostermontag', className: 'national-holiday' },
     { date: new Date(year, 4, 1), name: 'Tag der Arbeit', className: 'national-holiday' },
-    { 
-      date: new Date(easter.getFullYear(), easter.getMonth(), easter.getDate() + 39), 
-      name: 'Christi Himmelfahrt', 
-      className: 'national-holiday' 
-    },
-    { 
-      date: new Date(easter.getFullYear(), easter.getMonth(), easter.getDate() + 50), 
-      name: 'Pfingstmontag', 
-      className: 'national-holiday' 
-    },
-    { 
-      date: new Date(easter.getFullYear(), easter.getMonth(), easter.getDate() + 60), 
-      name: 'Fronleichnam', 
-      className: 'holiday' 
-    },
+    { date: new Date(easterY, easterM, easterD + 39), name: 'Christi Himmelfahrt', className: 'national-holiday' },
+    { date: new Date(easterY, easterM, easterD + 50), name: 'Pfingstmontag', className: 'national-holiday' },
+    { date: new Date(easterY, easterM, easterD + 60), name: 'Fronleichnam', className: 'holiday' },
+    { date: new Date(year, 7, 15), name: 'Mariä Himmelfahrt', className: 'holiday' },
+    { date: new Date(year, 8, 20), name: 'Weltkindertag', className: 'holiday' },
     { date: new Date(year, 9, 3), name: 'Tag der Deutschen Einheit', className: 'national-holiday' },
+    { date: new Date(year, 9, 31), name: 'Reformationstag', className: 'holiday' },
     { date: new Date(year, 10, 1), name: 'Allerheiligen', className: 'holiday' },
+    { date: getBussUndBettag(year), name: 'Buß- und Bettag', className: 'holiday' },
     { date: new Date(year, 11, 25), name: 'Weihnachten', className: 'national-holiday' },
     { date: new Date(year, 11, 26), name: '2. Weihnachtstag', className: 'national-holiday' },
   ];

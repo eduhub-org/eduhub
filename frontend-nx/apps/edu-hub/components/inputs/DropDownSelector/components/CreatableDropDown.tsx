@@ -179,7 +179,10 @@ export const CreatableDropDown: React.FC<CreatableDropDownProps> = ({
           placeholder={placeholder || label}
         />
         {helpText && (
-          <Tooltip title={helpText} placement="top">
+          <Tooltip
+            title={<span className="block max-w-sm whitespace-pre-line text-xs leading-snug">{helpText}</span>}
+            placement="top"
+          >
             <HelpOutline
               style={{
                 cursor: 'pointer',

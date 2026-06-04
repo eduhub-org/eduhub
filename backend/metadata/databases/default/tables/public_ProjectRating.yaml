@@ -1,7 +1,15 @@
 table:
-  schema: public
   name: ProjectRating
+  schema: public
 is_enum: true
+array_relationships:
+  - name: Projects
+    using:
+      foreign_key_constraint_on:
+        column: rating
+        table:
+          name: Project
+          schema: public
 select_permissions:
   - role: anonymous
     permission:

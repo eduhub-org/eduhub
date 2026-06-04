@@ -1,0 +1,35 @@
+name: Keycloak Code Checks
+
+on:
+  push:
+    paths:
+      - .github/workflows/keycloak-code-checks.yml
+      - docker-compose.yml
+      - keycloak/**
+      - scripts/rebuild-keycloak-matrix-handle-listener.sh
+  pull_request:
+    paths:
+      - .github/workflows/keycloak-code-checks.yml
+      - docker-compose.yml
+      - keycloak/**
+      - scripts/rebuild-keycloak-matrix-handle-listener.sh
+    types: [opened, synchronize, reopened]
+
+jobs:
+  keycloak-spi-version-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+
+    steps:
+      - name: Harden the runner
+        uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
+        with:
+          egress-policy: audit
+
+      - name: Checkout project
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+
+      - name: Check Keycloak SPI version alignment
+        run: scripts/rebuild-keycloak-matrix-handle-listener.sh --check

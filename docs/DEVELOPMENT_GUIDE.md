@@ -36,7 +36,6 @@ See the sections in **`.env.example`** (Matrix, Formbricks, Stripe, Ghost, and *
 - `4001` - File uploads
 - `8080` - Hasura API
 - `5000` - Edu frontend
-- `5001` - Rent-a-scientist frontend
 - `28080` - Keycloak admin interface, login as **admin** with password **admin**
 - `42000` to `420025` - serverless functions (currently most functions have their own port)
 

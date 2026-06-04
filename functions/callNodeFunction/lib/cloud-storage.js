@@ -5,6 +5,38 @@ import url from "url";
 
 const isPublicLegacy = (filePath) => filePath.startsWith("https://") || filePath.startsWith("http://");
 const isPublic = (filePath) => filePath.includes("/public/");
+const isPdf = (filePath) => filePath.split("?")[0].toLowerCase().endsWith(".pdf");
+
+const getDownloadFileName = (filePath) => {
+  const rawPathSegment = filePath.split("?")[0].split("/").pop() || "certificate.pdf";
+  let fileName = rawPathSegment;
+
+  try {
+    fileName = decodeURIComponent(rawPathSegment);
+  } catch (error) {
+    logger.warn("Failed to decode download file name, using raw path segment", {
+      filePath,
+      rawPathSegment,
+      error: error.message,
+    });
+  }
+
+  return fileName.replace(/["\\\r\n]/g, "_");
+};
+
+const getSignedReadUrlConfig = (filePath) => {
+  const config = {
+    action: "read",
+    expires: new Date(Date.now() + 1000 * 60 * 5),
+  };
+
+  if (isPdf(filePath)) {
+    config.responseType = "application/pdf";
+    config.responseDisposition = `inline; filename="${getDownloadFileName(filePath)}"`;
+  }
+
+  return config;
+};
 
 const getRelativePath = (filePath) => {
   if (isPublicLegacy(filePath)) {
@@ -107,7 +139,10 @@ export const buildCloudStorage = (Storage) => {
         const fileBuffer = new Buffer.from(content, "base64");
 
         logger.debug(`Saving file ${filename} to bucket ${bucketName}`);
-        const sr = await file.save(fileBuffer);
+        const saveOptions = isPdf(filename)
+          ? { metadata: { contentType: "application/pdf" } }
+          : undefined;
+        const sr = await file.save(fileBuffer, saveOptions);
 
         let link = "";
         if (isPublic) {
@@ -115,10 +150,7 @@ export const buildCloudStorage = (Storage) => {
           await file.makePublic();
           link = await file.publicUrl();
         } else {
-          link = await file.getSignedUrl({
-            action: "read",
-            expires: new Date(Date.now() + 1000 * 60 * 5),
-          });
+          link = await file.getSignedUrl(getSignedReadUrlConfig(filename));
         }
         return link;
       },
@@ -132,10 +164,7 @@ export const buildCloudStorage = (Storage) => {
         if (isPublic[0] == true) {
           link = await file.publicUrl();
         } else {
-          link = await file.getSignedUrl({
-            action: "read",
-            expires: new Date(Date.now() + 1000 * 60 * 5),
-          });
+          link = await file.getSignedUrl(getSignedReadUrlConfig(path));
         }
         return link;
       },

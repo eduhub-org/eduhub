@@ -58,7 +58,7 @@ export const CompletedDegreeCourses: FC<{ degreeCourseId: number }> = ({ degreeC
   const ectsTranslations = t.raw('ects') as Record<string, string>;
 
   return (
-    <div className="text-label-primary bg-fill-primary light px-8 py-8">
+    <div className="text-label-primary flex flex-col w-full">
       <div className="flex flex-col">
         <span className="text-3xl font-semibold mb-4">{t('degree_elements.completed_degree_elements')}</span>
         {completedDegreeEnrollments.length > 0 ? (

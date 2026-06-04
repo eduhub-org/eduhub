@@ -551,13 +551,16 @@ const InputField: React.FC<InputFieldProps> = ({
         onBlur={handleBlur}
         slotProps={{
           input: {
-            endAdornment: (
+            endAdornment: helpText ? (
               <InputAdornment position="end">
-                <Tooltip title={helpText || ''} placement="top">
+                <Tooltip
+                  title={<span className="block max-w-sm whitespace-pre-line text-xs leading-snug">{helpText}</span>}
+                  placement="top"
+                >
                   <HelpOutline style={{ cursor: 'pointer', color: 'var(--eduhub-label-disabled)' }} />
                 </Tooltip>
               </InputAdornment>
-            ),
+            ) : undefined,
           },
         }}
         error={hasBlurred && !!errorMessage}
@@ -571,12 +574,15 @@ const InputField: React.FC<InputFieldProps> = ({
     <div className="px-2">
       {(label || helpText) && (
         <div className="mb-2 flex items-center gap-2 text-label-primary">
-          {helpText && (
-            <Tooltip title={helpText} placement="top">
-              <HelpOutline style={{ cursor: 'pointer' }} />
+          {label ? <span className="text-sm font-semibold">{label}</span> : null}
+          {helpText ? (
+            <Tooltip
+              title={<span className="block max-w-sm whitespace-pre-line text-xs leading-snug">{helpText}</span>}
+              placement="top"
+            >
+              <HelpOutline style={{ cursor: 'pointer', color: 'var(--eduhub-label-disabled)' }} />
             </Tooltip>
-          )}
-          {label && <span>{label}</span>}
+          ) : null}
         </div>
       )}
       {/* Translation mode keeps a larger shared surface for tabs + editor; regular inputs stay compact */}

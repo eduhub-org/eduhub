@@ -71,6 +71,27 @@ array_relationships:
         table:
           name: OrganizationNewsletterSubscription
           schema: public
+  - name: ProjectAuthors
+    using:
+      foreign_key_constraint_on:
+        column: userId
+        table:
+          name: ProjectAuthor
+          schema: public
+  - name: ProjectMentors
+    using:
+      foreign_key_constraint_on:
+        column: userId
+        table:
+          name: ProjectMentor
+          schema: public
+  - name: ProposedProjects
+    using:
+      foreign_key_constraint_on:
+        column: proposedByUserId
+        table:
+          name: Project
+          schema: public
 select_permissions:
   - role: anonymous
     permission:
@@ -103,6 +124,7 @@ select_permissions:
         - newsletterRegistration
         - occupation
         - picture
+        - status
         - updated_at
         - zipCode
       filter: {}
@@ -132,6 +154,33 @@ select_permissions:
         id:
           _eq: X-Hasura-User-Id
       limit: 10
+  # Split across inherited roles: `user` JWT inherits both user_access and user_access_others;
+  # Hasura merges union semantics — classmates visible via projects stay limited columns only.
+  - role: user_access_others
+    permission:
+      columns:
+        - externalProfile
+        - firstName
+        - id
+        - lastName
+        - organizationId
+        - picture
+      filter:
+        ProjectAuthors:
+          _and:
+            - participationStatus:
+                _eq: ACCEPTED
+            - Project:
+                ProjectCourses:
+                  Course:
+                    CourseEnrollments:
+                      _and:
+                        - User:
+                            id:
+                              _eq: X-Hasura-User-Id
+                        - status:
+                            _eq: CONFIRMED
+      limit: 100
 update_permissions:
   - role: user_access
     permission:

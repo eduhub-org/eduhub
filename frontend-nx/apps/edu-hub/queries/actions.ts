@@ -51,71 +51,6 @@ export const SAVE_ACHIEVEMENT_CERTIFICATE_TEMPLATE = gql`
   }
 `;
 
-export const SAVE_ACHIEVEMENT_RECORD_COVER_IMAGE = gql`
-  mutation SaveAchievementRecordCoverImage(
-    $base64File: String!
-    $fileName: String!
-    $achievementRecordId: Int!
-  ) {
-    saveAchievementRecordCoverImage(
-      base64file: $base64File
-      filename: $fileName
-      achievementRecordId: $achievementRecordId
-    ) {
-      success
-      messageKey
-      error
-      filePath
-      accessUrl
-      resizedPaths {
-        size
-        filePath
-        accessUrl
-      }
-    }
-  }
-`;
-
-export const SAVE_ACHIEVEMENT_RECORD_DOCUMENTATION = gql`
-  mutation SaveAchievementRecordDocumentation(
-    $base64File: String!
-    $fileName: String!
-    $achievementRecordId: Int!
-  ) {
-    saveAchievementRecordDocumentation(
-      base64file: $base64File
-      filename: $fileName
-      achievementRecordId: $achievementRecordId
-    ) {
-      success
-      messageKey
-      error
-      filePath
-      accessUrl
-    }
-  }
-`;
-
-export const SAVE_ACHIEVEMENT_DOCUMENTATION_TEMPLATE = gql`
-  mutation SaveAchievementDocumentationTemplate(
-    $base64File: String!
-    $fileName: String!
-    $achievementDocumentationTemplateId: Int!
-  ) {
-    saveAchievementDocumentationTemplate(
-      base64file: $base64File
-      filename: $fileName
-      achievementDocumentationTemplateId: $achievementDocumentationTemplateId
-    ) {
-      success
-      messageKey
-      error
-      filePath
-      accessUrl
-    }
-  }
-`;
-
 export const GET_SIGNED_URL = gql`
   query GetSignedUrl($path: String!) {
     getSignedUrl(path: $path) {
@@ -206,6 +141,71 @@ export const SAVE_COURSE_IMAGE = gql`
         filePath
         accessUrl
       }
+    }
+  }
+`;
+
+export const SAVE_PROJECT_IMAGE = gql`
+  mutation SaveProjectImage(
+    $base64File: String!
+    $fileName: String!
+    $projectId: Int!
+  ) {
+    saveProjectImage(
+      base64file: $base64File
+      filename: $fileName
+      projectid: $projectId
+    ) {
+      success
+      messageKey
+      error
+      filePath
+      accessUrl
+      resizedPaths {
+        size
+        filePath
+        accessUrl
+      }
+    }
+  }
+`;
+
+export const SAVE_PROJECT_DOCUMENTATION = gql`
+  mutation SaveProjectDocumentation(
+    $base64File: String!
+    $fileName: String!
+    $projectId: Int!
+  ) {
+    saveProjectDocumentation(
+      base64file: $base64File
+      filename: $fileName
+      projectid: $projectId
+    ) {
+      success
+      messageKey
+      error
+      filePath
+      accessUrl
+    }
+  }
+`;
+
+export const SAVE_PROJECT_PRESENTATION = gql`
+  mutation SaveProjectPresentation(
+    $base64File: String!
+    $fileName: String!
+    $projectId: Int!
+  ) {
+    saveProjectPresentation(
+      base64file: $base64File
+      filename: $fileName
+      projectid: $projectId
+    ) {
+      success
+      messageKey
+      error
+      filePath
+      accessUrl
     }
   }
 `;

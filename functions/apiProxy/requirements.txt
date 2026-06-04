@@ -8,4 +8,4 @@ markdown>=3.0.0
 pytest
 jsonschema
 PyJWT==2.12.0
-cryptography==46.0.7
+cryptography>=48.0,<49

@@ -60,22 +60,21 @@ export const formattedDateWithTime = (date: Date, language = 'de') => {
     date
   );
 
-  const hour = new Intl.DateTimeFormat(language, { hour: '2-digit' }).format(
-    date
-  );
-  const minute = new Intl.DateTimeFormat(language, {
+  const time = new Intl.DateTimeFormat(language, {
+    hour: '2-digit',
     minute: '2-digit',
+    hour12: language === 'en',
   }).format(date);
 
-  return `${[day, m, y].join('.')} ${at} ${hour.replace(
-    ' ',
-    ':' + minute + ' '
-  )}`;
+  const timeSuffix = language === 'de' ? ' Uhr' : '';
+
+  return `${[day, m, y].join('.')} ${at} ${time}${timeSuffix}`;
 };
 
 export const downloadCSVFileFromBase64String = (base64File: string) => {
-  // decode the base-64 string
-  const csvContent = Buffer.from(base64File, 'base64');
+  // decode the base-64 string into a Uint8Array (Buffer's typings are no
+  // longer assignable to BlobPart since the SharedArrayBuffer split).
+  const csvContent = Uint8Array.from(Buffer.from(base64File, 'base64'));
 
   // Creating a Blob for having a csv file format
   // and passing the data with type

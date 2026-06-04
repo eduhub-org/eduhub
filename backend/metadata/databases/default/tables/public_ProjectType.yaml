@@ -1,11 +1,56 @@
 table:
-  schema: public
   name: ProjectType
-is_enum: true
+  schema: public
+object_relationships:
+  - name: CertificateTemplate
+    using:
+      foreign_key_constraint_on: certificateTemplateId
+array_relationships:
+  - name: ProjectDocumentationInstructions
+    using:
+      foreign_key_constraint_on:
+        column: projectTypeValue
+        table:
+          name: ProjectDocumentationInstruction
+          schema: public
+  - name: Projects
+    using:
+      foreign_key_constraint_on:
+        column: type
+        table:
+          name: Project
+          schema: public
 select_permissions:
   - role: anonymous
     permission:
       columns:
         - value
         - comment
+        - requiresDocumentation
+        - requiresPresentation
+        - requiresExternalUrl
+        - requiresCoverImage
+        - certificateTemplateId
+      filter: {}
+  - role: user_access
+    permission:
+      columns:
+        - value
+        - comment
+        - requiresDocumentation
+        - requiresPresentation
+        - requiresExternalUrl
+        - requiresCoverImage
+        - certificateTemplateId
+      filter: {}
+  - role: instructor_access
+    permission:
+      columns:
+        - value
+        - comment
+        - requiresDocumentation
+        - requiresPresentation
+        - requiresExternalUrl
+        - requiresCoverImage
+        - certificateTemplateId
       filter: {}

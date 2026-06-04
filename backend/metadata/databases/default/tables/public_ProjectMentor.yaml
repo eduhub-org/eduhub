@@ -1,0 +1,106 @@
+table:
+  name: ProjectMentor
+  schema: public
+object_relationships:
+  - name: Project
+    using:
+      foreign_key_constraint_on: projectId
+  - name: User
+    using:
+      foreign_key_constraint_on: userId
+insert_permissions:
+  - role: instructor_access
+    permission:
+      check:
+        Project:
+          ProjectCourses:
+            Course:
+              CourseInstructors:
+                User:
+                  id:
+                    _eq: X-Hasura-User-Id
+      columns:
+        - created_at
+        - id
+        - projectId
+        - updated_at
+        - userId
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - created_at
+        - id
+        - projectId
+        - updated_at
+        - userId
+      filter:
+        Project:
+          status:
+            _eq: PUBLISHED
+  - role: instructor_access
+    permission:
+      columns:
+        - created_at
+        - id
+        - projectId
+        - updated_at
+        - userId
+      filter:
+        Project:
+          _or:
+            - ProjectCourses:
+                Course:
+                  CourseInstructors:
+                    User:
+                      id:
+                        _eq: X-Hasura-User-Id
+            - ProjectMentors:
+                User:
+                  id:
+                    _eq: X-Hasura-User-Id
+  - role: user_access
+    permission:
+      columns:
+        - created_at
+        - id
+        - projectId
+        - updated_at
+        - userId
+      filter:
+        Project:
+          _or:
+            - ProjectAuthors:
+                User:
+                  id:
+                    _eq: X-Hasura-User-Id
+            - ProjectCourses:
+                Course:
+                  CourseEnrollments:
+                    User:
+                      id:
+                        _eq: X-Hasura-User-Id
+update_permissions:
+  - role: instructor_access
+    permission:
+      columns: []
+      filter:
+        Project:
+          ProjectCourses:
+            Course:
+              CourseInstructors:
+                User:
+                  id:
+                    _eq: X-Hasura-User-Id
+      check: null
+delete_permissions:
+  - role: instructor_access
+    permission:
+      filter:
+        Project:
+          ProjectCourses:
+            Course:
+              CourseInstructors:
+                User:
+                  id:
+                    _eq: X-Hasura-User-Id

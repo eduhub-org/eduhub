@@ -4,6 +4,14 @@ const isPublicLegacy = (filePath: string) => filePath.startsWith("https://") || 
 
 const isPublic = (filePath: string) => filePath.includes("/public/");
 
+const safeDecodeURIComponent = (value: string): string => {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+};
+
 export const getPublicUrl = (filePath: string): string | null  => {
   // log.debug(`getPublicUrl called with filePath: ${filePath}`);
 
@@ -17,7 +25,7 @@ export const getPublicUrl = (filePath: string): string | null  => {
   // log.debug(`isPublicLegacy: ${isPublicLegacy(filePath)}, isPublic: ${isPublic(filePath)}`);
 
   if (isPublicLegacy(filePath)) {
-    const decodedFilePath = decodeURIComponent(filePath);
+    const decodedFilePath = safeDecodeURIComponent(filePath);
     // log.debug(`Returning legacy public URL: ${decodedFilePath}`);
     return decodedFilePath;
   } else if (isPublic(filePath)) {

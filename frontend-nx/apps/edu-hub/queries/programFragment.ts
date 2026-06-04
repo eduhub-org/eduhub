@@ -10,6 +10,9 @@ export const PROGRAM_FRAGMENT_MINIMUM_PROPERTIES = gql`
     defaultApplicationEnd
     showExtendedApplicationPeriodBanner
     achievementRecordUploadDeadline
+    defaultProjectSubmissionDeadline
+    defaultProjectType
+    projectProposalsEnabledByDefault
     published
     type
     defaultFormbricksEnrollmentSurveyUrl
@@ -52,6 +55,7 @@ export const ADMIN_PROGRAM_FRAGMENT = gql`
     speakerQuestionnaire
     startQuestionnaire
     attendanceCertificateTemplateURL
+    attendanceCertificateTemplateId
     achievementCertificateTemplateURL
     visibility
     defaultFormbricksEnrollmentSurveyUrl
