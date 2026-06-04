@@ -111,8 +111,7 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
     refetchQueries,
   });
   const [updateAuthorParticipationStatus] = useRoleMutation(
-    UPDATE_PROJECT_AUTHOR_PARTICIPATION_STATUS,
-    { refetchQueries }
+    UPDATE_PROJECT_AUTHOR_PARTICIPATION_STATUS
   );
   const [markProjectReviewRequested, { loading: requestingProjectReview }] = useRoleMutation(
     MARK_PROJECT_REVIEW_REQUESTED,

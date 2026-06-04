@@ -40,6 +40,7 @@ This directory contains comprehensive development rules and guidelines for the E
 |------|-------------|-------------|
 | [Cursor Browser MCP](cursor-browser-mcp.mdc) | Prefer `cursor-ide-browser`; `user-playwright` as fallback if unavailable | @Browser, UI layout, inspecting localhost (always applied) |
 
+
 ### 🧪 Testing & Quality
 | Rule | Description | Applied When |
 |------|-------------|-------------|

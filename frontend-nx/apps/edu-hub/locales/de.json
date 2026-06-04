@@ -2251,6 +2251,11 @@
     "privacy": "Datenschutz",
     "faq": "FAQ",
     "newsletter": "Newsletter",
-    "sponsored_by": "Gefördert durch:"
+    "sponsored_by": "Gefördert durch:",
+    "dlc_logo_alt": "DLC-Logo",
+    "foerder_logo_alt": "Förderlogos",
+    "mastodon_alt": "Mastodon",
+    "linkedin_alt": "LinkedIn",
+    "instagram_alt": "Instagram"
   }
 }

@@ -315,7 +315,7 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
                   );
                   if (!name) return '';
                   return isExcludedAuthor(a)
-                    ? t('projects.table.author_excluded_inline', { name })
+                    ? tCourse('projects.table.author_excluded_inline', { name })
                     : name;
                 })
                 .filter(Boolean)
@@ -420,6 +420,7 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
       handlePublish,
       projectTypesQuery.loading,
       t,
+      tCourse,
       templateCopyCountByParentId,
       typeDescriptionsTooltip,
       typeDropdownOptions,

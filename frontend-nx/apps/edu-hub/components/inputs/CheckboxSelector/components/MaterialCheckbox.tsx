@@ -25,7 +25,7 @@ export const MaterialCheckbox: React.FC<MaterialCheckboxProps> = ({
     <div className={`relative ${className}`}>
       <div className="flex items-center">
         <label
-          className={`flex flex-1 items-center ${
+          className={`flex min-h-[44px] flex-1 items-center touch-manipulation ${
             disabled ? 'cursor-default' : 'cursor-pointer'
           }`}
         >

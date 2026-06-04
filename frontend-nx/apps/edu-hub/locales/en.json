@@ -2256,6 +2256,11 @@
     "privacy": "Privacy",
     "faq": "FAQ",
     "newsletter": "Newsletter",
-    "sponsored_by": "Sponsored by:"
+    "sponsored_by": "Sponsored by:",
+    "dlc_logo_alt": "DLC logo",
+    "foerder_logo_alt": "Funding partners logo",
+    "mastodon_alt": "Mastodon",
+    "linkedin_alt": "LinkedIn",
+    "instagram_alt": "Instagram"
   }
 }

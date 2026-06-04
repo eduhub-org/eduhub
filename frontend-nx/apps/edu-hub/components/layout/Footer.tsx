@@ -6,7 +6,7 @@ import { useTranslations } from 'next-intl';
 export const Footer: FC = () => {
   const t = useTranslations('footer');
   return (
-    <footer className="mt-7 sm:mt-20 bg-[#0F0F0F] text-white overflow-x-hidden">
+    <footer className="mt-7 sm:mt-20 bg-bg-footer text-white overflow-x-hidden">
       <div className="flex flex-col w-full p-6 md:px-16 max-w-screen-xl mx-auto min-w-0">
         <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-8 lg:gap-6 w-full min-w-0 max-w-full">
           <div className="order-1 lg:order-2 flex flex-col w-full min-w-0 max-w-full lg:max-w-[36rem]">
@@ -17,7 +17,7 @@ export const Footer: FC = () => {
               <div className="flex items-end w-full max-w-[200px] h-[80px] shrink-0">
                 <Image
                   src="/images/share/logo_dlc.svg"
-                  alt="DLC Logo"
+                  alt={t('dlc_logo_alt')}
                   width={200}
                   height={80}
                   unoptimized
@@ -27,7 +27,7 @@ export const Footer: FC = () => {
               <div className="flex items-end w-full max-w-[400px] h-[80px] min-w-0 sm:flex-1 sm:min-w-[12rem]">
                 <Image
                   src="/images/share/foerderlogos_2.svg"
-                  alt="Förder Logo"
+                  alt={t('foerder_logo_alt')}
                   width={400}
                   height={80}
                   priority
@@ -68,11 +68,16 @@ export const Footer: FC = () => {
         <div className="flex justify-between items-end mt-8 min-w-0 gap-4">
           <span className="text-sm font-light shrink-0">© 2010 — {new Date().getFullYear()}</span>
           <div className="flex items-center shrink-0">
-            <a href="https://norden.social/@opencampus_sh" target="_blank" rel="noopener noreferrer">
-              <div className="flex items-center w-[23px] h-[23px]">
+            <a
+              href="https://norden.social/@opencampus_sh"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex min-h-[44px] min-w-[44px] items-center justify-center touch-manipulation"
+            >
+              <div className="flex h-[23px] w-[23px] items-center">
                 <Image
                   src="/images/share/mastodon-icon.svg"
-                  alt="Mastodon"
+                  alt={t('mastodon_alt')}
                   width={23}
                   height={23}
                   unoptimized
@@ -80,11 +85,16 @@ export const Footer: FC = () => {
                 />
               </div>
             </a>
-            <a href="https://www.linkedin.com/school/opencampus-sh" target="_blank" rel="noopener noreferrer">
-              <div className="ml-6 sm:ml-20 flex items-center w-[23px] h-[23px]">
+            <a
+              href="https://www.linkedin.com/school/opencampus-sh"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ml-6 flex min-h-[44px] min-w-[44px] items-center justify-center touch-manipulation sm:ml-20"
+            >
+              <div className="flex h-[23px] w-[23px] items-center">
                 <Image
                   src="/images/share/linkedin-icon.svg"
-                  alt="LinkedIn"
+                  alt={t('linkedin_alt')}
                   width={23}
                   height={23}
                   unoptimized
@@ -96,11 +106,12 @@ export const Footer: FC = () => {
               href="https://www.instagram.com/opencampus.sh?igsh=a3dlN2J4bXo2ejM0"
               target="_blank"
               rel="noopener noreferrer"
+              className="ml-6 flex min-h-[44px] min-w-[44px] items-center justify-center touch-manipulation sm:ml-20"
             >
-              <div className="ml-6 sm:ml-20 flex items-center w-[23px] h-[23px]">
+              <div className="flex h-[23px] w-[23px] items-center">
                 <Image
                   src="/images/share/instagram-icon.svg"
-                  alt="Instagram"
+                  alt={t('instagram_alt')}
                   width={23}
                   height={23}
                   unoptimized

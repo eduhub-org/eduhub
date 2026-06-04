@@ -44,6 +44,16 @@ const StatusCard: FC<{
   );
 };
 
+const getSafeExternalUrl = (value: string | null | undefined): string | null => {
+  if (!value) return null;
+  try {
+    const parsed = new URL(value);
+    return parsed.protocol === 'https:' || parsed.protocol === 'http:' ? parsed.toString() : null;
+  } catch {
+    return null;
+  }
+};
+
 const buildCourseChatLink = (course: Course_Course_by_pk & { matrixRoomId?: string | null }): string | null => {
   const matrixRoomId = course.matrixRoomId;
   const elementBaseUrl = process.env.NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL?.replace(/\/+$/, '');
@@ -69,7 +79,7 @@ const CourseLinkInfos: FC<{ course: Course_Course_by_pk }> = ({ course }) => {
   const chatLink = buildCourseChatLink(course);
   const onlineLocation = course.CourseLocations?.find((location) => location.locationOption === 'ONLINE');
   const hasOnlineLocation = Boolean(onlineLocation);
-  const onlineMeetingUrl = onlineLocation?.defaultSessionAddress?.trim() || null;
+  const onlineMeetingUrl = getSafeExternalUrl(onlineLocation?.defaultSessionAddress?.trim());
   const hasOnlineMeeting = Boolean(onlineMeetingUrl);
   const onlineMeetingUnavailableMessage = hasOnlineLocation
     ? t('general.link_will_be_provided_soon')
@@ -92,7 +102,7 @@ const CourseLinkInfos: FC<{ course: Course_Course_by_pk }> = ({ course }) => {
       <div className="w-full flex flex-col items-center">
         {hasOnlineMeeting ? (
           <Button
-            className={`bg-blue-200 hover:shadow-lg ${courseActionButtonClassName}`}
+            className={`hover:shadow-lg ${courseActionButtonClassName}`}
             as="a"
             href={onlineMeetingUrl!}
             target="_blank"

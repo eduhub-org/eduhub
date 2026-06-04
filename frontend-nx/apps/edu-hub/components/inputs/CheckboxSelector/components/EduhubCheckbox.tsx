@@ -21,7 +21,9 @@ export const EduhubCheckbox: React.FC<EduhubCheckboxProps> = ({
   return (
     <div className={`relative ${className}`}>
       <label
-        className={`flex items-center ${disabled ? 'cursor-default' : 'cursor-pointer'}`}
+        className={`flex min-h-[44px] items-center touch-manipulation ${
+          disabled ? 'cursor-default' : 'cursor-pointer'
+        }`}
       >
         <input
           type="checkbox"

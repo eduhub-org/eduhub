@@ -495,7 +495,7 @@ export const FileUploadField: FC<FileUploadFieldProps> = ({
           onClick={handleClick}
           disabled={isUploading}
           aria-label={t('file_upload.replace')}
-          className="text-gray-700 hover:bg-gray-100"
+          className="text-label-primary hover:bg-bg-secondary"
         >
           <MdUpload />
         </IconButton>
@@ -506,7 +506,7 @@ export const FileUploadField: FC<FileUploadFieldProps> = ({
           onClick={handleDownloadClick}
           disabled={isUploading}
           aria-label={t('file_upload.download')}
-          className="border border-gray-300 text-gray-700 hover:bg-gray-100"
+          className="border border-border-primary text-label-primary hover:bg-bg-secondary"
         >
           <MdDownload />
         </IconButton>
@@ -517,7 +517,7 @@ export const FileUploadField: FC<FileUploadFieldProps> = ({
           onClick={handleRemoveClick}
           disabled={isUploading}
           aria-label={t('file_upload.remove')}
-          className="text-red-600 hover:text-red-700"
+          className="text-error hover:opacity-80"
         >
           <MdDelete />
         </IconButton>
