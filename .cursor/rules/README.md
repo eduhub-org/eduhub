@@ -35,6 +35,11 @@ This directory contains comprehensive development rules and guidelines for the E
 |------|-------------|-------------|
 | [Translation Implementation](translation-implementation.mdc) | German 'Du' form requirements and component-based organization | Working with translations, i18n, or localization |
 
+### 🌐 Browser & UI verification
+| Rule | Description | Applied When |
+|------|-------------|-------------|
+| [Cursor Browser MCP](cursor-browser-mcp.mdc) | Prefer `cursor-ide-browser`; `user-playwright` as fallback if unavailable | @Browser, UI layout, inspecting localhost (always applied) |
+
 ### 🧪 Testing & Quality
 | Rule | Description | Applied When |
 |------|-------------|-------------|
