@@ -153,6 +153,19 @@ const Projects: FC<ProjectsProps> = ({
     Boolean(userId) &&
     !isProjectSubmissionDeadlinePassed(null, effectiveSubmissionDeadline);
 
+  const showProjectsTableSection =
+    showMyProjectPanel ||
+    tableProjects.length > 0 ||
+    showProposeButton;
+
+  const projectsSectionHeading = showMyProjectPanel
+    ? t('projects.section_heading')
+    : t('projects.section_heading_all');
+
+  if (!showMyProjectPanel && !showProjectsTableSection) {
+    return null;
+  }
+
   return (
     <div className="mt-24 mb-24 min-w-0 mx-6 xl:mx-0">
       {showMyProjectPanel && userId ? (
@@ -175,23 +188,25 @@ const Projects: FC<ProjectsProps> = ({
         </>
       ) : null}
 
-      <div className="w-full min-w-0">
-        <SectionTitle>{t('projects.section_heading')}</SectionTitle>
-        <ProjectsTable
-          projects={tableProjects}
-          loading={projectsQuery.loading}
-          error={projectsQuery.error}
-          courseId={courseId}
-          userId={userId ?? undefined}
-          showProposeButton={showProposeButton}
-          hasMyProject={hasMyActiveProject}
-          courseDefaultSubmissionDeadline={effectiveSubmissionDeadline}
-          submissionDeadlineDefaultSource={submissionDeadlineDefaultSource}
-          refetchQueries={REFETCH_QUERIES}
-          onProposeClick={() => setProposeDialogOpen(true)}
-          onActionError={handleActionError}
-        />
-      </div>
+      {showProjectsTableSection ? (
+        <div className="w-full min-w-0">
+          <SectionTitle>{projectsSectionHeading}</SectionTitle>
+          <ProjectsTable
+            projects={tableProjects}
+            loading={projectsQuery.loading}
+            error={projectsQuery.error}
+            courseId={courseId}
+            userId={userId ?? undefined}
+            showProposeButton={showProposeButton}
+            hasMyProject={hasMyActiveProject}
+            courseDefaultSubmissionDeadline={effectiveSubmissionDeadline}
+            submissionDeadlineDefaultSource={submissionDeadlineDefaultSource}
+            refetchQueries={REFETCH_QUERIES}
+            onProposeClick={() => setProposeDialogOpen(true)}
+            onActionError={handleActionError}
+          />
+        </div>
+      ) : null}
 
       {userId ? (
         <ProposeProjectDialog
