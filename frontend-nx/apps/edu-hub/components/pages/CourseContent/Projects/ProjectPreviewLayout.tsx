@@ -1,13 +1,14 @@
 import { FC, ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
 import { MdDownload, MdOpenInNew } from 'react-icons/md';
-import { ProjectParticipationStatus_enum } from '../../../../__generated__/globalTypes';
 import UserCard from '../../../common/UserCard';
 import { Button } from '../../../common/Button';
 import { ProjectRow } from './types';
+import { getDisplayAuthors, isExcludedAuthor } from './projectAuthors';
 import { isProjectResourceUrlPresent, safeProjectExternalHref } from './projectMandatory';
+import { resolveProjectCoverImageSrc } from './projectCoverImage';
 
-export const PROJECT_COVER_PLACEHOLDER_SRC = '/images/common/project-cover-placeholder.svg';
+export { PROJECT_COVER_PLACEHOLDER_SRC } from './projectCoverImage';
 
 interface ProjectPreviewLayoutProps {
   project: ProjectRow;
@@ -23,6 +24,11 @@ interface ProjectPreviewLayoutProps {
   descriptionSlot?: ReactNode;
   /** Rendered directly under `titleRow` (e.g. submission deadline). */
   belowTitleRow?: ReactNode;
+  /**
+   * Also list EXCLUDED authors (marked as excluded). Set for privileged viewers
+   * (instructors/admins) and the excluded author's own "My Project" view.
+   */
+  includeExcludedAuthors?: boolean;
 }
 
 const ProjectPreviewLayout: FC<ProjectPreviewLayoutProps> = ({
@@ -33,14 +39,14 @@ const ProjectPreviewLayout: FC<ProjectPreviewLayoutProps> = ({
   taglineSlot,
   descriptionSlot,
   belowTitleRow,
+  includeExcludedAuthors = false,
 }) => {
   const t = useTranslations('course');
 
-  const acceptedAuthors = (project.ProjectAuthors ?? []).filter(
-    (a) => a.participationStatus === ProjectParticipationStatus_enum.ACCEPTED
-  );
-  const coverSrc =
-    project.coverImageUrl?.trim() ? project.coverImageUrl.trim() : PROJECT_COVER_PLACEHOLDER_SRC;
+  const displayAuthors = getDisplayAuthors(project.ProjectAuthors, {
+    includeExcluded: includeExcludedAuthors,
+  });
+  const coverSrc = resolveProjectCoverImageSrc(project.coverImageUrl);
   const hasTagline = Boolean(project.tagline?.trim());
   const hasDescription = Boolean(project.description?.trim());
 
@@ -108,16 +114,17 @@ const ProjectPreviewLayout: FC<ProjectPreviewLayoutProps> = ({
           )}
         </div>
 
-        {acceptedAuthors.length > 0 ? (
+        {displayAuthors.length > 0 ? (
           <div className="shrink-0 w-full lg:w-64 lg:max-w-xs lg:border-l lg:border-border-primary lg:pl-6">
             <h4 className="text-sm font-semibold text-label-primary mb-3">
               {t('projects.table.expandable_authors_heading')}
             </h4>
             <ul className="space-y-2 list-none p-0 m-0">
-              {acceptedAuthors.map((authorRow) => {
+              {displayAuthors.map((authorRow) => {
                 const user = authorRow.User;
+                const excluded = isExcludedAuthor(authorRow);
                 return (
-                  <li key={authorRow.id}>
+                  <li key={authorRow.id} className={excluded ? 'opacity-60' : undefined}>
                     <UserCard
                       className="flex items-start"
                       user={{
@@ -130,6 +137,11 @@ const ProjectPreviewLayout: FC<ProjectPreviewLayoutProps> = ({
                       }}
                       size="compact"
                     />
+                    {excluded ? (
+                      <span className="mt-1 inline-block text-xs font-medium text-label-secondary italic">
+                        {t('projects.table.author_excluded_marker')}
+                      </span>
+                    ) : null}
                   </li>
                 );
               })}

@@ -320,6 +320,7 @@
       "course_not_available": "Kurs nicht verfügbar",
       "to_course_chat": "ZUM CHAT",
       "to_online_meeting": "ZUM ONLINE-MEETING",
+      "no_online_participation_available": "Für diesen Kurs ist keine Online-Teilnahme verfügbar.",
       "speaker": "Referent:in",
       "link_will_be_provided_soon": "(Link wird hier in Kürze bereitgestellt)",
       "address_will_be_provided_soon": "(Adresse wird hier in Kürze angegeben)"
@@ -361,7 +362,7 @@
       }
     },
     "projects": {
-      "section_heading": "Projekte in diesem Kurs",
+      "section_heading": "Andere Projekte in diesem Kurs",
       "action_failed": "Aktion fehlgeschlagen",
       "status": {
         "TEMPLATE": "Projektvorlage",
@@ -397,6 +398,8 @@
         "title": "Titel",
         "authors": "Autor:innen",
         "no_authors": "Offene Vorlage",
+        "author_excluded_marker": "Aus finaler Einreichung ausgeschlossen",
+        "author_excluded_inline": "{name} (ausgeschlossen)",
         "form_new_group": "Neues Projektteam bilden",
         "enter_project_disabled_project_deadline": "Die Abgabefrist für dieses Projekt ist am {date} abgelaufen. Eine Teilnahme ist nicht mehr möglich.",
         "enter_project_disabled_has_project": "Du nimmst bereits an einem Projekt in diesem Kurs teil und kannst hier nicht erneut einsteigen.",
@@ -527,13 +530,16 @@
         "action_tooltip_join_requests_none": "Es gibt derzeit keine offenen Beitrittsanfragen.",
         "submitted_banner": "Am {date} eingereicht von {name}. Das Projekt ist nun für Änderungen gesperrt.",
         "sent_back_banner": "Dein Projekt wurde zur Überarbeitung zurückgegeben. Bitte aktualisiere es und reiche erneut ein.",
-        "deadline_passed_banner": "Die Abgabefrist ist am {date} abgelaufen."
+        "deadline_passed_banner": "Die Abgabefrist ist am {date} abgelaufen.",
+        "excluded_banner": "Die einreichende Person hat Dich von der finalen Einreichung dieses Projekts ausgeschlossen. Du zählst nicht mehr zu den Autor:innen."
       },
       "submit_dialog": {
         "title": "Projekt zur Bewertung einreichen",
-        "body_main": "Nach dem Einreichen geht das Projekt in die Bewertung und das Team wird gesperrt.",
+        "body_main": "Nach dem Einreichen geht das Projekt in die Bewertung und ist für Änderungen gesperrt.",
         "body_co_authors": "Alle Mitautor:innen verlieren ebenfalls die Bearbeitungsrechte.",
         "body_irreversible": "Eine Kursleitung kann das Projekt bei Bedarf zur Überarbeitung zurückgeben.",
+        "contributors_intro": "Wähle alle Autor:innen aus, die aktiv und substanziell am Projekt mitgearbeitet haben.",
+        "contributor_self_suffix": "(Du)",
         "confirm_button": "Einreichen"
       },
       "manage_requests": {
@@ -746,6 +752,7 @@
     "achievementCertificateDownload": "Leistungszertifikat herunterladen",
     "attendanceCertificateDownload": "Anwesenheitsbescheinigung herunterladen",
     "congrats_completion": "Herzlichen Glückwunsch zum Abschluss des Kurses!",
+    "view_my_certificates": "Zu meinen Zertifikaten",
     "add-session-address": "Neue Adresse",
     "upgrade-status": "Kursstatus erhöhen und zum nächsten Tab wechseln",
     "to-be-defined": "Der Ort bzw. die Adresse wird noch bekannt gegeben.",
@@ -1309,6 +1316,7 @@
         "no_authors": "Noch keine Autor:innen.",
         "remove_author_aria": "Autor:in entfernen",
         "requested": "angefragt",
+        "excluded": "ausgeschlossen",
         "mentors_heading": "Mentor:innen",
         "add_mentor": "Mentor:in hinzufügen",
         "no_mentors": "Noch keine Mentor:innen.",
@@ -2243,6 +2251,11 @@
     "privacy": "Datenschutz",
     "faq": "FAQ",
     "newsletter": "Newsletter",
-    "sponsored_by": "Gefördert durch:"
+    "sponsored_by": "Gefördert durch:",
+    "dlc_logo_alt": "DLC-Logo",
+    "foerder_logo_alt": "Förderlogos",
+    "mastodon_alt": "Mastodon",
+    "linkedin_alt": "LinkedIn",
+    "instagram_alt": "Instagram"
   }
 }

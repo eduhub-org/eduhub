@@ -39,6 +39,7 @@ module.exports = {
           secondary: 'var(--eduhub-bg-secondary)',
           modal: 'var(--eduhub-bg-modal)',
           card: 'var(--eduhub-bg-card)',
+          footer: 'var(--eduhub-bg-footer)',
         },
         success: 'var(--eduhub-success)',
         warning: 'var(--eduhub-warning)',

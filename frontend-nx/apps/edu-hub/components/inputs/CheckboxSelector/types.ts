@@ -11,5 +11,8 @@ export type CheckboxSelectorProps = {
   errorText?: string;
   className?: string;
   identifierVariables?: Record<string, any>;
+  /** Prevents interaction; checkbox appears greyed out. */
   disabled?: boolean;
+  /** Omits saved snackbar and error dialog (e.g. checkbox lists inside modals). */
+  suppressFeedback?: boolean;
 };

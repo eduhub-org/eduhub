@@ -85,19 +85,19 @@ export const Attendances: FC<AttendancesProps> = ({ course }) => {
   return (
     <div className="flex flex-col w-full mb-4 md:mb-0">
       <SectionTitle>{t('attendances.attendances')}</SectionTitle>
-      <span className="text-lg mb-4">
-        {t('attendances.max_missed_sessions_plural', {
-          count: course.maxMissedSessions,
-        })}
-      </span>
-      <div>
+      <div className="rounded-2xl overflow-hidden border border-border-primary bg-fill-primary light text-label-primary p-4 min-w-0">
+        <span className="text-lg mb-4 block">
+          {t('attendances.max_missed_sessions_plural', {
+            count: course.maxMissedSessions,
+          })}
+        </span>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3">
           {course.Sessions.map((session) => (
             <AttendanceEntry key={session.id} session={session} />
           ))}
         </div>
+        <AttendanceStatusLegend />
       </div>
-      <AttendanceStatusLegend />
     </div>
   );
 };

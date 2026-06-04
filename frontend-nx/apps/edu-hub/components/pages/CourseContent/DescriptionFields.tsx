@@ -46,12 +46,15 @@ export const DescriptionFields: FC<IProps> = ({ course }) => {
         </div>
       ) : null}
       {isAchievementCertificatePossible ? (
-        <div className="flex flex-wrap mt-10 bg-fill-primary text-label-primary light rounded-2xl p-4 mx-6 xl:mx-0">
-          <ReactMarkdown className="prose max-w-none break-words [&_*]:break-words" remarkPlugins={[remarkGfm]}>
+        <div className="flex flex-wrap mt-10 bg-transparent text-label-primary rounded-2xl p-4 mx-6 xl:mx-0">
+          <ReactMarkdown
+            className="prose max-w-none break-words [&_*]:break-words text-label-primary prose-headings:font-semibold prose-headings:text-label-primary prose-p:text-label-primary prose-strong:text-label-primary prose-li:text-label-primary"
+            remarkPlugins={[remarkGfm]}
+          >
             {t('learning.general_achievement_certificate_conditions').replace(/\n/g, '  \n')}
           </ReactMarkdown>
         </div>
-      ) : null}{' '}
+      ) : null}
     </>
   );
 };

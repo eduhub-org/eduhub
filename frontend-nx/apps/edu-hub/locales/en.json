@@ -320,6 +320,7 @@
       "course_not_available": "Course not available",
       "to_course_chat": "GO TO CHAT",
       "to_online_meeting": "GO TO ONLINE MEETING",
+      "no_online_participation_available": "Online participation is not available for this course.",
       "speaker": "Speaker",
       "link_will_be_provided_soon": "(Link will be provided here soon)",
       "address_will_be_provided_soon": "(Address will be provided here soon)"
@@ -361,7 +362,7 @@
       }
     },
     "projects": {
-      "section_heading": "Projects in this course",
+      "section_heading": "Other projects in this course",
       "action_failed": "Action failed",
       "status": {
         "TEMPLATE": "Project template",
@@ -397,6 +398,8 @@
         "title": "Title",
         "authors": "Authors",
         "no_authors": "Open template",
+        "author_excluded_marker": "Excluded from final submission",
+        "author_excluded_inline": "{name} (excluded)",
         "form_new_group": "Form new project team",
         "enter_project_disabled_project_deadline": "The submission deadline for this project passed on {date}. You can no longer join it.",
         "enter_project_disabled_has_project": "You are already on a project in this course and cannot join another one here.",
@@ -527,13 +530,16 @@
         "action_tooltip_join_requests_none": "There are no open join requests at the moment.",
         "submitted_banner": "Submitted on {date} by {name}. The team has been locked from changes.",
         "sent_back_banner": "Your project was sent back for revisions. Please update it and submit again.",
-        "deadline_passed_banner": "The submission deadline passed on {date}."
+        "deadline_passed_banner": "The submission deadline passed on {date}.",
+        "excluded_banner": "The submitting author excluded you from this project's final submission. You no longer count as one of its authors."
       },
       "submit_dialog": {
         "title": "Submit project for review",
-        "body_main": "Once submitted, the project enters review and the team is locked.",
+        "body_main": "Once submitted, the project enters review and is locked from further changes.",
         "body_co_authors": "All co-authors will lose edit access too.",
         "body_irreversible": "An instructor can send it back for revisions if needed.",
+        "contributors_intro": "Select every author who actively and substantially worked on the project.",
+        "contributor_self_suffix": "(you)",
         "confirm_button": "Submit"
       },
       "manage_requests": {
@@ -756,6 +762,7 @@
     "achievementCertificateDownload": "Download achievement certificate",
     "attendanceCertificateDownload": "Download attendance certificate",
     "congrats_completion": "Congratulations for finishing this course!",
+    "view_my_certificates": "Go to my certificates",
     "add-session-address": "New address",
     "upgrade-status": "Update course status and switch to next tab.",
     "to-be-defined": "Location still to be determined",
@@ -1327,6 +1334,7 @@
         "no_authors": "No authors yet.",
         "remove_author_aria": "Remove author",
         "requested": "requested",
+        "excluded": "excluded",
         "mentors_heading": "Mentors",
         "add_mentor": "Add mentor",
         "no_mentors": "No mentors yet.",
@@ -2248,6 +2256,11 @@
     "privacy": "Privacy",
     "faq": "FAQ",
     "newsletter": "Newsletter",
-    "sponsored_by": "Sponsored by:"
+    "sponsored_by": "Sponsored by:",
+    "dlc_logo_alt": "DLC logo",
+    "foerder_logo_alt": "Funding partners logo",
+    "mastodon_alt": "Mastodon",
+    "linkedin_alt": "LinkedIn",
+    "instagram_alt": "Instagram"
   }
 }

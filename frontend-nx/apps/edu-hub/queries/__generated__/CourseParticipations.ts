@@ -119,6 +119,9 @@ export interface CourseParticipations_Course_by_pk_ProjectCourses_Project {
   title: string;
   status: ProjectStatus_enum;
   rating: ProjectRating_enum | null;
+  /**
+   * Optional comment from course staff or project mentor accompanying rating (UNRATED/PASSED/FAILED).
+   */
   ratingComment: string | null;
   /**
    * An array relationship

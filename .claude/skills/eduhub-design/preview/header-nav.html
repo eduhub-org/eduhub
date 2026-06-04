@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html,body{margin:0}
+  body{font-family:var(--font-body);margin:0}
+  .hero{position:relative;height:200px;background:url('../assets/hero-background.png') center/cover}
+  .bar{position:absolute;top:0;left:0;right:0;background:rgba(34,34,34,.5);display:flex;align-items:center;justify-content:space-between;padding:14px 24px;box-sizing:border-box}
+  .left{display:flex;align-items:center;gap:10px}
+  .left img.ring{width:32px;height:32px}
+  .left img.word{height:26px}
+  .right{display:flex;align-items:center;gap:18px;color:#fff;font-size:15px}
+  .lang button{background:none;border:none;color:#fff;cursor:pointer;font-family:var(--font-body);font-size:15px}
+  .lang .on{font-weight:700}.lang .off{font-weight:300;opacity:.8}
+  .btn{border-radius:9999px;padding:7px 18px;font-family:var(--font-body);font-weight:500;font-size:14px;border:2px solid #D8D8D8;color:#fff;background:transparent;cursor:pointer}
+  .btn.filled{background:#F2F2F2;color:#222;border-color:#F2F2F2}
+</style>
+</head>
+<body>
+  <div class="hero">
+    <div class="bar">
+      <div class="left">
+        <img class="ring" src="../assets/oc-logo.svg" alt="opencampus">
+        <img class="word" src="../assets/eduhub-logo.svg" alt="EduHub">
+      </div>
+      <div class="right">
+        <span class="lang"><button class="on">EN</button> | <button class="off">DE</button></span>
+        <button class="btn">Login</button>
+        <button class="btn filled">Register</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

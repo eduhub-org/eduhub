@@ -137,6 +137,12 @@ export interface FileUploadFieldProps {
   density?: 'default' | 'compact';
 
   /**
+   * Uploaded-state layout. "stacked" shows a full-width preview with vertical action
+   * icons inside the bordered container (no filename). "default" uses a horizontal row.
+   */
+  layout?: 'default' | 'stacked';
+
+  /**
    * When set, shows an info control that opens a tooltip (e.g. format limits and upload guidance).
    * Use a multi-sentence string; newlines are preserved in the tooltip.
    */

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html,body{margin:0}
+  body{font-family:var(--font-body);background:#222222;padding:24px;display:flex;gap:30px;align-items:flex-start}
+  .menu{min-width:225px;background:#fff;color:#222;border-radius:8px;box-shadow:0 4px 6px rgba(0,0,0,.1);padding:8px 0;overflow:hidden}
+  .mi{padding:11px 22px;font-size:17px;cursor:pointer}
+  .mi:hover{background:#E5E5E5}
+  .mi.sel{background:#F2F2F2;border-left:3px solid #FFA665;padding-left:19px}
+  .note{color:#888;font-size:13px;max-width:230px;line-height:1.5}
+  .note b{color:#D8D8D8;font-weight:600}
+</style>
+</head>
+<body>
+  <div class="menu">
+    <div class="mi sel">Profile</div>
+    <div class="mi">My Certificates</div>
+    <div class="mi">Programs</div>
+    <div class="mi">Experts</div>
+    <div class="mi">Logout</div>
+  </div>
+  <div class="note"><b>Account menu</b> — flips to <b>.light</b>: white surface, 8px radius, soft shadow. Hover = <b>#E5E5E5</b>. Selected item gets a warning-orange left accent bar.</div>
+</body>
+</html>
