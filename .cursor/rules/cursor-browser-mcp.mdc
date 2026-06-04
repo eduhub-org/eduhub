@@ -1,0 +1,46 @@
+---
+description: Prefer cursor-ide-browser for UI work; use Playwright as fallback when internal browser MCP is unavailable
+alwaysApply: true
+---
+
+# Cursor IDE Browser (Playwright as fallback)
+
+When the user mentions **@Browser**, an open browser tab, UI verification,
+layout bugs, or asks you to look at the running app:
+
+## 1. Primary: `cursor-ide-browser`
+
+Use **`cursor-ide-browser`** when it is available. It controls the **Browser tab
+inside Cursor** (the user's real session, cookies, and open tabs).
+
+1. Read tool schemas under the `cursor-ide-browser` MCP server before calling.
+2. Start with `browser_tabs` (`action: "list"`) to see open tabs and URLs.
+3. Prefer `browser_snapshot` for structure; `browser_take_screenshot` for visuals.
+4. Follow lock workflow from server instructions: lock before interactions on an
+   existing tab; unlock when done.
+5. Use `browser_navigate` without `position` for background checks (preserves focus).
+
+## 2. Fallback: `user-playwright`
+
+Use **`user-playwright`** when:
+
+- `cursor-ide-browser` is **not** in the available MCP servers, or
+- Calls fail repeatedly (server down, no tab, permission errors), or
+- The environment has no Cursor IDE browser (e.g. some Claude Code runs), or
+- The user **explicitly** asks for Playwright (headless, E2E, `browser_run_code_unsafe`).
+
+When falling back, **tell the user briefly** that you are using a separate
+browser session, not their open Cursor tab.
+
+Do **not** default to Playwright if `cursor-ide-browser` works and matches the task.
+
+| MCP server | When |
+|------------|------|
+| `cursor-ide-browser` | Default — Cursor Browser tab, @Browser, UI review |
+| `user-playwright` | Fallback or explicit Playwright request |
+
+Playwright runs a **separate** instance; it does not see the user's Cursor Browser tabs.
+
+## If the wrong tool was used
+
+Switch to the correct server, re-check state, and note which browser you used.

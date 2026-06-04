@@ -108,6 +108,15 @@ context from this file by design.
 | `/create-project-issue` | Filing a GitHub issue on the EduHub project board |
 | `/pencil-design` | Reading/editing `.pen` design files via the Pencil MCP |
 
+**Browser / UI inspection:** Prefer MCP server **`cursor-ide-browser`** (Cursor’s
+internal Browser tab — sees the user’s open tabs, session, and cookies). Use
+**`user-playwright`** only as a **fallback** when `cursor-ide-browser` is
+unavailable (MCP not enabled, tool errors, no Browser tab, or environments like
+Claude Code without the Cursor IDE browser). If the user **explicitly** asks for
+Playwright (headless, E2E, isolated session), use Playwright directly. When
+falling back, say briefly that you are not on the user’s Cursor tab. Details:
+`.cursor/rules/cursor-browser-mcp.mdc`, `.cursor/skills/cursor-browser/`.
+
 Related sources (kept in sync but not loaded automatically): `.cursor/rules/`
 (Cursor format) and `.codex/skills/` (Codex format). Prefer the `.claude/commands/`
 versions when they disagree; treat `frontend-nx/.releaserc.json` and

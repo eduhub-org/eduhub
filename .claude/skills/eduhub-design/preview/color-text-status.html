@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html,body{margin:0}
+  body{font-family:var(--font-body);background:#222222;color:#F2F2F2;padding:22px}
+  .grid{display:flex;gap:14px;align-items:flex-start}
+  .col{flex:1}
+  .lab{font-size:12px;opacity:.6;margin-bottom:8px;letter-spacing:.04em;text-transform:uppercase}
+  .chip{display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:14px}
+  .dot{width:18px;height:18px;border-radius:50%;flex:none}
+  .hex{font-size:12px;opacity:.7;margin-left:auto}
+</style>
+</head>
+<body>
+  <div class="grid">
+    <div class="col">
+      <div class="lab">Text on dark</div>
+      <div class="chip"><span class="dot" style="background:#F2F2F2"></span> label-primary <span class="hex">#F2F2F2</span></div>
+      <div class="chip"><span class="dot" style="background:#D8D8D8"></span> label-secondary <span class="hex">#D8D8D8</span></div>
+      <div class="chip"><span class="dot" style="background:#888888"></span> label-disabled <span class="hex">#888888</span></div>
+    </div>
+    <div class="col">
+      <div class="lab">Status</div>
+      <div class="chip"><span class="dot" style="background:#A2EBA0"></span> confirmed / current <span class="hex">#A2EBA0</span></div>
+      <div class="chip"><span class="dot" style="background:#FFA665"></span> invited <span class="hex">#FFA665</span></div>
+      <div class="chip"><span class="dot" style="background:#F2991D66"></span> missed <span class="hex">#F2991D66</span></div>
+    </div>
+  </div>
+</body>
+</html>

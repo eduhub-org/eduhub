@@ -50,6 +50,8 @@ export interface TableGridProps<T extends BaseRow> {
   onSortingChange?: (sorting: SortingState | ((prev: SortingState) => SortingState)) => void;
   /** When true, uses reduced row padding for more compact table layout */
   compactRows?: boolean;
+  /** When true, wraps the table in a rounded card (e.g. course page sections) */
+  rounded?: boolean;
 }
 
 export interface UseTableGridProps<V> {

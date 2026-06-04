@@ -18,6 +18,7 @@ const CheckboxSelector: React.FC<CheckboxSelectorProps> = ({
   className = '',
   identifierVariables,
   disabled = false,
+  suppressFeedback = false,
 }) => {
   const t = useTranslations('common');
 
@@ -51,14 +52,21 @@ const CheckboxSelector: React.FC<CheckboxSelectorProps> = ({
     <>
       {variant === 'material' ? <MaterialCheckbox {...checkboxProps} /> : <EduhubCheckbox {...checkboxProps} />}
 
-      {/* Notification Components */}
-      <NotificationSnackbar
-        open={showSavedNotification}
-        onClose={() => setShowSavedNotification(false)}
-        message={t('notification_snackbar.saved')}
-      />
+      {!suppressFeedback ? (
+        <>
+          <NotificationSnackbar
+            open={showSavedNotification}
+            onClose={() => setShowSavedNotification(false)}
+            message={t('notification_snackbar.saved')}
+          />
 
-      <ErrorMessageDialog errorMessage={typeof error === 'string' ? error : ''} open={!!error} onClose={resetError} />
+          <ErrorMessageDialog
+            errorMessage={typeof error === 'string' ? error : ''}
+            open={!!error}
+            onClose={resetError}
+          />
+        </>
+      ) : null}
     </>
   );
 };

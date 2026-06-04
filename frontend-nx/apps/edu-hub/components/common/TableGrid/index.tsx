@@ -53,6 +53,7 @@ const TableGrid = <T extends BaseRow,>({
   sorting: externalSorting,
   onSortingChange: externalOnSortingChange,
   compactRows = false,
+  rounded = false,
 }: TableGridProps<T>) => {
   const onGlobalFilterChange = useCallback(
     (value: string) => {
@@ -315,9 +316,12 @@ const TableGrid = <T extends BaseRow,>({
           overflow: 'hidden',
         };
 
-  return (
-    <div>
-      <div className="flex justify-between items-center mb-4">
+  const showToolbar = Boolean(onAddButtonClick) || showCheckbox || showGlobalSearchField;
+
+  const toolbarClassName = 'flex justify-between items-center mb-4';
+
+  const toolbar = showToolbar ? (
+      <div className={toolbarClassName}>
         <div className="flex items-center">
           {onAddButtonClick && (
             <div className="text-label-primary mr-4">
@@ -451,11 +455,9 @@ const TableGrid = <T extends BaseRow,>({
           />
         )}
       </div>
+  ) : null;
 
-      {/* Table Container with horizontal scroll */}
-      <div className="overflow-x-auto">
-        <div className="w-full" style={{ minWidth: `${mainRowContentWidth}px` }}>
-          {/* Header row */}
+  const tableHeaderRow = (
           <div className="flex items-center mb-1 bg-bg-primary text-label-primary py-2">
         <div
           className={`flex-grow min-w-0 flex gap-3 ${!showCheckbox ? 'pl-3' : ''}`}
@@ -501,9 +503,10 @@ const TableGrid = <T extends BaseRow,>({
         {deleteMutation && <div className="w-20 flex-shrink-0" />}
         {expandableRowComponent && <div className="w-10 flex-shrink-0" />}
       </div>
+  );
 
-      {/* Data Rows */}
-      {!loading &&
+  const tableBodyRows =
+    !loading &&
         !error &&
         (() => {
           // When server-side sorting is enabled, pagination is also server-side
@@ -514,10 +517,12 @@ const TableGrid = <T extends BaseRow,>({
             ? table.getRowModel().rows.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize)
             : table.getRowModel().rows;
 
+          const rowMarginClass = rounded ? 'mb-0' : 'mb-1';
+
           // If there are no rows, render an empty row
           if (rowsToDisplay.length === 0) {
             return (
-              <div className="flex items-stretch mb-1">
+              <div className={`flex items-stretch ${rowMarginClass}`}>
                 <div className={`flex-grow min-w-0 overflow-hidden bg-bg-secondary text-label-primary light ${compactRows ? 'py-1' : 'py-2'}`}>
                   <div
                     className={`flex items-center gap-3 ${!showCheckbox ? 'pl-3' : ''}`}
@@ -539,17 +544,24 @@ const TableGrid = <T extends BaseRow,>({
                     );})}
                   </div>
                 </div>
-                {expandableRowComponent && <div className="w-10 flex-shrink-0 bg-gray-300"></div>}
+                {expandableRowComponent && <div className="w-10 flex-shrink-0" />}
                 {deleteMutation && <div className="w-20 flex-shrink-0"></div>}
               </div>
             );
           }
 
           // Otherwise, render the actual data rows
-          return rowsToDisplay.map((row) => (
+          return rowsToDisplay.map((row, rowIndex) => {
+            const isLastRow = rowIndex === rowsToDisplay.length - 1;
+            const primaryRowMargin =
+              expandedRows.has(row.original.id) || (rounded && isLastRow)
+                ? 'mb-0'
+                : rowMarginClass;
+
+            return (
             <React.Fragment key={row.id}>
               {/* Primary Row */}
-              <div className={`flex items-stretch ${expandedRows.has(row.original.id) ? 'mb-0' : 'mb-1'}`}>
+              <div className={`flex items-stretch ${primaryRowMargin}`}>
                 <div className={`flex-grow min-w-0 overflow-hidden bg-bg-secondary text-label-primary light ${compactRows ? 'py-1' : 'py-2'}`}>
                   <div
                     className={`flex items-center gap-3 ${!showCheckbox ? 'pl-3' : ''}`}
@@ -621,8 +633,23 @@ const TableGrid = <T extends BaseRow,>({
                 </div>
               )}
             </React.Fragment>
-          ));
-        })()}
+          );
+          });
+        })();
+
+  return (
+    <div>
+      {toolbar}
+      <div className="overflow-x-auto">
+        <div className="w-full" style={{ minWidth: `${mainRowContentWidth}px` }}>
+          {tableHeaderRow}
+          {rounded ? (
+            <div className="rounded-2xl overflow-hidden border border-border-primary min-w-0">
+              {tableBodyRows}
+            </div>
+          ) : (
+            tableBodyRows
+          )}
         </div>
       </div>
 

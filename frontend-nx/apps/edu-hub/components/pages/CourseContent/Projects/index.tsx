@@ -37,7 +37,10 @@ import { SectionTitle } from '../../../common/SectionTitle';
 import MyProjectPanel from './MyProjectPanel';
 import ProjectsTable from './ProjectsTable';
 import ProposeProjectDialog from './ProposeProjectDialog';
-import { CourseProjectSubmissionDefaultSource } from './projectEffectiveSubmissionDeadline';
+import {
+  CourseProjectSubmissionDefaultSource,
+  isProjectSubmissionDeadlinePassed,
+} from './projectEffectiveSubmissionDeadline';
 
 interface ProjectsProps {
   courseId: number;
@@ -77,9 +80,38 @@ const Projects: FC<ProjectsProps> = ({
 
   const projectTypesQuery = useRoleQuery<ProjectTypes>(PROJECT_TYPES);
 
-  const myProject = myProjectQuery.data?.Project?.[0] ?? null;
+  const myAcceptedProject = useMemo(
+    () =>
+      (myProjectQuery.data?.Project ?? []).find((p) =>
+        p.ProjectAuthors?.some(
+          (a) =>
+            a.userId === userId &&
+            a.participationStatus === ProjectParticipationStatus_enum.ACCEPTED
+        )
+      ) ?? null,
+    [myProjectQuery.data?.Project, userId]
+  );
+  const myExcludedProject = useMemo(
+    () =>
+      (myProjectQuery.data?.Project ?? []).find((p) =>
+        p.ProjectAuthors?.some(
+          (a) =>
+            a.userId === userId &&
+            a.participationStatus === ProjectParticipationStatus_enum.EXCLUDED
+        )
+      ) ?? null,
+    [myProjectQuery.data?.Project, userId]
+  );
+  // Prefer an active ACCEPTED project; otherwise surface the project the user
+  // was excluded from so they still get the "you were excluded" notice.
+  const myProject = myAcceptedProject ?? myExcludedProject;
+  const isExcludedFromMyProject = !myAcceptedProject && Boolean(myExcludedProject);
+
+  // Only an ACCEPTED author occupies the one-active-project slot (mirrors the
+  // DB trigger); an excluded author may freely propose or join another project.
   const hasMyActiveProject = Boolean(
-    myProject && ACTIVE_PROJECT_STATUSES.has(myProject.status as ProjectStatus_enum)
+    myAcceptedProject &&
+      ACTIVE_PROJECT_STATUSES.has(myAcceptedProject.status as ProjectStatus_enum)
   );
 
   const tableProjects = useMemo(() => {
@@ -111,28 +143,27 @@ const Projects: FC<ProjectsProps> = ({
     );
   }
 
-  const myProjectAcceptedAuthor =
-    myProject?.ProjectAuthors?.find(
-      (a) =>
-        a.userId === userId &&
-        a.participationStatus === ProjectParticipationStatus_enum.ACCEPTED
-    ) ?? null;
-
   const projectTypes = projectTypesQuery.data?.ProjectType ?? [];
 
-  const showMyProjectPanel =
-    Boolean(myProject && myProjectAcceptedAuthor && userId);
+  const showMyProjectPanel = Boolean(myProject && userId);
+
+  const showProposeButton =
+    proposalsEnabled &&
+    !hasMyActiveProject &&
+    Boolean(userId) &&
+    !isProjectSubmissionDeadlinePassed(null, effectiveSubmissionDeadline);
 
   return (
-    <div className="w-full mt-24 mb-24 min-w-0">
+    <div className="mt-24 mb-24 min-w-0 mx-6 xl:mx-0">
       {showMyProjectPanel && userId ? (
         <>
           <SectionTitle>{t('projects.my_project.heading')}</SectionTitle>
-          <ContentRow className="mb-12 text-label-primary bg-fill-primary light px-8 py-8 w-full min-w-0">
+          <ContentRow className="mb-12 text-label-primary bg-fill-primary light rounded-2xl p-4 min-w-0">
             <div className="flex flex-col w-full min-w-0">
               <MyProjectPanel
                 project={myProject!}
                 userId={userId}
+                isExcludedAuthor={isExcludedFromMyProject}
                 projectTypes={projectTypes}
                 courseDefaultSubmissionDeadline={effectiveSubmissionDeadline}
                 submissionDeadlineDefaultSource={submissionDeadlineDefaultSource}
@@ -152,7 +183,7 @@ const Projects: FC<ProjectsProps> = ({
           error={projectsQuery.error}
           courseId={courseId}
           userId={userId ?? undefined}
-          proposalsEnabled={proposalsEnabled}
+          showProposeButton={showProposeButton}
           hasMyProject={hasMyActiveProject}
           courseDefaultSubmissionDeadline={effectiveSubmissionDeadline}
           submissionDeadlineDefaultSource={submissionDeadlineDefaultSource}
