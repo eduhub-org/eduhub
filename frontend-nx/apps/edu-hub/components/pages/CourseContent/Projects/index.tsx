@@ -37,7 +37,10 @@ import { SectionTitle } from '../../../common/SectionTitle';
 import MyProjectPanel from './MyProjectPanel';
 import ProjectsTable from './ProjectsTable';
 import ProposeProjectDialog from './ProposeProjectDialog';
-import { CourseProjectSubmissionDefaultSource } from './projectEffectiveSubmissionDeadline';
+import {
+  CourseProjectSubmissionDefaultSource,
+  isProjectSubmissionDeadlinePassed,
+} from './projectEffectiveSubmissionDeadline';
 
 interface ProjectsProps {
   courseId: number;
@@ -144,12 +147,18 @@ const Projects: FC<ProjectsProps> = ({
 
   const showMyProjectPanel = Boolean(myProject && userId);
 
+  const showProposeButton =
+    proposalsEnabled &&
+    !hasMyActiveProject &&
+    Boolean(userId) &&
+    !isProjectSubmissionDeadlinePassed(null, effectiveSubmissionDeadline);
+
   return (
-    <div className="w-full mt-24 mb-24 min-w-0">
+    <div className="mt-24 mb-24 min-w-0 mx-6 xl:mx-0">
       {showMyProjectPanel && userId ? (
         <>
           <SectionTitle>{t('projects.my_project.heading')}</SectionTitle>
-          <ContentRow className="mb-12 text-label-primary bg-fill-primary light px-8 py-8 w-full min-w-0">
+          <ContentRow className="mb-12 text-label-primary bg-fill-primary light rounded-2xl p-4 min-w-0">
             <div className="flex flex-col w-full min-w-0">
               <MyProjectPanel
                 project={myProject!}
@@ -174,7 +183,7 @@ const Projects: FC<ProjectsProps> = ({
           error={projectsQuery.error}
           courseId={courseId}
           userId={userId ?? undefined}
-          proposalsEnabled={proposalsEnabled}
+          showProposeButton={showProposeButton}
           hasMyProject={hasMyActiveProject}
           courseDefaultSubmissionDeadline={effectiveSubmissionDeadline}
           submissionDeadlineDefaultSource={submissionDeadlineDefaultSource}

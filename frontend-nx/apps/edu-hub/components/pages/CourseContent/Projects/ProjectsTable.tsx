@@ -42,7 +42,7 @@ interface ProjectsTableProps {
   error: any;
   courseId: number;
   userId: string | undefined;
-  proposalsEnabled: boolean;
+  showProposeButton: boolean;
   hasMyProject: boolean;
   courseDefaultSubmissionDeadline: string | null | undefined;
   submissionDeadlineDefaultSource: CourseProjectSubmissionDefaultSource;
@@ -62,7 +62,7 @@ const ProjectsTable: FC<ProjectsTableProps> = ({
   error,
   courseId,
   userId,
-  proposalsEnabled,
+  showProposeButton,
   hasMyProject,
   courseDefaultSubmissionDeadline,
   submissionDeadlineDefaultSource,
@@ -360,17 +360,6 @@ const ProjectsTable: FC<ProjectsTableProps> = ({
     [canViewExcludedAuthors, courseDefaultSubmissionDeadline, submissionDeadlineDefaultSource]
   );
 
-  const courseSubmissionDeadlinePassed = isProjectSubmissionDeadlinePassed(
-    null,
-    courseDefaultSubmissionDeadline
-  );
-
-  const showAddButton =
-    proposalsEnabled &&
-    !hasMyProject &&
-    Boolean(userId) &&
-    !courseSubmissionDeadlinePassed;
-
   return (
     <TableGrid<ProjectRow>
       columns={columns}
@@ -384,9 +373,10 @@ const ProjectsTable: FC<ProjectsTableProps> = ({
       searchFilter=""
       onSearchFilterChange={() => undefined}
       refetchQueries={refetchQueries}
-      addButtonText={showAddButton ? t('projects.table.propose_button') : undefined}
-      onAddButtonClick={showAddButton ? onProposeClick : undefined}
+      addButtonText={showProposeButton ? t('projects.table.propose_button') : undefined}
+      onAddButtonClick={showProposeButton ? onProposeClick : undefined}
       expandableRowComponent={expandableRowComponent}
+      rounded
     />
   );
 };

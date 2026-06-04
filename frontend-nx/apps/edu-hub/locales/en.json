@@ -320,6 +320,7 @@
       "course_not_available": "Course not available",
       "to_course_chat": "GO TO CHAT",
       "to_online_meeting": "GO TO ONLINE MEETING",
+      "no_online_participation_available": "Online participation is not available for this course.",
       "speaker": "Speaker",
       "link_will_be_provided_soon": "(Link will be provided here soon)",
       "address_will_be_provided_soon": "(Address will be provided here soon)"
@@ -361,7 +362,7 @@
       }
     },
     "projects": {
-      "section_heading": "Projects in this course",
+      "section_heading": "Other projects in this course",
       "action_failed": "Action failed",
       "status": {
         "TEMPLATE": "Project template",
@@ -761,6 +762,7 @@
     "achievementCertificateDownload": "Download achievement certificate",
     "attendanceCertificateDownload": "Download attendance certificate",
     "congrats_completion": "Congratulations for finishing this course!",
+    "view_my_certificates": "Go to my certificates",
     "add-session-address": "New address",
     "upgrade-status": "Update course status and switch to next tab.",
     "to-be-defined": "Location still to be determined",
