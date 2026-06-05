@@ -4,7 +4,7 @@ import { MdCheckCircle, MdRadioButtonUnchecked } from 'react-icons/md';
 import { ProjectStatus_enum } from '../../../../__generated__/globalTypes';
 import { ProjectRow, ProjectTypeRow } from './types';
 import { PROJECT_FALLBACK_TITLE } from './projectDefaults';
-import { isProjectResourceUrlPresent, safeProjectResourceHref } from './projectMandatory';
+import { isProjectResourceUrlPresent, safeProjectInstructionHref } from './projectMandatory';
 import { isOnlineCourseProject } from './projectStatusDisplay';
 
 type TodoItem =
@@ -101,7 +101,7 @@ const ProjectNextTodos: FC<ProjectNextTodosProps> = ({
       }
 
       const instruction = project.ProjectDocumentationInstruction;
-      const instructionHref = safeProjectResourceHref(instruction?.url);
+      const instructionHref = safeProjectInstructionHref(instruction?.url);
 
       const tasks: TodoItem[] = [];
 

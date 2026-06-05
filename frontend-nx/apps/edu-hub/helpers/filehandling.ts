@@ -4,6 +4,17 @@ const isPublicLegacy = (filePath: string) => filePath.startsWith("https://") || 
 
 const isPublic = (filePath: string) => filePath.includes("/public/");
 
+/** Same-origin path served from the Next.js `public/` folder (not protocol-relative). */
+export const isStaticAppPath = (filePath: string): boolean =>
+  filePath.startsWith('/') && !filePath.startsWith('//');
+
+const hasUrlScheme = (value: string): boolean => {
+  const colonIndex = value.indexOf(':');
+  if (colonIndex === -1) return false;
+  const scheme = value.slice(0, colonIndex);
+  return /^[a-zA-Z][a-zA-Z0-9+.-]*$/.test(scheme);
+};
+
 const safeDecodeURIComponent = (value: string): string => {
   try {
     return decodeURIComponent(value);
@@ -38,6 +49,57 @@ export const getPublicUrl = (filePath: string): string | null  => {
     return null;
   }
 }
+
+const hasParentTraversal = (value: string): boolean => /(^|\/)\.\.(\/|$)/.test(value);
+
+export type SafeFileHrefOptions = {
+  /** When true, http(s) values are rejected instead of resolved via getPublicUrl. */
+  rejectExternalUrls?: boolean;
+  /**
+   * Same-origin path prefixes (e.g. `/project-documentation-instructions/`) that
+   * may be returned verbatim. Static app paths are otherwise rejected, since
+   * user-controlled columns must not produce arbitrary same-origin links.
+   */
+  allowedStaticPrefixes?: string[];
+};
+
+/**
+ * Resolve a stored file path to an href safe for anchor/img elements. Handles
+ * GCS object keys, legacy absolute URLs, and (only when explicitly allowlisted)
+ * static app paths seeded by migrations.
+ */
+export const getSafeFileHref = (
+  filePath?: string | null,
+  options: SafeFileHrefOptions = {},
+): string | null => {
+  const trimmed = filePath?.trim();
+  if (!trimmed || trimmed === 'pending_upload') return null;
+  if (trimmed.startsWith('//')) return null;
+  if (
+    hasUrlScheme(trimmed) &&
+    !trimmed.startsWith('http://') &&
+    !trimmed.startsWith('https://')
+  ) {
+    return null;
+  }
+
+  if (isStaticAppPath(trimmed)) {
+    const prefixes = options.allowedStaticPrefixes ?? [];
+    if (hasParentTraversal(trimmed) || !prefixes.some((prefix) => trimmed.startsWith(prefix))) {
+      return null;
+    }
+    return trimmed;
+  }
+
+  if (
+    options.rejectExternalUrls &&
+    (trimmed.startsWith('http://') || trimmed.startsWith('https://'))
+  ) {
+    return null;
+  }
+
+  return getPublicUrl(trimmed);
+};
 
 export const getPublicImageUrl = (filePath: string | null, size: number): string | null  => {
   // log.debug(`getPublicImageUrl called with filePath: ${filePath} and size: ${size}`);
