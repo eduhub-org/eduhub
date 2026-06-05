@@ -887,7 +887,8 @@ INSERT INTO public."CourseEnrollment" (id, "courseId", "userId", status, "motiva
 INSERT INTO public."CourseEnrollment" (id, "courseId", "userId", status, "motivationLetter", "motivationRating", "achievementCertificateURL", "attendanceCertificateURL", created_at, updated_at, "invitationExpirationDate") VALUES (453, 302, '66666666-6666-6666-6666-666666666666', 'CONFIRMED', 'Ready to engage with the course material.', 'UNRATED', NULL, '66666666-6666-6666-6666-666666666666/302/attendance_certificate.pdf', '2024-09-20 10:00:00+00', '2025-02-28 11:39:20.990522+00', NULL);
 INSERT INTO public."CourseEnrollment" (id, "courseId", "userId", status, "motivationLetter", "motivationRating", "achievementCertificateURL", "attendanceCertificateURL", created_at, updated_at, "invitationExpirationDate") VALUES (464, 302, '77777777-7777-7777-7777-777777777777', 'CONFIRMED', 'Ready to start this educational experience.', 'UNRATED', NULL, '77777777-7777-7777-7777-777777777777/302/attendance_certificate.pdf', '2024-09-20 09:00:00+00', '2025-02-28 11:39:22.378815+00', NULL);
 INSERT INTO public."CourseEnrollment" (id, "courseId", "userId", status, "motivationLetter", "motivationRating", "achievementCertificateURL", "attendanceCertificateURL", created_at, updated_at, "invitationExpirationDate") VALUES (465, 302, '88888888-8888-8888-8888-888888888888', 'CONFIRMED', 'Looking forward to collaborative learning.', 'UNRATED', 'test.url', '88888888-8888-8888-8888-888888888888/302/attendance_certificate.pdf', '2024-09-20 10:00:00+00', '2025-02-28 11:39:23.151425+00', NULL);
-INSERT INTO public."CourseEnrollment" (id, "courseId", "userId", status, "motivationLetter", "motivationRating", "achievementCertificateURL", "attendanceCertificateURL", created_at, updated_at, "invitationExpirationDate") VALUES (466, 4, '8914bee9-0549-44af-bcae-cafeec5ba92e', 'COMPLETED', 'Admin seed enrollment for certificate download testing.', 'UNRATED', '8914bee9-0549-44af-bcae-cafeec5ba92e/4/achievement_certificate.pdf', '8914bee9-0549-44af-bcae-cafeec5ba92e/4/attendance_certificate.pdf', '2025-05-19 09:00:00+00', '2025-05-19 09:00:00+00', NULL);
+INSERT INTO public."CourseEnrollment" (id, "courseId", "userId", status, "motivationLetter", "motivationRating", "achievementCertificateURL", "attendanceCertificateURL", created_at, updated_at, "invitationExpirationDate") VALUES (466, 1, '8914bee9-0549-44af-bcae-cafeec5ba92e', 'COMPLETED', 'Admin seed enrollment for certificate download testing.', 'UNRATED', '8914bee9-0549-44af-bcae-cafeec5ba92e/1/achievement_certificate.pdf', '8914bee9-0549-44af-bcae-cafeec5ba92e/1/attendance_certificate.pdf', '2025-05-19 09:00:00+00', '2025-05-19 09:00:00+00', NULL);
+INSERT INTO public."CourseEnrollment" (id, "courseId", "userId", status, "motivationLetter", "motivationRating", "achievementCertificateURL", "attendanceCertificateURL", created_at, updated_at, "invitationExpirationDate") VALUES (467, 4, '8914bee9-0549-44af-bcae-cafeec5ba92e', 'CONFIRMED', 'Admin seed enrollment for project download testing.', 'UNRATED', NULL, NULL, '2026-06-05 00:00:00+00', '2026-06-05 00:00:00+00', NULL);
 INSERT INTO public."CourseFundingOrganization" (id, "courseId", "organizationId", created_at, updated_at) VALUES (1, 302, 160, '2025-11-28 09:44:09.478479+00', '2025-11-28 09:44:09.478479+00');
 INSERT INTO public."CourseFundingOrganization" (id, "courseId", "organizationId", created_at, updated_at) VALUES (2, 301, 160, '2025-11-28 09:44:33.610791+00', '2025-11-28 09:44:33.610791+00');
 INSERT INTO public."CourseFundingOrganization" (id, "courseId", "organizationId", created_at, updated_at) VALUES (3, 7, 160, '2025-11-28 09:45:16.853692+00', '2025-11-28 09:45:16.853692+00');
@@ -1744,6 +1745,62 @@ UPDATE public."ProjectType" SET "certificateTemplateId" = 1
    'PRESENTATION_WITHOUT_DOCUMENTATION', 'PRESENTATION_AND_LINK_WITHOUT_DOCUMENTATION'
  );
 
+-- =============================================================================
+-- Project storage-backed download fixture
+--
+-- Exercises local Docker Compose file downloads that are stored as public bucket
+-- object keys instead of absolute URLs. The matching PDF lives in
+-- backend/init.d/file_storage/project-docs-instructions/public/.
+-- In local dev this should resolve to:
+-- http://localhost:4001/emulated-bucket/project-docs-instructions/public/...
+-- =============================================================================
+INSERT INTO public."ProjectDocumentationInstruction"
+  (id, title, url, "projectTypeValue", "isDefault", created_at, updated_at)
+VALUES
+  (9901, 'Dev storage-backed documentation instruction',
+   'project-docs-instructions/public/PROJECT_DOCUMENTATION_INSTRUCTION.pdf',
+   'CLASSIC_PROJECT', false,
+   '2026-06-05 00:00:00+00', '2026-06-05 00:00:00+00');
+
+INSERT INTO public."Project"
+  (id, title, tagline, description, "coverImageUrl", "documentationUrl",
+   "presentationUrl", "externalUrl", status, type, rating,
+   "documentationInstructionId", "proposedByUserId", "acceptingParticipants",
+   created_at, updated_at)
+VALUES
+  (9901, 'Storage-backed instruction fixture',
+   'Shows an instruction PDF stored as a public bucket key.',
+   'This project intentionally has no uploaded documentation yet, so the '
+   || 'next-todo panel keeps rendering the documentation-instruction link.',
+   NULL, NULL, NULL, NULL, 'ONGOING', 'CLASSIC_PROJECT', 'UNRATED',
+   9901, '8914bee9-0549-44af-bcae-cafeec5ba92e', false,
+   '2026-06-05 00:00:00+00', '2026-06-05 00:00:00+00'),
+  (9902, 'Storage-backed resource fixture',
+   'Shows project files stored as public bucket keys.',
+   'This completed project exposes documentation and presentation download '
+   || 'buttons from storage object keys.',
+   NULL,
+   'project-docs-instructions/public/PROJECT_DOCUMENTATION_INSTRUCTION.pdf',
+   'project-docs-instructions/public/PROJECT_DOCUMENTATION_INSTRUCTION.pdf',
+   'https://example.com/project-resource-fixture',
+   'COMPLETED', 'CLASSIC_PROJECT', 'PASSED',
+   9901, '22222222-2222-2222-2222-222222222222', false,
+   '2026-06-05 00:00:00+00', '2026-06-05 00:00:00+00');
+
+INSERT INTO public."ProjectCourse"
+  (id, "projectId", "courseId", created_at, updated_at)
+VALUES
+  (9901, 9901, 4, '2026-06-05 00:00:00+00', '2026-06-05 00:00:00+00'),
+  (9902, 9902, 4, '2026-06-05 00:00:00+00', '2026-06-05 00:00:00+00');
+
+INSERT INTO public."ProjectAuthor"
+  (id, "projectId", "userId", "participationStatus", created_at, updated_at)
+VALUES
+  (9901, 9901, '8914bee9-0549-44af-bcae-cafeec5ba92e', 'ACCEPTED',
+   '2026-06-05 00:00:00+00', '2026-06-05 00:00:00+00'),
+  (9902, 9902, '22222222-2222-2222-2222-222222222222', 'ACCEPTED',
+   '2026-06-05 00:00:00+00', '2026-06-05 00:00:00+00');
+
 SELECT pg_catalog.setval('public."AchievementDocumentationTemplate_id_seq"', 1, true);
 SELECT pg_catalog.setval('public."AchievementOptionCourse_id_seq"', 10, true);
 SELECT pg_catalog.setval('public."AchievementOptionMentor_id_seq"', 1, true);
@@ -1773,4 +1830,8 @@ SELECT pg_catalog.setval(pg_get_serial_sequence('public."Attendance"', 'id'), (S
 SELECT pg_catalog.setval(pg_get_serial_sequence('public."Course"', 'id'), (SELECT max(id) FROM public."Course"), true);
 SELECT pg_catalog.setval(pg_get_serial_sequence('public."CourseDegree"', 'id'), (SELECT max(id) FROM public."CourseDegree"), true);
 SELECT pg_catalog.setval(pg_get_serial_sequence('public."CourseEnrollment"', 'id'), (SELECT max(id) FROM public."CourseEnrollment"), true);
+SELECT pg_catalog.setval(pg_get_serial_sequence('public."Project"', 'id'), (SELECT max(id) FROM public."Project"), true);
+SELECT pg_catalog.setval(pg_get_serial_sequence('public."ProjectAuthor"', 'id'), (SELECT max(id) FROM public."ProjectAuthor"), true);
+SELECT pg_catalog.setval(pg_get_serial_sequence('public."ProjectCourse"', 'id'), (SELECT max(id) FROM public."ProjectCourse"), true);
+SELECT pg_catalog.setval(pg_get_serial_sequence('public."ProjectDocumentationInstruction"', 'id'), (SELECT max(id) FROM public."ProjectDocumentationInstruction"), true);
 SELECT pg_catalog.setval(pg_get_serial_sequence('public."Session"', 'id'), (SELECT max(id) FROM public."Session"), true);
