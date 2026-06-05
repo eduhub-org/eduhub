@@ -277,6 +277,7 @@
       "creative_social_sustainable": "Creative, Social & Sustainable",
       "degree": "Degrees",
       "event": "Events",
+      "courses": "Courses",
       "my_admin_courses": "Kurs-Administration",
       "my_courses": "Meine Kurse"
     },
@@ -1811,6 +1812,23 @@
       "text_en": "News Banner Text EN"
     },
     "course_group_options": "Kursgruppierungen Reihenfolge",
+    "course_groups": {
+      "label": "Kursgruppierungen",
+      "help_text": "Lege fest, welche Kursgruppierungen es gibt und in welcher Reihenfolge die als Slider markierten Gruppen auf der Startseite erscheinen. Die Gruppen \"Courses\", \"Events\" und \"Degrees\" werden automatisch aus den veröffentlichten Angeboten des jeweiligen Programmtyps befüllt. Zusätzliche Gruppen können angelegt und in einem Org-Widget ausgewählt werden, ohne auf der Startseite zu erscheinen.",
+      "add_placeholder": "Name der neuen Kursgruppierung",
+      "add_button": "Hinzufügen",
+      "show_on_homepage": "Auf Startseite anzeigen",
+      "auto_badge": "Automatisch",
+      "org_badge": "Organisation",
+      "delete": "Kursgruppierung löschen",
+      "delete_disabled_auto": "Automatisch befüllte Gruppen können nicht gelöscht werden.",
+      "delete_disabled_in_use": "Diese Gruppierung ist noch mit Kursen verknüpft und kann nicht gelöscht werden.",
+      "error_duplicate": "Eine Kursgruppierung mit diesem Namen existiert bereits.",
+      "error_add": "Die Kursgruppierung konnte nicht angelegt werden.",
+      "error_delete": "Die Kursgruppierung konnte nicht gelöscht werden.",
+      "error_toggle": "Die Einstellung konnte nicht gespeichert werden.",
+      "error_reorder": "Die Reihenfolge konnte nicht aktualisiert werden."
+    },
     "faq": {
       "label": "FAQ Einstellungen",
       "show_section": "FAQ-Bereich auf der Startseite anzeigen",

@@ -16,6 +16,10 @@ export interface CourseTiles_Course_Program {
    */
   published: boolean;
   /**
+   * The program type (e.g. COURSES, EVENTS, DEGREES), used to automatically populate the matching slider groups.
+   */
+  type: string;
+  /**
    * The title of the program
    */
   title: string;
@@ -39,6 +43,7 @@ export interface CourseTiles_Course_CourseLocations {
 
 export interface CourseTiles_Course_CourseGroups_CourseGroupOption {
   __typename: "CourseGroupOption";
+  id: number;
   order: number;
   title: string;
 }

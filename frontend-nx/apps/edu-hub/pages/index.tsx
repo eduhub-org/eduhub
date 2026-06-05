@@ -99,16 +99,24 @@ const Home: FC = () => {
 
   const coursesGroups = useMemo(
     () =>
-      [1, 2, 3, 4, 5].map((order) => {
-        const filteredCourses = publishedCourses.filter((course) =>
-          course.CourseGroups.some((courseGroup) => courseGroup.CourseGroupOption.order === order)
-        );
-        const title = courseGroupOptionsData?.CourseGroupOption[order - 1]?.title;
-        return {
-          title,
-          courses: filteredCourses,
-        };
-      }),
+      (courseGroupOptionsData?.CourseGroupOption ?? [])
+        // Only groups that are marked as homepage sliders and are not owned by a
+        // specific organization (organization-owned groups only appear in widgets).
+        .filter((option) => option.sliderGroup && option.organizationId == null)
+        .map((option) => {
+          const filteredCourses = option.programType
+            ? // Program-type based groups (Courses, Events, Degrees) are populated
+              // automatically from the published courses of that program type.
+              publishedCourses.filter((course) => course.Program?.type === option.programType)
+            : // Other groups still rely on manual CourseGroup assignments.
+              publishedCourses.filter((course) =>
+                course.CourseGroups.some((courseGroup) => courseGroup.CourseGroupOption.id === option.id)
+              );
+          return {
+            title: option.title,
+            courses: filteredCourses,
+          };
+        }),
     [publishedCourses, courseGroupOptionsData]
   );
 
