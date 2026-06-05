@@ -1,7 +1,7 @@
 import { FC, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { DragDropContext, Droppable, Draggable, type DropResult } from '@hello-pangea/dnd';
-import { Close, DragIndicator } from '@mui/icons-material';
+import { Close, DragIndicator, HelpOutline, ContentCopy } from '@mui/icons-material';
 import Tooltip from '@mui/material/Tooltip';
 
 import { Button } from '../../common/Button';
@@ -55,6 +55,17 @@ const CourseGroupOptionsManager: FC = () => {
 
   const [newTitle, setNewTitle] = useState('');
   const [error, setError] = useState('');
+  const [copiedId, setCopiedId] = useState<number | null>(null);
+
+  const handleCopyId = async (id: number) => {
+    try {
+      await navigator.clipboard?.writeText(String(id));
+    } catch {
+      // Clipboard may be unavailable (e.g. insecure context); still give feedback.
+    }
+    setCopiedId(id);
+    setTimeout(() => setCopiedId((current) => (current === id ? null : current)), 1500);
+  };
 
   const { data } = useAdminQuery<AdminCourseGroupOptions>(ADMIN_COURSE_GROUP_OPTIONS);
   const options = useMemo(() => data?.CourseGroupOption ?? [], [data]);
@@ -159,7 +170,12 @@ const CourseGroupOptionsManager: FC = () => {
 
   return (
     <div className="mt-16">
-      <label className="text-xs uppercase tracking-widest font-medium text-gray-400 mb-2 block">{t('label')}</label>
+      <div className="flex items-center gap-2 mb-2">
+        <label className="text-xs uppercase tracking-widest font-medium text-gray-400">{t('label')}</label>
+        <Tooltip title={t('widget_help')} placement="top">
+          <HelpOutline style={{ cursor: 'pointer' }} fontSize="small" className="text-gray-400" />
+        </Tooltip>
+      </div>
       <p className="text-xs text-gray-400 mb-4">{t('help_text')}</p>
 
       {/* Add a new course group option */}
@@ -237,7 +253,16 @@ const CourseGroupOptionsManager: FC = () => {
                             />
                             {t('show_on_homepage')}
                           </label>
-                          <span className="text-label-secondary w-6 text-right">{index + 1}</span>
+                          <Tooltip title={copiedId === option.id ? t('copied') : t('copy_id')} placement="top">
+                            <button
+                              type="button"
+                              onClick={() => handleCopyId(option.id)}
+                              className="flex items-center gap-1 text-xs font-mono rounded border border-border-primary px-2 py-1 text-label-secondary hover:text-label-primary"
+                            >
+                              {t('id_label')} {option.id}
+                              <ContentCopy style={{ fontSize: '0.85rem' }} />
+                            </button>
+                          </Tooltip>
                           <Tooltip title={deleteTooltip} placement="top">
                             <span>
                               <button
