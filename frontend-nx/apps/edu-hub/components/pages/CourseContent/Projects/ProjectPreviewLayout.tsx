@@ -5,7 +5,11 @@ import UserCard from '../../../common/UserCard';
 import { Button } from '../../../common/Button';
 import { ProjectRow } from './types';
 import { getDisplayAuthors, isExcludedAuthor } from './projectAuthors';
-import { isProjectResourceUrlPresent, safeProjectExternalHref } from './projectMandatory';
+import {
+  isProjectResourceUrlPresent,
+  safeProjectExternalHref,
+  safeProjectResourceHref,
+} from './projectMandatory';
 import { resolveProjectCoverImageSrc } from './projectCoverImage';
 
 export { PROJECT_COVER_PLACEHOLDER_SRC } from './projectCoverImage';
@@ -54,8 +58,8 @@ const ProjectPreviewLayout: FC<ProjectPreviewLayoutProps> = ({
   const presProvided = isProjectResourceUrlPresent(project.presentationUrl);
   const extProvided = isProjectResourceUrlPresent(project.externalUrl);
 
-  const safeDocumentationHref = safeProjectExternalHref(project.documentationUrl);
-  const safePresentationHref = safeProjectExternalHref(project.presentationUrl);
+  const safeDocumentationHref = safeProjectResourceHref(project.documentationUrl);
+  const safePresentationHref = safeProjectResourceHref(project.presentationUrl);
   const safeExternalHref = safeProjectExternalHref(project.externalUrl);
 
   const showDocumentationRow = showResourceLinks && docProvided && safeDocumentationHref !== null;

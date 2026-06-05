@@ -2,6 +2,7 @@ import React, { FC, useEffect, useState } from 'react';
 import { GetApp } from '@mui/icons-material';
 import { Button } from '../common/Button';
 import { useSignedUrl } from '../../hooks/signedUrl';
+import { isStaticAppPath } from '../../helpers/filehandling';
 import { useTranslations } from 'next-intl';
 import { ErrorMessageDialog } from '../common/dialogs/ErrorMessageDialog';
 
@@ -12,11 +13,9 @@ interface IProps {
   type?: 'button' | 'icon';
 }
 
-// Paths starting with `/` are served from the Next.js `public/` folder and
-// paths starting with `http(s)://` are already absolute; both should be
-// opened directly without going through the GCS signing action.
+// Static app paths and absolute URLs are opened directly without GCS signing.
 const isDirectAssetUrl = (path: string): boolean =>
-  path.startsWith('/') || path.startsWith('http://') || path.startsWith('https://');
+  isStaticAppPath(path) || path.startsWith('http://') || path.startsWith('https://');
 
 const FileDownload: FC<IProps> = ({ filePath, className, label, type = 'icon' }) => {
   const t = useTranslations();
