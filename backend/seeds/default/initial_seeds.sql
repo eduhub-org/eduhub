@@ -1744,6 +1744,62 @@ UPDATE public."ProjectType" SET "certificateTemplateId" = 1
    'PRESENTATION_WITHOUT_DOCUMENTATION', 'PRESENTATION_AND_LINK_WITHOUT_DOCUMENTATION'
  );
 
+-- =============================================================================
+-- Project storage-backed download fixture
+--
+-- Exercises local Docker Compose file downloads that are stored as public bucket
+-- object keys instead of absolute URLs. The matching PDF lives in
+-- backend/init.d/file_storage/project-docs-instructions/public/.
+-- In local dev this should resolve to:
+-- http://localhost:4001/emulated-bucket/project-docs-instructions/public/...
+-- =============================================================================
+INSERT INTO public."ProjectDocumentationInstruction"
+  (id, title, url, "projectTypeValue", "isDefault", created_at, updated_at)
+VALUES
+  (9901, 'Dev storage-backed documentation instruction',
+   'project-docs-instructions/public/PROJECT_DOCUMENTATION_INSTRUCTION.pdf',
+   'CLASSIC_PROJECT', false,
+   '2026-06-05 00:00:00+00', '2026-06-05 00:00:00+00');
+
+INSERT INTO public."Project"
+  (id, title, tagline, description, "coverImageUrl", "documentationUrl",
+   "presentationUrl", "externalUrl", status, type, rating,
+   "documentationInstructionId", "proposedByUserId", "acceptingParticipants",
+   created_at, updated_at)
+VALUES
+  (9901, 'Storage-backed instruction fixture',
+   'Shows an instruction PDF stored as a public bucket key.',
+   'This project intentionally has no uploaded documentation yet, so the '
+   || 'next-todo panel keeps rendering the documentation-instruction link.',
+   NULL, NULL, NULL, NULL, 'ONGOING', 'CLASSIC_PROJECT', 'UNRATED',
+   9901, '8914bee9-0549-44af-bcae-cafeec5ba92e', false,
+   '2026-06-05 00:00:00+00', '2026-06-05 00:00:00+00'),
+  (9902, 'Storage-backed resource fixture',
+   'Shows project files stored as public bucket keys.',
+   'This completed project exposes documentation and presentation download '
+   || 'buttons from storage object keys.',
+   NULL,
+   'project-docs-instructions/public/PROJECT_DOCUMENTATION_INSTRUCTION.pdf',
+   'project-docs-instructions/public/PROJECT_DOCUMENTATION_INSTRUCTION.pdf',
+   'https://example.com/project-resource-fixture',
+   'COMPLETED', 'CLASSIC_PROJECT', 'PASSED',
+   9901, '22222222-2222-2222-2222-222222222222', false,
+   '2026-06-05 00:00:00+00', '2026-06-05 00:00:00+00');
+
+INSERT INTO public."ProjectCourse"
+  (id, "projectId", "courseId", created_at, updated_at)
+VALUES
+  (9901, 9901, 4, '2026-06-05 00:00:00+00', '2026-06-05 00:00:00+00'),
+  (9902, 9902, 4, '2026-06-05 00:00:00+00', '2026-06-05 00:00:00+00');
+
+INSERT INTO public."ProjectAuthor"
+  (id, "projectId", "userId", "participationStatus", created_at, updated_at)
+VALUES
+  (9901, 9901, '8914bee9-0549-44af-bcae-cafeec5ba92e', 'ACCEPTED',
+   '2026-06-05 00:00:00+00', '2026-06-05 00:00:00+00'),
+  (9902, 9902, '22222222-2222-2222-2222-222222222222', 'ACCEPTED',
+   '2026-06-05 00:00:00+00', '2026-06-05 00:00:00+00');
+
 SELECT pg_catalog.setval('public."AchievementDocumentationTemplate_id_seq"', 1, true);
 SELECT pg_catalog.setval('public."AchievementOptionCourse_id_seq"', 10, true);
 SELECT pg_catalog.setval('public."AchievementOptionMentor_id_seq"', 1, true);
@@ -1773,4 +1829,8 @@ SELECT pg_catalog.setval(pg_get_serial_sequence('public."Attendance"', 'id'), (S
 SELECT pg_catalog.setval(pg_get_serial_sequence('public."Course"', 'id'), (SELECT max(id) FROM public."Course"), true);
 SELECT pg_catalog.setval(pg_get_serial_sequence('public."CourseDegree"', 'id'), (SELECT max(id) FROM public."CourseDegree"), true);
 SELECT pg_catalog.setval(pg_get_serial_sequence('public."CourseEnrollment"', 'id'), (SELECT max(id) FROM public."CourseEnrollment"), true);
+SELECT pg_catalog.setval(pg_get_serial_sequence('public."Project"', 'id'), (SELECT max(id) FROM public."Project"), true);
+SELECT pg_catalog.setval(pg_get_serial_sequence('public."ProjectAuthor"', 'id'), (SELECT max(id) FROM public."ProjectAuthor"), true);
+SELECT pg_catalog.setval(pg_get_serial_sequence('public."ProjectCourse"', 'id'), (SELECT max(id) FROM public."ProjectCourse"), true);
+SELECT pg_catalog.setval(pg_get_serial_sequence('public."ProjectDocumentationInstruction"', 'id'), (SELECT max(id) FROM public."ProjectDocumentationInstruction"), true);
 SELECT pg_catalog.setval(pg_get_serial_sequence('public."Session"', 'id'), (SELECT max(id) FROM public."Session"), true);
