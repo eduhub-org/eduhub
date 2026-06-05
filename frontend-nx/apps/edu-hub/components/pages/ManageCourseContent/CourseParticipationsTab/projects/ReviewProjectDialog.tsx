@@ -10,7 +10,10 @@ import {
   UPDATE_PROJECT_RATING_AND_COMMENT,
 } from '../../../../../queries/projectInstructor';
 import { ProjectRow } from '../../../CourseContent/Projects/types';
-import { safeProjectExternalHref } from '../../../CourseContent/Projects/projectMandatory';
+import {
+  safeProjectExternalHref,
+  safeProjectResourceHref,
+} from '../../../CourseContent/Projects/projectMandatory';
 import { ProjectRating_enum } from '../../../../../__generated__/globalTypes';
 
 interface ReviewProjectDialogProps {
@@ -151,7 +154,7 @@ const ReviewProjectDialog: FC<ReviewProjectDialogProps> = ({
           </div>
           <div className="space-y-1 text-sm">
             {(() => {
-              const docHref = safeProjectExternalHref(project.documentationUrl);
+              const docHref = safeProjectResourceHref(project.documentationUrl);
               return docHref ? (
                 <a
                   href={docHref}
@@ -164,7 +167,7 @@ const ReviewProjectDialog: FC<ReviewProjectDialogProps> = ({
               ) : null;
             })()}
             {(() => {
-              const presHref = safeProjectExternalHref(project.presentationUrl);
+              const presHref = safeProjectResourceHref(project.presentationUrl);
               return presHref ? (
                 <a
                   href={presHref}

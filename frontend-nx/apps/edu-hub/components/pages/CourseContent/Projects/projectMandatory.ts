@@ -1,4 +1,5 @@
 import { ProjectRow, ProjectTypeRow } from './types';
+import { getPublicUrl } from '../../../../helpers/filehandling';
 
 export const MANDATORY_INCOMPLETE_HIGHLIGHT_CLASS =
   'rounded-lg ring-2 ring-error border border-error/50 bg-error/10';
@@ -24,6 +25,32 @@ export function safeProjectExternalHref(url?: string | null): string | null {
     /* fall through */
   }
   return null;
+}
+
+/**
+ * Resolve EduHub-owned project resource paths to hrefs that are safe to bind
+ * to anchors. Resource values may be absolute URLs, static Next.js public
+ * paths, or public storage object keys.
+ */
+export function safeProjectResourceHref(resourcePath?: string | null): string | null {
+  const trimmed = resourcePath?.trim();
+  if (!trimmed || trimmed === 'pending_upload') return null;
+
+  try {
+    const parsed = new URL(trimmed);
+    if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+      return trimmed;
+    }
+    return null;
+  } catch {
+    /* fall through */
+  }
+
+  if (trimmed.startsWith('/') && !trimmed.startsWith('//')) {
+    return trimmed;
+  }
+
+  return getPublicUrl(trimmed);
 }
 
 export function isProjectDocumentationIncomplete(

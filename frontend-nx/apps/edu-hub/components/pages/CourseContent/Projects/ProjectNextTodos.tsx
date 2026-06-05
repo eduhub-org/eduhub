@@ -4,7 +4,7 @@ import { MdCheckCircle, MdRadioButtonUnchecked } from 'react-icons/md';
 import { ProjectStatus_enum } from '../../../../__generated__/globalTypes';
 import { ProjectRow, ProjectTypeRow } from './types';
 import { PROJECT_FALLBACK_TITLE } from './projectDefaults';
-import { isProjectResourceUrlPresent } from './projectMandatory';
+import { isProjectResourceUrlPresent, safeProjectResourceHref } from './projectMandatory';
 import { isOnlineCourseProject } from './projectStatusDisplay';
 
 type TodoItem =
@@ -101,13 +101,13 @@ const ProjectNextTodos: FC<ProjectNextTodosProps> = ({
       }
 
       const instruction = project.ProjectDocumentationInstruction;
-      const instructionUrl = instruction?.url?.trim();
+      const instructionHref = safeProjectResourceHref(instruction?.url);
 
       const tasks: TodoItem[] = [];
 
       if (projectType.requiresDocumentation) {
         const docSatisfied = isProjectResourceUrlPresent(project.documentationUrl);
-        if (instructionUrl) {
+        if (instructionHref) {
           tasks.push({
             id: 'documentation',
             kind: 'task',
@@ -115,7 +115,7 @@ const ProjectNextTodos: FC<ProjectNextTodosProps> = ({
             label: t('projects.next_todos.ongoing.documentation_upload_with_instruction_prefix'),
             labelSuffix: t('projects.next_todos.ongoing.documentation_upload_with_instruction_suffix'),
             embeddedLink: {
-              href: instructionUrl,
+              href: instructionHref,
               label: t('projects.next_todos.ongoing.documentation_instruction_link'),
             },
           });
