@@ -20,6 +20,7 @@ import {
   UpdateCourseAchievementCertificatePossible,
   UpdateCourseAchievementCertificatePossibleVariables,
 } from '../../../queries/__generated__/UpdateCourseAchievementCertificatePossible';
+import { isKnownCourseGroupOptionTitle } from '../../../helpers/courseGroupOptions';
 import { DEGREE_COURSES } from '../../../queries/courseDegree';
 import { DegreeCourses } from '../../../queries/__generated__/DegreeCourses';
 import { DELETE_A_COURSE } from '../../../queries/mutateCourse';
@@ -335,12 +336,12 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
   const courseGroupOptions = useMemo(() => {
     if (data && !loading && !error) {
       return (
-        data.CourseGroupOption
-          ?.filter((option: { sliderGroup: boolean }) => option.sliderGroup)
-          .map((option: { id: number; title: string | null }) => ({
-            id: option.id,
-            name: option.title ? tCommon(`course_group_options.${option.title}`) : '—',
-          })) || []
+        data.CourseGroupOption?.map((option: { id: number; title: string | null }) => ({
+          id: option.id,
+          name: isKnownCourseGroupOptionTitle(option.title)
+            ? tCommon(`course_group_options.${option.title}`)
+            : option.title ?? '—',
+        })) || []
       );
     } else {
       return [];

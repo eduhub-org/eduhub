@@ -253,7 +253,11 @@ const TagSelector: React.FC<TagSelectorProps> = ({
         fullWidth
         sx={{
           '& .MuiChip-root': { color: 'var(--eduhub-label-primary)', backgroundColor: 'var(--eduhub-bg-secondary)' },
-          '& .MuiChip-deleteIcon': { color: 'var(--eduhub-label-secondary)', '&:hover': { color: 'var(--eduhub-label-primary)' } },
+          '& .MuiChip-deleteIcon': {
+            color: 'var(--eduhub-label-primary)',
+            opacity: 0.8,
+            '&:hover': { color: 'var(--eduhub-error)', opacity: 1 },
+          },
           '& .MuiInputBase-input': { color: 'var(--eduhub-label-primary)' },
           '& .MuiInputLabel-root': { color: 'var(--eduhub-label-secondary)' },
           '& .MuiInput-underline:before': { borderBottomColor: 'var(--eduhub-border-primary)' },

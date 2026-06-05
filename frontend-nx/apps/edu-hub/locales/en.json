@@ -1047,6 +1047,10 @@
       "label": "Tile Slider Group",
       "placeholder": "Select tile slider groups"
     },
+    "course_group": {
+      "label": "Course Group",
+      "placeholder": "Select course groups"
+    },
     "cover_image": {
       "label": "Cover Image",
       "upload_text": "Click to upload cover image",
@@ -1059,6 +1063,9 @@
     "funding_organizations": {
       "label": "Funding Organizations",
       "add": "Add Funding Organization"
+    },
+    "certificates": {
+      "label": "Certificates"
     },
     "possible_certificates": {
       "label": "Possible Certificates",
@@ -1825,8 +1832,6 @@
       "add_button": "Add",
       "widget_help": "Every course group has an ID (shown on the right of each row). To show one or more groups in an organization widget, add the parameter ?groups=ID to the widget URL (separate multiple IDs with commas, e.g. ?groups=3,7). The selected groups are joined into a single slider. Groups with \"Show on homepage\" enabled also appear automatically on the homepage.",
       "id_label": "ID",
-      "copy_id": "Copy ID",
-      "copied": "Copied",
       "show_on_homepage": "Show on homepage",
       "auto_badge": "Automatic",
       "org_badge": "Organization",

@@ -1,7 +1,7 @@
 import { FC, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { DragDropContext, Droppable, Draggable, type DropResult } from '@hello-pangea/dnd';
-import { Close, DragIndicator, HelpOutline, ContentCopy } from '@mui/icons-material';
+import { Close, DragIndicator, HelpOutline } from '@mui/icons-material';
 import Tooltip from '@mui/material/Tooltip';
 
 import { Button } from '../../common/Button';
@@ -34,17 +34,7 @@ import {
   DeleteCourseGroupOption,
   DeleteCourseGroupOptionVariables,
 } from '../../../queries/__generated__/DeleteCourseGroupOption';
-
-// Titles that have a translation in common.course_group_options. Custom group
-// options created by an admin are shown with their raw title instead.
-const KNOWN_TITLES = new Set([
-  'tech_coding',
-  'business_startup',
-  'creative_social_sustainable',
-  'degree',
-  'event',
-  'courses',
-]);
+import { isKnownCourseGroupOptionTitle } from '../../../helpers/courseGroupOptions';
 
 const connectedCount = (option: AdminCourseGroupOptions_CourseGroupOption) =>
   option.CourseGroups_aggregate?.aggregate?.count ?? 0;
@@ -55,17 +45,6 @@ const CourseGroupOptionsManager: FC = () => {
 
   const [newTitle, setNewTitle] = useState('');
   const [error, setError] = useState('');
-  const [copiedId, setCopiedId] = useState<number | null>(null);
-
-  const handleCopyId = async (id: number) => {
-    try {
-      await navigator.clipboard?.writeText(String(id));
-    } catch {
-      // Clipboard may be unavailable (e.g. insecure context); still give feedback.
-    }
-    setCopiedId(id);
-    setTimeout(() => setCopiedId((current) => (current === id ? null : current)), 1500);
-  };
 
   const { data } = useAdminQuery<AdminCourseGroupOptions>(ADMIN_COURSE_GROUP_OPTIONS);
   const options = useMemo(() => data?.CourseGroupOption ?? [], [data]);
@@ -87,7 +66,7 @@ const CourseGroupOptionsManager: FC = () => {
   );
 
   const labelFor = (title: string) =>
-    KNOWN_TITLES.has(title) ? tCommon(`course_group_options.${title}`) : title;
+    isKnownCourseGroupOptionTitle(title) ? tCommon(`course_group_options.${title}`) : title;
 
   const onDragEnd = async (result: DropResult) => {
     if (!result.destination) return;
@@ -253,16 +232,9 @@ const CourseGroupOptionsManager: FC = () => {
                             />
                             {t('show_on_homepage')}
                           </label>
-                          <Tooltip title={copiedId === option.id ? t('copied') : t('copy_id')} placement="top">
-                            <button
-                              type="button"
-                              onClick={() => handleCopyId(option.id)}
-                              className="flex items-center gap-1 text-xs font-mono rounded border border-border-primary px-2 py-1 text-label-secondary hover:text-label-primary"
-                            >
-                              {t('id_label')} {option.id}
-                              <ContentCopy style={{ fontSize: '0.85rem' }} />
-                            </button>
-                          </Tooltip>
+                          <span className="text-xs font-mono text-label-secondary whitespace-nowrap">
+                            {t('id_label')} {option.id}
+                          </span>
                           <Tooltip title={deleteTooltip} placement="top">
                             <span>
                               <button

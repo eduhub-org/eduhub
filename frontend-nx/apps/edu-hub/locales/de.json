@@ -1031,6 +1031,10 @@
       "label": "Kachel-Slider Gruppe",
       "placeholder": "Kachel-Slider Gruppen auswählen"
     },
+    "course_group": {
+      "label": "Kurs-Gruppe",
+      "placeholder": "Kurs-Gruppen auswählen"
+    },
     "cover_image": {
       "label": "Titelbild",
       "upload_text": "Klicken um Titelbild hochzuladen oder Datei hier ablegen",
@@ -1043,6 +1047,9 @@
     "funding_organizations": {
       "label": "Förderorganisationen",
       "add": "Förderorganisation hinzufügen"
+    },
+    "certificates": {
+      "label": "Bescheinigungen"
     },
     "possible_certificates": {
       "label": "Mögliche Bescheinigungen",
@@ -1819,8 +1826,6 @@
       "add_button": "Hinzufügen",
       "widget_help": "Jede Kursgruppierung hat eine ID (rechts in jeder Zeile). Um eine oder mehrere Gruppen in einem Organisations-Widget anzuzeigen, füge der Widget-URL den Parameter ?groups=ID hinzu (mehrere IDs mit Komma trennen, z. B. ?groups=3,7). Die ausgewählten Gruppen werden zu einem einzigen Slider zusammengeführt. Gruppen mit aktiviertem \"Auf Startseite anzeigen\" erscheinen zusätzlich automatisch auf der Startseite.",
       "id_label": "ID",
-      "copy_id": "ID kopieren",
-      "copied": "Kopiert",
       "show_on_homepage": "Auf Startseite anzeigen",
       "auto_badge": "Automatisch",
       "org_badge": "Organisation",
