@@ -13,14 +13,22 @@ import { useUserId } from './user';
 // organizations' published programs. Filtering by the OrganizationAdmins relationship keeps the
 // lists limited to the admin's own organizations.
 
+// A filter that matches no rows. Used as a safe default for non-admins while their user id is still
+// resolving, so a management list never momentarily renders unscoped (the org_admin select is
+// unioned with public read). `id` is a non-null primary key, so `_is_null: true` matches nothing.
+const MATCH_NONE = { id: { _is_null: true } } as const;
+
 // Program_bool_exp scoping for the program management list.
 export const useManageProgramWhere = (): Record<string, unknown> => {
   const isAdmin = useIsAdmin();
   const userId = useUserId();
 
   return useMemo(() => {
-    if (isAdmin || !userId) {
+    if (isAdmin) {
       return {};
+    }
+    if (!userId) {
+      return MATCH_NONE;
     }
     return {
       Organization: {
@@ -40,8 +48,11 @@ export const useManageCourseWhere = (): Record<string, unknown> => {
   const userId = useUserId();
 
   return useMemo(() => {
-    if (isAdmin || !userId) {
+    if (isAdmin) {
       return {};
+    }
+    if (!userId) {
+      return MATCH_NONE;
     }
     return {
       Program: {

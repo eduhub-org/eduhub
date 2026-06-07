@@ -34,6 +34,9 @@ export const useRoleMutation = <TData = any, TVariables = any>(
         ...passedOptions,
         context: {
           ...passedOptions?.context,
+          // The Apollo auth link sets x-hasura-role from context.role (falling back to the session
+          // role), so the role MUST be set here — a header alone would be overwritten by the link.
+          role: effectiveRole,
           headers: {
             ...(effectiveRole !== AuthRoles.anonymous && {
               'x-hasura-role': effectiveRole,
@@ -70,6 +73,7 @@ export const useFlexibleMutation = <TData = any, TVariables = any>(
           ...passedOptions,
           context: {
             ...passedOptions?.context,
+            role: AuthRoles.admin,
             headers: {
               ...passedOptions?.context?.headers,
               'x-hasura-role': AuthRoles.admin,
@@ -82,6 +86,7 @@ export const useFlexibleMutation = <TData = any, TVariables = any>(
             ...passedOptions,
             context: {
               ...passedOptions?.context,
+              role: passedRole ?? contextRole ?? currentRole,
               headers: {
                 ...passedOptions?.context?.headers,
                 ...(currentRole !== AuthRoles.anonymous && {
@@ -111,6 +116,7 @@ export const useInstructorMutation = <TData = any, TVariables = any>(
         ...passedOptions,
         context: {
           ...passedOptions?.context,
+          role: AuthRoles.instructor,
           headers: {
             ...passedOptions?.context?.headers,
             'x-hasura-role': AuthRoles.instructor,
@@ -137,6 +143,7 @@ export const useOrgAdminMutation = <TData = any, TVariables = any>(
         ...passedOptions,
         context: {
           ...passedOptions?.context,
+          role: AuthRoles.org_admin,
           headers: {
             ...passedOptions?.context?.headers,
             'x-hasura-role': AuthRoles.org_admin,
@@ -165,6 +172,7 @@ export const useManageMutation = <TData = any, TVariables = any>(
         ...passedOptions,
         context: {
           ...passedOptions?.context,
+          role,
           headers: {
             ...passedOptions?.context?.headers,
             'x-hasura-role': role,
@@ -190,6 +198,7 @@ export const useAdminMutation = <TData = any, TVariables = any>(
         ...passedOptions,
         context: {
           ...passedOptions?.context,
+          role: AuthRoles.admin,
           headers: {
             ...passedOptions?.context?.headers,
             'x-hasura-role': AuthRoles.admin,

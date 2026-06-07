@@ -296,6 +296,8 @@ select_permissions:
             OrganizationAdmins:
               userId:
                 _eq: X-Hasura-User-Id
+      # The manage-courses list reads Course_aggregate { count }, so org admins need aggregations.
+      allow_aggregations: true
 update_permissions:
   - role: instructor_access
     permission:

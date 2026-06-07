@@ -102,16 +102,13 @@ export const useLazyRoleQuery: typeof useLazyQuery = (query, passedOptions) => {
   const currentRole = useCurrentRole();
   const contextRole = useManagementRoleContext();
   const passedRole = passedOptions?.context?.role as AuthRoles | undefined;
-  const mergedContext = useMemo(() => {
-    if (!passedOptions?.context) {
-      return passedOptions?.context;
-    }
-
-    return {
-      ...passedOptions.context,
+  const mergedContext = useMemo(
+    () => ({
+      ...(passedOptions?.context ?? {}),
       role: passedRole ?? contextRole ?? currentRole,
-    };
-  }, [passedOptions?.context, passedRole, contextRole, currentRole]);
+    }),
+    [passedOptions?.context, passedRole, contextRole, currentRole]
+  );
 
   const errorHandler = useErrorHandler();
   const errorHandlerRef = useRef(errorHandler);

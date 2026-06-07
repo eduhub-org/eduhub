@@ -36,10 +36,14 @@ const ExpandableUserRow: FC<{
   const [setAdminStatus] = useAdminMutation(UPDATE_USER_ADMIN_STATUS);
 
   const handleAdminToggle = async (checked: boolean) => {
+    // row.id is the OrganizationAdmin grant id; the super-admin action keys off the User id.
+    if (!row.User?.id) {
+      return;
+    }
     try {
       const response = await setAdminStatus({
         variables: {
-          userId: row.id,
+          userId: row.User.id,
           isAdmin: checked,
         },
       });

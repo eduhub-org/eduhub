@@ -103,6 +103,10 @@ export const removeKeycloakRole = async (req, res) => {
     first: 1,
   });
 
+  if (!hasura_client?.[0]?.id) {
+    return res.status(500).json({ error: "Keycloak client 'hasura' not found" });
+  }
+
   // Only roles currently assigned to the user can be removed; resolve the role id from the user's
   // assigned client roles. If it is not assigned this is an idempotent no-op rather than an error.
   const assigned_roles = await kcAdminClient.users.listClientRoleMappings({

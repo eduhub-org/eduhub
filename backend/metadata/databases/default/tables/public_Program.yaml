@@ -109,6 +109,8 @@ select_permissions:
           OrganizationAdmins:
             userId:
               _eq: X-Hasura-User-Id
+      # ProgramList reads Program_aggregate { count }, so org admins need aggregations.
+      allow_aggregations: true
 update_permissions:
   # Editing a program requires the matching per-type capability on the admin's row for the
   # program's organization. `type`, `id` and `organizationId` are excluded so the program cannot
