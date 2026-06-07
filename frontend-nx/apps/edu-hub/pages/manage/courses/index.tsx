@@ -10,6 +10,7 @@ import { Page } from '../../../components/layout/Page';
 import { useManageQuery } from '../../../hooks/authedQuery';
 import { useIsAdmin, useIsLoggedIn, useIsOrgAdmin } from '../../../hooks/authentication';
 import { useManageProgramWhere } from '../../../hooks/manageScope';
+import { ManagementRoleProvider } from '../../../hooks/managementRole';
 import { PROGRAMS_WITH_MINIMUM_PROPERTIES } from '../../../queries/programList';
 import { Programs } from '../../../queries/__generated__/Programs';
 
@@ -24,7 +25,13 @@ const Index: FC = () => {
         <link rel="icon" href="/favicon.png" />
       </Head>
       <Page>
-        <div className="min-h-[77vh]">{isLoggedIn && (isAdmin || isOrgAdmin) && <CoursesDashBoard />}</div>
+        <div className="min-h-[77vh]">
+          {isLoggedIn && (isAdmin || isOrgAdmin) && (
+            <ManagementRoleProvider>
+              <CoursesDashBoard />
+            </ManagementRoleProvider>
+          )}
+        </div>
       </Page>
     </>
   );

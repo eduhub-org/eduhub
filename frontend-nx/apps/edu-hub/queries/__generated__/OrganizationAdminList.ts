@@ -45,6 +45,9 @@ export interface OrganizationAdminList_OrganizationAdmin {
   Organization: OrganizationAdminList_OrganizationAdmin_Organization;
   canManageEvents: boolean;
   canManageCourses: boolean;
+  /**
+   * Allows the organization admin to manage programs (and their courses) of type DEGREES for the organization
+   */
   canManageDegrees: boolean;
   canManageSettings: boolean;
 }

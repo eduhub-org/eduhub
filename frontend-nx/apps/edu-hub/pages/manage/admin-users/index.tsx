@@ -6,6 +6,7 @@ import Head from 'next/head';
 import { FC } from 'react';
 import { Page } from '../../../components/layout/Page';
 import { useIsAdmin, useIsLoggedIn, useIsOrgAdmin } from '../../../hooks/authentication';
+import { ManagementRoleProvider } from '../../../hooks/managementRole';
 
 import ManageAdminUsersContent from '../../../components/pages/ManageAdminUsersContent';
 
@@ -22,7 +23,13 @@ const ManageAdminUsers: FC = () => {
       </Head>
       <div className="max-w-screen-xl mx-auto">
         <Page>
-          <div className="min-h-[77vh]">{isLoggedIn && (isAdmin || isOrgAdmin) && <ManageAdminUsersContent />}</div>
+          <div className="min-h-[77vh]">
+            {isLoggedIn && (isAdmin || isOrgAdmin) && (
+              <ManagementRoleProvider>
+                <ManageAdminUsersContent />
+              </ManagementRoleProvider>
+            )}
+          </div>
         </Page>
       </div>
     </>

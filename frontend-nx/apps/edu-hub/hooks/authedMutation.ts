@@ -3,6 +3,7 @@ import { useSession } from 'next-auth/react';
 import { useCallback } from 'react';
 
 import { useCurrentRole, useManageRole } from './authentication';
+import { useManagementRoleContext } from './managementRole';
 import { AuthRoles } from '../types/enums';
 
 type CustomContext = {
@@ -21,8 +22,12 @@ export const useRoleMutation = <TData = any, TVariables = any>(
   const { data } = useSession();
   const accessToken = data?.accessToken;
   const currentRole = useCurrentRole();
+  const contextRole = useManagementRoleContext();
 
+  // Priority: an explicit role on the call > the surrounding management-role context (set on the
+  // /manage screens) > the current session role.
   const passedRole: AuthRoles | undefined = passedOptions?.context?.role;
+  const effectiveRole = passedRole ?? contextRole ?? currentRole;
 
   const options = accessToken
     ? {
@@ -30,10 +35,10 @@ export const useRoleMutation = <TData = any, TVariables = any>(
         context: {
           ...passedOptions?.context,
           headers: {
-            ...(currentRole !== AuthRoles.anonymous && {
-              'x-hasura-role': passedRole ?? currentRole,
+            ...(effectiveRole !== AuthRoles.anonymous && {
+              'x-hasura-role': effectiveRole,
             }),
-            ...(currentRole !== AuthRoles.anonymous && {
+            ...(effectiveRole !== AuthRoles.anonymous && {
               Authorization: `Bearer ${accessToken}`,
             }),
           },
@@ -56,6 +61,7 @@ export const useFlexibleMutation = <TData = any, TVariables = any>(
   const { data } = useSession();
   const accessToken = data?.accessToken;
   const currentRole = useCurrentRole();
+  const contextRole = useManagementRoleContext();
   const passedRole: AuthRoles | undefined = passedOptions?.context?.role;
 
   const options =
@@ -79,7 +85,7 @@ export const useFlexibleMutation = <TData = any, TVariables = any>(
               headers: {
                 ...passedOptions?.context?.headers,
                 ...(currentRole !== AuthRoles.anonymous && {
-                  'x-hasura-role': passedRole ?? currentRole,
+                  'x-hasura-role': passedRole ?? contextRole ?? currentRole,
                 }),
                 ...(currentRole !== AuthRoles.anonymous && {
                   Authorization: `Bearer ${accessToken}`,

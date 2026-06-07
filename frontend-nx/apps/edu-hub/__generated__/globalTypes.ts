@@ -1056,6 +1056,7 @@ export enum OrganizationAdmin_constraint {
  */
 export enum OrganizationAdmin_select_column {
   canManageCourses = "canManageCourses",
+  canManageDegrees = "canManageDegrees",
   canManageEvents = "canManageEvents",
   canManageSettings = "canManageSettings",
   created_at = "created_at",
@@ -1070,6 +1071,7 @@ export enum OrganizationAdmin_select_column {
  */
 export enum OrganizationAdmin_select_column_OrganizationAdmin_aggregate_bool_exp_bool_and_arguments_columns {
   canManageCourses = "canManageCourses",
+  canManageDegrees = "canManageDegrees",
   canManageEvents = "canManageEvents",
   canManageSettings = "canManageSettings",
 }
@@ -1079,6 +1081,7 @@ export enum OrganizationAdmin_select_column_OrganizationAdmin_aggregate_bool_exp
  */
 export enum OrganizationAdmin_select_column_OrganizationAdmin_aggregate_bool_exp_bool_or_arguments_columns {
   canManageCourses = "canManageCourses",
+  canManageDegrees = "canManageDegrees",
   canManageEvents = "canManageEvents",
   canManageSettings = "canManageSettings",
 }
@@ -1088,6 +1091,7 @@ export enum OrganizationAdmin_select_column_OrganizationAdmin_aggregate_bool_exp
  */
 export enum OrganizationAdmin_update_column {
   canManageCourses = "canManageCourses",
+  canManageDegrees = "canManageDegrees",
   canManageEvents = "canManageEvents",
   canManageSettings = "canManageSettings",
   created_at = "created_at",
@@ -6391,6 +6395,7 @@ export interface OrganizationAdmin_bool_exp {
   _not?: OrganizationAdmin_bool_exp | null;
   _or?: OrganizationAdmin_bool_exp[] | null;
   canManageCourses?: Boolean_comparison_exp | null;
+  canManageDegrees?: Boolean_comparison_exp | null;
   canManageEvents?: Boolean_comparison_exp | null;
   canManageSettings?: Boolean_comparison_exp | null;
   created_at?: timestamptz_comparison_exp | null;
@@ -6407,6 +6412,7 @@ export interface OrganizationAdmin_insert_input {
   Organization?: Organization_obj_rel_insert_input | null;
   User?: User_obj_rel_insert_input | null;
   canManageCourses?: boolean | null;
+  canManageDegrees?: boolean | null;
   canManageEvents?: boolean | null;
   canManageSettings?: boolean | null;
   created_at?: any | null;
@@ -6454,6 +6460,7 @@ export interface OrganizationAdmin_order_by {
   Organization?: Organization_order_by | null;
   User?: User_order_by | null;
   canManageCourses?: order_by | null;
+  canManageDegrees?: order_by | null;
   canManageEvents?: order_by | null;
   canManageSettings?: order_by | null;
   created_at?: order_by | null;

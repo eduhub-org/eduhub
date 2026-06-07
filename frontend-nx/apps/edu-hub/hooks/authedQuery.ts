@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl';
 import { useCallback, useMemo, useRef } from 'react';
 
 import { useCurrentRole, useManageRole } from './authentication';
+import { useManagementRoleContext } from './managementRole';
 import { useAuthError } from '../contexts/AuthErrorContext';
 
 import { AuthRoles } from '../types/enums';
@@ -54,19 +55,18 @@ export const useRoleQuery: typeof useQuery = (query, passedOptions) => {
   // Auth headers are added by the Apollo auth link (reads from authStore).
   // We do NOT pass context with auth here — context changes trigger refetches
   // (Apollo issue #11835). Only pass role override when caller needs it.
-  const roleOverride = passedOptions?.context?.role as AuthRoles | undefined;
+  // On the /manage screens a management-role context is present and is used when the caller did not
+  // pass an explicit role, so nested read widgets query under the org admin's role.
+  const contextRole = useManagementRoleContext();
+  const roleOverride = (passedOptions?.context?.role as AuthRoles | undefined) ?? contextRole;
   const mergedContext = useMemo(() => {
     const currentContext = passedOptions?.context;
-    if (!currentContext) {
-      return undefined;
-    }
-
     if (!roleOverride) {
       return currentContext;
     }
 
     return {
-      ...currentContext,
+      ...(currentContext ?? {}),
       role: roleOverride,
     };
   }, [passedOptions?.context, roleOverride]);
@@ -100,6 +100,7 @@ export const useRoleQuery: typeof useQuery = (query, passedOptions) => {
 
 export const useLazyRoleQuery: typeof useLazyQuery = (query, passedOptions) => {
   const currentRole = useCurrentRole();
+  const contextRole = useManagementRoleContext();
   const passedRole = passedOptions?.context?.role as AuthRoles | undefined;
   const mergedContext = useMemo(() => {
     if (!passedOptions?.context) {
@@ -108,9 +109,9 @@ export const useLazyRoleQuery: typeof useLazyQuery = (query, passedOptions) => {
 
     return {
       ...passedOptions.context,
-      role: passedRole ?? currentRole,
+      role: passedRole ?? contextRole ?? currentRole,
     };
-  }, [passedOptions?.context, passedRole, currentRole]);
+  }, [passedOptions?.context, passedRole, contextRole, currentRole]);
 
   const errorHandler = useErrorHandler();
   const errorHandlerRef = useRef(errorHandler);
