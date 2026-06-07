@@ -26,6 +26,16 @@ export const useIsInstructor = (): boolean => {
   return hasRole(sessionData, AuthRoles.instructor);
 };
 
+// Whether the current user administers at least one organization. Used purely for UI gating/nav.
+// NOTE: org_admin is intentionally NOT part of useCurrentRole — a user who is both an instructor
+// and an org admin must keep `instructor` (or `user`) as their default request role so access to
+// resources from other organizations (granted via the instructor path) is not lost. The org_admin
+// role is only ever applied explicitly via useOrgAdminQuery / useOrgAdminMutation.
+export const useIsOrgAdmin = (): boolean => {
+  const { data: sessionData } = useSession();
+  return hasRole(sessionData, AuthRoles.org_admin);
+};
+
 export const useIsUserIdInList = (allowedIds: string[]): boolean => {
   const { data: sessionData } = useSession();
   const userId = sessionData?.profile?.['https://hasura.io/jwt/claims']?.['x-hasura-user-id'];

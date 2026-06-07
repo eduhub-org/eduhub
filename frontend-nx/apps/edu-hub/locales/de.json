@@ -1804,6 +1804,7 @@
     "is_super_admin": "Ist Super-Admin",
     "can_manage_events": "Kann Events verwalten",
     "can_manage_courses": "Kann Kurse verwalten",
+    "can_manage_degrees": "Kann Studiengänge verwalten",
     "can_manage_users_and_settings": "Kann Benutzer und Einstellungen verwalten"
   },
   "manageAppSettings": {

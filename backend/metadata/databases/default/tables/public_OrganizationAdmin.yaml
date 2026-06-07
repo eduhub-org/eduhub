@@ -8,3 +8,43 @@ object_relationships:
   - name: User
     using:
       foreign_key_constraint_on: userId
+select_permissions:
+  # Org admins may read their own grants (to drive UI capability checks). They cannot
+  # insert/update/delete OrganizationAdmin rows — only super-admins (admin role) assign admins,
+  # which prevents self-escalation of capability flags.
+  - role: org_admin_access
+    permission:
+      columns:
+        - id
+        - userId
+        - organizationId
+        - canManageCourses
+        - canManageEvents
+        - canManageDegrees
+        - canManageSettings
+      filter:
+        userId:
+          _eq: X-Hasura-User-Id
+event_triggers:
+  - name: add_keycloak_org_admin_role
+    definition:
+      enable_manual: false
+      insert:
+        columns: '*'
+    retry_conf:
+      interval_sec: 10
+      num_retries: 0
+      timeout_sec: 60
+    webhook_from_env: CLOUD_FUNCTION_LINK_ADD_KEYCLOAK_ROLE
+    headers:
+      - name: secret
+        value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+      - name: role
+        value: org_admin
+    cleanup_config:
+      batch_size: 10000
+      clean_invocation_logs: false
+      clear_older_than: 168
+      paused: true
+      schedule: 0 0 * * *
+      timeout: 60

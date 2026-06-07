@@ -117,6 +117,32 @@ export const useInstructorMutation = <TData = any, TVariables = any>(
   return useMutation<TData, TVariables>(mutation, options);
 };
 
+// Pins the org_admin role on a mutation. Caller must hold the role (useIsOrgAdmin). Use on
+// organization-management screens so writes are evaluated against the org_admin Hasura permissions.
+export const useOrgAdminMutation = <TData = any, TVariables = any>(
+  mutation: DocumentNode,
+  passedOptions?: CustomMutationOptions<TData, TVariables>
+) => {
+  const { data } = useSession();
+  const accessToken = data?.accessToken;
+
+  const options = accessToken
+    ? {
+        ...passedOptions,
+        context: {
+          ...passedOptions?.context,
+          headers: {
+            ...passedOptions?.context?.headers,
+            'x-hasura-role': AuthRoles.org_admin,
+            Authorization: 'Bearer ' + accessToken,
+          },
+        },
+      }
+    : passedOptions;
+
+  return useMutation<TData, TVariables>(mutation, options);
+};
+
 // Corrected useAdminMutation hook
 export const useAdminMutation = <TData = any, TVariables = any>(
   mutation: DocumentNode,

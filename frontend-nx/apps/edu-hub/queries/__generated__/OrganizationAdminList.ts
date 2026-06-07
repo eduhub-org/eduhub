@@ -45,6 +45,7 @@ export interface OrganizationAdminList_OrganizationAdmin {
   Organization: OrganizationAdminList_OrganizationAdmin_Organization;
   canManageEvents: boolean;
   canManageCourses: boolean;
+  canManageDegrees: boolean;
   canManageSettings: boolean;
 }
 

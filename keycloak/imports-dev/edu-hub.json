@@ -430,6 +430,14 @@
           "clientRole": true,
           "containerId": "c4bb855a-ab27-4b23-a2ee-be55d7604a57",
           "attributes": {}
+        },
+        {
+          "id": "b8e1f3a2-2c44-4f8d-9a7b-1d6e0c5f4a90",
+          "name": "org_admin",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "c4bb855a-ab27-4b23-a2ee-be55d7604a57",
+          "attributes": {}
         }
       ]
     }
@@ -496,6 +504,32 @@
   "webAuthnPolicyPasswordlessAvoidSameAuthenticatorRegister": false,
   "webAuthnPolicyPasswordlessAcceptableAaguids": [],
   "users": [ {
+      "id" : "dddddddd-dddd-dddd-dddd-dddddddddddd",
+      "createdTimestamp" : 1670948741507,
+      "username" : "orgadmin@example.com",
+      "enabled" : true,
+      "totp" : false,
+      "emailVerified" : true,
+      "firstName" : "Org",
+      "lastName" : "Admin",
+      "email" : "orgadmin@example.com",
+      "credentials" : [ {
+        "id" : "a1c3e5f7-1111-2222-3333-444455556666",
+        "type" : "password",
+        "userLabel" : "My password",
+        "createdDate" : 1670948759216,
+        "secretData" : "{\"value\":\"fN0ObkFyQW7Pp4WwLzAz+k8RJW3sOfWcHgXIEZB7JfK44O8XfFIaANMZaJk6n4YrkKc3gwURHFy8uJwbdplI/Q==\",\"salt\":\"gZwz/MqzUCBtoUfdP7dpPw==\",\"additionalParameters\":{}}",
+        "credentialData" : "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}"
+      } ],
+      "disableableCredentialTypes" : [ ],
+      "requiredActions" : [ ],
+      "realmRoles" : [ "default-roles-edu-hub" ],
+      "clientRoles" : {
+        "hasura" : [ "user", "instructor", "org_admin" ]
+      },
+      "notBefore" : 0,
+      "groups" : [ "defaults" ]
+    }, {
       "id" : "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
       "createdTimestamp" : 1670948741507,
       "username" : "user@example.com",

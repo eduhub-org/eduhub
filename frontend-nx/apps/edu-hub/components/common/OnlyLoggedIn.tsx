@@ -5,6 +5,7 @@ import {
   useIsAdmin,
   useIsInstructor,
   useIsLoggedIn,
+  useIsOrgAdmin,
 } from "../../hooks/authentication";
 
 type TProps = {
@@ -63,6 +64,18 @@ export const OnlyAdmin: FC<OnlyAdminProps> = ({ children, showFeedback = false }
 
   return null;
 };
+// Renders children for organization admins (or super-admins, who can do everything).
+export const OnlyOrgAdmin: FC<TProps> = ({ children }: TProps) => {
+  const isLoggedIn = useIsLoggedIn();
+  const isAdmin = useIsAdmin();
+  const isOrgAdmin = useIsOrgAdmin();
+  if (isLoggedIn && (isOrgAdmin || isAdmin)) {
+    return <>{children}</>;
+  } else {
+    return null;
+  }
+};
+
 export const OnlyInstructor: FC<TProps> = ({ children }: TProps) => {
   const isLoggedIn = useIsLoggedIn();
   const isAdmin = useIsAdmin();

@@ -15,6 +15,7 @@ import {
   DELETE_ORGANIZATION_ADMIN,
   UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_EVENTS,
   UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_COURSES,
+  UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_DEGREES,
   UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_SETTINGS,
 } from '../../../queries/organizationAdmin';
 import { UPDATE_USER_ADMIN_STATUS, ADMIN_USERS } from '../../../queries/actions';
@@ -73,7 +74,17 @@ const ExpandableUserRow: FC<{
             refetchQueries={['GetAdminUsers']}
           />
         </div>
-        <div className="pl-3 col-span-4">
+        <div className="pl-3 col-span-3">
+          <CheckboxSelector
+            variant="eduhub"
+            label={t('can_manage_degrees')}
+            checked={row.canManageDegrees}
+            updateValueMutation={UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_DEGREES}
+            identifierVariables={{ itemId: row.id }}
+            refetchQueries={['GetAdminUsers']}
+          />
+        </div>
+        <div className="pl-3 col-span-3">
           <CheckboxSelector
             variant="eduhub"
             label={t('can_manage_users_and_settings')}

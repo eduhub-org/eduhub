@@ -237,6 +237,40 @@ export const useInstructorQuery: typeof useQuery = (query, passedOptions) => {
   return useQuery(query, options);
 };
 
+// Pins the org_admin role on the request. The caller must actually hold the role (useIsOrgAdmin).
+// Use on organization-management screens so the request matches the org_admin Hasura permissions.
+export const useOrgAdminQuery: typeof useQuery = (query, passedOptions) => {
+  const mergedContext = useMemo(
+    () => ({
+      ...passedOptions?.context,
+      role: AuthRoles.org_admin,
+    }),
+    [passedOptions?.context]
+  );
+
+  const errorHandler = useErrorHandler();
+  const errorHandlerRef = useRef(errorHandler);
+  errorHandlerRef.current = errorHandler;
+  const callerOnErrorRef = useRef(passedOptions?.onError);
+  callerOnErrorRef.current = passedOptions?.onError;
+
+  const onError = useCallback((error: ApolloError) => {
+    errorHandlerRef.current(error);
+    callerOnErrorRef.current?.(error);
+  }, []);
+
+  const options = useMemo(
+    () => ({
+      ...passedOptions,
+      context: mergedContext,
+      onError,
+    }),
+    [passedOptions, mergedContext, onError]
+  );
+
+  return useQuery(query, options);
+};
+
 /**
  * @deprecated Use useRoleQuery instead.
  * This alias exists for backward compatibility and no longer forces role=user.
