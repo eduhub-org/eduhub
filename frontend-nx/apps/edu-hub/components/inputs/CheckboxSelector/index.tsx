@@ -12,6 +12,7 @@ const CheckboxSelector: React.FC<CheckboxSelectorProps> = ({
   label,
   checked,
   updateValueMutation,
+  role,
   onValueUpdated,
   refetchQueries = [],
   helpText,
@@ -35,7 +36,7 @@ const CheckboxSelector: React.FC<CheckboxSelectorProps> = ({
     setShowSavedNotification,
     errorMessage,
     handleValueChange,
-  } = useCheckboxLogic(checked, updateValueMutation ?? null, identifierVariables ?? {}, handleMutationValueUpdate, refetchQueries);
+  } = useCheckboxLogic(checked, updateValueMutation ?? null, identifierVariables ?? {}, handleMutationValueUpdate, refetchQueries, role);
 
   const checkboxProps = {
     label,

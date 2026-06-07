@@ -63,3 +63,22 @@ export const useCurrentRole = (): AuthRoles => {
       return AuthRoles.anonymous;
   }
 };
+
+// The role to use for the organization-management screens (manage programs/courses/admin-users).
+// Super-admins keep the `admin` role (full, unscoped access); everyone else who reaches these
+// screens is an org admin and uses `org_admin` (tenant-scoped in Hasura). This is deliberately NOT
+// folded into useCurrentRole — see the note on useIsOrgAdmin — so it must be requested explicitly
+// via useManageQuery / useManageMutation (or by passing it as the `role` of a shared component).
+export const useManageRole = (): AuthRoles => {
+  const isAdmin = useIsAdmin();
+  const isOrgAdmin = useIsOrgAdmin();
+
+  switch (true) {
+    case isAdmin:
+      return AuthRoles.admin;
+    case isOrgAdmin:
+      return AuthRoles.org_admin;
+    default:
+      return AuthRoles.user;
+  }
+};

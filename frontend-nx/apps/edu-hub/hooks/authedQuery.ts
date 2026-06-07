@@ -3,7 +3,7 @@ import { signOut } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
 import { useCallback, useMemo, useRef } from 'react';
 
-import { useCurrentRole } from './authentication';
+import { useCurrentRole, useManageRole } from './authentication';
 import { useAuthError } from '../contexts/AuthErrorContext';
 
 import { AuthRoles } from '../types/enums';
@@ -148,6 +148,42 @@ export const useAdminQuery: typeof useQuery = (query, passedOptions) => {
       role: AuthRoles.admin,
     }),
     [passedOptions?.context]
+  );
+
+  const errorHandler = useErrorHandler();
+  const errorHandlerRef = useRef(errorHandler);
+  errorHandlerRef.current = errorHandler;
+  const callerOnErrorRef = useRef(passedOptions?.onError);
+  callerOnErrorRef.current = passedOptions?.onError;
+
+  const onError = useCallback((error: ApolloError) => {
+    errorHandlerRef.current(error);
+    callerOnErrorRef.current?.(error);
+  }, []);
+
+  const options = useMemo(
+    () => ({
+      ...passedOptions,
+      context: mergedContext,
+      onError,
+    }),
+    [passedOptions, mergedContext, onError]
+  );
+
+  return useQuery(query, options);
+};
+
+// Like useAdminQuery, but pins the management role: `admin` for super-admins, `org_admin` for org
+// admins. Drop-in replacement for useAdminQuery on the organization-management screens so the same
+// component works for both. For super-admins the behaviour is identical to useAdminQuery.
+export const useManageQuery: typeof useQuery = (query, passedOptions) => {
+  const role = useManageRole();
+  const mergedContext = useMemo(
+    () => ({
+      ...passedOptions?.context,
+      role,
+    }),
+    [passedOptions?.context, role]
   );
 
   const errorHandler = useErrorHandler();

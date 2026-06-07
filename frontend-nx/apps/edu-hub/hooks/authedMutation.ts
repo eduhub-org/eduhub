@@ -2,7 +2,7 @@ import { QueryResult, useMutation, DocumentNode, MutationFunctionOptions } from 
 import { useSession } from 'next-auth/react';
 import { useCallback } from 'react';
 
-import { useCurrentRole } from './authentication';
+import { useCurrentRole, useManageRole } from './authentication';
 import { AuthRoles } from '../types/enums';
 
 type CustomContext = {
@@ -134,6 +134,34 @@ export const useOrgAdminMutation = <TData = any, TVariables = any>(
           headers: {
             ...passedOptions?.context?.headers,
             'x-hasura-role': AuthRoles.org_admin,
+            Authorization: 'Bearer ' + accessToken,
+          },
+        },
+      }
+    : passedOptions;
+
+  return useMutation<TData, TVariables>(mutation, options);
+};
+
+// Like useAdminMutation, but pins the management role: `admin` for super-admins, `org_admin` for
+// org admins. Drop-in replacement for useAdminMutation on the organization-management screens; for
+// super-admins it behaves identically. Hasura enforces the per-organization/per-capability scope.
+export const useManageMutation = <TData = any, TVariables = any>(
+  mutation: DocumentNode,
+  passedOptions?: CustomMutationOptions<TData, TVariables>
+) => {
+  const { data } = useSession();
+  const accessToken = data?.accessToken;
+  const role = useManageRole();
+
+  const options = accessToken
+    ? {
+        ...passedOptions,
+        context: {
+          ...passedOptions?.context,
+          headers: {
+            ...passedOptions?.context?.headers,
+            'x-hasura-role': role,
             Authorization: 'Bearer ' + accessToken,
           },
         },

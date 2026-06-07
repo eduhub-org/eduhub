@@ -32,6 +32,7 @@ const TableGrid = <T extends BaseRow,>({
   columns,
   deleteMutation,
   deleteIdType,
+  role,
   generateDeletionConfirmationQuestion,
   error,
   expandableRowComponent,
@@ -600,6 +601,7 @@ const TableGrid = <T extends BaseRow,>({
                       deleteMutation={deleteMutation}
                       id={row.original.id}
                       idType={deleteIdType ?? 'number'}
+                      role={role}
                       deletionConfirmationQuestion={
                         generateDeletionConfirmationQuestion
                           ? generateDeletionConfirmationQuestion(row.original)

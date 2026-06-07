@@ -90,6 +90,10 @@ module "hasura_service" {
       value = google_cloudfunctions2_function.add_keycloak_role.service_config[0].uri
     },
     {
+      name  = "CLOUD_FUNCTION_LINK_REMOVE_KEYCLOAK_ROLE"
+      value = google_cloudfunctions2_function.remove_keycloak_role.service_config[0].uri
+    },
+    {
       name  = "CLOUD_FUNCTION_LINK_UPDATE_FROM_KEYCLOAK"
       value = google_cloudfunctions2_function.update_from_keycloak.service_config[0].uri
     },

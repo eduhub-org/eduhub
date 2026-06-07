@@ -41,6 +41,7 @@
       "my_certificates": "Meine Zertifikate",
       "faq": "FAQ",
       "user": "Benutzer",
+      "admin_users": "Admin-Benutzer",
       "experts": "Experten",
       "courses": "Kurse",
       "programs": "Programme",
@@ -1186,7 +1187,7 @@
     "add_as_aborted": "als abgebrochen hinzufügen oder ändern",
     "add_user_error": "Bitte mindestens einen User auswählen!",
     "submit": "Absenden",
-    "application_history":  {
+    "application_history": {
       "label": "Bisherige Bewerbungen und Teilnahmen",
       "no_applications_present": "Keine Bewerbungen vorhanden"
     },

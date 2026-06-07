@@ -1,10 +1,14 @@
 import { DocumentNode } from 'graphql';
 
+import { AuthRoles } from '../../../types/enums';
+
 export type CheckboxSelectorProps = {
   variant: 'material' | 'eduhub';
   label?: string;
   checked: boolean;
   updateValueMutation?: DocumentNode;
+  /** Overrides the Hasura role used for updateValueMutation (defaults to the current session role). */
+  role?: AuthRoles;
   onValueUpdated?: (data: any) => void;
   refetchQueries?: string[];
   helpText?: string;

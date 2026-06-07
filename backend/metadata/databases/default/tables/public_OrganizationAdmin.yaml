@@ -9,9 +9,9 @@ object_relationships:
     using:
       foreign_key_constraint_on: userId
 select_permissions:
-  # Org admins may read their own grants (to drive UI capability checks). They cannot
-  # insert/update/delete OrganizationAdmin rows — only super-admins (admin role) assign admins,
-  # which prevents self-escalation of capability flags.
+  # Org admins may read (a) their own grant — so the UI can derive their capabilities even when they
+  # have no settings rights — and (b) every admin grant of any organization for which they hold the
+  # canManageSettings capability, so they can manage that organization's admin team.
   - role: org_admin_access
     permission:
       columns:
@@ -23,8 +23,76 @@ select_permissions:
         - canManageDegrees
         - canManageSettings
       filter:
-        userId:
-          _eq: X-Hasura-User-Id
+        _or:
+          - userId:
+              _eq: X-Hasura-User-Id
+          - Organization:
+              OrganizationAdmins:
+                _and:
+                  - userId:
+                      _eq: X-Hasura-User-Id
+                  - canManageSettings:
+                      _eq: true
+insert_permissions:
+  # An org admin with canManageSettings may add admins to organizations they manage. The check pins
+  # the new row's organization to one they hold canManageSettings on; id is serial and userId/flags
+  # are supplied by the caller. They cannot grant super-admin (that lives in the separate Admin table).
+  - role: org_admin_access
+    permission:
+      columns:
+        - userId
+        - organizationId
+        - canManageCourses
+        - canManageEvents
+        - canManageDegrees
+        - canManageSettings
+      check:
+        Organization:
+          OrganizationAdmins:
+            _and:
+              - userId:
+                  _eq: X-Hasura-User-Id
+              - canManageSettings:
+                  _eq: true
+update_permissions:
+  # An org admin with canManageSettings may change the capability flags of grants in organizations
+  # they manage. organizationId and userId are intentionally not updatable, so a grant cannot be
+  # moved to another organization or reassigned to a different user, keeping changes inside scope.
+  - role: org_admin_access
+    permission:
+      columns:
+        - canManageCourses
+        - canManageEvents
+        - canManageDegrees
+        - canManageSettings
+      filter:
+        Organization:
+          OrganizationAdmins:
+            _and:
+              - userId:
+                  _eq: X-Hasura-User-Id
+              - canManageSettings:
+                  _eq: true
+      check:
+        Organization:
+          OrganizationAdmins:
+            _and:
+              - userId:
+                  _eq: X-Hasura-User-Id
+              - canManageSettings:
+                  _eq: true
+delete_permissions:
+  # An org admin with canManageSettings may remove admins from organizations they manage.
+  - role: org_admin_access
+    permission:
+      filter:
+        Organization:
+          OrganizationAdmins:
+            _and:
+              - userId:
+                  _eq: X-Hasura-User-Id
+              - canManageSettings:
+                  _eq: true
 event_triggers:
   - name: add_keycloak_org_admin_role
     definition:
@@ -36,6 +104,31 @@ event_triggers:
       num_retries: 0
       timeout_sec: 60
     webhook_from_env: CLOUD_FUNCTION_LINK_ADD_KEYCLOAK_ROLE
+    headers:
+      - name: secret
+        value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+      - name: role
+        value: org_admin
+    cleanup_config:
+      batch_size: 10000
+      clean_invocation_logs: false
+      clear_older_than: 168
+      paused: true
+      schedule: 0 0 * * *
+      timeout: 60
+  # On delete, ask removeKeycloakRole to revoke the org_admin Keycloak role. The function is a no-op
+  # if the user still administers another organization (still has an OrganizationAdmin row), so the
+  # role is only actually removed when the last grant is gone.
+  - name: remove_keycloak_org_admin_role
+    definition:
+      enable_manual: false
+      delete:
+        columns: '*'
+    retry_conf:
+      interval_sec: 10
+      num_retries: 0
+      timeout_sec: 60
+    webhook_from_env: CLOUD_FUNCTION_LINK_REMOVE_KEYCLOAK_ROLE
     headers:
       - name: secret
         value_from_env: HASURA_CLOUD_FUNCTION_SECRET

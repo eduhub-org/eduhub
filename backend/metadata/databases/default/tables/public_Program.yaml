@@ -92,6 +92,8 @@ select_permissions:
         - id
         - lectureEnd
         - lectureStart
+        - matrixSpaceId
+        - matrixInstructorRoomId
         - organizationId
         - projectProposalsEnabledByDefault
         - published

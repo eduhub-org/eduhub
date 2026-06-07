@@ -8,7 +8,7 @@ import { useTableGrid } from '../../common/TableGrid/hooks';
 import { createMultiWordSearchCondition } from '../../common/TableGrid/utils';
 import CheckboxSelector from '../../inputs/CheckboxSelector';
 
-import { useAdminQuery } from '../../../hooks/authedQuery';
+import { useAdminQuery, useManageQuery } from '../../../hooks/authedQuery';
 import { useAdminMutation } from '../../../hooks/authedMutation';
 import {
   ORGANIZATION_ADMIN_LIST,
@@ -21,7 +21,7 @@ import {
 import { UPDATE_USER_ADMIN_STATUS, ADMIN_USERS } from '../../../queries/actions';
 import { PageBlock } from '../../common/PageBlock';
 import CommonPageHeader from '../../common/CommonPageHeader';
-import { useIsAdmin } from '../../../hooks/authentication';
+import { useIsAdmin, useManageRole } from '../../../hooks/authentication';
 import { OrganizationAdminList_OrganizationAdmin } from '../../../queries/__generated__/OrganizationAdminList';
 
 const ExpandableUserRow: FC<{
@@ -31,6 +31,7 @@ const ExpandableUserRow: FC<{
 }> = ({ row, isSuperAdmin, onAdminStatusChange }) => {
   const t = useTranslations('manageAdminUsers');
   const isAdmin = useIsAdmin();
+  const manageRole = useManageRole();
 
   const [setAdminStatus] = useAdminMutation(UPDATE_USER_ADMIN_STATUS);
 
@@ -60,6 +61,7 @@ const ExpandableUserRow: FC<{
             label={t('can_manage_events')}
             checked={row.canManageEvents}
             updateValueMutation={UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_EVENTS}
+            role={manageRole}
             identifierVariables={{ itemId: row.id }}
             refetchQueries={['GetAdminUsers']}
           />
@@ -70,6 +72,7 @@ const ExpandableUserRow: FC<{
             label={t('can_manage_courses')}
             checked={row.canManageCourses}
             updateValueMutation={UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_COURSES}
+            role={manageRole}
             identifierVariables={{ itemId: row.id }}
             refetchQueries={['GetAdminUsers']}
           />
@@ -80,6 +83,7 @@ const ExpandableUserRow: FC<{
             label={t('can_manage_degrees')}
             checked={row.canManageDegrees}
             updateValueMutation={UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_DEGREES}
+            role={manageRole}
             identifierVariables={{ itemId: row.id }}
             refetchQueries={['GetAdminUsers']}
           />
@@ -90,6 +94,7 @@ const ExpandableUserRow: FC<{
             label={t('can_manage_users_and_settings')}
             checked={row.canManageSettings}
             updateValueMutation={UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_SETTINGS}
+            role={manageRole}
             identifierVariables={{ itemId: row.id }}
             refetchQueries={['GetAdminUsers']}
           />
@@ -112,10 +117,15 @@ const ExpandableUserRow: FC<{
 
 const ManageAdminUsersContent: FC = () => {
   const t = useTranslations('manageAdminUsers');
+  const isAdmin = useIsAdmin();
+  const manageRole = useManageRole();
   const [adminUserIds, setAdminUserIds] = useState<string[]>([]);
   const [adminError, setAdminError] = useState<Error | null>(null);
 
+  // The super-admin (Admin table) list drives only the super-admin toggle, which is shown to
+  // super-admins only. It is also an admin-only action, so org admins must not request it.
   useAdminQuery(ADMIN_USERS, {
+    skip: !isAdmin,
     onCompleted: (data) => {
       if (data?.getAdminUsers?.success) {
         setAdminUserIds(data.getAdminUsers.adminUserIds);
@@ -127,8 +137,10 @@ const ManageAdminUsersContent: FC = () => {
     },
   });
 
+  // Org admins see only the grants of organizations they administer (enforced by the org_admin
+  // select permission); super-admins see all. useManageQuery pins the role accordingly.
   const { data, loading, error, pageIndex, setPageIndex, searchFilter, setSearchFilter, refetch } = useTableGrid({
-    queryHook: useAdminQuery,
+    queryHook: useManageQuery,
     query: ORGANIZATION_ADMIN_LIST,
     pageSize: 15,
     refetchFilter: (searchFilter) => {
@@ -207,6 +219,7 @@ const ManageAdminUsersContent: FC = () => {
               onSearchFilterChange={setSearchFilter}
               deleteMutation={DELETE_ORGANIZATION_ADMIN}
               deleteIdType="uuidString"
+              role={manageRole}
               error={error}
               loading={loading}
               refetchQueries={['UsersByLastName', 'GetAdminUsers']}

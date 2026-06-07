@@ -580,6 +580,78 @@ resource "google_cloudfunctions2_function" "add_keycloak_role" {
 }
 
 ###############################################################################
+# Create Google cloud function for removeKeycloakRole
+#####
+# Apply IAM policy (see 'main.tf') which grants any user the privilige to invoke the serverless function
+resource "google_cloud_run_service_iam_policy" "remove_keycloak_role_noauth_invoker" {
+  location    = google_cloudfunctions2_function.remove_keycloak_role.location
+  project     = google_cloudfunctions2_function.remove_keycloak_role.project
+  service     = google_cloudfunctions2_function.remove_keycloak_role.name
+  policy_data = data.google_iam_policy.noauth_invoker.policy_data
+}
+# Retrieve data object with zipped scource code
+data "google_storage_bucket_object" "remove_keycloak_role" {
+  name   = "cloud-functions/removeKeycloakRole.zip"
+  bucket = var.project_id
+}
+# Create cloud function
+resource "google_cloudfunctions2_function" "remove_keycloak_role" {
+  provider    = google-beta
+  location    = var.region
+  name        = "remove-keycloak-role"
+  description = "Removes role mapping for given role from keycloak hasura client once the backing grant is gone"
+
+  build_config {
+    runtime     = "nodejs20"
+    entry_point = "removeKeycloakRole"
+    environment_variables = {
+      # Causes a re-deploy of the function when the source changes
+      "SOURCE_SHA" = data.google_storage_bucket_object.remove_keycloak_role.md5hash
+    }
+    source {
+      storage_source {
+        bucket = var.project_id
+        object = data.google_storage_bucket_object.remove_keycloak_role.name
+      }
+    }
+  }
+
+  service_config {
+    environment_variables = {
+      KEYCLOAK_USER   = var.keycloak_user
+      KEYCLOAK_URL    = "https://${local.keycloak_service_name}.opencampus.sh"
+      HASURA_ENDPOINT = "https://${local.hasura_service_name}.opencampus.sh/v1/graphql"
+    }
+
+    secret_environment_variables {
+      key        = "HASURA_CLOUD_FUNCTION_SECRET"
+      project_id = var.project_id
+      secret     = google_secret_manager_secret.cloud_function.secret_id
+      version    = "latest"
+    }
+
+    secret_environment_variables {
+      key        = "KEYCLOAK_PW"
+      project_id = var.project_id
+      secret     = google_secret_manager_secret.keycloak_pw.secret_id
+      version    = "latest"
+    }
+
+    secret_environment_variables {
+      key        = "HASURA_ADMIN_SECRET"
+      project_id = var.project_id
+      secret     = google_secret_manager_secret.hasura_graphql_admin_key.secret_id
+      version    = "latest"
+    }
+
+    max_instance_count = 1
+    available_memory   = "256M"
+    timeout_seconds    = 60
+    ingress_settings   = var.cloud_function_ingress_settings
+  }
+}
+
+###############################################################################
 # Create Google cloud function for updateFromKeycloak
 #####
 # Apply IAM policy (see 'main.tf') which grants any user the privilige to invoke the serverless function
