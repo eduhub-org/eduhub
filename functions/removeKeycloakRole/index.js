@@ -18,11 +18,11 @@ const { createClient } = require('graphqurl');
 const REMAINING_GRANT_QUERIES = {
   org_admin: {
     field: 'OrganizationAdmin',
-    query: 'query($id: uuid!) { OrganizationAdmin(where: {userId: {_eq: $id}}) { id } }',
+    query: 'query($id: uuid!) { OrganizationAdmin(where: {userId: {_eq: $id}}, limit: 1) { id } }',
   },
   instructor: {
     field: 'CourseInstructor',
-    query: 'query($id: uuid!) { CourseInstructor(where: {userId: {_eq: $id}}) { id } }',
+    query: 'query($id: uuid!) { CourseInstructor(where: {userId: {_eq: $id}}, limit: 1) { id } }',
   },
 };
 
@@ -64,12 +64,12 @@ export const removeKeycloakRole = async (req, res) => {
     });
 
     let stillGranted = null;
-    await client
-      .query({ query: remaining.query, variables: { id: userid } })
-      .then((response) => {
-        stillGranted = response.data[remaining.field];
-      })
-      .catch((error) => console.error(error));
+    try {
+      const response = await client.query({ query: remaining.query, variables: { id: userid } });
+      stillGranted = response.data[remaining.field];
+    } catch (error) {
+      console.error(error);
+    }
 
     if (stillGranted == null) {
       // Could not determine the remaining grants; fail rather than risk wrongly revoking the role.

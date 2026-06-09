@@ -35,26 +35,29 @@ const ExpandableUserRow: FC<{
 
   const [setAdminStatus] = useAdminMutation(UPDATE_USER_ADMIN_STATUS);
 
-  const handleAdminToggle = async (checked: boolean) => {
-    // row.id is the OrganizationAdmin grant id; the super-admin action keys off the User id.
-    if (!row.User?.id) {
-      return;
-    }
-    try {
-      const response = await setAdminStatus({
-        variables: {
-          userId: row.User.id,
-          isAdmin: checked,
-        },
-      });
-
-      if (response.data?.success) {
-        onAdminStatusChange();
+  const handleAdminToggle = useCallback(
+    async (checked: boolean) => {
+      // row.id is the OrganizationAdmin grant id; the super-admin action keys off the User id.
+      if (!row.User?.id) {
+        return;
       }
-    } catch (error) {
-      console.error('Error updating admin status:', error);
-    }
-  };
+      try {
+        const response = await setAdminStatus({
+          variables: {
+            userId: row.User.id,
+            isAdmin: checked,
+          },
+        });
+
+        if (response.data?.success) {
+          onAdminStatusChange();
+        }
+      } catch (error) {
+        console.error('Error updating admin status:', error);
+      }
+    },
+    [onAdminStatusChange, row.User?.id, setAdminStatus]
+  );
 
   return (
     <div>

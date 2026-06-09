@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 
 import { useIsAdmin } from './authentication';
 import { useUserId } from './user';
+import { Course_bool_exp, Program_bool_exp } from '../__generated__/globalTypes';
 
 // Where-fragments that scope the organization-management screens to the data an org admin is allowed
 // to manage. Super-admins get an empty filter (no scoping — they see everything); org admins get a
@@ -19,7 +20,7 @@ import { useUserId } from './user';
 const MATCH_NONE = { id: { _is_null: true } } as const;
 
 // Program_bool_exp scoping for the program management list.
-export const useManageProgramWhere = (): Record<string, unknown> => {
+export const useManageProgramWhere = (): Program_bool_exp => {
   const isAdmin = useIsAdmin();
   const userId = useUserId();
 
@@ -43,7 +44,7 @@ export const useManageProgramWhere = (): Record<string, unknown> => {
 // Course_bool_exp scoping for the course management list. A course belongs to a program, which
 // belongs to an organization; org admins only see courses of programs in organizations they
 // administer. Super-admins get an empty filter.
-export const useManageCourseWhere = (): Record<string, unknown> => {
+export const useManageCourseWhere = (): Course_bool_exp => {
   const isAdmin = useIsAdmin();
   const userId = useUserId();
 
