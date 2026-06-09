@@ -277,6 +277,7 @@
       "creative_social_sustainable": "Creative, Social & Sustainable",
       "degree": "Degrees",
       "event": "Events",
+      "courses": "Courses",
       "my_admin_courses": "Course Administration",
       "my_courses": "My Courses"
     },
@@ -1046,6 +1047,11 @@
       "label": "Tile Slider Group",
       "placeholder": "Select tile slider groups"
     },
+    "course_group": {
+      "label": "Course Group",
+      "placeholder": "Select course groups",
+      "slider_badge": "Homepage slider"
+    },
     "cover_image": {
       "label": "Cover Image",
       "upload_text": "Click to upload cover image",
@@ -1058,6 +1064,9 @@
     "funding_organizations": {
       "label": "Funding Organizations",
       "add": "Add Funding Organization"
+    },
+    "certificates": {
+      "label": "Certificates"
     },
     "possible_certificates": {
       "label": "Possible Certificates",
@@ -1817,6 +1826,27 @@
     "previewImageURL": "Default preview image URL",
     "appSettings": "App Settings",
     "courseGroupOptions": "Course Groups Order",
+    "course_groups": {
+      "label": "Course Groups",
+      "help_text": "Define which course groups exist and the order in which the groups marked as sliders appear on the homepage. The \"Courses\", \"Events\" and \"Degrees\" groups are populated automatically from the published offerings of the matching program type. Additional groups can be created and selected in an organization widget without appearing on the homepage.",
+      "add_placeholder": "Name of the new course group",
+      "add_button": "Add",
+      "widget_help": "Every course group has an ID (shown on the right of each row). To show one or more groups in an organization widget, add the parameter ?groups=ID to the widget URL (separate multiple IDs with commas, e.g. ?groups=3,7). The selected groups are joined into a single slider. Groups with \"Show on homepage\" enabled also appear automatically on the homepage.",
+      "id_label": "ID",
+      "show_on_homepage": "Show on homepage",
+      "auto_badge": "Automatic",
+      "org_badge": "Organization",
+      "delete": "Delete course group",
+      "delete_disabled_auto": "Automatically populated groups cannot be deleted.",
+      "delete_disabled_in_use": "This group is still connected to courses and cannot be deleted.",
+      "error_duplicate": "A course group with this name already exists.",
+      "error_add": "The course group could not be created.",
+      "error_delete": "The course group could not be deleted.",
+      "error_toggle": "The setting could not be saved.",
+      "error_reorder": "The order could not be updated.",
+      "loading": "Loading...",
+      "error_loading": "The course groups could not be loaded."
+    },
     "timeZone": "Time Zone",
     "bannerSettings": "Banner Settings",
     "faqSettings": "FAQ Settings",

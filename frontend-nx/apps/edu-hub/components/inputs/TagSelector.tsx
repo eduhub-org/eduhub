@@ -2,9 +2,10 @@ import React, { useState, useCallback } from 'react';
 import { DocumentNode } from 'graphql';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
+import Chip from '@mui/material/Chip';
 import Tooltip from '@mui/material/Tooltip';
 import InputAdornment from '@mui/material/InputAdornment';
-import { HelpOutline } from '@mui/icons-material';
+import { HelpOutline, CancelOutlined } from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
 import { useDebouncedCallback } from 'use-debounce';
 import { useRoleMutation } from '../../hooks/authedMutation';
@@ -95,6 +96,13 @@ type TagSelectorProps = {
 
   // Prefix for options/tags translations (optional)
   optionsTranslationPrefix?: string;
+
+  // Ids of options that should be visually marked with a small badge (e.g. to
+  // highlight course groups that are shown as a slider on the homepage).
+  markedOptionIds?: number[];
+
+  // Badge text shown next to marked options/tags.
+  markLabel?: string;
 };
 
 const TagSelector: React.FC<TagSelectorProps> = ({
@@ -114,6 +122,8 @@ const TagSelector: React.FC<TagSelectorProps> = ({
   className = '',
   invertColors = false,
   optionsTranslationPrefix = '',
+  markedOptionIds,
+  markLabel,
 }) => {
   const t = useTranslations('common');
   const [tags, setTags] = useState(values);
@@ -206,6 +216,10 @@ const TagSelector: React.FC<TagSelectorProps> = ({
     debouncedUpdateTags.flush();
   }, [variant, tags, isMandatory, debouncedUpdateTags, handleError, resetError, t]);
 
+  const getOptionLabel = (option: { id: number; name: string }) =>
+    optionsTranslationPrefix ? t(`${optionsTranslationPrefix}${option.name}`) : option.name;
+  const isMarked = (id: number) => !!markedOptionIds?.includes(id);
+
   const baseClass = `w-full px-3 py-3 mb-8 rounded ${
     invertColors ? 'bg-gray-200 text-black' : 'text-label-primary bg-fill-primary'
   }`;
@@ -217,8 +231,54 @@ const TagSelector: React.FC<TagSelectorProps> = ({
         multiple
         id="tags-standard"
         options={options}
-        getOptionLabel={(option) =>
-          optionsTranslationPrefix ? t(`${optionsTranslationPrefix}${option.name}`) : option.name
+        getOptionLabel={getOptionLabel}
+        renderOption={
+          markedOptionIds
+            ? (props, option) => (
+                <li {...props} key={option.id}>
+                  <span className="flex-1">{getOptionLabel(option)}</span>
+                  {isMarked(option.id) && markLabel && (
+                    <span className="ml-2 text-[10px] uppercase tracking-wide rounded bg-[color:var(--eduhub-brand)] text-white px-1.5 py-0.5">
+                      {markLabel}
+                    </span>
+                  )}
+                </li>
+              )
+            : undefined
+        }
+        renderTags={(value, getTagProps) =>
+          value.map((option, index) => {
+            // Render chips explicitly so the delete (x) icon is always visible:
+            // pull `key` out of the spread (React requires it passed directly),
+            // keep `onDelete` from the spread, and force a high-contrast icon.
+            const { key, ...tagProps } = getTagProps({ index });
+            return (
+              <Chip
+                key={key}
+                {...tagProps}
+                deleteIcon={
+                  <CancelOutlined
+                    sx={{
+                      '&&': { color: 'var(--eduhub-label-secondary)' },
+                      '&&:hover': { color: 'var(--eduhub-error)' },
+                    }}
+                  />
+                }
+                label={
+                  isMarked(option.id) && markLabel ? (
+                    <span className="flex items-center gap-1">
+                      {getOptionLabel(option)}
+                      <Tooltip title={markLabel} placement="top">
+                        <span aria-label={markLabel}>★</span>
+                      </Tooltip>
+                    </span>
+                  ) : (
+                    getOptionLabel(option)
+                  )
+                }
+              />
+            );
+          })
         }
         renderInput={(params) => (
           <TextField
@@ -253,7 +313,11 @@ const TagSelector: React.FC<TagSelectorProps> = ({
         fullWidth
         sx={{
           '& .MuiChip-root': { color: 'var(--eduhub-label-primary)', backgroundColor: 'var(--eduhub-bg-secondary)' },
-          '& .MuiChip-deleteIcon': { color: 'var(--eduhub-label-secondary)', '&:hover': { color: 'var(--eduhub-label-primary)' } },
+          '& .MuiChip-deleteIcon': {
+            color: 'var(--eduhub-label-primary)',
+            opacity: 0.8,
+            '&:hover': { color: 'var(--eduhub-error)', opacity: 1 },
+          },
           '& .MuiInputBase-input': { color: 'var(--eduhub-label-primary)' },
           '& .MuiInputLabel-root': { color: 'var(--eduhub-label-secondary)' },
           '& .MuiInput-underline:before': { borderBottomColor: 'var(--eduhub-border-primary)' },

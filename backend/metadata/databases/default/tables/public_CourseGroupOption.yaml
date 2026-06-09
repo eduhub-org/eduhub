@@ -1,6 +1,13 @@
 table:
   name: CourseGroupOption
   schema: public
+object_relationships:
+  - name: Organization
+    using:
+      foreign_key_constraint_on: organizationId
+  - name: ProgramType
+    using:
+      foreign_key_constraint_on: programType
 array_relationships:
   - name: CourseGroups
     using:
@@ -17,6 +24,8 @@ select_permissions:
         - title
         - order
         - sliderGroup
+        - programType
+        - organizationId
         - created_at
         - updated_at
       filter: {}

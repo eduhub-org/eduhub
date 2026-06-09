@@ -604,6 +604,8 @@ export enum CourseGroupOption_update_column {
   created_at = "created_at",
   id = "id",
   order = "order",
+  organizationId = "organizationId",
+  programType = "programType",
   sliderGroup = "sliderGroup",
   title = "title",
   updated_at = "updated_at",
@@ -4374,12 +4376,16 @@ export interface CourseFundingOrganization_variance_order_by {
 export interface CourseGroupOption_bool_exp {
   CourseGroups?: CourseGroup_bool_exp | null;
   CourseGroups_aggregate?: CourseGroup_aggregate_bool_exp | null;
+  Organization?: Organization_bool_exp | null;
+  ProgramType?: ProgramType_bool_exp | null;
   _and?: CourseGroupOption_bool_exp[] | null;
   _not?: CourseGroupOption_bool_exp | null;
   _or?: CourseGroupOption_bool_exp[] | null;
   created_at?: timestamptz_comparison_exp | null;
   id?: Int_comparison_exp | null;
   order?: Int_comparison_exp | null;
+  organizationId?: Int_comparison_exp | null;
+  programType?: String_comparison_exp | null;
   sliderGroup?: Boolean_comparison_exp | null;
   title?: String_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
@@ -4390,9 +4396,13 @@ export interface CourseGroupOption_bool_exp {
  */
 export interface CourseGroupOption_insert_input {
   CourseGroups?: CourseGroup_arr_rel_insert_input | null;
+  Organization?: Organization_obj_rel_insert_input | null;
+  ProgramType?: ProgramType_obj_rel_insert_input | null;
   created_at?: any | null;
   id?: number | null;
   order?: number | null;
+  organizationId?: number | null;
+  programType?: string | null;
   sliderGroup?: boolean | null;
   title?: string | null;
   updated_at?: any | null;

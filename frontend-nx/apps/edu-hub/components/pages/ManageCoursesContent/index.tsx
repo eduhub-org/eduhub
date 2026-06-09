@@ -20,6 +20,7 @@ import {
   UpdateCourseAchievementCertificatePossible,
   UpdateCourseAchievementCertificatePossibleVariables,
 } from '../../../queries/__generated__/UpdateCourseAchievementCertificatePossible';
+import { isKnownCourseGroupOptionTitle } from '../../../helpers/courseGroupOptions';
 import { DEGREE_COURSES } from '../../../queries/courseDegree';
 import { DegreeCourses } from '../../../queries/__generated__/DegreeCourses';
 import { DELETE_A_COURSE } from '../../../queries/mutateCourse';
@@ -336,16 +337,33 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
     if (data && !loading && !error) {
       return (
         data.CourseGroupOption
-          ?.filter((option: { sliderGroup: boolean }) => option.sliderGroup)
+          // Program-type based groups (Courses, Events, Degrees) are assigned
+          // automatically via the program type, so they must not be manually
+          // selectable here.
+          ?.filter((option: { programType: string | null }) => option.programType == null)
           .map((option: { id: number; title: string | null }) => ({
             id: option.id,
-            name: option.title ? tCommon(`course_group_options.${option.title}`) : '—',
+            name: isKnownCourseGroupOptionTitle(option.title)
+              ? tCommon(`course_group_options.${option.title}`)
+              : option.title ?? '—',
           })) || []
       );
     } else {
       return [];
     }
   }, [tCommon, data, loading, error]);
+
+  const sliderCourseGroupIds = useMemo(() => {
+    if (data && !loading && !error) {
+      return (
+        data.CourseGroupOption?.filter((option: { sliderGroup: boolean }) => option.sliderGroup).map(
+          (option: { id: number }) => option.id
+        ) || []
+      );
+    } else {
+      return [];
+    }
+  }, [data, loading, error]);
 
   const degreeCoursesQuery = useRoleQuery<DegreeCourses>(DEGREE_COURSES);
   const degreeCourses = useMemo(() => {
@@ -748,6 +766,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
           <ExpandableCourseRow
             course={props.row}
             courseGroupOptions={courseGroupOptions}
+            sliderCourseGroupIds={sliderCourseGroupIds}
             degreeCourses={degreeCourses}
             onSetAttendanceCertificatePossible={handleAttendanceCertificatePossible}
             onSetAchievementCertificatePossible={handleAchievementCertificatePossible}
