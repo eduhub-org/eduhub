@@ -5,7 +5,7 @@ import TextField from '@mui/material/TextField';
 import Chip from '@mui/material/Chip';
 import Tooltip from '@mui/material/Tooltip';
 import InputAdornment from '@mui/material/InputAdornment';
-import { HelpOutline } from '@mui/icons-material';
+import { HelpOutline, Cancel } from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
 import { useDebouncedCallback } from 'use-debounce';
 import { useRoleMutation } from '../../hooks/authedMutation';
@@ -250,11 +250,22 @@ const TagSelector: React.FC<TagSelectorProps> = ({
           markedOptionIds
             ? (value, getTagProps) =>
                 value.map((option, index) => {
-                  const tagProps = getTagProps({ index });
+                  // Pull `key` out of the spread (React requires it passed directly)
+                  // and keep `onDelete` so the delete icon renders, like the
+                  // default MUI tag rendering.
+                  const { key, ...tagProps } = getTagProps({ index });
                   return (
                     <Chip
+                      key={key}
                       {...tagProps}
-                      key={option.id}
+                      deleteIcon={
+                        <Cancel
+                          sx={{
+                            '&&': { color: 'var(--eduhub-label-primary)', opacity: 0.85 },
+                            '&&:hover': { color: 'var(--eduhub-error)', opacity: 1 },
+                          }}
+                        />
+                      }
                       label={
                         isMarked(option.id) && markLabel ? (
                           <span className="flex items-center gap-1">

@@ -1032,8 +1032,8 @@
       "placeholder": "Kachel-Slider Gruppen auswählen"
     },
     "course_group": {
-      "label": "Kurs-Gruppe",
-      "placeholder": "Kurs-Gruppen auswählen",
+      "label": "Kursgruppe",
+      "placeholder": "Kursgruppen auswählen",
       "slider_badge": "Startseiten-Slider"
     },
     "cover_image": {
