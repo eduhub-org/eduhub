@@ -5,7 +5,7 @@ import TextField from '@mui/material/TextField';
 import Chip from '@mui/material/Chip';
 import Tooltip from '@mui/material/Tooltip';
 import InputAdornment from '@mui/material/InputAdornment';
-import { HelpOutline, Cancel } from '@mui/icons-material';
+import { HelpOutline, CancelOutlined } from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
 import { useDebouncedCallback } from 'use-debounce';
 import { useRoleMutation } from '../../hooks/authedMutation';
@@ -257,7 +257,7 @@ const TagSelector: React.FC<TagSelectorProps> = ({
                 key={key}
                 {...tagProps}
                 deleteIcon={
-                  <Cancel
+                  <CancelOutlined
                     sx={{
                       '&&': { color: 'var(--eduhub-label-primary)', opacity: 0.85 },
                       '&&:hover': { color: 'var(--eduhub-error)', opacity: 1 },
