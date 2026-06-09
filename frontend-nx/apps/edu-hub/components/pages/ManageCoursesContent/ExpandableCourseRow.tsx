@@ -39,6 +39,7 @@ import { OrganizationList_Organization } from '../../../queries/__generated__/Or
 import EntityListManager from '../../inputs/EntityListManager';
 import { useTranslations } from 'next-intl';
 import TagSelector from '../../inputs/TagSelector';
+import { isKnownCourseGroupOptionTitle } from '../../../helpers/courseGroupOptions';
 import InputField from '../../inputs/InputField';
 import DropDownSelector from '../../inputs/DropDownSelector';
 import FileUploadField from '../../inputs/FileUploadField';
@@ -79,6 +80,7 @@ import { InsertEmailTemplate, InsertEmailTemplateVariables } from '../../../quer
 interface ExpandableCourseRowProps {
   course: AdminCourseList_Course;
   courseGroupOptions: { id: number; name: string }[];
+  sliderCourseGroupIds: number[];
   degreeCourses: { id: number; name: string }[];
   onSetAttendanceCertificatePossible: (c: AdminCourseList_Course, isPossible: boolean) => any;
   onSetAchievementCertificatePossible: (c: AdminCourseList_Course, isPossible: boolean) => any;
@@ -87,6 +89,7 @@ interface ExpandableCourseRowProps {
 const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
   course,
   courseGroupOptions,
+  sliderCourseGroupIds,
   degreeCourses,
   onSetAttendanceCertificatePossible,
   onSetAchievementCertificatePossible,
@@ -624,12 +627,13 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
   );
 
 
-  const currentCourseGroups = course.CourseGroups.map((group) => ({
-    id: group.CourseGroupOption.id,
-    name: group.CourseGroupOption.title
-      ? t(`common.course_group_options.${group.CourseGroupOption.title}`)
-      : '—',
-  }));
+  const currentCourseGroups = course.CourseGroups.map((group) => {
+    const title = group.CourseGroupOption.title;
+    return {
+      id: group.CourseGroupOption.id,
+      name: isKnownCourseGroupOptionTitle(title) ? t(`common.course_group_options.${title}`) : title ?? '—',
+    };
+  });
 
   const currentCourseDegrees = course.CourseDegrees.map((degree) => ({
     id: degree.degreeCourseId,
@@ -797,27 +801,18 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
               )}
             </div>
 
-            {/* 2. Course Organization - Card Container */}
+            {/* 2. Course Group - Card Container */}
             <div className="bg-fill-primary border border-border-primary rounded-lg p-4 space-y-4">
+              <h4 className="text-sm font-medium text-label-primary">{t('manageCourses.course_group.label')}</h4>
               <TagSelector
                 variant="material"
-                label={t('manageCourses.course_degree_title.label')}
-                placeholder={t('manageCourses.course_degree_title.placeholder')}
-                itemId={course.id}
-                values={currentCourseDegrees}
-                options={degreeCourses}
-                insertValueMutation={INSERT_COURSE_DEGREE_TAG}
-                deleteValueMutation={DELETE_COURSE_DEGREE_TAG}
-                refetchQueries={['AdminCourseList']}
-              />
-
-              <TagSelector
-                variant="material"
-                label={t('manageCourses.tile_slider_group.label')}
-                placeholder={t('manageCourses.tile_slider_group.placeholder')}
+                label={t('manageCourses.course_group.label')}
+                placeholder={t('manageCourses.course_group.placeholder')}
                 itemId={course.id}
                 values={currentCourseGroups}
                 options={courseGroupOptions}
+                markedOptionIds={sliderCourseGroupIds}
+                markLabel={t('manageCourses.course_group.slider_badge')}
                 insertValueMutation={INSERT_COURSE_GROUP_TAG}
                 deleteValueMutation={DELETE_COURSE_GROUP_TAG}
                 refetchQueries={['AdminCourseList']}
@@ -998,9 +993,9 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
               />
             </div>
 
-            {/* 3. Types of Available Certificates - Card Container */}
+            {/* 3. Certificates - Card Container */}
             <div className="bg-fill-primary border border-border-primary rounded-lg p-4">
-              <h4 className="text-sm font-medium text-label-primary mb-3">{t('manageCourses.possible_certificates.label')}</h4>
+              <h4 className="text-sm font-medium text-label-primary mb-3">{t('manageCourses.certificates.label')}</h4>
               <div className="space-y-2">
                 <div className="flex items-center space-x-2">
                   <button
@@ -1120,6 +1115,20 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                     />
                   </div>
                 )}
+              </div>
+
+              <div className="mt-4 pt-4 border-t border-border-primary">
+                <TagSelector
+                  variant="material"
+                  label={t('manageCourses.course_degree_title.label')}
+                  placeholder={t('manageCourses.course_degree_title.placeholder')}
+                  itemId={course.id}
+                  values={currentCourseDegrees}
+                  options={degreeCourses}
+                  insertValueMutation={INSERT_COURSE_DEGREE_TAG}
+                  deleteValueMutation={DELETE_COURSE_DEGREE_TAG}
+                  refetchQueries={['AdminCourseList']}
+                />
               </div>
             </div>
 

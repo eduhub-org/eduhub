@@ -4,10 +4,20 @@
 // This file was automatically generated and should not be edited.
 
 // ====================================================
-// GraphQL query operation: CourseGroupOptions
+// GraphQL query operation: AdminCourseGroupOptions
 // ====================================================
 
-export interface CourseGroupOptions_CourseGroupOption {
+export interface AdminCourseGroupOptions_CourseGroupOption_CourseGroups_aggregate_aggregate {
+  __typename: "CourseGroup_aggregate_fields";
+  count: number;
+}
+
+export interface AdminCourseGroupOptions_CourseGroupOption_CourseGroups_aggregate {
+  __typename: "CourseGroup_aggregate";
+  aggregate: AdminCourseGroupOptions_CourseGroupOption_CourseGroups_aggregate_aggregate | null;
+}
+
+export interface AdminCourseGroupOptions_CourseGroupOption {
   __typename: "CourseGroupOption";
   id: number;
   order: number;
@@ -24,11 +34,15 @@ export interface CourseGroupOptions_CourseGroupOption {
    * When set, this group is owned by the given organization. Organization-owned groups are not shown on the public homepage but can be selected in that organization's course widget.
    */
   organizationId: number | null;
+  /**
+   * An aggregate relationship
+   */
+  CourseGroups_aggregate: AdminCourseGroupOptions_CourseGroupOption_CourseGroups_aggregate;
 }
 
-export interface CourseGroupOptions {
+export interface AdminCourseGroupOptions {
   /**
    * fetch data from the table: "CourseGroupOption"
    */
-  CourseGroupOption: CourseGroupOptions_CourseGroupOption[];
+  CourseGroupOption: AdminCourseGroupOptions_CourseGroupOption[];
 }

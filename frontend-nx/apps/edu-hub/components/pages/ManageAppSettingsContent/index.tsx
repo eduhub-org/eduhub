@@ -2,7 +2,6 @@ import { FC, useMemo, useState } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { useSession } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
-import { DragDropContext, Droppable, Draggable, type DropResult } from '@hello-pangea/dnd';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
@@ -35,16 +34,11 @@ import {
   UpdateProgramTypeDefaultAttendanceCertificateTemplate,
   UpdateProgramTypeDefaultAttendanceCertificateTemplateVariables,
 } from '../../../queries/__generated__/UpdateProgramTypeDefaultAttendanceCertificateTemplate';
-import { COURSE_GROUP_OPTIONS, UPDATE_COURSE_GROUP_OPTION_ORDER } from '../../../queries/courseGroupOptions';
-import { CourseGroupOptions } from '../../../queries/__generated__/CourseGroupOptions';
 import { FaqCollections } from '../../../queries/__generated__/FaqCollections';
-import {
-  UpdateCourseGroupOptionOrder,
-  UpdateCourseGroupOptionOrderVariables,
-} from '../../../queries/__generated__/UpdateCourseGroupOptionOrder';
 import { useAdminMutation } from '../../../hooks/authedMutation';
 import { ONBOARDING_TEXTS, UPDATE_ONBOARDING_TEXT } from '../../../queries/onboardingText';
 import ProjectDocumentationInstructionsSection from './ProjectDocumentationInstructionsSection';
+import CourseGroupOptionsManager from './CourseGroupOptionsManager';
 
 type OnboardingTextRow = {
   id: number;
@@ -67,7 +61,6 @@ type Inputs = {
 const ManageAppSettingsContent: FC = () => {
   const { data: sessionData } = useSession();
   const t = useTranslations('manageAppSettings');
-  const tCommon = useTranslations('common');
   const tCourse = useTranslations('course');
   const tProfile = useTranslations('profile');
   const [previewProgramType, setPreviewProgramType] = useState('COURSES');
@@ -121,7 +114,6 @@ const ManageAppSettingsContent: FC = () => {
     skip: !sessionData,
   });
 
-  const { data: courseGroupOptionsData } = useAdminQuery<CourseGroupOptions>(COURSE_GROUP_OPTIONS);
   const { data: faqCollectionsData } = useAdminQuery<FaqCollections>(FAQ_COLLECTIONS);
   const { data: certificateTemplatesData } = useAdminQuery<CertificateTemplates>(CERTIFICATE_TEMPLATES);
   const { data: programTypeDefaultsData } = useAdminQuery<ProgramTypeDefaults>(PROGRAM_TYPE_DEFAULTS);
@@ -133,13 +125,6 @@ const ManageAppSettingsContent: FC = () => {
     refetchQueries: ['ProgramTypeDefaults'],
   });
 
-  // Filter course group options to only show slider groups
-  const sliderGroupOptions = useMemo(() => {
-    return (
-      courseGroupOptionsData?.CourseGroupOption.filter((option) => option.sliderGroup) ?? []
-    );
-  }, [courseGroupOptionsData]);
-
   const faqCollectionOptions = useMemo(() => {
     return (
       faqCollectionsData?.FaqCollection.map((collection) => ({
@@ -150,10 +135,6 @@ const ManageAppSettingsContent: FC = () => {
   }, [faqCollectionsData]);
 
   const [updateBanner] = useAdminMutation<UpdateBanner, UpdateBannerVariables>(UPDATE_APP_SETTINGS_BANNER);
-  const [updateCourseGroupOptionOrder] = useAdminMutation<
-    UpdateCourseGroupOptionOrder,
-    UpdateCourseGroupOptionOrderVariables
-  >(UPDATE_COURSE_GROUP_OPTION_ORDER);
 
   const getOnboardingTextRow = (programType: string, lang: string) =>
     onboardingTextsData?.OnboardingText.find((row) => row.programType === programType && row.lang === lang);
@@ -177,54 +158,6 @@ const ManageAppSettingsContent: FC = () => {
     } catch (error) {
       console.error('Failed to update app settings:', error);
       alert('An error occurred while saving the settings. Please try again.');
-    }
-  };
-
-  const onDragEnd = async (result: DropResult) => {
-    if (!result.destination || !sliderGroupOptions) return;
-
-    const reorderedItems = Array.from(sliderGroupOptions);
-    const [movedItem] = reorderedItems.splice(result.source.index, 1);
-    reorderedItems.splice(result.destination.index, 0, movedItem);
-
-    try {
-      await Promise.all(
-        reorderedItems.map((item, index) =>
-          updateCourseGroupOptionOrder({
-            variables: {
-              id: item.id,
-              order: index + 1,
-            },
-            optimisticResponse: {
-              update_CourseGroupOption_by_pk: {
-                __typename: 'CourseGroupOption',
-                id: item.id,
-                order: index + 1,
-              },
-            },
-            update: (cache) => {
-              const existingData = cache.readQuery<CourseGroupOptions>({
-                query: COURSE_GROUP_OPTIONS,
-              });
-
-              if (existingData) {
-                const updatedData = {
-                  ...existingData,
-                  CourseGroupOption: reorderedItems,
-                };
-
-                cache.writeQuery({
-                  query: COURSE_GROUP_OPTIONS,
-                  data: updatedData,
-                });
-              }
-            },
-          })
-        )
-      );
-    } catch (error) {
-      console.error('Failed to update course group order:', error);
-      alert('An error occurred while updating the course group order. Please try again.');
     }
   };
 
@@ -278,37 +211,7 @@ const ManageAppSettingsContent: FC = () => {
             </FormProvider>
           </div>
 
-          <div className="mt-16">
-            <label className="text-xs uppercase tracking-widest font-medium text-gray-400 mb-2 block">
-              {t('course_group_options')}
-            </label>
-            <DragDropContext onDragEnd={onDragEnd}>
-              <Droppable droppableId="courseGroupOptions">
-                {(provided) => (
-                  <div {...provided.droppableProps} ref={provided.innerRef}>
-                    {sliderGroupOptions.map((option, index) => (
-                      <Draggable key={option.id} draggableId={String(option.id)} index={index}>
-                        {(provided) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            className="p-4 border border-border-primary rounded mb-2 bg-fill-primary flex justify-between items-center light"
-                          >
-                            <h2 className="text-xl font-semibold text-label-primary">
-                              {option.title ? tCommon(`course_group_options.${option.title}`) : '—'}
-                            </h2>
-                            <span className="text-label-secondary">{index + 1}</span>
-                          </div>
-                        )}
-                      </Draggable>
-                    ))}
-                    {provided.placeholder}
-                  </div>
-                )}
-              </Droppable>
-            </DragDropContext>
-          </div>
+          <CourseGroupOptionsManager />
 
           <div className="mt-16">
             <label className="text-xs uppercase tracking-widest font-medium text-gray-400 mb-2 block">
