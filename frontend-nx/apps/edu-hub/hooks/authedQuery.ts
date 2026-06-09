@@ -26,6 +26,31 @@ const getErrorMessage = (error: unknown): string | undefined => {
   return undefined;
 };
 
+const isGraphQLSchemaError = (error: unknown): boolean => {
+  const message = getErrorMessage(error) ?? '';
+  if (
+    message.includes('not found in type') ||
+    message.includes('Cannot query field') ||
+    message.includes('validation-failed')
+  ) {
+    return true;
+  }
+
+  if (typeof error === 'object' && error !== null && 'graphQLErrors' in error) {
+    const graphQLErrors = (error as { graphQLErrors?: Array<{ extensions?: { code?: string } }> })
+      .graphQLErrors;
+    return (
+      graphQLErrors?.some(
+        (graphQLError) =>
+          graphQLError.extensions?.code === 'validation-failed' ||
+          graphQLError.extensions?.code === 'access-denied'
+      ) ?? false
+    );
+  }
+
+  return false;
+};
+
 const useErrorHandler = () => {
   const t = useTranslations();
   const { showAuthError } = useAuthError();
@@ -43,6 +68,9 @@ const useErrorHandler = () => {
     } else if (message?.includes('NetworkError') || message?.includes('Failed to fetch')) {
       // NetworkError (e.g. aborted on page refresh, offline) — don't show auth dialog; log only
       console.warn('GraphQL network error (may be transient):', error);
+    } else if (isGraphQLSchemaError(error)) {
+      // Role-scoped schema / permission mismatches are query errors, not auth failures.
+      console.error('GraphQL query error in query hook:', error);
     } else {
       console.error('Authentication error in query hook:', error);
       // Show a generic user-facing auth dialog; internal details stay in logs only.
