@@ -135,20 +135,6 @@ export const MANAGEABLE_ORGANIZATIONS = gql`
   }
 `;
 
-// Resolve a user by their exact email so a new admin grant can be created from the email entered in
-// the add-admin dialog. Only id/firstName/lastName are selected: under the inherited org_admin role
-// these come from the public (anonymous) user permission for any user, while the email filter still
-// matches the row, so an org admin can add any registered user to an organization they manage.
-export const ORGANIZATION_ADMIN_USER_BY_EMAIL = gql`
-  query OrganizationAdminUserByEmail($email: String!) {
-    User(where: { email: { _eq: $email } }, limit: 1) {
-      id
-      firstName
-      lastName
-    }
-  }
-`;
-
 // Create an admin grant for an existing user. Hasura enforces scope: an org admin may only insert for
 // organizations they hold canManageSettings on (super-admins may insert anywhere).
 export const INSERT_ORGANIZATION_ADMIN = gql`

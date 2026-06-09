@@ -1,27 +1,20 @@
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
-import { Autocomplete, Checkbox, FormControlLabel, TextField } from '@mui/material';
+import { Checkbox, FormControlLabel } from '@mui/material';
 import { useTranslations } from 'next-intl';
 
 import { DialogShell } from '../../common/dialogs/DialogShell';
 import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
 import NotificationSnackbar from '../../common/dialogs/NotificationSnackbar';
+import { SelectUserDialog } from '../../common/dialogs/SelectUserDialog';
 import { Button } from '../../common/Button';
-import InputField from '../../inputs/InputField';
-import { useLazyRoleQuery } from '../../../hooks/authedQuery';
+import DropDownSelector from '../../inputs/DropDownSelector';
 import { useManageMutation } from '../../../hooks/authedMutation';
-import { useManageRole } from '../../../hooks/authentication';
-import {
-  INSERT_ORGANIZATION_ADMIN,
-  ORGANIZATION_ADMIN_USER_BY_EMAIL,
-} from '../../../queries/organizationAdmin';
+import { INSERT_ORGANIZATION_ADMIN } from '../../../queries/organizationAdmin';
 import {
   InsertOrganizationAdmin,
   InsertOrganizationAdminVariables,
 } from '../../../queries/__generated__/InsertOrganizationAdmin';
-import {
-  OrganizationAdminUserByEmail,
-  OrganizationAdminUserByEmailVariables,
-} from '../../../queries/__generated__/OrganizationAdminUserByEmail';
+import { UserSelectionWithFilter_User } from '../../../queries/__generated__/UserSelectionWithFilter';
 
 export interface AdminOrganizationOption {
   id: number;
@@ -36,8 +29,6 @@ interface AddOrganizationAdminDialogProps {
   organizationOptions: AdminOrganizationOption[];
 }
 
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
 const AddOrganizationAdminDialog: FC<AddOrganizationAdminDialogProps> = ({
   open,
   onClose,
@@ -46,10 +37,10 @@ const AddOrganizationAdminDialog: FC<AddOrganizationAdminDialogProps> = ({
 }) => {
   const t = useTranslations('manageAdminUsers');
   const tCommon = useTranslations('common');
-  const manageRole = useManageRole();
 
-  const [email, setEmail] = useState('');
-  const [organization, setOrganization] = useState<AdminOrganizationOption | null>(null);
+  const [organizationId, setOrganizationId] = useState<number | null>(null);
+  const [selectedUser, setSelectedUser] = useState<UserSelectionWithFilter_User | null>(null);
+  const [isUserDialogOpen, setIsUserDialogOpen] = useState(false);
   const [canManageEvents, setCanManageEvents] = useState(false);
   const [canManageCourses, setCanManageCourses] = useState(false);
   const [canManageDegrees, setCanManageDegrees] = useState(false);
@@ -59,11 +50,11 @@ const AddOrganizationAdminDialog: FC<AddOrganizationAdminDialogProps> = ({
   const [showSuccess, setShowSuccess] = useState(false);
 
   // Reset the form whenever the dialog opens. When the user administers a single organization it is
-  // preselected so they only have to enter the new admin's email.
+  // preselected so they only have to pick the new admin.
   useEffect(() => {
     if (open) {
-      setEmail('');
-      setOrganization(organizationOptions.length === 1 ? organizationOptions[0] : null);
+      setOrganizationId(organizationOptions.length === 1 ? organizationOptions[0].id : null);
+      setSelectedUser(null);
       setCanManageEvents(false);
       setCanManageCourses(false);
       setCanManageDegrees(false);
@@ -73,50 +64,46 @@ const AddOrganizationAdminDialog: FC<AddOrganizationAdminDialogProps> = ({
     }
   }, [open, organizationOptions]);
 
-  const [loadUserByEmail] = useLazyRoleQuery<
-    OrganizationAdminUserByEmail,
-    OrganizationAdminUserByEmailVariables
-  >(ORGANIZATION_ADMIN_USER_BY_EMAIL, {
-    fetchPolicy: 'network-only',
-    context: { role: manageRole },
-  });
+  const organizationDropDownOptions = useMemo(
+    () => organizationOptions.map((organization) => ({ value: String(organization.id), label: organization.name })),
+    [organizationOptions]
+  );
 
   const [insertOrganizationAdmin, { loading: inserting }] = useManageMutation<
     InsertOrganizationAdmin,
     InsertOrganizationAdminVariables
   >(INSERT_ORGANIZATION_ADMIN);
 
+  const handleUserDialogClose = useCallback(
+    (confirmed: boolean, user: UserSelectionWithFilter_User | null) => {
+      setIsUserDialogOpen(false);
+      if (confirmed && user) {
+        setSelectedUser(user);
+        setValidationError(null);
+      }
+    },
+    []
+  );
+
   const handleSubmit = useCallback(async () => {
     setValidationError(null);
     setServerError(null);
 
-    const trimmedEmail = email.trim().toLowerCase();
-    if (!trimmedEmail) {
-      setValidationError(t('add_admin_email_required'));
-      return;
-    }
-    if (!EMAIL_REGEX.test(trimmedEmail)) {
-      setValidationError(t('add_admin_email_invalid'));
-      return;
-    }
-    if (!organization) {
+    if (!organizationId) {
       setValidationError(t('add_admin_organization_required'));
+      return;
+    }
+    if (!selectedUser) {
+      setValidationError(t('add_admin_user_required'));
       return;
     }
 
     try {
-      const userResult = await loadUserByEmail({ variables: { email: trimmedEmail } });
-      const user = userResult.data?.User?.[0];
-      if (!user) {
-        setServerError(t('add_admin_user_not_found'));
-        return;
-      }
-
       const insertResult = await insertOrganizationAdmin({
         variables: {
           input: {
-            userId: user.id,
-            organizationId: organization.id,
+            userId: selectedUser.id,
+            organizationId,
             canManageEvents,
             canManageCourses,
             canManageDegrees,
@@ -136,13 +123,12 @@ const AddOrganizationAdminDialog: FC<AddOrganizationAdminDialogProps> = ({
       setServerError(error instanceof Error ? error.message : t('add_admin_error'));
     }
   }, [
-    email,
-    organization,
+    organizationId,
+    selectedUser,
     canManageEvents,
     canManageCourses,
     canManageDegrees,
     canManageSettings,
-    loadUserByEmail,
     insertOrganizationAdmin,
     onSuccess,
     onClose,
@@ -182,27 +168,32 @@ const AddOrganizationAdminDialog: FC<AddOrganizationAdminDialogProps> = ({
         }
       >
         <div className="space-y-4 text-label-primary">
-          <Autocomplete
-            options={organizationOptions}
-            getOptionLabel={(option) => option.name}
-            isOptionEqualToValue={(option, value) => option.id === value.id}
-            value={organization}
-            onChange={(_event, value) => setOrganization(value)}
-            renderInput={(params) => (
-              <TextField {...params} label={t('organization')} variant="outlined" />
-            )}
+          <DropDownSelector
+            variant="material"
+            label={t('organization')}
+            value={organizationId ? String(organizationId) : ''}
+            options={organizationDropDownOptions}
+            onValueUpdated={(value) => setOrganizationId(value ? Number(value) : null)}
           />
 
-          <InputField
-            variant="material"
-            type="email"
-            label={t('email')}
-            placeholder={t('add_admin_email_placeholder')}
-            itemId={0}
-            value={email}
-            onValueUpdated={(data) => setEmail(data.text || '')}
-            className="w-full"
-          />
+          <div>
+            <div className="text-sm text-label-secondary mb-1">{t('add_admin_user_label')}</div>
+            <div className="flex items-center gap-3">
+              <div className="flex-1 min-w-0">
+                {selectedUser ? (
+                  <span>
+                    {`${selectedUser.firstName ?? ''} ${selectedUser.lastName ?? ''}`.trim()}
+                    {selectedUser.email && (
+                      <span className="text-sm text-label-secondary ml-1">({selectedUser.email})</span>
+                    )}
+                  </span>
+                ) : (
+                  <span className="text-label-secondary">{t('add_admin_no_user_selected')}</span>
+                )}
+              </div>
+              <Button onClick={() => setIsUserDialogOpen(true)}>{t('add_admin_select_user')}</Button>
+            </div>
+          </div>
 
           <div>
             {capabilityOptions.map((capability) => (
@@ -223,6 +214,12 @@ const AddOrganizationAdminDialog: FC<AddOrganizationAdminDialogProps> = ({
           {validationError && <div className="text-red-600 text-sm">{validationError}</div>}
         </div>
       </DialogShell>
+
+      <SelectUserDialog
+        open={isUserDialogOpen}
+        title={t('add_admin_select_user_dialog_title')}
+        onClose={handleUserDialogClose}
+      />
 
       <NotificationSnackbar
         open={showSuccess}
