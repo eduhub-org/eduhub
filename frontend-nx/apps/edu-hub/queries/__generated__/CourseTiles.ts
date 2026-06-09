@@ -16,10 +16,6 @@ export interface CourseTiles_Course_Program {
    */
   published: boolean;
   /**
-   * The program type (e.g. COURSES, EVENTS, DEGREES), used to automatically populate the matching slider groups.
-   */
-  type: string;
-  /**
    * The title of the program
    */
   title: string;
@@ -31,6 +27,7 @@ export interface CourseTiles_Course_Program {
    * Controls whether course tiles should show an extended application period banner after the program deadline has passed while individual course deadlines are still open.
    */
   showExtendedApplicationPeriodBanner: boolean;
+  type: string;
 }
 
 export interface CourseTiles_Course_CourseLocations {
