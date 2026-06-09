@@ -181,6 +181,28 @@ select_permissions:
                         - status:
                             _eq: CONFIRMED
       limit: 100
+  # Org admins with canManageSettings may read contact details of users they administer (and their
+  # own record) when managing an organization's admin team on /manage/admin-users.
+  - role: org_admin_access
+    permission:
+      columns:
+        - id
+        - firstName
+        - lastName
+        - email
+      filter:
+        _or:
+          - id:
+              _eq: X-Hasura-User-Id
+          - OrganizationAdmins:
+              Organization:
+                OrganizationAdmins:
+                  _and:
+                    - userId:
+                        _eq: X-Hasura-User-Id
+                    - canManageSettings:
+                        _eq: true
+      limit: 100
 update_permissions:
   - role: user_access
     permission:

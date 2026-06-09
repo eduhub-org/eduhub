@@ -22,6 +22,8 @@ select_permissions:
         - canManageEvents
         - canManageDegrees
         - canManageSettings
+        - created_at
+        - updated_at
       filter:
         _or:
           - userId:
@@ -33,6 +35,7 @@ select_permissions:
                       _eq: X-Hasura-User-Id
                   - canManageSettings:
                       _eq: true
+      allow_aggregations: true
 insert_permissions:
   # An org admin with canManageSettings may add admins to organizations they manage. The check pins
   # the new row's organization to one they hold canManageSettings on; id is serial and userId/flags
