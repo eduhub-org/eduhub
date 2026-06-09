@@ -1843,7 +1843,9 @@
       "error_add": "The course group could not be created.",
       "error_delete": "The course group could not be deleted.",
       "error_toggle": "The setting could not be saved.",
-      "error_reorder": "The order could not be updated."
+      "error_reorder": "The order could not be updated.",
+      "loading": "Loading...",
+      "error_loading": "The course groups could not be loaded."
     },
     "timeZone": "Time Zone",
     "bannerSettings": "Banner Settings",

@@ -46,8 +46,9 @@ const CourseGroupOptionsManager: FC = () => {
   const [newTitle, setNewTitle] = useState('');
   const [error, setError] = useState('');
 
-  const { data } = useAdminQuery<AdminCourseGroupOptions>(ADMIN_COURSE_GROUP_OPTIONS);
+  const { data, loading, error: queryError } = useAdminQuery<AdminCourseGroupOptions>(ADMIN_COURSE_GROUP_OPTIONS);
   const options = useMemo(() => data?.CourseGroupOption ?? [], [data]);
+  const isReady = !loading && !queryError && !!data;
 
   const [updateOrder] = useAdminMutation<UpdateCourseGroupOptionOrder, UpdateCourseGroupOptionOrderVariables>(
     UPDATE_COURSE_GROUP_OPTION_ORDER
@@ -69,7 +70,9 @@ const CourseGroupOptionsManager: FC = () => {
     isKnownCourseGroupOptionTitle(title) ? tCommon(`course_group_options.${title}`) : title;
 
   const onDragEnd = async (result: DropResult) => {
+    if (!isReady) return;
     if (!result.destination) return;
+    if (result.source.index === result.destination.index) return;
 
     const reordered = Array.from(options);
     const [moved] = reordered.splice(result.source.index, 1);
@@ -108,6 +111,7 @@ const CourseGroupOptionsManager: FC = () => {
   };
 
   const handleAdd = async () => {
+    if (!isReady) return;
     const title = newTitle.trim();
     if (!title) return;
 
@@ -157,29 +161,42 @@ const CourseGroupOptionsManager: FC = () => {
       </div>
       <p className="text-xs text-gray-400 mb-4">{t('help_text')}</p>
 
-      {/* Add a new course group option */}
-      <div className="flex gap-2 mb-4">
-        <input
-          type="text"
-          value={newTitle}
-          onChange={(e) => setNewTitle(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              e.preventDefault();
-              handleAdd();
-            }
-          }}
-          placeholder={t('add_placeholder')}
-          className="flex-1 rounded border border-border-primary bg-fill-primary text-label-primary px-3 py-2"
-        />
-        <Button as="button" type="button" filled inverted onClick={handleAdd} disabled={!newTitle.trim()}>
-          {t('add_button')}
-        </Button>
-      </div>
+      {queryError ? (
+        <p className="text-red-500 text-sm">{t('error_loading')}</p>
+      ) : loading ? (
+        <p className="text-sm text-label-secondary">{t('loading')}</p>
+      ) : (
+        <>
+          {/* Add a new course group option */}
+          <div className="flex gap-2 mb-4">
+            <input
+              type="text"
+              value={newTitle}
+              onChange={(e) => setNewTitle(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleAdd();
+                }
+              }}
+              placeholder={t('add_placeholder')}
+              className="flex-1 rounded border border-border-primary bg-fill-primary text-label-primary px-3 py-2"
+            />
+            <Button
+              as="button"
+              type="button"
+              filled
+              inverted
+              onClick={handleAdd}
+              disabled={!isReady || !newTitle.trim()}
+            >
+              {t('add_button')}
+            </Button>
+          </div>
 
-      {error && <p className="text-red-500 text-sm mb-3">{error}</p>}
+          {error && <p className="text-red-500 text-sm mb-3">{error}</p>}
 
-      <DragDropContext onDragEnd={onDragEnd}>
+          <DragDropContext onDragEnd={onDragEnd}>
         <Droppable droppableId="courseGroupOptionsTable">
           {(provided) => (
             <div {...provided.droppableProps} ref={provided.innerRef}>
@@ -259,6 +276,8 @@ const CourseGroupOptionsManager: FC = () => {
           )}
         </Droppable>
       </DragDropContext>
+        </>
+      )}
     </div>
   );
 };

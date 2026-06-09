@@ -16,6 +16,9 @@ ALTER TABLE "public"."CourseGroupOption"
   ADD CONSTRAINT "CourseGroupOption_organizationId_fkey"
   FOREIGN KEY ("organizationId") REFERENCES "public"."Organization"("id") ON UPDATE CASCADE ON DELETE CASCADE;
 
+CREATE INDEX "CourseGroupOption_programType_idx" ON "public"."CourseGroupOption" ("programType");
+CREATE INDEX "CourseGroupOption_organizationId_idx" ON "public"."CourseGroupOption" ("organizationId");
+
 -- Map the existing type-based slider groups to their program type so that they
 -- are populated automatically from now on.
 UPDATE "public"."CourseGroupOption" SET "programType" = 'EVENTS' WHERE "title" = 'event';

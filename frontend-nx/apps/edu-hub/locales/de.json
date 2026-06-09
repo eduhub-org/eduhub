@@ -1837,7 +1837,9 @@
       "error_add": "Die Kursgruppierung konnte nicht angelegt werden.",
       "error_delete": "Die Kursgruppierung konnte nicht gelöscht werden.",
       "error_toggle": "Die Einstellung konnte nicht gespeichert werden.",
-      "error_reorder": "Die Reihenfolge konnte nicht aktualisiert werden."
+      "error_reorder": "Die Reihenfolge konnte nicht aktualisiert werden.",
+      "loading": "Wird geladen...",
+      "error_loading": "Die Kursgruppierungen konnten nicht geladen werden."
     },
     "faq": {
       "label": "FAQ Einstellungen",

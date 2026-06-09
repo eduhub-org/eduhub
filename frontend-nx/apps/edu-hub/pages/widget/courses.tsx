@@ -88,18 +88,6 @@ const WidgetCourses: FC = () => {
     }
   );
 
-  // Fetch the available course group options so the widget can resolve the
-  // selected group ids (including organization-owned, non-homepage groups).
-  const { data: groupOptionsData } = useQuery<CourseGroupOptions>(COURSE_GROUP_OPTIONS, {
-    client,
-    fetchPolicy: 'network-only',
-    context: {
-      headers: {
-        'x-hasura-role': 'anonymous',
-      },
-    },
-  });
-
   // Parse the comma-separated list of selected group option ids (e.g. groups=3,7).
   const selectedGroupIds = useMemo(() => {
     if (!groups) return [] as number[];
@@ -110,6 +98,24 @@ const WidgetCourses: FC = () => {
       .filter((value) => !isNaN(value));
   }, [groups]);
 
+  // Fetch the available course group options so the widget can resolve the
+  // selected group ids (including organization-owned, non-homepage groups).
+  // Only needed when group ids are provided via the `groups` query param.
+  const {
+    data: groupOptionsData,
+    loading: groupOptionsLoading,
+    error: groupOptionsError,
+  } = useQuery<CourseGroupOptions>(COURSE_GROUP_OPTIONS, {
+    client,
+    skip: selectedGroupIds.length === 0,
+    fetchPolicy: 'network-only',
+    context: {
+      headers: {
+        'x-hasura-role': 'anonymous',
+      },
+    },
+  });
+
   // Filter courses by the selected group(s). Multiple groups are joined into a
   // single, de-duplicated list of courses.
   const filteredCourses = useMemo(() => {
@@ -117,11 +123,16 @@ const WidgetCourses: FC = () => {
 
     // Preferred mode: explicit group option ids (supports joining several groups).
     if (selectedGroupIds.length > 0) {
+      // Don't fall back to the full course list for scoped URLs: wait for the
+      // group options to resolve, and show nothing if they fail or don't match.
+      if (groupOptionsLoading || groupOptionsError) {
+        return [];
+      }
       const options = (groupOptionsData?.CourseGroupOption ?? []).filter((option) =>
         selectedGroupIds.includes(option.id)
       );
       if (options.length === 0) {
-        return courses;
+        return [];
       }
       return courses.filter((course) =>
         options.some((option) =>
@@ -145,7 +156,7 @@ const WidgetCourses: FC = () => {
     return courses.filter((course) =>
       course.CourseGroups.some((courseGroup) => courseGroup.CourseGroupOption.order === groupOrder)
     );
-  }, [coursesData, group, selectedGroupIds, groupOptionsData]);
+  }, [coursesData, group, selectedGroupIds, groupOptionsData, groupOptionsLoading, groupOptionsError]);
 
   // Filter only published courses
   // Note: CourseTiles_Course type doesn't include 'published' in generated types,
@@ -159,7 +170,8 @@ const WidgetCourses: FC = () => {
     );
   }, [filteredCourses]);
 
-  const isLoading = coursesLoading || apiKeyValidating;
+  const isLoading =
+    coursesLoading || apiKeyValidating || (selectedGroupIds.length > 0 && groupOptionsLoading);
   const hasError = coursesError || apiKeyError;
 
   // Add widget-page class to body and html for scoped CSS

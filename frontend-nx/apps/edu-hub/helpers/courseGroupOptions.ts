@@ -8,6 +8,9 @@ export const KNOWN_COURSE_GROUP_OPTION_TITLES = new Set<string>([
   'degree',
   'event',
   'courses',
+  // Not DB-backed options, but homepage groups that ship with a translation.
+  'my_admin_courses',
+  'my_courses',
 ]);
 
 export const isKnownCourseGroupOptionTitle = (title?: string | null): boolean =>

@@ -256,10 +256,10 @@ const TagSelector: React.FC<TagSelectorProps> = ({
                       {...tagProps}
                       key={option.id}
                       label={
-                        isMarked(option.id) ? (
+                        isMarked(option.id) && markLabel ? (
                           <span className="flex items-center gap-1">
                             {getOptionLabel(option)}
-                            <Tooltip title={markLabel ?? ''} placement="top">
+                            <Tooltip title={markLabel} placement="top">
                               <span aria-label={markLabel}>★</span>
                             </Tooltip>
                           </span>

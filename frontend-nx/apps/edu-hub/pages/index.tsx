@@ -18,6 +18,7 @@ import { useUserId } from '../hooks/user';
 import { AuthRoles } from '../types/enums';
 
 import { COURSE_GROUP_OPTIONS } from '../queries/courseGroupOptions';
+import { isKnownCourseGroupOptionTitle } from '../helpers/courseGroupOptions';
 import { COURSE_TILES, COURSES_BY_INSTRUCTOR, COURSES_ENROLLED_BY_USER } from '../queries/courseQueries';
 import { APP_SETTINGS } from '../queries/appSettings';
 import { CourseGroupOptions } from '../queries/__generated__/CourseGroupOptions';
@@ -130,7 +131,11 @@ const Home: FC = () => {
           group.courses.length > 0 && (
             <Fragment key={`${groupKey}-${index}`}>
               <h2 id={`sliderGroup${index + 1}`} className="text-2xl font-semibold text-left ml-3 md:ml-0">
-                {group.title ? tCommon(`course_group_options.${group.title}`) : '—'}
+                {group.title
+                  ? isKnownCourseGroupOptionTitle(group.title)
+                    ? tCommon(`course_group_options.${group.title}`)
+                    : group.title
+                  : '—'}
               </h2>
               <div className="mt-2 mb-12">
                 <TileSlider courses={group.courses as import('../components/common/TileSlider').CourseType[]} isManage={group.isManaged ?? false} />
