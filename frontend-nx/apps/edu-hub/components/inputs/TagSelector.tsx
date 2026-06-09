@@ -259,8 +259,8 @@ const TagSelector: React.FC<TagSelectorProps> = ({
                 deleteIcon={
                   <CancelOutlined
                     sx={{
-                      '&&': { color: 'var(--eduhub-label-primary)', opacity: 0.85 },
-                      '&&:hover': { color: 'var(--eduhub-error)', opacity: 1 },
+                      '&&': { color: 'var(--eduhub-label-secondary)' },
+                      '&&:hover': { color: 'var(--eduhub-error)' },
                     }}
                   />
                 }
