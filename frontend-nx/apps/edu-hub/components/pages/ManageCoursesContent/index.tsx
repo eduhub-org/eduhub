@@ -336,12 +336,17 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
   const courseGroupOptions = useMemo(() => {
     if (data && !loading && !error) {
       return (
-        data.CourseGroupOption?.map((option: { id: number; title: string | null }) => ({
-          id: option.id,
-          name: isKnownCourseGroupOptionTitle(option.title)
-            ? tCommon(`course_group_options.${option.title}`)
-            : option.title ?? '—',
-        })) || []
+        data.CourseGroupOption
+          // Program-type based groups (Courses, Events, Degrees) are assigned
+          // automatically via the program type, so they must not be manually
+          // selectable here.
+          ?.filter((option: { programType: string | null }) => option.programType == null)
+          .map((option: { id: number; title: string | null }) => ({
+            id: option.id,
+            name: isKnownCourseGroupOptionTitle(option.title)
+              ? tCommon(`course_group_options.${option.title}`)
+              : option.title ?? '—',
+          })) || []
       );
     } else {
       return [];

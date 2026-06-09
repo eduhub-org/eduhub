@@ -96,6 +96,7 @@ export const ADMIN_COURSE_LIST = gql`
       title
       order
       sliderGroup
+      programType
     }
   }
 `;

@@ -555,6 +555,10 @@ export interface AdminCourseList_CourseGroupOption {
    * Indicates whether this group option is used in UI sliders (true) or as metadata tags (false)
    */
   sliderGroup: boolean | null;
+  /**
+   * When set, this group automatically includes all published courses of the given program type (e.g. COURSES, EVENTS, DEGREES) instead of relying on manual CourseGroup assignments.
+   */
+  programType: string | null;
 }
 
 export interface AdminCourseList {
