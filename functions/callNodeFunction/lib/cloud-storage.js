@@ -38,6 +38,12 @@ const getSignedReadUrlConfig = (filePath) => {
   return config;
 };
 
+const getSignedReadUrl = async (file, filePath) => {
+  // Google returns signed URLs as a single-element array.
+  const [signedUrl] = await file.getSignedUrl(getSignedReadUrlConfig(filePath));
+  return signedUrl;
+};
+
 const getRelativePath = (filePath) => {
   if (isPublicLegacy(filePath)) {
     const parsedUrl = url.parse(filePath);
@@ -150,7 +156,7 @@ export const buildCloudStorage = (Storage) => {
           await file.makePublic();
           link = await file.publicUrl();
         } else {
-          link = await file.getSignedUrl(getSignedReadUrlConfig(filename));
+          link = await getSignedReadUrl(file, filename);
         }
         return link;
       },
@@ -164,7 +170,7 @@ export const buildCloudStorage = (Storage) => {
         if (isPublic[0] == true) {
           link = await file.publicUrl();
         } else {
-          link = await file.getSignedUrl(getSignedReadUrlConfig(path));
+          link = await getSignedReadUrl(file, path);
         }
         return link;
       },

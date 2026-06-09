@@ -18,6 +18,7 @@ import { useUserId } from '../hooks/user';
 import { AuthRoles } from '../types/enums';
 
 import { COURSE_GROUP_OPTIONS } from '../queries/courseGroupOptions';
+import { isKnownCourseGroupOptionTitle } from '../helpers/courseGroupOptions';
 import { COURSE_TILES, COURSES_BY_INSTRUCTOR, COURSES_ENROLLED_BY_USER } from '../queries/courseQueries';
 import { APP_SETTINGS } from '../queries/appSettings';
 import { CourseGroupOptions } from '../queries/__generated__/CourseGroupOptions';
@@ -99,16 +100,24 @@ const Home: FC = () => {
 
   const coursesGroups = useMemo(
     () =>
-      [1, 2, 3, 4, 5].map((order) => {
-        const filteredCourses = publishedCourses.filter((course) =>
-          course.CourseGroups.some((courseGroup) => courseGroup.CourseGroupOption.order === order)
-        );
-        const title = courseGroupOptionsData?.CourseGroupOption[order - 1]?.title;
-        return {
-          title,
-          courses: filteredCourses,
-        };
-      }),
+      (courseGroupOptionsData?.CourseGroupOption ?? [])
+        // Only groups that are marked as homepage sliders and are not owned by a
+        // specific organization (organization-owned groups only appear in widgets).
+        .filter((option) => option.sliderGroup && option.organizationId == null)
+        .map((option) => {
+          const filteredCourses = option.programType
+            ? // Program-type based groups (Courses, Events, Degrees) are populated
+              // automatically from the published courses of that program type.
+              publishedCourses.filter((course) => course.Program?.type === option.programType)
+            : // Other groups still rely on manual CourseGroup assignments.
+              publishedCourses.filter((course) =>
+                course.CourseGroups.some((courseGroup) => courseGroup.CourseGroupOption.id === option.id)
+              );
+          return {
+            title: option.title,
+            courses: filteredCourses,
+          };
+        }),
     [publishedCourses, courseGroupOptionsData]
   );
 
@@ -122,7 +131,11 @@ const Home: FC = () => {
           group.courses.length > 0 && (
             <Fragment key={`${groupKey}-${index}`}>
               <h2 id={`sliderGroup${index + 1}`} className="text-2xl font-semibold text-left ml-3 md:ml-0">
-                {group.title ? tCommon(`course_group_options.${group.title}`) : '—'}
+                {group.title
+                  ? isKnownCourseGroupOptionTitle(group.title)
+                    ? tCommon(`course_group_options.${group.title}`)
+                    : group.title
+                  : '—'}
               </h2>
               <div className="mt-2 mb-12">
                 <TileSlider courses={group.courses as import('../components/common/TileSlider').CourseType[]} isManage={group.isManaged ?? false} />
