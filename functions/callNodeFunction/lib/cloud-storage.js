@@ -164,7 +164,10 @@ export const buildCloudStorage = (Storage) => {
         if (isPublic[0] == true) {
           link = await file.publicUrl();
         } else {
-          link = await file.getSignedUrl(getSignedReadUrlConfig(path));
+          // file.getSignedUrl resolves to a single-element array ([url]); unwrap it so
+          // callers (and the getSignedUrl action's `link: String!` field) get a plain string.
+          const [signedUrl] = await file.getSignedUrl(getSignedReadUrlConfig(path));
+          link = signedUrl;
         }
         return link;
       },

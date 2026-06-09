@@ -20,7 +20,7 @@ type SessionToken = {
 
 type GetSignedUrlResponse = {
   getSignedUrl?: {
-    link?: string | null;
+    link?: string | string[] | null;
   } | null;
 };
 
@@ -97,7 +97,10 @@ export default async function certificateDownload(
       { path: certificatePath }
     );
 
-    const signedUrl = result.getSignedUrl?.link;
+    const link = result.getSignedUrl?.link;
+    // Older signed-URL responses may wrap the URL in a single-element array; normalize to a
+    // string so res.redirect (which rejects non-string URLs) does not throw.
+    const signedUrl = Array.isArray(link) ? link[0] : link;
     if (!signedUrl) {
       return res.status(404).json({ error: 'Certificate not found.' });
     }
