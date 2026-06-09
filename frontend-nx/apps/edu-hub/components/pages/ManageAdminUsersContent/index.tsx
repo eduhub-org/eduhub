@@ -8,21 +8,26 @@ import { useTableGrid } from '../../common/TableGrid/hooks';
 import { createMultiWordSearchCondition } from '../../common/TableGrid/utils';
 import CheckboxSelector from '../../inputs/CheckboxSelector';
 
-import { useAdminQuery, useManageQuery } from '../../../hooks/authedQuery';
+import { useAdminQuery, useManageQuery, useOrgAdminQuery } from '../../../hooks/authedQuery';
 import { useAdminMutation } from '../../../hooks/authedMutation';
 import {
   ORGANIZATION_ADMIN_LIST,
   DELETE_ORGANIZATION_ADMIN,
+  MANAGEABLE_ORGANIZATIONS,
   UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_EVENTS,
   UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_COURSES,
   UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_DEGREES,
   UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_SETTINGS,
 } from '../../../queries/organizationAdmin';
+import { ORGANIZATION_OPTIONS } from '../../../queries/organization';
 import { UPDATE_USER_ADMIN_STATUS, ADMIN_USERS } from '../../../queries/actions';
 import { PageBlock } from '../../common/PageBlock';
 import CommonPageHeader from '../../common/CommonPageHeader';
 import { useIsAdmin, useManageRole } from '../../../hooks/authentication';
 import { OrganizationAdminList_OrganizationAdmin } from '../../../queries/__generated__/OrganizationAdminList';
+import { OrganizationOptions, OrganizationOptionsVariables } from '../../../queries/__generated__/OrganizationOptions';
+import { ManageableOrganizations } from '../../../queries/__generated__/ManageableOrganizations';
+import AddOrganizationAdminDialog, { AdminOrganizationOption } from './AddOrganizationAdminDialog';
 
 const ExpandableUserRow: FC<{
   row: OrganizationAdminList_OrganizationAdmin;
@@ -163,14 +168,54 @@ const ManageAdminUsersContent: FC = () => {
     },
   });
 
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+
+  // Organizations the current user may add admins to. Super-admins pick from all organizations; org
+  // admins are restricted to those they administer with the canManageSettings capability (the same
+  // capability Hasura enforces on insert). The add button is shown only when at least one option
+  // exists, which also hides it from org admins who cannot manage users/settings anywhere.
+  const { data: allOrganizationsData } = useAdminQuery<OrganizationOptions, OrganizationOptionsVariables>(
+    ORGANIZATION_OPTIONS,
+    { skip: !isAdmin }
+  );
+  const { data: manageableOrganizationsData } = useOrgAdminQuery<ManageableOrganizations>(
+    MANAGEABLE_ORGANIZATIONS,
+    { skip: isAdmin }
+  );
+
+  const organizationOptions = useMemo<AdminOrganizationOption[]>(() => {
+    if (isAdmin) {
+      return (allOrganizationsData?.Organization ?? []).map((organization) => ({
+        id: organization.id,
+        name: organization.name,
+      }));
+    }
+    const byId = new Map<number, string>();
+    (manageableOrganizationsData?.OrganizationAdmin ?? []).forEach((grant) => {
+      if (grant.Organization) {
+        byId.set(grant.Organization.id, grant.Organization.name);
+      }
+    });
+    return Array.from(byId, ([id, name]) => ({ id, name })).sort((a, b) => a.name.localeCompare(b.name));
+  }, [isAdmin, allOrganizationsData, manageableOrganizationsData]);
+
+  const canAddAdmins = organizationOptions.length > 0;
+
   const columns = useMemo<ColumnDef<OrganizationAdminList_OrganizationAdmin>[]>(
     () => [
       {
+        // The organization the user administers. Super-admins are not scoped to a single organization,
+        // so their rows show a "Super Admin" marker instead of an organization name.
         header: t('organization'),
         accessorKey: 'Organization.name',
         enableSorting: true,
         size: 300,
-        cell: ({ getValue }) => <div>{getValue<ReactNode>()}</div>,
+        cell: ({ row, getValue }) =>
+          adminUserIds.includes(row.original.User?.id) ? (
+            <div className="font-medium">{t('super_admin_label')}</div>
+          ) : (
+            <div>{getValue<ReactNode>()}</div>
+          ),
       },
       {
         header: t('first_name'),
@@ -187,6 +232,15 @@ const ManageAdminUsersContent: FC = () => {
         cell: ({ getValue }) => <div>{getValue<ReactNode>()}</div>,
       },
       {
+        // The organization the user belongs to according to their own profile (independent of the
+        // organizations they administer).
+        header: t('profile_organization'),
+        accessorKey: 'User.Organization.name',
+        enableSorting: true,
+        size: 250,
+        cell: ({ row }) => <div>{row.original.User?.Organization?.name ?? ''}</div>,
+      },
+      {
         header: t('email'),
         accessorKey: 'User.email',
         enableSorting: true,
@@ -194,7 +248,7 @@ const ManageAdminUsersContent: FC = () => {
         cell: ({ getValue }) => <div>{getValue<ReactNode>()}</div>,
       },
     ],
-    [t]
+    [t, adminUserIds]
   );
 
   const generateDeletionConfirmation = useCallback(
@@ -218,6 +272,9 @@ const ManageAdminUsersContent: FC = () => {
             <CommonPageHeader headline={t('headline')} />
             <TableGrid
               columns={columns}
+              {...(canAddAdmins
+                ? { onAddButtonClick: () => setIsAddDialogOpen(true), addButtonText: t('add_admin_button') }
+                : {})}
               data={data?.OrganizationAdmin || []}
               totalCount={data?.OrganizationAdmin_aggregate?.aggregate?.count || 0}
               pageIndex={pageIndex}
@@ -238,6 +295,12 @@ const ManageAdminUsersContent: FC = () => {
                   onAdminStatusChange={() => refetch()}
                 />
               )}
+            />
+            <AddOrganizationAdminDialog
+              open={isAddDialogOpen}
+              onClose={() => setIsAddDialogOpen(false)}
+              onSuccess={() => refetch()}
+              organizationOptions={organizationOptions}
             />
           </div>
         )}

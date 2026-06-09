@@ -9,6 +9,12 @@ import { OrganizationAdmin_bool_exp, OrganizationAdmin_order_by } from "./../../
 // GraphQL query operation: OrganizationAdminList
 // ====================================================
 
+export interface OrganizationAdminList_OrganizationAdmin_User_Organization {
+  __typename: "Organization";
+  id: number;
+  name: string;
+}
+
 export interface OrganizationAdminList_OrganizationAdmin_User {
   __typename: "User";
   id: any;
@@ -24,6 +30,10 @@ export interface OrganizationAdminList_OrganizationAdmin_User {
    * The user's email address
    */
   email: string;
+  /**
+   * An object relationship
+   */
+  Organization: OrganizationAdminList_OrganizationAdmin_User_Organization | null;
 }
 
 export interface OrganizationAdminList_OrganizationAdmin_Organization {
