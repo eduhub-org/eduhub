@@ -12,6 +12,13 @@ object_relationships:
     using:
       foreign_key_constraint_on: userId
 insert_permissions:
+  # Instructor add-author flow: an instructor adds one or more authors (any userId)
+  # to a project in a course they teach. userId is supplied by the client, so this
+  # role must NOT use a `set: userId` preset — a preset would strip userId from
+  # ProjectAuthor_insert_input ("field 'userId' not found in type") and force every
+  # author to be the instructor themselves.
+  # Instructors acting as course participants (join-request) use the `user` JWT role
+  # (user_access); the second branch below is a defensive fallback constrained to self.
   - role: instructor_access
     permission:
       check:
@@ -26,6 +33,8 @@ insert_permissions:
           - _and:
               - participationStatus:
                   _eq: REQUESTED
+              - userId:
+                  _eq: X-Hasura-User-Id
               - Project:
                   _and:
                     - status:
@@ -40,8 +49,6 @@ insert_permissions:
                             User:
                               id:
                                 _eq: X-Hasura-User-Id
-      set:
-        userId: x-hasura-user-id
       columns:
         - participationStatus
         - projectId
