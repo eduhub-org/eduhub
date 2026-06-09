@@ -5,16 +5,25 @@ import { useTranslations } from 'next-intl';
 import { DialogShell } from '../../common/dialogs/DialogShell';
 import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
 import NotificationSnackbar from '../../common/dialogs/NotificationSnackbar';
-import { SelectUserDialog } from '../../common/dialogs/SelectUserDialog';
+import SelectUserRow from '../../common/dialogs/SelectUserRow';
 import { Button } from '../../common/Button';
 import DropDownSelector from '../../inputs/DropDownSelector';
 import { useManageMutation } from '../../../hooks/authedMutation';
+import { useRoleQuery } from '../../../hooks/authedQuery';
+import { useManageRole } from '../../../hooks/authentication';
 import { INSERT_ORGANIZATION_ADMIN } from '../../../queries/organizationAdmin';
+import { USER_SELECTION_WITH_FILTER } from '../../../queries/user';
+import { createMultiWordSearchCondition } from '../../../helpers/searchUtils';
+import { order_by } from '../../../__generated__/globalTypes';
 import {
   InsertOrganizationAdmin,
   InsertOrganizationAdminVariables,
 } from '../../../queries/__generated__/InsertOrganizationAdmin';
-import { UserSelectionWithFilter_User } from '../../../queries/__generated__/UserSelectionWithFilter';
+import {
+  UserSelectionWithFilter,
+  UserSelectionWithFilterVariables,
+  UserSelectionWithFilter_User,
+} from '../../../queries/__generated__/UserSelectionWithFilter';
 
 export interface AdminOrganizationOption {
   id: number;
@@ -37,10 +46,11 @@ const AddOrganizationAdminDialog: FC<AddOrganizationAdminDialogProps> = ({
 }) => {
   const t = useTranslations('manageAdminUsers');
   const tCommon = useTranslations('common');
+  const manageRole = useManageRole();
 
   const [organizationId, setOrganizationId] = useState<number | null>(null);
   const [selectedUser, setSelectedUser] = useState<UserSelectionWithFilter_User | null>(null);
-  const [isUserDialogOpen, setIsUserDialogOpen] = useState(false);
+  const [userSearch, setUserSearch] = useState('');
   const [canManageEvents, setCanManageEvents] = useState(false);
   const [canManageCourses, setCanManageCourses] = useState(false);
   const [canManageDegrees, setCanManageDegrees] = useState(false);
@@ -55,6 +65,7 @@ const AddOrganizationAdminDialog: FC<AddOrganizationAdminDialogProps> = ({
     if (open) {
       setOrganizationId(organizationOptions.length === 1 ? organizationOptions[0].id : null);
       setSelectedUser(null);
+      setUserSearch('');
       setCanManageEvents(false);
       setCanManageCourses(false);
       setCanManageDegrees(false);
@@ -69,21 +80,41 @@ const AddOrganizationAdminDialog: FC<AddOrganizationAdminDialogProps> = ({
     [organizationOptions]
   );
 
+  // Inline user search (same query/role as the shared SelectUserDialog used to add instructors): only
+  // existing, active EduHub users are returned, matched by partial name or email.
+  const hasSearched = userSearch.trim().length >= 2;
+  const userFilter = useMemo(
+    () =>
+      hasSearched
+        ? createMultiWordSearchCondition(userSearch.trim(), ['firstName', 'lastName', 'email'])
+        : {},
+    [hasSearched, userSearch]
+  );
+  const { data: userData, loading: usersLoading } = useRoleQuery<
+    UserSelectionWithFilter,
+    UserSelectionWithFilterVariables
+  >(USER_SELECTION_WITH_FILTER, {
+    variables: {
+      limit: 100,
+      filter: userFilter,
+      order_by: [{ lastName: order_by.asc }, { firstName: order_by.asc }],
+    },
+    skip: !open || !!selectedUser || !hasSearched,
+    context: { role: manageRole },
+  });
+  const users = userData?.User ?? [];
+  const showNoResults = hasSearched && !usersLoading && users.length === 0;
+
+  const handleSelectUser = useCallback((user: UserSelectionWithFilter_User) => {
+    setSelectedUser(user);
+    setUserSearch('');
+    setValidationError(null);
+  }, []);
+
   const [insertOrganizationAdmin, { loading: inserting }] = useManageMutation<
     InsertOrganizationAdmin,
     InsertOrganizationAdminVariables
   >(INSERT_ORGANIZATION_ADMIN);
-
-  const handleUserDialogClose = useCallback(
-    (confirmed: boolean, user: UserSelectionWithFilter_User | null) => {
-      setIsUserDialogOpen(false);
-      if (confirmed && user) {
-        setSelectedUser(user);
-        setValidationError(null);
-      }
-    },
-    []
-  );
 
   const handleSubmit = useCallback(async () => {
     setValidationError(null);
@@ -178,21 +209,40 @@ const AddOrganizationAdminDialog: FC<AddOrganizationAdminDialogProps> = ({
 
           <div>
             <div className="text-sm text-label-secondary mb-1">{t('add_admin_user_label')}</div>
-            <div className="flex items-center gap-3">
-              <div className="flex-1 min-w-0">
-                {selectedUser ? (
-                  <span>
-                    {`${selectedUser.firstName ?? ''} ${selectedUser.lastName ?? ''}`.trim()}
-                    {selectedUser.email && (
-                      <span className="text-sm text-label-secondary ml-1">({selectedUser.email})</span>
-                    )}
-                  </span>
-                ) : (
-                  <span className="text-label-secondary">{t('add_admin_no_user_selected')}</span>
-                )}
+            {selectedUser ? (
+              <div className="flex items-center gap-3">
+                <div className="flex-1 min-w-0">
+                  {`${selectedUser.firstName ?? ''} ${selectedUser.lastName ?? ''}`.trim()}
+                  {selectedUser.email && (
+                    <span className="text-sm text-label-secondary ml-1">({selectedUser.email})</span>
+                  )}
+                </div>
+                <Button onClick={() => setSelectedUser(null)}>{t('add_admin_change_user')}</Button>
               </div>
-              <Button onClick={() => setIsUserDialogOpen(true)}>{t('add_admin_select_user')}</Button>
-            </div>
+            ) : (
+              <>
+                <input
+                  placeholder={t('add_admin_user_search_placeholder')}
+                  className="w-full border border-solid border-gray-300 rounded px-3 py-2"
+                  type="text"
+                  value={userSearch}
+                  onChange={(event) => setUserSearch(event.target.value)}
+                />
+                {hasSearched && (
+                  <div className="mt-2 max-h-64 overflow-auto border border-gray-200 rounded">
+                    {users.map((user) => (
+                      <SelectUserRow user={user} key={user.id} onClick={handleSelectUser} />
+                    ))}
+                    {showNoResults && (
+                      <div className="p-3 text-center text-label-secondary">{t('add_admin_no_users_found')}</div>
+                    )}
+                    {usersLoading && (
+                      <div className="p-3 text-center text-label-secondary">{tCommon('loading')}</div>
+                    )}
+                  </div>
+                )}
+              </>
+            )}
           </div>
 
           <div>
@@ -214,12 +264,6 @@ const AddOrganizationAdminDialog: FC<AddOrganizationAdminDialogProps> = ({
           {validationError && <div className="text-red-600 text-sm">{validationError}</div>}
         </div>
       </DialogShell>
-
-      <SelectUserDialog
-        open={isUserDialogOpen}
-        title={t('add_admin_select_user_dialog_title')}
-        onClose={handleUserDialogClose}
-      />
 
       <NotificationSnackbar
         open={showSuccess}
