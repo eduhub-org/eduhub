@@ -80,6 +80,7 @@ import { InsertEmailTemplate, InsertEmailTemplateVariables } from '../../../quer
 interface ExpandableCourseRowProps {
   course: AdminCourseList_Course;
   courseGroupOptions: { id: number; name: string }[];
+  sliderCourseGroupIds: number[];
   degreeCourses: { id: number; name: string }[];
   onSetAttendanceCertificatePossible: (c: AdminCourseList_Course, isPossible: boolean) => any;
   onSetAchievementCertificatePossible: (c: AdminCourseList_Course, isPossible: boolean) => any;
@@ -88,6 +89,7 @@ interface ExpandableCourseRowProps {
 const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
   course,
   courseGroupOptions,
+  sliderCourseGroupIds,
   degreeCourses,
   onSetAttendanceCertificatePossible,
   onSetAchievementCertificatePossible,
@@ -809,6 +811,8 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                 itemId={course.id}
                 values={currentCourseGroups}
                 options={courseGroupOptions}
+                markedOptionIds={sliderCourseGroupIds}
+                markLabel={t('manageCourses.course_group.slider_badge')}
                 insertValueMutation={INSERT_COURSE_GROUP_TAG}
                 deleteValueMutation={DELETE_COURSE_GROUP_TAG}
                 refetchQueries={['AdminCourseList']}

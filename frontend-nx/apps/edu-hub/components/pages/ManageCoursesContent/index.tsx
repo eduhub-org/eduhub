@@ -348,6 +348,18 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
     }
   }, [tCommon, data, loading, error]);
 
+  const sliderCourseGroupIds = useMemo(() => {
+    if (data && !loading && !error) {
+      return (
+        data.CourseGroupOption?.filter((option: { sliderGroup: boolean }) => option.sliderGroup).map(
+          (option: { id: number }) => option.id
+        ) || []
+      );
+    } else {
+      return [];
+    }
+  }, [data, loading, error]);
+
   const degreeCoursesQuery = useRoleQuery<DegreeCourses>(DEGREE_COURSES);
   const degreeCourses = useMemo(() => {
     if (degreeCoursesQuery.data && !degreeCoursesQuery.loading && !degreeCoursesQuery.error) {
@@ -749,6 +761,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
           <ExpandableCourseRow
             course={props.row}
             courseGroupOptions={courseGroupOptions}
+            sliderCourseGroupIds={sliderCourseGroupIds}
             degreeCourses={degreeCourses}
             onSetAttendanceCertificatePossible={handleAttendanceCertificatePossible}
             onSetAchievementCertificatePossible={handleAchievementCertificatePossible}

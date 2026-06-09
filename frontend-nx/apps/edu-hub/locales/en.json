@@ -1049,7 +1049,8 @@
     },
     "course_group": {
       "label": "Course Group",
-      "placeholder": "Select course groups"
+      "placeholder": "Select course groups",
+      "slider_badge": "Homepage slider"
     },
     "cover_image": {
       "label": "Cover Image",

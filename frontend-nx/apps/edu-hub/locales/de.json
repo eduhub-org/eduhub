@@ -1033,7 +1033,8 @@
     },
     "course_group": {
       "label": "Kurs-Gruppe",
-      "placeholder": "Kurs-Gruppen auswählen"
+      "placeholder": "Kurs-Gruppen auswählen",
+      "slider_badge": "Startseiten-Slider"
     },
     "cover_image": {
       "label": "Titelbild",
