@@ -246,42 +246,39 @@ const TagSelector: React.FC<TagSelectorProps> = ({
               )
             : undefined
         }
-        renderTags={
-          markedOptionIds
-            ? (value, getTagProps) =>
-                value.map((option, index) => {
-                  // Pull `key` out of the spread (React requires it passed directly)
-                  // and keep `onDelete` so the delete icon renders, like the
-                  // default MUI tag rendering.
-                  const { key, ...tagProps } = getTagProps({ index });
-                  return (
-                    <Chip
-                      key={key}
-                      {...tagProps}
-                      deleteIcon={
-                        <Cancel
-                          sx={{
-                            '&&': { color: 'var(--eduhub-label-primary)', opacity: 0.85 },
-                            '&&:hover': { color: 'var(--eduhub-error)', opacity: 1 },
-                          }}
-                        />
-                      }
-                      label={
-                        isMarked(option.id) && markLabel ? (
-                          <span className="flex items-center gap-1">
-                            {getOptionLabel(option)}
-                            <Tooltip title={markLabel} placement="top">
-                              <span aria-label={markLabel}>★</span>
-                            </Tooltip>
-                          </span>
-                        ) : (
-                          getOptionLabel(option)
-                        )
-                      }
-                    />
-                  );
-                })
-            : undefined
+        renderTags={(value, getTagProps) =>
+          value.map((option, index) => {
+            // Render chips explicitly so the delete (x) icon is always visible:
+            // pull `key` out of the spread (React requires it passed directly),
+            // keep `onDelete` from the spread, and force a high-contrast icon.
+            const { key, ...tagProps } = getTagProps({ index });
+            return (
+              <Chip
+                key={key}
+                {...tagProps}
+                deleteIcon={
+                  <Cancel
+                    sx={{
+                      '&&': { color: 'var(--eduhub-label-primary)', opacity: 0.85 },
+                      '&&:hover': { color: 'var(--eduhub-error)', opacity: 1 },
+                    }}
+                  />
+                }
+                label={
+                  isMarked(option.id) && markLabel ? (
+                    <span className="flex items-center gap-1">
+                      {getOptionLabel(option)}
+                      <Tooltip title={markLabel} placement="top">
+                        <span aria-label={markLabel}>★</span>
+                      </Tooltip>
+                    </span>
+                  ) : (
+                    getOptionLabel(option)
+                  )
+                }
+              />
+            );
+          })
         }
         renderInput={(params) => (
           <TextField
