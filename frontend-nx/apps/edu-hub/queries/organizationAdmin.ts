@@ -120,12 +120,14 @@ export const UPDATE_ORGANIZATION_ADMIN_ORGANIZATION_ID = gql`
 
 // Organizations the current user may add admins to. Run under the management role: for a super-admin
 // (admin role) this is unused (they use ORGANIZATION_OPTIONS for the full list); for an org admin
-// (org_admin role) the row permission scopes OrganizationAdmin to grants they can see, and the
-// canManageSettings filter narrows it to organizations they actually administer with settings rights.
-// Several rows per organization are expected — dedupe by Organization.id on the client.
+// (org_admin role) we scope explicitly to the caller's OWN grant rows that carry canManageSettings.
+// The org_admin select permission also exposes colleagues' grants in those organizations, so without
+// the userId filter a colleague's settings-enabled grant could surface an organization the caller
+// cannot actually add to (the insert check would then reject it). Filtering on the caller's userId
+// keeps this aligned with what Hasura allows on insert. One row per administered organization.
 export const MANAGEABLE_ORGANIZATIONS = gql`
-  query ManageableOrganizations {
-    OrganizationAdmin(where: { canManageSettings: { _eq: true } }) {
+  query ManageableOrganizations($currentUserId: uuid!) {
+    OrganizationAdmin(where: { userId: { _eq: $currentUserId }, canManageSettings: { _eq: true } }) {
       organizationId
       Organization {
         id

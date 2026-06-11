@@ -127,6 +127,12 @@ const AddOrganizationAdminDialog: FC<AddOrganizationAdminDialogProps> = ({
       setValidationError(t('add_admin_user_required'));
       return;
     }
+    // A grant with no capabilities still confers org-admin access in the permission model, so a
+    // capability must be picked explicitly rather than silently creating a bare admin row.
+    if (!canManageEvents && !canManageCourses && !canManageDegrees && !canManageSettings) {
+      setValidationError(t('add_admin_capability_required'));
+      return;
+    }
 
     try {
       const insertResult = await insertOrganizationAdmin({
@@ -224,13 +230,13 @@ const AddOrganizationAdminDialog: FC<AddOrganizationAdminDialogProps> = ({
               <>
                 <input
                   placeholder={t('add_admin_user_search_placeholder')}
-                  className="w-full border border-solid border-gray-300 rounded px-3 py-2"
+                  className="w-full border border-solid border-border-primary rounded px-3 py-2 bg-fill-primary text-label-primary"
                   type="text"
                   value={userSearch}
                   onChange={(event) => setUserSearch(event.target.value)}
                 />
                 {hasSearched && (
-                  <div className="mt-2 max-h-64 overflow-auto border border-gray-200 rounded">
+                  <div className="mt-2 max-h-64 overflow-auto border border-border-primary rounded">
                     {users.map((user) => (
                       <SelectUserRow user={user} key={user.id} onClick={handleSelectUser} />
                     ))}

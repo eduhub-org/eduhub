@@ -28,3 +28,7 @@ export interface ManageableOrganizations {
    */
   OrganizationAdmin: ManageableOrganizations_OrganizationAdmin[];
 }
+
+export interface ManageableOrganizationsVariables {
+  currentUserId: any;
+}

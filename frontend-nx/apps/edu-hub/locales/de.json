@@ -1818,6 +1818,7 @@
     "add_admin_change_user": "Ändern",
     "add_admin_organization_required": "Bitte wähle eine Organisation aus.",
     "add_admin_user_required": "Bitte wähle einen Benutzer aus.",
+    "add_admin_capability_required": "Bitte vergib mindestens eine Berechtigung.",
     "add_admin_error": "Der Admin-Benutzer konnte nicht hinzugefügt werden.",
     "add_admin_submit": "Hinzufügen",
     "add_admin_submitting": "Wird hinzugefügt…",

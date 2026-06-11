@@ -24,9 +24,13 @@ import { UPDATE_USER_ADMIN_STATUS, ADMIN_USERS } from '../../../queries/actions'
 import { PageBlock } from '../../common/PageBlock';
 import CommonPageHeader from '../../common/CommonPageHeader';
 import { useIsAdmin, useManageRole } from '../../../hooks/authentication';
+import { useUserId } from '../../../hooks/user';
 import { OrganizationAdminList_OrganizationAdmin } from '../../../queries/__generated__/OrganizationAdminList';
 import { OrganizationOptions, OrganizationOptionsVariables } from '../../../queries/__generated__/OrganizationOptions';
-import { ManageableOrganizations } from '../../../queries/__generated__/ManageableOrganizations';
+import {
+  ManageableOrganizations,
+  ManageableOrganizationsVariables,
+} from '../../../queries/__generated__/ManageableOrganizations';
 import AddOrganizationAdminDialog, { AdminOrganizationOption } from './AddOrganizationAdminDialog';
 
 const ExpandableUserRow: FC<{
@@ -131,6 +135,7 @@ const ManageAdminUsersContent: FC = () => {
   const t = useTranslations('manageAdminUsers');
   const isAdmin = useIsAdmin();
   const manageRole = useManageRole();
+  const currentUserId = useUserId();
   const [adminUserIds, setAdminUserIds] = useState<string[]>([]);
   const [adminError, setAdminError] = useState<Error | null>(null);
 
@@ -178,10 +183,13 @@ const ManageAdminUsersContent: FC = () => {
     ORGANIZATION_OPTIONS,
     { skip: !isAdmin }
   );
-  const { data: manageableOrganizationsData } = useOrgAdminQuery<ManageableOrganizations>(
-    MANAGEABLE_ORGANIZATIONS,
-    { skip: isAdmin }
-  );
+  const { data: manageableOrganizationsData } = useOrgAdminQuery<
+    ManageableOrganizations,
+    ManageableOrganizationsVariables
+  >(MANAGEABLE_ORGANIZATIONS, {
+    skip: isAdmin || !currentUserId,
+    variables: { currentUserId: currentUserId ?? '' },
+  });
 
   const organizationOptions = useMemo<AdminOrganizationOption[]>(() => {
     if (isAdmin) {
@@ -204,18 +212,22 @@ const ManageAdminUsersContent: FC = () => {
   const columns = useMemo<ColumnDef<OrganizationAdminList_OrganizationAdmin>[]>(
     () => [
       {
-        // The organization the user administers. Super-admins are not scoped to a single organization,
-        // so their rows show a "Super Admin" marker instead of an organization name.
+        // The organization the user administers. The grant's organization is always shown (the row's
+        // capability toggles and delete action target that specific grant, so it must stay
+        // identifiable even for super-admins with several grants); super-admins additionally get a
+        // "Super Admin" marker next to the organization name.
         header: t('organization'),
         accessorKey: 'Organization.name',
         enableSorting: true,
         size: 180,
-        cell: ({ row, getValue }) =>
-          adminUserIds.includes(row.original.User?.id) ? (
-            <div className="font-medium truncate">{t('super_admin_label')}</div>
-          ) : (
-            <div className="truncate">{getValue<ReactNode>()}</div>
-          ),
+        cell: ({ row, getValue }) => (
+          <div className="truncate">
+            {adminUserIds.includes(row.original.User?.id) && (
+              <span className="font-medium mr-2">{t('super_admin_label')}</span>
+            )}
+            {getValue<ReactNode>()}
+          </div>
+        ),
       },
       {
         header: t('first_name'),

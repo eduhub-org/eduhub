@@ -63,7 +63,9 @@ export const SelectUserDialog: FC<IProps> = ({ onClose, open, title, onAddNewUse
     return buildUserSelectionFilter(searchFilter, queryRole);
   }, [searchValue, queryRole]);
 
-  // Query users with dynamic filter - uses current user's role (admin/instructor) to access email column
+  // Query users with dynamic filter. Pin the request to queryRole (management role when this dialog is
+  // opened from a management screen, otherwise the current session role) so the filter built above and
+  // the role Hasura evaluates the query under stay in sync — an org_admin must query as org_admin.
   const { data, loading } = useRoleQuery<UserSelectionWithFilter, UserSelectionWithFilterVariables>(
     USER_SELECTION_WITH_FILTER,
     {
@@ -73,6 +75,7 @@ export const SelectUserDialog: FC<IProps> = ({ onClose, open, title, onAddNewUse
         order_by: [{ lastName: order_by.asc }, { firstName: order_by.asc }],
       },
       skip: !open,
+      context: { role: queryRole },
     }
   );
 

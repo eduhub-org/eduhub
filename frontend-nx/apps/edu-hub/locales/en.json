@@ -1833,6 +1833,7 @@
     "add_admin_change_user": "Change",
     "add_admin_organization_required": "Please select an organization.",
     "add_admin_user_required": "Please select a user.",
+    "add_admin_capability_required": "Please grant at least one capability.",
     "add_admin_error": "The admin user could not be added.",
     "add_admin_submit": "Add",
     "add_admin_submitting": "Adding…",
