@@ -1825,19 +1825,32 @@
     "add_admin_success": "Admin-Benutzer hinzugefügt."
   },
   "manageAppSettings": {
-    "app_settings": "App Einstellungen",
-    "background_image_url": "Hintergrundbild URL",
-    "preview_image_url": "Vorschaubild URL",
+    "appSettings": "App Einstellungen",
+    "backgroundImageURL": "Hintergrundbild URL",
+    "previewImageURL": "Vorschaubild URL",
+    "bannerBackgroundColor": "News Banner Hintergrundfarbe",
+    "bannerFontColor": "News Banner Textfarbe",
+    "bannerTextDe": "News Banner Text DE",
+    "bannerTextEn": "News Banner Text EN",
+    "bannerSettings": "Banner Einstellungen",
+    "courseGroupOptions": "Kursgruppierungen Reihenfolge",
+    "timeZone": "Zeitzone",
+    "timeZoneHelpText": "Die Zeitzone wird verwendet, um die Datums- und Uhrzeiten in der Anwendung anzuzeigen. Generelle Zeiten wie die wiederkehrende Kurszeit, die nicht an einen konkreten Tag gebunden sind, werden immer in der ursprünglich angelegten Zeit angezeigt und nicht angepasst.",
+    "timeZones": {
+      "Europe/Berlin": "Berlin",
+      "Europe/London": "London",
+      "Europe/Paris": "Paris",
+      "UTC": "UTC",
+      "America/New_York": "New York",
+      "America/Los_Angeles": "Los Angeles",
+      "Asia/Tokyo": "Tokio"
+    },
+    "faqSettings": "FAQ Einstellungen",
+    "showFaqSection": "FAQ-Bereich auf der Startseite anzeigen",
+    "faqCollectionName": "Angezeigte FAQ-Sammlung",
+    "faqCollectionPlaceholder": "FAQ-Sammlung auswählen",
     "save": "Speichern",
     "saving": "Speichern...",
-    "banner": {
-      "label": "Banner Einstellungen",
-      "background_color": "News Banner Hintergrundfarbe",
-      "fontColor": "News Banner Textfarbe",
-      "text_de": "News Banner Text DE",
-      "text_en": "News Banner Text EN"
-    },
-    "course_group_options": "Kursgruppierungen Reihenfolge",
     "course_groups": {
       "label": "Kursgruppierungen",
       "help_text": "Lege fest, welche Kursgruppierungen es gibt und in welcher Reihenfolge die als Slider markierten Gruppen auf der Startseite erscheinen. Die Gruppen \"Courses\", \"Events\" und \"Degrees\" werden automatisch aus den veröffentlichten Angeboten des jeweiligen Programmtyps befüllt. Zusätzliche Gruppen können angelegt und in einem Org-Widget ausgewählt werden, ohne auf der Startseite zu erscheinen.",
@@ -1858,25 +1871,6 @@
       "error_reorder": "Die Reihenfolge konnte nicht aktualisiert werden.",
       "loading": "Wird geladen...",
       "error_loading": "Die Kursgruppierungen konnten nicht geladen werden."
-    },
-    "faq": {
-      "label": "FAQ Einstellungen",
-      "show_section": "FAQ-Bereich auf der Startseite anzeigen",
-      "collection_name": "Angezeigte FAQ-Sammlung",
-      "collection_placeholder": "FAQ-Sammlung auswählen"
-    },
-    "time_zone": {
-      "label": "Zeitzone",
-      "values": {
-        "Europe/Berlin": "Berlin",
-        "Europe/London": "London",
-        "Europe/Paris": "Paris",
-        "UTC": "UTC",
-        "America/New_York": "New York",
-        "America/Los_Angeles": "Los Angeles",
-        "Asia/Tokyo": "Tokio"
-      },
-      "help_text": "Die Zeitzone wird verwendet, um die Datums- und Uhrzeiten in der Anwendung anzuzeigen. Generelle Zeiten wie die wiederkehrende Kurszeit, die nicht an einen konkreten Tag gebunden sind, werden immer in der ursprünglich angelegten Zeit angezeigt und nicht angepasst."
     },
     "projectDocumentationInstructions": {
       "section_label": "Projekt-Dokumentationsanleitungen",
@@ -1928,13 +1922,13 @@
     "programTypes": {
       "COURSES": "Kurse",
       "EVENTS": "Veranstaltungen",
-      "DEGREES": "Degrees"
+      "DEGREES": "Studiengänge"
     },
     "onboarding": {
       "label": "Onboarding-Texte",
       "courses_label": "Kurse",
       "events_label": "Veranstaltungen",
-      "degrees_label": "Degrees",
+      "degrees_label": "Studiengänge",
       "text_de": "Text (Deutsch)",
       "text_en": "Text (Englisch)",
       "preview": "Vorschau",
