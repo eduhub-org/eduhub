@@ -41,6 +41,7 @@
       "my_certificates": "Meine Zertifikate",
       "faq": "FAQ",
       "user": "Benutzer",
+      "admin_users": "Admin-Benutzer",
       "experts": "Experten",
       "courses": "Kurse",
       "programs": "Programme",
@@ -1186,7 +1187,7 @@
     "add_as_aborted": "als abgebrochen hinzufügen oder ändern",
     "add_user_error": "Bitte mindestens einen User auswählen!",
     "submit": "Absenden",
-    "application_history":  {
+    "application_history": {
       "label": "Bisherige Bewerbungen und Teilnahmen",
       "no_applications_present": "Keine Bewerbungen vorhanden"
     },
@@ -1800,11 +1801,28 @@
     "last_name": "Nachname",
     "email": "E-Mail",
     "organization": "Organisation",
+    "profile_organization": "Organisation (Profil)",
+    "super_admin_label": "Super-Admin",
     "deletion_confirmation_question": "Bist du sicher, dass du die Administrationsrechte von {firstName} {lastName} für die Organisation {organization} löschen möchtest?",
     "is_super_admin": "Ist Super-Admin",
     "can_manage_events": "Kann Events verwalten",
     "can_manage_courses": "Kann Kurse verwalten",
-    "can_manage_users_and_settings": "Kann Benutzer und Einstellungen verwalten"
+    "can_manage_degrees": "Kann Degrees verwalten",
+    "can_manage_users_and_settings": "Kann Benutzer und Einstellungen verwalten",
+    "error_loading_admin_users": "Fehler beim Laden der Admin-Benutzer.",
+    "add_admin_button": "Admin hinzufügen",
+    "add_admin_dialog_title": "Admin-Benutzer hinzufügen",
+    "add_admin_user_label": "Benutzer",
+    "add_admin_user_search_placeholder": "Nach Name oder E-Mail suchen",
+    "add_admin_no_users_found": "Keine Benutzer gefunden.",
+    "add_admin_change_user": "Ändern",
+    "add_admin_organization_required": "Bitte wähle eine Organisation aus.",
+    "add_admin_user_required": "Bitte wähle einen Benutzer aus.",
+    "add_admin_capability_required": "Bitte vergib mindestens eine Berechtigung.",
+    "add_admin_error": "Der Admin-Benutzer konnte nicht hinzugefügt werden.",
+    "add_admin_submit": "Hinzufügen",
+    "add_admin_submitting": "Wird hinzugefügt…",
+    "add_admin_success": "Admin-Benutzer hinzugefügt."
   },
   "manageAppSettings": {
     "app_settings": "App Einstellungen",

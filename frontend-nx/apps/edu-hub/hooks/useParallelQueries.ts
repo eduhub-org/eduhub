@@ -76,14 +76,7 @@ export const useParallelQueries = <TId, TData>(
 
     const fetchData = async () => {
       try {
-        const context = accessToken
-          ? {
-              headers: {
-                'x-hasura-role': role,
-                Authorization: `Bearer ${accessToken}`,
-              },
-            }
-          : undefined;
+        const context = accessToken ? { role } : undefined;
 
         // Fetch all queries in parallel
         const promises = currentIds.map((id) =>

@@ -2,7 +2,8 @@ import { QueryResult, useMutation, DocumentNode, MutationFunctionOptions } from 
 import { useSession } from 'next-auth/react';
 import { useCallback } from 'react';
 
-import { useCurrentRole } from './authentication';
+import { useCurrentRole, useManageRole } from './authentication';
+import { useManagementRoleContext } from './managementRole';
 import { AuthRoles } from '../types/enums';
 
 type CustomContext = {
@@ -21,19 +22,26 @@ export const useRoleMutation = <TData = any, TVariables = any>(
   const { data } = useSession();
   const accessToken = data?.accessToken;
   const currentRole = useCurrentRole();
+  const contextRole = useManagementRoleContext();
 
+  // Priority: an explicit role on the call > the surrounding management-role context (set on the
+  // /manage screens) > the current session role.
   const passedRole: AuthRoles | undefined = passedOptions?.context?.role;
+  const effectiveRole = passedRole ?? contextRole ?? currentRole;
 
   const options = accessToken
     ? {
         ...passedOptions,
         context: {
           ...passedOptions?.context,
+          // The Apollo auth link sets x-hasura-role from context.role (falling back to the session
+          // role), so the role MUST be set here — a header alone would be overwritten by the link.
+          role: effectiveRole,
           headers: {
-            ...(currentRole !== AuthRoles.anonymous && {
-              'x-hasura-role': passedRole ?? currentRole,
+            ...(effectiveRole !== AuthRoles.anonymous && {
+              'x-hasura-role': effectiveRole,
             }),
-            ...(currentRole !== AuthRoles.anonymous && {
+            ...(effectiveRole !== AuthRoles.anonymous && {
               Authorization: `Bearer ${accessToken}`,
             }),
           },
@@ -56,6 +64,7 @@ export const useFlexibleMutation = <TData = any, TVariables = any>(
   const { data } = useSession();
   const accessToken = data?.accessToken;
   const currentRole = useCurrentRole();
+  const contextRole = useManagementRoleContext();
   const passedRole: AuthRoles | undefined = passedOptions?.context?.role;
 
   const options =
@@ -64,6 +73,7 @@ export const useFlexibleMutation = <TData = any, TVariables = any>(
           ...passedOptions,
           context: {
             ...passedOptions?.context,
+            role: AuthRoles.admin,
             headers: {
               ...passedOptions?.context?.headers,
               'x-hasura-role': AuthRoles.admin,
@@ -76,10 +86,11 @@ export const useFlexibleMutation = <TData = any, TVariables = any>(
             ...passedOptions,
             context: {
               ...passedOptions?.context,
+              role: passedRole ?? contextRole ?? currentRole,
               headers: {
                 ...passedOptions?.context?.headers,
                 ...(currentRole !== AuthRoles.anonymous && {
-                  'x-hasura-role': passedRole ?? currentRole,
+                  'x-hasura-role': passedRole ?? contextRole ?? currentRole,
                 }),
                 ...(currentRole !== AuthRoles.anonymous && {
                   Authorization: `Bearer ${accessToken}`,
@@ -105,9 +116,66 @@ export const useInstructorMutation = <TData = any, TVariables = any>(
         ...passedOptions,
         context: {
           ...passedOptions?.context,
+          role: AuthRoles.instructor,
           headers: {
             ...passedOptions?.context?.headers,
             'x-hasura-role': AuthRoles.instructor,
+            Authorization: 'Bearer ' + accessToken,
+          },
+        },
+      }
+    : passedOptions;
+
+  return useMutation<TData, TVariables>(mutation, options);
+};
+
+// Pins the org_admin role on a mutation. Caller must hold the role (useIsOrgAdmin). Use on
+// organization-management screens so writes are evaluated against the org_admin Hasura permissions.
+export const useOrgAdminMutation = <TData = any, TVariables = any>(
+  mutation: DocumentNode,
+  passedOptions?: CustomMutationOptions<TData, TVariables>
+) => {
+  const { data } = useSession();
+  const accessToken = data?.accessToken;
+
+  const options = accessToken
+    ? {
+        ...passedOptions,
+        context: {
+          ...passedOptions?.context,
+          role: AuthRoles.org_admin,
+          headers: {
+            ...passedOptions?.context?.headers,
+            'x-hasura-role': AuthRoles.org_admin,
+            Authorization: 'Bearer ' + accessToken,
+          },
+        },
+      }
+    : passedOptions;
+
+  return useMutation<TData, TVariables>(mutation, options);
+};
+
+// Like useAdminMutation, but pins the management role: `admin` for super-admins, `org_admin` for
+// org admins. Drop-in replacement for useAdminMutation on the organization-management screens; for
+// super-admins it behaves identically. Hasura enforces the per-organization/per-capability scope.
+export const useManageMutation = <TData = any, TVariables = any>(
+  mutation: DocumentNode,
+  passedOptions?: CustomMutationOptions<TData, TVariables>
+) => {
+  const { data } = useSession();
+  const accessToken = data?.accessToken;
+  const role = useManageRole();
+
+  const options = accessToken
+    ? {
+        ...passedOptions,
+        context: {
+          ...passedOptions?.context,
+          role,
+          headers: {
+            ...passedOptions?.context?.headers,
+            'x-hasura-role': role,
             Authorization: 'Bearer ' + accessToken,
           },
         },
@@ -130,6 +198,7 @@ export const useAdminMutation = <TData = any, TVariables = any>(
         ...passedOptions,
         context: {
           ...passedOptions?.context,
+          role: AuthRoles.admin,
           headers: {
             ...passedOptions?.context?.headers,
             'x-hasura-role': AuthRoles.admin,

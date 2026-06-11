@@ -2,7 +2,8 @@ import Head from 'next/head';
 import { FC } from 'react';
 import { Page } from '../../../components/layout/Page';
 
-import { useIsAdmin } from '../../../hooks/authentication';
+import { useIsAdmin, useIsOrgAdmin } from '../../../hooks/authentication';
+import { ManagementRoleProvider } from '../../../hooks/managementRole';
 import { ManageProgramsContent } from '../../../components/pages/ManageProgramsContent';
 
 // export const getStaticProps = async ({ locale }: { locale: string }) => ({
@@ -13,6 +14,7 @@ import { ManageProgramsContent } from '../../../components/pages/ManageProgramsC
 
 const ProgramsPage: FC = () => {
   const isAdmin = useIsAdmin();
+  const isOrgAdmin = useIsOrgAdmin();
 
   return (
     <>
@@ -20,7 +22,13 @@ const ProgramsPage: FC = () => {
         <title>EduHub | opencampus.sh</title>
         <link rel="icon" href="/favicon.png" />
       </Head>
-      <Page>{isAdmin && <ManageProgramsContent />}</Page>
+      <Page>
+        {(isAdmin || isOrgAdmin) && (
+          <ManagementRoleProvider>
+            <ManageProgramsContent />
+          </ManagementRoleProvider>
+        )}
+      </Page>
     </>
   );
 };

@@ -1,5 +1,6 @@
 export enum AuthRoles {
   admin = 'admin',
+  org_admin = 'org_admin',
   instructor = 'instructor',
   user = 'user',
   anonymous = 'anonymous'

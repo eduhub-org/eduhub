@@ -18,6 +18,7 @@ type MaterialDropDownProps = {
   errorMessage?: string;
   hasBlurred?: boolean;
   creatable?: boolean;
+  searchable?: boolean;
   inputValue?: string;
   onInputChange?: (value: string) => void;
   onValueChange: (event: SelectChangeEvent<string> | React.ChangeEvent<HTMLSelectElement>) => void;
@@ -36,6 +37,7 @@ export const MaterialDropDown: React.FC<MaterialDropDownProps> = ({
   errorMessage,
   hasBlurred,
   creatable,
+  searchable,
   inputValue,
   onInputChange,
   onValueChange,
@@ -56,7 +58,7 @@ export const MaterialDropDown: React.FC<MaterialDropDownProps> = ({
             {label}
           </InputLabel>
         )}
-        {creatable && onInputChange && onCreateOption && getLabelForValue ? (
+        {(creatable || searchable) && onInputChange && getLabelForValue ? (
           <CreatableDropDown
             inputValue={inputValue || ''}
             localValue={localValue}
@@ -70,6 +72,7 @@ export const MaterialDropDown: React.FC<MaterialDropDownProps> = ({
             onValueChange={onValueChange}
             onCreateOption={onCreateOption}
             getLabelForValue={getLabelForValue}
+            allowCreate={!!creatable}
             disabled={disabled}
           />
         ) : (

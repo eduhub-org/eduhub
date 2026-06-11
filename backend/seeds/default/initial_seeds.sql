@@ -1835,3 +1835,54 @@ SELECT pg_catalog.setval(pg_get_serial_sequence('public."ProjectAuthor"', 'id'),
 SELECT pg_catalog.setval(pg_get_serial_sequence('public."ProjectCourse"', 'id'), (SELECT max(id) FROM public."ProjectCourse"), true);
 SELECT pg_catalog.setval(pg_get_serial_sequence('public."ProjectDocumentationInstruction"', 'id'), (SELECT max(id) FROM public."ProjectDocumentationInstruction"), true);
 SELECT pg_catalog.setval(pg_get_serial_sequence('public."Session"', 'id'), (SELECT max(id) FROM public."Session"), true);
+
+--
+-- Organization-admin test scenario (org_admin role). Self-contained fixture for manually testing
+-- organization-scoped admin rights and the per-program-type capability split.
+-- Login: orgadmin@example.com / dev  (Keycloak: keycloak/imports-dev/edu-hub.json)
+--
+-- Test org 9100 ("Org Admin Test Org") is a NON-default organization that holds one program of
+-- each type (EVENTS/COURSES/DEGREES), each with a course. The org_admin user administers ONLY this
+-- organization (no grant on the default org), which is the key scenario for verifying that an org
+-- admin of organization X sees and manages only organization X's programs/courses/settings and
+-- none of the other organizations seeded above. They may manage org 9100's settings + EVENTS only
+-- (not COURSES/DEGREES) to exercise the per-capability split. They are additionally an instructor
+-- of an existing course (id 4) belonging to a different organization, to confirm that being an org
+-- admin does not interfere with retained instructor access elsewhere.
+--
+-- All ids are in the 9000+ range to stay clear of the base seed data (Organizations/Programs go up
+-- to 500, Courses to ~303), so this block can be appended without colliding with existing rows.
+--
+INSERT INTO public."Organization" (id, name, type, description, created_at, updated_at, logo, aliases, "apiKeyHash") VALUES
+  (9100, 'Org Admin Test Org', 'OTHER', 'Dedicated non-default organization for testing org_admin capabilities.', now(), now(), NULL, NULL, NULL);
+
+INSERT INTO public."Program" (id, title, "lectureStart", "lectureEnd", "applicationStart", "defaultApplicationEnd", "achievementRecordUploadDeadline", visibility, "startQuestionnaire", "speakerQuestionnaire", "closingQuestionnaire", "attendanceCertificateTemplateURL", "achievementCertificateTemplateURL", "shortTitle", "defaultMaxMissedSessions", published, type, "organizationId") VALUES
+  (9200, 'Test Events Program',  '2026-04-01', '2026-09-30', NULL, NULL, NULL, true, NULL, NULL, NULL, NULL, NULL, 'TEST-EVT', 2, true, 'EVENTS',  9100),
+  (9201, 'Test Courses Program', '2026-04-01', '2026-09-30', NULL, NULL, NULL, true, NULL, NULL, NULL, NULL, NULL, 'TEST-CRS', 2, true, 'COURSES', 9100),
+  (9202, 'Test Degrees Program', '2026-04-01', '2026-09-30', NULL, NULL, NULL, true, NULL, NULL, NULL, NULL, NULL, 'TEST-DEG', 2, true, 'DEGREES', 9100);
+
+INSERT INTO public."Course" (id, title, status, ects, tagline, language, "applicationEnd", cost, "achievementCertificatePossible", "attendanceCertificatePossible", "maxMissedSessions", "weekDay", "coverImage", created_at, updated_at, "programId", "headingDescriptionField1", "headingDescriptionField2", "contentDescriptionField1", "contentDescriptionField2", "learningGoals", "chatLink", "maxParticipants", "endTime", "startTime", published, "externalRegistrationLink", "registrationType") VALUES
+  (9001, 'Test Event Course',  'APPLICANTS_INVITED', '5', 'Event course for org_admin testing',  'DE', '2026-03-15', 'NO_COST', true, true, 2, 'TUESDAY', NULL, now(), now(), 9200, NULL, NULL, NULL, NULL, NULL, NULL, 20, '21:00:00', '19:00:00', true, NULL, 'APPROVAL_WITH_INPUT'),
+  (9002, 'Test Course Course', 'APPLICANTS_INVITED', '5', 'Regular course for org_admin testing', 'DE', '2026-03-15', 'NO_COST', true, true, 2, 'TUESDAY', NULL, now(), now(), 9201, NULL, NULL, NULL, NULL, NULL, NULL, 20, '21:00:00', '19:00:00', true, NULL, 'APPROVAL_WITH_INPUT'),
+  (9003, 'Test Degree Course', 'APPLICANTS_INVITED', '5', 'Degree course for org_admin testing',  'DE', '2026-03-15', 'NO_COST', true, true, 2, 'TUESDAY', NULL, now(), now(), 9202, NULL, NULL, NULL, NULL, NULL, NULL, 20, '21:00:00', '19:00:00', true, NULL, 'APPROVAL_WITH_INPUT');
+
+INSERT INTO public."User" (id, "firstName", "lastName", email, picture, "externalProfile", "newsletterRegistration", "anonymousId", created_at, updated_at, "matriculationNumber", status, "integerId", "organizationId", occupation, "zipCode", country) VALUES
+  ('dddddddd-dddd-dddd-dddd-dddddddddddd', 'Org', 'Admin', 'orgadmin@example.com', NULL, NULL, false, NULL, now(), now(), NULL, 'ACTIVE', NULL, 9100, NULL, NULL, NULL);
+
+-- Org-admin grant: ONLY the non-default test org 9100 (no grant on the default organization, and no
+-- Admin row, so this user is not a super-admin). canManageDegrees comes from migration 1780300000000.
+-- May edit org 9100's settings + EVENTS programs/courses, but NOT its COURSES/DEGREES programs.
+INSERT INTO public."OrganizationAdmin" (id, "userId", "organizationId", "canManageCourses", "canManageEvents", "canManageDegrees", "canManageSettings", updated_at, created_at) VALUES
+  (9100, 'dddddddd-dddd-dddd-dddd-dddddddddddd', 9100, false, true, false, true, now(), now());
+
+-- Instructor of an existing course (id 4), which belongs to a different organization than the one
+-- this user administers, to confirm that instructor access is retained alongside the org_admin role.
+INSERT INTO public."CourseInstructor" (id, "courseId", "userId", created_at, updated_at) VALUES
+  (9100, 4, 'dddddddd-dddd-dddd-dddd-dddddddddddd', now(), now());
+
+-- Bump sequences past the explicit ids inserted above.
+SELECT pg_catalog.setval(pg_get_serial_sequence('public."Program"', 'id'), (SELECT max(id) FROM public."Program"), true);
+SELECT pg_catalog.setval(pg_get_serial_sequence('public."Course"', 'id'), (SELECT max(id) FROM public."Course"), true);
+SELECT pg_catalog.setval(pg_get_serial_sequence('public."Organization"', 'id'), (SELECT GREATEST(max(id), 500) FROM public."Organization"), true);
+SELECT pg_catalog.setval(pg_get_serial_sequence('public."OrganizationAdmin"', 'id'), (SELECT max(id) FROM public."OrganizationAdmin"), true);
+SELECT pg_catalog.setval(pg_get_serial_sequence('public."CourseInstructor"', 'id'), (SELECT max(id) FROM public."CourseInstructor"), true);

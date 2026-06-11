@@ -56,8 +56,8 @@ export const PROGRAM_STATISTICS = gql`
 
 export const PROGRAMS_WITH_MINIMUM_PROPERTIES = gql`
   ${PROGRAM_FRAGMENT_MINIMUM_PROPERTIES}
-  query Programs {
-    Program(order_by: { id: desc }) {
+  query Programs($where: Program_bool_exp = {}) {
+    Program(order_by: { id: desc }, where: $where) {
       ...ProgramFragmentMinimumProperties
     }
   }

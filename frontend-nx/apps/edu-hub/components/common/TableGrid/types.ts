@@ -2,6 +2,8 @@ import { ApolloError, DocumentNode } from '@apollo/client';
 import { ColumnDef, SortingState } from '@tanstack/react-table';
 import { ReactElement } from 'react';
 
+import { AuthRoles } from '../../../types/enums';
+
 export interface BaseRow {
   id: number;
 }
@@ -27,6 +29,8 @@ export interface TableGridProps<T extends BaseRow> {
   columns: ColumnDef<T>[];
   deleteMutation?: DocumentNode;
   deleteIdType?: 'number' | 'uuidString';
+  /** Overrides the Hasura role used for deleteMutation (defaults to the current session role). */
+  role?: AuthRoles;
   generateDeletionConfirmationQuestion?: (row: T) => string;
   enablePagination?: boolean;
   error: ApolloError | null | undefined;
@@ -71,4 +75,6 @@ export interface TableGridDeleteButtonProps {
   refetchQueries: string[];
   idType: 'number' | 'uuidString';
   deletionConfirmationQuestion?: string;
+  /** Overrides the Hasura role used for the delete mutation (defaults to the current session role). */
+  role?: AuthRoles;
 }

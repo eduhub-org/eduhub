@@ -1,8 +1,10 @@
 import { FC, useCallback, useMemo, useState } from 'react';
 import { CircularProgress } from '@mui/material';
 import { ColumnDef } from '@tanstack/react-table';
-import { useAdminMutation } from '../../../hooks/authedMutation';
-import { useAdminQuery } from '../../../hooks/authedQuery';
+import { useManageMutation } from '../../../hooks/authedMutation';
+import { useManageQuery } from '../../../hooks/authedQuery';
+import { useManageRole } from '../../../hooks/authentication';
+import { useManageProgramWhere } from '../../../hooks/manageScope';
 
 import { ProgramList_Program } from '../../../queries/__generated__/ProgramList';
 import { PROGRAM_LIST } from '../../../queries/programList';
@@ -39,6 +41,11 @@ const QUERY_LIMIT = 100;
 export const ManageProgramsContent: FC = () => {
   const t = useTranslations('managePrograms');
 
+  // Management role (admin for super-admins, org_admin otherwise) and the organization scope that
+  // restricts org admins to their own organizations' programs (empty for super-admins).
+  const manageRole = useManageRole();
+  const orgWhere = useManageProgramWhere();
+
   // Filter state management
   const [filter] = useState({
     limit: QUERY_LIMIT,
@@ -47,7 +54,7 @@ export const ManageProgramsContent: FC = () => {
 
   // Use TableGrid hook with server-side sorting
   const { data, loading, error, searchFilter, pageIndex, sorting, setSearchFilter, setPageIndex, setSorting } = useTableGrid({
-    queryHook: useAdminQuery,
+    queryHook: useManageQuery,
     query: PROGRAM_LIST,
     queryVariables: filter,
     pageSize: filter.limit || QUERY_LIMIT,
@@ -69,13 +76,12 @@ export const ManageProgramsContent: FC = () => {
     refetchFilter: useCallback(
       (searchTerm: string) => {
         const searchCondition = createMultiWordSearchCondition(searchTerm, ['title']);
+        const hasOrgScope = Object.keys(orgWhere).length > 0;
         return {
-          where: {
-            ...searchCondition,
-          },
+          where: hasOrgScope ? { _and: [orgWhere, searchCondition] } : searchCondition,
         };
       },
-      []
+      [orgWhere]
     ),
   });
 
@@ -89,11 +95,11 @@ export const ManageProgramsContent: FC = () => {
   const [errorMessage, setErrorMessage] = useState('');
 
   // Mutations
-  const [insertProgram] = useAdminMutation<InsertProgram, InsertProgramVariables>(INSERT_PROGRAM, {
+  const [insertProgram] = useManageMutation<InsertProgram, InsertProgramVariables>(INSERT_PROGRAM, {
     refetchQueries: ['ProgramList'],
   });
 
-  const [updatePublished] = useAdminMutation<UpdateProgramPublished, UpdateProgramPublishedVariables>(
+  const [updatePublished] = useManageMutation<UpdateProgramPublished, UpdateProgramPublishedVariables>(
     UPDATE_PROGRAM_PUBLISHED,
     {
       refetchQueries: ['ProgramList'],
@@ -379,6 +385,7 @@ export const ManageProgramsContent: FC = () => {
         expandableRowComponent={(props) => <ExpandableProgramRow program={props.row} />}
         deleteMutation={DELETE_PROGRAM}
         deleteIdType="number"
+        role={manageRole}
         generateDeletionConfirmationQuestion={(row) =>
           t('delete_button.delete_program_confirmation', {
             title: row.title || t('delete_button.untitled_program'),
