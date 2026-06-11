@@ -22,6 +22,8 @@ export type DropDownSelectorProps = {
   className?: string;
   identifierVariables?: Record<string, any>;
   creatable?: boolean;
+  /** Searchable typeahead without "create new" option. */
+  searchable?: boolean;
   onOptionCreated?: (newValue: string) => void;
   createOptionMutation?: DocumentNode;
   nullable?: boolean; // Allow clearing selection and convert empty string to null

@@ -3,6 +3,8 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
+import { Program_bool_exp } from "./../../__generated__/globalTypes";
+
 // ====================================================
 // GraphQL query operation: Programs
 // ====================================================
@@ -66,4 +68,8 @@ export interface Programs {
    * fetch data from the table: "Program"
    */
   Program: Programs_Program[];
+}
+
+export interface ProgramsVariables {
+  where?: Program_bool_exp | null;
 }

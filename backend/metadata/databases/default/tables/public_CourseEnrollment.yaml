@@ -109,6 +109,56 @@ select_permissions:
         - userId
         - location
       filter: {}
+  # Org admins need enrollment counts on /manage/courses (AdminCourseList). Scoped to enrollments
+  # for courses whose program belongs to an organization they administer, and only when their
+  # OrganizationAdmin grant includes the capability matching that program type (same rules as
+  # Course org_admin_access update/delete).
+  - role: org_admin_access
+    permission:
+      columns:
+        - id
+        - courseId
+        - status
+        - motivationRating
+      filter:
+        _or:
+          - Course:
+              Program:
+                _and:
+                  - type:
+                      _eq: EVENTS
+                  - Organization:
+                      OrganizationAdmins:
+                        _and:
+                          - userId:
+                              _eq: X-Hasura-User-Id
+                          - canManageEvents:
+                              _eq: true
+          - Course:
+              Program:
+                _and:
+                  - type:
+                      _eq: COURSES
+                  - Organization:
+                      OrganizationAdmins:
+                        _and:
+                          - userId:
+                              _eq: X-Hasura-User-Id
+                          - canManageCourses:
+                              _eq: true
+          - Course:
+              Program:
+                _and:
+                  - type:
+                      _eq: DEGREES
+                  - Organization:
+                      OrganizationAdmins:
+                        _and:
+                          - userId:
+                              _eq: X-Hasura-User-Id
+                          - canManageDegrees:
+                              _eq: true
+      allow_aggregations: true
 update_permissions:
   - role: instructor_access
     permission:

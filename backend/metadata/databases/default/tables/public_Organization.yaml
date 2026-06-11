@@ -112,7 +112,11 @@ select_permissions:
         - updated_at
       filter: {}
       allow_aggregations: true
-  - role: user_access
+  # Org admins may read the full record of any organization they administer (regardless of which
+  # capability flags are set) so they have context for managing it. Editing settings additionally
+  # requires canManageSettings (see update_permissions). The `user` role only sees the public
+  # columns granted to `anonymous`.
+  - role: org_admin_access
     permission:
       columns:
         - addressLine1
@@ -146,6 +150,7 @@ select_permissions:
         - ghostNewsletterSlug
         - ghostNewsletterLabel
         - ghostNewsletterDoubleOptInEnabled
+        - apiKeyHash
         - taxNumber
         - type
         - updated_at
@@ -157,7 +162,10 @@ select_permissions:
             _eq: X-Hasura-User-Id
       allow_aggregations: true
 update_permissions:
-  - role: user_access
+  # Editing an organization's settings (logo, name, API key, branding, invoice/billing data)
+  # requires the canManageSettings capability on the admin's OrganizationAdmin row for that org.
+  # `type` and `id` are intentionally excluded so an org admin cannot reassign the record.
+  - role: org_admin_access
     permission:
       columns:
         - addressLine1
@@ -188,12 +196,15 @@ update_permissions:
         - ghostNewsletterSlug
         - ghostNewsletterLabel
         - ghostNewsletterDoubleOptInEnabled
+        - apiKeyHash
         - taxNumber
-        - type
         - vatId
         - website
       filter:
         OrganizationAdmins:
-          userId:
-            _eq: X-Hasura-User-Id
-      check: {}
+          _and:
+            - userId:
+                _eq: X-Hasura-User-Id
+            - canManageSettings:
+                _eq: true
+      check: null

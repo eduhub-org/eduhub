@@ -23,6 +23,7 @@ const DropDownSelector: React.FC<DropDownSelectorProps> = ({
   className = '',
   identifierVariables,
   creatable = false,
+  searchable = false,
   onOptionCreated,
   createOptionMutation,
   nullable = false,
@@ -160,6 +161,7 @@ const DropDownSelector: React.FC<DropDownSelectorProps> = ({
           errorMessage={errorMessage}
           hasBlurred={hasBlurred}
           creatable={creatable}
+          searchable={searchable}
           inputValue={inputValue}
           onInputChange={setInputValue}
           onValueChange={handleValueChange}
@@ -178,6 +180,7 @@ const DropDownSelector: React.FC<DropDownSelectorProps> = ({
           errorMessage={errorMessage}
           className={className}
           creatable={creatable}
+          searchable={searchable}
           inputValue={inputValue}
           onInputChange={setInputValue}
           onValueChange={handleValueChange}

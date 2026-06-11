@@ -45,15 +45,22 @@ export const addKeycloakRole = async (req, res) => {
       clientUniqueId: hasura_client[0].id,
     });
 
-    const instructor_role = available_roles.filter(it => it.name === 'instructor')[0];
+    // Resolve the requested role (admin, instructor, org_admin, ...) by name so the correct
+    // role id is sent. If the user already has the role it is no longer "available", so this is
+    // an idempotent no-op rather than an error.
+    const target_role = available_roles.filter(it => it.name === role)[0];
+
+    if (!target_role) {
+      return res.json({ message: `Role '${role}' not available for user (already assigned or unknown)` });
+    }
 
     await kcAdminClient.users.addClientRoleMappings({
       id: userid,
       clientUniqueId: hasura_client[0].id,
       roles: [
         {
-          id: instructor_role.id,
-          name: role,
+          id: target_role.id,
+          name: target_role.name,
         },
       ],
     });
