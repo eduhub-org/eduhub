@@ -209,27 +209,27 @@ const ManageAdminUsersContent: FC = () => {
         header: t('organization'),
         accessorKey: 'Organization.name',
         enableSorting: true,
-        size: 300,
+        size: 180,
         cell: ({ row, getValue }) =>
           adminUserIds.includes(row.original.User?.id) ? (
-            <div className="font-medium">{t('super_admin_label')}</div>
+            <div className="font-medium truncate">{t('super_admin_label')}</div>
           ) : (
-            <div>{getValue<ReactNode>()}</div>
+            <div className="truncate">{getValue<ReactNode>()}</div>
           ),
       },
       {
         header: t('first_name'),
         accessorKey: 'User.firstName',
         enableSorting: true,
-        size: 200,
-        cell: ({ getValue }) => <div>{getValue<ReactNode>()}</div>,
+        size: 140,
+        cell: ({ getValue }) => <div className="truncate">{getValue<ReactNode>()}</div>,
       },
       {
         header: t('last_name'),
         accessorKey: 'User.lastName',
         enableSorting: true,
-        size: 200,
-        cell: ({ getValue }) => <div>{getValue<ReactNode>()}</div>,
+        size: 140,
+        cell: ({ getValue }) => <div className="truncate">{getValue<ReactNode>()}</div>,
       },
       {
         // The organization the user belongs to according to their own profile (independent of the
@@ -237,15 +237,15 @@ const ManageAdminUsersContent: FC = () => {
         header: t('profile_organization'),
         accessorKey: 'User.Organization.name',
         enableSorting: true,
-        size: 250,
-        cell: ({ row }) => <div>{row.original.User?.Organization?.name ?? ''}</div>,
+        size: 180,
+        cell: ({ row }) => <div className="truncate">{row.original.User?.Organization?.name ?? ''}</div>,
       },
       {
         header: t('email'),
         accessorKey: 'User.email',
         enableSorting: true,
-        size: 300,
-        cell: ({ getValue }) => <div>{getValue<ReactNode>()}</div>,
+        size: 220,
+        cell: ({ getValue }) => <div className="truncate">{getValue<ReactNode>()}</div>,
       },
     ],
     [t, adminUserIds]

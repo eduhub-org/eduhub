@@ -13,6 +13,7 @@ type EduhubDropDownProps = {
   errorMessage?: string;
   className?: string;
   creatable?: boolean;
+  searchable?: boolean;
   inputValue?: string;
   onInputChange?: (value: string) => void;
   onValueChange: (event: SelectChangeEvent<string> | React.ChangeEvent<HTMLSelectElement>) => void;
@@ -31,6 +32,7 @@ export const EduhubDropDown: React.FC<EduhubDropDownProps> = ({
   errorMessage,
   className = '',
   creatable,
+  searchable,
   inputValue,
   onInputChange,
   onValueChange,
@@ -39,7 +41,8 @@ export const EduhubDropDown: React.FC<EduhubDropDownProps> = ({
   getLabelForValue,
   disabled = false,
 }) => {
-  const baseClass = 'w-full h-12 pl-3 pr-10 py-3 text-label-primary rounded bg-fill-primary';
+  const baseClass =
+    'w-full h-12 pl-3 pr-10 py-3 text-label-primary rounded bg-fill-primary border border-border-primary';
   const finalClassName = `${baseClass} ${className}`;
 
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -65,7 +68,7 @@ export const EduhubDropDown: React.FC<EduhubDropDownProps> = ({
           </div>
         )}
         <div className="light relative">
-          {creatable && onInputChange && onCreateOption && getLabelForValue ? (
+          {(creatable || searchable) && onInputChange && getLabelForValue ? (
             <CreatableDropDown
               inputValue={inputValue || ''}
               localValue={localValue}
@@ -79,6 +82,7 @@ export const EduhubDropDown: React.FC<EduhubDropDownProps> = ({
               onValueChange={onValueChange}
               onCreateOption={onCreateOption}
               getLabelForValue={getLabelForValue}
+              allowCreate={!!creatable}
               disabled={disabled}
             />
           ) : (

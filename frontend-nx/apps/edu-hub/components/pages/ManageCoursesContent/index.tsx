@@ -84,10 +84,15 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
     });
   }, [programs]);
 
-  const defaultProgramId = useMemo(
-    () => sortedPrograms.find((program) => program.shortTitle !== 'EVENTS' && program.shortTitle !== 'DEGREES')?.id,
-    [sortedPrograms]
-  );
+  const defaultProgramId = useMemo(() => {
+    if (sortedPrograms.length === 0) {
+      return undefined;
+    }
+    const preferredRegularProgram = sortedPrograms.find(
+      (program) => program.shortTitle !== 'EVENTS' && program.shortTitle !== 'DEGREES'
+    );
+    return (preferredRegularProgram ?? sortedPrograms[0]).id;
+  }, [sortedPrograms]);
 
   // Filter state management (single source of truth)
   const [filter, setFilter] = useState<AdminCourseListVariables>({
@@ -195,7 +200,8 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
     GET_COURSE_TEMPLATES_COUNT,
     courseIds,
     getTemplateVariables,
-    extractTemplateCount
+    extractTemplateCount,
+    manageRole
   );
 
   // Handle program tab clicks (moved after useTableGrid to access setPageIndex)

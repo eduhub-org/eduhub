@@ -12,7 +12,7 @@ import { useManageMutation } from '../../../hooks/authedMutation';
 import { useRoleQuery } from '../../../hooks/authedQuery';
 import { useManageRole } from '../../../hooks/authentication';
 import { INSERT_ORGANIZATION_ADMIN } from '../../../queries/organizationAdmin';
-import { USER_SELECTION_WITH_FILTER } from '../../../queries/user';
+import { USER_SELECTION_WITH_FILTER, buildUserSelectionFilter } from '../../../queries/user';
 import { createMultiWordSearchCondition } from '../../../helpers/searchUtils';
 import { order_by } from '../../../__generated__/globalTypes';
 import {
@@ -83,13 +83,12 @@ const AddOrganizationAdminDialog: FC<AddOrganizationAdminDialogProps> = ({
   // Inline user search (same query/role as the shared SelectUserDialog used to add instructors): only
   // existing, active EduHub users are returned, matched by partial name or email.
   const hasSearched = userSearch.trim().length >= 2;
-  const userFilter = useMemo(
-    () =>
-      hasSearched
-        ? createMultiWordSearchCondition(userSearch.trim(), ['firstName', 'lastName', 'email'])
-        : {},
-    [hasSearched, userSearch]
-  );
+  const userFilter = useMemo(() => {
+    const searchFilter = hasSearched
+      ? createMultiWordSearchCondition(userSearch.trim(), ['firstName', 'lastName', 'email'])
+      : {};
+    return buildUserSelectionFilter(searchFilter, manageRole);
+  }, [hasSearched, userSearch, manageRole]);
   const { data: userData, loading: usersLoading } = useRoleQuery<
     UserSelectionWithFilter,
     UserSelectionWithFilterVariables
@@ -200,10 +199,12 @@ const AddOrganizationAdminDialog: FC<AddOrganizationAdminDialogProps> = ({
       >
         <div className="space-y-4 text-label-primary">
           <DropDownSelector
-            variant="material"
+            variant="eduhub"
             label={t('organization')}
+            placeholder={tCommon('organization_dialog.search_organizations')}
             value={organizationId ? String(organizationId) : ''}
             options={organizationDropDownOptions}
+            searchable
             onValueUpdated={(value) => setOrganizationId(value ? Number(value) : null)}
           />
 

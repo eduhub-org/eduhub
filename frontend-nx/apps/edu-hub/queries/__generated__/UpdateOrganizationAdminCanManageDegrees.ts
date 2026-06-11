@@ -24,6 +24,6 @@ export interface UpdateOrganizationAdminCanManageDegrees {
 }
 
 export interface UpdateOrganizationAdminCanManageDegreesVariables {
-  id: number;
-  canManageDegrees: boolean;
+  itemId: number;
+  value: boolean;
 }

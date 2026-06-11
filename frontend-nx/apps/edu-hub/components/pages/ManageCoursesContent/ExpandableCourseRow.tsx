@@ -7,7 +7,7 @@ import { SAVE_COURSE_IMAGE } from '../../../queries/actions';
 import { INSERT_COURSE_GROUP_TAG, DELETE_COURSE_GROUP_TAG } from '../../../queries/courseGroup';
 import { INSERT_COURSE_DEGREE_TAG, DELETE_COURSE_DEGREE_TAG } from '../../../queries/courseDegree';
 import { DELETE_COURSE_INSRTRUCTOR, INSERT_A_COURSEINSTRUCTOR } from '../../../queries/mutateCourseInstructor';
-import { USER_SELECTION_WITH_FILTER } from '../../../queries/user';
+import { USER_SELECTION_WITH_FILTER, buildUserSelectionFilter } from '../../../queries/user';
 import { AdminCourseList_Course } from '../../../queries/__generated__/AdminCourseList';
 import {
   DeleteCourseInstructor,
@@ -67,6 +67,8 @@ import { InfoDialog } from '../../common/dialogs/InfoDialog';
 import { translateErrorMessage } from '../../../helpers/errorHandling';
 import { submissionDeadlineToCalendarDate } from '../CourseContent/Projects/projectEffectiveSubmissionDeadline';
 import { useRoleQuery, useLazyRoleQuery } from '../../../hooks/authedQuery';
+import { useCurrentRole } from '../../../hooks/authentication';
+import { useManagementRoleContext } from '../../../hooks/managementRole';
 import PricingSummary from '../../common/PricingSummary';
 import {
   GET_COURSE_TEMPLATES_COUNT,
@@ -97,6 +99,9 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
   const t = useTranslations();
   const router = useRouter();
   const { error, handleError, resetError } = useErrorHandler();
+  const managementRole = useManagementRoleContext();
+  const currentRole = useCurrentRole();
+  const queryRole = managementRole ?? currentRole;
 
   // Check if course has custom email templates
   const { data: templatesCountData, refetch: refetchTemplatesCount } = useRoleQuery<GetCourseTemplatesCount>(
@@ -562,9 +567,12 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
         const { data } = await fetchUserByEmail({
           variables: {
             limit: 100,
-            filter: {
-              _or: [{ id: { _eq: userId } }, { email: { _ilike: `%${email}%` } }],
-            },
+            filter: buildUserSelectionFilter(
+              {
+                _or: [{ id: { _eq: userId } }, { email: { _ilike: `%${email}%` } }],
+              },
+              queryRole
+            ),
             order_by: [{ lastName: order_by.asc }, { firstName: order_by.asc }],
           },
         });
@@ -581,7 +589,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
         setSearchValueForNewUser('');
       }
     },
-    [fetchUserByEmail, addInstructorHandler, handleError, t]
+    [fetchUserByEmail, addInstructorHandler, handleError, queryRole, t]
   );
 
   const parsedSearchValues = parseSearchValue(searchValueForNewUser);

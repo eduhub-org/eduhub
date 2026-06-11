@@ -17,8 +17,9 @@ type CreatableDropDownProps = {
   helpText?: string;
   onInputChange: (value: string) => void;
   onValueChange: (event: SelectChangeEvent<string> | React.ChangeEvent<HTMLSelectElement>) => void;
-  onCreateOption: () => void;
+  onCreateOption?: () => void;
   getLabelForValue: (value?: string) => string;
+  allowCreate?: boolean;
   disabled?: boolean;
 };
 
@@ -36,6 +37,7 @@ export const CreatableDropDown: React.FC<CreatableDropDownProps> = ({
   onValueChange,
   onCreateOption,
   getLabelForValue,
+  allowCreate = true,
   disabled = false,
 }) => {
   const t = useTranslations('common');
@@ -65,7 +67,7 @@ export const CreatableDropDown: React.FC<CreatableDropDownProps> = ({
 
   const shouldShowCreateOption = useCallback(
     (searchValue = '') => {
-      if (!searchValue) return false;
+      if (!allowCreate || !searchValue) return false;
 
       const searchLower = searchValue.toLowerCase();
       const filteredOptions = getFilteredOptions(searchValue);
@@ -90,7 +92,7 @@ export const CreatableDropDown: React.FC<CreatableDropDownProps> = ({
 
       return !hasExactNameMatch && !hasExactAliasMatch;
     },
-    [getFilteredOptions]
+    [allowCreate, getFilteredOptions]
   );
 
   const handleValueChange = (value: string | null) => {
@@ -130,7 +132,11 @@ export const CreatableDropDown: React.FC<CreatableDropDownProps> = ({
       if (highlightedIndex < filteredOptions.length) {
         const selectedOption = filteredOptions[highlightedIndex];
         handleOptionSelect(selectedOption.value);
-      } else if (highlightedIndex === filteredOptions.length && shouldShowCreateOption(inputValue)) {
+      } else if (
+        highlightedIndex === filteredOptions.length &&
+        shouldShowCreateOption(inputValue) &&
+        onCreateOption
+      ) {
         onCreateOption();
         setIsOpen(false);
         setHighlightedIndex(-1);
@@ -213,7 +219,7 @@ export const CreatableDropDown: React.FC<CreatableDropDownProps> = ({
               {option.label}
             </div>
           ))}
-          {shouldShowCreateOption(inputValue) && (
+          {shouldShowCreateOption(inputValue) && onCreateOption && (
             <div
               className={`px-4 py-2 cursor-pointer text-brand flex items-center ${
                 highlightedIndex === getFilteredOptions(inputValue).length ? 'bg-[var(--eduhub-border-primary)]' : 'hover:bg-[var(--eduhub-border-primary)]'

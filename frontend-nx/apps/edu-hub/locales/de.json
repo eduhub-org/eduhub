@@ -1807,7 +1807,7 @@
     "is_super_admin": "Ist Super-Admin",
     "can_manage_events": "Kann Events verwalten",
     "can_manage_courses": "Kann Kurse verwalten",
-    "can_manage_degrees": "Kann Studiengänge verwalten",
+    "can_manage_degrees": "Kann Degrees verwalten",
     "can_manage_users_and_settings": "Kann Benutzer und Einstellungen verwalten",
     "error_loading_admin_users": "Fehler beim Laden der Admin-Benutzer.",
     "add_admin_button": "Admin hinzufügen",

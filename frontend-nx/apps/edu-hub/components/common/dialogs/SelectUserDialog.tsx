@@ -3,7 +3,9 @@ import { useTranslations } from 'next-intl';
 import { ChangeEvent, FC, useCallback, useState, useMemo } from 'react';
 import { MdClose } from 'react-icons/md';
 import { useRoleQuery } from '../../../hooks/authedQuery';
-import { USER_SELECTION_WITH_FILTER } from '../../../queries/user';
+import { useCurrentRole } from '../../../hooks/authentication';
+import { useManagementRoleContext } from '../../../hooks/managementRole';
+import { USER_SELECTION_WITH_FILTER, buildUserSelectionFilter } from '../../../queries/user';
 import {
   UserSelectionWithFilter,
   UserSelectionWithFilterVariables,
@@ -28,6 +30,9 @@ interface IProps {
 export const SelectUserDialog: FC<IProps> = ({ onClose, open, title, onAddNewUser, showAddNewUserOption = false }) => {
   const [searchValue, setSearchValue] = useState('');
   const t = useTranslations();
+  const managementRole = useManagementRoleContext();
+  const currentRole = useCurrentRole();
+  const queryRole = managementRole ?? currentRole;
 
   const handleNewInput = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
@@ -54,8 +59,9 @@ export const SelectUserDialog: FC<IProps> = ({ onClose, open, title, onAddNewUse
     if (searchValue.trim().length < 2) {
       return {};
     }
-    return createMultiWordSearchCondition(searchValue.trim(), ['firstName', 'lastName', 'email']);
-  }, [searchValue]);
+    const searchFilter = createMultiWordSearchCondition(searchValue.trim(), ['firstName', 'lastName', 'email']);
+    return buildUserSelectionFilter(searchFilter, queryRole);
+  }, [searchValue, queryRole]);
 
   // Query users with dynamic filter - uses current user's role (admin/instructor) to access email column
   const { data, loading } = useRoleQuery<UserSelectionWithFilter, UserSelectionWithFilterVariables>(

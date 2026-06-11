@@ -59,10 +59,10 @@ export const DELETE_ORGANIZATION_ADMIN = gql`
 `;
 
 export const UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_EVENTS = gql`
-  mutation UpdateOrganizationAdminCanManageEvents($id: Int!, $canManageEvents: Boolean!) {
+  mutation UpdateOrganizationAdminCanManageEvents($itemId: Int!, $value: Boolean!) {
     update_OrganizationAdmin_by_pk(
-      pk_columns: { id: $id },
-      _set: { canManageEvents: $canManageEvents }
+      pk_columns: { id: $itemId },
+      _set: { canManageEvents: $value }
     ) {
       id
       canManageEvents
@@ -71,10 +71,10 @@ export const UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_EVENTS = gql`
 `;
 
 export const UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_COURSES = gql`
-  mutation UpdateOrganizationAdminCanManageCourses($id: Int!, $canManageCourses: Boolean!) {
+  mutation UpdateOrganizationAdminCanManageCourses($itemId: Int!, $value: Boolean!) {
     update_OrganizationAdmin_by_pk(
-      pk_columns: { id: $id },
-      _set: { canManageCourses: $canManageCourses }
+      pk_columns: { id: $itemId },
+      _set: { canManageCourses: $value }
     ) {
       id
       canManageCourses
@@ -83,10 +83,10 @@ export const UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_COURSES = gql`
 `;
 
 export const UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_DEGREES = gql`
-  mutation UpdateOrganizationAdminCanManageDegrees($id: Int!, $canManageDegrees: Boolean!) {
+  mutation UpdateOrganizationAdminCanManageDegrees($itemId: Int!, $value: Boolean!) {
     update_OrganizationAdmin_by_pk(
-      pk_columns: { id: $id },
-      _set: { canManageDegrees: $canManageDegrees }
+      pk_columns: { id: $itemId },
+      _set: { canManageDegrees: $value }
     ) {
       id
       canManageDegrees
@@ -95,10 +95,10 @@ export const UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_DEGREES = gql`
 `;
 
 export const UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_SETTINGS = gql`
-  mutation UpdateOrganizationAdminCanManageSettings($id: Int!, $canManageSettings: Boolean!) {
+  mutation UpdateOrganizationAdminCanManageSettings($itemId: Int!, $value: Boolean!) {
     update_OrganizationAdmin_by_pk(
-      pk_columns: { id: $id },
-      _set: { canManageSettings: $canManageSettings }
+      pk_columns: { id: $itemId },
+      _set: { canManageSettings: $value }
     ) {
       id
       canManageSettings
