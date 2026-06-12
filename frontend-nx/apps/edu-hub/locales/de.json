@@ -1850,6 +1850,8 @@
     "faqCollectionPlaceholder": "FAQ-Sammlung auswählen",
     "save": "Speichern",
     "saving": "Speichern...",
+    "loading": "Wird geladen...",
+    "errorSavingSettings": "Beim Speichern der Einstellungen ist ein Fehler aufgetreten. Bitte versuche es erneut.",
     "course_groups": {
       "label": "Kursgruppierungen",
       "help_text": "Lege fest, welche Kursgruppierungen es gibt und in welcher Reihenfolge die als Slider markierten Gruppen auf der Startseite erscheinen. Die Gruppen \"Courses\", \"Events\" und \"Degrees\" werden automatisch aus den veröffentlichten Angeboten des jeweiligen Programmtyps befüllt. Zusätzliche Gruppen können angelegt und in einem Org-Widget ausgewählt werden, ohne auf der Startseite zu erscheinen.",
@@ -1928,6 +1930,7 @@
     },
     "attendanceCertificates": {
       "loading": "Zertifikat-Vorlagen werden geladen…",
+      "load_error": "Die Zertifikat-Vorlagen konnten nicht geladen werden.",
       "html_editor": {
         "label": "HTML-Vorlagen für Teilnahmezertifikate",
         "help_text": "Bearbeite das in der Datenbank gespeicherte Jinja2-HTML.",
@@ -2342,6 +2345,7 @@
     "title": "Einstellungen",
     "subtitle": "Plattformweite Konfiguration. Änderungen werden sofort wirksam.",
     "back_to_settings": "Zurück zu den Einstellungen",
+    "access_denied": "Du hast keine Berechtigung, auf diese Seite zuzugreifen.",
     "overview_lead": "Wähle einen Bereich, um plattformweite Voreinstellungen und Inhalte zu konfigurieren.",
     "nav": {
       "mobile_label": "Einstellungsbereich",

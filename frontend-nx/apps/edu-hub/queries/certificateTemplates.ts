@@ -9,9 +9,11 @@ export const CERTIFICATE_TEMPLATES = gql`
   }
 `;
 
-export const CERTIFICATE_TEMPLATES_WITH_HTML = gql`
-  query CertificateTemplatesWithHtml {
-    CertificateTemplate(order_by: { name: asc }) {
+// Detail query for the selected template only — avoids shipping every template's
+// HTML body (up to 50k each) to populate the settings selector.
+export const CERTIFICATE_TEMPLATE_HTML = gql`
+  query CertificateTemplateHtml($id: Int!) {
+    CertificateTemplate_by_pk(id: $id) {
       id
       name
       html

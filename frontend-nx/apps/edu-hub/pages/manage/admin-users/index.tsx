@@ -2,16 +2,13 @@
 import path from 'path';
 path.resolve('./next.config.js');
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/router';
+import { GetServerSideProps } from 'next';
 
 /** @deprecated Use /manage/settings/access — kept for bookmarks and external links. */
+export const getServerSideProps: GetServerSideProps = async () => ({
+  redirect: { destination: '/manage/settings/access', permanent: false },
+});
+
 export default function ManageAdminUsersRedirect() {
-  const router = useRouter();
-
-  useEffect(() => {
-    router.replace('/manage/settings/access');
-  }, [router]);
-
   return null;
 }

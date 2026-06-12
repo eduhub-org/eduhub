@@ -35,11 +35,25 @@ const ProjectTypesSection: FC = () => {
   const t = useTranslations('manageAppSettings.projectTypes');
   const tCourse = useTranslations('course');
 
-  const { data: projectTypesData, loading, error } = useAdminQuery<ProjectTypes>(PROJECT_TYPES);
-  const { data: certificateTemplatesData } = useAdminQuery<CertificateTemplates>(CERTIFICATE_TEMPLATES);
-  const { data: instructionsData } = useAdminQuery<ProjectDocumentationInstructions>(
-    PROJECT_DOCUMENTATION_INSTRUCTIONS
-  );
+  const {
+    data: projectTypesData,
+    loading: projectTypesLoading,
+    error: projectTypesError,
+  } = useAdminQuery<ProjectTypes>(PROJECT_TYPES);
+  const {
+    data: certificateTemplatesData,
+    loading: certificateTemplatesLoading,
+    error: certificateTemplatesError,
+  } = useAdminQuery<CertificateTemplates>(CERTIFICATE_TEMPLATES);
+  const {
+    data: instructionsData,
+    loading: instructionsLoading,
+    error: instructionsError,
+  } = useAdminQuery<ProjectDocumentationInstructions>(PROJECT_DOCUMENTATION_INSTRUCTIONS);
+
+  // Surface a single loading/error path so missing data is distinguishable from a backend failure.
+  const loading = projectTypesLoading || certificateTemplatesLoading || instructionsLoading;
+  const error = projectTypesError || certificateTemplatesError || instructionsError;
 
   const [updateCertificateTemplate] = useAdminMutation<
     UpdateProjectTypeCertificateTemplate,

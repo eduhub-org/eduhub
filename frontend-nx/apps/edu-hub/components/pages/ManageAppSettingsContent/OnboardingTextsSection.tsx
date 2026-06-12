@@ -44,7 +44,7 @@ const OnboardingTextsSection: FC = () => {
 
   return (
     <div className="mt-8">
-      <label className="text-xs uppercase tracking-widest font-medium text-gray-400 mb-4 block">
+      <label className="text-xs uppercase tracking-widest font-medium text-label-secondary mb-4 block">
         {t('onboarding.label')}
       </label>
 
@@ -74,14 +74,14 @@ const OnboardingTextsSection: FC = () => {
                 />
               </div>
             ) : (
-              <div className="text-sm text-label-secondary">Loading...</div>
+              <div className="text-sm text-label-secondary">{t('loading')}</div>
             )}
           </div>
         );
       })}
 
       <div>
-        <label className="text-xs uppercase tracking-widest font-medium text-gray-400 mb-3 block">
+        <label className="text-xs uppercase tracking-widest font-medium text-label-secondary mb-3 block">
           {t('onboarding.preview')}
         </label>
         <div className="flex flex-col lg:flex-row gap-3 mb-4">
@@ -104,7 +104,7 @@ const OnboardingTextsSection: FC = () => {
           </select>
         </div>
         <div className="max-w-4xl">
-          <div className="bg-edu-course-invited rounded-2xl p-6 text-label-primary light border border-border-primary/30 shadow-lg">
+          <div className="bg-fill-secondary rounded-2xl p-6 text-label-primary light border border-border-primary/30 shadow-lg">
             <div className="mb-6 rounded-xl bg-fill-primary p-4">
               <ReactMarkdown
                 className="prose max-w-none text-label-primary prose-headings:font-bold prose-headings:text-label-primary prose-p:text-label-secondary prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg"

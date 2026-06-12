@@ -4,10 +4,10 @@
 // This file was automatically generated and should not be edited.
 
 // ====================================================
-// GraphQL query operation: CertificateTemplatesWithHtml
+// GraphQL query operation: CertificateTemplateHtml
 // ====================================================
 
-export interface CertificateTemplatesWithHtml_CertificateTemplate {
+export interface CertificateTemplateHtml_CertificateTemplate_by_pk {
   __typename: "CertificateTemplate";
   id: number;
   /**
@@ -21,9 +21,13 @@ export interface CertificateTemplatesWithHtml_CertificateTemplate {
   updated_at: any;
 }
 
-export interface CertificateTemplatesWithHtml {
+export interface CertificateTemplateHtml {
   /**
-   * fetch data from the table: "CertificateTemplate"
+   * fetch data from the table: "CertificateTemplate" using primary key columns
    */
-  CertificateTemplate: CertificateTemplatesWithHtml_CertificateTemplate[];
+  CertificateTemplate_by_pk: CertificateTemplateHtml_CertificateTemplate_by_pk | null;
+}
+
+export interface CertificateTemplateHtmlVariables {
+  id: number;
 }

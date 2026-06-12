@@ -1,9 +1,10 @@
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { useSession } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
 
 import { Button } from '../../common/Button';
+import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
 import FormFieldRow from '../../inputs/FormFieldRow';
 import { useAdminQuery } from '../../../hooks/authedQuery';
 import { useAdminMutation } from '../../../hooks/authedMutation';
@@ -21,6 +22,7 @@ type Inputs = {
 const BannerSettingsSection: FC = () => {
   const { data: sessionData } = useSession();
   const t = useTranslations('manageAppSettings');
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const methods = useForm<Inputs>({
     defaultValues: {
@@ -70,13 +72,13 @@ const BannerSettingsSection: FC = () => {
       await new Promise((resolve) => setTimeout(resolve, 1000));
     } catch (error) {
       console.error('Failed to update banner settings:', error);
-      alert('An error occurred while saving the settings. Please try again.');
+      setErrorMessage(t('errorSavingSettings'));
     }
   };
 
   return (
     <div className="mt-8">
-      <label className="text-xs uppercase tracking-widest font-medium text-gray-400 mb-4 block">
+      <label className="text-xs uppercase tracking-widest font-medium text-label-secondary mb-4 block">
         {t('bannerSettings')}
       </label>
       <FormProvider {...methods}>
@@ -113,12 +115,15 @@ const BannerSettingsSection: FC = () => {
             disabled={isSubmitting}
             filled
             inverted
-            className="mt-8 block mx-auto mb-5 disabled:bg-slate-500"
+            className="mt-8 block mx-auto mb-5 disabled:opacity-50"
           >
             {isSubmitting ? t('saving') : t('save')}
           </Button>
         </form>
       </FormProvider>
+      {errorMessage && (
+        <ErrorMessageDialog errorMessage={errorMessage} open={!!errorMessage} onClose={() => setErrorMessage(null)} />
+      )}
     </div>
   );
 };

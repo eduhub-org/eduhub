@@ -3,10 +3,15 @@ import { useTranslations } from 'next-intl';
 
 import { useAdminQuery } from '../../../hooks/authedQuery';
 import {
-  CERTIFICATE_TEMPLATES_WITH_HTML,
+  CERTIFICATE_TEMPLATES,
+  CERTIFICATE_TEMPLATE_HTML,
   UPDATE_CERTIFICATE_TEMPLATE_HTML,
 } from '../../../queries/certificateTemplates';
-import { CertificateTemplatesWithHtml } from '../../../queries/__generated__/CertificateTemplatesWithHtml';
+import { CertificateTemplates } from '../../../queries/__generated__/CertificateTemplates';
+import {
+  CertificateTemplateHtml,
+  CertificateTemplateHtmlVariables,
+} from '../../../queries/__generated__/CertificateTemplateHtml';
 import DefaultCertificateTemplatesSection from './DefaultCertificateTemplatesSection';
 import EmailEditor, { CERTIFICATE_HTML_VARIABLES } from '../../inputs/EmailEditor';
 import DropDownSelector from '../../inputs/DropDownSelector';
@@ -30,13 +35,11 @@ const renderCertificatePreview = (html: string): string => {
 
 const AttendanceCertificatesSection: FC = () => {
   const t = useTranslations('manageAppSettings.attendanceCertificates');
-  const { data, loading, refetch } = useAdminQuery<CertificateTemplatesWithHtml>(
-    CERTIFICATE_TEMPLATES_WITH_HTML
-  );
+  const { data: listData, loading, error } = useAdminQuery<CertificateTemplates>(CERTIFICATE_TEMPLATES);
 
   const templates = useMemo(
-    () => data?.CertificateTemplate ?? [],
-    [data?.CertificateTemplate]
+    () => listData?.CertificateTemplate ?? [],
+    [listData?.CertificateTemplate]
   );
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>('');
 
@@ -47,7 +50,18 @@ const AttendanceCertificatesSection: FC = () => {
     return templates[0] ? String(templates[0].id) : '';
   }, [selectedTemplateId, templates]);
 
-  const activeTemplate = templates.find((tpl) => String(tpl.id) === activeTemplateId);
+  // Fetch the heavy HTML body only for the selected template.
+  const {
+    data: detailData,
+    loading: detailLoading,
+    error: detailError,
+    refetch,
+  } = useAdminQuery<CertificateTemplateHtml, CertificateTemplateHtmlVariables>(CERTIFICATE_TEMPLATE_HTML, {
+    variables: { id: parseInt(activeTemplateId, 10) },
+    skip: !activeTemplateId,
+  });
+
+  const activeTemplate = detailData?.CertificateTemplate_by_pk ?? undefined;
 
   const templateOptions = templates.map((tpl) => ({
     value: String(tpl.id),
@@ -56,6 +70,10 @@ const AttendanceCertificatesSection: FC = () => {
 
   if (loading) {
     return <p className="text-sm text-label-secondary">{t('loading')}</p>;
+  }
+
+  if (error || detailError) {
+    return <p className="text-sm text-error">{t('load_error')}</p>;
   }
 
   return (
@@ -86,7 +104,11 @@ const AttendanceCertificatesSection: FC = () => {
               />
             </div>
 
-            {activeTemplate && (
+            {detailLoading && (
+              <p className="text-sm text-label-secondary">{t('loading')}</p>
+            )}
+
+            {!detailLoading && activeTemplate && (
               <div className="grid gap-6 xl:grid-cols-2">
                 <div className="min-w-0">
                   <EmailEditor
@@ -95,7 +117,7 @@ const AttendanceCertificatesSection: FC = () => {
                     value={activeTemplate.html ?? ''}
                     updateValueMutation={UPDATE_CERTIFICATE_TEMPLATE_HTML}
                     updateVariablesMapper={(content) => ({ id: activeTemplate.id, html: content })}
-                    refetchQueries={['CertificateTemplatesWithHtml']}
+                    refetchQueries={['CertificateTemplateHtml']}
                     onValueUpdated={() => refetch()}
                     htmlOnly
                     variables={CERTIFICATE_HTML_VARIABLES}
@@ -108,7 +130,7 @@ const AttendanceCertificatesSection: FC = () => {
                     {t('html_editor.preview_label')}
                   </p>
                   <div
-                    className="mx-auto bg-white shadow-lg overflow-hidden"
+                    className="light mx-auto bg-fill-primary shadow-lg overflow-hidden"
                     style={{ width: '210mm', minHeight: '297mm', maxWidth: '100%' }}
                   >
                     <iframe

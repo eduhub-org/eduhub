@@ -62,7 +62,7 @@ const SettingsOverview: FC = () => {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-semibold text-label-primary lg:hidden">{t('title')}</h1>
+        <h1 className="text-2xl font-semibold text-label-primary">{t('title')}</h1>
         <p className="mt-1 text-sm text-label-secondary">{t('overview_lead')}</p>
       </div>
 

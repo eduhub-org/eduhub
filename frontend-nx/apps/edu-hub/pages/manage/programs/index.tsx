@@ -1,16 +1,13 @@
 import path from 'path';
 path.resolve('./next.config.js');
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/router';
+import { GetServerSideProps } from 'next';
 
 /** @deprecated Use /manage/settings/programs — kept for bookmarks and external links. */
+export const getServerSideProps: GetServerSideProps = async () => ({
+  redirect: { destination: '/manage/settings/programs', permanent: false },
+});
+
 export default function ManageProgramsRedirect() {
-  const router = useRouter();
-
-  useEffect(() => {
-    router.replace('/manage/settings/programs');
-  }, [router]);
-
   return null;
 }

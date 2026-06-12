@@ -36,8 +36,10 @@ const SettingsSectionPage: FC<SettingsSectionPageProps> = ({
       </Head>
       <Page>
         <div className="min-h-[77vh]">
-          {canView && (
+          {canView ? (
             <SettingsLayout activeItemId={itemId}>{children}</SettingsLayout>
+          ) : (
+            <div className="p-6 text-label-secondary">{t('access_denied')}</div>
           )}
         </div>
       </Page>

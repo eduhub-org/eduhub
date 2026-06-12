@@ -1876,6 +1876,8 @@
     "faqCollectionPlaceholder": "Select FAQ collection",
     "save": "Save",
     "saving": "Saving...",
+    "loading": "Loading...",
+    "errorSavingSettings": "An error occurred while saving the settings. Please try again.",
     "timeZones": {
       "Europe/Berlin": "Berlin",
       "Europe/London": "London",
@@ -1943,6 +1945,7 @@
     },
     "attendanceCertificates": {
       "loading": "Loading certificate templates…",
+      "load_error": "The certificate templates could not be loaded.",
       "html_editor": {
         "label": "Attendance certificate HTML templates",
         "help_text": "Edit the Jinja2 HTML stored in the database.",
@@ -2357,6 +2360,7 @@
     "title": "Settings",
     "subtitle": "Platform-wide configuration. Changes take effect immediately.",
     "back_to_settings": "Back to settings",
+    "access_denied": "You do not have permission to access this page.",
     "overview_lead": "Choose a section to configure platform-wide defaults and content.",
     "nav": {
       "mobile_label": "Settings section",

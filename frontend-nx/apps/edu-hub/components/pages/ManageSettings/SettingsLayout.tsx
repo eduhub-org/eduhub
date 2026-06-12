@@ -45,21 +45,26 @@ const SettingsLayout: FC<SettingsLayoutProps> = ({ children, activeItemId }) => 
           onChange={(e) => handleMobileNavChange(e.target.value)}
         >
           <option value="">{t('title')}</option>
-          {SETTINGS_NAV_GROUPS.map((group) => (
-            <optgroup key={group.id} label={t(`nav.groups.${group.id}`)}>
-              {group.items.map((itemId) => {
-                const item = SETTINGS_NAV_ITEMS[itemId];
-                if (!canAccessSettingsItem(item, capabilities, isOrgAdmin) || item.status === 'soon') {
-                  return null;
-                }
-                return (
+          {SETTINGS_NAV_GROUPS.map((group) => {
+            const visibleItems = group.items.filter((itemId) => {
+              const item = SETTINGS_NAV_ITEMS[itemId];
+              return canAccessSettingsItem(item, capabilities, isOrgAdmin) && item.status !== 'soon';
+            });
+
+            if (visibleItems.length === 0) {
+              return null;
+            }
+
+            return (
+              <optgroup key={group.id} label={t(`nav.groups.${group.id}`)}>
+                {visibleItems.map((itemId) => (
                   <option key={itemId} value={itemId}>
                     {t(`nav.items.${itemId}.label`)}
                   </option>
-                );
-              })}
-            </optgroup>
-          ))}
+                ))}
+              </optgroup>
+            );
+          })}
         </select>
       </div>
 

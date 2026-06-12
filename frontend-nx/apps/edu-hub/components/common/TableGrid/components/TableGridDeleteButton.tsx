@@ -28,10 +28,6 @@ const TableGridDeleteButton = ({
       if (data?.anonymizeUser?.error) {
         console.error('Anonymization error:', data.anonymizeUser.error);
       }
-      const validationError = validateDeleteResult?.(data);
-      if (validationError) {
-        setErrorMessage(validationError);
-      }
     },
     ...(role ? { context: { role } } : {}),
   });

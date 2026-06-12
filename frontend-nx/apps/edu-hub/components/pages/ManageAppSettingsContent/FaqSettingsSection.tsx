@@ -33,7 +33,7 @@ const FaqSettingsSection: FC = () => {
 
   return (
     <div className="mt-8">
-      <label className="text-xs uppercase tracking-widest font-medium text-gray-400 mb-4 block">
+      <label className="text-xs uppercase tracking-widest font-medium text-label-secondary mb-4 block">
         {t('faqSettings')}
       </label>
       <div className="mb-6">
@@ -44,11 +44,11 @@ const FaqSettingsSection: FC = () => {
           updateValueMutation={UPDATE_APP_SETTINGS_FAQ_VISIBILITY}
           identifierVariables={{ appName: 'edu' }}
           refetchQueries={['AppSettings']}
-          className="text-gray-300"
+          className="text-label-primary"
         />
       </div>
       <div>
-        <label className="block text-base font-medium text-gray-300 mb-3">{t('faqCollectionName')}</label>
+        <label className="block text-base font-medium text-label-primary mb-3">{t('faqCollectionName')}</label>
         <DropDownSelector
           variant="material"
           options={faqCollectionOptions}

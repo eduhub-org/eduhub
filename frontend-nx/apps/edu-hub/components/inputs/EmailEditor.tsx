@@ -207,12 +207,12 @@ const EmailEditor: React.FC<EmailEditorProps> = ({
 
   const handleHtmlContentChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newContent = event.target.value;
-    const prepared = prepareContentForSave(newContent);
-    setHtmlContent(prepared);
+    // Persist the raw value; persistContent sanitizes once via prepareContentForSave.
+    setHtmlContent(newContent);
     if (!htmlOnly && editor) {
-      editor.commands.setContent(prepared, false);
+      editor.commands.setContent(newContent, false);
     }
-    debouncedUpdate(prepared);
+    debouncedUpdate(newContent);
   };
 
   const toggleHtmlMode = () => {

@@ -33,10 +33,10 @@ const DefaultCertificateTemplatesSection: FC = () => {
 
   return (
     <div className="mt-8">
-      <label className="text-xs uppercase tracking-widest font-medium text-gray-400 mb-4 block">
+      <label className="text-xs uppercase tracking-widest font-medium text-label-secondary mb-4 block">
         {t('default_attendance_certificate_template.label')}
       </label>
-      <p className="text-xs text-gray-400 mb-4">
+      <p className="text-xs text-label-secondary mb-4">
         {t('default_attendance_certificate_template.help_text')}
       </p>
       <div className="space-y-4">
@@ -44,7 +44,7 @@ const DefaultCertificateTemplatesSection: FC = () => {
           .filter((row) => PROGRAM_TYPES_WITH_ATTENDANCE_DEFAULT.has(row.value))
           .map((row) => (
           <div key={row.value}>
-            <label className="block text-base font-medium text-gray-300 mb-2">
+            <label className="block text-base font-medium text-label-primary mb-2">
               {t(`programTypes.${row.value}`)}
             </label>
             <select
