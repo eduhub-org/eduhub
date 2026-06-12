@@ -215,7 +215,8 @@ export const ApplicationsTab: FC<IProps> = ({ course }) => {
   }
 
   if (error) {
-    return <div className="text-error">{error.message}</div>;
+    console.error('ApplicationsTab: failed to load course applications', error);
+    return <div className="text-error">{t('course_load_error')}</div>;
   }
 
   if (!data?.Course_by_pk) {
@@ -769,9 +770,18 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
       }
 
       const emails = targetEnrollments.map((e) => e.User.email).filter(Boolean);
-      if (emails.length > 0) {
-        window.location.href = buildMailtoUrl(emails);
+      if (emails.length === 0) {
+        showBulkNotice(t('bulk_actions.no_email_recipients'));
+        return;
       }
+
+      openMailtoOrShowFallback({
+        actionLabel: t('bulk_actions.email_selected'),
+        recipients: targetEnrollments,
+        totalCount: targetEnrollments.length,
+        isMailtoTooLong: false,
+        isLimited: false,
+      });
     },
     [
       buildMailtoUrl,
@@ -779,6 +789,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
       handleOpenInviteDialog,
       handleOpenRejectionDialog,
       loadBulkEmailRecipients,
+      openMailtoOrShowFallback,
       setIsNoSelectionDialogOpen,
       showBulkNotice,
       t,

@@ -671,6 +671,9 @@ def main() -> None:
     parser.add_argument("--print-only", action="store_true")
     args = parser.parse_args()
 
+    if args.users < 1:
+        parser.error("--users must be at least 1")
+
     generated_sql = build_sql(args.users)
     if args.print_only:
         print(generated_sql, end="")
