@@ -1,15 +1,16 @@
 import Head from 'next/head';
 import { FC } from 'react';
-import { Page } from '../../../components/layout/Page';
-import { useIsAdmin, useIsLoggedIn } from '../../../hooks/authentication';
 import { useTranslations } from 'next-intl';
 
+import { Page } from '../../../components/layout/Page';
+import { useIsAdmin, useIsLoggedIn } from '../../../hooks/authentication';
 import ManageEmailTemplatesContent from '../../../components/pages/ManageEmailTemplatesContent';
 
-const EmailTemplates: FC = () => {
+const EmailSettings: FC = () => {
   const isAdmin = useIsAdmin();
   const isLoggedIn = useIsLoggedIn();
   const t = useTranslations('manageEmailTemplates');
+  const tSettings = useTranslations('manageSettings');
 
   return (
     <>
@@ -23,7 +24,10 @@ const EmailTemplates: FC = () => {
             <ManageEmailTemplatesContent
               courseId={undefined}
               explanatoryText={t('default_templates_explanation')}
-              showBackButton={false}
+              grouped
+              showBackButton
+              backHref="/manage/settings"
+              backLabel={tSettings('back_to_settings')}
             />
           )}
         </div>
@@ -32,4 +36,4 @@ const EmailTemplates: FC = () => {
   );
 };
 
-export default EmailTemplates;
+export default EmailSettings;

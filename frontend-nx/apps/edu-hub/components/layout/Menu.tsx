@@ -172,17 +172,12 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
       )}
 
       {isAdmin && (
-        <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/email-templates')}>
-          <Link className="w-full text-lg" href="/manage/email-templates">
-            {t('menu.email_templates')}
-          </Link>
-        </MenuItem>
-      )}
-
-      {isAdmin && (
-        <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/app-settings')}>
-          <Link className="w-full text-lg" href="/manage/app-settings">
-            {t('menu.app_settings')}
+        <MenuItem
+          onClick={closeMenu}
+          selected={isActiveRoute('/manage/settings') || router.pathname.startsWith('/manage/settings/')}
+        >
+          <Link className="w-full text-lg" href="/manage/settings">
+            {t('menu.settings')}
           </Link>
         </MenuItem>
       )}

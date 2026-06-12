@@ -47,8 +47,7 @@
       "programs": "Programs",
       "organizations": "Organizations",
       "location_addresses": "Location Addresses",
-      "email_templates": "Email Templates",
-      "app_settings": "App Settings",
+      "settings": "Settings",
       "calendar": "Calendar",
       "statistics": "Statistics",
       "course_instructor_manual": "Course Instructor Manual",
@@ -2250,7 +2249,19 @@
       "ORGANIZER_ADDED": "Sent when a user is added as an organizer to a course or event"
     },
     "delete_confirmation": "Are you sure you want to delete the email template '{title}'?",
-    "unknown_trigger": "Unknown trigger type"
+    "unknown_trigger": "Unknown trigger type",
+    "categories": {
+      "all": "All",
+      "application": "Application process",
+      "projects": "Project notifications",
+      "sessions": "Session reminders",
+      "system": "System emails",
+      "other": "Other"
+    },
+    "category_coming_soon": "Soon",
+    "categories_coming_soon_explanation": {
+      "projects": "Templates for project status updates will appear here once project notifications are available."
+    }
   },
   "manageAchievementTemplates": {
     "error": {
@@ -2315,5 +2326,40 @@
     "mastodon_alt": "Mastodon",
     "linkedin_alt": "LinkedIn",
     "instagram_alt": "Instagram"
+  },
+  "manageSettings": {
+    "title": "Settings",
+    "subtitle": "Platform-wide configuration. Changes take effect immediately.",
+    "back_to_settings": "Back to settings",
+    "groups": {
+      "appearance": {
+        "label": "Appearance",
+        "description": "News banner colors and texts"
+      },
+      "homepage": {
+        "label": "Homepage content",
+        "description": "Course groups and FAQ section"
+      },
+      "emails": {
+        "label": "Email notifications",
+        "description": "Automated emails to participants and instructors"
+      },
+      "programDefaults": {
+        "label": "Program defaults",
+        "description": "Certificates, project documentation and onboarding texts"
+      },
+      "system": {
+        "label": "System",
+        "description": "Time zone and platform internals"
+      },
+      "access": {
+        "label": "Access & roles",
+        "description": "Control which roles can access each settings section"
+      }
+    },
+    "access": {
+      "superadmin_only": "Super admin only",
+      "coming_soon": "Coming soon"
+    }
   }
 }

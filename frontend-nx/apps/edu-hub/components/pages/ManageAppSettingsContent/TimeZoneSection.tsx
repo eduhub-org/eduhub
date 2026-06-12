@@ -24,7 +24,7 @@ const TimeZoneSection: FC = () => {
   });
 
   return (
-    <div className="mt-16">
+    <div className="mt-8">
       <label className="text-xs uppercase tracking-widest font-medium text-gray-400 mb-2 block">
         {t('timeZone')}
       </label>

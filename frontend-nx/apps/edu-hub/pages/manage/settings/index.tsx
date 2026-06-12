@@ -2,9 +2,9 @@ import Head from 'next/head';
 import { FC } from 'react';
 import { Page } from '../../../components/layout/Page';
 import { useIsAdmin } from '../../../hooks/authentication';
-import AppSettingsContent from '../../../components/pages/ManageAppSettingsContent';
+import ManageSettingsContent from '../../../components/pages/ManageSettings';
 
-const AppSettings: FC = () => {
+const Settings: FC = () => {
   const isAdmin = useIsAdmin();
 
   return (
@@ -15,11 +15,11 @@ const AppSettings: FC = () => {
           <link rel="icon" href="/favicon.png" />
         </Head>
         <Page>
-          <div className="min-h-[77vh]">{isAdmin && <AppSettingsContent />}</div>
+          <div className="min-h-[77vh]">{isAdmin && <ManageSettingsContent />}</div>
         </Page>
       </div>
     </>
   );
 };
 
-export default AppSettings;
+export default Settings;

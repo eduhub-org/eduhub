@@ -22,6 +22,12 @@ import {
   UPDATE_EMAIL_TEMPLATE_CONTENT,
   DELETE_EMAIL_TEMPLATE,
 } from '../../../queries/emailTemplates';
+import {
+  EMAIL_TEMPLATE_CATEGORIES,
+  EmailTemplateCategory,
+  UPCOMING_EMAIL_TEMPLATE_CATEGORIES,
+  getEmailTemplateCategory,
+} from '../../../helpers/emailTemplateCategories';
 
 // Helper function to safely get translation with fallback
 const getTranslation = (t: (key: string) => string, key: string, fallback: string): string => {
@@ -57,6 +63,12 @@ interface ManageEmailTemplatesContentProps {
   explanatoryText?: string;
   showBackButton?: boolean;
   availableTemplateTypes?: string[];
+  /** Group templates into category tabs (application / projects / sessions / system). */
+  grouped?: boolean;
+  /** Back button target; defaults to /manage/courses. */
+  backHref?: string;
+  /** Back button label; defaults to the "back to courses" translation. */
+  backLabel?: string;
 }
 
 // Expandable row component with full functionality
@@ -193,9 +205,13 @@ const ManageEmailTemplatesContent: FC<ManageEmailTemplatesContentProps> = ({
   explanatoryText,
   showBackButton = false,
   availableTemplateTypes,
+  grouped = false,
+  backHref,
+  backLabel,
 }) => {
   const t = useTranslations('manageEmailTemplates');
   const router = useRouter();
+  const [activeCategory, setActiveCategory] = useState<EmailTemplateCategory | 'all'>('all');
 
   // Determine the courseId to filter by (default templates use NULL)
   const filterCourseId = courseId !== undefined ? courseId : null;
@@ -231,6 +247,28 @@ const ManageEmailTemplatesContent: FC<ManageEmailTemplatesContentProps> = ({
     emailTemplates = emailTemplates.filter((template) => availableTemplateTypes.includes(template.type));
   }
 
+  // Category tabs (grouped mode): counts always reflect the full (searched) list
+  const categoryCounts: Partial<Record<EmailTemplateCategory, number>> = {};
+  emailTemplates.forEach((template) => {
+    const category = getEmailTemplateCategory(template.type);
+    categoryCounts[category] = (categoryCounts[category] ?? 0) + 1;
+  });
+
+  const categoryTabs: (EmailTemplateCategory | 'all')[] = ['all', ...EMAIL_TEMPLATE_CATEGORIES];
+  if ((categoryCounts.other ?? 0) > 0) categoryTabs.push('other');
+
+  if (grouped && activeCategory !== 'all') {
+    emailTemplates = emailTemplates.filter(
+      (template) => getEmailTemplateCategory(template.type) === activeCategory
+    );
+  }
+
+  const isUpcomingCategory =
+    grouped &&
+    activeCategory !== 'all' &&
+    UPCOMING_EMAIL_TEMPLATE_CATEGORIES.includes(activeCategory) &&
+    emailTemplates.length === 0;
+
   const totalCount = emailTemplates.length;
 
   const generateDeletionConfirmation = useCallback(
@@ -241,8 +279,8 @@ const ManageEmailTemplatesContent: FC<ManageEmailTemplatesContentProps> = ({
   );
 
   const handleBackToCourses = useCallback(() => {
-    router.push('/manage/courses');
-  }, [router]);
+    router.push(backHref ?? '/manage/courses');
+  }, [router, backHref]);
 
   // No-op function for disabled pagination
   const handlePageChange = useCallback(() => {
@@ -319,10 +357,65 @@ const ManageEmailTemplatesContent: FC<ManageEmailTemplatesContentProps> = ({
               filled
             >
               <MdArrowBack className="w-5 h-5" />
-              {getTranslation(t, 'back_to_courses', 'Back to Courses')}
+              {backLabel ?? getTranslation(t, 'back_to_courses', 'Back to Courses')}
             </Button>
           )}
         </div>
+        {grouped && (
+          <div className="flex flex-wrap gap-2 mb-6" role="tablist">
+            {categoryTabs.map((category) => {
+              const isActive = activeCategory === category;
+              const count =
+                category === 'all'
+                  ? Object.values(categoryCounts).reduce((sum, n) => sum + n, 0)
+                  : categoryCounts[category] ?? 0;
+              const isUpcoming =
+                category !== 'all' && UPCOMING_EMAIL_TEMPLATE_CATEGORIES.includes(category) && count === 0;
+              return (
+                <button
+                  key={category}
+                  type="button"
+                  role="tab"
+                  aria-selected={isActive}
+                  onClick={() => setActiveCategory(category)}
+                  className={`flex items-center gap-2 rounded-full border-2 px-4 py-1.5 text-sm transition-colors ${
+                    isActive
+                      ? 'border-brand bg-brand text-white'
+                      : 'border-gray-500 text-gray-300 hover:border-brand hover:text-brand'
+                  }`}
+                >
+                  {getTranslation(t, `categories.${category}`, category)}
+                  {isUpcoming ? (
+                    <span
+                      className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${
+                        isActive ? 'bg-white/20' : 'border border-warning text-warning'
+                      }`}
+                    >
+                      {getTranslation(t, 'category_coming_soon', 'Soon')}
+                    </span>
+                  ) : (
+                    <span
+                      className={`rounded-full px-2 py-0.5 text-xs ${
+                        isActive ? 'bg-white/20' : 'bg-gray-700 text-gray-300'
+                      }`}
+                    >
+                      {count}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        )}
+        {isUpcomingCategory ? (
+          <div className="rounded border border-dashed border-gray-500 p-6 text-sm italic text-gray-400">
+            {getTranslation(
+              t,
+              `categories_coming_soon_explanation.${activeCategory}`,
+              'Templates for this category will appear here once the feature is available.'
+            )}
+          </div>
+        ) : (
         <TableGrid
           columns={columns}
           data={emailTemplates}
@@ -340,6 +433,7 @@ const ManageEmailTemplatesContent: FC<ManageEmailTemplatesContentProps> = ({
           generateDeletionConfirmationQuestion={generateDeletionConfirmation}
           expandableRowComponent={({ row }) => <ExpandableEmailTemplateRow row={row} />}
         />
+        )}
       </div>
     </PageBlock>
   );

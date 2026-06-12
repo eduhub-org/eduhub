@@ -47,8 +47,7 @@
       "programs": "Programme",
       "organizations": "Organisationen",
       "location_addresses": "Veranstaltungsadressen",
-      "email_templates": "E-Mail-Vorlagen",
-      "app_settings": "App-Einstellungen",
+      "settings": "Einstellungen",
       "calendar": "Kalender",
       "statistics": "Statistiken",
       "course_instructor_manual": "Kursleitungshandbuch",
@@ -2235,7 +2234,19 @@
       "ORGANIZER_ADDED": "Gesendet, wenn ein Benutzer als Organisator zu einem Kurs oder Event hinzugefügt wird"
     },
     "delete_confirmation": "Bist du sicher, dass du die E-Mail-Vorlage '{title}' löschen möchtest?",
-    "unknown_trigger": "Unbekannter Auslöser-Typ"
+    "unknown_trigger": "Unbekannter Auslöser-Typ",
+    "categories": {
+      "all": "Alle",
+      "application": "Bewerbungsprozess",
+      "projects": "Projekt-Benachrichtigungen",
+      "sessions": "Termin-Erinnerungen",
+      "system": "System-E-Mails",
+      "other": "Sonstige"
+    },
+    "category_coming_soon": "Bald",
+    "categories_coming_soon_explanation": {
+      "projects": "Vorlagen für Projekt-Statusupdates erscheinen hier, sobald Projekt-Benachrichtigungen verfügbar sind."
+    }
   },
   "manageAchievementTemplates": {
     "error": {
@@ -2300,5 +2311,40 @@
     "mastodon_alt": "Mastodon",
     "linkedin_alt": "LinkedIn",
     "instagram_alt": "Instagram"
+  },
+  "manageSettings": {
+    "title": "Einstellungen",
+    "subtitle": "Plattformweite Konfiguration. Änderungen werden sofort wirksam.",
+    "back_to_settings": "Zurück zu den Einstellungen",
+    "groups": {
+      "appearance": {
+        "label": "Erscheinungsbild",
+        "description": "Farben und Texte des News-Banners"
+      },
+      "homepage": {
+        "label": "Startseiten-Inhalte",
+        "description": "Kursgruppen und FAQ-Bereich"
+      },
+      "emails": {
+        "label": "E-Mail-Benachrichtigungen",
+        "description": "Automatische E-Mails an Teilnehmende und Kursleitungen"
+      },
+      "programDefaults": {
+        "label": "Programm-Voreinstellungen",
+        "description": "Zertifikate, Projektdokumentation und Onboarding-Texte"
+      },
+      "system": {
+        "label": "System",
+        "description": "Zeitzone und Plattform-Interna"
+      },
+      "access": {
+        "label": "Zugriff & Rollen",
+        "description": "Festlegen, welche Rollen auf welche Einstellungen zugreifen können"
+      }
+    },
+    "access": {
+      "superadmin_only": "Nur Super-Admin",
+      "coming_soon": "Bald verfügbar"
+    }
   }
 }

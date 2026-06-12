@@ -29,7 +29,7 @@ const DefaultCertificateTemplatesSection: FC = () => {
   });
 
   return (
-    <div className="mt-16 border border-gray-300 rounded p-6">
+    <div className="mt-8">
       <label className="text-xs uppercase tracking-widest font-medium text-gray-400 mb-4 block">
         {t('default_attendance_certificate_template.label')}
       </label>
