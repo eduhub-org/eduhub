@@ -59,11 +59,6 @@ interface IProps {
   programs: Programs_Program[];
 }
 
-const COURSE_TITLE_AVERAGE_CHAR_WIDTH_PX = 9;
-const COURSE_TITLE_VIEW_LINK_RESERVED_WIDTH_PX = 50;
-
-const getCourseTitleInputWidth = (title: string) => title.length * COURSE_TITLE_AVERAGE_CHAR_WIDTH_PX;
-
 const ManageCoursesContent: FC<IProps> = ({ programs }) => {
   const t = useTranslations('manageCourses');
   const tCommon = useTranslations('common');
@@ -608,17 +603,10 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
         enableSorting: true,
         cell: ({ row }) => {
           const defaultTitle = t('default_course_title');
-          const courseTitle = row.original.title || defaultTitle;
 
           return (
-            <div className="flex w-full items-center gap-2">
-              <div
-                className="min-w-0 shrink"
-                style={{
-                  flexBasis: getCourseTitleInputWidth(courseTitle),
-                  maxWidth: `calc(100% - ${COURSE_TITLE_VIEW_LINK_RESERVED_WIDTH_PX}px)`,
-                }}
-              >
+            <div className="grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-2 pr-3">
+              <div className="min-w-0">
                 <InputField
                   variant="material"
                   type="input"
