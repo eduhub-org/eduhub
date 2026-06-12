@@ -294,7 +294,7 @@ const ManageAdminUsersContent: FC = () => {
               searchFilter={searchFilter}
               onSearchFilterChange={setSearchFilter}
               deleteMutation={DELETE_ORGANIZATION_ADMIN}
-              deleteIdType="uuidString"
+              deleteIdType="number"
               role={manageRole}
               error={error}
               loading={loading}
