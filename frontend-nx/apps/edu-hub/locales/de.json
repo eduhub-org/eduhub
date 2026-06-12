@@ -1404,6 +1404,34 @@
         "error_instruction_required": "Bitte wähle eine Dokumentationsanleitung aus.",
         "error_author_already_in_project": "{name} ist in diesem Kurs bereits einem aktiven Projekt zugeordnet und kann keinem weiteren hinzugefügt werden.",
         "error_author_conflict_generic": "Mindestens eine:r der ausgewählten Autor:innen ist in diesem Kurs bereits einem aktiven Projekt zugeordnet und kann keinem weiteren hinzugefügt werden."
+      },
+      "requirements": {
+        "section_label": "Erforderliche Abgaben",
+        "section_help": "Wähle aus, was Teilnehmende für dieses Projekt einreichen müssen. Die gewählte Kombination bestimmt den Projekttyp.",
+        "requiresDocumentation": {
+          "label": "Projektdokumentation (PDF-Upload)",
+          "help": "Teilnehmende müssen eine schriftliche Projektdokumentation hochladen.",
+          "short": "Dokumentation"
+        },
+        "requiresExternalUrl": {
+          "label": "Externer Link (z. B. Repository oder Live-Demo)",
+          "help": "Teilnehmende müssen einen externen Link angeben, z. B. zu einem Repository oder einer Live-Demo.",
+          "short": "Externer Link"
+        },
+        "requiresPresentation": {
+          "label": "Präsentations-Upload",
+          "help": "Teilnehmende müssen eine Präsentation hochladen.",
+          "short": "Präsentation"
+        },
+        "requiresCoverImage": {
+          "label": "Titelbild",
+          "help": "Teilnehmende müssen ein Titelbild hochladen (wird auch für die Veröffentlichung im Schaufenster genutzt).",
+          "short": "Titelbild"
+        },
+        "resolved_label": "Resultierender Projekttyp",
+        "invalid_combination": "Diese Kombination passt zu keinem verfügbaren Projekttyp. Passe die Auswahl an eines der folgenden Profile an.",
+        "profiles_label": "Verfügbare Projektprofile",
+        "profiles_none": "Keine Abgabe erforderlich"
       }
     },
     "attendance_cert_issued": "Teilnahmebescheinigung ausgestellt",
@@ -1650,7 +1678,25 @@
     },
     "no-certificate-generated": "Es wurden keine Zertifikate generiert.",
     "certificates-generated": "Es wurden {number} Zertifikate generiert.",
-    "1-certificate-generated": "Es wurde ein Zertifikat generiert."
+    "1-certificate-generated": "Es wurde ein Zertifikat generiert.",
+    "project_settings": {
+      "heading": "Projekt-Einrichtung",
+      "intro": "Lege fest, wie Teilnehmende ein Projekt für den Leistungsnachweis erhalten. Du kannst eine oder beide Optionen nutzen.",
+      "option_templates": {
+        "title": "Projektvorlagen definieren",
+        "help": "Erstelle unten über „Projekt hinzufügen\" eine oder mehrere präzise beschriebene Projektaufgaben. Teilnehmende wählen eine Vorlage und bearbeiten diese definierte Aufgabe."
+      },
+      "option_propose": {
+        "title": "Teilnehmende eigene Projekte vorschlagen lassen",
+        "help": "Wenn aktiviert, können Teilnehmende eigene, offene Projektideen vorschlagen, die Du anschließend bestätigst."
+      },
+      "proposals": {
+        "option_inherit_yes": "Programm-Voreinstellung verwenden (Ja)",
+        "option_inherit_no": "Programm-Voreinstellung verwenden (Nein)",
+        "option_enabled": "Ja",
+        "option_disabled": "Nein"
+      }
+    }
   },
   "managePrograms": {
     "headline": "Programme",

@@ -1422,6 +1422,34 @@
         "error_instruction_required": "Please select documentation instructions.",
         "error_author_already_in_project": "{name} already belongs to an active project in this course and can't be added to another one.",
         "error_author_conflict_generic": "One or more selected authors already belong to an active project in this course and can't be added to another one."
+      },
+      "requirements": {
+        "section_label": "Required submission deliverables",
+        "section_help": "Check what students must submit for this project. The selected combination determines the project type.",
+        "requiresDocumentation": {
+          "label": "Project documentation (PDF upload)",
+          "help": "Students must upload a written project documentation.",
+          "short": "Documentation"
+        },
+        "requiresExternalUrl": {
+          "label": "External link (e.g. repository or live demo)",
+          "help": "Students must provide an external link, for example to a repository or a live demo.",
+          "short": "External link"
+        },
+        "requiresPresentation": {
+          "label": "Presentation upload",
+          "help": "Students must upload a presentation.",
+          "short": "Presentation"
+        },
+        "requiresCoverImage": {
+          "label": "Cover image",
+          "help": "Students must upload a cover image (also used for showcase publication).",
+          "short": "Cover image"
+        },
+        "resolved_label": "Resulting project type",
+        "invalid_combination": "This combination does not match any available project type. Adjust the selection to match one of the profiles below.",
+        "profiles_label": "Available project profiles",
+        "profiles_none": "No deliverables required"
       }
     },
     "attendance_cert_issued": "Attendance certificate issued",
@@ -1665,6 +1693,24 @@
     "please_fill_all_fields": "Please fill out all fields to proceed!",
     "errors": {
       "failed_to_load_location_addresses": "Failed to load location addresses."
+    },
+    "project_settings": {
+      "heading": "Project setup",
+      "intro": "Decide how participants get a project for the achievement certificate. You can use either option or both.",
+      "option_templates": {
+        "title": "Define project templates",
+        "help": "Use \"Add project\" below to create one or more precisely described project tasks. Participants pick a template and work on that defined task."
+      },
+      "option_propose": {
+        "title": "Let participants propose their own projects",
+        "help": "When enabled, participants can propose their own, open project ideas that you then confirm."
+      },
+      "proposals": {
+        "option_inherit_yes": "Use program default (Yes)",
+        "option_inherit_no": "Use program default (No)",
+        "option_enabled": "Yes",
+        "option_disabled": "No"
+      }
     }
   },
   "managePrograms": {

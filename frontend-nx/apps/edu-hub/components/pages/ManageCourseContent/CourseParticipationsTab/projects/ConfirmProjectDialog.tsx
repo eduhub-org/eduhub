@@ -4,6 +4,7 @@ import { useRoleMutation } from '../../../../../hooks/authedMutation';
 import { DialogShell } from '../../../../common/dialogs/DialogShell';
 import { Button } from '../../../../common/Button';
 import DropDownSelector from '../../../../inputs/DropDownSelector';
+import ProjectTypeRequirementSelector from '../../../CourseContent/Projects/ProjectTypeRequirementSelector';
 import { UPDATE_PROJECT_CONFIRM_TEAM } from '../../../../../queries/projectInstructor';
 import { ProjectRow, ProjectTypeRow } from '../../../CourseContent/Projects/types';
 
@@ -72,11 +73,13 @@ const ConfirmProjectDialog: FC<ConfirmProjectDialogProps> = ({
 
   // Always overwrite the instruction on type change so the filtered dropdown
   // (projectTypeValue === type) never carries a stale value from the prior
-  // type. Matches AddProjectDialog behaviour.
+  // type. Matches AddProjectDialog behaviour. `nextType` is null when the
+  // checked requirement combination matches no catalog project type.
   const handleTypeChange = useCallback(
-    (nextType: string) => {
-      setType(nextType);
-      const defaultId = findDefaultInstructionIdForType(nextType);
+    (nextType: string | null) => {
+      const resolved = nextType ?? '';
+      setType(resolved);
+      const defaultId = findDefaultInstructionIdForType(resolved);
       setInstructionId(defaultId == null ? '' : String(defaultId));
     },
     [findDefaultInstructionIdForType]
@@ -90,15 +93,6 @@ const ConfirmProjectDialog: FC<ConfirmProjectDialogProps> = ({
   }, [project]);
 
   const hasAcceptedAuthor = acceptedAuthorNames.length > 0;
-
-  const typeDropdownOptions = useMemo(
-    () =>
-      projectTypes.map((pt) => ({
-        value: pt.value,
-        label: tCourse(`projects.type_label.${pt.value}` as never),
-      })),
-    [projectTypes, tCourse]
-  );
 
   const defaultSuffix = tCourse('projects.instruction_dropdown.default_suffix');
 
@@ -182,39 +176,13 @@ const ConfirmProjectDialog: FC<ConfirmProjectDialogProps> = ({
               </p>
             )}
           </div>
-          <div>
-            <div className="[&_.col-span-10]:!mt-0">
-              <DropDownSelector
-                variant="material"
-                label={t('projects.add_dialog.type_label')}
-                placeholder={t('projects.add_dialog.type_placeholder')}
-                value={type}
-                options={typeDropdownOptions}
-                isMandatory
-                disabled={loading}
-                onValueUpdated={handleTypeChange}
-                identifierVariables={{}}
-                refetchQueries={[]}
-              />
-            </div>
-            {projectTypes.length > 0 ? (
-              <div className="mt-2">
-                <p className="text-xs font-medium text-label-primary">
-                  {t('projects.add_dialog.type_descriptions_heading')}
-                </p>
-                <ul className="mt-1 ml-4 space-y-1 text-xs text-label-secondary">
-                  {projectTypes.map((pt) => (
-                    <li key={pt.value}>
-                      <span className="font-medium text-label-primary">
-                        {tCourse(`projects.type_label.${pt.value}` as never)}:
-                      </span>{' '}
-                      {tCourse(`projects.type_description.${pt.value}` as never)}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ) : null}
-          </div>
+          <ProjectTypeRequirementSelector
+            projectTypes={projectTypes}
+            value={type}
+            onChange={handleTypeChange}
+            programDefaultType={programDefaultProjectType}
+            disabled={loading}
+          />
 
           <div className="[&_.col-span-10]:!mt-0">
             <DropDownSelector

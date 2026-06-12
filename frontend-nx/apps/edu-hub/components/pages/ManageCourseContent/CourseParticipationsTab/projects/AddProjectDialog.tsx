@@ -7,6 +7,7 @@ import { DialogShell } from '../../../../common/dialogs/DialogShell';
 import { SelectUserDialog } from '../../../../common/dialogs/SelectUserDialog';
 import { Button } from '../../../../common/Button';
 import DropDownSelector from '../../../../inputs/DropDownSelector';
+import ProjectTypeRequirementSelector from '../../../CourseContent/Projects/ProjectTypeRequirementSelector';
 import { INSTRUCTOR_INSERT_PROJECT } from '../../../../../queries/projectInstructor';
 import {
   PROJECT_DOCUMENTATION_INSTRUCTIONS,
@@ -69,26 +70,6 @@ const AddProjectDialog: FC<AddProjectDialogProps> = ({
     [documentationInstructionsQuery.data?.ProjectDocumentationInstruction]
   );
 
-  const typeDropdownOptions = useMemo(
-    () =>
-      projectTypes.map((pt) => ({
-        value: pt.value,
-        label: tCourse(`projects.type_label.${pt.value}` as never),
-      })),
-    [projectTypes, tCourse]
-  );
-
-  const typeHelpText = useMemo(
-    () =>
-      projectTypes
-        .map(
-          (pt) =>
-            `${tCourse(`projects.type_label.${pt.value}` as never)}\n${tCourse(`projects.type_description.${pt.value}` as never)}`
-        )
-        .join('\n\n'),
-    [projectTypes, tCourse]
-  );
-
   const instructionsForSelectedType = useMemo(
     () =>
       documentationInstructions.filter(
@@ -125,10 +106,11 @@ const AddProjectDialog: FC<AddProjectDialogProps> = ({
   // so the dropdown filter (scoped to projectTypeValue === type) is never
   // stuck on a stale value from the previous type.
   const handleTypeChange = useCallback(
-    (nextType: string) => {
-      setType(nextType);
+    (nextType: string | null) => {
+      const resolved = nextType ?? '';
+      setType(resolved);
       const nextDefault = documentationInstructions.find(
-        (inst) => inst.projectTypeValue === nextType && inst.isDefault
+        (inst) => inst.projectTypeValue === resolved && inst.isDefault
       );
       setInstructionId(nextDefault ? String(nextDefault.id) : '');
     },
@@ -299,40 +281,13 @@ const AddProjectDialog: FC<AddProjectDialogProps> = ({
             />
           </label>
 
-          <div>
-            <div className="[&_.col-span-10]:!mt-0">
-              <DropDownSelector
-                variant="material"
-                label={t('projects.add_dialog.type_label')}
-                placeholder={t('projects.add_dialog.type_placeholder')}
-                value={type}
-                options={typeDropdownOptions}
-                helpText={typeHelpText}
-                isMandatory
-                disabled={loading || projectTypesQuery.loading}
-                onValueUpdated={handleTypeChange}
-                identifierVariables={{}}
-                refetchQueries={[]}
-              />
-            </div>
-            {projectTypes.length > 0 ? (
-              <div className="mt-2">
-                <p className="text-xs font-medium text-label-primary">
-                  {t('projects.add_dialog.type_descriptions_heading')}
-                </p>
-                <ul className="mt-1 ml-4 space-y-1 text-xs text-label-secondary">
-                  {projectTypes.map((pt) => (
-                    <li key={pt.value}>
-                      <span className="font-medium text-label-primary">
-                        {tCourse(`projects.type_label.${pt.value}` as never)}:
-                      </span>{' '}
-                      {tCourse(`projects.type_description.${pt.value}` as never)}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ) : null}
-          </div>
+          <ProjectTypeRequirementSelector
+            projectTypes={projectTypes}
+            value={type}
+            onChange={handleTypeChange}
+            programDefaultType={defaultProjectType}
+            disabled={loading || projectTypesQuery.loading}
+          />
 
           <div className="[&_.col-span-10]:!mt-0">
             <DropDownSelector

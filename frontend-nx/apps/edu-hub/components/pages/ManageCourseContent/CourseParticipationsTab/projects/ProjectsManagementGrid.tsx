@@ -16,6 +16,11 @@ import InputField from '../../../../inputs/InputField';
 import DropDownSelector from '../../../../inputs/DropDownSelector';
 import CheckboxSelector from '../../../../inputs/CheckboxSelector';
 import FileUploadField from '../../../../inputs/FileUploadField';
+import ProjectTypeRequirementSelector from '../../../CourseContent/Projects/ProjectTypeRequirementSelector';
+import {
+  PROJECT_REQUIREMENT_KEYS,
+  flagsOfProjectType,
+} from '../../../CourseContent/Projects/projectTypeRequirements';
 import { UserSelectionWithFilter_User } from '../../../../../queries/__generated__/UserSelectionWithFilter';
 import { SAVE_PROJECT_IMAGE } from '../../../../../queries/actions';
 import {
@@ -127,6 +132,9 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
   const [deleteProject, { loading: deleteProjectLoading }] = useRoleMutation(DELETE_PROJECT, {
     refetchQueries: REFETCH_QUERIES,
   });
+  const [updateProjectType] = useRoleMutation(UPDATE_PROJECT_TYPE, {
+    refetchQueries: REFETCH_QUERIES,
+  });
 
   const allProjects = projectsQuery.data?.Project ?? [];
 
@@ -166,26 +174,6 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
   const projectTypesList = useMemo(
     () => projectTypesQuery.data?.ProjectType ?? [],
     [projectTypesQuery.data?.ProjectType]
-  );
-
-  const typeDescriptionsTooltip = useMemo(
-    () =>
-      projectTypesList
-        .map(
-          (pt) =>
-            `${tCourse(`projects.type_label.${pt.value}` as never)}\n${tCourse(`projects.type_description.${pt.value}` as never)}`
-        )
-        .join('\n\n'),
-    [projectTypesList, tCourse]
-  );
-
-  const typeDropdownOptions = useMemo(
-    () =>
-      projectTypesList.map((pt) => ({
-        value: pt.value,
-        label: tCourse(`projects.type_label.${pt.value}` as never),
-      })),
-    [projectTypesList, tCourse]
   );
 
   const documentationInstructionOptions = useMemo(
@@ -294,6 +282,19 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
     [publishProject, tCommon]
   );
 
+  const handleSetProjectType = useCallback(
+    async (projectId: number, value: string | null) => {
+      // Skip persistence while the checked deliverables match no catalog type.
+      if (!value) return;
+      try {
+        await updateProjectType({ variables: { itemId: projectId, value } });
+      } catch (err) {
+        setErrorMessage(err instanceof Error ? err.message : tCommon('error'));
+      }
+    },
+    [updateProjectType, tCommon]
+  );
+
   const columns = useMemo<ColumnDef<ProjectRow>[]>(
     () => [
       {
@@ -349,26 +350,36 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
         id: 'type',
         header: t('projects.table.type'),
         meta: { className: 'max-w-[14rem]' },
-        cell: ({ row }) => (
-          <div
-            className="min-w-0 w-full [&_.col-span-10]:!mt-0"
-            onMouseDown={(e) => e.stopPropagation()}
-            role="presentation"
-          >
-            <DropDownSelector
-              variant="material"
-              value={projectTypesQuery.loading ? '' : row.original.type ?? ''}
-              options={typeDropdownOptions}
-              updateValueMutation={UPDATE_PROJECT_TYPE}
-              identifierVariables={{ itemId: row.original.id }}
-              refetchQueries={REFETCH_QUERIES}
-              helpText={typeDescriptionsTooltip}
-              nullable
-              nullableLabel={t('projects.type_select_placeholder')}
-              disabled={projectTypesQuery.loading}
-            />
-          </div>
-        ),
+        cell: ({ row }) => {
+          const typeValue = row.original.type;
+          if (!typeValue) {
+            return (
+              <span className="text-label-secondary">
+                {t('projects.type_select_placeholder')}
+              </span>
+            );
+          }
+          const projectType = projectTypesList.find((pt) => pt.value === typeValue);
+          const deliverables = projectType
+            ? PROJECT_REQUIREMENT_KEYS.filter((key) => flagsOfProjectType(projectType)[key]).map(
+                (key) => t(`projects.requirements.${key}.short` as never)
+              )
+            : [];
+          return (
+            <Tooltip title={deliverables.join(', ')}>
+              <div className="min-w-0">
+                <span className="font-medium text-label-primary">
+                  {tCourse(`projects.type_label.${typeValue}` as never)}
+                </span>
+                {deliverables.length > 0 ? (
+                  <span className="block text-xs text-label-secondary truncate">
+                    {deliverables.join(', ')}
+                  </span>
+                ) : null}
+              </div>
+            </Tooltip>
+          );
+        },
       },
       {
         id: 'action',
@@ -439,12 +450,10 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
     [
       deleteProjectLoading,
       handlePublish,
-      projectTypesQuery.loading,
+      projectTypesList,
       t,
       tCourse,
       templateCopyCountByParentId,
-      typeDescriptionsTooltip,
-      typeDropdownOptions,
     ]
   );
 
@@ -601,6 +610,17 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
         </div>
       );
 
+      const projectTypeSelector = (
+        <div className="rounded-lg border border-border-primary p-3 bg-bg-secondary/20">
+          <ProjectTypeRequirementSelector
+            projectTypes={projectTypesList}
+            value={row.type ?? ''}
+            programDefaultType={programDefaultProjectType}
+            onChange={(value) => handleSetProjectType(row.id, value)}
+          />
+        </div>
+      );
+
       const documentationInstructionSelector =
         documentationInstructionOptions.length > 0 ? (
           <div className="[&_.col-span-10]:!mt-0">
@@ -740,6 +760,7 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
                   </ProjectFormFieldSection>
                 }
               />
+              {projectTypeSelector}
               {documentationInstructionSelector}
               <CheckboxSelector
                 variant="material"
@@ -771,6 +792,7 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
           <div className="rounded-lg border border-border-primary p-3 bg-bg-secondary/20">
             <ProjectPreviewLayout project={row} showResourceLinks={showResourceLinks} includeExcludedAuthors />
           </div>
+          {projectTypeSelector}
           {documentationInstructionSelector}
           {(row.rating != null || row.ratingComment?.trim()) && (
             <div className="text-sm space-y-2 border-t border-border-primary pt-3">
@@ -802,6 +824,9 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
       documentationInstructionOptions,
       handleCoverUploadError,
       handleRemoveMentor,
+      handleSetProjectType,
+      projectTypesList,
+      programDefaultProjectType,
       courseDefaultProjectSubmissionDeadline,
       courseSubmissionDeadlineDefaultSource,
       t,
