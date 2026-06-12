@@ -1050,6 +1050,9 @@
     });
   });
 
+  const activeScreen = document.querySelector('.screen.active')?.dataset.screen || 'ia';
+  document.getElementById('variantTabs').style.display = activeScreen === 'ia' ? 'none' : 'flex';
+
   document.querySelectorAll('.variant-tab').forEach(tab => {
     tab.addEventListener('click', () => {
       document.querySelectorAll('.variant-tab').forEach(t => t.classList.remove('active'));

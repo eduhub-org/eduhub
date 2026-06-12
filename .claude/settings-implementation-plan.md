@@ -27,7 +27,7 @@ you pick pure-A (sidebar) or pure-C (single page) instead.
 
 ## Target information architecture
 
-```
+```text
 Settings  (route: /manage/settings — renamed from "App settings")
 ├─ Appearance
 │   └─ Banner (colors, text DE/EN)
