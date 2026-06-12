@@ -1,36 +1,16 @@
-import Head from 'next/head';
-import { FC } from 'react';
-import { Page } from '../../../components/layout/Page';
+import path from 'path';
+path.resolve('./next.config.js');
 
-import { useIsAdmin, useIsOrgAdmin } from '../../../hooks/authentication';
-import { ManagementRoleProvider } from '../../../hooks/managementRole';
-import { ManageProgramsContent } from '../../../components/pages/ManageProgramsContent';
+import { useEffect } from 'react';
+import { useRouter } from 'next/router';
 
-// export const getStaticProps = async ({ locale }: { locale: string }) => ({
-//   props: {
-//     ...(await serverSideTranslations(locale, ["common"])),
-//   },
-// });
+/** @deprecated Use /manage/settings/programs — kept for bookmarks and external links. */
+export default function ManageProgramsRedirect() {
+  const router = useRouter();
 
-const ProgramsPage: FC = () => {
-  const isAdmin = useIsAdmin();
-  const isOrgAdmin = useIsOrgAdmin();
+  useEffect(() => {
+    router.replace('/manage/settings/programs');
+  }, [router]);
 
-  return (
-    <>
-      <Head>
-        <title>EduHub | opencampus.sh</title>
-        <link rel="icon" href="/favicon.png" />
-      </Head>
-      <Page>
-        {(isAdmin || isOrgAdmin) && (
-          <ManagementRoleProvider>
-            <ManageProgramsContent />
-          </ManagementRoleProvider>
-        )}
-      </Page>
-    </>
-  );
-};
-
-export default ProgramsPage;
+  return null;
+}

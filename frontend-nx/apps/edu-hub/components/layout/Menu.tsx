@@ -107,26 +107,10 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
         </MenuItem>
       )}
 
-      {isAdminOrOrgAdmin && (
-        <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/programs')}>
-          <Link className="w-full text-lg" href="/manage/programs">
-            {t('menu.programs')}
-          </Link>
-        </MenuItem>
-      )}
-
       {isAdmin && (
         <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/users')}>
           <Link className="w-full text-lg" href="/manage/users">
             {t('menu.user')}
-          </Link>
-        </MenuItem>
-      )}
-
-      {isAdminOrOrgAdmin && (
-        <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/admin-users')}>
-          <Link className="w-full text-lg" href="/manage/admin-users">
-            {t('menu.admin_users')}
           </Link>
         </MenuItem>
       )}
@@ -171,7 +155,7 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
         </MenuItem>
       )}
 
-      {isAdmin && (
+      {isAdminOrOrgAdmin && (
         <MenuItem
           onClick={closeMenu}
           selected={isActiveRoute('/manage/settings') || router.pathname.startsWith('/manage/settings/')}

@@ -9,6 +9,27 @@ export const PROJECT_TYPES = gql`
       requiresPresentation
       requiresExternalUrl
       requiresCoverImage
+      certificateTemplateId
+      CertificateTemplate {
+        id
+        name
+      }
+    }
+  }
+`;
+
+export const UPDATE_PROJECT_TYPE_CERTIFICATE_TEMPLATE = gql`
+  mutation UpdateProjectTypeCertificateTemplate($value: String!, $templateId: Int) {
+    update_ProjectType_by_pk(
+      pk_columns: { value: $value }
+      _set: { certificateTemplateId: $templateId }
+    ) {
+      value
+      certificateTemplateId
+      CertificateTemplate {
+        id
+        name
+      }
     }
   }
 `;

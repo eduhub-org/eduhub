@@ -31,6 +31,11 @@ export const PROJECT_DOCUMENTATION_INSTRUCTIONS_TABLE = gql`
       projectTypeValue
       isDefault
       updated_at
+      Projects_aggregate {
+        aggregate {
+          count
+        }
+      }
     }
     ProjectDocumentationInstruction_aggregate(where: $filter) {
       aggregate {
@@ -55,6 +60,29 @@ export const INSERT_PROJECT_DOCUMENTATION_INSTRUCTION = gql`
       title
       projectTypeValue
       isDefault
+    }
+  }
+`;
+
+export const UPDATE_PROJECT_DOCUMENTATION_INSTRUCTION_PROJECT_TYPE = gql`
+  mutation UpdateProjectDocumentationInstructionProjectType($itemId: Int!, $value: String!) {
+    update_ProjectDocumentationInstruction_by_pk(
+      pk_columns: { id: $itemId }
+      _set: { projectTypeValue: $value }
+    ) {
+      id
+      projectTypeValue
+    }
+  }
+`;
+
+export const DELETE_PROJECT_DOCUMENTATION_INSTRUCTION_ACTION = gql`
+  mutation DeleteProjectDocumentationInstructionAction($instructionId: Int!) {
+    deleteProjectDocumentationInstruction(instructionId: $instructionId) {
+      success
+      messageKey
+      error
+      reassignedProjectCount
     }
   }
 `;

@@ -1902,6 +1902,7 @@
         "title": "Title",
         "pdf": "PDF",
         "upload": "Upload",
+        "usage": "Used by",
         "default": "Default",
         "actions": "Actions"
       },
@@ -1918,14 +1919,36 @@
       },
       "delete_dialog": {
         "title": "Delete documentation instruction",
-        "question": "Delete \"{title}\"? Any project still referencing it must be edited first.",
+        "question": "Delete \"{title}\"? All projects using this instruction will be switched to the default instruction for their project type.",
         "confirm": "Delete"
       },
       "error": {
         "duplicate_title": "An instruction with this title already exists.",
         "set_default_failed": "Could not change the default. Please try again.",
+        "delete_failed": "The instruction could not be deleted.",
         "pdf_upload_failed": "The PDF could not be uploaded. The instruction was not saved.",
         "create_failed": "The instruction could not be created."
+      }
+    },
+    "projectTypes": {
+      "help_text": "Set the default achievement certificate template and documentation instruction for each project type.",
+      "manage_instructions_link": "Manage documentation instructions",
+      "none_option": "(none)",
+      "no_instructions": "No instructions yet",
+      "column": {
+        "project_type": "Project type",
+        "achievement_template": "Achievement certificate template",
+        "default_instruction": "Default documentation instruction"
+      }
+    },
+    "attendanceCertificates": {
+      "loading": "Loading certificate templates…",
+      "html_editor": {
+        "label": "Attendance certificate HTML templates",
+        "help_text": "Edit the Jinja2 HTML stored in the database.",
+        "template_select": "Template",
+        "no_templates": "No certificate templates found.",
+        "preview_label": "A4 preview (sample data)"
       }
     },
     "default_attendance_certificate_template": {
@@ -2204,6 +2227,9 @@
     "default_templates_explanation": "These are the default email templates used app-wide. You can also define course-specific templates in the manage courses view by clicking on the corresponding button in the expandable row of the course.",
     "course_specific_explanation": "These email templates are specific to this course and will override the default templates when sending emails for this course.",
     "back_to_courses": "Back to Courses",
+    "editor": {
+      "not_found": "Email template not found."
+    },
     "columns": {
       "title": "Template Type",
       "subject": "Email Subject Line",
@@ -2331,6 +2357,62 @@
     "title": "Settings",
     "subtitle": "Platform-wide configuration. Changes take effect immediately.",
     "back_to_settings": "Back to settings",
+    "overview_lead": "Choose a section to configure platform-wide defaults and content.",
+    "nav": {
+      "mobile_label": "Settings section",
+      "groups": {
+        "platform": "Platform",
+        "notifications": "Notifications",
+        "programs": "Programs",
+        "system": "System"
+      },
+      "items": {
+        "appearance": {
+          "label": "Appearance",
+          "description": "News banner colors and texts"
+        },
+        "homepage": {
+          "label": "Homepage content",
+          "description": "FAQ section on the homepage"
+        },
+        "emails": {
+          "label": "Email templates",
+          "description": "Automated emails to participants and instructors"
+        },
+        "programs": {
+          "label": "Manage programs",
+          "description": "Create, edit, and publish programs"
+        },
+        "attendance-certificates": {
+          "label": "Attendance certificates",
+          "description": "HTML templates and program-type defaults for attendance certificates"
+        },
+        "project-types": {
+          "label": "Project types",
+          "description": "Default achievement certificate templates and documentation instructions per project type"
+        },
+        "documentation-instructions": {
+          "label": "Documentation instructions",
+          "description": "Manage PDF instructions assigned to projects"
+        },
+        "onboarding-texts": {
+          "label": "Onboarding texts",
+          "description": "Texts shown during participant onboarding"
+        },
+        "course-groups": {
+          "label": "Course groups",
+          "description": "Homepage course group order and visibility"
+        },
+        "time-zone": {
+          "label": "Time zone",
+          "description": "Default time zone for dates and times"
+        },
+        "access": {
+          "label": "Access & roles",
+          "description": "Admin users and organization roles"
+        }
+      }
+    },
     "groups": {
       "appearance": {
         "label": "Appearance",

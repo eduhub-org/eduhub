@@ -2,8 +2,8 @@ import { FC, useCallback, useId, useMemo, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { ApolloError, MutationFunction } from '@apollo/client';
 import { ColumnDef } from '@tanstack/react-table';
-import { Chip, IconButton, Tooltip } from '@mui/material';
-import { MdCheckCircle, MdDelete, MdStarOutline } from 'react-icons/md';
+import { Chip, Tooltip } from '@mui/material';
+import { MdCheckCircle, MdStarOutline } from 'react-icons/md';
 import { useFileUploader } from '../../../hooks/fileUpload';
 
 import TableGrid from '../../common/TableGrid';
@@ -15,7 +15,6 @@ import FileDownload from '../../inputs/FileDownload';
 import DropDownSelector from '../../inputs/DropDownSelector';
 import { DialogShell } from '../../common/dialogs/DialogShell';
 import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
-import { QuestionConfirmationDialog } from '../../common/dialogs/QuestionConfirmationDialog';
 import { Button } from '../../common/Button';
 
 import { useAdminQuery } from '../../../hooks/authedQuery';
@@ -26,7 +25,9 @@ import {
   INSERT_PROJECT_DOCUMENTATION_INSTRUCTION,
   UPDATE_PROJECT_DOCUMENTATION_INSTRUCTION_TITLE,
   UPDATE_PROJECT_DOCUMENTATION_INSTRUCTION_URL,
+  UPDATE_PROJECT_DOCUMENTATION_INSTRUCTION_PROJECT_TYPE,
   DELETE_PROJECT_DOCUMENTATION_INSTRUCTION,
+  DELETE_PROJECT_DOCUMENTATION_INSTRUCTION_ACTION,
   SET_PROJECT_DOCUMENTATION_INSTRUCTION_DEFAULT,
   SAVE_PROJECT_DOCUMENTATION_INSTRUCTION,
 } from '../../../queries/projectDocumentationInstruction';
@@ -54,7 +55,6 @@ import {
   DeleteProjectDocumentationInstruction,
   DeleteProjectDocumentationInstructionVariables,
 } from '../../../queries/__generated__/DeleteProjectDocumentationInstruction';
-import { handleForeignKeyError } from '../../../helpers/errorHandling';
 
 const REFETCH_QUERIES = ['ProjectDocumentationInstructionsTable'];
 
@@ -117,7 +117,7 @@ const ProjectDocumentationInstructionsSection: FC = () => {
     refetchQueries: REFETCH_QUERIES,
   });
 
-  const [deleteInstruction, { loading: deleting }] = useAdminMutation<
+  const [deleteInstruction] = useAdminMutation<
     DeleteProjectDocumentationInstruction,
     DeleteProjectDocumentationInstructionVariables
   >(DELETE_PROJECT_DOCUMENTATION_INSTRUCTION, {
@@ -125,7 +125,6 @@ const ProjectDocumentationInstructionsSection: FC = () => {
   });
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [pendingDelete, setPendingDelete] = useState<InstructionRow | null>(null);
 
   const [addOpen, setAddOpen] = useState(false);
   const [addTitle, setAddTitle] = useState('');
@@ -261,24 +260,22 @@ const ProjectDocumentationInstructionsSection: FC = () => {
     [setInstructionDefault, t, tCommon]
   );
 
-  const performDelete = useCallback(async () => {
-    if (!pendingDelete) return;
-    try {
-      await deleteInstruction({ variables: { id: pendingDelete.id } });
-      setPendingDelete(null);
-    } catch (err) {
-      let message: string;
-      if (err instanceof ApolloError) {
-        message = handleForeignKeyError(err, tCommon);
-      } else if (err instanceof Error) {
-        message = err.message;
-      } else {
-        message = tCommon('error');
+  const validateDeleteResult = useCallback(
+    (data: unknown) => {
+      const payload = (data as { deleteProjectDocumentationInstruction?: { success?: boolean; error?: string } })
+        ?.deleteProjectDocumentationInstruction;
+      if (payload && !payload.success) {
+        return payload.error ?? t('error.delete_failed');
       }
-      setErrorMessage(message);
-      setPendingDelete(null);
-    }
-  }, [deleteInstruction, pendingDelete, tCommon]);
+      return null;
+    },
+    [t]
+  );
+
+  const generateDeletionConfirmation = useCallback(
+    (row: InstructionRow) => t('delete_dialog.question', { title: row.title }),
+    [t]
+  );
 
   const columns = useMemo<ColumnDef<InstructionRow>[]>(
     () => [
@@ -286,10 +283,17 @@ const ProjectDocumentationInstructionsSection: FC = () => {
         accessorKey: 'projectTypeValue',
         header: t('column.project_type'),
         size: 220,
-        cell: ({ getValue }) => (
-          <span className="text-sm text-label-primary">
-            {tCourse(`projects.type_label.${getValue<string>()}` as never)}
-          </span>
+        cell: ({ getValue, row }) => (
+          <DropDownSelector
+            variant="material"
+            label={t('column.project_type')}
+            value={getValue<string>()}
+            options={projectTypeOptions}
+            isMandatory
+            identifierVariables={{ itemId: row.original.id }}
+            updateValueMutation={UPDATE_PROJECT_DOCUMENTATION_INSTRUCTION_PROJECT_TYPE}
+            refetchQueries={REFETCH_QUERIES}
+          />
         ),
       },
       {
@@ -347,6 +351,17 @@ const ProjectDocumentationInstructionsSection: FC = () => {
         ),
       },
       {
+        id: 'usage',
+        header: t('column.usage'),
+        size: 100,
+        meta: { align: 'center' },
+        cell: ({ row }) => (
+          <span className="text-sm text-label-primary tabular-nums">
+            {row.original.Projects_aggregate?.aggregate?.count ?? 0}
+          </span>
+        ),
+      },
+      {
         id: 'default',
         header: t('column.default'),
         size: 160,
@@ -380,50 +395,14 @@ const ProjectDocumentationInstructionsSection: FC = () => {
           );
         },
       },
-      {
-        id: 'actions',
-        header: t('column.actions'),
-        size: 90,
-        cell: ({ row }) => {
-          const blocked = row.original.isDefault;
-          return (
-            <Tooltip
-              title={
-                blocked
-                  ? t('delete_disabled_default_tooltip')
-                  : t('delete_tooltip')
-              }
-            >
-              <span>
-                <IconButton
-                  size="small"
-                  aria-label={t('delete_tooltip')}
-                  onClick={() => setPendingDelete(row.original)}
-                  disabled={blocked || deleting}
-                  sx={{
-                    backgroundColor: 'transparent !important',
-                    padding: 0,
-                    '&:hover': {
-                      backgroundColor: 'rgba(255, 0, 0, 0.1) !important',
-                    },
-                  }}
-                >
-                  <MdDelete size="1.25em" color={blocked ? 'gray' : 'red'} />
-                </IconButton>
-              </span>
-            </Tooltip>
-          );
-        },
-      },
     ],
     [
       t,
-      tCourse,
+      projectTypeOptions,
       saveInstructionFile,
       updateInstructionUrl,
       handleSetDefault,
       settingDefault,
-      deleting,
     ]
   );
 
@@ -448,6 +427,11 @@ const ProjectDocumentationInstructionsSection: FC = () => {
         refetchQueries={REFETCH_QUERIES}
         onAddButtonClick={openAddDialog}
         addButtonText={t('add_button')}
+        deleteMutation={DELETE_PROJECT_DOCUMENTATION_INSTRUCTION_ACTION}
+        deleteVariableName="instructionId"
+        canDeleteRow={(row) => !row.isDefault}
+        generateDeletionConfirmationQuestion={generateDeletionConfirmation}
+        validateDeleteResult={validateDeleteResult}
       />
 
       <DialogShell
@@ -526,20 +510,6 @@ const ProjectDocumentationInstructionsSection: FC = () => {
           </div>
         </div>
       </DialogShell>
-
-      <QuestionConfirmationDialog
-        open={Boolean(pendingDelete)}
-        title={t('delete_dialog.title')}
-        question={
-          pendingDelete
-            ? t('delete_dialog.question', { title: pendingDelete.title })
-            : ''
-        }
-        confirmationText={t('delete_dialog.confirm')}
-        confirmDisabled={deleting}
-        onClose={() => setPendingDelete(null)}
-        onConfirm={performDelete}
-      />
 
       <ErrorMessageDialog
         errorMessage={errorMessage ?? ''}

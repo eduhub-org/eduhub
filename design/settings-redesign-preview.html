@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduHub Settings Redesign — Design Preview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --brand: #00A398;
+      --brand-dark: #008078;
+      --bg-primary: #222222;
+      --bg-secondary: #333333;
+      --bg-card: #2a2a2a;
+      --bg-deep: #0F0F0F;
+      --label-primary: #F2F2F2;
+      --label-secondary: #D8D8D8;
+      --label-muted: #888888;
+      --border: #444444;
+      --success: #A2EBA0;
+      --warning: #FFA665;
+      --info: #1982fc;
+      --radius: 12px;
+      --sidebar-w: 240px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Space Grotesk', system-ui, sans-serif;
+      background: #1a1a1a;
+      color: var(--label-primary);
+      font-weight: 500;
+      line-height: 1.5;
+    }
+
+    /* ---- Preview chrome ---- */
+    .preview-bar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--bg-deep);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .preview-bar h1 {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--label-secondary);
+      margin-right: auto;
+    }
+
+    .preview-bar h1 span { color: var(--brand); }
+
+    .screen-tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .screen-tab {
+      background: transparent;
+      border: 2px solid var(--border);
+      color: var(--label-secondary);
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 6px 14px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .screen-tab:hover { border-color: var(--brand); color: var(--brand); }
+    .screen-tab.active {
+      background: var(--brand);
+      border-color: var(--brand);
+      color: #fff;
+    }
+
+    .variant-tabs {
+      display: flex;
+      gap: 6px;
+      margin-left: 16px;
+      padding-left: 16px;
+      border-left: 1px solid var(--border);
+    }
+
+    .variant-tab {
+      background: var(--bg-secondary);
+      border: none;
+      color: var(--label-muted);
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 4px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .variant-tab.active { background: var(--border); color: var(--label-primary); }
+
+    .screen { display: none; padding: 24px; }
+    .screen.active { display: block; }
+
+    .screen-note {
+      max-width: 1280px;
+      margin: 0 auto 16px;
+      padding: 12px 16px;
+      background: rgba(0, 163, 152, 0.1);
+      border: 1px solid rgba(0, 163, 152, 0.3);
+      border-radius: var(--radius);
+      font-size: 13px;
+      color: var(--label-secondary);
+    }
+
+    /* ---- App shell ---- */
+    .app-shell {
+      max-width: 1280px;
+      margin: 0 auto;
+      background: var(--bg-primary);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      min-height: 720px;
+      display: flex;
+    }
+
+    /* ---- Sidebar ---- */
+    .sidebar {
+      width: var(--sidebar-w);
+      flex-shrink: 0;
+      background: var(--bg-deep);
+      border-right: 1px solid var(--border);
+      padding: 20px 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar-title {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--label-muted);
+      padding: 0 16px 16px;
+    }
+
+    .nav-group { margin-bottom: 20px; }
+
+    .nav-group-label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--label-muted);
+      padding: 0 16px 8px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 16px;
+      font-size: 13px;
+      color: var(--label-secondary);
+      cursor: pointer;
+      border-left: 3px solid transparent;
+      transition: all 0.12s;
+      text-decoration: none;
+    }
+
+    .nav-item:hover { color: var(--label-primary); background: rgba(255,255,255,0.03); }
+
+    .nav-item.active {
+      color: var(--brand);
+      background: rgba(0, 163, 152, 0.08);
+      border-left-color: var(--brand);
+    }
+
+    .nav-item .icon {
+      width: 18px;
+      height: 18px;
+      opacity: 0.7;
+      flex-shrink: 0;
+    }
+
+    .nav-item.active .icon { opacity: 1; }
+
+    .nav-badge {
+      margin-left: auto;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: var(--bg-secondary);
+      color: var(--label-muted);
+    }
+
+    .nav-item.active .nav-badge {
+      background: var(--brand);
+      color: #fff;
+    }
+
+    .badge-soon {
+      margin-left: auto;
+      font-size: 9px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 2px 6px;
+      border-radius: 999px;
+      border: 1px solid var(--warning);
+      color: var(--warning);
+    }
+
+    .badge-lock {
+      margin-left: auto;
+      opacity: 0.5;
+    }
+
+    .sidebar-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 8px 16px 16px;
+    }
+
+    /* ---- Main content ---- */
+    .main {
+      flex: 1;
+      padding: 32px 40px;
+      overflow-y: auto;
+    }
+
+    .page-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 28px;
+    }
+
+    .page-header h2 {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .page-header p {
+      font-size: 13px;
+      color: var(--label-muted);
+      max-width: 520px;
+    }
+
+    .btn-primary {
+      background: var(--brand);
+      color: #fff;
+      border: 2px solid var(--brand);
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 10px 18px;
+      border-radius: 999px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s;
+    }
+
+    .btn-primary:hover { background: var(--brand-dark); }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--label-secondary);
+      border: 2px solid var(--border);
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 8px 16px;
+      border-radius: 999px;
+      cursor: pointer;
+    }
+
+    /* ---- Tabs ---- */
+    .content-tabs {
+      display: flex;
+      gap: 4px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 24px;
+    }
+
+    .content-tab {
+      background: none;
+      border: none;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--label-muted);
+      padding: 10px 16px;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .content-tab:hover { color: var(--label-secondary); }
+
+    .content-tab.active {
+      color: var(--brand);
+      border-bottom-color: var(--brand);
+    }
+
+    .tab-count {
+      font-size: 11px;
+      padding: 1px 7px;
+      border-radius: 999px;
+      background: var(--bg-secondary);
+      color: var(--label-muted);
+    }
+
+    .content-tab.active .tab-count {
+      background: rgba(0, 163, 152, 0.2);
+      color: var(--brand);
+    }
+
+    /* ---- Section blocks ---- */
+    .section-label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--label-muted);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-block { margin-bottom: 32px; }
+
+    /* ---- Template cards ---- */
+    .template-card {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: border-color 0.12s;
+    }
+
+    .template-card:hover { border-color: var(--brand); }
+
+    .template-card.selected {
+      border-color: var(--brand);
+      box-shadow: 0 0 0 1px var(--brand);
+    }
+
+    .tag {
+      font-size: 9px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 3px 8px;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+
+    .tag-application { background: rgba(162, 235, 160, 0.15); color: var(--success); }
+    .tag-system { background: rgba(136, 136, 136, 0.2); color: var(--label-muted); }
+
+    .template-id {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--brand);
+      font-family: monospace;
+      flex-shrink: 0;
+      min-width: 180px;
+    }
+
+    .template-subject {
+      flex: 1;
+      font-size: 13px;
+      color: var(--label-secondary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .template-meta {
+      font-size: 11px;
+      color: var(--label-muted);
+      flex-shrink: 0;
+    }
+
+    .template-chevron {
+      color: var(--label-muted);
+      flex-shrink: 0;
+    }
+
+    /* ---- Placeholder ---- */
+    .placeholder-box {
+      border: 1px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 32px;
+      text-align: center;
+      color: var(--label-muted);
+      font-size: 13px;
+      font-style: italic;
+    }
+
+    .coming-soon-badge {
+      font-size: 9px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--warning);
+      color: var(--warning);
+    }
+
+    /* ---- Form sections (appearance / programs) ---- */
+    .form-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-bottom: 16px;
+    }
+
+    .form-card h3 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .form-card .desc {
+      font-size: 12px;
+      color: var(--label-muted);
+      margin-bottom: 16px;
+    }
+
+    .field-label {
+      font-size: 12px;
+      color: var(--label-secondary);
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .field-input {
+      width: 100%;
+      background: #fff;
+      color: #222;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-family: inherit;
+      font-size: 13px;
+    }
+
+    textarea.field-input { min-height: 120px; resize: vertical; }
+
+    /* ---- Email editor layout ---- */
+    .editor-layout {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 24px;
+    }
+
+    .editor-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .editor-panel-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .editor-panel-body { padding: 18px; }
+
+    .preview-frame {
+      background: #fff;
+      color: #222;
+      border-radius: 8px;
+      padding: 20px;
+      min-height: 280px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .preview-subject {
+      background: #f5f5f5;
+      padding: 10px 12px;
+      border-radius: 6px;
+      margin-bottom: 16px;
+      font-size: 13px;
+    }
+
+    .var-chip {
+      display: inline-block;
+      font-size: 11px;
+      font-family: monospace;
+      background: rgba(0, 163, 152, 0.12);
+      color: var(--brand);
+      padding: 3px 8px;
+      border-radius: 4px;
+      margin: 3px;
+      cursor: pointer;
+    }
+
+    .var-chip:hover { background: rgba(0, 163, 152, 0.25); }
+
+    .breadcrumb {
+      font-size: 12px;
+      color: var(--label-muted);
+      margin-bottom: 8px;
+    }
+
+    .breadcrumb a { color: var(--brand); text-decoration: none; }
+
+    /* ---- Variant B: flat nav ---- */
+    .variant-b .nav-group-label { display: none; }
+    .variant-b .nav-group { margin-bottom: 0; }
+    .variant-b .sidebar-divider { display: none; }
+
+    /* ---- Variant C: collapsible groups ---- */
+    .variant-c .nav-group-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 16px;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--label-muted);
+      cursor: pointer;
+    }
+
+    .variant-c .nav-group.collapsed .nav-item { display: none; }
+
+    /* ---- IA diagram ---- */
+    .ia-grid {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    .ia-card {
+      background: var(--bg-primary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+    }
+
+    .ia-card h3 {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--brand);
+      margin-bottom: 12px;
+    }
+
+    .ia-card ul { list-style: none; }
+    .ia-card li {
+      font-size: 13px;
+      color: var(--label-secondary);
+      padding: 4px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .ia-card li.soon { color: var(--label-muted); }
+    .ia-card li.soon::after {
+      content: 'SOON';
+      font-size: 8px;
+      font-weight: 600;
+      color: var(--warning);
+      border: 1px solid var(--warning);
+      padding: 1px 5px;
+      border-radius: 999px;
+    }
+
+    .ia-card li.lock::after {
+      content: '🔒';
+      font-size: 10px;
+    }
+
+    .mapping-table {
+      max-width: 1280px;
+      margin: 24px auto 0;
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .mapping-table th, .mapping-table td {
+      text-align: left;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+    }
+
+    .mapping-table th {
+      background: var(--bg-secondary);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--label-muted);
+    }
+
+    .mapping-table td { color: var(--label-secondary); }
+    .mapping-table code {
+      font-size: 11px;
+      color: var(--brand);
+      background: rgba(0,163,152,0.1);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+
+<header class="preview-bar">
+  <h1>EduHub <span>Settings Redesign</span> — Design Preview</h1>
+  <div class="screen-tabs">
+    <button class="screen-tab active" data-screen="ia">Information architecture</button>
+    <button class="screen-tab" data-screen="emails">Email templates list</button>
+    <button class="screen-tab" data-screen="editor">Template editor</button>
+    <button class="screen-tab" data-screen="programs">Programs: Certificates</button>
+    <button class="screen-tab" data-screen="appearance">Appearance</button>
+  </div>
+  <div class="variant-tabs" id="variantTabs">
+    <button class="variant-tab active" data-variant="a">Grouped nav</button>
+    <button class="variant-tab" data-variant="b">Flat nav</button>
+    <button class="variant-tab" data-variant="c">Collapsible</button>
+  </div>
+</header>
+
+<!-- IA Screen -->
+<section class="screen active" id="screen-ia">
+  <div class="screen-note">
+  Proposed sidebar structure integrating programs into settings. Notifications split into sub-items
+  (sidebar entries map to content tabs or anchor sections). Course groups moves from Homepage to Programs.
+  </div>
+  <div class="ia-grid">
+    <div class="ia-card">
+      <h3>Platform</h3>
+      <ul>
+        <li>Appearance</li>
+        <li>Homepage content <span style="font-size:10px;color:var(--label-muted)">(FAQ only)</span></li>
+      </ul>
+    </div>
+    <div class="ia-card">
+      <h3>Notifications</h3>
+      <ul>
+        <li>Email templates <span style="font-size:10px;color:var(--brand)">14</span></li>
+        <li>Application process</li>
+        <li class="soon">Project updates</li>
+        <li class="soon">Session reminders</li>
+        <li>System emails</li>
+      </ul>
+    </div>
+    <div class="ia-card">
+      <h3>Programs</h3>
+      <ul>
+        <li>Certificates</li>
+        <li>Project documentation</li>
+        <li>Onboarding texts</li>
+        <li>Course groups</li>
+      </ul>
+    </div>
+    <div class="ia-card">
+      <h3>System</h3>
+      <ul>
+        <li>Time zone</li>
+        <li class="lock">Access &amp; roles</li>
+      </ul>
+    </div>
+  </div>
+  <table class="mapping-table">
+    <thead>
+      <tr>
+        <th>Current group</th>
+        <th>Current sections</th>
+        <th>Proposed location</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>appearance</code></td>
+        <td>Banner settings</td>
+        <td>Platform → Appearance</td>
+      </tr>
+      <tr>
+        <td><code>homepage</code></td>
+        <td>Course groups, FAQ</td>
+        <td>Programs → Course groups; Platform → Homepage (FAQ)</td>
+      </tr>
+      <tr>
+        <td><code>emails</code></td>
+        <td>All templates (tabbed)</td>
+        <td>Notifications → split sidebar + tabs</td>
+      </tr>
+      <tr>
+        <td><code>programDefaults</code></td>
+        <td>Certificates, project docs, onboarding</td>
+        <td>Programs → 3 separate pages</td>
+      </tr>
+      <tr>
+        <td><code>system</code></td>
+        <td>Time zone</td>
+        <td>System → Time zone</td>
+      </tr>
+      <tr>
+        <td><code>access</code></td>
+        <td>Coming soon</td>
+        <td>System → Access &amp; roles (locked)</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- Email templates list -->
+<section class="screen" id="screen-emails">
+  <div class="screen-note">
+  Replaces accordion + separate /manage/settings/emails page. Sidebar stays visible; main area shows
+  grouped template cards instead of expandable table rows.
+  </div>
+  <div class="app-shell variant-a" id="shell-emails">
+    <aside class="sidebar" id="sidebar-emails"></aside>
+    <main class="main">
+      <div class="page-header">
+        <div>
+          <h2>Email notifications</h2>
+          <p>Automated emails sent to participants and instructors. Variables like <code style="color:var(--brand)">[User:FirstName]</code> are replaced at send time.</p>
+        </div>
+        <button class="btn-primary">+ New template</button>
+      </div>
+      <div class="content-tabs">
+        <button class="content-tab active">All <span class="tab-count">14</span></button>
+        <button class="content-tab">Application <span class="tab-count">6</span></button>
+        <button class="content-tab">Projects <span class="coming-soon-badge">Soon</span></button>
+        <button class="content-tab">Sessions <span class="coming-soon-badge">Soon</span></button>
+        <button class="content-tab">System <span class="tab-count">4</span></button>
+      </div>
+
+      <div class="section-block">
+        <div class="section-label">Application process</div>
+        <div class="template-card selected">
+          <span class="tag tag-application">Application</span>
+          <span class="template-id">ENROLLMENT_INVITE</span>
+          <span class="template-subject">You're invited to apply for [Enrollment:CourseId--Course:Name]</span>
+          <span class="template-meta">3 days ago</span>
+          <span class="template-chevron">›</span>
+        </div>
+        <div class="template-card">
+          <span class="tag tag-application">Application</span>
+          <span class="template-id">ENROLLMENT_CONFIRMED</span>
+          <span class="template-subject">Your application for [Enrollment:CourseId--Course:Name] was confirmed</span>
+          <span class="template-meta">1 week ago</span>
+          <span class="template-chevron">›</span>
+        </div>
+        <div class="template-card">
+          <span class="tag tag-application">Application</span>
+          <span class="template-id">ENROLLMENT_REJECTED</span>
+          <span class="template-subject">Update on your application for [Enrollment:CourseId--Course:Name]</span>
+          <span class="template-meta">2 weeks ago</span>
+          <span class="template-chevron">›</span>
+        </div>
+      </div>
+
+      <div class="section-block">
+        <div class="section-label">Project updates <span class="coming-soon-badge">Coming soon</span></div>
+        <div class="placeholder-box">Templates for project milestone notifications will appear here once the feature is available.</div>
+      </div>
+
+      <div class="section-block">
+        <div class="section-label">System</div>
+        <div class="template-card">
+          <span class="tag tag-system">System</span>
+          <span class="template-id">PASSWORD_RESET</span>
+          <span class="template-subject">Reset your EduHub password</span>
+          <span class="template-meta">1 month ago</span>
+          <span class="template-chevron">›</span>
+        </div>
+        <div class="template-card">
+          <span class="tag tag-system">System</span>
+          <span class="template-id">EMAIL_VERIFY</span>
+          <span class="template-subject">Verify your email address</span>
+          <span class="template-meta">1 month ago</span>
+          <span class="template-chevron">›</span>
+        </div>
+      </div>
+    </main>
+  </div>
+</section>
+
+<!-- Template editor -->
+<section class="screen" id="screen-editor">
+  <div class="screen-note">
+  Dedicated edit view (replaces inline table expansion). Clicking a template card navigates here.
+  Subject is editable inline; body uses rich editor; preview panel on the right.
+  </div>
+  <div class="app-shell variant-a" id="shell-editor">
+    <aside class="sidebar" id="sidebar-editor"></aside>
+    <main class="main">
+      <div class="breadcrumb"><a href="#">Email notifications</a> / Application process / ENROLLMENT_INVITE</div>
+      <div class="page-header">
+        <div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+            <span class="tag tag-application">Application</span>
+            <span style="font-family:monospace;font-size:14px;color:var(--brand)">ENROLLMENT_INVITE</span>
+          </div>
+          <h2>Edit template</h2>
+          <p>Sent when a participant is invited to apply for a course. Last updated 3 days ago.</p>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="btn-ghost">Discard</button>
+          <button class="btn-primary">Save changes</button>
+        </div>
+      </div>
+
+      <div class="editor-layout">
+        <div>
+          <div class="form-card" style="margin-bottom:16px">
+            <label class="field-label">Subject line</label>
+            <input class="field-input" value="You're invited to apply for [Enrollment:CourseId--Course:Name]" />
+          </div>
+          <div class="editor-panel">
+            <div class="editor-panel-header">
+              Body content
+              <button class="btn-ghost" style="font-size:11px;padding:4px 12px">Generate preview</button>
+            </div>
+            <div class="editor-panel-body">
+              <div style="background:#fff;border-radius:8px;min-height:240px;padding:12px;color:#222;font-size:13px">
+                <p>Hi [User:FirstName],</p>
+                <p style="margin-top:8px">You've been invited to apply for <strong>[Enrollment:CourseId--Course:Name]</strong>. Click the link below to complete your application.</p>
+                <p style="margin-top:8px;color:var(--brand)">[Enrollment:CourseLink]</p>
+              </div>
+            </div>
+          </div>
+          <div class="form-card" style="margin-top:16px">
+            <h3>Trigger</h3>
+            <p class="desc">This email is sent automatically when an admin invites a user to apply for a course.</p>
+          </div>
+        </div>
+        <div>
+          <div class="editor-panel">
+            <div class="editor-panel-header">Preview</div>
+            <div class="editor-panel-body">
+              <div class="preview-frame">
+                <div class="preview-subject"><strong>Subject:</strong> You're invited to apply for Sample Course Title</div>
+                <p>Hi John,</p>
+                <p style="margin-top:8px">You've been invited to apply for <strong>Sample Course Title</strong>. Click the link below to complete your application.</p>
+                <p style="margin-top:8px"><a href="#" style="color:var(--brand)">https://edu.opencampus.sh/course/123</a></p>
+              </div>
+            </div>
+          </div>
+          <div class="editor-panel" style="margin-top:16px">
+            <div class="editor-panel-header">Available variables</div>
+            <div class="editor-panel-body">
+              <span class="var-chip">[User:FirstName]</span>
+              <span class="var-chip">[User:LastName]</span>
+              <span class="var-chip">[Enrollment:CourseId--Course:Name]</span>
+              <span class="var-chip">[Enrollment:CourseLink]</span>
+              <span class="var-chip">[Enrollment:ExpirationDate]</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</section>
+
+<!-- Programs: Certificates -->
+<section class="screen" id="screen-programs">
+  <div class="screen-note">
+  Programs split into dedicated pages. Each program setting gets its own sidebar entry instead of
+  one accordion with three sections.
+  </div>
+  <div class="app-shell variant-a" id="shell-programs">
+    <aside class="sidebar" id="sidebar-programs"></aside>
+    <main class="main">
+      <div class="page-header">
+        <div>
+          <h2>Certificate templates</h2>
+          <p>Default certificate layouts used when no course-specific template is configured.</p>
+        </div>
+      </div>
+      <div class="form-card">
+        <h3>Default certificate template</h3>
+        <p class="desc">Upload or configure the platform-wide certificate design.</p>
+        <div style="border:2px dashed var(--border);border-radius:8px;padding:40px;text-align:center;color:var(--label-muted);font-size:13px">
+          Drop certificate template file or click to browse
+        </div>
+      </div>
+      <div class="form-card">
+        <h3>Preview</h3>
+        <p class="desc">How certificates will look with sample data.</p>
+        <div style="background:#fff;border-radius:8px;height:200px;display:flex;align-items:center;justify-content:center;color:#888;font-size:13px">
+          Certificate preview
+        </div>
+      </div>
+    </main>
+  </div>
+</section>
+
+<!-- Appearance -->
+<section class="screen" id="screen-appearance">
+  <div class="screen-note">
+  Simple settings pages use the same shell. Content area shows form cards on dark background with
+  light inputs (matching existing .light pattern).
+  </div>
+  <div class="app-shell variant-a" id="shell-appearance">
+    <aside class="sidebar" id="sidebar-appearance"></aside>
+    <main class="main">
+      <div class="page-header">
+        <div>
+          <h2>Appearance</h2>
+          <p>News banner colors and texts shown on the homepage.</p>
+        </div>
+      </div>
+      <div class="form-card">
+        <h3>News banner</h3>
+        <p class="desc">Configure the announcement banner visible to all visitors.</p>
+        <label class="field-label">Banner text</label>
+        <input class="field-input" value="New courses starting in September — apply now!" style="margin-bottom:16px" />
+        <label class="field-label">Background color</label>
+        <div style="display:flex;gap:12px;align-items:center">
+          <div style="width:40px;height:40px;border-radius:8px;background:var(--brand);border:1px solid var(--border)"></div>
+          <input class="field-input" value="#00A398" style="max-width:140px" />
+        </div>
+      </div>
+    </main>
+  </div>
+</section>
+
+<script>
+  const NAV = [
+    { group: 'Platform', items: [
+      { id: 'appearance', label: 'Appearance', icon: '◐', active: false },
+      { id: 'homepage', label: 'Homepage content', icon: '⌂', active: false },
+    ]},
+    { group: 'Notifications', items: [
+      { id: 'emails', label: 'Email templates', icon: '✉', badge: '14', active: false },
+      { id: 'app-process', label: 'Application process', icon: '↗', active: false },
+      { id: 'project-updates', label: 'Project updates', icon: '▣', soon: true },
+      { id: 'session-reminders', label: 'Session reminders', icon: '◷', soon: true },
+      { id: 'system-emails', label: 'System emails', icon: '⚙', active: false },
+    ]},
+    { group: 'Programs', items: [
+      { id: 'certificates', label: 'Certificates', icon: '◈', active: false },
+      { id: 'project-docs', label: 'Project docs', icon: '▤', active: false },
+      { id: 'onboarding', label: 'Onboarding texts', icon: '¶', active: false },
+      { id: 'course-groups', label: 'Course groups', icon: '⊞', active: false },
+    ]},
+    { group: 'System', items: [
+      { id: 'timezone', label: 'Time zone', icon: '◷', active: false },
+      { id: 'access', label: 'Access & roles', icon: '🔒', locked: true },
+    ]},
+  ];
+
+  const ACTIVE_BY_SCREEN = {
+    emails: 'emails',
+    editor: 'emails',
+    programs: 'certificates',
+    appearance: 'appearance',
+  };
+
+  function renderSidebar(containerId, activeId, variant) {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    el.innerHTML = `
+      <div class="sidebar-title">Settings</div>
+      ${NAV.map((g, gi) => `
+        <div class="nav-group${variant === 'c' && gi > 1 ? '' : ''}" ${variant === 'c' ? `data-group="${g.group}"` : ''}>
+          ${variant === 'c'
+            ? `<div class="nav-group-header" onclick="this.parentElement.classList.toggle('collapsed')">${g.group} <span>▾</span></div>`
+            : variant === 'b' ? '' : `<div class="nav-group-label">${g.group}</div>`
+          }
+          ${g.items.map(item => `
+            <div class="nav-item${item.id === activeId ? ' active' : ''}">
+              <span class="icon">${item.icon}</span>
+              ${item.label}
+              ${item.badge ? `<span class="nav-badge">${item.badge}</span>` : ''}
+              ${item.soon ? '<span class="badge-soon">Soon</span>' : ''}
+              ${item.locked ? '<span class="badge-lock">🔒</span>' : ''}
+            </div>
+          `).join('')}
+        </div>
+        ${gi < NAV.length - 1 && variant !== 'b' ? '<div class="sidebar-divider"></div>' : ''}
+      `).join('')}
+    `;
+  }
+
+  function applyVariant(variant) {
+    document.querySelectorAll('.app-shell').forEach(shell => {
+      shell.className = 'app-shell variant-' + variant;
+    });
+    const activeScreen = document.querySelector('.screen.active')?.id?.replace('screen-', '');
+    if (activeScreen && activeScreen !== 'ia') {
+      initSidebars(activeScreen);
+    }
+  }
+
+  function initSidebars(screen) {
+    const activeId = ACTIVE_BY_SCREEN[screen];
+    const variant = document.querySelector('.variant-tab.active')?.dataset.variant || 'a';
+    ['emails', 'editor', 'programs', 'appearance'].forEach(s => {
+      if (document.getElementById('sidebar-' + s)) {
+        renderSidebar('sidebar-' + s, s === screen ? activeId : activeId, variant);
+      }
+    });
+    renderSidebar('sidebar-' + screen, activeId, variant);
+  }
+
+  document.querySelectorAll('.screen-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.screen-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      tab.classList.add('active');
+      const screen = tab.dataset.screen;
+      document.getElementById('screen-' + screen).classList.add('active');
+      document.getElementById('variantTabs').style.display = screen === 'ia' ? 'none' : 'flex';
+      if (screen !== 'ia') initSidebars(screen);
+    });
+  });
+
+  document.querySelectorAll('.variant-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.variant-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      applyVariant(tab.dataset.variant);
+    });
+  });
+
+  initSidebars('emails');
+</script>
+</body>
+</html>

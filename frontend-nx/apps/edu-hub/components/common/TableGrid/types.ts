@@ -56,6 +56,15 @@ export interface TableGridProps<T extends BaseRow> {
   compactRows?: boolean;
   /** When true, wraps the table in a rounded card (e.g. course page sections) */
   rounded?: boolean;
+  /** Navigate to full-page editor on chevron click (mutually exclusive with expandableRowComponent). */
+  rowHref?: (row: T) => string;
+  onRowNavigate?: (row: T) => void;
+  /** When false, the row delete control is disabled (TableGrid delete column). */
+  canDeleteRow?: (row: T) => boolean;
+  /** GraphQL variable name for delete mutation (default: id). */
+  deleteVariableName?: string;
+  /** Return an error message when delete response indicates failure (e.g. Hasura actions). */
+  validateDeleteResult?: (data: unknown) => string | null;
 }
 
 export interface UseTableGridProps<V> {
@@ -77,4 +86,7 @@ export interface TableGridDeleteButtonProps {
   deletionConfirmationQuestion?: string;
   /** Overrides the Hasura role used for the delete mutation (defaults to the current session role). */
   role?: AuthRoles;
+  deleteVariableName?: string;
+  disabled?: boolean;
+  validateDeleteResult?: (data: unknown) => string | null;
 }

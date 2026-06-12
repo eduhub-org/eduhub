@@ -1887,6 +1887,7 @@
         "title": "Titel",
         "pdf": "PDF",
         "upload": "Hochladen",
+        "usage": "Verwendet in",
         "default": "Standard",
         "actions": "Aktionen"
       },
@@ -1903,14 +1904,36 @@
       },
       "delete_dialog": {
         "title": "Dokumentationsanleitung löschen",
-        "question": "„{title}“ löschen? Alle Projekte, die noch darauf verweisen, müssen vorher bearbeitet werden.",
+        "question": "„{title}“ wirklich löschen? In allen Projekten, die diese Anleitung nutzen, wird die Standard-Anleitung für den jeweiligen Projekttyp gesetzt.",
         "confirm": "Löschen"
       },
       "error": {
         "duplicate_title": "Eine Anleitung mit diesem Titel existiert bereits.",
         "set_default_failed": "Standard konnte nicht geändert werden. Bitte erneut versuchen.",
+        "delete_failed": "Die Anleitung konnte nicht gelöscht werden.",
         "pdf_upload_failed": "Das PDF konnte nicht hochgeladen werden. Die Anleitung wurde nicht gespeichert.",
         "create_failed": "Die Anleitung konnte nicht angelegt werden."
+      }
+    },
+    "projectTypes": {
+      "help_text": "Lege die Standard-Leistungszertifikat-Vorlage und die Standard-Dokumentationsanleitung für jeden Projekttyp fest.",
+      "manage_instructions_link": "Dokumentationsanleitungen verwalten",
+      "none_option": "(keine)",
+      "no_instructions": "Noch keine Anleitungen",
+      "column": {
+        "project_type": "Projekttyp",
+        "achievement_template": "Leistungszertifikat-Vorlage",
+        "default_instruction": "Standard-Dokumentationsanleitung"
+      }
+    },
+    "attendanceCertificates": {
+      "loading": "Zertifikat-Vorlagen werden geladen…",
+      "html_editor": {
+        "label": "HTML-Vorlagen für Teilnahmezertifikate",
+        "help_text": "Bearbeite das in der Datenbank gespeicherte Jinja2-HTML.",
+        "template_select": "Vorlage",
+        "no_templates": "Keine Zertifikat-Vorlagen gefunden.",
+        "preview_label": "A4-Vorschau (Beispieldaten)"
       }
     },
     "default_attendance_certificate_template": {
@@ -2189,6 +2212,9 @@
     "default_templates_explanation": "Dies sind die Standard-E-Mail-Vorlagen, die app-weit verwendet werden. Du kannst auch kurs-spezifische Vorlagen in der Kursverwaltung definieren, indem du auf den entsprechenden Button in der erweiterbaren Zeile des Kurses klickst.",
     "course_specific_explanation": "Diese E-Mail-Vorlagen sind spezifisch für diesen Kurs und überschreiben die Standard-Vorlagen beim Versenden von E-Mails für diesen Kurs.",
     "back_to_courses": "Zurück zu Kursen",
+    "editor": {
+      "not_found": "E-Mail-Vorlage nicht gefunden."
+    },
     "columns": {
       "title": "Vorlagen-Typ",
       "subject": "E-Mail-Betreffzeile",
@@ -2316,6 +2342,62 @@
     "title": "Einstellungen",
     "subtitle": "Plattformweite Konfiguration. Änderungen werden sofort wirksam.",
     "back_to_settings": "Zurück zu den Einstellungen",
+    "overview_lead": "Wähle einen Bereich, um plattformweite Voreinstellungen und Inhalte zu konfigurieren.",
+    "nav": {
+      "mobile_label": "Einstellungsbereich",
+      "groups": {
+        "platform": "Plattform",
+        "notifications": "Benachrichtigungen",
+        "programs": "Programme",
+        "system": "System"
+      },
+      "items": {
+        "appearance": {
+          "label": "Erscheinungsbild",
+          "description": "Farben und Texte des News-Banners"
+        },
+        "homepage": {
+          "label": "Startseiten-Inhalte",
+          "description": "FAQ-Bereich auf der Startseite"
+        },
+        "emails": {
+          "label": "E-Mail-Vorlagen",
+          "description": "Automatische E-Mails an Teilnehmende und Kursleitungen"
+        },
+        "programs": {
+          "label": "Programme verwalten",
+          "description": "Programme anlegen, bearbeiten und veröffentlichen"
+        },
+        "attendance-certificates": {
+          "label": "Teilnahmezertifikate",
+          "description": "HTML-Vorlagen und Programmtyp-Voreinstellungen für Teilnahmezertifikate"
+        },
+        "project-types": {
+          "label": "Projekttypen",
+          "description": "Standard-Leistungszertifikate und Dokumentationsanleitungen pro Projekttyp"
+        },
+        "documentation-instructions": {
+          "label": "Dokumentationsanleitungen",
+          "description": "PDF-Anleitungen verwalten, die Projekten zugeordnet werden"
+        },
+        "onboarding-texts": {
+          "label": "Onboarding-Texte",
+          "description": "Texte während des Teilnehmer-Onboardings"
+        },
+        "course-groups": {
+          "label": "Kursgruppen",
+          "description": "Reihenfolge und Sichtbarkeit der Kursgruppen auf der Startseite"
+        },
+        "time-zone": {
+          "label": "Zeitzone",
+          "description": "Standard-Zeitzone für Datums- und Zeitangaben"
+        },
+        "access": {
+          "label": "Zugriff & Rollen",
+          "description": "Admin-Nutzer und Organisationsrollen"
+        }
+      }
+    },
     "groups": {
       "appearance": {
         "label": "Erscheinungsbild",

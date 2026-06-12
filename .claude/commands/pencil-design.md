@@ -73,6 +73,81 @@ tokens from `frontend-nx/apps/edu-hub/.cursor/rules/theme-and-styling.mdc`
 (brand green, label/fill/border roles). Pencil variables can stand in for
 those roles even if the hex values are approximations.
 
+## EduHub color schema (use variables, never hard-coded hex)
+
+EduHub screens are **dark by default**, with **light "content" surfaces**
+(TableGrid rows, editors, A4 previews, dialogs use the `.light` theme in code).
+Seed both sets once with `set_variables`, then reference tokens as `$name`
+(e.g. `$brand`). Mirror `frontend-nx/apps/edu-hub/styles/globals.css`:
+
+```
+# Dark surface + functional (globals.css :root)
+brand #00A398 · brand-light #00C4B8 · brand-dark #008078
+bg-primary #222222 · bg-secondary #333333 · bg-card #2A2A2A · bg-deep #0F0F0F
+border #444444
+label-primary #F2F2F2 · label-secondary #D8D8D8 · label-muted #888888
+success #A2EBA0 · warning #FFA665 · error #D45A5A · info #1982fc · white #FFFFFF
+
+# Light surfaces (globals.css .light) — text/borders on white cards
+on-light-primary #222222 · on-light-secondary #666666 · on-light-muted #999999
+light-border #D8D8D8 · light-divider #E5E5E5 · light-bg-secondary #F2F2F2
+```
+
+Rules:
+
+- **Dark chrome**: `$bg-primary`/`$bg-secondary`/`$bg-card`/`$bg-deep`,
+  text `$label-primary`/`$label-secondary`/`$label-muted`, borders `$border`,
+  accent `$brand`.
+- **White surfaces** (`fill: "$white"`): text `$on-light-primary` /
+  `$on-light-secondary` / `$on-light-muted`; borders `$light-border`; row
+  dividers and the TableGrid expand column `$light-divider`; subtle inner
+  panels `$light-bg-secondary`.
+- **Destructive** uses `$error` (e.g. TableGrid delete trash icon).
+- **No translucent tints** (Pencil fills lack alpha): active sidebar items and
+  note/callout boxes use a **solid** `$bg-secondary` / `$bg-card` fill with a
+  `$brand` accent border, not a baked `#00A398xx` tint.
+- Filled primary buttons use `fill: "$label-primary"` with `$on-light-primary`
+  text. `$fill-primary` is **not** a token (resolves to black) — do not use it.
+
+## EduHub standard component layouts
+
+Replicate the structure/sizing of these real components (`components/common/`):
+
+- **Settings sidebar**: width `240`, `fill: "$bg-deep"`, `padding: [20,0]`,
+  right `$border`. Group label (10px `$label-muted`) then nav items height `36`,
+  `padding: [0,16]`, 13px `$label-secondary`. **Active** = `$bg-secondary` fill
+  + 3px left `$brand` border + `$brand` text. Clickable "Settings" title
+  (chevron-left + label, `$brand`) returns to the overview.
+- **TableGrid**: rounded `12`, `clip`, `$border`. Header height `48`,
+  `fill: "$bg-secondary"`, 12px/600 `$label-secondary` cells. Rows on `$white`,
+  height `48–64`, bottom `$light-divider`, text `$on-light-primary`. Built-in
+  **toolbar above the table** (space-between): **AddButton left**, **Search
+  right**. **Delete column** = `80` wide, transparent, centered `$error`
+  `trash-2` (faint `$light-divider` when disabled). **Expand column** = `40`
+  wide, `$light-divider`, `chevron-down`/`chevron-right`.
+- **AddButton**: rounded-full, `fill: "$label-primary"`, `padding ~[9,16]`,
+  `circle-plus` icon + label, both `$on-light-primary`.
+- **Search field**: width `256`, height `40`, `fill: "$bg-card"`, `$border`,
+  cornerRadius `4`, "Search" `$label-secondary` + `search` icon.
+- **Button**: rounded-full. Outline = transparent + 2px border + label. Filled
+  = `$label-primary` (dark page) or `$on-light-primary` (light dialog) with
+  contrasting text.
+- **Dialog** (`DialogShell` + `QuestionConfirmationDialog`): **light/white**
+  card (`fill: "$white"`, `$light-border`, rounded `8`, width ~`480`). Top =
+  title `$on-light-primary` + `x` close `$on-light-secondary`. Body = plain
+  text `$on-light-primary` (full message incl. consequences in the `question`
+  string). Actions = Cancel (outline pill) + Confirm (filled `$on-light-primary`
+  pill, `$white` text). Backdrop = solid `$bg-deep`.
+- **Inputs / dropdowns on white**: `$white`, `$light-border`, cornerRadius
+  `6–8`; dropdowns space-between with a `chevron-down` `$on-light-secondary`.
+- **Cards / panels**: `$bg-card`, `$border`, cornerRadius `12`, padding `16–20`.
+- **EmailEditor** (reused for certificate HTML): full-width subject input
+  (`$white`); header with a **Visual/HTML** toggle (`$bg-secondary` track,
+  active segment `$bg-primary` + `$brand`); formatting toolbar (`$white`,
+  `$light-divider` divider, `$on-light-secondary` icons); variable **chips**
+  (`$light-border` outline, `$on-light-secondary` text); editor area (`$white`);
+  separate preview block.
+
 ## Output reporting
 
 When you finish a Pencil task, mention:

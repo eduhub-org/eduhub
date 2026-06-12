@@ -7,6 +7,15 @@
 // GraphQL query operation: ProjectTypes
 // ====================================================
 
+export interface ProjectTypes_ProjectType_CertificateTemplate {
+  __typename: "CertificateTemplate";
+  id: number;
+  /**
+   * Human-readable, unique identifier (e.g. "Default achievement certificate", "Degree certificate - Digital Innovation").
+   */
+  name: string;
+}
+
 export interface ProjectTypes_ProjectType {
   __typename: "ProjectType";
   value: string;
@@ -30,6 +39,14 @@ export interface ProjectTypes_ProjectType {
    * When true, project.coverImageUrl must be present before submission and for showcase publication.
    */
   requiresCoverImage: boolean;
+  /**
+   * Default achievement-certificate template for projects of this type. Used when Course.achievementCertificateTemplateId is NULL on the project's course.
+   */
+  certificateTemplateId: number | null;
+  /**
+   * An object relationship
+   */
+  CertificateTemplate: ProjectTypes_ProjectType_CertificateTemplate | null;
 }
 
 export interface ProjectTypes {

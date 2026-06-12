@@ -15,6 +15,9 @@ import {
   UpdateProgramTypeDefaultAttendanceCertificateTemplateVariables,
 } from '../../../queries/__generated__/UpdateProgramTypeDefaultAttendanceCertificateTemplate';
 
+/** Degree programs use per-course achievement templates, not attendance certificates. */
+const PROGRAM_TYPES_WITH_ATTENDANCE_DEFAULT = new Set(['COURSES', 'EVENTS']);
+
 const DefaultCertificateTemplatesSection: FC = () => {
   const t = useTranslations('manageAppSettings');
 
@@ -37,7 +40,9 @@ const DefaultCertificateTemplatesSection: FC = () => {
         {t('default_attendance_certificate_template.help_text')}
       </p>
       <div className="space-y-4">
-        {(programTypeDefaultsData?.ProgramType ?? []).map((row) => (
+        {(programTypeDefaultsData?.ProgramType ?? [])
+          .filter((row) => PROGRAM_TYPES_WITH_ATTENDANCE_DEFAULT.has(row.value))
+          .map((row) => (
           <div key={row.value}>
             <label className="block text-base font-medium text-gray-300 mb-2">
               {t(`programTypes.${row.value}`)}
