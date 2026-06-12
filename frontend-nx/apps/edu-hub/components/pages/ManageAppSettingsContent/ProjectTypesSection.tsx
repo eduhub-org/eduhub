@@ -8,7 +8,11 @@ import DropDownSelector from '../../inputs/DropDownSelector';
 import { Button } from '../../common/Button';
 import { useAdminQuery } from '../../../hooks/authedQuery';
 import { useAdminMutation } from '../../../hooks/authedMutation';
-import { PROJECT_TYPES, UPDATE_PROJECT_TYPE_CERTIFICATE_TEMPLATE } from '../../../queries/project';
+import {
+  PROJECT_DOCUMENTATION_INSTRUCTIONS,
+  PROJECT_TYPES,
+  UPDATE_PROJECT_TYPE_CERTIFICATE_TEMPLATE,
+} from '../../../queries/project';
 import { ProjectTypes } from '../../../queries/__generated__/ProjectTypes';
 import {
   UpdateProjectTypeCertificateTemplate,
@@ -16,10 +20,7 @@ import {
 } from '../../../queries/__generated__/UpdateProjectTypeCertificateTemplate';
 import { CERTIFICATE_TEMPLATES } from '../../../queries/certificateTemplates';
 import { CertificateTemplates } from '../../../queries/__generated__/CertificateTemplates';
-import {
-  PROJECT_DOCUMENTATION_INSTRUCTIONS,
-  SET_PROJECT_DOCUMENTATION_INSTRUCTION_DEFAULT,
-} from '../../../queries/projectDocumentationInstruction';
+import { SET_PROJECT_DOCUMENTATION_INSTRUCTION_DEFAULT } from '../../../queries/projectDocumentationInstruction';
 import { ProjectDocumentationInstructions } from '../../../queries/__generated__/ProjectDocumentationInstructions';
 import {
   SetProjectDocumentationInstructionDefault,
@@ -60,7 +61,7 @@ const ProjectTypesSection: FC = () => {
   );
 
   const instructionsByType = useMemo(() => {
-    const map = new Map<string, ProjectDocumentationInstructions['ProjectDocumentationInstruction']>();
+    const map = new Map<string, ProjectDocumentationInstructions['ProjectDocumentationInstruction'][number]>();
     (instructionsData?.ProjectDocumentationInstruction ?? []).forEach((instr) => {
       if (instr.isDefault) {
         map.set(instr.projectTypeValue, instr);

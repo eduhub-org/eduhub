@@ -104,7 +104,7 @@ const ManageEmailTemplateEditor: FC<ManageEmailTemplateEditorProps> = ({ templat
   const typeLabel = getTranslation(
     t,
     `template_types.${template.type}`,
-    template.type
+    template.type ?? ''
   );
 
   return (
@@ -147,7 +147,7 @@ const ManageEmailTemplateEditor: FC<ManageEmailTemplateEditorProps> = ({ templat
           placeholder={t('placeholders.body')}
           maxLength={5000}
           className="w-full"
-          templateType={template.type}
+          templateType={template.type ?? undefined}
         />
       </div>
 
