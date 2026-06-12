@@ -292,7 +292,7 @@ resource "google_cloudfunctions2_function" "call_node_function" {
   description = "Calls a node function specificed via the function header."
 
   build_config {
-    runtime     = "nodejs20"
+    runtime     = "nodejs22"
     entry_point = "callNodeFunction"
     environment_variables = {
       # Causes a re-deploy of the function when the source changes
@@ -446,7 +446,7 @@ resource "google_cloudfunctions2_function" "send_mail" {
   description = "Sends an email as defined in the Hasura mail log table"
 
   build_config {
-    runtime     = "nodejs20"
+    runtime     = "nodejs22"
     entry_point = "sendMail"
     environment_variables = {
       # Causes a re-deploy of the function when the source changes
@@ -538,7 +538,7 @@ resource "google_cloudfunctions2_function" "add_keycloak_role" {
   description = "Adds role mapping for given role for keycloak hasura client"
 
   build_config {
-    runtime     = "nodejs20"
+    runtime     = "nodejs22"
     entry_point = "addKeycloakRole"
     environment_variables = {
       # Causes a re-deploy of the function when the source changes
@@ -602,7 +602,7 @@ resource "google_cloudfunctions2_function" "remove_keycloak_role" {
   description = "Removes role mapping for given role from keycloak hasura client once the backing grant is gone"
 
   build_config {
-    runtime     = "nodejs20"
+    runtime     = "nodejs22"
     entry_point = "removeKeycloakRole"
     environment_variables = {
       # Causes a re-deploy of the function when the source changes
@@ -674,7 +674,7 @@ resource "google_cloudfunctions2_function" "update_from_keycloak" {
   description = "Looks up keycloak user of given uuid and creates new hasura user if necessary or updates existing"
 
   build_config {
-    runtime     = "nodejs20"
+    runtime     = "nodejs22"
     entry_point = "updateFromKeycloak"
     environment_variables = {
       # Causes a re-deploy of the function when the source changes
@@ -747,7 +747,7 @@ resource "google_cloudfunctions2_function" "send_questionaires" {
   description = "send out questionaires for published past sessions"
 
   build_config {
-    runtime     = "nodejs20"
+    runtime     = "nodejs22"
     entry_point = "sendQuestionaires"
     environment_variables = {
       # Causes a re-deploy of the function when the source changes
