@@ -5,28 +5,24 @@ import { logger } from '../index.js';
 const getAdminUsers = async (req) => {
   try {
     const keycloakToken = await getKeycloakToken();
+    const authHeaders = { headers: { Authorization: `Bearer ${keycloakToken}` } };
+    const realmUrl = `${process.env.KEYCLOAK_URL}/admin/realms/edu-hub`;
 
-    // First get all users
-    const usersResponse = await axios.get(
-      `${process.env.KEYCLOAK_URL}/admin/realms/edu-hub/users`,
-      {
-        headers: {
-          Authorization: `Bearer ${keycloakToken}`,
-        },
-      }
+    // Super-admin is modeled as the "admin" role on the "hasura" client (not a realm role),
+    // matching addKeycloakRole and the Hasura JWT role mapping. Resolve the client by clientId so we
+    // do not depend on a hardcoded client uuid that differs between environments.
+    const clientsResponse = await axios.get(`${realmUrl}/clients?clientId=hasura`, authHeaders);
+    const hasuraClient = clientsResponse.data[0];
+    if (!hasuraClient) {
+      throw new Error('Hasura client not found in Keycloak');
+    }
+
+    const adminRoleUsers = await axios.get(
+      `${realmUrl}/clients/${hasuraClient.id}/roles/admin/users`,
+      authHeaders
     );
 
-    // Then get all users with admin role
-    const adminRole = await axios.get(
-      `${process.env.KEYCLOAK_URL}/admin/realms/edu-hub/roles/admin/users`,
-      {
-        headers: {
-          Authorization: `Bearer ${keycloakToken}`,
-        },
-      }
-    );
-
-    const adminUserIds = adminRole.data.map(user => user.id);
+    const adminUserIds = adminRoleUsers.data.map((user) => user.id);
 
     return {
       success: true,
@@ -45,4 +41,4 @@ const getAdminUsers = async (req) => {
   }
 };
 
-export default getAdminUsers; 
+export default getAdminUsers;

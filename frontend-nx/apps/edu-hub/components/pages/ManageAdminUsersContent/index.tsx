@@ -1,6 +1,7 @@
 import { FC, ReactNode, useMemo, useCallback, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { ColumnDef } from '@tanstack/react-table';
+import { MdStar } from 'react-icons/md';
 
 import TableGrid from '../../common/TableGrid';
 import Loading from '../../common/Loading';
@@ -58,7 +59,7 @@ const ExpandableUserRow: FC<{
           },
         });
 
-        if (response.data?.success) {
+        if (response.data?.updateUserAdminStatus?.success) {
           onAdminStatusChange();
         }
       } catch (error) {
@@ -123,7 +124,6 @@ const ExpandableUserRow: FC<{
             label={t('is_super_admin')}
             checked={isSuperAdmin}
             onValueUpdated={handleAdminToggle}
-            refetchQueries={['GetAdminUsers']}
           />
         </div>
       )}
@@ -139,9 +139,9 @@ const ManageAdminUsersContent: FC = () => {
   const [adminUserIds, setAdminUserIds] = useState<string[]>([]);
   const [adminError, setAdminError] = useState<Error | null>(null);
 
-  // The super-admin (Admin table) list drives only the super-admin toggle, which is shown to
-  // super-admins only. It is also an admin-only action, so org admins must not request it.
-  useAdminQuery(ADMIN_USERS, {
+  // The super-admin list drives only the super-admin toggle, which is shown to super-admins only.
+  // It is also an admin-only action, so org admins must not request it.
+  const { refetch: refetchAdminUsers } = useAdminQuery(ADMIN_USERS, {
     skip: !isAdmin,
     onCompleted: (data) => {
       if (data?.getAdminUsers?.success) {
@@ -153,6 +153,20 @@ const ManageAdminUsersContent: FC = () => {
       setAdminError(error);
     },
   });
+
+  // The super-admin checkbox is controlled by `adminUserIds` (derived from the AdminUsers query),
+  // which is held in local state. After a toggle we must refetch that query and refresh the state so
+  // the checkbox and "Super Admin" marker reflect the change (refetching the grid query does not).
+  const handleAdminStatusChange = useCallback(async () => {
+    try {
+      const { data: adminData } = await refetchAdminUsers();
+      if (adminData?.getAdminUsers?.success) {
+        setAdminUserIds(adminData.getAdminUsers.adminUserIds);
+      }
+    } catch (refetchError) {
+      console.error('Error refreshing admin users:', refetchError);
+    }
+  }, [refetchAdminUsers]);
 
   // Org admins see only the grants of organizations they administer (enforced by the org_admin
   // select permission); super-admins see all. useManageQuery pins the role accordingly.
@@ -209,25 +223,17 @@ const ManageAdminUsersContent: FC = () => {
 
   const canAddAdmins = organizationOptions.length > 0;
 
-  const columns = useMemo<ColumnDef<OrganizationAdminList_OrganizationAdmin>[]>(
-    () => [
+  const columns = useMemo<ColumnDef<OrganizationAdminList_OrganizationAdmin>[]>(() => {
+    const baseColumns: ColumnDef<OrganizationAdminList_OrganizationAdmin>[] = [
       {
-        // The organization the user administers. The grant's organization is always shown (the row's
+        // The organization the user administers. The grant's organization is always shown: the row's
         // capability toggles and delete action target that specific grant, so it must stay
-        // identifiable even for super-admins with several grants); super-admins additionally get a
-        // "Super Admin" marker next to the organization name.
+        // identifiable even for super-admins with several grants.
         header: t('organization'),
         accessorKey: 'Organization.name',
         enableSorting: true,
         size: 180,
-        cell: ({ row, getValue }) => (
-          <div className="truncate">
-            {adminUserIds.includes(row.original.User?.id) && (
-              <span className="font-medium mr-2">{t('super_admin_label')}</span>
-            )}
-            {getValue<ReactNode>()}
-          </div>
-        ),
+        cell: ({ getValue }) => <div className="truncate">{getValue<ReactNode>()}</div>,
       },
       {
         header: t('first_name'),
@@ -259,9 +265,32 @@ const ManageAdminUsersContent: FC = () => {
         size: 220,
         cell: ({ getValue }) => <div className="truncate">{getValue<ReactNode>()}</div>,
       },
-    ],
-    [t, adminUserIds]
-  );
+    ];
+
+    // Only super-admins can see super-admin status (adminUserIds is empty for org admins), so the
+    // marker column is added for them only. It is kept short and shows a star icon (with a tooltip)
+    // instead of inline text, which would otherwise crowd the organization name.
+    if (!isAdmin) {
+      return baseColumns;
+    }
+
+    return [
+      {
+        id: 'superAdmin',
+        header: '',
+        enableSorting: false,
+        size: 44,
+        meta: { align: 'center' },
+        cell: ({ row }) =>
+          adminUserIds.includes(row.original.User?.id) ? (
+            <div className="flex justify-center" title={t('super_admin_label')}>
+              <MdStar className="text-brand" size="1.25em" aria-label={t('super_admin_label')} />
+            </div>
+          ) : null,
+      },
+      ...baseColumns,
+    ];
+  }, [t, adminUserIds, isAdmin]);
 
   const generateDeletionConfirmation = useCallback(
     (row: OrganizationAdminList_OrganizationAdmin) => {
@@ -298,13 +327,13 @@ const ManageAdminUsersContent: FC = () => {
               role={manageRole}
               error={error}
               loading={loading}
-              refetchQueries={['UsersByLastName', 'GetAdminUsers']}
+              refetchQueries={['OrganizationAdminList', 'AdminUsers']}
               generateDeletionConfirmationQuestion={generateDeletionConfirmation}
               expandableRowComponent={({ row }) => (
                 <ExpandableUserRow
                   row={row}
                   isSuperAdmin={adminUserIds.includes(row.User?.id)}
-                  onAdminStatusChange={() => refetch()}
+                  onAdminStatusChange={handleAdminStatusChange}
                 />
               )}
             />

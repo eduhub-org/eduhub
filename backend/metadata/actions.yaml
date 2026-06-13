@@ -456,7 +456,7 @@ actions:
         - name: bucket
           value_from_env: HASURA_BUCKET
         - name: name
-          value: setUserAdmin
+          value: updateAdminUser
   - name: validateFormbricksSurvey
     definition:
       kind: synchronous
