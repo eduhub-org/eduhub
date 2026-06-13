@@ -4,13 +4,15 @@ import { useDebouncedCallback } from 'use-debounce';
 import useErrorHandler from '../../../hooks/useErrorHandler';
 import { gql } from '@apollo/client';
 import { DocumentNode } from 'graphql';
+import { AuthRoles } from '../../../types/enums';
 
 export const useCheckboxLogic = (
   checked: boolean,
   updateValueMutation: DocumentNode | null,
   identifierVariables: Record<string, unknown>,
   onValueUpdated: (value: unknown) => void,
-  refetchQueries: string[]
+  refetchQueries: string[],
+  role?: AuthRoles
 ) => {
   const [localChecked, setLocalChecked] = useState(checked);
   const { error, handleError, resetError } = useErrorHandler();
@@ -31,6 +33,7 @@ export const useCheckboxLogic = (
         setShowSavedNotification(true);
       },
       refetchQueries,
+      ...(role ? { context: { role } } : {}),
     }
   );
 

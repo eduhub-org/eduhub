@@ -10,6 +10,9 @@
 export interface UpdateProjectDocumentationInstruction_update_Project_by_pk {
   __typename: "Project";
   id: number;
+  /**
+   * FK to ProjectDocumentationInstruction.id. Must match Project.type (trigger Project_instruction_matches_type_trg). Instruction PDF describes deliverable composition; enforced uploads are only those required by the project type.
+   */
   documentationInstructionId: number | null;
 }
 

@@ -27,6 +27,7 @@ export interface CourseTilesByOrganization_Course_Program {
    * Controls whether course tiles should show an extended application period banner after the program deadline has passed while individual course deadlines are still open.
    */
   showExtendedApplicationPeriodBanner: boolean;
+  type: string;
 }
 
 export interface CourseTilesByOrganization_Course_CourseLocations {
@@ -39,6 +40,7 @@ export interface CourseTilesByOrganization_Course_CourseLocations {
 
 export interface CourseTilesByOrganization_Course_CourseGroups_CourseGroupOption {
   __typename: "CourseGroupOption";
+  id: number;
   order: number;
   title: string;
 }

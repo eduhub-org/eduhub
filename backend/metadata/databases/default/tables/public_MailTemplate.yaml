@@ -27,3 +27,59 @@ select_permissions:
               CourseInstructors:
                 userId:
                   _eq: X-Hasura-User-Id
+  # Org admins read system default templates (courseId null) and course-specific templates for
+  # courses they may manage (same program-type capability rules as Course org_admin_access writes).
+  - role: org_admin_access
+    permission:
+      columns:
+        - id
+        - type
+        - courseId
+        - subject
+        - content
+        - from
+        - cc
+        - bcc
+        - created_at
+        - updated_at
+      filter:
+        _or:
+          - courseId:
+              _is_null: true
+          - Course:
+              Program:
+                _and:
+                  - type:
+                      _eq: EVENTS
+                  - Organization:
+                      OrganizationAdmins:
+                        _and:
+                          - userId:
+                              _eq: X-Hasura-User-Id
+                          - canManageEvents:
+                              _eq: true
+          - Course:
+              Program:
+                _and:
+                  - type:
+                      _eq: COURSES
+                  - Organization:
+                      OrganizationAdmins:
+                        _and:
+                          - userId:
+                              _eq: X-Hasura-User-Id
+                          - canManageCourses:
+                              _eq: true
+          - Course:
+              Program:
+                _and:
+                  - type:
+                      _eq: DEGREES
+                  - Organization:
+                      OrganizationAdmins:
+                        _and:
+                          - userId:
+                              _eq: X-Hasura-User-Id
+                          - canManageDegrees:
+                              _eq: true
+      allow_aggregations: true

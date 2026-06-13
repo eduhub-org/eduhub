@@ -21,6 +21,6 @@ export interface UpdateOrganizationAdminCanManageCourses {
 }
 
 export interface UpdateOrganizationAdminCanManageCoursesVariables {
-  id: number;
-  canManageCourses: boolean;
+  itemId: number;
+  value: boolean;
 }

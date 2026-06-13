@@ -1,0 +1,142 @@
+/* EduHub Web UI Kit — shared styles.
+   Follows .cursor/rules/theme-and-styling.mdc:
+   colors are consumed as semantic --eduhub-* tokens (defined in
+   ../../colors_and_type.css), never hardcoded. Light-on-dark sections
+   carry the `.light` class, which inverts the same tokens.
+   Literal values are reserved for: white text directly over photos
+   (matches `text-white` in the product) and black rgba photo-protection
+   gradients (matches the product's inline gradients). */
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:var(--font-body);
+  font-weight:var(--fw-medium);
+  background:var(--eduhub-bg-primary);
+  color:var(--eduhub-label-primary);
+  -webkit-font-smoothing:antialiased;
+}
+#root{min-height:100vh;display:flex;flex-direction:column}
+a{color:inherit;text-decoration:none}
+button{font-family:var(--font-body)}
+
+.container{max-width:1280px;margin:0 auto;padding:0 16px;width:100%}
+@media(min-width:768px){.container{padding:0 64px}}
+
+/* ---- Button (mirrors common/Button.tsx) ---- */
+.eh-btn{
+  border-radius:9999px;padding:9px 22px;font-weight:var(--fw-medium);font-size:15px;
+  border:2px solid var(--eduhub-border-secondary);color:var(--eduhub-label-primary);background:transparent;
+  cursor:pointer;transition:border-color .2s ease,background-color .2s ease,color .2s;
+  white-space:nowrap;display:inline-flex;align-items:center;gap:8px;
+}
+.eh-btn:hover{border-color:var(--eduhub-brand)}
+/* filled = bg-label-primary text-fill-primary (per Button.tsx) */
+.eh-btn--filled{background:var(--eduhub-label-primary);color:var(--eduhub-fill-primary);border-color:var(--eduhub-label-primary)}
+.eh-btn--filled:hover{border-color:var(--eduhub-brand-light)}
+.eh-btn--brand{background:var(--eduhub-brand);color:#fff;border-color:var(--eduhub-brand)}
+.eh-btn--brand:hover{border-color:var(--eduhub-brand-light);background:var(--eduhub-brand-light)}
+.eh-btn--sm{padding:7px 16px;font-size:14px}
+.eh-btn:disabled{background:var(--eduhub-fill-disabled);color:var(--eduhub-label-disabled);border-color:var(--eduhub-fill-disabled);cursor:not-allowed}
+
+/* ---- Header (transparent bar over hero, rgba(34,34,34,.5) per Header.tsx) ---- */
+.eh-header{position:absolute;top:0;left:0;right:0;z-index:40;background:rgba(34,34,34,.5)}
+.eh-header__inner{display:flex;align-items:center;justify-content:space-between;padding:16px 0}
+.eh-logo{display:flex;align-items:center;gap:10px;cursor:pointer}
+.eh-logo img.ring{width:34px;height:34px}
+.eh-logo img.word{height:28px;filter:brightness(0) invert(1)}
+.eh-header__right{display:flex;align-items:center;gap:18px}
+.eh-lang{color:#fff;font-size:15px;display:flex;gap:8px;align-items:center}
+.eh-lang button{background:none;border:none;color:#fff;cursor:pointer;font-size:15px;padding:0}
+.eh-lang .on{font-weight:var(--fw-bold)}
+.eh-lang .off{font-weight:var(--fw-thin);opacity:.8}
+.eh-avatar{width:38px;height:38px;border-radius:50%;background:var(--eduhub-brand);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:var(--fw-semibold);cursor:pointer;border:2px solid rgba(255,255,255,.5)}
+
+/* ---- Account menu (.light dropdown, per Menu.tsx) ---- */
+.eh-menu{position:absolute;right:0;top:52px;min-width:225px;background:var(--eduhub-fill-primary);color:var(--eduhub-label-primary);border-radius:8px;box-shadow:0 4px 6px rgba(0,0,0,.12);padding:8px 0;overflow:hidden;z-index:50}
+.eh-menu__item{padding:11px 22px;font-size:17px;cursor:pointer}
+.eh-menu__item:hover{background:var(--edu-row-color)}
+.eh-menu__item.sel{background:var(--eduhub-bg-secondary);border-left:3px solid var(--eduhub-warning);padding-left:19px}
+
+/* ---- Hero (full-bleed photo + gradients to bg-deep, per index.tsx) ---- */
+.eh-hero{position:relative;min-height:100vh;display:flex;align-items:flex-end;
+  background-image:linear-gradient(360deg,#0F0F0F 0%,rgba(0,0,0,0) 12%),linear-gradient(53deg,rgba(0,0,0,.8) 16%,rgba(0,0,0,0) 79%),url('../../assets/hero-background.png');
+  background-size:cover;background-position:top center}
+.eh-hero__h{padding-bottom:180px;padding-top:120px}
+.eh-hero__h h1{font-size:clamp(54px,9vw,128px);line-height:.95;font-weight:var(--fw-medium);letter-spacing:-.01em;margin:0;color:#fff}
+
+/* ---- Course rows ---- */
+.eh-rows{margin-top:-150px;position:relative;z-index:10;padding-bottom:40px}
+.eh-row{margin-bottom:44px}
+.eh-row__title{font-size:24px;font-weight:var(--fw-semibold);margin:0 0 14px}
+.eh-row__scroll{display:flex;gap:11px;overflow-x:auto;padding-bottom:8px;scroll-snap-type:x mandatory}
+.eh-row__scroll::-webkit-scrollbar{height:8px}
+.eh-row__scroll::-webkit-scrollbar-thumb{background:var(--eduhub-border-primary);border-radius:4px}
+
+/* ---- Tile (rounded-2xl, photo top + .light body — per TileBase.tsx) ---- */
+.eh-tile{width:325px;min-width:325px;height:431px;border-radius:16px;overflow:hidden;display:flex;flex-direction:column;cursor:pointer;scroll-snap-align:start;font-weight:var(--fw-medium);transition:transform .2s}
+.eh-tile:hover{transform:translateY(-4px)}
+.eh-tile__cover{position:relative;height:230px;background-size:cover;background-position:center}
+.eh-tile__cover::after{content:"";position:absolute;inset:0;background:linear-gradient(51deg,rgba(0,0,0,.7) 17%,rgba(0,0,0,0) 85%)}
+.eh-tile__title{position:absolute;left:14px;bottom:12px;right:14px;color:#fff;font-size:30px;line-height:1.05;z-index:2}
+.eh-tile__badge{position:absolute;right:12px;top:12px;background:var(--eduhub-warning);color:var(--eduhub-label-primary);font-size:11px;font-weight:var(--fw-semibold);border-radius:9999px;padding:4px 11px;z-index:2}
+/* .light body: tokens flip → white bg, dark text */
+.eh-tile__body{flex:1;background:var(--eduhub-fill-primary);color:var(--eduhub-label-primary);padding:20px;display:flex;flex-direction:column;justify-content:space-between}
+.eh-tile__meta{display:flex;justify-content:space-between;font-size:13px;letter-spacing:.03em;color:var(--eduhub-label-primary)}
+.eh-tile__meta .lang{display:flex;align-items:center;gap:5px}
+.eh-tile__meta img{width:16px;height:16px}
+.eh-tile__tagline{font-size:18px;line-height:1.35;color:var(--eduhub-label-primary);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.eh-tile__loc{display:flex;gap:6px;font-size:12px;text-transform:uppercase;letter-spacing:.06em;align-items:center;color:var(--eduhub-label-primary)}
+.eh-tile__loc img{width:12px;height:12px}
+
+/* ---- Course detail ---- */
+.eh-detail__hero{height:384px;display:flex;align-items:flex-end;background-size:cover;background-position:center;color:#fff}
+.eh-detail__hero .container{padding-bottom:24px;font-size:clamp(32px,5vw,52px);font-weight:var(--fw-medium)}
+.eh-section{padding:0 0}
+.eh-detail__top{display:flex;gap:32px;align-items:center;flex-wrap:wrap;padding:40px 0}
+.eh-detail__top .lead{flex:1;min-width:280px}
+.eh-detail__top .lead .day{font-size:13px;opacity:.8}
+.eh-detail__top .lead .tag{font-size:24px;margin-top:8px}
+.eh-reg{flex:1;min-width:300px;max-width:440px}
+.eh-card-dark{background:var(--eduhub-bg-card);border:1px solid var(--eduhub-border-primary);border-radius:16px;padding:24px}
+.eh-reg h3{margin:0 0 4px;font-size:20px;font-weight:var(--fw-semibold)}
+.eh-reg .price{font-size:34px;font-weight:var(--fw-semibold);margin:8px 0}
+.eh-reg .price small{font-size:15px;font-weight:var(--fw-regular);opacity:.7}
+.eh-reg ul{list-style:none;padding:0;margin:14px 0;font-size:14px}
+.eh-reg li{display:flex;gap:8px;padding:5px 0;color:var(--eduhub-label-secondary)}
+.eh-reg li img{width:16px;height:16px;filter:brightness(0) invert(1);opacity:.8}
+
+.eh-twocol{display:flex;gap:48px;flex-wrap:wrap;padding:32px 0 64px}
+.eh-twocol .main{flex:1;min-width:300px}
+.eh-twocol .side{flex:1;min-width:280px;max-width:440px}
+.eh-h2{font-size:30px;font-weight:var(--fw-semibold);margin:0 0 20px}
+.eh-goals{list-style:none;padding:0;margin:0}
+.eh-goals li{padding:8px 0 8px 32px;background:url('../../assets/icon-checkmark.svg') no-repeat 0 12px;font-size:17px;color:var(--eduhub-label-secondary)}
+.eh-session{display:flex;gap:16px;padding:16px 0;border-bottom:1px solid var(--eduhub-bg-secondary)}
+.eh-session .num{width:38px;height:38px;border-radius:50%;background:var(--eduhub-bg-secondary);display:flex;align-items:center;justify-content:center;font-weight:var(--fw-semibold);flex:none}
+.eh-session .st{font-size:17px}
+.eh-session .sd{font-size:13px;opacity:.6}
+.eh-info{font-size:15px}
+.eh-info .r{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--eduhub-border-primary)}
+.eh-info .r .k{opacity:.6}
+
+/* ---- Footer (bg-deep, text-white per Footer.tsx) ---- */
+.eh-footer{margin-top:auto;background:var(--eduhub-bg-deep);color:#fff;padding:40px 0}
+.eh-footer h3 .a{font-size:24px;font-weight:var(--fw-medium)}
+.eh-footer h3 .b{font-size:20px;font-weight:var(--fw-thin)}
+.eh-footer__links{margin-top:24px;font-size:14px;font-weight:var(--fw-thin);display:flex;flex-direction:column;gap:6px}
+.eh-footer__bottom{display:flex;justify-content:space-between;align-items:center;margin-top:32px;font-size:14px;font-weight:var(--fw-thin)}
+.eh-footer__social{display:flex;gap:24px;align-items:center}
+.eh-footer__social img{width:22px;height:22px;filter:brightness(0) invert(1)}
+
+/* ---- Modal / Login (.light surface) ---- */
+.eh-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px}
+.eh-modal{background:var(--eduhub-fill-primary);color:var(--eduhub-label-primary);border-radius:12px;width:100%;max-width:400px;padding:32px;box-shadow:0 10px 40px rgba(0,0,0,.4)}
+.eh-modal h2{margin:0 0 4px;font-size:26px;font-weight:var(--fw-semibold)}
+.eh-modal p{margin:0 0 20px;font-size:14px;color:var(--eduhub-label-secondary)}
+.eh-field{margin-bottom:14px}
+.eh-field label{display:block;font-size:13px;color:var(--eduhub-label-secondary);margin-bottom:5px}
+.eh-field input{width:100%;padding:11px 14px;border:2px solid var(--eduhub-border-primary);border-radius:8px;font-family:var(--font-body);font-size:15px;background:var(--eduhub-fill-primary);color:var(--eduhub-label-primary)}
+.eh-field input:focus{outline:none;border-color:var(--eduhub-brand)}
+.eh-modal__close{float:right;background:none;border:none;font-size:22px;cursor:pointer;color:var(--eduhub-label-disabled);line-height:1;margin:-8px -8px 0 0}
+
+.eh-toast{position:fixed;left:50%;bottom:32px;transform:translateX(-50%);background:var(--eduhub-bg-card);border:1px solid var(--eduhub-brand);color:#fff;padding:14px 22px;border-radius:9999px;z-index:120;font-size:15px;box-shadow:0 6px 20px rgba(0,0,0,.4)}

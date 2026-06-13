@@ -42,8 +42,9 @@ import {
 import { useTranslations } from 'next-intl';
 import { LocationOption_enum, order_by, SessionAddress_insert_input } from '../../../../__generated__/globalTypes';
 import { useLazyRoleQuery } from '../../../../hooks/authedQuery';
-import { useIsAdmin } from '../../../../hooks/authentication';
-import { USER_SELECTION_WITH_FILTER } from '../../../../queries/user';
+import { useCurrentRole, useIsAdmin } from '../../../../hooks/authentication';
+import { useManagementRoleContext } from '../../../../hooks/managementRole';
+import { USER_SELECTION_WITH_FILTER, buildUserSelectionFilter } from '../../../../queries/user';
 
 import TableGrid from '../../../common/TableGrid';
 import { formatTruncatedList, makeFullName } from '../../../../helpers/util';
@@ -349,6 +350,9 @@ const ExpandableSessionRowContent: FC<ExpandableSessionRowContentProps> = ({ ses
   const t = useTranslations('manageCourse');
   const tCoursePage = useTranslations('coursePage');
   const tCommon = useTranslations('common');
+  const managementRole = useManagementRoleContext();
+  const currentRole = useCurrentRole();
+  const queryRole = managementRole ?? currentRole;
 
   const [createUserDialogOpen, setCreateUserDialogOpen] = useState(false);
   const [searchValueForNewUser, setSearchValueForNewUser] = useState('');
@@ -407,9 +411,12 @@ const ExpandableSessionRowContent: FC<ExpandableSessionRowContentProps> = ({ ses
         const { data } = await fetchUserByEmail({
           variables: {
             limit: 100,
-            filter: {
-              _or: [{ id: { _eq: userId } }, { email: { _ilike: `%${email}%` } }],
-            },
+            filter: buildUserSelectionFilter(
+              {
+                _or: [{ id: { _eq: userId } }, { email: { _ilike: `%${email}%` } }],
+              },
+              queryRole
+            ),
             order_by: [{ lastName: order_by.asc }, { firstName: order_by.asc }],
           },
         });
@@ -422,7 +429,7 @@ const ExpandableSessionRowContent: FC<ExpandableSessionRowContentProps> = ({ ses
         console.error('Error fetching new user:', error);
       }
     },
-    [fetchUserByEmail, handleNewSpeaker]
+    [fetchUserByEmail, handleNewSpeaker, queryRole]
   );
 
   const parsedSearchValues = parseSearchValue(searchValueForNewUser);

@@ -1,6 +1,9 @@
 # misc
 .DS_Store
 
+# Playwright MCP (Cursor) — local console logs and page snapshots
+.playwright-mcp/
+
 hasura_keycloak.env
 docker-compose.env
 frontend.env

@@ -27,7 +27,6 @@ import { getRegistrationTypeConfig } from './Registration/types';
 import { getBackgroundImage } from '../../../helpers/imageHandling';
 import { Attendances } from './Attendances';
 import { CertificateDownload } from '../../common/CertificateDownload';
-import AchievementRecord from './AchievementRecord';
 import Projects from './Projects';
 import {
   resolveEffectiveCourseProjectSubmissionDeadline,
@@ -210,37 +209,43 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                 (course.achievementCertificatePossible || course.attendanceCertificatePossible) && (
                   <>
                     {!isDegreeCourse && course.achievementCertificatePossible && (
-                      <Projects
-                        courseId={course.id}
-                        defaultProjectType={course.Program?.defaultProjectType ?? null}
-                        effectiveSubmissionDeadline={submissionDeadlineToIsoString(
-                          resolveEffectiveCourseProjectSubmissionDeadline(course)
-                        )}
-                        submissionDeadlineDefaultSource={getCourseProjectSubmissionDefaultSource(course)}
-                        proposalsEnabled={Boolean(
-                          course.projectProposalsEnabled ??
-                            course.Program?.projectProposalsEnabledByDefault
-                        )}
-                      />
+                      <>
+                        {courseEnrollment &&
+                          (courseEnrollment.achievementCertificateURL ||
+                            courseEnrollment.attendanceCertificateURL) && (
+                            <div className="mt-24 min-w-0 mx-6 xl:mx-0 text-label-primary">
+                              <CertificateDownload
+                                courseEnrollment={courseEnrollment}
+                                className="mt-0"
+                              />
+                            </div>
+                          )}
+                        <Projects
+                          courseId={course.id}
+                          defaultProjectType={course.Program?.defaultProjectType ?? null}
+                          effectiveSubmissionDeadline={submissionDeadlineToIsoString(
+                            resolveEffectiveCourseProjectSubmissionDeadline(course)
+                          )}
+                          submissionDeadlineDefaultSource={getCourseProjectSubmissionDefaultSource(course)}
+                          proposalsEnabled={Boolean(
+                            course.projectProposalsEnabled ??
+                              course.Program?.projectProposalsEnabledByDefault
+                          )}
+                        />
+                      </>
                     )}
-                    <ContentRow className="my-24 text-label-primary bg-fill-primary light px-8 py-8">
+                    <ContentRow className="my-24 min-w-0 text-label-primary mx-6 xl:mx-0">
                       <div className="flex flex-col w-full min-w-0">
                       {!isDegreeCourse && (
-                        <div className="flex flex-col md:flex-row gap-12 md:gap-24 w-full">
+                        <>
                           <Attendances course={course} />
-                          <div className="flex flex-col w-full md:w-1/2">
-                            {!courseEnrollment?.achievementCertificateURL && (
-                              <AchievementRecord
-                                courseId={course.id}
-                                achievementRecordUploadDeadline={resolveEffectiveCourseProjectSubmissionDeadline(
-                                  course
-                                )}
-                                courseTitle={course.title}
-                              />
+                          {courseEnrollment &&
+                            !course.achievementCertificatePossible &&
+                            (courseEnrollment.achievementCertificateURL ||
+                              courseEnrollment.attendanceCertificateURL) && (
+                              <CertificateDownload courseEnrollment={courseEnrollment} />
                             )}
-                            {courseEnrollment && <CertificateDownload courseEnrollment={courseEnrollment} />}
-                          </div>
-                        </div>
+                        </>
                       )}
                       {isDegreeCourse && (
                         <>

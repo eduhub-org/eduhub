@@ -2,7 +2,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import { FC } from 'react';
 
 import { CourseWithEnrollment_Course_by_pk } from '../../../queries/__generated__/CourseWithEnrollment';
-import { BlockTitle } from '@opencampus/shared-components';
+import { SectionTitle } from '../../common/SectionTitle';
 import Dot from '../../common/Dot';
 
 import { AttendanceStatus_enum } from '../../../__generated__/globalTypes';
@@ -83,23 +83,21 @@ export const Attendances: FC<AttendancesProps> = ({ course }) => {
   const t = useTranslations('course');
 
   return (
-    <div className="flex flex-col w-full md:w-1/2 mb-4 md:mb-0">
-      <div className="mb-2">
-        <BlockTitle>{t('attendances.attendances')}</BlockTitle>
-      </div>
-      <span className="text-lg mb-4">
-        {t('attendances.max_missed_sessions_plural', {
-          count: course.maxMissedSessions,
-        })}
-      </span>
-      <div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+    <div className="flex flex-col w-full mb-4 md:mb-0">
+      <SectionTitle>{t('attendances.attendances')}</SectionTitle>
+      <div className="rounded-2xl overflow-hidden border border-border-primary bg-fill-primary light text-label-primary p-4 min-w-0">
+        <span className="text-lg mb-4 block">
+          {t('attendances.max_missed_sessions_plural', {
+            count: course.maxMissedSessions,
+          })}
+        </span>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3">
           {course.Sessions.map((session) => (
             <AttendanceEntry key={session.id} session={session} />
           ))}
         </div>
+        <AttendanceStatusLegend />
       </div>
-      <AttendanceStatusLegend />
     </div>
   );
 };

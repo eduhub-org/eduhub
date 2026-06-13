@@ -8,20 +8,30 @@ import { useTableGrid } from '../../common/TableGrid/hooks';
 import { createMultiWordSearchCondition } from '../../common/TableGrid/utils';
 import CheckboxSelector from '../../inputs/CheckboxSelector';
 
-import { useAdminQuery } from '../../../hooks/authedQuery';
+import { useAdminQuery, useManageQuery, useOrgAdminQuery } from '../../../hooks/authedQuery';
 import { useAdminMutation } from '../../../hooks/authedMutation';
 import {
   ORGANIZATION_ADMIN_LIST,
   DELETE_ORGANIZATION_ADMIN,
+  MANAGEABLE_ORGANIZATIONS,
   UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_EVENTS,
   UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_COURSES,
+  UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_DEGREES,
   UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_SETTINGS,
 } from '../../../queries/organizationAdmin';
+import { ORGANIZATION_OPTIONS } from '../../../queries/organization';
 import { UPDATE_USER_ADMIN_STATUS, ADMIN_USERS } from '../../../queries/actions';
 import { PageBlock } from '../../common/PageBlock';
 import CommonPageHeader from '../../common/CommonPageHeader';
-import { useIsAdmin } from '../../../hooks/authentication';
+import { useIsAdmin, useManageRole } from '../../../hooks/authentication';
+import { useUserId } from '../../../hooks/user';
 import { OrganizationAdminList_OrganizationAdmin } from '../../../queries/__generated__/OrganizationAdminList';
+import { OrganizationOptions, OrganizationOptionsVariables } from '../../../queries/__generated__/OrganizationOptions';
+import {
+  ManageableOrganizations,
+  ManageableOrganizationsVariables,
+} from '../../../queries/__generated__/ManageableOrganizations';
+import AddOrganizationAdminDialog, { AdminOrganizationOption } from './AddOrganizationAdminDialog';
 
 const ExpandableUserRow: FC<{
   row: OrganizationAdminList_OrganizationAdmin;
@@ -30,25 +40,33 @@ const ExpandableUserRow: FC<{
 }> = ({ row, isSuperAdmin, onAdminStatusChange }) => {
   const t = useTranslations('manageAdminUsers');
   const isAdmin = useIsAdmin();
+  const manageRole = useManageRole();
 
   const [setAdminStatus] = useAdminMutation(UPDATE_USER_ADMIN_STATUS);
 
-  const handleAdminToggle = async (checked: boolean) => {
-    try {
-      const response = await setAdminStatus({
-        variables: {
-          userId: row.id,
-          isAdmin: checked,
-        },
-      });
-
-      if (response.data?.success) {
-        onAdminStatusChange();
+  const handleAdminToggle = useCallback(
+    async (checked: boolean) => {
+      // row.id is the OrganizationAdmin grant id; the super-admin action keys off the User id.
+      if (!row.User?.id) {
+        return;
       }
-    } catch (error) {
-      console.error('Error updating admin status:', error);
-    }
-  };
+      try {
+        const response = await setAdminStatus({
+          variables: {
+            userId: row.User.id,
+            isAdmin: checked,
+          },
+        });
+
+        if (response.data?.success) {
+          onAdminStatusChange();
+        }
+      } catch (error) {
+        console.error('Error updating admin status:', error);
+      }
+    },
+    [onAdminStatusChange, row.User?.id, setAdminStatus]
+  );
 
   return (
     <div>
@@ -59,6 +77,7 @@ const ExpandableUserRow: FC<{
             label={t('can_manage_events')}
             checked={row.canManageEvents}
             updateValueMutation={UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_EVENTS}
+            role={manageRole}
             identifierVariables={{ itemId: row.id }}
             refetchQueries={['GetAdminUsers']}
           />
@@ -69,16 +88,29 @@ const ExpandableUserRow: FC<{
             label={t('can_manage_courses')}
             checked={row.canManageCourses}
             updateValueMutation={UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_COURSES}
+            role={manageRole}
             identifierVariables={{ itemId: row.id }}
             refetchQueries={['GetAdminUsers']}
           />
         </div>
-        <div className="pl-3 col-span-4">
+        <div className="pl-3 col-span-3">
+          <CheckboxSelector
+            variant="eduhub"
+            label={t('can_manage_degrees')}
+            checked={row.canManageDegrees}
+            updateValueMutation={UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_DEGREES}
+            role={manageRole}
+            identifierVariables={{ itemId: row.id }}
+            refetchQueries={['GetAdminUsers']}
+          />
+        </div>
+        <div className="pl-3 col-span-3">
           <CheckboxSelector
             variant="eduhub"
             label={t('can_manage_users_and_settings')}
             checked={row.canManageSettings}
             updateValueMutation={UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_SETTINGS}
+            role={manageRole}
             identifierVariables={{ itemId: row.id }}
             refetchQueries={['GetAdminUsers']}
           />
@@ -101,10 +133,16 @@ const ExpandableUserRow: FC<{
 
 const ManageAdminUsersContent: FC = () => {
   const t = useTranslations('manageAdminUsers');
+  const isAdmin = useIsAdmin();
+  const manageRole = useManageRole();
+  const currentUserId = useUserId();
   const [adminUserIds, setAdminUserIds] = useState<string[]>([]);
   const [adminError, setAdminError] = useState<Error | null>(null);
 
+  // The super-admin (Admin table) list drives only the super-admin toggle, which is shown to
+  // super-admins only. It is also an admin-only action, so org admins must not request it.
   useAdminQuery(ADMIN_USERS, {
+    skip: !isAdmin,
     onCompleted: (data) => {
       if (data?.getAdminUsers?.success) {
         setAdminUserIds(data.getAdminUsers.adminUserIds);
@@ -116,8 +154,10 @@ const ManageAdminUsersContent: FC = () => {
     },
   });
 
+  // Org admins see only the grants of organizations they administer (enforced by the org_admin
+  // select permission); super-admins see all. useManageQuery pins the role accordingly.
   const { data, loading, error, pageIndex, setPageIndex, searchFilter, setSearchFilter, refetch } = useTableGrid({
-    queryHook: useAdminQuery,
+    queryHook: useManageQuery,
     query: ORGANIZATION_ADMIN_LIST,
     pageSize: 15,
     refetchFilter: (searchFilter) => {
@@ -133,38 +173,94 @@ const ManageAdminUsersContent: FC = () => {
     },
   });
 
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+
+  // Organizations the current user may add admins to. Super-admins pick from all organizations; org
+  // admins are restricted to those they administer with the canManageSettings capability (the same
+  // capability Hasura enforces on insert). The add button is shown only when at least one option
+  // exists, which also hides it from org admins who cannot manage users/settings anywhere.
+  const { data: allOrganizationsData } = useAdminQuery<OrganizationOptions, OrganizationOptionsVariables>(
+    ORGANIZATION_OPTIONS,
+    { skip: !isAdmin }
+  );
+  const { data: manageableOrganizationsData } = useOrgAdminQuery<
+    ManageableOrganizations,
+    ManageableOrganizationsVariables
+  >(MANAGEABLE_ORGANIZATIONS, {
+    skip: isAdmin || !currentUserId,
+    variables: { currentUserId: currentUserId ?? '' },
+  });
+
+  const organizationOptions = useMemo<AdminOrganizationOption[]>(() => {
+    if (isAdmin) {
+      return (allOrganizationsData?.Organization ?? []).map((organization) => ({
+        id: organization.id,
+        name: organization.name,
+      }));
+    }
+    const byId = new Map<number, string>();
+    (manageableOrganizationsData?.OrganizationAdmin ?? []).forEach((grant) => {
+      if (grant.Organization) {
+        byId.set(grant.Organization.id, grant.Organization.name);
+      }
+    });
+    return Array.from(byId, ([id, name]) => ({ id, name })).sort((a, b) => a.name.localeCompare(b.name));
+  }, [isAdmin, allOrganizationsData, manageableOrganizationsData]);
+
+  const canAddAdmins = organizationOptions.length > 0;
+
   const columns = useMemo<ColumnDef<OrganizationAdminList_OrganizationAdmin>[]>(
     () => [
       {
+        // The organization the user administers. The grant's organization is always shown (the row's
+        // capability toggles and delete action target that specific grant, so it must stay
+        // identifiable even for super-admins with several grants); super-admins additionally get a
+        // "Super Admin" marker next to the organization name.
         header: t('organization'),
         accessorKey: 'Organization.name',
         enableSorting: true,
-        size: 300,
-        cell: ({ getValue }) => <div>{getValue<ReactNode>()}</div>,
+        size: 180,
+        cell: ({ row, getValue }) => (
+          <div className="truncate">
+            {adminUserIds.includes(row.original.User?.id) && (
+              <span className="font-medium mr-2">{t('super_admin_label')}</span>
+            )}
+            {getValue<ReactNode>()}
+          </div>
+        ),
       },
       {
         header: t('first_name'),
         accessorKey: 'User.firstName',
         enableSorting: true,
-        size: 200,
-        cell: ({ getValue }) => <div>{getValue<ReactNode>()}</div>,
+        size: 140,
+        cell: ({ getValue }) => <div className="truncate">{getValue<ReactNode>()}</div>,
       },
       {
         header: t('last_name'),
         accessorKey: 'User.lastName',
         enableSorting: true,
-        size: 200,
-        cell: ({ getValue }) => <div>{getValue<ReactNode>()}</div>,
+        size: 140,
+        cell: ({ getValue }) => <div className="truncate">{getValue<ReactNode>()}</div>,
+      },
+      {
+        // The organization the user belongs to according to their own profile (independent of the
+        // organizations they administer).
+        header: t('profile_organization'),
+        accessorKey: 'User.Organization.name',
+        enableSorting: true,
+        size: 180,
+        cell: ({ row }) => <div className="truncate">{row.original.User?.Organization?.name ?? ''}</div>,
       },
       {
         header: t('email'),
         accessorKey: 'User.email',
         enableSorting: true,
-        size: 300,
-        cell: ({ getValue }) => <div>{getValue<ReactNode>()}</div>,
+        size: 220,
+        cell: ({ getValue }) => <div className="truncate">{getValue<ReactNode>()}</div>,
       },
     ],
-    [t]
+    [t, adminUserIds]
   );
 
   const generateDeletionConfirmation = useCallback(
@@ -188,6 +284,9 @@ const ManageAdminUsersContent: FC = () => {
             <CommonPageHeader headline={t('headline')} />
             <TableGrid
               columns={columns}
+              {...(canAddAdmins
+                ? { onAddButtonClick: () => setIsAddDialogOpen(true), addButtonText: t('add_admin_button') }
+                : {})}
               data={data?.OrganizationAdmin || []}
               totalCount={data?.OrganizationAdmin_aggregate?.aggregate?.count || 0}
               pageIndex={pageIndex}
@@ -195,7 +294,8 @@ const ManageAdminUsersContent: FC = () => {
               searchFilter={searchFilter}
               onSearchFilterChange={setSearchFilter}
               deleteMutation={DELETE_ORGANIZATION_ADMIN}
-              deleteIdType="uuidString"
+              deleteIdType="number"
+              role={manageRole}
               error={error}
               loading={loading}
               refetchQueries={['UsersByLastName', 'GetAdminUsers']}
@@ -207,6 +307,12 @@ const ManageAdminUsersContent: FC = () => {
                   onAdminStatusChange={() => refetch()}
                 />
               )}
+            />
+            <AddOrganizationAdminDialog
+              open={isAddDialogOpen}
+              onClose={() => setIsAddDialogOpen(false)}
+              onSuccess={() => refetch()}
+              organizationOptions={organizationOptions}
             />
           </div>
         )}

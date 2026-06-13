@@ -16,6 +16,14 @@ export interface CourseGroupOptions_CourseGroupOption {
    * Indicates whether this group option is used in UI sliders (true) or as metadata tags (false)
    */
   sliderGroup: boolean | null;
+  /**
+   * When set, this group automatically includes all published courses of the given program type (e.g. COURSES, EVENTS, DEGREES) instead of relying on manual CourseGroup assignments.
+   */
+  programType: string | null;
+  /**
+   * When set, this group is owned by the given organization. Organization-owned groups are not shown on the public homepage but can be selected in that organization's course widget.
+   */
+  organizationId: number | null;
 }
 
 export interface CourseGroupOptions {

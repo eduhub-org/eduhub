@@ -1,5 +1,19 @@
 import { gql } from "@apollo/client";
+import { User_bool_exp, UserStatus_enum } from "../__generated__/globalTypes";
+import { AuthRoles } from "../types/enums";
 import { USER_FRAGMENT } from "./userFragment";
+
+/** User picker where-clause. org_admin cannot filter on status in Hasura, so ACTIVE is omitted there. */
+export function buildUserSelectionFilter(
+  searchFilter: User_bool_exp = {},
+  role: AuthRoles
+): User_bool_exp {
+  if (role === AuthRoles.org_admin) {
+    return searchFilter;
+  }
+
+  return { _and: [{ status: { _eq: UserStatus_enum.ACTIVE } }, searchFilter] };
+}
 
 export const USER_LIST = gql`
   query UserList {
@@ -189,7 +203,7 @@ export const USER_SELECTION_WITH_FILTER = gql`
   ) {
     User(
       limit: $limit
-      where: { _and: [{ status: { _eq: ACTIVE } }, $filter] }
+      where: $filter
       order_by: $order_by
     ) {
       ...UserFragment

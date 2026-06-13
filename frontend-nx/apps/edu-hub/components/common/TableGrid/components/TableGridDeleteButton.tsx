@@ -15,17 +15,19 @@ const TableGridDeleteButton = ({
   refetchQueries,
   idType,
   deletionConfirmationQuestion,
+  role,
 }: TableGridDeleteButtonProps) => {
   const [deleteItem] = useRoleMutation(deleteMutation, {
     onError: (error) => {
       console.error('Error during deletion:', error);
     },
     onCompleted: (data) => {
-     
+
       if (data?.anonymizeUser?.error) {
         console.error('Anonymization error:', data.anonymizeUser.error);
       }
-    }
+    },
+    ...(role ? { context: { role } } : {}),
   });
 
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);

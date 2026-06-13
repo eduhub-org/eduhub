@@ -2,6 +2,12 @@ table:
   name: Course
   schema: public
 object_relationships:
+  - name: AchievementCertificateTemplate
+    using:
+      foreign_key_constraint_on: achievementCertificateTemplateId
+  - name: AttendanceCertificateTemplate
+    using:
+      foreign_key_constraint_on: attendanceCertificateTemplateId
   - name: CourseRegistrationType
     using:
       foreign_key_constraint_on: registrationType
@@ -107,6 +113,8 @@ select_permissions:
     permission:
       columns:
         - achievementCertificatePossible
+        - achievementCertificateTemplateId
+        - attendanceCertificateTemplateId
         - applicationEnd
         - attendanceCertificatePossible
         - chatLink
@@ -153,6 +161,8 @@ select_permissions:
     permission:
       columns:
         - achievementCertificatePossible
+        - achievementCertificateTemplateId
+        - attendanceCertificateTemplateId
         - applicationEnd
         - attendanceCertificatePossible
         - chatLink
@@ -194,6 +204,8 @@ select_permissions:
     permission:
       columns:
         - achievementCertificatePossible
+        - achievementCertificateTemplateId
+        - attendanceCertificateTemplateId
         - applicationEnd
         - attendanceCertificatePossible
         - chatLink
@@ -234,10 +246,64 @@ select_permissions:
           User:
             id:
               _eq: X-Hasura-User-Id
+  # Org admins see every course belonging to a program of any organization they administer.
+  # Create/edit/delete is gated below by the program's type capability.
+  - role: org_admin_access
+    permission:
+      columns:
+        - achievementCertificatePossible
+        - achievementCertificateTemplateId
+        - attendanceCertificateTemplateId
+        - applicationEnd
+        - attendanceCertificatePossible
+        - chatLink
+        - contentDescriptionField1
+        - contentDescriptionField2
+        - cost
+        - coverImage
+        - created_at
+        - ects
+        - endTime
+        - externalRegistrationLink
+        - headingDescriptionField1
+        - headingDescriptionField2
+        - id
+        - language
+        - learningGoals
+        - maxMissedSessions
+        - maxParticipants
+        - programId
+        - projectProposalsEnabled
+        - projectSubmissionDeadline
+        - published
+        - startTime
+        - status
+        - tagline
+        - title
+        - updated_at
+        - weekDay
+        - formbricksEnrollmentSurveyUrl
+        - basePrice
+        - currency
+        - stripeProductId
+        - stripePriceId
+        - matrixRoomId
+      computed_fields:
+        - activeParticipantCount
+      filter:
+        Program:
+          Organization:
+            OrganizationAdmins:
+              userId:
+                _eq: X-Hasura-User-Id
+      # The manage-courses list reads Course_aggregate { count }, so org admins need aggregations.
+      allow_aggregations: true
 update_permissions:
   - role: instructor_access
     permission:
       columns:
+        - achievementCertificateTemplateId
+        - attendanceCertificateTemplateId
         - chatLink
         - contentDescriptionField1
         - contentDescriptionField2
@@ -268,3 +334,219 @@ update_permissions:
             id:
               _eq: X-Hasura-User-Id
       check: null
+  # Org admins may edit a course only if they have the capability matching the type of the
+  # program the course belongs to. programId is not editable, so a course cannot be moved into a
+  # program (type/org) outside the admin's scope.
+  - role: org_admin_access
+    permission:
+      columns:
+        - achievementCertificateTemplateId
+        - attendanceCertificateTemplateId
+        - chatLink
+        - contentDescriptionField1
+        - contentDescriptionField2
+        - coverImage
+        - ects
+        - endTime
+        - headingDescriptionField1
+        - headingDescriptionField2
+        - language
+        - learningGoals
+        - maxMissedSessions
+        - maxParticipants
+        - projectProposalsEnabled
+        - projectSubmissionDeadline
+        - startTime
+        - status
+        - tagline
+        - title
+        - weekDay
+        - formbricksEnrollmentSurveyUrl
+        - basePrice
+        - currency
+        - stripeProductId
+        - stripePriceId
+        - published
+        - applicationEnd
+        - cost
+        - externalRegistrationLink
+      filter:
+        _or:
+          - Program:
+              _and:
+                - type:
+                    _eq: EVENTS
+                - Organization:
+                    OrganizationAdmins:
+                      _and:
+                        - userId:
+                            _eq: X-Hasura-User-Id
+                        - canManageEvents:
+                            _eq: true
+          - Program:
+              _and:
+                - type:
+                    _eq: COURSES
+                - Organization:
+                    OrganizationAdmins:
+                      _and:
+                        - userId:
+                            _eq: X-Hasura-User-Id
+                        - canManageCourses:
+                            _eq: true
+          - Program:
+              _and:
+                - type:
+                    _eq: DEGREES
+                - Organization:
+                    OrganizationAdmins:
+                      _and:
+                        - userId:
+                            _eq: X-Hasura-User-Id
+                        - canManageDegrees:
+                            _eq: true
+      check:
+        _or:
+          - Program:
+              _and:
+                - type:
+                    _eq: EVENTS
+                - Organization:
+                    OrganizationAdmins:
+                      _and:
+                        - userId:
+                            _eq: X-Hasura-User-Id
+                        - canManageEvents:
+                            _eq: true
+          - Program:
+              _and:
+                - type:
+                    _eq: COURSES
+                - Organization:
+                    OrganizationAdmins:
+                      _and:
+                        - userId:
+                            _eq: X-Hasura-User-Id
+                        - canManageCourses:
+                            _eq: true
+          - Program:
+              _and:
+                - type:
+                    _eq: DEGREES
+                - Organization:
+                    OrganizationAdmins:
+                      _and:
+                        - userId:
+                            _eq: X-Hasura-User-Id
+                        - canManageDegrees:
+                            _eq: true
+insert_permissions:
+  - role: org_admin_access
+    permission:
+      columns:
+        - achievementCertificatePossible
+        - achievementCertificateTemplateId
+        - attendanceCertificateTemplateId
+        - applicationEnd
+        - attendanceCertificatePossible
+        - chatLink
+        - contentDescriptionField1
+        - contentDescriptionField2
+        - cost
+        - coverImage
+        - ects
+        - endTime
+        - externalRegistrationLink
+        - headingDescriptionField1
+        - headingDescriptionField2
+        - language
+        - learningGoals
+        - maxMissedSessions
+        - maxParticipants
+        - programId
+        - projectProposalsEnabled
+        - projectSubmissionDeadline
+        - published
+        - startTime
+        - status
+        - tagline
+        - title
+        - weekDay
+        - formbricksEnrollmentSurveyUrl
+        - basePrice
+        - currency
+        - stripeProductId
+        - stripePriceId
+      check:
+        _or:
+          - Program:
+              _and:
+                - type:
+                    _eq: EVENTS
+                - Organization:
+                    OrganizationAdmins:
+                      _and:
+                        - userId:
+                            _eq: X-Hasura-User-Id
+                        - canManageEvents:
+                            _eq: true
+          - Program:
+              _and:
+                - type:
+                    _eq: COURSES
+                - Organization:
+                    OrganizationAdmins:
+                      _and:
+                        - userId:
+                            _eq: X-Hasura-User-Id
+                        - canManageCourses:
+                            _eq: true
+          - Program:
+              _and:
+                - type:
+                    _eq: DEGREES
+                - Organization:
+                    OrganizationAdmins:
+                      _and:
+                        - userId:
+                            _eq: X-Hasura-User-Id
+                        - canManageDegrees:
+                            _eq: true
+delete_permissions:
+  - role: org_admin_access
+    permission:
+      filter:
+        _or:
+          - Program:
+              _and:
+                - type:
+                    _eq: EVENTS
+                - Organization:
+                    OrganizationAdmins:
+                      _and:
+                        - userId:
+                            _eq: X-Hasura-User-Id
+                        - canManageEvents:
+                            _eq: true
+          - Program:
+              _and:
+                - type:
+                    _eq: COURSES
+                - Organization:
+                    OrganizationAdmins:
+                      _and:
+                        - userId:
+                            _eq: X-Hasura-User-Id
+                        - canManageCourses:
+                            _eq: true
+          - Program:
+              _and:
+                - type:
+                    _eq: DEGREES
+                - Organization:
+                    OrganizationAdmins:
+                      _and:
+                        - userId:
+                            _eq: X-Hasura-User-Id
+                        - canManageDegrees:
+                            _eq: true

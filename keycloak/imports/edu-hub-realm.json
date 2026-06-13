@@ -332,6 +332,13 @@
         "clientRole" : true,
         "containerId" : "c4bb855a-ab27-4b23-a2ee-be55d7604a57",
         "attributes" : { }
+      }, {
+        "id" : "b8e1f3a2-2c44-4f8d-9a7b-1d6e0c5f4a90",
+        "name" : "org_admin",
+        "composite" : false,
+        "clientRole" : true,
+        "containerId" : "c4bb855a-ab27-4b23-a2ee-be55d7604a57",
+        "attributes" : { }
       } ]
     }
   },

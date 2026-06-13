@@ -5,7 +5,7 @@ import { styled } from '@mui/material/styles';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { FC, useCallback } from 'react';
-import { useIsAdmin, useIsInstructor } from '../../hooks/authentication';
+import { useIsAdmin, useIsInstructor, useIsOrgAdmin } from '../../hooks/authentication';
 import { useTranslations } from 'next-intl';
 import useLogout from '../../hooks/logout';
 
@@ -53,7 +53,11 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
 
   const isAdmin = useIsAdmin();
   const isInstructor = useIsInstructor();
+  const isOrgAdmin = useIsOrgAdmin();
   const isInstructorOrAdmin = isAdmin || isInstructor;
+  // Organization admins reach the program/course/admin-user management screens (scoped to their own
+  // organization). Other manage links remain super-admin only.
+  const isAdminOrOrgAdmin = isAdmin || isOrgAdmin;
 
   const t = useTranslations('common');
 
@@ -95,7 +99,7 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
         </Link>
       </MenuItem>
 
-      {isAdmin && (
+      {isAdminOrOrgAdmin && (
         <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/courses')}>
           <Link className="w-full text-lg" href="/manage/courses">
             {t('menu.courses')}
@@ -103,7 +107,7 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
         </MenuItem>
       )}
 
-      {isAdmin && (
+      {isAdminOrOrgAdmin && (
         <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/programs')}>
           <Link className="w-full text-lg" href="/manage/programs">
             {t('menu.programs')}
@@ -115,6 +119,14 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
         <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/users')}>
           <Link className="w-full text-lg" href="/manage/users">
             {t('menu.user')}
+          </Link>
+        </MenuItem>
+      )}
+
+      {isAdminOrOrgAdmin && (
+        <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/admin-users')}>
+          <Link className="w-full text-lg" href="/manage/admin-users">
+            {t('menu.admin_users')}
           </Link>
         </MenuItem>
       )}
@@ -139,14 +151,6 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
         <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/location-addresses')}>
           <Link className="w-full text-lg" href="/manage/location-addresses">
             {t('menu.location_addresses')}
-          </Link>
-        </MenuItem>
-      )}
-
-      {isAdmin && (
-        <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/achievement-options')}>
-          <Link className="w-full text-lg" href="/manage/achievement-options">
-            {t('menu.achievements')}
           </Link>
         </MenuItem>
       )}

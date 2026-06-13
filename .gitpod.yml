@@ -42,9 +42,6 @@ ports:
   - port: 5000
     onOpen: open-browser
     visibility: public
-  - port: 5001
-    onOpen: open-browser
-    visibility: public
   - port: 42000
     onOpen: ignore
   - port: 42001-42024

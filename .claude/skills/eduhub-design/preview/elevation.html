@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html,body{margin:0}
+  body{font-family:var(--font-body);background:#F2F2F2;color:#222;padding:28px}
+  .row{display:flex;gap:24px;align-items:center}
+  .item{text-align:center}
+  .box{background:#fff;width:130px;height:78px;border-radius:12px}
+  .lab{font-size:12px;margin-top:12px;opacity:.7}
+  .v{font-size:11px;opacity:.5}
+</style>
+</head>
+<body>
+  <div class="row">
+    <div class="item"><div class="box" style="box-shadow:none;border:1px solid #D8D8D8"></div><div class="lab">flat · contrast only</div><div class="v">no shadow</div></div>
+    <div class="item"><div class="box" style="box-shadow:0 1px 2px rgba(0,0,0,.12)"></div><div class="lab">badge · shadow-sm</div><div class="v">0 1px 2px /.12</div></div>
+    <div class="item"><div class="box" style="box-shadow:0 4px 6px rgba(0,0,0,.1)"></div><div class="lab">menu / popover</div><div class="v">0 4px 6px /.10</div></div>
+  </div>
+</body>
+</html>

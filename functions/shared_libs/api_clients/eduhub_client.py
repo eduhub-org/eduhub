@@ -194,30 +194,30 @@ class EduHubClient:
                     }
                     firstName
                     lastName
-                    AchievementRecordAuthors(
-                        where: {AchievementRecord: {AchievementOption: {AchievementOptionCourses: {Course: {id: {_eq: $courseId}}}}}},
-                        order_by: {AchievementRecord: {updated_at: desc}}, limit: 1
+                    ProjectAuthors(
+                        where: {participationStatus: {_eq: ACCEPTED}, Project: {status: {_eq: COMPLETED}, ProjectCourses: {courseId: {_eq: $courseId}}}},
+                        order_by: {Project: {updated_at: desc}}, limit: 1
                     ) {
-                        AchievementRecord {
-                        AchievementOption {
+                        Project {
                             title
-                            recordType
+                            type
+                            ProjectType {
+                                CertificateTemplate { html }
+                            }
                         }
-                        created_at
                     }
-                }
                 id
                 }
                 Course {
                     Program {
                         title
-                        shortTitle
                         achievementCertificateTemplateURL
                         attendanceCertificateTemplateURL
-                        attendanceCertificateTemplateTextId
-                        achievementCertificateTemplateTextId
+                        AttendanceCertificateTemplate { html }
                         id
                     }
+                    AchievementCertificateTemplate { html }
+                    AttendanceCertificateTemplate { html }
                     Sessions(order_by: {startDateTime: asc}) {
                         id
                         title
@@ -244,13 +244,25 @@ class EduHubClient:
             )
             response.raise_for_status()  # Raises a HTTPError if the HTTP request returned an unsuccessful status code
 
-            # Assuming the data is returned in JSON format
             data = response.json()
+            if not isinstance(data, dict):
+                raise ValueError(
+                    f"fetch_enrollments: expected JSON object, got {type(data).__name__}"
+                )
             return self._extract_course_enrollment(data)
         except requests.exceptions.RequestException as e:
             # Handle any errors that occur during the request
             logging.error(f"An error occurred during fetch_enrollments: {e}")
             raise
+
+    def _raise_on_graphql_errors(self, data, operation_name):
+        if not isinstance(data, dict):
+            raise ValueError(f"{operation_name}: expected JSON object, got {type(data).__name__}")
+        if data.get("errors"):
+            logging.error("%s GraphQL errors: %s", operation_name, data["errors"])
+            raise ValueError(f"{operation_name} failed: {data['errors']}")
+        if data.get("data") is None:
+            raise ValueError(f"{operation_name}: missing data in GraphQL response")
 
     def _extract_course_enrollment(self, data):
         """
@@ -262,11 +274,49 @@ class EduHubClient:
         Returns:
             list: A list of course enrollment records, or an empty list if no data is found.
         """
+        self._raise_on_graphql_errors(data, "fetch_enrollments")
         try:
-            return data.get('data', {}).get('CourseEnrollment', [])
+            enrollments = data["data"]["CourseEnrollment"]
         except KeyError as e:
             logging.error(f"Key error in response parsing: {e}")
             raise
+        for enrollment in enrollments:
+            course = enrollment.get("Course")
+            if course is None:
+                raise ValueError("fetch_enrollments: missing Course on enrollment")
+            program = course.get("Program")
+            if program is None:
+                raise ValueError("fetch_enrollments: missing Program on Course")
+            if "AttendanceCertificateTemplate" not in program:
+                raise ValueError(
+                    "fetch_enrollments: missing AttendanceCertificateTemplate on Program"
+                )
+            if "AchievementCertificateTemplate" not in course:
+                raise ValueError(
+                    "fetch_enrollments: missing AchievementCertificateTemplate on Course"
+                )
+            if "AttendanceCertificateTemplate" not in course:
+                raise ValueError(
+                    "fetch_enrollments: missing AttendanceCertificateTemplate on Course"
+                )
+            user = enrollment.get("User")
+            if user is None:
+                raise ValueError("fetch_enrollments: missing User on enrollment")
+            project_authors = user.get("ProjectAuthors")
+            if project_authors is None:
+                raise ValueError("fetch_enrollments: missing ProjectAuthors on User")
+            for author in project_authors:
+                project = author.get("Project")
+                if project is None:
+                    continue
+                project_type = project.get("ProjectType")
+                if project_type is None:
+                    raise ValueError("fetch_enrollments: missing ProjectType on Project")
+                if "CertificateTemplate" not in project_type:
+                    raise ValueError(
+                        "fetch_enrollments: missing CertificateTemplate on ProjectType"
+                    )
+        return enrollments
         
 
     def _safe_iloc(self, series, cast=None):

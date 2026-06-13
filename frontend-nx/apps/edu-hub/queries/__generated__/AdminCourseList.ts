@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { Course_bool_exp, Course_order_by, Weekday_enum, CourseRegistrationType_enum, LocationOption_enum, ProgramType_enum, OrganizationType_enum, CourseStatus_enum } from "./../../__generated__/globalTypes";
+import { Course_bool_exp, Course_order_by, Weekday_enum, CourseRegistrationType_enum, LocationOption_enum, OrganizationType_enum, CourseStatus_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: AdminCourseList
@@ -200,7 +200,7 @@ export interface AdminCourseList_Course_Program {
    * Decides whether the courses of this program can be published or not. (Courses are ony published if the filed publised in the Course table is also set to true.)
    */
   published: boolean;
-  type: ProgramType_enum;
+  type: string;
   /**
    * Default Formbricks survey URL for course enrollments/applications. Courses can override this with their own formbricksEnrollmentSurveyUrl.
    */
@@ -555,6 +555,10 @@ export interface AdminCourseList_CourseGroupOption {
    * Indicates whether this group option is used in UI sliders (true) or as metadata tags (false)
    */
   sliderGroup: boolean | null;
+  /**
+   * When set, this group automatically includes all published courses of the given program type (e.g. COURSES, EVENTS, DEGREES) instead of relying on manual CourseGroup assignments.
+   */
+  programType: string | null;
 }
 
 export interface AdminCourseList {

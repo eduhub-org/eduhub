@@ -41,7 +41,6 @@ export const PROJECT_FRAGMENT_DETAILED = gql`
     documentationInstructionId
     status
     type
-    achievementCertificateType
     rating
     ratingComment
     acceptingParticipants
@@ -116,6 +115,10 @@ export const PROJECTS_BY_COURSE = gql`
 `;
 
 export const MY_PROJECT_BY_COURSE = gql`
+  # Matches projects in the course where the user is a confirmed author (ACCEPTED)
+  # or was marked EXCLUDED from the final submission. The caller prefers the
+  # ACCEPTED project and otherwise shows the EXCLUDED one with a "you were
+  # excluded" notice, so a few rows are fetched instead of limiting to one.
   ${PROJECT_FRAGMENT_DETAILED}
   query MyProjectByCourse($courseId: Int!, $userId: uuid!) {
     Project(
@@ -126,14 +129,14 @@ export const MY_PROJECT_BY_COURSE = gql`
             ProjectAuthors: {
               _and: [
                 { userId: { _eq: $userId } }
-                { participationStatus: { _eq: ACCEPTED } }
+                { participationStatus: { _in: [ACCEPTED, EXCLUDED] } }
               ]
             }
           }
         ]
       }
       order_by: { created_at: desc }
-      limit: 1
+      limit: 5
     ) {
       ...ProjectFragmentDetailed
     }

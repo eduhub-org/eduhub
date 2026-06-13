@@ -3,8 +3,6 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { ProgramType_enum } from "./../../__generated__/globalTypes";
-
 // ====================================================
 // GraphQL fragment: AdminProgramFragment
 // ====================================================
@@ -56,7 +54,7 @@ export interface AdminProgramFragment {
    * Decides whether the courses of this program can be published or not. (Courses are ony published if the filed publised in the Course table is also set to true.)
    */
   published: boolean;
-  type: ProgramType_enum;
+  type: string;
   /**
    * Default Formbricks survey URL for course enrollments/applications. Courses can override this with their own formbricksEnrollmentSurveyUrl.
    */
@@ -85,6 +83,10 @@ export interface AdminProgramFragment {
    * The URL to the pdf template for the attendance certificate
    */
   attendanceCertificateTemplateURL: string | null;
+  /**
+   * Default attendance-certificate template for courses in this program. Falls back to NULL when no template is configured.
+   */
+  attendanceCertificateTemplateId: number | null;
   /**
    * The URL to the pdf template for the attendance certificate
    */

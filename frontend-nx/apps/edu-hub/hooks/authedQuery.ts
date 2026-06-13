@@ -3,7 +3,8 @@ import { signOut } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
 import { useCallback, useMemo, useRef } from 'react';
 
-import { useCurrentRole } from './authentication';
+import { useCurrentRole, useManageRole } from './authentication';
+import { useManagementRoleContext } from './managementRole';
 import { useAuthError } from '../contexts/AuthErrorContext';
 
 import { AuthRoles } from '../types/enums';
@@ -25,6 +26,31 @@ const getErrorMessage = (error: unknown): string | undefined => {
   return undefined;
 };
 
+const isGraphQLSchemaError = (error: unknown): boolean => {
+  const message = getErrorMessage(error) ?? '';
+  if (
+    message.includes('not found in type') ||
+    message.includes('Cannot query field') ||
+    message.includes('validation-failed')
+  ) {
+    return true;
+  }
+
+  if (typeof error === 'object' && error !== null && 'graphQLErrors' in error) {
+    const graphQLErrors = (error as { graphQLErrors?: Array<{ extensions?: { code?: string } }> })
+      .graphQLErrors;
+    return (
+      graphQLErrors?.some(
+        (graphQLError) =>
+          graphQLError.extensions?.code === 'validation-failed' ||
+          graphQLError.extensions?.code === 'access-denied'
+      ) ?? false
+    );
+  }
+
+  return false;
+};
+
 const useErrorHandler = () => {
   const t = useTranslations();
   const { showAuthError } = useAuthError();
@@ -42,6 +68,9 @@ const useErrorHandler = () => {
     } else if (message?.includes('NetworkError') || message?.includes('Failed to fetch')) {
       // NetworkError (e.g. aborted on page refresh, offline) — don't show auth dialog; log only
       console.warn('GraphQL network error (may be transient):', error);
+    } else if (isGraphQLSchemaError(error)) {
+      // Role-scoped schema / permission mismatches are query errors, not auth failures.
+      console.error('GraphQL query error in query hook:', error);
     } else {
       console.error('Authentication error in query hook:', error);
       // Show a generic user-facing auth dialog; internal details stay in logs only.
@@ -54,19 +83,18 @@ export const useRoleQuery: typeof useQuery = (query, passedOptions) => {
   // Auth headers are added by the Apollo auth link (reads from authStore).
   // We do NOT pass context with auth here — context changes trigger refetches
   // (Apollo issue #11835). Only pass role override when caller needs it.
-  const roleOverride = passedOptions?.context?.role as AuthRoles | undefined;
+  // On the /manage screens a management-role context is present and is used when the caller did not
+  // pass an explicit role, so nested read widgets query under the org admin's role.
+  const contextRole = useManagementRoleContext();
+  const roleOverride = (passedOptions?.context?.role as AuthRoles | undefined) ?? contextRole;
   const mergedContext = useMemo(() => {
     const currentContext = passedOptions?.context;
-    if (!currentContext) {
-      return undefined;
-    }
-
     if (!roleOverride) {
       return currentContext;
     }
 
     return {
-      ...currentContext,
+      ...(currentContext ?? {}),
       role: roleOverride,
     };
   }, [passedOptions?.context, roleOverride]);
@@ -100,17 +128,15 @@ export const useRoleQuery: typeof useQuery = (query, passedOptions) => {
 
 export const useLazyRoleQuery: typeof useLazyQuery = (query, passedOptions) => {
   const currentRole = useCurrentRole();
+  const contextRole = useManagementRoleContext();
   const passedRole = passedOptions?.context?.role as AuthRoles | undefined;
-  const mergedContext = useMemo(() => {
-    if (!passedOptions?.context) {
-      return passedOptions?.context;
-    }
-
-    return {
-      ...passedOptions.context,
-      role: passedRole ?? currentRole,
-    };
-  }, [passedOptions?.context, passedRole, currentRole]);
+  const mergedContext = useMemo(
+    () => ({
+      ...(passedOptions?.context ?? {}),
+      role: passedRole ?? contextRole ?? currentRole,
+    }),
+    [passedOptions?.context, passedRole, contextRole, currentRole]
+  );
 
   const errorHandler = useErrorHandler();
   const errorHandlerRef = useRef(errorHandler);
@@ -173,6 +199,42 @@ export const useAdminQuery: typeof useQuery = (query, passedOptions) => {
   return useQuery(query, options);
 };
 
+// Like useAdminQuery, but pins the management role: `admin` for super-admins, `org_admin` for org
+// admins. Drop-in replacement for useAdminQuery on the organization-management screens so the same
+// component works for both. For super-admins the behaviour is identical to useAdminQuery.
+export const useManageQuery: typeof useQuery = (query, passedOptions) => {
+  const role = useManageRole();
+  const mergedContext = useMemo(
+    () => ({
+      ...passedOptions?.context,
+      role,
+    }),
+    [passedOptions?.context, role]
+  );
+
+  const errorHandler = useErrorHandler();
+  const errorHandlerRef = useRef(errorHandler);
+  errorHandlerRef.current = errorHandler;
+  const callerOnErrorRef = useRef(passedOptions?.onError);
+  callerOnErrorRef.current = passedOptions?.onError;
+
+  const onError = useCallback((error: ApolloError) => {
+    errorHandlerRef.current(error);
+    callerOnErrorRef.current?.(error);
+  }, []);
+
+  const options = useMemo(
+    () => ({
+      ...passedOptions,
+      context: mergedContext,
+      onError,
+    }),
+    [passedOptions, mergedContext, onError]
+  );
+
+  return useQuery(query, options);
+};
+
 export const useAdminLazyQuery: typeof useLazyQuery = (query, passedOptions) => {
   const mergedContext = useMemo(
     () => ({
@@ -210,6 +272,40 @@ export const useInstructorQuery: typeof useQuery = (query, passedOptions) => {
     () => ({
       ...passedOptions?.context,
       role: AuthRoles.instructor,
+    }),
+    [passedOptions?.context]
+  );
+
+  const errorHandler = useErrorHandler();
+  const errorHandlerRef = useRef(errorHandler);
+  errorHandlerRef.current = errorHandler;
+  const callerOnErrorRef = useRef(passedOptions?.onError);
+  callerOnErrorRef.current = passedOptions?.onError;
+
+  const onError = useCallback((error: ApolloError) => {
+    errorHandlerRef.current(error);
+    callerOnErrorRef.current?.(error);
+  }, []);
+
+  const options = useMemo(
+    () => ({
+      ...passedOptions,
+      context: mergedContext,
+      onError,
+    }),
+    [passedOptions, mergedContext, onError]
+  );
+
+  return useQuery(query, options);
+};
+
+// Pins the org_admin role on the request. The caller must actually hold the role (useIsOrgAdmin).
+// Use on organization-management screens so the request matches the org_admin Hasura permissions.
+export const useOrgAdminQuery: typeof useQuery = (query, passedOptions) => {
+  const mergedContext = useMemo(
+    () => ({
+      ...passedOptions?.context,
+      role: AuthRoles.org_admin,
     }),
     [passedOptions?.context]
   );

@@ -10,6 +10,9 @@
 export interface UpdateProjectDocumentationInstructionUrl_update_ProjectDocumentationInstruction_by_pk {
   __typename: "ProjectDocumentationInstruction";
   id: number;
+  /**
+   * Instruction PDF location: static app path (e.g. /project-documentation-instructions/…) or GCS object path after admin upload. Nullable until a file is attached.
+   */
   url: string | null;
 }
 

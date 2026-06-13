@@ -44,6 +44,16 @@ const StatusCard: FC<{
   );
 };
 
+const getSafeExternalUrl = (value: string | null | undefined): string | null => {
+  if (!value) return null;
+  try {
+    const parsed = new URL(value);
+    return parsed.protocol === 'https:' || parsed.protocol === 'http:' ? parsed.toString() : null;
+  } catch {
+    return null;
+  }
+};
+
 const buildCourseChatLink = (course: Course_Course_by_pk & { matrixRoomId?: string | null }): string | null => {
   const matrixRoomId = course.matrixRoomId;
   const elementBaseUrl = process.env.NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL?.replace(/\/+$/, '');
@@ -60,18 +70,27 @@ const buildCourseChatLink = (course: Course_Course_by_pk & { matrixRoomId?: stri
  * @param course - Course data containing chat and location information
  * @returns JSX element with course resource buttons
  */
+const courseActionButtonClassName =
+  'w-full max-w-md px-8 py-3.5 sm:px-10 sm:py-4 text-base sm:text-lg font-semibold uppercase tracking-wide shadow-md transition-shadow flex items-center justify-center min-h-[3.25rem] sm:min-h-[3.5rem]';
+
 const CourseLinkInfos: FC<{ course: Course_Course_by_pk }> = ({ course }) => {
   const t = useTranslations('course');
 
   const chatLink = buildCourseChatLink(course);
   const onlineLocation = course.CourseLocations?.find((location) => location.locationOption === 'ONLINE');
+  const hasOnlineLocation = Boolean(onlineLocation);
+  const onlineMeetingUrl = getSafeExternalUrl(onlineLocation?.defaultSessionAddress?.trim());
+  const hasOnlineMeeting = Boolean(onlineMeetingUrl);
+  const onlineMeetingUnavailableMessage = hasOnlineLocation
+    ? t('general.link_will_be_provided_soon')
+    : t('general.no_online_participation_available');
 
   return (
-    <div className="flex flex-col justify-between items-center w-full">
+    <div className="flex flex-col items-center w-full gap-10">
       {chatLink && (
-        <div className="mb-10 w-full flex justify-center">
+        <div className="w-full flex justify-center">
           <Button
-            className="!bg-brand !text-white !border-brand hover:!bg-brand-light hover:!border-brand-light px-8 py-3.5 sm:px-10 sm:py-4 text-base sm:text-lg font-semibold uppercase tracking-wide shadow-md hover:shadow-lg transition-shadow"
+            className={`!bg-brand !text-white !border-brand hover:!bg-brand-light hover:!border-brand-light hover:shadow-lg ${courseActionButtonClassName}`}
             as="a"
             href={chatLink}
             filled
@@ -80,13 +99,35 @@ const CourseLinkInfos: FC<{ course: Course_Course_by_pk }> = ({ course }) => {
           </Button>
         </div>
       )}
-      {onlineLocation?.defaultSessionAddress && (
-        <div className="">
-          <Button className="bg-blue-200" as="a" href={onlineLocation.defaultSessionAddress ?? '#'} filled inverted>
+      <div className="w-full flex flex-col items-center">
+        {hasOnlineMeeting ? (
+          <Button
+            className={`hover:shadow-lg ${courseActionButtonClassName}`}
+            as="a"
+            href={onlineMeetingUrl!}
+            target="_blank"
+            rel="noopener noreferrer"
+            filled
+            inverted
+          >
             {t('general.to_online_meeting')}
           </Button>
-        </div>
-      )}
+        ) : (
+          <Button
+            className={courseActionButtonClassName}
+            disabled
+            title={onlineMeetingUnavailableMessage}
+            aria-label={onlineMeetingUnavailableMessage}
+          >
+            {t('general.to_online_meeting')}
+          </Button>
+        )}
+        {!hasOnlineMeeting && (
+          <p className="mt-3 text-sm text-center text-label-secondary max-w-md px-4">
+            {onlineMeetingUnavailableMessage}
+          </p>
+        )}
+      </div>
     </div>
   );
 };

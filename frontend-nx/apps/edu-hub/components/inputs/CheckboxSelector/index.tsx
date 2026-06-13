@@ -12,12 +12,14 @@ const CheckboxSelector: React.FC<CheckboxSelectorProps> = ({
   label,
   checked,
   updateValueMutation,
+  role,
   onValueUpdated,
   refetchQueries = [],
   helpText,
   className = '',
   identifierVariables,
   disabled = false,
+  suppressFeedback = false,
 }) => {
   const t = useTranslations('common');
 
@@ -34,7 +36,7 @@ const CheckboxSelector: React.FC<CheckboxSelectorProps> = ({
     setShowSavedNotification,
     errorMessage,
     handleValueChange,
-  } = useCheckboxLogic(checked, updateValueMutation ?? null, identifierVariables ?? {}, handleMutationValueUpdate, refetchQueries);
+  } = useCheckboxLogic(checked, updateValueMutation ?? null, identifierVariables ?? {}, handleMutationValueUpdate, refetchQueries, role);
 
   const checkboxProps = {
     label,
@@ -51,14 +53,21 @@ const CheckboxSelector: React.FC<CheckboxSelectorProps> = ({
     <>
       {variant === 'material' ? <MaterialCheckbox {...checkboxProps} /> : <EduhubCheckbox {...checkboxProps} />}
 
-      {/* Notification Components */}
-      <NotificationSnackbar
-        open={showSavedNotification}
-        onClose={() => setShowSavedNotification(false)}
-        message={t('notification_snackbar.saved')}
-      />
+      {!suppressFeedback ? (
+        <>
+          <NotificationSnackbar
+            open={showSavedNotification}
+            onClose={() => setShowSavedNotification(false)}
+            message={t('notification_snackbar.saved')}
+          />
 
-      <ErrorMessageDialog errorMessage={typeof error === 'string' ? error : ''} open={!!error} onClose={resetError} />
+          <ErrorMessageDialog
+            errorMessage={typeof error === 'string' ? error : ''}
+            open={!!error}
+            onClose={resetError}
+          />
+        </>
+      ) : null}
     </>
   );
 };

@@ -2,12 +2,12 @@ import { FC, Fragment, useCallback, useMemo, useState, useEffect } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
 import { MdCheckBox, MdOutlineCheckBoxOutlineBlank, MdAddCircle, MdEmail, MdForum } from 'react-icons/md';
 import { useRouter } from 'next/router';
-import { useAdminMutation } from '../../../hooks/authedMutation';
+import { useManageMutation } from '../../../hooks/authedMutation';
 import { SAVE_COURSE_IMAGE } from '../../../queries/actions';
 import { INSERT_COURSE_GROUP_TAG, DELETE_COURSE_GROUP_TAG } from '../../../queries/courseGroup';
 import { INSERT_COURSE_DEGREE_TAG, DELETE_COURSE_DEGREE_TAG } from '../../../queries/courseDegree';
 import { DELETE_COURSE_INSRTRUCTOR, INSERT_A_COURSEINSTRUCTOR } from '../../../queries/mutateCourseInstructor';
-import { USER_SELECTION_WITH_FILTER } from '../../../queries/user';
+import { USER_SELECTION_WITH_FILTER, buildUserSelectionFilter } from '../../../queries/user';
 import { AdminCourseList_Course } from '../../../queries/__generated__/AdminCourseList';
 import {
   DeleteCourseInstructor,
@@ -39,6 +39,7 @@ import { OrganizationList_Organization } from '../../../queries/__generated__/Or
 import EntityListManager from '../../inputs/EntityListManager';
 import { useTranslations } from 'next-intl';
 import TagSelector from '../../inputs/TagSelector';
+import { isKnownCourseGroupOptionTitle } from '../../../helpers/courseGroupOptions';
 import InputField from '../../inputs/InputField';
 import DropDownSelector from '../../inputs/DropDownSelector';
 import FileUploadField from '../../inputs/FileUploadField';
@@ -66,6 +67,8 @@ import { InfoDialog } from '../../common/dialogs/InfoDialog';
 import { translateErrorMessage } from '../../../helpers/errorHandling';
 import { submissionDeadlineToCalendarDate } from '../CourseContent/Projects/projectEffectiveSubmissionDeadline';
 import { useRoleQuery, useLazyRoleQuery } from '../../../hooks/authedQuery';
+import { useCurrentRole } from '../../../hooks/authentication';
+import { useManagementRoleContext } from '../../../hooks/managementRole';
 import PricingSummary from '../../common/PricingSummary';
 import {
   GET_COURSE_TEMPLATES_COUNT,
@@ -79,6 +82,7 @@ import { InsertEmailTemplate, InsertEmailTemplateVariables } from '../../../quer
 interface ExpandableCourseRowProps {
   course: AdminCourseList_Course;
   courseGroupOptions: { id: number; name: string }[];
+  sliderCourseGroupIds: number[];
   degreeCourses: { id: number; name: string }[];
   onSetAttendanceCertificatePossible: (c: AdminCourseList_Course, isPossible: boolean) => any;
   onSetAchievementCertificatePossible: (c: AdminCourseList_Course, isPossible: boolean) => any;
@@ -87,6 +91,7 @@ interface ExpandableCourseRowProps {
 const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
   course,
   courseGroupOptions,
+  sliderCourseGroupIds,
   degreeCourses,
   onSetAttendanceCertificatePossible,
   onSetAchievementCertificatePossible,
@@ -94,6 +99,9 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
   const t = useTranslations();
   const router = useRouter();
   const { error, handleError, resetError } = useErrorHandler();
+  const managementRole = useManagementRoleContext();
+  const currentRole = useCurrentRole();
+  const queryRole = managementRole ?? currentRole;
 
   // Check if course has custom email templates
   const { data: templatesCountData, refetch: refetchTemplatesCount } = useRoleQuery<GetCourseTemplatesCount>(
@@ -107,13 +115,13 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
   // Get default templates
   const { data: defaultTemplatesData } = useRoleQuery<GetDefaultTemplates>(GET_DEFAULT_TEMPLATES);
 
-  const [insertEmailTemplate] = useAdminMutation<InsertEmailTemplate, InsertEmailTemplateVariables>(
+  const [insertEmailTemplate] = useManageMutation<InsertEmailTemplate, InsertEmailTemplateVariables>(
     INSERT_EMAIL_TEMPLATE
   );
 
   const isExternalRegistration = course.registrationType === CourseRegistrationType_enum.EXTERNAL_REGISTRATION;
 
-  const [updateProjectProposalsEnabled] = useAdminMutation(UPDATE_COURSE_PROJECT_PROPOSALS_ENABLED, {
+  const [updateProjectProposalsEnabled] = useManageMutation(UPDATE_COURSE_PROJECT_PROPOSALS_ENABLED, {
     refetchQueries: ['AdminCourseList'],
   });
 
@@ -159,9 +167,9 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
   const [isStripeSyncing, setIsStripeSyncing] = useState(false);
   const [stripeSyncStatus, setStripeSyncStatus] = useState<'idle' | 'syncing' | 'success' | 'error'>('idle');
 
-  const [validateSurvey] = useAdminMutation(VALIDATE_FORMBRICKS_SURVEY);
-  const [saveAddonMappings] = useAdminMutation(SAVE_ADDON_MAPPINGS);
-  const [createStripeBasePrice] = useAdminMutation(CREATE_STRIPE_BASE_PRICE);
+  const [validateSurvey] = useManageMutation(VALIDATE_FORMBRICKS_SURVEY);
+  const [saveAddonMappings] = useManageMutation(SAVE_ADDON_MAPPINGS);
+  const [createStripeBasePrice] = useManageMutation(CREATE_STRIPE_BASE_PRICE);
 
   // Fetch addon mappings for the course
   const { data: addonMappingsData, refetch: refetchAddonMappings } = useRoleQuery(GET_COURSE_ADDON_MAPPINGS, {
@@ -425,14 +433,14 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
   const [matrixDialogOpen, setMatrixDialogOpen] = useState(false);
 
   // Instructor management mutations
-  const [insertCourseInstructor] = useAdminMutation<InsertCourseInstructor, InsertCourseInstructorVariables>(
+  const [insertCourseInstructor] = useManageMutation<InsertCourseInstructor, InsertCourseInstructorVariables>(
     INSERT_A_COURSEINSTRUCTOR,
     {
       refetchQueries: ['AdminCourseList'],
     }
   );
 
-  const [deleteInstructorAPI] = useAdminMutation<DeleteCourseInstructor, DeleteCourseInstructorVariables>(
+  const [deleteInstructorAPI] = useManageMutation<DeleteCourseInstructor, DeleteCourseInstructorVariables>(
     DELETE_COURSE_INSRTRUCTOR,
     {
       refetchQueries: ['AdminCourseList'],
@@ -444,7 +452,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
   );
 
   // Funding organization management mutations
-  const [insertCourseFundingOrg] = useAdminMutation<
+  const [insertCourseFundingOrg] = useManageMutation<
     InsertCourseFundingOrganization,
     InsertCourseFundingOrganizationVariables
   >(INSERT_COURSE_FUNDING_ORGANIZATION, {
@@ -559,9 +567,12 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
         const { data } = await fetchUserByEmail({
           variables: {
             limit: 100,
-            filter: {
-              _or: [{ id: { _eq: userId } }, { email: { _ilike: `%${email}%` } }],
-            },
+            filter: buildUserSelectionFilter(
+              {
+                _or: [{ id: { _eq: userId } }, { email: { _ilike: `%${email}%` } }],
+              },
+              queryRole
+            ),
             order_by: [{ lastName: order_by.asc }, { firstName: order_by.asc }],
           },
         });
@@ -578,7 +589,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
         setSearchValueForNewUser('');
       }
     },
-    [fetchUserByEmail, addInstructorHandler, handleError, t]
+    [fetchUserByEmail, addInstructorHandler, handleError, queryRole, t]
   );
 
   const parsedSearchValues = parseSearchValue(searchValueForNewUser);
@@ -624,12 +635,13 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
   );
 
 
-  const currentCourseGroups = course.CourseGroups.map((group) => ({
-    id: group.CourseGroupOption.id,
-    name: group.CourseGroupOption.title
-      ? t(`common.course_group_options.${group.CourseGroupOption.title}`)
-      : '—',
-  }));
+  const currentCourseGroups = course.CourseGroups.map((group) => {
+    const title = group.CourseGroupOption.title;
+    return {
+      id: group.CourseGroupOption.id,
+      name: isKnownCourseGroupOptionTitle(title) ? t(`common.course_group_options.${title}`) : title ?? '—',
+    };
+  });
 
   const currentCourseDegrees = course.CourseDegrees.map((degree) => ({
     id: degree.degreeCourseId,
@@ -797,27 +809,18 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
               )}
             </div>
 
-            {/* 2. Course Organization - Card Container */}
+            {/* 2. Course Group - Card Container */}
             <div className="bg-fill-primary border border-border-primary rounded-lg p-4 space-y-4">
+              <h4 className="text-sm font-medium text-label-primary">{t('manageCourses.course_group.label')}</h4>
               <TagSelector
                 variant="material"
-                label={t('manageCourses.course_degree_title.label')}
-                placeholder={t('manageCourses.course_degree_title.placeholder')}
-                itemId={course.id}
-                values={currentCourseDegrees}
-                options={degreeCourses}
-                insertValueMutation={INSERT_COURSE_DEGREE_TAG}
-                deleteValueMutation={DELETE_COURSE_DEGREE_TAG}
-                refetchQueries={['AdminCourseList']}
-              />
-
-              <TagSelector
-                variant="material"
-                label={t('manageCourses.tile_slider_group.label')}
-                placeholder={t('manageCourses.tile_slider_group.placeholder')}
+                label={t('manageCourses.course_group.label')}
+                placeholder={t('manageCourses.course_group.placeholder')}
                 itemId={course.id}
                 values={currentCourseGroups}
                 options={courseGroupOptions}
+                markedOptionIds={sliderCourseGroupIds}
+                markLabel={t('manageCourses.course_group.slider_badge')}
                 insertValueMutation={INSERT_COURSE_GROUP_TAG}
                 deleteValueMutation={DELETE_COURSE_GROUP_TAG}
                 refetchQueries={['AdminCourseList']}
@@ -998,9 +1001,9 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
               />
             </div>
 
-            {/* 3. Types of Available Certificates - Card Container */}
+            {/* 3. Certificates - Card Container */}
             <div className="bg-fill-primary border border-border-primary rounded-lg p-4">
-              <h4 className="text-sm font-medium text-label-primary mb-3">{t('manageCourses.possible_certificates.label')}</h4>
+              <h4 className="text-sm font-medium text-label-primary mb-3">{t('manageCourses.certificates.label')}</h4>
               <div className="space-y-2">
                 <div className="flex items-center space-x-2">
                   <button
@@ -1120,6 +1123,20 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                     />
                   </div>
                 )}
+              </div>
+
+              <div className="mt-4 pt-4 border-t border-border-primary">
+                <TagSelector
+                  variant="material"
+                  label={t('manageCourses.course_degree_title.label')}
+                  placeholder={t('manageCourses.course_degree_title.placeholder')}
+                  itemId={course.id}
+                  values={currentCourseDegrees}
+                  options={degreeCourses}
+                  insertValueMutation={INSERT_COURSE_DEGREE_TAG}
+                  deleteValueMutation={DELETE_COURSE_DEGREE_TAG}
+                  refetchQueries={['AdminCourseList']}
+                />
               </div>
             </div>
 

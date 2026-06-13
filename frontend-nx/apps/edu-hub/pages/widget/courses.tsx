@@ -9,14 +9,16 @@ import { client } from '../../config/apollo';
 import TileSlider from '../../components/common/TileSlider';
 import Loading from '../../components/common/Loading';
 import { COURSE_TILES, COURSE_TILES_BY_ORGANIZATION } from '../../queries/courseQueries';
+import { COURSE_GROUP_OPTIONS } from '../../queries/courseGroupOptions';
 import { CourseTiles, CourseTiles_Course } from '../../queries/__generated__/CourseTiles';
+import { CourseGroupOptions } from '../../queries/__generated__/CourseGroupOptions';
 
 // Type for organization-filtered courses (same structure as CourseTiles)
 type CourseTilesByOrganization = CourseTiles;
 
 const WidgetCourses: FC = () => {
   const router = useRouter();
-  const { group, locale, apiKey } = router.query;
+  const { group, groups, locale, apiKey } = router.query;
   const t = useTranslations('common');
 
   const [organizationId, setOrganizationId] = useState<number | null>(null);
@@ -86,23 +88,75 @@ const WidgetCourses: FC = () => {
     }
   );
 
-  // Filter courses by group if specified
+  // Parse the comma-separated list of selected group option ids (e.g. groups=3,7).
+  const selectedGroupIds = useMemo(() => {
+    if (!groups) return [] as number[];
+    const raw = Array.isArray(groups) ? groups.join(',') : groups;
+    return raw
+      .split(',')
+      .map((value) => parseInt(value.trim(), 10))
+      .filter((value) => !isNaN(value));
+  }, [groups]);
+
+  // Fetch the available course group options so the widget can resolve the
+  // selected group ids (including organization-owned, non-homepage groups).
+  // Only needed when group ids are provided via the `groups` query param.
+  const {
+    data: groupOptionsData,
+    loading: groupOptionsLoading,
+    error: groupOptionsError,
+  } = useQuery<CourseGroupOptions>(COURSE_GROUP_OPTIONS, {
+    client,
+    skip: selectedGroupIds.length === 0,
+    fetchPolicy: 'network-only',
+    context: {
+      headers: {
+        'x-hasura-role': 'anonymous',
+      },
+    },
+  });
+
+  // Filter courses by the selected group(s). Multiple groups are joined into a
+  // single, de-duplicated list of courses.
   const filteredCourses = useMemo(() => {
     const courses = coursesData?.Course ?? [];
 
+    // Preferred mode: explicit group option ids (supports joining several groups).
+    if (selectedGroupIds.length > 0) {
+      // Don't fall back to the full course list for scoped URLs: wait for the
+      // group options to resolve, and show nothing if they fail or don't match.
+      if (groupOptionsLoading || groupOptionsError) {
+        return [];
+      }
+      const options = (groupOptionsData?.CourseGroupOption ?? []).filter((option) =>
+        selectedGroupIds.includes(option.id)
+      );
+      if (options.length === 0) {
+        return [];
+      }
+      return courses.filter((course) =>
+        options.some((option) =>
+          option.programType
+            ? course.Program?.type === option.programType
+            : course.CourseGroups.some((courseGroup) => courseGroup.CourseGroupOption.id === option.id)
+        )
+      );
+    }
+
+    // Legacy mode: a single group order (1-5).
     if (!group) {
       return courses;
     }
 
     const groupOrder = parseInt(group as string, 10);
-    if (isNaN(groupOrder) || groupOrder < 1 || groupOrder > 5) {
+    if (isNaN(groupOrder)) {
       return courses;
     }
 
     return courses.filter((course) =>
       course.CourseGroups.some((courseGroup) => courseGroup.CourseGroupOption.order === groupOrder)
     );
-  }, [coursesData, group]);
+  }, [coursesData, group, selectedGroupIds, groupOptionsData, groupOptionsLoading, groupOptionsError]);
 
   // Filter only published courses
   // Note: CourseTiles_Course type doesn't include 'published' in generated types,
@@ -116,7 +170,8 @@ const WidgetCourses: FC = () => {
     );
   }, [filteredCourses]);
 
-  const isLoading = coursesLoading || apiKeyValidating;
+  const isLoading =
+    coursesLoading || apiKeyValidating || (selectedGroupIds.length > 0 && groupOptionsLoading);
   const hasError = coursesError || apiKeyError;
 
   // Add widget-page class to body and html for scoped CSS

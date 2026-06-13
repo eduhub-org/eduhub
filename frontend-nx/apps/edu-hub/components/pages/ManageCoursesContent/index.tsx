@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { FC, useCallback, useMemo, useState } from 'react';
 import { ColumnDef } from '@tanstack/react-table';
-import { useAdminMutation } from '../../../hooks/authedMutation';
+import { useManageMutation } from '../../../hooks/authedMutation';
 import { useRoleQuery } from '../../../hooks/authedQuery';
 
 import { QUERY_LIMIT } from '../../../pages/manage/courses';
@@ -19,6 +19,7 @@ import {
   UpdateCourseAchievementCertificatePossible,
   UpdateCourseAchievementCertificatePossibleVariables,
 } from '../../../queries/__generated__/UpdateCourseAchievementCertificatePossible';
+import { isKnownCourseGroupOptionTitle } from '../../../helpers/courseGroupOptions';
 import { DEGREE_COURSES } from '../../../queries/courseDegree';
 import { DegreeCourses } from '../../../queries/__generated__/DegreeCourses';
 import { DELETE_A_COURSE } from '../../../queries/mutateCourse';
@@ -27,7 +28,9 @@ import TableGrid from '../../common/TableGrid';
 import Loading from '../../common/Loading';
 import { useTableGrid } from '../../common/TableGrid/hooks';
 import { createMultiWordSearchCondition } from '../../common/TableGrid/utils';
-import { useAdminQuery } from '../../../hooks/authedQuery';
+import { useManageQuery } from '../../../hooks/authedQuery';
+import { useManageRole } from '../../../hooks/authentication';
+import { useManageCourseWhere } from '../../../hooks/manageScope';
 import { ADMIN_COURSE_LIST } from '../../../queries/courseList';
 import { GET_COURSE_TEMPLATES_COUNT } from '../../../queries/emailTemplates';
 import ExpandableCourseRow from './ExpandableCourseRow';
@@ -65,6 +68,11 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
   const tCoursePage = useTranslations('coursePage');
   const locale = useLocale();
 
+  // Management role (admin for super-admins, org_admin otherwise) and the organization scope that
+  // restricts org admins to courses of programs in their own organizations (empty for super-admins).
+  const manageRole = useManageRole();
+  const orgCourseWhere = useManageCourseWhere();
+
   // Calculate default program
   const sortedPrograms = useMemo(() => {
     return [...programs].sort((a, b) => {
@@ -76,10 +84,15 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
     });
   }, [programs]);
 
-  const defaultProgramId = useMemo(
-    () => sortedPrograms.find((program) => program.shortTitle !== 'EVENTS' && program.shortTitle !== 'DEGREES')?.id,
-    [sortedPrograms]
-  );
+  const defaultProgramId = useMemo(() => {
+    if (sortedPrograms.length === 0) {
+      return undefined;
+    }
+    const preferredRegularProgram = sortedPrograms.find(
+      (program) => program.shortTitle !== 'EVENTS' && program.shortTitle !== 'DEGREES'
+    );
+    return (preferredRegularProgram ?? sortedPrograms[0]).id;
+  }, [sortedPrograms]);
 
   // Filter state management (single source of truth)
   const [filter, setFilter] = useState<AdminCourseListVariables>({
@@ -131,7 +144,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
 
   // Use TableGrid hook with proper refetchFilter for search debouncing
   const { data, loading, error, searchFilter, pageIndex, sorting, setSearchFilter, setPageIndex, setSorting } = useTableGrid({
-    queryHook: useAdminQuery,
+    queryHook: useManageQuery,
     query: ADMIN_COURSE_LIST,
     queryVariables: filter,
     pageSize: filter.limit || QUERY_LIMIT, // Use actual page size for offset calculations
@@ -158,14 +171,18 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
       (searchTerm: string) => {
         // Return the complete queryVariables including search
         const searchCondition = createMultiWordSearchCondition(searchTerm, ['title']);
+        const baseWhere = {
+          ...filter.where, // Include current program filter
+          ...searchCondition, // Add multi-word search filter
+        };
+        const hasOrgScope = Object.keys(orgCourseWhere).length > 0;
+        // Org admins are additionally restricted to their own organizations' courses (covers the
+        // "All" tab, where no program filter is applied).
         return {
-          where: {
-            ...filter.where, // Include current program filter
-            ...searchCondition, // Add multi-word search filter
-          },
+          where: hasOrgScope ? { _and: [orgCourseWhere, baseWhere] } : baseWhere,
         };
       },
-      [filter.where] // Update when program filter changes
+      [filter.where, orgCourseWhere] // Update when program filter or org scope changes
     ),
   });
 
@@ -183,7 +200,8 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
     GET_COURSE_TEMPLATES_COUNT,
     courseIds,
     getTemplateVariables,
-    extractTemplateCount
+    extractTemplateCount,
+    manageRole
   );
 
   // Handle program tab clicks (moved after useTableGrid to access setPageIndex)
@@ -211,25 +229,25 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const [updateAttendanceCertificatePossible] = useAdminMutation<
+  const [updateAttendanceCertificatePossible] = useManageMutation<
     UpdateCourseAttendanceCertificatePossible,
     UpdateCourseAttendanceCertificatePossibleVariables
   >(UPDATE_COURSE_ATTENDANCE_CERTIFICATE_POSSIBLE, {
     refetchQueries: ['AdminCourseList'],
   });
 
-  const [updateAchievementCertificatePossible] = useAdminMutation<
+  const [updateAchievementCertificatePossible] = useManageMutation<
     UpdateCourseAchievementCertificatePossible,
     UpdateCourseAchievementCertificatePossibleVariables
   >(UPDATE_COURSE_ACHIEVEMENT_CERTIFICATE_POSSIBLE, {
     refetchQueries: ['AdminCourseList'],
   });
 
-  const [updateCourse] = useAdminMutation<UpdateCourseByPk, UpdateCourseByPkVariables>(UPDATE_COURSE_PROPERTY);
+  const [updateCourse] = useManageMutation<UpdateCourseByPk, UpdateCourseByPkVariables>(UPDATE_COURSE_PROPERTY);
 
-  const [insertCourse] = useAdminMutation<InsertCourseWithLocation, InsertCourseWithLocationVariables>(INSERT_COURSE);
+  const [insertCourse] = useManageMutation<InsertCourseWithLocation, InsertCourseWithLocationVariables>(INSERT_COURSE);
 
-  const [copyCourses] = useAdminMutation(COPY_COURSES_TO_PROGRAM);
+  const [copyCourses] = useManageMutation(COPY_COURSES_TO_PROGRAM);
 
   // Add course handler
   const handleAddCourse = useCallback(async () => {
@@ -336,16 +354,33 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
     if (data && !loading && !error) {
       return (
         data.CourseGroupOption
-          ?.filter((option: { sliderGroup: boolean }) => option.sliderGroup)
+          // Program-type based groups (Courses, Events, Degrees) are assigned
+          // automatically via the program type, so they must not be manually
+          // selectable here.
+          ?.filter((option: { programType: string | null }) => option.programType == null)
           .map((option: { id: number; title: string | null }) => ({
             id: option.id,
-            name: option.title ? tCommon(`course_group_options.${option.title}`) : '—',
+            name: isKnownCourseGroupOptionTitle(option.title)
+              ? tCommon(`course_group_options.${option.title}`)
+              : option.title ?? '—',
           })) || []
       );
     } else {
       return [];
     }
   }, [tCommon, data, loading, error]);
+
+  const sliderCourseGroupIds = useMemo(() => {
+    if (data && !loading && !error) {
+      return (
+        data.CourseGroupOption?.filter((option: { sliderGroup: boolean }) => option.sliderGroup).map(
+          (option: { id: number }) => option.id
+        ) || []
+      );
+    } else {
+      return [];
+    }
+  }, [data, loading, error]);
 
   const degreeCoursesQuery = useRoleQuery<DegreeCourses>(DEGREE_COURSES);
   const degreeCourses = useMemo(() => {
@@ -761,6 +796,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
             <ExpandableCourseRow
               course={props.row}
               courseGroupOptions={courseGroupOptions}
+              sliderCourseGroupIds={sliderCourseGroupIds}
               degreeCourses={degreeCourses}
               onSetAttendanceCertificatePossible={handleAttendanceCertificatePossible}
               onSetAchievementCertificatePossible={handleAchievementCertificatePossible}
@@ -768,6 +804,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
           )}
           deleteMutation={DELETE_A_COURSE}
           deleteIdType="number"
+          role={manageRole}
           generateDeletionConfirmationQuestion={(row) =>
             t('delete_button.delete_course_confirmation', {
               title: row.title || t('delete_button.untitled_course'),

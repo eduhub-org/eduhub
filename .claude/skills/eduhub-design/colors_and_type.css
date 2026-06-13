@@ -1,0 +1,154 @@
+/* ============================================================
+   EduHub by opencampus.sh — Colors & Type
+   Source of truth: eduhub-org/eduhub (frontend-nx/apps/edu-hub)
+   - styles/globals.css  (CSS custom properties)
+   - tailwind.config.js  (semantic color mapping, font family)
+   ============================================================ */
+
+/* ---- Webfont ----------------------------------------------
+   The product uses "Space Grotesk" (Google Fonts) as the single
+   typeface, applied at font-weight 500 (medium) on <body> by default.
+   No font file ships in the repo, so we load it from Google Fonts.
+   If you have licensed/self-hosted files, drop them in fonts/ and
+   swap the @import for an @font-face block.
+------------------------------------------------------------ */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+
+:root {
+  /* ---------- Brand ---------- */
+  --eduhub-brand: #00A398;        /* primary teal-green */
+  --eduhub-brand-light: #00C4B8;
+  --eduhub-brand-dark: #008078;
+
+  /* ---------- Surfaces (DARK aesthetic — the current default) ---------- */
+  --eduhub-bg-primary: #222222;   /* page background */
+  --eduhub-bg-secondary: #333333; /* raised surface */
+  --eduhub-bg-card: #2a2a2a;      /* card */
+  --eduhub-bg-modal: #222222;
+  --eduhub-bg-deep: #0F0F0F;      /* footer + hero gradient floor */
+
+  /* Fill */
+  --eduhub-fill-primary: #222222;
+  --eduhub-fill-secondary: #F2F2F2;
+  --eduhub-fill-disabled: #444444;
+
+  /* ---------- Text / labels (light text on dark) ---------- */
+  --eduhub-label-primary: #F2F2F2;
+  --eduhub-label-secondary: #D8D8D8;
+  --eduhub-label-disabled: #888888;
+
+  /* ---------- Borders ---------- */
+  --eduhub-border-primary: #444444;
+  --eduhub-border-secondary: #D8D8D8;
+
+  /* ---------- Functional ---------- */
+  --eduhub-success: #A2EBA0;
+  --eduhub-warning: #FFA665;
+  --eduhub-error: #D45A5A;
+  --eduhub-info: #1982fc;
+
+  /* ---------- Status ---------- */
+  --eduhub-status-confirmed: #A2EBA0;
+  --eduhub-status-invited: #FFA665;
+  --eduhub-status-current: #A2EBA0;
+  --eduhub-status-missed: #F2991D66;
+
+  /* ---------- Legacy aliases (gradual migration in product) ---------- */
+  --edu-tag-color: #C4C4C4;
+  --edu-row-color: #E5E5E5;
+
+  /* =========================================================
+     TYPE SYSTEM
+     Family + role tokens. The product is single-typeface.
+     ========================================================= */
+  --font-body: 'Space Grotesk', system-ui, sans-serif;
+
+  /* Weights actually used in the codebase */
+  --fw-thin: 300;       /* footer fine print */
+  --fw-regular: 400;
+  --fw-medium: 500;     /* default body weight */
+  --fw-semibold: 600;   /* section headings */
+  --fw-bold: 700;       /* emphasis, active nav */
+
+  /* Role sizes (mapped from Tailwind utilities seen in product) */
+  --display: 8rem;      /* hero headline — text-9xl on desktop */
+  --display-sm: 3.75rem;/* hero on mobile — text-6xl */
+  --h1: 3rem;           /* text-5xl */
+  --h2: 1.5rem;         /* text-2xl section titles (font-semibold) */
+  --h3: 1.25rem;        /* text-xl */
+  --tile-title: 1.875rem; /* text-3xl — title overlaid on course tiles */
+  --body-lg: 1.125rem;  /* text-lg — taglines */
+  --body: 1rem;
+  --body-sm: 0.875rem;  /* text-sm — meta rows */
+  --caption: 0.75rem;   /* text-xs — uppercase location / labels */
+}
+
+/* ---- Light scope -------------------------------------------
+   The product flips to a light palette inside elements carrying
+   the `.light` class — used for course-tile bodies, dropdown
+   menus, modals and other "card" surfaces sitting on the dark page.
+------------------------------------------------------------ */
+.light {
+  --eduhub-fill-primary: #ffffff;
+  --eduhub-fill-secondary: #222222;
+  --eduhub-fill-disabled: #E5E5E5;
+
+  --eduhub-label-primary: #222222;
+  --eduhub-label-secondary: #666666;
+  --eduhub-label-disabled: #999999;
+
+  --eduhub-border-primary: #D8D8D8;
+  --eduhub-border-secondary: #222222;
+
+  --eduhub-bg-primary: #ffffff;
+  --eduhub-bg-secondary: #F2F2F2;
+  --eduhub-bg-modal: #ffffff;
+  --eduhub-bg-card: #ffffff;
+}
+
+/* ============================================================
+   Semantic helpers — convenience classes mirroring product usage
+   ============================================================ */
+.eduhub-body {
+  font-family: var(--font-body);
+  font-weight: var(--fw-medium);
+  background: var(--eduhub-bg-primary);
+  color: var(--eduhub-label-primary);
+  -webkit-font-smoothing: antialiased;
+}
+
+.eduhub-display {
+  font-family: var(--font-body);
+  font-weight: var(--fw-medium);
+  font-size: var(--display);
+  line-height: 1.0;
+  letter-spacing: -0.01em;
+}
+
+.eduhub-h2 {
+  font-family: var(--font-body);
+  font-weight: var(--fw-semibold);
+  font-size: var(--h2);
+}
+
+/* Pill button — the product's only button shape (rounded-full, 2px border) */
+.eduhub-btn {
+  font-family: var(--font-body);
+  font-weight: var(--fw-medium);
+  border-radius: 9999px;
+  padding: 0.5rem 1rem;
+  border: 2px solid var(--eduhub-border-secondary);
+  color: var(--eduhub-label-primary);
+  background: transparent;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+  user-select: none;
+}
+.eduhub-btn:hover { border-color: var(--eduhub-brand); }
+
+.eduhub-btn--filled {
+  background: var(--eduhub-label-primary);
+  color: var(--eduhub-fill-primary);
+  border-color: var(--eduhub-label-primary);
+}
+.eduhub-btn--filled:hover { border-color: var(--eduhub-brand-light); }

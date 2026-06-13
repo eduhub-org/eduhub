@@ -17,6 +17,10 @@ export interface UpdateProjectSendBack_update_Project_by_pk {
    * Timestamp at which the project most recently transitioned to SUBMITTED. Cleared when a reviewer sends the project back to ONGOING so the student-side "sent back for revisions" banner remains accurate.
    */
   submittedAt: any | null;
+  /**
+   * User who issued the most recent SUBMITTED transition. Set via a Hasura permission preset (x-hasura-user-id) so the client cannot impersonate another author.
+   */
+  submittedBy: any | null;
 }
 
 export interface UpdateProjectSendBack {

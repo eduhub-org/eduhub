@@ -1,5 +1,4 @@
 import { Dialog, DialogContent, DialogTitle } from '@mui/material';
-import { AtLeastNameEmail } from '../../../helpers/achievement';
 import { COURSE_ENROLLMENTS_WITH_USER } from '../../../queries/courseEnrollment';
 import {
   CourseEnrollmentWithUserQuery,
@@ -12,6 +11,12 @@ import { makeFullName } from '../../../helpers/util';
 import { useAuthedQuery } from '../../../hooks/authedQuery';
 import { Button } from '../Button';
 import SearchBox from '../SearchBox';
+
+export interface AtLeastNameEmail {
+  id: any;
+  firstName: string;
+  lastName: string;
+}
 
 interface IProps {
   title: string;

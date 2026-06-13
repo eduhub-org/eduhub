@@ -19,15 +19,18 @@ export const generateAchievementCertificate = async (
   bucket
 ) => {
   try {
-    // Set online_courses and practical_project according to recordType
-    const recordType =
-      courseEnrollment.User.AchievementRecordAuthors[0].AchievementRecord
-        .AchievementOption.recordType;
-    const recordTitle =
-      courseEnrollment.User.AchievementRecordAuthors[0].AchievementRecord
-        .AchievementOption.title;
-    const online_courses = recordType === "ONLINE_COURSE" ? recordTitle : "";
-    const practical_project = recordType === "DOCUMENTATION" ? recordTitle : "";
+    // Resolve the user's completed project for this course and derive the
+    // online_courses / practical_project variable contract from Project.type
+    // (ONLINE_COURSE -> online-course flavour, every other type -> practical project).
+    const project = courseEnrollment.User.ProjectAuthors?.[0]?.Project;
+    if (!project) {
+      throw new Error(
+        `No completed project found for user ${courseEnrollment.User.id} in course ${courseEnrollment.Course.id}`
+      );
+    }
+    const recordTitle = project.title;
+    const online_courses = project.type === "ONLINE_COURSE" ? recordTitle : "";
+    const practical_project = project.type === "ONLINE_COURSE" ? "" : recordTitle;
 
     // Set certificate text to learning goals or empty string if learning goals is null
     const certificate = (courseEnrollment.Course.learningGoals || "")

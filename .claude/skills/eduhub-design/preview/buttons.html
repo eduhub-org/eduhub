@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html,body{margin:0}
+  body{font-family:var(--font-body);background:#222222;padding:26px}
+  .row{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+  .lab{color:#888;font-size:12px;width:100%;margin:4px 0 2px}
+  .btn{border-radius:9999px;padding:9px 20px;font-family:var(--font-body);font-weight:500;font-size:15px;border:2px solid #D8D8D8;color:#F2F2F2;background:transparent;cursor:pointer;transition:border-color .2s}
+  .btn:hover{border-color:#00A398}
+  .filled{background:#F2F2F2;color:#222;border-color:#F2F2F2}
+  .filled:hover{border-color:#00C4B8}
+  .brand{background:#00A398;color:#fff;border-color:#00A398}
+  .dis{background:#9aa0a0;color:#5a5f5f;border-color:#9aa0a0;cursor:not-allowed}
+</style>
+</head>
+<body>
+  <div class="row">
+    <span class="lab">outline (default) · hover → teal border &nbsp;|&nbsp; filled &nbsp;|&nbsp; brand &nbsp;|&nbsp; disabled</span>
+    <button class="btn">Login</button>
+    <button class="btn filled">Register now</button>
+    <button class="btn brand">Apply</button>
+    <button class="btn dis">Unavailable</button>
+  </div>
+</body>
+</html>

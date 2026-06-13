@@ -41,10 +41,9 @@
       "my_certificates": "My Certificates",
       "faq": "FAQ",
       "user": "User",
+      "admin_users": "Admin Users",
       "experts": "Experts",
       "courses": "Courses",
-      "achievements": "Achievement Records",
-      "achievement_templates": "Achievement Record Templates",
       "programs": "Programs",
       "organizations": "Organizations",
       "location_addresses": "Location Addresses",
@@ -89,7 +88,6 @@
     "project-description": "Projekt description",
     "project-new-button": "New project",
     "courses": "Courses",
-    "achievement-record-type": "Achievement record type",
     "authors": "Authors",
     "mentors": "Mentors",
     "documentation": "Documentation",
@@ -118,7 +116,6 @@
       "other": "Other",
       "teacher": "Name of the school"
     },
-    "achievement-documentation-template": "Achievement Record Documentation Template",
     "preview": "Preview",
     "edit_markdown": "Edit",
     "markdown_info": "Markdown formatting is supported.",
@@ -265,7 +262,6 @@
         "coursegroup": "Course groups",
         "organization": "Organizations",
         "program": "Programs",
-        "achievement": "Achievement records",
         "locationaddress": "Location addresses",
         "session_addresses": "session addresses",
         "courses": "courses",
@@ -282,6 +278,7 @@
       "creative_social_sustainable": "Creative, Social & Sustainable",
       "degree": "Degrees",
       "event": "Events",
+      "courses": "Courses",
       "my_admin_courses": "Course Administration",
       "my_courses": "My Courses"
     },
@@ -325,6 +322,7 @@
       "course_not_available": "Course not available",
       "to_course_chat": "GO TO CHAT",
       "to_online_meeting": "GO TO ONLINE MEETING",
+      "no_online_participation_available": "Online participation is not available for this course.",
       "speaker": "Speaker",
       "link_will_be_provided_soon": "(Link will be provided here soon)",
       "address_will_be_provided_soon": "(Address will be provided here soon)"
@@ -365,33 +363,9 @@
         "PENDING": "Review Pending"
       }
     },
-    "achievement": {
-      "achievement_option": "Achievement Option",
-      "achievement_record_upload_dead_line_text": "You have until {date} to upload an achievement record.",
-      "choose_achievement_option": "Choose the title of your achievement record.",
-      "selected_achievement_option": "Selected Achievement Option",
-      "no_current_achievement_option": "No achievement record has been submitted yet.",
-      "no_achievement_option": "Currently no achievement option is available for this course.",
-      "upload_achievement_record": "Upload new record",
-      "download_template": "Download template",
-      "last_record_upload": "The last record with you as author was uploaded on {dateTime} by {fullName} for \"{achievementRecordTitle}\": {achievementRecordFileName}",
-      "no_existing_record_upload": "No record with you as author has been uploaded yet.",
-      "use_documentation_template": "Use the following template for documentation:",
-      "achievement_option_not_selected": "Please select an achievement option.",
-      "authors": "Authors",
-      "documentation": "Documentation",
-      "upload": "Upload",
-      "authors_missing": "Please add authors!",
-      "documentation_missing": "Please upload documentation!",
-      "file_name": "File name",
-      "operation_failed": "Operation failed",
-      "max_file_size": "Maximum file size: {size} MB",
-      "upload_achievement_record_modal": {
-        "file_too_large": "The file is too large. The maximum size is {size} MB."
-      }
-    },
     "projects": {
-      "section_heading": "Projects in this course",
+      "section_heading": "Other projects in this course",
+      "section_heading_all": "Projects in this course",
       "action_failed": "Action failed",
       "status": {
         "TEMPLATE": "Project template",
@@ -427,6 +401,8 @@
         "title": "Title",
         "authors": "Authors",
         "no_authors": "Open template",
+        "author_excluded_marker": "Excluded from final submission",
+        "author_excluded_inline": "{name} (excluded)",
         "form_new_group": "Form new project team",
         "enter_project_disabled_project_deadline": "The submission deadline for this project passed on {date}. You can no longer join it.",
         "enter_project_disabled_has_project": "You are already on a project in this course and cannot join another one here.",
@@ -557,13 +533,16 @@
         "action_tooltip_join_requests_none": "There are no open join requests at the moment.",
         "submitted_banner": "Submitted on {date} by {name}. The team has been locked from changes.",
         "sent_back_banner": "Your project was sent back for revisions. Please update it and submit again.",
-        "deadline_passed_banner": "The submission deadline passed on {date}."
+        "deadline_passed_banner": "The submission deadline passed on {date}.",
+        "excluded_banner": "The submitting author excluded you from this project's final submission. You no longer count as one of its authors."
       },
       "submit_dialog": {
         "title": "Submit project for review",
-        "body_main": "Once submitted, the project enters review and the team is locked.",
+        "body_main": "Once submitted, the project enters review and is locked from further changes.",
         "body_co_authors": "All co-authors will lose edit access too.",
         "body_irreversible": "An instructor can send it back for revisions if needed.",
+        "contributors_intro": "Select every author who actively and substantially worked on the project.",
+        "contributor_self_suffix": "(you)",
         "confirm_button": "Submit"
       },
       "manage_requests": {
@@ -786,6 +765,7 @@
     "achievementCertificateDownload": "Download achievement certificate",
     "attendanceCertificateDownload": "Download attendance certificate",
     "congrats_completion": "Congratulations for finishing this course!",
+    "view_my_certificates": "Go to my certificates",
     "add-session-address": "New address",
     "upgrade-status": "Update course status and switch to next tab.",
     "to-be-defined": "Location still to be determined",
@@ -795,7 +775,6 @@
     "confirm-online-course-description": "Hereby you confirm that you have participated in the required online courses. Your record of performance is your reflection sheet. You can find it <component>HERE</component>. If you have any questions, please contact your course leader.",
     "confirm-online-course": "Confirm",
     "online-course-confirmed": "You have confirmed on {dateTime} that you have participated in the required online courses.",
-    "achievement-certificate-generation": "Generate Achievement Certificates",
     "attendance-certificate-generation": "Generate Attendance Certificates",
     "certificates-generated": "{number} certificates have been generated.",
     "1-certificate-generated": "One certificate has been generated.",
@@ -901,66 +880,6 @@
       "ogDescription": "Start your learning journey with EduHub by opencampus.sh! Join an active community and explore expert-led courses in tech, business, and creativity.",
       "twitterDescription": "Learn coding, business & creativity with EduHub by opencampus.sh. Join our community and start today!",
       "keywords": "online courses, tech courses, business courses, creative courses, programming, coding, entrepreneurship, startups, sustainability, lifelong learning, opencampus, EduHub, learning platform"
-    }
-  },
-  "achievementsPage": {
-    "title": "Achievements",
-    "page-header": "Performance records",
-    "achievement-record": "Performance records",
-    "achievement-record-admin": "Administration performance records",
-    "results": "Results",
-    "upload": "↑ Upload",
-    "description": "Description",
-    "mentors": "Mentors",
-    "result": "Result",
-    "documentation": "Documentation",
-    "deadline": "Deadline",
-    "results-so-far": "Current results",
-    "rank": "rank",
-    "last-upload": "Last upload",
-    "file-name": "Filename",
-    "last-submitted-documentation": "Last submitted documentation",
-    "cover-image-required": "Cover image required",
-    "csv-file-missing": "CSV file missing!",
-    "documentation-missing": "Please upload documentation!",
-    "authors-missing": "Please add some authors!",
-    "upload-proof": "Upload proof",
-    "form-info-cover-image-size": "Optimal size: {width} x {height} Pixel.",
-    "form-info-documentations": "<component>Use this template to upload the documentation!</component>",
-    "uploadDocumentationTemplate": "Upload documentation template"
-  },
-  "manageAchievementOptions": {
-    "manage_templates_button": "Manage templates",
-    "table_header": {
-      "title": "Title",
-      "record_type": "Type",
-      "mentors": "Mentors",
-      "courses": "Courses"
-    },
-    "record_type": {
-      "DOCUMENTATION": "Documentation",
-      "ONLINE_COURSE": "Online course"
-    },
-    "title": {
-      "placeholder": "Enter project title"
-    },
-    "description": {
-      "placeholder": "Enter description"
-    },
-    "documentation_template": {
-      "placeholder": "Select template",
-      "help_text": "Select a documentation template for this achievement option"
-    },
-    "add_mentor": "Add mentor",
-    "remove_mentor": "Remove mentor",
-    "add_course": "Add course",
-    "delete_button": {
-      "untitled_achievement_option": "Untitled achievement option",
-      "delete_achievement_option_confirmation": "Are you sure you want to delete the achievement option \"{title}\"?"
-    },
-    "notifications": {
-      "achievement_option_added": "Achievement option was added",
-      "add_failed": "Failed to add achievement option"
     }
   },
   "statistics": {
@@ -1097,8 +1016,7 @@
     "application-start": "Application start",
     "application-end": "Application deadline",
     "course-start": "Course start",
-    "course-end": "Course end",
-    "achievement-upload-deadline": "Deadline achievement upload"
+    "course-end": "Course end"
   },
   "manageCourses": {
     "table_header": {
@@ -1130,6 +1048,11 @@
       "label": "Tile Slider Group",
       "placeholder": "Select tile slider groups"
     },
+    "course_group": {
+      "label": "Course Group",
+      "placeholder": "Select course groups",
+      "slider_badge": "Homepage slider"
+    },
     "cover_image": {
       "label": "Cover Image",
       "upload_text": "Click to upload cover image",
@@ -1142,6 +1065,9 @@
     "funding_organizations": {
       "label": "Funding Organizations",
       "add": "Add Funding Organization"
+    },
+    "certificates": {
+      "label": "Certificates"
     },
     "possible_certificates": {
       "label": "Possible Certificates",
@@ -1391,12 +1317,6 @@
     "ectsTotal": "Total ECTS",
     "attendedEvents": "Attended Events",
     "certificate": "Certificate",
-    "projectTitle": "Project title",
-    "lastRecordUpload": "Upload Date",
-    "uploaded_by": "Uploaded by",
-    "co_authors": "Co-authors",
-    "download_documentation": "Download Documentation",
-    "download_documentation_error": "Failed to load project documentation. Please try again.",
     "generate_achievement_certificates": "Generate Achievement Certificates",
     "delete_achievement_certificates": "Delete Achievement Certificates",
     "no_certificates_deleted": "No certificates were deleted",
@@ -1438,6 +1358,7 @@
         "no_authors": "No authors yet.",
         "remove_author_aria": "Remove author",
         "requested": "requested",
+        "excluded": "excluded",
         "mentors_heading": "Mentors",
         "add_mentor": "Add mentor",
         "no_mentors": "No mentors yet.",
@@ -1516,12 +1437,23 @@
     "achievement_passed": "Documentation submitted – passed",
     "achievement_failed": "Documentation submitted – failed",
     "certificates_section": "Certificates",
-    "documentation_section": "Project Documentation",
     "generate_attendance_certificates": "Generate Attendance Certificates",
     "delete_attendance_certificates": "Delete Attendance Certificates",
     "no_attendance_certificates_deleted": "No attendance certificates were deleted",
     "attendance_certificate_deleted_singular": "{count} attendance certificate was deleted",
     "attendance_certificates_deleted_plural": "{count} attendance certificates were deleted",
+    "participations_bulk_actions": {
+      "mark_aborted_selected": "Mark participation as aborted",
+      "mark_aborted_dialog_title": "Mark participation as aborted",
+      "mark_aborted_confirm_singular": "Mark the selected person as aborted? They will be removed from the participants list but remain visible under applications. You can change the status there later.",
+      "mark_aborted_confirm_plural": "Mark {count} selected people as aborted? They will be removed from the participants list but remain visible under applications. You can change the status there later.",
+      "mark_aborted_success_singular": "{count} participation was marked as aborted.",
+      "mark_aborted_success_plural": "{count} participations were marked as aborted.",
+      "mark_aborted_error": "Could not mark participations as aborted: {error}",
+      "disabled_reasons": {
+        "instructors_only": "Only instructors can run this bulk action."
+      }
+    },
     "certificates_group": "Certificates",
     "application_status_tooltip": "Click on the circles to change the rating",
     "application_deadline_tooltip": "If you want to change the date for the Confirmation deadline you can resend the invitation.",
@@ -1785,13 +1717,16 @@
       "delete_program_confirmation": "Are you sure you want to delete the program '{title}'?",
       "untitled_program": "Untitled Program"
     },
-    "certificates": {
+    "Certificates": {
       "template": "Template",
       "proof_of_participation": "Proof of participation",
       "performance_certificate": "Performance certificate",
       "show_certificates": "Show certificate",
       "no_template_uploaded_yet": "No template uploaded yet",
-      "upload_template": "Click to upload template or drag and drop"
+      "upload_template": "Click to upload template or drag and drop",
+      "html_template_label": "HTML template",
+      "html_template_apply_default": "Use default for this program type",
+      "apply_default_unavailable": "No attendance template default is configured for this program type yet."
     },
     "participation_data": {
       "generate": "Generate Participation Data (CSV)",
@@ -1896,7 +1831,28 @@
     "last_name": "Last Name",
     "email": "Email",
     "organization": "Organization",
-    "deletion_confirmation_question": "Are you sure you want to delete the admin rights of {firstName} {lastName} for the organization {organization}?"
+    "profile_organization": "Organization (Profile)",
+    "super_admin_label": "Super Admin",
+    "is_super_admin": "Is Super Admin",
+    "can_manage_events": "Can manage events",
+    "can_manage_courses": "Can manage courses",
+    "can_manage_degrees": "Can manage degrees",
+    "can_manage_users_and_settings": "Can manage users and settings",
+    "error_loading_admin_users": "Error loading admin users.",
+    "deletion_confirmation_question": "Are you sure you want to delete the admin rights of {firstName} {lastName} for the organization {organization}?",
+    "add_admin_button": "Add admin",
+    "add_admin_dialog_title": "Add admin user",
+    "add_admin_user_label": "User",
+    "add_admin_user_search_placeholder": "Search by name or email",
+    "add_admin_no_users_found": "No users found.",
+    "add_admin_change_user": "Change",
+    "add_admin_organization_required": "Please select an organization.",
+    "add_admin_user_required": "Please select a user.",
+    "add_admin_capability_required": "Please grant at least one capability.",
+    "add_admin_error": "The admin user could not be added.",
+    "add_admin_submit": "Add",
+    "add_admin_submitting": "Adding…",
+    "add_admin_success": "Admin user added."
   },
   "manageAppSettings": {
     "backgroundImageURL": "Background image URL",
@@ -1907,6 +1863,27 @@
     "previewImageURL": "Default preview image URL",
     "appSettings": "App Settings",
     "courseGroupOptions": "Course Groups Order",
+    "course_groups": {
+      "label": "Course Groups",
+      "help_text": "Define which course groups exist and the order in which the groups marked as sliders appear on the homepage. The \"Courses\", \"Events\" and \"Degrees\" groups are populated automatically from the published offerings of the matching program type. Additional groups can be created and selected in an organization widget without appearing on the homepage.",
+      "add_placeholder": "Name of the new course group",
+      "add_button": "Add",
+      "widget_help": "Every course group has an ID (shown on the right of each row). To show one or more groups in an organization widget, add the parameter ?groups=ID to the widget URL (separate multiple IDs with commas, e.g. ?groups=3,7). The selected groups are joined into a single slider. Groups with \"Show on homepage\" enabled also appear automatically on the homepage.",
+      "id_label": "ID",
+      "show_on_homepage": "Show on homepage",
+      "auto_badge": "Automatic",
+      "org_badge": "Organization",
+      "delete": "Delete course group",
+      "delete_disabled_auto": "Automatically populated groups cannot be deleted.",
+      "delete_disabled_in_use": "This group is still connected to courses and cannot be deleted.",
+      "error_duplicate": "A course group with this name already exists.",
+      "error_add": "The course group could not be created.",
+      "error_delete": "The course group could not be deleted.",
+      "error_toggle": "The setting could not be saved.",
+      "error_reorder": "The order could not be updated.",
+      "loading": "Loading...",
+      "error_loading": "The course groups could not be loaded."
+    },
     "timeZone": "Time Zone",
     "bannerSettings": "Banner Settings",
     "faqSettings": "FAQ Settings",
@@ -1966,6 +1943,16 @@
         "pdf_upload_failed": "The PDF could not be uploaded. The instruction was not saved.",
         "create_failed": "The instruction could not be created."
       }
+    },
+    "default_attendance_certificate_template": {
+      "label": "Default attendance certificate templates by program type",
+      "help_text": "Default HTML template for attendance certificates, set separately per program type. New programs of a given type inherit the corresponding template automatically; individual programs can override it.",
+      "none_option": "(none)"
+    },
+    "programTypes": {
+      "COURSES": "Courses",
+      "EVENTS": "Events",
+      "DEGREES": "Degree Programs"
     },
     "onboarding": {
       "label": "Onboarding Texts",
@@ -2337,6 +2324,11 @@
     "privacy": "Privacy",
     "faq": "FAQ",
     "newsletter": "Newsletter",
-    "sponsored_by": "Sponsored by:"
+    "sponsored_by": "Sponsored by:",
+    "dlc_logo_alt": "DLC logo",
+    "foerder_logo_alt": "Funding partners logo",
+    "mastodon_alt": "Mastodon",
+    "linkedin_alt": "LinkedIn",
+    "instagram_alt": "Instagram"
   }
 }

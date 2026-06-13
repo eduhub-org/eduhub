@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html,body{margin:0}
+  body{font-family:var(--font-body);background:#222222;padding:26px}
+  .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  .badge{border-radius:9999px;padding:5px 14px;font-size:13px;font-weight:600;border:1px solid #444}
+  .conf{background:#A2EBA0;color:#143a13}
+  .inv{background:#FFA665;color:#4a2400}
+  .err{background:#D45A5A;color:#fff}
+  .tag{background:#C4C4C4;color:#222}
+  .ghost{background:transparent;color:#D8D8D8;border-color:#D8D8D8}
+</style>
+</head>
+<body>
+  <div class="row">
+    <span class="badge conf">Confirmed</span>
+    <span class="badge inv">Invited</span>
+    <span class="badge inv">Extended application period</span>
+    <span class="badge err">Missed</span>
+    <span class="badge tag">Data Science</span>
+    <span class="badge ghost">Online</span>
+  </div>
+</body>
+</html>

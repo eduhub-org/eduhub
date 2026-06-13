@@ -29,7 +29,6 @@ const GET_TEMPLATE = `
       coverImageUrl
       type
       documentationInstructionId
-      achievementCertificateType
       organizationId
       proposedByUserId
       status
@@ -120,7 +119,6 @@ const INSERT_COPY = `
     $coverImageUrl: String
     $type: String
     $documentationInstructionId: Int
-    $achievementCertificateType: ProjectAchievementCertificateType_enum
     $organizationId: Int
     $proposedByUserId: uuid!
     $parentProjectId: Int!
@@ -139,7 +137,6 @@ const INSERT_COPY = `
         coverImageUrl: $coverImageUrl
         type: $type
         documentationInstructionId: $documentationInstructionId
-        achievementCertificateType: $achievementCertificateType
         organizationId: $organizationId
         proposedByUserId: $proposedByUserId
         parentProjectId: $parentProjectId
@@ -331,7 +328,6 @@ export default async function copyProjectFromTemplate(req, logger) {
         coverImageUrl: parent.coverImageUrl ?? null,
         type: parent.type ?? null,
         documentationInstructionId: parent.documentationInstructionId ?? null,
-        achievementCertificateType: parent.achievementCertificateType ?? null,
         organizationId: parent.organizationId ?? null,
         proposedByUserId: parent.proposedByUserId,
         parentProjectId,

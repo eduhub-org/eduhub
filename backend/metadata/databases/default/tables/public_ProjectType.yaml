@@ -1,6 +1,10 @@
 table:
   name: ProjectType
   schema: public
+object_relationships:
+  - name: CertificateTemplate
+    using:
+      foreign_key_constraint_on: certificateTemplateId
 array_relationships:
   - name: ProjectDocumentationInstructions
     using:
@@ -26,6 +30,7 @@ select_permissions:
         - requiresPresentation
         - requiresExternalUrl
         - requiresCoverImage
+        - certificateTemplateId
       filter: {}
   - role: user_access
     permission:
@@ -36,6 +41,7 @@ select_permissions:
         - requiresPresentation
         - requiresExternalUrl
         - requiresCoverImage
+        - certificateTemplateId
       filter: {}
   - role: instructor_access
     permission:
@@ -46,4 +52,5 @@ select_permissions:
         - requiresPresentation
         - requiresExternalUrl
         - requiresCoverImage
+        - certificateTemplateId
       filter: {}

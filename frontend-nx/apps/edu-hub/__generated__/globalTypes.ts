@@ -334,82 +334,22 @@ export enum Attendance_update_column {
 }
 
 /**
- * unique or primary key constraints on table "CertificateTemplateProgram"
+ * unique or primary key constraints on table "CertificateTemplate"
  */
-export enum CertificateTemplateProgram_constraint {
-  CertificateTemplateProgram_pkey = "CertificateTemplateProgram_pkey",
+export enum CertificateTemplate_constraint {
+  CertificateTemplate_name_key = "CertificateTemplate_name_key",
+  CertificateTemplate_pkey = "CertificateTemplate_pkey",
 }
 
 /**
- * select columns of table "CertificateTemplateProgram"
+ * update columns of table "CertificateTemplate"
  */
-export enum CertificateTemplateProgram_select_column {
-  certificateTemplateText = "certificateTemplateText",
-  id = "id",
-  programId = "programId",
-}
-
-/**
- * update columns of table "CertificateTemplateProgram"
- */
-export enum CertificateTemplateProgram_update_column {
-  certificateTemplateText = "certificateTemplateText",
-  id = "id",
-  programId = "programId",
-}
-
-/**
- * unique or primary key constraints on table "CertificateTemplateText"
- */
-export enum CertificateTemplateText_constraint {
-  CertificateTemplateText_pkey = "CertificateTemplateText_pkey",
-  CertificateTemplateText_title_key = "CertificateTemplateText_title_key",
-}
-
-/**
- * select columns of table "CertificateTemplateText"
- */
-export enum CertificateTemplateText_select_column {
-  certificateType = "certificateType",
+export enum CertificateTemplate_update_column {
   created_at = "created_at",
   html = "html",
   id = "id",
-  recordType = "recordType",
-  title = "title",
+  name = "name",
   updated_at = "updated_at",
-}
-
-/**
- * update columns of table "CertificateTemplateText"
- */
-export enum CertificateTemplateText_update_column {
-  certificateType = "certificateType",
-  created_at = "created_at",
-  html = "html",
-  id = "id",
-  recordType = "recordType",
-  title = "title",
-  updated_at = "updated_at",
-}
-
-/**
- * unique or primary key constraints on table "CertificateType"
- */
-export enum CertificateType_constraint {
-  CertificateType_pkey = "CertificateType_pkey",
-}
-
-export enum CertificateType_enum {
-  ACHIEVEMENT = "ACHIEVEMENT",
-  ATTENDANCE = "ATTENDANCE",
-}
-
-/**
- * update columns of table "CertificateType"
- */
-export enum CertificateType_update_column {
-  comment = "comment",
-  value = "value",
 }
 
 /**
@@ -664,6 +604,8 @@ export enum CourseGroupOption_update_column {
   created_at = "created_at",
   id = "id",
   order = "order",
+  organizationId = "organizationId",
+  programType = "programType",
   sliderGroup = "sliderGroup",
   title = "title",
   updated_at = "updated_at",
@@ -820,8 +762,10 @@ export enum Course_constraint {
  */
 export enum Course_select_column {
   achievementCertificatePossible = "achievementCertificatePossible",
+  achievementCertificateTemplateId = "achievementCertificateTemplateId",
   applicationEnd = "applicationEnd",
   attendanceCertificatePossible = "attendanceCertificatePossible",
+  attendanceCertificateTemplateId = "attendanceCertificateTemplateId",
   basePrice = "basePrice",
   chatLink = "chatLink",
   contentDescriptionField1 = "contentDescriptionField1",
@@ -882,8 +826,10 @@ export enum Course_select_column_Course_aggregate_bool_exp_bool_or_arguments_col
  */
 export enum Course_update_column {
   achievementCertificatePossible = "achievementCertificatePossible",
+  achievementCertificateTemplateId = "achievementCertificateTemplateId",
   applicationEnd = "applicationEnd",
   attendanceCertificatePossible = "attendanceCertificatePossible",
+  attendanceCertificateTemplateId = "attendanceCertificateTemplateId",
   basePrice = "basePrice",
   chatLink = "chatLink",
   contentDescriptionField1 = "contentDescriptionField1",
@@ -1110,6 +1056,7 @@ export enum OrganizationAdmin_constraint {
  */
 export enum OrganizationAdmin_select_column {
   canManageCourses = "canManageCourses",
+  canManageDegrees = "canManageDegrees",
   canManageEvents = "canManageEvents",
   canManageSettings = "canManageSettings",
   created_at = "created_at",
@@ -1124,6 +1071,7 @@ export enum OrganizationAdmin_select_column {
  */
 export enum OrganizationAdmin_select_column_OrganizationAdmin_aggregate_bool_exp_bool_and_arguments_columns {
   canManageCourses = "canManageCourses",
+  canManageDegrees = "canManageDegrees",
   canManageEvents = "canManageEvents",
   canManageSettings = "canManageSettings",
 }
@@ -1133,6 +1081,7 @@ export enum OrganizationAdmin_select_column_OrganizationAdmin_aggregate_bool_exp
  */
 export enum OrganizationAdmin_select_column_OrganizationAdmin_aggregate_bool_exp_bool_or_arguments_columns {
   canManageCourses = "canManageCourses",
+  canManageDegrees = "canManageDegrees",
   canManageEvents = "canManageEvents",
   canManageSettings = "canManageSettings",
 }
@@ -1142,6 +1091,7 @@ export enum OrganizationAdmin_select_column_OrganizationAdmin_aggregate_bool_exp
  */
 export enum OrganizationAdmin_update_column {
   canManageCourses = "canManageCourses",
+  canManageDegrees = "canManageDegrees",
   canManageEvents = "canManageEvents",
   canManageSettings = "canManageSettings",
   created_at = "created_at",
@@ -1347,18 +1297,12 @@ export enum ProgramType_constraint {
   ProgramType_pkey = "ProgramType_pkey",
 }
 
-export enum ProgramType_enum {
-  COURSES = "COURSES",
-  DEGREES = "DEGREES",
-  EVENTS = "EVENTS",
-  RENT_A_SCIENTIST = "RENT_A_SCIENTIST",
-}
-
 /**
  * update columns of table "ProgramType"
  */
 export enum ProgramType_update_column {
   comment = "comment",
+  defaultAttendanceCertificateTemplateId = "defaultAttendanceCertificateTemplateId",
   value = "value",
 }
 
@@ -1373,11 +1317,10 @@ export enum Program_constraint {
  * select columns of table "Program"
  */
 export enum Program_select_column {
-  achievementCertificateTemplateTextId = "achievementCertificateTemplateTextId",
   achievementCertificateTemplateURL = "achievementCertificateTemplateURL",
   achievementRecordUploadDeadline = "achievementRecordUploadDeadline",
   applicationStart = "applicationStart",
-  attendanceCertificateTemplateTextId = "attendanceCertificateTemplateTextId",
+  attendanceCertificateTemplateId = "attendanceCertificateTemplateId",
   attendanceCertificateTemplateURL = "attendanceCertificateTemplateURL",
   closingQuestionnaire = "closingQuestionnaire",
   defaultApplicationEnd = "defaultApplicationEnd",
@@ -1426,11 +1369,10 @@ export enum Program_select_column_Program_aggregate_bool_exp_bool_or_arguments_c
  * update columns of table "Program"
  */
 export enum Program_update_column {
-  achievementCertificateTemplateTextId = "achievementCertificateTemplateTextId",
   achievementCertificateTemplateURL = "achievementCertificateTemplateURL",
   achievementRecordUploadDeadline = "achievementRecordUploadDeadline",
   applicationStart = "applicationStart",
-  attendanceCertificateTemplateTextId = "attendanceCertificateTemplateTextId",
+  attendanceCertificateTemplateId = "attendanceCertificateTemplateId",
   attendanceCertificateTemplateURL = "attendanceCertificateTemplateURL",
   closingQuestionnaire = "closingQuestionnaire",
   defaultApplicationEnd = "defaultApplicationEnd",
@@ -1453,26 +1395,6 @@ export enum Program_update_column {
   title = "title",
   type = "type",
   visibility = "visibility",
-}
-
-/**
- * unique or primary key constraints on table "ProjectAchievementCertificateType"
- */
-export enum ProjectAchievementCertificateType_constraint {
-  ProjectAchievementCertificateType_pkey = "ProjectAchievementCertificateType_pkey",
-}
-
-export enum ProjectAchievementCertificateType_enum {
-  DOCUMENTATION = "DOCUMENTATION",
-  ONLINE_COURSE = "ONLINE_COURSE",
-}
-
-/**
- * update columns of table "ProjectAchievementCertificateType"
- */
-export enum ProjectAchievementCertificateType_update_column {
-  comment = "comment",
-  value = "value",
 }
 
 /**
@@ -1553,6 +1475,7 @@ export enum ProjectDocumentationInstruction_select_column {
   created_at = "created_at",
   id = "id",
   isDefault = "isDefault",
+  legacyAchievementDocumentationTemplateId = "legacyAchievementDocumentationTemplateId",
   projectTypeValue = "projectTypeValue",
   title = "title",
   updated_at = "updated_at",
@@ -1580,6 +1503,7 @@ export enum ProjectDocumentationInstruction_update_column {
   created_at = "created_at",
   id = "id",
   isDefault = "isDefault",
+  legacyAchievementDocumentationTemplateId = "legacyAchievementDocumentationTemplateId",
   projectTypeValue = "projectTypeValue",
   title = "title",
   updated_at = "updated_at",
@@ -1626,6 +1550,7 @@ export enum ProjectParticipationStatus_constraint {
 export enum ProjectParticipationStatus_enum {
   ACCEPTED = "ACCEPTED",
   DECLINED = "DECLINED",
+  EXCLUDED = "EXCLUDED",
   REQUESTED = "REQUESTED",
 }
 
@@ -1690,9 +1615,43 @@ export enum ProjectType_constraint {
 }
 
 /**
+ * select columns of table "ProjectType"
+ */
+export enum ProjectType_select_column {
+  certificateTemplateId = "certificateTemplateId",
+  comment = "comment",
+  requiresCoverImage = "requiresCoverImage",
+  requiresDocumentation = "requiresDocumentation",
+  requiresExternalUrl = "requiresExternalUrl",
+  requiresPresentation = "requiresPresentation",
+  value = "value",
+}
+
+/**
+ * select "ProjectType_aggregate_bool_exp_bool_and_arguments_columns" columns of table "ProjectType"
+ */
+export enum ProjectType_select_column_ProjectType_aggregate_bool_exp_bool_and_arguments_columns {
+  requiresCoverImage = "requiresCoverImage",
+  requiresDocumentation = "requiresDocumentation",
+  requiresExternalUrl = "requiresExternalUrl",
+  requiresPresentation = "requiresPresentation",
+}
+
+/**
+ * select "ProjectType_aggregate_bool_exp_bool_or_arguments_columns" columns of table "ProjectType"
+ */
+export enum ProjectType_select_column_ProjectType_aggregate_bool_exp_bool_or_arguments_columns {
+  requiresCoverImage = "requiresCoverImage",
+  requiresDocumentation = "requiresDocumentation",
+  requiresExternalUrl = "requiresExternalUrl",
+  requiresPresentation = "requiresPresentation",
+}
+
+/**
  * update columns of table "ProjectType"
  */
 export enum ProjectType_update_column {
+  certificateTemplateId = "certificateTemplateId",
   comment = "comment",
   requiresCoverImage = "requiresCoverImage",
   requiresDocumentation = "requiresDocumentation",
@@ -1705,6 +1664,8 @@ export enum ProjectType_update_column {
  * unique or primary key constraints on table "Project"
  */
 export enum Project_constraint {
+  Project_legacyAchievementOptionId_key = "Project_legacyAchievementOptionId_key",
+  Project_legacyAchievementRecordId_key = "Project_legacyAchievementRecordId_key",
   Project_pkey = "Project_pkey",
 }
 
@@ -1713,7 +1674,6 @@ export enum Project_constraint {
  */
 export enum Project_select_column {
   acceptingParticipants = "acceptingParticipants",
-  achievementCertificateType = "achievementCertificateType",
   coverImageUrl = "coverImageUrl",
   created_at = "created_at",
   csvResults = "csvResults",
@@ -1722,6 +1682,8 @@ export enum Project_select_column {
   documentationUrl = "documentationUrl",
   externalUrl = "externalUrl",
   id = "id",
+  legacyAchievementOptionId = "legacyAchievementOptionId",
+  legacyAchievementRecordId = "legacyAchievementRecordId",
   organizationId = "organizationId",
   parentProjectId = "parentProjectId",
   presentationUrl = "presentationUrl",
@@ -1758,7 +1720,6 @@ export enum Project_select_column_Project_aggregate_bool_exp_bool_or_arguments_c
  */
 export enum Project_update_column {
   acceptingParticipants = "acceptingParticipants",
-  achievementCertificateType = "achievementCertificateType",
   coverImageUrl = "coverImageUrl",
   created_at = "created_at",
   csvResults = "csvResults",
@@ -1767,6 +1728,8 @@ export enum Project_update_column {
   documentationUrl = "documentationUrl",
   externalUrl = "externalUrl",
   id = "id",
+  legacyAchievementOptionId = "legacyAchievementOptionId",
+  legacyAchievementRecordId = "legacyAchievementRecordId",
   organizationId = "organizationId",
   parentProjectId = "parentProjectId",
   presentationUrl = "presentationUrl",
@@ -2107,17 +2070,6 @@ export interface AchievementDocumentationTemplate_on_conflict {
   where?: AchievementDocumentationTemplate_bool_exp | null;
 }
 
-/**
- * Ordering options when selecting data from "AchievementDocumentationTemplate".
- */
-export interface AchievementDocumentationTemplate_order_by {
-  created_at?: order_by | null;
-  id?: order_by | null;
-  title?: order_by | null;
-  updated_at?: order_by | null;
-  url?: order_by | null;
-}
-
 export interface AchievementOptionCourse_aggregate_bool_exp {
   count?: AchievementOptionCourse_aggregate_bool_exp_count | null;
 }
@@ -2221,30 +2173,6 @@ export interface AchievementOptionCourse_on_conflict {
   constraint: AchievementOptionCourse_constraint;
   update_columns: AchievementOptionCourse_update_column[];
   where?: AchievementOptionCourse_bool_exp | null;
-}
-
-/**
- * Ordering options when selecting data from "AchievementOptionCourse".
- */
-export interface AchievementOptionCourse_order_by {
-  AchievementOption?: AchievementOption_order_by | null;
-  Course?: Course_order_by | null;
-  achievementOptionId?: order_by | null;
-  courseId?: order_by | null;
-  created_at?: order_by | null;
-  id?: order_by | null;
-  updated_at?: order_by | null;
-}
-
-/**
- * input type for updating data in table "AchievementOptionCourse"
- */
-export interface AchievementOptionCourse_set_input {
-  achievementOptionId?: number | null;
-  courseId?: number | null;
-  created_at?: any | null;
-  id?: number | null;
-  updated_at?: any | null;
 }
 
 /**
@@ -2415,17 +2343,6 @@ export interface AchievementOptionMentor_on_conflict {
 }
 
 /**
- * input type for updating data in table "AchievementOptionMentor"
- */
-export interface AchievementOptionMentor_set_input {
-  achievementOptionId?: number | null;
-  created_at?: any | null;
-  id?: number | null;
-  updated_at?: any | null;
-  userId?: any | null;
-}
-
-/**
  * order by stddev() on columns of table "AchievementOptionMentor"
  */
 export interface AchievementOptionMentor_stddev_order_by {
@@ -2509,36 +2426,11 @@ export interface AchievementOption_aggregate_bool_exp_count {
 }
 
 /**
- * order by aggregate values of table "AchievementOption"
- */
-export interface AchievementOption_aggregate_order_by {
-  avg?: AchievementOption_avg_order_by | null;
-  count?: order_by | null;
-  max?: AchievementOption_max_order_by | null;
-  min?: AchievementOption_min_order_by | null;
-  stddev?: AchievementOption_stddev_order_by | null;
-  stddev_pop?: AchievementOption_stddev_pop_order_by | null;
-  stddev_samp?: AchievementOption_stddev_samp_order_by | null;
-  sum?: AchievementOption_sum_order_by | null;
-  var_pop?: AchievementOption_var_pop_order_by | null;
-  var_samp?: AchievementOption_var_samp_order_by | null;
-  variance?: AchievementOption_variance_order_by | null;
-}
-
-/**
  * input type for inserting array relation for remote table "AchievementOption"
  */
 export interface AchievementOption_arr_rel_insert_input {
   data: AchievementOption_insert_input[];
   on_conflict?: AchievementOption_on_conflict | null;
-}
-
-/**
- * order by avg() on columns of table "AchievementOption"
- */
-export interface AchievementOption_avg_order_by {
-  achievementDocumentationTemplateId?: order_by | null;
-  id?: order_by | null;
 }
 
 /**
@@ -2588,32 +2480,6 @@ export interface AchievementOption_insert_input {
 }
 
 /**
- * order by max() on columns of table "AchievementOption"
- */
-export interface AchievementOption_max_order_by {
-  achievementDocumentationTemplateId?: order_by | null;
-  created_at?: order_by | null;
-  description?: order_by | null;
-  evaluationScriptUrl?: order_by | null;
-  id?: order_by | null;
-  title?: order_by | null;
-  updated_at?: order_by | null;
-}
-
-/**
- * order by min() on columns of table "AchievementOption"
- */
-export interface AchievementOption_min_order_by {
-  achievementDocumentationTemplateId?: order_by | null;
-  created_at?: order_by | null;
-  description?: order_by | null;
-  evaluationScriptUrl?: order_by | null;
-  id?: order_by | null;
-  title?: order_by | null;
-  updated_at?: order_by | null;
-}
-
-/**
  * input type for inserting object relation for remote table "AchievementOption"
  */
 export interface AchievementOption_obj_rel_insert_input {
@@ -2628,97 +2494,6 @@ export interface AchievementOption_on_conflict {
   constraint: AchievementOption_constraint;
   update_columns: AchievementOption_update_column[];
   where?: AchievementOption_bool_exp | null;
-}
-
-/**
- * Ordering options when selecting data from "AchievementOption".
- */
-export interface AchievementOption_order_by {
-  AchievementOptionCourses_aggregate?: AchievementOptionCourse_aggregate_order_by | null;
-  AchievementOptionMentors_aggregate?: AchievementOptionMentor_aggregate_order_by | null;
-  AchievementOptionTemplate?: AchievementDocumentationTemplate_order_by | null;
-  AchievementRecordType?: AchievementRecordType_order_by | null;
-  AchievementRecords_aggregate?: AchievementRecord_aggregate_order_by | null;
-  achievementDocumentationTemplateId?: order_by | null;
-  created_at?: order_by | null;
-  description?: order_by | null;
-  evaluationScriptUrl?: order_by | null;
-  id?: order_by | null;
-  published?: order_by | null;
-  recordType?: order_by | null;
-  title?: order_by | null;
-  updated_at?: order_by | null;
-}
-
-/**
- * input type for updating data in table "AchievementOption"
- */
-export interface AchievementOption_set_input {
-  achievementDocumentationTemplateId?: number | null;
-  created_at?: any | null;
-  description?: string | null;
-  evaluationScriptUrl?: string | null;
-  id?: number | null;
-  published?: boolean | null;
-  recordType?: AchievementRecordType_enum | null;
-  title?: string | null;
-  updated_at?: any | null;
-}
-
-/**
- * order by stddev() on columns of table "AchievementOption"
- */
-export interface AchievementOption_stddev_order_by {
-  achievementDocumentationTemplateId?: order_by | null;
-  id?: order_by | null;
-}
-
-/**
- * order by stddev_pop() on columns of table "AchievementOption"
- */
-export interface AchievementOption_stddev_pop_order_by {
-  achievementDocumentationTemplateId?: order_by | null;
-  id?: order_by | null;
-}
-
-/**
- * order by stddev_samp() on columns of table "AchievementOption"
- */
-export interface AchievementOption_stddev_samp_order_by {
-  achievementDocumentationTemplateId?: order_by | null;
-  id?: order_by | null;
-}
-
-/**
- * order by sum() on columns of table "AchievementOption"
- */
-export interface AchievementOption_sum_order_by {
-  achievementDocumentationTemplateId?: order_by | null;
-  id?: order_by | null;
-}
-
-/**
- * order by var_pop() on columns of table "AchievementOption"
- */
-export interface AchievementOption_var_pop_order_by {
-  achievementDocumentationTemplateId?: order_by | null;
-  id?: order_by | null;
-}
-
-/**
- * order by var_samp() on columns of table "AchievementOption"
- */
-export interface AchievementOption_var_samp_order_by {
-  achievementDocumentationTemplateId?: order_by | null;
-  id?: order_by | null;
-}
-
-/**
- * order by variance() on columns of table "AchievementOption"
- */
-export interface AchievementOption_variance_order_by {
-  achievementDocumentationTemplateId?: order_by | null;
-  id?: order_by | null;
 }
 
 export interface AchievementRecordAuthor_aggregate_bool_exp {
@@ -2823,19 +2598,6 @@ export interface AchievementRecordAuthor_on_conflict {
   constraint: AchievementRecordAuthor_constraint;
   update_columns: AchievementRecordAuthor_update_column[];
   where?: AchievementRecordAuthor_bool_exp | null;
-}
-
-/**
- * Ordering options when selecting data from "AchievementRecordAuthor".
- */
-export interface AchievementRecordAuthor_order_by {
-  AchievementRecord?: AchievementRecord_order_by | null;
-  User?: User_order_by | null;
-  achievementRecordId?: order_by | null;
-  created_at?: order_by | null;
-  id?: order_by | null;
-  updated_at?: order_by | null;
-  userId?: order_by | null;
 }
 
 /**
@@ -2945,15 +2707,6 @@ export interface AchievementRecordRating_on_conflict {
 }
 
 /**
- * Ordering options when selecting data from "AchievementRecordRating".
- */
-export interface AchievementRecordRating_order_by {
-  AchievementRecords_aggregate?: AchievementRecord_aggregate_order_by | null;
-  comment?: order_by | null;
-  value?: order_by | null;
-}
-
-/**
  * Boolean expression to filter rows from the table "AchievementRecordType". All fields are combined with a logical 'AND'.
  */
 export interface AchievementRecordType_bool_exp {
@@ -3003,15 +2756,6 @@ export interface AchievementRecordType_on_conflict {
   where?: AchievementRecordType_bool_exp | null;
 }
 
-/**
- * Ordering options when selecting data from "AchievementRecordType".
- */
-export interface AchievementRecordType_order_by {
-  AchievementOptions_aggregate?: AchievementOption_aggregate_order_by | null;
-  comment?: order_by | null;
-  value?: order_by | null;
-}
-
 export interface AchievementRecord_aggregate_bool_exp {
   count?: AchievementRecord_aggregate_bool_exp_count | null;
 }
@@ -3024,38 +2768,11 @@ export interface AchievementRecord_aggregate_bool_exp_count {
 }
 
 /**
- * order by aggregate values of table "AchievementRecord"
- */
-export interface AchievementRecord_aggregate_order_by {
-  avg?: AchievementRecord_avg_order_by | null;
-  count?: order_by | null;
-  max?: AchievementRecord_max_order_by | null;
-  min?: AchievementRecord_min_order_by | null;
-  stddev?: AchievementRecord_stddev_order_by | null;
-  stddev_pop?: AchievementRecord_stddev_pop_order_by | null;
-  stddev_samp?: AchievementRecord_stddev_samp_order_by | null;
-  sum?: AchievementRecord_sum_order_by | null;
-  var_pop?: AchievementRecord_var_pop_order_by | null;
-  var_samp?: AchievementRecord_var_samp_order_by | null;
-  variance?: AchievementRecord_variance_order_by | null;
-}
-
-/**
  * input type for inserting array relation for remote table "AchievementRecord"
  */
 export interface AchievementRecord_arr_rel_insert_input {
   data: AchievementRecord_insert_input[];
   on_conflict?: AchievementRecord_on_conflict | null;
-}
-
-/**
- * order by avg() on columns of table "AchievementRecord"
- */
-export interface AchievementRecord_avg_order_by {
-  achievementOptionId?: order_by | null;
-  courseId?: order_by | null;
-  id?: order_by | null;
-  score?: order_by | null;
 }
 
 /**
@@ -3107,42 +2824,6 @@ export interface AchievementRecord_insert_input {
 }
 
 /**
- * order by max() on columns of table "AchievementRecord"
- */
-export interface AchievementRecord_max_order_by {
-  achievementOptionId?: order_by | null;
-  courseId?: order_by | null;
-  coverImageUrl?: order_by | null;
-  created_at?: order_by | null;
-  csvResults?: order_by | null;
-  description?: order_by | null;
-  documentationUrl?: order_by | null;
-  evaluationScriptUrl?: order_by | null;
-  id?: order_by | null;
-  score?: order_by | null;
-  updated_at?: order_by | null;
-  uploadUserId?: order_by | null;
-}
-
-/**
- * order by min() on columns of table "AchievementRecord"
- */
-export interface AchievementRecord_min_order_by {
-  achievementOptionId?: order_by | null;
-  courseId?: order_by | null;
-  coverImageUrl?: order_by | null;
-  created_at?: order_by | null;
-  csvResults?: order_by | null;
-  description?: order_by | null;
-  documentationUrl?: order_by | null;
-  evaluationScriptUrl?: order_by | null;
-  id?: order_by | null;
-  score?: order_by | null;
-  updated_at?: order_by | null;
-  uploadUserId?: order_by | null;
-}
-
-/**
  * input type for inserting object relation for remote table "AchievementRecord"
  */
 export interface AchievementRecord_obj_rel_insert_input {
@@ -3157,117 +2838,6 @@ export interface AchievementRecord_on_conflict {
   constraint: AchievementRecord_constraint;
   update_columns: AchievementRecord_update_column[];
   where?: AchievementRecord_bool_exp | null;
-}
-
-/**
- * Ordering options when selecting data from "AchievementRecord".
- */
-export interface AchievementRecord_order_by {
-  AchievementOption?: AchievementOption_order_by | null;
-  AchievementRecordAuthors_aggregate?: AchievementRecordAuthor_aggregate_order_by | null;
-  AchievementRecordRating?: AchievementRecordRating_order_by | null;
-  achievementOptionId?: order_by | null;
-  courseId?: order_by | null;
-  coverImageUrl?: order_by | null;
-  created_at?: order_by | null;
-  csvResults?: order_by | null;
-  description?: order_by | null;
-  documentationUrl?: order_by | null;
-  evaluationScriptUrl?: order_by | null;
-  id?: order_by | null;
-  rating?: order_by | null;
-  score?: order_by | null;
-  updated_at?: order_by | null;
-  uploadUserId?: order_by | null;
-}
-
-/**
- * input type for updating data in table "AchievementRecord"
- */
-export interface AchievementRecord_set_input {
-  achievementOptionId?: number | null;
-  courseId?: number | null;
-  coverImageUrl?: string | null;
-  created_at?: any | null;
-  csvResults?: string | null;
-  description?: string | null;
-  documentationUrl?: string | null;
-  evaluationScriptUrl?: string | null;
-  id?: number | null;
-  rating?: AchievementRecordRating_enum | null;
-  score?: any | null;
-  updated_at?: any | null;
-  uploadUserId?: any | null;
-}
-
-/**
- * order by stddev() on columns of table "AchievementRecord"
- */
-export interface AchievementRecord_stddev_order_by {
-  achievementOptionId?: order_by | null;
-  courseId?: order_by | null;
-  id?: order_by | null;
-  score?: order_by | null;
-}
-
-/**
- * order by stddev_pop() on columns of table "AchievementRecord"
- */
-export interface AchievementRecord_stddev_pop_order_by {
-  achievementOptionId?: order_by | null;
-  courseId?: order_by | null;
-  id?: order_by | null;
-  score?: order_by | null;
-}
-
-/**
- * order by stddev_samp() on columns of table "AchievementRecord"
- */
-export interface AchievementRecord_stddev_samp_order_by {
-  achievementOptionId?: order_by | null;
-  courseId?: order_by | null;
-  id?: order_by | null;
-  score?: order_by | null;
-}
-
-/**
- * order by sum() on columns of table "AchievementRecord"
- */
-export interface AchievementRecord_sum_order_by {
-  achievementOptionId?: order_by | null;
-  courseId?: order_by | null;
-  id?: order_by | null;
-  score?: order_by | null;
-}
-
-/**
- * order by var_pop() on columns of table "AchievementRecord"
- */
-export interface AchievementRecord_var_pop_order_by {
-  achievementOptionId?: order_by | null;
-  courseId?: order_by | null;
-  id?: order_by | null;
-  score?: order_by | null;
-}
-
-/**
- * order by var_samp() on columns of table "AchievementRecord"
- */
-export interface AchievementRecord_var_samp_order_by {
-  achievementOptionId?: order_by | null;
-  courseId?: order_by | null;
-  id?: order_by | null;
-  score?: order_by | null;
-}
-
-/**
- * order by variance() on columns of table "AchievementRecord"
- */
-export interface AchievementRecord_variance_order_by {
-  achievementOptionId?: order_by | null;
-  courseId?: order_by | null;
-  id?: order_by | null;
-  score?: order_by | null;
 }
 
 export interface AddonMappingInput {
@@ -3622,292 +3192,73 @@ export interface Boolean_comparison_exp {
   _nin?: boolean[] | null;
 }
 
-export interface CertificateTemplateProgram_aggregate_bool_exp {
-  count?: CertificateTemplateProgram_aggregate_bool_exp_count | null;
-}
-
-export interface CertificateTemplateProgram_aggregate_bool_exp_count {
-  arguments?: CertificateTemplateProgram_select_column[] | null;
-  distinct?: boolean | null;
-  filter?: CertificateTemplateProgram_bool_exp | null;
-  predicate: Int_comparison_exp;
-}
-
 /**
- * order by aggregate values of table "CertificateTemplateProgram"
+ * Boolean expression to filter rows from the table "CertificateTemplate". All fields are combined with a logical 'AND'.
  */
-export interface CertificateTemplateProgram_aggregate_order_by {
-  avg?: CertificateTemplateProgram_avg_order_by | null;
-  count?: order_by | null;
-  max?: CertificateTemplateProgram_max_order_by | null;
-  min?: CertificateTemplateProgram_min_order_by | null;
-  stddev?: CertificateTemplateProgram_stddev_order_by | null;
-  stddev_pop?: CertificateTemplateProgram_stddev_pop_order_by | null;
-  stddev_samp?: CertificateTemplateProgram_stddev_samp_order_by | null;
-  sum?: CertificateTemplateProgram_sum_order_by | null;
-  var_pop?: CertificateTemplateProgram_var_pop_order_by | null;
-  var_samp?: CertificateTemplateProgram_var_samp_order_by | null;
-  variance?: CertificateTemplateProgram_variance_order_by | null;
-}
-
-/**
- * input type for inserting array relation for remote table "CertificateTemplateProgram"
- */
-export interface CertificateTemplateProgram_arr_rel_insert_input {
-  data: CertificateTemplateProgram_insert_input[];
-  on_conflict?: CertificateTemplateProgram_on_conflict | null;
-}
-
-/**
- * order by avg() on columns of table "CertificateTemplateProgram"
- */
-export interface CertificateTemplateProgram_avg_order_by {
-  certificateTemplateText?: order_by | null;
-  id?: order_by | null;
-  programId?: order_by | null;
-}
-
-/**
- * Boolean expression to filter rows from the table "CertificateTemplateProgram". All fields are combined with a logical 'AND'.
- */
-export interface CertificateTemplateProgram_bool_exp {
-  CertificateTemplateText?: CertificateTemplateText_bool_exp | null;
-  Program?: Program_bool_exp | null;
-  _and?: CertificateTemplateProgram_bool_exp[] | null;
-  _not?: CertificateTemplateProgram_bool_exp | null;
-  _or?: CertificateTemplateProgram_bool_exp[] | null;
-  certificateTemplateText?: Int_comparison_exp | null;
-  id?: Int_comparison_exp | null;
-  programId?: Int_comparison_exp | null;
-}
-
-/**
- * input type for inserting data into table "CertificateTemplateProgram"
- */
-export interface CertificateTemplateProgram_insert_input {
-  CertificateTemplateText?: CertificateTemplateText_obj_rel_insert_input | null;
-  Program?: Program_obj_rel_insert_input | null;
-  certificateTemplateText?: number | null;
-  id?: number | null;
-  programId?: number | null;
-}
-
-/**
- * order by max() on columns of table "CertificateTemplateProgram"
- */
-export interface CertificateTemplateProgram_max_order_by {
-  certificateTemplateText?: order_by | null;
-  id?: order_by | null;
-  programId?: order_by | null;
-}
-
-/**
- * order by min() on columns of table "CertificateTemplateProgram"
- */
-export interface CertificateTemplateProgram_min_order_by {
-  certificateTemplateText?: order_by | null;
-  id?: order_by | null;
-  programId?: order_by | null;
-}
-
-/**
- * on_conflict condition type for table "CertificateTemplateProgram"
- */
-export interface CertificateTemplateProgram_on_conflict {
-  constraint: CertificateTemplateProgram_constraint;
-  update_columns: CertificateTemplateProgram_update_column[];
-  where?: CertificateTemplateProgram_bool_exp | null;
-}
-
-/**
- * order by stddev() on columns of table "CertificateTemplateProgram"
- */
-export interface CertificateTemplateProgram_stddev_order_by {
-  certificateTemplateText?: order_by | null;
-  id?: order_by | null;
-  programId?: order_by | null;
-}
-
-/**
- * order by stddev_pop() on columns of table "CertificateTemplateProgram"
- */
-export interface CertificateTemplateProgram_stddev_pop_order_by {
-  certificateTemplateText?: order_by | null;
-  id?: order_by | null;
-  programId?: order_by | null;
-}
-
-/**
- * order by stddev_samp() on columns of table "CertificateTemplateProgram"
- */
-export interface CertificateTemplateProgram_stddev_samp_order_by {
-  certificateTemplateText?: order_by | null;
-  id?: order_by | null;
-  programId?: order_by | null;
-}
-
-/**
- * order by sum() on columns of table "CertificateTemplateProgram"
- */
-export interface CertificateTemplateProgram_sum_order_by {
-  certificateTemplateText?: order_by | null;
-  id?: order_by | null;
-  programId?: order_by | null;
-}
-
-/**
- * order by var_pop() on columns of table "CertificateTemplateProgram"
- */
-export interface CertificateTemplateProgram_var_pop_order_by {
-  certificateTemplateText?: order_by | null;
-  id?: order_by | null;
-  programId?: order_by | null;
-}
-
-/**
- * order by var_samp() on columns of table "CertificateTemplateProgram"
- */
-export interface CertificateTemplateProgram_var_samp_order_by {
-  certificateTemplateText?: order_by | null;
-  id?: order_by | null;
-  programId?: order_by | null;
-}
-
-/**
- * order by variance() on columns of table "CertificateTemplateProgram"
- */
-export interface CertificateTemplateProgram_variance_order_by {
-  certificateTemplateText?: order_by | null;
-  id?: order_by | null;
-  programId?: order_by | null;
-}
-
-export interface CertificateTemplateText_aggregate_bool_exp {
-  count?: CertificateTemplateText_aggregate_bool_exp_count | null;
-}
-
-export interface CertificateTemplateText_aggregate_bool_exp_count {
-  arguments?: CertificateTemplateText_select_column[] | null;
-  distinct?: boolean | null;
-  filter?: CertificateTemplateText_bool_exp | null;
-  predicate: Int_comparison_exp;
-}
-
-/**
- * input type for inserting array relation for remote table "CertificateTemplateText"
- */
-export interface CertificateTemplateText_arr_rel_insert_input {
-  data: CertificateTemplateText_insert_input[];
-  on_conflict?: CertificateTemplateText_on_conflict | null;
-}
-
-/**
- * Boolean expression to filter rows from the table "CertificateTemplateText". All fields are combined with a logical 'AND'.
- */
-export interface CertificateTemplateText_bool_exp {
-  AchievementRecordType?: AchievementRecordType_bool_exp | null;
-  CertificateTemplatePrograms?: CertificateTemplateProgram_bool_exp | null;
-  CertificateTemplatePrograms_aggregate?: CertificateTemplateProgram_aggregate_bool_exp | null;
-  CertificateType?: CertificateType_bool_exp | null;
-  Programs?: Program_bool_exp | null;
-  Programs_aggregate?: Program_aggregate_bool_exp | null;
-  _and?: CertificateTemplateText_bool_exp[] | null;
-  _not?: CertificateTemplateText_bool_exp | null;
-  _or?: CertificateTemplateText_bool_exp[] | null;
-  certificateType?: CertificateType_enum_comparison_exp | null;
+export interface CertificateTemplate_bool_exp {
+  AchievementCourses?: Course_bool_exp | null;
+  AchievementCourses_aggregate?: Course_aggregate_bool_exp | null;
+  AttendanceCourses?: Course_bool_exp | null;
+  AttendanceCourses_aggregate?: Course_aggregate_bool_exp | null;
+  AttendancePrograms?: Program_bool_exp | null;
+  AttendancePrograms_aggregate?: Program_aggregate_bool_exp | null;
+  ProjectTypes?: ProjectType_bool_exp | null;
+  ProjectTypes_aggregate?: ProjectType_aggregate_bool_exp | null;
+  _and?: CertificateTemplate_bool_exp[] | null;
+  _not?: CertificateTemplate_bool_exp | null;
+  _or?: CertificateTemplate_bool_exp[] | null;
   created_at?: timestamptz_comparison_exp | null;
   html?: String_comparison_exp | null;
   id?: Int_comparison_exp | null;
-  programsByAttendancecertificatetemplatetextid?: Program_bool_exp | null;
-  programsByAttendancecertificatetemplatetextid_aggregate?: Program_aggregate_bool_exp | null;
-  recordType?: AchievementRecordType_enum_comparison_exp | null;
-  title?: String_comparison_exp | null;
+  name?: String_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
 }
 
 /**
- * input type for inserting data into table "CertificateTemplateText"
+ * input type for inserting data into table "CertificateTemplate"
  */
-export interface CertificateTemplateText_insert_input {
-  AchievementRecordType?: AchievementRecordType_obj_rel_insert_input | null;
-  CertificateTemplatePrograms?: CertificateTemplateProgram_arr_rel_insert_input | null;
-  CertificateType?: CertificateType_obj_rel_insert_input | null;
-  Programs?: Program_arr_rel_insert_input | null;
-  certificateType?: CertificateType_enum | null;
+export interface CertificateTemplate_insert_input {
+  AchievementCourses?: Course_arr_rel_insert_input | null;
+  AttendanceCourses?: Course_arr_rel_insert_input | null;
+  AttendancePrograms?: Program_arr_rel_insert_input | null;
+  ProjectTypes?: ProjectType_arr_rel_insert_input | null;
   created_at?: any | null;
   html?: string | null;
   id?: number | null;
-  programsByAttendancecertificatetemplatetextid?: Program_arr_rel_insert_input | null;
-  recordType?: AchievementRecordType_enum | null;
-  title?: string | null;
+  name?: string | null;
   updated_at?: any | null;
 }
 
 /**
- * input type for inserting object relation for remote table "CertificateTemplateText"
+ * input type for inserting object relation for remote table "CertificateTemplate"
  */
-export interface CertificateTemplateText_obj_rel_insert_input {
-  data: CertificateTemplateText_insert_input;
-  on_conflict?: CertificateTemplateText_on_conflict | null;
+export interface CertificateTemplate_obj_rel_insert_input {
+  data: CertificateTemplate_insert_input;
+  on_conflict?: CertificateTemplate_on_conflict | null;
 }
 
 /**
- * on_conflict condition type for table "CertificateTemplateText"
+ * on_conflict condition type for table "CertificateTemplate"
  */
-export interface CertificateTemplateText_on_conflict {
-  constraint: CertificateTemplateText_constraint;
-  update_columns: CertificateTemplateText_update_column[];
-  where?: CertificateTemplateText_bool_exp | null;
+export interface CertificateTemplate_on_conflict {
+  constraint: CertificateTemplate_constraint;
+  update_columns: CertificateTemplate_update_column[];
+  where?: CertificateTemplate_bool_exp | null;
 }
 
 /**
- * Boolean expression to filter rows from the table "CertificateType". All fields are combined with a logical 'AND'.
+ * Ordering options when selecting data from "CertificateTemplate".
  */
-export interface CertificateType_bool_exp {
-  CertificateTemplateTexts?: CertificateTemplateText_bool_exp | null;
-  CertificateTemplateTexts_aggregate?: CertificateTemplateText_aggregate_bool_exp | null;
-  _and?: CertificateType_bool_exp[] | null;
-  _not?: CertificateType_bool_exp | null;
-  _or?: CertificateType_bool_exp[] | null;
-  comment?: String_comparison_exp | null;
-  value?: String_comparison_exp | null;
-}
-
-/**
- * Boolean expression to compare columns of type "CertificateType_enum". All fields are combined with logical 'AND'.
- */
-export interface CertificateType_enum_comparison_exp {
-  _eq?: CertificateType_enum | null;
-  _in?: CertificateType_enum[] | null;
-  _is_null?: boolean | null;
-  _neq?: CertificateType_enum | null;
-  _nin?: CertificateType_enum[] | null;
-}
-
-/**
- * input type for inserting data into table "CertificateType"
- */
-export interface CertificateType_insert_input {
-  CertificateTemplateTexts?: CertificateTemplateText_arr_rel_insert_input | null;
-  comment?: string | null;
-  value?: string | null;
-}
-
-/**
- * input type for inserting object relation for remote table "CertificateType"
- */
-export interface CertificateType_obj_rel_insert_input {
-  data: CertificateType_insert_input;
-  on_conflict?: CertificateType_on_conflict | null;
-}
-
-/**
- * on_conflict condition type for table "CertificateType"
- */
-export interface CertificateType_on_conflict {
-  constraint: CertificateType_constraint;
-  update_columns: CertificateType_update_column[];
-  where?: CertificateType_bool_exp | null;
+export interface CertificateTemplate_order_by {
+  AchievementCourses_aggregate?: Course_aggregate_order_by | null;
+  AttendanceCourses_aggregate?: Course_aggregate_order_by | null;
+  AttendancePrograms_aggregate?: Program_aggregate_order_by | null;
+  ProjectTypes_aggregate?: ProjectType_aggregate_order_by | null;
+  created_at?: order_by | null;
+  html?: order_by | null;
+  id?: order_by | null;
+  name?: order_by | null;
+  updated_at?: order_by | null;
 }
 
 /**
@@ -5029,12 +4380,16 @@ export interface CourseFundingOrganization_variance_order_by {
 export interface CourseGroupOption_bool_exp {
   CourseGroups?: CourseGroup_bool_exp | null;
   CourseGroups_aggregate?: CourseGroup_aggregate_bool_exp | null;
+  Organization?: Organization_bool_exp | null;
+  ProgramType?: ProgramType_bool_exp | null;
   _and?: CourseGroupOption_bool_exp[] | null;
   _not?: CourseGroupOption_bool_exp | null;
   _or?: CourseGroupOption_bool_exp[] | null;
   created_at?: timestamptz_comparison_exp | null;
   id?: Int_comparison_exp | null;
   order?: Int_comparison_exp | null;
+  organizationId?: Int_comparison_exp | null;
+  programType?: String_comparison_exp | null;
   sliderGroup?: Boolean_comparison_exp | null;
   title?: String_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
@@ -5045,9 +4400,13 @@ export interface CourseGroupOption_bool_exp {
  */
 export interface CourseGroupOption_insert_input {
   CourseGroups?: CourseGroup_arr_rel_insert_input | null;
+  Organization?: Organization_obj_rel_insert_input | null;
+  ProgramType?: ProgramType_obj_rel_insert_input | null;
   created_at?: any | null;
   id?: number | null;
   order?: number | null;
+  organizationId?: number | null;
+  programType?: string | null;
   sliderGroup?: boolean | null;
   title?: string | null;
   updated_at?: any | null;
@@ -5765,6 +5124,8 @@ export interface Course_arr_rel_insert_input {
  * order by avg() on columns of table "Course"
  */
 export interface Course_avg_order_by {
+  achievementCertificateTemplateId?: order_by | null;
+  attendanceCertificateTemplateId?: order_by | null;
   basePrice?: order_by | null;
   id?: order_by | null;
   maxMissedSessions?: order_by | null;
@@ -5776,8 +5137,10 @@ export interface Course_avg_order_by {
  * Boolean expression to filter rows from the table "Course". All fields are combined with a logical 'AND'.
  */
 export interface Course_bool_exp {
+  AchievementCertificateTemplate?: CertificateTemplate_bool_exp | null;
   AchievementOptionCourses?: AchievementOptionCourse_bool_exp | null;
   AchievementOptionCourses_aggregate?: AchievementOptionCourse_aggregate_bool_exp | null;
+  AttendanceCertificateTemplate?: CertificateTemplate_bool_exp | null;
   CourseAddonMappings?: CourseAddonMapping_bool_exp | null;
   CourseAddonMappings_aggregate?: CourseAddonMapping_aggregate_bool_exp | null;
   CourseDegrees?: CourseDegree_bool_exp | null;
@@ -5807,9 +5170,11 @@ export interface Course_bool_exp {
   _not?: Course_bool_exp | null;
   _or?: Course_bool_exp[] | null;
   achievementCertificatePossible?: Boolean_comparison_exp | null;
+  achievementCertificateTemplateId?: Int_comparison_exp | null;
   activeParticipantCount?: bigint_comparison_exp | null;
   applicationEnd?: date_comparison_exp | null;
   attendanceCertificatePossible?: Boolean_comparison_exp | null;
+  attendanceCertificateTemplateId?: Int_comparison_exp | null;
   basePrice?: Int_comparison_exp | null;
   chatLink?: String_comparison_exp | null;
   contentDescriptionField1?: String_comparison_exp | null;
@@ -5849,7 +5214,9 @@ export interface Course_bool_exp {
  * input type for inserting data into table "Course"
  */
 export interface Course_insert_input {
+  AchievementCertificateTemplate?: CertificateTemplate_obj_rel_insert_input | null;
   AchievementOptionCourses?: AchievementOptionCourse_arr_rel_insert_input | null;
+  AttendanceCertificateTemplate?: CertificateTemplate_obj_rel_insert_input | null;
   CourseAddonMappings?: CourseAddonMapping_arr_rel_insert_input | null;
   CourseDegrees?: CourseDegree_arr_rel_insert_input | null;
   CourseEnrollments?: CourseEnrollment_arr_rel_insert_input | null;
@@ -5866,8 +5233,10 @@ export interface Course_insert_input {
   Sessions?: Session_arr_rel_insert_input | null;
   Weekday?: Weekday_obj_rel_insert_input | null;
   achievementCertificatePossible?: boolean | null;
+  achievementCertificateTemplateId?: number | null;
   applicationEnd?: any | null;
   attendanceCertificatePossible?: boolean | null;
+  attendanceCertificateTemplateId?: number | null;
   basePrice?: number | null;
   chatLink?: string | null;
   contentDescriptionField1?: string | null;
@@ -5907,7 +5276,9 @@ export interface Course_insert_input {
  * order by max() on columns of table "Course"
  */
 export interface Course_max_order_by {
+  achievementCertificateTemplateId?: order_by | null;
   applicationEnd?: order_by | null;
+  attendanceCertificateTemplateId?: order_by | null;
   basePrice?: order_by | null;
   chatLink?: order_by | null;
   contentDescriptionField1?: order_by | null;
@@ -5940,7 +5311,9 @@ export interface Course_max_order_by {
  * order by min() on columns of table "Course"
  */
 export interface Course_min_order_by {
+  achievementCertificateTemplateId?: order_by | null;
   applicationEnd?: order_by | null;
+  attendanceCertificateTemplateId?: order_by | null;
   basePrice?: order_by | null;
   chatLink?: order_by | null;
   contentDescriptionField1?: order_by | null;
@@ -5990,7 +5363,9 @@ export interface Course_on_conflict {
  * Ordering options when selecting data from "Course".
  */
 export interface Course_order_by {
+  AchievementCertificateTemplate?: CertificateTemplate_order_by | null;
   AchievementOptionCourses_aggregate?: AchievementOptionCourse_aggregate_order_by | null;
+  AttendanceCertificateTemplate?: CertificateTemplate_order_by | null;
   CourseAddonMappings_aggregate?: CourseAddonMapping_aggregate_order_by | null;
   CourseDegrees_aggregate?: CourseDegree_aggregate_order_by | null;
   CourseEnrollments_aggregate?: CourseEnrollment_aggregate_order_by | null;
@@ -6007,9 +5382,11 @@ export interface Course_order_by {
   Sessions_aggregate?: Session_aggregate_order_by | null;
   Weekday?: Weekday_order_by | null;
   achievementCertificatePossible?: order_by | null;
+  achievementCertificateTemplateId?: order_by | null;
   activeParticipantCount?: order_by | null;
   applicationEnd?: order_by | null;
   attendanceCertificatePossible?: order_by | null;
+  attendanceCertificateTemplateId?: order_by | null;
   basePrice?: order_by | null;
   chatLink?: order_by | null;
   contentDescriptionField1?: order_by | null;
@@ -6050,8 +5427,10 @@ export interface Course_order_by {
  */
 export interface Course_set_input {
   achievementCertificatePossible?: boolean | null;
+  achievementCertificateTemplateId?: number | null;
   applicationEnd?: any | null;
   attendanceCertificatePossible?: boolean | null;
+  attendanceCertificateTemplateId?: number | null;
   basePrice?: number | null;
   chatLink?: string | null;
   contentDescriptionField1?: string | null;
@@ -6091,6 +5470,8 @@ export interface Course_set_input {
  * order by stddev() on columns of table "Course"
  */
 export interface Course_stddev_order_by {
+  achievementCertificateTemplateId?: order_by | null;
+  attendanceCertificateTemplateId?: order_by | null;
   basePrice?: order_by | null;
   id?: order_by | null;
   maxMissedSessions?: order_by | null;
@@ -6102,6 +5483,8 @@ export interface Course_stddev_order_by {
  * order by stddev_pop() on columns of table "Course"
  */
 export interface Course_stddev_pop_order_by {
+  achievementCertificateTemplateId?: order_by | null;
+  attendanceCertificateTemplateId?: order_by | null;
   basePrice?: order_by | null;
   id?: order_by | null;
   maxMissedSessions?: order_by | null;
@@ -6113,6 +5496,8 @@ export interface Course_stddev_pop_order_by {
  * order by stddev_samp() on columns of table "Course"
  */
 export interface Course_stddev_samp_order_by {
+  achievementCertificateTemplateId?: order_by | null;
+  attendanceCertificateTemplateId?: order_by | null;
   basePrice?: order_by | null;
   id?: order_by | null;
   maxMissedSessions?: order_by | null;
@@ -6124,6 +5509,8 @@ export interface Course_stddev_samp_order_by {
  * order by sum() on columns of table "Course"
  */
 export interface Course_sum_order_by {
+  achievementCertificateTemplateId?: order_by | null;
+  attendanceCertificateTemplateId?: order_by | null;
   basePrice?: order_by | null;
   id?: order_by | null;
   maxMissedSessions?: order_by | null;
@@ -6135,6 +5522,8 @@ export interface Course_sum_order_by {
  * order by var_pop() on columns of table "Course"
  */
 export interface Course_var_pop_order_by {
+  achievementCertificateTemplateId?: order_by | null;
+  attendanceCertificateTemplateId?: order_by | null;
   basePrice?: order_by | null;
   id?: order_by | null;
   maxMissedSessions?: order_by | null;
@@ -6146,6 +5535,8 @@ export interface Course_var_pop_order_by {
  * order by var_samp() on columns of table "Course"
  */
 export interface Course_var_samp_order_by {
+  achievementCertificateTemplateId?: order_by | null;
+  attendanceCertificateTemplateId?: order_by | null;
   basePrice?: order_by | null;
   id?: order_by | null;
   maxMissedSessions?: order_by | null;
@@ -6157,6 +5548,8 @@ export interface Course_var_samp_order_by {
  * order by variance() on columns of table "Course"
  */
 export interface Course_variance_order_by {
+  achievementCertificateTemplateId?: order_by | null;
+  attendanceCertificateTemplateId?: order_by | null;
   basePrice?: order_by | null;
   id?: order_by | null;
   maxMissedSessions?: order_by | null;
@@ -7002,6 +6395,7 @@ export interface OrganizationAdmin_bool_exp {
   _not?: OrganizationAdmin_bool_exp | null;
   _or?: OrganizationAdmin_bool_exp[] | null;
   canManageCourses?: Boolean_comparison_exp | null;
+  canManageDegrees?: Boolean_comparison_exp | null;
   canManageEvents?: Boolean_comparison_exp | null;
   canManageSettings?: Boolean_comparison_exp | null;
   created_at?: timestamptz_comparison_exp | null;
@@ -7018,6 +6412,7 @@ export interface OrganizationAdmin_insert_input {
   Organization?: Organization_obj_rel_insert_input | null;
   User?: User_obj_rel_insert_input | null;
   canManageCourses?: boolean | null;
+  canManageDegrees?: boolean | null;
   canManageEvents?: boolean | null;
   canManageSettings?: boolean | null;
   created_at?: any | null;
@@ -7065,6 +6460,7 @@ export interface OrganizationAdmin_order_by {
   Organization?: Organization_order_by | null;
   User?: User_order_by | null;
   canManageCourses?: order_by | null;
+  canManageDegrees?: order_by | null;
   canManageEvents?: order_by | null;
   canManageSettings?: order_by | null;
   created_at?: order_by | null;
@@ -7774,32 +7170,25 @@ export interface Organization_variance_order_by {
  * Boolean expression to filter rows from the table "ProgramType". All fields are combined with a logical 'AND'.
  */
 export interface ProgramType_bool_exp {
+  DefaultAttendanceCertificateTemplate?: CertificateTemplate_bool_exp | null;
   Programs?: Program_bool_exp | null;
   Programs_aggregate?: Program_aggregate_bool_exp | null;
   _and?: ProgramType_bool_exp[] | null;
   _not?: ProgramType_bool_exp | null;
   _or?: ProgramType_bool_exp[] | null;
   comment?: String_comparison_exp | null;
+  defaultAttendanceCertificateTemplateId?: Int_comparison_exp | null;
   value?: String_comparison_exp | null;
-}
-
-/**
- * Boolean expression to compare columns of type "ProgramType_enum". All fields are combined with logical 'AND'.
- */
-export interface ProgramType_enum_comparison_exp {
-  _eq?: ProgramType_enum | null;
-  _in?: ProgramType_enum[] | null;
-  _is_null?: boolean | null;
-  _neq?: ProgramType_enum | null;
-  _nin?: ProgramType_enum[] | null;
 }
 
 /**
  * input type for inserting data into table "ProgramType"
  */
 export interface ProgramType_insert_input {
+  DefaultAttendanceCertificateTemplate?: CertificateTemplate_obj_rel_insert_input | null;
   Programs?: Program_arr_rel_insert_input | null;
   comment?: string | null;
+  defaultAttendanceCertificateTemplateId?: number | null;
   value?: string | null;
 }
 
@@ -7824,8 +7213,10 @@ export interface ProgramType_on_conflict {
  * Ordering options when selecting data from "ProgramType".
  */
 export interface ProgramType_order_by {
+  DefaultAttendanceCertificateTemplate?: CertificateTemplate_order_by | null;
   Programs_aggregate?: Program_aggregate_order_by | null;
   comment?: order_by | null;
+  defaultAttendanceCertificateTemplateId?: order_by | null;
   value?: order_by | null;
 }
 
@@ -7885,8 +7276,7 @@ export interface Program_arr_rel_insert_input {
  * order by avg() on columns of table "Program"
  */
 export interface Program_avg_order_by {
-  achievementCertificateTemplateTextId?: order_by | null;
-  attendanceCertificateTemplateTextId?: order_by | null;
+  attendanceCertificateTemplateId?: order_by | null;
   defaultMaxMissedSessions?: order_by | null;
   id?: order_by | null;
   organizationId?: order_by | null;
@@ -7896,8 +7286,7 @@ export interface Program_avg_order_by {
  * Boolean expression to filter rows from the table "Program". All fields are combined with a logical 'AND'.
  */
 export interface Program_bool_exp {
-  CertificateTemplatePrograms?: CertificateTemplateProgram_bool_exp | null;
-  CertificateTemplatePrograms_aggregate?: CertificateTemplateProgram_aggregate_bool_exp | null;
+  AttendanceCertificateTemplate?: CertificateTemplate_bool_exp | null;
   Courses?: Course_bool_exp | null;
   Courses_aggregate?: Course_aggregate_bool_exp | null;
   DefaultProjectType?: ProjectType_bool_exp | null;
@@ -7906,11 +7295,10 @@ export interface Program_bool_exp {
   _and?: Program_bool_exp[] | null;
   _not?: Program_bool_exp | null;
   _or?: Program_bool_exp[] | null;
-  achievementCertificateTemplateTextId?: Int_comparison_exp | null;
   achievementCertificateTemplateURL?: String_comparison_exp | null;
   achievementRecordUploadDeadline?: date_comparison_exp | null;
   applicationStart?: date_comparison_exp | null;
-  attendanceCertificateTemplateTextId?: Int_comparison_exp | null;
+  attendanceCertificateTemplateId?: Int_comparison_exp | null;
   attendanceCertificateTemplateURL?: String_comparison_exp | null;
   closingQuestionnaire?: String_comparison_exp | null;
   defaultApplicationEnd?: date_comparison_exp | null;
@@ -7931,7 +7319,7 @@ export interface Program_bool_exp {
   speakerQuestionnaire?: String_comparison_exp | null;
   startQuestionnaire?: String_comparison_exp | null;
   title?: String_comparison_exp | null;
-  type?: ProgramType_enum_comparison_exp | null;
+  type?: String_comparison_exp | null;
   visibility?: Boolean_comparison_exp | null;
 }
 
@@ -7939,16 +7327,15 @@ export interface Program_bool_exp {
  * input type for inserting data into table "Program"
  */
 export interface Program_insert_input {
-  CertificateTemplatePrograms?: CertificateTemplateProgram_arr_rel_insert_input | null;
+  AttendanceCertificateTemplate?: CertificateTemplate_obj_rel_insert_input | null;
   Courses?: Course_arr_rel_insert_input | null;
   DefaultProjectType?: ProjectType_obj_rel_insert_input | null;
   Organization?: Organization_obj_rel_insert_input | null;
   ProgramType?: ProgramType_obj_rel_insert_input | null;
-  achievementCertificateTemplateTextId?: number | null;
   achievementCertificateTemplateURL?: string | null;
   achievementRecordUploadDeadline?: any | null;
   applicationStart?: any | null;
-  attendanceCertificateTemplateTextId?: number | null;
+  attendanceCertificateTemplateId?: number | null;
   attendanceCertificateTemplateURL?: string | null;
   closingQuestionnaire?: string | null;
   defaultApplicationEnd?: any | null;
@@ -7969,7 +7356,7 @@ export interface Program_insert_input {
   speakerQuestionnaire?: string | null;
   startQuestionnaire?: string | null;
   title?: string | null;
-  type?: ProgramType_enum | null;
+  type?: string | null;
   visibility?: boolean | null;
 }
 
@@ -7977,11 +7364,10 @@ export interface Program_insert_input {
  * order by max() on columns of table "Program"
  */
 export interface Program_max_order_by {
-  achievementCertificateTemplateTextId?: order_by | null;
   achievementCertificateTemplateURL?: order_by | null;
   achievementRecordUploadDeadline?: order_by | null;
   applicationStart?: order_by | null;
-  attendanceCertificateTemplateTextId?: order_by | null;
+  attendanceCertificateTemplateId?: order_by | null;
   attendanceCertificateTemplateURL?: order_by | null;
   closingQuestionnaire?: order_by | null;
   defaultApplicationEnd?: order_by | null;
@@ -7999,17 +7385,17 @@ export interface Program_max_order_by {
   speakerQuestionnaire?: order_by | null;
   startQuestionnaire?: order_by | null;
   title?: order_by | null;
+  type?: order_by | null;
 }
 
 /**
  * order by min() on columns of table "Program"
  */
 export interface Program_min_order_by {
-  achievementCertificateTemplateTextId?: order_by | null;
   achievementCertificateTemplateURL?: order_by | null;
   achievementRecordUploadDeadline?: order_by | null;
   applicationStart?: order_by | null;
-  attendanceCertificateTemplateTextId?: order_by | null;
+  attendanceCertificateTemplateId?: order_by | null;
   attendanceCertificateTemplateURL?: order_by | null;
   closingQuestionnaire?: order_by | null;
   defaultApplicationEnd?: order_by | null;
@@ -8027,6 +7413,7 @@ export interface Program_min_order_by {
   speakerQuestionnaire?: order_by | null;
   startQuestionnaire?: order_by | null;
   title?: order_by | null;
+  type?: order_by | null;
 }
 
 /**
@@ -8050,16 +7437,15 @@ export interface Program_on_conflict {
  * Ordering options when selecting data from "Program".
  */
 export interface Program_order_by {
-  CertificateTemplatePrograms_aggregate?: CertificateTemplateProgram_aggregate_order_by | null;
+  AttendanceCertificateTemplate?: CertificateTemplate_order_by | null;
   Courses_aggregate?: Course_aggregate_order_by | null;
   DefaultProjectType?: ProjectType_order_by | null;
   Organization?: Organization_order_by | null;
   ProgramType?: ProgramType_order_by | null;
-  achievementCertificateTemplateTextId?: order_by | null;
   achievementCertificateTemplateURL?: order_by | null;
   achievementRecordUploadDeadline?: order_by | null;
   applicationStart?: order_by | null;
-  attendanceCertificateTemplateTextId?: order_by | null;
+  attendanceCertificateTemplateId?: order_by | null;
   attendanceCertificateTemplateURL?: order_by | null;
   closingQuestionnaire?: order_by | null;
   defaultApplicationEnd?: order_by | null;
@@ -8088,8 +7474,7 @@ export interface Program_order_by {
  * order by stddev() on columns of table "Program"
  */
 export interface Program_stddev_order_by {
-  achievementCertificateTemplateTextId?: order_by | null;
-  attendanceCertificateTemplateTextId?: order_by | null;
+  attendanceCertificateTemplateId?: order_by | null;
   defaultMaxMissedSessions?: order_by | null;
   id?: order_by | null;
   organizationId?: order_by | null;
@@ -8099,8 +7484,7 @@ export interface Program_stddev_order_by {
  * order by stddev_pop() on columns of table "Program"
  */
 export interface Program_stddev_pop_order_by {
-  achievementCertificateTemplateTextId?: order_by | null;
-  attendanceCertificateTemplateTextId?: order_by | null;
+  attendanceCertificateTemplateId?: order_by | null;
   defaultMaxMissedSessions?: order_by | null;
   id?: order_by | null;
   organizationId?: order_by | null;
@@ -8110,8 +7494,7 @@ export interface Program_stddev_pop_order_by {
  * order by stddev_samp() on columns of table "Program"
  */
 export interface Program_stddev_samp_order_by {
-  achievementCertificateTemplateTextId?: order_by | null;
-  attendanceCertificateTemplateTextId?: order_by | null;
+  attendanceCertificateTemplateId?: order_by | null;
   defaultMaxMissedSessions?: order_by | null;
   id?: order_by | null;
   organizationId?: order_by | null;
@@ -8121,8 +7504,7 @@ export interface Program_stddev_samp_order_by {
  * order by sum() on columns of table "Program"
  */
 export interface Program_sum_order_by {
-  achievementCertificateTemplateTextId?: order_by | null;
-  attendanceCertificateTemplateTextId?: order_by | null;
+  attendanceCertificateTemplateId?: order_by | null;
   defaultMaxMissedSessions?: order_by | null;
   id?: order_by | null;
   organizationId?: order_by | null;
@@ -8132,8 +7514,7 @@ export interface Program_sum_order_by {
  * order by var_pop() on columns of table "Program"
  */
 export interface Program_var_pop_order_by {
-  achievementCertificateTemplateTextId?: order_by | null;
-  attendanceCertificateTemplateTextId?: order_by | null;
+  attendanceCertificateTemplateId?: order_by | null;
   defaultMaxMissedSessions?: order_by | null;
   id?: order_by | null;
   organizationId?: order_by | null;
@@ -8143,8 +7524,7 @@ export interface Program_var_pop_order_by {
  * order by var_samp() on columns of table "Program"
  */
 export interface Program_var_samp_order_by {
-  achievementCertificateTemplateTextId?: order_by | null;
-  attendanceCertificateTemplateTextId?: order_by | null;
+  attendanceCertificateTemplateId?: order_by | null;
   defaultMaxMissedSessions?: order_by | null;
   id?: order_by | null;
   organizationId?: order_by | null;
@@ -8154,61 +7534,10 @@ export interface Program_var_samp_order_by {
  * order by variance() on columns of table "Program"
  */
 export interface Program_variance_order_by {
-  achievementCertificateTemplateTextId?: order_by | null;
-  attendanceCertificateTemplateTextId?: order_by | null;
+  attendanceCertificateTemplateId?: order_by | null;
   defaultMaxMissedSessions?: order_by | null;
   id?: order_by | null;
   organizationId?: order_by | null;
-}
-
-/**
- * Boolean expression to filter rows from the table "ProjectAchievementCertificateType". All fields are combined with a logical 'AND'.
- */
-export interface ProjectAchievementCertificateType_bool_exp {
-  Projects?: Project_bool_exp | null;
-  Projects_aggregate?: Project_aggregate_bool_exp | null;
-  _and?: ProjectAchievementCertificateType_bool_exp[] | null;
-  _not?: ProjectAchievementCertificateType_bool_exp | null;
-  _or?: ProjectAchievementCertificateType_bool_exp[] | null;
-  comment?: String_comparison_exp | null;
-  value?: String_comparison_exp | null;
-}
-
-/**
- * Boolean expression to compare columns of type "ProjectAchievementCertificateType_enum". All fields are combined with logical 'AND'.
- */
-export interface ProjectAchievementCertificateType_enum_comparison_exp {
-  _eq?: ProjectAchievementCertificateType_enum | null;
-  _in?: ProjectAchievementCertificateType_enum[] | null;
-  _is_null?: boolean | null;
-  _neq?: ProjectAchievementCertificateType_enum | null;
-  _nin?: ProjectAchievementCertificateType_enum[] | null;
-}
-
-/**
- * input type for inserting data into table "ProjectAchievementCertificateType"
- */
-export interface ProjectAchievementCertificateType_insert_input {
-  Projects?: Project_arr_rel_insert_input | null;
-  comment?: string | null;
-  value?: string | null;
-}
-
-/**
- * input type for inserting object relation for remote table "ProjectAchievementCertificateType"
- */
-export interface ProjectAchievementCertificateType_obj_rel_insert_input {
-  data: ProjectAchievementCertificateType_insert_input;
-  on_conflict?: ProjectAchievementCertificateType_on_conflict | null;
-}
-
-/**
- * on_conflict condition type for table "ProjectAchievementCertificateType"
- */
-export interface ProjectAchievementCertificateType_on_conflict {
-  constraint: ProjectAchievementCertificateType_constraint;
-  update_columns: ProjectAchievementCertificateType_update_column[];
-  where?: ProjectAchievementCertificateType_bool_exp | null;
 }
 
 export interface ProjectAuthor_aggregate_bool_exp {
@@ -8600,6 +7929,7 @@ export interface ProjectDocumentationInstruction_arr_rel_insert_input {
  */
 export interface ProjectDocumentationInstruction_avg_order_by {
   id?: order_by | null;
+  legacyAchievementDocumentationTemplateId?: order_by | null;
 }
 
 /**
@@ -8615,6 +7945,7 @@ export interface ProjectDocumentationInstruction_bool_exp {
   created_at?: timestamptz_comparison_exp | null;
   id?: Int_comparison_exp | null;
   isDefault?: Boolean_comparison_exp | null;
+  legacyAchievementDocumentationTemplateId?: Int_comparison_exp | null;
   projectTypeValue?: String_comparison_exp | null;
   title?: String_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
@@ -8630,6 +7961,7 @@ export interface ProjectDocumentationInstruction_insert_input {
   created_at?: any | null;
   id?: number | null;
   isDefault?: boolean | null;
+  legacyAchievementDocumentationTemplateId?: number | null;
   projectTypeValue?: string | null;
   title?: string | null;
   updated_at?: any | null;
@@ -8642,6 +7974,7 @@ export interface ProjectDocumentationInstruction_insert_input {
 export interface ProjectDocumentationInstruction_max_order_by {
   created_at?: order_by | null;
   id?: order_by | null;
+  legacyAchievementDocumentationTemplateId?: order_by | null;
   projectTypeValue?: order_by | null;
   title?: order_by | null;
   updated_at?: order_by | null;
@@ -8654,6 +7987,7 @@ export interface ProjectDocumentationInstruction_max_order_by {
 export interface ProjectDocumentationInstruction_min_order_by {
   created_at?: order_by | null;
   id?: order_by | null;
+  legacyAchievementDocumentationTemplateId?: order_by | null;
   projectTypeValue?: order_by | null;
   title?: order_by | null;
   updated_at?: order_by | null;
@@ -8686,6 +8020,7 @@ export interface ProjectDocumentationInstruction_order_by {
   created_at?: order_by | null;
   id?: order_by | null;
   isDefault?: order_by | null;
+  legacyAchievementDocumentationTemplateId?: order_by | null;
   projectTypeValue?: order_by | null;
   title?: order_by | null;
   updated_at?: order_by | null;
@@ -8697,6 +8032,7 @@ export interface ProjectDocumentationInstruction_order_by {
  */
 export interface ProjectDocumentationInstruction_stddev_order_by {
   id?: order_by | null;
+  legacyAchievementDocumentationTemplateId?: order_by | null;
 }
 
 /**
@@ -8704,6 +8040,7 @@ export interface ProjectDocumentationInstruction_stddev_order_by {
  */
 export interface ProjectDocumentationInstruction_stddev_pop_order_by {
   id?: order_by | null;
+  legacyAchievementDocumentationTemplateId?: order_by | null;
 }
 
 /**
@@ -8711,6 +8048,7 @@ export interface ProjectDocumentationInstruction_stddev_pop_order_by {
  */
 export interface ProjectDocumentationInstruction_stddev_samp_order_by {
   id?: order_by | null;
+  legacyAchievementDocumentationTemplateId?: order_by | null;
 }
 
 /**
@@ -8718,6 +8056,7 @@ export interface ProjectDocumentationInstruction_stddev_samp_order_by {
  */
 export interface ProjectDocumentationInstruction_sum_order_by {
   id?: order_by | null;
+  legacyAchievementDocumentationTemplateId?: order_by | null;
 }
 
 /**
@@ -8725,6 +8064,7 @@ export interface ProjectDocumentationInstruction_sum_order_by {
  */
 export interface ProjectDocumentationInstruction_var_pop_order_by {
   id?: order_by | null;
+  legacyAchievementDocumentationTemplateId?: order_by | null;
 }
 
 /**
@@ -8732,6 +8072,7 @@ export interface ProjectDocumentationInstruction_var_pop_order_by {
  */
 export interface ProjectDocumentationInstruction_var_samp_order_by {
   id?: order_by | null;
+  legacyAchievementDocumentationTemplateId?: order_by | null;
 }
 
 /**
@@ -8739,6 +8080,7 @@ export interface ProjectDocumentationInstruction_var_samp_order_by {
  */
 export interface ProjectDocumentationInstruction_variance_order_by {
   id?: order_by | null;
+  legacyAchievementDocumentationTemplateId?: order_by | null;
 }
 
 export interface ProjectMentor_aggregate_bool_exp {
@@ -9051,10 +8393,70 @@ export interface ProjectStatus_on_conflict {
   where?: ProjectStatus_bool_exp | null;
 }
 
+export interface ProjectType_aggregate_bool_exp {
+  bool_and?: ProjectType_aggregate_bool_exp_bool_and | null;
+  bool_or?: ProjectType_aggregate_bool_exp_bool_or | null;
+  count?: ProjectType_aggregate_bool_exp_count | null;
+}
+
+export interface ProjectType_aggregate_bool_exp_bool_and {
+  arguments: ProjectType_select_column_ProjectType_aggregate_bool_exp_bool_and_arguments_columns;
+  distinct?: boolean | null;
+  filter?: ProjectType_bool_exp | null;
+  predicate: Boolean_comparison_exp;
+}
+
+export interface ProjectType_aggregate_bool_exp_bool_or {
+  arguments: ProjectType_select_column_ProjectType_aggregate_bool_exp_bool_or_arguments_columns;
+  distinct?: boolean | null;
+  filter?: ProjectType_bool_exp | null;
+  predicate: Boolean_comparison_exp;
+}
+
+export interface ProjectType_aggregate_bool_exp_count {
+  arguments?: ProjectType_select_column[] | null;
+  distinct?: boolean | null;
+  filter?: ProjectType_bool_exp | null;
+  predicate: Int_comparison_exp;
+}
+
+/**
+ * order by aggregate values of table "ProjectType"
+ */
+export interface ProjectType_aggregate_order_by {
+  avg?: ProjectType_avg_order_by | null;
+  count?: order_by | null;
+  max?: ProjectType_max_order_by | null;
+  min?: ProjectType_min_order_by | null;
+  stddev?: ProjectType_stddev_order_by | null;
+  stddev_pop?: ProjectType_stddev_pop_order_by | null;
+  stddev_samp?: ProjectType_stddev_samp_order_by | null;
+  sum?: ProjectType_sum_order_by | null;
+  var_pop?: ProjectType_var_pop_order_by | null;
+  var_samp?: ProjectType_var_samp_order_by | null;
+  variance?: ProjectType_variance_order_by | null;
+}
+
+/**
+ * input type for inserting array relation for remote table "ProjectType"
+ */
+export interface ProjectType_arr_rel_insert_input {
+  data: ProjectType_insert_input[];
+  on_conflict?: ProjectType_on_conflict | null;
+}
+
+/**
+ * order by avg() on columns of table "ProjectType"
+ */
+export interface ProjectType_avg_order_by {
+  certificateTemplateId?: order_by | null;
+}
+
 /**
  * Boolean expression to filter rows from the table "ProjectType". All fields are combined with a logical 'AND'.
  */
 export interface ProjectType_bool_exp {
+  CertificateTemplate?: CertificateTemplate_bool_exp | null;
   ProjectDocumentationInstructions?: ProjectDocumentationInstruction_bool_exp | null;
   ProjectDocumentationInstructions_aggregate?: ProjectDocumentationInstruction_aggregate_bool_exp | null;
   Projects?: Project_bool_exp | null;
@@ -9062,6 +8464,7 @@ export interface ProjectType_bool_exp {
   _and?: ProjectType_bool_exp[] | null;
   _not?: ProjectType_bool_exp | null;
   _or?: ProjectType_bool_exp[] | null;
+  certificateTemplateId?: Int_comparison_exp | null;
   comment?: String_comparison_exp | null;
   requiresCoverImage?: Boolean_comparison_exp | null;
   requiresDocumentation?: Boolean_comparison_exp | null;
@@ -9074,14 +8477,34 @@ export interface ProjectType_bool_exp {
  * input type for inserting data into table "ProjectType"
  */
 export interface ProjectType_insert_input {
+  CertificateTemplate?: CertificateTemplate_obj_rel_insert_input | null;
   ProjectDocumentationInstructions?: ProjectDocumentationInstruction_arr_rel_insert_input | null;
   Projects?: Project_arr_rel_insert_input | null;
+  certificateTemplateId?: number | null;
   comment?: string | null;
   requiresCoverImage?: boolean | null;
   requiresDocumentation?: boolean | null;
   requiresExternalUrl?: boolean | null;
   requiresPresentation?: boolean | null;
   value?: string | null;
+}
+
+/**
+ * order by max() on columns of table "ProjectType"
+ */
+export interface ProjectType_max_order_by {
+  certificateTemplateId?: order_by | null;
+  comment?: order_by | null;
+  value?: order_by | null;
+}
+
+/**
+ * order by min() on columns of table "ProjectType"
+ */
+export interface ProjectType_min_order_by {
+  certificateTemplateId?: order_by | null;
+  comment?: order_by | null;
+  value?: order_by | null;
 }
 
 /**
@@ -9105,14 +8528,65 @@ export interface ProjectType_on_conflict {
  * Ordering options when selecting data from "ProjectType".
  */
 export interface ProjectType_order_by {
+  CertificateTemplate?: CertificateTemplate_order_by | null;
   ProjectDocumentationInstructions_aggregate?: ProjectDocumentationInstruction_aggregate_order_by | null;
   Projects_aggregate?: Project_aggregate_order_by | null;
+  certificateTemplateId?: order_by | null;
   comment?: order_by | null;
   requiresCoverImage?: order_by | null;
   requiresDocumentation?: order_by | null;
   requiresExternalUrl?: order_by | null;
   requiresPresentation?: order_by | null;
   value?: order_by | null;
+}
+
+/**
+ * order by stddev() on columns of table "ProjectType"
+ */
+export interface ProjectType_stddev_order_by {
+  certificateTemplateId?: order_by | null;
+}
+
+/**
+ * order by stddev_pop() on columns of table "ProjectType"
+ */
+export interface ProjectType_stddev_pop_order_by {
+  certificateTemplateId?: order_by | null;
+}
+
+/**
+ * order by stddev_samp() on columns of table "ProjectType"
+ */
+export interface ProjectType_stddev_samp_order_by {
+  certificateTemplateId?: order_by | null;
+}
+
+/**
+ * order by sum() on columns of table "ProjectType"
+ */
+export interface ProjectType_sum_order_by {
+  certificateTemplateId?: order_by | null;
+}
+
+/**
+ * order by var_pop() on columns of table "ProjectType"
+ */
+export interface ProjectType_var_pop_order_by {
+  certificateTemplateId?: order_by | null;
+}
+
+/**
+ * order by var_samp() on columns of table "ProjectType"
+ */
+export interface ProjectType_var_samp_order_by {
+  certificateTemplateId?: order_by | null;
+}
+
+/**
+ * order by variance() on columns of table "ProjectType"
+ */
+export interface ProjectType_variance_order_by {
+  certificateTemplateId?: order_by | null;
 }
 
 export interface Project_aggregate_bool_exp {
@@ -9173,6 +8647,8 @@ export interface Project_arr_rel_insert_input {
 export interface Project_avg_order_by {
   documentationInstructionId?: order_by | null;
   id?: order_by | null;
+  legacyAchievementOptionId?: order_by | null;
+  legacyAchievementRecordId?: order_by | null;
   organizationId?: order_by | null;
   parentProjectId?: order_by | null;
 }
@@ -9185,7 +8661,6 @@ export interface Project_bool_exp {
   ChildProjects_aggregate?: Project_aggregate_bool_exp | null;
   Organization?: Organization_bool_exp | null;
   ParentProject?: Project_bool_exp | null;
-  ProjectAchievementCertificateType?: ProjectAchievementCertificateType_bool_exp | null;
   ProjectAuthors?: ProjectAuthor_bool_exp | null;
   ProjectAuthors_aggregate?: ProjectAuthor_aggregate_bool_exp | null;
   ProjectCourses?: ProjectCourse_bool_exp | null;
@@ -9202,7 +8677,6 @@ export interface Project_bool_exp {
   _not?: Project_bool_exp | null;
   _or?: Project_bool_exp[] | null;
   acceptingParticipants?: Boolean_comparison_exp | null;
-  achievementCertificateType?: ProjectAchievementCertificateType_enum_comparison_exp | null;
   coverImageUrl?: String_comparison_exp | null;
   created_at?: timestamptz_comparison_exp | null;
   csvResults?: String_comparison_exp | null;
@@ -9211,6 +8685,8 @@ export interface Project_bool_exp {
   documentationUrl?: String_comparison_exp | null;
   externalUrl?: String_comparison_exp | null;
   id?: Int_comparison_exp | null;
+  legacyAchievementOptionId?: Int_comparison_exp | null;
+  legacyAchievementRecordId?: Int_comparison_exp | null;
   organizationId?: Int_comparison_exp | null;
   parentProjectId?: Int_comparison_exp | null;
   presentationUrl?: String_comparison_exp | null;
@@ -9235,7 +8711,6 @@ export interface Project_insert_input {
   ChildProjects?: Project_arr_rel_insert_input | null;
   Organization?: Organization_obj_rel_insert_input | null;
   ParentProject?: Project_obj_rel_insert_input | null;
-  ProjectAchievementCertificateType?: ProjectAchievementCertificateType_obj_rel_insert_input | null;
   ProjectAuthors?: ProjectAuthor_arr_rel_insert_input | null;
   ProjectCourses?: ProjectCourse_arr_rel_insert_input | null;
   ProjectDocumentationInstruction?: ProjectDocumentationInstruction_obj_rel_insert_input | null;
@@ -9246,7 +8721,6 @@ export interface Project_insert_input {
   ProposedByUser?: User_obj_rel_insert_input | null;
   SubmittedByUser?: User_obj_rel_insert_input | null;
   acceptingParticipants?: boolean | null;
-  achievementCertificateType?: ProjectAchievementCertificateType_enum | null;
   coverImageUrl?: string | null;
   created_at?: any | null;
   csvResults?: string | null;
@@ -9255,6 +8729,8 @@ export interface Project_insert_input {
   documentationUrl?: string | null;
   externalUrl?: string | null;
   id?: number | null;
+  legacyAchievementOptionId?: number | null;
+  legacyAchievementRecordId?: number | null;
   organizationId?: number | null;
   parentProjectId?: number | null;
   presentationUrl?: string | null;
@@ -9284,6 +8760,8 @@ export interface Project_max_order_by {
   documentationUrl?: order_by | null;
   externalUrl?: order_by | null;
   id?: order_by | null;
+  legacyAchievementOptionId?: order_by | null;
+  legacyAchievementRecordId?: order_by | null;
   organizationId?: order_by | null;
   parentProjectId?: order_by | null;
   presentationUrl?: order_by | null;
@@ -9311,6 +8789,8 @@ export interface Project_min_order_by {
   documentationUrl?: order_by | null;
   externalUrl?: order_by | null;
   id?: order_by | null;
+  legacyAchievementOptionId?: order_by | null;
+  legacyAchievementRecordId?: order_by | null;
   organizationId?: order_by | null;
   parentProjectId?: order_by | null;
   presentationUrl?: order_by | null;
@@ -9349,6 +8829,8 @@ export interface Project_on_conflict {
 export interface Project_stddev_order_by {
   documentationInstructionId?: order_by | null;
   id?: order_by | null;
+  legacyAchievementOptionId?: order_by | null;
+  legacyAchievementRecordId?: order_by | null;
   organizationId?: order_by | null;
   parentProjectId?: order_by | null;
 }
@@ -9359,6 +8841,8 @@ export interface Project_stddev_order_by {
 export interface Project_stddev_pop_order_by {
   documentationInstructionId?: order_by | null;
   id?: order_by | null;
+  legacyAchievementOptionId?: order_by | null;
+  legacyAchievementRecordId?: order_by | null;
   organizationId?: order_by | null;
   parentProjectId?: order_by | null;
 }
@@ -9369,6 +8853,8 @@ export interface Project_stddev_pop_order_by {
 export interface Project_stddev_samp_order_by {
   documentationInstructionId?: order_by | null;
   id?: order_by | null;
+  legacyAchievementOptionId?: order_by | null;
+  legacyAchievementRecordId?: order_by | null;
   organizationId?: order_by | null;
   parentProjectId?: order_by | null;
 }
@@ -9379,6 +8865,8 @@ export interface Project_stddev_samp_order_by {
 export interface Project_sum_order_by {
   documentationInstructionId?: order_by | null;
   id?: order_by | null;
+  legacyAchievementOptionId?: order_by | null;
+  legacyAchievementRecordId?: order_by | null;
   organizationId?: order_by | null;
   parentProjectId?: order_by | null;
 }
@@ -9389,6 +8877,8 @@ export interface Project_sum_order_by {
 export interface Project_var_pop_order_by {
   documentationInstructionId?: order_by | null;
   id?: order_by | null;
+  legacyAchievementOptionId?: order_by | null;
+  legacyAchievementRecordId?: order_by | null;
   organizationId?: order_by | null;
   parentProjectId?: order_by | null;
 }
@@ -9399,6 +8889,8 @@ export interface Project_var_pop_order_by {
 export interface Project_var_samp_order_by {
   documentationInstructionId?: order_by | null;
   id?: order_by | null;
+  legacyAchievementOptionId?: order_by | null;
+  legacyAchievementRecordId?: order_by | null;
   organizationId?: order_by | null;
   parentProjectId?: order_by | null;
 }
@@ -9409,6 +8901,8 @@ export interface Project_var_samp_order_by {
 export interface Project_variance_order_by {
   documentationInstructionId?: order_by | null;
   id?: order_by | null;
+  legacyAchievementOptionId?: order_by | null;
+  legacyAchievementRecordId?: order_by | null;
   organizationId?: order_by | null;
   parentProjectId?: order_by | null;
 }

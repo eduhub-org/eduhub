@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { ProgramType_enum } from "./../../__generated__/globalTypes";
+import { Program_bool_exp } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: Programs
@@ -56,7 +56,7 @@ export interface Programs_Program {
    * Decides whether the courses of this program can be published or not. (Courses are ony published if the filed publised in the Course table is also set to true.)
    */
   published: boolean;
-  type: ProgramType_enum;
+  type: string;
   /**
    * Default Formbricks survey URL for course enrollments/applications. Courses can override this with their own formbricksEnrollmentSurveyUrl.
    */
@@ -68,4 +68,8 @@ export interface Programs {
    * fetch data from the table: "Program"
    */
   Program: Programs_Program[];
+}
+
+export interface ProgramsVariables {
+  where?: Program_bool_exp | null;
 }

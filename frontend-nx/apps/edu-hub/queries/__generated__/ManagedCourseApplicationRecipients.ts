@@ -75,6 +75,6 @@ export interface ManagedCourseApplicationRecipients {
 
 export interface ManagedCourseApplicationRecipientsVariables {
   id: number;
-  limit?: number | null;
+  limit: number;
   filter?: CourseEnrollment_bool_exp | null;
 }
