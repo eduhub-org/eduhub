@@ -9,7 +9,7 @@ export const Footer: FC = () => {
     <footer className="mt-7 sm:mt-20 bg-bg-footer text-white overflow-x-hidden">
       <div className="flex flex-col w-full p-6 md:px-16 max-w-screen-xl mx-auto min-w-0">
         <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-8 lg:gap-6 w-full min-w-0 max-w-full">
-          <div className="order-1 lg:order-2 flex flex-col w-full min-w-0 max-w-full lg:max-w-[52rem]">
+          <div className="order-1 lg:order-2 flex flex-col w-full min-w-0 max-w-full lg:max-w-[49rem]">
             <span className="text-white text-sm font-medium tracking-wide mb-2">
               {t('sponsored_by')}
             </span>
@@ -49,12 +49,12 @@ export const Footer: FC = () => {
                 href="https://www.kiel.de"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-end w-full max-w-[200px] h-[80px] shrink-0"
+                className="flex items-end w-full max-w-[119px] h-[80px] shrink-0 sm:-ml-4"
               >
                 <Image
-                  src="/images/share/logo-kiel-sailing-city.png"
+                  src="/images/share/logo-kiel-sailing-city.svg"
                   alt={t('kiel_sailing_city_logo_alt')}
-                  width={200}
+                  width={119}
                   height={80}
                   unoptimized
                   className="w-full h-full object-contain"
