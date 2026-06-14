@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { FC, useCallback, useMemo, useState } from 'react';
-import { CircularProgress } from '@mui/material';
 import { ColumnDef } from '@tanstack/react-table';
 import { useManageMutation } from '../../../hooks/authedMutation';
 import { useRoleQuery } from '../../../hooks/authedQuery';
@@ -26,6 +25,7 @@ import { DegreeCourses } from '../../../queries/__generated__/DegreeCourses';
 import { DELETE_A_COURSE } from '../../../queries/mutateCourse';
 
 import TableGrid from '../../common/TableGrid';
+import Loading from '../../common/Loading';
 import { useTableGrid } from '../../common/TableGrid/hooks';
 import { createMultiWordSearchCondition } from '../../common/TableGrid/utils';
 import { useManageQuery } from '../../../hooks/authedQuery';
@@ -636,28 +636,32 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
         size: 320,
         minSize: 250,
         enableSorting: true,
-        cell: ({ row }) => (
-          <div className="flex items-center space-x-2">
-            <div className="flex-1">
-              <InputField
-                variant="material"
-                type="input"
-                placeholder={t('default_course_title')}
-                itemId={row.original.id}
-                value={row.original.title || ''}
-                updateValueMutation={UPDATE_COURSE_TITLE}
-                refetchQueries={['AdminCourseList']}
-              />
+        cell: ({ row }) => {
+          const defaultTitle = t('default_course_title');
+
+          return (
+            <div className="grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-2 pr-3">
+              <div className="min-w-0">
+                <InputField
+                  variant="material"
+                  type="input"
+                  placeholder={defaultTitle}
+                  itemId={row.original.id}
+                  value={row.original.title || ''}
+                  updateValueMutation={UPDATE_COURSE_TITLE}
+                  refetchQueries={['AdminCourseList']}
+                />
+              </div>
+              <a
+                href={`course/${row.original.id}`}
+                className="shrink-0 whitespace-nowrap text-sm font-medium text-blue-600 underline hover:text-blue-800"
+                title={t('view_course')}
+              >
+                {t('view')}
+              </a>
             </div>
-            <a
-              href={`course/${row.original.id}`}
-              className="text-blue-600 hover:text-blue-800 text-sm font-medium underline whitespace-nowrap"
-              title={t('view_course')}
-            >
-              {t('view')}
-            </a>
-          </div>
-        ),
+          );
+        },
       },
       {
         header: t('table_header.applications'),
@@ -728,7 +732,15 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
         },
       },
     ],
-    [t, handleApplicationEndChange, locale, getApplicationsCount, getConfirmedCount, getUnratedAndRatedButNotInformed, courseTemplateCounts]
+    [
+      t,
+      handleApplicationEndChange,
+      locale,
+      getApplicationsCount,
+      getConfirmedCount,
+      getUnratedAndRatedButNotInformed,
+      courseTemplateCounts,
+    ]
   );
 
   const handlePageSizeChange = useCallback(
@@ -743,10 +755,6 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
     [filter, updateFilter, setPageIndex]
   );
 
-  if (loading) {
-    return <CircularProgress />;
-  }
-
   return (
     <>
       <CommonPageHeader headline={tCoursePage('coursesHeadline')} />
@@ -759,45 +767,51 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
         />
       </div>
 
-      <TableGrid<AdminCourseList_Course>
-        columns={columns}
-        data={courses}
-        loading={loading}
-        error={error}
-        enablePagination={true}
-        totalCount={totalCount}
-        pageIndex={pageIndex}
-        onPageChange={setPageIndex}
-        pageSize={filter.limit ?? QUERY_LIMIT}
-        onPageSizeChange={handlePageSizeChange}
-        searchFilter={searchFilter}
-        onSearchFilterChange={setSearchFilter}
-        sorting={sorting}
-        onSortingChange={setSorting}
-        refetchQueries={['AdminCourseList']}
-        bulkActions={bulkActions}
-        onBulkAction={handleBulkAction}
-        onAddButtonClick={handleAddCourse}
-        addButtonText={t('add_course_button')}
-        expandableRowComponent={(props) => (
-          <ExpandableCourseRow
-            course={props.row}
-            courseGroupOptions={courseGroupOptions}
-            sliderCourseGroupIds={sliderCourseGroupIds}
-            degreeCourses={degreeCourses}
-            onSetAttendanceCertificatePossible={handleAttendanceCertificatePossible}
-            onSetAchievementCertificatePossible={handleAchievementCertificatePossible}
-          />
-        )}
-        deleteMutation={DELETE_A_COURSE}
-        deleteIdType="number"
-        role={manageRole}
-        generateDeletionConfirmationQuestion={(row) =>
-          t('delete_button.delete_course_confirmation', {
-            title: row.title || t('delete_button.untitled_course'),
-          })
-        }
-      />
+      {loading ? (
+        <div className="pb-12 pt-16">
+          <Loading />
+        </div>
+      ) : (
+        <TableGrid<AdminCourseList_Course>
+          columns={columns}
+          data={courses}
+          loading={loading}
+          error={error}
+          enablePagination={true}
+          totalCount={totalCount}
+          pageIndex={pageIndex}
+          onPageChange={setPageIndex}
+          pageSize={filter.limit ?? QUERY_LIMIT}
+          onPageSizeChange={handlePageSizeChange}
+          searchFilter={searchFilter}
+          onSearchFilterChange={setSearchFilter}
+          sorting={sorting}
+          onSortingChange={setSorting}
+          refetchQueries={['AdminCourseList']}
+          bulkActions={bulkActions}
+          onBulkAction={handleBulkAction}
+          onAddButtonClick={handleAddCourse}
+          addButtonText={t('add_course_button')}
+          expandableRowComponent={(props) => (
+            <ExpandableCourseRow
+              course={props.row}
+              courseGroupOptions={courseGroupOptions}
+              sliderCourseGroupIds={sliderCourseGroupIds}
+              degreeCourses={degreeCourses}
+              onSetAttendanceCertificatePossible={handleAttendanceCertificatePossible}
+              onSetAchievementCertificatePossible={handleAchievementCertificatePossible}
+            />
+          )}
+          deleteMutation={DELETE_A_COURSE}
+          deleteIdType="number"
+          role={manageRole}
+          generateDeletionConfirmationQuestion={(row) =>
+            t('delete_button.delete_course_confirmation', {
+              title: row.title || t('delete_button.untitled_course'),
+            })
+          }
+        />
+      )}
 
       <SelectProgramDialog
         open={showProgramDialog}

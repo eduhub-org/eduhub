@@ -1241,6 +1241,19 @@
       "invitations_queued_plural": "{count} Einladungen wurden ausgelöst; Bestätigungs-E-Mails werden verschickt.",
       "declines_queued_singular": "{count} Ablehnung wurde ausgelöst; eine Benachrichtigung wird per E-Mail verschickt.",
       "declines_queued_plural": "{count} Ablehnungen wurden ausgelöst; Benachrichtigungen werden per E-Mail verschickt.",
+      "bulk_email_dialog_title": "Bewerber:innen per E-Mail kontaktieren",
+      "bulk_email_loading": "Empfänger:innen für {action} werden geladen...",
+      "bulk_email_load_error": "Empfänger:innen konnten nicht geladen werden: {error}",
+      "bulk_email_recipient_count": "{action}: {count} Empfänger:innen gefunden.",
+      "bulk_email_recipient_limit": "Mehr als {limit} Empfänger:innen passen zu dieser Aktion ({count} insgesamt). Die vollständige Liste wurde nicht geladen.",
+      "bulk_email_mailto_too_long": "Diese Empfängerliste ist zu groß für einen zuverlässigen mailto-Link (über {limit} Zeichen). Kopiere stattdessen die Adressen.",
+      "bulk_email_preview_label": "Vorschau",
+      "bulk_email_preview_more": "+ {count} weitere",
+      "bulk_email_open_mail": "Mail-App öffnen",
+      "bulk_email_copy": "E-Mails kopieren",
+      "bulk_email_copy_success": "E-Mail-Adressen kopiert.",
+      "bulk_email_copy_error": "E-Mail-Adressen konnten nicht kopiert werden.",
+      "no_email_recipients": "Für diese Aktion wurden keine E-Mail-Empfänger:innen gefunden.",
       "no_selection_dialog_title": "Keine Auswahl",
       "disabled_reasons": {
         "select_participants_first": "Wähle zuerst Teilnehmende aus.",
@@ -1519,6 +1532,8 @@
       "invitation_expired": "Einladung abgelaufen"
     },
     "invitation_deadline": "Ablaufdatum Einladung",
+    "loading_course": "Kurs wird geladen...",
+    "course_load_error": "Der Kurs konnte nicht geladen werden. Bitte versuche es erneut.",
     "course_not_found": "Kurs {courseId} wurde nicht gefunden!",
     "add_session": "Termin hinzufügen",
     "SessionsTab": {

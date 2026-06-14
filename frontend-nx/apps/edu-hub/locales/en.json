@@ -1259,6 +1259,19 @@
       "invitations_queued_plural": "{count} invitations were applied; confirmation emails will be sent.",
       "declines_queued_singular": "{count} decline was applied; a notification email will be sent.",
       "declines_queued_plural": "{count} declines were applied; notification emails will be sent.",
+      "bulk_email_dialog_title": "Email Applicants",
+      "bulk_email_loading": "Loading recipients for {action}...",
+      "bulk_email_load_error": "Failed to load recipients: {error}",
+      "bulk_email_recipient_count": "{action}: {count} recipients found.",
+      "bulk_email_recipient_limit": "More than {limit} recipients match this action ({count} total). The full list was not loaded.",
+      "bulk_email_mailto_too_long": "This recipient list is too large for a reliable mailto link (over {limit} characters). Copy the addresses instead.",
+      "bulk_email_preview_label": "Preview",
+      "bulk_email_preview_more": "+ {count} more",
+      "bulk_email_open_mail": "Open Mail App",
+      "bulk_email_copy": "Copy Emails",
+      "bulk_email_copy_success": "Email addresses copied.",
+      "bulk_email_copy_error": "Email addresses could not be copied.",
+      "no_email_recipients": "No email recipients found for this action.",
       "no_selection_dialog_title": "No Selection",
       "disabled_reasons": {
         "select_participants_first": "Select participants first.",
@@ -1537,6 +1550,8 @@
       "invitation_expired": "Invitation expired"
     },
     "invitation_deadline": "Invitation deadline",
+    "loading_course": "Loading course...",
+    "course_load_error": "The course could not be loaded. Please try again.",
     "course_not_found": "Course {courseId} could not be found!",
     "add_session": "Add Session",
     "SessionsTab": {
