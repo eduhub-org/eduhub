@@ -325,6 +325,18 @@ actions:
         - name: name
           value: setProjectDocumentationInstructionDefault
     comment: Atomically promotes one ProjectDocumentationInstruction to the default for its projectTypeValue, demoting whichever row was previously default for the same type.
+  - name: deleteProjectDocumentationInstruction
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: name
+          value: deleteProjectDocumentationInstruction
+    permissions:
+      - role: admin
+    comment: Reassigns projects using the instruction to the type default, then deletes the non-default instruction.
   - name: saveProjectImage
     definition:
       kind: synchronous
@@ -539,4 +551,5 @@ custom_types:
     - name: GetFormbricksAddonSelectionsResult
     - name: SelectedAddon
     - name: SetProjectDocumentationInstructionDefaultResult
+    - name: DeleteProjectDocumentationInstructionResult
   scalars: []

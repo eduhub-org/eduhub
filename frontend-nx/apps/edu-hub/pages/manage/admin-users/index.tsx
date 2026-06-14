@@ -2,38 +2,13 @@
 import path from 'path';
 path.resolve('./next.config.js');
 
-import Head from 'next/head';
-import { FC } from 'react';
-import { Page } from '../../../components/layout/Page';
-import { useIsAdmin, useIsLoggedIn, useIsOrgAdmin } from '../../../hooks/authentication';
-import { ManagementRoleProvider } from '../../../hooks/managementRole';
+import { GetServerSideProps } from 'next';
 
-import ManageAdminUsersContent from '../../../components/pages/ManageAdminUsersContent';
+/** @deprecated Use /manage/settings/access — kept for bookmarks and external links. */
+export const getServerSideProps: GetServerSideProps = async () => ({
+  redirect: { destination: '/manage/settings/access', permanent: false },
+});
 
-const ManageAdminUsers: FC = () => {
-  const isAdmin = useIsAdmin();
-  const isOrgAdmin = useIsOrgAdmin();
-  const isLoggedIn = useIsLoggedIn();
-
-  return (
-    <>
-      <Head>
-        <title>EduHub | opencampus.sh</title>
-        <link rel="icon" href="/favicon.png" />
-      </Head>
-      <div className="max-w-screen-xl mx-auto">
-        <Page>
-          <div className="min-h-[77vh]">
-            {isLoggedIn && (isAdmin || isOrgAdmin) && (
-              <ManagementRoleProvider>
-                <ManageAdminUsersContent />
-              </ManagementRoleProvider>
-            )}
-          </div>
-        </Page>
-      </div>
-    </>
-  );
-};
-
-export default ManageAdminUsers;
+export default function ManageAdminUsersRedirect() {
+  return null;
+}
