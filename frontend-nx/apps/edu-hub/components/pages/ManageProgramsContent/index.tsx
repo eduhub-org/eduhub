@@ -38,7 +38,12 @@ import { useTranslations } from 'next-intl';
 
 const QUERY_LIMIT = 100;
 
-export const ManageProgramsContent: FC = () => {
+type ManageProgramsContentProps = {
+  /** When true, rendered inside SettingsLayout (no page header wrapper). */
+  inSettingsLayout?: boolean;
+};
+
+export const ManageProgramsContent: FC<ManageProgramsContentProps> = ({ inSettingsLayout = false }) => {
   const t = useTranslations('managePrograms');
 
   // Management role (admin for super-admins, org_admin otherwise) and the organization scope that
@@ -358,11 +363,8 @@ export const ManageProgramsContent: FC = () => {
     return <CircularProgress />;
   }
 
-  return (
-    <div className="max-w-screen-xl mx-auto">
-      <CommonPageHeader headline={t('headline')} />
-      
-      <TableGrid<ProgramList_Program>
+  const table = (
+    <TableGrid<ProgramList_Program>
         columns={columns}
         data={programs}
         loading={loading}
@@ -392,20 +394,39 @@ export const ManageProgramsContent: FC = () => {
           })
         }
       />
+  );
 
+  const notifications = (
+    <>
       <NotificationSnackbar
         open={showSuccessNotification}
         onClose={() => setShowSuccessNotification(false)}
         message={successMessage}
         duration={4000}
       />
-
       <NotificationSnackbar
         open={showErrorNotification}
         onClose={() => setShowErrorNotification(false)}
         message={errorMessage}
         duration={6000}
-        />
+      />
+    </>
+  );
+
+  if (inSettingsLayout) {
+    return (
+      <>
+        {table}
+        {notifications}
+      </>
+    );
+  }
+
+  return (
+    <div className="max-w-screen-xl mx-auto">
+      <CommonPageHeader headline={t('headline')} />
+      {table}
+      {notifications}
     </div>
   );
 };

@@ -9,6 +9,16 @@ import { ProjectDocumentationInstruction_bool_exp, ProjectDocumentationInstructi
 // GraphQL query operation: ProjectDocumentationInstructionsTable
 // ====================================================
 
+export interface ProjectDocumentationInstructionsTable_ProjectDocumentationInstruction_Projects_aggregate_aggregate {
+  __typename: "Project_aggregate_fields";
+  count: number;
+}
+
+export interface ProjectDocumentationInstructionsTable_ProjectDocumentationInstruction_Projects_aggregate {
+  __typename: "Project_aggregate";
+  aggregate: ProjectDocumentationInstructionsTable_ProjectDocumentationInstruction_Projects_aggregate_aggregate | null;
+}
+
 export interface ProjectDocumentationInstructionsTable_ProjectDocumentationInstruction {
   __typename: "ProjectDocumentationInstruction";
   id: number;
@@ -29,6 +39,10 @@ export interface ProjectDocumentationInstructionsTable_ProjectDocumentationInstr
    */
   isDefault: boolean;
   updated_at: any;
+  /**
+   * An aggregate relationship
+   */
+  Projects_aggregate: ProjectDocumentationInstructionsTable_ProjectDocumentationInstruction_Projects_aggregate;
 }
 
 export interface ProjectDocumentationInstructionsTable_ProjectDocumentationInstruction_aggregate_aggregate {

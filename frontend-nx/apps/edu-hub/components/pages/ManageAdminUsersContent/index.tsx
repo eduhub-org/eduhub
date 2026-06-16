@@ -131,7 +131,12 @@ const ExpandableUserRow: FC<{
   );
 };
 
-const ManageAdminUsersContent: FC = () => {
+type ManageAdminUsersContentProps = {
+  /** When true, rendered inside SettingsLayout (no PageBlock / page header). */
+  inSettingsLayout?: boolean;
+};
+
+const ManageAdminUsersContent: FC<ManageAdminUsersContentProps> = ({ inSettingsLayout = false }) => {
   const t = useTranslations('manageAdminUsers');
   const isAdmin = useIsAdmin();
   const manageRole = useManageRole();
@@ -303,15 +308,14 @@ const ManageAdminUsersContent: FC = () => {
     [t]
   );
 
-  return (
-    <PageBlock>
-      <div className="max-w-screen-xl mx-auto mt-20">
-        {loading && <Loading />}
-        {adminError && <div className="text-red-500 p-4">{t('error_loading_admin_users')}</div>}
-        {!loading && !error && (
-          <div>
-            <CommonPageHeader headline={t('headline')} />
-            <TableGrid
+  const table = (
+    <>
+      {loading && <Loading />}
+      {adminError && <div className="text-red-500 p-4">{t('error_loading_admin_users')}</div>}
+      {!loading && !error && (
+        <div>
+          {!inSettingsLayout && <CommonPageHeader headline={t('headline')} />}
+          <TableGrid
               columns={columns}
               {...(canAddAdmins
                 ? { onAddButtonClick: () => setIsAddDialogOpen(true), addButtonText: t('add_admin_button') }
@@ -343,9 +347,18 @@ const ManageAdminUsersContent: FC = () => {
               onSuccess={() => refetch()}
               organizationOptions={organizationOptions}
             />
-          </div>
-        )}
-      </div>
+        </div>
+      )}
+    </>
+  );
+
+  if (inSettingsLayout) {
+    return table;
+  }
+
+  return (
+    <PageBlock>
+      <div className="max-w-screen-xl mx-auto mt-20">{table}</div>
     </PageBlock>
   );
 };

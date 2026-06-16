@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EduHub — Settings UX Proposals</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --brand:        #00A398;
+      --brand-light:  #00C4B8;
+      --brand-dark:   #008078;
+      --bg:           #222222;
+      --bg-raised:    #333333;
+      --bg-card:      #2a2a2a;
+      --bg-deep:      #0F0F0F;
+      --label:        #F2F2F2;
+      --label-2:      #D8D8D8;
+      --label-off:    #888888;
+      --border:       #444444;
+      --success:      #A2EBA0;
+      --warning:      #FFA665;
+      --error:        #D45A5A;
+      --font:         'Space Grotesk', system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font);
+      font-weight: 500;
+      background: #111;
+      color: var(--label);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── chooser bar ─────────────────────────────────────────── */
+    #chooser {
+      background: var(--bg-deep);
+      border-bottom: 1px solid #333;
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      position: sticky;
+      top: 0;
+      z-index: 200;
+    }
+    .chooser-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      color: var(--label-off);
+      margin-right: 6px;
+    }
+    .dtab {
+      padding: 6px 18px;
+      border-radius: 9999px;
+      border: 2px solid var(--border);
+      background: transparent;
+      color: var(--label-2);
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: border-color .18s, background .18s, color .18s;
+    }
+    .dtab:hover  { border-color: var(--brand); color: var(--brand); }
+    .dtab.active { border-color: var(--brand); background: var(--brand); color: #fff; }
+
+    .dpanel { display: none; }
+    .dpanel.active { display: block; }
+
+    /* ── shared shell ────────────────────────────────────────── */
+    .shell { background: var(--bg); min-height: calc(100vh - 53px); }
+    .shell-header {
+      background: rgba(34,34,34,.97);
+      border-bottom: 1px solid var(--border);
+      padding: 13px 28px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .logo { font-size: 17px; font-weight: 700; letter-spacing: .05em; color: #fff; margin-right: 20px; }
+    .logo em { color: var(--brand); font-style: normal; }
+    .breadcrumb { font-size: 13px; color: var(--label-off); }
+    .breadcrumb span { color: var(--label); }
+
+    /* ── shared atoms ────────────────────────────────────────── */
+    .chip {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 10px; font-weight: 600; padding: 2px 8px;
+      border-radius: 9999px; text-transform: uppercase; letter-spacing: .06em;
+    }
+    .chip.brand  { background: rgba(0,163,152,.18);  color: var(--brand-light);  border: 1px solid rgba(0,163,152,.3); }
+    .chip.orange { background: rgba(255,166,101,.18); color: var(--warning);      border: 1px solid rgba(255,166,101,.3); }
+    .chip.mint   { background: rgba(161,235,160,.18); color: var(--success);      border: 1px solid rgba(161,235,160,.3); }
+    .chip.muted  { background: rgba(255,255,255,.07); color: var(--label-off);    border: 1px solid rgba(255,255,255,.12); }
+    .chip.soon   { background: rgba(255,166,101,.1);  color: var(--warning);      border: 1px solid rgba(255,166,101,.2); }
+    .chip.super-a{ background: rgba(0,163,152,.18);  color: var(--brand-light);  border: 1px solid rgba(0,163,152,.3); }
+    .chip.admin-a{ background: rgba(255,166,101,.18); color: var(--warning);      border: 1px solid rgba(255,166,101,.3); }
+
+    .future { display: inline-flex; align-items: center; gap: 3px;
+      font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 9999px;
+      background: rgba(255,166,101,.1); color: var(--warning); border: 1px solid rgba(255,166,101,.2);
+      text-transform: uppercase; letter-spacing: .06em; vertical-align: middle; margin-left: 6px; }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 20px; border-radius: 9999px;
+      border: 2px solid var(--label-2); background: transparent;
+      color: var(--label); font-family: var(--font); font-size: 13px; font-weight: 500; cursor: pointer;
+    }
+    .btn.brand-fill { background: var(--brand); border-color: var(--brand); color: #fff; }
+
+    .divider { height: 1px; background: var(--border); margin: 22px 0; }
+
+    .note-box {
+      background: #0a0a0a; border: 1px solid #2a2a2a; border-radius: 12px;
+      padding: 20px 24px; margin: 20px 0;
+    }
+    .note-box h3 {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .12em; color: var(--brand); margin-bottom: 10px;
+    }
+    .note-box ul { list-style: none; padding: 0; }
+    .note-box li {
+      font-size: 13px; color: var(--label-2); padding: 4px 0 4px 16px;
+      position: relative; line-height: 1.55;
+    }
+    .note-box li::before { content: "–"; position: absolute; left: 0; color: var(--label-off); }
+
+    .design-bar {
+      background: linear-gradient(90deg, rgba(0,163,152,.14), transparent);
+      border-left: 3px solid var(--brand);
+      padding: 10px 20px;
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .12em; color: var(--brand);
+    }
+
+    .access-note {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 14px; background: rgba(0,0,0,.35);
+      border-radius: 8px; border: 1px dashed var(--border);
+      font-size: 12px; color: var(--label-off); margin-top: 20px;
+    }
+    .access-note strong { color: var(--label-2); }
+
+    /* ── DESIGN A ────────────────────────────────────────────── */
+    .a-layout {
+      display: flex; max-width: 1280px; margin: 0 auto;
+      min-height: calc(100vh - 110px);
+    }
+    .a-sidebar {
+      width: 232px; flex-shrink: 0;
+      border-right: 1px solid var(--border);
+      padding: 28px 0;
+      position: sticky; top: 110px;
+      height: calc(100vh - 110px); overflow-y: auto;
+    }
+    .s-group-lbl {
+      font-size: 10px; text-transform: uppercase; letter-spacing: .12em;
+      font-weight: 600; color: var(--label-off); padding: 20px 22px 5px;
+    }
+    .s-item {
+      display: flex; align-items: center; gap: 9px;
+      padding: 9px 22px; font-size: 13.5px; font-weight: 500;
+      color: var(--label-2); cursor: pointer; text-decoration: none;
+      border-left: 3px solid transparent;
+      transition: color .14s, background .14s, border-color .14s;
+    }
+    .s-item:hover { color: var(--label); background: rgba(255,255,255,.04); }
+    .s-item.on { color: #fff; border-left-color: var(--brand); background: rgba(0,163,152,.08); font-weight: 600; }
+    .s-item .ct { margin-left: auto; font-size: 10px; background: var(--brand); color: #fff; border-radius: 9999px; padding: 1px 7px; }
+    .s-item .lk { margin-left: auto; font-size: 12px; color: var(--label-off); }
+    .s-item.locked { opacity: .4; cursor: not-allowed; }
+    .s-divider { height: 1px; background: var(--border); margin: 10px 0; }
+    .s-sub { padding-left: 24px; }
+    .s-sub .s-item { font-size: 13px; padding: 7px 14px; }
+
+    .a-content { flex: 1; padding: 36px 44px; max-width: 820px; }
+    .a-pg-title { font-size: 21px; font-weight: 600; margin-bottom: 5px; }
+    .a-pg-sub { font-size: 13.5px; color: var(--label-2); margin-bottom: 28px; }
+
+    /* inline tabs (within a-content) */
+    .inner-tabs { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 22px; }
+    .inner-tab { padding: 8px 16px; font-size: 13px; cursor: pointer; color: var(--label-off); }
+    .inner-tab.on { color: var(--brand); font-weight: 600; border-bottom: 2px solid var(--brand); margin-bottom: -1px; }
+
+    /* email template rows */
+    .tpl-row {
+      display: flex; align-items: center; gap: 11px;
+      border: 1px solid var(--border); border-radius: 8px;
+      padding: 13px 14px; margin-bottom: 7px; cursor: pointer;
+      transition: border-color .14s, background .14s;
+    }
+    .tpl-row:hover { border-color: var(--brand); background: rgba(0,163,152,.04); }
+    .tpl-type { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .09em; color: var(--brand); min-width: 165px; }
+    .tpl-subj { flex: 1; font-size: 13.5px; color: var(--label); }
+    .tpl-age  { font-size: 11px; color: var(--label-off); }
+    .tpl-go   { font-size: 17px; color: var(--label-off); }
+
+    .sect-lbl { font-size: 10px; text-transform: uppercase; letter-spacing: .1em; font-weight: 600; color: var(--label-off); margin: 18px 0 7px; }
+    .soon-block {
+      font-size: 12px; color: var(--label-off); font-style: italic;
+      padding: 10px 14px; border-radius: 8px; background: rgba(255,255,255,.03);
+      border: 1px dashed var(--border); margin-bottom: 6px;
+    }
+
+    /* ── DESIGN B ────────────────────────────────────────────── */
+    .b-body { max-width: 1280px; margin: 0 auto; padding: 38px 36px; }
+    .b-pg-title { font-size: 27px; font-weight: 600; margin-bottom: 6px; }
+    .b-pg-sub { font-size: 14px; color: var(--label-2); margin-bottom: 12px; }
+    .b-grp-lbl {
+      font-size: 10px; text-transform: uppercase; letter-spacing: .12em;
+      font-weight: 600; color: var(--label-off); margin: 30px 0 10px;
+    }
+    .cards { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
+    .tile {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 22px; cursor: pointer; position: relative;
+      overflow: hidden;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .tile:hover { border-color: var(--brand); box-shadow: 0 4px 20px rgba(0,163,152,.13); }
+    .tile.locked { opacity: .48; cursor: not-allowed; }
+    .tile.locked::after {
+      content: ""; position: absolute; inset: 0; border-radius: 16px;
+      background: repeating-linear-gradient(45deg, transparent, transparent 8px, rgba(255,255,255,.025) 8px, rgba(255,255,255,.025) 10px);
+    }
+    .tile-ico {
+      width: 40px; height: 40px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; margin-bottom: 14px;
+    }
+    .ico-brand { background: rgba(0,163,152,.12);  color: var(--brand);   }
+    .ico-warn  { background: rgba(255,166,101,.12); color: var(--warning); }
+    .ico-mint  { background: rgba(161,235,160,.12); color: var(--success); }
+    .ico-muted { background: rgba(255,255,255,.06); color: var(--label-off); }
+    .tile-title { font-size: 14.5px; font-weight: 600; margin-bottom: 4px; }
+    .tile-desc  { font-size: 12.5px; color: var(--label-2); line-height: 1.5; margin-bottom: 13px; }
+    .tile-foot  { display: flex; align-items: center; justify-content: space-between; }
+    .tile-count { font-size: 12px; color: var(--label-off); }
+    .tile-arr   { font-size: 16px; color: var(--brand); }
+    .tile-lock  { font-size: 15px; color: var(--label-off); }
+
+    /* ── DESIGN C ────────────────────────────────────────────── */
+    .c-body { max-width: 860px; margin: 0 auto; padding: 38px 28px; }
+    .c-top  { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 30px; }
+    .c-pg-title { font-size: 23px; font-weight: 600; }
+    .c-pg-sub   { font-size: 13.5px; color: var(--label-2); margin-top: 3px; }
+    .searchbar {
+      display: flex; align-items: center; gap: 7px;
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 9999px; padding: 8px 15px; min-width: 210px;
+    }
+    .searchbar input {
+      background: none; border: none; outline: none;
+      font-family: var(--font); font-size: 13px; color: var(--label); width: 100%;
+    }
+    .searchbar input::placeholder { color: var(--label-off); }
+
+    .acc-group { border: 1px solid var(--border); border-radius: 13px; overflow: hidden; margin-bottom: 10px; transition: border-color .2s; }
+    .acc-group.is-open { border-color: rgba(0,163,152,.35); }
+    .acc-head {
+      display: flex; align-items: center; gap: 12px;
+      padding: 17px 22px; cursor: pointer; background: var(--bg-card);
+      transition: background .14s; user-select: none;
+    }
+    .acc-head:hover { background: var(--bg-raised); }
+    .acc-head.open  { background: var(--bg-raised); border-bottom: 1px solid var(--border); }
+    .acc-ico {
+      width: 34px; height: 34px; border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 17px; flex-shrink: 0;
+    }
+    .acc-title { font-size: 14.5px; font-weight: 600; flex: 1; }
+    .acc-meta  { font-size: 11.5px; color: var(--label-off); }
+    .acc-chev  { font-size: 13px; color: var(--label-off); transition: transform .2s; margin-left: 10px; }
+    .acc-head.open .acc-chev { transform: rotate(180deg); }
+    .acc-body { display: none; background: rgba(0,0,0,.22); padding: 14px 20px; }
+    .acc-body.open { display: block; }
+
+    .acc-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px; border-radius: 8px;
+      cursor: pointer; transition: background .12s;
+    }
+    .acc-row:hover { background: rgba(255,255,255,.04); }
+    .acc-row.featured { background: rgba(0,163,152,.07); border: 1px solid rgba(0,163,152,.14); margin-bottom: 4px; }
+    .acc-row .rl  { font-size: 14px; font-weight: 500; flex: 1; }
+    .acc-row .rh  { font-size: 12px; color: var(--label-off); }
+    .acc-row .ra  { font-size: 12px; color: var(--label-off); }
+    .row-ico { width: 26px; height: 26px; border-radius: 7px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+    /* scrollbar */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════
+     CHOOSER
+════════════════════════════════════════════════════════════ -->
+<div id="chooser">
+  <span class="chooser-label">Proposal</span>
+  <button class="dtab active" onclick="pick('a',this)">A — Left sidebar nav</button>
+  <button class="dtab"        onclick="pick('b',this)">B — Card dashboard</button>
+  <button class="dtab"        onclick="pick('c',this)">C — Accordion groups</button>
+  <span style="margin-left:auto; font-size:11px; color:var(--label-off);">EduHub · Settings redesign · 2026</span>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     DESIGN A — Left sidebar navigation
+════════════════════════════════════════════════════════════ -->
+<div id="pa" class="dpanel active">
+  <div class="design-bar">Design A — Left sidebar navigation &nbsp;·&nbsp; GitHub Settings / VS Code pattern</div>
+  <div class="shell">
+    <div class="shell-header">
+      <span class="logo">EDU <em>HUB</em></span>
+      <span class="breadcrumb">Settings <span>/ Email notifications</span></span>
+    </div>
+
+    <div class="a-layout">
+      <!-- sidebar -->
+      <nav class="a-sidebar">
+        <div class="s-group-lbl">Platform</div>
+        <a class="s-item" href="#">
+          <!-- appearance icon -->
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+          Appearance
+        </a>
+        <a class="s-item" href="#">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          Homepage content
+        </a>
+
+        <div class="s-group-lbl">Notifications</div>
+        <a class="s-item on" href="#">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          Email templates
+          <span class="ct">14</span>
+        </a>
+        <div class="s-sub">
+          <a class="s-item" href="#">Application process</a>
+          <a class="s-item" href="#">Project updates <span class="future">soon</span></a>
+          <a class="s-item" href="#">Session reminders <span class="future">soon</span></a>
+          <a class="s-item" href="#">System emails</a>
+        </div>
+
+        <div class="s-group-lbl">Programs</div>
+        <a class="s-item" href="#">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          Certificates
+        </a>
+        <a class="s-item" href="#">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Project docs
+        </a>
+        <a class="s-item" href="#">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+          Onboarding texts
+        </a>
+        <a class="s-item" href="#">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3M16 6h3a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-3M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M8 6h8"/></svg>
+          Course groups
+        </a>
+
+        <div class="s-divider"></div>
+        <div class="s-group-lbl">System</div>
+        <a class="s-item" href="#">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Time zone &amp; FAQ
+        </a>
+        <a class="s-item locked" href="#">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          Access &amp; roles
+          <span class="lk">🔒</span>
+        </a>
+      </nav>
+
+      <!-- content — email templates section -->
+      <main class="a-content">
+        <div style="display:flex; align-items:flex-start; gap:12px; margin-bottom:5px;">
+          <div>
+            <div class="a-pg-title">Email notifications</div>
+            <div class="a-pg-sub">Automated emails sent to participants and instructors. Variables like <code style="font-size:11px; background:rgba(255,255,255,.07); padding:1px 5px; border-radius:4px;">[User:FirstName]</code> are replaced at send time.</div>
+          </div>
+          <button class="btn brand-fill" style="margin-left:auto; flex-shrink:0; margin-top:2px; font-size:12px;">+ New template</button>
+        </div>
+
+        <!-- inline category tabs -->
+        <div class="inner-tabs">
+          <div class="inner-tab on">All &nbsp;<span style="background:rgba(0,163,152,.18); color:var(--brand); font-size:10px; font-weight:700; padding:1px 7px; border-radius:9999px;">14</span></div>
+          <div class="inner-tab">Application</div>
+          <div class="inner-tab">Projects <span class="future">soon</span></div>
+          <div class="inner-tab">Sessions <span class="future">soon</span></div>
+          <div class="inner-tab">System</div>
+        </div>
+
+        <div class="sect-lbl">Application process</div>
+        <div class="tpl-row">
+          <span class="chip mint">Application</span>
+          <div class="tpl-type">ENROLLMENT_INVITE</div>
+          <div class="tpl-subj">You're invited to join "{{course_name}}"</div>
+          <div class="tpl-age">3 days ago</div>
+          <span class="tpl-go">›</span>
+        </div>
+        <div class="tpl-row">
+          <span class="chip mint">Application</span>
+          <div class="tpl-type">ENROLLMENT_CONFIRM</div>
+          <div class="tpl-subj">Your application was confirmed!</div>
+          <div class="tpl-age">1 week ago</div>
+          <span class="tpl-go">›</span>
+        </div>
+        <div class="tpl-row">
+          <span class="chip mint">Application</span>
+          <div class="tpl-type">ENROLLMENT_REJECT</div>
+          <div class="tpl-subj">Update on your application</div>
+          <div class="tpl-age">2 weeks ago</div>
+          <span class="tpl-go">›</span>
+        </div>
+        <div class="tpl-row">
+          <span class="chip mint">Application</span>
+          <div class="tpl-type">WAITLIST_NOTIFY</div>
+          <div class="tpl-subj">A spot just opened up — act fast</div>
+          <div class="tpl-age">2 weeks ago</div>
+          <span class="tpl-go">›</span>
+        </div>
+
+        <div class="sect-lbl" style="display:flex; align-items:center; gap:8px;">
+          Project updates <span class="future">coming soon</span>
+        </div>
+        <div class="soon-block">Templates for project status changes and participant updates will appear here once the project notification system is live.</div>
+
+        <div class="sect-lbl" style="display:flex; align-items:center; gap:8px;">
+          Session reminders <span class="future">coming soon</span>
+        </div>
+        <div class="soon-block">Pre- and post-session reminder templates will be configurable here.</div>
+
+        <div class="sect-lbl">System</div>
+        <div class="tpl-row">
+          <span class="chip muted">System</span>
+          <div class="tpl-type">PASSWORD_RESET</div>
+          <div class="tpl-subj">Reset your EduHub password</div>
+          <div class="tpl-age">1 month ago</div>
+          <span class="tpl-go">›</span>
+        </div>
+        <div class="tpl-row">
+          <span class="chip muted">System</span>
+          <div class="tpl-type">EMAIL_VERIFY</div>
+          <div class="tpl-subj">Confirm your email address</div>
+          <div class="tpl-age">1 month ago</div>
+          <span class="tpl-go">›</span>
+        </div>
+
+        <div class="access-note">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <strong>Access:</strong>&nbsp;visible to&nbsp;
+          <span class="chip super-a" style="margin:0 3px">super-admin</span>&nbsp;and&nbsp;
+          <span class="chip admin-a"  style="margin:0 3px">admin</span>.
+          &nbsp;Instructors can view templates for their own courses only.
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div style="max-width:900px; margin:0 auto; padding:20px 28px 36px;">
+    <div class="note-box">
+      <h3>Design A notes</h3>
+      <ul>
+        <li>Persistent left rail = permanent table of contents; each section is a bookmarkable URL (<code>/manage/settings/emails</code>, etc.)</li>
+        <li>Email templates become a top-level nav item with expandable sub-nav: Application / Projects / Sessions / System — ready for all the new categories you described</li>
+        <li>Role-based access: locked nav items are greyed out with a padlock glyph; tooltip explains which role unlocks them; invisible items can be hidden entirely for lower roles</li>
+        <li>Scales best as settings grow — adding a new section is a single new sidebar entry</li>
+        <li>Trade-off: requires a layout change from the current single-column scroll to a two-column layout, and deep nesting (sidebar group → sub-item → inline edit) needs care</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     DESIGN B — Card overview dashboard
+════════════════════════════════════════════════════════════ -->
+<div id="pb" class="dpanel">
+  <div class="design-bar">Design B — Card overview dashboard &nbsp;·&nbsp; Stripe / Vercel settings pattern</div>
+  <div class="shell">
+    <div class="shell-header">
+      <span class="logo">EDU <em>HUB</em></span>
+      <span class="breadcrumb"><span>Settings</span></span>
+    </div>
+
+    <div class="b-body">
+      <div style="display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+        <div>
+          <div class="b-pg-title">Settings</div>
+          <div class="b-pg-sub">Configure platform appearance, notifications, and program defaults.</div>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px; padding-top:4px;">
+          <span class="chip super-a">Super admin</span>
+          <span style="font-size:12px; color:var(--label-off);">login@opencampus.sh</span>
+        </div>
+      </div>
+
+      <!-- group: Appearance & content -->
+      <div class="b-grp-lbl">Appearance &amp; content</div>
+      <div class="cards">
+        <div class="tile">
+          <div class="tile-ico ico-brand">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+          </div>
+          <div class="tile-title">Appearance</div>
+          <div class="tile-desc">Banner colors, text (DE/EN), and branding overrides.</div>
+          <div class="tile-foot"><span class="tile-count">Banner · 4 fields</span><span class="tile-arr">→</span></div>
+        </div>
+        <div class="tile">
+          <div class="tile-ico ico-brand">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3M16 6h3a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-3M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M8 6h8"/></svg>
+          </div>
+          <div class="tile-title">Course groups</div>
+          <div class="tile-desc">Organize homepage sections, toggle visibility, drag to reorder.</div>
+          <div class="tile-foot"><span class="tile-count">4 active groups</span><span class="tile-arr">→</span></div>
+        </div>
+        <div class="tile">
+          <div class="tile-ico ico-brand">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </div>
+          <div class="tile-title">FAQ section</div>
+          <div class="tile-desc">Show/hide the FAQ block and choose which collection to display.</div>
+          <div class="tile-foot"><span class="tile-count">Visible · "default"</span><span class="tile-arr">→</span></div>
+        </div>
+      </div>
+
+      <!-- group: Email notifications -->
+      <div class="b-grp-lbl">Email notifications</div>
+      <div class="cards">
+        <div class="tile" style="border-color:rgba(0,163,152,.28);">
+          <div class="tile-ico ico-brand">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </div>
+          <div class="tile-title">Application process</div>
+          <div class="tile-desc">Invitations, confirmations, rejections, and waitlist notifications.</div>
+          <div class="tile-foot"><span class="tile-count">8 templates</span><span class="tile-arr">→</span></div>
+        </div>
+        <div class="tile">
+          <div class="tile-ico ico-warn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+          </div>
+          <div class="tile-title">Project notifications <span class="future">soon</span></div>
+          <div class="tile-desc">Status changes and action requests for project participants.</div>
+          <div class="tile-foot"><span class="tile-count">0 templates</span><span class="tile-arr" style="opacity:.3">→</span></div>
+        </div>
+        <div class="tile">
+          <div class="tile-ico ico-mint">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div class="tile-title">Session reminders <span class="future">soon</span></div>
+          <div class="tile-desc">Pre-/post-session automated emails to registered participants.</div>
+          <div class="tile-foot"><span class="tile-count">0 templates</span><span class="tile-arr" style="opacity:.3">→</span></div>
+        </div>
+        <div class="tile">
+          <div class="tile-ico ico-muted">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+          </div>
+          <div class="tile-title">System emails</div>
+          <div class="tile-desc">Password reset, email verification, and account alerts.</div>
+          <div class="tile-foot"><span class="tile-count">6 templates</span><span class="tile-arr">→</span></div>
+        </div>
+      </div>
+
+      <!-- group: Program defaults -->
+      <div class="b-grp-lbl">Program defaults</div>
+      <div class="cards">
+        <div class="tile">
+          <div class="tile-ico ico-mint">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <div class="tile-title">Certificate templates</div>
+          <div class="tile-desc">Default certificate layout per program type (Courses / Events / Degrees).</div>
+          <div class="tile-foot"><span class="tile-count">3 program types</span><span class="tile-arr">→</span></div>
+        </div>
+        <div class="tile">
+          <div class="tile-ico ico-brand">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          </div>
+          <div class="tile-title">Project doc guides</div>
+          <div class="tile-desc">Upload PDF instructions and assign defaults per project type.</div>
+          <div class="tile-foot"><span class="tile-count">5 uploaded</span><span class="tile-arr">→</span></div>
+        </div>
+        <div class="tile">
+          <div class="tile-ico ico-brand">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <div class="tile-title">Onboarding texts</div>
+          <div class="tile-desc">Markdown sign-up instructions per program type, bilingual DE/EN.</div>
+          <div class="tile-foot"><span class="tile-count">6 texts</span><span class="tile-arr">→</span></div>
+        </div>
+      </div>
+
+      <!-- group: System -->
+      <div class="b-grp-lbl">System</div>
+      <div class="cards">
+        <div class="tile">
+          <div class="tile-ico ico-muted">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div class="tile-title">Time zone</div>
+          <div class="tile-desc">Default timezone for scheduling and session display.</div>
+          <div class="tile-foot"><span class="tile-count">Europe/Berlin</span><span class="tile-arr">→</span></div>
+        </div>
+        <div class="tile locked">
+          <div class="tile-ico ico-muted">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </div>
+          <div class="tile-title">Roles &amp; permissions</div>
+          <div class="tile-desc">Control which admin roles can access each settings section.</div>
+          <div class="tile-foot">
+            <span class="chip super-a" style="font-size:10px;">Super-admin only</span>
+            <span class="tile-lock">🔒</span>
+          </div>
+        </div>
+        <div style="min-height:1px"></div>
+      </div>
+    </div>
+  </div>
+
+  <div style="max-width:900px; margin:0 auto; padding:20px 28px 36px;">
+    <div class="note-box">
+      <h3>Design B notes</h3>
+      <ul>
+        <li>Overview page gives every admin an instant orientation — no scrolling needed to see all available settings</li>
+        <li>Each tile shows live summary data (e.g. "8 templates", "Europe/Berlin") so problems are spotted at a glance</li>
+        <li>Email categories become separate tiles; "soon" tiles set expectation and hold the slot before the feature ships</li>
+        <li>Role-based access: locked tiles use a diagonal hatching texture + padlock — clearly present but visually inaccessible; less confusing than invisible items</li>
+        <li>Trade-off: introduces two navigation levels (overview → detail page), which adds one click compared to today's single scroll; best mitigated by surfacing current values on the tile itself</li>
+        <li>Natural fit if the settings catalog continues to grow — the grid absorbs new tiles without pushing others off screen</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     DESIGN C — Accordion groups
+════════════════════════════════════════════════════════════ -->
+<div id="pc" class="dpanel">
+  <div class="design-bar">Design C — Accordion groups &nbsp;·&nbsp; single-page, collapsible, lowest migration effort</div>
+  <div class="shell">
+    <div class="shell-header">
+      <span class="logo">EDU <em>HUB</em></span>
+      <span class="breadcrumb"><span>Settings</span></span>
+    </div>
+
+    <div class="c-body">
+      <div class="c-top">
+        <div>
+          <div class="c-pg-title">Settings</div>
+          <div class="c-pg-sub">Platform-wide configuration. Changes take effect immediately.</div>
+        </div>
+        <div class="searchbar">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" placeholder="Search settings…">
+        </div>
+      </div>
+
+      <!-- Accordion 1: Appearance (collapsed) -->
+      <div class="acc-group" id="ag1">
+        <div class="acc-head" onclick="tog('ag1')">
+          <div class="acc-ico" style="background:rgba(0,163,152,.1); color:var(--brand);">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+          </div>
+          <div style="flex:1">
+            <div class="acc-title">Appearance</div>
+            <div style="font-size:12px; color:var(--label-off); margin-top:2px;">Banner, colors, and homepage layout</div>
+          </div>
+          <span class="acc-meta">2 settings</span>
+          <span class="acc-chev">&#8964;</span>
+        </div>
+        <div class="acc-body">
+          <div class="acc-row">
+            <div class="rl">Banner</div>
+            <div class="rh">Background + font colors, text DE/EN</div>
+            <span class="ra">›</span>
+          </div>
+          <div class="acc-row">
+            <div class="rl">Homepage sections</div>
+            <div class="rh">Show/hide and reorder course groups</div>
+            <span class="ra">›</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Accordion 2: Email notifications (open by default) -->
+      <div class="acc-group is-open" id="ag2">
+        <div class="acc-head open" onclick="tog('ag2')">
+          <div class="acc-ico" style="background:rgba(0,163,152,.1); color:var(--brand);">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </div>
+          <div style="flex:1">
+            <div class="acc-title">Email notifications</div>
+            <div style="font-size:12px; color:var(--label-off); margin-top:2px;">Automated emails to participants and instructors</div>
+          </div>
+          <span class="acc-meta">14 templates</span>
+          <span class="acc-chev">&#8964;</span>
+        </div>
+        <div class="acc-body open">
+          <div class="acc-row featured">
+            <div class="row-ico" style="background:rgba(161,235,160,.15);">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#A2EBA0" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="rl">Application process
+              <span style="font-size:11px; background:rgba(161,235,160,.15); color:var(--success); padding:1px 7px; border-radius:9999px; margin-left:7px;">8 active</span>
+            </div>
+            <div class="rh">Invitations, confirmations, rejections</div>
+            <span class="ra">›</span>
+          </div>
+          <div class="acc-row">
+            <div class="row-ico" style="background:rgba(255,166,101,.12);">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#FFA665" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+            </div>
+            <div class="rl">Project notifications <span class="future">soon</span></div>
+            <div class="rh">Status changes and participant updates</div>
+            <span class="ra" style="opacity:.3">›</span>
+          </div>
+          <div class="acc-row">
+            <div class="row-ico" style="background:rgba(0,163,152,.1);">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div class="rl">Session reminders <span class="future">soon</span></div>
+            <div class="rh">Before/after session emails</div>
+            <span class="ra" style="opacity:.3">›</span>
+          </div>
+          <div class="acc-row">
+            <div class="row-ico" style="background:rgba(255,255,255,.06);">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--label-off)" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+            </div>
+            <div class="rl">System emails
+              <span style="font-size:11px; background:rgba(255,255,255,.07); color:var(--label-off); padding:1px 7px; border-radius:9999px; margin-left:7px;">6 active</span>
+            </div>
+            <div class="rh">Password reset, verification</div>
+            <span class="ra">›</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Accordion 3: Program defaults (collapsed) -->
+      <div class="acc-group" id="ag3">
+        <div class="acc-head" onclick="tog('ag3')">
+          <div class="acc-ico" style="background:rgba(161,235,160,.1); color:var(--success);">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <div style="flex:1">
+            <div class="acc-title">Program defaults</div>
+            <div style="font-size:12px; color:var(--label-off); margin-top:2px;">Certificates, project docs, onboarding texts</div>
+          </div>
+          <span class="acc-meta">9 settings</span>
+          <span class="acc-chev">&#8964;</span>
+        </div>
+        <div class="acc-body">
+          <div class="acc-row">
+            <div class="rl">Default certificate templates</div>
+            <div class="rh">Per program type: Courses, Events, Degrees</div>
+            <span class="ra">›</span>
+          </div>
+          <div class="acc-row">
+            <div class="rl">Project documentation guides</div>
+            <div class="rh">PDF instructions and defaults per project type</div>
+            <span class="ra">›</span>
+          </div>
+          <div class="acc-row">
+            <div class="rl">Onboarding texts</div>
+            <div class="rh">Markdown, bilingual DE/EN, per program type</div>
+            <span class="ra">›</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Accordion 4: System (collapsed) -->
+      <div class="acc-group" id="ag4">
+        <div class="acc-head" onclick="tog('ag4')">
+          <div class="acc-ico" style="background:rgba(255,255,255,.05); color:var(--label-off);">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M5.34 18.66l-1.41 1.41M3 12H1m4.93-7.07L4.52 3.52M21 12h-2m-1.93 7.07 1.41 1.41M18.66 5.34l1.41-1.41M12 1v2m0 18v2M5.34 5.34 3.93 3.93"/></svg>
+          </div>
+          <div style="flex:1">
+            <div class="acc-title">System</div>
+            <div style="font-size:12px; color:var(--label-off); margin-top:2px;">Time zone, FAQ, platform internals</div>
+          </div>
+          <span class="acc-meta">3 settings</span>
+          <span class="acc-chev">&#8964;</span>
+        </div>
+        <div class="acc-body">
+          <div class="acc-row">
+            <div class="rl">Time zone</div>
+            <div class="rh">Currently: Europe/Berlin</div>
+            <span class="ra">›</span>
+          </div>
+          <div class="acc-row">
+            <div class="rl">FAQ section</div>
+            <div class="rh">Visible · Collection: "default"</div>
+            <span class="ra">›</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Accordion 5: Roles — locked -->
+      <div class="acc-group" style="opacity:.45; pointer-events:none;">
+        <div class="acc-head">
+          <div class="acc-ico" style="background:rgba(255,255,255,.04); color:var(--label-off);">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </div>
+          <div style="flex:1">
+            <div class="acc-title">
+              Access &amp; roles
+              <span class="chip super-a" style="margin-left:9px;">Super-admin only</span>
+            </div>
+            <div style="font-size:12px; color:var(--label-off); margin-top:2px;">Manage who can access each settings section</div>
+          </div>
+          <span style="font-size:16px; color:var(--label-off);">🔒</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div style="max-width:900px; margin:0 auto; padding:20px 28px 36px;">
+    <div class="note-box">
+      <h3>Design C notes</h3>
+      <ul>
+        <li>Lowest migration cost — same URL, same layout; the current stacked sections simply gain collapsible headers</li>
+        <li>All groups visible at once; power users collapse what they don't need and stay in context</li>
+        <li>Email templates expand inline into sub-rows (Application / Projects / Sessions / System) without a page transition; clicking a row opens the full editor in a slide-over panel or inline expansion</li>
+        <li>Search bar at the top can be wired to highlight or filter visible rows — makes finding a specific template fast even with many items</li>
+        <li>Role-based access: entire groups can be hidden or rendered locked/greyed for lower-privilege roles; individual rows within a group can also carry a lock state</li>
+        <li>Trade-off: as email templates multiply, even the sub-rows can get long; consider pairing this with a full-page drill-down for the email template list specifically (hybrid of C + A)</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     SHARED: proposed information architecture summary
+════════════════════════════════════════════════════════════ -->
+<div style="background:#0a0a0a; border-top:1px solid #222; padding:40px 28px;">
+  <div style="max-width:900px; margin:0 auto;">
+    <div style="font-size:11px; text-transform:uppercase; letter-spacing:.12em; font-weight:700; color:var(--brand); margin-bottom:18px;">Proposed settings taxonomy (shared across all three designs)</div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+      <!-- col 1 -->
+      <div>
+        <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:11px; padding:18px 20px; margin-bottom:12px;">
+          <div style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--brand); margin-bottom:10px;">Appearance</div>
+          <div style="font-size:13px; color:var(--label-2); line-height:1.8;">
+            · Banner (colors, text DE/EN)<br>
+            · <em style="color:var(--label-off);">future: logo, theme overrides</em>
+          </div>
+        </div>
+        <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:11px; padding:18px 20px; margin-bottom:12px;">
+          <div style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--brand); margin-bottom:10px;">Homepage content</div>
+          <div style="font-size:13px; color:var(--label-2); line-height:1.8;">
+            · Course groups (visibility, order)<br>
+            · FAQ section (visibility, collection)
+          </div>
+        </div>
+        <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:11px; padding:18px 20px;">
+          <div style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--label-off); margin-bottom:10px;">System</div>
+          <div style="font-size:13px; color:var(--label-2); line-height:1.8;">
+            · Time zone<br>
+            · <em style="color:var(--label-off);">future: integrations, API</em>
+          </div>
+        </div>
+      </div>
+      <!-- col 2 -->
+      <div>
+        <div style="background:var(--bg-card); border:1px solid rgba(0,163,152,.3); border-radius:11px; padding:18px 20px; margin-bottom:12px;">
+          <div style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--brand); margin-bottom:10px;">Email notifications <span class="chip brand" style="margin-left:6px;">Growing</span></div>
+          <div style="font-size:13px; color:var(--label-2); line-height:1.8;">
+            · Application process (current)<br>
+            · Project notifications <span class="future">soon</span><br>
+            · Session reminders <span class="future">soon</span><br>
+            · System emails (password reset…)
+          </div>
+        </div>
+        <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:11px; padding:18px 20px; margin-bottom:12px;">
+          <div style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--success); margin-bottom:10px;">Program defaults</div>
+          <div style="font-size:13px; color:var(--label-2); line-height:1.8;">
+            · Certificate templates (per type)<br>
+            · Project documentation guides<br>
+            · Onboarding texts (DE/EN, per type)
+          </div>
+        </div>
+        <div style="background:var(--bg-card); border:1px dashed var(--border); border-radius:11px; padding:18px 20px; opacity:.55;">
+          <div style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--label-off); margin-bottom:10px;">Access &amp; roles 🔒 <span class="chip super-a" style="margin-left:6px;">Super-admin</span></div>
+          <div style="font-size:13px; color:var(--label-2); line-height:1.8;">
+            · Role definitions<br>
+            · Per-section access grants<br>
+            · <em style="color:var(--label-off);">future: instructor-scoped views</em>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- rename note -->
+    <div style="margin-top:24px; display:flex; align-items:center; gap:10px; padding:12px 18px; background:rgba(0,163,152,.08); border:1px solid rgba(0,163,152,.2); border-radius:9px; font-size:13px; color:var(--label-2);">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <strong style="color:var(--label);">Menu rename:</strong>&nbsp;
+      "App settings" → <strong style="color:var(--brand);">Settings</strong>&nbsp; (menu item, page title, and route <code style="font-size:11px; background:rgba(255,255,255,.07); padding:1px 5px; border-radius:4px;">/manage/settings</code>). "Email templates" becomes a section inside Settings rather than a separate menu item.
+    </div>
+  </div>
+</div>
+
+<script>
+  function pick(id, btn) {
+    document.querySelectorAll('.dpanel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.dtab').forEach(t => t.classList.remove('active'));
+    document.getElementById('p'+id).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  function tog(groupId) {
+    const g    = document.getElementById(groupId);
+    const head = g.querySelector('.acc-head');
+    const body = g.querySelector('.acc-body');
+    const open = head.classList.contains('open');
+    head.classList.toggle('open', !open);
+    body.classList.toggle('open', !open);
+    g.classList.toggle('is-open', !open);
+  }
+</script>
+</body>
+</html>

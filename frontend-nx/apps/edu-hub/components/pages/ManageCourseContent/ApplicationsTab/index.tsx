@@ -2,8 +2,20 @@ import { QueryResult } from '@apollo/client';
 import { FC, useCallback, useMemo, useState } from 'react';
 import {
   ManagedCourse_Course_by_pk,
-  ManagedCourse_Course_by_pk_CourseEnrollments,
 } from '../../../../queries/__generated__/ManagedCourse';
+import {
+  ManagedCourseApplications,
+  ManagedCourseApplicationsVariables,
+  ManagedCourseApplications_Course_by_pk,
+  ManagedCourseApplications_Course_by_pk_CourseEnrollments,
+} from '../../../../queries/__generated__/ManagedCourseApplications';
+import {
+  ManagedCourseApplicationRecipients,
+  ManagedCourseApplicationRecipientsVariables,
+  ManagedCourseApplicationRecipients_Course_by_pk_CourseEnrollments,
+} from '../../../../queries/__generated__/ManagedCourseApplicationRecipients';
+import { useLazyRoleQuery, useRoleQuery } from '../../../../hooks/authedQuery';
+import { MANAGED_COURSE_APPLICATIONS, MANAGED_COURSE_APPLICATION_RECIPIENTS } from '../../../../queries/course';
 import Dot from '../../../common/Dot';
 import { OnlyInstructor } from '../../../common/OnlyLoggedIn';
 import { useIsInstructor, useIsAdmin } from '../../../../hooks/authentication';
@@ -37,10 +49,12 @@ import { useTranslations, useLocale } from 'next-intl';
 import Modal from '../../../common/Modal';
 import AddParticipantsForm from './AddParticipantsForm';
 import TableGrid from '../../../common/TableGrid';
-import { ColumnDef } from '@tanstack/react-table';
+import { useTableGrid } from '../../../common/TableGrid/hooks';
+import { createMultiWordSearchCondition } from '../../../common/TableGrid/utils';
+import { ColumnDef, SortingState } from '@tanstack/react-table';
 import { GoDotFill } from 'react-icons/go';
 import { IoIosCheckmarkCircle, IoIosCloseCircle } from 'react-icons/io';
-import { MotivationRating_enum, CourseEnrollmentStatus_enum } from '../../../../__generated__/globalTypes';
+import { CourseEnrollmentStatus_enum, MotivationRating_enum } from '../../../../__generated__/globalTypes';
 import { getPaymentStatusFromInvoices } from '../../../../utils/invoicePaymentStatus';
 import { useDisplayDate } from '../../../../helpers/dateTimeHelpers';
 import { BulkAction } from '../../../common/TableGrid/types';
@@ -49,9 +63,13 @@ import { ErrorMessageDialog } from '../../../common/dialogs/ErrorMessageDialog';
 import { FormbricksResponsesDisplay } from './FormbricksResponsesDisplay';
 import { getRegistrationFeatures, type RegistrationFeatures } from './registrationConfig';
 import NotificationSnackbar from '../../../common/dialogs/NotificationSnackbar';
+import Loading from '../../../common/Loading';
 
 /** Matches TableGrid `gap-3` between columns; keep in sync with expandable row width math. */
 const APPLICATION_TABLE_GAP_PX = 12;
+const BULK_EMAIL_MAILTO_URL_LIMIT = 1800;
+const BULK_EMAIL_RECIPIENT_LIMIT = 10000;
+const BULK_EMAIL_PREVIEW_COUNT = 8;
 
 /**
  * Default pixel widths for Applications tab columns (accessorKey → size).
@@ -99,27 +117,144 @@ function getExpandableRowWidths(features: RegistrationFeatures) {
 
 interface IProps {
   course: ManagedCourse_Course_by_pk;
-  qResult: QueryResult<any, any>;
 }
 
-const isExpired = (enrollment: ManagedCourse_Course_by_pk_CourseEnrollments) => {
+type ApplicationCourse = ManagedCourseApplications_Course_by_pk;
+type ApplicationEnrollment = ManagedCourseApplications_Course_by_pk_CourseEnrollments;
+type BulkEmailRecipient = ManagedCourseApplicationRecipients_Course_by_pk_CourseEnrollments;
+
+type BulkEmailDialogData = {
+  actionLabel: string;
+  recipients: BulkEmailRecipient[];
+  totalCount: number;
+  isMailtoTooLong: boolean;
+  isLimited: boolean;
+};
+
+interface ApplicationsTabContentProps {
+  course: ApplicationCourse;
+  qResult: QueryResult<ManagedCourseApplications, ManagedCourseApplicationsVariables>;
+  loading: boolean;
+  error: ApolloError | undefined;
+  pageIndex: number;
+  setPageIndex: (index: number) => void;
+  pageSize: number;
+  setPageSize: (size: number) => void;
+  searchFilter: string;
+  setSearchFilter: (value: string) => void;
+  sorting: SortingState;
+  setSorting: (sorting: SortingState | ((prev: SortingState) => SortingState)) => void;
+}
+
+const isExpired = (enrollment: ApplicationEnrollment) => {
   if (enrollment.invitationExpirationDate == null) {
     return false;
   }
   return new Date(enrollment.invitationExpirationDate).setHours(0, 0, 0, 0) < new Date().setHours(0, 0, 0, 0);
 };
 
-const isInviteEligibleEnrollment = (enrollment: ManagedCourse_Course_by_pk_CourseEnrollments) =>
+const isInviteEligibleEnrollment = (enrollment: ApplicationEnrollment) =>
   enrollment.motivationRating === 'INVITE' &&
   (enrollment.status === 'APPLIED' ||
     enrollment.status === 'INVITED' ||
     enrollment.status === 'WAITLIST');
 
-const isRejectionEligibleEnrollment = (enrollment: ManagedCourse_Course_by_pk_CourseEnrollments) =>
+const isRejectionEligibleEnrollment = (enrollment: ApplicationEnrollment) =>
   enrollment.motivationRating === 'DECLINE' &&
   (enrollment.status === 'APPLIED' || enrollment.status === 'WAITLIST');
 
-export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
+export const ApplicationsTab: FC<IProps> = ({ course }) => {
+  const t = useTranslations('manageCourse');
+  const [pageSize, setPageSize] = useState(20);
+  const {
+    data,
+    loading,
+    error,
+    queryResult,
+    pageIndex,
+    setPageIndex,
+    searchFilter,
+    setSearchFilter,
+    sorting,
+    setSorting,
+  } = useTableGrid<ManagedCourseApplicationsVariables>({
+    queryHook: useRoleQuery,
+    query: MANAGED_COURSE_APPLICATIONS,
+    queryVariables: { id: course.id },
+    pageSize,
+    refetchFilter: (search) => {
+      const searchCondition = createMultiWordSearchCondition(search, [
+        'User.firstName',
+        'User.lastName',
+        'User.email',
+        'motivationLetter',
+      ]);
+      return { filter: searchCondition };
+    },
+    sortColumnMapper: (columnId) => {
+      switch (columnId) {
+        case 'User.firstName':
+          return { User: { firstName: null } };
+        case 'User.lastName':
+          return { User: { lastName: null } };
+        case 'User.Organization.name':
+          return { User: { Organization: { name: null } } };
+        case 'created_at':
+        case 'motivationRating':
+        case 'status':
+          return columnId;
+        default:
+          return null;
+      }
+    },
+    defaultSort: [{ id: 'asc' }],
+  });
+
+  if (loading && !data) {
+    return <Loading />;
+  }
+
+  if (error) {
+    console.error('ApplicationsTab: failed to load course applications', error);
+    return <div className="text-error">{t('course_load_error')}</div>;
+  }
+
+  if (!data?.Course_by_pk) {
+    return <div>{t('course_not_found', { courseId: course.id })}</div>;
+  }
+
+  return (
+    <ApplicationsTabContent
+      course={data.Course_by_pk}
+      qResult={queryResult}
+      loading={loading}
+      error={error}
+      pageIndex={pageIndex}
+      setPageIndex={setPageIndex}
+      pageSize={pageSize}
+      setPageSize={setPageSize}
+      searchFilter={searchFilter}
+      setSearchFilter={setSearchFilter}
+      sorting={sorting}
+      setSorting={setSorting}
+    />
+  );
+};
+
+const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
+  course,
+  qResult,
+  loading,
+  error,
+  pageIndex,
+  setPageIndex,
+  pageSize,
+  setPageSize,
+  searchFilter,
+  setSearchFilter,
+  sorting,
+  setSorting,
+}) => {
   const t = useTranslations('manageCourse');
   const tCommon = useTranslations('common');
   const tCourse = useTranslations('course');
@@ -139,24 +274,23 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
 
   const expandableRowWidths = useMemo(() => getExpandableRowWidths(features), [features]);
   
-  const applicationStats = useMemo(() => {
-    const totalApplications = course.CourseEnrollments.length;
-    const approvedApplications = course.CourseEnrollments.filter(
-      (enrollment) => enrollment.motivationRating === 'INVITE'
-    ).length;
-    const invitedApplicants = course.CourseEnrollments.filter(
-      (enrollment) => enrollment.status === 'INVITED' || enrollment.status === 'CONFIRMED'
-    ).length;
-    const confirmedApplicants = course.CourseEnrollments.filter(
-      (enrollment) => enrollment.status === 'CONFIRMED' || enrollment.status === 'COMPLETED' || enrollment.status === 'REGISTERED'
-    ).length;
-    return { totalApplications, approvedApplications, invitedApplicants, confirmedApplicants };
-  }, [course.CourseEnrollments]);
+  const applicationStats = useMemo(
+    () => ({
+      totalApplications: course.TotalCourseEnrollments.aggregate?.count ?? 0,
+      approvedApplications: course.ApprovedCourseEnrollments.aggregate?.count ?? 0,
+      invitedApplicants: course.InvitedCourseEnrollments.aggregate?.count ?? 0,
+      confirmedApplicants: course.ConfirmedCourseEnrollments.aggregate?.count ?? 0,
+    }),
+    [
+      course.ApprovedCourseEnrollments.aggregate?.count,
+      course.ConfirmedCourseEnrollments.aggregate?.count,
+      course.InvitedCourseEnrollments.aggregate?.count,
+      course.TotalCourseEnrollments.aggregate?.count,
+    ]
+  );
 
   const courseEnrollments = useMemo(() => {
-    const result = [...course.CourseEnrollments];
-    result.sort((a, b) => a.id - b.id);
-    return result;
+    return course.CourseEnrollments ?? [];
   }, [course]);
 
   const infoDots = (
@@ -188,6 +322,13 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
     UpdateEnrollmentStatusWhenApplied,
     UpdateEnrollmentStatusWhenAppliedVariables
   >(UPDATE_ENROLLMENT_STATUS_WHEN_APPLIED);
+
+  const [loadBulkEmailRecipients, bulkEmailRecipientsQuery] = useLazyRoleQuery<
+    ManagedCourseApplicationRecipients,
+    ManagedCourseApplicationRecipientsVariables
+  >(MANAGED_COURSE_APPLICATION_RECIPIENTS, {
+    fetchPolicy: 'network-only',
+  });
 
   const [bulkNoticeOpen, setBulkNoticeOpen] = useState(false);
   const [bulkNoticeMessage, setBulkNoticeMessage] = useState('');
@@ -229,7 +370,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
   // Dialog state for invitations
   const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
   const [inviteDialogData, setInviteDialogData] = useState<{
-    enrollmentsToSend: ManagedCourse_Course_by_pk_CourseEnrollments[];
+    enrollmentsToSend: ApplicationEnrollment[];
     selectedCount?: number;
     identifiedCount: number;
     actionType: 'selected' | 'all';
@@ -241,7 +382,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
       const enrollmentsToSend = enrollmentIds
         .map((id) => idToRow.get(id))
         .filter(
-          (e): e is ManagedCourse_Course_by_pk_CourseEnrollments => !!e && isInviteEligibleEnrollment(e)
+          (e): e is ApplicationEnrollment => !!e && isInviteEligibleEnrollment(e)
         );
       if (enrollmentsToSend.length === 0) {
         showBulkNotice(t('bulk_actions.no_eligible_invitations'));
@@ -338,7 +479,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
   // Dialog state for rejections
   const [isRejectionDialogOpen, setIsRejectionDialogOpen] = useState(false);
   const [rejectionDialogData, setRejectionDialogData] = useState<{
-    enrollmentsToSend: ManagedCourse_Course_by_pk_CourseEnrollments[];
+    enrollmentsToSend: ApplicationEnrollment[];
     selectedCount?: number;
     identifiedCount: number;
     actionType: 'selected' | 'all';
@@ -350,7 +491,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
       const enrollmentsToSend = enrollmentIds
         .map((id) => idToRow.get(id))
         .filter(
-          (e): e is ManagedCourse_Course_by_pk_CourseEnrollments =>
+          (e): e is ApplicationEnrollment =>
             !!e && isRejectionEligibleEnrollment(e)
         );
       if (enrollmentsToSend.length === 0) {
@@ -449,6 +590,18 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
     setIsNoSelectionDialogOpen(false);
   }, []);
 
+  const [bulkEmailDialogData, setBulkEmailDialogData] = useState<BulkEmailDialogData | null>(null);
+  const [bulkEmailPendingLabel, setBulkEmailPendingLabel] = useState<string | null>(null);
+  const [bulkEmailCopyStatus, setBulkEmailCopyStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [bulkEmailError, setBulkEmailError] = useState<string | null>(null);
+
+  const handleCloseBulkEmailDialog = useCallback(() => {
+    setBulkEmailDialogData(null);
+    setBulkEmailPendingLabel(null);
+    setBulkEmailCopyStatus('idle');
+    setBulkEmailError(null);
+  }, []);
+
   const setEnrollmentRating = useUpdateCallback2<UpdateEnrollmentRating, UpdateEnrollmentRatingVariables>(
     UPDATE_ENROLLMENT_RATING,
     'enrollmentId',
@@ -459,77 +612,52 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
   );
 
   const [isAddParticipantsModalOpen, setAddParticipantsModalOpen] = useState(false);
-  const [pageIndex, setPageIndex] = useState(0);
-  const [pageSize, setPageSize] = useState(20);
-  const [searchFilter, setSearchFilter] = useState('');
-
   const openAddParticipantsModal = () => setAddParticipantsModalOpen(true);
   const closeAddParticipantsModal = () => setAddParticipantsModalOpen(false);
 
-  // Filter enrollments (TableGrid will handle sorting and pagination)
-  const filteredEnrollments = useMemo(() => {
-    let filtered = courseEnrollments;
-    
-    if (searchFilter) {
-      const searchLower = searchFilter.toLowerCase();
-      filtered = filtered.filter((enrollment) => {
-        return (
-          enrollment.User.firstName.toLowerCase().includes(searchLower) ||
-          enrollment.User.lastName.toLowerCase().includes(searchLower) ||
-          enrollment.User.email.toLowerCase().includes(searchLower) ||
-          (enrollment.motivationLetter || '').toLowerCase().includes(searchLower)
-        );
-      });
-    }
-    
-    return filtered;
-  }, [courseEnrollments, searchFilter]);
+  const buildMailtoUrl = useCallback((emails: string[]) => {
+    return `mailto:?bcc=${encodeURIComponent(emails.join(','))}`;
+  }, []);
 
-  const hasStatus = useMemo(
-    () => ({
-      CONFIRMED: courseEnrollments.some((e) => e.status === 'CONFIRMED'),
-      INVITED: courseEnrollments.some((e) => e.status === 'INVITED'),
-      APPLIED: courseEnrollments.some((e) => e.status === 'APPLIED'),
-      REJECTED: courseEnrollments.some((e) => e.status === 'REJECTED'),
-      WAITLIST: courseEnrollments.some((e) => e.status === 'WAITLIST'),
-    }),
-    [courseEnrollments]
-  );
+  const openMailtoOrShowFallback = useCallback(
+    (dialogData: BulkEmailDialogData) => {
+      const emails = dialogData.recipients.map((recipient) => recipient.User.email).filter(Boolean);
+      const mailtoUrl = buildMailtoUrl(emails);
 
-  const hasRating = useMemo(
-    () => ({
-      INVITE: courseEnrollments.some((e) => e.motivationRating === 'INVITE'),
-      DECLINE: courseEnrollments.some((e) => e.motivationRating === 'DECLINE'),
-      REVIEW: courseEnrollments.some((e) => e.motivationRating === 'REVIEW'),
-    }),
-    [courseEnrollments]
-  );
-
-  const bulkActionDisabledMap = useMemo(
-    () => ({
-      email_status_CONFIRMED: !hasStatus.CONFIRMED,
-      email_status_INVITED: !hasStatus.INVITED,
-      email_status_APPLIED: !hasStatus.APPLIED,
-      email_status_REJECTED: !hasStatus.REJECTED,
-      email_status_WAITLIST: !hasStatus.WAITLIST,
-      email_rating_INVITE: !hasRating.INVITE,
-      email_rating_DECLINE: !hasRating.DECLINE,
-      email_rating_REVIEW: !hasRating.REVIEW,
-    }),
-    [hasRating, hasStatus]
-  );
-
-  // Bulk actions handler
-  const handleBulkEmailAction = useCallback(
-    (action: string, selectedRows: ManagedCourse_Course_by_pk_CourseEnrollments[]) => {
-      if (
-        action in bulkActionDisabledMap &&
-        bulkActionDisabledMap[action as keyof typeof bulkActionDisabledMap]
-      ) {
+      if (mailtoUrl.length <= BULK_EMAIL_MAILTO_URL_LIMIT) {
+        window.location.href = mailtoUrl;
+        handleCloseBulkEmailDialog();
         return;
       }
 
-      let targetEnrollments: ManagedCourse_Course_by_pk_CourseEnrollments[] = [];
+      setBulkEmailDialogData({
+        ...dialogData,
+        isMailtoTooLong: true,
+      });
+    },
+    [buildMailtoUrl, handleCloseBulkEmailDialog]
+  );
+
+  const copyBulkEmailRecipients = useCallback(async () => {
+    if (!bulkEmailDialogData) {
+      return;
+    }
+
+    const emails = bulkEmailDialogData.recipients.map((recipient) => recipient.User.email).filter(Boolean);
+
+    try {
+      await navigator.clipboard.writeText(emails.join(','));
+      setBulkEmailCopyStatus('success');
+    } catch (error) {
+      console.error('ApplicationsTab: copying bulk email recipients failed', error);
+      setBulkEmailCopyStatus('error');
+    }
+  }, [bulkEmailDialogData]);
+
+  // Bulk actions handler
+  const handleBulkEmailAction = useCallback(
+    async (action: string, selectedRows: ApplicationEnrollment[]) => {
+      let targetEnrollments: ApplicationEnrollment[] = [];
 
       // Row expansion actions are handled directly in TableGrid.
       // We only show feedback here when no row was selected.
@@ -573,28 +701,95 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
       // Handle email actions (existing)
       if (action === 'email_selected') {
         targetEnrollments = selectedRows;
-      } else if (action.startsWith('email_status_')) {
-        const status = action.replace('email_status_', '') as CourseEnrollmentStatus_enum;
-        targetEnrollments = courseEnrollments.filter((e) => e.status === status);
-      } else if (action.startsWith('email_rating_')) {
-        const rating = action.replace('email_rating_', '') as MotivationRating_enum;
-        targetEnrollments = courseEnrollments.filter((e) => e.motivationRating === rating);
+      } else if (action.startsWith('email_status_') || action.startsWith('email_rating_')) {
+        const isStatusAction = action.startsWith('email_status_');
+        const emailActionLabelByValue: Record<string, string> = {
+          email_status_CONFIRMED: t('bulk_actions.email_all_confirmed'),
+          email_status_INVITED: t('bulk_actions.email_all_invited'),
+          email_status_APPLIED: t('bulk_actions.email_all_applied'),
+          email_status_REJECTED: t('bulk_actions.email_all_rejected'),
+          email_status_WAITLIST: t('bulk_actions.email_all_waitlist'),
+          email_rating_INVITE: t('bulk_actions.email_all_invite_rating'),
+          email_rating_DECLINE: t('bulk_actions.email_all_decline_rating'),
+          email_rating_REVIEW: t('bulk_actions.email_all_review_rating'),
+        };
+        const filter = isStatusAction
+          ? {
+              status: {
+                _eq: action.replace('email_status_', '') as CourseEnrollmentStatus_enum,
+              },
+            }
+          : {
+              motivationRating: {
+                _eq: action.replace('email_rating_', '') as MotivationRating_enum,
+              },
+            };
+        const actionLabel = emailActionLabelByValue[action] ?? t('bulk_actions.email_selected');
+
+        setBulkEmailDialogData(null);
+        setBulkEmailCopyStatus('idle');
+        setBulkEmailError(null);
+        setBulkEmailPendingLabel(actionLabel);
+
+        try {
+          const result = await loadBulkEmailRecipients({
+            variables: {
+              id: course.id,
+              limit: BULK_EMAIL_RECIPIENT_LIMIT,
+              filter,
+            },
+          });
+          const courseData = result.data?.Course_by_pk;
+          const recipients = courseData?.CourseEnrollments ?? [];
+          const totalCount = courseData?.CourseEnrollments_aggregate.aggregate?.count ?? recipients.length;
+          const emails = recipients.map((recipient) => recipient.User.email).filter(Boolean);
+
+          if (emails.length === 0) {
+            showBulkNotice(t('bulk_actions.no_email_recipients'));
+            return;
+          }
+
+          setBulkEmailDialogData({
+            actionLabel,
+            recipients,
+            totalCount,
+            isMailtoTooLong: buildMailtoUrl(emails).length > BULK_EMAIL_MAILTO_URL_LIMIT,
+            isLimited: totalCount > recipients.length,
+          });
+        } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : String(error);
+          setBulkEmailError(t('bulk_actions.bulk_email_load_error', { error: errorMessage }));
+        } finally {
+          setBulkEmailPendingLabel(null);
+        }
+        return;
       }
 
       if (targetEnrollments.length === 0) {
         return;
       }
 
-      const emails = targetEnrollments.map((e) => e.User.email).filter(Boolean).join(',');
-      if (emails) {
-        window.location.href = `mailto:?bcc=${emails}`;
+      const emails = targetEnrollments.map((e) => e.User.email).filter(Boolean);
+      if (emails.length === 0) {
+        showBulkNotice(t('bulk_actions.no_email_recipients'));
+        return;
       }
+
+      openMailtoOrShowFallback({
+        actionLabel: t('bulk_actions.email_selected'),
+        recipients: targetEnrollments,
+        totalCount: targetEnrollments.length,
+        isMailtoTooLong: false,
+        isLimited: false,
+      });
     },
     [
-      bulkActionDisabledMap,
-      courseEnrollments,
+      buildMailtoUrl,
+      course.id,
       handleOpenInviteDialog,
       handleOpenRejectionDialog,
+      loadBulkEmailRecipients,
+      openMailtoOrShowFallback,
       setIsNoSelectionDialogOpen,
       showBulkNotice,
       t,
@@ -647,62 +842,46 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
         value: 'email_status_CONFIRMED',
         label: t('bulk_actions.email_all_confirmed'),
         group: t('bulk_actions.email_all_by_status'),
-        disabled: bulkActionDisabledMap.email_status_CONFIRMED,
-        disabledReason: t('bulk_actions.disabled_reasons.no_confirmed'),
       },
       {
         value: 'email_status_INVITED',
         label: t('bulk_actions.email_all_invited'),
         group: t('bulk_actions.email_all_by_status'),
-        disabled: bulkActionDisabledMap.email_status_INVITED,
-        disabledReason: t('bulk_actions.disabled_reasons.no_invited'),
       },
       {
         value: 'email_status_APPLIED',
         label: t('bulk_actions.email_all_applied'),
         group: t('bulk_actions.email_all_by_status'),
-        disabled: bulkActionDisabledMap.email_status_APPLIED,
-        disabledReason: t('bulk_actions.disabled_reasons.no_applied'),
       },
       {
         value: 'email_status_REJECTED',
         label: t('bulk_actions.email_all_rejected'),
         group: t('bulk_actions.email_all_by_status'),
-        disabled: bulkActionDisabledMap.email_status_REJECTED,
-        disabledReason: t('bulk_actions.disabled_reasons.no_rejected'),
       },
       {
         value: 'email_status_WAITLIST',
         label: t('bulk_actions.email_all_waitlist'),
         group: t('bulk_actions.email_all_by_status'),
-        disabled: bulkActionDisabledMap.email_status_WAITLIST,
-        disabledReason: t('bulk_actions.disabled_reasons.no_waitlist'),
       },
       {
         value: 'email_rating_INVITE',
         label: t('bulk_actions.email_all_invite_rating'),
         group: t('bulk_actions.email_all_by_rating'),
-        disabled: bulkActionDisabledMap.email_rating_INVITE,
-        disabledReason: t('bulk_actions.disabled_reasons.no_invite_rating'),
       },
       {
         value: 'email_rating_DECLINE',
         label: t('bulk_actions.email_all_decline_rating'),
         group: t('bulk_actions.email_all_by_rating'),
-        disabled: bulkActionDisabledMap.email_rating_DECLINE,
-        disabledReason: t('bulk_actions.disabled_reasons.no_decline_rating'),
       },
       {
         value: 'email_rating_REVIEW',
         label: t('bulk_actions.email_all_review_rating'),
         group: t('bulk_actions.email_all_by_rating'),
-        disabled: bulkActionDisabledMap.email_rating_REVIEW,
-        disabledReason: t('bulk_actions.disabled_reasons.no_review_rating'),
       },
     ];
 
     return actions;
-  }, [bulkActionDisabledMap, isInstructor, t]);
+  }, [isInstructor, t]);
 
   // Rating sort function
   const ratingSortFn = useCallback((a: MotivationRating_enum, b: MotivationRating_enum) => {
@@ -732,9 +911,9 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
   }, []);
 
   // Columns definition
-  const columns = useMemo<ColumnDef<ManagedCourse_Course_by_pk_CourseEnrollments>[]>(
+  const columns = useMemo<ColumnDef<ApplicationEnrollment>[]>(
     () => {
-      const baseColumns: ColumnDef<ManagedCourse_Course_by_pk_CourseEnrollments>[] = [
+      const baseColumns: ColumnDef<ApplicationEnrollment>[] = [
         {
           header: t('first_name'),
           accessorKey: 'User.firstName',
@@ -825,7 +1004,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
           header: t('payment_status'),
           accessorKey: 'Invoices',
           size: APPLICATION_TABLE_COLUMN_SIZES.Invoices,
-          enableSorting: true,
+          enableSorting: false,
           cell: ({ row }) => {
             const paymentStatus = getPaymentStatusFromInvoices(row.original.Invoices);
             return (
@@ -914,7 +1093,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
   );
 
   // Expandable row component
-  const ExpandableApplicationRow = ({ row: enrollment }: { row: ManagedCourse_Course_by_pk_CourseEnrollments }) => {
+  const ExpandableApplicationRow = ({ row: enrollment }: { row: ApplicationEnrollment }) => {
     const setUnrated = useCallback(() => {
       setEnrollmentRating(enrollment, MotivationRating_enum.UNRATED);
     }, [enrollment]);
@@ -1087,12 +1266,12 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
   const handlePageSizeChange = useCallback((newSize: number) => {
     setPageSize(newSize);
     setPageIndex(0);
-  }, []);
+  }, [setPageIndex, setPageSize]);
 
   const handleSearchFilterChange = useCallback((value: string) => {
     setSearchFilter(value);
     setPageIndex(0);
-  }, []);
+  }, [setPageIndex, setSearchFilter]);
 
   return (
     <>
@@ -1160,22 +1339,24 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
 
       <div>
         <OnlyInstructor>
-          <TableGrid<ManagedCourse_Course_by_pk_CourseEnrollments>
+          <TableGrid<ApplicationEnrollment>
             columns={columns}
-            data={filteredEnrollments}
-            loading={false}
-            error={null as unknown as ApolloError}
+            data={courseEnrollments}
+            loading={loading}
+            error={error}
             expandableRowComponent={ExpandableApplicationRow}
             bulkActions={bulkActions}
             onBulkAction={handleBulkEmailAction}
             enablePagination={true}
-            totalCount={filteredEnrollments.length}
+            totalCount={course.CourseEnrollments_aggregate.aggregate?.count ?? 0}
             pageIndex={pageIndex}
             onPageChange={setPageIndex}
             pageSize={pageSize}
             onPageSizeChange={handlePageSizeChange}
             searchFilter={searchFilter}
             onSearchFilterChange={handleSearchFilterChange}
+            sorting={sorting}
+            onSortingChange={setSorting}
             refetchQueries={[]}
             {...(isAdmin && {
               addButtonText: t('add_participants'),
@@ -1184,7 +1365,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
           />
         </OnlyInstructor>
 
-        {filteredEnrollments.length > 0 && features.hasApplicationProcess && (
+        {courseEnrollments.length > 0 && features.hasApplicationProcess && (
           <div className="-mt-8 mb-3">{infoDots}</div>
         )}
       </div>
@@ -1297,6 +1478,103 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
               </div>
             </>
           )}
+        </div>
+      </Dialog>
+
+      {/* Bulk Email Dialog */}
+      <Dialog
+        open={!!bulkEmailPendingLabel || !!bulkEmailDialogData || !!bulkEmailError}
+        onClose={handleCloseBulkEmailDialog}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{ className: 'light' }}
+      >
+        <DialogTitle>
+          <div className="flex justify-between items-center">
+            <div className="text-xl font-semibold text-label-primary">{t('bulk_actions.bulk_email_dialog_title')}</div>
+            <div className="cursor-pointer text-label-primary" onClick={handleCloseBulkEmailDialog}>
+              <MdClose className="w-6 h-6" />
+            </div>
+          </div>
+        </DialogTitle>
+        <div className="px-6 pb-6">
+          {bulkEmailPendingLabel || bulkEmailRecipientsQuery.loading ? (
+            <div className="flex flex-col items-center justify-center gap-3 py-8">
+              <Loading />
+              <p className="text-label-primary">{t('bulk_actions.bulk_email_loading', { action: bulkEmailPendingLabel ?? '' })}</p>
+            </div>
+          ) : bulkEmailError ? (
+            <>
+              <p className="mb-6 text-error">{bulkEmailError}</p>
+              <div className="flex justify-end">
+                <OldButton onClick={handleCloseBulkEmailDialog} filled>
+                  {tCommon('ok')}
+                </OldButton>
+              </div>
+            </>
+          ) : bulkEmailDialogData ? (
+            <>
+              <div className="mb-6 space-y-4">
+                <p className="text-label-primary">
+                  {t('bulk_actions.bulk_email_recipient_count', {
+                    action: bulkEmailDialogData.actionLabel,
+                    count: bulkEmailDialogData.totalCount,
+                  })}
+                </p>
+                {bulkEmailDialogData.isLimited ? (
+                  <p className="text-error">
+                    {t('bulk_actions.bulk_email_recipient_limit', {
+                      limit: BULK_EMAIL_RECIPIENT_LIMIT,
+                      count: bulkEmailDialogData.totalCount,
+                    })}
+                  </p>
+                ) : bulkEmailDialogData.isMailtoTooLong ? (
+                  <p className="text-label-primary">
+                    {t('bulk_actions.bulk_email_mailto_too_long', {
+                      limit: BULK_EMAIL_MAILTO_URL_LIMIT,
+                    })}
+                  </p>
+                ) : null}
+                <div>
+                  <div className="mb-2 text-sm font-medium text-label-primary">{t('bulk_actions.bulk_email_preview_label')}</div>
+                  <div className="max-h-40 overflow-auto rounded border border-border-primary bg-bg-secondary p-3 text-sm text-label-primary">
+                    {bulkEmailDialogData.recipients.slice(0, BULK_EMAIL_PREVIEW_COUNT).map((recipient) => (
+                      <div key={recipient.id} className="truncate" title={recipient.User.email}>
+                        {recipient.User.email}
+                      </div>
+                    ))}
+                    {bulkEmailDialogData.recipients.length > BULK_EMAIL_PREVIEW_COUNT && (
+                      <div className="mt-2 text-label-secondary">
+                        {t('bulk_actions.bulk_email_preview_more', {
+                          count: bulkEmailDialogData.recipients.length - BULK_EMAIL_PREVIEW_COUNT,
+                        })}
+                      </div>
+                    )}
+                  </div>
+                </div>
+                {bulkEmailCopyStatus === 'success' && (
+                  <p className="text-label-primary">{t('bulk_actions.bulk_email_copy_success')}</p>
+                )}
+                {bulkEmailCopyStatus === 'error' && (
+                  <p className="text-error">{t('bulk_actions.bulk_email_copy_error')}</p>
+                )}
+              </div>
+              <div className="flex justify-end gap-3">
+                <OldButton onClick={handleCloseBulkEmailDialog} inverted>
+                  {tCommon('cancel')}
+                </OldButton>
+                {bulkEmailDialogData.isMailtoTooLong || bulkEmailDialogData.isLimited ? (
+                  <OldButton onClick={copyBulkEmailRecipients} filled disabled={bulkEmailDialogData.isLimited}>
+                    {t('bulk_actions.bulk_email_copy')}
+                  </OldButton>
+                ) : (
+                  <OldButton onClick={() => openMailtoOrShowFallback(bulkEmailDialogData)} filled>
+                    {t('bulk_actions.bulk_email_open_mail')}
+                  </OldButton>
+                )}
+              </div>
+            </>
+          ) : null}
         </div>
       </Dialog>
 

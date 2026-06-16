@@ -195,6 +195,19 @@ type Mutation {
   ): SetProjectDocumentationInstructionDefaultResult!
 }
 
+type Mutation {
+  deleteProjectDocumentationInstruction(
+    instructionId: Int!
+  ): DeleteProjectDocumentationInstructionResult!
+}
+
+type DeleteProjectDocumentationInstructionResult {
+  success: Boolean!
+  messageKey: String!
+  error: String
+  reassignedProjectCount: Int
+}
+
 type SetProjectDocumentationInstructionDefaultResult {
   success: Boolean!
   messageKey: String!

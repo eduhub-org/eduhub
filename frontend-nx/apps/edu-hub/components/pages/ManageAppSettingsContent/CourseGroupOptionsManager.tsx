@@ -152,7 +152,7 @@ const CourseGroupOptionsManager: FC = () => {
   };
 
   return (
-    <div className="mt-16">
+    <div className="mt-8">
       <div className="flex items-center gap-2 mb-2">
         <label className="text-xs uppercase tracking-widest font-medium text-gray-400">{t('label')}</label>
         <Tooltip title={t('widget_help')} placement="top">

@@ -19,6 +19,7 @@ import { CourseParticipationsTab } from './CourseParticipationsTab';
 import { DegreeParticipationsTab } from './DegreeParticipationsTab';
 import { useIsAdmin, useIsUserIdInList } from '../../../hooks/authentication';
 import { getRegistrationFeatures } from './ApplicationsTab/registrationConfig';
+import Loading from '../../common/Loading';
 
 interface Props {
   courseId: number;
@@ -166,6 +167,27 @@ export const ManageCourseContent: FC<Props> = ({ courseId }) => {
     [course?.registrationType]
   );
 
+  if (qResult.loading && !qResult.data) {
+    return (
+      <PageBlock>
+        <div className="min-h-[50vh] flex flex-col items-center justify-center gap-4 text-label-primary">
+          <Loading />
+          <p>{t('loading_course')}</p>
+        </div>
+      </PageBlock>
+    );
+  }
+
+  if (qResult.error) {
+    return (
+      <PageBlock>
+        <div className="min-h-[50vh] flex items-center justify-center text-error">
+          {t('course_load_error')}
+        </div>
+      </PageBlock>
+    );
+  }
+
   if (course == null) {
     return <div>{t('course_not_found', { courseId: courseId })}</div>;
   }
@@ -216,7 +238,7 @@ export const ManageCourseContent: FC<Props> = ({ courseId }) => {
 
           {openTabIndex === 0 && <DescriptionTab course={course} qResult={qResult} />}
           {openTabIndex === 1 && <SessionsTab course={course} qResult={qResult} />}
-          {openTabIndex === 2 && <ApplicationsTab course={course} qResult={qResult} />}
+          {openTabIndex === 2 && <ApplicationsTab course={course} />}
           {openTabIndex === 3 && <CourseParticipationsTab course={course} qResult={qResult} />}
           {openTabIndex === 4 && <DegreeParticipationsTab course={course} />}
         </div>
