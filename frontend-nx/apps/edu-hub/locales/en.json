@@ -384,15 +384,6 @@
         "PRESENTATION_WITHOUT_DOCUMENTATION": "Presentation (without documentation)",
         "PRESENTATION_AND_LINK_WITHOUT_DOCUMENTATION": "Presentation with link (without documentation)"
       },
-      "type_description": {
-        "ONLINE_COURSE": "Completion of an online course – only a documentation upload is required (e.g. a reflection questionnaire / Reflexionsfragebogen).",
-        "CLASSIC_PROJECT": "Classic project – only a documentation upload is required.",
-        "PROJECT_WITH_LINK": "Publishable project – requires documentation, cover image and an external link (e.g. repository or live demo).",
-        "PROJECT_WITH_PRESENTATION": "Publishable project – requires documentation, cover image and a presentation upload.",
-        "PROJECT_WITH_LINK_AND_PRESENTATION": "Publishable project – requires documentation, cover image, presentation upload and an external link.",
-        "PRESENTATION_WITHOUT_DOCUMENTATION": "Publishable project – requires a presentation and cover image. Uploading a written documentation is optional.",
-        "PRESENTATION_AND_LINK_WITHOUT_DOCUMENTATION": "Publishable project – requires a presentation, cover image and external link. Uploading a written documentation is optional."
-      },
       "instruction_dropdown": {
         "default_suffix": " (default)"
       },
@@ -1404,11 +1395,9 @@
         "title": "Add project",
         "title_label": "Title",
         "title_placeholder": "Project title",
-        "type_label": "Project type",
-        "type_placeholder": "Select a project type",
-        "type_descriptions_heading": "Project types at a glance",
         "instruction_label": "Documentation instructions",
         "instruction_placeholder": "Select documentation instructions",
+        "instruction_open": "Open the selected instructions in a new tab",
         "instruction_info": "Documentation instructions are PDF files that describe how the project documentation (or any other mandatory deliverable) should be composed. In some cases — for example the reflection questionnaires for online courses — the PDF is fillable and can be completed directly.",
         "authors_label": "Authors",
         "add_author": "Add author",
@@ -1419,7 +1408,59 @@
         "submit_button": "Create",
         "error_title_required": "Please enter a project title.",
         "error_type_required": "Please select a project type.",
-        "error_instruction_required": "Please select documentation instructions."
+        "error_instruction_required": "Please select documentation instructions.",
+        "error_author_already_in_project": "{name} already belongs to an active project in this course and can't be added to another one.",
+        "error_author_conflict_generic": "One or more selected authors already belong to an active project in this course and can't be added to another one."
+      },
+      "requirements": {
+        "section_label": "Required submission deliverables",
+        "section_help": "Check what students must submit for this project. The selected combination determines the project type.",
+        "requires_documentation": {
+          "label": "Project documentation (PDF upload)",
+          "help": "Students must upload a written project documentation.",
+          "short": "Documentation"
+        },
+        "requires_external_url": {
+          "label": "External link (e.g. repository or live demo)",
+          "help": "Students must provide an external link, for example to a repository or a live demo.",
+          "short": "External link"
+        },
+        "requires_presentation": {
+          "label": "Presentation upload",
+          "help": "Students must upload a presentation.",
+          "short": "Presentation"
+        },
+        "requires_cover_image": {
+          "label": "Cover image",
+          "help": "Students must upload a cover image (also used for showcase publication).",
+          "short": "Cover image"
+        },
+        "format": {
+          "label": "Project format",
+          "classic": {
+            "label": "Classic project",
+            "help": "Participants form a team that you confirm before work starts and submit the deliverables selected below."
+          },
+          "online": {
+            "label": "Online course",
+            "help": "Shortened process: participants take part individually — no team confirmation is needed."
+          }
+        },
+        "section_help_classic": "Choose what participants must submit for this project.",
+        "self_reflection": {
+          "label": "Self-reflection questionnaire",
+          "help": "Participants complete the self-reflection questionnaire (a fillable PDF provided with the documentation instructions)."
+        },
+        "classic_invalid_combination": "Select at least an external link or a presentation — documentation alone is not possible for a classic project.",
+        "invalid_combination": "This combination of requirements is not available. Adjust your selection.",
+        "type_choice": {
+          "label": "Project format",
+          "help": "These deliverables apply to more than one project format. Choose which one to use.",
+          "descriptions": {
+            "ONLINE_COURSE": "Online course – shortened process: participants take part individually and no team confirmation is needed.",
+            "CLASSIC_PROJECT": "Classic project – participants form a team that you confirm before work starts."
+          }
+        }
       }
     },
     "attendance_cert_issued": "Attendance certificate issued",
@@ -1663,6 +1704,22 @@
     "please_fill_all_fields": "Please fill out all fields to proceed!",
     "errors": {
       "failed_to_load_location_addresses": "Failed to load location addresses."
+    },
+    "project_settings": {
+      "heading": "Project setup",
+      "intro": "Decide how participants get a project for the achievement certificate. You can use either option or both.",
+      "option_templates": {
+        "title": "Define project templates",
+        "help": "Use \"Add project\" below to create one or more precisely described project tasks. Participants pick a template and work on that defined task."
+      },
+      "option_propose": {
+        "title": "Let participants propose their own projects",
+        "help": "When enabled, participants can propose their own, open project ideas that you then confirm."
+      },
+      "proposals": {
+        "option_enabled": "Yes",
+        "option_disabled": "No"
+      }
     }
   },
   "managePrograms": {
