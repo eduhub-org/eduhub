@@ -24,6 +24,8 @@ class EduHubClient:
     def set_headers(self):
         self.headers = CaseInsensitiveDict()
         self.headers["x-hasura-admin-secret"] = self.hasura_admin_secret
+        if os.getenv("HASURA_USE_READ_ONLY_ROLE", "").lower() == "true":
+            self.headers["x-hasura-role"] = "api_proxy"
         self.headers["content-type"] = "application/json"
 
     def to_datetime(self, date_time):

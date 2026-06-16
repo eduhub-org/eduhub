@@ -58,6 +58,18 @@ insert_permissions:
         - location
         - termsAcceptedAt
 select_permissions:
+  - role: api_proxy
+    permission:
+      columns:
+        - id
+        - courseId
+        - userId
+        - status
+        - achievementCertificateURL
+        - attendanceCertificateURL
+        - created_at
+        - updated_at
+      filter: {}
   - role: instructor_access
     permission:
       columns:

@@ -11,20 +11,6 @@ actions:
         - name: name
           value: anonymizeUser
     comment: Anonymizes a user's data in Hasura and Googl Cloud bucket and deletes it in Keycloak
-  - name: createCertificate
-    definition:
-      kind: synchronous
-      # Default Hasura action timeout (60s) causes 504 while many PDFs are generated in parallel.
-      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
-      timeout: 180
-      headers:
-        - name: secret
-          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
-        - name: bucket
-          value_from_env: HASURA_BUCKET
-        - name: name
-          value: createCertificate
-    comment: Generates a certificate of a given type for a given course and user id
   - name: createCertificates
     definition:
       kind: synchronous
@@ -42,7 +28,7 @@ actions:
   - name: createStripeBasePrice
     definition:
       kind: synchronous
-      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      handler: '{{CLOUD_FUNCTION_LINK_NODE_PAYMENTS}}'
       headers:
         - name: secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
@@ -102,7 +88,7 @@ actions:
   - name: createStripeCheckout
     definition:
       kind: synchronous
-      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      handler: '{{CLOUD_FUNCTION_LINK_NODE_PAYMENTS}}'
       headers:
         - name: secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
@@ -259,7 +245,7 @@ actions:
   - name: saveAddonMappings
     definition:
       kind: synchronous
-      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      handler: '{{CLOUD_FUNCTION_LINK_NODE_PAYMENTS}}'
       headers:
         - name: secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
@@ -450,11 +436,13 @@ actions:
   - name: updateFromKeycloak
     definition:
       kind: synchronous
-      handler: '{{CLOUD_FUNCTION_LINK_UPDATE_FROM_KEYCLOAK}}'
+      handler: '{{CLOUD_FUNCTION_LINK_KEYCLOAK_ADMIN}}'
       forward_client_headers: true
       headers:
         - name: secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: name
+          value: updateFromKeycloak
     permissions:
       - role: instructor_access
       - role: user_access

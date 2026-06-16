@@ -106,10 +106,12 @@ event_triggers:
       interval_sec: 10
       num_retries: 3
       timeout_sec: 60
-    webhook_from_env: CLOUD_FUNCTION_LINK_ADD_KEYCLOAK_ROLE
+    webhook_from_env: CLOUD_FUNCTION_LINK_KEYCLOAK_ADMIN
     headers:
       - name: secret
         value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+      - name: name
+        value: addKeycloakRole
       - name: role
         value: org_admin
     cleanup_config:
@@ -131,10 +133,12 @@ event_triggers:
       interval_sec: 10
       num_retries: 3
       timeout_sec: 60
-    webhook_from_env: CLOUD_FUNCTION_LINK_REMOVE_KEYCLOAK_ROLE
+    webhook_from_env: CLOUD_FUNCTION_LINK_KEYCLOAK_ADMIN
     headers:
       - name: secret
         value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+      - name: name
+        value: removeKeycloakRole
       - name: role
         value: org_admin
     cleanup_config:

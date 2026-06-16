@@ -14,3 +14,14 @@ object_relationships:
       remote_table:
         name: LocationOptions
         schema: public
+select_permissions:
+  - role: api_proxy
+    permission:
+      columns:
+        - id
+        - courseId
+        - shortLabel
+        - address
+        - description
+        - location
+      filter: {}

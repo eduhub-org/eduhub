@@ -37,6 +37,17 @@ insert_permissions:
         - userId
         - location
 select_permissions:
+  - role: api_proxy
+    permission:
+      columns:
+        - id
+        - status
+        - sessionId
+        - userId
+        - totalAttendanceTime
+        - startDateTime
+        - endDateTime
+      filter: {}
   - role: instructor_access
     permission:
       columns:

@@ -42,6 +42,14 @@ insert_permissions:
         - id
         - locationOption
 select_permissions:
+  - role: api_proxy
+    permission:
+      columns:
+        - courseId
+        - defaultSessionAddressId
+        - id
+        - locationOption
+      filter: {}
   - role: anonymous
     permission:
       columns:

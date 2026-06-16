@@ -44,6 +44,15 @@ insert_permissions:
         - startDateTime
         - title
 select_permissions:
+  - role: api_proxy
+    permission:
+      columns:
+        - courseId
+        - endDateTime
+        - id
+        - startDateTime
+        - title
+      filter: {}
   - role: anonymous
     permission:
       columns:

@@ -109,6 +109,27 @@ computed_fields:
         schema: public
       table_argument: course_row
 select_permissions:
+  - role: api_proxy
+    permission:
+      columns:
+        - applicationEnd
+        - contentDescriptionField1
+        - contentDescriptionField2
+        - coverImage
+        - ects
+        - endTime
+        - headingDescriptionField1
+        - headingDescriptionField2
+        - id
+        - language
+        - learningGoals
+        - programId
+        - published
+        - startTime
+        - tagline
+        - title
+        - weekDay
+      filter: {}
   - role: anonymous
     permission:
       columns:

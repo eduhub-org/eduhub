@@ -23,6 +23,16 @@ array_relationships:
           name: Course
           schema: public
 select_permissions:
+  - role: api_proxy
+    permission:
+      columns:
+        - applicationStart
+        - id
+        - published
+        - shortTitle
+        - title
+        - type
+      filter: {}
   - role: anonymous
     permission:
       columns:
