@@ -15,6 +15,14 @@ export type ProjectRequirementKey = (typeof PROJECT_REQUIREMENT_KEYS)[number];
 
 export type ProjectRequirementFlags = Record<ProjectRequirementKey, boolean>;
 
+/**
+ * Catalog value of the online-course project type. It shares its deliverable
+ * flags with CLASSIC_PROJECT (documentation only), so the two can only be told
+ * apart by an explicit choice. Used as the default when a documentation-only
+ * combination is otherwise ambiguous.
+ */
+export const ONLINE_COURSE_TYPE_VALUE = 'ONLINE_COURSE';
+
 /** Reads the requirement flags off a catalog project type (defaults to all false). */
 export const flagsOfProjectType = (
   projectType?: ProjectTypeRow | null
@@ -27,6 +35,13 @@ export const flagsOfProjectType = (
 
 const flagsEqual = (a: ProjectRequirementFlags, b: ProjectRequirementFlags): boolean =>
   PROJECT_REQUIREMENT_KEYS.every((key) => a[key] === b[key]);
+
+/** Every catalog type whose deliverable flags exactly match `requirements`. */
+export const getMatchingProjectTypes = (
+  projectTypes: ProjectTypeRow[],
+  requirements: ProjectRequirementFlags
+): ProjectTypeRow[] =>
+  projectTypes.filter((pt) => flagsEqual(flagsOfProjectType(pt), requirements));
 
 /**
  * Maps a set of checked deliverable requirements back onto the fixed catalog of
@@ -41,9 +56,7 @@ export const resolveProjectTypeFromRequirements = (
   requirements: ProjectRequirementFlags,
   preferredValues: string[] = []
 ): ProjectTypeRow | null => {
-  const matches = projectTypes.filter((pt) =>
-    flagsEqual(flagsOfProjectType(pt), requirements)
-  );
+  const matches = getMatchingProjectTypes(projectTypes, requirements);
   if (matches.length === 0) return null;
   for (const preferred of preferredValues) {
     const preferredMatch = matches.find((pt) => pt.value === preferred);

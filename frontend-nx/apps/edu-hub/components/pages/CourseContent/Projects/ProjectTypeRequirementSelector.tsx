@@ -1,11 +1,13 @@
-import { FC, useMemo } from 'react';
+import { FC, useId, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import CheckboxSelector from '../../../inputs/CheckboxSelector';
 import { ProjectTypeRow } from './types';
 import {
+  ONLINE_COURSE_TYPE_VALUE,
   PROJECT_REQUIREMENT_KEYS,
   ProjectRequirementKey,
   flagsOfProjectType,
+  getMatchingProjectTypes,
   resolveProjectTypeFromRequirements,
 } from './projectTypeRequirements';
 
@@ -28,6 +30,11 @@ interface ProjectTypeRequirementSelectorProps {
  * combination is resolved back to one of the catalog project types (stored in
  * `Project.type`). Makes the mandatory deliverables explicit instead of hiding
  * them behind an opaque type name.
+ *
+ * When a combination is shared by several catalog types (e.g. ONLINE_COURSE and
+ * CLASSIC_PROJECT both require documentation only) an extra format picker is
+ * shown so the instructor can resolve the ambiguity; it defaults to the online
+ * course, whose shortened proposal flow is described inline.
  */
 const ProjectTypeRequirementSelector: FC<ProjectTypeRequirementSelectorProps> = ({
   projectTypes,
@@ -40,6 +47,7 @@ const ProjectTypeRequirementSelector: FC<ProjectTypeRequirementSelectorProps> = 
 }) => {
   const t = useTranslations('manageCourse');
   const tCourse = useTranslations('course');
+  const typeChoiceGroupName = useId();
 
   const currentType = useMemo(
     () => projectTypes.find((pt) => pt.value === value) ?? null,
@@ -48,8 +56,13 @@ const ProjectTypeRequirementSelector: FC<ProjectTypeRequirementSelectorProps> = 
 
   const requirements = useMemo(() => flagsOfProjectType(currentType), [currentType]);
 
+  // Online course is the default whenever a documentation-only combination is
+  // ambiguous, but an already-stored type still wins so editing stays stable.
   const preferredValues = useMemo(
-    () => [value, programDefaultType].filter(Boolean) as string[],
+    () =>
+      [value, ONLINE_COURSE_TYPE_VALUE, programDefaultType].filter(
+        Boolean
+      ) as string[],
     [value, programDefaultType]
   );
 
@@ -59,7 +72,13 @@ const ProjectTypeRequirementSelector: FC<ProjectTypeRequirementSelectorProps> = 
     onChange(matched ? matched.value : null);
   };
 
+  const matchingTypes = useMemo(
+    () => getMatchingProjectTypes(projectTypes, requirements),
+    [projectTypes, requirements]
+  );
+
   const isValid = Boolean(value && currentType);
+  const isAmbiguous = isValid && matchingTypes.length > 1;
 
   return (
     <div className={className}>
@@ -84,42 +103,46 @@ const ProjectTypeRequirementSelector: FC<ProjectTypeRequirementSelectorProps> = 
         ))}
       </div>
 
-      {isValid ? (
-        <p className="mt-2 text-xs text-label-secondary">
-          <span className="font-medium text-label-primary">
-            {t('projects.requirements.resolved_label')}:{' '}
-          </span>
-          {tCourse(`projects.type_label.${value}` as never)}
-        </p>
-      ) : (
+      {isAmbiguous ? (
+        <div className="mt-3 rounded-md border border-border-primary p-3 bg-bg-secondary/40">
+          <p className="text-sm font-medium text-label-primary">
+            {t('projects.requirements.type_choice.label')}
+          </p>
+          <p className="text-xs text-label-secondary mb-2">
+            {t('projects.requirements.type_choice.help')}
+          </p>
+          <div className="flex flex-col space-y-2">
+            {matchingTypes.map((pt) => (
+              <label
+                key={pt.value}
+                className="flex items-start gap-2 cursor-pointer"
+              >
+                <input
+                  type="radio"
+                  name={typeChoiceGroupName}
+                  className="mt-1 cursor-pointer"
+                  checked={pt.value === value}
+                  disabled={disabled}
+                  onChange={() => onChange(pt.value)}
+                />
+                <span className="text-sm">
+                  <span className="font-medium text-label-primary">
+                    {tCourse(`projects.type_label.${pt.value}` as never)}
+                  </span>
+                  <span className="block text-xs text-label-secondary">
+                    {t(`projects.requirements.type_choice.descriptions.${pt.value}` as never)}
+                  </span>
+                </span>
+              </label>
+            ))}
+          </div>
+        </div>
+      ) : null}
+
+      {!isValid ? (
         <p className="mt-2 text-xs text-status-error">
           {t('projects.requirements.invalid_combination')}
         </p>
-      )}
-
-      {projectTypes.length > 0 ? (
-        <div className="mt-2">
-          <p className="text-xs font-medium text-label-primary">
-            {t('projects.requirements.profiles_label')}
-          </p>
-          <ul className="mt-1 ml-4 space-y-1 text-xs text-label-secondary list-disc">
-            {projectTypes.map((pt) => {
-              const deliverables = PROJECT_REQUIREMENT_KEYS.filter(
-                (key) => flagsOfProjectType(pt)[key]
-              ).map((key) => t(`projects.requirements.${key}.short` as never));
-              return (
-                <li key={pt.value}>
-                  <span className="font-medium text-label-primary">
-                    {tCourse(`projects.type_label.${pt.value}` as never)}:
-                  </span>{' '}
-                  {deliverables.length > 0
-                    ? deliverables.join(', ')
-                    : t('projects.requirements.profiles_none')}
-                </li>
-              );
-            })}
-          </ul>
-        </div>
       ) : null}
     </div>
   );

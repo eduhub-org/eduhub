@@ -384,15 +384,6 @@
         "PRESENTATION_WITHOUT_DOCUMENTATION": "Presentation (without documentation)",
         "PRESENTATION_AND_LINK_WITHOUT_DOCUMENTATION": "Presentation with link (without documentation)"
       },
-      "type_description": {
-        "ONLINE_COURSE": "Completion of an online course – only a documentation upload is required (e.g. a reflection questionnaire / Reflexionsfragebogen).",
-        "CLASSIC_PROJECT": "Classic project – only a documentation upload is required.",
-        "PROJECT_WITH_LINK": "Publishable project – requires documentation, cover image and an external link (e.g. repository or live demo).",
-        "PROJECT_WITH_PRESENTATION": "Publishable project – requires documentation, cover image and a presentation upload.",
-        "PROJECT_WITH_LINK_AND_PRESENTATION": "Publishable project – requires documentation, cover image, presentation upload and an external link.",
-        "PRESENTATION_WITHOUT_DOCUMENTATION": "Publishable project – requires a presentation and cover image. Uploading a written documentation is optional.",
-        "PRESENTATION_AND_LINK_WITHOUT_DOCUMENTATION": "Publishable project – requires a presentation, cover image and external link. Uploading a written documentation is optional."
-      },
       "instruction_dropdown": {
         "default_suffix": " (default)"
       },
@@ -1404,9 +1395,6 @@
         "title": "Add project",
         "title_label": "Title",
         "title_placeholder": "Project title",
-        "type_label": "Project type",
-        "type_placeholder": "Select a project type",
-        "type_descriptions_heading": "Project types at a glance",
         "instruction_label": "Documentation instructions",
         "instruction_placeholder": "Select documentation instructions",
         "instruction_info": "Documentation instructions are PDF files that describe how the project documentation (or any other mandatory deliverable) should be composed. In some cases — for example the reflection questionnaires for online courses — the PDF is fillable and can be completed directly.",
@@ -1446,10 +1434,15 @@
           "help": "Students must upload a cover image (also used for showcase publication).",
           "short": "Cover image"
         },
-        "resolved_label": "Resulting project type",
-        "invalid_combination": "This combination does not match any available project type. Adjust the selection to match one of the profiles below.",
-        "profiles_label": "Available project profiles",
-        "profiles_none": "No deliverables required"
+        "invalid_combination": "This combination of requirements is not available. Adjust your selection.",
+        "type_choice": {
+          "label": "Project format",
+          "help": "These deliverables apply to more than one project format. Choose which one to use.",
+          "descriptions": {
+            "ONLINE_COURSE": "Online course – shortened process: participants take part individually and no team confirmation is needed.",
+            "CLASSIC_PROJECT": "Classic project – participants form a team that you confirm before work starts."
+          }
+        }
       }
     },
     "attendance_cert_issued": "Attendance certificate issued",

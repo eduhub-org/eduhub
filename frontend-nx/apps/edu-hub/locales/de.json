@@ -384,15 +384,6 @@
         "PRESENTATION_WITHOUT_DOCUMENTATION": "Präsentation (ohne Dokumentation)",
         "PRESENTATION_AND_LINK_WITHOUT_DOCUMENTATION": "Präsentation mit Link (ohne Dokumentation)"
       },
-      "type_description": {
-        "ONLINE_COURSE": "Abschluss eines Online-Kurses – nur eine Dokumentation muss hochgeladen werden (z. B. ein Reflexionsfragebogen).",
-        "CLASSIC_PROJECT": "Klassisches Projekt – nur eine Dokumentation muss hochgeladen werden.",
-        "PROJECT_WITH_LINK": "Veröffentlichbares Projekt – benötigt Dokumentation, Titelbild und einen externen Link (z. B. Repository oder Live-Demo).",
-        "PROJECT_WITH_PRESENTATION": "Veröffentlichbares Projekt – benötigt Dokumentation, Titelbild und eine Präsentation.",
-        "PROJECT_WITH_LINK_AND_PRESENTATION": "Veröffentlichbares Projekt – benötigt Dokumentation, Titelbild, Präsentation und einen externen Link.",
-        "PRESENTATION_WITHOUT_DOCUMENTATION": "Veröffentlichbares Projekt – benötigt Präsentation und Titelbild. Das Hochladen einer schriftlichen Dokumentation ist optional.",
-        "PRESENTATION_AND_LINK_WITHOUT_DOCUMENTATION": "Veröffentlichbares Projekt – benötigt Präsentation, Titelbild und einen externen Link. Das Hochladen einer schriftlichen Dokumentation ist optional."
-      },
       "instruction_dropdown": {
         "default_suffix": " (Standard)"
       },
@@ -1386,9 +1377,6 @@
         "title": "Projekt hinzufügen",
         "title_label": "Titel",
         "title_placeholder": "Projekttitel",
-        "type_label": "Projekttyp",
-        "type_placeholder": "Projekttyp auswählen",
-        "type_descriptions_heading": "Projekttypen im Überblick",
         "instruction_label": "Dokumentationsanleitung",
         "instruction_placeholder": "Dokumentationsanleitung auswählen",
         "instruction_info": "Dokumentationsanleitungen sind PDF-Dateien, die beschreiben, wie die Projektdokumentation (oder ein anderes verpflichtendes Abgabedokument) verfasst sein soll. In manchen Fällen – z. B. bei den Reflexionsfragebögen für Online-Kurse – ist das PDF direkt ausfüllbar.",
@@ -1428,10 +1416,15 @@
           "help": "Teilnehmende müssen ein Titelbild hochladen (wird auch für die Veröffentlichung im Schaufenster genutzt).",
           "short": "Titelbild"
         },
-        "resolved_label": "Resultierender Projekttyp",
-        "invalid_combination": "Diese Kombination passt zu keinem verfügbaren Projekttyp. Passe die Auswahl an eines der folgenden Profile an.",
-        "profiles_label": "Verfügbare Projektprofile",
-        "profiles_none": "Keine Abgabe erforderlich"
+        "invalid_combination": "Diese Kombination von Anforderungen ist nicht verfügbar. Passe Deine Auswahl an.",
+        "type_choice": {
+          "label": "Projektformat",
+          "help": "Diese Abgaben treffen auf mehrere Projektformate zu. Wähle aus, welches verwendet werden soll.",
+          "descriptions": {
+            "ONLINE_COURSE": "Online-Kurs – verkürzter Ablauf: Teilnehmende nehmen einzeln teil, eine Team-Bestätigung ist nicht erforderlich.",
+            "CLASSIC_PROJECT": "Klassisches Projekt – Teilnehmende bilden ein Team, das Du vor Arbeitsbeginn bestätigst."
+          }
+        }
       }
     },
     "attendance_cert_issued": "Teilnahmebescheinigung ausgestellt",
