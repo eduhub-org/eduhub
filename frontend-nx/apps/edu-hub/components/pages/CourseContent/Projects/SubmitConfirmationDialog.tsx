@@ -16,8 +16,8 @@ export interface SubmitAuthorOption {
 interface SubmitConfirmationDialogProps {
   open: boolean;
   onClose: () => void;
-  /** Receives the ProjectAuthor ids the submitter unchecked (to be EXCLUDED). */
-  onConfirm: (excludedAuthorIds: number[]) => void;
+  /** Receives the ProjectAuthor ids the submitter unchecked (to be EXCLUDED) and whether publication consent was granted. */
+  onConfirm: (excludedAuthorIds: number[], consentGranted: boolean) => void;
   loading?: boolean;
   authors: SubmitAuthorOption[];
 }
@@ -34,10 +34,13 @@ const SubmitConfirmationDialog: FC<SubmitConfirmationDialogProps> = ({
 
   // Default: everyone checked (contributed). Keyed by ProjectAuthor.id.
   const [checked, setChecked] = useState<Record<number, boolean>>({});
+  // Publication consent is opt-in (GDPR requires affirmative consent — unchecked by default).
+  const [consentGranted, setConsentGranted] = useState(false);
 
   useEffect(() => {
     if (open) {
       setChecked(Object.fromEntries(authors.map((a) => [a.id, true])));
+      setConsentGranted(false);
     }
   }, [open, authors]);
 
@@ -45,8 +48,13 @@ const SubmitConfirmationDialog: FC<SubmitConfirmationDialogProps> = ({
     const excludedAuthorIds = authors
       .filter((a) => !a.isSelf && checked[a.id] === false)
       .map((a) => a.id);
-    onConfirm(excludedAuthorIds);
+    onConfirm(excludedAuthorIds, consentGranted);
   };
+
+  const isSolo = authors.length <= 1;
+  const consentLabel = isSolo
+    ? t('projects.submit_dialog.consent_label_solo')
+    : t('projects.submit_dialog.consent_label_team');
 
   return (
     <DialogShell
@@ -90,9 +98,29 @@ const SubmitConfirmationDialog: FC<SubmitConfirmationDialogProps> = ({
           </li>
         ))}
       </ul>
-      <p className="text-sm text-label-secondary">
+      <p className="mb-4 text-sm text-label-secondary">
         {t('projects.submit_dialog.body_irreversible')}
       </p>
+
+      <div className="rounded border border-border-primary bg-bg-secondary/30 p-3 space-y-2">
+        <p className="text-sm font-semibold text-label-primary">
+          {t('projects.submit_dialog.consent_section_heading')}
+        </p>
+        <p className="text-xs text-label-secondary">
+          {t('projects.submit_dialog.consent_description')}
+        </p>
+        <CheckboxSelector
+          variant="material"
+          suppressFeedback
+          checked={consentGranted}
+          disabled={loading}
+          onValueUpdated={setConsentGranted}
+          label={consentLabel}
+        />
+        <p className="text-xs text-label-secondary">
+          {t('projects.submit_dialog.consent_optional_note')}
+        </p>
+      </div>
     </DialogShell>
   );
 };

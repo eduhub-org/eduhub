@@ -130,6 +130,26 @@ export interface ProjectFragmentDetailed_ProjectMentors {
   User: ProjectFragmentDetailed_ProjectMentors_User;
 }
 
+export interface ProjectFragmentDetailed_ProjectConsentEvents_ActorUser {
+  __typename: "User";
+  id: any;
+  firstName: string;
+  lastName: string;
+}
+
+export interface ProjectFragmentDetailed_ProjectConsentEvents {
+  __typename: "ProjectConsentEvent";
+  id: number;
+  event_type: string;
+  actor_user_id: any;
+  created_at: any;
+  terms_version: string;
+  /**
+   * An object relationship
+   */
+  ActorUser: ProjectFragmentDetailed_ProjectConsentEvents_ActorUser | null;
+}
+
 export interface ProjectFragmentDetailed {
   __typename: "Project";
   id: number;
@@ -200,4 +220,8 @@ export interface ProjectFragmentDetailed {
    * An array relationship
    */
   ProjectMentors: ProjectFragmentDetailed_ProjectMentors[];
+  /**
+   * An array relationship
+   */
+  ProjectConsentEvents: ProjectFragmentDetailed_ProjectConsentEvents[];
 }

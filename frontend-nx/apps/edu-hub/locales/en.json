@@ -524,7 +524,14 @@
         "submitted_banner": "Submitted on {date} by {name}. The team has been locked from changes.",
         "sent_back_banner": "Your project was sent back for revisions. Please update it and submit again.",
         "deadline_passed_banner": "The submission deadline passed on {date}.",
-        "excluded_banner": "The submitting author excluded you from this project's final submission. You no longer count as one of its authors."
+        "excluded_banner": "The submitting author excluded you from this project's final submission. You no longer count as one of its authors.",
+        "publication_consent_heading": "Publication consent",
+        "publication_consent_description": "Your project may be used as an example on the opencampus.sh platform and in promotional materials. Consent is voluntary and does not affect participation, grading, or prizes. Any team member can grant or withdraw consent at any time.",
+        "publication_consent_status_none": "No consent given yet.",
+        "publication_consent_status_granted": "Consented by {name} on {date}.",
+        "publication_consent_status_withdrawn": "Consent withdrawn on {date}.",
+        "publication_consent_grant_button": "Grant publication consent",
+        "publication_consent_withdraw_button": "Withdraw publication consent"
       },
       "submit_dialog": {
         "title": "Submit project for review",
@@ -533,7 +540,12 @@
         "body_irreversible": "An instructor can send it back for revisions if needed.",
         "contributors_intro": "Select every author who actively and substantially worked on the project.",
         "contributor_self_suffix": "(you)",
-        "confirm_button": "Submit"
+        "confirm_button": "Submit",
+        "consent_section_heading": "Publication consent (optional)",
+        "consent_description": "Your project may be used as an example on the opencampus.sh platform and in promotional materials. Consent is entirely voluntary and does not affect participation, grading, or prizes.",
+        "consent_label_solo": "I agree that this project may be published.",
+        "consent_label_team": "On behalf of my team, we agree that this project may be published. I confirm I am authorised by my teammates to give this consent.",
+        "consent_optional_note": "You can change this decision at any time after submission from your project view."
       },
       "manage_requests": {
         "title": "Co-author requests",

@@ -120,6 +120,18 @@ export const PROJECT_FRAGMENT_DETAILED = gql`
         lastName
       }
     }
+    ProjectConsentEvents(order_by: { created_at: desc }, limit: 1) {
+      id
+      event_type
+      actor_user_id
+      created_at
+      terms_version
+      ActorUser {
+        id
+        firstName
+        lastName
+      }
+    }
   }
 `;
 
@@ -409,6 +421,28 @@ export const COPY_PROJECT_FROM_TEMPLATE = gql`
       messageKey
       error
       projectId
+    }
+  }
+`;
+
+
+export const INSERT_PROJECT_CONSENT_EVENT = gql`
+  mutation InsertProjectConsentEvent(
+    $projectId: Int!
+    $eventType: String!
+    $termsVersion: String!
+  ) {
+    insert_ProjectConsentEvent_one(
+      object: {
+        project_id: $projectId
+        event_type: $eventType
+        terms_version: $termsVersion
+      }
+    ) {
+      id
+      event_type
+      created_at
+      terms_version
     }
   }
 `;

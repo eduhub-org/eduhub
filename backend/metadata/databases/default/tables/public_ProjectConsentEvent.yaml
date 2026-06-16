@@ -1,0 +1,81 @@
+table:
+  name: ProjectConsentEvent
+  schema: public
+object_relationships:
+  - name: ActorUser
+    using:
+      foreign_key_constraint_on: actor_user_id
+  - name: Project
+    using:
+      foreign_key_constraint_on: project_id
+insert_permissions:
+  # Any ACCEPTED author may insert a consent event for their own project.
+  # actor_user_id is always stamped server-side from the session; clients supply
+  # project_id, event_type ('granted'|'withdrawn'), and terms_version.
+  - role: user_access
+    permission:
+      check:
+        Project:
+          ProjectAuthors:
+            _and:
+              - participationStatus:
+                  _eq: ACCEPTED
+              - userId:
+                  _eq: X-Hasura-User-Id
+      set:
+        actor_user_id: x-hasura-user-id
+      columns:
+        - project_id
+        - event_type
+        - terms_version
+select_permissions:
+  # Team members (ACCEPTED or EXCLUDED) may read consent events for their project.
+  # Enrolled non-authors must not see consent events.
+  - role: user_access
+    permission:
+      columns:
+        - id
+        - project_id
+        - event_type
+        - actor_user_id
+        - created_at
+        - terms_version
+      filter:
+        Project:
+          ProjectAuthors:
+            _and:
+              - participationStatus:
+                  _in:
+                    - ACCEPTED
+                    - EXCLUDED
+              - userId:
+                  _eq: X-Hasura-User-Id
+  # Instructors see consent status for projects in courses they teach.
+  - role: instructor_access
+    permission:
+      columns:
+        - id
+        - project_id
+        - event_type
+        - actor_user_id
+        - created_at
+        - terms_version
+      filter:
+        Project:
+          ProjectCourses:
+            Course:
+              CourseInstructors:
+                User:
+                  id:
+                    _eq: X-Hasura-User-Id
+  # Org admins see consent events across all projects.
+  - role: org_admin_access
+    permission:
+      columns:
+        - id
+        - project_id
+        - event_type
+        - actor_user_id
+        - created_at
+        - terms_version
+      filter: {}

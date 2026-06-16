@@ -130,6 +130,26 @@ export interface MyProjectByCourse_Project_ProjectMentors {
   User: MyProjectByCourse_Project_ProjectMentors_User;
 }
 
+export interface MyProjectByCourse_Project_ProjectConsentEvents_ActorUser {
+  __typename: "User";
+  id: any;
+  firstName: string;
+  lastName: string;
+}
+
+export interface MyProjectByCourse_Project_ProjectConsentEvents {
+  __typename: "ProjectConsentEvent";
+  id: number;
+  event_type: string;
+  actor_user_id: any;
+  created_at: any;
+  terms_version: string;
+  /**
+   * An object relationship
+   */
+  ActorUser: MyProjectByCourse_Project_ProjectConsentEvents_ActorUser | null;
+}
+
 export interface MyProjectByCourse_Project {
   __typename: "Project";
   id: number;
@@ -200,6 +220,10 @@ export interface MyProjectByCourse_Project {
    * An array relationship
    */
   ProjectMentors: MyProjectByCourse_Project_ProjectMentors[];
+  /**
+   * An array relationship
+   */
+  ProjectConsentEvents: MyProjectByCourse_Project_ProjectConsentEvents[];
 }
 
 export interface MyProjectByCourse {

@@ -20,6 +20,7 @@ import {
   UPDATE_PROJECT_AUTHOR_PARTICIPATION_STATUS,
   SUBMIT_PROJECT,
   DELETE_PROJECT_AUTHOR,
+  INSERT_PROJECT_CONSENT_EVENT,
 } from '../../../../queries/project';
 import FileUploadField from '../../../inputs/FileUploadField';
 import {
@@ -108,6 +109,10 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
   const [submitProject, { loading: submitting }] = useRoleMutation(SUBMIT_PROJECT, {
     refetchQueries,
   });
+  const [insertConsentEvent, { loading: consentLoading }] = useRoleMutation(
+    INSERT_PROJECT_CONSENT_EVENT,
+    { refetchQueries }
+  );
   const [updateAuthorParticipationStatus] = useRoleMutation(
     UPDATE_PROJECT_AUTHOR_PARTICIPATION_STATUS
   );
@@ -263,7 +268,7 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
     project.status === ProjectStatus_enum.ONGOING && Boolean(project.submittedAt);
 
   const handleSubmitConfirm = useCallback(
-    async (excludedAuthorIds: number[]) => {
+    async (excludedAuthorIds: number[], consentGranted: boolean) => {
       setSubmitInProgress(true);
       // Track which co-authors we actually moved to EXCLUDED so we can roll
       // them back if a later step fails (these mutations are not in one tx).
@@ -284,6 +289,15 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
         await submitProject({
           variables: { itemId: project.id },
         });
+        if (consentGranted) {
+          await insertConsentEvent({
+            variables: {
+              projectId: project.id,
+              eventType: 'granted',
+              termsVersion: 'v1',
+            },
+          });
+        }
         setSubmitDialogOpen(false);
       } catch (err) {
         // Submission (or one of the exclusions) failed partway. Restore the
@@ -304,7 +318,7 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
         setSubmitInProgress(false);
       }
     },
-    [updateAuthorParticipationStatus, submitProject, project.id, onActionError, t]
+    [updateAuthorParticipationStatus, submitProject, insertConsentEvent, project.id, onActionError, t]
   );
 
   const handleLeaveConfirm = useCallback(async () => {
@@ -373,6 +387,23 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
         project.SubmittedByUser.lastName ?? ''
       )
     : null;
+
+  const latestConsentEvent = project.ProjectConsentEvents?.[0] ?? null;
+  const publicationConsented = latestConsentEvent?.event_type === 'granted';
+
+  const handleConsentToggle = useCallback(async () => {
+    try {
+      await insertConsentEvent({
+        variables: {
+          projectId: project.id,
+          eventType: publicationConsented ? 'withdrawn' : 'granted',
+          termsVersion: 'v1',
+        },
+      });
+    } catch (err) {
+      onActionError(err instanceof Error ? err.message : t('projects.action_failed'));
+    }
+  }, [insertConsentEvent, project.id, publicationConsented, onActionError, t]);
 
   const acceptingParticipantsCheckbox =
     project.status === ProjectStatus_enum.PROPOSED ? (
@@ -797,6 +828,44 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
             : null}
         </div>
       ) : null}
+
+      <div className="border-t border-border-primary pt-4 space-y-2">
+        <p className="text-sm font-semibold text-label-primary">
+          {t('projects.my_project.publication_consent_heading')}
+        </p>
+        <p className="text-xs text-label-secondary">
+          {t('projects.my_project.publication_consent_description')}
+        </p>
+        {latestConsentEvent ? (
+          <p className="text-xs text-label-secondary">
+            {publicationConsented
+              ? t('projects.my_project.publication_consent_status_granted', {
+                  name: makeFullName(
+                    latestConsentEvent.ActorUser?.firstName ?? '',
+                    latestConsentEvent.ActorUser?.lastName ?? ''
+                  ) || tCommon('unknown_user'),
+                  date: formattedDateWithTime(new Date(latestConsentEvent.created_at), locale),
+                })
+              : t('projects.my_project.publication_consent_status_withdrawn', {
+                  date: formattedDateWithTime(new Date(latestConsentEvent.created_at), locale),
+                })}
+          </p>
+        ) : (
+          <p className="text-xs text-label-secondary">
+            {t('projects.my_project.publication_consent_status_none')}
+          </p>
+        )}
+        {myAuthorRow?.participationStatus === ProjectParticipationStatus_enum.ACCEPTED ? (
+          <Button
+            onClick={handleConsentToggle}
+            disabled={consentLoading}
+          >
+            {publicationConsented
+              ? t('projects.my_project.publication_consent_withdraw_button')
+              : t('projects.my_project.publication_consent_grant_button')}
+          </Button>
+        ) : null}
+      </div>
 
       <div className="border-t border-border-primary pt-4">
         <div className="flex flex-wrap gap-2">
