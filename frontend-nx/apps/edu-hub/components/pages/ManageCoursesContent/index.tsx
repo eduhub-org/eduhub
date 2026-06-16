@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { FC, useCallback, useMemo, useState } from 'react';
-import { CircularProgress } from '@mui/material';
 import { ColumnDef } from '@tanstack/react-table';
-import { useAdminMutation } from '../../../hooks/authedMutation';
+import { useManageMutation } from '../../../hooks/authedMutation';
 import { useRoleQuery } from '../../../hooks/authedQuery';
 
 import { QUERY_LIMIT } from '../../../pages/manage/courses';
@@ -26,9 +25,12 @@ import { DegreeCourses } from '../../../queries/__generated__/DegreeCourses';
 import { DELETE_A_COURSE } from '../../../queries/mutateCourse';
 
 import TableGrid from '../../common/TableGrid';
+import Loading from '../../common/Loading';
 import { useTableGrid } from '../../common/TableGrid/hooks';
 import { createMultiWordSearchCondition } from '../../common/TableGrid/utils';
-import { useAdminQuery } from '../../../hooks/authedQuery';
+import { useManageQuery } from '../../../hooks/authedQuery';
+import { useManageRole } from '../../../hooks/authentication';
+import { useManageCourseWhere } from '../../../hooks/manageScope';
 import { ADMIN_COURSE_LIST } from '../../../queries/courseList';
 import { GET_COURSE_TEMPLATES_COUNT } from '../../../queries/emailTemplates';
 import ExpandableCourseRow from './ExpandableCourseRow';
@@ -66,6 +68,11 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
   const tCoursePage = useTranslations('coursePage');
   const locale = useLocale();
 
+  // Management role (admin for super-admins, org_admin otherwise) and the organization scope that
+  // restricts org admins to courses of programs in their own organizations (empty for super-admins).
+  const manageRole = useManageRole();
+  const orgCourseWhere = useManageCourseWhere();
+
   // Calculate default program
   const sortedPrograms = useMemo(() => {
     return [...programs].sort((a, b) => {
@@ -77,10 +84,15 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
     });
   }, [programs]);
 
-  const defaultProgramId = useMemo(
-    () => sortedPrograms.find((program) => program.shortTitle !== 'EVENTS' && program.shortTitle !== 'DEGREES')?.id,
-    [sortedPrograms]
-  );
+  const defaultProgramId = useMemo(() => {
+    if (sortedPrograms.length === 0) {
+      return undefined;
+    }
+    const preferredRegularProgram = sortedPrograms.find(
+      (program) => program.shortTitle !== 'EVENTS' && program.shortTitle !== 'DEGREES'
+    );
+    return (preferredRegularProgram ?? sortedPrograms[0]).id;
+  }, [sortedPrograms]);
 
   // Filter state management (single source of truth)
   const [filter, setFilter] = useState<AdminCourseListVariables>({
@@ -132,7 +144,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
 
   // Use TableGrid hook with proper refetchFilter for search debouncing
   const { data, loading, error, searchFilter, pageIndex, sorting, setSearchFilter, setPageIndex, setSorting } = useTableGrid({
-    queryHook: useAdminQuery,
+    queryHook: useManageQuery,
     query: ADMIN_COURSE_LIST,
     queryVariables: filter,
     pageSize: filter.limit || QUERY_LIMIT, // Use actual page size for offset calculations
@@ -159,14 +171,18 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
       (searchTerm: string) => {
         // Return the complete queryVariables including search
         const searchCondition = createMultiWordSearchCondition(searchTerm, ['title']);
+        const baseWhere = {
+          ...filter.where, // Include current program filter
+          ...searchCondition, // Add multi-word search filter
+        };
+        const hasOrgScope = Object.keys(orgCourseWhere).length > 0;
+        // Org admins are additionally restricted to their own organizations' courses (covers the
+        // "All" tab, where no program filter is applied).
         return {
-          where: {
-            ...filter.where, // Include current program filter
-            ...searchCondition, // Add multi-word search filter
-          },
+          where: hasOrgScope ? { _and: [orgCourseWhere, baseWhere] } : baseWhere,
         };
       },
-      [filter.where] // Update when program filter changes
+      [filter.where, orgCourseWhere] // Update when program filter or org scope changes
     ),
   });
 
@@ -184,7 +200,8 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
     GET_COURSE_TEMPLATES_COUNT,
     courseIds,
     getTemplateVariables,
-    extractTemplateCount
+    extractTemplateCount,
+    manageRole
   );
 
   // Handle program tab clicks (moved after useTableGrid to access setPageIndex)
@@ -212,25 +229,25 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const [updateAttendanceCertificatePossible] = useAdminMutation<
+  const [updateAttendanceCertificatePossible] = useManageMutation<
     UpdateCourseAttendanceCertificatePossible,
     UpdateCourseAttendanceCertificatePossibleVariables
   >(UPDATE_COURSE_ATTENDANCE_CERTIFICATE_POSSIBLE, {
     refetchQueries: ['AdminCourseList'],
   });
 
-  const [updateAchievementCertificatePossible] = useAdminMutation<
+  const [updateAchievementCertificatePossible] = useManageMutation<
     UpdateCourseAchievementCertificatePossible,
     UpdateCourseAchievementCertificatePossibleVariables
   >(UPDATE_COURSE_ACHIEVEMENT_CERTIFICATE_POSSIBLE, {
     refetchQueries: ['AdminCourseList'],
   });
 
-  const [updateCourse] = useAdminMutation<UpdateCourseByPk, UpdateCourseByPkVariables>(UPDATE_COURSE_PROPERTY);
+  const [updateCourse] = useManageMutation<UpdateCourseByPk, UpdateCourseByPkVariables>(UPDATE_COURSE_PROPERTY);
 
-  const [insertCourse] = useAdminMutation<InsertCourseWithLocation, InsertCourseWithLocationVariables>(INSERT_COURSE);
+  const [insertCourse] = useManageMutation<InsertCourseWithLocation, InsertCourseWithLocationVariables>(INSERT_COURSE);
 
-  const [copyCourses] = useAdminMutation(COPY_COURSES_TO_PROGRAM);
+  const [copyCourses] = useManageMutation(COPY_COURSES_TO_PROGRAM);
 
   // Add course handler
   const handleAddCourse = useCallback(async () => {
@@ -619,28 +636,32 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
         size: 320,
         minSize: 250,
         enableSorting: true,
-        cell: ({ row }) => (
-          <div className="flex items-center space-x-2">
-            <div className="flex-1">
-              <InputField
-                variant="material"
-                type="input"
-                placeholder={t('default_course_title')}
-                itemId={row.original.id}
-                value={row.original.title || ''}
-                updateValueMutation={UPDATE_COURSE_TITLE}
-                refetchQueries={['AdminCourseList']}
-              />
+        cell: ({ row }) => {
+          const defaultTitle = t('default_course_title');
+
+          return (
+            <div className="grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-2 pr-3">
+              <div className="min-w-0">
+                <InputField
+                  variant="material"
+                  type="input"
+                  placeholder={defaultTitle}
+                  itemId={row.original.id}
+                  value={row.original.title || ''}
+                  updateValueMutation={UPDATE_COURSE_TITLE}
+                  refetchQueries={['AdminCourseList']}
+                />
+              </div>
+              <a
+                href={`course/${row.original.id}`}
+                className="shrink-0 whitespace-nowrap text-sm font-medium text-blue-600 underline hover:text-blue-800"
+                title={t('view_course')}
+              >
+                {t('view')}
+              </a>
             </div>
-            <a
-              href={`course/${row.original.id}`}
-              className="text-blue-600 hover:text-blue-800 text-sm font-medium underline whitespace-nowrap"
-              title={t('view_course')}
-            >
-              {t('view')}
-            </a>
-          </div>
-        ),
+          );
+        },
       },
       {
         header: t('table_header.applications'),
@@ -711,7 +732,15 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
         },
       },
     ],
-    [t, handleApplicationEndChange, locale, getApplicationsCount, getConfirmedCount, getUnratedAndRatedButNotInformed, courseTemplateCounts]
+    [
+      t,
+      handleApplicationEndChange,
+      locale,
+      getApplicationsCount,
+      getConfirmedCount,
+      getUnratedAndRatedButNotInformed,
+      courseTemplateCounts,
+    ]
   );
 
   const handlePageSizeChange = useCallback(
@@ -726,10 +755,6 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
     [filter, updateFilter, setPageIndex]
   );
 
-  if (loading) {
-    return <CircularProgress />;
-  }
-
   return (
     <>
       <CommonPageHeader headline={tCoursePage('coursesHeadline')} />
@@ -742,44 +767,51 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
         />
       </div>
 
-      <TableGrid<AdminCourseList_Course>
-        columns={columns}
-        data={courses}
-        loading={loading}
-        error={error}
-        enablePagination={true}
-        totalCount={totalCount}
-        pageIndex={pageIndex}
-        onPageChange={setPageIndex}
-        pageSize={filter.limit ?? QUERY_LIMIT}
-        onPageSizeChange={handlePageSizeChange}
-        searchFilter={searchFilter}
-        onSearchFilterChange={setSearchFilter}
-        sorting={sorting}
-        onSortingChange={setSorting}
-        refetchQueries={['AdminCourseList']}
-        bulkActions={bulkActions}
-        onBulkAction={handleBulkAction}
-        onAddButtonClick={handleAddCourse}
-        addButtonText={t('add_course_button')}
-        expandableRowComponent={(props) => (
-          <ExpandableCourseRow
-            course={props.row}
-            courseGroupOptions={courseGroupOptions}
-            sliderCourseGroupIds={sliderCourseGroupIds}
-            degreeCourses={degreeCourses}
-            onSetAttendanceCertificatePossible={handleAttendanceCertificatePossible}
-            onSetAchievementCertificatePossible={handleAchievementCertificatePossible}
-          />
-        )}
-        deleteMutation={DELETE_A_COURSE}
-        deleteIdType="number"
-        generateDeletionConfirmationQuestion={(row) =>
-          t('delete_button.delete_course_confirmation', {
-            title: row.title || t('delete_button.untitled_course'),
-          })
-        }
-      />
+      {loading ? (
+        <div className="pb-12 pt-16">
+          <Loading />
+        </div>
+      ) : (
+        <TableGrid<AdminCourseList_Course>
+          columns={columns}
+          data={courses}
+          loading={loading}
+          error={error}
+          enablePagination={true}
+          totalCount={totalCount}
+          pageIndex={pageIndex}
+          onPageChange={setPageIndex}
+          pageSize={filter.limit ?? QUERY_LIMIT}
+          onPageSizeChange={handlePageSizeChange}
+          searchFilter={searchFilter}
+          onSearchFilterChange={setSearchFilter}
+          sorting={sorting}
+          onSortingChange={setSorting}
+          refetchQueries={['AdminCourseList']}
+          bulkActions={bulkActions}
+          onBulkAction={handleBulkAction}
+          onAddButtonClick={handleAddCourse}
+          addButtonText={t('add_course_button')}
+          expandableRowComponent={(props) => (
+            <ExpandableCourseRow
+              course={props.row}
+              courseGroupOptions={courseGroupOptions}
+              sliderCourseGroupIds={sliderCourseGroupIds}
+              degreeCourses={degreeCourses}
+              onSetAttendanceCertificatePossible={handleAttendanceCertificatePossible}
+              onSetAchievementCertificatePossible={handleAchievementCertificatePossible}
+            />
+          )}
+          deleteMutation={DELETE_A_COURSE}
+          deleteIdType="number"
+          role={manageRole}
+          generateDeletionConfirmationQuestion={(row) =>
+            t('delete_button.delete_course_confirmation', {
+              title: row.title || t('delete_button.untitled_course'),
+            })
+          }
+        />
+      )}
 
       <SelectProgramDialog
         open={showProgramDialog}

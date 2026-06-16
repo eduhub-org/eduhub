@@ -9,12 +9,17 @@ export const Footer: FC = () => {
     <footer className="mt-7 sm:mt-20 bg-bg-footer text-white overflow-x-hidden">
       <div className="flex flex-col w-full p-6 md:px-16 max-w-screen-xl mx-auto min-w-0">
         <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-8 lg:gap-6 w-full min-w-0 max-w-full">
-          <div className="order-1 lg:order-2 flex flex-col w-full min-w-0 max-w-full lg:max-w-[36rem]">
+          <div className="order-1 lg:order-2 flex flex-col w-full min-w-0 max-w-full lg:max-w-[49rem]">
             <span className="text-white text-sm font-medium tracking-wide mb-2">
               {t('sponsored_by')}
             </span>
             <div className="flex flex-col sm:flex-row sm:flex-wrap items-center sm:items-end justify-center sm:justify-start gap-6 sm:gap-4 bg-white p-6 sm:p-4 rounded w-full max-w-full min-w-0 box-border">
-              <div className="flex items-end w-full max-w-[200px] h-[80px] shrink-0">
+              <a
+                href="https://dlc.sh/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-end w-full max-w-[200px] h-[80px] shrink-0"
+              >
                 <Image
                   src="/images/share/logo_dlc.svg"
                   alt={t('dlc_logo_alt')}
@@ -23,8 +28,13 @@ export const Footer: FC = () => {
                   unoptimized
                   className="w-full h-full object-contain"
                 />
-              </div>
-              <div className="flex items-end w-full max-w-[400px] h-[80px] min-w-0 sm:flex-1 sm:min-w-[12rem]">
+              </a>
+              <a
+                href="https://www.schleswig-holstein.de"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-end w-full max-w-[400px] h-[80px] min-w-0 sm:flex-1 sm:min-w-[12rem]"
+              >
                 <Image
                   src="/images/share/foerderlogos_2.svg"
                   alt={t('foerder_logo_alt')}
@@ -34,7 +44,22 @@ export const Footer: FC = () => {
                   unoptimized
                   className="w-full h-full object-contain"
                 />
-              </div>
+              </a>
+              <a
+                href="https://www.kiel.de"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-end w-full max-w-[119px] h-[80px] shrink-0 sm:-ml-4"
+              >
+                <Image
+                  src="/images/share/logo-kiel-sailing-city.svg"
+                  alt={t('kiel_sailing_city_logo_alt')}
+                  width={119}
+                  height={80}
+                  unoptimized
+                  className="w-full h-full object-contain"
+                />
+              </a>
             </div>
           </div>
 

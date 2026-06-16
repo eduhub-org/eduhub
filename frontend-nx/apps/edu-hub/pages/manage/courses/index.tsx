@@ -7,13 +7,16 @@ import ManageCoursesContent from '../../../components/pages/ManageCoursesContent
 import { FC } from 'react';
 import Loading from '../../../components/common/Loading';
 import { Page } from '../../../components/layout/Page';
-import { useAdminQuery } from '../../../hooks/authedQuery';
-import { useIsAdmin, useIsLoggedIn } from '../../../hooks/authentication';
+import { useManageQuery } from '../../../hooks/authedQuery';
+import { useIsAdmin, useIsLoggedIn, useIsOrgAdmin } from '../../../hooks/authentication';
+import { useManageProgramWhere } from '../../../hooks/manageScope';
+import { ManagementRoleProvider } from '../../../hooks/managementRole';
 import { PROGRAMS_WITH_MINIMUM_PROPERTIES } from '../../../queries/programList';
 import { Programs } from '../../../queries/__generated__/Programs';
 
 const Index: FC = () => {
   const isAdmin = useIsAdmin();
+  const isOrgAdmin = useIsOrgAdmin();
   const isLoggedIn = useIsLoggedIn();
   return (
     <>
@@ -22,7 +25,13 @@ const Index: FC = () => {
         <link rel="icon" href="/favicon.png" />
       </Head>
       <Page>
-        <div className="min-h-[77vh]">{isLoggedIn && isAdmin && <CoursesDashBoard />}</div>
+        <div className="min-h-[77vh]">
+          {isLoggedIn && (isAdmin || isOrgAdmin) && (
+            <ManagementRoleProvider>
+              <CoursesDashBoard />
+            </ManagementRoleProvider>
+          )}
+        </div>
       </Page>
     </>
   );
@@ -33,7 +42,12 @@ export default Index;
 export const QUERY_LIMIT = 50;
 
 const CoursesDashBoard: FC = () => {
-  const programListRequest = useAdminQuery<Programs>(PROGRAMS_WITH_MINIMUM_PROPERTIES);
+  // Org admins only see programs (and therefore courses) of organizations they administer; for
+  // super-admins the where filter is empty. useManageQuery pins admin vs org_admin accordingly.
+  const where = useManageProgramWhere();
+  const programListRequest = useManageQuery<Programs>(PROGRAMS_WITH_MINIMUM_PROPERTIES, {
+    variables: { where },
+  });
 
   if (programListRequest.error) {
     console.log(programListRequest.error);

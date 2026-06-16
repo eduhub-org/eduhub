@@ -27,6 +27,7 @@ import updateMatrixInstructorPowerLevel from "./updateMatrixInstructorPowerLevel
 import syncProgramInstructorMatrixRoom from "./syncProgramInstructorMatrixRoom/index.js";
 import copyProjectFromTemplate from "./copyProjectFromTemplate/index.js";
 import setProjectDocumentationInstructionDefault from "./setProjectDocumentationInstructionDefault/index.js";
+import deleteProjectDocumentationInstruction from "./deleteProjectDocumentationInstruction/index.js";
 
 const require = createRequire(import.meta.url);
 let constantTimeSecretsEqual;
@@ -81,7 +82,8 @@ const functionMap = {
   syncProgramInstructorMatrixRoom,
   syncGhostNewsletterSubscription,
   copyProjectFromTemplate,
-  setProjectDocumentationInstructionDefault
+  setProjectDocumentationInstructionDefault,
+  deleteProjectDocumentationInstruction,
 };
 
 const constantTimeEquals = (providedSecret, expectedSecret) => {

@@ -15,17 +15,21 @@ const TableGridDeleteButton = ({
   refetchQueries,
   idType,
   deletionConfirmationQuestion,
+  role,
+  deleteVariableName = 'id',
+  disabled = false,
+  validateDeleteResult,
 }: TableGridDeleteButtonProps) => {
   const [deleteItem] = useRoleMutation(deleteMutation, {
     onError: (error) => {
       console.error('Error during deletion:', error);
     },
     onCompleted: (data) => {
-     
       if (data?.anonymizeUser?.error) {
         console.error('Anonymization error:', data.anonymizeUser.error);
       }
-    }
+    },
+    ...(role ? { context: { role } } : {}),
   });
 
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
@@ -37,6 +41,7 @@ const TableGridDeleteButton = ({
     deletionConfirmationQuestion || t('table_grid_delete_button.deletion_confirmation_question');
 
   const handleDeleteClick = () => {
+    if (disabled) return;
     setIsConfirmationOpen(true);
   };
 
@@ -69,16 +74,19 @@ const TableGridDeleteButton = ({
     }
   
     try {
-      await deleteItem({
-        variables: { id: variableId },
+      const result = await deleteItem({
+        variables: { [deleteVariableName]: variableId },
         refetchQueries,
         onError: (error) => {
-          // Use the generic foreign key error handler
           const message = handleForeignKeyError(error, t);
           setErrorMessage(message);
           console.error('Error deleting item:', error.message);
         },
       });
+      const validationError = validateDeleteResult?.(result.data);
+      if (validationError) {
+        setErrorMessage(validationError);
+      }
     } catch (error) {
       console.error('Error during deletion:', error);
     }
@@ -89,17 +97,18 @@ const TableGridDeleteButton = ({
       <IconButton
         size="small"
         onClick={handleDeleteClick}
+        disabled={disabled}
         className="delete-button"
         sx={{
           backgroundColor: 'transparent !important',
           padding: 0,
           boxShadow: 'none',
           '&:hover': {
-            backgroundColor: 'rgba(255, 0, 0, 0.1) !important',
+            backgroundColor: disabled ? undefined : 'rgba(255, 0, 0, 0.1) !important',
           },
         }}
       >
-        <MdDelete size="1.25em" color="red" />
+        <MdDelete size="1.25em" color={disabled ? 'gray' : 'red'} />
       </IconButton>
       <QuestionConfirmationDialog
         question={confirmationQuestion}

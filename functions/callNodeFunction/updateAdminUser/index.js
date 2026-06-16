@@ -15,60 +15,37 @@ const updateAdminUser = async (req) => {
 
     const { userId, isAdmin } = req.body.input;
     const keycloakToken = await getKeycloakToken();
+    const authHeaders = { headers: { Authorization: `Bearer ${keycloakToken}` } };
+    const jsonHeaders = {
+      headers: { Authorization: `Bearer ${keycloakToken}`, 'Content-Type': 'application/json' },
+    };
+    const realmUrl = `${process.env.KEYCLOAK_URL}/admin/realms/edu-hub`;
 
-    // First, get current user roles
-    const userResponse = await axios.get(
-      `${process.env.KEYCLOAK_URL}/admin/realms/edu-hub/users/${userId}/role-mappings/realm`,
-      {
-        headers: {
-          Authorization: `Bearer ${keycloakToken}`,
-        },
-      }
-    );
-
-    // Get admin role details
-    const rolesResponse = await axios.get(
-      `${process.env.KEYCLOAK_URL}/admin/realms/edu-hub/roles`,
-      {
-        headers: {
-          Authorization: `Bearer ${keycloakToken}`,
-        },
-      }
-    );
-
-    const adminRole = rolesResponse.data.find(role => role.name === 'admin');
-    if (!adminRole) {
-      throw new Error('Admin role not found in Keycloak');
+    // Super-admin is the "admin" role on the "hasura" client (not a realm role), matching
+    // addKeycloakRole and the Hasura JWT role mapping. Resolve the client by clientId so we do not
+    // depend on a hardcoded client uuid that differs between environments.
+    const clientsResponse = await axios.get(`${realmUrl}/clients?clientId=hasura`, authHeaders);
+    const hasuraClient = clientsResponse.data[0];
+    if (!hasuraClient) {
+      throw new Error('Hasura client not found in Keycloak');
     }
 
-    // Add or remove admin role based on isAdmin value
-    if (isAdmin) {
-      // Check if user already has admin role
-      const hasAdminRole = userResponse.data.some(role => role.name === 'admin');
-      if (!hasAdminRole) {
-        await axios.post(
-          `${process.env.KEYCLOAK_URL}/admin/realms/edu-hub/users/${userId}/role-mappings/realm`,
-          [adminRole],
-          {
-            headers: {
-              Authorization: `Bearer ${keycloakToken}`,
-              'Content-Type': 'application/json',
-            },
-          }
-        );
-      }
-    } else {
-      // Remove admin role
-      await axios.delete(
-        `${process.env.KEYCLOAK_URL}/admin/realms/edu-hub/users/${userId}/role-mappings/realm`,
-        {
-          data: [adminRole],
-          headers: {
-            Authorization: `Bearer ${keycloakToken}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+    const adminRoleResponse = await axios.get(
+      `${realmUrl}/clients/${hasuraClient.id}/roles/admin`,
+      authHeaders
+    );
+    const adminRole = adminRoleResponse.data;
+
+    const userClientRolesUrl = `${realmUrl}/users/${userId}/role-mappings/clients/${hasuraClient.id}`;
+
+    // Only add/remove when needed so the operation is idempotent.
+    const currentRolesResponse = await axios.get(userClientRolesUrl, authHeaders);
+    const hasAdminRole = currentRolesResponse.data.some((role) => role.name === 'admin');
+
+    if (isAdmin && !hasAdminRole) {
+      await axios.post(userClientRolesUrl, [adminRole], jsonHeaders);
+    } else if (!isAdmin && hasAdminRole) {
+      await axios.delete(userClientRolesUrl, { data: [adminRole], ...jsonHeaders });
     }
 
     logger.debug(`Successfully ${isAdmin ? 'added' : 'removed'} admin role for user ${userId}`);
@@ -87,4 +64,4 @@ const updateAdminUser = async (req) => {
   }
 };
 
-export default updateAdminUser; 
+export default updateAdminUser;

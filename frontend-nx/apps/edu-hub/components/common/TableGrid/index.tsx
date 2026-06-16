@@ -3,7 +3,8 @@ import React, { useState, useMemo, useCallback } from 'react';
 import { TextField, Checkbox, Select, MenuItem, FormControl, InputLabel, SelectChangeEvent, ListSubheader, Divider, Tooltip } from '@mui/material';
 import { useTranslations } from 'next-intl';
 import { ArrowDropUp, ArrowDropDown } from '@mui/icons-material';
-import { MdArrowBack, MdArrowForward } from 'react-icons/md';
+import { useRouter } from 'next/router';
+import { MdArrowBack, MdArrowForward, MdChevronRight } from 'react-icons/md';
 import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
 import {
   ColumnDef,
@@ -32,6 +33,7 @@ const TableGrid = <T extends BaseRow,>({
   columns,
   deleteMutation,
   deleteIdType,
+  role,
   generateDeletionConfirmationQuestion,
   error,
   expandableRowComponent,
@@ -54,7 +56,17 @@ const TableGrid = <T extends BaseRow,>({
   onSortingChange: externalOnSortingChange,
   compactRows = false,
   rounded = false,
+  rowHref,
+  onRowNavigate,
+  canDeleteRow,
+  deleteVariableName = 'id',
+  validateDeleteResult,
 }: TableGridProps<T>) => {
+  const router = useRouter();
+  const navigateMode = Boolean(rowHref || onRowNavigate);
+  if (navigateMode && expandableRowComponent) {
+    console.warn('TableGrid: rowHref/onRowNavigate is ignored when expandableRowComponent is set');
+  }
   const onGlobalFilterChange = useCallback(
     (value: string) => {
       onSearchFilterChange(value);
@@ -299,7 +311,7 @@ const TableGrid = <T extends BaseRow,>({
     const leftPadding = showCheckbox ? 0 : 12;
     
     // Add action column widths (w-10 = 40px, w-20 = 80px)
-    const expandButtonWidth = expandableRowComponent ? 40 : 0;
+    const expandButtonWidth = expandableRowComponent || navigateMode ? 40 : 0;
     const deleteButtonWidth = deleteMutation ? 80 : 0;
     
     return totalColumnWidth + totalGapWidth + leftPadding + expandButtonWidth + deleteButtonWidth;
@@ -501,8 +513,22 @@ const TableGrid = <T extends BaseRow,>({
           ))}
         </div>
         {deleteMutation && <div className="w-20 flex-shrink-0" />}
-        {expandableRowComponent && <div className="w-10 flex-shrink-0" />}
+        {(expandableRowComponent || navigateMode) && <div className="w-10 flex-shrink-0" />}
       </div>
+  );
+
+  const handleRowNavigate = useCallback(
+    (row: T) => {
+      if (onRowNavigate) {
+        onRowNavigate(row);
+        return;
+      }
+      const href = rowHref?.(row);
+      if (href) {
+        router.push(href);
+      }
+    },
+    [onRowNavigate, rowHref, router]
   );
 
   const tableBodyRows =
@@ -527,7 +553,7 @@ const TableGrid = <T extends BaseRow,>({
                   <div
                     className={`flex items-center gap-3 ${!showCheckbox ? 'pl-3' : ''}`}
                     style={{
-                      minWidth: `${mainRowContentWidth - (expandableRowComponent != null ? 40 : 0) - (deleteMutation != null ? 80 : 0)}px`,
+                      minWidth: `${mainRowContentWidth - (expandableRowComponent != null || navigateMode ? 40 : 0) - (deleteMutation != null ? 80 : 0)}px`,
                       width: '100%',
                     }}
                   >
@@ -544,7 +570,7 @@ const TableGrid = <T extends BaseRow,>({
                     );})}
                   </div>
                 </div>
-                {expandableRowComponent && <div className="w-10 flex-shrink-0" />}
+                {(expandableRowComponent || navigateMode) && <div className="w-10 flex-shrink-0" />}
                 {deleteMutation && <div className="w-20 flex-shrink-0"></div>}
               </div>
             );
@@ -566,7 +592,7 @@ const TableGrid = <T extends BaseRow,>({
                   <div
                     className={`flex items-center gap-3 ${!showCheckbox ? 'pl-3' : ''}`}
                     style={{
-                      minWidth: `${mainRowContentWidth - (expandableRowComponent != null ? 40 : 0) - (deleteMutation != null ? 80 : 0)}px`,
+                      minWidth: `${mainRowContentWidth - (expandableRowComponent != null || navigateMode ? 40 : 0) - (deleteMutation != null ? 80 : 0)}px`,
                       width: '100%',
                     }}
                   >
@@ -584,9 +610,22 @@ const TableGrid = <T extends BaseRow,>({
                   </div>
                 </div>
                 {/* Add expand/collapse button here */}
+                {navigateMode && !expandableRowComponent && (
+                  <div className="w-10 flex-shrink-0 flex items-stretch bg-gray-300">
+                    <button
+                      type="button"
+                      onClick={() => handleRowNavigate(row.original)}
+                      className="w-full flex items-center justify-center hover:bg-gray-400 transition-colors duration-200"
+                      aria-label="Open"
+                    >
+                      <MdChevronRight size={22} />
+                    </button>
+                  </div>
+                )}
                 {expandableRowComponent && (
                   <div className="w-10 flex-shrink-0 flex items-stretch bg-gray-300">
                     <button
+                      type="button"
                       onClick={() => toggleRowExpansion(row.original.id)}
                       className="w-full flex items-center justify-center hover:bg-gray-400 transition-colors duration-200"
                     >
@@ -600,6 +639,10 @@ const TableGrid = <T extends BaseRow,>({
                       deleteMutation={deleteMutation}
                       id={row.original.id}
                       idType={deleteIdType ?? 'number'}
+                      role={role}
+                      deleteVariableName={deleteVariableName}
+                      disabled={canDeleteRow ? !canDeleteRow(row.original) : false}
+                      validateDeleteResult={validateDeleteResult}
                       deletionConfirmationQuestion={
                         generateDeletionConfirmationQuestion
                           ? generateDeletionConfirmationQuestion(row.original)
@@ -617,7 +660,7 @@ const TableGrid = <T extends BaseRow,>({
                     <div
                       className={`flex items-center gap-3 ${!showCheckbox ? 'pl-3' : ''}`}
                       style={{
-                        minWidth: `${mainRowContentWidth - (expandableRowComponent != null ? 40 : 0) - (deleteMutation != null ? 80 : 0)}px`,
+                        minWidth: `${mainRowContentWidth - (expandableRowComponent != null || navigateMode ? 40 : 0) - (deleteMutation != null ? 80 : 0)}px`,
                         width: '100%',
                       }}
                     >
@@ -638,9 +681,9 @@ const TableGrid = <T extends BaseRow,>({
         })();
 
   return (
-    <div>
+    <div className="min-w-0 max-w-full">
       {toolbar}
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto max-w-full">
         <div className="w-full" style={{ minWidth: `${mainRowContentWidth}px` }}>
           {tableHeaderRow}
           {rounded ? (

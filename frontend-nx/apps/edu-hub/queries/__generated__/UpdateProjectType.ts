@@ -14,6 +14,7 @@ export interface UpdateProjectType_update_Project_by_pk {
    * FK to ProjectType.value. Required with documentationInstructionId before leaving PROPOSED (check constraint). Drives mandatory deliverables and workflow (e.g. ONLINE_COURSE template claim may insert ONGOING directly).
    */
   type: string | null;
+  documentationInstructionId: number | null;
 }
 
 export interface UpdateProjectType {
@@ -26,4 +27,5 @@ export interface UpdateProjectType {
 export interface UpdateProjectTypeVariables {
   itemId: number;
   value?: string | null;
+  documentationInstructionId?: number | null;
 }

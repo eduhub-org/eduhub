@@ -5,7 +5,7 @@ import { styled } from '@mui/material/styles';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { FC, useCallback } from 'react';
-import { useIsAdmin, useIsInstructor } from '../../hooks/authentication';
+import { useIsAdmin, useIsInstructor, useIsOrgAdmin } from '../../hooks/authentication';
 import { useTranslations } from 'next-intl';
 import useLogout from '../../hooks/logout';
 
@@ -53,7 +53,11 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
 
   const isAdmin = useIsAdmin();
   const isInstructor = useIsInstructor();
+  const isOrgAdmin = useIsOrgAdmin();
   const isInstructorOrAdmin = isAdmin || isInstructor;
+  // Organization admins reach the program/course/admin-user management screens (scoped to their own
+  // organization). Other manage links remain super-admin only.
+  const isAdminOrOrgAdmin = isAdmin || isOrgAdmin;
 
   const t = useTranslations('common');
 
@@ -95,18 +99,10 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
         </Link>
       </MenuItem>
 
-      {isAdmin && (
+      {isAdminOrOrgAdmin && (
         <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/courses')}>
           <Link className="w-full text-lg" href="/manage/courses">
             {t('menu.courses')}
-          </Link>
-        </MenuItem>
-      )}
-
-      {isAdmin && (
-        <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/programs')}>
-          <Link className="w-full text-lg" href="/manage/programs">
-            {t('menu.programs')}
           </Link>
         </MenuItem>
       )}
@@ -159,18 +155,13 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
         </MenuItem>
       )}
 
-      {isAdmin && (
-        <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/email-templates')}>
-          <Link className="w-full text-lg" href="/manage/email-templates">
-            {t('menu.email_templates')}
-          </Link>
-        </MenuItem>
-      )}
-
-      {isAdmin && (
-        <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/app-settings')}>
-          <Link className="w-full text-lg" href="/manage/app-settings">
-            {t('menu.app_settings')}
+      {isAdminOrOrgAdmin && (
+        <MenuItem
+          onClick={closeMenu}
+          selected={isActiveRoute('/manage/settings') || router.pathname.startsWith('/manage/settings/')}
+        >
+          <Link className="w-full text-lg" href="/manage/settings">
+            {t('menu.settings')}
           </Link>
         </MenuItem>
       )}

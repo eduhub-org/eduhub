@@ -2,7 +2,7 @@ import { FC, useCallback, useMemo, useState } from 'react';
 import { CircularProgress } from '@mui/material';
 import { useTranslations } from 'next-intl';
 import { useLazyRoleQuery, useRoleQuery } from '../../../hooks/authedQuery';
-import { useAdminMutation } from '../../../hooks/authedMutation';
+import { useManageMutation } from '../../../hooks/authedMutation';
 import { ProgramList_Program } from '../../../queries/__generated__/ProgramList';
 import { ProjectTypes } from '../../../queries/__generated__/ProjectTypes';
 import {
@@ -75,7 +75,7 @@ const ExpandableProgramRow: FC<ExpandableProgramRowProps> = ({ program }) => {
     !programTypeDefaultsLoading &&
     Boolean(programTypeDefaultsData) &&
     defaultAttendanceCertificateTemplateId != null;
-  const [updateAttendanceCertificateTemplateId] = useAdminMutation<
+  const [updateAttendanceCertificateTemplateId] = useManageMutation<
     UpdateProgramAttendanceCertificateTemplateId,
     UpdateProgramAttendanceCertificateTemplateIdVariables
   >(UPDATE_PROGRAM_ATTENDANCE_CERTIFICATE_TEMPLATE_ID, { refetchQueries: ['ProgramList'] });
@@ -123,7 +123,7 @@ const ExpandableProgramRow: FC<ExpandableProgramRowProps> = ({ program }) => {
     [program.defaultProjectSubmissionDeadline]
   );
 
-  const [syncProgramInstructorRoom, { loading: syncLoading }] = useAdminMutation<
+  const [syncProgramInstructorRoom, { loading: syncLoading }] = useManageMutation<
     SyncProgramInstructorMatrixRoom,
     SyncProgramInstructorMatrixRoomVariables
   >(SYNC_PROGRAM_INSTRUCTOR_MATRIX_ROOM);

@@ -154,6 +154,7 @@ export function useTableGrid<V>({
   }, []);
 
   return {
+    queryResult,
     data,
     loading,
     error,

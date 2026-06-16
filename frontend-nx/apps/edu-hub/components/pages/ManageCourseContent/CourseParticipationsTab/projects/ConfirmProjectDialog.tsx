@@ -4,12 +4,20 @@ import { useRoleMutation } from '../../../../../hooks/authedMutation';
 import { DialogShell } from '../../../../common/dialogs/DialogShell';
 import { Button } from '../../../../common/Button';
 import DropDownSelector from '../../../../inputs/DropDownSelector';
+import ProjectFormatSelector from '../../../CourseContent/Projects/ProjectFormatSelector';
+import InstructionDownloadButton from '../../../CourseContent/Projects/InstructionDownloadButton';
+import {
+  DEFAULT_CLASSIC_REQUIREMENT_FLAGS,
+  isClassicCatalogType,
+  resolveClassicProjectType,
+} from '../../../CourseContent/Projects/projectTypeRequirements';
 import { UPDATE_PROJECT_CONFIRM_TEAM } from '../../../../../queries/projectInstructor';
 import { ProjectRow, ProjectTypeRow } from '../../../CourseContent/Projects/types';
 
 interface ConfirmProjectDocumentationInstruction {
   id: number;
   title: string;
+  url: string | null;
   projectTypeValue: string;
   isDefault: boolean;
 }
@@ -57,26 +65,48 @@ const ConfirmProjectDialog: FC<ConfirmProjectDialogProps> = ({
     [documentationInstructions]
   );
 
+  // Students cannot propose online courses, so the confirm dialog is classical
+  // only. Fall back to the baseline classical type whenever the carried-over
+  // type is missing, the online course, or a legacy (non-cover) classical type.
+  const classicBaselineType = useMemo(
+    () =>
+      resolveClassicProjectType(projectTypes, DEFAULT_CLASSIC_REQUIREMENT_FLAGS)
+        ?.value ?? '',
+    [projectTypes]
+  );
+
   useEffect(() => {
     if (!project) return;
+    const carried = projectTypes.find(
+      (pt) => pt.value === (project.type ?? programDefaultProjectType)
+    );
     const initialType =
-      project.type ?? programDefaultProjectType ?? projectTypes[0]?.value ?? '';
+      carried && isClassicCatalogType(carried) ? carried.value : classicBaselineType;
     setType(initialType);
-    if (project.documentationInstructionId) {
+    if (project.documentationInstructionId && initialType === project.type) {
       setInstructionId(String(project.documentationInstructionId));
     } else {
       const defaultId = findDefaultInstructionIdForType(initialType);
       setInstructionId(defaultId == null ? '' : String(defaultId));
     }
-  }, [open, project, programDefaultProjectType, projectTypes, findDefaultInstructionIdForType]);
+  }, [
+    open,
+    project,
+    programDefaultProjectType,
+    projectTypes,
+    classicBaselineType,
+    findDefaultInstructionIdForType,
+  ]);
 
   // Always overwrite the instruction on type change so the filtered dropdown
   // (projectTypeValue === type) never carries a stale value from the prior
-  // type. Matches AddProjectDialog behaviour.
+  // type. Matches AddProjectDialog behaviour. `nextType` is null when the
+  // checked requirement combination matches no catalog project type.
   const handleTypeChange = useCallback(
-    (nextType: string) => {
-      setType(nextType);
-      const defaultId = findDefaultInstructionIdForType(nextType);
+    (nextType: string | null) => {
+      const resolved = nextType ?? '';
+      setType(resolved);
+      const defaultId = findDefaultInstructionIdForType(resolved);
       setInstructionId(defaultId == null ? '' : String(defaultId));
     },
     [findDefaultInstructionIdForType]
@@ -90,15 +120,6 @@ const ConfirmProjectDialog: FC<ConfirmProjectDialogProps> = ({
   }, [project]);
 
   const hasAcceptedAuthor = acceptedAuthorNames.length > 0;
-
-  const typeDropdownOptions = useMemo(
-    () =>
-      projectTypes.map((pt) => ({
-        value: pt.value,
-        label: tCourse(`projects.type_label.${pt.value}` as never),
-      })),
-    [projectTypes, tCourse]
-  );
 
   const defaultSuffix = tCourse('projects.instruction_dropdown.default_suffix');
 
@@ -119,6 +140,13 @@ const ConfirmProjectDialog: FC<ConfirmProjectDialogProps> = ({
   );
 
   const instructionHelpText = t('projects.add_dialog.instruction_info');
+
+  const selectedInstructionUrl = useMemo(
+    () =>
+      documentationInstructions.find((inst) => String(inst.id) === instructionId)
+        ?.url ?? null,
+    [documentationInstructions, instructionId]
+  );
 
   const handleConfirm = async () => {
     if (!project || !type || !instructionId || !hasAcceptedAuthor) {
@@ -144,7 +172,7 @@ const ConfirmProjectDialog: FC<ConfirmProjectDialogProps> = ({
       onClose={onClose}
       title={t('projects.confirm_project_dialog.title')}
       ariaLabelledBy="confirm-project-dialog"
-      maxWidth="sm"
+      maxWidth="md"
       actions={
         <div className="flex justify-end gap-2">
           <Button onClick={onClose} disabled={loading}>
@@ -161,17 +189,17 @@ const ConfirmProjectDialog: FC<ConfirmProjectDialogProps> = ({
       }
     >
       {project ? (
-        <div className="space-y-4">
+        <div className="space-y-5">
           <div>
-            <p className="text-sm font-medium mb-1">
+            <p className="text-xs font-semibold uppercase tracking-wide text-label-secondary mb-2">
               {t('projects.confirm_project_dialog.project_title_label')}
             </p>
             <p className="text-sm font-semibold text-label-primary break-words">
               {project.title}
             </p>
           </div>
-          <div>
-            <p className="text-sm font-medium mb-1">
+          <div className="border-t border-border-primary pt-5">
+            <p className="text-xs font-semibold uppercase tracking-wide text-label-secondary mb-2">
               {t('projects.confirm_project_dialog.authors_label')}
             </p>
             {hasAcceptedAuthor ? (
@@ -182,55 +210,42 @@ const ConfirmProjectDialog: FC<ConfirmProjectDialogProps> = ({
               </p>
             )}
           </div>
-          <div>
-            <div className="[&_.col-span-10]:!mt-0">
-              <DropDownSelector
-                variant="material"
-                label={t('projects.add_dialog.type_label')}
-                placeholder={t('projects.add_dialog.type_placeholder')}
-                value={type}
-                options={typeDropdownOptions}
-                isMandatory
-                disabled={loading}
-                onValueUpdated={handleTypeChange}
-                identifierVariables={{}}
-                refetchQueries={[]}
-              />
-            </div>
-            {projectTypes.length > 0 ? (
-              <div className="mt-2">
-                <p className="text-xs font-medium text-label-primary">
-                  {t('projects.add_dialog.type_descriptions_heading')}
-                </p>
-                <ul className="mt-1 ml-4 space-y-1 text-xs text-label-secondary">
-                  {projectTypes.map((pt) => (
-                    <li key={pt.value}>
-                      <span className="font-medium text-label-primary">
-                        {tCourse(`projects.type_label.${pt.value}` as never)}:
-                      </span>{' '}
-                      {tCourse(`projects.type_description.${pt.value}` as never)}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ) : null}
+
+          <div className="border-t border-border-primary pt-5">
+            <ProjectFormatSelector
+              projectTypes={projectTypes}
+              value={type}
+              onChange={handleTypeChange}
+              showFormatChoice={false}
+              disabled={loading}
+            />
           </div>
 
-          <div className="[&_.col-span-10]:!mt-0">
-            <DropDownSelector
-              variant="material"
-              label={t('projects.add_dialog.instruction_label')}
-              placeholder={t('projects.add_dialog.instruction_placeholder')}
-              value={instructionId}
-              options={instructionDropdownOptions}
-              isMandatory
-              disabled={loading}
-              onValueUpdated={(v: string) => {
-                setInstructionId(v);
-              }}
-              identifierVariables={{}}
-              refetchQueries={[]}
-            />
+          <div className="border-t border-border-primary pt-5 [&_.col-span-10]:!mt-0">
+            <p className="text-xs font-semibold uppercase tracking-wide text-label-secondary mb-2">
+              {t('projects.add_dialog.instruction_label')}
+            </p>
+            <div className="flex items-center gap-2">
+              <div className="flex-1">
+                <DropDownSelector
+                  variant="material"
+                  placeholder={t('projects.add_dialog.instruction_placeholder')}
+                  value={instructionId}
+                  options={instructionDropdownOptions}
+                  isMandatory
+                  disabled={loading}
+                  onValueUpdated={(v: string) => {
+                    setInstructionId(v);
+                  }}
+                  identifierVariables={{}}
+                  refetchQueries={[]}
+                />
+              </div>
+              <InstructionDownloadButton
+                url={selectedInstructionUrl}
+                disabled={loading}
+              />
+            </div>
             <p className="mt-2 text-xs text-label-secondary whitespace-pre-line">
               {instructionHelpText}
             </p>

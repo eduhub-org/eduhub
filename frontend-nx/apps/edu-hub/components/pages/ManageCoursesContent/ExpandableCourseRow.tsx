@@ -2,12 +2,12 @@ import { FC, Fragment, useCallback, useMemo, useState, useEffect } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
 import { MdCheckBox, MdOutlineCheckBoxOutlineBlank, MdAddCircle, MdEmail, MdForum } from 'react-icons/md';
 import { useRouter } from 'next/router';
-import { useAdminMutation } from '../../../hooks/authedMutation';
+import { useManageMutation } from '../../../hooks/authedMutation';
 import { SAVE_COURSE_IMAGE } from '../../../queries/actions';
 import { INSERT_COURSE_GROUP_TAG, DELETE_COURSE_GROUP_TAG } from '../../../queries/courseGroup';
 import { INSERT_COURSE_DEGREE_TAG, DELETE_COURSE_DEGREE_TAG } from '../../../queries/courseDegree';
 import { DELETE_COURSE_INSRTRUCTOR, INSERT_A_COURSEINSTRUCTOR } from '../../../queries/mutateCourseInstructor';
-import { USER_SELECTION_WITH_FILTER } from '../../../queries/user';
+import { USER_SELECTION_WITH_FILTER, buildUserSelectionFilter } from '../../../queries/user';
 import { AdminCourseList_Course } from '../../../queries/__generated__/AdminCourseList';
 import {
   DeleteCourseInstructor,
@@ -53,7 +53,6 @@ import {
   SAVE_COURSE_FORMBRICKS_ENROLLMENT_SURVEY,
   UPDATE_COURSE_BASE_PRICE,
   UPDATE_COURSE_CURRENCY,
-  UPDATE_COURSE_PROJECT_PROPOSALS_ENABLED,
   UPDATE_COURSE_PROJECT_SUBMISSION_DEADLINE,
 } from '../../../queries/course';
 import { VALIDATE_FORMBRICKS_SURVEY, SAVE_ADDON_MAPPINGS, CREATE_STRIPE_BASE_PRICE, GET_COURSE_ADDON_MAPPINGS } from '../../../queries/stripe';
@@ -67,6 +66,8 @@ import { InfoDialog } from '../../common/dialogs/InfoDialog';
 import { translateErrorMessage } from '../../../helpers/errorHandling';
 import { submissionDeadlineToCalendarDate } from '../CourseContent/Projects/projectEffectiveSubmissionDeadline';
 import { useRoleQuery, useLazyRoleQuery } from '../../../hooks/authedQuery';
+import { useCurrentRole } from '../../../hooks/authentication';
+import { useManagementRoleContext } from '../../../hooks/managementRole';
 import PricingSummary from '../../common/PricingSummary';
 import {
   GET_COURSE_TEMPLATES_COUNT,
@@ -97,6 +98,9 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
   const t = useTranslations();
   const router = useRouter();
   const { error, handleError, resetError } = useErrorHandler();
+  const managementRole = useManagementRoleContext();
+  const currentRole = useCurrentRole();
+  const queryRole = managementRole ?? currentRole;
 
   // Check if course has custom email templates
   const { data: templatesCountData, refetch: refetchTemplatesCount } = useRoleQuery<GetCourseTemplatesCount>(
@@ -110,38 +114,17 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
   // Get default templates
   const { data: defaultTemplatesData } = useRoleQuery<GetDefaultTemplates>(GET_DEFAULT_TEMPLATES);
 
-  const [insertEmailTemplate] = useAdminMutation<InsertEmailTemplate, InsertEmailTemplateVariables>(
+  const [insertEmailTemplate] = useManageMutation<InsertEmailTemplate, InsertEmailTemplateVariables>(
     INSERT_EMAIL_TEMPLATE
   );
 
   const isExternalRegistration = course.registrationType === CourseRegistrationType_enum.EXTERNAL_REGISTRATION;
-
-  const [updateProjectProposalsEnabled] = useAdminMutation(UPDATE_COURSE_PROJECT_PROPOSALS_ENABLED, {
-    refetchQueries: ['AdminCourseList'],
-  });
-
-  const handleSetProjectProposalsEnabled = useCallback(
-    async (next: boolean | null) => {
-      try {
-        await updateProjectProposalsEnabled({
-          variables: { itemId: course.id, value: next },
-        });
-      } catch (err) {
-        handleError(err instanceof Error ? err.message : String(err));
-      }
-    },
-    [course.id, updateProjectProposalsEnabled, handleError]
-  );
 
   const projectSubmissionDeadlineValue = useMemo(
     () => submissionDeadlineToCalendarDate(course.projectSubmissionDeadline),
     [course.projectSubmissionDeadline]
   );
 
-  const programDefaultProjectsEnabled = Boolean(
-    course.Program?.projectProposalsEnabledByDefault
-  );
-  
   // Check if course requires payment
   const requiresPayment = course.registrationType === 'DIRECT_WITH_INPUT_AND_PAYMENT' ||
     course.registrationType === 'DIRECT_CONFIRMATION_AND_PAYMENT';
@@ -162,9 +145,9 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
   const [isStripeSyncing, setIsStripeSyncing] = useState(false);
   const [stripeSyncStatus, setStripeSyncStatus] = useState<'idle' | 'syncing' | 'success' | 'error'>('idle');
 
-  const [validateSurvey] = useAdminMutation(VALIDATE_FORMBRICKS_SURVEY);
-  const [saveAddonMappings] = useAdminMutation(SAVE_ADDON_MAPPINGS);
-  const [createStripeBasePrice] = useAdminMutation(CREATE_STRIPE_BASE_PRICE);
+  const [validateSurvey] = useManageMutation(VALIDATE_FORMBRICKS_SURVEY);
+  const [saveAddonMappings] = useManageMutation(SAVE_ADDON_MAPPINGS);
+  const [createStripeBasePrice] = useManageMutation(CREATE_STRIPE_BASE_PRICE);
 
   // Fetch addon mappings for the course
   const { data: addonMappingsData, refetch: refetchAddonMappings } = useRoleQuery(GET_COURSE_ADDON_MAPPINGS, {
@@ -428,14 +411,14 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
   const [matrixDialogOpen, setMatrixDialogOpen] = useState(false);
 
   // Instructor management mutations
-  const [insertCourseInstructor] = useAdminMutation<InsertCourseInstructor, InsertCourseInstructorVariables>(
+  const [insertCourseInstructor] = useManageMutation<InsertCourseInstructor, InsertCourseInstructorVariables>(
     INSERT_A_COURSEINSTRUCTOR,
     {
       refetchQueries: ['AdminCourseList'],
     }
   );
 
-  const [deleteInstructorAPI] = useAdminMutation<DeleteCourseInstructor, DeleteCourseInstructorVariables>(
+  const [deleteInstructorAPI] = useManageMutation<DeleteCourseInstructor, DeleteCourseInstructorVariables>(
     DELETE_COURSE_INSRTRUCTOR,
     {
       refetchQueries: ['AdminCourseList'],
@@ -447,7 +430,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
   );
 
   // Funding organization management mutations
-  const [insertCourseFundingOrg] = useAdminMutation<
+  const [insertCourseFundingOrg] = useManageMutation<
     InsertCourseFundingOrganization,
     InsertCourseFundingOrganizationVariables
   >(INSERT_COURSE_FUNDING_ORGANIZATION, {
@@ -562,9 +545,12 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
         const { data } = await fetchUserByEmail({
           variables: {
             limit: 100,
-            filter: {
-              _or: [{ id: { _eq: userId } }, { email: { _ilike: `%${email}%` } }],
-            },
+            filter: buildUserSelectionFilter(
+              {
+                _or: [{ id: { _eq: userId } }, { email: { _ilike: `%${email}%` } }],
+              },
+              queryRole
+            ),
             order_by: [{ lastName: order_by.asc }, { firstName: order_by.asc }],
           },
         });
@@ -581,7 +567,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
         setSearchValueForNewUser('');
       }
     },
-    [fetchUserByEmail, addInstructorHandler, handleError, t]
+    [fetchUserByEmail, addInstructorHandler, handleError, queryRole, t]
   );
 
   const parsedSearchValues = parseSearchValue(searchValueForNewUser);
@@ -1052,55 +1038,6 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                       refetchQueries={['AdminCourseList']}
                       helpText={t('manageCourses.ects.help_text')}
                     />
-
-                    <div>
-                      <p className="text-sm font-medium text-label-primary mb-1">
-                        {t('manageCourses.project_options.proposals_enabled.label')}
-                      </p>
-                      <p className="text-xs text-label-secondary mb-2">
-                        {t('manageCourses.project_options.proposals_enabled.help_text')}
-                      </p>
-                      <div className="flex flex-col space-y-1">
-                        {[
-                          {
-                            id: 'inherit',
-                            isActive: course.projectProposalsEnabled === null || course.projectProposalsEnabled === undefined,
-                            onClick: () => handleSetProjectProposalsEnabled(null),
-                            label: t(
-                              programDefaultProjectsEnabled
-                                ? 'manageCourses.project_options.proposals_enabled.option_inherit_yes'
-                                : 'manageCourses.project_options.proposals_enabled.option_inherit_no'
-                            ),
-                          },
-                          {
-                            id: 'enabled',
-                            isActive: course.projectProposalsEnabled === true,
-                            onClick: () => handleSetProjectProposalsEnabled(true),
-                            label: t('manageCourses.project_options.proposals_enabled.option_enabled'),
-                          },
-                          {
-                            id: 'disabled',
-                            isActive: course.projectProposalsEnabled === false,
-                            onClick: () => handleSetProjectProposalsEnabled(false),
-                            label: t('manageCourses.project_options.proposals_enabled.option_disabled'),
-                          },
-                        ].map((option) => (
-                          <label
-                            key={option.id}
-                            className="inline-flex items-center space-x-2 cursor-pointer"
-                          >
-                            <input
-                              type="radio"
-                              name={`project-proposals-${course.id}`}
-                              className="cursor-pointer"
-                              checked={option.isActive}
-                              onChange={option.onClick}
-                            />
-                            <span className="text-sm">{option.label}</span>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
 
                     <DatePicker
                       variant="material"

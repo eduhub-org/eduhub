@@ -10,3 +10,10 @@
     - user_access
     - user_access_others
     - anonymous
+# Organization admins manage their organization's settings/programs/courses through the
+# org_admin_access role. They browse the platform normally under the `user` role, so org_admin
+# deliberately does NOT inherit user_access (the frontend pins the role per request).
+- role_name: org_admin
+  role_set:
+    - org_admin_access
+    - anonymous

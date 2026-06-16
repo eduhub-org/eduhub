@@ -95,6 +95,9 @@ const nextConfig = {
   async redirects() {
     return [
       { source: '/impressum', destination: '/imprint', permanent: true },
+      // Settings reorganization: old admin routes live on as redirects
+      { source: '/manage/app-settings', destination: '/manage/settings', permanent: false },
+      { source: '/manage/email-templates', destination: '/manage/settings/emails', permanent: false },
     ];
   },
   async headers() {

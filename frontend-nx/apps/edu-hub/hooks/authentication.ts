@@ -26,6 +26,16 @@ export const useIsInstructor = (): boolean => {
   return hasRole(sessionData, AuthRoles.instructor);
 };
 
+// Whether the current user administers at least one organization. Used purely for UI gating/nav.
+// NOTE: org_admin is intentionally NOT part of useCurrentRole — a user who is both an instructor
+// and an org admin must keep `instructor` (or `user`) as their default request role so access to
+// resources from other organizations (granted via the instructor path) is not lost. The org_admin
+// role is only ever applied explicitly via useOrgAdminQuery / useOrgAdminMutation.
+export const useIsOrgAdmin = (): boolean => {
+  const { data: sessionData } = useSession();
+  return hasRole(sessionData, AuthRoles.org_admin);
+};
+
 export const useIsUserIdInList = (allowedIds: string[]): boolean => {
   const { data: sessionData } = useSession();
   const userId = sessionData?.profile?.['https://hasura.io/jwt/claims']?.['x-hasura-user-id'];
@@ -51,5 +61,24 @@ export const useCurrentRole = (): AuthRoles => {
       return AuthRoles.user;
     default:
       return AuthRoles.anonymous;
+  }
+};
+
+// The role to use for the organization-management screens (manage programs/courses/admin-users).
+// Super-admins keep the `admin` role (full, unscoped access); everyone else who reaches these
+// screens is an org admin and uses `org_admin` (tenant-scoped in Hasura). This is deliberately NOT
+// folded into useCurrentRole — see the note on useIsOrgAdmin — so it must be requested explicitly
+// via useManageQuery / useManageMutation (or by passing it as the `role` of a shared component).
+export const useManageRole = (): AuthRoles => {
+  const isAdmin = useIsAdmin();
+  const isOrgAdmin = useIsOrgAdmin();
+
+  switch (true) {
+    case isAdmin:
+      return AuthRoles.admin;
+    case isOrgAdmin:
+      return AuthRoles.org_admin;
+    default:
+      return AuthRoles.user;
   }
 };

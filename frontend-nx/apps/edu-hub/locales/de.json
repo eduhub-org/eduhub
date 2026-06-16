@@ -41,13 +41,13 @@
       "my_certificates": "Meine Zertifikate",
       "faq": "FAQ",
       "user": "Benutzer",
+      "admin_users": "Admin-Benutzer",
       "experts": "Experten",
       "courses": "Kurse",
       "programs": "Programme",
       "organizations": "Organisationen",
       "location_addresses": "Veranstaltungsadressen",
-      "email_templates": "E-Mail-Vorlagen",
-      "app_settings": "App-Einstellungen",
+      "settings": "Einstellungen",
       "calendar": "Kalender",
       "statistics": "Statistiken",
       "course_instructor_manual": "Kursleitungshandbuch",
@@ -383,15 +383,6 @@
         "PROJECT_WITH_LINK_AND_PRESENTATION": "Projekt mit Link und Präsentation",
         "PRESENTATION_WITHOUT_DOCUMENTATION": "Präsentation (ohne Dokumentation)",
         "PRESENTATION_AND_LINK_WITHOUT_DOCUMENTATION": "Präsentation mit Link (ohne Dokumentation)"
-      },
-      "type_description": {
-        "ONLINE_COURSE": "Abschluss eines Online-Kurses – nur eine Dokumentation muss hochgeladen werden (z. B. ein Reflexionsfragebogen).",
-        "CLASSIC_PROJECT": "Klassisches Projekt – nur eine Dokumentation muss hochgeladen werden.",
-        "PROJECT_WITH_LINK": "Veröffentlichbares Projekt – benötigt Dokumentation, Titelbild und einen externen Link (z. B. Repository oder Live-Demo).",
-        "PROJECT_WITH_PRESENTATION": "Veröffentlichbares Projekt – benötigt Dokumentation, Titelbild und eine Präsentation.",
-        "PROJECT_WITH_LINK_AND_PRESENTATION": "Veröffentlichbares Projekt – benötigt Dokumentation, Titelbild, Präsentation und einen externen Link.",
-        "PRESENTATION_WITHOUT_DOCUMENTATION": "Veröffentlichbares Projekt – benötigt Präsentation und Titelbild. Das Hochladen einer schriftlichen Dokumentation ist optional.",
-        "PRESENTATION_AND_LINK_WITHOUT_DOCUMENTATION": "Veröffentlichbares Projekt – benötigt Präsentation, Titelbild und einen externen Link. Das Hochladen einer schriftlichen Dokumentation ist optional."
       },
       "instruction_dropdown": {
         "default_suffix": " (Standard)"
@@ -1186,7 +1177,7 @@
     "add_as_aborted": "als abgebrochen hinzufügen oder ändern",
     "add_user_error": "Bitte mindestens einen User auswählen!",
     "submit": "Absenden",
-    "application_history":  {
+    "application_history": {
       "label": "Bisherige Bewerbungen und Teilnahmen",
       "no_applications_present": "Keine Bewerbungen vorhanden"
     },
@@ -1240,6 +1231,19 @@
       "invitations_queued_plural": "{count} Einladungen wurden ausgelöst; Bestätigungs-E-Mails werden verschickt.",
       "declines_queued_singular": "{count} Ablehnung wurde ausgelöst; eine Benachrichtigung wird per E-Mail verschickt.",
       "declines_queued_plural": "{count} Ablehnungen wurden ausgelöst; Benachrichtigungen werden per E-Mail verschickt.",
+      "bulk_email_dialog_title": "Bewerber:innen per E-Mail kontaktieren",
+      "bulk_email_loading": "Empfänger:innen für {action} werden geladen...",
+      "bulk_email_load_error": "Empfänger:innen konnten nicht geladen werden: {error}",
+      "bulk_email_recipient_count": "{action}: {count} Empfänger:innen gefunden.",
+      "bulk_email_recipient_limit": "Mehr als {limit} Empfänger:innen passen zu dieser Aktion ({count} insgesamt). Die vollständige Liste wurde nicht geladen.",
+      "bulk_email_mailto_too_long": "Diese Empfängerliste ist zu groß für einen zuverlässigen mailto-Link (über {limit} Zeichen). Kopiere stattdessen die Adressen.",
+      "bulk_email_preview_label": "Vorschau",
+      "bulk_email_preview_more": "+ {count} weitere",
+      "bulk_email_open_mail": "Mail-App öffnen",
+      "bulk_email_copy": "E-Mails kopieren",
+      "bulk_email_copy_success": "E-Mail-Adressen kopiert.",
+      "bulk_email_copy_error": "E-Mail-Adressen konnten nicht kopiert werden.",
+      "no_email_recipients": "Für diese Aktion wurden keine E-Mail-Empfänger:innen gefunden.",
       "no_selection_dialog_title": "Keine Auswahl",
       "disabled_reasons": {
         "select_participants_first": "Wähle zuerst Teilnehmende aus.",
@@ -1373,11 +1377,9 @@
         "title": "Projekt hinzufügen",
         "title_label": "Titel",
         "title_placeholder": "Projekttitel",
-        "type_label": "Projekttyp",
-        "type_placeholder": "Projekttyp auswählen",
-        "type_descriptions_heading": "Projekttypen im Überblick",
         "instruction_label": "Dokumentationsanleitung",
         "instruction_placeholder": "Dokumentationsanleitung auswählen",
+        "instruction_open": "Ausgewählte Anleitung in neuem Tab öffnen",
         "instruction_info": "Dokumentationsanleitungen sind PDF-Dateien, die beschreiben, wie die Projektdokumentation (oder ein anderes verpflichtendes Abgabedokument) verfasst sein soll. In manchen Fällen – z. B. bei den Reflexionsfragebögen für Online-Kurse – ist das PDF direkt ausfüllbar.",
         "authors_label": "Autor:innen",
         "add_author": "Autor:in hinzufügen",
@@ -1388,7 +1390,59 @@
         "submit_button": "Anlegen",
         "error_title_required": "Bitte gib einen Projekttitel an.",
         "error_type_required": "Bitte wähle einen Projekttyp aus.",
-        "error_instruction_required": "Bitte wähle eine Dokumentationsanleitung aus."
+        "error_instruction_required": "Bitte wähle eine Dokumentationsanleitung aus.",
+        "error_author_already_in_project": "{name} ist in diesem Kurs bereits einem aktiven Projekt zugeordnet und kann keinem weiteren hinzugefügt werden.",
+        "error_author_conflict_generic": "Mindestens eine:r der ausgewählten Autor:innen ist in diesem Kurs bereits einem aktiven Projekt zugeordnet und kann keinem weiteren hinzugefügt werden."
+      },
+      "requirements": {
+        "section_label": "Erforderliche Abgaben",
+        "section_help": "Wähle aus, was Teilnehmende für dieses Projekt einreichen müssen. Die gewählte Kombination bestimmt den Projekttyp.",
+        "requires_documentation": {
+          "label": "Projektdokumentation (PDF-Upload)",
+          "help": "Teilnehmende müssen eine schriftliche Projektdokumentation hochladen.",
+          "short": "Dokumentation"
+        },
+        "requires_external_url": {
+          "label": "Externer Link (z. B. Repository oder Live-Demo)",
+          "help": "Teilnehmende müssen einen externen Link angeben, z. B. zu einem Repository oder einer Live-Demo.",
+          "short": "Externer Link"
+        },
+        "requires_presentation": {
+          "label": "Präsentations-Upload",
+          "help": "Teilnehmende müssen eine Präsentation hochladen.",
+          "short": "Präsentation"
+        },
+        "requires_cover_image": {
+          "label": "Titelbild",
+          "help": "Teilnehmende müssen ein Titelbild hochladen (wird auch für die Veröffentlichung im Schaufenster genutzt).",
+          "short": "Titelbild"
+        },
+        "format": {
+          "label": "Projektformat",
+          "classic": {
+            "label": "Klassisches Projekt",
+            "help": "Teilnehmende bilden ein Team, das Du vor Arbeitsbeginn bestätigst, und reichen die unten gewählten Abgaben ein."
+          },
+          "online": {
+            "label": "Online-Kurs",
+            "help": "Verkürzter Ablauf: Teilnehmende nehmen einzeln teil – eine Team-Bestätigung ist nicht erforderlich."
+          }
+        },
+        "section_help_classic": "Wähle aus, was Teilnehmende für dieses Projekt einreichen müssen.",
+        "self_reflection": {
+          "label": "Selbstreflexions-Fragebogen",
+          "help": "Teilnehmende füllen den Selbstreflexions-Fragebogen aus (ein direkt ausfüllbares PDF in der Dokumentationsanleitung)."
+        },
+        "classic_invalid_combination": "Wähle mindestens einen externen Link oder eine Präsentation aus – nur eine Dokumentation ist für ein klassisches Projekt nicht möglich.",
+        "invalid_combination": "Diese Kombination von Anforderungen ist nicht verfügbar. Passe Deine Auswahl an.",
+        "type_choice": {
+          "label": "Projektformat",
+          "help": "Diese Abgaben treffen auf mehrere Projektformate zu. Wähle aus, welches verwendet werden soll.",
+          "descriptions": {
+            "ONLINE_COURSE": "Online-Kurs – verkürzter Ablauf: Teilnehmende nehmen einzeln teil, eine Team-Bestätigung ist nicht erforderlich.",
+            "CLASSIC_PROJECT": "Klassisches Projekt – Teilnehmende bilden ein Team, das Du vor Arbeitsbeginn bestätigst."
+          }
+        }
       }
     },
     "attendance_cert_issued": "Teilnahmebescheinigung ausgestellt",
@@ -1518,6 +1572,8 @@
       "invitation_expired": "Einladung abgelaufen"
     },
     "invitation_deadline": "Ablaufdatum Einladung",
+    "loading_course": "Kurs wird geladen...",
+    "course_load_error": "Der Kurs konnte nicht geladen werden. Bitte versuche es erneut.",
     "course_not_found": "Kurs {courseId} wurde nicht gefunden!",
     "add_session": "Termin hinzufügen",
     "SessionsTab": {
@@ -1633,7 +1689,23 @@
     },
     "no-certificate-generated": "Es wurden keine Zertifikate generiert.",
     "certificates-generated": "Es wurden {number} Zertifikate generiert.",
-    "1-certificate-generated": "Es wurde ein Zertifikat generiert."
+    "1-certificate-generated": "Es wurde ein Zertifikat generiert.",
+    "project_settings": {
+      "heading": "Projekt-Einrichtung",
+      "intro": "Lege fest, wie Teilnehmende ein Projekt für den Leistungsnachweis erhalten. Du kannst eine oder beide Optionen nutzen.",
+      "option_templates": {
+        "title": "Projektvorlagen definieren",
+        "help": "Erstelle unten über „Projekt hinzufügen“ eine oder ggf. mehrere präzise beschriebene Projekte. Teilnehmende können dann genau eines auswählen und bearbeiten."
+      },
+      "option_propose": {
+        "title": "Teilnehmende eigene Projekte vorschlagen lassen",
+        "help": "Wenn aktiviert, können Teilnehmende eigene Projektideen vorschlagen, die Du anschließend bestätigst."
+      },
+      "proposals": {
+        "option_enabled": "Ja",
+        "option_disabled": "Nein"
+      }
+    }
   },
   "managePrograms": {
     "headline": "Programme",
@@ -1800,26 +1872,58 @@
     "last_name": "Nachname",
     "email": "E-Mail",
     "organization": "Organisation",
+    "profile_organization": "Organisation (Profil)",
+    "super_admin_label": "Super-Admin",
     "deletion_confirmation_question": "Bist du sicher, dass du die Administrationsrechte von {firstName} {lastName} für die Organisation {organization} löschen möchtest?",
     "is_super_admin": "Ist Super-Admin",
     "can_manage_events": "Kann Events verwalten",
     "can_manage_courses": "Kann Kurse verwalten",
-    "can_manage_users_and_settings": "Kann Benutzer und Einstellungen verwalten"
+    "can_manage_degrees": "Kann Degrees verwalten",
+    "can_manage_users_and_settings": "Kann Benutzer und Einstellungen verwalten",
+    "error_loading_admin_users": "Fehler beim Laden der Admin-Benutzer.",
+    "add_admin_button": "Admin hinzufügen",
+    "add_admin_dialog_title": "Admin-Benutzer hinzufügen",
+    "add_admin_user_label": "Benutzer",
+    "add_admin_user_search_placeholder": "Nach Name oder E-Mail suchen",
+    "add_admin_no_users_found": "Keine Benutzer gefunden.",
+    "add_admin_change_user": "Ändern",
+    "add_admin_organization_required": "Bitte wähle eine Organisation aus.",
+    "add_admin_user_required": "Bitte wähle einen Benutzer aus.",
+    "add_admin_capability_required": "Bitte vergib mindestens eine Berechtigung.",
+    "add_admin_error": "Der Admin-Benutzer konnte nicht hinzugefügt werden.",
+    "add_admin_submit": "Hinzufügen",
+    "add_admin_submitting": "Wird hinzugefügt…",
+    "add_admin_success": "Admin-Benutzer hinzugefügt."
   },
   "manageAppSettings": {
-    "app_settings": "App Einstellungen",
-    "background_image_url": "Hintergrundbild URL",
-    "preview_image_url": "Vorschaubild URL",
+    "appSettings": "App Einstellungen",
+    "backgroundImageURL": "Hintergrundbild URL",
+    "previewImageURL": "Vorschaubild URL",
+    "bannerBackgroundColor": "News Banner Hintergrundfarbe",
+    "bannerFontColor": "News Banner Textfarbe",
+    "bannerTextDe": "News Banner Text DE",
+    "bannerTextEn": "News Banner Text EN",
+    "bannerSettings": "Banner Einstellungen",
+    "courseGroupOptions": "Kursgruppierungen Reihenfolge",
+    "timeZone": "Zeitzone",
+    "timeZoneHelpText": "Die Zeitzone wird verwendet, um die Datums- und Uhrzeiten in der Anwendung anzuzeigen. Generelle Zeiten wie die wiederkehrende Kurszeit, die nicht an einen konkreten Tag gebunden sind, werden immer in der ursprünglich angelegten Zeit angezeigt und nicht angepasst.",
+    "timeZones": {
+      "Europe/Berlin": "Berlin",
+      "Europe/London": "London",
+      "Europe/Paris": "Paris",
+      "UTC": "UTC",
+      "America/New_York": "New York",
+      "America/Los_Angeles": "Los Angeles",
+      "Asia/Tokyo": "Tokio"
+    },
+    "faqSettings": "FAQ Einstellungen",
+    "showFaqSection": "FAQ-Bereich auf der Startseite anzeigen",
+    "faqCollectionName": "Angezeigte FAQ-Sammlung",
+    "faqCollectionPlaceholder": "FAQ-Sammlung auswählen",
     "save": "Speichern",
     "saving": "Speichern...",
-    "banner": {
-      "label": "Banner Einstellungen",
-      "background_color": "News Banner Hintergrundfarbe",
-      "fontColor": "News Banner Textfarbe",
-      "text_de": "News Banner Text DE",
-      "text_en": "News Banner Text EN"
-    },
-    "course_group_options": "Kursgruppierungen Reihenfolge",
+    "loading": "Wird geladen...",
+    "errorSavingSettings": "Beim Speichern der Einstellungen ist ein Fehler aufgetreten. Bitte versuche es erneut.",
     "course_groups": {
       "label": "Kursgruppierungen",
       "help_text": "Lege fest, welche Kursgruppierungen es gibt und in welcher Reihenfolge die als Slider markierten Gruppen auf der Startseite erscheinen. Die Gruppen \"Courses\", \"Events\" und \"Degrees\" werden automatisch aus den veröffentlichten Angeboten des jeweiligen Programmtyps befüllt. Zusätzliche Gruppen können angelegt und in einem Org-Widget ausgewählt werden, ohne auf der Startseite zu erscheinen.",
@@ -1841,25 +1945,6 @@
       "loading": "Wird geladen...",
       "error_loading": "Die Kursgruppierungen konnten nicht geladen werden."
     },
-    "faq": {
-      "label": "FAQ Einstellungen",
-      "show_section": "FAQ-Bereich auf der Startseite anzeigen",
-      "collection_name": "Angezeigte FAQ-Sammlung",
-      "collection_placeholder": "FAQ-Sammlung auswählen"
-    },
-    "time_zone": {
-      "label": "Zeitzone",
-      "values": {
-        "Europe/Berlin": "Berlin",
-        "Europe/London": "London",
-        "Europe/Paris": "Paris",
-        "UTC": "UTC",
-        "America/New_York": "New York",
-        "America/Los_Angeles": "Los Angeles",
-        "Asia/Tokyo": "Tokio"
-      },
-      "help_text": "Die Zeitzone wird verwendet, um die Datums- und Uhrzeiten in der Anwendung anzuzeigen. Generelle Zeiten wie die wiederkehrende Kurszeit, die nicht an einen konkreten Tag gebunden sind, werden immer in der ursprünglich angelegten Zeit angezeigt und nicht angepasst."
-    },
     "projectDocumentationInstructions": {
       "section_label": "Projekt-Dokumentationsanleitungen",
       "section_help": "Verwalte die PDF-Anleitungen, die Teilnehmenden beim Vorschlagen und Bearbeiten von Projekten angezeigt werden. Einträge ohne PDF bleiben hier sichtbar, damit du sie hochladen oder löschen kannst; in den Projektdialogen der Kurse sind sie erst nach dem Upload verfügbar. Genau eine Anleitung pro Projekttyp ist die Standard-Anleitung; diese wird automatisch ausgewählt, sobald eine Lehrperson den Projekttyp eines Projekts ändert.",
@@ -1876,6 +1961,7 @@
         "title": "Titel",
         "pdf": "PDF",
         "upload": "Hochladen",
+        "usage": "Verwendet in",
         "default": "Standard",
         "actions": "Aktionen"
       },
@@ -1892,14 +1978,37 @@
       },
       "delete_dialog": {
         "title": "Dokumentationsanleitung löschen",
-        "question": "„{title}“ löschen? Alle Projekte, die noch darauf verweisen, müssen vorher bearbeitet werden.",
+        "question": "„{title}“ wirklich löschen? In allen Projekten, die diese Anleitung nutzen, wird die Standard-Anleitung für den jeweiligen Projekttyp gesetzt.",
         "confirm": "Löschen"
       },
       "error": {
         "duplicate_title": "Eine Anleitung mit diesem Titel existiert bereits.",
         "set_default_failed": "Standard konnte nicht geändert werden. Bitte erneut versuchen.",
+        "delete_failed": "Die Anleitung konnte nicht gelöscht werden.",
         "pdf_upload_failed": "Das PDF konnte nicht hochgeladen werden. Die Anleitung wurde nicht gespeichert.",
         "create_failed": "Die Anleitung konnte nicht angelegt werden."
+      }
+    },
+    "projectTypes": {
+      "help_text": "Lege die Standard-Leistungszertifikat-Vorlage und die Standard-Dokumentationsanleitung für jeden Projekttyp fest.",
+      "manage_instructions_link": "Dokumentationsanleitungen verwalten",
+      "none_option": "(keine)",
+      "no_instructions": "Noch keine Anleitungen",
+      "column": {
+        "project_type": "Projekttyp",
+        "achievement_template": "Leistungszertifikat-Vorlage",
+        "default_instruction": "Standard-Dokumentationsanleitung"
+      }
+    },
+    "attendanceCertificates": {
+      "loading": "Zertifikat-Vorlagen werden geladen…",
+      "load_error": "Die Zertifikat-Vorlagen konnten nicht geladen werden.",
+      "html_editor": {
+        "label": "HTML-Vorlagen für Teilnahmezertifikate",
+        "help_text": "Bearbeite das in der Datenbank gespeicherte Jinja2-HTML.",
+        "template_select": "Vorlage",
+        "no_templates": "Keine Zertifikat-Vorlagen gefunden.",
+        "preview_label": "A4-Vorschau (Beispieldaten)"
       }
     },
     "default_attendance_certificate_template": {
@@ -1910,13 +2019,13 @@
     "programTypes": {
       "COURSES": "Kurse",
       "EVENTS": "Veranstaltungen",
-      "DEGREES": "Degrees"
+      "DEGREES": "Studiengänge"
     },
     "onboarding": {
       "label": "Onboarding-Texte",
       "courses_label": "Kurse",
       "events_label": "Veranstaltungen",
-      "degrees_label": "Degrees",
+      "degrees_label": "Studiengänge",
       "text_de": "Text (Deutsch)",
       "text_en": "Text (Englisch)",
       "preview": "Vorschau",
@@ -2178,6 +2287,9 @@
     "default_templates_explanation": "Dies sind die Standard-E-Mail-Vorlagen, die app-weit verwendet werden. Du kannst auch kurs-spezifische Vorlagen in der Kursverwaltung definieren, indem du auf den entsprechenden Button in der erweiterbaren Zeile des Kurses klickst.",
     "course_specific_explanation": "Diese E-Mail-Vorlagen sind spezifisch für diesen Kurs und überschreiben die Standard-Vorlagen beim Versenden von E-Mails für diesen Kurs.",
     "back_to_courses": "Zurück zu Kursen",
+    "editor": {
+      "not_found": "E-Mail-Vorlage nicht gefunden."
+    },
     "columns": {
       "title": "Vorlagen-Typ",
       "subject": "E-Mail-Betreffzeile",
@@ -2223,7 +2335,19 @@
       "ORGANIZER_ADDED": "Gesendet, wenn ein Benutzer als Organisator zu einem Kurs oder Event hinzugefügt wird"
     },
     "delete_confirmation": "Bist du sicher, dass du die E-Mail-Vorlage '{title}' löschen möchtest?",
-    "unknown_trigger": "Unbekannter Auslöser-Typ"
+    "unknown_trigger": "Unbekannter Auslöser-Typ",
+    "categories": {
+      "all": "Alle",
+      "application": "Bewerbungsprozess",
+      "projects": "Projekt-Benachrichtigungen",
+      "sessions": "Termin-Erinnerungen",
+      "system": "System-E-Mails",
+      "other": "Sonstige"
+    },
+    "category_coming_soon": "Bald",
+    "categories_coming_soon_explanation": {
+      "projects": "Vorlagen für Projekt-Statusupdates erscheinen hier, sobald Projekt-Benachrichtigungen verfügbar sind."
+    }
   },
   "manageAchievementTemplates": {
     "error": {
@@ -2285,8 +2409,101 @@
     "sponsored_by": "Gefördert durch:",
     "dlc_logo_alt": "DLC-Logo",
     "foerder_logo_alt": "Förderlogos",
+    "kiel_sailing_city_logo_alt": "Logo Kiel. Sailing. City.",
     "mastodon_alt": "Mastodon",
     "linkedin_alt": "LinkedIn",
     "instagram_alt": "Instagram"
+  },
+  "manageSettings": {
+    "title": "Einstellungen",
+    "subtitle": "Plattformweite Konfiguration. Änderungen werden sofort wirksam.",
+    "back_to_settings": "Zurück zu den Einstellungen",
+    "access_denied": "Du hast keine Berechtigung, auf diese Seite zuzugreifen.",
+    "overview_lead": "Wähle einen Bereich, um plattformweite Voreinstellungen und Inhalte zu konfigurieren.",
+    "nav": {
+      "mobile_label": "Einstellungsbereich",
+      "groups": {
+        "platform": "Plattform",
+        "notifications": "Benachrichtigungen",
+        "programs": "Programme",
+        "system": "System"
+      },
+      "items": {
+        "appearance": {
+          "label": "Erscheinungsbild",
+          "description": "Farben und Texte des News-Banners"
+        },
+        "homepage": {
+          "label": "Startseiten-Inhalte",
+          "description": "FAQ-Bereich auf der Startseite"
+        },
+        "emails": {
+          "label": "E-Mail-Vorlagen",
+          "description": "Automatische E-Mails an Teilnehmende und Kursleitungen"
+        },
+        "programs": {
+          "label": "Programme verwalten",
+          "description": "Programme anlegen, bearbeiten und veröffentlichen"
+        },
+        "attendance-certificates": {
+          "label": "Teilnahmezertifikate",
+          "description": "HTML-Vorlagen und Programmtyp-Voreinstellungen für Teilnahmezertifikate"
+        },
+        "project-types": {
+          "label": "Projekttypen",
+          "description": "Standard-Leistungszertifikate und Dokumentationsanleitungen pro Projekttyp"
+        },
+        "documentation-instructions": {
+          "label": "Dokumentationsanleitungen",
+          "description": "PDF-Anleitungen verwalten, die Projekten zugeordnet werden"
+        },
+        "onboarding-texts": {
+          "label": "Onboarding-Texte",
+          "description": "Texte während des Teilnehmer-Onboardings"
+        },
+        "course-groups": {
+          "label": "Kursgruppen",
+          "description": "Reihenfolge und Sichtbarkeit der Kursgruppen auf der Startseite"
+        },
+        "time-zone": {
+          "label": "Zeitzone",
+          "description": "Standard-Zeitzone für Datums- und Zeitangaben"
+        },
+        "access": {
+          "label": "Zugriff & Rollen",
+          "description": "Admin-Nutzer und Organisationsrollen"
+        }
+      }
+    },
+    "groups": {
+      "appearance": {
+        "label": "Erscheinungsbild",
+        "description": "Farben und Texte des News-Banners"
+      },
+      "homepage": {
+        "label": "Startseiten-Inhalte",
+        "description": "Kursgruppen und FAQ-Bereich"
+      },
+      "emails": {
+        "label": "E-Mail-Benachrichtigungen",
+        "description": "Automatische E-Mails an Teilnehmende und Kursleitungen"
+      },
+      "programDefaults": {
+        "label": "Programm-Voreinstellungen",
+        "description": "Zertifikate, Projektdokumentation und Onboarding-Texte"
+      },
+      "system": {
+        "label": "System",
+        "description": "Zeitzone und Plattform-Interna"
+      },
+      "access": {
+        "label": "Zugriff & Rollen",
+        "description": "Festlegen, welche Rollen auf welche Einstellungen zugreifen können"
+      }
+    },
+    "access": {
+      "superadmin_only": "Nur Super-Admin",
+      "coming_soon": "Bald verfügbar"
+    }
   }
 }

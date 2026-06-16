@@ -127,7 +127,7 @@ const ManageUsersContent: FC = () => {
           <div>
             <div className="flex justify-between items-center mb-4">
               <CommonPageHeader headline={t('headline')} />
-              <NavigationButton href="/manage/admin-users" filled inverted>
+              <NavigationButton href="/manage/settings/access" filled inverted>
                 {t('manage_admins')}
               </NavigationButton>
             </div>
