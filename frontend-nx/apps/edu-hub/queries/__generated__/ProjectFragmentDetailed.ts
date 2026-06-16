@@ -140,10 +140,10 @@ export interface ProjectFragmentDetailed_ProjectConsentEvents_ActorUser {
 export interface ProjectFragmentDetailed_ProjectConsentEvents {
   __typename: "ProjectConsentEvent";
   id: number;
-  event_type: string;
-  actor_user_id: any;
+  eventType: string;
+  actorUserId: any;
   created_at: any;
-  terms_version: string;
+  termsVersion: string;
   /**
    * An object relationship
    */

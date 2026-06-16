@@ -10,9 +10,9 @@
 export interface InsertProjectConsentEvent_insert_ProjectConsentEvent_one {
   __typename: "ProjectConsentEvent";
   id: number;
-  event_type: string;
+  eventType: string;
   created_at: any;
-  terms_version: string;
+  termsVersion: string;
 }
 
 export interface InsertProjectConsentEvent {

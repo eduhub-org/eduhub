@@ -51,7 +51,7 @@ array_relationships:
   - name: ProjectConsentEvents
     using:
       foreign_key_constraint_on:
-        column: project_id
+        column: projectId
         table:
           name: ProjectConsentEvent
           schema: public

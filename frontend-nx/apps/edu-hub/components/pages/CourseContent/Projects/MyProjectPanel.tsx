@@ -271,8 +271,9 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
     async (excludedAuthorIds: number[], consentGranted: boolean) => {
       setSubmitInProgress(true);
       // Track which co-authors we actually moved to EXCLUDED so we can roll
-      // them back if a later step fails (these mutations are not in one tx).
+      // them back if the submission itself fails (these mutations are not in one tx).
       const applied: number[] = [];
+      let submitted = false;
       try {
         // Mark unchecked co-authors EXCLUDED first (while still an ACCEPTED
         // author of an ONGOING project, which the Hasura permission requires),
@@ -289,30 +290,37 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
         await submitProject({
           variables: { itemId: project.id },
         });
+        submitted = true;
         if (consentGranted) {
-          await insertConsentEvent({
-            variables: {
-              projectId: project.id,
-              eventType: 'granted',
-              termsVersion: 'v1',
-            },
-          });
+          // Consent insertion is best-effort: a failure here must NOT roll back
+          // the exclusions — the project is already SUBMITTED at this point.
+          try {
+            await insertConsentEvent({
+              variables: {
+                projectId: project.id,
+                eventType: 'granted',
+                termsVersion: 'v1',
+              },
+            });
+          } catch (err) {
+            onActionError(err instanceof Error ? err.message : t('projects.action_failed'));
+          }
         }
         setSubmitDialogOpen(false);
       } catch (err) {
-        // Submission (or one of the exclusions) failed partway. Restore the
-        // co-authors we already excluded back to ACCEPTED so we never leave a
-        // team member excluded on a project that was not actually submitted.
-        await Promise.all(
-          applied.map((authorId) =>
-            updateAuthorParticipationStatus({
-              variables: {
-                id: authorId,
-                value: ProjectParticipationStatus_enum.ACCEPTED,
-              },
-            }).catch(() => undefined)
-          )
-        );
+        if (!submitted) {
+          // Restore co-authors only when the submission itself never went through.
+          await Promise.all(
+            applied.map((authorId) =>
+              updateAuthorParticipationStatus({
+                variables: {
+                  id: authorId,
+                  value: ProjectParticipationStatus_enum.ACCEPTED,
+                },
+              }).catch(() => undefined)
+            )
+          );
+        }
         onActionError(err instanceof Error ? err.message : t('projects.action_failed'));
       } finally {
         setSubmitInProgress(false);
@@ -389,7 +397,7 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
     : null;
 
   const latestConsentEvent = project.ProjectConsentEvents?.[0] ?? null;
-  const publicationConsented = latestConsentEvent?.event_type === 'granted';
+  const publicationConsented = latestConsentEvent?.eventType === 'granted';
 
   const handleConsentToggle = useCallback(async () => {
     try {

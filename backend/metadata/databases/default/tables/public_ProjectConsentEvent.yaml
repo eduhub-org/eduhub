@@ -4,14 +4,14 @@ table:
 object_relationships:
   - name: ActorUser
     using:
-      foreign_key_constraint_on: actor_user_id
+      foreign_key_constraint_on: actorUserId
   - name: Project
     using:
-      foreign_key_constraint_on: project_id
+      foreign_key_constraint_on: projectId
 insert_permissions:
   # Any ACCEPTED author may insert a consent event for their own project.
-  # actor_user_id is always stamped server-side from the session; clients supply
-  # project_id, event_type ('granted'|'withdrawn'), and terms_version.
+  # actorUserId is always stamped server-side from the session; clients supply
+  # projectId, eventType ('granted'|'withdrawn'), and termsVersion.
   - role: user_access
     permission:
       check:
@@ -23,11 +23,11 @@ insert_permissions:
               - userId:
                   _eq: X-Hasura-User-Id
       set:
-        actor_user_id: x-hasura-user-id
+        actorUserId: x-hasura-user-id
       columns:
-        - project_id
-        - event_type
-        - terms_version
+        - projectId
+        - eventType
+        - termsVersion
 select_permissions:
   # Team members (ACCEPTED or EXCLUDED) may read consent events for their project.
   # Enrolled non-authors must not see consent events.
@@ -35,11 +35,11 @@ select_permissions:
     permission:
       columns:
         - id
-        - project_id
-        - event_type
-        - actor_user_id
+        - projectId
+        - eventType
+        - actorUserId
         - created_at
-        - terms_version
+        - termsVersion
       filter:
         Project:
           ProjectAuthors:
@@ -55,11 +55,11 @@ select_permissions:
     permission:
       columns:
         - id
-        - project_id
-        - event_type
-        - actor_user_id
+        - projectId
+        - eventType
+        - actorUserId
         - created_at
-        - terms_version
+        - termsVersion
       filter:
         Project:
           ProjectCourses:
@@ -73,9 +73,9 @@ select_permissions:
     permission:
       columns:
         - id
-        - project_id
-        - event_type
-        - actor_user_id
+        - projectId
+        - eventType
+        - actorUserId
         - created_at
-        - terms_version
+        - termsVersion
       filter: {}
