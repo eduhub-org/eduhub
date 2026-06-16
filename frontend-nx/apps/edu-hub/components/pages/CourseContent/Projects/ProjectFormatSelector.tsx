@@ -8,6 +8,7 @@ import {
   ONLINE_COURSE_TYPE_VALUE,
   ProjectRequirementFlags,
   ProjectRequirementKey,
+  REQUIREMENT_I18N_KEY,
   flagsOfProjectType,
   resolveClassicProjectType,
 } from './projectTypeRequirements';
@@ -174,14 +175,14 @@ const ProjectFormatSelector: FC<ProjectFormatSelectorProps> = ({
                   suppressFeedback
                   disabled={disabled}
                   checked={classicFlags[key]}
-                  label={t(`projects.requirements.${key}.label` as never)}
-                  helpText={t(`projects.requirements.${key}.help` as never)}
+                  label={t(`projects.requirements.${REQUIREMENT_I18N_KEY[key]}.label` as never)}
+                  helpText={t(`projects.requirements.${REQUIREMENT_I18N_KEY[key]}.help` as never)}
                   onValueUpdated={(checked: boolean) => handleClassicToggle(key, checked)}
                 />
               ))}
             </div>
             {classicInvalid ? (
-              <p className="mt-2 text-xs text-error">
+              <p className="mt-2 text-xs text-status-error">
                 {t('projects.requirements.classic_invalid_combination')}
               </p>
             ) : null}

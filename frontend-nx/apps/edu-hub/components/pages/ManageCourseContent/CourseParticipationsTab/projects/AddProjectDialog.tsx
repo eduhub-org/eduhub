@@ -204,10 +204,32 @@ const AddProjectDialog: FC<AddProjectDialogProps> = ({
     }
     if (catalogSeededRef.current || projectTypes.length === 0) return;
     catalogSeededRef.current = true;
-    setType(
-      (current) => current || resolveInitialProjectType(defaultProjectType, projectTypes)
-    );
-  }, [open, projectTypes, defaultProjectType]);
+    const seededType =
+      type || resolveInitialProjectType(defaultProjectType, projectTypes);
+    setType((current) => current || seededType);
+    // Preserve the carried-over instruction (lost otherwise, since reset() ran
+    // before the catalog resolved the type); fall back to the type's default.
+    setInstructionId((current) => {
+      if (current || !seededType) return current;
+      if (
+        defaultDocumentationInstructionId != null &&
+        seededType === defaultProjectType
+      ) {
+        return String(defaultDocumentationInstructionId);
+      }
+      const nextDefault = documentationInstructions.find(
+        (inst) => inst.projectTypeValue === seededType && inst.isDefault
+      );
+      return nextDefault ? String(nextDefault.id) : '';
+    });
+  }, [
+    open,
+    projectTypes,
+    type,
+    defaultProjectType,
+    defaultDocumentationInstructionId,
+    documentationInstructions,
+  ]);
 
   const handleClose = useCallback(() => {
     reset();

@@ -6,6 +6,7 @@ import {
   ONLINE_COURSE_TYPE_VALUE,
   PROJECT_REQUIREMENT_KEYS,
   ProjectRequirementKey,
+  REQUIREMENT_I18N_KEY,
   flagsOfProjectType,
   getMatchingProjectTypes,
   resolveProjectTypeFromRequirements,
@@ -96,8 +97,8 @@ const ProjectTypeRequirementSelector: FC<ProjectTypeRequirementSelectorProps> = 
             suppressFeedback
             disabled={disabled}
             checked={requirements[key]}
-            label={t(`projects.requirements.${key}.label` as never)}
-            helpText={t(`projects.requirements.${key}.help` as never)}
+            label={t(`projects.requirements.${REQUIREMENT_I18N_KEY[key]}.label` as never)}
+            helpText={t(`projects.requirements.${REQUIREMENT_I18N_KEY[key]}.help` as never)}
             onValueUpdated={(checked: boolean) => handleToggle(key, checked)}
           />
         ))}

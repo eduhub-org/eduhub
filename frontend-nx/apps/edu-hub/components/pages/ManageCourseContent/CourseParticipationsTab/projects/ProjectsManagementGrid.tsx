@@ -19,6 +19,7 @@ import FileUploadField from '../../../../inputs/FileUploadField';
 import ProjectTypeRequirementSelector from '../../../CourseContent/Projects/ProjectTypeRequirementSelector';
 import {
   PROJECT_REQUIREMENT_KEYS,
+  REQUIREMENT_I18N_KEY,
   flagsOfProjectType,
 } from '../../../CourseContent/Projects/projectTypeRequirements';
 import { UserSelectionWithFilter_User } from '../../../../../queries/__generated__/UserSelectionWithFilter';
@@ -187,11 +188,11 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
     [projectTypesQuery.data?.ProjectType]
   );
 
-  const documentationInstructionOptions = useMemo(
+  const documentationInstructionsWithPdf = useMemo(
     () =>
       filterProjectDocumentationInstructionsWithPdf(
         documentationInstructionsQuery.data?.ProjectDocumentationInstruction ?? []
-      ).map((tpl) => ({ value: String(tpl.id), label: tpl.title })),
+      ),
     [documentationInstructionsQuery.data?.ProjectDocumentationInstruction]
   );
 
@@ -298,12 +299,28 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
       // Skip persistence while the checked deliverables match no catalog type.
       if (!value) return;
       try {
-        await updateProjectType({ variables: { itemId: projectId, value } });
+        // Reset the instruction to the new type's default so type and
+        // documentationInstructionId stay consistent (the DB trigger rejects a
+        // mismatch). Mirrors the Add/Confirm dialog behaviour.
+        const defaultInstruction = (
+          documentationInstructionsQuery.data?.ProjectDocumentationInstruction ?? []
+        ).find((inst) => inst.projectTypeValue === value && inst.isDefault);
+        await updateProjectType({
+          variables: {
+            itemId: projectId,
+            value,
+            documentationInstructionId: defaultInstruction?.id ?? null,
+          },
+        });
       } catch (err) {
         setErrorMessage(err instanceof Error ? err.message : tCommon('error'));
       }
     },
-    [updateProjectType, tCommon]
+    [
+      updateProjectType,
+      documentationInstructionsQuery.data?.ProjectDocumentationInstruction,
+      tCommon,
+    ]
   );
 
   const columns = useMemo<ColumnDef<ProjectRow>[]>(
@@ -373,7 +390,7 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
           const projectType = projectTypesList.find((pt) => pt.value === typeValue);
           const deliverables = projectType
             ? PROJECT_REQUIREMENT_KEYS.filter((key) => flagsOfProjectType(projectType)[key]).map(
-                (key) => t(`projects.requirements.${key}.short` as never)
+                (key) => t(`projects.requirements.${REQUIREMENT_I18N_KEY[key]}.short` as never)
               )
             : [];
           return (
@@ -632,8 +649,14 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
         </div>
       );
 
+      // Scope instructions to the row's project type so the instructor cannot
+      // pick one for a different type (the DB trigger would reject it).
+      const rowInstructionOptions = documentationInstructionsWithPdf
+        .filter((tpl) => !row.type || tpl.projectTypeValue === row.type)
+        .map((tpl) => ({ value: String(tpl.id), label: tpl.title }));
+
       const documentationInstructionSelector =
-        documentationInstructionOptions.length > 0 ? (
+        rowInstructionOptions.length > 0 ? (
           <div className="[&_.col-span-10]:!mt-0">
             <DropDownSelector
               variant="material"
@@ -643,7 +666,7 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
                   ? String(row.documentationInstructionId)
                   : ''
               }
-              options={documentationInstructionOptions}
+              options={rowInstructionOptions}
               nullable
               nullableLabel={tCourse('projects.my_project.documentation_instruction_none')}
               updateValueMutation={UPDATE_PROJECT_DOCUMENTATION_INSTRUCTION}
@@ -832,7 +855,7 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
       );
     },
     [
-      documentationInstructionOptions,
+      documentationInstructionsWithPdf,
       handleCoverUploadError,
       handleRemoveMentor,
       handleSetProjectType,

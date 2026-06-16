@@ -16,6 +16,18 @@ export type ProjectRequirementKey = (typeof PROJECT_REQUIREMENT_KEYS)[number];
 export type ProjectRequirementFlags = Record<ProjectRequirementKey, boolean>;
 
 /**
+ * Maps each camelCase requirement flag (a `ProjectType` column name) to its
+ * snake_case translation key segment under `manageCourse.projects.requirements`
+ * (locale keys follow snake_case convention).
+ */
+export const REQUIREMENT_I18N_KEY: Record<ProjectRequirementKey, string> = {
+  requiresDocumentation: 'requires_documentation',
+  requiresExternalUrl: 'requires_external_url',
+  requiresPresentation: 'requires_presentation',
+  requiresCoverImage: 'requires_cover_image',
+};
+
+/**
  * Catalog value of the online-course project type. It shares its deliverable
  * flags with CLASSIC_PROJECT (documentation only), so the two can only be told
  * apart by an explicit choice. Used as the default when a documentation-only

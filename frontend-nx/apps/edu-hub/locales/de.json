@@ -1397,22 +1397,22 @@
       "requirements": {
         "section_label": "Erforderliche Abgaben",
         "section_help": "Wähle aus, was Teilnehmende für dieses Projekt einreichen müssen. Die gewählte Kombination bestimmt den Projekttyp.",
-        "requiresDocumentation": {
+        "requires_documentation": {
           "label": "Projektdokumentation (PDF-Upload)",
           "help": "Teilnehmende müssen eine schriftliche Projektdokumentation hochladen.",
           "short": "Dokumentation"
         },
-        "requiresExternalUrl": {
+        "requires_external_url": {
           "label": "Externer Link (z. B. Repository oder Live-Demo)",
           "help": "Teilnehmende müssen einen externen Link angeben, z. B. zu einem Repository oder einer Live-Demo.",
           "short": "Externer Link"
         },
-        "requiresPresentation": {
+        "requires_presentation": {
           "label": "Präsentations-Upload",
           "help": "Teilnehmende müssen eine Präsentation hochladen.",
           "short": "Präsentation"
         },
-        "requiresCoverImage": {
+        "requires_cover_image": {
           "label": "Titelbild",
           "help": "Teilnehmende müssen ein Titelbild hochladen (wird auch für die Veröffentlichung im Schaufenster genutzt).",
           "short": "Titelbild"
@@ -1695,7 +1695,7 @@
       "intro": "Lege fest, wie Teilnehmende ein Projekt für den Leistungsnachweis erhalten. Du kannst eine oder beide Optionen nutzen.",
       "option_templates": {
         "title": "Projektvorlagen definieren",
-        "help": "Erstelle unten über „Projekt hinzufügen\" eine oder ggf. mehrere präzise beschriebene Projekte. Teilnehmende können dann genau eines auswählen und bearbeiten."
+        "help": "Erstelle unten über „Projekt hinzufügen“ eine oder ggf. mehrere präzise beschriebene Projekte. Teilnehmende können dann genau eines auswählen und bearbeiten."
       },
       "option_propose": {
         "title": "Teilnehmende eigene Projekte vorschlagen lassen",

@@ -25,7 +25,7 @@ const InstructionDownloadButton: FC<InstructionDownloadButtonProps> = ({
   const t = useTranslations('manageCourse');
   const href = safeProjectInstructionHref(url);
   const label = t('projects.add_dialog.instruction_open');
-  const baseClass = `inline-flex h-10 w-10 shrink-0 items-center justify-center rounded border border-border-primary text-label-secondary ${className}`;
+  const baseClass = `inline-flex h-11 w-11 shrink-0 items-center justify-center rounded border border-border-primary text-label-secondary touch-manipulation ${className}`;
 
   if (disabled || !href) {
     return (

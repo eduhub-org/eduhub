@@ -1415,22 +1415,22 @@
       "requirements": {
         "section_label": "Required submission deliverables",
         "section_help": "Check what students must submit for this project. The selected combination determines the project type.",
-        "requiresDocumentation": {
+        "requires_documentation": {
           "label": "Project documentation (PDF upload)",
           "help": "Students must upload a written project documentation.",
           "short": "Documentation"
         },
-        "requiresExternalUrl": {
+        "requires_external_url": {
           "label": "External link (e.g. repository or live demo)",
           "help": "Students must provide an external link, for example to a repository or a live demo.",
           "short": "External link"
         },
-        "requiresPresentation": {
+        "requires_presentation": {
           "label": "Presentation upload",
           "help": "Students must upload a presentation.",
           "short": "Presentation"
         },
-        "requiresCoverImage": {
+        "requires_cover_image": {
           "label": "Cover image",
           "help": "Students must upload a cover image (also used for showcase publication).",
           "short": "Cover image"
