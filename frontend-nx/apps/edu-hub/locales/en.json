@@ -1419,7 +1419,9 @@
         "submit_button": "Create",
         "error_title_required": "Please enter a project title.",
         "error_type_required": "Please select a project type.",
-        "error_instruction_required": "Please select documentation instructions."
+        "error_instruction_required": "Please select documentation instructions.",
+        "error_author_already_in_project": "{name} already belongs to an active project in this course and can't be added to another one.",
+        "error_author_conflict_generic": "One or more selected authors already belong to an active project in this course and can't be added to another one."
       }
     },
     "attendance_cert_issued": "Attendance certificate issued",

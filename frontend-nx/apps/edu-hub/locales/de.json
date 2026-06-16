@@ -1401,7 +1401,9 @@
         "submit_button": "Anlegen",
         "error_title_required": "Bitte gib einen Projekttitel an.",
         "error_type_required": "Bitte wähle einen Projekttyp aus.",
-        "error_instruction_required": "Bitte wähle eine Dokumentationsanleitung aus."
+        "error_instruction_required": "Bitte wähle eine Dokumentationsanleitung aus.",
+        "error_author_already_in_project": "{name} ist in diesem Kurs bereits einem aktiven Projekt zugeordnet und kann keinem weiteren hinzugefügt werden.",
+        "error_author_conflict_generic": "Mindestens eine:r der ausgewählten Autor:innen ist in diesem Kurs bereits einem aktiven Projekt zugeordnet und kann keinem weiteren hinzugefügt werden."
       }
     },
     "attendance_cert_issued": "Teilnahmebescheinigung ausgestellt",

@@ -24,9 +24,14 @@ interface AddProjectDialogProps {
   courseId: number;
   instructorUserId: string;
   defaultProjectType: string | null;
+  blockedAuthorIds: Set<string>;
   refetchQueries: string[];
   onError: (msg: string) => void;
 }
+
+const isAuthorConflictError = (message: string): boolean =>
+  message.includes('user_already_has_active_accepted_project_in_course') ||
+  message.includes('postgres tx error');
 
 const AddProjectDialog: FC<AddProjectDialogProps> = ({
   open,
@@ -34,6 +39,7 @@ const AddProjectDialog: FC<AddProjectDialogProps> = ({
   courseId,
   instructorUserId,
   defaultProjectType,
+  blockedAuthorIds,
   refetchQueries,
   onError,
 }) => {
@@ -167,6 +173,17 @@ const AddProjectDialog: FC<AddProjectDialogProps> = ({
     onClose();
   }, [onClose, reset]);
 
+  const reportAuthorConflict = useCallback(
+    (user: Pick<UserSelectionWithFilter_User, 'firstName' | 'lastName'>) => {
+      onError(
+        t('projects.add_dialog.error_author_already_in_project', {
+          name: makeFullName(user.firstName, user.lastName),
+        })
+      );
+    },
+    [onError, t]
+  );
+
   const handleSubmit = useCallback(async () => {
     if (!titleTrimmed) {
       onError(t('projects.add_dialog.error_title_required'));
@@ -178,6 +195,11 @@ const AddProjectDialog: FC<AddProjectDialogProps> = ({
     }
     if (!instructionId) {
       onError(t('projects.add_dialog.error_instruction_required'));
+      return;
+    }
+    const conflictingAuthor = authors.find((a) => blockedAuthorIds.has(a.id));
+    if (conflictingAuthor) {
+      reportAuthorConflict(conflictingAuthor);
       return;
     }
     try {
@@ -197,16 +219,23 @@ const AddProjectDialog: FC<AddProjectDialogProps> = ({
       reset();
       onClose();
     } catch (err) {
-      onError(err instanceof Error ? err.message : tCommon('error'));
+      const message = err instanceof Error ? err.message : '';
+      if (message && isAuthorConflictError(message)) {
+        onError(t('projects.add_dialog.error_author_conflict_generic'));
+        return;
+      }
+      onError(message || tCommon('error'));
     }
   }, [
     authors,
+    blockedAuthorIds,
     courseId,
     insertProject,
     instructionId,
     instructorUserId,
     onClose,
     onError,
+    reportAuthorConflict,
     reset,
     t,
     tCommon,
@@ -218,11 +247,15 @@ const AddProjectDialog: FC<AddProjectDialogProps> = ({
     (confirmed: boolean, user: UserSelectionWithFilter_User | null) => {
       setSelectAuthorOpen(false);
       if (!confirmed || !user) return;
+      if (blockedAuthorIds.has(user.id)) {
+        reportAuthorConflict(user);
+        return;
+      }
       setAuthors((prev) =>
         prev.some((a) => a.id === user.id) ? prev : [...prev, user]
       );
     },
-    []
+    [blockedAuthorIds, reportAuthorConflict]
   );
 
   const handleRemoveAuthor = useCallback((userId: unknown) => {

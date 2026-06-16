@@ -130,6 +130,27 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
 
   const allProjects = projectsQuery.data?.Project ?? [];
 
+  const blockedAuthorIds = useMemo(() => {
+    const activeStatuses = new Set([
+      ProjectStatus_enum.PROPOSED,
+      ProjectStatus_enum.ONGOING,
+      ProjectStatus_enum.SUBMITTED,
+    ]);
+    const ids = new Set<string>();
+    for (const p of projectsQuery.data?.Project ?? []) {
+      if (!activeStatuses.has(p.status)) continue;
+      for (const a of p.ProjectAuthors ?? []) {
+        if (
+          a.participationStatus === ProjectParticipationStatus_enum.ACCEPTED &&
+          a.userId
+        ) {
+          ids.add(a.userId);
+        }
+      }
+    }
+    return ids;
+  }, [projectsQuery.data?.Project]);
+
   /** Counts course projects whose parentProjectId points at a template (same course list). */
   const templateCopyCountByParentId = useMemo(() => {
     const counts = new Map<number, number>();
@@ -844,6 +865,7 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
           courseId={courseId}
           instructorUserId={instructorUserId}
           defaultProjectType={programDefaultProjectType}
+          blockedAuthorIds={blockedAuthorIds}
           refetchQueries={REFETCH_QUERIES}
           onError={setErrorMessage}
         />
