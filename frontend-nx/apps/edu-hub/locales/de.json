@@ -1379,6 +1379,7 @@
         "title_placeholder": "Projekttitel",
         "instruction_label": "Dokumentationsanleitung",
         "instruction_placeholder": "Dokumentationsanleitung auswählen",
+        "instruction_open": "Ausgewählte Anleitung in neuem Tab öffnen",
         "instruction_info": "Dokumentationsanleitungen sind PDF-Dateien, die beschreiben, wie die Projektdokumentation (oder ein anderes verpflichtendes Abgabedokument) verfasst sein soll. In manchen Fällen – z. B. bei den Reflexionsfragebögen für Online-Kurse – ist das PDF direkt ausfüllbar.",
         "authors_label": "Autor:innen",
         "add_author": "Autor:in hinzufügen",
@@ -1416,6 +1417,23 @@
           "help": "Teilnehmende müssen ein Titelbild hochladen (wird auch für die Veröffentlichung im Schaufenster genutzt).",
           "short": "Titelbild"
         },
+        "format": {
+          "label": "Projektformat",
+          "classic": {
+            "label": "Klassisches Projekt",
+            "help": "Teilnehmende bilden ein Team, das Du vor Arbeitsbeginn bestätigst, und reichen die unten gewählten Abgaben ein."
+          },
+          "online": {
+            "label": "Online-Kurs",
+            "help": "Verkürzter Ablauf: Teilnehmende nehmen einzeln teil – eine Team-Bestätigung ist nicht erforderlich."
+          }
+        },
+        "section_help_classic": "Wähle aus, was Teilnehmende für dieses Projekt einreichen müssen.",
+        "self_reflection": {
+          "label": "Selbstreflexions-Fragebogen",
+          "help": "Teilnehmende füllen den Selbstreflexions-Fragebogen aus (ein direkt ausfüllbares PDF in der Dokumentationsanleitung)."
+        },
+        "classic_invalid_combination": "Wähle mindestens einen externen Link oder eine Präsentation aus – nur eine Dokumentation ist für ein klassisches Projekt nicht möglich.",
         "invalid_combination": "Diese Kombination von Anforderungen ist nicht verfügbar. Passe Deine Auswahl an.",
         "type_choice": {
           "label": "Projektformat",
@@ -1677,15 +1695,13 @@
       "intro": "Lege fest, wie Teilnehmende ein Projekt für den Leistungsnachweis erhalten. Du kannst eine oder beide Optionen nutzen.",
       "option_templates": {
         "title": "Projektvorlagen definieren",
-        "help": "Erstelle unten über „Projekt hinzufügen\" eine oder mehrere präzise beschriebene Projektaufgaben. Teilnehmende wählen eine Vorlage und bearbeiten diese definierte Aufgabe."
+        "help": "Erstelle unten über „Projekt hinzufügen\" eine oder ggf. mehrere präzise beschriebene Projekte. Teilnehmende können dann genau eines auswählen und bearbeiten."
       },
       "option_propose": {
         "title": "Teilnehmende eigene Projekte vorschlagen lassen",
-        "help": "Wenn aktiviert, können Teilnehmende eigene, offene Projektideen vorschlagen, die Du anschließend bestätigst."
+        "help": "Wenn aktiviert, können Teilnehmende eigene Projektideen vorschlagen, die Du anschließend bestätigst."
       },
       "proposals": {
-        "option_inherit_yes": "Programm-Voreinstellung verwenden (Ja)",
-        "option_inherit_no": "Programm-Voreinstellung verwenden (Nein)",
         "option_enabled": "Ja",
         "option_disabled": "Nein"
       }

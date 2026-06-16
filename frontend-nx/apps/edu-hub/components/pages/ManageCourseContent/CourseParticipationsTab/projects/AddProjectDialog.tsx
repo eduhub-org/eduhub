@@ -7,7 +7,9 @@ import { DialogShell } from '../../../../common/dialogs/DialogShell';
 import { SelectUserDialog } from '../../../../common/dialogs/SelectUserDialog';
 import { Button } from '../../../../common/Button';
 import DropDownSelector from '../../../../inputs/DropDownSelector';
-import ProjectTypeRequirementSelector from '../../../CourseContent/Projects/ProjectTypeRequirementSelector';
+import ProjectFormatSelector from '../../../CourseContent/Projects/ProjectFormatSelector';
+import InstructionDownloadButton from '../../../CourseContent/Projects/InstructionDownloadButton';
+import { resolveInitialProjectType } from '../../../CourseContent/Projects/projectTypeRequirements';
 import { INSTRUCTOR_INSERT_PROJECT } from '../../../../../queries/projectInstructor';
 import {
   PROJECT_DOCUMENTATION_INSTRUCTIONS,
@@ -109,6 +111,13 @@ const AddProjectDialog: FC<AddProjectDialogProps> = ({
 
   const instructionHelpText = t('projects.add_dialog.instruction_info');
 
+  const selectedInstructionUrl = useMemo(
+    () =>
+      documentationInstructions.find((inst) => String(inst.id) === instructionId)
+        ?.url ?? null,
+    [documentationInstructions, instructionId]
+  );
+
   // Always overwrite the instruction selection when the project type changes
   // so the dropdown filter (scoped to projectTypeValue === type) is never
   // stuck on a stale value from the previous type.
@@ -145,11 +154,14 @@ const AddProjectDialog: FC<AddProjectDialogProps> = ({
 
   const reset = useCallback(() => {
     setTitle('');
-    const nextType = defaultProjectType ?? '';
+    // Default to a classical project unless the last created project was an
+    // online course; a carried-over classical type is kept when still valid.
+    const nextType = resolveInitialProjectType(defaultProjectType, projectTypes);
     setType(nextType);
-    // Carry over the last project's documentation instruction when available;
-    // otherwise fall back to the default instruction for the type.
-    if (defaultDocumentationInstructionId != null) {
+    // Carry over the last project's documentation instruction only when the
+    // resolved type still matches the carried-over type; otherwise fall back to
+    // that type's default instruction (the DB enforces type/instruction match).
+    if (defaultDocumentationInstructionId != null && nextType === defaultProjectType) {
       setInstructionId(String(defaultDocumentationInstructionId));
     } else {
       const nextDefault = nextType
@@ -161,7 +173,12 @@ const AddProjectDialog: FC<AddProjectDialogProps> = ({
     }
     setAuthors([]);
     setSelectAuthorOpen(false);
-  }, [defaultProjectType, defaultDocumentationInstructionId, documentationInstructions]);
+  }, [
+    defaultProjectType,
+    defaultDocumentationInstructionId,
+    documentationInstructions,
+    projectTypes,
+  ]);
 
   // Re-seed from the latest defaults each time the dialog opens. The carried
   // over values come from an async query, so they may settle after mount.
@@ -172,6 +189,25 @@ const AddProjectDialog: FC<AddProjectDialogProps> = ({
     }
     wasOpen.current = open;
   }, [open, reset]);
+
+  // Seed the type once the project-type catalog finishes loading, in case the
+  // dialog was opened before PROJECT_TYPES resolved (resolveInitialProjectType
+  // needs the catalog to pick the baseline classical type). Guarded so it runs
+  // at most once per open: otherwise it would re-seed (and hide the invalid
+  // combination error) every time the user clears the type by selecting a
+  // requirement combination that matches no catalog project type.
+  const catalogSeededRef = useRef(false);
+  useEffect(() => {
+    if (!open) {
+      catalogSeededRef.current = false;
+      return;
+    }
+    if (catalogSeededRef.current || projectTypes.length === 0) return;
+    catalogSeededRef.current = true;
+    setType(
+      (current) => current || resolveInitialProjectType(defaultProjectType, projectTypes)
+    );
+  }, [open, projectTypes, defaultProjectType]);
 
   const handleClose = useCallback(() => {
     reset();
@@ -286,9 +322,9 @@ const AddProjectDialog: FC<AddProjectDialogProps> = ({
           </div>
         }
       >
-        <div className="space-y-4">
+        <div className="space-y-5">
           <label className="block">
-            <span className="block text-sm font-medium mb-1">
+            <span className="block text-xs font-semibold uppercase tracking-wide text-label-secondary mb-2">
               {t('projects.add_dialog.title_label')}
               <span className="text-status-error ml-1">*</span>
             </span>
@@ -304,37 +340,9 @@ const AddProjectDialog: FC<AddProjectDialogProps> = ({
             />
           </label>
 
-          <ProjectTypeRequirementSelector
-            projectTypes={projectTypes}
-            value={type}
-            onChange={handleTypeChange}
-            programDefaultType={defaultProjectType}
-            disabled={loading || projectTypesQuery.loading}
-          />
-
-          <div className="[&_.col-span-10]:!mt-0">
-            <DropDownSelector
-              variant="material"
-              label={t('projects.add_dialog.instruction_label')}
-              placeholder={t('projects.add_dialog.instruction_placeholder')}
-              value={instructionId}
-              options={instructionDropdownOptions}
-              isMandatory
-              disabled={loading || documentationInstructionsQuery.loading}
-              onValueUpdated={(v: string) => {
-                setInstructionId(v);
-              }}
-              identifierVariables={{}}
-              refetchQueries={[]}
-            />
-            <p className="mt-2 text-xs text-label-secondary whitespace-pre-line">
-              {instructionHelpText}
-            </p>
-          </div>
-
-          <div>
+          <div className="border-t border-border-primary pt-5">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium">
+              <span className="text-xs font-semibold uppercase tracking-wide text-label-secondary">
                 {t('projects.add_dialog.authors_label')}
               </span>
               <Button onClick={() => setSelectAuthorOpen(true)} disabled={loading}>
@@ -367,6 +375,45 @@ const AddProjectDialog: FC<AddProjectDialogProps> = ({
                 {t('projects.add_dialog.no_authors_added')}
               </p>
             )}
+          </div>
+
+          <div className="border-t border-border-primary pt-5">
+            <ProjectFormatSelector
+              projectTypes={projectTypes}
+              value={type}
+              onChange={handleTypeChange}
+              disabled={loading || projectTypesQuery.loading}
+            />
+          </div>
+
+          <div className="border-t border-border-primary pt-5 [&_.col-span-10]:!mt-0">
+            <p className="text-xs font-semibold uppercase tracking-wide text-label-secondary mb-2">
+              {t('projects.add_dialog.instruction_label')}
+            </p>
+            <div className="flex items-center gap-2">
+              <div className="flex-1">
+                <DropDownSelector
+                  variant="material"
+                  placeholder={t('projects.add_dialog.instruction_placeholder')}
+                  value={instructionId}
+                  options={instructionDropdownOptions}
+                  isMandatory
+                  disabled={loading || documentationInstructionsQuery.loading}
+                  onValueUpdated={(v: string) => {
+                    setInstructionId(v);
+                  }}
+                  identifierVariables={{}}
+                  refetchQueries={[]}
+                />
+              </div>
+              <InstructionDownloadButton
+                url={selectedInstructionUrl}
+                disabled={loading}
+              />
+            </div>
+            <p className="mt-2 text-xs text-label-secondary whitespace-pre-line">
+              {instructionHelpText}
+            </p>
           </div>
 
           <div className="rounded border border-border-primary bg-bg-secondary p-3 space-y-2 text-sm text-label-secondary">

@@ -1397,6 +1397,7 @@
         "title_placeholder": "Project title",
         "instruction_label": "Documentation instructions",
         "instruction_placeholder": "Select documentation instructions",
+        "instruction_open": "Open the selected instructions in a new tab",
         "instruction_info": "Documentation instructions are PDF files that describe how the project documentation (or any other mandatory deliverable) should be composed. In some cases — for example the reflection questionnaires for online courses — the PDF is fillable and can be completed directly.",
         "authors_label": "Authors",
         "add_author": "Add author",
@@ -1434,6 +1435,23 @@
           "help": "Students must upload a cover image (also used for showcase publication).",
           "short": "Cover image"
         },
+        "format": {
+          "label": "Project format",
+          "classic": {
+            "label": "Classic project",
+            "help": "Participants form a team that you confirm before work starts and submit the deliverables selected below."
+          },
+          "online": {
+            "label": "Online course",
+            "help": "Shortened process: participants take part individually — no team confirmation is needed."
+          }
+        },
+        "section_help_classic": "Choose what participants must submit for this project.",
+        "self_reflection": {
+          "label": "Self-reflection questionnaire",
+          "help": "Participants complete the self-reflection questionnaire (a fillable PDF provided with the documentation instructions)."
+        },
+        "classic_invalid_combination": "Select at least an external link or a presentation — documentation alone is not possible for a classic project.",
         "invalid_combination": "This combination of requirements is not available. Adjust your selection.",
         "type_choice": {
           "label": "Project format",
@@ -1699,8 +1717,6 @@
         "help": "When enabled, participants can propose their own, open project ideas that you then confirm."
       },
       "proposals": {
-        "option_inherit_yes": "Use program default (Yes)",
-        "option_inherit_no": "Use program default (No)",
         "option_enabled": "Yes",
         "option_disabled": "No"
       }

@@ -43,6 +43,10 @@ const ProjectSetupCard: FC<ProjectSetupCardProps> = ({
     [courseId, updateProposalsEnabled, tCommon]
   );
 
+  // When the course has no explicit override yet, fall back to the program
+  // default so one of the two options is always preselected.
+  const effectiveEnabled = proposalsEnabled ?? programDefaultEnabled;
+
   const proposalOptions: {
     id: string;
     isActive: boolean;
@@ -50,24 +54,14 @@ const ProjectSetupCard: FC<ProjectSetupCardProps> = ({
     label: string;
   }[] = [
     {
-      id: 'inherit',
-      isActive: proposalsEnabled === null || proposalsEnabled === undefined,
-      onClick: () => handleSetProposalsEnabled(null),
-      label: t(
-        programDefaultEnabled
-          ? 'project_settings.proposals.option_inherit_yes'
-          : 'project_settings.proposals.option_inherit_no'
-      ),
-    },
-    {
       id: 'enabled',
-      isActive: proposalsEnabled === true,
+      isActive: effectiveEnabled === true,
       onClick: () => handleSetProposalsEnabled(true),
       label: t('project_settings.proposals.option_enabled'),
     },
     {
       id: 'disabled',
-      isActive: proposalsEnabled === false,
+      isActive: effectiveEnabled === false,
       onClick: () => handleSetProposalsEnabled(false),
       label: t('project_settings.proposals.option_disabled'),
     },
