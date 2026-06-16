@@ -384,15 +384,6 @@
         "PRESENTATION_WITHOUT_DOCUMENTATION": "Präsentation (ohne Dokumentation)",
         "PRESENTATION_AND_LINK_WITHOUT_DOCUMENTATION": "Präsentation mit Link (ohne Dokumentation)"
       },
-      "type_description": {
-        "ONLINE_COURSE": "Abschluss eines Online-Kurses – nur eine Dokumentation muss hochgeladen werden (z. B. ein Reflexionsfragebogen).",
-        "CLASSIC_PROJECT": "Klassisches Projekt – nur eine Dokumentation muss hochgeladen werden.",
-        "PROJECT_WITH_LINK": "Veröffentlichbares Projekt – benötigt Dokumentation, Titelbild und einen externen Link (z. B. Repository oder Live-Demo).",
-        "PROJECT_WITH_PRESENTATION": "Veröffentlichbares Projekt – benötigt Dokumentation, Titelbild und eine Präsentation.",
-        "PROJECT_WITH_LINK_AND_PRESENTATION": "Veröffentlichbares Projekt – benötigt Dokumentation, Titelbild, Präsentation und einen externen Link.",
-        "PRESENTATION_WITHOUT_DOCUMENTATION": "Veröffentlichbares Projekt – benötigt Präsentation und Titelbild. Das Hochladen einer schriftlichen Dokumentation ist optional.",
-        "PRESENTATION_AND_LINK_WITHOUT_DOCUMENTATION": "Veröffentlichbares Projekt – benötigt Präsentation, Titelbild und einen externen Link. Das Hochladen einer schriftlichen Dokumentation ist optional."
-      },
       "instruction_dropdown": {
         "default_suffix": " (Standard)"
       },
@@ -1386,11 +1377,9 @@
         "title": "Projekt hinzufügen",
         "title_label": "Titel",
         "title_placeholder": "Projekttitel",
-        "type_label": "Projekttyp",
-        "type_placeholder": "Projekttyp auswählen",
-        "type_descriptions_heading": "Projekttypen im Überblick",
         "instruction_label": "Dokumentationsanleitung",
         "instruction_placeholder": "Dokumentationsanleitung auswählen",
+        "instruction_open": "Ausgewählte Anleitung in neuem Tab öffnen",
         "instruction_info": "Dokumentationsanleitungen sind PDF-Dateien, die beschreiben, wie die Projektdokumentation (oder ein anderes verpflichtendes Abgabedokument) verfasst sein soll. In manchen Fällen – z. B. bei den Reflexionsfragebögen für Online-Kurse – ist das PDF direkt ausfüllbar.",
         "authors_label": "Autor:innen",
         "add_author": "Autor:in hinzufügen",
@@ -1404,6 +1393,56 @@
         "error_instruction_required": "Bitte wähle eine Dokumentationsanleitung aus.",
         "error_author_already_in_project": "{name} ist in diesem Kurs bereits einem aktiven Projekt zugeordnet und kann keinem weiteren hinzugefügt werden.",
         "error_author_conflict_generic": "Mindestens eine:r der ausgewählten Autor:innen ist in diesem Kurs bereits einem aktiven Projekt zugeordnet und kann keinem weiteren hinzugefügt werden."
+      },
+      "requirements": {
+        "section_label": "Erforderliche Abgaben",
+        "section_help": "Wähle aus, was Teilnehmende für dieses Projekt einreichen müssen. Die gewählte Kombination bestimmt den Projekttyp.",
+        "requires_documentation": {
+          "label": "Projektdokumentation (PDF-Upload)",
+          "help": "Teilnehmende müssen eine schriftliche Projektdokumentation hochladen.",
+          "short": "Dokumentation"
+        },
+        "requires_external_url": {
+          "label": "Externer Link (z. B. Repository oder Live-Demo)",
+          "help": "Teilnehmende müssen einen externen Link angeben, z. B. zu einem Repository oder einer Live-Demo.",
+          "short": "Externer Link"
+        },
+        "requires_presentation": {
+          "label": "Präsentations-Upload",
+          "help": "Teilnehmende müssen eine Präsentation hochladen.",
+          "short": "Präsentation"
+        },
+        "requires_cover_image": {
+          "label": "Titelbild",
+          "help": "Teilnehmende müssen ein Titelbild hochladen (wird auch für die Veröffentlichung im Schaufenster genutzt).",
+          "short": "Titelbild"
+        },
+        "format": {
+          "label": "Projektformat",
+          "classic": {
+            "label": "Klassisches Projekt",
+            "help": "Teilnehmende bilden ein Team, das Du vor Arbeitsbeginn bestätigst, und reichen die unten gewählten Abgaben ein."
+          },
+          "online": {
+            "label": "Online-Kurs",
+            "help": "Verkürzter Ablauf: Teilnehmende nehmen einzeln teil – eine Team-Bestätigung ist nicht erforderlich."
+          }
+        },
+        "section_help_classic": "Wähle aus, was Teilnehmende für dieses Projekt einreichen müssen.",
+        "self_reflection": {
+          "label": "Selbstreflexions-Fragebogen",
+          "help": "Teilnehmende füllen den Selbstreflexions-Fragebogen aus (ein direkt ausfüllbares PDF in der Dokumentationsanleitung)."
+        },
+        "classic_invalid_combination": "Wähle mindestens einen externen Link oder eine Präsentation aus – nur eine Dokumentation ist für ein klassisches Projekt nicht möglich.",
+        "invalid_combination": "Diese Kombination von Anforderungen ist nicht verfügbar. Passe Deine Auswahl an.",
+        "type_choice": {
+          "label": "Projektformat",
+          "help": "Diese Abgaben treffen auf mehrere Projektformate zu. Wähle aus, welches verwendet werden soll.",
+          "descriptions": {
+            "ONLINE_COURSE": "Online-Kurs – verkürzter Ablauf: Teilnehmende nehmen einzeln teil, eine Team-Bestätigung ist nicht erforderlich.",
+            "CLASSIC_PROJECT": "Klassisches Projekt – Teilnehmende bilden ein Team, das Du vor Arbeitsbeginn bestätigst."
+          }
+        }
       }
     },
     "attendance_cert_issued": "Teilnahmebescheinigung ausgestellt",
@@ -1650,7 +1689,23 @@
     },
     "no-certificate-generated": "Es wurden keine Zertifikate generiert.",
     "certificates-generated": "Es wurden {number} Zertifikate generiert.",
-    "1-certificate-generated": "Es wurde ein Zertifikat generiert."
+    "1-certificate-generated": "Es wurde ein Zertifikat generiert.",
+    "project_settings": {
+      "heading": "Projekt-Einrichtung",
+      "intro": "Lege fest, wie Teilnehmende ein Projekt für den Leistungsnachweis erhalten. Du kannst eine oder beide Optionen nutzen.",
+      "option_templates": {
+        "title": "Projektvorlagen definieren",
+        "help": "Erstelle unten über „Projekt hinzufügen“ eine oder ggf. mehrere präzise beschriebene Projekte. Teilnehmende können dann genau eines auswählen und bearbeiten."
+      },
+      "option_propose": {
+        "title": "Teilnehmende eigene Projekte vorschlagen lassen",
+        "help": "Wenn aktiviert, können Teilnehmende eigene Projektideen vorschlagen, die Du anschließend bestätigst."
+      },
+      "proposals": {
+        "option_enabled": "Ja",
+        "option_disabled": "Nein"
+      }
+    }
   },
   "managePrograms": {
     "headline": "Programme",

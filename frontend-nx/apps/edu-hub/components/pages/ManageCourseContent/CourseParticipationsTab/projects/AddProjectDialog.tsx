@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect, useMemo, useState } from 'react';
+import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { MdAddCircle, MdClose } from 'react-icons/md';
 import { useRoleMutation } from '../../../../../hooks/authedMutation';
@@ -7,6 +7,9 @@ import { DialogShell } from '../../../../common/dialogs/DialogShell';
 import { SelectUserDialog } from '../../../../common/dialogs/SelectUserDialog';
 import { Button } from '../../../../common/Button';
 import DropDownSelector from '../../../../inputs/DropDownSelector';
+import ProjectFormatSelector from '../../../CourseContent/Projects/ProjectFormatSelector';
+import InstructionDownloadButton from '../../../CourseContent/Projects/InstructionDownloadButton';
+import { resolveInitialProjectType } from '../../../CourseContent/Projects/projectTypeRequirements';
 import { INSTRUCTOR_INSERT_PROJECT } from '../../../../../queries/projectInstructor';
 import {
   PROJECT_DOCUMENTATION_INSTRUCTIONS,
@@ -24,6 +27,8 @@ interface AddProjectDialogProps {
   courseId: number;
   instructorUserId: string;
   defaultProjectType: string | null;
+  /** Pre-selects the documentation instruction (carried over from the course's last project). */
+  defaultDocumentationInstructionId: number | null;
   blockedAuthorIds: Set<string>;
   refetchQueries: string[];
   onError: (msg: string) => void;
@@ -39,6 +44,7 @@ const AddProjectDialog: FC<AddProjectDialogProps> = ({
   courseId,
   instructorUserId,
   defaultProjectType,
+  defaultDocumentationInstructionId,
   blockedAuthorIds,
   refetchQueries,
   onError,
@@ -49,7 +55,11 @@ const AddProjectDialog: FC<AddProjectDialogProps> = ({
 
   const [title, setTitle] = useState('');
   const [type, setType] = useState<string>(defaultProjectType ?? '');
-  const [instructionId, setInstructionId] = useState<string>('');
+  const [instructionId, setInstructionId] = useState<string>(
+    defaultDocumentationInstructionId != null
+      ? String(defaultDocumentationInstructionId)
+      : ''
+  );
   const [authors, setAuthors] = useState<UserSelectionWithFilter_User[]>([]);
   const [selectAuthorOpen, setSelectAuthorOpen] = useState(false);
 
@@ -67,26 +77,6 @@ const AddProjectDialog: FC<AddProjectDialogProps> = ({
     () =>
       documentationInstructionsQuery.data?.ProjectDocumentationInstruction ?? [],
     [documentationInstructionsQuery.data?.ProjectDocumentationInstruction]
-  );
-
-  const typeDropdownOptions = useMemo(
-    () =>
-      projectTypes.map((pt) => ({
-        value: pt.value,
-        label: tCourse(`projects.type_label.${pt.value}` as never),
-      })),
-    [projectTypes, tCourse]
-  );
-
-  const typeHelpText = useMemo(
-    () =>
-      projectTypes
-        .map(
-          (pt) =>
-            `${tCourse(`projects.type_label.${pt.value}` as never)}\n${tCourse(`projects.type_description.${pt.value}` as never)}`
-        )
-        .join('\n\n'),
-    [projectTypes, tCourse]
   );
 
   const instructionsForSelectedType = useMemo(
@@ -121,14 +111,22 @@ const AddProjectDialog: FC<AddProjectDialogProps> = ({
 
   const instructionHelpText = t('projects.add_dialog.instruction_info');
 
+  const selectedInstructionUrl = useMemo(
+    () =>
+      documentationInstructions.find((inst) => String(inst.id) === instructionId)
+        ?.url ?? null,
+    [documentationInstructions, instructionId]
+  );
+
   // Always overwrite the instruction selection when the project type changes
   // so the dropdown filter (scoped to projectTypeValue === type) is never
   // stuck on a stale value from the previous type.
   const handleTypeChange = useCallback(
-    (nextType: string) => {
-      setType(nextType);
+    (nextType: string | null) => {
+      const resolved = nextType ?? '';
+      setType(resolved);
       const nextDefault = documentationInstructions.find(
-        (inst) => inst.projectTypeValue === nextType && inst.isDefault
+        (inst) => inst.projectTypeValue === resolved && inst.isDefault
       );
       setInstructionId(nextDefault ? String(nextDefault.id) : '');
     },
@@ -156,17 +154,82 @@ const AddProjectDialog: FC<AddProjectDialogProps> = ({
 
   const reset = useCallback(() => {
     setTitle('');
-    const nextType = defaultProjectType ?? '';
+    // Default to a classical project unless the last created project was an
+    // online course; a carried-over classical type is kept when still valid.
+    const nextType = resolveInitialProjectType(defaultProjectType, projectTypes);
     setType(nextType);
-    const nextDefault = nextType
-      ? documentationInstructions.find(
-          (inst) => inst.projectTypeValue === nextType && inst.isDefault
-        )
-      : null;
-    setInstructionId(nextDefault ? String(nextDefault.id) : '');
+    // Carry over the last project's documentation instruction only when the
+    // resolved type still matches the carried-over type; otherwise fall back to
+    // that type's default instruction (the DB enforces type/instruction match).
+    if (defaultDocumentationInstructionId != null && nextType === defaultProjectType) {
+      setInstructionId(String(defaultDocumentationInstructionId));
+    } else {
+      const nextDefault = nextType
+        ? documentationInstructions.find(
+            (inst) => inst.projectTypeValue === nextType && inst.isDefault
+          )
+        : null;
+      setInstructionId(nextDefault ? String(nextDefault.id) : '');
+    }
     setAuthors([]);
     setSelectAuthorOpen(false);
-  }, [defaultProjectType, documentationInstructions]);
+  }, [
+    defaultProjectType,
+    defaultDocumentationInstructionId,
+    documentationInstructions,
+    projectTypes,
+  ]);
+
+  // Re-seed from the latest defaults each time the dialog opens. The carried
+  // over values come from an async query, so they may settle after mount.
+  const wasOpen = useRef(false);
+  useEffect(() => {
+    if (open && !wasOpen.current) {
+      reset();
+    }
+    wasOpen.current = open;
+  }, [open, reset]);
+
+  // Seed the type once the project-type catalog finishes loading, in case the
+  // dialog was opened before PROJECT_TYPES resolved (resolveInitialProjectType
+  // needs the catalog to pick the baseline classical type). Guarded so it runs
+  // at most once per open: otherwise it would re-seed (and hide the invalid
+  // combination error) every time the user clears the type by selecting a
+  // requirement combination that matches no catalog project type.
+  const catalogSeededRef = useRef(false);
+  useEffect(() => {
+    if (!open) {
+      catalogSeededRef.current = false;
+      return;
+    }
+    if (catalogSeededRef.current || projectTypes.length === 0) return;
+    catalogSeededRef.current = true;
+    const seededType =
+      type || resolveInitialProjectType(defaultProjectType, projectTypes);
+    setType((current) => current || seededType);
+    // Preserve the carried-over instruction (lost otherwise, since reset() ran
+    // before the catalog resolved the type); fall back to the type's default.
+    setInstructionId((current) => {
+      if (current || !seededType) return current;
+      if (
+        defaultDocumentationInstructionId != null &&
+        seededType === defaultProjectType
+      ) {
+        return String(defaultDocumentationInstructionId);
+      }
+      const nextDefault = documentationInstructions.find(
+        (inst) => inst.projectTypeValue === seededType && inst.isDefault
+      );
+      return nextDefault ? String(nextDefault.id) : '';
+    });
+  }, [
+    open,
+    projectTypes,
+    type,
+    defaultProjectType,
+    defaultDocumentationInstructionId,
+    documentationInstructions,
+  ]);
 
   const handleClose = useCallback(() => {
     reset();
@@ -281,9 +344,9 @@ const AddProjectDialog: FC<AddProjectDialogProps> = ({
           </div>
         }
       >
-        <div className="space-y-4">
+        <div className="space-y-5">
           <label className="block">
-            <span className="block text-sm font-medium mb-1">
+            <span className="block text-xs font-semibold uppercase tracking-wide text-label-secondary mb-2">
               {t('projects.add_dialog.title_label')}
               <span className="text-status-error ml-1">*</span>
             </span>
@@ -299,64 +362,9 @@ const AddProjectDialog: FC<AddProjectDialogProps> = ({
             />
           </label>
 
-          <div>
-            <div className="[&_.col-span-10]:!mt-0">
-              <DropDownSelector
-                variant="material"
-                label={t('projects.add_dialog.type_label')}
-                placeholder={t('projects.add_dialog.type_placeholder')}
-                value={type}
-                options={typeDropdownOptions}
-                helpText={typeHelpText}
-                isMandatory
-                disabled={loading || projectTypesQuery.loading}
-                onValueUpdated={handleTypeChange}
-                identifierVariables={{}}
-                refetchQueries={[]}
-              />
-            </div>
-            {projectTypes.length > 0 ? (
-              <div className="mt-2">
-                <p className="text-xs font-medium text-label-primary">
-                  {t('projects.add_dialog.type_descriptions_heading')}
-                </p>
-                <ul className="mt-1 ml-4 space-y-1 text-xs text-label-secondary">
-                  {projectTypes.map((pt) => (
-                    <li key={pt.value}>
-                      <span className="font-medium text-label-primary">
-                        {tCourse(`projects.type_label.${pt.value}` as never)}:
-                      </span>{' '}
-                      {tCourse(`projects.type_description.${pt.value}` as never)}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ) : null}
-          </div>
-
-          <div className="[&_.col-span-10]:!mt-0">
-            <DropDownSelector
-              variant="material"
-              label={t('projects.add_dialog.instruction_label')}
-              placeholder={t('projects.add_dialog.instruction_placeholder')}
-              value={instructionId}
-              options={instructionDropdownOptions}
-              isMandatory
-              disabled={loading || documentationInstructionsQuery.loading}
-              onValueUpdated={(v: string) => {
-                setInstructionId(v);
-              }}
-              identifierVariables={{}}
-              refetchQueries={[]}
-            />
-            <p className="mt-2 text-xs text-label-secondary whitespace-pre-line">
-              {instructionHelpText}
-            </p>
-          </div>
-
-          <div>
+          <div className="border-t border-border-primary pt-5">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium">
+              <span className="text-xs font-semibold uppercase tracking-wide text-label-secondary">
                 {t('projects.add_dialog.authors_label')}
               </span>
               <Button onClick={() => setSelectAuthorOpen(true)} disabled={loading}>
@@ -389,6 +397,45 @@ const AddProjectDialog: FC<AddProjectDialogProps> = ({
                 {t('projects.add_dialog.no_authors_added')}
               </p>
             )}
+          </div>
+
+          <div className="border-t border-border-primary pt-5">
+            <ProjectFormatSelector
+              projectTypes={projectTypes}
+              value={type}
+              onChange={handleTypeChange}
+              disabled={loading || projectTypesQuery.loading}
+            />
+          </div>
+
+          <div className="border-t border-border-primary pt-5 [&_.col-span-10]:!mt-0">
+            <p className="text-xs font-semibold uppercase tracking-wide text-label-secondary mb-2">
+              {t('projects.add_dialog.instruction_label')}
+            </p>
+            <div className="flex items-center gap-2">
+              <div className="flex-1">
+                <DropDownSelector
+                  variant="material"
+                  placeholder={t('projects.add_dialog.instruction_placeholder')}
+                  value={instructionId}
+                  options={instructionDropdownOptions}
+                  isMandatory
+                  disabled={loading || documentationInstructionsQuery.loading}
+                  onValueUpdated={(v: string) => {
+                    setInstructionId(v);
+                  }}
+                  identifierVariables={{}}
+                  refetchQueries={[]}
+                />
+              </div>
+              <InstructionDownloadButton
+                url={selectedInstructionUrl}
+                disabled={loading}
+              />
+            </div>
+            <p className="mt-2 text-xs text-label-secondary whitespace-pre-line">
+              {instructionHelpText}
+            </p>
           </div>
 
           <div className="rounded border border-border-primary bg-bg-secondary p-3 space-y-2 text-sm text-label-secondary">
