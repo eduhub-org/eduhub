@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect, useMemo, useState } from 'react';
+import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { MdAddCircle, MdClose } from 'react-icons/md';
 import { useRoleMutation } from '../../../../../hooks/authedMutation';
@@ -25,6 +25,8 @@ interface AddProjectDialogProps {
   courseId: number;
   instructorUserId: string;
   defaultProjectType: string | null;
+  /** Pre-selects the documentation instruction (carried over from the course's last project). */
+  defaultDocumentationInstructionId: number | null;
   blockedAuthorIds: Set<string>;
   refetchQueries: string[];
   onError: (msg: string) => void;
@@ -40,6 +42,7 @@ const AddProjectDialog: FC<AddProjectDialogProps> = ({
   courseId,
   instructorUserId,
   defaultProjectType,
+  defaultDocumentationInstructionId,
   blockedAuthorIds,
   refetchQueries,
   onError,
@@ -50,7 +53,11 @@ const AddProjectDialog: FC<AddProjectDialogProps> = ({
 
   const [title, setTitle] = useState('');
   const [type, setType] = useState<string>(defaultProjectType ?? '');
-  const [instructionId, setInstructionId] = useState<string>('');
+  const [instructionId, setInstructionId] = useState<string>(
+    defaultDocumentationInstructionId != null
+      ? String(defaultDocumentationInstructionId)
+      : ''
+  );
   const [authors, setAuthors] = useState<UserSelectionWithFilter_User[]>([]);
   const [selectAuthorOpen, setSelectAuthorOpen] = useState(false);
 
@@ -140,15 +147,31 @@ const AddProjectDialog: FC<AddProjectDialogProps> = ({
     setTitle('');
     const nextType = defaultProjectType ?? '';
     setType(nextType);
-    const nextDefault = nextType
-      ? documentationInstructions.find(
-          (inst) => inst.projectTypeValue === nextType && inst.isDefault
-        )
-      : null;
-    setInstructionId(nextDefault ? String(nextDefault.id) : '');
+    // Carry over the last project's documentation instruction when available;
+    // otherwise fall back to the default instruction for the type.
+    if (defaultDocumentationInstructionId != null) {
+      setInstructionId(String(defaultDocumentationInstructionId));
+    } else {
+      const nextDefault = nextType
+        ? documentationInstructions.find(
+            (inst) => inst.projectTypeValue === nextType && inst.isDefault
+          )
+        : null;
+      setInstructionId(nextDefault ? String(nextDefault.id) : '');
+    }
     setAuthors([]);
     setSelectAuthorOpen(false);
-  }, [defaultProjectType, documentationInstructions]);
+  }, [defaultProjectType, defaultDocumentationInstructionId, documentationInstructions]);
+
+  // Re-seed from the latest defaults each time the dialog opens. The carried
+  // over values come from an async query, so they may settle after mount.
+  const wasOpen = useRef(false);
+  useEffect(() => {
+    if (open && !wasOpen.current) {
+      reset();
+    }
+    wasOpen.current = open;
+  }, [open, reset]);
 
   const handleClose = useCallback(() => {
     reset();

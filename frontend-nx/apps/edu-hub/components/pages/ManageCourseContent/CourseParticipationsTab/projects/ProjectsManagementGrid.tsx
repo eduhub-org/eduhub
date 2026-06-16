@@ -138,6 +138,17 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
 
   const allProjects = projectsQuery.data?.Project ?? [];
 
+  // Most recently created project (the query is ordered by id asc) that has a
+  // type set. New projects default to its type + documentation instruction so
+  // an instructor doesn't re-pick the same setup for every project in a course.
+  const lastTypedProject = useMemo(() => {
+    const list = projectsQuery.data?.Project ?? [];
+    for (let i = list.length - 1; i >= 0; i--) {
+      if (list[i].type) return list[i];
+    }
+    return null;
+  }, [projectsQuery.data?.Project]);
+
   const blockedAuthorIds = useMemo(() => {
     const activeStatuses = new Set([
       ProjectStatus_enum.PROPOSED,
@@ -889,7 +900,10 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
           onClose={() => setAddDialogOpen(false)}
           courseId={courseId}
           instructorUserId={instructorUserId}
-          defaultProjectType={programDefaultProjectType}
+          defaultProjectType={lastTypedProject?.type ?? programDefaultProjectType}
+          defaultDocumentationInstructionId={
+            lastTypedProject?.documentationInstructionId ?? null
+          }
           blockedAuthorIds={blockedAuthorIds}
           refetchQueries={REFETCH_QUERIES}
           onError={setErrorMessage}
