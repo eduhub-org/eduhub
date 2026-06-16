@@ -30,9 +30,9 @@ export const INSTRUCTOR_INSERT_PROJECT = gql`
   }
 `;
 
-# Sets type and documentationInstructionId together so the
-# Project_instruction_matches_type trigger never sees a transient mismatch
-# (it fires BEFORE UPDATE OF either column).
+// Sets type and documentationInstructionId together so the
+// Project_instruction_matches_type trigger never sees a transient mismatch
+// (it fires BEFORE UPDATE OF either column).
 export const UPDATE_PROJECT_TYPE = gql`
   mutation UpdateProjectType(
     $itemId: Int!
