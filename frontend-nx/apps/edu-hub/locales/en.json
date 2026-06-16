@@ -526,10 +526,10 @@
         "deadline_passed_banner": "The submission deadline passed on {date}.",
         "excluded_banner": "The submitting author excluded you from this project's final submission. You no longer count as one of its authors.",
         "publication_consent_heading": "Publication consent",
-        "publication_consent_description": "Your project may be used as an example on the opencampus.sh platform and in promotional materials. Consent is voluntary and does not affect participation, grading, or prizes. Any team member can grant or withdraw consent at any time.",
-        "publication_consent_status_none": "No consent given yet.",
-        "publication_consent_status_granted": "Consented by {name} on {date}.",
-        "publication_consent_status_withdrawn": "Consent withdrawn on {date}.",
+        "publication_consent_description": "opencampus.sh may publish this project as a showcase example on the platform and in promotional materials. What will be shared: project title, description, cover image, files and links, and the names and Element room links of the contributing authors. Any team member can grant or withdraw consent at any time. Withdrawing consent will remove the project from publication.",
+        "publication_consent_status_none": "No consent given yet — the project will not be published.",
+        "publication_consent_status_granted": "Consent granted by {name} on {date}.",
+        "publication_consent_status_withdrawn": "Consent withdrawn on {date} — the project will not be published.",
         "publication_consent_grant_button": "Grant publication consent",
         "publication_consent_withdraw_button": "Withdraw publication consent"
       },
@@ -542,10 +542,10 @@
         "contributor_self_suffix": "(you)",
         "confirm_button": "Submit",
         "consent_section_heading": "Publication consent (optional)",
-        "consent_description": "Your project may be used as an example on the opencampus.sh platform and in promotional materials. Consent is entirely voluntary and does not affect participation, grading, or prizes.",
-        "consent_label_solo": "I agree that this project may be published.",
-        "consent_label_team": "On behalf of my team, we agree that this project may be published. I confirm I am authorised by my teammates to give this consent.",
-        "consent_optional_note": "You can change this decision at any time after submission from your project view."
+        "consent_description": "opencampus.sh may publish this project as a showcase example on the platform and in promotional materials. What will be shared: project title, description, cover image, files and links you uploaded, and the names and Element room links of the contributing authors. Consent is entirely voluntary and has no effect on participation, grading, or prizes.",
+        "consent_label_solo": "I agree that this project may be published by opencampus.sh as described above.",
+        "consent_label_team": "On behalf of my team, we agree that this project may be published by opencampus.sh as described above. I confirm I am authorised by my teammates to give this consent.",
+        "consent_optional_note": "You can grant or withdraw this consent at any time after submission from your project view. Withdrawing consent will remove the project from publication."
       },
       "manage_requests": {
         "title": "Co-author requests",

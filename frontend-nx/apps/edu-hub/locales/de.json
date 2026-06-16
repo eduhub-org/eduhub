@@ -526,10 +526,10 @@
         "deadline_passed_banner": "Die Abgabefrist ist am {date} abgelaufen.",
         "excluded_banner": "Die einreichende Person hat Dich von der finalen Einreichung dieses Projekts ausgeschlossen. Du zählst nicht mehr zu den Autor:innen.",
         "publication_consent_heading": "Einwilligung zur Veröffentlichung",
-        "publication_consent_description": "Dein Projekt kann als Beispiel auf der opencampus.sh-Plattform und in Werbematerialien verwendet werden. Die Einwilligung ist freiwillig und hat keinen Einfluss auf Teilnahme, Bewertung oder Preise. Jedes Teammitglied kann die Einwilligung jederzeit erteilen oder widerrufen.",
-        "publication_consent_status_none": "Noch keine Einwilligung erteilt.",
+        "publication_consent_description": "opencampus.sh kann dieses Projekt als Showcase-Beispiel auf der Plattform und in Werbematerialien veröffentlichen. Was geteilt wird: Projekttitel, Beschreibung, Titelbild, hochgeladene Dateien und Links sowie die Namen und Element-Raum-Links der beitragenden Autor:innen. Jedes Teammitglied kann die Einwilligung jederzeit erteilen oder widerrufen. Ein Widerruf führt zur Entfernung des Projekts aus der Veröffentlichung.",
+        "publication_consent_status_none": "Noch keine Einwilligung erteilt — das Projekt wird nicht veröffentlicht.",
         "publication_consent_status_granted": "Einwilligung erteilt von {name} am {date}.",
-        "publication_consent_status_withdrawn": "Einwilligung widerrufen am {date}.",
+        "publication_consent_status_withdrawn": "Einwilligung widerrufen am {date} — das Projekt wird nicht veröffentlicht.",
         "publication_consent_grant_button": "Einwilligung zur Veröffentlichung erteilen",
         "publication_consent_withdraw_button": "Einwilligung zur Veröffentlichung widerrufen"
       },
@@ -542,10 +542,10 @@
         "contributor_self_suffix": "(Du)",
         "confirm_button": "Einreichen",
         "consent_section_heading": "Einwilligung zur Veröffentlichung (optional)",
-        "consent_description": "Dein Projekt kann als Beispiel auf der opencampus.sh-Plattform und in Werbematerialien verwendet werden. Die Einwilligung ist freiwillig und hat keinen Einfluss auf Teilnahme, Bewertung oder Preise.",
-        "consent_label_solo": "Ich stimme zu, dass dieses Projekt veröffentlicht werden darf.",
-        "consent_label_team": "Im Namen unseres Teams stimmen wir zu, dass dieses Projekt veröffentlicht werden darf. Ich bestätige, dass ich von meinen Teammitgliedern bevollmächtigt bin, diese Einwilligung zu erteilen.",
-        "consent_optional_note": "Diese Entscheidung kann nach der Einreichung jederzeit in der Projektansicht geändert werden."
+        "consent_description": "opencampus.sh kann dieses Projekt als Showcase-Beispiel auf der Plattform und in Werbematerialien veröffentlichen. Was geteilt wird: Projekttitel, Beschreibung, Titelbild, hochgeladene Dateien und Links sowie die Namen und Element-Raum-Links der beitragenden Autor:innen. Die Einwilligung ist freiwillig und hat keinen Einfluss auf Teilnahme, Bewertung oder Preise.",
+        "consent_label_solo": "Ich stimme zu, dass dieses Projekt von opencampus.sh wie oben beschrieben veröffentlicht werden darf.",
+        "consent_label_team": "Im Namen unseres Teams stimmen wir zu, dass dieses Projekt von opencampus.sh wie oben beschrieben veröffentlicht werden darf. Ich bestätige, dass ich von meinen Teammitgliedern bevollmächtigt bin, diese Einwilligung zu erteilen.",
+        "consent_optional_note": "Diese Einwilligung kann nach der Einreichung jederzeit in der Projektansicht erteilt oder widerrufen werden. Ein Widerruf führt zur Entfernung des Projekts aus der Veröffentlichung."
       },
       "manage_requests": {
         "title": "Mitautor:innen-Anfragen",
