@@ -18,6 +18,11 @@ import CheckboxSelector from '../../../../inputs/CheckboxSelector';
 import FileUploadField from '../../../../inputs/FileUploadField';
 import ProjectFormatSelector from '../../../CourseContent/Projects/ProjectFormatSelector';
 import InstructionDownloadButton from '../../../CourseContent/Projects/InstructionDownloadButton';
+import {
+  PROJECT_REQUIREMENT_KEYS,
+  REQUIREMENT_I18N_KEY,
+  flagsOfProjectType,
+} from '../../../CourseContent/Projects/projectTypeRequirements';
 import { UserSelectionWithFilter_User } from '../../../../../queries/__generated__/UserSelectionWithFilter';
 import { SAVE_PROJECT_IMAGE } from '../../../../../queries/actions';
 import {
