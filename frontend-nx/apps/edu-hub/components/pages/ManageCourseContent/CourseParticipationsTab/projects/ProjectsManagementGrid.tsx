@@ -16,12 +16,8 @@ import InputField from '../../../../inputs/InputField';
 import DropDownSelector from '../../../../inputs/DropDownSelector';
 import CheckboxSelector from '../../../../inputs/CheckboxSelector';
 import FileUploadField from '../../../../inputs/FileUploadField';
-import ProjectTypeRequirementSelector from '../../../CourseContent/Projects/ProjectTypeRequirementSelector';
-import {
-  PROJECT_REQUIREMENT_KEYS,
-  REQUIREMENT_I18N_KEY,
-  flagsOfProjectType,
-} from '../../../CourseContent/Projects/projectTypeRequirements';
+import ProjectFormatSelector from '../../../CourseContent/Projects/ProjectFormatSelector';
+import InstructionDownloadButton from '../../../CourseContent/Projects/InstructionDownloadButton';
 import { UserSelectionWithFilter_User } from '../../../../../queries/__generated__/UserSelectionWithFilter';
 import { SAVE_PROJECT_IMAGE } from '../../../../../queries/actions';
 import {
@@ -508,8 +504,8 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
       const authorMentorSection = (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 w-full">
           <div className="min-w-0">
-            <div className="flex items-center justify-between mb-1 gap-2">
-              <span className="text-sm font-medium">
+            <div className="flex items-center justify-between mb-2 gap-2">
+              <span className="text-xs font-semibold uppercase tracking-wide text-label-secondary">
                 {t('projects.expanded.authors_heading')}
               </span>
               <Button onClick={() => setSelectAuthorTarget(row)}>
@@ -588,9 +584,9 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
             </ul>
           </div>
           <div className="min-w-0 md:border-l md:border-border-primary md:pl-4">
-            <div className="flex items-center justify-between mb-1 gap-2">
+            <div className="flex items-center justify-between mb-2 gap-2">
               <div className="flex items-center gap-1 min-w-0">
-                <span className="text-sm font-medium">
+                <span className="text-xs font-semibold uppercase tracking-wide text-label-secondary">
                   {t('projects.expanded.mentors_heading')}
                 </span>
                 <Tooltip title={t('projects.expanded.mentors_heading_tooltip')}>
@@ -638,42 +634,51 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
         </div>
       );
 
-      const projectTypeSelector = (
-        <div className="rounded-lg border border-border-primary p-3 bg-bg-secondary/20">
-          <ProjectTypeRequirementSelector
-            projectTypes={projectTypesList}
-            value={row.type ?? ''}
-            programDefaultType={programDefaultProjectType}
-            onChange={(value) => handleSetProjectType(row.id, value)}
-          />
-        </div>
-      );
-
-      // Scope instructions to the row's project type so the instructor cannot
-      // pick one for a different type (the DB trigger would reject it).
+      // Sorted instruction options matching the Add/Confirm dialog presentation.
+      const defaultSuffix = tCourse('projects.instruction_dropdown.default_suffix');
       const rowInstructionOptions = documentationInstructionsWithPdf
-        .filter((tpl) => !row.type || tpl.projectTypeValue === row.type)
-        .map((tpl) => ({ value: String(tpl.id), label: tpl.title }));
+        .filter((inst) => !row.type || inst.projectTypeValue === row.type)
+        .slice()
+        .sort((a, b) => {
+          if (a.isDefault === b.isDefault) return a.title.localeCompare(b.title);
+          return a.isDefault ? -1 : 1;
+        })
+        .map((inst) => ({
+          value: String(inst.id),
+          label: inst.isDefault ? `${inst.title}${defaultSuffix}` : inst.title,
+        }));
 
-      const documentationInstructionSelector =
+      const selectedInstructionUrl =
+        documentationInstructionsWithPdf.find(
+          (inst) => inst.id === row.documentationInstructionId
+        )?.url ?? null;
+
+      const documentationInstructionSection =
         rowInstructionOptions.length > 0 ? (
-          <div className="[&_.col-span-10]:!mt-0">
-            <DropDownSelector
-              variant="material"
-              label={tCourse('projects.my_project.documentation_instruction_label')}
-              value={
-                row.documentationInstructionId
-                  ? String(row.documentationInstructionId)
-                  : ''
-              }
-              options={rowInstructionOptions}
-              nullable
-              nullableLabel={tCourse('projects.my_project.documentation_instruction_none')}
-              updateValueMutation={UPDATE_PROJECT_DOCUMENTATION_INSTRUCTION}
-              identifierVariables={{ itemId: row.id }}
-              refetchQueries={REFETCH_QUERIES}
-              helpText={t('projects.add_dialog.instruction_info')}
-            />
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-label-secondary mb-2">
+              {t('projects.add_dialog.instruction_label')}
+            </p>
+            <div className="flex items-center gap-2 [&_.col-span-10]:!mt-0">
+              <div className="flex-1">
+                <DropDownSelector
+                  variant="material"
+                  value={
+                    row.documentationInstructionId
+                      ? String(row.documentationInstructionId)
+                      : ''
+                  }
+                  options={rowInstructionOptions}
+                  updateValueMutation={UPDATE_PROJECT_DOCUMENTATION_INSTRUCTION}
+                  identifierVariables={{ itemId: row.id }}
+                  refetchQueries={REFETCH_QUERIES}
+                />
+              </div>
+              <InstructionDownloadButton url={selectedInstructionUrl} />
+            </div>
+            <p className="mt-2 text-xs text-label-secondary whitespace-pre-line">
+              {t('projects.add_dialog.instruction_info')}
+            </p>
           </div>
         ) : null;
 
@@ -683,7 +688,7 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
           <div className="bg-fill-primary text-label-primary p-4 space-y-6 light">
             {authorMentorSection}
 
-            <div className="border-t border-border-primary pt-4 space-y-4">
+            <div className="border-t border-border-primary pt-5 space-y-4">
               <ProjectSubmissionDeadlineBelowTitle
                 mode="instructor"
                 project={row}
@@ -797,8 +802,6 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
                     </ProjectFormFieldSection>
                   }
                 />
-                {projectTypeSelector}
-                {documentationInstructionSelector}
                 <CheckboxSelector
                   variant="material"
                   label={tCourse('projects.my_project.accepting_participants_label')}
@@ -810,15 +813,29 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
                 />
               </div>
             </div>
+
+            <div className="border-t border-border-primary pt-5">
+              <ProjectFormatSelector
+                projectTypes={projectTypesList}
+                value={row.type ?? ''}
+                onChange={(typeValue) => handleSetProjectType(row.id, typeValue)}
+              />
+            </div>
+
+            {documentationInstructionSection ? (
+              <div className="border-t border-border-primary pt-5">
+                {documentationInstructionSection}
+              </div>
+            ) : null}
           </div>
         );
       }
 
       return (
-        <div className="bg-fill-primary text-label-primary p-4 space-y-4 light">
+        <div className="bg-fill-primary text-label-primary p-4 space-y-6 light">
           {authorMentorSection}
 
-          <div className="border-t border-border-primary pt-4 space-y-3">
+          <div className="border-t border-border-primary pt-5 space-y-3">
             <ProjectSubmissionDeadlineBelowTitle
               mode="instructor"
               project={row}
@@ -829,29 +846,42 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
             <div className="rounded-lg border border-border-primary p-3 bg-bg-secondary/20">
               <ProjectPreviewLayout project={row} showResourceLinks={showResourceLinks} includeExcludedAuthors />
             </div>
-            {projectTypeSelector}
-            {documentationInstructionSelector}
-            {(row.rating != null || row.ratingComment?.trim()) && (
-              <div className="text-sm space-y-2 border-t border-border-primary pt-3">
-                <div className="flex flex-wrap gap-4">
-                  {row.rating != null ? (
-                    <p>
-                      <span className="font-medium">{t('projects.expanded.rating')}: </span>
-                      {row.rating}
-                    </p>
-                  ) : null}
-                </div>
-                {row.ratingComment?.trim() ? (
-                  <p className="text-label-secondary whitespace-pre-line">
-                    <span className="font-medium text-label-primary">
-                      {t('projects.expanded.rating_comment_label')}:{' '}
-                    </span>
-                    {row.ratingComment.trim()}
+          </div>
+
+          <div className="border-t border-border-primary pt-5">
+            <ProjectFormatSelector
+              projectTypes={projectTypesList}
+              value={row.type ?? ''}
+              onChange={(typeValue) => handleSetProjectType(row.id, typeValue)}
+            />
+          </div>
+
+          {documentationInstructionSection ? (
+            <div className="border-t border-border-primary pt-5">
+              {documentationInstructionSection}
+            </div>
+          ) : null}
+
+          {(row.rating != null || row.ratingComment?.trim()) && (
+            <div className="text-sm space-y-2 border-t border-border-primary pt-3">
+              <div className="flex flex-wrap gap-4">
+                {row.rating != null ? (
+                  <p>
+                    <span className="font-medium">{t('projects.expanded.rating')}: </span>
+                    {row.rating}
                   </p>
                 ) : null}
               </div>
-            )}
-          </div>
+              {row.ratingComment?.trim() ? (
+                <p className="text-label-secondary whitespace-pre-line">
+                  <span className="font-medium text-label-primary">
+                    {t('projects.expanded.rating_comment_label')}:{' '}
+                  </span>
+                  {row.ratingComment.trim()}
+                </p>
+              ) : null}
+            </div>
+          )}
         </div>
       );
     },
@@ -861,7 +891,6 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
       handleRemoveMentor,
       handleSetProjectType,
       projectTypesList,
-      programDefaultProjectType,
       courseDefaultProjectSubmissionDeadline,
       courseSubmissionDeadlineDefaultSource,
       t,
