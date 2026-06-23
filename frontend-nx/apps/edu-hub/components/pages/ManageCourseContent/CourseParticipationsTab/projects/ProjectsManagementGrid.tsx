@@ -16,7 +16,8 @@ import InputField from '../../../../inputs/InputField';
 import DropDownSelector from '../../../../inputs/DropDownSelector';
 import CheckboxSelector from '../../../../inputs/CheckboxSelector';
 import FileUploadField from '../../../../inputs/FileUploadField';
-import ProjectTypeRequirementSelector from '../../../CourseContent/Projects/ProjectTypeRequirementSelector';
+import ProjectFormatSelector from '../../../CourseContent/Projects/ProjectFormatSelector';
+import InstructionDownloadButton from '../../../CourseContent/Projects/InstructionDownloadButton';
 import {
   PROJECT_REQUIREMENT_KEYS,
   REQUIREMENT_I18N_KEY,
@@ -508,8 +509,8 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
       const authorMentorSection = (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 w-full">
           <div className="min-w-0">
-            <div className="flex items-center justify-between mb-1 gap-2">
-              <span className="text-sm font-medium">
+            <div className="flex items-center justify-between mb-2 gap-2">
+              <span className="text-xs font-semibold uppercase tracking-wide text-label-secondary">
                 {t('projects.expanded.authors_heading')}
               </span>
               <Button onClick={() => setSelectAuthorTarget(row)}>
@@ -588,9 +589,9 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
             </ul>
           </div>
           <div className="min-w-0 md:border-l md:border-border-primary md:pl-4">
-            <div className="flex items-center justify-between mb-1 gap-2">
+            <div className="flex items-center justify-between mb-2 gap-2">
               <div className="flex items-center gap-1 min-w-0">
-                <span className="text-sm font-medium">
+                <span className="text-xs font-semibold uppercase tracking-wide text-label-secondary">
                   {t('projects.expanded.mentors_heading')}
                 </span>
                 <Tooltip title={t('projects.expanded.mentors_heading_tooltip')}>
@@ -638,42 +639,51 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
         </div>
       );
 
-      const projectTypeSelector = (
-        <div className="rounded-lg border border-border-primary p-3 bg-bg-secondary/20">
-          <ProjectTypeRequirementSelector
-            projectTypes={projectTypesList}
-            value={row.type ?? ''}
-            programDefaultType={programDefaultProjectType}
-            onChange={(value) => handleSetProjectType(row.id, value)}
-          />
-        </div>
-      );
-
-      // Scope instructions to the row's project type so the instructor cannot
-      // pick one for a different type (the DB trigger would reject it).
+      // Sorted instruction options matching the Add/Confirm dialog presentation.
+      const defaultSuffix = tCourse('projects.instruction_dropdown.default_suffix');
       const rowInstructionOptions = documentationInstructionsWithPdf
-        .filter((tpl) => !row.type || tpl.projectTypeValue === row.type)
-        .map((tpl) => ({ value: String(tpl.id), label: tpl.title }));
+        .filter((inst) => !row.type || inst.projectTypeValue === row.type)
+        .slice()
+        .sort((a, b) => {
+          if (a.isDefault === b.isDefault) return a.title.localeCompare(b.title);
+          return a.isDefault ? -1 : 1;
+        })
+        .map((inst) => ({
+          value: String(inst.id),
+          label: inst.isDefault ? `${inst.title}${defaultSuffix}` : inst.title,
+        }));
 
-      const documentationInstructionSelector =
+      const selectedInstructionUrl =
+        documentationInstructionsWithPdf.find(
+          (inst) => inst.id === row.documentationInstructionId
+        )?.url ?? null;
+
+      const documentationInstructionSection =
         rowInstructionOptions.length > 0 ? (
-          <div className="[&_.col-span-10]:!mt-0">
-            <DropDownSelector
-              variant="material"
-              label={tCourse('projects.my_project.documentation_instruction_label')}
-              value={
-                row.documentationInstructionId
-                  ? String(row.documentationInstructionId)
-                  : ''
-              }
-              options={rowInstructionOptions}
-              nullable
-              nullableLabel={tCourse('projects.my_project.documentation_instruction_none')}
-              updateValueMutation={UPDATE_PROJECT_DOCUMENTATION_INSTRUCTION}
-              identifierVariables={{ itemId: row.id }}
-              refetchQueries={REFETCH_QUERIES}
-              helpText={t('projects.add_dialog.instruction_info')}
-            />
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-label-secondary mb-2">
+              {t('projects.add_dialog.instruction_label')}
+            </p>
+            <div className="flex items-center gap-2 [&_.col-span-10]:!mt-0">
+              <div className="flex-1">
+                <DropDownSelector
+                  variant="material"
+                  value={
+                    row.documentationInstructionId
+                      ? String(row.documentationInstructionId)
+                      : ''
+                  }
+                  options={rowInstructionOptions}
+                  updateValueMutation={UPDATE_PROJECT_DOCUMENTATION_INSTRUCTION}
+                  identifierVariables={{ itemId: row.id }}
+                  refetchQueries={REFETCH_QUERIES}
+                />
+              </div>
+              <InstructionDownloadButton url={selectedInstructionUrl} />
+            </div>
+            <p className="mt-2 text-xs text-label-secondary whitespace-pre-line">
+              {t('projects.add_dialog.instruction_info')}
+            </p>
           </div>
         ) : null;
 
@@ -681,6 +691,156 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
         const canEditProjectTitle = row.parentProjectId == null;
         return (
           <div className="bg-fill-primary text-label-primary p-4 space-y-6 light">
+            {authorMentorSection}
+
+            <div className="border-t border-border-primary pt-5 space-y-4">
+              <ProjectSubmissionDeadlineBelowTitle
+                mode="instructor"
+                project={row}
+                courseDefaultSubmissionDeadline={courseDefaultProjectSubmissionDeadline}
+                defaultDeadlineSource={courseSubmissionDeadlineDefaultSource}
+                refetchQueries={REFETCH_QUERIES}
+              />
+              <div className="rounded-lg border border-border-primary p-4 bg-bg-secondary/30 space-y-3">
+                <ProjectPreviewLayout
+                  project={row}
+                  showResourceLinks={showResourceLinks}
+                  includeExcludedAuthors
+                  titleRow={
+                    <div className="flex flex-wrap items-start gap-2 mb-1 w-full">
+                      <div className="min-w-0 flex-1">
+                        {canEditProjectTitle ? (
+                          <InputField
+                            variant="material"
+                            type="input"
+                            label={tCourse('projects.my_project.title_label')}
+                            placeholder={tCourse('projects.my_project.title_label')}
+                            itemId={row.id}
+                            value={row.title}
+                            updateValueMutation={UPDATE_PROJECT_TITLE}
+                            refetchQueries={REFETCH_QUERIES}
+                            helpText={tCourse('projects.my_project.field_tooltip_title')}
+                            className="[&>div]:!mt-0 [&>div]:!mb-2"
+                          />
+                        ) : (
+                          <div className="space-y-1">
+                            <h4 className="text-xl font-semibold text-label-primary min-w-0 break-words">
+                              {row.title}
+                            </h4>
+                            <p className="text-xs text-label-secondary">
+                              {tCourse('projects.my_project.title_locked_hint')}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                      <StatusChip status={row.status} />
+                    </div>
+                  }
+                  coverSlot={
+                    <ProjectFormFieldSection
+                      title={tCourse('projects.my_project.cover_image_section_label')}
+                      tooltip={tCourse('projects.my_project.field_tooltip_cover_image')}
+                    >
+                    <FileUploadField
+                      variant="material"
+                      layout="stacked"
+                      mutationPreset="role"
+                      currentFileUrl={row.coverImageUrl}
+                      uploadMutation={SAVE_PROJECT_IMAGE}
+                      updateMutation={UPDATE_PROJECT_COVER_IMAGE_URL}
+                      identifierVariables={{ itemId: row.id }}
+                      uploadIdentifierVariables={{ projectId: row.id }}
+                      updateFieldName="text"
+                      acceptedFileTypes="image/*"
+                      maxFileSize={5 * 1024 * 1024}
+                      imageWidth={160}
+                      imageHeight={96}
+                      refetchQueries={REFETCH_QUERIES}
+                      uploadText={tCourse('projects.my_project.cover_image_upload_text')}
+                      altText={tCourse('projects.my_project.cover_image_alt')}
+                      onUploadError={handleCoverUploadError}
+                    />
+                    </ProjectFormFieldSection>
+                  }
+                  taglineSlot={
+                    <ProjectFormFieldSection
+                      className="mt-3"
+                      title={tCourse('projects.my_project.tagline_label')}
+                      tooltip={tCourse('projects.my_project.field_tooltip_tagline')}
+                    >
+                      <div className="rounded border border-border-primary p-3 min-h-[3.5rem] text-sm bg-bg-secondary/50">
+                        <InputField
+                          variant="eduhub"
+                          type="input"
+                          placeholder={tCourse('projects.my_project.tagline_placeholder')}
+                          itemId={row.id}
+                          value={row.tagline ?? ''}
+                          updateValueMutation={UPDATE_PROJECT_TAGLINE}
+                          refetchQueries={REFETCH_QUERIES}
+                          maxLength={400}
+                          showCharacterCount={false}
+                          className="!mb-0 border-transparent bg-transparent [&>div]:!px-0"
+                        />
+                      </div>
+                    </ProjectFormFieldSection>
+                  }
+                  descriptionSlot={
+                    <ProjectFormFieldSection
+                      className="flex flex-col flex-1 min-h-0"
+                      title={tCourse('projects.my_project.description_label')}
+                      tooltip={tCourse('projects.my_project.field_tooltip_description')}
+                    >
+                      <div className="rounded border border-border-primary p-3 flex-1 min-h-[10rem] text-sm bg-bg-secondary/50">
+                        <InputField
+                          variant="eduhub"
+                          type="textarea"
+                          placeholder={tCourse('projects.my_project.description_placeholder')}
+                          itemId={row.id}
+                          value={row.description ?? ''}
+                          updateValueMutation={UPDATE_PROJECT_DESCRIPTION}
+                          refetchQueries={REFETCH_QUERIES}
+                          maxLength={8000}
+                          showCharacterCount={false}
+                          className="!mb-0 min-h-[9rem] border-transparent bg-transparent [&>div]:!px-0"
+                        />
+                      </div>
+                    </ProjectFormFieldSection>
+                  }
+                />
+                <CheckboxSelector
+                  variant="material"
+                  label={tCourse('projects.my_project.accepting_participants_label')}
+                  checked={Boolean(row.acceptingParticipants)}
+                  updateValueMutation={UPDATE_PROJECT_ACCEPTING_PARTICIPANTS}
+                  identifierVariables={{ itemId: row.id }}
+                  refetchQueries={REFETCH_QUERIES}
+                  helpText={tCourse('projects.my_project.field_tooltip_accepting_participants')}
+                />
+              </div>
+            </div>
+
+            <div className="border-t border-border-primary pt-5">
+              <ProjectFormatSelector
+                projectTypes={projectTypesList}
+                value={row.type ?? ''}
+                onChange={(typeValue) => handleSetProjectType(row.id, typeValue)}
+              />
+            </div>
+
+            {documentationInstructionSection ? (
+              <div className="border-t border-border-primary pt-5">
+                {documentationInstructionSection}
+              </div>
+            ) : null}
+          </div>
+        );
+      }
+
+      return (
+        <div className="bg-fill-primary text-label-primary p-4 space-y-6 light">
+          {authorMentorSection}
+
+          <div className="border-t border-border-primary pt-5 space-y-3">
             <ProjectSubmissionDeadlineBelowTitle
               mode="instructor"
               project={row}
@@ -688,146 +848,25 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
               defaultDeadlineSource={courseSubmissionDeadlineDefaultSource}
               refetchQueries={REFETCH_QUERIES}
             />
-            <div className="rounded-lg border border-border-primary p-4 bg-bg-secondary/30 space-y-3">
-              <ProjectPreviewLayout
-                project={row}
-                showResourceLinks={showResourceLinks}
-                includeExcludedAuthors
-                titleRow={
-                  <div className="flex flex-wrap items-start gap-2 mb-1 w-full">
-                    <div className="min-w-0 flex-1">
-                      {canEditProjectTitle ? (
-                        <InputField
-                          variant="material"
-                          type="input"
-                          label={tCourse('projects.my_project.title_label')}
-                          placeholder={tCourse('projects.my_project.title_label')}
-                          itemId={row.id}
-                          value={row.title}
-                          updateValueMutation={UPDATE_PROJECT_TITLE}
-                          refetchQueries={REFETCH_QUERIES}
-                          helpText={tCourse('projects.my_project.field_tooltip_title')}
-                          className="[&>div]:!mt-0 [&>div]:!mb-2"
-                        />
-                      ) : (
-                        <div className="space-y-1">
-                          <h4 className="text-xl font-semibold text-label-primary min-w-0 break-words">
-                            {row.title}
-                          </h4>
-                          <p className="text-xs text-label-secondary">
-                            {tCourse('projects.my_project.title_locked_hint')}
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                    <StatusChip status={row.status} />
-                  </div>
-                }
-                coverSlot={
-                  <ProjectFormFieldSection
-                    title={tCourse('projects.my_project.cover_image_section_label')}
-                    tooltip={tCourse('projects.my_project.field_tooltip_cover_image')}
-                  >
-                  <FileUploadField
-                    variant="material"
-                    layout="stacked"
-                    mutationPreset="role"
-                    currentFileUrl={row.coverImageUrl}
-                    uploadMutation={SAVE_PROJECT_IMAGE}
-                    updateMutation={UPDATE_PROJECT_COVER_IMAGE_URL}
-                    identifierVariables={{ itemId: row.id }}
-                    uploadIdentifierVariables={{ projectId: row.id }}
-                    updateFieldName="text"
-                    acceptedFileTypes="image/*"
-                    maxFileSize={5 * 1024 * 1024}
-                    imageWidth={160}
-                    imageHeight={96}
-                    refetchQueries={REFETCH_QUERIES}
-                    uploadText={tCourse('projects.my_project.cover_image_upload_text')}
-                    altText={tCourse('projects.my_project.cover_image_alt')}
-                    onUploadError={handleCoverUploadError}
-                  />
-                  </ProjectFormFieldSection>
-                }
-                taglineSlot={
-                  <ProjectFormFieldSection
-                    className="mt-3"
-                    title={tCourse('projects.my_project.tagline_label')}
-                    tooltip={tCourse('projects.my_project.field_tooltip_tagline')}
-                  >
-                    <div className="rounded border border-border-primary p-3 min-h-[3.5rem] text-sm bg-bg-secondary/50">
-                      <InputField
-                        variant="eduhub"
-                        type="input"
-                        placeholder={tCourse('projects.my_project.tagline_placeholder')}
-                        itemId={row.id}
-                        value={row.tagline ?? ''}
-                        updateValueMutation={UPDATE_PROJECT_TAGLINE}
-                        refetchQueries={REFETCH_QUERIES}
-                        maxLength={400}
-                        showCharacterCount={false}
-                        className="!mb-0 border-transparent bg-transparent [&>div]:!px-0"
-                      />
-                    </div>
-                  </ProjectFormFieldSection>
-                }
-                descriptionSlot={
-                  <ProjectFormFieldSection
-                    className="flex flex-col flex-1 min-h-0"
-                    title={tCourse('projects.my_project.description_label')}
-                    tooltip={tCourse('projects.my_project.field_tooltip_description')}
-                  >
-                    <div className="rounded border border-border-primary p-3 flex-1 min-h-[10rem] text-sm bg-bg-secondary/50">
-                      <InputField
-                        variant="eduhub"
-                        type="textarea"
-                        placeholder={tCourse('projects.my_project.description_placeholder')}
-                        itemId={row.id}
-                        value={row.description ?? ''}
-                        updateValueMutation={UPDATE_PROJECT_DESCRIPTION}
-                        refetchQueries={REFETCH_QUERIES}
-                        maxLength={8000}
-                        showCharacterCount={false}
-                        className="!mb-0 min-h-[9rem] border-transparent bg-transparent [&>div]:!px-0"
-                      />
-                    </div>
-                  </ProjectFormFieldSection>
-                }
-              />
-              {projectTypeSelector}
-              {documentationInstructionSelector}
-              <CheckboxSelector
-                variant="material"
-                label={tCourse('projects.my_project.accepting_participants_label')}
-                checked={Boolean(row.acceptingParticipants)}
-                updateValueMutation={UPDATE_PROJECT_ACCEPTING_PARTICIPANTS}
-                identifierVariables={{ itemId: row.id }}
-                refetchQueries={REFETCH_QUERIES}
-                helpText={tCourse('projects.my_project.field_tooltip_accepting_participants')}
-              />
-            </div>
-
-            <div className="border-t border-border-primary pt-4">
-              {authorMentorSection}
+            <div className="rounded-lg border border-border-primary p-3 bg-bg-secondary/20">
+              <ProjectPreviewLayout project={row} showResourceLinks={showResourceLinks} includeExcludedAuthors />
             </div>
           </div>
-        );
-      }
 
-      return (
-        <div className="bg-fill-primary text-label-primary p-4 space-y-4 light">
-          <ProjectSubmissionDeadlineBelowTitle
-            mode="instructor"
-            project={row}
-            courseDefaultSubmissionDeadline={courseDefaultProjectSubmissionDeadline}
-            defaultDeadlineSource={courseSubmissionDeadlineDefaultSource}
-            refetchQueries={REFETCH_QUERIES}
-          />
-          <div className="rounded-lg border border-border-primary p-3 bg-bg-secondary/20">
-            <ProjectPreviewLayout project={row} showResourceLinks={showResourceLinks} includeExcludedAuthors />
+          <div className="border-t border-border-primary pt-5">
+            <ProjectFormatSelector
+              projectTypes={projectTypesList}
+              value={row.type ?? ''}
+              onChange={(typeValue) => handleSetProjectType(row.id, typeValue)}
+            />
           </div>
-          {projectTypeSelector}
-          {documentationInstructionSelector}
+
+          {documentationInstructionSection ? (
+            <div className="border-t border-border-primary pt-5">
+              {documentationInstructionSection}
+            </div>
+          ) : null}
+
           {(row.rating != null || row.ratingComment?.trim()) && (
             <div className="text-sm space-y-2 border-t border-border-primary pt-3">
               <div className="flex flex-wrap gap-4">
@@ -848,9 +887,6 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
               ) : null}
             </div>
           )}
-          <div className="border-t border-border-primary pt-3">
-            {authorMentorSection}
-          </div>
         </div>
       );
     },
@@ -860,7 +896,6 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
       handleRemoveMentor,
       handleSetProjectType,
       projectTypesList,
-      programDefaultProjectType,
       courseDefaultProjectSubmissionDeadline,
       courseSubmissionDeadlineDefaultSource,
       t,
