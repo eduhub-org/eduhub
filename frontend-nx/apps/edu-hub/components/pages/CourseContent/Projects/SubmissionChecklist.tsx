@@ -1,9 +1,9 @@
-import { ProjectRow, ProjectTypeRow } from './types';
+import { ProjectRow, ProjectTypeRequirements } from './types';
 import { isProjectResourceUrlPresent } from './projectMandatory';
 
 export const isChecklistComplete = (
   project: ProjectRow,
-  projectType: ProjectTypeRow | null | undefined
+  projectType: ProjectTypeRequirements | null | undefined
 ): boolean => {
   if (!projectType) return false;
   if (projectType.requiresDocumentation && !isProjectResourceUrlPresent(project.documentationUrl)) {
