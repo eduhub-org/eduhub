@@ -6,7 +6,6 @@ import { useUserId } from '../../../../hooks/user';
 import {
   PROJECTS_BY_COURSE,
   MY_PROJECT_BY_COURSE,
-  PROJECT_TYPES,
 } from '../../../../queries/project';
 import {
   ProjectsByCourse,
@@ -16,7 +15,6 @@ import {
   MyProjectByCourse,
   MyProjectByCourseVariables,
 } from '../../../../queries/__generated__/MyProjectByCourse';
-import { ProjectTypes } from '../../../../queries/__generated__/ProjectTypes';
 import {
   ProjectParticipationStatus_enum,
   ProjectStatus_enum,
@@ -78,8 +76,6 @@ const Projects: FC<ProjectsProps> = ({
       skip: !userId,
     }
   );
-
-  const projectTypesQuery = useRoleQuery<ProjectTypes>(PROJECT_TYPES);
 
   const myAcceptedProject = useMemo(
     () =>
@@ -149,8 +145,6 @@ const Projects: FC<ProjectsProps> = ({
     );
   }
 
-  const projectTypes = projectTypesQuery.data?.ProjectType ?? [];
-
   const showMyProjectPanel = Boolean(myProject && userId);
 
   const showProposeButton =
@@ -183,7 +177,6 @@ const Projects: FC<ProjectsProps> = ({
                 project={myProject!}
                 userId={userId}
                 isExcludedAuthor={isExcludedFromMyProject}
-                projectTypes={projectTypes}
                 courseDefaultSubmissionDeadline={effectiveSubmissionDeadline}
                 submissionDeadlineDefaultSource={submissionDeadlineDefaultSource}
                 refetchQueries={REFETCH_QUERIES}

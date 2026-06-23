@@ -2,7 +2,7 @@ import { FC, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import { MdCheckCircle, MdRadioButtonUnchecked } from 'react-icons/md';
 import { ProjectStatus_enum } from '../../../../__generated__/globalTypes';
-import { ProjectRow, ProjectTypeRow } from './types';
+import { ProjectRow, ProjectTypeRequirements } from './types';
 import { PROJECT_FALLBACK_TITLE } from './projectDefaults';
 import { isProjectResourceUrlPresent, safeProjectInstructionHref } from './projectMandatory';
 import { isOnlineCourseProject } from './projectStatusDisplay';
@@ -19,7 +19,7 @@ type TodoItem =
 
 interface ProjectNextTodosProps {
   project: ProjectRow;
-  projectType: ProjectTypeRow | null | undefined;
+  projectType: ProjectTypeRequirements | null | undefined;
   canEditProjectTitle: boolean;
   requestedJoinCount: number;
   isSubmissionDeadlinePassed?: boolean;

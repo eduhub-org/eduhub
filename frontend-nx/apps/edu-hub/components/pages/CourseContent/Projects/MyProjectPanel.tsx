@@ -54,7 +54,7 @@ import ManageRequestsDialog from './ManageRequestsDialog';
 import ProjectPreviewLayout from './ProjectPreviewLayout';
 import ProjectFormFieldSection from './ProjectFormFieldSection';
 import ProjectSubmissionDeadlineBelowTitle from './ProjectSubmissionDeadlineBelowTitle';
-import { ProjectRow, ProjectTypeRow } from './types';
+import { ProjectRow } from './types';
 import { PROJECT_FALLBACK_TITLE } from './projectDefaults';
 /** Extensions only — MIME variants are derived for validation; avoids raw MIME labels in the UI. */
 const PROJECT_DOCUMENTATION_ACCEPT = '.pdf,.doc,.docx,.odt';
@@ -65,7 +65,6 @@ interface MyProjectPanelProps {
   userId: string;
   /** The viewer was EXCLUDED from this project's final submission (read-only view). */
   isExcludedAuthor?: boolean;
-  projectTypes: ProjectTypeRow[];
   /** Course/program fallback when `project.submissionDeadline` is null. */
   courseDefaultSubmissionDeadline: string | null | undefined;
   submissionDeadlineDefaultSource: CourseProjectSubmissionDefaultSource;
@@ -77,7 +76,6 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
   project,
   userId,
   isExcludedAuthor = false,
-  projectTypes,
   courseDefaultSubmissionDeadline,
   submissionDeadlineDefaultSource,
   refetchQueries,
@@ -206,10 +204,11 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
     setLeaveDialogOpen(true);
   }, [cannotLeaveWhileRequestsPending, onActionError, t]);
 
-  const projectType = useMemo(
-    () => projectTypes.find((pt) => pt.value === project.type) ?? null,
-    [project.type, projectTypes]
-  );
+  // The project's own type (FK-joined, user-readable) is the source of truth for
+  // its deliverable requirements. Resolving it here — instead of from the
+  // instructor-only ProjectType catalog query — keeps the checklist and submit
+  // button working for participants.
+  const projectType = project.ProjectType ?? null;
 
   const isContentEditable =
     project.status === ProjectStatus_enum.PROPOSED ||
