@@ -543,7 +543,7 @@ const TableGrid = <T extends BaseRow,>({
             ? table.getRowModel().rows.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize)
             : table.getRowModel().rows;
 
-          const rowMarginClass = rounded ? 'mb-0' : 'mb-1';
+          const rowMarginClass = 'mb-1';
 
           // If there are no rows, render an empty row
           if (rowsToDisplay.length === 0) {

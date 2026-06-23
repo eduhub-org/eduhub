@@ -41,6 +41,7 @@ import {
   CourseProjectSubmissionDefaultSource,
   isProjectSubmissionDeadlinePassed,
 } from './projectEffectiveSubmissionDeadline';
+import { isOnlineCourseProject } from './projectStatusDisplay';
 
 interface ProjectsProps {
   courseId: number;
@@ -116,8 +117,13 @@ const Projects: FC<ProjectsProps> = ({
 
   const tableProjects = useMemo(() => {
     const all = projectsQuery.data?.Project ?? [];
-    if (!myProject) return all;
-    return all.filter((p) => p.id !== myProject.id);
+    // Hide online-course instances (copied from a template) from the participant
+    // table; only the template itself (parentProjectId === null) remains visible.
+    const filtered = all.filter(
+      (p) => !isOnlineCourseProject(p) || p.parentProjectId == null
+    );
+    if (!myProject) return filtered;
+    return filtered.filter((p) => p.id !== myProject.id);
   }, [projectsQuery.data?.Project, myProject]);
 
   const handleProposeSuccess = useCallback(() => {
