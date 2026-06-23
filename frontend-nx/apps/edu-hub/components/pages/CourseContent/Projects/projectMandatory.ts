@@ -1,4 +1,4 @@
-import { ProjectRow, ProjectTypeRow } from './types';
+import { ProjectRow, ProjectTypeRequirements } from './types';
 import { getSafeFileHref } from '../../../../helpers/filehandling';
 
 /** Static path prefix for migration-seeded default instruction PDFs in `public/`. */
@@ -52,28 +52,28 @@ export function safeProjectInstructionHref(instructionUrl?: string | null): stri
 
 export function isProjectDocumentationIncomplete(
   project: ProjectRow,
-  projectType: ProjectTypeRow | null | undefined
+  projectType: ProjectTypeRequirements | null | undefined
 ): boolean {
   return Boolean(projectType?.requiresDocumentation && !isProjectResourceUrlPresent(project.documentationUrl));
 }
 
 export function isProjectPresentationIncomplete(
   project: ProjectRow,
-  projectType: ProjectTypeRow | null | undefined
+  projectType: ProjectTypeRequirements | null | undefined
 ): boolean {
   return Boolean(projectType?.requiresPresentation && !isProjectResourceUrlPresent(project.presentationUrl));
 }
 
 export function isProjectExternalUrlIncomplete(
   project: ProjectRow,
-  projectType: ProjectTypeRow | null | undefined
+  projectType: ProjectTypeRequirements | null | undefined
 ): boolean {
   return Boolean(projectType?.requiresExternalUrl && !isProjectResourceUrlPresent(project.externalUrl));
 }
 
 export function isProjectCoverImageIncomplete(
   project: ProjectRow,
-  projectType: ProjectTypeRow | null | undefined
+  projectType: ProjectTypeRequirements | null | undefined
 ): boolean {
   return Boolean(projectType?.requiresCoverImage && !project.coverImageUrl?.trim());
 }
