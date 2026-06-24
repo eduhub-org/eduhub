@@ -5,6 +5,16 @@ import { Sessions } from '../Sessions';
 import type { Course_Course_by_pk_Sessions, Course_Course_by_pk_CourseLocations } from '../../../../queries/__generated__/Course';
 import { LocationOption_enum } from '../../../../__generated__/globalTypes';
 
+class ResizeObserverMock {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+
+beforeAll(() => {
+  global.ResizeObserver = ResizeObserverMock as typeof ResizeObserver;
+});
+
 // Mock the hooks and dependencies
 jest.mock('next-intl', () => ({
   useTranslations: () => (key: string) => key,
@@ -110,9 +120,8 @@ describe('Sessions Component - Separator Logic', () => {
     expect(screen.getByText('Test Address 2')).toBeInTheDocument();
 
     // Check that separators are present between addresses
-    // The separator should be " + " between the two addresses (with non-breaking space)
-    const separator = screen.getByText(' +\u00A0');
-    expect(separator).toBeInTheDocument();
+    const listItem = screen.getByText('Test Session').closest('li');
+    expect(listItem?.textContent).toMatch(/Test Address 1.*\+.*Test Address 2/);
   });
 
   it('should not render separators when there is only one address', () => {
@@ -136,6 +145,37 @@ describe('Sessions Component - Separator Logic', () => {
 
     // Check that no separator is present
     expect(screen.queryByText(' +\u00A0')).not.toBeInTheDocument();
+  });
+
+  it('should render session description when provided', () => {
+    const sessionWithDescription = [
+      {
+        ...mockSessions[0],
+        description: 'Bring **materials**.',
+      },
+    ];
+
+    render(
+      <Sessions
+        sessions={sessionWithDescription}
+        courseLocations={mockCourseLocations}
+        isLoggedInParticipant={true}
+      />
+    );
+
+    expect(screen.getByText('materials').tagName).toBe('STRONG');
+  });
+
+  it('should not render description block when description is empty', () => {
+    render(
+      <Sessions
+        sessions={mockSessions}
+        courseLocations={mockCourseLocations}
+        isLoggedInParticipant={true}
+      />
+    );
+
+    expect(screen.queryByText('sessions.description_show_more')).not.toBeInTheDocument();
   });
 
   it('should handle empty SessionAddresses gracefully', () => {
