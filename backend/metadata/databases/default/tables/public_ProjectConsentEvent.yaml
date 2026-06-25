@@ -10,24 +10,26 @@ object_relationships:
       foreign_key_constraint_on: projectId
 insert_permissions:
   # Any ACCEPTED author may insert a consent event for their own project.
-  # actorUserId is always stamped server-side from the session; clients supply
-  # projectId, eventType ('granted'|'withdrawn'), and termsVersion.
+  # actorUserId must equal the session user (the check below prevents spoofing),
+  # so a user_access caller can only ever record themselves as the actor.
   - role: user_access
     permission:
       check:
-        Project:
-          ProjectAuthors:
-            _and:
-              - participationStatus:
-                  _eq: ACCEPTED
-              - userId:
-                  _eq: X-Hasura-User-Id
-      set:
-        actorUserId: x-hasura-user-id
+        _and:
+          - actorUserId:
+              _eq: X-Hasura-User-Id
+          - Project:
+              ProjectAuthors:
+                _and:
+                  - participationStatus:
+                      _eq: ACCEPTED
+                  - userId:
+                      _eq: X-Hasura-User-Id
       columns:
         - projectId
         - eventType
         - termsVersion
+        - actorUserId
 select_permissions:
   # Team members (ACCEPTED or EXCLUDED) may read consent events for their project.
   # Enrolled non-authors must not see consent events.

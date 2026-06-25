@@ -1430,6 +1430,37 @@ export enum ProjectAuthor_update_column {
 }
 
 /**
+ * unique or primary key constraints on table "ProjectConsentEvent"
+ */
+export enum ProjectConsentEvent_constraint {
+  ProjectConsentEvent_pkey = "ProjectConsentEvent_pkey",
+}
+
+/**
+ * select columns of table "ProjectConsentEvent"
+ */
+export enum ProjectConsentEvent_select_column {
+  actorUserId = "actorUserId",
+  created_at = "created_at",
+  eventType = "eventType",
+  id = "id",
+  projectId = "projectId",
+  termsVersion = "termsVersion",
+}
+
+/**
+ * update columns of table "ProjectConsentEvent"
+ */
+export enum ProjectConsentEvent_update_column {
+  actorUserId = "actorUserId",
+  created_at = "created_at",
+  eventType = "eventType",
+  id = "id",
+  projectId = "projectId",
+  termsVersion = "termsVersion",
+}
+
+/**
  * unique or primary key constraints on table "ProjectCourse"
  */
 export enum ProjectCourse_constraint {
@@ -1695,6 +1726,7 @@ export enum Project_select_column {
   submissionDeadline = "submissionDeadline",
   submittedAt = "submittedAt",
   submittedBy = "submittedBy",
+  suggestedForPublication = "suggestedForPublication",
   tagline = "tagline",
   title = "title",
   type = "type",
@@ -1706,6 +1738,7 @@ export enum Project_select_column {
  */
 export enum Project_select_column_Project_aggregate_bool_exp_bool_and_arguments_columns {
   acceptingParticipants = "acceptingParticipants",
+  suggestedForPublication = "suggestedForPublication",
 }
 
 /**
@@ -1713,6 +1746,7 @@ export enum Project_select_column_Project_aggregate_bool_exp_bool_and_arguments_
  */
 export enum Project_select_column_Project_aggregate_bool_exp_bool_or_arguments_columns {
   acceptingParticipants = "acceptingParticipants",
+  suggestedForPublication = "suggestedForPublication",
 }
 
 /**
@@ -1741,6 +1775,7 @@ export enum Project_update_column {
   submissionDeadline = "submissionDeadline",
   submittedAt = "submittedAt",
   submittedBy = "submittedBy",
+  suggestedForPublication = "suggestedForPublication",
   tagline = "tagline",
   title = "title",
   type = "type",
@@ -7704,6 +7739,65 @@ export interface ProjectAuthor_variance_order_by {
   projectId?: order_by | null;
 }
 
+export interface ProjectConsentEvent_aggregate_bool_exp {
+  count?: ProjectConsentEvent_aggregate_bool_exp_count | null;
+}
+
+export interface ProjectConsentEvent_aggregate_bool_exp_count {
+  arguments?: ProjectConsentEvent_select_column[] | null;
+  distinct?: boolean | null;
+  filter?: ProjectConsentEvent_bool_exp | null;
+  predicate: Int_comparison_exp;
+}
+
+/**
+ * input type for inserting array relation for remote table "ProjectConsentEvent"
+ */
+export interface ProjectConsentEvent_arr_rel_insert_input {
+  data: ProjectConsentEvent_insert_input[];
+  on_conflict?: ProjectConsentEvent_on_conflict | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "ProjectConsentEvent". All fields are combined with a logical 'AND'.
+ */
+export interface ProjectConsentEvent_bool_exp {
+  ActorUser?: User_bool_exp | null;
+  Project?: Project_bool_exp | null;
+  _and?: ProjectConsentEvent_bool_exp[] | null;
+  _not?: ProjectConsentEvent_bool_exp | null;
+  _or?: ProjectConsentEvent_bool_exp[] | null;
+  actorUserId?: uuid_comparison_exp | null;
+  created_at?: timestamptz_comparison_exp | null;
+  eventType?: String_comparison_exp | null;
+  id?: Int_comparison_exp | null;
+  projectId?: Int_comparison_exp | null;
+  termsVersion?: String_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "ProjectConsentEvent"
+ */
+export interface ProjectConsentEvent_insert_input {
+  ActorUser?: User_obj_rel_insert_input | null;
+  Project?: Project_obj_rel_insert_input | null;
+  actorUserId?: any | null;
+  created_at?: any | null;
+  eventType?: string | null;
+  id?: number | null;
+  projectId?: number | null;
+  termsVersion?: string | null;
+}
+
+/**
+ * on_conflict condition type for table "ProjectConsentEvent"
+ */
+export interface ProjectConsentEvent_on_conflict {
+  constraint: ProjectConsentEvent_constraint;
+  update_columns: ProjectConsentEvent_update_column[];
+  where?: ProjectConsentEvent_bool_exp | null;
+}
+
 export interface ProjectCourse_aggregate_bool_exp {
   count?: ProjectCourse_aggregate_bool_exp_count | null;
 }
@@ -8663,6 +8757,8 @@ export interface Project_bool_exp {
   ParentProject?: Project_bool_exp | null;
   ProjectAuthors?: ProjectAuthor_bool_exp | null;
   ProjectAuthors_aggregate?: ProjectAuthor_aggregate_bool_exp | null;
+  ProjectConsentEvents?: ProjectConsentEvent_bool_exp | null;
+  ProjectConsentEvents_aggregate?: ProjectConsentEvent_aggregate_bool_exp | null;
   ProjectCourses?: ProjectCourse_bool_exp | null;
   ProjectCourses_aggregate?: ProjectCourse_aggregate_bool_exp | null;
   ProjectDocumentationInstruction?: ProjectDocumentationInstruction_bool_exp | null;
@@ -8698,6 +8794,7 @@ export interface Project_bool_exp {
   submissionDeadline?: timestamptz_comparison_exp | null;
   submittedAt?: timestamptz_comparison_exp | null;
   submittedBy?: uuid_comparison_exp | null;
+  suggestedForPublication?: Boolean_comparison_exp | null;
   tagline?: String_comparison_exp | null;
   title?: String_comparison_exp | null;
   type?: String_comparison_exp | null;
@@ -8712,6 +8809,7 @@ export interface Project_insert_input {
   Organization?: Organization_obj_rel_insert_input | null;
   ParentProject?: Project_obj_rel_insert_input | null;
   ProjectAuthors?: ProjectAuthor_arr_rel_insert_input | null;
+  ProjectConsentEvents?: ProjectConsentEvent_arr_rel_insert_input | null;
   ProjectCourses?: ProjectCourse_arr_rel_insert_input | null;
   ProjectDocumentationInstruction?: ProjectDocumentationInstruction_obj_rel_insert_input | null;
   ProjectMentors?: ProjectMentor_arr_rel_insert_input | null;
@@ -8742,6 +8840,7 @@ export interface Project_insert_input {
   submissionDeadline?: any | null;
   submittedAt?: any | null;
   submittedBy?: any | null;
+  suggestedForPublication?: boolean | null;
   tagline?: string | null;
   title?: string | null;
   type?: string | null;

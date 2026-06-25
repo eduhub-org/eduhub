@@ -52,6 +52,7 @@ import {
   MANDATORY_INCOMPLETE_HIGHLIGHT_CLASS,
 } from './projectMandatory';
 import ManageRequestsDialog from './ManageRequestsDialog';
+import PublicationConsentField from './PublicationConsentField';
 import ProjectPreviewLayout from './ProjectPreviewLayout';
 import ProjectFormFieldSection from './ProjectFormFieldSection';
 import ProjectSubmissionDeadlineBelowTitle from './ProjectSubmissionDeadlineBelowTitle';
@@ -220,6 +221,11 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
     project.status === ProjectStatus_enum.ONGOING;
 
   const isSubmitted = project.status === ProjectStatus_enum.SUBMITTED;
+  // Publication consent only matters once a project has actually been submitted.
+  const isPostSubmission =
+    project.status === ProjectStatus_enum.SUBMITTED ||
+    project.status === ProjectStatus_enum.COMPLETED ||
+    project.status === ProjectStatus_enum.PUBLISHED;
   const effectiveSubmissionDeadlineIso = useMemo(
     () =>
       getEffectiveProjectSubmissionDeadlineIso(
@@ -247,6 +253,7 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
   const canEditFields = isContentEditable && !isDeadlinePassed;
 
   const isOnlineCourse = isOnlineCourseProject(project);
+  const consentVariant = acceptedAuthors.length > 1 ? 'team' : 'solo';
 
   /** Online-course projects: metadata comes from the template; only documentation etc. remain editable. */
   const canEditProjectMetadata = canEditFields && !isOnlineCourse;
@@ -300,6 +307,7 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
                 projectId: project.id,
                 eventType: 'granted',
                 termsVersion: 'v1',
+                actorUserId: userId,
               },
             });
           } catch (err) {
@@ -326,7 +334,7 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
         setSubmitInProgress(false);
       }
     },
-    [updateAuthorParticipationStatus, submitProject, insertConsentEvent, project.id, onActionError, t]
+    [updateAuthorParticipationStatus, submitProject, insertConsentEvent, project.id, userId, onActionError, t]
   );
 
   const handleLeaveConfirm = useCallback(async () => {
@@ -399,19 +407,23 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
   const latestConsentEvent = project.ProjectConsentEvents?.[0] ?? null;
   const publicationConsented = latestConsentEvent?.eventType === 'granted';
 
-  const handleConsentToggle = useCallback(async () => {
-    try {
-      await insertConsentEvent({
-        variables: {
-          projectId: project.id,
-          eventType: publicationConsented ? 'withdrawn' : 'granted',
-          termsVersion: 'v1',
-        },
-      });
-    } catch (err) {
-      onActionError(err instanceof Error ? err.message : t('projects.action_failed'));
-    }
-  }, [insertConsentEvent, project.id, publicationConsented, onActionError, t]);
+  const handleConsentToggle = useCallback(
+    async (granted: boolean) => {
+      try {
+        await insertConsentEvent({
+          variables: {
+            projectId: project.id,
+            eventType: granted ? 'granted' : 'withdrawn',
+            termsVersion: 'v1',
+            actorUserId: userId,
+          },
+        });
+      } catch (err) {
+        onActionError(err instanceof Error ? err.message : t('projects.action_failed'));
+      }
+    },
+    [insertConsentEvent, project.id, userId, onActionError, t]
+  );
 
   const acceptingParticipantsCheckbox =
     project.status === ProjectStatus_enum.PROPOSED ? (
@@ -454,7 +466,12 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
                 <h4 className="text-xl font-semibold text-label-primary min-w-0 break-words">
                   {project.title}
                 </h4>
-                <StatusChip status={project.status} />
+                <StatusChip
+                  status={project.status}
+                  rating={project.rating}
+                  ratingComment={project.ratingComment}
+                  suggestedForPublication={project.suggestedForPublication}
+                />
               </div>
             }
           />
@@ -648,12 +665,22 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
                     </div>
                   )}
                 </div>
-                <StatusChip status={project.status} />
+                <StatusChip
+                  status={project.status}
+                  rating={project.rating}
+                  ratingComment={project.ratingComment}
+                  suggestedForPublication={project.suggestedForPublication}
+                />
               </div>
             ) : (
               <div className="flex flex-wrap items-center gap-2 mb-1">
                 <h4 className="text-xl font-semibold text-label-primary min-w-0 break-words">{project.title}</h4>
-                <StatusChip status={project.status} />
+                <StatusChip
+                  status={project.status}
+                  rating={project.rating}
+                  ratingComment={project.ratingComment}
+                  suggestedForPublication={project.suggestedForPublication}
+                />
               </div>
             )
           }
@@ -837,43 +864,40 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
         </div>
       ) : null}
 
+      {isPostSubmission && !isOnlineCourse ? (
       <div className="border-t border-border-primary pt-4 space-y-2">
         <p className="text-sm font-semibold text-label-primary">
-          {t('projects.my_project.publication_consent_heading')}
-        </p>
-        <p className="text-xs text-label-secondary">
-          {t('projects.my_project.publication_consent_description')}
+          {t('projects.publication_consent.heading')}
         </p>
         {latestConsentEvent ? (
           <p className="text-xs text-label-secondary">
             {publicationConsented
-              ? t('projects.my_project.publication_consent_status_granted', {
+              ? t('projects.publication_consent.status_granted', {
                   name: makeFullName(
                     latestConsentEvent.ActorUser?.firstName ?? '',
                     latestConsentEvent.ActorUser?.lastName ?? ''
                   ) || tCommon('unknown_user'),
                   date: formattedDateWithTime(new Date(latestConsentEvent.created_at), locale),
                 })
-              : t('projects.my_project.publication_consent_status_withdrawn', {
+              : t('projects.publication_consent.status_withdrawn', {
+                  name: makeFullName(
+                    latestConsentEvent.ActorUser?.firstName ?? '',
+                    latestConsentEvent.ActorUser?.lastName ?? ''
+                  ) || tCommon('unknown_user'),
                   date: formattedDateWithTime(new Date(latestConsentEvent.created_at), locale),
                 })}
           </p>
-        ) : (
-          <p className="text-xs text-label-secondary">
-            {t('projects.my_project.publication_consent_status_none')}
-          </p>
-        )}
+        ) : null}
         {myAuthorRow?.participationStatus === ProjectParticipationStatus_enum.ACCEPTED ? (
-          <Button
-            onClick={handleConsentToggle}
+          <PublicationConsentField
+            checked={publicationConsented}
+            onChange={handleConsentToggle}
+            variant={consentVariant}
             disabled={consentLoading}
-          >
-            {publicationConsented
-              ? t('projects.my_project.publication_consent_withdraw_button')
-              : t('projects.my_project.publication_consent_grant_button')}
-          </Button>
+          />
         ) : null}
       </div>
+      ) : null}
 
       <div className="border-t border-border-primary pt-4">
         <div className="flex flex-wrap gap-2">
@@ -910,6 +934,7 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
         onConfirm={handleSubmitConfirm}
         loading={submitting || submitInProgress}
         authors={submitAuthorOptions}
+        showPublicationConsent={!isOnlineCourse}
       />
 
       <RequestProjectReviewDialog

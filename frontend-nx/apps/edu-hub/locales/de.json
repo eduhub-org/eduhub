@@ -372,7 +372,10 @@
         "ONGOING": "In Bearbeitung",
         "SUBMITTED": "Eingereicht",
         "COMPLETED": "Abgeschlossen",
+        "COMPLETED_PASSED": "Bestanden",
         "INCOMPLETE": "Nicht abgeschlossen",
+        "INCOMPLETE_FAILED": "Nicht bestanden",
+        "SUGGESTED_FOR_PUBLICATION": "Zur Veröffentlichung vorgeschlagen",
         "PUBLISHED": "Veröffentlicht"
       },
       "type_label": {
@@ -524,14 +527,16 @@
         "submitted_banner": "Am {date} eingereicht von {name}. Das Projekt ist nun für Änderungen gesperrt.",
         "sent_back_banner": "Dein Projekt wurde zur Überarbeitung zurückgegeben. Bitte aktualisiere es und reiche erneut ein.",
         "deadline_passed_banner": "Die Abgabefrist ist am {date} abgelaufen.",
-        "excluded_banner": "Die einreichende Person hat Dich von der finalen Einreichung dieses Projekts ausgeschlossen. Du zählst nicht mehr zu den Autor:innen.",
-        "publication_consent_heading": "Einwilligung zur Veröffentlichung",
-        "publication_consent_description": "opencampus.sh kann dieses Projekt als Showcase-Beispiel auf der Plattform und in Werbematerialien veröffentlichen. Was geteilt wird: Projekttitel, Beschreibung, Titelbild, hochgeladene Dateien und Links sowie die Namen und Element-Raum-Links der beitragenden Autor:innen. Jedes Teammitglied kann die Einwilligung jederzeit erteilen oder widerrufen. Ein Widerruf führt zur Entfernung des Projekts aus der Veröffentlichung.",
-        "publication_consent_status_none": "Noch keine Einwilligung erteilt — das Projekt wird nicht veröffentlicht.",
-        "publication_consent_status_granted": "Einwilligung erteilt von {name} am {date}.",
-        "publication_consent_status_withdrawn": "Einwilligung widerrufen am {date} — das Projekt wird nicht veröffentlicht.",
-        "publication_consent_grant_button": "Einwilligung zur Veröffentlichung erteilen",
-        "publication_consent_withdraw_button": "Einwilligung zur Veröffentlichung widerrufen"
+        "excluded_banner": "Die einreichende Person hat Dich von der finalen Einreichung dieses Projekts ausgeschlossen. Du zählst nicht mehr zu den Autor:innen."
+      },
+      "publication_consent": {
+        "heading": "Einwilligung zur Veröffentlichung",
+        "checkbox_label_solo": "Ich willige ein, dass dieses Projekt veröffentlicht werden kann.",
+        "checkbox_label_team": "Im Namen meines Teams willige ich ein, dass dieses Projekt veröffentlicht werden kann.",
+        "details_summary": "Was wird veröffentlicht?",
+        "description": "opencampus.sh (betrieben vom gemeinnützigen Verein Campus Business Box e.V.) kann dieses Projekt als Showcase-Beispiel auf der Plattform und in Werbematerialien veröffentlichen sowie für die Teilnahme oder Einreichung bei Preisen verwenden. Was geteilt wird: Projekttitel, Beschreibung, Titelbild, hochgeladene Dateien und Links sowie die Namen und Element-Raum-Links der beitragenden Autor:innen. Die Einwilligung ist freiwillig und kann jederzeit in deiner Projektansicht erteilt oder widerrufen werden; ein Widerruf entfernt das Projekt aus der Veröffentlichung.",
+        "status_granted": "Einwilligung erteilt von {name} am {date}.",
+        "status_withdrawn": "Einwilligung widerrufen von {name} am {date} — das Projekt wird nicht veröffentlicht."
       },
       "submit_dialog": {
         "title": "Projekt zur Bewertung einreichen",
@@ -540,12 +545,7 @@
         "body_irreversible": "Eine Kursleitung kann das Projekt bei Bedarf zur Überarbeitung zurückgeben.",
         "contributors_intro": "Wähle alle Autor:innen aus, die aktiv und substanziell am Projekt mitgearbeitet haben.",
         "contributor_self_suffix": "(Du)",
-        "confirm_button": "Einreichen",
-        "consent_section_heading": "Einwilligung zur Veröffentlichung (optional)",
-        "consent_description": "opencampus.sh kann dieses Projekt als Showcase-Beispiel auf der Plattform und in Werbematerialien veröffentlichen. Was geteilt wird: Projekttitel, Beschreibung, Titelbild, hochgeladene Dateien und Links sowie die Namen und Element-Raum-Links der beitragenden Autor:innen. Die Einwilligung ist freiwillig und hat keinen Einfluss auf Teilnahme, Bewertung oder Preise.",
-        "consent_label_solo": "Ich stimme zu, dass dieses Projekt von opencampus.sh wie oben beschrieben veröffentlicht werden darf.",
-        "consent_label_team": "Im Namen unseres Teams stimmen wir zu, dass dieses Projekt von opencampus.sh wie oben beschrieben veröffentlicht werden darf. Ich bestätige, dass ich von meinen Teammitgliedern bevollmächtigt bin, diese Einwilligung zu erteilen.",
-        "consent_optional_note": "Diese Einwilligung kann nach der Einreichung jederzeit in der Projektansicht erteilt oder widerrufen werden. Ein Widerruf führt zur Entfernung des Projekts aus der Veröffentlichung."
+        "confirm_button": "Einreichen"
       },
       "manage_requests": {
         "title": "Mitautor:innen-Anfragen",
@@ -1327,7 +1327,8 @@
         "review": "Bewerten",
         "evaluate_project": "Projekt beurteilen",
         "evaluate_disabled_tooltip": "Sobald das Projekt eingereicht wurde, kannst du es hier bewerten.",
-        "publish": "Im Showcase veröffentlichen"
+        "suggest_for_publication": "Zur Veröffentlichung vorschlagen",
+        "withdraw_publication_suggestion": "Vorschlag zurückziehen"
       },
       "delete_template_confirmation": "Die Projektvorlage \"{title}\" wirklich löschen? Das kann nicht rückgängig gemacht werden.",
       "delete_template_disabled_tooltip": "Du kannst diese Vorlage nicht löschen, solange mindestens eine daraus erstellte Kopie in diesem Kurs existiert.",
@@ -1355,7 +1356,8 @@
         "submission_deadline_instructor_origin_program": " (Programmvorgabe)",
         "submission_deadline_instructor_origin_program_legacy": " (Programm: Leistungsnachweis)",
         "submission_deadline_instructor_picker_prompt": "Wenn Du für dieses Projekt eine abweichende Frist setzen willst, wähle sie hier aus:",
-        "submission_deadline_instructor_picker_help": "Leer lassen, um die oben genannte Abgabefrist zu übernehmen."
+        "submission_deadline_instructor_picker_help": "Leer lassen, um die oben genannte Abgabefrist zu übernehmen.",
+        "type_locked_hint": "Der Projekttyp kann nach Bestätigung oder Einreichung des Projekts nicht mehr geändert werden."
       },
       "confirm_project_dialog": {
         "title": "Projekt bestätigen",

@@ -117,6 +117,7 @@ select_permissions:
         - acceptingParticipants
         - coverImageUrl
         - description
+        - documentationInstructionId
         - documentationUrl
         - externalUrl
         - id
@@ -161,6 +162,7 @@ select_permissions:
         - submissionDeadline
         - submittedAt
         - submittedBy
+        - suggestedForPublication
         - projectReviewRequestedAt
         - tagline
         - title
@@ -200,6 +202,7 @@ select_permissions:
         - submissionDeadline
         - submittedAt
         - submittedBy
+        - suggestedForPublication
         - projectReviewRequestedAt
         - tagline
         - title
@@ -238,6 +241,7 @@ update_permissions:
         - tagline
         - title
         - type
+        - suggestedForPublication
       filter:
         _or:
           - ProjectCourses:

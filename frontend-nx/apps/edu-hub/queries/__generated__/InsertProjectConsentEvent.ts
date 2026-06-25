@@ -4,7 +4,7 @@
 // This file was automatically generated and should not be edited.
 
 // ====================================================
-// GraphQL mutation: InsertProjectConsentEvent
+// GraphQL mutation operation: InsertProjectConsentEvent
 // ====================================================
 
 export interface InsertProjectConsentEvent_insert_ProjectConsentEvent_one {
@@ -16,6 +16,9 @@ export interface InsertProjectConsentEvent_insert_ProjectConsentEvent_one {
 }
 
 export interface InsertProjectConsentEvent {
+  /**
+   * insert a single row into the table: "ProjectConsentEvent"
+   */
   insert_ProjectConsentEvent_one: InsertProjectConsentEvent_insert_ProjectConsentEvent_one | null;
 }
 
@@ -23,4 +26,5 @@ export interface InsertProjectConsentEventVariables {
   projectId: number;
   eventType: string;
   termsVersion: string;
+  actorUserId: any;
 }

@@ -14,6 +14,9 @@ export interface UpdateProjectType_update_Project_by_pk {
    * FK to ProjectType.value. Required with documentationInstructionId before leaving PROPOSED (check constraint). Drives mandatory deliverables and workflow (e.g. ONLINE_COURSE template claim may insert ONGOING directly).
    */
   type: string | null;
+  /**
+   * FK to ProjectDocumentationInstruction.id. Must match Project.type (trigger Project_instruction_matches_type_trg). Instruction PDF describes deliverable composition; enforced uploads are only those required by the project type.
+   */
   documentationInstructionId: number | null;
 }
 

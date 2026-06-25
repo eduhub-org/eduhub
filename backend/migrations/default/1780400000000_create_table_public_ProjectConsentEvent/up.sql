@@ -17,9 +17,7 @@ CREATE TABLE "public"."ProjectConsentEvent" (
 );
 
 COMMENT ON TABLE "public"."ProjectConsentEvent" IS
-  E'Append-only log of publication-consent events for a project. '
-  E'Current consent state is derived: the project has active consent when the latest event has eventType = ''granted''. '
-  E'termsVersion records which version of the consent text was shown at the time of the action.';
+  E'Append-only log of publication-consent events for a project. Current consent state is derived: the project has active consent when the latest event has eventType = ''granted''. termsVersion records which version of the consent text was shown at the time of the action.';
 
 CREATE INDEX "ProjectConsentEvent_projectId_created_at_idx"
   ON "public"."ProjectConsentEvent" ("projectId", "created_at" DESC);

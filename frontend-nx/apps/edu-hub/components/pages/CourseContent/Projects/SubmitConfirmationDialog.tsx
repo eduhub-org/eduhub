@@ -3,6 +3,7 @@ import { useTranslations } from 'next-intl';
 import { DialogShell } from '../../../common/dialogs/DialogShell';
 import { Button } from '../../../common/Button';
 import CheckboxSelector from '../../../inputs/CheckboxSelector';
+import PublicationConsentField from './PublicationConsentField';
 
 export interface SubmitAuthorOption {
   /** ProjectAuthor.id */
@@ -20,6 +21,8 @@ interface SubmitConfirmationDialogProps {
   onConfirm: (excludedAuthorIds: number[], consentGranted: boolean) => void;
   loading?: boolean;
   authors: SubmitAuthorOption[];
+  /** Online-course projects do not offer publication consent. */
+  showPublicationConsent?: boolean;
 }
 
 const SubmitConfirmationDialog: FC<SubmitConfirmationDialogProps> = ({
@@ -28,6 +31,7 @@ const SubmitConfirmationDialog: FC<SubmitConfirmationDialogProps> = ({
   onConfirm,
   loading,
   authors,
+  showPublicationConsent = true,
 }) => {
   const t = useTranslations('course');
   const tCommon = useTranslations('common');
@@ -48,13 +52,10 @@ const SubmitConfirmationDialog: FC<SubmitConfirmationDialogProps> = ({
     const excludedAuthorIds = authors
       .filter((a) => !a.isSelf && checked[a.id] === false)
       .map((a) => a.id);
-    onConfirm(excludedAuthorIds, consentGranted);
+    onConfirm(excludedAuthorIds, showPublicationConsent ? consentGranted : false);
   };
 
-  const isSolo = authors.length <= 1;
-  const consentLabel = isSolo
-    ? t('projects.submit_dialog.consent_label_solo')
-    : t('projects.submit_dialog.consent_label_team');
+  const consentVariant = authors.length <= 1 ? 'solo' : 'team';
 
   return (
     <DialogShell
@@ -102,25 +103,19 @@ const SubmitConfirmationDialog: FC<SubmitConfirmationDialogProps> = ({
         {t('projects.submit_dialog.body_irreversible')}
       </p>
 
+      {showPublicationConsent ? (
       <div className="rounded border border-border-primary bg-bg-secondary/30 p-3 space-y-2">
         <p className="text-sm font-semibold text-label-primary">
-          {t('projects.submit_dialog.consent_section_heading')}
+          {t('projects.publication_consent.heading')}
         </p>
-        <p className="text-xs text-label-secondary">
-          {t('projects.submit_dialog.consent_description')}
-        </p>
-        <CheckboxSelector
-          variant="material"
-          suppressFeedback
+        <PublicationConsentField
           checked={consentGranted}
+          onChange={setConsentGranted}
+          variant={consentVariant}
           disabled={loading}
-          onValueUpdated={setConsentGranted}
-          label={consentLabel}
         />
-        <p className="text-xs text-label-secondary">
-          {t('projects.submit_dialog.consent_optional_note')}
-        </p>
       </div>
+      ) : null}
     </DialogShell>
   );
 };

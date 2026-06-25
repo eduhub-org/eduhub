@@ -96,7 +96,7 @@ const ProjectFormatSelector: FC<ProjectFormatSelectorProps> = ({
   );
 
   const handleFormatChange = (next: ProjectFormat) => {
-    if (next === format) return;
+    if (disabled || next === format) return;
     if (next === 'online') {
       onChange(ONLINE_COURSE_TYPE_VALUE);
     } else {
@@ -115,6 +115,7 @@ const ProjectFormatSelector: FC<ProjectFormatSelectorProps> = ({
   );
 
   const handleClassicToggle = (key: ProjectRequirementKey, checked: boolean) => {
+    if (disabled) return;
     const next: ProjectRequirementFlags = { ...classicFlags, [key]: checked };
     setClassicFlags(next);
     const matched = resolveClassicProjectType(

@@ -133,14 +133,17 @@ export const UPDATE_PROJECT_REJECT = gql`
   }
 `;
 
-export const UPDATE_PROJECT_PUBLISH = gql`
-  mutation UpdateProjectPublish($itemId: Int!) {
+export const UPDATE_PROJECT_SUGGESTED_FOR_PUBLICATION = gql`
+  mutation UpdateProjectSuggestedForPublication(
+    $itemId: Int!
+    $suggested: Boolean!
+  ) {
     update_Project_by_pk(
       pk_columns: { id: $itemId }
-      _set: { status: PUBLISHED }
+      _set: { suggestedForPublication: $suggested }
     ) {
       id
-      status
+      suggestedForPublication
     }
   }
 `;
