@@ -41,7 +41,7 @@ const PublicationConsentField: FC<PublicationConsentFieldProps> = ({
         className="w-full"
       />
       <details className="text-xs text-label-secondary mt-1">
-        <summary className="cursor-pointer text-brand hover:underline">
+        <summary className="cursor-pointer text-brand hover:underline min-h-[44px] flex items-center touch-manipulation">
           {t('projects.publication_consent.details_summary')}
         </summary>
         <p className="mt-1">{t('projects.publication_consent.description')}</p>

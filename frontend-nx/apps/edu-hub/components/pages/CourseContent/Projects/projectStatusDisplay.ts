@@ -98,8 +98,5 @@ export function isProjectTypeEditable(status: ProjectStatus_enum): boolean {
 export function canManagePublicationSuggestion(
   status: ProjectStatus_enum
 ): boolean {
-  return (
-    status === ProjectStatus_enum.COMPLETED ||
-    status === ProjectStatus_enum.PUBLISHED
-  );
+  return status === ProjectStatus_enum.COMPLETED;
 }

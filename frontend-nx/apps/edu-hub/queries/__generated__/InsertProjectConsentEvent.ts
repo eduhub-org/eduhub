@@ -26,5 +26,4 @@ export interface InsertProjectConsentEventVariables {
   projectId: number;
   eventType: string;
   termsVersion: string;
-  actorUserId: any;
 }

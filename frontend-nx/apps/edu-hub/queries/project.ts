@@ -432,14 +432,12 @@ export const INSERT_PROJECT_CONSENT_EVENT = gql`
     $projectId: Int!
     $eventType: String!
     $termsVersion: String!
-    $actorUserId: uuid!
   ) {
     insert_ProjectConsentEvent_one(
       object: {
         projectId: $projectId
         eventType: $eventType
         termsVersion: $termsVersion
-        actorUserId: $actorUserId
       }
     ) {
       id

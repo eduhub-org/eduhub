@@ -709,6 +709,7 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
                   updateValueMutation={UPDATE_PROJECT_DOCUMENTATION_INSTRUCTION}
                   identifierVariables={{ itemId: row.id }}
                   refetchQueries={REFETCH_QUERIES}
+                  disabled={!canEditProjectType}
                 />
               </div>
               <InstructionDownloadButton url={selectedInstructionUrl} />

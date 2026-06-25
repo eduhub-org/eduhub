@@ -307,7 +307,6 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
                 projectId: project.id,
                 eventType: 'granted',
                 termsVersion: 'v1',
-                actorUserId: userId,
               },
             });
           } catch (err) {
@@ -334,7 +333,7 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
         setSubmitInProgress(false);
       }
     },
-    [updateAuthorParticipationStatus, submitProject, insertConsentEvent, project.id, userId, onActionError, t]
+    [updateAuthorParticipationStatus, submitProject, insertConsentEvent, project.id, onActionError, t]
   );
 
   const handleLeaveConfirm = useCallback(async () => {
@@ -415,14 +414,13 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
             projectId: project.id,
             eventType: granted ? 'granted' : 'withdrawn',
             termsVersion: 'v1',
-            actorUserId: userId,
           },
         });
       } catch (err) {
         onActionError(err instanceof Error ? err.message : t('projects.action_failed'));
       }
     },
-    [insertConsentEvent, project.id, userId, onActionError, t]
+    [insertConsentEvent, project.id, onActionError, t]
   );
 
   const acceptingParticipantsCheckbox =

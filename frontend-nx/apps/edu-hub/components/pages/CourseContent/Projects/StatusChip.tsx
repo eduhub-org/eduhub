@@ -59,7 +59,9 @@ const StatusChip: FC<StatusChipProps> = ({
 
   return (
     <Tooltip title={comment}>
-      <span className="inline-flex">{chip}</span>
+      <span className="inline-flex" tabIndex={0}>
+        {chip}
+      </span>
     </Tooltip>
   );
 };

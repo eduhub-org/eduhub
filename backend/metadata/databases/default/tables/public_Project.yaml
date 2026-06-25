@@ -266,7 +266,13 @@ update_permissions:
                     - User:
                         id:
                           _eq: X-Hasura-User-Id
-      check: {}
+      check:
+        _or:
+          - suggestedForPublication:
+              _eq: false
+          - status:
+              _in:
+                - COMPLETED
   # submittedBy is populated only via the server-side preset below; clients cannot write it.
   # The set_project_submitted_metadata trigger clears submittedBy when status transitions out of SUBMITTED.
   - role: user_access
