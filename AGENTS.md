@@ -42,8 +42,9 @@ yarn build
 GRAPHQL_URI=http://localhost:8080/v1/graphql yarn apollo   # regenerate GraphQL types
 ```
 
-Pre-existing repo issue: `yarn test` may fail with `Requires Babel "^7.22.0"`
-(next/babel vs jest-config). Treat as baseline, not a regression.
+Note: `yarn test` previously failed with `Requires Babel "^7.22.0"` (next/babel
+vs jest-config). This is now fixed by pinning `@babel/core` to `7.29.7` via a
+`resolutions` entry in `frontend-nx/package.json`.
 
 ## Critical rules (never break these)
 
