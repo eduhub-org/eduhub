@@ -64,6 +64,7 @@ export const PROJECT_FRAGMENT_DETAILED = gql`
     type
     rating
     ratingComment
+    suggestedForPublication
     acceptingParticipants
     organizationId
     proposedByUserId
@@ -115,6 +116,18 @@ export const PROJECT_FRAGMENT_DETAILED = gql`
       id
       userId
       User {
+        id
+        firstName
+        lastName
+      }
+    }
+    ProjectConsentEvents(order_by: [{ created_at: desc }, { id: desc }], limit: 1) {
+      id
+      eventType
+      actorUserId
+      created_at
+      termsVersion
+      ActorUser {
         id
         firstName
         lastName
@@ -409,6 +422,28 @@ export const COPY_PROJECT_FROM_TEMPLATE = gql`
       messageKey
       error
       projectId
+    }
+  }
+`;
+
+
+export const INSERT_PROJECT_CONSENT_EVENT = gql`
+  mutation InsertProjectConsentEvent(
+    $projectId: Int!
+    $eventType: String!
+    $termsVersion: String!
+  ) {
+    insert_ProjectConsentEvent_one(
+      object: {
+        projectId: $projectId
+        eventType: $eventType
+        termsVersion: $termsVersion
+      }
+    ) {
+      id
+      eventType
+      created_at
+      termsVersion
     }
   }
 `;

@@ -47,6 +47,7 @@
 - "!include public_ProgramType.yaml"
 - "!include public_Project.yaml"
 - "!include public_ProjectAuthor.yaml"
+- "!include public_ProjectConsentEvent.yaml"
 - "!include public_ProjectCourse.yaml"
 - "!include public_ProjectDocumentationInstruction.yaml"
 - "!include public_ProjectMentor.yaml"

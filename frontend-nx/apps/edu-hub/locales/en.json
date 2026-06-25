@@ -372,7 +372,10 @@
         "ONGOING": "In progress",
         "SUBMITTED": "Submitted",
         "COMPLETED": "Completed",
+        "COMPLETED_PASSED": "Passed",
         "INCOMPLETE": "Incomplete",
+        "INCOMPLETE_FAILED": "Failed",
+        "SUGGESTED_FOR_PUBLICATION": "Suggested for publication",
         "PUBLISHED": "Published"
       },
       "type_label": {
@@ -525,6 +528,15 @@
         "sent_back_banner": "Your project was sent back for revisions. Please update it and submit again.",
         "deadline_passed_banner": "The submission deadline passed on {date}.",
         "excluded_banner": "The submitting author excluded you from this project's final submission. You no longer count as one of its authors."
+      },
+      "publication_consent": {
+        "heading": "Publication consent",
+        "checkbox_label_solo": "I consent to this project being published.",
+        "checkbox_label_team": "On behalf of my team, I consent to this project being published.",
+        "details_summary": "What will be published?",
+        "description": "opencampus.sh (operated by the non-profit Campus Business Box e.V.) may publish this project as a showcase example on the platform and in promotional materials, and may enter it for participation or submission for prizes. What will be shared: project title, description, cover image, files and links, and the names and Element room links of the contributing authors. Consent is voluntary and can be granted or withdrawn at any time from your project view; withdrawing removes the project from publication.",
+        "status_granted": "Consent granted by {name} on {date}.",
+        "status_withdrawn": "Consent withdrawn by {name} on {date} — the project will not be published."
       },
       "submit_dialog": {
         "title": "Submit project for review",
@@ -1333,7 +1345,8 @@
         "review": "Review",
         "evaluate_project": "Evaluate project",
         "evaluate_disabled_tooltip": "You can evaluate the project here once it has been submitted.",
-        "publish": "Publish for showcase"
+        "suggest_for_publication": "Suggest for publication",
+        "withdraw_publication_suggestion": "Withdraw suggestion"
       },
       "delete_template_confirmation": "Delete the project template \"{title}\"? This cannot be undone.",
       "delete_template_disabled_tooltip": "You cannot delete this template while at least one copy created from it still exists in this course.",
@@ -1361,7 +1374,8 @@
         "submission_deadline_instructor_origin_program": " (from the program)",
         "submission_deadline_instructor_origin_program_legacy": " (from the program certificate deadline)",
         "submission_deadline_instructor_picker_prompt": "If you want to change it for this project, select the specific date here:",
-        "submission_deadline_instructor_picker_help": "Leave empty to use the default submission deadline shown above."
+        "submission_deadline_instructor_picker_help": "Leave empty to use the default submission deadline shown above.",
+        "type_locked_hint": "The project type can no longer be changed once the project is confirmed or submitted."
       },
       "confirm_project_dialog": {
         "title": "Confirm project",

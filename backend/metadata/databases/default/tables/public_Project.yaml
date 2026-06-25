@@ -48,6 +48,13 @@ array_relationships:
         table:
           name: ProjectCourse
           schema: public
+  - name: ProjectConsentEvents
+    using:
+      foreign_key_constraint_on:
+        column: projectId
+        table:
+          name: ProjectConsentEvent
+          schema: public
   - name: ProjectMentors
     using:
       foreign_key_constraint_on:
@@ -110,6 +117,7 @@ select_permissions:
         - acceptingParticipants
         - coverImageUrl
         - description
+        - documentationInstructionId
         - documentationUrl
         - externalUrl
         - id
@@ -154,6 +162,7 @@ select_permissions:
         - submissionDeadline
         - submittedAt
         - submittedBy
+        - suggestedForPublication
         - projectReviewRequestedAt
         - tagline
         - title
@@ -193,6 +202,7 @@ select_permissions:
         - submissionDeadline
         - submittedAt
         - submittedBy
+        - suggestedForPublication
         - projectReviewRequestedAt
         - tagline
         - title
@@ -231,6 +241,7 @@ update_permissions:
         - tagline
         - title
         - type
+        - suggestedForPublication
       filter:
         _or:
           - ProjectCourses:
@@ -255,7 +266,13 @@ update_permissions:
                     - User:
                         id:
                           _eq: X-Hasura-User-Id
-      check: {}
+      check:
+        _or:
+          - suggestedForPublication:
+              _eq: false
+          - status:
+              _in:
+                - COMPLETED
   # submittedBy is populated only via the server-side preset below; clients cannot write it.
   # The set_project_submitted_metadata trigger clears submittedBy when status transitions out of SUBMITTED.
   - role: user_access
