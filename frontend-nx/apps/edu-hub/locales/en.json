@@ -1376,20 +1376,20 @@
         "tagline_label": "Tagline",
         "documentation_link": "Open documentation",
         "presentation_link": "Open presentation",
-        "external_link": "Open project link",
-        "approve_button": "Approve & complete",
-        "send_back_button": "Send back for revisions",
-        "reject_button": "Reject as incomplete"
+        "external_link": "Open project link"
       },
       "evaluate_dialog": {
         "title": "Evaluate project",
-        "rating_section_label": "Rating",
-        "rating_UNRATED": "Unrated",
-        "rating_PASSED": "Passed",
-        "rating_FAILED": "Failed",
+        "decision_label": "Decision",
+        "approve_title": "Pass & complete",
+        "approve_description": "Marks the project as passed and completes it.",
+        "revise_title": "Send back for revisions",
+        "revise_description": "The team can revise the project and submit it again.",
+        "reject_title": "Reject as not passed",
+        "reject_description": "Marks the project as not passed.",
         "comment_label": "Comment (optional)",
         "comment_placeholder": "Notes for the project team (visible where project details are shown)",
-        "save_rating_button": "Save rating"
+        "confirm_button": "Confirm"
       },
       "add_dialog": {
         "title": "Add project",

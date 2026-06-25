@@ -1358,20 +1358,20 @@
         "tagline_label": "Untertitel",
         "documentation_link": "Dokumentation öffnen",
         "presentation_link": "Präsentation öffnen",
-        "external_link": "Projektlink öffnen",
-        "approve_button": "Genehmigen & abschließen",
-        "send_back_button": "Zur Überarbeitung zurückgeben",
-        "reject_button": "Als nicht abgeschlossen ablehnen"
+        "external_link": "Projektlink öffnen"
       },
       "evaluate_dialog": {
         "title": "Projekt beurteilen",
-        "rating_section_label": "Bewertung",
-        "rating_UNRATED": "Noch nicht bewertet",
-        "rating_PASSED": "Bestanden",
-        "rating_FAILED": "Nicht bestanden",
+        "decision_label": "Entscheidung",
+        "approve_title": "Bestanden & abschließen",
+        "approve_description": "Das Projekt gilt als bestanden und wird abgeschlossen.",
+        "revise_title": "Zur Überarbeitung zurückgeben",
+        "revise_description": "Das Team kann das Projekt überarbeiten und erneut einreichen.",
+        "reject_title": "Als nicht bestanden ablehnen",
+        "reject_description": "Das Projekt wird als nicht bestanden markiert.",
         "comment_label": "Kommentar (optional)",
         "comment_placeholder": "Hinweise für das Projektteam (sichtbar, wo Projektdetails angezeigt werden)",
-        "save_rating_button": "Bewertung speichern"
+        "confirm_button": "Bestätigen"
       },
       "add_dialog": {
         "title": "Projekt hinzufügen",
