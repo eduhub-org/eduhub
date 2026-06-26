@@ -1,0 +1,56 @@
+---
+description: "Apply when changing Dockerfiles, docker-compose images, Keycloak providers/version, or serverless function dependencies — decides when `docker compose build` / pull / restart is required so containers don't run a stale image"
+globs: "docker-compose.yml,**/Dockerfile,**/Dockerfile-dev,keycloak/libs/**,keycloak/spi/**,functions/**,backend/dockerfile-dev-entrypoint.sh,backend/wait-for-it.sh,backend/config.yaml,frontend-nx/dev.sh"
+alwaysApply: false
+---
+# Docker image rebuild guard
+
+`docker compose up` only builds an image **if it does not already exist**. It
+does **not** detect Dockerfile or baked-content changes. So after changing
+anything that is baked into an image, the running stack will silently keep using
+the **old** image until you rebuild, pull, or restart the right service.
+
+After making a change, pick the matching action below and tell the user which
+command to run (and why).
+
+## Decision table
+
+| What you changed | Service | Required action |
+|---|---|---|
+| Any `Dockerfile` / `Dockerfile-dev` | that service | `docker compose build <svc>` then `up` (or `up --build`) |
+| `keycloak/libs/*.jar` (bcrypt, matrix-handle-listener) or the Keycloak image version | `keycloak` | **rebuild** — re-runs `kc.sh build` (the augmentation baked into the image) |
+| `keycloak/themes/**` | `keycloak` | **nothing** — themes are volume-mounted and theme caching is off, so they hot-reload |
+| `functions/Dockerfile` (Python base image / apt packages) | `python_functions` | **rebuild** |
+| `functions/**/requirements.txt` (pip deps) | `python_functions` | `docker compose restart python_functions` — pip installs at container start, no rebuild |
+| `functions/**` Node deps (`package.json`) | `node_functions` | `docker compose restart node_functions` — deps install at container start; this service has **no build context**, so `build` does nothing |
+| Pinned `image:` tag bump in `docker-compose.yml` (e.g. `node:22-bullseye`, `postgres:12`) | `node_functions`, `db_hasura` | `docker compose pull <svc>` then `docker compose up -d --force-recreate <svc>` — **not** `build` |
+| `backend/dockerfile-dev-entrypoint.sh`, `backend/wait-for-it.sh`, `backend/config.yaml` (COPY'd in `backend/Dockerfile-dev`) | `hasura` | **rebuild** |
+| `frontend-nx` deps (`package.json`) | `frontend-nx` | `docker compose restart frontend-nx` — `dev.sh` runs `yarn install` at start; only a base-image change needs a rebuild |
+| App code (`.ts`/`.tsx`, queries, metadata, migrations) | — | **nothing** — hot reload / Hasura CLI handles it |
+
+## Which services even have a build
+
+- **Build context** (rebuildable): `frontend-nx`, `hasura`, `python_functions`, `keycloak`.
+- **Pinned image, no build**: `node_functions` (`node:22-bullseye`), `db_hasura` (`postgres:12`). For these, "update the Node/Postgres version" means editing the `image:` tag and doing `pull` + `--force-recreate`, not `build`.
+
+## Commands
+
+```bash
+docker compose build <svc>                       # rebuild one image (layer cache keeps it cheap)
+docker compose up --build                         # rebuild any changed images, then start
+docker compose up -d --force-recreate --no-deps <svc>   # recreate one container from its current image
+docker compose pull <svc> && docker compose up -d --force-recreate <svc>  # adopt a new pinned image tag
+docker compose restart <svc>                      # re-run a container's start script (re-installs runtime deps)
+```
+
+## Notes
+
+- Docker's layer cache makes `--build` near-instant when nothing changed, so
+  recommending `docker compose up --build` as the default start command is a safe
+  habit that guarantees baked changes are picked up.
+- A bare `docker compose up` after a `git pull` can run a **stale** image. If a
+  teammate reports old behavior after pulling image-affecting changes, suspect a
+  missing `--build`.
+- Keycloak specifically: provider/version changes need a rebuild because the
+  Quarkus augmentation is baked in at build time (`start --optimized`); theme
+  edits do not.

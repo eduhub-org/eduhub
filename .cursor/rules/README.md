@@ -66,6 +66,7 @@ This directory contains comprehensive development rules and guidelines for the E
 | Rule | Description | Applied When |
 |------|-------------|-------------|
 | [DevOps and Monitoring](devops-monitoring.mdc) | DevOps practices, monitoring, logging, deployment, and observability | Working with deployment, monitoring, or DevOps processes |
+| [Docker Image Rebuild Guard](docker-rebuild.mdc) | When `docker compose build` / `pull` / `restart` is required so containers don't run a stale image | Changing Dockerfiles, compose image tags, Keycloak providers/version, or serverless function dependencies |
 
 ### 🚀 Release Management
 | Rule | Description | Applied When |

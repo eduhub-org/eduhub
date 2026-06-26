@@ -77,6 +77,11 @@ Pre-existing repo issue: `yarn test` may fail with `Requires Babel "^7.22.0"`
    merges. Semantic-release only runs on pushes to `production`.
 8. **Branch flow**: `develop` → `staging` → `production`. Never edit version
    fields in any `package.json` or `CHANGELOG.md` by hand.
+9. **Docker image rebuilds**: `docker compose up` reuses an existing image and
+   does NOT detect Dockerfile/baked-content changes. After changing a
+   `Dockerfile`, Keycloak provider jars/version, a pinned `image:` tag, or
+   serverless function dependencies, run the right `build` / `pull` / `restart`
+   and tell the user. Full decision table: `.cursor/rules/docker-rebuild.mdc`.
 
 ## Behavioral guidelines (Karpathy)
 
