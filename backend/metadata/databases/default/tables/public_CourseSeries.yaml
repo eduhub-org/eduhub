@@ -1,0 +1,25 @@
+table:
+  name: CourseSeries
+  schema: public
+object_relationships:
+  - name: Organization
+    using:
+      foreign_key_constraint_on: organizationId
+array_relationships:
+  - name: Courses
+    using:
+      foreign_key_constraint_on:
+        column: courseSeriesId
+        table:
+          name: Course
+          schema: public
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - id
+        - title
+        - organizationId
+        - created_at
+        - updated_at
+      filter: {}
