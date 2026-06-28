@@ -163,16 +163,21 @@ services:
       dockerfile: Dockerfile-dev
     entrypoint: ["/bin/sh", "-c"]
     command:
+      # --optimized reuses the augmentation baked into the image (see
+      # Dockerfile-dev), skipping the ~90s Quarkus build on every startup.
+      # The SPI theme-cache flags keep live theme reloading that `start-dev`
+      # used to provide automatically.
       - >-
         unset KC_BOOTSTRAP_ADMIN_USERNAME KC_BOOTSTRAP_ADMIN_PASSWORD &&
-        /opt/keycloak/bin/kc.sh import --file /opt/keycloak/data/import/master.json --override true &&
-        exec /opt/keycloak/bin/kc.sh start-dev --import-realm
+        /opt/keycloak/bin/kc.sh import --optimized --file /opt/keycloak/data/import/master.json --override true &&
+        exec /opt/keycloak/bin/kc.sh start --optimized --import-realm --spi-theme-cache-themes=false --spi-theme-cache-templates=false
     ports:
       - 28080:8080
     environment:
       KC_BOOTSTRAP_ADMIN_USERNAME: admin
       KC_BOOTSTRAP_ADMIN_PASSWORD: admin
       KC_HOSTNAME_STRICT: "false"
+      KC_HTTP_ENABLED: "true"
       KC_HTTP_HOST: "0.0.0.0"
     volumes:
       - ./keycloak/imports-dev/master.json:/opt/keycloak/data/import/master.json
