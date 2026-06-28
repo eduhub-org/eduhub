@@ -2563,5 +2563,57 @@
       "superadmin_only": "Super admin only",
       "coming_soon": "Coming soon"
     }
+  },
+  "project": {
+    "not_found": "Project not found",
+    "status": {
+      "published": "Published"
+    },
+    "tile": {
+      "template_eyebrow": "Open project template",
+      "mentored_by": "Mentored by {name}"
+    },
+    "cta": {
+      "apply_for_course": "Apply for course",
+      "view_and_join": "View & join",
+      "apply_to_join": "Apply to join",
+      "view_course": "View course"
+    },
+    "viewing_from": "Viewing from {course}",
+    "about": {
+      "title": "About this project"
+    },
+    "stats": {
+      "team_members": "Team members"
+    },
+    "similar": {
+      "title": "Similar projects"
+    },
+    "description": {
+      "title": "Description"
+    },
+    "sidebar": {
+      "documentation": "View documentation",
+      "presentation": "Watch presentation",
+      "demo": "Visit live demo",
+      "team": "Team",
+      "mentor": "Mentor"
+    },
+    "course_card": {
+      "eyebrow": "Part of course",
+      "go_to_course": "Go to course"
+    },
+    "enroll": {
+      "title": "Enroll to participate",
+      "hint": "Projects are only accessible after enrolling in the course. Apply for the course first, then join this project from the course page.",
+      "applications_until": "Applications until {date}"
+    },
+    "join": {
+      "title": "Join this project"
+    },
+    "course_section": {
+      "open_templates": "Open project templates",
+      "past_projects": "Projects from past courses"
+    }
   }
 }

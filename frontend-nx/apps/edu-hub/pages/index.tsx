@@ -9,6 +9,7 @@ import { ClientOnly } from '@opencampus/shared-components';
 import { Page } from '../components/layout/Page';
 import Loading from '../components/common/Loading';
 import TileSlider from '../components/common/TileSlider';
+import HomeProjectSlider from '../components/common/TileSlider/HomeProjectSlider';
 import FaqSection from '../components/common/FaqSection';
 import NotificationSnackbar from '../components/common/dialogs/NotificationSnackbar';
 
@@ -98,13 +99,16 @@ const Home: FC = () => {
     [myAdminCourses, myCourses]
   );
 
-  const coursesGroups = useMemo(
+  // Ordered home sliders, interleaving course sliders and project sliders by the
+  // shared CourseGroupOption "order". Organization-owned rows only appear in widgets.
+  const homeSliders = useMemo(
     () =>
       (courseGroupOptionsData?.CourseGroupOption ?? [])
-        // Only groups that are marked as homepage sliders and are not owned by a
-        // specific organization (organization-owned groups only appear in widgets).
         .filter((option) => option.sliderGroup && option.organizationId == null)
         .map((option) => {
+          if (option.contentType === 'PROJECT') {
+            return { kind: 'project' as const, option };
+          }
           const filteredCourses = option.programType
             ? // Program-type based groups (Courses, Events, Degrees) are populated
               // automatically from the published courses of that program type.
@@ -113,12 +117,34 @@ const Home: FC = () => {
               publishedCourses.filter((course) =>
                 course.CourseGroups.some((courseGroup) => courseGroup.CourseGroupOption.id === option.id)
               );
-          return {
-            title: option.title,
-            courses: filteredCourses,
-          };
+          return { kind: 'course' as const, title: option.title, courses: filteredCourses };
         }),
     [publishedCourses, courseGroupOptionsData]
+  );
+
+  const renderHomeSliders = () => (
+    <>
+      {homeSliders.map((slider, index) => {
+        if (slider.kind === 'project') {
+          return <HomeProjectSlider key={`home-project-${slider.option.id}`} option={slider.option} />;
+        }
+        if (slider.courses.length === 0) return null;
+        return (
+          <Fragment key={`home-course-${index}`}>
+            <h2 id={`sliderGroup${index + 1}`} className="text-2xl font-semibold text-left ml-3 md:ml-0">
+              {slider.title
+                ? isKnownCourseGroupOptionTitle(slider.title)
+                  ? tCommon(`course_group_options.${slider.title}`)
+                  : slider.title
+                : '—'}
+            </h2>
+            <div className="mt-2 mb-12">
+              <TileSlider courses={slider.courses as import('../components/common/TileSlider').CourseType[]} isManage={false} />
+            </div>
+          </Fragment>
+        );
+      })}
+    </>
   );
 
   const renderCourseGroups = (
@@ -244,7 +270,7 @@ const Home: FC = () => {
           ) : (
             <ClientOnly>
               {isLoggedIn && renderCourseGroups(coursesGroupsAuthenticated, 'coursesGroupsAuthenticated')}
-              {renderCourseGroups(coursesGroups, 'coursesGroups')}
+              {renderHomeSliders()}
             </ClientOnly>
           )}
         </div>

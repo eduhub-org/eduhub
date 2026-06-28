@@ -2548,5 +2548,57 @@
       "superadmin_only": "Nur Super-Admin",
       "coming_soon": "Bald verfügbar"
     }
+  },
+  "project": {
+    "not_found": "Projekt nicht gefunden",
+    "status": {
+      "published": "Veröffentlicht"
+    },
+    "tile": {
+      "template_eyebrow": "Offene Projektvorlage",
+      "mentored_by": "Betreut von {name}"
+    },
+    "cta": {
+      "apply_for_course": "Für Kurs bewerben",
+      "view_and_join": "Ansehen & beitreten",
+      "apply_to_join": "Zum Mitmachen bewerben",
+      "view_course": "Kurs ansehen"
+    },
+    "viewing_from": "Angesehen aus {course}",
+    "about": {
+      "title": "Über dieses Projekt"
+    },
+    "stats": {
+      "team_members": "Teammitglieder"
+    },
+    "similar": {
+      "title": "Ähnliche Projekte"
+    },
+    "description": {
+      "title": "Beschreibung"
+    },
+    "sidebar": {
+      "documentation": "Dokumentation ansehen",
+      "presentation": "Präsentation ansehen",
+      "demo": "Live-Demo besuchen",
+      "team": "Team",
+      "mentor": "Mentor:in"
+    },
+    "course_card": {
+      "eyebrow": "Teil des Kurses",
+      "go_to_course": "Zum Kurs"
+    },
+    "enroll": {
+      "title": "Zum Mitmachen anmelden",
+      "hint": "Projekte sind erst nach der Anmeldung zum Kurs zugänglich. Bewirb dich zuerst für den Kurs und tritt dem Projekt dann über die Kursseite bei.",
+      "applications_until": "Bewerbung bis {date}"
+    },
+    "join": {
+      "title": "Diesem Projekt beitreten"
+    },
+    "course_section": {
+      "open_templates": "Offene Projektvorlagen",
+      "past_projects": "Projekte aus vergangenen Kursen"
+    }
   }
 }

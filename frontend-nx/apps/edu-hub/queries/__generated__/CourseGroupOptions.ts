@@ -7,6 +7,18 @@
 // GraphQL query operation: CourseGroupOptions
 // ====================================================
 
+export interface CourseGroupOptions_CourseGroupOption_SelectedCourseGroups {
+  __typename: "ProjectSliderCourseGroup";
+  id: number;
+  courseGroupOptionId: number;
+}
+
+export interface CourseGroupOptions_CourseGroupOption_SelectedProjectGroups {
+  __typename: "ProjectSliderProjectGroup";
+  id: number;
+  projectGroupOptionId: number;
+}
+
 export interface CourseGroupOptions_CourseGroupOption {
   __typename: "CourseGroupOption";
   id: number;
@@ -17,6 +29,10 @@ export interface CourseGroupOptions_CourseGroupOption {
    */
   sliderGroup: boolean | null;
   /**
+   * Whether this slider row renders courses (COURSE, default) or projects (PROJECT).
+   */
+  contentType: string;
+  /**
    * When set, this group automatically includes all published courses of the given program type (e.g. COURSES, EVENTS, DEGREES) instead of relying on manual CourseGroup assignments.
    */
   programType: string | null;
@@ -24,6 +40,14 @@ export interface CourseGroupOptions_CourseGroupOption {
    * When set, this group is owned by the given organization. Organization-owned groups are not shown on the public homepage but can be selected in that organization's course widget.
    */
   organizationId: number | null;
+  /**
+   * For a project-slider row: the selected source course groups.
+   */
+  SelectedCourseGroups: CourseGroupOptions_CourseGroupOption_SelectedCourseGroups[];
+  /**
+   * For a project-slider row: the selected source project groups.
+   */
+  SelectedProjectGroups: CourseGroupOptions_CourseGroupOption_SelectedProjectGroups[];
 }
 
 export interface CourseGroupOptions {
