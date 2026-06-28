@@ -108,6 +108,14 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
       )}
 
       {isAdmin && (
+        <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/projects')}>
+          <Link className="w-full text-lg" href="/manage/projects">
+            {t('menu.projects')}
+          </Link>
+        </MenuItem>
+      )}
+
+      {isAdmin && (
         <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/users')}>
           <Link className="w-full text-lg" href="/manage/users">
             {t('menu.user')}

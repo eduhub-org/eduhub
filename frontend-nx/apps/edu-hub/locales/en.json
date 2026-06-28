@@ -44,6 +44,7 @@
       "admin_users": "Admin Users",
       "experts": "Experts",
       "courses": "Courses",
+      "projects": "Projects",
       "programs": "Programs",
       "organizations": "Organizations",
       "location_addresses": "Location Addresses",
@@ -1734,6 +1735,34 @@
         "option_enabled": "Yes",
         "option_disabled": "No"
       }
+    }
+  },
+  "manageProjects": {
+    "headline": "Projects",
+    "search_placeholder": "Search projects",
+    "filter": {
+      "program_label": "Program",
+      "all_programs": "All programs",
+      "course_group_label": "Course group",
+      "all_course_groups": "All course groups"
+    },
+    "table": {
+      "title": "Title",
+      "authors": "Authors",
+      "no_authors": "No authors",
+      "program": "Program / Course",
+      "published": "Published",
+      "not_published": "Not published"
+    },
+    "actions": {
+      "publish": "Publish",
+      "unpublish": "Unpublish",
+      "publish_blocked_incomplete": "Set a project type and documentation instruction before this project can be published."
+    },
+    "notifications": {
+      "publish_success": "Project published",
+      "unpublish_success": "Project unpublished",
+      "action_failed": "The action could not be completed. Please try again."
     }
   },
   "managePrograms": {

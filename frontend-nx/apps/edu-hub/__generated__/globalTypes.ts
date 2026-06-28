@@ -8750,6 +8750,60 @@ export interface Project_avg_order_by {
 /**
  * Boolean expression to filter rows from the table "Project". All fields are combined with a logical 'AND'.
  */
+export interface ProjectRating_order_by {
+  Projects_aggregate?: Project_aggregate_order_by | null;
+  comment?: order_by | null;
+  value?: order_by | null;
+}
+
+export interface ProjectStatus_order_by {
+  Projects_aggregate?: Project_aggregate_order_by | null;
+  comment?: order_by | null;
+  value?: order_by | null;
+}
+
+export interface Project_order_by {
+  ChildProjects_aggregate?: Project_aggregate_order_by | null;
+  Organization?: Organization_order_by | null;
+  ParentProject?: Project_order_by | null;
+  ProjectAuthors_aggregate?: ProjectAuthor_aggregate_order_by | null;
+  ProjectCourses_aggregate?: ProjectCourse_aggregate_order_by | null;
+  ProjectDocumentationInstruction?: ProjectDocumentationInstruction_order_by | null;
+  ProjectMentors_aggregate?: ProjectMentor_aggregate_order_by | null;
+  ProjectRating?: ProjectRating_order_by | null;
+  ProjectStatus?: ProjectStatus_order_by | null;
+  ProjectType?: ProjectType_order_by | null;
+  ProposedByUser?: User_order_by | null;
+  SubmittedByUser?: User_order_by | null;
+  acceptingParticipants?: order_by | null;
+  coverImageUrl?: order_by | null;
+  created_at?: order_by | null;
+  csvResults?: order_by | null;
+  description?: order_by | null;
+  documentationInstructionId?: order_by | null;
+  documentationUrl?: order_by | null;
+  externalUrl?: order_by | null;
+  id?: order_by | null;
+  legacyAchievementOptionId?: order_by | null;
+  legacyAchievementRecordId?: order_by | null;
+  organizationId?: order_by | null;
+  parentProjectId?: order_by | null;
+  presentationUrl?: order_by | null;
+  projectReviewRequestedAt?: order_by | null;
+  proposedByUserId?: order_by | null;
+  rating?: order_by | null;
+  ratingComment?: order_by | null;
+  status?: order_by | null;
+  submissionDeadline?: order_by | null;
+  submittedAt?: order_by | null;
+  submittedBy?: order_by | null;
+  suggestedForPublication?: order_by | null;
+  tagline?: order_by | null;
+  title?: order_by | null;
+  type?: order_by | null;
+  updated_at?: order_by | null;
+}
+
 export interface Project_bool_exp {
   ChildProjects?: Project_bool_exp | null;
   ChildProjects_aggregate?: Project_aggregate_bool_exp | null;
