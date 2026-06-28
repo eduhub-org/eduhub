@@ -2073,6 +2073,37 @@
       "text_en": "Text (Englisch)",
       "preview": "Vorschau",
       "generic_help": "Dieser Text wird Teilnehmenden im Onboarding angezeigt, wenn der entsprechende Registrierungstyp ausgewählt ist."
+    },
+    "project_groups": {
+      "label": "Projektgruppen",
+      "help_text": "Lege fest, welche Projektgruppen es gibt. Ordne Projekte diesen Gruppen zu und wähle sie aus, um einen Projekt-Slider zusammenzustellen.",
+      "add_placeholder": "Name der neuen Projektgruppe",
+      "add_button": "Hinzufügen",
+      "id_label": "ID",
+      "delete": "Projektgruppe löschen",
+      "delete_disabled_in_use": "Diese Gruppe ist noch mit Projekten verbunden und kann nicht gelöscht werden.",
+      "error_duplicate": "Eine Projektgruppe mit diesem Namen existiert bereits.",
+      "error_add": "Die Projektgruppe konnte nicht erstellt werden.",
+      "error_delete": "Die Projektgruppe konnte nicht gelöscht werden.",
+      "error_reorder": "Die Reihenfolge konnte nicht aktualisiert werden.",
+      "loading": "Lädt...",
+      "error_loading": "Die Projektgruppen konnten nicht geladen werden."
+    },
+    "project_sliders": {
+      "label": "Projekt-Slider",
+      "help_text": "Erstelle Projekt-Slider für die Startseite. Jeder Slider zeigt veröffentlichte Projekte und offene Vorlagen. Wähle Kursgruppen und/oder Projektgruppen als Quelle aus oder lasse die Auswahl leer, um alle Projekte zu zeigen. Slider werden zusammen mit den Kursgruppen oben sortiert.",
+      "add_placeholder": "Titel des neuen Projekt-Sliders",
+      "add_button": "Slider hinzufügen",
+      "id_label": "ID",
+      "delete": "Projekt-Slider löschen",
+      "source_course_groups": "Kursgruppen",
+      "source_project_groups": "Projektgruppen",
+      "no_selection_hint": "Keine Gruppen ausgewählt — zeigt alle Projekte.",
+      "error_add": "Der Projekt-Slider konnte nicht erstellt werden.",
+      "error_delete": "Der Projekt-Slider konnte nicht gelöscht werden.",
+      "error_save": "Die Auswahl konnte nicht gespeichert werden.",
+      "loading": "Lädt...",
+      "error_loading": "Die Projekt-Slider konnten nicht geladen werden."
     }
   },
   "manageExperts": {

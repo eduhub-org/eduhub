@@ -2088,6 +2088,37 @@
       "text_en": "Text (English)",
       "preview": "Preview",
       "generic_help": "This text is shown to participants during onboarding when the corresponding registration type is selected."
+    },
+    "project_groups": {
+      "label": "Project Groups",
+      "help_text": "Define which project groups exist. Tag projects into these groups and select them to compose a project slider.",
+      "add_placeholder": "Name of the new project group",
+      "add_button": "Add",
+      "id_label": "ID",
+      "delete": "Delete project group",
+      "delete_disabled_in_use": "This group is still connected to projects and cannot be deleted.",
+      "error_duplicate": "A project group with this name already exists.",
+      "error_add": "The project group could not be created.",
+      "error_delete": "The project group could not be deleted.",
+      "error_reorder": "The order could not be updated.",
+      "loading": "Loading...",
+      "error_loading": "The project groups could not be loaded."
+    },
+    "project_sliders": {
+      "label": "Project Sliders",
+      "help_text": "Create project sliders for the homepage. Each slider shows published projects and open templates. Pick source course groups and/or project groups, or leave empty to show all projects. Sliders are ordered together with the course groups above.",
+      "add_placeholder": "Title of the new project slider",
+      "add_button": "Add slider",
+      "id_label": "ID",
+      "delete": "Delete project slider",
+      "source_course_groups": "Course groups",
+      "source_project_groups": "Project groups",
+      "no_selection_hint": "No groups selected — shows all projects.",
+      "error_add": "The project slider could not be created.",
+      "error_delete": "The project slider could not be deleted.",
+      "error_save": "The selection could not be saved.",
+      "loading": "Loading...",
+      "error_loading": "The project sliders could not be loaded."
     }
   },
   "manageExperts": {
