@@ -294,7 +294,7 @@ const ManageProjectsContent: FC = () => {
           return (
             <div className="flex flex-col items-center gap-2">
               <span
-                className={`w-3 h-3 rounded-full ${published ? 'bg-green-500' : 'bg-gray-300'}`}
+                className={`w-3 h-3 rounded-full ${published ? 'bg-success' : 'bg-fill-disabled'}`}
                 title={published ? t('table.published') : t('table.not_published')}
               />
               {publishBlocked ? (

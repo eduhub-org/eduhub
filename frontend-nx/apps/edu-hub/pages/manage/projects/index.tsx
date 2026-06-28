@@ -5,14 +5,11 @@ path.resolve('./next.config.js');
 import Head from 'next/head';
 import { FC } from 'react';
 import { Page } from '../../../components/layout/Page';
-import { useIsAdmin, useIsLoggedIn } from '../../../hooks/authentication';
+import { OnlyAdmin } from '../../../components/common/OnlyLoggedIn';
 
 import ManageProjectsContent from '../../../components/pages/ManageProjectsContent';
 
 const ManageProjects: FC = () => {
-  const isAdmin = useIsAdmin();
-  const isLoggedIn = useIsLoggedIn();
-
   return (
     <>
       <Head>
@@ -21,7 +18,11 @@ const ManageProjects: FC = () => {
       </Head>
       <div className="max-w-screen-xl mx-auto">
         <Page>
-          <div className="min-h-[77vh]">{isLoggedIn && isAdmin && <ManageProjectsContent />}</div>
+          <div className="min-h-[77vh]">
+            <OnlyAdmin showFeedback={true}>
+              <ManageProjectsContent />
+            </OnlyAdmin>
+          </div>
         </Page>
       </div>
     </>
