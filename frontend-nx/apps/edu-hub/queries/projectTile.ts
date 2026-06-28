@@ -59,7 +59,7 @@ export const PROJECT_TILE_FRAGMENT = gql`
 // templates), ordered by recency. Used when a project slider selects no groups.
 export const HOME_PROJECT_TILES_ALL = gql`
   ${PROJECT_TILE_FRAGMENT}
-  query HomeProjectTilesAll {
+  query HomeProjectTilesAll($limit: Int = 24, $offset: Int = 0) {
     Project(
       where: {
         _or: [
@@ -74,6 +74,8 @@ export const HOME_PROJECT_TILES_ALL = gql`
         ]
       }
       order_by: { updated_at: desc }
+      limit: $limit
+      offset: $offset
     ) {
       ...ProjectTileFragment
     }
@@ -84,7 +86,7 @@ export const HOME_PROJECT_TILES_ALL = gql`
 // groups and project groups.
 export const HOME_PROJECT_TILES_BY_GROUPS = gql`
   ${PROJECT_TILE_FRAGMENT}
-  query HomeProjectTilesByGroups($courseGroupIds: [Int!]!, $projectGroupIds: [Int!]!) {
+  query HomeProjectTilesByGroups($courseGroupIds: [Int!]!, $projectGroupIds: [Int!]!, $limit: Int = 24, $offset: Int = 0) {
     Project(
       where: {
         _and: [
@@ -109,6 +111,8 @@ export const HOME_PROJECT_TILES_BY_GROUPS = gql`
         ]
       }
       order_by: { updated_at: desc }
+      limit: $limit
+      offset: $offset
     ) {
       ...ProjectTileFragment
     }
@@ -130,13 +134,15 @@ export const COURSE_SERIES_INFO = gql`
 // course series whose program lecture period has ended.
 export const COURSE_PUBLISHED_PROJECT_TILES = gql`
   ${PROJECT_TILE_FRAGMENT}
-  query CoursePublishedProjectTiles($courseSeriesId: Int!, $now: timestamptz!) {
+  query CoursePublishedProjectTiles($courseSeriesId: Int!, $now: timestamptz!, $limit: Int = 24, $offset: Int = 0) {
     Project(
       where: {
         status: { _eq: PUBLISHED }
         ProjectCourses: { Course: { courseSeriesId: { _eq: $courseSeriesId }, Program: { lectureEnd: { _lt: $now } } } }
       }
       order_by: { updated_at: desc }
+      limit: $limit
+      offset: $offset
     ) {
       ...ProjectTileFragment
     }
@@ -146,7 +152,7 @@ export const COURSE_PUBLISHED_PROJECT_TILES = gql`
 // Course page — open project templates available in this specific course.
 export const COURSE_TEMPLATE_PROJECT_TILES = gql`
   ${PROJECT_TILE_FRAGMENT}
-  query CourseTemplateProjectTiles($courseId: Int!) {
+  query CourseTemplateProjectTiles($courseId: Int!, $limit: Int = 24, $offset: Int = 0) {
     Project(
       where: {
         status: { _eq: PROPOSED }
@@ -155,6 +161,8 @@ export const COURSE_TEMPLATE_PROJECT_TILES = gql`
         ProjectCourses: { courseId: { _eq: $courseId } }
       }
       order_by: { updated_at: desc }
+      limit: $limit
+      offset: $offset
     ) {
       ...ProjectTileFragment
     }

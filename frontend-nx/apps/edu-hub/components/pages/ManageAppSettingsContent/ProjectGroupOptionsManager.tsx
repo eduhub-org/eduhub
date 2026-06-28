@@ -30,8 +30,11 @@ import {
   DeleteProjectGroupOptionVariables,
 } from '../../../queries/__generated__/DeleteProjectGroupOption';
 
+// A group is "in use" if it tags projects OR is referenced by a project slider;
+// deleting it would otherwise cascade into live slider configuration.
 const connectedCount = (option: AdminProjectGroupOptions_ProjectGroupOption) =>
-  option.ProjectGroups_aggregate?.aggregate?.count ?? 0;
+  (option.ProjectGroups_aggregate?.aggregate?.count ?? 0) +
+  (option.ProjectSliderProjectGroups_aggregate?.aggregate?.count ?? 0);
 
 const ProjectGroupOptionsManager: FC = () => {
   const t = useTranslations('manageAppSettings.project_groups');

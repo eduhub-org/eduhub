@@ -22,4 +22,13 @@ select_permissions:
         - organizationId
         - created_at
         - updated_at
-      filter: {}
+      # Only series that have at least one publicly-visible course, mirroring the
+      # Course anonymous visibility gate.
+      filter:
+        Courses:
+          _and:
+            - published:
+                _eq: true
+            - Program:
+                published:
+                  _eq: true

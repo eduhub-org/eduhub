@@ -47,7 +47,7 @@ const ProjectContent: FC<ProjectContentProps> = ({ id, context, courseId }) => {
   const t = useTranslations('project');
   const anonymous = { role: AuthRoles.anonymous };
 
-  const { data, loading } = useQuery<ProjectPage, ProjectPageVariables>(PROJECT_PAGE, {
+  const { data, loading, error } = useQuery<ProjectPage, ProjectPageVariables>(PROJECT_PAGE, {
     variables: { id },
     context: anonymous,
   });
@@ -56,10 +56,9 @@ const ProjectContent: FC<ProjectContentProps> = ({ id, context, courseId }) => {
 
   const relevantCourse = useMemo(() => {
     if (!project) return undefined;
-    return (
-      (courseId != null && project.ProjectCourses.find((pc) => pc.courseId === courseId)) ||
-      project.ProjectCourses[0]
-    );
+    // Within-course route: only the matching course (no fallback to a different one).
+    if (courseId != null) return project.ProjectCourses.find((pc) => pc.courseId === courseId);
+    return project.ProjectCourses[0];
   }, [project, courseId]);
 
   const course = relevantCourse?.Course;
@@ -85,6 +84,14 @@ const ProjectContent: FC<ProjectContentProps> = ({ id, context, courseId }) => {
     );
   }
 
+  if (error) {
+    return (
+      <div className="flex justify-center max-w-screen-xl mx-auto w-full pt-32">
+        <div className="text-white">{t('load_error')}</div>
+      </div>
+    );
+  }
+
   if (!project) {
     return (
       <div className="flex justify-center max-w-screen-xl mx-auto w-full pt-32">
@@ -103,10 +110,12 @@ const ProjectContent: FC<ProjectContentProps> = ({ id, context, courseId }) => {
     : project.Organization?.name ?? '';
   const coverImage = getPublicImageUrl(project.coverImageUrl, 1024);
 
+  // Only allow http(s) links into hrefs to avoid javascript:/data: XSS via stored content.
+  const safeUrl = (url: string | null): string | null => (url && /^https?:\/\//i.test(url.trim()) ? url.trim() : null);
   const links = [
-    project.documentationUrl ? { url: project.documentationUrl, label: t('sidebar.documentation') } : null,
-    project.presentationUrl ? { url: project.presentationUrl, label: t('sidebar.presentation') } : null,
-    project.externalUrl ? { url: project.externalUrl, label: t('sidebar.demo') } : null,
+    safeUrl(project.documentationUrl) ? { url: safeUrl(project.documentationUrl)!, label: t('sidebar.documentation') } : null,
+    safeUrl(project.presentationUrl) ? { url: safeUrl(project.presentationUrl)!, label: t('sidebar.presentation') } : null,
+    safeUrl(project.externalUrl) ? { url: safeUrl(project.externalUrl)!, label: t('sidebar.demo') } : null,
   ].filter(Boolean) as { url: string; label: string }[];
 
   const description = project.description ? (

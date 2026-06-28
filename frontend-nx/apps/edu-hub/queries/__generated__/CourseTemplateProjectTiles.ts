@@ -18,4 +18,6 @@ export interface CourseTemplateProjectTiles {
 
 export interface CourseTemplateProjectTilesVariables {
   courseId: number;
+  limit?: number | null;
+  offset?: number | null;
 }

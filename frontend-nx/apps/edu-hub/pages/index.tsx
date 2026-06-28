@@ -117,26 +117,32 @@ const Home: FC = () => {
               publishedCourses.filter((course) =>
                 course.CourseGroups.some((courseGroup) => courseGroup.CourseGroupOption.id === option.id)
               );
-          return { kind: 'course' as const, title: option.title, courses: filteredCourses };
+          return { kind: 'course' as const, id: option.id, title: option.title, courses: filteredCourses };
         }),
     [publishedCourses, courseGroupOptionsData]
   );
 
+  // Translate known built-in CourseGroupOption titles; otherwise use the title verbatim.
+  const sliderLabel = (title: string) =>
+    isKnownCourseGroupOptionTitle(title) ? tCommon(`course_group_options.${title}`) : title;
+
   const renderHomeSliders = () => (
     <>
-      {homeSliders.map((slider, index) => {
+      {homeSliders.map((slider) => {
         if (slider.kind === 'project') {
-          return <HomeProjectSlider key={`home-project-${slider.option.id}`} option={slider.option} />;
+          return (
+            <HomeProjectSlider
+              key={`home-project-${slider.option.id}`}
+              option={slider.option}
+              title={sliderLabel(slider.option.title)}
+            />
+          );
         }
         if (slider.courses.length === 0) return null;
         return (
-          <Fragment key={`home-course-${index}`}>
-            <h2 id={`sliderGroup${index + 1}`} className="text-2xl font-semibold text-left ml-3 md:ml-0">
-              {slider.title
-                ? isKnownCourseGroupOptionTitle(slider.title)
-                  ? tCommon(`course_group_options.${slider.title}`)
-                  : slider.title
-                : '—'}
+          <Fragment key={`home-course-${slider.id}`}>
+            <h2 id={`homeSliderGroup${slider.id}`} className="text-2xl font-semibold text-left ml-3 md:ml-0">
+              {slider.title ? sliderLabel(slider.title) : '—'}
             </h2>
             <div className="mt-2 mb-12">
               <TileSlider courses={slider.courses as import('../components/common/TileSlider').CourseType[]} isManage={false} />

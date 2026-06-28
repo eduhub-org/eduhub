@@ -13,8 +13,10 @@ CREATE TABLE "public"."ProjectSliderCourseGroup" (
   PRIMARY KEY ("id"),
   UNIQUE ("id"),
   UNIQUE ("projectSliderOptionId", "courseGroupOptionId"),
-  FOREIGN KEY ("projectSliderOptionId") REFERENCES "public"."CourseGroupOption"("id") ON UPDATE CASCADE ON DELETE CASCADE,
-  FOREIGN KEY ("courseGroupOptionId") REFERENCES "public"."CourseGroupOption"("id") ON UPDATE CASCADE ON DELETE CASCADE
+  CONSTRAINT "ProjectSliderCourseGroup_projectSliderOptionId_fkey"
+    FOREIGN KEY ("projectSliderOptionId") REFERENCES "public"."CourseGroupOption"("id") ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT "ProjectSliderCourseGroup_courseGroupOptionId_fkey"
+    FOREIGN KEY ("courseGroupOptionId") REFERENCES "public"."CourseGroupOption"("id") ON UPDATE CASCADE ON DELETE CASCADE
 );
 COMMENT ON TABLE "public"."ProjectSliderCourseGroup" IS E'Selects a course group as a source for a project slider (CourseGroupOption with contentType = PROJECT). Projects linked to courses in that course group are included.';
 
@@ -30,8 +32,10 @@ CREATE TABLE "public"."ProjectSliderProjectGroup" (
   PRIMARY KEY ("id"),
   UNIQUE ("id"),
   UNIQUE ("projectSliderOptionId", "projectGroupOptionId"),
-  FOREIGN KEY ("projectSliderOptionId") REFERENCES "public"."CourseGroupOption"("id") ON UPDATE CASCADE ON DELETE CASCADE,
-  FOREIGN KEY ("projectGroupOptionId") REFERENCES "public"."ProjectGroupOption"("id") ON UPDATE CASCADE ON DELETE CASCADE
+  CONSTRAINT "ProjectSliderProjectGroup_projectSliderOptionId_fkey"
+    FOREIGN KEY ("projectSliderOptionId") REFERENCES "public"."CourseGroupOption"("id") ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT "ProjectSliderProjectGroup_projectGroupOptionId_fkey"
+    FOREIGN KEY ("projectGroupOptionId") REFERENCES "public"."ProjectGroupOption"("id") ON UPDATE CASCADE ON DELETE CASCADE
 );
 COMMENT ON TABLE "public"."ProjectSliderProjectGroup" IS E'Selects a project group as a source for a project slider (CourseGroupOption with contentType = PROJECT).';
 
@@ -56,3 +60,30 @@ CREATE TRIGGER "set_public_ProjectSliderProjectGroup_updated_at"
 BEFORE UPDATE ON "public"."ProjectSliderProjectGroup"
 FOR EACH ROW
 EXECUTE PROCEDURE "public"."set_current_timestamp_updated_at"();
+
+-- Enforce the content-type invariant at the schema level: a project slider's
+-- projectSliderOptionId must reference a CourseGroupOption with contentType =
+-- 'PROJECT', and a course-group source must reference one with 'COURSE'. This
+-- guards against bad writes from the admin mutations persisting unusable config.
+CREATE OR REPLACE FUNCTION "public"."check_project_slider_selection_types"()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF (SELECT "contentType" FROM "public"."CourseGroupOption" WHERE "id" = NEW."projectSliderOptionId") <> 'PROJECT' THEN
+    RAISE EXCEPTION 'projectSliderOptionId % must reference a CourseGroupOption with contentType = PROJECT', NEW."projectSliderOptionId";
+  END IF;
+  IF TG_TABLE_NAME = 'ProjectSliderCourseGroup'
+     AND (SELECT "contentType" FROM "public"."CourseGroupOption" WHERE "id" = NEW."courseGroupOptionId") <> 'COURSE' THEN
+    RAISE EXCEPTION 'courseGroupOptionId % must reference a CourseGroupOption with contentType = COURSE', NEW."courseGroupOptionId";
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER "check_ProjectSliderCourseGroup_types"
+BEFORE INSERT OR UPDATE ON "public"."ProjectSliderCourseGroup"
+FOR EACH ROW
+EXECUTE PROCEDURE "public"."check_project_slider_selection_types"();
+CREATE TRIGGER "check_ProjectSliderProjectGroup_types"
+BEFORE INSERT OR UPDATE ON "public"."ProjectSliderProjectGroup"
+FOR EACH ROW
+EXECUTE PROCEDURE "public"."check_project_slider_selection_types"();

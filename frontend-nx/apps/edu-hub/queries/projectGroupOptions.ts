@@ -14,6 +14,11 @@ export const ADMIN_PROJECT_GROUP_OPTIONS = gql`
           count
         }
       }
+      ProjectSliderProjectGroups_aggregate {
+        aggregate {
+          count
+        }
+      }
     }
   }
 `;

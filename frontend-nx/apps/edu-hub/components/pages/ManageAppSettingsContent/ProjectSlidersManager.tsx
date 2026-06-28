@@ -49,11 +49,17 @@ const ProjectSlidersManager: FC = () => {
   const [error, setError] = useState('');
 
   const { data, loading, error: queryError } = useAdminQuery<AdminProjectSliders>(ADMIN_PROJECT_SLIDERS);
-  const { data: sourcesData } = useAdminQuery<AdminProjectSliderSources>(ADMIN_PROJECT_SLIDER_SOURCES);
+  const {
+    data: sourcesData,
+    loading: sourcesLoading,
+    error: sourcesError,
+  } = useAdminQuery<AdminProjectSliderSources>(ADMIN_PROJECT_SLIDER_SOURCES);
   const sliders = useMemo(() => data?.CourseGroupOption ?? [], [data]);
   const courseGroups = sourcesData?.CourseGroupOption ?? [];
   const projectGroups = sourcesData?.ProjectGroupOption ?? [];
-  const isReady = !loading && !queryError && !!data;
+  const anyLoading = loading || sourcesLoading;
+  const anyError = queryError || sourcesError;
+  const isReady = !anyLoading && !anyError && !!data && !!sourcesData;
 
   const [insertSlider] = useAdminMutation<InsertProjectSlider, InsertProjectSliderVariables>(INSERT_PROJECT_SLIDER, REFETCH);
   const [deleteSlider] = useAdminMutation<DeleteProjectSlider, DeleteProjectSliderVariables>(DELETE_PROJECT_SLIDER, REFETCH);
@@ -130,9 +136,9 @@ const ProjectSlidersManager: FC = () => {
       <label className="text-xs uppercase tracking-widest font-medium text-gray-400">{t('label')}</label>
       <p className="text-xs text-gray-400 mb-4">{t('help_text')}</p>
 
-      {queryError ? (
+      {anyError ? (
         <p className="text-red-500 text-sm">{t('error_loading')}</p>
-      ) : loading ? (
+      ) : anyLoading ? (
         <p className="text-sm text-label-secondary">{t('loading')}</p>
       ) : (
         <>

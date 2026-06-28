@@ -17,4 +17,17 @@ select_permissions:
         - groupOptionId
         - created_at
         - updated_at
-      filter: {}
+      # Only rows whose project is anonymously visible (mirrors the Project rule),
+      # so anonymous callers cannot enumerate groupings of hidden projects.
+      filter:
+        Project:
+          _or:
+            - status:
+                _eq: PUBLISHED
+            - _and:
+                - status:
+                    _eq: PROPOSED
+                - _not:
+                    ProjectAuthors:
+                      participationStatus:
+                        _eq: ACCEPTED

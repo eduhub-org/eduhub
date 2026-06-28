@@ -15,3 +15,8 @@ export interface HomeProjectTilesAll {
    */
   Project: ProjectTileFragment[];
 }
+
+export interface HomeProjectTilesAllVariables {
+  limit?: number | null;
+  offset?: number | null;
+}

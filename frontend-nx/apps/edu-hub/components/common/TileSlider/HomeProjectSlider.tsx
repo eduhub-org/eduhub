@@ -16,6 +16,7 @@ import ProjectTileSlider from './ProjectTileSlider';
 
 interface HomeProjectSliderProps {
   option: CourseGroupOptions_CourseGroupOption;
+  title: string;
 }
 
 /**
@@ -23,7 +24,7 @@ interface HomeProjectSliderProps {
  * contentType = 'PROJECT'). Pulls its membership from the selected groups, or
  * all home-eligible projects when no groups are selected.
  */
-const HomeProjectSlider: FC<HomeProjectSliderProps> = ({ option }) => {
+const HomeProjectSlider: FC<HomeProjectSliderProps> = ({ option, title }) => {
   const courseGroupIds = useMemo(
     () => option.SelectedCourseGroups.map((s) => s.courseGroupOptionId),
     [option.SelectedCourseGroups]
@@ -34,27 +35,52 @@ const HomeProjectSlider: FC<HomeProjectSliderProps> = ({ option }) => {
   );
   const hasGroupSelection = courseGroupIds.length > 0 || projectGroupIds.length > 0;
 
-  const { data: allData } = useQuery<HomeProjectTilesAll>(HOME_PROJECT_TILES_ALL, {
-    context: { role: AuthRoles.anonymous },
-    skip: hasGroupSelection,
-  });
-
-  const { data: groupData } = useQuery<HomeProjectTilesByGroups, HomeProjectTilesByGroupsVariables>(
-    HOME_PROJECT_TILES_BY_GROUPS,
+  const { data: allData, loading: allLoading, error: allError } = useQuery<HomeProjectTilesAll>(
+    HOME_PROJECT_TILES_ALL,
     {
-      variables: { courseGroupIds, projectGroupIds },
       context: { role: AuthRoles.anonymous },
-      skip: !hasGroupSelection,
+      skip: hasGroupSelection,
     }
   );
 
+  const { data: groupData, loading: groupLoading, error: groupError } = useQuery<
+    HomeProjectTilesByGroups,
+    HomeProjectTilesByGroupsVariables
+  >(HOME_PROJECT_TILES_BY_GROUPS, {
+    variables: { courseGroupIds, projectGroupIds },
+    context: { role: AuthRoles.anonymous },
+    skip: !hasGroupSelection,
+  });
+
+  const loading = hasGroupSelection ? groupLoading : allLoading;
+  const error = hasGroupSelection ? groupError : allError;
   const projects = (hasGroupSelection ? groupData?.Project : allData?.Project) ?? [];
+
+  const heading = <h2 className="text-2xl font-semibold text-left ml-3 md:ml-0">{title}</h2>;
+
+  // Degrade gracefully on the public homepage: log the failure but don't render a
+  // broken/error section to every visitor.
+  if (error) {
+    console.warn('HomeProjectSlider failed to load projects', error);
+    return null;
+  }
+
+  if (loading) {
+    return (
+      <>
+        {heading}
+        <div className="mt-2 mb-12">
+          <div className="relative h-[431px] animate-pulse bg-bg-card rounded-2xl" />
+        </div>
+      </>
+    );
+  }
 
   if (projects.length === 0) return null;
 
   return (
     <>
-      <h2 className="text-2xl font-semibold text-left ml-3 md:ml-0">{option.title}</h2>
+      {heading}
       <div className="mt-2 mb-12">
         <ProjectTileSlider projects={projects} context="public" />
       </div>

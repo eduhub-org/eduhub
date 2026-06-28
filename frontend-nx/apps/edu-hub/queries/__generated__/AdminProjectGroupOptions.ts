@@ -17,6 +17,16 @@ export interface AdminProjectGroupOptions_ProjectGroupOption_ProjectGroups_aggre
   aggregate: AdminProjectGroupOptions_ProjectGroupOption_ProjectGroups_aggregate_aggregate | null;
 }
 
+export interface AdminProjectGroupOptions_ProjectGroupOption_ProjectSliderProjectGroups_aggregate_aggregate {
+  __typename: "ProjectSliderProjectGroup_aggregate_fields";
+  count: number;
+}
+
+export interface AdminProjectGroupOptions_ProjectGroupOption_ProjectSliderProjectGroups_aggregate {
+  __typename: "ProjectSliderProjectGroup_aggregate";
+  aggregate: AdminProjectGroupOptions_ProjectGroupOption_ProjectSliderProjectGroups_aggregate_aggregate | null;
+}
+
 export interface AdminProjectGroupOptions_ProjectGroupOption {
   __typename: "ProjectGroupOption";
   id: number;
@@ -24,6 +34,7 @@ export interface AdminProjectGroupOptions_ProjectGroupOption {
   title: string;
   organizationId: number | null;
   ProjectGroups_aggregate: AdminProjectGroupOptions_ProjectGroupOption_ProjectGroups_aggregate;
+  ProjectSliderProjectGroups_aggregate: AdminProjectGroupOptions_ProjectGroupOption_ProjectSliderProjectGroups_aggregate;
 }
 
 export interface AdminProjectGroupOptions {

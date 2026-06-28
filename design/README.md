@@ -9,7 +9,7 @@ Pencil designs for reusable project tiles, tile slider, and public project pages
 | Project Tiles — Explorations | Tile A (published showcase) + Tile B variants (public vs within-course CTA) |
 | Project Page V1 — Showcase | Full-bleed hero, about, similar projects slider, sidebar |
 | Project Page V2 — Public | Horizontal hero split, enroll card (no bookmark), markdown-split description |
-| Project Page V2 — Within course | Join card with spots bar, full-width "Apply to join" (no bookmark) |
+| Project Page V2 — Within course | Join card with full-width "Apply to join" (no spots/capacity bar, no bookmark) |
 
 Implementation plan: [docs/project-tile-slider.plan.md](../docs/project-tile-slider.plan.md)
 

@@ -2630,6 +2630,7 @@
     "course_section": {
       "open_templates": "Offene Projektvorlagen",
       "past_projects": "Projekte aus vergangenen Kursen"
-    }
+    },
+    "load_error": "Dieses Projekt konnte nicht geladen werden. Bitte versuche es später erneut."
   }
 }

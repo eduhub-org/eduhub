@@ -19,4 +19,6 @@ export interface CoursePublishedProjectTiles {
 export interface CoursePublishedProjectTilesVariables {
   courseSeriesId: number;
   now: any;
+  limit?: number | null;
+  offset?: number | null;
 }

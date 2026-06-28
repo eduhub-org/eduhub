@@ -50,7 +50,7 @@ export const ProjectTile: FC<ProjectTileProps> = ({ project, context, courseId }
               {t('tile.template_eyebrow')}
             </span>
             <span className="text-lg mb-auto line-clamp-2 text-label-primary">
-              {context === 'withinCourse' ? courseLine : project.tagline}
+              {context === 'withinCourse' ? courseLine : project.tagline ?? courseLine}
             </span>
             {mentorName ? (
               <span className="text-sm text-label-secondary mb-3 truncate">

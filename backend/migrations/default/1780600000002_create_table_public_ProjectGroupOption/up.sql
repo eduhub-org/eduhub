@@ -11,7 +11,8 @@ CREATE TABLE "public"."ProjectGroupOption" (
   PRIMARY KEY ("id"),
   UNIQUE ("id"),
   UNIQUE ("title"),
-  FOREIGN KEY ("organizationId") REFERENCES "public"."Organization"("id") ON UPDATE CASCADE ON DELETE CASCADE
+  CONSTRAINT "ProjectGroupOption_organizationId_fkey"
+    FOREIGN KEY ("organizationId") REFERENCES "public"."Organization"("id") ON UPDATE CASCADE ON DELETE CASCADE
 );
 COMMENT ON TABLE "public"."ProjectGroupOption" IS E'Defines the possible groups a project can be assigned to, used to compose project sliders. The provided order is used to show the groups in the respective order.';
 

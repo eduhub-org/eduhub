@@ -2645,6 +2645,7 @@
     "course_section": {
       "open_templates": "Open project templates",
       "past_projects": "Projects from past courses"
-    }
+    },
+    "load_error": "Could not load this project. Please try again later."
   }
 }

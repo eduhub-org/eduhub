@@ -9,7 +9,8 @@ CREATE TABLE "public"."CourseSeries" (
   "updated_at" timestamptz NOT NULL DEFAULT now(),
   PRIMARY KEY ("id"),
   UNIQUE ("id"),
-  FOREIGN KEY ("organizationId") REFERENCES "public"."Organization"("id") ON UPDATE CASCADE ON DELETE SET NULL
+  CONSTRAINT "CourseSeries_organizationId_fkey"
+    FOREIGN KEY ("organizationId") REFERENCES "public"."Organization"("id") ON UPDATE CASCADE ON DELETE SET NULL
 );
 COMMENT ON TABLE "public"."CourseSeries" IS E'Groups successive iterations of the same course into one durable series so past/related projects can be found via a single FK lookup.';
 

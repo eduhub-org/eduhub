@@ -19,4 +19,6 @@ export interface HomeProjectTilesByGroups {
 export interface HomeProjectTilesByGroupsVariables {
   courseGroupIds: number[];
   projectGroupIds: number[];
+  limit?: number | null;
+  offset?: number | null;
 }

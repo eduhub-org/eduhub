@@ -8,8 +8,10 @@ CREATE TABLE "public"."ProjectGroup" (
   PRIMARY KEY ("id"),
   UNIQUE ("id"),
   UNIQUE ("projectId", "groupOptionId"),
-  FOREIGN KEY ("projectId") REFERENCES "public"."Project"("id") ON UPDATE CASCADE ON DELETE CASCADE,
-  FOREIGN KEY ("groupOptionId") REFERENCES "public"."ProjectGroupOption"("id") ON UPDATE CASCADE ON DELETE CASCADE
+  CONSTRAINT "ProjectGroup_projectId_fkey"
+    FOREIGN KEY ("projectId") REFERENCES "public"."Project"("id") ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT "ProjectGroup_groupOptionId_fkey"
+    FOREIGN KEY ("groupOptionId") REFERENCES "public"."ProjectGroupOption"("id") ON UPDATE CASCADE ON DELETE CASCADE
 );
 COMMENT ON TABLE "public"."ProjectGroup" IS E'Assigns a project to a ProjectGroupOption so it can be selected into project sliders.';
 

@@ -22,7 +22,7 @@ export const ProjectAvatars: FC<ProjectAvatarsProps> = ({ authors, max = 3 }) =>
         return (
           <div
             key={author.id}
-            className="w-7 h-7 rounded-full border-2 border-fill-primary bg-gray-400 bg-cover bg-center flex items-center justify-center text-[10px] text-white overflow-hidden"
+            className="w-7 h-7 rounded-full border-2 border-fill-primary bg-fill-secondary bg-cover bg-center flex items-center justify-center text-[10px] text-label-primary overflow-hidden"
             style={{
               marginLeft: index === 0 ? 0 : -10,
               backgroundImage: user.picture ? `url("${user.picture}")` : undefined,
@@ -35,7 +35,7 @@ export const ProjectAvatars: FC<ProjectAvatarsProps> = ({ authors, max = 3 }) =>
       })}
       {extra > 0 && (
         <div
-          className="w-7 h-7 rounded-full border-2 border-fill-primary bg-gray-600 flex items-center justify-center text-[10px] text-white"
+          className="w-7 h-7 rounded-full border-2 border-fill-primary bg-bg-card flex items-center justify-center text-[10px] text-label-primary"
           style={{ marginLeft: -10 }}
         >
           +{extra}
