@@ -45,6 +45,8 @@ module.exports = {
         warning: 'var(--eduhub-warning)',
         error: 'var(--eduhub-error)',
         info: 'var(--eduhub-info)',
+        badge: 'var(--eduhub-badge)',
+        'badge-contrast': 'var(--eduhub-badge-contrast)',
         status: {
           confirmed: 'var(--eduhub-status-confirmed)',
           invited: 'var(--eduhub-status-invited)',

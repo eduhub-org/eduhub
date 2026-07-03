@@ -15,6 +15,9 @@ export interface InsertProjectGroupOption_insert_ProjectGroupOption_one {
 }
 
 export interface InsertProjectGroupOption {
+  /**
+   * insert a single row into the table: "ProjectGroupOption"
+   */
   insert_ProjectGroupOption_one: InsertProjectGroupOption_insert_ProjectGroupOption_one | null;
 }
 

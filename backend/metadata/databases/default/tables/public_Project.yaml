@@ -41,6 +41,13 @@ array_relationships:
         table:
           name: ProjectAuthor
           schema: public
+  - name: ProjectBadges
+    using:
+      foreign_key_constraint_on:
+        column: projectId
+        table:
+          name: ProjectBadge
+          schema: public
   - name: ProjectCourses
     using:
       foreign_key_constraint_on:
@@ -136,6 +143,8 @@ select_permissions:
         - tagline
         - title
         - type
+        # Required for public project-slider ordering (order_by: updated_at desc).
+        - updated_at
       filter:
         _or:
           - status:

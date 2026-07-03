@@ -13,6 +13,9 @@ export interface InsertProjectSliderProjectGroup_insert_ProjectSliderProjectGrou
 }
 
 export interface InsertProjectSliderProjectGroup {
+  /**
+   * insert a single row into the table: "ProjectSliderProjectGroup"
+   */
   insert_ProjectSliderProjectGroup_one: InsertProjectSliderProjectGroup_insert_ProjectSliderProjectGroup_one | null;
 }
 

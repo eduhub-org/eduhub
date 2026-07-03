@@ -33,10 +33,19 @@ export interface AdminProjectGroupOptions_ProjectGroupOption {
   order: number;
   title: string;
   organizationId: number | null;
+  /**
+   * An aggregate relationship
+   */
   ProjectGroups_aggregate: AdminProjectGroupOptions_ProjectGroupOption_ProjectGroups_aggregate;
+  /**
+   * An aggregate relationship
+   */
   ProjectSliderProjectGroups_aggregate: AdminProjectGroupOptions_ProjectGroupOption_ProjectSliderProjectGroups_aggregate;
 }
 
 export interface AdminProjectGroupOptions {
+  /**
+   * fetch data from the table: "ProjectGroupOption"
+   */
   ProjectGroupOption: AdminProjectGroupOptions_ProjectGroupOption[];
 }

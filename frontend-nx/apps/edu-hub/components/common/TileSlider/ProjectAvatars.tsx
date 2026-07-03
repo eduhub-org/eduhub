@@ -1,42 +1,40 @@
 import { FC } from 'react';
 
 import { ProjectTileFragment_ProjectAuthors } from '../../../queries/__generated__/ProjectTileFragment';
+import { Avatar } from '../../shared-components';
 
 interface ProjectAvatarsProps {
   authors: ProjectTileFragment_ProjectAuthors[];
   max?: number;
+  /** Avatar diameter in pixels. */
+  size?: number;
 }
 
-const initials = (firstName: string, lastName: string) =>
-  `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
-
-export const ProjectAvatars: FC<ProjectAvatarsProps> = ({ authors, max = 3 }) => {
+export const ProjectAvatars: FC<ProjectAvatarsProps> = ({ authors, max = 3, size = 40 }) => {
   if (!authors || authors.length === 0) return <span />;
   const shown = authors.slice(0, max);
   const extra = authors.length - shown.length;
+  const overlap = Math.round(size * 0.32);
 
   return (
     <div className="flex items-center">
       {shown.map((author, index) => {
         const user = author.User;
         return (
-          <div
-            key={author.id}
-            className="w-7 h-7 rounded-full border-2 border-fill-primary bg-fill-secondary bg-cover bg-center flex items-center justify-center text-[10px] text-label-primary overflow-hidden"
-            style={{
-              marginLeft: index === 0 ? 0 : -10,
-              backgroundImage: user.picture ? `url("${user.picture}")` : undefined,
-            }}
-            title={`${user.firstName} ${user.lastName}`}
-          >
-            {!user.picture && initials(user.firstName, user.lastName)}
+          <div key={author.id} style={{ marginLeft: index === 0 ? 0 : -overlap }}>
+            <Avatar
+              imageUrl={user.picture}
+              name={`${user.firstName} ${user.lastName}`}
+              size={size}
+              className="border-2 border-fill-primary"
+            />
           </div>
         );
       })}
       {extra > 0 && (
         <div
-          className="w-7 h-7 rounded-full border-2 border-fill-primary bg-bg-card flex items-center justify-center text-[10px] text-label-primary"
-          style={{ marginLeft: -10 }}
+          className="flex items-center justify-center rounded-full border-2 border-fill-primary bg-bg-card text-label-primary"
+          style={{ width: size, height: size, marginLeft: -overlap, fontSize: Math.max(10, Math.round(size * 0.32)) }}
         >
           +{extra}
         </div>

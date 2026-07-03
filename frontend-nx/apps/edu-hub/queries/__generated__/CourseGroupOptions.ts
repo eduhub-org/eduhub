@@ -29,7 +29,7 @@ export interface CourseGroupOptions_CourseGroupOption {
    */
   sliderGroup: boolean | null;
   /**
-   * Whether this slider row renders courses (COURSE, default) or projects (PROJECT).
+   * Whether this slider row renders courses (COURSE, default) or projects (PROJECT). PROJECT rows compose their membership from the ProjectSliderCourseGroup / ProjectSliderProjectGroup selections.
    */
   contentType: string;
   /**
@@ -41,11 +41,11 @@ export interface CourseGroupOptions_CourseGroupOption {
    */
   organizationId: number | null;
   /**
-   * For a project-slider row: the selected source course groups.
+   * An array relationship
    */
   SelectedCourseGroups: CourseGroupOptions_CourseGroupOption_SelectedCourseGroups[];
   /**
-   * For a project-slider row: the selected source project groups.
+   * An array relationship
    */
   SelectedProjectGroups: CourseGroupOptions_CourseGroupOption_SelectedProjectGroups[];
 }

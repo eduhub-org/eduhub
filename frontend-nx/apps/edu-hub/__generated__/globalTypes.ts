@@ -334,6 +334,47 @@ export enum Attendance_update_column {
 }
 
 /**
+ * unique or primary key constraints on table "BadgeStatus"
+ */
+export enum BadgeStatus_constraint {
+  BadgeStatus_pkey = "BadgeStatus_pkey",
+}
+
+export enum BadgeStatus_enum {
+  NOMINATED = "NOMINATED",
+  WON = "WON",
+}
+
+/**
+ * update columns of table "BadgeStatus"
+ */
+export enum BadgeStatus_update_column {
+  comment = "comment",
+  value = "value",
+}
+
+/**
+ * unique or primary key constraints on table "Badge"
+ */
+export enum Badge_constraint {
+  Badge_pkey = "Badge_pkey",
+}
+
+/**
+ * update columns of table "Badge"
+ */
+export enum Badge_update_column {
+  created_at = "created_at",
+  description = "description",
+  icon = "icon",
+  id = "id",
+  order = "order",
+  organizationId = "organizationId",
+  title = "title",
+  updated_at = "updated_at",
+}
+
+/**
  * unique or primary key constraints on table "CertificateTemplate"
  */
 export enum CertificateTemplate_constraint {
@@ -601,6 +642,7 @@ export enum CourseGroupOption_constraint {
  * update columns of table "CourseGroupOption"
  */
 export enum CourseGroupOption_update_column {
+  contentType = "contentType",
   created_at = "created_at",
   id = "id",
   order = "order",
@@ -728,6 +770,24 @@ export enum CourseRegistrationType_update_column {
 }
 
 /**
+ * unique or primary key constraints on table "CourseSeries"
+ */
+export enum CourseSeries_constraint {
+  CourseSeries_pkey = "CourseSeries_pkey",
+}
+
+/**
+ * update columns of table "CourseSeries"
+ */
+export enum CourseSeries_update_column {
+  created_at = "created_at",
+  id = "id",
+  organizationId = "organizationId",
+  title = "title",
+  updated_at = "updated_at",
+}
+
+/**
  * unique or primary key constraints on table "CourseStatus"
  */
 export enum CourseStatus_constraint {
@@ -771,6 +831,7 @@ export enum Course_select_column {
   contentDescriptionField1 = "contentDescriptionField1",
   contentDescriptionField2 = "contentDescriptionField2",
   cost = "cost",
+  courseSeriesId = "courseSeriesId",
   coverImage = "coverImage",
   created_at = "created_at",
   currency = "currency",
@@ -835,6 +896,7 @@ export enum Course_update_column {
   contentDescriptionField1 = "contentDescriptionField1",
   contentDescriptionField2 = "contentDescriptionField2",
   cost = "cost",
+  courseSeriesId = "courseSeriesId",
   coverImage = "coverImage",
   created_at = "created_at",
   currency = "currency",
@@ -1430,6 +1492,38 @@ export enum ProjectAuthor_update_column {
 }
 
 /**
+ * unique or primary key constraints on table "ProjectBadge"
+ */
+export enum ProjectBadge_constraint {
+  ProjectBadge_pkey = "ProjectBadge_pkey",
+  ProjectBadge_projectId_badgeId_key = "ProjectBadge_projectId_badgeId_key",
+}
+
+/**
+ * select columns of table "ProjectBadge"
+ */
+export enum ProjectBadge_select_column {
+  badgeId = "badgeId",
+  created_at = "created_at",
+  id = "id",
+  projectId = "projectId",
+  status = "status",
+  updated_at = "updated_at",
+}
+
+/**
+ * update columns of table "ProjectBadge"
+ */
+export enum ProjectBadge_update_column {
+  badgeId = "badgeId",
+  created_at = "created_at",
+  id = "id",
+  projectId = "projectId",
+  status = "status",
+  updated_at = "updated_at",
+}
+
+/**
  * unique or primary key constraints on table "ProjectConsentEvent"
  */
 export enum ProjectConsentEvent_constraint {
@@ -1542,6 +1636,56 @@ export enum ProjectDocumentationInstruction_update_column {
 }
 
 /**
+ * unique or primary key constraints on table "ProjectGroupOption"
+ */
+export enum ProjectGroupOption_constraint {
+  ProjectGroupOption_pkey = "ProjectGroupOption_pkey",
+  ProjectGroupOption_title_key = "ProjectGroupOption_title_key",
+}
+
+/**
+ * update columns of table "ProjectGroupOption"
+ */
+export enum ProjectGroupOption_update_column {
+  created_at = "created_at",
+  id = "id",
+  order = "order",
+  organizationId = "organizationId",
+  title = "title",
+  updated_at = "updated_at",
+}
+
+/**
+ * unique or primary key constraints on table "ProjectGroup"
+ */
+export enum ProjectGroup_constraint {
+  ProjectGroup_pkey = "ProjectGroup_pkey",
+  ProjectGroup_projectId_groupOptionId_key = "ProjectGroup_projectId_groupOptionId_key",
+}
+
+/**
+ * select columns of table "ProjectGroup"
+ */
+export enum ProjectGroup_select_column {
+  created_at = "created_at",
+  groupOptionId = "groupOptionId",
+  id = "id",
+  projectId = "projectId",
+  updated_at = "updated_at",
+}
+
+/**
+ * update columns of table "ProjectGroup"
+ */
+export enum ProjectGroup_update_column {
+  created_at = "created_at",
+  groupOptionId = "groupOptionId",
+  id = "id",
+  projectId = "projectId",
+  updated_at = "updated_at",
+}
+
+/**
  * unique or primary key constraints on table "ProjectMentor"
  */
 export enum ProjectMentor_constraint {
@@ -1612,6 +1756,66 @@ export enum ProjectRating_enum {
 export enum ProjectRating_update_column {
   comment = "comment",
   value = "value",
+}
+
+/**
+ * unique or primary key constraints on table "ProjectSliderCourseGroup"
+ */
+export enum ProjectSliderCourseGroup_constraint {
+  ProjectSliderCourseGroup_pkey = "ProjectSliderCourseGroup_pkey",
+  ProjectSliderCourseGroup_projectSliderOptionId_courseGroupO_key = "ProjectSliderCourseGroup_projectSliderOptionId_courseGroupO_key",
+}
+
+/**
+ * select columns of table "ProjectSliderCourseGroup"
+ */
+export enum ProjectSliderCourseGroup_select_column {
+  courseGroupOptionId = "courseGroupOptionId",
+  created_at = "created_at",
+  id = "id",
+  projectSliderOptionId = "projectSliderOptionId",
+  updated_at = "updated_at",
+}
+
+/**
+ * update columns of table "ProjectSliderCourseGroup"
+ */
+export enum ProjectSliderCourseGroup_update_column {
+  courseGroupOptionId = "courseGroupOptionId",
+  created_at = "created_at",
+  id = "id",
+  projectSliderOptionId = "projectSliderOptionId",
+  updated_at = "updated_at",
+}
+
+/**
+ * unique or primary key constraints on table "ProjectSliderProjectGroup"
+ */
+export enum ProjectSliderProjectGroup_constraint {
+  ProjectSliderProjectGroup_pkey = "ProjectSliderProjectGroup_pkey",
+  ProjectSliderProjectGroup_projectSliderOptionId_projectGrou_key = "ProjectSliderProjectGroup_projectSliderOptionId_projectGrou_key",
+}
+
+/**
+ * select columns of table "ProjectSliderProjectGroup"
+ */
+export enum ProjectSliderProjectGroup_select_column {
+  created_at = "created_at",
+  id = "id",
+  projectGroupOptionId = "projectGroupOptionId",
+  projectSliderOptionId = "projectSliderOptionId",
+  updated_at = "updated_at",
+}
+
+/**
+ * update columns of table "ProjectSliderProjectGroup"
+ */
+export enum ProjectSliderProjectGroup_update_column {
+  created_at = "created_at",
+  id = "id",
+  projectGroupOptionId = "projectGroupOptionId",
+  projectSliderOptionId = "projectSliderOptionId",
+  updated_at = "updated_at",
 }
 
 /**
@@ -3213,6 +3417,109 @@ export interface Attendance_variance_order_by {
 }
 
 /**
+ * Boolean expression to filter rows from the table "BadgeStatus". All fields are combined with a logical 'AND'.
+ */
+export interface BadgeStatus_bool_exp {
+  ProjectBadges?: ProjectBadge_bool_exp | null;
+  ProjectBadges_aggregate?: ProjectBadge_aggregate_bool_exp | null;
+  _and?: BadgeStatus_bool_exp[] | null;
+  _not?: BadgeStatus_bool_exp | null;
+  _or?: BadgeStatus_bool_exp[] | null;
+  comment?: String_comparison_exp | null;
+  value?: String_comparison_exp | null;
+}
+
+/**
+ * Boolean expression to compare columns of type "BadgeStatus_enum". All fields are combined with logical 'AND'.
+ */
+export interface BadgeStatus_enum_comparison_exp {
+  _eq?: BadgeStatus_enum | null;
+  _in?: BadgeStatus_enum[] | null;
+  _is_null?: boolean | null;
+  _neq?: BadgeStatus_enum | null;
+  _nin?: BadgeStatus_enum[] | null;
+}
+
+/**
+ * input type for inserting data into table "BadgeStatus"
+ */
+export interface BadgeStatus_insert_input {
+  ProjectBadges?: ProjectBadge_arr_rel_insert_input | null;
+  comment?: string | null;
+  value?: string | null;
+}
+
+/**
+ * input type for inserting object relation for remote table "BadgeStatus"
+ */
+export interface BadgeStatus_obj_rel_insert_input {
+  data: BadgeStatus_insert_input;
+  on_conflict?: BadgeStatus_on_conflict | null;
+}
+
+/**
+ * on_conflict condition type for table "BadgeStatus"
+ */
+export interface BadgeStatus_on_conflict {
+  constraint: BadgeStatus_constraint;
+  update_columns: BadgeStatus_update_column[];
+  where?: BadgeStatus_bool_exp | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "Badge". All fields are combined with a logical 'AND'.
+ */
+export interface Badge_bool_exp {
+  Organization?: Organization_bool_exp | null;
+  ProjectBadges?: ProjectBadge_bool_exp | null;
+  ProjectBadges_aggregate?: ProjectBadge_aggregate_bool_exp | null;
+  _and?: Badge_bool_exp[] | null;
+  _not?: Badge_bool_exp | null;
+  _or?: Badge_bool_exp[] | null;
+  created_at?: timestamptz_comparison_exp | null;
+  description?: String_comparison_exp | null;
+  icon?: String_comparison_exp | null;
+  id?: Int_comparison_exp | null;
+  order?: Int_comparison_exp | null;
+  organizationId?: Int_comparison_exp | null;
+  title?: String_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "Badge"
+ */
+export interface Badge_insert_input {
+  Organization?: Organization_obj_rel_insert_input | null;
+  ProjectBadges?: ProjectBadge_arr_rel_insert_input | null;
+  created_at?: any | null;
+  description?: string | null;
+  icon?: string | null;
+  id?: number | null;
+  order?: number | null;
+  organizationId?: number | null;
+  title?: string | null;
+  updated_at?: any | null;
+}
+
+/**
+ * input type for inserting object relation for remote table "Badge"
+ */
+export interface Badge_obj_rel_insert_input {
+  data: Badge_insert_input;
+  on_conflict?: Badge_on_conflict | null;
+}
+
+/**
+ * on_conflict condition type for table "Badge"
+ */
+export interface Badge_on_conflict {
+  constraint: Badge_constraint;
+  update_columns: Badge_update_column[];
+  where?: Badge_bool_exp | null;
+}
+
+/**
  * Boolean expression to compare columns of type "Boolean". All fields are combined with logical 'AND'.
  */
 export interface Boolean_comparison_exp {
@@ -4417,9 +4724,14 @@ export interface CourseGroupOption_bool_exp {
   CourseGroups_aggregate?: CourseGroup_aggregate_bool_exp | null;
   Organization?: Organization_bool_exp | null;
   ProgramType?: ProgramType_bool_exp | null;
+  SelectedCourseGroups?: ProjectSliderCourseGroup_bool_exp | null;
+  SelectedCourseGroups_aggregate?: ProjectSliderCourseGroup_aggregate_bool_exp | null;
+  SelectedProjectGroups?: ProjectSliderProjectGroup_bool_exp | null;
+  SelectedProjectGroups_aggregate?: ProjectSliderProjectGroup_aggregate_bool_exp | null;
   _and?: CourseGroupOption_bool_exp[] | null;
   _not?: CourseGroupOption_bool_exp | null;
   _or?: CourseGroupOption_bool_exp[] | null;
+  contentType?: String_comparison_exp | null;
   created_at?: timestamptz_comparison_exp | null;
   id?: Int_comparison_exp | null;
   order?: Int_comparison_exp | null;
@@ -4437,6 +4749,9 @@ export interface CourseGroupOption_insert_input {
   CourseGroups?: CourseGroup_arr_rel_insert_input | null;
   Organization?: Organization_obj_rel_insert_input | null;
   ProgramType?: ProgramType_obj_rel_insert_input | null;
+  SelectedCourseGroups?: ProjectSliderCourseGroup_arr_rel_insert_input | null;
+  SelectedProjectGroups?: ProjectSliderProjectGroup_arr_rel_insert_input | null;
+  contentType?: string | null;
   created_at?: any | null;
   id?: number | null;
   order?: number | null;
@@ -5045,6 +5360,66 @@ export interface CourseRegistrationType_order_by {
 }
 
 /**
+ * Boolean expression to filter rows from the table "CourseSeries". All fields are combined with a logical 'AND'.
+ */
+export interface CourseSeries_bool_exp {
+  Courses?: Course_bool_exp | null;
+  Courses_aggregate?: Course_aggregate_bool_exp | null;
+  Organization?: Organization_bool_exp | null;
+  _and?: CourseSeries_bool_exp[] | null;
+  _not?: CourseSeries_bool_exp | null;
+  _or?: CourseSeries_bool_exp[] | null;
+  created_at?: timestamptz_comparison_exp | null;
+  id?: Int_comparison_exp | null;
+  organizationId?: Int_comparison_exp | null;
+  title?: String_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "CourseSeries"
+ */
+export interface CourseSeries_insert_input {
+  Courses?: Course_arr_rel_insert_input | null;
+  Organization?: Organization_obj_rel_insert_input | null;
+  created_at?: any | null;
+  id?: number | null;
+  organizationId?: number | null;
+  title?: string | null;
+  updated_at?: any | null;
+}
+
+/**
+ * input type for inserting object relation for remote table "CourseSeries"
+ */
+export interface CourseSeries_obj_rel_insert_input {
+  data: CourseSeries_insert_input;
+  on_conflict?: CourseSeries_on_conflict | null;
+}
+
+/**
+ * on_conflict condition type for table "CourseSeries"
+ */
+export interface CourseSeries_on_conflict {
+  constraint: CourseSeries_constraint;
+  update_columns: CourseSeries_update_column[];
+  where?: CourseSeries_bool_exp | null;
+}
+
+/**
+ * Ordering options when selecting data from "CourseSeries".
+ */
+export interface CourseSeries_order_by {
+  Courses_aggregate?: Course_aggregate_order_by | null;
+  Organization?: Organization_order_by | null;
+  created_at?: order_by | null;
+  id?: order_by | null;
+  organizationId?: order_by | null;
+  title?: order_by | null;
+  updated_at?: order_by | null;
+}
+
+/**
  * Boolean expression to filter rows from the table "CourseStatus". All fields are combined with a logical 'AND'.
  */
 export interface CourseStatus_bool_exp {
@@ -5162,6 +5537,7 @@ export interface Course_avg_order_by {
   achievementCertificateTemplateId?: order_by | null;
   attendanceCertificateTemplateId?: order_by | null;
   basePrice?: order_by | null;
+  courseSeriesId?: order_by | null;
   id?: order_by | null;
   maxMissedSessions?: order_by | null;
   maxParticipants?: order_by | null;
@@ -5191,6 +5567,7 @@ export interface Course_bool_exp {
   CourseLocations?: CourseLocation_bool_exp | null;
   CourseLocations_aggregate?: CourseLocation_aggregate_bool_exp | null;
   CourseRegistrationType?: CourseRegistrationType_bool_exp | null;
+  CourseSeries?: CourseSeries_bool_exp | null;
   CourseStatus?: CourseStatus_bool_exp | null;
   DegreeCourses?: CourseDegree_bool_exp | null;
   DegreeCourses_aggregate?: CourseDegree_aggregate_bool_exp | null;
@@ -5215,6 +5592,7 @@ export interface Course_bool_exp {
   contentDescriptionField1?: String_comparison_exp | null;
   contentDescriptionField2?: String_comparison_exp | null;
   cost?: String_comparison_exp | null;
+  courseSeriesId?: Int_comparison_exp | null;
   coverImage?: String_comparison_exp | null;
   created_at?: timestamptz_comparison_exp | null;
   currency?: String_comparison_exp | null;
@@ -5260,6 +5638,7 @@ export interface Course_insert_input {
   CourseInstructors?: CourseInstructor_arr_rel_insert_input | null;
   CourseLocations?: CourseLocation_arr_rel_insert_input | null;
   CourseRegistrationType?: CourseRegistrationType_obj_rel_insert_input | null;
+  CourseSeries?: CourseSeries_obj_rel_insert_input | null;
   CourseStatus?: CourseStatus_obj_rel_insert_input | null;
   DegreeCourses?: CourseDegree_arr_rel_insert_input | null;
   Language?: Language_obj_rel_insert_input | null;
@@ -5277,6 +5656,7 @@ export interface Course_insert_input {
   contentDescriptionField1?: string | null;
   contentDescriptionField2?: string | null;
   cost?: string | null;
+  courseSeriesId?: number | null;
   coverImage?: string | null;
   created_at?: any | null;
   currency?: string | null;
@@ -5319,6 +5699,7 @@ export interface Course_max_order_by {
   contentDescriptionField1?: order_by | null;
   contentDescriptionField2?: order_by | null;
   cost?: order_by | null;
+  courseSeriesId?: order_by | null;
   coverImage?: order_by | null;
   created_at?: order_by | null;
   currency?: order_by | null;
@@ -5354,6 +5735,7 @@ export interface Course_min_order_by {
   contentDescriptionField1?: order_by | null;
   contentDescriptionField2?: order_by | null;
   cost?: order_by | null;
+  courseSeriesId?: order_by | null;
   coverImage?: order_by | null;
   created_at?: order_by | null;
   currency?: order_by | null;
@@ -5409,6 +5791,7 @@ export interface Course_order_by {
   CourseInstructors_aggregate?: CourseInstructor_aggregate_order_by | null;
   CourseLocations_aggregate?: CourseLocation_aggregate_order_by | null;
   CourseRegistrationType?: CourseRegistrationType_order_by | null;
+  CourseSeries?: CourseSeries_order_by | null;
   CourseStatus?: CourseStatus_order_by | null;
   DegreeCourses_aggregate?: CourseDegree_aggregate_order_by | null;
   Language?: Language_order_by | null;
@@ -5427,6 +5810,7 @@ export interface Course_order_by {
   contentDescriptionField1?: order_by | null;
   contentDescriptionField2?: order_by | null;
   cost?: order_by | null;
+  courseSeriesId?: order_by | null;
   coverImage?: order_by | null;
   created_at?: order_by | null;
   currency?: order_by | null;
@@ -5471,6 +5855,7 @@ export interface Course_set_input {
   contentDescriptionField1?: string | null;
   contentDescriptionField2?: string | null;
   cost?: string | null;
+  courseSeriesId?: number | null;
   coverImage?: string | null;
   created_at?: any | null;
   currency?: string | null;
@@ -5508,6 +5893,7 @@ export interface Course_stddev_order_by {
   achievementCertificateTemplateId?: order_by | null;
   attendanceCertificateTemplateId?: order_by | null;
   basePrice?: order_by | null;
+  courseSeriesId?: order_by | null;
   id?: order_by | null;
   maxMissedSessions?: order_by | null;
   maxParticipants?: order_by | null;
@@ -5521,6 +5907,7 @@ export interface Course_stddev_pop_order_by {
   achievementCertificateTemplateId?: order_by | null;
   attendanceCertificateTemplateId?: order_by | null;
   basePrice?: order_by | null;
+  courseSeriesId?: order_by | null;
   id?: order_by | null;
   maxMissedSessions?: order_by | null;
   maxParticipants?: order_by | null;
@@ -5534,6 +5921,7 @@ export interface Course_stddev_samp_order_by {
   achievementCertificateTemplateId?: order_by | null;
   attendanceCertificateTemplateId?: order_by | null;
   basePrice?: order_by | null;
+  courseSeriesId?: order_by | null;
   id?: order_by | null;
   maxMissedSessions?: order_by | null;
   maxParticipants?: order_by | null;
@@ -5547,6 +5935,7 @@ export interface Course_sum_order_by {
   achievementCertificateTemplateId?: order_by | null;
   attendanceCertificateTemplateId?: order_by | null;
   basePrice?: order_by | null;
+  courseSeriesId?: order_by | null;
   id?: order_by | null;
   maxMissedSessions?: order_by | null;
   maxParticipants?: order_by | null;
@@ -5560,6 +5949,7 @@ export interface Course_var_pop_order_by {
   achievementCertificateTemplateId?: order_by | null;
   attendanceCertificateTemplateId?: order_by | null;
   basePrice?: order_by | null;
+  courseSeriesId?: order_by | null;
   id?: order_by | null;
   maxMissedSessions?: order_by | null;
   maxParticipants?: order_by | null;
@@ -5573,6 +5963,7 @@ export interface Course_var_samp_order_by {
   achievementCertificateTemplateId?: order_by | null;
   attendanceCertificateTemplateId?: order_by | null;
   basePrice?: order_by | null;
+  courseSeriesId?: order_by | null;
   id?: order_by | null;
   maxMissedSessions?: order_by | null;
   maxParticipants?: order_by | null;
@@ -5586,6 +5977,7 @@ export interface Course_variance_order_by {
   achievementCertificateTemplateId?: order_by | null;
   attendanceCertificateTemplateId?: order_by | null;
   basePrice?: order_by | null;
+  courseSeriesId?: order_by | null;
   id?: order_by | null;
   maxMissedSessions?: order_by | null;
   maxParticipants?: order_by | null;
@@ -7739,6 +8131,178 @@ export interface ProjectAuthor_variance_order_by {
   projectId?: order_by | null;
 }
 
+export interface ProjectBadge_aggregate_bool_exp {
+  count?: ProjectBadge_aggregate_bool_exp_count | null;
+}
+
+export interface ProjectBadge_aggregate_bool_exp_count {
+  arguments?: ProjectBadge_select_column[] | null;
+  distinct?: boolean | null;
+  filter?: ProjectBadge_bool_exp | null;
+  predicate: Int_comparison_exp;
+}
+
+/**
+ * order by aggregate values of table "ProjectBadge"
+ */
+export interface ProjectBadge_aggregate_order_by {
+  avg?: ProjectBadge_avg_order_by | null;
+  count?: order_by | null;
+  max?: ProjectBadge_max_order_by | null;
+  min?: ProjectBadge_min_order_by | null;
+  stddev?: ProjectBadge_stddev_order_by | null;
+  stddev_pop?: ProjectBadge_stddev_pop_order_by | null;
+  stddev_samp?: ProjectBadge_stddev_samp_order_by | null;
+  sum?: ProjectBadge_sum_order_by | null;
+  var_pop?: ProjectBadge_var_pop_order_by | null;
+  var_samp?: ProjectBadge_var_samp_order_by | null;
+  variance?: ProjectBadge_variance_order_by | null;
+}
+
+/**
+ * input type for inserting array relation for remote table "ProjectBadge"
+ */
+export interface ProjectBadge_arr_rel_insert_input {
+  data: ProjectBadge_insert_input[];
+  on_conflict?: ProjectBadge_on_conflict | null;
+}
+
+/**
+ * order by avg() on columns of table "ProjectBadge"
+ */
+export interface ProjectBadge_avg_order_by {
+  badgeId?: order_by | null;
+  id?: order_by | null;
+  projectId?: order_by | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "ProjectBadge". All fields are combined with a logical 'AND'.
+ */
+export interface ProjectBadge_bool_exp {
+  Badge?: Badge_bool_exp | null;
+  BadgeStatus?: BadgeStatus_bool_exp | null;
+  Project?: Project_bool_exp | null;
+  _and?: ProjectBadge_bool_exp[] | null;
+  _not?: ProjectBadge_bool_exp | null;
+  _or?: ProjectBadge_bool_exp[] | null;
+  badgeId?: Int_comparison_exp | null;
+  created_at?: timestamptz_comparison_exp | null;
+  id?: Int_comparison_exp | null;
+  projectId?: Int_comparison_exp | null;
+  status?: BadgeStatus_enum_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "ProjectBadge"
+ */
+export interface ProjectBadge_insert_input {
+  Badge?: Badge_obj_rel_insert_input | null;
+  BadgeStatus?: BadgeStatus_obj_rel_insert_input | null;
+  Project?: Project_obj_rel_insert_input | null;
+  badgeId?: number | null;
+  created_at?: any | null;
+  id?: number | null;
+  projectId?: number | null;
+  status?: BadgeStatus_enum | null;
+  updated_at?: any | null;
+}
+
+/**
+ * order by max() on columns of table "ProjectBadge"
+ */
+export interface ProjectBadge_max_order_by {
+  badgeId?: order_by | null;
+  created_at?: order_by | null;
+  id?: order_by | null;
+  projectId?: order_by | null;
+  updated_at?: order_by | null;
+}
+
+/**
+ * order by min() on columns of table "ProjectBadge"
+ */
+export interface ProjectBadge_min_order_by {
+  badgeId?: order_by | null;
+  created_at?: order_by | null;
+  id?: order_by | null;
+  projectId?: order_by | null;
+  updated_at?: order_by | null;
+}
+
+/**
+ * on_conflict condition type for table "ProjectBadge"
+ */
+export interface ProjectBadge_on_conflict {
+  constraint: ProjectBadge_constraint;
+  update_columns: ProjectBadge_update_column[];
+  where?: ProjectBadge_bool_exp | null;
+}
+
+/**
+ * order by stddev() on columns of table "ProjectBadge"
+ */
+export interface ProjectBadge_stddev_order_by {
+  badgeId?: order_by | null;
+  id?: order_by | null;
+  projectId?: order_by | null;
+}
+
+/**
+ * order by stddev_pop() on columns of table "ProjectBadge"
+ */
+export interface ProjectBadge_stddev_pop_order_by {
+  badgeId?: order_by | null;
+  id?: order_by | null;
+  projectId?: order_by | null;
+}
+
+/**
+ * order by stddev_samp() on columns of table "ProjectBadge"
+ */
+export interface ProjectBadge_stddev_samp_order_by {
+  badgeId?: order_by | null;
+  id?: order_by | null;
+  projectId?: order_by | null;
+}
+
+/**
+ * order by sum() on columns of table "ProjectBadge"
+ */
+export interface ProjectBadge_sum_order_by {
+  badgeId?: order_by | null;
+  id?: order_by | null;
+  projectId?: order_by | null;
+}
+
+/**
+ * order by var_pop() on columns of table "ProjectBadge"
+ */
+export interface ProjectBadge_var_pop_order_by {
+  badgeId?: order_by | null;
+  id?: order_by | null;
+  projectId?: order_by | null;
+}
+
+/**
+ * order by var_samp() on columns of table "ProjectBadge"
+ */
+export interface ProjectBadge_var_samp_order_by {
+  badgeId?: order_by | null;
+  id?: order_by | null;
+  projectId?: order_by | null;
+}
+
+/**
+ * order by variance() on columns of table "ProjectBadge"
+ */
+export interface ProjectBadge_variance_order_by {
+  badgeId?: order_by | null;
+  id?: order_by | null;
+  projectId?: order_by | null;
+}
+
 export interface ProjectConsentEvent_aggregate_bool_exp {
   count?: ProjectConsentEvent_aggregate_bool_exp_count | null;
 }
@@ -7751,11 +8315,36 @@ export interface ProjectConsentEvent_aggregate_bool_exp_count {
 }
 
 /**
+ * order by aggregate values of table "ProjectConsentEvent"
+ */
+export interface ProjectConsentEvent_aggregate_order_by {
+  avg?: ProjectConsentEvent_avg_order_by | null;
+  count?: order_by | null;
+  max?: ProjectConsentEvent_max_order_by | null;
+  min?: ProjectConsentEvent_min_order_by | null;
+  stddev?: ProjectConsentEvent_stddev_order_by | null;
+  stddev_pop?: ProjectConsentEvent_stddev_pop_order_by | null;
+  stddev_samp?: ProjectConsentEvent_stddev_samp_order_by | null;
+  sum?: ProjectConsentEvent_sum_order_by | null;
+  var_pop?: ProjectConsentEvent_var_pop_order_by | null;
+  var_samp?: ProjectConsentEvent_var_samp_order_by | null;
+  variance?: ProjectConsentEvent_variance_order_by | null;
+}
+
+/**
  * input type for inserting array relation for remote table "ProjectConsentEvent"
  */
 export interface ProjectConsentEvent_arr_rel_insert_input {
   data: ProjectConsentEvent_insert_input[];
   on_conflict?: ProjectConsentEvent_on_conflict | null;
+}
+
+/**
+ * order by avg() on columns of table "ProjectConsentEvent"
+ */
+export interface ProjectConsentEvent_avg_order_by {
+  id?: order_by | null;
+  projectId?: order_by | null;
 }
 
 /**
@@ -7790,12 +8379,92 @@ export interface ProjectConsentEvent_insert_input {
 }
 
 /**
+ * order by max() on columns of table "ProjectConsentEvent"
+ */
+export interface ProjectConsentEvent_max_order_by {
+  actorUserId?: order_by | null;
+  created_at?: order_by | null;
+  eventType?: order_by | null;
+  id?: order_by | null;
+  projectId?: order_by | null;
+  termsVersion?: order_by | null;
+}
+
+/**
+ * order by min() on columns of table "ProjectConsentEvent"
+ */
+export interface ProjectConsentEvent_min_order_by {
+  actorUserId?: order_by | null;
+  created_at?: order_by | null;
+  eventType?: order_by | null;
+  id?: order_by | null;
+  projectId?: order_by | null;
+  termsVersion?: order_by | null;
+}
+
+/**
  * on_conflict condition type for table "ProjectConsentEvent"
  */
 export interface ProjectConsentEvent_on_conflict {
   constraint: ProjectConsentEvent_constraint;
   update_columns: ProjectConsentEvent_update_column[];
   where?: ProjectConsentEvent_bool_exp | null;
+}
+
+/**
+ * order by stddev() on columns of table "ProjectConsentEvent"
+ */
+export interface ProjectConsentEvent_stddev_order_by {
+  id?: order_by | null;
+  projectId?: order_by | null;
+}
+
+/**
+ * order by stddev_pop() on columns of table "ProjectConsentEvent"
+ */
+export interface ProjectConsentEvent_stddev_pop_order_by {
+  id?: order_by | null;
+  projectId?: order_by | null;
+}
+
+/**
+ * order by stddev_samp() on columns of table "ProjectConsentEvent"
+ */
+export interface ProjectConsentEvent_stddev_samp_order_by {
+  id?: order_by | null;
+  projectId?: order_by | null;
+}
+
+/**
+ * order by sum() on columns of table "ProjectConsentEvent"
+ */
+export interface ProjectConsentEvent_sum_order_by {
+  id?: order_by | null;
+  projectId?: order_by | null;
+}
+
+/**
+ * order by var_pop() on columns of table "ProjectConsentEvent"
+ */
+export interface ProjectConsentEvent_var_pop_order_by {
+  id?: order_by | null;
+  projectId?: order_by | null;
+}
+
+/**
+ * order by var_samp() on columns of table "ProjectConsentEvent"
+ */
+export interface ProjectConsentEvent_var_samp_order_by {
+  id?: order_by | null;
+  projectId?: order_by | null;
+}
+
+/**
+ * order by variance() on columns of table "ProjectConsentEvent"
+ */
+export interface ProjectConsentEvent_variance_order_by {
+  id?: order_by | null;
+  projectId?: order_by | null;
 }
 
 export interface ProjectCourse_aggregate_bool_exp {
@@ -8177,6 +8846,226 @@ export interface ProjectDocumentationInstruction_variance_order_by {
   legacyAchievementDocumentationTemplateId?: order_by | null;
 }
 
+/**
+ * Boolean expression to filter rows from the table "ProjectGroupOption". All fields are combined with a logical 'AND'.
+ */
+export interface ProjectGroupOption_bool_exp {
+  Organization?: Organization_bool_exp | null;
+  ProjectGroups?: ProjectGroup_bool_exp | null;
+  ProjectGroups_aggregate?: ProjectGroup_aggregate_bool_exp | null;
+  ProjectSliderProjectGroups?: ProjectSliderProjectGroup_bool_exp | null;
+  ProjectSliderProjectGroups_aggregate?: ProjectSliderProjectGroup_aggregate_bool_exp | null;
+  _and?: ProjectGroupOption_bool_exp[] | null;
+  _not?: ProjectGroupOption_bool_exp | null;
+  _or?: ProjectGroupOption_bool_exp[] | null;
+  created_at?: timestamptz_comparison_exp | null;
+  id?: Int_comparison_exp | null;
+  order?: Int_comparison_exp | null;
+  organizationId?: Int_comparison_exp | null;
+  title?: String_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "ProjectGroupOption"
+ */
+export interface ProjectGroupOption_insert_input {
+  Organization?: Organization_obj_rel_insert_input | null;
+  ProjectGroups?: ProjectGroup_arr_rel_insert_input | null;
+  ProjectSliderProjectGroups?: ProjectSliderProjectGroup_arr_rel_insert_input | null;
+  created_at?: any | null;
+  id?: number | null;
+  order?: number | null;
+  organizationId?: number | null;
+  title?: string | null;
+  updated_at?: any | null;
+}
+
+/**
+ * input type for inserting object relation for remote table "ProjectGroupOption"
+ */
+export interface ProjectGroupOption_obj_rel_insert_input {
+  data: ProjectGroupOption_insert_input;
+  on_conflict?: ProjectGroupOption_on_conflict | null;
+}
+
+/**
+ * on_conflict condition type for table "ProjectGroupOption"
+ */
+export interface ProjectGroupOption_on_conflict {
+  constraint: ProjectGroupOption_constraint;
+  update_columns: ProjectGroupOption_update_column[];
+  where?: ProjectGroupOption_bool_exp | null;
+}
+
+export interface ProjectGroup_aggregate_bool_exp {
+  count?: ProjectGroup_aggregate_bool_exp_count | null;
+}
+
+export interface ProjectGroup_aggregate_bool_exp_count {
+  arguments?: ProjectGroup_select_column[] | null;
+  distinct?: boolean | null;
+  filter?: ProjectGroup_bool_exp | null;
+  predicate: Int_comparison_exp;
+}
+
+/**
+ * order by aggregate values of table "ProjectGroup"
+ */
+export interface ProjectGroup_aggregate_order_by {
+  avg?: ProjectGroup_avg_order_by | null;
+  count?: order_by | null;
+  max?: ProjectGroup_max_order_by | null;
+  min?: ProjectGroup_min_order_by | null;
+  stddev?: ProjectGroup_stddev_order_by | null;
+  stddev_pop?: ProjectGroup_stddev_pop_order_by | null;
+  stddev_samp?: ProjectGroup_stddev_samp_order_by | null;
+  sum?: ProjectGroup_sum_order_by | null;
+  var_pop?: ProjectGroup_var_pop_order_by | null;
+  var_samp?: ProjectGroup_var_samp_order_by | null;
+  variance?: ProjectGroup_variance_order_by | null;
+}
+
+/**
+ * input type for inserting array relation for remote table "ProjectGroup"
+ */
+export interface ProjectGroup_arr_rel_insert_input {
+  data: ProjectGroup_insert_input[];
+  on_conflict?: ProjectGroup_on_conflict | null;
+}
+
+/**
+ * order by avg() on columns of table "ProjectGroup"
+ */
+export interface ProjectGroup_avg_order_by {
+  groupOptionId?: order_by | null;
+  id?: order_by | null;
+  projectId?: order_by | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "ProjectGroup". All fields are combined with a logical 'AND'.
+ */
+export interface ProjectGroup_bool_exp {
+  Project?: Project_bool_exp | null;
+  ProjectGroupOption?: ProjectGroupOption_bool_exp | null;
+  _and?: ProjectGroup_bool_exp[] | null;
+  _not?: ProjectGroup_bool_exp | null;
+  _or?: ProjectGroup_bool_exp[] | null;
+  created_at?: timestamptz_comparison_exp | null;
+  groupOptionId?: Int_comparison_exp | null;
+  id?: Int_comparison_exp | null;
+  projectId?: Int_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "ProjectGroup"
+ */
+export interface ProjectGroup_insert_input {
+  Project?: Project_obj_rel_insert_input | null;
+  ProjectGroupOption?: ProjectGroupOption_obj_rel_insert_input | null;
+  created_at?: any | null;
+  groupOptionId?: number | null;
+  id?: number | null;
+  projectId?: number | null;
+  updated_at?: any | null;
+}
+
+/**
+ * order by max() on columns of table "ProjectGroup"
+ */
+export interface ProjectGroup_max_order_by {
+  created_at?: order_by | null;
+  groupOptionId?: order_by | null;
+  id?: order_by | null;
+  projectId?: order_by | null;
+  updated_at?: order_by | null;
+}
+
+/**
+ * order by min() on columns of table "ProjectGroup"
+ */
+export interface ProjectGroup_min_order_by {
+  created_at?: order_by | null;
+  groupOptionId?: order_by | null;
+  id?: order_by | null;
+  projectId?: order_by | null;
+  updated_at?: order_by | null;
+}
+
+/**
+ * on_conflict condition type for table "ProjectGroup"
+ */
+export interface ProjectGroup_on_conflict {
+  constraint: ProjectGroup_constraint;
+  update_columns: ProjectGroup_update_column[];
+  where?: ProjectGroup_bool_exp | null;
+}
+
+/**
+ * order by stddev() on columns of table "ProjectGroup"
+ */
+export interface ProjectGroup_stddev_order_by {
+  groupOptionId?: order_by | null;
+  id?: order_by | null;
+  projectId?: order_by | null;
+}
+
+/**
+ * order by stddev_pop() on columns of table "ProjectGroup"
+ */
+export interface ProjectGroup_stddev_pop_order_by {
+  groupOptionId?: order_by | null;
+  id?: order_by | null;
+  projectId?: order_by | null;
+}
+
+/**
+ * order by stddev_samp() on columns of table "ProjectGroup"
+ */
+export interface ProjectGroup_stddev_samp_order_by {
+  groupOptionId?: order_by | null;
+  id?: order_by | null;
+  projectId?: order_by | null;
+}
+
+/**
+ * order by sum() on columns of table "ProjectGroup"
+ */
+export interface ProjectGroup_sum_order_by {
+  groupOptionId?: order_by | null;
+  id?: order_by | null;
+  projectId?: order_by | null;
+}
+
+/**
+ * order by var_pop() on columns of table "ProjectGroup"
+ */
+export interface ProjectGroup_var_pop_order_by {
+  groupOptionId?: order_by | null;
+  id?: order_by | null;
+  projectId?: order_by | null;
+}
+
+/**
+ * order by var_samp() on columns of table "ProjectGroup"
+ */
+export interface ProjectGroup_var_samp_order_by {
+  groupOptionId?: order_by | null;
+  id?: order_by | null;
+  projectId?: order_by | null;
+}
+
+/**
+ * order by variance() on columns of table "ProjectGroup"
+ */
+export interface ProjectGroup_variance_order_by {
+  groupOptionId?: order_by | null;
+  id?: order_by | null;
+  projectId?: order_by | null;
+}
+
 export interface ProjectMentor_aggregate_bool_exp {
   count?: ProjectMentor_aggregate_bool_exp_count | null;
 }
@@ -8438,6 +9327,129 @@ export interface ProjectRating_on_conflict {
 }
 
 /**
+ * Ordering options when selecting data from "ProjectRating".
+ */
+export interface ProjectRating_order_by {
+  Projects_aggregate?: Project_aggregate_order_by | null;
+  comment?: order_by | null;
+  value?: order_by | null;
+}
+
+export interface ProjectSliderCourseGroup_aggregate_bool_exp {
+  count?: ProjectSliderCourseGroup_aggregate_bool_exp_count | null;
+}
+
+export interface ProjectSliderCourseGroup_aggregate_bool_exp_count {
+  arguments?: ProjectSliderCourseGroup_select_column[] | null;
+  distinct?: boolean | null;
+  filter?: ProjectSliderCourseGroup_bool_exp | null;
+  predicate: Int_comparison_exp;
+}
+
+/**
+ * input type for inserting array relation for remote table "ProjectSliderCourseGroup"
+ */
+export interface ProjectSliderCourseGroup_arr_rel_insert_input {
+  data: ProjectSliderCourseGroup_insert_input[];
+  on_conflict?: ProjectSliderCourseGroup_on_conflict | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "ProjectSliderCourseGroup". All fields are combined with a logical 'AND'.
+ */
+export interface ProjectSliderCourseGroup_bool_exp {
+  CourseGroupOption?: CourseGroupOption_bool_exp | null;
+  ProjectSliderOption?: CourseGroupOption_bool_exp | null;
+  _and?: ProjectSliderCourseGroup_bool_exp[] | null;
+  _not?: ProjectSliderCourseGroup_bool_exp | null;
+  _or?: ProjectSliderCourseGroup_bool_exp[] | null;
+  courseGroupOptionId?: Int_comparison_exp | null;
+  created_at?: timestamptz_comparison_exp | null;
+  id?: Int_comparison_exp | null;
+  projectSliderOptionId?: Int_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "ProjectSliderCourseGroup"
+ */
+export interface ProjectSliderCourseGroup_insert_input {
+  CourseGroupOption?: CourseGroupOption_obj_rel_insert_input | null;
+  ProjectSliderOption?: CourseGroupOption_obj_rel_insert_input | null;
+  courseGroupOptionId?: number | null;
+  created_at?: any | null;
+  id?: number | null;
+  projectSliderOptionId?: number | null;
+  updated_at?: any | null;
+}
+
+/**
+ * on_conflict condition type for table "ProjectSliderCourseGroup"
+ */
+export interface ProjectSliderCourseGroup_on_conflict {
+  constraint: ProjectSliderCourseGroup_constraint;
+  update_columns: ProjectSliderCourseGroup_update_column[];
+  where?: ProjectSliderCourseGroup_bool_exp | null;
+}
+
+export interface ProjectSliderProjectGroup_aggregate_bool_exp {
+  count?: ProjectSliderProjectGroup_aggregate_bool_exp_count | null;
+}
+
+export interface ProjectSliderProjectGroup_aggregate_bool_exp_count {
+  arguments?: ProjectSliderProjectGroup_select_column[] | null;
+  distinct?: boolean | null;
+  filter?: ProjectSliderProjectGroup_bool_exp | null;
+  predicate: Int_comparison_exp;
+}
+
+/**
+ * input type for inserting array relation for remote table "ProjectSliderProjectGroup"
+ */
+export interface ProjectSliderProjectGroup_arr_rel_insert_input {
+  data: ProjectSliderProjectGroup_insert_input[];
+  on_conflict?: ProjectSliderProjectGroup_on_conflict | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "ProjectSliderProjectGroup". All fields are combined with a logical 'AND'.
+ */
+export interface ProjectSliderProjectGroup_bool_exp {
+  ProjectGroupOption?: ProjectGroupOption_bool_exp | null;
+  ProjectSliderOption?: CourseGroupOption_bool_exp | null;
+  _and?: ProjectSliderProjectGroup_bool_exp[] | null;
+  _not?: ProjectSliderProjectGroup_bool_exp | null;
+  _or?: ProjectSliderProjectGroup_bool_exp[] | null;
+  created_at?: timestamptz_comparison_exp | null;
+  id?: Int_comparison_exp | null;
+  projectGroupOptionId?: Int_comparison_exp | null;
+  projectSliderOptionId?: Int_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "ProjectSliderProjectGroup"
+ */
+export interface ProjectSliderProjectGroup_insert_input {
+  ProjectGroupOption?: ProjectGroupOption_obj_rel_insert_input | null;
+  ProjectSliderOption?: CourseGroupOption_obj_rel_insert_input | null;
+  created_at?: any | null;
+  id?: number | null;
+  projectGroupOptionId?: number | null;
+  projectSliderOptionId?: number | null;
+  updated_at?: any | null;
+}
+
+/**
+ * on_conflict condition type for table "ProjectSliderProjectGroup"
+ */
+export interface ProjectSliderProjectGroup_on_conflict {
+  constraint: ProjectSliderProjectGroup_constraint;
+  update_columns: ProjectSliderProjectGroup_update_column[];
+  where?: ProjectSliderProjectGroup_bool_exp | null;
+}
+
+/**
  * Boolean expression to filter rows from the table "ProjectStatus". All fields are combined with a logical 'AND'.
  */
 export interface ProjectStatus_bool_exp {
@@ -8485,6 +9497,15 @@ export interface ProjectStatus_on_conflict {
   constraint: ProjectStatus_constraint;
   update_columns: ProjectStatus_update_column[];
   where?: ProjectStatus_bool_exp | null;
+}
+
+/**
+ * Ordering options when selecting data from "ProjectStatus".
+ */
+export interface ProjectStatus_order_by {
+  Projects_aggregate?: Project_aggregate_order_by | null;
+  comment?: order_by | null;
+  value?: order_by | null;
 }
 
 export interface ProjectType_aggregate_bool_exp {
@@ -8750,60 +9771,6 @@ export interface Project_avg_order_by {
 /**
  * Boolean expression to filter rows from the table "Project". All fields are combined with a logical 'AND'.
  */
-export interface ProjectRating_order_by {
-  Projects_aggregate?: Project_aggregate_order_by | null;
-  comment?: order_by | null;
-  value?: order_by | null;
-}
-
-export interface ProjectStatus_order_by {
-  Projects_aggregate?: Project_aggregate_order_by | null;
-  comment?: order_by | null;
-  value?: order_by | null;
-}
-
-export interface Project_order_by {
-  ChildProjects_aggregate?: Project_aggregate_order_by | null;
-  Organization?: Organization_order_by | null;
-  ParentProject?: Project_order_by | null;
-  ProjectAuthors_aggregate?: ProjectAuthor_aggregate_order_by | null;
-  ProjectCourses_aggregate?: ProjectCourse_aggregate_order_by | null;
-  ProjectDocumentationInstruction?: ProjectDocumentationInstruction_order_by | null;
-  ProjectMentors_aggregate?: ProjectMentor_aggregate_order_by | null;
-  ProjectRating?: ProjectRating_order_by | null;
-  ProjectStatus?: ProjectStatus_order_by | null;
-  ProjectType?: ProjectType_order_by | null;
-  ProposedByUser?: User_order_by | null;
-  SubmittedByUser?: User_order_by | null;
-  acceptingParticipants?: order_by | null;
-  coverImageUrl?: order_by | null;
-  created_at?: order_by | null;
-  csvResults?: order_by | null;
-  description?: order_by | null;
-  documentationInstructionId?: order_by | null;
-  documentationUrl?: order_by | null;
-  externalUrl?: order_by | null;
-  id?: order_by | null;
-  legacyAchievementOptionId?: order_by | null;
-  legacyAchievementRecordId?: order_by | null;
-  organizationId?: order_by | null;
-  parentProjectId?: order_by | null;
-  presentationUrl?: order_by | null;
-  projectReviewRequestedAt?: order_by | null;
-  proposedByUserId?: order_by | null;
-  rating?: order_by | null;
-  ratingComment?: order_by | null;
-  status?: order_by | null;
-  submissionDeadline?: order_by | null;
-  submittedAt?: order_by | null;
-  submittedBy?: order_by | null;
-  suggestedForPublication?: order_by | null;
-  tagline?: order_by | null;
-  title?: order_by | null;
-  type?: order_by | null;
-  updated_at?: order_by | null;
-}
-
 export interface Project_bool_exp {
   ChildProjects?: Project_bool_exp | null;
   ChildProjects_aggregate?: Project_aggregate_bool_exp | null;
@@ -8811,11 +9778,15 @@ export interface Project_bool_exp {
   ParentProject?: Project_bool_exp | null;
   ProjectAuthors?: ProjectAuthor_bool_exp | null;
   ProjectAuthors_aggregate?: ProjectAuthor_aggregate_bool_exp | null;
+  ProjectBadges?: ProjectBadge_bool_exp | null;
+  ProjectBadges_aggregate?: ProjectBadge_aggregate_bool_exp | null;
   ProjectConsentEvents?: ProjectConsentEvent_bool_exp | null;
   ProjectConsentEvents_aggregate?: ProjectConsentEvent_aggregate_bool_exp | null;
   ProjectCourses?: ProjectCourse_bool_exp | null;
   ProjectCourses_aggregate?: ProjectCourse_aggregate_bool_exp | null;
   ProjectDocumentationInstruction?: ProjectDocumentationInstruction_bool_exp | null;
+  ProjectGroups?: ProjectGroup_bool_exp | null;
+  ProjectGroups_aggregate?: ProjectGroup_aggregate_bool_exp | null;
   ProjectMentors?: ProjectMentor_bool_exp | null;
   ProjectMentors_aggregate?: ProjectMentor_aggregate_bool_exp | null;
   ProjectRating?: ProjectRating_bool_exp | null;
@@ -8863,9 +9834,11 @@ export interface Project_insert_input {
   Organization?: Organization_obj_rel_insert_input | null;
   ParentProject?: Project_obj_rel_insert_input | null;
   ProjectAuthors?: ProjectAuthor_arr_rel_insert_input | null;
+  ProjectBadges?: ProjectBadge_arr_rel_insert_input | null;
   ProjectConsentEvents?: ProjectConsentEvent_arr_rel_insert_input | null;
   ProjectCourses?: ProjectCourse_arr_rel_insert_input | null;
   ProjectDocumentationInstruction?: ProjectDocumentationInstruction_obj_rel_insert_input | null;
+  ProjectGroups?: ProjectGroup_arr_rel_insert_input | null;
   ProjectMentors?: ProjectMentor_arr_rel_insert_input | null;
   ProjectRating?: ProjectRating_obj_rel_insert_input | null;
   ProjectStatus?: ProjectStatus_obj_rel_insert_input | null;
@@ -8974,6 +9947,54 @@ export interface Project_on_conflict {
   constraint: Project_constraint;
   update_columns: Project_update_column[];
   where?: Project_bool_exp | null;
+}
+
+/**
+ * Ordering options when selecting data from "Project".
+ */
+export interface Project_order_by {
+  ChildProjects_aggregate?: Project_aggregate_order_by | null;
+  Organization?: Organization_order_by | null;
+  ParentProject?: Project_order_by | null;
+  ProjectAuthors_aggregate?: ProjectAuthor_aggregate_order_by | null;
+  ProjectBadges_aggregate?: ProjectBadge_aggregate_order_by | null;
+  ProjectConsentEvents_aggregate?: ProjectConsentEvent_aggregate_order_by | null;
+  ProjectCourses_aggregate?: ProjectCourse_aggregate_order_by | null;
+  ProjectDocumentationInstruction?: ProjectDocumentationInstruction_order_by | null;
+  ProjectGroups_aggregate?: ProjectGroup_aggregate_order_by | null;
+  ProjectMentors_aggregate?: ProjectMentor_aggregate_order_by | null;
+  ProjectRating?: ProjectRating_order_by | null;
+  ProjectStatus?: ProjectStatus_order_by | null;
+  ProjectType?: ProjectType_order_by | null;
+  ProposedByUser?: User_order_by | null;
+  SubmittedByUser?: User_order_by | null;
+  acceptingParticipants?: order_by | null;
+  coverImageUrl?: order_by | null;
+  created_at?: order_by | null;
+  csvResults?: order_by | null;
+  description?: order_by | null;
+  documentationInstructionId?: order_by | null;
+  documentationUrl?: order_by | null;
+  externalUrl?: order_by | null;
+  id?: order_by | null;
+  legacyAchievementOptionId?: order_by | null;
+  legacyAchievementRecordId?: order_by | null;
+  organizationId?: order_by | null;
+  parentProjectId?: order_by | null;
+  presentationUrl?: order_by | null;
+  projectReviewRequestedAt?: order_by | null;
+  proposedByUserId?: order_by | null;
+  rating?: order_by | null;
+  ratingComment?: order_by | null;
+  status?: order_by | null;
+  submissionDeadline?: order_by | null;
+  submittedAt?: order_by | null;
+  submittedBy?: order_by | null;
+  suggestedForPublication?: order_by | null;
+  tagline?: order_by | null;
+  title?: order_by | null;
+  type?: order_by | null;
+  updated_at?: order_by | null;
 }
 
 /**

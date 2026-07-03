@@ -11,6 +11,7 @@ export const PROJECT_TILE_FRAGMENT = gql`
     tagline
     coverImageUrl
     status
+    submittedAt
     acceptingParticipants
     organizationId
     Organization {
@@ -33,6 +34,16 @@ export const PROJECT_TILE_FRAGMENT = gql`
         firstName
         lastName
         picture
+      }
+    }
+    ProjectBadges {
+      id
+      status
+      Badge {
+        id
+        title
+        description
+        icon
       }
     }
     ProjectCourses {

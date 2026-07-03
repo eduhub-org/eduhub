@@ -1,12 +1,14 @@
 import Link from 'next/link';
 import { FC } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
+import { Calendar } from 'lucide-react';
 
 import { ProjectStatus_enum } from '../../../__generated__/globalTypes';
 import { ProjectTileFragment } from '../../../queries/__generated__/ProjectTileFragment';
 import { TileBase } from './TileBase';
 import { ProjectAvatars } from './ProjectAvatars';
-import { projectCourseLine, projectMentorName, projectHref } from './projectTileHelpers';
+import { BadgeChip, pickPrimaryBadge } from '../badges/ProjectBadges';
+import { projectCourseLine, projectMentorName, projectHref, formatSubmittedDate } from './projectTileHelpers';
 
 export type ProjectTileContext = 'public' | 'withinCourse';
 
@@ -19,10 +21,13 @@ interface ProjectTileProps {
 
 export const ProjectTile: FC<ProjectTileProps> = ({ project, context, courseId }) => {
   const t = useTranslations('project');
+  const locale = useLocale();
   const isPublished = project.status === ProjectStatus_enum.PUBLISHED;
   const courseLine = projectCourseLine(project, courseId);
   const mentorName = projectMentorName(project);
   const href = projectHref(project, context, courseId);
+  const primaryBadge = pickPrimaryBadge(project.ProjectBadges);
+  const submittedLabel = formatSubmittedDate(project.submittedAt, locale);
 
   return (
     <Link href={href}>
@@ -30,17 +35,19 @@ export const ProjectTile: FC<ProjectTileProps> = ({ project, context, courseId }
         {isPublished ? (
           // Tile A — published showcase
           <>
-            <div className="flex justify-between items-center mb-3 text-sm tracking-wider text-label-primary">
+            <div className="flex justify-between items-center gap-2 mb-3 text-sm tracking-wider text-label-primary">
               <span className="truncate">{courseLine}</span>
-              <span className="flex items-center gap-1 shrink-0">
-                <span className="w-2 h-2 rounded-full bg-success" />
-                {t('status.published')}
-              </span>
+              {submittedLabel && (
+                <span className="flex items-center gap-1 shrink-0 text-label-secondary">
+                  <Calendar size={14} className="shrink-0" />
+                  {t('submitted_on', { date: submittedLabel })}
+                </span>
+              )}
             </div>
             <span className="text-lg mb-auto line-clamp-3 text-label-primary">{project.tagline}</span>
-            <div className="flex justify-between items-center text-xs tracking-wider text-label-primary">
-              <ProjectAvatars authors={project.ProjectAuthors} />
-              <span className="uppercase truncate">{project.Organization?.name}</span>
+            <div className="flex justify-between items-center gap-2 text-xs text-label-secondary">
+              <ProjectAvatars authors={project.ProjectAuthors} size={40} />
+              {primaryBadge && <BadgeChip badge={primaryBadge} className="shrink-0" />}
             </div>
           </>
         ) : (

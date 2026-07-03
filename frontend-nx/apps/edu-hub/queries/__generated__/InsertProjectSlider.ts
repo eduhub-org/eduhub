@@ -14,6 +14,9 @@ export interface InsertProjectSlider_insert_CourseGroupOption_one {
 }
 
 export interface InsertProjectSlider {
+  /**
+   * insert a single row into the table: "CourseGroupOption"
+   */
   insert_CourseGroupOption_one: InsertProjectSlider_insert_CourseGroupOption_one | null;
 }
 

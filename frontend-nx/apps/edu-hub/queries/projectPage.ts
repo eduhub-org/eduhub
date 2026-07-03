@@ -20,6 +20,7 @@ export const PROJECT_PAGE_FRAGMENT = gql`
     presentationUrl
     externalUrl
     submissionDeadline
+    submittedAt
     Organization {
       id
       name
@@ -40,6 +41,16 @@ export const PROJECT_PAGE_FRAGMENT = gql`
         firstName
         lastName
         picture
+      }
+    }
+    ProjectBadges {
+      id
+      status
+      Badge {
+        id
+        title
+        description
+        icon
       }
     }
     ProjectCourses {

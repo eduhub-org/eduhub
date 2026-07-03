@@ -13,6 +13,9 @@ export interface DeleteProjectSliderProjectGroup_delete_ProjectSliderProjectGrou
 }
 
 export interface DeleteProjectSliderProjectGroup {
+  /**
+   * delete single row from the table: "ProjectSliderProjectGroup"
+   */
   delete_ProjectSliderProjectGroup_by_pk: DeleteProjectSliderProjectGroup_delete_ProjectSliderProjectGroup_by_pk | null;
 }
 

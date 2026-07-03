@@ -14,6 +14,9 @@ export interface UpdateProjectGroupOptionOrder_update_ProjectGroupOption_by_pk {
 }
 
 export interface UpdateProjectGroupOptionOrder {
+  /**
+   * update single row of the table: "ProjectGroupOption"
+   */
   update_ProjectGroupOption_by_pk: UpdateProjectGroupOptionOrder_update_ProjectGroupOption_by_pk | null;
 }
 

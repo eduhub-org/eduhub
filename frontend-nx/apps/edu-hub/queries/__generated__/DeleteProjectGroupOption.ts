@@ -13,6 +13,9 @@ export interface DeleteProjectGroupOption_delete_ProjectGroupOption_by_pk {
 }
 
 export interface DeleteProjectGroupOption {
+  /**
+   * delete single row from the table: "ProjectGroupOption"
+   */
   delete_ProjectGroupOption_by_pk: DeleteProjectGroupOption_delete_ProjectGroupOption_by_pk | null;
 }
 

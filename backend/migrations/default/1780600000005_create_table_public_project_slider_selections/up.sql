@@ -71,9 +71,13 @@ BEGIN
   IF (SELECT "contentType" FROM "public"."CourseGroupOption" WHERE "id" = NEW."projectSliderOptionId") <> 'PROJECT' THEN
     RAISE EXCEPTION 'projectSliderOptionId % must reference a CourseGroupOption with contentType = PROJECT', NEW."projectSliderOptionId";
   END IF;
-  IF TG_TABLE_NAME = 'ProjectSliderCourseGroup'
-     AND (SELECT "contentType" FROM "public"."CourseGroupOption" WHERE "id" = NEW."courseGroupOptionId") <> 'COURSE' THEN
-    RAISE EXCEPTION 'courseGroupOptionId % must reference a CourseGroupOption with contentType = COURSE', NEW."courseGroupOptionId";
+  -- Nested (not AND-combined) so NEW."courseGroupOptionId" is only referenced for
+  -- ProjectSliderCourseGroup; the ProjectSliderProjectGroup NEW record has no such
+  -- field and a single AND expression is not guaranteed to short-circuit.
+  IF TG_TABLE_NAME = 'ProjectSliderCourseGroup' THEN
+    IF (SELECT "contentType" FROM "public"."CourseGroupOption" WHERE "id" = NEW."courseGroupOptionId") <> 'COURSE' THEN
+      RAISE EXCEPTION 'courseGroupOptionId % must reference a CourseGroupOption with contentType = COURSE', NEW."courseGroupOptionId";
+    END IF;
   END IF;
   RETURN NEW;
 END;

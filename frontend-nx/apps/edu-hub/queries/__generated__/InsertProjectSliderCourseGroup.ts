@@ -13,6 +13,9 @@ export interface InsertProjectSliderCourseGroup_insert_ProjectSliderCourseGroup_
 }
 
 export interface InsertProjectSliderCourseGroup {
+  /**
+   * insert a single row into the table: "ProjectSliderCourseGroup"
+   */
   insert_ProjectSliderCourseGroup_one: InsertProjectSliderCourseGroup_insert_ProjectSliderCourseGroup_one | null;
 }
 

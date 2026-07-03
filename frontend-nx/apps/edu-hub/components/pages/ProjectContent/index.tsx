@@ -1,7 +1,7 @@
 import { FC, useMemo } from 'react';
 import Link from 'next/link';
 import { useQuery } from '@apollo/client';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { CircularProgress } from '@mui/material';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -18,6 +18,8 @@ import { ProjectPageFragment } from '../../../queries/__generated__/ProjectPageF
 import { getPublicImageUrl } from '../../../helpers/filehandling';
 import { Button } from '../../common/Button';
 import ProjectTileSlider from '../../common/TileSlider/ProjectTileSlider';
+import { BadgeBanner, pickPrimaryBadge } from '../../common/badges/ProjectBadges';
+import { Avatar } from '../../shared-components';
 
 export type ProjectPageContext = 'public' | 'withinCourse';
 
@@ -29,22 +31,9 @@ interface ProjectContentProps {
 
 const fullName = (user: { firstName: string; lastName: string }) => `${user.firstName} ${user.lastName}`.trim();
 
-const Avatar: FC<{ picture: string | null; name: string; size?: number }> = ({ picture, name, size = 40 }) => (
-  <div
-    className="rounded-full bg-gray-500 bg-cover bg-center flex items-center justify-center text-xs text-white shrink-0 overflow-hidden"
-    style={{
-      width: size,
-      height: size,
-      backgroundImage: picture ? `url("${picture}")` : undefined,
-    }}
-    title={name}
-  >
-    {!picture && name.split(' ').map((p) => p.charAt(0)).join('').slice(0, 2).toUpperCase()}
-  </div>
-);
-
 const ProjectContent: FC<ProjectContentProps> = ({ id, context, courseId }) => {
   const t = useTranslations('project');
+  const locale = useLocale();
   const anonymous = { role: AuthRoles.anonymous };
 
   const { data, loading, error } = useQuery<ProjectPage, ProjectPageVariables>(PROJECT_PAGE, {
@@ -103,12 +92,17 @@ const ProjectContent: FC<ProjectContentProps> = ({ id, context, courseId }) => {
   const isPublished = project.status === ProjectStatus_enum.PUBLISHED;
   const mentor = project.ProjectMentors[0]?.User;
   const team = project.ProjectAuthors;
-  const courseLine = course
-    ? program?.shortTitle
-      ? `${course.title} · ${program.shortTitle}`
-      : course.title
-    : project.Organization?.name ?? '';
+  // Only the course name is shown (program / term intentionally omitted).
+  const courseLine = course ? course.title : project.Organization?.name ?? '';
   const coverImage = getPublicImageUrl(project.coverImageUrl, 1024);
+  const primaryBadge = pickPrimaryBadge(project.ProjectBadges);
+  const submittedLabel = project.submittedAt
+    ? new Date(project.submittedAt).toLocaleDateString(locale === 'de' ? 'de-DE' : 'en-US', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      })
+    : null;
 
   // Only allow http(s) links into hrefs to avoid javascript:/data: XSS via stored content.
   const safeUrl = (url: string | null): string | null => (url && /^https?:\/\//i.test(url.trim()) ? url.trim() : null);
@@ -148,16 +142,19 @@ const ProjectContent: FC<ProjectContentProps> = ({ id, context, courseId }) => {
 
         <div className="max-w-screen-xl mx-auto w-full px-3 md:px-16 py-12 grid grid-cols-1 lg:grid-cols-3 gap-12">
           <div className="lg:col-span-2 flex flex-col gap-12">
+            {primaryBadge && <BadgeBanner badge={primaryBadge} />}
             <section>
               <h2 className="text-2xl font-semibold mb-4">{t('about.title')}</h2>
               {description}
             </section>
-            <section className="flex gap-10">
-              <div>
-                <div className="text-3xl font-semibold">{team.length}</div>
-                <div className="text-label-secondary text-sm">{t('stats.team_members')}</div>
-              </div>
-            </section>
+            {submittedLabel && (
+              <section className="flex gap-10">
+                <div>
+                  <div className="text-xl font-semibold">{submittedLabel}</div>
+                  <div className="text-label-secondary text-sm">{t('stats.submitted')}</div>
+                </div>
+              </section>
+            )}
             {similar.length > 0 && (
               <section>
                 <h2 className="text-2xl font-semibold mb-2">{t('similar.title')}</h2>
@@ -190,7 +187,7 @@ const ProjectContent: FC<ProjectContentProps> = ({ id, context, courseId }) => {
                 <div className="flex flex-col gap-3">
                   {team.map((author) => (
                     <div key={author.id} className="flex items-center gap-3">
-                      <Avatar picture={author.User.picture} name={fullName(author.User)} />
+                      <Avatar imageUrl={author.User.picture} name={fullName(author.User)} />
                       <span>{fullName(author.User)}</span>
                     </div>
                   ))}
@@ -202,7 +199,7 @@ const ProjectContent: FC<ProjectContentProps> = ({ id, context, courseId }) => {
               <div className="rounded-xl border border-border-primary bg-bg-card p-5">
                 <h3 className="font-semibold mb-4">{t('sidebar.mentor')}</h3>
                 <div className="flex items-center gap-3">
-                  <Avatar picture={mentor.picture} name={fullName(mentor)} />
+                  <Avatar imageUrl={mentor.picture} name={fullName(mentor)} />
                   <span>{fullName(mentor)}</span>
                 </div>
               </div>
@@ -243,7 +240,7 @@ const ProjectContent: FC<ProjectContentProps> = ({ id, context, courseId }) => {
           {project.tagline && <p className="text-lg text-label-secondary">{project.tagline}</p>}
           {mentor && (
             <div className="flex items-center gap-3">
-              <Avatar picture={mentor.picture} name={fullName(mentor)} size={36} />
+              <Avatar imageUrl={mentor.picture} name={fullName(mentor)} size={36} />
               <span className="text-label-secondary text-sm">{t('tile.mentored_by', { name: fullName(mentor) })}</span>
             </div>
           )}

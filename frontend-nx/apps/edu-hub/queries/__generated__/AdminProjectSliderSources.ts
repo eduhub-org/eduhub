@@ -20,6 +20,12 @@ export interface AdminProjectSliderSources_ProjectGroupOption {
 }
 
 export interface AdminProjectSliderSources {
+  /**
+   * fetch data from the table: "CourseGroupOption"
+   */
   CourseGroupOption: AdminProjectSliderSources_CourseGroupOption[];
+  /**
+   * fetch data from the table: "ProjectGroupOption"
+   */
   ProjectGroupOption: AdminProjectSliderSources_ProjectGroupOption[];
 }

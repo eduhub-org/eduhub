@@ -2597,6 +2597,9 @@
   },
   "project": {
     "not_found": "Project not found",
+    "breadcrumb": {
+      "projects": "Projects"
+    },
     "status": {
       "published": "Published"
     },
@@ -2615,7 +2618,8 @@
       "title": "About this project"
     },
     "stats": {
-      "team_members": "Team members"
+      "team_members": "Team members",
+      "submitted": "Submitted"
     },
     "similar": {
       "title": "Similar projects"
@@ -2645,6 +2649,11 @@
     "course_section": {
       "open_templates": "Open project templates",
       "past_projects": "Projects from past courses"
+    },
+    "submitted_on": "Submitted {date}",
+    "badge": {
+      "won": "Winner",
+      "nominated": "Nominated"
     },
     "load_error": "Could not load this project. Please try again later."
   }

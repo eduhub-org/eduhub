@@ -159,7 +159,13 @@ export interface AdminProjectList_Project_ProjectConsentEvents {
 export interface AdminProjectList_Project_ProjectCourses_Course_Program {
   __typename: "Program";
   id: number;
+  /**
+   * The title of the program
+   */
   title: string;
+  /**
+   * The 6 letter short title for the program.
+   */
   shortTitle: string | null;
 }
 
@@ -181,12 +187,18 @@ export interface AdminProjectList_Project_ProjectCourses_Course_CourseGroups {
 export interface AdminProjectList_Project_ProjectCourses_Course {
   __typename: "Course";
   id: number;
+  /**
+   * The title of the course (only editable by an admin user)
+   */
   title: string;
-  programId: number | null;
+  /**
+   * Id of the program to which the course belongs.
+   */
+  programId: number;
   /**
    * An object relationship
    */
-  Program: AdminProjectList_Project_ProjectCourses_Course_Program | null;
+  Program: AdminProjectList_Project_ProjectCourses_Course_Program;
   /**
    * An array relationship
    */

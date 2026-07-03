@@ -11,7 +11,7 @@ export interface CourseSeriesInfo_Course {
   __typename: "Course";
   id: number;
   /**
-   * Links this course to its CourseSeries (the set of all iterations of the same course).
+   * Links this course to its CourseSeries (the set of all iterations of the same course). Used to surface projects from past iterations.
    */
   courseSeriesId: number | null;
 }

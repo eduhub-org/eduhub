@@ -24,11 +24,23 @@ export interface AdminProjectSliders_CourseGroupOption {
   id: number;
   title: string;
   order: number;
+  /**
+   * Indicates whether this group option is used in UI sliders (true) or as metadata tags (false)
+   */
   sliderGroup: boolean | null;
+  /**
+   * An array relationship
+   */
   SelectedCourseGroups: AdminProjectSliders_CourseGroupOption_SelectedCourseGroups[];
+  /**
+   * An array relationship
+   */
   SelectedProjectGroups: AdminProjectSliders_CourseGroupOption_SelectedProjectGroups[];
 }
 
 export interface AdminProjectSliders {
+  /**
+   * fetch data from the table: "CourseGroupOption"
+   */
   CourseGroupOption: AdminProjectSliders_CourseGroupOption[];
 }
