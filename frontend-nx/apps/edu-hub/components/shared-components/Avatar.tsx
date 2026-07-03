@@ -11,6 +11,10 @@ interface IProps {
   className?: string;
 }
 
+// Escape characters that would break out of the CSS url("…") context, preventing
+// CSS injection via crafted image URLs in the inline style attribute.
+const escapeCssUrl = (url: string): string => url.replace(/["\\]/g, '\\$&');
+
 const initialsOf = (name?: string): string =>
   (name ?? '')
     .split(' ')
@@ -63,7 +67,7 @@ export const Avatar: FC<IProps> = ({ imageUrl, name, size = 40, className = '' }
         width: size,
         height: size,
         fontSize: Math.max(10, Math.round(size * 0.36)),
-        backgroundImage: imageUrl ? `url("${imageUrl}")` : undefined,
+        backgroundImage: imageUrl ? `url("${escapeCssUrl(imageUrl)}")` : undefined,
         backgroundColor: showInitials ? colorOf(name) : undefined,
       }}
       title={name || undefined}

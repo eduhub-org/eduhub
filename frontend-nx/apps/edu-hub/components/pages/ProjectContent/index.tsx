@@ -52,7 +52,10 @@ const ProjectContent: FC<ProjectContentProps> = ({ id, context, courseId }) => {
 
   const course = relevantCourse?.Course;
   const program = course?.Program;
-  const linkedCourseId = courseId ?? course?.id;
+  // Only ever link to a course this project is actually linked to; when the
+  // within-course route's courseId has no matching ProjectCourses entry,
+  // `course` is undefined and the course card/CTA are hidden.
+  const linkedCourseId = course?.id;
   const courseGroupIds = useMemo(
     () => (course?.CourseGroups ?? []).map((cg) => cg.groupOptionId),
     [course]
