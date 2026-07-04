@@ -147,10 +147,6 @@ const ProjectContent: FC<ProjectContentProps> = ({ id, context, courseId }) => {
             style={{ background: 'linear-gradient(0deg, rgba(15,15,15,0.95) 0%, rgba(15,15,15,0) 70%)' }}
           />
           <div className="relative max-w-screen-xl mx-auto w-full px-3 md:px-16 pb-10">
-            <div className="text-sm text-label-secondary mb-3">
-              {t('breadcrumb.projects')}
-              {courseLine ? ` / ${courseLine}` : ''}
-            </div>
             <h1 className="text-5xl font-semibold">{project.title}</h1>
             {project.tagline && <p className="text-xl text-label-secondary mt-3 max-w-3xl">{project.tagline}</p>}
           </div>

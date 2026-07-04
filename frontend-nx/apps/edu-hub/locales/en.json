@@ -2630,9 +2630,6 @@
   },
   "project": {
     "not_found": "Project not found",
-    "breadcrumb": {
-      "projects": "Projects"
-    },
     "status": {
       "published": "Published"
     },

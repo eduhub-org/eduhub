@@ -64,6 +64,7 @@ import {
   isExcludedAuthor,
 } from '../../../CourseContent/Projects/projectAuthors';
 import { translateErrorMessage } from '../../../../../helpers/errorHandling';
+import { PROJECT_TAGLINE_MAX_LENGTH } from '../../../CourseContent/Projects/projectDefaults';
 import StatusChip from '../../../CourseContent/Projects/StatusChip';
 import { isProjectTypeEditable, canManagePublicationSuggestion } from '../../../CourseContent/Projects/projectStatusDisplay';
 import ProjectPreviewLayout from '../../../CourseContent/Projects/ProjectPreviewLayout';
@@ -815,7 +816,7 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
                           value={row.tagline ?? ''}
                           updateValueMutation={UPDATE_PROJECT_TAGLINE}
                           refetchQueries={REFETCH_QUERIES}
-                          maxLength={400}
+                          maxLength={PROJECT_TAGLINE_MAX_LENGTH}
                           showCharacterCount={false}
                           className="!mb-0 border-transparent bg-transparent [&>div]:!px-0"
                         />

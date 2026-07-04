@@ -4,6 +4,7 @@ import { useRoleMutation } from '../../../../hooks/authedMutation';
 import { DialogShell } from '../../../common/dialogs/DialogShell';
 import { Button } from '../../../common/Button';
 import { INSERT_SELF_PROPOSED_PROJECT } from '../../../../queries/project';
+import { PROJECT_TAGLINE_MAX_LENGTH } from './projectDefaults';
 
 interface ProposeProjectDialogProps {
   open: boolean;
@@ -133,7 +134,7 @@ const ProposeProjectDialog: FC<ProposeProjectDialogProps> = ({
             value={tagline}
             onChange={(e) => setTagline(e.target.value)}
             placeholder={t('projects.propose_dialog.tagline_placeholder')}
-            maxLength={200}
+            maxLength={PROJECT_TAGLINE_MAX_LENGTH}
             disabled={loading}
           />
         </label>

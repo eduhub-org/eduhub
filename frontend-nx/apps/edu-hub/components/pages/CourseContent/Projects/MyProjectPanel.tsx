@@ -57,7 +57,7 @@ import ProjectPreviewLayout from './ProjectPreviewLayout';
 import ProjectFormFieldSection from './ProjectFormFieldSection';
 import ProjectSubmissionDeadlineBelowTitle from './ProjectSubmissionDeadlineBelowTitle';
 import { ProjectRow } from './types';
-import { PROJECT_FALLBACK_TITLE } from './projectDefaults';
+import { PROJECT_FALLBACK_TITLE, PROJECT_TAGLINE_MAX_LENGTH } from './projectDefaults';
 /** Extensions only — MIME variants are derived for validation; avoids raw MIME labels in the UI. */
 const PROJECT_DOCUMENTATION_ACCEPT = '.pdf,.doc,.docx,.odt';
 const PROJECT_PRESENTATION_ACCEPT = '.pdf,.ppt,.pptx,.odp';
@@ -727,7 +727,7 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
                     value={project.tagline ?? ''}
                     updateValueMutation={UPDATE_PROJECT_TAGLINE}
                     refetchQueries={refetchQueries}
-                    maxLength={400}
+                    maxLength={PROJECT_TAGLINE_MAX_LENGTH}
                     showCharacterCount={false}
                     className="!mb-0 border-transparent bg-transparent [&>div]:!px-0"
                   />
