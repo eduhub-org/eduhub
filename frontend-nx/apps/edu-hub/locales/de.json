@@ -2104,6 +2104,35 @@
       "error_save": "Die Auswahl konnte nicht gespeichert werden.",
       "loading": "Lädt...",
       "error_loading": "Die Projekt-Slider konnten nicht geladen werden."
+    },
+    "badges": {
+      "section_label": "Badges",
+      "section_help": "Lege wiederverwendbare Badges (z. B. Auszeichnungen) fest, die Projekten zugeordnet werden können. Titel, Beschreibung und Icon werden hier einmal gepflegt und überall automatisch angezeigt.",
+      "add_button": "Badge hinzufügen",
+      "column": {
+        "icon": "Icon",
+        "title": "Titel",
+        "awards": "Vergeben",
+        "updated": "Zuletzt geändert",
+        "description": "Beschreibung",
+        "order": "Reihenfolge"
+      },
+      "description_placeholder": "Wofür dieses Badge steht",
+      "icon_placeholder": "z. B. trophy",
+      "icon_help": "Optionaler lucide-Icon-Name. Leer lassen, um das Standard-Icon zu verwenden.",
+      "add_dialog": {
+        "title": "Badge hinzufügen",
+        "submit": "Erstellen",
+        "title_label": "Titel",
+        "title_placeholder": "z. B. AI Idea Award 2024"
+      },
+      "delete_dialog": {
+        "question": "Das Badge „{title}“ löschen? Es wird auch von {count} Projekt(en) entfernt, denen es verliehen wurde."
+      },
+      "error": {
+        "create_failed": "Das Badge konnte nicht erstellt werden.",
+        "duplicate_title": "Ein Badge mit diesem Titel existiert bereits."
+      }
     }
   },
   "manageExperts": {
@@ -2546,6 +2575,10 @@
         "access": {
           "label": "Zugriff & Rollen",
           "description": "Admin-Nutzer und Organisationsrollen"
+        },
+        "badges": {
+          "label": "Badges",
+          "description": "Wiederverwendbare Projekt-Badges und Auszeichnungen"
         }
       }
     },

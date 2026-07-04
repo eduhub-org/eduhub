@@ -2119,6 +2119,35 @@
       "error_save": "The selection could not be saved.",
       "loading": "Loading...",
       "error_loading": "The project sliders could not be loaded."
+    },
+    "badges": {
+      "section_label": "Badges",
+      "section_help": "Define reusable badges (e.g. awards) that can be attached to projects. Title, description and icon are authored once here and shown automatically wherever the badge appears.",
+      "add_button": "Add badge",
+      "column": {
+        "icon": "Icon",
+        "title": "Title",
+        "awards": "Awards",
+        "updated": "Last updated",
+        "description": "Description",
+        "order": "Order"
+      },
+      "description_placeholder": "What this badge recognizes",
+      "icon_placeholder": "e.g. trophy",
+      "icon_help": "Optional lucide icon name. Leave empty to use the default award icon.",
+      "add_dialog": {
+        "title": "Add badge",
+        "submit": "Create",
+        "title_label": "Title",
+        "title_placeholder": "e.g. AI Idea Award 2024"
+      },
+      "delete_dialog": {
+        "question": "Delete the badge “{title}”? This also removes it from {count} project(s) it was awarded to."
+      },
+      "error": {
+        "create_failed": "The badge could not be created.",
+        "duplicate_title": "A badge with this title already exists."
+      }
     }
   },
   "manageExperts": {
@@ -2561,6 +2590,10 @@
         "access": {
           "label": "Access & roles",
           "description": "Admin users and organization roles"
+        },
+        "badges": {
+          "label": "Badges",
+          "description": "Reusable project badges and awards"
         }
       }
     },
