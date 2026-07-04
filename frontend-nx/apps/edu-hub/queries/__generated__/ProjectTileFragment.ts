@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { ProjectStatus_enum, BadgeStatus_enum } from "./../../__generated__/globalTypes";
+import { ProjectStatus_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL fragment: ProjectTileFragment
@@ -78,7 +78,6 @@ export interface ProjectTileFragment_ProjectBadges_Badge {
 export interface ProjectTileFragment_ProjectBadges {
   __typename: "ProjectBadge";
   id: number;
-  status: BadgeStatus_enum;
   /**
    * An object relationship
    */

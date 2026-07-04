@@ -2684,10 +2684,6 @@
       "past_projects": "Projects from past courses"
     },
     "submitted_on": "Submitted {date}",
-    "badge": {
-      "won": "Winner",
-      "nominated": "Nominated"
-    },
     "load_error": "Could not load this project. Please try again later."
   }
 }

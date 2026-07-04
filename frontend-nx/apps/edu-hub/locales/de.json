@@ -2669,10 +2669,6 @@
       "past_projects": "Projekte aus vergangenen Kursen"
     },
     "submitted_on": "Eingereicht {date}",
-    "badge": {
-      "won": "Gewinner",
-      "nominated": "Nominiert"
-    },
     "load_error": "Dieses Projekt konnte nicht geladen werden. Bitte versuche es später erneut."
   }
 }

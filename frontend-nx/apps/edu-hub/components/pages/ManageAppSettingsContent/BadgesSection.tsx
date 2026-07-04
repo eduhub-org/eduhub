@@ -1,7 +1,6 @@
 import { FC, useCallback, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { ColumnDef } from '@tanstack/react-table';
-import { icons, type LucideIcon } from 'lucide-react';
 
 import TableGrid from '../../common/TableGrid';
 import InputField from '../../inputs/InputField';
@@ -21,6 +20,7 @@ import {
 } from '../../../queries/badge';
 import { AdminBadges, AdminBadges_Badge } from '../../../queries/__generated__/AdminBadges';
 import { InsertBadge, InsertBadgeVariables } from '../../../queries/__generated__/InsertBadge';
+import { getLucideIcon } from '../../../helpers/lucideIcon';
 
 const REFETCH_QUERIES = ['AdminBadges'];
 const PAGE_SIZE = 20;
@@ -29,18 +29,9 @@ type BadgeRow = AdminBadges_Badge;
 
 const awardCount = (row: BadgeRow) => row.ProjectBadges_aggregate?.aggregate?.count ?? 0;
 
-// Resolve a stored lucide icon name (e.g. "trophy", "graduation-cap") to its
-// PascalCase component key.
-const toPascalCase = (name: string) =>
-  name
-    .split(/[-_ ]+/)
-    .filter(Boolean)
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join('');
-
 /** Renders the actual lucide icon for a badge, falling back to a dash. */
 const BadgeIcon: FC<{ name: string | null }> = ({ name }) => {
-  const Icon = name ? (icons as Record<string, LucideIcon>)[toPascalCase(name)] : undefined;
+  const Icon = getLucideIcon(name);
   if (!Icon) return <span className="text-label-secondary">—</span>;
   return <Icon size={20} className="text-label-primary" aria-label={name ?? undefined} />;
 };

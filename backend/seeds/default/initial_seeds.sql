@@ -3498,18 +3498,17 @@ VALUES
   (9911, 9911, 'cccccccc-cccc-cccc-cccc-cccccccccccc', now(), now()),
   (9912, 9913, '8914bee9-0549-44af-bcae-cafeec5ba92e', now(), now());
 
--- Badge awards: a mix of WON and NOMINATED. 9910 and 9913 carry two badges each
--- (so "won beats nominated" tile logic is exercised); 9915 stays un-badged.
+-- Badge awards. 9910 and 9913 carry two badges each; 9915 stays un-badged.
 INSERT INTO public."ProjectBadge"
-  (id, "projectId", "badgeId", status, created_at, updated_at)
+  (id, "projectId", "badgeId", created_at, updated_at)
 VALUES
-  (1, 9910, 4, 'WON',       now(), now()),
-  (2, 9910, 1, 'NOMINATED', now(), now()),
-  (3, 9911, 1, 'WON',       now(), now()),
-  (4, 9912, 3, 'NOMINATED', now(), now()),
-  (5, 9913, 2, 'WON',       now(), now()),
-  (6, 9913, 4, 'NOMINATED', now(), now()),
-  (7, 9914, 2, 'NOMINATED', now(), now());
+  (1, 9910, 4, now(), now()),
+  (2, 9910, 1, now(), now()),
+  (3, 9911, 1, now(), now()),
+  (4, 9912, 3, now(), now()),
+  (5, 9913, 2, now(), now()),
+  (6, 9913, 4, now(), now()),
+  (7, 9914, 2, now(), now());
 
 -- A home project slider showcasing the badged projects. A "project slider" is a
 -- CourseGroupOption row with contentType = 'PROJECT'; its membership is composed

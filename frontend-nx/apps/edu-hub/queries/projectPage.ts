@@ -45,7 +45,6 @@ export const PROJECT_PAGE_FRAGMENT = gql`
     }
     ProjectBadges {
       id
-      status
       Badge {
         id
         title
