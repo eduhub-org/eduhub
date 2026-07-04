@@ -2616,7 +2616,7 @@
   "project": {
     "not_found": "Projekt nicht gefunden",
     "status": {
-      "published": "Veröffentlicht"
+      "PUBLISHED": "Veröffentlicht"
     },
     "tile": {
       "template_eyebrow": "Offene Projektvorlage",

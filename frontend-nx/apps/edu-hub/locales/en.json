@@ -2631,7 +2631,7 @@
   "project": {
     "not_found": "Project not found",
     "status": {
-      "published": "Published"
+      "PUBLISHED": "Published"
     },
     "tile": {
       "template_eyebrow": "Open project template",
