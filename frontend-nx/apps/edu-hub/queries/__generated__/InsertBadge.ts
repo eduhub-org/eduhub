@@ -21,5 +21,4 @@ export interface InsertBadgeVariables {
   title: string;
   description?: string | null;
   icon?: string | null;
-  order: number;
 }

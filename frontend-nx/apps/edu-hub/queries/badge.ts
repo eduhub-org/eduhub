@@ -7,7 +7,7 @@ export const ADMIN_BADGES = gql`
   query AdminBadges($limit: Int = 20, $offset: Int = 0, $search: String = "%%") {
     Badge(
       where: { title: { _ilike: $search } }
-      order_by: [{ order: asc }, { title: asc }]
+      order_by: [{ title: asc }]
       limit: $limit
       offset: $offset
     ) {
@@ -15,7 +15,6 @@ export const ADMIN_BADGES = gql`
       title
       description
       icon
-      order
       updated_at
       ProjectBadges_aggregate {
         aggregate {
@@ -31,23 +30,9 @@ export const ADMIN_BADGES = gql`
   }
 `;
 
-// Global max order across all badges (independent of the table's pagination /
-// search), so a newly added badge is appended after every existing one.
-export const BADGE_MAX_ORDER = gql`
-  query BadgeMaxOrder {
-    Badge_aggregate {
-      aggregate {
-        max {
-          order
-        }
-      }
-    }
-  }
-`;
-
 export const INSERT_BADGE = gql`
-  mutation InsertBadge($title: String!, $description: String, $icon: String, $order: Int!) {
-    insert_Badge_one(object: { title: $title, description: $description, icon: $icon, order: $order }) {
+  mutation InsertBadge($title: String!, $description: String, $icon: String) {
+    insert_Badge_one(object: { title: $title, description: $description, icon: $icon }) {
       id
       title
     }
@@ -77,15 +62,6 @@ export const UPDATE_BADGE_ICON = gql`
     update_Badge_by_pk(pk_columns: { id: $itemId }, _set: { icon: $text }) {
       id
       icon
-    }
-  }
-`;
-
-export const UPDATE_BADGE_ORDER = gql`
-  mutation UpdateBadgeOrder($id: Int!, $order: Int!) {
-    update_Badge_by_pk(pk_columns: { id: $id }, _set: { order: $order }) {
-      id
-      order
     }
   }
 `;

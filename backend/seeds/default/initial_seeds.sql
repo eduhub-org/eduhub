@@ -3398,23 +3398,23 @@ VALUES
 -- All ids are in the 99xx range to stay clear of the base seed data.
 -- =============================================================================
 INSERT INTO public."Badge"
-  (id, title, description, icon, "order", "organizationId", created_at, updated_at)
+  (id, title, description, icon, created_at, updated_at)
 VALUES
   (1, 'AI Innovation Award 2025',
    'Awarded to the project with the most original use of AI.',
-   'trophy', 1, NULL, now(), now()),
+   'trophy', now(), now()),
   (2, 'Best Social Impact',
    'For the project that best improves the community or society.',
-   'heart', 2, NULL, now(), now()),
+   'heart', now(), now()),
   (3, 'Audience Choice',
    'Voted the crowd favourite at the final showcase.',
-   'users', 3, NULL, now(), now()),
+   'users', now(), now()),
   (4, 'Sustainability Prize',
    'Recognises outstanding contribution to sustainability.',
-   'leaf', 4, NULL, now(), now()),
+   'leaf', now(), now()),
   (5, 'Best Prototype',
    'For the most polished and functional working prototype.',
-   'wrench', 5, NULL, now(), now());
+   'wrench', now(), now());
 
 INSERT INTO public."Project"
   (id, title, tagline, description, "coverImageUrl", "documentationUrl",

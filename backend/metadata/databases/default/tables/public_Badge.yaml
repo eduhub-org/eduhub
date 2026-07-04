@@ -1,10 +1,6 @@
 table:
   name: Badge
   schema: public
-object_relationships:
-  - name: Organization
-    using:
-      foreign_key_constraint_on: organizationId
 array_relationships:
   - name: ProjectBadges
     using:
@@ -21,8 +17,6 @@ select_permissions:
         - title
         - description
         - icon
-        - order
-        - organizationId
         - created_at
         - updated_at
       # Only badges that tag at least one anonymously-visible project, mirroring

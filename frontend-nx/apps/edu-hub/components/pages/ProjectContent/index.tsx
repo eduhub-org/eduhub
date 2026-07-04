@@ -1,4 +1,4 @@
-import { FC, useMemo } from 'react';
+import { FC, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useQuery } from '@apollo/client';
 import { useTranslations, useLocale } from 'next-intl';
@@ -15,7 +15,7 @@ import {
   SimilarProjectTilesVariables,
 } from '../../../queries/__generated__/SimilarProjectTiles';
 import { ProjectPageFragment } from '../../../queries/__generated__/ProjectPageFragment';
-import { getPublicImageUrl } from '../../../helpers/filehandling';
+import { getBackgroundImage } from '../../../helpers/imageHandling';
 import { Button } from '../../common/Button';
 import ProjectTileSlider from '../../common/TileSlider/ProjectTileSlider';
 import { BadgeBanner, pickPrimaryBadge } from '../../common/badges/ProjectBadges';
@@ -42,6 +42,20 @@ const ProjectContent: FC<ProjectContentProps> = ({ id, context, courseId }) => {
   });
 
   const project: ProjectPageFragment | undefined = data?.Project?.[0];
+
+  // Resolve the cover to an actually-generated image size (with original/placeholder
+  // fallback), the same way course pages load their hero — a fixed size like 1024
+  // is not generated for every upload and would otherwise 404 to a black box.
+  const [coverImage, setCoverImage] = useState<string>('');
+  useEffect(() => {
+    let active = true;
+    getBackgroundImage(project?.coverImageUrl ?? null).then((url) => {
+      if (active) setCoverImage(url);
+    });
+    return () => {
+      active = false;
+    };
+  }, [project?.coverImageUrl]);
 
   const relevantCourse = useMemo(() => {
     if (!project) return undefined;
@@ -97,7 +111,6 @@ const ProjectContent: FC<ProjectContentProps> = ({ id, context, courseId }) => {
   const team = project.ProjectAuthors;
   // Only the course name is shown (program / term intentionally omitted).
   const courseLine = course ? course.title : project.Organization?.name ?? '';
-  const coverImage = getPublicImageUrl(project.coverImageUrl, 1024);
   const primaryBadge = pickPrimaryBadge(project.ProjectBadges);
   const submittedLabel = project.submittedAt
     ? new Date(project.submittedAt).toLocaleDateString(locale === 'de' ? 'de-DE' : 'en-US', {
@@ -126,8 +139,8 @@ const ProjectContent: FC<ProjectContentProps> = ({ id, context, courseId }) => {
     return (
       <div className="text-white">
         <div
-          className="relative h-[420px] flex items-end bg-cover bg-center"
-          style={coverImage ? { backgroundImage: `url("${coverImage}")` } : { backgroundColor: '#222' }}
+          className="relative h-[420px] flex items-end bg-cover bg-center bg-bg-secondary"
+          style={coverImage ? { backgroundImage: `url("${coverImage}")` } : undefined}
         >
           <div
             className="absolute inset-0"
@@ -231,8 +244,8 @@ const ProjectContent: FC<ProjectContentProps> = ({ id, context, courseId }) => {
     <div className="text-white max-w-screen-xl mx-auto w-full px-3 md:px-16 py-10">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
         <div
-          className="rounded-2xl h-[320px] bg-cover bg-center"
-          style={coverImage ? { backgroundImage: `url("${coverImage}")` } : { backgroundColor: '#222' }}
+          className="rounded-2xl h-[320px] bg-cover bg-center bg-bg-secondary"
+          style={coverImage ? { backgroundImage: `url("${coverImage}")` } : undefined}
         />
         <div className="flex flex-col gap-4">
           {context === 'withinCourse' && courseLine && (

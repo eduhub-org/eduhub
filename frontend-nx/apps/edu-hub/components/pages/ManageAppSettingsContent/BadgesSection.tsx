@@ -1,6 +1,7 @@
 import { FC, useCallback, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { ColumnDef } from '@tanstack/react-table';
+import { icons, type LucideIcon } from 'lucide-react';
 
 import TableGrid from '../../common/TableGrid';
 import InputField from '../../inputs/InputField';
@@ -12,33 +13,41 @@ import { useAdminQuery } from '../../../hooks/authedQuery';
 import { useAdminMutation } from '../../../hooks/authedMutation';
 import {
   ADMIN_BADGES,
-  BADGE_MAX_ORDER,
   INSERT_BADGE,
   UPDATE_BADGE_TITLE,
   UPDATE_BADGE_DESCRIPTION,
   UPDATE_BADGE_ICON,
-  UPDATE_BADGE_ORDER,
   DELETE_BADGE,
 } from '../../../queries/badge';
 import { AdminBadges, AdminBadges_Badge } from '../../../queries/__generated__/AdminBadges';
-import { BadgeMaxOrder } from '../../../queries/__generated__/BadgeMaxOrder';
 import { InsertBadge, InsertBadgeVariables } from '../../../queries/__generated__/InsertBadge';
-import { UpdateBadgeOrder, UpdateBadgeOrderVariables } from '../../../queries/__generated__/UpdateBadgeOrder';
 
-// Badge edits change both the list and the global max order, so refetch both.
-const REFETCH_QUERIES = ['AdminBadges', 'BadgeMaxOrder'];
+const REFETCH_QUERIES = ['AdminBadges'];
 const PAGE_SIZE = 20;
 
 type BadgeRow = AdminBadges_Badge;
 
 const awardCount = (row: BadgeRow) => row.ProjectBadges_aggregate?.aggregate?.count ?? 0;
 
-/** Editable detail panel for a single badge (description, icon name, order). */
+// Resolve a stored lucide icon name (e.g. "trophy", "graduation-cap") to its
+// PascalCase component key.
+const toPascalCase = (name: string) =>
+  name
+    .split(/[-_ ]+/)
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join('');
+
+/** Renders the actual lucide icon for a badge, falling back to a dash. */
+const BadgeIcon: FC<{ name: string | null }> = ({ name }) => {
+  const Icon = name ? (icons as Record<string, LucideIcon>)[toPascalCase(name)] : undefined;
+  if (!Icon) return <span className="text-label-secondary">—</span>;
+  return <Icon size={20} className="text-label-primary" aria-label={name ?? undefined} />;
+};
+
+/** Editable detail panel for a single badge (description and icon name). */
 const BadgeExpandableRow: FC<{ badge: BadgeRow }> = ({ badge }) => {
   const t = useTranslations('manageAppSettings.badges');
-  const [updateOrder] = useAdminMutation<UpdateBadgeOrder, UpdateBadgeOrderVariables>(UPDATE_BADGE_ORDER, {
-    refetchQueries: REFETCH_QUERIES,
-  });
 
   return (
     <div className="flex w-full flex-col gap-4 py-2">
@@ -57,43 +66,21 @@ const BadgeExpandableRow: FC<{ badge: BadgeRow }> = ({ badge }) => {
           refetchQueries={REFETCH_QUERIES}
         />
       </div>
-      <div className="flex flex-col gap-4 sm:flex-row">
-        <div className="flex-1">
-          <span className="mb-1 block text-xs font-medium uppercase tracking-wide text-label-secondary">
-            {t('column.icon')}
-          </span>
-          <InputField
-            variant="material"
-            type="input"
-            value={badge.icon ?? ''}
-            label={t('column.icon')}
-            placeholder={t('icon_placeholder')}
-            itemId={badge.id}
-            updateValueMutation={UPDATE_BADGE_ICON}
-            refetchQueries={REFETCH_QUERIES}
-          />
-          <p className="mt-1 text-xs text-label-secondary">{t('icon_help')}</p>
-        </div>
-        <div className="w-full sm:w-40">
-          <span className="mb-1 block text-xs font-medium uppercase tracking-wide text-label-secondary">
-            {t('column.order')}
-          </span>
-          <input
-            type="number"
-            // Remount when the persisted order changes so the field never shows a stale value
-            // after a refetch (expandable rows stay mounted).
-            key={badge.order}
-            defaultValue={badge.order}
-            aria-label={t('column.order')}
-            className="w-full rounded border border-border-primary bg-bg-card px-3 py-2 text-label-primary"
-            onBlur={(e) => {
-              const value = parseInt(e.target.value, 10);
-              if (!Number.isNaN(value) && value !== badge.order) {
-                updateOrder({ variables: { id: badge.id, order: value } });
-              }
-            }}
-          />
-        </div>
+      <div>
+        <span className="mb-1 block text-xs font-medium uppercase tracking-wide text-label-secondary">
+          {t('column.icon')}
+        </span>
+        <InputField
+          variant="material"
+          type="input"
+          value={badge.icon ?? ''}
+          label={t('column.icon')}
+          placeholder={t('icon_placeholder')}
+          itemId={badge.id}
+          updateValueMutation={UPDATE_BADGE_ICON}
+          refetchQueries={REFETCH_QUERIES}
+        />
+        <p className="mt-1 text-xs text-label-secondary">{t('icon_help')}</p>
       </div>
     </div>
   );
@@ -111,10 +98,6 @@ const BadgesSection: FC = () => {
   const { data, loading, error } = useAdminQuery<AdminBadges>(ADMIN_BADGES, {
     variables: { limit: PAGE_SIZE, offset: pageIndex * PAGE_SIZE, search: searchPattern },
   });
-
-  // Global max order (not limited by pagination/search) so a new badge appends last.
-  const { data: maxOrderData } = useAdminQuery<BadgeMaxOrder>(BADGE_MAX_ORDER);
-  const maxOrder = maxOrderData?.Badge_aggregate?.aggregate?.max?.order ?? 0;
 
   const badges = useMemo(() => data?.Badge ?? [], [data]);
   const totalCount = data?.Badge_aggregate?.aggregate?.count ?? 0;
@@ -157,7 +140,6 @@ const BadgesSection: FC = () => {
           title,
           description: addDescription.trim() || null,
           icon: addIcon.trim() || null,
-          order: maxOrder + 1,
         },
       });
       setAddOpen(false);
@@ -167,7 +149,7 @@ const BadgesSection: FC = () => {
     } finally {
       setAdding(false);
     }
-  }, [addTitle, addDescription, addIcon, maxOrder, insertBadge, t]);
+  }, [addTitle, addDescription, addIcon, insertBadge, t]);
 
   const generateDeletionConfirmation = useCallback(
     (row: BadgeRow) => t('delete_dialog.question', { title: row.title, count: awardCount(row) }),
@@ -179,15 +161,9 @@ const BadgesSection: FC = () => {
       {
         accessorKey: 'icon',
         header: t('column.icon'),
-        size: 120,
-        cell: ({ getValue }) => {
-          const icon = getValue<string | null>();
-          return icon ? (
-            <span className="font-mono text-xs text-label-secondary">{icon}</span>
-          ) : (
-            <span className="text-label-secondary">—</span>
-          );
-        },
+        size: 90,
+        meta: { align: 'center' },
+        cell: ({ getValue }) => <BadgeIcon name={getValue<string | null>()} />,
       },
       {
         accessorKey: 'title',

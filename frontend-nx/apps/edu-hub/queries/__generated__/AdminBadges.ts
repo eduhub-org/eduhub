@@ -23,7 +23,6 @@ export interface AdminBadges_Badge {
   title: string;
   description: string | null;
   icon: string | null;
-  order: number;
   updated_at: any;
   ProjectBadges_aggregate: AdminBadges_Badge_ProjectBadges_aggregate;
 }
