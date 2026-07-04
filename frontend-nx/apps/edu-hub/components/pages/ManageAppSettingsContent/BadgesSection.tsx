@@ -1,6 +1,5 @@
 import { FC, useCallback, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { ApolloError } from '@apollo/client';
 import { ColumnDef } from '@tanstack/react-table';
 
 import TableGrid from '../../common/TableGrid';
@@ -13,6 +12,7 @@ import { useAdminQuery } from '../../../hooks/authedQuery';
 import { useAdminMutation } from '../../../hooks/authedMutation';
 import {
   ADMIN_BADGES,
+  BADGE_MAX_ORDER,
   INSERT_BADGE,
   UPDATE_BADGE_TITLE,
   UPDATE_BADGE_DESCRIPTION,
@@ -21,10 +21,12 @@ import {
   DELETE_BADGE,
 } from '../../../queries/badge';
 import { AdminBadges, AdminBadges_Badge } from '../../../queries/__generated__/AdminBadges';
+import { BadgeMaxOrder } from '../../../queries/__generated__/BadgeMaxOrder';
 import { InsertBadge, InsertBadgeVariables } from '../../../queries/__generated__/InsertBadge';
 import { UpdateBadgeOrder, UpdateBadgeOrderVariables } from '../../../queries/__generated__/UpdateBadgeOrder';
 
-const REFETCH_QUERIES = ['AdminBadges'];
+// Badge edits change both the list and the global max order, so refetch both.
+const REFETCH_QUERIES = ['AdminBadges', 'BadgeMaxOrder'];
 const PAGE_SIZE = 20;
 
 type BadgeRow = AdminBadges_Badge;
@@ -78,7 +80,11 @@ const BadgeExpandableRow: FC<{ badge: BadgeRow }> = ({ badge }) => {
           </span>
           <input
             type="number"
+            // Remount when the persisted order changes so the field never shows a stale value
+            // after a refetch (expandable rows stay mounted).
+            key={badge.order}
             defaultValue={badge.order}
+            aria-label={t('column.order')}
             className="w-full rounded border border-border-primary bg-bg-card px-3 py-2 text-label-primary"
             onBlur={(e) => {
               const value = parseInt(e.target.value, 10);
@@ -102,9 +108,13 @@ const BadgesSection: FC = () => {
 
   const searchPattern = useMemo(() => `%${searchFilter.trim()}%`, [searchFilter]);
 
-  const { data, loading, error, refetch } = useAdminQuery<AdminBadges>(ADMIN_BADGES, {
+  const { data, loading, error } = useAdminQuery<AdminBadges>(ADMIN_BADGES, {
     variables: { limit: PAGE_SIZE, offset: pageIndex * PAGE_SIZE, search: searchPattern },
   });
+
+  // Global max order (not limited by pagination/search) so a new badge appends last.
+  const { data: maxOrderData } = useAdminQuery<BadgeMaxOrder>(BADGE_MAX_ORDER);
+  const maxOrder = maxOrderData?.Badge_aggregate?.aggregate?.max?.order ?? 0;
 
   const badges = useMemo(() => data?.Badge ?? [], [data]);
   const totalCount = data?.Badge_aggregate?.aggregate?.count ?? 0;
@@ -142,27 +152,22 @@ const BadgesSection: FC = () => {
     if (!title) return;
     setAdding(true);
     try {
-      const nextOrder = badges.reduce((max, b) => Math.max(max, b.order), 0) + 1;
       await insertBadge({
         variables: {
           title,
           description: addDescription.trim() || null,
           icon: addIcon.trim() || null,
-          order: nextOrder,
+          order: maxOrder + 1,
         },
       });
       setAddOpen(false);
-      refetch();
-    } catch (err) {
-      setErrorMessage(
-        err instanceof ApolloError && err.message.includes('duplicate key value')
-          ? t('error.duplicate_title')
-          : t('error.create_failed')
-      );
+    } catch {
+      // insertBadge already refetches on success via refetchQueries.
+      setErrorMessage(t('error.create_failed'));
     } finally {
       setAdding(false);
     }
-  }, [addTitle, addDescription, addIcon, badges, insertBadge, refetch, t]);
+  }, [addTitle, addDescription, addIcon, maxOrder, insertBadge, t]);
 
   const generateDeletionConfirmation = useCallback(
     (row: BadgeRow) => t('delete_dialog.question', { title: row.title, count: awardCount(row) }),
@@ -230,7 +235,7 @@ const BadgesSection: FC = () => {
 
   return (
     <div className="mt-8">
-      <label className="mb-4 block text-xs font-medium uppercase tracking-widest text-gray-400">
+      <label className="mb-4 block text-xs font-medium uppercase tracking-widest text-label-secondary">
         {t('section_label')}
       </label>
       <p className="mb-4 text-sm text-label-secondary">{t('section_help')}</p>

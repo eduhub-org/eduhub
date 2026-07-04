@@ -31,6 +31,20 @@ export const ADMIN_BADGES = gql`
   }
 `;
 
+// Global max order across all badges (independent of the table's pagination /
+// search), so a newly added badge is appended after every existing one.
+export const BADGE_MAX_ORDER = gql`
+  query BadgeMaxOrder {
+    Badge_aggregate {
+      aggregate {
+        max {
+          order
+        }
+      }
+    }
+  }
+`;
+
 export const INSERT_BADGE = gql`
   mutation InsertBadge($title: String!, $description: String, $icon: String, $order: Int!) {
     insert_Badge_one(object: { title: $title, description: $description, icon: $icon, order: $order }) {
