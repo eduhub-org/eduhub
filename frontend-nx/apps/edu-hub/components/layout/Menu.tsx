@@ -88,20 +88,20 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
       }}
     >
       <MenuItem onClick={closeMenu} selected={isActiveRoute('/profile')}>
-        <Link className="w-full text-lg" href="/profile">
+        <Link className="block -my-3 -mx-4 py-3 px-4 text-lg" href="/profile">
           {t('menu.profile')}
         </Link>
       </MenuItem>
 
       <MenuItem onClick={closeMenu} selected={isActiveRoute('/my-certificates')}>
-        <Link className="w-full text-lg" href="/my-certificates">
+        <Link className="block -my-3 -mx-4 py-3 px-4 text-lg" href="/my-certificates">
           {t('menu.my_certificates')}
         </Link>
       </MenuItem>
 
       {isAdminOrOrgAdmin && (
         <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/courses')}>
-          <Link className="w-full text-lg" href="/manage/courses">
+          <Link className="block -my-3 -mx-4 py-3 px-4 text-lg" href="/manage/courses">
             {t('menu.courses')}
           </Link>
         </MenuItem>
@@ -109,7 +109,7 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
 
       {isAdmin && (
         <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/projects')}>
-          <Link className="w-full text-lg" href="/manage/projects">
+          <Link className="block -my-3 -mx-4 py-3 px-4 text-lg" href="/manage/projects">
             {t('menu.projects')}
           </Link>
         </MenuItem>
@@ -117,7 +117,7 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
 
       {isAdmin && (
         <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/users')}>
-          <Link className="w-full text-lg" href="/manage/users">
+          <Link className="block -my-3 -mx-4 py-3 px-4 text-lg" href="/manage/users">
             {t('menu.user')}
           </Link>
         </MenuItem>
@@ -125,7 +125,7 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
 
       {isAdmin && (
         <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/experts')}>
-          <Link className="w-full text-lg" href="/manage/experts">
+          <Link className="block -my-3 -mx-4 py-3 px-4 text-lg" href="/manage/experts">
             {t('menu.experts')}
           </Link>
         </MenuItem>
@@ -133,7 +133,7 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
 
       {isAdmin && (
         <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/organizations')}>
-          <Link className="w-full text-lg" href="/manage/organizations">
+          <Link className="block -my-3 -mx-4 py-3 px-4 text-lg" href="/manage/organizations">
             {t('menu.organizations')}
           </Link>
         </MenuItem>
@@ -141,7 +141,7 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
 
       {isAdmin && (
         <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/location-addresses')}>
-          <Link className="w-full text-lg" href="/manage/location-addresses">
+          <Link className="block -my-3 -mx-4 py-3 px-4 text-lg" href="/manage/location-addresses">
             {t('menu.location_addresses')}
           </Link>
         </MenuItem>
@@ -149,7 +149,7 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
 
       {isAdmin && (
         <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/calendar')}>
-          <Link className="w-full text-lg" href="/manage/calendar">
+          <Link className="block -my-3 -mx-4 py-3 px-4 text-lg" href="/manage/calendar">
             {t('menu.calendar')}
           </Link>
         </MenuItem>
@@ -157,7 +157,7 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
 
       {isAdmin && (
         <MenuItem onClick={closeMenu} selected={isActiveRoute('/statistics')}>
-          <Link className="w-full text-lg" href="/statistics">
+          <Link className="block -my-3 -mx-4 py-3 px-4 text-lg" href="/statistics">
             {t('menu.statistics')}
           </Link>
         </MenuItem>
@@ -168,7 +168,7 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
           onClick={closeMenu}
           selected={isActiveRoute('/manage/settings') || router.pathname.startsWith('/manage/settings/')}
         >
-          <Link className="w-full text-lg" href="/manage/settings">
+          <Link className="block -my-3 -mx-4 py-3 px-4 text-lg" href="/manage/settings">
             {t('menu.settings')}
           </Link>
         </MenuItem>
@@ -177,7 +177,7 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
       {isInstructorOrAdmin && (
         <MenuItem onClick={closeMenu}>
           <Link
-            className="w-full text-lg"
+            className="block -my-3 -mx-4 py-3 px-4 text-lg"
             href="https://opencampus.gitbook.io/kursleitungshandbuch/"
             target="_blank"
             rel="noopener noreferrer"
@@ -188,7 +188,7 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
       )}
 
       <MenuItem onClick={closeMenu}>
-        <Link className="w-full text-lg" href="https://opencampus.gitbook.io/faq/" target="_blank">
+        <Link className="block -my-3 -mx-4 py-3 px-4 text-lg" href="https://opencampus.gitbook.io/faq/" target="_blank">
           {t('menu.faq')}
         </Link>
       </MenuItem>
