@@ -60,9 +60,9 @@ export const Avatar: FC<IProps> = ({ imageUrl, name, size = 40, className = '' }
 
   return (
     <div
-      className={`flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-cover bg-center font-medium ${
-        showInitials ? 'text-white' : 'bg-fill-secondary text-label-primary'
-      } ${className}`}
+      className={`profile-avatar flex shrink-0 items-center justify-center overflow-hidden rounded-full font-medium ${
+        imageUrl ? 'bg-cover bg-center' : ''
+      } ${showInitials ? 'text-white' : 'bg-fill-secondary text-label-primary'} ${className}`}
       style={{
         width: size,
         height: size,
