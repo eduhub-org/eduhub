@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { FC } from 'react';
+import { FC, memo } from 'react';
 import { useTranslations } from 'next-intl';
 import { CourseList_Course } from '../../../queries/__generated__/CourseList';
 import { CoursesEnrolledByUser_Course } from '../../../queries/__generated__/CoursesEnrolledByUser';
@@ -10,6 +10,7 @@ import {
 import React from 'react';
 import { TileBase } from './TileBase';
 import { shouldShowExtendedApplicationBanner } from './extendedApplicationBanner';
+import { getWidgetBaseUrl } from './widgetBaseUrl';
 
 type CourseType = CourseList_Course | CoursesEnrolledByUser_Course | CourseTiles_Course;
 
@@ -17,28 +18,7 @@ interface TileWidgetProps {
   course: CourseType;
 }
 
-/**
- * Get the base URL for the EduHub application based on environment
- * Uses NEXT_PUBLIC_BASE_URL if set, otherwise uses window.location.origin when on EduHub domain
- */
-const getBaseUrl = (): string => {
-  // Check for explicit base URL environment variable (client-side accessible)
-  if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_BASE_URL) {
-    return process.env.NEXT_PUBLIC_BASE_URL;
-  }
-  
-  // Client-side: Use current origin (works when widget is served from EduHub domain)
-  // This will be correct for development, staging, and production
-  if (typeof window !== 'undefined') {
-    return window.location.origin;
-  }
-  
-  // Server-side fallback (shouldn't happen in widget, but safe fallback)
-  // This would only be used during SSR, which shouldn't happen for widget
-  return process.env.NEXTAUTH_URL || 'https://edu.opencampus.sh';
-};
-
-export const TileWidget: FC<TileWidgetProps> = ({ course }) => {
+const TileWidgetComponent: FC<TileWidgetProps> = ({ course }) => {
   const t = useTranslations('common');
   const getWeekdayStartAndEndString = useWeekdayStartAndEndString();
   const showExtendedApplicationBanner = shouldShowExtendedApplicationBanner(
@@ -47,8 +27,7 @@ export const TileWidget: FC<TileWidgetProps> = ({ course }) => {
     Boolean(course.Program.showExtendedApplicationPeriodBanner)
   );
 
-  const baseUrl = getBaseUrl();
-  const courseUrl = `${baseUrl}/course/${course.id}`;
+  const courseUrl = `${getWidgetBaseUrl()}/course/${course.id}`;
 
   return (
     <a href={courseUrl} target="_blank" rel="noopener noreferrer" style={{ display: 'block' }}>
@@ -89,4 +68,6 @@ export const TileWidget: FC<TileWidgetProps> = ({ course }) => {
     </a>
   );
 };
+
+export const TileWidget = memo(TileWidgetComponent);
 

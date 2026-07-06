@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { FC } from 'react';
+import { FC, memo } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { Calendar } from 'lucide-react';
 
@@ -9,6 +9,7 @@ import { TileBase } from './TileBase';
 import { ProjectAvatars } from './ProjectAvatars';
 import { BadgeChip, pickPrimaryBadge } from '../badges/ProjectBadges';
 import { projectCourseLine, projectMentorName, projectHref, formatSubmittedDate } from './projectTileHelpers';
+import { getWidgetBaseUrl } from './widgetBaseUrl';
 
 export type ProjectTileContext = 'public' | 'withinCourse';
 
@@ -17,9 +18,14 @@ interface ProjectTileProps {
   context: ProjectTileContext;
   /** Course context for the link / course line when rendered within a course. */
   courseId?: number;
+  /**
+   * Widget embed mode: link to an absolute EduHub URL and open in a new tab,
+   * since the tile is rendered inside a third-party iframe.
+   */
+  isWidget?: boolean;
 }
 
-export const ProjectTile: FC<ProjectTileProps> = ({ project, context, courseId }) => {
+const ProjectTileComponent: FC<ProjectTileProps> = ({ project, context, courseId, isWidget = false }) => {
   const t = useTranslations('project');
   const locale = useLocale();
   const isPublished = project.status === ProjectStatus_enum.PUBLISHED;
@@ -29,9 +35,8 @@ export const ProjectTile: FC<ProjectTileProps> = ({ project, context, courseId }
   const primaryBadge = pickPrimaryBadge(project.ProjectBadges);
   const submittedLabel = formatSubmittedDate(project.submittedAt, locale);
 
-  return (
-    <Link href={href}>
-      <TileBase coverImage={project.coverImageUrl ?? null} title={project.title}>
+  const tile = (
+    <TileBase coverImage={project.coverImageUrl ?? null} title={project.title}>
         {isPublished ? (
           // Tile A — published showcase
           <>
@@ -70,7 +75,18 @@ export const ProjectTile: FC<ProjectTileProps> = ({ project, context, courseId }
             </span>
           </>
         )}
-      </TileBase>
-    </Link>
+    </TileBase>
   );
+
+  if (isWidget) {
+    return (
+      <a href={`${getWidgetBaseUrl()}${href}`} target="_blank" rel="noopener noreferrer" className="block">
+        {tile}
+      </a>
+    );
+  }
+
+  return <Link href={href}>{tile}</Link>;
 };
+
+export const ProjectTile = memo(ProjectTileComponent);

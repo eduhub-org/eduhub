@@ -13,6 +13,9 @@ export interface DeleteBadge_delete_Badge_by_pk {
 }
 
 export interface DeleteBadge {
+  /**
+   * delete single row from the table: "Badge"
+   */
   delete_Badge_by_pk: DeleteBadge_delete_Badge_by_pk | null;
 }
 

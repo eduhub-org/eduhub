@@ -24,6 +24,9 @@ export interface AdminBadges_Badge {
   description: string | null;
   icon: string | null;
   updated_at: any;
+  /**
+   * An aggregate relationship
+   */
   ProjectBadges_aggregate: AdminBadges_Badge_ProjectBadges_aggregate;
 }
 
@@ -38,7 +41,13 @@ export interface AdminBadges_Badge_aggregate {
 }
 
 export interface AdminBadges {
+  /**
+   * fetch data from the table: "Badge"
+   */
   Badge: AdminBadges_Badge[];
+  /**
+   * fetch aggregated fields from the table: "Badge"
+   */
   Badge_aggregate: AdminBadges_Badge_aggregate;
 }
 

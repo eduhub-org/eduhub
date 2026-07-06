@@ -304,6 +304,8 @@
     },
     "widget_error_loading_courses": "Fehler beim Laden der Kurse",
     "widget_no_courses_available": "Keine Kurse verfügbar",
+    "widget_error_loading_projects": "Fehler beim Laden der Projekte",
+    "widget_no_projects_available": "Keine Projekte verfügbar",
     "page_not_found": "Seite nicht gefunden",
     "page_not_found_description": "Die Seite, die du suchst, existiert leider nicht. Sie wurde möglicherweise verschoben oder gelöscht.",
     "back_to_home": "Zur Startseite",

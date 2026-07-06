@@ -17,7 +17,8 @@ import {
   CourseTemplateProjectTiles,
   CourseTemplateProjectTilesVariables,
 } from '../../../queries/__generated__/CourseTemplateProjectTiles';
-import ProjectTileSlider from './ProjectTileSlider';
+import TileSlider from '.';
+import { ProjectTile } from './ProjectTile';
 
 interface CourseProjectsSectionProps {
   courseId: number;
@@ -66,13 +67,19 @@ const CourseProjectsSection: FC<CourseProjectsSectionProps> = ({ courseId }) => 
       {templates.length > 0 && (
         <div>
           <h2 className="text-2xl font-semibold text-left mb-2">{t('course_section.open_templates')}</h2>
-          <ProjectTileSlider projects={templates} context="withinCourse" courseId={courseId} />
+          <TileSlider
+            items={templates}
+            renderTile={(project) => <ProjectTile project={project} context="withinCourse" courseId={courseId} />}
+          />
         </div>
       )}
       {published.length > 0 && (
         <div>
           <h2 className="text-2xl font-semibold text-left mb-2">{t('course_section.past_projects')}</h2>
-          <ProjectTileSlider projects={published} context="withinCourse" courseId={courseId} />
+          <TileSlider
+            items={published}
+            renderTile={(project) => <ProjectTile project={project} context="withinCourse" courseId={courseId} />}
+          />
         </div>
       )}
     </div>

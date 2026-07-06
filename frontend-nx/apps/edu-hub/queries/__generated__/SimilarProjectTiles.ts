@@ -106,6 +106,20 @@ export interface SimilarProjectTiles_Project_ProjectCourses_Course_Program {
   lectureEnd: any | null;
 }
 
+export interface SimilarProjectTiles_Project_ProjectCourses_Course_CourseGroups_CourseGroupOption {
+  __typename: "CourseGroupOption";
+  id: number;
+  order: number;
+}
+
+export interface SimilarProjectTiles_Project_ProjectCourses_Course_CourseGroups {
+  __typename: "CourseGroup";
+  /**
+   * An object relationship
+   */
+  CourseGroupOption: SimilarProjectTiles_Project_ProjectCourses_Course_CourseGroups_CourseGroupOption;
+}
+
 export interface SimilarProjectTiles_Project_ProjectCourses_Course {
   __typename: "Course";
   id: number;
@@ -121,6 +135,10 @@ export interface SimilarProjectTiles_Project_ProjectCourses_Course {
    * An object relationship
    */
   Program: SimilarProjectTiles_Project_ProjectCourses_Course_Program;
+  /**
+   * An array relationship
+   */
+  CourseGroups: SimilarProjectTiles_Project_ProjectCourses_Course_CourseGroups[];
 }
 
 export interface SimilarProjectTiles_Project_ProjectCourses {

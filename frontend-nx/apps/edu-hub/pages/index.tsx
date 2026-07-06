@@ -8,7 +8,8 @@ import { ClientOnly } from '@opencampus/shared-components';
 
 import { Page } from '../components/layout/Page';
 import Loading from '../components/common/Loading';
-import TileSlider from '../components/common/TileSlider';
+import TileSlider, { CourseType } from '../components/common/TileSlider';
+import { Tile } from '../components/common/TileSlider/Tile';
 import HomeProjectSlider from '../components/common/TileSlider/HomeProjectSlider';
 import FaqSection from '../components/common/FaqSection';
 import NotificationSnackbar from '../components/common/dialogs/NotificationSnackbar';
@@ -145,7 +146,10 @@ const Home: FC = () => {
               {slider.title ? sliderLabel(slider.title) : '—'}
             </h2>
             <div className="mt-2 mb-12">
-              <TileSlider courses={slider.courses as import('../components/common/TileSlider').CourseType[]} isManage={false} />
+              <TileSlider
+                items={slider.courses as CourseType[]}
+                renderTile={(course) => <Tile course={course} isManage={false} />}
+              />
             </div>
           </Fragment>
         );
@@ -170,7 +174,10 @@ const Home: FC = () => {
                   : '—'}
               </h2>
               <div className="mt-2 mb-12">
-                <TileSlider courses={group.courses as import('../components/common/TileSlider').CourseType[]} isManage={group.isManaged ?? false} />
+                <TileSlider
+                  items={group.courses as CourseType[]}
+                  renderTile={(course) => <Tile course={course} isManage={group.isManaged ?? false} />}
+                />
               </div>
             </Fragment>
           )

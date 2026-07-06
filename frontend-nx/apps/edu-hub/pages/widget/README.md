@@ -1,4 +1,13 @@
-# Course Widget Documentation
+# EduHub Widget Documentation
+
+EduHub exposes two embeddable widgets that external organizations can drop into
+their websites via a simple iframe:
+
+- **`/widget/courses`** — a slider of published courses (documented below).
+- **`/widget/projects`** — a slider of public projects (see [Project Widget](#project-widget)).
+
+Both widgets share the same transparent, borderless, responsive styling and the
+same base-URL/API-key behaviour.
 
 ## Overview
 
@@ -153,12 +162,82 @@ You can customize the iframe appearance:
 </iframe>
 ```
 
+## Project Widget
+
+The Project Widget (`/widget/projects`) embeds a slider of public projects. It
+reuses the same slider shell and styling as the course widget; only the tile
+content and data source differ.
+
+**Home-eligible projects** are shown: published showcase projects plus open
+project templates (proposed, still accepting participants). Tiles link to the
+public project page and open in a new tab.
+
+### Simple Embed (All Projects)
+
+```html
+<iframe
+  src="https://edu.opencampus.sh/widget/projects"
+  frameborder="0"
+  style="width:100%; height:435px; border:none; background:transparent;">
+</iframe>
+```
+
+### Filter by Course Group
+
+Same query parameters as the course widget (`group`, `groups`):
+
+```html
+<iframe
+  src="https://edu.opencampus.sh/widget/projects?group=1&locale=de"
+  frameborder="0"
+  style="width:100%; height:435px; border:none; background:transparent;">
+</iframe>
+```
+
+Multiple groups (comma-separated option ids):
+
+```html
+<iframe
+  src="https://edu.opencampus.sh/widget/projects?groups=3,7&locale=de"
+  frameborder="0"
+  style="width:100%; height:435px; border:none; background:transparent;">
+</iframe>
+```
+
+Projects are matched when any linked course belongs to the selected course group
+(or program type, for program-type-based groups).
+
+### Organization-Specific Projects (with API Key)
+
+```html
+<iframe
+  src="https://edu.opencampus.sh/widget/projects?apiKey=edh_live_org123_sk_abcdef1234567890&locale=en"
+  frameborder="0"
+  style="width:100%; height:435px; border:none; background:transparent;">
+</iframe>
+```
+
+### Query Parameters
+
+Uses the same parameters as the course widget:
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `group` | number | No | Filter by course group order (1–5). If not provided, shows all home-eligible projects. |
+| `groups` | string | No | Comma-separated `CourseGroupOption` ids. Projects linked to a course in any matching group are included. |
+| `locale` | string | No | Language code (`de` or `en`). Defaults to German. |
+| `apiKey` | string | No | Organization API key. When valid, only that organization's projects are shown (server-side). Format: `edh_live_org123_sk_...` |
+
+When neither `group` nor `groups` is provided, all home-eligible projects are
+shown (most recently updated first). Organization scoping uses `Project.organizationId`
+on the server, analogous to course funding-organization filtering.
+
 ## Security Considerations
 
 - The widget uses CORS headers to allow embedding from any domain
 - API keys are validated server-side
-- Only published courses are displayed
-- The widget route is excluded from search engine indexing (`noindex, nofollow`)
+- Only published courses / home-eligible projects are displayed
+- The widget routes are excluded from search engine indexing (`noindex, nofollow`)
 
 ## Support
 

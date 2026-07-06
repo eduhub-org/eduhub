@@ -60,6 +60,12 @@ export const PROJECT_TILE_FRAGMENT = gql`
           published
           lectureEnd
         }
+        CourseGroups {
+          CourseGroupOption {
+            id
+            order
+          }
+        }
       }
     }
   }
@@ -86,6 +92,32 @@ export const HOME_PROJECT_TILES_ALL = gql`
       order_by: { updated_at: desc }
       limit: $limit
       offset: $offset
+    ) {
+      ...ProjectTileFragment
+    }
+  }
+`;
+
+// Home / widget — home-eligible projects for a single organization (server-side
+// scoping, mirrors COURSE_TILES_BY_ORGANIZATION in the course widget).
+export const HOME_PROJECT_TILES_BY_ORGANIZATION = gql`
+  ${PROJECT_TILE_FRAGMENT}
+  query HomeProjectTilesByOrganization($organizationId: Int!) {
+    Project(
+      where: {
+        organizationId: { _eq: $organizationId }
+        _or: [
+          { status: { _eq: PUBLISHED } }
+          {
+            _and: [
+              { status: { _eq: PROPOSED } }
+              { acceptingParticipants: { _eq: true } }
+              { _not: { ProjectAuthors: { participationStatus: { _eq: ACCEPTED } } } }
+            ]
+          }
+        ]
+      }
+      order_by: { updated_at: desc }
     ) {
       ...ProjectTileFragment
     }

@@ -17,7 +17,8 @@ import {
 import { ProjectPageFragment } from '../../../queries/__generated__/ProjectPageFragment';
 import { getBackgroundImage } from '../../../helpers/imageHandling';
 import { Button } from '../../common/Button';
-import ProjectTileSlider from '../../common/TileSlider/ProjectTileSlider';
+import TileSlider from '../../common/TileSlider';
+import { ProjectTile } from '../../common/TileSlider/ProjectTile';
 import { BadgeBanner, pickPrimaryBadge } from '../../common/badges/ProjectBadges';
 import { Avatar } from '../../shared-components';
 
@@ -170,7 +171,7 @@ const ProjectContent: FC<ProjectContentProps> = ({ id, context, courseId }) => {
             {similar.length > 0 && (
               <section>
                 <h2 className="text-2xl font-semibold mb-2">{t('similar.title')}</h2>
-                <ProjectTileSlider projects={similar} context="public" />
+                <TileSlider items={similar} renderTile={(project) => <ProjectTile project={project} context="public" />} />
               </section>
             )}
           </div>

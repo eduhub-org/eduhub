@@ -1,4 +1,4 @@
-import React, { FC, useRef, useState, memo, useEffect } from 'react';
+import React, { FC, ReactNode, useRef, useState, useEffect } from 'react';
 import { Mousewheel } from 'swiper/modules';
 import { Swiper, SwiperSlide, SwiperRef } from 'swiper/react';
 import 'swiper/css';
@@ -8,14 +8,19 @@ import { useTranslations } from 'next-intl';
 import { CourseList_Course } from '../../../queries/__generated__/CourseList';
 import { CourseTiles_Course } from '../../../queries/__generated__/CourseTiles';
 import { CoursesEnrolledByUser_Course } from '../../../queries/__generated__/CoursesEnrolledByUser';
-import { Tile } from './Tile';
-import { TileWidget } from './TileWidget';
 
 export type CourseType = CourseList_Course | CourseTiles_Course | CoursesEnrolledByUser_Course;
 
-interface TileSliderProps {
-  courses: CourseType[];
-  isManage: boolean;
+/** Minimal shape every tile item must expose so the shell can key each slide. */
+export interface TileSliderItem {
+  id: number | string;
+}
+
+interface TileSliderProps<T extends TileSliderItem> {
+  items: T[];
+  /** Renders the tile content for a single item (course, project, …). */
+  renderTile: (item: T) => ReactNode;
+  /** Widget embed mode: transparent background, visible overflow, taller nav. */
   isWidget?: boolean;
 }
 
@@ -45,8 +50,6 @@ const NavButton: FC<NavButtonProps> = ({ idSuffix, className, visible, onClick, 
   </button>
 );
 
-const LazyTile = memo(Tile);
-const LazyTileWidget = memo(TileWidget);
 const COMMON_SPACE_BETWEEN = 11;
 const COMMON_OFFSET = 12;
 
@@ -59,7 +62,12 @@ const breakpoints = {
   1536: { spaceBetween: COMMON_SPACE_BETWEEN },
 };
 
-const TileSlider: FC<TileSliderProps> = ({ courses, isManage, isWidget = false }) => {
+/**
+ * Shared horizontal tile carousel (Swiper). Content-agnostic: callers supply the
+ * items and a `renderTile` callback, so courses, projects, widgets, etc. all reuse
+ * the same shell, nav arrows, resize handling and Swiper resilience.
+ */
+function TileSlider<T extends TileSliderItem>({ items, renderTile, isWidget = false }: TileSliderProps<T>) {
   const t = useTranslations('common');
   const swiperRef = useRef<SwiperRef | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -90,7 +98,7 @@ const TileSlider: FC<TileSliderProps> = ({ courses, isManage, isWidget = false }
     const checkIfAllTilesFit = () => {
       const containerWidth = containerRef.current ? containerRef.current.offsetWidth : 0;
       const tileWidth = calculateTileWidth();
-      const totalTileWidth = courses.length * tileWidth;
+      const totalTileWidth = items.length * tileWidth;
       setNextVisible(totalTileWidth > containerWidth);
     };
     checkIfAllTilesFit();
@@ -98,7 +106,7 @@ const TileSlider: FC<TileSliderProps> = ({ courses, isManage, isWidget = false }
     return () => {
       window.removeEventListener('resize', checkIfAllTilesFit);
     };
-  }, [courses]);
+  }, [items]);
 
   // Ensure we're on the client side before initializing Swiper
   useEffect(() => {
@@ -124,7 +132,7 @@ const TileSlider: FC<TileSliderProps> = ({ courses, isManage, isWidget = false }
     if (!containerRef.current) return;
 
     const container = containerRef.current;
-    
+
     const handleWheel = (e: WheelEvent) => {
       // Only prevent default for horizontal scrolling
       if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
@@ -139,8 +147,8 @@ const TileSlider: FC<TileSliderProps> = ({ courses, isManage, isWidget = false }
     };
   }, []);
 
-  // Don't render Swiper if no courses
-  if (!courses || courses.length === 0) {
+  // Don't render Swiper if no items
+  if (!items || items.length === 0) {
     return <div className="relative h-[431px]" ref={containerRef} />;
   }
 
@@ -153,7 +161,7 @@ const TileSlider: FC<TileSliderProps> = ({ courses, isManage, isWidget = false }
     );
   }
 
-  // If there was an error, render a fallback
+  // If there was an error, render a static fallback grid using the same tiles
   if (hasError) {
     return (
       <div className="relative h-[431px]" ref={containerRef}>
@@ -161,11 +169,8 @@ const TileSlider: FC<TileSliderProps> = ({ courses, isManage, isWidget = false }
           <div className="text-center">
             <p className="text-gray-500 mb-4">{t('tile_slider_unavailable')}</p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {courses.slice(0, 3).map((course) => (
-                <div key={course.id} className="bg-white rounded-lg shadow p-4">
-                  <h3 className="font-semibold">{course.title}</h3>
-                  <p className="text-sm text-gray-600">{course.tagline || t('no_description_available')}</p>
-                </div>
+              {items.slice(0, 3).map((item) => (
+                <div key={item.id}>{renderTile(item)}</div>
               ))}
             </div>
           </div>
@@ -175,8 +180,8 @@ const TileSlider: FC<TileSliderProps> = ({ courses, isManage, isWidget = false }
   }
 
   return (
-    <div 
-      className={`relative ${isWidget ? 'h-[435px] bg-transparent overflow-hidden' : 'h-[431px]'}`} 
+    <div
+      className={`relative ${isWidget ? 'h-[435px] bg-transparent overflow-hidden' : 'h-[431px]'}`}
       ref={containerRef}
       style={{ overscrollBehaviorX: 'contain' }}
     >
@@ -224,17 +229,13 @@ const TileSlider: FC<TileSliderProps> = ({ courses, isManage, isWidget = false }
           }
         }}
       >
-        {courses.map((course) => (
-          <SwiperSlide key={course.id} className="whitespace-normal !h-[431px] !w-[275px] xs:!w-[325px]">
-            {isWidget ? (
-              <LazyTileWidget course={course} />
-            ) : (
-              <LazyTile course={course} isManage={isManage} />
-            )}
+        {items.map((item) => (
+          <SwiperSlide key={item.id} className="whitespace-normal !h-[431px] !w-[275px] xs:!w-[325px]">
+            {renderTile(item)}
           </SwiperSlide>
         ))}
       </Swiper>
-      {courses.length > 1 && isSwiperReady && (
+      {items.length > 1 && isSwiperReady && (
         <>
           <NavButton
             idSuffix={`prev-${idSuffix}`}
@@ -258,6 +259,6 @@ const TileSlider: FC<TileSliderProps> = ({ courses, isManage, isWidget = false }
       )}
     </div>
   );
-};
+}
 
 export default TileSlider;

@@ -12,7 +12,8 @@ import {
   HomeProjectTilesByGroupsVariables,
 } from '../../../queries/__generated__/HomeProjectTilesByGroups';
 import { CourseGroupOptions_CourseGroupOption } from '../../../queries/__generated__/CourseGroupOptions';
-import ProjectTileSlider from './ProjectTileSlider';
+import TileSlider from '.';
+import { ProjectTile } from './ProjectTile';
 
 interface HomeProjectSliderProps {
   option: CourseGroupOptions_CourseGroupOption;
@@ -82,7 +83,7 @@ const HomeProjectSlider: FC<HomeProjectSliderProps> = ({ option, title }) => {
     <>
       {heading}
       <div className="mt-2 mb-12">
-        <ProjectTileSlider projects={projects} context="public" />
+        <TileSlider items={projects} renderTile={(project) => <ProjectTile project={project} context="public" />} />
       </div>
     </>
   );

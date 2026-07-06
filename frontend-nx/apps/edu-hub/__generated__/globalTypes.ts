@@ -334,26 +334,6 @@ export enum Attendance_update_column {
 }
 
 /**
- * unique or primary key constraints on table "BadgeStatus"
- */
-export enum BadgeStatus_constraint {
-  BadgeStatus_pkey = "BadgeStatus_pkey",
-}
-
-export enum BadgeStatus_enum {
-  NOMINATED = "NOMINATED",
-  WON = "WON",
-}
-
-/**
- * update columns of table "BadgeStatus"
- */
-export enum BadgeStatus_update_column {
-  comment = "comment",
-  value = "value",
-}
-
-/**
  * unique or primary key constraints on table "Badge"
  */
 export enum Badge_constraint {
@@ -368,8 +348,6 @@ export enum Badge_update_column {
   description = "description",
   icon = "icon",
   id = "id",
-  order = "order",
-  organizationId = "organizationId",
   title = "title",
   updated_at = "updated_at",
 }
@@ -1507,7 +1485,6 @@ export enum ProjectBadge_select_column {
   created_at = "created_at",
   id = "id",
   projectId = "projectId",
-  status = "status",
   updated_at = "updated_at",
 }
 
@@ -1519,7 +1496,6 @@ export enum ProjectBadge_update_column {
   created_at = "created_at",
   id = "id",
   projectId = "projectId",
-  status = "status",
   updated_at = "updated_at",
 }
 
@@ -3417,60 +3393,9 @@ export interface Attendance_variance_order_by {
 }
 
 /**
- * Boolean expression to filter rows from the table "BadgeStatus". All fields are combined with a logical 'AND'.
- */
-export interface BadgeStatus_bool_exp {
-  ProjectBadges?: ProjectBadge_bool_exp | null;
-  ProjectBadges_aggregate?: ProjectBadge_aggregate_bool_exp | null;
-  _and?: BadgeStatus_bool_exp[] | null;
-  _not?: BadgeStatus_bool_exp | null;
-  _or?: BadgeStatus_bool_exp[] | null;
-  comment?: String_comparison_exp | null;
-  value?: String_comparison_exp | null;
-}
-
-/**
- * Boolean expression to compare columns of type "BadgeStatus_enum". All fields are combined with logical 'AND'.
- */
-export interface BadgeStatus_enum_comparison_exp {
-  _eq?: BadgeStatus_enum | null;
-  _in?: BadgeStatus_enum[] | null;
-  _is_null?: boolean | null;
-  _neq?: BadgeStatus_enum | null;
-  _nin?: BadgeStatus_enum[] | null;
-}
-
-/**
- * input type for inserting data into table "BadgeStatus"
- */
-export interface BadgeStatus_insert_input {
-  ProjectBadges?: ProjectBadge_arr_rel_insert_input | null;
-  comment?: string | null;
-  value?: string | null;
-}
-
-/**
- * input type for inserting object relation for remote table "BadgeStatus"
- */
-export interface BadgeStatus_obj_rel_insert_input {
-  data: BadgeStatus_insert_input;
-  on_conflict?: BadgeStatus_on_conflict | null;
-}
-
-/**
- * on_conflict condition type for table "BadgeStatus"
- */
-export interface BadgeStatus_on_conflict {
-  constraint: BadgeStatus_constraint;
-  update_columns: BadgeStatus_update_column[];
-  where?: BadgeStatus_bool_exp | null;
-}
-
-/**
  * Boolean expression to filter rows from the table "Badge". All fields are combined with a logical 'AND'.
  */
 export interface Badge_bool_exp {
-  Organization?: Organization_bool_exp | null;
   ProjectBadges?: ProjectBadge_bool_exp | null;
   ProjectBadges_aggregate?: ProjectBadge_aggregate_bool_exp | null;
   _and?: Badge_bool_exp[] | null;
@@ -3480,8 +3405,6 @@ export interface Badge_bool_exp {
   description?: String_comparison_exp | null;
   icon?: String_comparison_exp | null;
   id?: Int_comparison_exp | null;
-  order?: Int_comparison_exp | null;
-  organizationId?: Int_comparison_exp | null;
   title?: String_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
 }
@@ -3490,14 +3413,11 @@ export interface Badge_bool_exp {
  * input type for inserting data into table "Badge"
  */
 export interface Badge_insert_input {
-  Organization?: Organization_obj_rel_insert_input | null;
   ProjectBadges?: ProjectBadge_arr_rel_insert_input | null;
   created_at?: any | null;
   description?: string | null;
   icon?: string | null;
   id?: number | null;
-  order?: number | null;
-  organizationId?: number | null;
   title?: string | null;
   updated_at?: any | null;
 }
@@ -8181,7 +8101,6 @@ export interface ProjectBadge_avg_order_by {
  */
 export interface ProjectBadge_bool_exp {
   Badge?: Badge_bool_exp | null;
-  BadgeStatus?: BadgeStatus_bool_exp | null;
   Project?: Project_bool_exp | null;
   _and?: ProjectBadge_bool_exp[] | null;
   _not?: ProjectBadge_bool_exp | null;
@@ -8190,7 +8109,6 @@ export interface ProjectBadge_bool_exp {
   created_at?: timestamptz_comparison_exp | null;
   id?: Int_comparison_exp | null;
   projectId?: Int_comparison_exp | null;
-  status?: BadgeStatus_enum_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
 }
 
@@ -8199,13 +8117,11 @@ export interface ProjectBadge_bool_exp {
  */
 export interface ProjectBadge_insert_input {
   Badge?: Badge_obj_rel_insert_input | null;
-  BadgeStatus?: BadgeStatus_obj_rel_insert_input | null;
   Project?: Project_obj_rel_insert_input | null;
   badgeId?: number | null;
   created_at?: any | null;
   id?: number | null;
   projectId?: number | null;
-  status?: BadgeStatus_enum | null;
   updated_at?: any | null;
 }
 

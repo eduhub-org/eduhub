@@ -304,6 +304,8 @@
     },
     "widget_error_loading_courses": "Error loading courses",
     "widget_no_courses_available": "No courses available",
+    "widget_error_loading_projects": "Error loading projects",
+    "widget_no_projects_available": "No projects available",
     "page_not_found": "Page not found",
     "page_not_found_description": "The page you're looking for doesn't exist. It may have been moved or deleted.",
     "back_to_home": "Back to home",

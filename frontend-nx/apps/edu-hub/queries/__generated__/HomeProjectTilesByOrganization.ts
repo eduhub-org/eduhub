@@ -6,16 +6,16 @@
 import { ProjectStatus_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
-// GraphQL query operation: HomeProjectTilesByGroups
+// GraphQL query operation: HomeProjectTilesByOrganization
 // ====================================================
 
-export interface HomeProjectTilesByGroups_Project_Organization {
+export interface HomeProjectTilesByOrganization_Project_Organization {
   __typename: "Organization";
   id: number;
   name: string;
 }
 
-export interface HomeProjectTilesByGroups_Project_ProjectMentors_User {
+export interface HomeProjectTilesByOrganization_Project_ProjectMentors_User {
   __typename: "User";
   id: any;
   /**
@@ -32,16 +32,16 @@ export interface HomeProjectTilesByGroups_Project_ProjectMentors_User {
   picture: string | null;
 }
 
-export interface HomeProjectTilesByGroups_Project_ProjectMentors {
+export interface HomeProjectTilesByOrganization_Project_ProjectMentors {
   __typename: "ProjectMentor";
   id: number;
   /**
    * An object relationship
    */
-  User: HomeProjectTilesByGroups_Project_ProjectMentors_User;
+  User: HomeProjectTilesByOrganization_Project_ProjectMentors_User;
 }
 
-export interface HomeProjectTilesByGroups_Project_ProjectAuthors_User {
+export interface HomeProjectTilesByOrganization_Project_ProjectAuthors_User {
   __typename: "User";
   id: any;
   /**
@@ -58,16 +58,16 @@ export interface HomeProjectTilesByGroups_Project_ProjectAuthors_User {
   picture: string | null;
 }
 
-export interface HomeProjectTilesByGroups_Project_ProjectAuthors {
+export interface HomeProjectTilesByOrganization_Project_ProjectAuthors {
   __typename: "ProjectAuthor";
   id: number;
   /**
    * An object relationship
    */
-  User: HomeProjectTilesByGroups_Project_ProjectAuthors_User;
+  User: HomeProjectTilesByOrganization_Project_ProjectAuthors_User;
 }
 
-export interface HomeProjectTilesByGroups_Project_ProjectBadges_Badge {
+export interface HomeProjectTilesByOrganization_Project_ProjectBadges_Badge {
   __typename: "Badge";
   id: number;
   title: string;
@@ -75,16 +75,16 @@ export interface HomeProjectTilesByGroups_Project_ProjectBadges_Badge {
   icon: string | null;
 }
 
-export interface HomeProjectTilesByGroups_Project_ProjectBadges {
+export interface HomeProjectTilesByOrganization_Project_ProjectBadges {
   __typename: "ProjectBadge";
   id: number;
   /**
    * An object relationship
    */
-  Badge: HomeProjectTilesByGroups_Project_ProjectBadges_Badge;
+  Badge: HomeProjectTilesByOrganization_Project_ProjectBadges_Badge;
 }
 
-export interface HomeProjectTilesByGroups_Project_ProjectCourses_Course_Program {
+export interface HomeProjectTilesByOrganization_Project_ProjectCourses_Course_Program {
   __typename: "Program";
   id: number;
   /**
@@ -106,21 +106,21 @@ export interface HomeProjectTilesByGroups_Project_ProjectCourses_Course_Program 
   lectureEnd: any | null;
 }
 
-export interface HomeProjectTilesByGroups_Project_ProjectCourses_Course_CourseGroups_CourseGroupOption {
+export interface HomeProjectTilesByOrganization_Project_ProjectCourses_Course_CourseGroups_CourseGroupOption {
   __typename: "CourseGroupOption";
   id: number;
   order: number;
 }
 
-export interface HomeProjectTilesByGroups_Project_ProjectCourses_Course_CourseGroups {
+export interface HomeProjectTilesByOrganization_Project_ProjectCourses_Course_CourseGroups {
   __typename: "CourseGroup";
   /**
    * An object relationship
    */
-  CourseGroupOption: HomeProjectTilesByGroups_Project_ProjectCourses_Course_CourseGroups_CourseGroupOption;
+  CourseGroupOption: HomeProjectTilesByOrganization_Project_ProjectCourses_Course_CourseGroups_CourseGroupOption;
 }
 
-export interface HomeProjectTilesByGroups_Project_ProjectCourses_Course {
+export interface HomeProjectTilesByOrganization_Project_ProjectCourses_Course {
   __typename: "Course";
   id: number;
   /**
@@ -134,24 +134,24 @@ export interface HomeProjectTilesByGroups_Project_ProjectCourses_Course {
   /**
    * An object relationship
    */
-  Program: HomeProjectTilesByGroups_Project_ProjectCourses_Course_Program;
+  Program: HomeProjectTilesByOrganization_Project_ProjectCourses_Course_Program;
   /**
    * An array relationship
    */
-  CourseGroups: HomeProjectTilesByGroups_Project_ProjectCourses_Course_CourseGroups[];
+  CourseGroups: HomeProjectTilesByOrganization_Project_ProjectCourses_Course_CourseGroups[];
 }
 
-export interface HomeProjectTilesByGroups_Project_ProjectCourses {
+export interface HomeProjectTilesByOrganization_Project_ProjectCourses {
   __typename: "ProjectCourse";
   id: number;
   courseId: number;
   /**
    * An object relationship
    */
-  Course: HomeProjectTilesByGroups_Project_ProjectCourses_Course;
+  Course: HomeProjectTilesByOrganization_Project_ProjectCourses_Course;
 }
 
-export interface HomeProjectTilesByGroups_Project {
+export interface HomeProjectTilesByOrganization_Project {
   __typename: "Project";
   id: number;
   title: string;
@@ -167,35 +167,32 @@ export interface HomeProjectTilesByGroups_Project {
   /**
    * An object relationship
    */
-  Organization: HomeProjectTilesByGroups_Project_Organization | null;
+  Organization: HomeProjectTilesByOrganization_Project_Organization | null;
   /**
    * An array relationship
    */
-  ProjectMentors: HomeProjectTilesByGroups_Project_ProjectMentors[];
+  ProjectMentors: HomeProjectTilesByOrganization_Project_ProjectMentors[];
   /**
    * An array relationship
    */
-  ProjectAuthors: HomeProjectTilesByGroups_Project_ProjectAuthors[];
+  ProjectAuthors: HomeProjectTilesByOrganization_Project_ProjectAuthors[];
   /**
    * An array relationship
    */
-  ProjectBadges: HomeProjectTilesByGroups_Project_ProjectBadges[];
+  ProjectBadges: HomeProjectTilesByOrganization_Project_ProjectBadges[];
   /**
    * An array relationship
    */
-  ProjectCourses: HomeProjectTilesByGroups_Project_ProjectCourses[];
+  ProjectCourses: HomeProjectTilesByOrganization_Project_ProjectCourses[];
 }
 
-export interface HomeProjectTilesByGroups {
+export interface HomeProjectTilesByOrganization {
   /**
    * fetch data from the table: "Project"
    */
-  Project: HomeProjectTilesByGroups_Project[];
+  Project: HomeProjectTilesByOrganization_Project[];
 }
 
-export interface HomeProjectTilesByGroupsVariables {
-  courseGroupIds: number[];
-  projectGroupIds: number[];
-  limit?: number | null;
-  offset?: number | null;
+export interface HomeProjectTilesByOrganizationVariables {
+  organizationId: number;
 }

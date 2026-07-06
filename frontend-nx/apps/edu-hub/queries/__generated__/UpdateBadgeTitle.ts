@@ -14,6 +14,9 @@ export interface UpdateBadgeTitle_update_Badge_by_pk {
 }
 
 export interface UpdateBadgeTitle {
+  /**
+   * update single row of the table: "Badge"
+   */
   update_Badge_by_pk: UpdateBadgeTitle_update_Badge_by_pk | null;
 }
 

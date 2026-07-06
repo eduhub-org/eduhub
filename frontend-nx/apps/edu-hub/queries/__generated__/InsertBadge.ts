@@ -14,6 +14,9 @@ export interface InsertBadge_insert_Badge_one {
 }
 
 export interface InsertBadge {
+  /**
+   * insert a single row into the table: "Badge"
+   */
   insert_Badge_one: InsertBadge_insert_Badge_one | null;
 }
 
