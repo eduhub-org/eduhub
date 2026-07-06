@@ -36,11 +36,15 @@ export const useWidgetApiKey = (
       setValidating(true);
       setError(null);
 
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 8000);
+
       try {
         const response = await fetch('/api/widget/validate-api-key', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ apiKey }),
+          signal: controller.signal,
         });
 
         const data = await response.json();
@@ -59,6 +63,7 @@ export const useWidgetApiKey = (
         }
         setError('Failed to validate API key');
       } finally {
+        clearTimeout(timeoutId);
         if (!cancelled) {
           setValidating(false);
         }

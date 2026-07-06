@@ -102,7 +102,7 @@ export const HOME_PROJECT_TILES_ALL = gql`
 // scoping, mirrors COURSE_TILES_BY_ORGANIZATION in the course widget).
 export const HOME_PROJECT_TILES_BY_ORGANIZATION = gql`
   ${PROJECT_TILE_FRAGMENT}
-  query HomeProjectTilesByOrganization($organizationId: Int!) {
+  query HomeProjectTilesByOrganization($organizationId: Int!, $limit: Int = 24, $offset: Int = 0) {
     Project(
       where: {
         organizationId: { _eq: $organizationId }
@@ -118,6 +118,8 @@ export const HOME_PROJECT_TILES_BY_ORGANIZATION = gql`
         ]
       }
       order_by: { updated_at: desc }
+      limit: $limit
+      offset: $offset
     ) {
       ...ProjectTileFragment
     }

@@ -195,4 +195,6 @@ export interface HomeProjectTilesByOrganization {
 
 export interface HomeProjectTilesByOrganizationVariables {
   organizationId: number;
+  limit?: number | null;
+  offset?: number | null;
 }

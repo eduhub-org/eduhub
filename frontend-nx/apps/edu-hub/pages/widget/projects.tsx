@@ -77,7 +77,9 @@ const WidgetProjects: FC = () => {
   ]);
 
   const isLoading = projectsLoading || apiKeyValidating || (selectedGroupIds.length > 0 && groupOptionsLoading);
-  const hasError = Boolean(projectsError || apiKeyError);
+  const hasError = Boolean(
+    projectsError || apiKeyError || (selectedGroupIds.length > 0 && groupOptionsError)
+  );
 
   return (
     <WidgetSliderShell
