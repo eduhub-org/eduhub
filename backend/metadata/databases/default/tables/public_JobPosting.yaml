@@ -1,0 +1,288 @@
+table:
+  name: JobPosting
+  schema: public
+object_relationships:
+  - name: Organization
+    using:
+      foreign_key_constraint_on: organizationId
+  - name: ContactUser
+    using:
+      foreign_key_constraint_on: contactUserId
+  - name: RestrictedToOrganization
+    using:
+      foreign_key_constraint_on: restrictedToOrganizationId
+  - name: JobPostingType
+    using:
+      foreign_key_constraint_on: type
+  - name: JobPostingStatus
+    using:
+      foreign_key_constraint_on: status
+  - name: JobRegion
+    using:
+      foreign_key_constraint_on: region
+  - name: JobOccupation
+    using:
+      foreign_key_constraint_on: occupation
+array_relationships:
+  - name: JobPostingTags
+    using:
+      foreign_key_constraint_on:
+        column: jobPostingId
+        table:
+          name: JobPostingTag
+          schema: public
+  - name: SavedJobPostings
+    using:
+      foreign_key_constraint_on:
+        column: jobPostingId
+        table:
+          name: SavedJobPosting
+          schema: public
+  - name: Invoices
+    using:
+      foreign_key_constraint_on:
+        column: jobPostingId
+        table:
+          name: Invoice
+          schema: public
+select_permissions:
+  # Public job pages must work logged out (SEO). Only published, non-expired,
+  # unrestricted postings are visible; contactUserId stays private.
+  - role: anonymous
+    permission:
+      columns:
+        - id
+        - slug
+        - organizationId
+        - type
+        - status
+        - region
+        - occupation
+        - title
+        - description
+        - shortDescription
+        - requirement
+        - location
+        - salaryText
+        - startText
+        - durationText
+        - applicationDeadline
+        - workExperienceRequired
+        - hoursPerWeek
+        - language
+        - international
+        - internationalDescription
+        - customCompany
+        - featured
+        - pdfUrl
+        - views
+        - publishedAt
+        - expiresAt
+        - legacyStujoId
+        - created_at
+        - updated_at
+      filter:
+        _and:
+          - status:
+              _eq: PUBLISHED
+          - restrictedToOrganizationId:
+              _is_null: true
+          - _or:
+              - expiresAt:
+                  _is_null: true
+              - expiresAt:
+                  _gt: now()
+      allow_aggregations: true
+  # Logged-in users additionally see postings restricted to their university
+  # (replaces the StuJo mandate mechanism, e.g. HAW Kiel).
+  - role: user_access
+    permission:
+      columns:
+        - id
+        - slug
+        - organizationId
+        - type
+        - status
+        - region
+        - occupation
+        - title
+        - description
+        - shortDescription
+        - requirement
+        - location
+        - salaryText
+        - startText
+        - durationText
+        - applicationDeadline
+        - workExperienceRequired
+        - hoursPerWeek
+        - language
+        - international
+        - internationalDescription
+        - customCompany
+        - featured
+        - pdfUrl
+        - views
+        - restrictedToOrganizationId
+        - publishedAt
+        - expiresAt
+        - legacyStujoId
+        - created_at
+        - updated_at
+      filter:
+        _and:
+          - status:
+              _eq: PUBLISHED
+          - _or:
+              - expiresAt:
+                  _is_null: true
+              - expiresAt:
+                  _gt: now()
+          - _or:
+              - restrictedToOrganizationId:
+                  _is_null: true
+              - RestrictedToOrganization:
+                  Users:
+                    id:
+                      _eq: X-Hasura-User-Id
+      allow_aggregations: true
+  # Employers see all of their own organization's postings in every status.
+  - role: org_admin_access
+    permission:
+      columns:
+        - id
+        - slug
+        - organizationId
+        - contactUserId
+        - type
+        - status
+        - region
+        - occupation
+        - title
+        - description
+        - shortDescription
+        - requirement
+        - location
+        - salaryText
+        - startText
+        - durationText
+        - applicationDeadline
+        - workExperienceRequired
+        - hoursPerWeek
+        - language
+        - international
+        - internationalDescription
+        - customCompany
+        - featured
+        - pdfUrl
+        - views
+        - restrictedToOrganizationId
+        - publishedAt
+        - expiresAt
+        - legacyStujoId
+        - created_at
+        - updated_at
+      filter:
+        Organization:
+          OrganizationAdmins:
+            _and:
+              - userId:
+                  _eq: X-Hasura-User-Id
+              - canManageJobs:
+                  _eq: true
+      allow_aggregations: true
+insert_permissions:
+  # Employers create postings for organizations where they hold canManageJobs.
+  # status, featured, publishedAt, expiresAt, slug and views are
+  # server-controlled: publishing happens through the checkout/publish
+  # serverless functions, never directly.
+  - role: org_admin_access
+    permission:
+      columns:
+        - organizationId
+        - contactUserId
+        - type
+        - region
+        - occupation
+        - title
+        - description
+        - shortDescription
+        - requirement
+        - location
+        - salaryText
+        - startText
+        - durationText
+        - applicationDeadline
+        - workExperienceRequired
+        - hoursPerWeek
+        - language
+        - international
+        - internationalDescription
+        - customCompany
+        - pdfUrl
+        - restrictedToOrganizationId
+      check:
+        Organization:
+          OrganizationAdmins:
+            _and:
+              - userId:
+                  _eq: X-Hasura-User-Id
+              - canManageJobs:
+                  _eq: true
+update_permissions:
+  - role: org_admin_access
+    permission:
+      columns:
+        - contactUserId
+        - type
+        - region
+        - occupation
+        - title
+        - description
+        - shortDescription
+        - requirement
+        - location
+        - salaryText
+        - startText
+        - durationText
+        - applicationDeadline
+        - workExperienceRequired
+        - hoursPerWeek
+        - language
+        - international
+        - internationalDescription
+        - customCompany
+        - pdfUrl
+        - restrictedToOrganizationId
+      filter:
+        Organization:
+          OrganizationAdmins:
+            _and:
+              - userId:
+                  _eq: X-Hasura-User-Id
+              - canManageJobs:
+                  _eq: true
+      check:
+        Organization:
+          OrganizationAdmins:
+            _and:
+              - userId:
+                  _eq: X-Hasura-User-Id
+              - canManageJobs:
+                  _eq: true
+delete_permissions:
+  # Only drafts may be deleted; everything else is archived via the
+  # server-side status transitions (paid postings also carry invoices).
+  - role: org_admin_access
+    permission:
+      filter:
+        _and:
+          - status:
+              _eq: DRAFT
+          - Organization:
+              OrganizationAdmins:
+                _and:
+                  - userId:
+                      _eq: X-Hasura-User-Id
+                  - canManageJobs:
+                      _eq: true

@@ -1,0 +1,31 @@
+table:
+  name: JobPostingStatus
+  schema: public
+is_enum: true
+array_relationships:
+  - name: JobPostings
+    using:
+      foreign_key_constraint_on:
+        column: status
+        table:
+          name: JobPosting
+          schema: public
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - value
+        - comment
+      filter: {}
+  - role: user_access
+    permission:
+      columns:
+        - value
+        - comment
+      filter: {}
+  - role: org_admin_access
+    permission:
+      columns:
+        - value
+        - comment
+      filter: {}
