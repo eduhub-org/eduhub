@@ -17,6 +17,13 @@ array_relationships:
           name: CourseGroup
           schema: public
 select_permissions:
+  - role: api_proxy
+    permission:
+      columns:
+        - id
+        - title
+        - sliderGroup
+      filter: {}
   - role: anonymous
     permission:
       columns:

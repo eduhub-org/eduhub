@@ -51,7 +51,7 @@ jobs:
           cp -r ./${CF_FOLDER}/shared_libs/api_clients ./${CF_FOLDER}/callPythonFunction/
 
           # Copy shared Node security helpers into each Node function package
-          for fn in callNodeFunction sendMail updateFromKeycloak addKeycloakRole removeKeycloakRole sendQuestionaires; do
+          for fn in callNodeFunction sendMail sendQuestionaires nodePayments keycloakAdmin; do
             rm -rf ./${CF_FOLDER}/$fn/shared_libs
             mkdir -p ./${CF_FOLDER}/$fn/shared_libs
             cp -r ./${CF_FOLDER}/shared_libs/node ./${CF_FOLDER}/$fn/shared_libs/
@@ -71,26 +71,12 @@ jobs:
           directory: "./${{ inputs.CLOUD_FUNCTION_FOLDER }}/sendMail"
           filename: "../sendMail.zip"
 
-      - name: Zip Archive for updateFromKeycloak
+      - name: Zip Archive for keycloakAdmin
         uses: thedoctor0/zip-release@main
         with:
           type: "zip"
-          directory: "./${{ inputs.CLOUD_FUNCTION_FOLDER }}/updateFromKeycloak"
-          filename: "../updateFromKeycloak.zip"
-
-      - name: Zip Archive for addKeycloakRole
-        uses: thedoctor0/zip-release@main
-        with:
-          type: "zip"
-          directory: "./${{ inputs.CLOUD_FUNCTION_FOLDER }}/addKeycloakRole"
-          filename: "../addKeycloakRole.zip"
-
-      - name: Zip Archive for removeKeycloakRole
-        uses: thedoctor0/zip-release@main
-        with:
-          type: "zip"
-          directory: "./${{ inputs.CLOUD_FUNCTION_FOLDER }}/removeKeycloakRole"
-          filename: "../removeKeycloakRole.zip"
+          directory: "./${{ inputs.CLOUD_FUNCTION_FOLDER }}/keycloakAdmin"
+          filename: "../keycloakAdmin.zip"
 
       - name: Zip Archive for callNodeFunction
         uses: thedoctor0/zip-release@main
@@ -98,6 +84,13 @@ jobs:
           type: "zip"
           directory: "./${{ inputs.CLOUD_FUNCTION_FOLDER }}/callNodeFunction"
           filename: "../callNodeFunction.zip"
+
+      - name: Zip Archive for nodePayments
+        uses: thedoctor0/zip-release@main
+        with:
+          type: "zip"
+          directory: "./${{ inputs.CLOUD_FUNCTION_FOLDER }}/nodePayments"
+          filename: "../nodePayments.zip"
 
       - name: Zip Archive for sendQuestionaires
         uses: thedoctor0/zip-release@main

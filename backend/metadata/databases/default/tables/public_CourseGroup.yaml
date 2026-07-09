@@ -9,6 +9,13 @@ object_relationships:
     using:
       foreign_key_constraint_on: groupOptionId
 select_permissions:
+  - role: api_proxy
+    permission:
+      columns:
+        - id
+        - courseId
+        - groupOptionId
+      filter: {}
   - role: anonymous
     permission:
       columns:

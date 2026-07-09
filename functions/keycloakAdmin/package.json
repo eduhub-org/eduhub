@@ -1,0 +1,23 @@
+{
+  "name": "keycloakAdmin",
+  "version": "0.1.0",
+  "type": "module",
+  "dependencies": {
+    "@keycloak/keycloak-admin-client": "^24.0.5",
+    "body-parser": "1.20.3",
+    "graphqurl": "1.0.1",
+    "node-fetch": "2.6.7",
+    "winston": "^3.3.3"
+  },
+  "devDependencies": {
+    "@google-cloud/functions-framework": "^3.1.2",
+    "npm-watch": "^0.13.0"
+  },
+  "watch": {
+    "start": "*.js"
+  },
+  "scripts": {
+    "watch": "npm-watch start",
+    "start": "npx @google-cloud/functions-framework --port 42001 --target=keycloakAdmin"
+  }
+}

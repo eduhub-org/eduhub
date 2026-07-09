@@ -10,7 +10,6 @@
     "got": "^12.5.3",
     "graphql-request": "^6.1.0",
     "sharp": "^0.33.2",
-    "stripe": "^14.21.0",
     "winston": "^3.3.3"
   },
   "devDependencies": {

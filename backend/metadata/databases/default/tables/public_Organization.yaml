@@ -92,6 +92,16 @@ insert_permissions:
         - vatId
         - website
 select_permissions:
+  - role: api_proxy
+    permission:
+      columns:
+        - aliases
+        - description
+        - id
+        - logo
+        - name
+        - type
+      filter: {}
   - role: anonymous
     permission:
       columns:
