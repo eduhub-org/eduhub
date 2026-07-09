@@ -11,7 +11,11 @@
     "lint": "eslint \"apps/edu-hub/**/*.{ts,tsx,js,jsx}\"",
     "apollo": "cd apps/edu-hub && rm -rf queries/__generated__ && mkdir -p queries/__generated__ && ../../node_modules/apollo/bin/run client:codegen --includes \"./queries/**/*.ts\" --target typescript",
     "find-unused": "unused-exports ./apps/edu-hub/components",
-    "type-check": "tsc --noEmit --project apps/edu-hub/tsconfig.json"
+    "type-check": "tsc --noEmit --project apps/edu-hub/tsconfig.json",
+    "start:stujo": "next dev apps/stujo -p 5001 -H 0.0.0.0",
+    "build:stujo": "next build apps/stujo",
+    "start:stujo-prod": "next start apps/stujo -p 5001 -H 0.0.0.0",
+    "type-check:stujo": "tsc --noEmit --project apps/stujo/tsconfig.json"
   },
   "private": true,
   "dependencies": {

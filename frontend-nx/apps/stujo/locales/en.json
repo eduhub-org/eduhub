@@ -1,0 +1,25 @@
+{
+  "common": {
+    "jobs": "Job offers",
+    "employers": "Employers",
+    "forEmployers": "For employers",
+    "search": "Search",
+    "allRegions": "All regions",
+    "allTypes": "All categories",
+    "allOccupations": "All occupations",
+    "noResults": "No job offers found.",
+    "results": "{count} job offers",
+    "apply": "Apply now",
+    "publishedAt": "Published on",
+    "deadline": "Application deadline",
+    "location": "Location",
+    "salary": "Salary",
+    "start": "Start",
+    "duration": "Duration",
+    "hoursPerWeek": "h/week",
+    "requirements": "Requirements",
+    "aboutEmployer": "About the employer",
+    "downloadPdf": "Job posting (PDF)",
+    "backToList": "Back to overview"
+  }
+}

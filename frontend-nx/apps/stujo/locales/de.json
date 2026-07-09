@@ -1,0 +1,25 @@
+{
+  "common": {
+    "jobs": "Stellenangebote",
+    "employers": "Arbeitgeber",
+    "forEmployers": "Für Arbeitgeber",
+    "search": "Suchen",
+    "allRegions": "Alle Regionen",
+    "allTypes": "Alle Kategorien",
+    "allOccupations": "Alle Berufsfelder",
+    "noResults": "Keine Stellenangebote gefunden.",
+    "results": "{count} Stellenangebote",
+    "apply": "Jetzt bewerben",
+    "publishedAt": "Veröffentlicht am",
+    "deadline": "Bewerbungsschluss",
+    "location": "Ort",
+    "salary": "Vergütung",
+    "start": "Eintritt",
+    "duration": "Dauer",
+    "hoursPerWeek": "Std./Woche",
+    "requirements": "Anforderungen",
+    "aboutEmployer": "Über den Arbeitgeber",
+    "downloadPdf": "Stellenausschreibung (PDF)",
+    "backToList": "Zurück zur Übersicht"
+  }
+}

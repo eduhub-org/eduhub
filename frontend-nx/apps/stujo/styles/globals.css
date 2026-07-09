@@ -1,0 +1,96 @@
+/* StuJo base styles. The concrete design port (colors, typography from the
+   Rails app) lands with the design phase; branding colors are injected as
+   CSS variables from AppSettings by the layout. */
+
+:root {
+  --stujo-primary: #005b7f;
+  --stujo-secondary: #f29400;
+  --stujo-text: #1f2937;
+  --stujo-bg: #ffffff;
+  --stujo-muted: #6b7280;
+  --stujo-border: #e5e7eb;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  color: var(--stujo-text);
+  background: var(--stujo-bg);
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    'Helvetica Neue',
+    sans-serif;
+  line-height: 1.5;
+}
+
+a {
+  color: var(--stujo-primary);
+}
+
+.stujo-container {
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.stujo-header {
+  background: var(--stujo-primary);
+  color: #fff;
+  padding: 1rem 0;
+}
+
+.stujo-header a {
+  color: #fff;
+  text-decoration: none;
+  margin-right: 1.5rem;
+  font-weight: 600;
+}
+
+.stujo-job-card {
+  border: 1px solid var(--stujo-border);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.stujo-job-card--featured {
+  border-color: var(--stujo-secondary);
+  background: #fffaf0;
+}
+
+.stujo-badge {
+  display: inline-block;
+  background: var(--stujo-border);
+  border-radius: 0.25rem;
+  padding: 0.1rem 0.5rem;
+  font-size: 0.8rem;
+  margin-right: 0.5rem;
+}
+
+.stujo-muted {
+  color: var(--stujo-muted);
+  font-size: 0.9rem;
+}
+
+.stujo-filterbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.stujo-filterbar select,
+.stujo-filterbar input {
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--stujo-border);
+  border-radius: 0.25rem;
+}
