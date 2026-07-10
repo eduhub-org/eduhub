@@ -20,6 +20,8 @@ import saveCourseFormbricksEnrollmentSurvey from "./saveCourseFormbricksEnrollme
 import createStripeCheckout from "./createStripeCheckout/index.js";
 import createStripeBasePrice from "./createStripeBasePrice/index.js";
 import createStripeAddonPrices from "./createStripeAddonPrices/index.js";
+import createStripeJobPostingPrices from "./createStripeJobPostingPrices/index.js";
+import publishJobPosting from "./publishJobPosting/index.js";
 import createEnrollmentWithAddons from "./createEnrollmentWithAddons/index.js";
 import syncGhostNewsletterSubscription from "./syncGhostNewsletterSubscription/index.js";
 import createMatrixRoom from "./createMatrixRoom/index.js";
@@ -76,6 +78,8 @@ const functionMap = {
   createStripeCheckout,
   createStripeBasePrice,
   createStripeAddonPrices,
+  createStripeJobPostingPrices,
+  publishJobPosting,
   createEnrollmentWithAddons,
   createMatrixRoom,
   updateMatrixInstructorPowerLevel,

@@ -111,6 +111,28 @@ actions:
     permissions:
       - role: user_access
     comment: Creates a Stripe Checkout Session for course enrollment with add-ons
+  - name: createStripeJobPostingPrices
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: name
+          value: createStripeJobPostingPrices
+    comment: Bootstraps Stripe products/prices and the 19% tax rate for StuJo job postings (admin only)
+  - name: publishJobPosting
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: name
+          value: publishJobPosting
+    permissions:
+      - role: user_access
+    comment: Publishes a StuJo job posting (free/credit) or creates the Stripe checkout session for it
   - name: createUser
     definition:
       kind: synchronous

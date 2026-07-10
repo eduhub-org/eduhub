@@ -4,6 +4,14 @@ import { GraphQLClient, gql } from 'graphql-request';
 import Stripe from 'stripe';
 import getRawBody from 'raw-body';
 
+import {
+  handleJobPostingCheckoutCompleted,
+  handleJobPostingAsyncPaymentSucceeded,
+  handleJobPostingAsyncPaymentFailed,
+  handleJobPostingCheckoutExpired,
+  parseJobPostingId,
+} from '../../../lib/stripeJobPosting';
+
 // Disable body parsing - we need raw body for signature verification
 export const config = {
   api: {
@@ -300,6 +308,13 @@ const handleStripeWebhook = async (
         const session = event.data.object as Stripe.Checkout.Session;
         const { enrollmentId, courseId } = session.metadata || {};
 
+        // StuJo job posting checkout (metadata set by publishJobPosting)
+        const jobPostingId = parseJobPostingId(session.metadata?.jobPostingId);
+        if (jobPostingId !== null) {
+          await handleJobPostingCheckoutCompleted(client, session, jobPostingId);
+          return res.status(200).json({ received: true });
+        }
+
         if (!enrollmentId) {
           console.error('Missing enrollmentId in session metadata');
           return res.status(400).json({ error: 'Missing enrollmentId' });
@@ -349,9 +364,33 @@ const handleStripeWebhook = async (
         return res.status(200).json({ received: true });
       }
 
+      case 'checkout.session.async_payment_succeeded': {
+        const session = event.data.object as Stripe.Checkout.Session;
+        if (parseJobPostingId(session.metadata?.jobPostingId) !== null) {
+          await handleJobPostingAsyncPaymentSucceeded(client, session);
+        }
+        return res.status(200).json({ received: true });
+      }
+
+      case 'checkout.session.async_payment_failed': {
+        const session = event.data.object as Stripe.Checkout.Session;
+        const failedJobPostingId = parseJobPostingId(session.metadata?.jobPostingId);
+        if (failedJobPostingId !== null) {
+          await handleJobPostingAsyncPaymentFailed(client, session, failedJobPostingId);
+        }
+        return res.status(200).json({ received: true });
+      }
+
       case 'checkout.session.expired': {
         const session = event.data.object as Stripe.Checkout.Session;
         const { enrollmentId } = session.metadata || {};
+
+        // StuJo job posting: abandoned checkout goes back to DRAFT
+        const expiredJobPostingId = parseJobPostingId(session.metadata?.jobPostingId);
+        if (expiredJobPostingId !== null) {
+          await handleJobPostingCheckoutExpired(client, expiredJobPostingId);
+          return res.status(200).json({ received: true });
+        }
 
         if (enrollmentId) {
           const parsedEnrollmentId = parseAndValidateEnrollmentId(enrollmentId);

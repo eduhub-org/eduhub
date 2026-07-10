@@ -686,3 +686,30 @@ type CourseAddonMapping {
   updated_at: timestamptz!
 }
 
+
+type Mutation {
+  publishJobPosting(jobPostingId: Int!): PublishJobPostingResult!
+}
+
+type Mutation {
+  createStripeJobPostingPrices: CreateStripeJobPostingPricesResult!
+}
+
+type PublishJobPostingResult {
+  success: Boolean!
+  published: Boolean
+  paid: Boolean
+  usedCredit: Boolean
+  expiresAt: String
+  checkoutUrl: String
+  sessionId: String
+  error: String
+  messageKey: String
+}
+
+type CreateStripeJobPostingPricesResult {
+  success: Boolean!
+  taxRateId: String
+  error: String
+  messageKey: String
+}
