@@ -387,7 +387,30 @@ running `next build apps/edu-hub`, with `tsconfig.base.json` path aliases and
   export, admin impersonation, `landingpageentries` CMS (portal landing
   content moves into AppSettings/static content), job-letter (§9).
 
-## 9. Open questions (business/data — the code questions are all resolved)
+## 9. Business decisions (resolved 2026-07-11)
+
+All former open questions are decided and implemented:
+
+1. **Catalog at cutover:** every currently "active" job (the Rails archiver
+   was dead — 1,026 visible, only 27 within the paid window) gets a fresh
+   8-week window at import; the expire cron shrinks the catalog organically.
+2. **Retention:** ALL companies migrate (2,542 → 2,480 organizations after
+   merging 62 duplicate/near-duplicate names; each duplicate's legacy slug
+   is kept as an alias for redirects).
+3. **Students:** all 322 migrate with email dedupe against Keycloak/Hasura;
+   saved jobs → SavedJobPosting, old job-letter config → JobAlertSubscription.
+4. **Credits:** all remaining trial credits import — 733 companies / 748
+   credits (the often-quoted ~1,950 included orphaned counters whose
+   companies had been deleted from the Rails DB).
+5. **Job-Letter:** launched properly — JobAlertSubscription table, weekly
+   send_job_alerts cron (Mondays 06:00), JOB_ALERT template, /job-letter
+   settings page in the stujo app.
+6. **Live Stripe:** the existing opencampus.sh account (key/env switch +
+   price bootstrap re-run at cutover).
+7. **e-talents:** deleted outright (site already offline) — no sunset page
+   or mail; the data stays only in the archived Rails snapshot.
+
+### Former open questions (superseded by the decisions above)
 
 1. **Volume audit** on the production DB before fixing ETL scope: active
    jobs/companies/students, last-activity distribution.

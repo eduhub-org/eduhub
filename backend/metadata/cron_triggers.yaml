@@ -55,3 +55,19 @@
     - name: Hasura-Secret
       value_from_env: HASURA_CLOUD_FUNCTION_SECRET
   comment: Flips PUBLISHED job postings past their expiresAt to EXPIRED (StuJo job board)
+- name: send_job_alerts
+  webhook: '{{CLOUD_FUNCTION_LINK_CALL_PYTHON_FUNCTION}}'
+  schedule: 0 6 * * 1
+  include_in_metadata: true
+  payload: {}
+  retry_conf:
+    num_retries: 0
+    retry_interval_seconds: 10
+    timeout_seconds: 3699
+    tolerance_seconds: 21600
+  headers:
+    - name: Function-Name
+      value: send_job_alerts
+    - name: Hasura-Secret
+      value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+  comment: Sends the weekly StuJo job alert (Job-Letter) to subscribed users

@@ -186,33 +186,49 @@ def fetch_all(cnx, sql: str, params=()):
     return rows
 
 
-def load_source(cnx, retention_years: int):
+def load_source(cnx, retention_years=None):
     """Load the relevant slice of the Rails DB into memory.
 
-    Scope rules (plan §7.1):
+    Scope rules (business decisions 2026-07-11):
+    - migrate ALL companies by default (retention_years is an opt-in
+      restriction for test runs)
     - skip pure e-talents companies/people (sitememberships.site = 1 only)
-    - only companies with a posting newer than the retention window
     """
-    cutoff = datetime.now(timezone.utc) - timedelta(days=365 * retention_years)
-
-    companies = fetch_all(
-        cnx,
-        """
-        SELECT DISTINCT c.*, a.street, a.nr, a.zip, a.location AS city,
-               a.country, i.name AS industry
-        FROM companies c
-        LEFT JOIN addresses a ON a.id = c.address_id
-        LEFT JOIN industries i ON i.id = c.industry_id
-        JOIN contacts ct ON ct.company_id = c.id
-        JOIN jobs j ON j.contact_id = ct.id
-        WHERE j.created_at >= %s AND j.status > 0
-        """,
-        (cutoff,),
-    )
+    if retention_years:
+        cutoff = datetime.now(timezone.utc) - timedelta(days=365 * retention_years)
+        companies = fetch_all(
+            cnx,
+            """
+            SELECT DISTINCT c.*, a.street, a.nr, a.zip, a.location AS city,
+                   a.country, i.name AS industry
+            FROM companies c
+            LEFT JOIN addresses a ON a.id = c.address_id
+            LEFT JOIN industries i ON i.id = c.industry_id
+            JOIN contacts ct ON ct.company_id = c.id
+            JOIN jobs j ON j.contact_id = ct.id
+            WHERE j.created_at >= %s AND j.status > 0
+            """,
+            (cutoff,),
+        )
+    else:
+        companies = fetch_all(
+            cnx,
+            """
+            SELECT c.*, a.street, a.nr, a.zip, a.location AS city,
+                   a.country, i.name AS industry
+            FROM companies c
+            LEFT JOIN addresses a ON a.id = c.address_id
+            LEFT JOIN industries i ON i.id = c.industry_id
+            """,
+        )
     company_ids = [c["id"] for c in companies]
-    log.info("companies in scope (retention %sy): %s", retention_years, len(company_ids))
+    log.info(
+        "companies in scope (retention %s): %s",
+        f"{retention_years}y" if retention_years else "all",
+        len(company_ids),
+    )
     if not company_ids:
-        return {"companies": [], "contacts": [], "jobs": [], "counters": []}
+        return {"companies": [], "contacts": [], "jobs": [], "counters": [], "students": []}
 
     fmt = ",".join(["%s"] * len(company_ids))
     contacts = fetch_all(
@@ -259,7 +275,35 @@ def load_source(cnx, retention_years: int):
         company_ids,
     )
 
-    return {"companies": companies, "contacts": contacts, "jobs": jobs, "counters": counters}
+    # Students (business decision 2026-07-11: migrate all, dedupe by email)
+    # incl. saved jobs and the old job-letter config.
+    students = fetch_all(
+        cnx,
+        f"""
+        SELECT s.id AS student_id, p.id AS person_id, p.email, p.forname,
+               p.name, p.password_hash,
+               (SELECT COUNT(*) FROM sitememberships sm
+                 WHERE sm.person_id = p.id AND sm.site = {SITE_ETALENTS}) AS etalents,
+               (SELECT COUNT(*) FROM sitememberships sm
+                 WHERE sm.person_id = p.id AND sm.site = {SITE_STUJO}) AS stujo,
+               (SELECT COUNT(*) FROM sitememberships sm
+                 WHERE sm.person_id = p.id) AS memberships,
+               (SELECT GROUP_CONCAT(rj.job_id SEPARATOR '|||') FROM rememberedjobs rj
+                 WHERE rj.student_id = s.id) AS saved_job_ids,
+               (SELECT jl.active FROM jobletterconfig jl
+                 WHERE jl.student_id = s.id LIMIT 1) AS jobletter_active
+        FROM students s JOIN people p ON p.id = s.person_id
+        """,
+    )
+    students = [s for s in students if s["memberships"] == 0 or s["stujo"] > 0]
+
+    return {
+        "companies": companies,
+        "contacts": contacts,
+        "jobs": jobs,
+        "counters": counters,
+        "students": students,
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -280,9 +324,24 @@ def step_companies(hasura: HasuraClient, gcs_bucket, files_root, companies) -> d
     mapping = {}
     for c in companies:
         legacy_alias = f"stujo:{c['id']}-{slugify(c['name'])}"
-        org = by_alias.get(legacy_alias) or by_norm.get(normalize_company_name(c["name"]))
+        norm = normalize_company_name(c["name"])
+        org = by_alias.get(legacy_alias) or by_norm.get(norm)
         if org:
+            # Duplicate company rows in the Rails DB (23 exist, e.g. two
+            # 'terwixonse') merge into one Organization; record this row's
+            # legacy alias too so old URLs keep redirecting.
             mapping[c["id"]] = org["id"]
+            if legacy_alias not in (org.get("aliases") or []):
+                hasura.mutate(
+                    """
+                    mutation ($id: Int!, $alias: jsonb!) {
+                      update_Organization_by_pk(pk_columns: {id: $id}, _append: {aliases: $alias}) { id }
+                    }
+                    """,
+                    {"id": org["id"], "alias": [legacy_alias]},
+                )
+                org.setdefault("aliases", []).append(legacy_alias)
+                by_alias[legacy_alias] = org
             log.info("company %s → existing Organization %s (%s)", c["id"], org["id"], org["name"])
             continue
 
@@ -310,6 +369,11 @@ def step_companies(hasura: HasuraClient, gcs_bucket, files_root, companies) -> d
         )
         org_id = result["insert_Organization_one"]["id"] if result else -c["id"]
         mapping[c["id"]] = org_id
+        # Register the new org in the dedupe maps so later duplicate rows
+        # in the same run merge instead of violating Organization_name_key.
+        created = {"id": org_id, "name": c["name"], "aliases": [legacy_alias]}
+        by_norm[norm] = created
+        by_alias[legacy_alias] = created
         log.info("company %s '%s' → new Organization %s", c["id"], c["name"], org_id)
     return mapping
 
@@ -434,12 +498,10 @@ def step_jobs(hasura: HasuraClient, gcs_bucket, files_root, jobs, org_mapping, h
 
         published = j["status"] in (STATUS_ACTIVE, STATUS_FEATURED)
         created = j["created_at"]
-        expires = (created + timedelta(days=PUBLICATION_DAYS)) if created else None
-        if j.get("recurring") and published:
-            # Evergreen postings get one fresh full window and are reported
-            # for the manual pricing conversation (plan §1.4/§9).
-            expires = datetime.now(timezone.utc) + timedelta(days=PUBLICATION_DAYS)
-            log.warning("job %s '%s' is recurring — fresh window, needs follow-up", j["id"], j["title"])
+        # Business decision (2026-07-11): the Rails archiver was dead, so
+        # every currently visible ("active") job gets a fresh 8-week window
+        # at cutover; the expire cron then shrinks the catalog organically.
+        expires = (datetime.now(timezone.utc) + timedelta(days=PUBLICATION_DAYS)) if published else None
 
         restricted_to = None
         if j.get("mandate_names"):
@@ -456,7 +518,9 @@ def step_jobs(hasura: HasuraClient, gcs_bucket, files_root, jobs, org_mapping, h
         duration_text = " ".join(
             filter(None, [str(j.get("duration") or "").strip(), (j.get("duration_unit") or "").strip()])
         ) or None
-        tags = [t for t in (j.get("tag_names") or "").split("|||") if t]
+        # Duplicate tags on the same job exist in the prod data; dedupe
+        # (unique constraint JobPostingTag_jobPostingId_name_key).
+        tags = list(dict.fromkeys(t for t in (j.get("tag_names") or "").split("|||") if t))
 
         hasura.mutate(
             """
@@ -501,6 +565,76 @@ def step_jobs(hasura: HasuraClient, gcs_bucket, files_root, jobs, org_mapping, h
         log.info("job %s '%s' → JobPosting (%s)", j["id"], j["title"], "PUBLISHED" if published else "ARCHIVED")
 
 
+def step_students(hasura: HasuraClient, keycloak, students):
+    """Students → Keycloak/User (dedupe by email) + SavedJobPosting +
+    JobAlertSubscription (business decision 2026-07-11: migrate all 322).
+    """
+    # Legacy job id → new JobPosting id, for the saved-jobs import.
+    posting_map = {
+        row["legacyStujoId"]: row["id"]
+        for row in hasura.query(
+            "query { JobPosting(where: {legacyStujoId: {_is_null: false}}) { id legacyStujoId } }"
+        )["JobPosting"]
+    }
+
+    for s in students:
+        email = (s.get("email") or "").strip().lower()
+        if not email:
+            continue
+
+        existing = hasura.query(
+            """query ($email: String!) { User(where: {email: {_ilike: $email}}) { id } }""",
+            {"email": email},
+        )["User"]
+
+        if existing:
+            user_id = existing[0]["id"]
+            log.info("student %s (%s) → existing User %s", s["student_id"], email, user_id)
+        else:
+            if keycloak is None:
+                log.info("[dry-run] would create Keycloak user %s (bcrypt import)", email)
+                continue
+            user_id = keycloak.create_user_with_bcrypt(
+                email=email,
+                first_name=s.get("forname") or "",
+                last_name=s.get("name") or "",
+                bcrypt_hash=s.get("password_hash"),
+            )
+
+        # Saved jobs (rememberedjobs) → SavedJobPosting
+        for legacy_id in (s.get("saved_job_ids") or "").split("|||"):
+            if not legacy_id:
+                continue
+            posting_id = posting_map.get(int(legacy_id))
+            if not posting_id:
+                continue
+            hasura.mutate(
+                """
+                mutation ($obj: SavedJobPosting_insert_input!) {
+                  insert_SavedJobPosting_one(
+                    object: $obj,
+                    on_conflict: {constraint: SavedJobPosting_userId_jobPostingId_key, update_columns: []}
+                  ) { id }
+                }
+                """,
+                {"obj": {"userId": user_id, "jobPostingId": posting_id}},
+            )
+
+        # Old job-letter config → JobAlertSubscription (weekly cron)
+        if s.get("jobletter_active"):
+            hasura.mutate(
+                """
+                mutation ($obj: JobAlertSubscription_insert_input!) {
+                  insert_JobAlertSubscription_one(
+                    object: $obj,
+                    on_conflict: {constraint: JobAlertSubscription_userId_key, update_columns: [active]}
+                  ) { id }
+                }
+                """,
+                {"obj": {"userId": user_id, "active": True}},
+            )
+
+
 def step_credits(hasura: HasuraClient, counters, org_mapping):
     """Remaining paymentcounters credits → JobPostingCredit (untyped)."""
     for pc in counters:
@@ -534,11 +668,12 @@ def step_credits(hasura: HasuraClient, counters, org_mapping):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--dry-run", action="store_true", help="no writes, log intent only")
-    parser.add_argument("--steps", default="companies,users,jobs,credits")
+    parser.add_argument("--steps", default="companies,users,jobs,credits,students")
     parser.add_argument("--haw-org-id", type=int, default=None,
                         help="Organization.id of HAW Kiel (mandate restriction target)")
     parser.add_argument("--retention-years", type=int,
-                        default=int(os.environ.get("RETENTION_YEARS", "3")))
+                        default=int(os.environ.get("RETENTION_YEARS", "0")) or None,
+                        help="opt-in restriction for test runs; default: migrate everything")
     args = parser.parse_args()
     steps = set(args.steps.split(","))
 
@@ -562,8 +697,9 @@ def main():
     cnx = mysql_connection(dsn)
     src = load_source(cnx, args.retention_years)
     log.info(
-        "loaded: %s companies, %s contacts, %s jobs, %s counters",
-        len(src["companies"]), len(src["contacts"]), len(src["jobs"]), len(src["counters"]),
+        "loaded: %s companies, %s contacts, %s jobs, %s counters, %s students",
+        len(src["companies"]), len(src["contacts"]), len(src["jobs"]),
+        len(src["counters"]), len(src["students"]),
     )
 
     org_mapping = {}
@@ -575,6 +711,8 @@ def main():
         step_jobs(hasura, gcs_bucket, files_root, src["jobs"], org_mapping, args.haw_org_id)
     if "credits" in steps:
         step_credits(hasura, src["counters"], org_mapping)
+    if "students" in steps:
+        step_students(hasura, keycloak, src["students"])
 
     log.info("done%s", " (dry run)" if args.dry_run else "")
 

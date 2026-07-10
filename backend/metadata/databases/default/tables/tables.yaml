@@ -33,6 +33,7 @@
 - "!include public_FaqTranslation.yaml"
 - "!include public_Invoice.yaml"
 - "!include public_InvoiceStatus.yaml"
+- "!include public_JobAlertSubscription.yaml"
 - "!include public_JobOccupation.yaml"
 - "!include public_JobPortal.yaml"
 - "!include public_JobPosting.yaml"
