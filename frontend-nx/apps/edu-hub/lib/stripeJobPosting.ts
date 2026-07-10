@@ -79,6 +79,9 @@ const INSERT_JOB_INVOICE = gql`
     $currency: String!
     $stripeCheckoutSessionId: String
     $stripePaymentIntentId: String
+    $stripeInvoiceId: String
+    $stripeHostedInvoiceUrl: String
+    $stripeInvoicePdfUrl: String
   ) {
     insert_Invoice_one(
       object: {
@@ -93,6 +96,9 @@ const INSERT_JOB_INVOICE = gql`
         currency: $currency
         stripeCheckoutSessionId: $stripeCheckoutSessionId
         stripePaymentIntentId: $stripePaymentIntentId
+        stripeInvoiceId: $stripeInvoiceId
+        stripeHostedInvoiceUrl: $stripeHostedInvoiceUrl
+        stripeInvoicePdfUrl: $stripeInvoicePdfUrl
       }
     ) {
       id
@@ -220,6 +226,7 @@ function buildMailVars(
  */
 export async function handleJobPostingCheckoutCompleted(
   client: GraphQLClient,
+  stripe: Stripe,
   session: Stripe.Checkout.Session,
   jobPostingId: number
 ): Promise<void> {
@@ -258,6 +265,25 @@ export async function handleJobPostingCheckoutCompleted(
     const grossTotal = session.amount_total ?? 0;
     const netTotal = session.amount_subtotal ?? grossTotal;
     const vatTotal = session.total_details?.amount_tax ?? grossTotal - netTotal;
+    // The Stripe-generated invoice document (invoice_creation) carries the
+    // legally required sequential number and VAT breakdown.
+    let stripeInvoiceId: string | null = null;
+    let stripeHostedInvoiceUrl: string | null = null;
+    let stripeInvoicePdfUrl: string | null = null;
+    if (session.invoice) {
+      try {
+        const invoiceDoc =
+          typeof session.invoice === 'string'
+            ? await stripe.invoices.retrieve(session.invoice)
+            : session.invoice;
+        stripeInvoiceId = invoiceDoc.id ?? null;
+        stripeHostedInvoiceUrl = invoiceDoc.hosted_invoice_url ?? null;
+        stripeInvoicePdfUrl = invoiceDoc.invoice_pdf ?? null;
+      } catch (err) {
+        console.warn('Could not resolve Stripe invoice for job posting:', err);
+        stripeInvoiceId = typeof session.invoice === 'string' ? session.invoice : null;
+      }
+    }
     // The platform (not the employer) is the selling organization.
     const sellerOrganizationId = Number.parseInt(
       process.env.STUJO_SELLER_ORGANIZATION_ID || '',
@@ -282,6 +308,9 @@ export async function handleJobPostingCheckoutCompleted(
         typeof session.payment_intent === 'string'
           ? session.payment_intent
           : session.payment_intent?.id ?? null,
+      stripeInvoiceId,
+      stripeHostedInvoiceUrl,
+      stripeInvoicePdfUrl,
     });
   }
 

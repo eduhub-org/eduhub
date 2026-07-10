@@ -79,12 +79,16 @@ const INSERT_INVOICE = gql`
     $userId: uuid!
     $courseEnrollmentId: Int!
     $invoiceNumber: String!
+    $status: InvoiceStatus_enum!
     $netTotal: Int!
     $vatTotal: Int!
     $grossTotal: Int!
     $currency: String!
     $stripeCheckoutSessionId: String
     $stripePaymentIntentId: String
+    $stripeInvoiceId: String
+    $stripeHostedInvoiceUrl: String
+    $stripeInvoicePdfUrl: String
   ) {
     insert_Invoice_one(
       object: {
@@ -92,14 +96,16 @@ const INSERT_INVOICE = gql`
         userId: $userId
         courseEnrollmentId: $courseEnrollmentId
         invoiceNumber: $invoiceNumber
-        status: PAID
+        status: $status
         netTotal: $netTotal
         vatTotal: $vatTotal
         grossTotal: $grossTotal
         currency: $currency
         stripeCheckoutSessionId: $stripeCheckoutSessionId
         stripePaymentIntentId: $stripePaymentIntentId
-        stripeHostedInvoiceUrl: null
+        stripeInvoiceId: $stripeInvoiceId
+        stripeHostedInvoiceUrl: $stripeHostedInvoiceUrl
+        stripeInvoicePdfUrl: $stripeInvoicePdfUrl
       }
     ) {
       id
@@ -107,35 +113,25 @@ const INSERT_INVOICE = gql`
   }
 `;
 
-const INSERT_INVOICE_CANCELLED = gql`
-  mutation InsertInvoiceCancelled(
-    $organizationId: Int!
-    $userId: uuid!
-    $courseEnrollmentId: Int!
-    $invoiceNumber: String!
-    $netTotal: Int!
-    $vatTotal: Int!
-    $grossTotal: Int!
-    $currency: String!
-    $stripeCheckoutSessionId: String
-    $stripePaymentIntentId: String
-  ) {
-    insert_Invoice_one(
-      object: {
-        organizationId: $organizationId
-        userId: $userId
-        courseEnrollmentId: $courseEnrollmentId
-        invoiceNumber: $invoiceNumber
-        status: CANCELLED
-        netTotal: $netTotal
-        vatTotal: $vatTotal
-        grossTotal: $grossTotal
-        currency: $currency
-        stripeCheckoutSessionId: $stripeCheckoutSessionId
-        stripePaymentIntentId: $stripePaymentIntentId
-      }
+const UPDATE_INVOICE_STATUS_BY_SESSION = gql`
+  mutation UpdateInvoiceStatusBySession($sessionId: String!, $status: InvoiceStatus_enum!) {
+    update_Invoice(
+      where: { stripeCheckoutSessionId: { _eq: $sessionId } }
+      _set: { status: $status }
+    ) {
+      affected_rows
+    }
+  }
+`;
+
+const UPDATE_ENROLLMENT_STATUS_ABORTED = gql`
+  mutation UpdateEnrollmentStatusAborted($enrollmentId: Int!) {
+    update_CourseEnrollment_by_pk(
+      pk_columns: { id: $enrollmentId }
+      _set: { status: ABORTED }
     ) {
       id
+      status
     }
   }
 `;
@@ -228,13 +224,47 @@ const handleStripeWebhook = async (
     }
   );
 
+  /**
+   * Resolves the Stripe-generated invoice document (invoice_creation) so
+   * the Invoice row carries the legally required document references.
+   */
+  const resolveStripeInvoice = async (
+    invoiceRef: string | Stripe.Invoice | null | undefined
+  ): Promise<{ id: string | null; hostedUrl: string | null; pdfUrl: string | null }> => {
+    if (!invoiceRef) {
+      return { id: null, hostedUrl: null, pdfUrl: null };
+    }
+    try {
+      const invoice =
+        typeof invoiceRef === 'string'
+          ? await stripe.invoices.retrieve(invoiceRef)
+          : invoiceRef;
+      return {
+        id: invoice.id ?? null,
+        hostedUrl: invoice.hosted_invoice_url ?? null,
+        pdfUrl: invoice.invoice_pdf ?? null,
+      };
+    } catch (err) {
+      console.warn('Could not resolve Stripe invoice document:', err);
+      return {
+        id: typeof invoiceRef === 'string' ? invoiceRef : null,
+        hostedUrl: null,
+        pdfUrl: null,
+      };
+    }
+  };
+
   const createInvoiceForEnrollment = async (
     enrollmentId: number,
-    amountTotal: number,
-    currency: string,
-    status: 'PAID' | 'CANCELLED',
-    stripeCheckoutSessionId: string | null,
-    stripePaymentIntentId: string | null
+    session: {
+      amountTotal: number;
+      amountTax: number | null;
+      currency: string;
+      stripeCheckoutSessionId: string | null;
+      stripePaymentIntentId: string | null;
+      stripeInvoice?: string | Stripe.Invoice | null;
+    },
+    status: 'PAID' | 'ISSUED' | 'CANCELLED'
   ) => {
     const { CourseEnrollment_by_pk } =
       await client.request<GetEnrollmentForInvoiceResponse>(
@@ -261,45 +291,36 @@ const handleStripeWebhook = async (
     const invoiceNumberPrefix =
       program.Organization?.invoiceNumberPrefix ?? 'EDU';
 
-    // For Stripe Checkout: amount_total is in cents, same as our schema.
-    // Net/VAT split: use Stripe Tax breakdown when available; otherwise net = gross, vat = 0.
-    const grossTotal = amountTotal;
-    const netTotal = amountTotal; // Stripe Tax breakdown can be used when available
-    const vatTotal = 0;
+    // Course prices are gross (inclusive tax rate): amount_total is the
+    // gross total, total_details.amount_tax the contained VAT portion.
+    const grossTotal = session.amountTotal;
+    const vatTotal = session.amountTax ?? 0;
+    const netTotal = grossTotal - vatTotal;
 
     const invoiceNumber = generateInvoiceNumber(
       invoiceNumberPrefix,
-      stripeCheckoutSessionId,
-      stripePaymentIntentId
+      session.stripeCheckoutSessionId,
+      session.stripePaymentIntentId
     );
 
-    if (status === 'PAID') {
-      await client.request(INSERT_INVOICE, {
-        organizationId,
-        userId,
-        courseEnrollmentId: enrollmentId,
-        invoiceNumber,
-        netTotal,
-        vatTotal,
-        grossTotal,
-        currency: (currency || 'eur').toUpperCase(),
-        stripeCheckoutSessionId,
-        stripePaymentIntentId,
-      });
-    } else {
-      await client.request(INSERT_INVOICE_CANCELLED, {
-        organizationId,
-        userId,
-        courseEnrollmentId: enrollmentId,
-        invoiceNumber,
-        netTotal,
-        vatTotal,
-        grossTotal,
-        currency: (currency || 'eur').toUpperCase(),
-        stripeCheckoutSessionId,
-        stripePaymentIntentId,
-      });
-    }
+    const stripeInvoice = await resolveStripeInvoice(session.stripeInvoice);
+
+    await client.request(INSERT_INVOICE, {
+      organizationId,
+      userId,
+      courseEnrollmentId: enrollmentId,
+      invoiceNumber,
+      status,
+      netTotal,
+      vatTotal,
+      grossTotal,
+      currency: (session.currency || 'eur').toUpperCase(),
+      stripeCheckoutSessionId: session.stripeCheckoutSessionId,
+      stripePaymentIntentId: session.stripePaymentIntentId,
+      stripeInvoiceId: stripeInvoice.id,
+      stripeHostedInvoiceUrl: stripeInvoice.hostedUrl,
+      stripeInvoicePdfUrl: stripeInvoice.pdfUrl,
+    });
   };
 
   try {
@@ -311,7 +332,7 @@ const handleStripeWebhook = async (
         // StuJo job posting checkout (metadata set by publishJobPosting)
         const jobPostingId = parseJobPostingId(session.metadata?.jobPostingId);
         if (jobPostingId !== null) {
-          await handleJobPostingCheckoutCompleted(client, session, jobPostingId);
+          await handleJobPostingCheckoutCompleted(client, stripe, session, jobPostingId);
           return res.status(200).json({ received: true });
         }
 
@@ -341,13 +362,20 @@ const handleStripeWebhook = async (
           if (existingInvoices?.length === 0) {
             await createInvoiceForEnrollment(
               parsedEnrollmentId,
-              session.amount_total ?? 0,
-              session.currency ?? 'eur',
-              'PAID',
-              session.id,
-              typeof session.payment_intent === 'string'
-                ? session.payment_intent
-                : session.payment_intent?.id ?? null
+              {
+                amountTotal: session.amount_total ?? 0,
+                amountTax: session.total_details?.amount_tax ?? null,
+                currency: session.currency ?? 'eur',
+                stripeCheckoutSessionId: session.id,
+                stripePaymentIntentId:
+                  typeof session.payment_intent === 'string'
+                    ? session.payment_intent
+                    : session.payment_intent?.id ?? null,
+                stripeInvoice: session.invoice as string | Stripe.Invoice | null,
+              },
+              // SEPA / bank transfer settle later: ISSUED until
+              // async_payment_succeeded flips the invoice to PAID.
+              session.payment_status === 'paid' ? 'PAID' : 'ISSUED'
             );
           }
         } catch (err) {
@@ -368,6 +396,14 @@ const handleStripeWebhook = async (
         const session = event.data.object as Stripe.Checkout.Session;
         if (parseJobPostingId(session.metadata?.jobPostingId) !== null) {
           await handleJobPostingAsyncPaymentSucceeded(client, session);
+          return res.status(200).json({ received: true });
+        }
+        // Course enrollment: delayed payment settled, invoice ISSUED -> PAID
+        if (session.metadata?.enrollmentId) {
+          await client.request(UPDATE_INVOICE_STATUS_BY_SESSION, {
+            sessionId: session.id,
+            status: 'PAID',
+          });
         }
         return res.status(200).json({ received: true });
       }
@@ -377,6 +413,20 @@ const handleStripeWebhook = async (
         const failedJobPostingId = parseJobPostingId(session.metadata?.jobPostingId);
         if (failedJobPostingId !== null) {
           await handleJobPostingAsyncPaymentFailed(client, session, failedJobPostingId);
+          return res.status(200).json({ received: true });
+        }
+        // Course enrollment: delayed payment failed after the enrollment
+        // was optimistically confirmed — revert to ABORTED and cancel the
+        // invoice reference.
+        if (session.metadata?.enrollmentId) {
+          const parsedId = parseAndValidateEnrollmentId(session.metadata.enrollmentId);
+          if (parsedId !== null) {
+            await client.request(UPDATE_ENROLLMENT_STATUS_ABORTED, { enrollmentId: parsedId });
+            await client.request(UPDATE_INVOICE_STATUS_BY_SESSION, {
+              sessionId: session.id,
+              status: 'CANCELLED',
+            });
+          }
         }
         return res.status(200).json({ received: true });
       }
@@ -397,11 +447,14 @@ const handleStripeWebhook = async (
           if (parsedEnrollmentId !== null) {
             await createInvoiceForEnrollment(
               parsedEnrollmentId,
-              session.amount_total ?? 0,
-              session.currency ?? 'eur',
-              'CANCELLED',
-              session.id,
-              null
+              {
+                amountTotal: session.amount_total ?? 0,
+                amountTax: session.total_details?.amount_tax ?? null,
+                currency: session.currency ?? 'eur',
+                stripeCheckoutSessionId: session.id,
+                stripePaymentIntentId: null,
+              },
+              'CANCELLED'
             );
           }
         }
@@ -418,11 +471,14 @@ const handleStripeWebhook = async (
           if (parsedEnrollmentId !== null) {
             await createInvoiceForEnrollment(
               parsedEnrollmentId,
-              paymentIntent.amount ?? 0,
-              paymentIntent.currency ?? 'eur',
-              'CANCELLED',
-              null,
-              paymentIntent.id
+              {
+                amountTotal: paymentIntent.amount ?? 0,
+                amountTax: null,
+                currency: paymentIntent.currency ?? 'eur',
+                stripeCheckoutSessionId: null,
+                stripePaymentIntentId: paymentIntent.id,
+              },
+              'CANCELLED'
             );
           }
         }

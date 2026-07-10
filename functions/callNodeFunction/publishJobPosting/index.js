@@ -1,6 +1,8 @@
 import Stripe from 'stripe';
 import { GraphQLClient, gql } from 'graphql-request';
 
+import { buildInvoiceCreation, buildPaymentMethodConfig } from '../lib/stripeTax.js';
+
 /**
  * Single entry point for publishing a StuJo job posting (phase 4 of
  * docs/STUJO_INTEGRATION_PLAN.md).
@@ -334,19 +336,39 @@ export default async function publishJobPosting(req, logger) {
       logger.warn('STRIPE_TAX_RATE_ID not set — charging net price without VAT line');
     }
 
+    // The platform organization sells the posting; its invoice footer and
+    // tax notes go onto the Stripe invoice (production review 2026-07-11).
+    let sellerOrganization = null;
+    const sellerOrgId = Number.parseInt(process.env.STUJO_SELLER_ORGANIZATION_ID || '', 10);
+    if (Number.isInteger(sellerOrgId)) {
+      try {
+        const sellerData = await client.request(
+          gql`
+            query GetStujoSellerOrganization($id: Int!) {
+              Organization_by_pk(id: $id) {
+                id
+                invoiceFooterText
+                defaultVatRate
+                defaultTaxExemptionNote
+              }
+            }
+          `,
+          { id: sellerOrgId }
+        );
+        sellerOrganization = sellerData.Organization_by_pk;
+      } catch (error) {
+        logger.warn('Could not load seller organization for invoice footer', { error: error.message });
+      }
+    }
+
     const sessionConfig = {
       line_items: [lineItem],
       mode: 'payment',
       // Agreed payment methods: card, SEPA direct debit, bank transfer
       // (pay later, parity with the old invoice flow).
-      payment_method_types: ['card', 'sepa_debit', 'customer_balance'],
-      payment_method_options: {
-        customer_balance: {
-          funding_type: 'bank_transfer',
-          bank_transfer: { type: 'eu_bank_transfer', eu_bank_transfer: { country: 'DE' } },
-        },
-      },
-      customer_creation: 'always',
+      ...buildPaymentMethodConfig(),
+      // Stripe issues a real, sequentially numbered invoice (§14 UStG).
+      invoice_creation: buildInvoiceCreation(sellerOrganization),
       success_url: `${frontendUrl}/mein-stujo?payment=success&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${frontendUrl}/mein-stujo?payment=cancelled&posting=${posting.id}`,
       metadata: {

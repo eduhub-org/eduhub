@@ -1,6 +1,12 @@
 import Stripe from 'stripe';
 import { GraphQLClient } from 'graphql-request';
 
+import {
+  getOrCreateTaxRate,
+  buildInvoiceCreation,
+  buildPaymentMethodConfig,
+} from '../lib/stripeTax.js';
+
 const GET_COURSE_AND_ADDONS = `
   query GetCourseAndAddons($courseId: Int!) {
     Course_by_pk(id: $courseId) {
@@ -10,6 +16,14 @@ const GET_COURSE_AND_ADDONS = `
       currency
       stripeProductId
       stripePriceId
+      Program {
+        Organization {
+          id
+          defaultVatRate
+          defaultTaxExemptionNote
+          invoiceFooterText
+        }
+      }
       CourseAddonMappings {
         id
         questionId
@@ -440,12 +454,38 @@ export default async function createStripeCheckout(req, logger) {
       };
     }
 
+    // German VAT (production-readiness review 2026-07-11): course prices
+    // are consumer-facing GROSS prices, so the selling organization's
+    // defaultVatRate is applied as an INCLUSIVE tax rate. 0/null means
+    // tax-exempt; the exemption note lands on the invoice footer below.
+    const organization = course.Program?.Organization || null;
+    const vatRate = organization?.defaultVatRate != null ? Number(organization.defaultVatRate) : null;
+    if (vatRate && vatRate > 0) {
+      const taxRateId = await getOrCreateTaxRate(stripe, vatRate, true, logger);
+      if (taxRateId) {
+        for (const item of lineItems) {
+          item.tax_rates = [taxRateId];
+        }
+      }
+    } else if (!organization?.defaultTaxExemptionNote) {
+      logger.warn('Organization has no defaultVatRate and no defaultTaxExemptionNote — invoice will carry neither VAT nor an exemption note', {
+        organizationId: organization?.id,
+        courseId,
+      });
+    }
+
     // Create Stripe Checkout Session
     // Only include customer_email if we have a valid email address
     // Stripe will prompt for email during checkout if not provided
     const sessionConfig = {
       line_items: lineItems,
       mode: 'payment',
+      // Agreed payment methods (card, SEPA debit, EU bank transfer);
+      // delayed methods settle via checkout.session.async_payment_* events.
+      ...buildPaymentMethodConfig(),
+      // Stripe issues a real, sequentially numbered invoice (§14 UStG);
+      // the webhook stores its hosted/PDF URLs on the Invoice row.
+      invoice_creation: buildInvoiceCreation(organization),
       success_url: successUrl,
       cancel_url: cancelUrl,
       metadata: {
