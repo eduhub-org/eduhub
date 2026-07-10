@@ -99,6 +99,14 @@ OCCUPATION_TO_ENUM = {
     "Unternehmensführung / Geschäftsleitung": "MANAGEMENT",
     "Vertrieb und Handel": "SALES_RETAIL",
     "Sonstiges Berufsfeld": "OTHER",
+    # Added in production after the original seeds (validated against the
+    # 2026-07-10 dump; enum values from insert_into_public_JobOccupation_prod_additions)
+    "Tourismus": "TOURISM",
+    "Event Management": "EVENT_MANAGEMENT",
+    "Unternehmensberatung": "CONSULTING",
+    "Immobilien": "REAL_ESTATE",
+    "Social Media": "SOCIAL_MEDIA",
+    "Sozialpädagogik": "SOCIAL_PEDAGOGY",
 }
 
 PUBLICATION_DAYS = 56  # 8 weeks, parity with Job.archiveoldjobs
@@ -435,10 +443,15 @@ def step_jobs(hasura: HasuraClient, gcs_bucket, files_root, jobs, org_mapping, h
 
         restricted_to = None
         if j.get("mandate_names"):
-            # Only real-world mandate is "HAW Kiel" (plan §2.4)
-            restricted_to = haw_org_id
-            if haw_org_id is None:
-                log.warning("job %s has mandates (%s) but no HAW org id configured", j["id"], j["mandate_names"])
+            # Production data (2026-07-10): HAW-Kiel restricts 36 jobs, ZfS
+            # restricts a single old one; other mandates restrict nothing.
+            names = j["mandate_names"]
+            if "HAW" in names:
+                restricted_to = haw_org_id
+                if haw_org_id is None:
+                    log.warning("job %s restricted to HAW but --haw-org-id not set", j["id"])
+            else:
+                log.warning("job %s has non-HAW mandates (%s) — imported unrestricted, review manually", j["id"], names)
 
         duration_text = " ".join(
             filter(None, [str(j.get("duration") or "").strip(), (j.get("duration_unit") or "").strip()])
