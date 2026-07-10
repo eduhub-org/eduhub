@@ -8,6 +8,7 @@ import { useRouter } from 'next/router';
 // Shared infrastructure reused from the edu-hub app (via the @eduhub/*
 // tsconfig alias + externalDir) until it is extracted into root libs/.
 import { client } from '@eduhub/config/apollo';
+import { AuthStoreUpdater } from '@eduhub/components/AuthStoreUpdater';
 
 import deMessages from '../locales/de.json';
 import enMessages from '../locales/en.json';
@@ -26,6 +27,7 @@ export default function StujoApp({ Component, pageProps }: AppProps) {
   return (
     <SessionProvider session={pageProps.session}>
       <ApolloProvider client={client}>
+        <AuthStoreUpdater />
         <NextIntlClientProvider
           locale={locale}
           messages={messages[locale] ?? messages.de}

@@ -2596,6 +2596,10 @@
         "badges": {
           "label": "Badges",
           "description": "Reusable project badges and awards"
+        },
+        "jobboerse": {
+          "label": "Job board (StuJo)",
+          "description": "Moderate job postings, manage portals, prices and credits"
         }
       }
     },

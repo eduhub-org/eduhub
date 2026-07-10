@@ -2581,6 +2581,10 @@
         "badges": {
           "label": "Badges",
           "description": "Wiederverwendbare Projekt-Badges und Auszeichnungen"
+        },
+        "jobboerse": {
+          "label": "Jobbörse (StuJo)",
+          "description": "Stellenangebote moderieren, Portale, Preise und Kontingente verwalten"
         }
       }
     },

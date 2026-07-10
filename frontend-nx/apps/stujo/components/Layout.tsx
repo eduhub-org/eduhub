@@ -38,6 +38,7 @@ const Layout: FC<PropsWithChildren<{ portal: PortalBranding }>> = ({ portal, chi
           </Link>
           <Link href="/stellenangebote">{t('jobs')}</Link>
           <Link href="/fuer-arbeitgeber">{t('forEmployers')}</Link>
+          <Link href="/mein-stujo">Mein StuJo</Link>
         </div>
       </header>
       <main className="stujo-container" style={{ padding: '1.5rem 1rem' }}>

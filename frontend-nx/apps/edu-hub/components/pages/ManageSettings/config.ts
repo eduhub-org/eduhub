@@ -1,6 +1,7 @@
 import { ComponentType } from 'react';
 import {
   MdOutlineCategory,
+  MdOutlineWorkOutline,
   MdOutlineDescription,
   MdOutlineEmail,
   MdOutlineEventNote,
@@ -26,6 +27,7 @@ export type SettingsNavGroupId = 'platform' | 'notifications' | 'programs' | 'sy
 
 export type SettingsNavItemId =
   | 'appearance'
+  | 'jobboerse'
   | 'homepage'
   | 'emails'
   | 'programs'
@@ -59,6 +61,14 @@ export const SETTINGS_NAV_ITEMS: Record<SettingsNavItemId, SettingsNavItemDef> =
     id: 'appearance',
     icon: MdOutlinePalette,
     href: '/manage/settings/appearance',
+    requiredCapability: 'admin',
+    status: 'live',
+    groupId: 'platform',
+  },
+  jobboerse: {
+    id: 'jobboerse',
+    icon: MdOutlineWorkOutline,
+    href: '/manage/settings/jobboerse',
     requiredCapability: 'admin',
     status: 'live',
     groupId: 'platform',
@@ -157,7 +167,7 @@ export const SETTINGS_NAV_ITEMS: Record<SettingsNavItemId, SettingsNavItemDef> =
 export const SETTINGS_NAV_GROUPS: SettingsNavGroupDef[] = [
   {
     id: 'platform',
-    items: ['appearance', 'homepage'],
+    items: ['appearance', 'homepage', 'jobboerse'],
   },
   {
     id: 'notifications',

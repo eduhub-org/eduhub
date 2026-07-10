@@ -713,3 +713,13 @@ type CreateStripeJobPostingPricesResult {
   error: String
   messageKey: String
 }
+
+type Mutation {
+  archiveJobPosting(jobPostingId: Int!): ArchiveJobPostingResult!
+}
+
+type ArchiveJobPostingResult {
+  success: Boolean!
+  error: String
+  messageKey: String
+}
