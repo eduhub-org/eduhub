@@ -30,11 +30,16 @@ const Layout: FC<PropsWithChildren<{ portal: PortalBranding }>> = ({ portal, chi
       <header className="stujo-header">
         <div className="stujo-container">
           <Link href="/">
-            {portal.logoUrl ? (
-              <img src={portal.logoUrl} alt={portal.title} style={{ height: '2rem' }} />
-            ) : (
-              portal.title
-            )}
+            <img
+              src={portal.logoUrl || '/stujo_header_logo.png'}
+              alt={portal.title}
+              style={{
+                height: '2.4rem',
+                background: '#fff',
+                borderRadius: '0.25rem',
+                padding: '0.15rem 0.4rem',
+              }}
+            />
           </Link>
           <Link href="/stellenangebote">{t('jobs')}</Link>
           <Link href="/fuer-arbeitgeber">{t('forEmployers')}</Link>

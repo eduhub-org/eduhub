@@ -299,3 +299,98 @@ a {
   padding-top: 0.6rem;
   font-weight: 900;
 }
+
+/* --- Landing hero (per design/stujo-design.pen) --- */
+
+.stujo-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  background: var(--stujo-bg-soft, #f6f6f4);
+  border-radius: 0.5rem;
+  padding: 3rem 1.5rem;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.stujo-hero-bird {
+  height: 4rem;
+}
+
+.stujo-hero-claim {
+  margin: 0;
+  font-size: 2.1rem;
+  font-weight: 900;
+}
+
+.stujo-hero-sub {
+  margin: 0;
+  color: var(--stujo-grey, #646363);
+  max-width: 42rem;
+}
+
+.stujo-hero-search {
+  display: flex;
+  width: 100%;
+  max-width: 36rem;
+}
+
+.stujo-hero-search input {
+  flex: 1;
+  font-family: inherit;
+  font-size: 1rem;
+  padding: 0.8rem 1rem;
+  border: 1px solid var(--stujo-border);
+  border-radius: 0.25rem 0 0 0.25rem;
+  border-right: none;
+}
+
+.stujo-hero-search button {
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fff;
+  background: var(--stujo-secondary);
+  border: none;
+  cursor: pointer;
+  padding: 0.8rem 1.6rem;
+  border-radius: 0 0.25rem 0.25rem 0;
+}
+
+.stujo-hero-filters {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.stujo-badge-link {
+  background: #fff;
+  border: 1px solid var(--stujo-border);
+  border-radius: 0.2rem;
+  padding: 0.25rem 0.7rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--stujo-grey, #646363);
+  text-decoration: none;
+}
+
+.stujo-badge-link:hover {
+  color: var(--stujo-primary);
+  border-color: var(--stujo-primary);
+}
+
+.stujo-section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.75rem;
+}
+
+.stujo-section-head h2 {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 900;
+}
