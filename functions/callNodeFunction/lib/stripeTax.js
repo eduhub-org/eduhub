@@ -76,13 +76,46 @@ export function buildInvoiceCreation(organization) {
 }
 
 /**
+ * Finds (by email) or creates the Stripe Customer for a checkout. The
+ * bank-transfer method (customer_balance) requires sessions to be created
+ * with an existing customer — customer_creation is not sufficient
+ * (verified against the test-mode API).
+ *
+ * @param {import('stripe').Stripe} stripe
+ * @param {string} email
+ * @param {string|null} name
+ * @returns {Promise<string>} customer id
+ */
+export async function getOrCreateCustomer(stripe, email, name = null) {
+  const existing = await stripe.customers.list({ email, limit: 1 });
+  if (existing.data.length > 0) {
+    return existing.data[0].id;
+  }
+  const created = await stripe.customers.create({ email, ...(name ? { name } : {}) });
+  return created.id;
+}
+
+/**
  * Payment methods agreed for both flows (2026-07-10): card, SEPA direct
  * debit and EU bank transfer (pay later). SEPA and bank transfer settle
  * asynchronously — webhook consumers must handle
  * checkout.session.async_payment_succeeded / _failed.
+ *
+ * Bank transfer is only offered when a Stripe customer exists (pass its
+ * id, see getOrCreateCustomer); without one the session degrades to
+ * card + SEPA.
+ *
+ * @param {string|null} customerId
  */
-export function buildPaymentMethodConfig() {
+export function buildPaymentMethodConfig(customerId = null) {
+  if (!customerId) {
+    return {
+      payment_method_types: ['card', 'sepa_debit'],
+      customer_creation: 'always',
+    };
+  }
   return {
+    customer: customerId,
     payment_method_types: ['card', 'sepa_debit', 'customer_balance'],
     payment_method_options: {
       customer_balance: {
@@ -90,6 +123,5 @@ export function buildPaymentMethodConfig() {
         bank_transfer: { type: 'eu_bank_transfer', eu_bank_transfer: { country: 'DE' } },
       },
     },
-    customer_creation: 'always',
   };
 }

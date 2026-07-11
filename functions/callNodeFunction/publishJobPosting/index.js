@@ -1,7 +1,11 @@
 import Stripe from 'stripe';
 import { GraphQLClient, gql } from 'graphql-request';
 
-import { buildInvoiceCreation, buildPaymentMethodConfig } from '../lib/stripeTax.js';
+import {
+  buildInvoiceCreation,
+  buildPaymentMethodConfig,
+  getOrCreateCustomer,
+} from '../lib/stripeTax.js';
 
 /**
  * Single entry point for publishing a StuJo job posting (phase 4 of
@@ -361,12 +365,23 @@ export default async function publishJobPosting(req, logger) {
       }
     }
 
+    // Bank transfer (customer_balance) requires an existing Stripe
+    // customer; without a contact email the session degrades to card+SEPA.
+    let customerId = null;
+    if (posting.ContactUser?.email) {
+      customerId = await getOrCreateCustomer(
+        stripe,
+        posting.ContactUser.email,
+        posting.Organization?.name || null
+      );
+    }
+
     const sessionConfig = {
       line_items: [lineItem],
       mode: 'payment',
       // Agreed payment methods: card, SEPA direct debit, bank transfer
       // (pay later, parity with the old invoice flow).
-      ...buildPaymentMethodConfig(),
+      ...buildPaymentMethodConfig(customerId),
       // Stripe issues a real, sequentially numbered invoice (§14 UStG).
       invoice_creation: buildInvoiceCreation(sellerOrganization),
       success_url: `${frontendUrl}/mein-stujo?payment=success&session_id={CHECKOUT_SESSION_ID}`,
@@ -382,9 +397,6 @@ export default async function publishJobPosting(req, logger) {
         metadata: { jobPostingId: String(posting.id), source: 'stujo' },
       },
     };
-    if (posting.ContactUser?.email) {
-      sessionConfig.customer_email = posting.ContactUser.email;
-    }
 
     const session = await stripe.checkout.sessions.create(sessionConfig);
     await client.request(SET_PENDING_PAYMENT, { id: posting.id });

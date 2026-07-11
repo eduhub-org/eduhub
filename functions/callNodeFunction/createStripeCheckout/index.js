@@ -5,6 +5,7 @@ import {
   getOrCreateTaxRate,
   buildInvoiceCreation,
   buildPaymentMethodConfig,
+  getOrCreateCustomer,
 } from '../lib/stripeTax.js';
 
 const GET_COURSE_AND_ADDONS = `
@@ -474,15 +475,20 @@ export default async function createStripeCheckout(req, logger) {
       });
     }
 
+    // Bank transfer (customer_balance) requires an existing Stripe
+    // customer; without an email the session degrades to card+SEPA.
+    let stripeCustomerId = null;
+    if (emailToUse && emailToUse.trim() !== '' && emailToUse.includes('@')) {
+      stripeCustomerId = await getOrCreateCustomer(stripe, emailToUse.trim());
+    }
+
     // Create Stripe Checkout Session
-    // Only include customer_email if we have a valid email address
-    // Stripe will prompt for email during checkout if not provided
     const sessionConfig = {
       line_items: lineItems,
       mode: 'payment',
       // Agreed payment methods (card, SEPA debit, EU bank transfer);
       // delayed methods settle via checkout.session.async_payment_* events.
-      ...buildPaymentMethodConfig(),
+      ...buildPaymentMethodConfig(stripeCustomerId),
       // Stripe issues a real, sequentially numbered invoice (§14 UStG);
       // the webhook stores its hosted/PDF URLs on the Invoice row.
       invoice_creation: buildInvoiceCreation(organization),
@@ -525,10 +531,7 @@ export default async function createStripeCheckout(req, logger) {
       }
     };
 
-    // Only add customer_email if we have a valid email address
-    if (emailToUse && emailToUse.trim() !== '' && emailToUse.includes('@')) {
-      sessionConfig.customer_email = emailToUse.trim();
-    }
+    // Without a customer, let Stripe prompt for the email during checkout.
 
     const session = await stripe.checkout.sessions.create(sessionConfig);
 

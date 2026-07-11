@@ -72,7 +72,7 @@ module "lb-http" {
 
   # Create Google-managed SSL certificates for the specified domains. 
   ssl                             = "true"
-  managed_ssl_certificate_domains = ["${local.keycloak_service_name}.opencampus.sh", "${local.hasura_service_name}.opencampus.sh", "${local.eduhub_service_name}.opencampus.sh", "${local.eduhub_api_service_name}.opencampus.sh"]
+  managed_ssl_certificate_domains = ["${local.keycloak_service_name}.opencampus.sh", "${local.hasura_service_name}.opencampus.sh", "${local.eduhub_service_name}.opencampus.sh", "${local.eduhub_api_service_name}.opencampus.sh", local.stujo_domain]
   https_redirect                  = "true"
   random_certificate_suffix       = "true"
 
@@ -138,6 +138,14 @@ resource "cloudflare_record" "eduhub" {
 resource "cloudflare_record" "eduhub_api" {
   zone_id = var.cloudflare_zone_id
   name    = local.eduhub_api_service_name
+  type    = "A"
+  value   = module.lb-http.external_ip
+}
+
+# Add a domain record for the StuJo job board frontend
+resource "cloudflare_record" "stujo" {
+  zone_id = var.cloudflare_zone_id
+  name    = trimsuffix(local.stujo_domain, ".opencampus.sh")
   type    = "A"
   value   = module.lb-http.external_ip
 }

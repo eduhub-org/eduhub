@@ -2394,7 +2394,8 @@
                       "fill": "$text-grey",
                       "content": "Neues Angebot",
                       "fontFamily": "$font",
-                      "fontSize": 14
+                      "fontSize": 14,
+                      "fontWeight": "normal"
                     }
                   ]
                 },
@@ -2429,7 +2430,8 @@
                       "fill": "$text-grey",
                       "content": "Unternehmensprofil",
                       "fontFamily": "$font",
-                      "fontSize": 14
+                      "fontSize": 14,
+                      "fontWeight": "normal"
                     }
                   ]
                 },
@@ -2464,7 +2466,8 @@
                       "fill": "$text-grey",
                       "content": "Kontakte",
                       "fontFamily": "$font",
-                      "fontSize": 14
+                      "fontSize": 14,
+                      "fontWeight": "normal"
                     }
                   ]
                 },
@@ -2499,7 +2502,8 @@
                       "fill": "$text-grey",
                       "content": "Rechnungen",
                       "fontFamily": "$font",
-                      "fontSize": 14
+                      "fontSize": 14,
+                      "fontWeight": "normal"
                     }
                   ]
                 },
@@ -2534,7 +2538,8 @@
                       "fill": "$text-grey",
                       "content": "Statistik",
                       "fontFamily": "$font",
-                      "fontSize": 14
+                      "fontSize": 14,
+                      "fontWeight": "normal"
                     }
                   ]
                 }
@@ -3696,7 +3701,8 @@
                       "fill": "$text-muted",
                       "content": "Vorschau & Veröffentlichen",
                       "fontFamily": "$font",
-                      "fontSize": 14
+                      "fontSize": 14,
+                      "fontWeight": "normal"
                     }
                   ]
                 }
@@ -4500,7 +4506,8 @@
                       "fill": "$text-grey",
                       "content": "Angebot erstellen",
                       "fontFamily": "$font",
-                      "fontSize": 14
+                      "fontSize": 14,
+                      "fontWeight": "normal"
                     }
                   ]
                 },
@@ -4668,7 +4675,8 @@
                           "fill": "$text-grey",
                           "content": "Studentenjob · 8 Wochen",
                           "fontFamily": "$font",
-                          "fontSize": 13
+                          "fontSize": 13,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
@@ -4697,7 +4705,8 @@
                           "fill": "$text-grey",
                           "content": "19 % MwSt.",
                           "fontFamily": "$font",
-                          "fontSize": 13
+                          "fontSize": 13,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "text",
