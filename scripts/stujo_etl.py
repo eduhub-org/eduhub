@@ -13,13 +13,15 @@ Usage:
 
 Environment:
     STUJO_MYSQL_DSN        e.g. mysql://user:pass@host:3306/stujo
-    STUJO_FILES_ROOT       path to the Rails public/ dir (Paperclip files)
+    STUJO_FILES_ROOT       path to the Rails public/ dir (Paperclip files);
+                           required for real companies/jobs runs
     HASURA_URL             e.g. https://.../v1/graphql
     HASURA_ADMIN_SECRET
     KEYCLOAK_URL, KEYCLOAK_USER, KEYCLOAK_PW   (admin credentials; same names
                            the functions use in docker-compose.yml)
     KEYCLOAK_REALM         target realm (default: edu-hub)
-    GCS_BUCKET             target bucket for logos and job PDFs
+    GCS_BUCKET             target bucket for logos and job PDFs;
+                           required for real companies/jobs runs
     RETENTION_YEARS        only migrate companies with a posting newer than
                            this many years (default 3; see plan §7/§9)
 
@@ -35,6 +37,7 @@ import re
 import sys
 import unicodedata
 from datetime import datetime, timedelta, timezone
+from urllib.parse import quote
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
 log = logging.getLogger("stujo-etl")
@@ -119,6 +122,15 @@ PUBLICATION_DAYS = 56  # 8 weeks, parity with Job.archiveoldjobs
 UNLIMITED_CREDITS_SENTINEL = 100000
 
 SITE_STUJO, SITE_ETALENTS = 0, 1  # sitememberships.site
+
+# Paperclip file-copy accounting, reported at the end of the run so "did all
+# PDFs/logos make it?" is answerable without grepping the per-file warnings.
+FILE_STATS = {
+    "logos_copied": 0,
+    "logos_missing": 0,
+    "pdfs_copied": 0,
+    "pdfs_missing": 0,
+}
 
 
 # ---------------------------------------------------------------------------
@@ -541,9 +553,20 @@ def step_companies(hasura: HasuraClient, gcs_bucket, files_root, companies) -> d
     return mapping
 
 
+def public_gcs_url(bucket_name: str, blob_name: str) -> str:
+    """Percent-encoded public URL — legacy Paperclip filenames contain
+    spaces/umlauts, which are valid blob names but not valid URL paths."""
+    return f"https://storage.googleapis.com/{bucket_name}/{quote(blob_name)}"
+
+
 def copy_paperclip_logo(gcs_bucket, files_root, company) -> str | None:
-    """Copy public/system/logos/:id/original/:filename to GCS."""
-    if not company.get("logo_file_name") or gcs_bucket is None:
+    """Copy public/system/logos/:id/original/:filename to GCS.
+
+    Dry runs (gcs_bucket None) still verify the file on disk and feed
+    FILE_STATS when STUJO_FILES_ROOT is set, so a dry run doubles as a
+    pre-flight check of the rsynced Rails public/ dir; only uploads skip.
+    """
+    if not company.get("logo_file_name") or not files_root:
         return None
     src = os.path.join(
         files_root, "system", "logos", str(company["id"]), "original",
@@ -551,16 +574,23 @@ def copy_paperclip_logo(gcs_bucket, files_root, company) -> str | None:
     )
     if not os.path.exists(src):
         log.warning("logo missing on disk: %s", src)
+        FILE_STATS["logos_missing"] += 1
+        return None
+    FILE_STATS["logos_copied"] += 1
+    if gcs_bucket is None:  # dry run
         return None
     blob_name = f"stujo/logos/{company['id']}/{company['logo_file_name']}"
     blob = gcs_bucket.blob(blob_name)
     blob.upload_from_filename(src)
-    return f"https://storage.googleapis.com/{gcs_bucket.name}/{blob_name}"
+    return public_gcs_url(gcs_bucket.name, blob_name)
 
 
 def copy_paperclip_pdf(gcs_bucket, files_root, job) -> str | None:
-    """Copy the Paperclip job PDF (default id_partition path) to GCS."""
-    if not job.get("pdf_file_name") or gcs_bucket is None:
+    """Copy the Paperclip job PDF (default id_partition path) to GCS.
+
+    Same dry-run/pre-flight semantics as copy_paperclip_logo.
+    """
+    if not job.get("pdf_file_name") or not files_root:
         return None
     id_partition = "/".join(re.findall("...", f"{job['id']:09d}"))
     src = os.path.join(
@@ -569,11 +599,15 @@ def copy_paperclip_pdf(gcs_bucket, files_root, job) -> str | None:
     )
     if not os.path.exists(src):
         log.warning("job pdf missing on disk: %s", src)
+        FILE_STATS["pdfs_missing"] += 1
+        return None
+    FILE_STATS["pdfs_copied"] += 1
+    if gcs_bucket is None:  # dry run
         return None
     blob_name = f"stujo/job-pdfs/{job['id']}/{job['pdf_file_name']}"
     blob = gcs_bucket.blob(blob_name)
     blob.upload_from_filename(src)
-    return f"https://storage.googleapis.com/{gcs_bucket.name}/{blob_name}"
+    return public_gcs_url(gcs_bucket.name, blob_name)
 
 
 def step_users(hasura: HasuraClient, keycloak, contacts, org_mapping) -> dict:
@@ -686,16 +720,35 @@ def step_users(hasura: HasuraClient, keycloak, contacts, org_mapping) -> dict:
 
 def step_jobs(hasura: HasuraClient, gcs_bucket, files_root, jobs, org_mapping,
               user_mapping, haw_org_id):
-    """jobs → JobPosting (+ tags). Idempotent via legacyStujoId."""
+    """jobs → JobPosting (+ tags). Idempotent via legacyStujoId. Postings
+    that already exist are skipped, except that a missing pdfUrl is
+    backfilled — so a delta re-run repairs postings whose PDF was not on
+    disk yet (incomplete rsync) when they were first imported."""
     existing = {
-        row["legacyStujoId"]
+        row["legacyStujoId"]: row
         for row in hasura.query(
-            "query { JobPosting(where: {legacyStujoId: {_is_null: false}}) { legacyStujoId } }"
+            "query { JobPosting(where: {legacyStujoId: {_is_null: false}}) { id legacyStujoId pdfUrl } }"
         )["JobPosting"]
     }
 
     for j in jobs:
-        if j["id"] in existing or j["company_id"] not in org_mapping:
+        if j["company_id"] not in org_mapping:
+            continue
+        prior = existing.get(j["id"])
+        if prior:
+            if prior["pdfUrl"] is None and j.get("pdf_file_name"):
+                pdf_url = copy_paperclip_pdf(gcs_bucket, files_root, j)
+                if pdf_url:
+                    hasura.mutate(
+                        """
+                        mutation ($id: Int!, $url: String!) {
+                          update_JobPosting_by_pk(pk_columns: {id: $id}, _set: {pdfUrl: $url}) { id }
+                        }
+                        """,
+                        {"id": prior["id"], "url": pdf_url},
+                    )
+                    log.info("job %s: backfilled missing pdfUrl on JobPosting %s",
+                             j["id"], prior["id"])
             continue
         posting_type = CATEGORY_TO_TYPE.get(j["category_id"])
         if posting_type is None:
@@ -963,6 +1016,17 @@ def main():
         log.error("STUJO_MYSQL_DSN, HASURA_URL and HASURA_ADMIN_SECRET are required")
         sys.exit(2)
 
+    # Logos/PDFs move during the companies/jobs steps; running those for real
+    # without the bucket or the rsynced Rails public/ dir would silently
+    # migrate every record with null logo/pdfUrl (and re-runs skip existing
+    # rows, so the loss would be permanent for organizations).
+    if not args.dry_run and ({"companies", "jobs"} & steps):
+        if not os.environ.get("GCS_BUCKET") or not files_root:
+            log.error("GCS_BUCKET and STUJO_FILES_ROOT are required for the "
+                      "companies/jobs steps in a real run (rsync the Rails "
+                      "public/ dir first; see plan §7)")
+            sys.exit(2)
+
     gcs_bucket = None
     if os.environ.get("GCS_BUCKET") and not args.dry_run:
         from google.cloud import storage
@@ -1004,6 +1068,16 @@ def main():
     if "students" in steps:
         step_students(hasura, keycloak, src["students"])
 
+    if any(FILE_STATS.values()):
+        log.info(
+            "file copy summary: %s logos copied, %s logos missing, "
+            "%s job PDFs copied, %s job PDFs missing",
+            FILE_STATS["logos_copied"], FILE_STATS["logos_missing"],
+            FILE_STATS["pdfs_copied"], FILE_STATS["pdfs_missing"],
+        )
+        if (FILE_STATS["logos_missing"] or FILE_STATS["pdfs_missing"]) and not args.dry_run:
+            log.warning("some files were missing on disk — complete the rsync "
+                        "and re-run; missing pdfUrls are backfilled on re-runs")
     log.info("done%s", " (dry run)" if args.dry_run else "")
 
 
