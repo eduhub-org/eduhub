@@ -145,6 +145,26 @@ actions:
     permissions:
       - role: user_access
     comment: Publishes a StuJo job posting (free/credit) or creates the Stripe checkout session for it
+  - name: saveJobPostingPdf
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: bucket
+          value_from_env: HASURA_BUCKET
+        - name: name
+          value: saveFile
+        - name: file-path
+          value: jobpostings/jobposting-${jobpostingid}/public/${filename}
+        - name: is-public
+          value: "true"
+        - name: max-file-size-mb
+          value: "15"
+    permissions:
+      - role: user_access
+    comment: Uploads the job posting PDF (StuJo offer document, embedded on the detail page)
   - name: createUser
     definition:
       kind: synchronous

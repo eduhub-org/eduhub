@@ -43,6 +43,8 @@
                 <div class="navbar-logo-wrapper">
                     <img class="navbar-logo" src="${url.resourcesPath}/img/edu_logo.svg">
                     <img class="navbar-logo-text" src="${url.resourcesPath}/img/logo_text.svg">
+                    <#-- StuJo variant, toggled by js/stujo-brand.js (hidden by default) -->
+                    <img class="navbar-logo-stujo" style="display:none" src="${url.resourcesPath}/img/stujo_header_logo.png" alt="StuJo">
                 </div>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="true" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>

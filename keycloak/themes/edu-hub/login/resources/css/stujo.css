@@ -1,0 +1,82 @@
+/*
+ * StuJo skin for the shared login theme. Activated via html.stujo-brand
+ * (see js/stujo-brand.js). Recreates the StuJo look: purple gradient
+ * backdrop (like the site header), white dialog card, green submit
+ * button, pink links — so the login reads as a StuJo dialog instead of
+ * the dark EduHub page.
+ */
+
+html.stujo-brand .login-pf body,
+html.stujo-brand body {
+  background-image: none !important;
+  background: linear-gradient(to right, #4b0135, #a71580, #4b0135) !important;
+  font-family: Lato, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+/* Header bar: white strip with the StuJo logo instead of the EduHub logo */
+html.stujo-brand .academy_header_guest {
+  background: #fff;
+}
+
+html.stujo-brand .navbar-logo,
+html.stujo-brand .navbar-logo-text {
+  display: none !important;
+}
+
+html.stujo-brand .navbar-logo-stujo {
+  display: block !important;
+  height: 52px;
+  padding: 4px 12px;
+}
+
+/* Dialog card */
+html.stujo-brand .card-pf {
+  background-color: #fff !important;
+  border-radius: 4px !important;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.35) !important;
+  padding: 8px 24px 20px !important;
+}
+
+html.stujo-brand #kc-page-title,
+html.stujo-brand .edu-title {
+  color: #a71580 !important;
+  font-weight: bold;
+}
+
+html.stujo-brand .pf-c-form-control {
+  border: 2px solid #dedad5 !important;
+  border-radius: 0 !important;
+}
+
+/* Green StuJo submit button (live .stujo-submit) */
+html.stujo-brand .pf-c-button.pf-m-primary,
+html.stujo-brand .login-pf-page .btn-primary {
+  background: #acca23 !important;
+  border: none !important;
+  border-radius: 4px !important;
+  color: #fff !important;
+  text-transform: none !important;
+  font-size: 17px;
+  padding: 8px 24px;
+}
+
+html.stujo-brand .pf-c-button.pf-m-primary:hover,
+html.stujo-brand .login-pf-page .btn-primary:hover {
+  background: #9cb81f !important;
+  color: #fff !important;
+}
+
+/* Links: grey with pink hover like the site */
+html.stujo-brand a {
+  color: #646363 !important;
+}
+
+html.stujo-brand a:hover {
+  color: #a71580 !important;
+}
+
+html.stujo-brand #kc-registration a,
+html.stujo-brand .login-pf-settings a {
+  color: #a71580 !important;
+  font-weight: bold;
+}

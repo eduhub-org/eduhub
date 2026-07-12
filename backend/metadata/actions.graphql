@@ -692,6 +692,14 @@ type Mutation {
 }
 
 type Mutation {
+  saveJobPostingPdf(
+    base64file: String!
+    filename: String!
+    jobpostingid: Int!
+  ): saveFileResult
+}
+
+type Mutation {
   createStripeJobPostingPrices: CreateStripeJobPostingPricesResult!
 }
 

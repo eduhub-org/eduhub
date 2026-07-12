@@ -94,6 +94,19 @@ export const GET_JOB_POSTING_FOR_EDIT = gql`
       applicationDeadline
       hoursPerWeek
       language
+      pdfUrl
+    }
+  }
+`;
+
+export const SAVE_JOB_POSTING_PDF = gql`
+  mutation SaveJobPostingPdf($base64file: String!, $filename: String!, $jobpostingid: Int!) {
+    saveJobPostingPdf(base64file: $base64file, filename: $filename, jobpostingid: $jobpostingid) {
+      success
+      error
+      messageKey
+      filePath
+      accessUrl
     }
   }
 `;
