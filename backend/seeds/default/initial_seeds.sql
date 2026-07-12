@@ -3388,6 +3388,168 @@ VALUES
   (9902, 9902, '22222222-2222-2222-2222-222222222222', 'ACCEPTED',
    '2026-06-05 00:00:00+00', '2026-06-05 00:00:00+00');
 
+-- =============================================================================
+-- Published showcase projects + badges.
+-- The base seed has many published Courses but no PUBLISHED (showcase) Projects,
+-- so the home/course project sliders and the badge feature had nothing to show.
+-- These PUBLISHED projects are attached to existing published courses, given
+-- authors/mentors for the avatar rows, and tagged with a mix of WON / NOMINATED
+-- badges (with a couple of projects intentionally left un-badged as a control).
+-- All ids are in the 99xx range to stay clear of the base seed data.
+-- =============================================================================
+INSERT INTO public."Badge"
+  (id, title, description, icon, created_at, updated_at)
+VALUES
+  (1, 'AI Innovation Award 2025',
+   'Awarded to the project with the most original use of AI.',
+   'trophy', now(), now()),
+  (2, 'Best Social Impact',
+   'For the project that best improves the community or society.',
+   'heart', now(), now()),
+  (3, 'Audience Choice',
+   'Voted the crowd favourite at the final showcase.',
+   'users', now(), now()),
+  (4, 'Sustainability Prize',
+   'Recognises outstanding contribution to sustainability.',
+   'leaf', now(), now()),
+  (5, 'Best Prototype',
+   'For the most polished and functional working prototype.',
+   'wrench', now(), now());
+
+INSERT INTO public."Project"
+  (id, title, tagline, description, "coverImageUrl", "documentationUrl",
+   "presentationUrl", "externalUrl", status, type, rating,
+   "documentationInstructionId", "proposedByUserId", "acceptingParticipants",
+   created_at, updated_at)
+VALUES
+  (9910, 'EcoTrack – Carbon Footprint App',
+   'Track and reduce your daily carbon footprint.',
+   'A mobile app that turns everyday purchases and travel into an actionable '
+   || 'carbon score, with tips to cut emissions over time.',
+   NULL, NULL, NULL, NULL, 'PUBLISHED', 'CLASSIC_PROJECT', 'PASSED',
+   9901, '11111111-1111-1111-1111-111111111111', false,
+   '2025-02-01 10:00:00+00', '2025-02-10 10:00:00+00'),
+  (9911, 'StudyBuddy – AI Tutor',
+   'A conversational tutor that adapts to how you learn.',
+   'StudyBuddy generates personalised practice questions and explanations from '
+   || 'your own course material using a retrieval-augmented language model.',
+   NULL, NULL, NULL, NULL, 'PUBLISHED', 'CLASSIC_PROJECT', 'PASSED',
+   9901, '22222222-2222-2222-2222-222222222222', false,
+   '2025-02-02 10:00:00+00', '2025-02-11 10:00:00+00'),
+  (9912, 'CityPulse – Urban Data Dashboard',
+   'Live, open-data insights for city residents.',
+   'CityPulse aggregates public transport, air-quality and event data into a '
+   || 'single dashboard so residents can plan around what is happening now.',
+   NULL, NULL, NULL, NULL, 'PUBLISHED', 'CLASSIC_PROJECT', 'PASSED',
+   9901, '33333333-3333-3333-3333-333333333333', false,
+   '2025-02-03 10:00:00+00', '2025-02-12 10:00:00+00'),
+  (9913, 'MediSort – Recycling Assistant',
+   'Point your camera, learn how to recycle it.',
+   'MediSort uses on-device image recognition to tell you which bin an item '
+   || 'belongs in, tuned to local recycling rules.',
+   NULL, NULL, NULL, NULL, 'PUBLISHED', 'CLASSIC_PROJECT', 'PASSED',
+   9901, '44444444-4444-4444-4444-444444444444', false,
+   '2025-02-04 10:00:00+00', '2025-02-13 10:00:00+00'),
+  (9914, 'LinguaLoop – Language Exchange',
+   'Match with a partner and practise a new language.',
+   'LinguaLoop pairs learners for short, structured conversation sessions and '
+   || 'suggests topics based on each partner''s level.',
+   NULL, NULL, NULL, NULL, 'PUBLISHED', 'CLASSIC_PROJECT', 'PASSED',
+   9901, '66666666-6666-6666-6666-666666666666', false,
+   '2025-02-05 10:00:00+00', '2025-02-14 10:00:00+00'),
+  (9915, 'FarmSense – Smart Agriculture',
+   'Low-cost soil sensors for small farms.',
+   'FarmSense combines cheap moisture sensors with a simple app so smallholder '
+   || 'farmers know exactly when and how much to irrigate.',
+   NULL, NULL, NULL, NULL, 'PUBLISHED', 'CLASSIC_PROJECT', 'PASSED',
+   9901, '77777777-7777-7777-7777-777777777777', false,
+   '2025-02-06 10:00:00+00', '2025-02-15 10:00:00+00');
+
+-- Link each showcase project to an existing published course.
+INSERT INTO public."ProjectCourse"
+  (id, "projectId", "courseId", created_at, updated_at)
+VALUES
+  (9910, 9910, 4,   now(), now()),
+  (9911, 9911, 5,   now(), now()),
+  (9912, 9912, 302, now(), now()),
+  (9913, 9913, 301, now(), now()),
+  (9914, 9914, 101, now(), now()),
+  (9915, 9915, 4,   now(), now());
+
+-- Implementing authors (ACCEPTED) drive the tile/detail avatar rows.
+INSERT INTO public."ProjectAuthor"
+  (id, "projectId", "userId", "participationStatus", created_at, updated_at)
+VALUES
+  (9910, 9910, '11111111-1111-1111-1111-111111111111', 'ACCEPTED', now(), now()),
+  (9911, 9910, '88888888-8888-8888-8888-888888888888', 'ACCEPTED', now(), now()),
+  (9912, 9911, '22222222-2222-2222-2222-222222222222', 'ACCEPTED', now(), now()),
+  (9913, 9911, '99999999-9999-9999-9999-999999999999', 'ACCEPTED', now(), now()),
+  (9914, 9912, '33333333-3333-3333-3333-333333333333', 'ACCEPTED', now(), now()),
+  (9915, 9913, '44444444-4444-4444-4444-444444444444', 'ACCEPTED', now(), now()),
+  (9916, 9913, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'ACCEPTED', now(), now()),
+  (9917, 9914, '66666666-6666-6666-6666-666666666666', 'ACCEPTED', now(), now()),
+  (9918, 9915, '77777777-7777-7777-7777-777777777777', 'ACCEPTED', now(), now());
+
+-- Mentors are independent of the author lifecycle.
+INSERT INTO public."ProjectMentor"
+  (id, "projectId", "userId", created_at, updated_at)
+VALUES
+  (9910, 9910, 'cccccccc-cccc-cccc-cccc-cccccccccccc', now(), now()),
+  (9911, 9911, 'cccccccc-cccc-cccc-cccc-cccccccccccc', now(), now()),
+  (9912, 9913, '8914bee9-0549-44af-bcae-cafeec5ba92e', now(), now());
+
+-- Badge awards. 9910 and 9913 carry two badges each; 9915 stays un-badged.
+INSERT INTO public."ProjectBadge"
+  (id, "projectId", "badgeId", created_at, updated_at)
+VALUES
+  (1, 9910, 4, now(), now()),
+  (2, 9910, 1, now(), now()),
+  (3, 9911, 1, now(), now()),
+  (4, 9912, 3, now(), now()),
+  (5, 9913, 2, now(), now()),
+  (6, 9913, 4, now(), now()),
+  (7, 9914, 2, now(), now());
+
+-- A home project slider showcasing the badged projects. A "project slider" is a
+-- CourseGroupOption row with contentType = 'PROJECT'; its membership is composed
+-- from the selected ProjectGroupOption(s). We tag the badge-carrying projects
+-- into an "Award Winners" project group and point the slider at that group, so
+-- the homepage renders a slider of projects that all have a badge.
+INSERT INTO public."ProjectGroupOption"
+  (id, title, "order", "organizationId", created_at, updated_at)
+VALUES
+  (1, 'Award Winners', 1, NULL, now(), now());
+
+INSERT INTO public."ProjectGroup"
+  (id, "projectId", "groupOptionId", created_at, updated_at)
+VALUES
+  (1, 9910, 1, now(), now()),
+  (2, 9911, 1, now(), now()),
+  (3, 9912, 1, now(), now()),
+  (4, 9913, 1, now(), now()),
+  (5, 9914, 1, now(), now());
+
+-- The slider row itself (contentType = PROJECT). Its free-text title is shown
+-- verbatim on the homepage (non-built-in titles are not translated). "order" 7
+-- places it after the existing course sliders (orders 1-6).
+INSERT INTO public."CourseGroupOption"
+  (id, title, "order", "sliderGroup", "contentType", "programType", "organizationId", created_at, updated_at)
+VALUES
+  (9300, 'Ausgezeichnete Projekte', 7, true, 'PROJECT', NULL, NULL, now(), now());
+
+INSERT INTO public."ProjectSliderProjectGroup"
+  (id, "projectSliderOptionId", "projectGroupOptionId", created_at, updated_at)
+VALUES
+  (1, 9300, 1, now(), now());
+
+SELECT pg_catalog.setval(pg_get_serial_sequence('public."Badge"', 'id'), (SELECT max(id) FROM public."Badge"), true);
+SELECT pg_catalog.setval(pg_get_serial_sequence('public."ProjectBadge"', 'id'), (SELECT max(id) FROM public."ProjectBadge"), true);
+SELECT pg_catalog.setval(pg_get_serial_sequence('public."ProjectMentor"', 'id'), (SELECT max(id) FROM public."ProjectMentor"), true);
+SELECT pg_catalog.setval(pg_get_serial_sequence('public."ProjectGroupOption"', 'id'), (SELECT max(id) FROM public."ProjectGroupOption"), true);
+SELECT pg_catalog.setval(pg_get_serial_sequence('public."ProjectGroup"', 'id'), (SELECT max(id) FROM public."ProjectGroup"), true);
+SELECT pg_catalog.setval(pg_get_serial_sequence('public."ProjectSliderProjectGroup"', 'id'), (SELECT max(id) FROM public."ProjectSliderProjectGroup"), true);
+SELECT pg_catalog.setval(pg_get_serial_sequence('public."CourseGroupOption"', 'id'), (SELECT GREATEST(max(id), 6) FROM public."CourseGroupOption"), true);
+
 SELECT pg_catalog.setval('public."AchievementDocumentationTemplate_id_seq"', 1, true);
 SELECT pg_catalog.setval('public."AchievementOptionCourse_id_seq"', 10, true);
 SELECT pg_catalog.setval('public."AchievementOptionMentor_id_seq"', 1, true);

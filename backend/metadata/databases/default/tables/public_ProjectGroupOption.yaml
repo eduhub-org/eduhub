@@ -1,0 +1,47 @@
+table:
+  name: ProjectGroupOption
+  schema: public
+object_relationships:
+  - name: Organization
+    using:
+      foreign_key_constraint_on: organizationId
+array_relationships:
+  - name: ProjectGroups
+    using:
+      foreign_key_constraint_on:
+        column: groupOptionId
+        table:
+          name: ProjectGroup
+          schema: public
+  - name: ProjectSliderProjectGroups
+    using:
+      foreign_key_constraint_on:
+        column: projectGroupOptionId
+        table:
+          name: ProjectSliderProjectGroup
+          schema: public
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - id
+        - title
+        - order
+        - organizationId
+        - created_at
+        - updated_at
+      # Only options that tag at least one anonymously-visible project, so
+      # admin-managed / organization-scoped tags are not globally enumerable.
+      filter:
+        ProjectGroups:
+          Project:
+            _or:
+              - status:
+                  _eq: PUBLISHED
+              - _and:
+                  - status:
+                      _eq: PROPOSED
+                  - _not:
+                      ProjectAuthors:
+                        participationStatus:
+                          _eq: ACCEPTED

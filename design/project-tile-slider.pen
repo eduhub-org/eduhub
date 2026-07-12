@@ -1,0 +1,3393 @@
+{
+  "version": "2.13",
+  "children": [
+    {
+      "children": [
+        {
+          "content": "Project Tile — 2 types × 2 contexts",
+          "fill": "#F2F2F2",
+          "fontFamily": "Space Grotesk",
+          "fontSize": 26,
+          "fontWeight": "600",
+          "id": "U5RvRM",
+          "name": "Heading",
+          "textGrowth": "fixed-width",
+          "type": "text",
+          "width": "fill_container"
+        },
+        {
+          "content": "Tile A = published showcase. Tile B = open template with public vs within-course CTA variants.",
+          "fill": "#888888",
+          "fontFamily": "Space Grotesk",
+          "fontSize": 14,
+          "fontWeight": "normal",
+          "id": "d8UMX",
+          "name": "Subheading",
+          "textGrowth": "fixed-width",
+          "type": "text",
+          "width": "fill_container"
+        },
+        {
+          "children": [
+            {
+              "children": [
+                {
+                  "children": [
+                    {
+                      "fill": {
+                        "enabled": true,
+                        "mode": "fill",
+                        "type": "image",
+                        "url": "https://images.unsplash.com/photo-1775765638934-159833cca422?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3ODI2NTMwMDJ8&ixlib=rb-4.1.0&q=80&w=1080"
+                      },
+                      "height": 230,
+                      "id": "hfIHj",
+                      "metadata": {
+                        "author": "Pietro Maccoppi",
+                        "link": "https://unsplash.com/@maccops",
+                        "type": "unsplash",
+                        "username": "maccops"
+                      },
+                      "name": "Cover Image",
+                      "type": "rectangle",
+                      "width": 300,
+                      "x": 0,
+                      "y": 0
+                    },
+                    {
+                      "fill": {
+                        "colors": [
+                          {
+                            "color": "#000000C2",
+                            "position": 0
+                          },
+                          {
+                            "color": "#00000000",
+                            "position": 0.75
+                          }
+                        ],
+                        "enabled": true,
+                        "gradientType": "linear",
+                        "rotation": 120,
+                        "size": {
+                          "height": 1
+                        },
+                        "type": "gradient"
+                      },
+                      "height": 230,
+                      "id": "QIa4r",
+                      "name": "Gradient",
+                      "type": "rectangle",
+                      "width": 300,
+                      "x": 0,
+                      "y": 0
+                    },
+                    {
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "fill": "#00C4B8",
+                          "height": 13,
+                          "icon": "code",
+                          "id": "TQx3Z",
+                          "library": "lucide",
+                          "name": "Type Icon",
+                          "type": "icon",
+                          "width": 13
+                        },
+                        {
+                          "content": "Software",
+                          "fill": "#FFFFFF",
+                          "fontFamily": "Space Grotesk",
+                          "fontSize": 12,
+                          "fontWeight": "500",
+                          "id": "c01Pvs",
+                          "name": "Type Label",
+                          "type": "text"
+                        }
+                      ],
+                      "cornerRadius": 999,
+                      "fill": "#0F0F0FB3",
+                      "gap": 6,
+                      "id": "xZVQE",
+                      "name": "Type Chip",
+                      "padding": [
+                        6,
+                        10
+                      ],
+                      "type": "frame",
+                      "x": 14,
+                      "y": 14
+                    },
+                    {
+                      "content": "Smart Garden Monitor",
+                      "fill": "#FFFFFF",
+                      "fontFamily": "Space Grotesk",
+                      "fontSize": 26,
+                      "fontWeight": "600",
+                      "id": "oMONm",
+                      "lineHeight": 1.05,
+                      "name": "Title",
+                      "textGrowth": "fixed-width",
+                      "type": "text",
+                      "width": 268,
+                      "x": 16,
+                      "y": 166
+                    }
+                  ],
+                  "height": 230,
+                  "id": "iPGwL",
+                  "layout": "none",
+                  "name": "Cover",
+                  "type": "frame",
+                  "width": 300
+                },
+                {
+                  "children": [
+                    {
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "content": "Web Dev · WS24",
+                          "fill": "#666666",
+                          "fontFamily": "Space Grotesk",
+                          "fontSize": 13,
+                          "fontWeight": "normal",
+                          "id": "BK7jx",
+                          "name": "Course",
+                          "type": "text"
+                        },
+                        {
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "fill": "#1F9D55",
+                              "height": 7,
+                              "id": "M30ice",
+                              "name": "Dot",
+                              "type": "ellipse",
+                              "width": 7
+                            },
+                            {
+                              "content": "Published",
+                              "fill": "#1F9D55",
+                              "fontFamily": "Space Grotesk",
+                              "fontSize": 11,
+                              "fontWeight": "600",
+                              "id": "w5nZNj",
+                              "name": "Status Label",
+                              "type": "text"
+                            }
+                          ],
+                          "cornerRadius": 999,
+                          "fill": "#E7F6EC",
+                          "gap": 6,
+                          "id": "E0H2y",
+                          "name": "Status",
+                          "padding": [
+                            4,
+                            10
+                          ],
+                          "type": "frame"
+                        }
+                      ],
+                      "id": "v7ZeAv",
+                      "justifyContent": "space_between",
+                      "name": "Meta",
+                      "type": "frame",
+                      "width": "fill_container"
+                    },
+                    {
+                      "content": "An IoT system that tracks soil moisture and automates watering for urban balconies.",
+                      "fill": "#222222",
+                      "fontFamily": "Space Grotesk",
+                      "fontSize": 15,
+                      "fontWeight": "normal",
+                      "id": "RL3RV",
+                      "lineHeight": 1.3,
+                      "name": "Tagline",
+                      "textGrowth": "fixed-width",
+                      "type": "text",
+                      "width": "fill_container"
+                    },
+                    {
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "children": [
+                            {
+                              "fill": "#00A398",
+                              "height": 30,
+                              "id": "gEIdA",
+                              "name": "Avatar 1",
+                              "stroke": "#FFFFFF",
+                              "strokeWidth": 2,
+                              "type": "ellipse",
+                              "width": 30,
+                              "x": 0,
+                              "y": 0
+                            },
+                            {
+                              "fill": "#FFA665",
+                              "height": 30,
+                              "id": "L8agH",
+                              "name": "Avatar 2",
+                              "stroke": "#FFFFFF",
+                              "strokeWidth": 2,
+                              "type": "ellipse",
+                              "width": 30,
+                              "x": 22,
+                              "y": 0
+                            },
+                            {
+                              "fill": "#1982fc",
+                              "height": 30,
+                              "id": "SK1F4",
+                              "name": "Avatar 3",
+                              "stroke": "#FFFFFF",
+                              "strokeWidth": 2,
+                              "type": "ellipse",
+                              "width": 30,
+                              "x": 44,
+                              "y": 0
+                            }
+                          ],
+                          "height": 30,
+                          "id": "gzhMY",
+                          "layout": "none",
+                          "name": "Avatars",
+                          "type": "frame",
+                          "width": 74
+                        },
+                        {
+                          "content": "opencampus.sh",
+                          "fill": "#999999",
+                          "fontFamily": "Space Grotesk",
+                          "fontSize": 12,
+                          "fontWeight": "normal",
+                          "id": "A9qW5",
+                          "name": "Org",
+                          "type": "text"
+                        }
+                      ],
+                      "id": "txQLh",
+                      "justifyContent": "space_between",
+                      "name": "Footer",
+                      "type": "frame",
+                      "width": "fill_container"
+                    }
+                  ],
+                  "fill": "#FFFFFF",
+                  "gap": 14,
+                  "id": "f0T6q",
+                  "layout": "vertical",
+                  "name": "Body",
+                  "padding": 18,
+                  "type": "frame",
+                  "width": "fill_container"
+                }
+              ],
+              "clip": true,
+              "cornerRadius": 16,
+              "effect": {
+                "blur": 28,
+                "color": "#00000033",
+                "offset": {
+                  "x": 0,
+                  "y": 10
+                },
+                "shadowType": "outer",
+                "spread": -6,
+                "type": "shadow"
+              },
+              "fill": "#FFFFFF",
+              "id": "x5RIt",
+              "layout": "vertical",
+              "name": "Tile A — Showcase",
+              "type": "frame",
+              "width": 300
+            },
+            {
+              "children": [
+                {
+                  "children": [
+                    {
+                      "fill": {
+                        "enabled": true,
+                        "mode": "fill",
+                        "type": "image",
+                        "url": "https://images.unsplash.com/photo-1667470931143-91ba5d5ebe58?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3ODI2NTMwMDJ8&ixlib=rb-4.1.0&q=80&w=1080"
+                      },
+                      "height": 230,
+                      "id": "VVhJC",
+                      "metadata": {
+                        "author": "Andrew Dawes",
+                        "link": "https://unsplash.com/@9andrewd",
+                        "type": "unsplash",
+                        "username": "9andrewd"
+                      },
+                      "name": "Cover Image",
+                      "type": "rectangle",
+                      "width": 300,
+                      "x": 0,
+                      "y": 0
+                    },
+                    {
+                      "fill": {
+                        "colors": [
+                          {
+                            "color": "#000000C2",
+                            "position": 0
+                          },
+                          {
+                            "color": "#00000000",
+                            "position": 0.75
+                          }
+                        ],
+                        "enabled": true,
+                        "gradientType": "linear",
+                        "rotation": 120,
+                        "size": {
+                          "height": 1
+                        },
+                        "type": "gradient"
+                      },
+                      "height": 230,
+                      "id": "cG9zi",
+                      "name": "Gradient",
+                      "type": "rectangle",
+                      "width": 300,
+                      "x": 0,
+                      "y": 0
+                    },
+                    {
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "fill": "#00C4B8",
+                              "height": 13,
+                              "icon": "cpu",
+                              "id": "VpBvT",
+                              "library": "lucide",
+                              "name": "Type Icon",
+                              "type": "icon",
+                              "width": 13
+                            },
+                            {
+                              "content": "Hardware",
+                              "fill": "#FFFFFF",
+                              "fontFamily": "Space Grotesk",
+                              "fontSize": 12,
+                              "fontWeight": "500",
+                              "id": "m2fQu",
+                              "name": "Type Label",
+                              "type": "text"
+                            }
+                          ],
+                          "cornerRadius": 999,
+                          "fill": "#0F0F0FB3",
+                          "gap": 6,
+                          "id": "B089H",
+                          "name": "Type Chip",
+                          "padding": [
+                            6,
+                            10
+                          ],
+                          "type": "frame"
+                        },
+                        {
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "fill": "#C97A12",
+                              "height": 12,
+                              "icon": "user-plus",
+                              "id": "Z0mPO",
+                              "library": "lucide",
+                              "name": "Open Icon",
+                              "type": "icon",
+                              "width": 12
+                            },
+                            {
+                              "content": "3 spots",
+                              "fill": "#C97A12",
+                              "fontFamily": "Space Grotesk",
+                              "fontSize": 11,
+                              "fontWeight": "600",
+                              "id": "u557xo",
+                              "name": "Open Label",
+                              "type": "text"
+                            }
+                          ],
+                          "cornerRadius": 999,
+                          "fill": "#FBF0DD",
+                          "gap": 6,
+                          "id": "qJjse",
+                          "name": "Open Pill",
+                          "padding": [
+                            6,
+                            10
+                          ],
+                          "type": "frame"
+                        }
+                      ],
+                      "id": "BuKqh",
+                      "justifyContent": "space_between",
+                      "name": "Top Row",
+                      "type": "frame",
+                      "width": 272,
+                      "x": 14,
+                      "y": 14
+                    },
+                    {
+                      "content": "Tidal Energy Buoy",
+                      "fill": "#FFFFFF",
+                      "fontFamily": "Space Grotesk",
+                      "fontSize": 26,
+                      "fontWeight": "600",
+                      "id": "M7utM",
+                      "lineHeight": 1.05,
+                      "name": "Title",
+                      "textGrowth": "fixed-width",
+                      "type": "text",
+                      "width": 268,
+                      "x": 16,
+                      "y": 166
+                    }
+                  ],
+                  "height": 230,
+                  "id": "ebpdo",
+                  "layout": "none",
+                  "name": "Cover",
+                  "type": "frame",
+                  "width": 300
+                },
+                {
+                  "children": [
+                    {
+                      "content": "OPEN PROJECT TEMPLATE",
+                      "fill": "#00A398",
+                      "fontFamily": "Space Grotesk",
+                      "fontSize": 11,
+                      "fontWeight": "600",
+                      "id": "GYMDg",
+                      "letterSpacing": 0.5,
+                      "name": "Eyebrow",
+                      "type": "text"
+                    },
+                    {
+                      "content": "Part of Web Development · apply for the course to join.",
+                      "fill": "#222222",
+                      "fontFamily": "Space Grotesk",
+                      "fontSize": 15,
+                      "fontWeight": "normal",
+                      "id": "z83BoW",
+                      "lineHeight": 1.3,
+                      "name": "Tagline",
+                      "textGrowth": "fixed-width",
+                      "type": "text",
+                      "width": "fill_container"
+                    },
+                    {
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "fill": "#1982fc",
+                          "height": 24,
+                          "id": "Y3J61",
+                          "name": "Mentor Avatar",
+                          "type": "ellipse",
+                          "width": 24
+                        },
+                        {
+                          "content": "Mentored by Dr. Lena Voss",
+                          "fill": "#666666",
+                          "fontFamily": "Space Grotesk",
+                          "fontSize": 12,
+                          "fontWeight": "normal",
+                          "id": "EYd3g",
+                          "name": "Mentor Name",
+                          "type": "text"
+                        }
+                      ],
+                      "gap": 8,
+                      "id": "mMXwz",
+                      "name": "Mentor",
+                      "type": "frame",
+                      "width": "fill_container"
+                    },
+                    {
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "content": "Apply for course",
+                          "fill": "#FFFFFF",
+                          "fontFamily": "Space Grotesk",
+                          "fontSize": 14,
+                          "fontWeight": "600",
+                          "id": "J6r3iO",
+                          "name": "CTA Label",
+                          "type": "text"
+                        },
+                        {
+                          "fill": "#FFFFFF",
+                          "height": 16,
+                          "icon": "arrow-right",
+                          "id": "J6gfI",
+                          "library": "lucide",
+                          "name": "CTA Icon",
+                          "type": "icon",
+                          "width": 16
+                        }
+                      ],
+                      "cornerRadius": 999,
+                      "fill": "#00A398",
+                      "gap": 8,
+                      "id": "RkVVm",
+                      "justifyContent": "center",
+                      "name": "CTA",
+                      "padding": [
+                        11,
+                        16
+                      ],
+                      "type": "frame",
+                      "width": "fill_container"
+                    }
+                  ],
+                  "fill": "#FFFFFF",
+                  "gap": 12,
+                  "id": "ZtuYY",
+                  "layout": "vertical",
+                  "name": "Body",
+                  "padding": 18,
+                  "type": "frame",
+                  "width": "fill_container"
+                }
+              ],
+              "clip": true,
+              "cornerRadius": 16,
+              "effect": {
+                "blur": 28,
+                "color": "#00000033",
+                "offset": {
+                  "x": 0,
+                  "y": 10
+                },
+                "shadowType": "outer",
+                "spread": -6,
+                "type": "shadow"
+              },
+              "fill": "#FFFFFF",
+              "id": "cK0Ev",
+              "layout": "vertical",
+              "name": "Tile B — Public (no course context)",
+              "type": "frame",
+              "width": 300
+            },
+            {
+              "children": [
+                {
+                  "children": [
+                    {
+                      "fill": {
+                        "enabled": true,
+                        "mode": "fill",
+                        "type": "image",
+                        "url": "https://images.unsplash.com/photo-1667470931143-91ba5d5ebe58?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3ODI2NTMwMDJ8&ixlib=rb-4.1.0&q=80&w=1080"
+                      },
+                      "height": 230,
+                      "id": "HQ9HB",
+                      "metadata": {
+                        "author": "Andrew Dawes",
+                        "link": "https://unsplash.com/@9andrewd",
+                        "type": "unsplash",
+                        "username": "9andrewd"
+                      },
+                      "name": "Cover Image",
+                      "type": "rectangle",
+                      "width": 300,
+                      "x": 0,
+                      "y": 0
+                    },
+                    {
+                      "fill": {
+                        "colors": [
+                          {
+                            "color": "#000000C2",
+                            "position": 0
+                          },
+                          {
+                            "color": "#00000000",
+                            "position": 0.75
+                          }
+                        ],
+                        "enabled": true,
+                        "gradientType": "linear",
+                        "rotation": 120,
+                        "size": {
+                          "height": 1
+                        },
+                        "type": "gradient"
+                      },
+                      "height": 230,
+                      "id": "O4sRsq",
+                      "name": "Gradient",
+                      "type": "rectangle",
+                      "width": 300,
+                      "x": 0,
+                      "y": 0
+                    },
+                    {
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "fill": "#00C4B8",
+                              "height": 13,
+                              "icon": "cpu",
+                              "id": "awneK",
+                              "library": "lucide",
+                              "name": "Type Icon",
+                              "type": "icon",
+                              "width": 13
+                            },
+                            {
+                              "content": "Hardware",
+                              "fill": "#FFFFFF",
+                              "fontFamily": "Space Grotesk",
+                              "fontSize": 12,
+                              "fontWeight": "500",
+                              "id": "z27tP",
+                              "name": "Type Label",
+                              "type": "text"
+                            }
+                          ],
+                          "cornerRadius": 999,
+                          "fill": "#0F0F0FB3",
+                          "gap": 6,
+                          "id": "H2pAhn",
+                          "name": "Type Chip",
+                          "padding": [
+                            6,
+                            10
+                          ],
+                          "type": "frame"
+                        },
+                        {
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "fill": "#C97A12",
+                              "height": 12,
+                              "icon": "user-plus",
+                              "id": "OYL6O",
+                              "library": "lucide",
+                              "name": "Open Icon",
+                              "type": "icon",
+                              "width": 12
+                            },
+                            {
+                              "content": "3 spots",
+                              "fill": "#C97A12",
+                              "fontFamily": "Space Grotesk",
+                              "fontSize": 11,
+                              "fontWeight": "600",
+                              "id": "zkZOx",
+                              "name": "Open Label",
+                              "type": "text"
+                            }
+                          ],
+                          "cornerRadius": 999,
+                          "fill": "#FBF0DD",
+                          "gap": 6,
+                          "id": "Kza3k",
+                          "name": "Open Pill",
+                          "padding": [
+                            6,
+                            10
+                          ],
+                          "type": "frame"
+                        }
+                      ],
+                      "id": "H0iee",
+                      "justifyContent": "space_between",
+                      "name": "Top Row",
+                      "type": "frame",
+                      "width": 272,
+                      "x": 14,
+                      "y": 14
+                    },
+                    {
+                      "content": "Tidal Energy Buoy",
+                      "fill": "#FFFFFF",
+                      "fontFamily": "Space Grotesk",
+                      "fontSize": 26,
+                      "fontWeight": "600",
+                      "id": "g7tN9H",
+                      "lineHeight": 1.05,
+                      "name": "Title",
+                      "textGrowth": "fixed-width",
+                      "type": "text",
+                      "width": 268,
+                      "x": 16,
+                      "y": 166
+                    }
+                  ],
+                  "height": 230,
+                  "id": "crZVj",
+                  "layout": "none",
+                  "name": "Cover",
+                  "type": "frame",
+                  "width": 300
+                },
+                {
+                  "children": [
+                    {
+                      "content": "OPEN PROJECT TEMPLATE",
+                      "fill": "#00A398",
+                      "fontFamily": "Space Grotesk",
+                      "fontSize": 11,
+                      "fontWeight": "600",
+                      "id": "L1rpbD",
+                      "letterSpacing": 0.5,
+                      "name": "Eyebrow",
+                      "type": "text"
+                    },
+                    {
+                      "content": "Web Development · WS24",
+                      "fill": "#222222",
+                      "fontFamily": "Space Grotesk",
+                      "fontSize": 15,
+                      "fontWeight": "normal",
+                      "id": "Z3oLwG",
+                      "lineHeight": 1.3,
+                      "name": "Tagline",
+                      "textGrowth": "fixed-width",
+                      "type": "text",
+                      "width": "fill_container"
+                    },
+                    {
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "fill": "#1982fc",
+                          "height": 24,
+                          "id": "iMtGk",
+                          "name": "Mentor Avatar",
+                          "type": "ellipse",
+                          "width": 24
+                        },
+                        {
+                          "content": "Mentored by Dr. Lena Voss",
+                          "fill": "#666666",
+                          "fontFamily": "Space Grotesk",
+                          "fontSize": 12,
+                          "fontWeight": "normal",
+                          "id": "ac02t",
+                          "name": "Mentor Name",
+                          "type": "text"
+                        }
+                      ],
+                      "gap": 8,
+                      "id": "W6c7cJ",
+                      "name": "Mentor",
+                      "type": "frame",
+                      "width": "fill_container"
+                    },
+                    {
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "content": "View & join",
+                          "fill": "#FFFFFF",
+                          "fontFamily": "Space Grotesk",
+                          "fontSize": 14,
+                          "fontWeight": "600",
+                          "id": "Ag9Ss",
+                          "name": "CTA Label",
+                          "type": "text"
+                        },
+                        {
+                          "fill": "#FFFFFF",
+                          "height": 16,
+                          "icon": "arrow-right",
+                          "id": "c7LAEi",
+                          "library": "lucide",
+                          "name": "CTA Icon",
+                          "type": "icon",
+                          "width": 16
+                        }
+                      ],
+                      "cornerRadius": 999,
+                      "fill": "#222222",
+                      "gap": 8,
+                      "id": "axkwU",
+                      "justifyContent": "center",
+                      "name": "CTA",
+                      "padding": [
+                        11,
+                        16
+                      ],
+                      "type": "frame",
+                      "width": "fill_container"
+                    }
+                  ],
+                  "fill": "#FFFFFF",
+                  "gap": 12,
+                  "id": "aGrSU",
+                  "layout": "vertical",
+                  "name": "Body",
+                  "padding": 18,
+                  "type": "frame",
+                  "width": "fill_container"
+                }
+              ],
+              "clip": true,
+              "cornerRadius": 16,
+              "effect": {
+                "blur": 28,
+                "color": "#00000033",
+                "offset": {
+                  "x": 0,
+                  "y": 10
+                },
+                "shadowType": "outer",
+                "spread": -6,
+                "type": "shadow"
+              },
+              "fill": "#FFFFFF",
+              "id": "OyirL",
+              "layout": "vertical",
+              "name": "Tile B — Within course context",
+              "type": "frame",
+              "width": 300
+            }
+          ],
+          "gap": 28,
+          "id": "WbUFK",
+          "name": "Tiles Row",
+          "padding": [
+            24,
+            0,
+            0,
+            0
+          ],
+          "type": "frame",
+          "width": "fill_container"
+        },
+        {
+          "children": [
+            {
+              "children": [
+                {
+                  "content": "Tile A",
+                  "fill": "#00C4B8",
+                  "fontFamily": "Space Grotesk",
+                  "fontSize": 12,
+                  "fontWeight": "600",
+                  "id": "c48Lb8",
+                  "name": "Label",
+                  "type": "text"
+                },
+                {
+                  "content": "Published showcase",
+                  "fill": "#666666",
+                  "fontFamily": "Space Grotesk",
+                  "fontSize": 11,
+                  "fontWeight": "normal",
+                  "id": "pspNm",
+                  "name": "Hint",
+                  "type": "text"
+                }
+              ],
+              "gap": 2,
+              "id": "Nwnxq",
+              "layout": "vertical",
+              "name": "Tile A",
+              "type": "frame",
+              "width": 300
+            },
+            {
+              "children": [
+                {
+                  "content": "Tile B public",
+                  "fill": "#00C4B8",
+                  "fontFamily": "Space Grotesk",
+                  "fontSize": 12,
+                  "fontWeight": "600",
+                  "id": "i8LR7N",
+                  "name": "Label",
+                  "type": "text"
+                },
+                {
+                  "content": "Home / no course context",
+                  "fill": "#666666",
+                  "fontFamily": "Space Grotesk",
+                  "fontSize": 11,
+                  "fontWeight": "normal",
+                  "id": "VaHMl",
+                  "name": "Hint",
+                  "type": "text"
+                }
+              ],
+              "gap": 2,
+              "id": "zfqkr",
+              "layout": "vertical",
+              "name": "Tile B public",
+              "type": "frame",
+              "width": 300
+            },
+            {
+              "children": [
+                {
+                  "content": "Tile B in course",
+                  "fill": "#00C4B8",
+                  "fontFamily": "Space Grotesk",
+                  "fontSize": 12,
+                  "fontWeight": "600",
+                  "id": "eXxdI",
+                  "name": "Label",
+                  "type": "text"
+                },
+                {
+                  "content": "Course page context",
+                  "fill": "#666666",
+                  "fontFamily": "Space Grotesk",
+                  "fontSize": 11,
+                  "fontWeight": "normal",
+                  "id": "JTYOP",
+                  "name": "Hint",
+                  "type": "text"
+                }
+              ],
+              "gap": 2,
+              "id": "bOwfk",
+              "layout": "vertical",
+              "name": "Tile B in course",
+              "type": "frame",
+              "width": 300
+            }
+          ],
+          "gap": 28,
+          "id": "s8ALN",
+          "name": "Context Labels",
+          "padding": [
+            12,
+            0,
+            0,
+            0
+          ],
+          "type": "frame",
+          "width": "fill_container"
+        }
+      ],
+      "clip": true,
+      "cornerRadius": 24,
+      "fill": "#1A1A1A",
+      "gap": 6,
+      "id": "VuTne",
+      "layout": "vertical",
+      "name": "Project Tiles — Explorations",
+      "padding": 32,
+      "type": "frame",
+      "width": 1060,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "children": [
+        {
+          "alignItems": "center",
+          "children": [
+            {
+              "alignItems": "center",
+              "children": [
+                {
+                  "fill": "#00A398",
+                  "height": 22,
+                  "id": "hdxAN",
+                  "innerRadius": 0.55,
+                  "name": "Ring",
+                  "type": "ellipse",
+                  "width": 22
+                },
+                {
+                  "content": "EduHub",
+                  "fill": "#F2F2F2",
+                  "fontFamily": "Space Grotesk",
+                  "fontSize": 18,
+                  "fontWeight": "600",
+                  "id": "I0Llff",
+                  "name": "Wordmark",
+                  "type": "text"
+                }
+              ],
+              "gap": 10,
+              "id": "UCnhm",
+              "name": "Logo",
+              "type": "frame"
+            },
+            {
+              "alignItems": "center",
+              "children": [
+                {
+                  "content": "Courses",
+                  "fill": "#D8D8D8",
+                  "fontFamily": "Space Grotesk",
+                  "fontSize": 14,
+                  "fontWeight": "normal",
+                  "id": "oJJmb",
+                  "name": "Courses",
+                  "type": "text"
+                },
+                {
+                  "content": "Projects",
+                  "fill": "#00C4B8",
+                  "fontFamily": "Space Grotesk",
+                  "fontSize": 14,
+                  "fontWeight": "normal",
+                  "id": "mIsTv",
+                  "name": "Projects",
+                  "type": "text"
+                },
+                {
+                  "content": "About",
+                  "fill": "#D8D8D8",
+                  "fontFamily": "Space Grotesk",
+                  "fontSize": 14,
+                  "fontWeight": "normal",
+                  "id": "XYgIf",
+                  "name": "About",
+                  "type": "text"
+                }
+              ],
+              "gap": 28,
+              "id": "HQPRu",
+              "name": "Nav",
+              "type": "frame"
+            },
+            {
+              "alignItems": "center",
+              "children": [
+                {
+                  "content": "DE",
+                  "fill": "#888888",
+                  "fontFamily": "Space Grotesk",
+                  "fontSize": 13,
+                  "fontWeight": "normal",
+                  "id": "LxIs3",
+                  "name": "Lang",
+                  "type": "text"
+                },
+                {
+                  "fill": "#00A398",
+                  "height": 30,
+                  "id": "oaNg4",
+                  "name": "User",
+                  "type": "ellipse",
+                  "width": 30
+                }
+              ],
+              "gap": 16,
+              "id": "DzXmx",
+              "name": "Header Right",
+              "type": "frame"
+            }
+          ],
+          "fill": "#1A1A1A",
+          "id": "FgBWb",
+          "justifyContent": "space_between",
+          "name": "Header",
+          "padding": [
+            16,
+            32
+          ],
+          "type": "frame",
+          "width": "fill_container"
+        },
+        {
+          "children": [
+            {
+              "fill": {
+                "enabled": true,
+                "mode": "fill",
+                "type": "image",
+                "url": "https://images.unsplash.com/photo-1583753075968-1236ccb83c66?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3ODI2NTMxODZ8&ixlib=rb-4.1.0&q=80&w=1080"
+              },
+              "height": 380,
+              "id": "xgVED",
+              "metadata": {
+                "author": "Huy Phan",
+                "link": "https://unsplash.com/@huyphan2602",
+                "type": "unsplash",
+                "username": "huyphan2602"
+              },
+              "name": "Hero Image",
+              "type": "rectangle",
+              "width": 1200,
+              "x": 0,
+              "y": 0
+            },
+            {
+              "fill": {
+                "colors": [
+                  {
+                    "color": "#0F0F0FF2",
+                    "position": 0
+                  },
+                  {
+                    "color": "#0F0F0F33",
+                    "position": 0.7
+                  },
+                  {
+                    "color": "#0F0F0F00",
+                    "position": 1
+                  }
+                ],
+                "enabled": true,
+                "gradientType": "linear",
+                "rotation": 110,
+                "size": {
+                  "height": 1
+                },
+                "type": "gradient"
+              },
+              "height": 380,
+              "id": "Ry7VZ",
+              "name": "Hero Gradient",
+              "type": "rectangle",
+              "width": 1200,
+              "x": 0,
+              "y": 0
+            },
+            {
+              "children": [
+                {
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "content": "Projects",
+                      "fill": "#B8B8B8",
+                      "fontFamily": "Space Grotesk",
+                      "fontSize": 13,
+                      "fontWeight": "normal",
+                      "id": "jDo3n",
+                      "name": "BC1",
+                      "type": "text"
+                    },
+                    {
+                      "content": "/",
+                      "fill": "#666666",
+                      "fontFamily": "Space Grotesk",
+                      "fontSize": 13,
+                      "fontWeight": "normal",
+                      "id": "utfUk",
+                      "name": "BC Sep",
+                      "type": "text"
+                    },
+                    {
+                      "content": "Web Dev · WS24",
+                      "fill": "#B8B8B8",
+                      "fontFamily": "Space Grotesk",
+                      "fontSize": 13,
+                      "fontWeight": "normal",
+                      "id": "Ebjfq",
+                      "name": "BC2",
+                      "type": "text"
+                    }
+                  ],
+                  "gap": 8,
+                  "id": "kgwE5",
+                  "name": "Breadcrumb",
+                  "type": "frame"
+                },
+                {
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "fill": "#00C4B8",
+                          "height": 14,
+                          "icon": "code",
+                          "id": "oDdQP",
+                          "library": "lucide",
+                          "name": "Icon",
+                          "type": "icon",
+                          "width": 14
+                        },
+                        {
+                          "content": "Software",
+                          "fill": "#FFFFFF",
+                          "fontFamily": "Space Grotesk",
+                          "fontSize": 12,
+                          "fontWeight": "500",
+                          "id": "kCVSn",
+                          "name": "Label",
+                          "type": "text"
+                        }
+                      ],
+                      "cornerRadius": 999,
+                      "fill": "#0F0F0FB3",
+                      "gap": 6,
+                      "id": "Sa6uu",
+                      "name": "Type Chip",
+                      "padding": [
+                        6,
+                        12
+                      ],
+                      "stroke": "#00A398",
+                      "strokeWidth": 1,
+                      "type": "frame"
+                    },
+                    {
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "content": "Published",
+                          "fill": "#FFFFFF",
+                          "fontFamily": "Space Grotesk",
+                          "fontSize": 12,
+                          "fontWeight": "600",
+                          "id": "tzmAP",
+                          "name": "Label",
+                          "type": "text"
+                        }
+                      ],
+                      "cornerRadius": 999,
+                      "fill": "#1F9D55",
+                      "gap": 6,
+                      "id": "g1kj6",
+                      "name": "Status Chip",
+                      "padding": [
+                        6,
+                        12
+                      ],
+                      "type": "frame"
+                    }
+                  ],
+                  "gap": 10,
+                  "id": "YgODq",
+                  "name": "Chips",
+                  "type": "frame"
+                },
+                {
+                  "content": "Smart Garden Monitor",
+                  "fill": "#FFFFFF",
+                  "fontFamily": "Space Grotesk",
+                  "fontSize": 46,
+                  "fontWeight": "600",
+                  "id": "pekdH",
+                  "lineHeight": 1.05,
+                  "name": "Title",
+                  "textGrowth": "fixed-width",
+                  "type": "text",
+                  "width": 760
+                },
+                {
+                  "content": "An IoT system that tracks soil moisture and automates watering for urban balconies.",
+                  "fill": "#E0E0E0",
+                  "fontFamily": "Space Grotesk",
+                  "fontSize": 18,
+                  "fontWeight": "normal",
+                  "id": "vhoWt",
+                  "lineHeight": 1.3,
+                  "name": "Tagline",
+                  "textGrowth": "fixed-width",
+                  "type": "text",
+                  "width": 680
+                }
+              ],
+              "gap": 14,
+              "id": "lxhJM",
+              "layout": "vertical",
+              "name": "Hero Content",
+              "type": "frame",
+              "width": 820,
+              "x": 32,
+              "y": 140
+            }
+          ],
+          "height": 380,
+          "id": "fBrRn",
+          "layout": "none",
+          "name": "Hero",
+          "type": "frame",
+          "width": "fill_container"
+        },
+        {
+          "children": [
+            {
+              "children": [
+                {
+                  "children": [
+                    {
+                      "content": "About this project",
+                      "fill": "#F2F2F2",
+                      "fontFamily": "Space Grotesk",
+                      "fontSize": 22,
+                      "fontWeight": "600",
+                      "id": "n2RIyI",
+                      "name": "About Title",
+                      "type": "text"
+                    },
+                    {
+                      "content": "Smart Garden Monitor is a compact IoT device that continuously measures soil moisture, light and temperature for balcony and indoor gardens. When the soil dries below a set threshold, it triggers an automated drip pump and notifies the owner in the companion app.",
+                      "fill": "#C8C8C8",
+                      "fontFamily": "Space Grotesk",
+                      "fontSize": 15,
+                      "fontWeight": "normal",
+                      "id": "y6CVaA",
+                      "lineHeight": 1.55,
+                      "name": "P1",
+                      "textGrowth": "fixed-width",
+                      "type": "text",
+                      "width": "fill_container"
+                    },
+                    {
+                      "content": "The team built the firmware on an ESP32, designed a 3D-printed weatherproof enclosure, and shipped a small Next.js dashboard for historical charts. It was completed as part of the Web Development course in winter term 2024.",
+                      "fill": "#C8C8C8",
+                      "fontFamily": "Space Grotesk",
+                      "fontSize": 15,
+                      "fontWeight": "normal",
+                      "id": "qlOZX",
+                      "lineHeight": 1.55,
+                      "name": "P2",
+                      "textGrowth": "fixed-width",
+                      "type": "text",
+                      "width": "fill_container"
+                    }
+                  ],
+                  "gap": 14,
+                  "id": "G4fpe",
+                  "layout": "vertical",
+                  "name": "About",
+                  "type": "frame",
+                  "width": "fill_container"
+                },
+                {
+                  "children": [
+                    {
+                      "children": [
+                        {
+                          "content": "3",
+                          "fill": "#00C4B8",
+                          "fontFamily": "Space Grotesk",
+                          "fontSize": 24,
+                          "fontWeight": "600",
+                          "id": "W73plb",
+                          "name": "V",
+                          "type": "text"
+                        },
+                        {
+                          "content": "Team members",
+                          "fill": "#888888",
+                          "fontFamily": "Space Grotesk",
+                          "fontSize": 13,
+                          "fontWeight": "normal",
+                          "id": "dbjUf",
+                          "name": "L",
+                          "type": "text"
+                        }
+                      ],
+                      "cornerRadius": 12,
+                      "fill": "#2A2A2A",
+                      "gap": 4,
+                      "id": "BTMmg",
+                      "layout": "vertical",
+                      "name": "Team members",
+                      "padding": 18,
+                      "stroke": "#333333",
+                      "strokeWidth": 1,
+                      "type": "frame",
+                      "width": 200
+                    }
+                  ],
+                  "gap": 16,
+                  "id": "U3GdMi",
+                  "name": "Meta Row",
+                  "type": "frame",
+                  "width": "fill_container"
+                },
+                {
+                  "children": [
+                    {
+                      "content": "Similar projects",
+                      "fill": "#F2F2F2",
+                      "fontFamily": "Space Grotesk",
+                      "fontSize": 22,
+                      "fontWeight": "600",
+                      "id": "D1r9J",
+                      "name": "Similar Title",
+                      "type": "text"
+                    },
+                    {
+                      "content": "Same course first, then related course groups — loaded dynamically.",
+                      "fill": "#888888",
+                      "fontFamily": "Space Grotesk",
+                      "fontSize": 13,
+                      "fontWeight": "normal",
+                      "id": "opGhn",
+                      "name": "Similar Hint",
+                      "textGrowth": "fixed-width",
+                      "type": "text",
+                      "width": "fill_container"
+                    },
+                    {
+                      "children": [
+                        {
+                          "children": [
+                            {
+                              "children": "...",
+                              "height": 130,
+                              "id": "jPz57",
+                              "layout": "none",
+                              "name": "Cover",
+                              "type": "frame",
+                              "width": 220
+                            },
+                            {
+                              "children": "...",
+                              "gap": 4,
+                              "id": "Ru0nF",
+                              "layout": "vertical",
+                              "name": "Body",
+                              "padding": [
+                                10,
+                                12,
+                                12,
+                                12
+                              ],
+                              "type": "frame",
+                              "width": "fill_container"
+                            }
+                          ],
+                          "clip": true,
+                          "cornerRadius": 12,
+                          "fill": "#2A2A2A",
+                          "id": "ULouu",
+                          "layout": "vertical",
+                          "name": "Urban Bee Counter",
+                          "stroke": "#333333",
+                          "strokeWidth": 1,
+                          "type": "frame",
+                          "width": 220
+                        },
+                        {
+                          "children": [
+                            {
+                              "children": "...",
+                              "height": 130,
+                              "id": "n9ayZG",
+                              "layout": "none",
+                              "name": "Cover",
+                              "type": "frame",
+                              "width": 220
+                            },
+                            {
+                              "children": "...",
+                              "gap": 4,
+                              "id": "z7h255",
+                              "layout": "vertical",
+                              "name": "Body",
+                              "padding": [
+                                10,
+                                12,
+                                12,
+                                12
+                              ],
+                              "type": "frame",
+                              "width": "fill_container"
+                            }
+                          ],
+                          "clip": true,
+                          "cornerRadius": 12,
+                          "fill": "#2A2A2A",
+                          "id": "LzaHN",
+                          "layout": "vertical",
+                          "name": "Soil Sensor Kit",
+                          "stroke": "#333333",
+                          "strokeWidth": 1,
+                          "type": "frame",
+                          "width": 220
+                        },
+                        {
+                          "children": [
+                            {
+                              "children": "...",
+                              "height": 130,
+                              "id": "cz9uR",
+                              "layout": "none",
+                              "name": "Cover",
+                              "type": "frame",
+                              "width": 220
+                            },
+                            {
+                              "children": "...",
+                              "gap": 4,
+                              "id": "H7CtX",
+                              "layout": "vertical",
+                              "name": "Body",
+                              "padding": [
+                                10,
+                                12,
+                                12,
+                                12
+                              ],
+                              "type": "frame",
+                              "width": "fill_container"
+                            }
+                          ],
+                          "clip": true,
+                          "cornerRadius": 12,
+                          "fill": "#2A2A2A",
+                          "id": "XG4X5",
+                          "layout": "vertical",
+                          "name": "Green Roof Monitor",
+                          "stroke": "#333333",
+                          "strokeWidth": 1,
+                          "type": "frame",
+                          "width": 220
+                        }
+                      ],
+                      "gap": 16,
+                      "id": "fK2jn",
+                      "name": "Similar Slider",
+                      "type": "frame",
+                      "width": "fill_container"
+                    },
+                    {
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "alignItems": "center",
+                          "cornerRadius": 999,
+                          "fill": "#2A2A2A",
+                          "height": 32,
+                          "id": "booJa",
+                          "justifyContent": "center",
+                          "name": "Prev",
+                          "stroke": "#444444",
+                          "strokeWidth": 1,
+                          "type": "frame",
+                          "width": 32
+                        },
+                        {
+                          "content": "← →",
+                          "fill": "#666666",
+                          "fontFamily": "Space Grotesk",
+                          "fontSize": 12,
+                          "fontWeight": "normal",
+                          "id": "J1pLR",
+                          "name": "Nav Hint",
+                          "type": "text"
+                        }
+                      ],
+                      "gap": 8,
+                      "id": "RK4Ga",
+                      "name": "Slider Nav",
+                      "type": "frame"
+                    }
+                  ],
+                  "gap": 16,
+                  "id": "n4J0r0",
+                  "layout": "vertical",
+                  "name": "Similar Projects",
+                  "type": "frame",
+                  "width": "fill_container"
+                }
+              ],
+              "gap": 34,
+              "id": "u7VrK",
+              "layout": "vertical",
+              "name": "Main",
+              "type": "frame",
+              "width": "fill_container"
+            },
+            {
+              "children": [
+                {
+                  "children": [
+                    {
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "fill": "#FFFFFF",
+                          "height": 16,
+                          "icon": "file-text",
+                          "id": "Ip93R",
+                          "library": "lucide",
+                          "name": "I",
+                          "type": "icon",
+                          "width": 16
+                        },
+                        {
+                          "content": "View documentation",
+                          "fill": "#FFFFFF",
+                          "fontFamily": "Space Grotesk",
+                          "fontSize": 14,
+                          "fontWeight": "600",
+                          "id": "p46JOk",
+                          "name": "L",
+                          "type": "text"
+                        }
+                      ],
+                      "cornerRadius": 999,
+                      "fill": "#00A398",
+                      "gap": 8,
+                      "id": "ZFYwE",
+                      "justifyContent": "center",
+                      "name": "View documentation",
+                      "padding": [
+                        13,
+                        18
+                      ],
+                      "stroke": "#00A398",
+                      "strokeWidth": 2,
+                      "type": "frame",
+                      "width": "fill_container"
+                    },
+                    {
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "fill": "#D8D8D8",
+                          "height": 16,
+                          "icon": "play",
+                          "id": "BLJut",
+                          "library": "lucide",
+                          "name": "I",
+                          "type": "icon",
+                          "width": 16
+                        },
+                        {
+                          "content": "Watch presentation",
+                          "fill": "#D8D8D8",
+                          "fontFamily": "Space Grotesk",
+                          "fontSize": 14,
+                          "fontWeight": "600",
+                          "id": "p3UREp",
+                          "name": "L",
+                          "type": "text"
+                        }
+                      ],
+                      "cornerRadius": 999,
+                      "fill": "#00000000",
+                      "gap": 8,
+                      "id": "a6JbsF",
+                      "justifyContent": "center",
+                      "name": "Watch presentation",
+                      "padding": [
+                        13,
+                        18
+                      ],
+                      "stroke": "#444444",
+                      "strokeWidth": 2,
+                      "type": "frame",
+                      "width": "fill_container"
+                    },
+                    {
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "fill": "#D8D8D8",
+                          "height": 16,
+                          "icon": "external-link",
+                          "id": "CMNJf",
+                          "library": "lucide",
+                          "name": "I",
+                          "type": "icon",
+                          "width": 16
+                        },
+                        {
+                          "content": "Visit live demo",
+                          "fill": "#D8D8D8",
+                          "fontFamily": "Space Grotesk",
+                          "fontSize": 14,
+                          "fontWeight": "600",
+                          "id": "G0Lm3b",
+                          "name": "L",
+                          "type": "text"
+                        }
+                      ],
+                      "cornerRadius": 999,
+                      "fill": "#00000000",
+                      "gap": 8,
+                      "id": "LEdHV",
+                      "justifyContent": "center",
+                      "name": "Visit live demo",
+                      "padding": [
+                        13,
+                        18
+                      ],
+                      "stroke": "#444444",
+                      "strokeWidth": 2,
+                      "type": "frame",
+                      "width": "fill_container"
+                    }
+                  ],
+                  "gap": 10,
+                  "id": "Nh4bs",
+                  "layout": "vertical",
+                  "name": "Actions",
+                  "type": "frame",
+                  "width": "fill_container"
+                },
+                {
+                  "children": [
+                    {
+                      "content": "Team",
+                      "fill": "#222222",
+                      "fontFamily": "Space Grotesk",
+                      "fontSize": 16,
+                      "fontWeight": "600",
+                      "id": "L2eCmd",
+                      "name": "Team Title",
+                      "type": "text"
+                    },
+                    {
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "fill": "#00A398",
+                          "height": 38,
+                          "id": "GKL1Y",
+                          "name": "Av",
+                          "type": "ellipse",
+                          "width": 38
+                        },
+                        {
+                          "children": [
+                            {
+                              "content": "Mara Köhler",
+                              "fill": "#222222",
+                              "fontFamily": "Space Grotesk",
+                              "fontSize": 14,
+                              "fontWeight": "600",
+                              "id": "ylISF",
+                              "name": "N",
+                              "type": "text"
+                            },
+                            {
+                              "content": "Firmware & hardware",
+                              "fill": "#666666",
+                              "fontFamily": "Space Grotesk",
+                              "fontSize": 12,
+                              "fontWeight": "normal",
+                              "id": "JLksK",
+                              "name": "R",
+                              "type": "text"
+                            }
+                          ],
+                          "gap": 2,
+                          "id": "vWxtN",
+                          "layout": "vertical",
+                          "name": "Col",
+                          "type": "frame"
+                        }
+                      ],
+                      "gap": 12,
+                      "id": "f2but",
+                      "name": "Mara Köhler",
+                      "type": "frame",
+                      "width": "fill_container"
+                    },
+                    {
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "fill": "#FFA665",
+                          "height": 38,
+                          "id": "zMOhW",
+                          "name": "Av",
+                          "type": "ellipse",
+                          "width": 38
+                        },
+                        {
+                          "children": [
+                            {
+                              "content": "Jonas Reuter",
+                              "fill": "#222222",
+                              "fontFamily": "Space Grotesk",
+                              "fontSize": 14,
+                              "fontWeight": "600",
+                              "id": "YxVHB",
+                              "name": "N",
+                              "type": "text"
+                            },
+                            {
+                              "content": "Frontend & app",
+                              "fill": "#666666",
+                              "fontFamily": "Space Grotesk",
+                              "fontSize": 12,
+                              "fontWeight": "normal",
+                              "id": "WVXrY",
+                              "name": "R",
+                              "type": "text"
+                            }
+                          ],
+                          "gap": 2,
+                          "id": "tFZW8",
+                          "layout": "vertical",
+                          "name": "Col",
+                          "type": "frame"
+                        }
+                      ],
+                      "gap": 12,
+                      "id": "mIETR",
+                      "name": "Jonas Reuter",
+                      "type": "frame",
+                      "width": "fill_container"
+                    },
+                    {
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "fill": "#1982fc",
+                          "height": 38,
+                          "id": "VSBUZ",
+                          "name": "Av",
+                          "type": "ellipse",
+                          "width": 38
+                        },
+                        {
+                          "children": [
+                            {
+                              "content": "Aylin Demir",
+                              "fill": "#222222",
+                              "fontFamily": "Space Grotesk",
+                              "fontSize": 14,
+                              "fontWeight": "600",
+                              "id": "vSA0q",
+                              "name": "N",
+                              "type": "text"
+                            },
+                            {
+                              "content": "Design & docs",
+                              "fill": "#666666",
+                              "fontFamily": "Space Grotesk",
+                              "fontSize": 12,
+                              "fontWeight": "normal",
+                              "id": "lWs7L",
+                              "name": "R",
+                              "type": "text"
+                            }
+                          ],
+                          "gap": 2,
+                          "id": "DKl1u",
+                          "layout": "vertical",
+                          "name": "Col",
+                          "type": "frame"
+                        }
+                      ],
+                      "gap": 12,
+                      "id": "DRtrY",
+                      "name": "Aylin Demir",
+                      "type": "frame",
+                      "width": "fill_container"
+                    }
+                  ],
+                  "cornerRadius": 12,
+                  "fill": "#FFFFFF",
+                  "gap": 16,
+                  "id": "Z09NvE",
+                  "layout": "vertical",
+                  "name": "Team Card",
+                  "padding": 20,
+                  "type": "frame",
+                  "width": "fill_container"
+                },
+                {
+                  "children": [
+                    {
+                      "content": "Mentor",
+                      "fill": "#222222",
+                      "fontFamily": "Space Grotesk",
+                      "fontSize": 16,
+                      "fontWeight": "600",
+                      "id": "Nmqlm",
+                      "name": "Mentor Title",
+                      "type": "text"
+                    },
+                    {
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "fill": "#888888",
+                          "height": 38,
+                          "id": "X5Xd0K",
+                          "name": "Av",
+                          "type": "ellipse",
+                          "width": 38
+                        },
+                        {
+                          "children": [
+                            {
+                              "content": "Dr. Lena Voss",
+                              "fill": "#222222",
+                              "fontFamily": "Space Grotesk",
+                              "fontSize": 14,
+                              "fontWeight": "600",
+                              "id": "dPmBo",
+                              "name": "N",
+                              "type": "text"
+                            },
+                            {
+                              "content": "Marine Robotics Lab",
+                              "fill": "#666666",
+                              "fontFamily": "Space Grotesk",
+                              "fontSize": 12,
+                              "fontWeight": "normal",
+                              "id": "TTe8x",
+                              "name": "R",
+                              "type": "text"
+                            }
+                          ],
+                          "gap": 2,
+                          "id": "Ato2x",
+                          "layout": "vertical",
+                          "name": "Col",
+                          "type": "frame"
+                        }
+                      ],
+                      "gap": 12,
+                      "id": "G4cgZo",
+                      "name": "MRow",
+                      "type": "frame",
+                      "width": "fill_container"
+                    }
+                  ],
+                  "cornerRadius": 12,
+                  "fill": "#FFFFFF",
+                  "gap": 16,
+                  "id": "Siv0A",
+                  "layout": "vertical",
+                  "name": "Mentor Card",
+                  "padding": 20,
+                  "type": "frame",
+                  "width": "fill_container"
+                },
+                {
+                  "children": [
+                    {
+                      "content": "PART OF COURSE",
+                      "fill": "#999999",
+                      "fontFamily": "Space Grotesk",
+                      "fontSize": 11,
+                      "fontWeight": "600",
+                      "id": "APMJT",
+                      "letterSpacing": 0.5,
+                      "name": "Eyebrow",
+                      "type": "text"
+                    },
+                    {
+                      "content": "Web Development",
+                      "fill": "#222222",
+                      "fontFamily": "Space Grotesk",
+                      "fontSize": 16,
+                      "fontWeight": "600",
+                      "id": "B8UGWJ",
+                      "name": "CName",
+                      "type": "text"
+                    },
+                    {
+                      "content": "Winter term 2024 · opencampus.sh",
+                      "fill": "#666666",
+                      "fontFamily": "Space Grotesk",
+                      "fontSize": 13,
+                      "fontWeight": "normal",
+                      "id": "r0vSZ2",
+                      "name": "CMeta",
+                      "type": "text"
+                    },
+                    {
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "content": "Go to course",
+                          "fill": "#00A398",
+                          "fontFamily": "Space Grotesk",
+                          "fontSize": 13,
+                          "fontWeight": "600",
+                          "id": "jWSRD",
+                          "name": "LinkLabel",
+                          "type": "text"
+                        },
+                        {
+                          "fill": "#00A398",
+                          "height": 14,
+                          "icon": "arrow-right",
+                          "id": "u2com",
+                          "library": "lucide",
+                          "name": "LinkIcon",
+                          "type": "icon",
+                          "width": 14
+                        }
+                      ],
+                      "gap": 6,
+                      "id": "pG4HE",
+                      "name": "CLink",
+                      "padding": [
+                        6,
+                        0,
+                        0,
+                        0
+                      ],
+                      "type": "frame"
+                    }
+                  ],
+                  "cornerRadius": 12,
+                  "fill": "#FFFFFF",
+                  "gap": 6,
+                  "id": "TtUPP",
+                  "layout": "vertical",
+                  "name": "Course Card",
+                  "padding": 20,
+                  "type": "frame",
+                  "width": "fill_container"
+                }
+              ],
+              "gap": 18,
+              "id": "iedLB",
+              "layout": "vertical",
+              "name": "Sidebar",
+              "type": "frame",
+              "width": 360
+            }
+          ],
+          "gap": 40,
+          "id": "ce7IL",
+          "name": "Body",
+          "padding": [
+            40,
+            32,
+            48,
+            32
+          ],
+          "type": "frame",
+          "width": "fill_container"
+        }
+      ],
+      "clip": true,
+      "fill": "#222222",
+      "id": "Qx0dV",
+      "layout": "vertical",
+      "name": "Project Page V1 — Showcase",
+      "type": "frame",
+      "width": 1200,
+      "x": 0,
+      "y": 900
+    },
+    {
+      "children": [
+        {
+          "alignItems": "center",
+          "children": [
+            {
+              "alignItems": "center",
+              "children": [
+                {
+                  "fill": "#00A398",
+                  "height": 22,
+                  "id": "R81XP",
+                  "innerRadius": 0.55,
+                  "name": "Ring",
+                  "type": "ellipse",
+                  "width": 22
+                },
+                {
+                  "content": "EduHub",
+                  "fill": "#F2F2F2",
+                  "fontFamily": "Space Grotesk",
+                  "fontSize": 18,
+                  "fontWeight": "600",
+                  "id": "LRF18",
+                  "name": "Wordmark",
+                  "type": "text"
+                }
+              ],
+              "gap": 10,
+              "id": "k91I7I",
+              "name": "Logo",
+              "type": "frame"
+            },
+            {
+              "alignItems": "center",
+              "children": [
+                {
+                  "content": "Courses",
+                  "fill": "#D8D8D8",
+                  "fontFamily": "Space Grotesk",
+                  "fontSize": 14,
+                  "fontWeight": "normal",
+                  "id": "BN064",
+                  "name": "Courses",
+                  "type": "text"
+                },
+                {
+                  "content": "Projects",
+                  "fill": "#00C4B8",
+                  "fontFamily": "Space Grotesk",
+                  "fontSize": 14,
+                  "fontWeight": "normal",
+                  "id": "WkaHz",
+                  "name": "Projects",
+                  "type": "text"
+                },
+                {
+                  "content": "About",
+                  "fill": "#D8D8D8",
+                  "fontFamily": "Space Grotesk",
+                  "fontSize": 14,
+                  "fontWeight": "normal",
+                  "id": "IvgAp",
+                  "name": "About",
+                  "type": "text"
+                }
+              ],
+              "gap": 28,
+              "id": "I54Jzr",
+              "name": "Nav",
+              "type": "frame"
+            },
+            {
+              "alignItems": "center",
+              "children": [
+                {
+                  "content": "DE",
+                  "fill": "#888888",
+                  "fontFamily": "Space Grotesk",
+                  "fontSize": 13,
+                  "fontWeight": "normal",
+                  "id": "I6yHw",
+                  "name": "Lang",
+                  "type": "text"
+                },
+                {
+                  "fill": "#00A398",
+                  "height": 30,
+                  "id": "MaEbW",
+                  "name": "User",
+                  "type": "ellipse",
+                  "width": 30
+                }
+              ],
+              "gap": 16,
+              "id": "I87pGE",
+              "name": "Header Right",
+              "type": "frame"
+            }
+          ],
+          "fill": "#1A1A1A",
+          "id": "KeIAv",
+          "justifyContent": "space_between",
+          "name": "Header",
+          "padding": [
+            16,
+            32
+          ],
+          "type": "frame",
+          "width": "fill_container"
+        },
+        {
+          "children": [
+            {
+              "content": "Context: Public — user must apply for the course first",
+              "fill": "#C97A12",
+              "fontFamily": "Space Grotesk",
+              "fontSize": 12,
+              "fontWeight": "600",
+              "id": "X0Zyk",
+              "name": "Label",
+              "type": "text"
+            }
+          ],
+          "fill": "#3A2A10",
+          "id": "BeU0F",
+          "name": "Context Banner",
+          "padding": [
+            8,
+            32
+          ],
+          "type": "frame",
+          "width": "fill_container"
+        },
+        {
+          "children": [
+            {
+              "children": [
+                {
+                  "cornerRadius": 16,
+                  "fill": {
+                    "enabled": true,
+                    "mode": "fill",
+                    "type": "image",
+                    "url": "https://images.unsplash.com/photo-1767357250965-fad702ee8c40?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3ODI2NTMyOTR8&ixlib=rb-4.1.0&q=80&w=1080"
+                  },
+                  "height": 400,
+                  "id": "T2Dhu",
+                  "metadata": {
+                    "author": "DOKYUNG KIM",
+                    "link": "https://unsplash.com/@jindujiong",
+                    "type": "unsplash",
+                    "username": "jindujiong"
+                  },
+                  "name": "Media",
+                  "type": "rectangle",
+                  "width": "fill_container"
+                }
+              ],
+              "gap": 14,
+              "id": "nYamD",
+              "layout": "vertical",
+              "name": "Media Col",
+              "type": "frame",
+              "width": 520
+            },
+            {
+              "children": [
+                {
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "fill": "#00C4B8",
+                          "height": 14,
+                          "icon": "cpu",
+                          "id": "Erf1n",
+                          "library": "lucide",
+                          "name": "I",
+                          "type": "icon",
+                          "width": 14
+                        },
+                        {
+                          "content": "Hardware",
+                          "fill": "#F2F2F2",
+                          "fontFamily": "Space Grotesk",
+                          "fontSize": 12,
+                          "fontWeight": "500",
+                          "id": "QsRBd",
+                          "name": "L",
+                          "type": "text"
+                        }
+                      ],
+                      "cornerRadius": 999,
+                      "fill": "#2A2A2A",
+                      "gap": 6,
+                      "id": "RRFxD",
+                      "name": "Type Chip",
+                      "padding": [
+                        6,
+                        12
+                      ],
+                      "stroke": "#444444",
+                      "strokeWidth": 1,
+                      "type": "frame"
+                    },
+                    {
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "fill": "#C97A12",
+                          "height": 13,
+                          "icon": "lock-open",
+                          "id": "p4DKl",
+                          "library": "lucide",
+                          "name": "I",
+                          "type": "icon",
+                          "width": 13
+                        },
+                        {
+                          "content": "Open template",
+                          "fill": "#C97A12",
+                          "fontFamily": "Space Grotesk",
+                          "fontSize": 12,
+                          "fontWeight": "600",
+                          "id": "Bloeg",
+                          "name": "L",
+                          "type": "text"
+                        }
+                      ],
+                      "cornerRadius": 999,
+                      "fill": "#FBF0DD",
+                      "gap": 6,
+                      "id": "brVkh",
+                      "name": "Open Pill",
+                      "padding": [
+                        6,
+                        12
+                      ],
+                      "type": "frame"
+                    }
+                  ],
+                  "gap": 10,
+                  "id": "xJQed",
+                  "name": "Chips",
+                  "type": "frame"
+                },
+                {
+                  "content": "Tidal Energy Buoy",
+                  "fill": "#FFFFFF",
+                  "fontFamily": "Space Grotesk",
+                  "fontSize": 42,
+                  "fontWeight": "600",
+                  "id": "DVJ4n",
+                  "lineHeight": 1.05,
+                  "name": "Title",
+                  "textGrowth": "fixed-width",
+                  "type": "text",
+                  "width": "fill_container"
+                },
+                {
+                  "content": "Prototype a floating buoy that harvests tidal motion to charge coastal sensor networks.",
+                  "fill": "#C8C8C8",
+                  "fontFamily": "Space Grotesk",
+                  "fontSize": 17,
+                  "fontWeight": "normal",
+                  "id": "Z6Qm9",
+                  "lineHeight": 1.35,
+                  "name": "Tagline",
+                  "textGrowth": "fixed-width",
+                  "type": "text",
+                  "width": "fill_container"
+                },
+                {
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "fill": "#1982fc",
+                      "height": 32,
+                      "id": "hSxNp",
+                      "name": "Av",
+                      "type": "ellipse",
+                      "width": 32
+                    },
+                    {
+                      "children": [
+                        {
+                          "content": "Proposed by Dr. Lena Voss",
+                          "fill": "#F2F2F2",
+                          "fontFamily": "Space Grotesk",
+                          "fontSize": 13,
+                          "fontWeight": "600",
+                          "id": "SoDbq",
+                          "name": "N",
+                          "type": "text"
+                        },
+                        {
+                          "content": "Marine Robotics Lab · opencampus.sh",
+                          "fill": "#888888",
+                          "fontFamily": "Space Grotesk",
+                          "fontSize": 12,
+                          "fontWeight": "normal",
+                          "id": "H8uO1",
+                          "name": "R",
+                          "type": "text"
+                        }
+                      ],
+                      "gap": 1,
+                      "id": "q4pG6",
+                      "layout": "vertical",
+                      "name": "Col",
+                      "type": "frame"
+                    }
+                  ],
+                  "gap": 10,
+                  "id": "Fi1Oi",
+                  "name": "Proposer",
+                  "type": "frame"
+                },
+                {
+                  "children": [
+                    {
+                      "content": "Enroll to participate",
+                      "fill": "#F2F2F2",
+                      "fontFamily": "Space Grotesk",
+                      "fontSize": 18,
+                      "fontWeight": "600",
+                      "id": "OL7O0",
+                      "name": "Apply Title",
+                      "type": "text"
+                    },
+                    {
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "content": "Part of Web Development · WS24",
+                          "fill": "#B8B8B8",
+                          "fontFamily": "Space Grotesk",
+                          "fontSize": 13,
+                          "fontWeight": "normal",
+                          "id": "N4S6lr",
+                          "name": "Spots",
+                          "type": "text"
+                        },
+                        {
+                          "content": "Course applications open",
+                          "fill": "#FFA665",
+                          "fontFamily": "Space Grotesk",
+                          "fontSize": 13,
+                          "fontWeight": "normal",
+                          "id": "tbpgN",
+                          "name": "Deadline",
+                          "type": "text"
+                        }
+                      ],
+                      "id": "I49VPq",
+                      "justifyContent": "space_between",
+                      "name": "Spots Row",
+                      "type": "frame",
+                      "width": "fill_container"
+                    },
+                    {
+                      "content": "Projects are only accessible after enrolling in the course. Apply for the course first, then join this project from the course page.",
+                      "fill": "#B8B8B8",
+                      "fontFamily": "Space Grotesk",
+                      "fontSize": 14,
+                      "fontWeight": "normal",
+                      "id": "VXlQw",
+                      "lineHeight": 1.45,
+                      "name": "Enroll Hint",
+                      "textGrowth": "fixed-width",
+                      "type": "text",
+                      "width": "fill_container"
+                    },
+                    {
+                      "children": [
+                        {
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "fill": "#FFFFFF",
+                              "height": 16,
+                              "icon": "graduation-cap",
+                              "id": "Dqm4S",
+                              "library": "lucide",
+                              "name": "I",
+                              "type": "icon",
+                              "width": 16
+                            },
+                            {
+                              "content": "Apply for course",
+                              "fill": "#FFFFFF",
+                              "fontFamily": "Space Grotesk",
+                              "fontSize": 14,
+                              "fontWeight": "600",
+                              "id": "pJ3Hg",
+                              "name": "L",
+                              "type": "text"
+                            }
+                          ],
+                          "cornerRadius": 999,
+                          "fill": "#00A398",
+                          "gap": 8,
+                          "id": "ifsYj",
+                          "justifyContent": "center",
+                          "name": "Apply Course Btn",
+                          "padding": [
+                            13,
+                            18
+                          ],
+                          "type": "frame",
+                          "width": "fill_container"
+                        },
+                        {
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "content": "View course",
+                              "fill": "#D8D8D8",
+                              "fontFamily": "Space Grotesk",
+                              "fontSize": 14,
+                              "fontWeight": "600",
+                              "id": "F13oB",
+                              "name": "L",
+                              "type": "text"
+                            }
+                          ],
+                          "cornerRadius": 999,
+                          "fill": "#00000000",
+                          "gap": 8,
+                          "id": "CbTGn",
+                          "justifyContent": "center",
+                          "name": "View Course Btn",
+                          "padding": [
+                            13,
+                            18
+                          ],
+                          "stroke": "#444444",
+                          "strokeWidth": 2,
+                          "type": "frame"
+                        }
+                      ],
+                      "gap": 10,
+                      "id": "FzW9h",
+                      "name": "Enroll Actions",
+                      "type": "frame",
+                      "width": "fill_container"
+                    }
+                  ],
+                  "cornerRadius": 16,
+                  "fill": "#2A2A2A",
+                  "gap": 16,
+                  "id": "WkmK8",
+                  "layout": "vertical",
+                  "name": "Enroll Card",
+                  "padding": 22,
+                  "stroke": "#00A398",
+                  "strokeWidth": 1,
+                  "type": "frame",
+                  "width": "fill_container"
+                }
+              ],
+              "gap": 18,
+              "id": "afh9u",
+              "layout": "vertical",
+              "name": "Content Col",
+              "type": "frame",
+              "width": "fill_container"
+            }
+          ],
+          "gap": 40,
+          "id": "jTnYp",
+          "name": "Hero Split",
+          "padding": [
+            40,
+            32,
+            16,
+            32
+          ],
+          "type": "frame",
+          "width": "fill_container"
+        },
+        {
+          "children": [
+            {
+              "content": "Description",
+              "fill": "#F2F2F2",
+              "fontFamily": "Space Grotesk",
+              "fontSize": 22,
+              "fontWeight": "600",
+              "id": "dE1qR",
+              "name": "Desc Title",
+              "type": "text"
+            },
+            {
+              "content": "Single Project.description field — split into sections by markdown headings (##).",
+              "fill": "#888888",
+              "fontFamily": "Space Grotesk",
+              "fontSize": 13,
+              "fontWeight": "normal",
+              "id": "Qamnb",
+              "name": "Desc Hint",
+              "textGrowth": "fixed-width",
+              "type": "text",
+              "width": "fill_container"
+            },
+            {
+              "children": [
+                {
+                  "children": [
+                    {
+                      "content": "## The idea",
+                      "fill": "#00C4B8",
+                      "fontFamily": "Space Grotesk",
+                      "fontSize": 18,
+                      "fontWeight": "600",
+                      "id": "IEeUL",
+                      "name": "Heading",
+                      "type": "text"
+                    },
+                    {
+                      "content": "Coastal sensor networks need reliable off-grid power. This project explores a low-cost buoy that converts wave motion into stored energy for nearby IoT devices.",
+                      "fill": "#C8C8C8",
+                      "fontFamily": "Space Grotesk",
+                      "fontSize": 15,
+                      "fontWeight": "normal",
+                      "id": "ZUclb",
+                      "lineHeight": 1.55,
+                      "name": "Body",
+                      "textGrowth": "fixed-width",
+                      "type": "text",
+                      "width": "fill_container"
+                    }
+                  ],
+                  "gap": 8,
+                  "id": "ZOYgB",
+                  "layout": "vertical",
+                  "name": "The idea",
+                  "type": "frame",
+                  "width": "fill_container"
+                },
+                {
+                  "children": [
+                    {
+                      "content": "## What you'll build",
+                      "fill": "#00C4B8",
+                      "fontFamily": "Space Grotesk",
+                      "fontSize": 18,
+                      "fontWeight": "600",
+                      "id": "ySCtt",
+                      "name": "Heading",
+                      "type": "text"
+                    },
+                    {
+                      "content": "A waterproof buoy housing, an energy-harvesting mechanism, a charge controller, and a small telemetry dashboard to monitor output over time.",
+                      "fill": "#C8C8C8",
+                      "fontFamily": "Space Grotesk",
+                      "fontSize": 15,
+                      "fontWeight": "normal",
+                      "id": "q3agxq",
+                      "lineHeight": 1.55,
+                      "name": "Body",
+                      "textGrowth": "fixed-width",
+                      "type": "text",
+                      "width": "fill_container"
+                    }
+                  ],
+                  "gap": 8,
+                  "id": "uEBbg",
+                  "layout": "vertical",
+                  "name": "What you'll build",
+                  "type": "frame",
+                  "width": "fill_container"
+                },
+                {
+                  "children": [
+                    {
+                      "content": "## A good fit if",
+                      "fill": "#00C4B8",
+                      "fontFamily": "Space Grotesk",
+                      "fontSize": 18,
+                      "fontWeight": "600",
+                      "id": "vgKIM",
+                      "name": "Heading",
+                      "type": "text"
+                    },
+                    {
+                      "content": "You're curious about embedded hardware, enjoy hands-on prototyping, and want to work across mechanics, electronics and a bit of frontend.",
+                      "fill": "#C8C8C8",
+                      "fontFamily": "Space Grotesk",
+                      "fontSize": 15,
+                      "fontWeight": "normal",
+                      "id": "t7I7a",
+                      "lineHeight": 1.55,
+                      "name": "Body",
+                      "textGrowth": "fixed-width",
+                      "type": "text",
+                      "width": "fill_container"
+                    }
+                  ],
+                  "gap": 8,
+                  "id": "Z37YSu",
+                  "layout": "vertical",
+                  "name": "A good fit if",
+                  "type": "frame",
+                  "width": "fill_container"
+                }
+              ],
+              "gap": 24,
+              "id": "f84OM",
+              "layout": "vertical",
+              "name": "Markdown Content",
+              "type": "frame",
+              "width": "fill_container"
+            }
+          ],
+          "gap": 18,
+          "id": "tkae8",
+          "layout": "vertical",
+          "name": "Description",
+          "padding": [
+            8,
+            32,
+            48,
+            32
+          ],
+          "type": "frame",
+          "width": "fill_container"
+        }
+      ],
+      "clip": true,
+      "fill": "#222222",
+      "id": "azuL0",
+      "layout": "vertical",
+      "name": "Project Page V2 — Public (no course context)",
+      "type": "frame",
+      "width": 1200,
+      "x": 1300,
+      "y": 0
+    },
+    {
+      "children": [
+        {
+          "alignItems": "center",
+          "children": [
+            {
+              "alignItems": "center",
+              "children": [
+                {
+                  "fill": "#00A398",
+                  "height": 22,
+                  "id": "M8LqN",
+                  "innerRadius": 0.55,
+                  "name": "Ring",
+                  "type": "ellipse",
+                  "width": 22
+                },
+                {
+                  "content": "EduHub",
+                  "fill": "#F2F2F2",
+                  "fontFamily": "Space Grotesk",
+                  "fontSize": 18,
+                  "fontWeight": "600",
+                  "id": "i1U1sp",
+                  "name": "Wordmark",
+                  "type": "text"
+                }
+              ],
+              "gap": 10,
+              "id": "JgFBO",
+              "name": "Logo",
+              "type": "frame"
+            },
+            {
+              "alignItems": "center",
+              "children": [
+                {
+                  "content": "Courses",
+                  "fill": "#D8D8D8",
+                  "fontFamily": "Space Grotesk",
+                  "fontSize": 14,
+                  "fontWeight": "normal",
+                  "id": "ZrIDv",
+                  "name": "Courses",
+                  "type": "text"
+                },
+                {
+                  "content": "Projects",
+                  "fill": "#00C4B8",
+                  "fontFamily": "Space Grotesk",
+                  "fontSize": 14,
+                  "fontWeight": "normal",
+                  "id": "G55ikW",
+                  "name": "Projects",
+                  "type": "text"
+                },
+                {
+                  "content": "About",
+                  "fill": "#D8D8D8",
+                  "fontFamily": "Space Grotesk",
+                  "fontSize": 14,
+                  "fontWeight": "normal",
+                  "id": "f3ari",
+                  "name": "About",
+                  "type": "text"
+                }
+              ],
+              "gap": 28,
+              "id": "MqUlx",
+              "name": "Nav",
+              "type": "frame"
+            },
+            {
+              "alignItems": "center",
+              "children": [
+                {
+                  "content": "DE",
+                  "fill": "#888888",
+                  "fontFamily": "Space Grotesk",
+                  "fontSize": 13,
+                  "fontWeight": "normal",
+                  "id": "osZ9N",
+                  "name": "Lang",
+                  "type": "text"
+                },
+                {
+                  "fill": "#00A398",
+                  "height": 30,
+                  "id": "BpxJN",
+                  "name": "User",
+                  "type": "ellipse",
+                  "width": 30
+                }
+              ],
+              "gap": 16,
+              "id": "CONH8",
+              "name": "Header Right",
+              "type": "frame"
+            }
+          ],
+          "fill": "#1A1A1A",
+          "id": "Asn74",
+          "justifyContent": "space_between",
+          "name": "Header",
+          "padding": [
+            16,
+            32
+          ],
+          "type": "frame",
+          "width": "fill_container"
+        },
+        {
+          "children": [
+            {
+              "content": "Context: Within course — user is on the course page / enrolled",
+              "fill": "#00C4B8",
+              "fontFamily": "Space Grotesk",
+              "fontSize": 12,
+              "fontWeight": "600",
+              "id": "H9VG0",
+              "name": "Label",
+              "type": "text"
+            }
+          ],
+          "fill": "#0F2A28",
+          "id": "FjJNy",
+          "name": "Context Banner",
+          "padding": [
+            8,
+            32
+          ],
+          "type": "frame",
+          "width": "fill_container"
+        },
+        {
+          "children": [
+            {
+              "children": [
+                {
+                  "cornerRadius": 16,
+                  "fill": {
+                    "enabled": true,
+                    "mode": "fill",
+                    "type": "image",
+                    "url": "https://images.unsplash.com/photo-1767357250965-fad702ee8c40?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3ODI2NTMyOTR8&ixlib=rb-4.1.0&q=80&w=1080"
+                  },
+                  "height": 400,
+                  "id": "J8ier",
+                  "metadata": {
+                    "author": "DOKYUNG KIM",
+                    "link": "https://unsplash.com/@jindujiong",
+                    "type": "unsplash",
+                    "username": "jindujiong"
+                  },
+                  "name": "Media",
+                  "type": "rectangle",
+                  "width": "fill_container"
+                }
+              ],
+              "gap": 14,
+              "id": "unqup",
+              "layout": "vertical",
+              "name": "Media Col",
+              "type": "frame",
+              "width": 520
+            },
+            {
+              "children": [
+                {
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "fill": "#00C4B8",
+                      "height": 14,
+                      "icon": "book-open",
+                      "id": "QB8tO",
+                      "library": "lucide",
+                      "name": "I",
+                      "type": "icon",
+                      "width": 14
+                    },
+                    {
+                      "content": "Viewing from Web Development · WS24",
+                      "fill": "#B8B8B8",
+                      "fontFamily": "Space Grotesk",
+                      "fontSize": 12,
+                      "fontWeight": "normal",
+                      "id": "BzHL5",
+                      "name": "L",
+                      "type": "text"
+                    }
+                  ],
+                  "cornerRadius": 8,
+                  "fill": "#2A2A2A",
+                  "gap": 8,
+                  "id": "xWmfG",
+                  "name": "Course Context",
+                  "padding": [
+                    8,
+                    12
+                  ],
+                  "stroke": "#444444",
+                  "strokeWidth": 1,
+                  "type": "frame",
+                  "width": "fill_container"
+                },
+                {
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "fill": "#00C4B8",
+                          "height": 14,
+                          "icon": "cpu",
+                          "id": "g72a01",
+                          "library": "lucide",
+                          "name": "I",
+                          "type": "icon",
+                          "width": 14
+                        },
+                        {
+                          "content": "Hardware",
+                          "fill": "#F2F2F2",
+                          "fontFamily": "Space Grotesk",
+                          "fontSize": 12,
+                          "fontWeight": "500",
+                          "id": "IQXM4",
+                          "name": "L",
+                          "type": "text"
+                        }
+                      ],
+                      "cornerRadius": 999,
+                      "fill": "#2A2A2A",
+                      "gap": 6,
+                      "id": "a3yja",
+                      "name": "Type Chip",
+                      "padding": [
+                        6,
+                        12
+                      ],
+                      "stroke": "#444444",
+                      "strokeWidth": 1,
+                      "type": "frame"
+                    },
+                    {
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "fill": "#C97A12",
+                          "height": 13,
+                          "icon": "lock-open",
+                          "id": "E8ECkW",
+                          "library": "lucide",
+                          "name": "I",
+                          "type": "icon",
+                          "width": 13
+                        },
+                        {
+                          "content": "Open template",
+                          "fill": "#C97A12",
+                          "fontFamily": "Space Grotesk",
+                          "fontSize": 12,
+                          "fontWeight": "600",
+                          "id": "JAXWp",
+                          "name": "L",
+                          "type": "text"
+                        }
+                      ],
+                      "cornerRadius": 999,
+                      "fill": "#FBF0DD",
+                      "gap": 6,
+                      "id": "sywVb",
+                      "name": "Open Pill",
+                      "padding": [
+                        6,
+                        12
+                      ],
+                      "type": "frame"
+                    }
+                  ],
+                  "gap": 10,
+                  "id": "YhRAG",
+                  "name": "Chips",
+                  "type": "frame"
+                },
+                {
+                  "content": "Tidal Energy Buoy",
+                  "fill": "#FFFFFF",
+                  "fontFamily": "Space Grotesk",
+                  "fontSize": 42,
+                  "fontWeight": "600",
+                  "id": "EySb0",
+                  "lineHeight": 1.05,
+                  "name": "Title",
+                  "textGrowth": "fixed-width",
+                  "type": "text",
+                  "width": "fill_container"
+                },
+                {
+                  "content": "Prototype a floating buoy that harvests tidal motion to charge coastal sensor networks.",
+                  "fill": "#C8C8C8",
+                  "fontFamily": "Space Grotesk",
+                  "fontSize": 17,
+                  "fontWeight": "normal",
+                  "id": "eXOWT",
+                  "lineHeight": 1.35,
+                  "name": "Tagline",
+                  "textGrowth": "fixed-width",
+                  "type": "text",
+                  "width": "fill_container"
+                },
+                {
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "fill": "#1982fc",
+                      "height": 32,
+                      "id": "T6mFtG",
+                      "name": "Av",
+                      "type": "ellipse",
+                      "width": 32
+                    },
+                    {
+                      "children": [
+                        {
+                          "content": "Proposed by Dr. Lena Voss",
+                          "fill": "#F2F2F2",
+                          "fontFamily": "Space Grotesk",
+                          "fontSize": 13,
+                          "fontWeight": "600",
+                          "id": "kRI2I",
+                          "name": "N",
+                          "type": "text"
+                        },
+                        {
+                          "content": "Marine Robotics Lab · opencampus.sh",
+                          "fill": "#888888",
+                          "fontFamily": "Space Grotesk",
+                          "fontSize": 12,
+                          "fontWeight": "normal",
+                          "id": "Nn7Tn",
+                          "name": "R",
+                          "type": "text"
+                        }
+                      ],
+                      "gap": 1,
+                      "id": "yhIkT",
+                      "layout": "vertical",
+                      "name": "Col",
+                      "type": "frame"
+                    }
+                  ],
+                  "gap": 10,
+                  "id": "q5Jag9",
+                  "name": "Proposer",
+                  "type": "frame"
+                },
+                {
+                  "children": [
+                    {
+                      "content": "Join this project",
+                      "fill": "#F2F2F2",
+                      "fontFamily": "Space Grotesk",
+                      "fontSize": 18,
+                      "fontWeight": "600",
+                      "id": "H83lw",
+                      "name": "Apply Title",
+                      "type": "text"
+                    },
+                    {
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "content": "2 of 5 spots filled",
+                          "fill": "#B8B8B8",
+                          "fontFamily": "Space Grotesk",
+                          "fontSize": 13,
+                          "fontWeight": "normal",
+                          "id": "K5jBK",
+                          "name": "Spots",
+                          "type": "text"
+                        },
+                        {
+                          "content": "Apply by 15 Nov",
+                          "fill": "#FFA665",
+                          "fontFamily": "Space Grotesk",
+                          "fontSize": 13,
+                          "fontWeight": "normal",
+                          "id": "ytOVF",
+                          "name": "Deadline",
+                          "type": "text"
+                        }
+                      ],
+                      "id": "BuNwL",
+                      "justifyContent": "space_between",
+                      "name": "Spots Row",
+                      "type": "frame",
+                      "width": "fill_container"
+                    },
+                    {
+                      "children": [
+                        {
+                          "cornerRadius": 999,
+                          "fill": "#00A398",
+                          "height": 8,
+                          "id": "rDsE8",
+                          "name": "Fill",
+                          "type": "rectangle",
+                          "width": 180,
+                          "x": 0,
+                          "y": 0
+                        }
+                      ],
+                      "cornerRadius": 999,
+                      "fill": "#1A1A1A",
+                      "height": 8,
+                      "id": "SYfXx",
+                      "layout": "none",
+                      "name": "Track",
+                      "type": "frame",
+                      "width": "fill_container"
+                    },
+                    {
+                      "children": [
+                        {
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "fill": "#FFFFFF",
+                              "height": 16,
+                              "icon": "user-plus",
+                              "id": "I9KVoj",
+                              "library": "lucide",
+                              "name": "I",
+                              "type": "icon",
+                              "width": 16
+                            },
+                            {
+                              "content": "Apply to join",
+                              "fill": "#FFFFFF",
+                              "fontFamily": "Space Grotesk",
+                              "fontSize": 14,
+                              "fontWeight": "600",
+                              "id": "Dh5j9",
+                              "name": "L",
+                              "type": "text"
+                            }
+                          ],
+                          "cornerRadius": 999,
+                          "fill": "#00A398",
+                          "gap": 8,
+                          "id": "o6Hc3",
+                          "justifyContent": "center",
+                          "name": "Join Btn",
+                          "padding": [
+                            13,
+                            18
+                          ],
+                          "type": "frame",
+                          "width": "fill_container"
+                        }
+                      ],
+                      "gap": 10,
+                      "id": "l0AeyD",
+                      "layout": "vertical",
+                      "name": "Join Actions",
+                      "type": "frame",
+                      "width": "fill_container"
+                    }
+                  ],
+                  "cornerRadius": 16,
+                  "fill": "#2A2A2A",
+                  "gap": 16,
+                  "id": "cFZLi",
+                  "layout": "vertical",
+                  "name": "Join Card",
+                  "padding": 22,
+                  "stroke": "#00A398",
+                  "strokeWidth": 1,
+                  "type": "frame",
+                  "width": "fill_container"
+                }
+              ],
+              "gap": 18,
+              "id": "uc7v1",
+              "layout": "vertical",
+              "name": "Content Col",
+              "type": "frame",
+              "width": "fill_container"
+            }
+          ],
+          "gap": 40,
+          "id": "diSoH",
+          "name": "Hero Split",
+          "padding": [
+            40,
+            32,
+            16,
+            32
+          ],
+          "type": "frame",
+          "width": "fill_container"
+        },
+        {
+          "children": [
+            {
+              "content": "Description",
+              "fill": "#F2F2F2",
+              "fontFamily": "Space Grotesk",
+              "fontSize": 22,
+              "fontWeight": "600",
+              "id": "By150",
+              "name": "Desc Title",
+              "type": "text"
+            },
+            {
+              "content": "Single Project.description field — split into sections by markdown headings (##).",
+              "fill": "#888888",
+              "fontFamily": "Space Grotesk",
+              "fontSize": 13,
+              "fontWeight": "normal",
+              "id": "U8p6Fs",
+              "name": "Desc Hint",
+              "textGrowth": "fixed-width",
+              "type": "text",
+              "width": "fill_container"
+            },
+            {
+              "children": [
+                {
+                  "children": [
+                    {
+                      "content": "## The idea",
+                      "fill": "#00C4B8",
+                      "fontFamily": "Space Grotesk",
+                      "fontSize": 18,
+                      "fontWeight": "600",
+                      "id": "mX7nS",
+                      "name": "Heading",
+                      "type": "text"
+                    },
+                    {
+                      "content": "Coastal sensor networks need reliable off-grid power. This project explores a low-cost buoy that converts wave motion into stored energy for nearby IoT devices.",
+                      "fill": "#C8C8C8",
+                      "fontFamily": "Space Grotesk",
+                      "fontSize": 15,
+                      "fontWeight": "normal",
+                      "id": "nn77M",
+                      "lineHeight": 1.55,
+                      "name": "Body",
+                      "textGrowth": "fixed-width",
+                      "type": "text",
+                      "width": "fill_container"
+                    }
+                  ],
+                  "gap": 8,
+                  "id": "y3pqsT",
+                  "layout": "vertical",
+                  "name": "The idea",
+                  "type": "frame",
+                  "width": "fill_container"
+                },
+                {
+                  "children": [
+                    {
+                      "content": "## What you'll build",
+                      "fill": "#00C4B8",
+                      "fontFamily": "Space Grotesk",
+                      "fontSize": 18,
+                      "fontWeight": "600",
+                      "id": "zGGqa",
+                      "name": "Heading",
+                      "type": "text"
+                    },
+                    {
+                      "content": "A waterproof buoy housing, an energy-harvesting mechanism, a charge controller, and a small telemetry dashboard to monitor output over time.",
+                      "fill": "#C8C8C8",
+                      "fontFamily": "Space Grotesk",
+                      "fontSize": 15,
+                      "fontWeight": "normal",
+                      "id": "x5tj9A",
+                      "lineHeight": 1.55,
+                      "name": "Body",
+                      "textGrowth": "fixed-width",
+                      "type": "text",
+                      "width": "fill_container"
+                    }
+                  ],
+                  "gap": 8,
+                  "id": "g47kuh",
+                  "layout": "vertical",
+                  "name": "What you'll build",
+                  "type": "frame",
+                  "width": "fill_container"
+                },
+                {
+                  "children": [
+                    {
+                      "content": "## A good fit if",
+                      "fill": "#00C4B8",
+                      "fontFamily": "Space Grotesk",
+                      "fontSize": 18,
+                      "fontWeight": "600",
+                      "id": "VrfNz",
+                      "name": "Heading",
+                      "type": "text"
+                    },
+                    {
+                      "content": "You're curious about embedded hardware, enjoy hands-on prototyping, and want to work across mechanics, electronics and a bit of frontend.",
+                      "fill": "#C8C8C8",
+                      "fontFamily": "Space Grotesk",
+                      "fontSize": 15,
+                      "fontWeight": "normal",
+                      "id": "kIHAC",
+                      "lineHeight": 1.55,
+                      "name": "Body",
+                      "textGrowth": "fixed-width",
+                      "type": "text",
+                      "width": "fill_container"
+                    }
+                  ],
+                  "gap": 8,
+                  "id": "icHQI",
+                  "layout": "vertical",
+                  "name": "A good fit if",
+                  "type": "frame",
+                  "width": "fill_container"
+                }
+              ],
+              "gap": 24,
+              "id": "bEPi4",
+              "layout": "vertical",
+              "name": "Markdown Content",
+              "type": "frame",
+              "width": "fill_container"
+            }
+          ],
+          "gap": 18,
+          "id": "hfwkM",
+          "layout": "vertical",
+          "name": "Description",
+          "padding": [
+            8,
+            32,
+            48,
+            32
+          ],
+          "type": "frame",
+          "width": "fill_container"
+        }
+      ],
+      "clip": true,
+      "fill": "#222222",
+      "id": "b78Im",
+      "layout": "vertical",
+      "name": "Project Page V2 — Within course context",
+      "type": "frame",
+      "width": 1200,
+      "x": 1300,
+      "y": 1100
+    }
+  ]
+}

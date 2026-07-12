@@ -1,0 +1,33 @@
+table:
+  name: ProjectGroup
+  schema: public
+object_relationships:
+  - name: Project
+    using:
+      foreign_key_constraint_on: projectId
+  - name: ProjectGroupOption
+    using:
+      foreign_key_constraint_on: groupOptionId
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - id
+        - projectId
+        - groupOptionId
+        - created_at
+        - updated_at
+      # Only rows whose project is anonymously visible (mirrors the Project rule),
+      # so anonymous callers cannot enumerate groupings of hidden projects.
+      filter:
+        Project:
+          _or:
+            - status:
+                _eq: PUBLISHED
+            - _and:
+                - status:
+                    _eq: PROPOSED
+                - _not:
+                    ProjectAuthors:
+                      participationStatus:
+                        _eq: ACCEPTED

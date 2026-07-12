@@ -11,6 +11,7 @@ import {
   MdOutlinePalette,
   MdOutlineSettings,
   MdOutlineVerified,
+  MdOutlineWorkspacePremium,
 } from 'react-icons/md';
 
 /**
@@ -33,6 +34,7 @@ export type SettingsNavItemId =
   | 'documentation-instructions'
   | 'onboarding-texts'
   | 'course-groups'
+  | 'badges'
   | 'time-zone'
   | 'access';
 
@@ -125,6 +127,14 @@ export const SETTINGS_NAV_ITEMS: Record<SettingsNavItemId, SettingsNavItemDef> =
     status: 'live',
     groupId: 'programs',
   },
+  badges: {
+    id: 'badges',
+    icon: MdOutlineWorkspacePremium,
+    href: '/manage/settings/badges',
+    requiredCapability: 'admin',
+    status: 'live',
+    groupId: 'programs',
+  },
   'time-zone': {
     id: 'time-zone',
     icon: MdOutlineSettings,
@@ -162,6 +172,7 @@ export const SETTINGS_NAV_GROUPS: SettingsNavGroupDef[] = [
       'documentation-instructions',
       'onboarding-texts',
       'course-groups',
+      'badges',
     ],
   },
   {

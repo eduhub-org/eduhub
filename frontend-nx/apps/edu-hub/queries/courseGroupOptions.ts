@@ -7,8 +7,17 @@ export const COURSE_GROUP_OPTIONS = gql`
       order
       title
       sliderGroup
+      contentType
       programType
       organizationId
+      SelectedCourseGroups {
+        id
+        courseGroupOptionId
+      }
+      SelectedProjectGroups {
+        id
+        projectGroupOptionId
+      }
     }
   }
 `;
