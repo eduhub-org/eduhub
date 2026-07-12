@@ -37,7 +37,7 @@ const WidgetProjects: FC = () => {
     HomeProjectTilesAll | HomeProjectTilesByOrganizationResult
   >(organizationId ? HOME_PROJECT_TILES_BY_ORGANIZATION : HOME_PROJECT_TILES_ALL, {
     client,
-    variables: organizationId ? { organizationId } : undefined,
+    variables: organizationId ? { organizationId, limit: 24, offset: 0 } : { limit: 24, offset: 0 },
     skip: apiKeyValidating || !router.isReady,
     fetchPolicy: 'network-only',
     context: WIDGET_ANONYMOUS_CONTEXT,

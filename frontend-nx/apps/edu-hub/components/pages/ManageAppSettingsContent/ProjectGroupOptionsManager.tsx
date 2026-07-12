@@ -66,25 +66,26 @@ const ProjectGroupOptionsManager: FC = () => {
     reordered.splice(result.destination.index, 0, moved);
 
     try {
-      await Promise.all(
+      setError('');
+      // Send all updates concurrently to minimize latency, but the mutations
+      // will return early if any fail so we can detect partial writes.
+      const results = await Promise.allSettled(
         reordered.map((item, index) =>
           updateOrder({
             variables: { id: item.id, order: index + 1 },
             optimisticResponse: {
               update_ProjectGroupOption_by_pk: { __typename: 'ProjectGroupOption', id: item.id, order: index + 1 },
             },
-            update: (cache) => {
-              const existing = cache.readQuery<AdminProjectGroupOptions>({ query: ADMIN_PROJECT_GROUP_OPTIONS });
-              if (existing) {
-                cache.writeQuery({
-                  query: ADMIN_PROJECT_GROUP_OPTIONS,
-                  data: { ...existing, ProjectGroupOption: reordered.map((o, i) => ({ ...o, order: i + 1 })) },
-                });
-              }
-            },
           })
         )
       );
+
+      // Check if all mutations succeeded
+      const failures = results.filter((r) => r.status === 'rejected');
+      if (failures.length > 0) {
+        setError(t('error_reorder'));
+        return;
+      }
     } catch {
       setError(t('error_reorder'));
     }

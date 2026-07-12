@@ -90,7 +90,7 @@ function TileSlider<T extends TileSliderItem>({ items, renderTile, isWidget = fa
   const swiperNext = () => swiperRef.current?.swiper?.slideNext();
 
   const calculateTileWidth = () => {
-    const tileWidth = window.innerWidth >= 640 ? 325 : 275; // Tile width based on breakpoint
+    const tileWidth = window.innerWidth >= 375 ? 325 : 275; // Match xs: 375px breakpoint from tailwind.config.js
     return tileWidth;
   };
 
