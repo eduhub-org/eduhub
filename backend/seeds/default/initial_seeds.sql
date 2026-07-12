@@ -3621,8 +3621,9 @@ INSERT INTO public."User" (id, "firstName", "lastName", email, picture, "externa
 -- Org-admin grant: ONLY the non-default test org 9100 (no grant on the default organization, and no
 -- Admin row, so this user is not a super-admin). canManageDegrees comes from migration 1780300000000.
 -- May edit org 9100's settings + EVENTS programs/courses, but NOT its COURSES/DEGREES programs.
-INSERT INTO public."OrganizationAdmin" (id, "userId", "organizationId", "canManageCourses", "canManageEvents", "canManageDegrees", "canManageSettings", updated_at, created_at) VALUES
-  (9100, 'dddddddd-dddd-dddd-dddd-dddddddddddd', 9100, false, true, false, true, now(), now());
+-- canManageJobs is enabled so this user can create/manage StuJo job postings for org 9100.
+INSERT INTO public."OrganizationAdmin" (id, "userId", "organizationId", "canManageCourses", "canManageEvents", "canManageDegrees", "canManageSettings", "canManageJobs", updated_at, created_at) VALUES
+  (9100, 'dddddddd-dddd-dddd-dddd-dddddddddddd', 9100, false, true, false, true, true, now(), now());
 
 -- Instructor of an existing course (id 4), which belongs to a different organization than the one
 -- this user administers, to confirm that instructor access is retained alongside the org_admin role.

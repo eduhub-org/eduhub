@@ -31,6 +31,7 @@ export const ORGANIZATION_ADMIN_LIST = gql`
       canManageEvents
       canManageCourses
       canManageDegrees
+      canManageJobs
       canManageSettings
     }
     OrganizationAdmin_aggregate(where: $filter) {
@@ -90,6 +91,18 @@ export const UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_DEGREES = gql`
     ) {
       id
       canManageDegrees
+    }
+  }
+`;
+
+export const UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_JOBS = gql`
+  mutation UpdateOrganizationAdminCanManageJobs($itemId: Int!, $value: Boolean!) {
+    update_OrganizationAdmin_by_pk(
+      pk_columns: { id: $itemId },
+      _set: { canManageJobs: $value }
+    ) {
+      id
+      canManageJobs
     }
   }
 `;
