@@ -9,77 +9,101 @@ import { fetchJobDetail, JobDetail } from '../../lib/jobs';
 
 type Props = { portal: PortalBranding; job: JobDetail };
 
+// Legacy (ETL-imported) postings carry HTML like the Rails app rendered
+// with `raw`; postings written through the plain-textarea form are plain
+// text — render those escaped with preserved line breaks instead.
+const RichText: FC<{ value: string }> = ({ value }) =>
+  /<[a-z][^>]*>/i.test(value) ? (
+    <div dangerouslySetInnerHTML={{ __html: value }} />
+  ) : (
+    <div style={{ whiteSpace: 'pre-line' }}>{value}</div>
+  );
+
+/**
+ * Job detail, ported from the live /stellenangebot page: pink title +
+ * grey company, company logo next to a bold-label/value fact grid
+ * (Kategorie, Berufsfeld, Vergütung, Beginn, Arbeitsort, …), description,
+ * and the job PDF embedded inline.
+ */
 const JobDetailPage: FC<Props> = ({ portal, job }) => {
   const t = useTranslations('common');
+  const tType = useTranslations('jobType');
+  const tOccupation = useTranslations('jobOccupation');
+  const tRegion = useTranslations('jobRegion');
+
+  const facts: [string, string | null][] = [
+    [t('category'), tType(job.type)],
+    [t('occupation'), job.occupation ? tOccupation(job.occupation) : null],
+    [t('salary'), job.salaryText],
+    [t('start'), job.startText],
+    [t('duration'), job.durationText],
+    [t('hoursPerWeek'), job.hoursPerWeek != null ? String(job.hoursPerWeek) : null],
+    [t('location'), [job.location, job.region && tRegion(job.region)].filter(Boolean).join(', ')],
+    [t('deadline'), job.applicationDeadline],
+    [
+      t('publishedAt'),
+      job.publishedAt ? new Date(job.publishedAt).toLocaleDateString('de-DE') : null,
+    ],
+  ];
+
   return (
     <Layout portal={portal}>
       <Link href="/stellenangebote">← {t('backToList')}</Link>
-      <h1>{job.title}</h1>
-      <div className="stujo-muted">
-        {job.customCompany || job.Organization.name}
-        {job.location ? ` · ${job.location}` : ''}
+      <h2 style={{ marginBottom: 0 }}>{job.title}</h2>
+      <h4 style={{ marginTop: '0.2em' }}>{job.customCompany || job.Organization.name}</h4>
+
+      <div className="stujo-detail-grid">
+        {job.Organization.logo && (
+          <img
+            src={job.Organization.logo}
+            alt={job.Organization.name}
+            className="stujo-detail-logo"
+          />
+        )}
+        <dl className="stujo-detail-list">
+          {facts.map(
+            ([label, value]) =>
+              value && (
+                <div key={label}>
+                  <dt>{label}</dt>
+                  <dd>{value}</dd>
+                </div>
+              )
+          )}
+        </dl>
+        <dl className="stujo-detail-list">
+          <dt>{t('aboutEmployer')}</dt>
+          <dd>
+            {job.Organization.name}
+            {job.Organization.city ? `, ${job.Organization.city}` : ''}
+          </dd>
+          {job.Organization.website && (
+            <dd>
+              <a href={job.Organization.website} target="_blank" rel="noreferrer">
+                {job.Organization.website}
+              </a>
+            </dd>
+          )}
+        </dl>
       </div>
-      <div style={{ margin: '0.5rem 0' }}>
-        <span className="stujo-badge">{job.type}</span>
-        <span className="stujo-badge">{job.occupation}</span>
-        {job.region && <span className="stujo-badge">{job.region}</span>}
-      </div>
-      <dl>
-        {job.salaryText && (
-          <>
-            <dt>{t('salary')}</dt>
-            <dd>{job.salaryText}</dd>
-          </>
-        )}
-        {job.startText && (
-          <>
-            <dt>{t('start')}</dt>
-            <dd>{job.startText}</dd>
-          </>
-        )}
-        {job.durationText && (
-          <>
-            <dt>{t('duration')}</dt>
-            <dd>{job.durationText}</dd>
-          </>
-        )}
-        {job.hoursPerWeek != null && (
-          <>
-            <dt>{t('hoursPerWeek')}</dt>
-            <dd>{job.hoursPerWeek}</dd>
-          </>
-        )}
-        {job.applicationDeadline && (
-          <>
-            <dt>{t('deadline')}</dt>
-            <dd>{job.applicationDeadline}</dd>
-          </>
-        )}
-      </dl>
-      {job.description && <div dangerouslySetInnerHTML={{ __html: job.description }} />}
+
+      {job.description && <RichText value={job.description} />}
       {job.requirement && (
         <>
-          <h2>{t('requirements')}</h2>
-          <div dangerouslySetInnerHTML={{ __html: job.requirement }} />
+          <h3>{t('requirements')}</h3>
+          <RichText value={job.requirement} />
         </>
       )}
       {job.pdfUrl && (
-        <p>
-          <a href={job.pdfUrl} target="_blank" rel="noreferrer">
-            {t('downloadPdf')}
-          </a>
-        </p>
+        <>
+          <embed src={job.pdfUrl} type="application/pdf" className="stujo-pdf-embed" />
+          <p>
+            <a href={job.pdfUrl} target="_blank" rel="noreferrer" className="stujo-btn">
+              {t('downloadPdf')}
+            </a>
+          </p>
+        </>
       )}
-      <h2>{t('aboutEmployer')}</h2>
-      <p>
-        {job.Organization.name}
-        {job.Organization.city ? `, ${job.Organization.city}` : ''}{' '}
-        {job.Organization.website && (
-          <a href={job.Organization.website} target="_blank" rel="noreferrer">
-            {job.Organization.website}
-          </a>
-        )}
-      </p>
     </Layout>
   );
 };

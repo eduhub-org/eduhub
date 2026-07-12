@@ -14,58 +14,43 @@ type Props = {
   totalCount: number;
 };
 
-const QUICK_FILTERS: [string, string][] = [
-  ['WERKSTUDENT', 'WORKING_STUDENT'],
-  ['PRAKTIKUM', 'INTERNSHIP'],
-  ['ABSCHLUSSARBEIT', 'THESIS'],
-  ['FESTANSTELLUNG', 'PERMANENT'],
-  ['TRAINEE', 'TRAINEE'],
-  ['MINIJOB', 'MINIJOB'],
-];
-
 /**
- * Portal landing page per design/stujo-design.pen: branded hero with
- * search and quick type filters, plus the latest published postings
- * (with the portal's default region preset — parity with the Rails
- * landing pages, e.g. Flensburg).
+ * Portal landing page, ported from the live university landing
+ * (partials/_university_landing.scss): purple gradient band with the green
+ * "STUJO.NET - DAS KARRIEREPORTAL" headline and white intro copy, followed
+ * by the latest published postings (with the portal's default region
+ * preset — parity with the Rails landing pages, e.g. Flensburg).
  */
 const Home: FC<Props> = ({ portal, jobs, totalCount }) => {
   const t = useTranslations('common');
   return (
     <Layout portal={portal}>
-      <section className="stujo-hero">
-        <img src="/stujo_bird.png" alt="" className="stujo-hero-bird" />
-        <h1 className="stujo-hero-claim">Finde Deinen Studentenjob in Schleswig-Holstein</h1>
-        <p className="stujo-hero-sub">
-          Werkstudentenjobs, Praktika, Abschlussarbeiten und Festanstellungen – direkt von
-          Arbeitgebern aus der Region.
+      <section className="stujo-hero" style={{ margin: '-1.5rem -1rem 0' }}>
+        <h1 className="stujo-hero-claim">{t('heroTitle')}</h1>
+        <p className="stujo-hero-sub">{t('heroText')}</p>
+        <p className="stujo-hero-sub" style={{ marginTop: '1em', fontWeight: 'bold' }}>
+          {t('heroClaim')}
         </p>
-        <form className="stujo-hero-search" action="/stellenangebote" method="get">
-          <input name="search" placeholder="Jobtitel, Firma oder Stichwort …" />
-          <button type="submit">{t('search')}</button>
-        </form>
-        <div className="stujo-hero-filters">
-          {QUICK_FILTERS.map(([label, type]) => (
-            <Link key={type} href={`/stellenangebote?type=${type}`} className="stujo-badge-link">
-              {label}
-            </Link>
-          ))}
-        </div>
       </section>
 
-      <section>
-        <div className="stujo-section-head">
-          <h2>Neueste Stellenangebote</h2>
-          <span className="stujo-muted">{t('results', { count: totalCount })}</span>
+      <section className="stujo-landing-cols">
+        <div>
+          <h2 className="stujo-landing-head">{t('latestOffers').toUpperCase()}</h2>
+          {jobs.map((job) => (
+            <JobCard key={job.id} job={job} />
+          ))}
+          <p style={{ marginTop: '1.5rem' }}>
+            <Link href="/stellenangebote" className="stujo-btn">
+              {t('allOffers')}
+            </Link>
+          </p>
         </div>
-        {jobs.map((job) => (
-          <JobCard key={job.id} job={job} />
-        ))}
-        <p style={{ textAlign: 'center' }}>
-          <Link href="/stellenangebote" className="stujo-btn stujo-btn--ghost">
-            Alle Stellenangebote ansehen
-          </Link>
-        </p>
+        <div>
+          <h2 className="stujo-landing-head">{t('availableOffers', { count: totalCount })}</h2>
+          <p>
+            <img src="/stujo_bird.png" alt="StuJo" style={{ maxWidth: '10rem' }} />
+          </p>
+        </div>
       </section>
     </Layout>
   );
@@ -75,7 +60,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => 
   const portal = await resolvePortal(req.headers.host);
   const { jobs, totalCount } = await fetchJobList({
     region: portal.defaultRegion ?? undefined,
-    limit: 10,
+    limit: 5,
   });
   return { props: { portal, jobs, totalCount } };
 };

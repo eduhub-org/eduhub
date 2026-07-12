@@ -1,5 +1,7 @@
 import type { GetServerSideProps } from 'next';
 import { FC } from 'react';
+import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 
 import Layout from '../components/Layout';
 import { resolvePortal, PortalBranding } from '../lib/portal';
@@ -9,37 +11,47 @@ type Price = { jobPostingType: string; price: number; currency: string; duration
 type Props = { portal: PortalBranding; prices: Price[] };
 
 /**
- * Employer landing page with the current prices (from JobPostingPrice).
- * The employer dashboard (create/manage postings, Stripe checkout) lands
- * with phase 4 of docs/STUJO_INTEGRATION_PLAN.md.
+ * Employer landing page with the intro copy from the live Arbeitgeber page
+ * and the current prices (from JobPostingPrice).
  */
-const ForEmployers: FC<Props> = ({ portal, prices }) => (
-  <Layout portal={portal}>
-    <h1>Für Arbeitgeber</h1>
-    <p>
-      Erreiche Studierende der Hochschulen in Schleswig-Holstein mit Deinem Stellenangebot – bis zu
-      8 Wochen sichtbar auf allen StuJo-Portalen.
-    </p>
-    <table>
-      <thead>
-        <tr>
-          <th style={{ textAlign: 'left' }}>Kategorie</th>
-          <th style={{ textAlign: 'right' }}>Preis (netto)</th>
-        </tr>
-      </thead>
-      <tbody>
-        {prices.map((p) => (
-          <tr key={p.jobPostingType}>
-            <td>{p.jobPostingType}</td>
-            <td style={{ textAlign: 'right' }}>
-              {p.price === 0 ? 'kostenlos' : `${(p.price / 100).toFixed(2)} €`}
-            </td>
+const ForEmployers: FC<Props> = ({ portal, prices }) => {
+  const tType = useTranslations('jobType');
+  return (
+    <Layout portal={portal}>
+      <h2>Für Arbeitgeber</h2>
+      <p style={{ maxWidth: '46em' }}>
+        Als Karriereportal für Studierende in Kiel und Flensburg bietet StuJo Arbeitgebern die
+        Möglichkeit, Fachkräfte von morgen frühzeitig kennenzulernen und um sie zu werben. Ob
+        Werkstudentenstelle, Praktikum oder erste Festanstellung – StuJo deckt die ganze Bandbreite
+        von Angeboten ab! Dein Stellenangebot ist bis zu 8 Wochen auf allen StuJo-Portalen sichtbar.
+      </p>
+      <h3>Leistungen und Preise</h3>
+      <table className="stujo-table" style={{ maxWidth: '32rem' }}>
+        <thead>
+          <tr>
+            <th style={{ textAlign: 'left' }}>Kategorie</th>
+            <th style={{ textAlign: 'right' }}>Preis (netto)</th>
           </tr>
-        ))}
-      </tbody>
-    </table>
-  </Layout>
-);
+        </thead>
+        <tbody>
+          {prices.map((p) => (
+            <tr key={p.jobPostingType}>
+              <td>{tType(p.jobPostingType)}</td>
+              <td style={{ textAlign: 'right' }}>
+                {p.price === 0 ? 'kostenlos' : `${(p.price / 100).toFixed(2).replace('.', ',')} €`}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <p style={{ marginTop: '1.5rem' }}>
+        <Link href="/mein-stujo/neu" className="stujo-btn">
+          Jetzt Angebot einstellen
+        </Link>
+      </p>
+    </Layout>
+  );
+};
 
 export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => {
   const [portal, data] = await Promise.all([
