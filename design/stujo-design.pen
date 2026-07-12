@@ -8,7 +8,7 @@
       "y": 80,
       "name": "Button Primary",
       "reusable": true,
-      "fill": "$primary",
+      "fill": "$accent",
       "cornerRadius": 4,
       "gap": 8,
       "padding": [
@@ -24,8 +24,8 @@
           "fill": "#FFFFFF",
           "content": "Jetzt inserieren",
           "fontFamily": "$font",
-          "fontSize": 15,
-          "fontWeight": "700"
+          "fontSize": 16,
+          "fontWeight": "normal"
         }
       ]
     },
@@ -39,7 +39,7 @@
       "fill": "#FFFFFF",
       "cornerRadius": 4,
       "stroke": "$primary",
-      "strokeWidth": 1.5,
+      "strokeWidth": 2,
       "gap": 8,
       "padding": [
         11,
@@ -66,14 +66,8 @@
       "y": 220,
       "name": "Badge",
       "reusable": true,
-      "fill": "$bg-soft",
-      "cornerRadius": 3,
-      "stroke": "$border",
-      "strokeWidth": 1,
-      "padding": [
-        4,
-        10
-      ],
+      "fill": "#FFFFFF00",
+      "stroke": "#00000000",
       "children": [
         {
           "type": "text",
@@ -82,9 +76,9 @@
           "fill": "$text-grey",
           "content": "WERKSTUDENT",
           "fontFamily": "$font",
-          "fontSize": 12,
+          "fontSize": 15,
           "fontWeight": "700",
-          "letterSpacing": 0.3
+          "letterSpacing": 0.2
         }
       ]
     },
@@ -126,23 +120,59 @@
       "children": [
         {
           "type": "frame",
-          "id": "M1bDyb",
-          "name": "Topbar",
+          "id": "raiwy",
+          "name": "Banner",
+          "clip": true,
           "width": "fill_container",
-          "fill": "#FFFFFF",
-          "padding": [
-            14,
-            60
-          ],
-          "justifyContent": "space_between",
-          "alignItems": "center",
+          "height": 240,
+          "fill": {
+            "type": "gradient",
+            "gradientType": "linear",
+            "enabled": true,
+            "rotation": 90,
+            "size": {
+              "height": 1
+            },
+            "colors": [
+              {
+                "color": "$gradient-dark",
+                "position": 0
+              },
+              {
+                "color": "$primary",
+                "position": 0.5
+              },
+              {
+                "color": "$gradient-dark",
+                "position": 1
+              }
+            ]
+          },
+          "layout": "none",
           "children": [
             {
               "type": "frame",
-              "id": "zJeli",
+              "id": "p6GHsG",
+              "x": 0,
+              "y": 0,
+              "name": "Diagonal Art",
+              "width": 1440,
+              "height": 150,
+              "fill": {
+                "type": "image",
+                "enabled": true,
+                "url": "stujo-assets/stujo_header_diag.png",
+                "mode": "stretch"
+              }
+            },
+            {
+              "type": "frame",
+              "id": "x9BxXG",
+              "x": 36,
+              "y": 26,
               "name": "Logo",
-              "width": 170,
-              "height": 52,
+              "width": 300,
+              "height": 92,
               "fill": {
                 "type": "image",
                 "enabled": true,
@@ -152,41 +182,71 @@
             },
             {
               "type": "frame",
-              "id": "KJTHf",
-              "name": "Topbar Right",
+              "id": "uyP4y",
+              "x": 1000,
+              "y": 52,
+              "name": "Topnav",
               "gap": 24,
               "alignItems": "center",
               "children": [
                 {
-                  "type": "text",
-                  "id": "jhd8A",
-                  "name": "For Employers Link",
-                  "fill": "$text-grey",
-                  "content": "Für Arbeitgeber",
-                  "fontFamily": "$font",
-                  "fontSize": 14,
-                  "fontWeight": "700"
-                },
-                {
-                  "type": "text",
-                  "id": "iXix4",
-                  "name": "Login Link",
-                  "fill": "$primary",
-                  "content": "Einloggen",
-                  "fontFamily": "$font",
-                  "fontSize": 14,
-                  "fontWeight": "700"
-                },
-                {
-                  "id": "g3cwOo",
-                  "type": "ref",
-                  "ref": "uR40i",
-                  "name": "Register Button",
-                  "descendants": {
-                    "XNWjH": {
-                      "content": "Registrieren"
+                  "type": "frame",
+                  "id": "tbdDO",
+                  "name": "Lang Switch",
+                  "gap": 6,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "D08v4",
+                      "name": "Lang DE",
+                      "fill": "#FFFFFF",
+                      "content": "DE",
+                      "fontFamily": "$font",
+                      "fontSize": 16,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "kpFrj",
+                      "name": "Lang Sep",
+                      "fill": "#FFFFFF99",
+                      "content": "|",
+                      "fontFamily": "$font",
+                      "fontSize": 16,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "I5YDpe",
+                      "name": "Lang EN",
+                      "fill": "#FFFFFF99",
+                      "content": "EN",
+                      "fontFamily": "$font",
+                      "fontSize": 16,
+                      "fontWeight": "700"
                     }
-                  }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "jb9Ge",
+                  "name": "Register Link",
+                  "fill": "#FFFFFF",
+                  "content": "+ Registrieren",
+                  "fontFamily": "$font",
+                  "fontSize": 16,
+                  "fontWeight": "700"
+                },
+                {
+                  "type": "text",
+                  "id": "wqGLJ",
+                  "name": "Login Link",
+                  "fill": "#FFFFFF",
+                  "content": "Login",
+                  "fontFamily": "$font",
+                  "fontSize": 16,
+                  "fontWeight": "700"
                 }
               ]
             }
@@ -195,155 +255,107 @@
         {
           "type": "frame",
           "id": "NCLfh",
-          "name": "Navbar",
+          "name": "Nav Bar",
           "width": "fill_container",
-          "fill": {
-            "type": "gradient",
-            "gradientType": "linear",
-            "enabled": true,
-            "rotation": 270,
-            "size": {
-              "height": 1
-            },
-            "colors": [
-              {
-                "color": "$primary",
-                "position": 0
-              },
-              {
-                "color": "$gradient-dark",
-                "position": 1
-              }
-            ]
-          },
-          "gap": 36,
+          "fill": "$accent",
           "padding": [
             0,
-            60
+            48
           ],
           "alignItems": "center",
           "children": [
             {
               "type": "frame",
-              "id": "dF03E",
+              "id": "LRlVU",
+              "name": "Nav Home",
+              "fill": "#00000000",
+              "padding": [
+                12,
+                20
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "KksLW",
+                  "name": "Home Icon",
+                  "width": 22,
+                  "height": 22,
+                  "icon": "home",
+                  "library": "Material Symbols Rounded",
+                  "fill": "#FFFFFF"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "o0Mu2N",
               "name": "Nav Stellenangebote",
-              "layout": "vertical",
-              "gap": 6,
+              "fill": "#FFFFFF",
               "padding": [
                 14,
-                2
+                20
               ],
+              "alignItems": "center",
               "children": [
                 {
                   "type": "text",
-                  "id": "gf5oj",
+                  "id": "TJLZ0",
+                  "name": "Nav Label",
+                  "fill": "$primary",
+                  "content": "STELLENANGEBOTE",
+                  "fontFamily": "$font",
+                  "fontSize": 17,
+                  "fontWeight": "700",
+                  "letterSpacing": 0.5
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "XokDf",
+              "name": "Nav Arbeitgeber",
+              "fill": "#00000000",
+              "padding": [
+                14,
+                20
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "C4TGhw",
                   "name": "Nav Label",
                   "fill": "#FFFFFF",
-                  "content": "Stellenangebote",
+                  "content": "ARBEITGEBER",
                   "fontFamily": "$font",
-                  "fontSize": 15,
-                  "fontWeight": "700"
-                },
-                {
-                  "type": "rectangle",
-                  "id": "e4eZK",
-                  "name": "Active Line",
-                  "fill": "$accent",
-                  "width": 118,
-                  "height": 3
+                  "fontSize": 17,
+                  "fontWeight": "700",
+                  "letterSpacing": 0.5
                 }
               ]
             },
             {
               "type": "frame",
-              "id": "N19NO",
-              "name": "Nav Arbeitgeber",
-              "layout": "vertical",
-              "gap": 6,
+              "id": "GDhqt",
+              "name": "Nav Mein StuJo",
+              "fill": "#00000000",
               "padding": [
                 14,
-                2
+                20
               ],
+              "alignItems": "center",
               "children": [
                 {
                   "type": "text",
-                  "id": "pmC4Q",
+                  "id": "B5fJVr",
                   "name": "Nav Label",
-                  "fill": "#FFFFFFCC",
-                  "content": "Arbeitgeber",
+                  "fill": "#FFFFFF",
+                  "content": "MEIN STUJO",
                   "fontFamily": "$font",
-                  "fontSize": 15,
-                  "fontWeight": "700"
-                },
-                {
-                  "type": "rectangle",
-                  "id": "s6DYa",
-                  "name": "Active Line",
-                  "fill": "#00000000",
-                  "width": 92,
-                  "height": 3
-                }
-              ]
-            },
-            {
-              "type": "frame",
-              "id": "xg0Fu",
-              "name": "Nav Leistungen & Preise",
-              "layout": "vertical",
-              "gap": 6,
-              "padding": [
-                14,
-                2
-              ],
-              "children": [
-                {
-                  "type": "text",
-                  "id": "x3xqp",
-                  "name": "Nav Label",
-                  "fill": "#FFFFFFCC",
-                  "content": "Leistungen & Preise",
-                  "fontFamily": "$font",
-                  "fontSize": 15,
-                  "fontWeight": "700"
-                },
-                {
-                  "type": "rectangle",
-                  "id": "WfIHX",
-                  "name": "Active Line",
-                  "fill": "#00000000",
-                  "width": 142,
-                  "height": 3
-                }
-              ]
-            },
-            {
-              "type": "frame",
-              "id": "t2ijId",
-              "name": "Nav FAQ",
-              "layout": "vertical",
-              "gap": 6,
-              "padding": [
-                14,
-                2
-              ],
-              "children": [
-                {
-                  "type": "text",
-                  "id": "GsgkF",
-                  "name": "Nav Label",
-                  "fill": "#FFFFFFCC",
-                  "content": "FAQ",
-                  "fontFamily": "$font",
-                  "fontSize": 15,
-                  "fontWeight": "700"
-                },
-                {
-                  "type": "rectangle",
-                  "id": "pMw1a",
-                  "name": "Active Line",
-                  "fill": "#00000000",
-                  "width": 34,
-                  "height": 3
+                  "fontSize": 17,
+                  "fontWeight": "700",
+                  "letterSpacing": 0.5
                 }
               ]
             }
@@ -359,100 +371,108 @@
       "name": "Job Card",
       "reusable": true,
       "width": 900,
-      "fill": "#FFFFFF",
-      "cornerRadius": 4,
-      "stroke": "$border",
-      "strokeWidth": 1,
+      "fill": "#FFFFFF00",
+      "stroke": "#00000000",
+      "layout": "vertical",
+      "gap": 12,
       "padding": [
-        18,
-        24
+        16,
+        4
       ],
-      "justifyContent": "space_between",
-      "alignItems": "center",
       "children": [
         {
           "type": "frame",
-          "id": "MRBsy",
-          "name": "Job Info",
-          "layout": "vertical",
-          "gap": 8,
+          "id": "Giv2k",
+          "name": "Content Row",
+          "width": "fill_container",
+          "justifyContent": "space_between",
+          "alignItems": "center",
           "children": [
             {
-              "type": "text",
-              "id": "aI8eh",
-              "name": "Job Title",
-              "fill": "$primary",
-              "content": "Werkstudent Data Engineering (m/w/d)",
-              "fontFamily": "$font",
-              "fontSize": 17,
-              "fontWeight": "700"
-            },
-            {
-              "type": "text",
-              "id": "x3lhSw",
-              "name": "Job Meta",
-              "fill": "$text-grey",
-              "content": "Musterfirma GmbH · Kiel",
-              "fontFamily": "$font",
-              "fontSize": 13,
-              "fontWeight": "normal"
-            },
-            {
               "type": "frame",
-              "id": "HdSBo",
-              "name": "Badges",
+              "id": "MRBsy",
+              "name": "Job Info",
+              "layout": "vertical",
               "gap": 8,
               "children": [
                 {
-                  "id": "mWmbV",
-                  "type": "ref",
-                  "ref": "hzIRZ",
-                  "name": "Type Badge"
+                  "type": "text",
+                  "id": "aI8eh",
+                  "name": "Job Title",
+                  "fill": "$primary",
+                  "content": "Werkstudent Data Engineering (m/w/d)",
+                  "fontFamily": "$font",
+                  "fontSize": 24,
+                  "fontWeight": "700"
                 },
                 {
-                  "id": "AJEVc",
-                  "type": "ref",
-                  "ref": "hzIRZ",
-                  "name": "Region Badge",
-                  "descendants": {
-                    "FMuem": {
-                      "content": "KIEL"
+                  "type": "text",
+                  "id": "x3lhSw",
+                  "name": "Job Meta",
+                  "fill": "$text-grey",
+                  "content": "Musterfirma GmbH · Kiel",
+                  "fontFamily": "$font",
+                  "fontSize": 18,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "frame",
+                  "id": "HdSBo",
+                  "name": "Badges",
+                  "gap": 10,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "Z4SOO6",
+                      "name": "Job Date",
+                      "fill": "$text-grey",
+                      "content": "08.07.2026",
+                      "fontFamily": "$font",
+                      "fontSize": 15,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "id": "mWmbV",
+                      "type": "ref",
+                      "ref": "hzIRZ",
+                      "name": "Type Badge"
+                    },
+                    {
+                      "id": "AJEVc",
+                      "type": "ref",
+                      "ref": "hzIRZ",
+                      "name": "Region Badge",
+                      "descendants": {
+                        "FMuem": {
+                          "content": "KIEL"
+                        }
+                      }
                     }
-                  }
+                  ]
                 }
               ]
+            },
+            {
+              "type": "icon",
+              "id": "M1WYyu",
+              "name": "Expand Plus",
+              "width": 36,
+              "height": 36,
+              "icon": "add_circle",
+              "library": "Material Symbols Rounded",
+              "fill": "$text-grey"
             }
           ]
         },
         {
-          "type": "frame",
-          "id": "l7KLXj",
-          "name": "Job Right",
-          "layout": "vertical",
-          "gap": 10,
-          "alignItems": "end",
-          "children": [
-            {
-              "type": "text",
-              "id": "Z4SOO6",
-              "name": "Job Date",
-              "fill": "$text-muted",
-              "content": "08.07.2026",
-              "fontFamily": "$font",
-              "fontSize": 12,
-              "fontWeight": "normal"
-            },
-            {
-              "type": "icon",
-              "id": "Yg4RS",
-              "name": "Save Star",
-              "width": 20,
-              "height": 20,
-              "icon": "star",
-              "library": "lucide",
-              "fill": "$accent"
-            }
-          ]
+          "type": "rectangle",
+          "id": "ntsVq",
+          "name": "Dotted Rule",
+          "opacity": 0.5,
+          "fill": "#737373",
+          "width": "fill_container",
+          "height": 1
         }
       ]
     },
@@ -468,84 +488,277 @@
       "children": [
         {
           "type": "frame",
-          "id": "iF77K",
+          "id": "mYmY0",
           "name": "Footer Bar",
           "width": "fill_container",
-          "fill": "$gradient-dark",
+          "fill": {
+            "type": "gradient",
+            "gradientType": "linear",
+            "enabled": true,
+            "rotation": 90,
+            "size": {
+              "height": 1
+            },
+            "colors": [
+              {
+                "color": "$gradient-dark",
+                "position": 0
+              },
+              {
+                "color": "$primary",
+                "position": 0.5
+              },
+              {
+                "color": "$gradient-dark",
+                "position": 1
+              }
+            ]
+          },
+          "gap": 40,
           "padding": [
-            28,
+            36,
             60
           ],
-          "justifyContent": "space_between",
-          "alignItems": "center",
           "children": [
             {
               "type": "frame",
-              "id": "v0tx9",
-              "name": "Footer Links",
-              "gap": 28,
+              "id": "CS0Q7",
+              "name": "Col About",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 12,
               "children": [
                 {
                   "type": "text",
-                  "id": "LSgeX",
-                  "name": "Footer Impressum",
-                  "fill": "#FFFFFFB3",
-                  "content": "Impressum",
+                  "id": "ZaWUY",
+                  "name": "About Head",
+                  "fill": "#FFFFFF",
+                  "content": "Über StuJo.net",
                   "fontFamily": "$font",
-                  "fontSize": 13,
-                  "fontWeight": "normal"
+                  "fontSize": 16,
+                  "fontWeight": "700"
                 },
                 {
                   "type": "text",
-                  "id": "R3u0bB",
-                  "name": "Footer Datenschutz",
-                  "fill": "#FFFFFFB3",
-                  "content": "Datenschutz",
+                  "id": "skwzD",
+                  "name": "About Text",
+                  "fill": "#FFFFFFCC",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "StuJo ist das Karriereportal für Studierende in Schleswig-Holstein, insbesondere vertreten an den Hochschulstandorten Kiel und Flensburg. Natürlich bieten wir darüber hinaus aber auch Stellenanzeigen aus anderen Bundesländern den hiesigen Studierenden an.",
+                  "lineHeight": 1.5,
+                  "textAlign": "justify",
                   "fontFamily": "$font",
-                  "fontSize": 13,
-                  "fontWeight": "normal"
-                },
-                {
-                  "type": "text",
-                  "id": "YokBP",
-                  "name": "Footer AGB",
-                  "fill": "#FFFFFFB3",
-                  "content": "AGB",
-                  "fontFamily": "$font",
-                  "fontSize": 13,
-                  "fontWeight": "normal"
-                },
-                {
-                  "type": "text",
-                  "id": "IkXVk",
-                  "name": "Footer Kontakt",
-                  "fill": "#FFFFFFB3",
-                  "content": "Kontakt",
-                  "fontFamily": "$font",
-                  "fontSize": 13,
-                  "fontWeight": "normal"
-                },
-                {
-                  "type": "text",
-                  "id": "c9wXR",
-                  "name": "Footer FAQ",
-                  "fill": "#FFFFFFB3",
-                  "content": "FAQ",
-                  "fontFamily": "$font",
-                  "fontSize": 13,
+                  "fontSize": 12,
                   "fontWeight": "normal"
                 }
               ]
             },
             {
-              "type": "text",
-              "id": "RIgzb",
-              "name": "Footer Copy",
-              "fill": "#FFFFFF80",
-              "content": "© 2026 StuJo · opencampus.sh",
-              "fontFamily": "$font",
-              "fontSize": 13,
-              "fontWeight": "normal"
+              "type": "frame",
+              "id": "zVOEC",
+              "name": "Col Links",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 10,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "EOKDL",
+                  "name": "Links Head",
+                  "fill": "#FFFFFF",
+                  "content": "Hinweise",
+                  "fontFamily": "$font",
+                  "fontSize": 16,
+                  "fontWeight": "700"
+                },
+                {
+                  "type": "text",
+                  "id": "lukBh",
+                  "name": "Link AGB",
+                  "fill": "#FFFFFFCC",
+                  "content": "AGB",
+                  "fontFamily": "$font",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "Wijb7",
+                  "name": "Link Leistungen und Preise",
+                  "fill": "#FFFFFFCC",
+                  "content": "Leistungen und Preise",
+                  "fontFamily": "$font",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "N68kd",
+                  "name": "Link FAQ",
+                  "fill": "#FFFFFFCC",
+                  "content": "FAQ",
+                  "fontFamily": "$font",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "G25nh",
+                  "name": "Link Impressum",
+                  "fill": "#FFFFFFCC",
+                  "content": "Impressum",
+                  "fontFamily": "$font",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "Zafu5",
+                  "name": "Link Datenschutz",
+                  "fill": "#FFFFFFCC",
+                  "content": "Datenschutz",
+                  "fontFamily": "$font",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "Psx4z",
+              "name": "Col Hochschulpartner",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 10,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "pIOo5",
+                  "name": "Uni Head",
+                  "fill": "#FFFFFF",
+                  "content": "Hochschulpartner",
+                  "fontFamily": "$font",
+                  "fontSize": 16,
+                  "fontWeight": "700"
+                },
+                {
+                  "type": "frame",
+                  "id": "xKN5h",
+                  "name": "Logo Uni Kiel",
+                  "width": 140,
+                  "height": 48,
+                  "fill": [
+                    "#FFFFFF",
+                    {
+                      "type": "image",
+                      "enabled": true,
+                      "url": "stujo-assets/partner/uni-kiel-logo-norm-228x76.gif",
+                      "mode": "fit"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "WIcf0",
+                  "name": "Logo HAW Kiel",
+                  "width": 140,
+                  "height": 48,
+                  "fill": [
+                    "#FFFFFF",
+                    {
+                      "type": "image",
+                      "enabled": true,
+                      "url": "stujo-assets/partner/Logo_HAW_Kiel.jpg",
+                      "mode": "fit"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "Xm6ry",
+                  "name": "Logo Campus Flensburg",
+                  "width": 140,
+                  "height": 48,
+                  "fill": [
+                    "#FFFFFF",
+                    {
+                      "type": "image",
+                      "enabled": true,
+                      "url": "stujo-assets/partner/logo_flensburg.png",
+                      "mode": "fit"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "FFlpL",
+              "name": "Col Gefoerdert",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 10,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "rTUqh",
+                  "name": "Partner Head",
+                  "fill": "#FFFFFF",
+                  "content": "Gefördert durch",
+                  "fontFamily": "$font",
+                  "fontSize": 16,
+                  "fontWeight": "700"
+                },
+                {
+                  "type": "frame",
+                  "id": "G3It2",
+                  "name": "Logo Wissenschaftszentrum",
+                  "width": 140,
+                  "height": 48,
+                  "fill": [
+                    "#FFFFFF",
+                    {
+                      "type": "image",
+                      "enabled": true,
+                      "url": "stujo-assets/partner/Logo-Wissenschaftszentrum.png",
+                      "mode": "fit"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "fZcwJ",
+                  "name": "Logo Campus Business Box",
+                  "width": 140,
+                  "height": 48,
+                  "fill": [
+                    "#FFFFFF",
+                    {
+                      "type": "image",
+                      "enabled": true,
+                      "url": "stujo-assets/partner/cbb.png",
+                      "mode": "fit"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "u6grd",
+                  "name": "Logo KielRegion",
+                  "width": 140,
+                  "height": 48,
+                  "fill": [
+                    "#FFFFFF",
+                    {
+                      "type": "image",
+                      "enabled": true,
+                      "url": "stujo-assets/partner/KielRegion.jpg",
+                      "mode": "fit"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
@@ -566,209 +779,92 @@
           "id": "pEW6x",
           "type": "ref",
           "ref": "Q04CFD",
-          "name": "Header"
+          "name": "Header",
+          "descendants": {
+            "LRlVU": {
+              "fill": "#FFFFFF"
+            },
+            "KksLW": {
+              "fill": "$primary"
+            },
+            "o0Mu2N": {
+              "fill": "#00000000"
+            },
+            "TJLZ0": {
+              "fill": "#FFFFFF"
+            }
+          }
         },
         {
           "type": "frame",
           "id": "j1MHXb",
           "name": "Hero",
           "width": "fill_container",
-          "fill": "$bg-soft",
+          "fill": {
+            "type": "gradient",
+            "gradientType": "linear",
+            "enabled": true,
+            "rotation": 90,
+            "size": {
+              "height": 1
+            },
+            "colors": [
+              {
+                "color": "$gradient-dark",
+                "position": 0
+              },
+              {
+                "color": "$primary",
+                "position": 0.5
+              },
+              {
+                "color": "$gradient-dark",
+                "position": 1
+              }
+            ]
+          },
           "layout": "vertical",
-          "gap": 28,
+          "gap": 20,
           "padding": [
-            64,
-            60
+            56,
+            160
           ],
           "alignItems": "center",
           "children": [
             {
-              "type": "frame",
-              "id": "hQCm4",
-              "name": "Bird",
-              "width": 96,
-              "height": 64,
-              "fill": {
-                "type": "image",
-                "enabled": true,
-                "url": "stujo-assets/stujo_bird.png",
-                "mode": "fit"
-              }
-            },
-            {
               "type": "text",
               "id": "QfsUM",
               "name": "Hero Claim",
-              "fill": "$text-primary",
-              "content": "Finde Deinen Studentenjob in Schleswig-Holstein",
+              "fill": "$accent",
+              "content": "STUJO.NET - DAS KARRIEREPORTAL",
               "textAlign": "center",
               "fontFamily": "$font",
-              "fontSize": 34,
-              "fontWeight": "900"
+              "fontSize": 36,
+              "fontWeight": "700"
             },
             {
               "type": "text",
               "id": "g3FCOb",
               "name": "Hero Sub",
-              "fill": "$text-grey",
-              "content": "Werkstudentenjobs, Praktika, Abschlussarbeiten und Festanstellungen – direkt von Arbeitgebern aus der Region.",
+              "fill": "#FFFFFF",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "Du suchst nach einem Nebenjob, einem Praktikum oder fragst Dich, welche interessanten Stellenangebote Deine Region zu bieten hat? Dann bist Du bei uns richtig. StuJo ist Deine Plattform für Nebenjobs, Praktika oder Festanstellungen im Raum Schleswig-Holstein. Wir verbinden Dich mit den Arbeitgebern in Deiner Umgebung.",
+              "lineHeight": 1.45,
               "textAlign": "center",
               "fontFamily": "$font",
-              "fontSize": 17,
+              "fontSize": 20,
               "fontWeight": "normal"
             },
             {
-              "type": "frame",
-              "id": "OTw2F",
-              "name": "Search Row",
-              "alignItems": "center",
-              "children": [
-                {
-                  "type": "frame",
-                  "id": "q2at08",
-                  "name": "Search Input",
-                  "width": 520,
-                  "fill": "#FFFFFF",
-                  "cornerRadius": [
-                    4,
-                    0,
-                    0,
-                    4
-                  ],
-                  "stroke": "$border",
-                  "strokeWidth": 1,
-                  "gap": 10,
-                  "padding": [
-                    14,
-                    18
-                  ],
-                  "alignItems": "center",
-                  "children": [
-                    {
-                      "type": "icon",
-                      "id": "ErIUv",
-                      "name": "Search Icon",
-                      "width": 18,
-                      "height": 18,
-                      "icon": "search",
-                      "library": "lucide",
-                      "fill": "$text-muted"
-                    },
-                    {
-                      "type": "text",
-                      "id": "nOchQ",
-                      "name": "Search Placeholder",
-                      "fill": "$text-muted",
-                      "content": "Jobtitel, Firma oder Stichwort …",
-                      "fontFamily": "$font",
-                      "fontSize": 15,
-                      "fontWeight": "normal"
-                    }
-                  ]
-                },
-                {
-                  "type": "frame",
-                  "id": "ryqtF",
-                  "name": "Search Button",
-                  "fill": "$accent",
-                  "cornerRadius": [
-                    0,
-                    4,
-                    4,
-                    0
-                  ],
-                  "padding": [
-                    15,
-                    28
-                  ],
-                  "children": [
-                    {
-                      "type": "text",
-                      "id": "I1ORx",
-                      "name": "Search Label",
-                      "fill": "#FFFFFF",
-                      "content": "Suchen",
-                      "fontFamily": "$font",
-                      "fontSize": 15,
-                      "fontWeight": "700"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "frame",
-              "id": "oirZa",
-              "name": "Quick Filters",
-              "gap": 10,
-              "children": [
-                {
-                  "id": "bKds6",
-                  "type": "ref",
-                  "ref": "hzIRZ",
-                  "name": "Quick WERKSTUDENT",
-                  "descendants": {
-                    "FMuem": {
-                      "content": "WERKSTUDENT"
-                    }
-                  }
-                },
-                {
-                  "id": "q5Igo",
-                  "type": "ref",
-                  "ref": "hzIRZ",
-                  "name": "Quick PRAKTIKUM",
-                  "descendants": {
-                    "FMuem": {
-                      "content": "PRAKTIKUM"
-                    }
-                  }
-                },
-                {
-                  "id": "a3oR0",
-                  "type": "ref",
-                  "ref": "hzIRZ",
-                  "name": "Quick ABSCHLUSSARBEIT",
-                  "descendants": {
-                    "FMuem": {
-                      "content": "ABSCHLUSSARBEIT"
-                    }
-                  }
-                },
-                {
-                  "id": "MX1iI",
-                  "type": "ref",
-                  "ref": "hzIRZ",
-                  "name": "Quick FESTANSTELLUNG",
-                  "descendants": {
-                    "FMuem": {
-                      "content": "FESTANSTELLUNG"
-                    }
-                  }
-                },
-                {
-                  "id": "Bs4Yh",
-                  "type": "ref",
-                  "ref": "hzIRZ",
-                  "name": "Quick TRAINEE",
-                  "descendants": {
-                    "FMuem": {
-                      "content": "TRAINEE"
-                    }
-                  }
-                },
-                {
-                  "id": "Ebizs",
-                  "type": "ref",
-                  "ref": "hzIRZ",
-                  "name": "Quick MINIJOB",
-                  "descendants": {
-                    "FMuem": {
-                      "content": "MINIJOB"
-                    }
-                  }
-                }
-              ]
+              "type": "text",
+              "id": "Mf7JM",
+              "name": "Hero Claim Line",
+              "fill": "#FFFFFF",
+              "content": "Unkompliziert - Lokal - Persönlich: www.StuJo.net",
+              "fontFamily": "$font",
+              "fontSize": 20,
+              "fontWeight": "700"
             }
           ]
         },
@@ -796,21 +892,21 @@
                   "type": "text",
                   "id": "Nk7QN",
                   "name": "Section Title",
-                  "fill": "$text-primary",
-                  "content": "Neueste Stellenangebote",
+                  "fill": "$accent",
+                  "content": "NEUESTE ANGEBOTE",
                   "fontFamily": "$font",
-                  "fontSize": 24,
-                  "fontWeight": "900"
+                  "fontSize": 28,
+                  "fontWeight": "700"
                 },
                 {
                   "type": "text",
                   "id": "XLNxi",
                   "name": "Section Count",
-                  "fill": "$text-muted",
-                  "content": "27 aktive Angebote",
+                  "fill": "$accent",
+                  "content": "Verfügbare Angebote: 27",
                   "fontFamily": "$font",
-                  "fontSize": 14,
-                  "fontWeight": "normal"
+                  "fontSize": 20,
+                  "fontWeight": "700"
                 }
               ]
             },
@@ -827,14 +923,14 @@
                 "x3lhSw": {
                   "content": "Musterfirma GmbH · Kiel"
                 },
+                "Z4SOO6": {
+                  "content": "08.07.2026"
+                },
                 "mWmbV/FMuem": {
                   "content": "WERKSTUDENT"
                 },
                 "AJEVc/FMuem": {
                   "content": "KIEL"
-                },
-                "Z4SOO6": {
-                  "content": "08.07.2026"
                 }
               }
             },
@@ -851,14 +947,14 @@
                 "x3lhSw": {
                   "content": "HAW Kiel – Fachbereich Wirtschaft · Kiel"
                 },
+                "Z4SOO6": {
+                  "content": "05.07.2026"
+                },
                 "mWmbV/FMuem": {
                   "content": "PRAKTIKUM"
                 },
                 "AJEVc/FMuem": {
                   "content": "KIEL"
-                },
-                "Z4SOO6": {
-                  "content": "05.07.2026"
                 }
               }
             },
@@ -875,14 +971,14 @@
                 "x3lhSw": {
                   "content": "Sternstunden e.V. · Flensburg"
                 },
+                "Z4SOO6": {
+                  "content": "03.07.2026"
+                },
                 "mWmbV/FMuem": {
                   "content": "MINIJOB"
                 },
                 "AJEVc/FMuem": {
                   "content": "FLENSBURG"
-                },
-                "Z4SOO6": {
-                  "content": "03.07.2026"
                 }
               }
             },
@@ -899,14 +995,14 @@
                 "x3lhSw": {
                   "content": "Landesamt SH · Kiel"
                 },
+                "Z4SOO6": {
+                  "content": "01.07.2026"
+                },
                 "mWmbV/FMuem": {
                   "content": "ABSCHLUSSARBEIT"
                 },
                 "AJEVc/FMuem": {
                   "content": "SH + HH"
-                },
-                "Z4SOO6": {
-                  "content": "01.07.2026"
                 }
               }
             },
@@ -945,14 +1041,18 @@
             "type": "gradient",
             "gradientType": "linear",
             "enabled": true,
-            "rotation": 0,
+            "rotation": 90,
             "size": {
               "height": 1
             },
             "colors": [
               {
-                "color": "$primary",
+                "color": "$gradient-dark",
                 "position": 0
+              },
+              {
+                "color": "$primary",
+                "position": 0.5
               },
               {
                 "color": "$gradient-dark",
@@ -1051,24 +1151,36 @@
           "id": "HoxEs",
           "name": "Title Bar",
           "width": "fill_container",
-          "fill": "$bg-soft",
+          "fill": {
+            "type": "gradient",
+            "gradientType": "linear",
+            "enabled": true,
+            "rotation": 90,
+            "size": {
+              "height": 1
+            },
+            "colors": [
+              {
+                "color": "$gradient-dark",
+                "position": 0
+              },
+              {
+                "color": "$primary",
+                "position": 0.5
+              },
+              {
+                "color": "$gradient-dark",
+                "position": 1
+              }
+            ]
+          },
           "layout": "vertical",
           "gap": 18,
           "padding": [
-            32,
+            26,
             270
           ],
           "children": [
-            {
-              "type": "text",
-              "id": "So49S",
-              "name": "Page Title",
-              "fill": "$text-primary",
-              "content": "Stellenangebote",
-              "fontFamily": "$font",
-              "fontSize": 28,
-              "fontWeight": "900"
-            },
             {
               "type": "frame",
               "id": "Av2Jz",
@@ -1083,9 +1195,8 @@
                   "name": "Filter Region",
                   "width": 200,
                   "fill": "#FFFFFF",
-                  "cornerRadius": 4,
-                  "stroke": "$border",
-                  "strokeWidth": 1,
+                  "stroke": "#DEDAD5",
+                  "strokeWidth": 2,
                   "padding": [
                     11,
                     14
@@ -1121,9 +1232,8 @@
                   "name": "Filter Kategorie",
                   "width": 200,
                   "fill": "#FFFFFF",
-                  "cornerRadius": 4,
-                  "stroke": "$border",
-                  "strokeWidth": 1,
+                  "stroke": "#DEDAD5",
+                  "strokeWidth": 2,
                   "padding": [
                     11,
                     14
@@ -1159,9 +1269,8 @@
                   "name": "Filter Berufsfeld",
                   "width": 200,
                   "fill": "#FFFFFF",
-                  "cornerRadius": 4,
-                  "stroke": "$border",
-                  "strokeWidth": 1,
+                  "stroke": "#DEDAD5",
+                  "strokeWidth": 2,
                   "padding": [
                     11,
                     14
@@ -1197,9 +1306,8 @@
                   "name": "Filter Search",
                   "width": "fill_container",
                   "fill": "#FFFFFF",
-                  "cornerRadius": 4,
-                  "stroke": "$border",
-                  "strokeWidth": 1,
+                  "stroke": "#DEDAD5",
+                  "strokeWidth": 2,
                   "gap": 8,
                   "padding": [
                     11,
@@ -1234,7 +1342,6 @@
                   "id": "gSdYW",
                   "name": "Filter Button",
                   "fill": "$accent",
-                  "cornerRadius": 4,
                   "padding": [
                     12,
                     22
@@ -1280,40 +1387,11 @@
                   "type": "text",
                   "id": "B6USk",
                   "name": "Results Count",
-                  "fill": "$text-grey",
-                  "content": "27 Stellenangebote gefunden",
+                  "fill": "$primary",
+                  "content": "Verfügbare Angebote: 27",
                   "fontFamily": "$font",
-                  "fontSize": 14,
+                  "fontSize": 24,
                   "fontWeight": "700"
-                },
-                {
-                  "type": "frame",
-                  "id": "e5JseT",
-                  "name": "Sort",
-                  "gap": 6,
-                  "alignItems": "center",
-                  "children": [
-                    {
-                      "type": "text",
-                      "id": "RfQkm",
-                      "name": "Sort Label",
-                      "fill": "$text-muted",
-                      "content": "Sortieren:",
-                      "fontFamily": "$font",
-                      "fontSize": 13,
-                      "fontWeight": "normal"
-                    },
-                    {
-                      "type": "text",
-                      "id": "d9glzS",
-                      "name": "Sort Value",
-                      "fill": "$primary",
-                      "content": "Neueste zuerst",
-                      "fontFamily": "$font",
-                      "fontSize": 13,
-                      "fontWeight": "700"
-                    }
-                  ]
                 }
               ]
             },
@@ -1330,14 +1408,14 @@
                 "x3lhSw": {
                   "content": "Musterfirma GmbH · Kiel"
                 },
+                "Z4SOO6": {
+                  "content": "08.07.2026"
+                },
                 "mWmbV/FMuem": {
                   "content": "WERKSTUDENT"
                 },
                 "AJEVc/FMuem": {
                   "content": "KIEL"
-                },
-                "Z4SOO6": {
-                  "content": "08.07.2026"
                 }
               }
             },
@@ -1354,14 +1432,14 @@
                 "x3lhSw": {
                   "content": "Stadtwerke Kiel AG · Kiel"
                 },
+                "Z4SOO6": {
+                  "content": "07.07.2026"
+                },
                 "mWmbV/FMuem": {
                   "content": "WERKSTUDENT"
                 },
                 "AJEVc/FMuem": {
                   "content": "KIEL"
-                },
-                "Z4SOO6": {
-                  "content": "07.07.2026"
                 }
               }
             },
@@ -1378,14 +1456,14 @@
                 "x3lhSw": {
                   "content": "HAW Kiel – Fachbereich Wirtschaft · Kiel"
                 },
+                "Z4SOO6": {
+                  "content": "05.07.2026"
+                },
                 "mWmbV/FMuem": {
                   "content": "PRAKTIKUM"
                 },
                 "AJEVc/FMuem": {
                   "content": "KIEL"
-                },
-                "Z4SOO6": {
-                  "content": "05.07.2026"
                 }
               }
             },
@@ -1402,14 +1480,14 @@
                 "x3lhSw": {
                   "content": "Diakonie SH · Rendsburg"
                 },
+                "Z4SOO6": {
+                  "content": "04.07.2026"
+                },
                 "mWmbV/FMuem": {
                   "content": "STAATL. ANERKENNUNG"
                 },
                 "AJEVc/FMuem": {
                   "content": "SH + HH"
-                },
-                "Z4SOO6": {
-                  "content": "04.07.2026"
                 }
               }
             },
@@ -1426,14 +1504,14 @@
                 "x3lhSw": {
                   "content": "Sternstunden e.V. · Flensburg"
                 },
+                "Z4SOO6": {
+                  "content": "03.07.2026"
+                },
                 "mWmbV/FMuem": {
                   "content": "MINIJOB"
                 },
                 "AJEVc/FMuem": {
                   "content": "FLENSBURG"
-                },
-                "Z4SOO6": {
-                  "content": "03.07.2026"
                 }
               }
             },
@@ -1450,14 +1528,14 @@
                 "x3lhSw": {
                   "content": "Landesamt SH · Kiel"
                 },
+                "Z4SOO6": {
+                  "content": "01.07.2026"
+                },
                 "mWmbV/FMuem": {
                   "content": "ABSCHLUSSARBEIT"
                 },
                 "AJEVc/FMuem": {
                   "content": "SH + HH"
-                },
-                "Z4SOO6": {
-                  "content": "01.07.2026"
                 }
               }
             },
@@ -1474,14 +1552,14 @@
                 "x3lhSw": {
                   "content": "Förde Sparkasse · Kiel"
                 },
+                "Z4SOO6": {
+                  "content": "28.06.2026"
+                },
                 "mWmbV/FMuem": {
                   "content": "TRAINEE"
                 },
                 "AJEVc/FMuem": {
                   "content": "KIEL"
-                },
-                "Z4SOO6": {
-                  "content": "28.06.2026"
                 }
               }
             },
@@ -2264,11 +2342,23 @@
           "ref": "Q04CFD",
           "name": "Header",
           "descendants": {
-            "iXix4": {
-              "content": "Musterfirma GmbH"
-            },
-            "g3cwOo": {
+            "jb9Ge": {
               "enabled": false
+            },
+            "wqGLJ": {
+              "content": "Logout"
+            },
+            "o0Mu2N": {
+              "fill": "#00000000"
+            },
+            "TJLZ0": {
+              "fill": "#FFFFFF"
+            },
+            "GDhqt": {
+              "fill": "#FFFFFF"
+            },
+            "B5fJVr": {
+              "fill": "$primary"
             }
           }
         },
@@ -3580,11 +3670,23 @@
           "ref": "Q04CFD",
           "name": "Header",
           "descendants": {
-            "iXix4": {
-              "content": "Musterfirma GmbH"
-            },
-            "g3cwOo": {
+            "jb9Ge": {
               "enabled": false
+            },
+            "wqGLJ": {
+              "content": "Logout"
+            },
+            "o0Mu2N": {
+              "fill": "#00000000"
+            },
+            "TJLZ0": {
+              "fill": "#FFFFFF"
+            },
+            "GDhqt": {
+              "fill": "#FFFFFF"
+            },
+            "B5fJVr": {
+              "fill": "$primary"
             }
           }
         },
@@ -4431,11 +4533,23 @@
           "ref": "Q04CFD",
           "name": "Header",
           "descendants": {
-            "iXix4": {
-              "content": "Musterfirma GmbH"
-            },
-            "g3cwOo": {
+            "jb9Ge": {
               "enabled": false
+            },
+            "wqGLJ": {
+              "content": "Logout"
+            },
+            "o0Mu2N": {
+              "fill": "#00000000"
+            },
+            "TJLZ0": {
+              "fill": "#FFFFFF"
+            },
+            "GDhqt": {
+              "fill": "#FFFFFF"
+            },
+            "B5fJVr": {
+              "fill": "$primary"
             }
           }
         },
