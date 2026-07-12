@@ -138,6 +138,27 @@ def normalize_company_name(name: str) -> str:
     return re.sub(r"[^a-z0-9]+", "", n)
 
 
+def mask_email(email: str | None) -> str:
+    """PII-safe log representation (first character + domain only)."""
+    local, _, domain = (email or "").partition("@")
+    return f"{local[:1]}***@{domain}" if domain else "***"
+
+
+def normalize_website(url: str | None) -> str | None:
+    """Rails companies.url is free text; bare domains ('www.foo.de') become
+    https:// links and anything that is not http(s) after that is dropped —
+    the job detail page only renders http(s) hrefs (XSS review finding)."""
+    u = (url or "").strip()
+    if not u:
+        return None
+    if re.match(r"^https?://", u, re.I):
+        return u
+    if re.match(r"^[\w.-]+\.[a-z]{2,}([/?#].*)?$", u, re.I):
+        return f"https://{u}"
+    log.warning("dropping non-http(s) company website %r", u)
+    return None
+
+
 class HasuraClient:
     def __init__(self, url: str, admin_secret: str, dry_run: bool):
         self.url = url
@@ -231,7 +252,7 @@ class KeycloakClient:
             }]
         else:
             log.warning("user %s: no importable bcrypt hash — created without "
-                        "password (needs the reset flow)", email)
+                        "password (needs the reset flow)", mask_email(email))
         r = self._request("POST", "/users", json=payload)
         if r.status_code == 201:
             return r.headers["Location"].rstrip("/").split("/")[-1]
@@ -240,10 +261,12 @@ class KeycloakClient:
             lookup.raise_for_status()
             matches = lookup.json()
             if matches:
-                log.info("Keycloak user %s already exists (%s)", email, matches[0]["id"])
+                log.info("Keycloak user %s already exists (%s)",
+                         mask_email(email), matches[0]["id"])
                 return matches[0]["id"]
         raise RuntimeError(
-            f"Keycloak user create failed for {email}: {r.status_code} {r.text[:300]}"
+            f"Keycloak user create failed for {mask_email(email)}: "
+            f"{r.status_code} {r.text[:300]}"
         )
 
     def grant_client_role(self, user_id: str, role_name: str, client_id: str = "hasura"):
@@ -498,7 +521,7 @@ def step_companies(hasura: HasuraClient, gcs_bucket, files_root, companies) -> d
                     "name": c["name"],
                     "type": "CORPORATION",
                     "description": c.get("description"),
-                    "website": c.get("url"),
+                    "website": normalize_website(c.get("url")),
                     "logo": logo_url,
                     "addressLine1": address_line,
                     "postalCode": c.get("zip"),
@@ -559,7 +582,10 @@ def step_users(hasura: HasuraClient, keycloak, contacts, org_mapping) -> dict:
     The Keycloak instance has the bcrypt password-hash extension, so the
     Rails bcrypt hashes are imported as credentials and passwords keep
     working. Users are matched by email first (many employers already have
-    EduHub accounts). Returns rails contact_id → EduHub User.id, used by
+    EduHub accounts). Every account also gets the hasura client roles it
+    needs (see grant_client_role calls below): x-hasura-allowed-roles is
+    built from the user's hasura client-role mappings, so without them the
+    JWT is useless. Returns rails contact_id → EduHub User.id, used by
     step_jobs to fill JobPosting.contactUserId.
     """
     user_mapping = {}
@@ -581,9 +607,11 @@ def step_users(hasura: HasuraClient, keycloak, contacts, org_mapping) -> dict:
                 if not hasura.dry_run:
                     raise RuntimeError(
                         f"Keycloak client not configured — refusing to silently "
-                        f"skip user creation for {email} in a real run"
+                        f"skip user creation for contact {c['id']} "
+                        f"({mask_email(email)}) in a real run"
                     )
-                log.info("[dry-run] would create Keycloak user %s (bcrypt import)", email)
+                log.info("[dry-run] would create Keycloak user %s (bcrypt import)",
+                         mask_email(email))
                 continue
             user_id = keycloak.create_user_with_bcrypt(
                 email=email,
@@ -606,14 +634,20 @@ def step_users(hasura: HasuraClient, keycloak, contacts, org_mapping) -> dict:
             )
         user_mapping[c["id"]] = user_id
 
-        # The Mein-StuJo dashboard elevates to the org_admin role; the JWT
-        # only allows that when the Keycloak client role is assigned. Also
-        # needed for employers who already had an EduHub account.
+        # Hasura JWT roles: `user` is the base role every EduHub account
+        # needs (x-hasura-default-role is hardcoded to "user" and must be in
+        # x-hasura-allowed-roles, which mirrors the hasura client roles —
+        # the createUser action grants it the same way); `org_admin` is what
+        # the Mein-StuJo dashboard elevates to. Granting is idempotent, so
+        # both are ensured even for employers who already had an account
+        # (and on re-runs after a partial first run).
         if keycloak is not None:
+            keycloak.grant_client_role(user_id, "user")
             keycloak.grant_client_role(user_id, "org_admin")
         elif not hasura.dry_run:
             raise RuntimeError(
-                f"Keycloak client not configured — cannot grant org_admin to {email}"
+                f"Keycloak client not configured — cannot grant user/org_admin "
+                f"to contact {c['id']} ({mask_email(email)})"
             )
 
         # OrganizationAdmin has no unique(userId, organizationId) constraint,
@@ -645,7 +679,8 @@ def step_users(hasura: HasuraClient, keycloak, contacts, org_mapping) -> dict:
                 """,
                 {"obj": {"userId": user_id, "organizationId": org_id, "canManageJobs": True}},
             )
-        log.info("contact %s (%s) → OrganizationAdmin of org %s", c["id"], email, org_id)
+        log.info("contact %s (%s) → OrganizationAdmin of org %s",
+                 c["id"], mask_email(email), org_id)
     return user_mapping
 
 
@@ -777,15 +812,18 @@ def step_students(hasura: HasuraClient, keycloak, students):
 
         if existing:
             user_id = existing[0]["id"]
-            log.info("student %s (%s) → existing User %s", s["student_id"], email, user_id)
+            log.info("student %s (%s) → existing User %s",
+                     s["student_id"], mask_email(email), user_id)
         else:
             if keycloak is None:
                 if not hasura.dry_run:
                     raise RuntimeError(
                         f"Keycloak client not configured — refusing to silently "
-                        f"skip user creation for {email} in a real run"
+                        f"skip user creation for student {s['student_id']} "
+                        f"({mask_email(email)}) in a real run"
                     )
-                log.info("[dry-run] would create Keycloak user %s (bcrypt import)", email)
+                log.info("[dry-run] would create Keycloak user %s (bcrypt import)",
+                         mask_email(email))
                 continue
             user_id = keycloak.create_user_with_bcrypt(
                 email=email,
@@ -805,6 +843,13 @@ def step_students(hasura: HasuraClient, keycloak, students):
                          "firstName": s.get("forname") or "",
                          "lastName": s.get("name") or ""}},
             )
+
+        # Base hasura role, same as for employers: without `user` in
+        # x-hasura-allowed-roles the account cannot query anything. Granted
+        # on both paths (idempotent no-op for accounts that already have it)
+        # so a re-run repairs users from a partial first run.
+        if keycloak is not None:
+            keycloak.grant_client_role(user_id, "user")
 
         # Saved jobs (rememberedjobs) → SavedJobPosting
         for legacy_id in (s.get("saved_job_ids") or "").split("|||"):

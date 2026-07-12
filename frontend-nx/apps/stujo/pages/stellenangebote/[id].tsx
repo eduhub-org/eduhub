@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl';
 import Layout from '../../components/Layout';
 import { resolvePortal, PortalBranding } from '../../lib/portal';
 import { fetchJobDetail, JobDetail } from '../../lib/jobs';
+import { httpUrlOrNull, sanitizeHtml } from '../../lib/sanitizeHtml';
 
 type Props = { portal: PortalBranding; job: JobDetail };
 
@@ -14,7 +15,7 @@ type Props = { portal: PortalBranding; job: JobDetail };
 // text — render those escaped with preserved line breaks instead.
 const RichText: FC<{ value: string }> = ({ value }) =>
   /<[a-z][^>]*>/i.test(value) ? (
-    <div dangerouslySetInnerHTML={{ __html: value }} />
+    <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(value) }} />
   ) : (
     <div style={{ whiteSpace: 'pre-line' }}>{value}</div>
   );
@@ -30,6 +31,9 @@ const JobDetailPage: FC<Props> = ({ portal, job }) => {
   const tType = useTranslations('jobType');
   const tOccupation = useTranslations('jobOccupation');
   const tRegion = useTranslations('jobRegion');
+
+  // Employer-supplied field: only ever link out to http(s) URLs.
+  const website = httpUrlOrNull(job.Organization.website);
 
   const facts: [string, string | null][] = [
     [t('category'), tType(job.type)],
@@ -77,10 +81,10 @@ const JobDetailPage: FC<Props> = ({ portal, job }) => {
             {job.Organization.name}
             {job.Organization.city ? `, ${job.Organization.city}` : ''}
           </dd>
-          {job.Organization.website && (
+          {website && (
             <dd>
-              <a href={job.Organization.website} target="_blank" rel="noreferrer">
-                {job.Organization.website}
+              <a href={website} target="_blank" rel="noreferrer">
+                {website}
               </a>
             </dd>
           )}
