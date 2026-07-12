@@ -1,8 +1,8 @@
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { getSession, signIn, signOut, useSession } from 'next-auth/react';
-import { FC, PropsWithChildren, useCallback, useEffect, useRef, useState } from 'react';
+import { signIn, signOut, useSession } from 'next-auth/react';
+import { FC, PropsWithChildren, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 
 import type { PortalBranding } from '../lib/portal';
@@ -30,61 +30,20 @@ const Layout: FC<PropsWithChildren<{ portal: PortalBranding }>> = ({ portal, chi
     router.push(url);
   }, [router]);
 
-  // Login/registration open as a centered dialog window over the current
-  // page (dimmed backdrop) instead of a full-page redirect. A popup keeps
-  // Keycloak's cookies first-party, which an in-page iframe would not
-  // (stujo.net and Keycloak are cross-site in production). Falls back to
-  // the classic redirect when the popup is blocked.
-  const [authPopupOpen, setAuthPopupOpen] = useState(false);
-  const authPopupRef = useRef<Window | null>(null);
-
-  const closeAuthPopup = useCallback(() => {
-    authPopupRef.current?.close();
-    authPopupRef.current = null;
-    setAuthPopupOpen(false);
-  }, []);
-
-  const openAuthPopup = useCallback(
-    (register: boolean) => {
-      const width = 480;
-      const height = 720;
-      const left = window.screenX + Math.max(0, (window.outerWidth - width) / 2);
-      const top = window.screenY + Math.max(0, (window.outerHeight - height) / 2);
-      const popup = window.open(
-        `/auth/popup${register ? '?register=1' : ''}`,
-        'stujo-auth',
-        `popup=yes,width=${width},height=${height},left=${left},top=${top}`
-      );
-      if (!popup) {
-        signIn('keycloak', { callbackUrl: router.asPath });
-        return;
-      }
-      authPopupRef.current = popup;
-      setAuthPopupOpen(true);
-    },
+  // Login/registration use the standard OIDC full-page redirect. Keycloak
+  // and the portal will live on different domains in production, where
+  // popup/iframe flows break on third-party-cookie blocking. `prompt=create`
+  // deep-links into Keycloak's registration form (Keycloak 22+); afterwards
+  // the user returns to the page they started from.
+  const login = useCallback(
+    (register: boolean) =>
+      signIn(
+        'keycloak',
+        { callbackUrl: router.asPath },
+        register ? { prompt: 'create' } : undefined
+      ),
     [router.asPath]
   );
-
-  useEffect(() => {
-    if (!authPopupOpen) return;
-    const onMessage = (event: MessageEvent) => {
-      if (event.origin === window.location.origin && event.data === 'stujo:auth-complete') {
-        getSession(); // refresh the opener's session immediately
-        closeAuthPopup();
-      }
-    };
-    window.addEventListener('message', onMessage);
-    const watcher = window.setInterval(() => {
-      if (authPopupRef.current?.closed) {
-        getSession();
-        closeAuthPopup();
-      }
-    }, 500);
-    return () => {
-      window.removeEventListener('message', onMessage);
-      window.clearInterval(watcher);
-    };
-  }, [authPopupOpen, closeAuthPopup]);
 
   const styleVars = [
     portal.primaryColor ? `--stujo-primary: ${portal.primaryColor};` : '',
@@ -158,19 +117,19 @@ const Layout: FC<PropsWithChildren<{ portal: PortalBranding }>> = ({ portal, chi
           ) : (
             <>
               <a
-                href="/auth/popup?register=1"
+                href="/api/auth/signin"
                 onClick={(e) => {
                   e.preventDefault();
-                  openAuthPopup(true);
+                  login(true);
                 }}
               >
                 + {t('register')}
               </a>
               <a
-                href="/auth/popup"
+                href="/api/auth/signin"
                 onClick={(e) => {
                   e.preventDefault();
-                  openAuthPopup(false);
+                  login(false);
                 }}
               >
                 {t('login')}
@@ -195,21 +154,6 @@ const Layout: FC<PropsWithChildren<{ portal: PortalBranding }>> = ({ portal, chi
           </Link>
         </div>
       </nav>
-      {authPopupOpen && (
-        <div
-          className="stujo-auth-backdrop"
-          onClick={() => authPopupRef.current?.focus()}
-          role="dialog"
-          aria-label={t('login')}
-        >
-          <div className="stujo-auth-backdrop-card" onClick={(e) => e.stopPropagation()}>
-            <p>Die Anmeldung ist im geöffneten Fenster fortzusetzen.</p>
-            <button className="stujo-btn stujo-btn--ghost" onClick={closeAuthPopup}>
-              Abbrechen
-            </button>
-          </div>
-        </div>
-      )}
       <main className="stujo-container" style={{ padding: '1.5rem 1rem', minHeight: '40vh' }}>
         {children}
       </main>
