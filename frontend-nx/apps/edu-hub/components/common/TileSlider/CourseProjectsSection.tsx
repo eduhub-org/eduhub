@@ -32,7 +32,8 @@ interface CourseProjectsSectionProps {
 const CourseProjectsSection: FC<CourseProjectsSectionProps> = ({ courseId }) => {
   const t = useTranslations('project');
   const anonymous = { role: AuthRoles.anonymous };
-  const now = useMemo(() => new Date().toISOString(), []);
+  // Program.lectureEnd is a `date` column, so compare against a date-only value.
+  const now = useMemo(() => new Date().toISOString().slice(0, 10), []);
 
   const { data: seriesData } = useQuery<CourseSeriesInfo, CourseSeriesInfoVariables>(COURSE_SERIES_INFO, {
     variables: { id: courseId },

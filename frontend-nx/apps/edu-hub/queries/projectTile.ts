@@ -178,7 +178,7 @@ export const COURSE_SERIES_INFO = gql`
 // course series whose program lecture period has ended.
 export const COURSE_PUBLISHED_PROJECT_TILES = gql`
   ${PROJECT_TILE_FRAGMENT}
-  query CoursePublishedProjectTiles($courseSeriesId: Int!, $now: timestamptz!, $limit: Int = 24, $offset: Int = 0) {
+  query CoursePublishedProjectTiles($courseSeriesId: Int!, $now: date!, $limit: Int = 24, $offset: Int = 0) {
     Project(
       where: {
         status: { _eq: PUBLISHED }
