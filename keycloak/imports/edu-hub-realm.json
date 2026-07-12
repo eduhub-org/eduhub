@@ -621,7 +621,7 @@
     "enabled" : true,
     "alwaysDisplayInConsole" : false,
     "clientAuthenticatorType" : "client-secret",
-    "redirectUris" : [ "https://frontend-aifcpc7awq-ey.a.run.app/*" ],
+    "redirectUris" : [ "https://frontend-aifcpc7awq-ey.a.run.app/*", "https://stujo.opencampus.sh/*", "https://stujo-staging.opencampus.sh/*", "https://stujo.net/*" ],
     "webOrigins" : [ "+" ],
     "notBefore" : 0,
     "bearerOnly" : false,
