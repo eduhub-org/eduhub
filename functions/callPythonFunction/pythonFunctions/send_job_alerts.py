@@ -9,6 +9,13 @@ from pythonFunctions.expire_job_postings import _get_mail_template, _queue_mail
 
 MAX_POSTINGS_PER_MAIL = 10
 
+# Same widened region semantics as the website search (frontend lib/jobs.ts,
+# from Rails "region <= param"): broad regions include the local ones.
+REGION_WIDENING = {
+    "SCHLESWIG_HOLSTEIN_HAMBURG": ["FLENSBURG", "KIEL", "SCHLESWIG_HOLSTEIN_HAMBURG"],
+    "GERMANY": ["FLENSBURG", "KIEL", "SCHLESWIG_HOLSTEIN_HAMBURG", "GERMANY"],
+}
+
 
 def send_job_alerts(arguments):
     """
@@ -98,7 +105,8 @@ def send_job_alerts(arguments):
             if sub.get("jobPostingType"):
                 postings = [p for p in postings if p["type"] == sub["jobPostingType"]]
             if sub.get("region"):
-                postings = [p for p in postings if p["region"] == sub["region"]]
+                matching_regions = REGION_WIDENING.get(sub["region"], [sub["region"]])
+                postings = [p for p in postings if p["region"] in matching_regions]
             if not postings:
                 continue
 

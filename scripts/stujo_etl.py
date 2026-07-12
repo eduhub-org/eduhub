@@ -16,7 +16,9 @@ Environment:
     STUJO_FILES_ROOT       path to the Rails public/ dir (Paperclip files)
     HASURA_URL             e.g. https://.../v1/graphql
     HASURA_ADMIN_SECRET
-    KEYCLOAK_URL, KEYCLOAK_REALM, KEYCLOAK_ADMIN_USER, KEYCLOAK_ADMIN_PASSWORD
+    KEYCLOAK_URL, KEYCLOAK_USER, KEYCLOAK_PW   (admin credentials; same names
+                           the functions use in docker-compose.yml)
+    KEYCLOAK_REALM         target realm (default: edu-hub)
     GCS_BUCKET             target bucket for logos and job PDFs
     RETENTION_YEARS        only migrate companies with a posting newer than
                            this many years (default 3; see plan §7/§9)
@@ -111,6 +113,11 @@ OCCUPATION_TO_ENUM = {
 
 PUBLICATION_DAYS = 56  # 8 weeks, parity with Job.archiveoldjobs
 
+# JobPostingCredit has no "unlimited" flag or free-text column, so the legacy
+# "-1 = unlimited" paymentcounter tier is imported as a sentinel amount that
+# no employer will realistically exhaust (flagged with a warning per org).
+UNLIMITED_CREDITS_SENTINEL = 100000
+
 SITE_STUJO, SITE_ETALENTS = 0, 1  # sitememberships.site
 
 
@@ -157,6 +164,116 @@ class HasuraClient:
             log.info("[dry-run] mutation skipped: %s", query.strip().splitlines()[0])
             return None
         return self.query(query, variables)
+
+
+class KeycloakClient:
+    """Minimal Keycloak Admin REST client (admin-cli password grant).
+
+    The Keycloak image ships the bcrypt password-hash SPI
+    (keycloak/libs/keycloak-bcrypt-1.6.0.jar, provider id "bcrypt"), so Rails
+    `people.password_hash` values import directly as credentials and the
+    legacy passwords keep working after migration.
+    """
+
+    def __init__(self, url: str, realm: str, admin_user: str, admin_password: str):
+        import requests
+
+        self.url = url.rstrip("/")
+        self.realm = realm
+        self.admin_user = admin_user
+        self.admin_password = admin_password
+        self.session = requests.Session()
+        self._authenticate()  # fail loudly up front if unreachable/misconfigured
+
+    def _authenticate(self):
+        r = self.session.post(
+            f"{self.url}/realms/master/protocol/openid-connect/token",
+            data={
+                "grant_type": "password",
+                "client_id": "admin-cli",
+                "username": self.admin_user,
+                "password": self.admin_password,
+            },
+            timeout=30,
+        )
+        r.raise_for_status()
+        self.session.headers["Authorization"] = f"Bearer {r.json()['access_token']}"
+
+    def _request(self, method: str, path: str, **kwargs):
+        url = f"{self.url}/admin/realms/{self.realm}{path}"
+        r = self.session.request(method, url, timeout=30, **kwargs)
+        if r.status_code == 401:  # admin token expired mid-run — re-auth once
+            self._authenticate()
+            r = self.session.request(method, url, timeout=30, **kwargs)
+        return r
+
+    def create_user_with_bcrypt(self, email: str, first_name: str, last_name: str,
+                                bcrypt_hash: str | None) -> str:
+        """Create the user (idempotent: 409 → look up the existing one) with
+        the legacy bcrypt hash imported as password credential. Returns the
+        Keycloak user id (uuid), which doubles as the EduHub User.id."""
+        payload = {
+            "username": email,
+            "email": email,
+            "firstName": first_name,
+            "lastName": last_name,
+            "enabled": True,
+            "emailVerified": True,
+        }
+        cost = re.match(r"^\$2[abxy]?\$(\d+)\$", bcrypt_hash or "")
+        if cost:
+            payload["credentials"] = [{
+                "type": "password",
+                "secretData": json.dumps({"value": bcrypt_hash}),
+                "credentialData": json.dumps(
+                    {"algorithm": "bcrypt", "hashIterations": int(cost.group(1))}
+                ),
+            }]
+        else:
+            log.warning("user %s: no importable bcrypt hash — created without "
+                        "password (needs the reset flow)", email)
+        r = self._request("POST", "/users", json=payload)
+        if r.status_code == 201:
+            return r.headers["Location"].rstrip("/").split("/")[-1]
+        if r.status_code == 409:
+            lookup = self._request("GET", "/users", params={"email": email, "exact": "true"})
+            lookup.raise_for_status()
+            matches = lookup.json()
+            if matches:
+                log.info("Keycloak user %s already exists (%s)", email, matches[0]["id"])
+                return matches[0]["id"]
+        raise RuntimeError(
+            f"Keycloak user create failed for {email}: {r.status_code} {r.text[:300]}"
+        )
+
+    def grant_client_role(self, user_id: str, role_name: str, client_id: str = "hasura"):
+        """Grant a client role (e.g. hasura/org_admin) to a user. Employers
+        need `org_admin` in x-hasura-allowed-roles for the Mein-StuJo
+        dashboard; without it Hasura rejects the role elevation. Adding an
+        already-assigned role is a no-op in Keycloak, so this is idempotent."""
+        if not hasattr(self, "_client_uuids"):
+            self._client_uuids = {}
+            self._role_reps = {}
+        if client_id not in self._client_uuids:
+            r = self._request("GET", "/clients", params={"clientId": client_id})
+            r.raise_for_status()
+            self._client_uuids[client_id] = r.json()[0]["id"]
+        client_uuid = self._client_uuids[client_id]
+        role_key = (client_id, role_name)
+        if role_key not in self._role_reps:
+            r = self._request("GET", f"/clients/{client_uuid}/roles/{role_name}")
+            r.raise_for_status()
+            self._role_reps[role_key] = r.json()
+        r = self._request(
+            "POST",
+            f"/users/{user_id}/role-mappings/clients/{client_uuid}",
+            json=[self._role_reps[role_key]],
+        )
+        if r.status_code not in (204, 409):
+            raise RuntimeError(
+                f"Granting {client_id}/{role_name} to {user_id} failed: "
+                f"{r.status_code} {r.text[:300]}"
+            )
 
 
 # ---------------------------------------------------------------------------
@@ -221,6 +338,29 @@ def load_source(cnx, retention_years=None):
             LEFT JOIN industries i ON i.id = c.industry_id
             """,
         )
+    # Skip pure e-talents companies: keep only companies with at least one
+    # StuJo contact person (same is_stujo_person? rule as the contacts filter
+    # below: no sitememberships at all OR an explicit stujo one). Companies
+    # without any contact drop out too — they carry no users and no jobs.
+    stujo_company_ids = {
+        row["company_id"]
+        for row in fetch_all(
+            cnx,
+            f"""
+            SELECT DISTINCT ct.company_id
+            FROM contacts ct JOIN people p ON p.id = ct.person_id
+            WHERE NOT EXISTS (SELECT 1 FROM sitememberships sm
+                               WHERE sm.person_id = p.id)
+               OR EXISTS (SELECT 1 FROM sitememberships sm
+                           WHERE sm.person_id = p.id AND sm.site = {SITE_STUJO})
+            """,
+        )
+    }
+    before = len(companies)
+    companies = [c for c in companies if c["id"] in stujo_company_ids]
+    if before != len(companies):
+        log.info("skipped %s companies without a StuJo contact (pure e-talents or contactless)",
+                 before - len(companies))
     company_ids = [c["id"] for c in companies]
     log.info(
         "companies in scope (retention %s): %s",
@@ -413,14 +553,16 @@ def copy_paperclip_pdf(gcs_bucket, files_root, job) -> str | None:
     return f"https://storage.googleapis.com/{gcs_bucket.name}/{blob_name}"
 
 
-def step_users(hasura: HasuraClient, keycloak, contacts, org_mapping):
+def step_users(hasura: HasuraClient, keycloak, contacts, org_mapping) -> dict:
     """Employer accounts → Keycloak (bcrypt import) + User + OrganizationAdmin.
 
     The Keycloak instance has the bcrypt password-hash extension, so the
     Rails bcrypt hashes are imported as credentials and passwords keep
     working. Users are matched by email first (many employers already have
-    EduHub accounts).
+    EduHub accounts). Returns rails contact_id → EduHub User.id, used by
+    step_jobs to fill JobPosting.contactUserId.
     """
+    user_mapping = {}
     for c in contacts:
         email = (c.get("email") or "").strip().lower()
         if not email or c["company_id"] not in org_mapping:
@@ -436,6 +578,11 @@ def step_users(hasura: HasuraClient, keycloak, contacts, org_mapping):
             user_id = existing[0]["id"]
         else:
             if keycloak is None:
+                if not hasura.dry_run:
+                    raise RuntimeError(
+                        f"Keycloak client not configured — refusing to silently "
+                        f"skip user creation for {email} in a real run"
+                    )
                 log.info("[dry-run] would create Keycloak user %s (bcrypt import)", email)
                 continue
             user_id = keycloak.create_user_with_bcrypt(
@@ -444,8 +591,30 @@ def step_users(hasura: HasuraClient, keycloak, contacts, org_mapping):
                 last_name=c.get("name") or "",
                 bcrypt_hash=c.get("password_hash"),
             )
-            # The updateFromKeycloak event/function mirrors the user into the
-            # User table; poll or upsert directly depending on environment.
+            # Mirror into the User table right away (the updateFromKeycloak
+            # event only fires on interactive logins) so the FK targets for
+            # OrganizationAdmin / JobPosting.contactUserId exist.
+            hasura.mutate(
+                """
+                mutation ($obj: User_insert_input!) {
+                  insert_User_one(object: $obj, on_conflict: {constraint: User_pkey, update_columns: []}) { id }
+                }
+                """,
+                {"obj": {"id": user_id, "email": email,
+                         "firstName": c.get("forname") or "",
+                         "lastName": c.get("name") or ""}},
+            )
+        user_mapping[c["id"]] = user_id
+
+        # The Mein-StuJo dashboard elevates to the org_admin role; the JWT
+        # only allows that when the Keycloak client role is assigned. Also
+        # needed for employers who already had an EduHub account.
+        if keycloak is not None:
+            keycloak.grant_client_role(user_id, "org_admin")
+        elif not hasura.dry_run:
+            raise RuntimeError(
+                f"Keycloak client not configured — cannot grant org_admin to {email}"
+            )
 
         # OrganizationAdmin has no unique(userId, organizationId) constraint,
         # so idempotency is check-then-insert.
@@ -477,9 +646,11 @@ def step_users(hasura: HasuraClient, keycloak, contacts, org_mapping):
                 {"obj": {"userId": user_id, "organizationId": org_id, "canManageJobs": True}},
             )
         log.info("contact %s (%s) → OrganizationAdmin of org %s", c["id"], email, org_id)
+    return user_mapping
 
 
-def step_jobs(hasura: HasuraClient, gcs_bucket, files_root, jobs, org_mapping, haw_org_id):
+def step_jobs(hasura: HasuraClient, gcs_bucket, files_root, jobs, org_mapping,
+              user_mapping, haw_org_id):
     """jobs → JobPosting (+ tags). Idempotent via legacyStujoId."""
     existing = {
         row["legacyStujoId"]
@@ -498,10 +669,24 @@ def step_jobs(hasura: HasuraClient, gcs_bucket, files_root, jobs, org_mapping, h
 
         published = j["status"] in (STATUS_ACTIVE, STATUS_FEATURED)
         created = j["created_at"]
-        # Business decision (2026-07-11): the Rails archiver was dead, so
-        # every currently visible ("active") job gets a fresh 8-week window
-        # at cutover; the expire cron then shrinks the catalog organically.
-        expires = (datetime.now(timezone.utc) + timedelta(days=PUBLICATION_DAYS)) if published else None
+        if created and created.tzinfo is None:  # MySQL returns naive datetimes
+            created = created.replace(tzinfo=timezone.utc)
+        now = datetime.now(timezone.utc)
+        if published:
+            # Business decision (2026-07-11): the Rails archiver was dead, so
+            # every currently visible ("active") job gets a fresh 8-week window
+            # at cutover; the expire cron then shrinks the catalog organically.
+            status = "PUBLISHED"
+            expires = now + timedelta(days=PUBLICATION_DAYS)
+        else:
+            # The Rails ARCHIVE is the pool employers re-post from, so it maps
+            # to EXPIRED — the only non-published status publishJobPosting
+            # accepts and the dashboard offers "Erneut inserieren" for
+            # (ARCHIVED would be a dead end). expiresAt must lie in the past.
+            status = "EXPIRED"
+            expires = created + timedelta(days=PUBLICATION_DAYS) if created else None
+            if expires is None or expires >= now:
+                expires = now - timedelta(days=1)
 
         restricted_to = None
         if j.get("mandate_names"):
@@ -532,9 +717,10 @@ def step_jobs(hasura: HasuraClient, gcs_bucket, files_root, jobs, org_mapping, h
                 "obj": {
                     "legacyStujoId": j["id"],
                     "organizationId": org_mapping[j["company_id"]],
+                    "contactUserId": user_mapping.get(j["contact_id"]),
                     "slug": f"{j['id']}-{slugify(j['title'])}",
                     "type": posting_type,
-                    "status": "PUBLISHED" if published else "ARCHIVED",
+                    "status": status,
                     "featured": j["status"] == STATUS_FEATURED,
                     "region": REGION_TO_ENUM.get(j.get("region")),
                     "occupation": OCCUPATION_TO_ENUM.get(j.get("occupation_name"), "OTHER"),
@@ -556,13 +742,15 @@ def step_jobs(hasura: HasuraClient, gcs_bucket, files_root, jobs, org_mapping, h
                     "pdfUrl": copy_paperclip_pdf(gcs_bucket, files_root, j),
                     "views": j.get("views") or 0,
                     "restrictedToOrganizationId": restricted_to,
-                    "publishedAt": created.isoformat() if (published and created) else None,
-                    "expiresAt": expires.isoformat() if (published and expires) else None,
+                    # Legacy archived jobs were once live, so publishedAt is
+                    # their creation date and expiresAt lies in the past.
+                    "publishedAt": created.isoformat() if created else None,
+                    "expiresAt": expires.isoformat() if expires else None,
                     "JobPostingTags": {"data": [{"name": t} for t in tags]},
                 }
             },
         )
-        log.info("job %s '%s' → JobPosting (%s)", j["id"], j["title"], "PUBLISHED" if published else "ARCHIVED")
+        log.info("job %s '%s' → JobPosting (%s)", j["id"], j["title"], status)
 
 
 def step_students(hasura: HasuraClient, keycloak, students):
@@ -592,6 +780,11 @@ def step_students(hasura: HasuraClient, keycloak, students):
             log.info("student %s (%s) → existing User %s", s["student_id"], email, user_id)
         else:
             if keycloak is None:
+                if not hasura.dry_run:
+                    raise RuntimeError(
+                        f"Keycloak client not configured — refusing to silently "
+                        f"skip user creation for {email} in a real run"
+                    )
                 log.info("[dry-run] would create Keycloak user %s (bcrypt import)", email)
                 continue
             user_id = keycloak.create_user_with_bcrypt(
@@ -599,6 +792,18 @@ def step_students(hasura: HasuraClient, keycloak, students):
                 first_name=s.get("forname") or "",
                 last_name=s.get("name") or "",
                 bcrypt_hash=s.get("password_hash"),
+            )
+            # Mirror into the User table right away so the SavedJobPosting /
+            # JobAlertSubscription FKs below resolve.
+            hasura.mutate(
+                """
+                mutation ($obj: User_insert_input!) {
+                  insert_User_one(object: $obj, on_conflict: {constraint: User_pkey, update_columns: []}) { id }
+                }
+                """,
+                {"obj": {"id": user_id, "email": email,
+                         "firstName": s.get("forname") or "",
+                         "lastName": s.get("name") or ""}},
             )
 
         # Saved jobs (rememberedjobs) → SavedJobPosting
@@ -636,29 +841,57 @@ def step_students(hasura: HasuraClient, keycloak, students):
 
 
 def step_credits(hasura: HasuraClient, counters, org_mapping):
-    """Remaining paymentcounters credits → JobPostingCredit (untyped)."""
+    """Remaining paymentcounters credits → JobPostingCredit (untyped).
+
+    on_conflict cannot make this idempotent: the unique constraint on
+    (organizationId, jobPostingType) never fires for jobPostingType NULL
+    because Postgres treats NULLs as distinct. Existing untyped rows are
+    therefore queried up front and their orgs skipped on re-runs.
+    """
+    existing = {
+        row["organizationId"]: row
+        for row in hasura.query(
+            "query { JobPostingCredit(where: {jobPostingType: {_is_null: true}}) { id organizationId remaining } }"
+        )["JobPostingCredit"]
+    }
+
+    # Aggregate per organization first: duplicate Rails company rows merge
+    # into one Organization, so several paymentcounters can target one org.
+    per_org = {}
     for pc in counters:
         org_id = org_mapping.get(pc["company_id"])
+        if org_id is None:
+            continue
         # Rails uses `job` as the generic free-posting counter in the current
         # flow (free == "promo" decrements it); -1 means unlimited legacy tier.
         remaining = pc.get("job") or 0
-        if org_id is None or remaining <= 0:
+        if remaining == -1:
+            log.warning(
+                "paymentcounter %s (company %s → org %s): legacy UNLIMITED "
+                "tier — imported as %s credits (sentinel, review manually)",
+                pc["id"], pc["company_id"], org_id, UNLIMITED_CREDITS_SENTINEL,
+            )
+            remaining = UNLIMITED_CREDITS_SENTINEL
+        if remaining <= 0:
+            continue
+        per_org[org_id] = min(per_org.get(org_id, 0) + remaining, UNLIMITED_CREDITS_SENTINEL)
+
+    for org_id, remaining in sorted(per_org.items()):
+        if org_id in existing:
+            log.info(
+                "org %s already has an untyped JobPostingCredit (id %s, remaining %s) — skipped",
+                org_id, existing[org_id]["id"], existing[org_id]["remaining"],
+            )
             continue
         hasura.mutate(
             """
             mutation ($obj: JobPostingCredit_insert_input!) {
-              insert_JobPostingCredit_one(
-                object: $obj,
-                on_conflict: {
-                  constraint: JobPostingCredit_organizationId_jobPostingType_key,
-                  update_columns: []
-                }
-              ) { id }
+              insert_JobPostingCredit_one(object: $obj) { id }
             }
             """,
             {"obj": {"organizationId": org_id, "jobPostingType": None, "remaining": remaining}},
         )
-        log.info("paymentcounter %s → %s credit(s) for org %s", pc["id"], remaining, org_id)
+        log.info("→ %s credit(s) for org %s", remaining, org_id)
 
 
 # ---------------------------------------------------------------------------
@@ -691,7 +924,17 @@ def main():
 
         gcs_bucket = storage.Client().bucket(os.environ["GCS_BUCKET"])
 
-    keycloak = None  # wire python-keycloak here for the real run (see step_users)
+    keycloak = None  # stays None in dry runs (steps only log what they would do)
+    if not args.dry_run and ({"users", "students"} & steps):
+        kc_url = os.environ.get("KEYCLOAK_URL")
+        kc_user = os.environ.get("KEYCLOAK_USER")
+        kc_pw = os.environ.get("KEYCLOAK_PW")
+        kc_realm = os.environ.get("KEYCLOAK_REALM", "edu-hub")
+        if not kc_url or not kc_user or not kc_pw:
+            log.error("KEYCLOAK_URL, KEYCLOAK_USER and KEYCLOAK_PW are required "
+                      "for the users/students steps in a real run")
+            sys.exit(2)
+        keycloak = KeycloakClient(kc_url, kc_realm, kc_user, kc_pw)
 
     hasura = HasuraClient(hasura_url, admin_secret, args.dry_run)
     cnx = mysql_connection(dsn)
@@ -703,12 +946,14 @@ def main():
     )
 
     org_mapping = {}
+    user_mapping = {}
     if "companies" in steps:
         org_mapping = step_companies(hasura, gcs_bucket, files_root, src["companies"])
     if "users" in steps:
-        step_users(hasura, keycloak, src["contacts"], org_mapping)
+        user_mapping = step_users(hasura, keycloak, src["contacts"], org_mapping)
     if "jobs" in steps:
-        step_jobs(hasura, gcs_bucket, files_root, src["jobs"], org_mapping, args.haw_org_id)
+        step_jobs(hasura, gcs_bucket, files_root, src["jobs"], org_mapping,
+                  user_mapping, args.haw_org_id)
     if "credits" in steps:
         step_credits(hasura, src["counters"], org_mapping)
     if "students" in steps:

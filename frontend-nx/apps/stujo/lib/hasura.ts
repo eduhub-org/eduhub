@@ -33,3 +33,25 @@ export async function fetchAnonymous<T = unknown>(
   }
   return json.data;
 }
+
+/**
+ * View counter, incremented on every job detail render like the Rails app
+ * did on `show`. Anonymous users have no update permission, so this runs
+ * server-side with the admin secret; failures must never break the page.
+ */
+export function incrementJobViews(id: number): void {
+  const adminSecret = process.env.HASURA_ADMIN_SECRET;
+  if (!API_URL || !adminSecret) return;
+  void fetch(API_URL, {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      'x-hasura-admin-secret': adminSecret,
+    },
+    body: JSON.stringify({
+      query:
+        'mutation IncrementJobViews($id: Int!) { update_JobPosting_by_pk(pk_columns: {id: $id}, _inc: {views: 1}) { id } }',
+      variables: { id },
+    }),
+  }).catch(() => undefined);
+}

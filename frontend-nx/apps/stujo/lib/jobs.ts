@@ -1,4 +1,5 @@
-import { fetchAnonymous } from './hasura';
+import { fetchAnonymous, incrementJobViews } from './hasura';
+import { resolveStorageUrl } from './storage';
 
 /**
  * Anonymous job queries for the public pages. Hasura's `anonymous` role
@@ -55,12 +56,12 @@ export type JobFilter = {
   offset?: number;
 };
 
-// Rails `defaultsearch` widens Kiel to also match SH+HH scope-wise; here we
-// interpret a region filter as "job is available in/around this region".
+// Rails `defaultsearch` (jobs_controller.rb:572): for region params 1 (SH+HH)
+// and 2 (Deutschland) it matches `region <= param`, i.e. a broad search
+// includes the narrower local regions; all other regions match exactly.
 const REGION_WIDENING: Record<string, string[]> = {
-  KIEL: ['KIEL', 'SCHLESWIG_HOLSTEIN_HAMBURG', 'GERMANY'],
-  FLENSBURG: ['FLENSBURG', 'SCHLESWIG_HOLSTEIN_HAMBURG', 'GERMANY'],
-  SCHLESWIG_HOLSTEIN_HAMBURG: ['SCHLESWIG_HOLSTEIN_HAMBURG', 'GERMANY'],
+  SCHLESWIG_HOLSTEIN_HAMBURG: ['FLENSBURG', 'KIEL', 'SCHLESWIG_HOLSTEIN_HAMBURG'],
+  GERMANY: ['FLENSBURG', 'KIEL', 'SCHLESWIG_HOLSTEIN_HAMBURG', 'GERMANY'],
 };
 
 const LIST_FIELDS = /* GraphQL */ `
@@ -145,7 +146,11 @@ export async function fetchJobList(filter: JobFilter = {}): Promise<{
     JobPosting_aggregate: { aggregate: { count: number } };
   }>(query, variables);
 
-  return { jobs: data.JobPosting, totalCount: data.JobPosting_aggregate.aggregate.count };
+  const jobs = data.JobPosting.map((job) => ({
+    ...job,
+    Organization: { ...job.Organization, logo: resolveStorageUrl(job.Organization.logo) },
+  }));
+  return { jobs, totalCount: data.JobPosting_aggregate.aggregate.count };
 }
 
 export async function fetchJobDetail(id: number): Promise<JobDetail | null> {
@@ -182,5 +187,14 @@ export async function fetchJobDetail(id: number): Promise<JobDetail | null> {
     }
   `;
   const data = await fetchAnonymous<{ JobPosting_by_pk: JobDetail | null }>(query, { id });
-  return data.JobPosting_by_pk;
+  const job = data.JobPosting_by_pk;
+  if (!job) {
+    return null;
+  }
+  incrementJobViews(id);
+  return {
+    ...job,
+    pdfUrl: resolveStorageUrl(job.pdfUrl),
+    Organization: { ...job.Organization, logo: resolveStorageUrl(job.Organization.logo) },
+  };
 }

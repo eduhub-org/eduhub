@@ -3,6 +3,7 @@ import type { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
 import { signIn, useSession } from 'next-auth/react';
 import { FC, useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 import Layout from '../../components/Layout';
 import JobCard from '../../components/JobCard';
@@ -15,9 +16,11 @@ import {
   MY_JOB_POSTINGS,
   ORG_ADMIN_ROLE_CONTEXT,
   PUBLISH_JOB_POSTING_ACTION,
+  SAVE_JOB_POSTING_PDF,
   UPDATE_JOB_POSTING,
 } from '../../lib/employer';
 import { resolvePortal, PortalBranding } from '../../lib/portal';
+import { resolveStorageUrl } from '../../lib/storage';
 
 type Props = { portal: PortalBranding };
 
@@ -58,16 +61,26 @@ const EMPTY_FORM: FormState = {
  * postings go live directly, paid ones redirect to Stripe Checkout.
  */
 const NeuesAngebot: FC<Props> = ({ portal }) => {
+  const tType = useTranslations('jobType');
+  const tOccupation = useTranslations('jobOccupation');
+  const tRegion = useTranslations('jobRegion');
   const router = useRouter();
-  const { status: sessionStatus } = useSession();
+  const { data: session, status: sessionStatus } = useSession();
+  // Contact for status mails (published/expired/payment failed) and the
+  // Stripe customer — without it those flows silently do nothing.
+  const currentUserId = (session as any)?.profile?.sub ?? null;
   const editId = typeof router.query.id === 'string' ? Number(router.query.id) : null;
 
   const [step, setStep] = useState<1 | 2>(1);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [savedId, setSavedId] = useState<number | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  // The offer PDF is the centerpiece of a StuJo posting (embedded on the
+  // detail page like in the Rails app). Uploaded after the draft exists.
+  const [pdfFile, setPdfFile] = useState<File | null>(null);
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
 
-  const { data: orgData } = useQuery(MY_JOB_ORGANIZATIONS, {
+  const { data: orgData, loading: orgsLoading } = useQuery(MY_JOB_ORGANIZATIONS, {
     context: ORG_ADMIN_ROLE_CONTEXT,
     skip: sessionStatus !== 'authenticated',
   });
@@ -95,6 +108,13 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
   const [publishPosting, { loading: publishing }] = useMutation(PUBLISH_JOB_POSTING_ACTION, {
     context: ACTION_ROLE_CONTEXT,
   });
+  const [savePdf, { loading: uploadingPdf }] = useMutation(SAVE_JOB_POSTING_PDF, {
+    context: ACTION_ROLE_CONTEXT,
+  });
+
+  // Published postings can be edited, but not "published" again — the
+  // action rejects them with INVALID_STATUS. Offer a plain save instead.
+  const isLive = editData?.JobPosting_by_pk?.status === 'PUBLISHED';
 
   useEffect(() => {
     if (sessionStatus === 'unauthenticated') {
@@ -120,6 +140,7 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
         description: posting.description ?? '',
         requirement: posting.requirement ?? '',
       });
+      setPdfUrl(posting.pdfUrl ?? null);
     }
   }, [editData]);
 
@@ -141,18 +162,52 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
     requirement: form.requirement || null,
   });
 
+  const fileToBase64 = (file: File) =>
+    new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result).split(',')[1] ?? '');
+      reader.onerror = () => reject(reader.error);
+      reader.readAsDataURL(file);
+    });
+
+  const uploadPdf = async (id: number): Promise<boolean> => {
+    if (!pdfFile) return true;
+    const base64file = await fileToBase64(pdfFile);
+    const filename = pdfFile.name.replace(/[^A-Za-z0-9._-]+/g, '_');
+    const result = await savePdf({ variables: { base64file, filename, jobpostingid: id } });
+    const payload = result.data?.saveJobPostingPdf;
+    if (!payload?.success) {
+      setErrorMessage(`PDF-Upload fehlgeschlagen: ${payload?.error ?? 'Unbekannter Fehler'}`);
+      return false;
+    }
+    await updatePosting({ variables: { id, set: { pdfUrl: payload.accessUrl } } });
+    setPdfUrl(payload.accessUrl);
+    setPdfFile(null);
+    return true;
+  };
+
   const saveDraft = async (): Promise<number | null> => {
     setErrorMessage(null);
     try {
-      if (savedId) {
-        await updatePosting({ variables: { id: savedId, set: buildInput() } });
-        return savedId;
+      let id = savedId;
+      if (id) {
+        await updatePosting({ variables: { id, set: buildInput() } });
+      } else {
+        const result = await createPosting({
+          variables: {
+            object: {
+              ...buildInput(),
+              organizationId: organization.id,
+              contactUserId: currentUserId,
+            },
+          },
+        });
+        id = result.data?.insert_JobPosting_one?.id ?? null;
+        setSavedId(id);
       }
-      const result = await createPosting({
-        variables: { object: { ...buildInput(), organizationId: organization.id } },
-      });
-      const id = result.data?.insert_JobPosting_one?.id ?? null;
-      setSavedId(id);
+      if (id && !(await uploadPdf(id))) {
+        return null;
+      }
       return id;
     } catch (error: any) {
       setErrorMessage(error.message);
@@ -193,7 +248,7 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
     (sum: number, credit: any) => sum + credit.remaining,
     0
   );
-  const busy = creating || updating || publishing;
+  const busy = creating || updating || publishing || uploadingPdf;
 
   const field = (
     label: string,
@@ -211,18 +266,43 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
     </label>
   );
 
-  const select = (label: string, key: keyof FormState, values: string[]) => (
+  const select = (
+    label: string,
+    key: keyof FormState,
+    values: string[],
+    translate: (value: string) => string
+  ) => (
     <label className="stujo-field">
       <span>{label}</span>
       <select value={form[key]} onChange={(event) => setField(key)(event.target.value)}>
         {values.map((value) => (
           <option key={value} value={value}>
-            {value}
+            {translate(value)}
           </option>
         ))}
       </select>
     </label>
   );
+
+  if (sessionStatus !== 'authenticated' || orgsLoading) {
+    return (
+      <Layout portal={portal}>
+        <p className="stujo-muted">Anmeldung wird geprüft …</p>
+      </Layout>
+    );
+  }
+
+  if (!organization) {
+    return (
+      <Layout portal={portal}>
+        <h2>Neues Stellenangebot</h2>
+        <p>
+          Deinem Konto ist noch kein Unternehmen mit Stellen-Verwaltung zugeordnet. Bitte wende
+          Dich an {portal.contactEmail || 'das StuJo-Team'}.
+        </p>
+      </Layout>
+    );
+  }
 
   return (
     <Layout portal={portal}>
@@ -242,9 +322,9 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
         <div className="stujo-form">
           {field('Titel des Angebots *', 'title')}
           <div className="stujo-form-row">
-            {select('Kategorie *', 'type', enums?.JobPostingType?.map((e: any) => e.value) ?? [])}
-            {select('Berufsfeld *', 'occupation', enums?.JobOccupation?.map((e: any) => e.value) ?? [])}
-            {select('Region', 'region', enums?.JobRegion?.map((e: any) => e.value) ?? [])}
+            {select('Kategorie *', 'type', enums?.JobPostingType?.map((e: any) => e.value) ?? [], tType)}
+            {select('Berufsfeld *', 'occupation', enums?.JobOccupation?.map((e: any) => e.value) ?? [], tOccupation)}
+            {select('Region', 'region', enums?.JobRegion?.map((e: any) => e.value) ?? [], tRegion)}
           </div>
           <div className="stujo-form-row">
             {field('Ort', 'location', { placeholder: 'z.B. Kiel' })}
@@ -271,6 +351,33 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
               value={form.requirement}
               onChange={(event) => setField('requirement')(event.target.value)}
             />
+          </label>
+          <label className="stujo-field">
+            <span>Stellenausschreibung als PDF</span>
+            <input
+              type="file"
+              accept="application/pdf,.pdf"
+              onChange={(event) => {
+                const file = event.target.files?.[0] ?? null;
+                if (file && !/\.pdf$/i.test(file.name)) {
+                  setErrorMessage('Bitte wähle eine PDF-Datei aus.');
+                  return;
+                }
+                setErrorMessage(null);
+                setPdfFile(file);
+              }}
+            />
+            {pdfUrl && !pdfFile && (
+              <span style={{ fontWeight: 400 }}>
+                Aktuelle Datei:{' '}
+                <a href={resolveStorageUrl(pdfUrl) ?? pdfUrl} target="_blank" rel="noreferrer">
+                  {decodeURIComponent(pdfUrl.split('/').pop() ?? 'PDF ansehen')}
+                </a>
+              </span>
+            )}
+            <span className="stujo-muted" style={{ fontWeight: 400 }}>
+              Das PDF wird Studierenden direkt auf der Angebotsseite angezeigt (max. 15 MB).
+            </span>
           </label>
           <div className="stujo-form-actions">
             <button className="stujo-btn stujo-btn--ghost" disabled={busy} onClick={saveDraft}>
@@ -300,6 +407,12 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
               Organization: { id: organization?.id ?? 0, name: organization?.name ?? '', logo: null },
             }}
           />
+          {isLive ? (
+            <div className="stujo-notice">
+              Dieses Angebot ist bereits veröffentlicht – Deine Änderungen werden direkt
+              übernommen.
+            </div>
+          ) : (
           <div className="stujo-order-box">
             <h3>Deine Bestellung</h3>
             {netPrice === 0 ? (
@@ -315,7 +428,7 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
               <>
                 <div className="stujo-order-row">
                   <span>
-                    {form.type} · {price?.durationDays ?? 56} Tage
+                    {tType(form.type)} · {price?.durationDays ?? 56} Tage
                   </span>
                   <span>{(netPrice / 100).toFixed(2).replace('.', ',')} €</span>
                 </div>
@@ -335,15 +448,29 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
               </>
             )}
           </div>
+          )}
           <div className="stujo-form-actions">
             <button className="stujo-btn stujo-btn--ghost" disabled={busy} onClick={() => setStep(1)}>
               ← Zurück
             </button>
-            <button className="stujo-btn stujo-btn--accent" disabled={busy} onClick={publish}>
-              {netPrice === 0 || credits > 0
-                ? 'Jetzt veröffentlichen'
-                : `Kostenpflichtig veröffentlichen · ${(grossPrice / 100).toFixed(2).replace('.', ',')} €`}
-            </button>
+            {isLive ? (
+              <button
+                className="stujo-btn stujo-btn--accent"
+                disabled={busy}
+                onClick={async () => {
+                  const id = await saveDraft();
+                  if (id) router.push('/mein-stujo');
+                }}
+              >
+                Änderungen speichern
+              </button>
+            ) : (
+              <button className="stujo-btn stujo-btn--accent" disabled={busy} onClick={publish}>
+                {netPrice === 0 || credits > 0
+                  ? 'Jetzt veröffentlichen'
+                  : `Kostenpflichtig veröffentlichen · ${(grossPrice / 100).toFixed(2).replace('.', ',')} €`}
+              </button>
+            )}
           </div>
         </div>
       )}

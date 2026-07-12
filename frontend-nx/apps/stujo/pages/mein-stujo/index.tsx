@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { signIn, useSession } from 'next-auth/react';
 import { FC, useEffect, useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 import Layout from '../../components/Layout';
 import {
@@ -34,6 +35,7 @@ const formatDate = (value: string | null) =>
  * publish/archive/re-post actions, per design/stujo-design.pen.
  */
 const MeinStujo: FC<Props> = ({ portal }) => {
+  const tType = useTranslations('jobType');
   const router = useRouter();
   const { status: sessionStatus } = useSession();
   const [notice, setNotice] = useState<string | null>(null);
@@ -71,6 +73,19 @@ const MeinStujo: FC<Props> = ({ portal }) => {
       setNotice('Zahlung abgebrochen – Dein Angebot ist weiterhin als Entwurf gespeichert.');
     }
   }, [router.query.payment]);
+
+  // "Jetzt erneut inserieren" mail CTA: trigger the re-publish once the
+  // postings are loaded, then drop the parameter so it fires only once.
+  useEffect(() => {
+    const repostId = Number(router.query.repost);
+    if (!repostId || !data?.JobPosting) return;
+    const posting = data.JobPosting.find((p: any) => p.id === repostId);
+    router.replace('/mein-stujo', undefined, { shallow: true });
+    if (posting && ['EXPIRED', 'DRAFT', 'PENDING_PAYMENT'].includes(posting.status)) {
+      handlePublish(repostId);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router.query.repost, data]);
 
   const handlePublish = async (jobPostingId: number) => {
     setNotice(null);
@@ -192,13 +207,19 @@ const MeinStujo: FC<Props> = ({ portal }) => {
                     {posting.title}
                   </Link>
                 </td>
-                <td className="stujo-muted">{posting.type}</td>
+                <td className="stujo-muted">{tType(posting.type)}</td>
                 <td>
                   <span className={status.className}>{status.label}</span>
                 </td>
                 <td className="stujo-muted">{posting.views}</td>
                 <td className="stujo-muted">{formatDate(posting.expiresAt)}</td>
                 <td style={{ whiteSpace: 'nowrap' }}>
+                  <Link
+                    href={`/mein-stujo/neu?id=${posting.id}`}
+                    className="stujo-button-pen"
+                    title="Bearbeiten"
+                    aria-label="Bearbeiten"
+                  />
                   {(posting.status === 'DRAFT' || posting.status === 'PENDING_PAYMENT') && (
                     <button
                       className="stujo-btn stujo-btn--small"

@@ -183,6 +183,8 @@ export async function publishAndNotify(client, logger, posting, durationDays) {
   });
 
   const frontendUrl = process.env.STUJO_FRONTEND_URL || process.env.FRONTEND_URL || '';
+  // The job board admin UI lives in the edu-hub app, not the stujo app.
+  const adminAppUrl = process.env.FRONTEND_URL || frontendUrl;
   const vars = {
     '[JobPosting:Title]': posting.title,
     '[JobPosting:Type]': posting.type,
@@ -193,7 +195,7 @@ export async function publishAndNotify(client, logger, posting, durationDays) {
     }),
     '[JobPosting:DashboardUrl]': `${frontendUrl}/mein-stujo`,
     '[JobPosting:RepostUrl]': `${frontendUrl}/mein-stujo?repost=${posting.id}`,
-    '[JobPosting:AdminUrl]': `${frontendUrl}/manage/jobboerse?posting=${posting.id}`,
+    '[JobPosting:AdminUrl]': `${adminAppUrl}/manage/settings/jobboerse?posting=${posting.id}`,
     '[Organization:Name]': posting.Organization?.name || '',
     '[JobPosting:Payment]': posting.paymentDescription || '',
   };
