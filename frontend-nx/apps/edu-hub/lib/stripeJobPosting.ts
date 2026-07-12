@@ -23,6 +23,7 @@ const GET_POSTING_FOR_WEBHOOK = gql`
       title
       type
       status
+      expiresAt
       organizationId
       ContactUser {
         email
@@ -150,6 +151,7 @@ type PostingForWebhook = {
     title: string;
     type: string;
     status: string;
+    expiresAt: string | null;
     organizationId: number;
     ContactUser: { email: string } | null;
     Organization: { name: string } | null;
@@ -256,7 +258,8 @@ export async function handleJobPostingCheckoutCompleted(
     GET_INVOICE_BY_SESSION,
     { sessionId: session.id }
   );
-  if (existing.length === 0) {
+  const invoiceCreated = existing.length === 0;
+  if (invoiceCreated) {
     const buyerUserId = session.metadata?.userId;
     if (!buyerUserId) {
       throw new Error(`Session ${session.id} is missing userId metadata for the invoice`);
@@ -314,16 +317,23 @@ export async function handleJobPostingCheckoutCompleted(
     });
   }
 
-  // Mails: employer confirmation + admin post-hoc moderation notice.
-  const paymentDescription = `${((session.amount_total ?? 0) / 100).toFixed(2)} € (${
-    session.payment_status === 'paid' ? 'bezahlt' : 'Zahlung ausstehend'
-  })`;
-  const vars = buildMailVars(posting, expiresAt, paymentDescription);
-  if (posting.ContactUser?.email) {
-    await queueMail(client, 'JOB_POSTING_PUBLISHED', posting.ContactUser.email, vars);
-  }
-  if (process.env.STUJO_ADMIN_EMAIL) {
-    await queueMail(client, 'JOB_POSTING_ADMIN_NOTICE', process.env.STUJO_ADMIN_EMAIL, vars);
+  // Mails: employer confirmation + admin post-hoc moderation notice. Gate on
+  // the invoice-creation branch so Stripe redeliveries (posting already
+  // PUBLISHED, invoice already present) don't enqueue duplicate sends. Fall
+  // back to the posting's stored expiresAt when this delivery didn't publish.
+  if (invoiceCreated) {
+    const mailExpiresAt =
+      expiresAt ?? (posting.expiresAt ? new Date(posting.expiresAt) : null);
+    const paymentDescription = `${((session.amount_total ?? 0) / 100).toFixed(2)} € (${
+      session.payment_status === 'paid' ? 'bezahlt' : 'Zahlung ausstehend'
+    })`;
+    const vars = buildMailVars(posting, mailExpiresAt, paymentDescription);
+    if (posting.ContactUser?.email) {
+      await queueMail(client, 'JOB_POSTING_PUBLISHED', posting.ContactUser.email, vars);
+    }
+    if (process.env.STUJO_ADMIN_EMAIL) {
+      await queueMail(client, 'JOB_POSTING_ADMIN_NOTICE', process.env.STUJO_ADMIN_EMAIL, vars);
+    }
   }
 
   console.log('Job posting published via Stripe webhook', {

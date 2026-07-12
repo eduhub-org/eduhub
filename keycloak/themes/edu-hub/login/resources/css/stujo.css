@@ -8,7 +8,6 @@
 
 html.stujo-brand .login-pf body,
 html.stujo-brand body {
-  background-image: none !important;
   background: linear-gradient(to right, #4b0135, #a71580, #4b0135) !important;
   font-family: Lato, 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }

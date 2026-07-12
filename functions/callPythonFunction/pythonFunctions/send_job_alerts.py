@@ -131,7 +131,16 @@ def send_job_alerts(arguments):
             }
             if _queue_mail(client, template, email, variables):
                 mailed += 1
-                client.send_query(update_sub, {"id": sub["id"], "now": now.isoformat()})
+                update_result = client.send_query(
+                    update_sub, {"id": sub["id"], "now": now.isoformat()}
+                )
+                if not isinstance(update_result, dict) or update_result.get("errors"):
+                    # lastSentAt stays stale: without it the same postings would
+                    # be re-sent next run, so surface the failure loudly.
+                    logging.error(
+                        f"Failed to update lastSentAt for subscription {sub['id']}: "
+                        f"{update_result}"
+                    )
 
         logging.info(f"Job alerts: {len(subscriptions)} subscriptions, {mailed} mails queued")
         return {"success": True, "data": {"subscriptions": len(subscriptions), "mailed": mailed}}

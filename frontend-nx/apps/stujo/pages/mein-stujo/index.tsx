@@ -19,12 +19,14 @@ import { resolvePortal, PortalBranding } from '../../lib/portal';
 
 type Props = { portal: PortalBranding };
 
-const STATUS_LABELS: Record<string, { label: string; className: string }> = {
-  PUBLISHED: { label: 'Aktiv', className: 'stujo-chip stujo-chip--green' },
-  EXPIRED: { label: 'Abgelaufen', className: 'stujo-chip stujo-chip--red' },
-  DRAFT: { label: 'Entwurf', className: 'stujo-chip stujo-chip--grey' },
-  PENDING_PAYMENT: { label: 'Zahlung offen', className: 'stujo-chip stujo-chip--yellow' },
-  ARCHIVED: { label: 'Archiviert', className: 'stujo-chip stujo-chip--grey' },
+// Status label text lives in the `meinStujo.status` translation namespace;
+// only the chip styling is kept here (keyed by the same status value).
+const STATUS_CLASSNAMES: Record<string, string> = {
+  PUBLISHED: 'stujo-chip stujo-chip--green',
+  EXPIRED: 'stujo-chip stujo-chip--red',
+  DRAFT: 'stujo-chip stujo-chip--grey',
+  PENDING_PAYMENT: 'stujo-chip stujo-chip--yellow',
+  ARCHIVED: 'stujo-chip stujo-chip--grey',
 };
 
 const formatDate = (value: string | null) =>
@@ -35,6 +37,7 @@ const formatDate = (value: string | null) =>
  * publish/archive/re-post actions, per design/stujo-design.pen.
  */
 const MeinStujo: FC<Props> = ({ portal }) => {
+  const t = useTranslations('meinStujo');
   const tType = useTranslations('jobType');
   const router = useRouter();
   const { status: sessionStatus } = useSession();
@@ -68,10 +71,11 @@ const MeinStujo: FC<Props> = ({ portal }) => {
   // Payment return + re-post deep links (?payment=success / ?repost=id)
   useEffect(() => {
     if (router.query.payment === 'success') {
-      setNotice('Zahlung erfolgreich – Dein Angebot ist veröffentlicht.');
+      setNotice(t('noticePaymentSuccess'));
     } else if (router.query.payment === 'cancelled') {
-      setNotice('Zahlung abgebrochen – Dein Angebot ist weiterhin als Entwurf gespeichert.');
+      setNotice(t('noticePaymentCancelled'));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router.query.payment]);
 
   // "Jetzt erneut inserieren" mail CTA: trigger the re-publish once the
@@ -89,28 +93,41 @@ const MeinStujo: FC<Props> = ({ portal }) => {
 
   const handlePublish = async (jobPostingId: number) => {
     setNotice(null);
-    const result = await publishPosting({ variables: { jobPostingId } });
-    const payload = result.data?.publishJobPosting;
-    if (payload?.checkoutUrl) {
-      window.location.href = payload.checkoutUrl;
-      return;
-    }
-    if (payload?.success) {
-      setNotice(
-        payload.usedCredit
-          ? 'Veröffentlicht – ein Gratis-Kontingent wurde eingelöst.'
-          : 'Dein Angebot ist veröffentlicht.'
-      );
-      await refetch();
-    } else {
-      setNotice(`Veröffentlichen fehlgeschlagen: ${payload?.error ?? 'Unbekannter Fehler'}`);
+    try {
+      const result = await publishPosting({ variables: { jobPostingId } });
+      const payload = result.data?.publishJobPosting;
+      if (payload?.checkoutUrl) {
+        window.location.href = payload.checkoutUrl;
+        return;
+      }
+      if (payload?.success) {
+        setNotice(payload.usedCredit ? t('noticePublishedCredit') : t('noticePublished'));
+        await refetch();
+      } else {
+        setNotice(t('publishFailed', { error: payload?.error ?? t('unknownError') }));
+      }
+    } catch (error) {
+      console.error('publishJobPosting failed', error);
+      setNotice(t('publishNetworkError'));
     }
   };
 
   const handleArchive = async (jobPostingId: number) => {
-    const result = await archivePosting({ variables: { jobPostingId } });
-    if (result.data?.archiveJobPosting?.success) {
-      await refetch();
+    setNotice(null);
+    try {
+      const result = await archivePosting({ variables: { jobPostingId } });
+      if (result.data?.archiveJobPosting?.success) {
+        await refetch();
+      } else {
+        setNotice(
+          t('archiveFailed', {
+            error: result.data?.archiveJobPosting?.error ?? t('unknownError'),
+          })
+        );
+      }
+    } catch (error) {
+      console.error('archiveJobPosting failed', error);
+      setNotice(t('archiveNetworkError'));
     }
   };
 
@@ -131,7 +148,7 @@ const MeinStujo: FC<Props> = ({ portal }) => {
   if (sessionStatus !== 'authenticated' || orgsLoading) {
     return (
       <Layout portal={portal}>
-        <p className="stujo-muted">Anmeldung wird geprüft …</p>
+        <p className="stujo-muted">{t('checkingLogin')}</p>
       </Layout>
     );
   }
@@ -139,11 +156,8 @@ const MeinStujo: FC<Props> = ({ portal }) => {
   if (!organization) {
     return (
       <Layout portal={portal}>
-        <h1>Mein StuJo</h1>
-        <p>
-          Deinem Konto ist noch kein Unternehmen mit Stellen-Verwaltung zugeordnet. Bitte wende Dich
-          an {portal.contactEmail || 'das StuJo-Team'}.
-        </p>
+        <h1>{t('title')}</h1>
+        <p>{t('noOrganization', { contact: portal.contactEmail || t('defaultContact') })}</p>
       </Layout>
     );
   }
@@ -152,13 +166,13 @@ const MeinStujo: FC<Props> = ({ portal }) => {
     <Layout portal={portal}>
       <div className="stujo-dash-head">
         <div>
-          <h1 style={{ margin: 0 }}>Mein StuJo</h1>
+          <h1 style={{ margin: 0 }}>{t('title')}</h1>
           <p className="stujo-muted" style={{ margin: '0.25rem 0 0' }}>
             {organization.name}
           </p>
         </div>
         <Link href="/mein-stujo/neu" className="stujo-btn stujo-btn--primary">
-          + Neues Angebot
+          {t('newOffer')}
         </Link>
       </div>
 
@@ -166,9 +180,9 @@ const MeinStujo: FC<Props> = ({ portal }) => {
 
       <div className="stujo-stats">
         {[
-          ['Aktive Angebote', String(stats.active), false],
-          ['Aufrufe gesamt', String(stats.views), false],
-          ['Freie Kontingente', String(stats.credits), true],
+          [t('statActiveOffers'), String(stats.active), false],
+          [t('statTotalViews'), String(stats.views), false],
+          [t('statFreeCredits'), String(stats.credits), true],
         ].map(([label, value, accent]) => (
           <div key={label as string} className={`stujo-stat${accent ? ' stujo-stat--accent' : ''}`}>
             <div className="stujo-muted" style={{ fontSize: '0.8rem' }}>
@@ -182,11 +196,11 @@ const MeinStujo: FC<Props> = ({ portal }) => {
       <table className="stujo-table">
         <thead>
           <tr>
-            <th>Angebot</th>
-            <th>Kategorie</th>
-            <th>Status</th>
-            <th>Aufrufe</th>
-            <th>Läuft ab</th>
+            <th>{t('colOffer')}</th>
+            <th>{t('colCategory')}</th>
+            <th>{t('colStatus')}</th>
+            <th>{t('colViews')}</th>
+            <th>{t('colExpires')}</th>
             <th />
           </tr>
         </thead>
@@ -194,12 +208,13 @@ const MeinStujo: FC<Props> = ({ portal }) => {
           {loading && (
             <tr>
               <td colSpan={6} className="stujo-muted">
-                Lädt …
+                {t('loading')}
               </td>
             </tr>
           )}
           {data?.JobPosting?.map((posting: any) => {
-            const status = STATUS_LABELS[posting.status] ?? STATUS_LABELS.DRAFT;
+            const statusClassName =
+              STATUS_CLASSNAMES[posting.status] ?? STATUS_CLASSNAMES.DRAFT;
             return (
               <tr key={posting.id}>
                 <td>
@@ -209,7 +224,7 @@ const MeinStujo: FC<Props> = ({ portal }) => {
                 </td>
                 <td className="stujo-muted">{tType(posting.type)}</td>
                 <td>
-                  <span className={status.className}>{status.label}</span>
+                  <span className={statusClassName}>{t(`status.${posting.status}`)}</span>
                 </td>
                 <td className="stujo-muted">{posting.views}</td>
                 <td className="stujo-muted">{formatDate(posting.expiresAt)}</td>
@@ -217,8 +232,8 @@ const MeinStujo: FC<Props> = ({ portal }) => {
                   <Link
                     href={`/mein-stujo/neu?id=${posting.id}`}
                     className="stujo-button-pen"
-                    title="Bearbeiten"
-                    aria-label="Bearbeiten"
+                    title={t('edit')}
+                    aria-label={t('edit')}
                   />
                   {(posting.status === 'DRAFT' || posting.status === 'PENDING_PAYMENT') && (
                     <button
@@ -226,7 +241,7 @@ const MeinStujo: FC<Props> = ({ portal }) => {
                       disabled={publishing}
                       onClick={() => handlePublish(posting.id)}
                     >
-                      Veröffentlichen
+                      {t('publish')}
                     </button>
                   )}
                   {posting.status === 'EXPIRED' && (
@@ -235,7 +250,7 @@ const MeinStujo: FC<Props> = ({ portal }) => {
                       disabled={publishing}
                       onClick={() => handlePublish(posting.id)}
                     >
-                      Erneut inserieren
+                      {t('repost')}
                     </button>
                   )}
                   {posting.status === 'PUBLISHED' && (
@@ -243,7 +258,7 @@ const MeinStujo: FC<Props> = ({ portal }) => {
                       className="stujo-btn stujo-btn--small stujo-btn--ghost"
                       onClick={() => handleArchive(posting.id)}
                     >
-                      Archivieren
+                      {t('archive')}
                     </button>
                   )}
                 </td>
@@ -253,7 +268,7 @@ const MeinStujo: FC<Props> = ({ portal }) => {
           {!loading && data?.JobPosting?.length === 0 && (
             <tr>
               <td colSpan={6} className="stujo-muted">
-                Noch keine Angebote – erstelle Dein erstes über „+ Neues Angebot“.
+                {t('noOffers')}
               </td>
             </tr>
           )}

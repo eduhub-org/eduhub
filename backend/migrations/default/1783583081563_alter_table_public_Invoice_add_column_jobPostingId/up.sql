@@ -9,3 +9,5 @@ ALTER TABLE "public"."Invoice"
   ON UPDATE RESTRICT ON DELETE RESTRICT;
 
 COMMENT ON COLUMN "public"."Invoice"."jobPostingId" IS 'Job posting this invoice covers (null for course invoices)';
+
+CREATE INDEX "Invoice_jobPostingId_idx" ON "public"."Invoice" ("jobPostingId");

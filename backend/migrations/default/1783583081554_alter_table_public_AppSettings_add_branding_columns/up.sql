@@ -17,4 +17,6 @@ ALTER TABLE "public"."AppSettings"
   FOREIGN KEY ("defaultLocale") REFERENCES "public"."Language"("value")
   ON UPDATE RESTRICT ON DELETE RESTRICT;
 
+CREATE INDEX "AppSettings_defaultLocale_idx" ON "public"."AppSettings" ("defaultLocale");
+
 COMMENT ON COLUMN "public"."AppSettings"."domain" IS 'Request host resolved to this app (e.g. cau.stujo.net); null for apps addressed by env var';

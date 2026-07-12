@@ -1,3 +1,5 @@
+DROP INDEX IF EXISTS "public"."AppSettings_defaultLocale_idx";
+
 ALTER TABLE "public"."AppSettings"
   DROP CONSTRAINT IF EXISTS "AppSettings_defaultLocale_fkey",
   DROP CONSTRAINT IF EXISTS "AppSettings_domain_unique",
