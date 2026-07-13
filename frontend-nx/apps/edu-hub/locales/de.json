@@ -306,6 +306,8 @@
     "widget_no_courses_available": "Keine Kurse verfügbar",
     "widget_error_loading_projects": "Fehler beim Laden der Projekte",
     "widget_no_projects_available": "Keine Projekte verfügbar",
+    "widget_error_loading_jobs": "Fehler beim Laden der Stellenangebote",
+    "widget_no_jobs_available": "Keine Stellenangebote verfügbar",
     "page_not_found": "Seite nicht gefunden",
     "page_not_found_description": "Die Seite, die du suchst, existiert leider nicht. Sie wurde möglicherweise verschoben oder gelöscht.",
     "back_to_home": "Zur Startseite",
@@ -2109,6 +2111,21 @@
       "loading": "Lädt...",
       "error_loading": "Die Projekt-Slider konnten nicht geladen werden."
     },
+    "job_sliders": {
+      "label": "Job-Slider",
+      "help_text": "Erstelle Job-Slider für die Startseite. Jeder Slider zeigt veröffentlichte StuJo-Stellenangebote. Wähle die anzuzeigenden Job-Kategorien aus oder lasse die Auswahl leer, um alle veröffentlichten Stellenangebote zu zeigen. Slider werden zusammen mit den Kursgruppen oben sortiert.",
+      "add_placeholder": "Titel des neuen Job-Sliders",
+      "add_button": "Slider hinzufügen",
+      "id_label": "ID",
+      "delete": "Job-Slider löschen",
+      "source_job_types": "Job-Kategorien",
+      "no_selection_hint": "Keine Job-Kategorien ausgewählt — zeigt alle veröffentlichten Stellenangebote.",
+      "error_add": "Der Job-Slider konnte nicht erstellt werden.",
+      "error_delete": "Der Job-Slider konnte nicht gelöscht werden.",
+      "error_save": "Die Auswahl konnte nicht gespeichert werden.",
+      "loading": "Lädt...",
+      "error_loading": "Die Job-Slider konnten nicht geladen werden."
+    },
     "badges": {
       "section_label": "Badges",
       "section_help": "Lege wiederverwendbare Badges (z. B. Auszeichnungen) fest, die Projekten zugeordnet werden können. Titel, Beschreibung und Icon werden hier einmal gepflegt und überall automatisch angezeigt.",
@@ -2675,5 +2692,62 @@
     },
     "submitted_on": "Eingereicht {date}",
     "load_error": "Dieses Projekt konnte nicht geladen werden. Bitte versuche es später erneut."
+  },
+  "job": {
+    "view_on_stujo": "Auf StuJo ansehen",
+    "published_on": "Eingestellt {date}",
+    "type": {
+      "MINIJOB": "Minijobs",
+      "WORKING_STUDENT": "Studentenjobs",
+      "INTERNSHIP": "Praktika",
+      "THESIS": "Abschlussarbeiten",
+      "PERMANENT": "Festanstellungen",
+      "TRAINEE": "Trainees",
+      "STATE_RECOGNITION_INTERNSHIP": "Praktika für die staatliche Anerkennung"
+    },
+    "region": {
+      "FLENSBURG": "Flensburg",
+      "KIEL": "Kiel Region",
+      "SCHLESWIG_HOLSTEIN_HAMBURG": "Schleswig-Holstein und Hamburg",
+      "GERMANY": "Deutschland",
+      "DENMARK": "Dänemark",
+      "ABROAD": "Sonstiges Ausland"
+    },
+    "occupation": {
+      "ADMINISTRATION": "Administration und Sachbearbeitung",
+      "EDUCATION_TRAINING": "Aus- und Weiterbildung",
+      "BANKING_INSURANCE": "Banken, Versicherungen und Finanzdienstleistungen",
+      "CUSTOMER_SERVICE": "Customer Service und Kundenbetreuung",
+      "DESIGN_ARCHITECTURE": "Design, Gestaltung und Architektur",
+      "PURCHASING_LOGISTICS": "Einkauf, Transport und Logistik",
+      "MANUFACTURING_CONSTRUCTION": "Fertigung, Bau und Handwerk",
+      "ACCOUNTING": "Finanz- und Rechnungswesen",
+      "RESEARCH_SCIENCE": "Forschung, Entwicklung und Wissenschaft",
+      "HEALTH_SOCIAL": "Gesundheit, Medizin und Soziales",
+      "HOSPITALITY": "Hotel und Gastronomie",
+      "ENGINEERING": "Ingenieurwesen und technische Berufe",
+      "MAINTENANCE": "Instandhaltung",
+      "IT_TELECOMMUNICATIONS": "IT und Telekommunikation",
+      "ARTS_CULTURE": "Kunst und Kultur",
+      "AGRICULTURE_ENVIRONMENT": "Land-, Forst-, Fischwirtschaft und Umwelt",
+      "MARKETING_ADVERTISING": "Marketing und Werbung",
+      "PUBLIC_SERVICE": "Öffentlicher Dienst und Verbände",
+      "HUMAN_RESOURCES": "Personalwesen",
+      "PRODUCTION": "Produktion",
+      "PROJECT_MANAGEMENT": "Projektmanagement",
+      "QUALITY_MANAGEMENT": "Qualitätswesen",
+      "LEGAL": "Recht",
+      "MEDIA_EDITORIAL": "Redaktion, Medien und Information",
+      "SECURITY_CIVIL_PROTECTION": "Sicherheit und Zivilschutz",
+      "MANAGEMENT": "Unternehmensführung / Geschäftsleitung",
+      "SALES_RETAIL": "Vertrieb und Handel",
+      "TOURISM": "Tourismus",
+      "EVENT_MANAGEMENT": "Event Management",
+      "CONSULTING": "Unternehmensberatung",
+      "REAL_ESTATE": "Immobilien",
+      "SOCIAL_MEDIA": "Social Media",
+      "SOCIAL_PEDAGOGY": "Sozialpädagogik",
+      "OTHER": "Sonstiges Berufsfeld"
+    }
   }
 }

@@ -1,0 +1,46 @@
+/* tslint:disable */
+/* eslint-disable */
+// @generated
+// This file was automatically generated and should not be edited.
+
+import { JobPostingType_enum, JobOccupation_enum, JobRegion_enum } from "./../../__generated__/globalTypes";
+
+// ====================================================
+// GraphQL query operation: HomeJobTilesByTypes
+// ====================================================
+
+export interface HomeJobTilesByTypes_JobPosting_Organization {
+  __typename: "Organization";
+  id: number;
+  name: string;
+  logo: string | null;
+}
+
+export interface HomeJobTilesByTypes_JobPosting {
+  __typename: "JobPosting";
+  id: number;
+  title: string;
+  type: JobPostingType_enum;
+  occupation: JobOccupation_enum;
+  location: string | null;
+  region: JobRegion_enum | null;
+  featured: boolean;
+  publishedAt: any | null;
+  /**
+   * An object relationship
+   */
+  Organization: HomeJobTilesByTypes_JobPosting_Organization;
+}
+
+export interface HomeJobTilesByTypes {
+  /**
+   * fetch data from the table: "JobPosting"
+   */
+  JobPosting: HomeJobTilesByTypes_JobPosting[];
+}
+
+export interface HomeJobTilesByTypesVariables {
+  types: JobPostingType_enum[];
+  limit?: number | null;
+  offset?: number | null;
+}

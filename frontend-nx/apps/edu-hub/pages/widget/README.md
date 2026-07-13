@@ -5,8 +5,9 @@ their websites via a simple iframe:
 
 - **`/widget/courses`** — a slider of published courses (documented below).
 - **`/widget/projects`** — a slider of public projects (see [Project Widget](#project-widget)).
+- **`/widget/jobs`** — a slider of published Stujo job postings (see [Job Widget](#job-widget)).
 
-Both widgets share the same transparent, borderless, responsive styling and the
+All widgets share the same transparent, borderless, responsive styling and the
 same base-URL/API-key behaviour.
 
 ## Overview
@@ -231,6 +232,82 @@ Uses the same parameters as the course widget:
 When neither `group` nor `groups` is provided, all home-eligible projects are
 shown (most recently updated first). Organization scoping uses `Project.organizationId`
 on the server, analogous to course funding-organization filtering.
+
+## Job Widget
+
+The Job Widget (`/widget/jobs`) embeds a slider of published Stujo job postings.
+It reuses the same slider shell and styling as the course and project widgets;
+only the tile content and data source differ.
+
+Only **published, non-expired, unrestricted** postings are shown (enforced by the
+Hasura anonymous permission), ordered featured-first then newest. Each tile shows
+the employer logo on a Stujo-branded background, the job title, type, company,
+location and occupation, with a small Stujo sign in the top-right corner. Tiles
+link to the Stujo job detail page and always open in a new tab
+(`https://<stujo-domain>/stellenangebote/<id>?utm_source=eduhub`), so they work
+from inside an iframe without any extra configuration.
+
+### Simple Embed (All Jobs)
+
+```html
+<iframe
+  src="https://edu.opencampus.sh/widget/jobs"
+  frameborder="0"
+  style="width:100%; height:435px; border:none; background:transparent;">
+</iframe>
+```
+
+### Filter by Job Slider
+
+Same query parameters as the project widget (`group`, `groups`). A job slider is
+a `CourseGroupOption` with `contentType = 'JOB'`; the widget narrows the result to
+the union of the selected sliders' job types:
+
+```html
+<iframe
+  src="https://edu.opencampus.sh/widget/jobs?group=1&locale=de"
+  frameborder="0"
+  style="width:100%; height:435px; border:none; background:transparent;">
+</iframe>
+```
+
+Multiple sliders (comma-separated option ids):
+
+```html
+<iframe
+  src="https://edu.opencampus.sh/widget/jobs?groups=3,7&locale=de"
+  frameborder="0"
+  style="width:100%; height:435px; border:none; background:transparent;">
+</iframe>
+```
+
+A selected slider with no job-type selection contributes "all types", so no type
+filtering is applied when any selected slider selects zero types.
+
+### Organization-Specific Jobs (with API Key)
+
+```html
+<iframe
+  src="https://edu.opencampus.sh/widget/jobs?apiKey=edh_live_org123_sk_abcdef1234567890&locale=en"
+  frameborder="0"
+  style="width:100%; height:435px; border:none; background:transparent;">
+</iframe>
+```
+
+### Query Parameters
+
+Uses the same parameters as the project widget:
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `group` | number | No | Filter by job slider `order`. If not provided, shows all published jobs. |
+| `groups` | string | No | Comma-separated `CourseGroupOption` ids of JOB sliders. Jobs whose type is in the union of the selected sliders' job types are included. |
+| `locale` | string | No | Language code (`de` or `en`). Defaults to German. |
+| `apiKey` | string | No | Organization API key. When valid, only that organization's postings are shown (server-side). Format: `edh_live_org123_sk_...` |
+
+When neither `group` nor `groups` is provided, all published postings are shown
+(featured first, then newest). Organization scoping uses `JobPosting.organizationId`
+on the server.
 
 ## Security Considerations
 

@@ -3,6 +3,8 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
+import { JobPostingType_enum } from "./../../__generated__/globalTypes";
+
 // ====================================================
 // GraphQL query operation: CourseGroupOptions
 // ====================================================
@@ -17,6 +19,12 @@ export interface CourseGroupOptions_CourseGroupOption_SelectedProjectGroups {
   __typename: "ProjectSliderProjectGroup";
   id: number;
   projectGroupOptionId: number;
+}
+
+export interface CourseGroupOptions_CourseGroupOption_SelectedJobTypes {
+  __typename: "JobSliderJobType";
+  id: number;
+  jobType: JobPostingType_enum;
 }
 
 export interface CourseGroupOptions_CourseGroupOption {
@@ -48,6 +56,10 @@ export interface CourseGroupOptions_CourseGroupOption {
    * An array relationship
    */
   SelectedProjectGroups: CourseGroupOptions_CourseGroupOption_SelectedProjectGroups[];
+  /**
+   * An array relationship
+   */
+  SelectedJobTypes: CourseGroupOptions_CourseGroupOption_SelectedJobTypes[];
 }
 
 export interface CourseGroupOptions {
