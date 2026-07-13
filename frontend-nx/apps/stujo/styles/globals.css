@@ -104,18 +104,23 @@ a:focus {
 
 .stujo-header-diag {
   position: absolute;
-  right: 0;
+  left: 0;
   top: 0;
-  height: 100%;
+  /* Span 70% of the header width so the white wedge crosses the top edge at
+     ~70% and purple covers the rest, matching the live stujo.net banner. The
+     PNG's diagonal angle already matches; anchoring left keeps the purple
+     starting far left. */
+  width: 70%;
   pointer-events: none;
 }
 
 .stujo-header-logo {
   position: absolute;
-  top: 2em;
-  left: 2em;
-  max-height: 50%;
-  max-width: 60%;
+  top: 1.5em;
+  left: 1.5em;
+  width: 13%;
+  max-width: 180px;
+  height: auto;
   object-fit: contain;
 }
 
