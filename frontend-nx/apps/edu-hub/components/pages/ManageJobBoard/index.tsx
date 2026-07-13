@@ -96,7 +96,7 @@ const UPDATE_PRICE = gql`
 
 const SEARCH_ORGANIZATIONS = gql`
   query AdminSearchOrganizations($search: String!) {
-    Organization(where: { name: { _ilike: $search }, type: { _eq: CORPORATION } }, limit: 5) {
+    Organization(where: { name: { _ilike: $search } }, limit: 20) {
       id
       name
     }
