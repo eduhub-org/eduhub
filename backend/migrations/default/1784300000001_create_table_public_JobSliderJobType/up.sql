@@ -15,8 +15,13 @@ CREATE TABLE "public"."JobSliderJobType" (
   UNIQUE ("jobSliderOptionId", "jobType"),
   CONSTRAINT "JobSliderJobType_jobSliderOptionId_fkey"
     FOREIGN KEY ("jobSliderOptionId") REFERENCES "public"."CourseGroupOption"("id") ON UPDATE CASCADE ON DELETE CASCADE,
+  -- No ON DELETE CASCADE here (unlike the slider-option FK above): jobType
+  -- references the JobPostingType enum table, and cascade-deleting the last
+  -- selected type would silently widen the slider to "all published postings".
+  -- Restrict instead, matching every other enum-value FK in the schema, so
+  -- removing an enum value is an explicit, loud operation.
   CONSTRAINT "JobSliderJobType_jobType_fkey"
-    FOREIGN KEY ("jobType") REFERENCES "public"."JobPostingType"("value") ON UPDATE CASCADE ON DELETE CASCADE
+    FOREIGN KEY ("jobType") REFERENCES "public"."JobPostingType"("value") ON UPDATE CASCADE ON DELETE RESTRICT
 );
 COMMENT ON TABLE "public"."JobSliderJobType" IS E'Selects a job posting type as a source for a job slider (CourseGroupOption with contentType = JOB). No rows for a slider means all published postings.';
 COMMENT ON COLUMN "public"."JobSliderJobType"."jobSliderOptionId" IS E'The CourseGroupOption (contentType = JOB) this selection belongs to.';

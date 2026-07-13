@@ -12,7 +12,10 @@ export const resolveStujoLogoUrl = (pathOrUrl: string | null | undefined): strin
   if (!pathOrUrl) return null;
   if (/^https?:\/\//i.test(pathOrUrl)) return pathOrUrl;
   const bucketUrl = (process.env.NEXT_PUBLIC_STORAGE_BUCKET_URL || '').replace(/\/$/, '');
-  if (!bucketUrl) return pathOrUrl;
+  // Guarantee root-relative resolution when the bucket URL is unset: without a
+  // leading slash the browser would resolve "logos/x.png" against the current
+  // route rather than the origin, breaking the logo on any non-root page.
+  if (!bucketUrl) return pathOrUrl.startsWith('/') ? pathOrUrl : `/${pathOrUrl}`;
   return `${bucketUrl}/${pathOrUrl.replace(/^\//, '')}`;
 };
 

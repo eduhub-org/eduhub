@@ -99,8 +99,8 @@ const JobSlidersManager: FC = () => {
 
   return (
     <div className="mt-8">
-      <label className="text-xs uppercase tracking-widest font-medium text-gray-400">{t('label')}</label>
-      <p className="text-xs text-gray-400 mb-4">{t('help_text')}</p>
+      <label className="text-xs uppercase tracking-widest font-medium text-label-secondary">{t('label')}</label>
+      <p className="text-xs text-label-secondary mb-4">{t('help_text')}</p>
 
       {anyError ? (
         <p className="text-red-500 text-sm">{t('error_loading')}</p>

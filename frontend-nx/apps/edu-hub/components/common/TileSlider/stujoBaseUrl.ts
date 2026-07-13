@@ -10,7 +10,9 @@
  *      stujo.opencampus.sh).
  */
 export const getStujoBaseUrl = (): string => {
-  return process.env.NEXT_PUBLIC_STUJO_URL || 'https://stujo.opencampus.sh';
+  // Strip a trailing slash so stujoJobUrl never produces a double slash if the
+  // env var is configured with one (e.g. "https://stujo.opencampus.sh/").
+  return (process.env.NEXT_PUBLIC_STUJO_URL || 'https://stujo.opencampus.sh').replace(/\/$/, '');
 };
 
 /**
