@@ -5,6 +5,10 @@
 > selection pattern; this plan extends the same mechanism with a third content type,
 > `JOB`, whose tiles show Stujo job postings and link out to the Stujo job board.
 > **Planning document only — nothing here is implemented yet.**
+>
+> **Review decisions (2026-07-13).** The seven open questions were answered and are
+> baked into the sections below; the summary lives in
+> [Resolved decisions](#resolved-decisions-2026-07-13) at the end.
 
 ## Goal & UX summary
 
@@ -60,9 +64,10 @@ Suggested information, most meaningful first:
 **Body (mirrors the `ProjectTile` layout rhythm)**
 1. Meta row (like the published-project course line): **job type chip**
    (translated `JobPostingType`: Werkstudent:in, Praktikum, Abschlussarbeit,
-   Minijob, Festanstellung, Trainee, …) left; right-aligned date — prefer
-   **"Apply by {applicationDeadline}"** when set, else "Published {publishedAt}"
-   (with the small calendar icon).
+   Minijob, Festanstellung, Trainee, …) left; right-aligned the **published date**
+   ("Published {publishedAt}", with the small calendar icon) — matches what
+   Stujo's own job list shows. *(Decision: published date only; no deadline on
+   the tile, so `applicationDeadline` drops out of the tile fragment.)*
 2. **Company name** — `customCompany ?? Organization.name` — as the prominent
    middle line (the slot `tagline` occupies on project tiles).
 3. **Location line** — `location`, falling back to / suffixed with the translated
@@ -72,9 +77,9 @@ Suggested information, most meaningful first:
    CTA right: **"View on Stujo →"** in brand color (mirrors the Tile B CTA row).
 
 Deliberately *not* on the tile: salary/hours (inconsistent free-text, detail-page
-material), tags, description. `featured` postings can be sorted first (see query)
-rather than visually decorated — flag if a "Featured" banner is wanted
-(`TileBase.bannerText` already exists for that).
+material), tags, description, application deadline. `featured` postings are
+**sorted first but look identical** to other tiles *(decision: no "Featured"
+banner; `TileBase.bannerText` stays available if that changes later)*.
 
 ## Change 1 — Extend `contentType` to allow `JOB`
 
@@ -114,9 +119,10 @@ Mirror the project-slider junctions with **one** junction to start with — the 
   (via `useAdminMutation`), so no extra insert/delete permissions are required —
   same as the project junctions.
 
-Occupation (`JobOccupation`) and region (`JobRegion`) filters would follow the
-exact same pattern (`JobSliderOccupation`, `JobSliderRegion`) — **deferred** unless
-wanted now; flag if type-only curation is too coarse.
+*(Decision: job type is the only curation axis for now.)* Occupation
+(`JobOccupation`) and region (`JobRegion`) filters would follow the exact same
+pattern (`JobSliderOccupation`, `JobSliderRegion`) if type-only curation turns
+out too coarse — deferred.
 
 Optional: seed one demo `JOB` slider row in `backend/seeds/default/initial_seeds.sql`
 (next to the existing PROJECT slider seed) — only useful once local seeds contain
@@ -135,7 +141,9 @@ staging `stujo-staging.opencampus.sh`).
 - Wire the env var wherever the other `NEXT_PUBLIC_*` vars are provided at **build
   time** for the edu frontend image (Next.js inlines them at build), plus
   `.env.development` (`http://localhost:5001` per `apps/stujo/.env.development`).
-- Optionally append `?utm_source=eduhub` for attribution — decide before launch.
+- *(Decision: yes to attribution.)* `stujoJobUrl(id)` appends
+  `?utm_source=eduhub` to every tile link so Stujo analytics can distinguish
+  EduHub-referred views from organic ones.
 
 ## Frontend changes (apps/edu-hub)
 
@@ -148,13 +156,15 @@ staging `stujo-staging.opencampus.sh`).
      the enum table is stable; prefer querying it like stujo does).
    - `queries/jobTile.ts`: lean `JobTileFragment` — `id`, `title`, `type`,
      `occupation`, `location`, `region`, `featured`, `publishedAt`,
-     `applicationDeadline`, `Organization { id name logo }`. Queries
-     `HOME_JOB_TILES_ALL` and `HOME_JOB_TILES_BY_TYPES($types: [JobPostingType_enum!]!)`,
-     both `order_by: [{featured: desc}, {publishedAt: desc}]` (same ordering the
+     `Organization { id name logo }`. Queries `HOME_JOB_TILES_ALL`,
+     `HOME_JOB_TILES_BY_TYPES($types: [JobPostingType_enum!]!)` and
+     `HOME_JOB_TILES_BY_ORGANIZATION($organizationId: Int!)` (widget scoping,
+     mirrors `HOME_PROJECT_TILES_BY_ORGANIZATION`), all
+     `order_by: [{featured: desc}, {publishedAt: desc}]` (same ordering the
      stujo list page uses), `limit` default ~24, run with
-     `context: { role: AuthRoles.anonymous }`. Note: anonymous deliberately excludes
-     university-restricted postings; keep anonymous even for logged-in users so the
-     public homepage renders one consistent set.
+     `context: { role: AuthRoles.anonymous }`. *(Decision: anonymous role for
+     everyone, including logged-in users — university-restricted postings never
+     appear on the homepage; they stay discoverable on Stujo itself.)*
    - Extend `COURSE_GROUP_OPTIONS` in `queries/courseGroupOptions.ts` with
      `SelectedJobTypes { id jobType }`.
    - Regenerate types (`/regenerate-types` workflow: Hasura up, `yarn apollo`).
@@ -198,10 +208,23 @@ staging `stujo-staging.opencampus.sh`).
      `apps/stujo/locales/{de,en}.json` (keys match the enum values).
    - `manageAppSettings.job_sliders.*` (mirror `project_sliders.*`).
 
-6. **Widget (optional, deferred)**: `pages/widget/jobs.tsx` mirroring
-   `widget/projects.tsx` would let partner sites embed a jobs slider; tiles
-   already open a new tab, so the widget variant is nearly free. Not in scope
-   unless requested.
+6. **Widget** *(decision: in scope)*: `pages/widget/jobs.tsx` mirroring
+   `widget/projects.tsx`:
+   - Same chrome/scaffolding: `WidgetSliderShell`, `useWidgetChrome`,
+     `useWidgetLocale`, `WIDGET_ANONYMOUS_CONTEXT`.
+   - `apiKey` query param → `useWidgetApiKey` resolves an `organizationId`;
+     with a key the widget shows **that organization's postings**
+     (`HOME_JOB_TILES_BY_ORGANIZATION`), without one all published postings
+     (`HOME_JOB_TILES_ALL`).
+   - `group` / `groups` query params select JOB slider rows (by
+     `CourseGroupOption` order/id, as the project widget does) and narrow the
+     result to the union of those rows' `SelectedJobTypes` — a small
+     `filterJobsByWidgetSliders` helper analogous to
+     `helpers/filterProjectsByWidgetGroups.ts`.
+   - Tiles render with the same `JobTile` (already `target="_blank"` +
+     absolute Stujo URL, so nothing extra is needed for iframe embedding).
+   - New i18n keys `widget_error_loading_jobs` / `widget_no_jobs_available`;
+     document the embed in `pages/widget/README.md`.
 
 ## Ordering & behavior notes
 
@@ -223,19 +246,22 @@ staging `stujo-staging.opencampus.sh`).
 - Manual verification via the local stack (`/start-dev`): create a `JOB` slider in
   *Manage → Settings → Course groups*, insert a couple of `PUBLISHED` job postings
   (SQL or stujo employer flow), check homepage slider + new-tab navigation to
-  `localhost:5001/stellenangebote/<id>`.
+  `localhost:5001/stellenangebote/<id>?utm_source=eduhub`. For the widget: load
+  `/widget/jobs` bare, with `groups=`, and with an `apiKey` of a job-board-enabled
+  organization; verify org scoping and that tiles open Stujo in a new tab from
+  inside an iframe.
 
-## Open decisions (flag if the defaults are wrong)
+## Resolved decisions (2026-07-13)
 
-| # | Question | Proposed default |
-|---|----------|------------------|
+| # | Question | Decision |
+|---|----------|----------|
 | 1 | Curation axes for a job slider | **Job type only** (`JobSliderJobType`); occupation/region junctions deferred |
-| 2 | Tile image area | **Branded fallback + employer logo** (no cover images exist for jobs) |
-| 3 | Date on tile | **`applicationDeadline` when set, else `publishedAt`** |
-| 4 | Featured postings | **Sorted first only**, no banner (reuse `bannerText` later if wanted) |
+| 2 | Tile image area | **Stujo-branded background + employer logo** (no cover images exist for jobs) |
+| 3 | Date on tile | **Published date only** (`publishedAt`; no deadline on the tile) |
+| 4 | Featured postings | **Sorted first only**, visually identical (no banner) |
 | 5 | Logged-in visibility | **Anonymous role everywhere** — university-restricted postings stay off the homepage |
-| 6 | UTM attribution on outbound links | **Yes, `?utm_source=eduhub`** (cheap, useful) |
-| 7 | Jobs widget for partner sites | **Deferred** |
+| 6 | UTM attribution on outbound links | **Yes, `?utm_source=eduhub`** |
+| 7 | Jobs widget for partner sites | **In scope** — build `pages/widget/jobs.tsx` alongside the homepage slider |
 
 ## Implementation todos (in order)
 
@@ -250,5 +276,8 @@ staging `stujo-staging.opencampus.sh`).
    `HomeJobSlider`; copy Stujo logo asset.
 6. Wire `pages/index.tsx` `JOB` branch.
 7. `JobSlidersManager` + mount on the course-groups settings page.
-8. i18n keys (de/en), reusing stujo's enum label translations.
-9. `JobTile` component test; manual end-to-end check with the local stack.
+8. `pages/widget/jobs.tsx` + `filterJobsByWidgetSliders` helper + widget README
+   entry.
+9. i18n keys (de/en), reusing stujo's enum label translations; widget
+   error/empty strings.
+10. `JobTile` component test; manual end-to-end check with the local stack.
