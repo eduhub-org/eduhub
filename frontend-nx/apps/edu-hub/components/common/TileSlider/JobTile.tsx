@@ -1,6 +1,6 @@
 import { FC, memo } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import { Calendar } from 'lucide-react';
+import { ArrowRight, Calendar } from 'lucide-react';
 
 import { JobTileFragment } from '../../../queries/__generated__/JobTileFragment';
 import { TileBase } from './TileBase';
@@ -24,7 +24,9 @@ const JobTileComponent: FC<JobTileProps> = ({ job }) => {
 
   // Job postings have no cover image: use a StuJo-branded flat background with
   // the employer logo on a white card (so dark logos stay legible), plus a
-  // subtle bottom gradient so the white title overlay stays readable.
+  // smooth bottom-up gradient that fades from dark behind the title to fully
+  // transparent, so the pink surface never meets an abrupt darker band and the
+  // white title overlay stays readable.
   const imageArea = (
     <>
       <div className="absolute inset-0" style={{ backgroundColor: STUJO_PINK }}></div>
@@ -39,7 +41,7 @@ const JobTileComponent: FC<JobTileProps> = ({ job }) => {
       <div
         className="absolute inset-0"
         style={{
-          background: 'linear-gradient(0deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0) 45%)',
+          background: 'linear-gradient(0deg, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0) 62%)',
         }}
       ></div>
     </>
@@ -49,7 +51,10 @@ const JobTileComponent: FC<JobTileProps> = ({ job }) => {
     <a href={stujoJobUrl(job.id)} target="_blank" rel="noopener noreferrer" className="block">
       <TileBase coverImage={null} title={job.title} imageArea={imageArea} cornerBadge={<StujoSign />}>
         <div className="flex justify-between items-center gap-2 mb-3 text-sm text-label-primary">
-          <span className="rounded-full bg-fill-secondary px-2 py-0.5 text-xs font-semibold text-label-secondary truncate">
+          <span
+            className="rounded-full px-2 py-0.5 text-xs font-semibold text-white truncate"
+            style={{ backgroundColor: STUJO_PINK }}
+          >
             {t(`type.${job.type}`)}
           </span>
           {publishedLabel && (
@@ -59,14 +64,13 @@ const JobTileComponent: FC<JobTileProps> = ({ job }) => {
             </span>
           )}
         </div>
-        <span className="text-lg mb-auto line-clamp-2 text-label-primary">{job.Organization.name}</span>
+        <span className="text-lg font-bold mb-auto line-clamp-2 text-label-primary">
+          {job.Organization.name}
+        </span>
         {locationLine ? <span className="text-sm text-label-secondary mb-3 truncate">{locationLine}</span> : null}
         <div className="flex justify-between items-center gap-2 text-xs text-label-secondary">
           <span className="truncate">{t(`occupation.${job.occupation}`)}</span>
-          <span className="flex items-center gap-1 shrink-0 font-semibold text-brand">
-            {t('view_on_stujo')}
-            <span aria-hidden>→</span>
-          </span>
+          <ArrowRight size={16} className="shrink-0" style={{ color: STUJO_PINK }} aria-hidden />
         </div>
       </TileBase>
     </a>

@@ -17,12 +17,20 @@ export const resolveStujoLogoUrl = (pathOrUrl: string | null | undefined): strin
 };
 
 /**
- * Formats a job posting's published timestamp as a short month + year label,
- * e.g. "Mar 2025" / "März 2025". Returns null when there is no valid date.
+ * Formats a job posting's published timestamp as an exact calendar date,
+ * e.g. "08.07.2026" (de) / "07/08/2026" (en). The timezone is pinned to
+ * Europe/Berlin so the server (UTC) and client render the same day for
+ * timestamps near midnight UTC (avoids a React hydration mismatch). Returns
+ * null when there is no valid date.
  */
 export const formatPublishedDate = (publishedAt: string | null | undefined, locale: string): string | null => {
   if (!publishedAt) return null;
   const date = new Date(publishedAt);
   if (Number.isNaN(date.getTime())) return null;
-  return date.toLocaleDateString(locale === 'de' ? 'de-DE' : 'en-US', { month: 'short', year: 'numeric' });
+  return date.toLocaleDateString(locale === 'de' ? 'de-DE' : 'en-US', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    timeZone: 'Europe/Berlin',
+  });
 };

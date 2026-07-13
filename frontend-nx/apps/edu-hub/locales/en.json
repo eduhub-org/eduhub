@@ -2709,7 +2709,6 @@
     "load_error": "Could not load this project. Please try again later."
   },
   "job": {
-    "view_on_stujo": "View on StuJo",
     "published_on": "Published {date}",
     "type": {
       "MINIJOB": "Mini jobs",

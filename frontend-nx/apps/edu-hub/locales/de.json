@@ -2694,7 +2694,6 @@
     "load_error": "Dieses Projekt konnte nicht geladen werden. Bitte versuche es später erneut."
   },
   "job": {
-    "view_on_stujo": "Auf StuJo ansehen",
     "published_on": "Eingestellt {date}",
     "type": {
       "MINIJOB": "Minijobs",
