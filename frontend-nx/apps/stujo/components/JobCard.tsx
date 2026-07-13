@@ -4,8 +4,13 @@ import { useTranslations } from 'next-intl';
 
 import type { JobListItem } from '../lib/jobs';
 
+// Pin the timezone so server (UTC) and client (local) render the same
+// calendar day; otherwise timestamps near midnight UTC hydrate as off-by-one
+// dates (React hydration mismatch).
 const formatDate = (value: string | null) =>
-  value ? new Date(value).toLocaleDateString('de-DE') : null;
+  value
+    ? new Date(value).toLocaleDateString('de-DE', { timeZone: 'Europe/Berlin' })
+    : null;
 
 /**
  * One job row, styled like the live /stellenangebote list: pink h3 title,

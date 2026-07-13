@@ -29,8 +29,13 @@ const STATUS_CLASSNAMES: Record<string, string> = {
   ARCHIVED: 'stujo-chip stujo-chip--grey',
 };
 
+// Pin the timezone so server (UTC) and client (local) render the same
+// calendar day; otherwise timestamps near midnight UTC hydrate as off-by-one
+// dates (React hydration mismatch).
 const formatDate = (value: string | null) =>
-  value ? new Date(value).toLocaleDateString('de-DE') : '–';
+  value
+    ? new Date(value).toLocaleDateString('de-DE', { timeZone: 'Europe/Berlin' })
+    : '–';
 
 /**
  * Employer dashboard ("Mein StuJo") — postings table, stats and the
