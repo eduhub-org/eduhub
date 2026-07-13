@@ -251,6 +251,41 @@ export enum AchievementRecord_update_column {
 }
 
 /**
+ * unique or primary key constraints on table "AppSettings"
+ */
+export enum AppSettings_constraint {
+  AppSettings_app_key = "AppSettings_app_key",
+  AppSettings_domain_unique = "AppSettings_domain_unique",
+  AppSettings_pkey = "AppSettings_pkey",
+}
+
+/**
+ * update columns of table "AppSettings"
+ */
+export enum AppSettings_update_column {
+  appName = "appName",
+  backgroundImageURL = "backgroundImageURL",
+  bannerBackgroundColor = "bannerBackgroundColor",
+  bannerFontColor = "bannerFontColor",
+  bannerTextDe = "bannerTextDe",
+  bannerTextEn = "bannerTextEn",
+  created_at = "created_at",
+  defaultLocale = "defaultLocale",
+  domain = "domain",
+  faqCollectionName = "faqCollectionName",
+  faviconUrl = "faviconUrl",
+  imprintUrl = "imprintUrl",
+  logoUrl = "logoUrl",
+  previewImageURL = "previewImageURL",
+  primaryColor = "primaryColor",
+  privacyUrl = "privacyUrl",
+  secondaryColor = "secondaryColor",
+  showFaqSection = "showFaqSection",
+  timeZone = "timeZone",
+  updated_at = "updated_at",
+}
+
+/**
  * unique or primary key constraints on table "AttendanceSource"
  */
 export enum AttendanceSource_constraint {
@@ -949,6 +984,7 @@ export enum Invoice_select_column {
   id = "id",
   invoiceDate = "invoiceDate",
   invoiceNumber = "invoiceNumber",
+  jobPostingId = "jobPostingId",
   netTotal = "netTotal",
   notes = "notes",
   organizationId = "organizationId",
@@ -974,6 +1010,7 @@ export enum Invoice_update_column {
   id = "id",
   invoiceDate = "invoiceDate",
   invoiceNumber = "invoiceNumber",
+  jobPostingId = "jobPostingId",
   netTotal = "netTotal",
   notes = "notes",
   organizationId = "organizationId",
@@ -986,6 +1023,370 @@ export enum Invoice_update_column {
   updated_at = "updated_at",
   userId = "userId",
   vatTotal = "vatTotal",
+}
+
+/**
+ * unique or primary key constraints on table "JobOccupation"
+ */
+export enum JobOccupation_constraint {
+  JobOccupation_pkey = "JobOccupation_pkey",
+}
+
+export enum JobOccupation_enum {
+  ACCOUNTING = "ACCOUNTING",
+  ADMINISTRATION = "ADMINISTRATION",
+  AGRICULTURE_ENVIRONMENT = "AGRICULTURE_ENVIRONMENT",
+  ARTS_CULTURE = "ARTS_CULTURE",
+  BANKING_INSURANCE = "BANKING_INSURANCE",
+  CONSULTING = "CONSULTING",
+  CUSTOMER_SERVICE = "CUSTOMER_SERVICE",
+  DESIGN_ARCHITECTURE = "DESIGN_ARCHITECTURE",
+  EDUCATION_TRAINING = "EDUCATION_TRAINING",
+  ENGINEERING = "ENGINEERING",
+  EVENT_MANAGEMENT = "EVENT_MANAGEMENT",
+  HEALTH_SOCIAL = "HEALTH_SOCIAL",
+  HOSPITALITY = "HOSPITALITY",
+  HUMAN_RESOURCES = "HUMAN_RESOURCES",
+  IT_TELECOMMUNICATIONS = "IT_TELECOMMUNICATIONS",
+  LEGAL = "LEGAL",
+  MAINTENANCE = "MAINTENANCE",
+  MANAGEMENT = "MANAGEMENT",
+  MANUFACTURING_CONSTRUCTION = "MANUFACTURING_CONSTRUCTION",
+  MARKETING_ADVERTISING = "MARKETING_ADVERTISING",
+  MEDIA_EDITORIAL = "MEDIA_EDITORIAL",
+  OTHER = "OTHER",
+  PRODUCTION = "PRODUCTION",
+  PROJECT_MANAGEMENT = "PROJECT_MANAGEMENT",
+  PUBLIC_SERVICE = "PUBLIC_SERVICE",
+  PURCHASING_LOGISTICS = "PURCHASING_LOGISTICS",
+  QUALITY_MANAGEMENT = "QUALITY_MANAGEMENT",
+  REAL_ESTATE = "REAL_ESTATE",
+  RESEARCH_SCIENCE = "RESEARCH_SCIENCE",
+  SALES_RETAIL = "SALES_RETAIL",
+  SECURITY_CIVIL_PROTECTION = "SECURITY_CIVIL_PROTECTION",
+  SOCIAL_MEDIA = "SOCIAL_MEDIA",
+  SOCIAL_PEDAGOGY = "SOCIAL_PEDAGOGY",
+  TOURISM = "TOURISM",
+}
+
+/**
+ * update columns of table "JobOccupation"
+ */
+export enum JobOccupation_update_column {
+  comment = "comment",
+  value = "value",
+}
+
+/**
+ * unique or primary key constraints on table "JobPortal"
+ */
+export enum JobPortal_constraint {
+  JobPortal_pkey = "JobPortal_pkey",
+  JobPortal_slug_key = "JobPortal_slug_key",
+}
+
+/**
+ * select columns of table "JobPortal"
+ */
+export enum JobPortal_select_column {
+  appName = "appName",
+  contactEmail = "contactEmail",
+  created_at = "created_at",
+  defaultRegion = "defaultRegion",
+  id = "id",
+  organizationId = "organizationId",
+  slug = "slug",
+  title = "title",
+  updated_at = "updated_at",
+}
+
+/**
+ * update columns of table "JobPortal"
+ */
+export enum JobPortal_update_column {
+  appName = "appName",
+  contactEmail = "contactEmail",
+  created_at = "created_at",
+  defaultRegion = "defaultRegion",
+  id = "id",
+  organizationId = "organizationId",
+  slug = "slug",
+  title = "title",
+  updated_at = "updated_at",
+}
+
+/**
+ * unique or primary key constraints on table "JobPostingCredit"
+ */
+export enum JobPostingCredit_constraint {
+  JobPostingCredit_organizationId_jobPostingType_key = "JobPostingCredit_organizationId_jobPostingType_key",
+  JobPostingCredit_pkey = "JobPostingCredit_pkey",
+}
+
+/**
+ * select columns of table "JobPostingCredit"
+ */
+export enum JobPostingCredit_select_column {
+  created_at = "created_at",
+  id = "id",
+  jobPostingType = "jobPostingType",
+  organizationId = "organizationId",
+  remaining = "remaining",
+  updated_at = "updated_at",
+}
+
+/**
+ * update columns of table "JobPostingCredit"
+ */
+export enum JobPostingCredit_update_column {
+  created_at = "created_at",
+  id = "id",
+  jobPostingType = "jobPostingType",
+  organizationId = "organizationId",
+  remaining = "remaining",
+  updated_at = "updated_at",
+}
+
+/**
+ * unique or primary key constraints on table "JobPostingPrice"
+ */
+export enum JobPostingPrice_constraint {
+  JobPostingPrice_jobPostingType_key = "JobPostingPrice_jobPostingType_key",
+  JobPostingPrice_pkey = "JobPostingPrice_pkey",
+}
+
+/**
+ * select columns of table "JobPostingPrice"
+ */
+export enum JobPostingPrice_select_column {
+  created_at = "created_at",
+  currency = "currency",
+  durationDays = "durationDays",
+  id = "id",
+  jobPostingType = "jobPostingType",
+  price = "price",
+  stripePriceId = "stripePriceId",
+  updated_at = "updated_at",
+  vatRate = "vatRate",
+}
+
+/**
+ * update columns of table "JobPostingPrice"
+ */
+export enum JobPostingPrice_update_column {
+  created_at = "created_at",
+  currency = "currency",
+  durationDays = "durationDays",
+  id = "id",
+  jobPostingType = "jobPostingType",
+  price = "price",
+  stripePriceId = "stripePriceId",
+  updated_at = "updated_at",
+  vatRate = "vatRate",
+}
+
+/**
+ * unique or primary key constraints on table "JobPostingStatus"
+ */
+export enum JobPostingStatus_constraint {
+  JobPostingStatus_pkey = "JobPostingStatus_pkey",
+}
+
+export enum JobPostingStatus_enum {
+  ARCHIVED = "ARCHIVED",
+  DRAFT = "DRAFT",
+  EXPIRED = "EXPIRED",
+  PENDING_PAYMENT = "PENDING_PAYMENT",
+  PUBLISHED = "PUBLISHED",
+}
+
+/**
+ * update columns of table "JobPostingStatus"
+ */
+export enum JobPostingStatus_update_column {
+  comment = "comment",
+  value = "value",
+}
+
+/**
+ * unique or primary key constraints on table "JobPostingTag"
+ */
+export enum JobPostingTag_constraint {
+  JobPostingTag_jobPostingId_name_key = "JobPostingTag_jobPostingId_name_key",
+  JobPostingTag_pkey = "JobPostingTag_pkey",
+}
+
+/**
+ * select columns of table "JobPostingTag"
+ */
+export enum JobPostingTag_select_column {
+  created_at = "created_at",
+  id = "id",
+  jobPostingId = "jobPostingId",
+  name = "name",
+  updated_at = "updated_at",
+}
+
+/**
+ * update columns of table "JobPostingTag"
+ */
+export enum JobPostingTag_update_column {
+  created_at = "created_at",
+  id = "id",
+  jobPostingId = "jobPostingId",
+  name = "name",
+  updated_at = "updated_at",
+}
+
+/**
+ * unique or primary key constraints on table "JobPostingType"
+ */
+export enum JobPostingType_constraint {
+  JobPostingType_pkey = "JobPostingType_pkey",
+}
+
+export enum JobPostingType_enum {
+  INTERNSHIP = "INTERNSHIP",
+  MINIJOB = "MINIJOB",
+  PERMANENT = "PERMANENT",
+  STATE_RECOGNITION_INTERNSHIP = "STATE_RECOGNITION_INTERNSHIP",
+  THESIS = "THESIS",
+  TRAINEE = "TRAINEE",
+  WORKING_STUDENT = "WORKING_STUDENT",
+}
+
+/**
+ * update columns of table "JobPostingType"
+ */
+export enum JobPostingType_update_column {
+  comment = "comment",
+  value = "value",
+}
+
+/**
+ * unique or primary key constraints on table "JobPosting"
+ */
+export enum JobPosting_constraint {
+  JobPosting_legacyStujoId_key = "JobPosting_legacyStujoId_key",
+  JobPosting_pkey = "JobPosting_pkey",
+}
+
+/**
+ * select columns of table "JobPosting"
+ */
+export enum JobPosting_select_column {
+  applicationDeadline = "applicationDeadline",
+  contactUserId = "contactUserId",
+  created_at = "created_at",
+  customCompany = "customCompany",
+  description = "description",
+  durationText = "durationText",
+  expiresAt = "expiresAt",
+  featured = "featured",
+  hoursPerWeek = "hoursPerWeek",
+  id = "id",
+  international = "international",
+  internationalDescription = "internationalDescription",
+  language = "language",
+  legacyStujoId = "legacyStujoId",
+  location = "location",
+  occupation = "occupation",
+  organizationId = "organizationId",
+  pdfUrl = "pdfUrl",
+  publishedAt = "publishedAt",
+  region = "region",
+  requirement = "requirement",
+  restrictedToOrganizationId = "restrictedToOrganizationId",
+  salaryText = "salaryText",
+  shortDescription = "shortDescription",
+  slug = "slug",
+  startText = "startText",
+  status = "status",
+  title = "title",
+  type = "type",
+  updated_at = "updated_at",
+  views = "views",
+  workExperienceRequired = "workExperienceRequired",
+}
+
+/**
+ * select "JobPosting_aggregate_bool_exp_bool_and_arguments_columns" columns of table "JobPosting"
+ */
+export enum JobPosting_select_column_JobPosting_aggregate_bool_exp_bool_and_arguments_columns {
+  featured = "featured",
+  international = "international",
+  workExperienceRequired = "workExperienceRequired",
+}
+
+/**
+ * select "JobPosting_aggregate_bool_exp_bool_or_arguments_columns" columns of table "JobPosting"
+ */
+export enum JobPosting_select_column_JobPosting_aggregate_bool_exp_bool_or_arguments_columns {
+  featured = "featured",
+  international = "international",
+  workExperienceRequired = "workExperienceRequired",
+}
+
+/**
+ * update columns of table "JobPosting"
+ */
+export enum JobPosting_update_column {
+  applicationDeadline = "applicationDeadline",
+  contactUserId = "contactUserId",
+  created_at = "created_at",
+  customCompany = "customCompany",
+  description = "description",
+  durationText = "durationText",
+  expiresAt = "expiresAt",
+  featured = "featured",
+  hoursPerWeek = "hoursPerWeek",
+  id = "id",
+  international = "international",
+  internationalDescription = "internationalDescription",
+  language = "language",
+  legacyStujoId = "legacyStujoId",
+  location = "location",
+  occupation = "occupation",
+  organizationId = "organizationId",
+  pdfUrl = "pdfUrl",
+  publishedAt = "publishedAt",
+  region = "region",
+  requirement = "requirement",
+  restrictedToOrganizationId = "restrictedToOrganizationId",
+  salaryText = "salaryText",
+  shortDescription = "shortDescription",
+  slug = "slug",
+  startText = "startText",
+  status = "status",
+  title = "title",
+  type = "type",
+  updated_at = "updated_at",
+  views = "views",
+  workExperienceRequired = "workExperienceRequired",
+}
+
+/**
+ * unique or primary key constraints on table "JobRegion"
+ */
+export enum JobRegion_constraint {
+  JobRegion_pkey = "JobRegion_pkey",
+}
+
+export enum JobRegion_enum {
+  ABROAD = "ABROAD",
+  DENMARK = "DENMARK",
+  FLENSBURG = "FLENSBURG",
+  GERMANY = "GERMANY",
+  KIEL = "KIEL",
+  SCHLESWIG_HOLSTEIN_HAMBURG = "SCHLESWIG_HOLSTEIN_HAMBURG",
+}
+
+/**
+ * update columns of table "JobRegion"
+ */
+export enum JobRegion_update_column {
+  comment = "comment",
+  value = "value",
 }
 
 /**
@@ -1098,6 +1499,7 @@ export enum OrganizationAdmin_select_column {
   canManageCourses = "canManageCourses",
   canManageDegrees = "canManageDegrees",
   canManageEvents = "canManageEvents",
+  canManageJobs = "canManageJobs",
   canManageSettings = "canManageSettings",
   created_at = "created_at",
   id = "id",
@@ -1113,6 +1515,7 @@ export enum OrganizationAdmin_select_column_OrganizationAdmin_aggregate_bool_exp
   canManageCourses = "canManageCourses",
   canManageDegrees = "canManageDegrees",
   canManageEvents = "canManageEvents",
+  canManageJobs = "canManageJobs",
   canManageSettings = "canManageSettings",
 }
 
@@ -1123,6 +1526,7 @@ export enum OrganizationAdmin_select_column_OrganizationAdmin_aggregate_bool_exp
   canManageCourses = "canManageCourses",
   canManageDegrees = "canManageDegrees",
   canManageEvents = "canManageEvents",
+  canManageJobs = "canManageJobs",
   canManageSettings = "canManageSettings",
 }
 
@@ -1133,6 +1537,7 @@ export enum OrganizationAdmin_update_column {
   canManageCourses = "canManageCourses",
   canManageDegrees = "canManageDegrees",
   canManageEvents = "canManageEvents",
+  canManageJobs = "canManageJobs",
   canManageSettings = "canManageSettings",
   created_at = "created_at",
   id = "id",
@@ -1960,6 +2365,36 @@ export enum Project_update_column {
   title = "title",
   type = "type",
   updated_at = "updated_at",
+}
+
+/**
+ * unique or primary key constraints on table "SavedJobPosting"
+ */
+export enum SavedJobPosting_constraint {
+  SavedJobPosting_pkey = "SavedJobPosting_pkey",
+  SavedJobPosting_userId_jobPostingId_key = "SavedJobPosting_userId_jobPostingId_key",
+}
+
+/**
+ * select columns of table "SavedJobPosting"
+ */
+export enum SavedJobPosting_select_column {
+  created_at = "created_at",
+  id = "id",
+  jobPostingId = "jobPostingId",
+  updated_at = "updated_at",
+  userId = "userId",
+}
+
+/**
+ * update columns of table "SavedJobPosting"
+ */
+export enum SavedJobPosting_update_column {
+  created_at = "created_at",
+  id = "id",
+  jobPostingId = "jobPostingId",
+  updated_at = "updated_at",
+  userId = "userId",
 }
 
 /**
@@ -3067,6 +3502,78 @@ export interface AddonMappingInput {
   stripePriceId?: string | null;
   stripeProductId?: string | null;
   validatedPrice: number;
+}
+
+/**
+ * Boolean expression to filter rows from the table "AppSettings". All fields are combined with a logical 'AND'.
+ */
+export interface AppSettings_bool_exp {
+  _and?: AppSettings_bool_exp[] | null;
+  _not?: AppSettings_bool_exp | null;
+  _or?: AppSettings_bool_exp[] | null;
+  appName?: String_comparison_exp | null;
+  backgroundImageURL?: String_comparison_exp | null;
+  bannerBackgroundColor?: String_comparison_exp | null;
+  bannerFontColor?: String_comparison_exp | null;
+  bannerTextDe?: String_comparison_exp | null;
+  bannerTextEn?: String_comparison_exp | null;
+  created_at?: timestamptz_comparison_exp | null;
+  defaultLocale?: String_comparison_exp | null;
+  domain?: String_comparison_exp | null;
+  faqCollectionName?: String_comparison_exp | null;
+  faviconUrl?: String_comparison_exp | null;
+  imprintUrl?: String_comparison_exp | null;
+  logoUrl?: String_comparison_exp | null;
+  previewImageURL?: String_comparison_exp | null;
+  primaryColor?: String_comparison_exp | null;
+  privacyUrl?: String_comparison_exp | null;
+  secondaryColor?: String_comparison_exp | null;
+  showFaqSection?: Boolean_comparison_exp | null;
+  timeZone?: String_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "AppSettings"
+ */
+export interface AppSettings_insert_input {
+  appName?: string | null;
+  backgroundImageURL?: string | null;
+  bannerBackgroundColor?: string | null;
+  bannerFontColor?: string | null;
+  bannerTextDe?: string | null;
+  bannerTextEn?: string | null;
+  created_at?: any | null;
+  defaultLocale?: string | null;
+  domain?: string | null;
+  faqCollectionName?: string | null;
+  faviconUrl?: string | null;
+  imprintUrl?: string | null;
+  logoUrl?: string | null;
+  previewImageURL?: string | null;
+  primaryColor?: string | null;
+  privacyUrl?: string | null;
+  secondaryColor?: string | null;
+  showFaqSection?: boolean | null;
+  timeZone?: string | null;
+  updated_at?: any | null;
+}
+
+/**
+ * input type for inserting object relation for remote table "AppSettings"
+ */
+export interface AppSettings_obj_rel_insert_input {
+  data: AppSettings_insert_input;
+  on_conflict?: AppSettings_on_conflict | null;
+}
+
+/**
+ * on_conflict condition type for table "AppSettings"
+ */
+export interface AppSettings_on_conflict {
+  constraint: AppSettings_constraint;
+  update_columns: AppSettings_update_column[];
+  where?: AppSettings_bool_exp | null;
 }
 
 /**
@@ -6052,6 +6559,7 @@ export interface Invoice_avg_order_by {
   courseEnrollmentId?: order_by | null;
   grossTotal?: order_by | null;
   id?: order_by | null;
+  jobPostingId?: order_by | null;
   netTotal?: order_by | null;
   organizationId?: order_by | null;
   vatTotal?: order_by | null;
@@ -6063,6 +6571,7 @@ export interface Invoice_avg_order_by {
 export interface Invoice_bool_exp {
   CourseEnrollment?: CourseEnrollment_bool_exp | null;
   InvoiceStatus?: InvoiceStatus_bool_exp | null;
+  JobPosting?: JobPosting_bool_exp | null;
   Organization?: Organization_bool_exp | null;
   User?: User_bool_exp | null;
   _and?: Invoice_bool_exp[] | null;
@@ -6075,6 +6584,7 @@ export interface Invoice_bool_exp {
   id?: Int_comparison_exp | null;
   invoiceDate?: date_comparison_exp | null;
   invoiceNumber?: String_comparison_exp | null;
+  jobPostingId?: Int_comparison_exp | null;
   netTotal?: Int_comparison_exp | null;
   notes?: String_comparison_exp | null;
   organizationId?: Int_comparison_exp | null;
@@ -6095,6 +6605,7 @@ export interface Invoice_bool_exp {
 export interface Invoice_insert_input {
   CourseEnrollment?: CourseEnrollment_obj_rel_insert_input | null;
   InvoiceStatus?: InvoiceStatus_obj_rel_insert_input | null;
+  JobPosting?: JobPosting_obj_rel_insert_input | null;
   Organization?: Organization_obj_rel_insert_input | null;
   User?: User_obj_rel_insert_input | null;
   courseEnrollmentId?: number | null;
@@ -6104,6 +6615,7 @@ export interface Invoice_insert_input {
   id?: number | null;
   invoiceDate?: any | null;
   invoiceNumber?: string | null;
+  jobPostingId?: number | null;
   netTotal?: number | null;
   notes?: string | null;
   organizationId?: number | null;
@@ -6129,6 +6641,7 @@ export interface Invoice_max_order_by {
   id?: order_by | null;
   invoiceDate?: order_by | null;
   invoiceNumber?: order_by | null;
+  jobPostingId?: order_by | null;
   netTotal?: order_by | null;
   notes?: order_by | null;
   organizationId?: order_by | null;
@@ -6153,6 +6666,7 @@ export interface Invoice_min_order_by {
   id?: order_by | null;
   invoiceDate?: order_by | null;
   invoiceNumber?: order_by | null;
+  jobPostingId?: order_by | null;
   netTotal?: order_by | null;
   notes?: order_by | null;
   organizationId?: order_by | null;
@@ -6182,6 +6696,7 @@ export interface Invoice_stddev_order_by {
   courseEnrollmentId?: order_by | null;
   grossTotal?: order_by | null;
   id?: order_by | null;
+  jobPostingId?: order_by | null;
   netTotal?: order_by | null;
   organizationId?: order_by | null;
   vatTotal?: order_by | null;
@@ -6194,6 +6709,7 @@ export interface Invoice_stddev_pop_order_by {
   courseEnrollmentId?: order_by | null;
   grossTotal?: order_by | null;
   id?: order_by | null;
+  jobPostingId?: order_by | null;
   netTotal?: order_by | null;
   organizationId?: order_by | null;
   vatTotal?: order_by | null;
@@ -6206,6 +6722,7 @@ export interface Invoice_stddev_samp_order_by {
   courseEnrollmentId?: order_by | null;
   grossTotal?: order_by | null;
   id?: order_by | null;
+  jobPostingId?: order_by | null;
   netTotal?: order_by | null;
   organizationId?: order_by | null;
   vatTotal?: order_by | null;
@@ -6218,6 +6735,7 @@ export interface Invoice_sum_order_by {
   courseEnrollmentId?: order_by | null;
   grossTotal?: order_by | null;
   id?: order_by | null;
+  jobPostingId?: order_by | null;
   netTotal?: order_by | null;
   organizationId?: order_by | null;
   vatTotal?: order_by | null;
@@ -6230,6 +6748,7 @@ export interface Invoice_var_pop_order_by {
   courseEnrollmentId?: order_by | null;
   grossTotal?: order_by | null;
   id?: order_by | null;
+  jobPostingId?: order_by | null;
   netTotal?: order_by | null;
   organizationId?: order_by | null;
   vatTotal?: order_by | null;
@@ -6242,6 +6761,7 @@ export interface Invoice_var_samp_order_by {
   courseEnrollmentId?: order_by | null;
   grossTotal?: order_by | null;
   id?: order_by | null;
+  jobPostingId?: order_by | null;
   netTotal?: order_by | null;
   organizationId?: order_by | null;
   vatTotal?: order_by | null;
@@ -6254,9 +6774,1004 @@ export interface Invoice_variance_order_by {
   courseEnrollmentId?: order_by | null;
   grossTotal?: order_by | null;
   id?: order_by | null;
+  jobPostingId?: order_by | null;
   netTotal?: order_by | null;
   organizationId?: order_by | null;
   vatTotal?: order_by | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "JobOccupation". All fields are combined with a logical 'AND'.
+ */
+export interface JobOccupation_bool_exp {
+  JobPostings?: JobPosting_bool_exp | null;
+  JobPostings_aggregate?: JobPosting_aggregate_bool_exp | null;
+  _and?: JobOccupation_bool_exp[] | null;
+  _not?: JobOccupation_bool_exp | null;
+  _or?: JobOccupation_bool_exp[] | null;
+  comment?: String_comparison_exp | null;
+  value?: String_comparison_exp | null;
+}
+
+/**
+ * Boolean expression to compare columns of type "JobOccupation_enum". All fields are combined with logical 'AND'.
+ */
+export interface JobOccupation_enum_comparison_exp {
+  _eq?: JobOccupation_enum | null;
+  _in?: JobOccupation_enum[] | null;
+  _is_null?: boolean | null;
+  _neq?: JobOccupation_enum | null;
+  _nin?: JobOccupation_enum[] | null;
+}
+
+/**
+ * input type for inserting data into table "JobOccupation"
+ */
+export interface JobOccupation_insert_input {
+  JobPostings?: JobPosting_arr_rel_insert_input | null;
+  comment?: string | null;
+  value?: string | null;
+}
+
+/**
+ * input type for inserting object relation for remote table "JobOccupation"
+ */
+export interface JobOccupation_obj_rel_insert_input {
+  data: JobOccupation_insert_input;
+  on_conflict?: JobOccupation_on_conflict | null;
+}
+
+/**
+ * on_conflict condition type for table "JobOccupation"
+ */
+export interface JobOccupation_on_conflict {
+  constraint: JobOccupation_constraint;
+  update_columns: JobOccupation_update_column[];
+  where?: JobOccupation_bool_exp | null;
+}
+
+export interface JobPortal_aggregate_bool_exp {
+  count?: JobPortal_aggregate_bool_exp_count | null;
+}
+
+export interface JobPortal_aggregate_bool_exp_count {
+  arguments?: JobPortal_select_column[] | null;
+  distinct?: boolean | null;
+  filter?: JobPortal_bool_exp | null;
+  predicate: Int_comparison_exp;
+}
+
+/**
+ * order by aggregate values of table "JobPortal"
+ */
+export interface JobPortal_aggregate_order_by {
+  avg?: JobPortal_avg_order_by | null;
+  count?: order_by | null;
+  max?: JobPortal_max_order_by | null;
+  min?: JobPortal_min_order_by | null;
+  stddev?: JobPortal_stddev_order_by | null;
+  stddev_pop?: JobPortal_stddev_pop_order_by | null;
+  stddev_samp?: JobPortal_stddev_samp_order_by | null;
+  sum?: JobPortal_sum_order_by | null;
+  var_pop?: JobPortal_var_pop_order_by | null;
+  var_samp?: JobPortal_var_samp_order_by | null;
+  variance?: JobPortal_variance_order_by | null;
+}
+
+/**
+ * input type for inserting array relation for remote table "JobPortal"
+ */
+export interface JobPortal_arr_rel_insert_input {
+  data: JobPortal_insert_input[];
+  on_conflict?: JobPortal_on_conflict | null;
+}
+
+/**
+ * order by avg() on columns of table "JobPortal"
+ */
+export interface JobPortal_avg_order_by {
+  id?: order_by | null;
+  organizationId?: order_by | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "JobPortal". All fields are combined with a logical 'AND'.
+ */
+export interface JobPortal_bool_exp {
+  AppSetting?: AppSettings_bool_exp | null;
+  Organization?: Organization_bool_exp | null;
+  _and?: JobPortal_bool_exp[] | null;
+  _not?: JobPortal_bool_exp | null;
+  _or?: JobPortal_bool_exp[] | null;
+  appName?: String_comparison_exp | null;
+  contactEmail?: String_comparison_exp | null;
+  created_at?: timestamptz_comparison_exp | null;
+  defaultRegion?: JobRegion_enum_comparison_exp | null;
+  id?: Int_comparison_exp | null;
+  organizationId?: Int_comparison_exp | null;
+  slug?: String_comparison_exp | null;
+  title?: String_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "JobPortal"
+ */
+export interface JobPortal_insert_input {
+  AppSetting?: AppSettings_obj_rel_insert_input | null;
+  Organization?: Organization_obj_rel_insert_input | null;
+  appName?: string | null;
+  contactEmail?: string | null;
+  created_at?: any | null;
+  defaultRegion?: JobRegion_enum | null;
+  id?: number | null;
+  organizationId?: number | null;
+  slug?: string | null;
+  title?: string | null;
+  updated_at?: any | null;
+}
+
+/**
+ * order by max() on columns of table "JobPortal"
+ */
+export interface JobPortal_max_order_by {
+  appName?: order_by | null;
+  contactEmail?: order_by | null;
+  created_at?: order_by | null;
+  id?: order_by | null;
+  organizationId?: order_by | null;
+  slug?: order_by | null;
+  title?: order_by | null;
+  updated_at?: order_by | null;
+}
+
+/**
+ * order by min() on columns of table "JobPortal"
+ */
+export interface JobPortal_min_order_by {
+  appName?: order_by | null;
+  contactEmail?: order_by | null;
+  created_at?: order_by | null;
+  id?: order_by | null;
+  organizationId?: order_by | null;
+  slug?: order_by | null;
+  title?: order_by | null;
+  updated_at?: order_by | null;
+}
+
+/**
+ * on_conflict condition type for table "JobPortal"
+ */
+export interface JobPortal_on_conflict {
+  constraint: JobPortal_constraint;
+  update_columns: JobPortal_update_column[];
+  where?: JobPortal_bool_exp | null;
+}
+
+/**
+ * order by stddev() on columns of table "JobPortal"
+ */
+export interface JobPortal_stddev_order_by {
+  id?: order_by | null;
+  organizationId?: order_by | null;
+}
+
+/**
+ * order by stddev_pop() on columns of table "JobPortal"
+ */
+export interface JobPortal_stddev_pop_order_by {
+  id?: order_by | null;
+  organizationId?: order_by | null;
+}
+
+/**
+ * order by stddev_samp() on columns of table "JobPortal"
+ */
+export interface JobPortal_stddev_samp_order_by {
+  id?: order_by | null;
+  organizationId?: order_by | null;
+}
+
+/**
+ * order by sum() on columns of table "JobPortal"
+ */
+export interface JobPortal_sum_order_by {
+  id?: order_by | null;
+  organizationId?: order_by | null;
+}
+
+/**
+ * order by var_pop() on columns of table "JobPortal"
+ */
+export interface JobPortal_var_pop_order_by {
+  id?: order_by | null;
+  organizationId?: order_by | null;
+}
+
+/**
+ * order by var_samp() on columns of table "JobPortal"
+ */
+export interface JobPortal_var_samp_order_by {
+  id?: order_by | null;
+  organizationId?: order_by | null;
+}
+
+/**
+ * order by variance() on columns of table "JobPortal"
+ */
+export interface JobPortal_variance_order_by {
+  id?: order_by | null;
+  organizationId?: order_by | null;
+}
+
+export interface JobPostingCredit_aggregate_bool_exp {
+  count?: JobPostingCredit_aggregate_bool_exp_count | null;
+}
+
+export interface JobPostingCredit_aggregate_bool_exp_count {
+  arguments?: JobPostingCredit_select_column[] | null;
+  distinct?: boolean | null;
+  filter?: JobPostingCredit_bool_exp | null;
+  predicate: Int_comparison_exp;
+}
+
+/**
+ * order by aggregate values of table "JobPostingCredit"
+ */
+export interface JobPostingCredit_aggregate_order_by {
+  avg?: JobPostingCredit_avg_order_by | null;
+  count?: order_by | null;
+  max?: JobPostingCredit_max_order_by | null;
+  min?: JobPostingCredit_min_order_by | null;
+  stddev?: JobPostingCredit_stddev_order_by | null;
+  stddev_pop?: JobPostingCredit_stddev_pop_order_by | null;
+  stddev_samp?: JobPostingCredit_stddev_samp_order_by | null;
+  sum?: JobPostingCredit_sum_order_by | null;
+  var_pop?: JobPostingCredit_var_pop_order_by | null;
+  var_samp?: JobPostingCredit_var_samp_order_by | null;
+  variance?: JobPostingCredit_variance_order_by | null;
+}
+
+/**
+ * input type for inserting array relation for remote table "JobPostingCredit"
+ */
+export interface JobPostingCredit_arr_rel_insert_input {
+  data: JobPostingCredit_insert_input[];
+  on_conflict?: JobPostingCredit_on_conflict | null;
+}
+
+/**
+ * order by avg() on columns of table "JobPostingCredit"
+ */
+export interface JobPostingCredit_avg_order_by {
+  id?: order_by | null;
+  organizationId?: order_by | null;
+  remaining?: order_by | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "JobPostingCredit". All fields are combined with a logical 'AND'.
+ */
+export interface JobPostingCredit_bool_exp {
+  JobPostingType?: JobPostingType_bool_exp | null;
+  Organization?: Organization_bool_exp | null;
+  _and?: JobPostingCredit_bool_exp[] | null;
+  _not?: JobPostingCredit_bool_exp | null;
+  _or?: JobPostingCredit_bool_exp[] | null;
+  created_at?: timestamptz_comparison_exp | null;
+  id?: Int_comparison_exp | null;
+  jobPostingType?: JobPostingType_enum_comparison_exp | null;
+  organizationId?: Int_comparison_exp | null;
+  remaining?: Int_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "JobPostingCredit"
+ */
+export interface JobPostingCredit_insert_input {
+  JobPostingType?: JobPostingType_obj_rel_insert_input | null;
+  Organization?: Organization_obj_rel_insert_input | null;
+  created_at?: any | null;
+  id?: number | null;
+  jobPostingType?: JobPostingType_enum | null;
+  organizationId?: number | null;
+  remaining?: number | null;
+  updated_at?: any | null;
+}
+
+/**
+ * order by max() on columns of table "JobPostingCredit"
+ */
+export interface JobPostingCredit_max_order_by {
+  created_at?: order_by | null;
+  id?: order_by | null;
+  organizationId?: order_by | null;
+  remaining?: order_by | null;
+  updated_at?: order_by | null;
+}
+
+/**
+ * order by min() on columns of table "JobPostingCredit"
+ */
+export interface JobPostingCredit_min_order_by {
+  created_at?: order_by | null;
+  id?: order_by | null;
+  organizationId?: order_by | null;
+  remaining?: order_by | null;
+  updated_at?: order_by | null;
+}
+
+/**
+ * on_conflict condition type for table "JobPostingCredit"
+ */
+export interface JobPostingCredit_on_conflict {
+  constraint: JobPostingCredit_constraint;
+  update_columns: JobPostingCredit_update_column[];
+  where?: JobPostingCredit_bool_exp | null;
+}
+
+/**
+ * order by stddev() on columns of table "JobPostingCredit"
+ */
+export interface JobPostingCredit_stddev_order_by {
+  id?: order_by | null;
+  organizationId?: order_by | null;
+  remaining?: order_by | null;
+}
+
+/**
+ * order by stddev_pop() on columns of table "JobPostingCredit"
+ */
+export interface JobPostingCredit_stddev_pop_order_by {
+  id?: order_by | null;
+  organizationId?: order_by | null;
+  remaining?: order_by | null;
+}
+
+/**
+ * order by stddev_samp() on columns of table "JobPostingCredit"
+ */
+export interface JobPostingCredit_stddev_samp_order_by {
+  id?: order_by | null;
+  organizationId?: order_by | null;
+  remaining?: order_by | null;
+}
+
+/**
+ * order by sum() on columns of table "JobPostingCredit"
+ */
+export interface JobPostingCredit_sum_order_by {
+  id?: order_by | null;
+  organizationId?: order_by | null;
+  remaining?: order_by | null;
+}
+
+/**
+ * order by var_pop() on columns of table "JobPostingCredit"
+ */
+export interface JobPostingCredit_var_pop_order_by {
+  id?: order_by | null;
+  organizationId?: order_by | null;
+  remaining?: order_by | null;
+}
+
+/**
+ * order by var_samp() on columns of table "JobPostingCredit"
+ */
+export interface JobPostingCredit_var_samp_order_by {
+  id?: order_by | null;
+  organizationId?: order_by | null;
+  remaining?: order_by | null;
+}
+
+/**
+ * order by variance() on columns of table "JobPostingCredit"
+ */
+export interface JobPostingCredit_variance_order_by {
+  id?: order_by | null;
+  organizationId?: order_by | null;
+  remaining?: order_by | null;
+}
+
+export interface JobPostingPrice_aggregate_bool_exp {
+  count?: JobPostingPrice_aggregate_bool_exp_count | null;
+}
+
+export interface JobPostingPrice_aggregate_bool_exp_count {
+  arguments?: JobPostingPrice_select_column[] | null;
+  distinct?: boolean | null;
+  filter?: JobPostingPrice_bool_exp | null;
+  predicate: Int_comparison_exp;
+}
+
+/**
+ * input type for inserting array relation for remote table "JobPostingPrice"
+ */
+export interface JobPostingPrice_arr_rel_insert_input {
+  data: JobPostingPrice_insert_input[];
+  on_conflict?: JobPostingPrice_on_conflict | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "JobPostingPrice". All fields are combined with a logical 'AND'.
+ */
+export interface JobPostingPrice_bool_exp {
+  JobPostingType?: JobPostingType_bool_exp | null;
+  _and?: JobPostingPrice_bool_exp[] | null;
+  _not?: JobPostingPrice_bool_exp | null;
+  _or?: JobPostingPrice_bool_exp[] | null;
+  created_at?: timestamptz_comparison_exp | null;
+  currency?: String_comparison_exp | null;
+  durationDays?: Int_comparison_exp | null;
+  id?: Int_comparison_exp | null;
+  jobPostingType?: JobPostingType_enum_comparison_exp | null;
+  price?: Int_comparison_exp | null;
+  stripePriceId?: String_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
+  vatRate?: numeric_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "JobPostingPrice"
+ */
+export interface JobPostingPrice_insert_input {
+  JobPostingType?: JobPostingType_obj_rel_insert_input | null;
+  created_at?: any | null;
+  currency?: string | null;
+  durationDays?: number | null;
+  id?: number | null;
+  jobPostingType?: JobPostingType_enum | null;
+  price?: number | null;
+  stripePriceId?: string | null;
+  updated_at?: any | null;
+  vatRate?: any | null;
+}
+
+/**
+ * on_conflict condition type for table "JobPostingPrice"
+ */
+export interface JobPostingPrice_on_conflict {
+  constraint: JobPostingPrice_constraint;
+  update_columns: JobPostingPrice_update_column[];
+  where?: JobPostingPrice_bool_exp | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "JobPostingStatus". All fields are combined with a logical 'AND'.
+ */
+export interface JobPostingStatus_bool_exp {
+  JobPostings?: JobPosting_bool_exp | null;
+  JobPostings_aggregate?: JobPosting_aggregate_bool_exp | null;
+  _and?: JobPostingStatus_bool_exp[] | null;
+  _not?: JobPostingStatus_bool_exp | null;
+  _or?: JobPostingStatus_bool_exp[] | null;
+  comment?: String_comparison_exp | null;
+  value?: String_comparison_exp | null;
+}
+
+/**
+ * Boolean expression to compare columns of type "JobPostingStatus_enum". All fields are combined with logical 'AND'.
+ */
+export interface JobPostingStatus_enum_comparison_exp {
+  _eq?: JobPostingStatus_enum | null;
+  _in?: JobPostingStatus_enum[] | null;
+  _is_null?: boolean | null;
+  _neq?: JobPostingStatus_enum | null;
+  _nin?: JobPostingStatus_enum[] | null;
+}
+
+/**
+ * input type for inserting data into table "JobPostingStatus"
+ */
+export interface JobPostingStatus_insert_input {
+  JobPostings?: JobPosting_arr_rel_insert_input | null;
+  comment?: string | null;
+  value?: string | null;
+}
+
+/**
+ * input type for inserting object relation for remote table "JobPostingStatus"
+ */
+export interface JobPostingStatus_obj_rel_insert_input {
+  data: JobPostingStatus_insert_input;
+  on_conflict?: JobPostingStatus_on_conflict | null;
+}
+
+/**
+ * on_conflict condition type for table "JobPostingStatus"
+ */
+export interface JobPostingStatus_on_conflict {
+  constraint: JobPostingStatus_constraint;
+  update_columns: JobPostingStatus_update_column[];
+  where?: JobPostingStatus_bool_exp | null;
+}
+
+export interface JobPostingTag_aggregate_bool_exp {
+  count?: JobPostingTag_aggregate_bool_exp_count | null;
+}
+
+export interface JobPostingTag_aggregate_bool_exp_count {
+  arguments?: JobPostingTag_select_column[] | null;
+  distinct?: boolean | null;
+  filter?: JobPostingTag_bool_exp | null;
+  predicate: Int_comparison_exp;
+}
+
+/**
+ * input type for inserting array relation for remote table "JobPostingTag"
+ */
+export interface JobPostingTag_arr_rel_insert_input {
+  data: JobPostingTag_insert_input[];
+  on_conflict?: JobPostingTag_on_conflict | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "JobPostingTag". All fields are combined with a logical 'AND'.
+ */
+export interface JobPostingTag_bool_exp {
+  JobPosting?: JobPosting_bool_exp | null;
+  _and?: JobPostingTag_bool_exp[] | null;
+  _not?: JobPostingTag_bool_exp | null;
+  _or?: JobPostingTag_bool_exp[] | null;
+  created_at?: timestamptz_comparison_exp | null;
+  id?: Int_comparison_exp | null;
+  jobPostingId?: Int_comparison_exp | null;
+  name?: String_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "JobPostingTag"
+ */
+export interface JobPostingTag_insert_input {
+  JobPosting?: JobPosting_obj_rel_insert_input | null;
+  created_at?: any | null;
+  id?: number | null;
+  jobPostingId?: number | null;
+  name?: string | null;
+  updated_at?: any | null;
+}
+
+/**
+ * on_conflict condition type for table "JobPostingTag"
+ */
+export interface JobPostingTag_on_conflict {
+  constraint: JobPostingTag_constraint;
+  update_columns: JobPostingTag_update_column[];
+  where?: JobPostingTag_bool_exp | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "JobPostingType". All fields are combined with a logical 'AND'.
+ */
+export interface JobPostingType_bool_exp {
+  JobPostingPrices?: JobPostingPrice_bool_exp | null;
+  JobPostingPrices_aggregate?: JobPostingPrice_aggregate_bool_exp | null;
+  JobPostings?: JobPosting_bool_exp | null;
+  JobPostings_aggregate?: JobPosting_aggregate_bool_exp | null;
+  _and?: JobPostingType_bool_exp[] | null;
+  _not?: JobPostingType_bool_exp | null;
+  _or?: JobPostingType_bool_exp[] | null;
+  comment?: String_comparison_exp | null;
+  value?: String_comparison_exp | null;
+}
+
+/**
+ * Boolean expression to compare columns of type "JobPostingType_enum". All fields are combined with logical 'AND'.
+ */
+export interface JobPostingType_enum_comparison_exp {
+  _eq?: JobPostingType_enum | null;
+  _in?: JobPostingType_enum[] | null;
+  _is_null?: boolean | null;
+  _neq?: JobPostingType_enum | null;
+  _nin?: JobPostingType_enum[] | null;
+}
+
+/**
+ * input type for inserting data into table "JobPostingType"
+ */
+export interface JobPostingType_insert_input {
+  JobPostingPrices?: JobPostingPrice_arr_rel_insert_input | null;
+  JobPostings?: JobPosting_arr_rel_insert_input | null;
+  comment?: string | null;
+  value?: string | null;
+}
+
+/**
+ * input type for inserting object relation for remote table "JobPostingType"
+ */
+export interface JobPostingType_obj_rel_insert_input {
+  data: JobPostingType_insert_input;
+  on_conflict?: JobPostingType_on_conflict | null;
+}
+
+/**
+ * on_conflict condition type for table "JobPostingType"
+ */
+export interface JobPostingType_on_conflict {
+  constraint: JobPostingType_constraint;
+  update_columns: JobPostingType_update_column[];
+  where?: JobPostingType_bool_exp | null;
+}
+
+export interface JobPosting_aggregate_bool_exp {
+  bool_and?: JobPosting_aggregate_bool_exp_bool_and | null;
+  bool_or?: JobPosting_aggregate_bool_exp_bool_or | null;
+  count?: JobPosting_aggregate_bool_exp_count | null;
+}
+
+export interface JobPosting_aggregate_bool_exp_bool_and {
+  arguments: JobPosting_select_column_JobPosting_aggregate_bool_exp_bool_and_arguments_columns;
+  distinct?: boolean | null;
+  filter?: JobPosting_bool_exp | null;
+  predicate: Boolean_comparison_exp;
+}
+
+export interface JobPosting_aggregate_bool_exp_bool_or {
+  arguments: JobPosting_select_column_JobPosting_aggregate_bool_exp_bool_or_arguments_columns;
+  distinct?: boolean | null;
+  filter?: JobPosting_bool_exp | null;
+  predicate: Boolean_comparison_exp;
+}
+
+export interface JobPosting_aggregate_bool_exp_count {
+  arguments?: JobPosting_select_column[] | null;
+  distinct?: boolean | null;
+  filter?: JobPosting_bool_exp | null;
+  predicate: Int_comparison_exp;
+}
+
+/**
+ * order by aggregate values of table "JobPosting"
+ */
+export interface JobPosting_aggregate_order_by {
+  avg?: JobPosting_avg_order_by | null;
+  count?: order_by | null;
+  max?: JobPosting_max_order_by | null;
+  min?: JobPosting_min_order_by | null;
+  stddev?: JobPosting_stddev_order_by | null;
+  stddev_pop?: JobPosting_stddev_pop_order_by | null;
+  stddev_samp?: JobPosting_stddev_samp_order_by | null;
+  sum?: JobPosting_sum_order_by | null;
+  var_pop?: JobPosting_var_pop_order_by | null;
+  var_samp?: JobPosting_var_samp_order_by | null;
+  variance?: JobPosting_variance_order_by | null;
+}
+
+/**
+ * input type for inserting array relation for remote table "JobPosting"
+ */
+export interface JobPosting_arr_rel_insert_input {
+  data: JobPosting_insert_input[];
+  on_conflict?: JobPosting_on_conflict | null;
+}
+
+/**
+ * order by avg() on columns of table "JobPosting"
+ */
+export interface JobPosting_avg_order_by {
+  hoursPerWeek?: order_by | null;
+  id?: order_by | null;
+  legacyStujoId?: order_by | null;
+  organizationId?: order_by | null;
+  restrictedToOrganizationId?: order_by | null;
+  views?: order_by | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "JobPosting". All fields are combined with a logical 'AND'.
+ */
+export interface JobPosting_bool_exp {
+  ContactUser?: User_bool_exp | null;
+  Invoices?: Invoice_bool_exp | null;
+  Invoices_aggregate?: Invoice_aggregate_bool_exp | null;
+  JobOccupation?: JobOccupation_bool_exp | null;
+  JobPostingStatus?: JobPostingStatus_bool_exp | null;
+  JobPostingTags?: JobPostingTag_bool_exp | null;
+  JobPostingTags_aggregate?: JobPostingTag_aggregate_bool_exp | null;
+  JobPostingType?: JobPostingType_bool_exp | null;
+  JobRegion?: JobRegion_bool_exp | null;
+  Organization?: Organization_bool_exp | null;
+  RestrictedToOrganization?: Organization_bool_exp | null;
+  SavedJobPostings?: SavedJobPosting_bool_exp | null;
+  SavedJobPostings_aggregate?: SavedJobPosting_aggregate_bool_exp | null;
+  _and?: JobPosting_bool_exp[] | null;
+  _not?: JobPosting_bool_exp | null;
+  _or?: JobPosting_bool_exp[] | null;
+  applicationDeadline?: date_comparison_exp | null;
+  contactUserId?: uuid_comparison_exp | null;
+  created_at?: timestamptz_comparison_exp | null;
+  customCompany?: String_comparison_exp | null;
+  description?: String_comparison_exp | null;
+  durationText?: String_comparison_exp | null;
+  expiresAt?: timestamptz_comparison_exp | null;
+  featured?: Boolean_comparison_exp | null;
+  hoursPerWeek?: Int_comparison_exp | null;
+  id?: Int_comparison_exp | null;
+  international?: Boolean_comparison_exp | null;
+  internationalDescription?: String_comparison_exp | null;
+  language?: String_comparison_exp | null;
+  legacyStujoId?: Int_comparison_exp | null;
+  location?: String_comparison_exp | null;
+  occupation?: JobOccupation_enum_comparison_exp | null;
+  organizationId?: Int_comparison_exp | null;
+  pdfUrl?: String_comparison_exp | null;
+  publishedAt?: timestamptz_comparison_exp | null;
+  region?: JobRegion_enum_comparison_exp | null;
+  requirement?: String_comparison_exp | null;
+  restrictedToOrganizationId?: Int_comparison_exp | null;
+  salaryText?: String_comparison_exp | null;
+  shortDescription?: String_comparison_exp | null;
+  slug?: String_comparison_exp | null;
+  startText?: String_comparison_exp | null;
+  status?: JobPostingStatus_enum_comparison_exp | null;
+  title?: String_comparison_exp | null;
+  type?: JobPostingType_enum_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
+  views?: Int_comparison_exp | null;
+  workExperienceRequired?: Boolean_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "JobPosting"
+ */
+export interface JobPosting_insert_input {
+  ContactUser?: User_obj_rel_insert_input | null;
+  Invoices?: Invoice_arr_rel_insert_input | null;
+  JobOccupation?: JobOccupation_obj_rel_insert_input | null;
+  JobPostingStatus?: JobPostingStatus_obj_rel_insert_input | null;
+  JobPostingTags?: JobPostingTag_arr_rel_insert_input | null;
+  JobPostingType?: JobPostingType_obj_rel_insert_input | null;
+  JobRegion?: JobRegion_obj_rel_insert_input | null;
+  Organization?: Organization_obj_rel_insert_input | null;
+  RestrictedToOrganization?: Organization_obj_rel_insert_input | null;
+  SavedJobPostings?: SavedJobPosting_arr_rel_insert_input | null;
+  applicationDeadline?: any | null;
+  contactUserId?: any | null;
+  created_at?: any | null;
+  customCompany?: string | null;
+  description?: string | null;
+  durationText?: string | null;
+  expiresAt?: any | null;
+  featured?: boolean | null;
+  hoursPerWeek?: number | null;
+  id?: number | null;
+  international?: boolean | null;
+  internationalDescription?: string | null;
+  language?: string | null;
+  legacyStujoId?: number | null;
+  location?: string | null;
+  occupation?: JobOccupation_enum | null;
+  organizationId?: number | null;
+  pdfUrl?: string | null;
+  publishedAt?: any | null;
+  region?: JobRegion_enum | null;
+  requirement?: string | null;
+  restrictedToOrganizationId?: number | null;
+  salaryText?: string | null;
+  shortDescription?: string | null;
+  slug?: string | null;
+  startText?: string | null;
+  status?: JobPostingStatus_enum | null;
+  title?: string | null;
+  type?: JobPostingType_enum | null;
+  updated_at?: any | null;
+  views?: number | null;
+  workExperienceRequired?: boolean | null;
+}
+
+/**
+ * order by max() on columns of table "JobPosting"
+ */
+export interface JobPosting_max_order_by {
+  applicationDeadline?: order_by | null;
+  contactUserId?: order_by | null;
+  created_at?: order_by | null;
+  customCompany?: order_by | null;
+  description?: order_by | null;
+  durationText?: order_by | null;
+  expiresAt?: order_by | null;
+  hoursPerWeek?: order_by | null;
+  id?: order_by | null;
+  internationalDescription?: order_by | null;
+  language?: order_by | null;
+  legacyStujoId?: order_by | null;
+  location?: order_by | null;
+  organizationId?: order_by | null;
+  pdfUrl?: order_by | null;
+  publishedAt?: order_by | null;
+  requirement?: order_by | null;
+  restrictedToOrganizationId?: order_by | null;
+  salaryText?: order_by | null;
+  shortDescription?: order_by | null;
+  slug?: order_by | null;
+  startText?: order_by | null;
+  title?: order_by | null;
+  updated_at?: order_by | null;
+  views?: order_by | null;
+}
+
+/**
+ * order by min() on columns of table "JobPosting"
+ */
+export interface JobPosting_min_order_by {
+  applicationDeadline?: order_by | null;
+  contactUserId?: order_by | null;
+  created_at?: order_by | null;
+  customCompany?: order_by | null;
+  description?: order_by | null;
+  durationText?: order_by | null;
+  expiresAt?: order_by | null;
+  hoursPerWeek?: order_by | null;
+  id?: order_by | null;
+  internationalDescription?: order_by | null;
+  language?: order_by | null;
+  legacyStujoId?: order_by | null;
+  location?: order_by | null;
+  organizationId?: order_by | null;
+  pdfUrl?: order_by | null;
+  publishedAt?: order_by | null;
+  requirement?: order_by | null;
+  restrictedToOrganizationId?: order_by | null;
+  salaryText?: order_by | null;
+  shortDescription?: order_by | null;
+  slug?: order_by | null;
+  startText?: order_by | null;
+  title?: order_by | null;
+  updated_at?: order_by | null;
+  views?: order_by | null;
+}
+
+/**
+ * input type for inserting object relation for remote table "JobPosting"
+ */
+export interface JobPosting_obj_rel_insert_input {
+  data: JobPosting_insert_input;
+  on_conflict?: JobPosting_on_conflict | null;
+}
+
+/**
+ * on_conflict condition type for table "JobPosting"
+ */
+export interface JobPosting_on_conflict {
+  constraint: JobPosting_constraint;
+  update_columns: JobPosting_update_column[];
+  where?: JobPosting_bool_exp | null;
+}
+
+/**
+ * order by stddev() on columns of table "JobPosting"
+ */
+export interface JobPosting_stddev_order_by {
+  hoursPerWeek?: order_by | null;
+  id?: order_by | null;
+  legacyStujoId?: order_by | null;
+  organizationId?: order_by | null;
+  restrictedToOrganizationId?: order_by | null;
+  views?: order_by | null;
+}
+
+/**
+ * order by stddev_pop() on columns of table "JobPosting"
+ */
+export interface JobPosting_stddev_pop_order_by {
+  hoursPerWeek?: order_by | null;
+  id?: order_by | null;
+  legacyStujoId?: order_by | null;
+  organizationId?: order_by | null;
+  restrictedToOrganizationId?: order_by | null;
+  views?: order_by | null;
+}
+
+/**
+ * order by stddev_samp() on columns of table "JobPosting"
+ */
+export interface JobPosting_stddev_samp_order_by {
+  hoursPerWeek?: order_by | null;
+  id?: order_by | null;
+  legacyStujoId?: order_by | null;
+  organizationId?: order_by | null;
+  restrictedToOrganizationId?: order_by | null;
+  views?: order_by | null;
+}
+
+/**
+ * order by sum() on columns of table "JobPosting"
+ */
+export interface JobPosting_sum_order_by {
+  hoursPerWeek?: order_by | null;
+  id?: order_by | null;
+  legacyStujoId?: order_by | null;
+  organizationId?: order_by | null;
+  restrictedToOrganizationId?: order_by | null;
+  views?: order_by | null;
+}
+
+/**
+ * order by var_pop() on columns of table "JobPosting"
+ */
+export interface JobPosting_var_pop_order_by {
+  hoursPerWeek?: order_by | null;
+  id?: order_by | null;
+  legacyStujoId?: order_by | null;
+  organizationId?: order_by | null;
+  restrictedToOrganizationId?: order_by | null;
+  views?: order_by | null;
+}
+
+/**
+ * order by var_samp() on columns of table "JobPosting"
+ */
+export interface JobPosting_var_samp_order_by {
+  hoursPerWeek?: order_by | null;
+  id?: order_by | null;
+  legacyStujoId?: order_by | null;
+  organizationId?: order_by | null;
+  restrictedToOrganizationId?: order_by | null;
+  views?: order_by | null;
+}
+
+/**
+ * order by variance() on columns of table "JobPosting"
+ */
+export interface JobPosting_variance_order_by {
+  hoursPerWeek?: order_by | null;
+  id?: order_by | null;
+  legacyStujoId?: order_by | null;
+  organizationId?: order_by | null;
+  restrictedToOrganizationId?: order_by | null;
+  views?: order_by | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "JobRegion". All fields are combined with a logical 'AND'.
+ */
+export interface JobRegion_bool_exp {
+  JobPostings?: JobPosting_bool_exp | null;
+  JobPostings_aggregate?: JobPosting_aggregate_bool_exp | null;
+  _and?: JobRegion_bool_exp[] | null;
+  _not?: JobRegion_bool_exp | null;
+  _or?: JobRegion_bool_exp[] | null;
+  comment?: String_comparison_exp | null;
+  value?: String_comparison_exp | null;
+}
+
+/**
+ * Boolean expression to compare columns of type "JobRegion_enum". All fields are combined with logical 'AND'.
+ */
+export interface JobRegion_enum_comparison_exp {
+  _eq?: JobRegion_enum | null;
+  _in?: JobRegion_enum[] | null;
+  _is_null?: boolean | null;
+  _neq?: JobRegion_enum | null;
+  _nin?: JobRegion_enum[] | null;
+}
+
+/**
+ * input type for inserting data into table "JobRegion"
+ */
+export interface JobRegion_insert_input {
+  JobPostings?: JobPosting_arr_rel_insert_input | null;
+  comment?: string | null;
+  value?: string | null;
+}
+
+/**
+ * input type for inserting object relation for remote table "JobRegion"
+ */
+export interface JobRegion_obj_rel_insert_input {
+  data: JobRegion_insert_input;
+  on_conflict?: JobRegion_on_conflict | null;
+}
+
+/**
+ * on_conflict condition type for table "JobRegion"
+ */
+export interface JobRegion_on_conflict {
+  constraint: JobRegion_constraint;
+  update_columns: JobRegion_update_column[];
+  where?: JobRegion_bool_exp | null;
 }
 
 /**
@@ -6744,6 +8259,7 @@ export interface OrganizationAdmin_bool_exp {
   canManageCourses?: Boolean_comparison_exp | null;
   canManageDegrees?: Boolean_comparison_exp | null;
   canManageEvents?: Boolean_comparison_exp | null;
+  canManageJobs?: Boolean_comparison_exp | null;
   canManageSettings?: Boolean_comparison_exp | null;
   created_at?: timestamptz_comparison_exp | null;
   id?: Int_comparison_exp | null;
@@ -6761,6 +8277,7 @@ export interface OrganizationAdmin_insert_input {
   canManageCourses?: boolean | null;
   canManageDegrees?: boolean | null;
   canManageEvents?: boolean | null;
+  canManageJobs?: boolean | null;
   canManageSettings?: boolean | null;
   created_at?: any | null;
   id?: number | null;
@@ -6809,6 +8326,7 @@ export interface OrganizationAdmin_order_by {
   canManageCourses?: order_by | null;
   canManageDegrees?: order_by | null;
   canManageEvents?: order_by | null;
+  canManageJobs?: order_by | null;
   canManageSettings?: order_by | null;
   created_at?: order_by | null;
   id?: order_by | null;
@@ -7167,6 +8685,12 @@ export interface Organization_bool_exp {
   Country?: Country_bool_exp | null;
   FundedCourses?: CourseFundingOrganization_bool_exp | null;
   FundedCourses_aggregate?: CourseFundingOrganization_aggregate_bool_exp | null;
+  JobPortals?: JobPortal_bool_exp | null;
+  JobPortals_aggregate?: JobPortal_aggregate_bool_exp | null;
+  JobPostingCredits?: JobPostingCredit_bool_exp | null;
+  JobPostingCredits_aggregate?: JobPostingCredit_aggregate_bool_exp | null;
+  JobPostings?: JobPosting_bool_exp | null;
+  JobPostings_aggregate?: JobPosting_aggregate_bool_exp | null;
   OrganizationAdmins?: OrganizationAdmin_bool_exp | null;
   OrganizationAdmins_aggregate?: OrganizationAdmin_aggregate_bool_exp | null;
   OrganizationNewsletterSubscriptions?: OrganizationNewsletterSubscription_bool_exp | null;
@@ -7234,6 +8758,9 @@ export interface Organization_bool_exp {
 export interface Organization_insert_input {
   Country?: Country_obj_rel_insert_input | null;
   FundedCourses?: CourseFundingOrganization_arr_rel_insert_input | null;
+  JobPortals?: JobPortal_arr_rel_insert_input | null;
+  JobPostingCredits?: JobPostingCredit_arr_rel_insert_input | null;
+  JobPostings?: JobPosting_arr_rel_insert_input | null;
   OrganizationAdmins?: OrganizationAdmin_arr_rel_insert_input | null;
   OrganizationNewsletterSubscriptions?: OrganizationNewsletterSubscription_arr_rel_insert_input | null;
   OrganizationType?: OrganizationType_obj_rel_insert_input | null;
@@ -7404,6 +8931,9 @@ export interface Organization_on_conflict {
 export interface Organization_order_by {
   Country?: Country_order_by | null;
   FundedCourses_aggregate?: CourseFundingOrganization_aggregate_order_by | null;
+  JobPortals_aggregate?: JobPortal_aggregate_order_by | null;
+  JobPostingCredits_aggregate?: JobPostingCredit_aggregate_order_by | null;
+  JobPostings_aggregate?: JobPosting_aggregate_order_by | null;
   OrganizationAdmins_aggregate?: OrganizationAdmin_aggregate_order_by | null;
   OrganizationNewsletterSubscriptions_aggregate?: OrganizationNewsletterSubscription_aggregate_order_by | null;
   OrganizationType?: OrganizationType_order_by | null;
@@ -9995,6 +11525,63 @@ export interface Project_variance_order_by {
   legacyAchievementRecordId?: order_by | null;
   organizationId?: order_by | null;
   parentProjectId?: order_by | null;
+}
+
+export interface SavedJobPosting_aggregate_bool_exp {
+  count?: SavedJobPosting_aggregate_bool_exp_count | null;
+}
+
+export interface SavedJobPosting_aggregate_bool_exp_count {
+  arguments?: SavedJobPosting_select_column[] | null;
+  distinct?: boolean | null;
+  filter?: SavedJobPosting_bool_exp | null;
+  predicate: Int_comparison_exp;
+}
+
+/**
+ * input type for inserting array relation for remote table "SavedJobPosting"
+ */
+export interface SavedJobPosting_arr_rel_insert_input {
+  data: SavedJobPosting_insert_input[];
+  on_conflict?: SavedJobPosting_on_conflict | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "SavedJobPosting". All fields are combined with a logical 'AND'.
+ */
+export interface SavedJobPosting_bool_exp {
+  JobPosting?: JobPosting_bool_exp | null;
+  User?: User_bool_exp | null;
+  _and?: SavedJobPosting_bool_exp[] | null;
+  _not?: SavedJobPosting_bool_exp | null;
+  _or?: SavedJobPosting_bool_exp[] | null;
+  created_at?: timestamptz_comparison_exp | null;
+  id?: Int_comparison_exp | null;
+  jobPostingId?: Int_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
+  userId?: uuid_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "SavedJobPosting"
+ */
+export interface SavedJobPosting_insert_input {
+  JobPosting?: JobPosting_obj_rel_insert_input | null;
+  User?: User_obj_rel_insert_input | null;
+  created_at?: any | null;
+  id?: number | null;
+  jobPostingId?: number | null;
+  updated_at?: any | null;
+  userId?: any | null;
+}
+
+/**
+ * on_conflict condition type for table "SavedJobPosting"
+ */
+export interface SavedJobPosting_on_conflict {
+  constraint: SavedJobPosting_constraint;
+  update_columns: SavedJobPosting_update_column[];
+  where?: SavedJobPosting_bool_exp | null;
 }
 
 export interface SessionAddress_aggregate_bool_exp {

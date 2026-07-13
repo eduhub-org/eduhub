@@ -1,0 +1,89 @@
+table:
+  name: JobPostingTag
+  schema: public
+object_relationships:
+  - name: JobPosting
+    using:
+      foreign_key_constraint_on: jobPostingId
+select_permissions:
+  # Tag visibility follows the posting visibility (inherited via the
+  # relationship filters below mirroring public_JobPosting.yaml).
+  - role: anonymous
+    permission:
+      columns:
+        - id
+        - jobPostingId
+        - name
+        - created_at
+        - updated_at
+      filter:
+        JobPosting:
+          _and:
+            - status:
+                _eq: PUBLISHED
+            - restrictedToOrganizationId:
+                _is_null: true
+  - role: user_access
+    permission:
+      columns:
+        - id
+        - jobPostingId
+        - name
+        - created_at
+        - updated_at
+      filter:
+        JobPosting:
+          _and:
+            - status:
+                _eq: PUBLISHED
+            - _or:
+                - restrictedToOrganizationId:
+                    _is_null: true
+                - RestrictedToOrganization:
+                    Users:
+                      id:
+                        _eq: X-Hasura-User-Id
+  - role: org_admin_access
+    permission:
+      columns:
+        - id
+        - jobPostingId
+        - name
+        - created_at
+        - updated_at
+      filter:
+        JobPosting:
+          Organization:
+            OrganizationAdmins:
+              _and:
+                - userId:
+                    _eq: X-Hasura-User-Id
+                - canManageJobs:
+                    _eq: true
+insert_permissions:
+  - role: org_admin_access
+    permission:
+      columns:
+        - jobPostingId
+        - name
+      check:
+        JobPosting:
+          Organization:
+            OrganizationAdmins:
+              _and:
+                - userId:
+                    _eq: X-Hasura-User-Id
+                - canManageJobs:
+                    _eq: true
+delete_permissions:
+  - role: org_admin_access
+    permission:
+      filter:
+        JobPosting:
+          Organization:
+            OrganizationAdmins:
+              _and:
+                - userId:
+                    _eq: X-Hasura-User-Id
+                - canManageJobs:
+                    _eq: true

@@ -175,6 +175,8 @@ resource "google_cloudfunctions2_function" "call_python_function" {
       LMS_USER                        = var.lms_user
       LMS_ATTENDANCE_SURVEY_ID        = var.lms_attendance_survey_id
       MM_URL                          = var.mm_url
+      # StuJo job board (expire_job_postings / send_job_alerts mails)
+      STUJO_FRONTEND_URL = "https://${local.stujo_domain}"
     }
 
     secret_environment_variables {
@@ -320,6 +322,11 @@ resource "google_cloudfunctions2_function" "call_node_function" {
       MATRIX_ELEMENT_CLIENT_URL = var.matrix_element_client_url
       MATRIX_MAIN_SPACE_ID      = var.matrix_main_space_id
       MATRIX_ADMIN_USER_ID      = var.matrix_admin_user_id
+      # StuJo job board (publishJobPosting / createStripeJobPostingPrices)
+      STUJO_FRONTEND_URL           = "https://${local.stujo_domain}"
+      STUJO_ADMIN_EMAIL            = var.stujo_admin_email
+      STRIPE_TAX_RATE_ID           = var.stripe_tax_rate_id
+      STUJO_SELLER_ORGANIZATION_ID = var.stujo_seller_organization_id
     }
 
     secret_environment_variables {

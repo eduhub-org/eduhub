@@ -1,0 +1,37 @@
+table:
+  name: SavedJobPosting
+  schema: public
+object_relationships:
+  - name: User
+    using:
+      foreign_key_constraint_on: userId
+  - name: JobPosting
+    using:
+      foreign_key_constraint_on: jobPostingId
+select_permissions:
+  - role: user_access
+    permission:
+      columns:
+        - id
+        - userId
+        - jobPostingId
+        - created_at
+        - updated_at
+      filter:
+        userId:
+          _eq: X-Hasura-User-Id
+      allow_aggregations: true
+insert_permissions:
+  - role: user_access
+    permission:
+      columns:
+        - jobPostingId
+      check: {}
+      set:
+        userId: x-hasura-User-Id
+delete_permissions:
+  - role: user_access
+    permission:
+      filter:
+        userId:
+          _eq: X-Hasura-User-Id

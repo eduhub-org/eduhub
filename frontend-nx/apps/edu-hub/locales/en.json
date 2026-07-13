@@ -1935,9 +1935,11 @@
     "profile_organization": "Organization (Profile)",
     "super_admin_label": "Super Admin",
     "is_super_admin": "Is Super Admin",
+    "capabilities_heading": "Permissions",
     "can_manage_events": "Can manage events",
     "can_manage_courses": "Can manage courses",
     "can_manage_degrees": "Can manage degrees",
+    "can_manage_jobs": "Can manage job postings",
     "can_manage_users_and_settings": "Can manage users and settings",
     "error_loading_admin_users": "Error loading admin users.",
     "deletion_confirmation_question": "Are you sure you want to delete the admin rights of {firstName} {lastName} for the organization {organization}?",
@@ -2596,6 +2598,10 @@
         "badges": {
           "label": "Badges",
           "description": "Reusable project badges and awards"
+        },
+        "jobboerse": {
+          "label": "Job board (StuJo)",
+          "description": "Moderate job postings, manage portals, prices and credits"
         }
       }
     },
