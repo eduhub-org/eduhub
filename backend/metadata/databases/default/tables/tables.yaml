@@ -43,6 +43,7 @@
 - "!include public_JobPostingTag.yaml"
 - "!include public_JobPostingType.yaml"
 - "!include public_JobRegion.yaml"
+- "!include public_JobSliderJobType.yaml"
 - "!include public_Language.yaml"
 - "!include public_LocationAddress.yaml"
 - "!include public_LocationOption.yaml"

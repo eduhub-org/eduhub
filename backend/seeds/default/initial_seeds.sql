@@ -3542,6 +3542,16 @@ INSERT INTO public."ProjectSliderProjectGroup"
 VALUES
   (1, 9300, 1, now(), now());
 
+-- A home job slider (contentType = JOB). Its membership is composed from the
+-- selected JobPostingType(s) in JobSliderJobType; with no JobSliderJobType rows
+-- it shows all published job postings. The local seeds do not contain job
+-- postings (the stujo ETL populates real data), so this slider is empty until
+-- postings exist. "order" 8 places it after the project slider (order 7).
+INSERT INTO public."CourseGroupOption"
+  (id, title, "order", "sliderGroup", "contentType", "programType", "organizationId", created_at, updated_at)
+VALUES
+  (9301, 'Jobs', 8, true, 'JOB', NULL, NULL, now(), now());
+
 SELECT pg_catalog.setval(pg_get_serial_sequence('public."Badge"', 'id'), (SELECT max(id) FROM public."Badge"), true);
 SELECT pg_catalog.setval(pg_get_serial_sequence('public."ProjectBadge"', 'id'), (SELECT max(id) FROM public."ProjectBadge"), true);
 SELECT pg_catalog.setval(pg_get_serial_sequence('public."ProjectMentor"', 'id'), (SELECT max(id) FROM public."ProjectMentor"), true);
