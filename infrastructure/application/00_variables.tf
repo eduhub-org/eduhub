@@ -360,7 +360,7 @@ variable "stujo_admin_email" {
   default     = ""
 }
 variable "stripe_tax_rate_id" {
-  description = "Stripe TaxRate id (19% exclusive) used for StuJo job posting checkouts; created by the createStripeJobPostingPrices action"
+  description = "Optional override for the Stripe TaxRate id (19% exclusive) used for StuJo job posting checkouts. Leave empty to have publishJobPosting find-or-create the rate automatically; set it to pin a specific rate (e.g. one verified against the live account). Also created by the createStripeJobPostingPrices action."
   type        = string
   default     = ""
 }
