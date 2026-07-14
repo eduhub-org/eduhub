@@ -5,9 +5,12 @@ import { fetchAnonymous } from './hasura';
  *
  * Portals are a BRANDING dimension only — all portals share one job pool
  * (see docs/STUJO_INTEGRATION_PLAN.md §2.4). The request host is resolved
- * to a JobPortal row (via AppSettings.domain), falling back to the
- * APP_NAME env var and finally to the root `stujo` portal, so local dev
- * and single-domain deployments work without special DNS.
+ * to a JobPortal row in this order:
+ *   1. JobPortalDomain.hostname (primary source — many hostnames per portal)
+ *   2. AppSettings.domain (legacy single-domain fallback)
+ *   3. the APP_NAME env var
+ *   4. the root `stujo` portal
+ * so local dev and single-domain deployments work without special DNS.
  */
 
 export type PortalBranding = {
@@ -33,6 +36,10 @@ const PORTAL_QUERY = /* GraphQL */ `
       contactEmail
       defaultRegion
     }
+    JobPortalDomain {
+      appName
+      hostname
+    }
     AppSettings {
       appName
       domain
@@ -54,6 +61,10 @@ type PortalQueryResult = {
     contactEmail: string | null;
     defaultRegion: string | null;
   }[];
+  JobPortalDomain: {
+    appName: string;
+    hostname: string;
+  }[];
   AppSettings: {
     appName: string;
     domain: string | null;
@@ -72,8 +83,10 @@ export async function resolvePortal(host: string | undefined): Promise<PortalBra
   const data = await fetchAnonymous<PortalQueryResult>(PORTAL_QUERY);
 
   const hostname = (host || '').split(':')[0].toLowerCase();
+  const domainMapping = data.JobPortalDomain.find((d) => d.hostname === hostname);
   const settingsByDomain = data.AppSettings.find((s) => s.domain === hostname);
-  const appName = settingsByDomain?.appName || FALLBACK_APP_NAME;
+  const appName =
+    domainMapping?.appName || settingsByDomain?.appName || FALLBACK_APP_NAME;
 
   const portal =
     data.JobPortal.find((p) => p.appName === appName) ||
