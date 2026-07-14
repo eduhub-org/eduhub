@@ -23,7 +23,7 @@ import TableGridDeleteButton from './components/TableGridDeleteButton';
 
 /** Stable wrapper so expandable row content is not remounted when parent re-renders (e.g. after refetch). */
 const ExpandableRowWrapper: React.FC<{
-  renderFn: (props: { row: any }) => React.ReactElement | null;
+  renderFn: (props: { row: any }) => React.ReactElement<any> | null;
   row: any;
 }> = ({ renderFn, row }) => renderFn({ row });
 

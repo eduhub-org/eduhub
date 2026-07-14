@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { FC, useMemo, useCallback, Fragment } from 'react';
+import { FC, useMemo, useCallback, Fragment, type JSX } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { MdAttachMoney, MdCalendarMonth } from 'react-icons/md';
 

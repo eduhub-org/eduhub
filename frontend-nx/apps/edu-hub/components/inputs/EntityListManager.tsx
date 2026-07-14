@@ -257,7 +257,7 @@ const EntityListManager = <TEntity, TSelectedEntity>({
   );
 
   // Create a modified dialog that uses our handler
-  const enhancedDialog = React.cloneElement(selectionDialog as React.ReactElement, {
+  const enhancedDialog = React.cloneElement(selectionDialog as React.ReactElement<any>, {
     onClose: handleEntitySelection,
   });
 

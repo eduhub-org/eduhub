@@ -1,5 +1,5 @@
-import { ChangeEvent, FC, useCallback } from 'react';
-import { DebounceInput } from 'react-debounce-input';
+import { ChangeEvent, FC, useCallback, useEffect, useState } from 'react';
+import { useDebouncedCallback } from 'use-debounce';
 import { MdSearch } from 'react-icons/md';
 
 interface IProps {
@@ -17,11 +17,25 @@ const SearchBox: FC<IProps> = ({
   onChangeCallback,
   autoFocus,
 }) => {
+  // Keep an immediate local value for display and debounce the callback to the
+  // parent, mirroring the previous react-debounce-input behavior.
+  const [localValue, setLocalValue] = useState(searchText ?? '');
+
+  useEffect(() => {
+    setLocalValue(searchText ?? '');
+  }, [searchText]);
+
+  const debouncedOnChange = useDebouncedCallback((text: string) => {
+    onChangeCallback(text);
+  }, debounceTime ?? 1000);
+
   const onChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
-      onChangeCallback(event.target.value);
+      const { value } = event.target;
+      setLocalValue(value);
+      debouncedOnChange(value);
     },
-    [onChangeCallback]
+    [debouncedOnChange]
   );
 
   return (
@@ -30,10 +44,9 @@ const SearchBox: FC<IProps> = ({
         <button className="flex items-center justify-center px-4 border-r">
           <MdSearch size={26} />
         </button>
-        <DebounceInput
+        <input
           className="px-4 py-2 focus:outline-none text-black"
-          debounceTimeout={debounceTime ?? 1000}
-          value={searchText ?? ''}
+          value={localValue}
           onChange={onChange}
           placeholder={placeholder}
           autoFocus={autoFocus ?? false}
