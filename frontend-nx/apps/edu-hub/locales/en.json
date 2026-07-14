@@ -306,6 +306,8 @@
     "widget_no_courses_available": "No courses available",
     "widget_error_loading_projects": "Error loading projects",
     "widget_no_projects_available": "No projects available",
+    "widget_error_loading_jobs": "Error loading jobs",
+    "widget_no_jobs_available": "No jobs available",
     "page_not_found": "Page not found",
     "page_not_found_description": "The page you're looking for doesn't exist. It may have been moved or deleted.",
     "back_to_home": "Back to home",
@@ -2124,6 +2126,21 @@
       "loading": "Loading...",
       "error_loading": "The project sliders could not be loaded."
     },
+    "job_sliders": {
+      "label": "Job Sliders",
+      "help_text": "Create job sliders for the homepage. Each slider shows published Stujo job postings. Pick the job types to include, or leave empty to show all published jobs. Sliders are ordered together with the course groups above.",
+      "add_placeholder": "Title of the new job slider",
+      "add_button": "Add slider",
+      "id_label": "ID",
+      "delete": "Delete job slider",
+      "source_job_types": "Job types",
+      "no_selection_hint": "No job types selected — shows all published jobs.",
+      "error_add": "The job slider could not be created.",
+      "error_delete": "The job slider could not be deleted.",
+      "error_save": "The selection could not be saved.",
+      "loading": "Loading...",
+      "error_loading": "The job sliders could not be loaded."
+    },
     "badges": {
       "section_label": "Badges",
       "section_help": "Define reusable badges (e.g. awards) that can be attached to projects. Title, description and icon are authored once here and shown automatically wherever the badge appears.",
@@ -2690,5 +2707,61 @@
     },
     "submitted_on": "Submitted {date}",
     "load_error": "Could not load this project. Please try again later."
+  },
+  "job": {
+    "published_on": "Published {date}",
+    "type": {
+      "MINIJOB": "Mini jobs",
+      "WORKING_STUDENT": "Student jobs",
+      "INTERNSHIP": "Internships",
+      "THESIS": "Theses",
+      "PERMANENT": "Permanent positions",
+      "TRAINEE": "Trainee positions",
+      "STATE_RECOGNITION_INTERNSHIP": "Internships for state recognition"
+    },
+    "region": {
+      "FLENSBURG": "Flensburg",
+      "KIEL": "Kiel region",
+      "SCHLESWIG_HOLSTEIN_HAMBURG": "Schleswig-Holstein and Hamburg",
+      "GERMANY": "Germany",
+      "DENMARK": "Denmark",
+      "ABROAD": "Other countries"
+    },
+    "occupation": {
+      "ADMINISTRATION": "Administration and clerical work",
+      "EDUCATION_TRAINING": "Education and training",
+      "BANKING_INSURANCE": "Banking, insurance and financial services",
+      "CUSTOMER_SERVICE": "Customer service and support",
+      "DESIGN_ARCHITECTURE": "Design and architecture",
+      "PURCHASING_LOGISTICS": "Purchasing, transport and logistics",
+      "MANUFACTURING_CONSTRUCTION": "Manufacturing, construction and crafts",
+      "ACCOUNTING": "Finance and accounting",
+      "RESEARCH_SCIENCE": "Research, development and science",
+      "HEALTH_SOCIAL": "Health, medicine and social affairs",
+      "HOSPITALITY": "Hotel and gastronomy",
+      "ENGINEERING": "Engineering and technical professions",
+      "MAINTENANCE": "Maintenance",
+      "IT_TELECOMMUNICATIONS": "IT and telecommunications",
+      "ARTS_CULTURE": "Arts and culture",
+      "AGRICULTURE_ENVIRONMENT": "Agriculture, forestry, fishery and environment",
+      "MARKETING_ADVERTISING": "Marketing and advertising",
+      "PUBLIC_SERVICE": "Public service and associations",
+      "HUMAN_RESOURCES": "Human resources",
+      "PRODUCTION": "Production",
+      "PROJECT_MANAGEMENT": "Project management",
+      "QUALITY_MANAGEMENT": "Quality management",
+      "LEGAL": "Legal",
+      "MEDIA_EDITORIAL": "Editorial, media and information",
+      "SECURITY_CIVIL_PROTECTION": "Security and civil protection",
+      "MANAGEMENT": "Management / executive board",
+      "SALES_RETAIL": "Sales and retail",
+      "TOURISM": "Tourism",
+      "EVENT_MANAGEMENT": "Event management",
+      "CONSULTING": "Consulting",
+      "REAL_ESTATE": "Real estate",
+      "SOCIAL_MEDIA": "Social media",
+      "SOCIAL_PEDAGOGY": "Social pedagogy",
+      "OTHER": "Other occupational field"
+    }
   }
 }

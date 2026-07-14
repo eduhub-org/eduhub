@@ -18,6 +18,10 @@ export const COURSE_GROUP_OPTIONS = gql`
         id
         projectGroupOptionId
       }
+      SelectedJobTypes {
+        id
+        jobType
+      }
     }
   }
 `;
