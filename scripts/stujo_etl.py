@@ -505,16 +505,22 @@ def step_companies(hasura: HasuraClient, gcs_bucket, files_root, companies) -> d
             # 'terwixonse') merge into one Organization; record this row's
             # legacy alias too so old URLs keep redirecting.
             mapping[c["id"]] = org["id"]
-            if legacy_alias not in (org.get("aliases") or []):
+            aliases = org.get("aliases") or []
+            if legacy_alias not in aliases:
+                # Compute the new array client-side and _set it: some orgs have
+                # aliases = null, and Postgres `null || jsonb` is null, so a
+                # Hasura _append would silently drop the alias (and .append on
+                # None would crash).
+                new_aliases = aliases + [legacy_alias]
                 hasura.mutate(
                     """
-                    mutation ($id: Int!, $alias: jsonb!) {
-                      update_Organization_by_pk(pk_columns: {id: $id}, _append: {aliases: $alias}) { id }
+                    mutation ($id: Int!, $aliases: jsonb!) {
+                      update_Organization_by_pk(pk_columns: {id: $id}, _set: {aliases: $aliases}) { id }
                     }
                     """,
-                    {"id": org["id"], "alias": [legacy_alias]},
+                    {"id": org["id"], "aliases": new_aliases},
                 )
-                org.setdefault("aliases", []).append(legacy_alias)
+                org["aliases"] = new_aliases
                 by_alias[legacy_alias] = org
             # Backfill a logo onto a matched org that has none (repairs a prior
             # run whose upload failed after the insert; fills a null logo on a
