@@ -70,7 +70,22 @@ module "lb-http" {
   name    = "load-balancer"
   project = var.project_id
 
-  # Create Google-managed SSL certificates for the specified domains. 
+  # Create Google-managed SSL certificates for the specified domains.
+  #
+  # This is a single multi-SAN managed cert. A managed cert's domain list is
+  # immutable, so changing it (e.g. adding the stujo portal hosts below)
+  # provisions a brand-new cert; random_certificate_suffix + the module's
+  # create-before-destroy make the swap gap-free. The new cert only reaches
+  # ACTIVE once EVERY listed domain validates, and validation requires each
+  # domain's Cloudflare A record (created further down from this LB's IP) to
+  # resolve to the LB. Those records depend on module.lb-http.external_ip, so
+  # they can only be created after this module — the cert cannot be ordered
+  # to wait for them. This is self-healing (GCP retries validation; Cloudflare
+  # propagates in seconds), but the practical consequence when applying a
+  # domain change is a provisioning window (can be tens of minutes) during
+  # which the affected hosts serve no valid HTTPS. Apply domain changes in a
+  # low-traffic window and confirm the new cert is ACTIVE and the new records
+  # resolve before treating the new hosts as live.
   ssl                             = "true"
   managed_ssl_certificate_domains = concat(["${local.keycloak_service_name}.opencampus.sh", "${local.hasura_service_name}.opencampus.sh", "${local.eduhub_service_name}.opencampus.sh", "${local.eduhub_api_service_name}.opencampus.sh", local.stujo_domain], [for portal in local.stujo_portals : portal.domain])
   https_redirect                  = "true"
