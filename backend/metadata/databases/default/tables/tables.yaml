@@ -36,6 +36,7 @@
 - "!include public_JobAlertSubscription.yaml"
 - "!include public_JobOccupation.yaml"
 - "!include public_JobPortal.yaml"
+- "!include public_JobPortalDomain.yaml"
 - "!include public_JobPosting.yaml"
 - "!include public_JobPostingCredit.yaml"
 - "!include public_JobPostingPrice.yaml"

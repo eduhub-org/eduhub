@@ -13,6 +13,9 @@ export interface JobTileFragment_Organization {
   __typename: "Organization";
   id: number;
   name: string;
+  /**
+   * Path to the organization logo image file
+   */
   logo: string | null;
 }
 
