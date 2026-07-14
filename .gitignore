@@ -21,3 +21,7 @@ next-env.d.ts
 keycloak/spi/*/target/
 # Python bytecode
 __pycache__/
+
+# Local, untracked source-side config for the StuJo ETL wrapper
+# (MySQL DSN, Rails files root, Keycloak admin user). Never commit.
+scripts/.stujo_etl_source.env
