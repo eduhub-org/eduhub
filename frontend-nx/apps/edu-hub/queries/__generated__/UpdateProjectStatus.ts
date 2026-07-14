@@ -6,22 +6,23 @@
 import { ProjectStatus_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
-// GraphQL mutation operation: UpdateProjectPublish
+// GraphQL mutation operation: UpdateProjectStatus
 // ====================================================
 
-export interface UpdateProjectPublish_update_Project_by_pk {
+export interface UpdateProjectStatus_update_Project_by_pk {
   __typename: "Project";
   id: number;
   status: ProjectStatus_enum;
 }
 
-export interface UpdateProjectPublish {
+export interface UpdateProjectStatus {
   /**
    * update single row of the table: "Project"
    */
-  update_Project_by_pk: UpdateProjectPublish_update_Project_by_pk | null;
+  update_Project_by_pk: UpdateProjectStatus_update_Project_by_pk | null;
 }
 
-export interface UpdateProjectPublishVariables {
+export interface UpdateProjectStatusVariables {
   itemId: number;
+  status: ProjectStatus_enum;
 }

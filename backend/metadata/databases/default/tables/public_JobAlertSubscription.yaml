@@ -1,0 +1,51 @@
+table:
+  name: JobAlertSubscription
+  schema: public
+object_relationships:
+  - name: User
+    using:
+      foreign_key_constraint_on: userId
+select_permissions:
+  - role: user_access
+    permission:
+      columns:
+        - id
+        - userId
+        - active
+        - jobPostingType
+        - region
+        - lastSentAt
+        - created_at
+        - updated_at
+      filter:
+        userId:
+          _eq: X-Hasura-User-Id
+insert_permissions:
+  - role: user_access
+    permission:
+      columns:
+        - active
+        - jobPostingType
+        - region
+      check: {}
+      set:
+        userId: x-hasura-User-Id
+update_permissions:
+  - role: user_access
+    permission:
+      columns:
+        - active
+        - jobPostingType
+        - region
+      filter:
+        userId:
+          _eq: X-Hasura-User-Id
+      check:
+        userId:
+          _eq: X-Hasura-User-Id
+delete_permissions:
+  - role: user_access
+    permission:
+      filter:
+        userId:
+          _eq: X-Hasura-User-Id

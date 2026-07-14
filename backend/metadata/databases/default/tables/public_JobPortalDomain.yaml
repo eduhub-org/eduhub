@@ -1,0 +1,26 @@
+table:
+  name: JobPortalDomain
+  schema: public
+object_relationships:
+  - name: AppSetting
+    using:
+      foreign_key_constraint_on: appName
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - appName
+        - hostname
+      filter: {}
+  - role: user_access
+    permission:
+      columns:
+        - appName
+        - hostname
+      filter: {}
+  - role: org_admin_access
+    permission:
+      columns:
+        - appName
+        - hostname
+      filter: {}

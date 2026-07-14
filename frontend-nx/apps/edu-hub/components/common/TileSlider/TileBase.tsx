@@ -6,6 +6,10 @@ interface TileBaseProps {
   title: string;
   children: ReactNode;
   bannerText?: string | null;
+  /** Rendered in the top-right slot (where bannerText renders). Takes precedence over bannerText. */
+  cornerBadge?: ReactNode;
+  /** When set, replaces the cover-image background + gradient inside the image area; the title overlay and top-right slot still render on top. */
+  imageArea?: ReactNode;
   onClick?: () => void;
   className?: string;
   style?: React.CSSProperties;
@@ -16,6 +20,8 @@ const TileBaseComponent: FC<TileBaseProps> = ({
   title,
   children,
   bannerText,
+  cornerBadge,
+  imageArea,
   onClick,
   className = '',
   style,
@@ -54,23 +60,31 @@ const TileBaseComponent: FC<TileBaseProps> = ({
       style={style}
     >
       <div className="relative h-[230px] flex justify-start items-end">
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{
-            backgroundImage: `url("${coverImage}")`,
-          }}
-        ></div>
-        {bannerText ? (
+        {imageArea ? (
+          imageArea
+        ) : (
+          <>
+            <div
+              className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+              style={{
+                backgroundImage: `url("${coverImage}")`,
+              }}
+            ></div>
+            <div
+              className="absolute inset-0"
+              style={{
+                background: 'linear-gradient(51.32deg, rgba(0, 0, 0, 0.7) 17.57%, rgba(0, 0, 0, 0) 85.36%)',
+              }}
+            ></div>
+          </>
+        )}
+        {cornerBadge ? (
+          <div className="absolute right-3 top-3 z-20 max-w-[80%]">{cornerBadge}</div>
+        ) : bannerText ? (
           <div className="absolute right-3 top-3 z-20 max-w-[80%] rounded-full border border-border-primary bg-warning px-3 py-1 text-xs font-semibold text-label-primary shadow-sm">
             {bannerText}
           </div>
         ) : null}
-        <div
-          className="absolute inset-0"
-          style={{
-            background: 'linear-gradient(51.32deg, rgba(0, 0, 0, 0.7) 17.57%, rgba(0, 0, 0, 0) 85.36%)',
-          }}
-        ></div>
         <div className="absolute inset-0 flex justify-start items-end p-3">
           <span className="text-3xl text-white">{title}</span>
         </div>

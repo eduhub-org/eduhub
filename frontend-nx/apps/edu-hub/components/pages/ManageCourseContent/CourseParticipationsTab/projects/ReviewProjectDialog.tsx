@@ -1,5 +1,12 @@
-import { FC, useEffect, useState } from 'react';
+import { FC, ReactNode, useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
+import {
+  MdCheck,
+  MdCheckCircle,
+  MdClose,
+  MdRadioButtonUnchecked,
+  MdReplay,
+} from 'react-icons/md';
 import { useRoleMutation } from '../../../../../hooks/authedMutation';
 import { DialogShell } from '../../../../common/dialogs/DialogShell';
 import { Button } from '../../../../common/Button';
@@ -24,11 +31,104 @@ interface ReviewProjectDialogProps {
   onError: (msg: string) => void;
 }
 
-const RATING_OPTIONS: ProjectRating_enum[] = [
-  ProjectRating_enum.UNRATED,
-  ProjectRating_enum.PASSED,
-  ProjectRating_enum.FAILED,
+type Verdict = 'approve' | 'revise' | 'reject';
+
+// Each verdict bundles the rating that is persisted alongside the status change,
+// removing the redundancy between the former rating radios and action buttons.
+const VERDICT_RATING: Record<Verdict, ProjectRating_enum> = {
+  approve: ProjectRating_enum.PASSED,
+  revise: ProjectRating_enum.UNRATED,
+  reject: ProjectRating_enum.FAILED,
+};
+
+interface DecisionAccent {
+  chip: string;
+  ring: string;
+  tint: string;
+  indicator: string;
+}
+
+const DECISIONS: { key: Verdict; icon: ReactNode; accent: DecisionAccent }[] = [
+  {
+    key: 'approve',
+    icon: <MdCheck />,
+    accent: {
+      chip: 'bg-green-600',
+      ring: 'border-green-600',
+      tint: 'bg-green-50',
+      indicator: 'text-green-600',
+    },
+  },
+  {
+    key: 'revise',
+    icon: <MdReplay />,
+    accent: {
+      chip: 'bg-amber-500',
+      ring: 'border-amber-500',
+      tint: 'bg-amber-50',
+      indicator: 'text-amber-500',
+    },
+  },
+  {
+    key: 'reject',
+    icon: <MdClose />,
+    accent: {
+      chip: 'bg-red-600',
+      ring: 'border-red-600',
+      tint: 'bg-red-50',
+      indicator: 'text-red-600',
+    },
+  },
 ];
+
+interface DecisionCardProps {
+  selected: boolean;
+  disabled: boolean;
+  onSelect: () => void;
+  icon: ReactNode;
+  title: string;
+  description: string;
+  accent: DecisionAccent;
+}
+
+const DecisionCard: FC<DecisionCardProps> = ({
+  selected,
+  disabled,
+  onSelect,
+  icon,
+  title,
+  description,
+  accent,
+}) => (
+  <button
+    type="button"
+    onClick={onSelect}
+    disabled={disabled}
+    aria-pressed={selected}
+    className={`flex w-full items-center gap-3 rounded-lg border-2 p-3 text-left transition-colors disabled:opacity-60 ${
+      selected
+        ? `${accent.ring} ${accent.tint}`
+        : 'border-border-primary bg-fill-primary hover:border-border-secondary'
+    }`}
+  >
+    <span
+      className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full text-lg text-white ${accent.chip}`}
+    >
+      {icon}
+    </span>
+    <span className="min-w-0 flex-1">
+      <span className="block text-sm font-semibold text-label-primary">
+        {title}
+      </span>
+      <span className="block text-xs text-label-secondary">{description}</span>
+    </span>
+    {selected ? (
+      <MdCheckCircle className={`flex-shrink-0 text-xl ${accent.indicator}`} />
+    ) : (
+      <MdRadioButtonUnchecked className="flex-shrink-0 text-xl text-border-secondary" />
+    )}
+  </button>
+);
 
 const ReviewProjectDialog: FC<ReviewProjectDialogProps> = ({
   open,
@@ -40,7 +140,7 @@ const ReviewProjectDialog: FC<ReviewProjectDialogProps> = ({
   const t = useTranslations('manageCourse');
   const tCommon = useTranslations('common');
 
-  const [rating, setRating] = useState<ProjectRating_enum>(ProjectRating_enum.UNRATED);
+  const [verdict, setVerdict] = useState<Verdict | null>(null);
   const [ratingComment, setRatingComment] = useState<string>('');
 
   const [approveProject, approveState] = useRoleMutation(UPDATE_PROJECT_APPROVE, {
@@ -58,7 +158,14 @@ const ReviewProjectDialog: FC<ReviewProjectDialogProps> = ({
 
   useEffect(() => {
     if (!project) return;
-    setRating(project.rating ?? ProjectRating_enum.UNRATED);
+    const rating = project.rating ?? ProjectRating_enum.UNRATED;
+    setVerdict(
+      rating === ProjectRating_enum.PASSED
+        ? 'approve'
+        : rating === ProjectRating_enum.FAILED
+          ? 'reject'
+          : null
+    );
     setRatingComment(project.ratingComment?.trim() ? project.ratingComment : '');
   }, [open, project]);
 
@@ -68,51 +175,33 @@ const ReviewProjectDialog: FC<ReviewProjectDialogProps> = ({
     rejectState.loading ||
     saveRatingState.loading;
 
-  const handleSaveRating = async () => {
-    if (!project) return;
+  const handleSave = async () => {
+    if (!project || !verdict) return;
     const trimmed = ratingComment.trim();
     try {
       await saveRating({
         variables: {
           itemId: project.id,
-          rating,
+          rating: VERDICT_RATING[verdict],
           ratingComment: trimmed === '' ? null : trimmed,
         },
       });
-    } catch (err) {
-      onError(err instanceof Error ? err.message : tCommon('error'));
-    }
-  };
-
-  const handleApprove = async () => {
-    if (!project) return;
-    try {
-      await approveProject({ variables: { itemId: project.id } });
+      if (verdict === 'approve') {
+        await approveProject({ variables: { itemId: project.id } });
+      } else if (verdict === 'revise') {
+        await sendBackProject({ variables: { itemId: project.id } });
+      } else {
+        await rejectProject({ variables: { itemId: project.id } });
+      }
       onClose();
     } catch (err) {
       onError(err instanceof Error ? err.message : tCommon('error'));
     }
   };
 
-  const handleSendBack = async () => {
-    if (!project) return;
-    try {
-      await sendBackProject({ variables: { itemId: project.id } });
-      onClose();
-    } catch (err) {
-      onError(err instanceof Error ? err.message : tCommon('error'));
-    }
-  };
-
-  const handleReject = async () => {
-    if (!project) return;
-    try {
-      await rejectProject({ variables: { itemId: project.id } });
-      onClose();
-    } catch (err) {
-      onError(err instanceof Error ? err.message : tCommon('error'));
-    }
-  };
+  const docHref = safeProjectResourceHref(project?.documentationUrl);
+  const presHref = safeProjectResourceHref(project?.presentationUrl);
+  const extHref = safeProjectExternalHref(project?.externalUrl);
 
   return (
     <DialogShell
@@ -120,17 +209,14 @@ const ReviewProjectDialog: FC<ReviewProjectDialogProps> = ({
       onClose={onClose}
       title={t('projects.evaluate_dialog.title')}
       ariaLabelledBy="review-project-dialog"
-      maxWidth="md"
+      maxWidth="sm"
       actions={
-        <div className="flex flex-wrap justify-end gap-2">
-          <Button onClick={handleReject} disabled={busy}>
-            {t('projects.review_dialog.reject_button')}
+        <div className="flex justify-end gap-2">
+          <Button onClick={onClose} disabled={busy}>
+            {tCommon('cancel')}
           </Button>
-          <Button onClick={handleSendBack} disabled={busy}>
-            {t('projects.review_dialog.send_back_button')}
-          </Button>
-          <Button filled onClick={handleApprove} disabled={busy}>
-            {t('projects.review_dialog.approve_button')}
+          <Button filled onClick={handleSave} disabled={busy || !verdict}>
+            {t('projects.evaluate_dialog.confirm_button')}
           </Button>
         </div>
       }
@@ -152,10 +238,10 @@ const ReviewProjectDialog: FC<ReviewProjectDialogProps> = ({
               <p className="whitespace-pre-line">{project.description}</p>
             ) : null}
           </div>
-          <div className="space-y-1 text-sm">
-            {(() => {
-              const docHref = safeProjectResourceHref(project.documentationUrl);
-              return docHref ? (
+
+          {docHref || presHref || extHref ? (
+            <div className="space-y-1 text-sm">
+              {docHref ? (
                 <a
                   href={docHref}
                   target="_blank"
@@ -164,11 +250,8 @@ const ReviewProjectDialog: FC<ReviewProjectDialogProps> = ({
                 >
                   {t('projects.review_dialog.documentation_link')}
                 </a>
-              ) : null;
-            })()}
-            {(() => {
-              const presHref = safeProjectResourceHref(project.presentationUrl);
-              return presHref ? (
+              ) : null}
+              {presHref ? (
                 <a
                   href={presHref}
                   target="_blank"
@@ -177,11 +260,8 @@ const ReviewProjectDialog: FC<ReviewProjectDialogProps> = ({
                 >
                   {t('projects.review_dialog.presentation_link')}
                 </a>
-              ) : null;
-            })()}
-            {(() => {
-              const extHref = safeProjectExternalHref(project.externalUrl);
-              return extHref ? (
+              ) : null}
+              {extHref ? (
                 <a
                   href={extHref}
                   target="_blank"
@@ -190,56 +270,43 @@ const ReviewProjectDialog: FC<ReviewProjectDialogProps> = ({
                 >
                   {t('projects.review_dialog.external_link')}
                 </a>
-              ) : null;
-            })()}
-          </div>
+              ) : null}
+            </div>
+          ) : null}
 
-          <div className="rounded-lg border border-border-primary p-4 space-y-4 bg-bg-secondary/30">
-            <fieldset className="space-y-2">
-              <legend className="text-sm font-medium text-label-primary mb-2">
-                {t('projects.evaluate_dialog.rating_section_label')}
-              </legend>
-              <div className="flex flex-col gap-2">
-                {RATING_OPTIONS.map((value) => (
-                  <label key={value} className="flex items-center gap-2 text-sm cursor-pointer">
-                    <input
-                      type="radio"
-                      name="project-rating"
-                      value={value}
-                      checked={rating === value}
-                      onChange={() => setRating(value)}
-                      disabled={busy}
-                    />
-                    <span>
-                      {value === ProjectRating_enum.UNRATED
-                        ? t('projects.evaluate_dialog.rating_UNRATED')
-                        : value === ProjectRating_enum.PASSED
-                          ? t('projects.evaluate_dialog.rating_PASSED')
-                          : t('projects.evaluate_dialog.rating_FAILED')}
-                    </span>
-                  </label>
-                ))}
-              </div>
-            </fieldset>
-            <label className="block">
-              <span className="block text-sm font-medium mb-1">
-                {t('projects.evaluate_dialog.comment_label')}
-              </span>
-              <textarea
-                className="w-full border border-border-primary rounded px-3 py-2 text-sm min-h-[5rem]"
-                value={ratingComment}
-                onChange={(e) => setRatingComment(e.target.value)}
-                disabled={busy}
-                placeholder={t('projects.evaluate_dialog.comment_placeholder')}
-                maxLength={4000}
-              />
-            </label>
-            <div className="flex justify-end">
-              <Button filled onClick={handleSaveRating} disabled={busy}>
-                {t('projects.evaluate_dialog.save_rating_button')}
-              </Button>
+          <div className="space-y-2">
+            <span className="block text-sm font-medium text-label-primary">
+              {t('projects.evaluate_dialog.decision_label')}
+            </span>
+            <div className="space-y-2">
+              {DECISIONS.map(({ key, icon, accent }) => (
+                <DecisionCard
+                  key={key}
+                  selected={verdict === key}
+                  disabled={busy}
+                  onSelect={() => setVerdict(key)}
+                  icon={icon}
+                  title={t(`projects.evaluate_dialog.${key}_title`)}
+                  description={t(`projects.evaluate_dialog.${key}_description`)}
+                  accent={accent}
+                />
+              ))}
             </div>
           </div>
+
+          <label className="block">
+            <span className="block text-sm font-medium mb-1">
+              {t('projects.evaluate_dialog.comment_label')}
+            </span>
+            <textarea
+              className="w-full border border-border-primary rounded px-3 py-2 text-sm min-h-[5rem]"
+              value={ratingComment}
+              onChange={(e) => setRatingComment(e.target.value)}
+              disabled={busy}
+              placeholder={t('projects.evaluate_dialog.comment_placeholder')}
+              maxLength={4000}
+            />
+          </label>
         </div>
       ) : null}
     </DialogShell>

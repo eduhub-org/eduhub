@@ -130,6 +130,32 @@ export interface ProjectsByCourse_Project_ProjectMentors {
   User: ProjectsByCourse_Project_ProjectMentors_User;
 }
 
+export interface ProjectsByCourse_Project_ProjectConsentEvents_ActorUser {
+  __typename: "User";
+  id: any;
+  /**
+   * The user's first name
+   */
+  firstName: string;
+  /**
+   * The user's last name
+   */
+  lastName: string;
+}
+
+export interface ProjectsByCourse_Project_ProjectConsentEvents {
+  __typename: "ProjectConsentEvent";
+  id: number;
+  eventType: string;
+  actorUserId: any;
+  created_at: any;
+  termsVersion: string;
+  /**
+   * An object relationship
+   */
+  ActorUser: ProjectsByCourse_Project_ProjectConsentEvents_ActorUser;
+}
+
 export interface ProjectsByCourse_Project {
   __typename: "Project";
   id: number;
@@ -154,6 +180,10 @@ export interface ProjectsByCourse_Project {
    * Optional comment from course staff or project mentor accompanying rating (UNRATED/PASSED/FAILED).
    */
   ratingComment: string | null;
+  /**
+   * Course staff flag: a completed project is suggested for showcase publication. Toggling this does not publish the project (status PUBLISHED is set separately).
+   */
+  suggestedForPublication: boolean;
   acceptingParticipants: boolean;
   organizationId: number | null;
   proposedByUserId: any;
@@ -200,6 +230,10 @@ export interface ProjectsByCourse_Project {
    * An array relationship
    */
   ProjectMentors: ProjectsByCourse_Project_ProjectMentors[];
+  /**
+   * An array relationship
+   */
+  ProjectConsentEvents: ProjectsByCourse_Project_ProjectConsentEvents[];
 }
 
 export interface ProjectsByCourse {

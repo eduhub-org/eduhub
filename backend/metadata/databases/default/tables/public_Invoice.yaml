@@ -14,6 +14,9 @@ object_relationships:
   - name: InvoiceStatus
     using:
       foreign_key_constraint_on: status
+  - name: JobPosting
+    using:
+      foreign_key_constraint_on: jobPostingId
 select_permissions:
   - role: user_access
     permission:
@@ -25,6 +28,7 @@ select_permissions:
         - id
         - invoiceDate
         - invoiceNumber
+        - jobPostingId
         - netTotal
         - organizationId
         - status
@@ -37,6 +41,36 @@ select_permissions:
       filter:
         userId:
           _eq: X-Hasura-User-Id
+      allow_aggregations: true
+  # Employers see invoices for their organization's job postings.
+  - role: org_admin_access
+    permission:
+      columns:
+        - created_at
+        - currency
+        - grossTotal
+        - id
+        - invoiceDate
+        - invoiceNumber
+        - jobPostingId
+        - netTotal
+        - organizationId
+        - status
+        - stripeHostedInvoiceUrl
+        - stripeInvoicePdfUrl
+        - stripeInvoiceId
+        - updated_at
+        - userId
+        - vatTotal
+      filter:
+        JobPosting:
+          Organization:
+            OrganizationAdmins:
+              _and:
+                - userId:
+                    _eq: X-Hasura-User-Id
+                - canManageJobs:
+                    _eq: true
       allow_aggregations: true
   - role: instructor_access
     permission:

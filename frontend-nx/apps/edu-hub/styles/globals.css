@@ -41,6 +41,8 @@
   --eduhub-warning: #FFA665;
   --eduhub-error: #D45A5A;
   --eduhub-info: #1982fc;
+  --eduhub-badge: #E7B24C;
+  --eduhub-badge-contrast: #4A3500;
   
   /* Status Colors */
   --eduhub-status-confirmed: #A2EBA0;

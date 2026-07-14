@@ -70,9 +70,24 @@ module "lb-http" {
   name    = "load-balancer"
   project = var.project_id
 
-  # Create Google-managed SSL certificates for the specified domains. 
+  # Create Google-managed SSL certificates for the specified domains.
+  #
+  # This is a single multi-SAN managed cert. A managed cert's domain list is
+  # immutable, so changing it (e.g. adding the stujo portal hosts below)
+  # provisions a brand-new cert; random_certificate_suffix + the module's
+  # create-before-destroy make the swap gap-free. The new cert only reaches
+  # ACTIVE once EVERY listed domain validates, and validation requires each
+  # domain's Cloudflare A record (created further down from this LB's IP) to
+  # resolve to the LB. Those records depend on module.lb-http.external_ip, so
+  # they can only be created after this module — the cert cannot be ordered
+  # to wait for them. This is self-healing (GCP retries validation; Cloudflare
+  # propagates in seconds), but the practical consequence when applying a
+  # domain change is a provisioning window (can be tens of minutes) during
+  # which the affected hosts serve no valid HTTPS. Apply domain changes in a
+  # low-traffic window and confirm the new cert is ACTIVE and the new records
+  # resolve before treating the new hosts as live.
   ssl                             = "true"
-  managed_ssl_certificate_domains = ["${local.keycloak_service_name}.opencampus.sh", "${local.hasura_service_name}.opencampus.sh", "${local.eduhub_service_name}.opencampus.sh", "${local.eduhub_api_service_name}.opencampus.sh"]
+  managed_ssl_certificate_domains = concat(["${local.keycloak_service_name}.opencampus.sh", "${local.hasura_service_name}.opencampus.sh", "${local.eduhub_service_name}.opencampus.sh", "${local.eduhub_api_service_name}.opencampus.sh", local.stujo_domain], [for portal in local.stujo_portals : portal.domain])
   https_redirect                  = "true"
   random_certificate_suffix       = "true"
 
@@ -138,6 +153,27 @@ resource "cloudflare_record" "eduhub" {
 resource "cloudflare_record" "eduhub_api" {
   zone_id = var.cloudflare_zone_id
   name    = local.eduhub_api_service_name
+  type    = "A"
+  value   = module.lb-http.external_ip
+}
+
+# Add a domain record for the StuJo job board frontend
+resource "cloudflare_record" "stujo" {
+  zone_id = var.cloudflare_zone_id
+  name    = trimsuffix(local.stujo_domain, ".opencampus.sh")
+  type    = "A"
+  value   = module.lb-http.external_ip
+}
+
+# Add domain records for the interim white-label StuJo portal hosts on
+# opencampus.sh (stujo-<portal>[-staging].opencampus.sh). Each maps to its
+# own Cloud Run service via the load balancer url_mask (see
+# local.stujo_portals in 00_variables.tf and 08_stujo.tf).
+resource "cloudflare_record" "stujo_portals" {
+  for_each = local.stujo_portals
+
+  zone_id = var.cloudflare_zone_id
+  name    = trimsuffix(each.value.domain, ".opencampus.sh")
   type    = "A"
   value   = module.lb-http.external_ip
 }

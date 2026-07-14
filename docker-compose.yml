@@ -33,6 +33,39 @@ services:
       # Optional for local dev; required to encrypt Ghost newsletter credentials (see .env.example)
       GHOST_NEWSLETTER_CREDENTIALS_ENCRYPTION_KEY: ${GHOST_NEWSLETTER_CREDENTIALS_ENCRYPTION_KEY:-}
 
+  # StuJo job board frontend (apps/stujo) — same dev image as edu-hub,
+  # served on http://localhost:5001
+  frontend-stujo:
+    container_name: eduhub-frontend-stujo
+    ports:
+      - "5001:4201"
+    build:
+      context: ./frontend-nx
+      dockerfile: Dockerfile-dev
+    # uncomment this to disable automatic yarn dev on stujo startup
+    # command: tail -F anything
+    volumes:
+      - ./frontend-nx:/opt/app
+    depends_on:
+      - hasura
+      - keycloak
+    environment:
+      DEV_APP: stujo
+      DEV_APP_PORT: 4201
+      DEV_SELF_PORT: 5001
+      APP_NAME: stujo
+      NEXT_PUBLIC_ENVIRONMENT: development
+      NEXT_PUBLIC_API_URL: http://localhost:8080/v1/graphql
+      NEXT_PUBLIC_STORAGE_BUCKET_URL: ${GITPOD_WORKSPACE_URL:-http://localhost}:4001/emulated-bucket
+      # SSR queries go directly to the hasura container
+      API_URL: http://hasura:8080/v1/graphql
+      NEXTAUTH_URL: http://localhost:5001
+      CHOKIDAR_USEPOLLING: "true"
+      WATCHPACK_POLLING: "true"
+      NODE_OPTIONS: "--dns-result-order=ipv4first"
+      HASURA_ADMIN_SECRET: myadminsecretkey
+      GRAPHQL_URI: http://hasura:8080/v1/graphql
+
   node_functions:
     container_name: eduhub-node-functions
     image: node:22-bullseye
@@ -66,6 +99,11 @@ services:
       MATRIX_ADMIN_USER_ID: ${MATRIX_ADMIN_USER_ID:-}
       MATRIX_ADMIN_ACCESS_TOKEN: ${MATRIX_ADMIN_ACCESS_TOKEN:-}
       FRONTEND_URL: http://localhost:5000
+      # StuJo job board (publishJobPosting / createStripeJobPostingPrices)
+      STUJO_FRONTEND_URL: ${STUJO_FRONTEND_URL:-http://localhost:5001}
+      STUJO_ADMIN_EMAIL: ${STUJO_ADMIN_EMAIL:-}
+      STRIPE_TAX_RATE_ID: ${STRIPE_TAX_RATE_ID:-}
+      STUJO_SELLER_ORGANIZATION_ID: ${STUJO_SELLER_ORGANIZATION_ID:-}
       STORAGE_BUCKET_PUBLIC_URL: ${GITPOD_WORKSPACE_URL:-http://localhost}:4001/emulated-bucket
       # Optional for local dev; required to encrypt Ghost newsletter credentials (see .env.example)
       GHOST_NEWSLETTER_CREDENTIALS_ENCRYPTION_KEY: ${GHOST_NEWSLETTER_CREDENTIALS_ENCRYPTION_KEY:-}
@@ -96,6 +134,8 @@ services:
       HASURA_CLOUD_FUNCTION_SECRET: test1234
       BUCKET_NAME: emulated-bucket
       LOCAL_STORAGE_PORT: 4001
+      # StuJo job board (expire_job_postings / send_job_alerts mails)
+      STUJO_FRONTEND_URL: ${STUJO_FRONTEND_URL:-http://localhost:5001}
       # From repo-root .env (optional; see .env.example → Python serverless functions)
       ZOOM_API_KEY: ${ZOOM_API_KEY:-}
       ZOOM_API_SECRET: ${ZOOM_API_SECRET:-}
@@ -163,16 +203,21 @@ services:
       dockerfile: Dockerfile-dev
     entrypoint: ["/bin/sh", "-c"]
     command:
+      # --optimized reuses the augmentation baked into the image (see
+      # Dockerfile-dev), skipping the ~90s Quarkus build on every startup.
+      # The SPI theme-cache flags keep live theme reloading that `start-dev`
+      # used to provide automatically.
       - >-
         unset KC_BOOTSTRAP_ADMIN_USERNAME KC_BOOTSTRAP_ADMIN_PASSWORD &&
-        /opt/keycloak/bin/kc.sh import --file /opt/keycloak/data/import/master.json --override true &&
-        exec /opt/keycloak/bin/kc.sh start-dev --import-realm
+        /opt/keycloak/bin/kc.sh import --optimized --file /opt/keycloak/data/import/master.json --override true &&
+        exec /opt/keycloak/bin/kc.sh start --optimized --import-realm --spi-theme-cache-themes=false --spi-theme-cache-templates=false
     ports:
       - 28080:8080
     environment:
       KC_BOOTSTRAP_ADMIN_USERNAME: admin
       KC_BOOTSTRAP_ADMIN_PASSWORD: admin
       KC_HOSTNAME_STRICT: "false"
+      KC_HTTP_ENABLED: "true"
       KC_HTTP_HOST: "0.0.0.0"
     volumes:
       - ./keycloak/imports-dev/master.json:/opt/keycloak/data/import/master.json

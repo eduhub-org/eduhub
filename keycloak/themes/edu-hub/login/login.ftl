@@ -87,7 +87,10 @@
             </div>
         </#if>
     <#elseif section = "socialProviders" >
-        <#if realm.password && social.providers??>
+        <#-- ?has_content: social.providers is an empty list (not null) when no
+             identity providers are configured, which used to leave an orphaned
+             "Or sign in with" heading above an empty list. -->
+        <#if realm.password && social.providers?has_content>
             <div id="kc-social-providers" class="${properties.kcFormSocialAccountSectionClass!}">
                 <hr/>
                 <h4>${msg("identity-provider-login-label")}</h4>

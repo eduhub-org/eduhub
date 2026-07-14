@@ -1,0 +1,61 @@
+-- Reusable badge definitions and project links. Badge carries the title /
+-- description / icon shown for every entity linked to it, so badge context is
+-- authored once and displayed automatically. ProjectBadge links a project to a
+-- badge. Kept separate from ProjectGroup so badges never leak into topical
+-- grouping or project sliders. Winner vs nominee is modeled as separate badges
+-- (each with its own title/icon), not a per-link status.
+
+CREATE TABLE "public"."Badge" (
+  "id" serial NOT NULL,
+  "title" text NOT NULL,
+  "description" text NULL,
+  "icon" text NULL,
+  "created_at" timestamptz NOT NULL DEFAULT now(),
+  "updated_at" timestamptz NOT NULL DEFAULT now(),
+  PRIMARY KEY ("id"),
+  UNIQUE ("id")
+);
+COMMENT ON TABLE "public"."Badge" IS E'Reusable badge definition (e.g. "AI Idea Award 2024"). title and description are shown automatically for every entity linked via a per-target link table. icon is an optional lucide icon name.';
+
+CREATE TABLE "public"."ProjectBadge" (
+  "id" serial NOT NULL,
+  "projectId" integer NOT NULL,
+  "badgeId" integer NOT NULL,
+  "created_at" timestamptz NOT NULL DEFAULT now(),
+  "updated_at" timestamptz NOT NULL DEFAULT now(),
+  PRIMARY KEY ("id"),
+  UNIQUE ("id"),
+  UNIQUE ("projectId", "badgeId"),
+  CONSTRAINT "ProjectBadge_projectId_fkey"
+    FOREIGN KEY ("projectId") REFERENCES "public"."Project"("id") ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT "ProjectBadge_badgeId_fkey"
+    FOREIGN KEY ("badgeId") REFERENCES "public"."Badge"("id") ON UPDATE CASCADE ON DELETE CASCADE
+);
+COMMENT ON TABLE "public"."ProjectBadge" IS E'Links a project to a badge.';
+CREATE INDEX "ProjectBadge_projectId_idx" ON "public"."ProjectBadge" ("projectId");
+CREATE INDEX "ProjectBadge_badgeId_idx" ON "public"."ProjectBadge" ("badgeId");
+
+CREATE OR REPLACE FUNCTION "public"."set_current_timestamp_updated_at"()
+RETURNS TRIGGER AS $$
+DECLARE
+  _new record;
+BEGIN
+  _new := NEW;
+  _new."updated_at" = NOW();
+  RETURN _new;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER "set_public_Badge_updated_at"
+BEFORE UPDATE ON "public"."Badge"
+FOR EACH ROW
+EXECUTE PROCEDURE "public"."set_current_timestamp_updated_at"();
+COMMENT ON TRIGGER "set_public_Badge_updated_at" ON "public"."Badge"
+IS 'trigger to set value of column "updated_at" to current timestamp on row update';
+
+CREATE TRIGGER "set_public_ProjectBadge_updated_at"
+BEFORE UPDATE ON "public"."ProjectBadge"
+FOR EACH ROW
+EXECUTE PROCEDURE "public"."set_current_timestamp_updated_at"();
+COMMENT ON TRIGGER "set_public_ProjectBadge_updated_at" ON "public"."ProjectBadge"
+IS 'trigger to set value of column "updated_at" to current timestamp on row update';

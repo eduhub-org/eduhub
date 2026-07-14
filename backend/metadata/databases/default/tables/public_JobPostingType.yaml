@@ -1,0 +1,38 @@
+table:
+  name: JobPostingType
+  schema: public
+is_enum: true
+array_relationships:
+  - name: JobPostings
+    using:
+      foreign_key_constraint_on:
+        column: type
+        table:
+          name: JobPosting
+          schema: public
+  - name: JobPostingPrices
+    using:
+      foreign_key_constraint_on:
+        column: jobPostingType
+        table:
+          name: JobPostingPrice
+          schema: public
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - value
+        - comment
+      filter: {}
+  - role: user_access
+    permission:
+      columns:
+        - value
+        - comment
+      filter: {}
+  - role: org_admin_access
+    permission:
+      columns:
+        - value
+        - comment
+      filter: {}

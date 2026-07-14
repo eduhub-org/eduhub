@@ -20,7 +20,7 @@ body.widget-page.bg-edu-bg-gray {
 }
 
 /* Ensure all container divs are transparent on widget pages */
-body.widget-page div[class*="bg-"]:not([class*="bg-white"]):not([class*="bg-transparent"]):not(.bg-fill-primary) {
+body.widget-page div[class*="bg-"]:not([class*="bg-white"]):not([class*="bg-transparent"]):not(.bg-fill-primary):not(.profile-avatar) {
   background-color: transparent !important;
 }
 

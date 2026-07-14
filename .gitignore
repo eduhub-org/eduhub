@@ -19,3 +19,5 @@ next-env.d.ts
 
 # Keycloak SPI Maven build output
 keycloak/spi/*/target/
+# Python bytecode
+__pycache__/

@@ -1,0 +1,66 @@
+# Clone of Dockerfile-edu building apps/stujo instead of apps/edu-hub.
+
+# 1. Install dependencies only when needed
+FROM node:18-alpine AS deps
+
+RUN apk add --no-cache libc6-compat
+
+RUN corepack enable
+
+WORKDIR /opt/app
+
+COPY package.json /opt/app
+COPY yarn.lock /opt/app
+COPY .yarn/ /opt/app/.yarn
+COPY .yarnrc.yml /opt/app
+
+RUN yarn --immutable
+
+# 2. Rebuild the source code only when needed
+FROM node:18-alpine AS builder
+
+WORKDIR /opt/app
+
+COPY --from=deps /opt/app/node_modules ./node_modules
+COPY . .
+
+ARG NEXT_PUBLIC_AUTH_URL
+ENV NEXT_PUBLIC_AUTH_URL=${NEXT_PUBLIC_AUTH_URL}
+
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+
+ARG NEXT_PUBLIC_ENVIRONMENT
+ENV NEXT_PUBLIC_ENVIRONMENT=${NEXT_PUBLIC_ENVIRONMENT}
+
+ARG NEXT_PUBLIC_STORAGE_BUCKET_URL
+ENV NEXT_PUBLIC_STORAGE_BUCKET_URL=${NEXT_PUBLIC_STORAGE_BUCKET_URL}
+
+RUN yarn build:stujo
+
+# 3. Production image, copy all the files and run next
+FROM node:18-alpine AS runner
+
+WORKDIR /opt/app
+
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED 1
+
+RUN addgroup -g 1001 -S nodejs
+RUN adduser -S nextjs -u 1001
+
+# Automatically leverage output traces to reduce image size
+COPY --from=builder --chown=nextjs:nodejs /opt/app/apps/stujo/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /opt/app/apps/stujo/.next/static ./apps/stujo/.next/static
+COPY --from=builder --chown=nextjs:nodejs /opt/app/apps/stujo/public ./apps/stujo/public
+COPY --from=builder --chown=nextjs:nodejs /opt/app/node_modules/next/dist/compiled/jest-worker ./node_modules/next/dist/compiled/jest-worker
+
+WORKDIR /opt/app/apps/stujo
+
+USER nextjs
+
+EXPOSE 25001
+
+ENV PORT 25001
+
+CMD [ "node", "server.js" ]

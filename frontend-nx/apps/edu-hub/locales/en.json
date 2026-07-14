@@ -44,6 +44,7 @@
       "admin_users": "Admin Users",
       "experts": "Experts",
       "courses": "Courses",
+      "projects": "Projects",
       "programs": "Programs",
       "organizations": "Organizations",
       "location_addresses": "Location Addresses",
@@ -303,6 +304,10 @@
     },
     "widget_error_loading_courses": "Error loading courses",
     "widget_no_courses_available": "No courses available",
+    "widget_error_loading_projects": "Error loading projects",
+    "widget_no_projects_available": "No projects available",
+    "widget_error_loading_jobs": "Error loading jobs",
+    "widget_no_jobs_available": "No jobs available",
     "page_not_found": "Page not found",
     "page_not_found_description": "The page you're looking for doesn't exist. It may have been moved or deleted.",
     "back_to_home": "Back to home",
@@ -372,7 +377,10 @@
         "ONGOING": "In progress",
         "SUBMITTED": "Submitted",
         "COMPLETED": "Completed",
+        "COMPLETED_PASSED": "Passed",
         "INCOMPLETE": "Incomplete",
+        "INCOMPLETE_FAILED": "Failed",
+        "SUGGESTED_FOR_PUBLICATION": "Suggested for publication",
         "PUBLISHED": "Published"
       },
       "type_label": {
@@ -525,6 +533,15 @@
         "sent_back_banner": "Your project was sent back for revisions. Please update it and submit again.",
         "deadline_passed_banner": "The submission deadline passed on {date}.",
         "excluded_banner": "The submitting author excluded you from this project's final submission. You no longer count as one of its authors."
+      },
+      "publication_consent": {
+        "heading": "Publication consent",
+        "checkbox_label_solo": "I consent to this project being published.",
+        "checkbox_label_team": "On behalf of my team, I consent to this project being published.",
+        "details_summary": "What will be published?",
+        "description": "opencampus.sh (operated by the non-profit Campus Business Box e.V.) may publish this project as a showcase example on the platform and in promotional materials, and may enter it for participation or submission for prizes. What will be shared: project title, description, cover image, files and links, and the names and Element room links of the contributing authors. Consent is voluntary and can be granted or withdrawn at any time from your project view; withdrawing removes the project from publication.",
+        "status_granted": "Consent granted by {name} on {date}.",
+        "status_withdrawn": "Consent withdrawn by {name} on {date} — the project will not be published."
       },
       "submit_dialog": {
         "title": "Submit project for review",
@@ -1333,7 +1350,8 @@
         "review": "Review",
         "evaluate_project": "Evaluate project",
         "evaluate_disabled_tooltip": "You can evaluate the project here once it has been submitted.",
-        "publish": "Publish for showcase"
+        "suggest_for_publication": "Suggest for publication",
+        "withdraw_publication_suggestion": "Withdraw suggestion"
       },
       "delete_template_confirmation": "Delete the project template \"{title}\"? This cannot be undone.",
       "delete_template_disabled_tooltip": "You cannot delete this template while at least one copy created from it still exists in this course.",
@@ -1361,7 +1379,8 @@
         "submission_deadline_instructor_origin_program": " (from the program)",
         "submission_deadline_instructor_origin_program_legacy": " (from the program certificate deadline)",
         "submission_deadline_instructor_picker_prompt": "If you want to change it for this project, select the specific date here:",
-        "submission_deadline_instructor_picker_help": "Leave empty to use the default submission deadline shown above."
+        "submission_deadline_instructor_picker_help": "Leave empty to use the default submission deadline shown above.",
+        "type_locked_hint": "The project type can no longer be changed once the project is confirmed or submitted."
       },
       "confirm_project_dialog": {
         "title": "Confirm project",
@@ -1376,20 +1395,20 @@
         "tagline_label": "Tagline",
         "documentation_link": "Open documentation",
         "presentation_link": "Open presentation",
-        "external_link": "Open project link",
-        "approve_button": "Approve & complete",
-        "send_back_button": "Send back for revisions",
-        "reject_button": "Reject as incomplete"
+        "external_link": "Open project link"
       },
       "evaluate_dialog": {
         "title": "Evaluate project",
-        "rating_section_label": "Rating",
-        "rating_UNRATED": "Unrated",
-        "rating_PASSED": "Passed",
-        "rating_FAILED": "Failed",
+        "decision_label": "Decision",
+        "approve_title": "Pass & complete",
+        "approve_description": "Marks the project as passed and completes it.",
+        "revise_title": "Send back for revisions",
+        "revise_description": "The team can revise the project and submit it again.",
+        "reject_title": "Reject as not passed",
+        "reject_description": "Marks the project as not passed.",
         "comment_label": "Comment (optional)",
         "comment_placeholder": "Notes for the project team (visible where project details are shown)",
-        "save_rating_button": "Save rating"
+        "confirm_button": "Confirm"
       },
       "add_dialog": {
         "title": "Add project",
@@ -1722,6 +1741,34 @@
       }
     }
   },
+  "manageProjects": {
+    "headline": "Projects",
+    "search_placeholder": "Search projects",
+    "filter": {
+      "program_label": "Program",
+      "all_programs": "All programs",
+      "course_group_label": "Course group",
+      "all_course_groups": "All course groups"
+    },
+    "table": {
+      "title": "Title",
+      "authors": "Authors",
+      "no_authors": "No authors",
+      "program": "Program / Course",
+      "published": "Published",
+      "not_published": "Not published"
+    },
+    "actions": {
+      "publish": "Publish",
+      "unpublish": "Unpublish",
+      "publish_blocked_incomplete": "Set a project type and documentation instruction before this project can be published."
+    },
+    "notifications": {
+      "publish_success": "Project published",
+      "unpublish_success": "Project unpublished",
+      "action_failed": "The action could not be completed. Please try again."
+    }
+  },
   "managePrograms": {
     "headline": "Programs",
     "table_header": {
@@ -1890,9 +1937,11 @@
     "profile_organization": "Organization (Profile)",
     "super_admin_label": "Super Admin",
     "is_super_admin": "Is Super Admin",
+    "capabilities_heading": "Permissions",
     "can_manage_events": "Can manage events",
     "can_manage_courses": "Can manage courses",
     "can_manage_degrees": "Can manage degrees",
+    "can_manage_jobs": "Can manage job postings",
     "can_manage_users_and_settings": "Can manage users and settings",
     "error_loading_admin_users": "Error loading admin users.",
     "deletion_confirmation_question": "Are you sure you want to delete the admin rights of {firstName} {lastName} for the organization {organization}?",
@@ -2045,6 +2094,81 @@
       "text_en": "Text (English)",
       "preview": "Preview",
       "generic_help": "This text is shown to participants during onboarding when the corresponding registration type is selected."
+    },
+    "project_groups": {
+      "label": "Project Groups",
+      "help_text": "Define which project groups exist. Tag projects into these groups and select them to compose a project slider.",
+      "add_placeholder": "Name of the new project group",
+      "add_button": "Add",
+      "id_label": "ID",
+      "delete": "Delete project group",
+      "delete_disabled_in_use": "This group is still connected to projects and cannot be deleted.",
+      "error_duplicate": "A project group with this name already exists.",
+      "error_add": "The project group could not be created.",
+      "error_delete": "The project group could not be deleted.",
+      "error_reorder": "The order could not be updated.",
+      "loading": "Loading...",
+      "error_loading": "The project groups could not be loaded."
+    },
+    "project_sliders": {
+      "label": "Project Sliders",
+      "help_text": "Create project sliders for the homepage. Each slider shows published projects and open templates. Pick source course groups and/or project groups, or leave empty to show all projects. Sliders are ordered together with the course groups above.",
+      "add_placeholder": "Title of the new project slider",
+      "add_button": "Add slider",
+      "id_label": "ID",
+      "delete": "Delete project slider",
+      "source_course_groups": "Course groups",
+      "source_project_groups": "Project groups",
+      "no_selection_hint": "No groups selected — shows all projects.",
+      "error_add": "The project slider could not be created.",
+      "error_delete": "The project slider could not be deleted.",
+      "error_save": "The selection could not be saved.",
+      "loading": "Loading...",
+      "error_loading": "The project sliders could not be loaded."
+    },
+    "job_sliders": {
+      "label": "Job Sliders",
+      "help_text": "Create job sliders for the homepage. Each slider shows published Stujo job postings. Pick the job types to include, or leave empty to show all published jobs. Sliders are ordered together with the course groups above.",
+      "add_placeholder": "Title of the new job slider",
+      "add_button": "Add slider",
+      "id_label": "ID",
+      "delete": "Delete job slider",
+      "source_job_types": "Job types",
+      "no_selection_hint": "No job types selected — shows all published jobs.",
+      "error_add": "The job slider could not be created.",
+      "error_delete": "The job slider could not be deleted.",
+      "error_save": "The selection could not be saved.",
+      "loading": "Loading...",
+      "error_loading": "The job sliders could not be loaded."
+    },
+    "badges": {
+      "section_label": "Badges",
+      "section_help": "Define reusable badges (e.g. awards) that can be attached to projects. Title, description and icon are authored once here and shown automatically wherever the badge appears.",
+      "add_button": "Add badge",
+      "column": {
+        "icon": "Icon",
+        "title": "Title",
+        "awards": "Awards",
+        "updated": "Last updated",
+        "description": "Description",
+        "order": "Order"
+      },
+      "description_placeholder": "What this badge recognizes",
+      "icon_placeholder": "e.g. trophy",
+      "icon_help": "Optional lucide icon name. Leave empty to use the default award icon.",
+      "add_dialog": {
+        "title": "Add badge",
+        "submit": "Create",
+        "title_label": "Title",
+        "title_placeholder": "e.g. AI Idea Award 2024"
+      },
+      "delete_dialog": {
+        "question": "Delete the badge “{title}”? This also removes it from {count} project(s) it was awarded to."
+      },
+      "error": {
+        "create_failed": "The badge could not be created.",
+        "duplicate_title": "A badge with this title already exists."
+      }
     }
   },
   "manageExperts": {
@@ -2487,6 +2611,14 @@
         "access": {
           "label": "Access & roles",
           "description": "Admin users and organization roles"
+        },
+        "badges": {
+          "label": "Badges",
+          "description": "Reusable project badges and awards"
+        },
+        "jobboerse": {
+          "label": "Job board (StuJo)",
+          "description": "Moderate job postings, manage portals, prices and credits"
         }
       }
     },
@@ -2519,6 +2651,117 @@
     "access": {
       "superadmin_only": "Super admin only",
       "coming_soon": "Coming soon"
+    }
+  },
+  "project": {
+    "not_found": "Project not found",
+    "status": {
+      "PUBLISHED": "Published"
+    },
+    "tile": {
+      "template_eyebrow": "Open project template",
+      "mentored_by": "Mentored by {name}"
+    },
+    "cta": {
+      "apply_for_course": "Apply for course",
+      "view_and_join": "View & join",
+      "apply_to_join": "Apply to join",
+      "view_course": "View course"
+    },
+    "viewing_from": "Viewing from {course}",
+    "about": {
+      "title": "About this project"
+    },
+    "stats": {
+      "team_members": "Team members",
+      "submitted": "Submitted"
+    },
+    "similar": {
+      "title": "Similar projects"
+    },
+    "description": {
+      "title": "Description"
+    },
+    "sidebar": {
+      "documentation": "View documentation",
+      "presentation": "Watch presentation",
+      "demo": "Visit live demo",
+      "team": "Team",
+      "mentor": "Mentor"
+    },
+    "course_card": {
+      "eyebrow": "Part of course",
+      "go_to_course": "Go to course"
+    },
+    "enroll": {
+      "title": "Enroll to participate",
+      "hint": "Projects are only accessible after enrolling in the course. Apply for the course first, then join this project from the course page.",
+      "applications_until": "Applications until {date}"
+    },
+    "join": {
+      "title": "Join this project"
+    },
+    "course_section": {
+      "open_templates": "Open project templates",
+      "past_projects": "Projects from past courses"
+    },
+    "submitted_on": "Submitted {date}",
+    "load_error": "Could not load this project. Please try again later."
+  },
+  "job": {
+    "published_on": "Published {date}",
+    "type": {
+      "MINIJOB": "Mini jobs",
+      "WORKING_STUDENT": "Student jobs",
+      "INTERNSHIP": "Internships",
+      "THESIS": "Theses",
+      "PERMANENT": "Permanent positions",
+      "TRAINEE": "Trainee positions",
+      "STATE_RECOGNITION_INTERNSHIP": "Internships for state recognition"
+    },
+    "region": {
+      "FLENSBURG": "Flensburg",
+      "KIEL": "Kiel region",
+      "SCHLESWIG_HOLSTEIN_HAMBURG": "Schleswig-Holstein and Hamburg",
+      "GERMANY": "Germany",
+      "DENMARK": "Denmark",
+      "ABROAD": "Other countries"
+    },
+    "occupation": {
+      "ADMINISTRATION": "Administration and clerical work",
+      "EDUCATION_TRAINING": "Education and training",
+      "BANKING_INSURANCE": "Banking, insurance and financial services",
+      "CUSTOMER_SERVICE": "Customer service and support",
+      "DESIGN_ARCHITECTURE": "Design and architecture",
+      "PURCHASING_LOGISTICS": "Purchasing, transport and logistics",
+      "MANUFACTURING_CONSTRUCTION": "Manufacturing, construction and crafts",
+      "ACCOUNTING": "Finance and accounting",
+      "RESEARCH_SCIENCE": "Research, development and science",
+      "HEALTH_SOCIAL": "Health, medicine and social affairs",
+      "HOSPITALITY": "Hotel and gastronomy",
+      "ENGINEERING": "Engineering and technical professions",
+      "MAINTENANCE": "Maintenance",
+      "IT_TELECOMMUNICATIONS": "IT and telecommunications",
+      "ARTS_CULTURE": "Arts and culture",
+      "AGRICULTURE_ENVIRONMENT": "Agriculture, forestry, fishery and environment",
+      "MARKETING_ADVERTISING": "Marketing and advertising",
+      "PUBLIC_SERVICE": "Public service and associations",
+      "HUMAN_RESOURCES": "Human resources",
+      "PRODUCTION": "Production",
+      "PROJECT_MANAGEMENT": "Project management",
+      "QUALITY_MANAGEMENT": "Quality management",
+      "LEGAL": "Legal",
+      "MEDIA_EDITORIAL": "Editorial, media and information",
+      "SECURITY_CIVIL_PROTECTION": "Security and civil protection",
+      "MANAGEMENT": "Management / executive board",
+      "SALES_RETAIL": "Sales and retail",
+      "TOURISM": "Tourism",
+      "EVENT_MANAGEMENT": "Event management",
+      "CONSULTING": "Consulting",
+      "REAL_ESTATE": "Real estate",
+      "SOCIAL_MEDIA": "Social media",
+      "SOCIAL_PEDAGOGY": "Social pedagogy",
+      "OTHER": "Other occupational field"
     }
   }
 }

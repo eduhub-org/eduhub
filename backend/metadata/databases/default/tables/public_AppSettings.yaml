@@ -12,8 +12,16 @@ select_permissions:
         - bannerTextDe
         - bannerTextEn
         - created_at
+        - defaultLocale
+        - domain
         - faqCollectionName
+        - faviconUrl
+        - imprintUrl
+        - logoUrl
         - previewImageURL
+        - primaryColor
+        - privacyUrl
+        - secondaryColor
         - showFaqSection
         - timeZone
         - updated_at

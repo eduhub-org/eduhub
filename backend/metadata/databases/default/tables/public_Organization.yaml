@@ -51,6 +51,27 @@ array_relationships:
         table:
           name: OrganizationNewsletterSubscription
           schema: public
+  - name: JobPostings
+    using:
+      foreign_key_constraint_on:
+        column: organizationId
+        table:
+          name: JobPosting
+          schema: public
+  - name: JobPostingCredits
+    using:
+      foreign_key_constraint_on:
+        column: organizationId
+        table:
+          name: JobPostingCredit
+          schema: public
+  - name: JobPortals
+    using:
+      foreign_key_constraint_on:
+        column: organizationId
+        table:
+          name: JobPortal
+          schema: public
 insert_permissions:
   - role: user_access
     permission:
@@ -110,6 +131,9 @@ select_permissions:
         - newsletterProvider
         - type
         - updated_at
+        # website and city are public on the StuJo employer profile pages
+        - website
+        - city
       filter: {}
       allow_aggregations: true
   # Org admins may read the full record of any organization they administer (regardless of which

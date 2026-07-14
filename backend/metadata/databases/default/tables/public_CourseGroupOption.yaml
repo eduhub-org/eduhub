@@ -16,6 +16,30 @@ array_relationships:
         table:
           name: CourseGroup
           schema: public
+  # For a project-slider row (contentType = PROJECT): the course groups it pulls projects from.
+  - name: SelectedCourseGroups
+    using:
+      foreign_key_constraint_on:
+        column: projectSliderOptionId
+        table:
+          name: ProjectSliderCourseGroup
+          schema: public
+  # For a project-slider row (contentType = PROJECT): the project groups it pulls projects from.
+  - name: SelectedProjectGroups
+    using:
+      foreign_key_constraint_on:
+        column: projectSliderOptionId
+        table:
+          name: ProjectSliderProjectGroup
+          schema: public
+  # For a job-slider row (contentType = JOB): the job posting types it pulls from.
+  - name: SelectedJobTypes
+    using:
+      foreign_key_constraint_on:
+        column: jobSliderOptionId
+        table:
+          name: JobSliderJobType
+          schema: public
 select_permissions:
   - role: anonymous
     permission:
@@ -24,6 +48,7 @@ select_permissions:
         - title
         - order
         - sliderGroup
+        - contentType
         - programType
         - organizationId
         - created_at

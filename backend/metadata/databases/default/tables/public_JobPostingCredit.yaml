@@ -1,0 +1,27 @@
+table:
+  name: JobPostingCredit
+  schema: public
+object_relationships:
+  - name: Organization
+    using:
+      foreign_key_constraint_on: organizationId
+  - name: JobPostingType
+    using:
+      foreign_key_constraint_on: jobPostingType
+select_permissions:
+  # Employers see their own organization's remaining credits; credits are
+  # granted by admins and consumed by the publish/checkout functions only.
+  - role: org_admin_access
+    permission:
+      columns:
+        - id
+        - organizationId
+        - jobPostingType
+        - remaining
+        - created_at
+        - updated_at
+      filter:
+        Organization:
+          OrganizationAdmins:
+            userId:
+              _eq: X-Hasura-User-Id

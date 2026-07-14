@@ -10,13 +10,13 @@ COPY ./themes/edu-hub /opt/keycloak/themes/edu-hub
 RUN /opt/keycloak/bin/kc.sh build
 
 FROM quay.io/keycloak/keycloak:26.6.1
-COPY --from=builder /opt/keycloak/lib/quarkus/ /opt/keycloak/lib/quarkus/
-COPY ./libs/keycloak-bcrypt-1.6.0.jar /opt/keycloak/providers/
-COPY ./libs/matrix-handle-listener.jar /opt/keycloak/providers/
+# Copy the full pre-built (augmented) server so `start --optimized` can skip the
+# Quarkus augmentation at runtime instead of rebuilding on every container boot.
+COPY --from=builder /opt/keycloak/ /opt/keycloak/
 WORKDIR /opt/keycloak
 
 ENV KC_HOSTNAME_STRICT=false
 ENV KC_HTTP_ENABLED=true
 ENV KC_HTTP_HOST=0.0.0.0
 
-ENTRYPOINT ["/opt/keycloak/bin/kc.sh", "start-dev", "--import-realm"]
+ENTRYPOINT ["/opt/keycloak/bin/kc.sh", "start", "--optimized", "--import-realm"]

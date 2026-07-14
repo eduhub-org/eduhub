@@ -1,0 +1,33 @@
+table:
+  name: ProjectBadge
+  schema: public
+object_relationships:
+  - name: Project
+    using:
+      foreign_key_constraint_on: projectId
+  - name: Badge
+    using:
+      foreign_key_constraint_on: badgeId
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - id
+        - projectId
+        - badgeId
+        - created_at
+        - updated_at
+      # Only badges whose project is anonymously visible (mirrors the Project and
+      # ProjectGroup rules), so badge rows of hidden projects stay hidden.
+      filter:
+        Project:
+          _or:
+            - status:
+                _eq: PUBLISHED
+            - _and:
+                - status:
+                    _eq: PROPOSED
+                - _not:
+                    ProjectAuthors:
+                      participationStatus:
+                        _eq: ACCEPTED

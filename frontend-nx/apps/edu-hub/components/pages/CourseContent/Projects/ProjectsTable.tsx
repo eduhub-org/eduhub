@@ -205,7 +205,11 @@ const ProjectsTable: FC<ProjectsTableProps> = ({
         cell: ({ row }) => (
           <div className="flex items-center gap-2 flex-wrap">
             <span className="font-medium">{row.original.title}</span>
-            <StatusChip status={getProjectStatusChipKey(row.original)} />
+            <StatusChip
+              displayKey={getProjectStatusChipKey(row.original)}
+              status={row.original.status}
+              ratingComment={row.original.ratingComment}
+            />
           </div>
         ),
       },
@@ -350,7 +354,11 @@ const ProjectsTable: FC<ProjectsTableProps> = ({
             titleRow={
               <div className="flex flex-wrap items-center gap-2 mb-1">
                 <h4 className="text-xl font-semibold text-label-primary min-w-0 break-words">{row.title}</h4>
-                <StatusChip status={getProjectStatusChipKey(row)} />
+                <StatusChip
+                  displayKey={getProjectStatusChipKey(row)}
+                  status={row.status}
+                  ratingComment={row.ratingComment}
+                />
               </div>
             }
           />

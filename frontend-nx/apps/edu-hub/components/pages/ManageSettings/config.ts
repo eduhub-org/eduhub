@@ -1,6 +1,7 @@
 import { ComponentType } from 'react';
 import {
   MdOutlineCategory,
+  MdOutlineWorkOutline,
   MdOutlineDescription,
   MdOutlineEmail,
   MdOutlineEventNote,
@@ -11,6 +12,7 @@ import {
   MdOutlinePalette,
   MdOutlineSettings,
   MdOutlineVerified,
+  MdOutlineWorkspacePremium,
 } from 'react-icons/md';
 
 /**
@@ -25,6 +27,7 @@ export type SettingsNavGroupId = 'platform' | 'notifications' | 'programs' | 'sy
 
 export type SettingsNavItemId =
   | 'appearance'
+  | 'jobboerse'
   | 'homepage'
   | 'emails'
   | 'programs'
@@ -33,6 +36,7 @@ export type SettingsNavItemId =
   | 'documentation-instructions'
   | 'onboarding-texts'
   | 'course-groups'
+  | 'badges'
   | 'time-zone'
   | 'access';
 
@@ -57,6 +61,14 @@ export const SETTINGS_NAV_ITEMS: Record<SettingsNavItemId, SettingsNavItemDef> =
     id: 'appearance',
     icon: MdOutlinePalette,
     href: '/manage/settings/appearance',
+    requiredCapability: 'admin',
+    status: 'live',
+    groupId: 'platform',
+  },
+  jobboerse: {
+    id: 'jobboerse',
+    icon: MdOutlineWorkOutline,
+    href: '/manage/settings/jobboerse',
     requiredCapability: 'admin',
     status: 'live',
     groupId: 'platform',
@@ -125,6 +137,14 @@ export const SETTINGS_NAV_ITEMS: Record<SettingsNavItemId, SettingsNavItemDef> =
     status: 'live',
     groupId: 'programs',
   },
+  badges: {
+    id: 'badges',
+    icon: MdOutlineWorkspacePremium,
+    href: '/manage/settings/badges',
+    requiredCapability: 'admin',
+    status: 'live',
+    groupId: 'programs',
+  },
   'time-zone': {
     id: 'time-zone',
     icon: MdOutlineSettings,
@@ -147,7 +167,7 @@ export const SETTINGS_NAV_ITEMS: Record<SettingsNavItemId, SettingsNavItemDef> =
 export const SETTINGS_NAV_GROUPS: SettingsNavGroupDef[] = [
   {
     id: 'platform',
-    items: ['appearance', 'homepage'],
+    items: ['appearance', 'homepage', 'jobboerse'],
   },
   {
     id: 'notifications',
@@ -162,6 +182,7 @@ export const SETTINGS_NAV_GROUPS: SettingsNavGroupDef[] = [
       'documentation-instructions',
       'onboarding-texts',
       'course-groups',
+      'badges',
     ],
   },
   {

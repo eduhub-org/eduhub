@@ -54,6 +54,7 @@ const AddOrganizationAdminDialog: FC<AddOrganizationAdminDialogProps> = ({
   const [canManageEvents, setCanManageEvents] = useState(false);
   const [canManageCourses, setCanManageCourses] = useState(false);
   const [canManageDegrees, setCanManageDegrees] = useState(false);
+  const [canManageJobs, setCanManageJobs] = useState(false);
   const [canManageSettings, setCanManageSettings] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
   const [serverError, setServerError] = useState<string | null>(null);
@@ -69,6 +70,7 @@ const AddOrganizationAdminDialog: FC<AddOrganizationAdminDialogProps> = ({
       setCanManageEvents(false);
       setCanManageCourses(false);
       setCanManageDegrees(false);
+      setCanManageJobs(false);
       setCanManageSettings(false);
       setValidationError(null);
       setServerError(null);
@@ -129,7 +131,7 @@ const AddOrganizationAdminDialog: FC<AddOrganizationAdminDialogProps> = ({
     }
     // A grant with no capabilities still confers org-admin access in the permission model, so a
     // capability must be picked explicitly rather than silently creating a bare admin row.
-    if (!canManageEvents && !canManageCourses && !canManageDegrees && !canManageSettings) {
+    if (!canManageEvents && !canManageCourses && !canManageDegrees && !canManageJobs && !canManageSettings) {
       setValidationError(t('add_admin_capability_required'));
       return;
     }
@@ -143,6 +145,7 @@ const AddOrganizationAdminDialog: FC<AddOrganizationAdminDialogProps> = ({
             canManageEvents,
             canManageCourses,
             canManageDegrees,
+            canManageJobs,
             canManageSettings,
           },
         },
@@ -164,6 +167,7 @@ const AddOrganizationAdminDialog: FC<AddOrganizationAdminDialogProps> = ({
     canManageEvents,
     canManageCourses,
     canManageDegrees,
+    canManageJobs,
     canManageSettings,
     insertOrganizationAdmin,
     onSuccess,
@@ -176,13 +180,14 @@ const AddOrganizationAdminDialog: FC<AddOrganizationAdminDialogProps> = ({
       { label: t('can_manage_events'), checked: canManageEvents, set: setCanManageEvents },
       { label: t('can_manage_courses'), checked: canManageCourses, set: setCanManageCourses },
       { label: t('can_manage_degrees'), checked: canManageDegrees, set: setCanManageDegrees },
+      { label: t('can_manage_jobs'), checked: canManageJobs, set: setCanManageJobs },
       {
         label: t('can_manage_users_and_settings'),
         checked: canManageSettings,
         set: setCanManageSettings,
       },
     ],
-    [canManageEvents, canManageCourses, canManageDegrees, canManageSettings, t]
+    [canManageEvents, canManageCourses, canManageDegrees, canManageJobs, canManageSettings, t]
   );
 
   return (

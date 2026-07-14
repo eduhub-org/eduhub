@@ -1,0 +1,20 @@
+table:
+  name: ProjectSliderCourseGroup
+  schema: public
+object_relationships:
+  - name: ProjectSliderOption
+    using:
+      foreign_key_constraint_on: projectSliderOptionId
+  - name: CourseGroupOption
+    using:
+      foreign_key_constraint_on: courseGroupOptionId
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - id
+        - projectSliderOptionId
+        - courseGroupOptionId
+        - created_at
+        - updated_at
+      filter: {}
