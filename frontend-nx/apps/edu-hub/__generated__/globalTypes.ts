@@ -1390,6 +1390,36 @@ export enum JobRegion_update_column {
 }
 
 /**
+ * unique or primary key constraints on table "JobSliderJobType"
+ */
+export enum JobSliderJobType_constraint {
+  JobSliderJobType_jobSliderOptionId_jobType_key = "JobSliderJobType_jobSliderOptionId_jobType_key",
+  JobSliderJobType_pkey = "JobSliderJobType_pkey",
+}
+
+/**
+ * select columns of table "JobSliderJobType"
+ */
+export enum JobSliderJobType_select_column {
+  created_at = "created_at",
+  id = "id",
+  jobSliderOptionId = "jobSliderOptionId",
+  jobType = "jobType",
+  updated_at = "updated_at",
+}
+
+/**
+ * update columns of table "JobSliderJobType"
+ */
+export enum JobSliderJobType_update_column {
+  created_at = "created_at",
+  id = "id",
+  jobSliderOptionId = "jobSliderOptionId",
+  jobType = "jobType",
+  updated_at = "updated_at",
+}
+
+/**
  * unique or primary key constraints on table "Language"
  */
 export enum Language_constraint {
@@ -5153,6 +5183,8 @@ export interface CourseGroupOption_bool_exp {
   ProgramType?: ProgramType_bool_exp | null;
   SelectedCourseGroups?: ProjectSliderCourseGroup_bool_exp | null;
   SelectedCourseGroups_aggregate?: ProjectSliderCourseGroup_aggregate_bool_exp | null;
+  SelectedJobTypes?: JobSliderJobType_bool_exp | null;
+  SelectedJobTypes_aggregate?: JobSliderJobType_aggregate_bool_exp | null;
   SelectedProjectGroups?: ProjectSliderProjectGroup_bool_exp | null;
   SelectedProjectGroups_aggregate?: ProjectSliderProjectGroup_aggregate_bool_exp | null;
   _and?: CourseGroupOption_bool_exp[] | null;
@@ -5177,6 +5209,7 @@ export interface CourseGroupOption_insert_input {
   Organization?: Organization_obj_rel_insert_input | null;
   ProgramType?: ProgramType_obj_rel_insert_input | null;
   SelectedCourseGroups?: ProjectSliderCourseGroup_arr_rel_insert_input | null;
+  SelectedJobTypes?: JobSliderJobType_arr_rel_insert_input | null;
   SelectedProjectGroups?: ProjectSliderProjectGroup_arr_rel_insert_input | null;
   contentType?: string | null;
   created_at?: any | null;
@@ -7772,6 +7805,63 @@ export interface JobRegion_on_conflict {
   constraint: JobRegion_constraint;
   update_columns: JobRegion_update_column[];
   where?: JobRegion_bool_exp | null;
+}
+
+export interface JobSliderJobType_aggregate_bool_exp {
+  count?: JobSliderJobType_aggregate_bool_exp_count | null;
+}
+
+export interface JobSliderJobType_aggregate_bool_exp_count {
+  arguments?: JobSliderJobType_select_column[] | null;
+  distinct?: boolean | null;
+  filter?: JobSliderJobType_bool_exp | null;
+  predicate: Int_comparison_exp;
+}
+
+/**
+ * input type for inserting array relation for remote table "JobSliderJobType"
+ */
+export interface JobSliderJobType_arr_rel_insert_input {
+  data: JobSliderJobType_insert_input[];
+  on_conflict?: JobSliderJobType_on_conflict | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "JobSliderJobType". All fields are combined with a logical 'AND'.
+ */
+export interface JobSliderJobType_bool_exp {
+  JobPostingType?: JobPostingType_bool_exp | null;
+  JobSliderOption?: CourseGroupOption_bool_exp | null;
+  _and?: JobSliderJobType_bool_exp[] | null;
+  _not?: JobSliderJobType_bool_exp | null;
+  _or?: JobSliderJobType_bool_exp[] | null;
+  created_at?: timestamptz_comparison_exp | null;
+  id?: Int_comparison_exp | null;
+  jobSliderOptionId?: Int_comparison_exp | null;
+  jobType?: JobPostingType_enum_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "JobSliderJobType"
+ */
+export interface JobSliderJobType_insert_input {
+  JobPostingType?: JobPostingType_obj_rel_insert_input | null;
+  JobSliderOption?: CourseGroupOption_obj_rel_insert_input | null;
+  created_at?: any | null;
+  id?: number | null;
+  jobSliderOptionId?: number | null;
+  jobType?: JobPostingType_enum | null;
+  updated_at?: any | null;
+}
+
+/**
+ * on_conflict condition type for table "JobSliderJobType"
+ */
+export interface JobSliderJobType_on_conflict {
+  constraint: JobSliderJobType_constraint;
+  update_columns: JobSliderJobType_update_column[];
+  where?: JobSliderJobType_bool_exp | null;
 }
 
 /**

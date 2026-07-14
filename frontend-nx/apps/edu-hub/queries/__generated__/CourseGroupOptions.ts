@@ -24,6 +24,9 @@ export interface CourseGroupOptions_CourseGroupOption_SelectedProjectGroups {
 export interface CourseGroupOptions_CourseGroupOption_SelectedJobTypes {
   __typename: "JobSliderJobType";
   id: number;
+  /**
+   * The JobPostingType value this job slider pulls postings from.
+   */
   jobType: JobPostingType_enum;
 }
 
@@ -37,7 +40,7 @@ export interface CourseGroupOptions_CourseGroupOption {
    */
   sliderGroup: boolean | null;
   /**
-   * Whether this slider row renders courses (COURSE, default) or projects (PROJECT). PROJECT rows compose their membership from the ProjectSliderCourseGroup / ProjectSliderProjectGroup selections.
+   * Whether this slider row renders courses (COURSE, default), projects (PROJECT) or jobs (JOB). PROJECT rows compose their membership from the ProjectSliderCourseGroup / ProjectSliderProjectGroup selections. JOB rows compose their membership from the JobSliderJobType selections.
    */
   contentType: string;
   /**

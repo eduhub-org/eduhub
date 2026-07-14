@@ -12,6 +12,9 @@ import { JobPostingType_enum } from "./../../__generated__/globalTypes";
 export interface AdminJobSliders_CourseGroupOption_SelectedJobTypes {
   __typename: "JobSliderJobType";
   id: number;
+  /**
+   * The JobPostingType value this job slider pulls postings from.
+   */
   jobType: JobPostingType_enum;
 }
 
