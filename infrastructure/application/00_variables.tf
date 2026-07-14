@@ -13,6 +13,27 @@ locals {
   # stujo-staging.opencampus.sh (staging); override via var.stujo_domain.
   stujo_service_name = "${var.stujo_service_name_root}${var.service_name_extension}"
   stujo_domain       = var.stujo_domain != "" ? var.stujo_domain : "${local.stujo_service_name}.opencampus.sh"
+
+  # Interim white-label StuJo portals. Each portal is served by its own tiny
+  # Cloud Run service (same image, scales to zero) so the load balancer
+  # url_mask can route <service>.opencampus.sh to it. The service sets
+  # APP_NAME, which apps/stujo/lib/portal.ts uses to resolve the portal
+  # branding without an AppSettings.domain match. This makes every portal
+  # testable under stujo-<portal>.opencampus.sh (production) and
+  # stujo-<portal>-staging.opencampus.sh (staging, via
+  # service_name_extension) before the real stujo.net domains are migrated.
+  #
+  # The map key is the portal appName and MUST exist in the AppSettings /
+  # JobPortal seed data (see backend/migrations .../insert_stujo_app_settings
+  # and .../create_table_public_JobPortal). The root "stujo" portal is served
+  # by the google_cloud_run_service.stujo resource, so it is not repeated here.
+  stujo_portal_app_names = ["stujo-cau", "stujo-haw-kiel", "stujo-flensburg"]
+  stujo_portals = {
+    for app_name in local.stujo_portal_app_names : app_name => {
+      service_name = "${app_name}${var.service_name_extension}"
+      domain       = "${app_name}${var.service_name_extension}.opencampus.sh"
+    }
+  }
 }
 
 ######
