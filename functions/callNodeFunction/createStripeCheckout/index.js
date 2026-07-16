@@ -20,6 +20,7 @@ const GET_COURSE_AND_ADDONS = `
       Program {
         Organization {
           id
+          name
           defaultVatRate
           defaultTaxExemptionNote
           invoiceFooterText
@@ -496,9 +497,12 @@ export default async function createStripeCheckout(req, logger) {
       cancel_url: cancelUrl,
       metadata: {
         courseId: String(courseId),
+        courseName: course.title || '',
         enrollmentId: String(enrollmentId),
         formbricksResponseId: formbricksResponseId || '',
         source: 'eduhub',
+        organizationId: organization?.id != null ? String(organization.id) : '',
+        organizationName: organization?.name || '',
         selectedAddons: (() => {
           if (!enrollmentAddons || enrollmentAddons.length === 0) {
             return '';
@@ -526,7 +530,10 @@ export default async function createStripeCheckout(req, logger) {
       payment_intent_data: {
         metadata: {
           courseId: String(courseId),
-          enrollmentId: String(enrollmentId)
+          courseName: course.title || '',
+          enrollmentId: String(enrollmentId),
+          organizationId: organization?.id != null ? String(organization.id) : '',
+          organizationName: organization?.name || '',
         }
       }
     };
