@@ -44,6 +44,15 @@ AP="$(mktemp)"; printf '#!/bin/sh\necho "$STRATO_SSH_PASS"\n' > "$AP"; chmod 700
 export STRATO_SSH_PASS SSH_ASKPASS="$AP" SSH_ASKPASS_REQUIRE=force
 SSH_OPTS="-o StrictHostKeyChecking=accept-new -o ConnectTimeout=20"
 
+# Clean up the askpass helper and the MySQL tunnel on every exit path,
+# including failures under `set -e`.
+TUNNEL_PID=""
+cleanup() {
+  if [ -n "${TUNNEL_PID}" ]; then kill "${TUNNEL_PID}" 2>/dev/null || true; fi
+  rm -f "${AP}"
+}
+trap cleanup EXIT
+
 echo "==> Rsyncing Rails public/system (logos + job PDFs) from prod"
 mkdir -p "${FILES_ROOT}/system"
 setsid -w rsync -a --info=progress2 -e "ssh ${SSH_OPTS}" \
@@ -54,6 +63,7 @@ setsid -w rsync -a --info=progress2 -e "ssh ${SSH_OPTS}" \
 echo "==> Opening SSH tunnel to prod MySQL (13306 -> 127.0.0.1:3306)"
 setsid -w ssh ${SSH_OPTS} -N -L 13306:127.0.0.1:3306 -o ExitOnForwardFailure=yes \
   "${STRATO_SSH_HOST}" </dev/null &
+TUNNEL_PID=$!
 python3 -c "
 import socket,time,sys
 for _ in range(30):
@@ -79,8 +89,11 @@ export KEYCLOAK_USER="${KEYCLOAK_USER:-admin}"
 export GCS_BUCKET='eduhub-staging-new'
 export STUJO_MYSQL_DSN="mysql://${DB_USER}:${DB_PASS}@127.0.0.1:13306/${DB_NAME}"
 export STUJO_FILES_ROOT="${FILES_ROOT}"
-export HASURA_ADMIN_SECRET="$(gcloud secrets versions access latest --secret=hasura-graphql-admin-key --project=${GCP_PROJECT})"
-export KEYCLOAK_PW="$(gcloud secrets versions access latest --secret=keycloak-pw --project=${GCP_PROJECT})"
+HASURA_ADMIN_SECRET="$(gcloud secrets versions access latest --secret=hasura-graphql-admin-key --project="${GCP_PROJECT}")"
+KEYCLOAK_PW="$(gcloud secrets versions access latest --secret=keycloak-pw --project="${GCP_PROJECT}")"
+[ -n "${HASURA_ADMIN_SECRET}" ] && [ -n "${KEYCLOAK_PW}" ] \
+  || { echo 'ERROR: could not fetch staging secrets from Secret Manager'; exit 1; }
+export HASURA_ADMIN_SECRET KEYCLOAK_PW
 
 run_step() {
   local step="$1"; shift
@@ -99,6 +112,4 @@ for step in "${STEPS[@]}"; do
   fi
 done
 
-echo "==> Closing tunnel"
-pkill -f '[1]3306:127.0.0.1:3306' 2>/dev/null || true
-echo "==> DONE"
+echo "==> DONE (tunnel closed by exit trap)"

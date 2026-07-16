@@ -46,10 +46,19 @@ export KEYCLOAK_USER="${KEYCLOAK_USER:-admin}"
 SOURCE_ENV="${STUJO_ETL_SOURCE_ENV:-${SCRIPT_DIR}/.stujo_etl_source.env}"
 if [[ -f "${SOURCE_ENV}" ]]; then
   echo "Loading source config from ${SOURCE_ENV}"
+  # The file may only provide source-side variables (STUJO_MYSQL_DSN,
+  # STUJO_FILES_ROOT, KEYCLOAK_USER, …); it must not be able to silently
+  # redirect the privileged ETL to another target environment, so the staging
+  # target settings configured above are restored after sourcing.
+  _hasura_url="${HASURA_URL}" _keycloak_url="${KEYCLOAK_URL}"
+  _keycloak_realm="${KEYCLOAK_REALM}" _gcs_bucket="${GCS_BUCKET}"
   set -a
   # shellcheck disable=SC1090
   source "${SOURCE_ENV}"
   set +a
+  export HASURA_URL="${_hasura_url}" KEYCLOAK_URL="${_keycloak_url}"
+  export KEYCLOAK_REALM="${_keycloak_realm}" GCS_BUCKET="${_gcs_bucket}"
+  unset _hasura_url _keycloak_url _keycloak_realm _gcs_bucket
 fi
 
 # ---- Fetch staging secrets from Secret Manager (never persisted) -----------
@@ -68,8 +77,9 @@ fetch_secret() {
 }
 
 echo "Fetching staging secrets from Secret Manager (${GCP_PROJECT})…"
-export HASURA_ADMIN_SECRET="$(fetch_secret hasura-graphql-admin-key)"
-export KEYCLOAK_PW="$(fetch_secret keycloak-pw)"
+HASURA_ADMIN_SECRET="$(fetch_secret hasura-graphql-admin-key)"
+KEYCLOAK_PW="$(fetch_secret keycloak-pw)"
+export HASURA_ADMIN_SECRET KEYCLOAK_PW
 
 # ---- Validate the source-side inputs ---------------------------------------
 missing=()
@@ -100,7 +110,7 @@ Target (staging):
   HASURA_URL   ${HASURA_URL}
   KEYCLOAK_URL ${KEYCLOAK_URL} (realm ${KEYCLOAK_REALM}, user ${KEYCLOAK_USER})
   GCS_BUCKET   ${GCS_BUCKET}
-  source DSN   ${STUJO_MYSQL_DSN%%@*}@… (host hidden)
+  source DSN   mysql://[redacted]@${STUJO_MYSQL_DSN##*@}
   files root   ${STUJO_FILES_ROOT}
   etl args     $*
 EOF
