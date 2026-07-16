@@ -75,7 +75,7 @@ async function queueEmail({
   try {
     // Get email template (course-specific or default)
     const GET_EMAIL_TEMPLATE = gql`
-      query GetEmailTemplate($type: String!, $courseId: Int) {
+      query GetEmailTemplate($type: MailTemplateType_enum!, $courseId: Int) {
         MailTemplate(
           where: {
             _and: [
@@ -106,7 +106,7 @@ async function queueEmail({
     // If no course-specific template found, fall back to default template (courseId = NULL)
     if (!templateData?.MailTemplate?.length) {
       const GET_DEFAULT_TEMPLATE = gql`
-        query GetDefaultTemplate($type: String!) {
+        query GetDefaultTemplate($type: MailTemplateType_enum!) {
           MailTemplate(
             where: {
               _and: [

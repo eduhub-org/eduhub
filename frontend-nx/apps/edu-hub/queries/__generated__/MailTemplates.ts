@@ -3,6 +3,8 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
+import { MailTemplateType_enum } from "./../../__generated__/globalTypes";
+
 // ====================================================
 // GraphQL query operation: MailTemplates
 // ====================================================
@@ -33,7 +35,7 @@ export interface MailTemplates_MailTemplate {
   /**
    * Mail template type
    */
-  type: string | null;
+  type: MailTemplateType_enum | null;
   courseId: number | null;
 }
 

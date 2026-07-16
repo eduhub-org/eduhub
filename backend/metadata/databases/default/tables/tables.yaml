@@ -51,6 +51,7 @@
 - "!include public_MailLog.yaml"
 - "!include public_MailStatus.yaml"
 - "!include public_MailTemplate.yaml"
+- "!include public_MailTemplateType.yaml"
 - "!include public_MotivationRating.yaml"
 - "!include public_OnboardingText.yaml"
 - "!include public_Organization.yaml"

@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { MailTemplate_insert_input } from "./../../__generated__/globalTypes";
+import { MailTemplate_insert_input, MailTemplateType_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL mutation operation: InsertEmailTemplate
@@ -15,7 +15,7 @@ export interface InsertEmailTemplate_insert_MailTemplate_one {
   /**
    * Mail template type
    */
-  type: string | null;
+  type: MailTemplateType_enum | null;
   courseId: number | null;
   /**
    * The subject of the email
