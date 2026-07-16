@@ -105,7 +105,7 @@ const SET_PENDING_PAYMENT = gql`
 `;
 
 const GET_MAIL_TEMPLATE = gql`
-  query GetJobMailTemplate($type: String!) {
+  query GetJobMailTemplate($type: MailTemplateType_enum!) {
     MailTemplate(where: { type: { _eq: $type }, courseId: { _is_null: true } }, limit: 1) {
       subject
       content
