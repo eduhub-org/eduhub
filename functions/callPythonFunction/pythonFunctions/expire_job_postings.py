@@ -7,7 +7,7 @@ from api_clients import EduHubClient
 def _get_mail_template(client, template_type):
     """Fetch the default (courseId NULL) mail template of the given type."""
     query = """
-    query GetJobMailTemplate($type: String!) {
+    query GetJobMailTemplate($type: MailTemplateType_enum!) {
         MailTemplate(where: {type: {_eq: $type}, courseId: {_is_null: true}}, limit: 1) {
             subject
             content

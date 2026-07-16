@@ -116,7 +116,7 @@ const UPDATE_INVOICE_STATUS = gql`
 `;
 
 const GET_MAIL_TEMPLATE = gql`
-  query GetJobMailTemplateWebhook($type: String!) {
+  query GetJobMailTemplateWebhook($type: MailTemplateType_enum!) {
     MailTemplate(where: { type: { _eq: $type }, courseId: { _is_null: true } }, limit: 1) {
       subject
       content

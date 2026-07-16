@@ -5,6 +5,7 @@ import {
   buildInvoiceCreation,
   buildPaymentMethodConfig,
   getOrCreateCustomer,
+  getOrCreateTaxRate,
 } from '../lib/stripeTax.js';
 
 /**
@@ -104,7 +105,7 @@ const SET_PENDING_PAYMENT = gql`
 `;
 
 const GET_MAIL_TEMPLATE = gql`
-  query GetJobMailTemplate($type: String!) {
+  query GetJobMailTemplate($type: MailTemplateType_enum!) {
     MailTemplate(where: { type: { _eq: $type }, courseId: { _is_null: true } }, limit: 1) {
       subject
       content
@@ -333,13 +334,19 @@ export default async function publishJobPosting(req, logger) {
       };
     }
 
-    // Fixed 19% German VAT on the net price. STRIPE_TAX_RATE_ID is created
-    // by the createStripeJobPostingPrices bootstrap function.
-    const taxRateId = process.env.STRIPE_TAX_RATE_ID;
+    // Fixed 19% exclusive German VAT on the net price. STRIPE_TAX_RATE_ID is
+    // an optional override (e.g. pin the rate verified against the live
+    // account); when unset we find-or-create the matching rate on the fly,
+    // mirroring the course checkout flow so no manual bootstrap step is
+    // required. The createStripeJobPostingPrices action creates the same rate.
+    let taxRateId = process.env.STRIPE_TAX_RATE_ID || null;
+    if (!taxRateId) {
+      taxRateId = await getOrCreateTaxRate(stripe, 19, false, logger);
+    }
     if (taxRateId) {
       lineItem.tax_rates = [taxRateId];
     } else {
-      logger.warn('STRIPE_TAX_RATE_ID not set — charging net price without VAT line');
+      logger.warn('Could not resolve a 19% VAT tax rate — charging net price without VAT line');
     }
 
     // The platform organization sells the posting; its invoice footer and
@@ -391,12 +398,18 @@ export default async function publishJobPosting(req, logger) {
       metadata: {
         jobPostingId: String(posting.id),
         organizationId: String(posting.organizationId),
+        organizationName: posting.Organization?.name || '',
         // The buying user for the Invoice row created by the webhook.
         userId: String(sessionUserId),
         source: 'stujo',
       },
       payment_intent_data: {
-        metadata: { jobPostingId: String(posting.id), source: 'stujo' },
+        metadata: {
+          jobPostingId: String(posting.id),
+          organizationId: String(posting.organizationId),
+          organizationName: posting.Organization?.name || '',
+          source: 'stujo',
+        },
       },
     };
 

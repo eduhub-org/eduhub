@@ -91,7 +91,7 @@ export default async function sendEnrollmentEmail(req, logger) {
     // Get appropriate email template based on status
     // First try course-specific template, then fall back to default template
     const GET_EMAIL_TEMPLATE = gql`
-      query GetEmailTemplate($type: String!, $courseId: Int) {
+      query GetEmailTemplate($type: MailTemplateType_enum!, $courseId: Int) {
         MailTemplate(
           where: {
             _and: [
@@ -168,7 +168,7 @@ export default async function sendEnrollmentEmail(req, logger) {
     // If no course-specific template found, fall back to default template (courseId = NULL)
     if (!templateData?.MailTemplate?.length) {
       const GET_DEFAULT_TEMPLATE = gql`
-        query GetDefaultTemplate($type: String!) {
+        query GetDefaultTemplate($type: MailTemplateType_enum!) {
           MailTemplate(
             where: {
               _and: [

@@ -1390,6 +1390,36 @@ export enum JobRegion_update_column {
 }
 
 /**
+ * unique or primary key constraints on table "JobSliderJobType"
+ */
+export enum JobSliderJobType_constraint {
+  JobSliderJobType_jobSliderOptionId_jobType_key = "JobSliderJobType_jobSliderOptionId_jobType_key",
+  JobSliderJobType_pkey = "JobSliderJobType_pkey",
+}
+
+/**
+ * select columns of table "JobSliderJobType"
+ */
+export enum JobSliderJobType_select_column {
+  created_at = "created_at",
+  id = "id",
+  jobSliderOptionId = "jobSliderOptionId",
+  jobType = "jobType",
+  updated_at = "updated_at",
+}
+
+/**
+ * update columns of table "JobSliderJobType"
+ */
+export enum JobSliderJobType_update_column {
+  created_at = "created_at",
+  id = "id",
+  jobSliderOptionId = "jobSliderOptionId",
+  jobType = "jobType",
+  updated_at = "updated_at",
+}
+
+/**
  * unique or primary key constraints on table "Language"
  */
 export enum Language_constraint {
@@ -1460,6 +1490,81 @@ export enum LocationOption_enum {
 export enum LocationOption_update_column {
   comment = "comment",
   value = "value",
+}
+
+/**
+ * unique or primary key constraints on table "MailTemplateType"
+ */
+export enum MailTemplateType_constraint {
+  MailTemplateType_pkey = "MailTemplateType_pkey",
+}
+
+export enum MailTemplateType_enum {
+  APPLICATION_CONFIRMED = "APPLICATION_CONFIRMED",
+  APPLICATION_RECEIVED = "APPLICATION_RECEIVED",
+  APPLICATION_RECEIVED_PAID = "APPLICATION_RECEIVED_PAID",
+  DECLINE = "DECLINE",
+  INVITE = "INVITE",
+  JOB_ALERT = "JOB_ALERT",
+  JOB_POSTING_ADMIN_NOTICE = "JOB_POSTING_ADMIN_NOTICE",
+  JOB_POSTING_EXPIRED = "JOB_POSTING_EXPIRED",
+  JOB_POSTING_PAYMENT_FAILED = "JOB_POSTING_PAYMENT_FAILED",
+  JOB_POSTING_PUBLISHED = "JOB_POSTING_PUBLISHED",
+  ORGANIZER_ADDED = "ORGANIZER_ADDED",
+  REGISTRATION_CONFIRMED = "REGISTRATION_CONFIRMED",
+  REGISTRATION_CONFIRMED_PAID = "REGISTRATION_CONFIRMED_PAID",
+  SESSION_REMINDER = "SESSION_REMINDER",
+  USER_CREATED = "USER_CREATED",
+  WAITLIST_NOTICE = "WAITLIST_NOTICE",
+}
+
+/**
+ * update columns of table "MailTemplateType"
+ */
+export enum MailTemplateType_update_column {
+  comment = "comment",
+  value = "value",
+}
+
+/**
+ * unique or primary key constraints on table "MailTemplate"
+ */
+export enum MailTemplate_constraint {
+  MailTemplate_pkey = "MailTemplate_pkey",
+  MailTemplate_type_courseId_unique_not_null = "MailTemplate_type_courseId_unique_not_null",
+  MailTemplate_type_unique_null = "MailTemplate_type_unique_null",
+}
+
+/**
+ * select columns of table "MailTemplate"
+ */
+export enum MailTemplate_select_column {
+  bcc = "bcc",
+  cc = "cc",
+  content = "content",
+  courseId = "courseId",
+  created_at = "created_at",
+  from = "from",
+  id = "id",
+  subject = "subject",
+  type = "type",
+  updated_at = "updated_at",
+}
+
+/**
+ * update columns of table "MailTemplate"
+ */
+export enum MailTemplate_update_column {
+  bcc = "bcc",
+  cc = "cc",
+  content = "content",
+  courseId = "courseId",
+  created_at = "created_at",
+  from = "from",
+  id = "id",
+  subject = "subject",
+  type = "type",
+  updated_at = "updated_at",
 }
 
 /**
@@ -5153,6 +5258,8 @@ export interface CourseGroupOption_bool_exp {
   ProgramType?: ProgramType_bool_exp | null;
   SelectedCourseGroups?: ProjectSliderCourseGroup_bool_exp | null;
   SelectedCourseGroups_aggregate?: ProjectSliderCourseGroup_aggregate_bool_exp | null;
+  SelectedJobTypes?: JobSliderJobType_bool_exp | null;
+  SelectedJobTypes_aggregate?: JobSliderJobType_aggregate_bool_exp | null;
   SelectedProjectGroups?: ProjectSliderProjectGroup_bool_exp | null;
   SelectedProjectGroups_aggregate?: ProjectSliderProjectGroup_aggregate_bool_exp | null;
   _and?: CourseGroupOption_bool_exp[] | null;
@@ -5177,6 +5284,7 @@ export interface CourseGroupOption_insert_input {
   Organization?: Organization_obj_rel_insert_input | null;
   ProgramType?: ProgramType_obj_rel_insert_input | null;
   SelectedCourseGroups?: ProjectSliderCourseGroup_arr_rel_insert_input | null;
+  SelectedJobTypes?: JobSliderJobType_arr_rel_insert_input | null;
   SelectedProjectGroups?: ProjectSliderProjectGroup_arr_rel_insert_input | null;
   contentType?: string | null;
   created_at?: any | null;
@@ -7774,6 +7882,63 @@ export interface JobRegion_on_conflict {
   where?: JobRegion_bool_exp | null;
 }
 
+export interface JobSliderJobType_aggregate_bool_exp {
+  count?: JobSliderJobType_aggregate_bool_exp_count | null;
+}
+
+export interface JobSliderJobType_aggregate_bool_exp_count {
+  arguments?: JobSliderJobType_select_column[] | null;
+  distinct?: boolean | null;
+  filter?: JobSliderJobType_bool_exp | null;
+  predicate: Int_comparison_exp;
+}
+
+/**
+ * input type for inserting array relation for remote table "JobSliderJobType"
+ */
+export interface JobSliderJobType_arr_rel_insert_input {
+  data: JobSliderJobType_insert_input[];
+  on_conflict?: JobSliderJobType_on_conflict | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "JobSliderJobType". All fields are combined with a logical 'AND'.
+ */
+export interface JobSliderJobType_bool_exp {
+  JobPostingType?: JobPostingType_bool_exp | null;
+  JobSliderOption?: CourseGroupOption_bool_exp | null;
+  _and?: JobSliderJobType_bool_exp[] | null;
+  _not?: JobSliderJobType_bool_exp | null;
+  _or?: JobSliderJobType_bool_exp[] | null;
+  created_at?: timestamptz_comparison_exp | null;
+  id?: Int_comparison_exp | null;
+  jobSliderOptionId?: Int_comparison_exp | null;
+  jobType?: JobPostingType_enum_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "JobSliderJobType"
+ */
+export interface JobSliderJobType_insert_input {
+  JobPostingType?: JobPostingType_obj_rel_insert_input | null;
+  JobSliderOption?: CourseGroupOption_obj_rel_insert_input | null;
+  created_at?: any | null;
+  id?: number | null;
+  jobSliderOptionId?: number | null;
+  jobType?: JobPostingType_enum | null;
+  updated_at?: any | null;
+}
+
+/**
+ * on_conflict condition type for table "JobSliderJobType"
+ */
+export interface JobSliderJobType_on_conflict {
+  constraint: JobSliderJobType_constraint;
+  update_columns: JobSliderJobType_update_column[];
+  where?: JobSliderJobType_bool_exp | null;
+}
+
 /**
  * Boolean expression to filter rows from the table "Language". All fields are combined with a logical 'AND'.
  */
@@ -8075,10 +8240,114 @@ export interface LocationOption_order_by {
 }
 
 /**
+ * Boolean expression to filter rows from the table "MailTemplateType". All fields are combined with a logical 'AND'.
+ */
+export interface MailTemplateType_bool_exp {
+  MailTemplates?: MailTemplate_bool_exp | null;
+  MailTemplates_aggregate?: MailTemplate_aggregate_bool_exp | null;
+  _and?: MailTemplateType_bool_exp[] | null;
+  _not?: MailTemplateType_bool_exp | null;
+  _or?: MailTemplateType_bool_exp[] | null;
+  comment?: String_comparison_exp | null;
+  value?: String_comparison_exp | null;
+}
+
+/**
+ * Boolean expression to compare columns of type "MailTemplateType_enum". All fields are combined with logical 'AND'.
+ */
+export interface MailTemplateType_enum_comparison_exp {
+  _eq?: MailTemplateType_enum | null;
+  _in?: MailTemplateType_enum[] | null;
+  _is_null?: boolean | null;
+  _neq?: MailTemplateType_enum | null;
+  _nin?: MailTemplateType_enum[] | null;
+}
+
+/**
+ * input type for inserting data into table "MailTemplateType"
+ */
+export interface MailTemplateType_insert_input {
+  MailTemplates?: MailTemplate_arr_rel_insert_input | null;
+  comment?: string | null;
+  value?: string | null;
+}
+
+/**
+ * input type for inserting object relation for remote table "MailTemplateType"
+ */
+export interface MailTemplateType_obj_rel_insert_input {
+  data: MailTemplateType_insert_input;
+  on_conflict?: MailTemplateType_on_conflict | null;
+}
+
+/**
+ * on_conflict condition type for table "MailTemplateType"
+ */
+export interface MailTemplateType_on_conflict {
+  constraint: MailTemplateType_constraint;
+  update_columns: MailTemplateType_update_column[];
+  where?: MailTemplateType_bool_exp | null;
+}
+
+/**
+ * Ordering options when selecting data from "MailTemplateType".
+ */
+export interface MailTemplateType_order_by {
+  MailTemplates_aggregate?: MailTemplate_aggregate_order_by | null;
+  comment?: order_by | null;
+  value?: order_by | null;
+}
+
+export interface MailTemplate_aggregate_bool_exp {
+  count?: MailTemplate_aggregate_bool_exp_count | null;
+}
+
+export interface MailTemplate_aggregate_bool_exp_count {
+  arguments?: MailTemplate_select_column[] | null;
+  distinct?: boolean | null;
+  filter?: MailTemplate_bool_exp | null;
+  predicate: Int_comparison_exp;
+}
+
+/**
+ * order by aggregate values of table "MailTemplate"
+ */
+export interface MailTemplate_aggregate_order_by {
+  avg?: MailTemplate_avg_order_by | null;
+  count?: order_by | null;
+  max?: MailTemplate_max_order_by | null;
+  min?: MailTemplate_min_order_by | null;
+  stddev?: MailTemplate_stddev_order_by | null;
+  stddev_pop?: MailTemplate_stddev_pop_order_by | null;
+  stddev_samp?: MailTemplate_stddev_samp_order_by | null;
+  sum?: MailTemplate_sum_order_by | null;
+  var_pop?: MailTemplate_var_pop_order_by | null;
+  var_samp?: MailTemplate_var_samp_order_by | null;
+  variance?: MailTemplate_variance_order_by | null;
+}
+
+/**
+ * input type for inserting array relation for remote table "MailTemplate"
+ */
+export interface MailTemplate_arr_rel_insert_input {
+  data: MailTemplate_insert_input[];
+  on_conflict?: MailTemplate_on_conflict | null;
+}
+
+/**
+ * order by avg() on columns of table "MailTemplate"
+ */
+export interface MailTemplate_avg_order_by {
+  courseId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
  * Boolean expression to filter rows from the table "MailTemplate". All fields are combined with a logical 'AND'.
  */
 export interface MailTemplate_bool_exp {
   Course?: Course_bool_exp | null;
+  MailTemplateType?: MailTemplateType_bool_exp | null;
   _and?: MailTemplate_bool_exp[] | null;
   _not?: MailTemplate_bool_exp | null;
   _or?: MailTemplate_bool_exp[] | null;
@@ -8090,7 +8359,7 @@ export interface MailTemplate_bool_exp {
   from?: String_comparison_exp | null;
   id?: Int_comparison_exp | null;
   subject?: String_comparison_exp | null;
-  type?: String_comparison_exp | null;
+  type?: MailTemplateType_enum_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
 }
 
@@ -8099,6 +8368,7 @@ export interface MailTemplate_bool_exp {
  */
 export interface MailTemplate_insert_input {
   Course?: Course_obj_rel_insert_input | null;
+  MailTemplateType?: MailTemplateType_obj_rel_insert_input | null;
   bcc?: string | null;
   cc?: string | null;
   content?: string | null;
@@ -8107,8 +8377,47 @@ export interface MailTemplate_insert_input {
   from?: string | null;
   id?: number | null;
   subject?: string | null;
-  type?: string | null;
+  type?: MailTemplateType_enum | null;
   updated_at?: any | null;
+}
+
+/**
+ * order by max() on columns of table "MailTemplate"
+ */
+export interface MailTemplate_max_order_by {
+  bcc?: order_by | null;
+  cc?: order_by | null;
+  content?: order_by | null;
+  courseId?: order_by | null;
+  created_at?: order_by | null;
+  from?: order_by | null;
+  id?: order_by | null;
+  subject?: order_by | null;
+  updated_at?: order_by | null;
+}
+
+/**
+ * order by min() on columns of table "MailTemplate"
+ */
+export interface MailTemplate_min_order_by {
+  bcc?: order_by | null;
+  cc?: order_by | null;
+  content?: order_by | null;
+  courseId?: order_by | null;
+  created_at?: order_by | null;
+  from?: order_by | null;
+  id?: order_by | null;
+  subject?: order_by | null;
+  updated_at?: order_by | null;
+}
+
+/**
+ * on_conflict condition type for table "MailTemplate"
+ */
+export interface MailTemplate_on_conflict {
+  constraint: MailTemplate_constraint;
+  update_columns: MailTemplate_update_column[];
+  where?: MailTemplate_bool_exp | null;
 }
 
 /**
@@ -8116,6 +8425,7 @@ export interface MailTemplate_insert_input {
  */
 export interface MailTemplate_order_by {
   Course?: Course_order_by | null;
+  MailTemplateType?: MailTemplateType_order_by | null;
   bcc?: order_by | null;
   cc?: order_by | null;
   content?: order_by | null;
@@ -8126,6 +8436,62 @@ export interface MailTemplate_order_by {
   subject?: order_by | null;
   type?: order_by | null;
   updated_at?: order_by | null;
+}
+
+/**
+ * order by stddev() on columns of table "MailTemplate"
+ */
+export interface MailTemplate_stddev_order_by {
+  courseId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by stddev_pop() on columns of table "MailTemplate"
+ */
+export interface MailTemplate_stddev_pop_order_by {
+  courseId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by stddev_samp() on columns of table "MailTemplate"
+ */
+export interface MailTemplate_stddev_samp_order_by {
+  courseId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by sum() on columns of table "MailTemplate"
+ */
+export interface MailTemplate_sum_order_by {
+  courseId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by var_pop() on columns of table "MailTemplate"
+ */
+export interface MailTemplate_var_pop_order_by {
+  courseId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by var_samp() on columns of table "MailTemplate"
+ */
+export interface MailTemplate_var_samp_order_by {
+  courseId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by variance() on columns of table "MailTemplate"
+ */
+export interface MailTemplate_variance_order_by {
+  courseId?: order_by | null;
+  id?: order_by | null;
 }
 
 /**

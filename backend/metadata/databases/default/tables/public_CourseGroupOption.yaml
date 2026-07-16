@@ -32,6 +32,14 @@ array_relationships:
         table:
           name: ProjectSliderProjectGroup
           schema: public
+  # For a job-slider row (contentType = JOB): the job posting types it pulls from.
+  - name: SelectedJobTypes
+    using:
+      foreign_key_constraint_on:
+        column: jobSliderOptionId
+        table:
+          name: JobSliderJobType
+          schema: public
 select_permissions:
   - role: anonymous
     permission:

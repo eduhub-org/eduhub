@@ -11,6 +11,7 @@ import Loading from '../components/common/Loading';
 import TileSlider, { CourseType } from '../components/common/TileSlider';
 import { Tile } from '../components/common/TileSlider/Tile';
 import HomeProjectSlider from '../components/common/TileSlider/HomeProjectSlider';
+import HomeJobSlider from '../components/common/TileSlider/HomeJobSlider';
 import FaqSection from '../components/common/FaqSection';
 import NotificationSnackbar from '../components/common/dialogs/NotificationSnackbar';
 
@@ -110,6 +111,9 @@ const Home: FC = () => {
           if (option.contentType === 'PROJECT') {
             return { kind: 'project' as const, option };
           }
+          if (option.contentType === 'JOB') {
+            return { kind: 'job' as const, option };
+          }
           const filteredCourses = option.programType
             ? // Program-type based groups (Courses, Events, Degrees) are populated
               // automatically from the published courses of that program type.
@@ -134,6 +138,15 @@ const Home: FC = () => {
           return (
             <HomeProjectSlider
               key={`home-project-${slider.option.id}`}
+              option={slider.option}
+              title={sliderLabel(slider.option.title)}
+            />
+          );
+        }
+        if (slider.kind === 'job') {
+          return (
+            <HomeJobSlider
+              key={`home-job-${slider.option.id}`}
               option={slider.option}
               title={sliderLabel(slider.option.title)}
             />

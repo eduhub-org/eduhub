@@ -1,0 +1,37 @@
+table:
+  name: MailTemplateType
+  schema: public
+is_enum: true
+array_relationships:
+  - name: MailTemplates
+    using:
+      foreign_key_constraint_on:
+        column: type
+        table:
+          name: MailTemplate
+          schema: public
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - value
+        - comment
+      filter: {}
+  - role: user_access
+    permission:
+      columns:
+        - value
+        - comment
+      filter: {}
+  - role: instructor_access
+    permission:
+      columns:
+        - value
+        - comment
+      filter: {}
+  - role: org_admin_access
+    permission:
+      columns:
+        - value
+        - comment
+      filter: {}

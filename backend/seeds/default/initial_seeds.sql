@@ -3542,6 +3542,66 @@ INSERT INTO public."ProjectSliderProjectGroup"
 VALUES
   (1, 9300, 1, now(), now());
 
+-- A home job slider (contentType = JOB). Its membership is composed from the
+-- selected JobPostingType(s) in JobSliderJobType; with no JobSliderJobType rows
+-- it shows all published job postings. Sample postings below power the homepage
+-- slider in local dev; production data comes from the StuJo ETL. "order" 8 places
+-- it after the project slider (order 7).
+INSERT INTO public."CourseGroupOption"
+  (id, title, "order", "sliderGroup", "contentType", "programType", "organizationId", created_at, updated_at)
+VALUES
+  (9301, 'Jobs', 8, true, 'JOB', NULL, NULL, now(), now());
+
+INSERT INTO public."JobSliderJobType"
+  (id, "jobSliderOptionId", "jobType", created_at, updated_at)
+VALUES
+  (1, 9301, 'INTERNSHIP', now(), now()),
+  (2, 9301, 'MINIJOB', now(), now()),
+  (3, 9301, 'WORKING_STUDENT', now(), now()),
+  (4, 9301, 'STATE_RECOGNITION_INTERNSHIP', now(), now());
+
+-- Sample published job postings for local dev (StuJo ETL populates production).
+INSERT INTO public."JobPosting"
+  (id, slug, "organizationId", type, status, region, occupation,
+   title, "shortDescription", location, featured, "publishedAt", "expiresAt",
+   created_at, updated_at)
+VALUES
+  (9920, 'working-student-frontend-dev', 10, 'WORKING_STUDENT', 'PUBLISHED', 'KIEL',
+   'IT_TELECOMMUNICATIONS',
+   'Werkstudent:in Frontend-Entwicklung',
+   'React und TypeScript — flexible 15–20 h/Woche im Kiel-Team.',
+   'Kiel', true,
+   '2026-03-01 10:00:00+00', '2027-03-01 10:00:00+00',
+   now(), now()),
+  (9921, 'praktikum-ml-engineering', 8, 'INTERNSHIP', 'PUBLISHED', 'SCHLESWIG_HOLSTEIN_HAMBURG',
+   'RESEARCH_SCIENCE',
+   'Praktikum Machine Learning Engineering',
+   'Sechs Monate im Forschungslabor — Modelltraining und Evaluation.',
+   'Lübeck', false,
+   '2026-02-15 10:00:00+00', '2027-02-15 10:00:00+00',
+   now(), now()),
+  (9922, 'minijob-event-support', 1, 'MINIJOB', 'PUBLISHED', 'KIEL',
+   'CUSTOMER_SERVICE',
+   'Minijob Event-Support',
+   'Auf- und Abbau bei Tech-Events — ideal neben dem Studium.',
+   'Kiel', false,
+   '2026-01-20 10:00:00+00', NULL,
+   now(), now()),
+  (9923, 'praktikum-soziale-arbeit-anerkennung', 7, 'STATE_RECOGNITION_INTERNSHIP', 'PUBLISHED', 'GERMANY',
+   'HEALTH_SOCIAL',
+   'Praktikum Soziale Arbeit (staatl. Anerkennung)',
+   'Begleitetes Praxissemester in der Jugendhilfe.',
+   'Hamburg', false,
+   '2026-02-01 10:00:00+00', '2027-01-01 10:00:00+00',
+   now(), now()),
+  (9924, 'werkstudent-data-platform', 20, 'WORKING_STUDENT', 'PUBLISHED', 'KIEL',
+   'ENGINEERING',
+   'Werkstudent:in Data Platform',
+   'Python und SQL — Pipeline-Wartung und Monitoring.',
+   'Kiel', false,
+   '2026-03-10 10:00:00+00', '2027-03-10 10:00:00+00',
+   now(), now());
+
 SELECT pg_catalog.setval(pg_get_serial_sequence('public."Badge"', 'id'), (SELECT max(id) FROM public."Badge"), true);
 SELECT pg_catalog.setval(pg_get_serial_sequence('public."ProjectBadge"', 'id'), (SELECT max(id) FROM public."ProjectBadge"), true);
 SELECT pg_catalog.setval(pg_get_serial_sequence('public."ProjectMentor"', 'id'), (SELECT max(id) FROM public."ProjectMentor"), true);
@@ -3579,6 +3639,8 @@ SELECT pg_catalog.setval(pg_get_serial_sequence('public."Attendance"', 'id'), (S
 SELECT pg_catalog.setval(pg_get_serial_sequence('public."Course"', 'id'), (SELECT max(id) FROM public."Course"), true);
 SELECT pg_catalog.setval(pg_get_serial_sequence('public."CourseDegree"', 'id'), (SELECT max(id) FROM public."CourseDegree"), true);
 SELECT pg_catalog.setval(pg_get_serial_sequence('public."CourseEnrollment"', 'id'), (SELECT max(id) FROM public."CourseEnrollment"), true);
+SELECT pg_catalog.setval(pg_get_serial_sequence('public."JobPosting"', 'id'), (SELECT max(id) FROM public."JobPosting"), true);
+SELECT pg_catalog.setval(pg_get_serial_sequence('public."JobSliderJobType"', 'id'), (SELECT max(id) FROM public."JobSliderJobType"), true);
 SELECT pg_catalog.setval(pg_get_serial_sequence('public."Project"', 'id'), (SELECT max(id) FROM public."Project"), true);
 SELECT pg_catalog.setval(pg_get_serial_sequence('public."ProjectAuthor"', 'id'), (SELECT max(id) FROM public."ProjectAuthor"), true);
 SELECT pg_catalog.setval(pg_get_serial_sequence('public."ProjectCourse"', 'id'), (SELECT max(id) FROM public."ProjectCourse"), true);

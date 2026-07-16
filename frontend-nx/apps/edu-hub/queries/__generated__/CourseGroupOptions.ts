@@ -3,6 +3,8 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
+import { JobPostingType_enum } from "./../../__generated__/globalTypes";
+
 // ====================================================
 // GraphQL query operation: CourseGroupOptions
 // ====================================================
@@ -19,6 +21,15 @@ export interface CourseGroupOptions_CourseGroupOption_SelectedProjectGroups {
   projectGroupOptionId: number;
 }
 
+export interface CourseGroupOptions_CourseGroupOption_SelectedJobTypes {
+  __typename: "JobSliderJobType";
+  id: number;
+  /**
+   * The JobPostingType value this job slider pulls postings from.
+   */
+  jobType: JobPostingType_enum;
+}
+
 export interface CourseGroupOptions_CourseGroupOption {
   __typename: "CourseGroupOption";
   id: number;
@@ -29,7 +40,7 @@ export interface CourseGroupOptions_CourseGroupOption {
    */
   sliderGroup: boolean | null;
   /**
-   * Whether this slider row renders courses (COURSE, default) or projects (PROJECT). PROJECT rows compose their membership from the ProjectSliderCourseGroup / ProjectSliderProjectGroup selections.
+   * Whether this slider row renders courses (COURSE, default), projects (PROJECT) or jobs (JOB). PROJECT rows compose their membership from the ProjectSliderCourseGroup / ProjectSliderProjectGroup selections. JOB rows compose their membership from the JobSliderJobType selections.
    */
   contentType: string;
   /**
@@ -48,6 +59,10 @@ export interface CourseGroupOptions_CourseGroupOption {
    * An array relationship
    */
   SelectedProjectGroups: CourseGroupOptions_CourseGroupOption_SelectedProjectGroups[];
+  /**
+   * An array relationship
+   */
+  SelectedJobTypes: CourseGroupOptions_CourseGroupOption_SelectedJobTypes[];
 }
 
 export interface CourseGroupOptions {

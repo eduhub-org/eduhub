@@ -178,7 +178,7 @@ export default async function sendSessionReminders(req, logger) {
       // Get email template for reminders
       // First try course-specific template, then fall back to default template
       const GET_EMAIL_TEMPLATE = gql`
-        query GetEmailTemplate($type: String!, $courseId: Int) {
+        query GetEmailTemplate($type: MailTemplateType_enum!, $courseId: Int) {
           MailTemplate(
             where: {
               _and: [
@@ -226,7 +226,7 @@ export default async function sendSessionReminders(req, logger) {
               template = defaultTemplate;
             } else {
               const GET_DEFAULT_TEMPLATE = gql`
-                query GetDefaultTemplate($type: String!) {
+                query GetDefaultTemplate($type: MailTemplateType_enum!) {
                   MailTemplate(
                     where: {
                       _and: [
