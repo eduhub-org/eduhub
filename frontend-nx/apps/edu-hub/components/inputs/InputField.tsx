@@ -650,6 +650,7 @@ const InputField: React.FC<InputFieldProps> = ({
             <div className="relative">
               {type === 'textarea' || type === 'markdown' ? (
                 <textarea
+                  {...props}
                   ref={type === 'markdown' ? resizableRef : undefined}
                   className={`${finalClassName.replace(/\bh-64\b/g, 'min-h-64')} ${errorMessage ? 'border-red-500' : ''}`}
                   style={type === 'markdown' && syncedHeight ? { height: syncedHeight } : undefined}
@@ -659,11 +660,19 @@ const InputField: React.FC<InputFieldProps> = ({
                   onKeyDown={handleKeyDown}
                   maxLength={maxLength}
                   placeholder={placeholder}
-                  {...props}
                 />
               ) : (
                 <input
-                  type={type === 'number' || type === 'ects' ? 'number' : 'text'}
+                  {...props}
+                  type={
+                    type === 'number' || type === 'ects'
+                      ? 'number'
+                      : type === 'email'
+                        ? 'email'
+                        : type === 'link'
+                          ? 'url'
+                          : 'text'
+                  }
                   className={`${finalClassName.replace(/\bh-64\b/g, 'min-h-64')} ${errorMessage ? 'border-red-500' : ''}`}
                   value={localText}
                   onChange={handleTextChange}
@@ -676,7 +685,6 @@ const InputField: React.FC<InputFieldProps> = ({
                   step={type === 'number' ? 1 : undefined}
                   inputMode={type === 'number' ? 'numeric' : undefined}
                   pattern={type === 'number' ? '[0-9]*' : undefined}
-                  {...props}
                 />
               )}
               {showCharacterCount && type !== 'ects' && type !== 'number' && (

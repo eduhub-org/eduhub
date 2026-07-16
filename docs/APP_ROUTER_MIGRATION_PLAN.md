@@ -55,6 +55,13 @@ Version targets (verified current as of July 2026):
 
 ## 2. Stage A — React 19 (Pages Router, Next 15.5)
 
+> **Status: implemented** (same PR as this plan). Deltas found during
+> implementation: `react-select`, `swr`, and the `@radix-ui/*` packages
+> also needed bumps (React-19 peer warnings); `@mui/lab` had to be pinned
+> exactly to `6.0.0-beta.32` (a caret range resolves to a `dev` prerelease
+> that is peer-locked to React 18); the unused `@mui/styles` package was
+> removed; `apps/stujo` needed its own `.eslintrc.json` to build.
+
 Next.js 15.5 supports React 19 on the Pages Router, so this lands
 independently of the Next upgrade.
 
@@ -84,9 +91,10 @@ npx types-react-codemod@latest preset-19 apps/edu-hub apps/stujo
 - **Stricter `ReactNode`/JSX namespace types** — expect a wave of small
   type errors; fix with the codemod plus manual cleanup, `yarn type-check`
   is the gate.
-- `pages/_app.tsx` calls `setDefaultLocale(locale)` (react-datepicker)
-  **during render** — a side effect that React 19 concurrent rendering makes
-  riskier. Move it into a `useEffect` as part of this stage.
+- ~~`pages/_app.tsx` calls `setDefaultLocale(locale)` (react-datepicker)
+  **during render**~~ — **done**: moved into a `useEffect` as part of this
+  stage (render-phase side effects are riskier under React 19 concurrent
+  rendering).
 
 ### A.3 Dependency compatibility audit
 
@@ -98,7 +106,7 @@ React 19 peer support (verify exact versions during implementation with
 |---------|---------|---------------------|
 | `next-auth` | `^4.24.7` | Bump to latest v4 (`4.24.11+` adds React 19 peer). **Stay on v4** — Auth.js v5 is a separate project, out of scope. |
 | `@apollo/client` | `~3.11.5` | Bump to latest 3.x (React 19 peer support landed in 3.12). Staying on 3.x avoids the Apollo Client 4 migration. |
-| `@mui/material` / `icons` / `lab` / `x-date-pickers` | 6.0.x / lab beta | Bump to latest 6.x line (React 19 support added mid-6.x). **Stay on MUI 6**; MUI 7 is a follow-up. |
+| `@mui/material` / `icons` / `lab` / `x-date-pickers` | 6.0.x / lab beta | Bump to latest 6.x line (React 19 support added mid-6.x). **Stay on MUI 6 for this stage** to contain scope. ⚠️ Known exception: MUI 6 is past end-of-support (the current line is v9; only the two newest majors receive security fixes). A dedicated MUI major upgrade (6 → 7 → current, following each migration guide + codemods) must be scheduled as its own workstream, at the latest right after Stage C — it is deliberately NOT bundled into the React/Next/router migration because each MUI major carries its own breaking-change surface. |
 | `@hello-pangea/dnd` | `^16.6.0` | v17+ required for React 19. |
 | `recharts` | `^2.12.7` | ≥2.15 required for React 19. |
 | `react-datepicker` | `^7.3.0` | v8 required for React 19 (check `OptimisticDatePicker` and holiday logic after bump). |
@@ -153,7 +161,7 @@ Relevant Next 16 breaking changes checked against this codebase:
 
 | Change | Impact here |
 |--------|-------------|
-| **Turbopack is the default** for `next dev` and `next build` | No custom webpack config ✓. Risk: Turbopack does not run Babel — verify the root `frontend-nx/babel.config.json` is not picked up by Next (it currently exists for Jest). Check a Next 15 build log for "using external babel configuration"; if it is detected, scope Babel config into `jest.config.ts` (`transform` option) so Next stays on SWC. Escape hatch: `next build --webpack`. |
+| **Turbopack is the default** for `next dev` and `next build` | No custom webpack config ✓. The root `frontend-nx/babel.config.json` (only `babelrcRoots`, present for Jest) is a project-wide Babel config that Next may detect. In Next 16, Turbopack **auto-enables a built-in babel-loader when a Babel config is detected** (`turbopackUseBuiltinBabel`, default `true`); SWC still performs Next's internal transforms either way, so this is a build-perf question, not a correctness blocker. During the upgrade: check the build log for Babel activation; if active, measure build impact and either set `turbopackUseBuiltinBabel: false` or scope the Babel config to Jest (`transform` in `jest.config.ts`) — decide from the measured result. Escape hatch: `next build --webpack`. |
 | `next lint` removed | Not used — repo calls `eslint` directly ✓. `eslint-config-next@16` may push toward ESLint 9 flat config; if it does, either pin ESLint 8 compat or convert `.eslintrc.json` → `eslint.config.mjs` (`@eslint/compat` is already installed). |
 | `images.domains` removed | Already on `remotePatterns` ✓ |
 | AMP support removed | Not used ✓ |
@@ -229,7 +237,9 @@ Target setup that **preserves every existing URL**:
   — `de` stays unprefixed, `/en/...` stays prefixed, `NEXT_LOCALE` cookie
   keeps working (same cookie the built-in i18n uses today).
 - `apps/edu-hub/proxy.ts` (Next 16's middleware): next-intl's
-  `createProxy(routing)` with a matcher that **excludes** `/api`,
+  `createMiddleware(routing)` (imported from `next-intl/middleware` — the
+  Next 16 change is only the *filename*, `middleware.ts` → `proxy.ts`; the
+  next-intl API keeps its name) with a matcher that **excludes** `/api`,
   `/_next`, static files, and `/widget` (widgets negotiate locale via query
   param, and iframe embeds must never be redirected).
 - Route tree: `app/[locale]/…` for everything except widgets;
@@ -278,7 +288,7 @@ Mapping of everything `_app`/`_document` do today:
 | Google Fonts `<link>` (Space Grotesk) | `next/font/google` in root layout (removes a render-blocking request; set `--font-body` var for Tailwind) |
 | Cookiebot `<Script strategy="beforeInteractive">` | Same `next/script` in root layout |
 | FB pixel + Plausible `afterInteractive` scripts | `providers.tsx` (client) |
-| FB pixel pageview on `router.events.routeChangeComplete` | `router.events` doesn't exist in App Router → small client component with `useEffect` on `usePathname()`/`useSearchParams()` |
+| FB pixel pageview on `router.events.routeChangeComplete` | `router.events` doesn't exist in App Router → dedicated client component with a `useEffect` on `usePathname()`/`useSearchParams()`. **Must preserve all existing guards**: fire only after the pixel script's `onLoad` has set the loaded flag AND `typeof window.fbq === 'function'`, keep the effect cleanup, and keep the Cookiebot consent gating (`type="text/plain"` + `data-cookieconsent="marketing"`) so no tracking runs before marketing consent. |
 | `<body className="font-body text-edu-black bg-edu-bg-gray">` | Root layout `<body>` |
 | `globals.css` / `widget.css` imports | Root layout (importing in both routers during coexistence is fine — each router bundles separately) |
 | `pageProps.session` for `SessionProvider` | Omit (v4's provider fetches the session client-side; this app never SSRs the session) |

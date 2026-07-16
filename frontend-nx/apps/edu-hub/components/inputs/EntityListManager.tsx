@@ -73,7 +73,7 @@ type EntityListManagerProps<TEntity, TSelectedEntity> = {
   /**
    * Selection dialog component.
    */
-  selectionDialog: React.ReactNode;
+  selectionDialog: React.ReactElement<any>;
 
   /**
    * Whether the selection dialog is open.
@@ -257,7 +257,7 @@ const EntityListManager = <TEntity, TSelectedEntity>({
   );
 
   // Create a modified dialog that uses our handler
-  const enhancedDialog = React.cloneElement(selectionDialog as React.ReactElement<any>, {
+  const enhancedDialog = React.cloneElement(selectionDialog, {
     onClose: handleEntitySelection,
   });
 
