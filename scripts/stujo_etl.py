@@ -37,7 +37,6 @@ import re
 import sys
 import unicodedata
 from datetime import datetime, timedelta, timezone
-from urllib.parse import quote
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
 log = logging.getLogger("stujo-etl")
@@ -488,7 +487,7 @@ def load_source(cnx, retention_years=None):
 def step_companies(hasura: HasuraClient, gcs_bucket, files_root, companies) -> dict:
     """Companies → Organization (CORPORATION). Returns rails_id → org_id."""
     existing = hasura.query(
-        """query { Organization { id name aliases } }"""
+        """query { Organization { id name aliases logo } }"""
     )["Organization"]
     by_norm = {normalize_company_name(o["name"]): o for o in existing}
     by_alias = {}
@@ -506,21 +505,35 @@ def step_companies(hasura: HasuraClient, gcs_bucket, files_root, companies) -> d
             # 'terwixonse') merge into one Organization; record this row's
             # legacy alias too so old URLs keep redirecting.
             mapping[c["id"]] = org["id"]
-            if legacy_alias not in (org.get("aliases") or []):
+            aliases = org.get("aliases") or []
+            if legacy_alias not in aliases:
+                # Compute the new array client-side and _set it: some orgs have
+                # aliases = null, and Postgres `null || jsonb` is null, so a
+                # Hasura _append would silently drop the alias (and .append on
+                # None would crash).
+                new_aliases = aliases + [legacy_alias]
                 hasura.mutate(
                     """
-                    mutation ($id: Int!, $alias: jsonb!) {
-                      update_Organization_by_pk(pk_columns: {id: $id}, _append: {aliases: $alias}) { id }
+                    mutation ($id: Int!, $aliases: jsonb!) {
+                      update_Organization_by_pk(pk_columns: {id: $id}, _set: {aliases: $aliases}) { id }
                     }
                     """,
-                    {"id": org["id"], "alias": [legacy_alias]},
+                    {"id": org["id"], "aliases": new_aliases},
                 )
-                org.setdefault("aliases", []).append(legacy_alias)
+                org["aliases"] = new_aliases
                 by_alias[legacy_alias] = org
+            # Backfill a logo onto a matched org that has none (repairs a prior
+            # run whose upload failed after the insert; fills a null logo on a
+            # name-matched pre-existing org). Never overwrites an existing logo.
+            if org.get("logo") is None:
+                logo_path = copy_paperclip_logo(gcs_bucket, files_root, org["id"], c)
+                if logo_path:
+                    _set_org_logo(hasura, org["id"], logo_path)
+                    org["logo"] = logo_path
+                    log.info("company %s: backfilled logo on Organization %s", c["id"], org["id"])
             log.info("company %s → existing Organization %s (%s)", c["id"], org["id"], org["name"])
             continue
 
-        logo_url = copy_paperclip_logo(gcs_bucket, files_root, c)
         address_line = " ".join(filter(None, [c.get("street"), c.get("nr")])) or None
         result = hasura.mutate(
             """
@@ -534,7 +547,6 @@ def step_companies(hasura: HasuraClient, gcs_bucket, files_root, companies) -> d
                     "type": "CORPORATION",
                     "description": c.get("description"),
                     "website": normalize_website(c.get("url")),
-                    "logo": logo_url,
                     "addressLine1": address_line,
                     "postalCode": c.get("zip"),
                     "city": c.get("city"),
@@ -544,27 +556,40 @@ def step_companies(hasura: HasuraClient, gcs_bucket, files_root, companies) -> d
         )
         org_id = result["insert_Organization_one"]["id"] if result else -c["id"]
         mapping[c["id"]] = org_id
+        # The logo path needs the new org id, so upload + set it after the
+        # insert (organizations/org-<id>/public/logo/...); in a dry run the
+        # same call is only a pre-flight file check and returns None.
+        logo_path = copy_paperclip_logo(gcs_bucket, files_root, org_id, c)
+        if logo_path:
+            _set_org_logo(hasura, org_id, logo_path)
         # Register the new org in the dedupe maps so later duplicate rows
         # in the same run merge instead of violating Organization_name_key.
-        created = {"id": org_id, "name": c["name"], "aliases": [legacy_alias]}
+        created = {"id": org_id, "name": c["name"], "aliases": [legacy_alias], "logo": logo_path}
         by_norm[norm] = created
         by_alias[legacy_alias] = created
         log.info("company %s '%s' → new Organization %s", c["id"], c["name"], org_id)
     return mapping
 
 
-def public_gcs_url(bucket_name: str, blob_name: str) -> str:
-    """Percent-encoded public URL — legacy Paperclip filenames contain
-    spaces/umlauts, which are valid blob names but not valid URL paths."""
-    return f"https://storage.googleapis.com/{bucket_name}/{quote(blob_name)}"
+def safe_filename(name: str) -> str:
+    """URL-clean leaf/object name. Legacy Paperclip filenames carry spaces and
+    umlauts; the frontend builds file URLs by plain concatenation without
+    percent-encoding (resolveStorageUrl / getPublicUrl), so the stored path
+    must already be URL-safe. One file lives per folder here, so slugifying
+    the stem can't collide."""
+    stem, ext = os.path.splitext(name)
+    return f"{slugify(stem) or 'file'}{ext.lower()}"
 
 
-def copy_paperclip_logo(gcs_bucket, files_root, company) -> str | None:
-    """Copy public/system/logos/:id/original/:filename to GCS.
+def copy_paperclip_logo(gcs_bucket, files_root, org_id, company) -> str | None:
+    """Copy system/logos/:id/original/:filename to
+    organizations/org-<org_id>/public/logo/<file> and return the bucket-
+    RELATIVE path — the native EduHub layout for org logos, keyed by the new
+    Organization.id. The frontend prefixes NEXT_PUBLIC_STORAGE_BUCKET_URL.
 
     Dry runs (gcs_bucket None) still verify the file on disk and feed
-    FILE_STATS when STUJO_FILES_ROOT is set, so a dry run doubles as a
-    pre-flight check of the rsynced Rails public/ dir; only uploads skip.
+    FILE_STATS, so a dry run doubles as a pre-flight check of the rsynced
+    Rails public/ dir; only the upload is skipped.
     """
     if not company.get("logo_file_name") or not files_root:
         return None
@@ -579,14 +604,19 @@ def copy_paperclip_logo(gcs_bucket, files_root, company) -> str | None:
     FILE_STATS["logos_copied"] += 1
     if gcs_bucket is None:  # dry run
         return None
-    blob_name = f"stujo/logos/{company['id']}/{company['logo_file_name']}"
-    blob = gcs_bucket.blob(blob_name)
-    blob.upload_from_filename(src)
-    return public_gcs_url(gcs_bucket.name, blob_name)
+    blob_name = f"organizations/org-{org_id}/public/logo/{safe_filename(company['logo_file_name'])}"
+    # public-read ACL so the object resolves anonymously (bucket UBLA is OFF
+    # and has no allUsers binding — visibility is per object), matching how the
+    # app serves its own uploads under a /public/ path segment.
+    gcs_bucket.blob(blob_name).upload_from_filename(src, predefined_acl="publicRead")
+    return blob_name
 
 
-def copy_paperclip_pdf(gcs_bucket, files_root, job) -> str | None:
-    """Copy the Paperclip job PDF (default id_partition path) to GCS.
+def copy_paperclip_pdf(gcs_bucket, files_root, job_posting_id, job) -> str | None:
+    """Copy the Paperclip job PDF to
+    jobpostings/jobposting-<job_posting_id>/public/<file> and return the
+    bucket-RELATIVE path — the same layout the dashboard uploader
+    (saveJobPostingPdf) writes, keyed by the new JobPosting.id.
 
     Same dry-run/pre-flight semantics as copy_paperclip_logo.
     """
@@ -604,10 +634,31 @@ def copy_paperclip_pdf(gcs_bucket, files_root, job) -> str | None:
     FILE_STATS["pdfs_copied"] += 1
     if gcs_bucket is None:  # dry run
         return None
-    blob_name = f"stujo/job-pdfs/{job['id']}/{job['pdf_file_name']}"
-    blob = gcs_bucket.blob(blob_name)
-    blob.upload_from_filename(src)
-    return public_gcs_url(gcs_bucket.name, blob_name)
+    blob_name = f"jobpostings/jobposting-{job_posting_id}/public/{safe_filename(job['pdf_file_name'])}"
+    gcs_bucket.blob(blob_name).upload_from_filename(src, predefined_acl="publicRead")
+    return blob_name
+
+
+def _set_org_logo(hasura: "HasuraClient", org_id: int, path: str) -> None:
+    hasura.mutate(
+        """
+        mutation ($id: Int!, $logo: String!) {
+          update_Organization_by_pk(pk_columns: {id: $id}, _set: {logo: $logo}) { id }
+        }
+        """,
+        {"id": org_id, "logo": path},
+    )
+
+
+def _set_job_pdf(hasura: "HasuraClient", posting_id: int, path: str) -> None:
+    hasura.mutate(
+        """
+        mutation ($id: Int!, $url: String!) {
+          update_JobPosting_by_pk(pk_columns: {id: $id}, _set: {pdfUrl: $url}) { id }
+        }
+        """,
+        {"id": posting_id, "url": path},
+    )
 
 
 def step_users(hasura: HasuraClient, keycloak, contacts, org_mapping) -> dict:
@@ -737,16 +788,9 @@ def step_jobs(hasura: HasuraClient, gcs_bucket, files_root, jobs, org_mapping,
         prior = existing.get(j["id"])
         if prior:
             if prior["pdfUrl"] is None and j.get("pdf_file_name"):
-                pdf_url = copy_paperclip_pdf(gcs_bucket, files_root, j)
-                if pdf_url:
-                    hasura.mutate(
-                        """
-                        mutation ($id: Int!, $url: String!) {
-                          update_JobPosting_by_pk(pk_columns: {id: $id}, _set: {pdfUrl: $url}) { id }
-                        }
-                        """,
-                        {"id": prior["id"], "url": pdf_url},
-                    )
+                pdf_path = copy_paperclip_pdf(gcs_bucket, files_root, prior["id"], j)
+                if pdf_path:
+                    _set_job_pdf(hasura, prior["id"], pdf_path)
                     log.info("job %s: backfilled missing pdfUrl on JobPosting %s",
                              j["id"], prior["id"])
             continue
@@ -795,7 +839,7 @@ def step_jobs(hasura: HasuraClient, gcs_bucket, files_root, jobs, org_mapping,
         # (unique constraint JobPostingTag_jobPostingId_name_key).
         tags = list(dict.fromkeys(t for t in (j.get("tag_names") or "").split("|||") if t))
 
-        hasura.mutate(
+        result = hasura.mutate(
             """
             mutation ($obj: JobPosting_insert_input!) {
               insert_JobPosting_one(object: $obj) { id }
@@ -827,7 +871,6 @@ def step_jobs(hasura: HasuraClient, gcs_bucket, files_root, jobs, org_mapping,
                     "international": bool(j.get("international")),
                     "internationalDescription": j.get("international_description"),
                     "customCompany": j.get("custom_Company"),
-                    "pdfUrl": copy_paperclip_pdf(gcs_bucket, files_root, j),
                     "views": j.get("views") or 0,
                     "restrictedToOrganizationId": restricted_to,
                     # Legacy archived jobs were once live, so publishedAt is
@@ -838,6 +881,13 @@ def step_jobs(hasura: HasuraClient, gcs_bucket, files_root, jobs, org_mapping,
                 }
             },
         )
+        posting_id = result["insert_JobPosting_one"]["id"] if result else None
+        # The PDF path needs the new posting id, so upload + set it after the
+        # insert (jobpostings/jobposting-<id>/public/...), matching the
+        # dashboard uploader; a dry run only pre-flights the file (returns None).
+        pdf_path = copy_paperclip_pdf(gcs_bucket, files_root, posting_id, j)
+        if posting_id is not None and pdf_path:
+            _set_job_pdf(hasura, posting_id, pdf_path)
         log.info("job %s '%s' → JobPosting (%s)", j["id"], j["title"], status)
 
 
