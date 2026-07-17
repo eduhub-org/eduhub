@@ -35,14 +35,17 @@ const Layout: FC<PropsWithChildren<{ portal: PortalBranding }>> = ({ portal, chi
   // popup/iframe flows break on third-party-cookie blocking. `prompt=create`
   // deep-links into Keycloak's registration form (Keycloak 22+); afterwards
   // the user returns to the page they started from.
+  //
+  // `stujo_portal` is read by the Keycloak theme so campus
+  // white-labels get the right skin even when NEXTAUTH_URL is a shared host
+  // (local multi-hostname /etc/hosts setup) and redirect_uri is localhost.
   const login = useCallback(
     (register: boolean) =>
-      signIn(
-        'keycloak',
-        { callbackUrl: router.asPath },
-        register ? { prompt: 'create' } : undefined
-      ),
-    [router.asPath]
+      signIn('keycloak', { callbackUrl: router.asPath }, {
+        stujo_portal: portal.appName,
+        ...(register ? { prompt: 'create' } : {}),
+      }),
+    [portal.appName, router.asPath]
   );
 
   const styleVars = [

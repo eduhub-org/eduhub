@@ -118,9 +118,9 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
 
   useEffect(() => {
     if (sessionStatus === 'unauthenticated') {
-      signIn('keycloak');
+      signIn('keycloak', undefined, { stujo_portal: portal.appName });
     }
-  }, [sessionStatus]);
+  }, [portal.appName, sessionStatus]);
 
   useEffect(() => {
     const posting = editData?.JobPosting_by_pk;

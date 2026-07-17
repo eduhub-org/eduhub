@@ -29,6 +29,36 @@
             <script src="${url.resourcesPath}/${script}" type="text/javascript"></script>
         </#list>
     </#if>
+    <#-- Inline brand bootstrap so campus skins still apply if the external
+         theme JS is served from a stale Keycloak resource cache. -->
+    <script type="text/javascript">
+      (function () {
+        try {
+          var params = new URLSearchParams(window.location.search);
+          var portal = (params.get('stujo_portal') || '').toLowerCase();
+          var brand = null;
+          if (portal === 'stujo-haw-kiel' || portal === 'stujo-flensburg') {
+            brand = portal;
+          } else if (portal.indexOf('stujo') === 0) {
+            brand = 'stujo';
+          } else {
+            var redirect = params.get('redirect_uri') || '';
+            var host = '';
+            try { host = new URL(redirect).hostname.toLowerCase(); } catch (e) { host = redirect.toLowerCase(); }
+            if (/haw-kiel|fh-kiel/.test(host)) brand = 'stujo-haw-kiel';
+            else if (/flensburg/.test(host)) brand = 'stujo-flensburg';
+            else if (/stujo|localhost:5001|127\.0\.0\.1:5001/.test(redirect)) brand = 'stujo';
+          }
+          if (!brand) brand = sessionStorage.getItem('kc-app-brand');
+          if (!brand || brand === 'eduhub') return;
+          sessionStorage.setItem('kc-app-brand', brand);
+          document.documentElement.classList.add('stujo-brand');
+          if (brand === 'stujo-haw-kiel' || brand === 'stujo-flensburg') {
+            document.documentElement.classList.add(brand);
+          }
+        } catch (e) { /* ignore */ }
+      })();
+    </script>
     <#if scripts??>
         <#list scripts as script>
             <script src="${script}" type="text/javascript"></script>
@@ -43,8 +73,10 @@
                 <div class="navbar-logo-wrapper">
                     <img class="navbar-logo" src="${url.resourcesPath}/img/edu_logo.svg">
                     <img class="navbar-logo-text" src="${url.resourcesPath}/img/logo_text.svg">
-                    <#-- StuJo variant, toggled by js/stujo-brand.js (hidden by default) -->
+                    <#-- StuJo / campus variants, toggled by js/stujo-brand.js (hidden by default) -->
                     <img class="navbar-logo-stujo" style="display:none" src="${url.resourcesPath}/img/stujo_header_logo.png" alt="StuJo">
+                    <img class="navbar-logo-stujo-portal navbar-logo-stujo-haw-kiel" style="display:none" src="${url.resourcesPath}/img/stujo_logo_haw_kiel.png" alt="HAW Kiel">
+                    <img class="navbar-logo-stujo-portal navbar-logo-stujo-flensburg" style="display:none" src="${url.resourcesPath}/img/stujo_logo_flensburg.png" alt="Campus Flensburg">
                 </div>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="true" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
