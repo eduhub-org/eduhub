@@ -11,6 +11,42 @@ already contains the `stujo.net` hosts (migration `1784400000000`).
 
 ---
 
+## Ordering — the switch is controlled by flags + DNS, not by merge timing
+
+The redirect code is **inert until activated**, so you do **not** need to hold
+any PR back to keep redirects from firing early:
+
+- Canonical `*.opencampus.sh → stujo.net` 301s are gated on the build-time flag
+  `NEXT_PUBLIC_STUJO_CANONICAL_REDIRECTS` (off by default).
+- Legacy job 301s only match the old **slug-bearing** `stujo.net` URL shape and
+  fail safe (a missing `legacyStujoId` just falls through) — the new app emits
+  bare-id URLs, which are never touched.
+- edu-hub's outbound links follow `NEXT_PUBLIC_STUJO_URL` (a build var).
+
+So merge/promote everything normally (`develop → staging → production`; note
+promoting is also what applies the Hasura schema + `JobPortalDomain` seed the
+prod ETL depends on), then orchestrate the actual switch with **data → domain →
+flags**:
+
+1. **Promote all StuJo work → production.** Schema live, app on
+   `stujo.opencampus.sh`, redirects inert, `NEXT_PUBLIC_STUJO_URL` still
+   opencampus.sh. Production is unchanged.
+2. **Run the prod ETL** (§A, full run). QA on `stujo.opencampus.sh`.
+3. **Freeze Rails writes → delta ETL** (the upsert reconciles changes).
+4. **Stand up stujo.net** (§B: cert SANs + DNS + routing). Wait for the cert to
+   be **ACTIVE**. stujo.net now serves the app; slug redirects on stujo.net
+   resolve because the data is already migrated.
+5. **Flip the flags** (GitHub Actions Variables, prod) → triggers a
+   rebuild/redeploy:
+   - `NEXT_PUBLIC_STUJO_URL=https://stujo.net`
+   - `NEXT_PUBLIC_STUJO_CANONICAL_REDIRECTS=true` (only now that stujo.net
+     resolves — setting it earlier would 301 `stujo.opencampus.sh` to a dead
+     domain).
+
+Rollback at any point is the DNS switch (§B "Rollback").
+
+---
+
 ## A. Data cutover (ETL against production)
 
 Runner: **`scripts/stujo_migrate_prod.sh`** — a thin wrapper over
