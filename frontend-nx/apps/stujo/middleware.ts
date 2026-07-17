@@ -42,6 +42,10 @@ const CANONICAL_HOSTS: Record<string, string> = {
 const CANONICAL_REDIRECTS_ENABLED =
   process.env.NEXT_PUBLIC_STUJO_CANONICAL_REDIRECTS === 'true';
 
+/**
+ * Applies the StuJo cutover redirects (canonical host, `en.` locale host, and
+ * slug-bearing legacy job URLs) and passes everything else through unchanged.
+ */
 export async function middleware(req: NextRequest): Promise<NextResponse> {
   const hostname = (req.headers.get('host') || '').split(':')[0].toLowerCase();
   const { pathname } = req.nextUrl;
@@ -69,17 +73,21 @@ export async function middleware(req: NextRequest): Promise<NextResponse> {
     return NextResponse.redirect(target, 301);
   }
 
-  // 2) Legacy job detail: /stellenangebote/:oldId(-slug) → /stellenangebote/:newId
-  //    (matched anywhere in the path so an optional /de|/en locale prefix is kept)
-  const jobMatch = pathname.match(/(^|\/(?:de|en))\/stellenangebote\/(\d+)(?:-[^/]*)?$/);
+  // 2) Legacy job detail — SLUG-BEARING only: /stellenangebote/:oldId-:slug.
+  //    Old Rails links carry a slug; the new app emits bare-id URLs. Because old
+  //    Rails ids overlap the new Postgres PK range, redirecting a bare id would
+  //    wrongly bounce a valid *new* page (its number may match some job's
+  //    legacyStujoId), so we only act on the slugged (unambiguously legacy)
+  //    shape. Resolve :oldId via legacyStujoId and 301 to the canonical bare
+  //    new-id URL (slug stripped). Any /de|/en prefix already in the path is kept.
+  const jobMatch = pathname.match(/\/stellenangebote\/(\d+)-[^/]+$/);
   if (jobMatch) {
-    const legacyId = Number(jobMatch[2]);
-    const newId = await lookupNewJobId(legacyId);
-    if (newId && newId !== legacyId) {
+    const newId = await lookupNewJobId(Number(jobMatch[1]));
+    if (newId) {
       const target = req.nextUrl.clone();
       target.pathname = pathname.replace(
-        /(\/stellenangebote\/)\d+(?:-[^/]*)?$/,
-        `$1${newId}`
+        /\/stellenangebote\/\d+-[^/]+$/,
+        `/stellenangebote/${newId}`
       );
       return NextResponse.redirect(target, 301);
     }
