@@ -36,6 +36,11 @@ ENV NEXT_PUBLIC_ENVIRONMENT=${NEXT_PUBLIC_ENVIRONMENT}
 ARG NEXT_PUBLIC_STORAGE_BUCKET_URL
 ENV NEXT_PUBLIC_STORAGE_BUCKET_URL=${NEXT_PUBLIC_STORAGE_BUCKET_URL}
 
+# "true" makes the app 301 the interim *.opencampus.sh hosts to stujo.net
+# (see apps/stujo/middleware.ts). Off unless explicitly enabled at cutover.
+ARG NEXT_PUBLIC_STUJO_CANONICAL_REDIRECTS
+ENV NEXT_PUBLIC_STUJO_CANONICAL_REDIRECTS=${NEXT_PUBLIC_STUJO_CANONICAL_REDIRECTS}
+
 RUN yarn build:stujo
 
 # 3. Production image, copy all the files and run next
