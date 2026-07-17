@@ -6946,6 +6946,2334 @@
       "width": 900,
       "height": 0,
       "content": "STUJO DESIGN PORT — Brand aus den Rails-Assets: Lato, Pink #A71580, Limette #ACCA23, Grau #646363, Header-Verlauf zu #4B0135. Portal-Theming über Theme-Achse 'portal' (stujo / flensburg / haw) — Frame auswählen und Theme umschalten, um die CAU-/Flensburg-/HAW-Varianten zu sehen (entspricht AppSettings primaryColor/secondaryColor). Admin-Screen nutzt das EduHub-Dark-Theme (#222222, Teal #00A398), da er in die EduHub-Verwaltung integriert wird."
+    },
+    {
+      "type": "note",
+      "id": "FAuwB",
+      "x": 4768,
+      "y": -282,
+      "name": "Job Tile Redesign Note",
+      "width": 1100,
+      "height": 0,
+      "content": "JOB TILE REDESIGN — 3 Varianten, alle basierend auf der bestehenden Tile-Basis (Bild oben / weisser Inhalt unten, TileBase). Umgesetzt: (2) redundanter Text 'Auf StuJo ansehen' entfernt, (3) exaktes Veroeffentlichungsdatum, (4) Job-Typ mit hohem Kontrast, (5) Firmenname prominent in der unteren Haelfte. Variante C testet ein gerendertes PDF-Seite-1-Bild als getoenten Hintergrund."
+    },
+    {
+      "type": "frame",
+      "id": "zSqIs",
+      "x": 4760,
+      "y": -160,
+      "name": "Job Tile Base (Variant A)",
+      "reusable": true,
+      "clip": true,
+      "width": 320,
+      "fill": "#FFFFFF",
+      "cornerRadius": 16,
+      "layout": "vertical",
+      "children": [
+        {
+          "type": "frame",
+          "id": "Glzgs",
+          "name": "Image Area",
+          "clip": true,
+          "width": "fill_container",
+          "height": 210,
+          "fill": "#A71580",
+          "layout": "none",
+          "children": [
+            {
+              "type": "frame",
+              "id": "I7zCw",
+              "x": 0,
+              "y": 0,
+              "name": "Logo Center",
+              "width": 320,
+              "height": 210,
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "fhHlr",
+                  "name": "Logo Card",
+                  "fill": "#FFFFFF",
+                  "cornerRadius": 12,
+                  "padding": [
+                    18,
+                    22
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "rectangle",
+                      "cornerRadius": 2,
+                      "id": "EyUnW",
+                      "name": "Logo Image",
+                      "fill": {
+                        "type": "image",
+                        "enabled": true,
+                        "url": "images/generated-1783982297457.png",
+                        "mode": "fill"
+                      },
+                      "width": 150,
+                      "height": 56
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "rectangle",
+              "id": "u1uMu9",
+              "layoutPosition": "absolute",
+              "x": 0,
+              "y": 0,
+              "name": "Bottom Gradient",
+              "fill": {
+                "type": "gradient",
+                "gradientType": "linear",
+                "enabled": true,
+                "rotation": 0,
+                "size": {
+                  "height": 1
+                },
+                "colors": [
+                  {
+                    "color": "#000000B3",
+                    "position": 0
+                  },
+                  {
+                    "color": "#00000000",
+                    "position": 0.62
+                  }
+                ]
+              },
+              "width": 320,
+              "height": 210
+            },
+            {
+              "type": "frame",
+              "id": "aQsgF",
+              "layoutPosition": "absolute",
+              "x": 16,
+              "y": 138,
+              "name": "Title Wrap",
+              "width": 288,
+              "layout": "vertical",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "JjIfL",
+                  "name": "Job Title",
+                  "fill": "#FFFFFF",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "Werkstudent Data Engineering (m/w/d)",
+                  "lineHeight": 1.15,
+                  "fontFamily": "Lato",
+                  "fontSize": 22,
+                  "fontWeight": "700"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "pbqSH",
+              "layoutPosition": "absolute",
+              "x": 206,
+              "y": 14,
+              "name": "StuJo Sign",
+              "fill": "#FFFFFF",
+              "cornerRadius": 999,
+              "gap": 5,
+              "padding": [
+                5,
+                10
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "pz77D",
+                  "name": "StuJo Label",
+                  "fill": "#A71580",
+                  "content": "StuJo",
+                  "fontFamily": "Lato",
+                  "fontSize": 12,
+                  "fontWeight": "700"
+                },
+                {
+                  "type": "icon",
+                  "id": "fdffJ",
+                  "name": "External",
+                  "width": 12,
+                  "height": 12,
+                  "icon": "external-link",
+                  "library": "lucide",
+                  "fill": "#A71580"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "g9KaP1",
+          "name": "Content",
+          "width": "fill_container",
+          "height": 190,
+          "fill": "#FFFFFF",
+          "layout": "vertical",
+          "gap": 10,
+          "padding": 20,
+          "justifyContent": "space_between",
+          "children": [
+            {
+              "type": "frame",
+              "id": "KrFWF",
+              "name": "Meta Row",
+              "width": "fill_container",
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "BaJ5Z",
+                  "name": "Type Badge",
+                  "fill": "#A71580",
+                  "cornerRadius": 999,
+                  "padding": [
+                    4,
+                    11
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "OfzED",
+                      "name": "Type",
+                      "fill": "#FFFFFF",
+                      "content": "WERKSTUDENT",
+                      "fontFamily": "Lato",
+                      "fontSize": 12,
+                      "fontWeight": "700",
+                      "letterSpacing": 0.3
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "Xd1ie",
+                  "name": "Date Chip",
+                  "gap": 6,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon",
+                      "id": "NEvGA",
+                      "name": "Calendar",
+                      "width": 14,
+                      "height": 14,
+                      "icon": "calendar",
+                      "library": "lucide",
+                      "fill": "#646363"
+                    },
+                    {
+                      "type": "text",
+                      "id": "bcuEB",
+                      "name": "Date",
+                      "fill": "#646363",
+                      "content": "08.07.2026",
+                      "fontFamily": "Lato",
+                      "fontSize": 13,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "FssNy",
+              "name": "Company",
+              "fill": "#333333",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "Musterfirma GmbH",
+              "fontFamily": "Lato",
+              "fontSize": 20,
+              "fontWeight": "700"
+            },
+            {
+              "type": "text",
+              "id": "Y0aLjq",
+              "name": "Location",
+              "fill": "#646363",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "Kiel",
+              "fontFamily": "Lato",
+              "fontSize": 14,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "frame",
+              "id": "rJ533",
+              "name": "Bottom Row",
+              "width": "fill_container",
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "hLcke",
+                  "name": "Occupation",
+                  "fill": "#8A8888",
+                  "content": "IT & Software",
+                  "fontFamily": "Lato",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "icon",
+                  "id": "Q6NI0",
+                  "name": "Arrow",
+                  "width": 18,
+                  "height": 18,
+                  "icon": "arrow-right",
+                  "library": "lucide",
+                  "fill": "#A71580"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "PZlVb",
+      "x": 5980,
+      "y": -160,
+      "name": "Job Tile Variants",
+      "fill": "#EDE7EA",
+      "gap": 48,
+      "padding": 40,
+      "children": [
+        {
+          "type": "frame",
+          "id": "ill1m",
+          "name": "Col A",
+          "layout": "vertical",
+          "gap": 14,
+          "children": [
+            {
+              "type": "text",
+              "id": "u4ob3",
+              "name": "Label A",
+              "fill": "#333333",
+              "content": "Variante A · Marke + Logo",
+              "fontFamily": "Lato",
+              "fontSize": 16,
+              "fontWeight": "700"
+            },
+            {
+              "id": "SW4lF",
+              "type": "ref",
+              "ref": "zSqIs",
+              "name": "Tile A"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "n2SN2U",
+          "name": "Col B",
+          "layout": "vertical",
+          "gap": 14,
+          "children": [
+            {
+              "type": "text",
+              "id": "SqrFh",
+              "name": "Label B",
+              "fill": "#333333",
+              "content": "Variante B · Logo im Fokus",
+              "fontFamily": "Lato",
+              "fontSize": 16,
+              "fontWeight": "700"
+            },
+            {
+              "id": "wmcOf",
+              "type": "ref",
+              "ref": "zSqIs",
+              "name": "Tile B",
+              "descendants": {
+                "Glzgs": {
+                  "type": "frame",
+                  "id": "e6k5g",
+                  "name": "Image Area B",
+                  "clip": true,
+                  "width": "fill_container",
+                  "height": 210,
+                  "fill": "#F1EEF0",
+                  "layout": "none",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "MyPd0",
+                      "x": 0,
+                      "y": 12,
+                      "name": "Logo Center B",
+                      "width": 320,
+                      "height": 126,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "QACn2",
+                          "name": "Logo B",
+                          "fill": "#A71580",
+                          "content": "Musterfirma",
+                          "fontFamily": "Lato",
+                          "fontSize": 32,
+                          "fontWeight": "900"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "rectangle",
+                      "id": "OMWM0",
+                      "layoutPosition": "absolute",
+                      "x": 16,
+                      "y": 150,
+                      "name": "Divider B",
+                      "fill": "#E3E3E3",
+                      "width": 288,
+                      "height": 1
+                    },
+                    {
+                      "type": "frame",
+                      "id": "aVbtj",
+                      "layoutPosition": "absolute",
+                      "x": 16,
+                      "y": 160,
+                      "name": "Title Wrap B",
+                      "width": 288,
+                      "layout": "vertical",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "RtILn",
+                          "name": "Job Title B",
+                          "fill": "#333333",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Werkstudent Data Engineering (m/w/d)",
+                          "lineHeight": 1.15,
+                          "fontFamily": "Lato",
+                          "fontSize": 18,
+                          "fontWeight": "700"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "q3Xmo",
+                      "layoutPosition": "absolute",
+                      "x": 206,
+                      "y": 14,
+                      "name": "StuJo Sign B",
+                      "fill": "#FFFFFF",
+                      "cornerRadius": 999,
+                      "stroke": "#E3E3E3",
+                      "strokeWidth": 1,
+                      "gap": 5,
+                      "padding": [
+                        5,
+                        10
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "UUNcT",
+                          "name": "StuJo Label B",
+                          "fill": "#A71580",
+                          "content": "StuJo",
+                          "fontFamily": "Lato",
+                          "fontSize": 12,
+                          "fontWeight": "700"
+                        },
+                        {
+                          "type": "icon",
+                          "id": "q8KTHR",
+                          "name": "External B",
+                          "width": 12,
+                          "height": 12,
+                          "icon": "external-link",
+                          "library": "lucide",
+                          "fill": "#A71580"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "PYWAu",
+          "name": "Col C",
+          "layout": "vertical",
+          "gap": 14,
+          "children": [
+            {
+              "type": "text",
+              "id": "DunsY",
+              "name": "Label C",
+              "fill": "#333333",
+              "content": "Variante C · PDF-Seite als Hintergrund",
+              "fontFamily": "Lato",
+              "fontSize": 16,
+              "fontWeight": "700"
+            },
+            {
+              "id": "JAaGc",
+              "type": "ref",
+              "ref": "zSqIs",
+              "name": "Tile C",
+              "descendants": {
+                "Glzgs": {
+                  "type": "frame",
+                  "id": "huY2t",
+                  "name": "Image Area C",
+                  "clip": true,
+                  "width": "fill_container",
+                  "height": 210,
+                  "fill": "#6E4A62",
+                  "layout": "none",
+                  "children": [
+                    {
+                      "type": "rectangle",
+                      "id": "pcpAz",
+                      "layoutPosition": "absolute",
+                      "x": -14,
+                      "y": -14,
+                      "name": "PDF Page BG",
+                      "fill": {
+                        "type": "image",
+                        "enabled": true,
+                        "url": "images/generated-1783981901209.png",
+                        "mode": "fill"
+                      },
+                      "width": 348,
+                      "height": 238,
+                      "effect": {
+                        "type": "blur",
+                        "radius": 5
+                      }
+                    },
+                    {
+                      "type": "rectangle",
+                      "id": "ZT8cV",
+                      "layoutPosition": "absolute",
+                      "x": 0,
+                      "y": 0,
+                      "name": "Brand Tint",
+                      "fill": "#A7158073",
+                      "width": 320,
+                      "height": 210
+                    },
+                    {
+                      "type": "rectangle",
+                      "id": "bCmKU",
+                      "layoutPosition": "absolute",
+                      "x": 0,
+                      "y": 120,
+                      "name": "Bottom Scrim C",
+                      "fill": "#00000080",
+                      "width": 320,
+                      "height": 90
+                    },
+                    {
+                      "type": "frame",
+                      "id": "kOZUp",
+                      "x": 0,
+                      "y": 6,
+                      "name": "Logo Center C",
+                      "width": 320,
+                      "height": 132,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "K2JHg2",
+                          "name": "Logo Card C",
+                          "fill": "#FFFFFF",
+                          "cornerRadius": 12,
+                          "padding": [
+                            14,
+                            18
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "lLhX0",
+                              "name": "Logo C",
+                              "fill": "#A71580",
+                              "content": "Musterfirma",
+                              "fontFamily": "Lato",
+                              "fontSize": 20,
+                              "fontWeight": "900"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "J4wK6e",
+                      "layoutPosition": "absolute",
+                      "x": 16,
+                      "y": 138,
+                      "name": "Title Wrap C",
+                      "width": 288,
+                      "layout": "vertical",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "loQ4c",
+                          "name": "Job Title C",
+                          "fill": "#FFFFFF",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Werkstudent Data Engineering (m/w/d)",
+                          "lineHeight": 1.15,
+                          "fontFamily": "Lato",
+                          "fontSize": 22,
+                          "fontWeight": "700"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "RKEbA",
+                      "layoutPosition": "absolute",
+                      "x": 206,
+                      "y": 14,
+                      "name": "StuJo Sign C",
+                      "fill": "#FFFFFF",
+                      "cornerRadius": 999,
+                      "gap": 5,
+                      "padding": [
+                        5,
+                        10
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "k1q2R",
+                          "name": "StuJo Label C",
+                          "fill": "#A71580",
+                          "content": "StuJo",
+                          "fontFamily": "Lato",
+                          "fontSize": 12,
+                          "fontWeight": "700"
+                        },
+                        {
+                          "type": "icon",
+                          "id": "BYl8W",
+                          "name": "External C",
+                          "width": 12,
+                          "height": 12,
+                          "icon": "external-link",
+                          "library": "lucide",
+                          "fill": "#A71580"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "RHinC",
+          "name": "Col A2",
+          "layout": "vertical",
+          "gap": 14,
+          "children": [
+            {
+              "type": "text",
+              "id": "jsObt",
+              "name": "Label A2",
+              "fill": "#333333",
+              "content": "Variante A2 · Marke als Verlauf",
+              "fontFamily": "Lato",
+              "fontSize": 16,
+              "fontWeight": "700"
+            },
+            {
+              "id": "H8mBw",
+              "type": "ref",
+              "ref": "zSqIs",
+              "name": "Tile A2",
+              "descendants": {
+                "Glzgs": {
+                  "fill": {
+                    "type": "gradient",
+                    "gradientType": "linear",
+                    "enabled": true,
+                    "rotation": 0,
+                    "size": {
+                      "height": 1
+                    },
+                    "colors": [
+                      {
+                        "color": "#2A0119",
+                        "position": 0
+                      },
+                      {
+                        "color": "#A71580",
+                        "position": 0.95
+                      }
+                    ]
+                  }
+                },
+                "u1uMu9": {
+                  "enabled": false
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "ddRiy",
+      "x": 7564,
+      "y": -160,
+      "name": "Job Tile Redesign v2 — No Overlap",
+      "width": 2040,
+      "height": 659,
+      "fill": "#F3EEF1",
+      "layout": "vertical",
+      "gap": 28,
+      "padding": 40,
+      "children": [
+        {
+          "type": "text",
+          "id": "TSiVa",
+          "name": "Board Title",
+          "fill": "#333333",
+          "content": "Job Tile Redesign v2 — D bevorzugt · D2 mit Verlauf",
+          "fontFamily": "Lato",
+          "fontSize": 22,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "C08Gy",
+          "name": "Board Subtitle",
+          "fill": "#646363",
+          "content": "D2 = Variante D mit weichem Farbverlauf im Header statt harter Kante zwischen Logo-Leiste und Titelzone.",
+          "fontFamily": "Lato",
+          "fontSize": 14,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "frame",
+          "id": "Fj1HB",
+          "name": "Variants Row",
+          "width": "fill_container",
+          "gap": 40,
+          "children": [
+            {
+              "type": "frame",
+              "id": "wbvpY",
+              "name": "Col D",
+              "layout": "vertical",
+              "gap": 14,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "V9SXo",
+                  "name": "Label D",
+                  "fill": "#333333",
+                  "content": "D · Logo-Strip + Titelzone",
+                  "fontFamily": "Lato",
+                  "fontSize": 16,
+                  "fontWeight": "700"
+                },
+                {
+                  "type": "frame",
+                  "id": "h16noS",
+                  "name": "Job Tile D",
+                  "reusable": true,
+                  "clip": true,
+                  "width": 320,
+                  "fill": "#FFFFFF",
+                  "cornerRadius": 16,
+                  "effect": {
+                    "type": "shadow",
+                    "shadowType": "outer",
+                    "color": "#0000001A",
+                    "offset": {
+                      "x": 0,
+                      "y": 4
+                    },
+                    "blur": 16
+                  },
+                  "layout": "vertical",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "vyJTb",
+                      "name": "Header D",
+                      "width": "fill_container",
+                      "fill": "$primary",
+                      "layout": "vertical",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "rpaNA",
+                          "name": "Logo Strip D",
+                          "width": "fill_container",
+                          "height": 88,
+                          "fill": "#8E116C",
+                          "padding": 16,
+                          "justifyContent": "space_between",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "fFFEL",
+                              "name": "Logo Card D",
+                              "height": 56,
+                              "fill": "#FFFFFF",
+                              "cornerRadius": 10,
+                              "padding": [
+                                10,
+                                14
+                              ],
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "rectangle",
+                                  "cornerRadius": 2,
+                                  "id": "lh9Ir",
+                                  "name": "Logo Image D",
+                                  "fill": {
+                                    "type": "image",
+                                    "enabled": true,
+                                    "url": "images/generated-1783982297457.png",
+                                    "mode": "fit"
+                                  },
+                                  "width": 120,
+                                  "height": 36
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "earac",
+                              "name": "StuJo Sign D",
+                              "fill": "#FFFFFF",
+                              "cornerRadius": 999,
+                              "gap": 5,
+                              "padding": [
+                                5,
+                                10
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "bohxa",
+                                  "name": "StuJo Label D",
+                                  "fill": "$primary",
+                                  "content": "StuJo",
+                                  "fontFamily": "Lato",
+                                  "fontSize": 12,
+                                  "fontWeight": "700"
+                                },
+                                {
+                                  "type": "icon",
+                                  "id": "CZkWb",
+                                  "name": "External D",
+                                  "width": 12,
+                                  "height": 12,
+                                  "icon": "external-link",
+                                  "library": "lucide",
+                                  "fill": "$primary"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "B7WcF",
+                          "name": "Title Zone D",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "padding": [
+                            14,
+                            16,
+                            18,
+                            16
+                          ],
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "bspHm",
+                              "name": "Job Title D",
+                              "fill": "#FFFFFF",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "Praktikant (m/w/d) Führungskräfteentwicklung & Personal",
+                              "lineHeight": 1.2,
+                              "fontFamily": "Lato",
+                              "fontSize": 20,
+                              "fontWeight": "700"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "LsnlM",
+                      "name": "Content D",
+                      "width": "fill_container",
+                      "height": 220,
+                      "fill": "#FFFFFF",
+                      "layout": "vertical",
+                      "gap": 10,
+                      "padding": 20,
+                      "justifyContent": "space_between",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "yU2zZ",
+                          "name": "Type Badge D",
+                          "fill": "$primary",
+                          "cornerRadius": 999,
+                          "padding": [
+                            4,
+                            11
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "mtwYZ",
+                              "name": "Type D",
+                              "fill": "#FFFFFF",
+                              "content": "PRAKTIKA",
+                              "fontFamily": "Lato",
+                              "fontSize": 12,
+                              "fontWeight": "700",
+                              "letterSpacing": 0.3
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "Nu6Bv",
+                          "name": "Company D",
+                          "fill": "$text-primary",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "HAW Kiel - Fachbereich Wirtschaft",
+                          "fontFamily": "Lato",
+                          "fontSize": 18,
+                          "fontWeight": "700"
+                        },
+                        {
+                          "type": "text",
+                          "id": "k6eyi",
+                          "name": "Location D",
+                          "fill": "$text-grey",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Kiel",
+                          "fontFamily": "Lato",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "pPAOI",
+                          "name": "Date Row D",
+                          "width": "fill_container",
+                          "gap": 6,
+                          "padding": [
+                            6,
+                            0,
+                            0,
+                            0
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon",
+                              "id": "CD97a",
+                              "name": "Calendar D",
+                              "width": 14,
+                              "height": 14,
+                              "icon": "calendar",
+                              "library": "lucide",
+                              "fill": "$text-muted"
+                            },
+                            {
+                              "type": "text",
+                              "id": "w7Gwy",
+                              "name": "Date D",
+                              "fill": "$text-muted",
+                              "content": "Eingestellt 03.07.2026",
+                              "fontFamily": "Lato",
+                              "fontSize": 13,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "KXQVt",
+                          "name": "Bottom Row D",
+                          "width": "fill_container",
+                          "justifyContent": "space_between",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "r1V8as",
+                              "name": "Occupation D",
+                              "fill": "$text-muted",
+                              "content": "Personalwesen",
+                              "fontFamily": "Lato",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "icon",
+                              "id": "J8p4fc",
+                              "name": "Arrow D",
+                              "width": 18,
+                              "height": 18,
+                              "icon": "arrow-right",
+                              "library": "lucide",
+                              "fill": "$primary"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "J02lEn",
+                  "name": "Desc D",
+                  "fill": "#646363",
+                  "textGrowth": "fixed-width",
+                  "width": 320,
+                  "content": "Eigene Logo-Leiste oben. Titel darunter in eigener Zone — kein Overlay. Datum unten auf eigener Zeile.",
+                  "lineHeight": 1.35,
+                  "fontFamily": "Lato",
+                  "fontSize": 13,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "D1vk0",
+              "name": "Col D2",
+              "layout": "vertical",
+              "gap": 14,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "lxhDs",
+                  "name": "Label D2",
+                  "fill": "#333333",
+                  "content": "D2 · Logo-Strip mit Verlauf",
+                  "fontFamily": "Lato",
+                  "fontSize": 16,
+                  "fontWeight": "700"
+                },
+                {
+                  "type": "frame",
+                  "id": "K8pWo",
+                  "name": "Job Tile D2",
+                  "reusable": true,
+                  "clip": true,
+                  "width": 320,
+                  "fill": "#FFFFFF",
+                  "cornerRadius": 16,
+                  "effect": {
+                    "type": "shadow",
+                    "shadowType": "outer",
+                    "color": "#0000001A",
+                    "offset": {
+                      "x": 0,
+                      "y": 4
+                    },
+                    "blur": 16
+                  },
+                  "layout": "vertical",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "sPIKE",
+                      "name": "Header D2",
+                      "width": "fill_container",
+                      "fill": {
+                        "type": "gradient",
+                        "gradientType": "linear",
+                        "enabled": true,
+                        "rotation": 180,
+                        "size": {
+                          "height": 1
+                        },
+                        "colors": [
+                          {
+                            "color": "#C91A99",
+                            "position": 0
+                          },
+                          {
+                            "color": "#A71580",
+                            "position": 0.4
+                          },
+                          {
+                            "color": "#5C0A48",
+                            "position": 0.75
+                          },
+                          {
+                            "color": "#1A0012",
+                            "position": 1
+                          }
+                        ]
+                      },
+                      "layout": "vertical",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "MOdsW",
+                          "name": "Logo Strip D2",
+                          "width": "fill_container",
+                          "height": 88,
+                          "padding": 16,
+                          "justifyContent": "space_between",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "Z5UWdG",
+                              "name": "Logo Card D2",
+                              "height": 56,
+                              "fill": "#FFFFFF",
+                              "cornerRadius": 10,
+                              "padding": [
+                                10,
+                                14
+                              ],
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "rectangle",
+                                  "cornerRadius": 2,
+                                  "id": "y9uwW2",
+                                  "name": "Logo Image D2",
+                                  "fill": {
+                                    "type": "image",
+                                    "enabled": true,
+                                    "url": "images/generated-1783982297457.png",
+                                    "mode": "fit"
+                                  },
+                                  "width": 120,
+                                  "height": 36
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "AT0wc",
+                              "name": "StuJo Sign D2",
+                              "fill": "#FFFFFF",
+                              "cornerRadius": 999,
+                              "gap": 5,
+                              "padding": [
+                                5,
+                                10
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "hv5yo",
+                                  "name": "StuJo Label D2",
+                                  "fill": "#A71580",
+                                  "content": "StuJo",
+                                  "fontFamily": "Lato",
+                                  "fontSize": 12,
+                                  "fontWeight": "700"
+                                },
+                                {
+                                  "type": "icon",
+                                  "id": "CSMxb",
+                                  "name": "External D2",
+                                  "width": 12,
+                                  "height": 12,
+                                  "icon": "external-link",
+                                  "library": "lucide",
+                                  "fill": "#A71580"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "nKDZg",
+                          "name": "Title Zone D2",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "padding": [
+                            14,
+                            16,
+                            18,
+                            16
+                          ],
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "L1l2Vc",
+                              "name": "Job Title D2",
+                              "fill": "#FFFFFF",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "Praktikant (m/w/d) Führungskräfteentwicklung & Personal",
+                              "lineHeight": 1.2,
+                              "fontFamily": "Lato",
+                              "fontSize": 20,
+                              "fontWeight": "700"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "rJA2a",
+                      "name": "Content D2",
+                      "width": "fill_container",
+                      "height": 220,
+                      "fill": "#FFFFFF",
+                      "layout": "vertical",
+                      "gap": 10,
+                      "padding": 20,
+                      "justifyContent": "space_between",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "W0ajIZ",
+                          "name": "Type Badge D2",
+                          "fill": "#A71580",
+                          "cornerRadius": 999,
+                          "padding": [
+                            4,
+                            11
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "bDhXk",
+                              "name": "Type D2",
+                              "fill": "#FFFFFF",
+                              "content": "PRAKTIKA",
+                              "fontFamily": "Lato",
+                              "fontSize": 12,
+                              "fontWeight": "700",
+                              "letterSpacing": 0.3
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "xzktM",
+                          "name": "Company D2",
+                          "fill": "#333333",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "HAW Kiel - Fachbereich Wirtschaft",
+                          "fontFamily": "Lato",
+                          "fontSize": 18,
+                          "fontWeight": "700"
+                        },
+                        {
+                          "type": "text",
+                          "id": "cdNwt",
+                          "name": "Location D2",
+                          "fill": "#646363",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Kiel",
+                          "fontFamily": "Lato",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "XgtcF",
+                          "name": "Date Row D2",
+                          "width": "fill_container",
+                          "gap": 6,
+                          "padding": [
+                            6,
+                            0,
+                            0,
+                            0
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon",
+                              "id": "Z8l74x",
+                              "name": "Calendar D2",
+                              "width": 14,
+                              "height": 14,
+                              "icon": "calendar",
+                              "library": "lucide",
+                              "fill": "#8A8888"
+                            },
+                            {
+                              "type": "text",
+                              "id": "EIbLq",
+                              "name": "Date D2",
+                              "fill": "#8A8888",
+                              "content": "Eingestellt 03.07.2026",
+                              "fontFamily": "Lato",
+                              "fontSize": 13,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "Q5Il7",
+                          "name": "Bottom Row D2",
+                          "width": "fill_container",
+                          "justifyContent": "space_between",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "EDEOj",
+                              "name": "Occupation D2",
+                              "fill": "#8A8888",
+                              "content": "Personalwesen",
+                              "fontFamily": "Lato",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "icon",
+                              "id": "Bg8H6",
+                              "name": "Arrow D2",
+                              "width": 18,
+                              "height": 18,
+                              "icon": "arrow-right",
+                              "library": "lucide",
+                              "fill": "#A71580"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "AaCk2",
+                  "name": "Desc D2",
+                  "fill": "#646363",
+                  "textGrowth": "fixed-width",
+                  "width": 320,
+                  "content": "Wie D, aber Verlauf umgekehrt: helleres Magenta oben (Logo), dunkler Verlauf unter dem Titel — keine harte Farbkante.",
+                  "lineHeight": 1.35,
+                  "fontFamily": "Lato",
+                  "fontSize": 13,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "LASbF",
+              "name": "Col E",
+              "layout": "vertical",
+              "gap": 14,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "f1kHqU",
+                  "name": "Label E",
+                  "fill": "#333333",
+                  "content": "E · Logo neben Titel",
+                  "fontFamily": "Lato",
+                  "fontSize": 16,
+                  "fontWeight": "700"
+                },
+                {
+                  "type": "frame",
+                  "id": "uYomL",
+                  "name": "Job Tile E",
+                  "reusable": true,
+                  "clip": true,
+                  "width": 320,
+                  "fill": "#FFFFFF",
+                  "cornerRadius": 16,
+                  "effect": {
+                    "type": "shadow",
+                    "shadowType": "outer",
+                    "color": "#0000001A",
+                    "offset": {
+                      "x": 0,
+                      "y": 4
+                    },
+                    "blur": 16
+                  },
+                  "layout": "vertical",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "nSBNq",
+                      "name": "Header E",
+                      "width": "fill_container",
+                      "fill": "$primary",
+                      "layout": "vertical",
+                      "gap": 12,
+                      "padding": [
+                        14,
+                        16,
+                        16,
+                        16
+                      ],
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "W7hUT",
+                          "name": "Main Row E",
+                          "width": "fill_container",
+                          "gap": 12,
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "Yr5YN",
+                              "name": "Logo Card E",
+                              "width": 72,
+                              "height": 72,
+                              "fill": "#FFFFFF",
+                              "cornerRadius": 12,
+                              "padding": 8,
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "rectangle",
+                                  "cornerRadius": 2,
+                                  "id": "l2NCs6",
+                                  "name": "Logo Image E",
+                                  "fill": {
+                                    "type": "image",
+                                    "enabled": true,
+                                    "url": "images/generated-1783982297457.png",
+                                    "mode": "fit"
+                                  },
+                                  "width": 56,
+                                  "height": 40
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "c65gOk",
+                              "name": "Title Col E",
+                              "width": "fill_container",
+                              "layout": "vertical",
+                              "gap": 10,
+                              "children": [
+                                {
+                                  "type": "frame",
+                                  "id": "Tlri2",
+                                  "name": "StuJo Row E",
+                                  "width": "fill_container",
+                                  "justifyContent": "end",
+                                  "children": [
+                                    {
+                                      "type": "frame",
+                                      "id": "JCf85",
+                                      "name": "StuJo Sign E",
+                                      "fill": "#FFFFFF",
+                                      "cornerRadius": 999,
+                                      "gap": 5,
+                                      "padding": [
+                                        5,
+                                        10
+                                      ],
+                                      "alignItems": "center",
+                                      "children": [
+                                        {
+                                          "type": "text",
+                                          "id": "AnjPj",
+                                          "name": "StuJo Label E",
+                                          "fill": "$primary",
+                                          "content": "StuJo",
+                                          "fontFamily": "Lato",
+                                          "fontSize": 12,
+                                          "fontWeight": "700"
+                                        },
+                                        {
+                                          "type": "icon",
+                                          "id": "DJe6r",
+                                          "name": "External E",
+                                          "width": 12,
+                                          "height": 12,
+                                          "icon": "external-link",
+                                          "library": "lucide",
+                                          "fill": "$primary"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "iuqBb",
+                                  "name": "Job Title E",
+                                  "fill": "#FFFFFF",
+                                  "textGrowth": "fixed-width",
+                                  "width": "fill_container",
+                                  "content": "Praktikant (m/w/d) Führungskräfteentwicklung & Personal",
+                                  "lineHeight": 1.2,
+                                  "fontFamily": "Lato",
+                                  "fontSize": 18,
+                                  "fontWeight": "700"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "iNWEr",
+                      "name": "Content E",
+                      "width": "fill_container",
+                      "height": 220,
+                      "fill": "#FFFFFF",
+                      "layout": "vertical",
+                      "gap": 10,
+                      "padding": 20,
+                      "justifyContent": "space_between",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "WXdXp",
+                          "name": "Type Badge E",
+                          "fill": "$primary",
+                          "cornerRadius": 999,
+                          "padding": [
+                            4,
+                            11
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "g5wJyE",
+                              "name": "Type E",
+                              "fill": "#FFFFFF",
+                              "content": "PRAKTIKA",
+                              "fontFamily": "Lato",
+                              "fontSize": 12,
+                              "fontWeight": "700",
+                              "letterSpacing": 0.3
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "wEDhN",
+                          "name": "Company E",
+                          "fill": "$text-primary",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "HAW Kiel - Fachbereich Wirtschaft",
+                          "fontFamily": "Lato",
+                          "fontSize": 18,
+                          "fontWeight": "700"
+                        },
+                        {
+                          "type": "text",
+                          "id": "MjEbd",
+                          "name": "Location E",
+                          "fill": "$text-grey",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Kiel",
+                          "fontFamily": "Lato",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "h5FM9",
+                          "name": "Date Row E",
+                          "width": "fill_container",
+                          "gap": 6,
+                          "padding": [
+                            6,
+                            0,
+                            0,
+                            0
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon",
+                              "id": "f2TXt",
+                              "name": "Calendar E",
+                              "width": 14,
+                              "height": 14,
+                              "icon": "calendar",
+                              "library": "lucide",
+                              "fill": "$text-muted"
+                            },
+                            {
+                              "type": "text",
+                              "id": "yYCLy",
+                              "name": "Date E",
+                              "fill": "$text-muted",
+                              "content": "Eingestellt 03.07.2026",
+                              "fontFamily": "Lato",
+                              "fontSize": 13,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "yi5dM",
+                          "name": "Bottom Row E",
+                          "width": "fill_container",
+                          "justifyContent": "space_between",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "RxYA4",
+                              "name": "Occupation E",
+                              "fill": "$text-muted",
+                              "content": "Personalwesen",
+                              "fontFamily": "Lato",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "icon",
+                              "id": "rJQOl",
+                              "name": "Arrow E",
+                              "width": 18,
+                              "height": 18,
+                              "icon": "arrow-right",
+                              "library": "lucide",
+                              "fill": "$primary"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "iUvjr",
+                  "name": "Desc E",
+                  "fill": "#646363",
+                  "textGrowth": "fixed-width",
+                  "width": 320,
+                  "content": "Logo links als feste Kachel, Titel rechts daneben. Kein Overlay. Datum unten auf eigener Zeile.",
+                  "lineHeight": 1.35,
+                  "fontFamily": "Lato",
+                  "fontSize": 13,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "I74sLq",
+              "name": "Col E2",
+              "layout": "vertical",
+              "gap": 14,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "R9ORy",
+                  "name": "Label E2",
+                  "fill": "#333333",
+                  "content": "E2 · Logo neben Titel + Verlauf",
+                  "fontFamily": "Lato",
+                  "fontSize": 16,
+                  "fontWeight": "700"
+                },
+                {
+                  "type": "frame",
+                  "id": "doVBa",
+                  "name": "Job Tile E2",
+                  "reusable": true,
+                  "clip": true,
+                  "width": 320,
+                  "fill": "#FFFFFF",
+                  "cornerRadius": 16,
+                  "effect": {
+                    "type": "shadow",
+                    "shadowType": "outer",
+                    "color": "#0000001A",
+                    "offset": {
+                      "x": 0,
+                      "y": 4
+                    },
+                    "blur": 16
+                  },
+                  "layout": "vertical",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "jtJKI",
+                      "name": "Header E2",
+                      "width": "fill_container",
+                      "fill": {
+                        "type": "gradient",
+                        "gradientType": "linear",
+                        "enabled": true,
+                        "rotation": 180,
+                        "size": {
+                          "height": 1
+                        },
+                        "colors": [
+                          {
+                            "color": "#A71580",
+                            "position": 0
+                          },
+                          {
+                            "color": "#A71580",
+                            "position": 0.42
+                          },
+                          {
+                            "color": "#D48BB8",
+                            "position": 0.72
+                          },
+                          {
+                            "color": "#FFFFFF",
+                            "position": 1
+                          }
+                        ]
+                      },
+                      "layout": "vertical",
+                      "gap": 12,
+                      "padding": [
+                        14,
+                        16,
+                        36,
+                        16
+                      ],
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "bzJmV",
+                          "name": "Main Row E2",
+                          "width": "fill_container",
+                          "gap": 12,
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "SLGvq",
+                              "name": "Logo Card E2",
+                              "width": 72,
+                              "height": 72,
+                              "fill": "#FFFFFF",
+                              "cornerRadius": 12,
+                              "padding": 8,
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "rectangle",
+                                  "cornerRadius": 2,
+                                  "id": "L6PRPM",
+                                  "name": "Logo Image E2",
+                                  "fill": {
+                                    "type": "image",
+                                    "enabled": true,
+                                    "url": "images/generated-1783982297457.png",
+                                    "mode": "fit"
+                                  },
+                                  "width": 56,
+                                  "height": 40
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "YW7Jb",
+                              "name": "Title Col E2",
+                              "width": "fill_container",
+                              "layout": "vertical",
+                              "gap": 10,
+                              "children": [
+                                {
+                                  "type": "frame",
+                                  "id": "aC4t0",
+                                  "name": "StuJo Row E2",
+                                  "width": "fill_container",
+                                  "justifyContent": "end",
+                                  "children": [
+                                    {
+                                      "type": "frame",
+                                      "id": "Y6xjvz",
+                                      "name": "StuJo Sign E2",
+                                      "fill": "#FFFFFF",
+                                      "cornerRadius": 999,
+                                      "gap": 5,
+                                      "padding": [
+                                        5,
+                                        10
+                                      ],
+                                      "alignItems": "center",
+                                      "children": [
+                                        {
+                                          "type": "text",
+                                          "id": "e996P",
+                                          "name": "StuJo Label E2",
+                                          "fill": "$primary",
+                                          "content": "StuJo",
+                                          "fontFamily": "Lato",
+                                          "fontSize": 12,
+                                          "fontWeight": "700"
+                                        },
+                                        {
+                                          "type": "icon",
+                                          "id": "Y3Xx6X",
+                                          "name": "External E2",
+                                          "width": 12,
+                                          "height": 12,
+                                          "icon": "external-link",
+                                          "library": "lucide",
+                                          "fill": "$primary"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "xHDZB",
+                                  "name": "Job Title E2",
+                                  "fill": "#FFFFFF",
+                                  "textGrowth": "fixed-width",
+                                  "width": "fill_container",
+                                  "content": "Praktikant (m/w/d) Führungskräfteentwicklung & Personal",
+                                  "lineHeight": 1.2,
+                                  "fontFamily": "Lato",
+                                  "fontSize": 18,
+                                  "fontWeight": "700"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "xL9Px",
+                      "name": "Content E2",
+                      "width": "fill_container",
+                      "height": 200,
+                      "fill": "#FFFFFF",
+                      "layout": "vertical",
+                      "gap": 10,
+                      "padding": [
+                        8,
+                        20,
+                        20,
+                        20
+                      ],
+                      "justifyContent": "space_between",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "SzU41",
+                          "name": "Type Badge E2",
+                          "fill": "$primary",
+                          "cornerRadius": 999,
+                          "padding": [
+                            4,
+                            11
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "V3t1B",
+                              "name": "Type E2",
+                              "fill": "#FFFFFF",
+                              "content": "PRAKTIKA",
+                              "fontFamily": "Lato",
+                              "fontSize": 12,
+                              "fontWeight": "700",
+                              "letterSpacing": 0.3
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "ib8kF",
+                          "name": "Company E2",
+                          "fill": "$text-primary",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "HAW Kiel - Fachbereich Wirtschaft",
+                          "fontFamily": "Lato",
+                          "fontSize": 18,
+                          "fontWeight": "700"
+                        },
+                        {
+                          "type": "text",
+                          "id": "k6QVBX",
+                          "name": "Location E2",
+                          "fill": "$text-grey",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Kiel",
+                          "fontFamily": "Lato",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "f5wQ8U",
+                          "name": "Date Row E2",
+                          "width": "fill_container",
+                          "gap": 6,
+                          "padding": [
+                            6,
+                            0,
+                            0,
+                            0
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon",
+                              "id": "tQs5P",
+                              "name": "Calendar E2",
+                              "width": 14,
+                              "height": 14,
+                              "icon": "calendar",
+                              "library": "lucide",
+                              "fill": "$text-muted"
+                            },
+                            {
+                              "type": "text",
+                              "id": "QWBl7",
+                              "name": "Date E2",
+                              "fill": "$text-muted",
+                              "content": "Eingestellt 03.07.2026",
+                              "fontFamily": "Lato",
+                              "fontSize": 13,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "Fci6T",
+                          "name": "Bottom Row E2",
+                          "width": "fill_container",
+                          "justifyContent": "space_between",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "vVlHT",
+                              "name": "Occupation E2",
+                              "fill": "$text-muted",
+                              "content": "Personalwesen",
+                              "fontFamily": "Lato",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "icon",
+                              "id": "Ibzyk",
+                              "name": "Arrow E2",
+                              "width": 18,
+                              "height": 18,
+                              "icon": "arrow-right",
+                              "library": "lucide",
+                              "fill": "$primary"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "Oi9Cb",
+                  "name": "Desc E2",
+                  "fill": "#646363",
+                  "textGrowth": "fixed-width",
+                  "width": 320,
+                  "content": "Wie E, aber Header faedt weich nach Weiss — kein harter Farbkante zum Content.",
+                  "lineHeight": 1.35,
+                  "fontFamily": "Lato",
+                  "fontSize": 13,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "bM0NC",
+              "name": "Col F",
+              "layout": "vertical",
+              "gap": 14,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "C1fRv",
+                  "name": "Label F",
+                  "fill": "#333333",
+                  "content": "F · Identität zuerst",
+                  "fontFamily": "Lato",
+                  "fontSize": 16,
+                  "fontWeight": "700"
+                },
+                {
+                  "type": "frame",
+                  "id": "oJfDH",
+                  "name": "Job Tile F",
+                  "reusable": true,
+                  "clip": true,
+                  "width": 320,
+                  "fill": "#FFFFFF",
+                  "cornerRadius": 16,
+                  "effect": {
+                    "type": "shadow",
+                    "shadowType": "outer",
+                    "color": "#0000001A",
+                    "offset": {
+                      "x": 0,
+                      "y": 4
+                    },
+                    "blur": 16
+                  },
+                  "layout": "vertical",
+                  "children": [
+                    {
+                      "type": "rectangle",
+                      "id": "csSc5",
+                      "name": "Accent Bar F",
+                      "fill": "$primary",
+                      "width": "fill_container",
+                      "height": 6
+                    },
+                    {
+                      "type": "frame",
+                      "id": "tEnJ8",
+                      "name": "Content F",
+                      "width": "fill_container",
+                      "fill": "#FFFFFF",
+                      "layout": "vertical",
+                      "gap": 12,
+                      "padding": 20,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "syFsH",
+                          "name": "Top Row F",
+                          "width": "fill_container",
+                          "justifyContent": "space_between",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "B6eSd",
+                              "name": "Identity F",
+                              "gap": 12,
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "frame",
+                                  "id": "lToBd",
+                                  "name": "Logo Card F",
+                                  "height": 48,
+                                  "fill": "#F6F0F4",
+                                  "cornerRadius": 10,
+                                  "stroke": "$border",
+                                  "strokeWidth": 1,
+                                  "padding": [
+                                    8,
+                                    10
+                                  ],
+                                  "justifyContent": "center",
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "rectangle",
+                                      "cornerRadius": 2,
+                                      "id": "P5IIPO",
+                                      "name": "Logo Image F",
+                                      "fill": {
+                                        "type": "image",
+                                        "enabled": true,
+                                        "url": "images/generated-1783982297457.png",
+                                        "mode": "fit"
+                                      },
+                                      "width": 88,
+                                      "height": 28
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "Z1xDUM",
+                              "name": "StuJo Sign F",
+                              "fill": "#F6F0F4",
+                              "cornerRadius": 999,
+                              "gap": 5,
+                              "padding": [
+                                5,
+                                10
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "hEffY",
+                                  "name": "StuJo Label F",
+                                  "fill": "$primary",
+                                  "content": "StuJo",
+                                  "fontFamily": "Lato",
+                                  "fontSize": 12,
+                                  "fontWeight": "700"
+                                },
+                                {
+                                  "type": "icon",
+                                  "id": "LIVws",
+                                  "name": "External F",
+                                  "width": 12,
+                                  "height": 12,
+                                  "icon": "external-link",
+                                  "library": "lucide",
+                                  "fill": "$primary"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "Ftl9z",
+                          "name": "Job Title F",
+                          "fill": "$text-primary",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Praktikant (m/w/d) Führungskräfteentwicklung & Personal",
+                          "lineHeight": 1.2,
+                          "fontFamily": "Lato",
+                          "fontSize": 20,
+                          "fontWeight": "700"
+                        },
+                        {
+                          "type": "text",
+                          "id": "A7WtX",
+                          "name": "Company F",
+                          "fill": "$text-primary",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "HAW Kiel - Fachbereich Wirtschaft",
+                          "fontFamily": "Lato",
+                          "fontSize": 16,
+                          "fontWeight": "700"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "bLSyG",
+                          "name": "Meta Row F",
+                          "width": "fill_container",
+                          "gap": 10,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "rZllk",
+                              "name": "Type Badge F",
+                              "fill": "$primary",
+                              "cornerRadius": 999,
+                              "padding": [
+                                4,
+                                11
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "aEyFi",
+                                  "name": "Type F",
+                                  "fill": "#FFFFFF",
+                                  "content": "PRAKTIKA",
+                                  "fontFamily": "Lato",
+                                  "fontSize": 12,
+                                  "fontWeight": "700",
+                                  "letterSpacing": 0.3
+                                }
+                              ]
+                            },
+                            {
+                              "type": "text",
+                              "id": "O7gDH7",
+                              "name": "Location F",
+                              "fill": "$text-grey",
+                              "content": "Kiel",
+                              "fontFamily": "Lato",
+                              "fontSize": 14,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "rectangle",
+                          "id": "bWpDH",
+                          "name": "Divider F",
+                          "fill": "$border",
+                          "width": "fill_container",
+                          "height": 1
+                        },
+                        {
+                          "type": "frame",
+                          "id": "zMeO7",
+                          "name": "Date Row F",
+                          "width": "fill_container",
+                          "gap": 6,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon",
+                              "id": "LUYrN",
+                              "name": "Calendar F",
+                              "width": 14,
+                              "height": 14,
+                              "icon": "calendar",
+                              "library": "lucide",
+                              "fill": "$text-muted"
+                            },
+                            {
+                              "type": "text",
+                              "id": "oZW6h",
+                              "name": "Date F",
+                              "fill": "$text-muted",
+                              "content": "Eingestellt 03.07.2026",
+                              "fontFamily": "Lato",
+                              "fontSize": 13,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "z5wsd",
+                          "name": "Bottom Row F",
+                          "width": "fill_container",
+                          "justifyContent": "space_between",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "q10TcG",
+                              "name": "Occupation F",
+                              "fill": "$text-muted",
+                              "content": "Personalwesen",
+                              "fontFamily": "Lato",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "icon",
+                              "id": "Rg8XF",
+                              "name": "Arrow F",
+                              "width": 18,
+                              "height": 18,
+                              "icon": "arrow-right",
+                              "library": "lucide",
+                              "fill": "$primary"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "q1oojt",
+                  "name": "Desc F",
+                  "fill": "#646363",
+                  "textGrowth": "fixed-width",
+                  "width": 320,
+                  "content": "Logo als Teil der Firmenidentität im weissen Body. Titel klar lesbar. Datum unter Divider unten.",
+                  "lineHeight": 1.35,
+                  "fontFamily": "Lato",
+                  "fontSize": 13,
+                  "fontWeight": "normal"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "note",
+      "id": "qVGqi",
+      "x": 7564,
+      "y": -300,
+      "name": "v2 Redesign Brief",
+      "width": 900,
+      "height": 0,
+      "content": "Job Tile Redesign v2 — 3 neue Varianten. Ziele: (1) Logo und Titel nie ueberlappen, auch bei langen Titeln; (2) Logo klar integriert statt floating; (3) Veroeffentlichungsdatum auf eigener Zeile unten. D=Logo-Strip oben, Titel darunter. E=Logo-Ecke + Titelzone. F=Identitaet zuerst (Logo+Firma), Titel im weissen Body."
     }
   ],
   "themes": {
