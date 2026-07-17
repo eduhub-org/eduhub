@@ -27,9 +27,32 @@ export const config = {
 
 const EN_SUFFIX = '.en.stujo.net';
 
+// Canonical domain: the interim production *.opencampus.sh hosts 301 to their
+// real stujo.net equivalents so stujo.net is the single canonical domain. Keyed
+// by exact host, so staging (stujo-staging.opencampus.sh, …) is never matched.
+// Gated on a BUILD-TIME flag (NEXT_PUBLIC_* is inlined at build; a runtime env
+// is not enough) so pre-cutover QA on *.opencampus.sh keeps working until
+// stujo.net is live — enable it in the cutover build.
+const CANONICAL_HOSTS: Record<string, string> = {
+  'stujo.opencampus.sh': 'stujo.net',
+  'stujo-cau.opencampus.sh': 'cau.stujo.net',
+  'stujo-haw-kiel.opencampus.sh': 'haw-kiel.stujo.net',
+  'stujo-flensburg.opencampus.sh': 'flensburg.stujo.net',
+};
+const CANONICAL_REDIRECTS_ENABLED =
+  process.env.NEXT_PUBLIC_STUJO_CANONICAL_REDIRECTS === 'true';
+
 export async function middleware(req: NextRequest): Promise<NextResponse> {
   const hostname = (req.headers.get('host') || '').split(':')[0].toLowerCase();
   const { pathname } = req.nextUrl;
+
+  // 0) Canonicalize interim opencampus.sh hosts → stujo.net (path + query kept)
+  if (CANONICAL_REDIRECTS_ENABLED && CANONICAL_HOSTS[hostname]) {
+    const target = req.nextUrl.clone();
+    target.protocol = 'https:';
+    target.host = CANONICAL_HOSTS[hostname];
+    return NextResponse.redirect(target, 301);
+  }
 
   // 1) Host-based locale: *.en.stujo.net → <portal>.stujo.net/en/...
   if (hostname === 'en.stujo.net' || hostname.endsWith(EN_SUFFIX)) {
