@@ -167,23 +167,19 @@ the datepicker/dnd bumps).
 > - **Turbopack did *not* auto-activate the built-in Babel loader** from the
 >   root `babel.config.json` (`babelrcRoots` only) — no build-perf hit, so
 >   no `turbopackUseBuiltinBabel` change was needed.
-> - Runtime prereqs done: `node:18 → node:22` in `Dockerfile-edu`,
->   `Dockerfile-stujo`, `Dockerfile-dev`; root `engines` `>=20 <21 →
->   >=20.9 <23`; CI `frontend-code-checks` `20.x → 22.x`; `release.yml`
->   Node `18 → 22`.
-> - Pre-existing (unrelated to this stage): `hooks/authedQuery.ts` has two
->   `@typescript-eslint/no-unused-vars` lint errors introduced by an earlier
->   commit; `yarn lint` is red independently of the Next upgrade.
+> - Runtime prereqs done: `node:18` → `node:22` in `Dockerfile-edu`,
+>   `Dockerfile-stujo`, `Dockerfile-dev`; root `engines` from `>=20 <21`
+>   to `>=20.9 <23`; CI `frontend-code-checks` `20.x` → `22.x`;
+>   `release.yml` Node `18` → `22`.
 
 Next 16 fully supports the Pages Router (including the built-in `i18n`
 config), so this is a contained upgrade.
 
-### B.1 Runtime prerequisites — do these first
+### B.1 Runtime prerequisites — ✅ done
 
-- **Node ≥ 20.9 is required.** `frontend-nx/Dockerfile-edu` and
-  `Dockerfile-stujo` still build on `node:18-alpine` → move to
-  `node:22-alpine` (LTS). CI is already on Node 20; consider bumping the
-  root `engines` field from `>=20 <21` to `>=20.9 <23` at the same time.
+- **Node ≥ 20.9 is required.** ✅ `Dockerfile-edu`, `Dockerfile-stujo` and
+  `Dockerfile-dev` build on `node:22-alpine`; root `engines` is
+  `>=20.9 <23`; CI and `release.yml` run Node 22.
 - TypeScript 5.7 ✓ (Next 16 needs ≥5.1).
 
 ### B.2 The upgrade
@@ -192,14 +188,17 @@ config), so this is a contained upgrade.
 npx @next/codemod@latest upgrade   # bumps next + applies codemods
 ```
 
-plus `eslint-config-next` → 16.x.
+`eslint-config-next` intentionally stays at 15.5.7 — v16 requires
+ESLint ≥9 / flat config, which is tracked as a separate workstream (see the
+status note above).
 
-Relevant Next 16 breaking changes checked against this codebase:
+Relevant Next 16 breaking changes checked against this codebase (outcomes
+as measured during implementation):
 
 | Change | Impact here |
 |--------|-------------|
-| **Turbopack is the default** for `next dev` and `next build` | No custom webpack config ✓. The root `frontend-nx/babel.config.json` (only `babelrcRoots`, present for Jest) is a project-wide Babel config that Next may detect. In Next 16, Turbopack **auto-enables a built-in babel-loader when a Babel config is detected** (`turbopackUseBuiltinBabel`, default `true`); SWC still performs Next's internal transforms either way, so this is a build-perf question, not a correctness blocker. During the upgrade: check the build log for Babel activation; if active, measure build impact and either set `turbopackUseBuiltinBabel: false` or scope the Babel config to Jest (`transform` in `jest.config.ts`) — decide from the measured result. Escape hatch: `next build --webpack`. |
-| `next lint` removed | Not used — repo calls `eslint` directly ✓. `eslint-config-next@16` may push toward ESLint 9 flat config; if it does, either pin ESLint 8 compat or convert `.eslintrc.json` → `eslint.config.mjs` (`@eslint/compat` is already installed). |
+| **Turbopack is the default** for `next dev` and `next build` | No custom webpack config ✓. Measured outcome: Turbopack did **not** auto-activate its built-in babel-loader from the root `babel.config.json` (`babelrcRoots` only, used by Jest), so no `turbopackUseBuiltinBabel` change was needed. However, Turbopack emits no `output: 'standalone'` bundle, so **production builds run `next build --webpack`** (the sanctioned escape hatch) while `next dev` stays on Turbopack. |
+| `next lint` removed | Not used — repo calls `eslint` directly ✓. `eslint-config-next@16` requires ESLint 9 flat config → pinned ESLint 8 compat for now (`eslint-config-next` 15.5.7); the flat-config conversion (`@eslint/compat` is already installed) is a separate workstream. |
 | `images.domains` removed | Already on `remotePatterns` ✓ |
 | AMP support removed | Not used ✓ |
 | `middleware.ts` renamed `proxy.ts` | No middleware today; Stage C will create `proxy.ts` directly ✓ |
@@ -208,14 +207,16 @@ Relevant Next 16 breaking changes checked against this codebase:
 
 ### B.3 Deployment-pipeline checks
 
-- `output: 'standalone'` layout: confirm the paths copied in
-  `Dockerfile-edu` (`.next/standalone`, `.next/static`, `public/`) are
-  unchanged under 16 and that `node server.js` still boots. Also check
-  whether the `jest-worker` copy hack in the Dockerfile is still needed.
-- Verify `next.config.js` `redirects()`/`headers()` (widget CSP/CORS!)
-  still behave identically.
-- Compare bundle sizes and build times before/after (Turbopack should
-  improve both; record numbers in the PR).
+- ✅ `output: 'standalone'` layout: paths copied in `Dockerfile-edu`
+  (`.next/standalone`, `.next/static`, `public/`) are unchanged under 16
+  (with the webpack builder) and the edu-hub image boots on
+  `node:22-alpine`. Required the `outputFileTracingIncludes` workaround
+  for the `@vercel/nft` `module-sync` gap (see status note above).
+- ✅ `next.config.js` `redirects()`/`headers()` (widget CSP/CORS!) verified
+  against the running image.
+- Production builds stay on webpack (standalone requirement), so no
+  Turbopack build-metrics comparison applies; revisit when Turbopack
+  supports `output: 'standalone'`.
 
 ### B.4 Verification gate for Stage B
 
