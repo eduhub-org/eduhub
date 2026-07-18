@@ -138,6 +138,43 @@ the datepicker/dnd bumps).
 
 ## 3. Stage B — Next.js 16.2 (still Pages Router)
 
+> **Status: implemented.** Landed `next ^15.5.18 → ^16.2.10` on the Pages
+> Router. Deltas found during implementation:
+>
+> - **Turbopack does not emit `output: 'standalone'`.** The Next 16 default
+>   build tool (Turbopack) produced no `.next/standalone` bundle at all,
+>   which the Docker images depend on. The production build scripts
+>   (`build`, `build:stujo`) therefore run `next build --webpack` (the
+>   sanctioned escape hatch); `next dev` stays on Turbopack. Revisit once
+>   the upstream Turbopack + standalone gap is closed.
+> - **`@vercel/nft` does not follow the `module-sync` export condition.**
+>   The ljharb helper packages `async-function`, `async-generator-function`
+>   and `generator-function` (pulled in transitively via `get-intrinsic`)
+>   shipped to the standalone bundle without their `require.mjs` entry; on
+>   Node 20.9+/22 `require('async-function')` resolves to that missing file
+>   and the standalone server throws `MODULE_NOT_FOUND` at runtime. Fixed
+>   with `outputFileTracingIncludes` in both `next.config.js` (§B.3). This
+>   only surfaced now because the old runtime was Node 18, which does not
+>   honour `module-sync` and so resolved to the bundled `index.js`.
+> - **`next/image` local-IP optimization is blocked by default in Next 16.**
+>   Dev serves images through `next/image` from the local storage emulator
+>   (`localhost:4001`), so `images.dangerouslyAllowLocalIP` is re-enabled
+>   **only outside production** (`NODE_ENV !== 'production'`) in both apps.
+> - **`eslint-config-next` stays at 15.5.7** (the "pin ESLint 8 compat"
+>   option in §B.2): `eslint-config-next@16` requires ESLint ≥9 / flat
+>   config, which is a separate workstream. Lint still runs against the
+>   v15 `@next/eslint-plugin-next` under ESLint 8 with no new findings.
+> - **Turbopack did *not* auto-activate the built-in Babel loader** from the
+>   root `babel.config.json` (`babelrcRoots` only) — no build-perf hit, so
+>   no `turbopackUseBuiltinBabel` change was needed.
+> - Runtime prereqs done: `node:18 → node:22` in `Dockerfile-edu`,
+>   `Dockerfile-stujo`, `Dockerfile-dev`; root `engines` `>=20 <21 →
+>   >=20.9 <23`; CI `frontend-code-checks` `20.x → 22.x`; `release.yml`
+>   Node `18 → 22`.
+> - Pre-existing (unrelated to this stage): `hooks/authedQuery.ts` has two
+>   `@typescript-eslint/no-unused-vars` lint errors introduced by an earlier
+>   commit; `yarn lint` is red independently of the Next upgrade.
+
 Next 16 fully supports the Pages Router (including the built-in `i18n`
 config), so this is a contained upgrade.
 

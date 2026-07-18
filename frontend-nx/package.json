@@ -4,7 +4,7 @@
   "license": "MIT",
   "scripts": {
     "start": "next dev apps/edu-hub -p 5000 -H 0.0.0.0",
-    "build": "next build apps/edu-hub",
+    "build": "next build apps/edu-hub --webpack",
     "start:prod": "next start apps/edu-hub -p 5000 -H 0.0.0.0",
     "test": "jest --config apps/edu-hub/jest.config.ts",
     "test:watch": "jest --config apps/edu-hub/jest.config.ts --watch",
@@ -13,7 +13,7 @@
     "find-unused": "unused-exports ./apps/edu-hub/components",
     "type-check": "tsc --noEmit --project apps/edu-hub/tsconfig.json",
     "start:stujo": "next dev apps/stujo -p 5001 -H 0.0.0.0",
-    "build:stujo": "next build apps/stujo",
+    "build:stujo": "next build apps/stujo --webpack",
     "start:stujo-prod": "next start apps/stujo -p 5001 -H 0.0.0.0",
     "type-check:stujo": "tsc --noEmit --project apps/stujo/tsconfig.json"
   },
@@ -65,7 +65,7 @@
     "lodash": "^4.18.1",
     "loglevel": "^1.9.1",
     "lucide-react": "^0.456.0",
-    "next": "^15.5.18",
+    "next": "^16.2.10",
     "next-auth": "^4.24.11",
     "next-intl": "^4.9.1",
     "papaparse": "^5.4.1",
