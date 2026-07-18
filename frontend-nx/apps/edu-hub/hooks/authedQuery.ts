@@ -82,10 +82,14 @@ const useErrorHandler = () => {
 /**
  * Apollo Client 3.14+ deprecates useQuery/useLazyQuery `onError`/`onCompleted`
  * (removed in v4). Bridge them via the returned `error`/`data` values instead.
+ * Callbacks only fire for the terminal result of an execution (`loading` is
+ * false), so partial cache emissions during an in-flight network request do
+ * not report premature completion.
  */
 const useQueryLifecycleSideEffects = (
   error: ApolloError | undefined,
   data: unknown,
+  loading: boolean,
   callerOnError?: ((error: ApolloError) => void) | undefined,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   callerOnCompleted?: ((data: any) => void) | undefined
@@ -97,32 +101,37 @@ const useQueryLifecycleSideEffects = (
   callerOnErrorRef.current = callerOnError;
   const callerOnCompletedRef = useRef(callerOnCompleted);
   callerOnCompletedRef.current = callerOnCompleted;
-  const lastHandledErrorKeyRef = useRef<string | null>(null);
+  const lastHandledErrorRef = useRef<ApolloError | null>(null);
   const lastCompletedDataRef = useRef<unknown>(undefined);
 
   useEffect(() => {
-    if (!error) {
-      lastHandledErrorKeyRef.current = null;
+    if (loading) {
+      // An execution is in flight; wait for its terminal result.
       return;
     }
 
-    const key = error.message;
-    if (lastHandledErrorKeyRef.current === key) {
+    if (error) {
+      // Dedupe by instance, not message: a rerender re-delivers the same
+      // ApolloError object, while each new failure — including a retry that
+      // fails with an identical message — yields a fresh instance and must
+      // fire the callbacks again.
+      if (lastHandledErrorRef.current === error) {
+        return;
+      }
+      lastHandledErrorRef.current = error;
+
+      errorHandlerRef.current(error);
+      callerOnErrorRef.current?.(error);
       return;
     }
-    lastHandledErrorKeyRef.current = key;
 
-    errorHandlerRef.current(error);
-    callerOnErrorRef.current?.(error);
-  }, [error]);
-
-  useEffect(() => {
+    lastHandledErrorRef.current = null;
     if (data === undefined || data === lastCompletedDataRef.current) {
       return;
     }
     lastCompletedDataRef.current = data;
     callerOnCompletedRef.current?.(data);
-  }, [data]);
+  }, [loading, error, data]);
 };
 
 /** Strip deprecated lifecycle callbacks so Apollo 3.14+ does not warn. */
@@ -133,11 +142,9 @@ const withoutDeprecatedCallbacks = <T extends Record<string, unknown> | undefine
     return undefined;
   }
 
-  const {
-    onError: _onError,
-    onCompleted: _onCompleted,
-    ...rest
-  } = passedOptions as Record<string, unknown>;
+  const rest = { ...(passedOptions as Record<string, unknown>) };
+  delete rest.onError;
+  delete rest.onCompleted;
   return rest;
 };
 
@@ -177,6 +184,7 @@ export const useRoleQuery: typeof useQuery = (query, passedOptions) => {
   useQueryLifecycleSideEffects(
     result.error,
     result.data,
+    result.loading,
     passedOptions?.onError,
     passedOptions?.onCompleted
   );
@@ -212,6 +220,7 @@ export const useLazyRoleQuery: typeof useLazyQuery = (query, passedOptions) => {
   useQueryLifecycleSideEffects(
     result[1].error,
     result[1].data,
+    result[1].loading,
     passedOptions?.onError,
     passedOptions?.onCompleted
   );
@@ -239,6 +248,7 @@ export const useAdminQuery: typeof useQuery = (query, passedOptions) => {
   useQueryLifecycleSideEffects(
     result.error,
     result.data,
+    result.loading,
     passedOptions?.onError,
     passedOptions?.onCompleted
   );
@@ -270,6 +280,7 @@ export const useManageQuery: typeof useQuery = (query, passedOptions) => {
   useQueryLifecycleSideEffects(
     result.error,
     result.data,
+    result.loading,
     passedOptions?.onError,
     passedOptions?.onCompleted
   );
@@ -297,6 +308,7 @@ export const useAdminLazyQuery: typeof useLazyQuery = (query, passedOptions) => 
   useQueryLifecycleSideEffects(
     result[1].error,
     result[1].data,
+    result[1].loading,
     passedOptions?.onError,
     passedOptions?.onCompleted
   );
@@ -324,6 +336,7 @@ export const useInstructorQuery: typeof useQuery = (query, passedOptions) => {
   useQueryLifecycleSideEffects(
     result.error,
     result.data,
+    result.loading,
     passedOptions?.onError,
     passedOptions?.onCompleted
   );
@@ -353,6 +366,7 @@ export const useOrgAdminQuery: typeof useQuery = (query, passedOptions) => {
   useQueryLifecycleSideEffects(
     result.error,
     result.data,
+    result.loading,
     passedOptions?.onError,
     passedOptions?.onCompleted
   );
