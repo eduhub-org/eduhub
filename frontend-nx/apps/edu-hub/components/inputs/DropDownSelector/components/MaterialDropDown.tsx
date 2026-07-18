@@ -82,7 +82,6 @@ export const MaterialDropDown: React.FC<MaterialDropDownProps> = ({
             value={localValue}
             onChange={handleChange}
             onBlur={onBlur}
-            placeholder={placeholder}
             displayEmpty
             disabled={disabled}
             sx={{

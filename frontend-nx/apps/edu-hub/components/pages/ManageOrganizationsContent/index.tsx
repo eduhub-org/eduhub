@@ -60,7 +60,7 @@ type ExpandableRowProps = {
   onError: (errorMessage: string) => void;
 };
 
-const ExpandableOrganizationRow: React.FC<ExpandableRowProps> = ({ row, onError }): React.ReactElement => {
+const ExpandableOrganizationRow: React.FC<ExpandableRowProps> = ({ row, onError }): React.ReactElement<any> => {
   const t = useTranslations('manageOrganizations');
   const { refetch } = useRoleQuery(ORGANIZATION_LIST);
   const [updateOrganizationNewsletterProvider] = useRoleMutation(UPDATE_ORGANIZATION_NEWSLETTER_PROVIDER, {

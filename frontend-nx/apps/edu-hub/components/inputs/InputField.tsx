@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent, useEffect, useCallback, useRef, useMemo } from 'react';
+import React, { useState, ChangeEvent, KeyboardEvent, useEffect, useCallback, useRef, useMemo } from 'react';
 import { DocumentNode } from 'graphql';
 import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
@@ -7,7 +7,6 @@ import { HelpOutline } from '@mui/icons-material';
 import { useDebouncedCallback } from 'use-debounce';
 import { useRoleMutation } from '../../hooks/authedMutation';
 import { useTranslations } from 'next-intl';
-import { DebounceInput } from 'react-debounce-input';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { prioritizeClasses, isLinkFormat, isECTSFormat } from '../../helpers/util';
@@ -515,6 +514,17 @@ const InputField: React.FC<InputFieldProps> = ({
     debouncedUpdateText.flush();
   }, [variant, localText, validateInput, debouncedUpdateText, type, handleError, resetError, getErrorMessage]);
 
+  // Preserves react-debounce-input's forceNotifyByEnter behavior: flush the
+  // pending debounced update immediately when Enter is pressed.
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      if (forceNotifyByEnter && event.key === 'Enter') {
+        debouncedUpdateText.flush();
+      }
+    },
+    [forceNotifyByEnter, debouncedUpdateText]
+  );
+
   const [syncedHeight, setSyncedHeight] = useState<number | null>(null);
   const observerRef = useRef<ResizeObserver | null>(null);
 
@@ -638,26 +648,45 @@ const InputField: React.FC<InputFieldProps> = ({
             </div>
           ) : (
             <div className="relative">
-              <DebounceInput
-                inputRef={type === 'markdown' ? resizableRef : undefined}
-                element={type === 'textarea' || type === 'markdown' ? 'textarea' : 'input'}
-                type={type === 'number' ? 'number' : type === 'ects' ? 'number' : 'text'}
-                debounceTimeout={debounceTimeout}
-                forceNotifyByEnter={forceNotifyByEnter}
-                className={`${finalClassName.replace(/\bh-64\b/g, 'min-h-64')} ${errorMessage ? 'border-red-500' : ''}`}
-                style={type === 'markdown' && syncedHeight ? { height: syncedHeight } : undefined}
-                value={localText}
-                onChange={handleTextChange}
-                onBlur={handleBlur}
-                maxLength={maxLength}
-                placeholder={placeholder}
-                min={type === 'number' ? min : undefined}
-                max={type === 'number' ? max : undefined}
-                step={type === 'number' ? 1 : undefined}
-                inputMode={type === 'number' ? 'numeric' : undefined}
-                pattern={type === 'number' ? '[0-9]*' : undefined}
-                {...props}
-              />
+              {type === 'textarea' || type === 'markdown' ? (
+                <textarea
+                  {...props}
+                  ref={type === 'markdown' ? resizableRef : undefined}
+                  className={`${finalClassName.replace(/\bh-64\b/g, 'min-h-64')} ${errorMessage ? 'border-red-500' : ''}`}
+                  style={type === 'markdown' && syncedHeight ? { height: syncedHeight } : undefined}
+                  value={localText}
+                  onChange={handleTextChange}
+                  onBlur={handleBlur}
+                  onKeyDown={handleKeyDown}
+                  maxLength={maxLength}
+                  placeholder={placeholder}
+                />
+              ) : (
+                <input
+                  {...props}
+                  type={
+                    type === 'number' || type === 'ects'
+                      ? 'number'
+                      : type === 'email'
+                        ? 'email'
+                        : type === 'link'
+                          ? 'url'
+                          : 'text'
+                  }
+                  className={`${finalClassName.replace(/\bh-64\b/g, 'min-h-64')} ${errorMessage ? 'border-red-500' : ''}`}
+                  value={localText}
+                  onChange={handleTextChange}
+                  onBlur={handleBlur}
+                  onKeyDown={handleKeyDown}
+                  maxLength={maxLength}
+                  placeholder={placeholder}
+                  min={type === 'number' ? min : undefined}
+                  max={type === 'number' ? max : undefined}
+                  step={type === 'number' ? 1 : undefined}
+                  inputMode={type === 'number' ? 'numeric' : undefined}
+                  pattern={type === 'number' ? '[0-9]*' : undefined}
+                />
+              )}
               {showCharacterCount && type !== 'ects' && type !== 'number' && (
                 <div className="absolute top-0 right-0 mr-2 mt-1 text-xs text-label-secondary">
                   {`${localText.length}/${maxLength}`}

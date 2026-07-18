@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "engines": {
-    "node": ">=20 <21"
+    "node": ">=20.9 <23"
   },
   "scripts": {
     "preinstall": "echo \"Please run package manager commands in the frontend-nx directory\" && exit 1"

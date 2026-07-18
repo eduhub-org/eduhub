@@ -184,7 +184,7 @@ const ProjectsTable: FC<ProjectsTableProps> = ({
   );
 
   const wrapDisabledActionButton = useCallback(
-    (button: ReactElement, tooltip: string) =>
+    (button: ReactElement<any>, tooltip: string) =>
       tooltip ? (
         <Tooltip title={tooltip}>
           <span className="inline-flex w-full">{button}</span>

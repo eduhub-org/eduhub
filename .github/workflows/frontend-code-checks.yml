@@ -27,7 +27,7 @@ jobs:
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && !contains(github.event.head_commit.message, 'Merge pull request'))
     strategy:
       matrix:
-        node-version: [20.x]
+        node-version: [22.x]
 
     steps:
       - name: Harden the runner

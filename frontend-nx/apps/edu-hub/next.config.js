@@ -88,10 +88,29 @@ const nextConfig = {
     formats: ['image/avif', 'image/webp'],
     // @ts-expect-error - TypeScript has trouble inferring literal types when pushing to arrays in JS files
     remotePatterns: buildRemotePatterns(),
+    // Next 16 blocks optimizing images served from local IPs by default. In
+    // development images are served through next/image from the local storage
+    // emulator (localhost:4001, see remotePatterns above); re-allow that ONLY
+    // outside production so real deployments keep the hardened default.
+    dangerouslyAllowLocalIP: process.env.NODE_ENV !== 'production',
   },
   // https://nextjs.org/docs/advanced-features/output-file-tracing#caveats
   // Moved from experimental in Next.js 15
   outputFileTracingRoot: path.join(__dirname, '../../'),
+  // @vercel/nft (used to build the `output: 'standalone'` bundle) does not
+  // follow the `module-sync` export condition. These ljharb helper packages
+  // (pulled in transitively via `get-intrinsic`) therefore ship to the
+  // standalone output WITHOUT their `require.mjs` entry. On Node 20.9+/22,
+  // `require('async-function')` resolves to that missing file and crashes the
+  // standalone server at runtime. Force-include the files until the upstream
+  // NFT gap is fixed. See docs/APP_ROUTER_MIGRATION_PLAN.md §B.3.
+  outputFileTracingIncludes: {
+    '/**': [
+      '../../node_modules/async-function/require.mjs',
+      '../../node_modules/async-generator-function/require.mjs',
+      '../../node_modules/generator-function/require.mjs',
+    ],
+  },
   async redirects() {
     return [
       { source: '/impressum', destination: '/imprint', permanent: true },
