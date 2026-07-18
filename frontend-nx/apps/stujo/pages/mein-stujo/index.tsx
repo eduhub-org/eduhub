@@ -69,9 +69,9 @@ const MeinStujo: FC<Props> = ({ portal }) => {
 
   useEffect(() => {
     if (sessionStatus === 'unauthenticated') {
-      signIn('keycloak');
+      signIn('keycloak', undefined, { stujo_portal: portal.appName });
     }
-  }, [sessionStatus]);
+  }, [portal.appName, sessionStatus]);
 
   // Payment return + re-post deep links (?payment=success / ?repost=id)
   useEffect(() => {

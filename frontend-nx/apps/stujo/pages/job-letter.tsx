@@ -107,7 +107,10 @@ const JobLetter: FC<Props> = ({ portal }) => {
       <Layout portal={portal}>
         <h1>Job-Letter</h1>
         <p>Melde Dich an, um den wöchentlichen Job-Letter zu abonnieren.</p>
-        <button className="stujo-btn stujo-btn--primary" onClick={() => signIn('keycloak')}>
+        <button
+          className="stujo-btn stujo-btn--primary"
+          onClick={() => signIn('keycloak', undefined, { stujo_portal: portal.appName })}
+        >
           Einloggen
         </button>
       </Layout>

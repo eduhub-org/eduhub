@@ -1,5 +1,6 @@
 import { FC, useEffect, useState, ReactNode, memo } from 'react';
 import { getTileImage } from '../../../helpers/imageHandling';
+import { useFittingTileTitleFontSize } from './useFittingTileTitleFontSize';
 
 interface TileBaseProps {
   coverImage: string | null;
@@ -28,10 +29,11 @@ const TileBaseComponent: FC<TileBaseProps> = ({
 }) => {
   // Initialize with placeholder immediately to prevent layout shifts
   const [coverImage, setCoverImage] = useState<string>('https://picsum.photos/240/144');
+  const { titleBoxRef, titleRef, titleFontSizePx } = useFittingTileTitleFontSize(title);
 
   useEffect(() => {
     let isMounted = true;
-    
+
     const loadCoverImage = async () => {
       if (coverImageProp) {
         try {
@@ -45,16 +47,16 @@ const TileBaseComponent: FC<TileBaseProps> = ({
         }
       }
     };
-    
+
     loadCoverImage();
-    
+
     return () => {
       isMounted = false;
     };
   }, [coverImageProp]);
 
   return (
-    <div 
+    <div
       className={`flex flex-col rounded-2xl overflow-hidden font-medium text-label-primary light ${onClick ? 'cursor-pointer' : ''} ${className}`}
       onClick={onClick}
       style={style}
@@ -86,7 +88,15 @@ const TileBaseComponent: FC<TileBaseProps> = ({
           </div>
         ) : null}
         <div className="absolute inset-0 flex justify-start items-end p-3">
-          <span className="text-3xl text-white">{title}</span>
+          <div ref={titleBoxRef} className="max-h-[130px] w-full overflow-hidden">
+            <span
+              ref={titleRef}
+              className="block leading-tight text-white"
+              style={{ fontSize: titleFontSizePx }}
+            >
+              {title}
+            </span>
+          </div>
         </div>
       </div>
       <div className="flex flex-col h-[201px] justify-between bg-fill-primary text-label-primary p-5">
@@ -98,4 +108,3 @@ const TileBaseComponent: FC<TileBaseProps> = ({
 
 // Memoize to prevent unnecessary re-renders that could interfere with Swiper
 export const TileBase = memo(TileBaseComponent);
-

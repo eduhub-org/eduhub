@@ -398,12 +398,18 @@ export default async function publishJobPosting(req, logger) {
       metadata: {
         jobPostingId: String(posting.id),
         organizationId: String(posting.organizationId),
+        organizationName: posting.Organization?.name || '',
         // The buying user for the Invoice row created by the webhook.
         userId: String(sessionUserId),
         source: 'stujo',
       },
       payment_intent_data: {
-        metadata: { jobPostingId: String(posting.id), source: 'stujo' },
+        metadata: {
+          jobPostingId: String(posting.id),
+          organizationId: String(posting.organizationId),
+          organizationName: posting.Organization?.name || '',
+          source: 'stujo',
+        },
       },
     };
 

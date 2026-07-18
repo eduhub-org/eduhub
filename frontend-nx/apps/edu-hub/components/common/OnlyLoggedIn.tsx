@@ -9,7 +9,7 @@ import {
 } from "../../hooks/authentication";
 
 type TProps = {
-  children?: ReactElement;
+  children?: ReactElement<any>;
 };
 
 export const OnlyLoggedIn: FC<TProps> = ({ children }: TProps) => {

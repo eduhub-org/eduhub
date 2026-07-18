@@ -53,7 +53,10 @@ const MyApp: FC<AppProps & InitialProps> & {
 } = ({ Component, pageProps }) => {
   const router = useRouter();
   const locale = router.locale || 'de';
-  setDefaultLocale(locale);
+
+  useEffect(() => {
+    setDefaultLocale(locale);
+  }, [locale]);
 
   const [isFBPixelLoaded, setFBPixelLoaded] = useState(false);
 

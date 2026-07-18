@@ -40,6 +40,13 @@ describe('JobTile', () => {
     expect(screen.getByText('Kiel, region.KIEL')).toBeInTheDocument();
   });
 
+  it('shows the published date label (date sits below company/location, not beside type)', () => {
+    render(<JobTile job={mockJob} />);
+
+    // next-intl mock returns the key verbatim (no interpolation).
+    expect(screen.getByText('published_on')).toBeInTheDocument();
+  });
+
   it('links to the Stujo detail page in a new tab', () => {
     render(<JobTile job={mockJob} />);
 
@@ -53,5 +60,13 @@ describe('JobTile', () => {
     render(<JobTile job={mockJob} />);
 
     expect(screen.getByAltText('StuJo')).toBeInTheDocument();
+  });
+
+  it('renders a long title without crashing', () => {
+    const longTitle =
+      'Praktikum Corporate HR Development - Change Management & Kulturentwicklung (m/w/d)';
+    render(<JobTile job={{ ...mockJob, title: longTitle }} />);
+
+    expect(screen.getByText(longTitle)).toBeInTheDocument();
   });
 });

@@ -19,10 +19,13 @@
 #   HAW_ORG_ID=8            (FH_KIEL / HAW Kiel — mandate restriction target)
 #   GCP_PROJECT=eduhub-staging-new
 #   ETL_STEPS=companies,users,jobs,credits,students
+#   DRY_RUN=1              (pass --dry-run to every ETL step; previews inserts,
+#                           validates source connectivity, writes nothing)
 #
 # Usage on the VM:
 #   export STRATO_SSH_PASS='...'
-#   bash stujo_migrate_gcp.sh 2>&1 | tee migrate.log
+#   DRY_RUN=1 bash stujo_migrate_gcp.sh 2>&1 | tee dryrun.log   # dry run first
+#   bash stujo_migrate_gcp.sh 2>&1 | tee migrate.log            # then for real
 #
 set -euo pipefail
 
@@ -32,12 +35,19 @@ HAW_ORG_ID="${HAW_ORG_ID:-8}"
 GCP_PROJECT="${GCP_PROJECT:-eduhub-staging-new}"
 ETL_STEPS="${ETL_STEPS:-companies,users,jobs,credits,students}"
 FILES_ROOT="${HOME}/stujo-files/public"
+# DRY_RUN=1 → append --dry-run to every ETL step (no writes to staging).
+DRY_RUN_ARGS=()
+if [ -n "${DRY_RUN:-}" ]; then DRY_RUN_ARGS=(--dry-run); fi
 : "${STRATO_SSH_PASS:?export STRATO_SSH_PASS (prod StuJo SSH password) first}"
 
 echo "==> Installing OS + Python dependencies"
 sudo apt-get update -qq
 sudo apt-get install -y -qq python3-pip rsync openssh-client >/dev/null
-pip3 install --user --quiet mysql-connector-python requests google-cloud-storage
+# Debian 12+ marks the system Python as externally managed (PEP 668); this is a
+# throwaway migration VM, so install straight into the user site with
+# --break-system-packages rather than standing up a venv.
+pip3 install --user --quiet --break-system-packages \
+  mysql-connector-python requests google-cloud-storage
 
 # askpass so ssh/rsync authenticate non-interactively (no sshpass needed)
 AP="$(mktemp)"; printf '#!/bin/sh\necho "$STRATO_SSH_PASS"\n' > "$AP"; chmod 700 "$AP"
@@ -95,21 +105,17 @@ KEYCLOAK_PW="$(gcloud secrets versions access latest --secret=keycloak-pw --proj
   || { echo 'ERROR: could not fetch staging secrets from Secret Manager'; exit 1; }
 export HASURA_ADMIN_SECRET KEYCLOAK_PW
 
-run_step() {
-  local step="$1"; shift
-  echo "==================================================================="
-  echo "==> STEP: ${step}   ($(date -u +%H:%M:%S) UTC)"
-  echo "==================================================================="
-  python3 "${SCRIPT_DIR}/stujo_etl.py" --steps "${step}" "$@"
-}
-
-IFS=',' read -ra STEPS <<< "${ETL_STEPS}"
-for step in "${STEPS[@]}"; do
-  if [ "${step}" = "jobs" ]; then
-    run_step jobs --haw-org-id "${HAW_ORG_ID}"
-  else
-    run_step "${step}"
-  fi
-done
+echo "==================================================================="
+echo "==> RUNNING ETL STEPS: ${ETL_STEPS}${DRY_RUN:+ [DRY RUN]}   ($(date -u +%H:%M:%S) UTC)"
+echo "==================================================================="
+# Run ALL requested steps in ONE python process. main() passes the rails-id →
+# new-id mappings between steps in memory (companies→org_mapping→users, then
+# users→user_mapping→jobs, etc.). Running each step as a separate process
+# leaves those mappings empty, so users/jobs/credits silently no-op — hence a
+# single invocation. --haw-org-id only affects the jobs step; harmless
+# otherwise. `companies` must be included so org_mapping is rebuilt in memory
+# (idempotent: existing orgs are matched by their stujo: alias, not re-created).
+python3 "${SCRIPT_DIR}/stujo_etl.py" --steps "${ETL_STEPS}" \
+  --haw-org-id "${HAW_ORG_ID}" "${DRY_RUN_ARGS[@]}"
 
 echo "==> DONE (tunnel closed by exit trap)"

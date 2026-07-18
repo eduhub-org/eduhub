@@ -34,7 +34,7 @@ export interface TableGridProps<T extends BaseRow> {
   generateDeletionConfirmationQuestion?: (row: T) => string;
   enablePagination?: boolean;
   error: ApolloError | null | undefined;
-  expandableRowComponent?: (props: { row: T }) => ReactElement | null;
+  expandableRowComponent?: (props: { row: T }) => ReactElement<any> | null;
   loading: boolean;
   pageSize?: number;
   refetchQueries: string[];

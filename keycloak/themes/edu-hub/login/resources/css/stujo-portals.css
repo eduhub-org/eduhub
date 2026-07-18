@@ -1,9 +1,12 @@
 /*
  * StuJo skin for the shared login theme. Activated via html.stujo-brand
- * (see js/stujo-brand.js). Recreates the StuJo look: purple gradient
+ * (see js/stujo-portal-brand.js). Recreates the StuJo look: purple gradient
  * backdrop (like the site header), white dialog card, green submit
  * button, pink links — so the login reads as a StuJo dialog instead of
  * the dark EduHub page.
+ *
+ * White-label campus portals add html.stujo-haw-kiel / html.stujo-flensburg
+ * on top of stujo-brand (colors match AppSettings primaryColor seeds).
  */
 
 html.stujo-brand .login-pf body,
@@ -28,6 +31,15 @@ html.stujo-brand .navbar-logo-stujo {
   padding: 4px 12px;
 }
 
+html.stujo-brand .navbar-logo-stujo-portal {
+  display: none !important;
+  height: 52px;
+  width: auto;
+  max-width: 280px;
+  object-fit: contain;
+  padding: 4px 12px;
+}
+
 /* Dialog card */
 html.stujo-brand .card-pf {
   background-color: #fff !important;
@@ -47,7 +59,7 @@ html.stujo-brand .pf-c-form-control {
   border-radius: 0 !important;
 }
 
-/* Green StuJo submit button (live .stujo-submit) */
+/* Green StuJo submit button (live .stujo-submit) — kept for all portals */
 html.stujo-brand .pf-c-button.pf-m-primary,
 html.stujo-brand .login-pf-page .btn-primary {
   background: #acca23 !important;
@@ -105,4 +117,72 @@ html.stujo-brand .kc-social-links a {
 
 html.stujo-brand .kc-social-links a:hover {
   border-color: #a71580;
+}
+
+/* --------------------------------------------------------------------------
+ * HAW Kiel (AppSettings: primary #04305E, secondary #646363)
+ * -------------------------------------------------------------------------- */
+html.stujo-haw-kiel .login-pf body,
+html.stujo-haw-kiel body {
+  background: linear-gradient(to right, #02152a, #04305e, #02152a) !important;
+}
+
+html.stujo-haw-kiel .navbar-logo-stujo {
+  display: none !important;
+}
+
+html.stujo-haw-kiel .navbar-logo-stujo-haw-kiel {
+  display: block !important;
+}
+
+html.stujo-haw-kiel #kc-page-title,
+html.stujo-haw-kiel .edu-title {
+  color: #04305e !important;
+}
+
+html.stujo-haw-kiel a:hover {
+  color: #04305e !important;
+}
+
+html.stujo-haw-kiel #kc-registration a,
+html.stujo-haw-kiel .login-pf-settings a {
+  color: #04305e !important;
+}
+
+html.stujo-haw-kiel .kc-social-links a:hover {
+  border-color: #04305e;
+}
+
+/* --------------------------------------------------------------------------
+ * Campus Flensburg (AppSettings: primary #025095, secondary #EC6707)
+ * -------------------------------------------------------------------------- */
+html.stujo-flensburg .login-pf body,
+html.stujo-flensburg body {
+  background: linear-gradient(to right, #011442, #025095, #011442) !important;
+}
+
+html.stujo-flensburg .navbar-logo-stujo {
+  display: none !important;
+}
+
+html.stujo-flensburg .navbar-logo-stujo-flensburg {
+  display: block !important;
+}
+
+html.stujo-flensburg #kc-page-title,
+html.stujo-flensburg .edu-title {
+  color: #025095 !important;
+}
+
+html.stujo-flensburg a:hover {
+  color: #ec6707 !important;
+}
+
+html.stujo-flensburg #kc-registration a,
+html.stujo-flensburg .login-pf-settings a {
+  color: #025095 !important;
+}
+
+html.stujo-flensburg .kc-social-links a:hover {
+  border-color: #ec6707;
 }

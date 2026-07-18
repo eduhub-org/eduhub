@@ -38,7 +38,7 @@ function ManagedItemList<T, TSelected>({
   dialogTitle,
   checkDuplicate,
   additionalDialogProps,
-}: ManagedItemListProps<T, TSelected>): ReactElement {
+}: ManagedItemListProps<T, TSelected>): ReactElement<any> {
   const [dialogOpen, setDialogOpen] = useState(false);
 
   const openDialog = useCallback(() => {

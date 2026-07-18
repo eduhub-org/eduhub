@@ -198,6 +198,22 @@ class HasuraClient:
         return self.query(query, variables)
 
 
+# Keycloak's default person-name validator (person-name-prohibited-characters)
+# rejects names containing any of these characters, so ~700 legacy contacts with
+# a comma / underscore / & / … in their forename or surname would fail to import
+# even though their email and bcrypt password are perfectly valid. Scrub the name
+# down to the allowed set (mirroring Keycloak's default prohibited list plus
+# control chars) rather than drop an otherwise-importable account.
+_NAME_PROHIBITED_RE = re.compile(r'[<>&"$%!#?§,*_={}\\/\x00-\x1f]')
+
+
+def sanitize_person_name(name: str | None) -> str:
+    if not name:
+        return ""
+    cleaned = _NAME_PROHIBITED_RE.sub(" ", name)
+    return re.sub(r"\s+", " ", cleaned).strip()
+
+
 class KeycloakClient:
     """Minimal Keycloak Admin REST client (admin-cli password grant).
 
@@ -247,8 +263,8 @@ class KeycloakClient:
         payload = {
             "username": email,
             "email": email,
-            "firstName": first_name,
-            "lastName": last_name,
+            "firstName": sanitize_person_name(first_name),
+            "lastName": sanitize_person_name(last_name),
             "enabled": True,
             "emailVerified": True,
         }
@@ -337,13 +353,39 @@ def fetch_all(cnx, sql: str, params=()):
     return rows
 
 
-def load_source(cnx, retention_years=None):
+# Disposable / fake email domains found in the StuJo data (staging spam
+# analysis 2026-07-17): bot signups cluster on these. Students on such a domain
+# are dropped by default (see is_migratable_email / --keep-junk-students).
+DISPOSABLE_EMAIL_DOMAINS = {
+    "example.com", "immenseignite.info", "testform.xyz", "solid-hamster.skin",
+    "swooflia.cc", "advoter.cc", "bestmailonline.com", "mail.ru",
+}
+
+
+def is_migratable_email(email) -> bool:
+    """True for a plausibly-real, non-disposable address. Filters out the bot
+    signups (invalid strings like 'sdgsdg', fake/disposable domains)."""
+    if not email:
+        return False
+    email = email.strip().lower()
+    if not re.match(r"^[^@\s]+@[^@\s]+\.[^@\s]+$", email):
+        return False
+    return email.rsplit("@", 1)[-1] not in DISPOSABLE_EMAIL_DOMAINS
+
+
+def load_source(cnx, retention_years=None, only_with_jobs=True,
+                drop_junk_students=True):
     """Load the relevant slice of the Rails DB into memory.
 
-    Scope rules (business decisions 2026-07-11):
-    - migrate ALL companies by default (retention_years is an opt-in
-      restriction for test runs)
+    Scope rules:
     - skip pure e-talents companies/people (sitememberships.site = 1 only)
+    - only_with_jobs (default, decision 2026-07-17): drop companies that never
+      posted an active job — ~65% of StuJo companies never did, and that group
+      is where the spam concentrates. --include-jobless-companies keeps them.
+    - drop_junk_students (default, decision 2026-07-17): drop students whose
+      email is invalid or on a disposable/fake domain. --keep-junk-students
+      keeps them.
+    - retention_years is an opt-in date restriction for test runs.
     """
     if retention_years:
         cutoff = datetime.now(timezone.utc) - timedelta(days=365 * retention_years)
@@ -395,6 +437,23 @@ def load_source(cnx, retention_years=None):
     if before != len(companies):
         log.info("skipped %s companies without a StuJo contact (pure e-talents or contactless)",
                  before - len(companies))
+
+    if only_with_jobs:
+        # Keep only companies with at least one active (status>0) job posting —
+        # the ~65% that never posted are inactive shells / spam signups.
+        with_active_job = {
+            row["company_id"]
+            for row in fetch_all(
+                cnx,
+                "SELECT DISTINCT ct.company_id FROM jobs j "
+                "JOIN contacts ct ON ct.id = j.contact_id WHERE j.status > 0",
+            )
+        }
+        before = len(companies)
+        companies = [c for c in companies if c["id"] in with_active_job]
+        log.info("only-with-jobs filter: dropped %s companies with no active job posting",
+                 before - len(companies))
+
     company_ids = [c["id"] for c in companies]
     log.info(
         "companies in scope (retention %s): %s",
@@ -470,6 +529,11 @@ def load_source(cnx, retention_years=None):
         """,
     )
     students = [s for s in students if s["memberships"] == 0 or s["stujo"] > 0]
+    if drop_junk_students:
+        before_s = len(students)
+        students = [s for s in students if is_migratable_email(s.get("email"))]
+        log.info("drop-junk-students filter: dropped %s students with invalid/disposable email",
+                 before_s - len(students))
 
     return {
         "companies": companies,
@@ -661,6 +725,32 @@ def _set_job_pdf(hasura: "HasuraClient", posting_id: int, path: str) -> None:
     )
 
 
+def _sync_job_tags(hasura: "HasuraClient", posting_id: int, tags: list) -> None:
+    """Replace a posting's tag set on a full-upsert re-run: delete the existing
+    rows and re-insert the current ones. Simpler than diffing and tag counts per
+    job are tiny. Both mutations are no-ops under --dry-run."""
+    hasura.mutate(
+        """
+        mutation ($id: Int!) {
+          delete_JobPostingTag(where: {jobPostingId: {_eq: $id}}) { affected_rows }
+        }
+        """,
+        {"id": posting_id},
+    )
+    if tags:
+        hasura.mutate(
+            """
+            mutation ($objs: [JobPostingTag_insert_input!]!) {
+              insert_JobPostingTag(
+                objects: $objs,
+                on_conflict: {constraint: JobPostingTag_jobPostingId_name_key, update_columns: []}
+              ) { affected_rows }
+            }
+            """,
+            {"objs": [{"jobPostingId": posting_id, "name": t} for t in tags]},
+        )
+
+
 def step_users(hasura: HasuraClient, keycloak, contacts, org_mapping) -> dict:
     """Employer accounts → Keycloak (bcrypt import) + User + OrganizationAdmin.
 
@@ -674,6 +764,7 @@ def step_users(hasura: HasuraClient, keycloak, contacts, org_mapping) -> dict:
     step_jobs to fill JobPosting.contactUserId.
     """
     user_mapping = {}
+    skipped = 0
     for c in contacts:
         email = (c.get("email") or "").strip().lower()
         if not email or c["company_id"] not in org_mapping:
@@ -698,12 +789,23 @@ def step_users(hasura: HasuraClient, keycloak, contacts, org_mapping) -> dict:
                 log.info("[dry-run] would create Keycloak user %s (bcrypt import)",
                          mask_email(email))
                 continue
-            user_id = keycloak.create_user_with_bcrypt(
-                email=email,
-                first_name=c.get("forname") or "",
-                last_name=c.get("name") or "",
-                bcrypt_hash=c.get("password_hash"),
-            )
+            # Some legacy contacts have unusable emails (a URL typed into the
+            # field, a non-ASCII local part, …) that Keycloak rejects. One such
+            # employer must not abort the whole step: log and skip so the rest
+            # migrate. Their org still exists; the contact can re-register or be
+            # fixed later. A re-run is idempotent.
+            try:
+                user_id = keycloak.create_user_with_bcrypt(
+                    email=email,
+                    first_name=c.get("forname") or "",
+                    last_name=c.get("name") or "",
+                    bcrypt_hash=c.get("password_hash"),
+                )
+            except RuntimeError as exc:
+                log.warning("skipping contact %s (%s): %s",
+                            c["id"], mask_email(email), exc)
+                skipped += 1
+                continue
             # Mirror into the User table right away (the updateFromKeycloak
             # event only fires on interactive logins) so the FK targets for
             # OrganizationAdmin / JobPosting.contactUserId exist.
@@ -766,33 +868,26 @@ def step_users(hasura: HasuraClient, keycloak, contacts, org_mapping) -> dict:
             )
         log.info("contact %s (%s) → OrganizationAdmin of org %s",
                  c["id"], mask_email(email), org_id)
+    if skipped:
+        log.info("users: skipped %s contact(s) with an unimportable email", skipped)
     return user_mapping
 
 
 def step_jobs(hasura: HasuraClient, gcs_bucket, files_root, jobs, org_mapping,
               user_mapping, haw_org_id):
-    """jobs → JobPosting (+ tags). Idempotent via legacyStujoId. Postings
-    that already exist are skipped, except that a missing pdfUrl is
-    backfilled — so a delta re-run repairs postings whose PDF was not on
-    disk yet (incomplete rsync) when they were first imported."""
+    """jobs → JobPosting (+ tags). Matched via legacyStujoId. New postings are
+    inserted; already-migrated ones are fully upserted on a delta re-run —
+    content, status, expiry and tags are overwritten from StuJo (source of
+    truth until cutover), and a missing pdfUrl / contactUserId is backfilled."""
     existing = {
         row["legacyStujoId"]: row
         for row in hasura.query(
-            "query { JobPosting(where: {legacyStujoId: {_is_null: false}}) { id legacyStujoId pdfUrl } }"
+            "query { JobPosting(where: {legacyStujoId: {_is_null: false}}) { id legacyStujoId pdfUrl contactUserId } }"
         )["JobPosting"]
     }
 
     for j in jobs:
         if j["company_id"] not in org_mapping:
-            continue
-        prior = existing.get(j["id"])
-        if prior:
-            if prior["pdfUrl"] is None and j.get("pdf_file_name"):
-                pdf_path = copy_paperclip_pdf(gcs_bucket, files_root, prior["id"], j)
-                if pdf_path:
-                    _set_job_pdf(hasura, prior["id"], pdf_path)
-                    log.info("job %s: backfilled missing pdfUrl on JobPosting %s",
-                             j["id"], prior["id"])
             continue
         posting_type = CATEGORY_TO_TYPE.get(j["category_id"])
         if posting_type is None:
@@ -808,6 +903,8 @@ def step_jobs(hasura: HasuraClient, gcs_bucket, files_root, jobs, org_mapping,
             # Business decision (2026-07-11): the Rails archiver was dead, so
             # every currently visible ("active") job gets a fresh 8-week window
             # at cutover; the expire cron then shrinks the catalog organically.
+            # On a full-upsert delta re-run this re-arms the window, so the final
+            # pre-cutover run defines the live catalog's expiry.
             status = "PUBLISHED"
             expires = now + timedelta(days=PUBLICATION_DAYS)
         else:
@@ -839,6 +936,70 @@ def step_jobs(hasura: HasuraClient, gcs_bucket, files_root, jobs, org_mapping,
         # (unique constraint JobPostingTag_jobPostingId_name_key).
         tags = list(dict.fromkeys(t for t in (j.get("tag_names") or "").split("|||") if t))
 
+        contact_user_id = user_mapping.get(j["contact_id"])
+        # Mutable target columns, shared by the insert and the full-upsert
+        # update path (everything except the legacyStujoId match key and the
+        # nested tags, which are reconciled separately).
+        fields = {
+            "organizationId": org_mapping[j["company_id"]],
+            "slug": f"{j['id']}-{slugify(j['title'])}",
+            "type": posting_type,
+            "status": status,
+            "featured": j["status"] == STATUS_FEATURED,
+            "region": REGION_TO_ENUM.get(j.get("region")),
+            "occupation": OCCUPATION_TO_ENUM.get(j.get("occupation_name"), "OTHER"),
+            "title": j["title"],
+            "description": j.get("description"),
+            "shortDescription": j.get("shortdescription"),
+            "requirement": j.get("requirement"),
+            "location": j.get("location"),
+            "salaryText": j.get("payment"),
+            "startText": j.get("entry"),
+            "durationText": duration_text,
+            "applicationDeadline": j["closingdate"].date().isoformat() if j.get("closingdate") else None,
+            "workExperienceRequired": bool(j.get("work_experience")),
+            "hoursPerWeek": j.get("working_time"),
+            "language": j.get("language"),
+            "international": bool(j.get("international")),
+            "internationalDescription": j.get("international_description"),
+            "customCompany": j.get("custom_Company"),
+            "views": j.get("views") or 0,
+            "restrictedToOrganizationId": restricted_to,
+            # Legacy archived jobs were once live, so publishedAt is their
+            # creation date and expiresAt lies in the past.
+            "publishedAt": created.isoformat() if created else None,
+            "expiresAt": expires.isoformat() if expires else None,
+        }
+
+        prior = existing.get(j["id"])
+        if prior:
+            # Full upsert (business decision: StuJo is source of truth until
+            # cutover, so a delta re-run overwrites content, status, expiry and
+            # tags of already-migrated postings). contactUserId is only written
+            # when we can resolve it, so a contact that briefly failed to import
+            # does not null out an already-linked posting.
+            set_fields = dict(fields)
+            if contact_user_id:
+                set_fields["contactUserId"] = contact_user_id
+            hasura.mutate(
+                """
+                mutation ($id: Int!, $set: JobPosting_set_input!) {
+                  update_JobPosting_by_pk(pk_columns: {id: $id}, _set: $set) { id }
+                }
+                """,
+                {"id": prior["id"], "set": set_fields},
+            )
+            _sync_job_tags(hasura, prior["id"], tags)
+            # PDF: (re)upload when the posting has none yet and a file exists —
+            # repairs an incomplete first rsync; keyed by the existing id.
+            if prior["pdfUrl"] is None and j.get("pdf_file_name"):
+                pdf_path = copy_paperclip_pdf(gcs_bucket, files_root, prior["id"], j)
+                if pdf_path:
+                    _set_job_pdf(hasura, prior["id"], pdf_path)
+            log.info("job %s '%s' → updated JobPosting %s (%s)",
+                     j["id"], j["title"], prior["id"], status)
+            continue
+
         result = hasura.mutate(
             """
             mutation ($obj: JobPosting_insert_input!) {
@@ -848,35 +1009,8 @@ def step_jobs(hasura: HasuraClient, gcs_bucket, files_root, jobs, org_mapping,
             {
                 "obj": {
                     "legacyStujoId": j["id"],
-                    "organizationId": org_mapping[j["company_id"]],
-                    "contactUserId": user_mapping.get(j["contact_id"]),
-                    "slug": f"{j['id']}-{slugify(j['title'])}",
-                    "type": posting_type,
-                    "status": status,
-                    "featured": j["status"] == STATUS_FEATURED,
-                    "region": REGION_TO_ENUM.get(j.get("region")),
-                    "occupation": OCCUPATION_TO_ENUM.get(j.get("occupation_name"), "OTHER"),
-                    "title": j["title"],
-                    "description": j.get("description"),
-                    "shortDescription": j.get("shortdescription"),
-                    "requirement": j.get("requirement"),
-                    "location": j.get("location"),
-                    "salaryText": j.get("payment"),
-                    "startText": j.get("entry"),
-                    "durationText": duration_text,
-                    "applicationDeadline": j["closingdate"].date().isoformat() if j.get("closingdate") else None,
-                    "workExperienceRequired": bool(j.get("work_experience")),
-                    "hoursPerWeek": j.get("working_time"),
-                    "language": j.get("language"),
-                    "international": bool(j.get("international")),
-                    "internationalDescription": j.get("international_description"),
-                    "customCompany": j.get("custom_Company"),
-                    "views": j.get("views") or 0,
-                    "restrictedToOrganizationId": restricted_to,
-                    # Legacy archived jobs were once live, so publishedAt is
-                    # their creation date and expiresAt lies in the past.
-                    "publishedAt": created.isoformat() if created else None,
-                    "expiresAt": expires.isoformat() if expires else None,
+                    "contactUserId": contact_user_id,
+                    **fields,
                     "JobPostingTags": {"data": [{"name": t} for t in tags]},
                 }
             },
@@ -903,6 +1037,7 @@ def step_students(hasura: HasuraClient, keycloak, students):
         )["JobPosting"]
     }
 
+    skipped = 0
     for s in students:
         email = (s.get("email") or "").strip().lower()
         if not email:
@@ -928,12 +1063,23 @@ def step_students(hasura: HasuraClient, keycloak, students):
                 log.info("[dry-run] would create Keycloak user %s (bcrypt import)",
                          mask_email(email))
                 continue
-            user_id = keycloak.create_user_with_bcrypt(
-                email=email,
-                first_name=s.get("forname") or "",
-                last_name=s.get("name") or "",
-                bcrypt_hash=s.get("password_hash"),
-            )
+            # A single unimportable student (e.g. Keycloak rejects a non-ASCII
+            # email local part) must not abort the whole step — students are the
+            # lowest-value records (plan §3) and such an address is unusable for
+            # login anyway. Log and skip so the rest still migrate; a re-run is
+            # idempotent and will retry nothing that already landed.
+            try:
+                user_id = keycloak.create_user_with_bcrypt(
+                    email=email,
+                    first_name=s.get("forname") or "",
+                    last_name=s.get("name") or "",
+                    bcrypt_hash=s.get("password_hash"),
+                )
+            except RuntimeError as exc:
+                log.warning("skipping student %s (%s): %s",
+                            s["student_id"], mask_email(email), exc)
+                skipped += 1
+                continue
             # Mirror into the User table right away so the SavedJobPosting /
             # JobAlertSubscription FKs below resolve.
             hasura.mutate(
@@ -987,6 +1133,9 @@ def step_students(hasura: HasuraClient, keycloak, students):
                 {"obj": {"userId": user_id, "active": True}},
             )
 
+    if skipped:
+        log.info("students: skipped %s unimportable account(s)", skipped)
+
 
 def step_credits(hasura: HasuraClient, counters, org_mapping):
     """Remaining paymentcounters credits → JobPostingCredit (untyped).
@@ -994,7 +1143,9 @@ def step_credits(hasura: HasuraClient, counters, org_mapping):
     on_conflict cannot make this idempotent: the unique constraint on
     (organizationId, jobPostingType) never fires for jobPostingType NULL
     because Postgres treats NULLs as distinct. Existing untyped rows are
-    therefore queried up front and their orgs skipped on re-runs.
+    therefore queried up front; a delta re-run reconciles their `remaining`
+    to the current StuJo balance (source of truth until cutover) rather than
+    skipping, so credits consumed/bought between runs stay in sync.
     """
     existing = {
         row["organizationId"]: row
@@ -1026,10 +1177,21 @@ def step_credits(hasura: HasuraClient, counters, org_mapping):
 
     for org_id, remaining in sorted(per_org.items()):
         if org_id in existing:
-            log.info(
-                "org %s already has an untyped JobPostingCredit (id %s, remaining %s) — skipped",
-                org_id, existing[org_id]["id"], existing[org_id]["remaining"],
-            )
+            prior = existing[org_id]
+            if prior["remaining"] != remaining:
+                hasura.mutate(
+                    """
+                    mutation ($id: Int!, $remaining: Int!) {
+                      update_JobPostingCredit_by_pk(pk_columns: {id: $id}, _set: {remaining: $remaining}) { id }
+                    }
+                    """,
+                    {"id": prior["id"], "remaining": remaining},
+                )
+                log.info("org %s: reconciled untyped credit %s remaining %s → %s",
+                         org_id, prior["id"], prior["remaining"], remaining)
+            else:
+                log.info("org %s already has %s untyped credit(s) — unchanged",
+                         org_id, remaining)
             continue
         hasura.mutate(
             """
@@ -1055,6 +1217,12 @@ def main():
     parser.add_argument("--retention-years", type=int,
                         default=int(os.environ.get("RETENTION_YEARS", "0")) or None,
                         help="opt-in restriction for test runs; default: migrate everything")
+    parser.add_argument("--include-jobless-companies", action="store_true",
+                        help="also migrate companies with no active job posting "
+                             "(default: skip them — they are inactive/spam shells)")
+    parser.add_argument("--keep-junk-students", action="store_true",
+                        help="also migrate students with an invalid/disposable "
+                             "email (default: skip them)")
     args = parser.parse_args()
     steps = set(args.steps.split(","))
 
@@ -1097,7 +1265,9 @@ def main():
 
     hasura = HasuraClient(hasura_url, admin_secret, args.dry_run)
     cnx = mysql_connection(dsn)
-    src = load_source(cnx, args.retention_years)
+    src = load_source(cnx, args.retention_years,
+                      only_with_jobs=not args.include_jobless_companies,
+                      drop_junk_students=not args.keep_junk_students)
     log.info(
         "loaded: %s companies, %s contacts, %s jobs, %s counters, %s students",
         len(src["companies"]), len(src["contacts"]), len(src["jobs"]),

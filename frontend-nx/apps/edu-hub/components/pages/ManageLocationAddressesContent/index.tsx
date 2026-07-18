@@ -50,7 +50,7 @@ type ExpandableRowProps = {
   onError: (errorMessage: string) => void;
 };
 
-const ExpandableLocationAddressRow: React.FC<ExpandableRowProps> = ({ row, onError }): React.ReactElement => {
+const ExpandableLocationAddressRow: React.FC<ExpandableRowProps> = ({ row, onError }): React.ReactElement<any> => {
   const t = useTranslations('manageLocationAddresses');
 
   // Handle location address alias errors specifically
