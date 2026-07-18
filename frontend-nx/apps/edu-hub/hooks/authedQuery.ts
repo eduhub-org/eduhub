@@ -1,7 +1,7 @@
 import { ApolloError, useQuery, useLazyQuery } from '@apollo/client';
 import { signOut } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
-import { useCallback, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 
 import { useCurrentRole, useManageRole } from './authentication';
 import { useManagementRoleContext } from './managementRole';
@@ -79,6 +79,68 @@ const useErrorHandler = () => {
   }, [showAuthError, t]);
 };
 
+/**
+ * Apollo Client 3.14+ deprecates useQuery/useLazyQuery `onError`/`onCompleted`
+ * (removed in v4). Bridge them via the returned `error`/`data` values instead.
+ */
+const useQueryLifecycleSideEffects = (
+  error: ApolloError | undefined,
+  data: unknown,
+  callerOnError?: ((error: ApolloError) => void) | undefined,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  callerOnCompleted?: ((data: any) => void) | undefined
+) => {
+  const errorHandler = useErrorHandler();
+  const errorHandlerRef = useRef(errorHandler);
+  errorHandlerRef.current = errorHandler;
+  const callerOnErrorRef = useRef(callerOnError);
+  callerOnErrorRef.current = callerOnError;
+  const callerOnCompletedRef = useRef(callerOnCompleted);
+  callerOnCompletedRef.current = callerOnCompleted;
+  const lastHandledErrorKeyRef = useRef<string | null>(null);
+  const lastCompletedDataRef = useRef<unknown>(undefined);
+
+  useEffect(() => {
+    if (!error) {
+      lastHandledErrorKeyRef.current = null;
+      return;
+    }
+
+    const key = error.message;
+    if (lastHandledErrorKeyRef.current === key) {
+      return;
+    }
+    lastHandledErrorKeyRef.current = key;
+
+    errorHandlerRef.current(error);
+    callerOnErrorRef.current?.(error);
+  }, [error]);
+
+  useEffect(() => {
+    if (data === undefined || data === lastCompletedDataRef.current) {
+      return;
+    }
+    lastCompletedDataRef.current = data;
+    callerOnCompletedRef.current?.(data);
+  }, [data]);
+};
+
+/** Strip deprecated lifecycle callbacks so Apollo 3.14+ does not warn. */
+const withoutDeprecatedCallbacks = <T extends Record<string, unknown> | undefined>(
+  passedOptions: T
+) => {
+  if (!passedOptions) {
+    return undefined;
+  }
+
+  const {
+    onError: _onError,
+    onCompleted: _onCompleted,
+    ...rest
+  } = passedOptions as Record<string, unknown>;
+  return rest;
+};
+
 export const useRoleQuery: typeof useQuery = (query, passedOptions) => {
   // Auth headers are added by the Apollo auth link (reads from authStore).
   // We do NOT pass context with auth here — context changes trigger refetches
@@ -99,31 +161,26 @@ export const useRoleQuery: typeof useQuery = (query, passedOptions) => {
     };
   }, [passedOptions?.context, roleOverride]);
 
-  const errorHandler = useErrorHandler();
-  const errorHandlerRef = useRef(errorHandler);
-  errorHandlerRef.current = errorHandler;
-  const callerOnErrorRef = useRef(passedOptions?.onError);
-  callerOnErrorRef.current = passedOptions?.onError;
-
-  const onError = useCallback((error: ApolloError) => {
-    errorHandlerRef.current(error);
-    callerOnErrorRef.current?.(error);
-  }, []);
-
   const options = useMemo(
     () => ({
-      ...passedOptions,
+      ...withoutDeprecatedCallbacks(passedOptions as Record<string, unknown> | undefined),
       context: mergedContext,
-      onError,
       fetchPolicy: passedOptions?.fetchPolicy ?? 'cache-first',
       ...(passedOptions?.nextFetchPolicy !== undefined
         ? { nextFetchPolicy: passedOptions.nextFetchPolicy }
         : {}),
     }),
-    [passedOptions, mergedContext, onError]
+    [passedOptions, mergedContext]
   );
 
-  return useQuery(query, options);
+  const result = useQuery(query, options);
+  useQueryLifecycleSideEffects(
+    result.error,
+    result.data,
+    passedOptions?.onError,
+    passedOptions?.onCompleted
+  );
+  return result;
 };
 
 export const useLazyRoleQuery: typeof useLazyQuery = (query, passedOptions) => {
@@ -138,33 +195,27 @@ export const useLazyRoleQuery: typeof useLazyQuery = (query, passedOptions) => {
     [passedOptions?.context, passedRole, contextRole, currentRole]
   );
 
-  const errorHandler = useErrorHandler();
-  const errorHandlerRef = useRef(errorHandler);
-  errorHandlerRef.current = errorHandler;
-  const callerOnErrorRef = useRef(passedOptions?.onError);
-  callerOnErrorRef.current = passedOptions?.onError;
-
-  const onError = useCallback((error: ApolloError) => {
-    errorHandlerRef.current(error);
-    callerOnErrorRef.current?.(error);
-  }, []);
-
   const options = useMemo(
     () =>
       passedOptions
         ? {
-            ...passedOptions,
+            ...withoutDeprecatedCallbacks(passedOptions as Record<string, unknown>),
             context: mergedContext,
-            onError,
           }
         : {
             context: mergedContext,
-            onError,
           },
-    [passedOptions, mergedContext, onError]
+    [passedOptions, mergedContext]
   );
 
-  return useLazyQuery(query, options);
+  const result = useLazyQuery(query, options);
+  useQueryLifecycleSideEffects(
+    result[1].error,
+    result[1].data,
+    passedOptions?.onError,
+    passedOptions?.onCompleted
+  );
+  return result;
 };
 
 export const useAdminQuery: typeof useQuery = (query, passedOptions) => {
@@ -176,27 +227,22 @@ export const useAdminQuery: typeof useQuery = (query, passedOptions) => {
     [passedOptions?.context]
   );
 
-  const errorHandler = useErrorHandler();
-  const errorHandlerRef = useRef(errorHandler);
-  errorHandlerRef.current = errorHandler;
-  const callerOnErrorRef = useRef(passedOptions?.onError);
-  callerOnErrorRef.current = passedOptions?.onError;
-
-  const onError = useCallback((error: ApolloError) => {
-    errorHandlerRef.current(error);
-    callerOnErrorRef.current?.(error);
-  }, []);
-
   const options = useMemo(
     () => ({
-      ...passedOptions,
+      ...withoutDeprecatedCallbacks(passedOptions as Record<string, unknown> | undefined),
       context: mergedContext,
-      onError,
     }),
-    [passedOptions, mergedContext, onError]
+    [passedOptions, mergedContext]
   );
 
-  return useQuery(query, options);
+  const result = useQuery(query, options);
+  useQueryLifecycleSideEffects(
+    result.error,
+    result.data,
+    passedOptions?.onError,
+    passedOptions?.onCompleted
+  );
+  return result;
 };
 
 // Like useAdminQuery, but pins the management role: `admin` for super-admins, `org_admin` for org
@@ -212,27 +258,22 @@ export const useManageQuery: typeof useQuery = (query, passedOptions) => {
     [passedOptions?.context, role]
   );
 
-  const errorHandler = useErrorHandler();
-  const errorHandlerRef = useRef(errorHandler);
-  errorHandlerRef.current = errorHandler;
-  const callerOnErrorRef = useRef(passedOptions?.onError);
-  callerOnErrorRef.current = passedOptions?.onError;
-
-  const onError = useCallback((error: ApolloError) => {
-    errorHandlerRef.current(error);
-    callerOnErrorRef.current?.(error);
-  }, []);
-
   const options = useMemo(
     () => ({
-      ...passedOptions,
+      ...withoutDeprecatedCallbacks(passedOptions as Record<string, unknown> | undefined),
       context: mergedContext,
-      onError,
     }),
-    [passedOptions, mergedContext, onError]
+    [passedOptions, mergedContext]
   );
 
-  return useQuery(query, options);
+  const result = useQuery(query, options);
+  useQueryLifecycleSideEffects(
+    result.error,
+    result.data,
+    passedOptions?.onError,
+    passedOptions?.onCompleted
+  );
+  return result;
 };
 
 export const useAdminLazyQuery: typeof useLazyQuery = (query, passedOptions) => {
@@ -244,27 +285,22 @@ export const useAdminLazyQuery: typeof useLazyQuery = (query, passedOptions) => 
     [passedOptions?.context]
   );
 
-  const errorHandler = useErrorHandler();
-  const errorHandlerRef = useRef(errorHandler);
-  errorHandlerRef.current = errorHandler;
-  const callerOnErrorRef = useRef(passedOptions?.onError);
-  callerOnErrorRef.current = passedOptions?.onError;
-
-  const onError = useCallback((error: ApolloError) => {
-    errorHandlerRef.current(error);
-    callerOnErrorRef.current?.(error);
-  }, []);
-
   const options = useMemo(
     () => ({
-      ...passedOptions,
+      ...withoutDeprecatedCallbacks(passedOptions as Record<string, unknown> | undefined),
       context: mergedContext,
-      onError,
     }),
-    [passedOptions, mergedContext, onError]
+    [passedOptions, mergedContext]
   );
 
-  return useLazyQuery(query, options);
+  const result = useLazyQuery(query, options);
+  useQueryLifecycleSideEffects(
+    result[1].error,
+    result[1].data,
+    passedOptions?.onError,
+    passedOptions?.onCompleted
+  );
+  return result;
 };
 
 export const useInstructorQuery: typeof useQuery = (query, passedOptions) => {
@@ -276,27 +312,22 @@ export const useInstructorQuery: typeof useQuery = (query, passedOptions) => {
     [passedOptions?.context]
   );
 
-  const errorHandler = useErrorHandler();
-  const errorHandlerRef = useRef(errorHandler);
-  errorHandlerRef.current = errorHandler;
-  const callerOnErrorRef = useRef(passedOptions?.onError);
-  callerOnErrorRef.current = passedOptions?.onError;
-
-  const onError = useCallback((error: ApolloError) => {
-    errorHandlerRef.current(error);
-    callerOnErrorRef.current?.(error);
-  }, []);
-
   const options = useMemo(
     () => ({
-      ...passedOptions,
+      ...withoutDeprecatedCallbacks(passedOptions as Record<string, unknown> | undefined),
       context: mergedContext,
-      onError,
     }),
-    [passedOptions, mergedContext, onError]
+    [passedOptions, mergedContext]
   );
 
-  return useQuery(query, options);
+  const result = useQuery(query, options);
+  useQueryLifecycleSideEffects(
+    result.error,
+    result.data,
+    passedOptions?.onError,
+    passedOptions?.onCompleted
+  );
+  return result;
 };
 
 // Pins the org_admin role on the request. The caller must actually hold the role (useIsOrgAdmin).
@@ -310,27 +341,22 @@ export const useOrgAdminQuery: typeof useQuery = (query, passedOptions) => {
     [passedOptions?.context]
   );
 
-  const errorHandler = useErrorHandler();
-  const errorHandlerRef = useRef(errorHandler);
-  errorHandlerRef.current = errorHandler;
-  const callerOnErrorRef = useRef(passedOptions?.onError);
-  callerOnErrorRef.current = passedOptions?.onError;
-
-  const onError = useCallback((error: ApolloError) => {
-    errorHandlerRef.current(error);
-    callerOnErrorRef.current?.(error);
-  }, []);
-
   const options = useMemo(
     () => ({
-      ...passedOptions,
+      ...withoutDeprecatedCallbacks(passedOptions as Record<string, unknown> | undefined),
       context: mergedContext,
-      onError,
     }),
-    [passedOptions, mergedContext, onError]
+    [passedOptions, mergedContext]
   );
 
-  return useQuery(query, options);
+  const result = useQuery(query, options);
+  useQueryLifecycleSideEffects(
+    result.error,
+    result.data,
+    passedOptions?.onError,
+    passedOptions?.onCompleted
+  );
+  return result;
 };
 
 /**
