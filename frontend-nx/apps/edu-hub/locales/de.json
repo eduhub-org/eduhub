@@ -2429,7 +2429,8 @@
       "REGISTRATION_CONFIRMED_PAID": "Bezahlung bestätigt",
       "APPLICATION_RECEIVED_PAID": "Bewerbung erhalten (kostenpflichtig)",
       "USER_CREATED": "Benutzer erstellt",
-      "ORGANIZER_ADDED": "Organisator hinzugefügt"
+      "ORGANIZER_ADDED": "Organisator hinzugefügt",
+      "WAITLIST_NOTICE": "Wartelisten-Benachrichtigung"
     },
     "placeholders": {
       "subject": "E-Mail-Betreff eingeben...",
@@ -2456,7 +2457,8 @@
       "APPLICATION_RECEIVED_PAID": "Gesendet, wenn eine Bewerbung für einen kostenpflichtigen Kurs eingegangen ist",
       "SESSION_REMINDER": "Gesendet vor Beginn der Sitzungen (24h, 1h, 15min vorher)",
       "USER_CREATED": "Gesendet, wenn ein neues Benutzerkonto erstellt wird",
-      "ORGANIZER_ADDED": "Gesendet, wenn ein Benutzer als Organisator zu einem Kurs oder Event hinzugefügt wird"
+      "ORGANIZER_ADDED": "Gesendet, wenn ein Benutzer als Organisator zu einem Kurs oder Event hinzugefügt wird",
+      "WAITLIST_NOTICE": "Gesendet, wenn ein Benutzer auf die Warteliste kommt, weil der Kurs voll ist"
     },
     "delete_confirmation": "Bist du sicher, dass du die E-Mail-Vorlage '{title}' löschen möchtest?",
     "unknown_trigger": "Unbekannter Auslöser-Typ",

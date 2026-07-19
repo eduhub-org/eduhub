@@ -64,7 +64,7 @@ export const useFormatTimeString = () => {
       }
 
       // Check if the string is in HH:mm or HH:mm:ss format
-      if (typeof ts === 'string' && /^\d{2}:\d{2}(:\d{2})?$/.test(ts)) {
+      if (typeof ts === 'string' && /^\d{2}:\d{2}(:\d{2}(\.\d+)?)?$/.test(ts)) {
         // Since we're already dealing with a simple HH:mm format, we assume
         // the input is already in the correct timezone and we don't need to
         // convert it.
