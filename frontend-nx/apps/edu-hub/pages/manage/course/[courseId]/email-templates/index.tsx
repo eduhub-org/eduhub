@@ -31,9 +31,12 @@ const CourseEmailTemplates: FC = () => {
   const isValidCourseId = courseIdNumber !== null && Number.isInteger(courseIdNumber) && courseIdNumber > 0;
   const [templatesCreated, setTemplatesCreated] = useState(false);
 
+  // Skip until the session is ready: the Apollo auth link only attaches the
+  // Authorization/role headers once the access token is in the auth store, so
+  // firing earlier sends the queries unauthenticated and Hasura rejects them.
   const { data, loading, error } = useAdminQuery<ManagedCourse>(MANAGED_COURSE, {
     variables: { id: courseIdNumber || 0 },
-    skip: !isValidCourseId,
+    skip: !isLoggedIn || !isAdmin || !isValidCourseId,
   });
 
   // Check if course has templates
@@ -41,12 +44,14 @@ const CourseEmailTemplates: FC = () => {
     GET_COURSE_TEMPLATES_COUNT,
     {
       variables: { courseId: courseIdNumber || 0 },
-      skip: !isValidCourseId,
+      skip: !isLoggedIn || !isAdmin || !isValidCourseId,
     }
   );
 
   // Get default templates
-  const { data: defaultTemplatesData } = useAdminQuery<GetDefaultTemplates>(GET_DEFAULT_TEMPLATES);
+  const { data: defaultTemplatesData } = useAdminQuery<GetDefaultTemplates>(GET_DEFAULT_TEMPLATES, {
+    skip: !isLoggedIn || !isAdmin,
+  });
 
   const [insertEmailTemplate] = useAdminMutation<InsertEmailTemplate, InsertEmailTemplateVariables>(
     INSERT_EMAIL_TEMPLATE
