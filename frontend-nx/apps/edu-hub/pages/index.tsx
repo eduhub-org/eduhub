@@ -15,7 +15,7 @@ import HomeJobSlider from '../components/common/TileSlider/HomeJobSlider';
 import FaqSection from '../components/common/FaqSection';
 import NotificationSnackbar from '../components/common/dialogs/NotificationSnackbar';
 
-import { useAuthedQuery, useInstructorQuery } from '../hooks/authedQuery';
+import { useAuthedQuery, useRoleQuery } from '../hooks/authedQuery';
 import { useIsLoggedIn, useIsInstructor, useIsAdmin } from '../hooks/authentication';
 import { useUserId } from '../hooks/user';
 import { AuthRoles } from '../types/enums';
@@ -60,11 +60,14 @@ const Home: FC = () => {
     }
   }, [router]);
 
-  const { data: adminCoursesData, loading: adminCoursesLoading } = useInstructorQuery<CoursesByInstructor>(
+  // Query under a role the JWT actually has: admins without the instructor
+  // role would otherwise be rejected by Hasura ("role is not in allowed roles").
+  const { data: adminCoursesData, loading: adminCoursesLoading } = useRoleQuery<CoursesByInstructor>(
     COURSES_BY_INSTRUCTOR,
     {
       variables: { userId },
       skip: !isLoggedIn || !(isInstructor || isAdmin),
+      context: { role: isInstructor ? AuthRoles.instructor : AuthRoles.admin },
     }
   );
 

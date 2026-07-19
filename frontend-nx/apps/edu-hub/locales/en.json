@@ -2444,7 +2444,8 @@
       "REGISTRATION_CONFIRMED_PAID": "Payment Confirmed",
       "APPLICATION_RECEIVED_PAID": "Application Received (Paid)",
       "USER_CREATED": "User Created",
-      "ORGANIZER_ADDED": "Organizer Added"
+      "ORGANIZER_ADDED": "Organizer Added",
+      "WAITLIST_NOTICE": "Waitlist Notice"
     },
     "placeholders": {
       "subject": "Enter email subject...",
@@ -2471,7 +2472,8 @@
       "APPLICATION_RECEIVED_PAID": "Sent when an application for a paid course is received",
       "SESSION_REMINDER": "Sent before sessions start (24h, 1h, 15min before)",
       "USER_CREATED": "Sent when a new user account is created",
-      "ORGANIZER_ADDED": "Sent when a user is added as an organizer to a course or event"
+      "ORGANIZER_ADDED": "Sent when a user is added as an organizer to a course or event",
+      "WAITLIST_NOTICE": "Sent when a user joins the waitlist because the course is full"
     },
     "delete_confirmation": "Are you sure you want to delete the email template '{title}'?",
     "unknown_trigger": "Unknown trigger type",
