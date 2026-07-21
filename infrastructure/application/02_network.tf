@@ -124,6 +124,15 @@ module "lb-http" {
 ###############################################################################
 # Setting the Domains for the Applications using Cloudflaire as a Provider
 #####
+#
+# IMPORTANT: every host below is part of the load balancer's Google-managed
+# multi-SAN certificate (see managed_ssl_certificate_domains above). Managed
+# cert validation requires each host to resolve directly to the LB IP, so all
+# records MUST stay DNS-only (proxied = false). If any single record is
+# switched to Cloudflare proxied mode, validation for that domain fails and
+# the ENTIRE certificate cannot (re)provision — taking down HTTPS for ALL
+# domains on the LB. proxied is pinned explicitly so Terraform reverts any
+# manual change in the Cloudflare dashboard.
 
 # Add a domain record for the Keycloak service
 resource "cloudflare_record" "keycloak" {
@@ -131,6 +140,7 @@ resource "cloudflare_record" "keycloak" {
   name    = local.keycloak_service_name
   type    = "A"
   value   = module.lb-http.external_ip
+  proxied = false
 }
 
 # Add a domain record for the Hasura service
@@ -139,6 +149,7 @@ resource "cloudflare_record" "hasura" {
   name    = local.hasura_service_name
   type    = "A"
   value   = module.lb-http.external_ip
+  proxied = false
 }
 
 # Add a domain record for the Hasura service
@@ -147,6 +158,7 @@ resource "cloudflare_record" "eduhub" {
   name    = local.eduhub_service_name
   type    = "A"
   value   = module.lb-http.external_ip
+  proxied = false
 }
 
 # Add a domain record for the EduHub API service
@@ -155,6 +167,7 @@ resource "cloudflare_record" "eduhub_api" {
   name    = local.eduhub_api_service_name
   type    = "A"
   value   = module.lb-http.external_ip
+  proxied = false
 }
 
 # Add a domain record for the StuJo job board frontend
@@ -163,6 +176,7 @@ resource "cloudflare_record" "stujo" {
   name    = trimsuffix(local.stujo_domain, ".opencampus.sh")
   type    = "A"
   value   = module.lb-http.external_ip
+  proxied = false
 }
 
 # Add domain records for the interim white-label StuJo portal hosts on
@@ -176,4 +190,5 @@ resource "cloudflare_record" "stujo_portals" {
   name    = trimsuffix(each.value.domain, ".opencampus.sh")
   type    = "A"
   value   = module.lb-http.external_ip
+  proxied = false
 }
