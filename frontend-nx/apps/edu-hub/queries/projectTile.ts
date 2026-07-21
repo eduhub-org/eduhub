@@ -2,8 +2,9 @@ import { gql } from '@apollo/client';
 
 // Lightweight fragment for project tiles and sliders. Deliberately NOT the heavy
 // ProjectFragmentDetailed: only public, anonymously-readable fields are selected
-// so the tiles render logged-out. Authors are PUBLISHED-only at the permission
-// level (used for showcase avatars); mentors are visible for templates too.
+// so the tiles render logged-out. Authors are limited to accepted authors of
+// published projects at the permission level (used for showcase avatars);
+// mentors are visible for templates too.
 export const PROJECT_TILE_FRAGMENT = gql`
   fragment ProjectTileFragment on Project {
     id
@@ -11,6 +12,7 @@ export const PROJECT_TILE_FRAGMENT = gql`
     tagline
     coverImageUrl
     status
+    published
     submittedAt
     acceptingParticipants
     organizationId
@@ -71,24 +73,14 @@ export const PROJECT_TILE_FRAGMENT = gql`
   }
 `;
 
-// Home slider — all home-eligible projects (PUBLISHED showcases + open PROPOSED
-// templates), ordered by recency. Used when a project slider selects no groups.
+// Home slider — all published showcase projects, ordered by recency. Used when a
+// project slider selects no groups. Only published projects appear here;
+// unpublished open templates stay in the in-course template carousel.
 export const HOME_PROJECT_TILES_ALL = gql`
   ${PROJECT_TILE_FRAGMENT}
   query HomeProjectTilesAll($limit: Int = 24, $offset: Int = 0) {
     Project(
-      where: {
-        _or: [
-          { status: { _eq: PUBLISHED } }
-          {
-            _and: [
-              { status: { _eq: PROPOSED } }
-              { acceptingParticipants: { _eq: true } }
-              { _not: { ProjectAuthors: { participationStatus: { _eq: ACCEPTED } } } }
-            ]
-          }
-        ]
-      }
+      where: { published: { _eq: true } }
       order_by: { updated_at: desc }
       limit: $limit
       offset: $offset
@@ -98,24 +90,16 @@ export const HOME_PROJECT_TILES_ALL = gql`
   }
 `;
 
-// Home / widget — home-eligible projects for a single organization (server-side
-// scoping, mirrors COURSE_TILES_BY_ORGANIZATION in the course widget).
+// Home / widget — published showcase projects for a single organization
+// (server-side scoping, mirrors COURSE_TILES_BY_ORGANIZATION in the course
+// widget).
 export const HOME_PROJECT_TILES_BY_ORGANIZATION = gql`
   ${PROJECT_TILE_FRAGMENT}
   query HomeProjectTilesByOrganization($organizationId: Int!, $limit: Int = 24, $offset: Int = 0) {
     Project(
       where: {
         organizationId: { _eq: $organizationId }
-        _or: [
-          { status: { _eq: PUBLISHED } }
-          {
-            _and: [
-              { status: { _eq: PROPOSED } }
-              { acceptingParticipants: { _eq: true } }
-              { _not: { ProjectAuthors: { participationStatus: { _eq: ACCEPTED } } } }
-            ]
-          }
-        ]
+        published: { _eq: true }
       }
       order_by: { updated_at: desc }
       limit: $limit
@@ -126,26 +110,15 @@ export const HOME_PROJECT_TILES_BY_ORGANIZATION = gql`
   }
 `;
 
-// Home slider — home-eligible projects narrowed to the union of selected course
-// groups and project groups.
+// Home slider — published showcase projects narrowed to the union of selected
+// course groups and project groups.
 export const HOME_PROJECT_TILES_BY_GROUPS = gql`
   ${PROJECT_TILE_FRAGMENT}
   query HomeProjectTilesByGroups($courseGroupIds: [Int!]!, $projectGroupIds: [Int!]!, $limit: Int = 24, $offset: Int = 0) {
     Project(
       where: {
         _and: [
-          {
-            _or: [
-              { status: { _eq: PUBLISHED } }
-              {
-                _and: [
-                  { status: { _eq: PROPOSED } }
-                  { acceptingParticipants: { _eq: true } }
-                  { _not: { ProjectAuthors: { participationStatus: { _eq: ACCEPTED } } } }
-                ]
-              }
-            ]
-          }
+          { published: { _eq: true } }
           {
             _or: [
               { ProjectCourses: { Course: { CourseGroups: { groupOptionId: { _in: $courseGroupIds } } } } }
@@ -181,7 +154,7 @@ export const COURSE_PUBLISHED_PROJECT_TILES = gql`
   query CoursePublishedProjectTiles($courseSeriesId: Int!, $now: date!, $limit: Int = 24, $offset: Int = 0) {
     Project(
       where: {
-        status: { _eq: PUBLISHED }
+        published: { _eq: true }
         ProjectCourses: { Course: { courseSeriesId: { _eq: $courseSeriesId }, Program: { lectureEnd: { _lt: $now } } } }
       }
       order_by: { updated_at: desc }

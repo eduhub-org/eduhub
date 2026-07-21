@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "license": "MIT",
   "scripts": {
-    "start": "next dev apps/edu-hub -p 5000 -H 0.0.0.0",
+    "start": "next dev apps/edu-hub -p 5000 -H 0.0.0.0 --webpack",
     "build": "next build apps/edu-hub --webpack",
     "start:prod": "next start apps/edu-hub -p 5000 -H 0.0.0.0",
     "test": "jest --config apps/edu-hub/jest.config.ts",
@@ -12,7 +12,7 @@
     "apollo": "cd apps/edu-hub && rm -rf queries/__generated__ && mkdir -p queries/__generated__ && ../../node_modules/apollo/bin/run client:codegen --includes \"./queries/**/*.ts\" --target typescript",
     "find-unused": "unused-exports ./apps/edu-hub/components",
     "type-check": "tsc --noEmit --project apps/edu-hub/tsconfig.json",
-    "start:stujo": "next dev apps/stujo -p 5001 -H 0.0.0.0",
+    "start:stujo": "next dev apps/stujo -p 5001 -H 0.0.0.0 --webpack",
     "build:stujo": "next build apps/stujo --webpack",
     "start:stujo-prod": "next start apps/stujo -p 5001 -H 0.0.0.0",
     "type-check:stujo": "tsc --noEmit --project apps/stujo/tsconfig.json"

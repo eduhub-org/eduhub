@@ -61,6 +61,7 @@ export const PROJECT_FRAGMENT_DETAILED = gql`
     externalUrl
     documentationInstructionId
     status
+    published
     type
     rating
     ratingComment

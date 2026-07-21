@@ -137,6 +137,7 @@ select_permissions:
         - id
         - organizationId
         - presentationUrl
+        - published
         - status
         - submissionDeadline
         - submittedAt
@@ -147,8 +148,8 @@ select_permissions:
         - updated_at
       filter:
         _or:
-          - status:
-              _eq: PUBLISHED
+          - published:
+              _eq: true
           - _and:
               - status:
                   _eq: PROPOSED
@@ -172,6 +173,7 @@ select_permissions:
         - parentProjectId
         - presentationUrl
         - proposedByUserId
+        - published
         - rating
         - ratingComment
         - status
@@ -212,6 +214,7 @@ select_permissions:
         - parentProjectId
         - presentationUrl
         - proposedByUserId
+        - published
         - rating
         - ratingComment
         - status
