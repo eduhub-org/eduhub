@@ -18,6 +18,7 @@ import {
   UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_EVENTS,
   UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_COURSES,
   UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_DEGREES,
+  UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_JOBS,
   UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_SETTINGS,
 } from '../../../queries/organizationAdmin';
 import { ORGANIZATION_OPTIONS } from '../../../queries/organization';
@@ -69,56 +70,63 @@ const ExpandableUserRow: FC<{
     [onAdminStatusChange, row.User?.id, setAdminStatus]
   );
 
+  const capabilities = useMemo(
+    () => [
+      {
+        key: 'events',
+        label: t('can_manage_events'),
+        checked: row.canManageEvents,
+        mutation: UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_EVENTS,
+      },
+      {
+        key: 'courses',
+        label: t('can_manage_courses'),
+        checked: row.canManageCourses,
+        mutation: UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_COURSES,
+      },
+      {
+        key: 'degrees',
+        label: t('can_manage_degrees'),
+        checked: row.canManageDegrees,
+        mutation: UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_DEGREES,
+      },
+      {
+        key: 'jobs',
+        label: t('can_manage_jobs'),
+        checked: row.canManageJobs,
+        mutation: UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_JOBS,
+      },
+      {
+        key: 'settings',
+        label: t('can_manage_users_and_settings'),
+        checked: row.canManageSettings,
+        mutation: UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_SETTINGS,
+      },
+    ],
+    [row, t]
+  );
+
   return (
-    <div>
-      <div className="font-medium bg-fill-primary text-label-primary light grid grid-cols-[repeat(auto-fill,minmax(100px,1fr))]">
-        <div className="pl-3 col-span-3">
+    <div className="light bg-fill-primary text-label-primary px-4 py-3">
+      <div className="text-xs font-semibold uppercase tracking-wide text-label-secondary mb-2">
+        {t('capabilities_heading')}
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-1">
+        {capabilities.map((capability) => (
           <CheckboxSelector
+            key={capability.key}
             variant="eduhub"
-            label={t('can_manage_events')}
-            checked={row.canManageEvents}
-            updateValueMutation={UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_EVENTS}
+            label={capability.label}
+            checked={capability.checked}
+            updateValueMutation={capability.mutation}
             role={manageRole}
             identifierVariables={{ itemId: row.id }}
             refetchQueries={['GetAdminUsers']}
           />
-        </div>
-        <div className="pl-3 col-span-3">
-          <CheckboxSelector
-            variant="eduhub"
-            label={t('can_manage_courses')}
-            checked={row.canManageCourses}
-            updateValueMutation={UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_COURSES}
-            role={manageRole}
-            identifierVariables={{ itemId: row.id }}
-            refetchQueries={['GetAdminUsers']}
-          />
-        </div>
-        <div className="pl-3 col-span-3">
-          <CheckboxSelector
-            variant="eduhub"
-            label={t('can_manage_degrees')}
-            checked={row.canManageDegrees}
-            updateValueMutation={UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_DEGREES}
-            role={manageRole}
-            identifierVariables={{ itemId: row.id }}
-            refetchQueries={['GetAdminUsers']}
-          />
-        </div>
-        <div className="pl-3 col-span-3">
-          <CheckboxSelector
-            variant="eduhub"
-            label={t('can_manage_users_and_settings')}
-            checked={row.canManageSettings}
-            updateValueMutation={UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_SETTINGS}
-            role={manageRole}
-            identifierVariables={{ itemId: row.id }}
-            refetchQueries={['GetAdminUsers']}
-          />
-        </div>
+        ))}
       </div>
       {isAdmin && (
-        <div className="pl-3 col-span-3">
+        <div className="mt-3 pt-3 border-t border-solid border-border-primary">
           <CheckboxSelector
             variant="eduhub"
             label={t('is_super_admin')}

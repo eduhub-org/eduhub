@@ -1,6 +1,6 @@
 import { ApolloError, QueryResult } from '@apollo/client';
 import { useTranslations } from 'next-intl';
-import { FC, useCallback, useMemo, useState } from 'react';
+import { FC, useCallback, useMemo, useState, type JSX } from 'react';
 import { useIsAdmin, useIsInstructor } from '../../../../hooks/authentication';
 import { useRoleMutation } from '../../../../hooks/authedMutation';
 import Dot, { DotColor } from '../../../common/Dot';

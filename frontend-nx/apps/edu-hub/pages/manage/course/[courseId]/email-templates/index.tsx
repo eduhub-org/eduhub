@@ -3,8 +3,8 @@ import { FC, useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { Page } from '../../../../../components/layout/Page';
 import { useIsAdmin, useIsLoggedIn } from '../../../../../hooks/authentication';
-import { useRoleQuery } from '../../../../../hooks/authedQuery';
-import { useRoleMutation } from '../../../../../hooks/authedMutation';
+import { useAdminQuery } from '../../../../../hooks/authedQuery';
+import { useAdminMutation } from '../../../../../hooks/authedMutation';
 import { useTranslations } from 'next-intl';
 import Loading from '../../../../../components/common/Loading';
 import { MANAGED_COURSE } from '../../../../../queries/course';
@@ -31,24 +31,29 @@ const CourseEmailTemplates: FC = () => {
   const isValidCourseId = courseIdNumber !== null && Number.isInteger(courseIdNumber) && courseIdNumber > 0;
   const [templatesCreated, setTemplatesCreated] = useState(false);
 
-  const { data, loading, error } = useRoleQuery<ManagedCourse>(MANAGED_COURSE, {
+  // Skip until the session is ready: the Apollo auth link only attaches the
+  // Authorization/role headers once the access token is in the auth store, so
+  // firing earlier sends the queries unauthenticated and Hasura rejects them.
+  const { data, loading, error } = useAdminQuery<ManagedCourse>(MANAGED_COURSE, {
     variables: { id: courseIdNumber || 0 },
-    skip: !isValidCourseId,
+    skip: !isLoggedIn || !isAdmin || !isValidCourseId,
   });
 
   // Check if course has templates
-  const { data: templatesCountData, refetch: refetchTemplatesCount } = useRoleQuery<GetCourseTemplatesCount>(
+  const { data: templatesCountData, refetch: refetchTemplatesCount } = useAdminQuery<GetCourseTemplatesCount>(
     GET_COURSE_TEMPLATES_COUNT,
     {
       variables: { courseId: courseIdNumber || 0 },
-      skip: !isValidCourseId,
+      skip: !isLoggedIn || !isAdmin || !isValidCourseId,
     }
   );
 
   // Get default templates
-  const { data: defaultTemplatesData } = useRoleQuery<GetDefaultTemplates>(GET_DEFAULT_TEMPLATES);
+  const { data: defaultTemplatesData } = useAdminQuery<GetDefaultTemplates>(GET_DEFAULT_TEMPLATES, {
+    skip: !isLoggedIn || !isAdmin,
+  });
 
-  const [insertEmailTemplate] = useRoleMutation<InsertEmailTemplate, InsertEmailTemplateVariables>(
+  const [insertEmailTemplate] = useAdminMutation<InsertEmailTemplate, InsertEmailTemplateVariables>(
     INSERT_EMAIL_TEMPLATE
   );
 

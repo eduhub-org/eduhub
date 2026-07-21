@@ -44,6 +44,7 @@
       "admin_users": "Admin-Benutzer",
       "experts": "Experten",
       "courses": "Kurse",
+      "projects": "Projekte",
       "programs": "Programme",
       "organizations": "Organisationen",
       "location_addresses": "Veranstaltungsadressen",
@@ -303,6 +304,10 @@
     },
     "widget_error_loading_courses": "Fehler beim Laden der Kurse",
     "widget_no_courses_available": "Keine Kurse verfügbar",
+    "widget_error_loading_projects": "Fehler beim Laden der Projekte",
+    "widget_no_projects_available": "Keine Projekte verfügbar",
+    "widget_error_loading_jobs": "Fehler beim Laden der Stellenangebote",
+    "widget_no_jobs_available": "Keine Stellenangebote verfügbar",
     "page_not_found": "Seite nicht gefunden",
     "page_not_found_description": "Die Seite, die du suchst, existiert leider nicht. Sie wurde möglicherweise verschoben oder gelöscht.",
     "back_to_home": "Zur Startseite",
@@ -372,7 +377,10 @@
         "ONGOING": "In Bearbeitung",
         "SUBMITTED": "Eingereicht",
         "COMPLETED": "Abgeschlossen",
+        "COMPLETED_PASSED": "Bestanden",
         "INCOMPLETE": "Nicht abgeschlossen",
+        "INCOMPLETE_FAILED": "Nicht bestanden",
+        "SUGGESTED_FOR_PUBLICATION": "Zur Veröffentlichung vorgeschlagen",
         "PUBLISHED": "Veröffentlicht"
       },
       "type_label": {
@@ -525,6 +533,15 @@
         "sent_back_banner": "Dein Projekt wurde zur Überarbeitung zurückgegeben. Bitte aktualisiere es und reiche erneut ein.",
         "deadline_passed_banner": "Die Abgabefrist ist am {date} abgelaufen.",
         "excluded_banner": "Die einreichende Person hat Dich von der finalen Einreichung dieses Projekts ausgeschlossen. Du zählst nicht mehr zu den Autor:innen."
+      },
+      "publication_consent": {
+        "heading": "Einwilligung zur Veröffentlichung",
+        "checkbox_label_solo": "Ich willige ein, dass dieses Projekt veröffentlicht werden kann.",
+        "checkbox_label_team": "Im Namen meines Teams willige ich ein, dass dieses Projekt veröffentlicht werden kann.",
+        "details_summary": "Was wird veröffentlicht?",
+        "description": "opencampus.sh (betrieben vom gemeinnützigen Verein Campus Business Box e.V.) kann dieses Projekt als Showcase-Beispiel auf der Plattform und in Werbematerialien veröffentlichen sowie für die Teilnahme oder Einreichung bei Preisen verwenden. Was geteilt wird: Projekttitel, Beschreibung, Titelbild, hochgeladene Dateien und Links sowie die Namen und Element-Raum-Links der beitragenden Autor:innen. Die Einwilligung ist freiwillig und kann jederzeit in deiner Projektansicht erteilt oder widerrufen werden; ein Widerruf entfernt das Projekt aus der Veröffentlichung.",
+        "status_granted": "Einwilligung erteilt von {name} am {date}.",
+        "status_withdrawn": "Einwilligung widerrufen von {name} am {date} — das Projekt wird nicht veröffentlicht."
       },
       "submit_dialog": {
         "title": "Projekt zur Bewertung einreichen",
@@ -1315,7 +1332,8 @@
         "review": "Bewerten",
         "evaluate_project": "Projekt beurteilen",
         "evaluate_disabled_tooltip": "Sobald das Projekt eingereicht wurde, kannst du es hier bewerten.",
-        "publish": "Im Showcase veröffentlichen"
+        "suggest_for_publication": "Zur Veröffentlichung vorschlagen",
+        "withdraw_publication_suggestion": "Vorschlag zurückziehen"
       },
       "delete_template_confirmation": "Die Projektvorlage \"{title}\" wirklich löschen? Das kann nicht rückgängig gemacht werden.",
       "delete_template_disabled_tooltip": "Du kannst diese Vorlage nicht löschen, solange mindestens eine daraus erstellte Kopie in diesem Kurs existiert.",
@@ -1343,7 +1361,8 @@
         "submission_deadline_instructor_origin_program": " (Programmvorgabe)",
         "submission_deadline_instructor_origin_program_legacy": " (Programm: Leistungsnachweis)",
         "submission_deadline_instructor_picker_prompt": "Wenn Du für dieses Projekt eine abweichende Frist setzen willst, wähle sie hier aus:",
-        "submission_deadline_instructor_picker_help": "Leer lassen, um die oben genannte Abgabefrist zu übernehmen."
+        "submission_deadline_instructor_picker_help": "Leer lassen, um die oben genannte Abgabefrist zu übernehmen.",
+        "type_locked_hint": "Der Projekttyp kann nach Bestätigung oder Einreichung des Projekts nicht mehr geändert werden."
       },
       "confirm_project_dialog": {
         "title": "Projekt bestätigen",
@@ -1358,20 +1377,20 @@
         "tagline_label": "Untertitel",
         "documentation_link": "Dokumentation öffnen",
         "presentation_link": "Präsentation öffnen",
-        "external_link": "Projektlink öffnen",
-        "approve_button": "Genehmigen & abschließen",
-        "send_back_button": "Zur Überarbeitung zurückgeben",
-        "reject_button": "Als nicht abgeschlossen ablehnen"
+        "external_link": "Projektlink öffnen"
       },
       "evaluate_dialog": {
         "title": "Projekt beurteilen",
-        "rating_section_label": "Bewertung",
-        "rating_UNRATED": "Noch nicht bewertet",
-        "rating_PASSED": "Bestanden",
-        "rating_FAILED": "Nicht bestanden",
+        "decision_label": "Entscheidung",
+        "approve_title": "Bestanden & abschließen",
+        "approve_description": "Das Projekt gilt als bestanden und wird abgeschlossen.",
+        "revise_title": "Zur Überarbeitung zurückgeben",
+        "revise_description": "Das Team kann das Projekt überarbeiten und erneut einreichen.",
+        "reject_title": "Als nicht bestanden ablehnen",
+        "reject_description": "Das Projekt wird als nicht bestanden markiert.",
         "comment_label": "Kommentar (optional)",
         "comment_placeholder": "Hinweise für das Projektteam (sichtbar, wo Projektdetails angezeigt werden)",
-        "save_rating_button": "Bewertung speichern"
+        "confirm_button": "Bestätigen"
       },
       "add_dialog": {
         "title": "Projekt hinzufügen",
@@ -1707,6 +1726,34 @@
       }
     }
   },
+  "manageProjects": {
+    "headline": "Projekte",
+    "search_placeholder": "Projekte suchen",
+    "filter": {
+      "program_label": "Programm",
+      "all_programs": "Alle Programme",
+      "course_group_label": "Kursgruppe",
+      "all_course_groups": "Alle Kursgruppen"
+    },
+    "table": {
+      "title": "Titel",
+      "authors": "Autor:innen",
+      "no_authors": "Keine Autor:innen",
+      "program": "Programm / Kurs",
+      "published": "Veröffentlicht",
+      "not_published": "Nicht veröffentlicht"
+    },
+    "actions": {
+      "publish": "Veröffentlichen",
+      "unpublish": "Zurückziehen",
+      "publish_blocked_incomplete": "Bitte Projekttyp und Dokumentationsanleitung festlegen, bevor dieses Projekt veröffentlicht werden kann."
+    },
+    "notifications": {
+      "publish_success": "Projekt veröffentlicht",
+      "unpublish_success": "Projekt zurückgezogen",
+      "action_failed": "Die Aktion konnte nicht abgeschlossen werden. Bitte erneut versuchen."
+    }
+  },
   "managePrograms": {
     "headline": "Programme",
     "table_header": {
@@ -1876,9 +1923,11 @@
     "super_admin_label": "Super-Admin",
     "deletion_confirmation_question": "Bist du sicher, dass du die Administrationsrechte von {firstName} {lastName} für die Organisation {organization} löschen möchtest?",
     "is_super_admin": "Ist Super-Admin",
+    "capabilities_heading": "Berechtigungen",
     "can_manage_events": "Kann Events verwalten",
     "can_manage_courses": "Kann Kurse verwalten",
     "can_manage_degrees": "Kann Degrees verwalten",
+    "can_manage_jobs": "Kann Stellenangebote verwalten",
     "can_manage_users_and_settings": "Kann Benutzer und Einstellungen verwalten",
     "error_loading_admin_users": "Fehler beim Laden der Admin-Benutzer.",
     "add_admin_button": "Admin hinzufügen",
@@ -2030,6 +2079,81 @@
       "text_en": "Text (Englisch)",
       "preview": "Vorschau",
       "generic_help": "Dieser Text wird Teilnehmenden im Onboarding angezeigt, wenn der entsprechende Registrierungstyp ausgewählt ist."
+    },
+    "project_groups": {
+      "label": "Projektgruppen",
+      "help_text": "Lege fest, welche Projektgruppen es gibt. Ordne Projekte diesen Gruppen zu und wähle sie aus, um einen Projekt-Slider zusammenzustellen.",
+      "add_placeholder": "Name der neuen Projektgruppe",
+      "add_button": "Hinzufügen",
+      "id_label": "ID",
+      "delete": "Projektgruppe löschen",
+      "delete_disabled_in_use": "Diese Gruppe ist noch mit Projekten verbunden und kann nicht gelöscht werden.",
+      "error_duplicate": "Eine Projektgruppe mit diesem Namen existiert bereits.",
+      "error_add": "Die Projektgruppe konnte nicht erstellt werden.",
+      "error_delete": "Die Projektgruppe konnte nicht gelöscht werden.",
+      "error_reorder": "Die Reihenfolge konnte nicht aktualisiert werden.",
+      "loading": "Lädt...",
+      "error_loading": "Die Projektgruppen konnten nicht geladen werden."
+    },
+    "project_sliders": {
+      "label": "Projekt-Slider",
+      "help_text": "Erstelle Projekt-Slider für die Startseite. Jeder Slider zeigt veröffentlichte Projekte und offene Vorlagen. Wähle Kursgruppen und/oder Projektgruppen als Quelle aus oder lasse die Auswahl leer, um alle Projekte zu zeigen. Slider werden zusammen mit den Kursgruppen oben sortiert.",
+      "add_placeholder": "Titel des neuen Projekt-Sliders",
+      "add_button": "Slider hinzufügen",
+      "id_label": "ID",
+      "delete": "Projekt-Slider löschen",
+      "source_course_groups": "Kursgruppen",
+      "source_project_groups": "Projektgruppen",
+      "no_selection_hint": "Keine Gruppen ausgewählt — zeigt alle Projekte.",
+      "error_add": "Der Projekt-Slider konnte nicht erstellt werden.",
+      "error_delete": "Der Projekt-Slider konnte nicht gelöscht werden.",
+      "error_save": "Die Auswahl konnte nicht gespeichert werden.",
+      "loading": "Lädt...",
+      "error_loading": "Die Projekt-Slider konnten nicht geladen werden."
+    },
+    "job_sliders": {
+      "label": "Job-Slider",
+      "help_text": "Erstelle Job-Slider für die Startseite. Jeder Slider zeigt veröffentlichte StuJo-Stellenangebote. Wähle die anzuzeigenden Job-Kategorien aus oder lasse die Auswahl leer, um alle veröffentlichten Stellenangebote zu zeigen. Slider werden zusammen mit den Kursgruppen oben sortiert.",
+      "add_placeholder": "Titel des neuen Job-Sliders",
+      "add_button": "Slider hinzufügen",
+      "id_label": "ID",
+      "delete": "Job-Slider löschen",
+      "source_job_types": "Job-Kategorien",
+      "no_selection_hint": "Keine Job-Kategorien ausgewählt — zeigt alle veröffentlichten Stellenangebote.",
+      "error_add": "Der Job-Slider konnte nicht erstellt werden.",
+      "error_delete": "Der Job-Slider konnte nicht gelöscht werden.",
+      "error_save": "Die Auswahl konnte nicht gespeichert werden.",
+      "loading": "Lädt...",
+      "error_loading": "Die Job-Slider konnten nicht geladen werden."
+    },
+    "badges": {
+      "section_label": "Badges",
+      "section_help": "Lege wiederverwendbare Badges (z. B. Auszeichnungen) fest, die Projekten zugeordnet werden können. Titel, Beschreibung und Icon werden hier einmal gepflegt und überall automatisch angezeigt.",
+      "add_button": "Badge hinzufügen",
+      "column": {
+        "icon": "Icon",
+        "title": "Titel",
+        "awards": "Vergeben",
+        "updated": "Zuletzt geändert",
+        "description": "Beschreibung",
+        "order": "Reihenfolge"
+      },
+      "description_placeholder": "Wofür dieses Badge steht",
+      "icon_placeholder": "z. B. trophy",
+      "icon_help": "Optionaler lucide-Icon-Name. Leer lassen, um das Standard-Icon zu verwenden.",
+      "add_dialog": {
+        "title": "Badge hinzufügen",
+        "submit": "Erstellen",
+        "title_label": "Titel",
+        "title_placeholder": "z. B. AI Idea Award 2024"
+      },
+      "delete_dialog": {
+        "question": "Das Badge „{title}“ löschen? Es wird auch von {count} Projekt(en) entfernt, denen es verliehen wurde."
+      },
+      "error": {
+        "create_failed": "Das Badge konnte nicht erstellt werden.",
+        "duplicate_title": "Ein Badge mit diesem Titel existiert bereits."
+      }
     }
   },
   "manageExperts": {
@@ -2305,7 +2429,8 @@
       "REGISTRATION_CONFIRMED_PAID": "Bezahlung bestätigt",
       "APPLICATION_RECEIVED_PAID": "Bewerbung erhalten (kostenpflichtig)",
       "USER_CREATED": "Benutzer erstellt",
-      "ORGANIZER_ADDED": "Organisator hinzugefügt"
+      "ORGANIZER_ADDED": "Organisator hinzugefügt",
+      "WAITLIST_NOTICE": "Wartelisten-Benachrichtigung"
     },
     "placeholders": {
       "subject": "E-Mail-Betreff eingeben...",
@@ -2332,7 +2457,8 @@
       "APPLICATION_RECEIVED_PAID": "Gesendet, wenn eine Bewerbung für einen kostenpflichtigen Kurs eingegangen ist",
       "SESSION_REMINDER": "Gesendet vor Beginn der Sitzungen (24h, 1h, 15min vorher)",
       "USER_CREATED": "Gesendet, wenn ein neues Benutzerkonto erstellt wird",
-      "ORGANIZER_ADDED": "Gesendet, wenn ein Benutzer als Organisator zu einem Kurs oder Event hinzugefügt wird"
+      "ORGANIZER_ADDED": "Gesendet, wenn ein Benutzer als Organisator zu einem Kurs oder Event hinzugefügt wird",
+      "WAITLIST_NOTICE": "Gesendet, wenn ein Benutzer auf die Warteliste kommt, weil der Kurs voll ist"
     },
     "delete_confirmation": "Bist du sicher, dass du die E-Mail-Vorlage '{title}' löschen möchtest?",
     "unknown_trigger": "Unbekannter Auslöser-Typ",
@@ -2472,6 +2598,14 @@
         "access": {
           "label": "Zugriff & Rollen",
           "description": "Admin-Nutzer und Organisationsrollen"
+        },
+        "badges": {
+          "label": "Badges",
+          "description": "Wiederverwendbare Projekt-Badges und Auszeichnungen"
+        },
+        "jobboerse": {
+          "label": "Jobbörse (StuJo)",
+          "description": "Stellenangebote moderieren, Portale, Preise und Kontingente verwalten"
         }
       }
     },
@@ -2504,6 +2638,117 @@
     "access": {
       "superadmin_only": "Nur Super-Admin",
       "coming_soon": "Bald verfügbar"
+    }
+  },
+  "project": {
+    "not_found": "Projekt nicht gefunden",
+    "status": {
+      "PUBLISHED": "Veröffentlicht"
+    },
+    "tile": {
+      "template_eyebrow": "Offene Projektvorlage",
+      "mentored_by": "Betreut von {name}"
+    },
+    "cta": {
+      "apply_for_course": "Für Kurs bewerben",
+      "view_and_join": "Ansehen & beitreten",
+      "apply_to_join": "Zum Mitmachen bewerben",
+      "view_course": "Kurs ansehen"
+    },
+    "viewing_from": "Angesehen aus {course}",
+    "about": {
+      "title": "Über dieses Projekt"
+    },
+    "stats": {
+      "team_members": "Teammitglieder",
+      "submitted": "Eingereicht"
+    },
+    "similar": {
+      "title": "Ähnliche Projekte"
+    },
+    "description": {
+      "title": "Beschreibung"
+    },
+    "sidebar": {
+      "documentation": "Dokumentation ansehen",
+      "presentation": "Präsentation ansehen",
+      "demo": "Live-Demo besuchen",
+      "team": "Team",
+      "mentor": "Mentor:in"
+    },
+    "course_card": {
+      "eyebrow": "Teil des Kurses",
+      "go_to_course": "Zum Kurs"
+    },
+    "enroll": {
+      "title": "Zum Mitmachen anmelden",
+      "hint": "Dieses Projekt ist nur im Rahmen des Kurses {course} zugänglich. Bewirb dich zuerst für den Kurs und tritt dem Projekt dann über die Kursseite bei.",
+      "applications_until": "Bewerbung bis {date}"
+    },
+    "join": {
+      "title": "Diesem Projekt beitreten"
+    },
+    "course_section": {
+      "open_templates": "Offene Projektvorlagen",
+      "past_projects": "Projekte aus vergangenen Kursen"
+    },
+    "submitted_on": "Eingereicht {date}",
+    "load_error": "Dieses Projekt konnte nicht geladen werden. Bitte versuche es später erneut."
+  },
+  "job": {
+    "published_on": "Eingestellt {date}",
+    "type": {
+      "MINIJOB": "Minijobs",
+      "WORKING_STUDENT": "Studentenjobs",
+      "INTERNSHIP": "Praktika",
+      "THESIS": "Abschlussarbeiten",
+      "PERMANENT": "Festanstellungen",
+      "TRAINEE": "Trainees",
+      "STATE_RECOGNITION_INTERNSHIP": "Praktika für die staatliche Anerkennung"
+    },
+    "region": {
+      "FLENSBURG": "Flensburg",
+      "KIEL": "Kiel Region",
+      "SCHLESWIG_HOLSTEIN_HAMBURG": "Schleswig-Holstein und Hamburg",
+      "GERMANY": "Deutschland",
+      "DENMARK": "Dänemark",
+      "ABROAD": "Sonstiges Ausland"
+    },
+    "occupation": {
+      "ADMINISTRATION": "Administration und Sachbearbeitung",
+      "EDUCATION_TRAINING": "Aus- und Weiterbildung",
+      "BANKING_INSURANCE": "Banken, Versicherungen und Finanzdienstleistungen",
+      "CUSTOMER_SERVICE": "Customer Service und Kundenbetreuung",
+      "DESIGN_ARCHITECTURE": "Design, Gestaltung und Architektur",
+      "PURCHASING_LOGISTICS": "Einkauf, Transport und Logistik",
+      "MANUFACTURING_CONSTRUCTION": "Fertigung, Bau und Handwerk",
+      "ACCOUNTING": "Finanz- und Rechnungswesen",
+      "RESEARCH_SCIENCE": "Forschung, Entwicklung und Wissenschaft",
+      "HEALTH_SOCIAL": "Gesundheit, Medizin und Soziales",
+      "HOSPITALITY": "Hotel und Gastronomie",
+      "ENGINEERING": "Ingenieurwesen und technische Berufe",
+      "MAINTENANCE": "Instandhaltung",
+      "IT_TELECOMMUNICATIONS": "IT und Telekommunikation",
+      "ARTS_CULTURE": "Kunst und Kultur",
+      "AGRICULTURE_ENVIRONMENT": "Land-, Forst-, Fischwirtschaft und Umwelt",
+      "MARKETING_ADVERTISING": "Marketing und Werbung",
+      "PUBLIC_SERVICE": "Öffentlicher Dienst und Verbände",
+      "HUMAN_RESOURCES": "Personalwesen",
+      "PRODUCTION": "Produktion",
+      "PROJECT_MANAGEMENT": "Projektmanagement",
+      "QUALITY_MANAGEMENT": "Qualitätswesen",
+      "LEGAL": "Recht",
+      "MEDIA_EDITORIAL": "Redaktion, Medien und Information",
+      "SECURITY_CIVIL_PROTECTION": "Sicherheit und Zivilschutz",
+      "MANAGEMENT": "Unternehmensführung / Geschäftsleitung",
+      "SALES_RETAIL": "Vertrieb und Handel",
+      "TOURISM": "Tourismus",
+      "EVENT_MANAGEMENT": "Event Management",
+      "CONSULTING": "Unternehmensberatung",
+      "REAL_ESTATE": "Immobilien",
+      "SOCIAL_MEDIA": "Social Media",
+      "SOCIAL_PEDAGOGY": "Sozialpädagogik",
+      "OTHER": "Sonstiges Berufsfeld"
     }
   }
 }

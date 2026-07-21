@@ -20,6 +20,7 @@ import {
   UPDATE_PROJECT_AUTHOR_PARTICIPATION_STATUS,
   SUBMIT_PROJECT,
   DELETE_PROJECT_AUTHOR,
+  INSERT_PROJECT_CONSENT_EVENT,
 } from '../../../../queries/project';
 import FileUploadField from '../../../inputs/FileUploadField';
 import {
@@ -51,11 +52,12 @@ import {
   MANDATORY_INCOMPLETE_HIGHLIGHT_CLASS,
 } from './projectMandatory';
 import ManageRequestsDialog from './ManageRequestsDialog';
+import PublicationConsentField from './PublicationConsentField';
 import ProjectPreviewLayout from './ProjectPreviewLayout';
 import ProjectFormFieldSection from './ProjectFormFieldSection';
 import ProjectSubmissionDeadlineBelowTitle from './ProjectSubmissionDeadlineBelowTitle';
 import { ProjectRow } from './types';
-import { PROJECT_FALLBACK_TITLE } from './projectDefaults';
+import { PROJECT_FALLBACK_TITLE, PROJECT_TAGLINE_MAX_LENGTH } from './projectDefaults';
 /** Extensions only — MIME variants are derived for validation; avoids raw MIME labels in the UI. */
 const PROJECT_DOCUMENTATION_ACCEPT = '.pdf,.doc,.docx,.odt';
 const PROJECT_PRESENTATION_ACCEPT = '.pdf,.ppt,.pptx,.odp';
@@ -108,6 +110,10 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
   const [submitProject, { loading: submitting }] = useRoleMutation(SUBMIT_PROJECT, {
     refetchQueries,
   });
+  const [insertConsentEvent, { loading: consentLoading }] = useRoleMutation(
+    INSERT_PROJECT_CONSENT_EVENT,
+    { refetchQueries }
+  );
   const [updateAuthorParticipationStatus] = useRoleMutation(
     UPDATE_PROJECT_AUTHOR_PARTICIPATION_STATUS
   );
@@ -215,6 +221,11 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
     project.status === ProjectStatus_enum.ONGOING;
 
   const isSubmitted = project.status === ProjectStatus_enum.SUBMITTED;
+  // Publication consent only matters once a project has actually been submitted.
+  const isPostSubmission =
+    project.status === ProjectStatus_enum.SUBMITTED ||
+    project.status === ProjectStatus_enum.COMPLETED ||
+    project.status === ProjectStatus_enum.PUBLISHED;
   const effectiveSubmissionDeadlineIso = useMemo(
     () =>
       getEffectiveProjectSubmissionDeadlineIso(
@@ -242,6 +253,7 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
   const canEditFields = isContentEditable && !isDeadlinePassed;
 
   const isOnlineCourse = isOnlineCourseProject(project);
+  const consentVariant = acceptedAuthors.length > 1 ? 'team' : 'solo';
 
   /** Online-course projects: metadata comes from the template; only documentation etc. remain editable. */
   const canEditProjectMetadata = canEditFields && !isOnlineCourse;
@@ -263,11 +275,12 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
     project.status === ProjectStatus_enum.ONGOING && Boolean(project.submittedAt);
 
   const handleSubmitConfirm = useCallback(
-    async (excludedAuthorIds: number[]) => {
+    async (excludedAuthorIds: number[], consentGranted: boolean) => {
       setSubmitInProgress(true);
       // Track which co-authors we actually moved to EXCLUDED so we can roll
-      // them back if a later step fails (these mutations are not in one tx).
+      // them back if the submission itself fails (these mutations are not in one tx).
       const applied: number[] = [];
+      let submitted = false;
       try {
         // Mark unchecked co-authors EXCLUDED first (while still an ACCEPTED
         // author of an ONGOING project, which the Hasura permission requires),
@@ -284,27 +297,43 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
         await submitProject({
           variables: { itemId: project.id },
         });
+        submitted = true;
+        if (consentGranted) {
+          // Consent insertion is best-effort: a failure here must NOT roll back
+          // the exclusions — the project is already SUBMITTED at this point.
+          try {
+            await insertConsentEvent({
+              variables: {
+                projectId: project.id,
+                eventType: 'granted',
+                termsVersion: 'v1',
+              },
+            });
+          } catch (err) {
+            onActionError(err instanceof Error ? err.message : t('projects.action_failed'));
+          }
+        }
         setSubmitDialogOpen(false);
       } catch (err) {
-        // Submission (or one of the exclusions) failed partway. Restore the
-        // co-authors we already excluded back to ACCEPTED so we never leave a
-        // team member excluded on a project that was not actually submitted.
-        await Promise.all(
-          applied.map((authorId) =>
-            updateAuthorParticipationStatus({
-              variables: {
-                id: authorId,
-                value: ProjectParticipationStatus_enum.ACCEPTED,
-              },
-            }).catch(() => undefined)
-          )
-        );
+        if (!submitted) {
+          // Restore co-authors only when the submission itself never went through.
+          await Promise.all(
+            applied.map((authorId) =>
+              updateAuthorParticipationStatus({
+                variables: {
+                  id: authorId,
+                  value: ProjectParticipationStatus_enum.ACCEPTED,
+                },
+              }).catch(() => undefined)
+            )
+          );
+        }
         onActionError(err instanceof Error ? err.message : t('projects.action_failed'));
       } finally {
         setSubmitInProgress(false);
       }
     },
-    [updateAuthorParticipationStatus, submitProject, project.id, onActionError, t]
+    [updateAuthorParticipationStatus, submitProject, insertConsentEvent, project.id, onActionError, t]
   );
 
   const handleLeaveConfirm = useCallback(async () => {
@@ -374,6 +403,26 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
       )
     : null;
 
+  const latestConsentEvent = project.ProjectConsentEvents?.[0] ?? null;
+  const publicationConsented = latestConsentEvent?.eventType === 'granted';
+
+  const handleConsentToggle = useCallback(
+    async (granted: boolean) => {
+      try {
+        await insertConsentEvent({
+          variables: {
+            projectId: project.id,
+            eventType: granted ? 'granted' : 'withdrawn',
+            termsVersion: 'v1',
+          },
+        });
+      } catch (err) {
+        onActionError(err instanceof Error ? err.message : t('projects.action_failed'));
+      }
+    },
+    [insertConsentEvent, project.id, onActionError, t]
+  );
+
   const acceptingParticipantsCheckbox =
     project.status === ProjectStatus_enum.PROPOSED ? (
       <CheckboxSelector
@@ -415,7 +464,12 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
                 <h4 className="text-xl font-semibold text-label-primary min-w-0 break-words">
                   {project.title}
                 </h4>
-                <StatusChip status={project.status} />
+                <StatusChip
+                  status={project.status}
+                  rating={project.rating}
+                  ratingComment={project.ratingComment}
+                  suggestedForPublication={project.suggestedForPublication}
+                />
               </div>
             }
           />
@@ -609,12 +663,22 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
                     </div>
                   )}
                 </div>
-                <StatusChip status={project.status} />
+                <StatusChip
+                  status={project.status}
+                  rating={project.rating}
+                  ratingComment={project.ratingComment}
+                  suggestedForPublication={project.suggestedForPublication}
+                />
               </div>
             ) : (
               <div className="flex flex-wrap items-center gap-2 mb-1">
                 <h4 className="text-xl font-semibold text-label-primary min-w-0 break-words">{project.title}</h4>
-                <StatusChip status={project.status} />
+                <StatusChip
+                  status={project.status}
+                  rating={project.rating}
+                  ratingComment={project.ratingComment}
+                  suggestedForPublication={project.suggestedForPublication}
+                />
               </div>
             )
           }
@@ -663,7 +727,7 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
                     value={project.tagline ?? ''}
                     updateValueMutation={UPDATE_PROJECT_TAGLINE}
                     refetchQueries={refetchQueries}
-                    maxLength={400}
+                    maxLength={PROJECT_TAGLINE_MAX_LENGTH}
                     showCharacterCount={false}
                     className="!mb-0 border-transparent bg-transparent [&>div]:!px-0"
                   />
@@ -798,6 +862,41 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
         </div>
       ) : null}
 
+      {isPostSubmission && !isOnlineCourse ? (
+      <div className="border-t border-border-primary pt-4 space-y-2">
+        <p className="text-sm font-semibold text-label-primary">
+          {t('projects.publication_consent.heading')}
+        </p>
+        {latestConsentEvent ? (
+          <p className="text-xs text-label-secondary">
+            {publicationConsented
+              ? t('projects.publication_consent.status_granted', {
+                  name: makeFullName(
+                    latestConsentEvent.ActorUser?.firstName ?? '',
+                    latestConsentEvent.ActorUser?.lastName ?? ''
+                  ) || tCommon('unknown_user'),
+                  date: formattedDateWithTime(new Date(latestConsentEvent.created_at), locale),
+                })
+              : t('projects.publication_consent.status_withdrawn', {
+                  name: makeFullName(
+                    latestConsentEvent.ActorUser?.firstName ?? '',
+                    latestConsentEvent.ActorUser?.lastName ?? ''
+                  ) || tCommon('unknown_user'),
+                  date: formattedDateWithTime(new Date(latestConsentEvent.created_at), locale),
+                })}
+          </p>
+        ) : null}
+        {myAuthorRow?.participationStatus === ProjectParticipationStatus_enum.ACCEPTED ? (
+          <PublicationConsentField
+            checked={publicationConsented}
+            onChange={handleConsentToggle}
+            variant={consentVariant}
+            disabled={consentLoading}
+          />
+        ) : null}
+      </div>
+      ) : null}
+
       <div className="border-t border-border-primary pt-4">
         <div className="flex flex-wrap gap-2">
           {canLeaveProject ? (
@@ -833,6 +932,7 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
         onConfirm={handleSubmitConfirm}
         loading={submitting || submitInProgress}
         authors={submitAuthorOptions}
+        showPublicationConsent={!isOnlineCourse}
       />
 
       <RequestProjectReviewDialog

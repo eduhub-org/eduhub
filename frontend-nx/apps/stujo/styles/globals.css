@@ -1,0 +1,702 @@
+/* StuJo design port — tokens and component styles taken 1:1 from the live
+   Rails app (app/assets/stylesheets/stujo.scss, partials/). Branding colors
+   can still be overridden per portal via AppSettings (Layout injects the
+   CSS variables). Live values: pink #A71580, green #ACCA23, grey #646363,
+   gradient #4B0135 → #A71580 → #4B0135. */
+
+:root {
+  --stujo-primary: #a71580;
+  --stujo-secondary: #acca23;
+  --stujo-grey: #646363;
+  --stujo-gradient-dark: #4b0135;
+  --stujo-gradient: linear-gradient(
+    to right,
+    var(--stujo-gradient-dark),
+    var(--stujo-primary),
+    var(--stujo-gradient-dark)
+  );
+  --stujo-text: #333333;
+  --stujo-bg: #ffffff;
+  --stujo-muted: #646363;
+  --stujo-border: #dedad5;
+  --stujo-divider: #737373;
+  --stujo-error: #ed2507;
+  /* Lato is declared like on the live site; its webfont 404s there too, so
+     the effective rendering is the same fallback stack. */
+  --stujo-font: Lato, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  color: var(--stujo-text);
+  background: var(--stujo-bg);
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.4286;
+}
+
+/* Live heading scale (partials/_objects.scss) */
+h1 {
+  color: var(--stujo-primary);
+  font-weight: bold;
+  font-size: 2.6em;
+}
+h2 {
+  color: var(--stujo-primary);
+  font-weight: bold;
+  font-size: 2.3em;
+}
+h3 {
+  color: var(--stujo-primary);
+  font-weight: bold;
+  font-size: 1.8em;
+}
+h4 {
+  color: var(--stujo-grey);
+  font-weight: normal;
+  font-size: 1.4em;
+}
+h5 {
+  color: var(--stujo-grey);
+  font-weight: bold;
+  font-size: 1.2em;
+}
+h6 {
+  color: var(--stujo-grey);
+  font-weight: bold;
+  font-size: 0.9em;
+}
+
+a {
+  color: var(--stujo-grey);
+  text-decoration: none;
+}
+a:hover,
+a:focus {
+  color: var(--stujo-primary);
+  text-decoration: none;
+}
+
+.stujo-container {
+  max-width: 1170px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* --- Header: gradient banner + green nav bar (partials/header/) --- */
+
+.stujo-header {
+  position: relative;
+  background: var(--stujo-gradient);
+  height: 15em;
+  overflow: hidden;
+}
+
+@media (min-width: 768px) {
+  .stujo-header {
+    height: 22em;
+  }
+}
+
+.stujo-header-diag {
+  position: absolute;
+  left: 0;
+  top: 0;
+  /* Span 70% of the header width so the white wedge crosses the top edge at
+     ~70% and purple covers the rest, matching the live stujo.net banner. The
+     PNG's diagonal angle already matches; anchoring left keeps the purple
+     starting far left. */
+  width: 70%;
+  pointer-events: none;
+}
+
+.stujo-header-logo {
+  position: absolute;
+  top: 1.5em;
+  left: 1.5em;
+  width: 13%;
+  max-width: 180px;
+  height: auto;
+  object-fit: contain;
+}
+
+.stujo-header-topnav {
+  position: absolute;
+  top: 1.2em;
+  right: 1.5em;
+  display: flex;
+  gap: 1.5rem;
+  font-family: var(--stujo-font);
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.stujo-header-topnav a {
+  color: #fff;
+}
+
+.stujo-header-topnav a:hover {
+  color: var(--stujo-secondary);
+}
+
+/* DE | EN switch (live: slider toggle in the upper-right header nav) */
+.stujo-lang-switch {
+  display: flex;
+  gap: 0.4rem;
+  color: #fff;
+}
+
+.stujo-lang-switch a {
+  opacity: 0.65;
+}
+
+.stujo-lang-switch a.stujo-lang--active,
+.stujo-lang-switch a:hover {
+  opacity: 1;
+  color: #fff;
+  text-decoration: underline;
+}
+
+.stujo-nav {
+  background: var(--stujo-secondary);
+}
+
+.stujo-nav-inner {
+  display: flex;
+  align-items: stretch;
+  flex-wrap: wrap;
+}
+
+.stujo-nav a {
+  display: flex;
+  align-items: center;
+  color: #fff;
+  font-family: var(--stujo-font);
+  font-size: 20px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 0.55em 1em;
+}
+
+.stujo-nav a:hover,
+.stujo-nav a.stujo-nav--active {
+  background: #fff;
+  color: var(--stujo-primary);
+}
+
+.stujo-nav-home img {
+  height: 1.4em;
+  display: block;
+}
+
+/* The home glyph is white — invert to pink instead of white so it stays
+   visible in the hover/active state. */
+.stujo-nav a.stujo-nav-home:hover,
+.stujo-nav a.stujo-nav-home.stujo-nav--active {
+  background: var(--stujo-primary);
+}
+
+/* --- Job list: dotted-rule rows (live /stellenangebote) --- */
+
+.stujo-job-row {
+  padding: 0.75rem 0;
+  border-bottom: 1px dotted var(--stujo-divider);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.stujo-job-row h3 {
+  margin: 0 0 0.15em;
+}
+
+.stujo-job-row h3 a {
+  color: var(--stujo-primary);
+}
+
+.stujo-job-row h3 a:hover {
+  color: var(--stujo-grey);
+}
+
+.stujo-job-row h4 {
+  margin: 0 0 0.1em;
+}
+
+.stujo-job-row h5 {
+  margin: 0;
+}
+
+.stujo-job-row--featured h3 a {
+  color: var(--stujo-secondary);
+}
+
+.stujo-badge {
+  display: inline-block;
+  background: #ececec;
+  border-radius: 0.25rem;
+  padding: 0.1rem 0.5rem;
+  font-size: 0.9em;
+  color: var(--stujo-grey);
+  margin-right: 0.5rem;
+}
+
+.stujo-muted {
+  color: var(--stujo-muted);
+  font-size: 0.95em;
+}
+
+/* --- Filter band: gradient background (partials/_filter.scss) --- */
+
+.stujo-filterband {
+  background: var(--stujo-gradient);
+  padding: 1.25rem;
+  margin: 1rem 0 1.5rem;
+}
+
+.stujo-filterbar {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+@media (max-width: 640px) {
+  .stujo-filterbar {
+    grid-template-columns: 1fr;
+  }
+}
+
+.stujo-filterbar select,
+.stujo-filterbar input {
+  width: 100%;
+  height: 34px;
+  padding: 0.3rem 0.6rem;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--stujo-text);
+  background: #fff;
+  border: 2px solid var(--stujo-border);
+  border-radius: 0;
+}
+
+.stujo-filterbar .stujo-filter-search {
+  display: flex;
+  gap: 0;
+}
+
+.stujo-filterbar .stujo-filter-search input {
+  flex: 1;
+}
+
+.stujo-filterbar .stujo-filter-search button {
+  height: 34px;
+  width: 44px;
+  border: none;
+  cursor: pointer;
+  background: var(--stujo-secondary);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+/* --- Landing (partials/_university_landing.scss) --- */
+
+.stujo-hero {
+  background: var(--stujo-gradient);
+  color: #fff;
+  text-align: center;
+  padding: 3rem 1.5rem;
+  font-family: var(--stujo-font);
+}
+
+.stujo-hero-claim {
+  margin: 0 0 0.5em;
+  color: var(--stujo-secondary);
+  font-size: 2.5em;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.stujo-hero-sub {
+  margin: 0 auto;
+  color: #fff;
+  font-size: 1.5em;
+  max-width: 46em;
+}
+
+.stujo-landing-cols {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: 2.5rem;
+  padding: 1.5rem 0;
+}
+
+@media (max-width: 768px) {
+  .stujo-landing-cols {
+    grid-template-columns: 1fr;
+  }
+}
+
+.stujo-landing-head {
+  color: var(--stujo-secondary);
+  font-weight: bold;
+  font-size: 2.3em;
+  font-family: var(--stujo-font);
+  margin: 0.5em 0;
+}
+
+/* --- Buttons (.stujo-submit on live) --- */
+
+.stujo-btn {
+  display: inline-block;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-family: var(--stujo-font);
+  font-weight: 400;
+  font-size: 18px;
+  text-decoration: none;
+  background: var(--stujo-secondary);
+  color: #fff;
+}
+
+.stujo-btn:hover {
+  color: #fff;
+  opacity: 0.9;
+}
+
+.stujo-btn--primary {
+  background: var(--stujo-secondary);
+  color: #fff;
+}
+
+.stujo-btn--accent {
+  background: var(--stujo-primary);
+  color: #fff;
+}
+
+.stujo-btn--ghost {
+  background: #fff;
+  color: var(--stujo-primary);
+  border: 2px solid var(--stujo-primary);
+}
+
+.stujo-btn--ghost:hover {
+  color: var(--stujo-primary);
+}
+
+.stujo-btn--small {
+  padding: 4px 10px;
+  font-size: 14px;
+}
+
+.stujo-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* 40x40 icon buttons with hover swap (live .button_pen) */
+.stujo-button-pen {
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  background-image: url('/icons/pen_off.png');
+  background-size: 100% auto;
+  background-repeat: no-repeat;
+  border: none;
+  cursor: pointer;
+}
+
+.stujo-button-pen:hover {
+  background-image: url('/icons/pen_on.png');
+}
+
+.stujo-notice {
+  background: #f5f9e4;
+  color: #5e7113;
+  border-radius: 4px;
+  padding: 0.75rem 1rem;
+  margin: 0.75rem 0;
+}
+
+.stujo-notice--error {
+  background: #f9e6e6;
+  color: var(--stujo-error);
+}
+
+/* --- Employer dashboard (Mein StuJo) --- */
+
+.stujo-dash-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.stujo-stats {
+  display: flex;
+  gap: 1rem;
+  margin: 1rem 0 1.5rem;
+}
+
+.stujo-stat {
+  flex: 1;
+  background: #f6f6f4;
+  border: 2px solid var(--stujo-border);
+  padding: 1rem;
+}
+
+.stujo-stat--accent {
+  background: #f5f9e4;
+}
+
+.stujo-stat-value {
+  font-size: 1.8em;
+  font-weight: bold;
+  color: var(--stujo-primary);
+}
+
+.stujo-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 1em;
+}
+
+.stujo-table th {
+  text-align: left;
+  font-size: 0.85em;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--stujo-grey);
+  border-bottom: 2px solid var(--stujo-border);
+  padding: 0.6rem 0.75rem;
+}
+
+.stujo-table td {
+  padding: 0.7rem 0.75rem;
+  border-bottom: 1px dotted var(--stujo-divider);
+}
+
+.stujo-table td a {
+  color: var(--stujo-primary);
+}
+
+.stujo-table td a:hover {
+  color: var(--stujo-grey);
+}
+
+.stujo-chip {
+  display: inline-block;
+  border-radius: 999px;
+  padding: 0.15rem 0.6rem;
+  font-size: 0.85em;
+  font-weight: 700;
+}
+
+.stujo-chip--green { background: #edf4d3; color: #5e7113; }
+.stujo-chip--red { background: #f3e3e3; color: #9a3b3b; }
+.stujo-chip--grey { background: #ececec; color: #646363; }
+.stujo-chip--yellow { background: #fdf3d7; color: #8a6d1a; }
+
+.stujo-steps {
+  display: flex;
+  gap: 1.5rem;
+  margin: 0.75rem 0 1.25rem;
+}
+
+.stujo-step {
+  color: var(--stujo-grey);
+  font-size: 1em;
+}
+
+.stujo-step--active {
+  color: var(--stujo-primary);
+  font-weight: 700;
+}
+
+.stujo-form,
+.stujo-preview {
+  max-width: 56rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.stujo-form-row {
+  display: flex;
+  gap: 1rem;
+}
+
+.stujo-form-row .stujo-field {
+  flex: 1;
+}
+
+.stujo-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 1em;
+  font-weight: 700;
+  color: var(--stujo-grey);
+}
+
+.stujo-field input,
+.stujo-field select,
+.stujo-field textarea {
+  font-family: inherit;
+  font-weight: 400;
+  font-size: 14px;
+  color: var(--stujo-text);
+  padding: 0.5rem 0.7rem;
+  border: 2px solid var(--stujo-border);
+  border-radius: 0;
+}
+
+.stujo-form-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+}
+
+.stujo-order-box {
+  border: 2px solid var(--stujo-border);
+  padding: 1.25rem;
+  max-width: 26rem;
+}
+
+.stujo-order-box h3 {
+  margin: 0 0 0.75rem;
+  font-size: 1.2em;
+}
+
+.stujo-order-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.2rem 0;
+}
+
+.stujo-order-row--total {
+  border-top: 1px dotted var(--stujo-divider);
+  margin-top: 0.5rem;
+  padding-top: 0.6rem;
+  font-weight: bold;
+}
+
+/* --- Job detail --- */
+
+.stujo-detail-grid {
+  display: grid;
+  grid-template-columns: auto 1fr 1fr;
+  gap: 2rem;
+  align-items: start;
+  margin: 1.5rem 0;
+}
+
+@media (max-width: 768px) {
+  .stujo-detail-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.stujo-detail-logo {
+  max-width: 180px;
+  max-height: 120px;
+  object-fit: contain;
+}
+
+.stujo-detail-list {
+  margin: 0;
+}
+
+.stujo-detail-list dt {
+  font-weight: bold;
+  color: var(--stujo-grey);
+  margin-top: 0.5em;
+}
+
+.stujo-detail-list dd {
+  margin: 0;
+}
+
+.stujo-pdf-embed {
+  width: 100%;
+  height: 1000px;
+  border: none;
+  margin: 1rem 0;
+}
+
+/* --- Footer: gradient, 4 columns (partials/_footer.scss) --- */
+
+.stujo-footer {
+  background: var(--stujo-gradient);
+  color: #fff;
+  font-size: 12px;
+  margin-top: 3rem;
+  padding: 2rem 0;
+}
+
+.stujo-footer-cols {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2rem;
+}
+
+@media (max-width: 900px) {
+  .stujo-footer-cols {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .stujo-footer-cols {
+    grid-template-columns: 1fr;
+  }
+}
+
+.stujo-footer h3 {
+  color: #fff;
+  font-size: 1.4em;
+  margin: 0 0 0.75em;
+}
+
+.stujo-footer a {
+  color: #fff;
+  display: block;
+  margin-bottom: 0.5em;
+}
+
+.stujo-footer a:hover {
+  color: var(--stujo-primary);
+  background: #fff;
+}
+
+.stujo-footer p {
+  margin: 0;
+  text-align: justify;
+}
+
+.stujo-footer-logo {
+  display: block;
+  width: 140px;
+  background: #fff;
+  padding: 4px;
+  margin-bottom: 0.6em;
+}
+
+/* --- Misc --- */
+
+.stujo-section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.75rem;
+}
+
+.stujo-section-head h2 {
+  margin: 0;
+}

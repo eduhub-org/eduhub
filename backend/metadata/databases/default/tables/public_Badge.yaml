@@ -1,0 +1,37 @@
+table:
+  name: Badge
+  schema: public
+array_relationships:
+  - name: ProjectBadges
+    using:
+      foreign_key_constraint_on:
+        column: badgeId
+        table:
+          name: ProjectBadge
+          schema: public
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - id
+        - title
+        - description
+        - icon
+        - created_at
+        - updated_at
+      # Only badges that tag at least one anonymously-visible project, mirroring
+      # ProjectGroupOption so organization-scoped badge definitions are not
+      # globally enumerable.
+      filter:
+        ProjectBadges:
+          Project:
+            _or:
+              - published:
+                  _eq: true
+              - _and:
+                  - status:
+                      _eq: PROPOSED
+                  - _not:
+                      ProjectAuthors:
+                        participationStatus:
+                          _eq: ACCEPTED

@@ -11,6 +11,9 @@ object_relationships:
   - name: CourseRegistrationType
     using:
       foreign_key_constraint_on: registrationType
+  - name: CourseSeries
+    using:
+      foreign_key_constraint_on: courseSeriesId
   - name: CourseStatus
     using:
       foreign_key_constraint_on: status
@@ -148,6 +151,7 @@ select_permissions:
         - currency
         - stripeProductId
         - stripePriceId
+        - courseSeriesId
       computed_fields:
         - activeParticipantCount
       filter:

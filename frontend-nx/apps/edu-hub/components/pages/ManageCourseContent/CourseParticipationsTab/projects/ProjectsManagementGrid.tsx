@@ -42,7 +42,7 @@ import {
   INSERT_PROJECT_MENTOR,
   DELETE_PROJECT_MENTOR,
   DELETE_PROJECT,
-  UPDATE_PROJECT_PUBLISH,
+  UPDATE_PROJECT_SUGGESTED_FOR_PUBLICATION,
   UPDATE_PROJECT_TYPE,
 } from '../../../../../queries/projectInstructor';
 import {
@@ -64,7 +64,9 @@ import {
   isExcludedAuthor,
 } from '../../../CourseContent/Projects/projectAuthors';
 import { translateErrorMessage } from '../../../../../helpers/errorHandling';
+import { PROJECT_TAGLINE_MAX_LENGTH } from '../../../CourseContent/Projects/projectDefaults';
 import StatusChip from '../../../CourseContent/Projects/StatusChip';
+import { isProjectTypeEditable, canManagePublicationSuggestion } from '../../../CourseContent/Projects/projectStatusDisplay';
 import ProjectPreviewLayout from '../../../CourseContent/Projects/ProjectPreviewLayout';
 import ProjectFormFieldSection from '../../../CourseContent/Projects/ProjectFormFieldSection';
 import ProjectSubmissionDeadlineBelowTitle from '../../../CourseContent/Projects/ProjectSubmissionDeadlineBelowTitle';
@@ -128,9 +130,12 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
   const [deleteMentor] = useRoleMutation(DELETE_PROJECT_MENTOR, {
     refetchQueries: REFETCH_QUERIES,
   });
-  const [publishProject] = useRoleMutation(UPDATE_PROJECT_PUBLISH, {
-    refetchQueries: REFETCH_QUERIES,
-  });
+  const [updateSuggestedForPublication] = useRoleMutation(
+    UPDATE_PROJECT_SUGGESTED_FOR_PUBLICATION,
+    {
+      refetchQueries: REFETCH_QUERIES,
+    }
+  );
   const [deleteProject, { loading: deleteProjectLoading }] = useRoleMutation(DELETE_PROJECT, {
     refetchQueries: REFETCH_QUERIES,
   });
@@ -284,19 +289,22 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
     [deleteMentor, tCommon]
   );
 
-  const handlePublish = useCallback(
-    async (id: number) => {
+  const handleTogglePublicationSuggestion = useCallback(
+    async (id: number, suggested: boolean) => {
       try {
-        await publishProject({ variables: { itemId: id } });
+        await updateSuggestedForPublication({
+          variables: { itemId: id, suggested },
+        });
       } catch (err) {
         setErrorMessage(err instanceof Error ? err.message : tCommon('error'));
       }
     },
-    [publishProject, tCommon]
+    [updateSuggestedForPublication, tCommon]
   );
 
   const handleSetProjectType = useCallback(
-    async (projectId: number, value: string | null) => {
+    async (projectId: number, value: string | null, status: ProjectStatus_enum) => {
+      if (!isProjectTypeEditable(status)) return;
       // Skip persistence while the checked deliverables match no catalog type.
       if (!value) return;
       try {
@@ -330,7 +338,14 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
         id: 'status',
         header: t('projects.table.status'),
         enableSorting: false,
-        cell: ({ row }) => <StatusChip status={row.original.status} />,
+        cell: ({ row }) => (
+          <StatusChip
+            status={row.original.status}
+            rating={row.original.rating}
+            ratingComment={row.original.ratingComment}
+            suggestedForPublication={row.original.suggestedForPublication}
+          />
+        ),
       },
       {
         id: 'title',
@@ -465,10 +480,27 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
               </Button>
             );
           }
-          if (project.status === ProjectStatus_enum.COMPLETED) {
+          if (canManagePublicationSuggestion(project.status)) {
+            if (project.suggestedForPublication) {
+              return (
+                <Button
+                  onClick={() =>
+                    handleTogglePublicationSuggestion(project.id, false)
+                  }
+                  className="w-full"
+                >
+                  {t('projects.actions.withdraw_publication_suggestion')}
+                </Button>
+              );
+            }
             return (
-              <Button onClick={() => handlePublish(project.id)} className="w-full">
-                {t('projects.actions.publish')}
+              <Button
+                onClick={() =>
+                  handleTogglePublicationSuggestion(project.id, true)
+                }
+                className="w-full"
+              >
+                {t('projects.actions.suggest_for_publication')}
               </Button>
             );
           }
@@ -478,7 +510,7 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
     ],
     [
       deleteProjectLoading,
-      handlePublish,
+      handleTogglePublicationSuggestion,
       projectTypesList,
       t,
       tCourse,
@@ -505,6 +537,7 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
         Boolean(row.presentationUrl?.trim()) ||
         Boolean(row.externalUrl?.trim());
       const showResourceLinks = showFullDetails || hasResourceUrl;
+      const canEditProjectType = isProjectTypeEditable(row.status);
 
       const authorMentorSection = (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 w-full">
@@ -677,6 +710,7 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
                   updateValueMutation={UPDATE_PROJECT_DOCUMENTATION_INSTRUCTION}
                   identifierVariables={{ itemId: row.id }}
                   refetchQueries={REFETCH_QUERIES}
+                  disabled={!canEditProjectType}
                 />
               </div>
               <InstructionDownloadButton url={selectedInstructionUrl} />
@@ -733,7 +767,12 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
                           </div>
                         )}
                       </div>
-                      <StatusChip status={row.status} />
+                      <StatusChip
+                        status={row.status}
+                        rating={row.rating}
+                        ratingComment={row.ratingComment}
+                        suggestedForPublication={row.suggestedForPublication}
+                      />
                     </div>
                   }
                   coverSlot={
@@ -777,7 +816,7 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
                           value={row.tagline ?? ''}
                           updateValueMutation={UPDATE_PROJECT_TAGLINE}
                           refetchQueries={REFETCH_QUERIES}
-                          maxLength={400}
+                          maxLength={PROJECT_TAGLINE_MAX_LENGTH}
                           showCharacterCount={false}
                           className="!mb-0 border-transparent bg-transparent [&>div]:!px-0"
                         />
@@ -823,8 +862,16 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
               <ProjectFormatSelector
                 projectTypes={projectTypesList}
                 value={row.type ?? ''}
-                onChange={(typeValue) => handleSetProjectType(row.id, typeValue)}
+                onChange={(typeValue) =>
+                  handleSetProjectType(row.id, typeValue, row.status)
+                }
+                disabled={!canEditProjectType}
               />
+              {!canEditProjectType ? (
+                <p className="mt-2 text-xs text-label-secondary">
+                  {t('projects.expanded.type_locked_hint')}
+                </p>
+              ) : null}
             </div>
 
             {documentationInstructionSection ? (
@@ -857,8 +904,16 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
             <ProjectFormatSelector
               projectTypes={projectTypesList}
               value={row.type ?? ''}
-              onChange={(typeValue) => handleSetProjectType(row.id, typeValue)}
+              onChange={(typeValue) =>
+                handleSetProjectType(row.id, typeValue, row.status)
+              }
+              disabled={!canEditProjectType}
             />
+            {!canEditProjectType ? (
+              <p className="mt-2 text-xs text-label-secondary">
+                {t('projects.expanded.type_locked_hint')}
+              </p>
+            ) : null}
           </div>
 
           {documentationInstructionSection ? (
@@ -866,27 +921,6 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
               {documentationInstructionSection}
             </div>
           ) : null}
-
-          {(row.rating != null || row.ratingComment?.trim()) && (
-            <div className="text-sm space-y-2 border-t border-border-primary pt-3">
-              <div className="flex flex-wrap gap-4">
-                {row.rating != null ? (
-                  <p>
-                    <span className="font-medium">{t('projects.expanded.rating')}: </span>
-                    {row.rating}
-                  </p>
-                ) : null}
-              </div>
-              {row.ratingComment?.trim() ? (
-                <p className="text-label-secondary whitespace-pre-line">
-                  <span className="font-medium text-label-primary">
-                    {t('projects.expanded.rating_comment_label')}:{' '}
-                  </span>
-                  {row.ratingComment.trim()}
-                </p>
-              ) : null}
-            </div>
-          )}
         </div>
       );
     },

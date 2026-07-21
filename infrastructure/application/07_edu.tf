@@ -92,6 +92,10 @@ resource "google_cloud_run_service" "eduhub" {
           value = var.matrix_element_client_url
         }
         env {
+          name  = "NEXT_PUBLIC_STUJO_URL"
+          value = "https://${local.stujo_domain}"
+        }
+        env {
           name = "GHOST_NEWSLETTER_CREDENTIALS_ENCRYPTION_KEY"
           value_from {
             secret_key_ref {

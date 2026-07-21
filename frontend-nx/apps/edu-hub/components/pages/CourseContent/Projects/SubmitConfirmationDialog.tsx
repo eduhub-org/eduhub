@@ -3,6 +3,7 @@ import { useTranslations } from 'next-intl';
 import { DialogShell } from '../../../common/dialogs/DialogShell';
 import { Button } from '../../../common/Button';
 import CheckboxSelector from '../../../inputs/CheckboxSelector';
+import PublicationConsentField from './PublicationConsentField';
 
 export interface SubmitAuthorOption {
   /** ProjectAuthor.id */
@@ -16,10 +17,12 @@ export interface SubmitAuthorOption {
 interface SubmitConfirmationDialogProps {
   open: boolean;
   onClose: () => void;
-  /** Receives the ProjectAuthor ids the submitter unchecked (to be EXCLUDED). */
-  onConfirm: (excludedAuthorIds: number[]) => void;
+  /** Receives the ProjectAuthor ids the submitter unchecked (to be EXCLUDED) and whether publication consent was granted. */
+  onConfirm: (excludedAuthorIds: number[], consentGranted: boolean) => void;
   loading?: boolean;
   authors: SubmitAuthorOption[];
+  /** Online-course projects do not offer publication consent. */
+  showPublicationConsent?: boolean;
 }
 
 const SubmitConfirmationDialog: FC<SubmitConfirmationDialogProps> = ({
@@ -28,16 +31,20 @@ const SubmitConfirmationDialog: FC<SubmitConfirmationDialogProps> = ({
   onConfirm,
   loading,
   authors,
+  showPublicationConsent = true,
 }) => {
   const t = useTranslations('course');
   const tCommon = useTranslations('common');
 
   // Default: everyone checked (contributed). Keyed by ProjectAuthor.id.
   const [checked, setChecked] = useState<Record<number, boolean>>({});
+  // Publication consent is opt-in (GDPR requires affirmative consent — unchecked by default).
+  const [consentGranted, setConsentGranted] = useState(false);
 
   useEffect(() => {
     if (open) {
       setChecked(Object.fromEntries(authors.map((a) => [a.id, true])));
+      setConsentGranted(false);
     }
   }, [open, authors]);
 
@@ -45,8 +52,10 @@ const SubmitConfirmationDialog: FC<SubmitConfirmationDialogProps> = ({
     const excludedAuthorIds = authors
       .filter((a) => !a.isSelf && checked[a.id] === false)
       .map((a) => a.id);
-    onConfirm(excludedAuthorIds);
+    onConfirm(excludedAuthorIds, showPublicationConsent ? consentGranted : false);
   };
+
+  const consentVariant = authors.length <= 1 ? 'solo' : 'team';
 
   return (
     <DialogShell
@@ -90,9 +99,23 @@ const SubmitConfirmationDialog: FC<SubmitConfirmationDialogProps> = ({
           </li>
         ))}
       </ul>
-      <p className="text-sm text-label-secondary">
+      <p className="mb-4 text-sm text-label-secondary">
         {t('projects.submit_dialog.body_irreversible')}
       </p>
+
+      {showPublicationConsent ? (
+      <div className="rounded border border-border-primary bg-bg-secondary/30 p-3 space-y-2">
+        <p className="text-sm font-semibold text-label-primary">
+          {t('projects.publication_consent.heading')}
+        </p>
+        <PublicationConsentField
+          checked={consentGranted}
+          onChange={setConsentGranted}
+          variant={consentVariant}
+          disabled={loading}
+        />
+      </div>
+      ) : null}
     </DialogShell>
   );
 };

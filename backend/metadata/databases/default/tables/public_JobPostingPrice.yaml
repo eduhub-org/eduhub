@@ -1,0 +1,46 @@
+table:
+  name: JobPostingPrice
+  schema: public
+object_relationships:
+  - name: JobPostingType
+    using:
+      foreign_key_constraint_on: jobPostingType
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - id
+        - jobPostingType
+        - price
+        - currency
+        - vatRate
+        - durationDays
+        - created_at
+        - updated_at
+      filter: {}
+  - role: user_access
+    permission:
+      columns:
+        - id
+        - jobPostingType
+        - price
+        - currency
+        - vatRate
+        - durationDays
+        - created_at
+        - updated_at
+      filter: {}
+  # Org admins additionally see the Stripe price reference used at checkout.
+  - role: org_admin_access
+    permission:
+      columns:
+        - id
+        - jobPostingType
+        - price
+        - currency
+        - vatRate
+        - durationDays
+        - stripePriceId
+        - created_at
+        - updated_at
+      filter: {}

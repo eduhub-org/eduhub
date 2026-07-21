@@ -42,6 +42,29 @@ insert_permissions:
         - projectId
         - updated_at
 select_permissions:
+  # Public: needed so logged-out visitors can read the course context of a
+  # publicly-visible project (course line on tiles, course card, group filters,
+  # past-courses-in-series). Mirrors the Project anonymous visibility rule.
+  - role: anonymous
+    permission:
+      columns:
+        - courseId
+        - created_at
+        - id
+        - projectId
+        - updated_at
+      filter:
+        Project:
+          _or:
+            - published:
+                _eq: true
+            - _and:
+                - status:
+                    _eq: PROPOSED
+                - _not:
+                    ProjectAuthors:
+                      participationStatus:
+                        _eq: ACCEPTED
   - role: instructor_access
     permission:
       columns:

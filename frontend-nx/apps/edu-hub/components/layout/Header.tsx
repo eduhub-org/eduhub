@@ -45,7 +45,7 @@ export const Header: FC = () => {
   };
 
   return (
-    <header className="w-full absolute top-0 left-0" style={{ backgroundColor: 'rgba(34, 34, 34, 0.5)' }}>
+    <header className="z-10 w-full absolute top-0 left-0" style={{ backgroundColor: 'rgba(34, 34, 34, 0.5)' }}>
       <div className="flex py-4 px-3 md:px-16 max-w-screen-xl w-full mx-auto justify-between">
         <div className="flex-grow w-full items-center">
           <Link href={`/`}>

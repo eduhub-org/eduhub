@@ -26,7 +26,10 @@ export const AddParticipantsForm: FC<AddParticipantsFormProps> = ({ courseId, on
   // GraphQL hooks
   const { data, loading, error } = useRoleQuery(USER_LIST);
   const [insertEnrollment] = useRoleMutation<UpdateEnrollment, UpdateEnrollmentVariables>(UPDATE_ENROLLMENT, {
-    refetchQueries: ['ManagedCourse'],
+    // The applications table is paged server-side via ManagedCourseApplications
+    // (not part of the ManagedCourse payload anymore), so it must be refetched
+    // explicitly for the new participants to appear without a reload.
+    refetchQueries: ['ManagedCourseApplications', 'ManagedCourse'],
   });
 
   // Memoized user list based on GraphQL query

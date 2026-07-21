@@ -130,6 +130,32 @@ export interface MyProjectByCourse_Project_ProjectMentors {
   User: MyProjectByCourse_Project_ProjectMentors_User;
 }
 
+export interface MyProjectByCourse_Project_ProjectConsentEvents_ActorUser {
+  __typename: "User";
+  id: any;
+  /**
+   * The user's first name
+   */
+  firstName: string;
+  /**
+   * The user's last name
+   */
+  lastName: string;
+}
+
+export interface MyProjectByCourse_Project_ProjectConsentEvents {
+  __typename: "ProjectConsentEvent";
+  id: number;
+  eventType: string;
+  actorUserId: any;
+  created_at: any;
+  termsVersion: string;
+  /**
+   * An object relationship
+   */
+  ActorUser: MyProjectByCourse_Project_ProjectConsentEvents_ActorUser;
+}
+
 export interface MyProjectByCourse_Project {
   __typename: "Project";
   id: number;
@@ -146,6 +172,10 @@ export interface MyProjectByCourse_Project {
   documentationInstructionId: number | null;
   status: ProjectStatus_enum;
   /**
+   * Showcase visibility flag: true means the project is publicly published (home sliders, public showcase). Orthogonal to lifecycle, which stays in "status".
+   */
+  published: boolean;
+  /**
    * FK to ProjectType.value. Required with documentationInstructionId before leaving PROPOSED (check constraint). Drives mandatory deliverables and workflow (e.g. ONLINE_COURSE template claim may insert ONGOING directly).
    */
   type: string | null;
@@ -154,6 +184,10 @@ export interface MyProjectByCourse_Project {
    * Optional comment from course staff or project mentor accompanying rating (UNRATED/PASSED/FAILED).
    */
   ratingComment: string | null;
+  /**
+   * Course staff flag: a completed project is suggested for showcase publication. Toggling this does not publish the project (status PUBLISHED is set separately).
+   */
+  suggestedForPublication: boolean;
   acceptingParticipants: boolean;
   organizationId: number | null;
   proposedByUserId: any;
@@ -200,6 +234,10 @@ export interface MyProjectByCourse_Project {
    * An array relationship
    */
   ProjectMentors: MyProjectByCourse_Project_ProjectMentors[];
+  /**
+   * An array relationship
+   */
+  ProjectConsentEvents: MyProjectByCourse_Project_ProjectConsentEvents[];
 }
 
 export interface MyProjectByCourse {

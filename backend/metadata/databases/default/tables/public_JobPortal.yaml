@@ -1,0 +1,50 @@
+table:
+  name: JobPortal
+  schema: public
+object_relationships:
+  - name: Organization
+    using:
+      foreign_key_constraint_on: organizationId
+  - name: AppSetting
+    using:
+      foreign_key_constraint_on: appName
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - id
+        - slug
+        - organizationId
+        - appName
+        - title
+        - contactEmail
+        - defaultRegion
+        - created_at
+        - updated_at
+      filter: {}
+  - role: user_access
+    permission:
+      columns:
+        - id
+        - slug
+        - organizationId
+        - appName
+        - title
+        - contactEmail
+        - defaultRegion
+        - created_at
+        - updated_at
+      filter: {}
+  - role: org_admin_access
+    permission:
+      columns:
+        - id
+        - slug
+        - organizationId
+        - appName
+        - title
+        - contactEmail
+        - defaultRegion
+        - created_at
+        - updated_at
+      filter: {}

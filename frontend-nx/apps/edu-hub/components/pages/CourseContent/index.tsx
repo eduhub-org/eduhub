@@ -16,6 +16,7 @@ import { ContentRow } from '../../common/ContentRow';
 import { PageBlock } from '../../common/PageBlock';
 import { DescriptionFields } from './DescriptionFields';
 import { FundingOrganizations } from './FundingOrganizations';
+import CourseProjectsSection from '../../common/TileSlider/CourseProjectsSection';
 import { InfoPanel } from './InfoPanel';
 import { useWeekdayStartAndEndString } from '../../../helpers/dateTimeHelpers';
 import { LearningGoals } from './LearningGoals';
@@ -291,6 +292,7 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
               </ContentRow>
               <DescriptionFields course={course} />
               <FundingOrganizations courseFundingOrganizations={course.CourseFundingOrganizations ?? []} />
+              <CourseProjectsSection courseId={id} />
             </div>
           </div>
         </div>

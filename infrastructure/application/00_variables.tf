@@ -8,6 +8,32 @@ locals {
   hasura_service_name     = "${var.hasura_service_name_root}${var.service_name_extension}"
   eduhub_service_name     = "${var.eduhub_service_name_root}${var.service_name_extension}"
   eduhub_api_service_name = "api-${local.eduhub_service_name}"
+  # StuJo job board frontend. With the default root this resolves to
+  # stujo.opencampus.sh (production, empty extension) and
+  # stujo-staging.opencampus.sh (staging); override via var.stujo_domain.
+  stujo_service_name = "${var.stujo_service_name_root}${var.service_name_extension}"
+  stujo_domain       = var.stujo_domain != "" ? var.stujo_domain : "${local.stujo_service_name}.opencampus.sh"
+
+  # Interim white-label StuJo portals. Each portal is served by its own tiny
+  # Cloud Run service (same image, scales to zero) so the load balancer
+  # url_mask can route <service>.opencampus.sh to it. The service sets
+  # APP_NAME, which apps/stujo/lib/portal.ts uses to resolve the portal
+  # branding without an AppSettings.domain match. This makes every portal
+  # testable under stujo-<portal>.opencampus.sh (production) and
+  # stujo-<portal>-staging.opencampus.sh (staging, via
+  # service_name_extension) before the real stujo.net domains are migrated.
+  #
+  # The map key is the portal appName and MUST exist in the AppSettings /
+  # JobPortal seed data (see backend/migrations .../insert_stujo_app_settings
+  # and .../create_table_public_JobPortal). The root "stujo" portal is served
+  # by the google_cloud_run_service.stujo resource, so it is not repeated here.
+  stujo_portal_app_names = ["stujo-cau", "stujo-haw-kiel", "stujo-flensburg"]
+  stujo_portals = {
+    for app_name in local.stujo_portal_app_names : app_name => {
+      service_name = "${app_name}${var.service_name_extension}"
+      domain       = "${app_name}${var.service_name_extension}.opencampus.sh"
+    }
+  }
 }
 
 ######
@@ -334,4 +360,33 @@ variable "ghost_newsletter_credentials_encryption_key" {
   description = "AES-256 key used to encrypt/decrypt Ghost newsletter API credentials at rest"
   type        = string
   sensitive   = true
+}
+
+######
+# StuJo Job Board Variables
+###
+variable "stujo_service_name_root" {
+  description = "Name for the Cloud Run service of the StuJo job board frontend (domain becomes <name><extension>.opencampus.sh unless stujo_domain is set)"
+  type        = string
+  default     = "stujo"
+}
+variable "stujo_domain" {
+  description = "Full domain for the StuJo frontend. Leave empty to fall back to stujo.opencampus.sh (production) / stujo-staging.opencampus.sh (staging via service_name_extension)."
+  type        = string
+  default     = ""
+}
+variable "stujo_admin_email" {
+  description = "Recipient of the StuJo admin notification mails (new job postings)"
+  type        = string
+  default     = ""
+}
+variable "stripe_tax_rate_id" {
+  description = "Optional override for the Stripe TaxRate id (19% exclusive) used for StuJo job posting checkouts. Leave empty to have publishJobPosting find-or-create the rate automatically; set it to pin a specific rate (e.g. one verified against the live account). Also created by the createStripeJobPostingPrices action."
+  type        = string
+  default     = ""
+}
+variable "stujo_seller_organization_id" {
+  description = "Organization.id that appears as seller on StuJo job posting invoices (defaults to the employer's organization when empty)"
+  type        = string
+  default     = ""
 }

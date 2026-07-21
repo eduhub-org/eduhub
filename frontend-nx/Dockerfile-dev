@@ -1,8 +1,12 @@
-FROM node:18-bullseye-slim
+FROM node:22-bullseye-slim
 
 RUN apt-get update && apt-get install -y socat && rm -rf /var/lib/apt/lists/*
 
 RUN corepack enable
+# Pre-fetch the pinned yarn version (package.json packageManager) at build
+# time so container startup never depends on repo.yarnpkg.com being
+# reachable from the compose network.
+RUN corepack prepare yarn@3.4.1 --activate
 
 USER node
 

@@ -109,9 +109,11 @@ describe('Sessions Component - Separator Logic', () => {
     expect(screen.getByText('Test Address 1')).toBeInTheDocument();
     expect(screen.getByText('Test Address 2')).toBeInTheDocument();
 
-    // Check that separators are present between addresses
-    // The separator should be " + " between the two addresses (with non-breaking space)
-    const separator = screen.getByText(' +\u00A0');
+    // Check that separators are present between addresses.
+    // The separator is " +\u00A0" (with a non-breaking space). Disable the
+    // default whitespace normalizer so the exact separator text is matched
+    // (otherwise RTL collapses it to "+" and the exact comparison fails).
+    const separator = screen.getByText(' +\u00A0', { normalizer: (text) => text });
     expect(separator).toBeInTheDocument();
   });
 
@@ -134,8 +136,12 @@ describe('Sessions Component - Separator Logic', () => {
     // Check that the address is rendered
     expect(screen.getByText('Test Address 1')).toBeInTheDocument();
 
-    // Check that no separator is present
-    expect(screen.queryByText(' +\u00A0')).not.toBeInTheDocument();
+    // Check that no separator is present. Use the same exact-text normalizer
+    // as the positive assertion so both checks compare the separator
+    // consistently (default RTL normalization would collapse " +\u00A0" to "+").
+    expect(
+      screen.queryByText(' +\u00A0', { normalizer: (text) => text })
+    ).not.toBeInTheDocument();
   });
 
   it('should handle empty SessionAddresses gracefully', () => {

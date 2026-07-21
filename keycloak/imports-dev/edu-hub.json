@@ -629,7 +629,7 @@
       "requiredActions" : [ ],
       "realmRoles" : [ "default-roles-edu-hub" ],
       "clientRoles" : {
-        "hasura" : [ "user" ]
+        "hasura" : [ "user", "org_admin" ]
       },
       "notBefore" : 0,
       "groups" : [ "defaults" ]
@@ -1216,7 +1216,8 @@
       "clientAuthenticatorType": "client-secret",
       "secret": "ySqpTw8DzM15qC4dDjLlhj21HK254lTz",
       "redirectUris": [
-        "http://localhost:5000/*"
+        "http://localhost:5000/*",
+        "http://localhost:5001/*"
       ],
       "webOrigins": [
         "+"

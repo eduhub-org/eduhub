@@ -26,6 +26,10 @@ insert_permissions:
         - updated_at
         - userId
 select_permissions:
+  # Mentors are public for any anonymously-visible project (a published showcase
+  # or an open PROPOSED template), so the mentor line renders on public template
+  # tiles and pages. Authors stay accepted-authors-of-published-only (see
+  # public_ProjectAuthor.yaml).
   - role: anonymous
     permission:
       columns:
@@ -36,8 +40,16 @@ select_permissions:
         - userId
       filter:
         Project:
-          status:
-            _eq: PUBLISHED
+          _or:
+            - published:
+                _eq: true
+            - _and:
+                - status:
+                    _eq: PROPOSED
+                - _not:
+                    ProjectAuthors:
+                      participationStatus:
+                        _eq: ACCEPTED
   - role: instructor_access
     permission:
       columns:

@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { FC } from 'react';
+import { FC, memo } from 'react';
 import { useTranslations } from 'next-intl';
 import { CourseList_Course } from '../../../queries/__generated__/CourseList';
 import { CoursesEnrolledByUser_Course } from '../../../queries/__generated__/CoursesEnrolledByUser';
@@ -19,7 +19,7 @@ interface TileProps {
   isManage: boolean;
 }
 
-export const Tile: FC<TileProps> = ({ course, isManage }) => {
+const TileComponent: FC<TileProps> = ({ course, isManage }) => {
   const t = useTranslations('common');
   const getWeekdayStartAndEndString = useWeekdayStartAndEndString();
   const showExtendedApplicationBanner = shouldShowExtendedApplicationBanner(
@@ -65,3 +65,5 @@ export const Tile: FC<TileProps> = ({ course, isManage }) => {
     </Link>
   );
 };
+
+export const Tile = memo(TileComponent);

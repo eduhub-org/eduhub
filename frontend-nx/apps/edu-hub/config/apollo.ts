@@ -34,7 +34,9 @@ const authLink = new ApolloLink((operation, forward) => {
 });
 
 export const client = new ApolloClient({
-  uri: process.env.NEXT_PUBLIC_API_URL,
+  // The transport URI is supplied by `httpLink` (createHttpLink) in the link
+  // chain below; a top-level `uri` alongside `link` is redundant and Apollo
+  // Client 3.14 warns against it.
   link: ApolloLink.from([authLink, httpLink]),
   cache: new InMemoryCache({
     typePolicies: {

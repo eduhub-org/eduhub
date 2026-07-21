@@ -7,7 +7,9 @@ from typing import Dict, Any, Callable
 from pythonFunctions.add_confirmed_user_to_mm import add_confirmed_user_to_mm
 from pythonFunctions.check_attendance import check_attendance
 from pythonFunctions.create_certificates import create_certificates
+from pythonFunctions.expire_job_postings import expire_job_postings
 from pythonFunctions.load_participation_data import load_participation_data
+from pythonFunctions.send_job_alerts import send_job_alerts
 from pythonFunctions.update_enrollment_locations import update_enrollment_locations
 
 # Initialize the logger level
@@ -21,7 +23,9 @@ PYTHON_FUNCTIONS: Dict[str, Callable] = {
     "add_confirmed_user_to_mm": add_confirmed_user_to_mm,
     "check_attendance": check_attendance,
     "create_certificates": create_certificates,
+    "expire_job_postings": expire_job_postings,
     "load_participation_data": load_participation_data,
+    "send_job_alerts": send_job_alerts,
     "update_enrollment_locations": update_enrollment_locations,
 }
 

@@ -41,12 +41,33 @@ array_relationships:
         table:
           name: ProjectAuthor
           schema: public
+  - name: ProjectBadges
+    using:
+      foreign_key_constraint_on:
+        column: projectId
+        table:
+          name: ProjectBadge
+          schema: public
   - name: ProjectCourses
     using:
       foreign_key_constraint_on:
         column: projectId
         table:
           name: ProjectCourse
+          schema: public
+  - name: ProjectConsentEvents
+    using:
+      foreign_key_constraint_on:
+        column: projectId
+        table:
+          name: ProjectConsentEvent
+          schema: public
+  - name: ProjectGroups
+    using:
+      foreign_key_constraint_on:
+        column: projectId
+        table:
+          name: ProjectGroup
           schema: public
   - name: ProjectMentors
     using:
@@ -110,21 +131,25 @@ select_permissions:
         - acceptingParticipants
         - coverImageUrl
         - description
+        - documentationInstructionId
         - documentationUrl
         - externalUrl
         - id
         - organizationId
         - presentationUrl
+        - published
         - status
         - submissionDeadline
         - submittedAt
         - tagline
         - title
         - type
+        # Required for public project-slider ordering (order_by: updated_at desc).
+        - updated_at
       filter:
         _or:
-          - status:
-              _eq: PUBLISHED
+          - published:
+              _eq: true
           - _and:
               - status:
                   _eq: PROPOSED
@@ -148,12 +173,14 @@ select_permissions:
         - parentProjectId
         - presentationUrl
         - proposedByUserId
+        - published
         - rating
         - ratingComment
         - status
         - submissionDeadline
         - submittedAt
         - submittedBy
+        - suggestedForPublication
         - projectReviewRequestedAt
         - tagline
         - title
@@ -187,12 +214,14 @@ select_permissions:
         - parentProjectId
         - presentationUrl
         - proposedByUserId
+        - published
         - rating
         - ratingComment
         - status
         - submissionDeadline
         - submittedAt
         - submittedBy
+        - suggestedForPublication
         - projectReviewRequestedAt
         - tagline
         - title
@@ -231,6 +260,7 @@ update_permissions:
         - tagline
         - title
         - type
+        - suggestedForPublication
       filter:
         _or:
           - ProjectCourses:
@@ -255,7 +285,13 @@ update_permissions:
                     - User:
                         id:
                           _eq: X-Hasura-User-Id
-      check: {}
+      check:
+        _or:
+          - suggestedForPublication:
+              _eq: false
+          - status:
+              _in:
+                - COMPLETED
   # submittedBy is populated only via the server-side preset below; clients cannot write it.
   # The set_project_submitted_metadata trigger clears submittedBy when status transitions out of SUBMITTED.
   - role: user_access

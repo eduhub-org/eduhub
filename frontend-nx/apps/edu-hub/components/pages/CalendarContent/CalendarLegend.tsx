@@ -11,7 +11,7 @@ const CalendarLegend: FC = () => {
           className="w-3 h-3 rounded border-2 border-dashed border-label-secondary"
           aria-hidden
         />
-        <span className="text-sm text-label-secondary">{t('filter_events')}</span>
+        <span className="text-sm text-label-secondary">{t('calendar.filter_events')}</span>
       </div>
       {Object.entries(LOCATION_COLORS).map(([location, colors]) => (
         <div key={location} className="flex items-center gap-2">
