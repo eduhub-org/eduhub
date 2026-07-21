@@ -36,8 +36,8 @@ select_permissions:
         ProjectGroups:
           Project:
             _or:
-              - status:
-                  _eq: PUBLISHED
+              - published:
+                  _eq: true
               - _and:
                   - status:
                       _eq: PROPOSED

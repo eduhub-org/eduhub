@@ -7,7 +7,6 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
 import { AuthRoles } from '../../../types/enums';
-import { ProjectStatus_enum } from '../../../__generated__/globalTypes';
 import { PROJECT_PAGE, SIMILAR_PROJECT_TILES } from '../../../queries/projectPage';
 import { ProjectPage, ProjectPageVariables } from '../../../queries/__generated__/ProjectPage';
 import {
@@ -20,6 +19,7 @@ import { Button } from '../../common/Button';
 import TileSlider from '../../common/TileSlider';
 import { ProjectTile } from '../../common/TileSlider/ProjectTile';
 import { BadgeBanner, pickPrimaryBadge } from '../../common/badges/ProjectBadges';
+import { isOpenTemplate, isProjectPublished } from '../CourseContent/Projects/projectStatusDisplay';
 import { Avatar } from '../../shared-components';
 
 export type ProjectPageContext = 'public' | 'withinCourse';
@@ -107,7 +107,9 @@ const ProjectContent: FC<ProjectContentProps> = ({ id, context, courseId }) => {
     );
   }
 
-  const isPublished = project.status === ProjectStatus_enum.PUBLISHED;
+  // A published showcase renders the showcase layout; an open template (even a
+  // published one, e.g. a showcased template) keeps the template + join layout.
+  const showcase = isProjectPublished(project) && !isOpenTemplate(project);
   const mentor = project.ProjectMentors[0]?.User;
   const team = project.ProjectAuthors;
   // Only the course name is shown (program / term intentionally omitted).
@@ -136,7 +138,7 @@ const ProjectContent: FC<ProjectContentProps> = ({ id, context, courseId }) => {
   ) : null;
 
   // -------- Published showcase layout (V1) --------
-  if (isPublished) {
+  if (showcase) {
     return (
       <div className="text-white">
         <div
@@ -237,28 +239,51 @@ const ProjectContent: FC<ProjectContentProps> = ({ id, context, courseId }) => {
   }
 
   // -------- Open template layout (V2 public / within course) --------
+  // B+C hybrid: full-bleed hero with mentor (B); brand-accent sticky CTA (C).
   return (
-    <div className="text-white max-w-screen-xl mx-auto w-full px-3 md:px-16 py-10">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+    <div className="text-white">
+      <div
+        className="relative h-[420px] flex items-end bg-cover bg-center bg-bg-secondary"
+        style={coverImage ? { backgroundImage: `url("${coverImage}")` } : undefined}
+      >
         <div
-          className="rounded-2xl h-[320px] bg-cover bg-center bg-bg-secondary"
-          style={coverImage ? { backgroundImage: `url("${coverImage}")` } : undefined}
+          className="absolute inset-0"
+          style={{ background: 'linear-gradient(0deg, rgba(15,15,15,0.95) 0%, rgba(15,15,15,0) 70%)' }}
         />
-        <div className="flex flex-col gap-4">
+        <div className="relative max-w-screen-xl mx-auto w-full px-3 md:px-16 pb-10 flex flex-col gap-3">
           {context === 'withinCourse' && courseLine && (
             <div className="text-sm text-label-secondary">{t('viewing_from', { course: courseLine })}</div>
           )}
-          <span className="text-xs uppercase tracking-widest text-label-secondary">{t('tile.template_eyebrow')}</span>
-          <h1 className="text-4xl font-semibold">{project.title}</h1>
-          {project.tagline && <p className="text-lg text-label-secondary">{project.tagline}</p>}
+          <span className="text-xs uppercase tracking-widest text-label-secondary">
+            {t('tile.template_eyebrow')}
+          </span>
+          <h1 className="text-5xl font-semibold">{project.title}</h1>
+          {project.tagline && (
+            <p className="text-xl text-label-secondary max-w-3xl">{project.tagline}</p>
+          )}
           {mentor && (
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 mt-1">
               <Avatar imageUrl={mentor.picture} name={fullName(mentor)} size={36} />
-              <span className="text-label-secondary text-sm">{t('tile.mentored_by', { name: fullName(mentor) })}</span>
+              <span className="text-label-secondary text-sm">
+                {t('tile.mentored_by', { name: fullName(mentor) })}
+              </span>
             </div>
           )}
+        </div>
+      </div>
 
-          <div className="rounded-2xl border border-border-primary bg-bg-card p-5 mt-2">
+      <div className="max-w-screen-xl mx-auto w-full px-3 md:px-16 py-12 grid grid-cols-1 lg:grid-cols-3 gap-12 items-start">
+        <section className="lg:col-span-2">
+          {description ? (
+            <>
+              <h2 className="text-2xl font-semibold mb-4">{t('description.title')}</h2>
+              {description}
+            </>
+          ) : null}
+        </section>
+
+        <aside className="lg:sticky lg:top-6">
+          <div className="rounded-2xl border-2 border-brand bg-bg-card p-5">
             <h3 className="font-semibold mb-2">
               {context === 'withinCourse' ? t('join.title') : t('enroll.title')}
             </h3>
@@ -270,37 +295,23 @@ const ProjectContent: FC<ProjectContentProps> = ({ id, context, courseId }) => {
                 })}
               </div>
             )}
-            {context === 'withinCourse' ? (
-              linkedCourseId != null && (
-                <Button as="link" href={`/course/${linkedCourseId}`} filled inverted className="w-full justify-center">
-                  {t('cta.apply_to_join')}
-                </Button>
-              )
-            ) : (
-              <>
-                <p className="text-label-secondary text-sm mb-3">{t('enroll.hint')}</p>
-                {linkedCourseId != null && (
-                  <div className="flex gap-3">
-                    <Button as="link" href={`/course/${linkedCourseId}`} filled inverted>
-                      {t('cta.apply_for_course')}
-                    </Button>
-                    <Button as="link" href={`/course/${linkedCourseId}`}>
-                      {t('cta.view_course')}
-                    </Button>
-                  </div>
-                )}
-              </>
+            {context === 'public' && (
+              <p className="text-label-secondary text-sm mb-3">{t('enroll.hint')}</p>
+            )}
+            {linkedCourseId != null && (
+              <Button
+                as="link"
+                href={`/course/${linkedCourseId}`}
+                filled
+                inverted
+                className="w-full justify-center"
+              >
+                {context === 'withinCourse' ? t('cta.apply_to_join') : t('cta.apply_for_course')}
+              </Button>
             )}
           </div>
-        </div>
+        </aside>
       </div>
-
-      {description && (
-        <section className="mt-12">
-          <h2 className="text-2xl font-semibold mb-4">{t('description.title')}</h2>
-          {description}
-        </section>
-      )}
     </div>
   );
 };

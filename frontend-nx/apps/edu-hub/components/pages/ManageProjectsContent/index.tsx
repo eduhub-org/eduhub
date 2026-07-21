@@ -1,6 +1,5 @@
 import { FC, useCallback, useMemo, useState } from 'react';
 import { ColumnDef } from '@tanstack/react-table';
-import Tooltip from '@mui/material/Tooltip';
 import { useTranslations } from 'next-intl';
 
 import { useAdminMutation } from '../../../hooks/authedMutation';
@@ -10,14 +9,14 @@ import {
   ProjectParticipationStatus_enum,
   ProjectStatus_enum,
 } from '../../../__generated__/globalTypes';
-import { ADMIN_PROJECT_LIST, UPDATE_PROJECT_STATUS } from '../../../queries/adminProjectList';
+import { ADMIN_PROJECT_LIST, UPDATE_PROJECT_PUBLISHED } from '../../../queries/adminProjectList';
 import { PROGRAMS_WITH_MINIMUM_PROPERTIES } from '../../../queries/programList';
 import { COURSE_GROUP_OPTIONS } from '../../../queries/courseGroupOptions';
 import { AdminProjectList, AdminProjectList_Project } from '../../../queries/__generated__/AdminProjectList';
 import {
-  UpdateProjectStatus,
-  UpdateProjectStatusVariables,
-} from '../../../queries/__generated__/UpdateProjectStatus';
+  UpdateProjectPublished,
+  UpdateProjectPublishedVariables,
+} from '../../../queries/__generated__/UpdateProjectPublished';
 import { Programs } from '../../../queries/__generated__/Programs';
 import { CourseGroupOptions } from '../../../queries/__generated__/CourseGroupOptions';
 
@@ -31,7 +30,7 @@ import { Button } from '../../common/Button';
 
 import StatusChip from '../CourseContent/Projects/StatusChip';
 import ProjectPreviewLayout from '../CourseContent/Projects/ProjectPreviewLayout';
-import { getDisplayAuthors, isAcceptedAuthor } from '../CourseContent/Projects/projectAuthors';
+import { getDisplayAuthors } from '../CourseContent/Projects/projectAuthors';
 import {
   getProjectStatusChipKey,
   PROJECT_TYPE_ONLINE_COURSE,
@@ -46,10 +45,10 @@ const QUERY_LIMIT = 50;
 // Rows shown on the cross-course overview (see plan / product decision):
 //   1. COMPLETED projects that are NOT online courses,
 //   2. template projects (PROPOSED with no ACCEPTED author), any type,
-//   3. every PUBLISHED project (so a row stays visible to be unpublished again).
+//   3. every published project (so a row stays visible to be unpublished again).
 const PROJECT_LIST_SCOPE_WHERE = {
   _or: [
-    { status: { _eq: ProjectStatus_enum.PUBLISHED } },
+    { published: { _eq: true } },
     {
       _and: [
         { status: { _eq: ProjectStatus_enum.COMPLETED } },
@@ -68,9 +67,6 @@ const PROJECT_LIST_SCOPE_WHERE = {
     },
   ],
 };
-
-const hasAcceptedAuthor = (project: Pick<ProjectRow, 'ProjectAuthors'>): boolean =>
-  (project.ProjectAuthors ?? []).some(isAcceptedAuthor);
 
 const ManageProjectsContent: FC = () => {
   const t = useTranslations('manageProjects');
@@ -164,22 +160,23 @@ const ManageProjectsContent: FC = () => {
   );
   const totalCount = (data as AdminProjectList | undefined)?.Project_aggregate?.aggregate?.count || 0;
 
-  const [updateStatus] = useAdminMutation<UpdateProjectStatus, UpdateProjectStatusVariables>(
-    UPDATE_PROJECT_STATUS,
+  const [updatePublished] = useAdminMutation<UpdateProjectPublished, UpdateProjectPublishedVariables>(
+    UPDATE_PROJECT_PUBLISHED,
     { refetchQueries: ['AdminProjectList'] }
   );
 
   const handleTogglePublish = useCallback(
     async (project: AdminProjectList_Project) => {
-      const publishing = project.status !== ProjectStatus_enum.PUBLISHED;
-      // Unpublish reverts graded projects to COMPLETED and templates to PROPOSED.
-      const targetStatus = publishing
-        ? ProjectStatus_enum.PUBLISHED
-        : hasAcceptedAuthor(project)
-          ? ProjectStatus_enum.COMPLETED
-          : ProjectStatus_enum.PROPOSED;
+      const publishing = !project.published;
       try {
-        await updateStatus({ variables: { itemId: project.id, status: targetStatus } });
+        await updatePublished({
+          variables: {
+            itemId: project.id,
+            published: publishing,
+            // Publishing fulfils the recommendation; unpublishing leaves it as-is.
+            suggestedForPublication: publishing ? false : project.suggestedForPublication ?? false,
+          },
+        });
         setSuccessMessage(publishing ? t('notifications.publish_success') : t('notifications.unpublish_success'));
         setShowSuccessNotification(true);
       } catch (err) {
@@ -188,7 +185,7 @@ const ManageProjectsContent: FC = () => {
         setShowErrorNotification(true);
       }
     },
-    [updateStatus, t]
+    [updatePublished, t]
   );
 
   const handleProgramFilterChange = useCallback(
@@ -224,6 +221,9 @@ const ManageProjectsContent: FC = () => {
               status={row.original.status}
               ratingComment={row.original.ratingComment}
             />
+            {row.original.published && (
+              <StatusChip displayKey="PUBLISHED" status={row.original.status} />
+            )}
           </div>
         ),
       },
@@ -273,37 +273,18 @@ const ManageProjectsContent: FC = () => {
         meta: { className: 'text-center' },
         cell: ({ row }) => {
           const project = row.original;
-          const published = project.status === ProjectStatus_enum.PUBLISHED;
-          // Leaving PROPOSED is rejected by the DB check constraint
-          // (Project_ongoing_requires_type_and_template_check) unless both a
-          // project type and a documentation instruction are set. Templates
-          // missing those therefore cannot be published yet.
-          const publishBlocked =
-            !published &&
-            project.status === ProjectStatus_enum.PROPOSED &&
-            (!project.type || project.documentationInstructionId == null);
-          const button = (
-            <Button
-              onClick={() => handleTogglePublish(project)}
-              disabled={publishBlocked}
-              className="w-full"
-            >
-              {published ? t('actions.unpublish') : t('actions.publish')}
-            </Button>
-          );
+          const published = project.published;
+          // Publication is orthogonal to the lifecycle status, so any project in
+          // scope can be toggled without a status transition (no DB constraint).
           return (
             <div className="flex flex-col items-center gap-2">
               <span
                 className={`w-3 h-3 rounded-full ${published ? 'bg-success' : 'bg-fill-disabled'}`}
                 title={published ? t('table.published') : t('table.not_published')}
               />
-              {publishBlocked ? (
-                <Tooltip title={t('actions.publish_blocked_incomplete')}>
-                  <span className="inline-flex w-full">{button}</span>
-                </Tooltip>
-              ) : (
-                button
-              )}
+              <Button onClick={() => handleTogglePublish(project)} className="w-full">
+                {published ? t('actions.unpublish') : t('actions.publish')}
+              </Button>
             </div>
           );
         },
@@ -327,6 +308,7 @@ const ManageProjectsContent: FC = () => {
                 status={row.status}
                 ratingComment={row.ratingComment}
               />
+              {row.published && <StatusChip displayKey="PUBLISHED" status={row.status} />}
             </div>
           }
         />

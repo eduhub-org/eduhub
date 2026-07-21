@@ -18,14 +18,50 @@ export const PROJECT_STATUS_CHIP_INCOMPLETE_FAILED = 'INCOMPLETE_FAILED';
 export const PROJECT_STATUS_CHIP_SUGGESTED_FOR_PUBLICATION =
   'SUGGESTED_FOR_PUBLICATION';
 
+/**
+ * An "open template" is a project anyone can still claim/join: no ACCEPTED
+ * authors yet and still in PROPOSED. This is orthogonal to publication — a
+ * published project can also be an open template (a showcased template).
+ *
+ * The public tile/page fragments only expose already-visible (ACCEPTED) authors
+ * and omit `participationStatus`; a missing status is therefore treated as
+ * ACCEPTED so the predicate works for both the admin `ProjectRow` shape and the
+ * anonymous fragments.
+ */
+export function isOpenTemplate(project: {
+  status: ProjectStatus_enum | string;
+  ProjectAuthors?: ReadonlyArray<{
+    participationStatus?: ProjectParticipationStatus_enum | string | null;
+  }> | null;
+}): boolean {
+  const acceptedCount = (project.ProjectAuthors ?? []).filter(
+    (a) =>
+      a.participationStatus == null ||
+      a.participationStatus === ProjectParticipationStatus_enum.ACCEPTED
+  ).length;
+  return acceptedCount === 0 && project.status === ProjectStatus_enum.PROPOSED;
+}
+
+/** True when the project is a published showcase (orthogonal to lifecycle). */
+export function isProjectPublished(project: {
+  published?: boolean | null;
+}): boolean {
+  return project.published === true;
+}
+
 export function resolveProjectStatusChipKey(
   status: ProjectStatus_enum | string,
   rating?: ProjectRating_enum | null,
-  suggestedForPublication?: boolean | null
+  suggestedForPublication?: boolean | null,
+  published?: boolean | null
 ): string {
+  // Once published, the publication recommendation is fulfilled — never show
+  // the amber "suggested for publication" chip (it would otherwise win over the
+  // Passed chip on a published, completed project).
   if (
     status === ProjectStatus_enum.COMPLETED &&
-    suggestedForPublication
+    suggestedForPublication &&
+    !published
   ) {
     return PROJECT_STATUS_CHIP_SUGGESTED_FOR_PUBLICATION;
   }
@@ -47,24 +83,18 @@ export function resolveProjectStatusChipKey(
 export function getProjectStatusChipKey(
   project: Pick<
     ProjectRow,
-    'status' | 'ProjectAuthors' | 'rating' | 'suggestedForPublication'
+    'status' | 'ProjectAuthors' | 'rating' | 'suggestedForPublication' | 'published'
   >
 ): string {
-  const acceptedCount = (project.ProjectAuthors ?? []).filter(
-    (a) => a.participationStatus === ProjectParticipationStatus_enum.ACCEPTED
-  ).length;
-
-  if (
-    acceptedCount === 0 &&
-    project.status === ProjectStatus_enum.PROPOSED
-  ) {
+  if (isOpenTemplate(project)) {
     return PROJECT_STATUS_CHIP_TEMPLATE;
   }
 
   return resolveProjectStatusChipKey(
     project.status,
     project.rating,
-    project.suggestedForPublication
+    project.suggestedForPublication,
+    project.published
   );
 }
 

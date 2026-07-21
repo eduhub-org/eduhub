@@ -2410,6 +2410,7 @@ export enum Project_select_column {
   presentationUrl = "presentationUrl",
   projectReviewRequestedAt = "projectReviewRequestedAt",
   proposedByUserId = "proposedByUserId",
+  published = "published",
   rating = "rating",
   ratingComment = "ratingComment",
   status = "status",
@@ -2428,6 +2429,7 @@ export enum Project_select_column {
  */
 export enum Project_select_column_Project_aggregate_bool_exp_bool_and_arguments_columns {
   acceptingParticipants = "acceptingParticipants",
+  published = "published",
   suggestedForPublication = "suggestedForPublication",
 }
 
@@ -2436,6 +2438,7 @@ export enum Project_select_column_Project_aggregate_bool_exp_bool_and_arguments_
  */
 export enum Project_select_column_Project_aggregate_bool_exp_bool_or_arguments_columns {
   acceptingParticipants = "acceptingParticipants",
+  published = "published",
   suggestedForPublication = "suggestedForPublication",
 }
 
@@ -2459,6 +2462,7 @@ export enum Project_update_column {
   presentationUrl = "presentationUrl",
   projectReviewRequestedAt = "projectReviewRequestedAt",
   proposedByUserId = "proposedByUserId",
+  published = "published",
   rating = "rating",
   ratingComment = "ratingComment",
   status = "status",
@@ -11625,6 +11629,7 @@ export interface Project_bool_exp {
   presentationUrl?: String_comparison_exp | null;
   projectReviewRequestedAt?: timestamptz_comparison_exp | null;
   proposedByUserId?: uuid_comparison_exp | null;
+  published?: Boolean_comparison_exp | null;
   rating?: ProjectRating_enum_comparison_exp | null;
   ratingComment?: String_comparison_exp | null;
   status?: ProjectStatus_enum_comparison_exp | null;
@@ -11673,6 +11678,7 @@ export interface Project_insert_input {
   presentationUrl?: string | null;
   projectReviewRequestedAt?: any | null;
   proposedByUserId?: any | null;
+  published?: boolean | null;
   rating?: ProjectRating_enum | null;
   ratingComment?: string | null;
   status?: ProjectStatus_enum | null;
@@ -11796,6 +11802,7 @@ export interface Project_order_by {
   presentationUrl?: order_by | null;
   projectReviewRequestedAt?: order_by | null;
   proposedByUserId?: order_by | null;
+  published?: order_by | null;
   rating?: order_by | null;
   ratingComment?: order_by | null;
   status?: order_by | null;

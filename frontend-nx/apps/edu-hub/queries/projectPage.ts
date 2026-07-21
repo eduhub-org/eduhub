@@ -13,6 +13,7 @@ export const PROJECT_PAGE_FRAGMENT = gql`
     description
     coverImageUrl
     status
+    published
     type
     acceptingParticipants
     organizationId
@@ -96,7 +97,7 @@ export const SIMILAR_PROJECT_TILES = gql`
     Project(
       where: {
         id: { _neq: $excludeId }
-        status: { _eq: PUBLISHED }
+        published: { _eq: true }
         ProjectCourses: { Course: { CourseGroups: { groupOptionId: { _in: $courseGroupIds } } } }
       }
       order_by: { updated_at: desc }
