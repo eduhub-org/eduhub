@@ -86,8 +86,16 @@ module "lb-http" {
   # which the affected hosts serve no valid HTTPS. Apply domain changes in a
   # low-traffic window and confirm the new cert is ACTIVE and the new records
   # resolve before treating the new hosts as live.
+  #
+  # TEMPORARY (2026-07-21 incident): local.stujo_domain is excluded from the
+  # cert. stujo.opencampus.sh currently resolves to a manually configured
+  # Cloudflare proxied setup (302 redirect to stujo.net) that Terraform does
+  # not manage, so its validation fails and blocks the ENTIRE cert — taking
+  # down HTTPS for all hosts on the load balancer. Re-add local.stujo_domain
+  # once the manual Cloudflare record/redirect rule is removed and
+  # stujo.opencampus.sh resolves to this LB's IP again.
   ssl                             = "true"
-  managed_ssl_certificate_domains = concat(["${local.keycloak_service_name}.opencampus.sh", "${local.hasura_service_name}.opencampus.sh", "${local.eduhub_service_name}.opencampus.sh", "${local.eduhub_api_service_name}.opencampus.sh", local.stujo_domain], [for portal in local.stujo_portals : portal.domain])
+  managed_ssl_certificate_domains = concat(["${local.keycloak_service_name}.opencampus.sh", "${local.hasura_service_name}.opencampus.sh", "${local.eduhub_service_name}.opencampus.sh", "${local.eduhub_api_service_name}.opencampus.sh"], [for portal in local.stujo_portals : portal.domain])
   https_redirect                  = "true"
   random_certificate_suffix       = "true"
 
