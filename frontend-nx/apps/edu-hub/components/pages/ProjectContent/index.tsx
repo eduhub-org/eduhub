@@ -295,7 +295,7 @@ const ProjectContent: FC<ProjectContentProps> = ({ id, context, courseId }) => {
                 })}
               </div>
             )}
-            {context === 'public' && (
+            {context === 'public' && linkedCourseId != null && (
               <p className="text-label-secondary text-sm mb-3">
                 {t('enroll.hint', { course: courseLine })}
               </p>

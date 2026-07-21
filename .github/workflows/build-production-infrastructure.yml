@@ -32,14 +32,25 @@ jobs:
     steps:
       - name: Define env variables as output variables
         id: define_output_variables
+        env:
+          PROJECT_ID: ${{ vars.PROJECT_ID }}
+          NEXT_PUBLIC_AUTH_URL: ${{ vars.NEXT_PUBLIC_AUTH_URL }}
+          NEXT_PUBLIC_API_URL: ${{ vars.NEXT_PUBLIC_API_URL }}
+          NEXT_PUBLIC_HELP_DOCS_URL: ${{ vars.NEXT_PUBLIC_HELP_DOCS_URL }}
+          NEXT_PUBLIC_STORAGE_BUCKET_URL: ${{ vars.NEXT_PUBLIC_STORAGE_BUCKET_URL }}
+          NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL: ${{ vars.NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL }}
+          NEXT_PUBLIC_STUJO_URL: ${{ vars.NEXT_PUBLIC_STUJO_URL }}
         run: |
-          echo "PROJECT_ID=${{ vars.PROJECT_ID }}" >> $GITHUB_OUTPUT
-          echo "NEXT_PUBLIC_AUTH_URL=${{ vars.NEXT_PUBLIC_AUTH_URL }}" >> $GITHUB_OUTPUT
-          echo "NEXT_PUBLIC_API_URL=${{ vars.NEXT_PUBLIC_API_URL }}" >> $GITHUB_OUTPUT
-          echo "NEXT_PUBLIC_HELP_DOCS_URL=${{ vars.NEXT_PUBLIC_HELP_DOCS_URL }}" >> $GITHUB_OUTPUT
-          echo "NEXT_PUBLIC_STORAGE_BUCKET_URL=${{ vars.NEXT_PUBLIC_STORAGE_BUCKET_URL }}" >> $GITHUB_OUTPUT
-          echo "NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL=${{ vars.NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL }}" >> $GITHUB_OUTPUT
-          echo "NEXT_PUBLIC_STUJO_URL=${{ vars.NEXT_PUBLIC_STUJO_URL }}" >> $GITHUB_OUTPUT
+          set -euo pipefail
+          {
+            printf 'PROJECT_ID=%s\n' "$PROJECT_ID"
+            printf 'NEXT_PUBLIC_AUTH_URL=%s\n' "$NEXT_PUBLIC_AUTH_URL"
+            printf 'NEXT_PUBLIC_API_URL=%s\n' "$NEXT_PUBLIC_API_URL"
+            printf 'NEXT_PUBLIC_HELP_DOCS_URL=%s\n' "$NEXT_PUBLIC_HELP_DOCS_URL"
+            printf 'NEXT_PUBLIC_STORAGE_BUCKET_URL=%s\n' "$NEXT_PUBLIC_STORAGE_BUCKET_URL"
+            printf 'NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL=%s\n' "$NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL"
+            printf 'NEXT_PUBLIC_STUJO_URL=%s\n' "$NEXT_PUBLIC_STUJO_URL"
+          } >> "$GITHUB_OUTPUT"
 
   check_folder_changes:
     name: Check for changes in specific folders

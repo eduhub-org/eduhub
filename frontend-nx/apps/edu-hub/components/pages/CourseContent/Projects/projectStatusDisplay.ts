@@ -32,7 +32,7 @@ export function isOpenTemplate(project: {
   status: ProjectStatus_enum | string;
   ProjectAuthors?: ReadonlyArray<{
     participationStatus?: ProjectParticipationStatus_enum | string | null;
-  }> | null;
+  } & Record<string, any>> | null;
 }): boolean {
   const acceptedCount = (project.ProjectAuthors ?? []).filter(
     (a) =>
