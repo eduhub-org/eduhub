@@ -145,8 +145,9 @@ the datepicker/dnd bumps).
 >   build tool (Turbopack) produced no `.next/standalone` bundle at all,
 >   which the Docker images depend on. The production build scripts
 >   (`build`, `build:stujo`) therefore run `next build --webpack` (the
->   sanctioned escape hatch); `next dev` stays on Turbopack. Revisit once
->   the upstream Turbopack + standalone gap is closed.
+>   sanctioned escape hatch). `next dev` also uses `--webpack`: Turbopack
+>   404s the Pages Router next-auth catch-all (`/api/auth/[...nextauth]`).
+>   Revisit once the upstream Turbopack gaps are closed.
 > - **`@vercel/nft` does not follow the `module-sync` export condition.**
 >   The ljharb helper packages `async-function`, `async-generator-function`
 >   and `generator-function` (pulled in transitively via `get-intrinsic`)
@@ -197,7 +198,7 @@ as measured during implementation):
 
 | Change | Impact here |
 |--------|-------------|
-| **Turbopack is the default** for `next dev` and `next build` | No custom webpack config ✓. Measured outcome: Turbopack did **not** auto-activate its built-in babel-loader from the root `babel.config.json` (`babelrcRoots` only, used by Jest), so no `turbopackUseBuiltinBabel` change was needed. However, Turbopack emits no `output: 'standalone'` bundle, so **production builds run `next build --webpack`** (the sanctioned escape hatch) while `next dev` stays on Turbopack. |
+| **Turbopack is the default** for `next dev` and `next build` | No custom webpack config ✓. Measured outcome: Turbopack did **not** auto-activate its built-in babel-loader from the root `babel.config.json` (`babelrcRoots` only, used by Jest), so no `turbopackUseBuiltinBabel` change was needed. However, Turbopack emits no `output: 'standalone'` bundle **and** 404s the Pages Router next-auth catch-all (`/api/auth/[...nextauth]`), so **both `next build` and `next dev` run with `--webpack`**. |
 | `next lint` removed | Not used — repo calls `eslint` directly ✓. `eslint-config-next@16` requires ESLint 9 flat config → pinned ESLint 8 compat for now (`eslint-config-next` 15.5.7); the flat-config conversion (`@eslint/compat` is already installed) is a separate workstream. |
 | `images.domains` removed | Already on `remotePatterns` ✓ |
 | AMP support removed | Not used ✓ |
