@@ -105,10 +105,16 @@ select_permissions:
         - projectId
         - updated_at
         - userId
+      # Only accepted authors of a published showcase are anonymously visible.
+      # Pending/requested applicants of an (unpublished or published) template
+      # must not be enumerable by logged-out visitors.
       filter:
-        Project:
-          status:
-            _eq: PUBLISHED
+        _and:
+          - Project:
+              published:
+                _eq: true
+          - participationStatus:
+              _eq: ACCEPTED
   - role: instructor_access
     permission:
       columns:

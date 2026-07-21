@@ -50,18 +50,23 @@ export const ADMIN_PROJECT_LIST = gql`
   }
 `;
 
-// Generic status update used for both publish (status: PUBLISHED) and unpublish
-// (status reverted to COMPLETED for graded projects or PROPOSED for templates).
-// Admin-only page: the admin role bypasses Hasura row/column permissions, so a
-// direct status write is allowed and trips no Project triggers.
-export const UPDATE_PROJECT_STATUS = gql`
-  mutation UpdateProjectStatus($itemId: Int!, $status: ProjectStatus_enum!) {
+// Toggles showcase publication independently of the lifecycle status. Publishing
+// also clears suggestedForPublication (the recommendation is fulfilled); on
+// unpublish the caller passes the current flag value so it is left untouched.
+// Admin-only page: the admin role bypasses Hasura row/column permissions.
+export const UPDATE_PROJECT_PUBLISHED = gql`
+  mutation UpdateProjectPublished(
+    $itemId: Int!
+    $published: Boolean!
+    $suggestedForPublication: Boolean!
+  ) {
     update_Project_by_pk(
       pk_columns: { id: $itemId }
-      _set: { status: $status }
+      _set: { published: $published, suggestedForPublication: $suggestedForPublication }
     ) {
       id
-      status
+      published
+      suggestedForPublication
     }
   }
 `;

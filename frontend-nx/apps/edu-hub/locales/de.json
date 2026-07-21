@@ -2682,7 +2682,7 @@
     },
     "enroll": {
       "title": "Zum Mitmachen anmelden",
-      "hint": "Projekte sind erst nach der Anmeldung zum Kurs zugänglich. Bewirb dich zuerst für den Kurs und tritt dem Projekt dann über die Kursseite bei.",
+      "hint": "Dieses Projekt ist nur im Rahmen des Kurses {course} zugänglich. Bewirb dich zuerst für den Kurs und tritt dem Projekt dann über die Kursseite bei.",
       "applications_until": "Bewerbung bis {date}"
     },
     "join": {

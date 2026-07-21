@@ -28,6 +28,7 @@ interface StatusChipProps {
   rating?: ProjectRating_enum | null;
   ratingComment?: string | null;
   suggestedForPublication?: boolean | null;
+  published?: boolean | null;
   /** Pre-resolved chip key (e.g. TEMPLATE from getProjectStatusChipKey). */
   displayKey?: string;
 }
@@ -37,12 +38,13 @@ const StatusChip: FC<StatusChipProps> = ({
   rating,
   ratingComment,
   suggestedForPublication,
+  published,
   displayKey,
 }) => {
   const t = useTranslations('course');
   const chipKey =
     displayKey ??
-    resolveProjectStatusChipKey(status, rating, suggestedForPublication);
+    resolveProjectStatusChipKey(status, rating, suggestedForPublication, published);
   const className = STATUS_CLASSES[chipKey] ?? 'bg-gray-200 text-gray-800';
   const chip = (
     <span

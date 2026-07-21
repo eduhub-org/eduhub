@@ -159,6 +159,10 @@ export interface CoursePublishedProjectTiles_Project {
   coverImageUrl: string | null;
   status: ProjectStatus_enum;
   /**
+   * Showcase visibility flag: true means the project is publicly published (home sliders, public showcase). Orthogonal to lifecycle, which stays in "status".
+   */
+  published: boolean;
+  /**
    * Timestamp at which the project most recently transitioned to SUBMITTED. Cleared when a reviewer sends the project back to ONGOING so the student-side "sent back for revisions" banner remains accurate.
    */
   submittedAt: any | null;

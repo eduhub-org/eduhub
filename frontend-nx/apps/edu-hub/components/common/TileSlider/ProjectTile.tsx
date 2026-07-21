@@ -3,12 +3,12 @@ import { FC, memo } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { Calendar } from 'lucide-react';
 
-import { ProjectStatus_enum } from '../../../__generated__/globalTypes';
 import { ProjectTileFragment } from '../../../queries/__generated__/ProjectTileFragment';
 import { TileBase } from './TileBase';
 import { ProjectAvatars } from './ProjectAvatars';
 import { BadgeChip, pickPrimaryBadge } from '../badges/ProjectBadges';
 import { projectCourseLine, projectMentorName, projectHref, formatSubmittedDate } from './projectTileHelpers';
+import { isOpenTemplate, isProjectPublished } from '../../pages/CourseContent/Projects/projectStatusDisplay';
 import { getWidgetBaseUrl } from './widgetBaseUrl';
 
 export type ProjectTileContext = 'public' | 'withinCourse';
@@ -28,7 +28,9 @@ interface ProjectTileProps {
 const ProjectTileComponent: FC<ProjectTileProps> = ({ project, context, courseId, isWidget = false }) => {
   const t = useTranslations('project');
   const locale = useLocale();
-  const isPublished = project.status === ProjectStatus_enum.PUBLISHED;
+  // A published project is shown as a showcase unless it is still an open
+  // template (a published, claimable template renders the template tile).
+  const isShowcase = isProjectPublished(project) && !isOpenTemplate(project);
   const courseLine = projectCourseLine(project, courseId);
   const mentorName = projectMentorName(project);
   const href = projectHref(project, context, courseId);
@@ -37,7 +39,7 @@ const ProjectTileComponent: FC<ProjectTileProps> = ({ project, context, courseId
 
   const tile = (
     <TileBase coverImage={project.coverImageUrl ?? null} title={project.title}>
-        {isPublished ? (
+        {isShowcase ? (
           // Tile A — published showcase
           <>
             <div className="flex justify-between items-center gap-2 mb-3 text-sm tracking-wider text-label-primary">
