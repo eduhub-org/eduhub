@@ -2697,7 +2697,7 @@
     },
     "enroll": {
       "title": "Enroll to participate",
-      "hint": "Projects are only accessible after enrolling in the course. Apply for the course first, then join this project from the course page.",
+      "hint": "This project is only accessible as part of the course {course}. Apply for the course first, then join this project from the course page.",
       "applications_until": "Applications until {date}"
     },
     "join": {

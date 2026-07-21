@@ -296,18 +296,22 @@ const ProjectContent: FC<ProjectContentProps> = ({ id, context, courseId }) => {
               </div>
             )}
             {context === 'public' && (
-              <p className="text-label-secondary text-sm mb-3">{t('enroll.hint')}</p>
+              <p className="text-label-secondary text-sm mb-3">
+                {t('enroll.hint', { course: courseLine })}
+              </p>
             )}
             {linkedCourseId != null && (
-              <Button
-                as="link"
-                href={`/course/${linkedCourseId}`}
-                filled
-                inverted
-                className="w-full justify-center"
-              >
-                {context === 'withinCourse' ? t('cta.apply_to_join') : t('cta.apply_for_course')}
-              </Button>
+              <div className="mt-6 flex justify-center">
+                <Button
+                  as="link"
+                  href={`/course/${linkedCourseId}`}
+                  filled
+                  inverted
+                  className="justify-center"
+                >
+                  {context === 'withinCourse' ? t('cta.apply_to_join') : t('cta.apply_for_course')}
+                </Button>
+              </div>
             )}
           </div>
         </aside>
