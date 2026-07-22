@@ -1,0 +1,119 @@
+name: Diagnose Production Hasura Startup
+
+run-name: Diagnose production Hasura${{ inputs.revision_name && format(' revision {0}', inputs.revision_name) || '' }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      revision_name:
+        description: "Optional failed revision, for example hasura-00188-4mc"
+        required: false
+        type: string
+      log_freshness:
+        description: "How far back Cloud Logging should be queried"
+        required: true
+        default: "24h"
+        type: choice
+        options:
+          - "6h"
+          - "24h"
+          - "72h"
+          - "168h"
+      max_log_entries:
+        description: "Maximum number of log entries to print"
+        required: true
+        default: "250"
+        type: choice
+        options:
+          - "100"
+          - "250"
+          - "500"
+
+permissions:
+  contents: read
+
+jobs:
+  inspect-hasura:
+    name: Read Hasura revisions and startup logs
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: production
+    env:
+      PROJECT_ID: ${{ vars.PROJECT_ID }}
+      REGION: ${{ secrets.GCP_REGION }}
+      HASURA_SERVICE: hasura
+      REVISION_NAME: ${{ inputs.revision_name }}
+      LOG_FRESHNESS: ${{ inputs.log_freshness }}
+      MAX_LOG_ENTRIES: ${{ inputs.max_log_entries }}
+
+    steps:
+      - name: Authenticate to production Google Cloud
+        uses: google-github-actions/auth@v3
+        with:
+          credentials_json: ${{ secrets.GCP_EDUHUB_PRODUCTION_KEY }}
+          project_id: ${{ env.PROJECT_ID }}
+
+      - name: Set up Google Cloud CLI
+        uses: google-github-actions/setup-gcloud@v3
+
+      - name: Validate diagnostic inputs
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ -n "$REVISION_NAME" ]] && \
+            [[ ! "$REVISION_NAME" =~ ^hasura-[a-z0-9-]+$ ]]; then
+            echo "revision_name must be empty or match hasura-[a-z0-9-]+" >&2
+            exit 1
+          fi
+
+      - name: Show production Hasura service state
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          gcloud run services describe "$HASURA_SERVICE" \
+            --project "$PROJECT_ID" \
+            --region "$REGION" \
+            --format='yaml(metadata.name,status.url,status.latestCreatedRevisionName,status.latestReadyRevisionName,status.traffic,status.conditions)'
+
+      - name: List recent Hasura revisions
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          gcloud run revisions list \
+            --service "$HASURA_SERVICE" \
+            --project "$PROJECT_ID" \
+            --region "$REGION" \
+            --limit 20 \
+            --sort-by='~metadata.creationTimestamp' \
+            --format='table(metadata.name,metadata.creationTimestamp,status.conditions[0].status,status.conditions[0].reason,spec.containers[0].image)'
+
+      - name: Show selected revision details
+        if: ${{ inputs.revision_name != '' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          gcloud run revisions describe "$REVISION_NAME" \
+            --project "$PROJECT_ID" \
+            --region "$REGION" \
+            --format='yaml(metadata.name,metadata.creationTimestamp,metadata.labels,spec.containers,status.conditions,status.logUrl)'
+
+      - name: Read Hasura startup logs
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          log_filter='resource.type="cloud_run_revision" AND resource.labels.service_name="hasura"'
+          if [[ -n "$REVISION_NAME" ]]; then
+            log_filter+=" AND resource.labels.revision_name=\"${REVISION_NAME}\""
+          fi
+
+          gcloud logging read "$log_filter" \
+            --project "$PROJECT_ID" \
+            --freshness "$LOG_FRESHNESS" \
+            --limit "$MAX_LOG_ENTRIES" \
+            --order desc \
+            --format='table(timestamp,severity,resource.labels.revision_name,textPayload,jsonPayload.message)'
