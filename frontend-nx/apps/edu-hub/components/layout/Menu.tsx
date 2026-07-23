@@ -22,42 +22,45 @@ interface IProps {
 const StyledMenu = styled(MaterialMenu)(() => ({
   '& .MuiPaper-root': {
     minWidth: '225px',
-    padding: '1rem 2rem',
-    backgroundColor: 'var(--eduhub-fill-primary, #ffffff) !important',
-    color: 'var(--eduhub-label-primary, #222222) !important',
+    padding: '0.5rem 2rem',
+    backgroundColor: 'var(--eduhub-fill-primary) !important',
+    color: 'var(--eduhub-label-primary) !important',
     borderRadius: '8px',
     boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
   },
   '& .MuiMenuItem-root': {
-    color: 'var(--eduhub-label-primary, #222222) !important',
-    backgroundColor: 'var(--eduhub-fill-primary, #ffffff) !important',
-    padding: '0.75rem 1rem',
+    color: 'var(--eduhub-label-primary) !important',
+    backgroundColor: 'var(--eduhub-fill-primary) !important',
+    padding: '0.375rem 1rem',
     '&:hover': {
-      backgroundColor: '#E5E5E5 !important', // Slightly darker than selected for better contrast
+      backgroundColor: 'var(--eduhub-fill-disabled) !important', // Slightly darker than selected for better contrast
     },
     '&.Mui-selected': {
-      backgroundColor: 'var(--eduhub-bg-secondary, #F2F2F2) !important',
-      borderLeft: '3px solid var(--eduhub-warning)',
-      paddingLeft: 'calc(1rem - 3px)',
+      backgroundColor: 'var(--eduhub-bg-secondary) !important',
+      // Inset accent bar for the active route — drawn as a box-shadow so it never shifts
+      // the layout or renders as a ragged partial border the way a `border-left` would.
+      boxShadow: 'inset 3px 0 0 var(--eduhub-warning)',
       '&:hover': {
-        backgroundColor: '#E5E5E5 !important', // Slightly darker than selected
+        backgroundColor: 'var(--eduhub-fill-disabled) !important', // Slightly darker than selected
       },
     },
   },
   '& .MuiListSubheader-root': {
     backgroundColor: 'transparent',
-    color: 'var(--eduhub-label-secondary, #666666)',
+    color: 'var(--eduhub-label-secondary)',
     fontFamily: 'inherit',
     fontSize: '0.6875rem', // 11px
     fontWeight: 600,
-    lineHeight: 2,
+    lineHeight: 1.3,
     letterSpacing: '0.06em',
     textTransform: 'uppercase',
-    padding: '0.5rem 1rem 0.25rem',
+    // No horizontal padding so the label's left edge lines up with the section
+    // dividers (which span the full menu width), sitting left of the item labels.
+    padding: '0.5rem 0 0.125rem',
   },
   '& .MuiDivider-root': {
-    borderColor: '#E5E5E5',
-    margin: '0.5rem 0',
+    borderColor: 'var(--eduhub-border-primary)',
+    margin: '0.25rem 0',
   },
 }));
 
@@ -118,13 +121,13 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
       <ListSubheader disableSticky>{t('menu.section_personal')}</ListSubheader>
 
       <MenuItem onClick={closeMenu} selected={isActiveRoute('/profile')}>
-        <Link className="block -my-3 -mx-4 py-3 px-4 text-lg" href="/profile">
+        <Link className="block -my-1.5 -mx-4 py-1.5 px-4 text-lg leading-snug" href="/profile">
           {t('menu.profile')}
         </Link>
       </MenuItem>
 
       <MenuItem onClick={closeMenu} selected={isActiveRoute('/my-certificates')}>
-        <Link className="block -my-3 -mx-4 py-3 px-4 text-lg" href="/my-certificates">
+        <Link className="block -my-1.5 -mx-4 py-1.5 px-4 text-lg leading-snug" href="/my-certificates">
           {t('menu.my_certificates')}
         </Link>
       </MenuItem>
@@ -134,7 +137,7 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
 
       {canManageCoursesMenu && (
         <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/courses')}>
-          <Link className="block -my-3 -mx-4 py-3 px-4 text-lg" href="/manage/courses">
+          <Link className="block -my-1.5 -mx-4 py-1.5 px-4 text-lg leading-snug" href="/manage/courses">
             {t('menu.courses')}
           </Link>
         </MenuItem>
@@ -142,7 +145,7 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
 
       {canManageEventsMenu && (
         <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/events')}>
-          <Link className="block -my-3 -mx-4 py-3 px-4 text-lg" href="/manage/events">
+          <Link className="block -my-1.5 -mx-4 py-1.5 px-4 text-lg leading-snug" href="/manage/events">
             {t('menu.events')}
           </Link>
         </MenuItem>
@@ -150,23 +153,15 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
 
       {canManageDegreesMenu && (
         <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/degrees')}>
-          <Link className="block -my-3 -mx-4 py-3 px-4 text-lg" href="/manage/degrees">
+          <Link className="block -my-1.5 -mx-4 py-1.5 px-4 text-lg leading-snug" href="/manage/degrees">
             {t('menu.degrees')}
           </Link>
         </MenuItem>
       )}
 
       {isAdmin && (
-        <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/projects')}>
-          <Link className="block -my-3 -mx-4 py-3 px-4 text-lg" href="/manage/projects">
-            {t('menu.projects')}
-          </Link>
-        </MenuItem>
-      )}
-
-      {isAdmin && (
         <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/users')}>
-          <Link className="block -my-3 -mx-4 py-3 px-4 text-lg" href="/manage/users">
+          <Link className="block -my-1.5 -mx-4 py-1.5 px-4 text-lg leading-snug" href="/manage/users">
             {t('menu.user')}
           </Link>
         </MenuItem>
@@ -174,7 +169,7 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
 
       {isAdmin && (
         <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/experts')}>
-          <Link className="block -my-3 -mx-4 py-3 px-4 text-lg" href="/manage/experts">
+          <Link className="block -my-1.5 -mx-4 py-1.5 px-4 text-lg leading-snug" href="/manage/experts">
             {t('menu.experts')}
           </Link>
         </MenuItem>
@@ -182,7 +177,7 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
 
       {isAdmin && (
         <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/calendar')}>
-          <Link className="block -my-3 -mx-4 py-3 px-4 text-lg" href="/manage/calendar">
+          <Link className="block -my-1.5 -mx-4 py-1.5 px-4 text-lg leading-snug" href="/manage/calendar">
             {t('menu.calendar')}
           </Link>
         </MenuItem>
@@ -190,7 +185,7 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
 
       {isAdmin && (
         <MenuItem onClick={closeMenu} selected={isActiveRoute('/statistics')}>
-          <Link className="block -my-3 -mx-4 py-3 px-4 text-lg" href="/statistics">
+          <Link className="block -my-1.5 -mx-4 py-1.5 px-4 text-lg leading-snug" href="/statistics">
             {t('menu.statistics')}
           </Link>
         </MenuItem>
@@ -201,7 +196,7 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
           onClick={closeMenu}
           selected={isActiveRoute('/manage/settings') || router.pathname.startsWith('/manage/settings/')}
         >
-          <Link className="block -my-3 -mx-4 py-3 px-4 text-lg" href="/manage/settings">
+          <Link className="block -my-1.5 -mx-4 py-1.5 px-4 text-lg leading-snug" href="/manage/settings">
             {t('menu.settings')}
           </Link>
         </MenuItem>
@@ -213,7 +208,7 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
       {isInstructorOrAdmin && (
         <MenuItem onClick={closeMenu}>
           <Link
-            className="block -my-3 -mx-4 py-3 px-4 text-lg"
+            className="block -my-1.5 -mx-4 py-1.5 px-4 text-lg leading-snug"
             href="https://opencampus.gitbook.io/kursleitungshandbuch/"
             target="_blank"
             rel="noopener noreferrer"
@@ -224,7 +219,7 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
       )}
 
       <MenuItem onClick={closeMenu}>
-        <Link className="block -my-3 -mx-4 py-3 px-4 text-lg" href="https://opencampus.gitbook.io/faq/" target="_blank">
+        <Link className="block -my-1.5 -mx-4 py-1.5 px-4 text-lg leading-snug" href="https://opencampus.gitbook.io/faq/" target="_blank">
           {t('menu.faq')}
         </Link>
       </MenuItem>

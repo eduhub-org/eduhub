@@ -46,10 +46,7 @@
       "courses": "Courses",
       "events": "Events",
       "degrees": "Degrees",
-      "projects": "Projects",
       "programs": "Programs",
-      "organizations": "Organizations",
-      "location_addresses": "Location Addresses",
       "settings": "Settings",
       "calendar": "Calendar",
       "statistics": "Statistics",
@@ -2606,6 +2603,10 @@
         "project-types": {
           "label": "Project types",
           "description": "Default achievement certificate templates and documentation instructions per project type"
+        },
+        "projects": {
+          "label": "Projects",
+          "description": "Publish, unpublish and tag projects"
         },
         "documentation-instructions": {
           "label": "Documentation instructions",
