@@ -44,6 +44,8 @@
       "admin_users": "Admin-Benutzer",
       "experts": "Experten",
       "courses": "Kurse",
+      "events": "Veranstaltungen",
+      "degrees": "Degrees",
       "projects": "Projekte",
       "programs": "Programme",
       "organizations": "Organisationen",
@@ -700,6 +702,8 @@
     "toCourseDescription": "zur Kursbeschreibung",
     "coursesPageTitle": "Courses: opencampus.sh Edu Hub",
     "coursesHeadline": "Kurse",
+    "eventsHeadline": "Veranstaltungen",
+    "degreesHeadline": "Degrees",
     "courseSearchPlaceholder": "Search in title",
     "addCourseText": "Add Course",
     "addCourseFormTitle": "Kurs hinzufügen",
@@ -2068,13 +2072,13 @@
     "programTypes": {
       "COURSES": "Kurse",
       "EVENTS": "Veranstaltungen",
-      "DEGREES": "Studiengänge"
+      "DEGREES": "Degrees"
     },
     "onboarding": {
       "label": "Onboarding-Texte",
       "courses_label": "Kurse",
       "events_label": "Veranstaltungen",
-      "degrees_label": "Studiengänge",
+      "degrees_label": "Degrees",
       "text_de": "Text (Deutsch)",
       "text_en": "Text (Englisch)",
       "preview": "Vorschau",

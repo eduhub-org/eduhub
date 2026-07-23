@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { FC, useCallback } from 'react';
 import { useIsAdmin, useIsInstructor, useIsOrgAdmin } from '../../hooks/authentication';
+import { useOrgAdminCapabilities } from '../../hooks/orgAdminCapabilities';
 import { useTranslations } from 'next-intl';
 import useLogout from '../../hooks/logout';
 
@@ -54,10 +55,16 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
   const isAdmin = useIsAdmin();
   const isInstructor = useIsInstructor();
   const isOrgAdmin = useIsOrgAdmin();
+  const orgAdminCaps = useOrgAdminCapabilities();
   const isInstructorOrAdmin = isAdmin || isInstructor;
   // Organization admins reach the program/course/admin-user management screens (scoped to their own
   // organization). Other manage links remain super-admin only.
   const isAdminOrOrgAdmin = isAdmin || isOrgAdmin;
+  // Program-type management entries: super-admins see all three; org admins only see types where
+  // they hold the matching canManage* capability on at least one organization.
+  const canManageCoursesMenu = isAdmin || (isOrgAdmin && orgAdminCaps.canManageCourses);
+  const canManageEventsMenu = isAdmin || (isOrgAdmin && orgAdminCaps.canManageEvents);
+  const canManageDegreesMenu = isAdmin || (isOrgAdmin && orgAdminCaps.canManageDegrees);
 
   const t = useTranslations('common');
 
@@ -99,10 +106,26 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
         </Link>
       </MenuItem>
 
-      {isAdminOrOrgAdmin && (
+      {canManageCoursesMenu && (
         <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/courses')}>
           <Link className="block -my-3 -mx-4 py-3 px-4 text-lg" href="/manage/courses">
             {t('menu.courses')}
+          </Link>
+        </MenuItem>
+      )}
+
+      {canManageEventsMenu && (
+        <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/events')}>
+          <Link className="block -my-3 -mx-4 py-3 px-4 text-lg" href="/manage/events">
+            {t('menu.events')}
+          </Link>
+        </MenuItem>
+      )}
+
+      {canManageDegreesMenu && (
+        <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/degrees')}>
+          <Link className="block -my-3 -mx-4 py-3 px-4 text-lg" href="/manage/degrees">
+            {t('menu.degrees')}
           </Link>
         </MenuItem>
       )}
