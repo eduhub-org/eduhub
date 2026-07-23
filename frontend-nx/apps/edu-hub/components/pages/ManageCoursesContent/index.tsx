@@ -57,12 +57,15 @@ import { MdMarkEmailRead } from 'react-icons/md';
 import CommonPageHeader from '../../common/CommonPageHeader';
 import { ProgramsMenubar } from '../../layout/ProgramsMenubar';
 import type { StaticComponentProperty } from '../../../types/UIComponents';
+import { ProgramType } from '../../../types/enums';
 
 interface IProps {
   programs: Programs_Program[];
+  /** Scopes the list (including the "All" tab) to a single Program.type. */
+  programType: ProgramType;
 }
 
-const ManageCoursesContent: FC<IProps> = ({ programs }) => {
+const ManageCoursesContent: FC<IProps> = ({ programs, programType }) => {
   const t = useTranslations('manageCourses');
   const tCommon = useTranslations('common');
   const tCoursePage = useTranslations('coursePage');
@@ -72,6 +75,22 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
   // restricts org admins to courses of programs in their own organizations (empty for super-admins).
   const manageRole = useManageRole();
   const orgCourseWhere = useManageCourseWhere();
+
+  const programTypeWhere = useMemo(
+    () => ({ Program: { type: { _eq: programType } } }),
+    [programType]
+  );
+
+  const headline = useMemo(() => {
+    switch (programType) {
+      case ProgramType.EVENTS:
+        return tCoursePage('eventsHeadline');
+      case ProgramType.DEGREES:
+        return tCoursePage('degreesHeadline');
+      default:
+        return tCoursePage('coursesHeadline');
+    }
+  }, [programType, tCoursePage]);
 
   // Calculate default program
   const sortedPrograms = useMemo(() => {
@@ -97,7 +116,10 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
   // Filter state management (single source of truth)
   const [filter, setFilter] = useState<AdminCourseListVariables>({
     limit: 100,
-    where: { programId: { _eq: defaultProgramId } },
+    where: {
+      ...programTypeWhere,
+      programId: { _eq: defaultProgramId },
+    },
     order_by: [{ id: order_by.desc }],
   });
 
@@ -207,16 +229,20 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
   // Handle program tab clicks (moved after useTableGrid to access setPageIndex)
   const handleTabClick = useCallback(
     (property: StaticComponentProperty) => {
-      // Update the base filter with the new program selection
+      // Update the base filter with the new program selection. Keep program-type scope so the
+      // "All" tab never leaks courses of other types.
       updateFilter({
         ...filter,
-        where: property.key === allTabId ? {} : { programId: { _eq: property.key } },
+        where:
+          property.key === allTabId
+            ? { ...programTypeWhere }
+            : { ...programTypeWhere, programId: { _eq: property.key } },
       });
       // Reset pagination state when switching programs
       setPageIndex(0);
       // Keep search term when switching programs
     },
-    [filter, updateFilter, allTabId, setPageIndex]
+    [filter, updateFilter, allTabId, setPageIndex, programTypeWhere]
   );
 
   // Dialog state for program selection
@@ -757,15 +783,18 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
 
   return (
     <>
-      <CommonPageHeader headline={tCoursePage('coursesHeadline')} />
-      <div className="flex justify-start mb-5 text-white">
-        <ProgramsMenubar
-          programs={menubarPrograms}
-          defaultProgramId={defaultProgramId ?? 0}
-          currentSelectedId={currentProgramId}
-          onTabClicked={handleTabClick}
-        />
-      </div>
+      <CommonPageHeader headline={headline} />
+      {/* Only show the program tab select when there is more than one program to switch between. */}
+      {programs.length > 1 && (
+        <div className="flex justify-start mb-5 text-white">
+          <ProgramsMenubar
+            programs={menubarPrograms}
+            defaultProgramId={defaultProgramId ?? 0}
+            currentSelectedId={currentProgramId}
+            onTabClicked={handleTabClick}
+          />
+        </div>
+      )}
 
       {loading ? (
         <div className="pb-12 pt-16">

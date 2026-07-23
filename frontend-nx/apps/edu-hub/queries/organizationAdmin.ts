@@ -131,6 +131,19 @@ export const UPDATE_ORGANIZATION_ADMIN_ORGANIZATION_ID = gql`
   }
 `;
 
+// Capability flags on the current user's OrganizationAdmin grants. Run under org_admin so Hasura
+// returns the caller's own rows. Used for menu visibility: show Courses/Events/Degrees when any
+// grant carries the matching canManage* flag.
+export const MY_ORG_ADMIN_CAPABILITIES = gql`
+  query MyOrgAdminCapabilities($userId: uuid!) {
+    OrganizationAdmin(where: { userId: { _eq: $userId } }) {
+      canManageCourses
+      canManageEvents
+      canManageDegrees
+    }
+  }
+`;
+
 // Organizations the current user may add admins to. Run under the management role: for a super-admin
 // (admin role) this is unused (they use ORGANIZATION_OPTIONS for the full list); for an org admin
 // (org_admin role) we scope explicitly to the caller's OWN grant rows that carry canManageSettings.

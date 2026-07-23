@@ -44,6 +44,8 @@
       "admin_users": "Admin Users",
       "experts": "Experts",
       "courses": "Courses",
+      "events": "Events",
+      "degrees": "Degrees",
       "projects": "Projects",
       "programs": "Programs",
       "organizations": "Organizations",
@@ -52,7 +54,10 @@
       "calendar": "Calendar",
       "statistics": "Statistics",
       "course_instructor_manual": "Course Instructor Manual",
-      "logout": "Logout"
+      "logout": "Logout",
+      "section_personal": "Personal",
+      "section_management": "Management",
+      "section_help": "Help"
     },
     "change-password": "Change email or password",
     "add": "Add",
@@ -700,6 +705,8 @@
     "toCourseDescription": "to course description",
     "coursesPageTitle": "Courses: opencampus.sh Edu Hub",
     "coursesHeadline": "Courses",
+    "eventsHeadline": "Events",
+    "degreesHeadline": "Degrees",
     "courseSearchPlaceholder": "Search in title",
     "addCourseText": "Add Course",
     "addCourseFormTitle": "Add Course",
@@ -1038,6 +1045,12 @@
       "status": "Status",
       "email_templates": "Templates",
       "has_custom_templates": "This course has custom email templates"
+    },
+    "error_loading_programs": "The programs could not be loaded. Please try again later.",
+    "empty_state": {
+      "events": "No events programs exist yet. Ask a platform admin to set up an events program for your organization before you can manage events here.",
+      "courses": "No course programs exist yet. Ask a platform admin to set up a course program for your organization before you can manage courses here.",
+      "degrees": "No degree programs exist yet. Ask a platform admin to set up a degree program for your organization before you can manage degrees here."
     },
     "view": "View",
     "view_course": "View Course",
@@ -2621,6 +2634,14 @@
         "jobboerse": {
           "label": "Job board (StuJo)",
           "description": "Moderate job postings, manage portals, prices and credits"
+        },
+        "location-addresses": {
+          "label": "Location addresses",
+          "description": "Manage addresses for offline sessions and event venues"
+        },
+        "organizations": {
+          "label": "Organizations",
+          "description": "Create, edit, and merge organizations"
         }
       }
     },

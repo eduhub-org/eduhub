@@ -44,6 +44,8 @@
       "admin_users": "Admin-Benutzer",
       "experts": "Experten",
       "courses": "Kurse",
+      "events": "Veranstaltungen",
+      "degrees": "Degrees",
       "projects": "Projekte",
       "programs": "Programme",
       "organizations": "Organisationen",
@@ -52,7 +54,10 @@
       "calendar": "Kalender",
       "statistics": "Statistiken",
       "course_instructor_manual": "Kursleitungshandbuch",
-      "logout": "Logout"
+      "logout": "Logout",
+      "section_personal": "Persönlich",
+      "section_management": "Verwaltung",
+      "section_help": "Hilfe"
     },
     "change-password": "Passwort oder E-Mail ändern",
     "add": "Hinzufügen",
@@ -700,6 +705,8 @@
     "toCourseDescription": "zur Kursbeschreibung",
     "coursesPageTitle": "Courses: opencampus.sh Edu Hub",
     "coursesHeadline": "Kurse",
+    "eventsHeadline": "Veranstaltungen",
+    "degreesHeadline": "Degrees",
     "courseSearchPlaceholder": "Search in title",
     "addCourseText": "Add Course",
     "addCourseFormTitle": "Kurs hinzufügen",
@@ -1022,6 +1029,12 @@
       "status": "Status",
       "email_templates": "Vorlagen",
       "has_custom_templates": "Dieser Kurs hat kursspezifische E-Mail-Vorlagen"
+    },
+    "error_loading_programs": "Die Programme konnten nicht geladen werden. Bitte versuche es später erneut.",
+    "empty_state": {
+      "events": "Es gibt noch kein Veranstaltungsprogramm. Bitte einen Plattform-Admin, ein Veranstaltungsprogramm für deine Organisation anzulegen, bevor du hier Veranstaltungen verwalten kannst.",
+      "courses": "Es gibt noch kein Kursprogramm. Bitte einen Plattform-Admin, ein Kursprogramm für deine Organisation anzulegen, bevor du hier Kurse verwalten kannst.",
+      "degrees": "Es gibt noch kein Studiengangsprogramm. Bitte einen Plattform-Admin, ein Studiengangsprogramm für deine Organisation anzulegen, bevor du hier Studiengänge verwalten kannst."
     },
     "view": "Anzeigen",
     "view_course": "Kurs anzeigen",
@@ -2068,13 +2081,13 @@
     "programTypes": {
       "COURSES": "Kurse",
       "EVENTS": "Veranstaltungen",
-      "DEGREES": "Studiengänge"
+      "DEGREES": "Degrees"
     },
     "onboarding": {
       "label": "Onboarding-Texte",
       "courses_label": "Kurse",
       "events_label": "Veranstaltungen",
-      "degrees_label": "Studiengänge",
+      "degrees_label": "Degrees",
       "text_de": "Text (Deutsch)",
       "text_en": "Text (Englisch)",
       "preview": "Vorschau",
@@ -2606,6 +2619,14 @@
         "jobboerse": {
           "label": "Jobbörse (StuJo)",
           "description": "Stellenangebote moderieren, Portale, Preise und Kontingente verwalten"
+        },
+        "location-addresses": {
+          "label": "Veranstaltungsadressen",
+          "description": "Adressen für Offline-Sessions und Veranstaltungsorte verwalten"
+        },
+        "organizations": {
+          "label": "Organisationen",
+          "description": "Organisationen anlegen, bearbeiten und zusammenführen"
         }
       }
     },

@@ -1,5 +1,6 @@
 import { ComponentType } from 'react';
 import {
+  MdOutlineBusiness,
   MdOutlineCategory,
   MdOutlineWorkOutline,
   MdOutlineDescription,
@@ -10,6 +11,7 @@ import {
   MdOutlineHome,
   MdOutlineLock,
   MdOutlinePalette,
+  MdOutlinePlace,
   MdOutlineSettings,
   MdOutlineVerified,
   MdOutlineWorkspacePremium,
@@ -29,6 +31,7 @@ export type SettingsNavItemId =
   | 'appearance'
   | 'jobboerse'
   | 'homepage'
+  | 'location-addresses'
   | 'emails'
   | 'programs'
   | 'attendance-certificates'
@@ -38,7 +41,8 @@ export type SettingsNavItemId =
   | 'course-groups'
   | 'badges'
   | 'time-zone'
-  | 'access';
+  | 'access'
+  | 'organizations';
 
 export type SettingsNavItemDef = {
   id: SettingsNavItemId;
@@ -77,6 +81,14 @@ export const SETTINGS_NAV_ITEMS: Record<SettingsNavItemId, SettingsNavItemDef> =
     id: 'homepage',
     icon: MdOutlineHome,
     href: '/manage/settings/homepage',
+    requiredCapability: 'admin',
+    status: 'live',
+    groupId: 'platform',
+  },
+  'location-addresses': {
+    id: 'location-addresses',
+    icon: MdOutlinePlace,
+    href: '/manage/settings/location-addresses',
     requiredCapability: 'admin',
     status: 'live',
     groupId: 'platform',
@@ -161,13 +173,21 @@ export const SETTINGS_NAV_ITEMS: Record<SettingsNavItemId, SettingsNavItemDef> =
     status: 'live',
     groupId: 'system',
   },
+  organizations: {
+    id: 'organizations',
+    icon: MdOutlineBusiness,
+    href: '/manage/settings/organizations',
+    requiredCapability: 'admin',
+    status: 'live',
+    groupId: 'system',
+  },
 };
 
 /** Sidebar / overview group order and membership. */
 export const SETTINGS_NAV_GROUPS: SettingsNavGroupDef[] = [
   {
     id: 'platform',
-    items: ['appearance', 'homepage', 'jobboerse'],
+    items: ['appearance', 'homepage', 'jobboerse', 'location-addresses'],
   },
   {
     id: 'notifications',
@@ -187,7 +207,7 @@ export const SETTINGS_NAV_GROUPS: SettingsNavGroupDef[] = [
   },
   {
     id: 'system',
-    items: ['time-zone', 'access'],
+    items: ['time-zone', 'access', 'organizations'],
   },
 ];
 

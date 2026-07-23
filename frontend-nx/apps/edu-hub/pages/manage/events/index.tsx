@@ -24,7 +24,7 @@ const Index: FC = () => {
         <div className="min-h-[77vh]">
           {isLoggedIn && (isAdmin || isOrgAdmin) && (
             <ManagementRoleProvider>
-              <ProgramManagementDashboard programType={ProgramType.COURSES} />
+              <ProgramManagementDashboard programType={ProgramType.EVENTS} />
             </ManagementRoleProvider>
           )}
         </div>
@@ -34,5 +34,3 @@ const Index: FC = () => {
 };
 
 export default Index;
-
-export const QUERY_LIMIT = 50;

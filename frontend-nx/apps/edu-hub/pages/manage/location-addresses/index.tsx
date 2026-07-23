@@ -1,23 +1,14 @@
-import Head from 'next/head';
-import { FC } from 'react';
-import { Page } from '../../../components/layout/Page';
-import { useIsAdmin } from '../../../hooks/authentication';
-import ManageLocationAddressesContent from '../../../components/pages/ManageLocationAddressesContent';
+// do not remove this https://github.com/nrwl/nx/issues/9017#issuecomment-1140066503
+import path from 'path';
+path.resolve('./next.config.js');
 
-const LocationAddresses: FC = () => {
-  const isAdmin = useIsAdmin();
+import { GetServerSideProps } from 'next';
 
-  return (
-    <>
-      <Head>
-        <title>Manage Location Addresses</title>
-        <link rel="icon" href="/favicon.png" />
-      </Head>
-      <Page>
-        <div className="min-h-[77vh]">{isAdmin && <ManageLocationAddressesContent />}</div>
-      </Page>
-    </>
-  );
-};
+/** @deprecated Use /manage/settings/location-addresses — kept for bookmarks and external links. */
+export const getServerSideProps: GetServerSideProps = async () => ({
+  redirect: { destination: '/manage/settings/location-addresses', permanent: false },
+});
 
-export default LocationAddresses;
+export default function ManageLocationAddressesRedirect() {
+  return null;
+}
