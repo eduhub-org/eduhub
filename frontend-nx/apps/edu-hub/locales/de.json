@@ -54,7 +54,10 @@
       "calendar": "Kalender",
       "statistics": "Statistiken",
       "course_instructor_manual": "Kursleitungshandbuch",
-      "logout": "Logout"
+      "logout": "Logout",
+      "section_personal": "Persönlich",
+      "section_management": "Verwaltung",
+      "section_help": "Hilfe"
     },
     "change-password": "Passwort oder E-Mail ändern",
     "add": "Hinzufügen",
@@ -2610,6 +2613,14 @@
         "jobboerse": {
           "label": "Jobbörse (StuJo)",
           "description": "Stellenangebote moderieren, Portale, Preise und Kontingente verwalten"
+        },
+        "location-addresses": {
+          "label": "Veranstaltungsadressen",
+          "description": "Adressen für Offline-Sessions und Veranstaltungsorte verwalten"
+        },
+        "organizations": {
+          "label": "Organisationen",
+          "description": "Organisationen anlegen, bearbeiten und zusammenführen"
         }
       }
     },

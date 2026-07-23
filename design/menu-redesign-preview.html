@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduHub Menu Redesign — Design Options</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --brand: #00A398;
+      --brand-dark: #008078;
+      --bg-primary: #222222;
+      --bg-secondary: #333333;
+      --bg-card: #2a2a2a;
+      --bg-deep: #0F0F0F;
+      --label-primary: #F2F2F2;
+      --label-secondary: #D8D8D8;
+      --label-muted: #888888;
+      --border: #444444;
+      --warning: #FFA665;
+      --white: #FFFFFF;
+      --on-light: #222222;
+      --on-light-secondary: #666666;
+      --light-bg: #F2F2F2;
+      --light-hover: #E5E5E5;
+      --radius: 8px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Space Grotesk', system-ui, sans-serif;
+      background: #1a1a1a;
+      color: var(--label-primary);
+      font-weight: 500;
+      line-height: 1.45;
+    }
+
+    .preview-bar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--bg-deep);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .preview-bar h1 {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--label-secondary);
+      margin-right: auto;
+    }
+
+    .preview-bar h1 span { color: var(--brand); }
+
+    .screen-tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .screen-tab {
+      background: transparent;
+      border: 2px solid var(--border);
+      color: var(--label-secondary);
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 6px 14px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .screen-tab:hover { border-color: var(--brand); color: var(--brand); }
+    .screen-tab.active {
+      background: var(--brand);
+      border-color: var(--brand);
+      color: var(--white);
+    }
+
+    .stage {
+      padding: 40px 24px 80px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .screen {
+      display: none;
+      width: 100%;
+      max-width: 1100px;
+    }
+
+    .screen.active { display: block; }
+
+    .screen-meta {
+      margin-bottom: 24px;
+      max-width: 640px;
+    }
+
+    .screen-meta h2 {
+      font-size: 22px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .screen-meta p {
+      color: var(--label-secondary);
+      font-size: 14px;
+    }
+
+    .screen-meta .badge {
+      display: inline-block;
+      margin-top: 10px;
+      font-size: 11px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--brand);
+      border: 1px solid var(--brand);
+      border-radius: 999px;
+      padding: 3px 10px;
+    }
+
+    /* App chrome mock */
+    .app-chrome {
+      background: var(--bg-primary);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      min-height: 520px;
+      position: relative;
+    }
+
+    .app-header {
+      height: 64px;
+      background: var(--bg-deep);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+    }
+
+    .logo {
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+
+    .logo span { color: var(--brand); }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--brand);
+      color: var(--white);
+      display: grid;
+      place-items: center;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 0 0 2px transparent;
+    }
+
+    .avatar.active {
+      box-shadow: 0 0 0 2px var(--brand);
+    }
+
+    .app-body {
+      padding: 32px;
+      color: var(--label-muted);
+      font-size: 14px;
+    }
+
+    /* Shared menu panel (light surface, matches current Menu.tsx) */
+    .menu-panel {
+      position: absolute;
+      top: 60px;
+      right: 20px;
+      background: var(--white);
+      color: var(--on-light);
+      border-radius: var(--radius);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+      min-width: 240px;
+      padding: 12px 0;
+      z-index: 10;
+    }
+
+    .menu-item {
+      display: block;
+      padding: 10px 20px;
+      font-size: 16px;
+      color: var(--on-light);
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .menu-item:hover { background: var(--light-hover); }
+
+    .menu-item.active {
+      background: var(--light-bg);
+      border-left: 3px solid var(--warning);
+      padding-left: 17px;
+    }
+
+    .menu-section {
+      padding: 10px 20px 4px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--on-light-secondary);
+    }
+
+    .menu-divider {
+      height: 1px;
+      background: #E5E5E5;
+      margin: 8px 12px;
+    }
+
+    .menu-item.logout {
+      color: var(--on-light-secondary);
+    }
+
+    .menu-item.nested {
+      padding-left: 32px;
+      font-size: 15px;
+    }
+
+    .menu-item.parent {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .chevron {
+      width: 16px;
+      height: 16px;
+      color: var(--on-light-secondary);
+      transition: transform 0.15s;
+    }
+
+    .chevron.open { transform: rotate(90deg); }
+
+    /* Option 4: two-column mega */
+    .menu-panel.mega {
+      min-width: 460px;
+      padding: 16px;
+      display: grid;
+      grid-template-columns: 1fr 1.4fr;
+      gap: 8px 16px;
+    }
+
+    .mega-col {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .mega-col .menu-item {
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 15px;
+    }
+
+    .mega-col .menu-item.active {
+      border-left: none;
+      padding-left: 12px;
+      background: var(--light-bg);
+      box-shadow: inset 3px 0 0 var(--warning);
+    }
+
+    .mega-col .menu-section { padding: 4px 12px 8px; }
+
+    /* Option 3 hub page */
+    .hub-layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+
+    .hub-header h3 {
+      font-size: 28px;
+      font-weight: 600;
+      color: var(--label-primary);
+      margin-bottom: 6px;
+    }
+
+    .hub-header p {
+      color: var(--label-secondary);
+      font-size: 14px;
+    }
+
+    .hub-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+    }
+
+    .hub-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      cursor: pointer;
+      transition: border-color 0.15s, transform 0.15s;
+    }
+
+    .hub-card:hover {
+      border-color: var(--brand);
+      transform: translateY(-2px);
+    }
+
+    .hub-card .icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: var(--bg-secondary);
+      display: grid;
+      place-items: center;
+      margin-bottom: 14px;
+      color: var(--brand);
+      font-size: 18px;
+    }
+
+    .hub-card h4 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .hub-card p {
+      font-size: 13px;
+      color: var(--label-muted);
+    }
+
+    .compare {
+      margin-top: 32px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    @media (max-width: 800px) {
+      .compare { grid-template-columns: 1fr; }
+      .menu-panel.mega { min-width: 280px; grid-template-columns: 1fr; }
+    }
+
+    .note {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 18px;
+      font-size: 13px;
+      color: var(--label-secondary);
+    }
+
+    .note strong { color: var(--label-primary); }
+
+    .pair {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 900px) {
+      .pair { grid-template-columns: 1fr; }
+    }
+
+    .pair-label {
+      font-size: 12px;
+      color: var(--label-muted);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+  </style>
+</head>
+<body>
+  <div class="preview-bar">
+    <h1>EduHub <span>Menu Redesign</span> — Design Options</h1>
+    <div class="screen-tabs" role="tablist">
+      <button class="screen-tab active" data-screen="opt1">1 · Grouped</button>
+      <button class="screen-tab" data-screen="opt2">2 · Collapsible</button>
+      <button class="screen-tab" data-screen="opt3">3 · Hub page</button>
+      <button class="screen-tab" data-screen="opt4">4 · Two-column</button>
+    </div>
+  </div>
+
+  <div class="stage">
+    <!-- Option 1: Grouped dropdown -->
+    <section class="screen active" id="opt1">
+      <div class="screen-meta">
+        <h2>Option 1 — Grouped dropdown</h2>
+        <p>
+          Keep the current light dropdown, add section headers and dividers
+          (Persönlich / Verwaltung / Hilfe). Lowest implementation cost;
+          shortens the visual list without changing navigation model.
+        </p>
+        <span class="badge">Recommended baseline</span>
+      </div>
+
+      <div class="app-chrome">
+        <div class="app-header">
+          <div class="logo">edu<span>hub</span></div>
+          <div class="header-actions">
+            <div class="avatar active">AD</div>
+          </div>
+        </div>
+        <div class="app-body">Page content…</div>
+
+        <div class="menu-panel" style="min-width: 260px;">
+          <div class="menu-section">Persönlich</div>
+          <a class="menu-item">Mein Profil</a>
+          <a class="menu-item">Meine Zertifikate</a>
+          <div class="menu-divider"></div>
+          <div class="menu-section">Verwaltung</div>
+          <a class="menu-item active">Kurse</a>
+          <a class="menu-item">Veranstaltungen</a>
+          <a class="menu-item">Degrees</a>
+          <a class="menu-item">Projekte</a>
+          <a class="menu-item">Benutzer</a>
+          <a class="menu-item">Experten</a>
+          <a class="menu-item">Kalender</a>
+          <a class="menu-item">Statistiken</a>
+          <a class="menu-item">Einstellungen</a>
+          <div class="menu-divider"></div>
+          <div class="menu-section">Hilfe</div>
+          <a class="menu-item">Kursleitungshandbuch</a>
+          <a class="menu-item">FAQ</a>
+          <div class="menu-divider"></div>
+          <a class="menu-item logout">Logout</a>
+        </div>
+      </div>
+
+      <div class="compare">
+        <div class="note">
+          <strong>Pros:</strong> Familiar pattern, matches current Menu.tsx styling,
+          clear hierarchy, works for org admins (fewer Verwaltung items).
+        </div>
+        <div class="note">
+          <strong>Cons:</strong> Admin list is still long (~12 Verwaltung rows);
+          section headers add a bit of height.
+        </div>
+      </div>
+    </section>
+
+    <!-- Option 2: Collapsible -->
+    <section class="screen" id="opt2">
+      <div class="screen-meta">
+        <h2>Option 2 — Collapsible Verwaltung</h2>
+        <p>
+          Slim default dropdown. “Verwaltung” expands inline to reveal management
+          links. Ideal when admins open the menu mostly for Profil / Einstellungen /
+          Logout.
+        </p>
+      </div>
+
+      <div class="pair">
+        <div>
+          <div class="pair-label">Collapsed</div>
+          <div class="app-chrome" style="min-height: 420px;">
+            <div class="app-header">
+              <div class="logo">edu<span>hub</span></div>
+              <div class="header-actions"><div class="avatar active">AD</div></div>
+            </div>
+            <div class="app-body">Page content…</div>
+            <div class="menu-panel" style="min-width: 240px;">
+              <a class="menu-item">Mein Profil</a>
+              <a class="menu-item">Meine Zertifikate</a>
+              <div class="menu-divider"></div>
+              <a class="menu-item parent">
+                Verwaltung
+                <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+              </a>
+              <a class="menu-item">Einstellungen</a>
+              <div class="menu-divider"></div>
+              <a class="menu-item">Kursleitungshandbuch</a>
+              <a class="menu-item">FAQ</a>
+              <div class="menu-divider"></div>
+              <a class="menu-item logout">Logout</a>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="pair-label">Expanded</div>
+          <div class="app-chrome" style="min-height: 420px;">
+            <div class="app-header">
+              <div class="logo">edu<span>hub</span></div>
+              <div class="header-actions"><div class="avatar active">AD</div></div>
+            </div>
+            <div class="app-body">Page content…</div>
+            <div class="menu-panel" style="min-width: 240px;">
+              <a class="menu-item">Mein Profil</a>
+              <a class="menu-item">Meine Zertifikate</a>
+              <div class="menu-divider"></div>
+              <a class="menu-item parent">
+                Verwaltung
+                <svg class="chevron open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+              </a>
+              <a class="menu-item nested active">Kurse</a>
+              <a class="menu-item nested">Veranstaltungen</a>
+              <a class="menu-item nested">Degrees</a>
+              <a class="menu-item nested">Projekte</a>
+              <a class="menu-item nested">Benutzer</a>
+              <a class="menu-item nested">Experten</a>
+              <a class="menu-item nested">Kalender</a>
+              <a class="menu-item nested">Statistiken</a>
+              <a class="menu-item">Einstellungen</a>
+              <div class="menu-divider"></div>
+              <a class="menu-item">Kursleitungshandbuch</a>
+              <a class="menu-item">FAQ</a>
+              <div class="menu-divider"></div>
+              <a class="menu-item logout">Logout</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="compare">
+        <div class="note">
+          <strong>Pros:</strong> Short by default; one extra click only when managing.
+          Auto-expand when current route is under /manage.
+        </div>
+        <div class="note">
+          <strong>Cons:</strong> Extra interaction; nested items can feel cramped on mobile.
+        </div>
+      </div>
+    </section>
+
+    <!-- Option 3: Slim + hub -->
+    <section class="screen" id="opt3">
+      <div class="screen-meta">
+        <h2>Option 3 — Slim dropdown + Verwaltung hub</h2>
+        <p>
+          Menu stays minimal. “Verwaltung” opens a dedicated hub page with cards
+          for each management area. Best for discoverability and future growth.
+        </p>
+      </div>
+
+      <div class="pair">
+        <div>
+          <div class="pair-label">Dropdown</div>
+          <div class="app-chrome" style="min-height: 380px;">
+            <div class="app-header">
+              <div class="logo">edu<span>hub</span></div>
+              <div class="header-actions"><div class="avatar active">AD</div></div>
+            </div>
+            <div class="app-body">Page content…</div>
+            <div class="menu-panel" style="min-width: 240px;">
+              <a class="menu-item">Mein Profil</a>
+              <a class="menu-item">Meine Zertifikate</a>
+              <div class="menu-divider"></div>
+              <a class="menu-item active">Verwaltung</a>
+              <a class="menu-item">Einstellungen</a>
+              <div class="menu-divider"></div>
+              <a class="menu-item">Kursleitungshandbuch</a>
+              <a class="menu-item">FAQ</a>
+              <div class="menu-divider"></div>
+              <a class="menu-item logout">Logout</a>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="pair-label">Hub page · /manage</div>
+          <div class="app-chrome" style="min-height: 380px;">
+            <div class="app-header">
+              <div class="logo">edu<span>hub</span></div>
+              <div class="header-actions"><div class="avatar">AD</div></div>
+            </div>
+            <div class="app-body" style="padding: 28px;">
+              <div class="hub-layout">
+                <div class="hub-header">
+                  <h3>Verwaltung</h3>
+                  <p>Wähle einen Bereich, um Kurse, Nutzer und mehr zu verwalten.</p>
+                </div>
+                <div class="hub-grid">
+                  <div class="hub-card"><div class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div><h4>Kurse</h4><p>Programme &amp; Kurse</p></div>
+                  <div class="hub-card"><div class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div><h4>Veranstaltungen</h4><p>Events verwalten</p></div>
+                  <div class="hub-card"><div class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></div><h4>Degrees</h4><p>Degree-Programme</p></div>
+                  <div class="hub-card"><div class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div><h4>Projekte</h4><p>Alle Projekte</p></div>
+                  <div class="hub-card"><div class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><h4>Benutzer</h4><p>Nutzer verwalten</p></div>
+                  <div class="hub-card"><div class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/></svg></div><h4>Experten</h4><p>Expert:innen</p></div>
+                  <div class="hub-card"><div class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div><h4>Kalender</h4><p>Session-Übersicht</p></div>
+                  <div class="hub-card"><div class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg></div><h4>Statistiken</h4><p>Kennzahlen</p></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="compare">
+        <div class="note">
+          <strong>Pros:</strong> Shortest menu; room for descriptions/icons; scales well;
+          mirrors the Settings overview pattern.
+        </div>
+        <div class="note">
+          <strong>Cons:</strong> Extra page load for every management task; needs a new
+          <code>/manage</code> route.
+        </div>
+      </div>
+    </section>
+
+    <!-- Option 4: Two-column mega -->
+    <section class="screen" id="opt4">
+      <div class="screen-meta">
+        <h2>Option 4 — Two-column mega-dropdown</h2>
+        <p>
+          Wider panel: personal + help on the left, full Verwaltung list on the right.
+          Everything visible at once without scrolling a tall single column.
+        </p>
+      </div>
+
+      <div class="app-chrome">
+        <div class="app-header">
+          <div class="logo">edu<span>hub</span></div>
+          <div class="header-actions"><div class="avatar active">AD</div></div>
+        </div>
+        <div class="app-body">Page content…</div>
+
+        <div class="menu-panel mega">
+          <div class="mega-col">
+            <div class="menu-section">Persönlich</div>
+            <a class="menu-item">Mein Profil</a>
+            <a class="menu-item">Meine Zertifikate</a>
+            <div class="menu-section" style="margin-top: 12px;">Hilfe</div>
+            <a class="menu-item">Kursleitungshandbuch</a>
+            <a class="menu-item">FAQ</a>
+            <div class="menu-divider" style="margin: 12px 0;"></div>
+            <a class="menu-item logout">Logout</a>
+          </div>
+          <div class="mega-col" style="border-left: 1px solid #E5E5E5; padding-left: 12px;">
+            <div class="menu-section">Verwaltung</div>
+            <a class="menu-item active">Kurse</a>
+            <a class="menu-item">Veranstaltungen</a>
+            <a class="menu-item">Degrees</a>
+            <a class="menu-item">Projekte</a>
+            <a class="menu-item">Benutzer</a>
+            <a class="menu-item">Experten</a>
+            <a class="menu-item">Kalender</a>
+            <a class="menu-item">Statistiken</a>
+            <a class="menu-item">Einstellungen</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="compare">
+        <div class="note">
+          <strong>Pros:</strong> All links visible; clear separation of personal vs admin;
+          less vertical scroll on desktop.
+        </div>
+        <div class="note">
+          <strong>Cons:</strong> Awkward on narrow viewports (falls back to single column);
+          visually heavier than the current menu.
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const tabs = document.querySelectorAll('.screen-tab');
+    const screens = document.querySelectorAll('.screen');
+    tabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        tabs.forEach((t) => t.classList.remove('active'));
+        screens.forEach((s) => s.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById(tab.dataset.screen).classList.add('active');
+      });
+    });
+  </script>
+</body>
+</html>

@@ -119,7 +119,14 @@ const ExpandableLocationAddressRow: React.FC<ExpandableRowProps> = ({ row, onErr
   );
 };
 
-const ManageLocationAddressesContent: FC = () => {
+type ManageLocationAddressesContentProps = {
+  /** When true, rendered inside SettingsLayout (no PageBlock / page header). */
+  inSettingsLayout?: boolean;
+};
+
+const ManageLocationAddressesContent: FC<ManageLocationAddressesContentProps> = ({
+  inSettingsLayout = false,
+}) => {
   const t = useTranslations('manageLocationAddresses');
   const tCommon = useTranslations('common');
   const [error, setError] = useState<string | null>(null);
@@ -533,60 +540,68 @@ const ManageLocationAddressesContent: FC = () => {
     setSelectedRowsForBulkAction([]);
   }, [selectedRowsForBulkAction, deleteLocationAddress, debouncedRefetch, t]);
 
+  const table = (
+    <>
+      {loading && <Loading />}
+      {!loading && (
+        <div>
+          {!inSettingsLayout && <CommonPageHeader headline={t('headline')} />}
+          <TableGrid
+            columns={columns}
+            data={data?.LocationAddress || []}
+            totalCount={data?.LocationAddress_aggregate?.aggregate?.count || 0}
+            pageIndex={pageIndex}
+            onPageChange={setPageIndex}
+            pageSize={pageSize}
+            onPageSizeChange={handlePageSizeChange}
+            searchFilter={searchFilter}
+            onSearchFilterChange={setSearchFilter}
+            sorting={sorting}
+            onSortingChange={setSorting}
+            deleteMutation={DELETE_LOCATION_ADDRESS}
+            error={queryError}
+            loading={loading}
+            refetchQueries={['LocationAddressList']}
+            bulkActions={bulkActions}
+            onBulkAction={handleBulkAction}
+            generateDeletionConfirmationQuestion={generateDeletionConfirmation}
+            expandableRowComponent={({ row }) => <ExpandableLocationAddressRow row={row} onError={setError} />}
+            onAddButtonClick={onAddLocationAddressClick}
+            addButtonText={t('action.add')}
+          />
+          <ErrorMessageDialog errorMessage={error || ''} open={!!error} onClose={handleCloseErrorDialog} />
+          <QuestionConfirmationDialog
+            open={bulkActionDialogOpen}
+            question={t('bulk_action.delete.description', {
+              count: selectedRowsForBulkAction.length,
+            })}
+            onConfirm={handleBulkActionConfirmation}
+            onClose={() => {
+              setBulkActionDialogOpen(false);
+              setSelectedRowsForBulkAction([]);
+            }}
+          />
+          <MergeLocationAddressesDialog
+            open={mergeDialogOpen}
+            onClose={() => {
+              setMergeDialogOpen(false);
+              setSelectedRowsForBulkAction([]);
+            }}
+            onConfirm={handleMergeConfirmation}
+            selectedAddresses={selectedRowsForBulkAction}
+          />
+        </div>
+      )}
+    </>
+  );
+
+  if (inSettingsLayout) {
+    return table;
+  }
+
   return (
     <PageBlock>
-      <div className="max-w-screen-xl mx-auto mt-20">
-        {loading && <Loading />}
-        {!loading && (
-          <div>
-            <CommonPageHeader headline={t('headline')} />
-            <TableGrid
-              columns={columns}
-              data={data?.LocationAddress || []}
-              totalCount={data?.LocationAddress_aggregate?.aggregate?.count || 0}
-              pageIndex={pageIndex}
-              onPageChange={setPageIndex}
-              pageSize={pageSize}
-              onPageSizeChange={handlePageSizeChange}
-              searchFilter={searchFilter}
-              onSearchFilterChange={setSearchFilter}
-              sorting={sorting}
-              onSortingChange={setSorting}
-              deleteMutation={DELETE_LOCATION_ADDRESS}
-              error={queryError}
-              loading={loading}
-              refetchQueries={['LocationAddressList']}
-              bulkActions={bulkActions}
-              onBulkAction={handleBulkAction}
-              generateDeletionConfirmationQuestion={generateDeletionConfirmation}
-              expandableRowComponent={({ row }) => <ExpandableLocationAddressRow row={row} onError={setError} />}
-              onAddButtonClick={onAddLocationAddressClick}
-              addButtonText={t('action.add')}
-            />
-            <ErrorMessageDialog errorMessage={error || ''} open={!!error} onClose={handleCloseErrorDialog} />
-            <QuestionConfirmationDialog
-              open={bulkActionDialogOpen}
-              question={t('bulk_action.delete.description', {
-                count: selectedRowsForBulkAction.length,
-              })}
-              onConfirm={handleBulkActionConfirmation}
-              onClose={() => {
-                setBulkActionDialogOpen(false);
-                setSelectedRowsForBulkAction([]);
-              }}
-            />
-            <MergeLocationAddressesDialog
-              open={mergeDialogOpen}
-              onClose={() => {
-                setMergeDialogOpen(false);
-                setSelectedRowsForBulkAction([]);
-              }}
-              onConfirm={handleMergeConfirmation}
-              selectedAddresses={selectedRowsForBulkAction}
-            />
-          </div>
-        )}
-      </div>
+      <div className="max-w-screen-xl mx-auto mt-20">{table}</div>
     </PageBlock>
   );
 };

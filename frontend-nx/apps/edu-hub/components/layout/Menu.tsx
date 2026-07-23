@@ -1,4 +1,6 @@
+import Divider from '@mui/material/Divider';
 import Fade from '@mui/material/Fade';
+import ListSubheader from '@mui/material/ListSubheader';
 import MaterialMenu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { styled } from '@mui/material/styles';
@@ -42,6 +44,21 @@ const StyledMenu = styled(MaterialMenu)(() => ({
       },
     },
   },
+  '& .MuiListSubheader-root': {
+    backgroundColor: 'transparent',
+    color: 'var(--eduhub-label-secondary, #666666)',
+    fontFamily: 'inherit',
+    fontSize: '0.6875rem', // 11px
+    fontWeight: 600,
+    lineHeight: 2,
+    letterSpacing: '0.06em',
+    textTransform: 'uppercase',
+    padding: '0.5rem 1rem 0.25rem',
+  },
+  '& .MuiDivider-root': {
+    borderColor: '#E5E5E5',
+    margin: '0.5rem 0',
+  },
 }));
 
 export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
@@ -65,6 +82,10 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
   const canManageCoursesMenu = isAdmin || (isOrgAdmin && orgAdminCaps.canManageCourses);
   const canManageEventsMenu = isAdmin || (isOrgAdmin && orgAdminCaps.canManageEvents);
   const canManageDegreesMenu = isAdmin || (isOrgAdmin && orgAdminCaps.canManageDegrees);
+  // Whether the "Verwaltung" section has any entries for this user (settings is the widest
+  // entry — every admin/org admin sees it — so it gates the section header along with the
+  // program-type links). Plain instructors have no management entries and skip the section.
+  const hasManagement = isAdminOrOrgAdmin || canManageCoursesMenu || canManageEventsMenu || canManageDegreesMenu;
 
   const t = useTranslations('common');
 
@@ -94,6 +115,8 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
         className: 'light',
       }}
     >
+      <ListSubheader disableSticky>{t('menu.section_personal')}</ListSubheader>
+
       <MenuItem onClick={closeMenu} selected={isActiveRoute('/profile')}>
         <Link className="block -my-3 -mx-4 py-3 px-4 text-lg" href="/profile">
           {t('menu.profile')}
@@ -105,6 +128,9 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
           {t('menu.my_certificates')}
         </Link>
       </MenuItem>
+
+      {hasManagement && <Divider component="li" />}
+      {hasManagement && <ListSubheader disableSticky>{t('menu.section_management')}</ListSubheader>}
 
       {canManageCoursesMenu && (
         <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/courses')}>
@@ -155,22 +181,6 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
       )}
 
       {isAdmin && (
-        <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/organizations')}>
-          <Link className="block -my-3 -mx-4 py-3 px-4 text-lg" href="/manage/organizations">
-            {t('menu.organizations')}
-          </Link>
-        </MenuItem>
-      )}
-
-      {isAdmin && (
-        <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/location-addresses')}>
-          <Link className="block -my-3 -mx-4 py-3 px-4 text-lg" href="/manage/location-addresses">
-            {t('menu.location_addresses')}
-          </Link>
-        </MenuItem>
-      )}
-
-      {isAdmin && (
         <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/calendar')}>
           <Link className="block -my-3 -mx-4 py-3 px-4 text-lg" href="/manage/calendar">
             {t('menu.calendar')}
@@ -197,6 +207,9 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
         </MenuItem>
       )}
 
+      <Divider component="li" />
+      <ListSubheader disableSticky>{t('menu.section_help')}</ListSubheader>
+
       {isInstructorOrAdmin && (
         <MenuItem onClick={closeMenu}>
           <Link
@@ -215,6 +228,8 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
           {t('menu.faq')}
         </Link>
       </MenuItem>
+
+      <Divider component="li" />
 
       <MenuItem onClick={() => logout()}>
         <button className="w-full text-lg text-left">{t('menu.logout')}</button>

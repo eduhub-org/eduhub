@@ -252,7 +252,14 @@ const ExpandableOrganizationRow: React.FC<ExpandableRowProps> = ({ row, onError 
   );
 };
 
-const ManageOrganizationsContent: FC = () => {
+type ManageOrganizationsContentProps = {
+  /** When true, rendered inside SettingsLayout (no PageBlock / page header). */
+  inSettingsLayout?: boolean;
+};
+
+const ManageOrganizationsContent: FC<ManageOrganizationsContentProps> = ({
+  inSettingsLayout = false,
+}) => {
   const t = useTranslations('manageOrganizations');
   const [error, setError] = useState<string | null>(null);
   const [bulkActionDialogOpen, setBulkActionDialogOpen] = useState(false);
@@ -669,60 +676,68 @@ const ManageOrganizationsContent: FC = () => {
     setSelectedRowsForBulkAction([]);
   }, [selectedRowsForBulkAction, deleteOrganization, debouncedRefetch, t]);
 
+  const table = (
+    <>
+      {loading && <Loading />}
+      {!loading && (
+        <div>
+          {!inSettingsLayout && <CommonPageHeader headline={t('headline')} />}
+          <TableGrid
+            columns={columns}
+            data={data?.Organization || []}
+            totalCount={data?.Organization_aggregate?.aggregate?.count || 0}
+            pageIndex={pageIndex}
+            onPageChange={setPageIndex}
+            pageSize={pageSize}
+            onPageSizeChange={handlePageSizeChange}
+            searchFilter={searchFilter}
+            onSearchFilterChange={setSearchFilter}
+            sorting={sorting}
+            onSortingChange={setSorting}
+            deleteMutation={DELETE_ORGANIZATION}
+            error={queryError}
+            loading={loading}
+            refetchQueries={['OrganizationList']}
+            bulkActions={bulkActions}
+            onBulkAction={handleBulkAction}
+            generateDeletionConfirmationQuestion={generateDeletionConfirmation}
+            expandableRowComponent={({ row }) => <ExpandableOrganizationRow row={row} onError={setError} />}
+            onAddButtonClick={onAddOrganizationClick}
+            addButtonText={t('action.add')}
+          />
+          <ErrorMessageDialog errorMessage={error || ''} open={!!error} onClose={handleCloseErrorDialog} />
+          <QuestionConfirmationDialog
+            open={bulkActionDialogOpen}
+            question={t('bulk_action.delete.description', {
+              count: selectedRowsForBulkAction.length,
+            })}
+            onConfirm={handleBulkActionConfirmation}
+            onClose={() => {
+              setBulkActionDialogOpen(false);
+              setSelectedRowsForBulkAction([]);
+            }}
+          />
+          <MergeOrganizationsDialog
+            open={mergeDialogOpen}
+            onClose={() => {
+              setMergeDialogOpen(false);
+              setSelectedRowsForBulkAction([]);
+            }}
+            onConfirm={handleMergeConfirmation}
+            selectedOrganizations={selectedRowsForBulkAction}
+          />
+        </div>
+      )}
+    </>
+  );
+
+  if (inSettingsLayout) {
+    return table;
+  }
+
   return (
     <PageBlock>
-      <div className="max-w-screen-xl mx-auto mt-20">
-        {loading && <Loading />}
-        {!loading && (
-          <div>
-            <CommonPageHeader headline={t('headline')} />
-            <TableGrid
-              columns={columns}
-              data={data?.Organization || []}
-              totalCount={data?.Organization_aggregate?.aggregate?.count || 0}
-              pageIndex={pageIndex}
-              onPageChange={setPageIndex}
-              pageSize={pageSize}
-              onPageSizeChange={handlePageSizeChange}
-              searchFilter={searchFilter}
-              onSearchFilterChange={setSearchFilter}
-              sorting={sorting}
-              onSortingChange={setSorting}
-              deleteMutation={DELETE_ORGANIZATION}
-              error={queryError}
-              loading={loading}
-              refetchQueries={['OrganizationList']}
-              bulkActions={bulkActions}
-              onBulkAction={handleBulkAction}
-              generateDeletionConfirmationQuestion={generateDeletionConfirmation}
-              expandableRowComponent={({ row }) => <ExpandableOrganizationRow row={row} onError={setError} />}
-              onAddButtonClick={onAddOrganizationClick}
-              addButtonText={t('action.add')}
-            />
-            <ErrorMessageDialog errorMessage={error || ''} open={!!error} onClose={handleCloseErrorDialog} />
-            <QuestionConfirmationDialog
-              open={bulkActionDialogOpen}
-              question={t('bulk_action.delete.description', {
-                count: selectedRowsForBulkAction.length,
-              })}
-              onConfirm={handleBulkActionConfirmation}
-              onClose={() => {
-                setBulkActionDialogOpen(false);
-                setSelectedRowsForBulkAction([]);
-              }}
-            />
-            <MergeOrganizationsDialog
-              open={mergeDialogOpen}
-              onClose={() => {
-                setMergeDialogOpen(false);
-                setSelectedRowsForBulkAction([]);
-              }}
-              onConfirm={handleMergeConfirmation}
-              selectedOrganizations={selectedRowsForBulkAction}
-            />
-          </div>
-        )}
-      </div>
+      <div className="max-w-screen-xl mx-auto mt-20">{table}</div>
     </PageBlock>
   );
 };
