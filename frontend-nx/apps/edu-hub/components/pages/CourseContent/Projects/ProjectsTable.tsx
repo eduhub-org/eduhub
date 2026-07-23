@@ -35,6 +35,7 @@ import ProjectPreviewLayout from './ProjectPreviewLayout';
 import ProjectSubmissionDeadlineBelowTitle from './ProjectSubmissionDeadlineBelowTitle';
 import { ProjectRow } from './types';
 import { CourseProjectSubmissionDefaultSource } from './projectEffectiveSubmissionDeadline';
+import { PARTICIPANT_PROJECT_ROLE_CONTEXT } from './participantProjectRole';
 
 interface ProjectsTableProps {
   projects: ProjectRow[];
@@ -110,12 +111,13 @@ const ProjectsTable: FC<ProjectsTableProps> = ({
 
   const [copyTemplate, { loading: copying }] = useRoleMutation(COPY_PROJECT_FROM_TEMPLATE, {
     refetchQueries,
+    context: PARTICIPANT_PROJECT_ROLE_CONTEXT,
   });
   const [insertRequest, { loading: requestingParticipant }] = useRoleMutation(
     INSERT_PROJECT_AUTHOR_REQUEST,
     {
       refetchQueries,
-      ...(isUser ? { context: { role: AuthRoles.user } } : {}),
+      context: PARTICIPANT_PROJECT_ROLE_CONTEXT,
     }
   );
   const [insertRequestAsAdmin, { loading: requestingAdmin }] = useRoleMutation(
