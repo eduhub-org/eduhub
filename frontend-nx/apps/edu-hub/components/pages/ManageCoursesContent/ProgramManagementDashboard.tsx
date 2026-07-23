@@ -43,12 +43,26 @@ const ProgramManagementDashboard: FC<ProgramManagementDashboardProps> = ({ progr
 
   const programs = [...(programListRequest?.data?.Program || [])];
 
-  return programs.length > 0 ? (
+  if (programs.length === 0) {
+    // No program of this type is visible to the current admin yet. Org admins cannot create
+    // programs from the management UI (creation is platform-admin only and always produces a
+    // COURSES program owned by no organization), so an informative empty state is shown instead
+    // of a blank page to explain how to get unblocked.
+    const emptyStateKey =
+      programType === ProgramType.EVENTS
+        ? 'empty_state.events'
+        : programType === ProgramType.DEGREES
+        ? 'empty_state.degrees'
+        : 'empty_state.courses';
+    return (
+      <div className="max-w-screen-xl mx-auto py-8 text-center text-gray-500">{t(emptyStateKey)}</div>
+    );
+  }
+
+  return (
     <div className="max-w-screen-xl mx-auto">
       <ManageCoursesContent programs={programs} programType={programType} />
     </div>
-  ) : (
-    <></>
   );
 };
 

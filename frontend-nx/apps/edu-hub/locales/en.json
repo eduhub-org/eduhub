@@ -1047,6 +1047,11 @@
       "has_custom_templates": "This course has custom email templates"
     },
     "error_loading_programs": "The programs could not be loaded. Please try again later.",
+    "empty_state": {
+      "events": "No events programs exist yet. Ask a platform admin to set up an events program for your organization before you can manage events here.",
+      "courses": "No course programs exist yet. Ask a platform admin to set up a course program for your organization before you can manage courses here.",
+      "degrees": "No degree programs exist yet. Ask a platform admin to set up a degree program for your organization before you can manage degrees here."
+    },
     "view": "View",
     "view_course": "View Course",
     "close": "Close",

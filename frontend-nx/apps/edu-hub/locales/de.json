@@ -1031,6 +1031,11 @@
       "has_custom_templates": "Dieser Kurs hat kursspezifische E-Mail-Vorlagen"
     },
     "error_loading_programs": "Die Programme konnten nicht geladen werden. Bitte versuche es später erneut.",
+    "empty_state": {
+      "events": "Es gibt noch kein Veranstaltungsprogramm. Bitte einen Plattform-Admin, ein Veranstaltungsprogramm für deine Organisation anzulegen, bevor du hier Veranstaltungen verwalten kannst.",
+      "courses": "Es gibt noch kein Kursprogramm. Bitte einen Plattform-Admin, ein Kursprogramm für deine Organisation anzulegen, bevor du hier Kurse verwalten kannst.",
+      "degrees": "Es gibt noch kein Studiengangsprogramm. Bitte einen Plattform-Admin, ein Studiengangsprogramm für deine Organisation anzulegen, bevor du hier Studiengänge verwalten kannst."
+    },
     "view": "Anzeigen",
     "view_course": "Kurs anzeigen",
     "close": "Schließen",
