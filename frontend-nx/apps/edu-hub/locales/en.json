@@ -1046,6 +1046,7 @@
       "email_templates": "Templates",
       "has_custom_templates": "This course has custom email templates"
     },
+    "error_loading_programs": "The programs could not be loaded. Please try again later.",
     "view": "View",
     "view_course": "View Course",
     "close": "Close",

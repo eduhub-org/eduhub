@@ -132,7 +132,8 @@
       background: var(--bg-primary);
       border: 1px solid var(--border);
       border-radius: 12px;
-      overflow: hidden;
+      /* No overflow clipping here: dropdown panels must be able to extend below
+         the mock viewport. Corner rounding is preserved via the header/body radii. */
       min-height: 520px;
       position: relative;
     }
@@ -141,6 +142,8 @@
       height: 64px;
       background: var(--bg-deep);
       border-bottom: 1px solid var(--border);
+      border-top-left-radius: 12px;
+      border-top-right-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: space-between;

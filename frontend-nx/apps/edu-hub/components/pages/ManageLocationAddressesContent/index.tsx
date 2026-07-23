@@ -119,10 +119,10 @@ const ExpandableLocationAddressRow: React.FC<ExpandableRowProps> = ({ row, onErr
   );
 };
 
-type ManageLocationAddressesContentProps = {
+interface ManageLocationAddressesContentProps {
   /** When true, rendered inside SettingsLayout (no PageBlock / page header). */
   inSettingsLayout?: boolean;
-};
+}
 
 const ManageLocationAddressesContent: FC<ManageLocationAddressesContentProps> = ({
   inSettingsLayout = false,

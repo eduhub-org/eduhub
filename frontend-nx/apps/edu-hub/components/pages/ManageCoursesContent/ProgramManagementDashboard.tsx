@@ -1,4 +1,5 @@
 import { FC, useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 
 import Loading from '../../common/Loading';
 import { useManageQuery } from '../../../hooks/authedQuery';
@@ -14,6 +15,7 @@ interface ProgramManagementDashboardProps {
 }
 
 const ProgramManagementDashboard: FC<ProgramManagementDashboardProps> = ({ programType }) => {
+  const t = useTranslations('manageCourses');
   // Org admins only see programs (and therefore courses) of organizations they administer; for
   // super-admins the where filter is empty. useManageQuery pins admin vs org_admin accordingly.
   // Each view additionally restricts to a single Program.type.
@@ -30,11 +32,13 @@ const ProgramManagementDashboard: FC<ProgramManagementDashboardProps> = ({ progr
     variables: { where },
   });
 
-  if (programListRequest.error) {
-    console.log(programListRequest.error);
-  }
   if (programListRequest.loading) {
     return <Loading />;
+  }
+  if (programListRequest.error) {
+    return (
+      <div className="max-w-screen-xl mx-auto py-8 text-center text-error">{t('error_loading_programs')}</div>
+    );
   }
 
   const programs = [...(programListRequest?.data?.Program || [])];

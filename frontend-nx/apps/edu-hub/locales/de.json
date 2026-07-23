@@ -1030,6 +1030,7 @@
       "email_templates": "Vorlagen",
       "has_custom_templates": "Dieser Kurs hat kursspezifische E-Mail-Vorlagen"
     },
+    "error_loading_programs": "Die Programme konnten nicht geladen werden. Bitte versuche es später erneut.",
     "view": "Anzeigen",
     "view_course": "Kurs anzeigen",
     "close": "Schließen",
