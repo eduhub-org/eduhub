@@ -202,7 +202,14 @@ variable "hasura_graphql_dev_mode" {
 variable "hasura_memory_limit" {
   description = "Memory limit for Hasura cloud run service"
   type        = string
-  default     = "1024M"
+  # 2048M: the cli-migrations-v3 image runs a temporary engine to apply
+  # migrations/metadata that overlaps in memory with the real engine at boot,
+  # and the schema cache has grown (many tables + event triggers). At 1024M the
+  # startup peak exceeded the limit and the container was OOM-killed before
+  # binding port 8080, so Cloud Run's startup probe timed out and rollouts got
+  # stuck (prod, 2026-07-21). The running instance also OOM'd at rest. ~$6.6/mo
+  # extra per always-on instance.
+  default = "2048M"
 }
 
 # Frontend
