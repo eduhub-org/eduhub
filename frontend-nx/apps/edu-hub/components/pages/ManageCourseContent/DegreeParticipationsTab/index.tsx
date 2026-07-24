@@ -241,12 +241,12 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
     // Attended courses (not passed AND (has attendance certificate OR is an EVENT course))
     const attendedEnrollments = courseEnrollments.filter(
       (ce: CeType) =>
-        !ce.achievementCertificateURL && (ce.attendanceCertificateURL || ce.Course.Program.shortTitle === 'EVENTS')
+        !ce.achievementCertificateURL && (ce.attendanceCertificateURL || ce.Course.Program.type === 'EVENTS')
     );
 
     // Not completed courses (not passed AND not attended by new definition)
     const notCompletedEnrollments = courseEnrollments.filter(
-      (ce: CeType) => !ce.achievementCertificateURL && !ce.attendanceCertificateURL && ce.Course.Program.shortTitle !== 'EVENTS'
+      (ce: CeType) => !ce.achievementCertificateURL && !ce.attendanceCertificateURL && ce.Course.Program.type !== 'EVENTS'
     );
 
     const mapParticipation = (ce: CeType): DegreeParticipationListItem => ({

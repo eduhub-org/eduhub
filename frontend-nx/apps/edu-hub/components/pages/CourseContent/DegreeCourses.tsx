@@ -68,9 +68,9 @@ export const CompletedDegreeCourses: FC<{ degreeCourseId: number }> = ({ degreeC
                 <NextLink href={`/course/${degreeEnrollment?.Course?.id}`} passHref>
                   <MuiLink className="text-label-secondary">
                     {degreeEnrollment?.Course?.title} -{' '}
-                    {degreeEnrollment?.Course?.Program?.shortTitle !== 'EVENTS'
+                    {degreeEnrollment?.Course?.Program?.type !== 'EVENTS'
                       ? ` ${t(degreeEnrollment?.Course?.Program?.title)} (${ectsTranslations[degreeEnrollment?.Course?.ects] || degreeEnrollment?.Course?.ects} ECTS)`
-                      : `${t(degreeEnrollment?.Course?.Program?.shortTitle)}`}
+                      : `${t(degreeEnrollment?.Course?.Program?.type)}`}
                   </MuiLink>
                 </NextLink>
               </li>

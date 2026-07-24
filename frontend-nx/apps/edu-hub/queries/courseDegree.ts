@@ -2,7 +2,7 @@ import { gql } from '@apollo/client';
 
 export const DEGREE_COURSES = gql`
   query DegreeCourses {
-    Course(where: {Program: {shortTitle: {_eq: "DEGREES"}}}) {
+    Course(where: {Program: {type: {_eq: "DEGREES"}}}) {
       id
       title
     }
@@ -23,7 +23,7 @@ export const COMPLETED_DEGREE_ENROLLMENTS = gql`
             userId: { _eq: $userId },
             Course: {
               CourseDegrees: { degreeCourseId: { _eq: $degreeCourseId } },
-              Program: { shortTitle: { _eq: "EVENTS" } }
+              Program: { type: { _eq: "EVENTS" } }
             }
           }
         ]
@@ -34,6 +34,7 @@ export const COMPLETED_DEGREE_ENROLLMENTS = gql`
         title
         ects
         Program {
+          type
           shortTitle
           title
         }
@@ -82,6 +83,7 @@ export const DEGREE_PARTICIPANTS_WITH_DEGREE_ENROLLMENTS = gql`
               ects
               Program {
                 id
+                type
                 shortTitle
                 title
               }

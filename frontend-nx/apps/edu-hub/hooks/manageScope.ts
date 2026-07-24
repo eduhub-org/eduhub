@@ -57,6 +57,16 @@ const orgAdminProgramCapabilityOr = (userId: string): Program_bool_exp['_or'] =>
       },
     ],
   },
+  // A settings admin manages every program type for their organization, so this branch has no
+  // `type` constraint — it matches any program whose org has the user's grant with canManageSettings.
+  // Mirrors the type-agnostic canManageSettings branch in the Hasura org_admin_access write rules.
+  {
+    Organization: {
+      OrganizationAdmins: {
+        _and: [{ userId: { _eq: userId } }, { canManageSettings: { _eq: true } }],
+      },
+    },
+  },
 ];
 
 // Program_bool_exp scoping for the program management list.

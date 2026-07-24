@@ -96,8 +96,8 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType }) => {
   const sortedPrograms = useMemo(() => {
     return [...programs].sort((a, b) => {
       // Assign specific indices for 'EVENTS' and 'DEGREES'
-      const indexA = a.shortTitle === 'EVENTS' ? -2 : a.shortTitle === 'DEGREES' ? -1 : programs.indexOf(a);
-      const indexB = b.shortTitle === 'EVENTS' ? -2 : b.shortTitle === 'DEGREES' ? -1 : programs.indexOf(b);
+      const indexA = a.type === 'EVENTS' ? -2 : a.type === 'DEGREES' ? -1 : programs.indexOf(a);
+      const indexB = b.type === 'EVENTS' ? -2 : b.type === 'DEGREES' ? -1 : programs.indexOf(b);
       // Sort based on these indices
       return indexA - indexB;
     });
@@ -108,7 +108,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType }) => {
       return undefined;
     }
     const preferredRegularProgram = sortedPrograms.find(
-      (program) => program.shortTitle !== 'EVENTS' && program.shortTitle !== 'DEGREES'
+      (program) => program.type !== 'EVENTS' && program.type !== 'DEGREES'
     );
     return (preferredRegularProgram ?? sortedPrograms[0]).id;
   }, [sortedPrograms]);
@@ -132,14 +132,14 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType }) => {
     const programs: Programs_Program[] = [];
 
     // First, add EVENTS and DEGREES if they exist (maintain their priority)
-    const eventsProgram = sortedPrograms.find((p) => p.shortTitle === 'EVENTS');
-    const degreesProgram = sortedPrograms.find((p) => p.shortTitle === 'DEGREES');
+    const eventsProgram = sortedPrograms.find((p) => p.type === 'EVENTS');
+    const degreesProgram = sortedPrograms.find((p) => p.type === 'DEGREES');
 
     if (eventsProgram) programs.push(eventsProgram);
     if (degreesProgram) programs.push(degreesProgram);
 
     // Then, get other programs (excluding EVENTS and DEGREES)
-    const otherPrograms = sortedPrograms.filter((p) => p.shortTitle !== 'EVENTS' && p.shortTitle !== 'DEGREES');
+    const otherPrograms = sortedPrograms.filter((p) => p.type !== 'EVENTS' && p.type !== 'DEGREES');
 
     // Take the most recent other programs (they should already be sorted by recency)
     const recentOtherPrograms = otherPrograms.slice(0, maxOtherPrograms);

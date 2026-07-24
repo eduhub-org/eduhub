@@ -257,6 +257,7 @@
       "delete_restricted_by_relationship": "{parent} können nicht gelöscht werden, wenn sie mit {child} verknüpft sind. Bitte lösche diese zuerst.",
       "delete_restricted_by_relationships": "{table} können nicht gelöscht werden, wenn sie mit anderen Einträgen verknüpft sind. Bitte lösche zuerst die anderen Einträge.",
       "generic_error": "Ein Fehler ist aufgetreten. Bitte versuche es erneut.",
+      "last_settings_admin": "Diese Organisation muss mindestens einen Nutzer mit Rechten zur Nutzer- und Einstellungsverwaltung behalten. Übertrage diese Rechte zuerst einem anderen Admin.",
       "certificate_deletion_failed": "Fehler beim Löschen der Leistungsnachweise. Bitte versuche es erneut.",
       "entities": {
         "course": "Kurse",
@@ -1925,6 +1926,7 @@
   },
   "manageAdminUsers": {
     "headline": "Admin-Benutzer",
+    "sole_settings_admin_hint": "Dies ist der einzige Nutzer mit Einstellungsrechten für diese Organisation. Übertrage die Einstellungsrechte zuerst einem anderen Admin, bevor du sie hier entfernst.",
     "first_name": "Vorname",
     "last_name": "Nachname",
     "email": "E-Mail",

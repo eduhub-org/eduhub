@@ -136,8 +136,8 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
   }
 
   // Check if course is a degree course
-  const isDegreeCourse = course.Program?.shortTitle === 'DEGREES';
-  const isEventCourse = course.Program?.shortTitle === 'EVENTS';
+  const isDegreeCourse = course.Program?.type === 'DEGREES';
+  const isEventCourse = course.Program?.type === 'EVENTS';
 
   // Check if registration requires payment
   const registrationConfig = course.registrationType 

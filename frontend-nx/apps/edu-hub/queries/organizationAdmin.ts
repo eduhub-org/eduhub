@@ -42,6 +42,18 @@ export const ORGANIZATION_ADMIN_LIST = gql`
   }
 `;
 
+// All settings-admin grants the caller may see (their own orgs). Used to decide, per organization,
+// whether a row is the *sole* settings admin — so the UI can pre-disable turning that flag off or
+// deleting the grant, matching the DB guard that keeps at least one settings admin per org.
+export const SETTINGS_ADMIN_GRANTS = gql`
+  query SettingsAdminGrants {
+    OrganizationAdmin(where: { canManageSettings: { _eq: true } }) {
+      id
+      organizationId
+    }
+  }
+`;
+
 export const DELETE_ORGANIZATION_ADMIN = gql`
   mutation DeleteOrganizationAdmin($id: Int!) {
     delete_OrganizationAdmin_by_pk(id: $id) {
