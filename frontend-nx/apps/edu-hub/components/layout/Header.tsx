@@ -76,9 +76,21 @@ export const Header: FC = () => {
             {isLoggedIn && user ? (
               <div className="flex">
                 <div className="flex">
-                  <div className="cursor-pointer" onClick={openMenu}>
+                  {/* A real <button>, not a clickable <div>: the click has to move focus onto the
+                      trigger before the menu opens. With nothing focused (document.body), Chrome
+                      treats MUI's programmatic focus of the first menu item as keyboard-driven and
+                      paints the native focus ring around it — the stray outline users saw on the
+                      first menu open after a page load. It also makes the menu keyboard-reachable. */}
+                  <button
+                    type="button"
+                    className="flex items-center cursor-pointer"
+                    onClick={openMenu}
+                    aria-haspopup="menu"
+                    aria-expanded={isMenuVisible}
+                    aria-controls={isMenuVisible ? 'fade-menu' : undefined}
+                  >
                     <UserCard className="flex items-center" key={`avatar`} user={user} size={`small`} />
-                  </div>
+                  </button>
                   {menuAnchorElement ? (
                     <Menu isVisible={isMenuVisible} setVisible={setMenuVisible} anchorElement={menuAnchorElement} />
                   ) : null}
