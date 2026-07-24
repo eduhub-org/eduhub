@@ -212,8 +212,8 @@ const CalendarContent: FC = () => {
       const location = resolveLocation(session);
       const colors = getLocationColor(location);
       const courseTitle = session.Course?.title || '';
-      const programShortTitle = session.Course?.Program?.shortTitle || '';
-      const isEvent = programShortTitle === 'EVENTS';
+      // Classify by Program.type (shortTitle is a free-text label); keep shortTitle for display only.
+      const isEvent = session.Course?.Program?.type === 'EVENTS';
       const address = resolveAddress(session);
 
       const titleLine = courseTitle + (session.title ? ` – ${session.title}` : '');

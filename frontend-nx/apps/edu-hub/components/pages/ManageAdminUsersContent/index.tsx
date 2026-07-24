@@ -149,7 +149,7 @@ const ExpandableUserRow: FC<{
             updateValueMutation={capability.mutation}
             role={manageRole}
             identifierVariables={{ itemId: row.id }}
-            refetchQueries={capability.refetchQueries ?? ['GetAdminUsers']}
+            refetchQueries={capability.refetchQueries ?? ['OrganizationAdminList']}
           />
         ))}
       </div>
