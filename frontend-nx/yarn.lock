@@ -15577,9 +15577,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"next-auth@npm:^4.24.11":
-  version: 4.24.14
-  resolution: "next-auth@npm:4.24.14"
+"next-auth@npm:^4.24.15":
+  version: 4.24.15
+  resolution: "next-auth@npm:4.24.15"
   dependencies:
     "@babel/runtime": ^7.20.13
     "@panva/hkdf": ^1.0.2
@@ -15589,7 +15589,7 @@ __metadata:
     openid-client: ^5.4.0
     preact: ^10.6.3
     preact-render-to-string: ^5.1.19
-    uuid: ^8.3.2
+    uuid: ^11.1.1
   peerDependencies:
     "@auth/core": 0.34.3
     next: ^12.2.5 || ^13 || ^14 || ^15 || ^16
@@ -15601,7 +15601,7 @@ __metadata:
       optional: true
     nodemailer:
       optional: true
-  checksum: fb1c8c8bbee8f2475c10369d2565f4af54a1a2d9f829eb164747c07995a7f01b4a14bc821eac6d04c82d3782b52fca9c5c8a2019a19cf015eda98f784c5cd565
+  checksum: 8ce20aff76fcdcd95deab322bce3adfa12f9858830689d56658c5cfb98e787aaddc85009dd39c2709f9664af14067638c906793cf17bed7d8a8c15b28d3df9f9
   languageName: node
   linkType: hard
 
@@ -16452,7 +16452,7 @@ __metadata:
     loglevel: ^1.9.1
     lucide-react: ^0.456.0
     next: ^16.2.10
-    next-auth: ^4.24.11
+    next-auth: ^4.24.15
     next-intl: ^4.9.1
     papaparse: ^5.4.1
     playwright: ^1.55.0
@@ -21493,6 +21493,15 @@ __metadata:
   bin:
     uuid: dist/bin/uuid
   checksum: 4b81611ade2885d2313ddd8dc865d93d8dccc13ddf901745edca8f86d99bc46d7a330d678e7532e7ebf93ce616679fb19b2e3568873ac0c14c999032acb25869
+  languageName: node
+  linkType: hard
+
+"uuid@npm:^11.1.1":
+  version: 11.1.1
+  resolution: "uuid@npm:11.1.1"
+  bin:
+    uuid: dist/esm/bin/uuid
+  checksum: 1c1ea6ffc9fd02a343d77151734af65644ebf5bac733b59bdab85859cf793cf03ac8d60909fa19dcd2272e154b20734c464b667afd8bdac02b4da5e206079469
   languageName: node
   linkType: hard
 
