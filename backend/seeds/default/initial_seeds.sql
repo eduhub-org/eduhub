@@ -1293,6 +1293,14 @@ INSERT INTO public."MailLog" (id, subject, content, "to", "from", cc, bcc, creat
                     <p>Dein opencampus.sh Team</p>
                   </body>
                 </html>', 'julia.hoffmann@example.com', 'noreply@edu.opencampus.sh', NULL, NULL, '2024-12-30 12:00:02.93538+00', '2024-12-30 12:00:02.93538+00', NULL, NULL, NULL);
+-- Advance Program sequence before OrganizationAdmin inserts. Explicit Program ids above do not
+-- update Semester_Id_seq; the organization_admin_seed_default_programs trigger inserts via
+-- nextval and would otherwise collide on id=1.
+SELECT pg_catalog.setval(
+  'public."Semester_Id_seq"',
+  (SELECT COALESCE(MAX(id), 1) FROM public."Program"),
+  true
+);
 INSERT INTO public."OrganizationAdmin" (id, "userId", "organizationId", "canManageCourses", "canManageEvents", "canManageSettings", updated_at, created_at) VALUES (1, '11111111-1111-1111-1111-111111111111', 42, true, false, false, '2025-01-22 14:13:53.101281+00', '2025-01-22 14:13:53.101281+00');
 INSERT INTO public."OrganizationAdmin" (id, "userId", "organizationId", "canManageCourses", "canManageEvents", "canManageSettings", updated_at, created_at) VALUES (2, '11111111-1111-1111-1111-111111111111', 67, false, true, false, '2025-01-22 14:16:03.261301+00', '2025-01-22 14:16:03.261301+00');
 INSERT INTO public."OrganizationAdmin" (id, "userId", "organizationId", "canManageCourses", "canManageEvents", "canManageSettings", updated_at, created_at) VALUES (3, '33333333-3333-3333-3333-333333333333', 67, false, true, true, '2025-01-22 14:16:21.054925+00', '2025-01-22 14:16:21.054925+00');
