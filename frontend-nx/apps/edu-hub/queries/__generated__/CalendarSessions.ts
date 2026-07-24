@@ -25,6 +25,7 @@ export interface CalendarSessions_Session_Course_CourseLocations {
 export interface CalendarSessions_Session_Course_Program {
   __typename: "Program";
   id: number;
+  type: string;
   /**
    * The title of the program
    */

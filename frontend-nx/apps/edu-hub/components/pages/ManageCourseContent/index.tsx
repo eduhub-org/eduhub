@@ -211,7 +211,7 @@ export const ManageCourseContent: FC<Props> = ({ courseId }) => {
               {t('description')}
             </div>
 
-            {course.Program.shortTitle === 'DEGREES' ? null : (
+            {course.Program.type === 'DEGREES' ? null : (
               <div className={`p-4 m-2 ${determineTabClasses(1, openTabIndex)}`} onClick={openTab1}>
                 {t('sessions')}
               </div>
@@ -223,13 +223,13 @@ export const ManageCourseContent: FC<Props> = ({ courseId }) => {
               </div>
             )}
 
-            {course.externalRegistrationLink || course.Program.shortTitle === 'DEGREES' ? null : (
+            {course.externalRegistrationLink || course.Program.type === 'DEGREES' ? null : (
               <div className={`p-4 m-2 ${determineTabClasses(3, openTabIndex)}`} onClick={openTab3}>
                 {t('participations_and_achievements')}
               </div>
             )}
 
-            {course.Program.shortTitle === 'DEGREES' ? (
+            {course.Program.type === 'DEGREES' ? (
               <div className={`p-4 m-2 ${determineTabClasses(4, openTabIndex)}`} onClick={openTab4}>
                 {t('degree_participations')}
               </div>

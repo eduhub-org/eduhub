@@ -8,6 +8,67 @@ object_relationships:
   - name: MailTemplateType
     using:
       foreign_key_constraint_on: type
+insert_permissions:
+  # Org admins may create course-specific templates for courses whose program they manage (per-type
+  # capability or canManageSettings). System-default templates (courseId null) stay super-admin-only:
+  # every branch below requires a Course -> Program, so a null-courseId row can never pass the check.
+  - role: org_admin_access
+    permission:
+      check:
+        _or:
+          - Course:
+              Program:
+                _and:
+                  - type:
+                      _eq: EVENTS
+                  - Organization:
+                      OrganizationAdmins:
+                        _and:
+                          - userId:
+                              _eq: X-Hasura-User-Id
+                          - canManageEvents:
+                              _eq: true
+          - Course:
+              Program:
+                _and:
+                  - type:
+                      _eq: COURSES
+                  - Organization:
+                      OrganizationAdmins:
+                        _and:
+                          - userId:
+                              _eq: X-Hasura-User-Id
+                          - canManageCourses:
+                              _eq: true
+          - Course:
+              Program:
+                _and:
+                  - type:
+                      _eq: DEGREES
+                  - Organization:
+                      OrganizationAdmins:
+                        _and:
+                          - userId:
+                              _eq: X-Hasura-User-Id
+                          - canManageDegrees:
+                              _eq: true
+          - Course:
+              Program:
+                Organization:
+                  OrganizationAdmins:
+                    _and:
+                      - userId:
+                          _eq: X-Hasura-User-Id
+                      - canManageSettings:
+                          _eq: true
+      columns:
+        - type
+        - courseId
+        - subject
+        - content
+        - from
+        - cc
+        - bcc
 select_permissions:
   - role: instructor_access
     permission:
@@ -86,3 +147,160 @@ select_permissions:
                           - canManageDegrees:
                               _eq: true
       allow_aggregations: true
+update_permissions:
+  # Org admins may edit course-specific templates for courses whose program they manage. Global
+  # (courseId null) templates are excluded for the same reason as insert.
+  - role: org_admin_access
+    permission:
+      columns:
+        - type
+        - courseId
+        - subject
+        - content
+        - from
+        - cc
+        - bcc
+      filter:
+        _or:
+          - Course:
+              Program:
+                _and:
+                  - type:
+                      _eq: EVENTS
+                  - Organization:
+                      OrganizationAdmins:
+                        _and:
+                          - userId:
+                              _eq: X-Hasura-User-Id
+                          - canManageEvents:
+                              _eq: true
+          - Course:
+              Program:
+                _and:
+                  - type:
+                      _eq: COURSES
+                  - Organization:
+                      OrganizationAdmins:
+                        _and:
+                          - userId:
+                              _eq: X-Hasura-User-Id
+                          - canManageCourses:
+                              _eq: true
+          - Course:
+              Program:
+                _and:
+                  - type:
+                      _eq: DEGREES
+                  - Organization:
+                      OrganizationAdmins:
+                        _and:
+                          - userId:
+                              _eq: X-Hasura-User-Id
+                          - canManageDegrees:
+                              _eq: true
+          - Course:
+              Program:
+                Organization:
+                  OrganizationAdmins:
+                    _and:
+                      - userId:
+                          _eq: X-Hasura-User-Id
+                      - canManageSettings:
+                          _eq: true
+      check:
+        _or:
+          - Course:
+              Program:
+                _and:
+                  - type:
+                      _eq: EVENTS
+                  - Organization:
+                      OrganizationAdmins:
+                        _and:
+                          - userId:
+                              _eq: X-Hasura-User-Id
+                          - canManageEvents:
+                              _eq: true
+          - Course:
+              Program:
+                _and:
+                  - type:
+                      _eq: COURSES
+                  - Organization:
+                      OrganizationAdmins:
+                        _and:
+                          - userId:
+                              _eq: X-Hasura-User-Id
+                          - canManageCourses:
+                              _eq: true
+          - Course:
+              Program:
+                _and:
+                  - type:
+                      _eq: DEGREES
+                  - Organization:
+                      OrganizationAdmins:
+                        _and:
+                          - userId:
+                              _eq: X-Hasura-User-Id
+                          - canManageDegrees:
+                              _eq: true
+          - Course:
+              Program:
+                Organization:
+                  OrganizationAdmins:
+                    _and:
+                      - userId:
+                          _eq: X-Hasura-User-Id
+                      - canManageSettings:
+                          _eq: true
+delete_permissions:
+  - role: org_admin_access
+    permission:
+      filter:
+        _or:
+          - Course:
+              Program:
+                _and:
+                  - type:
+                      _eq: EVENTS
+                  - Organization:
+                      OrganizationAdmins:
+                        _and:
+                          - userId:
+                              _eq: X-Hasura-User-Id
+                          - canManageEvents:
+                              _eq: true
+          - Course:
+              Program:
+                _and:
+                  - type:
+                      _eq: COURSES
+                  - Organization:
+                      OrganizationAdmins:
+                        _and:
+                          - userId:
+                              _eq: X-Hasura-User-Id
+                          - canManageCourses:
+                              _eq: true
+          - Course:
+              Program:
+                _and:
+                  - type:
+                      _eq: DEGREES
+                  - Organization:
+                      OrganizationAdmins:
+                        _and:
+                          - userId:
+                              _eq: X-Hasura-User-Id
+                          - canManageDegrees:
+                              _eq: true
+          - Course:
+              Program:
+                Organization:
+                  OrganizationAdmins:
+                    _and:
+                      - userId:
+                          _eq: X-Hasura-User-Id
+                      - canManageSettings:
+                          _eq: true

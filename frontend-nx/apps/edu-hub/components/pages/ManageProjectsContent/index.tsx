@@ -68,7 +68,12 @@ const PROJECT_LIST_SCOPE_WHERE = {
   ],
 };
 
-const ManageProjectsContent: FC = () => {
+type ManageProjectsContentProps = {
+  /** When true, rendered inside SettingsLayout (no page header / max-width wrapper). */
+  inSettingsLayout?: boolean;
+};
+
+const ManageProjectsContent: FC<ManageProjectsContentProps> = ({ inSettingsLayout = false }) => {
   const t = useTranslations('manageProjects');
   const tCommon = useTranslations('common');
 
@@ -318,8 +323,8 @@ const ManageProjectsContent: FC = () => {
   );
 
   return (
-    <div className="max-w-screen-xl mx-auto">
-      <CommonPageHeader headline={t('headline')} />
+    <div className={inSettingsLayout ? '' : 'max-w-screen-xl mx-auto'}>
+      {!inSettingsLayout && <CommonPageHeader headline={t('headline')} />}
 
       <div className="flex flex-col sm:flex-row gap-4 mb-4">
         <DropDownSelector

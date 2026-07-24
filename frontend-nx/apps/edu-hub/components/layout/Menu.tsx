@@ -1,4 +1,6 @@
+import Divider from '@mui/material/Divider';
 import Fade from '@mui/material/Fade';
+import ListSubheader from '@mui/material/ListSubheader';
 import MaterialMenu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { styled } from '@mui/material/styles';
@@ -6,6 +8,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { FC, useCallback } from 'react';
 import { useIsAdmin, useIsInstructor, useIsOrgAdmin } from '../../hooks/authentication';
+import { useOrgAdminCapabilities } from '../../hooks/orgAdminCapabilities';
 import { useTranslations } from 'next-intl';
 import useLogout from '../../hooks/logout';
 
@@ -15,31 +18,57 @@ interface IProps {
   setVisible: (visible: boolean) => void;
 }
 
+// Shared class for the nested navigation links. The negative margins + padding make the link fill
+// the whole MenuItem so the clickable area matches the row. On touch devices (coarse pointer) we
+// enforce a >=44px (min-h-11) target and vertically center the label; fine-pointer devices keep the
+// tighter rows so the full admin menu still fits on smaller laptop screens.
+const MENU_LINK_CLASS =
+  'block -my-1.5 -mx-4 py-1.5 px-4 text-lg leading-snug touch-manipulation ' +
+  'pointer-coarse:flex pointer-coarse:items-center pointer-coarse:min-h-11';
+
 // Replace with styled
 const StyledMenu = styled(MaterialMenu)(() => ({
   '& .MuiPaper-root': {
     minWidth: '225px',
-    padding: '1rem 2rem',
-    backgroundColor: 'var(--eduhub-fill-primary, #ffffff) !important',
-    color: 'var(--eduhub-label-primary, #222222) !important',
+    padding: '0.5rem 2rem',
+    backgroundColor: 'var(--eduhub-fill-primary) !important',
+    color: 'var(--eduhub-label-primary) !important',
     borderRadius: '8px',
     boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
   },
   '& .MuiMenuItem-root': {
-    color: 'var(--eduhub-label-primary, #222222) !important',
-    backgroundColor: 'var(--eduhub-fill-primary, #ffffff) !important',
-    padding: '0.75rem 1rem',
+    color: 'var(--eduhub-label-primary) !important',
+    backgroundColor: 'var(--eduhub-fill-primary) !important',
+    padding: '0.375rem 1rem',
     '&:hover': {
-      backgroundColor: '#E5E5E5 !important', // Slightly darker than selected for better contrast
+      backgroundColor: 'var(--eduhub-fill-disabled) !important', // Slightly darker than selected for better contrast
     },
     '&.Mui-selected': {
-      backgroundColor: 'var(--eduhub-bg-secondary, #F2F2F2) !important',
-      borderLeft: '3px solid var(--eduhub-warning)',
-      paddingLeft: 'calc(1rem - 3px)',
+      backgroundColor: 'var(--eduhub-bg-secondary) !important',
+      // Inset accent bar for the active route — drawn as a box-shadow so it never shifts
+      // the layout or renders as a ragged partial border the way a `border-left` would.
+      boxShadow: 'inset 3px 0 0 var(--eduhub-warning)',
       '&:hover': {
-        backgroundColor: '#E5E5E5 !important', // Slightly darker than selected
+        backgroundColor: 'var(--eduhub-fill-disabled) !important', // Slightly darker than selected
       },
     },
+  },
+  '& .MuiListSubheader-root': {
+    backgroundColor: 'transparent',
+    color: 'var(--eduhub-label-secondary)',
+    fontFamily: 'inherit',
+    fontSize: '0.6875rem', // 11px
+    fontWeight: 600,
+    lineHeight: 1.3,
+    letterSpacing: '0.06em',
+    textTransform: 'uppercase',
+    // No horizontal padding so the label's left edge lines up with the section
+    // dividers (which span the full menu width), sitting left of the item labels.
+    padding: '0.5rem 0 0.125rem',
+  },
+  '& .MuiDivider-root': {
+    borderColor: 'var(--eduhub-border-primary)',
+    margin: '0.25rem 0',
   },
 }));
 
@@ -54,10 +83,20 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
   const isAdmin = useIsAdmin();
   const isInstructor = useIsInstructor();
   const isOrgAdmin = useIsOrgAdmin();
+  const orgAdminCaps = useOrgAdminCapabilities();
   const isInstructorOrAdmin = isAdmin || isInstructor;
   // Organization admins reach the program/course/admin-user management screens (scoped to their own
   // organization). Other manage links remain super-admin only.
   const isAdminOrOrgAdmin = isAdmin || isOrgAdmin;
+  // Program-type management entries: super-admins see all three; org admins only see types where
+  // they hold the matching canManage* capability on at least one organization.
+  const canManageCoursesMenu = isAdmin || (isOrgAdmin && orgAdminCaps.canManageCourses);
+  const canManageEventsMenu = isAdmin || (isOrgAdmin && orgAdminCaps.canManageEvents);
+  const canManageDegreesMenu = isAdmin || (isOrgAdmin && orgAdminCaps.canManageDegrees);
+  // Whether the "Verwaltung" section has any entries for this user (settings is the widest
+  // entry — every admin/org admin sees it — so it gates the section header along with the
+  // program-type links). Plain instructors have no management entries and skip the section.
+  const hasManagement = isAdminOrOrgAdmin || canManageCoursesMenu || canManageEventsMenu || canManageDegreesMenu;
 
   const t = useTranslations('common');
 
@@ -87,37 +126,50 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
         className: 'light',
       }}
     >
+      <ListSubheader disableSticky>{t('menu.section_personal')}</ListSubheader>
+
       <MenuItem onClick={closeMenu} selected={isActiveRoute('/profile')}>
-        <Link className="block -my-3 -mx-4 py-3 px-4 text-lg" href="/profile">
+        <Link className={MENU_LINK_CLASS} href="/profile">
           {t('menu.profile')}
         </Link>
       </MenuItem>
 
       <MenuItem onClick={closeMenu} selected={isActiveRoute('/my-certificates')}>
-        <Link className="block -my-3 -mx-4 py-3 px-4 text-lg" href="/my-certificates">
+        <Link className={MENU_LINK_CLASS} href="/my-certificates">
           {t('menu.my_certificates')}
         </Link>
       </MenuItem>
 
-      {isAdminOrOrgAdmin && (
+      {hasManagement && <Divider component="li" />}
+      {hasManagement && <ListSubheader disableSticky>{t('menu.section_management')}</ListSubheader>}
+
+      {canManageCoursesMenu && (
         <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/courses')}>
-          <Link className="block -my-3 -mx-4 py-3 px-4 text-lg" href="/manage/courses">
+          <Link className={MENU_LINK_CLASS} href="/manage/courses">
             {t('menu.courses')}
           </Link>
         </MenuItem>
       )}
 
-      {isAdmin && (
-        <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/projects')}>
-          <Link className="block -my-3 -mx-4 py-3 px-4 text-lg" href="/manage/projects">
-            {t('menu.projects')}
+      {canManageEventsMenu && (
+        <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/events')}>
+          <Link className={MENU_LINK_CLASS} href="/manage/events">
+            {t('menu.events')}
+          </Link>
+        </MenuItem>
+      )}
+
+      {canManageDegreesMenu && (
+        <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/degrees')}>
+          <Link className={MENU_LINK_CLASS} href="/manage/degrees">
+            {t('menu.degrees')}
           </Link>
         </MenuItem>
       )}
 
       {isAdmin && (
         <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/users')}>
-          <Link className="block -my-3 -mx-4 py-3 px-4 text-lg" href="/manage/users">
+          <Link className={MENU_LINK_CLASS} href="/manage/users">
             {t('menu.user')}
           </Link>
         </MenuItem>
@@ -125,31 +177,15 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
 
       {isAdmin && (
         <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/experts')}>
-          <Link className="block -my-3 -mx-4 py-3 px-4 text-lg" href="/manage/experts">
+          <Link className={MENU_LINK_CLASS} href="/manage/experts">
             {t('menu.experts')}
           </Link>
         </MenuItem>
       )}
 
       {isAdmin && (
-        <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/organizations')}>
-          <Link className="block -my-3 -mx-4 py-3 px-4 text-lg" href="/manage/organizations">
-            {t('menu.organizations')}
-          </Link>
-        </MenuItem>
-      )}
-
-      {isAdmin && (
-        <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/location-addresses')}>
-          <Link className="block -my-3 -mx-4 py-3 px-4 text-lg" href="/manage/location-addresses">
-            {t('menu.location_addresses')}
-          </Link>
-        </MenuItem>
-      )}
-
-      {isAdmin && (
         <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/calendar')}>
-          <Link className="block -my-3 -mx-4 py-3 px-4 text-lg" href="/manage/calendar">
+          <Link className={MENU_LINK_CLASS} href="/manage/calendar">
             {t('menu.calendar')}
           </Link>
         </MenuItem>
@@ -157,7 +193,7 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
 
       {isAdmin && (
         <MenuItem onClick={closeMenu} selected={isActiveRoute('/statistics')}>
-          <Link className="block -my-3 -mx-4 py-3 px-4 text-lg" href="/statistics">
+          <Link className={MENU_LINK_CLASS} href="/statistics">
             {t('menu.statistics')}
           </Link>
         </MenuItem>
@@ -168,16 +204,19 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
           onClick={closeMenu}
           selected={isActiveRoute('/manage/settings') || router.pathname.startsWith('/manage/settings/')}
         >
-          <Link className="block -my-3 -mx-4 py-3 px-4 text-lg" href="/manage/settings">
+          <Link className={MENU_LINK_CLASS} href="/manage/settings">
             {t('menu.settings')}
           </Link>
         </MenuItem>
       )}
 
+      <Divider component="li" />
+      <ListSubheader disableSticky>{t('menu.section_help')}</ListSubheader>
+
       {isInstructorOrAdmin && (
         <MenuItem onClick={closeMenu}>
           <Link
-            className="block -my-3 -mx-4 py-3 px-4 text-lg"
+            className={MENU_LINK_CLASS}
             href="https://opencampus.gitbook.io/kursleitungshandbuch/"
             target="_blank"
             rel="noopener noreferrer"
@@ -188,10 +227,12 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
       )}
 
       <MenuItem onClick={closeMenu}>
-        <Link className="block -my-3 -mx-4 py-3 px-4 text-lg" href="https://opencampus.gitbook.io/faq/" target="_blank">
+        <Link className={MENU_LINK_CLASS} href="https://opencampus.gitbook.io/faq/" target="_blank">
           {t('menu.faq')}
         </Link>
       </MenuItem>
+
+      <Divider component="li" />
 
       <MenuItem onClick={() => logout()}>
         <button className="w-full text-lg text-left">{t('menu.logout')}</button>

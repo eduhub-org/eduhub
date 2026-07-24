@@ -44,15 +44,17 @@
       "admin_users": "Admin Users",
       "experts": "Experts",
       "courses": "Courses",
-      "projects": "Projects",
+      "events": "Events",
+      "degrees": "Degrees",
       "programs": "Programs",
-      "organizations": "Organizations",
-      "location_addresses": "Location Addresses",
       "settings": "Settings",
       "calendar": "Calendar",
       "statistics": "Statistics",
       "course_instructor_manual": "Course Instructor Manual",
-      "logout": "Logout"
+      "logout": "Logout",
+      "section_personal": "Personal",
+      "section_management": "Management",
+      "section_help": "Help"
     },
     "change-password": "Change email or password",
     "add": "Add",
@@ -255,6 +257,7 @@
       "delete_restricted_by_relationship": "{parent} cannot be deleted when they are still associated with {child}. Please remove all {child} first.",
       "delete_restricted_by_relationships": "{table} cannot be deleted when they are associated with other records. Please remove those records first.",
       "generic_error": "An error occurred. Please try again later.",
+      "last_settings_admin": "This organization must keep at least one user with user & settings management rights. Grant it to another admin first.",
       "certificate_deletion_failed": "Failed to delete achievement certificates. Please try again.",
       "entities": {
         "course": "Courses",
@@ -700,6 +703,8 @@
     "toCourseDescription": "to course description",
     "coursesPageTitle": "Courses: opencampus.sh Edu Hub",
     "coursesHeadline": "Courses",
+    "eventsHeadline": "Events",
+    "degreesHeadline": "Degrees",
     "courseSearchPlaceholder": "Search in title",
     "addCourseText": "Add Course",
     "addCourseFormTitle": "Add Course",
@@ -1038,6 +1043,12 @@
       "status": "Status",
       "email_templates": "Templates",
       "has_custom_templates": "This course has custom email templates"
+    },
+    "error_loading_programs": "The programs could not be loaded. Please try again later.",
+    "empty_state": {
+      "events": "No events programs exist yet. Ask a platform admin to set up an events program for your organization before you can manage events here.",
+      "courses": "No course programs exist yet. Ask a platform admin to set up a course program for your organization before you can manage courses here.",
+      "degrees": "No degree programs exist yet. Ask a platform admin to set up a degree program for your organization before you can manage degrees here."
     },
     "view": "View",
     "view_course": "View Course",
@@ -1930,6 +1941,7 @@
   },
   "manageAdminUsers": {
     "headline": "Admin Users",
+    "sole_settings_admin_hint": "This is the only user with settings rights for this organization. Grant settings to another admin before removing it here.",
     "first_name": "First Name",
     "last_name": "Last Name",
     "email": "Email",
@@ -2594,6 +2606,10 @@
           "label": "Project types",
           "description": "Default achievement certificate templates and documentation instructions per project type"
         },
+        "projects": {
+          "label": "Projects",
+          "description": "Publish, unpublish and tag projects"
+        },
         "documentation-instructions": {
           "label": "Documentation instructions",
           "description": "Manage PDF instructions assigned to projects"
@@ -2621,6 +2637,14 @@
         "jobboerse": {
           "label": "Job board (StuJo)",
           "description": "Moderate job postings, manage portals, prices and credits"
+        },
+        "location-addresses": {
+          "label": "Location addresses",
+          "description": "Manage addresses for offline sessions and event venues"
+        },
+        "organizations": {
+          "label": "Organizations",
+          "description": "Create, edit, and merge organizations"
         }
       }
     },

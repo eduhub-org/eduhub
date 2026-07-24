@@ -171,6 +171,14 @@ update_permissions:
                           _eq: X-Hasura-User-Id
                       - canManageDegrees:
                           _eq: true
+          # A settings admin manages every program type for their organization (no type constraint).
+          - Organization:
+              OrganizationAdmins:
+                _and:
+                  - userId:
+                      _eq: X-Hasura-User-Id
+                  - canManageSettings:
+                      _eq: true
       check:
         _or:
           - _and:
@@ -203,6 +211,14 @@ update_permissions:
                           _eq: X-Hasura-User-Id
                       - canManageDegrees:
                           _eq: true
+          # A settings admin manages every program type for their organization (no type constraint).
+          - Organization:
+              OrganizationAdmins:
+                _and:
+                  - userId:
+                      _eq: X-Hasura-User-Id
+                  - canManageSettings:
+                      _eq: true
 insert_permissions:
   # A new program may only be created in an organization the admin manages, and only of a type
   # they are allowed to manage (the check reuses the same per-type scope as update).
@@ -264,6 +280,14 @@ insert_permissions:
                           _eq: X-Hasura-User-Id
                       - canManageDegrees:
                           _eq: true
+          # A settings admin manages every program type for their organization (no type constraint).
+          - Organization:
+              OrganizationAdmins:
+                _and:
+                  - userId:
+                      _eq: X-Hasura-User-Id
+                  - canManageSettings:
+                      _eq: true
 delete_permissions:
   - role: org_admin_access
     permission:
@@ -299,3 +323,11 @@ delete_permissions:
                           _eq: X-Hasura-User-Id
                       - canManageDegrees:
                           _eq: true
+          # A settings admin manages every program type for their organization (no type constraint).
+          - Organization:
+              OrganizationAdmins:
+                _and:
+                  - userId:
+                      _eq: X-Hasura-User-Id
+                  - canManageSettings:
+                      _eq: true

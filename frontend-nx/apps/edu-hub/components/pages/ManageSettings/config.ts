@@ -1,15 +1,18 @@
 import { ComponentType } from 'react';
 import {
+  MdOutlineBusiness,
   MdOutlineCategory,
   MdOutlineWorkOutline,
   MdOutlineDescription,
   MdOutlineEmail,
+  MdOutlineFolderOpen,
   MdOutlineEventNote,
   MdOutlineGroups,
   MdOutlineBallot,
   MdOutlineHome,
   MdOutlineLock,
   MdOutlinePalette,
+  MdOutlinePlace,
   MdOutlineSettings,
   MdOutlineVerified,
   MdOutlineWorkspacePremium,
@@ -29,16 +32,19 @@ export type SettingsNavItemId =
   | 'appearance'
   | 'jobboerse'
   | 'homepage'
+  | 'location-addresses'
   | 'emails'
   | 'programs'
   | 'attendance-certificates'
   | 'project-types'
+  | 'projects'
   | 'documentation-instructions'
   | 'onboarding-texts'
   | 'course-groups'
   | 'badges'
   | 'time-zone'
-  | 'access';
+  | 'access'
+  | 'organizations';
 
 export type SettingsNavItemDef = {
   id: SettingsNavItemId;
@@ -81,6 +87,14 @@ export const SETTINGS_NAV_ITEMS: Record<SettingsNavItemId, SettingsNavItemDef> =
     status: 'live',
     groupId: 'platform',
   },
+  'location-addresses': {
+    id: 'location-addresses',
+    icon: MdOutlinePlace,
+    href: '/manage/settings/location-addresses',
+    requiredCapability: 'admin',
+    status: 'live',
+    groupId: 'platform',
+  },
   emails: {
     id: 'emails',
     icon: MdOutlineEmail,
@@ -109,6 +123,14 @@ export const SETTINGS_NAV_ITEMS: Record<SettingsNavItemId, SettingsNavItemDef> =
     id: 'project-types',
     icon: MdOutlineCategory,
     href: '/manage/settings/project-types',
+    requiredCapability: 'admin',
+    status: 'live',
+    groupId: 'programs',
+  },
+  projects: {
+    id: 'projects',
+    icon: MdOutlineFolderOpen,
+    href: '/manage/settings/projects',
     requiredCapability: 'admin',
     status: 'live',
     groupId: 'programs',
@@ -161,13 +183,21 @@ export const SETTINGS_NAV_ITEMS: Record<SettingsNavItemId, SettingsNavItemDef> =
     status: 'live',
     groupId: 'system',
   },
+  organizations: {
+    id: 'organizations',
+    icon: MdOutlineBusiness,
+    href: '/manage/settings/organizations',
+    requiredCapability: 'admin',
+    status: 'live',
+    groupId: 'system',
+  },
 };
 
 /** Sidebar / overview group order and membership. */
 export const SETTINGS_NAV_GROUPS: SettingsNavGroupDef[] = [
   {
     id: 'platform',
-    items: ['appearance', 'homepage', 'jobboerse'],
+    items: ['appearance', 'homepage', 'jobboerse', 'location-addresses'],
   },
   {
     id: 'notifications',
@@ -179,6 +209,7 @@ export const SETTINGS_NAV_GROUPS: SettingsNavGroupDef[] = [
       'programs',
       'attendance-certificates',
       'project-types',
+      'projects',
       'documentation-instructions',
       'onboarding-texts',
       'course-groups',
@@ -187,7 +218,7 @@ export const SETTINGS_NAV_GROUPS: SettingsNavGroupDef[] = [
   },
   {
     id: 'system',
-    items: ['time-zone', 'access'],
+    items: ['time-zone', 'access', 'organizations'],
   },
 ];
 

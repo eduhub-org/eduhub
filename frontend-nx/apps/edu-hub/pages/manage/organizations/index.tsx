@@ -1,23 +1,14 @@
-import Head from 'next/head';
-import { FC } from 'react';
-import { Page } from '../../../components/layout/Page';
-import ManageOrganizationsContent from '../../../components/pages/ManageOrganizationsContent';
-import { useIsAdmin } from '../../../hooks/authentication';
+// do not remove this https://github.com/nrwl/nx/issues/9017#issuecomment-1140066503
+import path from 'path';
+path.resolve('./next.config.js');
 
-const Organizations: FC = () => {
-  const isAdmin = useIsAdmin();
+import { GetServerSideProps } from 'next';
 
-  return (
-    <>
-      <Head>
-        <title>Manage Organizations</title>
-        <link rel="icon" href="/favicon.png" />
-      </Head>
-      <Page>
-        {isAdmin && <ManageOrganizationsContent />}
-      </Page>
-    </>
-  );
-};
+/** @deprecated Use /manage/settings/organizations — kept for bookmarks and external links. */
+export const getServerSideProps: GetServerSideProps = async () => ({
+  redirect: { destination: '/manage/settings/organizations', permanent: false },
+});
 
-export default Organizations;
+export default function ManageOrganizationsRedirect() {
+  return null;
+}

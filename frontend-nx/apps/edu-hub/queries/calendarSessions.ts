@@ -28,6 +28,7 @@ export const CALENDAR_SESSIONS = gql`
         }
         Program {
           id
+          type
           title
           shortTitle
         }

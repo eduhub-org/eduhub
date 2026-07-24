@@ -69,6 +69,13 @@ export const handleForeignKeyError = (error: ApolloError, t: (key: string, optio
     }
   }
   
+  // Custom trigger guard: an organization must always keep at least one settings admin. The DB
+  // raises "Cannot remove the last settings admin of organization <id>" (see the OrganizationAdmin
+  // trigger migration). Map it to a friendly message rather than the generic fallback.
+  if (errorMessage.includes('last settings admin')) {
+    return t('error_handling.last_settings_admin');
+  }
+
   // Check for specific database constraint error messages
   if (errorMessage.includes('Cannot delete') && errorMessage.includes('because it is referenced by')) {
     // Handle specific constraint error messages like:

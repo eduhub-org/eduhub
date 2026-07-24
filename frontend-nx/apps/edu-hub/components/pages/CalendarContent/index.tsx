@@ -112,10 +112,10 @@ const CalendarContent: FC = () => {
       return { id: { _eq: -1 } }; // no courses when neither selected
     }
     if (showCourses && !showEvents) {
-      return { Program: { shortTitle: { _neq: 'EVENTS' } } };
+      return { Program: { type: { _neq: 'EVENTS' } } };
     }
     if (!showCourses && showEvents) {
-      return { Program: { shortTitle: { _eq: 'EVENTS' } } };
+      return { Program: { type: { _eq: 'EVENTS' } } };
     }
     return {};
   }, [showCourses, showEvents]);
@@ -152,9 +152,9 @@ const CalendarContent: FC = () => {
     if (!showCourses && !showEvents) {
       conditions.push({ courseId: { _eq: -1 } }); // show nothing
     } else if (showCourses && !showEvents) {
-      conditions.push({ Course: { Program: { shortTitle: { _neq: 'EVENTS' } } } });
+      conditions.push({ Course: { Program: { type: { _neq: 'EVENTS' } } } });
     } else if (!showCourses && showEvents) {
-      conditions.push({ Course: { Program: { shortTitle: { _eq: 'EVENTS' } } } });
+      conditions.push({ Course: { Program: { type: { _eq: 'EVENTS' } } } });
     }
     if (conditions.length === 0) return {};
     if (conditions.length === 1) return conditions[0];
@@ -212,8 +212,8 @@ const CalendarContent: FC = () => {
       const location = resolveLocation(session);
       const colors = getLocationColor(location);
       const courseTitle = session.Course?.title || '';
-      const programShortTitle = session.Course?.Program?.shortTitle || '';
-      const isEvent = programShortTitle === 'EVENTS';
+      // Classify by Program.type (shortTitle is a free-text label); keep shortTitle for display only.
+      const isEvent = session.Course?.Program?.type === 'EVENTS';
       const address = resolveAddress(session);
 
       const titleLine = courseTitle + (session.title ? ` – ${session.title}` : '');

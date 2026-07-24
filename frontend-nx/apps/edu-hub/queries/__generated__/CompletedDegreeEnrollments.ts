@@ -9,6 +9,8 @@
 
 export interface CompletedDegreeEnrollments_CourseEnrollment_Course_Program {
   __typename: "Program";
+  id: number;
+  type: string;
   /**
    * The 6 letter short title for the program.
    */
