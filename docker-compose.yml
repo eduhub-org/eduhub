@@ -20,6 +20,9 @@ services:
       NEXT_PUBLIC_HELP_DOCS_URL: https://opencampus.gitbook.io/faq/
       NEXT_PUBLIC_STORAGE_BUCKET_URL: ${GITPOD_WORKSPACE_URL:-http://localhost}:4001/emulated-bucket
       NEXT_PUBLIC_ENVIRONMENT: development
+      # Job tile links go to the local StuJo app (frontend-stujo on :5001),
+      # not the production fallback in stujoBaseUrl.ts.
+      NEXT_PUBLIC_STUJO_URL: http://localhost:5001
       NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL: ${NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL:-}
       MM_URL: ${MM_URL:-https://chat.opencampus.sh}
       # Enable file watching in Docker environment
