@@ -18,6 +18,7 @@ export interface DegreeParticipantsWithDegreeEnrollments_Course_by_pk_CourseEnro
 export interface DegreeParticipantsWithDegreeEnrollments_Course_by_pk_CourseEnrollments_User_CourseEnrollments_Course_Program {
   __typename: "Program";
   id: number;
+  type: string;
   /**
    * The 6 letter short title for the program.
    */

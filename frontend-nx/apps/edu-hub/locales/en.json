@@ -257,6 +257,7 @@
       "delete_restricted_by_relationship": "{parent} cannot be deleted when they are still associated with {child}. Please remove all {child} first.",
       "delete_restricted_by_relationships": "{table} cannot be deleted when they are associated with other records. Please remove those records first.",
       "generic_error": "An error occurred. Please try again later.",
+      "last_settings_admin": "This organization must keep at least one user with user & settings management rights. Grant it to another admin first.",
       "certificate_deletion_failed": "Failed to delete achievement certificates. Please try again.",
       "entities": {
         "course": "Courses",
@@ -1940,6 +1941,7 @@
   },
   "manageAdminUsers": {
     "headline": "Admin Users",
+    "sole_settings_admin_hint": "This is the only user with settings rights for this organization. Grant settings to another admin before removing it here.",
     "first_name": "First Name",
     "last_name": "Last Name",
     "email": "Email",

@@ -1,8 +1,19 @@
 import { gql } from '@apollo/client';
 
+// Shared Program selection for the degree enrollment views, so `type` (used for classification) and
+// the display fields stay consistent across both queries.
+const DEGREE_COURSE_PROGRAM_FIELDS = gql`
+  fragment DegreeCourseProgramFields on Program {
+    id
+    type
+    shortTitle
+    title
+  }
+`;
+
 export const DEGREE_COURSES = gql`
   query DegreeCourses {
-    Course(where: {Program: {shortTitle: {_eq: "DEGREES"}}}) {
+    Course(where: {Program: {type: {_eq: "DEGREES"}}}) {
       id
       title
     }
@@ -23,7 +34,7 @@ export const COMPLETED_DEGREE_ENROLLMENTS = gql`
             userId: { _eq: $userId },
             Course: {
               CourseDegrees: { degreeCourseId: { _eq: $degreeCourseId } },
-              Program: { shortTitle: { _eq: "EVENTS" } }
+              Program: { type: { _eq: "EVENTS" } }
             }
           }
         ]
@@ -34,12 +45,12 @@ export const COMPLETED_DEGREE_ENROLLMENTS = gql`
         title
         ects
         Program {
-          shortTitle
-          title
+          ...DegreeCourseProgramFields
         }
       }
     }
   }
+  ${DEGREE_COURSE_PROGRAM_FIELDS}
 `;
 
 export const DEGREE_PARTICIPANTS_WITH_DEGREE_ENROLLMENTS = gql`
@@ -81,9 +92,7 @@ export const DEGREE_PARTICIPANTS_WITH_DEGREE_ENROLLMENTS = gql`
               title
               ects
               Program {
-                id
-                shortTitle
-                title
+                ...DegreeCourseProgramFields
               }
             }
           }
@@ -96,6 +105,7 @@ export const DEGREE_PARTICIPANTS_WITH_DEGREE_ENROLLMENTS = gql`
       }
     }
   }
+  ${DEGREE_COURSE_PROGRAM_FIELDS}
 `;
 
 export const INSERT_COURSE_DEGREE_TAG = gql`

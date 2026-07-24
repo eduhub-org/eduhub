@@ -1,6 +1,7 @@
 import { FC, ReactNode, useMemo, useCallback, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { ColumnDef } from '@tanstack/react-table';
+import { DocumentNode } from 'graphql';
 import { MdStar } from 'react-icons/md';
 
 import TableGrid from '../../common/TableGrid';
@@ -15,6 +16,7 @@ import {
   ORGANIZATION_ADMIN_LIST,
   DELETE_ORGANIZATION_ADMIN,
   MANAGEABLE_ORGANIZATIONS,
+  SETTINGS_ADMIN_GRANTS,
   UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_EVENTS,
   UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_COURSES,
   UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_DEGREES,
@@ -33,16 +35,24 @@ import {
   ManageableOrganizations,
   ManageableOrganizationsVariables,
 } from '../../../queries/__generated__/ManageableOrganizations';
+import { SettingsAdminGrants } from '../../../queries/__generated__/SettingsAdminGrants';
 import AddOrganizationAdminDialog, { AdminOrganizationOption } from './AddOrganizationAdminDialog';
 
 const ExpandableUserRow: FC<{
   row: OrganizationAdminList_OrganizationAdmin;
   isSuperAdmin: boolean;
+  // True when this grant is the only settings admin of its organization: the settings capability
+  // must not be turned off here (the DB guard would reject it), so the checkbox is disabled —
+  // unless the viewer is a super-admin, who bypasses the guard at the DB level.
+  isSoleSettingsAdmin: boolean;
   onAdminStatusChange: () => void;
-}> = ({ row, isSuperAdmin, onAdminStatusChange }) => {
+}> = ({ row, isSuperAdmin, isSoleSettingsAdmin, onAdminStatusChange }) => {
   const t = useTranslations('manageAdminUsers');
   const isAdmin = useIsAdmin();
   const manageRole = useManageRole();
+
+  // Non-super-admins cannot clear the last settings admin of an org; super-admins bypass the guard.
+  const settingsLocked = isSoleSettingsAdmin && !isAdmin;
 
   const [setAdminStatus] = useAdminMutation(UPDATE_USER_ADMIN_STATUS);
 
@@ -70,7 +80,17 @@ const ExpandableUserRow: FC<{
     [onAdminStatusChange, row.User?.id, setAdminStatus]
   );
 
-  const capabilities = useMemo(
+  const capabilities = useMemo<
+    {
+      key: string;
+      label: string;
+      checked: boolean;
+      mutation: DocumentNode;
+      disabled?: boolean;
+      helpText?: string;
+      refetchQueries?: string[];
+    }[]
+  >(
     () => [
       {
         key: 'events',
@@ -101,9 +121,15 @@ const ExpandableUserRow: FC<{
         label: t('can_manage_users_and_settings'),
         checked: row.canManageSettings,
         mutation: UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_SETTINGS,
+        // Sole settings admin: block turning it off (except for super-admins, who bypass the DB
+        // guard). Refetch the list + counts on toggle so the disabled state stays in sync after
+        // granting settings to someone else first.
+        disabled: settingsLocked,
+        helpText: settingsLocked ? t('sole_settings_admin_hint') : undefined,
+        refetchQueries: ['OrganizationAdminList', 'SettingsAdminGrants'],
       },
     ],
-    [row, t]
+    [row, t, settingsLocked]
   );
 
   return (
@@ -118,10 +144,12 @@ const ExpandableUserRow: FC<{
             variant="eduhub"
             label={capability.label}
             checked={capability.checked}
+            disabled={capability.disabled}
+            helpText={capability.helpText}
             updateValueMutation={capability.mutation}
             role={manageRole}
             identifierVariables={{ itemId: row.id }}
-            refetchQueries={['GetAdminUsers']}
+            refetchQueries={capability.refetchQueries ?? ['OrganizationAdminList']}
           />
         ))}
       </div>
@@ -199,6 +227,28 @@ const ManageAdminUsersContent: FC<ManageAdminUsersContentProps> = ({ inSettingsL
       };
     },
   });
+
+  // Per-organization count of settings admins, so the UI can pre-disable removing/deleting the
+  // *last* one for an org (the DB guard enforces the same rule). Role-scoped like the list: org
+  // admins see grants of their orgs, super-admins see all. Refetched after add/toggle/delete.
+  const { data: settingsAdminData, refetch: refetchSettingsAdmins } =
+    useManageQuery<SettingsAdminGrants>(SETTINGS_ADMIN_GRANTS);
+
+  const settingsAdminCountByOrg = useMemo(() => {
+    const counts = new Map<number, number>();
+    (settingsAdminData?.OrganizationAdmin ?? []).forEach((grant) => {
+      counts.set(grant.organizationId, (counts.get(grant.organizationId) ?? 0) + 1);
+    });
+    return counts;
+  }, [settingsAdminData]);
+
+  const isSoleSettingsAdmin = useCallback(
+    (row: OrganizationAdminList_OrganizationAdmin) => {
+      const orgId = row.Organization?.id;
+      return !!row.canManageSettings && orgId != null && (settingsAdminCountByOrg.get(orgId) ?? 0) <= 1;
+    },
+    [settingsAdminCountByOrg]
+  );
 
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 
@@ -336,15 +386,19 @@ const ManageAdminUsersContent: FC<ManageAdminUsersContentProps> = ({ inSettingsL
               onSearchFilterChange={setSearchFilter}
               deleteMutation={DELETE_ORGANIZATION_ADMIN}
               deleteIdType="number"
+              // Block deleting the last settings admin of an org (the DB guard would reject it too),
+              // except for super-admins, who bypass the guard at the DB level.
+              canDeleteRow={(row) => isAdmin || !isSoleSettingsAdmin(row)}
               role={manageRole}
               error={error}
               loading={loading}
-              refetchQueries={['OrganizationAdminList', 'AdminUsers']}
+              refetchQueries={['OrganizationAdminList', 'AdminUsers', 'SettingsAdminGrants']}
               generateDeletionConfirmationQuestion={generateDeletionConfirmation}
               expandableRowComponent={({ row }) => (
                 <ExpandableUserRow
                   row={row}
                   isSuperAdmin={adminUserIds.includes(row.User?.id)}
+                  isSoleSettingsAdmin={isSoleSettingsAdmin(row)}
                   onAdminStatusChange={handleAdminStatusChange}
                 />
               )}
@@ -352,7 +406,12 @@ const ManageAdminUsersContent: FC<ManageAdminUsersContentProps> = ({ inSettingsL
             <AddOrganizationAdminDialog
               open={isAddDialogOpen}
               onClose={() => setIsAddDialogOpen(false)}
-              onSuccess={() => refetch()}
+              onSuccess={() => {
+                // Refetch the list (so a first admin's DB-forced canManageSettings shows) and the
+                // settings-admin counts (so sole-admin disabling stays correct).
+                refetch();
+                refetchSettingsAdmins();
+              }}
               organizationOptions={organizationOptions}
             />
         </div>
