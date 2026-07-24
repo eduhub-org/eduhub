@@ -82,6 +82,11 @@ BEGIN
     RETURN COALESCE(NEW, OLD);
   END IF;
 
+  -- Serialize against concurrent demote/delete (and the first-admin insert) for this organization,
+  -- so the "another settings admin exists" check below cannot be defeated by an uncommitted sibling
+  -- transaction demoting/deleting a different one of the org's last settings admins (TOCTOU).
+  PERFORM pg_advisory_xact_lock(hashtext('OrganizationAdmin'), OLD."organizationId");
+
   IF TG_OP = 'UPDATE' THEN
     IF OLD."canManageSettings" = true AND NEW."canManageSettings" = false THEN
       org_id := OLD."organizationId";
