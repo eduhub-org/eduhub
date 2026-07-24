@@ -57,6 +57,65 @@ insert_permissions:
         - userId
         - location
         - termsAcceptedAt
+  # Org admins may enroll users into courses whose program they manage (per-type capability or
+  # canManageSettings). The check resolves the target course's program/organization.
+  - role: org_admin_access
+    permission:
+      check:
+        _or:
+          - Course:
+              Program:
+                _and:
+                  - type:
+                      _eq: EVENTS
+                  - Organization:
+                      OrganizationAdmins:
+                        _and:
+                          - userId:
+                              _eq: X-Hasura-User-Id
+                          - canManageEvents:
+                              _eq: true
+          - Course:
+              Program:
+                _and:
+                  - type:
+                      _eq: COURSES
+                  - Organization:
+                      OrganizationAdmins:
+                        _and:
+                          - userId:
+                              _eq: X-Hasura-User-Id
+                          - canManageCourses:
+                              _eq: true
+          - Course:
+              Program:
+                _and:
+                  - type:
+                      _eq: DEGREES
+                  - Organization:
+                      OrganizationAdmins:
+                        _and:
+                          - userId:
+                              _eq: X-Hasura-User-Id
+                          - canManageDegrees:
+                              _eq: true
+          - Course:
+              Program:
+                Organization:
+                  OrganizationAdmins:
+                    _and:
+                      - userId:
+                          _eq: X-Hasura-User-Id
+                      - canManageSettings:
+                          _eq: true
+      columns:
+        - courseId
+        - userId
+        - status
+        - billingOrganizationId
+        - motivationLetter
+        - location
+        - termsAcceptedAt
 select_permissions:
   - role: instructor_access
     permission:
@@ -109,17 +168,26 @@ select_permissions:
         - userId
         - location
       filter: {}
-  # Org admins need enrollment counts on /manage/courses (AdminCourseList). Scoped to enrollments
-  # for courses whose program belongs to an organization they administer, and only when their
-  # OrganizationAdmin grant includes the capability matching that program type (same rules as
-  # Course org_admin_access update/delete).
+  # Org admins may read enrollments for courses whose program belongs to an organization they
+  # administer, gated by the capability matching that program type or by canManageSettings. The
+  # column set mirrors instructor_access so the management UI can display/edit the same fields.
   - role: org_admin_access
     permission:
       columns:
         - id
         - courseId
+        - userId
         - status
+        - motivationLetter
         - motivationRating
+        - achievementCertificateURL
+        - attendanceCertificateURL
+        - created_at
+        - updated_at
+        - billingOrganizationId
+        - invitationExpirationDate
+        - location
+        - termsAcceptedAt
       filter:
         _or:
           - Course:
@@ -158,6 +226,15 @@ select_permissions:
                               _eq: X-Hasura-User-Id
                           - canManageDegrees:
                               _eq: true
+          - Course:
+              Program:
+                Organization:
+                  OrganizationAdmins:
+                    _and:
+                      - userId:
+                          _eq: X-Hasura-User-Id
+                      - canManageSettings:
+                          _eq: true
       allow_aggregations: true
 update_permissions:
   - role: instructor_access
@@ -209,6 +286,112 @@ update_permissions:
           - userId:
               _eq: X-Hasura-User-Id
       check: {}
+  # Org admins may update enrollments for courses whose program they manage. There is no delete
+  # permission by design: "removing" an enrollment is a status change (e.g. to CANCELLED), which
+  # avoids the destructive ProjectEnrollment / CourseEnrollmentAddon cascades.
+  - role: org_admin_access
+    permission:
+      columns:
+        - status
+        - motivationRating
+        - billingOrganizationId
+        - invitationExpirationDate
+        - location
+        - termsAcceptedAt
+      filter:
+        _or:
+          - Course:
+              Program:
+                _and:
+                  - type:
+                      _eq: EVENTS
+                  - Organization:
+                      OrganizationAdmins:
+                        _and:
+                          - userId:
+                              _eq: X-Hasura-User-Id
+                          - canManageEvents:
+                              _eq: true
+          - Course:
+              Program:
+                _and:
+                  - type:
+                      _eq: COURSES
+                  - Organization:
+                      OrganizationAdmins:
+                        _and:
+                          - userId:
+                              _eq: X-Hasura-User-Id
+                          - canManageCourses:
+                              _eq: true
+          - Course:
+              Program:
+                _and:
+                  - type:
+                      _eq: DEGREES
+                  - Organization:
+                      OrganizationAdmins:
+                        _and:
+                          - userId:
+                              _eq: X-Hasura-User-Id
+                          - canManageDegrees:
+                              _eq: true
+          - Course:
+              Program:
+                Organization:
+                  OrganizationAdmins:
+                    _and:
+                      - userId:
+                          _eq: X-Hasura-User-Id
+                      - canManageSettings:
+                          _eq: true
+      check:
+        _or:
+          - Course:
+              Program:
+                _and:
+                  - type:
+                      _eq: EVENTS
+                  - Organization:
+                      OrganizationAdmins:
+                        _and:
+                          - userId:
+                              _eq: X-Hasura-User-Id
+                          - canManageEvents:
+                              _eq: true
+          - Course:
+              Program:
+                _and:
+                  - type:
+                      _eq: COURSES
+                  - Organization:
+                      OrganizationAdmins:
+                        _and:
+                          - userId:
+                              _eq: X-Hasura-User-Id
+                          - canManageCourses:
+                              _eq: true
+          - Course:
+              Program:
+                _and:
+                  - type:
+                      _eq: DEGREES
+                  - Organization:
+                      OrganizationAdmins:
+                        _and:
+                          - userId:
+                              _eq: X-Hasura-User-Id
+                          - canManageDegrees:
+                              _eq: true
+          - Course:
+              Program:
+                Organization:
+                  OrganizationAdmins:
+                    _and:
+                      - userId:
+                          _eq: X-Hasura-User-Id
+                      - canManageSettings:
+                          _eq: true
 event_triggers:
   - name: add_confirmed_user_to_mm
     definition:
