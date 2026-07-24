@@ -5,6 +5,7 @@ import {
   MdOutlineWorkOutline,
   MdOutlineDescription,
   MdOutlineEmail,
+  MdOutlineFolderOpen,
   MdOutlineEventNote,
   MdOutlineGroups,
   MdOutlineBallot,
@@ -36,6 +37,7 @@ export type SettingsNavItemId =
   | 'programs'
   | 'attendance-certificates'
   | 'project-types'
+  | 'projects'
   | 'documentation-instructions'
   | 'onboarding-texts'
   | 'course-groups'
@@ -125,6 +127,14 @@ export const SETTINGS_NAV_ITEMS: Record<SettingsNavItemId, SettingsNavItemDef> =
     status: 'live',
     groupId: 'programs',
   },
+  projects: {
+    id: 'projects',
+    icon: MdOutlineFolderOpen,
+    href: '/manage/settings/projects',
+    requiredCapability: 'admin',
+    status: 'live',
+    groupId: 'programs',
+  },
   'documentation-instructions': {
     id: 'documentation-instructions',
     icon: MdOutlineDescription,
@@ -199,6 +209,7 @@ export const SETTINGS_NAV_GROUPS: SettingsNavGroupDef[] = [
       'programs',
       'attendance-certificates',
       'project-types',
+      'projects',
       'documentation-instructions',
       'onboarding-texts',
       'course-groups',

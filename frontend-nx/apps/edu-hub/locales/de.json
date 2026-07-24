@@ -46,10 +46,7 @@
       "courses": "Kurse",
       "events": "Veranstaltungen",
       "degrees": "Degrees",
-      "projects": "Projekte",
       "programs": "Programme",
-      "organizations": "Organisationen",
-      "location_addresses": "Veranstaltungsadressen",
       "settings": "Einstellungen",
       "calendar": "Kalender",
       "statistics": "Statistiken",
@@ -2591,6 +2588,10 @@
         "project-types": {
           "label": "Projekttypen",
           "description": "Standard-Leistungszertifikate und Dokumentationsanleitungen pro Projekttyp"
+        },
+        "projects": {
+          "label": "Projekte",
+          "description": "Projekte veröffentlichen, verbergen und verschlagworten"
         },
         "documentation-instructions": {
           "label": "Dokumentationsanleitungen",
