@@ -43,6 +43,8 @@ export default async function sendEnrollmentEmail(req, logger) {
           status
           created_at
           invitationExpirationDate
+          achievementCertificateURL
+          attendanceCertificateURL
           Invoices(limit: 1, order_by: { created_at: desc }) {
             status
           }
@@ -113,36 +115,79 @@ export default async function sendEnrollmentEmail(req, logger) {
       }
     `;
 
-    // Determine base template type based on enrollment status
+    // Detect a newly-issued certificate. The trigger also fires on updates to
+    // achievementCertificateURL / attendanceCertificateURL, and certificate
+    // issuance can happen without any status change. This takes priority over
+    // the status-based mapping and is the signal that a course is completed
+    // (there is deliberately no separate COURSE_COMPLETED email).
+    const achievementNewlyIssued = !oldEnrollment?.achievementCertificateURL && !!enrollment.achievementCertificateURL;
+    const attendanceNewlyIssued = !oldEnrollment?.attendanceCertificateURL && !!enrollment.attendanceCertificateURL;
+
+    // certificateLink is passed into the variable replacer for [Enrollment:CertificateLink]
+    let certificateLink = null;
+
+    // Determine base template type
     let baseTemplateType;
-    switch (enrollment.status) {
-      case 'APPLIED':
-        baseTemplateType = 'APPLICATION_RECEIVED';
-        break;
-      case 'CONFIRMED':
-        baseTemplateType = 'APPLICATION_CONFIRMED';
-        break;
-      case 'INVITED':
-        baseTemplateType = 'INVITE';
-        break;
-      case 'REJECTED':
-        baseTemplateType = 'DECLINE';
-        break;
-      case 'REGISTERED':
-        baseTemplateType = 'REGISTRATION_CONFIRMED';
-        break;
-      case 'WAITLIST':
-        baseTemplateType = 'WAITLIST_NOTICE';
-        break;
-      default:
-        // Don't send emails for other status changes
-        return {
-          success: true,
-          messageKey: 'NO_TEMPLATE_FOR_STATUS',
-          message: `No email template for status: ${enrollment.status}`
-        };
+    if (achievementNewlyIssued || attendanceNewlyIssued) {
+      // Prefer achievement over attendance if both are set in the same update
+      if (achievementNewlyIssued) {
+        baseTemplateType = 'CERTIFICATE_ACHIEVEMENT_READY';
+        certificateLink = enrollmentDetails.achievementCertificateURL;
+      } else {
+        baseTemplateType = 'CERTIFICATE_ATTENDANCE_READY';
+        certificateLink = enrollmentDetails.attendanceCertificateURL;
+      }
+    } else {
+      // A waitlisted user who is moved up to INVITED/CONFIRMED gets the
+      // "a spot opened up" email instead of the plain invite/confirmation.
+      const promotedFromWaitlist =
+        op === 'UPDATE' &&
+        oldEnrollment?.status === 'WAITLIST' &&
+        (enrollment.status === 'INVITED' || enrollment.status === 'CONFIRMED');
+
+      if (promotedFromWaitlist) {
+        baseTemplateType = 'WAITLIST_PROMOTED';
+      } else {
+        switch (enrollment.status) {
+          case 'APPLIED':
+            baseTemplateType = 'APPLICATION_RECEIVED';
+            break;
+          case 'CONFIRMED':
+            baseTemplateType = 'APPLICATION_CONFIRMED';
+            break;
+          case 'INVITED':
+            baseTemplateType = 'INVITE';
+            break;
+          case 'REJECTED':
+            baseTemplateType = 'DECLINE';
+            break;
+          case 'REGISTERED':
+            baseTemplateType = 'REGISTRATION_CONFIRMED';
+            break;
+          case 'WAITLIST':
+            baseTemplateType = 'WAITLIST_NOTICE';
+            break;
+          case 'CANCELLED':
+            baseTemplateType = 'ENROLLMENT_CANCELLED';
+            break;
+          case 'ABORTED':
+            baseTemplateType = 'ENROLLMENT_ABORTED';
+            break;
+          case 'EXPIRED':
+            baseTemplateType = 'INVITATION_EXPIRED';
+            break;
+          default:
+            // Don't send emails for other status changes (e.g. COMPLETED —
+            // completion is signalled by the certificate email above).
+            return {
+              success: true,
+              messageKey: 'NO_TEMPLATE_FOR_STATUS',
+              message: `No email template for status: ${enrollment.status}`
+            };
+        }
+      }
     }
-    
+
     // Select paid template variant if latest invoice is paid
     // (CourseEnrollment.paymentStatus was removed in favor of Invoice.status)
     let templateType = baseTemplateType;
@@ -243,6 +288,9 @@ export default async function sendEnrollmentEmail(req, logger) {
         day: 'numeric'
       });
     };
+
+    // Expose the certificate link (when a certificate was just issued) to the replacer
+    enrollmentDetails.certificateLink = certificateLink;
 
     const replaceVariables = createEnrollmentVariableReplacer(enrollmentDetails, formatDate);
 

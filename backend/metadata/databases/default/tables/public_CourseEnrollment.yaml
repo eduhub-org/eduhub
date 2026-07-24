@@ -420,6 +420,8 @@ event_triggers:
         columns:
           - invitationExpirationDate
           - status
+          - achievementCertificateURL
+          - attendanceCertificateURL
     retry_conf:
       interval_sec: 3660
       num_retries: 10

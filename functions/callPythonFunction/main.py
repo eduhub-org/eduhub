@@ -6,10 +6,13 @@ from typing import Dict, Any, Callable
 # Import functions explicitly
 from pythonFunctions.add_confirmed_user_to_mm import add_confirmed_user_to_mm
 from pythonFunctions.check_attendance import check_attendance
+from pythonFunctions.check_course_continuation import check_course_continuation
 from pythonFunctions.create_certificates import create_certificates
+from pythonFunctions.expire_invitations import expire_invitations
 from pythonFunctions.expire_job_postings import expire_job_postings
 from pythonFunctions.load_participation_data import load_participation_data
 from pythonFunctions.send_job_alerts import send_job_alerts
+from pythonFunctions.send_project_deadline_reminders import send_project_deadline_reminders
 from pythonFunctions.update_enrollment_locations import update_enrollment_locations
 
 # Initialize the logger level
@@ -22,10 +25,13 @@ else:
 PYTHON_FUNCTIONS: Dict[str, Callable] = {
     "add_confirmed_user_to_mm": add_confirmed_user_to_mm,
     "check_attendance": check_attendance,
+    "check_course_continuation": check_course_continuation,
     "create_certificates": create_certificates,
+    "expire_invitations": expire_invitations,
     "expire_job_postings": expire_job_postings,
     "load_participation_data": load_participation_data,
     "send_job_alerts": send_job_alerts,
+    "send_project_deadline_reminders": send_project_deadline_reminders,
     "update_enrollment_locations": update_enrollment_locations,
 }
 

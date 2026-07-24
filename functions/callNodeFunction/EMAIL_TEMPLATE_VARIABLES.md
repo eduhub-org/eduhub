@@ -46,6 +46,23 @@ The email template variable system is centralized in `emailTemplateVariables.js`
   - Example: `https://edu.opencampus.sh/course/123`
   - Available in: enrollment emails, session reminders
 
+- **`[Enrollment:CertificateLink]`**: Link to the issued certificate (achievement or attendance); falls back to the course page
+  - Example: `https://edu.opencampus.sh/course/123`
+  - Available in: certificate-ready emails
+
+### Project Variables
+*Available in: project lifecycle emails*
+
+- **`[Project:Title]`**: Project title
+  - Example: `Solar-powered water purifier`
+
+- **`[Project:Link]`**: Link to the project page
+  - Example: `https://edu.opencampus.sh/project/123`
+
+- **`[Project:ApplicantName]`**: Name of the user who requested to join the project
+  - Example: `Jane Doe`
+  - Available in: `PROJECT_JOIN_REQUESTED` emails only
+
 ### Session Variables
 *Available in: session reminder emails*
 

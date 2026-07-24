@@ -83,6 +83,11 @@ export const EMAIL_VARIABLES = {
       example: 'https://edu.opencampus.sh/course/123',
       categories: ['enrollment', 'session']
     },
+    '[Enrollment:CertificateLink]': {
+      description: 'Link to the issued certificate (achievement or attendance) or the course page as fallback',
+      example: 'https://edu.opencampus.sh/course/123',
+      categories: ['enrollment']
+    },
     '[Enrollment:Addons]': {
       description: 'HTML list of booked add-ons with prices (empty if no add-ons)',
       example: '<strong>Add-ons:</strong>\n– Networking Dinner: 15,00 € inkl. MwSt.\n– Workshop-Materialien: 10,00 € inkl. MwSt.',
@@ -121,6 +126,25 @@ export const EMAIL_VARIABLES = {
       description: 'Dynamic time text based on timing',
       example: 'tomorrow',
       categories: ['session']
+    }
+  },
+
+  // Project-related variables
+  PROJECT: {
+    '[Project:Title]': {
+      description: 'Project title',
+      example: 'Solar-powered water purifier',
+      categories: ['project']
+    },
+    '[Project:Link]': {
+      description: 'Link to the project page',
+      example: 'https://edu.opencampus.sh/project/123',
+      categories: ['project']
+    },
+    '[Project:ApplicantName]': {
+      description: 'Name of the user who requested to join the project (join-request emails only)',
+      example: 'Jane Doe',
+      categories: ['project']
     }
   },
 
@@ -228,8 +252,11 @@ export function createVariableReplacer(data, formatDate) {
         data.enrollment?.invitationExpirationDate ? 
           formatDate(data.enrollment.invitationExpirationDate) : 'TBD'
       )
-      .replaceAll('[Enrollment:CourseLink]', 
+      .replaceAll('[Enrollment:CourseLink]',
         data.courseLink || `${process.env.FRONTEND_URL || 'https://edu.opencampus.sh'}/course/${data.course?.id || ''}`
+      )
+      .replaceAll('[Enrollment:CertificateLink]',
+        data.certificateLink || data.courseLink || `${process.env.FRONTEND_URL || 'https://edu.opencampus.sh'}/course/${data.course?.id || ''}`
       );
     
     // Build addons HTML list (escape user-controlled strings to prevent XSS)
@@ -257,6 +284,14 @@ export function createVariableReplacer(data, formatDate) {
     const formattedTotalCost = (totalCost / 100).toFixed(2).replace('.', ',');
     result = result.replaceAll('[Enrollment:TotalCost]', formattedTotalCost);
     
+    // Project variables - always attempt replacement (escape user-controlled strings)
+    result = result
+      .replaceAll('[Project:Title]', escapeHtml(data.project?.title || ''))
+      .replaceAll('[Project:Link]',
+        data.projectLink || `${process.env.FRONTEND_URL || 'https://edu.opencampus.sh'}/project/${data.project?.id || ''}`
+      )
+      .replaceAll('[Project:ApplicantName]', escapeHtml(data.applicantName || ''));
+
     // Session variables (for reminders) - always attempt replacement
     result = result
       .replaceAll('[Session:Title]', data.session?.title || '')
@@ -281,7 +316,8 @@ export function createEnrollmentVariableReplacer(enrollmentDetails, formatDate) 
     course: enrollmentDetails.Course,
     enrollment: enrollmentDetails,
     enrollmentAddons: enrollmentDetails.CourseEnrollmentAddons || [],
-    courseLink: `${process.env.FRONTEND_URL || 'https://edu.opencampus.sh'}/course/${enrollmentDetails.Course.id}`
+    courseLink: `${process.env.FRONTEND_URL || 'https://edu.opencampus.sh'}/course/${enrollmentDetails.Course.id}`,
+    certificateLink: enrollmentDetails.certificateLink || null
   }, formatDate);
 }
 
@@ -308,7 +344,23 @@ export function createSessionVariableReplacer(session, enrollment, sessionData =
 }
 
 /**
- * Generate documentation for available variables  
+ * Convenience function for project lifecycle emails
+ * @param {Object} project - Project data ({ id, title })
+ * @param {Object} recipientUser - Recipient user ({ firstName, lastName, email })
+ * @param {Object} [extra] - Optional extra values ({ applicantName })
+ * @returns {Function} Variable replacement function
+ */
+export function createProjectVariableReplacer(project, recipientUser, extra = {}) {
+  return createVariableReplacer({
+    user: recipientUser,
+    project,
+    projectLink: `${process.env.FRONTEND_URL || 'https://edu.opencampus.sh'}/project/${project?.id || ''}`,
+    applicantName: extra.applicantName || ''
+  });
+}
+
+/**
+ * Generate documentation for available variables
  * @param {string} category - Optional category filter
  * @returns {string} Markdown documentation
  */
