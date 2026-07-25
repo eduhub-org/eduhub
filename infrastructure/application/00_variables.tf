@@ -202,14 +202,24 @@ variable "hasura_graphql_dev_mode" {
 variable "hasura_memory_limit" {
   description = "Memory limit for Hasura cloud run service"
   type        = string
-  # 2048M: the cli-migrations-v3 image runs a temporary engine to apply
+  # 2Gi: the cli-migrations-v3 image runs a temporary engine to apply
   # migrations/metadata that overlaps in memory with the real engine at boot,
   # and the schema cache has grown (many tables + event triggers). At 1024M the
   # startup peak exceeded the limit and the container was OOM-killed before
   # binding port 8080, so Cloud Run's startup probe timed out and rollouts got
   # stuck (prod, 2026-07-21). The running instance also OOM'd at rest. ~$6.6/mo
   # extra per always-on instance.
-  default = "2048M"
+  #
+  # Use binary units ("2Gi", like Keycloak in 04_keycloak.tf). The Cloud Run v1
+  # Admin API that google_cloud_run_service talks to rejects "2048M" with
+  # HTTP 400 "For 1.0 CPU, memory must be between 128Mi and 4Gi inclusive"
+  # (staging apply, 2026-07-24), even though gcloud/the v2 API accepts it.
+  #
+  # This default is the production value. Staging overrides it to "1Gi" via its
+  # Terraform Cloud workspace variable: its dataset is a fraction of prod's, so
+  # the boot peak stays well under the limit and it saves ~$6/mo on the
+  # always-on instance. Consequence: staging cannot reproduce a prod boot OOM.
+  default = "2Gi"
 }
 
 # Frontend
