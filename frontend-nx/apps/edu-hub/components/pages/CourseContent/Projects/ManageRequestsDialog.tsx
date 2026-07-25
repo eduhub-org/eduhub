@@ -9,6 +9,7 @@ import {
 } from '../../../../queries/project';
 import { ProjectParticipationStatus_enum } from '../../../../__generated__/globalTypes';
 import { ProjectRow } from './types';
+import { PARTICIPANT_PROJECT_ROLE_CONTEXT } from './participantProjectRole';
 
 interface ManageRequestsDialogProps {
   open: boolean;
@@ -30,7 +31,7 @@ const ManageRequestsDialog: FC<ManageRequestsDialogProps> = ({
 
   const [updateParticipation, { loading: updating }] = useRoleMutation(
     UPDATE_PROJECT_AUTHOR_PARTICIPATION_STATUS,
-    { refetchQueries }
+    { refetchQueries, context: PARTICIPANT_PROJECT_ROLE_CONTEXT }
   );
 
   const requested = (project.ProjectAuthors ?? []).filter(

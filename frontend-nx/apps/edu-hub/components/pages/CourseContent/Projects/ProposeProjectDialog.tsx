@@ -5,6 +5,7 @@ import { DialogShell } from '../../../common/dialogs/DialogShell';
 import { Button } from '../../../common/Button';
 import { INSERT_SELF_PROPOSED_PROJECT } from '../../../../queries/project';
 import { PROJECT_TAGLINE_MAX_LENGTH } from './projectDefaults';
+import { PARTICIPANT_PROJECT_ROLE_CONTEXT } from './participantProjectRole';
 
 interface ProposeProjectDialogProps {
   open: boolean;
@@ -36,6 +37,7 @@ const ProposeProjectDialog: FC<ProposeProjectDialogProps> = ({
 
   const [insertProject, { loading }] = useRoleMutation(INSERT_SELF_PROPOSED_PROJECT, {
     refetchQueries,
+    context: PARTICIPANT_PROJECT_ROLE_CONTEXT,
   });
 
   const reset = useCallback(() => {

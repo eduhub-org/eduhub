@@ -19,6 +19,7 @@ import {
   ProjectParticipationStatus_enum,
   ProjectStatus_enum,
 } from '../../../../__generated__/globalTypes';
+import { PARTICIPANT_PROJECT_ROLE_CONTEXT } from './participantProjectRole';
 
 // User can only hold one ACCEPTED project per course while it is in flight.
 // Completed / incomplete / published projects do not block proposing or
@@ -66,7 +67,7 @@ const Projects: FC<ProjectsProps> = ({
 
   const projectsQuery = useRoleQuery<ProjectsByCourse, ProjectsByCourseVariables>(
     PROJECTS_BY_COURSE,
-    { variables: { courseId } }
+    { variables: { courseId }, context: PARTICIPANT_PROJECT_ROLE_CONTEXT }
   );
 
   const myProjectQuery = useRoleQuery<MyProjectByCourse, MyProjectByCourseVariables>(
@@ -74,6 +75,7 @@ const Projects: FC<ProjectsProps> = ({
     {
       variables: { courseId, userId: userId ?? '' },
       skip: !userId,
+      context: PARTICIPANT_PROJECT_ROLE_CONTEXT,
     }
   );
 

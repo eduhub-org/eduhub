@@ -28,6 +28,7 @@ import {
   ProjectStatus_enum,
 } from '../../../../__generated__/globalTypes';
 import { formattedDateWithTime, makeFullName } from '../../../../helpers/util';
+import { PARTICIPANT_PROJECT_ROLE_CONTEXT } from './participantProjectRole';
 import { translateErrorMessage } from '../../../../helpers/errorHandling';
 import StatusChip from './StatusChip';
 import {
@@ -109,22 +110,26 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
 
   const [submitProject, { loading: submitting }] = useRoleMutation(SUBMIT_PROJECT, {
     refetchQueries,
+    context: PARTICIPANT_PROJECT_ROLE_CONTEXT,
   });
   const [insertConsentEvent, { loading: consentLoading }] = useRoleMutation(
     INSERT_PROJECT_CONSENT_EVENT,
-    { refetchQueries }
+    { refetchQueries, context: PARTICIPANT_PROJECT_ROLE_CONTEXT }
   );
   const [updateAuthorParticipationStatus] = useRoleMutation(
-    UPDATE_PROJECT_AUTHOR_PARTICIPATION_STATUS
+    UPDATE_PROJECT_AUTHOR_PARTICIPATION_STATUS,
+    { context: PARTICIPANT_PROJECT_ROLE_CONTEXT }
   );
   const [markProjectReviewRequested, { loading: requestingProjectReview }] = useRoleMutation(
     MARK_PROJECT_REVIEW_REQUESTED,
     {
       refetchQueries,
+      context: PARTICIPANT_PROJECT_ROLE_CONTEXT,
     }
   );
   const [deleteAuthor, { loading: leaving }] = useRoleMutation(DELETE_PROJECT_AUTHOR, {
     refetchQueries,
+    context: PARTICIPANT_PROJECT_ROLE_CONTEXT,
   });
 
   const myAuthorRow = useMemo(

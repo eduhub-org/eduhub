@@ -17,6 +17,36 @@ Open in Pencil: `design/project-tile-slider.pen`
 
 ---
 
+## Menu redesign (`menu-redesign-preview.html`)
+
+### Preview (open in browser)
+
+```bash
+xdg-open design/menu-redesign-preview.html
+```
+
+Four admin-menu layout options after moving Organizations and Location addresses
+into Settings. Target menu structure:
+
+- **Persönlich**: Mein Profil, Meine Zertifikate
+- **Verwaltung**: Kurse, Veranstaltungen, Degrees, Projekte, Benutzer, Experten, Kalender, Statistiken
+- **Einstellungen**
+- **Hilfe**: Kursleitungshandbuch, FAQ
+- Logout
+
+| Option | Description |
+|--------|-------------|
+| 1 · Grouped | Current light dropdown + section headers/dividers |
+| 2 · Collapsible | Slim dropdown; Verwaltung expands inline |
+| 3 · Hub page | Minimal dropdown + `/manage` hub with cards |
+| 4 · Two-column | Mega-dropdown: personal/help left, Verwaltung right |
+
+High-fidelity Pencil frames: open Pencil in Cursor, create
+`design/menu-redesign.pen`, then ask the agent to continue (MCP requires an
+active editor document).
+
+---
+
 ## Settings redesign (`settings-redesign.pen`)
 
 ## Preview (open in browser)

@@ -57,12 +57,15 @@ import { MdMarkEmailRead } from 'react-icons/md';
 import CommonPageHeader from '../../common/CommonPageHeader';
 import { ProgramsMenubar } from '../../layout/ProgramsMenubar';
 import type { StaticComponentProperty } from '../../../types/UIComponents';
+import { ProgramType } from '../../../types/enums';
 
 interface IProps {
   programs: Programs_Program[];
+  /** Scopes the list (including the "All" tab) to a single Program.type. */
+  programType: ProgramType;
 }
 
-const ManageCoursesContent: FC<IProps> = ({ programs }) => {
+const ManageCoursesContent: FC<IProps> = ({ programs, programType }) => {
   const t = useTranslations('manageCourses');
   const tCommon = useTranslations('common');
   const tCoursePage = useTranslations('coursePage');
@@ -73,12 +76,28 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
   const manageRole = useManageRole();
   const orgCourseWhere = useManageCourseWhere();
 
+  const programTypeWhere = useMemo(
+    () => ({ Program: { type: { _eq: programType } } }),
+    [programType]
+  );
+
+  const headline = useMemo(() => {
+    switch (programType) {
+      case ProgramType.EVENTS:
+        return tCoursePage('eventsHeadline');
+      case ProgramType.DEGREES:
+        return tCoursePage('degreesHeadline');
+      default:
+        return tCoursePage('coursesHeadline');
+    }
+  }, [programType, tCoursePage]);
+
   // Calculate default program
   const sortedPrograms = useMemo(() => {
     return [...programs].sort((a, b) => {
       // Assign specific indices for 'EVENTS' and 'DEGREES'
-      const indexA = a.shortTitle === 'EVENTS' ? -2 : a.shortTitle === 'DEGREES' ? -1 : programs.indexOf(a);
-      const indexB = b.shortTitle === 'EVENTS' ? -2 : b.shortTitle === 'DEGREES' ? -1 : programs.indexOf(b);
+      const indexA = a.type === 'EVENTS' ? -2 : a.type === 'DEGREES' ? -1 : programs.indexOf(a);
+      const indexB = b.type === 'EVENTS' ? -2 : b.type === 'DEGREES' ? -1 : programs.indexOf(b);
       // Sort based on these indices
       return indexA - indexB;
     });
@@ -89,7 +108,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
       return undefined;
     }
     const preferredRegularProgram = sortedPrograms.find(
-      (program) => program.shortTitle !== 'EVENTS' && program.shortTitle !== 'DEGREES'
+      (program) => program.type !== 'EVENTS' && program.type !== 'DEGREES'
     );
     return (preferredRegularProgram ?? sortedPrograms[0]).id;
   }, [sortedPrograms]);
@@ -97,7 +116,10 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
   // Filter state management (single source of truth)
   const [filter, setFilter] = useState<AdminCourseListVariables>({
     limit: 100,
-    where: { programId: { _eq: defaultProgramId } },
+    where: {
+      ...programTypeWhere,
+      programId: { _eq: defaultProgramId },
+    },
     order_by: [{ id: order_by.desc }],
   });
 
@@ -110,14 +132,14 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
     const programs: Programs_Program[] = [];
 
     // First, add EVENTS and DEGREES if they exist (maintain their priority)
-    const eventsProgram = sortedPrograms.find((p) => p.shortTitle === 'EVENTS');
-    const degreesProgram = sortedPrograms.find((p) => p.shortTitle === 'DEGREES');
+    const eventsProgram = sortedPrograms.find((p) => p.type === 'EVENTS');
+    const degreesProgram = sortedPrograms.find((p) => p.type === 'DEGREES');
 
     if (eventsProgram) programs.push(eventsProgram);
     if (degreesProgram) programs.push(degreesProgram);
 
     // Then, get other programs (excluding EVENTS and DEGREES)
-    const otherPrograms = sortedPrograms.filter((p) => p.shortTitle !== 'EVENTS' && p.shortTitle !== 'DEGREES');
+    const otherPrograms = sortedPrograms.filter((p) => p.type !== 'EVENTS' && p.type !== 'DEGREES');
 
     // Take the most recent other programs (they should already be sorted by recency)
     const recentOtherPrograms = otherPrograms.slice(0, maxOtherPrograms);
@@ -207,16 +229,20 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
   // Handle program tab clicks (moved after useTableGrid to access setPageIndex)
   const handleTabClick = useCallback(
     (property: StaticComponentProperty) => {
-      // Update the base filter with the new program selection
+      // Update the base filter with the new program selection. Keep program-type scope so the
+      // "All" tab never leaks courses of other types.
       updateFilter({
         ...filter,
-        where: property.key === allTabId ? {} : { programId: { _eq: property.key } },
+        where:
+          property.key === allTabId
+            ? { ...programTypeWhere }
+            : { ...programTypeWhere, programId: { _eq: property.key } },
       });
       // Reset pagination state when switching programs
       setPageIndex(0);
       // Keep search term when switching programs
     },
-    [filter, updateFilter, allTabId, setPageIndex]
+    [filter, updateFilter, allTabId, setPageIndex, programTypeWhere]
   );
 
   // Dialog state for program selection
@@ -757,15 +783,18 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
 
   return (
     <>
-      <CommonPageHeader headline={tCoursePage('coursesHeadline')} />
-      <div className="flex justify-start mb-5 text-white">
-        <ProgramsMenubar
-          programs={menubarPrograms}
-          defaultProgramId={defaultProgramId ?? 0}
-          currentSelectedId={currentProgramId}
-          onTabClicked={handleTabClick}
-        />
-      </div>
+      <CommonPageHeader headline={headline} />
+      {/* Only show the program tab select when there is more than one program to switch between. */}
+      {programs.length > 1 && (
+        <div className="flex justify-start mb-5 text-white">
+          <ProgramsMenubar
+            programs={menubarPrograms}
+            defaultProgramId={defaultProgramId ?? 0}
+            currentSelectedId={currentProgramId}
+            onTabClicked={handleTabClick}
+          />
+        </div>
+      )}
 
       {loading ? (
         <div className="pb-12 pt-16">

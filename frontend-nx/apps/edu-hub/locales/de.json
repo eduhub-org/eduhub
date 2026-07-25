@@ -44,15 +44,17 @@
       "admin_users": "Admin-Benutzer",
       "experts": "Experten",
       "courses": "Kurse",
-      "projects": "Projekte",
+      "events": "Veranstaltungen",
+      "degrees": "Degrees",
       "programs": "Programme",
-      "organizations": "Organisationen",
-      "location_addresses": "Veranstaltungsadressen",
       "settings": "Einstellungen",
       "calendar": "Kalender",
       "statistics": "Statistiken",
       "course_instructor_manual": "Kursleitungshandbuch",
-      "logout": "Logout"
+      "logout": "Logout",
+      "section_personal": "Persönlich",
+      "section_management": "Verwaltung",
+      "section_help": "Hilfe"
     },
     "change-password": "Passwort oder E-Mail ändern",
     "add": "Hinzufügen",
@@ -255,6 +257,7 @@
       "delete_restricted_by_relationship": "{parent} können nicht gelöscht werden, wenn sie mit {child} verknüpft sind. Bitte lösche diese zuerst.",
       "delete_restricted_by_relationships": "{table} können nicht gelöscht werden, wenn sie mit anderen Einträgen verknüpft sind. Bitte lösche zuerst die anderen Einträge.",
       "generic_error": "Ein Fehler ist aufgetreten. Bitte versuche es erneut.",
+      "last_settings_admin": "Diese Organisation muss mindestens einen Nutzer mit Rechten zur Nutzer- und Einstellungsverwaltung behalten. Übertrage diese Rechte zuerst einem anderen Admin.",
       "certificate_deletion_failed": "Fehler beim Löschen der Leistungsnachweise. Bitte versuche es erneut.",
       "entities": {
         "course": "Kurse",
@@ -700,6 +703,8 @@
     "toCourseDescription": "zur Kursbeschreibung",
     "coursesPageTitle": "Courses: opencampus.sh Edu Hub",
     "coursesHeadline": "Kurse",
+    "eventsHeadline": "Veranstaltungen",
+    "degreesHeadline": "Degrees",
     "courseSearchPlaceholder": "Search in title",
     "addCourseText": "Add Course",
     "addCourseFormTitle": "Kurs hinzufügen",
@@ -1022,6 +1027,12 @@
       "status": "Status",
       "email_templates": "Vorlagen",
       "has_custom_templates": "Dieser Kurs hat kursspezifische E-Mail-Vorlagen"
+    },
+    "error_loading_programs": "Die Programme konnten nicht geladen werden. Bitte versuche es später erneut.",
+    "empty_state": {
+      "events": "Es gibt noch kein Veranstaltungsprogramm. Bitte einen Plattform-Admin, ein Veranstaltungsprogramm für deine Organisation anzulegen, bevor du hier Veranstaltungen verwalten kannst.",
+      "courses": "Es gibt noch kein Kursprogramm. Bitte einen Plattform-Admin, ein Kursprogramm für deine Organisation anzulegen, bevor du hier Kurse verwalten kannst.",
+      "degrees": "Es gibt noch kein Studiengangsprogramm. Bitte einen Plattform-Admin, ein Studiengangsprogramm für deine Organisation anzulegen, bevor du hier Studiengänge verwalten kannst."
     },
     "view": "Anzeigen",
     "view_course": "Kurs anzeigen",
@@ -1915,6 +1926,7 @@
   },
   "manageAdminUsers": {
     "headline": "Admin-Benutzer",
+    "sole_settings_admin_hint": "Dies ist der einzige Nutzer mit Einstellungsrechten für diese Organisation. Übertrage die Einstellungsrechte zuerst einem anderen Admin, bevor du sie hier entfernst.",
     "first_name": "Vorname",
     "last_name": "Nachname",
     "email": "E-Mail",
@@ -2068,13 +2080,13 @@
     "programTypes": {
       "COURSES": "Kurse",
       "EVENTS": "Veranstaltungen",
-      "DEGREES": "Studiengänge"
+      "DEGREES": "Degrees"
     },
     "onboarding": {
       "label": "Onboarding-Texte",
       "courses_label": "Kurse",
       "events_label": "Veranstaltungen",
-      "degrees_label": "Studiengänge",
+      "degrees_label": "Degrees",
       "text_de": "Text (Deutsch)",
       "text_en": "Text (Englisch)",
       "preview": "Vorschau",
@@ -2579,6 +2591,10 @@
           "label": "Projekttypen",
           "description": "Standard-Leistungszertifikate und Dokumentationsanleitungen pro Projekttyp"
         },
+        "projects": {
+          "label": "Projekte",
+          "description": "Projekte veröffentlichen, verbergen und verschlagworten"
+        },
         "documentation-instructions": {
           "label": "Dokumentationsanleitungen",
           "description": "PDF-Anleitungen verwalten, die Projekten zugeordnet werden"
@@ -2606,6 +2622,14 @@
         "jobboerse": {
           "label": "Jobbörse (StuJo)",
           "description": "Stellenangebote moderieren, Portale, Preise und Kontingente verwalten"
+        },
+        "location-addresses": {
+          "label": "Veranstaltungsadressen",
+          "description": "Adressen für Offline-Sessions und Veranstaltungsorte verwalten"
+        },
+        "organizations": {
+          "label": "Organisationen",
+          "description": "Organisationen anlegen, bearbeiten und zusammenführen"
         }
       }
     },
