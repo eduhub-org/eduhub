@@ -211,6 +211,7 @@ class EduHubClient:
                 Course {
                     Program {
                         title
+                        type
                         achievementCertificateTemplateURL
                         attendanceCertificateTemplateURL
                         AttendanceCertificateTemplate { html }
@@ -227,6 +228,8 @@ class EduHubClient:
                     ects
                     title
                     learningGoals
+                    requiredEcts
+                    requiredEventCount
                 }
             }
         }"""
@@ -254,6 +257,115 @@ class EduHubClient:
             # Handle any errors that occur during the request
             logging.error(f"An error occurred during fetch_enrollments: {e}")
             raise
+
+    def fetch_degree_participations(self, user_ids, degree_course_id):
+        """Fetches the degree-relevant member-course enrollments of all given users.
+
+        A "degree" is a Course in a Program of type DEGREES; its member courses are
+        linked through CourseDegree.degreeCourseId. A member enrollment qualifies
+        when it either carries an achievementCertificateURL (a passed course) or
+        belongs to an EVENTS program (enrollment alone counts, no certificate
+        required). That is exactly the rule public.DegreeParticipationStats applies,
+        so the certificate can never contradict the numbers shown in the admin UI.
+
+        One query covers every user: degree certificates are generated as a bulk
+        action, and the pre-refactor implementation ran one query per user.
+
+        Args:
+            user_ids (list): User UUIDs.
+            degree_course_id (int): Id of the degree course.
+
+        Returns:
+            dict: {userId: [{"courseId", "title", "ects", "programTitle",
+                             "programType", "hasAchievementCertificate"}, ...]}
+                  Users without a qualifying enrollment are absent from the dict.
+        """
+        # Program.type is a plain text column (ProgramType is not a Hasura enum),
+        # hence the quoted "EVENTS".
+        query = """query GetDegreeParticipations($userIds: [uuid!]!, $degreeCourseId: Int!) {
+            CourseEnrollment(
+                where: {
+                    userId: {_in: $userIds},
+                    Course: {CourseDegrees: {degreeCourseId: {_eq: $degreeCourseId}}},
+                    _or: [
+                        {achievementCertificateURL: {_is_null: false}},
+                        {Course: {Program: {type: {_eq: "EVENTS"}}}}
+                    ]
+                },
+                order_by: [
+                    {Course: {Program: {lectureStart: asc}}},
+                    {Course: {title: asc}}
+                ]
+            ) {
+                userId
+                achievementCertificateURL
+                Course {
+                    id
+                    title
+                    ects
+                    Program {
+                        title
+                        type
+                    }
+                }
+            }
+        }"""
+
+        data = self._post_graphql(
+            query,
+            {"userIds": user_ids, "degreeCourseId": degree_course_id},
+            "fetch_degree_participations",
+        )
+        rows = data.get("CourseEnrollment")
+        if rows is None:
+            raise ValueError(
+                "fetch_degree_participations: missing CourseEnrollment in response"
+            )
+
+        participations = {}
+        for row in rows:
+            course = row.get("Course")
+            if course is None:
+                raise ValueError(
+                    "fetch_degree_participations: missing Course on enrollment"
+                )
+            program = course.get("Program") or {}
+            participations.setdefault(row["userId"], []).append(
+                {
+                    "courseId": course.get("id"),
+                    "title": course.get("title"),
+                    "ects": course.get("ects"),
+                    "programTitle": program.get("title"),
+                    "programType": program.get("type"),
+                    "hasAchievementCertificate": row.get("achievementCertificateURL")
+                    is not None,
+                }
+            )
+        return participations
+
+    def _post_graphql(self, query, variables, operation_name):
+        """POSTs a GraphQL document with the admin secret and fails loudly.
+
+        Unlike `send_query`, this raises on a non-200 response and on a populated
+        `errors` key instead of returning a string / a half-empty payload. Use it
+        wherever silently returning no data would produce a wrong result rather
+        than a visible failure.
+
+        Returns:
+            dict: The `data` object of the response.
+        """
+        response = requests.post(
+            self.url,
+            headers={
+                "x-hasura-admin-secret": self.hasura_admin_secret,
+                "content-type": "application/json",
+            },
+            json={"query": query, "variables": variables},
+        )
+        response.raise_for_status()
+        data = response.json()
+        self._raise_on_graphql_errors(data, operation_name)
+        return data["data"]
 
     def _raise_on_graphql_errors(self, data, operation_name):
         if not isinstance(data, dict):
@@ -287,6 +399,16 @@ class EduHubClient:
             program = course.get("Program")
             if program is None:
                 raise ValueError("fetch_enrollments: missing Program on Course")
+            # `type` decides whether this is a degree certificate, and NULL is a
+            # legitimate value for the two thresholds ("requirement not checked").
+            # An *absent* key therefore has to fail loudly instead of silently
+            # turning a degree into a project achievement / skipping the gate.
+            if "type" not in program:
+                raise ValueError("fetch_enrollments: missing type on Program")
+            if "requiredEcts" not in course or "requiredEventCount" not in course:
+                raise ValueError(
+                    "fetch_enrollments: missing degree requirement columns on Course"
+                )
             if "AttendanceCertificateTemplate" not in program:
                 raise ValueError(
                     "fetch_enrollments: missing AttendanceCertificateTemplate on Program"
