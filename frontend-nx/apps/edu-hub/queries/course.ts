@@ -652,6 +652,27 @@ export const UPDATE_COURSE_ECTS = gql`
   }
 `;
 
+// Degree completion thresholds. Only meaningful for a course in a DEGREES program;
+// null means the requirement is not checked when a degree certificate is generated,
+// so both variables must stay nullable for clearing the field to work.
+export const UPDATE_COURSE_REQUIRED_ECTS = gql`
+  mutation UpdateCourseRequiredEcts($itemId: Int!, $text: numeric) {
+    update_Course_by_pk(pk_columns: { id: $itemId }, _set: { requiredEcts: $text }) {
+      id
+      requiredEcts
+    }
+  }
+`;
+
+export const UPDATE_COURSE_REQUIRED_EVENT_COUNT = gql`
+  mutation UpdateCourseRequiredEventCount($itemId: Int!, $text: Int) {
+    update_Course_by_pk(pk_columns: { id: $itemId }, _set: { requiredEventCount: $text }) {
+      id
+      requiredEventCount
+    }
+  }
+`;
+
 export const UPDATE_COURSE_PROJECT_PROPOSALS_ENABLED = gql`
   mutation UpdateCourseProjectProposalsEnabled($itemId: Int!, $value: Boolean) {
     update_Course_by_pk(

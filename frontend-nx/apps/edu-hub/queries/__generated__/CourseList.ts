@@ -306,6 +306,10 @@ export interface CourseList_Course {
    */
   ects: string;
   /**
+   * Minimum number of ECTS a participant must have collected from this degree's member courses (CourseDegree.degreeCourseId = this course) before a degree certificate can be generated. Only member enrollments carrying an achievementCertificateURL count, matching the DegreeParticipationStats view. Only meaningful for a course whose Program.type = 'DEGREES'. NULL = requirement not checked.
+   */
+  requiredEcts: any | null;
+  /**
    * Shown below the title on the course page
    */
   tagline: string;

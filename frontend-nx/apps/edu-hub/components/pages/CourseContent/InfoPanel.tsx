@@ -27,6 +27,15 @@ export const InfoPanel: FC<IProps> = ({ course }) => {
   // Normalize ECTS key (replace dots with underscores) for translation lookup
   const normalizedEctsKey = course.ects?.replaceAll('.', '_') || course.ects;
 
+  // A degree does not award ECTS of its own - it states how many have to be collected
+  // from its member courses (Course.requiredEcts). That is a real number rather than one
+  // of the few fixed Course.ects strings, so it is formatted instead of looked up.
+  const isDegreeCourse = course.Program?.type === 'DEGREES';
+  const requiredEctsDisplay =
+    course.requiredEcts != null
+      ? Number(course.requiredEcts).toLocaleString(locale, { maximumFractionDigits: 1 })
+      : null;
+
   // Format price helper
   const formatPrice = useCallback((priceInCents: number, currency: string): string => {
     const price = priceInCents / 100;
@@ -99,7 +108,9 @@ export const InfoPanel: FC<IProps> = ({ course }) => {
   const hasWeekday = course.weekDay !== 'NONE';
   const hasSessionDate = course.weekDay === 'NONE' && sessionDisplay;
   // Only show ECTS if achievement certificate is possible
-  const hasEcts = !!course.ects && course.achievementCertificatePossible === true;
+  const hasEcts = isDegreeCourse
+    ? !!requiredEctsDisplay
+    : !!course.ects && course.achievementCertificatePossible === true;
   const hasLocation = !!locationText;
   const hasLanguage = !!course.language;
 
@@ -134,7 +145,9 @@ export const InfoPanel: FC<IProps> = ({ course }) => {
       elements.push(
         <div key="ects" className="flex flex-col items-center">
           <span className="text-lg mt-2 text-center">{tCourse('general.ects')}</span>
-          <span className="text-sm mt-2 text-center">{ectsTranslations[normalizedEctsKey] || course.ects}</span>
+          <span className="text-sm mt-2 text-center">
+            {isDegreeCourse ? requiredEctsDisplay : ectsTranslations[normalizedEctsKey] || course.ects}
+          </span>
         </div>
       );
     }
@@ -213,6 +226,8 @@ export const InfoPanel: FC<IProps> = ({ course }) => {
     hasAddons,
     ectsTranslations,
     normalizedEctsKey,
+    isDegreeCourse,
+    requiredEctsDisplay,
   ]);
 
   return (

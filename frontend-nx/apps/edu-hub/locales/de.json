@@ -219,6 +219,7 @@
       "invalid_maximum_integer": "Der Wert muss höchstens {max} sein",
       "invalid_minimum_maximum_integer": "Der Wert muss mindestens {min} und höchstens {max} sein",
       "invalid_integer_format": "Der Wert muss eine ganze Zahl sein",
+      "invalid_decimal_format": "Der Wert muss eine Zahl sein (Dezimalstellen erlaubt, z. B. 12,5)",
       "invalid_input": "Ungültige Eingabe",
       "transform_rejected": "Dieser Wert konnte nicht im erwarteten Format gespeichert werden.",
       "save_failed": "Speichern fehlgeschlagen."
@@ -1141,6 +1142,20 @@
       "label": "Maximal verpasste Sitzungen",
       "help_text": "Maximale Anzahl von Sitzungen, die ein Teilnehmer verpassen kann"
     },
+    "degree_requirements": {
+      "label": "Anforderungen für den Abschluss",
+      "help_text": "Mindestanforderungen, die Teilnehmende erfüllen müssen, damit ein Degree-Zertifikat erstellt werden kann. Lasse ein Feld leer, wenn diese Anforderung nicht geprüft werden soll.",
+      "required_ects": {
+        "label": "Erforderliche ECTS",
+        "placeholder": "z. B. 12,5",
+        "help_text": "Mindestanzahl an ECTS, die Teilnehmende aus bestandenen Kursen dieses Abschlusses gesammelt haben müssen. Dezimalstellen sind erlaubt (z. B. 12,5). Lasse das Feld leer, wenn diese Anforderung nicht geprüft werden soll."
+      },
+      "required_event_count": {
+        "label": "Erforderliche Events",
+        "placeholder": "z. B. 1",
+        "help_text": "Mindestanzahl an Events dieses Abschlusses, an denen Teilnehmende teilgenommen haben müssen. Lasse das Feld leer, wenn diese Anforderung nicht geprüft werden soll."
+      }
+    },
     "learning_goals": {
       "label": "Lernziele",
       "help_text": "Definiere, was die Teilnehmer nach Abschluss dieses Kurses erreichen werden. Schreibe jedes Lernziel in eine neue Zeile ohne Nummerierung. Verwende Handlungsverben wie 'verstehen', 'anwenden', 'analysieren', 'erstellen' (siehe: https://www.bloomstaxonomy.org).",
@@ -1715,7 +1730,27 @@
     "set_status_high": "Status hochsetzen",
     "please_fill_all_fields": "Bitte fülle alle Felder aus, um fortzufahren!",
     "errors": {
-      "failed_to_load_location_addresses": "Veranstaltungsadressen konnten nicht geladen werden."
+      "failed_to_load_location_addresses": "Veranstaltungsadressen konnten nicht geladen werden.",
+      "certificates": {
+        "DEGREE_REQUIREMENTS_NOT_MET": "Die Anforderungen für den Abschluss sind noch nicht erfüllt, daher wurde kein Zeugnis erstellt.",
+        "NO_USERS_SELECTED": "Es wurden keine Teilnehmenden ausgewählt.",
+        "NO_ENROLLMENTS_FOUND": "Für die ausgewählten Teilnehmenden wurden keine passenden Anmeldungen gefunden.",
+        "ACHIEVEMENT_RECORD_NOT_FOUND": "Für mindestens eine Person wurde kein abgeschlossenes Projekt gefunden.",
+        "CERTIFICATE_TEMPLATE_TEXT_NOT_FOUND": "Für diesen Kurs bzw. dieses Programm ist kein Zeugnistext hinterlegt.",
+        "CERTIFICATE_TEMPLATE_NOT_FOUND": "Die Zeugnisvorlage konnte nicht gefunden werden.",
+        "MISSING_COURSE_DATA": "Für das Zeugnis benötigte Kursdaten fehlen (zum Beispiel die Lernziele).",
+        "MISSING_ENROLLMENT_DATA": "Für das Zeugnis benötigte Anmeldedaten fehlen.",
+        "MISSING_REQUIRED_DATA": "Für das Zeugnis benötigte Daten fehlen.",
+        "ACHIEVEMENT_TEMPLATE_URL_NOT_FOUND": "Für dieses Programm ist keine Vorlage für Leistungsnachweise hinterlegt.",
+        "ATTENDANCE_TEMPLATE_URL_NOT_FOUND": "Für dieses Programm ist keine Vorlage für Teilnahmebescheinigungen hinterlegt.",
+        "TEMPLATE_FETCH_ERROR": "Die Zeugnisvorlage konnte nicht geladen werden.",
+        "TEMPLATE_TEXT_FETCH_ERROR": "Der Zeugnistext konnte nicht geladen werden.",
+        "TEXT_CONTENT_PREPARATION_ERROR": "Der Zeugnisinhalt konnte nicht aufbereitet werden.",
+        "PDF_CREATION_FAILED": "Das Zeugnis-PDF konnte nicht erstellt werden.",
+        "INVALID_CERTIFICATE_TYPE": "Ungültiger Zeugnistyp.",
+        "CERTIFICATE_GENERATION_ERROR": "Die Zeugnisse konnten nicht erstellt werden.",
+        "UNEXPECTED_ERROR": "Beim Erstellen der Zeugnisse ist ein unerwarteter Fehler aufgetreten."
+      }
     },
     "no-certificate-generated": "Es wurden keine Zertifikate generiert.",
     "certificates-generated": "Es wurden {number} Zertifikate generiert.",

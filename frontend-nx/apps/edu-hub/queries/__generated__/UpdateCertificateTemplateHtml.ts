@@ -11,7 +11,7 @@ export interface UpdateCertificateTemplateHtml_update_CertificateTemplate_by_pk 
   __typename: "CertificateTemplate";
   id: number;
   /**
-   * Jinja2 HTML body. Rendering variables depend on the certificate variant: full_name, semester, course_name, ECTS, learningGoalsList, praxisprojekt, online_courses (project-based achievement), successful_participations (degree), event_entries (attendance), template (background image).
+   * Jinja2 HTML body. Rendering variables depend on the certificate variant: full_name, semester, course_name, ECTS, learningGoalsList, praxisprojekt, online_courses (project-based achievement), successful_participations / passed_participations / event_participations / required_ects / required_ects_display / required_event_count / achieved_ects / achieved_ects_display / attended_event_count (degree), event_entries (attendance), template (background image).
    */
   html: string;
   updated_at: any;
