@@ -73,12 +73,14 @@ type InputFieldProps = {
 
   /**
    * HTML element type to use for input.
-   * Both variants fully support: 'input', 'textarea', 'link', 'email', 'ects', 'number'.
+   * Both variants fully support: 'input', 'textarea', 'link', 'email', 'ects', 'number', 'decimal'.
    * 'markdown' is only supported for 'eduhub' variant.
-   * 'link', 'email', 'ects', and 'number' are specialized input types with custom validation.
+   * 'link', 'email', 'ects', 'number' and 'decimal' are specialized input types with custom validation.
+   * 'number' accepts integers only; 'decimal' also accepts fractional values (comma or dot) and
+   * sends a JS number, so it fits nullable `numeric` columns.
    * @default 'textarea'
    */
-  type?: 'input' | 'textarea' | 'markdown' | 'link' | 'email' | 'ects' | 'number';
+  type?: 'input' | 'textarea' | 'markdown' | 'link' | 'email' | 'ects' | 'number' | 'decimal';
 
   /**
    * The label text for the input field.
@@ -392,6 +394,16 @@ const InputField: React.FC<InputFieldProps> = ({
             (max === undefined || num <= max)
           );
         }
+        case 'decimal': {
+          const normalized = text.replace(',', '.');
+          if (!/^-?\d+(\.\d+)?$/.test(normalized)) return false;
+          const num = Number.parseFloat(normalized);
+          return (
+            !Number.isNaN(num) &&
+            (min === undefined || num >= min) &&
+            (max === undefined || num <= max)
+          );
+        }
         default:
           return true;
       }
@@ -423,6 +435,22 @@ const InputField: React.FC<InputFieldProps> = ({
           }
           return t('input_field.invalid_integer_format');
         }
+        case 'decimal': {
+          const normalized = (numberText ?? '').replace(',', '.');
+          if (!/^-?\d+(\.\d+)?$/.test(normalized)) {
+            return t('input_field.invalid_decimal_format');
+          }
+          if (min !== undefined && max !== undefined) {
+            return t(`input_field.invalid_minimum_maximum_integer`, { min, max });
+          }
+          if (min !== undefined) {
+            return t(`input_field.invalid_minimum_integer`, { min });
+          }
+          if (max !== undefined) {
+            return t(`input_field.invalid_maximum_integer`, { max });
+          }
+          return t('input_field.invalid_decimal_format');
+        }
         default:
           return t('input_field.invalid_input');
       }
@@ -434,8 +462,14 @@ const InputField: React.FC<InputFieldProps> = ({
     if (validateInput(newText)) {
       if (updateValueMutation) {
         let textValue: string | number | null;
-        if (type === 'number') {
-          const parsed = newText === '' ? null : Number.parseInt(newText, 10);
+        if (type === 'number' || type === 'decimal') {
+          const raw = type === 'decimal' ? newText.replace(',', '.') : newText;
+          const parsed =
+            raw === ''
+              ? null
+              : type === 'decimal'
+              ? Number.parseFloat(raw)
+              : Number.parseInt(raw, 10);
           const numericValue = parsed !== null && !Number.isNaN(parsed) ? parsed : null;
           if (transformMutationText) {
             const transformed = transformMutationText(numericValue === null ? '' : String(numericValue));
@@ -485,8 +519,16 @@ const InputField: React.FC<InputFieldProps> = ({
   const handleTextChange = useCallback(
     (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       const newText = event.target.value;
-      if (type === 'number') {
-        const numberPattern = min !== undefined && min >= 0 ? /^\d*$/ : /^-?\d*$/;
+      if (type === 'number' || type === 'decimal') {
+        const nonNegative = min !== undefined && min >= 0;
+        const numberPattern =
+          type === 'decimal'
+            ? nonNegative
+              ? /^\d*([.,]\d*)?$/
+              : /^-?\d*([.,]\d*)?$/
+            : nonNegative
+            ? /^\d*$/
+            : /^-?\d*$/;
         if (!numberPattern.test(newText)) {
           return;
         }
@@ -687,7 +729,7 @@ const InputField: React.FC<InputFieldProps> = ({
                   pattern={type === 'number' ? '[0-9]*' : undefined}
                 />
               )}
-              {showCharacterCount && type !== 'ects' && type !== 'number' && (
+              {showCharacterCount && type !== 'ects' && type !== 'number' && type !== 'decimal' && (
                 <div className="absolute top-0 right-0 mr-2 mt-1 text-xs text-label-secondary">
                   {`${localText.length}/${maxLength}`}
                 </div>

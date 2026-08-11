@@ -36,6 +36,8 @@ export const COURSE_FRAGMENT = gql`
   fragment CourseFragment on Course {
     id
     ects
+    # A degree publishes the ECTS it requires, not ECTS it awards (see InfoPanel).
+    requiredEcts
     tagline
     weekDay
     published
@@ -131,6 +133,7 @@ export const ADMIN_COURSE_FRAGMENT = gql`
     attendanceCertificatePossible
     projectProposalsEnabled
     projectSubmissionDeadline
+    requiredEventCount
     chatLink
     matrixRoomId
     registrationType

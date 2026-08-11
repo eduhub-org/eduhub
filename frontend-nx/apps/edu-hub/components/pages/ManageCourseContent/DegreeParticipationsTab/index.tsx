@@ -21,6 +21,7 @@ import NotificationSnackbar from '../../../common/dialogs/NotificationSnackbar';
 import { ErrorMessageDialog } from '../../../common/dialogs/ErrorMessageDialog';
 import { CourseEnrollmentStatus_enum } from '../../../../__generated__/globalTypes';
 import Card from '../../../common/Card';
+import { certificateActionErrorMessage } from '../../../../helpers/certificateMessages';
 
 interface DegreeParticipationsTabIProps {
   course: ManagedCourse_Course_by_pk;
@@ -311,13 +312,15 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
             },
           });
 
-          const result = response.data.createCertificates;
+          const result = response.data?.createCertificates;
 
-          if (!result.success) {
-            throw new Error(result.error || t(`errors:${result.messageKey}`));
+          if (!result?.success) {
+            throw new Error(
+              certificateActionErrorMessage(result, t, tCommon('error_handling.certificate_generation_failed'))
+            );
           }
 
-          const certCount = result.count;
+          const certCount = result.count ?? 0;
           let successTranslationKey: string;
           if (certCount <= 1) {
             successTranslationKey = certCount === 0

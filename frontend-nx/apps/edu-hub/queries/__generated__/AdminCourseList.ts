@@ -369,6 +369,10 @@ export interface AdminCourseList_Course {
    */
   ects: string;
   /**
+   * Minimum number of ECTS a participant must have collected from this degree's member courses (CourseDegree.degreeCourseId = this course) before a degree certificate can be generated. Only member enrollments carrying an achievementCertificateURL count, matching the DegreeParticipationStats view. Only meaningful for a course whose Program.type = 'DEGREES'. NULL = requirement not checked.
+   */
+  requiredEcts: any | null;
+  /**
    * Shown below the title on the course page
    */
   tagline: string;
@@ -513,6 +517,10 @@ export interface AdminCourseList_Course {
    * Shows whether the current status is DRAFT, READY_FOR_PUBLICATION, READY_FOR_APPLICATION, APPLICANTS_INVITED, or PARTICIPANTS_RATED, which is set in correspondance to the tabs completed on the course administration page
    */
   status: CourseStatus_enum;
+  /**
+   * Minimum number of this degree's member courses in an EVENTS program the participant must be enrolled in before a degree certificate can be generated. Enrollment alone counts, no certificate required, matching the DegreeParticipationStats view. Only meaningful for a course whose Program.type = 'DEGREES'. NULL = requirement not checked.
+   */
+  requiredEventCount: number | null;
   matrixRoomId: string | null;
   /**
    * Stripe Product ID for the base course price

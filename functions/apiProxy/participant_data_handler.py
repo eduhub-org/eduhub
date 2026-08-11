@@ -12,6 +12,7 @@ import jwt
 from jwt import InvalidTokenError, PyJWKClient
 try:
     from api_clients.eduhub_client import EduHubClient
+    from api_clients.numeric_utils import safe_float_convert
     from security_handler import security_handler, get_security_level_for_organization, validate_and_sanitize_input, SecurityLevel
     from course_id_utils import generate_course_hash_id
 except ImportError:
@@ -21,6 +22,7 @@ except ImportError:
     current_dir = os.path.dirname(os.path.abspath(__file__))
     sys.path.insert(0, current_dir)
     from api_clients.eduhub_client import EduHubClient
+    from api_clients.numeric_utils import safe_float_convert
     from security_handler import security_handler, get_security_level_for_organization, validate_and_sanitize_input, SecurityLevel
     from course_id_utils import generate_course_hash_id
 
@@ -135,43 +137,6 @@ def resolve_course_id_from_url(course_id_param, org_courses):
                     "location_option": location_option,
                     "hash_id": course_id_param  # Preserve the original hash ID from request
                 }
-        return None
-
-
-def safe_float_convert(value):
-    """
-    Safely convert a value to float, handling both comma and period decimal separators.
-    This is needed for ECTS values that may use German decimal format (comma instead of period).
-    
-    Args:
-        value: The value to convert (string or numeric)
-        
-    Returns:
-        float or None: The converted float value, or None if value is invalid/empty/NONE
-        
-    Raises:
-        ValueError: If the value cannot be converted to float (only for unexpected errors)
-    """
-    # Handle None values
-    if value is None:
-        return None
-    
-    # Handle empty strings
-    if isinstance(value, str) and value.strip() == "":
-        return None
-    
-    # Handle "NONE" string (case-insensitive)
-    if isinstance(value, str) and value.strip().upper() == "NONE":
-        return None
-    
-    # Convert valid numeric strings and numbers
-    try:
-        if isinstance(value, str):
-            return float(value.replace(",", "."))
-        else:
-            return float(value)
-    except (ValueError, TypeError):
-        # Return None for any conversion failures instead of raising
         return None
 
 
