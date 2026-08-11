@@ -865,6 +865,8 @@ export enum Course_select_column {
   projectSubmissionDeadline = "projectSubmissionDeadline",
   published = "published",
   registrationType = "registrationType",
+  requiredEcts = "requiredEcts",
+  requiredEventCount = "requiredEventCount",
   startTime = "startTime",
   status = "status",
   stripePriceId = "stripePriceId",
@@ -930,6 +932,8 @@ export enum Course_update_column {
   projectSubmissionDeadline = "projectSubmissionDeadline",
   published = "published",
   registrationType = "registrationType",
+  requiredEcts = "requiredEcts",
+  requiredEventCount = "requiredEventCount",
   startTime = "startTime",
   status = "status",
   stripePriceId = "stripePriceId",
@@ -6081,6 +6085,8 @@ export interface Course_avg_order_by {
   maxMissedSessions?: order_by | null;
   maxParticipants?: order_by | null;
   programId?: order_by | null;
+  requiredEcts?: order_by | null;
+  requiredEventCount?: order_by | null;
 }
 
 /**
@@ -6152,6 +6158,8 @@ export interface Course_bool_exp {
   projectSubmissionDeadline?: timestamptz_comparison_exp | null;
   published?: Boolean_comparison_exp | null;
   registrationType?: CourseRegistrationType_enum_comparison_exp | null;
+  requiredEcts?: numeric_comparison_exp | null;
+  requiredEventCount?: Int_comparison_exp | null;
   startTime?: time_comparison_exp | null;
   status?: CourseStatus_enum_comparison_exp | null;
   stripePriceId?: String_comparison_exp | null;
@@ -6216,6 +6224,8 @@ export interface Course_insert_input {
   projectSubmissionDeadline?: any | null;
   published?: boolean | null;
   registrationType?: CourseRegistrationType_enum | null;
+  requiredEcts?: any | null;
+  requiredEventCount?: number | null;
   startTime?: any | null;
   status?: CourseStatus_enum | null;
   stripePriceId?: string | null;
@@ -6255,6 +6265,8 @@ export interface Course_max_order_by {
   maxParticipants?: order_by | null;
   programId?: order_by | null;
   projectSubmissionDeadline?: order_by | null;
+  requiredEcts?: order_by | null;
+  requiredEventCount?: order_by | null;
   stripePriceId?: order_by | null;
   stripeProductId?: order_by | null;
   tagline?: order_by | null;
@@ -6291,6 +6303,8 @@ export interface Course_min_order_by {
   maxParticipants?: order_by | null;
   programId?: order_by | null;
   projectSubmissionDeadline?: order_by | null;
+  requiredEcts?: order_by | null;
+  requiredEventCount?: order_by | null;
   stripePriceId?: order_by | null;
   stripeProductId?: order_by | null;
   tagline?: order_by | null;
@@ -6370,6 +6384,8 @@ export interface Course_order_by {
   projectSubmissionDeadline?: order_by | null;
   published?: order_by | null;
   registrationType?: order_by | null;
+  requiredEcts?: order_by | null;
+  requiredEventCount?: order_by | null;
   startTime?: order_by | null;
   status?: order_by | null;
   stripePriceId?: order_by | null;
@@ -6415,6 +6431,8 @@ export interface Course_set_input {
   projectSubmissionDeadline?: any | null;
   published?: boolean | null;
   registrationType?: CourseRegistrationType_enum | null;
+  requiredEcts?: any | null;
+  requiredEventCount?: number | null;
   startTime?: any | null;
   status?: CourseStatus_enum | null;
   stripePriceId?: string | null;
@@ -6437,6 +6455,8 @@ export interface Course_stddev_order_by {
   maxMissedSessions?: order_by | null;
   maxParticipants?: order_by | null;
   programId?: order_by | null;
+  requiredEcts?: order_by | null;
+  requiredEventCount?: order_by | null;
 }
 
 /**
@@ -6451,6 +6471,8 @@ export interface Course_stddev_pop_order_by {
   maxMissedSessions?: order_by | null;
   maxParticipants?: order_by | null;
   programId?: order_by | null;
+  requiredEcts?: order_by | null;
+  requiredEventCount?: order_by | null;
 }
 
 /**
@@ -6465,6 +6487,8 @@ export interface Course_stddev_samp_order_by {
   maxMissedSessions?: order_by | null;
   maxParticipants?: order_by | null;
   programId?: order_by | null;
+  requiredEcts?: order_by | null;
+  requiredEventCount?: order_by | null;
 }
 
 /**
@@ -6479,6 +6503,8 @@ export interface Course_sum_order_by {
   maxMissedSessions?: order_by | null;
   maxParticipants?: order_by | null;
   programId?: order_by | null;
+  requiredEcts?: order_by | null;
+  requiredEventCount?: order_by | null;
 }
 
 /**
@@ -6493,6 +6519,8 @@ export interface Course_var_pop_order_by {
   maxMissedSessions?: order_by | null;
   maxParticipants?: order_by | null;
   programId?: order_by | null;
+  requiredEcts?: order_by | null;
+  requiredEventCount?: order_by | null;
 }
 
 /**
@@ -6507,6 +6535,8 @@ export interface Course_var_samp_order_by {
   maxMissedSessions?: order_by | null;
   maxParticipants?: order_by | null;
   programId?: order_by | null;
+  requiredEcts?: order_by | null;
+  requiredEventCount?: order_by | null;
 }
 
 /**
@@ -6521,6 +6551,8 @@ export interface Course_variance_order_by {
   maxMissedSessions?: order_by | null;
   maxParticipants?: order_by | null;
   programId?: order_by | null;
+  requiredEcts?: order_by | null;
+  requiredEventCount?: order_by | null;
 }
 
 /**

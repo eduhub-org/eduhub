@@ -127,6 +127,8 @@ select_permissions:
         - coverImage
         - created_at
         - ects
+        - requiredEcts
+        - requiredEventCount
         - endTime
         - externalRegistrationLink
         - headingDescriptionField1
@@ -176,6 +178,8 @@ select_permissions:
         - coverImage
         - created_at
         - ects
+        - requiredEcts
+        - requiredEventCount
         - endTime
         - externalRegistrationLink
         - headingDescriptionField1
@@ -219,6 +223,8 @@ select_permissions:
         - coverImage
         - created_at
         - ects
+        - requiredEcts
+        - requiredEventCount
         - endTime
         - headingDescriptionField1
         - headingDescriptionField2
@@ -267,6 +273,8 @@ select_permissions:
         - coverImage
         - created_at
         - ects
+        - requiredEcts
+        - requiredEventCount
         - endTime
         - externalRegistrationLink
         - headingDescriptionField1
@@ -313,6 +321,8 @@ update_permissions:
         - contentDescriptionField2
         - coverImage
         - ects
+        - requiredEcts
+        - requiredEventCount
         - endTime
         - headingDescriptionField1
         - headingDescriptionField2
@@ -351,6 +361,8 @@ update_permissions:
         - contentDescriptionField2
         - coverImage
         - ects
+        - requiredEcts
+        - requiredEventCount
         - endTime
         - headingDescriptionField1
         - headingDescriptionField2
@@ -477,6 +489,8 @@ insert_permissions:
         - cost
         - coverImage
         - ects
+        - requiredEcts
+        - requiredEventCount
         - endTime
         - externalRegistrationLink
         - headingDescriptionField1

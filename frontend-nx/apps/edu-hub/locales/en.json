@@ -219,6 +219,7 @@
       "invalid_maximum_integer": "The value must be at most {max}",
       "invalid_minimum_maximum_integer": "The value must be at least {min} and at most {max}",
       "invalid_integer_format": "The value must be an integer",
+      "invalid_decimal_format": "The value must be a number (decimals allowed, e.g. 12.5)",
       "invalid_input": "Invalid input",
       "transform_rejected": "This value could not be saved in the expected format.",
       "save_failed": "Saving failed."
@@ -1159,6 +1160,20 @@
       "label": "Maximum Missed Sessions",
       "help_text": "Maximum number of sessions a participant can miss"
     },
+    "degree_requirements": {
+      "label": "Degree requirements",
+      "help_text": "Minimum requirements a participant must meet before a degree certificate can be generated. Leave a field empty to skip that requirement.",
+      "required_ects": {
+        "label": "Required ECTS",
+        "placeholder": "e.g. 12.5",
+        "help_text": "Minimum number of ECTS the participant must have collected from passed courses of this degree. Decimals are allowed (e.g. 12.5). Leave empty to skip this check."
+      },
+      "required_event_count": {
+        "label": "Required events",
+        "placeholder": "e.g. 1",
+        "help_text": "Minimum number of this degree's events the participant must have taken part in. Leave empty to skip this check."
+      }
+    },
     "learning_goals": {
       "label": "Learning Goals",
       "help_text": "Define what participants will achieve after completing this course. Write each learning goal on a new line without numbering. Use action verbs like 'understand', 'apply', 'analyze', 'create' (see: https://www.bloomstaxonomy.org).",
@@ -1733,7 +1748,27 @@
     "set_status_high": "increase status",
     "please_fill_all_fields": "Please fill out all fields to proceed!",
     "errors": {
-      "failed_to_load_location_addresses": "Failed to load location addresses."
+      "failed_to_load_location_addresses": "Failed to load location addresses.",
+      "certificates": {
+        "DEGREE_REQUIREMENTS_NOT_MET": "The degree requirements are not met yet, so no certificate was generated.",
+        "NO_USERS_SELECTED": "No participants were selected.",
+        "NO_ENROLLMENTS_FOUND": "No matching enrollments were found for the selected participants.",
+        "ACHIEVEMENT_RECORD_NOT_FOUND": "No completed project was found for at least one participant.",
+        "CERTIFICATE_TEMPLATE_TEXT_NOT_FOUND": "No certificate template text is configured for this course or program.",
+        "CERTIFICATE_TEMPLATE_NOT_FOUND": "The certificate template file could not be found.",
+        "MISSING_COURSE_DATA": "Course data required for the certificate is missing (for example the learning goals).",
+        "MISSING_ENROLLMENT_DATA": "Enrollment data required for the certificate is missing.",
+        "MISSING_REQUIRED_DATA": "Data required for the certificate is missing.",
+        "ACHIEVEMENT_TEMPLATE_URL_NOT_FOUND": "No achievement certificate template is configured for this program.",
+        "ATTENDANCE_TEMPLATE_URL_NOT_FOUND": "No attendance certificate template is configured for this program.",
+        "TEMPLATE_FETCH_ERROR": "The certificate template could not be loaded.",
+        "TEMPLATE_TEXT_FETCH_ERROR": "The certificate template text could not be loaded.",
+        "TEXT_CONTENT_PREPARATION_ERROR": "The certificate content could not be prepared.",
+        "PDF_CREATION_FAILED": "The certificate PDF could not be created.",
+        "INVALID_CERTIFICATE_TYPE": "Invalid certificate type.",
+        "CERTIFICATE_GENERATION_ERROR": "The certificates could not be generated.",
+        "UNEXPECTED_ERROR": "An unexpected error occurred while generating the certificates."
+      }
     },
     "project_settings": {
       "heading": "Project setup",

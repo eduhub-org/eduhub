@@ -148,6 +148,41 @@ A degree certificate is an achievement certificate; the resolution chain above
 applies. In practice it always resolves at the first step because each degree
 **course** has its own HTML on `Course.achievementCertificateTemplateId`.
 
+Its *content* differs from a project-based achievement certificate: instead of
+learning goals and a practical project it lists the degree's completed
+components — the member courses (`CourseDegree`) the participant passed, followed
+by the degree's events (see §7 for the variables).
+
+### 5.3 Degree requirements (when a degree certificate may be issued)
+
+Each degree course carries its own completion thresholds:
+
+| Field | Meaning |
+|---|---|
+| `Course.requiredEcts` | Minimum ECTS collected from **passed** member courses (those with an achievement certificate) |
+| `Course.requiredEventCount` | Minimum number of the degree's **events** the participant is enrolled in (enrollment counts; no certificate needed) |
+
+Both are edited in `Manage Degrees` → expand a degree row → **"Degree
+requirements"**. An empty field means that requirement is not checked.
+
+`requiredEcts` is the *only* ECTS number a degree has: a degree does not award ECTS
+of its own, so there is no separate ECTS field on a degree, the public info panel
+shows the required amount, and both `{{ ECTS }}` and `{{ required_ects_display }}`
+render it on the certificate. A degree whose requirement is not set therefore prints
+an empty ECTS value — a deliberate signal that the field still has to be filled in.
+
+The "possible certificates" toggles and the max-missed-sessions field are **not
+shown** for a degree: a degree has no sessions, and its certificate flags are set
+automatically — `achievementCertificatePossible = true`,
+`attendanceCertificatePossible = false` — by a database trigger on insert plus a
+one-off backfill (migration `1786463520002_degree_course_certificate_defaults`).
+Those flags are not cosmetic: with both false, a participant sees neither their
+completed degree components nor their certificate download on the degree page. Generating
+a degree certificate for a participant below a configured threshold is refused
+with `DEGREE_REQUIREMENTS_NOT_MET`, and the error names the shortfall (e.g.
+*"10.0 of 12.5 ECTS, 0 of 1 events"*). The numbers are exactly the ECTS and event
+counts shown in the degree's **Degree Participations** tab.
+
 ### 5.1 Where admins set these today
 
 | Scope | Field | UI location | Status |
@@ -210,7 +245,12 @@ The server fills different variables per variant. Common to all:
 | Variant | Additional variables |
 |---|---|
 | **Attendance** | `{{ event_entries }}` (list of attended session titles), `{{ ECTS }}` |
-| **Achievement** (including degree) | `{{ ECTS }}`, `{{ learningGoalsList }}`, `{{ praxisprojekt }}` (the completed project title) |
+| **Achievement** (project-based) | `{{ ECTS }}`, `{{ learningGoalsList }}`, `{{ praxisprojekt }}` (the completed project title) |
+| **Degree** | `{{ successful_participations }}` (all degree components, passed courses first, then events), `{{ passed_participations }}`, `{{ event_participations }}`, `{{ ECTS }}` (same value as `required_ects_display`, kept under the legacy name), plus the degree's requirements and what the participant achieved: `{{ required_ects_display }}`, `{{ required_event_count }}`, `{{ achieved_ects_display }}`, `{{ attended_event_count }}` |
+
+A degree template should print `{{ required_ects_display }}` / `{{ required_event_count }}`
+rather than hard-coding numbers, so the wording follows the thresholds configured
+on the degree course (§5.3).
 
 Names are rendered upper-cased. ECTS formatting is handled server-side.
 
@@ -226,6 +266,7 @@ Names are rendered upper-cased. ECTS formatting is handled server-side.
 | Override a **single course's** template | (DB for now) | `Course.{attendance,achievement}CertificateTemplateId` |
 | Change the **default achievement template per project type** | (DB for now) | `ProjectType.certificateTemplateId` |
 | Set a **degree's** unique wording | (DB for now) | the degree `Course.achievementCertificateTemplateId` |
+| Change **how much a degree requires** (ECTS / events) | Manage Degrees → expand the degree → "Degree requirements" | `Course.requiredEcts`, `Course.requiredEventCount` |
 | **Edit the HTML** of a template | (DB for now; dedicated page coming soon) | `CertificateTemplate.html` |
 | **Generate** certificates | Manage Course → Participations tab → generate buttons | — |
 
@@ -240,6 +281,11 @@ Names are rendered upper-cased. ECTS formatting is handled server-side.
   resolves through the chain in §5. Check, in order: the course override, then
   the program default (attendance) or the project type default (achievement). For
   a degree course, confirm its `achievementCertificateTemplateId` is set.
+- **"The degree requirements are not met yet"** — the participant is below
+  `Course.requiredEcts` or `Course.requiredEventCount` for that degree (§5.3). The
+  message names the shortfall. Either the missing component certificates have not
+  been generated yet (only *passed* member courses count towards ECTS), or the
+  degree's thresholds need adjusting on the degree row.
 - **A new program got the wrong / no attendance template** — it inherited
   whatever the **`ProgramType` default for its `type`** was at creation time
   (§5.2). If a ProgramType has no default set, new programs of that type start

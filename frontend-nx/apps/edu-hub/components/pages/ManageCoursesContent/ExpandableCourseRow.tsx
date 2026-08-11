@@ -54,11 +54,15 @@ import {
   UPDATE_COURSE_BASE_PRICE,
   UPDATE_COURSE_CURRENCY,
   UPDATE_COURSE_PROJECT_SUBMISSION_DEADLINE,
+  UPDATE_COURSE_REQUIRED_ECTS,
+  UPDATE_COURSE_REQUIRED_EVENT_COUNT,
 } from '../../../queries/course';
 import { VALIDATE_FORMBRICKS_SURVEY, SAVE_ADDON_MAPPINGS, CREATE_STRIPE_BASE_PRICE, GET_COURSE_ADDON_MAPPINGS } from '../../../queries/stripe';
 import { AddonValidationDialog } from './AddonValidationDialog';
 import CreateMatrixRoomDialog from './CreateMatrixRoomDialog';
 import { Button } from '../../common/Button';
+import Card from '../../common/Card';
+import { ProgramType } from '../../../types/enums';
 import { UPDATE_COURSE_PROPERTY } from '../../../queries/mutateCourse';
 import useErrorHandler from '../../../hooks/useErrorHandler';
 import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
@@ -119,6 +123,10 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
   );
 
   const isExternalRegistration = course.registrationType === CourseRegistrationType_enum.EXTERNAL_REGISTRATION;
+
+  // A "degree" is a course inside a DEGREES program; only such a course carries
+  // completion thresholds for its degree certificate.
+  const isDegreeCourse = course.Program?.type === ProgramType.DEGREES;
 
   const projectSubmissionDeadlineValue = useMemo(
     () => submissionDeadlineToCalendarDate(course.projectSubmissionDeadline),
@@ -979,112 +987,157 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
               />
             </div>
 
-            {/* 3. Certificates - Card Container */}
-            <div className="bg-fill-primary border border-border-primary rounded-lg p-4">
-              <h4 className="text-sm font-medium text-label-primary mb-3">{t('manageCourses.certificates.label')}</h4>
-              <div className="space-y-2">
-                <div className="flex items-center space-x-2">
-                  <button
-                    type="button"
-                    className="cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
-                    onClick={handleToggleAttendanceCertificatePossible}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        handleToggleAttendanceCertificatePossible();
-                      }
-                    }}
-                    aria-label={t('manageCourses.possible_certificates.attendance_certificate')}
-                  >
-                    {course.attendanceCertificatePossible ? (
-                      <MdCheckBox className="w-6 h-6 text-blue-600" />
-                    ) : (
-                      <MdOutlineCheckBoxOutlineBlank className="w-6 h-6 text-label-disabled" />
-                    )}
-                  </button>
-                  <span>{t('manageCourses.possible_certificates.attendance_certificate')}</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <button
-                    type="button"
-                    className="cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
-                    onClick={handleToggleAchievementCertificatePossible}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        handleToggleAchievementCertificatePossible();
-                      }
-                    }}
-                    aria-label={t('manageCourses.possible_certificates.achievement_certificate')}
-                  >
-                    {course.achievementCertificatePossible ? (
-                      <MdCheckBox className="w-6 h-6 text-blue-600" />
-                    ) : (
-                      <MdOutlineCheckBoxOutlineBlank className="w-6 h-6 text-label-disabled" />
-                    )}
-                  </button>
-                  <span>{t('manageCourses.possible_certificates.achievement_certificate')}</span>
-                </div>
-                {course.achievementCertificatePossible && (
-                  <div className="ml-8 mt-2 space-y-4">
-                    <InputField
-                      variant="material"
-                      type="ects"
-                      label={t('manageCourses.ects.label')}
-                      placeholder={t('manageCourses.ects.label')}
-                      itemId={course.id}
-                      value={course.ects || ''}
-                      updateValueMutation={UPDATE_COURSE_ECTS}
-                      refetchQueries={['AdminCourseList']}
-                      helpText={t('manageCourses.ects.help_text')}
-                    />
-
-                    <DatePicker
-                      variant="material"
-                      label={t('manageCourses.project_options.submission_deadline.label')}
-                      helpText={t('manageCourses.project_options.submission_deadline.help_text')}
-                      itemId={course.id}
-                      value={projectSubmissionDeadlineValue}
-                      updateValueMutation={UPDATE_COURSE_PROJECT_SUBMISSION_DEADLINE}
-                      identifierVariables={{ itemId: course.id }}
-                      dateFieldName="value"
-                      refetchQueries={['AdminCourseList']}
-                    />
+            {/* 3. Certificates - Card Container - hidden for a degree: the flags are
+                forced by a trigger (achievement possible, attendance not), a degree is
+                not assigned to another degree, and its ECTS is edited in the degree
+                requirements card below. */}
+            {!isDegreeCourse && (
+              <div className="bg-fill-primary border border-border-primary rounded-lg p-4">
+                <h4 className="text-sm font-medium text-label-primary mb-3">{t('manageCourses.certificates.label')}</h4>
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <button
+                      type="button"
+                      className="cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+                      onClick={handleToggleAttendanceCertificatePossible}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          handleToggleAttendanceCertificatePossible();
+                        }
+                      }}
+                      aria-label={t('manageCourses.possible_certificates.attendance_certificate')}
+                    >
+                      {course.attendanceCertificatePossible ? (
+                        <MdCheckBox className="w-6 h-6 text-blue-600" />
+                      ) : (
+                        <MdOutlineCheckBoxOutlineBlank className="w-6 h-6 text-label-disabled" />
+                      )}
+                    </button>
+                    <span>{t('manageCourses.possible_certificates.attendance_certificate')}</span>
                   </div>
-                )}
-              </div>
+                  <div className="flex items-center space-x-2">
+                    <button
+                      type="button"
+                      className="cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+                      onClick={handleToggleAchievementCertificatePossible}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          handleToggleAchievementCertificatePossible();
+                        }
+                      }}
+                      aria-label={t('manageCourses.possible_certificates.achievement_certificate')}
+                    >
+                      {course.achievementCertificatePossible ? (
+                        <MdCheckBox className="w-6 h-6 text-blue-600" />
+                      ) : (
+                        <MdOutlineCheckBoxOutlineBlank className="w-6 h-6 text-label-disabled" />
+                      )}
+                    </button>
+                    <span>{t('manageCourses.possible_certificates.achievement_certificate')}</span>
+                  </div>
+                  {course.achievementCertificatePossible && (
+                    <div className="ml-8 mt-2 space-y-4">
+                      <InputField
+                        variant="material"
+                        type="ects"
+                        label={t('manageCourses.ects.label')}
+                        placeholder={t('manageCourses.ects.label')}
+                        itemId={course.id}
+                        value={course.ects || ''}
+                        updateValueMutation={UPDATE_COURSE_ECTS}
+                        refetchQueries={['AdminCourseList']}
+                        helpText={t('manageCourses.ects.help_text')}
+                      />
 
-              <div className="mt-4 pt-4 border-t border-border-primary">
-                <TagSelector
+                      <DatePicker
+                        variant="material"
+                        label={t('manageCourses.project_options.submission_deadline.label')}
+                        helpText={t('manageCourses.project_options.submission_deadline.help_text')}
+                        itemId={course.id}
+                        value={projectSubmissionDeadlineValue}
+                        updateValueMutation={UPDATE_COURSE_PROJECT_SUBMISSION_DEADLINE}
+                        identifierVariables={{ itemId: course.id }}
+                        dateFieldName="value"
+                        refetchQueries={['AdminCourseList']}
+                      />
+                    </div>
+                  )}
+                </div>
+
+                <div className="mt-4 pt-4 border-t border-border-primary">
+                  <TagSelector
+                    variant="material"
+                    label={t('manageCourses.course_degree_title.label')}
+                    placeholder={t('manageCourses.course_degree_title.placeholder')}
+                    itemId={course.id}
+                    values={currentCourseDegrees}
+                    options={degreeCourses}
+                    insertValueMutation={INSERT_COURSE_DEGREE_TAG}
+                    deleteValueMutation={DELETE_COURSE_DEGREE_TAG}
+                    refetchQueries={['AdminCourseList']}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* 5. Course Requirements - Card Container - a degree has no sessions,
+                so nothing can be missed. */}
+            {!isDegreeCourse && (
+              <div className="bg-fill-primary border border-border-primary rounded-lg p-4 space-y-4">
+                {/* Maximum Number of Allowed Missing Sessions */}
+                <InputField
                   variant="material"
-                  label={t('manageCourses.course_degree_title.label')}
-                  placeholder={t('manageCourses.course_degree_title.placeholder')}
+                  type="number"
+                  label={t('manageCourses.max_missed_sessions.label')}
+                  placeholder={t('manageCourses.max_missed_sessions.label')}
                   itemId={course.id}
-                  values={currentCourseDegrees}
-                  options={degreeCourses}
-                  insertValueMutation={INSERT_COURSE_DEGREE_TAG}
-                  deleteValueMutation={DELETE_COURSE_DEGREE_TAG}
+                  value={String(course.maxMissedSessions ?? 2)}
+                  updateValueMutation={UPDATE_COURSE_MAX_MISSED_SESSION}
                   refetchQueries={['AdminCourseList']}
+                  helpText={t('manageCourses.max_missed_sessions.help_text')}
+                  min={0}
                 />
               </div>
-            </div>
+            )}
 
-            {/* 5. Course Requirements - Card Container */}
-            <div className="bg-fill-primary border border-border-primary rounded-lg p-4 space-y-4">
-              {/* Maximum Number of Allowed Missing Sessions */}
-              <InputField
-                variant="material"
-                type="number"
-                label={t('manageCourses.max_missed_sessions.label')}
-                placeholder={t('manageCourses.max_missed_sessions.label')}
-                itemId={course.id}
-                value={String(course.maxMissedSessions ?? 2)}
-                updateValueMutation={UPDATE_COURSE_MAX_MISSED_SESSION}
-                refetchQueries={['AdminCourseList']}
-                helpText={t('manageCourses.max_missed_sessions.help_text')}
-                min={0}
-              />
-            </div>
+            {/* Degree requirements - only for a course in a DEGREES program. An empty
+                field means that requirement is not checked when the degree
+                certificate is generated. */}
+            {isDegreeCourse && (
+              <Card
+                title={t('manageCourses.degree_requirements.label')}
+                helpText={t('manageCourses.degree_requirements.help_text')}
+                className="space-y-4"
+              >
+                <InputField
+                  variant="material"
+                  type="decimal"
+                  label={t('manageCourses.degree_requirements.required_ects.label')}
+                  placeholder={t('manageCourses.degree_requirements.required_ects.placeholder')}
+                  itemId={course.id}
+                  value={course.requiredEcts != null ? String(course.requiredEcts) : ''}
+                  updateValueMutation={UPDATE_COURSE_REQUIRED_ECTS}
+                  refetchQueries={['AdminCourseList']}
+                  helpText={t('manageCourses.degree_requirements.required_ects.help_text')}
+                  min={0}
+                />
+
+                <InputField
+                  variant="material"
+                  type="number"
+                  label={t('manageCourses.degree_requirements.required_event_count.label')}
+                  placeholder={t('manageCourses.degree_requirements.required_event_count.placeholder')}
+                  itemId={course.id}
+                  value={course.requiredEventCount != null ? String(course.requiredEventCount) : ''}
+                  updateValueMutation={UPDATE_COURSE_REQUIRED_EVENT_COUNT}
+                  refetchQueries={['AdminCourseList']}
+                  helpText={t('manageCourses.degree_requirements.required_event_count.help_text')}
+                  min={0}
+                />
+              </Card>
+            )}
 
             {/* 6. Learning Goals - Card Container */}
             <div className="bg-fill-primary border border-border-primary rounded-lg p-4 [&_.text-label-disabled]:text-label-primary">
