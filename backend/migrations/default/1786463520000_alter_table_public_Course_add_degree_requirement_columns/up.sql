@@ -8,11 +8,14 @@ ALTER TABLE "public"."Course"
   ADD COLUMN "requiredEcts"       numeric NULL,
   ADD COLUMN "requiredEventCount" integer NULL;
 
+-- NOT VALID keeps the ACCESS EXCLUSIVE lock off a full table scan; the columns are
+-- NULL for every existing row anyway. Validated below, after the backfill, which
+-- only needs SHARE UPDATE EXCLUSIVE.
 ALTER TABLE "public"."Course"
   ADD CONSTRAINT "Course_requiredEcts_check"
-    CHECK ("requiredEcts" IS NULL OR "requiredEcts" >= 0),
+    CHECK ("requiredEcts" IS NULL OR "requiredEcts" >= 0) NOT VALID,
   ADD CONSTRAINT "Course_requiredEventCount_check"
-    CHECK ("requiredEventCount" IS NULL OR "requiredEventCount" >= 0);
+    CHECK ("requiredEventCount" IS NULL OR "requiredEventCount" >= 0) NOT VALID;
 
 COMMENT ON COLUMN "public"."Course"."requiredEcts"
   IS E'Minimum number of ECTS a participant must have collected from this degree''s member courses (CourseDegree.degreeCourseId = this course) before a degree certificate can be generated. Only member enrollments carrying an achievementCertificateURL count, matching the DegreeParticipationStats view. Only meaningful for a course whose Program.type = ''DEGREES''. NULL = requirement not checked.';
@@ -28,6 +31,9 @@ UPDATE "public"."Course" c
   FROM "public"."Program" p
  WHERE p."id" = c."programId"
    AND p."type" = 'DEGREES';
+
+ALTER TABLE "public"."Course" VALIDATE CONSTRAINT "Course_requiredEcts_check";
+ALTER TABLE "public"."Course" VALIDATE CONSTRAINT "Course_requiredEventCount_check";
 
 -- Extend the documented Jinja variable contract (originally written by
 -- 1780045613786_migrate_achievements_to_projects) with the degree variables the

@@ -40,15 +40,18 @@ def _part(
     }
 
 
-def _event(title="Coding.Waterkant 2026", course_id=9):
-    return _part(
+def _event(title="Coding.Waterkant 2026", course_id=9, program_type="EVENTS",
+           program_short_title="EVENTS"):
+    row = _part(
         title,
         "NONE",
         program_title="Events",
-        program_type="EVENTS",
+        program_type=program_type,
         cert=False,
         course_id=course_id,
     )
+    row["programShortTitle"] = program_short_title
+    return row
 
 
 def _degree_enrollment(
@@ -165,6 +168,19 @@ class TestSummarizeDegreeParticipations:
         assert summary["ects_total"] == 0.0
         assert summary["event_count"] == 1
 
+    def test_legacy_program_without_events_type_still_counts(self):
+        """DegreeParticipationStats falls back to the free-text Program.shortTitle for
+        programs predating Program.type; the gate has to match or it would refuse a
+        participant the admin table shows as qualified."""
+        legacy = _event(program_type="COURSES", program_short_title="EVENTS")
+        summary = summarize_degree_participations([legacy])
+        assert summary["event_count"] == 1
+        assert summary["events"] == ["Coding.Waterkant 2026 (Hackathon)"]
+
+    def test_regular_course_is_not_an_event(self):
+        summary = summarize_degree_participations([_part("Intro to ML", "5")])
+        assert summary["event_count"] == 0
+
     def test_empty_input(self):
         for participations in ([], None):
             summary = summarize_degree_participations(participations)
@@ -239,6 +255,19 @@ class TestAssertDegreeRequirements:
         assert "3 selected participant(s)" in error.message
         assert error.message.count("Wiebke Engler") == 3
         assert "0.0 of 12.5 ECTS, 0 of 1 events" in error.message
+
+    def test_log_message_identifies_users_by_id_only(self):
+        """Cloud function logs have a different retention and access model, so the
+        blocked participants are named only in the admin-facing message."""
+        enrollments = [_degree_enrollment("u1")]
+        with pytest.raises(CertificateError) as excinfo:
+            assert_degree_requirements(enrollments, {})
+        error = excinfo.value
+        assert "Wiebke Engler" in error.message
+        assert "Wiebke" not in error.log_message
+        assert "Engler" not in error.log_message
+        assert "u1" in error.log_message
+        assert "0 of 1 events" in error.log_message
 
     def test_truncates_long_failure_lists(self):
         enrollments = [_degree_enrollment(f"u{i}") for i in range(1, 8)]
@@ -336,6 +365,8 @@ class TestPrepareTextContentDegreeBranch:
         assert "Wiebke Engler" in error.message
         assert "0.0 of 12.5 ECTS" in error.message
         assert "0 of 1 events" in error.message
+        assert "Wiebke" not in error.log_message
+        assert "u1" in error.log_message
 
     def test_renders_empty_list_when_no_thresholds_are_configured(self):
         creator = self._creator({})

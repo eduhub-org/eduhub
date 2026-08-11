@@ -33,10 +33,17 @@ def pick_effective_attendance(attendances):
 
 
 class CertificateError(Exception):
-    """Exception class for certificate generation errors with message keys"""
-    def __init__(self, message, message_key):
+    """Exception class for certificate generation errors with message keys.
+
+    ``message`` is returned to the admin who triggered the run and may name
+    participants. ``log_message`` is what goes to the cloud function logs, which
+    have a different retention and access model, so pass a version identifying
+    users by id whenever the message contains personal data.
+    """
+    def __init__(self, message, message_key, log_message=None):
         self.message = message
         self.message_key = message_key
+        self.log_message = log_message or message
         super().__init__(message)
 
 
@@ -63,6 +70,20 @@ def format_ects(value):
     """
     parsed = safe_float_convert(value)
     return f"{parsed:.1f}" if parsed is not None else "0"
+
+
+def is_event_participation(row):
+    """Tells whether a degree component is one of the degree's events.
+
+    Mirrors public.DegreeParticipationStats, which treats a program as an events
+    program when Program.type says so or - for programs predating that column - the
+    legacy free-text Program.shortTitle does. Keeping the two in step is what stops
+    the requirement gate from disagreeing with the numbers the admin sees.
+    """
+    return (
+        row.get("programType") == EVENTS_PROGRAM_TYPE
+        or row.get("programShortTitle") == EVENTS_PROGRAM_TYPE
+    )
 
 
 def summarize_degree_participations(participations):
@@ -96,7 +117,7 @@ def summarize_degree_participations(participations):
         title = row.get("title") or ""
         if row.get("hasAchievementCertificate"):
             ects_total += safe_float_convert(row.get("ects")) or 0.0
-        if row.get("programType") == EVENTS_PROGRAM_TYPE:
+        if is_event_participation(row):
             events.append(f"{title} (Hackathon)")
             event_count += 1
         elif row.get("hasAchievementCertificate"):
@@ -159,6 +180,7 @@ def assert_degree_requirements(enrollments, degree_participations):
         CertificateError: message key DEGREE_REQUIREMENTS_NOT_MET.
     """
     failures = []
+    logged_failures = []
     for enrollment in enrollments:
         course = enrollment.get("Course") or {}
         user = enrollment.get("User") or {}
@@ -177,14 +199,22 @@ def assert_degree_requirements(enrollments, degree_participations):
         if shortfall:
             name = f"{user.get('firstName') or ''} {user.get('lastName') or ''}".strip()
             failures.append(f"{name or user.get('id')} ({shortfall})")
+            # The log variant identifies people by id only.
+            logged_failures.append(f"{user.get('id')} ({shortfall})")
 
     if failures:
-        shown = "; ".join(failures[:5])
-        more = f" and {len(failures) - 5} more" if len(failures) > 5 else ""
+        def summarize(entries):
+            shown = "; ".join(entries[:5])
+            more = f" and {len(entries) - 5} more" if len(entries) > 5 else ""
+            return (
+                f"Degree requirements not met for {len(entries)} selected "
+                f"participant(s): {shown}{more}"
+            )
+
         raise CertificateError(
-            f"Degree requirements not met for {len(failures)} selected "
-            f"participant(s): {shown}{more}",
+            summarize(failures),
             "DEGREE_REQUIREMENTS_NOT_MET",
+            log_message=summarize(logged_failures),
         )
 
 
@@ -259,7 +289,7 @@ class CertificateCreator:
                 successful_count += 1
             except CertificateError as e:
                 # Propagate certificate generation errors immediately
-                logging.error(f"Certificate error: {str(e)}")
+                logging.error(f"Certificate error: {e.log_message}")
                 raise
             except Exception as e:
                 logging.error(f"Error in processing enrollment {i}: {e}")
@@ -497,6 +527,10 @@ class CertificateCreator:
                             f"Degree requirements not met for {user['firstName']} "
                             f"{user['lastName']} ({shortfall})",
                             "DEGREE_REQUIREMENTS_NOT_MET",
+                            log_message=(
+                                f"Degree requirements not met for user "
+                                f"{user['id']} ({shortfall})"
+                            ),
                         )
 
                     # A degree does not award ECTS of its own, it requires them, so
@@ -691,7 +725,7 @@ def create_certificates(arguments):
         }
         
     except CertificateError as e:
-        logging.error(f"Certificate error: {str(e)}")
+        logging.error(f"Certificate error: {e.log_message}")
         return {
             "success": False,
             "error": str(e),

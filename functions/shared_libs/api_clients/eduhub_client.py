@@ -4,6 +4,11 @@ import os
 from requests.structures import CaseInsensitiveDict
 import pandas as pd
 
+# Every request runs on a cloud function's request thread, so a stalled connection
+# must fail instead of holding the invocation until the platform kills it. Generous
+# enough for the bulk queries (the Hasura action itself allows 300s).
+GRAPHQL_REQUEST_TIMEOUT_SECONDS = 60
+
 
 class EduHubClient:
     def __init__(self):
@@ -243,7 +248,8 @@ class EduHubClient:
             response = requests.post(
                 self.url,
                 headers={"x-hasura-admin-secret": self.hasura_admin_secret},
-                json={"query": query, "variables": variables}
+                json={"query": query, "variables": variables},
+                timeout=GRAPHQL_REQUEST_TIMEOUT_SECONDS,
             )
             response.raise_for_status()  # Raises a HTTPError if the HTTP request returned an unsuccessful status code
 
@@ -266,7 +272,9 @@ class EduHubClient:
         when it either carries an achievementCertificateURL (a passed course) or
         belongs to an EVENTS program (enrollment alone counts, no certificate
         required). That is exactly the rule public.DegreeParticipationStats applies,
-        so the certificate can never contradict the numbers shown in the admin UI.
+        so the certificate can never contradict the numbers shown in the admin UI -
+        including that view's fallback to the legacy free-text Program.shortTitle for
+        programs that predate Program.type.
 
         One query covers every user: degree certificates are generated as a bulk
         action, and the pre-refactor implementation ran one query per user.
@@ -277,7 +285,8 @@ class EduHubClient:
 
         Returns:
             dict: {userId: [{"courseId", "title", "ects", "programTitle",
-                             "programType", "hasAchievementCertificate"}, ...]}
+                             "programType", "programShortTitle",
+                             "hasAchievementCertificate"}, ...]}
                   Users without a qualifying enrollment are absent from the dict.
         """
         # Program.type is a plain text column (ProgramType is not a Hasura enum),
@@ -289,7 +298,8 @@ class EduHubClient:
                     Course: {CourseDegrees: {degreeCourseId: {_eq: $degreeCourseId}}},
                     _or: [
                         {achievementCertificateURL: {_is_null: false}},
-                        {Course: {Program: {type: {_eq: "EVENTS"}}}}
+                        {Course: {Program: {type: {_eq: "EVENTS"}}}},
+                        {Course: {Program: {shortTitle: {_eq: "EVENTS"}}}}
                     ]
                 },
                 order_by: [
@@ -306,6 +316,7 @@ class EduHubClient:
                     Program {
                         title
                         type
+                        shortTitle
                     }
                 }
             }
@@ -337,6 +348,7 @@ class EduHubClient:
                     "ects": course.get("ects"),
                     "programTitle": program.get("title"),
                     "programType": program.get("type"),
+                    "programShortTitle": program.get("shortTitle"),
                     "hasAchievementCertificate": row.get("achievementCertificateURL")
                     is not None,
                 }
@@ -361,6 +373,7 @@ class EduHubClient:
                 "content-type": "application/json",
             },
             json={"query": query, "variables": variables},
+            timeout=GRAPHQL_REQUEST_TIMEOUT_SECONDS,
         )
         response.raise_for_status()
         data = response.json()
