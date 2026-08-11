@@ -35,8 +35,7 @@ def _client():
     return client
 
 
-def _row(user_id, course_id, title, ects, program_type="COURSES", certificate_url="a.pdf",
-         program_short_title="24W"):
+def _row(user_id, course_id, title, ects, program_type="COURSES", certificate_url="a.pdf"):
     return {
         "userId": user_id,
         "achievementCertificateURL": certificate_url,
@@ -44,11 +43,7 @@ def _row(user_id, course_id, title, ects, program_type="COURSES", certificate_ur
             "id": course_id,
             "title": title,
             "ects": ects,
-            "Program": {
-                "title": "Winter 2024",
-                "type": program_type,
-                "shortTitle": program_short_title,
-            },
+            "Program": {"title": "Winter 2024", "type": program_type},
         },
     }
 
@@ -76,8 +71,8 @@ class TestFetchDegreeParticipations:
                 "data": {
                     "CourseEnrollment": [
                         _row("u1", 1, "Intro to ML", "5"),
-                        _row("u1", 9, "Coding.Waterkant", "NONE", program_type="EVENTS",
-                             certificate_url=None, program_short_title="EVENTS"),
+                        _row("u1", 9, "Coding.Waterkant", "NONE",
+                             program_type="EVENTS", certificate_url=None),
                         _row("u2", 1, "Intro to ML", "5"),
                     ]
                 }
@@ -93,7 +88,6 @@ class TestFetchDegreeParticipations:
             "ects": "5",
             "programTitle": "Winter 2024",
             "programType": "COURSES",
-            "programShortTitle": "24W",
             "hasAchievementCertificate": True,
         }
         assert result["u1"][1]["hasAchievementCertificate"] is False

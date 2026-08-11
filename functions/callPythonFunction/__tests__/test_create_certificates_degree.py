@@ -40,18 +40,15 @@ def _part(
     }
 
 
-def _event(title="Coding.Waterkant 2026", course_id=9, program_type="EVENTS",
-           program_short_title="EVENTS"):
-    row = _part(
+def _event(title="Coding.Waterkant 2026", course_id=9):
+    return _part(
         title,
         "NONE",
         program_title="Events",
-        program_type=program_type,
+        program_type="EVENTS",
         cert=False,
         course_id=course_id,
     )
-    row["programShortTitle"] = program_short_title
-    return row
 
 
 def _degree_enrollment(
@@ -167,15 +164,6 @@ class TestSummarizeDegreeParticipations:
         summary = summarize_degree_participations([_event()])
         assert summary["ects_total"] == 0.0
         assert summary["event_count"] == 1
-
-    def test_legacy_program_without_events_type_still_counts(self):
-        """DegreeParticipationStats falls back to the free-text Program.shortTitle for
-        programs predating Program.type; the gate has to match or it would refuse a
-        participant the admin table shows as qualified."""
-        legacy = _event(program_type="COURSES", program_short_title="EVENTS")
-        summary = summarize_degree_participations([legacy])
-        assert summary["event_count"] == 1
-        assert summary["events"] == ["Coding.Waterkant 2026 (Hackathon)"]
 
     def test_regular_course_is_not_an_event(self):
         summary = summarize_degree_participations([_part("Intro to ML", "5")])

@@ -272,9 +272,7 @@ class EduHubClient:
         when it either carries an achievementCertificateURL (a passed course) or
         belongs to an EVENTS program (enrollment alone counts, no certificate
         required). That is exactly the rule public.DegreeParticipationStats applies,
-        so the certificate can never contradict the numbers shown in the admin UI -
-        including that view's fallback to the legacy free-text Program.shortTitle for
-        programs that predate Program.type.
+        so the certificate can never contradict the numbers shown in the admin UI.
 
         One query covers every user: degree certificates are generated as a bulk
         action, and the pre-refactor implementation ran one query per user.
@@ -285,8 +283,7 @@ class EduHubClient:
 
         Returns:
             dict: {userId: [{"courseId", "title", "ects", "programTitle",
-                             "programType", "programShortTitle",
-                             "hasAchievementCertificate"}, ...]}
+                             "programType", "hasAchievementCertificate"}, ...]}
                   Users without a qualifying enrollment are absent from the dict.
         """
         # Program.type is a plain text column (ProgramType is not a Hasura enum),
@@ -298,8 +295,7 @@ class EduHubClient:
                     Course: {CourseDegrees: {degreeCourseId: {_eq: $degreeCourseId}}},
                     _or: [
                         {achievementCertificateURL: {_is_null: false}},
-                        {Course: {Program: {type: {_eq: "EVENTS"}}}},
-                        {Course: {Program: {shortTitle: {_eq: "EVENTS"}}}}
+                        {Course: {Program: {type: {_eq: "EVENTS"}}}}
                     ]
                 },
                 order_by: [
@@ -316,7 +312,6 @@ class EduHubClient:
                     Program {
                         title
                         type
-                        shortTitle
                     }
                 }
             }
@@ -348,7 +343,6 @@ class EduHubClient:
                     "ects": course.get("ects"),
                     "programTitle": program.get("title"),
                     "programType": program.get("type"),
-                    "programShortTitle": program.get("shortTitle"),
                     "hasAchievementCertificate": row.get("achievementCertificateURL")
                     is not None,
                 }

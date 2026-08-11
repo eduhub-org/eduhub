@@ -72,20 +72,6 @@ def format_ects(value):
     return f"{parsed:.1f}" if parsed is not None else "0"
 
 
-def is_event_participation(row):
-    """Tells whether a degree component is one of the degree's events.
-
-    Mirrors public.DegreeParticipationStats, which treats a program as an events
-    program when Program.type says so or - for programs predating that column - the
-    legacy free-text Program.shortTitle does. Keeping the two in step is what stops
-    the requirement gate from disagreeing with the numbers the admin sees.
-    """
-    return (
-        row.get("programType") == EVENTS_PROGRAM_TYPE
-        or row.get("programShortTitle") == EVENTS_PROGRAM_TYPE
-    )
-
-
 def summarize_degree_participations(participations):
     """Builds the certificate lines and the requirement totals for one user.
 
@@ -117,7 +103,7 @@ def summarize_degree_participations(participations):
         title = row.get("title") or ""
         if row.get("hasAchievementCertificate"):
             ects_total += safe_float_convert(row.get("ects")) or 0.0
-        if is_event_participation(row):
+        if row.get("programType") == EVENTS_PROGRAM_TYPE:
             events.append(f"{title} (Hackathon)")
             event_count += 1
         elif row.get("hasAchievementCertificate"):

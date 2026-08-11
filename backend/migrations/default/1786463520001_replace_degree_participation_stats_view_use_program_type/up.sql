@@ -1,21 +1,16 @@
--- The frontend (and, as of this release, the degree certificate generator)
--- discriminates programs on Program.type, whose values are exactly
--- COURSES / EVENTS / DEGREES. This view used Program."shortTitle", an editable
--- free-text label: an organization that renames its programs silently loses its
--- degree statistics (no row at all for a renamed DEGREES program, zero events for a
--- renamed EVENTS program). Since the certificate requirement gate is checked
--- against the same rule these numbers express, the two must not be able to
--- disagree.
+-- The frontend, the admin UI and the degree certificate generator all discriminate
+-- programs on Program.type, whose values are exactly COURSES / EVENTS / DEGREES.
+-- This view used Program."shortTitle", an editable free-text label, so an
+-- organization that renames its programs silently lost its degree statistics: no row
+-- at all for a renamed DEGREES program, zero events for a renamed EVENTS program.
+-- The degree certificate requirement gate is checked against the same rule these
+-- numbers express, so the two must not be able to disagree.
 --
--- Program.type is authoritative, but "shortTitle" is still honoured as a fallback:
--- migration 1734993470424 added the column with DEFAULT 'COURSES' and nothing ever
--- backfilled it from the old label, and no admin screen can edit it. A program that
--- was missed back then still says COURSES, so accepting either signal keeps this
--- view a superset of both its old and its new behaviour - no participant can lose
--- statistics because of this migration. Drop the fallback once Program.type is known
--- to be correct everywhere (that is a data fix with admin-visible side effects: it
--- also decides which management page a program appears on and which org-admin
--- capability governs it).
+-- Program.type is trustworthy here even though migration 1734993470424 introduced it
+-- with DEFAULT 'COURSES' and nothing ever backfilled it from the old label: production
+-- was checked for programs whose "shortTitle" claims DEGREES/EVENTS while "type"
+-- disagrees, and for any degree participation number that would change as a result.
+-- Both came back empty.
 --
 -- Column names, order and types are unchanged, so no Hasura metadata change is
 -- required and dependent objects survive the replace.
@@ -36,7 +31,6 @@ SELECT
   ) AS "ectsTotal",
   COUNT(*) FILTER (
     WHERE program_row."type" = 'EVENTS'
-       OR program_row."shortTitle" = 'EVENTS'
   ) AS "attendedEventCount"
 FROM "public"."CourseEnrollment" degree_enrollment
 JOIN "public"."Course" degree_course_row
@@ -56,10 +50,9 @@ LEFT JOIN "public"."Course" course_row
 LEFT JOIN "public"."Program" program_row
   ON program_row.id = course_row."programId"
 WHERE degree_program_row."type" = 'DEGREES'
-   OR degree_program_row."shortTitle" = 'DEGREES'
 GROUP BY
   degree_enrollment."courseId",
   degree_enrollment."userId";
 
 COMMENT ON VIEW "public"."DegreeParticipationStats" IS
-  'Aggregated ECTS and event attendance statistics per degree participation. Discriminates on Program.type, which is what the admin UI and the degree certificate requirement gate use, and still accepts the legacy free-text Program.shortTitle so programs predating the type column keep their statistics.';
+  'Aggregated ECTS and event attendance statistics per degree participation. Discriminates on Program.type (not the editable free-text Program.shortTitle) so the numbers match the admin UI and the degree certificate requirement gate.';
