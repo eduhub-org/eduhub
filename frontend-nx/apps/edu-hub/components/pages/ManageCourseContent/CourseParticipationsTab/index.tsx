@@ -39,6 +39,7 @@ import {
 } from '../../../../queries/__generated__/UpdateEnrollmentStatusWhenConfirmed';
 import { Tooltip } from '@mui/material';
 import { pickEffectiveAttendance } from '../../../../helpers/attendance';
+import { certificateActionErrorMessage } from '../../../../helpers/certificateMessages';
 import { IoIosCheckmarkCircle } from 'react-icons/io';
 import { GoDotFill } from 'react-icons/go';
 import { ColumnDef, Row } from '@tanstack/react-table';
@@ -305,7 +306,9 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
           });
           const result = response.data?.createCertificates;
           if (!result?.success) {
-            throw new Error(result?.error || t('errors:certificate_generation_failed'));
+            throw new Error(
+              certificateActionErrorMessage(result, t, tCommon('error_handling.certificate_generation_failed'))
+            );
           }
           const count = result.count ?? 0;
           const key =
@@ -338,7 +341,9 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
           });
           const result = response.data?.createCertificates;
           if (!result?.success) {
-            throw new Error(result?.error || t('errors:certificate_generation_failed'));
+            throw new Error(
+              certificateActionErrorMessage(result, t, tCommon('error_handling.certificate_generation_failed'))
+            );
           }
           const count = result.count ?? 0;
           const key =
@@ -410,6 +415,7 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
       removeAchievementCertificates,
       removeAttendanceCertificates,
       t,
+      tCommon,
       tCoursePage,
       refetch,
       qResult,
