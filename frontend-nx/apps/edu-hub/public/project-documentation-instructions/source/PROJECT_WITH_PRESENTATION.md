@@ -32,7 +32,7 @@ Veröffentlichbares Projekt mit **Dokumentation**, **Präsentation** (Folien) un
 
 - **Länge:** typisch 8–15 Folien für eine Kurzpräsentation (Kursvorgabe beachten)
 - **Inhalt:** Problem → Ansatz → Demo/Ergebnis → Fazit
-- **Formate in EduHub:** PDF, PowerPoint (.ppt, .pptx), ODP — max. 25 MB
+- **Formate in EduHub:** PDF, PowerPoint (.ppt, .pptx), ODP — max. 22 MB
 - Lade die Datei unter **„Präsentation“** hoch (nicht nur in die Doku einbetten)
 
 ### Titelbild
@@ -74,7 +74,7 @@ Publishable project with **documentation**, **presentation** (slides), and
 
 - **Length:** typically 8–15 slides for a short talk (follow course rules)
 - **Content:** problem → approach → demo/result → conclusion
-- **Formats in EduHub:** PDF, PowerPoint (.ppt, .pptx), ODP — max. 25 MB
+- **Formats in EduHub:** PDF, PowerPoint (.ppt, .pptx), ODP — max. 22 MB
 - Upload under **Presentation** (do not rely only on embedding slides in the doc)
 
 ### Cover image

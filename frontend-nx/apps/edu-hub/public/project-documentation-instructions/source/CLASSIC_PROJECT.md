@@ -40,7 +40,7 @@ externer Link und kein Titelbild erforderlich.
 ### Technische Vorgaben (EduHub)
 
 - **Formate:** PDF, Microsoft Word (.doc, .docx), OpenDocument Text (.odt)
-- **Max. Größe:** 25 MB pro Datei
+- **Max. Größe:** 22 MB pro Datei
 - Abgabe unter **„Mein Projekt“ → Dokumentation**, vor Ablauf der **Abgabefrist**
 
 ### Checkliste vor Abgabe
@@ -87,7 +87,7 @@ image is required.
 ### Technical requirements (EduHub)
 
 - **Formats:** PDF, Microsoft Word (.doc, .docx), OpenDocument Text (.odt)
-- **Max. size:** 25 MB per file
+- **Max. size:** 22 MB per file
 - Submit under **My project → Documentation**, before the **submission deadline**
 
 ### Pre-submission checklist

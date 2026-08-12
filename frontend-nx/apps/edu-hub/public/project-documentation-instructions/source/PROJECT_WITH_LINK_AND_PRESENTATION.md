@@ -47,7 +47,7 @@ Vollständiges **veröffentlichbares** Projekt: **Dokumentation**, **Präsentati
 
 - Enthält **Demo-Moment** (Screenshot oder Live-Bezug zum Link)
 - Klare **Takeaways** auf der letzten Folie
-- Formate: PDF, PPT/PPTX, ODP — max. 25 MB
+- Formate: PDF, PPT/PPTX, ODP — max. 22 MB
 
 ### Externer Link & Titelbild
 
@@ -106,7 +106,7 @@ are the **overview**, the link is the **evidence**.
 
 - Include a **demo moment** (screenshot or live reference to the link)
 - Clear **takeaways** on the final slide
-- Formats: PDF, PPT/PPTX, ODP — max. 25 MB
+- Formats: PDF, PPT/PPTX, ODP — max. 22 MB
 
 ### External link & cover image
 

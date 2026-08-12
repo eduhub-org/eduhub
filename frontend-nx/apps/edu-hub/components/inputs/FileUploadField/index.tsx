@@ -13,7 +13,7 @@ import {
   formatAcceptedTypes,
   formatMaxSize,
   getFileIcon,
-  validateMimeType,
+  validateFileType,
 } from './utils';
 import { FileUploadFieldProps } from './types';
 import { useTranslations } from 'next-intl';
@@ -145,8 +145,7 @@ export const FileUploadField: FC<FileUploadFieldProps> = ({
     },
   });
 
-  // Process file upload
-  // Note: Server-side GraphQL mutation must independently validate MIME types
+  // Process file upload. The server currently validates size, but not file type.
   const processFileUpload = useCallback(
     async (file: UploadFile, fileType?: string) => {
       if (!file) return;
@@ -166,18 +165,17 @@ export const FileUploadField: FC<FileUploadFieldProps> = ({
         return;
       }
 
-      // Validate MIME type if file type is provided and acceptedFileTypes is not '*'
-      if (fileType && acceptedFileTypes !== '*') {
-        if (!validateMimeType(fileType, acceptedFileTypes)) {
-          const acceptedTypesText = formatAcceptedTypes(acceptedFileTypes);
-          const errorMessage = t('file_upload.invalid_file_type', { types: acceptedTypesText });
-          setIsUploading(false);
-          setUploadProgress(0);
-          if (onUploadError) {
-            onUploadError(errorMessage);
-          }
-          return;
+      // Validate picker and drag-and-drop files through the same path. Browsers
+      // may report an empty MIME type, so filename extensions are checked too.
+      if (!validateFileType(file.name, fileType, acceptedFileTypes)) {
+        const acceptedTypesText = formatAcceptedTypes(acceptedFileTypes);
+        const errorMessage = t('file_upload.invalid_file_type', { types: acceptedTypesText });
+        setIsUploading(false);
+        setUploadProgress(0);
+        if (onUploadError) {
+          onUploadError(errorMessage);
         }
+        return;
       }
 
       setIsUploading(true);
@@ -320,19 +318,6 @@ export const FileUploadField: FC<FileUploadFieldProps> = ({
 
       if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
         const droppedFile = e.dataTransfer.files[0];
-        
-        // Validate file type before processing (drag-and-drop bypasses file input accept attribute)
-        if (acceptedFileTypes !== '*') {
-          const fileType = droppedFile.type;
-          if (!validateMimeType(fileType, acceptedFileTypes)) {
-            const acceptedTypesText = formatAcceptedTypes(acceptedFileTypes);
-            const errorMessage = t('file_upload.invalid_file_type', { types: acceptedTypesText });
-            if (onUploadError) {
-              onUploadError(errorMessage);
-            }
-            return;
-          }
-        }
 
         // Create a mock event object for parseFileUploadEvent
         const mockEvent = {
@@ -346,7 +331,7 @@ export const FileUploadField: FC<FileUploadFieldProps> = ({
         }
       }
     },
-    [processFileUpload, acceptedFileTypes, onUploadError, t]
+    [processFileUpload]
   );
 
   const handleDownloadClick = useCallback(async () => {

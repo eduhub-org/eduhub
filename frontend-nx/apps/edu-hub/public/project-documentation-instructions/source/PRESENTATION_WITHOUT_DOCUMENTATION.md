@@ -36,7 +36,7 @@ optional hochladen, wenn dein Kurs das sinnvoll findet.
   5. Ergebnis (Demo, Screenshots, Prototyp)
   6. Reflexion & Ausblick
 - **Qualität:** Lesbar ohne Live-Vortrag; klare Überschriften, wenig Text pro Folie
-- **Format:** PDF, PowerPoint (.ppt, .pptx), ODP — max. 25 MB
+- **Format:** PDF, PowerPoint (.ppt, .pptx), ODP — max. 22 MB
 - Upload unter **„Mein Projekt“ → Präsentation**
 
 ### Titelbild
@@ -49,7 +49,7 @@ optional hochladen, wenn dein Kurs das sinnvoll findet.
 
 Wenn du zusätzlich eine Doku hochlädst, nutze sie für Details, die in den
 Folien keinen Platz haben (Quellen, Code, längere Reflexion). Formate wie beim
-Minimal-Projekt: PDF, Word, ODT — max. 25 MB.
+Minimal-Projekt: PDF, Word, ODT — max. 22 MB.
 
 ### Checkliste vor Einreichung
 
@@ -93,7 +93,7 @@ optionally if useful for your course.
   5. Results (demo, screenshots, prototype)
   6. Reflection & outlook
 - **Quality:** understandable without a live talk; clear headings, little text per slide
-- **Format:** PDF, PowerPoint (.ppt, .pptx), ODP — max. 25 MB
+- **Format:** PDF, PowerPoint (.ppt, .pptx), ODP — max. 22 MB
 - Upload under **My project → Presentation**
 
 ### Cover image
@@ -106,7 +106,7 @@ optionally if useful for your course.
 
 If you upload documentation anyway, use it for detail that does not fit on
 slides (sources, code, longer reflection). Same formats as a classic project:
-PDF, Word, ODT — max. 25 MB.
+PDF, Word, ODT — max. 22 MB.
 
 ### Pre-submission checklist
 

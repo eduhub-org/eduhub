@@ -28,7 +28,7 @@ Diese Anleitung (PDF) ist in EduHub die zugewiesene **Dokumentationsanleitung**
 - Erzählt die **Story** des Projekts; verweist auf den Link für Details/Demo
 - Enthält mindestens eine Folie **„Demo / Link“** mit URL und 2–3 Sätzen, was
   Prüfende dort sehen
-- 8–20 Folien empfohlen; Formate: PDF, PPT/PPTX, ODP — max. 25 MB
+- 8–20 Folien empfohlen; Formate: PDF, PPT/PPTX, ODP — max. 22 MB
 
 ### Externer Link
 
@@ -82,7 +82,7 @@ it explains what you must submit, not a mandatory report from you.
 - Tells the **story** of the project; points to the link for depth/demo
 - Include at least one **“Demo / link”** slide with the URL and 2–3 sentences
   on what reviewers will find there
-- About 8–20 slides recommended; formats: PDF, PPT/PPTX, ODP — max. 25 MB
+- About 8–20 slides recommended; formats: PDF, PPT/PPTX, ODP — max. 22 MB
 
 ### External link
 
