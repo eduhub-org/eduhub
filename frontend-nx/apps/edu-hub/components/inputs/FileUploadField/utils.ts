@@ -205,86 +205,69 @@ export const formatMaxSize = (maxFileSize?: number): string => {
   return formatFileSize(maxFileSize);
 };
 
-/**
- * Normalizes acceptedFileTypes prop into an array of MIME type patterns.
- * Converts extensions (e.g., ".pdf") to MIME types (e.g., "application/pdf").
- * @param acceptedFileTypes - Accept attribute value (e.g., "image/*,.pdf" or "*")
- * @returns Array of MIME type patterns (e.g., ["image/*", "application/pdf"])
- */
-export const normalizeAcceptedTypesToMime = (acceptedFileTypes: string): string[] => {
-  if (acceptedFileTypes === '*' || !acceptedFileTypes) {
-    return []; // Empty array means accept all types
-  }
+const extensionToMime: Record<string, string> = {
+  '.pdf': 'application/pdf',
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
+  '.png': 'image/png',
+  '.gif': 'image/gif',
+  '.webp': 'image/webp',
+  '.svg': 'image/svg+xml',
+  '.doc': 'application/msword',
+  '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  '.xls': 'application/vnd.ms-excel',
+  '.xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  '.csv': 'text/csv',
+  '.ppt': 'application/vnd.ms-powerpoint',
+  '.pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+  '.odt': 'application/vnd.oasis.opendocument.text',
+  '.odp': 'application/vnd.oasis.opendocument.presentation',
+  '.zip': 'application/zip',
+};
 
-  const mimeTypes: string[] = [];
-  const parts = acceptedFileTypes.split(',').map((s) => s.trim());
+const getExtension = (fileName: string): string => {
+  const extensionIndex = fileName.lastIndexOf('.');
+  return extensionIndex > -1 ? fileName.slice(extensionIndex).toLowerCase() : '';
+};
 
-  // Extension to MIME type mapping
-  const extensionToMime: Record<string, string> = {
-    '.pdf': 'application/pdf',
-    '.jpg': 'image/jpeg',
-    '.jpeg': 'image/jpeg',
-    '.png': 'image/png',
-    '.gif': 'image/gif',
-    '.webp': 'image/webp',
-    '.svg': 'image/svg+xml',
-    '.doc': 'application/msword',
-    '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    '.xls': 'application/vnd.ms-excel',
-    '.xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    '.csv': 'text/csv',
-    '.ppt': 'application/vnd.ms-powerpoint',
-    '.pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-    '.odt': 'application/vnd.oasis.opendocument.text',
-    '.odp': 'application/vnd.oasis.opendocument.presentation',
-  };
+const matchesMimeType = (fileType: string, acceptedType: string): boolean => {
+  if (acceptedType === fileType) return true;
+  if (!acceptedType.endsWith('/*')) return false;
 
-  for (const part of parts) {
-    if (part.startsWith('.')) {
-      // Extension like .pdf - convert to MIME type
-      const mimeType = extensionToMime[part.toLowerCase()];
-      if (mimeType) {
-        mimeTypes.push(mimeType);
-      }
-    } else if (part.includes('/')) {
-      // Already a MIME type like image/png or image/*
-      mimeTypes.push(part);
-    }
-  }
-
-  return mimeTypes;
+  const acceptedCategory = acceptedType.split('/')[0];
+  const fileCategory = fileType.split('/')[0];
+  return acceptedCategory === fileCategory;
 };
 
 /**
- * Validates if a file's MIME type matches the accepted file types.
- * @param fileType - The file's MIME type (e.g., "image/jpeg")
- * @param acceptedFileTypes - Accept attribute value (e.g., "image/*,.pdf")
- * @returns true if the file type is accepted, false otherwise
+ * Validates a file against the same extension and MIME rules used by an input's
+ * `accept` attribute. Filename extensions are authoritative for extension-only
+ * allowlists; MIME rules use the browser value with a filename-derived fallback.
  */
-export const validateMimeType = (fileType: string, acceptedFileTypes: string): boolean => {
+export const validateFileType = (
+  fileName: string,
+  fileType: string | undefined,
+  acceptedFileTypes: string
+): boolean => {
   if (acceptedFileTypes === '*' || !acceptedFileTypes) {
-    return true; // Accept all types
-  }
-
-  const acceptedMimeTypes = normalizeAcceptedTypesToMime(acceptedFileTypes);
-  
-  // If no MIME types found after normalization, accept all
-  if (acceptedMimeTypes.length === 0) {
     return true;
   }
 
-  // Check if file type matches any accepted MIME type pattern
-  return acceptedMimeTypes.some((acceptedType) => {
-    if (acceptedType === fileType) {
-      return true; // Exact match
-    }
-    if (acceptedType.endsWith('/*')) {
-      // Wildcard match (e.g., "image/*" matches "image/jpeg")
-      const category = acceptedType.split('/')[0];
-      const fileCategory = fileType.split('/')[0];
-      return category === fileCategory;
-    }
-    return false;
-  });
-};
+  const acceptedTypes = acceptedFileTypes
+    .split(',')
+    .map((type) => type.trim().toLowerCase())
+    .filter(Boolean);
+  const extension = getExtension(fileName);
 
+  if (extension && acceptedTypes.includes(extension)) return true;
+
+  const acceptedMimeTypes = acceptedTypes.filter((type) => type.includes('/'));
+  if (acceptedMimeTypes.length === 0) return false;
+
+  const candidateMimeTypes = [fileType?.toLowerCase(), extensionToMime[extension]]
+    .filter((type): type is string => Boolean(type));
+
+  return acceptedMimeTypes.some((acceptedType) =>
+    candidateMimeTypes.some((candidateType) => matchesMimeType(candidateType, acceptedType))
+  );
+};
