@@ -2,6 +2,7 @@ import { Storage } from "@google-cloud/storage";
 import { buildCloudStorage } from "../lib/cloud-storage.js";
 import { replacePlaceholders } from "../lib/utils.js";
 import { logger } from "../index.js";
+import { validateFileUpload } from "./fileValidation.js";
 
 const BYTES_PER_MB = 1024 * 1024;
 const DEFAULT_MAX_FILE_SIZE_MB = 20;
@@ -15,6 +16,7 @@ const DEFAULT_MAX_FILE_SIZE_MB = 20;
  *   - headers.bucket (string): Storage bucket name
  *   - headers.is-public (boolean, optional): Whether file should be public
  *   - headers.max-file-size-mb (number, optional): Maximum file size in MB
+ *   - headers.allowed-file-extensions (string, optional): Comma-separated extension allowlist
  * @returns {Object} Response containing:
  *   - success (boolean): Whether the operation was successful
  *   - messageKey (string): Translation key for messages
@@ -47,9 +49,11 @@ const saveFile = async (req) => {
     const templatePath = req.headers['file-path'];
     const isPublic = req.headers['is-public'] ?? false;
     const maxFileSizeInMB = req.headers['max-file-size-mb'] ?? DEFAULT_MAX_FILE_SIZE_MB;
+    const allowedFileExtensions = req.headers['allowed-file-extensions'];
+    const fileBuffer = Buffer.from(content, 'base64');
 
     // Validate file size
-    const fileSizeInBytes = Buffer.byteLength(content, 'base64');
+    const fileSizeInBytes = fileBuffer.length;
     const fileSizeInMB = fileSizeInBytes / BYTES_PER_MB;
     if (fileSizeInMB > maxFileSizeInMB) {
       logger.error("File size exceeds maximum size", { 
@@ -60,6 +64,23 @@ const saveFile = async (req) => {
         success: false,
         messageKey: "FILE_TOO_LARGE",
         error: `File size exceeds maximum size of ${maxFileSizeInMB} MB`
+      };
+    }
+
+    // Actions that provide an allowlist require both an accepted filename
+    // extension and a matching file signature before anything reaches storage.
+    if (
+      allowedFileExtensions &&
+      !validateFileUpload(req.body.input.filename ?? '', fileBuffer, allowedFileExtensions)
+    ) {
+      logger.error("File extension or signature is not allowed", {
+        fileName: req.body.input.filename,
+        allowedFileExtensions,
+      });
+      return {
+        success: false,
+        messageKey: "INVALID_FORMAT",
+        error: "File extension or content does not match an allowed format"
       };
     }
 

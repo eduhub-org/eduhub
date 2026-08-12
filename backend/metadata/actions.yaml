@@ -428,6 +428,8 @@ actions:
           value: "true"
         - name: max-file-size-mb
           value: "22"
+        - name: allowed-file-extensions
+          value: .pdf,.doc,.docx,.odt,.zip
     permissions:
       - role: instructor_access
       - role: user_access
@@ -448,6 +450,8 @@ actions:
           value: "true"
         - name: max-file-size-mb
           value: "22"
+        - name: allowed-file-extensions
+          value: .pdf,.ppt,.pptx,.odp
     permissions:
       - role: instructor_access
       - role: user_access

@@ -800,7 +800,7 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
                 updateFieldName="text"
                 acceptedFileTypes={PROJECT_DOCUMENTATION_ACCEPT}
                 maxFileSize={PROJECT_UPLOAD_MAX_FILE_SIZE}
-                maxFileSizeDisplay="23 MB"
+                maxFileSizeDisplay={t('projects.my_project.upload_max_file_size')}
                 imageWidth={52}
                 imageHeight={52}
                 showFileName
@@ -829,7 +829,7 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
                 updateFieldName="text"
                 acceptedFileTypes={PROJECT_PRESENTATION_ACCEPT}
                 maxFileSize={PROJECT_UPLOAD_MAX_FILE_SIZE}
-                maxFileSizeDisplay="23 MB"
+                maxFileSizeDisplay={t('projects.my_project.upload_max_file_size')}
                 imageWidth={52}
                 imageHeight={52}
                 showFileName

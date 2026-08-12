@@ -146,7 +146,8 @@ export const FileUploadField: FC<FileUploadFieldProps> = ({
     },
   });
 
-  // Process file upload. The server currently validates size, but not file type.
+  // Validate in the browser for immediate feedback. Configured upload actions
+  // also enforce their size and file-type policies before writing to storage.
   const processFileUpload = useCallback(
     async (file: UploadFile, fileType?: string) => {
       if (!file) return;
@@ -156,9 +157,8 @@ export const FileUploadField: FC<FileUploadFieldProps> = ({
 
       // Validate file size
       if (file.size > effectiveMaxFileSize) {
-        const maxSizeMB = maxFileSizeDisplay?.replace(/\s*MB$/i, '') ??
-          (effectiveMaxFileSize / 1024 / 1024).toFixed(2);
-        const errorMessage = t('file_upload.file_too_large', { maxSize: maxSizeMB });
+        const maxSize = maxFileSizeDisplay ?? `${(effectiveMaxFileSize / 1024 / 1024).toFixed(2)} MB`;
+        const errorMessage = t('file_upload.file_too_large', { maxSize });
         setIsUploading(false);
         setUploadProgress(0);
         if (onUploadError) {

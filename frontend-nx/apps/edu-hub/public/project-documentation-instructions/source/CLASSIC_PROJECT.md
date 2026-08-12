@@ -41,6 +41,8 @@ externer Link und kein Titelbild erforderlich.
 
 - **Formate:** PDF, Microsoft Word (.doc, .docx), OpenDocument Text (.odt), ZIP (.zip)
 - **Max. Größe:** 23 MB pro Datei
+- Hochgeladene Projektdateien sind **öffentlich abrufbar**. Füge keine Passwörter,
+  Zugangsdaten oder personenbezogenen Daten hinzu.
 - Abgabe unter **„Mein Projekt“ → Dokumentation**, vor Ablauf der **Abgabefrist**
 
 ### Checkliste vor Abgabe
@@ -88,6 +90,8 @@ image is required.
 
 - **Formats:** PDF, Microsoft Word (.doc, .docx), OpenDocument Text (.odt), ZIP (.zip)
 - **Max. size:** 23 MB per file
+- Uploaded project files are **publicly downloadable**. Do not include passwords,
+  credentials, or personal data.
 - Submit under **My project → Documentation**, before the **submission deadline**
 
 ### Pre-submission checklist
