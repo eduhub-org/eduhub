@@ -60,9 +60,9 @@ import ProjectSubmissionDeadlineBelowTitle from './ProjectSubmissionDeadlineBelo
 import { ProjectRow } from './types';
 import { PROJECT_FALLBACK_TITLE, PROJECT_TAGLINE_MAX_LENGTH } from './projectDefaults';
 /** Extensions only — MIME variants are derived for validation; avoids raw MIME labels in the UI. */
-const PROJECT_DOCUMENTATION_ACCEPT = '.pdf,.doc,.docx,.odt';
+const PROJECT_DOCUMENTATION_ACCEPT = '.pdf,.doc,.docx,.odt,.zip';
 const PROJECT_PRESENTATION_ACCEPT = '.pdf,.ppt,.pptx,.odp';
-const PROJECT_UPLOAD_MAX_FILE_SIZE = 22 * 1024 * 1024;
+const PROJECT_UPLOAD_MAX_FILE_SIZE = 23_000_000;
 
 interface MyProjectPanelProps {
   project: ProjectRow;
@@ -800,6 +800,7 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
                 updateFieldName="text"
                 acceptedFileTypes={PROJECT_DOCUMENTATION_ACCEPT}
                 maxFileSize={PROJECT_UPLOAD_MAX_FILE_SIZE}
+                maxFileSizeDisplay="23 MB"
                 imageWidth={52}
                 imageHeight={52}
                 showFileName
@@ -828,6 +829,7 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
                 updateFieldName="text"
                 acceptedFileTypes={PROJECT_PRESENTATION_ACCEPT}
                 maxFileSize={PROJECT_UPLOAD_MAX_FILE_SIZE}
+                maxFileSizeDisplay="23 MB"
                 imageWidth={52}
                 imageHeight={52}
                 showFileName

@@ -66,5 +66,5 @@ Correct relative output: `../${f%.md}.pdf`
 
 Accepted upload formats in EduHub (for reference in the PDFs):
 
-- Documentation: PDF, Word (.doc, .docx), ODT — max. 22 MB
-- Presentation: PDF, PowerPoint (.ppt, .pptx), ODP — max. 22 MB
+- Documentation: PDF, Word (.doc, .docx), ODT, ZIP — max. 23 MB
+- Presentation: PDF, PowerPoint (.ppt, .pptx), ODP — max. 23 MB

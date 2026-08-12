@@ -32,4 +32,15 @@ describe('validateFileType', () => {
   it('accepts any file when no restriction is configured', () => {
     expect(validateFileType('payload.exe', 'application/octet-stream', '*')).toBe(true);
   });
+
+  it.each(['application/zip', 'application/x-zip-compressed', ''])(
+    'accepts ZIP by extension when the browser reports MIME type %p',
+    (fileType) => {
+      expect(validateFileType('submission.ZIP', fileType, `${documentTypes},.zip`)).toBe(true);
+    }
+  );
+
+  it('does not accept ZIP when only presentation formats are allowed', () => {
+    expect(validateFileType('submission.zip', 'application/zip', '.pdf,.ppt,.pptx,.odp')).toBe(false);
+  });
 });

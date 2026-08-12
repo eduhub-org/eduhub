@@ -135,9 +135,10 @@ field is highlighted as **incomplete** until a valid value is supplied. The
 A project carries four artefact slots, each on its own column:
 
 - **Documentation** (`documentationUrl`) — uploaded file. Accepted
-  formats: `.pdf`, `.doc`, `.docx`, `.odt`; maximum size: 22 MB.
+  formats: `.pdf`, `.doc`, `.docx`, `.odt`, `.zip`; maximum size:
+  23 MB.
 - **Presentation** (`presentationUrl`) — uploaded file. Accepted
-  formats: `.pdf`, `.ppt`, `.pptx`, `.odp`; maximum size: 22 MB.
+  formats: `.pdf`, `.ppt`, `.pptx`, `.odp`; maximum size: 23 MB.
 - **External link** (`externalUrl`) — free-text URL, typically a
   GitHub repository or hosted demo. Only `http(s)` schemes are
   rendered; other schemes are silently dropped.
@@ -455,8 +456,11 @@ project write-up — distinct from the instruction PDF.
 
 - Uploaded via the standard FileUploadField; backed by the
   `saveProjectDocumentation` action which writes a public GCS object.
-- Accepted formats: `.pdf`, `.doc`, `.docx`, `.odt`; maximum size:
-  22 MB.
+- Accepted formats: `.pdf`, `.doc`, `.docx`, `.odt`, `.zip`; maximum
+  size: 23 MB. ZIP is an archive option for courses that require it;
+  repositories should normally still use the external-link field.
+- Project documentation is publicly downloadable. Do not include
+  passwords, credentials, private datasets, or personal data.
 - For project types that require documentation, the submission
   checklist treats the field as **mandatory**. The submit button stays
   disabled until a file is present.

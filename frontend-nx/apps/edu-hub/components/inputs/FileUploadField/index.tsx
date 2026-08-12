@@ -30,6 +30,7 @@ export const FileUploadField: FC<FileUploadFieldProps> = ({
   acceptedFileTypes = '*',
   acceptedTypesDisplay,
   maxFileSize,
+  maxFileSizeDisplay,
   uploadText,
   altText = 'File preview',
   imageWidth = 160,
@@ -155,7 +156,8 @@ export const FileUploadField: FC<FileUploadFieldProps> = ({
 
       // Validate file size
       if (file.size > effectiveMaxFileSize) {
-        const maxSizeMB = (effectiveMaxFileSize / 1024 / 1024).toFixed(2);
+        const maxSizeMB = maxFileSizeDisplay?.replace(/\s*MB$/i, '') ??
+          (effectiveMaxFileSize / 1024 / 1024).toFixed(2);
         const errorMessage = t('file_upload.file_too_large', { maxSize: maxSizeMB });
         setIsUploading(false);
         setUploadProgress(0);
@@ -266,6 +268,7 @@ export const FileUploadField: FC<FileUploadFieldProps> = ({
       updateFieldName,
       useChangesObject,
       maxFileSize,
+      maxFileSizeDisplay,
       acceptedFileTypes,
       onUploadSuccess,
       onUploadError,
@@ -437,7 +440,10 @@ export const FileUploadField: FC<FileUploadFieldProps> = ({
     () => acceptedTypesDisplay ?? formatAcceptedTypes(acceptedFileTypes),
     [acceptedTypesDisplay, acceptedFileTypes]
   );
-  const maxSizeText = useMemo(() => formatMaxSize(maxFileSize), [maxFileSize]);
+  const maxSizeText = useMemo(
+    () => maxFileSizeDisplay ?? formatMaxSize(maxFileSize),
+    [maxFileSize, maxFileSizeDisplay]
+  );
 
   // Determine container classes based on state
   const containerClasses = useMemo(() => {

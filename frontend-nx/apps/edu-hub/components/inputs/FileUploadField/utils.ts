@@ -222,6 +222,7 @@ const extensionToMime: Record<string, string> = {
   '.pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
   '.odt': 'application/vnd.oasis.opendocument.text',
   '.odp': 'application/vnd.oasis.opendocument.presentation',
+  '.zip': 'application/zip',
 };
 
 const getExtension = (fileName: string): string => {
