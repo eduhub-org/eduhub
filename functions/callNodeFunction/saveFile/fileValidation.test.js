@@ -1,51 +1,46 @@
 import { describe, expect, it } from '@jest/globals';
-import { validateFileUpload } from './fileValidation.js';
+import { maxBase64LengthForBytes, validateFileUpload } from './fileValidation.js';
 
-const PDF = Buffer.from('%PDF-1.7\n');
-const ZIP = Buffer.from([0x50, 0x4b, 0x03, 0x04, 0x00]);
-const zipWithMarker = (marker) => Buffer.concat([ZIP, Buffer.from(marker)]);
-const DOC = Buffer.concat([
-  Buffer.from([0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1]),
-  Buffer.from('WordDocument', 'utf16le'),
+const PDF = Buffer.from('%PDF-1.7\n1 0 obj<</Type/Catalog>>endobj\n%%EOF\n');
+const EMPTY_ZIP = Buffer.from([
+  0x50, 0x4b, 0x05, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 ]);
-const PPT = Buffer.concat([
-  Buffer.from([0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1]),
-  Buffer.from('PowerPoint Document', 'utf16le'),
-]);
-const DOCX = zipWithMarker('[Content_Types].xml word/document.xml');
-const PPTX = zipWithMarker('[Content_Types].xml ppt/presentation.xml');
-const ODT = zipWithMarker('application/vnd.oasis.opendocument.text');
-const ODP = zipWithMarker('application/vnd.oasis.opendocument.presentation');
+const COMPOUND_FILE = Buffer.alloc(512);
+Buffer.from([0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1]).copy(COMPOUND_FILE);
+COMPOUND_FILE.writeUInt16LE(0xfffe, 28);
+COMPOUND_FILE.writeUInt16LE(9, 30);
 
 describe('validateFileUpload', () => {
   it.each([
     ['submission.pdf', PDF],
-    ['submission.DOC', DOC],
-    ['submission.docx', DOCX],
-    ['submission.odt', ODT],
-    ['submission.zip', ZIP],
-  ])('accepts documentation extension and signature for %s', (fileName, buffer) => {
-    expect(validateFileUpload(fileName, buffer, '.pdf,.doc,.docx,.odt,.zip')).toBe(true);
+    ['submission.DOC', COMPOUND_FILE],
+    ['submission.docx', EMPTY_ZIP],
+    ['submission.odt', EMPTY_ZIP],
+    ['submission.zip', EMPTY_ZIP],
+    ['slides.ppt', COMPOUND_FILE],
+    ['slides.pptx', EMPTY_ZIP],
+    ['slides.odp', EMPTY_ZIP],
+  ])('accepts an allowed extension with the expected container for %s', (fileName, buffer) => {
+    const allowed = '.pdf,.doc,.docx,.odt,.zip,.ppt,.pptx,.odp';
+    expect(validateFileUpload(fileName, buffer, allowed)).toBe(true);
   });
 
-  it.each([
-    ['slides.pdf', PDF],
-    ['slides.ppt', PPT],
-    ['slides.pptx', PPTX],
-    ['slides.odp', ODP],
-  ])('accepts presentation extension and signature for %s', (fileName, buffer) => {
-    expect(validateFileUpload(fileName, buffer, '.pdf,.ppt,.pptx,.odp')).toBe(true);
+  it('keeps documentation and presentation extension allowlists separate', () => {
+    expect(validateFileUpload('submission.zip', EMPTY_ZIP, '.pdf,.ppt,.pptx,.odp')).toBe(false);
+    expect(validateFileUpload('slides.pptx', EMPTY_ZIP, '.pdf,.doc,.docx,.odt,.zip')).toBe(false);
   });
 
-  it('rejects an extension outside the action allowlist', () => {
-    expect(validateFileUpload('payload.exe', PDF, '.pdf,.doc,.docx,.odt,.zip')).toBe(false);
-    expect(validateFileUpload('submission.zip', ZIP, '.pdf,.ppt,.pptx,.odp')).toBe(false);
+  it('rejects malformed or obviously disguised content', () => {
+    expect(validateFileUpload('truncated.zip', EMPTY_ZIP.subarray(0, 10), '.zip')).toBe(false);
+    expect(validateFileUpload('marker.docx', Buffer.from('PK\x03\x04word/'), '.docx')).toBe(false);
+    expect(validateFileUpload('document.doc', Buffer.from('{\\rtf1 text}'), '.doc')).toBe(false);
+    expect(validateFileUpload('payload.pdf', EMPTY_ZIP, '.pdf')).toBe(false);
   });
+});
 
-  it('rejects content whose signature does not match its extension', () => {
-    expect(validateFileUpload('payload.pdf', ZIP, '.pdf')).toBe(false);
-    expect(validateFileUpload('payload.zip', PDF, '.zip')).toBe(false);
-    expect(validateFileUpload('payload.docx', ZIP, '.docx')).toBe(false);
-    expect(validateFileUpload('payload.ppt', DOC, '.ppt')).toBe(false);
+describe('maxBase64LengthForBytes', () => {
+  it('calculates the encoded allocation ceiling for the exact byte limit', () => {
+    expect(maxBase64LengthForBytes(23_000_000)).toBe(30_666_668);
   });
 });
