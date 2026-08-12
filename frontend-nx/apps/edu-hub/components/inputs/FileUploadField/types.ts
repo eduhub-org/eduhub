@@ -79,6 +79,12 @@ export interface FileUploadFieldProps {
   maxFileSize?: number;
 
   /**
+   * Optional label for the maximum size when its advertised unit differs
+   * from the shared binary byte formatter (for example, decimal "23 MB").
+   */
+  maxFileSizeDisplay?: string;
+
+  /**
    * Upload instruction text shown when no file is uploaded.
    */
   uploadText?: string;
@@ -148,4 +154,3 @@ export interface FileUploadFieldProps {
    */
   infoTooltip?: string;
 }
-

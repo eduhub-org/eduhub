@@ -50,7 +50,7 @@ sollen das Projekt verstehen, auch wenn der Link später nicht erreichbar ist.
 
 ### Formate & Frist
 
-- Dokumentation: PDF, Word (.doc, .docx), ODT — max. 25 MB
+- Dokumentation: PDF, Word (.doc, .docx), ODT, ZIP — max. 23 MB
 - Abgabe aller Pflichtfelder vor **Abgabefrist**; danach ist das Team gesperrt
 
 ---
@@ -100,7 +100,7 @@ understand the project even if the link stops working later.
 
 ### Formats & deadline
 
-- Documentation: PDF, Word (.doc, .docx), ODT — max. 25 MB
+- Documentation: PDF, Word (.doc, .docx), ODT, ZIP — max. 23 MB
 - Submit all required items before the **submission deadline**; the team is
   locked afterward
 

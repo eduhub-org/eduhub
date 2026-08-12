@@ -426,8 +426,10 @@ actions:
           value: projects/project-${projectid}/public/documentation/${filename}
         - name: is-public
           value: "true"
-        - name: max-file-size-mb
-          value: "25"
+        - name: max-file-size-bytes
+          value: "23000000"
+        - name: allowed-file-extensions
+          value: .pdf,.doc,.docx,.odt,.zip
     permissions:
       - role: instructor_access
       - role: user_access
@@ -446,8 +448,10 @@ actions:
           value: projects/project-${projectid}/public/presentation/${filename}
         - name: is-public
           value: "true"
-        - name: max-file-size-mb
-          value: "25"
+        - name: max-file-size-bytes
+          value: "23000000"
+        - name: allowed-file-extensions
+          value: .pdf,.ppt,.pptx,.odp
     permissions:
       - role: instructor_access
       - role: user_access
