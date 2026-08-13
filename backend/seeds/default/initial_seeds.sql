@@ -3322,7 +3322,7 @@ INSERT INTO public."AchievementRecordAuthor" (id, "achievementRecordId", "userId
 -- Course.achievementCertificateTemplateId at this template.
 -- =============================================================================
 INSERT INTO public."CertificateTemplate" (id, name, html, created_at, updated_at) VALUES
-  (3, 'degree certificate example', E'<html><head> <meta http-equiv="Content-Type" content="text/html; charset=utf-8"> <title>Document Title</title> <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400&display=swap" rel="stylesheet"> <style type="text/css"> @page { size: a4 landscape; background-image: url("{{ template }}"); background-position: center center; background-size: cover; @frame content_frame { left: 85mm; width: 195mm; top: 60mm; height: 140mm; } } body, html { font-family: \'Lato\', sans-serif !important; margin: 0; padding: 0; width: 297mm; height: 210mm; } .big { font-size: 7mm; font-weight: bold; color: #777; } .small { font-size: 4.2mm; color: #777; } p { margin-top: 3mm; margin-bottom: 3mm; } </style> </head> <body> <span class="big">{{ full_name }}</span> <p class="small"> has met the degree''s minimum requirements of completing 12.5 ECTS and participating in at least one hackathon by successfully completing the following degree components: </p> <p class="small"> {% for participation in successful_participations %} // {{ participation }}<br> {% endfor %} </p> </body> </html>',
+  (3, 'degree certificate example', E'<html><head> <meta http-equiv="Content-Type" content="text/html; charset=utf-8"> <title>Document Title</title> <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400&display=swap" rel="stylesheet"> <style type="text/css"> @page { size: a4 landscape; background-image: url("{{ template }}"); background-position: center center; background-size: cover; @frame content_frame { left: 85mm; width: 195mm; top: 60mm; height: 140mm; } } body, html { font-family: \'Lato\', sans-serif !important; margin: 0; padding: 0; width: 297mm; height: 210mm; } .big { font-size: 7mm; font-weight: bold; color: #777; } .small { font-size: 4.2mm; color: #777; } p { margin-top: 3mm; margin-bottom: 3mm; } </style> </head> <body> <span class="big">{{ full_name }}</span> <p class="small"> has met the degree''s minimum requirements of completing {{ required_ects_display }} ECTS{% if required_event_count %} and participating in at least {{ required_event_count }} hackathon(s){% endif %} by successfully completing the following degree components: </p> <p class="small"> {% for participation in successful_participations %} // {{ participation }}<br> {% endfor %} </p> </body> </html>',
    '2024-01-01 00:00:00+00', '2024-01-01 00:00:00+00');
 
 -- Wire the degree template to every degree course (identified by program shortTitle).
@@ -3699,6 +3699,18 @@ INSERT INTO public."OrganizationAdmin" (id, "userId", "organizationId", "canMana
 -- this user administers, to confirm that instructor access is retained alongside the org_admin role.
 INSERT INTO public."CourseInstructor" (id, "courseId", "userId", created_at, updated_at) VALUES
   (9100, 4, 'dddddddd-dddd-dddd-dddd-dddddddddddd', now(), now());
+
+-- Degree completion thresholds for every seeded degree. The migration that added these columns
+-- backfills existing degrees, but on a fresh database the dev entrypoint applies migrations BEFORE
+-- the seeds, so the backfill finds no rows and the thresholds have to be set here as well.
+-- Without them the seeded degree template renders an empty requirement sentence and the
+-- requirement gate never refuses anything locally.
+UPDATE public."Course" c
+   SET "requiredEcts"       = 12.5,
+       "requiredEventCount" = 1
+  FROM public."Program" p
+ WHERE p.id = c."programId"
+   AND p."type" = 'DEGREES';
 
 -- Bump sequences past the explicit ids inserted above.
 SELECT pg_catalog.setval(pg_get_serial_sequence('public."Program"', 'id'), (SELECT max(id) FROM public."Program"), true);

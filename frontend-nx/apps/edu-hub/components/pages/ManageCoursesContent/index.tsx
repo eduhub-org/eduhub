@@ -92,6 +92,17 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType }) => {
     }
   }, [programType, tCoursePage]);
 
+  const addButtonText = useMemo(() => {
+    switch (programType) {
+      case ProgramType.EVENTS:
+        return t('add_event_button');
+      case ProgramType.DEGREES:
+        return t('add_degree_button');
+      default:
+        return t('add_course_button');
+    }
+  }, [programType, t]);
+
   // Calculate default program
   const sortedPrograms = useMemo(() => {
     return [...programs].sort((a, b) => {
@@ -820,7 +831,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType }) => {
           bulkActions={bulkActions}
           onBulkAction={handleBulkAction}
           onAddButtonClick={handleAddCourse}
-          addButtonText={t('add_course_button')}
+          addButtonText={addButtonText}
           expandableRowComponent={(props) => (
             <ExpandableCourseRow
               course={props.row}

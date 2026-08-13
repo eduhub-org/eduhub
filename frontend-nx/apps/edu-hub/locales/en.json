@@ -180,8 +180,12 @@
       "uploading": "Uploading...",
       "upload_success": "File uploaded successfully",
       "upload_error": "Failed to upload file",
-      "file_too_large": "File size exceeds {maxSize}MB limit",
+      "file_too_large": "File size exceeds the {maxSize} limit",
       "invalid_file_type": "Invalid file type. Accepted types: {types}",
+      "file_save_error": "Failed to save file",
+      "image_save_error": "Failed to save image",
+      "invalid_input": "Missing or invalid upload data",
+      "invalid_format": "Unsupported or invalid file format",
       "image_alt": "Uploaded file preview",
       "unknown_file_type": "Unknown file type",
       "drag_drop_text": "Drop file here",
@@ -219,6 +223,7 @@
       "invalid_maximum_integer": "The value must be at most {max}",
       "invalid_minimum_maximum_integer": "The value must be at least {min} and at most {max}",
       "invalid_integer_format": "The value must be an integer",
+      "invalid_decimal_format": "The value must be a number (decimals allowed, e.g. 12.5)",
       "invalid_input": "Invalid input",
       "transform_rejected": "This value could not be saved in the expected format.",
       "save_failed": "Saving failed."
@@ -489,7 +494,7 @@
         "field_tooltip_description": "Describe goals, scope, methods, and expected outcomes so instructors understand the project during review—even without insider context.",
         "field_tooltip_cover_image": "Image for this project card.\n\nImages only (e.g. JPEG, PNG, WebP). Maximum file size: 5 MB.",
         "field_tooltip_external_url": "Public link to a demo, repository, video, or any other resource relevant to the project.",
-        "documentation_accepted_types_display": "PDF, Word (.doc, .docx), OpenDocument text (.odt)",
+        "documentation_accepted_types_display": "PDF, Word (.doc, .docx), OpenDocument text (.odt), ZIP archive (.zip)",
         "presentation_accepted_types_display": "PDF, PowerPoint (.ppt, .pptx), OpenDocument presentation (.odp)",
         "field_tooltip_documentation_instruction": "If your course provides documentation instructions, pick the one your team should follow. Only options chosen by course staff appear here.",
         "field_tooltip_accepting_participants": "When enabled, other participants can request to join as implementing co-authors. Turn off once your team is complete if you do not want new requests.",
@@ -511,11 +516,12 @@
         "presentation_upload_section_label": "Presentation",
         "cover_image_section_label": "Cover image",
         "documentation_upload_prompt": "Documentation — click or drag",
-        "documentation_upload_tooltip": "Upload your written project documentation for this course (follow the documentation instructions if your instructor assigned any).\n\nFormats: PDF, Microsoft Word (.doc, .docx), or OpenDocument text (.odt, e.g. LibreOffice Writer).\nMaximum file size: 25 MB per file.",
+        "documentation_upload_tooltip": "Upload your written project documentation for this course (follow the documentation instructions if your instructor assigned any).\n\nFormats: PDF, Microsoft Word (.doc, .docx), OpenDocument text (.odt, e.g. LibreOffice Writer), or ZIP archive (.zip).\nMaximum file size: 23 MB per file.\nUploaded project files are publicly downloadable. Do not include passwords, credentials, or personal data.",
         "documentation_upload_alt": "Documentation file",
         "presentation_upload_prompt": "Presentation — click or drag",
-        "presentation_upload_tooltip": "Upload your presentation, for example slides for a milestone talk or the final presentation.\n\nFormats: PDF, Microsoft PowerPoint (.ppt, .pptx), or OpenDocument presentation (.odp, e.g. LibreOffice Impress).\nMaximum file size: 25 MB per file.",
+        "presentation_upload_tooltip": "Upload your presentation, for example slides for a milestone talk or the final presentation.\n\nFormats: PDF, Microsoft PowerPoint (.ppt, .pptx), or OpenDocument presentation (.odp, e.g. LibreOffice Impress).\nMaximum file size: 23 MB per file.\nUploaded project files are publicly downloadable. Do not include passwords, credentials, or personal data.",
         "presentation_upload_alt": "Presentation file",
+        "upload_max_file_size": "23 MB",
         "submit_button": "Submit for review",
         "leave_button": "Leave project",
         "leave_dialog_title": "Leave project",
@@ -1159,12 +1165,28 @@
       "label": "Maximum Missed Sessions",
       "help_text": "Maximum number of sessions a participant can miss"
     },
+    "degree_requirements": {
+      "label": "Degree requirements",
+      "help_text": "Minimum requirements a participant must meet before a degree certificate can be generated. Leave a field empty to skip that requirement.",
+      "required_ects": {
+        "label": "Required ECTS",
+        "placeholder": "e.g. 12.5",
+        "help_text": "Minimum number of ECTS the participant must have collected from passed courses of this degree. Decimals are allowed (e.g. 12.5). Leave empty to skip this check."
+      },
+      "required_event_count": {
+        "label": "Required events",
+        "placeholder": "e.g. 1",
+        "help_text": "Minimum number of this degree's events the participant must have taken part in. Leave empty to skip this check."
+      }
+    },
     "learning_goals": {
       "label": "Learning Goals",
       "help_text": "Define what participants will achieve after completing this course. Write each learning goal on a new line without numbering. Use action verbs like 'understand', 'apply', 'analyze', 'create' (see: https://www.bloomstaxonomy.org).",
       "placeholder": "Understand the fundamentals of the topic\nApply key concepts in practical scenarios\nAnalyze complex problems and solutions\nCreate innovative approaches"
     },
     "add_course_button": "Add Course",
+    "add_event_button": "Add Event",
+    "add_degree_button": "Add Degree",
     "delete_button": {
       "delete_course_confirmation": "Are you sure you want to delete the course '{title}'?",
       "untitled_course": "Untitled Course"
@@ -1733,7 +1755,27 @@
     "set_status_high": "increase status",
     "please_fill_all_fields": "Please fill out all fields to proceed!",
     "errors": {
-      "failed_to_load_location_addresses": "Failed to load location addresses."
+      "failed_to_load_location_addresses": "Failed to load location addresses.",
+      "certificates": {
+        "DEGREE_REQUIREMENTS_NOT_MET": "The degree requirements are not met yet, so no certificate was generated.",
+        "NO_USERS_SELECTED": "No participants were selected.",
+        "NO_ENROLLMENTS_FOUND": "No matching enrollments were found for the selected participants.",
+        "ACHIEVEMENT_RECORD_NOT_FOUND": "No completed project was found for at least one participant.",
+        "CERTIFICATE_TEMPLATE_TEXT_NOT_FOUND": "No certificate template text is configured for this course or program.",
+        "CERTIFICATE_TEMPLATE_NOT_FOUND": "The certificate template file could not be found.",
+        "MISSING_COURSE_DATA": "Course data required for the certificate is missing (for example the learning goals).",
+        "MISSING_ENROLLMENT_DATA": "Enrollment data required for the certificate is missing.",
+        "MISSING_REQUIRED_DATA": "Data required for the certificate is missing.",
+        "ACHIEVEMENT_TEMPLATE_URL_NOT_FOUND": "No achievement certificate template is configured for this program.",
+        "ATTENDANCE_TEMPLATE_URL_NOT_FOUND": "No attendance certificate template is configured for this program.",
+        "TEMPLATE_FETCH_ERROR": "The certificate template could not be loaded.",
+        "TEMPLATE_TEXT_FETCH_ERROR": "The certificate template text could not be loaded.",
+        "TEXT_CONTENT_PREPARATION_ERROR": "The certificate content could not be prepared.",
+        "PDF_CREATION_FAILED": "The certificate PDF could not be created.",
+        "INVALID_CERTIFICATE_TYPE": "Invalid certificate type.",
+        "CERTIFICATE_GENERATION_ERROR": "The certificates could not be generated.",
+        "UNEXPECTED_ERROR": "An unexpected error occurred while generating the certificates."
+      }
     },
     "project_settings": {
       "heading": "Project setup",

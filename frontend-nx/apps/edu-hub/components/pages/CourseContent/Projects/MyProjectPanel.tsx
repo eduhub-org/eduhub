@@ -60,8 +60,9 @@ import ProjectSubmissionDeadlineBelowTitle from './ProjectSubmissionDeadlineBelo
 import { ProjectRow } from './types';
 import { PROJECT_FALLBACK_TITLE, PROJECT_TAGLINE_MAX_LENGTH } from './projectDefaults';
 /** Extensions only — MIME variants are derived for validation; avoids raw MIME labels in the UI. */
-const PROJECT_DOCUMENTATION_ACCEPT = '.pdf,.doc,.docx,.odt';
+const PROJECT_DOCUMENTATION_ACCEPT = '.pdf,.doc,.docx,.odt,.zip';
 const PROJECT_PRESENTATION_ACCEPT = '.pdf,.ppt,.pptx,.odp';
+const PROJECT_UPLOAD_MAX_FILE_SIZE = 23_000_000;
 
 interface MyProjectPanelProps {
   project: ProjectRow;
@@ -100,6 +101,13 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
 
   const handleCoverUploadError = useCallback(
     (error: string) => {
+      // FileUploadField localizes client-side validation errors before calling
+      // this handler. Only server message keys still need translation here.
+      if (!/^[A-Z0-9_.]+$/.test(error)) {
+        onActionError(error);
+        return;
+      }
+
       const normalizedKey = error.toLowerCase().replaceAll('.', '_');
       const fileUploadKey = `file_upload.${normalizedKey}`;
       const direct = tCommon(fileUploadKey);
@@ -791,7 +799,8 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
                 uploadIdentifierVariables={{ projectId: project.id }}
                 updateFieldName="text"
                 acceptedFileTypes={PROJECT_DOCUMENTATION_ACCEPT}
-                maxFileSize={25 * 1024 * 1024}
+                maxFileSize={PROJECT_UPLOAD_MAX_FILE_SIZE}
+                maxFileSizeDisplay={t('projects.my_project.upload_max_file_size')}
                 imageWidth={52}
                 imageHeight={52}
                 showFileName
@@ -819,7 +828,8 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
                 uploadIdentifierVariables={{ projectId: project.id }}
                 updateFieldName="text"
                 acceptedFileTypes={PROJECT_PRESENTATION_ACCEPT}
-                maxFileSize={25 * 1024 * 1024}
+                maxFileSize={PROJECT_UPLOAD_MAX_FILE_SIZE}
+                maxFileSizeDisplay={t('projects.my_project.upload_max_file_size')}
                 imageWidth={52}
                 imageHeight={52}
                 showFileName
