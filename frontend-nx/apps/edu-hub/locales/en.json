@@ -1185,6 +1185,8 @@
       "placeholder": "Understand the fundamentals of the topic\nApply key concepts in practical scenarios\nAnalyze complex problems and solutions\nCreate innovative approaches"
     },
     "add_course_button": "Add Course",
+    "add_event_button": "Add Event",
+    "add_degree_button": "Add Degree",
     "delete_button": {
       "delete_course_confirmation": "Are you sure you want to delete the course '{title}'?",
       "untitled_course": "Untitled Course"

@@ -44,7 +44,7 @@
       "admin_users": "Admin-Benutzer",
       "experts": "Experten",
       "courses": "Kurse",
-      "events": "Veranstaltungen",
+      "events": "Events",
       "degrees": "Degrees",
       "programs": "Programme",
       "settings": "Einstellungen",
@@ -709,7 +709,7 @@
     "toCourseDescription": "zur Kursbeschreibung",
     "coursesPageTitle": "Courses: opencampus.sh Edu Hub",
     "coursesHeadline": "Kurse",
-    "eventsHeadline": "Veranstaltungen",
+    "eventsHeadline": "Events",
     "degreesHeadline": "Degrees",
     "courseSearchPlaceholder": "Search in title",
     "addCourseText": "Add Course",
@@ -1167,6 +1167,8 @@
       "placeholder": "Die Grundlagen des Themas verstehen\nSchlüsselkonzepte in praktischen Szenarien anwenden\nKomplexe Probleme und Lösungen analysieren\nInnovative Ansätze entwickeln"
     },
     "add_course_button": "Kurs hinzufügen",
+    "add_event_button": "Event hinzufügen",
+    "add_degree_button": "Degree hinzufügen",
     "delete_button": {
       "delete_course_confirmation": "Bist du sicher, dass du den Kurs '{title}' löschen möchtest?",
       "untitled_course": "Unbenannter Kurs"
