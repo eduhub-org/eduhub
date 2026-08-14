@@ -10,6 +10,7 @@ import {
   ProjectStatus_enum,
 } from '../../../__generated__/globalTypes';
 import { ADMIN_PROJECT_LIST, UPDATE_PROJECT_PUBLISHED } from '../../../queries/adminProjectList';
+import { UPDATE_PROJECT_DESCRIPTION, UPDATE_PROJECT_TAGLINE } from '../../../queries/project';
 import { PROGRAMS_WITH_MINIMUM_PROPERTIES } from '../../../queries/programList';
 import { COURSE_GROUP_OPTIONS } from '../../../queries/courseGroupOptions';
 import { AdminProjectList, AdminProjectList_Project } from '../../../queries/__generated__/AdminProjectList';
@@ -26,10 +27,13 @@ import { createMultiWordSearchCondition } from '../../common/TableGrid/utils';
 import NotificationSnackbar from '../../common/dialogs/NotificationSnackbar';
 import CommonPageHeader from '../../common/CommonPageHeader';
 import DropDownSelector from '../../inputs/DropDownSelector';
+import InputField from '../../inputs/InputField';
 import { Button } from '../../common/Button';
 
 import StatusChip from '../CourseContent/Projects/StatusChip';
 import ProjectPreviewLayout from '../CourseContent/Projects/ProjectPreviewLayout';
+import ProjectFormFieldSection from '../CourseContent/Projects/ProjectFormFieldSection';
+import { PROJECT_TAGLINE_MAX_LENGTH } from '../CourseContent/Projects/projectDefaults';
 import { getDisplayAuthors } from '../CourseContent/Projects/projectAuthors';
 import {
   getProjectStatusChipKey,
@@ -76,6 +80,7 @@ type ManageProjectsContentProps = {
 const ManageProjectsContent: FC<ManageProjectsContentProps> = ({ inSettingsLayout = false }) => {
   const t = useTranslations('manageProjects');
   const tCommon = useTranslations('common');
+  const tCourse = useTranslations('course');
 
   const [programFilter, setProgramFilter] = useState('');
   const [courseGroupFilter, setCourseGroupFilter] = useState('');
@@ -299,6 +304,8 @@ const ManageProjectsContent: FC<ManageProjectsContentProps> = ({ inSettingsLayou
   );
 
   const expandableRowComponent = useCallback(
+    // Tagline and description are editable here so admins can correct the
+    // showcase texts of any project without going through the course page.
     ({ row }: { row: AdminProjectList_Project }) => (
       <div className="p-4">
         <ProjectPreviewLayout
@@ -316,10 +323,54 @@ const ManageProjectsContent: FC<ManageProjectsContentProps> = ({ inSettingsLayou
               {row.published && <StatusChip displayKey="PUBLISHED" status={row.status} />}
             </div>
           }
+          taglineSlot={
+            <ProjectFormFieldSection
+              className="mt-3"
+              title={tCourse('projects.my_project.tagline_label')}
+              tooltip={tCourse('projects.my_project.field_tooltip_tagline')}
+            >
+              <div className="rounded border border-border-primary p-3 min-h-[3.5rem] text-sm bg-bg-secondary/50">
+                <InputField
+                  variant="eduhub"
+                  type="input"
+                  placeholder={tCourse('projects.my_project.tagline_placeholder')}
+                  itemId={row.id}
+                  value={row.tagline ?? ''}
+                  updateValueMutation={UPDATE_PROJECT_TAGLINE}
+                  refetchQueries={['AdminProjectList']}
+                  maxLength={PROJECT_TAGLINE_MAX_LENGTH}
+                  showCharacterCount={false}
+                  className="!mb-0 border-transparent bg-transparent [&>div]:!px-0"
+                />
+              </div>
+            </ProjectFormFieldSection>
+          }
+          descriptionSlot={
+            <ProjectFormFieldSection
+              className="flex flex-col flex-1 min-h-0"
+              title={tCourse('projects.my_project.description_label')}
+              tooltip={tCourse('projects.my_project.field_tooltip_description')}
+            >
+              <div className="rounded border border-border-primary p-3 flex-1 min-h-[10rem] text-sm bg-bg-secondary/50">
+                <InputField
+                  variant="eduhub"
+                  type="textarea"
+                  placeholder={tCourse('projects.my_project.description_placeholder')}
+                  itemId={row.id}
+                  value={row.description ?? ''}
+                  updateValueMutation={UPDATE_PROJECT_DESCRIPTION}
+                  refetchQueries={['AdminProjectList']}
+                  maxLength={8000}
+                  showCharacterCount={false}
+                  className="!mb-0 min-h-[9rem] border-transparent bg-transparent [&>div]:!px-0"
+                />
+              </div>
+            </ProjectFormFieldSection>
+          }
         />
       </div>
     ),
-    []
+    [tCourse]
   );
 
   return (
