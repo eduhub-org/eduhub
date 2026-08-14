@@ -8,7 +8,11 @@ name: Dependabot triage
 # and run manually (`/dependabot-triage`) without touching CI config.
 #
 # Required repository secrets:
-#   ANTHROPIC_API_KEY         - Anthropic API key.
+#   CLAUDE_CODE_OAUTH_TOKEN   - Generated locally with `claude setup-token`. Authenticates
+#                               against the Claude subscription (Pro/Max/Team/Enterprise) and
+#                               draws on its usage budget rather than API credits. Swap to
+#                               the `anthropic_api_key` input if you would rather bill this
+#                               to pay-as-you-go API credits and keep it off the plan budget.
 #   DEPENDABOT_TRIAGE_TOKEN   - Fine-grained PAT on eduhub-org/eduhub with
 #                               "Dependabot alerts: read" (the default GITHUB_TOKEN cannot
 #                               read the alerts API), plus Contents: read/write, Pull
@@ -65,7 +69,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.DEPENDABOT_TRIAGE_TOKEN }}
         with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           claude_args: >-
             --model claude-opus-5
             --allowed-tools Bash,Read,Write,Edit,Glob,Grep,WebFetch
