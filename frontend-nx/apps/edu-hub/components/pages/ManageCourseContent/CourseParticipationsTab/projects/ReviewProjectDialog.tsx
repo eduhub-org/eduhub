@@ -17,10 +17,6 @@ import {
   UPDATE_PROJECT_RATING_AND_COMMENT,
 } from '../../../../../queries/projectInstructor';
 import { ProjectRow } from '../../../CourseContent/Projects/types';
-import {
-  safeProjectExternalHref,
-  safeProjectResourceHref,
-} from '../../../CourseContent/Projects/projectMandatory';
 import { ProjectRating_enum } from '../../../../../__generated__/globalTypes';
 
 interface ReviewProjectDialogProps {
@@ -199,10 +195,6 @@ const ReviewProjectDialog: FC<ReviewProjectDialogProps> = ({
     }
   };
 
-  const docHref = safeProjectResourceHref(project?.documentationUrl);
-  const presHref = safeProjectResourceHref(project?.presentationUrl);
-  const extHref = safeProjectExternalHref(project?.externalUrl);
-
   return (
     <DialogShell
       open={open}
@@ -234,45 +226,7 @@ const ReviewProjectDialog: FC<ReviewProjectDialogProps> = ({
                 {project.tagline}
               </p>
             ) : null}
-            {project.description ? (
-              <p className="whitespace-pre-line">{project.description}</p>
-            ) : null}
           </div>
-
-          {docHref || presHref || extHref ? (
-            <div className="space-y-1 text-sm">
-              {docHref ? (
-                <a
-                  href={docHref}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block text-status-confirmed underline"
-                >
-                  {t('projects.review_dialog.documentation_link')}
-                </a>
-              ) : null}
-              {presHref ? (
-                <a
-                  href={presHref}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block text-status-confirmed underline"
-                >
-                  {t('projects.review_dialog.presentation_link')}
-                </a>
-              ) : null}
-              {extHref ? (
-                <a
-                  href={extHref}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block text-status-confirmed underline"
-                >
-                  {t('projects.review_dialog.external_link')}
-                </a>
-              ) : null}
-            </div>
-          ) : null}
 
           <div className="space-y-2">
             <span className="block text-sm font-medium text-label-primary">
