@@ -45,6 +45,7 @@ def send_project_deadline_reminders(arguments):
             ) {
                 id
                 title
+                submissionDeadline
                 ProjectAuthors(where: {participationStatus: {_eq: ACCEPTED}}) {
                     User { id email firstName lastName }
                 }
@@ -68,14 +69,28 @@ def send_project_deadline_reminders(arguments):
                 user = author.get("User") or {}
                 if not user.get("id") or not user.get("email"):
                     continue
-                candidates.append({"projectId": project["id"], "userId": user["id"], "project": project, "user": user})
+                candidates.append(
+                    {
+                        "projectId": project["id"],
+                        "userId": user["id"],
+                        "submissionDeadline": project.get("submissionDeadline"),
+                        "project": project,
+                        "user": user,
+                    }
+                )
 
-        key_fields = ["projectId", "userId"]
+        # The deadline is part of the key: extending it opens a new reminder
+        # window, which must not be suppressed by the previous window's mail.
+        key_fields = ["projectId", "userId", "submissionDeadline"]
         reminded_keys = already_sent_keys(client, MAIL_TYPE, candidates, key_fields)
 
         reminded = 0
         for candidate in candidates:
-            if (candidate["projectId"], candidate["userId"]) in reminded_keys:
+            if (
+                candidate["projectId"],
+                candidate["userId"],
+                candidate["submissionDeadline"],
+            ) in reminded_keys:
                 continue
             project = candidate["project"]
             user = candidate["user"]
@@ -93,6 +108,7 @@ def send_project_deadline_reminders(arguments):
                     "type": MAIL_TYPE,
                     "projectId": candidate["projectId"],
                     "userId": candidate["userId"],
+                    "submissionDeadline": candidate["submissionDeadline"],
                 },
             )
             if queued:

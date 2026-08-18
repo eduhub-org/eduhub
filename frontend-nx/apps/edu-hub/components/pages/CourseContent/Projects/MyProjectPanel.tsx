@@ -477,6 +477,7 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
                   project.externalUrl?.trim()
               )
             }
+            belowTitleRow={<ProjectReviewComment ratingComment={project.ratingComment} />}
             titleRow={
               <div className="flex flex-wrap items-center gap-2 mb-1">
                 <h4 className="text-xl font-semibold text-label-primary min-w-0 break-words">

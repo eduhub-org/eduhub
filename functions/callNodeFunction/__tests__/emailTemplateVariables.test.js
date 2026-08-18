@@ -59,6 +59,7 @@ describe('Email Template Variables System', () => {
       expect(allKeys).toContain('[Project:Title]');
       expect(allKeys).toContain('[Project:Link]');
       expect(allKeys).toContain('[Project:ApplicantName]');
+      expect(allKeys).toContain('[Project:ReviewComment]');
     });
   });
 

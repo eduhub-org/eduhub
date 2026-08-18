@@ -325,7 +325,7 @@ export function createVariableReplacer(data, formatDate) {
 
     // Session variables (for reminders) - always attempt replacement
     result = result
-      .replaceAll('[Session:Title]', data.session?.title || '')
+      .replaceAll('[Session:Title]', escape(data.session?.title || ''))
       .replaceAll('[Session:StartDateTime]', data.session?.startDateTime || '')
       .replaceAll('[Session:EndDateTime]', data.session?.endDateTime || '')
       .replaceAll('[Session:Duration]', data.session?.duration || '')

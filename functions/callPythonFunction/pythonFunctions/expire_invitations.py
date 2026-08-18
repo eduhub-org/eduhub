@@ -75,16 +75,26 @@ def expire_invitations(arguments):
         template = get_default_mail_template(client, MAIL_TYPE)
         reminded = 0
         if template:
+            # The expiry date is part of the key: re-inviting someone moves the
+            # date and must produce a fresh reminder rather than matching the
+            # MailLog row of the previous invitation window.
             candidates = [
-                {"enrollmentId": enrollment["id"], "enrollment": enrollment}
+                {
+                    "enrollmentId": enrollment["id"],
+                    "invitationExpirationDate": enrollment.get("invitationExpirationDate"),
+                    "enrollment": enrollment,
+                }
                 for enrollment in expiring_soon
                 if (enrollment.get("User") or {}).get("email")
             ]
-            key_fields = ["enrollmentId"]
+            key_fields = ["enrollmentId", "invitationExpirationDate"]
             reminded_keys = already_sent_keys(client, MAIL_TYPE, candidates, key_fields)
 
             for candidate in candidates:
-                if (candidate["enrollmentId"],) in reminded_keys:
+                if (
+                    candidate["enrollmentId"],
+                    candidate["invitationExpirationDate"],
+                ) in reminded_keys:
                     continue
                 enrollment = candidate["enrollment"]
                 user = enrollment.get("User") or {}
@@ -102,7 +112,11 @@ def expire_invitations(arguments):
                         ),
                         "[Enrollment:CourseLink]": f"{frontend_url}/course/{course.get('id', '')}",
                     },
-                    metadata={"type": MAIL_TYPE, "enrollmentId": candidate["enrollmentId"]},
+                    metadata={
+                        "type": MAIL_TYPE,
+                        "enrollmentId": candidate["enrollmentId"],
+                        "invitationExpirationDate": candidate["invitationExpirationDate"],
+                    },
                 )
                 if queued:
                     reminded += 1

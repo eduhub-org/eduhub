@@ -19,7 +19,11 @@ import { createVariableReplacer, createEnrollmentVariableReplacer } from '../ema
  */
 export default async function sendCourseUpdateEmail(req, logger) {
   logger.info('########## Send Course Update Email ##########');
-  logger.debug(`Request body: ${JSON.stringify(req.body)}`);
+  // Never log the raw body: Hasura event payloads carry full row data
+  // (names, e-mail addresses, enrollment details). Allowlist metadata only.
+  logger.debug(
+    `Event: id=${req.body?.id} table=${req.body?.table?.name} op=${req.body?.event?.op}`
+  );
 
   try {
     const { event, table } = req.body;

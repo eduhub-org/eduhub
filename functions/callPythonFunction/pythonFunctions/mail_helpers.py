@@ -32,8 +32,10 @@ def format_date(iso_string):
     try:
         # Handle trailing Z as well as explicit offsets
         return datetime.fromisoformat(iso_string.replace("Z", "+00:00")).strftime("%d.%m.%Y")
-    except ValueError:
-        return iso_string
+    except (AttributeError, TypeError, ValueError):
+        # A datetime or numeric timestamp has no .replace(str, str); returning a
+        # string keeps the caller's cron from aborting on its broad except.
+        return str(iso_string)
 
 
 def get_default_mail_template(client, template_type):
@@ -136,7 +138,10 @@ def queue_mail(client, template, to, variables, metadata=None):
     content = template["content"]
     for key, value in variables.items():
         raw = "" if value is None else str(value)
-        subject = subject.replace(key, raw)
+        # The subject is a single header line and course/project titles are
+        # admin-editable free text: collapse newlines so they cannot inject a
+        # header or break the subject across lines.
+        subject = subject.replace(key, " ".join(raw.split()))
         content = content.replace(key, escape_html(raw))
 
     mutation = """

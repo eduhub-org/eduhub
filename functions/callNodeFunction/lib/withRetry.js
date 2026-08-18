@@ -1,5 +1,5 @@
 const DEFAULT_ATTEMPTS = 3;
-const BASE_BACKOFF_MS = 500;
+const BASE_BACKOFF_MS = 1000;
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
