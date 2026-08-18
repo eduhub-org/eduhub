@@ -539,6 +539,7 @@
         "requests_button_idle": "Join requests",
         "action_tooltip_join_requests_none": "There are no open join requests at the moment.",
         "submitted_banner": "Submitted on {date} by {name}. The team has been locked from changes.",
+        "review_comment_label": "Feedback from the course team",
         "sent_back_banner": "Your project was sent back for revisions. Please update it and submit again.",
         "deadline_passed_banner": "The submission deadline passed on {date}.",
         "excluded_banner": "The submitting author excluded you from this project's final submission. You no longer count as one of its authors."

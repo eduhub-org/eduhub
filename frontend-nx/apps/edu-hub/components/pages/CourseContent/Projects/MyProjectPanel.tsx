@@ -55,6 +55,7 @@ import {
 import ManageRequestsDialog from './ManageRequestsDialog';
 import PublicationConsentField from './PublicationConsentField';
 import ProjectPreviewLayout from './ProjectPreviewLayout';
+import ProjectReviewComment from './ProjectReviewComment';
 import ProjectFormFieldSection from './ProjectFormFieldSection';
 import ProjectSubmissionDeadlineBelowTitle from './ProjectSubmissionDeadlineBelowTitle';
 import { ProjectRow } from './types';
@@ -646,6 +647,7 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
                   project.externalUrl?.trim()
               )
             }
+            belowTitleRow={<ProjectReviewComment ratingComment={project.ratingComment} />}
             titleRow={
             canEditProjectMetadata ? (
               <div className="flex flex-wrap items-start gap-2 mb-1 w-full">
