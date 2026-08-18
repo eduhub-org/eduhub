@@ -285,8 +285,12 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
     checklistComplete &&
     !isDeadlinePassed;
 
+  // sentBackAt is stamped by set_project_submitted_metadata on SUBMITTED ->
+  // ONGOING and cleared on resubmission. submittedAt cannot serve here: the
+  // same trigger nulls it on the way out of SUBMITTED, so the old
+  // `status === ONGOING && submittedAt` test could never be true.
   const wasSentBack =
-    project.status === ProjectStatus_enum.ONGOING && Boolean(project.submittedAt);
+    project.status === ProjectStatus_enum.ONGOING && Boolean(project.sentBackAt);
 
   const handleSubmitConfirm = useCallback(
     async (excludedAuthorIds: number[], consentGranted: boolean) => {

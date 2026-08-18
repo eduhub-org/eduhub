@@ -179,6 +179,7 @@ select_permissions:
         - status
         - submissionDeadline
         - submittedAt
+        - sentBackAt
         - submittedBy
         - suggestedForPublication
         - projectReviewRequestedAt
@@ -220,6 +221,7 @@ select_permissions:
         - status
         - submissionDeadline
         - submittedAt
+        - sentBackAt
         - submittedBy
         - suggestedForPublication
         - projectReviewRequestedAt

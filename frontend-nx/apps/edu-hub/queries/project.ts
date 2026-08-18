@@ -72,6 +72,7 @@ export const PROJECT_FRAGMENT_DETAILED = gql`
     parentProjectId
     submittedAt
     submittedBy
+    sentBackAt
     projectReviewRequestedAt
     submissionDeadline
     created_at

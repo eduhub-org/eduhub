@@ -2437,6 +2437,7 @@ export enum Project_select_column {
   published = "published",
   rating = "rating",
   ratingComment = "ratingComment",
+  sentBackAt = "sentBackAt",
   status = "status",
   submissionDeadline = "submissionDeadline",
   submittedAt = "submittedAt",
@@ -2489,6 +2490,7 @@ export enum Project_update_column {
   published = "published",
   rating = "rating",
   ratingComment = "ratingComment",
+  sentBackAt = "sentBackAt",
   status = "status",
   submissionDeadline = "submissionDeadline",
   submittedAt = "submittedAt",
@@ -11684,6 +11686,7 @@ export interface Project_bool_exp {
   published?: Boolean_comparison_exp | null;
   rating?: ProjectRating_enum_comparison_exp | null;
   ratingComment?: String_comparison_exp | null;
+  sentBackAt?: timestamptz_comparison_exp | null;
   status?: ProjectStatus_enum_comparison_exp | null;
   submissionDeadline?: timestamptz_comparison_exp | null;
   submittedAt?: timestamptz_comparison_exp | null;
@@ -11733,6 +11736,7 @@ export interface Project_insert_input {
   published?: boolean | null;
   rating?: ProjectRating_enum | null;
   ratingComment?: string | null;
+  sentBackAt?: any | null;
   status?: ProjectStatus_enum | null;
   submissionDeadline?: any | null;
   submittedAt?: any | null;
@@ -11764,6 +11768,7 @@ export interface Project_max_order_by {
   projectReviewRequestedAt?: order_by | null;
   proposedByUserId?: order_by | null;
   ratingComment?: order_by | null;
+  sentBackAt?: order_by | null;
   submissionDeadline?: order_by | null;
   submittedAt?: order_by | null;
   submittedBy?: order_by | null;
@@ -11793,6 +11798,7 @@ export interface Project_min_order_by {
   projectReviewRequestedAt?: order_by | null;
   proposedByUserId?: order_by | null;
   ratingComment?: order_by | null;
+  sentBackAt?: order_by | null;
   submissionDeadline?: order_by | null;
   submittedAt?: order_by | null;
   submittedBy?: order_by | null;
@@ -11857,6 +11863,7 @@ export interface Project_order_by {
   published?: order_by | null;
   rating?: order_by | null;
   ratingComment?: order_by | null;
+  sentBackAt?: order_by | null;
   status?: order_by | null;
   submissionDeadline?: order_by | null;
   submittedAt?: order_by | null;

@@ -201,6 +201,10 @@ export interface MyProjectByCourse_Project {
    */
   submittedBy: any | null;
   /**
+   * When the project was last sent back for revision (SUBMITTED -> ONGOING). Cleared on resubmission, so a non-null value means the project is currently awaiting a revision. Not backfillable: earlier send-backs left no trace once submittedAt was cleared.
+   */
+  sentBackAt: any | null;
+  /**
    * Timestamp when project authors asked course staff to review the proposed project (still PROPOSED until staff confirm the team).
    */
   projectReviewRequestedAt: any | null;
