@@ -539,6 +539,7 @@
         "requests_button_idle": "Join requests",
         "action_tooltip_join_requests_none": "There are no open join requests at the moment.",
         "submitted_banner": "Submitted on {date} by {name}. The team has been locked from changes.",
+        "review_comment_label": "Feedback from the course team",
         "sent_back_banner": "Your project was sent back for revisions. Please update it and submit again.",
         "deadline_passed_banner": "The submission deadline passed on {date}.",
         "excluded_banner": "The submitting author excluded you from this project's final submission. You no longer count as one of its authors."
@@ -1439,7 +1440,7 @@
         "reject_title": "Reject as not passed",
         "reject_description": "Marks the project as not passed.",
         "comment_label": "Comment (optional)",
-        "comment_placeholder": "Notes for the project team (visible where project details are shown)",
+        "comment_placeholder": "Notes for the project team (visible where project details are shown, and included in the notification email)",
         "confirm_button": "Confirm"
       },
       "add_dialog": {
@@ -2498,7 +2499,27 @@
       "APPLICATION_RECEIVED_PAID": "Application Received (Paid)",
       "USER_CREATED": "User Created",
       "ORGANIZER_ADDED": "Organizer Added",
-      "WAITLIST_NOTICE": "Waitlist Notice"
+      "WAITLIST_NOTICE": "Waitlist Notice",
+      "CERTIFICATE_ACHIEVEMENT_READY": "Achievement Certificate Ready",
+      "CERTIFICATE_ATTENDANCE_READY": "Attendance Certificate Ready",
+      "ENROLLMENT_CANCELLED": "Enrollment Cancelled",
+      "ENROLLMENT_ABORTED": "Enrollment Aborted",
+      "WAITLIST_PROMOTED": "Promoted from Waitlist",
+      "INVITATION_EXPIRING_SOON": "Invitation Expiring Soon",
+      "INVITATION_EXPIRED": "Invitation Expired",
+      "PROJECT_JOIN_REQUESTED": "Project Join Requested",
+      "PROJECT_JOIN_ACCEPTED": "Project Join Accepted",
+      "PROJECT_JOIN_DECLINED": "Project Join Declined",
+      "PROJECT_AUTHOR_EXCLUDED": "Removed from Project",
+      "PROJECT_TEAM_CONFIRMED": "Project Team Confirmed",
+      "PROJECT_SENT_BACK": "Project Sent Back",
+      "PROJECT_SUBMITTED": "Project Submitted",
+      "PROJECT_APPROVED": "Project Approved",
+      "PROJECT_REJECTED": "Project Not Passed",
+      "PROJECT_DEADLINE_REMINDER": "Project Deadline Reminder",
+      "SESSION_RESCHEDULED": "Session Rescheduled",
+      "PAYMENT_RECEIPT": "Payment Receipt",
+      "COURSE_CONTINUATION_INQUIRY": "Course Continuation Inquiry"
     },
     "placeholders": {
       "subject": "Enter email subject...",
@@ -2526,7 +2547,27 @@
       "SESSION_REMINDER": "Sent before sessions start (24h, 1h, 15min before)",
       "USER_CREATED": "Sent when a new user account is created",
       "ORGANIZER_ADDED": "Sent when a user is added as an organizer to a course or event",
-      "WAITLIST_NOTICE": "Sent when a user joins the waitlist because the course is full"
+      "WAITLIST_NOTICE": "Sent when a user joins the waitlist because the course is full",
+      "CERTIFICATE_ACHIEVEMENT_READY": "Sent when an achievement certificate is issued for a participant",
+      "CERTIFICATE_ATTENDANCE_READY": "Sent when an attendance certificate is issued for a participant",
+      "ENROLLMENT_CANCELLED": "Sent when an enrollment is cancelled",
+      "ENROLLMENT_ABORTED": "Sent when a participant leaves a course without completing it",
+      "WAITLIST_PROMOTED": "Sent when a waitlisted user gets a spot in the course",
+      "INVITATION_EXPIRING_SOON": "Sent 24 hours before a course invitation expires",
+      "INVITATION_EXPIRED": "Sent when a course invitation has expired unused",
+      "PROJECT_JOIN_REQUESTED": "Sent to the project team when someone requests to join their project",
+      "PROJECT_JOIN_ACCEPTED": "Sent when a request to join a project is accepted",
+      "PROJECT_JOIN_DECLINED": "Sent when a request to join a project is declined",
+      "PROJECT_AUTHOR_EXCLUDED": "Sent when an author is removed from a project's final submission",
+      "PROJECT_TEAM_CONFIRMED": "Sent to the project team when the team is confirmed and the project starts",
+      "PROJECT_SENT_BACK": "Sent when a submitted project is sent back for revision",
+      "PROJECT_SUBMITTED": "Sent when a project is submitted for review",
+      "PROJECT_APPROVED": "Sent when a project is approved as completed",
+      "PROJECT_REJECTED": "Sent when a project is rated as not passed",
+      "PROJECT_DEADLINE_REMINDER": "Sent 48 hours before a project's submission deadline",
+      "SESSION_RESCHEDULED": "Sent to participants when a session's date or time changes",
+      "PAYMENT_RECEIPT": "Sent when an invoice for a course or event enrollment is paid",
+      "COURSE_CONTINUATION_INQUIRY": "Sent when a participant exceeds the course's limit of missed sessions"
     },
     "delete_confirmation": "Are you sure you want to delete the email template '{title}'?",
     "unknown_trigger": "Unknown trigger type",
@@ -2539,9 +2580,7 @@
       "other": "Other"
     },
     "category_coming_soon": "Soon",
-    "categories_coming_soon_explanation": {
-      "projects": "Templates for project status updates will appear here once project notifications are available."
-    }
+    "categories_coming_soon_explanation": {}
   },
   "manageAchievementTemplates": {
     "error": {

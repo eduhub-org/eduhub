@@ -22,6 +22,112 @@ describe('Email System Integration', () => {
     });
   });
 
+  describe('sendProjectEmail routing (no GraphQL needed)', () => {
+    it('should skip DELETE operations', async () => {
+      const { default: sendProjectEmail } = await import('../sendProjectEmail/index.js');
+      const res = await sendProjectEmail(
+        { body: { table: { name: 'Project' }, event: { op: 'DELETE', data: { new: null, old: { id: 1 } } } } },
+        mockLogger
+      );
+      expect(res.success).toBe(true);
+      expect(res.messageKey).toBe('NO_ACTION_NEEDED');
+    });
+
+    it('should skip Project updates with unchanged status', async () => {
+      const { default: sendProjectEmail } = await import('../sendProjectEmail/index.js');
+      const res = await sendProjectEmail(
+        {
+          body: {
+            table: { name: 'Project' },
+            event: { op: 'UPDATE', data: { new: { id: 1, status: 'ONGOING' }, old: { id: 1, status: 'ONGOING' } } },
+          },
+        },
+        mockLogger
+      );
+      expect(res.success).toBe(true);
+      expect(res.messageKey).toBe('NO_ACTION_NEEDED');
+    });
+
+    it('should not email on ProjectAuthor insert that is not REQUESTED', async () => {
+      const { default: sendProjectEmail } = await import('../sendProjectEmail/index.js');
+      const res = await sendProjectEmail(
+        {
+          body: {
+            table: { name: 'ProjectAuthor' },
+            event: { op: 'INSERT', data: { new: { projectId: 1, userId: 'u1', participationStatus: 'ACCEPTED' }, old: null } },
+          },
+        },
+        mockLogger
+      );
+      expect(res.success).toBe(true);
+      // ACCEPTED on INSERT is a self-proposed author, not a join request -> no email
+      expect(res.messageKey).toBe('NO_ACTION_NEEDED');
+    });
+  });
+
+  describe('sendCourseUpdateEmail routing (no GraphQL needed)', () => {
+    it('should skip non-UPDATE operations', async () => {
+      const { default: sendCourseUpdateEmail } = await import('../sendCourseUpdateEmail/index.js');
+      const res = await sendCourseUpdateEmail(
+        { body: { table: { name: 'Session' }, event: { op: 'INSERT', data: { new: { Id: 1 }, old: null } } } },
+        mockLogger
+      );
+      expect(res.success).toBe(true);
+      expect(res.messageKey).toBe('NO_ACTION_NEEDED');
+    });
+
+    it('should skip Session updates that do not change timing', async () => {
+      const { default: sendCourseUpdateEmail } = await import('../sendCourseUpdateEmail/index.js');
+      const res = await sendCourseUpdateEmail(
+        {
+          body: {
+            table: { name: 'Session' },
+            event: {
+              op: 'UPDATE',
+              data: {
+                new: { courseId: 1, startDateTime: '2024-01-01T10:00:00Z', endDateTime: '2024-01-01T12:00:00Z' },
+                old: { courseId: 1, startDateTime: '2024-01-01T10:00:00Z', endDateTime: '2024-01-01T12:00:00Z' },
+              },
+            },
+          },
+        },
+        mockLogger
+      );
+      expect(res.success).toBe(true);
+      expect(res.messageKey).toBe('NO_ACTION_NEEDED');
+    });
+
+    it('should skip Invoice updates that are not a fresh transition to PAID', async () => {
+      const { default: sendCourseUpdateEmail } = await import('../sendCourseUpdateEmail/index.js');
+      const res = await sendCourseUpdateEmail(
+        {
+          body: {
+            table: { name: 'Invoice' },
+            event: { op: 'UPDATE', data: { new: { status: 'ISSUED', courseEnrollmentId: 5 }, old: { status: 'DRAFT' } } },
+          },
+        },
+        mockLogger
+      );
+      expect(res.success).toBe(true);
+      expect(res.messageKey).toBe('NO_ACTION_NEEDED');
+    });
+
+    it('should skip PAID invoices with no linked course enrollment', async () => {
+      const { default: sendCourseUpdateEmail } = await import('../sendCourseUpdateEmail/index.js');
+      const res = await sendCourseUpdateEmail(
+        {
+          body: {
+            table: { name: 'Invoice' },
+            event: { op: 'UPDATE', data: { new: { status: 'PAID', courseEnrollmentId: null }, old: { status: 'ISSUED' } } },
+          },
+        },
+        mockLogger
+      );
+      expect(res.success).toBe(true);
+      expect(res.messageKey).toBe('NO_ACTION_NEEDED');
+    });
+  });
+
   describe('Function behavior without GraphQL', () => {
     it('should handle enrollment email edge cases', async () => {
       const { default: sendEnrollmentEmail } = await import('../sendEnrollmentEmail/index.js');

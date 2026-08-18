@@ -83,6 +83,11 @@ export const EMAIL_VARIABLES = {
       example: 'https://edu.opencampus.sh/course/123',
       categories: ['enrollment', 'session']
     },
+    '[Enrollment:CertificateLink]': {
+      description: 'Link to the issued certificate (achievement or attendance) or the course page as fallback',
+      example: 'https://edu.opencampus.sh/course/123',
+      categories: ['enrollment']
+    },
     '[Enrollment:Addons]': {
       description: 'HTML list of booked add-ons with prices (empty if no add-ons)',
       example: '<strong>Add-ons:</strong>\n– Networking Dinner: 15,00 € inkl. MwSt.\n– Workshop-Materialien: 10,00 € inkl. MwSt.',
@@ -107,6 +112,11 @@ export const EMAIL_VARIABLES = {
       example: '15.1.2024, 14:00:00',
       categories: ['session']
     },
+    '[Session:EndDateTime]': {
+      description: 'Session end date and time (localized); time only when it ends on the start day',
+      example: '16:00',
+      categories: ['session']
+    },
     '[Session:Duration]': {
       description: 'Session duration (calculated)',
       example: '2 hours',
@@ -121,6 +131,30 @@ export const EMAIL_VARIABLES = {
       description: 'Dynamic time text based on timing',
       example: 'tomorrow',
       categories: ['session']
+    }
+  },
+
+  // Project-related variables
+  PROJECT: {
+    '[Project:Title]': {
+      description: 'Project title',
+      example: 'Solar-powered water purifier',
+      categories: ['project']
+    },
+    '[Project:Link]': {
+      description: 'Link to the project page',
+      example: 'https://edu.opencampus.sh/project/123',
+      categories: ['project']
+    },
+    '[Project:ReviewComment]': {
+      description: 'The comment the instructor left when reviewing the project, as a labelled paragraph; empty when no comment was left',
+      example: '<p><strong>Kommentar der Kursleitung / Instructor comment:</strong><br>Bitte die Quellen ergänzen.</p>',
+      categories: ['project']
+    },
+    '[Project:ApplicantName]': {
+      description: 'Name of the user who requested to join the project (join-request emails only)',
+      example: 'Jane Doe',
+      categories: ['project']
     }
   },
 
@@ -194,25 +228,32 @@ export function validateTemplate(template) {
  * Creates a variable replacement function with standardized date formatting
  * @param {Object} data - Data object containing the values for replacement
  * @param {Function} formatDate - Date formatting function
- * @returns {Function} Function that performs variable replacement
+ * @returns {Function} Function that performs variable replacement. Accepts an
+ *   options object as second argument: pass `{ html: false }` for plain-text
+ *   targets such as the mail subject, where HTML entities would show up
+ *   literally instead of being rendered.
  */
 export function createVariableReplacer(data, formatDate) {
-  return function replaceVariables(text) {
+  return function replaceVariables(text, options = {}) {
     if (!text) return text;
+    
+    // Subjects are plain text: escaping there would render "&amp;" literally.
+    const isHtml = options.html !== false;
+    const escape = isHtml ? escapeHtml : (value) => (value == null ? '' : String(value));
     
     let result = text;
     
     // User variables - always attempt replacement
     // Escape user-supplied personal data to prevent XSS
-    const firstName = escapeHtml(data.user?.firstName || '');
-    const lastName = escapeHtml(data.user?.lastName || '');
+    const firstName = escape(data.user?.firstName || '');
+    const lastName = escape(data.user?.lastName || '');
     result = result
       .replaceAll('[User:FirstName]', firstName)
       .replaceAll('[User:LastName]', lastName);
     
     // Course variables - always attempt replacement  
     result = result
-      .replaceAll('[Enrollment:CourseId--Course:Name]', data.course?.title || '')
+      .replaceAll('[Enrollment:CourseId--Course:Name]', escape(data.course?.title || ''))
       .replaceAll('[Course:StartTime]', data.course?.startTime ? formatDate(data.course.startTime) : 'TBD')
       .replaceAll('[Course:EndTime]', data.course?.endTime ? formatDate(data.course.endTime) : 'TBD');
     
@@ -228,8 +269,11 @@ export function createVariableReplacer(data, formatDate) {
         data.enrollment?.invitationExpirationDate ? 
           formatDate(data.enrollment.invitationExpirationDate) : 'TBD'
       )
-      .replaceAll('[Enrollment:CourseLink]', 
+      .replaceAll('[Enrollment:CourseLink]',
         data.courseLink || `${process.env.FRONTEND_URL || 'https://edu.opencampus.sh'}/course/${data.course?.id || ''}`
+      )
+      .replaceAll('[Enrollment:CertificateLink]',
+        data.certificateLink || data.courseLink || `${process.env.FRONTEND_URL || 'https://edu.opencampus.sh'}/course/${data.course?.id || ''}`
       );
     
     // Build addons HTML list (escape user-controlled strings to prevent XSS)
@@ -237,14 +281,14 @@ export function createVariableReplacer(data, formatDate) {
     if (data.enrollmentAddons && Array.isArray(data.enrollmentAddons) && data.enrollmentAddons.length > 0) {
       const currencySymbolMap = { EUR: '€', USD: '$', GBP: '£', CHF: 'CHF' };
       const addonLines = data.enrollmentAddons.map(addon => {
-        const description = escapeHtml(addon.CourseAddonMapping?.description || addon.name || 'Zusatzleistung / Add-on');
+        const description = escape(addon.CourseAddonMapping?.description || addon.name || 'Zusatzleistung / Add-on');
         const price = addon.priceAtPurchase ?? 0;
         const currencyCode = addon.currency || 'EUR';
         const currencySymbol = currencySymbolMap[currencyCode] || currencyCode;
         const formattedPrice = (price / 100).toFixed(2).replace('.', ',');
         return `– ${description}: ${formattedPrice} ${currencySymbol} inkl. MwSt.`;
       });
-      addonsHtml = '<strong>Add-ons:</strong>\n' + addonLines.join('\n');
+      addonsHtml = (isHtml ? '<strong>Add-ons:</strong>\n' : 'Add-ons:\n') + addonLines.join('\n');
     }
     result = result.replaceAll('[Enrollment:Addons]', addonsHtml);
     
@@ -257,10 +301,33 @@ export function createVariableReplacer(data, formatDate) {
     const formattedTotalCost = (totalCost / 100).toFixed(2).replace('.', ',');
     result = result.replaceAll('[Enrollment:TotalCost]', formattedTotalCost);
     
+    // Review feedback: a labelled block when the instructor left a comment,
+    // nothing at all otherwise, so templates never show an empty heading.
+    // The label carries both languages because a template body holds both.
+    const reviewComment = (data.project?.ratingComment || '').trim();
+    let reviewCommentBlock = '';
+    if (reviewComment) {
+      reviewCommentBlock = isHtml
+        ? `<p><strong>Kommentar der Kursleitung / Instructor comment:</strong><br>${escapeHtml(reviewComment).replaceAll('\n', '<br>')}</p>`
+        : reviewComment.replace(/\s+/g, ' ');
+    }
+
+    // Project variables - always attempt replacement (escape user-controlled strings)
+    // ReviewComment is substituted last: it carries instructor-authored text,
+    // which must not be rescanned for the placeholders replaced above.
+    result = result
+      .replaceAll('[Project:Title]', escape(data.project?.title || ''))
+      .replaceAll('[Project:Link]',
+        data.projectLink || `${process.env.FRONTEND_URL || 'https://edu.opencampus.sh'}/project/${data.project?.id || ''}`
+      )
+      .replaceAll('[Project:ApplicantName]', escape(data.applicantName || ''))
+      .replaceAll('[Project:ReviewComment]', reviewCommentBlock);
+
     // Session variables (for reminders) - always attempt replacement
     result = result
-      .replaceAll('[Session:Title]', data.session?.title || '')
+      .replaceAll('[Session:Title]', escape(data.session?.title || ''))
       .replaceAll('[Session:StartDateTime]', data.session?.startDateTime || '')
+      .replaceAll('[Session:EndDateTime]', data.session?.endDateTime || '')
       .replaceAll('[Session:Duration]', data.session?.duration || '')
       .replaceAll('[Session:ReminderText]', data.session?.reminderText || '')
       .replaceAll('[Session:ReminderTime]', data.session?.reminderTime || '');
@@ -281,7 +348,8 @@ export function createEnrollmentVariableReplacer(enrollmentDetails, formatDate) 
     course: enrollmentDetails.Course,
     enrollment: enrollmentDetails,
     enrollmentAddons: enrollmentDetails.CourseEnrollmentAddons || [],
-    courseLink: `${process.env.FRONTEND_URL || 'https://edu.opencampus.sh'}/course/${enrollmentDetails.Course.id}`
+    courseLink: `${process.env.FRONTEND_URL || 'https://edu.opencampus.sh'}/course/${enrollmentDetails.Course.id}`,
+    certificateLink: enrollmentDetails.certificateLink || null
   }, formatDate);
 }
 
@@ -308,7 +376,23 @@ export function createSessionVariableReplacer(session, enrollment, sessionData =
 }
 
 /**
- * Generate documentation for available variables  
+ * Convenience function for project lifecycle emails
+ * @param {Object} project - Project data ({ id, title })
+ * @param {Object} recipientUser - Recipient user ({ firstName, lastName, email })
+ * @param {Object} [extra] - Optional extra values ({ applicantName })
+ * @returns {Function} Variable replacement function
+ */
+export function createProjectVariableReplacer(project, recipientUser, extra = {}) {
+  return createVariableReplacer({
+    user: recipientUser,
+    project,
+    projectLink: `${process.env.FRONTEND_URL || 'https://edu.opencampus.sh'}/project/${project?.id || ''}`,
+    applicantName: extra.applicantName || ''
+  });
+}
+
+/**
+ * Generate documentation for available variables
  * @param {string} category - Optional category filter
  * @returns {string} Markdown documentation
  */

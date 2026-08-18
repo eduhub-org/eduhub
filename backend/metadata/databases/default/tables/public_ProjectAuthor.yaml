@@ -244,3 +244,22 @@ delete_permissions:
                     User:
                       id:
                         _eq: X-Hasura-User-Id
+event_triggers:
+  - name: send_project_author_email
+    definition:
+      enable_manual: true
+      insert:
+        columns: '*'
+      update:
+        columns:
+          - participationStatus
+    retry_conf:
+      interval_sec: 3660
+      num_retries: 10
+      timeout_sec: 600
+    webhook: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+    headers:
+      - name: name
+        value: sendProjectEmail
+      - name: secret
+        value_from_env: HASURA_CLOUD_FUNCTION_SECRET

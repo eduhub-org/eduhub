@@ -55,6 +55,7 @@ import {
 import ManageRequestsDialog from './ManageRequestsDialog';
 import PublicationConsentField from './PublicationConsentField';
 import ProjectPreviewLayout from './ProjectPreviewLayout';
+import ProjectReviewComment from './ProjectReviewComment';
 import ProjectFormFieldSection from './ProjectFormFieldSection';
 import ProjectSubmissionDeadlineBelowTitle from './ProjectSubmissionDeadlineBelowTitle';
 import { ProjectRow } from './types';
@@ -284,8 +285,12 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
     checklistComplete &&
     !isDeadlinePassed;
 
+  // sentBackAt is stamped by set_project_submitted_metadata on SUBMITTED ->
+  // ONGOING and cleared on resubmission. submittedAt cannot serve here: the
+  // same trigger nulls it on the way out of SUBMITTED, so the old
+  // `status === ONGOING && submittedAt` test could never be true.
   const wasSentBack =
-    project.status === ProjectStatus_enum.ONGOING && Boolean(project.submittedAt);
+    project.status === ProjectStatus_enum.ONGOING && Boolean(project.sentBackAt);
 
   const handleSubmitConfirm = useCallback(
     async (excludedAuthorIds: number[], consentGranted: boolean) => {
@@ -472,6 +477,7 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
                   project.externalUrl?.trim()
               )
             }
+            belowTitleRow={<ProjectReviewComment ratingComment={project.ratingComment} />}
             titleRow={
               <div className="flex flex-wrap items-center gap-2 mb-1">
                 <h4 className="text-xl font-semibold text-label-primary min-w-0 break-words">
@@ -646,6 +652,7 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
                   project.externalUrl?.trim()
               )
             }
+            belowTitleRow={<ProjectReviewComment ratingComment={project.ratingComment} />}
             titleRow={
             canEditProjectMetadata ? (
               <div className="flex flex-wrap items-start gap-2 mb-1 w-full">

@@ -1507,7 +1507,14 @@ export enum MailTemplateType_enum {
   APPLICATION_CONFIRMED = "APPLICATION_CONFIRMED",
   APPLICATION_RECEIVED = "APPLICATION_RECEIVED",
   APPLICATION_RECEIVED_PAID = "APPLICATION_RECEIVED_PAID",
+  CERTIFICATE_ACHIEVEMENT_READY = "CERTIFICATE_ACHIEVEMENT_READY",
+  CERTIFICATE_ATTENDANCE_READY = "CERTIFICATE_ATTENDANCE_READY",
+  COURSE_CONTINUATION_INQUIRY = "COURSE_CONTINUATION_INQUIRY",
   DECLINE = "DECLINE",
+  ENROLLMENT_ABORTED = "ENROLLMENT_ABORTED",
+  ENROLLMENT_CANCELLED = "ENROLLMENT_CANCELLED",
+  INVITATION_EXPIRED = "INVITATION_EXPIRED",
+  INVITATION_EXPIRING_SOON = "INVITATION_EXPIRING_SOON",
   INVITE = "INVITE",
   JOB_ALERT = "JOB_ALERT",
   JOB_POSTING_ADMIN_NOTICE = "JOB_POSTING_ADMIN_NOTICE",
@@ -1515,11 +1522,24 @@ export enum MailTemplateType_enum {
   JOB_POSTING_PAYMENT_FAILED = "JOB_POSTING_PAYMENT_FAILED",
   JOB_POSTING_PUBLISHED = "JOB_POSTING_PUBLISHED",
   ORGANIZER_ADDED = "ORGANIZER_ADDED",
+  PAYMENT_RECEIPT = "PAYMENT_RECEIPT",
+  PROJECT_APPROVED = "PROJECT_APPROVED",
+  PROJECT_AUTHOR_EXCLUDED = "PROJECT_AUTHOR_EXCLUDED",
+  PROJECT_DEADLINE_REMINDER = "PROJECT_DEADLINE_REMINDER",
+  PROJECT_JOIN_ACCEPTED = "PROJECT_JOIN_ACCEPTED",
+  PROJECT_JOIN_DECLINED = "PROJECT_JOIN_DECLINED",
+  PROJECT_JOIN_REQUESTED = "PROJECT_JOIN_REQUESTED",
+  PROJECT_REJECTED = "PROJECT_REJECTED",
+  PROJECT_SENT_BACK = "PROJECT_SENT_BACK",
+  PROJECT_SUBMITTED = "PROJECT_SUBMITTED",
+  PROJECT_TEAM_CONFIRMED = "PROJECT_TEAM_CONFIRMED",
   REGISTRATION_CONFIRMED = "REGISTRATION_CONFIRMED",
   REGISTRATION_CONFIRMED_PAID = "REGISTRATION_CONFIRMED_PAID",
   SESSION_REMINDER = "SESSION_REMINDER",
+  SESSION_RESCHEDULED = "SESSION_RESCHEDULED",
   USER_CREATED = "USER_CREATED",
   WAITLIST_NOTICE = "WAITLIST_NOTICE",
+  WAITLIST_PROMOTED = "WAITLIST_PROMOTED",
 }
 
 /**
@@ -2417,6 +2437,7 @@ export enum Project_select_column {
   published = "published",
   rating = "rating",
   ratingComment = "ratingComment",
+  sentBackAt = "sentBackAt",
   status = "status",
   submissionDeadline = "submissionDeadline",
   submittedAt = "submittedAt",
@@ -2469,6 +2490,7 @@ export enum Project_update_column {
   published = "published",
   rating = "rating",
   ratingComment = "ratingComment",
+  sentBackAt = "sentBackAt",
   status = "status",
   submissionDeadline = "submissionDeadline",
   submittedAt = "submittedAt",
@@ -11664,6 +11686,7 @@ export interface Project_bool_exp {
   published?: Boolean_comparison_exp | null;
   rating?: ProjectRating_enum_comparison_exp | null;
   ratingComment?: String_comparison_exp | null;
+  sentBackAt?: timestamptz_comparison_exp | null;
   status?: ProjectStatus_enum_comparison_exp | null;
   submissionDeadline?: timestamptz_comparison_exp | null;
   submittedAt?: timestamptz_comparison_exp | null;
@@ -11713,6 +11736,7 @@ export interface Project_insert_input {
   published?: boolean | null;
   rating?: ProjectRating_enum | null;
   ratingComment?: string | null;
+  sentBackAt?: any | null;
   status?: ProjectStatus_enum | null;
   submissionDeadline?: any | null;
   submittedAt?: any | null;
@@ -11744,6 +11768,7 @@ export interface Project_max_order_by {
   projectReviewRequestedAt?: order_by | null;
   proposedByUserId?: order_by | null;
   ratingComment?: order_by | null;
+  sentBackAt?: order_by | null;
   submissionDeadline?: order_by | null;
   submittedAt?: order_by | null;
   submittedBy?: order_by | null;
@@ -11773,6 +11798,7 @@ export interface Project_min_order_by {
   projectReviewRequestedAt?: order_by | null;
   proposedByUserId?: order_by | null;
   ratingComment?: order_by | null;
+  sentBackAt?: order_by | null;
   submissionDeadline?: order_by | null;
   submittedAt?: order_by | null;
   submittedBy?: order_by | null;
@@ -11837,6 +11863,7 @@ export interface Project_order_by {
   published?: order_by | null;
   rating?: order_by | null;
   ratingComment?: order_by | null;
+  sentBackAt?: order_by | null;
   status?: order_by | null;
   submissionDeadline?: order_by | null;
   submittedAt?: order_by | null;
