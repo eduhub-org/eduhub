@@ -286,6 +286,15 @@ describe('Email Template Variables System', () => {
       expect(missing('<p>a</p>[Project:ReviewComment]<p>b</p>')).toBe('<p>a</p><p>b</p>');
     });
 
+    it('should not expand placeholders that appear inside the review comment', () => {
+      const replacer = createProjectVariableReplacer(
+        { id: 7, title: 'RealTitle', ratingComment: 'Compare with [Project:Title]' },
+        {}
+      );
+
+      expect(replacer('[Project:ReviewComment]')).toContain('Compare with [Project:Title]');
+    });
+
     it('should leave values unescaped for plain-text targets like the subject', () => {
       process.env.FRONTEND_URL = 'https://test.example.com';
 

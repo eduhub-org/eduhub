@@ -309,17 +309,19 @@ export function createVariableReplacer(data, formatDate) {
     if (reviewComment) {
       reviewCommentBlock = isHtml
         ? `<p><strong>Kommentar der Kursleitung / Instructor comment:</strong><br>${escapeHtml(reviewComment).replaceAll('\n', '<br>')}</p>`
-        : reviewComment;
+        : reviewComment.replace(/\s+/g, ' ');
     }
 
     // Project variables - always attempt replacement (escape user-controlled strings)
+    // ReviewComment is substituted last: it carries instructor-authored text,
+    // which must not be rescanned for the placeholders replaced above.
     result = result
-      .replaceAll('[Project:ReviewComment]', reviewCommentBlock)
       .replaceAll('[Project:Title]', escape(data.project?.title || ''))
       .replaceAll('[Project:Link]',
         data.projectLink || `${process.env.FRONTEND_URL || 'https://edu.opencampus.sh'}/project/${data.project?.id || ''}`
       )
-      .replaceAll('[Project:ApplicantName]', escape(data.applicantName || ''));
+      .replaceAll('[Project:ApplicantName]', escape(data.applicantName || ''))
+      .replaceAll('[Project:ReviewComment]', reviewCommentBlock);
 
     // Session variables (for reminders) - always attempt replacement
     result = result
