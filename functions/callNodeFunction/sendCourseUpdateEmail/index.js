@@ -1,5 +1,6 @@
 import { gql, GraphQLClient } from 'graphql-request';
 import { queueEmail } from '../lib/queueEmail.js';
+import { withRetry } from '../lib/withRetry.js';
 import { createVariableReplacer, createEnrollmentVariableReplacer } from '../emailTemplateVariables.js';
 
 /**
@@ -37,6 +38,8 @@ export default async function sendCourseUpdateEmail(req, logger) {
       dateString ? new Date(dateString).toLocaleDateString('de-DE', { year: 'numeric', month: 'long', day: 'numeric' }) : '';
     const formatDateTime = (dateString) =>
       dateString ? new Date(dateString).toLocaleString('de-DE', { dateStyle: 'long', timeStyle: 'short' }) : '';
+    const formatTime = (dateString) =>
+      dateString ? new Date(dateString).toLocaleTimeString('de-DE', { timeStyle: 'short' }) : '';
 
     if (tableName === 'Session') {
       const sessionNew = data.new;
@@ -62,7 +65,10 @@ export default async function sendCourseUpdateEmail(req, logger) {
           }
         }
       `;
-      const courseData = await client.request(GET_ENROLLEES, { courseId });
+      const courseData = await withRetry(() => client.request(GET_ENROLLEES, { courseId }), {
+        logger,
+        description: `enrollee lookup for course ${courseId}`,
+      });
       const course = courseData?.Course_by_pk;
       if (!course) {
         return { success: false, error: 'Course not found', messageKey: 'COURSE_NOT_FOUND' };
@@ -77,13 +83,20 @@ export default async function sendCourseUpdateEmail(req, logger) {
       }
 
       const formattedStart = formatDateTime(sessionNew.startDateTime);
+      // The trigger also fires on end-time-only changes, so the mail has to show
+      // the end time too. Same-day sessions only need the clock time for it.
+      const endsOnStartDay =
+        sessionNew.startDateTime &&
+        sessionNew.endDateTime &&
+        new Date(sessionNew.startDateTime).toDateString() === new Date(sessionNew.endDateTime).toDateString();
+      const formattedEnd = endsOnStartDay ? formatTime(sessionNew.endDateTime) : formatDateTime(sessionNew.endDateTime);
       let queued = 0;
       for (const user of uniqueRecipients) {
         const replacer = createVariableReplacer(
           {
             user,
             course: { id: course.id, title: course.title },
-            session: { title: sessionNew.title, startDateTime: formattedStart },
+            session: { title: sessionNew.title, startDateTime: formattedStart, endDateTime: formattedEnd },
             courseLink: `${process.env.FRONTEND_URL || 'https://edu.opencampus.sh'}/course/${course.id}`,
           },
           formatDate
@@ -133,7 +146,10 @@ export default async function sendCourseUpdateEmail(req, logger) {
           }
         }
       `;
-      const enrollmentData = await client.request(GET_ENROLLMENT, { enrollmentId: invoiceNew.courseEnrollmentId });
+      const enrollmentData = await withRetry(
+        () => client.request(GET_ENROLLMENT, { enrollmentId: invoiceNew.courseEnrollmentId }),
+        { logger, description: `enrollment ${invoiceNew.courseEnrollmentId} lookup` }
+      );
       const enrollmentDetails = enrollmentData?.CourseEnrollment_by_pk;
       if (!enrollmentDetails?.User?.email) {
         return { success: false, error: 'Enrollment/recipient not found', messageKey: 'ENROLLMENT_NOT_FOUND' };

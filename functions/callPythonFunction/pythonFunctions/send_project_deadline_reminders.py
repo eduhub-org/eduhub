@@ -1,108 +1,19 @@
 import logging
 import os
 from datetime import datetime, timedelta, timezone
+
 from api_clients import EduHubClient
 
-# How far ahead of the submission deadline we send the reminder.
+from pythonFunctions.mail_helpers import (
+    already_sent_keys,
+    get_default_mail_template,
+    queue_mail,
+)
+
+# How long before the submission deadline the reminder goes out.
 REMINDER_LEAD_HOURS = 48
 
-
-def _escape_html(text):
-    """Minimal HTML escaping for user-controlled values interpolated into mail bodies."""
-    if not text:
-        return ""
-    return (
-        str(text)
-        .replace("&", "&amp;")
-        .replace("<", "&lt;")
-        .replace(">", "&gt;")
-        .replace('"', "&quot;")
-        .replace("'", "&#39;")
-    )
-
-
-def _get_default_mail_template(client, template_type):
-    query = """
-    query GetProjectMailTemplate($type: MailTemplateType_enum!) {
-        MailTemplate(where: {type: {_eq: $type}, courseId: {_is_null: true}}, limit: 1) {
-            subject
-            content
-            from
-            cc
-            bcc
-        }
-    }
-    """
-    result = client.send_query(query, {"type": template_type})
-    if not isinstance(result, dict) or result.get("errors"):
-        logging.warning(f"Could not load mail template {template_type}: {result}")
-        return None
-    templates = result.get("data", {}).get("MailTemplate", [])
-    return templates[0] if templates else None
-
-
-def _already_reminded_keys(client):
-    """(projectId, userId) pairs already reminded, from MailLog metadata."""
-    query = """
-    query RemindedProjectDeadlines {
-        MailLog(where: {metadata: {_contains: {type: "PROJECT_DEADLINE_REMINDER"}}}) {
-            metadata
-        }
-    }
-    """
-    result = client.send_query(query, {})
-    reminded = set()
-    if isinstance(result, dict) and not result.get("errors"):
-        for row in result.get("data", {}).get("MailLog", []):
-            meta = row.get("metadata") or {}
-            project_id = meta.get("projectId")
-            user_id = meta.get("userId")
-            if project_id is not None and user_id is not None:
-                reminded.add((project_id, user_id))
-    return reminded
-
-
-def _queue_reminder(client, template, project, user):
-    to = user.get("email")
-    if not to:
-        return False
-    frontend_url = os.environ.get("FRONTEND_URL") or "https://edu.opencampus.sh"
-    variables = {
-        "[User:FirstName]": _escape_html(user.get("firstName")),
-        "[User:LastName]": _escape_html(user.get("lastName")),
-        "[Project:Title]": _escape_html(project.get("title")),
-        "[Project:Link]": f"{frontend_url}/project/{project.get('id', '')}",
-    }
-    subject = template["subject"]
-    content = template["content"]
-    for key, value in variables.items():
-        subject = subject.replace(key, value)
-        content = content.replace(key, value)
-
-    mutation = """
-    mutation QueueProjectDeadlineReminder(
-        $subject: String!, $content: String!, $from: String!, $to: String!,
-        $cc: String, $bcc: String, $metadata: jsonb
-    ) {
-        insert_MailLog_one(object: {
-            subject: $subject, content: $content, from: $from, to: $to,
-            cc: $cc, bcc: $bcc, status: "READY_TO_SEND", metadata: $metadata
-        }) { id }
-    }
-    """
-    result = client.send_query(mutation, {
-        "subject": subject,
-        "content": content,
-        "from": template.get("from") or "noreply@opencampus.sh",
-        "to": to,
-        "cc": template.get("cc"),
-        "bcc": template.get("bcc"),
-        "metadata": {"type": "PROJECT_DEADLINE_REMINDER", "projectId": project["id"], "userId": user.get("id")},
-    })
-    if not isinstance(result, dict) or result.get("errors"):
-        logging.error(f"Failed to queue project deadline reminder to {to}: {result}")
-        return False
-    return True
+MAIL_TYPE = "PROJECT_DEADLINE_REMINDER"
 
 
 def send_project_deadline_reminders(arguments):
@@ -122,6 +33,7 @@ def send_project_deadline_reminders(arguments):
         now = datetime.now(timezone.utc)
         now_iso = now.isoformat()
         cutoff_iso = (now + timedelta(hours=REMINDER_LEAD_HOURS)).isoformat()
+        frontend_url = os.environ.get("FRONTEND_URL") or "https://edu.opencampus.sh"
 
         query = """
         query ProjectsWithApproachingDeadline($now: timestamptz!, $cutoff: timestamptz!) {
@@ -145,22 +57,46 @@ def send_project_deadline_reminders(arguments):
             return {"success": False, "error": str(result)}
 
         projects = result["data"]["Project"]
-        template = _get_default_mail_template(client, "PROJECT_DEADLINE_REMINDER")
+        template = get_default_mail_template(client, MAIL_TYPE)
         if not template:
-            logging.warning("PROJECT_DEADLINE_REMINDER template missing; skipping")
+            logging.warning(f"{MAIL_TYPE} template missing; skipping")
             return {"success": True, "data": {"remindedCount": 0}}
 
-        reminded_keys = _already_reminded_keys(client)
-        reminded = 0
+        candidates = []
         for project in projects:
             for author in project.get("ProjectAuthors", []):
                 user = author.get("User") or {}
-                if not user.get("id"):
+                if not user.get("id") or not user.get("email"):
                     continue
-                if (project["id"], user["id"]) in reminded_keys:
-                    continue
-                if _queue_reminder(client, template, project, user):
-                    reminded += 1
+                candidates.append({"projectId": project["id"], "userId": user["id"], "project": project, "user": user})
+
+        key_fields = ["projectId", "userId"]
+        reminded_keys = already_sent_keys(client, MAIL_TYPE, candidates, key_fields)
+
+        reminded = 0
+        for candidate in candidates:
+            if (candidate["projectId"], candidate["userId"]) in reminded_keys:
+                continue
+            project = candidate["project"]
+            user = candidate["user"]
+            queued = queue_mail(
+                client,
+                template,
+                user.get("email"),
+                {
+                    "[User:FirstName]": user.get("firstName"),
+                    "[User:LastName]": user.get("lastName"),
+                    "[Project:Title]": project.get("title"),
+                    "[Project:Link]": f"{frontend_url}/project/{project.get('id', '')}",
+                },
+                metadata={
+                    "type": MAIL_TYPE,
+                    "projectId": candidate["projectId"],
+                    "userId": candidate["userId"],
+                },
+            )
+            if queued:
+                reminded += 1
 
         logging.info(f"Queued {reminded} project deadline reminder(s)")
         return {"success": True, "data": {"remindedCount": reminded}}

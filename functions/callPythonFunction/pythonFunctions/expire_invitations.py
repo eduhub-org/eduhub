@@ -1,129 +1,20 @@
 import logging
 import os
 from datetime import datetime, timedelta, timezone
+
 from api_clients import EduHubClient
+
+from pythonFunctions.mail_helpers import (
+    already_sent_keys,
+    format_date,
+    get_default_mail_template,
+    queue_mail,
+)
 
 # How long before an invitation expires we send the "expiring soon" reminder.
 REMINDER_LEAD_HOURS = 24
 
-
-def _escape_html(text):
-    """Minimal HTML escaping for user-controlled values interpolated into mail bodies."""
-    if not text:
-        return ""
-    return (
-        str(text)
-        .replace("&", "&amp;")
-        .replace("<", "&lt;")
-        .replace(">", "&gt;")
-        .replace('"', "&quot;")
-        .replace("'", "&#39;")
-    )
-
-
-def _get_default_mail_template(client, template_type):
-    """Fetch the default (courseId NULL) mail template of the given type."""
-    query = """
-    query GetInvitationMailTemplate($type: MailTemplateType_enum!) {
-        MailTemplate(where: {type: {_eq: $type}, courseId: {_is_null: true}}, limit: 1) {
-            subject
-            content
-            from
-            cc
-            bcc
-        }
-    }
-    """
-    result = client.send_query(query, {"type": template_type})
-    if not isinstance(result, dict) or result.get("errors"):
-        logging.warning(f"Could not load mail template {template_type}: {result}")
-        return None
-    templates = result.get("data", {}).get("MailTemplate", [])
-    return templates[0] if templates else None
-
-
-def _already_reminded_enrollment_ids(client):
-    """Enrollment ids that already received an INVITATION_EXPIRING_SOON mail."""
-    query = """
-    query RemindedInvitations {
-        MailLog(where: {metadata: {_contains: {type: "INVITATION_EXPIRING_SOON"}}}) {
-            metadata
-        }
-    }
-    """
-    result = client.send_query(query, {})
-    reminded = set()
-    if isinstance(result, dict) and not result.get("errors"):
-        for row in result.get("data", {}).get("MailLog", []):
-            meta = row.get("metadata") or {}
-            enrollment_id = meta.get("enrollmentId")
-            if isinstance(enrollment_id, int):
-                reminded.add(enrollment_id)
-    return reminded
-
-
-def _format_date(iso_string):
-    """Format a timestamptz ISO string as DD.MM.YYYY (best-effort)."""
-    if not iso_string:
-        return ""
-    try:
-        # Handle trailing Z and offsets
-        cleaned = iso_string.replace("Z", "+00:00")
-        return datetime.fromisoformat(cleaned).strftime("%d.%m.%Y")
-    except ValueError:
-        return iso_string
-
-
-def _queue_reminder_mail(client, template, enrollment):
-    """Queue an INVITATION_EXPIRING_SOON mail with dedup metadata."""
-    user = enrollment.get("User") or {}
-    course = enrollment.get("Course") or {}
-    to = user.get("email")
-    if not to:
-        return False
-
-    frontend_url = os.environ.get("FRONTEND_URL") or "https://edu.opencampus.sh"
-    course_link = f"{frontend_url}/course/{course.get('id', '')}"
-    variables = {
-        "[User:FirstName]": _escape_html(user.get("firstName")),
-        "[User:LastName]": _escape_html(user.get("lastName")),
-        "[Enrollment:CourseId--Course:Name]": _escape_html(course.get("title")),
-        "[Enrollment:ExpirationDate]": _format_date(enrollment.get("invitationExpirationDate")),
-        "[Enrollment:CourseLink]": course_link,
-    }
-
-    subject = template["subject"]
-    content = template["content"]
-    for key, value in variables.items():
-        subject = subject.replace(key, value)
-        content = content.replace(key, value)
-
-    mutation = """
-    mutation QueueInvitationReminder(
-        $subject: String!, $content: String!, $from: String!, $to: String!,
-        $cc: String, $bcc: String, $metadata: jsonb
-    ) {
-        insert_MailLog_one(object: {
-            subject: $subject, content: $content, from: $from, to: $to,
-            cc: $cc, bcc: $bcc, status: "READY_TO_SEND", metadata: $metadata
-        }) {
-            id
-        }
-    }
-    """
-    result = client.send_query(mutation, {
-        "subject": subject,
-        "content": content,
-        "from": template.get("from") or "noreply@opencampus.sh",
-        "to": to,
-        "cc": template.get("cc"),
-        "bcc": template.get("bcc"),
-        "metadata": {"type": "INVITATION_EXPIRING_SOON", "enrollmentId": enrollment["id"]},
-    })
-    if not isinstance(result, dict) or result.get("errors"):
-        logging.error(f"Failed to queue invitation reminder to {to}: {result}")
-        return False
-    return True
+MAIL_TYPE = "INVITATION_EXPIRING_SOON"
 
 
 def expire_invitations(arguments):
@@ -155,9 +46,9 @@ def expire_invitations(arguments):
         now = datetime.now(timezone.utc)
         now_iso = now.isoformat()
         reminder_cutoff_iso = (now + timedelta(hours=REMINDER_LEAD_HOURS)).isoformat()
+        frontend_url = os.environ.get("FRONTEND_URL") or "https://edu.opencampus.sh"
 
         # 1. Reminders for invitations expiring within the lead window (not yet lapsed).
-        reminded_ids = _already_reminded_enrollment_ids(client)
         reminder_query = """
         query ExpiringSoonInvitations($now: timestamptz!, $cutoff: timestamptz!) {
             CourseEnrollment(
@@ -181,16 +72,42 @@ def expire_invitations(arguments):
             return {"success": False, "error": str(reminder_result)}
 
         expiring_soon = reminder_result["data"]["CourseEnrollment"]
-        template = _get_default_mail_template(client, "INVITATION_EXPIRING_SOON")
+        template = get_default_mail_template(client, MAIL_TYPE)
         reminded = 0
         if template:
-            for enrollment in expiring_soon:
-                if enrollment["id"] in reminded_ids:
+            candidates = [
+                {"enrollmentId": enrollment["id"], "enrollment": enrollment}
+                for enrollment in expiring_soon
+                if (enrollment.get("User") or {}).get("email")
+            ]
+            key_fields = ["enrollmentId"]
+            reminded_keys = already_sent_keys(client, MAIL_TYPE, candidates, key_fields)
+
+            for candidate in candidates:
+                if (candidate["enrollmentId"],) in reminded_keys:
                     continue
-                if _queue_reminder_mail(client, template, enrollment):
+                enrollment = candidate["enrollment"]
+                user = enrollment.get("User") or {}
+                course = enrollment.get("Course") or {}
+                queued = queue_mail(
+                    client,
+                    template,
+                    user.get("email"),
+                    {
+                        "[User:FirstName]": user.get("firstName"),
+                        "[User:LastName]": user.get("lastName"),
+                        "[Enrollment:CourseId--Course:Name]": course.get("title"),
+                        "[Enrollment:ExpirationDate]": format_date(
+                            enrollment.get("invitationExpirationDate")
+                        ),
+                        "[Enrollment:CourseLink]": f"{frontend_url}/course/{course.get('id', '')}",
+                    },
+                    metadata={"type": MAIL_TYPE, "enrollmentId": candidate["enrollmentId"]},
+                )
+                if queued:
                     reminded += 1
         else:
-            logging.warning("INVITATION_EXPIRING_SOON template missing; skipping reminders")
+            logging.warning(f"{MAIL_TYPE} template missing; skipping reminders")
 
         # 2. Flip lapsed INVITED invitations to EXPIRED. The event trigger sends
         # INVITATION_EXPIRED. status is a Hasura enum -> use enum literals.

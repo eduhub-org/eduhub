@@ -314,7 +314,8 @@ export default async function sendSessionReminders(req, logger) {
             reminderTime
           });
 
-          const emailSubject = replaceVariables(template.subject);
+          // The subject is plain text, so variables must not be HTML-escaped there
+          const emailSubject = replaceVariables(template.subject, { html: false });
           const emailContent = replaceVariables(template.content);
 
           // Insert email into MailLog for sending

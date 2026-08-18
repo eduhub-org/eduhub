@@ -112,6 +112,11 @@ export const EMAIL_VARIABLES = {
       example: '15.1.2024, 14:00:00',
       categories: ['session']
     },
+    '[Session:EndDateTime]': {
+      description: 'Session end date and time (localized); time only when it ends on the start day',
+      example: '16:00',
+      categories: ['session']
+    },
     '[Session:Duration]': {
       description: 'Session duration (calculated)',
       example: '2 hours',
@@ -218,25 +223,32 @@ export function validateTemplate(template) {
  * Creates a variable replacement function with standardized date formatting
  * @param {Object} data - Data object containing the values for replacement
  * @param {Function} formatDate - Date formatting function
- * @returns {Function} Function that performs variable replacement
+ * @returns {Function} Function that performs variable replacement. Accepts an
+ *   options object as second argument: pass `{ html: false }` for plain-text
+ *   targets such as the mail subject, where HTML entities would show up
+ *   literally instead of being rendered.
  */
 export function createVariableReplacer(data, formatDate) {
-  return function replaceVariables(text) {
+  return function replaceVariables(text, options = {}) {
     if (!text) return text;
+    
+    // Subjects are plain text: escaping there would render "&amp;" literally.
+    const isHtml = options.html !== false;
+    const escape = isHtml ? escapeHtml : (value) => (value == null ? '' : String(value));
     
     let result = text;
     
     // User variables - always attempt replacement
     // Escape user-supplied personal data to prevent XSS
-    const firstName = escapeHtml(data.user?.firstName || '');
-    const lastName = escapeHtml(data.user?.lastName || '');
+    const firstName = escape(data.user?.firstName || '');
+    const lastName = escape(data.user?.lastName || '');
     result = result
       .replaceAll('[User:FirstName]', firstName)
       .replaceAll('[User:LastName]', lastName);
     
     // Course variables - always attempt replacement  
     result = result
-      .replaceAll('[Enrollment:CourseId--Course:Name]', data.course?.title || '')
+      .replaceAll('[Enrollment:CourseId--Course:Name]', escape(data.course?.title || ''))
       .replaceAll('[Course:StartTime]', data.course?.startTime ? formatDate(data.course.startTime) : 'TBD')
       .replaceAll('[Course:EndTime]', data.course?.endTime ? formatDate(data.course.endTime) : 'TBD');
     
@@ -264,14 +276,14 @@ export function createVariableReplacer(data, formatDate) {
     if (data.enrollmentAddons && Array.isArray(data.enrollmentAddons) && data.enrollmentAddons.length > 0) {
       const currencySymbolMap = { EUR: '€', USD: '$', GBP: '£', CHF: 'CHF' };
       const addonLines = data.enrollmentAddons.map(addon => {
-        const description = escapeHtml(addon.CourseAddonMapping?.description || addon.name || 'Zusatzleistung / Add-on');
+        const description = escape(addon.CourseAddonMapping?.description || addon.name || 'Zusatzleistung / Add-on');
         const price = addon.priceAtPurchase ?? 0;
         const currencyCode = addon.currency || 'EUR';
         const currencySymbol = currencySymbolMap[currencyCode] || currencyCode;
         const formattedPrice = (price / 100).toFixed(2).replace('.', ',');
         return `– ${description}: ${formattedPrice} ${currencySymbol} inkl. MwSt.`;
       });
-      addonsHtml = '<strong>Add-ons:</strong>\n' + addonLines.join('\n');
+      addonsHtml = (isHtml ? '<strong>Add-ons:</strong>\n' : 'Add-ons:\n') + addonLines.join('\n');
     }
     result = result.replaceAll('[Enrollment:Addons]', addonsHtml);
     
@@ -286,16 +298,17 @@ export function createVariableReplacer(data, formatDate) {
     
     // Project variables - always attempt replacement (escape user-controlled strings)
     result = result
-      .replaceAll('[Project:Title]', escapeHtml(data.project?.title || ''))
+      .replaceAll('[Project:Title]', escape(data.project?.title || ''))
       .replaceAll('[Project:Link]',
         data.projectLink || `${process.env.FRONTEND_URL || 'https://edu.opencampus.sh'}/project/${data.project?.id || ''}`
       )
-      .replaceAll('[Project:ApplicantName]', escapeHtml(data.applicantName || ''));
+      .replaceAll('[Project:ApplicantName]', escape(data.applicantName || ''));
 
     // Session variables (for reminders) - always attempt replacement
     result = result
       .replaceAll('[Session:Title]', data.session?.title || '')
       .replaceAll('[Session:StartDateTime]', data.session?.startDateTime || '')
+      .replaceAll('[Session:EndDateTime]', data.session?.endDateTime || '')
       .replaceAll('[Session:Duration]', data.session?.duration || '')
       .replaceAll('[Session:ReminderText]', data.session?.reminderText || '')
       .replaceAll('[Session:ReminderTime]', data.session?.reminderTime || '');

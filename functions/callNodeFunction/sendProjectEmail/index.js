@@ -1,5 +1,6 @@
 import { gql, GraphQLClient } from 'graphql-request';
 import { queueEmail } from '../lib/queueEmail.js';
+import { withRetry } from '../lib/withRetry.js';
 import { createProjectVariableReplacer } from '../emailTemplateVariables.js';
 
 /**
@@ -117,7 +118,10 @@ export default async function sendProjectEmail(req, logger) {
       }
     `;
 
-    const projectData = await client.request(GET_PROJECT, { projectId });
+    const projectData = await withRetry(() => client.request(GET_PROJECT, { projectId }), {
+      logger,
+      description: `project ${projectId} lookup`,
+    });
     const project = projectData?.Project_by_pk;
     if (!project) {
       logger.error(`Project not found: ${projectId}`);

@@ -294,7 +294,8 @@ export default async function sendEnrollmentEmail(req, logger) {
 
     const replaceVariables = createEnrollmentVariableReplacer(enrollmentDetails, formatDate);
 
-    const emailSubject = replaceVariables(template.subject);
+    // The subject is plain text, so variables must not be HTML-escaped there
+    const emailSubject = replaceVariables(template.subject, { html: false });
     const emailContent = replaceVariables(template.content);
 
     // Insert email into MailLog for sending

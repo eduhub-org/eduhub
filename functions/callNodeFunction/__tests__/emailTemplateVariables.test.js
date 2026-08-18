@@ -255,6 +255,28 @@ describe('Email Template Variables System', () => {
       expect(result).toBe('Hi Bob, Eve &lt;x&gt; joins &lt;b&gt;Solar&lt;/b&gt; &amp; Co at https://test.example.com/project/99');
     });
 
+    it('should leave values unescaped for plain-text targets like the subject', () => {
+      process.env.FRONTEND_URL = 'https://test.example.com';
+
+      const replacer = createProjectVariableReplacer(
+        { id: 99, title: 'Solar & Co' },
+        { firstName: "O'Brien" },
+        { applicantName: 'Eve & Co' }
+      );
+      const subject = replacer('New request - [Project:Title] ([Project:ApplicantName], [User:FirstName])', {
+        html: false
+      });
+
+      expect(subject).toBe("New request - Solar & Co (Eve & Co, O'Brien)");
+    });
+
+    it('should still escape values for the html body by default', () => {
+      const replacer = createProjectVariableReplacer({ id: 1, title: 'Solar & Co' }, {});
+
+      expect(replacer('<p>[Project:Title]</p>')).toBe('<p>Solar &amp; Co</p>');
+      expect(replacer('<p>[Project:Title]</p>', { html: true })).toBe('<p>Solar &amp; Co</p>');
+    });
+
     it('should create session variable replacer', () => {
       const session = {
         title: 'Session 1',

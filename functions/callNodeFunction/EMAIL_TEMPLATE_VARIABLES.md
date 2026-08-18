@@ -72,6 +72,11 @@ The email template variable system is centralized in `emailTemplateVariables.js`
 - **`[Session:StartDateTime]`**: Session start date and time (localized)
   - Example: `15.1.2024, 14:00:00`
 
+- **`[Session:EndDateTime]`**: Session end date and time (localized); the clock
+  time alone when the session ends on the day it starts
+  - Example: `16:00`
+  - Available in: `SESSION_RESCHEDULED` emails
+
 - **`[Session:Duration]`**: Session duration (calculated from start/end times)
   - Example: `2 hours` or `90 minutes`
 
@@ -268,9 +273,16 @@ The system gracefully handles missing data:
 import { createEnrollmentVariableReplacer } from '../emailTemplateVariables.js';
 
 const replaceVariables = createEnrollmentVariableReplacer(enrollmentDetails, formatDate);
-const emailSubject = replaceVariables(template.subject);
+// `{ html: false }` for the subject: it is plain text, so entity-escaping a
+// title like "Solar & Co" there would show up as "Solar &amp; Co".
+const emailSubject = replaceVariables(template.subject, { html: false });
 const emailContent = replaceVariables(template.content);
 ```
+
+Values that come from users (names, course and project titles) are HTML-escaped
+for the body and inserted verbatim into the subject. `queueEmail` already does
+this; functions that build a mail themselves have to pass `{ html: false }` for
+the subject.
 
 ### Session Reminder Function
 
