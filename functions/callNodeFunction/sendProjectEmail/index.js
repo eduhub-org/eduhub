@@ -10,6 +10,11 @@ import { createProjectVariableReplacer } from '../emailTemplateVariables.js';
  *   - send_project_author_email on public.ProjectAuthor (INSERT + UPDATE of participationStatus)
  *   - send_project_status_email on public.Project (UPDATE of status)
  *
+ * Review emails (approved / sent back / rejected) carry the instructor's
+ * ratingComment via [Project:ReviewComment]. ReviewProjectDialog saves that
+ * comment before it changes the status, and the trigger only fires on status,
+ * so the comment is already persisted when this reads the project back.
+ *
  * The originating table is read from req.body.table.name so a single function
  * can serve both triggers.
  *
@@ -104,6 +109,7 @@ export default async function sendProjectEmail(req, logger) {
         Project_by_pk(id: $projectId) {
           id
           title
+          ratingComment
           proposedByUserId
           ProposedByUser { id email firstName lastName }
           ProjectAuthors {

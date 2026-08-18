@@ -1439,7 +1439,7 @@
         "reject_title": "Reject as not passed",
         "reject_description": "Marks the project as not passed.",
         "comment_label": "Comment (optional)",
-        "comment_placeholder": "Notes for the project team (visible where project details are shown)",
+        "comment_placeholder": "Notes for the project team (visible where project details are shown, and included in the notification email)",
         "confirm_button": "Confirm"
       },
       "add_dialog": {
@@ -2514,7 +2514,7 @@
       "PROJECT_SENT_BACK": "Project Sent Back",
       "PROJECT_SUBMITTED": "Project Submitted",
       "PROJECT_APPROVED": "Project Approved",
-      "PROJECT_REJECTED": "Project Rejected",
+      "PROJECT_REJECTED": "Project Not Passed",
       "PROJECT_DEADLINE_REMINDER": "Project Deadline Reminder",
       "SESSION_RESCHEDULED": "Session Rescheduled",
       "PAYMENT_RECEIPT": "Payment Receipt",
@@ -2562,7 +2562,7 @@
       "PROJECT_SENT_BACK": "Sent when a submitted project is sent back for revision",
       "PROJECT_SUBMITTED": "Sent when a project is submitted for review",
       "PROJECT_APPROVED": "Sent when a project is approved as completed",
-      "PROJECT_REJECTED": "Sent when a project is marked as incomplete",
+      "PROJECT_REJECTED": "Sent when a project is rated as not passed",
       "PROJECT_DEADLINE_REMINDER": "Sent 48 hours before a project's submission deadline",
       "SESSION_RESCHEDULED": "Sent to participants when a session's date or time changes",
       "PAYMENT_RECEIPT": "Sent when an invoice for a course or event enrollment is paid",

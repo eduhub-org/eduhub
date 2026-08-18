@@ -11,7 +11,7 @@ VALUES
   ('PROJECT_SENT_BACK', 'Sent to project authors when a submitted project is sent back for revision'),
   ('PROJECT_SUBMITTED', 'Sent to instructors/mentors and authors when a project is submitted for review'),
   ('PROJECT_APPROVED', 'Sent to project authors when a project is approved/completed'),
-  ('PROJECT_REJECTED', 'Sent to project authors when a project is marked incomplete'),
+  ('PROJECT_REJECTED', 'Sent to project authors when a project is rated as not passed'),
   ('PROJECT_DEADLINE_REMINDER', 'Reminder sent to project authors before the submission deadline')
 ON CONFLICT ("value") DO NOTHING;
 
@@ -114,11 +114,13 @@ SELECT 'PROJECT_SENT_BACK', NULL,
   '<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body>
   <p>Hallo [User:FirstName] [User:LastName],</p>
   <p>euer Projekt <strong>[Project:Title]</strong> wurde zur Überarbeitung zurückgegeben.</p>
+  [Project:ReviewComment]
   <p>Bitte seht euch die Rückmeldungen an und reicht das Projekt erneut ein: <a href="[Project:Link]">[Project:Link]</a></p>
   <p>Viele Grüße,<br>Dein EduHub Team</p>
   <hr style="margin:2em 0;border:none;border-top:1px solid #ccc;" />
   <p>Hello [User:FirstName] [User:LastName],</p>
   <p>Your project <strong>[Project:Title]</strong> has been sent back for revision.</p>
+  [Project:ReviewComment]
   <p>Please review the feedback and submit again: <a href="[Project:Link]">[Project:Link]</a></p>
   <p>Best regards,<br>The EduHub Team</p>
   </body></html>',
@@ -150,11 +152,13 @@ SELECT 'PROJECT_APPROVED', NULL,
   '<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body>
   <p>Hallo [User:FirstName] [User:LastName],</p>
   <p>Glückwunsch! Euer Projekt <strong>[Project:Title]</strong> wurde erfolgreich abgeschlossen.</p>
+  [Project:ReviewComment]
   <p>Hier geht es zum Projekt: <a href="[Project:Link]">[Project:Link]</a></p>
   <p>Viele Grüße,<br>Dein EduHub Team</p>
   <hr style="margin:2em 0;border:none;border-top:1px solid #ccc;" />
   <p>Hello [User:FirstName] [User:LastName],</p>
   <p>Congratulations! Your project <strong>[Project:Title]</strong> has been successfully completed.</p>
+  [Project:ReviewComment]
   <p>Go to the project here: <a href="[Project:Link]">[Project:Link]</a></p>
   <p>Best regards,<br>The EduHub Team</p>
   </body></html>',
@@ -167,12 +171,14 @@ SELECT 'PROJECT_REJECTED', NULL,
   'Zu eurem Projekt / Regarding your project - [Project:Title]',
   '<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body>
   <p>Hallo [User:FirstName] [User:LastName],</p>
-  <p>euer Projekt <strong>[Project:Title]</strong> wurde als nicht abgeschlossen markiert.</p>
+  <p>euer Projekt <strong>[Project:Title]</strong> wurde als nicht bestanden bewertet.</p>
+  [Project:ReviewComment]
   <p>Bei Fragen wende dich bitte an dein Projektteam: <a href="[Project:Link]">[Project:Link]</a></p>
   <p>Viele Grüße,<br>Dein EduHub Team</p>
   <hr style="margin:2em 0;border:none;border-top:1px solid #ccc;" />
   <p>Hello [User:FirstName] [User:LastName],</p>
-  <p>Your project <strong>[Project:Title]</strong> has been marked as incomplete.</p>
+  <p>Your project <strong>[Project:Title]</strong> has been rated as not passed.</p>
+  [Project:ReviewComment]
   <p>If you have any questions, please contact your project team: <a href="[Project:Link]">[Project:Link]</a></p>
   <p>Best regards,<br>The EduHub Team</p>
   </body></html>',

@@ -255,6 +255,37 @@ describe('Email Template Variables System', () => {
       expect(result).toBe('Hi Bob, Eve &lt;x&gt; joins &lt;b&gt;Solar&lt;/b&gt; &amp; Co at https://test.example.com/project/99');
     });
 
+    it('should render the review comment as a labelled block', () => {
+      const replacer = createProjectVariableReplacer(
+        { id: 3, title: 'Solar', ratingComment: 'Bitte die Quellen ergänzen.\nDanke!' },
+        { firstName: 'Ann' }
+      );
+
+      expect(replacer('<p>x</p>[Project:ReviewComment]')).toBe(
+        '<p>x</p><p><strong>Kommentar der Kursleitung / Instructor comment:</strong><br>' +
+          'Bitte die Quellen ergänzen.<br>Danke!</p>'
+      );
+    });
+
+    it('should escape a review comment that contains markup', () => {
+      const replacer = createProjectVariableReplacer(
+        { id: 3, title: 'Solar', ratingComment: '<script>alert(1)</script> & more' },
+        {}
+      );
+
+      const result = replacer('[Project:ReviewComment]');
+      expect(result).toContain('&lt;script&gt;alert(1)&lt;/script&gt; &amp; more');
+      expect(result).not.toContain('<script>');
+    });
+
+    it('should expand the review comment to nothing when there is none', () => {
+      const blank = createProjectVariableReplacer({ id: 3, title: 'Solar', ratingComment: '   ' }, {});
+      const missing = createProjectVariableReplacer({ id: 3, title: 'Solar' }, {});
+
+      expect(blank('<p>a</p>[Project:ReviewComment]<p>b</p>')).toBe('<p>a</p><p>b</p>');
+      expect(missing('<p>a</p>[Project:ReviewComment]<p>b</p>')).toBe('<p>a</p><p>b</p>');
+    });
+
     it('should leave values unescaped for plain-text targets like the subject', () => {
       process.env.FRONTEND_URL = 'https://test.example.com';
 

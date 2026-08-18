@@ -1421,7 +1421,7 @@
         "reject_title": "Als nicht bestanden ablehnen",
         "reject_description": "Das Projekt wird als nicht bestanden markiert.",
         "comment_label": "Kommentar (optional)",
-        "comment_placeholder": "Hinweise für das Projektteam (sichtbar, wo Projektdetails angezeigt werden)",
+        "comment_placeholder": "Hinweise für das Projektteam (sichtbar, wo Projektdetails angezeigt werden, und in der Benachrichtigungs-E-Mail)",
         "confirm_button": "Bestätigen"
       },
       "add_dialog": {
@@ -2499,7 +2499,7 @@
       "PROJECT_SENT_BACK": "Projekt zurückgegeben",
       "PROJECT_SUBMITTED": "Projekt eingereicht",
       "PROJECT_APPROVED": "Projekt angenommen",
-      "PROJECT_REJECTED": "Projekt abgelehnt",
+      "PROJECT_REJECTED": "Projekt nicht bestanden",
       "PROJECT_DEADLINE_REMINDER": "Erinnerung Projektabgabe",
       "SESSION_RESCHEDULED": "Termin verschoben",
       "PAYMENT_RECEIPT": "Zahlungsbestätigung",
@@ -2547,7 +2547,7 @@
       "PROJECT_SENT_BACK": "Gesendet, wenn ein eingereichtes Projekt zur Überarbeitung zurückgegeben wird",
       "PROJECT_SUBMITTED": "Gesendet, wenn ein Projekt zur Bewertung eingereicht wird",
       "PROJECT_APPROVED": "Gesendet, wenn ein Projekt als abgeschlossen angenommen wird",
-      "PROJECT_REJECTED": "Gesendet, wenn ein Projekt als nicht abgeschlossen bewertet wird",
+      "PROJECT_REJECTED": "Gesendet, wenn ein Projekt als nicht bestanden bewertet wird",
       "PROJECT_DEADLINE_REMINDER": "Gesendet 48 Stunden vor dem Abgabetermin eines Projekts",
       "SESSION_RESCHEDULED": "Gesendet an Teilnehmende, wenn sich Datum oder Zeit eines Termins ändert",
       "PAYMENT_RECEIPT": "Gesendet, wenn eine Rechnung für eine Kurs- oder Event-Anmeldung bezahlt wurde",

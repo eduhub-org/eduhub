@@ -59,6 +59,13 @@ The email template variable system is centralized in `emailTemplateVariables.js`
 - **`[Project:Link]`**: Link to the project page
   - Example: `https://edu.opencampus.sh/project/123`
 
+- **`[Project:ReviewComment]`**: The comment the instructor left in the review
+  dialog, rendered as a labelled paragraph. Expands to nothing when no comment
+  was left, so the template never shows an empty heading. The label carries both
+  languages, since one template body holds the German and English half.
+  - Example: `<p><strong>Kommentar der Kursleitung / Instructor comment:</strong><br>Bitte die Quellen ergänzen.</p>`
+  - Available in: `PROJECT_APPROVED`, `PROJECT_REJECTED`, `PROJECT_SENT_BACK`
+
 - **`[Project:ApplicantName]`**: Name of the user who requested to join the project
   - Example: `Jane Doe`
   - Available in: `PROJECT_JOIN_REQUESTED` emails only

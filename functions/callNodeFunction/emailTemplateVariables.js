@@ -146,6 +146,11 @@ export const EMAIL_VARIABLES = {
       example: 'https://edu.opencampus.sh/project/123',
       categories: ['project']
     },
+    '[Project:ReviewComment]': {
+      description: 'The comment the instructor left when reviewing the project, as a labelled paragraph; empty when no comment was left',
+      example: '<p><strong>Kommentar der Kursleitung / Instructor comment:</strong><br>Bitte die Quellen ergänzen.</p>',
+      categories: ['project']
+    },
     '[Project:ApplicantName]': {
       description: 'Name of the user who requested to join the project (join-request emails only)',
       example: 'Jane Doe',
@@ -296,8 +301,20 @@ export function createVariableReplacer(data, formatDate) {
     const formattedTotalCost = (totalCost / 100).toFixed(2).replace('.', ',');
     result = result.replaceAll('[Enrollment:TotalCost]', formattedTotalCost);
     
+    // Review feedback: a labelled block when the instructor left a comment,
+    // nothing at all otherwise, so templates never show an empty heading.
+    // The label carries both languages because a template body holds both.
+    const reviewComment = (data.project?.ratingComment || '').trim();
+    let reviewCommentBlock = '';
+    if (reviewComment) {
+      reviewCommentBlock = isHtml
+        ? `<p><strong>Kommentar der Kursleitung / Instructor comment:</strong><br>${escapeHtml(reviewComment).replaceAll('\n', '<br>')}</p>`
+        : reviewComment;
+    }
+
     // Project variables - always attempt replacement (escape user-controlled strings)
     result = result
+      .replaceAll('[Project:ReviewComment]', reviewCommentBlock)
       .replaceAll('[Project:Title]', escape(data.project?.title || ''))
       .replaceAll('[Project:Link]',
         data.projectLink || `${process.env.FRONTEND_URL || 'https://edu.opencampus.sh'}/project/${data.project?.id || ''}`
