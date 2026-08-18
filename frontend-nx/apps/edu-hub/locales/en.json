@@ -1056,8 +1056,7 @@
       "courses": "No course programs exist yet. Ask a platform admin to set up a course program for your organization before you can manage courses here.",
       "degrees": "No degree programs exist yet. Ask a platform admin to set up a degree program for your organization before you can manage degrees here."
     },
-    "view": "View",
-    "view_course": "View Course",
+    "open_in_new_tab": "Open in new tab",
     "close": "Close",
     "cancel": "Cancel",
     "not_published": "Not Published",

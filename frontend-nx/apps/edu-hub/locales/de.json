@@ -1040,8 +1040,7 @@
       "courses": "Es gibt noch kein Kursprogramm. Bitte einen Plattform-Admin, ein Kursprogramm für deine Organisation anzulegen, bevor du hier Kurse verwalten kannst.",
       "degrees": "Es gibt noch kein Studiengangsprogramm. Bitte einen Plattform-Admin, ein Studiengangsprogramm für deine Organisation anzulegen, bevor du hier Studiengänge verwalten kannst."
     },
-    "view": "Anzeigen",
-    "view_course": "Kurs anzeigen",
+    "open_in_new_tab": "In neuem Tab öffnen",
     "close": "Schließen",
     "cancel": "Abbrechen",
     "not_published": "Nicht veröffentlicht",
