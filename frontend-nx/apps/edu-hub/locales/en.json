@@ -1415,7 +1415,7 @@
         "submission_deadline_instructor_picker_prompt": "If you want to change it for this project, select the specific date here:",
         "submission_deadline_instructor_picker_help": "Leave empty to use the default submission deadline shown above.",
         "type_locked_hint": "The project type can only be changed until the project has been submitted.",
-        "type_change_ongoing_warning": "This project is already ongoing. Changing the type changes what the team must submit and replaces the documentation instruction with the new type's default. Files already uploaded are kept.",
+        "type_change_ongoing_warning": "This project is already ongoing. Changing the type changes what the team must submit and replaces the documentation instruction with the new type's default — or, if there is none, with another instruction of that type. Files already uploaded are kept.",
         "type_change_no_instruction_error": "This project type has no documentation instruction with a PDF. Create one in app settings first — the project type was not changed."
       },
       "confirm_project_dialog": {

@@ -133,7 +133,8 @@ field is highlighted as **incomplete** until a valid value is supplied. The
   ONGOING). Instructors and mentors can still change it while the project is
   ONGOING — including after a send-back — but not once it is SUBMITTED.
   Changing the type changes the team's mandatory deliverables and resets the
-  documentation instruction to the new type's default; files already uploaded
+  documentation instruction to the new type's default — or, when the new type
+  has no default, to another instruction of that type; files already uploaded
   are kept. If the submission deadline has already passed, check that the team
   can still supply any newly required deliverable.
 - Programs and courses may carry a `defaultProjectType`. When set, the

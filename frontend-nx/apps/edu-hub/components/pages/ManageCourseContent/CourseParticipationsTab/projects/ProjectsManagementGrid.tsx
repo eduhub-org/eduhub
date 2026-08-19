@@ -312,8 +312,9 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
       // documentationInstructionId stay consistent (the DB trigger rejects a
       // mismatch). Mirrors the Add/Confirm dialog behaviour. Fall back to any
       // instruction of the new type when none is flagged as default.
-      const instructions =
-        documentationInstructionsQuery.data?.ProjectDocumentationInstruction ?? [];
+      // Only instructions that actually carry a PDF are eligible: the mutation
+      // would otherwise persist an ID the team cannot download.
+      const instructions = documentationInstructionsWithPdf;
       const nextInstruction =
         instructions.find(
           (inst) => inst.projectTypeValue === value && inst.isDefault
@@ -322,9 +323,9 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
       // Outside PROPOSED the database forbids a NULL documentationInstructionId
       // (Project_ongoing_requires_type_and_instruction_check), so refuse the
       // change with an actionable message instead of sending a mutation that
-      // fails with a raw constraint error. The query only returns instructions
-      // that actually have a PDF url, so "no instruction" also covers an
-      // admin-created row whose upload is still pending.
+      // fails with a raw constraint error. Since only instructions with a PDF url
+      // are eligible, "no instruction" also covers an admin-created row whose
+      // upload is still pending.
       if (!nextInstruction && status !== ProjectStatus_enum.PROPOSED) {
         setErrorMessage(t('projects.expanded.type_change_no_instruction_error'));
         return;
@@ -342,12 +343,7 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
         setErrorMessage(err instanceof Error ? err.message : tCommon('error'));
       }
     },
-    [
-      updateProjectType,
-      documentationInstructionsQuery.data?.ProjectDocumentationInstruction,
-      t,
-      tCommon,
-    ]
+    [updateProjectType, documentationInstructionsWithPdf, t, tCommon]
   );
 
   const columns = useMemo<ColumnDef<ProjectRow>[]>(

@@ -1397,7 +1397,7 @@
         "submission_deadline_instructor_picker_prompt": "Wenn Du für dieses Projekt eine abweichende Frist setzen willst, wähle sie hier aus:",
         "submission_deadline_instructor_picker_help": "Leer lassen, um die oben genannte Abgabefrist zu übernehmen.",
         "type_locked_hint": "Der Projekttyp kann nur geändert werden, solange das Projekt noch nicht eingereicht wurde.",
-        "type_change_ongoing_warning": "Das Projekt läuft bereits. Wenn Du den Typ änderst, ändern sich die Pflichtabgaben für das Team und die Dokumentationsanleitung wird durch die Standard-Anleitung des neuen Typs ersetzt. Bereits hochgeladene Dateien bleiben erhalten.",
+        "type_change_ongoing_warning": "Das Projekt läuft bereits. Wenn Du den Typ änderst, ändern sich die Pflichtabgaben für das Team und die Dokumentationsanleitung wird durch die Standard-Anleitung des neuen Typs ersetzt – oder, falls es keine gibt, durch eine andere Anleitung dieses Typs. Bereits hochgeladene Dateien bleiben erhalten.",
         "type_change_no_instruction_error": "Für diesen Projekttyp ist keine Dokumentationsanleitung mit PDF hinterlegt. Lege sie zuerst in den App-Einstellungen an – der Projekttyp wurde nicht geändert."
       },
       "confirm_project_dialog": {

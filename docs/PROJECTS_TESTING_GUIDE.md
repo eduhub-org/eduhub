@@ -289,7 +289,7 @@ project just confirmed:
    project to that type. Expect the friendly "no documentation instruction"
    message, **not** a raw
    `Project_ongoing_requires_type_and_instruction_check` error. Restore
-   afterwards.
+   afterward.
 7. After the team submits, re-expand the row: the checkboxes and the
    instruction dropdown are **disabled** and the hint reads "…until the
    project has been submitted". **Send back** re-enables them.
