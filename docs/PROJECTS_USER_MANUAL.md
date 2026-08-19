@@ -95,6 +95,7 @@ Key transitions in detail:
 | Manage join requests | ✓ (any ACCEPTED author) | ✓ | ✓ | ✓ |
 | Confirm team (PROPOSED → ONGOING) | — | ✓ | ✓ | ✓ |
 | Change project type / documentation instruction | — | ✓ (PROPOSED/ONGOING) | ✓ (PROPOSED/ONGOING) | ✓ |
+| Upload / rename / replace / delete a documentation instruction | — | ✓ (own uploads only) | ✓ (own uploads only) | ✓ (whole catalogue) |
 | Submit (ONGOING → SUBMITTED) | ✓ | — | — | ✓ |
 | Send back / approve / reject | — | ✓ | ✓ | ✓ |
 | Rate & comment | — | ✓ | ✓ | ✓ |
@@ -433,12 +434,28 @@ write-up).
 
 - Lives in the `ProjectDocumentationInstruction` table.
 - Each instruction has a **title**, a **PDF URL**, an associated
-  **project type**, and an **isDefault** flag.
+  **project type**, an **isDefault** flag, and a **createdByUserId**.
 - A database constraint guarantees that **exactly one** instruction per
   type is marked default. Promotions are atomic.
 - Default URLs follow a stable static path
   (`/project-documentation-instructions/<type>.pdf`). Custom uploads
   live in the GCS bucket and are served via a signed URL.
+
+**Ownership (`createdByUserId`)** decides who sees and manages a row:
+
+- **NULL — platform instruction.** Maintained by admins, visible to every
+  instructor. All instructions that existed before instructor uploads were
+  introduced are platform instructions.
+- **Set — a personal instruction.** Visible to its creator, to co-instructors
+  and mentors of a project that uses it, and to the students of those projects
+  (so a team can always open the instruction their project points at). Other
+  instructors do not see it. Only the creator (and admins) can rename it,
+  replace its PDF, or delete it.
+
+Only platform instructions can become a type default; promoting a personal
+instruction is refused, because a default has to stay visible to everyone.
+Titles must be unique per owner, and globally unique among platform
+instructions.
 
 ### 7.2 Where instructions appear
 
@@ -450,6 +467,10 @@ write-up).
   SUBMITTED.
 - **In the manage grid** — instructors can change a project's
   instruction after confirmation if requirements change.
+- **Next to every instruction dropdown** — an upload button opens *Your
+  documentation instructions* (see §7.3a). It is disabled while no project type
+  is selected, and in the manage grid it locks together with the dropdown once
+  the project has been submitted.
 
 ### 7.3 Managing the catalogue (admin only)
 
@@ -461,8 +482,36 @@ Open **App settings → Project documentation instructions**. Admins can:
 - **Edit** the title, replace the PDF, or change the URL.
 - **Set as default** — promotes the row to the type's default; the
   previous default is demoted in the same transaction.
-- **Delete** — only available for non-default rows that are not
-  currently referenced by any project.
+- **Delete** — available for non-default rows. Projects still using the
+  instruction are first reassigned to the type default, so a referenced row can
+  be deleted; the number of reassigned projects is reported back.
+
+Instructor uploads also appear here, so admins keep an overview of the whole
+catalogue. **Set as default** is refused for them (§7.1).
+
+### 7.3a Your own instructions (instructors)
+
+Instructors do not need an admin to get a course-specific write-up guide. Next
+to any documentation-instruction dropdown, the upload button opens **Your
+documentation instructions** for the project's type. In that dialog an
+instructor can:
+
+- **Upload** a new instruction: a title plus one PDF (at most 20 MB). It is
+  created as a non-default, personal instruction for the current project type
+  and is selected for the project immediately.
+- **Rename** it, **replace its PDF**, or **delete** it — for their own uploads
+  only. Deleting reassigns any project still using it to the type default.
+
+Notes:
+
+- An instruction always belongs to exactly one project type, so the button stays
+  disabled until a type is selected. Changing a project's type therefore also
+  resets its instruction.
+- PDFs are validated by content, not just by file extension.
+- Uploads are only offered while the project type itself is still editable, i.e.
+  until the team submits.
+- A super-admin using the same dialog creates a **platform** instruction, not a
+  personal one — admins manage the catalogue in app settings.
 
 ### 7.4 The author write-up (Documentation field)
 

@@ -18,6 +18,7 @@ const GET_INSTRUCTION_TYPE = `
     ProjectDocumentationInstruction_by_pk(id: $id) {
       id
       projectTypeValue
+      createdByUserId
     }
   }
 `;
@@ -93,6 +94,19 @@ export default async function setProjectDocumentationInstructionDefault(req, log
         success: false,
         messageKey: "SET_PROJECT_DOCUMENTATION_INSTRUCTION_DEFAULT_NOT_FOUND",
         error: "Documentation instruction not found",
+      };
+    }
+    // A type default is part of the platform catalogue and must stay visible to
+    // every instructor. Promoting a personal upload (createdByUserId IS NOT NULL)
+    // would make a type's only default invisible to everyone but its creator, and
+    // would also take the row out of its owner's control (the update and delete
+    // permissions both exclude isDefault rows).
+    if (row.createdByUserId) {
+      return {
+        success: false,
+        messageKey: "SET_PROJECT_DOCUMENTATION_INSTRUCTION_DEFAULT_NOT_PLATFORM",
+        error:
+          "Only platform instructions can become a type default; this one belongs to an instructor",
       };
     }
     projectTypeValue = row.projectTypeValue;

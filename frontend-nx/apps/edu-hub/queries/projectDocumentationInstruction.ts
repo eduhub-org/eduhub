@@ -151,3 +151,28 @@ export const SAVE_PROJECT_DOCUMENTATION_INSTRUCTION = gql`
     }
   }
 `;
+
+/**
+ * The instructions the caller may manage themselves.
+ *
+ * The caller passes the whole bool_exp (project type plus
+ * `createdByUserId: {_eq: <me>}`); Hasura ANDs its own select filter on top, so a
+ * client-side filter can never widen visibility. Unlike
+ * PROJECT_DOCUMENTATION_INSTRUCTIONS this does NOT filter on `url`: a draft left
+ * behind by a failed upload has to stay visible here so its owner can retry or
+ * delete it.
+ */
+export const MY_PROJECT_DOCUMENTATION_INSTRUCTIONS = gql`
+  query MyProjectDocumentationInstructions(
+    $filter: ProjectDocumentationInstruction_bool_exp!
+  ) {
+    ProjectDocumentationInstruction(where: $filter, order_by: [{ title: asc }]) {
+      id
+      title
+      url
+      projectTypeValue
+      isDefault
+      updated_at
+    }
+  }
+`;

@@ -2099,14 +2099,16 @@ export enum ProjectCourse_update_column {
  */
 export enum ProjectDocumentationInstruction_constraint {
   ProjectDocumentationInstruction_one_default_per_type = "ProjectDocumentationInstruction_one_default_per_type",
+  ProjectDocumentationInstruction_owner_title_key = "ProjectDocumentationInstruction_owner_title_key",
   ProjectDocumentationInstruction_pkey = "ProjectDocumentationInstruction_pkey",
-  ProjectDocumentationInstruction_title_key = "ProjectDocumentationInstruction_title_key",
+  ProjectDocumentationInstruction_platform_title_key = "ProjectDocumentationInstruction_platform_title_key",
 }
 
 /**
  * select columns of table "ProjectDocumentationInstruction"
  */
 export enum ProjectDocumentationInstruction_select_column {
+  createdByUserId = "createdByUserId",
   created_at = "created_at",
   id = "id",
   isDefault = "isDefault",
@@ -2135,6 +2137,7 @@ export enum ProjectDocumentationInstruction_select_column_ProjectDocumentationIn
  * update columns of table "ProjectDocumentationInstruction"
  */
 export enum ProjectDocumentationInstruction_update_column {
+  createdByUserId = "createdByUserId",
   created_at = "created_at",
   id = "id",
   isDefault = "isDefault",
@@ -10569,12 +10572,14 @@ export interface ProjectDocumentationInstruction_avg_order_by {
  * Boolean expression to filter rows from the table "ProjectDocumentationInstruction". All fields are combined with a logical 'AND'.
  */
 export interface ProjectDocumentationInstruction_bool_exp {
+  CreatedByUser?: User_bool_exp | null;
   ProjectType?: ProjectType_bool_exp | null;
   Projects?: Project_bool_exp | null;
   Projects_aggregate?: Project_aggregate_bool_exp | null;
   _and?: ProjectDocumentationInstruction_bool_exp[] | null;
   _not?: ProjectDocumentationInstruction_bool_exp | null;
   _or?: ProjectDocumentationInstruction_bool_exp[] | null;
+  createdByUserId?: uuid_comparison_exp | null;
   created_at?: timestamptz_comparison_exp | null;
   id?: Int_comparison_exp | null;
   isDefault?: Boolean_comparison_exp | null;
@@ -10589,8 +10594,10 @@ export interface ProjectDocumentationInstruction_bool_exp {
  * input type for inserting data into table "ProjectDocumentationInstruction"
  */
 export interface ProjectDocumentationInstruction_insert_input {
+  CreatedByUser?: User_obj_rel_insert_input | null;
   ProjectType?: ProjectType_obj_rel_insert_input | null;
   Projects?: Project_arr_rel_insert_input | null;
+  createdByUserId?: any | null;
   created_at?: any | null;
   id?: number | null;
   isDefault?: boolean | null;
@@ -10605,6 +10612,7 @@ export interface ProjectDocumentationInstruction_insert_input {
  * order by max() on columns of table "ProjectDocumentationInstruction"
  */
 export interface ProjectDocumentationInstruction_max_order_by {
+  createdByUserId?: order_by | null;
   created_at?: order_by | null;
   id?: order_by | null;
   legacyAchievementDocumentationTemplateId?: order_by | null;
@@ -10618,6 +10626,7 @@ export interface ProjectDocumentationInstruction_max_order_by {
  * order by min() on columns of table "ProjectDocumentationInstruction"
  */
 export interface ProjectDocumentationInstruction_min_order_by {
+  createdByUserId?: order_by | null;
   created_at?: order_by | null;
   id?: order_by | null;
   legacyAchievementDocumentationTemplateId?: order_by | null;
@@ -10648,8 +10657,10 @@ export interface ProjectDocumentationInstruction_on_conflict {
  * Ordering options when selecting data from "ProjectDocumentationInstruction".
  */
 export interface ProjectDocumentationInstruction_order_by {
+  CreatedByUser?: User_order_by | null;
   ProjectType?: ProjectType_order_by | null;
   Projects_aggregate?: Project_aggregate_order_by | null;
+  createdByUserId?: order_by | null;
   created_at?: order_by | null;
   id?: order_by | null;
   isDefault?: order_by | null;

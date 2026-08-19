@@ -3,9 +3,17 @@ import { buildCloudStorage } from "../lib/cloud-storage.js";
 import { replacePlaceholders } from "../lib/utils.js";
 import { logger } from "../index.js";
 import { maxBase64LengthForBytes, validateFileUpload } from "./fileValidation.js";
+import { sanitizeStoredFileName } from "../lib/fileName.js";
 
 const BYTES_PER_MB = 1024 * 1024;
 const DEFAULT_MAX_FILE_SIZE_MB = 20;
+
+// saveFileResult declares filePath/accessUrl as String! (actions.graphql), so every
+// return - including failures - must carry them. Omitting them makes Hasura reject
+// the whole response with "expecting not null value for field filePath" and the real
+// messageKey never reaches the client. Callers branch on `success` first, so the
+// empty strings below are never read.
+const FAILURE_FILE_FIELDS = { filePath: "", accessUrl: "" };
 
 /**
  * Saves a base64 encoded file to cloud storage.
@@ -41,7 +49,8 @@ const saveFile = async (req) => {
       return {
         success: false,
         messageKey: "INVALID_INPUT",
-        error: "Missing required fields: base64file, file-path, or bucket"
+        error: "Missing required fields: base64file, file-path, or bucket",
+        ...FAILURE_FILE_FIELDS,
       };
     }
 
@@ -64,7 +73,8 @@ const saveFile = async (req) => {
       return {
         success: false,
         messageKey: "FILE_TOO_LARGE",
-        error: `File size exceeds maximum size of ${maxFileSizeInBytes} bytes`
+        error: `File size exceeds maximum size of ${maxFileSizeInBytes} bytes`,
+        ...FAILURE_FILE_FIELDS,
       };
     }
 
@@ -80,15 +90,20 @@ const saveFile = async (req) => {
       return {
         success: false,
         messageKey: "FILE_TOO_LARGE",
-        error: `File size exceeds maximum size of ${maxFileSizeInBytes} bytes`
+        error: `File size exceeds maximum size of ${maxFileSizeInBytes} bytes`,
+        ...FAILURE_FILE_FIELDS,
       };
     }
 
     // Actions that provide an allowlist require both an accepted filename
     // extension and a matching file signature before anything reaches storage.
+    // The client-supplied name ends up in the storage object key via
+    // replacePlaceholders, so normalise it before it is validated or stored.
+    const safeFileName = sanitizeStoredFileName(req.body.input.filename);
+
     if (
       allowedFileExtensions &&
-      !validateFileUpload(req.body.input.filename ?? '', fileBuffer, allowedFileExtensions)
+      !validateFileUpload(safeFileName, fileBuffer, allowedFileExtensions)
     ) {
       logger.error("File extension or signature is not allowed", {
         fileName: req.body.input.filename,
@@ -97,11 +112,19 @@ const saveFile = async (req) => {
       return {
         success: false,
         messageKey: "INVALID_FORMAT",
-        error: "File extension or content does not match an allowed format"
+        error: "File extension or content does not match an allowed format",
+        ...FAILURE_FILE_FIELDS,
       };
     }
 
-    const filePath = replacePlaceholders(templatePath, req.body.input);
+    // base64file is excluded deliberately: it never appears in a path template and
+    // feeding a multi-MB string through RegExp replacement is pure waste (and its
+    // contents could otherwise act as a replacement pattern).
+    const { base64file: _base64file, ...pathInputs } = req.body.input;
+    const filePath = replacePlaceholders(templatePath, {
+      ...pathInputs,
+      filename: safeFileName,
+    });
     const storage = buildCloudStorage(Storage);
     const accessUrl = await storage.saveToBucket(filePath, req.headers.bucket, content, isPublic);
     
@@ -121,7 +144,8 @@ const saveFile = async (req) => {
     return {
       success: false,
       messageKey: "FILE_SAVE_ERROR",
-      error: "An error occurred while saving the file"
+      error: "An error occurred while saving the file",
+      ...FAILURE_FILE_FIELDS,
     };
   }
 };

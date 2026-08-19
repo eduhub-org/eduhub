@@ -9,6 +9,8 @@ import { Button } from '../../../../common/Button';
 import DropDownSelector from '../../../../inputs/DropDownSelector';
 import ProjectFormatSelector from '../../../CourseContent/Projects/ProjectFormatSelector';
 import InstructionDownloadButton from '../../../CourseContent/Projects/InstructionDownloadButton';
+import InstructionUploadButton from '../../../CourseContent/Projects/InstructionUploadButton';
+import DocumentationInstructionUploadDialog from './DocumentationInstructionUploadDialog';
 import { resolveInitialProjectType } from '../../../CourseContent/Projects/projectTypeRequirements';
 import { filterProjectDocumentationInstructionsWithPdf } from '../../../CourseContent/Projects/projectDocumentationInstruction';
 import { INSTRUCTOR_INSERT_PROJECT } from '../../../../../queries/projectInstructor';
@@ -63,6 +65,7 @@ const AddProjectDialog: FC<AddProjectDialogProps> = ({
   );
   const [authors, setAuthors] = useState<UserSelectionWithFilter_User[]>([]);
   const [selectAuthorOpen, setSelectAuthorOpen] = useState(false);
+  const [instructionDialogOpen, setInstructionDialogOpen] = useState(false);
 
   const projectTypesQuery = useRoleQuery<ProjectTypes>(PROJECT_TYPES);
   const documentationInstructionsQuery = useRoleQuery<ProjectDocumentationInstructions>(
@@ -454,6 +457,15 @@ const AddProjectDialog: FC<AddProjectDialogProps> = ({
                 url={selectedInstructionUrl}
                 disabled={loading}
               />
+              <InstructionUploadButton
+                onClick={() => setInstructionDialogOpen(true)}
+                disabled={loading || !type}
+                label={
+                  type
+                    ? t('projects.instruction_upload.open')
+                    : t('projects.instruction_upload.disabled_no_type')
+                }
+              />
             </div>
             <p className="mt-2 text-xs text-label-secondary whitespace-pre-line">
               {instructionHelpText}
@@ -472,6 +484,18 @@ const AddProjectDialog: FC<AddProjectDialogProps> = ({
         title={t('projects.select_author_title')}
         onClose={handleAuthorSelected}
       />
+
+      {type ? (
+        <DocumentationInstructionUploadDialog
+          open={instructionDialogOpen}
+          onClose={() => setInstructionDialogOpen(false)}
+          projectTypeValue={type}
+          selectedInstructionId={instructionId ? Number(instructionId) : null}
+          onCreated={(newId) => setInstructionId(String(newId))}
+          onSelectedDeleted={() => setInstructionId('')}
+          onError={onError}
+        />
+      ) : null}
     </>
   );
 };

@@ -363,12 +363,27 @@ actions:
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
         - name: bucket
           value_from_env: HASURA_BUCKET
+        # Dedicated handler instead of the generic saveFile: the target object path
+        # is derived from projectDocumentationInstructionId, so a caller who is not
+        # the owner could otherwise overwrite another instruction's PDF.
         - name: name
-          value: saveFile
+          value: saveProjectDocumentationInstruction
         - name: file-path
           value: project-docs-instructions/public/instruction-${projectDocumentationInstructionId}/${filename}
         - name: is-public
           value: "true"
+        # Was previously implicit (saveFile's 20 MB default); pinned so widening the
+        # caller set does not depend on a handler default.
+        - name: max-file-size-bytes
+          value: "20971520"
+        # Enables validateFileUpload -> isPdf (%PDF- magic bytes + trailing %%EOF) in
+        # saveFile/fileValidation.js. Without this header saveFile skips validation
+        # entirely, so a renamed non-PDF would reach storage.
+        - name: allowed-file-extensions
+          value: .pdf
+    permissions:
+      - role: instructor_access
+    comment: Stores an instruction PDF. The handler verifies that a non-admin caller owns the target non-default instruction before delegating to saveFile.
   - name: setProjectDocumentationInstructionDefault
     definition:
       kind: synchronous
@@ -390,7 +405,8 @@ actions:
           value: deleteProjectDocumentationInstruction
     permissions:
       - role: admin
-    comment: Reassigns projects using the instruction to the type default, then deletes the non-default instruction.
+      - role: instructor_access
+    comment: Reassigns projects using the instruction to the type default, then deletes the non-default instruction. Instructors may only delete instructions they created (verified in the handler).
   - name: saveProjectImage
     definition:
       kind: synchronous
