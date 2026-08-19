@@ -1,8 +1,9 @@
 # Project documentation instructions (default PDFs)
 
-This folder holds the **seven default** instruction PDFs shipped with EduHub.
+This folder holds the **eight default** instruction PDFs shipped with EduHub.
 They are linked from the seeded `ProjectDocumentationInstruction` rows created
-by migration `1779400000000_project_documentation_instruction_per_type_default`.
+by migrations `1779400000000_project_documentation_instruction_per_type_default`
+and `1787095331230_add_project_type_documentation_only`.
 
 ## Default vs custom instructions
 
@@ -28,6 +29,7 @@ Bilingual copy to export as PDF: **`source/`** (one `.md` per type). See
 
 - `ONLINE_COURSE.pdf`
 - `CLASSIC_PROJECT.pdf`
+- `PROJECT_WITH_DOCUMENTATION_ONLY.pdf`
 - `PROJECT_WITH_LINK.pdf`
 - `PROJECT_WITH_PRESENTATION.pdf`
 - `PROJECT_WITH_LINK_AND_PRESENTATION.pdf`

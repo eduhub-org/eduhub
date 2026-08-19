@@ -307,18 +307,35 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
       if (!isProjectTypeEditable(status)) return;
       // Skip persistence while the checked deliverables match no catalog type.
       if (!value) return;
+
+      // Reset the instruction to the new type's default so type and
+      // documentationInstructionId stay consistent (the DB trigger rejects a
+      // mismatch). Mirrors the Add/Confirm dialog behaviour. Fall back to any
+      // instruction of the new type when none is flagged as default.
+      const instructions =
+        documentationInstructionsQuery.data?.ProjectDocumentationInstruction ?? [];
+      const nextInstruction =
+        instructions.find(
+          (inst) => inst.projectTypeValue === value && inst.isDefault
+        ) ?? instructions.find((inst) => inst.projectTypeValue === value);
+
+      // Outside PROPOSED the database forbids a NULL documentationInstructionId
+      // (Project_ongoing_requires_type_and_instruction_check), so refuse the
+      // change with an actionable message instead of sending a mutation that
+      // fails with a raw constraint error. The query only returns instructions
+      // that actually have a PDF url, so "no instruction" also covers an
+      // admin-created row whose upload is still pending.
+      if (!nextInstruction && status !== ProjectStatus_enum.PROPOSED) {
+        setErrorMessage(t('projects.expanded.type_change_no_instruction_error'));
+        return;
+      }
+
       try {
-        // Reset the instruction to the new type's default so type and
-        // documentationInstructionId stay consistent (the DB trigger rejects a
-        // mismatch). Mirrors the Add/Confirm dialog behaviour.
-        const defaultInstruction = (
-          documentationInstructionsQuery.data?.ProjectDocumentationInstruction ?? []
-        ).find((inst) => inst.projectTypeValue === value && inst.isDefault);
         await updateProjectType({
           variables: {
             itemId: projectId,
             value,
-            documentationInstructionId: defaultInstruction?.id ?? null,
+            documentationInstructionId: nextInstruction?.id ?? null,
           },
         });
       } catch (err) {
@@ -328,6 +345,7 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
     [
       updateProjectType,
       documentationInstructionsQuery.data?.ProjectDocumentationInstruction,
+      t,
       tCommon,
     ]
   );
@@ -721,6 +739,33 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
           </div>
         ) : null;
 
+      const projectTypeSection = (
+        <>
+          <ProjectFormatSelector
+            projectTypes={projectTypesList}
+            value={row.type ?? ''}
+            onChange={(typeValue) =>
+              handleSetProjectType(row.id, typeValue, row.status)
+            }
+            disabled={!canEditProjectType}
+          />
+          {canEditProjectType && row.status === ProjectStatus_enum.ONGOING ? (
+            // Files already uploaded under the old type are kept, but the set of
+            // *mandatory* deliverables changes and the documentation instruction
+            // is swapped for the new type's default, so warn before the team is
+            // affected.
+            <p className="mt-2 text-xs text-warning">
+              {t('projects.expanded.type_change_ongoing_warning')}
+            </p>
+          ) : null}
+          {!canEditProjectType ? (
+            <p className="mt-2 text-xs text-label-secondary">
+              {t('projects.expanded.type_locked_hint')}
+            </p>
+          ) : null}
+        </>
+      );
+
       if (!hasAcceptedAuthor) {
         const canEditProjectTitle = row.parentProjectId == null;
         return (
@@ -859,19 +904,7 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
             </div>
 
             <div className="border-t border-border-primary pt-5">
-              <ProjectFormatSelector
-                projectTypes={projectTypesList}
-                value={row.type ?? ''}
-                onChange={(typeValue) =>
-                  handleSetProjectType(row.id, typeValue, row.status)
-                }
-                disabled={!canEditProjectType}
-              />
-              {!canEditProjectType ? (
-                <p className="mt-2 text-xs text-label-secondary">
-                  {t('projects.expanded.type_locked_hint')}
-                </p>
-              ) : null}
+              {projectTypeSection}
             </div>
 
             {documentationInstructionSection ? (
@@ -901,19 +934,7 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
           </div>
 
           <div className="border-t border-border-primary pt-5">
-            <ProjectFormatSelector
-              projectTypes={projectTypesList}
-              value={row.type ?? ''}
-              onChange={(typeValue) =>
-                handleSetProjectType(row.id, typeValue, row.status)
-              }
-              disabled={!canEditProjectType}
-            />
-            {!canEditProjectType ? (
-              <p className="mt-2 text-xs text-label-secondary">
-                {t('projects.expanded.type_locked_hint')}
-              </p>
-            ) : null}
+            {projectTypeSection}
           </div>
 
           {documentationInstructionSection ? (

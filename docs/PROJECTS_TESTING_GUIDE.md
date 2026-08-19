@@ -42,7 +42,7 @@ exist on production-like data; use a throw-away dev DB.
 
 ### 2.2 Programs and courses (fresh)
 
-- **Program P1** with `defaultProjectType = CLASSIC_PROJECT`,
+- **Program P1** with `defaultProjectType = PROJECT_WITH_DOCUMENTATION_ONLY`,
   `projectProposalsEnabledByDefault = true`,
   `defaultProjectSubmissionDeadline` set to **tomorrow**.
 - **Program P2** with no project defaults set.
@@ -57,7 +57,7 @@ exist on production-like data; use a throw-away dev DB.
 In **App settings → Project documentation instructions**, confirm that
 every `ProjectType` already has a default instruction. If not, upload a
 small PDF and mark it default for the missing types. Add **one extra**
-non-default instruction for `CLASSIC_PROJECT` to test the picker.
+non-default instruction for `PROJECT_WITH_DOCUMENTATION_ONLY` to test the picker.
 
 ---
 
@@ -168,7 +168,7 @@ This section walks the full project lifecycle once. Roles are noted in
 
 1. Open Manage Programs → expand P1. Confirm the three new program-level
    controls render:
-   - **Default project type** = CLASSIC_PROJECT.
+   - **Default project type** = Projekt (nur Dokumentation) (PROJECT_WITH_DOCUMENTATION_ONLY).
    - **Project proposals enabled by default** is on.
    - **Default project submission deadline** = tomorrow.
 2. Change P1's default deadline to **+7 days** and back. Toast confirms,
@@ -257,13 +257,42 @@ Then verify the rule lifts when the project finishes:
 **As `instr-a`** in Manage Course A → **Participations → Projects**:
 
 1. Find User-1's project. Status chip shows PROPOSED.
-2. Click **Confirm team**. Pick type `CLASSIC_PROJECT` and the default
+2. Click **Confirm team**. Uncheck **Präsentations-Upload** so the type
+   resolves to *Projekt (nur Dokumentation)* (`PROJECT_WITH_DOCUMENTATION_ONLY`), keep the default
    documentation instruction. Confirm.
 3. The status chip flips to ONGOING. **Accepting participants** is now
-   locked off. Type and instruction cells become read-only.
+   locked off. Type and instruction stay **editable** and an amber warning
+   appears above them explaining what changing the type does.
 4. As `user-1`: refresh the course page. The "Request to join" buttons
    on the Projects table are gone; the My Project panel still allows
    editing artifacts.
+
+### 4.6b Changing the project type of an ONGOING project
+
+**As `instr-a`** in Manage Course A → **Participations → Projects**, on the
+project just confirmed:
+
+1. Expand the row. The deliverable checkboxes are **enabled** and the amber
+   ONGOING warning is visible; the "locked" hint is gone.
+2. Check **Präsentations-Upload**. The type becomes
+   `PROJECT_WITH_PRESENTATION` and the documentation instruction switches to
+   that type's default. No Postgres constraint error appears.
+3. As `user-1`: the My Project panel now highlights the presentation slot as
+   mandatory and **Submit** is disabled until it is filled.
+4. Back as `instr-a`, uncheck it again — the project returns to
+   `PROJECT_WITH_DOCUMENTATION_ONLY` and the presentation slot stops being mandatory. The already
+   uploaded presentation file is **kept**.
+5. Uncheck everything, then check only **Externer Link**: the reworded
+   invalid-combination error shows and nothing is persisted.
+6. Negative test: `UPDATE "ProjectDocumentationInstruction" SET url = NULL
+   WHERE "projectTypeValue" = 'PROJECT_WITH_DOCUMENTATION_ONLY'`, reload, and try to switch an ONGOING
+   project to that type. Expect the friendly "no documentation instruction"
+   message, **not** a raw
+   `Project_ongoing_requires_type_and_instruction_check` error. Restore
+   afterwards.
+7. After the team submits, re-expand the row: the checkboxes and the
+   instruction dropdown are **disabled** and the hint reads "…until the
+   project has been submitted". **Send back** re-enables them.
 
 ### 4.7 Submission, review, send-back, approval
 
@@ -355,7 +384,8 @@ the slot is filled.
 
 | Type | Required slots to test |
 |---|---|
-| `CLASSIC_PROJECT` | Documentation |
+| `CLASSIC_PROJECT` | Documentation (legacy, not selectable in the picker) |
+| `PROJECT_WITH_DOCUMENTATION_ONLY` | Documentation + cover image |
 | `ONLINE_COURSE` | Documentation |
 | `PROJECT_WITH_LINK` | Documentation + cover image + external link |
 | `PROJECT_WITH_PRESENTATION` | Documentation + presentation + cover image |

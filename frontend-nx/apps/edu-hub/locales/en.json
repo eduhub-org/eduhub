@@ -394,6 +394,7 @@
       "type_label": {
         "ONLINE_COURSE": "Online course",
         "CLASSIC_PROJECT": "Classic project",
+        "PROJECT_WITH_DOCUMENTATION_ONLY": "Project (documentation only)",
         "PROJECT_WITH_LINK": "Project with link",
         "PROJECT_WITH_PRESENTATION": "Project with presentation",
         "PROJECT_WITH_LINK_AND_PRESENTATION": "Project with link and presentation",
@@ -1413,7 +1414,9 @@
         "submission_deadline_instructor_origin_program_legacy": " (from the program certificate deadline)",
         "submission_deadline_instructor_picker_prompt": "If you want to change it for this project, select the specific date here:",
         "submission_deadline_instructor_picker_help": "Leave empty to use the default submission deadline shown above.",
-        "type_locked_hint": "The project type can no longer be changed once the project is confirmed or submitted."
+        "type_locked_hint": "The project type can only be changed until the project has been submitted.",
+        "type_change_ongoing_warning": "This project is already ongoing. Changing the type changes what the team must submit and replaces the documentation instruction with the new type's default. Files already uploaded are kept.",
+        "type_change_no_instruction_error": "This project type has no documentation instruction with a PDF. Create one in app settings first — the project type was not changed."
       },
       "confirm_project_dialog": {
         "title": "Confirm project",
@@ -1503,7 +1506,7 @@
           "label": "Self-reflection questionnaire",
           "help": "Participants complete the self-reflection questionnaire (a fillable PDF provided with the documentation instructions)."
         },
-        "classic_invalid_combination": "Select at least an external link or a presentation — documentation alone is not possible for a classic project.",
+        "classic_invalid_combination": "Select at least documentation or a presentation — an external link alone is not enough for a classic project.",
         "invalid_combination": "This combination of requirements is not available. Adjust your selection.",
         "type_choice": {
           "label": "Project format",
@@ -1914,7 +1917,7 @@
       },
       "default_project_type": {
         "label": "Default project type",
-        "help_text": "New projects in this program inherit this type. Students never pick the type; instructors finalize it when confirming a team.",
+        "help_text": "New projects in this program inherit this type. Students never pick the type; instructors set it when confirming a team and can still change it until submission.",
         "none_option": "Not set"
       },
       "default_submission_deadline": {
@@ -1924,6 +1927,7 @@
       "type_options": {
         "ONLINE_COURSE": "Online course (documentation only)",
         "CLASSIC_PROJECT": "Classic project (documentation only)",
+        "PROJECT_WITH_DOCUMENTATION_ONLY": "Project (documentation only) (documentation, cover image)",
         "PROJECT_WITH_LINK": "Project with link (documentation, cover image, external link)",
         "PROJECT_WITH_PRESENTATION": "Project with presentation (documentation, cover image, presentation)",
         "PROJECT_WITH_LINK_AND_PRESENTATION": "Project with link and presentation (documentation, cover image, external link, presentation)",
