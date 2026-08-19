@@ -50,3 +50,16 @@ ALTER TABLE "public"."ProjectDocumentationInstruction"
     OR "url" IS NULL
     OR "url" LIKE 'project-docs-instructions/public/%'
   );
+
+-- A type default belongs to the platform catalogue and stays visible to every
+-- instructor, so it must never be personally owned. setProjectDocumentation-
+-- InstructionDefault already refuses to promote an owned row; this makes the
+-- invariant structural, so a privileged mutation or a data repair cannot create a
+-- default that only its owner can see (and that its owner could not manage either,
+-- because the update/delete permissions exclude isDefault rows).
+ALTER TABLE "public"."ProjectDocumentationInstruction"
+  ADD CONSTRAINT "ProjectDocumentationInstruction_default_is_platform_check"
+  CHECK (
+    "isDefault" IS NOT TRUE
+    OR "createdByUserId" IS NULL
+  );

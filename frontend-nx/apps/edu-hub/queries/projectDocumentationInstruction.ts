@@ -161,12 +161,21 @@ export const SAVE_PROJECT_DOCUMENTATION_INSTRUCTION = gql`
  * PROJECT_DOCUMENTATION_INSTRUCTIONS this does NOT filter on `url`: a draft left
  * behind by a failed upload has to stay visible here so its owner can retry or
  * delete it.
+ *
+ * `limit` bounds the result set. The dialog shows one growing window and raises the
+ * limit on demand rather than paging, because the list is meant to be read as a
+ * whole; that is why there is no `offset`.
  */
 export const MY_PROJECT_DOCUMENTATION_INSTRUCTIONS = gql`
   query MyProjectDocumentationInstructions(
     $filter: ProjectDocumentationInstruction_bool_exp!
+    $limit: Int!
   ) {
-    ProjectDocumentationInstruction(where: $filter, order_by: [{ title: asc }]) {
+    ProjectDocumentationInstruction(
+      where: $filter
+      order_by: [{ title: asc }]
+      limit: $limit
+    ) {
       id
       title
       url

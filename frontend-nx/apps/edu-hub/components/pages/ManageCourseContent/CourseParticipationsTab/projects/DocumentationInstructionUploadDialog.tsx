@@ -29,6 +29,11 @@ import {
 /** PDFs only: the action enforces the same via allowed-file-extensions + magic bytes. */
 const INSTRUCTION_ACCEPT = 'application/pdf,.pdf';
 const TITLE_MAX_LENGTH = 200;
+/**
+ * How many of the caller's own instructions are fetched at once. The list is meant
+ * to be read as a whole, so "load more" widens this window instead of paging.
+ */
+const OWN_LIST_PAGE_SIZE = 25;
 
 type OwnInstruction =
   MyProjectDocumentationInstructions_ProjectDocumentationInstruction;
@@ -81,6 +86,7 @@ const DocumentationInstructionUploadDialog: FC<
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<OwnInstruction | null>(null);
+  const [ownListLimit, setOwnListLimit] = useState(OWN_LIST_PAGE_SIZE);
 
   const pdfInputId = useId();
   const pdfInputRef = useRef<HTMLInputElement | null>(null);
@@ -105,6 +111,8 @@ const DocumentationInstructionUploadDialog: FC<
         projectTypeValue: { _eq: projectTypeValue },
         createdByUserId: { _eq: userId },
       },
+      // One extra row so a further page can be detected without a count query.
+      limit: ownListLimit + 1,
     },
     skip: !open || !projectTypeValue || !userId,
     fetchPolicy: 'cache-and-network',
@@ -132,11 +140,21 @@ const DocumentationInstructionUploadDialog: FC<
   );
   const { getFileBase64, isLoading: pdfEncoding } = useFileUploader();
 
-  const ownInstructions = ownInstructionsQuery.data?.ProjectDocumentationInstruction ?? [];
+  const fetchedOwnInstructions =
+    ownInstructionsQuery.data?.ProjectDocumentationInstruction ?? [];
+  const hasMoreOwnInstructions = fetchedOwnInstructions.length > ownListLimit;
+  const ownInstructions = hasMoreOwnInstructions
+    ? fetchedOwnInstructions.slice(0, ownListLimit)
+    : fetchedOwnInstructions;
+  // `cache-and-network` yields an empty list on the first pass, so the empty state
+  // must not be shown until the query has actually resolved once.
+  const ownListLoading =
+    ownInstructionsQuery.loading && ownInstructionsQuery.data === undefined;
 
   const resetForm = useCallback(() => {
     setTitle('');
     setPdfFile(null);
+    setOwnListLimit(OWN_LIST_PAGE_SIZE);
     if (pdfInputRef.current) pdfInputRef.current.value = '';
   }, []);
 
@@ -402,7 +420,9 @@ const DocumentationInstructionUploadDialog: FC<
               {t('projects.instruction_upload.own_list_help')}
             </p>
 
-            {ownInstructions.length === 0 ? (
+            {ownListLoading ? (
+              <p className="text-sm text-label-secondary">{tCommon('loading')}</p>
+            ) : ownInstructions.length === 0 ? (
               <p className="text-sm text-label-secondary">
                 {t('projects.instruction_upload.own_list_empty')}
               </p>
@@ -480,6 +500,14 @@ const DocumentationInstructionUploadDialog: FC<
                 ))}
               </ul>
             )}
+
+            {hasMoreOwnInstructions ? (
+              <Button
+                onClick={() => setOwnListLimit((n) => n + OWN_LIST_PAGE_SIZE)}
+              >
+                {t('projects.instruction_upload.load_more')}
+              </Button>
+            ) : null}
           </div>
         </div>
       </DialogShell>

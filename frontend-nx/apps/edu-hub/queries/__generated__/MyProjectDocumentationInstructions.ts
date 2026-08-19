@@ -40,4 +40,5 @@ export interface MyProjectDocumentationInstructions {
 
 export interface MyProjectDocumentationInstructionsVariables {
   filter: ProjectDocumentationInstruction_bool_exp;
+  limit: number;
 }

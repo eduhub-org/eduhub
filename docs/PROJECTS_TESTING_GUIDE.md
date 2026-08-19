@@ -558,7 +558,7 @@ Participations → Projects (expand the row), and again in **Add project** and
     deletes must go through the action).
 17. **`saveProjectDocumentationInstruction` against a row `instr-b` does not
     own**, using that row's exact filename → `..._UNAUTHORIZED`, and the object
-    in the bucket is byte-identical afterwards. This is the overwrite the
+    in the bucket is byte-identical afterward. This is the overwrite the
     dedicated handler exists to prevent.
 18. `deleteProjectDocumentationInstruction` on `instr-a`'s row →
     `..._FORBIDDEN`; on any default row → `..._IS_DEFAULT`.

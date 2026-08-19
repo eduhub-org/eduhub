@@ -1483,6 +1483,7 @@
         "own_list_heading": "Your instructions for this project type",
         "own_list_help": "Rename, replace the PDF, or delete. Instructions provided by opencampus.sh cannot be edited here.",
         "own_list_empty": "You have not uploaded your own instruction for this project type yet.",
+        "load_more": "Show more",
         "replace_label": "Replace PDF",
         "missing_pdf": "No PDF attached yet - this instruction is not offered anywhere.",
         "delete_tooltip": "Delete instruction",

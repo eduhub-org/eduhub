@@ -1465,6 +1465,7 @@
         "own_list_heading": "Deine Anleitungen für diesen Projekttyp",
         "own_list_help": "Titel ändern, PDF ersetzen oder Anleitung löschen. Anleitungen von opencampus.sh kannst Du hier nicht bearbeiten.",
         "own_list_empty": "Du hast für diesen Projekttyp noch keine eigene Anleitung hochgeladen.",
+        "load_more": "Weitere anzeigen",
         "replace_label": "PDF ersetzen",
         "missing_pdf": "Kein PDF hinterlegt – diese Anleitung wird noch nicht angeboten.",
         "delete_tooltip": "Anleitung löschen",

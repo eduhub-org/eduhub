@@ -1,4 +1,7 @@
 ALTER TABLE "public"."ProjectDocumentationInstruction"
+  DROP CONSTRAINT IF EXISTS "ProjectDocumentationInstruction_default_is_platform_check";
+
+ALTER TABLE "public"."ProjectDocumentationInstruction"
   DROP CONSTRAINT IF EXISTS "ProjectDocumentationInstruction_owned_url_prefix_check";
 
 DROP INDEX IF EXISTS "public"."ProjectDocumentationInstruction_owner_title_key";
