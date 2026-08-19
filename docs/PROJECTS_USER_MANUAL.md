@@ -134,9 +134,11 @@ field is highlighted as **incomplete** until a valid value is supplied. The
   ONGOING — including after a send-back — but not once it is SUBMITTED.
   Changing the type changes the team's mandatory deliverables and resets the
   documentation instruction to the new type's default — or, when the new type
-  has no default, to another instruction of that type; files already uploaded
-  are kept. If the submission deadline has already passed, check that the team
-  can still supply any newly required deliverable.
+  has no default, to another instruction of that type. Only instructions with an
+  uploaded PDF count: while the project is ONGOING, the change is rejected with
+  a hint and the type stays as it was if the new type has no such instruction.
+  Files already uploaded are kept. If the submission deadline has already
+  passed, check that the team can still supply any newly required deliverable.
 - Programs and courses may carry a `defaultProjectType`. When set, the
   **Add project** / **Confirm team** dialogs pre-select it.
 - For self-proposed projects, the type is **not** required at PROPOSED
