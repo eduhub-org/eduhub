@@ -10,6 +10,7 @@ import DropDownSelector from '../../../../inputs/DropDownSelector';
 import ProjectFormatSelector from '../../../CourseContent/Projects/ProjectFormatSelector';
 import InstructionDownloadButton from '../../../CourseContent/Projects/InstructionDownloadButton';
 import { resolveInitialProjectType } from '../../../CourseContent/Projects/projectTypeRequirements';
+import { filterProjectDocumentationInstructionsWithPdf } from '../../../CourseContent/Projects/projectDocumentationInstruction';
 import { INSTRUCTOR_INSERT_PROJECT } from '../../../../../queries/projectInstructor';
 import {
   PROJECT_DOCUMENTATION_INSTRUCTIONS,
@@ -73,9 +74,14 @@ const AddProjectDialog: FC<AddProjectDialogProps> = ({
     [projectTypesQuery.data?.ProjectType]
   );
 
+  // Only instructions with a stored PDF are selectable: a new project is created
+  // outside PROPOSED, where Project_ongoing_requires_type_and_instruction_check
+  // demands an instruction the team can actually download.
   const documentationInstructions = useMemo(
     () =>
-      documentationInstructionsQuery.data?.ProjectDocumentationInstruction ?? [],
+      filterProjectDocumentationInstructionsWithPdf(
+        documentationInstructionsQuery.data?.ProjectDocumentationInstruction ?? []
+      ),
     [documentationInstructionsQuery.data?.ProjectDocumentationInstruction]
   );
 
