@@ -64,9 +64,9 @@ PROPOSED ────────► ONGOING ────────► SUBMITT
 Key transitions in detail:
 
 - **PROPOSED → ONGOING**: an instructor confirms the team. The project type
-  and documentation instruction are chosen here and **locked** after the
-  transition; `acceptingParticipants` becomes false; any pending REQUESTED
-  rows are declined.
+  and documentation instruction are chosen here and stay editable for
+  instructors and mentors **until the team submits**; `acceptingParticipants`
+  becomes false; any pending REQUESTED rows are declined.
 - **ONGOING → SUBMITTED**: an author clicks **Submit** in the **My Project**
   panel. The `set_project_submitted_metadata` trigger stamps `submittedAt`
   on the server; a Hasura permission preset fills `submittedBy` with the
@@ -94,6 +94,7 @@ Key transitions in detail:
 | Edit title, tagline, description, artefacts | ✓ (PROPOSED/ONGOING; must be ACCEPTED author) | ✓ | ✓ | ✓ |
 | Manage join requests | ✓ (any ACCEPTED author) | ✓ | ✓ | ✓ |
 | Confirm team (PROPOSED → ONGOING) | — | ✓ | ✓ | ✓ |
+| Change project type / documentation instruction | — | ✓ (PROPOSED/ONGOING) | ✓ (PROPOSED/ONGOING) | ✓ |
 | Submit (ONGOING → SUBMITTED) | ✓ | — | — | ✓ |
 | Send back / approve / reject | — | ✓ | ✓ | ✓ |
 | Rate & comment | — | ✓ | ✓ | ✓ |
@@ -110,11 +111,17 @@ Project types describe the **deliverables** a project must produce.
 |---|:---:|:---:|:---:|:---:|
 | `CLASSIC_PROJECT` | ✓ | — | — | — |
 | `ONLINE_COURSE` | ✓ | — | — | — |
+| `PROJECT_WITH_DOCUMENTATION_ONLY` | ✓ | — | — | ✓ |
 | `PROJECT_WITH_LINK` | ✓ | — | ✓ | ✓ |
 | `PROJECT_WITH_PRESENTATION` | ✓ | ✓ | — | ✓ |
 | `PROJECT_WITH_LINK_AND_PRESENTATION` | ✓ | ✓ | ✓ | ✓ |
 | `PRESENTATION_WITHOUT_DOCUMENTATION` | — | ✓ | — | ✓ |
 | `PRESENTATION_AND_LINK_WITHOUT_DOCUMENTATION` | — | ✓ | ✓ | ✓ |
+
+`CLASSIC_PROJECT` is **legacy** and cannot be selected: it carries the projects
+migrated from the old achievement-record model and is the only classical type
+without a mandatory cover image. Documentation-only projects created today use
+`PROJECT_WITH_DOCUMENTATION_ONLY` instead.
 
 Each requirement is enforced in the **My Project** panel: the matching
 field is highlighted as **incomplete** until a valid value is supplied. The
@@ -123,7 +130,15 @@ field is highlighted as **incomplete** until a valid value is supplied. The
 ### 3.1 Choosing a type
 
 - A type is chosen when an instructor **confirms the team** (PROPOSED →
-  ONGOING). The choice is locked after that.
+  ONGOING). Instructors and mentors can still change it while the project is
+  ONGOING — including after a send-back — but not once it is SUBMITTED.
+  Changing the type changes the team's mandatory deliverables and resets the
+  documentation instruction to the new type's default — or, when the new type
+  has no default, to another instruction of that type. Only instructions with an
+  uploaded PDF count: while the project is ONGOING, the change is rejected with
+  a hint and the type stays as it was if the new type has no such instruction.
+  Files already uploaded are kept. If the submission deadline has already
+  passed, check that the team can still supply any newly required deliverable.
 - Programs and courses may carry a `defaultProjectType`. When set, the
   **Add project** / **Confirm team** dialogs pre-select it.
 - For self-proposed projects, the type is **not** required at PROPOSED
@@ -482,7 +497,7 @@ project write-up — distinct from the instruction PDF.
 | `projectSubmissionDeadline` | Course | Admin / Instructor | ExpandableCourseRow |
 | Project type catalogue | Global | Admin (migration-defined) | — |
 | Project documentation instructions | Global | Admin | App settings → Project documentation instructions |
-| Per-project type, instruction, deadline | Project | Instructor / Mentor | ProjectsManagementGrid |
+| Per-project type, instruction, deadline | Project | Instructor / Mentor (type and instruction: PROPOSED/ONGOING only) | ProjectsManagementGrid |
 | Per-project artefacts | Project | Author (PROPOSED/ONGOING) or Instructor/Mentor | MyProjectPanel / ProjectsManagementGrid |
 
 ---

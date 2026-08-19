@@ -10,6 +10,7 @@ import DropDownSelector from '../../../../inputs/DropDownSelector';
 import ProjectFormatSelector from '../../../CourseContent/Projects/ProjectFormatSelector';
 import InstructionDownloadButton from '../../../CourseContent/Projects/InstructionDownloadButton';
 import { resolveInitialProjectType } from '../../../CourseContent/Projects/projectTypeRequirements';
+import { filterProjectDocumentationInstructionsWithPdf } from '../../../CourseContent/Projects/projectDocumentationInstruction';
 import { INSTRUCTOR_INSERT_PROJECT } from '../../../../../queries/projectInstructor';
 import {
   PROJECT_DOCUMENTATION_INSTRUCTIONS,
@@ -73,10 +74,27 @@ const AddProjectDialog: FC<AddProjectDialogProps> = ({
     [projectTypesQuery.data?.ProjectType]
   );
 
+  // Only instructions with a stored PDF are selectable: a new project is created
+  // outside PROPOSED, where Project_ongoing_requires_type_and_instruction_check
+  // demands an instruction the team can actually download.
   const documentationInstructions = useMemo(
     () =>
-      documentationInstructionsQuery.data?.ProjectDocumentationInstruction ?? [],
+      filterProjectDocumentationInstructionsWithPdf(
+        documentationInstructionsQuery.data?.ProjectDocumentationInstruction ?? []
+      ),
     [documentationInstructionsQuery.data?.ProjectDocumentationInstruction]
+  );
+
+  // A carried-over or pre-seeded instruction id is only usable when it is still
+  // among the downloadable instructions of the selected type: the DB enforces the
+  // type/instruction match, and a row without a PDF cannot be downloaded.
+  const isUsableInstructionId = useCallback(
+    (id: number | string | null, forType: string) =>
+      id != null &&
+      documentationInstructions.some(
+        (inst) => String(inst.id) === String(id) && inst.projectTypeValue === forType
+      ),
+    [documentationInstructions]
   );
 
   const instructionsForSelectedType = useMemo(
@@ -149,7 +167,10 @@ const AddProjectDialog: FC<AddProjectDialogProps> = ({
 
   const titleTrimmed = title.trim();
   const canSubmit =
-    titleTrimmed.length > 0 && type.length > 0 && instructionId.length > 0 && !loading;
+    titleTrimmed.length > 0 &&
+    type.length > 0 &&
+    isUsableInstructionId(instructionId, type) &&
+    !loading;
   const hasAuthors = authors.length > 0;
 
   const reset = useCallback(() => {
@@ -158,10 +179,12 @@ const AddProjectDialog: FC<AddProjectDialogProps> = ({
     // online course; a carried-over classical type is kept when still valid.
     const nextType = resolveInitialProjectType(defaultProjectType, projectTypes);
     setType(nextType);
-    // Carry over the last project's documentation instruction only when the
-    // resolved type still matches the carried-over type; otherwise fall back to
-    // that type's default instruction (the DB enforces type/instruction match).
-    if (defaultDocumentationInstructionId != null && nextType === defaultProjectType) {
+    // Carry over the last project's documentation instruction only when it is
+    // still a downloadable instruction of the resolved type; otherwise fall back
+    // to that type's default instruction. When the instructions have not loaded
+    // yet this clears the selection, and the seeding effect above fills in the
+    // default as soon as they arrive.
+    if (isUsableInstructionId(defaultDocumentationInstructionId, nextType)) {
       setInstructionId(String(defaultDocumentationInstructionId));
     } else {
       const nextDefault = nextType
@@ -177,6 +200,7 @@ const AddProjectDialog: FC<AddProjectDialogProps> = ({
     defaultProjectType,
     defaultDocumentationInstructionId,
     documentationInstructions,
+    isUsableInstructionId,
     projectTypes,
   ]);
 
@@ -211,10 +235,7 @@ const AddProjectDialog: FC<AddProjectDialogProps> = ({
     // before the catalog resolved the type); fall back to the type's default.
     setInstructionId((current) => {
       if (current || !seededType) return current;
-      if (
-        defaultDocumentationInstructionId != null &&
-        seededType === defaultProjectType
-      ) {
+      if (isUsableInstructionId(defaultDocumentationInstructionId, seededType)) {
         return String(defaultDocumentationInstructionId);
       }
       const nextDefault = documentationInstructions.find(
@@ -229,6 +250,7 @@ const AddProjectDialog: FC<AddProjectDialogProps> = ({
     defaultProjectType,
     defaultDocumentationInstructionId,
     documentationInstructions,
+    isUsableInstructionId,
   ]);
 
   const handleClose = useCallback(() => {

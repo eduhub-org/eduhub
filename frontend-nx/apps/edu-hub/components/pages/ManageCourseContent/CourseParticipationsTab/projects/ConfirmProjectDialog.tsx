@@ -11,6 +11,7 @@ import {
   isClassicCatalogType,
   resolveClassicProjectType,
 } from '../../../CourseContent/Projects/projectTypeRequirements';
+import { filterProjectDocumentationInstructionsWithPdf } from '../../../CourseContent/Projects/projectDocumentationInstruction';
 import { UPDATE_PROJECT_CONFIRM_TEAM } from '../../../../../queries/projectInstructor';
 import { ProjectRow, ProjectTypeRow } from '../../../CourseContent/Projects/types';
 
@@ -53,16 +54,26 @@ const ConfirmProjectDialog: FC<ConfirmProjectDialogProps> = ({
     refetchQueries,
   });
 
+  // Confirming the team moves the project out of PROPOSED, where
+  // Project_ongoing_requires_type_and_instruction_check demands an instruction the
+  // team can actually download. Instructions without a stored PDF are therefore
+  // neither preselected nor offered, which keeps Confirm disabled instead of
+  // persisting an unusable instruction id.
+  const selectableInstructions = useMemo(
+    () => filterProjectDocumentationInstructionsWithPdf(documentationInstructions),
+    [documentationInstructions]
+  );
+
   const findDefaultInstructionIdForType = useCallback(
     (forType: string): number | null => {
       if (!forType) return null;
       return (
-        documentationInstructions.find(
+        selectableInstructions.find(
           (inst) => inst.projectTypeValue === forType && inst.isDefault
         )?.id ?? null
       );
     },
-    [documentationInstructions]
+    [selectableInstructions]
   );
 
   // Students cannot propose online courses, so the confirm dialog is classical
@@ -83,7 +94,12 @@ const ConfirmProjectDialog: FC<ConfirmProjectDialogProps> = ({
     const initialType =
       carried && isClassicCatalogType(carried) ? carried.value : classicBaselineType;
     setType(initialType);
-    if (project.documentationInstructionId && initialType === project.type) {
+    const carriedInstructionIsSelectable =
+      project.documentationInstructionId != null &&
+      selectableInstructions.some(
+        (inst) => inst.id === project.documentationInstructionId
+      );
+    if (carriedInstructionIsSelectable && initialType === project.type) {
       setInstructionId(String(project.documentationInstructionId));
     } else {
       const defaultId = findDefaultInstructionIdForType(initialType);
@@ -96,6 +112,7 @@ const ConfirmProjectDialog: FC<ConfirmProjectDialogProps> = ({
     projectTypes,
     classicBaselineType,
     findDefaultInstructionIdForType,
+    selectableInstructions,
   ]);
 
   // Always overwrite the instruction on type change so the filtered dropdown
@@ -125,7 +142,7 @@ const ConfirmProjectDialog: FC<ConfirmProjectDialogProps> = ({
 
   const instructionDropdownOptions = useMemo(
     () =>
-      documentationInstructions
+      selectableInstructions
         .filter((inst) => inst.projectTypeValue === type)
         .slice()
         .sort((a, b) => {
@@ -136,16 +153,16 @@ const ConfirmProjectDialog: FC<ConfirmProjectDialogProps> = ({
           value: String(inst.id),
           label: inst.isDefault ? `${inst.title}${defaultSuffix}` : inst.title,
         })),
-    [documentationInstructions, type, defaultSuffix]
+    [selectableInstructions, type, defaultSuffix]
   );
 
   const instructionHelpText = t('projects.add_dialog.instruction_info');
 
   const selectedInstructionUrl = useMemo(
     () =>
-      documentationInstructions.find((inst) => String(inst.id) === instructionId)
+      selectableInstructions.find((inst) => String(inst.id) === instructionId)
         ?.url ?? null,
-    [documentationInstructions, instructionId]
+    [selectableInstructions, instructionId]
   );
 
   const handleConfirm = async () => {

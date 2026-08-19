@@ -394,6 +394,7 @@
       "type_label": {
         "ONLINE_COURSE": "Online-Kurs",
         "CLASSIC_PROJECT": "Klassisches Projekt",
+        "PROJECT_WITH_DOCUMENTATION_ONLY": "Projekt (nur Dokumentation)",
         "PROJECT_WITH_LINK": "Projekt mit Link",
         "PROJECT_WITH_PRESENTATION": "Projekt mit Präsentation",
         "PROJECT_WITH_LINK_AND_PRESENTATION": "Projekt mit Link und Präsentation",
@@ -1395,7 +1396,9 @@
         "submission_deadline_instructor_origin_program_legacy": " (Programm: Leistungsnachweis)",
         "submission_deadline_instructor_picker_prompt": "Wenn Du für dieses Projekt eine abweichende Frist setzen willst, wähle sie hier aus:",
         "submission_deadline_instructor_picker_help": "Leer lassen, um die oben genannte Abgabefrist zu übernehmen.",
-        "type_locked_hint": "Der Projekttyp kann nach Bestätigung oder Einreichung des Projekts nicht mehr geändert werden."
+        "type_locked_hint": "Der Projekttyp kann nur geändert werden, solange das Projekt noch nicht eingereicht wurde.",
+        "type_change_ongoing_warning": "Das Projekt läuft bereits. Wenn Du den Typ änderst, ändern sich die Pflichtabgaben für das Team und die Dokumentationsanleitung wird durch die Standard-Anleitung des neuen Typs ersetzt – oder, falls es keine gibt, durch eine andere Anleitung dieses Typs. Bereits hochgeladene Dateien bleiben erhalten.",
+        "type_change_no_instruction_error": "Für diesen Projekttyp ist keine Dokumentationsanleitung mit PDF hinterlegt. Lege sie zuerst in den App-Einstellungen an – der Projekttyp wurde nicht geändert."
       },
       "confirm_project_dialog": {
         "title": "Projekt bestätigen",
@@ -1485,7 +1488,7 @@
           "label": "Selbstreflexions-Fragebogen",
           "help": "Teilnehmende füllen den Selbstreflexions-Fragebogen aus (ein direkt ausfüllbares PDF in der Dokumentationsanleitung)."
         },
-        "classic_invalid_combination": "Wähle mindestens einen externen Link oder eine Präsentation aus – nur eine Dokumentation ist für ein klassisches Projekt nicht möglich.",
+        "classic_invalid_combination": "Wähle mindestens eine Dokumentation oder eine Präsentation aus – ein externer Link allein reicht für ein klassisches Projekt nicht.",
         "invalid_combination": "Diese Kombination von Anforderungen ist nicht verfügbar. Passe Deine Auswahl an.",
         "type_choice": {
           "label": "Projektformat",
@@ -1899,7 +1902,7 @@
       },
       "default_project_type": {
         "label": "Standard-Projekttyp",
-        "help_text": "Neue Projekte in diesem Programm übernehmen diesen Typ. Studierende wählen den Typ nicht selbst; die Kursleitung legt ihn beim Bestätigen des Teams endgültig fest.",
+        "help_text": "Neue Projekte in diesem Programm übernehmen diesen Typ. Studierende wählen den Typ nicht selbst; die Kursleitung legt ihn beim Bestätigen des Teams fest und kann ihn bis zur Einreichung noch ändern.",
         "none_option": "Nicht festgelegt"
       },
       "default_submission_deadline": {
@@ -1909,6 +1912,7 @@
       "type_options": {
         "ONLINE_COURSE": "Online-Kurs (nur Dokumentation)",
         "CLASSIC_PROJECT": "Klassisches Projekt (nur Dokumentation)",
+        "PROJECT_WITH_DOCUMENTATION_ONLY": "Projekt (nur Dokumentation) (Dokumentation, Titelbild)",
         "PROJECT_WITH_LINK": "Projekt mit Link (Dokumentation, Titelbild, externer Link)",
         "PROJECT_WITH_PRESENTATION": "Projekt mit Präsentation (Dokumentation, Titelbild, Präsentation)",
         "PROJECT_WITH_LINK_AND_PRESENTATION": "Projekt mit Link und Präsentation (Dokumentation, Titelbild, externer Link, Präsentation)",
