@@ -29,24 +29,29 @@ export const REQUIREMENT_I18N_KEY: Record<ProjectRequirementKey, string> = {
 
 /**
  * Catalog value of the online-course project type. It shares its deliverable
- * flags with CLASSIC_PROJECT (documentation only), so the two can only be told
- * apart by an explicit choice. Used as the default when a documentation-only
- * combination is otherwise ambiguous.
+ * flags with the legacy CLASSIC_PROJECT (documentation only, no cover image),
+ * so those two can only be told apart by an explicit choice. The selectable
+ * documentation-only classical type (PROJECT_WITH_DOCUMENTATION_ONLY) is not
+ * ambiguous with it, because it requires a cover image.
  */
 export const ONLINE_COURSE_TYPE_VALUE = 'ONLINE_COURSE';
 
 /**
- * Legacy documentation-only type. New projects never store this value: a
- * classical project always requires a cover image, so it resolves to one of the
- * cover-requiring catalog types instead.
+ * Legacy documentation-only type, without the cover image every classical
+ * project requires. It carries the projects migrated from the old
+ * AchievementRecord model and is never stored on new projects: a
+ * documentation-only classical project resolves to
+ * PROJECT_WITH_DOCUMENTATION_ONLY instead.
+ *
+ * @deprecated Kept for reference; nothing selects this value.
  */
 export const CLASSIC_PROJECT_TYPE_VALUE = 'CLASSIC_PROJECT';
 
 /**
- * Default deliverables for a freshly selected "classical" project. A cover image
- * is always required for classical projects and the only documentation-only type
- * (CLASSIC_PROJECT) is legacy, so the minimal valid classical project also
- * requires a presentation (resolves to PROJECT_WITH_PRESENTATION).
+ * Default deliverables a freshly selected "classical" project starts on
+ * (resolves to PROJECT_WITH_PRESENTATION). This is a deliberate product default,
+ * not the minimum: documentation alone is a valid classical project too and
+ * resolves to PROJECT_WITH_DOCUMENTATION_ONLY.
  */
 export const DEFAULT_CLASSIC_REQUIREMENT_FLAGS: ProjectRequirementFlags = {
   requiresDocumentation: true,
@@ -100,8 +105,9 @@ export const resolveProjectTypeFromRequirements = (
 /**
  * True for catalog types that represent a valid *new* classical project, i.e.
  * everything except the online course and the legacy documentation-only type.
- * Classical projects always require a cover image, so the cover flag is the
- * distinguishing marker.
+ * Classical projects always require a cover image, so the cover flag is what
+ * separates the selectable PROJECT_WITH_DOCUMENTATION_ONLY from the legacy,
+ * cover-less CLASSIC_PROJECT.
  */
 export const isClassicCatalogType = (projectType: ProjectTypeRow): boolean =>
   projectType.value !== ONLINE_COURSE_TYPE_VALUE &&
@@ -110,8 +116,9 @@ export const isClassicCatalogType = (projectType: ProjectTypeRow): boolean =>
 /**
  * Resolves the deliverable selection of a classical project (documentation /
  * external link / presentation) to a catalog type, forcing the always-required
- * cover image on. Returns null when no catalog type matches the combination
- * (e.g. nothing but documentation, which has no cover-requiring counterpart).
+ * cover image on. Returns null when no catalog type matches the combination —
+ * with the current catalog that is an empty selection, or an external link
+ * without documentation or presentation.
  */
 export const resolveClassicProjectType = (
   projectTypes: ProjectTypeRow[],

@@ -1,6 +1,9 @@
 import { GraphQLClient } from "graphql-request";
 
-const ALLOWED_ROLES = new Set(["admin"]);
+// Request roles from session_variables, not the inherited-role names used in
+// actions.yaml permissions. Instructors are additionally limited to instructions
+// they created (checked below).
+const ALLOWED_ROLES = new Set(["admin", "instructor"]);
 
 const ensureHasuraClient = () => {
   if (!process.env.HASURA_ENDPOINT || !process.env.HASURA_ADMIN_SECRET) {
@@ -19,6 +22,7 @@ const GET_INSTRUCTION = `
       id
       projectTypeValue
       isDefault
+      createdByUserId
     }
   }
 `;
@@ -62,7 +66,7 @@ export default async function deleteProjectDocumentationInstruction(req, logger)
     return {
       success: false,
       messageKey: "DELETE_PROJECT_DOCUMENTATION_INSTRUCTION_UNAUTHORIZED",
-      error: "Only admin users may delete documentation instructions",
+      error: "Only admins and instructors may delete documentation instructions",
       reassignedProjectCount: 0,
     };
   }
@@ -111,6 +115,21 @@ export default async function deleteProjectDocumentationInstruction(req, logger)
         success: false,
         messageKey: "DELETE_PROJECT_DOCUMENTATION_INSTRUCTION_IS_DEFAULT",
         error: "Default instructions cannot be deleted",
+        reassignedProjectCount: 0,
+      };
+    }
+    // Admins manage the whole catalogue; an instructor may only delete what they
+    // created. Platform rows (createdByUserId IS NULL) are therefore off limits.
+    const callerUserId = req.body?.session_variables?.["x-hasura-user-id"];
+    if (role !== "admin" && instruction.createdByUserId !== callerUserId) {
+      logger.error("Instruction does not belong to the caller", {
+        instructionId,
+        role,
+      });
+      return {
+        success: false,
+        messageKey: "DELETE_PROJECT_DOCUMENTATION_INSTRUCTION_FORBIDDEN",
+        error: "You may only delete documentation instructions you created",
         reassignedProjectCount: 0,
       };
     }

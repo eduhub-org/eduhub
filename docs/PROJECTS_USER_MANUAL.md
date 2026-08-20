@@ -64,9 +64,9 @@ PROPOSED ────────► ONGOING ────────► SUBMITT
 Key transitions in detail:
 
 - **PROPOSED → ONGOING**: an instructor confirms the team. The project type
-  and documentation instruction are chosen here and **locked** after the
-  transition; `acceptingParticipants` becomes false; any pending REQUESTED
-  rows are declined.
+  and documentation instruction are chosen here and stay editable for
+  instructors and mentors **until the team submits**; `acceptingParticipants`
+  becomes false; any pending REQUESTED rows are declined.
 - **ONGOING → SUBMITTED**: an author clicks **Submit** in the **My Project**
   panel. The `set_project_submitted_metadata` trigger stamps `submittedAt`
   on the server; a Hasura permission preset fills `submittedBy` with the
@@ -94,6 +94,8 @@ Key transitions in detail:
 | Edit title, tagline, description, artefacts | ✓ (PROPOSED/ONGOING; must be ACCEPTED author) | ✓ | ✓ | ✓ |
 | Manage join requests | ✓ (any ACCEPTED author) | ✓ | ✓ | ✓ |
 | Confirm team (PROPOSED → ONGOING) | — | ✓ | ✓ | ✓ |
+| Change project type / documentation instruction | — | ✓ (PROPOSED/ONGOING) | ✓ (PROPOSED/ONGOING) | ✓ |
+| Upload / rename / replace / delete a documentation instruction | — | ✓ (own uploads only) | ✓ (own uploads only) | ✓ (whole catalogue) |
 | Submit (ONGOING → SUBMITTED) | ✓ | — | — | ✓ |
 | Send back / approve / reject | — | ✓ | ✓ | ✓ |
 | Rate & comment | — | ✓ | ✓ | ✓ |
@@ -110,11 +112,17 @@ Project types describe the **deliverables** a project must produce.
 |---|:---:|:---:|:---:|:---:|
 | `CLASSIC_PROJECT` | ✓ | — | — | — |
 | `ONLINE_COURSE` | ✓ | — | — | — |
+| `PROJECT_WITH_DOCUMENTATION_ONLY` | ✓ | — | — | ✓ |
 | `PROJECT_WITH_LINK` | ✓ | — | ✓ | ✓ |
 | `PROJECT_WITH_PRESENTATION` | ✓ | ✓ | — | ✓ |
 | `PROJECT_WITH_LINK_AND_PRESENTATION` | ✓ | ✓ | ✓ | ✓ |
 | `PRESENTATION_WITHOUT_DOCUMENTATION` | — | ✓ | — | ✓ |
 | `PRESENTATION_AND_LINK_WITHOUT_DOCUMENTATION` | — | ✓ | ✓ | ✓ |
+
+`CLASSIC_PROJECT` is **legacy** and cannot be selected: it carries the projects
+migrated from the old achievement-record model and is the only classical type
+without a mandatory cover image. Documentation-only projects created today use
+`PROJECT_WITH_DOCUMENTATION_ONLY` instead.
 
 Each requirement is enforced in the **My Project** panel: the matching
 field is highlighted as **incomplete** until a valid value is supplied. The
@@ -123,7 +131,15 @@ field is highlighted as **incomplete** until a valid value is supplied. The
 ### 3.1 Choosing a type
 
 - A type is chosen when an instructor **confirms the team** (PROPOSED →
-  ONGOING). The choice is locked after that.
+  ONGOING). Instructors and mentors can still change it while the project is
+  ONGOING — including after a send-back — but not once it is SUBMITTED.
+  Changing the type changes the team's mandatory deliverables and resets the
+  documentation instruction to the new type's default — or, when the new type
+  has no default, to another instruction of that type. Only instructions with an
+  uploaded PDF count: while the project is ONGOING, the change is rejected with
+  a hint and the type stays as it was if the new type has no such instruction.
+  Files already uploaded are kept. If the submission deadline has already
+  passed, check that the team can still supply any newly required deliverable.
 - Programs and courses may carry a `defaultProjectType`. When set, the
   **Add project** / **Confirm team** dialogs pre-select it.
 - For self-proposed projects, the type is **not** required at PROPOSED
@@ -418,12 +434,28 @@ write-up).
 
 - Lives in the `ProjectDocumentationInstruction` table.
 - Each instruction has a **title**, a **PDF URL**, an associated
-  **project type**, and an **isDefault** flag.
+  **project type**, an **isDefault** flag, and a **createdByUserId**.
 - A database constraint guarantees that **exactly one** instruction per
   type is marked default. Promotions are atomic.
 - Default URLs follow a stable static path
   (`/project-documentation-instructions/<type>.pdf`). Custom uploads
   live in the GCS bucket and are served via a signed URL.
+
+**Ownership (`createdByUserId`)** decides who sees and manages a row:
+
+- **NULL — platform instruction.** Maintained by admins, visible to every
+  instructor. All instructions that existed before instructor uploads were
+  introduced are platform instructions.
+- **Set — a personal instruction.** Visible to its creator, to co-instructors
+  and mentors of a project that uses it, and to the students of those projects
+  (so a team can always open the instruction their project points at). Other
+  instructors do not see it. Only the creator (and admins) can rename it,
+  replace its PDF, or delete it.
+
+Only platform instructions can become a type default; promoting a personal
+instruction is refused, because a default has to stay visible to everyone.
+Titles must be unique per owner, and globally unique among platform
+instructions.
 
 ### 7.2 Where instructions appear
 
@@ -435,6 +467,10 @@ write-up).
   SUBMITTED.
 - **In the manage grid** — instructors can change a project's
   instruction after confirmation if requirements change.
+- **Next to every instruction dropdown** — an upload button opens *Your
+  documentation instructions* (see §7.3a). It is disabled while no project type
+  is selected, and in the manage grid it locks together with the dropdown once
+  the project has been submitted.
 
 ### 7.3 Managing the catalogue (admin only)
 
@@ -446,8 +482,36 @@ Open **App settings → Project documentation instructions**. Admins can:
 - **Edit** the title, replace the PDF, or change the URL.
 - **Set as default** — promotes the row to the type's default; the
   previous default is demoted in the same transaction.
-- **Delete** — only available for non-default rows that are not
-  currently referenced by any project.
+- **Delete** — available for non-default rows. Projects still using the
+  instruction are first reassigned to the type default, so a referenced row can
+  be deleted; the number of reassigned projects is reported back.
+
+Instructor uploads also appear here, so admins keep an overview of the whole
+catalogue. **Set as default** is refused for them (§7.1).
+
+### 7.3a Your own instructions (instructors)
+
+Instructors do not need an admin to get a course-specific write-up guide. Next
+to any documentation-instruction dropdown, the upload button opens **Your
+documentation instructions** for the project's type. In that dialog an
+instructor can:
+
+- **Upload** a new instruction: a title plus one PDF (at most 20 MB). It is
+  created as a non-default, personal instruction for the current project type
+  and is selected for the project immediately.
+- **Rename** it, **replace its PDF**, or **delete** it — for their own uploads
+  only. Deleting reassigns any project still using it to the type default.
+
+Notes:
+
+- An instruction always belongs to exactly one project type, so the button stays
+  disabled until a type is selected. Changing a project's type therefore also
+  resets its instruction.
+- PDFs are validated by content, not just by file extension.
+- Uploads are only offered while the project type itself is still editable, i.e.
+  until the team submits.
+- A super-admin using the same dialog creates a **platform** instruction, not a
+  personal one — admins manage the catalogue in app settings.
 
 ### 7.4 The author write-up (Documentation field)
 
@@ -482,7 +546,7 @@ project write-up — distinct from the instruction PDF.
 | `projectSubmissionDeadline` | Course | Admin / Instructor | ExpandableCourseRow |
 | Project type catalogue | Global | Admin (migration-defined) | — |
 | Project documentation instructions | Global | Admin | App settings → Project documentation instructions |
-| Per-project type, instruction, deadline | Project | Instructor / Mentor | ProjectsManagementGrid |
+| Per-project type, instruction, deadline | Project | Instructor / Mentor (type and instruction: PROPOSED/ONGOING only) | ProjectsManagementGrid |
 | Per-project artefacts | Project | Author (PROPOSED/ONGOING) or Instructor/Mentor | MyProjectPanel / ProjectsManagementGrid |
 
 ---

@@ -1507,7 +1507,14 @@ export enum MailTemplateType_enum {
   APPLICATION_CONFIRMED = "APPLICATION_CONFIRMED",
   APPLICATION_RECEIVED = "APPLICATION_RECEIVED",
   APPLICATION_RECEIVED_PAID = "APPLICATION_RECEIVED_PAID",
+  CERTIFICATE_ACHIEVEMENT_READY = "CERTIFICATE_ACHIEVEMENT_READY",
+  CERTIFICATE_ATTENDANCE_READY = "CERTIFICATE_ATTENDANCE_READY",
+  COURSE_CONTINUATION_INQUIRY = "COURSE_CONTINUATION_INQUIRY",
   DECLINE = "DECLINE",
+  ENROLLMENT_ABORTED = "ENROLLMENT_ABORTED",
+  ENROLLMENT_CANCELLED = "ENROLLMENT_CANCELLED",
+  INVITATION_EXPIRED = "INVITATION_EXPIRED",
+  INVITATION_EXPIRING_SOON = "INVITATION_EXPIRING_SOON",
   INVITE = "INVITE",
   JOB_ALERT = "JOB_ALERT",
   JOB_POSTING_ADMIN_NOTICE = "JOB_POSTING_ADMIN_NOTICE",
@@ -1515,11 +1522,24 @@ export enum MailTemplateType_enum {
   JOB_POSTING_PAYMENT_FAILED = "JOB_POSTING_PAYMENT_FAILED",
   JOB_POSTING_PUBLISHED = "JOB_POSTING_PUBLISHED",
   ORGANIZER_ADDED = "ORGANIZER_ADDED",
+  PAYMENT_RECEIPT = "PAYMENT_RECEIPT",
+  PROJECT_APPROVED = "PROJECT_APPROVED",
+  PROJECT_AUTHOR_EXCLUDED = "PROJECT_AUTHOR_EXCLUDED",
+  PROJECT_DEADLINE_REMINDER = "PROJECT_DEADLINE_REMINDER",
+  PROJECT_JOIN_ACCEPTED = "PROJECT_JOIN_ACCEPTED",
+  PROJECT_JOIN_DECLINED = "PROJECT_JOIN_DECLINED",
+  PROJECT_JOIN_REQUESTED = "PROJECT_JOIN_REQUESTED",
+  PROJECT_REJECTED = "PROJECT_REJECTED",
+  PROJECT_SENT_BACK = "PROJECT_SENT_BACK",
+  PROJECT_SUBMITTED = "PROJECT_SUBMITTED",
+  PROJECT_TEAM_CONFIRMED = "PROJECT_TEAM_CONFIRMED",
   REGISTRATION_CONFIRMED = "REGISTRATION_CONFIRMED",
   REGISTRATION_CONFIRMED_PAID = "REGISTRATION_CONFIRMED_PAID",
   SESSION_REMINDER = "SESSION_REMINDER",
+  SESSION_RESCHEDULED = "SESSION_RESCHEDULED",
   USER_CREATED = "USER_CREATED",
   WAITLIST_NOTICE = "WAITLIST_NOTICE",
+  WAITLIST_PROMOTED = "WAITLIST_PROMOTED",
 }
 
 /**
@@ -2079,14 +2099,16 @@ export enum ProjectCourse_update_column {
  */
 export enum ProjectDocumentationInstruction_constraint {
   ProjectDocumentationInstruction_one_default_per_type = "ProjectDocumentationInstruction_one_default_per_type",
+  ProjectDocumentationInstruction_owner_title_key = "ProjectDocumentationInstruction_owner_title_key",
   ProjectDocumentationInstruction_pkey = "ProjectDocumentationInstruction_pkey",
-  ProjectDocumentationInstruction_title_key = "ProjectDocumentationInstruction_title_key",
+  ProjectDocumentationInstruction_platform_title_key = "ProjectDocumentationInstruction_platform_title_key",
 }
 
 /**
  * select columns of table "ProjectDocumentationInstruction"
  */
 export enum ProjectDocumentationInstruction_select_column {
+  createdByUserId = "createdByUserId",
   created_at = "created_at",
   id = "id",
   isDefault = "isDefault",
@@ -2115,6 +2137,7 @@ export enum ProjectDocumentationInstruction_select_column_ProjectDocumentationIn
  * update columns of table "ProjectDocumentationInstruction"
  */
 export enum ProjectDocumentationInstruction_update_column {
+  createdByUserId = "createdByUserId",
   created_at = "created_at",
   id = "id",
   isDefault = "isDefault",
@@ -2417,6 +2440,7 @@ export enum Project_select_column {
   published = "published",
   rating = "rating",
   ratingComment = "ratingComment",
+  sentBackAt = "sentBackAt",
   status = "status",
   submissionDeadline = "submissionDeadline",
   submittedAt = "submittedAt",
@@ -2469,6 +2493,7 @@ export enum Project_update_column {
   published = "published",
   rating = "rating",
   ratingComment = "ratingComment",
+  sentBackAt = "sentBackAt",
   status = "status",
   submissionDeadline = "submissionDeadline",
   submittedAt = "submittedAt",
@@ -10547,12 +10572,14 @@ export interface ProjectDocumentationInstruction_avg_order_by {
  * Boolean expression to filter rows from the table "ProjectDocumentationInstruction". All fields are combined with a logical 'AND'.
  */
 export interface ProjectDocumentationInstruction_bool_exp {
+  CreatedByUser?: User_bool_exp | null;
   ProjectType?: ProjectType_bool_exp | null;
   Projects?: Project_bool_exp | null;
   Projects_aggregate?: Project_aggregate_bool_exp | null;
   _and?: ProjectDocumentationInstruction_bool_exp[] | null;
   _not?: ProjectDocumentationInstruction_bool_exp | null;
   _or?: ProjectDocumentationInstruction_bool_exp[] | null;
+  createdByUserId?: uuid_comparison_exp | null;
   created_at?: timestamptz_comparison_exp | null;
   id?: Int_comparison_exp | null;
   isDefault?: Boolean_comparison_exp | null;
@@ -10567,8 +10594,10 @@ export interface ProjectDocumentationInstruction_bool_exp {
  * input type for inserting data into table "ProjectDocumentationInstruction"
  */
 export interface ProjectDocumentationInstruction_insert_input {
+  CreatedByUser?: User_obj_rel_insert_input | null;
   ProjectType?: ProjectType_obj_rel_insert_input | null;
   Projects?: Project_arr_rel_insert_input | null;
+  createdByUserId?: any | null;
   created_at?: any | null;
   id?: number | null;
   isDefault?: boolean | null;
@@ -10583,6 +10612,7 @@ export interface ProjectDocumentationInstruction_insert_input {
  * order by max() on columns of table "ProjectDocumentationInstruction"
  */
 export interface ProjectDocumentationInstruction_max_order_by {
+  createdByUserId?: order_by | null;
   created_at?: order_by | null;
   id?: order_by | null;
   legacyAchievementDocumentationTemplateId?: order_by | null;
@@ -10596,6 +10626,7 @@ export interface ProjectDocumentationInstruction_max_order_by {
  * order by min() on columns of table "ProjectDocumentationInstruction"
  */
 export interface ProjectDocumentationInstruction_min_order_by {
+  createdByUserId?: order_by | null;
   created_at?: order_by | null;
   id?: order_by | null;
   legacyAchievementDocumentationTemplateId?: order_by | null;
@@ -10626,8 +10657,10 @@ export interface ProjectDocumentationInstruction_on_conflict {
  * Ordering options when selecting data from "ProjectDocumentationInstruction".
  */
 export interface ProjectDocumentationInstruction_order_by {
+  CreatedByUser?: User_order_by | null;
   ProjectType?: ProjectType_order_by | null;
   Projects_aggregate?: Project_aggregate_order_by | null;
+  createdByUserId?: order_by | null;
   created_at?: order_by | null;
   id?: order_by | null;
   isDefault?: order_by | null;
@@ -11664,6 +11697,7 @@ export interface Project_bool_exp {
   published?: Boolean_comparison_exp | null;
   rating?: ProjectRating_enum_comparison_exp | null;
   ratingComment?: String_comparison_exp | null;
+  sentBackAt?: timestamptz_comparison_exp | null;
   status?: ProjectStatus_enum_comparison_exp | null;
   submissionDeadline?: timestamptz_comparison_exp | null;
   submittedAt?: timestamptz_comparison_exp | null;
@@ -11713,6 +11747,7 @@ export interface Project_insert_input {
   published?: boolean | null;
   rating?: ProjectRating_enum | null;
   ratingComment?: string | null;
+  sentBackAt?: any | null;
   status?: ProjectStatus_enum | null;
   submissionDeadline?: any | null;
   submittedAt?: any | null;
@@ -11744,6 +11779,7 @@ export interface Project_max_order_by {
   projectReviewRequestedAt?: order_by | null;
   proposedByUserId?: order_by | null;
   ratingComment?: order_by | null;
+  sentBackAt?: order_by | null;
   submissionDeadline?: order_by | null;
   submittedAt?: order_by | null;
   submittedBy?: order_by | null;
@@ -11773,6 +11809,7 @@ export interface Project_min_order_by {
   projectReviewRequestedAt?: order_by | null;
   proposedByUserId?: order_by | null;
   ratingComment?: order_by | null;
+  sentBackAt?: order_by | null;
   submissionDeadline?: order_by | null;
   submittedAt?: order_by | null;
   submittedBy?: order_by | null;
@@ -11837,6 +11874,7 @@ export interface Project_order_by {
   published?: order_by | null;
   rating?: order_by | null;
   ratingComment?: order_by | null;
+  sentBackAt?: order_by | null;
   status?: order_by | null;
   submissionDeadline?: order_by | null;
   submittedAt?: order_by | null;

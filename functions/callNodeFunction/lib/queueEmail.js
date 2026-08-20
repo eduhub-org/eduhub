@@ -143,8 +143,9 @@ async function queueEmail({
 
     const template = templateData.MailTemplate[0];
 
-    // Replace variables in template content
-    const emailSubject = variableReplacer(template.subject);
+    // Replace variables in template content. The subject is plain text, so
+    // variables must not be HTML-escaped there (see createVariableReplacer).
+    const emailSubject = variableReplacer(template.subject, { html: false });
     const emailContent = variableReplacer(template.content);
 
     // Insert email into MailLog for sending

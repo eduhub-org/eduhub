@@ -18,6 +18,26 @@ describe('getEmailTemplateCategory', () => {
     'SESSION_REMINDER',
     'USER_CREATED',
     'ORGANIZER_ADDED',
+    'CERTIFICATE_ACHIEVEMENT_READY',
+    'CERTIFICATE_ATTENDANCE_READY',
+    'ENROLLMENT_CANCELLED',
+    'ENROLLMENT_ABORTED',
+    'WAITLIST_PROMOTED',
+    'INVITATION_EXPIRING_SOON',
+    'INVITATION_EXPIRED',
+    'PROJECT_JOIN_REQUESTED',
+    'PROJECT_JOIN_ACCEPTED',
+    'PROJECT_JOIN_DECLINED',
+    'PROJECT_AUTHOR_EXCLUDED',
+    'PROJECT_TEAM_CONFIRMED',
+    'PROJECT_SUBMITTED',
+    'PROJECT_SENT_BACK',
+    'PROJECT_APPROVED',
+    'PROJECT_REJECTED',
+    'PROJECT_DEADLINE_REMINDER',
+    'SESSION_RESCHEDULED',
+    'PAYMENT_RECEIPT',
+    'COURSE_CONTINUATION_INQUIRY',
   ];
 
   it.each(knownTypes)('maps known type %s to a real category (not "other")', (type) => {
@@ -31,8 +51,22 @@ describe('getEmailTemplateCategory', () => {
     expect(getEmailTemplateCategory('WAITLIST_NOTICE')).toBe('application');
   });
 
-  it('maps session reminders to "sessions"', () => {
+  it('maps the project lifecycle types to "projects"', () => {
+    expect(getEmailTemplateCategory('PROJECT_JOIN_REQUESTED')).toBe('projects');
+    expect(getEmailTemplateCategory('PROJECT_TEAM_CONFIRMED')).toBe('projects');
+    expect(getEmailTemplateCategory('PROJECT_DEADLINE_REMINDER')).toBe('projects');
+  });
+
+  it('maps certificate and payment notices to "application"', () => {
+    expect(getEmailTemplateCategory('CERTIFICATE_ACHIEVEMENT_READY')).toBe('application');
+    expect(getEmailTemplateCategory('CERTIFICATE_ATTENDANCE_READY')).toBe('application');
+    expect(getEmailTemplateCategory('PAYMENT_RECEIPT')).toBe('application');
+  });
+
+  it('maps session reminders and changes to "sessions"', () => {
     expect(getEmailTemplateCategory('SESSION_REMINDER')).toBe('sessions');
+    expect(getEmailTemplateCategory('SESSION_RESCHEDULED')).toBe('sessions');
+    expect(getEmailTemplateCategory('COURSE_CONTINUATION_INQUIRY')).toBe('sessions');
   });
 
   it('maps account/system types to "system"', () => {
@@ -48,5 +82,9 @@ describe('getEmailTemplateCategory', () => {
     UPCOMING_EMAIL_TEMPLATE_CATEGORIES.forEach((category) => {
       expect(EMAIL_TEMPLATE_CATEGORIES).toContain(category);
     });
+  });
+
+  it('no longer treats project notifications as upcoming', () => {
+    expect(UPCOMING_EMAIL_TEMPLATE_CATEGORIES).not.toContain('projects');
   });
 });

@@ -394,6 +394,7 @@
       "type_label": {
         "ONLINE_COURSE": "Online course",
         "CLASSIC_PROJECT": "Classic project",
+        "PROJECT_WITH_DOCUMENTATION_ONLY": "Project (documentation only)",
         "PROJECT_WITH_LINK": "Project with link",
         "PROJECT_WITH_PRESENTATION": "Project with presentation",
         "PROJECT_WITH_LINK_AND_PRESENTATION": "Project with link and presentation",
@@ -539,6 +540,7 @@
         "requests_button_idle": "Join requests",
         "action_tooltip_join_requests_none": "There are no open join requests at the moment.",
         "submitted_banner": "Submitted on {date} by {name}. The team has been locked from changes.",
+        "review_comment_label": "Feedback from the course team",
         "sent_back_banner": "Your project was sent back for revisions. Please update it and submit again.",
         "deadline_passed_banner": "The submission deadline passed on {date}.",
         "excluded_banner": "The submitting author excluded you from this project's final submission. You no longer count as one of its authors."
@@ -1056,8 +1058,7 @@
       "courses": "No course programs exist yet. Ask a platform admin to set up a course program for your organization before you can manage courses here.",
       "degrees": "No degree programs exist yet. Ask a platform admin to set up a degree program for your organization before you can manage degrees here."
     },
-    "view": "View",
-    "view_course": "View Course",
+    "open_in_new_tab": "Open in new tab",
     "close": "Close",
     "cancel": "Cancel",
     "not_published": "Not Published",
@@ -1413,7 +1414,9 @@
         "submission_deadline_instructor_origin_program_legacy": " (from the program certificate deadline)",
         "submission_deadline_instructor_picker_prompt": "If you want to change it for this project, select the specific date here:",
         "submission_deadline_instructor_picker_help": "Leave empty to use the default submission deadline shown above.",
-        "type_locked_hint": "The project type can no longer be changed once the project is confirmed or submitted."
+        "type_locked_hint": "The project type can only be changed until the project has been submitted.",
+        "type_change_ongoing_warning": "This project is already ongoing. Changing the type changes what the team must submit and replaces the documentation instruction with the new type's default — or, if there is none, with another instruction of that type. Files already uploaded are kept.",
+        "type_change_no_instruction_error": "This project type has no documentation instruction with a PDF. Create one in app settings first — the project type was not changed."
       },
       "confirm_project_dialog": {
         "title": "Confirm project",
@@ -1440,7 +1443,7 @@
         "reject_title": "Reject as not passed",
         "reject_description": "Marks the project as not passed.",
         "comment_label": "Comment (optional)",
-        "comment_placeholder": "Notes for the project team (visible where project details are shown)",
+        "comment_placeholder": "Notes for the project team (visible where project details are shown, and included in the notification email)",
         "confirm_button": "Confirm"
       },
       "add_dialog": {
@@ -1463,6 +1466,38 @@
         "error_instruction_required": "Please select documentation instructions.",
         "error_author_already_in_project": "{name} already belongs to an active project in this course and can't be added to another one.",
         "error_author_conflict_generic": "One or more selected authors already belong to an active project in this course and can't be added to another one."
+      },
+      "instruction_upload": {
+        "open": "Upload or manage your own documentation instructions",
+        "disabled_no_type": "Select a project type first - a documentation instruction always belongs to one type.",
+        "dialog_title": "Your documentation instructions",
+        "create_heading": "Upload a new instruction",
+        "create_help": "The instruction applies to the current project type. Only you and the teams whose project uses it can see it - other instructors cannot.",
+        "title_label": "Title",
+        "title_placeholder": "e.g. Documentation guide course XY (WS26)",
+        "pdf_label": "PDF",
+        "pdf_required": "Required: one PDF file, at most 20 MB.",
+        "pdf_choose": "Choose PDF",
+        "pdf_selected": "Selected: {fileName}",
+        "submit": "Upload and select",
+        "own_list_heading": "Your instructions for this project type",
+        "own_list_help": "Rename, replace the PDF, or delete. Instructions provided by opencampus.sh cannot be edited here.",
+        "own_list_empty": "You have not uploaded your own instruction for this project type yet.",
+        "load_more": "Show more",
+        "replace_label": "Replace PDF",
+        "missing_pdf": "No PDF attached yet - this instruction is not offered anywhere.",
+        "delete_tooltip": "Delete instruction",
+        "delete_dialog": {
+          "title": "Delete instruction",
+          "question": "Delete the instruction “{title}”? Projects using it are moved to the project type's default instruction.",
+          "confirm": "Delete"
+        },
+        "error": {
+          "create_failed": "The instruction could not be created.",
+          "pdf_upload_failed": "The PDF could not be uploaded. The instruction was not created.",
+          "duplicate_title": "You already have an instruction with this title. Choose a different title.",
+          "delete_failed": "The instruction could not be deleted."
+        }
       },
       "requirements": {
         "section_label": "Required submission deliverables",
@@ -1503,7 +1538,7 @@
           "label": "Self-reflection questionnaire",
           "help": "Participants complete the self-reflection questionnaire (a fillable PDF provided with the documentation instructions)."
         },
-        "classic_invalid_combination": "Select at least an external link or a presentation — documentation alone is not possible for a classic project.",
+        "classic_invalid_combination": "Select at least documentation or a presentation — an external link alone is not enough for a classic project.",
         "invalid_combination": "This combination of requirements is not available. Adjust your selection.",
         "type_choice": {
           "label": "Project format",
@@ -1914,7 +1949,7 @@
       },
       "default_project_type": {
         "label": "Default project type",
-        "help_text": "New projects in this program inherit this type. Students never pick the type; instructors finalize it when confirming a team.",
+        "help_text": "New projects in this program inherit this type. Students never pick the type; instructors set it when confirming a team and can still change it until submission.",
         "none_option": "Not set"
       },
       "default_submission_deadline": {
@@ -1924,6 +1959,7 @@
       "type_options": {
         "ONLINE_COURSE": "Online course (documentation only)",
         "CLASSIC_PROJECT": "Classic project (documentation only)",
+        "PROJECT_WITH_DOCUMENTATION_ONLY": "Project (documentation only) (documentation, cover image)",
         "PROJECT_WITH_LINK": "Project with link (documentation, cover image, external link)",
         "PROJECT_WITH_PRESENTATION": "Project with presentation (documentation, cover image, presentation)",
         "PROJECT_WITH_LINK_AND_PRESENTATION": "Project with link and presentation (documentation, cover image, external link, presentation)",
@@ -2499,7 +2535,27 @@
       "APPLICATION_RECEIVED_PAID": "Application Received (Paid)",
       "USER_CREATED": "User Created",
       "ORGANIZER_ADDED": "Organizer Added",
-      "WAITLIST_NOTICE": "Waitlist Notice"
+      "WAITLIST_NOTICE": "Waitlist Notice",
+      "CERTIFICATE_ACHIEVEMENT_READY": "Achievement Certificate Ready",
+      "CERTIFICATE_ATTENDANCE_READY": "Attendance Certificate Ready",
+      "ENROLLMENT_CANCELLED": "Enrollment Cancelled",
+      "ENROLLMENT_ABORTED": "Enrollment Aborted",
+      "WAITLIST_PROMOTED": "Promoted from Waitlist",
+      "INVITATION_EXPIRING_SOON": "Invitation Expiring Soon",
+      "INVITATION_EXPIRED": "Invitation Expired",
+      "PROJECT_JOIN_REQUESTED": "Project Join Requested",
+      "PROJECT_JOIN_ACCEPTED": "Project Join Accepted",
+      "PROJECT_JOIN_DECLINED": "Project Join Declined",
+      "PROJECT_AUTHOR_EXCLUDED": "Removed from Project",
+      "PROJECT_TEAM_CONFIRMED": "Project Team Confirmed",
+      "PROJECT_SENT_BACK": "Project Sent Back",
+      "PROJECT_SUBMITTED": "Project Submitted",
+      "PROJECT_APPROVED": "Project Approved",
+      "PROJECT_REJECTED": "Project Not Passed",
+      "PROJECT_DEADLINE_REMINDER": "Project Deadline Reminder",
+      "SESSION_RESCHEDULED": "Session Rescheduled",
+      "PAYMENT_RECEIPT": "Payment Receipt",
+      "COURSE_CONTINUATION_INQUIRY": "Course Continuation Inquiry"
     },
     "placeholders": {
       "subject": "Enter email subject...",
@@ -2527,7 +2583,27 @@
       "SESSION_REMINDER": "Sent before sessions start (24h, 1h, 15min before)",
       "USER_CREATED": "Sent when a new user account is created",
       "ORGANIZER_ADDED": "Sent when a user is added as an organizer to a course or event",
-      "WAITLIST_NOTICE": "Sent when a user joins the waitlist because the course is full"
+      "WAITLIST_NOTICE": "Sent when a user joins the waitlist because the course is full",
+      "CERTIFICATE_ACHIEVEMENT_READY": "Sent when an achievement certificate is issued for a participant",
+      "CERTIFICATE_ATTENDANCE_READY": "Sent when an attendance certificate is issued for a participant",
+      "ENROLLMENT_CANCELLED": "Sent when an enrollment is cancelled",
+      "ENROLLMENT_ABORTED": "Sent when a participant leaves a course without completing it",
+      "WAITLIST_PROMOTED": "Sent when a waitlisted user gets a spot in the course",
+      "INVITATION_EXPIRING_SOON": "Sent 24 hours before a course invitation expires",
+      "INVITATION_EXPIRED": "Sent when a course invitation has expired unused",
+      "PROJECT_JOIN_REQUESTED": "Sent to the project team when someone requests to join their project",
+      "PROJECT_JOIN_ACCEPTED": "Sent when a request to join a project is accepted",
+      "PROJECT_JOIN_DECLINED": "Sent when a request to join a project is declined",
+      "PROJECT_AUTHOR_EXCLUDED": "Sent when an author is removed from a project's final submission",
+      "PROJECT_TEAM_CONFIRMED": "Sent to the project team when the team is confirmed and the project starts",
+      "PROJECT_SENT_BACK": "Sent when a submitted project is sent back for revision",
+      "PROJECT_SUBMITTED": "Sent when a project is submitted for review",
+      "PROJECT_APPROVED": "Sent when a project is approved as completed",
+      "PROJECT_REJECTED": "Sent when a project is rated as not passed",
+      "PROJECT_DEADLINE_REMINDER": "Sent 48 hours before a project's submission deadline",
+      "SESSION_RESCHEDULED": "Sent to participants when a session's date or time changes",
+      "PAYMENT_RECEIPT": "Sent when an invoice for a course or event enrollment is paid",
+      "COURSE_CONTINUATION_INQUIRY": "Sent when a participant exceeds the course's limit of missed sessions"
     },
     "delete_confirmation": "Are you sure you want to delete the email template '{title}'?",
     "unknown_trigger": "Unknown trigger type",
@@ -2540,9 +2616,7 @@
       "other": "Other"
     },
     "category_coming_soon": "Soon",
-    "categories_coming_soon_explanation": {
-      "projects": "Templates for project status updates will appear here once project notifications are available."
-    }
+    "categories_coming_soon_explanation": {}
   },
   "manageAchievementTemplates": {
     "error": {

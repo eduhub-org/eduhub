@@ -18,6 +18,8 @@ import CheckboxSelector from '../../../../inputs/CheckboxSelector';
 import FileUploadField from '../../../../inputs/FileUploadField';
 import ProjectFormatSelector from '../../../CourseContent/Projects/ProjectFormatSelector';
 import InstructionDownloadButton from '../../../CourseContent/Projects/InstructionDownloadButton';
+import InstructionUploadButton from '../../../CourseContent/Projects/InstructionUploadButton';
+import DocumentationInstructionUploadDialog from './DocumentationInstructionUploadDialog';
 import {
   PROJECT_REQUIREMENT_KEYS,
   REQUIREMENT_I18N_KEY,
@@ -101,6 +103,9 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
   const [confirmProject, setConfirmProject] = useState<ProjectRow | null>(null);
   const [reviewProject, setReviewProject] = useState<ProjectRow | null>(null);
   const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const [instructionDialogRow, setInstructionDialogRow] = useState<ProjectRow | null>(
+    null
+  );
   const [selectAuthorTarget, setSelectAuthorTarget] = useState<ProjectRow | null>(null);
   const [selectMentorTarget, setSelectMentorTarget] = useState<ProjectRow | null>(null);
   const [removeAuthorContext, setRemoveAuthorContext] = useState<{
@@ -142,6 +147,12 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
   const [updateProjectType] = useRoleMutation(UPDATE_PROJECT_TYPE, {
     refetchQueries: REFETCH_QUERIES,
   });
+  // Selecting the instruction created in the dialog: this dropdown is
+  // mutation-driven, so the choice has to be persisted rather than held in state.
+  const [updateProjectDocumentationInstruction] = useRoleMutation(
+    UPDATE_PROJECT_DOCUMENTATION_INSTRUCTION,
+    { refetchQueries: REFETCH_QUERIES }
+  );
 
   const allProjects = projectsQuery.data?.Project ?? [];
 
@@ -302,34 +313,65 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
     [updateSuggestedForPublication, tCommon]
   );
 
+  // The dialog is opened per row, so capture the target from state rather than from
+  // a row closure that may have been re-rendered in the meantime.
+  const handleInstructionCreated = useCallback(
+    async (instructionId: number) => {
+      const targetId = instructionDialogRow?.id;
+      if (targetId == null) return;
+      try {
+        await updateProjectDocumentationInstruction({
+          variables: { itemId: targetId, value: instructionId },
+        });
+      } catch (err) {
+        setErrorMessage(err instanceof Error ? err.message : tCommon('error'));
+      }
+    },
+    [instructionDialogRow?.id, updateProjectDocumentationInstruction, tCommon]
+  );
+
   const handleSetProjectType = useCallback(
     async (projectId: number, value: string | null, status: ProjectStatus_enum) => {
       if (!isProjectTypeEditable(status)) return;
       // Skip persistence while the checked deliverables match no catalog type.
       if (!value) return;
+
+      // Reset the instruction to the new type's default so type and
+      // documentationInstructionId stay consistent (the DB trigger rejects a
+      // mismatch). Mirrors the Add/Confirm dialog behaviour. Fall back to any
+      // instruction of the new type when none is flagged as default.
+      // Only instructions that actually carry a PDF are eligible: the mutation
+      // would otherwise persist an ID the team cannot download.
+      const instructions = documentationInstructionsWithPdf;
+      const nextInstruction =
+        instructions.find(
+          (inst) => inst.projectTypeValue === value && inst.isDefault
+        ) ?? instructions.find((inst) => inst.projectTypeValue === value);
+
+      // Outside PROPOSED the database forbids a NULL documentationInstructionId
+      // (Project_ongoing_requires_type_and_instruction_check), so refuse the
+      // change with an actionable message instead of sending a mutation that
+      // fails with a raw constraint error. Since only instructions with a PDF url
+      // are eligible, "no instruction" also covers an admin-created row whose
+      // upload is still pending.
+      if (!nextInstruction && status !== ProjectStatus_enum.PROPOSED) {
+        setErrorMessage(t('projects.expanded.type_change_no_instruction_error'));
+        return;
+      }
+
       try {
-        // Reset the instruction to the new type's default so type and
-        // documentationInstructionId stay consistent (the DB trigger rejects a
-        // mismatch). Mirrors the Add/Confirm dialog behaviour.
-        const defaultInstruction = (
-          documentationInstructionsQuery.data?.ProjectDocumentationInstruction ?? []
-        ).find((inst) => inst.projectTypeValue === value && inst.isDefault);
         await updateProjectType({
           variables: {
             itemId: projectId,
             value,
-            documentationInstructionId: defaultInstruction?.id ?? null,
+            documentationInstructionId: nextInstruction?.id ?? null,
           },
         });
       } catch (err) {
         setErrorMessage(err instanceof Error ? err.message : tCommon('error'));
       }
     },
-    [
-      updateProjectType,
-      documentationInstructionsQuery.data?.ProjectDocumentationInstruction,
-      tCommon,
-    ]
+    [updateProjectType, documentationInstructionsWithPdf, t, tCommon]
   );
 
   const columns = useMemo<ColumnDef<ProjectRow>[]>(
@@ -691,35 +733,80 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
           (inst) => inst.id === row.documentationInstructionId
         )?.url ?? null;
 
+      // An instructor may upload the first instruction for a type that has none, so
+      // the section also renders when the option list is still empty.
+      const canUploadOwnInstruction = canEditProjectType && Boolean(row.type);
       const documentationInstructionSection =
-        rowInstructionOptions.length > 0 ? (
+        rowInstructionOptions.length > 0 || canUploadOwnInstruction ? (
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-label-secondary mb-2">
               {t('projects.add_dialog.instruction_label')}
             </p>
             <div className="flex items-center gap-2 [&_.col-span-10]:!mt-0">
-              <div className="flex-1">
-                <DropDownSelector
-                  variant="material"
-                  value={
-                    row.documentationInstructionId
-                      ? String(row.documentationInstructionId)
-                      : ''
-                  }
-                  options={rowInstructionOptions}
-                  updateValueMutation={UPDATE_PROJECT_DOCUMENTATION_INSTRUCTION}
-                  identifierVariables={{ itemId: row.id }}
-                  refetchQueries={REFETCH_QUERIES}
-                  disabled={!canEditProjectType}
-                />
-              </div>
+              {rowInstructionOptions.length > 0 ? (
+                <div className="flex-1">
+                  <DropDownSelector
+                    variant="material"
+                    value={
+                      row.documentationInstructionId
+                        ? String(row.documentationInstructionId)
+                        : ''
+                    }
+                    options={rowInstructionOptions}
+                    updateValueMutation={UPDATE_PROJECT_DOCUMENTATION_INSTRUCTION}
+                    identifierVariables={{ itemId: row.id }}
+                    refetchQueries={REFETCH_QUERIES}
+                    disabled={!canEditProjectType}
+                  />
+                </div>
+              ) : (
+                <p className="flex-1 text-sm text-label-secondary">
+                  {t('projects.instruction_upload.own_list_empty')}
+                </p>
+              )}
               <InstructionDownloadButton url={selectedInstructionUrl} />
+              <InstructionUploadButton
+                onClick={() => setInstructionDialogRow(row)}
+                disabled={!canUploadOwnInstruction}
+                label={
+                  row.type
+                    ? t('projects.instruction_upload.open')
+                    : t('projects.instruction_upload.disabled_no_type')
+                }
+              />
             </div>
             <p className="mt-2 text-xs text-label-secondary whitespace-pre-line">
               {t('projects.add_dialog.instruction_info')}
             </p>
           </div>
         ) : null;
+
+      const projectTypeSection = (
+        <>
+          <ProjectFormatSelector
+            projectTypes={projectTypesList}
+            value={row.type ?? ''}
+            onChange={(typeValue) =>
+              handleSetProjectType(row.id, typeValue, row.status)
+            }
+            disabled={!canEditProjectType}
+          />
+          {canEditProjectType && row.status === ProjectStatus_enum.ONGOING ? (
+            // Files already uploaded under the old type are kept, but the set of
+            // *mandatory* deliverables changes and the documentation instruction
+            // is swapped for the new type's default, so warn before the team is
+            // affected.
+            <p className="mt-2 text-xs text-warning">
+              {t('projects.expanded.type_change_ongoing_warning')}
+            </p>
+          ) : null}
+          {!canEditProjectType ? (
+            <p className="mt-2 text-xs text-label-secondary">
+              {t('projects.expanded.type_locked_hint')}
+            </p>
+          ) : null}
+        </>
+      );
 
       if (!hasAcceptedAuthor) {
         const canEditProjectTitle = row.parentProjectId == null;
@@ -859,19 +946,7 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
             </div>
 
             <div className="border-t border-border-primary pt-5">
-              <ProjectFormatSelector
-                projectTypes={projectTypesList}
-                value={row.type ?? ''}
-                onChange={(typeValue) =>
-                  handleSetProjectType(row.id, typeValue, row.status)
-                }
-                disabled={!canEditProjectType}
-              />
-              {!canEditProjectType ? (
-                <p className="mt-2 text-xs text-label-secondary">
-                  {t('projects.expanded.type_locked_hint')}
-                </p>
-              ) : null}
+              {projectTypeSection}
             </div>
 
             {documentationInstructionSection ? (
@@ -901,19 +976,7 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
           </div>
 
           <div className="border-t border-border-primary pt-5">
-            <ProjectFormatSelector
-              projectTypes={projectTypesList}
-              value={row.type ?? ''}
-              onChange={(typeValue) =>
-                handleSetProjectType(row.id, typeValue, row.status)
-              }
-              disabled={!canEditProjectType}
-            />
-            {!canEditProjectType ? (
-              <p className="mt-2 text-xs text-label-secondary">
-                {t('projects.expanded.type_locked_hint')}
-              </p>
-            ) : null}
+            {projectTypeSection}
           </div>
 
           {documentationInstructionSection ? (
@@ -999,6 +1062,19 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
           blockedAuthorIds={blockedAuthorIds}
           refetchQueries={REFETCH_QUERIES}
           onError={setErrorMessage}
+        />
+      ) : null}
+
+      {instructionDialogRow?.type ? (
+        <DocumentationInstructionUploadDialog
+          open
+          onClose={() => setInstructionDialogRow(null)}
+          projectTypeValue={instructionDialogRow.type}
+          selectedInstructionId={instructionDialogRow.documentationInstructionId}
+          onCreated={handleInstructionCreated}
+          onSelectedDeleted={() => projectsQuery.refetch()}
+          onError={setErrorMessage}
+          refetchQueries={REFETCH_QUERIES}
         />
       ) : null}
 
