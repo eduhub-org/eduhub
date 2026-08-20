@@ -465,6 +465,7 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
         <div className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-900">
           {t('projects.my_project.excluded_banner')}
         </div>
+        <ProjectReviewComment ratingComment={project.ratingComment} />
         <div className="rounded-lg border border-border-primary p-4 bg-bg-secondary/30">
           <ProjectPreviewLayout
             project={project}
@@ -477,7 +478,6 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
                   project.externalUrl?.trim()
               )
             }
-            belowTitleRow={<ProjectReviewComment ratingComment={project.ratingComment} />}
             titleRow={
               <div className="flex flex-wrap items-center gap-2 mb-1">
                 <h4 className="text-xl font-semibold text-label-primary min-w-0 break-words">
@@ -629,6 +629,8 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
         </div>
       ) : null}
 
+      <ProjectReviewComment ratingComment={project.ratingComment} />
+
       <div className="space-y-3 min-w-0">
         {!isDeadlinePassed &&
         (project.status === ProjectStatus_enum.PROPOSED ||
@@ -652,7 +654,6 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
                   project.externalUrl?.trim()
               )
             }
-            belowTitleRow={<ProjectReviewComment ratingComment={project.ratingComment} />}
             titleRow={
             canEditProjectMetadata ? (
               <div className="flex flex-wrap items-start gap-2 mb-1 w-full">

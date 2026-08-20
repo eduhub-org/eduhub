@@ -26,8 +26,6 @@ interface ProjectPreviewLayoutProps {
   taglineSlot?: ReactNode;
   /** Optional: replace description panel (e.g. inline InputField). */
   descriptionSlot?: ReactNode;
-  /** Rendered directly under `titleRow` (e.g. submission deadline). */
-  belowTitleRow?: ReactNode;
   /**
    * Also list EXCLUDED authors (marked as excluded). Set for privileged viewers
    * (instructors/admins) and the excluded author's own "My Project" view.
@@ -42,7 +40,6 @@ const ProjectPreviewLayout: FC<ProjectPreviewLayoutProps> = ({
   coverSlot,
   taglineSlot,
   descriptionSlot,
-  belowTitleRow,
   includeExcludedAuthors = false,
 }) => {
   const t = useTranslations('course');
@@ -72,7 +69,6 @@ const ProjectPreviewLayout: FC<ProjectPreviewLayoutProps> = ({
   return (
     <div className="space-y-4">
       {titleRow ? <div className="min-w-0">{titleRow}</div> : null}
-      {belowTitleRow ? <div className="min-w-0">{belowTitleRow}</div> : null}
 
       <div className="flex flex-col lg:flex-row lg:items-stretch gap-6">
         <div className="shrink-0 w-full lg:w-56">
