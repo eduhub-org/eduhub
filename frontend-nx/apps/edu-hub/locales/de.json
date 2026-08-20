@@ -1408,12 +1408,7 @@
         "confirm_button": "Bestätigen"
       },
       "review_dialog": {
-        "title": "Eingereichtes Projekt bewerten",
-        "title_label": "Titel",
-        "tagline_label": "Untertitel",
-        "documentation_link": "Dokumentation öffnen",
-        "presentation_link": "Präsentation öffnen",
-        "external_link": "Projektlink öffnen"
+        "title_label": "Titel"
       },
       "evaluate_dialog": {
         "title": "Projekt beurteilen",

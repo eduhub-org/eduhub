@@ -1426,12 +1426,7 @@
         "confirm_button": "Confirm"
       },
       "review_dialog": {
-        "title": "Review submitted project",
-        "title_label": "Title",
-        "tagline_label": "Tagline",
-        "documentation_link": "Open documentation",
-        "presentation_link": "Open presentation",
-        "external_link": "Open project link"
+        "title_label": "Title"
       },
       "evaluate_dialog": {
         "title": "Evaluate project",
