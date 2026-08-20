@@ -18,6 +18,8 @@ import CheckboxSelector from '../../../../inputs/CheckboxSelector';
 import FileUploadField from '../../../../inputs/FileUploadField';
 import ProjectFormatSelector from '../../../CourseContent/Projects/ProjectFormatSelector';
 import InstructionDownloadButton from '../../../CourseContent/Projects/InstructionDownloadButton';
+import InstructionUploadButton from '../../../CourseContent/Projects/InstructionUploadButton';
+import DocumentationInstructionUploadDialog from './DocumentationInstructionUploadDialog';
 import {
   PROJECT_REQUIREMENT_KEYS,
   REQUIREMENT_I18N_KEY,
@@ -101,6 +103,9 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
   const [confirmProject, setConfirmProject] = useState<ProjectRow | null>(null);
   const [reviewProject, setReviewProject] = useState<ProjectRow | null>(null);
   const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const [instructionDialogRow, setInstructionDialogRow] = useState<ProjectRow | null>(
+    null
+  );
   const [selectAuthorTarget, setSelectAuthorTarget] = useState<ProjectRow | null>(null);
   const [selectMentorTarget, setSelectMentorTarget] = useState<ProjectRow | null>(null);
   const [removeAuthorContext, setRemoveAuthorContext] = useState<{
@@ -142,6 +147,12 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
   const [updateProjectType] = useRoleMutation(UPDATE_PROJECT_TYPE, {
     refetchQueries: REFETCH_QUERIES,
   });
+  // Selecting the instruction created in the dialog: this dropdown is
+  // mutation-driven, so the choice has to be persisted rather than held in state.
+  const [updateProjectDocumentationInstruction] = useRoleMutation(
+    UPDATE_PROJECT_DOCUMENTATION_INSTRUCTION,
+    { refetchQueries: REFETCH_QUERIES }
+  );
 
   const allProjects = projectsQuery.data?.Project ?? [];
 
@@ -300,6 +311,23 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
       }
     },
     [updateSuggestedForPublication, tCommon]
+  );
+
+  // The dialog is opened per row, so capture the target from state rather than from
+  // a row closure that may have been re-rendered in the meantime.
+  const handleInstructionCreated = useCallback(
+    async (instructionId: number) => {
+      const targetId = instructionDialogRow?.id;
+      if (targetId == null) return;
+      try {
+        await updateProjectDocumentationInstruction({
+          variables: { itemId: targetId, value: instructionId },
+        });
+      } catch (err) {
+        setErrorMessage(err instanceof Error ? err.message : tCommon('error'));
+      }
+    },
+    [instructionDialogRow?.id, updateProjectDocumentationInstruction, tCommon]
   );
 
   const handleSetProjectType = useCallback(
@@ -705,29 +733,47 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
           (inst) => inst.id === row.documentationInstructionId
         )?.url ?? null;
 
+      // An instructor may upload the first instruction for a type that has none, so
+      // the section also renders when the option list is still empty.
+      const canUploadOwnInstruction = canEditProjectType && Boolean(row.type);
       const documentationInstructionSection =
-        rowInstructionOptions.length > 0 ? (
+        rowInstructionOptions.length > 0 || canUploadOwnInstruction ? (
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-label-secondary mb-2">
               {t('projects.add_dialog.instruction_label')}
             </p>
             <div className="flex items-center gap-2 [&_.col-span-10]:!mt-0">
-              <div className="flex-1">
-                <DropDownSelector
-                  variant="material"
-                  value={
-                    row.documentationInstructionId
-                      ? String(row.documentationInstructionId)
-                      : ''
-                  }
-                  options={rowInstructionOptions}
-                  updateValueMutation={UPDATE_PROJECT_DOCUMENTATION_INSTRUCTION}
-                  identifierVariables={{ itemId: row.id }}
-                  refetchQueries={REFETCH_QUERIES}
-                  disabled={!canEditProjectType}
-                />
-              </div>
+              {rowInstructionOptions.length > 0 ? (
+                <div className="flex-1">
+                  <DropDownSelector
+                    variant="material"
+                    value={
+                      row.documentationInstructionId
+                        ? String(row.documentationInstructionId)
+                        : ''
+                    }
+                    options={rowInstructionOptions}
+                    updateValueMutation={UPDATE_PROJECT_DOCUMENTATION_INSTRUCTION}
+                    identifierVariables={{ itemId: row.id }}
+                    refetchQueries={REFETCH_QUERIES}
+                    disabled={!canEditProjectType}
+                  />
+                </div>
+              ) : (
+                <p className="flex-1 text-sm text-label-secondary">
+                  {t('projects.instruction_upload.own_list_empty')}
+                </p>
+              )}
               <InstructionDownloadButton url={selectedInstructionUrl} />
+              <InstructionUploadButton
+                onClick={() => setInstructionDialogRow(row)}
+                disabled={!canUploadOwnInstruction}
+                label={
+                  row.type
+                    ? t('projects.instruction_upload.open')
+                    : t('projects.instruction_upload.disabled_no_type')
+                }
+              />
             </div>
             <p className="mt-2 text-xs text-label-secondary whitespace-pre-line">
               {t('projects.add_dialog.instruction_info')}
@@ -1016,6 +1062,19 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
           blockedAuthorIds={blockedAuthorIds}
           refetchQueries={REFETCH_QUERIES}
           onError={setErrorMessage}
+        />
+      ) : null}
+
+      {instructionDialogRow?.type ? (
+        <DocumentationInstructionUploadDialog
+          open
+          onClose={() => setInstructionDialogRow(null)}
+          projectTypeValue={instructionDialogRow.type}
+          selectedInstructionId={instructionDialogRow.documentationInstructionId}
+          onCreated={handleInstructionCreated}
+          onSelectedDeleted={() => projectsQuery.refetch()}
+          onError={setErrorMessage}
+          refetchQueries={REFETCH_QUERIES}
         />
       ) : null}
 

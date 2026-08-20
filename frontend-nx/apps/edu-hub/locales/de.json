@@ -1449,6 +1449,38 @@
         "error_author_already_in_project": "{name} ist in diesem Kurs bereits einem aktiven Projekt zugeordnet und kann keinem weiteren hinzugefügt werden.",
         "error_author_conflict_generic": "Mindestens eine:r der ausgewählten Autor:innen ist in diesem Kurs bereits einem aktiven Projekt zugeordnet und kann keinem weiteren hinzugefügt werden."
       },
+      "instruction_upload": {
+        "open": "Eigene Dokumentationsanleitung hochladen oder verwalten",
+        "disabled_no_type": "Wähle zuerst einen Projekttyp – eine Dokumentationsanleitung gehört immer zu einem Typ.",
+        "dialog_title": "Eigene Dokumentationsanleitungen",
+        "create_heading": "Neue Anleitung hochladen",
+        "create_help": "Die Anleitung gilt für den aktuellen Projekttyp. Nur Du und die Teams, deren Projekt sie nutzt, sehen sie – andere Kursleitungen nicht.",
+        "title_label": "Titel",
+        "title_placeholder": "z. B. Doku-Leitfaden Kurs XY (WS26)",
+        "pdf_label": "PDF",
+        "pdf_required": "Erforderlich: eine PDF-Datei, maximal 20 MB.",
+        "pdf_choose": "PDF auswählen",
+        "pdf_selected": "Ausgewählt: {fileName}",
+        "submit": "Hochladen und auswählen",
+        "own_list_heading": "Deine Anleitungen für diesen Projekttyp",
+        "own_list_help": "Titel ändern, PDF ersetzen oder Anleitung löschen. Anleitungen von opencampus.sh kannst Du hier nicht bearbeiten.",
+        "own_list_empty": "Du hast für diesen Projekttyp noch keine eigene Anleitung hochgeladen.",
+        "load_more": "Weitere anzeigen",
+        "replace_label": "PDF ersetzen",
+        "missing_pdf": "Kein PDF hinterlegt – diese Anleitung wird noch nicht angeboten.",
+        "delete_tooltip": "Anleitung löschen",
+        "delete_dialog": {
+          "title": "Anleitung löschen",
+          "question": "Soll die Anleitung „{title}“ gelöscht werden? Projekte, die sie nutzen, werden auf die Standard-Anleitung des Projekttyps umgestellt.",
+          "confirm": "Löschen"
+        },
+        "error": {
+          "create_failed": "Die Anleitung konnte nicht angelegt werden.",
+          "pdf_upload_failed": "Das PDF konnte nicht hochgeladen werden. Die Anleitung wurde nicht angelegt.",
+          "duplicate_title": "Du hast bereits eine Anleitung mit diesem Titel. Wähle einen anderen Titel.",
+          "delete_failed": "Die Anleitung konnte nicht gelöscht werden."
+        }
+      },
       "requirements": {
         "section_label": "Erforderliche Abgaben",
         "section_help": "Wähle aus, was Teilnehmende für dieses Projekt einreichen müssen. Die gewählte Kombination bestimmt den Projekttyp.",
