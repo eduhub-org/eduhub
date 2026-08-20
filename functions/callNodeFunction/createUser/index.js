@@ -239,9 +239,9 @@ export default async function createUser(req, logger) {
       }, formatDate);
 
       // Also handle custom template variables for password reset link and portal URL
-      const customReplacer = (text) => {
+      const customReplacer = (text, options) => {
         if (!text) return text;
-        let result = variableReplacer(text);
+        let result = variableReplacer(text, options);
         result = result.replaceAll('[System:PasswordResetLink]', passwordResetLink);
         result = result.replaceAll('[System:PortalUrl]', portalUrl);
         return result;

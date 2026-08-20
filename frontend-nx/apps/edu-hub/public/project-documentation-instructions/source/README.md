@@ -1,6 +1,6 @@
 # Default instruction PDFs — markdown source
 
-Bilingual (German **Du** + English) source text for the **seven default**
+Bilingual (German **Du** + English) source text for the **eight default**
 instruction PDFs only. Custom instructions created in app-settings are stored
 in **Google Cloud Storage**, not here.
 
@@ -13,6 +13,7 @@ Each `.md` file maps 1:1 to a PDF in the parent folder:
 |---|---|
 | `ONLINE_COURSE` | `ONLINE_COURSE.pdf` |
 | `CLASSIC_PROJECT` | `CLASSIC_PROJECT.pdf` |
+| `PROJECT_WITH_DOCUMENTATION_ONLY` | `PROJECT_WITH_DOCUMENTATION_ONLY.pdf` |
 | `PROJECT_WITH_LINK` | `PROJECT_WITH_LINK.pdf` |
 | `PROJECT_WITH_PRESENTATION` | `PROJECT_WITH_PRESENTATION.pdf` |
 | `PROJECT_WITH_LINK_AND_PRESENTATION` | `PROJECT_WITH_LINK_AND_PRESENTATION.pdf` |
@@ -21,7 +22,7 @@ Each `.md` file maps 1:1 to a PDF in the parent folder:
 
 ## How to turn these into PDFs
 
-### Regenerate all seven (repo script)
+### Regenerate all eight (repo script)
 
 From this directory:
 

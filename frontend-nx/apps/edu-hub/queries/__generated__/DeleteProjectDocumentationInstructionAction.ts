@@ -17,7 +17,7 @@ export interface DeleteProjectDocumentationInstructionAction_deleteProjectDocume
 
 export interface DeleteProjectDocumentationInstructionAction {
   /**
-   * Reassigns projects using the instruction to the type default, then deletes the non-default instruction.
+   * Reassigns projects using the instruction to the type default, then deletes the non-default instruction. Instructors may only delete instructions they created (verified in the handler).
    */
   deleteProjectDocumentationInstruction: DeleteProjectDocumentationInstructionAction_deleteProjectDocumentationInstruction;
 }

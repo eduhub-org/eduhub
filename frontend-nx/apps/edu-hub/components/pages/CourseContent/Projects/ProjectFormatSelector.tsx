@@ -183,7 +183,7 @@ const ProjectFormatSelector: FC<ProjectFormatSelectorProps> = ({
               ))}
             </div>
             {classicInvalid ? (
-              <p className="mt-2 text-xs text-status-error">
+              <p className="mt-2 text-xs text-error">
                 {t('projects.requirements.classic_invalid_combination')}
               </p>
             ) : null}

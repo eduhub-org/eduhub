@@ -8,6 +8,7 @@ describe('Email Template Variables System', () => {
       createVariableReplacer,
       createEnrollmentVariableReplacer,
       createSessionVariableReplacer,
+      createProjectVariableReplacer,
       generateVariableDocumentation;
 
   beforeAll(async () => {
@@ -19,6 +20,7 @@ describe('Email Template Variables System', () => {
     createVariableReplacer = module.createVariableReplacer;
     createEnrollmentVariableReplacer = module.createEnrollmentVariableReplacer;
     createSessionVariableReplacer = module.createSessionVariableReplacer;
+    createProjectVariableReplacer = module.createProjectVariableReplacer;
     generateVariableDocumentation = module.generateVariableDocumentation;
   });
 
@@ -28,6 +30,7 @@ describe('Email Template Variables System', () => {
       expect(EMAIL_VARIABLES).toHaveProperty('COURSE');
       expect(EMAIL_VARIABLES).toHaveProperty('ENROLLMENT');
       expect(EMAIL_VARIABLES).toHaveProperty('SESSION');
+      expect(EMAIL_VARIABLES).toHaveProperty('PROJECT');
     });
 
     it('should have complete metadata for each variable', () => {
@@ -52,6 +55,11 @@ describe('Email Template Variables System', () => {
       expect(allKeys).toContain('[Course:StartTime]');
       expect(allKeys).toContain('[Session:Title]');
       expect(allKeys).toContain('[Session:ReminderText]');
+      expect(allKeys).toContain('[Enrollment:CertificateLink]');
+      expect(allKeys).toContain('[Project:Title]');
+      expect(allKeys).toContain('[Project:Link]');
+      expect(allKeys).toContain('[Project:ApplicantName]');
+      expect(allKeys).toContain('[Project:ReviewComment]');
     });
   });
 
@@ -217,6 +225,97 @@ describe('Email Template Variables System', () => {
       const result = replacer('Hello [User:FirstName], your course [Enrollment:CourseId--Course:Name] starts [Course:StartTime]. Link: [Enrollment:CourseLink]');
       
       expect(result).toBe('Hello John, your course Test Course starts formatted-2024-01-15. Link: https://test.example.com/course/123');
+    });
+
+    it('should resolve the certificate link, falling back to the course page', () => {
+      process.env.FRONTEND_URL = 'https://test.example.com';
+
+      const withCert = createEnrollmentVariableReplacer(
+        { User: { firstName: 'Ada' }, Course: { id: 7, title: 'Algo' }, certificateLink: 'https://gcs/cert.pdf' },
+        mockFormatDate
+      );
+      expect(withCert('[Enrollment:CertificateLink]')).toBe('https://gcs/cert.pdf');
+
+      const withoutCert = createEnrollmentVariableReplacer(
+        { User: { firstName: 'Ada' }, Course: { id: 7, title: 'Algo' }, certificateLink: null },
+        mockFormatDate
+      );
+      expect(withoutCert('[Enrollment:CertificateLink]')).toBe('https://test.example.com/course/7');
+    });
+
+    it('should create a project variable replacer and escape user-controlled values', () => {
+      process.env.FRONTEND_URL = 'https://test.example.com';
+
+      const replacer = createProjectVariableReplacer(
+        { id: 99, title: '<b>Solar</b> & Co' },
+        { firstName: 'Bob' },
+        { applicantName: 'Eve <x>' }
+      );
+      const result = replacer('Hi [User:FirstName], [Project:ApplicantName] joins [Project:Title] at [Project:Link]');
+
+      expect(result).toBe('Hi Bob, Eve &lt;x&gt; joins &lt;b&gt;Solar&lt;/b&gt; &amp; Co at https://test.example.com/project/99');
+    });
+
+    it('should render the review comment as a labelled block', () => {
+      const replacer = createProjectVariableReplacer(
+        { id: 3, title: 'Solar', ratingComment: 'Bitte die Quellen ergänzen.\nDanke!' },
+        { firstName: 'Ann' }
+      );
+
+      expect(replacer('<p>x</p>[Project:ReviewComment]')).toBe(
+        '<p>x</p><p><strong>Kommentar der Kursleitung / Instructor comment:</strong><br>' +
+          'Bitte die Quellen ergänzen.<br>Danke!</p>'
+      );
+    });
+
+    it('should escape a review comment that contains markup', () => {
+      const replacer = createProjectVariableReplacer(
+        { id: 3, title: 'Solar', ratingComment: '<script>alert(1)</script> & more' },
+        {}
+      );
+
+      const result = replacer('[Project:ReviewComment]');
+      expect(result).toContain('&lt;script&gt;alert(1)&lt;/script&gt; &amp; more');
+      expect(result).not.toContain('<script>');
+    });
+
+    it('should expand the review comment to nothing when there is none', () => {
+      const blank = createProjectVariableReplacer({ id: 3, title: 'Solar', ratingComment: '   ' }, {});
+      const missing = createProjectVariableReplacer({ id: 3, title: 'Solar' }, {});
+
+      expect(blank('<p>a</p>[Project:ReviewComment]<p>b</p>')).toBe('<p>a</p><p>b</p>');
+      expect(missing('<p>a</p>[Project:ReviewComment]<p>b</p>')).toBe('<p>a</p><p>b</p>');
+    });
+
+    it('should not expand placeholders that appear inside the review comment', () => {
+      const replacer = createProjectVariableReplacer(
+        { id: 7, title: 'RealTitle', ratingComment: 'Compare with [Project:Title]' },
+        {}
+      );
+
+      expect(replacer('[Project:ReviewComment]')).toContain('Compare with [Project:Title]');
+    });
+
+    it('should leave values unescaped for plain-text targets like the subject', () => {
+      process.env.FRONTEND_URL = 'https://test.example.com';
+
+      const replacer = createProjectVariableReplacer(
+        { id: 99, title: 'Solar & Co' },
+        { firstName: "O'Brien" },
+        { applicantName: 'Eve & Co' }
+      );
+      const subject = replacer('New request - [Project:Title] ([Project:ApplicantName], [User:FirstName])', {
+        html: false
+      });
+
+      expect(subject).toBe("New request - Solar & Co (Eve & Co, O'Brien)");
+    });
+
+    it('should still escape values for the html body by default', () => {
+      const replacer = createProjectVariableReplacer({ id: 1, title: 'Solar & Co' }, {});
+
+      expect(replacer('<p>[Project:Title]</p>')).toBe('<p>Solar &amp; Co</p>');
+      expect(replacer('<p>[Project:Title]</p>', { html: true })).toBe('<p>Solar &amp; Co</p>');
     });
 
     it('should create session variable replacer', () => {

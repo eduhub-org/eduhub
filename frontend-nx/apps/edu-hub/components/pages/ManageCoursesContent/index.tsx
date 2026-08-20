@@ -51,7 +51,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { SelectProgramDialog } from './SelectProgramDialog';
 import { COPY_COURSES_TO_PROGRAM } from '../../../queries/copyCourse';
 import NotificationSnackbar from '../../common/dialogs/NotificationSnackbar';
-import { MdMarkEmailRead } from 'react-icons/md';
+import { MdMarkEmailRead, MdOpenInNew } from 'react-icons/md';
 
 // Header imports
 import CommonPageHeader from '../../common/CommonPageHeader';
@@ -691,10 +691,13 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType }) => {
               </div>
               <a
                 href={`course/${row.original.id}`}
-                className="shrink-0 whitespace-nowrap text-sm font-medium text-blue-600 underline hover:text-blue-800"
-                title={t('view_course')}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="shrink-0 text-blue-600 hover:text-blue-800"
+                title={t('open_in_new_tab')}
+                aria-label={t('open_in_new_tab')}
               >
-                {t('view')}
+                <MdOpenInNew className="text-lg" aria-hidden />
               </a>
             </div>
           );

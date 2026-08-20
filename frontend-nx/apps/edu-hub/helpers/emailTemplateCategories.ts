@@ -15,7 +15,7 @@ export const EMAIL_TEMPLATE_CATEGORIES: EmailTemplateCategory[] = [
 ];
 
 /** Categories that exist in the taxonomy but have no live trigger types yet. */
-export const UPCOMING_EMAIL_TEMPLATE_CATEGORIES: EmailTemplateCategory[] = ['projects'];
+export const UPCOMING_EMAIL_TEMPLATE_CATEGORIES: EmailTemplateCategory[] = [];
 
 const CATEGORY_BY_TYPE: Record<string, EmailTemplateCategory> = {
   // Application process (enrollment lifecycle)
@@ -27,8 +27,30 @@ const CATEGORY_BY_TYPE: Record<string, EmailTemplateCategory> = {
   REGISTRATION_CONFIRMED: 'application',
   REGISTRATION_CONFIRMED_PAID: 'application',
   WAITLIST_NOTICE: 'application',
-  // Session reminders
+  WAITLIST_PROMOTED: 'application',
+  INVITATION_EXPIRING_SOON: 'application',
+  INVITATION_EXPIRED: 'application',
+  ENROLLMENT_CANCELLED: 'application',
+  ENROLLMENT_ABORTED: 'application',
+  PAYMENT_RECEIPT: 'application',
+  // End of the enrollment lifecycle: certificates signal course completion
+  CERTIFICATE_ACHIEVEMENT_READY: 'application',
+  CERTIFICATE_ATTENDANCE_READY: 'application',
+  // Project notifications
+  PROJECT_JOIN_REQUESTED: 'projects',
+  PROJECT_JOIN_ACCEPTED: 'projects',
+  PROJECT_JOIN_DECLINED: 'projects',
+  PROJECT_AUTHOR_EXCLUDED: 'projects',
+  PROJECT_TEAM_CONFIRMED: 'projects',
+  PROJECT_SUBMITTED: 'projects',
+  PROJECT_SENT_BACK: 'projects',
+  PROJECT_APPROVED: 'projects',
+  PROJECT_REJECTED: 'projects',
+  PROJECT_DEADLINE_REMINDER: 'projects',
+  // Session reminders and changes
   SESSION_REMINDER: 'sessions',
+  SESSION_RESCHEDULED: 'sessions',
+  COURSE_CONTINUATION_INQUIRY: 'sessions',
   // System / account
   USER_CREATED: 'system',
   ORGANIZER_ADDED: 'system',

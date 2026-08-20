@@ -42,7 +42,7 @@ exist on production-like data; use a throw-away dev DB.
 
 ### 2.2 Programs and courses (fresh)
 
-- **Program P1** with `defaultProjectType = CLASSIC_PROJECT`,
+- **Program P1** with `defaultProjectType = PROJECT_WITH_DOCUMENTATION_ONLY`,
   `projectProposalsEnabledByDefault = true`,
   `defaultProjectSubmissionDeadline` set to **tomorrow**.
 - **Program P2** with no project defaults set.
@@ -57,7 +57,11 @@ exist on production-like data; use a throw-away dev DB.
 In **App settings → Project documentation instructions**, confirm that
 every `ProjectType` already has a default instruction. If not, upload a
 small PDF and mark it default for the missing types. Add **one extra**
-non-default instruction for `CLASSIC_PROJECT` to test the picker.
+non-default instruction for `PROJECT_WITH_DOCUMENTATION_ONLY` to test the picker.
+
+All instructions seeded this way are **platform** instructions
+(`createdByUserId IS NULL`). For §8.1, also upload one instruction as `instr-a`
+from inside a course so at least one personal instruction exists.
 
 ---
 
@@ -168,7 +172,7 @@ This section walks the full project lifecycle once. Roles are noted in
 
 1. Open Manage Programs → expand P1. Confirm the three new program-level
    controls render:
-   - **Default project type** = CLASSIC_PROJECT.
+   - **Default project type** = Projekt (nur Dokumentation) (PROJECT_WITH_DOCUMENTATION_ONLY).
    - **Project proposals enabled by default** is on.
    - **Default project submission deadline** = tomorrow.
 2. Change P1's default deadline to **+7 days** and back. Toast confirms,
@@ -257,13 +261,42 @@ Then verify the rule lifts when the project finishes:
 **As `instr-a`** in Manage Course A → **Participations → Projects**:
 
 1. Find User-1's project. Status chip shows PROPOSED.
-2. Click **Confirm team**. Pick type `CLASSIC_PROJECT` and the default
+2. Click **Confirm team**. Uncheck **Präsentations-Upload** so the type
+   resolves to *Projekt (nur Dokumentation)* (`PROJECT_WITH_DOCUMENTATION_ONLY`), keep the default
    documentation instruction. Confirm.
 3. The status chip flips to ONGOING. **Accepting participants** is now
-   locked off. Type and instruction cells become read-only.
+   locked off. Type and instruction stay **editable** and an amber warning
+   appears above them explaining what changing the type does.
 4. As `user-1`: refresh the course page. The "Request to join" buttons
    on the Projects table are gone; the My Project panel still allows
    editing artifacts.
+
+### 4.6b Changing the project type of an ONGOING project
+
+**As `instr-a`** in Manage Course A → **Participations → Projects**, on the
+project just confirmed:
+
+1. Expand the row. The deliverable checkboxes are **enabled** and the amber
+   ONGOING warning is visible; the "locked" hint is gone.
+2. Check **Präsentations-Upload**. The type becomes
+   `PROJECT_WITH_PRESENTATION` and the documentation instruction switches to
+   that type's default. No Postgres constraint error appears.
+3. As `user-1`: the My Project panel now highlights the presentation slot as
+   mandatory and **Submit** is disabled until it is filled.
+4. Back as `instr-a`, uncheck it again — the project returns to
+   `PROJECT_WITH_DOCUMENTATION_ONLY` and the presentation slot stops being mandatory. The already
+   uploaded presentation file is **kept**.
+5. Uncheck everything, then check only **Externer Link**: the reworded
+   invalid-combination error shows and nothing is persisted.
+6. Negative test: `UPDATE "ProjectDocumentationInstruction" SET url = NULL
+   WHERE "projectTypeValue" = 'PROJECT_WITH_DOCUMENTATION_ONLY'`, reload, and try to switch an ONGOING
+   project to that type. Expect the friendly "no documentation instruction"
+   message, **not** a raw
+   `Project_ongoing_requires_type_and_instruction_check` error. Restore
+   afterward.
+7. After the team submits, re-expand the row: the checkboxes and the
+   instruction dropdown are **disabled** and the hint reads "…until the
+   project has been submitted". **Send back** re-enables them.
 
 ### 4.7 Submission, review, send-back, approval
 
@@ -355,7 +388,8 @@ the slot is filled.
 
 | Type | Required slots to test |
 |---|---|
-| `CLASSIC_PROJECT` | Documentation |
+| `CLASSIC_PROJECT` | Documentation (legacy, not selectable in the picker) |
+| `PROJECT_WITH_DOCUMENTATION_ONLY` | Documentation + cover image |
 | `ONLINE_COURSE` | Documentation |
 | `PROJECT_WITH_LINK` | Documentation + cover image + external link |
 | `PROJECT_WITH_PRESENTATION` | Documentation + presentation + cover image |
@@ -464,6 +498,73 @@ In App settings → Project documentation instructions:
 5. The icon-only delete button has a screen-reader-readable label. In
    Chrome DevTools → Accessibility, confirm the **Accessible name**
    reads "Delete documentation" (or your translation).
+6. Instructor uploads (see §8.1) are listed here too. **Set as default** on such
+   a row is refused with `..._NOT_PLATFORM` — a personal instruction must never
+   become a type default.
+7. Uploading a non-PDF renamed to `.pdf` is now rejected on content
+   (`INVALID_FORMAT`), not just on extension.
+
+---
+
+## 8.1 Own documentation instructions (instructor)
+
+Roles: `instr-a` and `instr-b` are instructors on **different** courses;
+`user-1` is an ACCEPTED author on one of `instr-a`'s ONGOING projects.
+
+**Happy path — as `instr-a`**, on an ONGOING project in Manage Course →
+Participations → Projects (expand the row), and again in **Add project** and
+**Confirm team**:
+
+1. Click the upload button next to the instruction dropdown. Enter a title,
+   choose a PDF, submit.
+2. The dialog closes, the new instruction is **selected** in the dropdown, and it
+   appears among the options. No console warnings about an out-of-range value.
+3. Reopen the dialog: the instruction is listed under *your instructions* with a
+   title field, an open button, **PDF ersetzen**, and a delete button.
+4. Rename it (the field saves on blur) and replace its PDF. Both persist after a
+   reload. There is deliberately **no** "remove PDF" control: clearing the URL
+   would hide an instruction that projects still reference.
+5. Delete it. A project still using it falls back to the type default and the
+   number of reassigned projects is reported.
+
+**Guards:**
+
+6. On a PROPOSED project without a type, the button is disabled and its tooltip
+   explains why.
+7. After the team submits, the button and the dropdown are both disabled.
+8. For a project type with no instruction at all, the section still renders so
+   the first instruction can be created.
+
+**Isolation matrix:**
+
+9. As `instr-b`: `instr-a`'s instruction is **not** in any dropdown and not in
+   the dialog list. Platform instructions are still all visible.
+10. Add `instr-b` as a CourseInstructor on `instr-a`'s course: `instr-b` now sees
+    that instruction for the project that uses it (so the dropdown is never out
+    of range) but still cannot rename or delete it.
+11. As `user-1`: the instruction PDF still downloads from **My Project**. Confirm
+    in the network panel that the response contains no `createdByUserId`.
+
+**Negative GraphQL** (Hasura console as `instr-b`, `x-hasura-role: instructor`):
+
+12. `update_ProjectDocumentationInstruction_by_pk` on `instr-a`'s row → affects
+    zero rows.
+13. `insert_..._one` with `createdByUserId` or `isDefault` → the field does not
+    exist in the input type.
+14. `_set: { projectTypeValue }` → field not in the set input type.
+15. `_set: { url: "programs/program-1/private/x.pdf" }` on an own row → check
+    constraint violation (`..._owned_url_prefix_check`).
+16. `delete_..._by_pk` on any row that has a URL → affects zero rows (real
+    deletes must go through the action).
+17. **`saveProjectDocumentationInstruction` against a row `instr-b` does not
+    own**, using that row's exact filename → `..._UNAUTHORIZED`, and the object
+    in the bucket is byte-identical afterward. This is the overwrite the
+    dedicated handler exists to prevent.
+18. `deleteProjectDocumentationInstruction` on `instr-a`'s row →
+    `..._FORBIDDEN`; on any default row → `..._IS_DEFAULT`.
+19. Upload a file named `../../../evil.pdf` → stored as
+    `project-docs-instructions/public/instruction-<id>/evil.pdf`; confirm on the
+    dev container filesystem that nothing was written outside that folder.
 
 ---
 
