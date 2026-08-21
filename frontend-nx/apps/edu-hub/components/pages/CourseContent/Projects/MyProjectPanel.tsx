@@ -44,7 +44,13 @@ import {
 import ProjectNextTodos from './ProjectNextTodos';
 import RequestProjectReviewDialog from './RequestProjectReviewDialog';
 import SubmitConfirmationDialog, { SubmitAuthorOption } from './SubmitConfirmationDialog';
-import { isChecklistComplete } from './SubmissionChecklist';
+import SubmissionBlockedDialog from './SubmissionBlockedDialog';
+import ProjectDeliverableReadOnlyField from './ProjectDeliverableReadOnlyField';
+import {
+  getProjectSubmissionBlockers,
+  PROJECT_SUBMISSION_FIELD_ANCHOR_ID,
+  ProjectSubmissionBlocker,
+} from './SubmissionChecklist';
 import {
   isProjectCoverImageIncomplete,
   isProjectDocumentationIncomplete,
@@ -91,6 +97,7 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
   const locale = useLocale();
 
   const [submitDialogOpen, setSubmitDialogOpen] = useState(false);
+  const [submissionBlockedDialogOpen, setSubmissionBlockedDialogOpen] = useState(false);
   const [submitInProgress, setSubmitInProgress] = useState(false);
   const [requestReviewDialogOpen, setRequestReviewDialogOpen] = useState(false);
   const [requestsDialogOpen, setRequestsDialogOpen] = useState(false);
@@ -275,15 +282,42 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
   /** Copies from a course template (Neues Projektteam bilden) keep the template title. */
   const canEditProjectTitle = project.parentProjectId == null;
 
-  const checklistComplete = useMemo(
-    () => isChecklistComplete(project, projectType),
-    [project, projectType]
+  const submissionBlockers = useMemo(
+    () =>
+      getProjectSubmissionBlockers(project, projectType, {
+        isSubmissionDeadlinePassed: isDeadlinePassed,
+      }),
+    [project, projectType, isDeadlinePassed]
   );
 
-  const canSubmit =
-    project.status === ProjectStatus_enum.ONGOING &&
-    checklistComplete &&
-    !isDeadlinePassed;
+  /**
+   * The submit button stays clickable while blockers remain: clicking it opens a
+   * dialog naming what is missing instead of leaving a dead button behind a
+   * tooltip.
+   */
+  const handleSubmitClick = useCallback(() => {
+    if (submissionBlockers.length > 0) {
+      setSubmissionBlockedDialogOpen(true);
+      return;
+    }
+    setSubmitDialogOpen(true);
+  }, [submissionBlockers]);
+
+  /** Close the blocker dialog, then scroll the offending field into view. */
+  const handleGoToBlockedField = useCallback((blocker: ProjectSubmissionBlocker) => {
+    const anchorId = PROJECT_SUBMISSION_FIELD_ANCHOR_ID[blocker];
+    setSubmissionBlockedDialogOpen(false);
+    if (!anchorId) return;
+    // Deferred so the dialog has closed before we scroll underneath it.
+    window.setTimeout(() => {
+      const section = document.getElementById(anchorId);
+      if (!section) return;
+      section.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      section
+        .querySelector<HTMLElement>('input, textarea, button, [contenteditable="true"]')
+        ?.focus({ preventScroll: true });
+    }, 150);
+  }, []);
 
   // sentBackAt is stamped by set_project_submitted_metadata on SUBMITTED ->
   // ONGOING and cleared on resubmission. submittedAt cannot serve here: the
@@ -555,23 +589,23 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
             )
           ) : null}
           {isContentEditable && project.status === ProjectStatus_enum.ONGOING ? (
-            !canSubmit && !submitting ? (
-              <Tooltip title={t('projects.my_project.submit_disabled_tooltip')}>
-                <span className="inline-flex">
-                  <Button filled onClick={() => setSubmitDialogOpen(true)} disabled>
-                    {t('projects.my_project.submit_button')}
-                  </Button>
-                </span>
-              </Tooltip>
-            ) : (
-              <Tooltip title={t('projects.my_project.action_tooltip_submit')}>
-                <span className="inline-flex">
-                  <Button filled onClick={() => setSubmitDialogOpen(true)} disabled={!canSubmit || submitting || submitInProgress}>
-                    {t('projects.my_project.submit_button')}
-                  </Button>
-                </span>
-              </Tooltip>
-            )
+            <Tooltip
+              title={
+                submissionBlockers.length > 0
+                  ? t('projects.my_project.submit_blocked_tooltip')
+                  : t('projects.my_project.action_tooltip_submit')
+              }
+            >
+              <span className="inline-flex">
+                <Button
+                  filled
+                  onClick={handleSubmitClick}
+                  disabled={submitting || submitInProgress}
+                >
+                  {t('projects.my_project.submit_button')}
+                </Button>
+              </span>
+            </Tooltip>
           ) : null}
         </div>
       </div>
@@ -706,6 +740,7 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
           coverSlot={
             canEditProjectMetadata ? (
               <ProjectFormFieldSection
+                id={PROJECT_SUBMISSION_FIELD_ANCHOR_ID.coverImage}
                 className={highlightCoverImage ? MANDATORY_INCOMPLETE_HIGHLIGHT_CLASS : ''}
                 title={t('projects.my_project.cover_image_section_label')}
                 tooltip={t('projects.my_project.field_tooltip_cover_image')}
@@ -791,6 +826,7 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
           {project.status === ProjectStatus_enum.ONGOING ? (
             <>
               <ProjectFormFieldSection
+                id={PROJECT_SUBMISSION_FIELD_ANCHOR_ID.documentation}
                 className={highlightDocumentation ? MANDATORY_INCOMPLETE_HIGHLIGHT_CLASS : ''}
                 title={t('projects.my_project.documentation_upload_section_label')}
                 tooltip={t('projects.my_project.documentation_upload_tooltip')}
@@ -820,6 +856,7 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
               </ProjectFormFieldSection>
               {!isOnlineCourse ? (
               <ProjectFormFieldSection
+                id={PROJECT_SUBMISSION_FIELD_ANCHOR_ID.presentation}
                 className={highlightPresentation ? MANDATORY_INCOMPLETE_HIGHLIGHT_CLASS : ''}
                 title={t('projects.my_project.presentation_upload_section_label')}
                 tooltip={t('projects.my_project.presentation_upload_tooltip')}
@@ -850,6 +887,7 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
               ) : null}
               {!isOnlineCourse ? (
               <ProjectFormFieldSection
+                id={PROJECT_SUBMISSION_FIELD_ANCHOR_ID.externalUrl}
                 className={highlightExternalUrl ? MANDATORY_INCOMPLETE_HIGHLIGHT_CLASS : ''}
                 title={t('projects.my_project.external_url_label')}
                 tooltip={t('projects.my_project.field_tooltip_external_url')}
@@ -882,6 +920,40 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
               )
               : acceptingParticipantsCheckbox
             : null}
+        </div>
+      ) : null}
+
+      {!canEditFields && isDeadlinePassed && project.status === ProjectStatus_enum.ONGOING ? (
+        <div className="space-y-3 pt-2 border-t border-border-primary">
+          <p className="text-sm text-label-secondary">
+            {t('projects.my_project.deliverables_locked_notice', {
+              date: submissionDeadlineDisplay ?? '',
+            })}
+          </p>
+          {projectType?.requiresDocumentation || project.documentationUrl ? (
+            <ProjectDeliverableReadOnlyField
+              id={PROJECT_SUBMISSION_FIELD_ANCHOR_ID.documentation}
+              title={t('projects.my_project.documentation_upload_section_label')}
+              tooltip={t('projects.my_project.documentation_upload_tooltip')}
+              value={project.documentationUrl}
+            />
+          ) : null}
+          {!isOnlineCourse && (projectType?.requiresPresentation || project.presentationUrl) ? (
+            <ProjectDeliverableReadOnlyField
+              id={PROJECT_SUBMISSION_FIELD_ANCHOR_ID.presentation}
+              title={t('projects.my_project.presentation_upload_section_label')}
+              tooltip={t('projects.my_project.presentation_upload_tooltip')}
+              value={project.presentationUrl}
+            />
+          ) : null}
+          {!isOnlineCourse && (projectType?.requiresExternalUrl || project.externalUrl) ? (
+            <ProjectDeliverableReadOnlyField
+              id={PROJECT_SUBMISSION_FIELD_ANCHOR_ID.externalUrl}
+              title={t('projects.my_project.external_url_label')}
+              tooltip={t('projects.my_project.field_tooltip_external_url')}
+              value={project.externalUrl}
+            />
+          ) : null}
         </div>
       ) : null}
 
@@ -948,6 +1020,14 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
           )}
         </div>
       </div>
+
+      <SubmissionBlockedDialog
+        open={submissionBlockedDialogOpen}
+        onClose={() => setSubmissionBlockedDialogOpen(false)}
+        blockers={submissionBlockers}
+        onGoToField={handleGoToBlockedField}
+        submissionDeadlineDisplay={submissionDeadlineDisplay}
+      />
 
       <SubmitConfirmationDialog
         open={submitDialogOpen}

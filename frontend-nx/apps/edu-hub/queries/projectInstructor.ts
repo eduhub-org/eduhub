@@ -73,65 +73,9 @@ export const UPDATE_PROJECT_CONFIRM_TEAM = gql`
   }
 `;
 
-export const UPDATE_PROJECT_RATING_AND_COMMENT = gql`
-  mutation UpdateProjectRatingAndComment(
-    $itemId: Int!
-    $rating: ProjectRating_enum!
-    $ratingComment: String
-  ) {
-    update_Project_by_pk(
-      pk_columns: { id: $itemId }
-      _set: { rating: $rating, ratingComment: $ratingComment }
-    ) {
-      id
-      rating
-      ratingComment
-    }
-  }
-`;
 
-export const UPDATE_PROJECT_APPROVE = gql`
-  mutation UpdateProjectApprove($itemId: Int!) {
-    update_Project_by_pk(
-      pk_columns: { id: $itemId }
-      _set: { status: COMPLETED, rating: PASSED }
-    ) {
-      id
-      status
-      rating
-    }
-  }
-`;
 
-export const UPDATE_PROJECT_SEND_BACK = gql`
-  # The set_project_submitted_metadata trigger nulls both submittedAt and
-  # submittedBy when status transitions out of SUBMITTED, so this mutation only
-  # needs to flip status.
-  mutation UpdateProjectSendBack($itemId: Int!) {
-    update_Project_by_pk(
-      pk_columns: { id: $itemId }
-      _set: { status: ONGOING }
-    ) {
-      id
-      status
-      submittedAt
-      submittedBy
-    }
-  }
-`;
 
-export const UPDATE_PROJECT_REJECT = gql`
-  mutation UpdateProjectReject($itemId: Int!) {
-    update_Project_by_pk(
-      pk_columns: { id: $itemId }
-      _set: { status: INCOMPLETE, rating: FAILED }
-    ) {
-      id
-      status
-      rating
-    }
-  }
-`;
 
 export const UPDATE_PROJECT_SUGGESTED_FOR_PUBLICATION = gql`
   mutation UpdateProjectSuggestedForPublication(
@@ -188,6 +132,48 @@ export const DELETE_PROJECT = gql`
   mutation DeleteProject($id: Int!) {
     delete_Project_by_pk(id: $id) {
       id
+    }
+  }
+`;
+
+export const UPDATE_PROJECT_REVIEW_VERDICT = gql`
+  # The whole verdict in one statement: status, rating, comment and the
+  # (possibly extended) submission deadline are written together, so a failure
+  # can never leave a project half-reviewed — sent back for revision but with a
+  # deadline the team can no longer meet, or rated without the status to match.
+  #
+  # submissionDeadline is always part of the _set: for "keep the deadline" the
+  # caller passes the project's own current value straight back, which is a
+  # no-op write. Resolving the course/program default here instead would
+  # silently pin an inherited deadline onto the project row.
+  #
+  # The set_project_submitted_metadata trigger clears submittedAt/submittedBy
+  # when status leaves SUBMITTED, so those need no explicit value. The status
+  # change is what fires the notification mail, and because it lands in the same
+  # statement as the deadline, the mail always reads the current deadline back.
+  mutation UpdateProjectReviewVerdict(
+    $itemId: Int!
+    $status: ProjectStatus_enum!
+    $rating: ProjectRating_enum!
+    $ratingComment: String
+    $submissionDeadline: timestamptz
+  ) {
+    update_Project_by_pk(
+      pk_columns: { id: $itemId }
+      _set: {
+        status: $status
+        rating: $rating
+        ratingComment: $ratingComment
+        submissionDeadline: $submissionDeadline
+      }
+    ) {
+      id
+      status
+      rating
+      ratingComment
+      submissionDeadline
+      submittedAt
+      submittedBy
     }
   }
 `;

@@ -73,11 +73,20 @@ const injectHighlightingStyles = () => {
 // ancestors that establish overflow/stacking contexts (e.g. table containers).
 const ensurePortalContainer = (id: string) => {
   if (typeof document === 'undefined' || !id) return;
-  if (!document.getElementById(id)) {
-    const container = document.createElement('div');
+  let container = document.getElementById(id);
+  if (!container) {
+    container = document.createElement('div');
     container.id = id;
     document.body.appendChild(container);
   }
+  // The container is an empty block at the end of <body>, so it adds no layout —
+  // but without a stacking context of its own the calendar paints *below* any
+  // dialog it was opened from (MUI modals sit at z-index 1300), which looks
+  // exactly like a picker that refuses to open. Sits above the modal layer but
+  // below MUI's snackbar (1400) and tooltip (1500), so a "saved" notification is
+  // never hidden. Applied on every call so an existing container is fixed up too.
+  container.style.position = 'relative';
+  container.style.zIndex = '1350';
 };
 
 export type HighlightDate = {

@@ -18,14 +18,6 @@ interface IProps {
   setVisible: (visible: boolean) => void;
 }
 
-// Shared class for the nested navigation links. The negative margins + padding make the link fill
-// the whole MenuItem so the clickable area matches the row. On touch devices (coarse pointer) we
-// enforce a >=44px (min-h-11) target and vertically center the label; fine-pointer devices keep the
-// tighter rows so the full admin menu still fits on smaller laptop screens.
-const MENU_LINK_CLASS =
-  'block -my-1.5 -mx-4 py-1.5 px-4 text-lg leading-snug touch-manipulation ' +
-  'pointer-coarse:flex pointer-coarse:items-center pointer-coarse:min-h-11';
-
 // Replace with styled
 const StyledMenu = styled(MaterialMenu)(() => ({
   '& .MuiPaper-root': {
@@ -39,7 +31,20 @@ const StyledMenu = styled(MaterialMenu)(() => ({
   '& .MuiMenuItem-root': {
     color: 'var(--eduhub-label-primary) !important',
     backgroundColor: 'var(--eduhub-fill-primary) !important',
+    // Each row renders as a single focusable control (`component={Link}`, or a plain menuitem for
+    // logout) rather than wrapping a nested link, so the element that takes focus, the element that
+    // navigates and the element that shows the hover highlight are all the same box. That keeps
+    // mouse and keyboard activation in sync and makes the whole row — not just the label — clickable.
     padding: '0.375rem 1rem',
+    fontSize: '1.125rem',
+    lineHeight: 1.375,
+    textDecoration: 'none',
+    touchAction: 'manipulation',
+    // Touch devices get a >=44px target; fine-pointer devices keep the tighter rows so the full
+    // admin menu still fits on smaller laptop screens.
+    '@media (pointer: coarse)': {
+      minHeight: '2.75rem',
+    },
     '&:hover': {
       backgroundColor: 'var(--eduhub-fill-disabled) !important', // Slightly darker than selected for better contrast
     },
@@ -128,85 +133,92 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
     >
       <ListSubheader disableSticky>{t('menu.section_personal')}</ListSubheader>
 
-      <MenuItem onClick={closeMenu} selected={isActiveRoute('/profile')}>
-        <Link className={MENU_LINK_CLASS} href="/profile">
-          {t('menu.profile')}
-        </Link>
+      <MenuItem component={Link} href="/profile" onClick={closeMenu} selected={isActiveRoute('/profile')}>
+        {t('menu.profile')}
       </MenuItem>
 
-      <MenuItem onClick={closeMenu} selected={isActiveRoute('/my-certificates')}>
-        <Link className={MENU_LINK_CLASS} href="/my-certificates">
-          {t('menu.my_certificates')}
-        </Link>
+      <MenuItem
+        component={Link}
+        href="/my-certificates"
+        onClick={closeMenu}
+        selected={isActiveRoute('/my-certificates')}
+      >
+        {t('menu.my_certificates')}
       </MenuItem>
 
       {hasManagement && <Divider component="li" />}
       {hasManagement && <ListSubheader disableSticky>{t('menu.section_management')}</ListSubheader>}
 
       {canManageCoursesMenu && (
-        <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/courses')}>
-          <Link className={MENU_LINK_CLASS} href="/manage/courses">
-            {t('menu.courses')}
-          </Link>
+        <MenuItem
+          component={Link}
+          href="/manage/courses"
+          onClick={closeMenu}
+          selected={isActiveRoute('/manage/courses')}
+        >
+          {t('menu.courses')}
         </MenuItem>
       )}
 
       {canManageEventsMenu && (
-        <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/events')}>
-          <Link className={MENU_LINK_CLASS} href="/manage/events">
-            {t('menu.events')}
-          </Link>
+        <MenuItem component={Link} href="/manage/events" onClick={closeMenu} selected={isActiveRoute('/manage/events')}>
+          {t('menu.events')}
         </MenuItem>
       )}
 
       {canManageDegreesMenu && (
-        <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/degrees')}>
-          <Link className={MENU_LINK_CLASS} href="/manage/degrees">
-            {t('menu.degrees')}
-          </Link>
+        <MenuItem
+          component={Link}
+          href="/manage/degrees"
+          onClick={closeMenu}
+          selected={isActiveRoute('/manage/degrees')}
+        >
+          {t('menu.degrees')}
         </MenuItem>
       )}
 
       {isAdmin && (
-        <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/users')}>
-          <Link className={MENU_LINK_CLASS} href="/manage/users">
-            {t('menu.user')}
-          </Link>
+        <MenuItem component={Link} href="/manage/users" onClick={closeMenu} selected={isActiveRoute('/manage/users')}>
+          {t('menu.user')}
         </MenuItem>
       )}
 
       {isAdmin && (
-        <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/experts')}>
-          <Link className={MENU_LINK_CLASS} href="/manage/experts">
-            {t('menu.experts')}
-          </Link>
+        <MenuItem
+          component={Link}
+          href="/manage/experts"
+          onClick={closeMenu}
+          selected={isActiveRoute('/manage/experts')}
+        >
+          {t('menu.experts')}
         </MenuItem>
       )}
 
       {isAdmin && (
-        <MenuItem onClick={closeMenu} selected={isActiveRoute('/manage/calendar')}>
-          <Link className={MENU_LINK_CLASS} href="/manage/calendar">
-            {t('menu.calendar')}
-          </Link>
+        <MenuItem
+          component={Link}
+          href="/manage/calendar"
+          onClick={closeMenu}
+          selected={isActiveRoute('/manage/calendar')}
+        >
+          {t('menu.calendar')}
         </MenuItem>
       )}
 
       {isAdmin && (
-        <MenuItem onClick={closeMenu} selected={isActiveRoute('/statistics')}>
-          <Link className={MENU_LINK_CLASS} href="/statistics">
-            {t('menu.statistics')}
-          </Link>
+        <MenuItem component={Link} href="/statistics" onClick={closeMenu} selected={isActiveRoute('/statistics')}>
+          {t('menu.statistics')}
         </MenuItem>
       )}
 
       {isAdminOrOrgAdmin && (
         <MenuItem
+          component={Link}
+          href="/manage/settings"
           onClick={closeMenu}
           selected={isActiveRoute('/manage/settings') || router.pathname.startsWith('/manage/settings/')}
         >
-          <Link className={MENU_LINK_CLASS} href="/manage/settings">
-            {t('menu.settings')}
-          </Link>
+          {t('menu.settings')}
         </MenuItem>
       )}
 
@@ -214,29 +226,30 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
       <ListSubheader disableSticky>{t('menu.section_help')}</ListSubheader>
 
       {isInstructorOrAdmin && (
-        <MenuItem onClick={closeMenu}>
-          <Link
-            className={MENU_LINK_CLASS}
-            href="https://opencampus.gitbook.io/kursleitungshandbuch/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {t('menu.course_instructor_manual')}
-          </Link>
+        <MenuItem
+          component={Link}
+          href="https://opencampus.gitbook.io/kursleitungshandbuch/"
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={closeMenu}
+        >
+          {t('menu.course_instructor_manual')}
         </MenuItem>
       )}
 
-      <MenuItem onClick={closeMenu}>
-        <Link className={MENU_LINK_CLASS} href="https://opencampus.gitbook.io/faq/" target="_blank">
-          {t('menu.faq')}
-        </Link>
+      <MenuItem
+        component={Link}
+        href="https://opencampus.gitbook.io/faq/"
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={closeMenu}
+      >
+        {t('menu.faq')}
       </MenuItem>
 
       <Divider component="li" />
 
-      <MenuItem onClick={() => logout()}>
-        <button className="w-full text-lg text-left">{t('menu.logout')}</button>
-      </MenuItem>
+      <MenuItem onClick={() => logout()}>{t('menu.logout')}</MenuItem>
     </StyledMenu>
   );
 };

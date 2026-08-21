@@ -5,6 +5,8 @@ import { HelpOutline } from '@mui/icons-material';
 import { prioritizeClasses } from '../../../../helpers/util';
 
 interface ProjectFormFieldSectionProps {
+  /** Optional DOM id, used as a scroll anchor (see SubmissionBlockedDialog). */
+  id?: string;
   title: string;
   tooltip?: string;
   children: ReactNode;
@@ -13,12 +15,13 @@ interface ProjectFormFieldSectionProps {
 
 /** Section title + help icon above a bordered field (matches upload field layout). */
 const ProjectFormFieldSection: FC<ProjectFormFieldSectionProps> = ({
+  id,
   title,
   tooltip,
   children,
   className,
 }) => (
-  <div className={prioritizeClasses(`space-y-2 ${className ?? ''}`)}>
+  <div id={id} className={prioritizeClasses(`space-y-2 ${className ?? ''}`)}>
     <div className="flex items-center gap-2">
       <h4 className="text-sm font-semibold text-label-primary">{title}</h4>
       {tooltip ? (

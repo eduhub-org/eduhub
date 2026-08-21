@@ -114,14 +114,23 @@ export default async function sendProjectEmail(req, logger) {
           id
           title
           ratingComment
+          submissionDeadline
           proposedByUserId
           ProposedByUser { id email firstName lastName }
           ProjectAuthors {
             participationStatus
             User { id email firstName lastName }
           }
-          ProjectCourses {
-            Course { id CourseInstructors { User { id email firstName lastName } } }
+          ProjectCourses(order_by: { courseId: asc }) {
+            Course {
+              id
+              projectSubmissionDeadline
+              Program {
+                defaultProjectSubmissionDeadline
+                achievementRecordUploadDeadline
+              }
+              CourseInstructors { User { id email firstName lastName } }
+            }
           }
           ProjectMentors { User { id email firstName lastName } }
         }
@@ -191,12 +200,35 @@ export default async function sendProjectEmail(req, logger) {
       return { success: true, messageKey: 'NO_RECIPIENTS', message: 'No recipients resolved' };
     }
 
-    // Course id enables course-specific template overrides (falls back to default).
-    const courseId = project.ProjectCourses?.[0]?.Course?.id ?? null;
+    // Every path that creates a project attaches exactly one course, so this is
+    // the project's course. ProjectCourse is only unique per project/course
+    // *pair* though, so a second row is possible outside the app — hence the
+    // query orders by courseId. Without it the "first" course would depend on
+    // arbitrary row order and two sends of the same mail could disagree.
+    //
+    // The template override and the deadline are both taken from this one
+    // course on purpose: sourcing them from different courses would mix two
+    // courses into a single mail.
+    const course = project.ProjectCourses?.[0]?.Course ?? null;
+    const courseId = course?.id ?? null;
+
+    // [Project:SubmissionDeadline] needs the deadline the team actually has to
+    // meet: the project's own override, else the course's, else the program's
+    // (same chain as resolveEffectiveCourseProjectSubmissionDeadline in the app).
+    const effectiveSubmissionDeadline =
+      project.submissionDeadline ??
+      course?.projectSubmissionDeadline ??
+      course?.Program?.defaultProjectSubmissionDeadline ??
+      course?.Program?.achievementRecordUploadDeadline ??
+      null;
+    const projectForTemplate = {
+      ...project,
+      submissionDeadline: effectiveSubmissionDeadline,
+    };
 
     const results = [];
     for (const recipient of uniqueRecipients) {
-      const replacer = createProjectVariableReplacer(project, recipient, { applicantName });
+      const replacer = createProjectVariableReplacer(projectForTemplate, recipient, { applicantName });
       const result = await queueEmail({
         templateType,
         variableReplacer: replacer,
