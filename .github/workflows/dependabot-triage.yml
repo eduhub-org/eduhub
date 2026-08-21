@@ -1,0 +1,95 @@
+name: Dependabot triage
+
+# Daily triage of open Dependabot alerts: assess each one against the codebase, patch the
+# relevant ones in a single consolidated PR against develop, and close the individual
+# Dependabot PRs that PR supersedes.
+#
+# The playbook lives in .github/dependabot-triage-playbook.md so it can be reviewed and
+# edited without touching CI config. It is deliberately NOT in .claude/commands/: this job
+# pushes branches, opens PRs and closes other people's PRs, and a repo-committed slash
+# command would let any developer with a checkout fire that by accident.
+#
+# Required repository secrets:
+#   CLAUDE_CODE_OAUTH_TOKEN   - Generated locally with `claude setup-token`. Authenticates
+#                               against the Claude subscription (Pro/Max/Team/Enterprise) and
+#                               draws on its usage budget rather than API credits. Swap to
+#                               the `anthropic_api_key` input if you would rather bill this
+#                               to pay-as-you-go API credits and keep it off the plan budget.
+#   DEPENDABOT_TRIAGE_TOKEN   - Fine-grained PAT on eduhub-org/eduhub with
+#                               "Dependabot alerts: read" (the default GITHUB_TOKEN cannot
+#                               read the alerts API), plus Contents: read/write, Pull
+#                               requests: read/write, Issues: read/write. Pushing with a PAT
+#                               rather than GITHUB_TOKEN is also what lets the triage PR
+#                               trigger frontend-code-checks.
+
+on:
+  schedule:
+    # 05:00 UTC = 07:00 Europe/Berlin in summer (CEST), 06:00 in winter (CET).
+    - cron: "0 5 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dependabot-triage
+  cancel-in-progress: false
+
+jobs:
+  triage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+    steps:
+      - name: Harden the runner
+        uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
+        with:
+          egress-policy: audit
+
+      - name: Checkout develop
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+        with:
+          ref: develop
+          fetch-depth: 0
+          token: ${{ secrets.DEPENDABOT_TRIAGE_TOKEN }}
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22.x
+
+      - name: Configure git identity
+        run: |
+          git config user.name "dependabot-triage"
+          git config user.email "dependabot-triage@users.noreply.github.com"
+
+      - name: Triage Dependabot alerts
+        uses: anthropics/claude-code-action@dcb57747bfceeaa1fa72638cae52295d1d853d4a # v1
+        env:
+          GH_TOKEN: ${{ secrets.DEPENDABOT_TRIAGE_TOKEN }}
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          claude_args: >-
+            --model claude-opus-5
+            --allowed-tools Bash,Read,Write,Edit,Glob,Grep,WebFetch
+          prompt: |
+            Run the daily Dependabot triage for eduhub-org/eduhub.
+
+            Read `.github/dependabot-triage-playbook.md` and follow it exactly. It is the
+            authoritative playbook: preflight, alert collection, relevance assessment,
+            patching per package manager, verification, the single consolidated PR, and
+            which Dependabot PRs may be closed.
+
+            You are running unattended in GitHub Actions, so a few things are on you:
+            - `gh` is available and `GH_TOKEN` is already set. Do not print the token.
+            - Honour the playbook's preflight: if the Dependabot alerts API is unreadable,
+              file or comment on the tracking issue and stop. Never open a PR you could not
+              base on real alert data.
+            - Honour the playbook's idempotence step. This job runs every day; extend the
+              existing open triage PR rather than opening a second one.
+            - Never dismiss a Dependabot alert, and never merge or approve your own PR.
+
+            Finish with the summary the playbook asks for.
