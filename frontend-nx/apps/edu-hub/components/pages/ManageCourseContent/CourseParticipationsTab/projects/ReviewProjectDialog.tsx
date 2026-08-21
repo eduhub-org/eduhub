@@ -10,15 +10,9 @@ import {
 import { useRoleMutation } from '../../../../../hooks/authedMutation';
 import { DialogShell } from '../../../../common/dialogs/DialogShell';
 import { Button } from '../../../../common/Button';
-import {
-  UPDATE_PROJECT_APPROVE,
-  UPDATE_PROJECT_SEND_BACK,
-  UPDATE_PROJECT_REJECT,
-  UPDATE_PROJECT_RATING_AND_COMMENT,
-} from '../../../../../queries/projectInstructor';
-import { UPDATE_PROJECT_SUBMISSION_DEADLINE } from '../../../../../queries/project';
+import { UPDATE_PROJECT_REVIEW_VERDICT } from '../../../../../queries/projectInstructor';
 import { ProjectRow } from '../../../CourseContent/Projects/types';
-import { ProjectRating_enum } from '../../../../../__generated__/globalTypes';
+import { ProjectRating_enum, ProjectStatus_enum } from '../../../../../__generated__/globalTypes';
 import {
   getEffectiveProjectSubmissionDeadlineIso,
   isProjectSubmissionDeadlinePassed,
@@ -48,6 +42,12 @@ const VERDICT_RATING: Record<Verdict, ProjectRating_enum> = {
   approve: ProjectRating_enum.PASSED,
   revise: ProjectRating_enum.UNRATED,
   reject: ProjectRating_enum.FAILED,
+};
+
+const VERDICT_STATUS: Record<Verdict, ProjectStatus_enum> = {
+  approve: ProjectStatus_enum.COMPLETED,
+  revise: ProjectStatus_enum.ONGOING,
+  reject: ProjectStatus_enum.INCOMPLETE,
 };
 
 interface DecisionAccent {
@@ -155,22 +155,9 @@ const ReviewProjectDialog: FC<ReviewProjectDialogProps> = ({
   const [deadlineChoice, setDeadlineChoice] = useState<DeadlineExtensionChoice>('');
   const [customDeadline, setCustomDeadline] = useState<string>('');
 
-  const [approveProject, approveState] = useRoleMutation(UPDATE_PROJECT_APPROVE, {
+  const [submitVerdict, verdictState] = useRoleMutation(UPDATE_PROJECT_REVIEW_VERDICT, {
     refetchQueries,
   });
-  const [sendBackProject, sendBackState] = useRoleMutation(UPDATE_PROJECT_SEND_BACK, {
-    refetchQueries,
-  });
-  const [rejectProject, rejectState] = useRoleMutation(UPDATE_PROJECT_REJECT, {
-    refetchQueries,
-  });
-  const [saveRating, saveRatingState] = useRoleMutation(UPDATE_PROJECT_RATING_AND_COMMENT, {
-    refetchQueries,
-  });
-  const [updateSubmissionDeadline, deadlineState] = useRoleMutation(
-    UPDATE_PROJECT_SUBMISSION_DEADLINE,
-    { refetchQueries }
-  );
 
   const effectiveDeadlineIso = project
     ? getEffectiveProjectSubmissionDeadlineIso(
@@ -209,12 +196,7 @@ const ReviewProjectDialog: FC<ReviewProjectDialogProps> = ({
     setCustomDeadline('');
   }, [open, project, courseDefaultSubmissionDeadline]);
 
-  const busy =
-    approveState.loading ||
-    sendBackState.loading ||
-    rejectState.loading ||
-    saveRatingState.loading ||
-    deadlineState.loading;
+  const busy = verdictState.loading;
 
   const deadlineConfirmable =
     verdict !== 'revise' ||
@@ -227,36 +209,30 @@ const ReviewProjectDialog: FC<ReviewProjectDialogProps> = ({
   const handleSave = async () => {
     if (!project || !verdict) return;
     const trimmed = ratingComment.trim();
+    // Only a send-back offers a deadline choice. Every other verdict — and
+    // "keep the deadline" — writes the project's own current value straight
+    // back, so the single statement below never changes a deadline by accident.
+    const extendedDeadline =
+      verdict === 'revise'
+        ? resolveExtendedDeadline({
+            choice: deadlineChoice,
+            customDate: customDeadline,
+            effectiveDeadlineIso,
+          })
+        : null;
     try {
-      // The deadline goes first: the send-back fires the PROJECT_SENT_BACK mail
-      // via a status trigger, and a failure here must not leave the team with a
-      // sent-back project they cannot resubmit.
-      if (verdict === 'revise') {
-        const newDeadline = resolveExtendedDeadline({
-          choice: deadlineChoice,
-          customDate: customDeadline,
-          effectiveDeadlineIso,
-        });
-        if (newDeadline) {
-          await updateSubmissionDeadline({
-            variables: { itemId: project.id, value: newDeadline },
-          });
-        }
-      }
-      await saveRating({
+      // One statement for status, rating, comment and deadline: a partial
+      // failure here used to be able to leave the project sent back with a
+      // deadline it could no longer be resubmitted against.
+      await submitVerdict({
         variables: {
           itemId: project.id,
+          status: VERDICT_STATUS[verdict],
           rating: VERDICT_RATING[verdict],
           ratingComment: trimmed === '' ? null : trimmed,
+          submissionDeadline: extendedDeadline ?? project.submissionDeadline ?? null,
         },
       });
-      if (verdict === 'approve') {
-        await approveProject({ variables: { itemId: project.id } });
-      } else if (verdict === 'revise') {
-        await sendBackProject({ variables: { itemId: project.id } });
-      } else {
-        await rejectProject({ variables: { itemId: project.id } });
-      }
       onClose();
     } catch (err) {
       onError(err instanceof Error ? err.message : tCommon('error'));

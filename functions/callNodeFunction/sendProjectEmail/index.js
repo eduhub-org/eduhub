@@ -121,7 +121,7 @@ export default async function sendProjectEmail(req, logger) {
             participationStatus
             User { id email firstName lastName }
           }
-          ProjectCourses {
+          ProjectCourses(order_by: { courseId: asc }) {
             Course {
               id
               projectSubmissionDeadline
@@ -200,7 +200,15 @@ export default async function sendProjectEmail(req, logger) {
       return { success: true, messageKey: 'NO_RECIPIENTS', message: 'No recipients resolved' };
     }
 
-    // Course id enables course-specific template overrides (falls back to default).
+    // Every path that creates a project attaches exactly one course, so this is
+    // the project's course. ProjectCourse is only unique per project/course
+    // *pair* though, so a second row is possible outside the app — hence the
+    // query orders by courseId. Without it the "first" course would depend on
+    // arbitrary row order and two sends of the same mail could disagree.
+    //
+    // The template override and the deadline are both taken from this one
+    // course on purpose: sourcing them from different courses would mix two
+    // courses into a single mail.
     const course = project.ProjectCourses?.[0]?.Course ?? null;
     const courseId = course?.id ?? null;
 

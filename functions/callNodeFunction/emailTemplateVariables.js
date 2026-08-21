@@ -18,9 +18,25 @@
 export function formatSubmissionDeadlineForEmail(value) {
   if (value == null) return '';
   const iso = String(value).trim();
-  const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso);
+  // The whole value has to be a date, optionally followed by a time — anchoring
+  // only the start would let a malformed value through as a plausible date.
+  const match = /^(\d{4})-(\d{2})-(\d{2})(?:[T ][^\s]*)?$/.exec(iso);
   if (!match) return '';
   const [, year, month, day] = match;
+  // Reject impossible calendar dates (2026-02-31, 2026-13-01), which a Date
+  // would silently roll forward — same guard as submissionDeadlineToCalendarDate
+  // in the app. The variable must expand to nothing rather than invent a day.
+  const y = Number(year);
+  const m = Number(month) - 1;
+  const d = Number(day);
+  const probe = new Date(Date.UTC(y, m, d));
+  if (
+    probe.getUTCFullYear() !== y ||
+    probe.getUTCMonth() !== m ||
+    probe.getUTCDate() !== d
+  ) {
+    return '';
+  }
   return `${day}.${month}.${year}`;
 }
 

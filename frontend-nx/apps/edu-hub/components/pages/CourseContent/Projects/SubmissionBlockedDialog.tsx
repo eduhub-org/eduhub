@@ -82,7 +82,7 @@ const SubmissionBlockedDialog: FC<SubmissionBlockedDialogProps> = ({
                 <button
                   type="button"
                   onClick={() => onGoToField(blocker)}
-                  className="shrink-0 inline-flex items-center gap-1 text-sm text-brand underline underline-offset-2 hover:opacity-90"
+                  className="shrink-0 inline-flex min-h-11 min-w-11 items-center justify-center gap-1 px-2 text-sm text-brand underline underline-offset-2 hover:opacity-90 touch-manipulation"
                 >
                   {t('projects.submission_blocked.go_to_field')}
                   <MdArrowForward aria-hidden />
