@@ -66,7 +66,9 @@ against the actual code rather than the advisory text alone.
 - EduHub context: users are students and instructors authenticated via Keycloak. There are
   public course pages, file uploads, certificate PDF generation, and mail sending. The app
   is server-side rendered, so Node-side dependencies are reachable at runtime.
-- No `first_patched_version` → cannot patch → NOT-RELEVANT, with that stated as the reason.
+- No `first_patched_version` → NEEDS-MANUAL-DECISION, not NOT-RELEVANT. "No fix exists" is
+  not evidence that the dependency is unreachable. Record the reachability assessment
+  alongside the missing fix so the next run, and a human, can act on it.
 - Fix requires a **major** version bump of a runtime dep → NEEDS-MANUAL-DECISION. Do not
   attempt it.
 - When unsure whether something is exploitable, treat it as relevant and patch it if a safe
@@ -89,9 +91,12 @@ If a PR already exists, check that branch out, merge `develop` into it, and exte
 not, delete any stale local and remote copy of the branch and cut it fresh from
 `origin/develop`.
 
-- **yarn**: `yarn up <pkg>@<version>` for direct deps. For transitive-only, add or raise a
-  `resolutions` entry in `frontend-nx/package.json`, then
-  `yarn install --mode=update-lockfile`. Never hand-edit `yarn.lock`.
+- **yarn**: run every yarn command from inside `frontend-nx/` — the Yarn 3.4.1 release and
+  its settings come from `frontend-nx/.yarnrc.yml`, and the repo root has its own
+  `package.json` that must not be touched. `cd frontend-nx && yarn up <pkg>@<version>` for
+  direct deps. For transitive-only, add or raise a `resolutions` entry in
+  `frontend-nx/package.json`, then `cd frontend-nx && yarn install --mode=update-lockfile`.
+  Never hand-edit `yarn.lock`.
 - **npm**: in the function directory, `npm install <pkg>@<version>`, or
   `npm install <pkg>@<version> --package-lock-only` for transitive-only.
 - **pip**: edit the pin in `requirements.txt`.
@@ -141,8 +146,11 @@ gh pr comment <n> --body "Superseded by #<PR> (consolidated Dependabot triage)."
 gh pr close <n> --delete-branch
 ```
 
-Leave every other Dependabot PR **open**, and comment on it explaining why it was excluded
-(e.g. "not included in today's triage: requires a major-version bump of X").
+Leave every other Dependabot PR **open**. When this run created or updated the consolidated
+triage PR, comment on each excluded one explaining why (e.g. "not included in today's triage:
+requires a major-version bump of X"). When the run produced no triage PR at all, comment
+nowhere — see section 8; a daily "nothing changed" note on every open Dependabot PR is noise,
+not information.
 
 ## 8. Nothing to do
 

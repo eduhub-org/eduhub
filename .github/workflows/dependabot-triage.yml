@@ -67,7 +67,7 @@ jobs:
           git config user.email "dependabot-triage@users.noreply.github.com"
 
       - name: Triage Dependabot alerts
-        uses: anthropics/claude-code-action@v1
+        uses: anthropics/claude-code-action@dcb57747bfceeaa1fa72638cae52295d1d853d4a # v1
         env:
           GH_TOKEN: ${{ secrets.DEPENDABOT_TRIAGE_TOKEN }}
         with:
