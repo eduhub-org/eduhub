@@ -464,6 +464,7 @@
           "presentation_upload": "Upload presentation (required for your project type).",
           "external_link": "Add your project’s external link (required for your project type).",
           "cover_image_upload": "Upload a cover image (required for your project type).",
+          "revise_after_feedback": "Revise your submission according to the course staff’s feedback and submit it again.",
           "authors_pending": "Respond to all pending join requests – you cannot submit while a request is open.",
           "authors_none_accepted": "The project needs at least one confirmed author."
         }

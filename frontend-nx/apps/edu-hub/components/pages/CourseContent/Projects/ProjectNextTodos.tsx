@@ -109,9 +109,24 @@ const ProjectNextTodos: FC<ProjectNextTodosProps> = ({
       const instruction = project.ProjectDocumentationInstruction;
       const instructionHref = safeProjectInstructionHref(instruction?.url);
 
+      // A project sent back for revision (SUBMITTED -> ONGOING stamps sentBackAt)
+      // has all its deliverables in place, so the requirement list below is
+      // empty — the actual open task is acting on the feedback and resubmitting.
+      // It stays unsatisfied until the team submits again.
+      const revisionTask: TodoItem[] = project.sentBackAt
+        ? [
+            {
+              id: 'revise_after_feedback',
+              kind: 'task',
+              satisfied: false,
+              label: t('projects.next_todos.ongoing.revise_after_feedback'),
+            },
+          ]
+        : [];
+
       // Derived from the same requirement list that gates the submit button, so
       // a blocker can never be missing from this checklist.
-      return getProjectSubmissionRequirements(project, projectType).map(
+      return revisionTask.concat(getProjectSubmissionRequirements(project, projectType).map(
         ({ key, satisfied }): TodoItem => {
           if (key === 'documentation' && instructionHref) {
             return {
@@ -136,7 +151,7 @@ const ProjectNextTodos: FC<ProjectNextTodosProps> = ({
                 : t(`projects.next_todos.ongoing.${ONGOING_TODO_I18N_KEY[key]}` as never),
           };
         }
-      );
+      ));
     }
 
     return [];

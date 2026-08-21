@@ -464,6 +464,7 @@
           "presentation_upload": "Lade die Präsentation hoch (für deinen Projekttyp Pflicht).",
           "external_link": "Trage den externen Projektlink ein (für deinen Projekttyp Pflicht).",
           "cover_image_upload": "Lade ein Titelbild hoch (für deinen Projekttyp Pflicht).",
+          "revise_after_feedback": "Überarbeite Deine Einreichung entsprechend der Rückmeldung der Kursleitung und reiche sie erneut ein.",
           "authors_pending": "Beantworte alle offenen Anfragen zur Mitarbeit – solange eine Anfrage offen ist, könnt Ihr nicht einreichen.",
           "authors_none_accepted": "Das Projekt braucht mindestens eine bestätigte Autor:in."
         }
