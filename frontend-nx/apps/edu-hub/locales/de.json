@@ -462,7 +462,28 @@
           "documentation_upload_with_instruction_prefix": "Lade die Dokumentation hoch (Beachte die ",
           "documentation_upload_with_instruction_suffix": ").",
           "presentation_upload": "Lade die Präsentation hoch (für deinen Projekttyp Pflicht).",
-          "external_link": "Trage den externen Projektlink ein (für deinen Projekttyp Pflicht)."
+          "external_link": "Trage den externen Projektlink ein (für deinen Projekttyp Pflicht).",
+          "cover_image_upload": "Lade ein Titelbild hoch (für deinen Projekttyp Pflicht).",
+          "authors_pending": "Beantworte alle offenen Anfragen zur Mitarbeit – solange eine Anfrage offen ist, könnt Ihr nicht einreichen.",
+          "authors_none_accepted": "Das Projekt braucht mindestens eine bestätigte Autor:in."
+        }
+      },
+      "submission_blocked": {
+        "title": "Einreichen noch nicht möglich",
+        "body_main": "Diese Punkte fehlen noch, bevor Du das Projekt einreichen kannst:",
+        "body_deadline": "Das Projekt kann nicht mehr eingereicht werden:",
+        "go_to_field": "Zum Feld",
+        "footer_hint": "Sobald alle Punkte erledigt sind, kannst Du hier direkt einreichen.",
+        "reason": {
+          "type": "Die Kursleitung hat noch keinen Projekttyp festgelegt. Bitte wende Dich an Deine Kursleitung.",
+          "documentation": "Die Projektdokumentation fehlt.",
+          "presentation": "Die Präsentation fehlt.",
+          "externalUrl": "Der externe Projektlink fehlt.",
+          "coverImage": "Das Titelbild fehlt.",
+          "authorsPending": "Es ist noch eine Anfrage zur Mitarbeit offen.",
+          "authorsNoneAccepted": "Das Projekt hat noch keine bestätigte Autor:in.",
+          "deadline": "Die Abgabefrist ist abgelaufen.",
+          "deadline_with_date": "Die Abgabefrist ({date}) ist abgelaufen. Wende Dich an Deine Kursleitung."
         }
       },
       "project_review_dialog": {
@@ -501,7 +522,7 @@
         "field_tooltip_accepting_participants": "Wenn aktiviert, können andere Teilnehmende eine Beitrittsanfrage als umsetzende Mitautor:innen stellen. Schalte es aus, sobald euer Team feststeht und ihr keine neuen Anfragen mehr wollt.",
         "action_tooltip_join_requests": "Offene Mitautor:innen-Anfragen ansehen und annehmen oder ablehnen.",
         "action_tooltip_request_review": "Informiert die Kursleitung, dass ihr bereit zur Prüfung seid. Der Status bleibt „vorgeschlagen“, bis Team und Projekt geklärt sind.",
-        "action_tooltip_submit": "Startet die offizielle Einreichung: das Team wird gesperrt und das Projekt geht in die Bewertung. Erfülle zuerst alle Pflichtpunkte unter „Nächste Schritte“ und die Abgabefrist.",
+        "action_tooltip_submit": "Startet die offizielle Einreichung: das Team wird gesperrt und das Projekt geht in die Bewertung.",
         "field_tooltip_next_todos_section": "Checkliste für deine aktuelle Phase (vorgeschlagen oder in Bearbeitung). Arbeitet die offenen Punkte ab, bevor ihr eine Freigabe anfragt oder einreicht.",
         "action_tooltip_leave": "Du verlässt das Team zu diesem Projekt. Bist du die einzige umsetzende Autor:in während „vorgeschlagen“ oder „in Bearbeitung“, kann das Projekt entfallen — lies den Bestätigungstext genau.",
         "action_tooltip_review_done": "Die Kursleitung hat deine Anfrage erhalten. Der Status bleibt „vorgeschlagen“, bis Team und Projekt bestätigt sind.",
@@ -512,7 +533,10 @@
         "proposal_action_disabled_tooltip": "Schließe zuerst die Schritte unten ab.",
         "project_review_disabled_deadline_tooltip": "Die Abgabefrist ist abgelaufen — eine Freigabe-Anfrage ist nicht mehr möglich.",
         "accepting_participants_disabled_review_tooltip": "Während die Freigabe-Anfrage läuft, können keine weiteren Mitautor:innen mehr zugelassen werden.",
-        "submit_disabled_tooltip": "Erfülle alle offenen Punkte unter „Nächste Schritte“ und halte die Abgabefrist ein.",
+        "submit_blocked_tooltip": "Klicke auf „Projekt einreichen“ – wir zeigen Dir dann, was noch fehlt.",
+        "deliverables_locked_notice": "Die Abgabefrist ({date}) ist abgelaufen. Deine Abgaben bleiben sichtbar, können aber nicht mehr geändert werden. Wende Dich an Deine Kursleitung, wenn Du noch etwas nachreichen musst.",
+        "deliverable_missing_after_deadline": "Keine Datei hochgeladen.",
+        "deliverable_locked_after_deadline": "Nach Ablauf der Abgabefrist gesperrt.",
         "documentation_upload_section_label": "Dokumentation",
         "presentation_upload_section_label": "Präsentation",
         "cover_image_section_label": "Titelbild",
@@ -1497,6 +1521,7 @@
         "requires_cover_image": {
           "label": "Titelbild",
           "help": "Teilnehmende müssen ein Titelbild hochladen (wird auch für die Veröffentlichung im Schaufenster genutzt).",
+          "help_always_required": "Für klassische Projekte immer Pflicht – Teilnehmende müssen ein Titelbild hochladen (wird auch für die Veröffentlichung im Schaufenster genutzt). Diese Abgabe kannst Du nicht abwählen.",
           "short": "Titelbild"
         },
         "format": {
