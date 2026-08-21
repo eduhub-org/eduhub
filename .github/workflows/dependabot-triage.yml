@@ -71,6 +71,12 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.DEPENDABOT_TRIAGE_TOKEN }}
         with:
+          # Act as the PAT, not as the Claude GitHub App. Without this the action
+          # mints an App installation token (which needs id-token: write) and hands
+          # it to Claude as GITHUB_TOKEN, overriding the GH_TOKEN set above. That
+          # App has no security_events permission, so the playbook's preflight would
+          # fail exactly as it did in the abandoned cloud-routine attempt (#1850).
+          github_token: ${{ secrets.DEPENDABOT_TRIAGE_TOKEN }}
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           claude_args: >-
             --model claude-opus-5
