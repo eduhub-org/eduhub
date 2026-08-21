@@ -17,6 +17,9 @@ export interface SaveProjectDocumentationInstruction_saveProjectDocumentationIns
 }
 
 export interface SaveProjectDocumentationInstruction {
+  /**
+   * Stores an instruction PDF. The handler verifies that a non-admin caller owns the target non-default instruction before delegating to saveFile.
+   */
   saveProjectDocumentationInstruction: SaveProjectDocumentationInstruction_saveProjectDocumentationInstruction | null;
 }
 

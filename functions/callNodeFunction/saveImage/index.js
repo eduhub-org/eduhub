@@ -1,6 +1,7 @@
 import { Storage } from "@google-cloud/storage";
 import { buildCloudStorage } from "../lib/cloud-storage.js";
 import { replacePlaceholders } from "../lib/utils.js";
+import { sanitizeStoredFileName } from "../lib/fileName.js";
 import { logger } from "../index.js";
 import sharp from "sharp";
 import path from "path";
@@ -94,7 +95,10 @@ const saveImage = async (req) => {
     }
 
     // Validate image format
-    const format = extractFormatFromFileName(req.body.input.filename);
+    // Normalised before use: the name reaches the storage object key through
+    // replacePlaceholders below.
+    const safeFileName = sanitizeStoredFileName(req.body.input.filename);
+    const format = extractFormatFromFileName(safeFileName);
     if (!format || !SUPPORTED_FORMATS.includes(format.toLowerCase())) {
       logger.error("Unsupported image format", { format });
       return {
@@ -125,7 +129,11 @@ const saveImage = async (req) => {
       };
     }
 
-    const filePath = replacePlaceholders(templatePath, req.body.input);
+    const { base64file: _base64file, ...pathInputs } = req.body.input;
+    const filePath = replacePlaceholders(templatePath, {
+      ...pathInputs,
+      filename: safeFileName,
+    });
     const accessUrl = await storage.saveToBucket(filePath, req.headers.bucket, contentBuffer.toString('base64'), isPublic);
     logger.debug(`Original image saved successfully: ${filePath}, public: ${isPublic}`);
 

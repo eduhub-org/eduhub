@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect, useMemo, useState } from 'react';
+import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useRoleMutation } from '../../../../../hooks/authedMutation';
 import { DialogShell } from '../../../../common/dialogs/DialogShell';
@@ -6,11 +6,14 @@ import { Button } from '../../../../common/Button';
 import DropDownSelector from '../../../../inputs/DropDownSelector';
 import ProjectFormatSelector from '../../../CourseContent/Projects/ProjectFormatSelector';
 import InstructionDownloadButton from '../../../CourseContent/Projects/InstructionDownloadButton';
+import InstructionUploadButton from '../../../CourseContent/Projects/InstructionUploadButton';
+import DocumentationInstructionUploadDialog from './DocumentationInstructionUploadDialog';
 import {
   DEFAULT_CLASSIC_REQUIREMENT_FLAGS,
   isClassicCatalogType,
   resolveClassicProjectType,
 } from '../../../CourseContent/Projects/projectTypeRequirements';
+import { filterProjectDocumentationInstructionsWithPdf } from '../../../CourseContent/Projects/projectDocumentationInstruction';
 import { UPDATE_PROJECT_CONFIRM_TEAM } from '../../../../../queries/projectInstructor';
 import { ProjectRow, ProjectTypeRow } from '../../../CourseContent/Projects/types';
 
@@ -49,20 +52,31 @@ const ConfirmProjectDialog: FC<ConfirmProjectDialogProps> = ({
 
   const [type, setType] = useState<string>('');
   const [instructionId, setInstructionId] = useState<string>('');
+  const [instructionDialogOpen, setInstructionDialogOpen] = useState(false);
   const [submitProject, { loading }] = useRoleMutation(UPDATE_PROJECT_CONFIRM_TEAM, {
     refetchQueries,
   });
+
+  // Confirming the team moves the project out of PROPOSED, where
+  // Project_ongoing_requires_type_and_instruction_check demands an instruction the
+  // team can actually download. Instructions without a stored PDF are therefore
+  // neither preselected nor offered, which keeps Confirm disabled instead of
+  // persisting an unusable instruction id.
+  const selectableInstructions = useMemo(
+    () => filterProjectDocumentationInstructionsWithPdf(documentationInstructions),
+    [documentationInstructions]
+  );
 
   const findDefaultInstructionIdForType = useCallback(
     (forType: string): number | null => {
       if (!forType) return null;
       return (
-        documentationInstructions.find(
+        selectableInstructions.find(
           (inst) => inst.projectTypeValue === forType && inst.isDefault
         )?.id ?? null
       );
     },
-    [documentationInstructions]
+    [selectableInstructions]
   );
 
   // Students cannot propose online courses, so the confirm dialog is classical
@@ -75,15 +89,34 @@ const ConfirmProjectDialog: FC<ConfirmProjectDialogProps> = ({
     [projectTypes]
   );
 
+  // Seeding must run once per opened project. Its dependencies include
+  // selectableInstructions / findDefaultInstructionIdForType, whose identity changes
+  // whenever the ProjectDocumentationInstructions query refetches - and creating an
+  // instruction from this dialog does exactly that. Without this guard the effect
+  // re-runs and overwrites the instruction the instructor just created with the
+  // type's default.
+  const seededForProjectRef = useRef<number | null>(null);
+
   useEffect(() => {
+    if (!open) {
+      seededForProjectRef.current = null;
+      return;
+    }
     if (!project) return;
+    if (seededForProjectRef.current === project.id) return;
+    seededForProjectRef.current = project.id;
     const carried = projectTypes.find(
       (pt) => pt.value === (project.type ?? programDefaultProjectType)
     );
     const initialType =
       carried && isClassicCatalogType(carried) ? carried.value : classicBaselineType;
     setType(initialType);
-    if (project.documentationInstructionId && initialType === project.type) {
+    const carriedInstructionIsSelectable =
+      project.documentationInstructionId != null &&
+      selectableInstructions.some(
+        (inst) => inst.id === project.documentationInstructionId
+      );
+    if (carriedInstructionIsSelectable && initialType === project.type) {
       setInstructionId(String(project.documentationInstructionId));
     } else {
       const defaultId = findDefaultInstructionIdForType(initialType);
@@ -96,6 +129,7 @@ const ConfirmProjectDialog: FC<ConfirmProjectDialogProps> = ({
     projectTypes,
     classicBaselineType,
     findDefaultInstructionIdForType,
+    selectableInstructions,
   ]);
 
   // Always overwrite the instruction on type change so the filtered dropdown
@@ -125,7 +159,7 @@ const ConfirmProjectDialog: FC<ConfirmProjectDialogProps> = ({
 
   const instructionDropdownOptions = useMemo(
     () =>
-      documentationInstructions
+      selectableInstructions
         .filter((inst) => inst.projectTypeValue === type)
         .slice()
         .sort((a, b) => {
@@ -136,16 +170,16 @@ const ConfirmProjectDialog: FC<ConfirmProjectDialogProps> = ({
           value: String(inst.id),
           label: inst.isDefault ? `${inst.title}${defaultSuffix}` : inst.title,
         })),
-    [documentationInstructions, type, defaultSuffix]
+    [selectableInstructions, type, defaultSuffix]
   );
 
   const instructionHelpText = t('projects.add_dialog.instruction_info');
 
   const selectedInstructionUrl = useMemo(
     () =>
-      documentationInstructions.find((inst) => String(inst.id) === instructionId)
+      selectableInstructions.find((inst) => String(inst.id) === instructionId)
         ?.url ?? null,
-    [documentationInstructions, instructionId]
+    [selectableInstructions, instructionId]
   );
 
   const handleConfirm = async () => {
@@ -167,92 +201,115 @@ const ConfirmProjectDialog: FC<ConfirmProjectDialogProps> = ({
   };
 
   return (
-    <DialogShell
-      open={open}
-      onClose={onClose}
-      title={t('projects.confirm_project_dialog.title')}
-      ariaLabelledBy="confirm-project-dialog"
-      maxWidth="md"
-      actions={
-        <div className="flex justify-end gap-2">
-          <Button onClick={onClose} disabled={loading}>
-            {tCommon('cancel')}
-          </Button>
-          <Button
-            filled
-            onClick={handleConfirm}
-            disabled={loading || !type || !instructionId || !hasAcceptedAuthor}
-          >
-            {t('projects.confirm_project_dialog.confirm_button')}
-          </Button>
-        </div>
-      }
-    >
-      {project ? (
-        <div className="space-y-5">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-label-secondary mb-2">
-              {t('projects.confirm_project_dialog.project_title_label')}
-            </p>
-            <p className="text-sm font-semibold text-label-primary break-words">
-              {project.title}
-            </p>
+    <>
+      <DialogShell
+        open={open}
+        onClose={onClose}
+        title={t('projects.confirm_project_dialog.title')}
+        ariaLabelledBy="confirm-project-dialog"
+        maxWidth="md"
+        actions={
+          <div className="flex justify-end gap-2">
+            <Button onClick={onClose} disabled={loading}>
+              {tCommon('cancel')}
+            </Button>
+            <Button
+              filled
+              onClick={handleConfirm}
+              disabled={loading || !type || !instructionId || !hasAcceptedAuthor}
+            >
+              {t('projects.confirm_project_dialog.confirm_button')}
+            </Button>
           </div>
-          <div className="border-t border-border-primary pt-5">
-            <p className="text-xs font-semibold uppercase tracking-wide text-label-secondary mb-2">
-              {t('projects.confirm_project_dialog.authors_label')}
-            </p>
-            {hasAcceptedAuthor ? (
-              <p className="text-sm">{acceptedAuthorNames.join(', ')}</p>
-            ) : (
-              <p className="text-sm text-error">
-                {t('projects.confirm_project_dialog.no_authors_blocking')}
+        }
+      >
+        {project ? (
+          <div className="space-y-5">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-label-secondary mb-2">
+                {t('projects.confirm_project_dialog.project_title_label')}
               </p>
-            )}
-          </div>
+              <p className="text-sm font-semibold text-label-primary break-words">
+                {project.title}
+              </p>
+            </div>
+            <div className="border-t border-border-primary pt-5">
+              <p className="text-xs font-semibold uppercase tracking-wide text-label-secondary mb-2">
+                {t('projects.confirm_project_dialog.authors_label')}
+              </p>
+              {hasAcceptedAuthor ? (
+                <p className="text-sm">{acceptedAuthorNames.join(', ')}</p>
+              ) : (
+                <p className="text-sm text-error">
+                  {t('projects.confirm_project_dialog.no_authors_blocking')}
+                </p>
+              )}
+            </div>
 
-          <div className="border-t border-border-primary pt-5">
-            <ProjectFormatSelector
-              projectTypes={projectTypes}
-              value={type}
-              onChange={handleTypeChange}
-              showFormatChoice={false}
-              disabled={loading}
-            />
-          </div>
-
-          <div className="border-t border-border-primary pt-5 [&_.col-span-10]:!mt-0">
-            <p className="text-xs font-semibold uppercase tracking-wide text-label-secondary mb-2">
-              {t('projects.add_dialog.instruction_label')}
-            </p>
-            <div className="flex items-center gap-2">
-              <div className="flex-1">
-                <DropDownSelector
-                  variant="material"
-                  placeholder={t('projects.add_dialog.instruction_placeholder')}
-                  value={instructionId}
-                  options={instructionDropdownOptions}
-                  isMandatory
-                  disabled={loading}
-                  onValueUpdated={(v: string) => {
-                    setInstructionId(v);
-                  }}
-                  identifierVariables={{}}
-                  refetchQueries={[]}
-                />
-              </div>
-              <InstructionDownloadButton
-                url={selectedInstructionUrl}
+            <div className="border-t border-border-primary pt-5">
+              <ProjectFormatSelector
+                projectTypes={projectTypes}
+                value={type}
+                onChange={handleTypeChange}
+                showFormatChoice={false}
                 disabled={loading}
               />
             </div>
-            <p className="mt-2 text-xs text-label-secondary whitespace-pre-line">
-              {instructionHelpText}
-            </p>
+
+            <div className="border-t border-border-primary pt-5 [&_.col-span-10]:!mt-0">
+              <p className="text-xs font-semibold uppercase tracking-wide text-label-secondary mb-2">
+                {t('projects.add_dialog.instruction_label')}
+              </p>
+              <div className="flex items-center gap-2">
+                <div className="flex-1">
+                  <DropDownSelector
+                    variant="material"
+                    placeholder={t('projects.add_dialog.instruction_placeholder')}
+                    value={instructionId}
+                    options={instructionDropdownOptions}
+                    isMandatory
+                    disabled={loading}
+                    onValueUpdated={(v: string) => {
+                      setInstructionId(v);
+                    }}
+                    identifierVariables={{}}
+                    refetchQueries={[]}
+                  />
+                </div>
+                <InstructionDownloadButton
+                  url={selectedInstructionUrl}
+                  disabled={loading}
+                />
+                <InstructionUploadButton
+                  onClick={() => setInstructionDialogOpen(true)}
+                  disabled={loading || !type}
+                  label={
+                    type
+                      ? t('projects.instruction_upload.open')
+                      : t('projects.instruction_upload.disabled_no_type')
+                  }
+                />
+              </div>
+              <p className="mt-2 text-xs text-label-secondary whitespace-pre-line">
+                {instructionHelpText}
+              </p>
+            </div>
           </div>
-        </div>
+        ) : null}
+      </DialogShell>
+
+      {type ? (
+        <DocumentationInstructionUploadDialog
+          open={instructionDialogOpen}
+          onClose={() => setInstructionDialogOpen(false)}
+          projectTypeValue={type}
+          selectedInstructionId={instructionId ? Number(instructionId) : null}
+          onCreated={(newId) => setInstructionId(String(newId))}
+          onSelectedDeleted={() => setInstructionId('')}
+          onError={onError}
+        />
       ) : null}
-    </DialogShell>
+    </>
   );
 };
 

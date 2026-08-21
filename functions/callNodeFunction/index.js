@@ -31,6 +31,9 @@ import syncProgramInstructorMatrixRoom from "./syncProgramInstructorMatrixRoom/i
 import copyProjectFromTemplate from "./copyProjectFromTemplate/index.js";
 import setProjectDocumentationInstructionDefault from "./setProjectDocumentationInstructionDefault/index.js";
 import deleteProjectDocumentationInstruction from "./deleteProjectDocumentationInstruction/index.js";
+import saveProjectDocumentationInstruction from "./saveProjectDocumentationInstruction/index.js";
+import sendProjectEmail from "./sendProjectEmail/index.js";
+import sendCourseUpdateEmail from "./sendCourseUpdateEmail/index.js";
 
 const require = createRequire(import.meta.url);
 let constantTimeSecretsEqual;
@@ -90,6 +93,9 @@ const functionMap = {
   copyProjectFromTemplate,
   setProjectDocumentationInstructionDefault,
   deleteProjectDocumentationInstruction,
+  saveProjectDocumentationInstruction,
+  sendProjectEmail,
+  sendCourseUpdateEmail,
 };
 
 const constantTimeEquals = (providedSecret, expectedSecret) => {

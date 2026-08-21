@@ -119,9 +119,22 @@ export function shouldShowProjectResourceDownloadLinks(
   );
 }
 
-/** Project type and documentation instruction are editable only while PROPOSED. */
+/**
+ * Project type and documentation instruction stay editable until the team
+ * submits. Instructors and mentors may still correct the type after confirming
+ * the team (PROPOSED -> ONGOING), including after a send-back
+ * (SUBMITTED -> ONGOING), but never once the project is SUBMITTED, COMPLETED,
+ * INCOMPLETE or PUBLISHED.
+ *
+ * Note for callers: outside PROPOSED the database requires a non-null
+ * documentationInstructionId (Project_ongoing_requires_type_and_instruction_check),
+ * so any type change made under this predicate must supply a matching instruction.
+ */
 export function isProjectTypeEditable(status: ProjectStatus_enum): boolean {
-  return status === ProjectStatus_enum.PROPOSED;
+  return (
+    status === ProjectStatus_enum.PROPOSED ||
+    status === ProjectStatus_enum.ONGOING
+  );
 }
 
 /** Staff may suggest or withdraw a publication recommendation for finished projects. */

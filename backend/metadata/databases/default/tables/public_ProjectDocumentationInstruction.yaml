@@ -2,6 +2,9 @@ table:
   name: ProjectDocumentationInstruction
   schema: public
 object_relationships:
+  - name: CreatedByUser
+    using:
+      foreign_key_constraint_on: createdByUserId
   - name: ProjectType
     using:
       foreign_key_constraint_on: projectTypeValue
@@ -14,6 +17,12 @@ array_relationships:
           name: Project
           schema: public
 select_permissions:
+  # Restricted to the platform catalogue, for two reasons. It keeps
+  # instructor-created titles off public pages (no anonymous query reads this table
+  # today, so nothing is lost), and - crucially - `instructor` INHERITS `anonymous`
+  # (inherited_roles.yaml). An unrestricted filter here would union over the
+  # instructor_access filter below and hand every instructor every other
+  # instructor's private instruction.
   - role: anonymous
     permission:
       columns:
@@ -24,7 +33,9 @@ select_permissions:
         - isDefault
         - created_at
         - updated_at
-      filter: {}
+      filter:
+        createdByUserId:
+          _is_null: true
   - role: user_access
     permission:
       columns:
@@ -36,6 +47,10 @@ select_permissions:
         - created_at
         - updated_at
       filter: {}
+  # Instructors see the platform catalogue plus their own uploads. Students and
+  # anonymous keep an unfiltered select (above) so a team can always open whichever
+  # instruction its project points at, whoever created it, and neither role is
+  # granted createdByUserId.
   - role: instructor_access
     permission:
       columns:
@@ -44,6 +59,90 @@ select_permissions:
         - url
         - projectTypeValue
         - isDefault
+        - createdByUserId
         - created_at
         - updated_at
-      filter: {}
+      filter:
+        _or:
+          # Platform / admin-maintained catalogue: today's behaviour for every
+          # pre-existing row, including admin-created non-default ones.
+          - createdByUserId:
+              _is_null: true
+          # Own uploads.
+          - createdByUserId:
+              _eq: X-Hasura-User-Id
+          # A type's default must never be invisible: handleSetProjectType resolves
+          # the new type's default from this list, and setProjectDocumentation-
+          # InstructionDefault could have promoted an instructor-owned row.
+          - isDefault:
+              _eq: true
+          # Keep an instruction a colleague attached to a shared project visible.
+          # Otherwise the mutation-driven dropdown in ProjectsManagementGrid renders
+          # a value that is not among its options and the co-instructor silently
+          # reassigns it. Mirrors the instructor_access filter on public_Project.
+          - Projects:
+              _or:
+                - ProjectCourses:
+                    Course:
+                      CourseInstructors:
+                        User:
+                          id:
+                            _eq: X-Hasura-User-Id
+                - ProjectMentors:
+                    User:
+                      id:
+                        _eq: X-Hasura-User-Id
+insert_permissions:
+  # createdByUserId is a preset, so Hasura removes it from this role's insert input
+  # type: an instructor can neither forge ownership nor create a platform-wide
+  # (NULL) row. isDefault is absent, so a new row is always non-default. url is
+  # absent too: it may only ever come from the filePath the
+  # saveProjectDocumentationInstruction action returns.
+  - role: instructor_access
+    permission:
+      set:
+        createdByUserId: x-hasura-user-id
+      check: {}
+      columns:
+        - title
+        - projectTypeValue
+update_permissions:
+  # Rename and replace-PDF, restricted to the caller's own non-default rows.
+  # projectTypeValue is deliberately not updatable: Project_instruction_matches_type
+  # _trg fires only on Project writes, so retyping an instruction would leave every
+  # referencing project permanently inconsistent. isDefault and createdByUserId are
+  # absent, and the check repeats the filter so that stays true if the column list is
+  # ever widened.
+  - role: instructor_access
+    permission:
+      columns:
+        - title
+        - url
+      filter:
+        _and:
+          - createdByUserId:
+              _eq: X-Hasura-User-Id
+          - isDefault:
+              _eq: false
+      check:
+        _and:
+          - createdByUserId:
+              _eq: X-Hasura-User-Id
+          - isDefault:
+              _eq: false
+delete_permissions:
+  # Rollback path only. Creating is three non-atomic steps (insert -> upload -> set
+  # url); when the upload fails the draft row has to go. Restricted to url IS NULL so
+  # a real deletion can never bypass deleteProjectDocumentationInstruction:
+  # Project.documentationInstructionId is ON DELETE RESTRICT and referencing projects
+  # must be reassigned to the type default first.
+  - role: instructor_access
+    permission:
+      filter:
+        _and:
+          - createdByUserId:
+              _eq: X-Hasura-User-Id
+          - isDefault:
+              _eq: false
+          - url:
+              _is_null: true
