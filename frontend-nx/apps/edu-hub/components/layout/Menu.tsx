@@ -18,13 +18,17 @@ interface IProps {
   setVisible: (visible: boolean) => void;
 }
 
-// Shared class for the nested navigation links. The negative margins + padding make the link fill
-// the whole MenuItem so the clickable area matches the row. On touch devices (coarse pointer) we
-// enforce a >=44px (min-h-11) target and vertically center the label; fine-pointer devices keep the
-// tighter rows so the full admin menu still fits on smaller laptop screens.
+// Shared class for the nested navigation links. MUI renders MenuItem as a flex container, so a
+// plain block child shrinks to its text width and leaves the rest of the visibly highlighted row
+// dead (a click there hits the MenuItem, which only closes the menu without navigating). `w-full`
+// plus `self-stretch` make the link span the row in both axes; the row's own padding is moved onto
+// the link (MuiMenuItem-root padding is zeroed below) so the hit box and the highlight coincide.
+// On touch devices we additionally enforce a >=44px (min-h-11) target; fine-pointer devices keep
+// the tighter rows so the full admin menu still fits on smaller laptop screens. The variant is
+// written as an arbitrary media query because Tailwind 3 has no built-in `pointer-coarse:`.
 const MENU_LINK_CLASS =
-  'block -my-1.5 -mx-4 py-1.5 px-4 text-lg leading-snug touch-manipulation ' +
-  'pointer-coarse:flex pointer-coarse:items-center pointer-coarse:min-h-11';
+  'flex items-center w-full self-stretch py-1.5 px-4 text-lg leading-snug touch-manipulation ' +
+  '[@media(pointer:coarse)]:min-h-11';
 
 // Replace with styled
 const StyledMenu = styled(MaterialMenu)(() => ({
@@ -39,7 +43,9 @@ const StyledMenu = styled(MaterialMenu)(() => ({
   '& .MuiMenuItem-root': {
     color: 'var(--eduhub-label-primary) !important',
     backgroundColor: 'var(--eduhub-fill-primary) !important',
-    padding: '0.375rem 1rem',
+    // The row's padding lives on the nested link/button (see MENU_LINK_CLASS) so that the whole
+    // highlighted row is clickable, not just the label.
+    padding: 0,
     '&:hover': {
       backgroundColor: 'var(--eduhub-fill-disabled) !important', // Slightly darker than selected for better contrast
     },
@@ -235,7 +241,7 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
       <Divider component="li" />
 
       <MenuItem onClick={() => logout()}>
-        <button className="w-full text-lg text-left">{t('menu.logout')}</button>
+        <button className={`${MENU_LINK_CLASS} text-left`}>{t('menu.logout')}</button>
       </MenuItem>
     </StyledMenu>
   );
