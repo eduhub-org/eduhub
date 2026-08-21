@@ -4,8 +4,10 @@ name: Dependabot triage
 # relevant ones in a single consolidated PR against develop, and close the individual
 # Dependabot PRs that PR supersedes.
 #
-# The playbook lives in .claude/commands/dependabot-triage.md so it can be reviewed, edited
-# and run manually (`/dependabot-triage`) without touching CI config.
+# The playbook lives in .github/dependabot-triage-playbook.md so it can be reviewed and
+# edited without touching CI config. It is deliberately NOT in .claude/commands/: this job
+# pushes branches, opens PRs and closes other people's PRs, and a repo-committed slash
+# command would let any developer with a checkout fire that by accident.
 #
 # Required repository secrets:
 #   CLAUDE_CODE_OAUTH_TOKEN   - Generated locally with `claude setup-token`. Authenticates
@@ -76,7 +78,7 @@ jobs:
           prompt: |
             Run the daily Dependabot triage for eduhub-org/eduhub.
 
-            Read `.claude/commands/dependabot-triage.md` and follow it exactly. It is the
+            Read `.github/dependabot-triage-playbook.md` and follow it exactly. It is the
             authoritative playbook: preflight, alert collection, relevance assessment,
             patching per package manager, verification, the single consolidated PR, and
             which Dependabot PRs may be closed.

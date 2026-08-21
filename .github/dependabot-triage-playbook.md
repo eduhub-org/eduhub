@@ -1,13 +1,14 @@
----
-description: Triage open Dependabot alerts, patch the relevant ones in a single PR, and close superseded Dependabot PRs.
----
-
-# Dependabot triage
+# Dependabot triage playbook
 
 Triage the open Dependabot alerts for `eduhub-org/eduhub` and consolidate every needed
 change into **one** pull request against `develop`. Work autonomously and finish in one
-session. This playbook is run daily by `.github/workflows/dependabot-triage.yml`, and can
-also be invoked manually as `/dependabot-triage`.
+session.
+
+This file is the instruction set for `.github/workflows/dependabot-triage.yml`, which reads
+it on every scheduled run. It deliberately lives here rather than in `.claude/commands/`:
+the job pushes branches, opens pull requests and closes other people's pull requests, so it
+should not be a slash command that every developer with a checkout can fire by accident.
+To run it by hand, point Claude Code at this path.
 
 ## 0. Preflight — fail loudly, never silently
 
