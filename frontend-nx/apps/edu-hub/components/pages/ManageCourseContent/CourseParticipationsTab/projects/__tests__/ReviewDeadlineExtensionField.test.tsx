@@ -61,6 +61,17 @@ describe('ReviewDeadlineExtensionField', () => {
     expect(onCustomDateChange).toHaveBeenCalledWith('2026-09-15');
   });
 
+  it('puts the calendar above the dialog it is opened from', () => {
+    setup();
+
+    // The calendar renders in a body-level portal. Without a stacking context
+    // above MUI's modal layer (1300) it paints *behind* the review dialog,
+    // which looks exactly like a picker that refuses to open.
+    const portal = document.getElementById('optimistic-datepicker-portal');
+    expect(portal).not.toBeNull();
+    expect(Number((portal as HTMLElement).style.zIndex)).toBeGreaterThan(1300);
+  });
+
   it('blocks days before today in the calendar', () => {
     setup({ customDate: '' });
 
