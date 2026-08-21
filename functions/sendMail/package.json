@@ -4,8 +4,7 @@
   "dependencies": {
     "body-parser": "1.20.6",
     "form-data": "^4.0.1",
-    "mailgun.js": "^10.4.0",
-    "nodemailer": "^6.6.3"
+    "mailgun.js": "^10.4.0"
   },
   "devDependencies": {
     "@google-cloud/functions-framework": "^3.4.5",
