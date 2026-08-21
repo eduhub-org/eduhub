@@ -2,7 +2,11 @@ import { FC, useMemo } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { MdWarningAmber } from 'react-icons/md';
 import RadioSelector, { RadioSelectorOption } from '../../../../inputs/RadioSelector';
-import { formatSubmissionDeadlineDate } from '../../../CourseContent/Projects/projectEffectiveSubmissionDeadline';
+import OptimisticDatePicker from '../../../../inputs/OptimisticDatePicker';
+import {
+  formatSubmissionDeadlineDate,
+  submissionDeadlineToCalendarDate,
+} from '../../../CourseContent/Projects/projectEffectiveSubmissionDeadline';
 import {
   DeadlineExtensionChoice,
   getRelativeDeadline,
@@ -45,7 +49,16 @@ const ReviewDeadlineExtensionField: FC<ReviewDeadlineExtensionFieldProps> = ({
   const locale = useLocale();
 
   const currentLabel = formatSubmissionDeadlineDate(effectiveDeadlineIso, locale);
-  const today = useMemo(() => toDateInputValue(new Date()), []);
+  // Earliest selectable day — the calendar must not offer a deadline in the past.
+  const today = useMemo(() => {
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  }, []);
+  // The parent keeps the custom date as `yyyy-mm-dd`; the picker works on Dates.
+  const customDateValue = useMemo(
+    () => submissionDeadlineToCalendarDate(customDate),
+    [customDate]
+  );
 
   const options = useMemo<RadioSelectorOption[]>(() => {
     const relativeOption = (key: 'plus_1_week' | 'plus_2_weeks'): RadioSelectorOption => ({
@@ -109,24 +122,33 @@ const ReviewDeadlineExtensionField: FC<ReviewDeadlineExtensionFieldProps> = ({
       />
 
       {choice === 'custom' ? (
-        <label className="block">
+        <div>
           <span className="block text-xs text-label-secondary mb-1">
             {t('projects.evaluate_dialog.deadline.custom_label')}
           </span>
-          <input
-            type="date"
-            className="rounded border border-border-primary px-2 py-1 text-sm"
-            value={customDate}
-            min={today}
-            disabled={disabled}
-            onChange={(e) => onCustomDateChange(e.target.value)}
-          />
+          {/* The app's standard date picker with its calendar popup, so a
+              deadline is picked here the same way it is everywhere else. Used
+              directly rather than through the mutation-bound `DatePicker`
+              wrapper (as SessionsTab does): nothing may be written before the
+              dialog is confirmed, the parent persists the resolved date. */}
+          <div className="max-w-[14rem] light">
+            <OptimisticDatePicker
+              value={customDateValue}
+              minDate={today}
+              disabled={disabled}
+              showWeekends
+              className="w-full !bg-fill-primary !text-label-primary border border-border-primary rounded px-2 py-1.5 h-9"
+              onChange={(date) =>
+                onCustomDateChange(date ? toDateInputValue(date) : '')
+              }
+            />
+          </div>
           {customInvalid ? (
             <span className="mt-1 block text-xs text-error">
               {t('projects.evaluate_dialog.deadline.custom_invalid')}
             </span>
           ) : null}
-        </label>
+        </div>
       ) : null}
     </div>
   );
