@@ -10,19 +10,26 @@ import {
 import { useRoleMutation } from '../../../../../hooks/authedMutation';
 import { DialogShell } from '../../../../common/dialogs/DialogShell';
 import { Button } from '../../../../common/Button';
-import {
-  UPDATE_PROJECT_APPROVE,
-  UPDATE_PROJECT_SEND_BACK,
-  UPDATE_PROJECT_REJECT,
-  UPDATE_PROJECT_RATING_AND_COMMENT,
-} from '../../../../../queries/projectInstructor';
+import { UPDATE_PROJECT_REVIEW_VERDICT } from '../../../../../queries/projectInstructor';
 import { ProjectRow } from '../../../CourseContent/Projects/types';
-import { ProjectRating_enum } from '../../../../../__generated__/globalTypes';
+import { ProjectRating_enum, ProjectStatus_enum } from '../../../../../__generated__/globalTypes';
+import {
+  getEffectiveProjectSubmissionDeadlineIso,
+  isProjectSubmissionDeadlinePassed,
+} from '../../../CourseContent/Projects/projectEffectiveSubmissionDeadline';
+import ReviewDeadlineExtensionField from './ReviewDeadlineExtensionField';
+import {
+  DeadlineExtensionChoice,
+  isDeadlineSelectionConfirmable,
+  resolveExtendedDeadline,
+} from './reviewDeadlineExtension';
 
 interface ReviewProjectDialogProps {
   open: boolean;
   onClose: () => void;
   project: ProjectRow | null;
+  /** Course / program fallback when `Project.submissionDeadline` is null. */
+  courseDefaultSubmissionDeadline: string | Date | null | undefined;
   refetchQueries: string[];
   onError: (msg: string) => void;
 }
@@ -35,6 +42,12 @@ const VERDICT_RATING: Record<Verdict, ProjectRating_enum> = {
   approve: ProjectRating_enum.PASSED,
   revise: ProjectRating_enum.UNRATED,
   reject: ProjectRating_enum.FAILED,
+};
+
+const VERDICT_STATUS: Record<Verdict, ProjectStatus_enum> = {
+  approve: ProjectStatus_enum.COMPLETED,
+  revise: ProjectStatus_enum.ONGOING,
+  reject: ProjectStatus_enum.INCOMPLETE,
 };
 
 interface DecisionAccent {
@@ -130,6 +143,7 @@ const ReviewProjectDialog: FC<ReviewProjectDialogProps> = ({
   open,
   onClose,
   project,
+  courseDefaultSubmissionDeadline,
   refetchQueries,
   onError,
 }) => {
@@ -138,19 +152,25 @@ const ReviewProjectDialog: FC<ReviewProjectDialogProps> = ({
 
   const [verdict, setVerdict] = useState<Verdict | null>(null);
   const [ratingComment, setRatingComment] = useState<string>('');
+  const [deadlineChoice, setDeadlineChoice] = useState<DeadlineExtensionChoice>('');
+  const [customDeadline, setCustomDeadline] = useState<string>('');
 
-  const [approveProject, approveState] = useRoleMutation(UPDATE_PROJECT_APPROVE, {
+  const [submitVerdict, verdictState] = useRoleMutation(UPDATE_PROJECT_REVIEW_VERDICT, {
     refetchQueries,
   });
-  const [sendBackProject, sendBackState] = useRoleMutation(UPDATE_PROJECT_SEND_BACK, {
-    refetchQueries,
-  });
-  const [rejectProject, rejectState] = useRoleMutation(UPDATE_PROJECT_REJECT, {
-    refetchQueries,
-  });
-  const [saveRating, saveRatingState] = useRoleMutation(UPDATE_PROJECT_RATING_AND_COMMENT, {
-    refetchQueries,
-  });
+
+  const effectiveDeadlineIso = project
+    ? getEffectiveProjectSubmissionDeadlineIso(
+        project.submissionDeadline,
+        courseDefaultSubmissionDeadline
+      )
+    : null;
+  const isDeadlinePassed = project
+    ? isProjectSubmissionDeadlinePassed(
+        project.submissionDeadline,
+        courseDefaultSubmissionDeadline
+      )
+    : false;
 
   useEffect(() => {
     if (!project) return;
@@ -163,32 +183,56 @@ const ReviewProjectDialog: FC<ReviewProjectDialogProps> = ({
           : null
     );
     setRatingComment(project.ratingComment?.trim() ? project.ratingComment : '');
-  }, [open, project]);
+    // A deadline still running may simply stay as it is; one that has passed
+    // needs a deliberate decision, so it starts out unselected.
+    setDeadlineChoice(
+      isProjectSubmissionDeadlinePassed(
+        project.submissionDeadline,
+        courseDefaultSubmissionDeadline
+      )
+        ? ''
+        : 'keep'
+    );
+    setCustomDeadline('');
+  }, [open, project, courseDefaultSubmissionDeadline]);
 
-  const busy =
-    approveState.loading ||
-    sendBackState.loading ||
-    rejectState.loading ||
-    saveRatingState.loading;
+  const busy = verdictState.loading;
+
+  const deadlineConfirmable =
+    verdict !== 'revise' ||
+    isDeadlineSelectionConfirmable({
+      choice: deadlineChoice,
+      customDate: customDeadline,
+      isDeadlinePassed,
+    });
 
   const handleSave = async () => {
     if (!project || !verdict) return;
     const trimmed = ratingComment.trim();
+    // Only a send-back offers a deadline choice. Every other verdict — and
+    // "keep the deadline" — writes the project's own current value straight
+    // back, so the single statement below never changes a deadline by accident.
+    const extendedDeadline =
+      verdict === 'revise'
+        ? resolveExtendedDeadline({
+            choice: deadlineChoice,
+            customDate: customDeadline,
+            effectiveDeadlineIso,
+          })
+        : null;
     try {
-      await saveRating({
+      // One statement for status, rating, comment and deadline: a partial
+      // failure here used to be able to leave the project sent back with a
+      // deadline it could no longer be resubmitted against.
+      await submitVerdict({
         variables: {
           itemId: project.id,
+          status: VERDICT_STATUS[verdict],
           rating: VERDICT_RATING[verdict],
           ratingComment: trimmed === '' ? null : trimmed,
+          submissionDeadline: extendedDeadline ?? project.submissionDeadline ?? null,
         },
       });
-      if (verdict === 'approve') {
-        await approveProject({ variables: { itemId: project.id } });
-      } else if (verdict === 'revise') {
-        await sendBackProject({ variables: { itemId: project.id } });
-      } else {
-        await rejectProject({ variables: { itemId: project.id } });
-      }
       onClose();
     } catch (err) {
       onError(err instanceof Error ? err.message : tCommon('error'));
@@ -207,7 +251,7 @@ const ReviewProjectDialog: FC<ReviewProjectDialogProps> = ({
           <Button onClick={onClose} disabled={busy}>
             {tCommon('cancel')}
           </Button>
-          <Button filled onClick={handleSave} disabled={busy || !verdict}>
+          <Button filled onClick={handleSave} disabled={busy || !verdict || !deadlineConfirmable}>
             {t('projects.evaluate_dialog.confirm_button')}
           </Button>
         </div>
@@ -239,6 +283,18 @@ const ReviewProjectDialog: FC<ReviewProjectDialogProps> = ({
               ))}
             </div>
           </div>
+
+          {verdict === 'revise' ? (
+            <ReviewDeadlineExtensionField
+              choice={deadlineChoice}
+              onChoiceChange={setDeadlineChoice}
+              customDate={customDeadline}
+              onCustomDateChange={setCustomDeadline}
+              effectiveDeadlineIso={effectiveDeadlineIso}
+              isDeadlinePassed={isDeadlinePassed}
+              disabled={busy}
+            />
+          ) : null}
 
           <label className="block">
             <span className="block text-sm font-medium mb-1">

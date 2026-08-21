@@ -462,7 +462,29 @@
           "documentation_upload_with_instruction_prefix": "Upload documentation (Check the ",
           "documentation_upload_with_instruction_suffix": ").",
           "presentation_upload": "Upload presentation (required for your project type).",
-          "external_link": "Add your project’s external link (required for your project type)."
+          "external_link": "Add your project’s external link (required for your project type).",
+          "cover_image_upload": "Upload a cover image (required for your project type).",
+          "revise_after_feedback": "Revise your submission according to the course staff’s feedback and submit it again.",
+          "authors_pending": "Respond to all pending join requests – you cannot submit while a request is open.",
+          "authors_none_accepted": "The project needs at least one confirmed author."
+        }
+      },
+      "submission_blocked": {
+        "title": "Submission not possible yet",
+        "body_main": "These items are still missing before you can submit the project:",
+        "body_deadline": "This project can no longer be submitted:",
+        "go_to_field": "Go to field",
+        "footer_hint": "Once every item is done you can submit right here.",
+        "reason": {
+          "type": "Course staff have not set a project type yet. Please contact your course staff.",
+          "documentation": "The project documentation is missing.",
+          "presentation": "The presentation is missing.",
+          "externalUrl": "The external project link is missing.",
+          "coverImage": "The cover image is missing.",
+          "authorsPending": "A join request is still pending.",
+          "authorsNoneAccepted": "The project has no confirmed author yet.",
+          "deadline": "The submission deadline has passed.",
+          "deadline_with_date": "The submission deadline ({date}) has passed. Please contact your course staff."
         }
       },
       "project_review_dialog": {
@@ -501,7 +523,7 @@
         "field_tooltip_accepting_participants": "When enabled, other participants can request to join as implementing co-authors. Turn off once your team is complete if you do not want new requests.",
         "action_tooltip_join_requests": "Review pending co-author requests and accept or decline each one.",
         "action_tooltip_request_review": "Notifies course staff that you are ready for review. Your status stays “Proposed” until they confirm the team and project details.",
-        "action_tooltip_submit": "Starts formal submission: the team is locked and the project goes to instructor review. Complete every required item in “Next to-dos” and respect the deadline first.",
+        "action_tooltip_submit": "Starts formal submission: the team is locked and the project goes to instructor review.",
         "field_tooltip_next_todos_section": "Checklist for your current project phase (proposed or in progress). Work through open items before you request staff review or submit for grading.",
         "action_tooltip_leave": "Leaves the project team. If you are the only implementing author while the project is still proposed or in progress, the project may be removed—read the confirmation carefully.",
         "action_tooltip_review_done": "Course staff received your request. Your project stays “Proposed” until they confirm the team and project details.",
@@ -512,7 +534,10 @@
         "proposal_action_disabled_tooltip": "Finish the checklist below first.",
         "project_review_disabled_deadline_tooltip": "The submission deadline has passed — you can no longer request project confirmation.",
         "accepting_participants_disabled_review_tooltip": "While a confirmation request is pending, you cannot allow additional co-authors.",
-        "submit_disabled_tooltip": "Complete every open item in “Next to-dos” before the submission deadline.",
+        "submit_blocked_tooltip": "Click “Submit project” – we will show you what is still missing.",
+        "deliverables_locked_notice": "The submission deadline ({date}) has passed. Your deliverables stay visible but can no longer be changed. Contact your course staff if you still need to hand something in.",
+        "deliverable_missing_after_deadline": "No file uploaded.",
+        "deliverable_locked_after_deadline": "Locked after the submission deadline.",
         "documentation_upload_section_label": "Documentation",
         "presentation_upload_section_label": "Presentation",
         "cover_image_section_label": "Cover image",
@@ -1437,6 +1462,20 @@
         "revise_description": "The team can revise the project and submit it again.",
         "reject_title": "Reject as not passed",
         "reject_description": "Marks the project as not passed.",
+        "deadline": {
+          "label": "Submission deadline for the revision",
+          "current": "Current deadline: {date}",
+          "current_none": "No submission deadline is set for this project.",
+          "passed_warning": "The submission deadline has already passed – without a new one the team cannot submit the project again.",
+          "keep": "Keep the deadline",
+          "keep_passed": "Send back without an extension",
+          "keep_passed_description": "The team will not be able to submit the project again.",
+          "plus_1_week": "One more week",
+          "plus_2_weeks": "Two more weeks",
+          "custom": "Another date",
+          "custom_label": "New submission deadline",
+          "custom_invalid": "Pick a date that is not in the past."
+        },
         "comment_label": "Comment (optional)",
         "comment_placeholder": "Notes for the project team (visible where project details are shown, and included in the notification email)",
         "confirm_button": "Confirm"
@@ -1514,6 +1553,7 @@
         },
         "requires_cover_image": {
           "label": "Cover image",
+          "help_always_required": "Always required for classical projects – participants must upload a cover image (also used for showcase publication). You cannot deselect this deliverable.",
           "help": "Students must upload a cover image (also used for showcase publication).",
           "short": "Cover image"
         },
