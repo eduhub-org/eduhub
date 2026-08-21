@@ -114,6 +114,7 @@ export default async function sendProjectEmail(req, logger) {
           id
           title
           ratingComment
+          submissionDeadline
           proposedByUserId
           ProposedByUser { id email firstName lastName }
           ProjectAuthors {
@@ -121,7 +122,15 @@ export default async function sendProjectEmail(req, logger) {
             User { id email firstName lastName }
           }
           ProjectCourses {
-            Course { id CourseInstructors { User { id email firstName lastName } } }
+            Course {
+              id
+              projectSubmissionDeadline
+              Program {
+                defaultProjectSubmissionDeadline
+                achievementRecordUploadDeadline
+              }
+              CourseInstructors { User { id email firstName lastName } }
+            }
           }
           ProjectMentors { User { id email firstName lastName } }
         }
@@ -192,11 +201,26 @@ export default async function sendProjectEmail(req, logger) {
     }
 
     // Course id enables course-specific template overrides (falls back to default).
-    const courseId = project.ProjectCourses?.[0]?.Course?.id ?? null;
+    const course = project.ProjectCourses?.[0]?.Course ?? null;
+    const courseId = course?.id ?? null;
+
+    // [Project:SubmissionDeadline] needs the deadline the team actually has to
+    // meet: the project's own override, else the course's, else the program's
+    // (same chain as resolveEffectiveCourseProjectSubmissionDeadline in the app).
+    const effectiveSubmissionDeadline =
+      project.submissionDeadline ??
+      course?.projectSubmissionDeadline ??
+      course?.Program?.defaultProjectSubmissionDeadline ??
+      course?.Program?.achievementRecordUploadDeadline ??
+      null;
+    const projectForTemplate = {
+      ...project,
+      submissionDeadline: effectiveSubmissionDeadline,
+    };
 
     const results = [];
     for (const recipient of uniqueRecipients) {
-      const replacer = createProjectVariableReplacer(project, recipient, { applicantName });
+      const replacer = createProjectVariableReplacer(projectForTemplate, recipient, { applicantName });
       const result = await queueEmail({
         templateType,
         variableReplacer: replacer,

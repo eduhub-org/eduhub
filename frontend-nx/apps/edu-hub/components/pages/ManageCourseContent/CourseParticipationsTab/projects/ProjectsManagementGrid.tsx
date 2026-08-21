@@ -1045,6 +1045,7 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
         open={Boolean(reviewProject)}
         onClose={() => setReviewProject(null)}
         project={reviewProject}
+        courseDefaultSubmissionDeadline={courseDefaultProjectSubmissionDeadline}
         refetchQueries={REFETCH_QUERIES}
         onError={setErrorMessage}
       />

@@ -60,6 +60,7 @@ describe('Email Template Variables System', () => {
       expect(allKeys).toContain('[Project:Link]');
       expect(allKeys).toContain('[Project:ApplicantName]');
       expect(allKeys).toContain('[Project:ReviewComment]');
+      expect(allKeys).toContain('[Project:SubmissionDeadline]');
     });
   });
 
@@ -285,6 +286,37 @@ describe('Email Template Variables System', () => {
 
       expect(blank('<p>a</p>[Project:ReviewComment]<p>b</p>')).toBe('<p>a</p><p>b</p>');
       expect(missing('<p>a</p>[Project:ReviewComment]<p>b</p>')).toBe('<p>a</p><p>b</p>');
+    });
+
+    it('should render the submission deadline as a labelled block', () => {
+      const replacer = createProjectVariableReplacer(
+        { id: 3, title: 'Solar', submissionDeadline: '2026-09-04T00:00:00+00:00' },
+        { firstName: 'Ann' }
+      );
+
+      expect(replacer('<p>x</p>[Project:SubmissionDeadline]')).toBe(
+        '<p>x</p><p><strong>Abgabefrist / Submission deadline:</strong> 04.09.2026</p>'
+      );
+    });
+
+    it('should read the deadline date verbatim, without a time-zone shift', () => {
+      const replacer = createProjectVariableReplacer(
+        { id: 3, title: 'Solar', submissionDeadline: '2026-01-01' },
+        {}
+      );
+
+      expect(replacer('[Project:SubmissionDeadline]')).toContain('01.01.2026');
+    });
+
+    it('should expand the submission deadline to nothing when there is none', () => {
+      const missing = createProjectVariableReplacer({ id: 3, title: 'Solar' }, {});
+      const nulled = createProjectVariableReplacer(
+        { id: 3, title: 'Solar', submissionDeadline: null },
+        {}
+      );
+
+      expect(missing('<p>a</p>[Project:SubmissionDeadline]<p>b</p>')).toBe('<p>a</p><p>b</p>');
+      expect(nulled('<p>a</p>[Project:SubmissionDeadline]<p>b</p>')).toBe('<p>a</p><p>b</p>');
     });
 
     it('should not expand placeholders that appear inside the review comment', () => {

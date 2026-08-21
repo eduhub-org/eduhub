@@ -1462,6 +1462,20 @@
         "revise_description": "The team can revise the project and submit it again.",
         "reject_title": "Reject as not passed",
         "reject_description": "Marks the project as not passed.",
+        "deadline": {
+          "label": "Submission deadline for the revision",
+          "current": "Current deadline: {date}",
+          "current_none": "No submission deadline is set for this project.",
+          "passed_warning": "The submission deadline has already passed – without a new one the team cannot submit the project again.",
+          "keep": "Keep the deadline",
+          "keep_passed": "Send back without an extension",
+          "keep_passed_description": "The team will not be able to submit the project again.",
+          "plus_1_week": "One more week",
+          "plus_2_weeks": "Two more weeks",
+          "custom": "Another date",
+          "custom_label": "New submission deadline",
+          "custom_invalid": "Pick a date that is not in the past."
+        },
         "comment_label": "Comment (optional)",
         "comment_placeholder": "Notes for the project team (visible where project details are shown, and included in the notification email)",
         "confirm_button": "Confirm"

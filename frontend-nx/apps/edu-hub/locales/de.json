@@ -1446,7 +1446,21 @@
         "reject_description": "Das Projekt wird als nicht bestanden markiert.",
         "comment_label": "Kommentar (optional)",
         "comment_placeholder": "Hinweise für das Projektteam (sichtbar, wo Projektdetails angezeigt werden, und in der Benachrichtigungs-E-Mail)",
-        "confirm_button": "Bestätigen"
+        "confirm_button": "Bestätigen",
+        "deadline": {
+          "label": "Abgabefrist für die Überarbeitung",
+          "current": "Aktuelle Frist: {date}",
+          "current_none": "Für dieses Projekt ist keine Abgabefrist gesetzt.",
+          "passed_warning": "Die Abgabefrist ist bereits abgelaufen – ohne neue Frist kann das Team das Projekt nicht erneut einreichen.",
+          "keep": "Frist beibehalten",
+          "keep_passed": "Ohne Verlängerung zurückgeben",
+          "keep_passed_description": "Das Team kann das Projekt dann nicht erneut einreichen.",
+          "plus_1_week": "Eine Woche mehr Zeit",
+          "plus_2_weeks": "Zwei Wochen mehr Zeit",
+          "custom": "Anderes Datum",
+          "custom_label": "Neue Abgabefrist",
+          "custom_invalid": "Wähle ein Datum, das nicht in der Vergangenheit liegt."
+        }
       },
       "add_dialog": {
         "title": "Projekt hinzufügen",

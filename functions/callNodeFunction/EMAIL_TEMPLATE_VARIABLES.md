@@ -66,6 +66,15 @@ The email template variable system is centralized in `emailTemplateVariables.js`
   - Example: `<p><strong>Kommentar der Kursleitung / Instructor comment:</strong><br>Bitte die Quellen ergänzen.</p>`
   - Available in: `PROJECT_APPROVED`, `PROJECT_REJECTED`, `PROJECT_SENT_BACK`
 
+- **`[Project:SubmissionDeadline]`**: The deadline the team has to meet — the
+  project's own `submissionDeadline`, else the course's, else the program's
+  default — rendered as a labelled paragraph. Expands to nothing when no
+  deadline is set, so a template never shows a dangling label. Date only
+  (`dd.mm.yyyy`); the label carries both languages, like `[Project:ReviewComment]`.
+  - Example: `<p><strong>Abgabefrist / Submission deadline:</strong> 04.09.2026</p>`
+  - Available in: all project lifecycle emails; used by `PROJECT_SENT_BACK`,
+    where instructors can extend the deadline while sending a project back
+
 - **`[Project:ApplicantName]`**: Name of the user who requested to join the project
   - Example: `Jane Doe`
   - Available in: `PROJECT_JOIN_REQUESTED` emails only
