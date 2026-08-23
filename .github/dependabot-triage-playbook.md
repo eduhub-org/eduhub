@@ -161,11 +161,32 @@ Then apply the bump with the manager that owns the manifest:
   1. `<keycloak.version>` in `keycloak/spi/matrix-handle-listener/pom.xml`
   2. the `FROM quay.io/keycloak/keycloak:<tag>` lines in **both** `keycloak/Dockerfile` and
      `keycloak/Dockerfile-dev`
-  3. `keycloak/libs/matrix-handle-listener.jar`, which is a **committed binary**, rebuilt via
-     `scripts/rebuild-keycloak-matrix-handle-listener.sh` (nothing in CI builds it — the
-     `keycloak-code-checks` workflow only runs `--check`, which compares versions)
+  3. `keycloak/libs/matrix-handle-listener.jar`, which is a **committed binary**
   4. `scripts/rebuild-keycloak-matrix-handle-listener.sh --check` passing, which is what CI
      enforces
+
+  **Always rebuild the jar — this step is not optional and not conditional.** Any time you
+  touch the Keycloak version, run:
+
+  ```bash
+  scripts/rebuild-keycloak-matrix-handle-listener.sh
+  ```
+
+  with no arguments. That compiles the SPI against the new version and copies the result over
+  `keycloak/libs/matrix-handle-listener.jar`, then verifies alignment. Commit the changed jar
+  along with the pom and the Dockerfiles.
+
+  Do not skip it on the assumption that only a version string changed: the jar embeds its own
+  copy of the POM, so a version-only bump still leaves the committed jar stale, and CI's
+  `--check` compares exactly that embedded value. **Nothing in CI rebuilds the jar for you** —
+  the `keycloak-code-checks` workflow runs only `--check`, which compares versions and fails;
+  it never regenerates the binary. Never hand-edit or repackage the jar by any other means,
+  and never bump the version and leave the rebuild for a follow-up commit — a pushed
+  pom/Dockerfile bump without the rebuilt jar is a red CI run.
+
+  The script needs `mvn`, a JDK and `unzip` on PATH. If any is missing, or the build fails,
+  say so and stop rather than committing a version bump with a stale jar.
+
   Because the shipped artifact is a container image rather than a Maven coordinate, resolve
   the target tag from Keycloak's own releases (`gh release list --repo keycloak/keycloak`),
   not from the advisory's `first_patched_version`. Flag in the PR body that this changes the
