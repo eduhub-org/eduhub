@@ -80,6 +80,13 @@ against the actual code rather than the advisory text alone.
   evidence that the dependency is unreachable. Either way, record the reachability
   assessment and the upstream check (with the release or advisory URL you consulted) so the
   next run, and a human, can act on it.
+- **A vulnerable-range upper bound is not "no fix".** Advisories for projects with several
+  supported branches list one affected range per branch, and each range's exclusive upper
+  bound *is* that branch's fix: `< 26.6.5` means 26.6.5 is the patched release for the 26.6
+  line, not that 26.6.4 is the end of the road. An alert showing `<= 26.6.4` is therefore
+  reporting a branch boundary, not an absent fix. Read every range on the advisory, find the
+  one containing the version in this repo, and take the fix from it — or move to a newer
+  branch that is also patched.
 - Fix requires a **major** version bump of a runtime dep → NEEDS-MANUAL-DECISION. Do not
   attempt it.
 - When unsure whether something is exploitable, treat it as relevant and patch it if a safe
