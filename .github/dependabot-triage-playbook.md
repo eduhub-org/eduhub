@@ -52,6 +52,11 @@ Per alert, capture: `number`, `security_advisory.severity`, `dependency.package.
 `security_advisory.ghsa_id`, `security_advisory.summary`, `security_advisory.description`,
 any `vulnerable_functions`, and `security_vulnerability.first_patched_version.identifier`.
 
+Alert data alone is not enough to choose a version — see section 4, *Pick the target
+version*. For every package you intend to touch, also look up what upstream currently
+ships. Advisory metadata lags releases, and `first_patched_version` is the **oldest**
+release carrying the fix, not the newest release available.
+
 ## 3. Assess relevance — this is the core of the job
 
 Classify every alert as **PATCH**, **NOT-RELEVANT**, or **NEEDS-MANUAL-DECISION**, judged
@@ -66,9 +71,15 @@ against the actual code rather than the advisory text alone.
 - EduHub context: users are students and instructors authenticated via Keycloak. There are
   public course pages, file uploads, certificate PDF generation, and mail sending. The app
   is server-side rendered, so Node-side dependencies are reachable at runtime.
-- No `first_patched_version` → NEEDS-MANUAL-DECISION, not NOT-RELEVANT. "No fix exists" is
-  not evidence that the dependency is unreachable. Record the reachability assessment
-  alongside the missing fix so the next run, and a human, can act on it.
+- No `first_patched_version` → **check upstream before believing it.** A null
+  `first_patched_version` means GitHub has not recorded a patched release, which is not the
+  same as no fix existing: the fix may have shipped in a release published after the
+  advisory was last edited. Look at the project's own releases and security page for the
+  affected minor before concluding anything. Only when upstream genuinely has no fix does
+  this become NEEDS-MANUAL-DECISION — never NOT-RELEVANT, since "no fix exists" is not
+  evidence that the dependency is unreachable. Either way, record the reachability
+  assessment and the upstream check (with the release or advisory URL you consulted) so the
+  next run, and a human, can act on it.
 - Fix requires a **major** version bump of a runtime dep → NEEDS-MANUAL-DECISION. Do not
   attempt it.
 - When unsure whether something is exploitable, treat it as relevant and patch it if a safe
@@ -91,6 +102,48 @@ If a PR already exists, check that branch out, merge `develop` into it, and exte
 not, delete any stale local and remote copy of the branch and cut it fresh from
 `origin/develop`.
 
+**Pick the target version — `first_patched_version` is a floor, not the answer.**
+
+Before editing any manifest, resolve the version you are moving to, and record it:
+
+```bash
+npm view <pkg> versions --json | tail -20        # npm / yarn
+pip index versions <pkg>                        # pip
+gh release list --repo <owner>/<repo> --limit 5 # Maven, containers, anything GitHub-released
+```
+
+Rules:
+
+- Target the **newest release within the bump class you are allowed to make** — the latest
+  patch of the current minor by default, not merely the oldest release that closes the
+  alert. Shipping `first_patched_version` when a newer patch exists knowingly deploys the
+  vulnerabilities fixed in between; those show up as new alerts on the next run.
+- Check the upstream release notes between the version in the repo and your target for
+  other security fixes, and mention them in the PR body. One bump usually closes more than
+  the alert that prompted it.
+- **Cool-down: prefer a release that has been out for at least 7 days**, and treat 14 days as
+  comfortable. A release published in the last day or two has had no time to surface
+  regressions, and this job runs daily — waiting a week costs one more run, while shipping a
+  day-old release can cost a rollback. Compare the release date against today, not the
+  version number.
+- **Security overrides the cool-down.** Take a release immediately, at any age, when it
+  fixes: the alert you are triaging; anything **high or critical**; or anything in the
+  authentication-bypass, account-takeover, privilege-escalation, signature-verification or
+  RCE classes, regardless of the score attached to it. The cool-down exists to avoid
+  regressions in routine bumps, never to leave a known exploitable hole in place. When you
+  take a release early, say which fix justified it in the `## Patched` table.
+- When the cool-down defers a bump, do **not** silently ship the older version as if it were
+  the target. Patch to the newest *eligible* release, and record in `## Needs a manual
+  decision` which newer release you deferred, its publication date, and the date it becomes
+  eligible — so the next run picks it up instead of rediscovering it.
+- If the newest patch of the current minor is still vulnerable and only a **minor or major**
+  bump fixes it, the existing rules apply: a safe minor is fine, a major runtime bump is
+  NEEDS-MANUAL-DECISION.
+- State the chosen version and why in the `## Patched` table, so a reviewer can see it was
+  picked deliberately rather than copied out of the alert.
+
+Then apply the bump with the manager that owns the manifest:
+
 - **yarn**: run every yarn command from inside `frontend-nx/` — the Yarn 3.4.1 release and
   its settings come from `frontend-nx/.yarnrc.yml`, and the repo root has its own
   `package.json` that must not be touched. `cd frontend-nx && yarn up <pkg>@<version>` for
@@ -101,6 +154,22 @@ not, delete any stale local and remote copy of the branch and cut it fresh from
   `npm install <pkg>@<version> --package-lock-only` for transitive-only.
 - **pip**: edit the pin in `requirements.txt`.
 - **Maven**: bump the `<version>` in the relevant `pom.xml`.
+- **Keycloak** (`keycloak/spi/matrix-handle-listener`): the pom alone remediates **nothing**.
+  All four Keycloak dependencies there are `provided` scope, so the vulnerable code that
+  actually runs is the `quay.io/keycloak/keycloak` base image. A Keycloak bump therefore
+  means all four of these together, or it is not a fix:
+  1. `<keycloak.version>` in `keycloak/spi/matrix-handle-listener/pom.xml`
+  2. the `FROM quay.io/keycloak/keycloak:<tag>` lines in **both** `keycloak/Dockerfile` and
+     `keycloak/Dockerfile-dev`
+  3. `keycloak/libs/matrix-handle-listener.jar`, which is a **committed binary**, rebuilt via
+     `scripts/rebuild-keycloak-matrix-handle-listener.sh` (nothing in CI builds it — the
+     `keycloak-code-checks` workflow only runs `--check`, which compares versions)
+  4. `scripts/rebuild-keycloak-matrix-handle-listener.sh --check` passing, which is what CI
+     enforces
+  Because the shipped artifact is a container image rather than a Maven coordinate, resolve
+  the target tag from Keycloak's own releases (`gh release list --repo keycloak/keycloak`),
+  not from the advisory's `first_patched_version`. Flag in the PR body that this changes the
+  deployed identity provider and needs a login-flow smoke test on staging before promotion.
 
 ## 5. Verify
 

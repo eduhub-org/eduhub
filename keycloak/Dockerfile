@@ -1,4 +1,4 @@
-FROM quay.io/keycloak/keycloak:26.7.0 as builder
+FROM quay.io/keycloak/keycloak:26.7.2 as builder
 
 ENV KC_METRICS_ENABLED=true
 ENV KC_FEATURES=token-exchange
@@ -9,7 +9,7 @@ COPY ./themes/opencampus /opt/keycloak/themes/opencampus
 COPY ./themes/edu-hub /opt/keycloak/themes/edu-hub
 RUN /opt/keycloak/bin/kc.sh build
 
-FROM quay.io/keycloak/keycloak:26.7.0
+FROM quay.io/keycloak/keycloak:26.7.2
 COPY --from=builder /opt/keycloak/lib/quarkus/ /opt/keycloak/lib/quarkus/
 COPY ./libs/keycloak-bcrypt-1.6.0.jar /opt/keycloak/providers/
 COPY ./libs/matrix-handle-listener.jar /opt/keycloak/providers/
