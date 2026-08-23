@@ -249,10 +249,35 @@ requires a major-version bump of X"). When the run produced no triage PR at all,
 nowhere — see section 8; a daily "nothing changed" note on every open Dependabot PR is noise,
 not information.
 
-## 8. Nothing to do
+## 8. Nothing to patch
 
-If there are no patchable alerts and no superseded PRs, open nothing, update nothing, and
-comment nowhere. Just report that.
+Two outcomes here, and they are not the same. Do not conflate them.
+
+**Nothing patchable, nothing superseded, and nothing awaiting a human** → open nothing,
+update nothing, comment nowhere. Just report it.
+
+**Nothing patchable, but alerts still classified NEEDS-MANUAL-DECISION** → those must not
+evaporate into a run log. Once the patchable backlog is clear, this is the steady state:
+every run re-derives the same manual-decision set, and with no PR to write it into, nobody
+ever sees it. Maintain one standing issue, the way preflight does:
+
+1. Search for an open issue titled `Dependabot triage: alerts needing a manual decision`.
+2. If none exists and there is at least one manual-decision alert, open it. List each alert
+   with its package, severity, scope, why it needs a human rather than a bump, and the
+   options — so it can be acted on without re-deriving the analysis.
+3. If one exists, comment **only when the set has changed** since the last comment: an alert
+   added, one that became patchable, one upstream fixed, one whose severity moved. An
+   unchanged set gets no comment — a daily "still N items" note is noise, not information.
+4. When the set empties, close the issue with a comment saying which alerts cleared and how.
+
+Never open one issue per alert. Never use the issue to restate what a triage PR already
+says: when this run created or updated the consolidated PR, that PR body is the record, and
+the issue needs only a link to it.
+
+Items that no future run can resolve on its own deserve particular care here — a fix that
+exists but is out of scope for automated triage (a major runtime bump), or an observation
+that is not an alert at all (drift, inconsistent pins across manifests). Those have no
+automated path to resolution, so the standing issue is the only place they survive.
 
 ## Hard limits
 
