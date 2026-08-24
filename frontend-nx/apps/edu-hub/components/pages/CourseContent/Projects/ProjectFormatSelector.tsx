@@ -181,6 +181,21 @@ const ProjectFormatSelector: FC<ProjectFormatSelectorProps> = ({
                   onValueUpdated={(checked: boolean) => handleClassicToggle(key, checked)}
                 />
               ))}
+              {/*
+                The cover image is not a choice — it is forced on for every
+                classical project by resolveClassicProjectType. It is listed
+                here (checked and disabled) so the deliverables the instructor
+                sees match the ones the team actually has to submit.
+              */}
+              <CheckboxSelector
+                variant={variant}
+                suppressFeedback
+                disabled
+                checked
+                label={t('projects.requirements.requires_cover_image.label')}
+                helpText={t('projects.requirements.requires_cover_image.help_always_required')}
+                onValueUpdated={() => undefined}
+              />
             </div>
             {classicInvalid ? (
               <p className="mt-2 text-xs text-error">

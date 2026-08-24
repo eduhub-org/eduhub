@@ -4,7 +4,11 @@ import { MdCheckCircle, MdRadioButtonUnchecked } from 'react-icons/md';
 import { ProjectStatus_enum } from '../../../../__generated__/globalTypes';
 import { ProjectRow, ProjectTypeRequirements } from './types';
 import { PROJECT_FALLBACK_TITLE } from './projectDefaults';
-import { isProjectResourceUrlPresent, safeProjectInstructionHref } from './projectMandatory';
+import { safeProjectInstructionHref } from './projectMandatory';
+import {
+  getProjectSubmissionRequirements,
+  ProjectSubmissionRequirement,
+} from './SubmissionChecklist';
 import { isOnlineCourseProject } from './projectStatusDisplay';
 
 type TodoItem =
@@ -16,6 +20,19 @@ type TodoItem =
       embeddedLink?: { href: string; label: string };
       labelSuffix?: string;
     }
+
+/** Translation key (under `projects.next_todos.ongoing`) per requirement. */
+const ONGOING_TODO_I18N_KEY: Record<
+  Exclude<ProjectSubmissionRequirement['key'], 'type'>,
+  string
+> = {
+  documentation: 'documentation_upload',
+  presentation: 'presentation_upload',
+  externalUrl: 'external_link',
+  coverImage: 'cover_image_upload',
+  authorsPending: 'authors_pending',
+  authorsNoneAccepted: 'authors_none_accepted',
+};
 
 interface ProjectNextTodosProps {
   project: ProjectRow;
@@ -89,71 +106,52 @@ const ProjectNextTodos: FC<ProjectNextTodosProps> = ({
     }
 
     if (project.status === ProjectStatus_enum.ONGOING) {
-      if (!projectType) {
-        return [
-          {
-            id: 'type',
-            kind: 'task',
-            satisfied: false,
-            label: t('projects.checklist.type_required'),
-          },
-        ];
-      }
-
       const instruction = project.ProjectDocumentationInstruction;
       const instructionHref = safeProjectInstructionHref(instruction?.url);
 
-      const tasks: TodoItem[] = [];
-
-      if (projectType.requiresDocumentation) {
-        const docSatisfied = isProjectResourceUrlPresent(project.documentationUrl);
-        if (instructionHref) {
-          tasks.push({
-            id: 'documentation',
-            kind: 'task',
-            satisfied: docSatisfied,
-            label: t('projects.next_todos.ongoing.documentation_upload_with_instruction_prefix'),
-            labelSuffix: t('projects.next_todos.ongoing.documentation_upload_with_instruction_suffix'),
-            embeddedLink: {
-              href: instructionHref,
-              label: t('projects.next_todos.ongoing.documentation_instruction_link'),
+      // A project sent back for revision (SUBMITTED -> ONGOING stamps sentBackAt)
+      // has all its deliverables in place, so the requirement list below is
+      // empty — the actual open task is acting on the feedback and resubmitting.
+      // It stays unsatisfied until the team submits again.
+      const revisionTask: TodoItem[] = project.sentBackAt
+        ? [
+            {
+              id: 'revise_after_feedback',
+              kind: 'task',
+              satisfied: false,
+              label: t('projects.next_todos.ongoing.revise_after_feedback'),
             },
-          });
-        } else {
-          tasks.push({
-            id: 'documentation',
-            kind: 'task',
-            satisfied: docSatisfied,
-            label: t('projects.next_todos.ongoing.documentation_upload'),
-          });
-        }
-      }
-      if (projectType.requiresPresentation) {
-        tasks.push({
-          id: 'presentation',
-          kind: 'task',
-          satisfied: isProjectResourceUrlPresent(project.presentationUrl),
-          label: t('projects.next_todos.ongoing.presentation_upload'),
-        });
-      }
-      if (projectType.requiresExternalUrl) {
-        tasks.push({
-          id: 'externalUrl',
-          kind: 'task',
-          satisfied: isProjectResourceUrlPresent(project.externalUrl),
-          label: t('projects.next_todos.ongoing.external_link'),
-        });
-      }
-      if (projectType.requiresCoverImage) {
-        tasks.push({
-          id: 'coverImage',
-          kind: 'task',
-          satisfied: Boolean(project.coverImageUrl?.trim()),
-          label: t('projects.checklist.cover_image'),
-        });
-      }
+          ]
+        : [];
 
-      return tasks;
+      // Derived from the same requirement list that gates the submit button, so
+      // a blocker can never be missing from this checklist.
+      return revisionTask.concat(getProjectSubmissionRequirements(project, projectType).map(
+        ({ key, satisfied }): TodoItem => {
+          if (key === 'documentation' && instructionHref) {
+            return {
+              id: key,
+              kind: 'task',
+              satisfied,
+              label: t('projects.next_todos.ongoing.documentation_upload_with_instruction_prefix'),
+              labelSuffix: t('projects.next_todos.ongoing.documentation_upload_with_instruction_suffix'),
+              embeddedLink: {
+                href: instructionHref,
+                label: t('projects.next_todos.ongoing.documentation_instruction_link'),
+              },
+            };
+          }
+          return {
+            id: key,
+            kind: 'task',
+            satisfied,
+            label:
+              key === 'type'
+                ? t('projects.checklist.type_required')
+                : t(`projects.next_todos.ongoing.${ONGOING_TODO_I18N_KEY[key]}` as never),
+          };
+        }
+      ));
     }
 
     return [];
