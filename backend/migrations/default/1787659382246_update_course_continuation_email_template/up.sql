@@ -15,13 +15,13 @@ SET "subject" = 'Bitte keine weiteren Termine verpassen / Please don''t miss fur
   <p>Hallo [User:FirstName] [User:LastName],</p>
   <p>uns ist aufgefallen, dass du bei <strong>[Enrollment:CourseId--Course:Name]</strong> inzwischen so viele Termine verpasst hast, wie für einen erfolgreichen Abschluss maximal möglich ist.</p>
   <p>Wir würden dich gerne weiter dabei haben: Bitte achte darauf, keine weiteren Termine zu verpassen, damit du den Kurs erfolgreich abschließen kannst.</p>
-  <p>Falls du nicht mehr teilnehmen möchtest, gib uns einfach kurz Bescheid oder wende dich an das Kursteam – dann können wir den Platz weitergeben. Den Kurs findest du hier: <a href="[Enrollment:CourseLink]">[Enrollment:CourseLink]</a></p>
+  <p>Falls du nicht mehr teilnehmen möchtest, gib uns einfach kurz Bescheid oder wende dich an das Kursteam – und schreib uns gerne kurz, woran es gelegen hat. Dein Feedback hilft uns, die Kurse besser zu machen. Den Kurs findest du hier: <a href="[Enrollment:CourseLink]">[Enrollment:CourseLink]</a></p>
   <p>Viele Grüße,<br>Dein EduHub Team</p>
   <hr style="margin:2em 0;border:none;border-top:1px solid #ccc;" />
   <p>Hello [User:FirstName] [User:LastName],</p>
   <p>We noticed that you have now missed as many sessions of <strong>[Enrollment:CourseId--Course:Name]</strong> as are allowed for a successful completion.</p>
   <p>We would love to keep you on board: please make sure not to miss any further sessions so that you can still complete the course successfully.</p>
-  <p>If you no longer want to take part, just send us a short note or contact the course team – that way we can offer your spot to someone else. You can find the course here: <a href="[Enrollment:CourseLink]">[Enrollment:CourseLink]</a></p>
+  <p>If you no longer want to take part, just send us a short note or contact the course team – and feel free to tell us briefly what made you stop. Your feedback helps us improve our courses. You can find the course here: <a href="[Enrollment:CourseLink]">[Enrollment:CourseLink]</a></p>
   <p>Best regards,<br>The EduHub Team</p>
   </body></html>',
     "updated_at" = NOW()
