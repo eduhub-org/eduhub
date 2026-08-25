@@ -1,4 +1,7 @@
-const KcAdminClient = require("@keycloak/keycloak-admin-client").default;
+import KcAdminClient from "@keycloak/keycloak-admin-client";
+import { createRequire } from "module";
+
+const require = createRequire(import.meta.url);
 
 let mergeUserPutPayload;
 try {
@@ -26,7 +29,7 @@ function computeMatrixHandle(firstName, lastName, userId) {
   return `${first}.${last}.${uuidPrefix}`;
 }
 
-exports.updateFromKeycloak = async (req, res) => {
+export const updateFromKeycloak = async (req, res) => {
   const expectedSecret = process.env.HASURA_CLOUD_FUNCTION_SECRET;
   if (!expectedSecret) {
     return res.status(500).json({ error: "Server secret not configured" });

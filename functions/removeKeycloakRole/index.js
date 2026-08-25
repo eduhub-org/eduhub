@@ -1,5 +1,4 @@
 import KcAdminClient from '@keycloak/keycloak-admin-client';
-import bodyParser from "body-parser";
 import { createRequire } from 'module';
 
 const require = createRequire(import.meta.url);
