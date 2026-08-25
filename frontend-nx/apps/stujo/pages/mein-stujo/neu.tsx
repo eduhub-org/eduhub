@@ -5,6 +5,8 @@ import { signIn, useSession } from 'next-auth/react';
 import { FC, useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
+import { useCurrentUserId } from '@eduhub/hooks/authentication';
+
 import Layout from '../../components/Layout';
 import JobCard from '../../components/JobCard';
 import {
@@ -14,10 +16,10 @@ import {
   GET_JOB_POSTING_FOR_EDIT,
   MY_JOB_ORGANIZATIONS,
   MY_JOB_POSTINGS,
-  ORG_ADMIN_ROLE_CONTEXT,
   PUBLISH_JOB_POSTING_ACTION,
   SAVE_JOB_POSTING_PDF,
   UPDATE_JOB_POSTING,
+  useEmployerRoleContext,
 } from '../../lib/employer';
 import { resolvePortal, PortalBranding } from '../../lib/portal';
 import { resolveStorageUrl } from '../../lib/storage';
@@ -65,10 +67,10 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
   const tOccupation = useTranslations('jobOccupation');
   const tRegion = useTranslations('jobRegion');
   const router = useRouter();
-  const { data: session, status: sessionStatus } = useSession();
+  const { status: sessionStatus } = useSession();
   // Contact for status mails (published/expired/payment failed) and the
   // Stripe customer — without it those flows silently do nothing.
-  const currentUserId = (session as any)?.profile?.sub ?? null;
+  const currentUserId = useCurrentUserId();
   const editId = typeof router.query.id === 'string' ? Number(router.query.id) : null;
 
   const [step, setStep] = useState<1 | 2>(1);
@@ -80,30 +82,33 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
 
+  const employerRole = useEmployerRoleContext();
+
   const { data: orgData, loading: orgsLoading } = useQuery(MY_JOB_ORGANIZATIONS, {
-    context: ORG_ADMIN_ROLE_CONTEXT,
-    skip: sessionStatus !== 'authenticated',
+    context: employerRole,
+    variables: { userId: currentUserId },
+    skip: sessionStatus !== 'authenticated' || !currentUserId,
   });
   const organization = orgData?.OrganizationAdmin?.[0]?.Organization ?? null;
 
   const { data: enums } = useQuery(ENUM_OPTIONS);
   const { data: priceData } = useQuery(MY_JOB_POSTINGS, {
-    context: ORG_ADMIN_ROLE_CONTEXT,
+    context: employerRole,
     variables: { organizationId: organization?.id ?? 0 },
     skip: !organization,
   });
 
   const { data: editData } = useQuery(GET_JOB_POSTING_FOR_EDIT, {
-    context: ORG_ADMIN_ROLE_CONTEXT,
+    context: employerRole,
     variables: { id: editId ?? 0 },
     skip: editId === null,
   });
 
   const [createPosting, { loading: creating }] = useMutation(CREATE_JOB_POSTING, {
-    context: ORG_ADMIN_ROLE_CONTEXT,
+    context: employerRole,
   });
   const [updatePosting, { loading: updating }] = useMutation(UPDATE_JOB_POSTING, {
-    context: ORG_ADMIN_ROLE_CONTEXT,
+    context: employerRole,
   });
   const [publishPosting, { loading: publishing }] = useMutation(PUBLISH_JOB_POSTING_ACTION, {
     context: ACTION_ROLE_CONTEXT,

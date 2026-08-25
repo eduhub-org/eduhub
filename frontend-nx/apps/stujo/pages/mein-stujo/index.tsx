@@ -6,14 +6,16 @@ import { signIn, useSession } from 'next-auth/react';
 import { FC, useEffect, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
+import { useCurrentUserId } from '@eduhub/hooks/authentication';
+
 import Layout from '../../components/Layout';
 import {
   ACTION_ROLE_CONTEXT,
   ARCHIVE_JOB_POSTING_ACTION,
   MY_JOB_ORGANIZATIONS,
   MY_JOB_POSTINGS,
-  ORG_ADMIN_ROLE_CONTEXT,
   PUBLISH_JOB_POSTING_ACTION,
+  useEmployerRoleContext,
 } from '../../lib/employer';
 import { resolvePortal, PortalBranding } from '../../lib/portal';
 
@@ -48,14 +50,18 @@ const MeinStujo: FC<Props> = ({ portal }) => {
   const { status: sessionStatus } = useSession();
   const [notice, setNotice] = useState<string | null>(null);
 
+  const employerRole = useEmployerRoleContext();
+  const currentUserId = useCurrentUserId();
+
   const { data: orgData, loading: orgsLoading } = useQuery(MY_JOB_ORGANIZATIONS, {
-    context: ORG_ADMIN_ROLE_CONTEXT,
-    skip: sessionStatus !== 'authenticated',
+    context: employerRole,
+    variables: { userId: currentUserId },
+    skip: sessionStatus !== 'authenticated' || !currentUserId,
   });
   const organization = orgData?.OrganizationAdmin?.[0]?.Organization ?? null;
 
   const { data, loading, refetch } = useQuery(MY_JOB_POSTINGS, {
-    context: ORG_ADMIN_ROLE_CONTEXT,
+    context: employerRole,
     variables: { organizationId: organization?.id ?? 0 },
     skip: !organization,
   });
