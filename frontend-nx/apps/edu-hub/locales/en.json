@@ -566,6 +566,7 @@
         "action_tooltip_join_requests_none": "There are no open join requests at the moment.",
         "submitted_banner": "Submitted on {date} by {name}. The team has been locked from changes.",
         "review_comment_label": "Feedback from the course team",
+        "review_comment_label_previous_round": "Feedback from the course team on the previous version",
         "sent_back_banner": "Your project was sent back for revisions. Please update it and submit again.",
         "deadline_passed_banner": "The submission deadline passed on {date}.",
         "excluded_banner": "The submitting author excluded you from this project's final submission. You no longer count as one of its authors."
@@ -1476,6 +1477,8 @@
           "custom_label": "New submission deadline",
           "custom_invalid": "Pick a date that is not in the past."
         },
+        "previous_comment_label": "Your feedback on the previous version",
+        "previous_comment_hint": "Kept for reference while you review this revision. Confirming your decision replaces it with the comment below.",
         "comment_label": "Comment (optional)",
         "comment_placeholder": "Notes for the project team (visible where project details are shown, and included in the notification email)",
         "confirm_button": "Confirm"

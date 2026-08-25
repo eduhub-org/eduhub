@@ -34,6 +34,7 @@ import ProjectReviewComment from '../CourseContent/Projects/ProjectReviewComment
 import { getDisplayAuthors } from '../CourseContent/Projects/projectAuthors';
 import {
   getProjectStatusChipKey,
+  isProjectReviewCommentFromPreviousRound,
   PROJECT_TYPE_ONLINE_COURSE,
   shouldShowProjectResourceDownloadLinks,
 } from '../CourseContent/Projects/projectStatusDisplay';
@@ -302,7 +303,10 @@ const ManageProjectsContent: FC<ManageProjectsContentProps> = ({ inSettingsLayou
   const expandableRowComponent = useCallback(
     ({ row }: { row: AdminProjectList_Project }) => (
       <div className="p-4 space-y-4">
-        <ProjectReviewComment ratingComment={row.ratingComment} />
+        <ProjectReviewComment
+          ratingComment={row.ratingComment}
+          fromPreviousRound={isProjectReviewCommentFromPreviousRound(row.status)}
+        />
         <ProjectPreviewLayout
           project={row as ProjectRow}
           showResourceLinks={shouldShowProjectResourceDownloadLinks(row.status)}

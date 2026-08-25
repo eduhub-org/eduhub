@@ -11,9 +11,17 @@ import { createProjectVariableReplacer } from '../emailTemplateVariables.js';
  *   - send_project_status_email on public.Project (UPDATE of status)
  *
  * Review emails (approved / sent back / rejected) carry the instructor's
- * ratingComment via [Project:ReviewComment]. ReviewProjectDialog saves that
- * comment before it changes the status, and the trigger only fires on status,
+ * ratingComment via [Project:ReviewComment]. ReviewProjectDialog writes the
+ * comment in the same statement as the status change that fires this trigger,
  * so the comment is already persisted when this reads the project back.
+ *
+ * ratingComment now survives a resubmission (the previous round's feedback
+ * stays readable while the revision is reviewed), so between a send-back and
+ * the next verdict the column holds last round's text. Only the three review
+ * templates above are sent at a moment when a verdict has just been written;
+ * the default PROJECT_SUBMITTED template deliberately does not use
+ * [Project:ReviewComment], since there it would repeat feedback the team has
+ * already acted on.
  *
  * The originating table is read from req.body.table.name so a single function
  * can serve both triggers.

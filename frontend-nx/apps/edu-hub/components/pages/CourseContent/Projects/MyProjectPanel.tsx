@@ -39,6 +39,7 @@ import {
 } from './projectEffectiveSubmissionDeadline';
 import {
   isOnlineCourseProject,
+  isProjectReviewCommentFromPreviousRound,
   shouldShowProjectResourceDownloadLinks,
 } from './projectStatusDisplay';
 import ProjectNextTodos from './ProjectNextTodos';
@@ -499,7 +500,10 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
         <div className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-900">
           {t('projects.my_project.excluded_banner')}
         </div>
-        <ProjectReviewComment ratingComment={project.ratingComment} />
+        <ProjectReviewComment
+        ratingComment={project.ratingComment}
+        fromPreviousRound={isProjectReviewCommentFromPreviousRound(project.status)}
+      />
         <div className="rounded-lg border border-border-primary p-4 bg-bg-secondary/30">
           <ProjectPreviewLayout
             project={project}
@@ -663,7 +667,10 @@ const MyProjectPanel: FC<MyProjectPanelProps> = ({
         </div>
       ) : null}
 
-      <ProjectReviewComment ratingComment={project.ratingComment} />
+      <ProjectReviewComment
+          ratingComment={project.ratingComment}
+          fromPreviousRound={isProjectReviewCommentFromPreviousRound(project.status)}
+        />
 
       <div className="space-y-3 min-w-0">
         {!isDeadlinePassed &&

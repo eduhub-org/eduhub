@@ -566,6 +566,7 @@
         "action_tooltip_join_requests_none": "Es gibt derzeit keine offenen Beitrittsanfragen.",
         "submitted_banner": "Am {date} eingereicht von {name}. Das Projekt ist nun für Änderungen gesperrt.",
         "review_comment_label": "Rückmeldung der Kursleitung",
+        "review_comment_label_previous_round": "Rückmeldung der Kursleitung zur vorherigen Version",
         "sent_back_banner": "Dein Projekt wurde zur Überarbeitung zurückgegeben. Bitte aktualisiere es und reiche erneut ein.",
         "deadline_passed_banner": "Die Abgabefrist ist am {date} abgelaufen.",
         "excluded_banner": "Die einreichende Person hat Dich von der finalen Einreichung dieses Projekts ausgeschlossen. Du zählst nicht mehr zu den Autor:innen."
@@ -1444,6 +1445,8 @@
         "revise_description": "Das Team kann das Projekt überarbeiten und erneut einreichen.",
         "reject_title": "Als nicht bestanden ablehnen",
         "reject_description": "Das Projekt wird als nicht bestanden markiert.",
+        "previous_comment_label": "Deine Rückmeldung zur vorherigen Version",
+        "previous_comment_hint": "Bleibt zur Orientierung stehen, während du die Überarbeitung prüfst. Mit dem Bestätigen deiner Entscheidung wird sie durch den Kommentar unten ersetzt.",
         "comment_label": "Kommentar (optional)",
         "comment_placeholder": "Hinweise für das Projektteam (sichtbar, wo Projektdetails angezeigt werden, und in der Benachrichtigungs-E-Mail)",
         "confirm_button": "Bestätigen",

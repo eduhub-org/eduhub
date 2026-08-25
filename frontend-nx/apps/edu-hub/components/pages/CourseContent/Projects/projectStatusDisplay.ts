@@ -120,6 +120,24 @@ export function shouldShowProjectResourceDownloadLinks(
 }
 
 /**
+ * Whether a stored `ratingComment` predates the review round currently in
+ * flight.
+ *
+ * The set_project_submitted_metadata trigger keeps the comment across a
+ * resubmission (so the course team can still see what they asked for while they
+ * review the revision) but always resets the rating to UNRATED. A project in
+ * SUBMITTED therefore carries no verdict of its own, and whatever comment sits
+ * on the row is the previous round's — worth labelling as such, and worth
+ * keeping out of the review dialog's input so it can never be mailed out again
+ * as feedback on a verdict nobody wrote it for.
+ */
+export function isProjectReviewCommentFromPreviousRound(
+  status: ProjectStatus_enum | string
+): boolean {
+  return status === ProjectStatus_enum.SUBMITTED;
+}
+
+/**
  * Project type and documentation instruction stay editable until the team
  * submits. Instructors and mentors may still correct the type after confirming
  * the team (PROPOSED -> ONGOING), including after a send-back

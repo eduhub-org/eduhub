@@ -17,6 +17,7 @@ import {
   getEffectiveProjectSubmissionDeadlineIso,
   isProjectSubmissionDeadlinePassed,
 } from '../../../CourseContent/Projects/projectEffectiveSubmissionDeadline';
+import { isProjectReviewCommentFromPreviousRound } from '../../../CourseContent/Projects/projectStatusDisplay';
 import ReviewDeadlineExtensionField from './ReviewDeadlineExtensionField';
 import {
   DeadlineExtensionChoice,
@@ -182,7 +183,16 @@ const ReviewProjectDialog: FC<ReviewProjectDialogProps> = ({
           ? 'reject'
           : null
     );
-    setRatingComment(project.ratingComment?.trim() ? project.ratingComment : '');
+    // A comment stored on a SUBMITTED project is the previous round's (see
+    // isProjectReviewCommentFromPreviousRound). It is shown read-only below
+    // instead of prefilled: an untouched box on an approval used to mail last
+    // round's revision request back out as the feedback on a passed project.
+    setRatingComment(
+      isProjectReviewCommentFromPreviousRound(project.status) ||
+        !project.ratingComment?.trim()
+        ? ''
+        : project.ratingComment
+    );
     // A deadline still running may simply stay as it is; one that has passed
     // needs a deliberate decision, so it starts out unselected.
     setDeadlineChoice(
@@ -197,6 +207,13 @@ const ReviewProjectDialog: FC<ReviewProjectDialogProps> = ({
   }, [open, project, courseDefaultSubmissionDeadline]);
 
   const busy = verdictState.loading;
+
+  // Only surfaced while the project is back in review; on any other status the
+  // stored comment is this round's and lives in the input below.
+  const previousRoundComment =
+    project && isProjectReviewCommentFromPreviousRound(project.status)
+      ? project.ratingComment?.trim() || null
+      : null;
 
   const deadlineConfirmable =
     verdict !== 'revise' ||
@@ -294,6 +311,20 @@ const ReviewProjectDialog: FC<ReviewProjectDialogProps> = ({
               isDeadlinePassed={isDeadlinePassed}
               disabled={busy}
             />
+          ) : null}
+
+          {previousRoundComment ? (
+            <div className="rounded-lg border-l-2 border-brand bg-bg-secondary p-3 space-y-1">
+              <p className="text-xs font-semibold text-label-primary">
+                {t('projects.evaluate_dialog.previous_comment_label')}
+              </p>
+              <p className="whitespace-pre-line break-words text-sm text-label-secondary">
+                {previousRoundComment}
+              </p>
+              <p className="text-xs text-label-secondary">
+                {t('projects.evaluate_dialog.previous_comment_hint')}
+              </p>
+            </div>
           ) : null}
 
           <label className="block">

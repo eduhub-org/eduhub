@@ -68,7 +68,11 @@ import {
 import { translateErrorMessage } from '../../../../../helpers/errorHandling';
 import { PROJECT_TAGLINE_MAX_LENGTH } from '../../../CourseContent/Projects/projectDefaults';
 import StatusChip from '../../../CourseContent/Projects/StatusChip';
-import { isProjectTypeEditable, canManagePublicationSuggestion } from '../../../CourseContent/Projects/projectStatusDisplay';
+import {
+  isProjectTypeEditable,
+  isProjectReviewCommentFromPreviousRound,
+  canManagePublicationSuggestion,
+} from '../../../CourseContent/Projects/projectStatusDisplay';
 import ProjectPreviewLayout from '../../../CourseContent/Projects/ProjectPreviewLayout';
 import ProjectReviewComment from '../../../CourseContent/Projects/ProjectReviewComment';
 import ProjectFormFieldSection from '../../../CourseContent/Projects/ProjectFormFieldSection';
@@ -816,7 +820,10 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
             {authorMentorSection}
 
             <div className="border-t border-border-primary pt-5 space-y-4">
-              <ProjectReviewComment ratingComment={row.ratingComment} />
+              <ProjectReviewComment
+                ratingComment={row.ratingComment}
+                fromPreviousRound={isProjectReviewCommentFromPreviousRound(row.status)}
+              />
               <ProjectSubmissionDeadlineBelowTitle
                 mode="instructor"
                 project={row}
@@ -965,7 +972,10 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
           {authorMentorSection}
 
           <div className="border-t border-border-primary pt-5 space-y-3">
-            <ProjectReviewComment ratingComment={row.ratingComment} />
+            <ProjectReviewComment
+              ratingComment={row.ratingComment}
+              fromPreviousRound={isProjectReviewCommentFromPreviousRound(row.status)}
+            />
             <ProjectSubmissionDeadlineBelowTitle
               mode="instructor"
               project={row}
