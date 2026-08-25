@@ -48,6 +48,7 @@
     "newOffer": "+ New offer",
     "checkingLogin": "Checking sign-in …",
     "noOrganization": "No company with job management is assigned to your account yet. Please contact {contact}.",
+    "organizationLabel": "Company",
     "defaultContact": "the StuJo team",
     "loading": "Loading …",
     "noOffers": "No offers yet – create your first one via “+ New offer”.",

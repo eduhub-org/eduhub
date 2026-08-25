@@ -438,6 +438,39 @@ a:focus {
   margin-bottom: 1rem;
 }
 
+/* Company picker, shown only when a user may post for several organizations. */
+.stujo-org-switcher {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin: 0.25rem 0 0.75rem;
+  font-size: 0.8rem;
+}
+
+.stujo-org-switcher select {
+  max-width: 20rem;
+  padding: 0.3rem 0.6rem;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--stujo-text);
+  background: #fff;
+  border: 2px solid var(--stujo-border);
+  border-radius: 0;
+}
+
+@media (max-width: 640px) {
+  .stujo-dash-head {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .stujo-org-switcher select {
+    max-width: none;
+    /* Comfortable touch target on phones. */
+    min-height: 44px;
+  }
+}
+
 .stujo-stats {
   display: flex;
   gap: 1rem;

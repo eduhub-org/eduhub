@@ -48,6 +48,7 @@
     "newOffer": "+ Neues Angebot",
     "checkingLogin": "Anmeldung wird geprüft …",
     "noOrganization": "Deinem Konto ist noch kein Unternehmen mit Stellen-Verwaltung zugeordnet. Bitte wende Dich an {contact}.",
+    "organizationLabel": "Unternehmen",
     "defaultContact": "das StuJo-Team",
     "loading": "Lädt …",
     "noOffers": "Noch keine Angebote – erstelle Dein erstes über „+ Neues Angebot“.",

@@ -33,7 +33,10 @@ export const ACTION_ROLE_CONTEXT = { role: 'user' };
 
 export const MY_JOB_ORGANIZATIONS = gql`
   query MyJobOrganizations($userId: uuid!) {
-    OrganizationAdmin(where: { userId: { _eq: $userId }, canManageJobs: { _eq: true } }) {
+    OrganizationAdmin(
+      where: { userId: { _eq: $userId }, canManageJobs: { _eq: true } }
+      order_by: { Organization: { name: asc } }
+    ) {
       id
       organizationId
       Organization {

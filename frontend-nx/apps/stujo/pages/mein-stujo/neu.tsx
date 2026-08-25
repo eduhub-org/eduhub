@@ -2,25 +2,26 @@ import { useMutation, useQuery } from '@apollo/client';
 import type { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
 import { signIn, useSession } from 'next-auth/react';
-import { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
 import { useCurrentUserId } from '@eduhub/hooks/authentication';
 
 import Layout from '../../components/Layout';
 import JobCard from '../../components/JobCard';
+import OrganizationSwitcher from '../../components/OrganizationSwitcher';
 import {
   ACTION_ROLE_CONTEXT,
   CREATE_JOB_POSTING,
   ENUM_OPTIONS,
   GET_JOB_POSTING_FOR_EDIT,
-  MY_JOB_ORGANIZATIONS,
   MY_JOB_POSTINGS,
   PUBLISH_JOB_POSTING_ACTION,
   SAVE_JOB_POSTING_PDF,
   UPDATE_JOB_POSTING,
   useEmployerRoleContext,
 } from '../../lib/employer';
+import { useEmployerOrganization } from '../../lib/useEmployerOrganization';
 import { resolvePortal, PortalBranding } from '../../lib/portal';
 import { resolveStorageUrl } from '../../lib/storage';
 
@@ -63,6 +64,7 @@ const EMPTY_FORM: FormState = {
  * postings go live directly, paid ones redirect to Stripe Checkout.
  */
 const NeuesAngebot: FC<Props> = ({ portal }) => {
+  const t = useTranslations('meinStujo');
   const tType = useTranslations('jobType');
   const tOccupation = useTranslations('jobOccupation');
   const tRegion = useTranslations('jobRegion');
@@ -83,25 +85,37 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
 
   const employerRole = useEmployerRoleContext();
-
-  const { data: orgData, loading: orgsLoading } = useQuery(MY_JOB_ORGANIZATIONS, {
-    context: employerRole,
-    variables: { userId: currentUserId },
-    skip: sessionStatus !== 'authenticated' || !currentUserId,
-  });
-  const organization = orgData?.OrganizationAdmin?.[0]?.Organization ?? null;
+  const {
+    organizations,
+    organization: selectedOrganization,
+    loading: orgsLoading,
+    selectOrganization,
+  } = useEmployerOrganization();
 
   const { data: enums } = useQuery(ENUM_OPTIONS);
-  const { data: priceData } = useQuery(MY_JOB_POSTINGS, {
-    context: employerRole,
-    variables: { organizationId: organization?.id ?? 0 },
-    skip: !organization,
-  });
 
   const { data: editData } = useQuery(GET_JOB_POSTING_FOR_EDIT, {
     context: employerRole,
     variables: { id: editId ?? 0 },
     skip: editId === null,
+  });
+
+  // An existing posting keeps the organization it was created for — the update
+  // path never writes organizationId — so editing must show that one rather than
+  // whatever the switcher last selected.
+  const organization = useMemo(() => {
+    const postingOrganizationId = editData?.JobPosting_by_pk?.organizationId ?? null;
+    if (postingOrganizationId === null) return selectedOrganization;
+    return (
+      organizations.find((candidate) => candidate.id === postingOrganizationId) ??
+      selectedOrganization
+    );
+  }, [editData, organizations, selectedOrganization]);
+
+  const { data: priceData } = useQuery(MY_JOB_POSTINGS, {
+    context: employerRole,
+    variables: { organizationId: organization?.id ?? 0 },
+    skip: !organization,
   });
 
   const [createPosting, { loading: creating }] = useMutation(CREATE_JOB_POSTING, {
@@ -193,6 +207,9 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
 
   const saveDraft = async (): Promise<number | null> => {
     setErrorMessage(null);
+    // The form only renders once an organization is resolved, so this is
+    // unreachable — it keeps the create branch below type-safe.
+    if (!organization) return null;
     try {
       let id = savedId;
       if (id) {
@@ -312,6 +329,19 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
   return (
     <Layout portal={portal}>
       <h1>{editId ? 'Angebot bearbeiten' : 'Neues Stellenangebot'}</h1>
+      {organizations.length > 1 &&
+        (editId === null ? (
+          <OrganizationSwitcher
+            organizations={organizations}
+            selectedId={organization.id}
+            label={t('organizationLabel')}
+            onSelect={selectOrganization}
+          />
+        ) : (
+          <p className="stujo-muted" style={{ margin: '0 0 0.75rem' }}>
+            {t('organizationLabel')}: {organization.name}
+          </p>
+        ))}
       <div className="stujo-steps">
         <span className={step === 1 ? 'stujo-step stujo-step--active' : 'stujo-step'}>
           1 · Angebot erstellen

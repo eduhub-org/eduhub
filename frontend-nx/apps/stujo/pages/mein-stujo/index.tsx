@@ -6,17 +6,16 @@ import { signIn, useSession } from 'next-auth/react';
 import { FC, useEffect, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
-import { useCurrentUserId } from '@eduhub/hooks/authentication';
-
 import Layout from '../../components/Layout';
+import OrganizationSwitcher from '../../components/OrganizationSwitcher';
 import {
   ACTION_ROLE_CONTEXT,
   ARCHIVE_JOB_POSTING_ACTION,
-  MY_JOB_ORGANIZATIONS,
   MY_JOB_POSTINGS,
   PUBLISH_JOB_POSTING_ACTION,
   useEmployerRoleContext,
 } from '../../lib/employer';
+import { useEmployerOrganization } from '../../lib/useEmployerOrganization';
 import { resolvePortal, PortalBranding } from '../../lib/portal';
 
 type Props = { portal: PortalBranding };
@@ -51,14 +50,12 @@ const MeinStujo: FC<Props> = ({ portal }) => {
   const [notice, setNotice] = useState<string | null>(null);
 
   const employerRole = useEmployerRoleContext();
-  const currentUserId = useCurrentUserId();
-
-  const { data: orgData, loading: orgsLoading } = useQuery(MY_JOB_ORGANIZATIONS, {
-    context: employerRole,
-    variables: { userId: currentUserId },
-    skip: sessionStatus !== 'authenticated' || !currentUserId,
-  });
-  const organization = orgData?.OrganizationAdmin?.[0]?.Organization ?? null;
+  const {
+    organizations,
+    organization,
+    loading: orgsLoading,
+    selectOrganization,
+  } = useEmployerOrganization();
 
   const { data, loading, refetch } = useQuery(MY_JOB_POSTINGS, {
     context: employerRole,
@@ -178,9 +175,18 @@ const MeinStujo: FC<Props> = ({ portal }) => {
       <div className="stujo-dash-head">
         <div>
           <h1 style={{ margin: 0 }}>{t('title')}</h1>
-          <p className="stujo-muted" style={{ margin: '0.25rem 0 0' }}>
-            {organization.name}
-          </p>
+          {organizations.length > 1 ? (
+            <OrganizationSwitcher
+              organizations={organizations}
+              selectedId={organization.id}
+              label={t('organizationLabel')}
+              onSelect={selectOrganization}
+            />
+          ) : (
+            <p className="stujo-muted" style={{ margin: '0.25rem 0 0' }}>
+              {organization.name}
+            </p>
+          )}
         </div>
         <Link href="/mein-stujo/neu" className="stujo-btn stujo-btn--primary">
           {t('newOffer')}
