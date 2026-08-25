@@ -100,7 +100,9 @@ insert_permissions:
         - tagline
         - title
         - type
-  # Same rules as user_access self-propose; instructors no longer inherit user_access (see inherited_roles).
+  # Same rules as user_access self-propose. Both roles define this insert identically and neither
+  # uses a preset, so Hasura merges them cleanly for the inherited `instructor` role and no
+  # explicit `- role: instructor` override is needed here (unlike Project update below).
   - role: instructor_access
     permission:
       check:
