@@ -16,9 +16,14 @@ MAIL_TYPE = "COURSE_CONTINUATION_INQUIRY"
 def check_course_continuation(arguments):
     """
     For running courses with a maxMissedSessions limit, finds active
-    (CONFIRMED/REGISTERED) enrollees whose number of MISSED sessions has
-    *exceeded* that limit and asks them (once, deduped via MailLog metadata)
-    whether they intend to continue the course.
+    (CONFIRMED/REGISTERED) enrollees who have *reached* that limit and asks
+    them (once, deduped via MailLog metadata) to attend the remaining
+    sessions or to let us know if they no longer want to take part.
+
+    The mail goes out as soon as the limit is reached - i.e. after the last
+    absence that still allows a successful completion - so participants get
+    a heads-up while they can still act on it, instead of only once the
+    limit is already blown.
 
     Returns:
         dict: { success, data: { notifiedCount } } or { success, error }
@@ -62,8 +67,8 @@ def check_course_continuation(arguments):
             logging.warning(f"{MAIL_TYPE} template missing; skipping")
             return {"success": True, "data": {"notifiedCount": 0}}
 
-        # Collect everyone over their course's limit first, so the dedup lookup
-        # can be restricted to this run's candidates.
+        # Collect everyone at or over their course's limit first, so the dedup
+        # lookup can be restricted to this run's candidates.
         candidates = []
         for course in courses:
             max_missed = course.get("maxMissedSessions")
@@ -83,8 +88,12 @@ def check_course_continuation(arguments):
                 uid = user.get("id")
                 if not uid or not user.get("email"):
                     continue
-                if missed_by_user.get(uid, 0) <= max_missed:
-                    continue  # only when the limit is EXCEEDED
+                missed = missed_by_user.get(uid, 0)
+                # Reaching the limit is the trigger, not exceeding it. A
+                # course allowing 0 missed sessions still needs one actual
+                # absence before there is anything to write about.
+                if missed < max(max_missed, 1):
+                    continue
                 candidates.append({"courseId": course["id"], "userId": uid, "course": course, "user": user})
 
         key_fields = ["courseId", "userId"]
