@@ -14,6 +14,7 @@ import {
  *
  * Flow (agreed 2026-07-10):
  * - Free type (price 0, e.g. MINIJOB)  -> publish immediately
+ * - Unlimited JobPostingCredit          -> publish, nothing consumed
  * - Available JobPostingCredit          -> consume one credit, publish
  * - Otherwise                           -> status PENDING_PAYMENT + Stripe
  *   Checkout Session (card, SEPA debit, bank transfer; net price + fixed
@@ -60,14 +61,17 @@ const GET_CREDIT = gql`
     JobPostingCredit(
       where: {
         organizationId: { _eq: $organizationId }
-        remaining: { _gt: 0 }
-        _or: [{ jobPostingType: { _eq: $type } }, { jobPostingType: { _is_null: true } }]
+        _and: [
+          { _or: [{ remaining: { _gt: 0 } }, { unlimited: { _eq: true } }] }
+          { _or: [{ jobPostingType: { _eq: $type } }, { jobPostingType: { _is_null: true } }] }
+        ]
       }
-      order_by: { jobPostingType: desc_nulls_last }
+      order_by: [{ unlimited: desc }, { jobPostingType: desc_nulls_last }]
       limit: 1
     ) {
       id
       remaining
+      unlimited
     }
   }
 `;
@@ -268,12 +272,29 @@ export default async function publishJobPosting(req, logger) {
       return { success: true, published: true, paid: false, expiresAt: expiresAt.toISOString() };
     }
 
-    // 2. Consume a credit when one is available (type-specific wins over generic).
+    // 2. Consume a credit when one is available. An unlimited grant (admin
+    // "Unbegrenzt") publishes for free without decrementing; among countable
+    // credits a type-specific one wins over the generic one.
     const creditData = await client.request(GET_CREDIT, {
       organizationId: posting.organizationId,
       type: posting.type,
     });
     const credit = creditData.JobPostingCredit?.[0];
+    if (credit?.unlimited) {
+      const { expiresAt } = await publishAndNotify(
+        client,
+        logger,
+        { ...posting, paymentDescription: 'Kontingent (unbegrenzt)' },
+        durationDays
+      );
+      return {
+        success: true,
+        published: true,
+        paid: false,
+        usedCredit: true,
+        expiresAt: expiresAt.toISOString(),
+      };
+    }
     if (credit) {
       const consumed = await client.request(CONSUME_CREDIT, {
         id: credit.id,

@@ -15,6 +15,7 @@ import {
   ORG_ADMIN_ROLE_CONTEXT,
   PUBLISH_JOB_POSTING_ACTION,
 } from '../../lib/employer';
+import { summarizeCredits } from '../../lib/credits';
 import { resolvePortal, PortalBranding } from '../../lib/portal';
 
 type Props = { portal: PortalBranding };
@@ -139,10 +140,7 @@ const MeinStujo: FC<Props> = ({ portal }) => {
   const stats = useMemo(() => {
     const postings = data?.JobPosting ?? [];
     const active = postings.filter((posting: any) => posting.status === 'PUBLISHED');
-    const credits = (organization?.JobPostingCredits ?? []).reduce(
-      (sum: number, credit: any) => sum + credit.remaining,
-      0
-    );
+    const credits = summarizeCredits(organization?.JobPostingCredits);
     return {
       active: active.length,
       views: active.reduce((sum: number, posting: any) => sum + (posting.views ?? 0), 0),
@@ -187,7 +185,11 @@ const MeinStujo: FC<Props> = ({ portal }) => {
         {[
           [t('statActiveOffers'), String(stats.active), false],
           [t('statTotalViews'), String(stats.views), false],
-          [t('statFreeCredits'), String(stats.credits), true],
+          [
+            t('statFreeCredits'),
+            stats.credits.unlimited ? t('statFreeCreditsUnlimited') : String(stats.credits.total),
+            true,
+          ],
         ].map(([label, value, accent]) => (
           <div key={label as string} className={`stujo-stat${accent ? ' stujo-stat--accent' : ''}`}>
             <div className="stujo-muted" style={{ fontSize: '0.8rem' }}>

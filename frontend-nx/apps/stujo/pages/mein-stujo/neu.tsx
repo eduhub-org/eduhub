@@ -19,6 +19,7 @@ import {
   SAVE_JOB_POSTING_PDF,
   UPDATE_JOB_POSTING,
 } from '../../lib/employer';
+import { summarizeCredits } from '../../lib/credits';
 import { resolvePortal, PortalBranding } from '../../lib/portal';
 import { resolveStorageUrl } from '../../lib/storage';
 
@@ -244,10 +245,7 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
   const price = priceData?.JobPostingPrice?.find((row: any) => row.jobPostingType === form.type);
   const netPrice = price?.price ?? 0;
   const grossPrice = Math.round(netPrice * (1 + (Number(price?.vatRate ?? 19) || 19) / 100));
-  const credits = (organization?.JobPostingCredits ?? []).reduce(
-    (sum: number, credit: any) => sum + credit.remaining,
-    0
-  );
+  const credits = summarizeCredits(organization?.JobPostingCredits);
   const busy = creating || updating || publishing || uploadingPdf;
 
   const field = (
@@ -419,10 +417,15 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
               <p>
                 <b>Kostenlos</b> – Minijob-Angebote sind gratis und werden sofort veröffentlicht.
               </p>
-            ) : credits > 0 ? (
+            ) : credits.unlimited ? (
               <p>
-                Du hast <b>{credits} Gratis-Kontingent{credits > 1 ? 'e' : ''}</b> – dieses Angebot
-                wird ohne Zahlung veröffentlicht.
+                Du kannst <b>unbegrenzt kostenlos veröffentlichen</b> – dieses Angebot wird ohne
+                Zahlung veröffentlicht.
+              </p>
+            ) : credits.total > 0 ? (
+              <p>
+                Du hast <b>{credits.total} Gratis-Kontingent{credits.total > 1 ? 'e' : ''}</b> –
+                dieses Angebot wird ohne Zahlung veröffentlicht.
               </p>
             ) : (
               <>
@@ -466,7 +469,7 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
               </button>
             ) : (
               <button className="stujo-btn stujo-btn--accent" disabled={busy} onClick={publish}>
-                {netPrice === 0 || credits > 0
+                {netPrice === 0 || credits.hasFree
                   ? 'Jetzt veröffentlichen'
                   : `Kostenpflichtig veröffentlichen · ${(grossPrice / 100).toFixed(2).replace('.', ',')} €`}
               </button>
