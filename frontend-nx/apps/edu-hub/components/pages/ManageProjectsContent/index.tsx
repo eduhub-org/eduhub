@@ -30,6 +30,7 @@ import { Button } from '../../common/Button';
 
 import StatusChip from '../CourseContent/Projects/StatusChip';
 import ProjectPreviewLayout from '../CourseContent/Projects/ProjectPreviewLayout';
+import ProjectReviewComment from '../CourseContent/Projects/ProjectReviewComment';
 import { getDisplayAuthors } from '../CourseContent/Projects/projectAuthors';
 import {
   getProjectStatusChipKey,
@@ -300,7 +301,8 @@ const ManageProjectsContent: FC<ManageProjectsContentProps> = ({ inSettingsLayou
 
   const expandableRowComponent = useCallback(
     ({ row }: { row: AdminProjectList_Project }) => (
-      <div className="p-4">
+      <div className="p-4 space-y-4">
+        <ProjectReviewComment ratingComment={row.ratingComment} />
         <ProjectPreviewLayout
           project={row as ProjectRow}
           showResourceLinks={shouldShowProjectResourceDownloadLinks(row.status)}
