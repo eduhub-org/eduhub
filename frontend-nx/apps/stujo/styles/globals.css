@@ -433,6 +433,8 @@ a:focus {
 
 .stujo-dash-head {
   display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1rem;
@@ -448,7 +450,8 @@ a:focus {
 }
 
 .stujo-org-switcher select {
-  max-width: 20rem;
+  /* Mobile first: full width, comfortable touch target. */
+  min-height: 44px;
   padding: 0.3rem 0.6rem;
   font-family: inherit;
   font-size: 14px;
@@ -458,16 +461,10 @@ a:focus {
   border-radius: 0;
 }
 
-@media (max-width: 640px) {
-  .stujo-dash-head {
-    flex-wrap: wrap;
-    gap: 0.75rem;
-  }
-
+@media (min-width: 641px) {
   .stujo-org-switcher select {
-    max-width: none;
-    /* Comfortable touch target on phones. */
-    min-height: 44px;
+    min-height: 0;
+    max-width: 20rem;
   }
 }
 

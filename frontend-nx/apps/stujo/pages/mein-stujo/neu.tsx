@@ -78,6 +78,10 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
   const [step, setStep] = useState<1 | 2>(1);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [savedId, setSavedId] = useState<number | null>(null);
+  // Which organization the draft was inserted for. Creation fixes it: the update
+  // path never writes organizationId, so the switcher must stop steering credits
+  // and the preview once a draft exists.
+  const [draftOrganizationId, setDraftOrganizationId] = useState<number | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   // The offer PDF is the centerpiece of a StuJo posting (embedded on the
   // detail page like in the Rails app). Uploaded after the draft exists.
@@ -100,17 +104,18 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
     skip: editId === null,
   });
 
-  // An existing posting keeps the organization it was created for — the update
-  // path never writes organizationId — so editing must show that one rather than
-  // whatever the switcher last selected.
+  // A posting keeps the organization it was created for, so once one exists —
+  // loaded for editing or just inserted — it, not the switcher, decides which
+  // company the credits and the preview describe.
   const organization = useMemo(() => {
-    const postingOrganizationId = editData?.JobPosting_by_pk?.organizationId ?? null;
+    const postingOrganizationId =
+      editData?.JobPosting_by_pk?.organizationId ?? draftOrganizationId;
     if (postingOrganizationId === null) return selectedOrganization;
     return (
       organizations.find((candidate) => candidate.id === postingOrganizationId) ??
       selectedOrganization
     );
-  }, [editData, organizations, selectedOrganization]);
+  }, [draftOrganizationId, editData, organizations, selectedOrganization]);
 
   const { data: priceData } = useQuery(MY_JOB_POSTINGS, {
     context: employerRole,
@@ -226,6 +231,7 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
         });
         id = result.data?.insert_JobPosting_one?.id ?? null;
         setSavedId(id);
+        if (id) setDraftOrganizationId(organization.id);
       }
       if (id && !(await uploadPdf(id))) {
         return null;
@@ -330,7 +336,7 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
     <Layout portal={portal}>
       <h1>{editId ? 'Angebot bearbeiten' : 'Neues Stellenangebot'}</h1>
       {organizations.length > 1 &&
-        (editId === null ? (
+        (editId === null && savedId === null ? (
           <OrganizationSwitcher
             organizations={organizations}
             selectedId={organization.id}
