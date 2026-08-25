@@ -1,9 +1,19 @@
-# Instructors must not inherit user_access: Hasura cannot merge inherited permissions when
-# ProjectAuthor insert presets conflict (student join-request vs instructor add-author).
-# Instructors acting as course participants should use JWT role `user` (then user_access applies).
+# Instructors inherit user_access so they keep the ordinary logged-in surface (own profile,
+# enrollments, checkout actions) without the frontend having to switch JWT roles, except for the
+# three mutations pinned below — the course-page project UI still pins the `user` role for those
+# (see frontend-nx/.../CourseContent/Projects/participantProjectRole.ts).
+# Hasura cannot merge a mutation permission that the two roles define differently, so each such
+# permission is pinned with an explicit `- role: instructor` rule on the table itself — an explicit
+# permission on the inherited role overrides the inherited merge. Three exist today (verified with
+# `hasura metadata apply && hasura metadata inconsistency list`); keep each in sync with
+# instructor_access, and add one whenever a new instructor_access/user_access mutation pair diverges:
+#   - ProjectAuthor insert  (user_access has a `set: userId` preset, instructor_access must not)
+#   - Project      update   (user_access has a `set: submittedBy` preset)
+#   - ProjectCourse insert  (the two roles differ in check and columns)
 - role_name: instructor
   role_set:
     - instructor_access
+    - user_access
     - anonymous
 - role_name: user
   role_set:

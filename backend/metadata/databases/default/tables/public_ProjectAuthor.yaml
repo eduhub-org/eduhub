@@ -95,6 +95,44 @@ insert_permissions:
       columns:
         - participationStatus
         - projectId
+  # Explicit override for the inherited `instructor` role: instructor_access has no `set: userId`
+  # preset while user_access does, and Hasura cannot merge that pair. Defining the permission
+  # directly on `instructor` overrides the inherited merge and pins the role to exactly the
+  # instructor_access behaviour above (userId client-supplied). Keep both rules in sync.
+  - role: instructor
+    permission:
+      check:
+        _or:
+          - Project:
+              ProjectCourses:
+                Course:
+                  CourseInstructors:
+                    User:
+                      id:
+                        _eq: X-Hasura-User-Id
+          - _and:
+              - participationStatus:
+                  _eq: REQUESTED
+              - userId:
+                  _eq: X-Hasura-User-Id
+              - Project:
+                  _and:
+                    - status:
+                        _eq: PROPOSED
+                    - acceptingParticipants:
+                        _eq: true
+                    - proposedByUserId:
+                        _neq: X-Hasura-User-Id
+                    - ProjectCourses:
+                        Course:
+                          CourseEnrollments:
+                            User:
+                              id:
+                                _eq: X-Hasura-User-Id
+      columns:
+        - participationStatus
+        - projectId
+        - userId
 select_permissions:
   - role: anonymous
     permission:
