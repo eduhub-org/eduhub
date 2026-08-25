@@ -1846,22 +1846,6 @@
         "CERTIFICATE_GENERATION_ERROR": "The certificates could not be generated.",
         "UNEXPECTED_ERROR": "An unexpected error occurred while generating the certificates."
       }
-    },
-    "project_settings": {
-      "heading": "Project setup",
-      "intro": "Decide how participants get a project for the achievement certificate. You can use either option or both.",
-      "option_templates": {
-        "title": "Define project templates",
-        "help": "Use \"Add project\" below to create one or more precisely described project tasks. Participants pick a template and work on that defined task."
-      },
-      "option_propose": {
-        "title": "Let participants propose their own projects",
-        "help": "When enabled, participants can propose their own, open project ideas that you then confirm."
-      },
-      "proposals": {
-        "option_enabled": "Yes",
-        "option_disabled": "No"
-      }
     }
   },
   "manageProjects": {
