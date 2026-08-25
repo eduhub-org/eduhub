@@ -338,6 +338,59 @@ update_permissions:
                         id:
                           _eq: X-Hasura-User-Id
       check: {}
+  # Explicit override for the inherited `instructor` role: user_access carries a
+  # `set: submittedBy` preset that instructor_access does not, and Hasura cannot merge that pair.
+  # Defining the permission directly on `instructor` overrides the inherited merge and pins the
+  # role to exactly the instructor_access behaviour above. Keep both rules in sync.
+  - role: instructor
+    permission:
+      columns:
+        - acceptingParticipants
+        - coverImageUrl
+        - description
+        - documentationInstructionId
+        - documentationUrl
+        - externalUrl
+        - presentationUrl
+        - rating
+        - ratingComment
+        - status
+        - submissionDeadline
+        - tagline
+        - title
+        - type
+        - suggestedForPublication
+      filter:
+        _or:
+          - ProjectCourses:
+              Course:
+                CourseInstructors:
+                  User:
+                    id:
+                      _eq: X-Hasura-User-Id
+          - ProjectMentors:
+              User:
+                id:
+                  _eq: X-Hasura-User-Id
+          - _and:
+              - status:
+                  _in:
+                    - PROPOSED
+                    - ONGOING
+              - ProjectAuthors:
+                  _and:
+                    - participationStatus:
+                        _eq: ACCEPTED
+                    - User:
+                        id:
+                          _eq: X-Hasura-User-Id
+      check:
+        _or:
+          - suggestedForPublication:
+              _eq: false
+          - status:
+              _in:
+                - COMPLETED
 delete_permissions:
   - role: instructor_access
     permission:
