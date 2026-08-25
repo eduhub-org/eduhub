@@ -1831,23 +1831,7 @@
     },
     "no-certificate-generated": "Es wurden keine Zertifikate generiert.",
     "certificates-generated": "Es wurden {number} Zertifikate generiert.",
-    "1-certificate-generated": "Es wurde ein Zertifikat generiert.",
-    "project_settings": {
-      "heading": "Projekt-Einrichtung",
-      "intro": "Lege fest, wie Teilnehmende ein Projekt für den Leistungsnachweis erhalten. Du kannst eine oder beide Optionen nutzen.",
-      "option_templates": {
-        "title": "Projektvorlagen definieren",
-        "help": "Erstelle unten über „Projekt hinzufügen“ eine oder ggf. mehrere präzise beschriebene Projekte. Teilnehmende können dann genau eines auswählen und bearbeiten."
-      },
-      "option_propose": {
-        "title": "Teilnehmende eigene Projekte vorschlagen lassen",
-        "help": "Wenn aktiviert, können Teilnehmende eigene Projektideen vorschlagen, die Du anschließend bestätigst."
-      },
-      "proposals": {
-        "option_enabled": "Ja",
-        "option_disabled": "Nein"
-      }
-    }
+    "1-certificate-generated": "Es wurde ein Zertifikat generiert."
   },
   "manageProjects": {
     "headline": "Projekte",
