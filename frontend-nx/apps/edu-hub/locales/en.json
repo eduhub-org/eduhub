@@ -2638,7 +2638,7 @@
       "PROJECT_DEADLINE_REMINDER": "Sent 48 hours before a project's submission deadline",
       "SESSION_RESCHEDULED": "Sent to participants when a session's date or time changes",
       "PAYMENT_RECEIPT": "Sent when an invoice for a course or event enrollment is paid",
-      "COURSE_CONTINUATION_INQUIRY": "Sent when a participant exceeds the course's limit of missed sessions"
+      "COURSE_CONTINUATION_INQUIRY": "Sent when a participant reaches the course's limit of missed sessions, asking them not to miss further sessions or to let the team know if they want to stop"
     },
     "delete_confirmation": "Are you sure you want to delete the email template '{title}'?",
     "unknown_trigger": "Unknown trigger type",

@@ -45,7 +45,7 @@
       value: check_course_continuation
     - name: Hasura-Secret
       value_from_env: HASURA_CLOUD_FUNCTION_SECRET
-  comment: Asks enrollees who exceeded the course max missed sessions whether they intend to continue
+  comment: Asks enrollees who reached the course max missed sessions to attend the remaining sessions or tell us if they drop out
 - name: send_project_deadline_reminders
   webhook: '{{CLOUD_FUNCTION_LINK_CALL_PYTHON_FUNCTION}}'
   schedule: 0 8 * * *
