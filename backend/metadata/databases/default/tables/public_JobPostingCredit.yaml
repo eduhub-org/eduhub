@@ -18,6 +18,7 @@ select_permissions:
         - organizationId
         - jobPostingType
         - remaining
+        - unlimited
         - created_at
         - updated_at
       filter:
