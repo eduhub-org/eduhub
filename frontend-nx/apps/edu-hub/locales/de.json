@@ -1831,23 +1831,7 @@
     },
     "no-certificate-generated": "Es wurden keine Zertifikate generiert.",
     "certificates-generated": "Es wurden {number} Zertifikate generiert.",
-    "1-certificate-generated": "Es wurde ein Zertifikat generiert.",
-    "project_settings": {
-      "heading": "Projekt-Einrichtung",
-      "intro": "Lege fest, wie Teilnehmende ein Projekt für den Leistungsnachweis erhalten. Du kannst eine oder beide Optionen nutzen.",
-      "option_templates": {
-        "title": "Projektvorlagen definieren",
-        "help": "Erstelle unten über „Projekt hinzufügen“ eine oder ggf. mehrere präzise beschriebene Projekte. Teilnehmende können dann genau eines auswählen und bearbeiten."
-      },
-      "option_propose": {
-        "title": "Teilnehmende eigene Projekte vorschlagen lassen",
-        "help": "Wenn aktiviert, können Teilnehmende eigene Projektideen vorschlagen, die Du anschließend bestätigst."
-      },
-      "proposals": {
-        "option_enabled": "Ja",
-        "option_disabled": "Nein"
-      }
-    }
+    "1-certificate-generated": "Es wurde ein Zertifikat generiert."
   },
   "manageProjects": {
     "headline": "Projekte",
@@ -2623,7 +2607,7 @@
       "PROJECT_DEADLINE_REMINDER": "Gesendet 48 Stunden vor dem Abgabetermin eines Projekts",
       "SESSION_RESCHEDULED": "Gesendet an Teilnehmende, wenn sich Datum oder Zeit eines Termins ändert",
       "PAYMENT_RECEIPT": "Gesendet, wenn eine Rechnung für eine Kurs- oder Event-Anmeldung bezahlt wurde",
-      "COURSE_CONTINUATION_INQUIRY": "Gesendet, wenn Teilnehmende mehr Termine versäumt haben als für den Kurs erlaubt"
+      "COURSE_CONTINUATION_INQUIRY": "Gesendet, wenn Teilnehmende so viele Termine versäumt haben, wie für den Kurs maximal erlaubt sind – mit der Bitte, keine weiteren Termine zu verpassen oder kurz Bescheid zu geben, falls sie nicht mehr teilnehmen möchten"
     },
     "delete_confirmation": "Bist du sicher, dass du die E-Mail-Vorlage '{title}' löschen möchtest?",
     "unknown_trigger": "Unbekannter Auslöser-Typ",

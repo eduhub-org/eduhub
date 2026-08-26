@@ -1,5 +1,4 @@
-
-const { createClient } = require("graphqurl");
+const { GraphQLClient, gql } = require("graphql-request");
 let secretsMatch;
 try {
   ({ secretsMatch } = require("./shared_libs/node/security.cjs"));
@@ -7,30 +6,7 @@ try {
   ({ secretsMatch } = require("../shared_libs/node/security.cjs"));
 }
 
-exports.sendQuestionaires = async (req, res) => {
-  const expectedSecret = process.env.HASURA_CLOUD_FUNCTION_SECRET;
-  if (!expectedSecret) {
-    return res.status(500).json({ error: "Server secret not configured" });
-  }
-
-  if (secretsMatch(req.headers.secret, expectedSecret)) {
-    
-    const client = createClient({
-      //endpoint: 'http://localhost:8080/v1/graphql',
-      endpoint: process.env.HASURA_ENDPOINT,
-      headers: {
-        "x-access-key": process.env.HASURA_ADMIN_SECRET,
-        "X-Hasura-Role": "admin",
-        "x-hasura-admin-secret": process.env.HASURA_ADMIN_SECRET,
-      },
-    });
-    
-    //get courses with sessions
-    let courses;
-    await client
-      .query({
-        query:
-          `query { 
+const COURSES_WITH_SESSIONS = gql`query { 
             Course(where: {Program: {published: {_eq: true}}, published: {_eq: true}}) {
                 id
                 title
@@ -63,19 +39,53 @@ exports.sendQuestionaires = async (req, res) => {
                   userId
                 }
               }
-            }`,
-        variables: { },
-      })
-      .then((response) => {
-        courses = response.data.Course;
-      })
-      .catch((error) => console.error(error));
-    
+            }`;
+
+const INSERT_MAIL_LOG = gql`
+  mutation($subject : String, $to : String, $from : String, $content : String) {
+    insert_MailLog_one(object: {subject: $subject, to: $to, from: $from, content: $content}) {
+      id
+    }
+  }
+`;
+
+const MARK_QUESTIONAIRE_SENT = gql`
+  mutation($id : Int!) {
+    update_Session_by_pk(pk_columns: {id: $id}, _set: {questionaire_sent: true}) {
+      title
+    }
+  }
+`;
+
+exports.sendQuestionaires = async (req, res) => {
+  const expectedSecret = process.env.HASURA_CLOUD_FUNCTION_SECRET;
+  if (!expectedSecret) {
+    return res.status(500).json({ error: "Server secret not configured" });
+  }
+
+  if (secretsMatch(req.headers.secret, expectedSecret)) {
+
+    const client = new GraphQLClient(process.env.HASURA_ENDPOINT, {
+      headers: {
+        "X-Hasura-Role": "admin",
+        "x-hasura-admin-secret": process.env.HASURA_ADMIN_SECRET,
+      },
+    });
+
+    //get courses with sessions
+    let courses;
+    try {
+      const response = await client.request(COURSES_WITH_SESSIONS, {});
+      courses = response.Course;
+    } catch (error) {
+      console.error(error);
+    }
+
     for (const course of courses) {
       const firstsession = course.Sessions[0];
       const lastsession = course.Sessions.slice(-1)[0];
       for (const session of course.Sessions) {
-        
+
         var doSpeakerQuestionaire = false;
         for (const sessionSpeaker of session.SessionSpeakers) {
           var isInstructor = false;
@@ -88,27 +98,18 @@ exports.sendQuestionaires = async (req, res) => {
             doSpeakerQuestionaire = true;
           }
         }
-        
+
         if (!session.questionaire_sent && Date.parse(session.endDateTime) <= Date.now()) {
           for (const enrollment of course.CourseEnrollments) {
-            
+
             //send start questionaire
             if (course.Program.startQuestionnaire && session.id == firstsession.id) {
-              await client
-              .query({
-                query:`
-                  mutation($subject : String, $to : String, $from : String, $content : String) {
-                    insert_MailLog_one(object: {subject: $subject, to: $to, from: $from, content: $content}) {
-                      id
-                    }
-                  }
-                `,
-                variables: {
+              try {
+                await client.request(INSERT_MAIL_LOG, {
                   subject: `Feedback zu ${course.title} bei opencampus.sh`,
                   to: enrollment.User.email,
                   from: "noreply@edu.opencampus.sh",
-                  content: 
-                  `<!DOCTYPE html>
+                  content: `<!DOCTYPE html>
                   <html>
                     <head>
                       <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
@@ -123,30 +124,21 @@ exports.sendQuestionaires = async (req, res) => {
                       <p>Viele Grüße</p>
                       <p>Dein opencampus.sh Team</p>
                     </body>
-                  </html>`
-                },
-              })
-              .then((response) => {})
-              .catch((error) => console.error(error));
+                  </html>`,
+                });
+              } catch (error) {
+                console.error(error);
+              }
             }
-            
+
             //send speaker questionaire
             if (course.Program.speakerQuestionnaire && session.SessionSpeakers.length > 0 && doSpeakerQuestionaire) {
-              await client
-              .query({
-                query:`
-                  mutation($subject : String, $to : String, $from : String, $content : String) {
-                    insert_MailLog_one(object: {subject: $subject, to: $to, from: $from, content: $content}) {
-                      id
-                    }
-                  }
-                `,
-                variables: {
+              try {
+                await client.request(INSERT_MAIL_LOG, {
                   subject: `Feedback zu ${session.title} bei opencampus.sh`,
                   to: enrollment.User.email,
                   from: "noreply@edu.opencampus.sh",
-                  content: 
-                  `<!DOCTYPE html>
+                  content: `<!DOCTYPE html>
                   <html>
                     <head>
                       <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
@@ -161,30 +153,21 @@ exports.sendQuestionaires = async (req, res) => {
                       <p>Viele Grüße</p>
                       <p>Dein opencampus.sh Team</p>
                     </body>
-                  </html>`
-                },
-              })
-              .then((response) => {})
-              .catch((error) => console.error(error));
+                  </html>`,
+                });
+              } catch (error) {
+                console.error(error);
+              }
             }
-          
-          //send closing questionaire
-          if (course.Program.closingQuestionnaire && session.id == lastsession.id) {
-            await client
-            .query({
-              query:`
-                mutation($subject : String, $to : String, $from : String, $content : String) {
-                  insert_MailLog_one(object: {subject: $subject, to: $to, from: $from, content: $content}) {
-                    id
-                  }
-                }
-              `,
-              variables: {
-                subject: `Feedback zu ${course.title} bei opencampus.sh`,
-                to: enrollment.User.email,
-                from: "noreply@edu.opencampus.sh",
-                content: 
-                `<!DOCTYPE html>
+
+            //send closing questionaire
+            if (course.Program.closingQuestionnaire && session.id == lastsession.id) {
+              try {
+                await client.request(INSERT_MAIL_LOG, {
+                  subject: `Feedback zu ${course.title} bei opencampus.sh`,
+                  to: enrollment.User.email,
+                  from: "noreply@edu.opencampus.sh",
+                  content: `<!DOCTYPE html>
                 <html>
                   <head>
                     <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
@@ -199,31 +182,21 @@ exports.sendQuestionaires = async (req, res) => {
                     <p>Viele Grüße</p>
                     <p>Dein opencampus.sh Team</p>
                   </body>
-                </html>`
-              },
-            })
-            .then((response) => {})
-            .catch((error) => console.error(error));
-          }
-        }
-          
-          // set questionaire_sent to true
-          await client
-          .query({
-            query:`
-              mutation($id : Int!) {
-                update_Session_by_pk(pk_columns: {id: $id}, _set: {questionaire_sent: true}) {
-                  title
-                }
+                </html>`,
+                });
+              } catch (error) {
+                console.error(error);
               }
-            `,
-            variables: {
-              id: session.id,
-            },
-          })
-          .then((response) => {})
-          .catch((error) => console.error(error));
-          
+            }
+          }
+
+          // set questionaire_sent to true
+          try {
+            await client.request(MARK_QUESTIONAIRE_SENT, { id: session.id });
+          } catch (error) {
+            console.error(error);
+          }
+
         }
       }
     }

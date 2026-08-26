@@ -42,6 +42,7 @@ import TagSelector from '../../inputs/TagSelector';
 import { isKnownCourseGroupOptionTitle } from '../../../helpers/courseGroupOptions';
 import InputField from '../../inputs/InputField';
 import DropDownSelector from '../../inputs/DropDownSelector';
+import RadioSelector, { RadioSelectorOption } from '../../inputs/RadioSelector';
 import FileUploadField from '../../inputs/FileUploadField';
 import DatePicker from '../../inputs/DatePicker';
 import {
@@ -53,6 +54,7 @@ import {
   SAVE_COURSE_FORMBRICKS_ENROLLMENT_SURVEY,
   UPDATE_COURSE_BASE_PRICE,
   UPDATE_COURSE_CURRENCY,
+  UPDATE_COURSE_PROJECT_PROPOSALS_ENABLED,
   UPDATE_COURSE_PROJECT_SUBMISSION_DEADLINE,
   UPDATE_COURSE_REQUIRED_ECTS,
   UPDATE_COURSE_REQUIRED_EVENT_COUNT,
@@ -131,6 +133,50 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
   const projectSubmissionDeadlineValue = useMemo(
     () => submissionDeadlineToCalendarDate(course.projectSubmissionDeadline),
     [course.projectSubmissionDeadline]
+  );
+
+  const [updateProjectProposalsEnabled] = useManageMutation(UPDATE_COURSE_PROJECT_PROPOSALS_ENABLED, {
+    refetchQueries: ['AdminCourseList'],
+  });
+
+  // Tri-state: no course override (inherit the program default), explicitly
+  // enabled, or explicitly disabled.
+  const projectProposalsValue =
+    course.projectProposalsEnabled == null ? 'inherit' : course.projectProposalsEnabled ? 'enabled' : 'disabled';
+
+  const projectProposalsOptions = useMemo<RadioSelectorOption[]>(
+    () => [
+      {
+        value: 'inherit',
+        label: t(
+          course.Program?.projectProposalsEnabledByDefault
+            ? 'manageCourses.project_options.proposals_enabled.option_inherit_yes'
+            : 'manageCourses.project_options.proposals_enabled.option_inherit_no'
+        ),
+      },
+      {
+        value: 'enabled',
+        label: t('manageCourses.project_options.proposals_enabled.option_enabled'),
+      },
+      {
+        value: 'disabled',
+        label: t('manageCourses.project_options.proposals_enabled.option_disabled'),
+      },
+    ],
+    [course.Program?.projectProposalsEnabledByDefault, t]
+  );
+
+  const handleSetProjectProposalsEnabled = useCallback(
+    async (value: string) => {
+      try {
+        await updateProjectProposalsEnabled({
+          variables: { itemId: course.id, value: value === 'inherit' ? null : value === 'enabled' },
+        });
+      } catch (err) {
+        handleError(err instanceof Error ? err.message : String(err));
+      }
+    },
+    [course.id, updateProjectProposalsEnabled, handleError]
   );
 
   // Check if course requires payment
@@ -1050,6 +1096,22 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                         refetchQueries={['AdminCourseList']}
                         helpText={t('manageCourses.ects.help_text')}
                       />
+
+                      <div>
+                        <p className="text-sm font-medium text-label-primary mb-1">
+                          {t('manageCourses.project_options.proposals_enabled.label')}
+                        </p>
+                        <p className="text-xs text-label-secondary mb-2">
+                          {t('manageCourses.project_options.proposals_enabled.help_text')}
+                        </p>
+                        <RadioSelector
+                          layout="inline"
+                          name={`project-proposals-${course.id}`}
+                          value={projectProposalsValue}
+                          options={projectProposalsOptions}
+                          onValueChange={handleSetProjectProposalsEnabled}
+                        />
+                      </div>
 
                       <DatePicker
                         variant="material"

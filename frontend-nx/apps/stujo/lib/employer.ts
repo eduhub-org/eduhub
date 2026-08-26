@@ -1,13 +1,30 @@
 import { gql } from '@apollo/client';
+import { useMemo } from 'react';
+
+import { useManageRole } from '@eduhub/hooks/authentication';
+import { AuthRoles } from '@eduhub/types/enums';
 
 /**
- * GraphQL documents for the employer dashboard (Mein StuJo). All queries
- * and mutations run under the `org_admin` inherited role (pinned per
- * request via the Apollo context), which resolves to org_admin_access
- * permissions in Hasura.
+ * GraphQL documents for the employer dashboard (Mein StuJo). Queries and
+ * mutations are pinned to a management role per request via the Apollo
+ * context; `org_admin` resolves to org_admin_access permissions in Hasura.
  */
 
-export const ORG_ADMIN_ROLE_CONTEXT = { role: 'org_admin' };
+/**
+ * Apollo context for the employer dashboard queries and mutations.
+ *
+ * Mirrors edu-hub's useManageRole instead of pinning `org_admin`: that role
+ * only reaches a user's JWT via the add_keycloak_org_admin_role event trigger,
+ * which fires when an OrganizationAdmin grant is inserted. A super-admin
+ * without a grant of their own therefore never carries it, and Hasura rejected
+ * every employer request — the dashboard then reported "no organization".
+ * Super-admins now use the unscoped `admin` role; the queries below scope
+ * themselves by userId/organizationId so both roles return the same rows.
+ */
+export const useEmployerRoleContext = (): { role: AuthRoles } => {
+  const role = useManageRole();
+  return useMemo(() => ({ role }), [role]);
+};
 
 // The publish/archive actions are permitted for user_access (they authorize
 // internally against OrganizationAdmin.canManageJobs), so they are called
@@ -15,8 +32,11 @@ export const ORG_ADMIN_ROLE_CONTEXT = { role: 'org_admin' };
 export const ACTION_ROLE_CONTEXT = { role: 'user' };
 
 export const MY_JOB_ORGANIZATIONS = gql`
-  query MyJobOrganizations {
-    OrganizationAdmin(where: { canManageJobs: { _eq: true } }) {
+  query MyJobOrganizations($userId: uuid!) {
+    OrganizationAdmin(
+      where: { userId: { _eq: $userId }, canManageJobs: { _eq: true } }
+      order_by: { Organization: { name: asc } }
+    ) {
       id
       organizationId
       Organization {

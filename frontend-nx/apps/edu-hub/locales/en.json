@@ -1846,22 +1846,6 @@
         "CERTIFICATE_GENERATION_ERROR": "The certificates could not be generated.",
         "UNEXPECTED_ERROR": "An unexpected error occurred while generating the certificates."
       }
-    },
-    "project_settings": {
-      "heading": "Project setup",
-      "intro": "Decide how participants get a project for the achievement certificate. You can use either option or both.",
-      "option_templates": {
-        "title": "Define project templates",
-        "help": "Use \"Add project\" below to create one or more precisely described project tasks. Participants pick a template and work on that defined task."
-      },
-      "option_propose": {
-        "title": "Let participants propose their own projects",
-        "help": "When enabled, participants can propose their own, open project ideas that you then confirm."
-      },
-      "proposals": {
-        "option_enabled": "Yes",
-        "option_disabled": "No"
-      }
     }
   },
   "manageProjects": {
@@ -2638,7 +2622,7 @@
       "PROJECT_DEADLINE_REMINDER": "Sent 48 hours before a project's submission deadline",
       "SESSION_RESCHEDULED": "Sent to participants when a session's date or time changes",
       "PAYMENT_RECEIPT": "Sent when an invoice for a course or event enrollment is paid",
-      "COURSE_CONTINUATION_INQUIRY": "Sent when a participant exceeds the course's limit of missed sessions"
+      "COURSE_CONTINUATION_INQUIRY": "Sent when a participant reaches the course's limit of missed sessions, asking them not to miss further sessions or to let the team know if they want to stop"
     },
     "delete_confirmation": "Are you sure you want to delete the email template '{title}'?",
     "unknown_trigger": "Unknown trigger type",

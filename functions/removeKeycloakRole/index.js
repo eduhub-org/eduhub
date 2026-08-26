@@ -1,5 +1,5 @@
 import KcAdminClient from '@keycloak/keycloak-admin-client';
-import bodyParser from "body-parser";
+import { GraphQLClient } from 'graphql-request';
 import { createRequire } from 'module';
 
 const require = createRequire(import.meta.url);
@@ -9,7 +9,6 @@ try {
 } catch {
   ({ secretsMatch } = require('../shared_libs/node/security.cjs'));
 }
-const { createClient } = require('graphqurl');
 
 // Roles that are backed by a "source of truth" table: the Keycloak role should only be removed once
 // the user has no remaining rows in that table (e.g. an org admin who still administers another
@@ -55,8 +54,7 @@ export const removeKeycloakRole = async (req, res) => {
   // organization, or instructor of another course).
   const remaining = REMAINING_GRANT_QUERIES[role];
   if (remaining) {
-    const client = createClient({
-      endpoint: process.env.HASURA_ENDPOINT,
+    const client = new GraphQLClient(process.env.HASURA_ENDPOINT, {
       headers: {
         'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET,
         'X-Hasura-Role': 'admin',
@@ -65,8 +63,8 @@ export const removeKeycloakRole = async (req, res) => {
 
     let stillGranted = null;
     try {
-      const response = await client.query({ query: remaining.query, variables: { id: userid } });
-      stillGranted = response.data[remaining.field];
+      const response = await client.request(remaining.query, { id: userid });
+      stillGranted = response[remaining.field];
     } catch (error) {
       console.error(error);
     }

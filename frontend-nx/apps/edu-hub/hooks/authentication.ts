@@ -36,9 +36,15 @@ export const useIsOrgAdmin = (): boolean => {
   return hasRole(sessionData, AuthRoles.org_admin);
 };
 
-export const useIsUserIdInList = (allowedIds: string[]): boolean => {
+// The Hasura user id of the signed-in user (the Keycloak `sub`, mapped onto the
+// x-hasura-user-id claim), or null while signed out. Single source for the claim path.
+export const useCurrentUserId = (): string | null => {
   const { data: sessionData } = useSession();
-  const userId = sessionData?.profile?.['https://hasura.io/jwt/claims']?.['x-hasura-user-id'];
+  return sessionData?.profile?.['https://hasura.io/jwt/claims']?.['x-hasura-user-id'] ?? null;
+};
+
+export const useIsUserIdInList = (allowedIds: string[]): boolean => {
+  const userId = useCurrentUserId();
   return Boolean(userId && allowedIds?.includes(userId));
 };
 
