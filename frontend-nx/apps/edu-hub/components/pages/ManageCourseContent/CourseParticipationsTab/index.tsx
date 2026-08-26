@@ -50,7 +50,6 @@ import { BulkAction } from '../../../common/TableGrid/types';
 import NotificationSnackbar from '../../../common/dialogs/NotificationSnackbar';
 import { ErrorMessageDialog } from '../../../common/dialogs/ErrorMessageDialog';
 import ProjectsManagementGrid from './projects/ProjectsManagementGrid';
-import ProjectSetupCard from './projects/ProjectSetupCard';
 import {
   resolveEffectiveCourseProjectSubmissionDeadline,
   getCourseProjectSubmissionDefaultSource,
@@ -794,13 +793,6 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
             {t('participations_tab_projects_subtitle')}
           </p>
         </header>
-        <ProjectSetupCard
-          courseId={course.id}
-          proposalsEnabled={course.projectProposalsEnabled}
-          programDefaultEnabled={Boolean(
-            course.Program?.projectProposalsEnabledByDefault
-          )}
-        />
         <ProjectsManagementGrid
           courseId={course.id}
           programDefaultProjectType={course.Program?.defaultProjectType ?? null}

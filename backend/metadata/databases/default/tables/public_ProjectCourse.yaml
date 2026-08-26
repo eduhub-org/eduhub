@@ -41,6 +41,24 @@ insert_permissions:
         - id
         - projectId
         - updated_at
+  # Explicit override for the inherited `instructor` role: instructor_access and user_access
+  # define different checks and column sets for this insert, and Hasura cannot merge differing
+  # insert permissions. Defining the permission directly on `instructor` overrides the inherited
+  # merge and pins the role to exactly the instructor_access behaviour above. Keep both in sync.
+  - role: instructor
+    permission:
+      check:
+        Course:
+          CourseInstructors:
+            User:
+              id:
+                _eq: X-Hasura-User-Id
+      columns:
+        - courseId
+        - created_at
+        - id
+        - projectId
+        - updated_at
 select_permissions:
   # Public: needed so logged-out visitors can read the course context of a
   # publicly-visible project (course line on tiles, course card, group filters,

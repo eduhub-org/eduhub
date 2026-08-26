@@ -3,10 +3,7 @@
   "version": "0.1.0",
   "type": "module",
   "dependencies": {
-    "@keycloak/keycloak-admin-client": "20.0.0",
-    "body-parser": "1.20.6",
-    "node-fetch": "2.6.7",
-    "graphqurl": "1.0.1"
+    "@keycloak/keycloak-admin-client": "26.7.2"
   },
   "devDependencies": {
     "npm-watch": "^0.6.0",
