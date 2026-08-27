@@ -104,6 +104,29 @@ resource "google_cloud_run_service" "eduhub" {
             }
           }
         }
+        # The Stripe webhook handler (pages/api/webhooks/stripe.ts) runs in this
+        # service, not in the cloud function: it needs the secret key to build
+        # the client and the signing secret to verify event signatures. Without
+        # both it answers every delivery with 500 "Stripe not configured", so a
+        # paid course enrollment or job posting is charged but never published.
+        env {
+          name = "STRIPE_SECRET_KEY"
+          value_from {
+            secret_key_ref {
+              name = google_secret_manager_secret.stripe_secret_key.secret_id
+              key  = "latest"
+            }
+          }
+        }
+        env {
+          name = "STRIPE_WEBHOOK_SECRET"
+          value_from {
+            secret_key_ref {
+              name = google_secret_manager_secret.stripe_webhook_secret.secret_id
+              key  = "latest"
+            }
+          }
+        }
       }
     }
 
@@ -134,5 +157,9 @@ resource "google_cloud_run_service" "eduhub" {
     google_secret_manager_secret_version.nextauth_secret,
     google_secret_manager_secret_version.keycloak_hasura_client_secret,
     google_secret_manager_secret_version.ghost_newsletter_credentials_encryption_key,
+    google_secret_manager_secret_version.stripe_secret_key,
+    google_secret_manager_secret_version.stripe_webhook_secret,
+    google_secret_manager_secret_iam_member.stripe_secret_key_eduhub,
+    google_secret_manager_secret_iam_member.stripe_webhook_secret_eduhub,
   ]
 }
