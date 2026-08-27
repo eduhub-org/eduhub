@@ -61,8 +61,15 @@ def _cutoff(retention_months):
 
 
 # Guests whose every event finished before the cutoff. A guest with any event
-# that ended later, or that has no end date yet, is left alone: the purpose the
-# data was collected for has not finished.
+# that ended later, or that has no date to count from, is left alone: the purpose
+# the data was collected for has not finished.
+#
+# The date an event runs on lives on its Session rows, not on Course.
+# Course.endTime is a `time without time zone` -- a wall-clock time of day like
+# `20:00`, with no year in it at all -- so it can neither be compared against a
+# timestamptz cutoff (Hasura rejects the query outright) nor answer "did this
+# finish more than N months ago". Course.applicationEnd is a real date but the
+# wrong one: it is the registration deadline, not when the event ended.
 GUESTS_PAST_RETENTION = """
 query GuestsPastRetention($cutoff: timestamptz!) {
     User(
@@ -71,8 +78,8 @@ query GuestsPastRetention($cutoff: timestamptz!) {
             _not: {
                 CourseEnrollments: {
                     _or: [
-                        {Course: {endTime: {_gt: $cutoff}}}
-                        {Course: {endTime: {_is_null: true}}}
+                        {Course: {Sessions: {endDateTime: {_gt: $cutoff}}}}
+                        {_not: {Course: {Sessions: {}}}}
                     ]
                 }
             }
@@ -105,16 +112,17 @@ query AbandonedGuests($cutoff: timestamptz!) {
 }
 """
 
-# Guests we cannot age out because at least one of their events has no end date.
-# Retaining them indefinitely would defeat the retention period, so the job
-# reports them rather than letting them sit unnoticed.
+# Guests we cannot age out because at least one of their events has no session,
+# and therefore no date to count the retention period from. Retaining them
+# indefinitely would defeat the period, so the job reports them rather than
+# letting them sit unnoticed.
 GUESTS_BLOCKED_BY_MISSING_END_DATE = """
 query GuestsBlockedByMissingEndDate($cutoff: timestamptz!) {
     User_aggregate(
         where: {
             status: {_eq: GUEST}
             created_at: {_lt: $cutoff}
-            CourseEnrollments: {Course: {endTime: {_is_null: true}}}
+            CourseEnrollments: {_not: {Course: {Sessions: {}}}}
         }
     ) {
         aggregate {
@@ -269,8 +277,9 @@ def anonymize_guest_data(arguments):
         if blocked_count:
             logging.warning(
                 f"{blocked_count} guest(s) older than the retention period cannot be "
-                "anonymized because at least one of their events has no end date. "
-                "Set Course.endTime on those events so the retention period can be applied."
+                "anonymized because at least one of their events has no session, and so "
+                "no date to count from. Add the session dates to those events so the "
+                "retention period can be applied."
             )
 
         unconfirmed_cutoff = (

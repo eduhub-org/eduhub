@@ -103,12 +103,17 @@ when all of these hold:
 
 Idempotent: an anonymized guest is `DELETED`, so it is not selected again.
 
-> **Known broken.** Both sweeps select on `Course.endTime`, which is a *time of
-> day* (`20:00`), not a date — the date an event runs on lives on its `Session`
-> rows. Hasura rejects the comparison against a `timestamptz` cutoff, the job
-> returns early, and neither sweep has ever run. Until the predicate is rewritten
-> against `Session.endDateTime`, no guest data is aged out and no abandoned signup
-> is deleted, which contradicts what the privacy policy states.
+Both sweeps date an event by its **sessions**, not by `Course`. `Course.endTime`
+is a `time without time zone` — a wall-clock time of day like `20:00`, with no
+year in it — so it can neither be compared against a `timestamptz` cutoff (Hasura
+rejects the query outright) nor answer "did this finish more than N months ago".
+`Course.applicationEnd` is a real date but the wrong one: it is the registration
+deadline, not the end of the event.
+
+A guest with an event that has **no session** cannot be aged out — there is no
+date to count from. Rather than guess, the job leaves them alone, counts them,
+and logs a warning naming how many; add the session dates to those events so the
+period can apply.
 
 > **Ordering matters.** Erasure unsubscribes from Ghost *before* overwriting the
 > email, because `syncGhostNewsletterSubscription` re-reads `User.email` when it
