@@ -2988,6 +2988,8 @@
       "guest_registration_not_enabled": "Registration without an account is not available for this event.",
       "course_full": "This event is already full.",
       "guest_registration_failed": "Your registration could not be processed. Please try again later.",
+      "guest_registration_throttled": "A lot of registrations are coming in right now. Please try again in an hour.",
+      "guest_account_exists": "An account now exists for this email address. Please log in and complete your registration there.",
       "invalid_token": "This link is not valid.",
       "token_expired": "This link has expired. Please register again.",
       "token_already_used": "This link has already been used.",

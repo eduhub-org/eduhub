@@ -2973,6 +2973,8 @@
       "guest_registration_not_enabled": "Für diese Veranstaltung ist eine Anmeldung ohne Konto nicht möglich.",
       "course_full": "Diese Veranstaltung ist bereits ausgebucht.",
       "guest_registration_failed": "Deine Anmeldung konnte nicht verarbeitet werden. Bitte versuche es später noch einmal.",
+      "guest_registration_throttled": "Gerade gehen sehr viele Anmeldungen ein. Bitte versuche es in einer Stunde noch einmal.",
+      "guest_account_exists": "Zu dieser E-Mail-Adresse gibt es inzwischen ein Konto. Bitte melde dich an und schließe die Anmeldung dort ab.",
       "invalid_token": "Dieser Link ist ungültig.",
       "token_expired": "Dieser Link ist abgelaufen. Bitte melde dich erneut an.",
       "token_already_used": "Dieser Link wurde bereits verwendet.",
