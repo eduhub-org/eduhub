@@ -358,8 +358,23 @@ export function buildGuestMailFooter(userId) {
  * GUEST_TOKEN_SECRET can fail here, and a session reminder that arrives without
  * the link beats one that never arrives.
  */
+export function isGuestRecipient(user) {
+  return user?.status === 'GUEST' && !!user?.id;
+}
+
+/**
+ * A guest mail carries a signed manage link, which is a credential: whoever
+ * holds it can read, cancel and erase that person's data. A MailTemplate may
+ * carry cc/bcc (an organizer address, say), and those copies would receive the
+ * link along with the body. Templates are shared with non-guest mail, so the
+ * copies are dropped per recipient rather than removed from the template.
+ */
+export function guestSafeCopyRecipients(user, { cc, bcc }) {
+  return isGuestRecipient(user) ? { cc: null, bcc: null } : { cc, bcc };
+}
+
 export function appendGuestMailFooter(content, user, logger) {
-  if (user?.status !== 'GUEST' || !user?.id) return content;
+  if (!isGuestRecipient(user)) return content;
   try {
     return insertBeforeBodyEnd(content ?? '', buildGuestMailFooter(user.id));
   } catch (error) {
@@ -415,8 +430,14 @@ export async function getGuestRetentionMonths(client) {
  * one sitting is what someone does at an open day, and a flat per-address cap
  * cannot tell those apart -- it silently drops the fourth event. `perAddress` is
  * still there as a backstop, just far enough up to clear real use.
+ *
+ * `perAddressMail` counts delivered mail rather than issued tokens, because not
+ * every branch issues one: telling an address that it already has an account
+ * sends a mail and creates no token, so every token-based counter reads zero for
+ * exactly the addresses an attacker already knows are registered.
  */
 export const GUEST_THROTTLE = {
+  perAddressMail: 5,
   perAddressCourse: 3,
   perAddress: 10,
   perCourse: 30,
@@ -447,12 +468,14 @@ export const NO_SUCH_USER_ID = '00000000-0000-0000-0000-000000000000';
  *            again later instead of watching an inbox that stays empty.
  */
 export function classifyGuestThrottle({
+  perAddressMail = 0,
   perAddressCourse = 0,
   perAddress = 0,
   perCourse = 0,
   global = 0,
 } = {}) {
   if (
+    perAddressMail >= GUEST_THROTTLE.perAddressMail ||
     perAddressCourse >= GUEST_THROTTLE.perAddressCourse ||
     perAddress >= GUEST_THROTTLE.perAddress
   ) {

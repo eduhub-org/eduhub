@@ -120,7 +120,24 @@ const FIND_EXISTING_ENROLLMENT = gql`
  * feature and the file is empty), so this is the only layer that can hold.
  */
 const COUNT_RECENT = gql`
-  query CountRecentGuestRegistrations($userId: uuid!, $courseId: Int!, $since: timestamptz!) {
+  query CountRecentGuestRegistrations(
+    $userId: uuid!
+    $courseId: Int!
+    $since: timestamptz!
+    $email: String!
+  ) {
+    # Counted from MailLog rather than from tokens, because the branch this
+    # protects issues no token: an address that already has an account has no
+    # guest row, so every token-based counter reads zero for it. Without this,
+    # GUEST_ALREADY_HAS_ACCOUNT was an unthrottled mail cannon aimed at any
+    # address an attacker knows to be registered.
+    perAddressMail: MailLog_aggregate(
+      where: { to: { _eq: $email }, created_at: { _gt: $since } }
+    ) {
+      aggregate {
+        count
+      }
+    }
     perAddressCourse: GuestRegistrationToken_aggregate(
       where: {
         userId: { _eq: $userId }
@@ -234,6 +251,45 @@ export default async function registerGuestForCourse(req, logger) {
     // below gets skipped. See findUsersByEmail.
     const { account, guest: existingUser } = await findUsersByEmail(client, email);
 
+    // Volume caps come before every branch that can queue mail, including the
+    // existing-account one below. Checked for new addresses as well as known
+    // ones: an attacker cycling through fresh addresses is the case that
+    // actually costs us mail volume.
+    const since = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+    const recent = await client.request(COUNT_RECENT, {
+      userId: existingUser?.id ?? NO_SUCH_USER_ID,
+      courseId: course.id,
+      since,
+      email,
+    });
+    const counts = {
+      perAddressMail: recent?.perAddressMail?.aggregate?.count ?? 0,
+      perAddressCourse: recent?.perAddressCourse?.aggregate?.count ?? 0,
+      perAddress: recent?.perAddress?.aggregate?.count ?? 0,
+      perCourse: recent?.perCourse?.aggregate?.count ?? 0,
+      global: recent?.global?.aggregate?.count ?? 0,
+    };
+
+    const throttled = classifyGuestThrottle(counts);
+    if (throttled) {
+      logger.warn(
+        `Guest registration throttled (${throttled}) for course ${course.id} ` +
+          `(mail=${counts.perAddressMail}/${GUEST_THROTTLE.perAddressMail}, ` +
+          `address+course=${counts.perAddressCourse}/${GUEST_THROTTLE.perAddressCourse}, ` +
+          `address=${counts.perAddress}/${GUEST_THROTTLE.perAddress}, ` +
+          `course=${counts.perCourse}/${GUEST_THROTTLE.perCourse}, ` +
+          `global=${counts.global}/${GUEST_THROTTLE.global})`
+      );
+      // An ADDRESS cap is keyed on the submitted address, so saying so would
+      // reveal how often that address has signed up recently - the same oracle
+      // the uniform response exists to close. A PUBLIC cap describes the event
+      // or the platform and leaks nothing, so the person is told plainly rather
+      // than left watching an inbox that will stay empty.
+      return throttled === 'ADDRESS'
+        ? GENERIC_SUCCESS
+        : { success: false, messageKey: 'GUEST_REGISTRATION_THROTTLED' };
+    }
+
     // The address already belongs to a real account. Create nothing, and tell
     // only the address owner - by mail, not in the response - to log in instead.
     // This keeps a guest row from shadowing a real account, and keeps the
@@ -264,41 +320,6 @@ export default async function registerGuestForCourse(req, logger) {
         logger.info(`Guest already enrolled in course ${course.id}, no mail queued`);
         return GENERIC_SUCCESS;
       }
-    }
-
-    // Checked before anything is written, and for new addresses as well as
-    // known ones: an attacker cycling through fresh addresses is the case that
-    // actually costs us mail volume.
-    const since = new Date(Date.now() - 60 * 60 * 1000).toISOString();
-    const recent = await client.request(COUNT_RECENT, {
-      userId: existingUser?.id ?? NO_SUCH_USER_ID,
-      courseId: course.id,
-      since,
-    });
-    const counts = {
-      perAddressCourse: recent?.perAddressCourse?.aggregate?.count ?? 0,
-      perAddress: recent?.perAddress?.aggregate?.count ?? 0,
-      perCourse: recent?.perCourse?.aggregate?.count ?? 0,
-      global: recent?.global?.aggregate?.count ?? 0,
-    };
-
-    const throttled = classifyGuestThrottle(counts);
-    if (throttled) {
-      logger.warn(
-        `Guest registration throttled (${throttled}) for course ${course.id} ` +
-          `(address+course=${counts.perAddressCourse}/${GUEST_THROTTLE.perAddressCourse}, ` +
-          `address=${counts.perAddress}/${GUEST_THROTTLE.perAddress}, ` +
-          `course=${counts.perCourse}/${GUEST_THROTTLE.perCourse}, ` +
-          `global=${counts.global}/${GUEST_THROTTLE.global})`
-      );
-      // An ADDRESS cap is keyed on the submitted address, so saying so would
-      // reveal how often that address has signed up recently - the same oracle
-      // the uniform response exists to close. A PUBLIC cap describes the event
-      // or the platform and leaks nothing, so the person is told plainly rather
-      // than left watching an inbox that will stay empty.
-      return throttled === 'ADDRESS'
-        ? GENERIC_SUCCESS
-        : { success: false, messageKey: 'GUEST_REGISTRATION_THROTTLED' };
     }
 
     let userId;
