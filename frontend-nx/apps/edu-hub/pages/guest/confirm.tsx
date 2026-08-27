@@ -77,6 +77,8 @@ const GuestConfirm: FC = () => {
     <div className="max-w-screen-md mx-auto mt-14">
       <Head>
         <title>{t('confirm.page_title')} | EduHub | opencampus.sh</title>
+        {/* This URL carries a single-use credential; keep it out of search indexes. */}
+        <meta name="robots" content="noindex, nofollow" />
         <link rel="icon" href="/favicon.png" />
       </Head>
       <Page>
