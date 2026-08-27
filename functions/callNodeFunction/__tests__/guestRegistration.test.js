@@ -12,6 +12,7 @@ const {
   escapeLikePattern,
   classifyGuestThrottle,
   findUsersByEmail,
+  appendGuestMailFooter,
   isHoneypotTripped,
   GUEST_THROTTLE,
   NO_SUCH_USER_ID,
@@ -211,6 +212,53 @@ describe('registration throttling', () => {
     // Hasura reads `{_eq: null}` as "no condition", so a null here would count
     // every token in the window instead of none.
     expect(NO_SUCH_USER_ID).toBe('00000000-0000-0000-0000-000000000000');
+  });
+});
+
+describe('guest mail footer', () => {
+  // Three senders append this, and it is a guest's only route to their own data,
+  // so the rules it follows are worth pinning down.
+  const GUEST = { id: USER_ID, status: 'GUEST' };
+  const silent = { error: () => {} };
+
+  it('adds the manage link for a guest', () => {
+    const out = appendGuestMailFooter('<html><body><p>hi</p></body></html>', GUEST, silent);
+    expect(out).toContain('/guest/manage?token=');
+    expect(out).toContain(USER_ID);
+  });
+
+  it('places the footer inside the document, not after it', () => {
+    // Plain concatenation left the markup dangling past </html>. Clients render
+    // it either way, but invalid structure is cheap spam-filter signal.
+    const out = appendGuestMailFooter('<html><body><p>hi</p></body></html>', GUEST, silent);
+    expect(out.indexOf('/guest/manage')).toBeLessThan(out.indexOf('</body>'));
+    expect(out.trimEnd().endsWith('</html>')).toBe(true);
+  });
+
+  it('falls back to appending when there is no closing tag', () => {
+    expect(appendGuestMailFooter('<p>hi</p>', GUEST, silent)).toContain('/guest/manage');
+  });
+
+  it('leaves mail to everyone else untouched', () => {
+    // The same templates serve logged-in users, for whom the link means nothing.
+    for (const status of ['ACTIVE', 'INACTIVE', 'DELETED', undefined]) {
+      const body = '<html><body><p>hi</p></body></html>';
+      expect(appendGuestMailFooter(body, { id: USER_ID, status }, silent)).toBe(body);
+    }
+    expect(appendGuestMailFooter('<p>x</p>', null, silent)).toBe('<p>x</p>');
+  });
+
+  it('returns the mail unchanged rather than throwing when the secret is missing', () => {
+    // A reminder without the footer beats a reminder that never arrives.
+    const original = process.env.GUEST_TOKEN_SECRET;
+    delete process.env.GUEST_TOKEN_SECRET;
+    let logged = '';
+    try {
+      expect(appendGuestMailFooter('<p>hi</p>', GUEST, { error: (m) => (logged = m) })).toBe('<p>hi</p>');
+      expect(logged).toContain('GUEST_TOKEN_SECRET');
+    } finally {
+      process.env.GUEST_TOKEN_SECRET = original;
+    }
   });
 });
 
