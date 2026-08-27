@@ -4,8 +4,12 @@ import {
   buildConfirmLink,
   buildCourseLink,
   buildPrivacyPolicyLink,
+  GUEST_THROTTLE,
+  NO_SUCH_USER_ID,
   createHasuraClient,
   escapeLikePattern,
+  isGuestRegistrationThrottled,
+  isHoneypotTripped,
   isValidEmail,
   isValidName,
   issueConfirmToken,
@@ -104,17 +108,40 @@ const FIND_EXISTING_ENROLLMENT = gql`
 `;
 
 /**
- * Pending confirmations issued for this address in the last hour. Caps how much
- * mail one submitter can aim at a third party's inbox, and how fast the form can
- * be used to mint rows.
+ * Volume counters, all over the last hour.
+ *
+ * Every `MailLog` insert becomes a real Mailgun send, and this endpoint needs no
+ * credential, so without these a script could mint unbounded guest rows and aim
+ * unbounded mail at addresses of its choosing. The cost is money and, worse,
+ * sender-domain reputation: bounces from unverified addresses are what get a
+ * domain throttled.
+ *
+ * Three scopes, narrowest first:
+ *   perAddress  keeps one inbox from being bombed
+ *   perCourse   keeps one event from being used as a mail cannon
+ *   global      backstop across every event
+ *
+ * Hasura CE cannot enforce per-role rate limits (`api_limits` is a Cloud/EE
+ * feature and the file is empty), so this is the only layer that can hold.
  */
-const COUNT_RECENT_TOKENS = gql`
-  query CountRecentGuestRegistrationTokens($userId: uuid!, $since: timestamptz!) {
-    GuestRegistrationToken_aggregate(
-      where: {
-        userId: { _eq: $userId }
-        created_at: { _gt: $since }
+const COUNT_RECENT = gql`
+  query CountRecentGuestRegistrations($userId: uuid!, $courseId: Int!, $since: timestamptz!) {
+    perAddress: GuestRegistrationToken_aggregate(
+      where: { userId: { _eq: $userId }, created_at: { _gt: $since } }
+    ) {
+      aggregate {
+        count
       }
+    }
+    perCourse: GuestRegistrationToken_aggregate(
+      where: { courseId: { _eq: $courseId }, created_at: { _gt: $since } }
+    ) {
+      aggregate {
+        count
+      }
+    }
+    global: User_aggregate(
+      where: { status: { _eq: GUEST }, created_at: { _gt: $since } }
     ) {
       aggregate {
         count
@@ -123,7 +150,6 @@ const COUNT_RECENT_TOKENS = gql`
   }
 `;
 
-const MAX_CONFIRM_MAILS_PER_HOUR = 3;
 
 /** The single response every caller gets, whatever actually happened. */
 const GENERIC_SUCCESS = {
@@ -142,6 +168,15 @@ export default async function registerGuestForCourse(req, logger) {
     const email = normalizeEmail(input.email);
     const acceptTerms = input.acceptTerms === true;
     const newsletterOptIn = input.newsletterOptIn === true;
+
+    // Honeypot. The form has a matching hidden field, but that check is client
+    // side and a script calling this action directly never sees it - so the
+    // decisive check has to be here. Answer exactly as we would a person, so an
+    // automated submitter learns nothing from the response.
+    if (isHoneypotTripped(input.website)) {
+      logger.warn(`Guest registration honeypot triggered for course ${courseId}`);
+      return GENERIC_SUCCESS;
+    }
 
     if (!Number.isInteger(courseId) || courseId <= 0) {
       return { success: false, messageKey: 'INVALID_COURSE' };
@@ -210,17 +245,9 @@ export default async function registerGuestForCourse(req, logger) {
       return GENERIC_SUCCESS;
     }
 
-    let userId;
     if (existingUser) {
-      userId = existingUser.id;
-      // Someone re-submitting with a corrected spelling should see the
-      // correction; the address is the identity, the name is just a label.
-      if (existingUser.firstName !== firstName || existingUser.lastName !== lastName) {
-        await client.request(UPDATE_GUEST_USER_NAME, { id: userId, firstName, lastName });
-      }
-
       const enrollmentData = await client.request(FIND_EXISTING_ENROLLMENT, {
-        userId,
+        userId: existingUser.id,
         courseId: course.id,
       });
       // Already registered. Sending a second confirmation would let anyone
@@ -230,12 +257,40 @@ export default async function registerGuestForCourse(req, logger) {
         logger.info(`Guest already enrolled in course ${course.id}, no mail queued`);
         return GENERIC_SUCCESS;
       }
+    }
 
-      const since = new Date(Date.now() - 60 * 60 * 1000).toISOString();
-      const recent = await client.request(COUNT_RECENT_TOKENS, { userId, since });
-      if ((recent?.GuestRegistrationToken_aggregate?.aggregate?.count ?? 0) >= MAX_CONFIRM_MAILS_PER_HOUR) {
-        logger.warn(`Guest confirmation rate limit hit for course ${course.id}`);
-        return GENERIC_SUCCESS;
+    // Checked before anything is written, and for new addresses as well as
+    // known ones: an attacker cycling through fresh addresses is the case that
+    // actually costs us mail volume.
+    const since = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+    const recent = await client.request(COUNT_RECENT, {
+      userId: existingUser?.id ?? NO_SUCH_USER_ID,
+      courseId: course.id,
+      since,
+    });
+    const counts = {
+      perAddress: recent?.perAddress?.aggregate?.count ?? 0,
+      perCourse: recent?.perCourse?.aggregate?.count ?? 0,
+      global: recent?.global?.aggregate?.count ?? 0,
+    };
+
+    if (isGuestRegistrationThrottled(counts)) {
+      logger.warn(
+        `Guest registration throttled for course ${course.id} ` +
+          `(address=${counts.perAddress}/${GUEST_THROTTLE.perAddress}, ` +
+          `course=${counts.perCourse}/${GUEST_THROTTLE.perCourse}, ` +
+          `global=${counts.global}/${GUEST_THROTTLE.global})`
+      );
+      return GENERIC_SUCCESS;
+    }
+
+    let userId;
+    if (existingUser) {
+      userId = existingUser.id;
+      // Someone re-submitting with a corrected spelling should see the
+      // correction; the address is the identity, the name is just a label.
+      if (existingUser.firstName !== firstName || existingUser.lastName !== lastName) {
+        await client.request(UPDATE_GUEST_USER_NAME, { id: userId, firstName, lastName });
       }
     } else {
       const inserted = await client.request(INSERT_GUEST_USER, { firstName, lastName, email });

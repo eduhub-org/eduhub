@@ -740,6 +740,8 @@ type Mutation {
     email: String!
     acceptTerms: Boolean!
     newsletterOptIn: Boolean
+    """Honeypot. A person never fills this; anything non-empty is discarded."""
+    website: String
   ): RegisterGuestForCourseResult!
 }
 

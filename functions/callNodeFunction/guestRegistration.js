@@ -359,6 +359,45 @@ export async function getGuestRetentionMonths(client) {
   return data?.AppSettings?.[0]?.guestDataRetentionMonths ?? 12;
 }
 
+/* ---------------------------------------------------------------- throttling */
+
+/**
+ * Hourly ceilings on guest registration. Every `MailLog` insert becomes a real
+ * Mailgun send and this endpoint needs no credential, so without these a script
+ * could mint unbounded guest rows and aim unbounded mail at addresses of its
+ * choosing. The cost is money and, worse, sender-domain reputation: bounces from
+ * unverified addresses are what get a domain throttled.
+ *
+ * Hasura CE cannot enforce per-role rate limits (`api_limits` is a Cloud/EE
+ * feature and the file is empty), so the handler is the only layer that can hold.
+ */
+export const GUEST_THROTTLE = {
+  perAddress: 3,
+  perCourse: 30,
+  global: 100,
+};
+
+/**
+ * Matches no row. Hasura treats `{_eq: null}` as "no condition", so counting by
+ * a null user id would silently return the unfiltered total; a sentinel that
+ * cannot occur (gen_random_uuid never produces the nil UUID) keeps the count
+ * honestly zero for an address we have never seen.
+ */
+export const NO_SUCH_USER_ID = '00000000-0000-0000-0000-000000000000';
+
+export function isGuestRegistrationThrottled({ perAddress = 0, perCourse = 0, global = 0 } = {}) {
+  return (
+    perAddress >= GUEST_THROTTLE.perAddress ||
+    perCourse >= GUEST_THROTTLE.perCourse ||
+    global >= GUEST_THROTTLE.global
+  );
+}
+
+/** A person never fills the honeypot field; anything in it is automated. */
+export function isHoneypotTripped(value) {
+  return String(value ?? '').trim() !== '';
+}
+
 /* -------------------------------------------------------------- validation */
 
 /**

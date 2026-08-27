@@ -72,13 +72,6 @@ export const GuestRegistrationModal: FC<GuestRegistrationModalProps> = ({ visibl
   const handleSubmit = useCallback(async () => {
     setErrorKey(null);
 
-    if (honeypot.trim() !== '') {
-      // Show the same confirmation a person would get rather than an error, so
-      // an automated submitter learns nothing from the response.
-      setSubmitted(true);
-      return;
-    }
-
     if (!firstName.trim() || !lastName.trim()) {
       setErrorKey('errors.name_required');
       return;
@@ -101,6 +94,9 @@ export const GuestRegistrationModal: FC<GuestRegistrationModalProps> = ({ visibl
           email: email.trim(),
           acceptTerms,
           newsletterOptIn,
+          // Forwarded rather than checked here: a script calling the action
+          // directly never runs this component, so the server decides.
+          website: honeypot,
         },
       });
 
@@ -179,7 +175,8 @@ export const GuestRegistrationModal: FC<GuestRegistrationModalProps> = ({ visibl
               />
             </label>
 
-            {/* Honeypot: hidden from people, irresistible to bots. */}
+            {/* Honeypot: hidden from people, irresistible to bots. Discarded server
+                side in registerGuestForCourse. */}
             <input
               type="text"
               value={honeypot}

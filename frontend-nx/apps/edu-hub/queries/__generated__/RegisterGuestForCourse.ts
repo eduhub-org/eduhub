@@ -28,4 +28,5 @@ export interface RegisterGuestForCourseVariables {
   email: string;
   acceptTerms: boolean;
   newsletterOptIn?: boolean | null;
+  website?: string | null;
 }

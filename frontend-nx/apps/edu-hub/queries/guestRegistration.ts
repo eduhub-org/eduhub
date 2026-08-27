@@ -25,6 +25,7 @@ export const REGISTER_GUEST_FOR_COURSE = gql`
     $email: String!
     $acceptTerms: Boolean!
     $newsletterOptIn: Boolean
+    $website: String
   ) {
     registerGuestForCourse(
       courseId: $courseId
@@ -33,6 +34,7 @@ export const REGISTER_GUEST_FOR_COURSE = gql`
       email: $email
       acceptTerms: $acceptTerms
       newsletterOptIn: $newsletterOptIn
+      website: $website
     ) {
       success
       error

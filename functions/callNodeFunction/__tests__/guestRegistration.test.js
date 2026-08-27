@@ -10,6 +10,10 @@ const {
   hashToken,
   generateRawToken,
   escapeLikePattern,
+  isGuestRegistrationThrottled,
+  isHoneypotTripped,
+  GUEST_THROTTLE,
+  NO_SUCH_USER_ID,
   isValidEmail,
   isValidName,
   normalizeEmail,
@@ -118,6 +122,54 @@ describe('LIKE escaping', () => {
   it('handles null and undefined', () => {
     expect(escapeLikePattern(null)).toBe('');
     expect(escapeLikePattern(undefined)).toBe('');
+  });
+});
+
+describe('honeypot', () => {
+  it('trips on anything a bot would type', () => {
+    expect(isHoneypotTripped('http://spam.example')).toBe(true);
+    expect(isHoneypotTripped('   x  ')).toBe(true);
+  });
+
+  it('does not trip on what a person leaves behind', () => {
+    // A real submission never touches the field, so empty, whitespace-only,
+    // and absent must all pass.
+    expect(isHoneypotTripped('')).toBe(false);
+    expect(isHoneypotTripped('   ')).toBe(false);
+    expect(isHoneypotTripped(null)).toBe(false);
+    expect(isHoneypotTripped(undefined)).toBe(false);
+  });
+});
+
+describe('registration throttling', () => {
+  it('lets an ordinary submission through', () => {
+    expect(isGuestRegistrationThrottled({ perAddress: 0, perCourse: 0, global: 0 })).toBe(false);
+    expect(isGuestRegistrationThrottled({})).toBe(false);
+  });
+
+  it('blocks at each ceiling independently', () => {
+    expect(isGuestRegistrationThrottled({ perAddress: GUEST_THROTTLE.perAddress })).toBe(true);
+    expect(isGuestRegistrationThrottled({ perCourse: GUEST_THROTTLE.perCourse })).toBe(true);
+    expect(isGuestRegistrationThrottled({ global: GUEST_THROTTLE.global })).toBe(true);
+  });
+
+  it('allows the submission that reaches one below the ceiling', () => {
+    expect(isGuestRegistrationThrottled({ perAddress: GUEST_THROTTLE.perAddress - 1 })).toBe(false);
+    expect(isGuestRegistrationThrottled({ perCourse: GUEST_THROTTLE.perCourse - 1 })).toBe(false);
+    expect(isGuestRegistrationThrottled({ global: GUEST_THROTTLE.global - 1 })).toBe(false);
+  });
+
+  it('orders the ceilings narrowest to widest', () => {
+    // A per-course cap below the per-address cap would make the address cap
+    // unreachable, and a global cap below the course cap likewise.
+    expect(GUEST_THROTTLE.perAddress).toBeLessThan(GUEST_THROTTLE.perCourse);
+    expect(GUEST_THROTTLE.perCourse).toBeLessThan(GUEST_THROTTLE.global);
+  });
+
+  it('uses a sentinel user id that no generated uuid can collide with', () => {
+    // Hasura reads `{_eq: null}` as "no condition", so a null here would count
+    // every token in the window instead of none.
+    expect(NO_SUCH_USER_ID).toBe('00000000-0000-0000-0000-000000000000');
   });
 });
 

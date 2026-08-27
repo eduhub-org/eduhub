@@ -126,8 +126,21 @@ at their own link is usually the fastest complete answer.
   payload whether the address was unknown, already had an account, already had a
   pending confirmation, or was already enrolled. Only the address owner learns
   the difference, by email. Keep it that way when editing.
-- **Rate limiting** caps confirmation mails per address per hour, so the form
-  cannot be used to bomb a third party's inbox.
+- **Volume caps** (`GUEST_THROTTLE` in `guestRegistration.js`) apply per address
+  (3/h), per course (30/h) and globally (100 new guests/h), all checked *before*
+  anything is written and for unseen addresses as well as known ones. Every
+  `MailLog` insert becomes a real Mailgun send, and this endpoint needs no
+  credential, so without these a script could aim unbounded mail at addresses of
+  its choosing — costing money and, worse, sender-domain reputation. Hasura CE
+  cannot enforce per-role rate limits (`api_limits` is a Cloud/EE feature and the
+  file is empty), so the handler is the only layer that can hold. A throttled
+  request gets the same generic success payload as any other.
+- **Honeypot**, decided server-side in `registerGuestForCourse`. The form has a
+  matching hidden field but only forwards it: a script calling the action
+  directly never runs the component.
+- **Deliberately not IP-based.** An IP is personal data; keying the caps on one
+  would mean processing and storing it, a worse trade than two counters. Revisit
+  only if real abuse appears.
 - **Tokens.** The confirmation token is random, stored only as a SHA-256 hash,
   single use, 7 days. The manage token is a stateless HMAC over the user id
   signed with `GUEST_TOKEN_SECRET` — nothing is stored, so any mailer can
@@ -141,7 +154,7 @@ at their own link is usually the fastest complete answer.
 
 | Layer | Path |
 |---|---|
-| Migrations | `backend/migrations/default/1788100000000_*` … `1788100000005_*` |
+| Migrations | `backend/migrations/default/1788100000000_*` … `1788100000007_*` |
 | Actions | `backend/metadata/actions.yaml`, `actions.graphql` |
 | Token table | `backend/metadata/databases/default/tables/public_GuestRegistrationToken.yaml` |
 | Shared helpers | `functions/callNodeFunction/guestRegistration.js` |

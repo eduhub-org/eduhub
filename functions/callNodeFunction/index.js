@@ -206,8 +206,11 @@ export const callNodeFunction = async (req, res) => {
 
   logger.info(`Received request for function: ${functionName}`);
 
-  // Validate function exists
-  if (!(functionName in functionMap)) {
+  // Own properties only: `in` walks the prototype chain, so a `name` header of
+  // `constructor` would resolve to `Object` and `__proto__` to `Object.prototype`.
+  // Neither is reachable without the shared secret, checked above - this is
+  // defence in depth, not a fix for a live hole.
+  if (!Object.prototype.hasOwnProperty.call(functionMap, functionName)) {
     return res.status(404).json({
       success: false,
       error: "Function Not Found",
