@@ -5335,15 +5335,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:>=8.1.0":
-  version: 25.0.3
-  resolution: "@types/node@npm:25.0.3"
-  dependencies:
-    undici-types: ~7.16.0
-  checksum: b5e0146eafe208e2f1c1167fd6078a460ace823ad1da61967ec70b8d7521bd6dd26f3cd945796effac48ef4b3df4d8d57d03e9eefd5f2903f6c1d6daf84a9a79
-  languageName: node
-  linkType: hard
-
 "@types/normalize-package-data@npm:^2.4.0, @types/normalize-package-data@npm:^2.4.1":
   version: 2.4.4
   resolution: "@types/normalize-package-data@npm:2.4.4"
@@ -16237,7 +16228,7 @@ __metadata:
     remark-gfm: ^4.0.0
     semantic-release: ^21.1.2
     sharp: ^0.35.0
-    stripe: ^14.21.0
+    stripe: ^22.6.0
     swiper: ^12.1.2
     swr: ^2.4.2
     tailwind-merge: ^2.5.4
@@ -19756,13 +19747,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"stripe@npm:^14.21.0":
-  version: 14.25.0
-  resolution: "stripe@npm:14.25.0"
-  dependencies:
-    "@types/node": ">=8.1.0"
-    qs: ^6.11.0
-  checksum: ac4bfa78a02346f4f05619f7886928da181f08c6bebd5d7c651ebe07dcaff3e6b97e0eeb1b0665eaa1b2ea0ba79622c3df3961de4a3629ec6feafd3637417184
+"stripe@npm:^22.6.0":
+  version: 22.6.0
+  resolution: "stripe@npm:22.6.0"
+  peerDependencies:
+    "@types/node": ">=18"
+  peerDependenciesMeta:
+    "@types/node":
+      optional: true
+  checksum: b72e7753bcb388d0752fb14b708638c07a7f2178d45ac7bf214a27e2585030a3ac6e7338901bd8836ec23e2d266353f229360d13c50591de82ac39ba4ee76b00
   languageName: node
   linkType: hard
 
@@ -20792,13 +20785,6 @@ __metadata:
   version: 6.19.8
   resolution: "undici-types@npm:6.19.8"
   checksum: de51f1b447d22571cf155dfe14ff6d12c5bdaec237c765085b439c38ca8518fc360e88c70f99469162bf2e14188a7b0bcb06e1ed2dc031042b984b0bb9544017
-  languageName: node
-  linkType: hard
-
-"undici-types@npm:~7.16.0":
-  version: 7.16.0
-  resolution: "undici-types@npm:7.16.0"
-  checksum: 1ef68fc6c5bad200c8b6f17de8e5bc5cfdcadc164ba8d7208cd087cfa8583d922d8316a7fd76c9a658c22b4123d3ff847429185094484fbc65377d695c905857
   languageName: node
   linkType: hard
 
