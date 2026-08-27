@@ -82,3 +82,19 @@ export const MANAGE_GUEST_REGISTRATION = gql`
     }
   }
 `;
+
+/**
+ * The configured guest retention period, for the privacy policy.
+ *
+ * The policy has to state the period it actually enforces, and
+ * `AppSettings.guestDataRetentionMonths` is deliberately adjustable -- a funding
+ * programme's evidence-retention period can require raising it. A number typed
+ * into the page text would quietly become untrue the first time anyone did.
+ */
+export const GUEST_DATA_RETENTION_MONTHS = gql`
+  query GuestDataRetentionMonths {
+    AppSettings(limit: 1) {
+      guestDataRetentionMonths
+    }
+  }
+`;

@@ -3,10 +3,28 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { FC } from 'react';
 import { Page } from '../../components/layout/Page';
+import { AuthRoles } from '../../types/enums';
+import { useRoleQuery } from '../../hooks/authedQuery';
+import { GUEST_DATA_RETENTION_MONTHS } from '../../queries/guestRegistration';
+import { GuestDataRetentionMonths } from '../../queries/__generated__/GuestDataRetentionMonths';
+
+/** Matches the fallback the retention job itself uses when the setting is unreadable. */
+const DEFAULT_GUEST_RETENTION_MONTHS = 12;
 
 const Privacy: FC = () => {
   const { locale } = useRouter();
   const isEnglish = locale === 'en';
+
+  // Read rather than hardcoded: this paragraph is a statement about what we
+  // actually do, and the period is configurable.
+  const { data: retentionData } = useRoleQuery<GuestDataRetentionMonths>(GUEST_DATA_RETENTION_MONTHS, {
+    context: { role: AuthRoles.anonymous },
+  });
+  const retentionMonths =
+    retentionData?.AppSettings?.[0]?.guestDataRetentionMonths ?? DEFAULT_GUEST_RETENTION_MONTHS;
+  const retentionPeriod = isEnglish
+    ? `${retentionMonths} ${retentionMonths === 1 ? 'month' : 'months'}`
+    : `${retentionMonths} ${retentionMonths === 1 ? 'Monat' : 'Monaten'}`;
 
   return (
     <div className="max-w-screen-xl mx-auto mt-14">
@@ -377,8 +395,8 @@ const Privacy: FC = () => {
           </p>
           <p>
             {isEnglish
-              ? 'We delete guest data automatically 12 months after the event has ended. Independently of that, every email you receive from us about the event contains a link through which you can view your stored data, cancel your registration, or have your data deleted at any time - no account or login required.'
-              : 'Wir löschen Gast-Daten automatisch 12 Monate nach dem Ende der Veranstaltung. Unabhängig davon enthält jede E-Mail, die du von uns zu der Veranstaltung erhältst, einen Link, über den du deine gespeicherten Daten jederzeit einsehen, deine Anmeldung stornieren oder deine Daten löschen lassen kannst - ohne Konto und ohne Anmeldung.'}
+              ? `We delete guest data automatically ${retentionPeriod} after the event has ended. Independently of that, every email you receive from us about the event contains a link through which you can view your stored data, cancel your registration, or have your data deleted at any time - no account or login required.`
+              : `Wir löschen Gast-Daten automatisch ${retentionPeriod} nach dem Ende der Veranstaltung. Unabhängig davon enthält jede E-Mail, die du von uns zu der Veranstaltung erhältst, einen Link, über den du deine gespeicherten Daten jederzeit einsehen, deine Anmeldung stornieren oder deine Daten löschen lassen kannst - ohne Konto und ohne Anmeldung.`}
           </p>
           <p>
             {isEnglish
