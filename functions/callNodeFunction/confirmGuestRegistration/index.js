@@ -1,5 +1,6 @@
 import { gql } from 'graphql-request';
 import {
+  GUEST_ALLOWED_REGISTRATION_TYPES,
   buildManageToken,
   createHasuraClient,
   findUsersByEmail,
@@ -25,10 +26,12 @@ const GET_COURSE = gql`
       title
       published
       guestRegistrationEnabled
+      registrationType
       maxParticipants
       activeParticipantCount
       Program {
         published
+        type
         organizationId
       }
     }
@@ -121,8 +124,19 @@ export default async function confirmGuestRegistration(req, logger) {
     const course = courseData?.Course_by_pk;
 
     // Re-checked rather than trusted from registration time: the token is valid
-    // for a week, and the event may have been unpublished or filled since.
-    if (!course || !course.published || !course.Program?.published || !course.guestRegistrationEnabled) {
+    // for a week, and the event may have been unpublished, filled, moved to a
+    // non-event programme or switched to an approval or paid registration type
+    // since. Every condition registerGuestForCourse enforces has to hold again
+    // here, or a week-old token becomes a way to create an enrollment the
+    // current settings would refuse.
+    if (
+      !course ||
+      !course.published ||
+      !course.Program?.published ||
+      !course.guestRegistrationEnabled ||
+      course.Program.type !== 'EVENTS' ||
+      !GUEST_ALLOWED_REGISTRATION_TYPES.has(course.registrationType)
+    ) {
       return { success: false, messageKey: 'COURSE_NOT_AVAILABLE' };
     }
 
