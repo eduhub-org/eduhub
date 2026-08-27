@@ -1,5 +1,6 @@
 import { gql, GraphQLClient } from 'graphql-request';
 import { createSessionVariableReplacer } from '../emailTemplateVariables.js';
+import { appendGuestMailFooter } from '../guestRegistration.js';
 
 /**
  * Calculates time window for a reminder based on current time
@@ -104,6 +105,7 @@ export default async function sendSessionReminders(req, logger) {
                 firstName
                 lastName
                 email
+                status
               }
             }
           }
@@ -150,9 +152,14 @@ export default async function sendSessionReminders(req, logger) {
       }
 
       // Check which reminders have already been sent using MailLog metadata
-      const sessionIds = validSessions.map(s => s.id);
+      // No variables: Hasura rejects a query that declares one it never uses
+      // ("unexpected variables in variableValues"), which is what this used to
+      // do with $sessionIds. Every run died here, so no session reminder has
+      // ever been sent. The dedupe below reads the metadata of every reminder
+      // logged so far, which is correct but unscoped -- worth narrowing to the
+      // sessions in the current window once that table grows.
       const GET_SENT_REMINDERS = gql`
-        query GetSentReminders($sessionIds: [Int!]!) {
+        query GetSentReminders {
           MailLog(
             where: {
               metadata: { _contains: { type: "SESSION_REMINDER" } }
@@ -165,16 +172,19 @@ export default async function sendSessionReminders(req, logger) {
         }
       `;
 
-      const sentRemindersData = await client.request(GET_SENT_REMINDERS, {
-        sessionIds: sessionIds
-      });
+      const sentRemindersData = await client.request(GET_SENT_REMINDERS);
 
       // Create a set of already sent reminders: "sessionId:userId:reminderType"
       const sentReminders = new Set();
       sentRemindersData?.MailLog?.forEach(mail => {
         const metadata = mail.metadata;
-        if (metadata?.sessionId && metadata?.userId && metadata?.reminderType && 
-            typeof metadata.sessionId === 'number' && typeof metadata.userId === 'number') {
+        // userId is a uuid, so a `typeof === 'number'` guard here rejected every
+        // entry and left the set permanently empty.
+        if (
+          typeof metadata?.sessionId === 'number' &&
+          typeof metadata?.userId === 'string' &&
+          typeof metadata?.reminderType === 'string'
+        ) {
           sentReminders.add(`${metadata.sessionId}:${metadata.userId}:${metadata.reminderType}`);
         }
       });
@@ -274,6 +284,10 @@ export default async function sendSessionReminders(req, logger) {
         let sessionEmailsSent = 0;
 
         for (const enrollment of session.Course.CourseEnrollments) {
+          // Anonymized records keep past enrollments but their address is a
+          // placeholder that goes nowhere.
+          if (enrollment.User?.status === 'DELETED') continue;
+
           const reminderKey = `${session.id}:${enrollment.User.id}:${window.type}`;
           
           if (sentReminders.has(reminderKey)) {
@@ -320,7 +334,13 @@ export default async function sendSessionReminders(req, logger) {
 
           // The subject is plain text, so variables must not be HTML-escaped there
           const emailSubject = replaceVariables(template.subject, { html: false });
-          const emailContent = replaceVariables(template.content);
+          // A guest has no account page to check the session details on, so the
+          // reminder carries their manage link like every other mail they get.
+          const emailContent = appendGuestMailFooter(
+            replaceVariables(template.content),
+            enrollment.User,
+            logger
+          );
 
           // Insert email into MailLog for sending
           const INSERT_MAIL_LOG = gql`
@@ -332,6 +352,7 @@ export default async function sendSessionReminders(req, logger) {
               $cc: String
               $bcc: String
               $status: String!
+              $metadata: jsonb
             ) {
               insert_MailLog_one(
                 object: {
@@ -342,6 +363,7 @@ export default async function sendSessionReminders(req, logger) {
                   cc: $cc
                   bcc: $bcc
                   status: $status
+                  metadata: $metadata
                 }
               ) {
                 id
@@ -356,7 +378,16 @@ export default async function sendSessionReminders(req, logger) {
             to: enrollment.User.email,
             cc: template.cc,
             bcc: template.bcc,
-            status: 'READY_TO_SEND'
+            status: 'READY_TO_SEND',
+            // This *is* the sent-reminder record. GET_SENT_REMINDERS reads it
+            // back to decide what has already gone out, so omitting it made the
+            // dedupe permanently empty and every run a repeat send.
+            metadata: {
+              type: 'SESSION_REMINDER',
+              sessionId: session.id,
+              userId: enrollment.User.id,
+              reminderType: window.type,
+            },
           });
 
           totalEmailsSent++;
