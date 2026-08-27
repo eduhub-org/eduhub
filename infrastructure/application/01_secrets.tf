@@ -387,3 +387,21 @@ resource "google_secret_manager_secret_iam_member" "stripe_webhook_secret" {
   member     = "serviceAccount:${google_service_account.custom_cloud_function_account.email}"
   depends_on = [google_secret_manager_secret.stripe_webhook_secret]
 }
+
+# The edu Cloud Run service hosts the Stripe webhook handler and sets no
+# service_account_name, so it runs as the default compute service account —
+# the two bindings above only cover the cloud function. These bindings are
+# per-member, so granting the compute account does not revoke that access.
+resource "google_secret_manager_secret_iam_member" "stripe_secret_key_eduhub" {
+  secret_id  = google_secret_manager_secret.stripe_secret_key.id
+  role       = "roles/secretmanager.secretAccessor"
+  member     = "serviceAccount:${data.google_project.eduhub.number}-compute@developer.gserviceaccount.com"
+  depends_on = [google_secret_manager_secret.stripe_secret_key]
+}
+
+resource "google_secret_manager_secret_iam_member" "stripe_webhook_secret_eduhub" {
+  secret_id  = google_secret_manager_secret.stripe_webhook_secret.id
+  role       = "roles/secretmanager.secretAccessor"
+  member     = "serviceAccount:${data.google_project.eduhub.number}-compute@developer.gserviceaccount.com"
+  depends_on = [google_secret_manager_secret.stripe_webhook_secret]
+}

@@ -169,6 +169,59 @@ function generateInvoiceNumber(
   return `${prefix}-${suffix}`;
 }
 
+/**
+ * Re-reads a Checkout Session from the API before its amounts are recorded.
+ *
+ * The delivered payload is shaped by the API version pinned to the webhook
+ * endpoint, which is fixed when the endpoint is created and can sit years
+ * away from the version this SDK is built against. Outgoing SDK calls always
+ * use the SDK's own version, so reading the amounts off a fresh response
+ * keeps the invoice figures independent of how the endpoint is configured.
+ *
+ * This matters because the fallbacks below are silent: on a payload without
+ * `amount_total` the invoice would be stored as 0,00 € with no error anywhere.
+ *
+ * Falls back to the delivered payload if the read fails — a Stripe outage
+ * must not turn a completed payment into a failed webhook, and the payload is
+ * still the authoritative record of what Stripe sent.
+ */
+export const refreshSession = async (
+  stripe: Stripe,
+  session: Stripe.Checkout.Session
+): Promise<Stripe.Checkout.Session> => {
+  try {
+    return await stripe.checkout.sessions.retrieve(session.id);
+  } catch (err) {
+    console.warn(
+      `Could not re-read Checkout Session ${session.id}; falling back to the delivered payload:`,
+      err
+    );
+    return session;
+  }
+};
+
+/**
+ * Returns a Checkout Session's gross total, refusing to proceed without one.
+ *
+ * A completed payment-mode session always carries `amount_total`, so an absent
+ * value means the data cannot be trusted — typically a failed re-read landing
+ * on a payload whose API version does not expose the field. The invoice paths
+ * downstream fall back to `?? 0`, which would record 0,00 € for money that
+ * actually moved. Throwing instead surfaces as a 500 and makes Stripe retry
+ * the delivery, so the payment is reconciled rather than silently mis-booked.
+ *
+ * Checked with `== null` rather than a falsy test: a genuine 0 — a fully
+ * discounted session — is a valid amount and must still be recorded.
+ */
+export const requireAmountTotal = (session: Stripe.Checkout.Session): number => {
+  if (session.amount_total == null) {
+    throw new Error(
+      `Checkout Session ${session.id} has no amount_total; refusing to record a zero-value invoice`
+    );
+  }
+  return session.amount_total;
+};
+
 const handleStripeWebhook = async (
   req: NextApiRequest,
   res: NextApiResponse
@@ -201,15 +254,16 @@ const handleStripeWebhook = async (
   let event: Stripe.Event;
 
   try {
+    // getRawBody with an encoding returns the raw payload as a string, which
+    // constructEvent accepts directly (WebhookPayload = string | Uint8Array).
+    // The previous Buffer.from() round-trip re-encoded it for no benefit and
+    // no longer typechecks, since Buffer is not assignable to Uint8Array under
+    // current @types/node.
     const rawBody = await getRawBody(req as any, {
       limit: '10mb',
       encoding: 'utf8',
     });
-    event = stripe.webhooks.constructEvent(
-      Buffer.from(rawBody),
-      sig,
-      webhookSecret
-    );
+    event = stripe.webhooks.constructEvent(rawBody, sig, webhookSecret);
   } catch (err: any) {
     console.error('Webhook signature verification failed:', err.message);
     return res.status(400).json({ error: `Webhook Error: ${err.message}` });
@@ -326,7 +380,13 @@ const handleStripeWebhook = async (
   try {
     switch (event.type) {
       case 'checkout.session.completed': {
-        const session = event.data.object as Stripe.Checkout.Session;
+        // Both branches below record monetary amounts, so read them from a
+        // fresh response rather than the endpoint-versioned payload.
+        const session = await refreshSession(
+          stripe,
+          event.data.object as Stripe.Checkout.Session
+        );
+        const amountTotal = requireAmountTotal(session);
         const { enrollmentId, courseId } = session.metadata || {};
 
         // StuJo job posting checkout (metadata set by publishJobPosting)
@@ -363,7 +423,7 @@ const handleStripeWebhook = async (
             await createInvoiceForEnrollment(
               parsedEnrollmentId,
               {
-                amountTotal: session.amount_total ?? 0,
+                amountTotal,
                 amountTax: session.total_details?.amount_tax ?? null,
                 currency: session.currency ?? 'eur',
                 stripeCheckoutSessionId: session.id,
