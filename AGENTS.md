@@ -38,9 +38,14 @@ Default login: `admin@example.com` / `dev`.
 nvm use 20
 yarn lint           # ESLint (matches CI)
 yarn test           # Jest + RTL
+yarn test:e2e       # Playwright against a running `docker compose up` stack
 yarn build
 GRAPHQL_URI=http://localhost:8080/v1/graphql yarn apollo   # regenerate GraphQL types
 ```
+
+E2E specs live in `frontend-nx/e2e/` and attach to a running stack — they never
+start one. CI runs them via `.github/workflows/e2e-tests.yml`, which boots the
+compose stack and serves a production build. See `frontend-nx/e2e/README.md`.
 
 Note: `yarn test` previously failed with `Requires Babel "^7.22.0"` (next/babel
 vs jest-config). This is now fixed by pinning `@babel/core` to `7.29.7` via a

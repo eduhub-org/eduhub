@@ -1,0 +1,369 @@
+name: E2E Tests
+
+# Boots the real EduHub stack (Postgres, Keycloak, Hasura, node functions) from
+# docker-compose.yml, serves a production build of apps/edu-hub against it, and
+# drives the result with Playwright (frontend-nx/e2e). See frontend-nx/e2e/README.md.
+#
+# Unlike `Code Checks edu-hub`, which only proves the frontend compiles and lints,
+# this workflow is the only place CI exercises the wiring *between* the layers:
+# NextAuth against Keycloak, Apollo against Hasura, and the Hasura role a JWT
+# actually carries.
+
+on:
+  workflow_call:
+    inputs:
+      test_filter:
+        description: "Playwright --grep filter; empty runs the whole suite"
+        type: string
+        required: false
+        default: ""
+  workflow_dispatch:
+    inputs:
+      test_filter:
+        description: "Playwright --grep filter (empty = whole suite)"
+        type: string
+        required: false
+        default: ""
+  pull_request:
+    branches:
+      - develop
+    types: [opened, synchronize, reopened]
+    paths:
+      # Anything that can change what the browser sees. `keycloak/` and
+      # `backend/` are in here because a realm export or a Hasura permission is
+      # exactly the kind of change the frontend unit tests cannot catch.
+      - frontend-nx/**
+      - backend/**
+      - keycloak/**
+      - functions/**
+      - docker-compose.yml
+      - .github/workflows/e2e-tests.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  # One run per ref. The job holds a whole docker stack for ~20 minutes, so
+  # superseded pushes should be cancelled rather than queued behind each other.
+  group: e2e-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  e2e:
+    name: Run E2E Tests
+    runs-on: ubuntu-latest
+
+    # Sized so a step timeout always fires FIRST: a step timeout names the
+    # culprit, while a job timeout only says the job exceeded its maximum time.
+    # The five capped steps below sum to 52 minutes and the uncapped scaffolding
+    # (harden-runner, checkout, setup-node, cache, artifact upload) costs ~5, so
+    # 60 clears the worst case without ever being the thing that trips.
+    #
+    # Expected wall clock is ~20 minutes, not 60. These caps are deliberately
+    # loose first-run values — there are no measured timings for this job yet, so
+    # tighten each one against real runs rather than trusting these numbers.
+    timeout-minutes: 60
+
+    env:
+      # docker-compose.yml publishes every service the app needs, so the app runs
+      # on the runner itself and reaches the containers over localhost.
+      E2E_HASURA_URL: http://localhost:8080
+      E2E_STORAGE_URL: http://localhost:4001
+
+    steps:
+      - name: Harden the runner (audit all outbound calls)
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c # v2.21.0
+        with:
+          egress-policy: audit
+
+      - name: Checkout project
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+
+      - name: Configure the E2E environment
+        run: |
+          set -euo pipefail
+
+          # Single source of truth: the committed dev config the compose stack
+          # already runs against. Everything in it is a development-only value for
+          # throwaway containers -- the NextAuth secret and the Keycloak client
+          # secret are both committed there and in keycloak/imports-dev/edu-hub.json
+          # -- not a repository secret. Reading the file instead of restating its
+          # values keeps CI from drifting when the dev config changes.
+          #
+          # This has to run before the build: `next build` sets NODE_ENV=production,
+          # so Next.js will not load .env.development itself, and NEXT_PUBLIC_* is
+          # inlined into the bundle at build time.
+          while IFS= read -r line; do
+            case "${line}" in ''|'#'*) continue ;; esac
+            [[ "${line}" == *=* ]] || continue
+            key="${line%%=*}"
+            value="${line#*=}"
+            value="${value%\"}"
+            value="${value#\"}"
+            export "${key}=${value}"
+            printf '%s=%s\n' "${key}" "${value}" >> "${GITHUB_ENV}"
+          done < frontend-nx/apps/edu-hub/.env.development
+
+          # Values the frontend only gets from docker-compose.yml in dev, where it
+          # runs inside the compose network. Here it runs on the runner, so the
+          # container hostnames become published ports.
+          {
+            echo "NEXT_PUBLIC_ENVIRONMENT=development"
+            echo "NEXT_PUBLIC_STORAGE_BUCKET_URL=${E2E_STORAGE_URL}/emulated-bucket"
+            echo "HASURA_ADMIN_SECRET=myadminsecretkey"
+            echo "GRAPHQL_URI=${E2E_HASURA_URL}/v1/graphql"
+          } >> "${GITHUB_ENV}"
+
+          # Derived, never restated: Playwright must drive the app on exactly the
+          # origin Keycloak allows as a redirect URI, and must send users to
+          # exactly the Keycloak origin baked into the provider's `issuer`. A
+          # localhost-vs-127.0.0.1 mismatch here fails the token exchange with a
+          # message that points nowhere near the cause.
+          {
+            echo "E2E_BASE_URL=${NEXTAUTH_URL}"
+            echo "E2E_KEYCLOAK_URL=${NEXT_PUBLIC_AUTH_URL}"
+            echo "E2E_USER_PASSWORD=dev"
+          } >> "${GITHUB_ENV}"
+
+      # Started before the frontend work so the containers' own start-up -- the
+      # Keycloak realm import plus Hasura migrations, metadata and seeds -- runs
+      # concurrently with `yarn install` and `yarn build` instead of adding to the
+      # critical path. The readiness gate is a separate step further down.
+      #
+      # `python_functions` is omitted: its `pip install` costs minutes on every
+      # run and nothing in this suite calls a Python action. Add it here (and to
+      # the log collection below) if a spec ever needs one.
+      - name: Start the backend stack (Postgres, Keycloak, Hasura, node functions)
+        timeout-minutes: 10
+        run: docker compose up -d --build db_hasura keycloak hasura node_functions
+
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 22.x
+          cache: yarn
+          cache-dependency-path: frontend-nx/yarn.lock
+
+      - name: Install yarn dependencies
+        timeout-minutes: 8
+        working-directory: frontend-nx
+        run: yarn install --immutable
+
+      # Keyed on the lockfile, which pins @playwright/test and therefore the exact
+      # browser build required. A hit skips the ~150MB download; `--with-deps`
+      # below still runs its (uncacheable) apt step.
+      - name: Cache Playwright browsers
+        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('frontend-nx/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
+
+      - name: Build the frontend (installing Playwright browsers in parallel)
+        timeout-minutes: 12
+        working-directory: frontend-nx
+        run: |
+          set -euo pipefail
+
+          PW_INSTALL_PID=""
+
+          emit_install_log() {
+            echo "--- playwright install output ---"
+            cat /tmp/playwright-install.log 2>/dev/null || echo "(no output captured)"
+            echo "--- end playwright install output ---"
+          }
+
+          # A failing `yarn build` would leave this step under `set -e` before the
+          # reaping block at the bottom, stranding the installer and discarding its
+          # log -- exactly the diagnostic needed to tell a build failure apart from
+          # an install failure. The trap reaps the child and emits the log on every
+          # exit path; the happy path clears PW_INSTALL_PID once it has done both
+          # itself, so this never reports twice.
+          on_exit() {
+            local status=$?
+            if [[ -n "${PW_INSTALL_PID}" ]]; then
+              kill "${PW_INSTALL_PID}" 2>/dev/null || true
+              wait "${PW_INSTALL_PID}" 2>/dev/null || true
+              emit_install_log
+            fi
+            return "${status}"
+          }
+          trap on_exit EXIT
+
+          # Both are largely I/O bound, so overlapping them takes the browser
+          # download off the critical path.
+          #
+          # Only chromium is enabled in e2e/playwright.config.ts, and `ffmpeg` is a
+          # separate download that the config's `video: 'retain-on-failure'` needs:
+          # omitting the browser list would pull Firefox and WebKit for nothing,
+          # while naming chromium alone would silently drop failure videos.
+          #
+          # Bounded by `timeout` and logged to a file that is always echoed below,
+          # because a backgrounded `--with-deps` apt step stalling on an Ubuntu
+          # mirror otherwise presents as a hung build with no output at all.
+          (timeout 420 yarn playwright install chromium ffmpeg --with-deps \
+            > /tmp/playwright-install.log 2>&1) &
+          PW_INSTALL_PID=$!
+
+          yarn build
+
+          # `wait` yields the background subshell's exit status. Capture it via
+          # `|| pw_rc=$?` rather than a temp file: under `set -e` the subshell dies
+          # the moment the install fails, so anything appended inside it after the
+          # install would never run.
+          pw_rc=0
+          wait "${PW_INSTALL_PID}" || pw_rc=$?
+          PW_INSTALL_PID=""  # reaped -- keep the EXIT trap from re-reporting it
+
+          emit_install_log
+
+          if [[ "${pw_rc}" == "124" ]]; then
+            echo "::error::playwright install exceeded its 420s budget (apt mirror stall?). See the install output above."
+            exit 1
+          fi
+          if [[ "${pw_rc}" != "0" ]]; then
+            echo "::error::playwright install failed with exit code ${pw_rc}. See the install output above."
+            exit 1
+          fi
+
+      - name: Wait for the backend stack
+        timeout-minutes: 6
+        run: |
+          set -euo pipefail
+
+          wait_for_http() {
+            local name="$1" url="$2"
+            for _ in $(seq 1 60); do
+              if curl -fsS -o /dev/null "${url}"; then
+                echo "${name} is ready."
+                return 0
+              fi
+              sleep 5
+            done
+            echo "::error::${name} did not become ready at ${url}"
+            return 1
+          }
+
+          wait_for_http "Keycloak (edu-hub realm)" \
+            "${E2E_KEYCLOAK_URL}/realms/edu-hub/.well-known/openid-configuration"
+          wait_for_http "Hasura" "${E2E_HASURA_URL}/healthz"
+
+          # /healthz answers as soon as graphql-engine is listening, which is well
+          # before backend/dockerfile-dev-entrypoint.sh has applied migrations,
+          # metadata and seeds. Gate on a real query instead: `Course` only resolves
+          # once the metadata is applied, and returns a row only once the seed ran.
+          seeded=false
+          for _ in $(seq 1 60); do
+            if curl -fsS -X POST "${E2E_HASURA_URL}/v1/graphql" \
+              -H "x-hasura-admin-secret: ${HASURA_ADMIN_SECRET}" \
+              -H 'content-type: application/json' \
+              -d '{"query":"query E2EReadiness { Course(limit: 1) { id } }"}' \
+              | jq -e '.data.Course | length > 0' > /dev/null 2>&1; then
+              seeded=true
+              echo "Hasura metadata and seed data are in place."
+              break
+            fi
+            sleep 5
+          done
+          if [[ "${seeded}" != "true" ]]; then
+            echo "::error::Hasura never served seeded Course data; migrations, metadata or seeds did not apply. See the hasura container log artifact."
+            exit 1
+          fi
+
+          # The storage emulator is not gated with -f: any HTTP status proves the
+          # listener is up, and the login path only *tolerates* the node functions
+          # being unreachable (the updateFromKeycloak action logs and moves on).
+          for _ in $(seq 1 24); do
+            if curl -sS -o /dev/null --max-time 5 "${E2E_STORAGE_URL}/"; then
+              echo "Storage emulator (node functions) is reachable."
+              break
+            fi
+            sleep 5
+          done
+
+      - name: Start the frontend
+        timeout-minutes: 4
+        working-directory: frontend-nx
+        run: |
+          set -euo pipefail
+
+          # `next start` logs a warning that it "does not work with output:
+          # standalone" and then serves the build correctly regardless; the
+          # standalone bundle only matters to Dockerfile-edu, whose static/public
+          # copy dance is not worth reproducing here.
+          yarn start:prod > "${GITHUB_WORKSPACE}/app.log" 2>&1 &
+
+          for _ in $(seq 1 30); do
+            if [[ "$(curl -s -o /dev/null -w '%{http_code}' "${E2E_BASE_URL}/")" == "200" ]]; then
+              echo "Frontend is ready at ${E2E_BASE_URL}."
+              exit 0
+            fi
+            sleep 4
+          done
+
+          echo "::error::Frontend did not answer 200 at ${E2E_BASE_URL}/ within two minutes."
+          cat "${GITHUB_WORKSPACE}/app.log"
+          exit 1
+
+      - name: Run E2E tests
+        timeout-minutes: 12
+        working-directory: frontend-nx
+        env:
+          CI: "true"
+          # Via env, not `${{ }}` inside the script: the value comes from a
+          # workflow input and must not be able to become shell.
+          TEST_FILTER: ${{ inputs.test_filter }}
+        run: |
+          set -euo pipefail
+
+          if [[ -n "${TEST_FILTER:-}" ]]; then
+            echo "Filtering the suite with --grep ${TEST_FILTER}"
+            yarn test:e2e --grep "${TEST_FILTER}"
+          else
+            yarn test:e2e
+          fi
+
+      # Always uploaded: a green report is what tells you which specs actually
+      # ran, and the HTML reporter embeds the traces, videos and screenshots the
+      # config retains on failure.
+      - name: Upload the Playwright report
+        if: always()
+        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
+        with:
+          name: playwright-report
+          path: frontend-nx/e2e/playwright-report/
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Collect container logs
+        if: failure()
+        run: |
+          mkdir -p container-logs
+          for service in db_hasura keycloak hasura node_functions; do
+            docker compose logs --no-color --timestamps "${service}" \
+              > "container-logs/${service}.log" 2>&1 || true
+          done
+
+      - name: Upload frontend and container logs
+        if: failure()
+        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
+        with:
+          name: e2e-logs
+          if-no-files-found: ignore
+          path: |
+            app.log
+            container-logs/
+          retention-days: 30
+
+      # Tailed inline as well as uploaded, so the common failures (a Hasura
+      # permission denial, a NextAuth callback error) are visible in the job log
+      # without downloading an artifact first.
+      - name: Output the frontend log
+        if: failure()
+        run: |
+          if [[ -f app.log ]]; then
+            tail -n 400 app.log
+          else
+            echo "app.log not found: the frontend never started, or it failed before creating the log."
+          fi

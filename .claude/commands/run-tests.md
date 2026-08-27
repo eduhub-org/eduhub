@@ -60,3 +60,28 @@ describe('MyComponent', () => {
   });
 });
 ```
+
+## End-to-end tests (Playwright)
+
+Separate suite, separate command. Jest mocks GraphQL; the E2E suite drives a real
+Hasura + Keycloak stack and is the only place CI checks that the layers agree.
+
+```bash
+docker compose up -d          # repo root — the suite attaches, it never starts a stack
+cd frontend-nx
+yarn playwright install chromium ffmpeg --with-deps   # once per machine
+yarn test:e2e                 # whole suite
+yarn test:e2e --grep "authentication"
+yarn test:e2e:ui              # interactive
+yarn test:e2e:report          # HTML report of the last run
+yarn type-check:e2e
+```
+
+Specs live in `frontend-nx/e2e/`; CI runs them via
+`.github/workflows/e2e-tests.yml` on PRs into `develop`. Conventions (read-only
+specs, locale-pinned paths, seed fixtures in `support/seed.ts`) are documented in
+`frontend-nx/e2e/README.md` — read it before adding a spec.
+
+Note the split when reporting results: `yarn test` failing is a component-level
+failure, `yarn test:e2e` failing can also mean the stack never came up. Check
+`app.log` and `docker compose logs hasura` before blaming a spec.
