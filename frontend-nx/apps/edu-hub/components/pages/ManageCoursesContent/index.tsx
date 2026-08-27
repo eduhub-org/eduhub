@@ -53,8 +53,6 @@ import { COPY_COURSES_TO_PROGRAM } from '../../../queries/copyCourse';
 import NotificationSnackbar from '../../common/dialogs/NotificationSnackbar';
 import { MdMarkEmailRead, MdOpenInNew } from 'react-icons/md';
 
-// Header imports
-import CommonPageHeader from '../../common/CommonPageHeader';
 import { ProgramsMenubar } from '../../layout/ProgramsMenubar';
 import type { StaticComponentProperty } from '../../../types/UIComponents';
 import { ProgramType } from '../../../types/enums';
@@ -63,12 +61,16 @@ interface IProps {
   programs: Programs_Program[];
   /** Scopes the list (including the "All" tab) to a single Program.type. */
   programType: ProgramType;
+  /**
+   * Organization the dashboard is scoped to, or null for all organizations. Only super-admins ever
+   * see more than one organization; see ProgramManagementDashboard.
+   */
+  organizationId?: number | null;
 }
 
-const ManageCoursesContent: FC<IProps> = ({ programs, programType }) => {
+const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationId = null }) => {
   const t = useTranslations('manageCourses');
   const tCommon = useTranslations('common');
-  const tCoursePage = useTranslations('coursePage');
   const locale = useLocale();
 
   // Management role (admin for super-admins, org_admin otherwise) and the organization scope that
@@ -76,21 +78,17 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType }) => {
   const manageRole = useManageRole();
   const orgCourseWhere = useManageCourseWhere();
 
+  // Scopes every course query — including the "All" tab, which applies no program filter — to the
+  // current program type and, for a super-admin who picked one, to a single organization.
   const programTypeWhere = useMemo(
-    () => ({ Program: { type: { _eq: programType } } }),
-    [programType]
+    () => ({
+      Program: {
+        type: { _eq: programType },
+        ...(organizationId === null ? {} : { organizationId: { _eq: organizationId } }),
+      },
+    }),
+    [programType, organizationId]
   );
-
-  const headline = useMemo(() => {
-    switch (programType) {
-      case ProgramType.EVENTS:
-        return tCoursePage('eventsHeadline');
-      case ProgramType.DEGREES:
-        return tCoursePage('degreesHeadline');
-      default:
-        return tCoursePage('coursesHeadline');
-    }
-  }, [programType, tCoursePage]);
 
   const addButtonText = useMemo(() => {
     switch (programType) {
@@ -797,7 +795,6 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType }) => {
 
   return (
     <>
-      <CommonPageHeader headline={headline} />
       {/* Only show the program tab select when there is more than one program to switch between. */}
       {programs.length > 1 && (
         <div className="flex justify-start mb-5 text-white">

@@ -5,6 +5,7 @@ import { DocumentNode } from 'graphql';
 import { MdStar } from 'react-icons/md';
 
 import TableGrid from '../../common/TableGrid';
+import TableGridDeleteButton from '../../common/TableGrid/components/TableGridDeleteButton';
 import Loading from '../../common/Loading';
 import { useTableGrid } from '../../common/TableGrid/hooks';
 import { createMultiWordSearchCondition } from '../../common/TableGrid/utils';
@@ -13,7 +14,7 @@ import CheckboxSelector from '../../inputs/CheckboxSelector';
 import { useAdminQuery, useManageQuery, useOrgAdminQuery } from '../../../hooks/authedQuery';
 import { useAdminMutation } from '../../../hooks/authedMutation';
 import {
-  ORGANIZATION_ADMIN_LIST,
+  ADMIN_USER_LIST,
   DELETE_ORGANIZATION_ADMIN,
   MANAGEABLE_ORGANIZATIONS,
   SETTINGS_ADMIN_GRANTS,
@@ -29,56 +30,39 @@ import { PageBlock } from '../../common/PageBlock';
 import CommonPageHeader from '../../common/CommonPageHeader';
 import { useIsAdmin, useManageRole } from '../../../hooks/authentication';
 import { useUserId } from '../../../hooks/user';
-import { OrganizationAdminList_OrganizationAdmin } from '../../../queries/__generated__/OrganizationAdminList';
+import { AdminUserList_User, AdminUserList_User_OrganizationAdmins } from '../../../queries/__generated__/AdminUserList';
 import { OrganizationOptions, OrganizationOptionsVariables } from '../../../queries/__generated__/OrganizationOptions';
 import {
   ManageableOrganizations,
   ManageableOrganizationsVariables,
 } from '../../../queries/__generated__/ManageableOrganizations';
 import { SettingsAdminGrants } from '../../../queries/__generated__/SettingsAdminGrants';
-import AddOrganizationAdminDialog, { AdminOrganizationOption } from './AddOrganizationAdminDialog';
+import { User_bool_exp, order_by } from '../../../__generated__/globalTypes';
+import AddAdminDialog, { AdminOrganizationOption } from './AddAdminDialog';
 
-const ExpandableUserRow: FC<{
-  row: OrganizationAdminList_OrganizationAdmin;
-  isSuperAdmin: boolean;
+// Every mutation on a grant changes both the list (capabilities, and possibly whether the user is
+// listed at all) and the per-organization settings-admin counts that gate the sole-admin guard.
+const GRANT_REFETCH_QUERIES = ['AdminUserList', 'SettingsAdminGrants'];
+
+/**
+ * One administered organization of an admin user: its capability flags plus the control to revoke
+ * the whole grant. A user with several organizations gets one of these blocks per organization.
+ */
+const OrganizationGrantBlock: FC<{
+  grant: AdminUserList_User_OrganizationAdmins;
+  firstName: string;
+  lastName: string;
+  isAdmin: boolean;
   // True when this grant is the only settings admin of its organization: the settings capability
-  // must not be turned off here (the DB guard would reject it), so the checkbox is disabled —
+  // must not be turned off (and the grant not deleted) here, because the DB guard would reject it —
   // unless the viewer is a super-admin, who bypasses the guard at the DB level.
   isSoleSettingsAdmin: boolean;
-  onAdminStatusChange: () => void;
-}> = ({ row, isSuperAdmin, isSoleSettingsAdmin, onAdminStatusChange }) => {
+}> = ({ grant, firstName, lastName, isAdmin, isSoleSettingsAdmin }) => {
   const t = useTranslations('manageAdminUsers');
-  const isAdmin = useIsAdmin();
   const manageRole = useManageRole();
 
   // Non-super-admins cannot clear the last settings admin of an org; super-admins bypass the guard.
   const settingsLocked = isSoleSettingsAdmin && !isAdmin;
-
-  const [setAdminStatus] = useAdminMutation(UPDATE_USER_ADMIN_STATUS);
-
-  const handleAdminToggle = useCallback(
-    async (checked: boolean) => {
-      // row.id is the OrganizationAdmin grant id; the super-admin action keys off the User id.
-      if (!row.User?.id) {
-        return;
-      }
-      try {
-        const response = await setAdminStatus({
-          variables: {
-            userId: row.User.id,
-            isAdmin: checked,
-          },
-        });
-
-        if (response.data?.updateUserAdminStatus?.success) {
-          onAdminStatusChange();
-        }
-      } catch (error) {
-        console.error('Error updating admin status:', error);
-      }
-    },
-    [onAdminStatusChange, row.User?.id, setAdminStatus]
-  );
 
   const capabilities = useMemo<
     {
@@ -88,54 +72,64 @@ const ExpandableUserRow: FC<{
       mutation: DocumentNode;
       disabled?: boolean;
       helpText?: string;
-      refetchQueries?: string[];
     }[]
   >(
     () => [
       {
         key: 'events',
         label: t('can_manage_events'),
-        checked: row.canManageEvents,
+        checked: grant.canManageEvents,
         mutation: UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_EVENTS,
       },
       {
         key: 'courses',
         label: t('can_manage_courses'),
-        checked: row.canManageCourses,
+        checked: grant.canManageCourses,
         mutation: UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_COURSES,
       },
       {
         key: 'degrees',
         label: t('can_manage_degrees'),
-        checked: row.canManageDegrees,
+        checked: grant.canManageDegrees,
         mutation: UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_DEGREES,
       },
       {
         key: 'jobs',
         label: t('can_manage_jobs'),
-        checked: row.canManageJobs,
+        checked: grant.canManageJobs,
         mutation: UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_JOBS,
       },
       {
         key: 'settings',
         label: t('can_manage_users_and_settings'),
-        checked: row.canManageSettings,
+        checked: grant.canManageSettings,
         mutation: UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_SETTINGS,
-        // Sole settings admin: block turning it off (except for super-admins, who bypass the DB
-        // guard). Refetch the list + counts on toggle so the disabled state stays in sync after
-        // granting settings to someone else first.
+        // Sole settings admin: block turning it off. Granting settings to a colleague first lifts
+        // the lock, which is why every toggle also refetches the counts.
         disabled: settingsLocked,
         helpText: settingsLocked ? t('sole_settings_admin_hint') : undefined,
-        refetchQueries: ['OrganizationAdminList', 'SettingsAdminGrants'],
       },
     ],
-    [row, t, settingsLocked]
+    [grant, t, settingsLocked]
   );
 
   return (
-    <div className="light bg-fill-primary text-label-primary px-4 py-3">
-      <div className="text-xs font-semibold uppercase tracking-wide text-label-secondary mb-2">
-        {t('capabilities_heading')}
+    <div className="border border-solid border-border-primary rounded p-3">
+      <div className="flex items-center justify-between gap-2 mb-2">
+        <div className="text-sm font-semibold truncate">{grant.Organization.name}</div>
+        <TableGridDeleteButton
+          deleteMutation={DELETE_ORGANIZATION_ADMIN}
+          id={grant.id}
+          idType="number"
+          role={manageRole}
+          disabled={settingsLocked}
+          refetchQueries={GRANT_REFETCH_QUERIES}
+          deletionConfirmationQuestion={t('deletion_confirmation_question', {
+            firstName,
+            lastName,
+            organization: grant.Organization.name,
+          })}
+        />
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-1">
         {capabilities.map((capability) => (
@@ -148,11 +142,71 @@ const ExpandableUserRow: FC<{
             helpText={capability.helpText}
             updateValueMutation={capability.mutation}
             role={manageRole}
-            identifierVariables={{ itemId: row.id }}
-            refetchQueries={capability.refetchQueries ?? ['OrganizationAdminList']}
+            identifierVariables={{ itemId: grant.id }}
+            refetchQueries={GRANT_REFETCH_QUERIES}
           />
         ))}
       </div>
+    </div>
+  );
+};
+
+const ExpandableAdminRow: FC<{
+  row: AdminUserList_User;
+  isSuperAdmin: boolean;
+  isSoleSettingsAdmin: (grant: AdminUserList_User_OrganizationAdmins) => boolean;
+  onAdminStatusChange: () => void;
+}> = ({ row, isSuperAdmin, isSoleSettingsAdmin, onAdminStatusChange }) => {
+  const t = useTranslations('manageAdminUsers');
+  const isAdmin = useIsAdmin();
+
+  const [setAdminStatus] = useAdminMutation(UPDATE_USER_ADMIN_STATUS);
+
+  const handleAdminToggle = useCallback(
+    async (checked: boolean) => {
+      if (!row.id) {
+        return;
+      }
+      try {
+        const response = await setAdminStatus({
+          variables: {
+            userId: row.id,
+            isAdmin: checked,
+          },
+        });
+
+        if (response.data?.updateUserAdminStatus?.success) {
+          onAdminStatusChange();
+        }
+      } catch (error) {
+        console.error('Error updating admin status:', error);
+      }
+    },
+    [onAdminStatusChange, row.id, setAdminStatus]
+  );
+
+  return (
+    <div className="light bg-fill-primary text-label-primary px-4 py-3">
+      <div className="text-xs font-semibold uppercase tracking-wide text-label-secondary mb-2">
+        {t('capabilities_heading')}
+      </div>
+      {row.OrganizationAdmins.length > 0 ? (
+        <div className="space-y-3">
+          {row.OrganizationAdmins.map((grant) => (
+            <OrganizationGrantBlock
+              key={grant.id}
+              grant={grant}
+              firstName={row.firstName}
+              lastName={row.lastName}
+              isAdmin={isAdmin}
+              isSoleSettingsAdmin={isSoleSettingsAdmin(grant)}
+            />
+          ))}
+        </div>
+      ) : (
+        // Super-admins have platform-wide rights without administering any single organization.
+        <div className="text-sm text-label-secondary">{t('no_organization_roles')}</div>
+      )}
       {isAdmin && (
         <div className="mt-3 pt-3 border-t border-solid border-border-primary">
           <CheckboxSelector
@@ -180,8 +234,10 @@ const ManageAdminUsersContent: FC<ManageAdminUsersContentProps> = ({ inSettingsL
   const [adminUserIds, setAdminUserIds] = useState<string[]>([]);
   const [adminError, setAdminError] = useState<Error | null>(null);
 
-  // The super-admin list drives only the super-admin toggle, which is shown to super-admins only.
-  // It is also an admin-only action, so org admins must not request it.
+  // Super-admin is a Keycloak role, not a database row, so the ids come from the getAdminUsers
+  // action. They drive both the super-admin marker/toggle and the list filter below, which pulls in
+  // super-admins who hold no organization grant. It is an admin-only action, so org admins must not
+  // request it — they simply never see super-admin state.
   const { refetch: refetchAdminUsers } = useAdminQuery(ADMIN_USERS, {
     skip: !isAdmin,
     onCompleted: (data) => {
@@ -197,8 +253,12 @@ const ManageAdminUsersContent: FC<ManageAdminUsersContentProps> = ({ inSettingsL
 
   // The super-admin checkbox is controlled by `adminUserIds` (derived from the AdminUsers query),
   // which is held in local state. After a toggle we must refetch that query and refresh the state so
-  // the checkbox and "Super Admin" marker reflect the change (refetching the grid query does not).
+  // the checkbox, the "Super Admin" marker and the list filter reflect the change.
   const handleAdminStatusChange = useCallback(async () => {
+    // The query is skipped for org admins (admin-only action); refetching it would run it anyway.
+    if (!isAdmin) {
+      return;
+    }
     try {
       const { data: adminData } = await refetchAdminUsers();
       if (adminData?.getAdminUsers?.success) {
@@ -207,26 +267,61 @@ const ManageAdminUsersContent: FC<ManageAdminUsersContentProps> = ({ inSettingsL
     } catch (refetchError) {
       console.error('Error refreshing admin users:', refetchError);
     }
-  }, [refetchAdminUsers]);
+  }, [isAdmin, refetchAdminUsers]);
 
-  // Org admins see only the grants of organizations they administer (enforced by the org_admin
-  // select permission); super-admins see all. useManageQuery pins the role accordingly.
-  const { data, loading, error, pageIndex, setPageIndex, searchFilter, setSearchFilter, refetch } = useTableGrid({
-    queryHook: useManageQuery,
-    query: ORGANIZATION_ADMIN_LIST,
-    pageSize: 15,
-    refetchFilter: (searchFilter) => {
+  // A single table of every admin: users holding at least one OrganizationAdmin grant, plus (for
+  // super-admin viewers) the super-admins themselves, who typically administer no organization at
+  // all and would otherwise be missing from the screen.
+  //
+  // Org admins see only the users of organizations they administer (enforced by the org_admin User
+  // select permission) and only the grants of those organizations (OrganizationAdmin select
+  // permission). useManageQuery pins admin vs org_admin accordingly.
+  const buildFilter = useCallback(
+    (searchFilter: string) => {
+      // "Has at least one grant", written in the explicit form so it reads as an EXISTS check.
+      const adminBranches: User_bool_exp[] = [{ OrganizationAdmins: { id: { _is_null: false } } }];
+      if (adminUserIds.length > 0) {
+        adminBranches.push({ id: { _in: adminUserIds } });
+      }
+      const isAdminUser: User_bool_exp = adminBranches.length > 1 ? { _or: adminBranches } : adminBranches[0];
+
       const searchCondition = createMultiWordSearchCondition(searchFilter, [
-        'User.lastName',
-        'User.firstName',
-        'User.email',
+        'lastName',
+        'firstName',
+        'email',
         'Organization.name',
+        'OrganizationAdmins.Organization.name',
       ]);
+
       return {
-        filter: searchCondition,
+        filter: Object.keys(searchCondition).length > 0 ? { _and: [isAdminUser, searchCondition] } : isAdminUser,
       };
     },
-  });
+    [adminUserIds]
+  );
+
+  const { data, loading, error, pageIndex, setPageIndex, searchFilter, setSearchFilter, sorting, setSorting, refetch } =
+    useTableGrid({
+      queryHook: useManageQuery,
+      query: ADMIN_USER_LIST,
+      pageSize: 15,
+      defaultSort: [{ lastName: order_by.asc }, { firstName: order_by.asc }],
+      sortColumnMapper: (columnId) => {
+        switch (columnId) {
+          case 'firstName':
+            return 'firstName';
+          case 'lastName':
+            return 'lastName';
+          case 'email':
+            return 'email';
+          case 'profileOrganization':
+            return { Organization: { name: null } };
+          default:
+            return null;
+        }
+      },
+      refetchFilter: buildFilter,
+    });
 
   // Per-organization count of settings admins, so the UI can pre-disable removing/deleting the
   // *last* one for an org (the DB guard enforces the same rule). Role-scoped like the list: org
@@ -243,10 +338,8 @@ const ManageAdminUsersContent: FC<ManageAdminUsersContentProps> = ({ inSettingsL
   }, [settingsAdminData]);
 
   const isSoleSettingsAdmin = useCallback(
-    (row: OrganizationAdminList_OrganizationAdmin) => {
-      const orgId = row.Organization?.id;
-      return !!row.canManageSettings && orgId != null && (settingsAdminCountByOrg.get(orgId) ?? 0) <= 1;
-    },
+    (grant: AdminUserList_User_OrganizationAdmins) =>
+      !!grant.canManageSettings && (settingsAdminCountByOrg.get(grant.organizationId) ?? 0) <= 1,
     [settingsAdminCountByOrg]
   );
 
@@ -254,8 +347,7 @@ const ManageAdminUsersContent: FC<ManageAdminUsersContentProps> = ({ inSettingsL
 
   // Organizations the current user may add admins to. Super-admins pick from all organizations; org
   // admins are restricted to those they administer with the canManageSettings capability (the same
-  // capability Hasura enforces on insert). The add button is shown only when at least one option
-  // exists, which also hides it from org admins who cannot manage users/settings anywhere.
+  // capability Hasura enforces on insert).
   const { data: allOrganizationsData } = useAdminQuery<OrganizationOptions, OrganizationOptionsVariables>(
     ORGANIZATION_OPTIONS,
     { skip: !isAdmin }
@@ -284,30 +376,22 @@ const ManageAdminUsersContent: FC<ManageAdminUsersContentProps> = ({ inSettingsL
     return Array.from(byId, ([id, name]) => ({ id, name })).sort((a, b) => a.name.localeCompare(b.name));
   }, [isAdmin, allOrganizationsData, manageableOrganizationsData]);
 
-  const canAddAdmins = organizationOptions.length > 0;
+  // Super-admins can always add someone (at minimum as a super-admin); org admins only when they may
+  // add to at least one organization, which hides the button from those without settings rights.
+  const canAddAdmins = isAdmin || organizationOptions.length > 0;
 
-  const columns = useMemo<ColumnDef<OrganizationAdminList_OrganizationAdmin>[]>(() => {
-    const baseColumns: ColumnDef<OrganizationAdminList_OrganizationAdmin>[] = [
-      {
-        // The organization the user administers. The grant's organization is always shown: the row's
-        // capability toggles and delete action target that specific grant, so it must stay
-        // identifiable even for super-admins with several grants.
-        header: t('organization'),
-        accessorKey: 'Organization.name',
-        enableSorting: true,
-        size: 180,
-        cell: ({ getValue }) => <div className="truncate">{getValue<ReactNode>()}</div>,
-      },
+  const columns = useMemo<ColumnDef<AdminUserList_User>[]>(() => {
+    const baseColumns: ColumnDef<AdminUserList_User>[] = [
       {
         header: t('first_name'),
-        accessorKey: 'User.firstName',
+        accessorKey: 'firstName',
         enableSorting: true,
         size: 140,
         cell: ({ getValue }) => <div className="truncate">{getValue<ReactNode>()}</div>,
       },
       {
         header: t('last_name'),
-        accessorKey: 'User.lastName',
+        accessorKey: 'lastName',
         enableSorting: true,
         size: 140,
         cell: ({ getValue }) => <div className="truncate">{getValue<ReactNode>()}</div>,
@@ -315,24 +399,36 @@ const ManageAdminUsersContent: FC<ManageAdminUsersContentProps> = ({ inSettingsL
       {
         // The organization the user belongs to according to their own profile (independent of the
         // organizations they administer).
+        id: 'profileOrganization',
         header: t('profile_organization'),
-        accessorKey: 'User.Organization.name',
         enableSorting: true,
         size: 180,
-        cell: ({ row }) => <div className="truncate">{row.original.User?.Organization?.name ?? ''}</div>,
+        cell: ({ row }) => <div className="truncate">{row.original.Organization?.name ?? ''}</div>,
       },
       {
         header: t('email'),
-        accessorKey: 'User.email',
+        accessorKey: 'email',
         enableSorting: true,
         size: 220,
         cell: ({ getValue }) => <div className="truncate">{getValue<ReactNode>()}</div>,
+      },
+      {
+        // Every organization this user administers. Expanding the row shows the capabilities per
+        // organization. Empty for a super-admin without any organization role.
+        id: 'administeredOrganizations',
+        header: t('administered_organizations'),
+        enableSorting: false,
+        size: 220,
+        cell: ({ row }) => {
+          const names = row.original.OrganizationAdmins.map((grant) => grant.Organization.name);
+          return <div className="truncate">{names.length > 0 ? names.join(', ') : '–'}</div>;
+        },
       },
     ];
 
     // Only super-admins can see super-admin status (adminUserIds is empty for org admins), so the
     // marker column is added for them only. It is kept short and shows a star icon (with a tooltip)
-    // instead of inline text, which would otherwise crowd the organization name.
+    // instead of inline text, which would otherwise crowd the name columns.
     if (!isAdmin) {
       return baseColumns;
     }
@@ -345,7 +441,7 @@ const ManageAdminUsersContent: FC<ManageAdminUsersContentProps> = ({ inSettingsL
         size: 44,
         meta: { align: 'center' },
         cell: ({ row }) =>
-          adminUserIds.includes(row.original.User?.id) ? (
+          adminUserIds.includes(row.original.id) ? (
             <div className="flex justify-center" title={t('super_admin_label')}>
               <MdStar className="text-brand" size="1.25em" aria-label={t('super_admin_label')} />
             </div>
@@ -355,17 +451,6 @@ const ManageAdminUsersContent: FC<ManageAdminUsersContentProps> = ({ inSettingsL
     ];
   }, [t, adminUserIds, isAdmin]);
 
-  const generateDeletionConfirmation = useCallback(
-    (row: OrganizationAdminList_OrganizationAdmin) => {
-      return t('deletion_confirmation_question', {
-        firstName: row.User?.firstName,
-        lastName: row.User?.lastName,
-        organization: row.Organization?.name,
-      });
-    },
-    [t]
-  );
-
   const table = (
     <>
       {loading && <Loading />}
@@ -373,47 +458,46 @@ const ManageAdminUsersContent: FC<ManageAdminUsersContentProps> = ({ inSettingsL
       {!loading && !error && (
         <div>
           {!inSettingsLayout && <CommonPageHeader headline={t('headline')} />}
-          <TableGrid
-              columns={columns}
-              {...(canAddAdmins
-                ? { onAddButtonClick: () => setIsAddDialogOpen(true), addButtonText: t('add_admin_button') }
-                : {})}
-              data={data?.OrganizationAdmin || []}
-              totalCount={data?.OrganizationAdmin_aggregate?.aggregate?.count || 0}
-              pageIndex={pageIndex}
-              onPageChange={setPageIndex}
-              searchFilter={searchFilter}
-              onSearchFilterChange={setSearchFilter}
-              deleteMutation={DELETE_ORGANIZATION_ADMIN}
-              deleteIdType="number"
-              // Block deleting the last settings admin of an org (the DB guard would reject it too),
-              // except for super-admins, who bypass the guard at the DB level.
-              canDeleteRow={(row) => isAdmin || !isSoleSettingsAdmin(row)}
-              role={manageRole}
-              error={error}
-              loading={loading}
-              refetchQueries={['OrganizationAdminList', 'AdminUsers', 'SettingsAdminGrants']}
-              generateDeletionConfirmationQuestion={generateDeletionConfirmation}
-              expandableRowComponent={({ row }) => (
-                <ExpandableUserRow
-                  row={row}
-                  isSuperAdmin={adminUserIds.includes(row.User?.id)}
-                  isSoleSettingsAdmin={isSoleSettingsAdmin(row)}
-                  onAdminStatusChange={handleAdminStatusChange}
-                />
-              )}
-            />
-            <AddOrganizationAdminDialog
-              open={isAddDialogOpen}
-              onClose={() => setIsAddDialogOpen(false)}
-              onSuccess={() => {
-                // Refetch the list (so a first admin's DB-forced canManageSettings shows) and the
-                // settings-admin counts (so sole-admin disabling stays correct).
-                refetch();
-                refetchSettingsAdmins();
-              }}
-              organizationOptions={organizationOptions}
-            />
+          <TableGrid<AdminUserList_User>
+            columns={columns}
+            {...(canAddAdmins
+              ? { onAddButtonClick: () => setIsAddDialogOpen(true), addButtonText: t('add_admin_button') }
+              : {})}
+            data={data?.User || []}
+            totalCount={data?.User_aggregate?.aggregate?.count || 0}
+            pageIndex={pageIndex}
+            onPageChange={setPageIndex}
+            searchFilter={searchFilter}
+            onSearchFilterChange={setSearchFilter}
+            sorting={sorting}
+            onSortingChange={setSorting}
+            role={manageRole}
+            error={error}
+            loading={loading}
+            refetchQueries={['AdminUserList', 'AdminUsers', 'SettingsAdminGrants']}
+            expandableRowComponent={({ row }) => (
+              <ExpandableAdminRow
+                row={row}
+                isSuperAdmin={adminUserIds.includes(row.id)}
+                isSoleSettingsAdmin={isSoleSettingsAdmin}
+                onAdminStatusChange={handleAdminStatusChange}
+              />
+            )}
+          />
+          <AddAdminDialog
+            open={isAddDialogOpen}
+            onClose={() => setIsAddDialogOpen(false)}
+            onSuccess={() => {
+              // Refetch the list (so a first admin's DB-forced canManageSettings shows), the
+              // settings-admin counts (so sole-admin disabling stays correct) and the super-admin
+              // ids (so a newly promoted super-admin appears in the list at all).
+              refetch();
+              refetchSettingsAdmins();
+              handleAdminStatusChange();
+            }}
+            organizationOptions={organizationOptions}
+            canGrantSuperAdmin={isAdmin}
+          />
         </div>
       )}
     </>

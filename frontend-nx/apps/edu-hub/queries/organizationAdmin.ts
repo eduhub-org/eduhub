@@ -1,40 +1,49 @@
 import { gql } from '@apollo/client';
 
-export const ORGANIZATION_ADMIN_LIST = gql`
-  query OrganizationAdminList(
+// One row per admin *person*, so the settings screen can show a single table of all admins:
+// organization admins and super-admins alike. Super-admins have no OrganizationAdmin grant of their
+// own, so they are pulled in by id via $filter (see ManageAdminUsersContent, which passes the ids
+// returned by the getAdminUsers action). Each row carries the user's grants, one per organization
+// they administer; the row is empty for a super-admin without any organization role.
+//
+// Role-scoped like the rest of the screen: org admins see only users they administer (User select
+// permission), and only the grants of their own organizations (OrganizationAdmin select permission).
+export const ADMIN_USER_LIST = gql`
+  query AdminUserList(
     $limit: Int = 15
     $offset: Int = 0
-    $filter: OrganizationAdmin_bool_exp = {}
-    $order_by: [OrganizationAdmin_order_by!] = {updated_at: desc}
+    $filter: User_bool_exp = {}
+    $order_by: [User_order_by!] = [{lastName: asc}, {firstName: asc}]
   ) {
-    OrganizationAdmin(
+    User(
       limit: $limit
       offset: $offset
       where: $filter
       order_by: $order_by
     ) {
       id
-      User {
-        id
-        firstName
-        lastName
-        email
-        Organization {
-          id
-          name
-        }
-      }
+      firstName
+      lastName
+      email
       Organization {
         id
         name
       }
-      canManageEvents
-      canManageCourses
-      canManageDegrees
-      canManageJobs
-      canManageSettings
+      OrganizationAdmins(order_by: {Organization: {name: asc}}) {
+        id
+        organizationId
+        Organization {
+          id
+          name
+        }
+        canManageEvents
+        canManageCourses
+        canManageDegrees
+        canManageJobs
+        canManageSettings
+      }
     }
-    OrganizationAdmin_aggregate(where: $filter) {
+    User_aggregate(where: $filter) {
       aggregate {
         count
       }

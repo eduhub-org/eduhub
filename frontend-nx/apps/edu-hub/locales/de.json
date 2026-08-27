@@ -1061,6 +1061,8 @@
       "email_templates": "Vorlagen",
       "has_custom_templates": "Dieser Kurs hat kursspezifische E-Mail-Vorlagen"
     },
+    "organization_scope_label": "Organisation",
+    "all_organizations_scope": "Alle Organisationen",
     "error_loading_programs": "Die Programme konnten nicht geladen werden. Bitte versuche es später erneut.",
     "empty_state": {
       "events": "Es gibt noch kein Veranstaltungsprogramm. Bitte einen Plattform-Admin, ein Veranstaltungsprogramm für deine Organisation anzulegen, bevor du hier Veranstaltungen verwalten kannst.",
@@ -2039,6 +2041,8 @@
     "can_manage_jobs": "Kann Stellenangebote verwalten",
     "can_manage_users_and_settings": "Kann Benutzer und Einstellungen verwalten",
     "error_loading_admin_users": "Fehler beim Laden der Admin-Benutzer.",
+    "administered_organizations": "Verwaltete Organisationen",
+    "no_organization_roles": "Keine Organisationsrolle – nur Super-Admin-Rechte.",
     "add_admin_button": "Admin hinzufügen",
     "add_admin_dialog_title": "Admin-Benutzer hinzufügen",
     "add_admin_user_label": "Benutzer",
@@ -2051,6 +2055,9 @@
     "add_admin_error": "Der Admin-Benutzer konnte nicht hinzugefügt werden.",
     "add_admin_submit": "Hinzufügen",
     "add_admin_submitting": "Wird hinzugefügt…",
+    "add_admin_scope_required": "Bitte wähle eine Organisation aus oder vergib Super-Admin-Rechte.",
+    "add_admin_no_organization": "Keine Organisation (nur Super-Admin)",
+    "add_admin_super_admin_hint": "Super-Admins verwalten die gesamte Plattform, unabhängig von einer Organisation.",
     "add_admin_success": "Admin-Benutzer hinzugefügt."
   },
   "manageAppSettings": {
