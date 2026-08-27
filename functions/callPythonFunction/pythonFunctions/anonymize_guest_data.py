@@ -42,7 +42,7 @@ def _get_retention_months(client):
         }
     }
     """
-    data = _check(client.send_query(query), "load retention setting")
+    data = _check(client.send_query(query, {}), "load retention setting")
     if not data:
         return DEFAULT_RETENTION_MONTHS
     settings = data.get("AppSettings") or []
