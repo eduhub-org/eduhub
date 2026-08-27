@@ -26,8 +26,17 @@ they would end up logged in with no Hasura `User` row. Re-pointing the guest
 row's id instead is not possible: most foreign keys to `User(id)` are
 `ON UPDATE RESTRICT`.
 
-`registerGuestForCourse` refuses to create a guest record for an address that
-already has an account, so only the guest-first ordering ever produces two rows.
+Both guest handlers refuse to act on an address that already has an account:
+`registerGuestForCourse` mails `GUEST_ALREADY_HAS_ACCOUNT` instead of creating a
+record, and `confirmGuestRegistration` repeats the check when the link is used,
+because a token stays valid for a week and the account may appear inside that
+window. So only the guest-first ordering ever produces two rows.
+
+Resolving an address is deliberately not a `limit: 1` lookup — see
+`findUsersByEmail`. Once both rows can exist, picking between them by row order
+is what lets a guest record shadow an account. A second partial index,
+`User_email_guest_key`, keeps the guest side to one row as well, so an address
+holds at most one account and at most one guest record.
 
 ## The flow
 
@@ -75,7 +84,7 @@ when all of these hold:
 | What is collected | First name, last name, email. Nothing else. |
 | Legal basis | Art. 6(1)(b) — performance of a contract / pre-contractual measures. Note this differs from regular participant profile data, which the privacy policy bases on Art. 6(1)(f). |
 | Retention | `AppSettings.guestDataRetentionMonths`, default **12**, counted from the end of the event. Enforced by the `anonymize_guest_data` cron. |
-| Erasure on request | Self-service via the manage link in every mail. No login needed. |
+| Erasure on request | Self-service via the manage link in every mail. No login needed. Cancels any registration still ahead of them, then anonymizes the record. |
 | Marketing | Separate, unticked, never required. Recorded only after confirmation, then handed to Ghost for its own double opt-in. |
 
 ### Retention job
@@ -94,9 +103,12 @@ when all of these hold:
 
 Idempotent: an anonymized guest is `DELETED`, so it is not selected again.
 
-A guest whose event has **no `endTime`** cannot be aged out — there is no date to
-count from. Rather than guess, the job counts these and logs a warning naming
-how many; set `Course.endTime` on those events so the period can apply.
+> **Known broken.** Both sweeps select on `Course.endTime`, which is a *time of
+> day* (`20:00`), not a date — the date an event runs on lives on its `Session`
+> rows. Hasura rejects the comparison against a `timestamptz` cutoff, the job
+> returns early, and neither sweep has ever run. Until the predicate is rewritten
+> against `Session.endDateTime`, no guest data is aged out and no abandoned signup
+> is deleted, which contradicts what the privacy policy states.
 
 > **Ordering matters.** Erasure unsubscribes from Ghost *before* overwriting the
 > email, because `syncGhostNewsletterSubscription` re-reads `User.email` when it
@@ -127,14 +139,25 @@ at their own link is usually the fastest complete answer.
   pending confirmation, or was already enrolled. Only the address owner learns
   the difference, by email. Keep it that way when editing.
 - **Volume caps** (`GUEST_THROTTLE` in `guestRegistration.js`) apply per address
-  (3/h), per course (30/h) and globally (100 new guests/h), all checked *before*
-  anything is written and for unseen addresses as well as known ones. Every
-  `MailLog` insert becomes a real Mailgun send, and this endpoint needs no
-  credential, so without these a script could aim unbounded mail at addresses of
-  its choosing — costing money and, worse, sender-domain reputation. Hasura CE
-  cannot enforce per-role rate limits (`api_limits` is a Cloud/EE feature and the
-  file is empty), so the handler is the only layer that can hold. A throttled
-  request gets the same generic success payload as any other.
+  *and course* (3/h), per address (10/h), per course (30/h) and globally (100 new
+  guests/h), all checked *before* anything is written and for unseen addresses as
+  well as known ones. Every `MailLog` insert becomes a real Mailgun send, and this
+  endpoint needs no credential, so without these a script could aim unbounded mail
+  at addresses of its choosing — costing money and, worse, sender-domain
+  reputation. Hasura CE cannot enforce per-role rate limits (`api_limits` is a
+  Cloud/EE feature and the file is empty), so the handler is the only layer that
+  can hold.
+
+  The narrow cap is per address *and* course on purpose: repeating one event is
+  the abuse, whereas signing up for several different events in one sitting is
+  what someone does at an open day, and a flat per-address cap cannot tell them
+  apart. How a throttled request is answered depends on what the answer would
+  reveal (`classifyGuestThrottle`): the address-keyed caps return the ordinary
+  success payload, because saying otherwise would disclose how often that address
+  signed up recently, while the per-course and global caps return
+  `GUEST_REGISTRATION_THROTTLED` — they describe the event or the platform, not
+  the person, so the visitor can be told to try again instead of watching an inbox
+  that stays empty.
 - **Honeypot**, decided server-side in `registerGuestForCourse`. The form has a
   matching hidden field but only forwards it: a script calling the action
   directly never runs the component.
@@ -168,7 +191,7 @@ at their own link is usually the fastest complete answer.
 | Token table | `backend/metadata/databases/default/tables/public_GuestRegistrationToken.yaml` |
 | Shared helpers | `functions/callNodeFunction/guestRegistration.js` |
 | Handlers | `functions/callNodeFunction/{registerGuestForCourse,confirmGuestRegistration,manageGuestRegistration}/` |
-| Guest mail footer | `functions/callNodeFunction/sendEnrollmentEmail/index.js` |
+| Guest mail footer | `appendGuestMailFooter` in `guestRegistration.js`, applied by `sendEnrollmentEmail`, `sendCourseUpdateEmail` and `sendSessionReminders` |
 | Retention cron | `functions/callPythonFunction/pythonFunctions/anonymize_guest_data.py` |
 | Form | `frontend-nx/apps/edu-hub/components/pages/CourseContent/Registration/GuestRegistrationModal.tsx` |
 | Public pages | `frontend-nx/apps/edu-hub/pages/guest/{confirm,manage}.tsx` |
@@ -184,6 +207,15 @@ so the confirmation link comes out of the `node_functions` container log:
 docker compose up -d
 docker compose exec hasura hasura-cli migrate apply --database-name default
 docker compose exec hasura hasura-cli metadata apply
+# Required: the GUEST value in the UserStatus enum table is not visible to the
+# GraphQL schema until the sources are reloaded, and nothing here works before
+# it is -- queries fail with "expected one of the values ['INACTIVE', 'SPAM',
+# 'ACTIVE', 'DELETED'] for type 'UserStatus_enum'".
+curl -s -X POST http://localhost:8080/v1/metadata \
+  -H 'x-hasura-admin-secret: myadminsecretkey' \
+  -d '{"type":"reload_metadata","args":{"reload_sources":true}}'
+# Recreate node_functions so it picks up GUEST_TOKEN_SECRET
+docker compose up -d node_functions
 docker compose logs -f node_functions   # the confirm link appears here
 ```
 
@@ -199,7 +231,8 @@ docker compose logs -f node_functions   # the confirm link appears here
 5. Shift the `Session.startDateTime` and expect a `SESSION_RESCHEDULED` mail to
    the guest — this is the proof that guests inherit the existing pipeline.
 6. Open the manage link, delete everything, and confirm the `User` row is
-   anonymized, the tokens are gone, and the link is inert on a second use.
+   anonymized, the enrollment is `CANCELLED`, the tokens are gone, and the link
+   is inert on a second use.
 
 To exercise retention, backdate the course's `endTime` beyond the period and
 invoke the function directly; run it twice to confirm the second run is a no-op.
