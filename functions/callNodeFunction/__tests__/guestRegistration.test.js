@@ -10,7 +10,8 @@ const {
   hashToken,
   generateRawToken,
   escapeLikePattern,
-  isGuestRegistrationThrottled,
+  classifyGuestThrottle,
+  findUsersByEmail,
   isHoneypotTripped,
   GUEST_THROTTLE,
   NO_SUCH_USER_ID,
@@ -143,25 +144,65 @@ describe('honeypot', () => {
 
 describe('registration throttling', () => {
   it('lets an ordinary submission through', () => {
-    expect(isGuestRegistrationThrottled({ perAddress: 0, perCourse: 0, global: 0 })).toBe(false);
-    expect(isGuestRegistrationThrottled({})).toBe(false);
+    expect(classifyGuestThrottle({ perAddressCourse: 0, perAddress: 0, perCourse: 0, global: 0 }))
+      .toBeNull();
+    expect(classifyGuestThrottle({})).toBeNull();
   });
 
   it('blocks at each ceiling independently', () => {
-    expect(isGuestRegistrationThrottled({ perAddress: GUEST_THROTTLE.perAddress })).toBe(true);
-    expect(isGuestRegistrationThrottled({ perCourse: GUEST_THROTTLE.perCourse })).toBe(true);
-    expect(isGuestRegistrationThrottled({ global: GUEST_THROTTLE.global })).toBe(true);
+    expect(classifyGuestThrottle({ perAddressCourse: GUEST_THROTTLE.perAddressCourse }))
+      .toBe('ADDRESS');
+    expect(classifyGuestThrottle({ perAddress: GUEST_THROTTLE.perAddress })).toBe('ADDRESS');
+    expect(classifyGuestThrottle({ perCourse: GUEST_THROTTLE.perCourse })).toBe('PUBLIC');
+    expect(classifyGuestThrottle({ global: GUEST_THROTTLE.global })).toBe('PUBLIC');
   });
 
   it('allows the submission that reaches one below the ceiling', () => {
-    expect(isGuestRegistrationThrottled({ perAddress: GUEST_THROTTLE.perAddress - 1 })).toBe(false);
-    expect(isGuestRegistrationThrottled({ perCourse: GUEST_THROTTLE.perCourse - 1 })).toBe(false);
-    expect(isGuestRegistrationThrottled({ global: GUEST_THROTTLE.global - 1 })).toBe(false);
+    expect(classifyGuestThrottle({ perAddressCourse: GUEST_THROTTLE.perAddressCourse - 1 }))
+      .toBeNull();
+    expect(classifyGuestThrottle({ perAddress: GUEST_THROTTLE.perAddress - 1 })).toBeNull();
+    expect(classifyGuestThrottle({ perCourse: GUEST_THROTTLE.perCourse - 1 })).toBeNull();
+    expect(classifyGuestThrottle({ global: GUEST_THROTTLE.global - 1 })).toBeNull();
+  });
+
+  it('lets one address sign up for several different events', () => {
+    // The narrow cap is per address *and* course. A flat per-address cap of 3
+    // silently dropped the fourth event someone signed up for at an open day.
+    const oneEachForFourEvents = { perAddressCourse: 1, perAddress: 4 };
+    expect(classifyGuestThrottle(oneEachForFourEvents)).toBeNull();
+  });
+
+  it('still stops one address hammering a single event', () => {
+    expect(classifyGuestThrottle({ perAddressCourse: GUEST_THROTTLE.perAddressCourse, perAddress: 3 }))
+      .toBe('ADDRESS');
+  });
+
+  it('classifies address-keyed ceilings separately from public ones', () => {
+    // Reporting an address-keyed ceiling would tell an unauthenticated caller
+    // how often that address signed up recently, which is the enumeration leak
+    // the uniform success payload exists to close. The event and platform
+    // ceilings describe neither the address nor its owner.
+    expect(classifyGuestThrottle({ perAddressCourse: GUEST_THROTTLE.perAddressCourse }))
+      .toBe('ADDRESS');
+    expect(classifyGuestThrottle({ perAddress: GUEST_THROTTLE.perAddress })).toBe('ADDRESS');
+    expect(classifyGuestThrottle({ perCourse: GUEST_THROTTLE.perCourse })).toBe('PUBLIC');
+    expect(classifyGuestThrottle({ global: GUEST_THROTTLE.global })).toBe('PUBLIC');
+  });
+
+  it('prefers the address verdict when an address and a public cap trip together', () => {
+    // Answering PUBLIC here would disclose the address-keyed fact by omission.
+    expect(
+      classifyGuestThrottle({
+        perAddress: GUEST_THROTTLE.perAddress,
+        perCourse: GUEST_THROTTLE.perCourse,
+      })
+    ).toBe('ADDRESS');
   });
 
   it('orders the ceilings narrowest to widest', () => {
-    // A per-course cap below the per-address cap would make the address cap
-    // unreachable, and a global cap below the course cap likewise.
+    // A wider cap at or below a narrower one would make the narrower one
+    // unreachable.
+    expect(GUEST_THROTTLE.perAddressCourse).toBeLessThan(GUEST_THROTTLE.perAddress);
     expect(GUEST_THROTTLE.perAddress).toBeLessThan(GUEST_THROTTLE.perCourse);
     expect(GUEST_THROTTLE.perCourse).toBeLessThan(GUEST_THROTTLE.global);
   });
@@ -170,6 +211,60 @@ describe('registration throttling', () => {
     // Hasura reads `{_eq: null}` as "no condition", so a null here would count
     // every token in the window instead of none.
     expect(NO_SUCH_USER_ID).toBe('00000000-0000-0000-0000-000000000000');
+  });
+});
+
+describe('resolving an address to its rows', () => {
+  // The one lookup that decides whether the "you already have an account" guard
+  // fires. It used to be `limit: 1` with no ordering, so when an address held
+  // both a guest record and an account, Postgres picked between them and the
+  // guard was skipped whenever the guest row happened to come back first.
+  const clientReturning = (rows) => ({ request: async () => ({ User: rows }) });
+
+  const GUEST = { id: 'g1', status: 'GUEST', firstName: 'Gast', lastName: 'Row' };
+  const ACCOUNT = { id: 'a1', status: 'ACTIVE', firstName: 'Real', lastName: 'Account' };
+
+  it('finds the account even when the guest row is listed first', async () => {
+    const { account, guest } = await findUsersByEmail(clientReturning([GUEST, ACCOUNT]), 'a@b.co');
+    expect(account).toBe(ACCOUNT);
+    expect(guest).toBe(GUEST);
+  });
+
+  it('finds the account when it is listed first', async () => {
+    const { account, guest } = await findUsersByEmail(clientReturning([ACCOUNT, GUEST]), 'a@b.co');
+    expect(account).toBe(ACCOUNT);
+    expect(guest).toBe(GUEST);
+  });
+
+  it('treats suspended accounts as accounts', async () => {
+    // The reason this cannot be an `order_by: {status: asc}`: both INACTIVE and
+    // SPAM sort *after* GUEST alphabetically, so ordering would have handed back
+    // the guest row and skipped the guard for exactly these users.
+    for (const status of ['INACTIVE', 'SPAM']) {
+      const rows = [GUEST, { ...ACCOUNT, status }];
+      const { account } = await findUsersByEmail(clientReturning(rows), 'a@b.co');
+      expect(account?.status).toBe(status);
+    }
+  });
+
+  it('does not mistake an anonymized row for an account', async () => {
+    const deleted = { id: 'd1', status: 'DELETED' };
+    const { account, guest } = await findUsersByEmail(clientReturning([deleted, GUEST]), 'a@b.co');
+    expect(account).toBeNull();
+    expect(guest).toBe(GUEST);
+  });
+
+  it('reports nothing for an address we have never seen', async () => {
+    const { account, guest } = await findUsersByEmail(clientReturning([]), 'a@b.co');
+    expect(account).toBeNull();
+    expect(guest).toBeNull();
+  });
+
+  it('escapes LIKE metacharacters in the address it looks up', async () => {
+    let sent;
+    const client = { request: async (_q, vars) => ((sent = vars), { User: [] }) };
+    await findUsersByEmail(client, 'first_last@example.com');
+    expect(sent.email).toBe('first\\_last@example.com');
   });
 });
 
