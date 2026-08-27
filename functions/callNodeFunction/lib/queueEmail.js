@@ -1,5 +1,5 @@
 import { gql, GraphQLClient } from 'graphql-request';
-import { appendGuestMailFooter } from '../guestRegistration.js';
+import { appendGuestMailFooter, guestSafeCopyRecipients } from '../guestRegistration.js';
 
 /**
  * Generic function to queue emails
@@ -184,13 +184,18 @@ async function queueEmail({
       }
     `;
 
+    const copies = guestSafeCopyRecipients(recipientUser, {
+      cc: template.cc,
+      bcc: template.bcc,
+    });
+
     const mailResult = await client.request(INSERT_MAIL_LOG, {
       subject: emailSubject,
       content: emailContent,
       from: template.from || 'noreply@opencampus.sh',
       to: recipientEmail,
-      cc: template.cc,
-      bcc: template.bcc,
+      cc: copies.cc,
+      bcc: copies.bcc,
       status: 'READY_TO_SEND'
     });
 

@@ -1,6 +1,6 @@
 import { gql, GraphQLClient } from 'graphql-request';
 import { createSessionVariableReplacer } from '../emailTemplateVariables.js';
-import { appendGuestMailFooter } from '../guestRegistration.js';
+import { appendGuestMailFooter, guestSafeCopyRecipients } from '../guestRegistration.js';
 
 /**
  * Calculates time window for a reminder based on current time
@@ -376,8 +376,10 @@ export default async function sendSessionReminders(req, logger) {
             content: emailContent,
             from: template.from || 'noreply@opencampus.sh',
             to: enrollment.User.email,
-            cc: template.cc,
-            bcc: template.bcc,
+            ...guestSafeCopyRecipients(enrollment.User, {
+              cc: template.cc,
+              bcc: template.bcc,
+            }),
             status: 'READY_TO_SEND',
             // This *is* the sent-reminder record. GET_SENT_REMINDERS reads it
             // back to decide what has already gone out, so omitting it made the

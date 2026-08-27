@@ -1,6 +1,6 @@
 import { gql, GraphQLClient } from 'graphql-request';
 import { createEnrollmentVariableReplacer } from '../emailTemplateVariables.js';
-import { appendGuestMailFooter } from '../guestRegistration.js';
+import { appendGuestMailFooter, guestSafeCopyRecipients } from '../guestRegistration.js';
 
 /**
  * Sends enrollment status emails when CourseEnrollment status or invitationExpirationDate changes
@@ -349,8 +349,10 @@ export default async function sendEnrollmentEmail(req, logger) {
       content: emailContent,
       from: template.from || 'noreply@opencampus.sh',
       to: enrollmentDetails.User.email,
-      cc: template.cc,
-      bcc: template.bcc,
+      ...guestSafeCopyRecipients(enrollmentDetails.User, {
+        cc: template.cc,
+        bcc: template.bcc,
+      }),
       status: 'READY_TO_SEND'
     });
 
