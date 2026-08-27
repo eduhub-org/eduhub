@@ -93,7 +93,10 @@ const GuestConfirm: FC = () => {
 
               <div className="flex flex-col gap-3 pt-4">
                 {courseId != null && (
-                  <Link href={`/course/${courseId}`} className="text-brand hover:underline">
+                  <Link
+                    href={`/course/${courseId}`}
+                    className="text-brand hover:underline inline-flex items-center min-h-[44px] py-2 touch-manipulation"
+                  >
                     {t('confirm.to_event')}
                   </Link>
                 )}
@@ -103,7 +106,7 @@ const GuestConfirm: FC = () => {
                 {manageToken && (
                   <Link
                     href={`/guest/manage?token=${encodeURIComponent(manageToken)}`}
-                    className="text-brand hover:underline"
+                    className="text-brand hover:underline inline-flex items-center min-h-[44px] py-2 touch-manipulation"
                   >
                     {t('confirm.manage_registration')}
                   </Link>
@@ -116,7 +119,10 @@ const GuestConfirm: FC = () => {
             <>
               <h1 className="text-3xl font-bold">{t('confirm.error_title')}</h1>
               <p>{t(errorKey)}</p>
-              <Link href="/" className="text-brand hover:underline">
+              <Link
+                href="/"
+                className="text-brand hover:underline inline-flex items-center min-h-[44px] py-2 touch-manipulation"
+              >
                 {t('confirm.to_home')}
               </Link>
             </>
