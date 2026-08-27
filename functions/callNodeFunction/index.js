@@ -34,6 +34,9 @@ import deleteProjectDocumentationInstruction from "./deleteProjectDocumentationI
 import saveProjectDocumentationInstruction from "./saveProjectDocumentationInstruction/index.js";
 import sendProjectEmail from "./sendProjectEmail/index.js";
 import sendCourseUpdateEmail from "./sendCourseUpdateEmail/index.js";
+import registerGuestForCourse from "./registerGuestForCourse/index.js";
+import confirmGuestRegistration from "./confirmGuestRegistration/index.js";
+import manageGuestRegistration from "./manageGuestRegistration/index.js";
 
 const require = createRequire(import.meta.url);
 let constantTimeSecretsEqual;
@@ -96,6 +99,9 @@ const functionMap = {
   saveProjectDocumentationInstruction,
   sendProjectEmail,
   sendCourseUpdateEmail,
+  registerGuestForCourse,
+  confirmGuestRegistration,
+  manageGuestRegistration,
 };
 
 const constantTimeEquals = (providedSecret, expectedSecret) => {

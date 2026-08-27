@@ -1,5 +1,6 @@
 import { gql, GraphQLClient } from 'graphql-request';
 import { createEnrollmentVariableReplacer } from '../emailTemplateVariables.js';
+import { buildGuestMailFooter } from '../guestRegistration.js';
 
 /**
  * Sends enrollment status emails when CourseEnrollment status or invitationExpirationDate changes
@@ -53,6 +54,7 @@ export default async function sendEnrollmentEmail(req, logger) {
             firstName
             lastName
             email
+            status
           }
           Course {
             id
@@ -296,7 +298,25 @@ export default async function sendEnrollmentEmail(req, logger) {
 
     // The subject is plain text, so variables must not be HTML-escaped there
     const emailSubject = replaceVariables(template.subject, { html: false });
-    const emailContent = replaceVariables(template.content);
+    let emailContent = replaceVariables(template.content);
+
+    // A guest has no account to manage this registration from, so every mail they
+    // receive has to carry the link that stands in for one. Appended here rather
+    // than baked into the templates, because the same templates serve logged-in
+    // users, for whom the link would be meaningless.
+    if (enrollmentDetails.User?.status === 'GUEST') {
+      try {
+        emailContent += buildGuestMailFooter(enrollmentDetails.User.id);
+      } catch (footerError) {
+        // Only a misconfigured GUEST_TOKEN_SECRET gets here. Dropping the whole
+        // mail would be worse than dropping the footer, so send it and shout:
+        // until this is fixed, guests cannot self-serve and erasure requests
+        // have to be handled by hand.
+        logger.error(
+          `Could not build guest mail footer for user ${enrollmentDetails.User.id}: ${footerError.message}`
+        );
+      }
+    }
 
     // Insert email into MailLog for sending
     const INSERT_MAIL_LOG = gql`
