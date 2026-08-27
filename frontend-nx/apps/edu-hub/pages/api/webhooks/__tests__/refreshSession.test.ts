@@ -1,6 +1,6 @@
 import type Stripe from 'stripe';
 
-import { refreshSession } from '../stripe';
+import { refreshSession, requireAmountTotal } from '../stripe';
 
 /**
  * refreshSession re-reads a Checkout Session so the recorded amounts come from
@@ -61,5 +61,26 @@ describe('refreshSession', () => {
     const retrieve = jest.fn().mockRejectedValue(new Error('boom'));
 
     await expect(refreshSession(stripeWith(retrieve), delivered)).resolves.toBeDefined();
+  });
+});
+
+describe('requireAmountTotal', () => {
+  const session = (amount_total: number | null | undefined) =>
+    ({ id: 'cs_test_x', amount_total } as unknown as Stripe.Checkout.Session);
+
+  it('returns the gross total when present', () => {
+    expect(requireAmountTotal(session(5950))).toBe(5950);
+  });
+
+  it('accepts a genuine zero from a fully discounted session', () => {
+    expect(requireAmountTotal(session(0))).toBe(0);
+  });
+
+  it('throws on null rather than recording a zero-value invoice', () => {
+    expect(() => requireAmountTotal(session(null))).toThrow(/no amount_total/);
+  });
+
+  it('throws on an absent field, so Stripe retries the delivery', () => {
+    expect(() => requireAmountTotal(session(undefined))).toThrow(/cs_test_x/);
   });
 });

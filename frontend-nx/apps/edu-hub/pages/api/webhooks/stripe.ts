@@ -200,6 +200,28 @@ export const refreshSession = async (
   }
 };
 
+/**
+ * Returns a Checkout Session's gross total, refusing to proceed without one.
+ *
+ * A completed payment-mode session always carries `amount_total`, so an absent
+ * value means the data cannot be trusted — typically a failed re-read landing
+ * on a payload whose API version does not expose the field. The invoice paths
+ * downstream fall back to `?? 0`, which would record 0,00 € for money that
+ * actually moved. Throwing instead surfaces as a 500 and makes Stripe retry
+ * the delivery, so the payment is reconciled rather than silently mis-booked.
+ *
+ * Checked with `== null` rather than a falsy test: a genuine 0 — a fully
+ * discounted session — is a valid amount and must still be recorded.
+ */
+export const requireAmountTotal = (session: Stripe.Checkout.Session): number => {
+  if (session.amount_total == null) {
+    throw new Error(
+      `Checkout Session ${session.id} has no amount_total; refusing to record a zero-value invoice`
+    );
+  }
+  return session.amount_total;
+};
+
 const handleStripeWebhook = async (
   req: NextApiRequest,
   res: NextApiResponse
@@ -364,6 +386,7 @@ const handleStripeWebhook = async (
           stripe,
           event.data.object as Stripe.Checkout.Session
         );
+        const amountTotal = requireAmountTotal(session);
         const { enrollmentId, courseId } = session.metadata || {};
 
         // StuJo job posting checkout (metadata set by publishJobPosting)
@@ -400,7 +423,7 @@ const handleStripeWebhook = async (
             await createInvoiceForEnrollment(
               parsedEnrollmentId,
               {
-                amountTotal: session.amount_total ?? 0,
+                amountTotal,
                 amountTax: session.total_details?.amount_tax ?? null,
                 currency: session.currency ?? 'eur',
                 stripeCheckoutSessionId: session.id,
