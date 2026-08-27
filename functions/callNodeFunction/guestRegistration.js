@@ -344,6 +344,45 @@ export function buildGuestMailFooter(userId) {
 </p>`;
 }
 
+/**
+ * Appends the guest footer to a rendered mail body, or returns it untouched.
+ *
+ * Every mail a guest receives has to carry their manage link -- it stands in for
+ * the account page they do not have, and it is the only route they have to their
+ * own data. Centralised here because three senders need it
+ * (`sendEnrollmentEmail`, `sendCourseUpdateEmail`, `sendSessionReminders`) and
+ * the templates they share also serve logged-in users, for whom the link is
+ * meaningless.
+ *
+ * A missing footer is never worth dropping the mail over: only a misconfigured
+ * GUEST_TOKEN_SECRET can fail here, and a session reminder that arrives without
+ * the link beats one that never arrives.
+ */
+export function appendGuestMailFooter(content, user, logger) {
+  if (user?.status !== 'GUEST' || !user?.id) return content;
+  try {
+    return insertBeforeBodyEnd(content ?? '', buildGuestMailFooter(user.id));
+  } catch (error) {
+    logger?.error?.(
+      `Could not build guest mail footer for user ${user.id}: ${error.message}. ` +
+        'Until GUEST_TOKEN_SECRET is set, guests cannot self-serve and erasure ' +
+        'requests have to be handled by hand.'
+    );
+    return content;
+  }
+}
+
+/**
+ * Places the footer inside the document rather than after it. Plain concatenation
+ * left the markup dangling past `</html>`; clients render it anyway, but invalid
+ * structure is one of the cheap signals spam filters score against.
+ */
+function insertBeforeBodyEnd(content, footer) {
+  const closing = /<\/body\s*>|<\/html\s*>/i.exec(content);
+  if (!closing) return content + footer;
+  return content.slice(0, closing.index) + footer + content.slice(closing.index);
+}
+
 /* ---------------------------------------------------------------- settings */
 
 const GET_APP_SETTINGS = gql`

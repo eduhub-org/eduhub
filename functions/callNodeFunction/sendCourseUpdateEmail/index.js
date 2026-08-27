@@ -64,7 +64,7 @@ export default async function sendCourseUpdateEmail(req, logger) {
             id
             title
             CourseEnrollments(where: { status: { _in: [CONFIRMED, REGISTERED] } }) {
-              User { id email firstName lastName }
+              User { id email firstName lastName status }
             }
           }
         }
@@ -78,7 +78,11 @@ export default async function sendCourseUpdateEmail(req, logger) {
         return { success: false, error: 'Course not found', messageKey: 'COURSE_NOT_FOUND' };
       }
 
-      const recipients = (course.CourseEnrollments || []).map((e) => e.User).filter((u) => u?.email);
+      // Anonymized records keep their past enrollments (the retention cron leaves
+      // them in place), but their address is a placeholder that goes nowhere.
+      const recipients = (course.CourseEnrollments || [])
+        .map((e) => e.User)
+        .filter((u) => u?.email && u.status !== 'DELETED');
       const seen = new Set();
       const uniqueRecipients = recipients.filter((u) => (seen.has(u.email) ? false : (seen.add(u.email), true)));
 
@@ -110,6 +114,9 @@ export default async function sendCourseUpdateEmail(req, logger) {
           variableReplacer: replacer,
           recipientEmail: user.email,
           courseId: course.id,
+          // A guest has no account page to check the new date on, so this mail
+          // has to carry their manage link like every other one.
+          recipientUser: user,
           client,
           logger,
         });

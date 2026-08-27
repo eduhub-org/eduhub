@@ -1,6 +1,6 @@
 import { gql, GraphQLClient } from 'graphql-request';
 import { createEnrollmentVariableReplacer } from '../emailTemplateVariables.js';
-import { buildGuestMailFooter } from '../guestRegistration.js';
+import { appendGuestMailFooter } from '../guestRegistration.js';
 
 /**
  * Sends enrollment status emails when CourseEnrollment status or invitationExpirationDate changes
@@ -298,25 +298,24 @@ export default async function sendEnrollmentEmail(req, logger) {
 
     // The subject is plain text, so variables must not be HTML-escaped there
     const emailSubject = replaceVariables(template.subject, { html: false });
-    let emailContent = replaceVariables(template.content);
-
-    // A guest has no account to manage this registration from, so every mail they
-    // receive has to carry the link that stands in for one. Appended here rather
-    // than baked into the templates, because the same templates serve logged-in
-    // users, for whom the link would be meaningless.
-    if (enrollmentDetails.User?.status === 'GUEST') {
-      try {
-        emailContent += buildGuestMailFooter(enrollmentDetails.User.id);
-      } catch (footerError) {
-        // Only a misconfigured GUEST_TOKEN_SECRET gets here. Dropping the whole
-        // mail would be worse than dropping the footer, so send it and shout:
-        // until this is fixed, guests cannot self-serve and erasure requests
-        // have to be handled by hand.
-        logger.error(
-          `Could not build guest mail footer for user ${enrollmentDetails.User.id}: ${footerError.message}`
-        );
-      }
+    // An anonymized recipient has a placeholder address that goes nowhere, so a
+    // mail queued for them is dead on arrival. This happens for real: the
+    // enrollment trigger is asynchronous, so a guest erasing their data has
+    // their enrollments cancelled and the row anonymized before the trigger
+    // runs, and the retention cron leaves past enrollments in place on records
+    // it has already anonymized.
+    if (enrollmentDetails.User?.status === 'DELETED') {
+      logger.info(
+        `Skipping ${templateType} for enrollment ${enrollment.id}: the recipient is anonymized`
+      );
+      return { success: true, messageKey: 'RECIPIENT_ANONYMIZED', skipped: true };
     }
+
+    const emailContent = appendGuestMailFooter(
+      replaceVariables(template.content),
+      enrollmentDetails.User,
+      logger
+    );
 
     // Insert email into MailLog for sending
     const INSERT_MAIL_LOG = gql`
