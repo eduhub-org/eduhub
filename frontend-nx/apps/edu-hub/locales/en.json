@@ -1846,6 +1846,10 @@
         "CERTIFICATE_GENERATION_ERROR": "The certificates could not be generated.",
         "UNEXPECTED_ERROR": "An unexpected error occurred while generating the certificates."
       }
+    },
+    "guest_registration": {
+      "label": "Allow registration without an account",
+      "help_text": "Lets people register with just a name and email address, without creating an account. The registration only becomes valid once confirmed by email. Only available for events with direct registration."
     }
   },
   "manageProjects": {
@@ -2923,6 +2927,73 @@
       "SOCIAL_MEDIA": "Social media",
       "SOCIAL_PEDAGOGY": "Social pedagogy",
       "OTHER": "Other occupational field"
+    }
+  },
+  "guest": {
+    "register_without_account": "Register without an account",
+    "modal": {
+      "title": "Register as a guest",
+      "intro": "Register for {course} without creating an account. All we need is your name and email address.",
+      "first_name": "First name",
+      "last_name": "Last name",
+      "email": "Email address",
+      "accept_terms": "I have read and accept the <terms>Terms and Conditions</terms> and the <privacy>Privacy Policy</privacy>.",
+      "newsletter_opt_in": "Email me about future events from this organiser. This is optional and you can withdraw it at any time.",
+      "data_notice": "We store your name and email address in order to run the event and to tell you about changes to it. After that we delete them automatically. The link in every email lets you view or delete your data at any time.",
+      "submit": "Send registration",
+      "submitting": "Sending …",
+      "cancel": "Cancel",
+      "done": "Close",
+      "close": "Close",
+      "check_your_inbox": "Check your inbox",
+      "confirmation_sent": "We sent an email to {email}. Please confirm your registration from there.",
+      "confirmation_hint": "Your registration only becomes valid once confirmed. The link is valid for 7 days."
+    },
+    "confirm": {
+      "page_title": "Confirm registration",
+      "checking": "Checking your link …",
+      "success_title": "Registration confirmed",
+      "success_body": "You are registered for {course}. A confirmation is on its way to you.",
+      "success_hint": "We will email you if anything about the event changes.",
+      "error_title": "That did not work",
+      "to_event": "Go to the event",
+      "manage_registration": "Manage registration",
+      "to_home": "Go to the homepage"
+    },
+    "manage": {
+      "page_title": "Your registration",
+      "loading": "Loading your data …",
+      "error_title": "That did not work",
+      "your_data": "Your data",
+      "retention_notice": "We store this data in order to run the event, and delete it automatically afterwards.",
+      "your_registrations": "Your registrations",
+      "no_registrations": "You have no active registrations at the moment.",
+      "cancel_registration": "Cancel registration",
+      "delete_title": "Delete your data",
+      "delete_body": "This removes your name and email address and cancels any open registrations. It cannot be undone.",
+      "delete_button": "Delete my data",
+      "delete_confirm_question": "Really delete all of your data? This cannot be undone.",
+      "deleted_title": "Your data has been deleted",
+      "deleted_body": "We have removed your name and email address. The link in your old emails no longer works."
+    },
+    "errors": {
+      "name_required": "Please enter your first and last name.",
+      "email_required": "Please enter your email address.",
+      "terms_required": "Please accept the terms and the privacy policy.",
+      "invalid_name": "Please check your name.",
+      "invalid_email": "Please check your email address.",
+      "invalid_course": "This event could not be found.",
+      "terms_not_accepted": "Please accept the terms and the privacy policy.",
+      "course_not_available": "This event is currently not available.",
+      "guest_registration_not_enabled": "Registration without an account is not available for this event.",
+      "course_full": "This event is already full.",
+      "guest_registration_failed": "Your registration could not be processed. Please try again later.",
+      "invalid_token": "This link is not valid.",
+      "token_expired": "This link has expired. Please register again.",
+      "token_already_used": "This link has already been used.",
+      "guest_confirmation_failed": "Your registration could not be confirmed. Please try again later.",
+      "invalid_operation": "That action is not possible.",
+      "guest_manage_failed": "That did not work. Please try again later."
     }
   }
 }

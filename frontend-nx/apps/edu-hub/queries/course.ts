@@ -771,3 +771,17 @@ export const UPDATE_COURSE_CURRENCY = gql`
     }
   }
 `;
+
+/**
+ * Guest registration is opt-in per event because it opens the only
+ * unauthenticated write path in the application. The backend applies the same
+ * check plus the program-type and registration-type restrictions.
+ */
+export const UPDATE_COURSE_GUEST_REGISTRATION_ENABLED = gql`
+  mutation UpdateCourseGuestRegistrationEnabled($courseId: Int!, $value: Boolean!) {
+    update_Course_by_pk(pk_columns: { id: $courseId }, _set: { guestRegistrationEnabled: $value }) {
+      id
+      guestRegistrationEnabled
+    }
+  }
+`;
