@@ -146,6 +146,15 @@ at their own link is usually the fastest complete answer.
   signed with `GUEST_TOKEN_SECRET` — nothing is stored, so any mailer can
   regenerate the link, and the trade-off is that an individual link cannot be
   revoked. It stops working when the guest record is anonymized.
+- **These handlers hold the Hasura admin secret.** Like every handler in
+  `callNodeFunction`, they authenticate with `HASURA_ADMIN_SECRET`, so the
+  `anonymous` role's table permissions do not constrain them — the guard clauses
+  above *are* the authorization boundary. Splitting them into their own function
+  behind a scoped `guest_registration_service` role is tracked as part of
+  [#1761](https://github.com/eduhub-org/eduhub/issues/1761) (least-privilege
+  service accounts), which carries the proposed permission set. Note the process
+  split alone would buy scaling isolation, not less access; the scoped role is
+  the part that restricts anything.
 - **`GUEST_TOKEN_SECRET` is a signing key.** Anyone holding it can mint a manage
   link for any guest. The dev default in `docker-compose.yml` is fine locally and
   nowhere else.
