@@ -2,6 +2,7 @@ import { gql } from 'graphql-request';
 import {
   buildManageToken,
   createHasuraClient,
+  findUsersByEmail,
   markConfirmTokenUsed,
   resolveConfirmToken,
 } from '../guestRegistration.js';
@@ -102,6 +103,19 @@ export default async function confirmGuestRegistration(req, logger) {
     }
 
     const { token } = resolved;
+
+    // registerGuestForCourse refuses to start a guest signup for an address that
+    // already has an account, but a token stays valid for a week and the account
+    // may have been created inside that window. Redeeming it anyway would split
+    // this person's registrations across two User rows, so the same guard has to
+    // be repeated here, against the address the token was issued to.
+    const { account } = await findUsersByEmail(client, token.User?.email ?? '');
+    if (account) {
+      logger.info(
+        `Guest confirmation refused for course ${token.courseId}: the address now has an account`
+      );
+      return { success: false, messageKey: 'GUEST_ACCOUNT_EXISTS' };
+    }
 
     const courseData = await client.request(GET_COURSE, { courseId: token.courseId });
     const course = courseData?.Course_by_pk;

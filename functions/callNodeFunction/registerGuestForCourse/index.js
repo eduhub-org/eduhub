@@ -6,9 +6,9 @@ import {
   buildPrivacyPolicyLink,
   GUEST_THROTTLE,
   NO_SUCH_USER_ID,
+  classifyGuestThrottle,
   createHasuraClient,
-  escapeLikePattern,
-  isGuestRegistrationThrottled,
+  findUsersByEmail,
   isHoneypotTripped,
   isValidEmail,
   isValidName,
@@ -51,17 +51,6 @@ const GET_COURSE = gql`
         type
         organizationId
       }
-    }
-  }
-`;
-
-const FIND_USER_BY_EMAIL = gql`
-  query FindUserByEmail($email: String!) {
-    User(where: { email: { _ilike: $email } }, limit: 1) {
-      id
-      status
-      firstName
-      lastName
     }
   }
 `;
@@ -116,16 +105,33 @@ const FIND_EXISTING_ENROLLMENT = gql`
  * sender-domain reputation: bounces from unverified addresses are what get a
  * domain throttled.
  *
- * Three scopes, narrowest first:
- *   perAddress  keeps one inbox from being bombed
- *   perCourse   keeps one event from being used as a mail cannon
- *   global      backstop across every event
+ * Four scopes, narrowest first:
+ *   perAddressCourse  keeps one inbox from being bombed over one event
+ *   perAddress        backstop across every event for one inbox
+ *   perCourse         keeps one event from being used as a mail cannon
+ *   global            backstop across every event
+ *
+ * The narrow counter is per address *and* course on purpose. Repeating a single
+ * event is the abuse; signing up for several different events in one sitting is
+ * what a person does at an open day, and a flat per-address cap cannot tell them
+ * apart -- it silently dropped the fourth event.
  *
  * Hasura CE cannot enforce per-role rate limits (`api_limits` is a Cloud/EE
  * feature and the file is empty), so this is the only layer that can hold.
  */
 const COUNT_RECENT = gql`
   query CountRecentGuestRegistrations($userId: uuid!, $courseId: Int!, $since: timestamptz!) {
+    perAddressCourse: GuestRegistrationToken_aggregate(
+      where: {
+        userId: { _eq: $userId }
+        courseId: { _eq: $courseId }
+        created_at: { _gt: $since }
+      }
+    ) {
+      aggregate {
+        count
+      }
+    }
     perAddress: GuestRegistrationToken_aggregate(
       where: { userId: { _eq: $userId }, created_at: { _gt: $since } }
     ) {
@@ -222,16 +228,17 @@ export default async function registerGuestForCourse(req, logger) {
 
     const courseLink = buildCourseLink(course.id);
 
-    const existingUserData = await client.request(FIND_USER_BY_EMAIL, {
-      email: escapeLikePattern(email),
-    });
-    const existingUser = existingUserData?.User?.[0];
+    // Resolved as two named rows rather than "the first row that came back":
+    // an address may legitimately hold both a guest record and the account that
+    // later claimed it, and picking between them by row order is how the guard
+    // below gets skipped. See findUsersByEmail.
+    const { account, guest: existingUser } = await findUsersByEmail(client, email);
 
     // The address already belongs to a real account. Create nothing, and tell
     // only the address owner - by mail, not in the response - to log in instead.
     // This keeps a guest row from shadowing a real account, and keeps the
     // account's existence out of the API answer.
-    if (existingUser && existingUser.status !== 'GUEST' && existingUser.status !== 'DELETED') {
+    if (account) {
       await queueGuestMail(client, logger, {
         templateType: 'GUEST_ALREADY_HAS_ACCOUNT',
         to: email,
@@ -269,19 +276,29 @@ export default async function registerGuestForCourse(req, logger) {
       since,
     });
     const counts = {
+      perAddressCourse: recent?.perAddressCourse?.aggregate?.count ?? 0,
       perAddress: recent?.perAddress?.aggregate?.count ?? 0,
       perCourse: recent?.perCourse?.aggregate?.count ?? 0,
       global: recent?.global?.aggregate?.count ?? 0,
     };
 
-    if (isGuestRegistrationThrottled(counts)) {
+    const throttled = classifyGuestThrottle(counts);
+    if (throttled) {
       logger.warn(
-        `Guest registration throttled for course ${course.id} ` +
-          `(address=${counts.perAddress}/${GUEST_THROTTLE.perAddress}, ` +
+        `Guest registration throttled (${throttled}) for course ${course.id} ` +
+          `(address+course=${counts.perAddressCourse}/${GUEST_THROTTLE.perAddressCourse}, ` +
+          `address=${counts.perAddress}/${GUEST_THROTTLE.perAddress}, ` +
           `course=${counts.perCourse}/${GUEST_THROTTLE.perCourse}, ` +
           `global=${counts.global}/${GUEST_THROTTLE.global})`
       );
-      return GENERIC_SUCCESS;
+      // An ADDRESS cap is keyed on the submitted address, so saying so would
+      // reveal how often that address has signed up recently - the same oracle
+      // the uniform response exists to close. A PUBLIC cap describes the event
+      // or the platform and leaks nothing, so the person is told plainly rather
+      // than left watching an inbox that will stay empty.
+      return throttled === 'ADDRESS'
+        ? GENERIC_SUCCESS
+        : { success: false, messageKey: 'GUEST_REGISTRATION_THROTTLED' };
     }
 
     let userId;
@@ -293,9 +310,20 @@ export default async function registerGuestForCourse(req, logger) {
         await client.request(UPDATE_GUEST_USER_NAME, { id: userId, firstName, lastName });
       }
     } else {
-      const inserted = await client.request(INSERT_GUEST_USER, { firstName, lastName, email });
-      userId = inserted.insert_User_one.id;
-      logger.info(`Created GUEST user for course ${course.id}`);
+      try {
+        const inserted = await client.request(INSERT_GUEST_USER, { firstName, lastName, email });
+        userId = inserted.insert_User_one.id;
+        logger.info(`Created GUEST user for course ${course.id}`);
+      } catch (insertError) {
+        // A concurrent submission for the same unseen address got there first.
+        // User_email_guest_key turns that race into a violation instead of a
+        // second guest identity; re-read and continue on the row that won, which
+        // is what the lookup above would have returned a moment later.
+        const { guest: raced } = await findUsersByEmail(client, email);
+        if (!raced) throw insertError;
+        userId = raced.id;
+        logger.info(`Guest user for course ${course.id} was created concurrently; reusing it`);
+      }
     }
 
     const rawToken = await issueConfirmToken(client, userId, course.id, newsletterOptIn);

@@ -370,9 +370,16 @@ export async function getGuestRetentionMonths(client) {
  *
  * Hasura CE cannot enforce per-role rate limits (`api_limits` is a Cloud/EE
  * feature and the file is empty), so the handler is the only layer that can hold.
+ *
+ * The narrow cap is per address *and course*, not per address alone. Repeating
+ * one event is what floods an inbox; signing up for several different events in
+ * one sitting is what someone does at an open day, and a flat per-address cap
+ * cannot tell those apart -- it silently drops the fourth event. `perAddress` is
+ * still there as a backstop, just far enough up to clear real use.
  */
 export const GUEST_THROTTLE = {
-  perAddress: 3,
+  perAddressCourse: 3,
+  perAddress: 10,
   perCourse: 30,
   global: 100,
 };
@@ -385,12 +392,37 @@ export const GUEST_THROTTLE = {
  */
 export const NO_SUCH_USER_ID = '00000000-0000-0000-0000-000000000000';
 
-export function isGuestRegistrationThrottled({ perAddress = 0, perCourse = 0, global = 0 } = {}) {
-  return (
-    perAddress >= GUEST_THROTTLE.perAddress ||
-    perCourse >= GUEST_THROTTLE.perCourse ||
-    global >= GUEST_THROTTLE.global
-  );
+/**
+ * Which ceiling a submission trips, or `null` if none does.
+ *
+ * The distinction the caller needs is not which counter, but whether saying so
+ * would describe the *address*:
+ *
+ *   ADDRESS  keyed on the submitted email. Answering differently would tell an
+ *            unauthenticated caller how often that address has signed up
+ *            recently, which is the account-enumeration leak the uniform
+ *            response exists to prevent. Must be answered as an ordinary
+ *            success.
+ *   PUBLIC   keyed on the event or the platform. Says nothing about the address,
+ *            so it can be reported plainly and the person can be told to try
+ *            again later instead of watching an inbox that stays empty.
+ */
+export function classifyGuestThrottle({
+  perAddressCourse = 0,
+  perAddress = 0,
+  perCourse = 0,
+  global = 0,
+} = {}) {
+  if (
+    perAddressCourse >= GUEST_THROTTLE.perAddressCourse ||
+    perAddress >= GUEST_THROTTLE.perAddress
+  ) {
+    return 'ADDRESS';
+  }
+  if (perCourse >= GUEST_THROTTLE.perCourse || global >= GUEST_THROTTLE.global) {
+    return 'PUBLIC';
+  }
+  return null;
 }
 
 /** A person never fills the honeypot field; anything in it is automated. */
@@ -430,4 +462,50 @@ export function normalizeName(name) {
 
 export function isValidName(name) {
   return name.length >= 1 && name.length <= 100;
+}
+
+/* ------------------------------------------------------------- user lookup */
+
+const FIND_USERS_BY_EMAIL = gql`
+  query FindGuestUsersByEmail($email: String!) {
+    User(where: { email: { _ilike: $email } }, order_by: { created_at: asc }, limit: 10) {
+      id
+      status
+      firstName
+      lastName
+    }
+  }
+`;
+
+/**
+ * Resolves an address to the rows that may exist for it.
+ *
+ * Since `User_email_non_guest_key` was narrowed to non-guest rows, "the user
+ * with this email" stopped being a single row: an address can carry a guest
+ * record *and* the account that later claimed it. A `limit: 1` lookup picks
+ * between them arbitrarily, which is how a guest record ends up shadowing a
+ * real account and the "you already have an account" guard gets skipped.
+ *
+ * So return them separately and let callers decide, rather than inherit
+ * whatever order Postgres happened to produce:
+ *
+ *   account  the real account, if any. INACTIVE and SPAM count -- they are
+ *            accounts. Note this cannot be done with `order_by: {status: asc}`:
+ *            both sort *after* GUEST alphabetically, so ordering would have
+ *            reintroduced the same bug for suspended accounts.
+ *   guest    the guest record, oldest first, so repeat submissions from one
+ *            address keep landing on the same row.
+ *
+ * A DELETED row is neither. `anonymizeUser` and the guest erasure path both
+ * replace the address with `anon_*@example.com`, so one can only appear here if
+ * somebody types that placeholder, and reusing it would hand out a token that
+ * `resolveConfirmToken` refuses anyway.
+ */
+export async function findUsersByEmail(client, email) {
+  const data = await client.request(FIND_USERS_BY_EMAIL, { email: escapeLikePattern(email) });
+  const rows = data?.User ?? [];
+  return {
+    account: rows.find((row) => row.status !== 'GUEST' && row.status !== 'DELETED') ?? null,
+    guest: rows.find((row) => row.status === 'GUEST') ?? null,
+  };
 }
