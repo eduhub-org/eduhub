@@ -17,7 +17,7 @@ import {
   ADMIN_USER_LIST,
   DELETE_ORGANIZATION_ADMIN,
   MANAGEABLE_ORGANIZATIONS,
-  SETTINGS_ADMIN_GRANTS,
+  ADMIN_GRANTS,
   UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_EVENTS,
   UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_COURSES,
   UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_DEGREES,
@@ -36,13 +36,13 @@ import {
   ManageableOrganizations,
   ManageableOrganizationsVariables,
 } from '../../../queries/__generated__/ManageableOrganizations';
-import { SettingsAdminGrants } from '../../../queries/__generated__/SettingsAdminGrants';
+import { AdminGrants } from '../../../queries/__generated__/AdminGrants';
 import { User_bool_exp, order_by } from '../../../__generated__/globalTypes';
 import AddAdminDialog, { AdminOrganizationOption } from './AddAdminDialog';
 
 // Every mutation on a grant changes both the list (capabilities, and possibly whether the user is
 // listed at all) and the per-organization settings-admin counts that gate the sole-admin guard.
-const GRANT_REFETCH_QUERIES = ['AdminUserList', 'SettingsAdminGrants'];
+const GRANT_REFETCH_QUERIES = ['AdminUserList', 'AdminGrants'];
 
 /**
  * One administered organization of an admin user: its capability flags plus the control to revoke
@@ -231,18 +231,18 @@ const ManageAdminUsersContent: FC<ManageAdminUsersContentProps> = ({ inSettingsL
   const isAdmin = useIsAdmin();
   const manageRole = useManageRole();
   const currentUserId = useUserId();
-  const [adminUserIds, setAdminUserIds] = useState<string[]>([]);
+  const [superAdminUserIds, setSuperAdminUserIds] = useState<string[]>([]);
   const [adminError, setAdminError] = useState<Error | null>(null);
 
   // Super-admin is a Keycloak role, not a database row, so the ids come from the getAdminUsers
-  // action. They drive both the super-admin marker/toggle and the list filter below, which pulls in
-  // super-admins who hold no organization grant. It is an admin-only action, so org admins must not
+  // action. They drive the super-admin marker/toggle and, together with the organization grants
+  // below, decide which users the table lists. It is an admin-only action, so org admins must not
   // request it — they simply never see super-admin state.
-  const { refetch: refetchAdminUsers } = useAdminQuery(ADMIN_USERS, {
+  const { loading: superAdminsLoading, refetch: refetchSuperAdmins } = useAdminQuery(ADMIN_USERS, {
     skip: !isAdmin,
     onCompleted: (data) => {
       if (data?.getAdminUsers?.success) {
-        setAdminUserIds(data.getAdminUsers.adminUserIds);
+        setSuperAdminUserIds(data.getAdminUsers.adminUserIds);
       }
     },
     onError: (error) => {
@@ -251,39 +251,71 @@ const ManageAdminUsersContent: FC<ManageAdminUsersContentProps> = ({ inSettingsL
     },
   });
 
-  // The super-admin checkbox is controlled by `adminUserIds` (derived from the AdminUsers query),
-  // which is held in local state. After a toggle we must refetch that query and refresh the state so
-  // the checkbox, the "Super Admin" marker and the list filter reflect the change.
+  // The super-admin checkbox is controlled by `superAdminUserIds` (derived from the AdminUsers
+  // query), which is held in local state. After a toggle we must refetch that query and refresh the
+  // state so the checkbox, the "Super Admin" marker and the listed users reflect the change.
   const handleAdminStatusChange = useCallback(async () => {
     // The query is skipped for org admins (admin-only action); refetching it would run it anyway.
     if (!isAdmin) {
       return;
     }
     try {
-      const { data: adminData } = await refetchAdminUsers();
+      const { data: adminData } = await refetchSuperAdmins();
       if (adminData?.getAdminUsers?.success) {
-        setAdminUserIds(adminData.getAdminUsers.adminUserIds);
+        setSuperAdminUserIds(adminData.getAdminUsers.adminUserIds);
       }
     } catch (refetchError) {
       console.error('Error refreshing admin users:', refetchError);
     }
-  }, [isAdmin, refetchAdminUsers]);
+  }, [isAdmin, refetchSuperAdmins]);
 
-  // A single table of every admin: users holding at least one OrganizationAdmin grant, plus (for
-  // super-admin viewers) the super-admins themselves, who typically administer no organization at
-  // all and would otherwise be missing from the screen.
+  // Every admin grant the caller may see. OrganizationAdmin has one row per (admin, organization)
+  // and stays tiny next to User, so it is fetched unpaginated and drives two things: who belongs in
+  // the table, and the per-organization settings-admin counts behind the sole-admin guard.
+  // Role-scoped like the list: org admins see grants of their orgs, super-admins see all.
+  const {
+    data: grantData,
+    loading: grantsLoading,
+    refetch: refetchGrants,
+  } = useManageQuery<AdminGrants>(ADMIN_GRANTS);
+
+  const settingsAdminCountByOrg = useMemo(() => {
+    const counts = new Map<number, number>();
+    (grantData?.OrganizationAdmin ?? []).forEach((grant) => {
+      if (grant.canManageSettings) {
+        counts.set(grant.organizationId, (counts.get(grant.organizationId) ?? 0) + 1);
+      }
+    });
+    return counts;
+  }, [grantData]);
+
+  const isSoleSettingsAdmin = useCallback(
+    (grant: AdminUserList_User_OrganizationAdmins) =>
+      !!grant.canManageSettings && (settingsAdminCountByOrg.get(grant.organizationId) ?? 0) <= 1,
+    [settingsAdminCountByOrg]
+  );
+
+  // Who to show: everyone holding an organization grant, plus the super-admins from Keycloak, who
+  // typically administer no organization at all and would otherwise be missing from the screen.
   //
-  // Org admins see only the users of organizations they administer (enforced by the org_admin User
-  // select permission) and only the grants of those organizations (OrganizationAdmin select
-  // permission). useManageQuery pins admin vs org_admin accordingly.
+  // The id set is assembled here rather than expressed as a database predicate on purpose. Asking
+  // User for "rows that have a grant or are in this id list" cannot use the User primary key, so
+  // Postgres scans the whole table — which grows with every signup — on every page change and every
+  // keystroke of the search. Looking the ids up instead keeps it a primary-key lookup over a set
+  // bounded by the number of admins. Sorted so the query variables stay byte-stable between
+  // renders and Apollo does not refetch on an unchanged set.
+  const adminUserIds = useMemo(() => {
+    const ids = new Set<string>(superAdminUserIds);
+    (grantData?.OrganizationAdmin ?? []).forEach((grant) => ids.add(grant.userId));
+    return Array.from(ids).sort();
+  }, [grantData, superAdminUserIds]);
+
+  // Org admins additionally see only the users of organizations they administer (enforced by the
+  // org_admin User select permission) and only the grants of those organizations (OrganizationAdmin
+  // select permission). useManageQuery pins admin vs org_admin accordingly.
   const buildFilter = useCallback(
     (searchFilter: string) => {
-      // "Has at least one grant", written in the explicit form so it reads as an EXISTS check.
-      const adminBranches: User_bool_exp[] = [{ OrganizationAdmins: { id: { _is_null: false } } }];
-      if (adminUserIds.length > 0) {
-        adminBranches.push({ id: { _in: adminUserIds } });
-      }
-      const isAdminUser: User_bool_exp = adminBranches.length > 1 ? { _or: adminBranches } : adminBranches[0];
+      const isAdminUser: User_bool_exp = { id: { _in: adminUserIds } };
 
       const searchCondition = createMultiWordSearchCondition(searchFilter, [
         'lastName',
@@ -322,26 +354,6 @@ const ManageAdminUsersContent: FC<ManageAdminUsersContentProps> = ({ inSettingsL
       },
       refetchFilter: buildFilter,
     });
-
-  // Per-organization count of settings admins, so the UI can pre-disable removing/deleting the
-  // *last* one for an org (the DB guard enforces the same rule). Role-scoped like the list: org
-  // admins see grants of their orgs, super-admins see all. Refetched after add/toggle/delete.
-  const { data: settingsAdminData, refetch: refetchSettingsAdmins } =
-    useManageQuery<SettingsAdminGrants>(SETTINGS_ADMIN_GRANTS);
-
-  const settingsAdminCountByOrg = useMemo(() => {
-    const counts = new Map<number, number>();
-    (settingsAdminData?.OrganizationAdmin ?? []).forEach((grant) => {
-      counts.set(grant.organizationId, (counts.get(grant.organizationId) ?? 0) + 1);
-    });
-    return counts;
-  }, [settingsAdminData]);
-
-  const isSoleSettingsAdmin = useCallback(
-    (grant: AdminUserList_User_OrganizationAdmins) =>
-      !!grant.canManageSettings && (settingsAdminCountByOrg.get(grant.organizationId) ?? 0) <= 1,
-    [settingsAdminCountByOrg]
-  );
 
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 
@@ -426,7 +438,7 @@ const ManageAdminUsersContent: FC<ManageAdminUsersContentProps> = ({ inSettingsL
       },
     ];
 
-    // Only super-admins can see super-admin status (adminUserIds is empty for org admins), so the
+    // Only super-admins can see super-admin status (the set is empty for org admins), so the
     // marker column is added for them only. It is kept short and shows a star icon (with a tooltip)
     // instead of inline text, which would otherwise crowd the name columns.
     if (!isAdmin) {
@@ -441,7 +453,7 @@ const ManageAdminUsersContent: FC<ManageAdminUsersContentProps> = ({ inSettingsL
         size: 44,
         meta: { align: 'center' },
         cell: ({ row }) =>
-          adminUserIds.includes(row.original.id) ? (
+          superAdminUserIds.includes(row.original.id) ? (
             <div className="flex justify-center" title={t('super_admin_label')}>
               <MdStar className="text-brand" size="1.25em" aria-label={t('super_admin_label')} />
             </div>
@@ -449,13 +461,19 @@ const ManageAdminUsersContent: FC<ManageAdminUsersContentProps> = ({ inSettingsL
       },
       ...baseColumns,
     ];
-  }, [t, adminUserIds, isAdmin]);
+  }, [t, superAdminUserIds, isAdmin]);
+
+  // The listed users are derived from the grants and the Keycloak super-admins, so the table must
+  // not render before both have resolved — it would show an empty list and then fill in. Both flags
+  // also drop on error (and superAdminsLoading stays false for org admins, who skip that query), so
+  // a failing Keycloak call still renders the table with the error banner above it.
+  const isLoading = loading || grantsLoading || superAdminsLoading;
 
   const table = (
     <>
-      {loading && <Loading />}
+      {isLoading && <Loading />}
       {adminError && <div className="text-red-500 p-4">{t('error_loading_admin_users')}</div>}
-      {!loading && !error && (
+      {!isLoading && !error && (
         <div>
           {!inSettingsLayout && <CommonPageHeader headline={t('headline')} />}
           <TableGrid<AdminUserList_User>
@@ -473,12 +491,12 @@ const ManageAdminUsersContent: FC<ManageAdminUsersContentProps> = ({ inSettingsL
             onSortingChange={setSorting}
             role={manageRole}
             error={error}
-            loading={loading}
-            refetchQueries={['AdminUserList', 'AdminUsers', 'SettingsAdminGrants']}
+            loading={isLoading}
+            refetchQueries={['AdminUserList', 'AdminUsers', 'AdminGrants']}
             expandableRowComponent={({ row }) => (
               <ExpandableAdminRow
                 row={row}
-                isSuperAdmin={adminUserIds.includes(row.id)}
+                isSuperAdmin={superAdminUserIds.includes(row.id)}
                 isSoleSettingsAdmin={isSoleSettingsAdmin}
                 onAdminStatusChange={handleAdminStatusChange}
               />
@@ -492,7 +510,7 @@ const ManageAdminUsersContent: FC<ManageAdminUsersContentProps> = ({ inSettingsL
               // settings-admin counts (so sole-admin disabling stays correct) and the super-admin
               // ids (so a newly promoted super-admin appears in the list at all).
               refetch();
-              refetchSettingsAdmins();
+              refetchGrants();
               handleAdminStatusChange();
             }}
             organizationOptions={organizationOptions}

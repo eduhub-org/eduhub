@@ -4,18 +4,20 @@
 // This file was automatically generated and should not be edited.
 
 // ====================================================
-// GraphQL query operation: SettingsAdminGrants
+// GraphQL query operation: AdminGrants
 // ====================================================
 
-export interface SettingsAdminGrants_OrganizationAdmin {
+export interface AdminGrants_OrganizationAdmin {
   __typename: "OrganizationAdmin";
   id: number;
+  userId: any;
   organizationId: number;
+  canManageSettings: boolean;
 }
 
-export interface SettingsAdminGrants {
+export interface AdminGrants {
   /**
    * fetch data from the table: "OrganizationAdmin"
    */
-  OrganizationAdmin: SettingsAdminGrants_OrganizationAdmin[];
+  OrganizationAdmin: AdminGrants_OrganizationAdmin[];
 }
