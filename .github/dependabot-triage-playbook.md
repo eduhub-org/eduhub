@@ -31,6 +31,9 @@ Dependabot PR. Instead:
 A run that looks clean because it read nothing is the worst possible outcome — an empty PR
 reads as "no vulnerabilities" to whoever reviews it.
 
+Stopping here stops the **alert-driven** half of the job only. The watchlist pass in section
+2b does not use this endpoint, so it still runs — see *When preflight failed* there.
+
 ## 1. Repository layout and package managers
 
 | Path | Manager | Notes |
@@ -56,6 +59,99 @@ Alert data alone is not enough to choose a version — see section 4, *Pick the 
 version*. For every package you intend to touch, also look up what upstream currently
 ships. Advisory metadata lags releases, and `first_patched_version` is the **oldest**
 release carrying the fix, not the newest release available.
+
+## 2b. Watchlist — what the alerts API cannot tell you
+
+Sections 0 and 2 read the Dependabot alerts API, and that API is generated from the
+**global** GitHub Advisory Database, which sits downstream of the maintainers. A project
+that publishes an advisory on its own repository and ships the fix reaches its users days
+before the global database mirrors it, and an advisory that never receives a CVE may never
+produce an alert here at all. For most dependencies that lag is an acceptable trade. For
+the handful this application is actually exposed through it is not — and a run reading only
+the alerts API cannot tell "no alert" apart from "not ingested yet".
+
+That is not hypothetical. On 2026-08-25 Next.js published two **critical** unauthenticated
+RCE advisories — `GHSA-2xp9-vwfh-vxw4` (RCE in the Image Optimization API via crafted AVIF
+files, CVSS 9.5) and `GHSA-p293-qw3h-jr36` (RCE on Windows-hosted servers) — and shipped
+the fix in 16.3.3. This repo was on 16.2.11, inside both vulnerable ranges. The run on
+2026-08-26 — the morning after publication — read the alerts API, found 11 open alerts, and
+none of them was `next`: the advisories had not reached the global database, so no alert
+existed to find. It reported a clean bill on a live critical RCE in the server that renders
+every page. The gap was closed on 2026-08-27 by a human who had read about it elsewhere and
+patched it by hand in #1881 — not by this job, which had no way to see it.
+
+Run this pass **on every run**, after section 2 and before section 3.
+
+`.github/security-watchlist.yml` names the dependencies it covers and, for each, the
+exposure that earns it a place. Read it. If it is missing or unparseable, that is a hard
+error: say so and stop, exactly as a failed preflight would.
+
+### The check
+
+For each entry, ask the upstream project directly instead of the advisory database:
+
+```bash
+gh api "/repos/<upstream>/security-advisories?state=published&per_page=30" \
+  --jq '.[] | {ghsa_id, severity, published_at, summary,
+               vulns: [.vulnerabilities[] | {pkg: .package.name,
+                                             range: .vulnerable_version_range,
+                                             patched: .patched_versions}]}'
+```
+
+That endpoint is public. It needs no `security_events` scope and works on any public
+repository — which is exactly why it sees what the alerts API has not ingested yet.
+
+If the `--jq` filter comes back empty, **drop the filter and read the raw JSON before
+concluding anything.** An empty result is a tooling failure until proven otherwise — a
+renamed field or a 404 on a moved repository looks exactly like "this project has published
+no advisories", and mistaking one for the other is the whole failure this section exists to
+prevent. Confirm against the project's releases or security page before recording a
+watchlist entry as clear, and say in the PR body which of the two you established.
+
+Then resolve what this repo actually ships — the **resolved version in the lockfile**, not
+the range in `package.json`, and the image tag for a container — and compare it against
+every published advisory's vulnerable range. Do not filter by publication date: an advisory
+from months ago whose range still covers the shipped version is still a finding, and a date
+filter would make this pass depend on when it last ran.
+
+**Second check, for the fix that ships without an advisory.** Not every security fix gets
+one; some land in a release with a line in the changelog and nothing else. For each
+watchlist entry, compare the shipped version against the newest release in its bump class —
+section 4 already requires resolving that — and where there is a gap, read the release notes
+between the two for security language. A fix described only in a changelog counts as a
+finding here.
+
+### What a watchlist hit means
+
+Treat a hit as a Dependabot alert of the severity **upstream** assigned, with three
+differences:
+
+- **The cool-down in section 4 does not apply.** These are the packages where a known
+  exploitable hole outweighs the risk of a young release. Take the patched version the day
+  it ships.
+- **Reachability does not gate the patch.** Section 3 still applies and you still record
+  the assessment — but for a watchlist package at high or critical severity, where the fix
+  is a patch or minor bump, patch first and write the reasoning down second. "This one
+  probably isn't reachable for us" belongs in the PR body, never in the decision to leave it
+  unpatched. Of the two Next.js advisories above only the AVIF one was reachable here —
+  nothing is Windows-hosted — and the bump that closed it closed both.
+- **A hit is never silently absent from the output.** Patched, it goes under `## Watchlist`
+  in the PR body. Needing a major bump, it goes to the standing issue in section 8 **and**
+  gets named at the top of the PR body. With no PR this run, that standing issue is the
+  record.
+
+**Never conclude a watchlist package is fine because it has no Dependabot alert.** The
+absence of an alert is the condition this section exists to compensate for.
+
+### When preflight failed
+
+Section 0 stops the run when the alerts API is unreadable, and that still holds for
+alert-driven work: no triage PR gets opened from alert data you could not read. This pass
+does not use that API, so **run it anyway**. If it finds a high or critical hit, patch it
+and open a PR whose title and body say plainly that it is watchlist-only and that the alert
+set could not be read. What section 0 guards against is a PR that looks comprehensive while
+resting on nothing — not a narrow one that is honest about its scope. Record the alerts
+failure on the tracking issue as section 0 requires, either way.
 
 ## 3. Assess relevance — this is the core of the job
 
@@ -139,6 +235,9 @@ Rules:
   RCE classes, regardless of the score attached to it. The cool-down exists to avoid
   regressions in routine bumps, never to leave a known exploitable hole in place. When you
   take a release early, say which fix justified it in the `## Patched` table.
+- **A watchlist hit (section 2b) waives the cool-down outright**, at whatever severity
+  upstream assigned it. Those packages are on the list precisely because this repo's
+  exposure to them outweighs the regression risk of a release published this morning.
 - When the cool-down defers a bump, do **not** silently ship the older version as if it were
   the target. Patch to the newest *eligible* release, and record in `## Needs a manual
   decision` which newer release you deferred, its publication date, and the date it becomes
@@ -220,7 +319,8 @@ If a `functions/` directory changed, at minimum confirm `npm ci` resolves there.
 ## 6. One PR
 
 Conventional commit and PR title: `fix(deps): dependabot triage YYYY-MM-DD` — use
-`chore(deps):` if nothing runtime-security was patched. Target `develop`, labels
+`chore(deps):` if nothing runtime-security was patched. A watchlist hit (section 2b) is
+runtime security by definition, so it always makes this `fix(deps):`. Target `develop`, labels
 `dependencies` and `chore`.
 
 The body must contain:
@@ -229,7 +329,13 @@ The body must contain:
 - `## Patched` — what changed, to which version, and why it was judged relevant.
 - `## Not patched — assessed as not relevant` — reviewer-checkable reasoning per alert, plus
   an explicit note that these remain **open** in GitHub and were **not** dismissed.
+- `## Watchlist` — every hit from section 2b: package, upstream advisory, severity, the
+  version shipped here, the version patched to, and whether a Dependabot alert existed for
+  it. Say so explicitly when none did — that gap is the point of the section, and a reviewer
+  should be able to see how far ahead of the alerts API this run was. If the pass found
+  nothing, one line saying which packages were checked and against what.
 - `## Needs a manual decision` — major bumps and alerts with no available fix.
+- `## Deployed exposure` — section 9. Omit only when nothing is exposed.
 - `## Verification` — the exact commands run and their outcomes.
 - `## Superseded Dependabot PRs` — which PRs were closed.
 
@@ -279,9 +385,50 @@ exists but is out of scope for automated triage (a major runtime bump), or an ob
 that is not an alert at all (drift, inconsistent pins across manifests). Those have no
 automated path to resolution, so the standing issue is the only place they survive.
 
+Watchlist hits (section 2b) and deployed exposure (section 9) belong in this issue on the
+same terms, and they are the two kinds of finding most likely to arrive on a run with no PR
+to write them into. A watchlist hit recorded here keeps its upstream advisory ID and
+severity, so nobody has to re-derive it. Deployed exposure stays listed until the promotion
+actually happens — not until the fix merges to `develop`.
+
+## 9. Deployed exposure — a fix on `develop` is not a fix in production
+
+`develop` is where this job works, and the hard limits below keep it there. But a patch
+merged to `develop` protects nobody until it is promoted, and this job is the only thing
+looking at these packages every day. So finish each run by checking where the fix actually
+got to.
+
+For every watchlist package, compare what `develop` ships against `staging` and
+`production`:
+
+```bash
+git fetch origin develop staging production
+for br in develop staging production; do
+  echo -n "$br: "; git show "origin/$br:frontend-nx/package.json" | grep '"<pkg>"'
+done
+```
+
+Use the same comparison for the container images in the watchlist, reading the tag out of
+each branch's `backend/Dockerfile` and `keycloak/Dockerfile`.
+
+Report every branch still carrying a version inside a known vulnerable range under
+`## Deployed exposure` in the PR body — naming the branch, the version it serves, the
+advisory, and the version that closes it. When there is no PR this run, it goes on the
+standing issue from section 8 instead and stays there until the promotion happens.
+
+This is reporting, not acting. **Never push to `staging` or `production`** (see the hard
+limits): the promotion is a human's decision and follows the repo's release workflow. The
+job here is to make sure nobody has to work out on their own that the fix is still sitting
+on `develop`.
+
+Say it plainly in the PR body when it applies, because it is the easy thing to assume away:
+a merged security PR and a patched deployment are not the same event. On 2026-08-27, #1881
+had put Next.js 16.3.3 on `develop` while `staging` and `production` both still served
+16.2.11 — the critical AVIF RCE was closed in the repository and open in production.
+
 ## Hard limits
 
-- Never push to `staging` or `production`.
+- Never push to `staging` or `production` — report the exposure instead (section 9).
 - Never force-push a shared branch.
 - Never merge or approve your own PR.
 - Never dismiss a Dependabot alert.
