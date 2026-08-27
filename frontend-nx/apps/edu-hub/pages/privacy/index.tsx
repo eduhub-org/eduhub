@@ -357,6 +357,57 @@ const Privacy: FC = () => {
               : 'Der Websitebetreiber speichert Daten zu Kursen, für die sich registrierte Nutzer:innen beworben haben bzw. an denen sie teilgenommen haben sowie zugehörige Informationen über die Erfüllung der angesetzten Leistungskriterien für die Kurse, die zur Ausstellung der Zertifikate benötigt werden (Art. 6 Abs. 1 lit. f DSGVO).'}
           </p>
 
+          <h3 className="text-lg mt-2 mb-2 italic">
+            {isEnglish ? 'Guest Registration for Events' : 'Gast-Anmeldung zu Veranstaltungen'}
+          </h3>
+          <p>
+            {isEnglish
+              ? 'For some events you can register without creating a user account ("guest registration"). In that case we only collect your first name, last name, and email address. We use this data solely to run the event you registered for: to confirm your registration, to keep the participant list, and to inform you about changes to that event (for example a change of date or its cancellation).'
+              : 'Für manche Veranstaltungen kannst du dich anmelden, ohne ein Nutzerkonto anzulegen („Gast-Anmeldung"). Dabei erheben wir ausschließlich deinen Vornamen, deinen Nachnamen und deine E-Mail-Adresse. Wir verwenden diese Daten allein zur Durchführung der Veranstaltung, für die du dich angemeldet hast: zur Bestätigung deiner Anmeldung, für die Teilnahmeliste und um dich über Änderungen an dieser Veranstaltung zu informieren (etwa eine Terminverschiebung oder den Ausfall).'}
+          </p>
+          <p>
+            {isEnglish
+              ? 'The legal basis is Art. 6 para. 1 lit. b GDPR (performance of a contract and pre-contractual measures). Providing the data is voluntary, but without it we cannot register you for the event.'
+              : 'Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (Vertragserfüllung und vorvertragliche Maßnahmen). Die Angabe der Daten ist freiwillig, ohne sie können wir dich aber nicht zur Veranstaltung anmelden.'}
+          </p>
+          <p>
+            {isEnglish
+              ? 'To make sure the email address really belongs to you, a guest registration only becomes valid once you confirm it via a link we send you (double opt-in). If you do not confirm within 7 days, we delete the data you entered.'
+              : 'Damit sichergestellt ist, dass die E-Mail-Adresse wirklich dir gehört, wird eine Gast-Anmeldung erst gültig, wenn du sie über einen Link bestätigst, den wir dir zusenden (Double-Opt-in). Bestätigst du nicht innerhalb von 7 Tagen, löschen wir die von dir eingegebenen Daten.'}
+          </p>
+          <p>
+            {isEnglish
+              ? 'We delete guest data automatically 12 months after the event has ended. Independently of that, every email you receive from us about the event contains a link through which you can view your stored data, cancel your registration, or have your data deleted at any time - no account or login required.'
+              : 'Wir löschen Gast-Daten automatisch 12 Monate nach dem Ende der Veranstaltung. Unabhängig davon enthält jede E-Mail, die du von uns zu der Veranstaltung erhältst, einen Link, über den du deine gespeicherten Daten jederzeit einsehen, deine Anmeldung stornieren oder deine Daten löschen lassen kannst - ohne Konto und ohne Anmeldung.'}
+          </p>
+          <p>
+            {isEnglish
+              ? 'We do not use guest data to advertise other events unless you have separately and explicitly consented to that (see "Newsletter" below).'
+              : 'Wir nutzen Gast-Daten nicht, um für andere Veranstaltungen zu werben, es sei denn, du hast dem gesondert und ausdrücklich zugestimmt (siehe „Newsletter" unten).'}
+          </p>
+
+          <h3 className="text-lg mt-2 mb-2 italic">{isEnglish ? 'Newsletter' : 'Newsletter'}</h3>
+          <p>
+            {isEnglish
+              ? 'When registering for an event, or in your profile, you can separately consent to being informed by email about future events and offers from the respective organizer. This consent is optional: your registration and your use of the platform never depend on it.'
+              : 'Bei der Anmeldung zu einer Veranstaltung oder in deinem Profil kannst du gesondert einwilligen, per E-Mail über künftige Veranstaltungen und Angebote des jeweiligen Veranstalters informiert zu werden. Diese Einwilligung ist freiwillig: Deine Anmeldung und die Nutzung der Plattform hängen nie davon ab.'}
+          </p>
+          <p>
+            {isEnglish
+              ? 'The legal basis is your consent under Art. 6 para. 1 lit. a GDPR and Section 7 (2) no. 2 UWG. After you consent, you receive a confirmation email and are only added to the distribution list once you confirm (double opt-in). We store your email address and the subscription status for this purpose.'
+              : 'Rechtsgrundlage ist deine Einwilligung nach Art. 6 Abs. 1 lit. a DSGVO und § 7 Abs. 2 Nr. 2 UWG. Nach deiner Einwilligung erhältst du eine Bestätigungs-E-Mail und wirst erst in den Verteiler aufgenommen, wenn du bestätigst (Double-Opt-in). Wir speichern hierfür deine E-Mail-Adresse und den Status des Abonnements.'}
+          </p>
+          <p>
+            {isEnglish
+              ? 'You can withdraw your consent at any time with effect for the future - via the unsubscribe link in every newsletter, in your profile, or by an informal message to us. Withdrawal does not affect the lawfulness of processing carried out before it. After withdrawal we remove your address from the distribution list.'
+              : 'Du kannst deine Einwilligung jederzeit mit Wirkung für die Zukunft widerrufen - über den Abmeldelink in jedem Newsletter, in deinem Profil oder durch eine formlose Mitteilung an uns. Der Widerruf berührt nicht die Rechtmäßigkeit der bis dahin erfolgten Verarbeitung. Nach dem Widerruf entfernen wir deine Adresse aus dem Verteiler.'}
+          </p>
+          <p>
+            {isEnglish
+              ? 'We use "Ghost" (Ghost Foundation) to send the newsletter. Ghost is used exclusively as a technical service provider and data processor in accordance with Art. 28 GDPR and processes the data only on our instructions.'
+              : 'Für den Versand des Newsletters setzen wir „Ghost" (Ghost Foundation) ein. Ghost wird ausschließlich als technischer Dienstleister und Auftragsverarbeiter gemäß Art. 28 DSGVO eingesetzt und verarbeitet die Daten nur auf unsere Weisung.'}
+          </p>
+
           <h2 className="text-xl mt-6 mb-2">
             5. {isEnglish ? 'Data Collection via Formbricks' : 'Datenerfassung über Formbricks'}
           </h2>
@@ -539,7 +590,7 @@ const Privacy: FC = () => {
 
           <div className="mt-12 mb-8">
             <p className="text-sm text-gray-400">
-              {isEnglish ? 'As of: February 5, 2026' : 'Stand: 5. Februar 2026'}
+              {isEnglish ? 'As of: August 27, 2026' : 'Stand: 27. August 2026'}
             </p>
           </div>
         </div>

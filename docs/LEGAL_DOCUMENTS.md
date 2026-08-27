@@ -12,6 +12,14 @@ When users accept terms during paid course registration:
 1. The timestamp is stored in `CourseEnrollment.termsAcceptedAt`
 2. Git history tracks which version of the document was active at that time
 
+Guest registrations use the same column: `confirmGuestRegistration` sets
+`termsAcceptedAt` when the double opt-in link is redeemed, so the timestamp
+records the moment the registration became valid.
+
+Newsletter consent is tracked separately in `OrganizationNewsletterSubscription`
+(`status`, `source`, `updated_at`) rather than as a timestamp on the enrollment,
+because it is per organization and can be withdrawn independently.
+
 ## How to Update Legal Documents
 
 1. **Edit the document content** in the respective file
@@ -43,3 +51,4 @@ All legal pages support both German and English translations. The language is au
 | Date       | Document        | Changes                                   |
 | ---------- | --------------- | ----------------------------------------- |
 | 2026-02-05 | Terms & Privacy | Initial versions with payment registration |
+| 2026-08-27 | Privacy         | Added guest registration (Art. 6(1)(b), 12-month retention, self-service deletion) and the newsletter section (Art. 6(1)(a), Ghost as processor) |
