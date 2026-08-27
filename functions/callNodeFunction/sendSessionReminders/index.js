@@ -68,8 +68,12 @@ export default async function sendSessionReminders(req, logger) {
               Sessions: {
                 startDateTime: { _gte: $startTime, _lte: $endTime }
               }
+              # REGISTERED sits alongside CONFIRMED here: it is what the direct
+              # registration flows write when there is no approval step, guest
+              # signup included. Those people are attending, so they get the
+              # reminder.
               CourseEnrollments: {
-                status: { _eq: "CONFIRMED" }
+                status: { _in: [CONFIRMED, REGISTERED] }
               }
             }
           ) {
@@ -93,7 +97,7 @@ export default async function sendSessionReminders(req, logger) {
               id
               startDateTime
             }
-            CourseEnrollments(where: { status: { _eq: "CONFIRMED" } }) {
+            CourseEnrollments(where: { status: { _in: [CONFIRMED, REGISTERED] } }) {
               id
               User {
                 id
