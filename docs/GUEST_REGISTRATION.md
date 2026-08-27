@@ -191,7 +191,7 @@ at their own link is usually the fastest complete answer.
 
 | Layer | Path |
 |---|---|
-| Migrations | `backend/migrations/default/1788100000000_*` … `1788100000007_*` |
+| Migrations | `backend/migrations/default/1788100000000_*` … `1788100000009_*` |
 | Actions | `backend/metadata/actions.yaml`, `actions.graphql` |
 | Token table | `backend/metadata/databases/default/tables/public_GuestRegistrationToken.yaml` |
 | Shared helpers | `functions/callNodeFunction/guestRegistration.js` |
@@ -239,5 +239,8 @@ docker compose logs -f node_functions   # the confirm link appears here
    anonymized, the enrollment is `CANCELLED`, the tokens are gone, and the link
    is inert on a second use.
 
-To exercise retention, backdate the course's `endTime` beyond the period and
-invoke the function directly; run it twice to confirm the second run is a no-op.
+To exercise retention, backdate the event's `Session.endDateTime` beyond the
+period -- not `Course.endTime`, which is only a time of day -- and invoke the
+function directly; run it twice to confirm the second run is a no-op. A guest
+whose event has no session at all is reported rather than anonymized, so add one
+if you want to see the first sweep act.

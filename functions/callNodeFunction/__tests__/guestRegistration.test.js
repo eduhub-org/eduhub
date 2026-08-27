@@ -13,6 +13,7 @@ const {
   classifyGuestThrottle,
   findUsersByEmail,
   appendGuestMailFooter,
+  guestSafeCopyRecipients,
   isHoneypotTripped,
   GUEST_THROTTLE,
   NO_SUCH_USER_ID,
@@ -202,16 +203,52 @@ describe('registration throttling', () => {
 
   it('orders the ceilings narrowest to widest', () => {
     // A wider cap at or below a narrower one would make the narrower one
-    // unreachable.
-    expect(GUEST_THROTTLE.perAddressCourse).toBeLessThan(GUEST_THROTTLE.perAddress);
+    // unreachable. perAddressMail counts mail rather than tokens, so it sits
+    // above the per-course token cap that feeds it and below the address cap.
+    expect(GUEST_THROTTLE.perAddressCourse).toBeLessThanOrEqual(GUEST_THROTTLE.perAddressMail);
+    expect(GUEST_THROTTLE.perAddressMail).toBeLessThanOrEqual(GUEST_THROTTLE.perAddress);
     expect(GUEST_THROTTLE.perAddress).toBeLessThan(GUEST_THROTTLE.perCourse);
     expect(GUEST_THROTTLE.perCourse).toBeLessThan(GUEST_THROTTLE.global);
+  });
+
+  it('caps mail to one address even when no token is ever issued', () => {
+    // The existing-account branch mails GUEST_ALREADY_HAS_ACCOUNT and creates no
+    // token, so every token-based counter reads zero for exactly the addresses
+    // an attacker knows are registered. Without a mail-based counter that branch
+    // is an unthrottled cannon.
+    expect(classifyGuestThrottle({ perAddressMail: GUEST_THROTTLE.perAddressMail }))
+      .toBe('ADDRESS');
+    expect(classifyGuestThrottle({ perAddressMail: GUEST_THROTTLE.perAddressMail - 1 }))
+      .toBeNull();
   });
 
   it('uses a sentinel user id that no generated uuid can collide with', () => {
     // Hasura reads `{_eq: null}` as "no condition", so a null here would count
     // every token in the window instead of none.
     expect(NO_SUCH_USER_ID).toBe('00000000-0000-0000-0000-000000000000');
+  });
+});
+
+describe('copy recipients on guest mail', () => {
+  it('drops cc and bcc for a guest', () => {
+    // The body carries a signed manage link: whoever holds it can read, cancel
+    // and erase that person's data, so it must not reach a template's copies.
+    expect(
+      guestSafeCopyRecipients(
+        { id: USER_ID, status: 'GUEST' },
+        { cc: 'organizer@example.com', bcc: 'archive@example.com' }
+      )
+    ).toEqual({ cc: null, bcc: null });
+  });
+
+  it('leaves them alone for everyone else', () => {
+    // Templates are shared with non-guest mail, so this is decided per
+    // recipient rather than by stripping the template.
+    const copies = { cc: 'organizer@example.com', bcc: 'archive@example.com' };
+    for (const status of ['ACTIVE', 'INACTIVE', 'DELETED']) {
+      expect(guestSafeCopyRecipients({ id: USER_ID, status }, copies)).toEqual(copies);
+    }
+    expect(guestSafeCopyRecipients(null, copies)).toEqual(copies);
   });
 });
 
