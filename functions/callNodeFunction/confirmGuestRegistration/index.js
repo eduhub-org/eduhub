@@ -57,6 +57,7 @@ const INSERT_ENROLLMENT = gql`
         courseId: $courseId
         status: REGISTERED
         termsAcceptedAt: $termsAcceptedAt
+        motivationLetter: ""
       }
     ) {
       id
