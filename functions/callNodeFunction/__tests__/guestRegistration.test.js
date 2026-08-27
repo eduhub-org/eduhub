@@ -1,4 +1,4 @@
-import { describe, expect, it, beforeAll } from '@jest/globals';
+import { describe, expect, it } from '@jest/globals';
 
 // The module reads GUEST_TOKEN_SECRET at call time, but set it before importing
 // so the import itself can never depend on ordering.
@@ -9,6 +9,7 @@ const {
   verifyManageToken,
   hashToken,
   generateRawToken,
+  escapeLikePattern,
   isValidEmail,
   isValidName,
   normalizeEmail,
@@ -97,6 +98,26 @@ describe('input normalization', () => {
     expect(isValidName('A')).toBe(true);
     expect(isValidName('')).toBe(false);
     expect(isValidName('x'.repeat(101))).toBe(false);
+  });
+});
+
+describe('LIKE escaping', () => {
+  it('escapes the metacharacters that would widen an _ilike lookup', () => {
+    // `_` is legal in an email local part and matches any character in LIKE, so
+    // an unescaped address could resolve to somebody else's account.
+    expect(escapeLikePattern('first_last@example.com')).toBe('first\\_last@example.com');
+    expect(escapeLikePattern('a%b@example.com')).toBe('a\\%b@example.com');
+    expect(escapeLikePattern('back\\slash@example.com')).toBe('back\\\\slash@example.com');
+  });
+
+  it('leaves ordinary addresses untouched', () => {
+    expect(escapeLikePattern('guest@example.com')).toBe('guest@example.com');
+    expect(escapeLikePattern('guest+tag@example.com')).toBe('guest+tag@example.com');
+  });
+
+  it('handles null and undefined', () => {
+    expect(escapeLikePattern(null)).toBe('');
+    expect(escapeLikePattern(undefined)).toBe('');
   });
 });
 

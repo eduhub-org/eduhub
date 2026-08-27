@@ -2706,7 +2706,6 @@ export enum UserStatus_update_column {
  */
 export enum User_constraint {
   Person_AnonymId_key = "Person_AnonymId_key",
-  User_email_key = "User_email_key",
   User_pkey = "User_pkey",
 }
 

@@ -5,6 +5,7 @@ import {
   buildCourseLink,
   buildPrivacyPolicyLink,
   createHasuraClient,
+  escapeLikePattern,
   isValidEmail,
   isValidName,
   issueConfirmToken,
@@ -186,7 +187,9 @@ export default async function registerGuestForCourse(req, logger) {
 
     const courseLink = buildCourseLink(course.id);
 
-    const existingUserData = await client.request(FIND_USER_BY_EMAIL, { email });
+    const existingUserData = await client.request(FIND_USER_BY_EMAIL, {
+      email: escapeLikePattern(email),
+    });
     const existingUser = existingUserData?.User?.[0];
 
     // The address already belongs to a real account. Create nothing, and tell

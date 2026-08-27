@@ -14,8 +14,20 @@ cancellations and newsletter opt-in work with **no guest-specific mail code**.
 Two consequences worth knowing:
 
 - `User.id` is no longer always a Keycloak user id. It is for every non-guest.
-- A guest who later signs up properly gets a **second** `User` row. Merging is
-  out of scope here and tracked as issue #1337.
+- A guest who later signs up properly gets a **second** `User` row. Merging their
+  past registrations into the new account is out of scope here and tracked as
+  issue #1337.
+
+Because of that second point, the email uniqueness on `User` is a **partial**
+unique index (`User_email_non_guest_key`) that excludes `status = 'GUEST'`. With
+the original table-wide constraint, the insert `updateFromKeycloak` performs on
+that person's first login would violate it — and since that error is swallowed,
+they would end up logged in with no Hasura `User` row. Re-pointing the guest
+row's id instead is not possible: most foreign keys to `User(id)` are
+`ON UPDATE RESTRICT`.
+
+`registerGuestForCourse` refuses to create a guest record for an address that
+already has an account, so only the guest-first ordering ever produces two rows.
 
 ## The flow
 
@@ -82,6 +94,10 @@ when all of these hold:
 
 Idempotent: an anonymized guest is `DELETED`, so it is not selected again.
 
+A guest whose event has **no `endTime`** cannot be aged out — there is no date to
+count from. Rather than guess, the job counts these and logs a warning naming
+how many; set `Course.endTime` on those events so the period can apply.
+
 > **Ordering matters.** Erasure unsubscribes from Ghost *before* overwriting the
 > email, because `syncGhostNewsletterSubscription` re-reads `User.email` when it
 > runs. Anonymizing first would push the placeholder address to Ghost and leave
@@ -125,7 +141,7 @@ at their own link is usually the fastest complete answer.
 
 | Layer | Path |
 |---|---|
-| Migrations | `backend/migrations/default/1788100000000_*` … `1788100000004_*` |
+| Migrations | `backend/migrations/default/1788100000000_*` … `1788100000005_*` |
 | Actions | `backend/metadata/actions.yaml`, `actions.graphql` |
 | Token table | `backend/metadata/databases/default/tables/public_GuestRegistrationToken.yaml` |
 | Shared helpers | `functions/callNodeFunction/guestRegistration.js` |

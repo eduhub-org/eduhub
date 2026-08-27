@@ -50,13 +50,13 @@ const FIND_EXISTING_ENROLLMENT = gql`
 `;
 
 const INSERT_ENROLLMENT = gql`
-  mutation InsertGuestEnrollment($userId: uuid!, $courseId: Int!) {
+  mutation InsertGuestEnrollment($userId: uuid!, $courseId: Int!, $termsAcceptedAt: timestamptz!) {
     insert_CourseEnrollment_one(
       object: {
         userId: $userId
         courseId: $courseId
         status: REGISTERED
-        termsAcceptedAt: "now()"
+        termsAcceptedAt: $termsAcceptedAt
       }
     ) {
       id
@@ -137,9 +137,13 @@ export default async function confirmGuestRegistration(req, logger) {
       return { success: false, messageKey: 'COURSE_FULL' };
     }
 
+    // Recorded at confirmation rather than at submission: the registration only
+    // legally exists once the address is confirmed, so that is when consent to
+    // the terms takes effect.
     await client.request(INSERT_ENROLLMENT, {
       userId: token.userId,
       courseId: course.id,
+      termsAcceptedAt: new Date().toISOString(),
     });
 
     await markConfirmTokenUsed(client, token.id);

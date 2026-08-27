@@ -105,6 +105,25 @@ query AbandonedGuests($cutoff: timestamptz!) {
 }
 """
 
+# Guests we cannot age out because at least one of their events has no end date.
+# Retaining them indefinitely would defeat the retention period, so the job
+# reports them rather than letting them sit unnoticed.
+GUESTS_BLOCKED_BY_MISSING_END_DATE = """
+query GuestsBlockedByMissingEndDate($cutoff: timestamptz!) {
+    User_aggregate(
+        where: {
+            status: {_eq: GUEST}
+            created_at: {_lt: $cutoff}
+            CourseEnrollments: {Course: {endTime: {_is_null: true}}}
+        }
+    ) {
+        aggregate {
+            count
+        }
+    }
+}
+"""
+
 UNSUBSCRIBE_NEWSLETTER = """
 mutation UnsubscribeGuestNewsletter($userId: uuid!) {
     update_OrganizationNewsletterSubscription(
@@ -240,6 +259,20 @@ def anonymize_guest_data(arguments):
             else:
                 failed += 1
 
+        blocked = _check(
+            client.send_query(GUESTS_BLOCKED_BY_MISSING_END_DATE, {"cutoff": retention_cutoff}),
+            "count guests blocked by a missing event end date",
+        )
+        blocked_count = (
+            (blocked or {}).get("User_aggregate", {}).get("aggregate", {}).get("count", 0)
+        )
+        if blocked_count:
+            logging.warning(
+                f"{blocked_count} guest(s) older than the retention period cannot be "
+                "anonymized because at least one of their events has no end date. "
+                "Set Course.endTime on those events so the retention period can be applied."
+            )
+
         unconfirmed_cutoff = (
             datetime.now(timezone.utc) - timedelta(days=UNCONFIRMED_GRACE_DAYS)
         ).isoformat()
@@ -262,7 +295,8 @@ def anonymize_guest_data(arguments):
 
         logging.info(
             f"Guest retention run complete: {anonymized} anonymized, "
-            f"{deleted} unconfirmed signups deleted, {failed} failed"
+            f"{deleted} unconfirmed signups deleted, {failed} failed, "
+            f"{blocked_count} blocked by a missing event end date"
         )
 
         return {
@@ -272,6 +306,7 @@ def anonymize_guest_data(arguments):
                 "anonymized": anonymized,
                 "deletedUnconfirmed": deleted,
                 "failed": failed,
+                "blockedByMissingEndDate": blocked_count,
             },
         }
 

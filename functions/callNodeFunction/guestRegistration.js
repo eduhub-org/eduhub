@@ -107,11 +107,8 @@ const FIND_CONFIRM_TOKEN = gql`
 `;
 
 const MARK_CONFIRM_TOKEN_USED = gql`
-  mutation MarkGuestRegistrationTokenUsed($id: uuid!) {
-    update_GuestRegistrationToken_by_pk(
-      pk_columns: { id: $id }
-      _set: { usedAt: "now()" }
-    ) {
+  mutation MarkGuestRegistrationTokenUsed($id: uuid!, $usedAt: timestamptz!) {
+    update_GuestRegistrationToken_by_pk(pk_columns: { id: $id }, _set: { usedAt: $usedAt }) {
       id
     }
   }
@@ -163,7 +160,10 @@ export async function resolveConfirmToken(client, rawToken) {
 }
 
 export async function markConfirmTokenUsed(client, tokenId) {
-  await client.request(MARK_CONFIRM_TOKEN_USED, { id: tokenId });
+  await client.request(MARK_CONFIRM_TOKEN_USED, {
+    id: tokenId,
+    usedAt: new Date().toISOString(),
+  });
 }
 
 /* -------------------------------------------------------- manage tokens */
@@ -374,6 +374,15 @@ export function normalizeEmail(email) {
 
 export function isValidEmail(email) {
   return EMAIL_PATTERN.test(email) && email.length <= 254;
+}
+
+/**
+ * Escapes the LIKE metacharacters so an `_ilike` comparison is an exact,
+ * case-insensitive match. Without this, `first_last@example.com` would also
+ * match `firstXlast@example.com` and could resolve to the wrong account.
+ */
+export function escapeLikePattern(value) {
+  return String(value ?? '').replace(/[\\%_]/g, (char) => `\\${char}`);
 }
 
 export function normalizeName(name) {
