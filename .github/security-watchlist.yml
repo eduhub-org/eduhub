@@ -1,0 +1,148 @@
+# Security watchlist — the dependencies this repo cannot afford to hear about late.
+#
+# Read by `.github/dependabot-triage-playbook.md` (section 2b) on every run of
+# `.github/workflows/dependabot-triage.yml`.
+#
+# WHY THIS FILE EXISTS
+# --------------------
+# Dependabot alerts are generated from the *global* GitHub Advisory Database, which sits
+# downstream of the maintainers. A project that publishes a repository security advisory
+# and ships the fix reaches its users days before that advisory is mirrored into the
+# global database, and an advisory that never gets a CVE may never produce an alert here
+# at all. An alerts-driven triage is blind for exactly as long as that lag lasts.
+#
+# 2026-08-25 is the worked example. Next.js published two **critical** unauthenticated
+# remote-code-execution advisories on its own repository and shipped the fix in 16.3.3:
+#
+#   GHSA-2xp9-vwfh-vxw4  RCE in the Image Optimization API via crafted AVIF files
+#                        (libheif, reached through sharp). CVSS 9.5, no CVE assigned.
+#                        Affected: >=10.0.0 <15.5.24 and <16.3.3.
+#   GHSA-p293-qw3h-jr36  Unauthenticated RCE on Windows-hosted servers.
+#
+# This repo shipped `next` 16.2.11 — inside the vulnerable range of both. The triage run on
+# 2026-08-26, the morning after publication, read the alerts API, found 11 open alerts and
+# reported a clean bill: none of them was `next`, because the advisories had not reached the
+# global database and so no alert existed to find. The gap was closed on 2026-08-27 by a
+# human who had read about it elsewhere and patched it by hand in #1881 — not by this job.
+#
+# Entries below are therefore checked against their upstream project's OWN advisories,
+# never against the alerts API.
+#
+# WHAT BELONGS HERE
+# -----------------
+# Only dependencies that process untrusted input on a deployed surface: the web server
+# itself, anything that parses what a user uploads or submits, anything in the
+# authentication path, and the deployed container images. Everything else is served well
+# enough by Dependabot alerts and does not need to cost a check on every run.
+#
+# Keep this list short and prune it. Every entry is a per-run cost, and a list nobody
+# maintains is a list nobody reads.
+#
+# FIELDS
+# ------
+#   package / image  identifier as it appears in the manifest being checked
+#   manifest         where the version this repo actually ships is declared
+#   upstream         GitHub `owner/repo` whose published advisories are authoritative
+#   why              the exposure that earns the entry — reread this before trusting it
+
+packages:
+  - package: next
+    manifest: frontend-nx/package.json
+    upstream: vercel/next.js
+    why: >-
+      The web server. Renders every public course page, runs the Server Actions behind
+      authenticated flows, and exposes the image optimization API. `images.formats` in
+      `apps/edu-hub/next.config.js` enables AVIF and `remotePatterns` allows the storage
+      bucket users upload into, so an attacker-supplied image reaches the optimizer.
+
+  - package: react
+    manifest: frontend-nx/package.json
+    upstream: facebook/react
+    why: Server-side rendering of user-supplied course, project and profile content.
+
+  - package: react-dom
+    manifest: frontend-nx/package.json
+    upstream: facebook/react
+    why: Same as `react` — the SSR renderer itself.
+
+  - package: sharp
+    manifest: frontend-nx/package.json
+    upstream: lovell/sharp
+    why: >-
+      Decodes every uploaded image on the server, and carries its own bundled libvips /
+      libheif codecs. The August 2026 Next.js AVIF RCE was a libheif flaw reached through
+      this package, so a Next.js bump does not always settle a sharp advisory.
+
+  - package: next-auth
+    manifest: frontend-nx/package.json
+    upstream: nextauthjs/next-auth
+    why: Session issuance and validation for every authenticated route. Auth bypasses land here.
+
+  - package: keycloak-js
+    manifest: frontend-nx/package.json
+    upstream: keycloak/keycloak
+    why: The browser half of the identity provider integration — token handling and refresh.
+
+  - package: dompurify
+    manifest: frontend-nx/package.json
+    upstream: cure53/DOMPurify
+    why: >-
+      The sanitizer standing between instructor-authored rich text and everyone who reads
+      it. A bypass here is a stored XSS in the product, with no other control behind it.
+
+  - package: "@apollo/client"
+    manifest: frontend-nx/package.json
+    upstream: apollographql/apollo-client
+    why: Every GraphQL request and the client-side cache that answers from prior responses.
+
+  - package: axios
+    manifest: frontend-nx/package.json
+    upstream: axios/axios
+    why: Server-side HTTP client. SSRF and redirect-handling flaws are reachable from API routes.
+
+  - package: cookie
+    manifest: frontend-nx/package.json
+    upstream: jshttp/cookie
+    why: Parses and serializes session cookies — injection here is a session-integrity bug.
+
+  - package: stripe
+    manifest: frontend-nx/package.json
+    upstream: stripe/stripe-node
+    why: >-
+      Payment flows and webhook signature verification. Signature-verification failures
+      are in the take-a-fix-immediately class regardless of the score attached to them.
+
+images:
+  - image: hasura/graphql-engine
+    manifest: backend/Dockerfile
+    upstream: hasura/graphql-engine
+    why: >-
+      The GraphQL API and the row-level permission engine — the control that decides which
+      student may read which record. Pinned at v2.19.0.cli-migrations-v3.
+
+  - image: quay.io/keycloak/keycloak
+    manifest: keycloak/Dockerfile, keycloak/Dockerfile-dev
+    upstream: keycloak/keycloak
+    why: >-
+      The identity provider. Section 4 of the playbook already governs how to bump it —
+      pom, both Dockerfiles and a rebuilt `keycloak/libs/matrix-handle-listener.jar`, or
+      it is not a fix.
+
+  - image: node
+    manifest: frontend-nx/Dockerfile-edu, frontend-nx/Dockerfile-stujo, functions/Dockerfile
+    upstream: nodejs/node
+    why: >-
+      The runtime under the deployed server. Node security releases are announced on the
+      project blog rather than as repository advisories, so check
+      https://nodejs.org/en/blog/vulnerability for the 22.x line when the release-based
+      check in section 2b flags a gap.
+
+# DELIBERATELY NOT LISTED
+# -----------------------
+# - Build, test and codegen tooling (cypress, eslint, the apollo@2 CLI, semantic-release).
+#   Dev scope, and Dependabot alerts already cover them adequately — see the standing
+#   manual-decision issue for the ones that are open.
+# - `postgres` in docker-compose.yml. That pin is the local development stack only;
+#   the deployed database is managed, and its patching is not this job's to drive.
+# - The MUI, TipTap, FullCalendar and Radix UI component families. Large surface, but
+#   client-side rendering of content the user already has access to.

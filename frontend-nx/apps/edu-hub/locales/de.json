@@ -1059,7 +1059,11 @@
       "program": "Programm",
       "status": "Status",
       "email_templates": "Vorlagen",
-      "has_custom_templates": "Dieser Kurs hat kursspezifische E-Mail-Vorlagen"
+      "has_custom_templates": {
+        "courses": "Dieser Kurs hat eigene E-Mail-Vorlagen",
+        "events": "Dieses Event hat eigene E-Mail-Vorlagen",
+        "degrees": "Dieses Degree hat eigene E-Mail-Vorlagen"
+      }
     },
     "error_loading_programs": "Die Programme konnten nicht geladen werden. Bitte versuche es später erneut.",
     "empty_state": {
@@ -1071,7 +1075,11 @@
     "close": "Schließen",
     "cancel": "Abbrechen",
     "not_published": "Nicht veröffentlicht",
-    "default_course_title": "Unbenannter Kurs",
+    "default_title": {
+      "courses": "Unbenannter Kurs",
+      "events": "Unbenanntes Event",
+      "degrees": "Unbenanntes Degree"
+    },
     "title": "Kurse verwalten",
     "all_programs": "Alle",
     "course_degree_title": {
@@ -1196,32 +1204,83 @@
     "add_event_button": "Event hinzufügen",
     "add_degree_button": "Degree hinzufügen",
     "delete_button": {
-      "delete_course_confirmation": "Bist du sicher, dass du den Kurs '{title}' löschen möchtest?",
-      "untitled_course": "Unbenannter Kurs"
+      "delete_confirmation": {
+        "courses": "Bist du sicher, dass du den Kurs „{title}“ löschen möchtest?",
+        "events": "Bist du sicher, dass du das Event „{title}“ löschen möchtest?",
+        "degrees": "Bist du sicher, dass du das Degree „{title}“ löschen möchtest?"
+      }
     },
     "bulk_action": {
       "publish": "Ausgewählte veröffentlichen",
       "unpublish": "Ausgewählte zurückziehen",
       "copy": "In Programm kopieren"
     },
-    "copy_courses_to_program_dialog": {
-      "title": "Kurse in Programm kopieren",
-      "description": "Wähle das Zielprogramm aus, in das die Kurse kopiert werden sollen:",
-      "button": "Kurse kopieren"
+    "copy_to_program_dialog": {
+      "title": {
+        "courses": "Kurse in Programm kopieren",
+        "events": "Events in Programm kopieren",
+        "degrees": "Degrees in Programm kopieren"
+      },
+      "description": {
+        "courses": "Wähle das Zielprogramm aus, in das die Kurse kopiert werden sollen:",
+        "events": "Wähle das Zielprogramm aus, in das die Events kopiert werden sollen:",
+        "degrees": "Wähle das Zielprogramm aus, in das die Degrees kopiert werden sollen:"
+      },
+      "button": {
+        "courses": "Kurse kopieren",
+        "events": "Events kopieren",
+        "degrees": "Degrees kopieren"
+      }
     },
     "notifications": {
-      "course_added_success": "Kurs erfolgreich hinzugefügt",
-      "course_add_failed": "Fehler beim Hinzufügen des Kurses. Bitte versuche es erneut.",
-      "courses_published_success_singular": "{count} Kurs erfolgreich veröffentlicht",
-      "courses_published_success_plural": "{count} Kurse erfolgreich veröffentlicht",
-      "courses_unpublished_success_singular": "{count} Kurs erfolgreich zurückgezogen",
-      "courses_unpublished_success_plural": "{count} Kurse erfolgreich zurückgezogen",
-      "bulk_action_failed": "Fehler beim {action} der Kurse. Bitte versuche es erneut.",
+      "added_success": {
+        "courses": "Kurs erfolgreich hinzugefügt",
+        "events": "Event erfolgreich hinzugefügt",
+        "degrees": "Degree erfolgreich hinzugefügt"
+      },
+      "add_failed": {
+        "courses": "Fehler beim Hinzufügen des Kurses. Bitte versuche es erneut.",
+        "events": "Fehler beim Hinzufügen des Events. Bitte versuche es erneut.",
+        "degrees": "Fehler beim Hinzufügen des Degrees. Bitte versuche es erneut."
+      },
+      "published_success_singular": {
+        "courses": "{count} Kurs erfolgreich veröffentlicht",
+        "events": "{count} Event erfolgreich veröffentlicht",
+        "degrees": "{count} Degree erfolgreich veröffentlicht"
+      },
+      "published_success_plural": {
+        "courses": "{count} Kurse erfolgreich veröffentlicht",
+        "events": "{count} Events erfolgreich veröffentlicht",
+        "degrees": "{count} Degrees erfolgreich veröffentlicht"
+      },
+      "unpublished_success_singular": {
+        "courses": "{count} Kurs erfolgreich zurückgezogen",
+        "events": "{count} Event erfolgreich zurückgezogen",
+        "degrees": "{count} Degree erfolgreich zurückgezogen"
+      },
+      "unpublished_success_plural": {
+        "courses": "{count} Kurse erfolgreich zurückgezogen",
+        "events": "{count} Events erfolgreich zurückgezogen",
+        "degrees": "{count} Degrees erfolgreich zurückgezogen"
+      },
+      "bulk_action_failed": {
+        "courses": "Die Massenaktion für die ausgewählten Kurse ist fehlgeschlagen. Bitte versuche es erneut.",
+        "events": "Die Massenaktion für die ausgewählten Events ist fehlgeschlagen. Bitte versuche es erneut.",
+        "degrees": "Die Massenaktion für die ausgewählten Degrees ist fehlgeschlagen. Bitte versuche es erneut."
+      },
       "attendance_certificate_update_failed": "Fehler beim Aktualisieren der Teilnahmebescheinigung-Einstellung",
       "achievement_certificate_update_failed": "Fehler beim Aktualisieren der Leistungsbescheinigung-Einstellung",
       "application_end_update_failed": "Fehler beim Aktualisieren des Bewerbungsendes",
-      "courses_copied_success_singular": "{count} Kurs erfolgreich in {programTitle} kopiert",
-      "courses_copied_success_plural": "{count} Kurse erfolgreich in {programTitle} kopiert"
+      "copied_success_singular": {
+        "courses": "{count} Kurs erfolgreich in {programTitle} kopiert",
+        "events": "{count} Event erfolgreich in {programTitle} kopiert",
+        "degrees": "{count} Degree erfolgreich in {programTitle} kopiert"
+      },
+      "copied_success_plural": {
+        "courses": "{count} Kurse erfolgreich in {programTitle} kopiert",
+        "events": "{count} Events erfolgreich in {programTitle} kopiert",
+        "degrees": "{count} Degrees erfolgreich in {programTitle} kopiert"
+      }
     }
   },
   "manageCourse": {
@@ -1913,7 +1972,7 @@
       "help_text": "Standard Formbricks Survey für Kurseinschreibungen. Kurse können dies mit ihrer eigenen Einschreibungs-Survey URL überschreiben."
     },
     "delete_button": {
-      "delete_program_confirmation": "Bist du sicher, dass du das Programm '{title}' löschen möchtest?",
+      "delete_program_confirmation": "Bist du sicher, dass du das Programm „{title}“ löschen möchtest?",
       "untitled_program": "Unbenanntes Programm"
     },
     "Certificates": {
@@ -1980,7 +2039,7 @@
       "programs_published_success_plural": "{count} Programme wurden erfolgreich veröffentlicht",
       "programs_unpublished_success_singular": "Programm wurde erfolgreich zurückgezogen",
       "programs_unpublished_success_plural": "{count} Programme wurden erfolgreich zurückgezogen",
-      "bulk_action_failed": "Massenaktion '{action}' ist fehlgeschlagen"
+      "bulk_action_failed": "Die Massenaktion ist fehlgeschlagen. Bitte versuche es erneut."
     }
   },
   "manageUsers": {
@@ -2613,7 +2672,7 @@
       "PAYMENT_RECEIPT": "Gesendet, wenn eine Rechnung für eine Kurs- oder Event-Anmeldung bezahlt wurde",
       "COURSE_CONTINUATION_INQUIRY": "Gesendet, wenn Teilnehmende so viele Termine versäumt haben, wie für den Kurs maximal erlaubt sind – mit der Bitte, keine weiteren Termine zu verpassen oder kurz Bescheid zu geben, falls sie nicht mehr teilnehmen möchten"
     },
-    "delete_confirmation": "Bist du sicher, dass du die E-Mail-Vorlage '{title}' löschen möchtest?",
+    "delete_confirmation": "Bist du sicher, dass du die E-Mail-Vorlage „{title}“ löschen möchtest?",
     "unknown_trigger": "Unbekannter Auslöser-Typ",
     "categories": {
       "all": "Alle",

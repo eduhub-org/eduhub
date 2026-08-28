@@ -433,7 +433,7 @@ const handleStripeWebhook = async (
                     : session.payment_intent?.id ?? null,
                 stripeInvoice: session.invoice as string | Stripe.Invoice | null,
               },
-              // SEPA / bank transfer settle later: ISSUED until
+              // SEPA settles later: ISSUED until
               // async_payment_succeeded flips the invoice to PAID.
               session.payment_status === 'paid' ? 'PAID' : 'ISSUED'
             );

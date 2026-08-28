@@ -476,8 +476,8 @@ export default async function createStripeCheckout(req, logger) {
       });
     }
 
-    // Bank transfer (customer_balance) requires an existing Stripe
-    // customer; without an email the session degrades to card+SEPA.
+    // A named customer keeps repeat purchases and their invoices on one
+    // record; without an email Stripe creates one during checkout instead.
     let stripeCustomerId = null;
     if (emailToUse && emailToUse.trim() !== '' && emailToUse.includes('@')) {
       stripeCustomerId = await getOrCreateCustomer(stripe, emailToUse.trim());
@@ -487,8 +487,8 @@ export default async function createStripeCheckout(req, logger) {
     const sessionConfig = {
       line_items: lineItems,
       mode: 'payment',
-      // Agreed payment methods (card, SEPA debit, EU bank transfer);
-      // delayed methods settle via checkout.session.async_payment_* events.
+      // Card and SEPA debit; the latter settles via the
+      // checkout.session.async_payment_* events.
       ...buildPaymentMethodConfig(stripeCustomerId),
       // Stripe issues a real, sequentially numbered invoice (§14 UStG);
       // the webhook stores its hosted/PDF URLs on the Invoice row.
