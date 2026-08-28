@@ -3,6 +3,80 @@
 Lets someone register for an event with just a name and an email address, with
 no Keycloak account. Off by default; an organizer enables it per event.
 
+## What people see
+
+The feature as the two people who meet it actually experience it. The rest of
+this document is how it works; this section is what to read before answering a
+support question.
+
+### As a visitor
+
+The entry point only exists for someone **logged out**, on the page of an event
+that has the toggle on: under the usual *Register* button that would send them
+to login, a secondary text link, **Register without an account**. It is
+deliberately the second option and never a replacement — anyone who already has
+an account is better served by it.
+
+The link opens a short form: first name, last name, email, one checkbox for the
+terms and the privacy policy, and an optional, unticked box to hear about future
+events from that organizer. Nothing else is asked and there is no password to
+choose.
+
+Submitting the form registers nobody. It sends a mail and says so — *"Check your
+inbox"*, naming the address and noting the link is valid for 7 days. **Clicking
+that link is the registration**: only then is a seat taken and the ordinary
+confirmation mail sent. An address someone else mistyped therefore never becomes
+a registration and never gets follow-up mail.
+
+From there a guest is on the normal mail pipeline — session reminders,
+reschedule notices, cancellations — indistinguishable from a participant with an
+account, because it is the same code. Every one of those mails carries a footer
+link to `/guest/manage` that needs no login:
+
+| Section | What it does |
+|---|---|
+| Your data | Shows the name and email held, and says they are deleted automatically after the event |
+| Your registrations | Each active registration, with its own **Cancel registration** button |
+| Delete your data | Erases the name and email and cancels anything still open, behind a confirmation dialog |
+
+That page is the entirety of a guest's Art. 15 and Art. 17 surface — they have
+no login, so there is nowhere else for them to look (for what a written access
+request needs beyond it, see
+[Answering an Art. 15 access request](#answering-an-art-15-access-request-from-a-guest)).
+After a deletion the old links are inert, which is the visible proof the record
+is gone.
+
+Two situations end differently, and in both the visitor is told **by mail rather
+than on screen** — the form answers identically whatever the address turns out
+to be, so that it cannot be used to test which addresses have accounts (see
+[No account enumeration](#security-notes)):
+
+- The address already has an EduHub account. They get a mail asking them to log
+  in and register there; no guest record is created.
+- The address already has a pending confirmation, or is already enrolled.
+  Nothing new happens.
+
+### As an organizer
+
+The toggle is per event and off by default: **Manage course → Description tab →
+Allow registration without an account**. It only appears on events that can
+actually support it — the conditions in
+[Enabling it for an event](#enabling-it-for-an-event) — because showing it
+elsewhere would offer something the backend then refuses.
+
+Once it is on, confirmed guests are simply participants: same participant list,
+same counts, same `maxParticipants` limit, same mails. There is no separate
+guest roster to check and no extra approval step, which is the point of building
+them as ordinary `User` rows.
+
+The one thing that differs is that their data expires. Once every event a guest
+is enrolled in is more than `AppSettings.guestDataRetentionMonths` (default 12)
+past, their name and email are overwritten automatically; the enrollment row
+stays, anonymized, so attendance figures survive but the person is no longer
+identifiable. If a participant list has to remain readable for longer — funding
+evidence is the usual reason — raise that setting in advance rather than
+expecting the names to still be there. See [Retention job](#retention-job).
+
 ## What a guest is
 
 A guest is an ordinary `User` row with `status = 'GUEST'` and no Keycloak
