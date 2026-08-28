@@ -1,188 +1,136 @@
 /*
- * StuJo skin for the shared login theme. Activated via html.stujo-brand
- * (see js/stujo-portal-brand.js). Recreates the StuJo look: purple gradient
- * backdrop (like the site header), white dialog card, green submit
- * button, pink links — so the login reads as a StuJo dialog instead of
- * the dark EduHub page.
+ * StuJo co-branding for the shared EduHub login theme.
+ *
+ * StuJo and EduHub are one Keycloak realm and one account. When the login
+ * looked like a standalone StuJo dialog, people with an existing EduHub
+ * account did not recognise it and tried to register again, which only got
+ * them "email already exists". So the page deliberately stays the EduHub
+ * login — dark #222 page, light card, pill buttons, Space Grotesk — and the
+ * portal only adds a small co-brand mark next to the EduHub lockup plus one
+ * accent colour. Activated via html.stujo-brand (see js/stujo-portal-brand.js).
  *
  * White-label campus portals add html.stujo-haw-kiel / html.stujo-flensburg
- * on top of stujo-brand (colors match AppSettings primaryColor seeds).
+ * on top of stujo-brand; they swap the co-brand logo and the accent colour
+ * (values match the AppSettings primaryColor seeds).
  */
 
-html.stujo-brand .login-pf body,
-html.stujo-brand body {
-  background: linear-gradient(to right, #4b0135, #a71580, #4b0135) !important;
-  font-family: Lato, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+html.stujo-brand {
+  --kc-cobrand-accent: #a71580;
 }
 
-/* Header bar: white strip with the StuJo logo instead of the EduHub logo */
-html.stujo-brand .academy_header_guest {
-  background: #fff;
+html.stujo-haw-kiel {
+  --kc-cobrand-accent: #04305e;
 }
 
-html.stujo-brand .navbar-logo,
-html.stujo-brand .navbar-logo-text {
-  display: none !important;
+html.stujo-flensburg {
+  --kc-cobrand-accent: #025095;
 }
 
-html.stujo-brand .navbar-logo-stujo {
-  display: block !important;
-  height: 52px;
-  padding: 4px 12px;
+/* --------------------------------------------------------------------------
+ * Header co-brand: the EduHub lockup keeps its place, the portal mark is
+ * added beside it. The portal logos are dark artwork made for a white
+ * header, so they sit on a small white plate to stay legible on #222.
+ * -------------------------------------------------------------------------- */
+
+.navbar-cobrand {
+  display: none;
 }
 
-html.stujo-brand .navbar-logo-stujo-portal {
-  display: none !important;
-  height: 52px;
+html.stujo-brand .navbar-cobrand {
+  display: flex;
+  align-items: center;
+}
+
+.navbar-cobrand-divider {
+  width: 1px;
+  height: 28px;
+  margin: 0 14px;
+  background-color: #4a4a4a;
+}
+
+.navbar-cobrand-plate {
+  display: flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background-color: #fff;
+}
+
+.navbar-cobrand-logo {
+  display: none;
   width: auto;
-  max-width: 280px;
-  object-fit: contain;
-  padding: 4px 12px;
+  height: 24px;
 }
 
-/* Dialog card */
-html.stujo-brand .card-pf {
-  background-color: #fff !important;
-  border-radius: 4px !important;
-  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.35) !important;
-  padding: 8px 24px 20px !important;
-}
-
-html.stujo-brand #kc-page-title,
-html.stujo-brand .edu-title {
-  color: #a71580 !important;
-  font-weight: bold;
-}
-
-html.stujo-brand .pf-c-form-control {
-  border: 2px solid #dedad5 !important;
-  border-radius: 0 !important;
-}
-
-/* Green StuJo submit button (live .stujo-submit) — kept for all portals */
-html.stujo-brand .pf-c-button.pf-m-primary,
-html.stujo-brand .login-pf-page .btn-primary {
-  background: #acca23 !important;
-  border: none !important;
-  border-radius: 4px !important;
-  color: #fff !important;
-  text-transform: none !important;
-  font-size: 17px;
-  padding: 8px 24px;
-}
-
-html.stujo-brand .pf-c-button.pf-m-primary:hover,
-html.stujo-brand .login-pf-page .btn-primary:hover {
-  background: #9cb81f !important;
-  color: #fff !important;
-}
-
-/* Links: grey with pink hover like the site */
-html.stujo-brand a {
-  color: #646363 !important;
-}
-
-html.stujo-brand a:hover {
-  color: #a71580 !important;
-}
-
-html.stujo-brand #kc-registration a,
-html.stujo-brand .login-pf-settings a {
-  color: #a71580 !important;
-  font-weight: bold;
-}
-
-/* The base theme pulls the registration strip out of the card with
-   margins sized for the default 40px/30px card padding; match the
-   smaller stujo card padding (24px sides, 20px bottom) and radius. */
-html.stujo-brand #kc-info {
-  margin: 20px -24px -20px;
-}
-
-html.stujo-brand #kc-info-wrapper {
-  border-bottom-left-radius: 4px;
-  border-bottom-right-radius: 4px;
-}
-
-/* Social provider buttons (production realm; dev has none configured):
-   outlined full-width buttons instead of bare links */
-html.stujo-brand .kc-social-links a {
+html.stujo-brand .navbar-cobrand-stujo {
   display: block;
-  border: 2px solid #dedad5;
-  border-radius: 4px;
-  padding: 6px 12px;
-  margin-bottom: 8px;
-  text-decoration: none;
 }
 
-html.stujo-brand .kc-social-links a:hover {
-  border-color: #a71580;
+/* Campus lockups stack the StuJo mark above the university logo, so they
+   need more height than the plain StuJo wordmark and replace it. */
+html.stujo-haw-kiel .navbar-cobrand-stujo,
+html.stujo-flensburg .navbar-cobrand-stujo {
+  display: none;
 }
 
-/* --------------------------------------------------------------------------
- * HAW Kiel (AppSettings: primary #04305E, secondary #646363)
- * -------------------------------------------------------------------------- */
-html.stujo-haw-kiel .login-pf body,
-html.stujo-haw-kiel body {
-  background: linear-gradient(to right, #02152a, #04305e, #02152a) !important;
+html.stujo-haw-kiel .navbar-cobrand-haw-kiel,
+html.stujo-flensburg .navbar-cobrand-flensburg {
+  display: block;
+  height: 36px;
 }
 
-html.stujo-haw-kiel .navbar-logo-stujo {
-  display: none !important;
-}
+@media (max-width: 480px) {
+  .navbar-cobrand-divider {
+    margin: 0 8px;
+  }
 
-html.stujo-haw-kiel .navbar-logo-stujo-haw-kiel {
-  display: block !important;
-}
+  .navbar-cobrand-logo {
+    height: 20px;
+  }
 
-html.stujo-haw-kiel #kc-page-title,
-html.stujo-haw-kiel .edu-title {
-  color: #04305e !important;
-}
-
-html.stujo-haw-kiel a:hover {
-  color: #04305e !important;
-}
-
-html.stujo-haw-kiel #kc-registration a,
-html.stujo-haw-kiel .login-pf-settings a {
-  color: #04305e !important;
-}
-
-html.stujo-haw-kiel .kc-social-links a:hover {
-  border-color: #04305e;
+  html.stujo-haw-kiel .navbar-cobrand-haw-kiel,
+  html.stujo-flensburg .navbar-cobrand-flensburg {
+    height: 28px;
+  }
 }
 
 /* --------------------------------------------------------------------------
- * Campus Flensburg (AppSettings: primary #025095, secondary #EC6707)
+ * Card: unchanged EduHub card with a thin accent line in the portal colour.
+ * No overflow:hidden here — that would clip the locale dropdown.
  * -------------------------------------------------------------------------- */
-html.stujo-flensburg .login-pf body,
-html.stujo-flensburg body {
-  background: linear-gradient(to right, #011442, #025095, #011442) !important;
+
+html.stujo-brand .card-pf {
+  position: relative;
 }
 
-html.stujo-flensburg .navbar-logo-stujo {
-  display: none !important;
+html.stujo-brand .card-pf::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 4px;
+  border-radius: 16px 16px 0 0;
+  background-color: var(--kc-cobrand-accent);
 }
 
-html.stujo-flensburg .navbar-logo-stujo-flensburg {
-  display: block !important;
+/* --------------------------------------------------------------------------
+ * Shared-account note. Rendered on every page by template.ftl and revealed
+ * only for StuJo, because the brand is resolved client-side.
+ * -------------------------------------------------------------------------- */
+
+.kc-cobrand-note {
+  display: none;
 }
 
-html.stujo-flensburg #kc-page-title,
-html.stujo-flensburg .edu-title {
-  color: #025095 !important;
-}
-
-html.stujo-flensburg a:hover {
-  color: #ec6707 !important;
-}
-
-html.stujo-flensburg #kc-registration a,
-html.stujo-flensburg .login-pf-settings a {
-  color: #025095 !important;
-}
-
-html.stujo-flensburg .kc-social-links a:hover {
-  border-color: #ec6707;
+html.stujo-brand .kc-cobrand-note {
+  display: block;
+  margin: 4px 0 20px;
+  padding: 10px 14px;
+  border-left: 3px solid var(--kc-cobrand-accent);
+  border-radius: 0 8px 8px 0;
+  background-color: #fff;
+  color: #444;
+  font-size: 13px;
+  line-height: 1.45;
 }

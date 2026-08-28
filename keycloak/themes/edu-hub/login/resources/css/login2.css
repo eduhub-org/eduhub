@@ -114,3 +114,14 @@ a:hover {
   color:black;
 }
 
+
+/* bootstrap.min.css is loaded after this file and repaints bare links
+   #007bff (visible e.g. on "back to login" on the registration page), so the
+   card links have to win on specificity rather than on order. */
+.card-pf a {
+  color: rgb(34, 34, 34);
+}
+
+.card-pf a:hover {
+  color: #0b7478;
+}
