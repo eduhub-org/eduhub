@@ -16,8 +16,8 @@ import {
  * - Free type (price 0, e.g. MINIJOB)  -> publish immediately
  * - Available JobPostingCredit          -> consume one credit, publish
  * - Otherwise                           -> status PENDING_PAYMENT + Stripe
- *   Checkout Session (card, SEPA debit, bank transfer; net price + fixed
- *   19% VAT). The webhook publishes on checkout.session.completed.
+ *   Checkout Session (card, SEPA debit; net price + fixed 19% VAT).
+ *   The webhook publishes on checkout.session.completed.
  *
  * Caller must be an OrganizationAdmin with canManageJobs for the posting's
  * organization. Direct status changes are blocked by Hasura permissions,
@@ -374,8 +374,9 @@ export default async function publishJobPosting(req, logger) {
       }
     }
 
-    // Bank transfer (customer_balance) requires an existing Stripe
-    // customer; without a contact email the session degrades to card+SEPA.
+    // A named customer keeps an organization's postings and their
+    // invoices on one record; without a contact email Stripe creates one
+    // during checkout instead.
     let customerId = null;
     if (posting.ContactUser?.email) {
       customerId = await getOrCreateCustomer(
@@ -388,8 +389,8 @@ export default async function publishJobPosting(req, logger) {
     const sessionConfig = {
       line_items: [lineItem],
       mode: 'payment',
-      // Agreed payment methods: card, SEPA direct debit, bank transfer
-      // (pay later, parity with the old invoice flow).
+      // Card and SEPA direct debit; the latter settles via the
+      // checkout.session.async_payment_* events.
       ...buildPaymentMethodConfig(customerId),
       // Stripe issues a real, sequentially numbered invoice (§14 UStG).
       invoice_creation: buildInvoiceCreation(sellerOrganization),
