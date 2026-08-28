@@ -567,6 +567,42 @@ actions:
     permissions:
       - role: instructor_access
     comment: Saves a course Formbricks survey URL after validating URL format and API token access
+  - name: registerGuestForCourse
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: name
+          value: registerGuestForCourse
+    permissions:
+      - role: anonymous
+    comment: Starts an account-less guest registration for an event. Validates that the course opted in to guest registration, then stores a GUEST User and emails a double opt-in link. Creates no enrollment until that link is used.
+  - name: confirmGuestRegistration
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: name
+          value: confirmGuestRegistration
+    permissions:
+      - role: anonymous
+    comment: Redeems a guest double opt-in token, creates the CourseEnrollment (which triggers the existing REGISTRATION_CONFIRMED mail) and returns a long-lived manage token.
+  - name: manageGuestRegistration
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: name
+          value: manageGuestRegistration
+    permissions:
+      - role: anonymous
+    comment: Token-authenticated self-service for guests without a login - lists their registrations, cancels one, or erases all their personal data (GDPR Art. 15/17).
 custom_types:
   enums: []
   input_objects:
@@ -626,4 +662,8 @@ custom_types:
     - name: SelectedAddon
     - name: SetProjectDocumentationInstructionDefaultResult
     - name: DeleteProjectDocumentationInstructionResult
+    - name: RegisterGuestForCourseResult
+    - name: ConfirmGuestRegistrationResult
+    - name: ManageGuestRegistrationResult
+    - name: GuestRegistrationSummary
   scalars: []

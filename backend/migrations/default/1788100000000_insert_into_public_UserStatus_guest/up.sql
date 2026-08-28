@@ -1,0 +1,1 @@
+INSERT INTO "public"."UserStatus"("value", "comment") VALUES (E'GUEST', E'User signed up for an event via guest registration and has no Keycloak account. Personal data is anonymized automatically once the retention period configured in AppSettings.guestDataRetentionMonths has passed.');

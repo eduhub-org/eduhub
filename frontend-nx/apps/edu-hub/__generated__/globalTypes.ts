@@ -274,6 +274,7 @@ export enum AppSettings_update_column {
   domain = "domain",
   faqCollectionName = "faqCollectionName",
   faviconUrl = "faviconUrl",
+  guestDataRetentionMonths = "guestDataRetentionMonths",
   imprintUrl = "imprintUrl",
   logoUrl = "logoUrl",
   previewImageURL = "previewImageURL",
@@ -852,6 +853,7 @@ export enum Course_select_column {
   endTime = "endTime",
   externalRegistrationLink = "externalRegistrationLink",
   formbricksEnrollmentSurveyUrl = "formbricksEnrollmentSurveyUrl",
+  guestRegistrationEnabled = "guestRegistrationEnabled",
   headingDescriptionField1 = "headingDescriptionField1",
   headingDescriptionField2 = "headingDescriptionField2",
   id = "id",
@@ -883,6 +885,7 @@ export enum Course_select_column {
 export enum Course_select_column_Course_aggregate_bool_exp_bool_and_arguments_columns {
   achievementCertificatePossible = "achievementCertificatePossible",
   attendanceCertificatePossible = "attendanceCertificatePossible",
+  guestRegistrationEnabled = "guestRegistrationEnabled",
   projectProposalsEnabled = "projectProposalsEnabled",
   published = "published",
 }
@@ -893,6 +896,7 @@ export enum Course_select_column_Course_aggregate_bool_exp_bool_and_arguments_co
 export enum Course_select_column_Course_aggregate_bool_exp_bool_or_arguments_columns {
   achievementCertificatePossible = "achievementCertificatePossible",
   attendanceCertificatePossible = "attendanceCertificatePossible",
+  guestRegistrationEnabled = "guestRegistrationEnabled",
   projectProposalsEnabled = "projectProposalsEnabled",
   published = "published",
 }
@@ -919,6 +923,7 @@ export enum Course_update_column {
   endTime = "endTime",
   externalRegistrationLink = "externalRegistrationLink",
   formbricksEnrollmentSurveyUrl = "formbricksEnrollmentSurveyUrl",
+  guestRegistrationEnabled = "guestRegistrationEnabled",
   headingDescriptionField1 = "headingDescriptionField1",
   headingDescriptionField2 = "headingDescriptionField2",
   id = "id",
@@ -1124,6 +1129,7 @@ export enum JobPortal_update_column {
  */
 export enum JobPostingCredit_constraint {
   JobPostingCredit_organizationId_jobPostingType_key = "JobPostingCredit_organizationId_jobPostingType_key",
+  JobPostingCredit_organizationId_untyped_unique = "JobPostingCredit_organizationId_untyped_unique",
   JobPostingCredit_pkey = "JobPostingCredit_pkey",
 }
 
@@ -1136,7 +1142,22 @@ export enum JobPostingCredit_select_column {
   jobPostingType = "jobPostingType",
   organizationId = "organizationId",
   remaining = "remaining",
+  unlimited = "unlimited",
   updated_at = "updated_at",
+}
+
+/**
+ * select "JobPostingCredit_aggregate_bool_exp_bool_and_arguments_columns" columns of table "JobPostingCredit"
+ */
+export enum JobPostingCredit_select_column_JobPostingCredit_aggregate_bool_exp_bool_and_arguments_columns {
+  unlimited = "unlimited",
+}
+
+/**
+ * select "JobPostingCredit_aggregate_bool_exp_bool_or_arguments_columns" columns of table "JobPostingCredit"
+ */
+export enum JobPostingCredit_select_column_JobPostingCredit_aggregate_bool_exp_bool_or_arguments_columns {
+  unlimited = "unlimited",
 }
 
 /**
@@ -1148,6 +1169,7 @@ export enum JobPostingCredit_update_column {
   jobPostingType = "jobPostingType",
   organizationId = "organizationId",
   remaining = "remaining",
+  unlimited = "unlimited",
   updated_at = "updated_at",
 }
 
@@ -1513,6 +1535,8 @@ export enum MailTemplateType_enum {
   DECLINE = "DECLINE",
   ENROLLMENT_ABORTED = "ENROLLMENT_ABORTED",
   ENROLLMENT_CANCELLED = "ENROLLMENT_CANCELLED",
+  GUEST_ALREADY_HAS_ACCOUNT = "GUEST_ALREADY_HAS_ACCOUNT",
+  GUEST_REGISTRATION_CONFIRM = "GUEST_REGISTRATION_CONFIRM",
   INVITATION_EXPIRED = "INVITATION_EXPIRED",
   INVITATION_EXPIRING_SOON = "INVITATION_EXPIRING_SOON",
   INVITE = "INVITE",
@@ -2689,6 +2713,7 @@ export enum UserStatus_constraint {
 export enum UserStatus_enum {
   ACTIVE = "ACTIVE",
   DELETED = "DELETED",
+  GUEST = "GUEST",
   INACTIVE = "INACTIVE",
   SPAM = "SPAM",
 }
@@ -2706,7 +2731,7 @@ export enum UserStatus_update_column {
  */
 export enum User_constraint {
   Person_AnonymId_key = "Person_AnonymId_key",
-  User_email_key = "User_email_key",
+  User_email_non_guest_key = "User_email_non_guest_key",
   User_pkey = "User_pkey",
 }
 
@@ -3660,6 +3685,7 @@ export interface AppSettings_bool_exp {
   domain?: String_comparison_exp | null;
   faqCollectionName?: String_comparison_exp | null;
   faviconUrl?: String_comparison_exp | null;
+  guestDataRetentionMonths?: Int_comparison_exp | null;
   imprintUrl?: String_comparison_exp | null;
   logoUrl?: String_comparison_exp | null;
   previewImageURL?: String_comparison_exp | null;
@@ -3686,6 +3712,7 @@ export interface AppSettings_insert_input {
   domain?: string | null;
   faqCollectionName?: string | null;
   faviconUrl?: string | null;
+  guestDataRetentionMonths?: number | null;
   imprintUrl?: string | null;
   logoUrl?: string | null;
   previewImageURL?: string | null;
@@ -6170,6 +6197,7 @@ export interface Course_bool_exp {
   endTime?: time_comparison_exp | null;
   externalRegistrationLink?: String_comparison_exp | null;
   formbricksEnrollmentSurveyUrl?: String_comparison_exp | null;
+  guestRegistrationEnabled?: Boolean_comparison_exp | null;
   headingDescriptionField1?: String_comparison_exp | null;
   headingDescriptionField2?: String_comparison_exp | null;
   id?: Int_comparison_exp | null;
@@ -6236,6 +6264,7 @@ export interface Course_insert_input {
   endTime?: any | null;
   externalRegistrationLink?: string | null;
   formbricksEnrollmentSurveyUrl?: string | null;
+  guestRegistrationEnabled?: boolean | null;
   headingDescriptionField1?: string | null;
   headingDescriptionField2?: string | null;
   id?: number | null;
@@ -6396,6 +6425,7 @@ export interface Course_order_by {
   endTime?: order_by | null;
   externalRegistrationLink?: order_by | null;
   formbricksEnrollmentSurveyUrl?: order_by | null;
+  guestRegistrationEnabled?: order_by | null;
   headingDescriptionField1?: order_by | null;
   headingDescriptionField2?: order_by | null;
   id?: order_by | null;
@@ -6443,6 +6473,7 @@ export interface Course_set_input {
   endTime?: any | null;
   externalRegistrationLink?: string | null;
   formbricksEnrollmentSurveyUrl?: string | null;
+  guestRegistrationEnabled?: boolean | null;
   headingDescriptionField1?: string | null;
   headingDescriptionField2?: string | null;
   id?: number | null;
@@ -7174,7 +7205,23 @@ export interface JobPortal_variance_order_by {
 }
 
 export interface JobPostingCredit_aggregate_bool_exp {
+  bool_and?: JobPostingCredit_aggregate_bool_exp_bool_and | null;
+  bool_or?: JobPostingCredit_aggregate_bool_exp_bool_or | null;
   count?: JobPostingCredit_aggregate_bool_exp_count | null;
+}
+
+export interface JobPostingCredit_aggregate_bool_exp_bool_and {
+  arguments: JobPostingCredit_select_column_JobPostingCredit_aggregate_bool_exp_bool_and_arguments_columns;
+  distinct?: boolean | null;
+  filter?: JobPostingCredit_bool_exp | null;
+  predicate: Boolean_comparison_exp;
+}
+
+export interface JobPostingCredit_aggregate_bool_exp_bool_or {
+  arguments: JobPostingCredit_select_column_JobPostingCredit_aggregate_bool_exp_bool_or_arguments_columns;
+  distinct?: boolean | null;
+  filter?: JobPostingCredit_bool_exp | null;
+  predicate: Boolean_comparison_exp;
 }
 
 export interface JobPostingCredit_aggregate_bool_exp_count {
@@ -7232,6 +7279,7 @@ export interface JobPostingCredit_bool_exp {
   jobPostingType?: JobPostingType_enum_comparison_exp | null;
   organizationId?: Int_comparison_exp | null;
   remaining?: Int_comparison_exp | null;
+  unlimited?: Boolean_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
 }
 
@@ -7246,6 +7294,7 @@ export interface JobPostingCredit_insert_input {
   jobPostingType?: JobPostingType_enum | null;
   organizationId?: number | null;
   remaining?: number | null;
+  unlimited?: boolean | null;
   updated_at?: any | null;
 }
 

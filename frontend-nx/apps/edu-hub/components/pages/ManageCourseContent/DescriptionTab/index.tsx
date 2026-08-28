@@ -13,6 +13,7 @@ import {
   UPDATE_COURSE_HEADING_DESCRIPTION_2,
   UPDATE_COURSE_LANGUAGE,
   UPDATE_COURSE_MAX_PARTICIPANTS,
+  UPDATE_COURSE_GUEST_REGISTRATION_ENABLED,
   UPDATE_COURSE_START_TIME,
   UPDATE_COURSE_WEEKDAY,
   UPDATE_COURSE_SHORT_DESCRIPTION,
@@ -25,8 +26,10 @@ import { Button } from '@mui/material';
 import { MdAddCircle } from 'react-icons/md';
 import { useTranslations } from 'next-intl';
 import DropDownSelector from '../../../inputs/DropDownSelector';
+import CheckboxSelector from '../../../inputs/CheckboxSelector';
 import TimePicker from '../../../inputs/TimePicker';
-import { LocationOption_enum } from '../../../../__generated__/globalTypes';
+import { CourseRegistrationType_enum, LocationOption_enum } from '../../../../__generated__/globalTypes';
+import { ProgramType } from '../../../../types/enums';
 import useErrorHandler from '../../../../hooks/useErrorHandler';
 import { ErrorMessageDialog } from '../../../common/dialogs/ErrorMessageDialog';
 import {
@@ -170,6 +173,12 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
     { value: 'DE', label: t('languages.DE') },
     { value: 'EN', label: t('languages.EN') },
   ];
+
+  // Mirrors the guards in functions/callNodeFunction/registerGuestForCourse.
+  const supportsGuestRegistration =
+    course.Program?.type === ProgramType.EVENTS &&
+    (course.registrationType === CourseRegistrationType_enum.DIRECT_CONFIRMATION ||
+      course.registrationType === CourseRegistrationType_enum.DIRECT_WITH_INPUT);
 
   const courseLocations = [...course.CourseLocations];
   courseLocations.sort((a, b) => a.id - b.id);
@@ -354,6 +363,23 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
             />
           </div>
         </div>
+        {/* Only meaningful for standalone events registered directly - the
+            backend rejects guest registration for anything else, so showing the
+            toggle elsewhere would just promise something that cannot work. */}
+        {supportsGuestRegistration && (
+          <div className="grid grid-cols-2">
+            <CheckboxSelector
+              variant="eduhub"
+              label={t('guest_registration.label')}
+              helpText={t('guest_registration.help_text')}
+              checked={Boolean(course.guestRegistrationEnabled)}
+              updateValueMutation={UPDATE_COURSE_GUEST_REGISTRATION_ENABLED}
+              identifierVariables={{ courseId: course.id }}
+              refetchQueries={['ManagedCourse']}
+            />
+            <div />
+          </div>
+        )}
       </div>
 
       <div>

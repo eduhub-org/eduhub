@@ -244,6 +244,10 @@ export interface ManagedCourseApplications_Course_by_pk {
   __typename: "Course";
   id: number;
   registrationType: CourseRegistrationType_enum | null;
+  /**
+   * Whether visitors without an account may register for this course/event with just name and email. Only honoured for courses in a Program of type EVENTS with a direct registration type.
+   */
+  guestRegistrationEnabled: boolean;
   matrixRoomId: string | null;
   /**
    * Full URL to the Formbricks survey for course enrollment/application (for iframe embedding). Overrides program default if set.
