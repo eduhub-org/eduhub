@@ -1,5 +1,6 @@
 import { gql, GraphQLClient } from 'graphql-request';
 import { createEnrollmentVariableReplacer } from '../emailTemplateVariables.js';
+import { appendGuestMailFooter, guestSafeCopyRecipients } from '../guestRegistration.js';
 
 /**
  * Sends enrollment status emails when CourseEnrollment status or invitationExpirationDate changes
@@ -53,6 +54,7 @@ export default async function sendEnrollmentEmail(req, logger) {
             firstName
             lastName
             email
+            status
           }
           Course {
             id
@@ -296,7 +298,24 @@ export default async function sendEnrollmentEmail(req, logger) {
 
     // The subject is plain text, so variables must not be HTML-escaped there
     const emailSubject = replaceVariables(template.subject, { html: false });
-    const emailContent = replaceVariables(template.content);
+    // An anonymized recipient has a placeholder address that goes nowhere, so a
+    // mail queued for them is dead on arrival. This happens for real: the
+    // enrollment trigger is asynchronous, so a guest erasing their data has
+    // their enrollments cancelled and the row anonymized before the trigger
+    // runs, and the retention cron leaves past enrollments in place on records
+    // it has already anonymized.
+    if (enrollmentDetails.User?.status === 'DELETED') {
+      logger.info(
+        `Skipping ${templateType} for enrollment ${enrollment.id}: the recipient is anonymized`
+      );
+      return { success: true, messageKey: 'RECIPIENT_ANONYMIZED', skipped: true };
+    }
+
+    const emailContent = appendGuestMailFooter(
+      replaceVariables(template.content),
+      enrollmentDetails.User,
+      logger
+    );
 
     // Insert email into MailLog for sending
     const INSERT_MAIL_LOG = gql`
@@ -330,8 +349,10 @@ export default async function sendEnrollmentEmail(req, logger) {
       content: emailContent,
       from: template.from || 'noreply@opencampus.sh',
       to: enrollmentDetails.User.email,
-      cc: template.cc,
-      bcc: template.bcc,
+      ...guestSafeCopyRecipients(enrollmentDetails.User, {
+        cc: template.cc,
+        bcc: template.bcc,
+      }),
       status: 'READY_TO_SEND'
     });
 

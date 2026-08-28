@@ -1,14 +1,16 @@
-import { FC } from 'react';
+import { FC, useCallback, useState } from 'react';
 
 import { CourseRegistrationType_enum } from '../../../../__generated__/globalTypes';
 import { canRetryPayment } from '../../../../utils/invoicePaymentStatus';
 import { Course_Course_by_pk } from '../../../../queries/__generated__/Course';
 import { CourseWithEnrollment_Course_by_pk_CourseEnrollments } from '../../../../queries/__generated__/CourseWithEnrollment';
 import { useIsLoggedIn } from '../../../../hooks/authentication';
+import { useTranslations } from 'next-intl';
 
 import { RegistrationButton } from './RegistrationButton';
 import { RegistrationStatus } from './RegistrationStatus';
 import { RegistrationModal } from './RegistrationModal';
+import { GuestRegistrationModal } from './GuestRegistrationModal';
 import { useRegistrationHandler } from './hooks/useRegistrationHandler';
 
 /**
@@ -49,6 +51,19 @@ interface RegistrationProps {
  */
 export const Registration: FC<RegistrationProps> = ({ course, courseEnrollment, onRegistrationSuccess }) => {
   const isLoggedIn = useIsLoggedIn();
+  const tGuest = useTranslations('guest');
+  const [isGuestModalOpen, setIsGuestModalOpen] = useState(false);
+  const openGuestModal = useCallback(() => setIsGuestModalOpen(true), []);
+  const closeGuestModal = useCallback(() => setIsGuestModalOpen(false), []);
+
+  // Mirrors the backend guard in registerGuestForCourse. Both checks exist on
+  // purpose: this one keeps the button off a page where it would fail, the
+  // server-side one is what actually enforces it.
+  const canRegisterAsGuest =
+    !!course.guestRegistrationEnabled &&
+    (course.registrationType === CourseRegistrationType_enum.DIRECT_CONFIRMATION ||
+      course.registrationType === CourseRegistrationType_enum.DIRECT_WITH_INPUT);
+
   const isCourseFull =
     course.maxParticipants != null &&
     (course.activeParticipantCount ?? 0) >= course.maxParticipants;
@@ -102,6 +117,25 @@ export const Registration: FC<RegistrationProps> = ({ course, courseEnrollment, 
               : registrationHandler.handleLogin
           }
         />
+        {/* Offered alongside login, never instead of it: an account is still the
+            better option for anyone who has one, so guest registration is the
+            second choice on the page, not the default. */}
+        {canRegisterAsGuest && (
+          <>
+            <button
+              type="button"
+              onClick={openGuestModal}
+              className="mt-3 w-full text-sm text-brand hover:underline min-h-[44px]"
+            >
+              {tGuest('register_without_account')}
+            </button>
+            <GuestRegistrationModal
+              visible={isGuestModalOpen}
+              closeModal={closeGuestModal}
+              course={course}
+            />
+          </>
+        )}
       </div>
     );
   }
