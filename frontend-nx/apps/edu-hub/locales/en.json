@@ -1075,7 +1075,11 @@
       "program": "Program",
       "status": "Status",
       "email_templates": "Templates",
-      "has_custom_templates": "This course has custom email templates"
+      "has_custom_templates": {
+        "courses": "This course has custom email templates",
+        "events": "This event has custom email templates",
+        "degrees": "This degree has custom email templates"
+      }
     },
     "error_loading_programs": "The programs could not be loaded. Please try again later.",
     "empty_state": {
@@ -1087,7 +1091,11 @@
     "close": "Close",
     "cancel": "Cancel",
     "not_published": "Not Published",
-    "default_course_title": "Untitled Course",
+    "default_title": {
+      "courses": "Untitled Course",
+      "events": "Untitled Event",
+      "degrees": "Untitled Degree"
+    },
     "title": "Manage Courses",
     "all_programs": "All",
     "course_degree_title": {
@@ -1214,32 +1222,83 @@
     "add_event_button": "Add Event",
     "add_degree_button": "Add Degree",
     "delete_button": {
-      "delete_course_confirmation": "Are you sure you want to delete the course '{title}'?",
-      "untitled_course": "Untitled Course"
+      "delete_confirmation": {
+        "courses": "Are you sure you want to delete the course \"{title}\"?",
+        "events": "Are you sure you want to delete the event \"{title}\"?",
+        "degrees": "Are you sure you want to delete the degree \"{title}\"?"
+      }
     },
     "bulk_action": {
       "publish": "Publish Selected",
       "unpublish": "Unpublish Selected",
       "copy": "Copy to Program"
     },
-    "copy_courses_to_program_dialog": {
-      "title": "Copy Courses to Program",
-      "description": "Select the target program where the courses should be copied:",
-      "button": "Copy Courses"
+    "copy_to_program_dialog": {
+      "title": {
+        "courses": "Copy Courses to Program",
+        "events": "Copy Events to Program",
+        "degrees": "Copy Degrees to Program"
+      },
+      "description": {
+        "courses": "Select the target program where the courses should be copied:",
+        "events": "Select the target program where the events should be copied:",
+        "degrees": "Select the target program where the degrees should be copied:"
+      },
+      "button": {
+        "courses": "Copy Courses",
+        "events": "Copy Events",
+        "degrees": "Copy Degrees"
+      }
     },
     "notifications": {
-      "course_added_success": "Course added successfully",
-      "course_add_failed": "Failed to add course. Please try again.",
-      "courses_published_success_singular": "Successfully published {count} course",
-      "courses_published_success_plural": "Successfully published {count} courses",
-      "courses_unpublished_success_singular": "Successfully unpublished {count} course",
-      "courses_unpublished_success_plural": "Successfully unpublished {count} courses",
-      "bulk_action_failed": "Failed to {action} courses. Please try again.",
+      "added_success": {
+        "courses": "Course added successfully",
+        "events": "Event added successfully",
+        "degrees": "Degree added successfully"
+      },
+      "add_failed": {
+        "courses": "Failed to add course. Please try again.",
+        "events": "Failed to add event. Please try again.",
+        "degrees": "Failed to add degree. Please try again."
+      },
+      "published_success_singular": {
+        "courses": "Successfully published {count} course",
+        "events": "Successfully published {count} event",
+        "degrees": "Successfully published {count} degree"
+      },
+      "published_success_plural": {
+        "courses": "Successfully published {count} courses",
+        "events": "Successfully published {count} events",
+        "degrees": "Successfully published {count} degrees"
+      },
+      "unpublished_success_singular": {
+        "courses": "Successfully unpublished {count} course",
+        "events": "Successfully unpublished {count} event",
+        "degrees": "Successfully unpublished {count} degree"
+      },
+      "unpublished_success_plural": {
+        "courses": "Successfully unpublished {count} courses",
+        "events": "Successfully unpublished {count} events",
+        "degrees": "Successfully unpublished {count} degrees"
+      },
+      "bulk_action_failed": {
+        "courses": "The bulk action on the selected courses failed. Please try again.",
+        "events": "The bulk action on the selected events failed. Please try again.",
+        "degrees": "The bulk action on the selected degrees failed. Please try again."
+      },
       "attendance_certificate_update_failed": "Failed to update attendance certificate setting",
       "achievement_certificate_update_failed": "Failed to update achievement certificate setting",
       "application_end_update_failed": "Failed to update application end date",
-      "courses_copied_success_singular": "Successfully copied {count} course to {programTitle}",
-      "courses_copied_success_plural": "Successfully copied {count} courses to {programTitle}"
+      "copied_success_singular": {
+        "courses": "Successfully copied {count} course to {programTitle}",
+        "events": "Successfully copied {count} event to {programTitle}",
+        "degrees": "Successfully copied {count} degree to {programTitle}"
+      },
+      "copied_success_plural": {
+        "courses": "Successfully copied {count} courses to {programTitle}",
+        "events": "Successfully copied {count} events to {programTitle}",
+        "degrees": "Successfully copied {count} degrees to {programTitle}"
+      }
     }
   },
   "manageCourse": {
@@ -1928,7 +1987,7 @@
       "help_text": "Default Formbricks survey for course enrollments. Courses can override this with their own enrollment survey URL."
     },
     "delete_button": {
-      "delete_program_confirmation": "Are you sure you want to delete the program '{title}'?",
+      "delete_program_confirmation": "Are you sure you want to delete the program \"{title}\"?",
       "untitled_program": "Untitled Program"
     },
     "Certificates": {
@@ -1995,7 +2054,7 @@
       "programs_published_success_plural": "{count} programs were successfully published",
       "programs_unpublished_success_singular": "Program was successfully unpublished",
       "programs_unpublished_success_plural": "{count} programs were successfully unpublished",
-      "bulk_action_failed": "Bulk action '{action}' failed"
+      "bulk_action_failed": "The bulk action failed. Please try again."
     }
   },
   "manageUsers": {
@@ -2628,7 +2687,7 @@
       "PAYMENT_RECEIPT": "Sent when an invoice for a course or event enrollment is paid",
       "COURSE_CONTINUATION_INQUIRY": "Sent when a participant reaches the course's limit of missed sessions, asking them not to miss further sessions or to let the team know if they want to stop"
     },
-    "delete_confirmation": "Are you sure you want to delete the email template '{title}'?",
+    "delete_confirmation": "Are you sure you want to delete the email template \"{title}\"?",
     "unknown_trigger": "Unknown trigger type",
     "categories": {
       "all": "All",

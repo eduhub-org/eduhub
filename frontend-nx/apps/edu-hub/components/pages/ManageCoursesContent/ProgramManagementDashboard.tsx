@@ -7,6 +7,7 @@ import { useManageProgramWhere } from '../../../hooks/manageScope';
 import { PROGRAMS_WITH_MINIMUM_PROPERTIES } from '../../../queries/programList';
 import { Programs } from '../../../queries/__generated__/Programs';
 import { ProgramType } from '../../../types/enums';
+import { programTypeMessageKey } from '../../../helpers/programType';
 import { Program_bool_exp } from '../../../__generated__/globalTypes';
 import ManageCoursesContent from './index';
 
@@ -48,14 +49,10 @@ const ProgramManagementDashboard: FC<ProgramManagementDashboardProps> = ({ progr
     // programs from the management UI (creation is platform-admin only and always produces a
     // COURSES program owned by no organization), so an informative empty state is shown instead
     // of a blank page to explain how to get unblocked.
-    const emptyStateKey =
-      programType === ProgramType.EVENTS
-        ? 'empty_state.events'
-        : programType === ProgramType.DEGREES
-        ? 'empty_state.degrees'
-        : 'empty_state.courses';
     return (
-      <div className="max-w-screen-xl mx-auto py-8 text-center text-gray-500">{t(emptyStateKey)}</div>
+      <div className="max-w-screen-xl mx-auto py-8 text-center text-gray-500">
+        {t(`empty_state.${programTypeMessageKey(programType)}`)}
+      </div>
     );
   }
 
