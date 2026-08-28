@@ -159,6 +159,10 @@ a:focus {
   gap: 0.35em;
 }
 
+.stujo-header-action--uppercase {
+  text-transform: uppercase;
+}
+
 .stujo-header-action-icon {
   width: 1.2em;
   height: 1.2em;

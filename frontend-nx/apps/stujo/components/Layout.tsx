@@ -131,7 +131,7 @@ const Layout: FC<LayoutProps> = ({ children, fullWidthMain = false, portal }) =>
                 e.preventDefault();
                 logout();
               }}
-              className="stujo-header-action"
+              className="stujo-header-action stujo-header-action--uppercase"
             >
               <StuJoLegacyIcon name="unlocked" className="stujo-header-action-icon" />
               {t('logout')}
@@ -144,7 +144,7 @@ const Layout: FC<LayoutProps> = ({ children, fullWidthMain = false, portal }) =>
                   e.preventDefault();
                   login(true);
                 }}
-                className="stujo-header-action"
+                className="stujo-header-action stujo-header-action--uppercase"
               >
                 <StuJoLegacyIcon name="plus" className="stujo-header-action-icon" />
                 {t('register')}
@@ -155,7 +155,7 @@ const Layout: FC<LayoutProps> = ({ children, fullWidthMain = false, portal }) =>
                   e.preventDefault();
                   login(false);
                 }}
-                className="stujo-header-action"
+                className="stujo-header-action stujo-header-action--uppercase"
               >
                 <StuJoLegacyIcon name="unlocked" className="stujo-header-action-icon" />
                 {t('login')}
