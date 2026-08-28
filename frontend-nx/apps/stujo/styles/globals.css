@@ -263,10 +263,15 @@ a:focus {
 }
 
 .stujo-job-row--featured {
-  width: calc(100% + 0.75rem);
-  margin-left: -0.75rem;
-  padding-left: 0.75rem;
-  padding-right: 0;
+  position: relative;
+  isolation: isolate;
+}
+
+.stujo-job-row--featured::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 0 -14px;
+  z-index: -1;
   background: color-mix(in srgb, var(--stujo-secondary) 7%, white);
   box-shadow: inset 4px 0 var(--stujo-secondary);
 }
