@@ -262,8 +262,13 @@ a:focus {
   margin: 0;
 }
 
-.stujo-job-row--featured h3 a {
-  color: var(--stujo-secondary);
+.stujo-job-row--featured {
+  width: calc(100% + 0.75rem);
+  margin-left: -0.75rem;
+  padding-left: 0.75rem;
+  padding-right: 0;
+  background: color-mix(in srgb, var(--stujo-secondary) 7%, white);
+  box-shadow: inset 4px 0 var(--stujo-secondary);
 }
 
 .stujo-badge {
