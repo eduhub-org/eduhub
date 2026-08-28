@@ -76,10 +76,9 @@ export function buildInvoiceCreation(organization) {
 }
 
 /**
- * Finds (by email) or creates the Stripe Customer for a checkout. The
- * bank-transfer method (customer_balance) requires sessions to be created
- * with an existing customer — customer_creation is not sufficient
- * (verified against the test-mode API).
+ * Finds (by email) or creates the Stripe Customer for a checkout, so
+ * repeat purchases attach to one customer record and its invoices stay
+ * together, instead of customer_creation minting a new one each time.
  *
  * @param {import('stripe').Stripe} stripe
  * @param {string} email
@@ -96,32 +95,26 @@ export async function getOrCreateCustomer(stripe, email, name = null) {
 }
 
 /**
- * Payment methods agreed for both flows (2026-07-10): card, SEPA direct
- * debit and EU bank transfer (pay later). SEPA and bank transfer settle
- * asynchronously — webhook consumers must handle
+ * Payment methods offered in both flows: card and SEPA direct debit.
+ * SEPA settles asynchronously — webhook consumers must handle
  * checkout.session.async_payment_succeeded / _failed.
  *
- * Bank transfer is only offered when a Stripe customer exists (pass its
- * id, see getOrCreateCustomer); without one the session degrades to
- * card + SEPA.
+ * EU bank transfer (customer_balance) was part of the 2026-07-10
+ * agreement but is not offered: the capability needs additional
+ * verification that the live account does not have, and Checkout
+ * rejects the whole session when an unactivated type is listed. Adding
+ * it back means one entry here plus its payment_method_options block
+ * (funding_type 'bank_transfer', eu_bank_transfer country DE) and a
+ * customer on the session. The longer-term direction is to stop
+ * hardcoding the list and pass a payment_method_configuration chosen
+ * per course instead (issue #1889).
  *
  * @param {string|null} customerId
  */
 export function buildPaymentMethodConfig(customerId = null) {
+  const types = ['card', 'sepa_debit'];
   if (!customerId) {
-    return {
-      payment_method_types: ['card', 'sepa_debit'],
-      customer_creation: 'always',
-    };
+    return { payment_method_types: types, customer_creation: 'always' };
   }
-  return {
-    customer: customerId,
-    payment_method_types: ['card', 'sepa_debit', 'customer_balance'],
-    payment_method_options: {
-      customer_balance: {
-        funding_type: 'bank_transfer',
-        bank_transfer: { type: 'eu_bank_transfer', eu_bank_transfer: { country: 'DE' } },
-      },
-    },
-  };
+  return { customer: customerId, payment_method_types: types };
 }

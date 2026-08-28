@@ -9,8 +9,8 @@ import type Stripe from 'stripe';
  *
  * Business decisions (2026-07-10):
  * - Instant publish on checkout completion — also for delayed payment
- *   methods (SEPA debit, bank transfer), matching the old Rails
- *   post-first/pay-later flow. The invoice starts as ISSUED and is
+ *   methods (SEPA debit), matching the old Rails post-first/pay-later
+ *   flow. The invoice starts as ISSUED and is
  *   flipped to PAID on async_payment_succeeded.
  * - On async_payment_failed the posting is taken offline again (DRAFT),
  *   the invoice is CANCELLED and the employer is notified.
@@ -299,8 +299,8 @@ export async function handleJobPostingCheckoutCompleted(
       userId: buyerUserId,
       jobPostingId: posting.id,
       invoiceNumber: `STUJO-${session.id}`,
-      // Card payments are settled at completion; SEPA/bank transfer settle
-      // later (async_payment_succeeded flips the invoice to PAID).
+      // Card payments are settled at completion; SEPA settles later
+      // (async_payment_succeeded flips the invoice to PAID).
       status: session.payment_status === 'paid' ? 'PAID' : 'ISSUED',
       netTotal,
       vatTotal,
@@ -344,7 +344,7 @@ export async function handleJobPostingCheckoutCompleted(
 }
 
 /**
- * Delayed payment (SEPA/bank transfer) settled: invoice ISSUED -> PAID.
+ * Delayed payment (SEPA) settled: invoice ISSUED -> PAID.
  */
 export async function handleJobPostingAsyncPaymentSucceeded(
   client: GraphQLClient,
