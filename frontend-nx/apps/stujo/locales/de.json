@@ -1,16 +1,12 @@
 {
   "common": {
-    "home": "Startseite",
     "jobs": "Stellenangebote",
     "employers": "Arbeitgeber",
     "forEmployers": "Für Arbeitgeber",
     "register": "Registrieren",
     "login": "Login",
     "logout": "Logout",
-    "switchToGerman": "Auf Deutsch wechseln",
-    "switchToEnglish": "Auf Englisch wechseln",
     "search": "Suchen",
-    "searchPlaceholder": "Suchbegriff, z. B. Marketing, Software, …",
     "categoryPrompt": "Kategorie",
     "regionPrompt": "Ort / Region",
     "occupationPrompt": "Berufsfeld",
@@ -45,7 +41,15 @@
     "footerLinksHead": "Hinweise",
     "footerPrices": "Leistungen und Preise",
     "footerUniversityPartners": "Hochschulpartner",
-    "footerPartners": "Gefördert durch"
+    "footerPartners": "Gefördert durch",
+    "Layout": {
+      "home": "Startseite",
+      "switch_to_german": "Auf Deutsch wechseln",
+      "switch_to_english": "Auf Englisch wechseln"
+    },
+    "JobList": {
+      "search_placeholder": "Suchbegriff, z. B. Marketing, Software, …"
+    }
   },
   "meinStujo": {
     "title": "Mein StuJo",

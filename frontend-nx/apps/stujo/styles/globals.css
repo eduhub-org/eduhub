@@ -296,13 +296,13 @@ a:focus {
 
 .stujo-filterbar {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 0.75rem;
 }
 
-@media (max-width: 640px) {
+@media (min-width: 641px) {
   .stujo-filterbar {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
   }
 }
 
@@ -828,6 +828,20 @@ a:focus {
   display: block;
   width: 140px;
   height: auto;
+}
+
+@media (max-width: 640px) {
+  .stujo-header-action,
+  .stujo-footer-links a {
+    min-width: 44px;
+    min-height: 44px;
+    touch-action: manipulation;
+  }
+
+  .stujo-footer-links a {
+    display: inline-flex;
+    align-items: center;
+  }
 }
 
 /* --- Misc --- */

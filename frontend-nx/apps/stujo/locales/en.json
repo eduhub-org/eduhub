@@ -1,16 +1,12 @@
 {
   "common": {
-    "home": "Home",
     "jobs": "Job offers",
     "employers": "Employers",
     "forEmployers": "For employers",
     "register": "Register",
     "login": "Login",
     "logout": "Logout",
-    "switchToGerman": "Switch to German",
-    "switchToEnglish": "Switch to English",
     "search": "Search",
-    "searchPlaceholder": "Search term, e.g. marketing, software, …",
     "categoryPrompt": "Category",
     "regionPrompt": "City / region",
     "occupationPrompt": "Occupational field",
@@ -45,7 +41,15 @@
     "footerLinksHead": "Information",
     "footerPrices": "Services and prices",
     "footerUniversityPartners": "University partners",
-    "footerPartners": "Sponsored by"
+    "footerPartners": "Sponsored by",
+    "Layout": {
+      "home": "Home",
+      "switch_to_german": "Switch to German",
+      "switch_to_english": "Switch to English"
+    },
+    "JobList": {
+      "search_placeholder": "Search term, e.g. marketing, software, …"
+    }
   },
   "meinStujo": {
     "title": "My StuJo",

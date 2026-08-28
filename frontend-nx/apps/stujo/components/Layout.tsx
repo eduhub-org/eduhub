@@ -8,10 +8,10 @@ import { useTranslations } from 'next-intl';
 import type { PortalBranding } from '../lib/portal';
 import StuJoLegacyIcon from './StuJoLegacyIcon';
 
-type LayoutProps = PropsWithChildren<{
+interface LayoutProps extends PropsWithChildren {
   fullWidthMain?: boolean;
   portal: PortalBranding;
-}>;
+}
 
 /**
  * Portal-branded page frame, ported from the live stujo.net layout:
@@ -22,6 +22,7 @@ type LayoutProps = PropsWithChildren<{
  */
 const Layout: FC<LayoutProps> = ({ children, fullWidthMain = false, portal }) => {
   const t = useTranslations('common');
+  const tLayout = useTranslations('common.Layout');
   const router = useRouter();
   const { status: sessionStatus } = useSession();
 
@@ -111,7 +112,7 @@ const Layout: FC<LayoutProps> = ({ children, fullWidthMain = false, portal }) =>
               href={router.asPath}
               locale={otherLocale}
               className="stujo-lang-toggle"
-              aria-label={t(isGerman ? 'switchToEnglish' : 'switchToGerman')}
+              aria-label={tLayout(isGerman ? 'switch_to_english' : 'switch_to_german')}
             >
               <img src={isGerman ? '/icons/language-switch-left.png' : '/icons/language-switch-right.png'} alt="" />
             </Link>
@@ -166,7 +167,7 @@ const Layout: FC<LayoutProps> = ({ children, fullWidthMain = false, portal }) =>
       </header>
       <nav className="stujo-nav">
         <div className="stujo-container stujo-nav-inner">
-          <Link href="/" className={`stujo-nav-home ${navClass('/') ?? ''}`} aria-label={t('home')}>
+          <Link href="/" className={`stujo-nav-home ${navClass('/') ?? ''}`} aria-label={tLayout('home')}>
             <StuJoLegacyIcon name="home" className="stujo-nav-home-icon" />
           </Link>
           <Link href="/stellenangebote" className={navClass('/stellenangebote')}>

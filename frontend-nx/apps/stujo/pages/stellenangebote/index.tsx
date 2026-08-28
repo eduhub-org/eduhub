@@ -42,6 +42,7 @@ const JobList: FC<Props> = ({
   page,
 }) => {
   const t = useTranslations('common');
+  const tJobList = useTranslations('common.JobList');
   const tType = useTranslations('jobType');
   const tRegion = useTranslations('jobRegion');
   const tOccupation = useTranslations('jobOccupation');
@@ -72,7 +73,7 @@ const JobList: FC<Props> = ({
               <input
                 name="search"
                 defaultValue={filter.search}
-                placeholder={t('searchPlaceholder')}
+                placeholder={tJobList('search_placeholder')}
               />
               <button type="submit" aria-label={t('search')}>
                 <StuJoLegacyIcon name="search" className="stujo-filter-search-icon" />

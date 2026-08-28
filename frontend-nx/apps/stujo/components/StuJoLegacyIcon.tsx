@@ -2,10 +2,10 @@ import { FC } from 'react';
 
 type StuJoLegacyIconName = 'home' | 'plus' | 'search' | 'unlocked';
 
-type Props = {
+interface Props {
   className?: string;
   name: StuJoLegacyIconName;
-};
+}
 
 const glyphs: Record<StuJoLegacyIconName, { path: string; transform: string; viewBox: string }> = {
   // Bootstrap 3.4.1 Glyphicons Halflings, code point U+E021.
