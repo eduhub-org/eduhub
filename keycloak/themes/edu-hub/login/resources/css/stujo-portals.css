@@ -44,7 +44,7 @@ html.stujo-brand .navbar-cobrand {
 .navbar-cobrand-divider {
   width: 1px;
   height: 28px;
-  margin: 0 14px;
+  margin: 0 8px;
   background-color: #4a4a4a;
 }
 
@@ -59,7 +59,7 @@ html.stujo-brand .navbar-cobrand {
 .navbar-cobrand-logo {
   display: none;
   width: auto;
-  height: 24px;
+  height: 20px;
 }
 
 html.stujo-brand .navbar-cobrand-stujo {
@@ -76,21 +76,21 @@ html.stujo-flensburg .navbar-cobrand-stujo {
 html.stujo-haw-kiel .navbar-cobrand-haw-kiel,
 html.stujo-flensburg .navbar-cobrand-flensburg {
   display: block;
-  height: 36px;
+  height: 28px;
 }
 
-@media (max-width: 480px) {
+@media (min-width: 481px) {
   .navbar-cobrand-divider {
-    margin: 0 8px;
+    margin: 0 14px;
   }
 
   .navbar-cobrand-logo {
-    height: 20px;
+    height: 24px;
   }
 
   html.stujo-haw-kiel .navbar-cobrand-haw-kiel,
   html.stujo-flensburg .navbar-cobrand-flensburg {
-    height: 28px;
+    height: 36px;
   }
 }
 
