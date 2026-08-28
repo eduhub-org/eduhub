@@ -1,12 +1,16 @@
 {
   "common": {
+    "home": "Startseite",
     "jobs": "Stellenangebote",
     "employers": "Arbeitgeber",
     "forEmployers": "Für Arbeitgeber",
     "register": "Registrieren",
     "login": "Login",
     "logout": "Logout",
+    "switchToGerman": "Auf Deutsch wechseln",
+    "switchToEnglish": "Auf Englisch wechseln",
     "search": "Suchen",
+    "searchPlaceholder": "Suchbegriff, z. B. Marketing, Software, …",
     "categoryPrompt": "Kategorie",
     "regionPrompt": "Ort / Region",
     "occupationPrompt": "Berufsfeld",

@@ -87,6 +87,16 @@ a:focus {
   padding: 0 1rem;
 }
 
+.stujo-main {
+  min-height: 40vh;
+  padding: 1.5rem 1rem;
+}
+
+.stujo-main--full-width {
+  max-width: none;
+  padding: 0;
+}
+
 /* --- Header: gradient banner + green nav bar (partials/header/) --- */
 
 .stujo-header {
@@ -143,22 +153,45 @@ a:focus {
   color: var(--stujo-secondary);
 }
 
+.stujo-header-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+}
+
+.stujo-header-action-icon {
+  width: 1.2em;
+  height: 1.2em;
+  flex: none;
+}
+
 /* DE | EN switch (live: slider toggle in the upper-right header nav) */
 .stujo-lang-switch {
   display: flex;
-  gap: 0.4rem;
+  align-items: center;
   color: #fff;
 }
 
 .stujo-lang-switch a {
-  opacity: 0.65;
+  color: #fff;
 }
 
 .stujo-lang-switch a.stujo-lang--active,
 .stujo-lang-switch a:hover {
-  opacity: 1;
   color: #fff;
-  text-decoration: underline;
+}
+
+.stujo-lang-switch .stujo-lang-toggle {
+  display: block;
+  width: 3em;
+  height: 3em;
+}
+
+.stujo-lang-toggle img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .stujo-nav {
@@ -188,16 +221,10 @@ a:focus {
   color: var(--stujo-primary);
 }
 
-.stujo-nav-home img {
-  height: 1.4em;
+.stujo-nav-home-icon {
+  width: 17px;
+  height: 17px;
   display: block;
-}
-
-/* The home glyph is white — invert to pink instead of white so it stays
-   visible in the hover/active state. */
-.stujo-nav a.stujo-nav-home:hover,
-.stujo-nav a.stujo-nav-home.stujo-nav--active {
-  background: var(--stujo-primary);
 }
 
 /* --- Job list: dotted-rule rows (live /stellenangebote) --- */
@@ -254,8 +281,8 @@ a:focus {
 
 .stujo-filterband {
   background: var(--stujo-gradient);
-  padding: 1.25rem;
-  margin: 1rem 0 1.5rem;
+  padding: 1.25rem 0;
+  margin: 0 0 1.5rem;
 }
 
 .stujo-filterbar {
@@ -280,7 +307,7 @@ a:focus {
   color: var(--stujo-text);
   background: #fff;
   border: 2px solid var(--stujo-border);
-  border-radius: 0;
+  border-radius: 4px;
 }
 
 .stujo-filterbar .stujo-filter-search {
@@ -290,17 +317,48 @@ a:focus {
 
 .stujo-filterbar .stujo-filter-search input {
   flex: 1;
+  min-width: 0;
+  border-right: 0;
+  border-radius: 4px 0 0 4px;
 }
 
 .stujo-filterbar .stujo-filter-search button {
   height: 34px;
   width: 44px;
   border: none;
+  border-radius: 0 4px 4px 0;
   cursor: pointer;
   background: var(--stujo-secondary);
   color: #fff;
-  font-size: 16px;
-  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stujo-filterbar .stujo-filter-search button:hover,
+.stujo-filterbar .stujo-filter-search button:focus-visible {
+  opacity: 0.9;
+}
+
+.stujo-filter-search-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.stujo-results {
+  padding-bottom: 1.5rem;
+}
+
+@media (max-width: 640px) {
+  .stujo-filterbar select,
+  .stujo-filterbar input,
+  .stujo-filterbar .stujo-filter-search button {
+    height: 44px;
+  }
+
+  .stujo-filterbar .stujo-filter-search button {
+    width: 52px;
+  }
 }
 
 /* --- Landing (partials/_university_landing.scss) --- */
@@ -309,8 +367,20 @@ a:focus {
   background: var(--stujo-gradient);
   color: #fff;
   text-align: center;
-  padding: 3rem 1.5rem;
+  padding: 2em 0;
+  margin-bottom: 2em;
   font-family: var(--stujo-font);
+}
+
+.stujo-hero-content {
+  width: 100%;
+  margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+  .stujo-hero-content {
+    width: 83.3333%;
+  }
 }
 
 .stujo-hero-claim {
@@ -325,7 +395,11 @@ a:focus {
   margin: 0 auto;
   color: #fff;
   font-size: 1.5em;
-  max-width: 46em;
+}
+
+.stujo-hero-tagline {
+  margin-top: 1em;
+  font-weight: bold;
 }
 
 .stujo-landing-cols {
@@ -672,8 +746,14 @@ a:focus {
 
 .stujo-footer-cols {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr) repeat(2, minmax(0, 1fr));
   gap: 2rem;
+}
+
+@media (min-width: 901px) {
+  .stujo-footer-cols > :nth-child(2) {
+    padding-left: 1rem;
+  }
 }
 
 @media (max-width: 900px) {
@@ -696,11 +776,23 @@ a:focus {
 
 .stujo-footer a {
   color: #fff;
-  display: block;
-  margin-bottom: 0.5em;
 }
 
-.stujo-footer a:hover {
+.stujo-footer-links {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.stujo-footer-links a {
+  display: inline-block;
+  width: fit-content;
+  margin-bottom: 0.1em;
+  padding: 0.3em 0.45em;
+}
+
+.stujo-footer-links a:hover,
+.stujo-footer-links a:focus-visible {
   color: var(--stujo-primary);
   background: #fff;
 }
@@ -710,12 +802,23 @@ a:focus {
   text-align: justify;
 }
 
+.stujo-footer-logo-link {
+  display: block;
+  width: fit-content;
+  background: #fff;
+  padding: 10px 20px;
+  margin-bottom: 0.6em;
+}
+
+.stujo-footer-logo-link:hover,
+.stujo-footer-logo-link:focus-visible {
+  background: #fff;
+}
+
 .stujo-footer-logo {
   display: block;
   width: 140px;
-  background: #fff;
-  padding: 4px;
-  margin-bottom: 0.6em;
+  height: auto;
 }
 
 /* --- Misc --- */

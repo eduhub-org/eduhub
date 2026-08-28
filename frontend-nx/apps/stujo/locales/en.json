@@ -1,12 +1,16 @@
 {
   "common": {
+    "home": "Home",
     "jobs": "Job offers",
     "employers": "Employers",
     "forEmployers": "For employers",
     "register": "Register",
     "login": "Login",
     "logout": "Logout",
+    "switchToGerman": "Switch to German",
+    "switchToEnglish": "Switch to English",
     "search": "Search",
+    "searchPlaceholder": "Search term, e.g. marketing, software, …",
     "categoryPrompt": "Category",
     "regionPrompt": "City / region",
     "occupationPrompt": "Occupational field",
