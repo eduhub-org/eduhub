@@ -1,6 +1,8 @@
 /*
- * Switches the shared login theme to StuJo (or a white-label campus portal)
- * branding when the auth request comes from a StuJo app. Brand is resolved
+ * Adds StuJo (or white-label campus portal) co-branding to the shared login
+ * theme when the auth request comes from a StuJo app. The page stays the
+ * EduHub login on purpose — StuJo and EduHub are one account, and a
+ * StuJo-only skin made people register a second time. Brand is resolved
  * from (in order):
  *   1. `stujo_portal` query param (passed by the StuJo app via NextAuth
  *      authorization params — reliable for local multi-hostname setups
@@ -62,7 +64,7 @@
 
   if (brand === 'eduhub') return;
 
-  // Shared StuJo base skin + optional campus override class.
+  // Shared StuJo co-brand + optional campus override class.
   document.documentElement.classList.add('stujo-brand');
   if (brand === 'stujo-haw-kiel' || brand === 'stujo-flensburg') {
     document.documentElement.classList.add(brand);
