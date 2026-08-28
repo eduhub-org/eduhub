@@ -87,10 +87,16 @@ export default async function createUser(req, logger) {
       };
     }
 
-    // Check if user already exists in Hasura
+    // Check if user already exists in Hasura.
+    //
+    // GUEST rows are excluded on purpose: a guest record is not an account, and
+    // User_email_non_guest_key was narrowed specifically so an address can hold
+    // a guest record and the account that later claims it. Counting guests here
+    // would make it impossible to create an account for anyone who had already
+    // signed up for an event without one.
     const CHECK_USER = gql`
       query CheckUser($email: String!) {
-        User(where: { email: { _eq: $email } }) {
+        User(where: { email: { _eq: $email }, status: { _neq: GUEST } }) {
           id
         }
       }
