@@ -103,17 +103,22 @@ when all of these hold:
 
 Idempotent: an anonymized guest is `DELETED`, so it is not selected again.
 
-Both sweeps date an event by its **sessions**, not by `Course`. `Course.endTime`
+An event is dated by its **last session** (`Session.endDateTime`), falling back
+to **`Course.applicationEnd`** when it has none. Not by `Course.endTime`, which
 is a `time without time zone` — a wall-clock time of day like `20:00`, with no
 year in it — so it can neither be compared against a `timestamptz` cutoff (Hasura
 rejects the query outright) nor answer "did this finish more than N months ago".
-`Course.applicationEnd` is a real date but the wrong one: it is the registration
-deadline, not the end of the event.
 
-A guest with an event that has **no session** cannot be aged out — there is no
-date to count from. Rather than guess, the job leaves them alone, counts them,
-and logs a warning naming how many; add the session dates to those events so the
-period can apply.
+The fallback matters because `applicationEnd` is `NOT NULL`: every course has
+one, so **every guest can always be aged out**. Retaining someone indefinitely
+because an organizer never entered session dates would defeat the whole period,
+and the privacy policy states the deletion as unconditional. It is the
+registration deadline rather than the end of the event, so it runs slightly
+early — the safe direction to err for storage limitation.
+
+The two cutoffs are separate query variables on purpose: `applicationEnd` is a
+`date` and `endDateTime` a `timestamptz`, and Hasura types each comparison from
+its column.
 
 > **Ordering matters.** Erasure unsubscribes from Ghost *before* overwriting the
 > email, because `syncGhostNewsletterSubscription` re-reads `User.email` when it
@@ -240,7 +245,7 @@ docker compose logs -f node_functions   # the confirm link appears here
    is inert on a second use.
 
 To exercise retention, backdate the event's `Session.endDateTime` beyond the
-period -- not `Course.endTime`, which is only a time of day -- and invoke the
-function directly; run it twice to confirm the second run is a no-op. A guest
-whose event has no session at all is reported rather than anonymized, so add one
-if you want to see the first sweep act.
+period — or `Course.applicationEnd` if the event has no sessions, but never
+`Course.endTime`, which is only a time of day — and invoke the function directly;
+run it twice to confirm the second run is a no-op. A guest is only anonymized
+once *every* event they are enrolled in is past the period.

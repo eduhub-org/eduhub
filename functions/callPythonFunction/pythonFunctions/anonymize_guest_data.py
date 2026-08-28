@@ -61,17 +61,29 @@ def _cutoff(retention_months):
 
 
 # Guests whose every event finished before the cutoff. A guest with any event
-# that ended later, or that has no date to count from, is left alone: the purpose
-# the data was collected for has not finished.
+# that ended later is left alone: the purpose the data was collected for has not
+# finished.
 #
-# The date an event runs on lives on its Session rows, not on Course.
-# Course.endTime is a `time without time zone` -- a wall-clock time of day like
-# `20:00`, with no year in it at all -- so it can neither be compared against a
-# timestamptz cutoff (Hasura rejects the query outright) nor answer "did this
-# finish more than N months ago". Course.applicationEnd is a real date but the
-# wrong one: it is the registration deadline, not when the event ended.
+# Two date sources, because there are two shapes of event:
+#
+#   Session.endDateTime    when the event has sessions -- the real thing.
+#   Course.applicationEnd  when it has none. Not the end of the event but the
+#                          registration deadline, so it runs slightly early. That
+#                          is the safe direction to err for storage limitation,
+#                          and it is NOT NULL, which means every guest can always
+#                          be aged out. Retaining someone indefinitely because an
+#                          organizer never entered session dates would defeat the
+#                          retention period entirely.
+#
+# Note the two cutoffs are deliberately separate variables. Course.applicationEnd
+# is a `date` and Session.endDateTime a `timestamptz`; Hasura types the
+# comparison from the column and rejects the query outright if a timestamptz is
+# used where a date is expected. That mismatch is what stopped this job running
+# at all when it read Course.endTime -- a `time without time zone`, a wall-clock
+# time of day with no year in it, which could never have answered "did this
+# finish more than N months ago".
 GUESTS_PAST_RETENTION = """
-query GuestsPastRetention($cutoff: timestamptz!) {
+query GuestsPastRetention($cutoff: timestamptz!, $cutoffDate: date!) {
     User(
         where: {
             status: {_eq: GUEST}
@@ -79,7 +91,10 @@ query GuestsPastRetention($cutoff: timestamptz!) {
                 CourseEnrollments: {
                     _or: [
                         {Course: {Sessions: {endDateTime: {_gt: $cutoff}}}}
-                        {_not: {Course: {Sessions: {}}}}
+                        {_and: [
+                            {_not: {Course: {Sessions: {}}}}
+                            {Course: {applicationEnd: {_gt: $cutoffDate}}}
+                        ]}
                     ]
                 }
             }
@@ -108,26 +123,6 @@ query AbandonedGuests($cutoff: timestamptz!) {
         limit: 500
     ) {
         id
-    }
-}
-"""
-
-# Guests we cannot age out because at least one of their events has no session,
-# and therefore no date to count the retention period from. Retaining them
-# indefinitely would defeat the period, so the job reports them rather than
-# letting them sit unnoticed.
-GUESTS_BLOCKED_BY_MISSING_END_DATE = """
-query GuestsBlockedByMissingEndDate($cutoff: timestamptz!) {
-    User_aggregate(
-        where: {
-            status: {_eq: GUEST}
-            created_at: {_lt: $cutoff}
-            CourseEnrollments: {_not: {Course: {Sessions: {}}}}
-        }
-    ) {
-        aggregate {
-            count
-        }
     }
 }
 """
@@ -219,7 +214,9 @@ def anonymize_guest_data(arguments):
       1. Guests whose events all ended more than AppSettings
          .guestDataRetentionMonths ago are anonymized in place. The
          CourseEnrollment rows stay, so participant counts and reporting keep
-         working, but they no longer point at an identifiable person.
+         working, but they no longer point at an identifiable person. An event
+         is dated by its last session, or by Course.applicationEnd when it has
+         none -- that column is NOT NULL, so every guest can always be aged out.
 
       2. Signups that were never confirmed are deleted outright. Nothing
          references them, and an address whose owner never confirmed it is data
@@ -244,7 +241,9 @@ def anonymize_guest_data(arguments):
         client = EduHubClient()
 
         retention_months = _get_retention_months(client)
-        retention_cutoff = _cutoff(retention_months).isoformat()
+        cutoff = _cutoff(retention_months)
+        retention_cutoff = cutoff.isoformat()
+        retention_cutoff_date = cutoff.date().isoformat()
         logging.info(
             f"Guest retention period is {retention_months} month(s); "
             f"anonymizing guests whose events ended before {retention_cutoff}"
@@ -254,7 +253,13 @@ def anonymize_guest_data(arguments):
         failed = 0
 
         data = _check(
-            client.send_query(GUESTS_PAST_RETENTION, {"cutoff": retention_cutoff}),
+            client.send_query(
+                GUESTS_PAST_RETENTION,
+                # Separate variables on purpose: Session.endDateTime is a
+                # timestamptz and Course.applicationEnd a date, and Hasura types
+                # each comparison from its column.
+                {"cutoff": retention_cutoff, "cutoffDate": retention_cutoff_date},
+            ),
             "select guests past retention",
         )
         if data is None:
@@ -266,21 +271,6 @@ def anonymize_guest_data(arguments):
                 anonymized += 1
             else:
                 failed += 1
-
-        blocked = _check(
-            client.send_query(GUESTS_BLOCKED_BY_MISSING_END_DATE, {"cutoff": retention_cutoff}),
-            "count guests blocked by a missing event end date",
-        )
-        blocked_count = (
-            (blocked or {}).get("User_aggregate", {}).get("aggregate", {}).get("count", 0)
-        )
-        if blocked_count:
-            logging.warning(
-                f"{blocked_count} guest(s) older than the retention period cannot be "
-                "anonymized because at least one of their events has no session, and so "
-                "no date to count from. Add the session dates to those events so the "
-                "retention period can be applied."
-            )
 
         unconfirmed_cutoff = (
             datetime.now(timezone.utc) - timedelta(days=UNCONFIRMED_GRACE_DAYS)
@@ -304,8 +294,7 @@ def anonymize_guest_data(arguments):
 
         logging.info(
             f"Guest retention run complete: {anonymized} anonymized, "
-            f"{deleted} unconfirmed signups deleted, {failed} failed, "
-            f"{blocked_count} blocked by a missing event end date"
+            f"{deleted} unconfirmed signups deleted, {failed} failed"
         )
 
         return {
@@ -315,7 +304,6 @@ def anonymize_guest_data(arguments):
                 "anonymized": anonymized,
                 "deletedUnconfirmed": deleted,
                 "failed": failed,
-                "blockedByMissingEndDate": blocked_count,
             },
         }
 
