@@ -1,4 +1,5 @@
 import { gql, GraphQLClient } from 'graphql-request';
+import { appendGuestMailFooter, guestSafeCopyRecipients } from '../guestRegistration.js';
 
 /**
  * Generic function to queue emails
@@ -10,6 +11,9 @@ import { gql, GraphQLClient } from 'graphql-request';
  * @param {string} params.recipientEmail - Recipient email address
  * @param {number|null} params.courseId - Optional course ID for course-specific templates
  * @param {GraphQLClient} params.client - GraphQL client instance
+ * @param {Object|null} params.recipientUser - Optional recipient User ({id, status}).
+ *   When it is a guest, their manage link is appended: a guest has no account
+ *   page, so that link is their only route to their own data.
  * @param {Object} params.logger - Logger instance
  * @returns {Promise<Object>} Result with mailId and success status
  */
@@ -18,6 +22,7 @@ async function queueEmail({
   variableReplacer,
   recipientEmail,
   courseId = null,
+  recipientUser = null,
   client,
   logger
 }) {
@@ -146,7 +151,11 @@ async function queueEmail({
     // Replace variables in template content. The subject is plain text, so
     // variables must not be HTML-escaped there (see createVariableReplacer).
     const emailSubject = variableReplacer(template.subject, { html: false });
-    const emailContent = variableReplacer(template.content);
+    const emailContent = appendGuestMailFooter(
+      variableReplacer(template.content),
+      recipientUser,
+      logger
+    );
 
     // Insert email into MailLog for sending
     const INSERT_MAIL_LOG = gql`
@@ -175,13 +184,18 @@ async function queueEmail({
       }
     `;
 
+    const copies = guestSafeCopyRecipients(recipientUser, {
+      cc: template.cc,
+      bcc: template.bcc,
+    });
+
     const mailResult = await client.request(INSERT_MAIL_LOG, {
       subject: emailSubject,
       content: emailContent,
       from: template.from || 'noreply@opencampus.sh',
       to: recipientEmail,
-      cc: template.cc,
-      bcc: template.bcc,
+      cc: copies.cc,
+      bcc: copies.bcc,
       status: 'READY_TO_SEND'
     });
 

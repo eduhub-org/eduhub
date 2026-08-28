@@ -34,6 +34,9 @@ import deleteProjectDocumentationInstruction from "./deleteProjectDocumentationI
 import saveProjectDocumentationInstruction from "./saveProjectDocumentationInstruction/index.js";
 import sendProjectEmail from "./sendProjectEmail/index.js";
 import sendCourseUpdateEmail from "./sendCourseUpdateEmail/index.js";
+import registerGuestForCourse from "./registerGuestForCourse/index.js";
+import confirmGuestRegistration from "./confirmGuestRegistration/index.js";
+import manageGuestRegistration from "./manageGuestRegistration/index.js";
 
 const require = createRequire(import.meta.url);
 let constantTimeSecretsEqual;
@@ -96,6 +99,9 @@ const functionMap = {
   saveProjectDocumentationInstruction,
   sendProjectEmail,
   sendCourseUpdateEmail,
+  registerGuestForCourse,
+  confirmGuestRegistration,
+  manageGuestRegistration,
 };
 
 const constantTimeEquals = (providedSecret, expectedSecret) => {
@@ -200,8 +206,11 @@ export const callNodeFunction = async (req, res) => {
 
   logger.info(`Received request for function: ${functionName}`);
 
-  // Validate function exists
-  if (!(functionName in functionMap)) {
+  // Own properties only: `in` walks the prototype chain, so a `name` header of
+  // `constructor` would resolve to `Object` and `__proto__` to `Object.prototype`.
+  // Neither is reachable without the shared secret, checked above - this is
+  // defence in depth, not a fix for a live hole.
+  if (!Object.prototype.hasOwnProperty.call(functionMap, functionName)) {
     return res.status(404).json({
       success: false,
       error: "Function Not Found",

@@ -1,0 +1,14 @@
+table:
+  name: GuestRegistrationToken
+  schema: public
+object_relationships:
+  - name: User
+    using:
+      foreign_key_constraint_on: userId
+  - name: Course
+    using:
+      foreign_key_constraint_on: courseId
+# Deliberately no permissions for any role. These rows gate an account-less
+# person's pending registration, so they are written and read exclusively by the
+# guest registration cloud functions, which hold the Hasura admin secret.
+# Granting even `select` to `anonymous` would turn the table into a token oracle.

@@ -61,6 +61,7 @@ export const COURSE_FRAGMENT = gql`
     contentDescriptionField2
     externalRegistrationLink
     registrationType
+    guestRegistrationEnabled
     formbricksEnrollmentSurveyUrl
     startTime
     endTime
@@ -137,6 +138,7 @@ export const ADMIN_COURSE_FRAGMENT = gql`
     chatLink
     matrixRoomId
     registrationType
+    guestRegistrationEnabled
     formbricksEnrollmentSurveyUrl
     basePrice
     currency
@@ -206,6 +208,7 @@ export const COURSE_FRAGMENT_ANONYMOUS = gql`
     contentDescriptionField2
     externalRegistrationLink
     registrationType
+    guestRegistrationEnabled
     formbricksEnrollmentSurveyUrl
     startTime
     endTime

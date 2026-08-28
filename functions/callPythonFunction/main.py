@@ -5,6 +5,7 @@ from typing import Dict, Any, Callable
 
 # Import functions explicitly
 from pythonFunctions.add_confirmed_user_to_mm import add_confirmed_user_to_mm
+from pythonFunctions.anonymize_guest_data import anonymize_guest_data
 from pythonFunctions.check_attendance import check_attendance
 from pythonFunctions.check_course_continuation import check_course_continuation
 from pythonFunctions.create_certificates import create_certificates
@@ -24,6 +25,7 @@ else:
 # Create an explicit function map
 PYTHON_FUNCTIONS: Dict[str, Callable] = {
     "add_confirmed_user_to_mm": add_confirmed_user_to_mm,
+    "anonymize_guest_data": anonymize_guest_data,
     "check_attendance": check_attendance,
     "check_course_continuation": check_course_continuation,
     "create_certificates": create_certificates,
