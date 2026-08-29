@@ -41,7 +41,15 @@
     "footerLinksHead": "Hinweise",
     "footerPrices": "Leistungen und Preise",
     "footerUniversityPartners": "Hochschulpartner",
-    "footerPartners": "Gefördert durch"
+    "footerPartners": "Gefördert durch",
+    "Layout": {
+      "home": "Startseite",
+      "switch_to_german": "Auf Deutsch wechseln",
+      "switch_to_english": "Auf Englisch wechseln"
+    },
+    "JobList": {
+      "search_placeholder": "Suchbegriff, z. B. Marketing, Software, …"
+    }
   },
   "meinStujo": {
     "title": "Mein StuJo",

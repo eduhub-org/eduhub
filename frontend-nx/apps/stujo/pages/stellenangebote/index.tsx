@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 
 import Layout from '../../components/Layout';
 import JobCard from '../../components/JobCard';
+import StuJoLegacyIcon from '../../components/StuJoLegacyIcon';
 import { resolvePortal, PortalBranding } from '../../lib/portal';
 import { fetchJobList, JobListItem } from '../../lib/jobs';
 import { fetchAnonymous } from '../../lib/hasura';
@@ -41,6 +42,7 @@ const JobList: FC<Props> = ({
   page,
 }) => {
   const t = useTranslations('common');
+  const tJobList = useTranslations('common.JobList');
   const tType = useTranslations('jobType');
   const tRegion = useTranslations('jobRegion');
   const tOccupation = useTranslations('jobOccupation');
@@ -56,79 +58,88 @@ const JobList: FC<Props> = ({
   const pageCount = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
 
   return (
-    <Layout portal={portal}>
-      <div className="stujo-filterband" style={{ marginTop: '-1.5rem' }}>
-        <form
-          className="stujo-filterbar"
-          onSubmit={(e) => {
-            e.preventDefault();
-            const data = new FormData(e.currentTarget);
-            updateFilter({ search: String(data.get('search') || ''), page: '' });
-          }}
-        >
-          <div className="stujo-filter-search">
-            <input name="search" defaultValue={filter.search} placeholder={t('search')} />
-            <button type="submit" aria-label={t('search')}>
-              🔍
-            </button>
-          </div>
-          <select
-            value={filter.type}
-            onChange={(e) => updateFilter({ type: e.target.value, page: '' })}
+    <Layout portal={portal} fullWidthMain>
+      <section className="stujo-filterband">
+        <div className="stujo-container">
+          <form
+            className="stujo-filterbar"
+            onSubmit={(e) => {
+              e.preventDefault();
+              const data = new FormData(e.currentTarget);
+              updateFilter({ search: String(data.get('search') || ''), page: '' });
+            }}
           >
-            <option value="">{t('categoryPrompt')}</option>
-            {types.map((c) => (
-              <option key={c.value} value={c.value}>
-                {tType(c.value)}
-              </option>
-            ))}
-          </select>
-          <select
-            value={filter.region}
-            onChange={(e) => updateFilter({ region: e.target.value, page: '' })}
-          >
-            <option value="">{t('regionPrompt')}</option>
-            {regions.map((r) => (
-              <option key={r.value} value={r.value}>
-                {tRegion(r.value)}
-              </option>
-            ))}
-          </select>
-          <select
-            value={filter.occupation}
-            onChange={(e) => updateFilter({ occupation: e.target.value, page: '' })}
-          >
-            <option value="">{t('occupationPrompt')}</option>
-            {occupations.map((o) => (
-              <option key={o.value} value={o.value}>
-                {tOccupation(o.value)}
-              </option>
-            ))}
-          </select>
-        </form>
-      </div>
-      <h3>{t('availableOffers', { count: totalCount })}</h3>
-      {jobs.length === 0 && <p>{t('noResults')}</p>}
-      {jobs.map((job) => (
-        <JobCard key={job.id} job={job} />
-      ))}
-      {pageCount > 1 && (
-        <p style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '1.5rem' }}>
-          {page > 1 && (
-            <button className="stujo-btn" onClick={() => updateFilter({ page: String(page - 1) })}>
-              ‹
-            </button>
-          )}
-          <span style={{ alignSelf: 'center' }}>
-            {page} / {pageCount}
-          </span>
-          {page < pageCount && (
-            <button className="stujo-btn" onClick={() => updateFilter({ page: String(page + 1) })}>
-              ›
-            </button>
-          )}
-        </p>
-      )}
+            <div className="stujo-filter-search">
+              <input
+                name="search"
+                defaultValue={filter.search}
+                placeholder={tJobList('search_placeholder')}
+              />
+              <button type="submit" aria-label={t('search')}>
+                <StuJoLegacyIcon name="search" className="stujo-filter-search-icon" />
+              </button>
+            </div>
+            <select
+              value={filter.type}
+              onChange={(e) => updateFilter({ type: e.target.value, page: '' })}
+            >
+              <option value="">{t('categoryPrompt')}</option>
+              {types.map((c) => (
+                <option key={c.value} value={c.value}>
+                  {tType(c.value)}
+                </option>
+              ))}
+            </select>
+            <select
+              value={filter.region}
+              onChange={(e) => updateFilter({ region: e.target.value, page: '' })}
+            >
+              <option value="">{t('regionPrompt')}</option>
+              {regions.map((r) => (
+                <option key={r.value} value={r.value}>
+                  {tRegion(r.value)}
+                </option>
+              ))}
+            </select>
+            <select
+              value={filter.occupation}
+              onChange={(e) => updateFilter({ occupation: e.target.value, page: '' })}
+            >
+              <option value="">{t('occupationPrompt')}</option>
+              {occupations.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {tOccupation(o.value)}
+                </option>
+              ))}
+            </select>
+          </form>
+        </div>
+      </section>
+
+      <section className="stujo-container stujo-results">
+        <h3>{t('availableOffers', { count: totalCount })}</h3>
+        {jobs.length === 0 && <p>{t('noResults')}</p>}
+        {jobs.map((job) => (
+          <JobCard key={job.id} job={job} />
+        ))}
+        {pageCount > 1 && (
+          <p style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '1.5rem' }}>
+            {page > 1 && (
+              <button className="stujo-btn" onClick={() => updateFilter({ page: String(page - 1) })}>
+                ‹
+              </button>
+            )}
+            <span style={{ alignSelf: 'center' }}>
+              {page} / {pageCount}
+            </span>
+            {page < pageCount && (
+              <button className="stujo-btn" onClick={() => updateFilter({ page: String(page + 1) })}>
+                ›
+              </button>
+            )}
+          </p>
+        )}
+      </section>
     </Layout>
   );
 };
