@@ -110,6 +110,10 @@ services:
       STORAGE_BUCKET_PUBLIC_URL: ${GITPOD_WORKSPACE_URL:-http://localhost}:4001/emulated-bucket
       # Optional for local dev; required to encrypt Ghost newsletter credentials (see .env.example)
       GHOST_NEWSLETTER_CREDENTIALS_ENCRYPTION_KEY: ${GHOST_NEWSLETTER_CREDENTIALS_ENCRYPTION_KEY:-}
+      # Signs the guest self-service manage links. The dev default is fine locally
+      # but MUST be a real secret elsewhere: anyone who knows it can mint a link to
+      # any guest's data.
+      GUEST_TOKEN_SECRET: ${GUEST_TOKEN_SECRET:-dev-guest-token-secret}
 
   python_functions:
     container_name: eduhub-python-functions

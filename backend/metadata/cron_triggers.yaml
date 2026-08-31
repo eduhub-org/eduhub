@@ -119,3 +119,19 @@
     - name: Hasura-Secret
       value_from_env: HASURA_CLOUD_FUNCTION_SECRET
   comment: Sends the weekly StuJo job alert (Job-Letter) to subscribed users
+- name: anonymize_guest_data
+  webhook: '{{CLOUD_FUNCTION_LINK_CALL_PYTHON_FUNCTION}}'
+  schedule: 0 4 * * *
+  include_in_metadata: true
+  payload: {}
+  retry_conf:
+    num_retries: 0
+    retry_interval_seconds: 10
+    timeout_seconds: 3699
+    tolerance_seconds: 21600
+  headers:
+    - name: Function-Name
+      value: anonymize_guest_data
+    - name: Hasura-Secret
+      value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+  comment: Enforces the guest data retention period - anonymizes guests whose events all ended more than AppSettings.guestDataRetentionMonths ago, and deletes signups that were never confirmed (GDPR Art. 5(1)(e))

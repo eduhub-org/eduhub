@@ -20,6 +20,7 @@ import {
   UpdateCourseAchievementCertificatePossibleVariables,
 } from '../../../queries/__generated__/UpdateCourseAchievementCertificatePossible';
 import { isKnownCourseGroupOptionTitle } from '../../../helpers/courseGroupOptions';
+import { programTypeMessageKey } from '../../../helpers/programType';
 import { DEGREE_COURSES } from '../../../queries/courseDegree';
 import { DegreeCourses } from '../../../queries/__generated__/DegreeCourses';
 import { DELETE_A_COURSE } from '../../../queries/mutateCourse';
@@ -89,6 +90,10 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
     }),
     [programType, organizationId]
   );
+
+  // Suffix of the program-type-aware message keys, so dialogs and snackbars talk about events or
+  // degrees instead of courses when this page manages those.
+  const messageKey = programTypeMessageKey(programType);
 
   const addButtonText = useMemo(() => {
     switch (programType) {
@@ -292,7 +297,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
     try {
       await insertCourse({
         variables: {
-          title: t('default_course_title'),
+          title: t(`default_title.${messageKey}`),
           applicationEnd:
             selectedProgram?.defaultApplicationEnd && new Date(selectedProgram.defaultApplicationEnd) > new Date()
               ? selectedProgram.defaultApplicationEnd
@@ -304,14 +309,14 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
         refetchQueries: ['AdminCourseList'],
       });
 
-      setSuccessMessage(t('notifications.course_added_success'));
+      setSuccessMessage(t(`notifications.added_success.${messageKey}`));
       setShowSuccessNotification(true);
     } catch (error) {
       console.error('Error adding course:', error);
-      setErrorMessage(t('notifications.course_add_failed'));
+      setErrorMessage(t(`notifications.add_failed.${messageKey}`));
       setShowErrorNotification(true);
     }
-  }, [filter.where.programId?._eq, sortedPrograms, insertCourse, t]);
+  }, [filter.where.programId?._eq, sortedPrograms, insertCourse, t, messageKey]);
 
   // Bulk action handlers
   const handleBulkAction = useCallback(
@@ -334,8 +339,8 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
           setSuccessMessage(
             t(
               selectedCourses.length === 1
-                ? 'notifications.courses_published_success_singular'
-                : 'notifications.courses_published_success_plural',
+                ? `notifications.published_success_singular.${messageKey}`
+                : `notifications.published_success_plural.${messageKey}`,
               {
                 count: selectedCourses.length,
               }
@@ -357,8 +362,8 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
           setSuccessMessage(
             t(
               selectedCourses.length === 1
-                ? 'notifications.courses_unpublished_success_singular'
-                : 'notifications.courses_unpublished_success_plural',
+                ? `notifications.unpublished_success_singular.${messageKey}`
+                : `notifications.unpublished_success_plural.${messageKey}`,
               {
                 count: selectedCourses.length,
               }
@@ -372,11 +377,11 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
         }
       } catch (error) {
         console.error(`Error during bulk ${action} action:`, error);
-        setErrorMessage(t('notifications.bulk_action_failed', { action }));
+        setErrorMessage(t(`notifications.bulk_action_failed.${messageKey}`));
         setShowErrorNotification(true);
       }
     },
-    [updateCourse, t]
+    [updateCourse, t, messageKey]
   );
 
   const bulkActions = [
@@ -551,8 +556,8 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
           setSuccessMessage(
             t(
               coursesToCopy.length === 1
-                ? 'notifications.courses_copied_success_singular'
-                : 'notifications.courses_copied_success_plural',
+                ? `notifications.copied_success_singular.${messageKey}`
+                : `notifications.copied_success_plural.${messageKey}`,
               {
                 count: coursesToCopy.length,
                 programTitle: targetProgram.title,
@@ -567,7 +572,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
 
       setCoursesToCopy([]);
     },
-    [coursesToCopy, copyCourses, t]
+    [coursesToCopy, copyCourses, t, messageKey]
   );
 
   const courseStatus = (status: string) => {
@@ -672,7 +677,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
         minSize: 250,
         enableSorting: true,
         cell: ({ row }) => {
-          const defaultTitle = t('default_course_title');
+          const defaultTitle = t(`default_title.${messageKey}`);
 
           return (
             <div className="grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-2 pr-3">
@@ -762,7 +767,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
               {hasCustomTemplates && (
                 <MdMarkEmailRead
                   className="w-4 h-4 text-blue-600 ml-1"
-                  title={t('table_header.has_custom_templates')}
+                  title={t(`table_header.has_custom_templates.${messageKey}`)}
                 />
               )}
             </div>
@@ -772,6 +777,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
     ],
     [
       t,
+      messageKey,
       handleApplicationEndChange,
       locale,
       getApplicationsCount,
@@ -846,8 +852,8 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
           deleteIdType="number"
           role={manageRole}
           generateDeletionConfirmationQuestion={(row) =>
-            t('delete_button.delete_course_confirmation', {
-              title: row.title || t('delete_button.untitled_course'),
+            t(`delete_button.delete_confirmation.${messageKey}`, {
+              title: row.title || t(`default_title.${messageKey}`),
             })
           }
         />
@@ -857,7 +863,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
         open={showProgramDialog}
         programs={sortedPrograms}
         onClose={handleProgramDialogClose}
-        title={t('copy_courses_to_program_dialog.title')}
+        programType={programType}
       />
 
       <NotificationSnackbar

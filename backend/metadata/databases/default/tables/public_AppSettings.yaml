@@ -16,6 +16,7 @@ select_permissions:
         - domain
         - faqCollectionName
         - faviconUrl
+        - guestDataRetentionMonths
         - imprintUrl
         - logoUrl
         - previewImageURL

@@ -1059,7 +1059,11 @@
       "program": "Programm",
       "status": "Status",
       "email_templates": "Vorlagen",
-      "has_custom_templates": "Dieser Kurs hat kursspezifische E-Mail-Vorlagen"
+      "has_custom_templates": {
+        "courses": "Dieser Kurs hat eigene E-Mail-Vorlagen",
+        "events": "Dieses Event hat eigene E-Mail-Vorlagen",
+        "degrees": "Dieses Degree hat eigene E-Mail-Vorlagen"
+      }
     },
     "organization_scope_label": "Organisation",
     "all_organizations_scope": "Alle Organisationen",
@@ -1073,7 +1077,11 @@
     "close": "Schließen",
     "cancel": "Abbrechen",
     "not_published": "Nicht veröffentlicht",
-    "default_course_title": "Unbenannter Kurs",
+    "default_title": {
+      "courses": "Unbenannter Kurs",
+      "events": "Unbenanntes Event",
+      "degrees": "Unbenanntes Degree"
+    },
     "title": "Kurse verwalten",
     "all_programs": "Alle",
     "course_degree_title": {
@@ -1198,32 +1206,83 @@
     "add_event_button": "Event hinzufügen",
     "add_degree_button": "Degree hinzufügen",
     "delete_button": {
-      "delete_course_confirmation": "Bist du sicher, dass du den Kurs '{title}' löschen möchtest?",
-      "untitled_course": "Unbenannter Kurs"
+      "delete_confirmation": {
+        "courses": "Bist du sicher, dass du den Kurs „{title}“ löschen möchtest?",
+        "events": "Bist du sicher, dass du das Event „{title}“ löschen möchtest?",
+        "degrees": "Bist du sicher, dass du das Degree „{title}“ löschen möchtest?"
+      }
     },
     "bulk_action": {
       "publish": "Ausgewählte veröffentlichen",
       "unpublish": "Ausgewählte zurückziehen",
       "copy": "In Programm kopieren"
     },
-    "copy_courses_to_program_dialog": {
-      "title": "Kurse in Programm kopieren",
-      "description": "Wähle das Zielprogramm aus, in das die Kurse kopiert werden sollen:",
-      "button": "Kurse kopieren"
+    "copy_to_program_dialog": {
+      "title": {
+        "courses": "Kurse in Programm kopieren",
+        "events": "Events in Programm kopieren",
+        "degrees": "Degrees in Programm kopieren"
+      },
+      "description": {
+        "courses": "Wähle das Zielprogramm aus, in das die Kurse kopiert werden sollen:",
+        "events": "Wähle das Zielprogramm aus, in das die Events kopiert werden sollen:",
+        "degrees": "Wähle das Zielprogramm aus, in das die Degrees kopiert werden sollen:"
+      },
+      "button": {
+        "courses": "Kurse kopieren",
+        "events": "Events kopieren",
+        "degrees": "Degrees kopieren"
+      }
     },
     "notifications": {
-      "course_added_success": "Kurs erfolgreich hinzugefügt",
-      "course_add_failed": "Fehler beim Hinzufügen des Kurses. Bitte versuche es erneut.",
-      "courses_published_success_singular": "{count} Kurs erfolgreich veröffentlicht",
-      "courses_published_success_plural": "{count} Kurse erfolgreich veröffentlicht",
-      "courses_unpublished_success_singular": "{count} Kurs erfolgreich zurückgezogen",
-      "courses_unpublished_success_plural": "{count} Kurse erfolgreich zurückgezogen",
-      "bulk_action_failed": "Fehler beim {action} der Kurse. Bitte versuche es erneut.",
+      "added_success": {
+        "courses": "Kurs erfolgreich hinzugefügt",
+        "events": "Event erfolgreich hinzugefügt",
+        "degrees": "Degree erfolgreich hinzugefügt"
+      },
+      "add_failed": {
+        "courses": "Fehler beim Hinzufügen des Kurses. Bitte versuche es erneut.",
+        "events": "Fehler beim Hinzufügen des Events. Bitte versuche es erneut.",
+        "degrees": "Fehler beim Hinzufügen des Degrees. Bitte versuche es erneut."
+      },
+      "published_success_singular": {
+        "courses": "{count} Kurs erfolgreich veröffentlicht",
+        "events": "{count} Event erfolgreich veröffentlicht",
+        "degrees": "{count} Degree erfolgreich veröffentlicht"
+      },
+      "published_success_plural": {
+        "courses": "{count} Kurse erfolgreich veröffentlicht",
+        "events": "{count} Events erfolgreich veröffentlicht",
+        "degrees": "{count} Degrees erfolgreich veröffentlicht"
+      },
+      "unpublished_success_singular": {
+        "courses": "{count} Kurs erfolgreich zurückgezogen",
+        "events": "{count} Event erfolgreich zurückgezogen",
+        "degrees": "{count} Degree erfolgreich zurückgezogen"
+      },
+      "unpublished_success_plural": {
+        "courses": "{count} Kurse erfolgreich zurückgezogen",
+        "events": "{count} Events erfolgreich zurückgezogen",
+        "degrees": "{count} Degrees erfolgreich zurückgezogen"
+      },
+      "bulk_action_failed": {
+        "courses": "Die Massenaktion für die ausgewählten Kurse ist fehlgeschlagen. Bitte versuche es erneut.",
+        "events": "Die Massenaktion für die ausgewählten Events ist fehlgeschlagen. Bitte versuche es erneut.",
+        "degrees": "Die Massenaktion für die ausgewählten Degrees ist fehlgeschlagen. Bitte versuche es erneut."
+      },
       "attendance_certificate_update_failed": "Fehler beim Aktualisieren der Teilnahmebescheinigung-Einstellung",
       "achievement_certificate_update_failed": "Fehler beim Aktualisieren der Leistungsbescheinigung-Einstellung",
       "application_end_update_failed": "Fehler beim Aktualisieren des Bewerbungsendes",
-      "courses_copied_success_singular": "{count} Kurs erfolgreich in {programTitle} kopiert",
-      "courses_copied_success_plural": "{count} Kurse erfolgreich in {programTitle} kopiert"
+      "copied_success_singular": {
+        "courses": "{count} Kurs erfolgreich in {programTitle} kopiert",
+        "events": "{count} Event erfolgreich in {programTitle} kopiert",
+        "degrees": "{count} Degree erfolgreich in {programTitle} kopiert"
+      },
+      "copied_success_plural": {
+        "courses": "{count} Kurse erfolgreich in {programTitle} kopiert",
+        "events": "{count} Events erfolgreich in {programTitle} kopiert",
+        "degrees": "{count} Degrees erfolgreich in {programTitle} kopiert"
+      }
     }
   },
   "manageCourse": {
@@ -1833,7 +1892,11 @@
     },
     "no-certificate-generated": "Es wurden keine Zertifikate generiert.",
     "certificates-generated": "Es wurden {number} Zertifikate generiert.",
-    "1-certificate-generated": "Es wurde ein Zertifikat generiert."
+    "1-certificate-generated": "Es wurde ein Zertifikat generiert.",
+    "guest_registration": {
+      "label": "Anmeldung ohne Konto erlauben",
+      "help_text": "Erlaubt die Anmeldung mit Name und E-Mail-Adresse, ohne dass ein Konto angelegt wird. Die Anmeldung wird erst nach Bestätigung per E-Mail gültig. Nur für Veranstaltungen mit direkter Anmeldung möglich."
+    }
   },
   "manageProjects": {
     "headline": "Projekte",
@@ -1911,7 +1974,7 @@
       "help_text": "Standard Formbricks Survey für Kurseinschreibungen. Kurse können dies mit ihrer eigenen Einschreibungs-Survey URL überschreiben."
     },
     "delete_button": {
-      "delete_program_confirmation": "Bist du sicher, dass du das Programm '{title}' löschen möchtest?",
+      "delete_program_confirmation": "Bist du sicher, dass du das Programm „{title}“ löschen möchtest?",
       "untitled_program": "Unbenanntes Programm"
     },
     "Certificates": {
@@ -1978,7 +2041,7 @@
       "programs_published_success_plural": "{count} Programme wurden erfolgreich veröffentlicht",
       "programs_unpublished_success_singular": "Programm wurde erfolgreich zurückgezogen",
       "programs_unpublished_success_plural": "{count} Programme wurden erfolgreich zurückgezogen",
-      "bulk_action_failed": "Massenaktion '{action}' ist fehlgeschlagen"
+      "bulk_action_failed": "Die Massenaktion ist fehlgeschlagen. Bitte versuche es erneut."
     }
   },
   "manageUsers": {
@@ -2616,7 +2679,7 @@
       "PAYMENT_RECEIPT": "Gesendet, wenn eine Rechnung für eine Kurs- oder Event-Anmeldung bezahlt wurde",
       "COURSE_CONTINUATION_INQUIRY": "Gesendet, wenn Teilnehmende so viele Termine versäumt haben, wie für den Kurs maximal erlaubt sind – mit der Bitte, keine weiteren Termine zu verpassen oder kurz Bescheid zu geben, falls sie nicht mehr teilnehmen möchten"
     },
-    "delete_confirmation": "Bist du sicher, dass du die E-Mail-Vorlage '{title}' löschen möchtest?",
+    "delete_confirmation": "Bist du sicher, dass du die E-Mail-Vorlage „{title}“ löschen möchtest?",
     "unknown_trigger": "Unbekannter Auslöser-Typ",
     "categories": {
       "all": "Alle",
@@ -2915,6 +2978,75 @@
       "SOCIAL_MEDIA": "Social Media",
       "SOCIAL_PEDAGOGY": "Sozialpädagogik",
       "OTHER": "Sonstiges Berufsfeld"
+    }
+  },
+  "guest": {
+    "register_without_account": "Ohne Konto anmelden",
+    "modal": {
+      "title": "Als Gast anmelden",
+      "intro": "Melde dich für {course} an, ohne ein Konto anzulegen. Wir brauchen dafür nur deinen Namen und deine E-Mail-Adresse.",
+      "first_name": "Vorname",
+      "last_name": "Nachname",
+      "email": "E-Mail-Adresse",
+      "accept_terms": "Ich habe die <terms>Allgemeinen Geschäftsbedingungen (AGB)</terms> sowie die <privacy>Datenschutzerklärung</privacy> gelesen und akzeptiere sie.",
+      "newsletter_opt_in": "Informiert mich per E-Mail über weitere Veranstaltungen dieses Veranstalters. Das ist freiwillig und du kannst es jederzeit widerrufen.",
+      "data_notice": "Wir speichern deinen Namen und deine E-Mail-Adresse, um die Veranstaltung durchzuführen und dich über Änderungen zu informieren. Danach löschen wir sie automatisch. Über den Link in jeder E-Mail kannst du deine Daten jederzeit einsehen oder löschen lassen.",
+      "submit": "Anmeldung abschicken",
+      "submitting": "Wird gesendet …",
+      "cancel": "Abbrechen",
+      "done": "Schließen",
+      "close": "Schließen",
+      "check_your_inbox": "Schau in dein Postfach",
+      "confirmation_sent": "Wir haben eine E-Mail an {email} geschickt. Bitte bestätige darüber deine Anmeldung.",
+      "confirmation_hint": "Erst nach der Bestätigung ist deine Anmeldung gültig. Der Link ist 7 Tage gültig."
+    },
+    "confirm": {
+      "page_title": "Anmeldung bestätigen",
+      "checking": "Wir prüfen deinen Link …",
+      "success_title": "Anmeldung bestätigt",
+      "success_body": "Du bist für {course} angemeldet. Eine Bestätigung ist unterwegs zu dir.",
+      "success_hint": "Wir informieren dich per E-Mail, falls sich an der Veranstaltung etwas ändert.",
+      "error_title": "Das hat nicht geklappt",
+      "to_event": "Zur Veranstaltung",
+      "manage_registration": "Anmeldung verwalten",
+      "to_home": "Zur Startseite"
+    },
+    "manage": {
+      "page_title": "Deine Anmeldung",
+      "loading": "Wir laden deine Daten …",
+      "error_title": "Das hat nicht geklappt",
+      "your_data": "Deine Daten",
+      "retention_notice": "Wir speichern diese Daten, um die Veranstaltung durchzuführen, und löschen sie danach automatisch.",
+      "your_registrations": "Deine Anmeldungen",
+      "no_registrations": "Du hast aktuell keine aktiven Anmeldungen.",
+      "cancel_registration": "Anmeldung stornieren",
+      "delete_title": "Daten löschen",
+      "delete_body": "Damit löschen wir deinen Namen und deine E-Mail-Adresse und stornieren alle offenen Anmeldungen. Das lässt sich nicht rückgängig machen.",
+      "delete_button": "Meine Daten löschen",
+      "delete_confirm_question": "Sollen wir wirklich alle deine Daten löschen? Das lässt sich nicht rückgängig machen.",
+      "deleted_title": "Deine Daten wurden gelöscht",
+      "deleted_body": "Wir haben deinen Namen und deine E-Mail-Adresse entfernt. Der Link in deinen alten E-Mails funktioniert nicht mehr."
+    },
+    "errors": {
+      "name_required": "Bitte gib deinen Vor- und Nachnamen an.",
+      "email_required": "Bitte gib deine E-Mail-Adresse an.",
+      "terms_required": "Bitte akzeptiere die AGB und die Datenschutzerklärung.",
+      "invalid_name": "Bitte prüfe deinen Namen.",
+      "invalid_email": "Bitte prüfe deine E-Mail-Adresse.",
+      "invalid_course": "Diese Veranstaltung wurde nicht gefunden.",
+      "terms_not_accepted": "Bitte akzeptiere die AGB und die Datenschutzerklärung.",
+      "course_not_available": "Diese Veranstaltung ist derzeit nicht verfügbar.",
+      "guest_registration_not_enabled": "Für diese Veranstaltung ist eine Anmeldung ohne Konto nicht möglich.",
+      "course_full": "Diese Veranstaltung ist bereits ausgebucht.",
+      "guest_registration_failed": "Deine Anmeldung konnte nicht verarbeitet werden. Bitte versuche es später noch einmal.",
+      "guest_registration_throttled": "Gerade gehen sehr viele Anmeldungen ein. Bitte versuche es in einer Stunde noch einmal.",
+      "guest_account_exists": "Zu dieser E-Mail-Adresse gibt es inzwischen ein Konto. Bitte melde dich an und schließe die Anmeldung dort ab.",
+      "invalid_token": "Dieser Link ist ungültig.",
+      "token_expired": "Dieser Link ist abgelaufen. Bitte melde dich erneut an.",
+      "token_already_used": "Dieser Link wurde bereits verwendet.",
+      "guest_confirmation_failed": "Deine Anmeldung konnte nicht bestätigt werden. Bitte versuche es später noch einmal.",
+      "invalid_operation": "Diese Aktion ist nicht möglich.",
+      "guest_manage_failed": "Das hat nicht geklappt. Bitte versuche es später noch einmal."
     }
   }
 }

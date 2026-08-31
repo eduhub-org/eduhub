@@ -731,3 +731,67 @@ type ArchiveJobPostingResult {
   error: String
   messageKey: String
 }
+
+type Mutation {
+  registerGuestForCourse(
+    courseId: Int!
+    firstName: String!
+    lastName: String!
+    email: String!
+    acceptTerms: Boolean!
+    newsletterOptIn: Boolean
+    """Honeypot. A person never fills this; anything non-empty is discarded."""
+    website: String
+  ): RegisterGuestForCourseResult!
+}
+
+"""
+Deliberately uniform: whether the address was unknown, already had an account, or
+already had a pending confirmation, the caller gets the same shape and the same
+messageKey. Anything else would turn this public endpoint into an oracle for
+whether a given email address has an EduHub account.
+"""
+type RegisterGuestForCourseResult {
+  success: Boolean!
+  error: String
+  messageKey: String
+}
+
+type Mutation {
+  confirmGuestRegistration(token: String!): ConfirmGuestRegistrationResult!
+}
+
+type ConfirmGuestRegistrationResult {
+  success: Boolean!
+  courseId: Int
+  courseTitle: String
+  manageToken: String
+  error: String
+  messageKey: String
+}
+
+type Mutation {
+  manageGuestRegistration(
+    token: String!
+    operation: String!
+    courseId: Int
+  ): ManageGuestRegistrationResult!
+}
+
+type GuestRegistrationSummary {
+  courseId: Int!
+  courseTitle: String!
+  startTime: timestamptz
+  endTime: timestamptz
+  status: String!
+}
+
+type ManageGuestRegistrationResult {
+  success: Boolean!
+  firstName: String
+  lastName: String
+  email: String
+  registrations: [GuestRegistrationSummary!]
+  error: String
+  messageKey: String
+}
