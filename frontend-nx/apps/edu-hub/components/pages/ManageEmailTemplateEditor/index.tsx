@@ -71,7 +71,43 @@ const ManageEmailTemplateEditor: FC<ManageEmailTemplateEditorProps> = ({ templat
         '\\[Session:ReminderTime\\]': 'tomorrow',
         '\\[System:PasswordResetLink\\]': 'https://keycloak.example.com/reset',
         '\\[System:PortalUrl\\]': 'https://edu.opencampus.sh',
+        // StuJo job board
+        '\\[JobPosting:Title\\]': 'Werkstudent:in Frontend',
+        '\\[JobPosting:Type\\]': 'Studentenjob',
+        '\\[JobPosting:PublishedAt\\]': '29. August 2026',
+        '\\[JobPosting:ExpiresAt\\]': '24. Oktober 2026',
+        '\\[JobPosting:Payment\\]': '59,50 € (bezahlt)',
+        '\\[JobPosting:DashboardUrl\\]': 'https://stujo.opencampus.sh/mein-stujo',
+        '\\[JobPosting:RepostUrl\\]': 'https://stujo.opencampus.sh/mein-stujo?repost=1',
+        '\\[JobPosting:AdminUrl\\]': 'https://edu.opencampus.sh/manage/settings/jobboerse',
+        '\\[JobPosting:TermsAcceptedAt\\]': '29. August 2026',
+        '\\[Organization:Name\\]': 'Beispiel GmbH',
+        '\\[Invoice:Number\\]': 'VGD1VIPO-0001',
+        '\\[Invoice:Date\\]': '29. August 2026',
+        '\\[Invoice:NetTotal\\]': '50,00 €',
+        '\\[Invoice:VatRate\\]': '19',
+        '\\[Invoice:VatTotal\\]': '9,50 €',
+        '\\[Invoice:GrossTotal\\]': '59,50 €',
+        '\\[Invoice:HostedUrl\\]': 'https://invoice.stripe.com/i/example',
+        '\\[Invoice:PaymentStatus\\]': 'bezahlt',
+        '\\[Legal:TermsUrl\\]': 'https://www.stujo.net/agb',
       };
+      // Conditional blocks are resolved before substitution, all flags on, so
+      // the preview shows the fullest variant instead of raw [#if:...] markers.
+      // Mirrors applyConditionalBlocks in lib/stripeJobPosting.ts.
+      const showAllConditionalBlocks = (text: string): string => {
+        const pattern = /\[#if:([A-Za-z]+)\]([\s\S]*?)\[\/if:\1\]/g;
+        let result = text || '';
+        for (let pass = 0; pass < 5; pass += 1) {
+          const next = result.replace(pattern, (_match, _key, body: string) => body);
+          if (next === result) return next;
+          result = next;
+        }
+        return result;
+      };
+      previewContent = showAllConditionalBlocks(previewContent);
+      previewSubject = showAllConditionalBlocks(previewSubject);
+
       Object.entries(sampleReplacements).forEach(([pattern, replacement]) => {
         const regex = new RegExp(pattern, 'g');
         previewContent = previewContent.replace(regex, replacement);
