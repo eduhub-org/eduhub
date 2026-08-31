@@ -24,6 +24,15 @@ services:
       # not the production fallback in stujoBaseUrl.ts.
       NEXT_PUBLIC_STUJO_URL: http://localhost:5001
       NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL: ${NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL:-}
+      # The Stripe webhook route lives in this app (pages/api/webhooks/stripe.ts),
+      # so it needs the keys too -- without them `stripe listen --forward-to
+      # localhost:5000/api/webhooks/stripe` (docs/STRIPE_INTEGRATION.md) only
+      # ever gets "Stripe not configured".
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
+      STUJO_FRONTEND_URL: ${STUJO_FRONTEND_URL:-http://localhost:5001}
+      STUJO_TERMS_URL: ${STUJO_TERMS_URL:-https://www.stujo.net/agb}
+      STUJO_ADMIN_EMAIL: ${STUJO_ADMIN_EMAIL:-}
       MM_URL: ${MM_URL:-https://chat.opencampus.sh}
       # Enable file watching in Docker environment
       CHOKIDAR_USEPOLLING: "true"
@@ -95,6 +104,7 @@ services:
       FORMBRICKS_API_KEY: ${FORMBRICKS_API_KEY:-}
       FORMBRICKS_API_URL: ${FORMBRICKS_API_URL:-https://app.formbricks.com}
       STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+      STUJO_TERMS_URL: ${STUJO_TERMS_URL:-https://www.stujo.net/agb}
       MATRIX_HOMESERVER_URL: ${MATRIX_HOMESERVER_URL:-}
       MATRIX_SERVER_NAME: ${MATRIX_SERVER_NAME:-}
       MATRIX_ELEMENT_CLIENT_URL: ${MATRIX_ELEMENT_CLIENT_URL:-}
