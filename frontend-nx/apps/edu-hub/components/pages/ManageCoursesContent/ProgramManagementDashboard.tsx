@@ -122,6 +122,11 @@ const ProgramManagementDashboard: FC<ProgramManagementDashboardProps> = ({ progr
     [allPrograms, organizationId]
   );
 
+  const handleOrganizationChange = useCallback(
+    (value: string) => selectOrganization(value ? Number(value) : null),
+    [selectOrganization]
+  );
+
   const organizationSelector = showOrganizationSelector && (
     <div className="mb-5 max-w-md">
       <DropDownSelector
@@ -132,7 +137,7 @@ const ProgramManagementDashboard: FC<ProgramManagementDashboardProps> = ({ progr
         searchable
         nullable
         nullableLabel={t('all_organizations_scope')}
-        onValueUpdated={(value) => selectOrganization(value ? Number(value) : null)}
+        onValueUpdated={handleOrganizationChange}
       />
     </div>
   );
@@ -150,7 +155,7 @@ const ProgramManagementDashboard: FC<ProgramManagementDashboardProps> = ({ progr
       // COURSES program owned by the default organization), so an informative empty state is shown
       // instead of a blank page to explain how to get unblocked.
       return (
-        <div className="py-8 text-center text-gray-500">
+        <div className="py-8 text-center text-label-secondary">
           {t(`empty_state.${programTypeMessageKey(programType)}`)}
         </div>
       );

@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect, useMemo, useState } from 'react';
+import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Checkbox, FormControlLabel } from '@mui/material';
 import { useTranslations } from 'next-intl';
 
@@ -61,6 +61,10 @@ const AddAdminDialog: FC<AddAdminDialogProps> = ({
   const [canManageJobs, setCanManageJobs] = useState(false);
   const [canManageSettings, setCanManageSettings] = useState(false);
   const [grantSuperAdmin, setGrantSuperAdmin] = useState(false);
+  // Set once the OrganizationAdmin row exists, so a retry after a failed super-admin promotion
+  // does not insert it twice — the second insert would violate the (userId, organizationId)
+  // unique constraint and surface as an error even though the grant is fine.
+  const grantCreatedRef = useRef(false);
   const [validationError, setValidationError] = useState<string | null>(null);
   const [serverError, setServerError] = useState<string | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -78,6 +82,7 @@ const AddAdminDialog: FC<AddAdminDialogProps> = ({
       setCanManageJobs(false);
       setCanManageSettings(false);
       setGrantSuperAdmin(false);
+      grantCreatedRef.current = false;
       setValidationError(null);
       setServerError(null);
     }
@@ -160,7 +165,7 @@ const AddAdminDialog: FC<AddAdminDialogProps> = ({
     }
 
     try {
-      if (organizationId) {
+      if (organizationId && !grantCreatedRef.current) {
         const insertResult = await insertOrganizationAdmin({
           variables: {
             input: {
@@ -179,6 +184,7 @@ const AddAdminDialog: FC<AddAdminDialogProps> = ({
           setServerError(t('add_admin_error'));
           return;
         }
+        grantCreatedRef.current = true;
       }
 
       if (grantSuperAdmin) {
@@ -188,6 +194,12 @@ const AddAdminDialog: FC<AddAdminDialogProps> = ({
 
         if (!adminResult.data?.updateUserAdminStatus?.success) {
           setServerError(t('add_admin_error'));
+          // The two grants are independent mutations. If the organization grant already went
+          // through, refresh the list so it shows up rather than silently existing behind an
+          // error dialog; retrying then only re-attempts the promotion.
+          if (grantCreatedRef.current) {
+            onSuccess();
+          }
           return;
         }
       }

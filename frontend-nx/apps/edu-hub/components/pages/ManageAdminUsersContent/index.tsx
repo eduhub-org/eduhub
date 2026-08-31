@@ -472,7 +472,7 @@ const ManageAdminUsersContent: FC<ManageAdminUsersContentProps> = ({ inSettingsL
   const table = (
     <>
       {isLoading && <Loading />}
-      {adminError && <div className="text-red-500 p-4">{t('error_loading_admin_users')}</div>}
+      {(adminError || error) && <div className="text-red-500 p-4">{t('error_loading_admin_users')}</div>}
       {!isLoading && !error && (
         <div>
           {!inSettingsLayout && <CommonPageHeader headline={t('headline')} />}
