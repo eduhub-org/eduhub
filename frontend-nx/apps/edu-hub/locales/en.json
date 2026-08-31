@@ -1081,6 +1081,8 @@
         "degrees": "This degree has custom email templates"
       }
     },
+    "organization_scope_label": "Organization",
+    "all_organizations_scope": "All organizations",
     "error_loading_programs": "The programs could not be loaded. Please try again later.",
     "empty_state": {
       "events": "No events programs exist yet. Ask a platform admin to set up an events program for your organization before you can manage events here.",
@@ -2117,6 +2119,8 @@
     "can_manage_users_and_settings": "Can manage users and settings",
     "error_loading_admin_users": "Error loading admin users.",
     "deletion_confirmation_question": "Are you sure you want to delete the admin rights of {firstName} {lastName} for the organization {organization}?",
+    "administered_organizations": "Administered organizations",
+    "no_organization_roles": "No organization role – super admin rights only.",
     "add_admin_button": "Add admin",
     "add_admin_dialog_title": "Add admin user",
     "add_admin_user_label": "User",
@@ -2129,6 +2133,9 @@
     "add_admin_error": "The admin user could not be added.",
     "add_admin_submit": "Add",
     "add_admin_submitting": "Adding…",
+    "add_admin_scope_required": "Please select an organization or grant super admin rights.",
+    "add_admin_no_organization": "No organization (super admin only)",
+    "add_admin_super_admin_hint": "Super admins manage the whole platform, independently of any organization.",
     "add_admin_success": "Admin user added."
   },
   "manageAppSettings": {
