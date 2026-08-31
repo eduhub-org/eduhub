@@ -63,10 +63,9 @@ describe('buildCoursePaymentDescription', () => {
     );
   });
 
-  it('shortens a long title but keeps the program type visible', () => {
+  it('shortens a long title to 120 characters but keeps the program type visible', () => {
     const description = buildCoursePaymentDescription('COURSES', 'x'.repeat(200), 'opencampus');
-    expect(description.startsWith('EduHub opencampus xxx')).toBe(true);
-    expect(description.endsWith('\u2026 (Kurs)')).toBe(true);
+    expect(description).toBe(`EduHub opencampus ${'x'.repeat(119)}\u2026 (Kurs)`);
   });
 });
 
