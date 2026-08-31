@@ -105,6 +105,14 @@ const SET_PENDING_PAYMENT = gql`
   }
 `;
 
+const SET_TERMS_ACCEPTED = gql`
+  mutation SetJobPostingTermsAccepted($id: Int!, $at: timestamptz!) {
+    update_JobPosting_by_pk(pk_columns: { id: $id }, _set: { termsAcceptedAt: $at }) {
+      id
+    }
+  }
+`;
+
 const GET_MAIL_TEMPLATE = gql`
   query GetJobMailTemplate($type: MailTemplateType_enum!) {
     MailTemplate(where: { type: { _eq: $type }, courseId: { _is_null: true } }, limit: 1) {
@@ -357,7 +365,7 @@ export default async function publishJobPosting(req, logger) {
   try {
     const sessionUserId = req.body?.session_variables?.['x-hasura-user-id'];
     const sessionRole = req.body?.session_variables?.['x-hasura-role'];
-    const { jobPostingId } = req.body.input || req.body;
+    const { jobPostingId, acceptTerms } = req.body.input || req.body;
 
     if (!jobPostingId) {
       return { success: false, error: 'jobPostingId is required', messageKey: 'MISSING_JOB_POSTING_ID' };
@@ -391,6 +399,18 @@ export default async function publishJobPosting(req, logger) {
         error: `Posting in status ${posting.status} cannot be published`,
         messageKey: 'INVALID_STATUS',
       };
+    }
+
+    // Consent is server-controlled: the client may say it was given, but only
+    // this function writes the timestamp, and only once. A client-writable
+    // column could be backdated or forged, which would defeat the point of
+    // recording it at all.
+    if (acceptTerms === true && !posting.termsAcceptedAt) {
+      await client.request(SET_TERMS_ACCEPTED, {
+        id: posting.id,
+        at: new Date().toISOString(),
+      });
+      posting.termsAcceptedAt = new Date().toISOString();
     }
 
     const priceRow = data.JobPostingPrice.find((p) => p.jobPostingType === posting.type);
@@ -432,6 +452,18 @@ export default async function publishJobPosting(req, logger) {
     }
 
     // 3. Stripe checkout.
+    // Only the paid path is gated: this is where a contract is concluded, and
+    // it mirrors `config.requiresPayment && !acceptTerms` in the course
+    // registration modal. A repost of a posting that already carries consent
+    // passes without asking again.
+    if (!posting.termsAcceptedAt) {
+      return {
+        success: false,
+        error: 'Terms must be accepted before publishing a paid posting',
+        messageKey: 'TERMS_NOT_ACCEPTED',
+      };
+    }
+
     const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
     if (!stripeSecretKey) {
       return { success: false, error: 'Stripe secret key not configured', messageKey: 'STRIPE_NOT_CONFIGURED' };

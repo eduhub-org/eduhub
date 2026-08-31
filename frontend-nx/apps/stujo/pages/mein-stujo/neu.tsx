@@ -83,6 +83,7 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
   // and the preview once a draft exists.
   const [draftOrganizationId, setDraftOrganizationId] = useState<number | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [acceptTerms, setAcceptTerms] = useState(false);
   // The offer PDF is the centerpiece of a StuJo posting (embedded on the
   // detail page like in the Rails app). Uploaded after the draft exists.
   const [pdfFile, setPdfFile] = useState<File | null>(null);
@@ -254,9 +255,15 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
 
   const publish = async () => {
     setErrorMessage(null);
+    if (requiresConsent && !acceptTerms) {
+      setErrorMessage('Bitte akzeptiere die AGB, um Dein Angebot zu veröffentlichen.');
+      return;
+    }
     const id = savedId ?? (await saveDraft());
     if (!id) return;
-    const result = await publishPosting({ variables: { jobPostingId: id } });
+    const result = await publishPosting({
+      variables: { jobPostingId: id, acceptTerms },
+    });
     const payload = result.data?.publishJobPosting;
     if (payload?.checkoutUrl) {
       window.location.href = payload.checkoutUrl;
@@ -277,6 +284,11 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
     0
   );
   const busy = creating || updating || publishing || uploadingPdf;
+  // Only a paid publish concludes a contract, so only that asks for consent --
+  // the same rule the course registration modal applies via
+  // `config.requiresPayment && !acceptTerms`.
+  const requiresConsent = netPrice > 0 && credits === 0;
+  const termsUrl = portal.termsUrl || 'https://www.stujo.net/agb';
 
   const field = (
     label: string,
@@ -490,6 +502,23 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
             )}
           </div>
           )}
+          {!isLive && requiresConsent && (
+            <label className="stujo-consent">
+              <input
+                type="checkbox"
+                checked={acceptTerms}
+                disabled={busy}
+                onChange={(event) => setAcceptTerms(event.target.checked)}
+              />
+              <span>
+                Ich habe die{' '}
+                <a href={termsUrl} target="_blank" rel="noreferrer">
+                  Allgemeinen Geschäftsbedingungen
+                </a>{' '}
+                gelesen und akzeptiere sie.
+              </span>
+            </label>
+          )}
           <div className="stujo-form-actions">
             <button className="stujo-btn stujo-btn--ghost" disabled={busy} onClick={() => setStep(1)}>
               ← Zurück
@@ -506,7 +535,11 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
                 Änderungen speichern
               </button>
             ) : (
-              <button className="stujo-btn stujo-btn--accent" disabled={busy} onClick={publish}>
+              <button
+                className="stujo-btn stujo-btn--accent"
+                disabled={busy || (requiresConsent && !acceptTerms)}
+                onClick={publish}
+              >
                 {netPrice === 0 || credits > 0
                   ? 'Jetzt veröffentlichen'
                   : `Kostenpflichtig veröffentlichen · ${(grossPrice / 100).toFixed(2).replace('.', ',')} €`}

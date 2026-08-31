@@ -77,6 +77,7 @@ const Layout: FC<LayoutProps> = ({ children, fullWidthMain = false, portal }) =>
   // the live stujo.net pages unless the portal configures its own URLs.
   const imprintUrl = portal.imprintUrl || 'https://www.stujo.net/impressum';
   const privacyUrl = portal.privacyUrl || 'https://www.stujo.net/datenschutz';
+  const termsUrl = portal.termsUrl || 'https://www.stujo.net/agb';
   const isGerman = router.locale === 'de';
   const otherLocale = isGerman ? 'en' : 'de';
 
@@ -192,7 +193,7 @@ const Layout: FC<LayoutProps> = ({ children, fullWidthMain = false, portal }) =>
           </div>
           <div className="stujo-footer-links">
             <h3>{t('footerLinksHead')}</h3>
-            <a href="https://www.stujo.net/agb">AGB</a>
+            <a href={termsUrl}>AGB</a>
             <Link href="/fuer-arbeitgeber">{t('footerPrices')}</Link>
             <a href="https://www.stujo.net/faq">FAQ</a>
             <a href={imprintUrl}>Impressum</a>
