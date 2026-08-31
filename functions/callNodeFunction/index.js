@@ -22,6 +22,7 @@ import createStripeBasePrice from "./createStripeBasePrice/index.js";
 import createStripeAddonPrices from "./createStripeAddonPrices/index.js";
 import createStripeJobPostingPrices from "./createStripeJobPostingPrices/index.js";
 import publishJobPosting from "./publishJobPosting/index.js";
+import sendPendingJobPostingMails from "./sendPendingJobPostingMails/index.js";
 import archiveJobPosting from "./archiveJobPosting/index.js";
 import createEnrollmentWithAddons from "./createEnrollmentWithAddons/index.js";
 import syncGhostNewsletterSubscription from "./syncGhostNewsletterSubscription/index.js";
@@ -87,6 +88,7 @@ const functionMap = {
   createStripeAddonPrices,
   createStripeJobPostingPrices,
   publishJobPosting,
+  sendPendingJobPostingMails,
   archiveJobPosting,
   createEnrollmentWithAddons,
   createMatrixRoom,
