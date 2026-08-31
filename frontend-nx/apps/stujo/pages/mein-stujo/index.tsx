@@ -207,7 +207,7 @@ const MeinStujo: FC<Props> = ({ portal }) => {
             <span>
               Für die kostenpflichtige Veröffentlichung gelten unsere{' '}
               <a
-                href={portal.termsUrl || 'https://www.stujo.net/agb'}
+                href={portal.termsUrl || '/agb'}
                 target="_blank"
                 rel="noreferrer"
               >

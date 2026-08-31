@@ -77,7 +77,7 @@ const Layout: FC<LayoutProps> = ({ children, fullWidthMain = false, portal }) =>
   // the live stujo.net pages unless the portal configures its own URLs.
   const imprintUrl = portal.imprintUrl || 'https://www.stujo.net/impressum';
   const privacyUrl = portal.privacyUrl || 'https://www.stujo.net/datenschutz';
-  const termsUrl = portal.termsUrl || 'https://www.stujo.net/agb';
+  const termsUrl = portal.termsUrl || '/agb';
   const isGerman = router.locale === 'de';
   const otherLocale = isGerman ? 'en' : 'de';
 

@@ -288,7 +288,7 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
   // the same rule the course registration modal applies via
   // `config.requiresPayment && !acceptTerms`.
   const requiresConsent = netPrice > 0 && credits === 0;
-  const termsUrl = portal.termsUrl || 'https://www.stujo.net/agb';
+  const termsUrl = portal.termsUrl || '/agb';
 
   const field = (
     label: string,

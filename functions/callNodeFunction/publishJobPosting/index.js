@@ -305,7 +305,8 @@ export function buildJobPostingMailVars(posting, { expiresAt, publishedAt, payme
     '[Invoice:GrossTotal]': invoice ? formatJobPostingAmount(invoice.grossTotal, invoice.currency) : '',
     '[Invoice:HostedUrl]': invoice?.hostedUrl || '',
     '[Invoice:PaymentStatus]': invoice ? (invoice.paid ? 'bezahlt' : 'Zahlung ausstehend') : '',
-    '[Legal:TermsUrl]': process.env.STUJO_TERMS_URL || 'https://www.stujo.net/agb',
+    // Absolute: this is read in an email, where a relative path is dead.
+    '[Legal:TermsUrl]': process.env.STUJO_TERMS_URL || `${frontendUrl}/agb`,
   };
 }
 
