@@ -18,6 +18,35 @@ Before creating any new UI, check existing shared components:
 
 When you reuse one of these, mention it in the PR/commit description.
 
+## Two apps, one component set (edu-hub ↔ StuJo)
+
+`frontend-nx/apps/stujo` (the StuJo job board) is not a separate design system.
+The standing goal is that **the apps differ in design tokens, not in forked
+components** — reuse grows over time.
+
+- Import shared code with the `@eduhub/*` alias (`tsconfig.base.json`);
+  `apps/stujo/next.config.js` enables `experimental.externalDir` for it. The
+  app already does this for `@eduhub/config/apollo`,
+  `@eduhub/components/AuthStoreUpdater` and `@eduhub/hooks/authentication`.
+- **Never copy a component into `apps/stujo` to restyle it.** Every colour in
+  `apps/edu-hub/tailwind.config.js` resolves to a `var(--eduhub-*)` token
+  defined in `apps/edu-hub/styles/globals.css`; StuJo overrides those same
+  token names with its own values in `apps/stujo/styles/globals.css`. Restyling
+  is a token change.
+- Both apps use `apps/edu-hub/tailwind.config.js`. StuJo's config must extend
+  it and its `content` globs must include `../edu-hub/components/**` —
+  otherwise Tailwind emits no classes for the shared components and they render
+  unstyled.
+- Components that call `useTranslations('common')` need their keys present in
+  **both** `apps/edu-hub/locales/*.json` and `apps/stujo/locales/*.json`; the
+  apps have separate `common` namespaces.
+- `DropDownSelector` and `InputField` carry a `variant` prop. It selects a
+  *style family*, not an app — with shared tokens, `'eduhub'` is the correct
+  variant inside StuJo too.
+- StuJo also keeps its own ported Rails layer (`--stujo-*` variables,
+  `stujo-*` classes) for page chrome. That stays; it is not a reason to fork a
+  shared component. Background: `docs/STUJO_INTEGRATION_PLAN.md` §8.1.
+
 ## Component organization
 
 Feature-based, not technology-based:
