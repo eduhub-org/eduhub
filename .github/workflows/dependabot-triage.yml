@@ -25,7 +25,7 @@ name: Dependabot triage
 on:
   schedule:
     # 05:00 UTC = 07:00 Europe/Berlin in summer (CEST), 06:00 in winter (CET).
-    - cron: "0 5 * * *"
+    - cron: "0 5 * * 2,4" # every Tuesday and Thursday at 05:00 UTC
   workflow_dispatch:
 
 permissions:
