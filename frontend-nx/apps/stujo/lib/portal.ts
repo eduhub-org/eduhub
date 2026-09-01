@@ -29,6 +29,7 @@ export type PortalBranding = {
   secondaryColor: string | null;
   imprintUrl: string | null;
   privacyUrl: string | null;
+  termsUrl: string | null;
 };
 
 const PORTAL_QUERY = /* GraphQL */ `
@@ -49,6 +50,7 @@ const PORTAL_QUERY = /* GraphQL */ `
       secondaryColor
       imprintUrl
       privacyUrl
+      termsUrl
     }
   }
 `;
@@ -83,6 +85,7 @@ type PortalQueryResult = {
     secondaryColor: string | null;
     imprintUrl: string | null;
     privacyUrl: string | null;
+    termsUrl: string | null;
   }[];
 };
 
@@ -150,5 +153,6 @@ export async function resolvePortal(host: string | undefined): Promise<PortalBra
     secondaryColor: settings?.secondaryColor ?? null,
     imprintUrl: settings?.imprintUrl ?? null,
     privacyUrl: settings?.privacyUrl ?? null,
+    termsUrl: settings?.termsUrl ?? null,
   };
 }

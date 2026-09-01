@@ -2644,7 +2644,12 @@
       "PROJECT_DEADLINE_REMINDER": "Project Deadline Reminder",
       "SESSION_RESCHEDULED": "Session Rescheduled",
       "PAYMENT_RECEIPT": "Payment Receipt",
-      "COURSE_CONTINUATION_INQUIRY": "Course Continuation Inquiry"
+      "COURSE_CONTINUATION_INQUIRY": "Course Continuation Inquiry",
+      "JOB_POSTING_PUBLISHED": "Job posting published",
+      "JOB_POSTING_EXPIRED": "Job posting expired",
+      "JOB_POSTING_ADMIN_NOTICE": "Job posting: admin notice",
+      "JOB_POSTING_PAYMENT_FAILED": "Job posting: payment failed",
+      "JOB_ALERT": "Job alert"
     },
     "placeholders": {
       "subject": "Enter email subject...",
@@ -2692,7 +2697,12 @@
       "PROJECT_DEADLINE_REMINDER": "Sent 48 hours before a project's submission deadline",
       "SESSION_RESCHEDULED": "Sent to participants when a session's date or time changes",
       "PAYMENT_RECEIPT": "Sent when an invoice for a course or event enrollment is paid",
-      "COURSE_CONTINUATION_INQUIRY": "Sent when a participant reaches the course's limit of missed sessions, asking them not to miss further sessions or to let the team know if they want to stop"
+      "COURSE_CONTINUATION_INQUIRY": "Sent when a participant reaches the course's limit of missed sessions, asking them not to miss further sessions or to let the team know if they want to stop",
+      "JOB_POSTING_PUBLISHED": "Sent to the employer once the posting is live. Carries the payment receipt, the invoice number and the invoice PDF as an attachment. The block between [#if:Invoice] and [/if:Invoice] is dropped for free and credit-funded postings; [#if:InvoicePdf] only renders when the PDF is actually attached.",
+      "JOB_POSTING_EXPIRED": "Sent to the employer when the posting run ends, with a link to post it again",
+      "JOB_POSTING_ADMIN_NOTICE": "Sent to the platform admins when a posting is published (post-hoc moderation)",
+      "JOB_POSTING_PAYMENT_FAILED": "Sent to the employer when a delayed payment (SEPA) fails and the posting is taken offline",
+      "JOB_ALERT": "Sent to subscribers with new postings matching their search profile"
     },
     "delete_confirmation": "Are you sure you want to delete the email template \"{title}\"?",
     "unknown_trigger": "Unknown trigger type",
@@ -2702,7 +2712,8 @@
       "projects": "Project notifications",
       "sessions": "Session reminders",
       "system": "System emails",
-      "other": "Other"
+      "other": "Other",
+      "jobboard": "Job board"
     },
     "category_coming_soon": "Soon",
     "categories_coming_soon_explanation": {}

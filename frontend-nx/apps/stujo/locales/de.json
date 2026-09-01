@@ -87,7 +87,14 @@
     "publishNetworkError": "Veröffentlichen fehlgeschlagen: Netzwerkfehler.",
     "archiveFailed": "Archivieren fehlgeschlagen: {error}",
     "archiveNetworkError": "Archivieren fehlgeschlagen: Netzwerkfehler.",
-    "unknownError": "Unbekannter Fehler"
+    "unknownError": "Unbekannter Fehler",
+    "acceptTermsPrefix": "Ich habe die",
+    "acceptTermsLink": "Allgemeinen Geschäftsbedingungen",
+    "acceptTermsSuffix": "gelesen und akzeptiere sie.",
+    "acceptTermsRequired": "Bitte akzeptiere die AGB, um Dein Angebot zu veröffentlichen.",
+    "consentPromptPrefix": "Für die kostenpflichtige Veröffentlichung gelten unsere",
+    "consentPromptSuffix": ".",
+    "consentAcceptAndPublish": "AGB akzeptieren und veröffentlichen"
   },
   "jobType": {
     "MINIJOB": "Minijobs",

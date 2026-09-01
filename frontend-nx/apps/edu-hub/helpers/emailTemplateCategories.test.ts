@@ -38,6 +38,11 @@ describe('getEmailTemplateCategory', () => {
     'SESSION_RESCHEDULED',
     'PAYMENT_RECEIPT',
     'COURSE_CONTINUATION_INQUIRY',
+    'JOB_POSTING_PUBLISHED',
+    'JOB_POSTING_EXPIRED',
+    'JOB_POSTING_ADMIN_NOTICE',
+    'JOB_POSTING_PAYMENT_FAILED',
+    'JOB_ALERT',
   ];
 
   it.each(knownTypes)('maps known type %s to a real category (not "other")', (type) => {
@@ -74,6 +79,18 @@ describe('getEmailTemplateCategory', () => {
     expect(getEmailTemplateCategory('ORGANIZER_ADDED')).toBe('system');
   });
 
+  it('maps the StuJo job board types to "jobboard"', () => {
+    expect(getEmailTemplateCategory('JOB_POSTING_PUBLISHED')).toBe('jobboard');
+    expect(getEmailTemplateCategory('JOB_POSTING_EXPIRED')).toBe('jobboard');
+    expect(getEmailTemplateCategory('JOB_POSTING_ADMIN_NOTICE')).toBe('jobboard');
+    expect(getEmailTemplateCategory('JOB_POSTING_PAYMENT_FAILED')).toBe('jobboard');
+    expect(getEmailTemplateCategory('JOB_ALERT')).toBe('jobboard');
+  });
+
+  it('shows the job board as a tab rather than hiding it behind "Sonstige"', () => {
+    expect(EMAIL_TEMPLATE_CATEGORIES).toContain('jobboard');
+  });
+
   it('falls back to "other" for unknown types so they never disappear from the UI', () => {
     expect(getEmailTemplateCategory('SOME_FUTURE_TYPE')).toBe('other');
   });
@@ -86,5 +103,35 @@ describe('getEmailTemplateCategory', () => {
 
   it('no longer treats project notifications as upcoming', () => {
     expect(UPCOMING_EMAIL_TEMPLATE_CATEGORIES).not.toContain('projects');
+  });
+});
+
+describe('job board template labels', () => {
+  // A type mapped to a category but missing from the locale files renders as
+  // "Unbekannter Auslöser-Typ" in the editor, which is how the JOB_POSTING_*
+  // templates were effectively invisible before.
+  const de = require('../locales/de.json');
+  const en = require('../locales/en.json');
+  const jobBoardTypes = [
+    'JOB_POSTING_PUBLISHED',
+    'JOB_POSTING_EXPIRED',
+    'JOB_POSTING_ADMIN_NOTICE',
+    'JOB_POSTING_PAYMENT_FAILED',
+    'JOB_ALERT',
+  ];
+
+  it.each(jobBoardTypes)('has a German name and trigger description for %s', (type) => {
+    expect(de.manageEmailTemplates.template_types[type]).toBeTruthy();
+    expect(de.manageEmailTemplates.triggers[type]).toBeTruthy();
+  });
+
+  it.each(jobBoardTypes)('has an English name and trigger description for %s', (type) => {
+    expect(en.manageEmailTemplates.template_types[type]).toBeTruthy();
+    expect(en.manageEmailTemplates.triggers[type]).toBeTruthy();
+  });
+
+  it('names the jobboard category in both locales', () => {
+    expect(de.manageEmailTemplates.categories.jobboard).toBeTruthy();
+    expect(en.manageEmailTemplates.categories.jobboard).toBeTruthy();
   });
 });

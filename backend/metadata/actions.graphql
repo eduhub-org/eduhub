@@ -688,7 +688,7 @@ type CourseAddonMapping {
 
 
 type Mutation {
-  publishJobPosting(jobPostingId: Int!): PublishJobPostingResult!
+  publishJobPosting(jobPostingId: Int!, acceptTerms: Boolean): PublishJobPostingResult!
 }
 
 type Mutation {

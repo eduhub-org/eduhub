@@ -48,6 +48,7 @@ const MeinStujo: FC<Props> = ({ portal }) => {
   const router = useRouter();
   const { status: sessionStatus } = useSession();
   const [notice, setNotice] = useState<string | null>(null);
+  const [consentNeededFor, setConsentNeededFor] = useState<number | null>(null);
 
   const employerRole = useEmployerRoleContext();
   const {
@@ -99,18 +100,23 @@ const MeinStujo: FC<Props> = ({ portal }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router.query.repost, data]);
 
-  const handlePublish = async (jobPostingId: number) => {
+  const handlePublish = async (jobPostingId: number, acceptTerms = false) => {
     setNotice(null);
     try {
-      const result = await publishPosting({ variables: { jobPostingId } });
+      const result = await publishPosting({ variables: { jobPostingId, acceptTerms } });
       const payload = result.data?.publishJobPosting;
       if (payload?.checkoutUrl) {
         window.location.href = payload.checkoutUrl;
         return;
       }
       if (payload?.success) {
+        setConsentNeededFor(null);
         setNotice(payload.usedCredit ? t('noticePublishedCredit') : t('noticePublished'));
         await refetch();
+      } else if (payload?.messageKey === 'TERMS_NOT_ACCEPTED') {
+        // A posting published before consent was recorded, or reposted from an
+        // expiry mail. Ask here rather than failing the action.
+        setConsentNeededFor(jobPostingId);
       } else {
         setNotice(t('publishFailed', { error: payload?.error ?? t('unknownError') }));
       }
@@ -194,6 +200,26 @@ const MeinStujo: FC<Props> = ({ portal }) => {
       </div>
 
       {notice && <div className="stujo-notice">{notice}</div>}
+
+      {consentNeededFor !== null && (
+        <div className="stujo-notice">
+          <label className="stujo-consent">
+            <span>
+              {t('consentPromptPrefix')}{' '}
+              <a href={portal.termsUrl || '/agb'} target="_blank" rel="noreferrer">
+                {t('acceptTermsLink')}
+              </a>
+              {t('consentPromptSuffix')}
+            </span>
+          </label>
+          <button
+            className="stujo-btn stujo-btn--accent"
+            onClick={() => handlePublish(consentNeededFor, true)}
+          >
+            {t('consentAcceptAndPublish')}
+          </button>
+        </div>
+      )}
 
       <div className="stujo-stats">
         {[
