@@ -362,7 +362,8 @@
       "show_all_dates": "Alle Termine anzeigen",
       "hide_dates": "Termine einklappen",
       "date_singular": "Termin",
-      "date_plural": "Termine"
+      "date_plural": "Termine",
+      "public_event_badge": "Öffentliches Event"
     },
     "attendances": {
       "attendances": "Anwesenheiten",
@@ -716,6 +717,26 @@
       "success_title": "Bewerbung erfolgreich eingereicht!",
       "success_body": "Du wirst spätestens ein bis zwei Tage nach Bewerbungsschluss über deine Zulassung informiert.",
       "success_close_button_title": "Schließen"
+    }
+  },
+  "event": {
+    "seo": {
+      "title": "EduHub Event | opencampus.sh",
+      "metaDescription": "Öffentliche Event-Details auf EduHub von opencampus.sh",
+      "ogDescription": "Entdecke dieses öffentliche Event auf EduHub",
+      "twitterDescription": "Entdecke dieses öffentliche Event auf EduHub"
+    },
+    "EventTile": {
+      "view_event": "Event ansehen"
+    },
+    "EventContent": {
+      "not_found": "Dieses öffentliche Event wurde nicht gefunden.",
+      "date_time_heading": "Datum & Uhrzeit",
+      "description_heading": "Beschreibung",
+      "speakers_heading": "Speaker:innen",
+      "location_heading": "Ort",
+      "course_heading": "Kurs",
+      "view_course_link": "Zum zugehörigen Kurs"
     }
   },
   "coursePage": {
@@ -1787,6 +1808,10 @@
         "select_location_option_first": "Bitte wähle zuerst eine Standortoption aus",
         "location_mismatch_error": "Die ausgewählte Adresse passt nicht zur Standortoption dieser Session. Bitte wähle eine Adresse aus, die zum richtigen Standort gehört.",
         "failed_to_load_session_addresses": "Session-Adressen konnten nicht geladen werden."
+      },
+      "public_event": {
+        "label": "Öffentliches Event",
+        "help_text": "Wenn aktiviert, erhält dieser Termin eine eigene öffentliche Seite unter /event/[id] und kann in Event-Listen erscheinen. Nur Admins können diese Einstellung ändern."
       },
       "session_description": {
         "label": "Beschreibung",

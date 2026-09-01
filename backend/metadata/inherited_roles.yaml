@@ -15,6 +15,12 @@
     - instructor_access
     - user_access
     - anonymous
+- role_name: admin
+  role_set:
+    - instructor_access
+    - user_access
+    - user_access_others
+    - anonymous
 - role_name: user
   role_set:
     - user_access

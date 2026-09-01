@@ -9,6 +9,9 @@ import { CourseList_Course } from '../../../queries/__generated__/CourseList';
 import { CourseTiles_Course } from '../../../queries/__generated__/CourseTiles';
 import { CoursesEnrolledByUser_Course } from '../../../queries/__generated__/CoursesEnrolledByUser';
 
+export { EventTile } from './EventTile';
+export type { PublicEventSession } from './EventTile';
+
 export type CourseType = CourseList_Course | CourseTiles_Course | CoursesEnrolledByUser_Course;
 
 /** Minimal shape every tile item must expose so the shell can key each slide. */

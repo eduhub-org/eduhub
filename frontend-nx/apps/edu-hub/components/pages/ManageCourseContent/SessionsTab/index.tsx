@@ -15,7 +15,9 @@ import {
   UPDATE_SESSION_END_TIME,
   UPDATE_SESSION_START_TIME,
   UPDATE_SESSION_TITLE,
+  UPDATE_SESSION_IS_PUBLIC_EVENT,
 } from '../../../../queries/course';
+import CheckboxSelector from '../../../inputs/CheckboxSelector';
 import {
   ManagedCourse,
   ManagedCourseVariables,
@@ -303,8 +305,28 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
           </span>
         ),
       },
+      {
+        id: 'publicEvent',
+        header: t('SessionsTab.public_event.label'),
+        accessorKey: 'isPublicEvent',
+        size: 160,
+        enableSorting: false,
+        cell: ({ row }) => (
+          <div className="light flex items-center min-w-[140px]">
+            <CheckboxSelector
+              variant="eduhub"
+              label=""
+              checked={Boolean(row.original.isPublicEvent)}
+              updateValueMutation={isAdmin ? UPDATE_SESSION_IS_PUBLIC_EVENT : undefined}
+              identifierVariables={{ sessionId: row.original.id }}
+              refetchQueries={['ManagedCourse']}
+              disabled={!isAdmin}
+            />
+          </div>
+        ),
+      },
     ],
-    [tCoursePage, lectureStart, lectureEnd, handleSetDate]
+    [t, tCoursePage, lectureStart, lectureEnd, handleSetDate, isAdmin]
   );
 
   return (

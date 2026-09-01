@@ -88,6 +88,7 @@ export interface Course_Course_by_pk_Sessions {
    * A description of the session
    */
   description: string;
+  isPublicEvent: boolean;
   /**
    * The day and time of the start of the session
    */

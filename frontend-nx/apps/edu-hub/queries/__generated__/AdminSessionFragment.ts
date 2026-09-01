@@ -110,6 +110,7 @@ export interface AdminSessionFragment {
    * A description of the session
    */
   description: string;
+  isPublicEvent: boolean;
   /**
    * The day and time of the start of the session
    */
