@@ -3,6 +3,7 @@ import { GraphQLClient, gql } from 'graphql-request';
 
 import {
   buildInvoiceCreation,
+  buildJobPostingPaymentDescription,
   buildPaymentMethodConfig,
   getOrCreateCustomer,
   getOrCreateTaxRate,
@@ -405,6 +406,12 @@ export default async function publishJobPosting(req, logger) {
         source: 'stujo',
       },
       payment_intent_data: {
+        // Without this Stripe shows the PaymentIntent id in the dashboard's
+        // payment list instead of what was sold.
+        description: buildJobPostingPaymentDescription(
+          posting.title || null,
+          posting.Organization?.name || null
+        ),
         metadata: {
           jobPostingId: String(posting.id),
           organizationId: String(posting.organizationId),
