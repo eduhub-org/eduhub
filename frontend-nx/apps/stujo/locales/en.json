@@ -41,7 +41,15 @@
     "footerLinksHead": "Information",
     "footerPrices": "Services and prices",
     "footerUniversityPartners": "University partners",
-    "footerPartners": "Sponsored by"
+    "footerPartners": "Sponsored by",
+    "Layout": {
+      "home": "Home",
+      "switch_to_german": "Switch to German",
+      "switch_to_english": "Switch to English"
+    },
+    "JobList": {
+      "search_placeholder": "Search term, e.g. marketing, software, …"
+    }
   },
   "meinStujo": {
     "title": "My StuJo",
@@ -79,7 +87,14 @@
     "publishNetworkError": "Publishing failed: network error.",
     "archiveFailed": "Archiving failed: {error}",
     "archiveNetworkError": "Archiving failed: network error.",
-    "unknownError": "Unknown error"
+    "unknownError": "Unknown error",
+    "acceptTermsPrefix": "I have read the",
+    "acceptTermsLink": "terms and conditions",
+    "acceptTermsSuffix": "and accept them.",
+    "acceptTermsRequired": "Please accept the terms to publish your posting.",
+    "consentPromptPrefix": "Publishing a paid posting is subject to our",
+    "consentPromptSuffix": ".",
+    "consentAcceptAndPublish": "Accept terms and publish"
   },
   "jobType": {
     "MINIJOB": "Mini jobs",

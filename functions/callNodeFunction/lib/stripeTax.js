@@ -76,6 +76,68 @@ export function buildInvoiceCreation(organization) {
 }
 
 /**
+ * Readable label per ProgramType enum value for the payment description.
+ * An unknown value falls through to the raw enum rather than vanishing,
+ * so a program type added later still shows something useful.
+ */
+const PROGRAM_TYPE_LABELS = {
+  COURSES: 'Kurs',
+  EVENTS: 'Event',
+  DEGREES: 'Degree',
+};
+
+// Stripe accepts long descriptions, but the dashboard's payment list is one
+// line — keep the title short enough that the organization stays visible.
+const TITLE_MAX_LENGTH = 120;
+
+function shortenTitle(title) {
+  if (!title) {
+    return null;
+  }
+  return title.length > TITLE_MAX_LENGTH ? `${title.slice(0, TITLE_MAX_LENGTH - 1)}\u2026` : title;
+}
+
+/**
+ * App, then seller, then what was bought, with the kind of offering in
+ * brackets at the end. Missing parts drop out rather than printing null.
+ */
+function buildDescription(app, organizationName, title, typeLabel) {
+  const text = [app, organizationName, shortenTitle(title)].filter(Boolean).join(' ');
+  return typeLabel ? `${text} (${typeLabel})` : text;
+}
+
+/**
+ * Description for a course/event/degree enrollment payment, e.g.
+ * "EduHub opencampus Design Thinking (Kurs)".
+ *
+ * Without a description Stripe prints the PaymentIntent id in the
+ * dashboard's payment list, which is unreadable next to the other
+ * integrations settling on the same account.
+ *
+ * @param {string|null} programType - Program.type (COURSES, EVENTS, DEGREES)
+ * @param {string|null} title - course title
+ * @param {string|null} organizationName - selling organization
+ * @returns {string}
+ */
+export function buildCoursePaymentDescription(programType, title, organizationName) {
+  const label = PROGRAM_TYPE_LABELS[programType] || programType || null;
+  return buildDescription('EduHub', organizationName, title, label);
+}
+
+/**
+ * Description for a StuJo job posting payment, e.g.
+ * "StuJo ACME GmbH Werkstudent Frontend (Stellenanzeige)" — same shape as
+ * the course one so the dashboard's payment list scans consistently.
+ *
+ * @param {string|null} title - posting title
+ * @param {string|null} organizationName - posting organization
+ * @returns {string}
+ */
+export function buildJobPostingPaymentDescription(title, organizationName) {
+  return buildDescription('StuJo', organizationName, title, 'Stellenanzeige');
+}
+
+/**
  * Finds (by email) or creates the Stripe Customer for a checkout, so
  * repeat purchases attach to one customer record and its invoices stay
  * together, instead of customer_creation minting a new one each time.

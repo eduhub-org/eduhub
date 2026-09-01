@@ -3,6 +3,7 @@ import { GraphQLClient, gql } from 'graphql-request';
 
 import {
   buildInvoiceCreation,
+  buildJobPostingPaymentDescription,
   buildPaymentMethodConfig,
   getOrCreateCustomer,
   getOrCreateTaxRate,
@@ -33,6 +34,7 @@ const GET_POSTING = gql`
       status
       organizationId
       contactUserId
+      termsAcceptedAt
       ContactUser {
         email
       }
@@ -104,6 +106,14 @@ const SET_PENDING_PAYMENT = gql`
   }
 `;
 
+const SET_TERMS_ACCEPTED = gql`
+  mutation SetJobPostingTermsAccepted($id: Int!, $at: timestamptz!) {
+    update_JobPosting_by_pk(pk_columns: { id: $id }, _set: { termsAcceptedAt: $at }) {
+      id
+    }
+  }
+`;
+
 const GET_MAIL_TEMPLATE = gql`
   query GetJobMailTemplate($type: MailTemplateType_enum!) {
     MailTemplate(where: { type: { _eq: $type }, courseId: { _is_null: true } }, limit: 1) {
@@ -124,6 +134,8 @@ const INSERT_MAIL_LOG = gql`
     $to: String!
     $bcc: String
     $status: String!
+    $metadata: jsonb
+    $attachments: jsonb
   ) {
     insert_MailLog_one(
       object: {
@@ -133,6 +145,8 @@ const INSERT_MAIL_LOG = gql`
         to: $to
         bcc: $bcc
         status: $status
+        metadata: $metadata
+        attachments: $attachments
       }
     ) {
       id
@@ -144,15 +158,76 @@ const INSERT_MAIL_LOG = gql`
 // price row is missing a duration.
 const DEFAULT_DURATION_DAYS = 56;
 
-export function replaceJobPostingVariables(text, vars) {
+/**
+ * Display labels for JobPostingType. The enum table deliberately keeps labels
+ * in the frontend i18n files, which the mail pipeline cannot reach. Keep in
+ * sync with the identical map in
+ * frontend-nx/apps/edu-hub/lib/stripeJobPosting.ts.
+ */
+const JOB_POSTING_TYPE_LABELS = {
+  MINIJOB: 'Minijob',
+  WORKING_STUDENT: 'Studentenjob',
+  INTERNSHIP: 'Praktikum',
+  STATE_RECOGNITION_INTERNSHIP: 'Anerkennungspraktikum',
+  THESIS: 'Abschlussarbeit',
+  TRAINEE: 'Trainee-Stelle',
+  PERMANENT: 'Festanstellung',
+};
+
+export function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+/**
+ * Drops [#if:Flag] ... [/if:Flag] sections whose flag is falsy and unwraps the
+ * rest, so one template can serve paid, free and credit-funded postings.
+ *
+ * Loops because String.replace does not rescan replaced regions, and the
+ * invoice block nests an inner [#if:InvoiceLink].
+ */
+export function applyConditionalBlocks(text, flags = {}) {
+  const pattern = /\[#if:([A-Za-z]+)\]([\s\S]*?)\[\/if:\1\]/g;
   let result = text || '';
-  for (const [key, value] of Object.entries(vars)) {
-    result = result.split(key).join(value ?? '');
+  for (let pass = 0; pass < 5; pass += 1) {
+    const next = result.replace(pattern, (_match, key, body) => (flags[key] ? body : ''));
+    if (next === result) return next;
+    result = next;
   }
   return result;
 }
 
-export async function sendJobPostingMail(client, logger, templateType, to, vars, bcc = null) {
+/**
+ * Substitutes [Entity:Field] placeholders. Values are HTML-escaped by default
+ * because they are employer-controlled and the result is sent as HTML -- the
+ * admin notice carries the same values into a staff inbox. Subjects are plain
+ * text, so they pass { html: false }.
+ */
+export function replaceJobPostingVariables(text, vars, options = {}) {
+  const { html = true } = options;
+  let result = text || '';
+  for (const [key, value] of Object.entries(vars)) {
+    const replacement = value ?? '';
+    result = result.split(key).join(html ? escapeHtml(replacement) : replacement);
+  }
+  return result;
+}
+
+export async function sendJobPostingMail(
+  client,
+  logger,
+  templateType,
+  to,
+  vars,
+  bcc = null,
+  flags = {},
+  jobPostingId = null,
+  attachments = null
+) {
   try {
     const templateData = await client.request(GET_MAIL_TEMPLATE, { type: templateType });
     const template = templateData?.MailTemplate?.[0];
@@ -161,17 +236,85 @@ export async function sendJobPostingMail(client, logger, templateType, to, vars,
       return;
     }
     await client.request(INSERT_MAIL_LOG, {
-      subject: replaceJobPostingVariables(template.subject, vars),
-      content: replaceJobPostingVariables(template.content, vars),
+      subject: replaceJobPostingVariables(applyConditionalBlocks(template.subject, flags), vars, {
+        html: false,
+      }),
+      content: replaceJobPostingVariables(applyConditionalBlocks(template.content, flags), vars),
       from: template.from || 'noreply@stujo.net',
       to,
       bcc: bcc || template.bcc || null,
       status: 'READY_TO_SEND',
+      // Dedup key for the sweep and the invoice.finalized handler, which can
+      // both queue this same mail later. See hasQueuedJobPostingMail in
+      // frontend-nx/apps/edu-hub/lib/stripeJobPosting.ts.
+      metadata: jobPostingId === null ? null : { type: templateType, jobPostingId },
+      attachments,
     });
   } catch (error) {
+    // Losing the race against the unique dedup index means the mail is already
+    // queued -- that is the guard working, not a failure.
+    if (String(error?.message ?? error).includes('MailLog_job_posting_mail_unique')) {
+      logger.info(`${templateType} already queued for job posting ${jobPostingId}`);
+      return;
+    }
     // Mails must never break the publish flow.
     logger.error(`Failed to queue ${templateType} mail`, { error: error.message });
   }
+}
+
+export const formatJobPostingDate = (date) =>
+  date.toLocaleDateString('de-DE', { year: 'numeric', month: 'long', day: 'numeric' });
+
+export function formatJobPostingAmount(cents, currency) {
+  const symbol = String(currency).toUpperCase() === 'EUR' ? '\u20ac' : String(currency).toUpperCase();
+  return `${(cents / 100).toFixed(2).replace('.', ',')} ${symbol}`;
+}
+
+/**
+ * Builds the mail variables for a job posting.
+ *
+ * The key set must stay identical to buildMailVars in
+ * frontend-nx/apps/edu-hub/lib/stripeJobPosting.ts: the replacer only
+ * substitutes keys it is handed, so a key missing on one path would reach the
+ * employer as literal "[Invoice:Number]" text. There is a parity test for this.
+ *
+ * `invoice` is null for free and credit-funded postings, which have no Invoice
+ * row at all; every [Invoice:*] key is then present but empty and the
+ * [#if:Invoice] block is dropped.
+ */
+export function buildJobPostingMailVars(posting, { expiresAt, publishedAt, paymentDescription, invoice = null }) {
+  const frontendUrl = process.env.STUJO_FRONTEND_URL || process.env.FRONTEND_URL || '';
+  // The job board admin UI lives in the edu-hub app, not the stujo app.
+  const adminAppUrl = process.env.FRONTEND_URL || frontendUrl;
+  const vatRate =
+    invoice && invoice.netTotal > 0
+      ? String(Math.round((invoice.vatTotal / invoice.netTotal) * 100))
+      : '';
+
+  return {
+    '[JobPosting:Title]': posting.title,
+    '[JobPosting:Type]': JOB_POSTING_TYPE_LABELS[posting.type] || posting.type,
+    '[JobPosting:ExpiresAt]': expiresAt ? formatJobPostingDate(expiresAt) : '',
+    '[JobPosting:PublishedAt]': publishedAt ? formatJobPostingDate(publishedAt) : '',
+    '[JobPosting:TermsAcceptedAt]': posting.termsAcceptedAt
+      ? formatJobPostingDate(new Date(posting.termsAcceptedAt))
+      : '',
+    '[JobPosting:DashboardUrl]': `${frontendUrl}/mein-stujo`,
+    '[JobPosting:RepostUrl]': `${frontendUrl}/mein-stujo?repost=${posting.id}`,
+    '[JobPosting:AdminUrl]': `${adminAppUrl}/manage/settings/jobboerse?posting=${posting.id}`,
+    '[Organization:Name]': posting.Organization?.name || '',
+    '[JobPosting:Payment]': paymentDescription || '',
+    '[Invoice:Number]': invoice?.number || '',
+    '[Invoice:Date]': invoice?.date ? formatJobPostingDate(invoice.date) : '',
+    '[Invoice:NetTotal]': invoice ? formatJobPostingAmount(invoice.netTotal, invoice.currency) : '',
+    '[Invoice:VatRate]': vatRate,
+    '[Invoice:VatTotal]': invoice ? formatJobPostingAmount(invoice.vatTotal, invoice.currency) : '',
+    '[Invoice:GrossTotal]': invoice ? formatJobPostingAmount(invoice.grossTotal, invoice.currency) : '',
+    '[Invoice:HostedUrl]': invoice?.hostedUrl || '',
+    '[Invoice:PaymentStatus]': invoice ? (invoice.paid ? 'bezahlt' : 'Zahlung ausstehend') : '',
+    // Absolute: this is read in an email, where a relative path is dead.
+    '[Legal:TermsUrl]': process.env.STUJO_TERMS_URL || `${frontendUrl}/agb`,
+  };
 }
 
 export async function publishAndNotify(client, logger, posting, durationDays) {
@@ -183,30 +326,43 @@ export async function publishAndNotify(client, logger, posting, durationDays) {
     expiresAt: expiresAt.toISOString(),
   });
 
-  const frontendUrl = process.env.STUJO_FRONTEND_URL || process.env.FRONTEND_URL || '';
-  // The job board admin UI lives in the edu-hub app, not the stujo app.
-  const adminAppUrl = process.env.FRONTEND_URL || frontendUrl;
-  const vars = {
-    '[JobPosting:Title]': posting.title,
-    '[JobPosting:Type]': posting.type,
-    '[JobPosting:ExpiresAt]': expiresAt.toLocaleDateString('de-DE', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    }),
-    '[JobPosting:DashboardUrl]': `${frontendUrl}/mein-stujo`,
-    '[JobPosting:RepostUrl]': `${frontendUrl}/mein-stujo?repost=${posting.id}`,
-    '[JobPosting:AdminUrl]': `${adminAppUrl}/manage/settings/jobboerse?posting=${posting.id}`,
-    '[Organization:Name]': posting.Organization?.name || '',
-    '[JobPosting:Payment]': posting.paymentDescription || '',
+  const vars = buildJobPostingMailVars(posting, {
+    expiresAt,
+    publishedAt,
+    paymentDescription: posting.paymentDescription || '',
+  });
+  const flags = {
+    Invoice: false,
+    InvoicePdf: false,
+    InvoiceLink: false,
+    InvoicePending: false,
+    TermsAccepted: Boolean(posting.termsAcceptedAt),
   };
 
   if (posting.ContactUser?.email) {
-    await sendJobPostingMail(client, logger, 'JOB_POSTING_PUBLISHED', posting.ContactUser.email, vars);
+    await sendJobPostingMail(
+      client,
+      logger,
+      'JOB_POSTING_PUBLISHED',
+      posting.ContactUser.email,
+      vars,
+      null,
+      flags,
+      posting.id
+    );
   }
   const adminMail = process.env.STUJO_ADMIN_EMAIL;
   if (adminMail) {
-    await sendJobPostingMail(client, logger, 'JOB_POSTING_ADMIN_NOTICE', adminMail, vars);
+    await sendJobPostingMail(
+      client,
+      logger,
+      'JOB_POSTING_ADMIN_NOTICE',
+      adminMail,
+      vars,
+      null,
+      flags,
+      posting.id
+    );
   }
   return { publishedAt, expiresAt };
 }
@@ -217,7 +373,7 @@ export default async function publishJobPosting(req, logger) {
   try {
     const sessionUserId = req.body?.session_variables?.['x-hasura-user-id'];
     const sessionRole = req.body?.session_variables?.['x-hasura-role'];
-    const { jobPostingId } = req.body.input || req.body;
+    const { jobPostingId, acceptTerms } = req.body.input || req.body;
 
     if (!jobPostingId) {
       return { success: false, error: 'jobPostingId is required', messageKey: 'MISSING_JOB_POSTING_ID' };
@@ -251,6 +407,18 @@ export default async function publishJobPosting(req, logger) {
         error: `Posting in status ${posting.status} cannot be published`,
         messageKey: 'INVALID_STATUS',
       };
+    }
+
+    // Consent is server-controlled: the client may say it was given, but only
+    // this function writes the timestamp, and only once. A client-writable
+    // column could be backdated or forged, which would defeat the point of
+    // recording it at all.
+    if (acceptTerms === true && !posting.termsAcceptedAt) {
+      await client.request(SET_TERMS_ACCEPTED, {
+        id: posting.id,
+        at: new Date().toISOString(),
+      });
+      posting.termsAcceptedAt = new Date().toISOString();
     }
 
     const priceRow = data.JobPostingPrice.find((p) => p.jobPostingType === posting.type);
@@ -292,6 +460,18 @@ export default async function publishJobPosting(req, logger) {
     }
 
     // 3. Stripe checkout.
+    // Only the paid path is gated: this is where a contract is concluded, and
+    // it mirrors `config.requiresPayment && !acceptTerms` in the course
+    // registration modal. A repost of a posting that already carries consent
+    // passes without asking again.
+    if (!posting.termsAcceptedAt) {
+      return {
+        success: false,
+        error: 'Terms must be accepted before publishing a paid posting',
+        messageKey: 'TERMS_NOT_ACCEPTED',
+      };
+    }
+
     const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
     if (!stripeSecretKey) {
       return { success: false, error: 'Stripe secret key not configured', messageKey: 'STRIPE_NOT_CONFIGURED' };
@@ -405,6 +585,12 @@ export default async function publishJobPosting(req, logger) {
         source: 'stujo',
       },
       payment_intent_data: {
+        // Without this Stripe shows the PaymentIntent id in the dashboard's
+        // payment list instead of what was sold.
+        description: buildJobPostingPaymentDescription(
+          posting.title || null,
+          posting.Organization?.name || null
+        ),
         metadata: {
           jobPostingId: String(posting.id),
           organizationId: String(posting.organizationId),

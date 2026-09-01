@@ -24,16 +24,18 @@ type Props = {
 const Home: FC<Props> = ({ portal, jobs, totalCount }) => {
   const t = useTranslations('common');
   return (
-    <Layout portal={portal}>
-      <section className="stujo-hero" style={{ margin: '-1.5rem -1rem 0' }}>
-        <h1 className="stujo-hero-claim">{t('heroTitle')}</h1>
-        <p className="stujo-hero-sub">{t('heroText')}</p>
-        <p className="stujo-hero-sub" style={{ marginTop: '1em', fontWeight: 'bold' }}>
-          {t('heroClaim')}
-        </p>
+    <Layout portal={portal} fullWidthMain>
+      <section className="stujo-hero">
+        <div className="stujo-container">
+          <div className="stujo-hero-content">
+            <h1 className="stujo-hero-claim">{t('heroTitle')}</h1>
+            <p className="stujo-hero-sub">{t('heroText')}</p>
+            <p className="stujo-hero-sub stujo-hero-tagline">{t('heroClaim')}</p>
+          </div>
+        </div>
       </section>
 
-      <section className="stujo-landing-cols">
+      <section className="stujo-container stujo-landing-cols">
         <div>
           <h2 className="stujo-landing-head">{t('latestOffers').toUpperCase()}</h2>
           {jobs.map((job) => (

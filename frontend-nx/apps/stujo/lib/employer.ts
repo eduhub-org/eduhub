@@ -140,8 +140,8 @@ export const DELETE_DRAFT_POSTING = gql`
 `;
 
 export const PUBLISH_JOB_POSTING_ACTION = gql`
-  mutation PublishJobPostingAction($jobPostingId: Int!) {
-    publishJobPosting(jobPostingId: $jobPostingId) {
+  mutation PublishJobPostingAction($jobPostingId: Int!, $acceptTerms: Boolean) {
+    publishJobPosting(jobPostingId: $jobPostingId, acceptTerms: $acceptTerms) {
       success
       published
       checkoutUrl

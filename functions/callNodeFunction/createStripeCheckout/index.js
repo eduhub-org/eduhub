@@ -6,6 +6,7 @@ import {
   buildInvoiceCreation,
   buildPaymentMethodConfig,
   getOrCreateCustomer,
+  buildCoursePaymentDescription,
 } from '../lib/stripeTax.js';
 
 const GET_COURSE_AND_ADDONS = `
@@ -18,6 +19,7 @@ const GET_COURSE_AND_ADDONS = `
       stripeProductId
       stripePriceId
       Program {
+        type
         Organization {
           id
           name
@@ -528,6 +530,13 @@ export default async function createStripeCheckout(req, logger) {
         })()
       },
       payment_intent_data: {
+        // Without this Stripe shows the PaymentIntent id in the dashboard's
+        // payment list instead of what was sold.
+        description: buildCoursePaymentDescription(
+          course.Program?.type || null,
+          course.title || null,
+          organization?.name || null
+        ),
         metadata: {
           courseId: String(courseId),
           courseName: course.title || '',

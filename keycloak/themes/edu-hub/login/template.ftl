@@ -29,8 +29,8 @@
             <script src="${url.resourcesPath}/${script}" type="text/javascript"></script>
         </#list>
     </#if>
-    <#-- Inline brand bootstrap so campus skins still apply if the external
-         theme JS is served from a stale Keycloak resource cache. -->
+    <#-- Inline brand bootstrap so the co-branding still applies if the
+         external theme JS is served from a stale Keycloak resource cache. -->
     <script type="text/javascript">
       (function () {
         try {
@@ -73,10 +73,18 @@
                 <div class="navbar-logo-wrapper">
                     <img class="navbar-logo" src="${url.resourcesPath}/img/edu_logo.svg">
                     <img class="navbar-logo-text" src="${url.resourcesPath}/img/logo_text.svg">
-                    <#-- StuJo / campus variants, toggled by js/stujo-brand.js (hidden by default) -->
-                    <img class="navbar-logo-stujo" style="display:none" src="${url.resourcesPath}/img/stujo_header_logo.png" alt="StuJo">
-                    <img class="navbar-logo-stujo-portal navbar-logo-stujo-haw-kiel" style="display:none" src="${url.resourcesPath}/img/stujo_logo_haw_kiel.png" alt="HAW Kiel">
-                    <img class="navbar-logo-stujo-portal navbar-logo-stujo-flensburg" style="display:none" src="${url.resourcesPath}/img/stujo_logo_flensburg.png" alt="Campus Flensburg">
+                    <#-- Co-brand slot: the EduHub lockup above always stays, the
+                         portal mark is added next to it so people recognise that
+                         StuJo runs on their EduHub account. Revealed by
+                         css/stujo-portals.css via js/stujo-portal-brand.js. -->
+                    <div class="navbar-cobrand">
+                        <span class="navbar-cobrand-divider"></span>
+                        <span class="navbar-cobrand-plate">
+                            <img class="navbar-cobrand-logo navbar-cobrand-stujo" src="${url.resourcesPath}/img/stujo_header_logo.png" alt="StuJo">
+                            <img class="navbar-cobrand-logo navbar-cobrand-haw-kiel" src="${url.resourcesPath}/img/stujo_logo_haw_kiel.png" alt="StuJo HAW Kiel">
+                            <img class="navbar-cobrand-logo navbar-cobrand-flensburg" src="${url.resourcesPath}/img/stujo_logo_flensburg.png" alt="StuJo Campus Flensburg">
+                        </span>
+                    </div>
                 </div>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="true" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -169,6 +177,10 @@
                                 <span class="${properties.kcAlertTitleClass!}">${kcSanitize(message.summary)?no_esc}</span>
                         </div>
                     </#if>
+
+                    <#-- StuJo and EduHub share one account; say so before people
+                         try to register a second time. Hidden for EduHub itself. -->
+                    <div class="kc-cobrand-note">${msg("cobrandAccountNote")}</div>
 
                     <#nested "form">
 

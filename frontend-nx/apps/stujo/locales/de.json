@@ -41,7 +41,15 @@
     "footerLinksHead": "Hinweise",
     "footerPrices": "Leistungen und Preise",
     "footerUniversityPartners": "Hochschulpartner",
-    "footerPartners": "Gefördert durch"
+    "footerPartners": "Gefördert durch",
+    "Layout": {
+      "home": "Startseite",
+      "switch_to_german": "Auf Deutsch wechseln",
+      "switch_to_english": "Auf Englisch wechseln"
+    },
+    "JobList": {
+      "search_placeholder": "Suchbegriff, z. B. Marketing, Software, …"
+    }
   },
   "meinStujo": {
     "title": "Mein StuJo",
@@ -79,7 +87,14 @@
     "publishNetworkError": "Veröffentlichen fehlgeschlagen: Netzwerkfehler.",
     "archiveFailed": "Archivieren fehlgeschlagen: {error}",
     "archiveNetworkError": "Archivieren fehlgeschlagen: Netzwerkfehler.",
-    "unknownError": "Unbekannter Fehler"
+    "unknownError": "Unbekannter Fehler",
+    "acceptTermsPrefix": "Ich habe die",
+    "acceptTermsLink": "Allgemeinen Geschäftsbedingungen",
+    "acceptTermsSuffix": "gelesen und akzeptiere sie.",
+    "acceptTermsRequired": "Bitte akzeptiere die AGB, um Dein Angebot zu veröffentlichen.",
+    "consentPromptPrefix": "Für die kostenpflichtige Veröffentlichung gelten unsere",
+    "consentPromptSuffix": ".",
+    "consentAcceptAndPublish": "AGB akzeptieren und veröffentlichen"
   },
   "jobType": {
     "MINIJOB": "Minijobs",
