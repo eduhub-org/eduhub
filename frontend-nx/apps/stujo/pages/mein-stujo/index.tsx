@@ -205,22 +205,18 @@ const MeinStujo: FC<Props> = ({ portal }) => {
         <div className="stujo-notice">
           <label className="stujo-consent">
             <span>
-              Für die kostenpflichtige Veröffentlichung gelten unsere{' '}
-              <a
-                href={portal.termsUrl || '/agb'}
-                target="_blank"
-                rel="noreferrer"
-              >
-                Allgemeinen Geschäftsbedingungen
+              {t('consentPromptPrefix')}{' '}
+              <a href={portal.termsUrl || '/agb'} target="_blank" rel="noreferrer">
+                {t('acceptTermsLink')}
               </a>
-              .
+              {t('consentPromptSuffix')}
             </span>
           </label>
           <button
             className="stujo-btn stujo-btn--accent"
             onClick={() => handlePublish(consentNeededFor, true)}
           >
-            AGB akzeptieren und veröffentlichen
+            {t('consentAcceptAndPublish')}
           </button>
         </div>
       )}

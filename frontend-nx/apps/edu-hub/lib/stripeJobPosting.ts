@@ -140,6 +140,7 @@ const GET_INVOICE_BY_STRIPE_ID = gql`
       id
       jobPostingId
       invoiceNumber
+      invoiceDate
       netTotal
       vatTotal
       grossTotal
@@ -267,6 +268,9 @@ function formatDate(date: Date): string {
 /** Invoice figures the confirmation mail renders; null on free/credit postings. */
 type InvoiceMailData = {
   number: string;
+  /** When the invoice was raised -- not when this mail is sent. The two differ
+   *  on the invoice.finalized and sweep paths, and the PDF shows this one. */
+  date: Date;
   hostedUrl: string | null;
   netTotal: number;
   vatTotal: number;
@@ -334,6 +338,12 @@ export async function hasQueuedJobPostingMail(
   return MailLog.length > 0;
 }
 
+/** True for a violation of MailLog_job_posting_mail_unique. */
+function isDuplicateMailError(error: unknown): boolean {
+  const message = error instanceof Error ? error.message : String(error);
+  return message.includes('MailLog_job_posting_mail_unique');
+}
+
 async function queueMail(
   client: GraphQLClient,
   templateType: string,
@@ -363,6 +373,13 @@ async function queueMail(
       metadata: jobPostingId === null ? null : { type: templateType, jobPostingId },
     });
   } catch (error) {
+    // The unique index on the job posting dedup key is the real guard against
+    // two deliveries racing past hasQueuedJobPostingMail. Losing that race is
+    // the mechanism working, not a failure.
+    if (isDuplicateMailError(error)) {
+      console.info(`${templateType} already queued for job posting ${jobPostingId}`);
+      return;
+    }
     // Mails must never fail the webhook.
     console.error(`Failed to queue ${templateType} mail:`, error);
   }
@@ -381,6 +398,10 @@ function buildMailVars(
   invoice: InvoiceMailData | null = null
 ): Record<string, string> {
   const frontendUrl = process.env.STUJO_FRONTEND_URL || process.env.FRONTEND_URL || '';
+  // The job board admin UI lives in the edu-hub app, not the stujo app, and the
+  // page is pages/manage/settings/jobboerse.tsx. Must match the AdminUrl built
+  // in publishJobPosting/index.js.
+  const adminAppUrl = process.env.FRONTEND_URL || frontendUrl;
   const vatRate =
     invoice && invoice.netTotal > 0 ? String(Math.round((invoice.vatTotal / invoice.netTotal) * 100)) : '';
   return {
@@ -393,11 +414,11 @@ function buildMailVars(
       : '',
     '[JobPosting:DashboardUrl]': `${frontendUrl}/mein-stujo`,
     '[JobPosting:RepostUrl]': `${frontendUrl}/mein-stujo?repost=${posting.id}`,
-    '[JobPosting:AdminUrl]': `${frontendUrl}/manage/jobboerse?posting=${posting.id}`,
+    '[JobPosting:AdminUrl]': `${adminAppUrl}/manage/settings/jobboerse?posting=${posting.id}`,
     '[Organization:Name]': posting.Organization?.name || '',
     '[JobPosting:Payment]': paymentDescription,
     '[Invoice:Number]': invoice?.number || '',
-    '[Invoice:Date]': invoice ? formatDate(new Date()) : '',
+    '[Invoice:Date]': invoice?.date ? formatDate(invoice.date) : '',
     '[Invoice:NetTotal]': invoice ? formatAmount(invoice.netTotal, invoice.currency) : '',
     '[Invoice:VatRate]': vatRate,
     '[Invoice:VatTotal]': invoice ? formatAmount(invoice.vatTotal, invoice.currency) : '',
@@ -561,6 +582,7 @@ export async function handleJobPostingCheckoutCompleted(
     // The document number is what the employer sees on the attached PDF; fall
     // back to our own key while Stripe has not finalized the invoice yet.
     number: invoiceDoc.number ?? invoiceNumber,
+    date: new Date(),
     hostedUrl: invoiceDoc.hostedUrl,
     netTotal,
     vatTotal,
@@ -716,6 +738,7 @@ export async function handleJobPostingInvoiceFinalized(
       id: number;
       jobPostingId: number | null;
       invoiceNumber: string;
+      invoiceDate: string | null;
       netTotal: number;
       vatTotal: number;
       grossTotal: number;
@@ -749,6 +772,7 @@ export async function handleJobPostingInvoiceFinalized(
     posting.expiresAt ? new Date(posting.expiresAt) : null,
     {
       number: invoiceDoc.number ?? row.invoiceNumber,
+      date: row.invoiceDate ? new Date(row.invoiceDate) : new Date(),
       hostedUrl: invoiceDoc.hosted_invoice_url ?? null,
       netTotal: row.netTotal,
       vatTotal: row.vatTotal,

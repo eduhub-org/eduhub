@@ -87,7 +87,14 @@
     "publishNetworkError": "Publishing failed: network error.",
     "archiveFailed": "Archiving failed: {error}",
     "archiveNetworkError": "Archiving failed: network error.",
-    "unknownError": "Unknown error"
+    "unknownError": "Unknown error",
+    "acceptTermsPrefix": "I have read the",
+    "acceptTermsLink": "terms and conditions",
+    "acceptTermsSuffix": "and accept them.",
+    "acceptTermsRequired": "Please accept the terms to publish your posting.",
+    "consentPromptPrefix": "Publishing a paid posting is subject to our",
+    "consentPromptSuffix": ".",
+    "consentAcceptAndPublish": "Accept terms and publish"
   },
   "jobType": {
     "MINIJOB": "Mini jobs",

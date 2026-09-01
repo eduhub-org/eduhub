@@ -47,6 +47,15 @@ function isAllowedAttachmentUrl(rawUrl) {
   );
 }
 
+/** Hostname of an attachment URL, for logs that must not carry the full URL. */
+function attachmentHost(rawUrl) {
+  try {
+    return new URL(rawUrl).hostname;
+  } catch {
+    return '(unparseable)';
+  }
+}
+
 function safeAttachmentFilename(name, fallback) {
   const cleaned = String(name || '')
     .replace(/[^A-Za-z0-9._-]+/g, '_')
@@ -74,7 +83,7 @@ async function resolveAttachments(descriptors, mailId) {
   for (const [index, descriptor] of descriptors.entries()) {
     const url = descriptor && descriptor.url;
     if (!isAllowedAttachmentUrl(url)) {
-      console.error('Attachment URL rejected', { mailId, index, url });
+      console.error('Attachment URL rejected', { mailId, index, host: attachmentHost(url) });
       continue;
     }
 
@@ -117,10 +126,12 @@ async function resolveAttachments(descriptors, mailId) {
     }
 
     if (lastError) {
+      // Host only: a Stripe invoice_pdf URL is unauthenticated and long-lived,
+      // so the full URL in a log line is a durable way to reach the document.
       console.error('Attachment fetch failed, sending mail without it', {
         mailId,
         index,
-        url,
+        host: attachmentHost(url),
         error: lastError.message,
       });
     }

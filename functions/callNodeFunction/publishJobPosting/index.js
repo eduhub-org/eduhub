@@ -250,6 +250,12 @@ export async function sendJobPostingMail(
       attachments,
     });
   } catch (error) {
+    // Losing the race against the unique dedup index means the mail is already
+    // queued -- that is the guard working, not a failure.
+    if (String(error?.message ?? error).includes('MailLog_job_posting_mail_unique')) {
+      logger.info(`${templateType} already queued for job posting ${jobPostingId}`);
+      return;
+    }
     // Mails must never break the publish flow.
     logger.error(`Failed to queue ${templateType} mail`, { error: error.message });
   }
@@ -298,7 +304,7 @@ export function buildJobPostingMailVars(posting, { expiresAt, publishedAt, payme
     '[Organization:Name]': posting.Organization?.name || '',
     '[JobPosting:Payment]': paymentDescription || '',
     '[Invoice:Number]': invoice?.number || '',
-    '[Invoice:Date]': invoice ? formatJobPostingDate(new Date()) : '',
+    '[Invoice:Date]': invoice?.date ? formatJobPostingDate(invoice.date) : '',
     '[Invoice:NetTotal]': invoice ? formatJobPostingAmount(invoice.netTotal, invoice.currency) : '',
     '[Invoice:VatRate]': vatRate,
     '[Invoice:VatTotal]': invoice ? formatJobPostingAmount(invoice.vatTotal, invoice.currency) : '',

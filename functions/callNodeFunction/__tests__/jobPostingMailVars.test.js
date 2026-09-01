@@ -10,6 +10,7 @@ const posting = {
 
 const paidInvoice = {
   number: 'VGD1VIPO-0001',
+  date: new Date('2026-08-29'),
   hostedUrl: 'https://invoice.stripe.com/i/x',
   netTotal: 50,
   vatTotal: 10,
@@ -58,6 +59,39 @@ describe('buildJobPostingMailVars', () => {
     expect(paid['[Invoice:VatRate]']).toBe('20');
     expect(paid['[Invoice:GrossTotal]']).toBe('0,60 €');
     expect(paid['[Invoice:PaymentStatus]']).toBe('bezahlt');
+  });
+
+  it('renders the invoice date, not the moment the mail is sent', () => {
+    // On the invoice.finalized and sweep paths the mail is queued minutes to
+    // days after the invoice was raised, and the PDF shows the invoice date.
+    const vars = buildJobPostingMailVars(posting, {
+      expiresAt: null,
+      publishedAt: null,
+      paymentDescription: '',
+      invoice: { ...paidInvoice, date: new Date('2026-01-15') },
+    });
+    expect(vars['[Invoice:Date]']).toBe('15. Januar 2026');
+  });
+
+  it('leaves the invoice date empty rather than throwing when it is missing', () => {
+    // This runs inside the publish action; a throw here would fail the publish.
+    const { date, ...noDate } = paidInvoice;
+    expect(() =>
+      buildJobPostingMailVars(posting, {
+        expiresAt: null,
+        publishedAt: null,
+        paymentDescription: '',
+        invoice: noDate,
+      })
+    ).not.toThrow();
+    const vars = buildJobPostingMailVars(posting, {
+      expiresAt: null,
+      publishedAt: null,
+      paymentDescription: '',
+      invoice: noDate,
+    });
+    expect(vars['[Invoice:Date]']).toBe('');
+    expect(vars['[Invoice:Number]']).toBe('VGD1VIPO-0001');
   });
 
   it('never divides by zero when the net total is zero', () => {

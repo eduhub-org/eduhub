@@ -256,7 +256,7 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
   const publish = async () => {
     setErrorMessage(null);
     if (requiresConsent && !acceptTerms) {
-      setErrorMessage('Bitte akzeptiere die AGB, um Dein Angebot zu veröffentlichen.');
+      setErrorMessage(t('acceptTermsRequired'));
       return;
     }
     const id = savedId ?? (await saveDraft());
@@ -511,11 +511,11 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
                 onChange={(event) => setAcceptTerms(event.target.checked)}
               />
               <span>
-                Ich habe die{' '}
+                {t('acceptTermsPrefix')}{' '}
                 <a href={termsUrl} target="_blank" rel="noreferrer">
-                  Allgemeinen Geschäftsbedingungen
+                  {t('acceptTermsLink')}
                 </a>{' '}
-                gelesen und akzeptiere sie.
+                {t('acceptTermsSuffix')}
               </span>
             </label>
           )}

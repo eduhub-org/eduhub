@@ -34,6 +34,7 @@ const posting = {
 
 const invoiceWith = (hostedUrl) => ({
   number: 'VGD1VIPO-0001',
+  date: new Date('2026-08-29'),
   hostedUrl,
   netTotal: 50,
   vatTotal: 10,
