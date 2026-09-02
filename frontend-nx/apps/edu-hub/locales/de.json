@@ -2629,7 +2629,12 @@
       "PROJECT_DEADLINE_REMINDER": "Erinnerung Projektabgabe",
       "SESSION_RESCHEDULED": "Termin verschoben",
       "PAYMENT_RECEIPT": "Zahlungsbestätigung",
-      "COURSE_CONTINUATION_INQUIRY": "Nachfrage zur Kursfortsetzung"
+      "COURSE_CONTINUATION_INQUIRY": "Nachfrage zur Kursfortsetzung",
+      "JOB_POSTING_PUBLISHED": "Stellenanzeige veröffentlicht",
+      "JOB_POSTING_EXPIRED": "Stellenanzeige abgelaufen",
+      "JOB_POSTING_ADMIN_NOTICE": "Stellenanzeige: Hinweis an Admins",
+      "JOB_POSTING_PAYMENT_FAILED": "Stellenanzeige: Zahlung fehlgeschlagen",
+      "JOB_ALERT": "Job-Benachrichtigung"
     },
     "placeholders": {
       "subject": "E-Mail-Betreff eingeben...",
@@ -2677,7 +2682,12 @@
       "PROJECT_DEADLINE_REMINDER": "Gesendet 48 Stunden vor dem Abgabetermin eines Projekts",
       "SESSION_RESCHEDULED": "Gesendet an Teilnehmende, wenn sich Datum oder Zeit eines Termins ändert",
       "PAYMENT_RECEIPT": "Gesendet, wenn eine Rechnung für eine Kurs- oder Event-Anmeldung bezahlt wurde",
-      "COURSE_CONTINUATION_INQUIRY": "Gesendet, wenn Teilnehmende so viele Termine versäumt haben, wie für den Kurs maximal erlaubt sind – mit der Bitte, keine weiteren Termine zu verpassen oder kurz Bescheid zu geben, falls sie nicht mehr teilnehmen möchten"
+      "COURSE_CONTINUATION_INQUIRY": "Gesendet, wenn Teilnehmende so viele Termine versäumt haben, wie für den Kurs maximal erlaubt sind – mit der Bitte, keine weiteren Termine zu verpassen oder kurz Bescheid zu geben, falls sie nicht mehr teilnehmen möchten",
+      "JOB_POSTING_PUBLISHED": "Geht an den Arbeitgeber, sobald die Anzeige online ist. Enthält den Zahlungsbeleg, die Rechnungsnummer und die Rechnung als PDF-Anhang. Der Abschnitt zwischen [#if:Invoice] und [/if:Invoice] entfällt bei kostenlosen und über Kontingent bezahlten Anzeigen; [#if:InvoicePdf] nur, wenn das PDF wirklich anhängt.",
+      "JOB_POSTING_EXPIRED": "Geht an den Arbeitgeber, wenn die Laufzeit der Anzeige endet, mit Link zum erneuten Schalten",
+      "JOB_POSTING_ADMIN_NOTICE": "Geht an die Plattform-Admins, wenn eine Anzeige veröffentlicht wurde (Prüfung im Nachhinein)",
+      "JOB_POSTING_PAYMENT_FAILED": "Geht an den Arbeitgeber, wenn eine verzögerte Zahlung (SEPA) fehlschlägt und die Anzeige offline genommen wird",
+      "JOB_ALERT": "Geht an Abonnenten mit neuen Anzeigen, die zu ihrem Suchprofil passen"
     },
     "delete_confirmation": "Bist du sicher, dass du die E-Mail-Vorlage „{title}“ löschen möchtest?",
     "unknown_trigger": "Unbekannter Auslöser-Typ",
@@ -2687,7 +2697,8 @@
       "projects": "Projekt-Benachrichtigungen",
       "sessions": "Termin-Erinnerungen",
       "system": "System-E-Mails",
-      "other": "Sonstige"
+      "other": "Sonstige",
+      "jobboard": "Stellenbörse"
     },
     "category_coming_soon": "Bald",
     "categories_coming_soon_explanation": {}

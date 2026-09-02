@@ -4,13 +4,20 @@
  * get a category here; anything unmapped falls back to 'other' so it never
  * disappears from the UI.
  */
-export type EmailTemplateCategory = 'application' | 'projects' | 'sessions' | 'system' | 'other';
+export type EmailTemplateCategory =
+  | 'application'
+  | 'projects'
+  | 'sessions'
+  | 'jobboard'
+  | 'system'
+  | 'other';
 
 /** Categories shown as tabs, in display order ('other' is appended only when present). */
 export const EMAIL_TEMPLATE_CATEGORIES: EmailTemplateCategory[] = [
   'application',
   'projects',
   'sessions',
+  'jobboard',
   'system',
 ];
 
@@ -54,6 +61,13 @@ const CATEGORY_BY_TYPE: Record<string, EmailTemplateCategory> = {
   // System / account
   USER_CREATED: 'system',
   ORGANIZER_ADDED: 'system',
+  // StuJo job board (the postings are sold through the same platform, but the
+  // mails go to employers rather than participants)
+  JOB_POSTING_PUBLISHED: 'jobboard',
+  JOB_POSTING_EXPIRED: 'jobboard',
+  JOB_POSTING_ADMIN_NOTICE: 'jobboard',
+  JOB_POSTING_PAYMENT_FAILED: 'jobboard',
+  JOB_ALERT: 'jobboard',
 };
 
 export const getEmailTemplateCategory = (type: string): EmailTemplateCategory =>

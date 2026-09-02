@@ -681,6 +681,48 @@ a:focus {
   margin-top: 0.5rem;
 }
 
+/* Consent checkbox at the point of purchase. Not .stujo-field: that is a
+   column layout and forces bold labels. */
+/* Legal documents (AGB). Narrow measure and generous spacing so long clauses
+   stay readable. */
+.stujo-legal {
+  max-width: 46em;
+  line-height: 1.6;
+}
+
+.stujo-legal h2 {
+  margin-top: 2em;
+  margin-bottom: 0.4em;
+  font-size: 1.1rem;
+}
+
+.stujo-legal p {
+  margin: 0 0 0.9em;
+}
+
+.stujo-legal-date {
+  margin-top: 3em;
+  font-size: 0.85em;
+  opacity: 0.7;
+}
+
+.stujo-consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  margin: 1rem 0 0;
+  max-width: 30rem;
+  font-size: 0.9em;
+  line-height: 1.4;
+}
+
+.stujo-consent input[type='checkbox'] {
+  margin-top: 0.2rem;
+  flex-shrink: 0;
+  width: 1rem;
+  height: 1rem;
+}
+
 .stujo-order-box {
   border: 2px solid var(--stujo-border);
   padding: 1.25rem;
