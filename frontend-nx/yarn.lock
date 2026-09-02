@@ -6797,15 +6797,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:^1.18.0":
-  version: 1.18.1
-  resolution: "axios@npm:1.18.1"
+"axios@npm:^1.20.0":
+  version: 1.20.0
+  resolution: "axios@npm:1.20.0"
   dependencies:
     follow-redirects: ^1.16.0
-    form-data: ^4.0.5
+    form-data: ^4.0.6
     https-proxy-agent: ^5.0.1
     proxy-from-env: ^2.1.0
-  checksum: e7a0c1f73f3d17ef5c5b09259b6aae0c1d841fe3b4ef76964ac5aca97b1cf30724cdedb9a514ccc435682dc690f4486580c5babfe897fbcbd500627bd2e86f6d
+  checksum: 58ff916938e317352e0c3483496a4609fd528da4823a8580969821748284bea2add069a39f2285a161020ce0886f33a982a162ebb49b5403c51a6977a1d50627
   languageName: node
   linkType: hard
 
@@ -16184,7 +16184,7 @@ __metadata:
     "@types/uuid": ^10.0.0
     apollo: ^2.34.0
     autoprefixer: ^10.4.20
-    axios: ^1.18.0
+    axios: ^1.20.0
     babel-jest: 29.7.0
     clsx: ^2.1.1
     cookie: ^0.7.0
@@ -16228,7 +16228,7 @@ __metadata:
     remark-gfm: ^4.0.0
     semantic-release: ^21.1.2
     sharp: ^0.35.4
-    stripe: ^22.6.0
+    stripe: ^22.6.1
     swiper: ^12.1.2
     swr: ^2.4.2
     tailwind-merge: ^2.5.4
@@ -16953,16 +16953,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss-selector-parser@npm:^6.0.10, postcss-selector-parser@npm:^6.1.1":
-  version: 6.1.2
-  resolution: "postcss-selector-parser@npm:6.1.2"
-  dependencies:
-    cssesc: ^3.0.0
-    util-deprecate: ^1.0.2
-  checksum: ce9440fc42a5419d103f4c7c1847cb75488f3ac9cbe81093b408ee9701193a509f664b4d10a2b4d82c694ee7495e022f8f482d254f92b7ffd9ed9dea696c6f84
-  languageName: node
-  linkType: hard
-
 "postcss-selector-parser@npm:^6.0.11":
   version: 6.0.11
   resolution: "postcss-selector-parser@npm:6.0.11"
@@ -16970,6 +16960,16 @@ __metadata:
     cssesc: ^3.0.0
     util-deprecate: ^1.0.2
   checksum: 0b01aa9c2d2c8dbeb51e9b204796b678284be9823abc8d6d40a8b16d4149514e922c264a8ed4deb4d6dbced564b9be390f5942c058582d8656351516d6c49cde
+  languageName: node
+  linkType: hard
+
+"postcss-selector-parser@npm:^6.1.4":
+  version: 6.1.4
+  resolution: "postcss-selector-parser@npm:6.1.4"
+  dependencies:
+    cssesc: ^3.0.0
+    util-deprecate: ^1.0.2
+  checksum: 6dac8996778480a4cd274d2588cccfd989f38c40853b7b83dc31c90ce6ba32e1e1b89811ad3beafdee72887fac9ddf9f1fca3876dc17467eed62d6a825d54bfb
   languageName: node
   linkType: hard
 
@@ -19740,15 +19740,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"stripe@npm:^22.6.0":
-  version: 22.6.0
-  resolution: "stripe@npm:22.6.0"
+"stripe@npm:^22.6.1":
+  version: 22.6.1
+  resolution: "stripe@npm:22.6.1"
   peerDependencies:
     "@types/node": ">=18"
   peerDependenciesMeta:
     "@types/node":
       optional: true
-  checksum: b72e7753bcb388d0752fb14b708638c07a7f2178d45ac7bf214a27e2585030a3ac6e7338901bd8836ec23e2d266353f229360d13c50591de82ac39ba4ee76b00
+  checksum: eee2c42227846d2e54f058438d5b6b30796fa7fe6e60d6332a32dfffee7f2183b72f10c1b3d517e5e2a3f4f5bec86343fca797378604f7b3d3e8e4a490ea6c5f
   languageName: node
   linkType: hard
 
