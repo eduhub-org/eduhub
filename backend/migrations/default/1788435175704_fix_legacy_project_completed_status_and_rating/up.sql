@@ -20,7 +20,7 @@
 --   "COMPLETED" in the UI for months.
 --
 -- Production state before this migration (all rows record-derived, unpublished)
---   COMPLETED + UNRATED   441, of which 433 created before 2026-04-01
+--   COMPLETED + UNRATED   441, the large majority created before 2026-05-01
 --   COMPLETED + FAILED     48
 --
 -- Reclassification
@@ -28,17 +28,17 @@
 --                                 INCOMPLETE + FAILED is the pairing the review
 --                                 dialog itself writes for a rejection.
 --   UNRATED, created before      -> rating PASSED, status stays COMPLETED. The
---   2026-04-01                    summer semester started on 2026-04-01, so
+--   2026-05-01                    summer semester started on 2026-05-01, so
 --                                 these submissions belong to semesters that
 --                                 were already closed out and reviewed in the
 --                                 legacy system even where no rating was ever
 --                                 recorded (196 enrollments already hold an
 --                                 achievement certificate earned through them).
 --   UNRATED, created on or       -> SUBMITTED (step 5), i.e. back into the
---   after 2026-04-01              instructor review queue: the running semester
+--   after 2026-05-01              instructor review queue: the running semester
 --                                 is still open, so these reviews are genuinely
---                                 pending. In production the 8 affected rows
---                                 were reopened ahead of this migration by hand
+--                                 pending. In production the affected rows were
+--                                 reopened ahead of this migration by hand
 --                                 so they could also carry the submittedAt /
 --                                 submittedBy of the original legacy upload,
 --                                 which this migration cannot reconstruct for
@@ -115,7 +115,7 @@ UPDATE "public"."Project" p
    AND b."status" = 'COMPLETED'
    AND b."rating" = 'UNRATED'
    AND p."legacyAchievementRecordId" IS NOT NULL
-   AND p."created_at" < (timestamp '2026-04-01 00:00' AT TIME ZONE 'Europe/Berlin')
+   AND p."created_at" < (timestamp '2026-05-01 00:00' AT TIME ZONE 'Europe/Berlin')
    AND p."status" = 'COMPLETED';
 
 -- -----------------------------------------------------------------------------
