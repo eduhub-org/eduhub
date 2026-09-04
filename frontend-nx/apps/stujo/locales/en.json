@@ -49,13 +49,24 @@
     },
     "JobList": {
       "search_placeholder": "Search term, e.g. marketing, software, …"
-    }
+    },
+    "dropdown_selector": {
+      "create_option": "Create new entry \"{option}\"",
+      "none_option": "-- None --",
+      "name_already_exists": "An entry with this name already exists."
+    },
+    "notification_snackbar": {
+      "saved": "Saved"
+    },
+    "error": "An error occurred",
+    "close": "Close",
+    "ok": "OK"
   },
   "meinStujo": {
     "title": "My StuJo",
     "newOffer": "+ New offer",
     "checkingLogin": "Checking sign-in …",
-    "noOrganization": "No company with job management is assigned to your account yet. Please contact {contact}.",
+    "noOrganization": "No company with job management is assigned to your account yet. Pick the company you want to publish job offers for in the next step.",
     "organizationLabel": "Company",
     "defaultContact": "the StuJo team",
     "loading": "Loading …",
@@ -94,7 +105,33 @@
     "acceptTermsRequired": "Please accept the terms to publish your posting.",
     "consentPromptPrefix": "Publishing a paid posting is subject to our",
     "consentPromptSuffix": ".",
-    "consentAcceptAndPublish": "Accept terms and publish"
+    "consentAcceptAndPublish": "Accept terms and publish",
+    "claimCta": "Select a company",
+    "claimAddAnother": "Add another company",
+    "claimTitle": "Select a company",
+    "claimIntro": "Pick the company you want to publish job offers for. If it is not on StuJo yet, just type its name and create it.",
+    "claimExistingIntro": "You already manage the job offers of {organizations}. Here you can add another company.",
+    "claimSignedOutIntro": "To publish job offers you need an account at opencampus.sh – the same account as in EduHub. If you already have one, just sign in with it.",
+    "claimRegister": "Create an account",
+    "claimLogin": "Sign in",
+    "claimOrganizationLabel": "Company",
+    "claimOrganizationPlaceholder": "Company name",
+    "claimWillCreate": "“{name}” will be created.",
+    "claimDeclaration": "I am authorized to publish job offers on behalf of this company.",
+    "claimDeclarationRequired": "Please confirm that you may act on behalf of this company.",
+    "claimPickOrganization": "Please select a company or enter a name.",
+    "claimSubmit": "Take over job management",
+    "claimCancel": "Cancel",
+    "claimSettingUpAccess": "Setting up your access …",
+    "claimFailed": "Your access could not be set up: {error}",
+    "claimNetworkError": "Your access could not be set up. Please try again later.",
+    "claimAlreadyClaimedByName": "{name} already manages the job offers of {organization}. We can ask whether you may join.",
+    "claimAlreadyClaimed": "Someone else already manages the job offers of {organization}. We can ask whether you may join.",
+    "claimRequestAccess": "Request access",
+    "claimContactFallback": "Stuck? Write to us at {contact}.",
+    "accessRequestSent": "We have passed your request on. You will hear directly from the colleagues who manage the job offers.",
+    "accessRequestAlreadySent": "You already have a pending request for this company. Please wait for a reply.",
+    "accessRequestFailed": "The request could not be sent: {error}"
   },
   "jobType": {
     "MINIJOB": "Mini jobs",
