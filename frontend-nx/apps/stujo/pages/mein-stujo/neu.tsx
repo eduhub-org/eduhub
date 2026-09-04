@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from '@apollo/client';
 import type { GetServerSideProps } from 'next';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { signIn, useSession } from 'next-auth/react';
 import { FC, useEffect, useMemo, useState } from 'react';
@@ -327,7 +328,7 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
   if (sessionStatus !== 'authenticated' || orgsLoading) {
     return (
       <Layout portal={portal}>
-        <p className="stujo-muted">Anmeldung wird geprüft …</p>
+        <p className="stujo-muted">{t('checkingLogin')}</p>
       </Layout>
     );
   }
@@ -335,10 +336,18 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
   if (!organization) {
     return (
       <Layout portal={portal}>
-        <h2>Neues Stellenangebot</h2>
+        <h1>{t('newOffer')}</h1>
+        <p style={{ maxWidth: '40em' }}>{t('noOrganization')}</p>
         <p>
-          Deinem Konto ist noch kein Unternehmen mit Stellen-Verwaltung zugeordnet. Bitte wende
-          Dich an {portal.contactEmail || 'das StuJo-Team'}.
+          <Link
+            href="/mein-stujo/unternehmen?next=/mein-stujo/neu"
+            className="stujo-btn stujo-btn--primary"
+          >
+            {t('claimCta')}
+          </Link>
+        </p>
+        <p className="stujo-muted">
+          {t('claimContactFallback', { contact: portal.contactEmail || t('defaultContact') })}
         </p>
       </Layout>
     );

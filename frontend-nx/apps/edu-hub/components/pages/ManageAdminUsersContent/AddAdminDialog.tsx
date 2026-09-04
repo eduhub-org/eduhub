@@ -39,6 +39,13 @@ interface AddAdminDialogProps {
   organizationOptions: AdminOrganizationOption[];
   /** Super-admins may also promote the picked user to super-admin (a platform-wide Keycloak role). */
   canGrantSuperAdmin?: boolean;
+  /**
+   * Organization ids that currently have no admin with canManageSettings. The database no longer
+   * forces that capability onto an organization's first admin, so for these the choice is here: an
+   * organization left without one has nobody who can add a second admin or edit its settings, and
+   * only a super-admin could repair that.
+   */
+  organizationIdsWithoutSettingsAdmin?: number[];
 }
 
 const AddAdminDialog: FC<AddAdminDialogProps> = ({
@@ -47,6 +54,7 @@ const AddAdminDialog: FC<AddAdminDialogProps> = ({
   onSuccess,
   organizationOptions,
   canGrantSuperAdmin = false,
+  organizationIdsWithoutSettingsAdmin = [],
 }) => {
   const t = useTranslations('manageAdminUsers');
   const tCommon = useTranslations('common');
@@ -92,6 +100,24 @@ const AddAdminDialog: FC<AddAdminDialogProps> = ({
     () => organizationOptions.map((organization) => ({ value: String(organization.id), label: organization.name })),
     [organizationOptions]
   );
+
+  const needsSettingsAdmin =
+    organizationId != null && organizationIdsWithoutSettingsAdmin.includes(organizationId);
+
+  // Pre-check rather than merely hint: the common case is granting the first admin of a fresh
+  // organization, and an unticked box there leaves it unmanageable. It stays a checkbox, so it can
+  // still be turned off deliberately.
+  //
+  // Assigned, not just set: switching from an organization that needs a settings admin to one that
+  // already has one must clear the box again, or the automatic tick silently follows along and
+  // grants settings rights the second organization never asked for.
+  //
+  // Keyed on the organization, not only on the flag: between two organizations that both need a
+  // settings admin the flag never changes, so an effect watching it alone would not run again and
+  // a box the user had deliberately unticked would stay unticked for the second one.
+  useEffect(() => {
+    setCanManageSettings(needsSettingsAdmin);
+  }, [organizationId, needsSettingsAdmin]);
 
   // Inline user search (same query/role as the shared SelectUserDialog used to add instructors): only
   // existing, active EduHub users are returned, matched by partial name or email.
@@ -237,9 +263,18 @@ const AddAdminDialog: FC<AddAdminDialogProps> = ({
         label: t('can_manage_users_and_settings'),
         checked: canManageSettings,
         set: setCanManageSettings,
+        hint: needsSettingsAdmin ? t('first_settings_admin_hint') : undefined,
       },
     ],
-    [canManageEvents, canManageCourses, canManageDegrees, canManageJobs, canManageSettings, t]
+    [
+      canManageEvents,
+      canManageCourses,
+      canManageDegrees,
+      canManageJobs,
+      canManageSettings,
+      needsSettingsAdmin,
+      t,
+    ]
   );
 
   return (
@@ -316,17 +351,21 @@ const AddAdminDialog: FC<AddAdminDialogProps> = ({
           {organizationId != null && (
             <div>
               {capabilityOptions.map((capability) => (
-                <FormControlLabel
-                  key={capability.label}
-                  control={
-                    <Checkbox
-                      checked={capability.checked}
-                      onChange={(event) => capability.set(event.target.checked)}
-                      color="primary"
-                    />
-                  }
-                  label={capability.label}
-                />
+                <div key={capability.label}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={capability.checked}
+                        onChange={(event) => capability.set(event.target.checked)}
+                        color="primary"
+                      />
+                    }
+                    label={capability.label}
+                  />
+                  {capability.hint && (
+                    <p className="mt-0 mb-2 ml-8 text-xs text-label-secondary">{capability.hint}</p>
+                  )}
+                </div>
               ))}
             </div>
           )}

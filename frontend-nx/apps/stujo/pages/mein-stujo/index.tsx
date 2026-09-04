@@ -171,7 +171,15 @@ const MeinStujo: FC<Props> = ({ portal }) => {
     return (
       <Layout portal={portal}>
         <h1>{t('title')}</h1>
-        <p>{t('noOrganization', { contact: portal.contactEmail || t('defaultContact') })}</p>
+        <p style={{ maxWidth: '40em' }}>{t('noOrganization')}</p>
+        <p>
+          <Link href="/mein-stujo/unternehmen" className="stujo-btn stujo-btn--primary">
+            {t('claimCta')}
+          </Link>
+        </p>
+        <p className="stujo-muted">
+          {t('claimContactFallback', { contact: portal.contactEmail || t('defaultContact') })}
+        </p>
       </Layout>
     );
   }
@@ -193,6 +201,9 @@ const MeinStujo: FC<Props> = ({ portal }) => {
               {organization.name}
             </p>
           )}
+          <p className="stujo-muted" style={{ margin: '0.25rem 0 0' }}>
+            <Link href="/mein-stujo/unternehmen">{t('claimAddAnother')}</Link>
+          </p>
         </div>
         <Link href="/mein-stujo/neu" className="stujo-btn stujo-btn--primary">
           {t('newOffer')}

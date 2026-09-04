@@ -91,6 +91,12 @@ const ManageEmailTemplateEditor: FC<ManageEmailTemplateEditorProps> = ({ templat
         '\\[Invoice:HostedUrl\\]': 'https://invoice.stripe.com/i/example',
         '\\[Invoice:PaymentStatus\\]': 'bezahlt',
         '\\[Legal:TermsUrl\\]': 'https://www.stujo.net/agb',
+        // StuJo organization claim
+        '\\[OrganizationClaim:UserName\\]': 'Alex Beispiel',
+        '\\[OrganizationClaim:UserEmail\\]': 'alex@beispiel.de',
+        '\\[OrganizationClaim:Verification\\]': 'E-Mail-Domain stimmt mit der Organisation überein',
+        '\\[OrganizationClaim:AdminUrl\\]': 'https://edu.opencampus.sh/manage/settings/access',
+        '\\[OrganizationClaim:ContactEmail\\]': 'stujo@opencampus.sh',
       };
       // Conditional blocks are resolved before substitution, all flags on, so
       // the preview shows the fullest variant instead of raw [#if:...] markers.

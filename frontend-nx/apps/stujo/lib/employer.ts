@@ -163,6 +163,63 @@ export const ARCHIVE_JOB_POSTING_ACTION = gql`
   }
 `;
 
+/**
+ * Options for the organization picker on the onboarding page — the same shape
+ * and the same generous limit as edu-hub's ORGANIZATION_OPTIONS, because the
+ * shared DropDownSelector filters its options client-side: a server-side
+ * `_ilike` would only ever narrow the first page and the typeahead would appear
+ * to have forgotten most companies.
+ *
+ * Runs under the session role. Organization select is unfiltered for
+ * `anonymous`, which `user` inherits, so no extra permission is needed.
+ * `aliases` comes along because the component matches against it too, which
+ * finds companies that came over from the legacy StuJo board under a slightly
+ * different name.
+ */
+export const ORGANIZATION_OPTIONS = gql`
+  query StujoOrganizationOptions($limit: Int = 10000) {
+    Organization(limit: $limit, order_by: { name: asc }) {
+      id
+      name
+      aliases
+    }
+  }
+`;
+
+export const CLAIM_JOB_ORGANIZATION = gql`
+  mutation ClaimJobOrganization(
+    $organizationId: Int
+    $newOrganizationName: String
+    $portalAppName: String
+    $declareAuthorization: Boolean!
+  ) {
+    claimJobOrganization(
+      organizationId: $organizationId
+      newOrganizationName: $newOrganizationName
+      portalAppName: $portalAppName
+      declareAuthorization: $declareAuthorization
+    ) {
+      success
+      status
+      organizationId
+      organizationName
+      existingAdminName
+      error
+      messageKey
+    }
+  }
+`;
+
+export const REQUEST_JOB_ORGANIZATION_ACCESS = gql`
+  mutation RequestJobOrganizationAccess($organizationId: Int!, $portalAppName: String) {
+    requestJobOrganizationAccess(organizationId: $organizationId, portalAppName: $portalAppName) {
+      success
+      error
+      messageKey
+    }
+  }
+`;
+
 export const ENUM_OPTIONS = gql`
   query JobEnumOptions {
     JobPostingType {

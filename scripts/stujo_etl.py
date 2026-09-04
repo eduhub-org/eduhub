@@ -143,10 +143,32 @@ def slugify(value: str) -> str:
 
 
 def normalize_company_name(name: str) -> str:
-    """Normalization for dedupe against existing EduHub organizations."""
+    """Normalization for dedupe against existing EduHub organizations.
+
+    Returns "" for a name that carries no dedupe signal at all — a punctuation-
+    only row ("-", "..."), or one that is nothing but a legal form ("e.V."),
+    since both the legal forms and every non-alphanumeric character are
+    stripped. Callers MUST NOT dedupe on an empty result: it matches every other
+    junk-named company, which is how a StuJo company merged into the placeholder
+    Organization "-" and made its contact an admin there.
+    """
     n = name.lower().strip()
     n = re.sub(r"\b(gmbh & co\.? kg|gmbh|ag|kg|e\.?v\.?|ug|se|ohg|mbh)\b", "", n)
     return re.sub(r"[^a-z0-9]+", "", n)
+
+
+_LIKE_WILDCARDS = re.compile(r"([\\%_])")
+
+
+def like_escape(value: str) -> str:
+    """Escape the LIKE/ILIKE wildcards in a value used as a pattern.
+
+    Legacy addresses regularly contain "_", which ILIKE reads as "any single
+    character": an unescaped lookup for `max_mustermann@x.de` also matches
+    `max.mustermann@x.de`, so a StuJo grant could land on a different person.
+    Postgres uses backslash as the default LIKE escape character.
+    """
+    return _LIKE_WILDCARDS.sub(r"\\\1", value)
 
 
 def mask_email(email: str | None) -> str:
@@ -553,17 +575,32 @@ def step_companies(hasura: HasuraClient, gcs_bucket, files_root, companies) -> d
     existing = hasura.query(
         """query { Organization { id name aliases logo } }"""
     )["Organization"]
-    by_norm = {normalize_company_name(o["name"]): o for o in existing}
+    # "" is deliberately not a key: a junk-named organization must not be a dedupe
+    # target for every other junk-named company (see normalize_company_name).
+    by_norm = {}
+    for o in existing:
+        norm_existing = normalize_company_name(o["name"])
+        if norm_existing:
+            by_norm[norm_existing] = o
     by_alias = {}
     for o in existing:
         for alias in o.get("aliases") or []:
             by_alias[alias] = o
 
+    existing_names = {o["name"] for o in existing}
+
     mapping = {}
     for c in companies:
         legacy_alias = f"stujo:{c['id']}-{slugify(c['name'])}"
         norm = normalize_company_name(c["name"])
-        org = by_alias.get(legacy_alias) or by_norm.get(norm)
+        # An empty normalization carries no identity (see normalize_company_name),
+        # so it must never dedupe: matching on it merged a junk-named StuJo company
+        # into the placeholder Organization "-" and made its contact an admin there.
+        # Such a company still migrates, as its own organization.
+        if not norm:
+            log.warning("company %s '%s' normalizes to nothing — not deduped, "
+                        "migrating as its own organization", c["id"], c["name"])
+        org = by_alias.get(legacy_alias) or (by_norm.get(norm) if norm else None)
         if org:
             # Duplicate company rows in the Rails DB (23 exist, e.g. two
             # 'terwixonse') merge into one Organization; record this row's
@@ -598,6 +635,14 @@ def step_companies(hasura: HasuraClient, gcs_bucket, files_root, companies) -> d
             log.info("company %s → existing Organization %s (%s)", c["id"], org["id"], org["name"])
             continue
 
+        # Organization.name is unique. Without the name dedupe above, a junk name can
+        # collide with an existing organization that carries it verbatim, which would
+        # abort the whole run — so those get the source row appended to stay distinct
+        # (and recognizable as imported junk in the UI).
+        org_name = c["name"]
+        if not norm and org_name in existing_names:
+            org_name = f"{org_name} (StuJo #{c['id']})"
+
         address_line = " ".join(filter(None, [c.get("street"), c.get("nr")])) or None
         result = hasura.mutate(
             """
@@ -607,7 +652,7 @@ def step_companies(hasura: HasuraClient, gcs_bucket, files_root, companies) -> d
             """,
             {
                 "obj": {
-                    "name": c["name"],
+                    "name": org_name,
                     "type": "CORPORATION",
                     "description": c.get("description"),
                     "website": normalize_website(c.get("url")),
@@ -628,10 +673,14 @@ def step_companies(hasura: HasuraClient, gcs_bucket, files_root, companies) -> d
             _set_org_logo(hasura, org_id, logo_path)
         # Register the new org in the dedupe maps so later duplicate rows
         # in the same run merge instead of violating Organization_name_key.
-        created = {"id": org_id, "name": c["name"], "aliases": [legacy_alias], "logo": logo_path}
-        by_norm[norm] = created
+        created = {"id": org_id, "name": org_name, "aliases": [legacy_alias], "logo": logo_path}
+        # Only a meaningful normalization may serve later rows; registering "" would
+        # re-introduce the junk collision within a single run.
+        if norm:
+            by_norm[norm] = created
         by_alias[legacy_alias] = created
-        log.info("company %s '%s' → new Organization %s", c["id"], c["name"], org_id)
+        existing_names.add(org_name)
+        log.info("company %s '%s' → new Organization %s", c["id"], org_name, org_id)
     return mapping
 
 
@@ -751,6 +800,33 @@ def _sync_job_tags(hasura: "HasuraClient", posting_id: int, tags: list) -> None:
         )
 
 
+def find_account_by_email(hasura: "HasuraClient", email: str):
+    """Look an EduHub account up by address — exactly, and case-insensitively.
+
+    Two traps this closes:
+      - ILIKE wildcards. Legacy addresses contain "_" (and occasionally "%"),
+        which ILIKE reads as a pattern: an unescaped lookup for
+        `max_mustermann@x.de` also matches `max.mustermann@x.de`, and the StuJo
+        grant would land on a different person. The address is escaped.
+      - GUEST rows are not accounts. User_email_non_guest_key exists precisely so
+        one address can carry a guest record *and* the account that later claims
+        it, so a guest row must not be mistaken for the account.
+
+    Returns (user_id, rows). user_id is None when nothing matched, and also when
+    several accounts share the address — picking one of them would silently give
+    the wrong person the grant, so the caller skips instead of guessing.
+    """
+    rows = hasura.query(
+        """
+        query ($pattern: String!) {
+          User(where: {email: {_ilike: $pattern}, status: {_neq: GUEST}}) { id email }
+        }
+        """,
+        {"pattern": like_escape(email)},
+    )["User"]
+    return (rows[0]["id"] if len(rows) == 1 else None), rows
+
+
 def step_users(hasura: HasuraClient, keycloak, contacts, org_mapping) -> dict:
     """Employer accounts → Keycloak (bcrypt import) + User + OrganizationAdmin.
 
@@ -771,14 +847,15 @@ def step_users(hasura: HasuraClient, keycloak, contacts, org_mapping) -> dict:
             continue
         org_id = org_mapping[c["company_id"]]
 
-        existing = hasura.query(
-            """query ($email: String!) { User(where: {email: {_ilike: $email}}) { id } }""",
-            {"email": email},
-        )["User"]
+        user_id, matches = find_account_by_email(hasura, email)
+        if user_id is None and matches:
+            log.warning("skipping contact %s (%s): %s accounts share this address — "
+                        "resolve the duplicate, then re-run (idempotent)",
+                        c["id"], mask_email(email), len(matches))
+            skipped += 1
+            continue
 
-        if existing:
-            user_id = existing[0]["id"]
-        else:
+        if user_id is None:
             if keycloak is None:
                 if not hasura.dry_run:
                     raise RuntimeError(
@@ -1043,13 +1120,15 @@ def step_students(hasura: HasuraClient, keycloak, students):
         if not email:
             continue
 
-        existing = hasura.query(
-            """query ($email: String!) { User(where: {email: {_ilike: $email}}) { id } }""",
-            {"email": email},
-        )["User"]
+        user_id, matches = find_account_by_email(hasura, email)
+        if user_id is None and matches:
+            log.warning("skipping student %s (%s): %s accounts share this address — "
+                        "resolve the duplicate, then re-run (idempotent)",
+                        s["student_id"], mask_email(email), len(matches))
+            skipped += 1
+            continue
 
-        if existing:
-            user_id = existing[0]["id"]
+        if user_id is not None:
             log.info("student %s (%s) → existing User %s",
                      s["student_id"], mask_email(email), user_id)
         else:
