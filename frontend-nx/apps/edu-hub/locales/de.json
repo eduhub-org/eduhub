@@ -2127,11 +2127,17 @@
     "add_admin_super_admin_hint": "Super-Admins verwalten die gesamte Plattform, unabhängig von einer Organisation.",
     "add_admin_success": "Admin-Benutzer hinzugefügt.",
     "first_settings_admin_hint": "Dieses Unternehmen hat noch niemanden mit diesem Recht. Ohne diese Berechtigung kann hier niemand weitere Admins hinzufügen oder Einstellungen ändern.",
-    "claim_declared_at": "Berechtigung bestätigt am {date}",
+    "claim_declared_at": "Die Administrationsrechte wurden am {date} beansprucht.",
+    "claim_declared": "Die Administrationsrechte wurden selbst beansprucht.",
+    "claim_needs_review_label": "Administrationsrechte selbst beansprucht – bitte überprüfen!",
+    "verify_claim_button": "Berechtigung bestätigen",
+    "verify_claim_submitting": "Wird bestätigt…",
+    "verify_claim_error": "Die Berechtigung konnte nicht bestätigt werden. Möglicherweise wurde sie inzwischen von jemand anderem bestätigt oder entzogen.",
     "claim_verification": {
-      "SELF_SERVICE_DOMAIN_VERIFIED": "Selbst übernommen – E-Mail-Domain stimmt mit der Organisation überein",
-      "SELF_SERVICE_UNVERIFIED": "Selbst übernommen – nicht geprüft, bitte kurz nachsehen",
-      "NEW_ORGANIZATION": "Selbst übernommen – Organisation dabei neu angelegt"
+      "SELF_SERVICE_DOMAIN_VERIFIED": "Die E-Mail-Domain stimmt mit der Organisation überein.",
+      "SELF_SERVICE_UNVERIFIED": "Bitte überprüfen!",
+      "NEW_ORGANIZATION": "Die Organisation wurde dabei neu angelegt.",
+      "ADMIN_VERIFIED": "Die Berechtigung wurde geprüft und bestätigt."
     }
   },
   "manageAppSettings": {

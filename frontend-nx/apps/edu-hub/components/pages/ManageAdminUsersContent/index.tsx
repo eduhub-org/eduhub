@@ -2,7 +2,7 @@ import { FC, useMemo, useCallback, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { ColumnDef } from '@tanstack/react-table';
 import { DocumentNode } from 'graphql';
-import { MdStar } from 'react-icons/md';
+import { MdStar, MdWarningAmber } from 'react-icons/md';
 
 import TableGrid from '../../common/TableGrid';
 import TableGridDeleteButton from '../../common/TableGrid/components/TableGridDeleteButton';
@@ -10,6 +10,7 @@ import Loading from '../../common/Loading';
 import { useTableGrid } from '../../common/TableGrid/hooks';
 import { createMultiWordSearchCondition } from '../../common/TableGrid/utils';
 import CheckboxSelector from '../../inputs/CheckboxSelector';
+import { Button } from '../../common/Button';
 
 import { useAdminQuery, useManageQuery, useOrgAdminQuery } from '../../../hooks/authedQuery';
 import { useAdminMutation } from '../../../hooks/authedMutation';
@@ -23,6 +24,7 @@ import {
   UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_DEGREES,
   UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_JOBS,
   UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_SETTINGS,
+  VERIFY_ORGANIZATION_ADMIN_CLAIM,
 } from '../../../queries/organizationAdmin';
 import { ORGANIZATION_OPTIONS } from '../../../queries/organization';
 import { UPDATE_USER_ADMIN_STATUS, ADMIN_USERS } from '../../../queries/actions';
@@ -38,9 +40,13 @@ import {
 } from '../../../queries/__generated__/ManageableOrganizations';
 import { AdminGrants } from '../../../queries/__generated__/AdminGrants';
 import { AdminUsers } from '../../../queries/__generated__/AdminUsers';
+import {
+  VerifyOrganizationAdminClaim,
+  VerifyOrganizationAdminClaimVariables,
+} from '../../../queries/__generated__/VerifyOrganizationAdminClaim';
 import { User_bool_exp, order_by } from '../../../__generated__/globalTypes';
 import AddAdminDialog, { AdminOrganizationOption } from './AddAdminDialog';
-import { AdminAccessRow, toAccessRows } from './accessRows';
+import { AdminAccessRow, claimNeedsReview, toAccessRows } from './accessRows';
 import { ADMIN_PRIVILEGES, AdminPrivilege, buildPrivilegeCondition, privilegeLabelKey } from './adminPrivileges';
 
 // Every mutation on a grant changes both the list (capabilities, and possibly whether the user is
@@ -71,6 +77,31 @@ const OrganizationGrantBlock: FC<{
 
   // Non-super-admins cannot clear the last settings admin of an org; super-admins bypass the guard.
   const settingsLocked = isSoleSettingsAdmin && !isAdmin;
+
+  const needsReview = claimNeedsReview(grant);
+
+  // Confirming a reviewed claim writes claimVerification, which no organization role may touch —
+  // hence the admin-role mutation, and hence the button only for super-admins.
+  const [verifyClaim, { loading: verifying }] = useAdminMutation<
+    VerifyOrganizationAdminClaim,
+    VerifyOrganizationAdminClaimVariables
+  >(VERIFY_ORGANIZATION_ADMIN_CLAIM, { refetchQueries: GRANT_REFETCH_QUERIES });
+  const [verifyFailed, setVerifyFailed] = useState(false);
+
+  const handleVerifyClaim = useCallback(async () => {
+    setVerifyFailed(false);
+    try {
+      const response = await verifyClaim({ variables: { id: grant.id } });
+      // The mutation pins the unverified state, so zero rows means somebody else already reviewed
+      // or revoked this grant. The refetch above brings the row up to date either way; all that is
+      // left is to not claim success.
+      if (!response.data?.update_OrganizationAdmin?.affected_rows) {
+        setVerifyFailed(true);
+      }
+    } catch {
+      setVerifyFailed(true);
+    }
+  }, [verifyClaim, grant.id]);
 
   const capabilities = useMemo<
     {
@@ -158,17 +189,31 @@ const OrganizationGrantBlock: FC<{
         ))}
       </div>
       {/* Only self-service claims carry a verification state; a grant a person made has none, and
-          saying so would add noise to every other row. An unverified claim is the one worth a look:
-          the claimer's email domain was not the organization's, so nothing corroborated it. */}
+          saying so would add noise to every other row. The note reads as two sentences — when the
+          claim happened, then what that says about it — so the unverified case ends on the request
+          to look, matching the marker icon on the row itself. */}
       {grant.claimVerification && (
-        <div className="mt-3 pt-3 border-t border-solid border-border-primary text-xs text-label-secondary">
+        <div
+          className={`mt-3 pt-3 border-t border-solid border-border-primary text-xs ${
+            needsReview ? 'text-warning' : 'text-label-secondary'
+          }`}
+        >
+          {grant.authorizationDeclaredAt
+            ? t('claim_declared_at', {
+                date: new Date(grant.authorizationDeclaredAt).toLocaleDateString(locale, {
+                  timeZone: 'Europe/Berlin',
+                }),
+              })
+            : t('claim_declared')}{' '}
           {t(`claim_verification.${grant.claimVerification}`)}
-          {grant.authorizationDeclaredAt &&
-            ` · ${t('claim_declared_at', {
-              date: new Date(grant.authorizationDeclaredAt).toLocaleDateString(locale, {
-                timeZone: 'Europe/Berlin',
-              }),
-            })}`}
+          {needsReview && isAdmin && (
+            <div className="mt-2">
+              <Button className="!py-1 !px-3 text-xs" onClick={handleVerifyClaim} disabled={verifying}>
+                {verifying ? t('verify_claim_submitting') : t('verify_claim_button')}
+              </Button>
+              {verifyFailed && <div className="mt-1 text-error">{t('verify_claim_error')}</div>}
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -533,30 +578,37 @@ const ManageAdminUsersContent: FC<ManageAdminUsersContentProps> = ({ inSettingsL
       },
     ];
 
-    // Only super-admins can see super-admin status (the set is empty for org admins), so the
-    // marker column is added for them only. It is kept short and shows a star icon (with a tooltip)
-    // instead of inline text, which would otherwise crowd the name columns.
-    if (!isAdmin) {
-      return baseColumns;
-    }
-
+    // A leading marker column carries what is worth seeing without expanding a row: the super-admin
+    // role, and a self-service claim nobody has checked yet. Icons with tooltips rather than inline
+    // text, which would crowd the name columns. Super-admin status is only ever visible to
+    // super-admins (the set is empty for org admins), so the star simply never renders for the
+    // others, while the review marker is for whoever manages the organization's admin team.
     return [
       {
-        id: 'superAdmin',
+        id: 'markers',
         header: '',
         enableSorting: false,
-        size: 44,
+        // Wide enough for both markers side by side: a super-admin can hold a claimed grant too.
+        size: 56,
         meta: { align: 'center' },
-        cell: ({ row }) =>
-          row.original.isSuperAdmin ? (
-            <div className="flex justify-center" title={t('super_admin_label')}>
-              <MdStar className="text-brand" size="1.25em" aria-label={t('super_admin_label')} />
-            </div>
-          ) : null,
+        cell: ({ row }) => (
+          <div className="flex justify-center items-center gap-1">
+            {row.original.isSuperAdmin && (
+              <span className="flex" title={t('super_admin_label')}>
+                <MdStar className="text-brand" size="1.25em" aria-label={t('super_admin_label')} />
+              </span>
+            )}
+            {claimNeedsReview(row.original.grant) && (
+              <span className="flex" title={t('claim_needs_review_label')}>
+                <MdWarningAmber className="text-warning" size="1.25em" aria-label={t('claim_needs_review_label')} />
+              </span>
+            )}
+          </div>
+        ),
       },
       ...baseColumns,
     ];
-  }, [t, isAdmin]);
+  }, [t]);
 
   // One row per administered organization. The query pages and sorts by person, so a page holds
   // `pageSize` people and renders one row for each organization they administer — their rows stay

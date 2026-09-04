@@ -17,9 +17,10 @@ select_permissions:
   # canManageSettings capability, so they can manage that organization's admin team.
   #
   # claimVerification and authorizationDeclaredAt are readable here so the access screen can show
-  # how a grant came about, but they appear in NO insert or update permission: they are written by
-  # the claimJobOrganization action only. A settings admin who could set them on any grant in their
-  # organization would make them worthless as review signals.
+  # how a grant came about, but they appear in NO insert or update permission: the claim action
+  # writes them, and confirming a reviewed claim (claimVerification = ADMIN_VERIFIED) needs the
+  # admin role, i.e. a super-admin. A settings admin who could set them on any grant in their own
+  # organization could clear the review marker on their own claim, making it worthless as a signal.
   - role: org_admin_access
     permission:
       columns:

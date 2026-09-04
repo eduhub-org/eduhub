@@ -2142,11 +2142,17 @@
     "add_admin_super_admin_hint": "Super admins manage the whole platform, independently of any organization.",
     "add_admin_success": "Admin user added.",
     "first_settings_admin_hint": "This company has nobody with this right yet. Without it, nobody here can add further admins or change its settings.",
-    "claim_declared_at": "Authorization declared on {date}",
+    "claim_declared_at": "The administration rights were claimed on {date}.",
+    "claim_declared": "The administration rights were self-claimed.",
+    "claim_needs_review_label": "Administration rights were self-claimed – please review!",
+    "verify_claim_button": "Confirm authorization",
+    "verify_claim_submitting": "Confirming…",
+    "verify_claim_error": "The authorization could not be confirmed. Somebody else may have confirmed or revoked it in the meantime.",
     "claim_verification": {
-      "SELF_SERVICE_DOMAIN_VERIFIED": "Self-service claim – email domain matches the organization",
-      "SELF_SERVICE_UNVERIFIED": "Self-service claim – not verified, worth a look",
-      "NEW_ORGANIZATION": "Self-service claim – organization was created with it"
+      "SELF_SERVICE_DOMAIN_VERIFIED": "The email domain matches the organization.",
+      "SELF_SERVICE_UNVERIFIED": "Please review!",
+      "NEW_ORGANIZATION": "The organization was created with the claim.",
+      "ADMIN_VERIFIED": "The authorization has been reviewed and confirmed."
     }
   },
   "manageAppSettings": {

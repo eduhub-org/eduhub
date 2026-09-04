@@ -59,3 +59,14 @@ export const toAccessRows = (
     );
   });
 };
+
+/**
+ * True when the row's grant came from a self-service claim that nothing corroborated: the claimer's
+ * email domain did not match the organization's, so a human still has to confirm that this person
+ * really may act for that organization.
+ *
+ * The other claim states are not flagged — a domain-verified claim was corroborated, and an
+ * organization the claimer created with the claim has nothing to be checked against.
+ */
+export const claimNeedsReview = (grant: AdminUserList_User_OrganizationAdmins | null): boolean =>
+  grant?.claimVerification === 'SELF_SERVICE_UNVERIFIED';
