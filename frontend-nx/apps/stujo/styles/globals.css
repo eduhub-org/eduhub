@@ -621,6 +621,12 @@ button.stujo-header-action:hover {
   color: var(--stujo-grey);
 }
 
+.stujo-table-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .stujo-chip {
   display: inline-block;
   border-radius: 999px;

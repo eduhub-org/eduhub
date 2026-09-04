@@ -272,38 +272,40 @@ const MeinStujo: FC<Props> = ({ portal }) => {
                 <td className="stujo-muted">{posting.views}</td>
                 <td className="stujo-muted">{formatDate(posting.expiresAt)}</td>
                 <td style={{ whiteSpace: 'nowrap' }}>
-                  <Link
-                    href={`/mein-stujo/neu?id=${posting.id}`}
-                    className="stujo-button-pen"
-                    title={t('edit')}
-                    aria-label={t('edit')}
-                  />
-                  {(posting.status === 'DRAFT' || posting.status === 'PENDING_PAYMENT') && (
-                    <button
-                      className="stujo-btn stujo-btn--small"
-                      disabled={publishing}
-                      onClick={() => handlePublish(posting.id)}
-                    >
-                      {t('publish')}
-                    </button>
-                  )}
-                  {posting.status === 'EXPIRED' && (
-                    <button
-                      className="stujo-btn stujo-btn--small"
-                      disabled={publishing}
-                      onClick={() => handlePublish(posting.id)}
-                    >
-                      {t('repost')}
-                    </button>
-                  )}
-                  {posting.status === 'PUBLISHED' && (
-                    <button
-                      className="stujo-btn stujo-btn--small stujo-btn--ghost"
-                      onClick={() => handleArchive(posting.id)}
-                    >
-                      {t('archive')}
-                    </button>
-                  )}
+                  <div className="stujo-table-actions">
+                    <Link
+                      href={`/mein-stujo/neu?id=${posting.id}`}
+                      className="stujo-button-pen"
+                      title={t('edit')}
+                      aria-label={t('edit')}
+                    />
+                    {(posting.status === 'DRAFT' || posting.status === 'PENDING_PAYMENT') && (
+                      <button
+                        className="stujo-btn stujo-btn--small"
+                        disabled={publishing}
+                        onClick={() => handlePublish(posting.id)}
+                      >
+                        {t('publish')}
+                      </button>
+                    )}
+                    {posting.status === 'EXPIRED' && (
+                      <button
+                        className="stujo-btn stujo-btn--small"
+                        disabled={publishing}
+                        onClick={() => handlePublish(posting.id)}
+                      >
+                        {t('repost')}
+                      </button>
+                    )}
+                    {posting.status === 'PUBLISHED' && (
+                      <button
+                        className="stujo-btn stujo-btn--small stujo-btn--ghost"
+                        onClick={() => handleArchive(posting.id)}
+                      >
+                        {t('archive')}
+                      </button>
+                    )}
+                  </div>
                 </td>
               </tr>
             );
