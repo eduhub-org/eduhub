@@ -187,6 +187,7 @@ const ManageJobBoard: FC = () => {
 
   const [orgSearch, setOrgSearch] = useState('');
   const [bootstrapResult, setBootstrapResult] = useState<string | null>(null);
+  const [portalSaveError, setPortalSaveError] = useState<string | null>(null);
   const { data: orgData } = useAdminQuery(SEARCH_ORGANIZATIONS, {
     variables: { search: `%${orgSearch}%` },
     skip: orgSearch.trim().length < 2,
@@ -289,6 +290,7 @@ const ManageJobBoard: FC = () => {
       </div>
 
       <SectionTitle title="Portale (AppSettings)" />
+      {portalSaveError && <div className="mb-2 text-sm text-red-400">{portalSaveError}</div>}
       <div className="rounded-lg bg-bg-card overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
@@ -311,7 +313,9 @@ const ManageJobBoard: FC = () => {
                 <td className="px-4 py-2">
                   <input
                     type="email"
-                    className="w-full bg-transparent text-label-primary outline-none border-b border-transparent focus:border-brand"
+                    // 44px minimum touch target, per the mobile guidance in
+                    // .cursor/rules/mobile-responsive-design.mdc.
+                    className="w-full min-h-[44px] touch-manipulation bg-transparent text-label-primary outline-none border-b border-transparent focus:border-brand"
                     placeholder="nicht gesetzt"
                     defaultValue={portal.contactEmail ?? ''}
                     onBlur={async (event) => {
@@ -319,10 +323,22 @@ const ManageJobBoard: FC = () => {
                       if (value === (portal.contactEmail ?? '')) {
                         return;
                       }
-                      await updatePortalContactEmail({
-                        variables: { id: portal.id, contactEmail: value === '' ? null : value },
-                      });
-                      await refetch();
+                      setPortalSaveError(null);
+                      try {
+                        await updatePortalContactEmail({
+                          variables: { id: portal.id, contactEmail: value === '' ? null : value },
+                        });
+                        await refetch();
+                      } catch (saveError: any) {
+                        // The field is uncontrolled, so it keeps showing the value that was not
+                        // saved. Say so, and put the stored value back so the two agree.
+                        event.target.value = portal.contactEmail ?? '';
+                        setPortalSaveError(
+                          `Kontakt-E-Mail für ${portal.slug} nicht gespeichert: ${
+                            saveError?.message ?? 'unbekannter Fehler'
+                          }`
+                        );
+                      }
                     }}
                   />
                 </td>

@@ -199,7 +199,17 @@ async function queueEmail({
 
     // extraBcc is merged before the guest check, so a guest recipient still
     // strips every copy — a caller-supplied address must not be a way around it.
-    const templateBcc = [template.bcc, extraBcc]
+    //
+    // It must also be exactly one address. Callers pass values that came from the database or the
+    // environment (a portal's contact address), and a stray comma there would silently turn into
+    // extra recipients on somebody else's mail. A malformed value is dropped, not sent: the mail
+    // still reaches its actual recipient.
+    const validExtraBcc =
+      extraBcc && emailRegex.test(String(extraBcc).trim()) ? String(extraBcc).trim() : null;
+    if (extraBcc && !validExtraBcc) {
+      logger.error('Ignoring an extraBcc value that is not a single valid email address');
+    }
+    const templateBcc = [template.bcc, validExtraBcc]
       .filter((address) => address && String(address).trim() !== '')
       .join(',');
     const copies = guestSafeCopyRecipients(recipientUser, {

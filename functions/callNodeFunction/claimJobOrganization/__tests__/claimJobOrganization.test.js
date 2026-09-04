@@ -27,6 +27,7 @@ const buildRequestMock = ({ organization = null, candidates = [], created = null
     if (query.includes('FindOrganizationCandidatesForClaim')) return { Organization: candidates };
     if (query.includes('GetOrganizationForClaim')) return { Organization_by_pk: organization };
     if (query.includes('CreateOrganizationForClaim')) return { insert_Organization_one: created };
+    if (query.includes('GetJobPortalContactEmail')) return { JobPortal: [{ contactEmail: null }] };
     if (query.includes('InsertJobOrganizationGrant')) {
       return { insert_OrganizationAdmin_one: { id: 99 } };
     }
@@ -278,10 +279,10 @@ describe('claimJobOrganization', () => {
     expect(created).toHaveLength(0);
   });
 
-  it('creates a genuinely new organization and marks the claim NEW_ORGANIZATION', async () => {
+  it('creates a genuinely new organization with its grant in one mutation', async () => {
     requestMock = buildRequestMock({
       candidates: [],
-      created: { id: 21, name: 'Ganz Neu GmbH', email: null, website: null },
+      created: { id: 21, name: 'Ganz Neu GmbH' },
     });
 
     const result = await claimJobOrganization(
@@ -290,8 +291,68 @@ describe('claimJobOrganization', () => {
     );
 
     expect(result).toMatchObject({ success: true, status: 'GRANTED', organizationId: 21 });
-    const [[, variables]] = grantMutations(requestMock);
-    expect(variables.claimVerification).toBe('NEW_ORGANIZATION');
+
+    // The grant is nested in the organization insert, so there is no second write that could
+    // fail and leave an organization nobody administers.
+    const [[, variables]] = requestMock.mock.calls.filter(([document]) =>
+      String(document).includes('CreateOrganizationForClaim')
+    );
+    expect(variables).toMatchObject({
+      name: 'Ganz Neu GmbH',
+      userId: CLAIMER.id,
+      claimVerification: 'NEW_ORGANIZATION',
+    });
+    expect(variables.authorizationDeclaredAt).toBeTruthy();
+    expect(grantMutations(requestMock)).toHaveLength(0);
+  });
+
+  it('reports ALREADY_CLAIMED when the database rejects a concurrent claim', async () => {
+    // organization_admin_single_job_claim raises this when another claim won the race between the
+    // handler's check and its insert.
+    requestMock = jest.fn(async (document) => {
+      const query = String(document);
+      if (query.includes('GetClaimerForOrganizationClaim')) return { User_by_pk: CLAIMER };
+      if (query.includes('GetOrganizationForClaim')) {
+        return {
+          Organization_by_pk: {
+            id: 7,
+            name: 'Beispiel GmbH',
+            email: null,
+            website: null,
+            OrganizationAdmins: [],
+          },
+        };
+      }
+      if (query.includes('InsertJobOrganizationGrant')) {
+        throw new Error(
+          'Uniqueness violation. check constraint ... HINT: job_claim_already_taken'
+        );
+      }
+      throw new Error(`Unexpected query: ${query.slice(0, 80)}`);
+    });
+
+    const result = await claimJobOrganization(claimInput({ organizationId: 7 }), mockLogger);
+
+    expect(result).toMatchObject({ success: true, status: 'ALREADY_CLAIMED', organizationId: 7 });
+    expect(queueEmailMock).not.toHaveBeenCalled();
+  });
+
+  it('surfaces an unexpected insert failure instead of calling it ALREADY_CLAIMED', async () => {
+    requestMock = jest.fn(async (document) => {
+      const query = String(document);
+      if (query.includes('GetClaimerForOrganizationClaim')) return { User_by_pk: CLAIMER };
+      if (query.includes('GetOrganizationForClaim')) {
+        return {
+          Organization_by_pk: { id: 7, name: 'Beispiel GmbH', email: null, website: null, OrganizationAdmins: [] },
+        };
+      }
+      if (query.includes('InsertJobOrganizationGrant')) throw new Error('connection reset');
+      throw new Error(`Unexpected query: ${query.slice(0, 80)}`);
+    });
+
+    const result = await claimJobOrganization(claimInput({ organizationId: 7 }), mockLogger);
+
+    expect(result).toMatchObject({ success: false, messageKey: 'CLAIM_JOB_ORGANIZATION_ERROR' });
   });
 
   it('still grants when the notification mail cannot be queued', async () => {

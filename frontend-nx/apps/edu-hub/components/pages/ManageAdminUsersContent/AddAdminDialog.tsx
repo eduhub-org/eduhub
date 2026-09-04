@@ -107,10 +107,12 @@ const AddAdminDialog: FC<AddAdminDialogProps> = ({
   // Pre-check rather than merely hint: the common case is granting the first admin of a fresh
   // organization, and an unticked box there leaves it unmanageable. It stays a checkbox, so it can
   // still be turned off deliberately.
+  //
+  // Assigned, not just set: switching from an organization that needs a settings admin to one that
+  // already has one must clear the box again, or the automatic tick silently follows along and
+  // grants settings rights the second organization never asked for.
   useEffect(() => {
-    if (needsSettingsAdmin) {
-      setCanManageSettings(true);
-    }
+    setCanManageSettings(needsSettingsAdmin);
   }, [needsSettingsAdmin]);
 
   // Inline user search (same query/role as the shared SelectUserDialog used to add instructors): only

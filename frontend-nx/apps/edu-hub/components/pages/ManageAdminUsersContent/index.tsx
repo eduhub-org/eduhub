@@ -1,5 +1,5 @@
 import { FC, useMemo, useCallback, useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { ColumnDef } from '@tanstack/react-table';
 import { DocumentNode } from 'graphql';
 import { MdStar } from 'react-icons/md';
@@ -64,6 +64,9 @@ const OrganizationGrantBlock: FC<{
   showDelete: boolean;
 }> = ({ grant, firstName, lastName, isAdmin, isSoleSettingsAdmin, showDelete }) => {
   const t = useTranslations('manageAdminUsers');
+  // The time zone is pinned so the date does not shift near midnight, but the format follows the
+  // reader's locale.
+  const locale = useLocale();
   const manageRole = useManageRole();
 
   // Non-super-admins cannot clear the last settings admin of an org; super-admins bypass the guard.
@@ -162,7 +165,7 @@ const OrganizationGrantBlock: FC<{
           {t(`claim_verification.${grant.claimVerification}`)}
           {grant.authorizationDeclaredAt &&
             ` · ${t('claim_declared_at', {
-              date: new Date(grant.authorizationDeclaredAt).toLocaleDateString('de-DE', {
+              date: new Date(grant.authorizationDeclaredAt).toLocaleDateString(locale, {
                 timeZone: 'Europe/Berlin',
               }),
             })}`}

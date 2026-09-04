@@ -101,13 +101,16 @@ export default async function requestJobOrganizationAccess(req, logger) {
       return { success: false, error: 'You already manage these job offers', messageKey: 'ALREADY_GRANTED' };
     }
 
-    const dedupKey = {
+    // The rate-limit key is the request; each mail additionally carries its recipient, so one
+    // administrator's failed delivery does not sit in the way of the others and
+    // MailLog_job_organization_access_request_unique can reject a genuine duplicate outright.
+    const requestKey = {
       type: 'JOB_ORGANIZATION_ACCESS_REQUEST',
       organizationId,
       requesterUserId: sessionUserId,
     };
     const since = new Date(Date.now() - RATE_LIMIT_HOURS * 60 * 60 * 1000).toISOString();
-    const recent = await client.request(RECENT_REQUESTS, { metadata: dedupKey, since });
+    const recent = await client.request(RECENT_REQUESTS, { metadata: requestKey, since });
     if (recent?.MailLog?.length > 0) {
       return {
         success: false,
@@ -134,14 +137,19 @@ export default async function requestJobOrganizationAccess(req, logger) {
         variableReplacer,
         recipientEmail: grant.User.email,
         extraBcc: contactEmail,
-        metadata: dedupKey,
+        metadata: { ...requestKey, adminUserId: grant.userId },
         client,
         logger,
       });
       if (result.success) {
         queued += 1;
       } else {
-        logger.error('Could not queue an access request mail', { messageKey: result.messageKey });
+        // Logged per recipient rather than aborting: the administrators who can be reached should
+        // be, and the unique index means a retry re-queues only the ones that are still missing.
+        logger.error('Could not queue an access request mail', {
+          messageKey: result.messageKey,
+          adminUserId: grant.userId,
+        });
       }
     }
 

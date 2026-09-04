@@ -104,13 +104,27 @@ describe('requestJobOrganizationAccess', () => {
       });
       // The dedup key must not carry a jobPostingId: MailLog_job_posting_mail_unique
       // constrains every row that does, and two requests would collide on it.
-      expect(args.metadata).toEqual({
+      expect(args.metadata).not.toHaveProperty('jobPostingId');
+    }
+
+    // Each row is keyed by its recipient as well, so
+    // MailLog_job_organization_access_request_unique still permits one mail per administrator
+    // while rejecting a genuine duplicate — and a delivery that failed for one administrator does
+    // not block a retry for the others.
+    expect(queueEmailMock.mock.calls.map(([args]) => args.metadata)).toEqual([
+      {
         type: 'JOB_ORGANIZATION_ACCESS_REQUEST',
         organizationId: 7,
         requesterUserId: REQUESTER.id,
-      });
-      expect(args.metadata).not.toHaveProperty('jobPostingId');
-    }
+        adminUserId: 'user-2',
+      },
+      {
+        type: 'JOB_ORGANIZATION_ACCESS_REQUEST',
+        organizationId: 7,
+        requesterUserId: REQUESTER.id,
+        adminUserId: 'user-3',
+      },
+    ]);
   });
 
   it('refuses a second request for the same organization within the rate-limit window', async () => {

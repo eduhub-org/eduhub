@@ -87,6 +87,8 @@ describe('getEmailTemplateCategory', () => {
     expect(getEmailTemplateCategory('JOB_POSTING_ADMIN_NOTICE')).toBe('jobboard');
     expect(getEmailTemplateCategory('JOB_POSTING_PAYMENT_FAILED')).toBe('jobboard');
     expect(getEmailTemplateCategory('JOB_ALERT')).toBe('jobboard');
+    expect(getEmailTemplateCategory('JOB_ORGANIZATION_CLAIMED')).toBe('jobboard');
+    expect(getEmailTemplateCategory('JOB_ORGANIZATION_ACCESS_REQUEST')).toBe('jobboard');
   });
 
   it('shows the job board as a tab rather than hiding it behind "Sonstige"', () => {

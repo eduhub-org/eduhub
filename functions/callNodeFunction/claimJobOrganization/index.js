@@ -35,6 +35,9 @@ import {
 
 const MAX_ORGANIZATION_NAME_LENGTH = 200;
 
+/** How long to wait for the synchronous Keycloak role grant before leaving it to the retry path. */
+const KEYCLOAK_ROLE_TIMEOUT_MS = 5000;
+
 const GET_CLAIMER = gql`
   query GetClaimerForOrganizationClaim($userId: uuid!) {
     User_by_pk(id: $userId) {
@@ -72,13 +75,34 @@ const GET_ORGANIZATION = gql`
 // Name and type only. `user_access` may insert 34 columns of this table,
 // including banking and tax fields, but a claim has no business setting any of
 // them: the employer fills their own profile in afterwards.
-const CREATE_ORGANIZATION = gql`
-  mutation CreateOrganizationForClaim($name: String!) {
-    insert_Organization_one(object: { name: $name, type: CORPORATION }) {
+//
+// The grant is nested rather than inserted afterwards so both writes share one transaction. Two
+// statements would leave an organization with no admin whenever the second failed — and a retry
+// would then match that orphan by name and claim it, which is exactly the state the name dedupe
+// is supposed to prevent.
+const CREATE_ORGANIZATION_WITH_GRANT = gql`
+  mutation CreateOrganizationForClaim(
+    $name: String!
+    $userId: uuid!
+    $claimVerification: String!
+    $authorizationDeclaredAt: timestamptz!
+  ) {
+    insert_Organization_one(
+      object: {
+        name: $name
+        type: CORPORATION
+        OrganizationAdmins: {
+          data: {
+            userId: $userId
+            canManageJobs: true
+            claimVerification: $claimVerification
+            authorizationDeclaredAt: $authorizationDeclaredAt
+          }
+        }
+      }
+    ) {
       id
       name
-      email
-      website
     }
   }
 `;
@@ -122,11 +146,17 @@ async function addKeycloakOrgAdminRole(userId, logger) {
     logger.warn('Keycloak role webhook not configured, relying on the event trigger');
     return;
   }
+  // Bounded, because by this point the grant is already committed: an endpoint that accepts the
+  // connection and never answers would otherwise hold the action until the platform timeout and
+  // report failure to somebody who does have access. The event trigger retries either way.
+  const controller = new AbortController();
+  const deadline = setTimeout(() => controller.abort(), KEYCLOAK_ROLE_TIMEOUT_MS);
   try {
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', secret, role: 'org_admin' },
       body: JSON.stringify({ event: { data: { new: { userId } } } }),
+      signal: controller.signal,
     });
     if (!response.ok) {
       logger.warn('Synchronous Keycloak role grant failed, relying on the event trigger', {
@@ -137,6 +167,50 @@ async function addKeycloakOrgAdminRole(userId, logger) {
     logger.warn('Synchronous Keycloak role grant failed, relying on the event trigger', {
       error: error.message,
     });
+  } finally {
+    clearTimeout(deadline);
+  }
+}
+
+/**
+ * Tell the address responsible for StuJo enquiries that a claim happened.
+ *
+ * The claim is already committed by the time this runs, so nothing in here may fail the request:
+ * an unsent notification is a missing review signal, not a reason to deny somebody the access they
+ * were just granted.
+ */
+async function notifyClaim(
+  client,
+  logger,
+  { organizationName, organizationId, claimer, verification, portalAppName }
+) {
+  const contactEmail = await resolveContactEmail(client, portalAppName, logger);
+  if (!contactEmail) {
+    logger.warn('No StuJo contact address configured, claim notification skipped', {
+      organizationId,
+    });
+    return;
+  }
+
+  const mailResult = await queueEmail({
+    templateType: 'JOB_ORGANIZATION_CLAIMED',
+    variableReplacer: createOrganizationClaimVariableReplacer(
+      { name: organizationName },
+      {
+        userName: displayName(claimer),
+        userEmail: claimer.email,
+        verification: verificationLabel(verification),
+        adminUrl: adminAccessUrl(),
+        contactEmail,
+      }
+    ),
+    recipientEmail: contactEmail,
+    metadata: { type: 'JOB_ORGANIZATION_CLAIMED', organizationId },
+    client,
+    logger,
+  });
+  if (!mailResult.success) {
+    logger.error('Could not queue the claim notification', { messageKey: mailResult.messageKey });
   }
 }
 
@@ -212,10 +286,32 @@ export default async function claimJobOrganization(req, logger) {
         organization = (await client.request(GET_ORGANIZATION, { id: existing.id }))?.Organization_by_pk;
         verification = classifyClaim(claimer.email, organization);
       } else {
-        const created = (await client.request(CREATE_ORGANIZATION, { name: typedName }))
-          ?.insert_Organization_one;
-        organization = { ...created, OrganizationAdmins: [] };
-        verification = CLAIM_NEW_ORGANIZATION;
+        // A brand-new organization has no admins to check against, so the grant goes in with it,
+        // in one transaction, and the flow is finished here.
+        const created = (
+          await client.request(CREATE_ORGANIZATION_WITH_GRANT, {
+            name: typedName,
+            userId: sessionUserId,
+            claimVerification: CLAIM_NEW_ORGANIZATION,
+            authorizationDeclaredAt: new Date().toISOString(),
+          })
+        )?.insert_Organization_one;
+
+        await addKeycloakOrgAdminRole(sessionUserId, logger);
+        await notifyClaim(client, logger, {
+          organizationName: created.name,
+          organizationId: created.id,
+          claimer,
+          verification: CLAIM_NEW_ORGANIZATION,
+          portalAppName,
+        });
+
+        return {
+          success: true,
+          status: 'GRANTED',
+          organizationId: created.id,
+          organizationName: created.name,
+        };
       }
     }
 
@@ -244,43 +340,39 @@ export default async function claimJobOrganization(req, logger) {
 
     // Everything above must hold BEFORE the insert: add_keycloak_org_admin_role
     // fires on it and hands out the Keycloak role.
-    await client.request(INSERT_GRANT, {
-      userId: sessionUserId,
-      organizationId: organization.id,
-      claimVerification: verification,
-      authorizationDeclaredAt: new Date().toISOString(),
-    });
+    //
+    // The database has the final say on "nobody else manages these job offers": the check above
+    // reads a snapshot, so two people claiming the same unclaimed organization at the same moment
+    // could both pass it. organization_admin_single_job_claim rejects the loser, and
+    // ALREADY_CLAIMED is the honest answer for them.
+    try {
+      await client.request(INSERT_GRANT, {
+        userId: sessionUserId,
+        organizationId: organization.id,
+        claimVerification: verification,
+        authorizationDeclaredAt: new Date().toISOString(),
+      });
+    } catch (insertError) {
+      if (String(insertError.message || '').includes('job_claim_already_taken')) {
+        return {
+          success: true,
+          status: 'ALREADY_CLAIMED',
+          organizationId: organization.id,
+          organizationName: organization.name,
+        };
+      }
+      throw insertError;
+    }
 
     await addKeycloakOrgAdminRole(sessionUserId, logger);
 
-    const contactEmail = await resolveContactEmail(client, portalAppName, logger);
-    if (contactEmail) {
-      // A mail must never undo a claim that already succeeded.
-      const mailResult = await queueEmail({
-        templateType: 'JOB_ORGANIZATION_CLAIMED',
-        variableReplacer: createOrganizationClaimVariableReplacer(
-          { name: organization.name },
-          {
-            userName: displayName(claimer),
-            userEmail: claimer.email,
-            verification: verificationLabel(verification),
-            adminUrl: adminAccessUrl(),
-            contactEmail,
-          }
-        ),
-        recipientEmail: contactEmail,
-        metadata: { type: 'JOB_ORGANIZATION_CLAIMED', organizationId: organization.id },
-        client,
-        logger,
-      });
-      if (!mailResult.success) {
-        logger.error('Could not queue the claim notification', { messageKey: mailResult.messageKey });
-      }
-    } else {
-      logger.warn('No StuJo contact address configured, claim notification skipped', {
-        organizationId: organization.id,
-      });
-    }
+    await notifyClaim(client, logger, {
+      organizationName: organization.name,
+      organizationId: organization.id,
+      claimer,
+      verification,
+      portalAppName,
+    });
 
     return {
       success: true,

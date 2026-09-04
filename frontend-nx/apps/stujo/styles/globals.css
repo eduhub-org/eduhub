@@ -338,6 +338,17 @@ a:focus {
   margin-right: 0.5rem;
 }
 
+/* Inline links inside muted helper text are still tap targets. 44px minimum on touch,
+   per .cursor/rules/mobile-responsive-design.mdc; desktop keeps the inline flow. */
+@media (hover: none) and (pointer: coarse) {
+  .stujo-muted a {
+    display: inline-flex;
+    align-items: center;
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
+
 .stujo-muted {
   color: var(--stujo-muted);
   font-size: 0.95em;

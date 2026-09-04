@@ -131,7 +131,10 @@
     "claimContactFallback": "Stuck? Write to us at {contact}.",
     "accessRequestSent": "We have passed your request on. You will hear directly from the colleagues who manage the job offers.",
     "accessRequestAlreadySent": "You already have a pending request for this company. Please wait for a reply.",
-    "accessRequestFailed": "The request could not be sent: {error}"
+    "accessRequestFailed": "The request could not be sent: {error}",
+    "claimOptionsLoading": "Loading companies …",
+    "claimOptionsError": "The list of companies could not be loaded.",
+    "claimOptionsRetry": "Try again"
   },
   "jobType": {
     "MINIJOB": "Mini jobs",

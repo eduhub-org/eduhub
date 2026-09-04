@@ -52,8 +52,11 @@ const Unternehmen: FC<Props> = ({ portal }) => {
   const employerRole = useEmployerRoleContext();
   const { organizations, loading: orgsLoading } = useEmployerOrganization();
 
-  const [selectedId, setSelectedId] = useState('');
-  const [typedName, setTypedName] = useState('');
+  // What the picker currently holds, tracked as a tagged value rather than inferred from the
+  // string: a company legitimately named "360" would otherwise be read back as organization id 360.
+  const [selection, setSelection] = useState<
+    { kind: 'none' } | { kind: 'existing'; id: string } | { kind: 'new'; name: string }
+  >({ kind: 'none' });
   const [declared, setDeclared] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -64,7 +67,12 @@ const Unternehmen: FC<Props> = ({ portal }) => {
   // send someone here and get them back to what they were doing.
   const next = typeof router.query.next === 'string' ? router.query.next : '/mein-stujo/neu';
 
-  const { data: optionsData } = useQuery(ORGANIZATION_OPTIONS, {
+  const {
+    data: optionsData,
+    loading: optionsLoading,
+    error: optionsError,
+    refetch: refetchOptions,
+  } = useQuery(ORGANIZATION_OPTIONS, {
     context: employerRole,
     skip: sessionStatus !== 'authenticated',
   });
@@ -103,7 +111,7 @@ const Unternehmen: FC<Props> = ({ portal }) => {
     setNotice(null);
     setClaim(null);
 
-    if (!selectedId && typedName.trim() === '') {
+    if (selection.kind === 'none' || (selection.kind === 'new' && selection.name.trim() === '')) {
       setError(t('claimPickOrganization'));
       return;
     }
@@ -117,8 +125,8 @@ const Unternehmen: FC<Props> = ({ portal }) => {
         variables: {
           // Exactly one of the two: an id when a suggestion was picked, the raw
           // text when the employer named a company that is not on the board.
-          organizationId: selectedId ? Number(selectedId) : null,
-          newOrganizationName: selectedId ? null : typedName.trim(),
+          organizationId: selection.kind === 'existing' ? Number(selection.id) : null,
+          newOrganizationName: selection.kind === 'new' ? selection.name.trim() : null,
           portalAppName: portal.appName,
           declareAuthorization: true,
         },
@@ -248,36 +256,46 @@ const Unternehmen: FC<Props> = ({ portal }) => {
         </div>
       ) : (
         <div className="stujo-form" style={{ maxWidth: '32rem' }}>
-          <DropDownSelector
-            variant="eduhub"
-            label={t('claimOrganizationLabel')}
-            placeholder={t('claimOrganizationPlaceholder')}
-            value={selectedId}
-            options={options}
-            creatable
-            className="stujo-field"
-            // Without an updateValueMutation the component reports through
-            // onValueUpdated for BOTH cases: an option's id when a suggestion
-            // is picked, and the raw text when "create" is chosen (it fires
-            // right after onOptionCreated). Telling them apart by shape rather
-            // than by call order keeps this correct either way.
-            onValueUpdated={(value: string) => {
-              if (/^\d+$/.test(value)) {
-                setSelectedId(value);
-                setTypedName('');
-              } else {
-                setSelectedId('');
-                setTypedName(value);
-              }
-            }}
-            onOptionCreated={(value: string) => {
-              setSelectedId('');
-              setTypedName(value);
-            }}
-          />
+          {/* The picker filters its options client-side, so until they arrive it would offer
+              nothing but "create" — and an employer whose company IS on the board would create a
+              duplicate of it. Say what is happening instead, and keep submit closed. */}
+          {optionsError ? (
+            <div className="stujo-notice stujo-notice--error">
+              {t('claimOptionsError')}{' '}
+              <button
+                type="button"
+                className="stujo-btn stujo-btn--small stujo-btn--ghost"
+                onClick={() => refetchOptions()}
+              >
+                {t('claimOptionsRetry')}
+              </button>
+            </div>
+          ) : optionsLoading ? (
+            <p className="stujo-muted">{t('claimOptionsLoading')}</p>
+          ) : (
+            <DropDownSelector
+              variant="eduhub"
+              label={t('claimOrganizationLabel')}
+              placeholder={t('claimOrganizationPlaceholder')}
+              value={selection.kind === 'existing' ? selection.id : ''}
+              options={options}
+              creatable
+              className="stujo-field"
+              // Without an updateValueMutation the component reports through onValueUpdated for
+              // BOTH cases: an option's id when a suggestion is picked, and the raw text when
+              // "create" is chosen (it fires right after onOptionCreated). onOptionCreated is what
+              // distinguishes them, so it tags the selection and onValueUpdated only overrides that
+              // tag when the value is a known option's id.
+              onValueUpdated={(value: string) => {
+                const picked = options.find((option: { value: string }) => option.value === value);
+                setSelection(picked ? { kind: 'existing', id: value } : { kind: 'new', name: value });
+              }}
+              onOptionCreated={(value: string) => setSelection({ kind: 'new', name: value })}
+            />
+          )}
 
-          {typedName !== '' && (
-            <p className="stujo-muted">{t('claimWillCreate', { name: typedName })}</p>
+          {selection.kind === 'new' && selection.name.trim() !== '' && (
+            <p className="stujo-muted">{t('claimWillCreate', { name: selection.name })}</p>
           )}
 
           <label className="stujo-consent">
@@ -293,7 +311,7 @@ const Unternehmen: FC<Props> = ({ portal }) => {
             <button
               type="button"
               className="stujo-btn stujo-btn--primary"
-              disabled={claiming}
+              disabled={claiming || optionsLoading || Boolean(optionsError)}
               onClick={handleSubmit}
             >
               {t('claimSubmit')}

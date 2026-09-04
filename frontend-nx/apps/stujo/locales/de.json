@@ -131,7 +131,10 @@
     "claimContactFallback": "Du kommst nicht weiter? Schreib uns an {contact}.",
     "accessRequestSent": "Wir haben Deine Anfrage weitergeleitet. Du hörst direkt von den Kolleg:innen, die die Stellenanzeigen verwalten.",
     "accessRequestAlreadySent": "Für dieses Unternehmen läuft schon eine Anfrage von Dir. Bitte warte die Antwort ab.",
-    "accessRequestFailed": "Die Anfrage konnte nicht gesendet werden: {error}"
+    "accessRequestFailed": "Die Anfrage konnte nicht gesendet werden: {error}",
+    "claimOptionsLoading": "Unternehmen werden geladen …",
+    "claimOptionsError": "Die Unternehmensliste konnte nicht geladen werden.",
+    "claimOptionsRetry": "Erneut versuchen"
   },
   "jobType": {
     "MINIJOB": "Minijobs",
