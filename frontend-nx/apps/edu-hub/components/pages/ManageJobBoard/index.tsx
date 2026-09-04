@@ -10,6 +10,12 @@ import { useAdminQuery } from '../../../hooks/authedQuery';
  * credit grants — the admin counterpart of design/stujo-design.pen.
  */
 
+// Same shape as the check queueEmail applies server-side, so the address an admin types here is
+// the address the mail layer will accept. Deliberately permissive: it rejects the typos that make a
+// recipient unusable, not exotic-but-valid addresses.
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const isValidEmail = (value: string) => EMAIL_PATTERN.test(value);
+
 const JOB_BOARD_ADMIN_QUERY = gql`
   query JobBoardAdmin {
     JobPosting(order_by: { publishedAt: desc_nulls_last }, limit: 25) {
@@ -290,7 +296,7 @@ const ManageJobBoard: FC = () => {
       </div>
 
       <SectionTitle title="Portale (AppSettings)" />
-      {portalSaveError && <div className="mb-2 text-sm text-red-400">{portalSaveError}</div>}
+      {portalSaveError && <div className="mb-2 text-sm text-error">{portalSaveError}</div>}
       <div className="rounded-lg bg-bg-card overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
@@ -323,19 +329,29 @@ const ManageJobBoard: FC = () => {
                       if (value === (portal.contactEmail ?? '')) {
                         return;
                       }
+                      // type="email" only gates form submission, and this field saves on blur, so
+                      // an unusable address would otherwise reach the column that every claim and
+                      // access-request notification is sent to.
+                      if (value !== '' && !isValidEmail(value)) {
+                        event.target.value = portal.contactEmail ?? '';
+                        setPortalSaveError(
+                          `Kontakt-E-Mail für ${portal.slug} nicht gespeichert: keine gültige E-Mail-Adresse.`
+                        );
+                        return;
+                      }
                       setPortalSaveError(null);
                       try {
                         await updatePortalContactEmail({
                           variables: { id: portal.id, contactEmail: value === '' ? null : value },
                         });
                         await refetch();
-                      } catch (saveError: any) {
+                      } catch (saveError: unknown) {
                         // The field is uncontrolled, so it keeps showing the value that was not
                         // saved. Say so, and put the stored value back so the two agree.
                         event.target.value = portal.contactEmail ?? '';
                         setPortalSaveError(
                           `Kontakt-E-Mail für ${portal.slug} nicht gespeichert: ${
-                            saveError?.message ?? 'unbekannter Fehler'
+                            saveError instanceof Error ? saveError.message : 'unbekannter Fehler'
                           }`
                         );
                       }

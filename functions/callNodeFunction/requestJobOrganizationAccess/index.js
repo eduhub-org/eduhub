@@ -53,8 +53,9 @@ const GET_ORGANIZATION = gql`
 // access requests for different organizations would collide on it.
 const RECENT_REQUESTS = gql`
   query RecentJobOrganizationAccessRequests($metadata: jsonb!, $since: timestamptz!) {
-    MailLog(where: { metadata: { _contains: $metadata }, created_at: { _gte: $since } }, limit: 1) {
+    MailLog(where: { metadata: { _contains: $metadata }, created_at: { _gte: $since } }) {
       id
+      metadata
     }
   }
 `;
@@ -111,7 +112,19 @@ export default async function requestJobOrganizationAccess(req, logger) {
     };
     const since = new Date(Date.now() - RATE_LIMIT_HOURS * 60 * 60 * 1000).toISOString();
     const recent = await client.request(RECENT_REQUESTS, { metadata: requestKey, since });
-    if (recent?.MailLog?.length > 0) {
+
+    // Per administrator, not per request: if one mail was queued and another failed, a request-level
+    // check would match the successful row and refuse the retry, leaving that administrator never
+    // asked. So the window is applied to each recipient, and only a request where every current
+    // administrator already has a mail is a duplicate.
+    const alreadyMailed = new Set(
+      (recent?.MailLog ?? [])
+        .map((row) => row.metadata?.adminUserId)
+        .filter(Boolean)
+        .map(String)
+    );
+    const pending = admins.filter((grant) => !alreadyMailed.has(String(grant.userId)));
+    if (pending.length === 0) {
       return {
         success: false,
         error: 'An access request for this organization was already sent recently',
@@ -131,7 +144,7 @@ export default async function requestJobOrganizationAccess(req, logger) {
     );
 
     let queued = 0;
-    for (const grant of admins) {
+    for (const grant of pending) {
       const result = await queueEmail({
         templateType: 'JOB_ORGANIZATION_ACCESS_REQUEST',
         variableReplacer,
@@ -145,7 +158,8 @@ export default async function requestJobOrganizationAccess(req, logger) {
         queued += 1;
       } else {
         // Logged per recipient rather than aborting: the administrators who can be reached should
-        // be, and the unique index means a retry re-queues only the ones that are still missing.
+        // be, and because the window above is evaluated per recipient a retry asks exactly the ones
+        // that are still missing.
         logger.error('Could not queue an access request mail', {
           messageKey: result.messageKey,
           adminUserId: grant.userId,

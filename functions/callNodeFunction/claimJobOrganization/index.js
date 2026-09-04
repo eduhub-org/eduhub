@@ -184,6 +184,12 @@ async function notifyClaim(
   logger,
   { organizationName, organizationId, claimer, verification, portalAppName }
 ) {
+  // portalAppName comes from the caller, and it selects which JobPortal.contactEmail is used. That
+  // must not be a way to steer the notification away from whoever reviews these claims: the mail is
+  // the review signal that makes an instant grant acceptable. So the platform address, which only
+  // the deployment can set, is always copied in when it is configured and is not already the
+  // recipient — whatever portal the caller names, the responsible mailbox learns of the claim.
+  const platformEmail = process.env.STUJO_ADMIN_EMAIL || null;
   const contactEmail = await resolveContactEmail(client, portalAppName, logger);
   if (!contactEmail) {
     logger.warn('No StuJo contact address configured, claim notification skipped', {
@@ -191,6 +197,7 @@ async function notifyClaim(
     });
     return;
   }
+  const extraBcc = platformEmail && platformEmail !== contactEmail ? platformEmail : null;
 
   const mailResult = await queueEmail({
     templateType: 'JOB_ORGANIZATION_CLAIMED',
@@ -205,6 +212,7 @@ async function notifyClaim(
       }
     ),
     recipientEmail: contactEmail,
+    extraBcc,
     metadata: { type: 'JOB_ORGANIZATION_CLAIMED', organizationId },
     client,
     logger,

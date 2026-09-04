@@ -111,9 +111,13 @@ const AddAdminDialog: FC<AddAdminDialogProps> = ({
   // Assigned, not just set: switching from an organization that needs a settings admin to one that
   // already has one must clear the box again, or the automatic tick silently follows along and
   // grants settings rights the second organization never asked for.
+  //
+  // Keyed on the organization, not only on the flag: between two organizations that both need a
+  // settings admin the flag never changes, so an effect watching it alone would not run again and
+  // a box the user had deliberately unticked would stay unticked for the second one.
   useEffect(() => {
     setCanManageSettings(needsSettingsAdmin);
-  }, [needsSettingsAdmin]);
+  }, [organizationId, needsSettingsAdmin]);
 
   // Inline user search (same query/role as the shared SelectUserDialog used to add instructors): only
   // existing, active EduHub users are returned, matched by partial name or email.

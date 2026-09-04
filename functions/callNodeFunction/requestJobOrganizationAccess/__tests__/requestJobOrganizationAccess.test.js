@@ -127,13 +127,40 @@ describe('requestJobOrganizationAccess', () => {
     ]);
   });
 
-  it('refuses a second request for the same organization within the rate-limit window', async () => {
-    requestMock = buildRequestMock({ recent: [{ id: 500 }] });
+  const mailedRow = (id, adminUserId) => ({
+    id,
+    metadata: {
+      type: 'JOB_ORGANIZATION_ACCESS_REQUEST',
+      organizationId: 7,
+      requesterUserId: REQUESTER.id,
+      adminUserId,
+    },
+  });
+
+  it('refuses a second request only once every administrator has been asked', async () => {
+    requestMock = buildRequestMock({
+      recent: [mailedRow(500, 'user-2'), mailedRow(501, 'user-3')],
+    });
 
     const result = await requestJobOrganizationAccess(accessInput({}), mockLogger);
 
     expect(result).toMatchObject({ success: false, messageKey: 'REQUEST_ALREADY_SENT' });
     expect(queueEmailMock).not.toHaveBeenCalled();
+  });
+
+  it('asks the administrator a previous attempt missed instead of refusing the retry', async () => {
+    // The first attempt reached Kim and failed for Lea. A request-level window would match Kim's
+    // row and refuse this retry, leaving Lea never asked at all.
+    requestMock = buildRequestMock({ recent: [mailedRow(500, 'user-2')] });
+
+    const result = await requestJobOrganizationAccess(accessInput({}), mockLogger);
+
+    expect(result).toMatchObject({ success: true, messageKey: 'REQUEST_SENT' });
+    expect(queueEmailMock).toHaveBeenCalledTimes(1);
+    expect(queueEmailMock.mock.calls[0][0]).toMatchObject({
+      recipientEmail: 'lea@beispiel.de',
+      metadata: expect.objectContaining({ adminUserId: 'user-3' }),
+    });
   });
 
   it('sends nobody anything when the organization has no job admin to ask', async () => {
