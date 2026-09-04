@@ -16,6 +16,7 @@ import { useAdminMutation } from '../../../hooks/authedMutation';
 import {
   ADMIN_USER_LIST,
   DELETE_ORGANIZATION_ADMIN,
+  DELETE_ORGANIZATION_ADMINS_BY_USER,
   MANAGEABLE_ORGANIZATIONS,
   ADMIN_GRANTS,
   UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_EVENTS,
@@ -37,8 +38,15 @@ import {
   ManageableOrganizationsVariables,
 } from '../../../queries/__generated__/ManageableOrganizations';
 import { AdminGrants } from '../../../queries/__generated__/AdminGrants';
+import { AdminUsers } from '../../../queries/__generated__/AdminUsers';
 import { User_bool_exp, order_by } from '../../../__generated__/globalTypes';
 import AddAdminDialog, { AdminOrganizationOption } from './AddAdminDialog';
+import {
+  ADMIN_PRIVILEGES,
+  AdminPrivilege,
+  buildPrivilegeCondition,
+  privilegeLabelKey,
+} from './adminPrivileges';
 
 // Every mutation on a grant changes both the list (capabilities, and possibly whether the user is
 // listed at all) and the per-organization settings-admin counts that gate the sole-admin guard.
@@ -57,7 +65,9 @@ const OrganizationGrantBlock: FC<{
   // must not be turned off (and the grant not deleted) here, because the DB guard would reject it —
   // unless the viewer is a super-admin, who bypasses the guard at the DB level.
   isSoleSettingsAdmin: boolean;
-}> = ({ grant, firstName, lastName, isAdmin, isSoleSettingsAdmin }) => {
+  // False when the row-level delete of the table already covers this grant (see ExpandableAdminRow).
+  showDelete: boolean;
+}> = ({ grant, firstName, lastName, isAdmin, isSoleSettingsAdmin, showDelete }) => {
   const t = useTranslations('manageAdminUsers');
   const manageRole = useManageRole();
 
@@ -117,19 +127,21 @@ const OrganizationGrantBlock: FC<{
     <div className="border border-solid border-border-primary rounded p-3">
       <div className="flex items-center justify-between gap-2 mb-2">
         <div className="text-sm font-semibold truncate">{grant.Organization.name}</div>
-        <TableGridDeleteButton
-          deleteMutation={DELETE_ORGANIZATION_ADMIN}
-          id={grant.id}
-          idType="number"
-          role={manageRole}
-          disabled={settingsLocked}
-          refetchQueries={GRANT_REFETCH_QUERIES}
-          deletionConfirmationQuestion={t('deletion_confirmation_question', {
-            firstName,
-            lastName,
-            organization: grant.Organization.name,
-          })}
-        />
+        {showDelete && (
+          <TableGridDeleteButton
+            deleteMutation={DELETE_ORGANIZATION_ADMIN}
+            id={grant.id}
+            idType="number"
+            role={manageRole}
+            disabled={settingsLocked}
+            refetchQueries={GRANT_REFETCH_QUERIES}
+            deletionConfirmationQuestion={t('deletion_confirmation_question', {
+              firstName,
+              lastName,
+              organization: grant.Organization.name,
+            })}
+          />
+        )}
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-1">
         {capabilities.map((capability) => (
@@ -185,6 +197,11 @@ const ExpandableAdminRow: FC<{
     [onAdminStatusChange, row.id, setAdminStatus]
   );
 
+  // Super-admins remove a whole person with the table's row delete, so the per-organization control
+  // only earns its place where it can express something the row delete cannot: picking one of
+  // several organizations, or a viewer who has no row delete at all (org admins).
+  const showGrantDelete = !isAdmin || row.OrganizationAdmins.length > 1;
+
   return (
     <div className="light bg-fill-primary text-label-primary px-4 py-3">
       <div className="text-xs font-semibold uppercase tracking-wide text-label-secondary mb-2">
@@ -200,6 +217,7 @@ const ExpandableAdminRow: FC<{
               lastName={row.lastName}
               isAdmin={isAdmin}
               isSoleSettingsAdmin={isSoleSettingsAdmin(grant)}
+              showDelete={showGrantDelete}
             />
           ))}
         </div>
@@ -231,39 +249,41 @@ const ManageAdminUsersContent: FC<ManageAdminUsersContentProps> = ({ inSettingsL
   const isAdmin = useIsAdmin();
   const manageRole = useManageRole();
   const currentUserId = useUserId();
-  const [superAdminUserIds, setSuperAdminUserIds] = useState<string[]>([]);
-  const [adminError, setAdminError] = useState<Error | null>(null);
+  const [privilegeFilter, setPrivilegeFilter] = useState<AdminPrivilege[]>([]);
 
   // Super-admin is a Keycloak role, not a database row, so the ids come from the getAdminUsers
   // action. They drive the super-admin marker/toggle and, together with the organization grants
   // below, decide which users the table lists. It is an admin-only action, so org admins must not
   // request it — they simply never see super-admin state.
-  const { loading: superAdminsLoading, refetch: refetchSuperAdmins } = useAdminQuery(ADMIN_USERS, {
+  //
+  // Read straight off the query result instead of mirrored into local state: several controls
+  // refresh the ids by naming AdminUsers in their refetchQueries, which a state copy would miss.
+  const {
+    data: superAdminData,
+    loading: superAdminsLoading,
+    error: adminError,
+    refetch: refetchSuperAdmins,
+  } = useAdminQuery<AdminUsers>(ADMIN_USERS, {
     skip: !isAdmin,
-    onCompleted: (data) => {
-      if (data?.getAdminUsers?.success) {
-        setSuperAdminUserIds(data.getAdminUsers.adminUserIds);
-      }
-    },
     onError: (error) => {
       console.error('Error fetching admin users:', error);
-      setAdminError(error);
     },
   });
 
-  // The super-admin checkbox is controlled by `superAdminUserIds` (derived from the AdminUsers
-  // query), which is held in local state. After a toggle we must refetch that query and refresh the
-  // state so the checkbox, the "Super Admin" marker and the listed users reflect the change.
+  const superAdminUserIds = useMemo<string[]>(
+    () => (superAdminData?.getAdminUsers?.success ? superAdminData.getAdminUsers.adminUserIds : []),
+    [superAdminData]
+  );
+
+  // The super-admin toggle is a Keycloak action without refetchQueries of its own, so the ids have
+  // to be pulled again for the checkbox, the "Super Admin" marker and the listed users to catch up.
   const handleAdminStatusChange = useCallback(async () => {
     // The query is skipped for org admins (admin-only action); refetching it would run it anyway.
     if (!isAdmin) {
       return;
     }
     try {
-      const { data: adminData } = await refetchSuperAdmins();
-      if (adminData?.getAdminUsers?.success) {
-        setSuperAdminUserIds(adminData.getAdminUsers.adminUserIds);
-      }
+      await refetchSuperAdmins();
     } catch (refetchError) {
       console.error('Error refreshing admin users:', refetchError);
     }
@@ -325,11 +345,19 @@ const ManageAdminUsersContent: FC<ManageAdminUsersContentProps> = ({ inSettingsL
         'OrganizationAdmins.Organization.name',
       ]);
 
-      return {
-        filter: Object.keys(searchCondition).length > 0 ? { _and: [isAdminUser, searchCondition] } : isAdminUser,
-      };
+      const privilegeCondition = buildPrivilegeCondition(privilegeFilter, superAdminUserIds);
+
+      const conditions: User_bool_exp[] = [isAdminUser];
+      if (Object.keys(searchCondition).length > 0) {
+        conditions.push(searchCondition);
+      }
+      if (privilegeCondition) {
+        conditions.push(privilegeCondition);
+      }
+
+      return { filter: conditions.length > 1 ? { _and: conditions } : isAdminUser };
     },
-    [adminUserIds]
+    [adminUserIds, privilegeFilter, superAdminUserIds]
   );
 
   const { data, loading, error, pageIndex, setPageIndex, searchFilter, setSearchFilter, sorting, setSorting, refetch } =
@@ -356,6 +384,51 @@ const ManageAdminUsersContent: FC<ManageAdminUsersContentProps> = ({ inSettingsL
     });
 
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+
+  // Changing a filter changes which users match, so the paging has to start over.
+  const handlePrivilegeFilterChange = useCallback(
+    (selected: string[]) => {
+      setPrivilegeFilter(selected as AdminPrivilege[]);
+      setPageIndex(0);
+    },
+    [setPageIndex]
+  );
+
+  const privilegeOptions = useMemo(
+    () =>
+      ADMIN_PRIVILEGES
+        // Org admins never see super-admin state, so they cannot filter on it either.
+        .filter((privilege) => isAdmin || privilege !== 'superAdmin')
+        .map((privilege) => ({ value: privilege, label: t(privilegeLabelKey(privilege)) })),
+    [isAdmin, t]
+  );
+
+  const [revokeSuperAdmin] = useAdminMutation(UPDATE_USER_ADMIN_STATUS);
+  const [deleteUserGrants] = useAdminMutation(DELETE_ORGANIZATION_ADMINS_BY_USER);
+
+  // A row is a person, so deleting it revokes their admin access as a whole: the Keycloak
+  // super-admin role plus every organization grant. That is two operations rather than one
+  // mutation, hence TableGrid's onRowDelete. Super-admins only, because it needs the admin-only
+  // updateUserAdminStatus action and only they are exempt from the DB guard that keeps the last
+  // settings admin of an organization in place.
+  const handleRowDelete = useCallback(
+    async (row: AdminUserList_User) => {
+      // The Keycloak role first: it is what keeps a user listed here even without any grant, so
+      // failing on it must not leave the person half-removed and invisible.
+      if (superAdminUserIds.includes(row.id)) {
+        const response = await revokeSuperAdmin({ variables: { userId: row.id, isAdmin: false } });
+        if (!response.data?.updateUserAdminStatus?.success) {
+          // Rejecting shows the delete button's error dialog and leaves the grants untouched.
+          throw new Error(response.data?.updateUserAdminStatus?.error ?? 'updateUserAdminStatus failed');
+        }
+      }
+      if (row.OrganizationAdmins.length > 0) {
+        await deleteUserGrants({ variables: { userId: row.id } });
+      }
+      await Promise.all([refetch(), refetchGrants(), refetchSuperAdmins()]);
+    },
+    [superAdminUserIds, revokeSuperAdmin, deleteUserGrants, refetch, refetchGrants, refetchSuperAdmins]
+  );
 
   // Organizations the current user may add admins to. Super-admins pick from all organizations; org
   // admins are restricted to those they administer with the canManageSettings capability (the same
@@ -493,6 +566,27 @@ const ManageAdminUsersContent: FC<ManageAdminUsersContentProps> = ({ inSettingsL
             error={error}
             loading={isLoading}
             refetchQueries={['AdminUserList', 'AdminUsers', 'AdminGrants']}
+            filters={[
+              {
+                id: 'privileges',
+                label: t('privileges_filter_label'),
+                options: privilegeOptions,
+                selected: privilegeFilter,
+                onChange: handlePrivilegeFilterChange,
+              },
+            ]}
+            {...(isAdmin
+              ? {
+                  onRowDelete: handleRowDelete,
+                  // Removing your own access would lock you out of this screen.
+                  canDeleteRow: (row: AdminUserList_User) => row.id !== currentUserId,
+                  generateDeletionConfirmationQuestion: (row: AdminUserList_User) =>
+                    t('remove_admin_confirmation_question', {
+                      firstName: row.firstName,
+                      lastName: row.lastName,
+                    }),
+                }
+              : {})}
             expandableRowComponent={({ row }) => (
               <ExpandableAdminRow
                 row={row}

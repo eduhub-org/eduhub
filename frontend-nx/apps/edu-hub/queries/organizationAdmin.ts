@@ -91,6 +91,18 @@ export const DELETE_ORGANIZATION_ADMIN = gql`
   }
 `;
 
+// Revoke every organization grant of one user at once, for the row-level "remove admin" control on
+// the access settings screen. Run as a super-admin, who is exempt from the trigger that keeps the
+// last settings admin of an organization in place — an org admin removing a whole person would hit
+// that guard, which is why the control is limited to super-admins.
+export const DELETE_ORGANIZATION_ADMINS_BY_USER = gql`
+  mutation DeleteOrganizationAdminsByUser($userId: uuid!) {
+    delete_OrganizationAdmin(where: { userId: { _eq: $userId } }) {
+      affected_rows
+    }
+  }
+`;
+
 export const UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_EVENTS = gql`
   mutation UpdateOrganizationAdminCanManageEvents($itemId: Int!, $value: Boolean!) {
     update_OrganizationAdmin_by_pk(

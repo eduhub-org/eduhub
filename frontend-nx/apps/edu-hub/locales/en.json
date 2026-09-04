@@ -2119,6 +2119,8 @@
     "can_manage_users_and_settings": "Can manage users and settings",
     "error_loading_admin_users": "Error loading admin users.",
     "deletion_confirmation_question": "Are you sure you want to delete the admin rights of {firstName} {lastName} for the organization {organization}?",
+    "remove_admin_confirmation_question": "Remove all admin rights of {firstName} {lastName}? This revokes their super admin rights and every organization role.",
+    "privileges_filter_label": "Privileges",
     "administered_organizations": "Administered organizations",
     "no_organization_roles": "No organization role – super admin rights only.",
     "add_admin_button": "Add admin",
