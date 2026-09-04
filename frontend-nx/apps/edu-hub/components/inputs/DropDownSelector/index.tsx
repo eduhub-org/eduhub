@@ -113,7 +113,10 @@ const DropDownSelector: React.FC<DropDownSelectorProps> = ({
     // typed text with `option.value` instead compared it with an id for every id-keyed picker
     // (organizations, addresses): it missed real duplicates, and it refused a legitimate creation
     // whenever a name happened to equal an existing row's id — a company called "360".
-    const typedName = inputValue.trim().toLowerCase();
+    // Trimmed throughout: the guard below would otherwise accept "   " as a name and create a
+    // blank organization, and a name typed with stray spaces would be stored with them.
+    const normalizedName = inputValue.trim();
+    const typedName = normalizedName.toLowerCase();
     const nameExists = localOptions.some((option) => {
       if (option.label.trim().toLowerCase() === typedName) return true;
       const aliases: NonNullable<Option['aliases']> = option.aliases ?? [];
@@ -122,12 +125,12 @@ const DropDownSelector: React.FC<DropDownSelectorProps> = ({
         return !!aliasName && aliasName.trim().toLowerCase() === typedName;
       });
     });
-    if (inputValue && !nameExists) {
+    if (normalizedName && !nameExists) {
       if (createOptionMutation) {
         createValue({
           variables: {
             ...identifierVariables,
-            value: inputValue,
+            value: normalizedName,
           },
           onCompleted: (data) => {
             const newValue = data?.createOption?.value || data?.insert_Organization_one?.id || data?.insert_LocationAddress_one?.id;
@@ -146,8 +149,8 @@ const DropDownSelector: React.FC<DropDownSelectorProps> = ({
           },
         });
       } else {
-        onOptionCreated?.(inputValue);
-        debouncedUpdateValue(inputValue);
+        onOptionCreated?.(normalizedName);
+        debouncedUpdateValue(normalizedName);
       }
     }
   }, [

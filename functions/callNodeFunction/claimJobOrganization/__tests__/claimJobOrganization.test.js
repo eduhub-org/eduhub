@@ -20,14 +20,23 @@ const CLAIMER = {
  * A response map keeps each test readable and lets it assert on the mutations
  * that were NOT sent, which is where the interesting guarantees live.
  */
-const buildRequestMock = ({ organization = null, candidates = [], created = null, portalContactEmail = null }) =>
-  jest.fn(async (document) => {
+const buildRequestMock = ({
+  organization = null,
+  candidates = [],
+  created = null,
+  portalContactEmail = null,
+  expectedPortalAppName = 'stujo',
+}) =>
+  jest.fn(async (document, variables) => {
     const query = String(document);
     if (query.includes('GetClaimerForOrganizationClaim')) return { User_by_pk: CLAIMER };
     if (query.includes('FindOrganizationCandidatesForClaim')) return { Organization: candidates };
     if (query.includes('GetOrganizationForClaim')) return { Organization_by_pk: organization };
     if (query.includes('CreateOrganizationForClaim')) return { insert_Organization_one: created };
     if (query.includes('GetJobPortalContactEmail')) {
+      // Asserted, not ignored: the point of the routing tests is which portal is looked up, so a
+      // handler that asked about a different appName must fail them rather than get this answer.
+      expect(variables).toMatchObject({ appName: expectedPortalAppName });
       return { JobPortal: [{ contactEmail: portalContactEmail }] };
     }
     if (query.includes('InsertJobOrganizationGrant')) {
@@ -153,6 +162,7 @@ describe('claimJobOrganization', () => {
     requestMock = buildRequestMock({
       organization: { id: 7, name: 'Andere GmbH', email: null, website: null, OrganizationAdmins: [] },
       portalContactEmail: 'jobs@andere-hochschule.de',
+      expectedPortalAppName: 'andere',
     });
 
     await claimJobOrganization(claimInput({ organizationId: 7, portalAppName: 'andere' }), mockLogger);
@@ -172,6 +182,7 @@ describe('claimJobOrganization', () => {
 
     await claimJobOrganization(claimInput({ organizationId: 7 }), mockLogger);
 
+    expect(queueEmailMock).toHaveBeenCalledTimes(1);
     expect(queueEmailMock.mock.calls[0][0]).toMatchObject({
       recipientEmail: 'stujo@opencampus.sh',
       extraBcc: null,

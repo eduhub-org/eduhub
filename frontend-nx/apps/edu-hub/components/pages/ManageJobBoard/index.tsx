@@ -344,7 +344,6 @@ const ManageJobBoard: FC = () => {
                         await updatePortalContactEmail({
                           variables: { id: portal.id, contactEmail: value === '' ? null : value },
                         });
-                        await refetch();
                       } catch (saveError: unknown) {
                         // The field is uncontrolled, so it keeps showing the value that was not
                         // saved. Say so, and put the stored value back so the two agree.
@@ -354,7 +353,13 @@ const ManageJobBoard: FC = () => {
                             saveError instanceof Error ? saveError.message : 'unbekannter Fehler'
                           }`
                         );
+                        return;
                       }
+                      // Refetched separately: the write already succeeded, so a failure to read the
+                      // table back must not revert the field or claim the address was not saved.
+                      // The input already shows the stored value; the rest of the table is stale
+                      // until the next refresh.
+                      await refetch().catch(() => undefined);
                     }}
                   />
                 </td>
