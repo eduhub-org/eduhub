@@ -26,6 +26,25 @@ Locations:
 - `components/inputs/`
 - `components/common/`
 
+## Two Apps, One Component Set (edu-hub ↔ StuJo)
+
+`frontend-nx/apps/stujo` (the StuJo job board) shares edu-hub's components.
+The apps differ in **design tokens, not in forked components.**
+
+- **Never copy a component into `apps/stujo` to restyle it.** Import it through
+  the `@eduhub/*` alias and override the `--eduhub-*` CSS variables in
+  `apps/stujo/styles/globals.css`. Every colour in
+  `apps/edu-hub/tailwind.config.js` resolves to one of those variables.
+- StuJo's `tailwind.config.js` extends edu-hub's; its `content` globs must
+  include `../edu-hub/components/**`, or Tailwind emits no classes for a shared
+  component and it renders unstyled.
+- Preflight is off in StuJo (the app is a CSS port of the Rails site).
+- `common` translation keys a shared component uses must exist in **both**
+  apps' `locales/*.json`.
+- `variant` picks a style family, not an app: use `'eduhub'` in StuJo too.
+
+Background: `docs/STUJO_INTEGRATION_PLAN.md` §8.1, `AGENTS.md` rule 10.
+
 ## Component Structure
 
 ```typescript

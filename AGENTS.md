@@ -8,7 +8,7 @@ Keycloak/NextAuth, and Node/Python serverless functions. Run everything with
 
 | Layer | Tech | Path |
 |-------|------|------|
-| Frontend | Next.js + TypeScript + Material-UI + Apollo + `next-intl` | `frontend-nx/apps/edu-hub/` |
+| Frontend | Next.js + TypeScript + Material-UI + Apollo + `next-intl` | `frontend-nx/apps/edu-hub/` (main app), `frontend-nx/apps/stujo/` (StuJo job board) |
 | GraphQL API | Hasura | `backend/metadata/`, `backend/migrations/` |
 | Database | PostgreSQL | tracked in Hasura metadata |
 | Auth | Keycloak + NextAuth | `keycloak/` |
@@ -20,6 +20,10 @@ Frontend internals:
 - `queries/*.ts` — GraphQL documents; types generated into `queries/__generated__/`
 - `locales/de.json`, `locales/en.json` — translations (German must use informal "Du")
 - `hooks/authedQuery.ts`, `hooks/authedMutation.ts` — role-aware Apollo hooks
+
+The two apps share a single yarn workspace. `apps/stujo` imports edu-hub code
+through the `@eduhub/*` alias (`tsconfig.base.json`) with
+`experimental.externalDir` enabled in its `next.config.js`.
 
 ## Services and ports
 
@@ -83,6 +87,16 @@ vs jest-config). This is now fixed by pinning `@babel/core` to `7.29.7` via a
    `Dockerfile`, Keycloak provider jars/version, a pinned `image:` tag, or
    serverless function dependencies, run the right `build` / `pull` / `restart`
    and tell the user. Full decision table: `.cursor/rules/docker-rebuild.mdc`.
+10. **App harmonization (edu-hub ↔ StuJo)**: the two apps must differ in
+    *design tokens*, not in forked components. Build StuJo screens from the
+    edu-hub components via `@eduhub/*`; to restyle one, override the
+    `--eduhub-*` CSS variables in `apps/stujo/styles/globals.css` — never copy
+    a component to change its classes. Both apps share
+    `apps/edu-hub/tailwind.config.js`, whose whole colour theme resolves to
+    those variables. A shared component only renders correctly in StuJo if it
+    is matched by StuJo's Tailwind `content` globs, so those must cover
+    `../edu-hub/components/**`. Direction of travel: more sharing over time —
+    see `docs/STUJO_INTEGRATION_PLAN.md` §8.1.
 
 ## Behavioral guidelines (Karpathy)
 

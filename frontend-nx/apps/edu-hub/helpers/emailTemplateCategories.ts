@@ -68,6 +68,8 @@ const CATEGORY_BY_TYPE: Record<string, EmailTemplateCategory> = {
   JOB_POSTING_ADMIN_NOTICE: 'jobboard',
   JOB_POSTING_PAYMENT_FAILED: 'jobboard',
   JOB_ALERT: 'jobboard',
+  JOB_ORGANIZATION_CLAIMED: 'jobboard',
+  JOB_ORGANIZATION_ACCESS_REQUEST: 'jobboard',
 };
 
 export const getEmailTemplateCategory = (type: string): EmailTemplateCategory =>

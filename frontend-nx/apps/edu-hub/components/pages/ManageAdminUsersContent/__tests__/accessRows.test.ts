@@ -1,8 +1,8 @@
-import { toAccessRows } from '../accessRows';
+import { claimNeedsReview, toAccessRows } from '../accessRows';
 
 const organization = (id: number, name: string) => ({ __typename: 'Organization' as const, id, name });
 
-const grant = (id: number, organizationName: string, capabilities: Record<string, boolean> = {}) =>
+const grant = (id: number, organizationName: string, overrides: Record<string, unknown> = {}) =>
   ({
     __typename: 'OrganizationAdmin',
     id,
@@ -13,7 +13,9 @@ const grant = (id: number, organizationName: string, capabilities: Record<string
     canManageDegrees: false,
     canManageJobs: false,
     canManageSettings: false,
-    ...capabilities,
+    claimVerification: null,
+    authorizationDeclaredAt: null,
+    ...overrides,
   }) as any;
 
 const user = (id: string, firstName: string, grants: any[]) =>
@@ -104,5 +106,25 @@ describe('toAccessRows', () => {
 
   it('returns nothing for an empty page', () => {
     expect(toAccessRows([], ['u1'], [])).toEqual([]);
+  });
+});
+
+describe('claimNeedsReview', () => {
+  it('flags a self-service claim whose domain did not match', () => {
+    expect(claimNeedsReview(grant(1, 'Uni Kiel', { claimVerification: 'SELF_SERVICE_UNVERIFIED' }))).toBe(true);
+  });
+
+  it('stops flagging once a super admin has confirmed the claim', () => {
+    expect(claimNeedsReview(grant(1, 'Uni Kiel', { claimVerification: 'ADMIN_VERIFIED' }))).toBe(false);
+  });
+
+  it('does not flag a corroborated claim, a new organization, or a grant a person made', () => {
+    expect(claimNeedsReview(grant(1, 'Uni Kiel', { claimVerification: 'SELF_SERVICE_DOMAIN_VERIFIED' }))).toBe(false);
+    expect(claimNeedsReview(grant(2, 'FH West', { claimVerification: 'NEW_ORGANIZATION' }))).toBe(false);
+    expect(claimNeedsReview(grant(3, 'opencampus.sh'))).toBe(false);
+  });
+
+  it('does not flag the grantless row of a super admin', () => {
+    expect(claimNeedsReview(null)).toBe(false);
   });
 });

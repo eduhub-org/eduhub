@@ -43,6 +43,8 @@ describe('getEmailTemplateCategory', () => {
     'JOB_POSTING_ADMIN_NOTICE',
     'JOB_POSTING_PAYMENT_FAILED',
     'JOB_ALERT',
+    'JOB_ORGANIZATION_CLAIMED',
+    'JOB_ORGANIZATION_ACCESS_REQUEST',
   ];
 
   it.each(knownTypes)('maps known type %s to a real category (not "other")', (type) => {
@@ -85,6 +87,8 @@ describe('getEmailTemplateCategory', () => {
     expect(getEmailTemplateCategory('JOB_POSTING_ADMIN_NOTICE')).toBe('jobboard');
     expect(getEmailTemplateCategory('JOB_POSTING_PAYMENT_FAILED')).toBe('jobboard');
     expect(getEmailTemplateCategory('JOB_ALERT')).toBe('jobboard');
+    expect(getEmailTemplateCategory('JOB_ORGANIZATION_CLAIMED')).toBe('jobboard');
+    expect(getEmailTemplateCategory('JOB_ORGANIZATION_ACCESS_REQUEST')).toBe('jobboard');
   });
 
   it('shows the job board as a tab rather than hiding it behind "Sonstige"', () => {
@@ -118,6 +122,8 @@ describe('job board template labels', () => {
     'JOB_POSTING_ADMIN_NOTICE',
     'JOB_POSTING_PAYMENT_FAILED',
     'JOB_ALERT',
+    'JOB_ORGANIZATION_CLAIMED',
+    'JOB_ORGANIZATION_ACCESS_REQUEST',
   ];
 
   it.each(jobBoardTypes)('has a German name and trigger description for %s', (type) => {

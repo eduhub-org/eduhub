@@ -85,45 +85,27 @@ array_relationships:
           name: JobPortal
           schema: public
 insert_permissions:
+  # A logged-in user creates an organization in exactly one situation: they name their employer or
+  # university in a picker that has no matching entry yet (the profile organization field, the
+  # course onboarding, the StuJo job-offer onboarding). All three send a name and a type, so those
+  # are the only columns granted here.
+  #
+  # Everything else was previously insertable, including the banking, tax, register and invoicing
+  # columns. Nobody ever wrote them on this path, and since those columns moved behind
+  # canManageSettings for reading (OrganizationSettings view) and have always required it for
+  # updating, being able to seed them at creation was the one remaining way for an unprivileged
+  # caller to put values there and never see them again. The organization's own settings admin fills
+  # them in afterwards.
+  #
+  # Callers that legitimately need the full column set — the StuJo ETL, the claimJobOrganization
+  # action, the organization management screen — run as `admin` or with the admin secret and are
+  # unaffected.
   - role: user_access
     permission:
       check: {}
       columns:
-        - addressLine1
-        - addressLine2
-        - aliases
-        - bankName
-        - city
-        - country
-        - created_at
-        - defaultTaxExemptionNote
-        - defaultVatRate
-        - description
-        - email
-        - id
-        - invoiceFooterText
-        - invoiceNumberPrefix
-        - legalForm
-        - legalName
-        - logo
-        - managingDirector
         - name
-        - newsletterDescription
-        - newsletterProvider
-        - phone
-        - postalCode
-        - registerCourt
-        - registerNumber
-        - ghostNewsletterApiUrl
-        - ghostNewsletterListId
-        - ghostNewsletterSlug
-        - ghostNewsletterLabel
-        - ghostNewsletterDoubleOptInEnabled
-        - taxNumber
         - type
-        - updated_at
-        - vatId
-        - website
 select_permissions:
   - role: anonymous
     permission:

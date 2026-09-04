@@ -2140,7 +2140,20 @@
     "add_admin_scope_required": "Please select an organization or grant super admin rights.",
     "add_admin_no_organization": "No organization (super admin only)",
     "add_admin_super_admin_hint": "Super admins manage the whole platform, independently of any organization.",
-    "add_admin_success": "Admin user added."
+    "add_admin_success": "Admin user added.",
+    "first_settings_admin_hint": "This company has nobody with this right yet. Without it, nobody here can add further admins or change its settings.",
+    "claim_declared_at": "The administration rights were claimed on {date}.",
+    "claim_declared": "The administration rights were self-claimed.",
+    "claim_needs_review_label": "Administration rights were self-claimed – please review!",
+    "verify_claim_button": "Confirm authorization",
+    "verify_claim_submitting": "Confirming…",
+    "verify_claim_error": "The authorization could not be confirmed. Somebody else may have confirmed or revoked it in the meantime.",
+    "claim_verification": {
+      "SELF_SERVICE_DOMAIN_VERIFIED": "The email domain matches the organization.",
+      "SELF_SERVICE_UNVERIFIED": "Please review!",
+      "NEW_ORGANIZATION": "The organization was created with the claim.",
+      "ADMIN_VERIFIED": "The authorization has been reviewed and confirmed."
+    }
   },
   "manageAppSettings": {
     "backgroundImageURL": "Background image URL",
@@ -2653,7 +2666,9 @@
       "JOB_POSTING_EXPIRED": "Job posting expired",
       "JOB_POSTING_ADMIN_NOTICE": "Job posting: admin notice",
       "JOB_POSTING_PAYMENT_FAILED": "Job posting: payment failed",
-      "JOB_ALERT": "Job alert"
+      "JOB_ALERT": "Job alert",
+      "JOB_ORGANIZATION_CLAIMED": "Job access: newly taken over",
+      "JOB_ORGANIZATION_ACCESS_REQUEST": "Job access: request to the current admins"
     },
     "placeholders": {
       "subject": "Enter email subject...",
@@ -2706,7 +2721,9 @@
       "JOB_POSTING_EXPIRED": "Sent to the employer when the posting run ends, with a link to post it again",
       "JOB_POSTING_ADMIN_NOTICE": "Sent to the platform admins when a posting is published (post-hoc moderation)",
       "JOB_POSTING_PAYMENT_FAILED": "Sent to the employer when a delayed payment (SEPA) fails and the posting is taken offline",
-      "JOB_ALERT": "Sent to subscribers with new postings matching their search profile"
+      "JOB_ALERT": "Sent to subscribers with new postings matching their search profile",
+      "JOB_ORGANIZATION_CLAIMED": "Goes to the StuJo contact address when someone takes over job management for a company themselves",
+      "JOB_ORGANIZATION_ACCESS_REQUEST": "Goes to the current admins when someone else asks for access to their job offers"
     },
     "delete_confirmation": "Are you sure you want to delete the email template \"{title}\"?",
     "unknown_trigger": "Unknown trigger type",

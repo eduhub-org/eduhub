@@ -12,13 +12,7 @@ import { Organization_bool_exp, Organization_order_by, OrganizationType_enum } f
 export interface OrganizationList_Organization_Settings {
   __typename: "OrganizationSettings";
   id: number | null;
-  /**
-   * SHA-256 hash of the organization API key for participant data access. Plain text keys are never stored.
-   */
   apiKeyHash: string | null;
-  /**
-   * Flag indicating whether an encrypted Ghost newsletter API credential is configured.
-   */
   ghostNewsletterApiKeyConfigured: boolean | null;
 }
 
@@ -69,12 +63,12 @@ export interface OrganizationList_Organization {
   created_at: any;
   updated_at: any;
   /**
-   * An array relationship
-   */
-  /**
-   * Settings-admin-only columns; null unless the caller holds canManageSettings for this organization.
+   * An object relationship
    */
   Settings: OrganizationList_Organization_Settings | null;
+  /**
+   * An array relationship
+   */
   Users: OrganizationList_Organization_Users[];
 }
 
