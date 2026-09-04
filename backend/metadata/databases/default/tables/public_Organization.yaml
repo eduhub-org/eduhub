@@ -5,6 +5,18 @@ object_relationships:
   - name: Country
     using:
       foreign_key_constraint_on: country
+  # The settings-admin-only columns (billing, tax, integration credentials) live in the
+  # OrganizationSettings view, whose own permission requires canManageSettings. Reading them
+  # through this relationship yields null for an admin without that capability.
+  - name: Settings
+    using:
+      manual_configuration:
+        column_mapping:
+          id: id
+        insertion_order: null
+        remote_table:
+          name: OrganizationSettings
+          schema: public
   - name: OrganizationType
     using:
       foreign_key_constraint_on: type
@@ -136,49 +148,40 @@ select_permissions:
         - city
       filter: {}
       allow_aggregations: true
-  # Org admins may read the full record of any organization they administer (regardless of which
-  # capability flags are set) so they have context for managing it. Editing settings additionally
-  # requires canManageSettings (see update_permissions). The `user` role only sees the public
-  # columns granted to `anonymous`.
+  # Org admins may read the working record of any organization they administer (regardless of which
+  # capability flags are set) so they have context for managing it.
+  #
+  # The banking, tax, register and invoicing columns and the integration credentials are NOT here:
+  # this filter is satisfied by any grant, so a job-board-only admin would read them too. They live
+  # in the OrganizationSettings view (relationship `Settings`), which requires canManageSettings —
+  # the same capability the update permission below requires to change them. The Ghost newsletter
+  # endpoint fields stay because `anonymous` may already read them; hiding them here would protect
+  # nothing. The `user` role only sees the public columns granted to `anonymous`.
   - role: org_admin_access
     permission:
       columns:
         - addressLine1
         - addressLine2
         - aliases
-        - bankName
         - city
         - country
         - created_at
-        - defaultTaxExemptionNote
-        - defaultVatRate
         - description
         - email
         - id
-        - invoiceFooterText
-        - invoiceNumberPrefix
-        - legalForm
-        - legalName
         - logo
-        - managingDirector
         - name
         - newsletterDescription
         - newsletterProvider
         - phone
         - postalCode
-        - registerCourt
-        - registerNumber
         - ghostNewsletterApiUrl
-        - ghostNewsletterApiKeyConfigured
         - ghostNewsletterListId
         - ghostNewsletterSlug
         - ghostNewsletterLabel
         - ghostNewsletterDoubleOptInEnabled
-        - apiKeyHash
-        - taxNumber
         - type
         - updated_at
-        - vatId
         - website
       filter:
         OrganizationAdmins:

@@ -19,17 +19,22 @@ export const ORGANIZATION_LIST = gql`
       description
       aliases
       logo
-      apiKeyHash
       newsletterDescription
       newsletterProvider
       ghostNewsletterApiUrl
-      ghostNewsletterApiKeyConfigured
       ghostNewsletterListId
       ghostNewsletterSlug
       ghostNewsletterLabel
       ghostNewsletterDoubleOptInEnabled
       created_at
       updated_at
+      # Only populated for admins who may manage this organization's settings; null otherwise
+      # (the OrganizationSettings permission requires canManageSettings).
+      Settings {
+        id
+        apiKeyHash
+        ghostNewsletterApiKeyConfigured
+      }
       Users {
         id
       }
@@ -129,7 +134,6 @@ export const UPDATE_ORGANIZATION_API_KEY_HASH = gql`
       _set: { apiKeyHash: $apiKeyHash }
     ) {
       id
-      apiKeyHash
     }
   }
 `;

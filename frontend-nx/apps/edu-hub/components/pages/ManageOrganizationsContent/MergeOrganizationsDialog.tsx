@@ -131,9 +131,12 @@ export const MergeOrganizationsDialog: React.FC<MergeOrganizationsDialogProps> =
     const willChangeToUniversity = hasUniversityType && targetOrg.type !== 'UNIVERSITY';
 
     // Check for API keys - count organizations with apiKeyHash defined
+    // Settings is null unless the viewer may manage the organization's settings.
     const orgsWithApiKeys = [
-      ...orgsToMerge.filter((org: OrganizationList_Organization) => org.apiKeyHash != null && org.apiKeyHash !== ''),
-      ...(targetOrg.apiKeyHash != null && targetOrg.apiKeyHash !== '' ? [targetOrg] : []),
+      ...orgsToMerge.filter(
+        (org: OrganizationList_Organization) => org.Settings?.apiKeyHash != null && org.Settings.apiKeyHash !== ''
+      ),
+      ...(targetOrg.Settings?.apiKeyHash != null && targetOrg.Settings.apiKeyHash !== '' ? [targetOrg] : []),
     ];
     const hasMultipleApiKeys = orgsWithApiKeys.length > 1;
 

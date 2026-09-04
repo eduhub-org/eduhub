@@ -58,6 +58,7 @@
 - "!include public_Organization.yaml"
 - "!include public_OrganizationAdmin.yaml"
 - "!include public_OrganizationNewsletterSubscription.yaml"
+- "!include public_OrganizationSettings.yaml"
 - "!include public_OrganizationType.yaml"
 - "!include public_Program.yaml"
 - "!include public_ProgramType.yaml"
