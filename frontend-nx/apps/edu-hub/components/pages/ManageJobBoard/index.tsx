@@ -94,6 +94,18 @@ const UPDATE_PRICE = gql`
   }
 `;
 
+// The address the job board writes to when it needs a human: the self-service claim
+// notifications, and the fallback shown to an employer who cannot get access. Seeded NULL, so until
+// it is filled in the StuJo pages say "write to das StuJo-Team" with no address at all.
+const UPDATE_PORTAL_CONTACT_EMAIL = gql`
+  mutation AdminUpdateJobPortalContactEmail($id: Int!, $contactEmail: String) {
+    update_JobPortal_by_pk(pk_columns: { id: $id }, _set: { contactEmail: $contactEmail }) {
+      id
+      contactEmail
+    }
+  }
+`;
+
 const SEARCH_ORGANIZATIONS = gql`
   query AdminSearchOrganizations($search: String!) {
     Organization(where: { name: { _ilike: $search } }, limit: 20) {
@@ -168,6 +180,7 @@ const ManageJobBoard: FC = () => {
   const [updateStatus] = useAdminMutation(UPDATE_POSTING_STATUS);
   const [updateFeatured] = useAdminMutation(UPDATE_POSTING_FEATURED);
   const [updatePrice] = useAdminMutation(UPDATE_PRICE);
+  const [updatePortalContactEmail] = useAdminMutation(UPDATE_PORTAL_CONTACT_EMAIL);
   const [insertCredit] = useAdminMutation(INSERT_CREDIT);
   const [incrementCredit] = useAdminMutation(INCREMENT_CREDIT);
   const [createStripePrices, { loading: bootstrapping }] = useAdminMutation(CREATE_STRIPE_PRICES);
@@ -284,6 +297,7 @@ const ManageJobBoard: FC = () => {
               <th className="px-4 py-2">Domain</th>
               <th className="px-4 py-2">Hochschule</th>
               <th className="px-4 py-2">Region-Filter</th>
+              <th className="px-4 py-2">Kontakt-E-Mail</th>
               <th className="px-4 py-2">Branding</th>
             </tr>
           </thead>
@@ -294,6 +308,24 @@ const ManageJobBoard: FC = () => {
                 <td className="px-4 py-2 text-label-secondary">{portal.AppSetting?.domain ?? '–'}</td>
                 <td className="px-4 py-2 text-label-secondary">{portal.Organization?.name ?? '–'}</td>
                 <td className="px-4 py-2 text-label-secondary">{portal.defaultRegion ?? '–'}</td>
+                <td className="px-4 py-2">
+                  <input
+                    type="email"
+                    className="w-full bg-transparent text-label-primary outline-none border-b border-transparent focus:border-brand"
+                    placeholder="nicht gesetzt"
+                    defaultValue={portal.contactEmail ?? ''}
+                    onBlur={async (event) => {
+                      const value = event.target.value.trim();
+                      if (value === (portal.contactEmail ?? '')) {
+                        return;
+                      }
+                      await updatePortalContactEmail({
+                        variables: { id: portal.id, contactEmail: value === '' ? null : value },
+                      });
+                      await refetch();
+                    }}
+                  />
+                </td>
                 <td className="px-4 py-2">
                   <span className="inline-flex gap-1">
                     {[portal.AppSetting?.primaryColor, portal.AppSetting?.secondaryColor]

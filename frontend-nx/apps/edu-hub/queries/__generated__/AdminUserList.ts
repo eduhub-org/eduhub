@@ -40,6 +40,14 @@ export interface AdminUserList_User_OrganizationAdmins {
    */
   canManageJobs: boolean;
   canManageSettings: boolean;
+  /**
+   * How this grant was obtained, NULL when a person granted it. Server-controlled: written by the claimJobOrganization action only, never by a client, since the value is what tells a reviewer whether the claim needs checking.
+   */
+  claimVerification: string | null;
+  /**
+   * When the claimer declared they are authorized to post job offers on behalf of this organization. Server-controlled, written by the claimJobOrganization action only, for the same reason as claimVerification.
+   */
+  authorizationDeclaredAt: any | null;
 }
 
 export interface AdminUserList_User {

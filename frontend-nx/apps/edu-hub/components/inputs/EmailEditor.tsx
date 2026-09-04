@@ -51,12 +51,19 @@ export function getTemplateCategory(templateType?: string): string {
     'JOB_POSTING_ADMIN_NOTICE',
     'JOB_POSTING_PAYMENT_FAILED',
   ];
+  // Also on the job board, but about an organization's access rather than a
+  // posting, so they get their own placeholders instead of the posting ones.
+  const organizationClaimTemplates = [
+    'JOB_ORGANIZATION_CLAIMED',
+    'JOB_ORGANIZATION_ACCESS_REQUEST',
+  ];
 
   if (sessionTemplates.includes(templateType)) return 'session';
   if (enrollmentTemplates.includes(templateType)) return 'enrollment';
   if (generalTemplates.includes(templateType)) return 'general';
   if (organizerTemplates.includes(templateType)) return 'organizer';
   if (jobPostingTemplates.includes(templateType)) return 'jobposting';
+  if (organizationClaimTemplates.includes(templateType)) return 'organizationclaim';
 
   return 'enrollment';
 }
@@ -100,7 +107,7 @@ const EMAIL_PLACEHOLDERS: EditorVariable[] = [
   { text: '[JobPosting:RepostUrl]', label: 'Repost Link', categories: ['jobposting'] },
   { text: '[JobPosting:AdminUrl]', label: 'Admin Link', categories: ['jobposting'] },
   { text: '[JobPosting:TermsAcceptedAt]', label: 'Terms Accepted Date', categories: ['jobposting'] },
-  { text: '[Organization:Name]', label: 'Employer Name', categories: ['jobposting'] },
+  { text: '[Organization:Name]', label: 'Employer Name', categories: ['jobposting', 'organizationclaim'] },
   { text: '[Invoice:Number]', label: 'Invoice Number', categories: ['jobposting'] },
   { text: '[Invoice:Date]', label: 'Invoice Date', categories: ['jobposting'] },
   { text: '[Invoice:NetTotal]', label: 'Invoice Net', categories: ['jobposting'] },
@@ -115,6 +122,14 @@ const EMAIL_PLACEHOLDERS: EditorVariable[] = [
   { text: '[#if:InvoicePdf][/if:InvoicePdf]', label: 'Block: PDF attached', categories: ['jobposting'] },
   { text: '[#if:InvoiceLink][/if:InvoiceLink]', label: 'Block: invoice link', categories: ['jobposting'] },
   { text: '[#if:InvoicePending][/if:InvoicePending]', label: 'Block: invoice follows', categories: ['jobposting'] },
+  // Organization claim (StuJo self-service onboarding). Unlike the posting mails
+  // above these go through queueEmail and the shared registry in
+  // emailTemplateVariables.js, so a chip here has a real substitution behind it.
+  { text: '[OrganizationClaim:UserName]', label: 'Person Name', categories: ['organizationclaim'] },
+  { text: '[OrganizationClaim:UserEmail]', label: 'Person Email', categories: ['organizationclaim'] },
+  { text: '[OrganizationClaim:Verification]', label: 'Claim Check', categories: ['organizationclaim'] },
+  { text: '[OrganizationClaim:AdminUrl]', label: 'Access Admin Link', categories: ['organizationclaim'] },
+  { text: '[OrganizationClaim:ContactEmail]', label: 'StuJo Contact Email', categories: ['organizationclaim'] },
   { text: '[#if:TermsAccepted][/if:TermsAccepted]', label: 'Block: consent date', categories: ['jobposting'] },
 ];
 

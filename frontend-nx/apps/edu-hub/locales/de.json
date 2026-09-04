@@ -2125,7 +2125,14 @@
     "add_admin_scope_required": "Bitte wähle eine Organisation aus oder vergib Super-Admin-Rechte.",
     "add_admin_no_organization": "Keine Organisation (nur Super-Admin)",
     "add_admin_super_admin_hint": "Super-Admins verwalten die gesamte Plattform, unabhängig von einer Organisation.",
-    "add_admin_success": "Admin-Benutzer hinzugefügt."
+    "add_admin_success": "Admin-Benutzer hinzugefügt.",
+    "first_settings_admin_hint": "Dieses Unternehmen hat noch niemanden mit diesem Recht. Ohne diese Berechtigung kann hier niemand weitere Admins hinzufügen oder Einstellungen ändern.",
+    "claim_declared_at": "Berechtigung bestätigt am {date}",
+    "claim_verification": {
+      "SELF_SERVICE_DOMAIN_VERIFIED": "Selbst übernommen – E-Mail-Domain stimmt mit der Organisation überein",
+      "SELF_SERVICE_UNVERIFIED": "Selbst übernommen – nicht geprüft, bitte kurz nachsehen",
+      "NEW_ORGANIZATION": "Selbst übernommen – Organisation dabei neu angelegt"
+    }
   },
   "manageAppSettings": {
     "appSettings": "App Einstellungen",
@@ -2638,7 +2645,9 @@
       "JOB_POSTING_EXPIRED": "Stellenanzeige abgelaufen",
       "JOB_POSTING_ADMIN_NOTICE": "Stellenanzeige: Hinweis an Admins",
       "JOB_POSTING_PAYMENT_FAILED": "Stellenanzeige: Zahlung fehlgeschlagen",
-      "JOB_ALERT": "Job-Benachrichtigung"
+      "JOB_ALERT": "Job-Benachrichtigung",
+      "JOB_ORGANIZATION_CLAIMED": "Stellen-Zugang: neu übernommen",
+      "JOB_ORGANIZATION_ACCESS_REQUEST": "Stellen-Zugang: Anfrage an Verwalter:innen"
     },
     "placeholders": {
       "subject": "E-Mail-Betreff eingeben...",
@@ -2691,7 +2700,9 @@
       "JOB_POSTING_EXPIRED": "Geht an den Arbeitgeber, wenn die Laufzeit der Anzeige endet, mit Link zum erneuten Schalten",
       "JOB_POSTING_ADMIN_NOTICE": "Geht an die Plattform-Admins, wenn eine Anzeige veröffentlicht wurde (Prüfung im Nachhinein)",
       "JOB_POSTING_PAYMENT_FAILED": "Geht an den Arbeitgeber, wenn eine verzögerte Zahlung (SEPA) fehlschlägt und die Anzeige offline genommen wird",
-      "JOB_ALERT": "Geht an Abonnenten mit neuen Anzeigen, die zu ihrem Suchprofil passen"
+      "JOB_ALERT": "Geht an Abonnenten mit neuen Anzeigen, die zu ihrem Suchprofil passen",
+      "JOB_ORGANIZATION_CLAIMED": "Geht an die StuJo-Kontaktadresse, wenn jemand die Stellen-Verwaltung eines Unternehmens selbst übernimmt",
+      "JOB_ORGANIZATION_ACCESS_REQUEST": "Geht an die bisherigen Verwalter:innen, wenn jemand anderes Zugang zu ihren Stellenanzeigen anfragt"
     },
     "delete_confirmation": "Bist du sicher, dass du die E-Mail-Vorlage „{title}“ löschen möchtest?",
     "unknown_trigger": "Unbekannter Auslöser-Typ",

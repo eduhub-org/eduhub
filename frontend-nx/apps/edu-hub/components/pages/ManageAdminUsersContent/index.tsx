@@ -154,6 +154,20 @@ const OrganizationGrantBlock: FC<{
           />
         ))}
       </div>
+      {/* Only self-service claims carry a verification state; a grant a person made has none, and
+          saying so would add noise to every other row. An unverified claim is the one worth a look:
+          the claimer's email domain was not the organization's, so nothing corroborated it. */}
+      {grant.claimVerification && (
+        <div className="mt-3 pt-3 border-t border-solid border-border-primary text-xs text-label-secondary">
+          {t(`claim_verification.${grant.claimVerification}`)}
+          {grant.authorizationDeclaredAt &&
+            ` · ${t('claim_declared_at', {
+              date: new Date(grant.authorizationDeclaredAt).toLocaleDateString('de-DE', {
+                timeZone: 'Europe/Berlin',
+              }),
+            })}`}
+        </div>
+      )}
     </div>
   );
 };
@@ -453,6 +467,18 @@ const ManageAdminUsersContent: FC<ManageAdminUsersContentProps> = ({ inSettingsL
   // add to at least one organization, which hides the button from those without settings rights.
   const canAddAdmins = isAdmin || organizationOptions.length > 0;
 
+  // Organizations the caller may add admins to that have nobody with canManageSettings. The
+  // database stopped forcing that capability onto an organization's first admin, so the add dialog
+  // pre-checks it for these rather than letting an organization end up with nobody able to manage
+  // its admin team or its settings.
+  const organizationIdsWithoutSettingsAdmin = useMemo(
+    () =>
+      organizationOptions
+        .map((organization) => organization.id)
+        .filter((id) => (settingsAdminCountByOrg.get(id) ?? 0) === 0),
+    [organizationOptions, settingsAdminCountByOrg]
+  );
+
   const columns = useMemo<ColumnDef<AdminAccessRow>[]>(() => {
     // The sortable columns are all properties of the person, matching the query, which pages and
     // sorts by person and keeps that person's organization rows together.
@@ -613,15 +639,16 @@ const ManageAdminUsersContent: FC<ManageAdminUsersContentProps> = ({ inSettingsL
             open={isAddDialogOpen}
             onClose={() => setIsAddDialogOpen(false)}
             onSuccess={() => {
-              // Refetch the list (so a first admin's DB-forced canManageSettings shows), the
-              // settings-admin counts (so sole-admin disabling stays correct) and the super-admin
-              // ids (so a newly promoted super-admin appears in the list at all).
+              // Refetch the list, the settings-admin counts (so sole-admin disabling and the
+              // first-settings-admin hint stay correct) and the super-admin ids (so a newly
+              // promoted super-admin appears in the list at all).
               refetch();
               refetchGrants();
               handleAdminStatusChange();
             }}
             organizationOptions={organizationOptions}
             canGrantSuperAdmin={isAdmin}
+            organizationIdsWithoutSettingsAdmin={organizationIdsWithoutSettingsAdmin}
           />
         </div>
       )}

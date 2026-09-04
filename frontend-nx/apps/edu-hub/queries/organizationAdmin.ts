@@ -46,6 +46,11 @@ export const ADMIN_USER_LIST = gql`
         canManageDegrees
         canManageJobs
         canManageSettings
+        # How the grant came about. Null means a person granted it; a value means
+        # it was claimed self-service on the job board and says what was checked.
+        # Server-controlled, so it is safe to read as a review signal.
+        claimVerification
+        authorizationDeclaredAt
       }
     }
     User_aggregate(where: $filter) {
@@ -172,6 +177,7 @@ export const MY_ORG_ADMIN_CAPABILITIES = gql`
       canManageCourses
       canManageEvents
       canManageDegrees
+      canManageJobs
     }
   }
 `;
@@ -216,6 +222,7 @@ export const ORGANIZATION_ADMINS_BY_ORGANIZATION_ID = gql`
       canManageEvents
       canManageCourses
       canManageDegrees
+      canManageJobs
       canManageSettings
       User {
         id
