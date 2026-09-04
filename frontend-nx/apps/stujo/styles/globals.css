@@ -4,6 +4,14 @@
    CSS variables). Live values: pink #A71580, green #ACCA23, grey #646363,
    gradient #4B0135 → #A71580 → #4B0135. */
 
+/* Tailwind, so edu-hub components can be reused here rather than forked
+   (AGENTS.md critical rule 10). Preflight is off in tailwind.config.js: the
+   port below relies on browser defaults and sets its own box-sizing and body
+   rules, so the reset would restyle every page. */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
   --stujo-primary: #a71580;
   --stujo-secondary: #acca23;
@@ -24,6 +32,50 @@
   /* Lato is declared like on the live site; its webfont 404s there too, so
      the effective rendering is the same fallback stack. */
   --stujo-font: Lato, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+/* Edu-hub design tokens, mapped to StuJo's values.
+ *
+ * Edu-hub's Tailwind theme resolves every colour to one of these variables, so
+ * defining them here is what makes a shared component render in StuJo branding
+ * instead of edu-hub's teal-on-charcoal. Edu-hub declares its DARK palette on
+ * :root and overrides it under `.light`; StuJo is a white page, so the light
+ * values live directly on :root here. Anything edu-hub paints a brand colour
+ * comes out StuJo pink.
+ */
+:root {
+  --eduhub-brand: var(--stujo-primary);
+  --eduhub-brand-light: #c2359c;
+  --eduhub-brand-dark: var(--stujo-gradient-dark);
+
+  --eduhub-fill-primary: var(--stujo-bg);
+  --eduhub-fill-secondary: #f4f2f0;
+  --eduhub-fill-disabled: #e5e5e5;
+
+  --eduhub-label-primary: var(--stujo-text);
+  --eduhub-label-secondary: var(--stujo-muted);
+  --eduhub-label-disabled: #999999;
+
+  --eduhub-border-primary: var(--stujo-border);
+  --eduhub-border-secondary: var(--stujo-divider);
+
+  --eduhub-bg-primary: var(--stujo-bg);
+  --eduhub-bg-secondary: #f4f2f0;
+  --eduhub-bg-modal: var(--stujo-bg);
+  --eduhub-bg-card: var(--stujo-bg);
+  --eduhub-bg-footer: var(--stujo-gradient-dark);
+
+  --eduhub-success: var(--stujo-secondary);
+  --eduhub-warning: #f2991d;
+  --eduhub-error: var(--stujo-error);
+  --eduhub-info: #1982fc;
+  --eduhub-badge: #e7b24c;
+  --eduhub-badge-contrast: #4a3500;
+
+  --eduhub-status-confirmed: var(--stujo-secondary);
+  --eduhub-status-invited: #f2991d;
+  --eduhub-status-current: var(--stujo-secondary);
+  --eduhub-status-missed: #f2991d66;
 }
 
 * {
