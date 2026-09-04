@@ -9,6 +9,19 @@ import { Organization_bool_exp, Organization_order_by, OrganizationType_enum } f
 // GraphQL query operation: OrganizationList
 // ====================================================
 
+export interface OrganizationList_Organization_Settings {
+  __typename: "OrganizationSettings";
+  id: number | null;
+  /**
+   * SHA-256 hash of the organization API key for participant data access. Plain text keys are never stored.
+   */
+  apiKeyHash: string | null;
+  /**
+   * Flag indicating whether an encrypted Ghost newsletter API credential is configured.
+   */
+  ghostNewsletterApiKeyConfigured: boolean | null;
+}
+
 export interface OrganizationList_Organization_Users {
   __typename: "User";
   id: any;
@@ -26,10 +39,6 @@ export interface OrganizationList_Organization {
    */
   logo: string | null;
   /**
-   * SHA-256 hash of the organization API key for participant data access. Plain text keys are never stored.
-   */
-  apiKeyHash: string | null;
-  /**
    * Short organization newsletter description shown to participants in onboarding and profile preferences.
    */
   newsletterDescription: string | null;
@@ -41,10 +50,6 @@ export interface OrganizationList_Organization {
    * Ghost members API URL used to synchronize newsletter subscriptions.
    */
   ghostNewsletterApiUrl: string | null;
-  /**
-   * Flag indicating whether an encrypted Ghost newsletter API credential is configured.
-   */
-  ghostNewsletterApiKeyConfigured: boolean;
   /**
    * Optional Ghost newsletter list identifier.
    */
@@ -66,6 +71,10 @@ export interface OrganizationList_Organization {
   /**
    * An array relationship
    */
+  /**
+   * Settings-admin-only columns; null unless the caller holds canManageSettings for this organization.
+   */
+  Settings: OrganizationList_Organization_Settings | null;
   Users: OrganizationList_Organization_Users[];
 }
 
