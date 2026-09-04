@@ -1,0 +1,299 @@
+import { GraphQLClient, gql } from 'graphql-request';
+
+import { queueEmail } from '../lib/queueEmail.js';
+import { createOrganizationClaimVariableReplacer } from '../emailTemplateVariables.js';
+import {
+  CLAIM_NEW_ORGANIZATION,
+  FIND_ORGANIZATION_CANDIDATES,
+  adminAccessUrl,
+  candidatePattern,
+  classifyClaim,
+  displayName,
+  matchOrganizationByName,
+  resolveContactEmail,
+  verificationLabel,
+} from '../lib/jobOrganizationClaim.js';
+
+/**
+ * Self-service claim of job-offer management for an organization.
+ *
+ * Why an action rather than a Hasura permission: OrganizationAdmin insert
+ * requires the caller to already hold canManageSettings on the same
+ * organization, so nobody can create an organization's FIRST grant. Opening
+ * that up to `user_access` would let anyone grant themselves any capability
+ * anywhere; the checks that make a claim acceptable — nobody else administers
+ * these job offers yet, the claimer declared authority, the provenance is
+ * recorded, opencampus is told — only hold if they run server-side.
+ *
+ * The claim is granted immediately, and deliberately: an employer who has to
+ * wait for a human is an employer who does not post. What makes it operable is
+ * the record it leaves (claimVerification, authorizationDeclaredAt) plus the
+ * notification mail, and the fact that a job-only grant reads nothing sensitive
+ * — the organization's banking, tax and register data live in the
+ * OrganizationSettings view behind canManageSettings.
+ */
+
+const MAX_ORGANIZATION_NAME_LENGTH = 200;
+
+const GET_CLAIMER = gql`
+  query GetClaimerForOrganizationClaim($userId: uuid!) {
+    User_by_pk(id: $userId) {
+      id
+      firstName
+      lastName
+      email
+    }
+  }
+`;
+
+// The organization plus every admin of it. `email` and `website` are the only
+// evidence available for domain verification; both are org-admin-only columns,
+// which is fine here because this handler runs with the admin secret.
+const GET_ORGANIZATION = gql`
+  query GetOrganizationForClaim($id: Int!) {
+    Organization_by_pk(id: $id) {
+      id
+      name
+      email
+      website
+      OrganizationAdmins {
+        id
+        userId
+        canManageJobs
+        User {
+          firstName
+          lastName
+        }
+      }
+    }
+  }
+`;
+
+// Name and type only. `user_access` may insert 34 columns of this table,
+// including banking and tax fields, but a claim has no business setting any of
+// them: the employer fills their own profile in afterwards.
+const CREATE_ORGANIZATION = gql`
+  mutation CreateOrganizationForClaim($name: String!) {
+    insert_Organization_one(object: { name: $name, type: CORPORATION }) {
+      id
+      name
+      email
+      website
+    }
+  }
+`;
+
+const INSERT_GRANT = gql`
+  mutation InsertJobOrganizationGrant(
+    $userId: uuid!
+    $organizationId: Int!
+    $claimVerification: String!
+    $authorizationDeclaredAt: timestamptz!
+  ) {
+    insert_OrganizationAdmin_one(
+      object: {
+        userId: $userId
+        organizationId: $organizationId
+        canManageJobs: true
+        claimVerification: $claimVerification
+        authorizationDeclaredAt: $authorizationDeclaredAt
+      }
+    ) {
+      id
+    }
+  }
+`;
+
+/**
+ * Hand the Keycloak `org_admin` role out synchronously.
+ *
+ * The add_keycloak_org_admin_role event trigger on OrganizationAdmin does this
+ * too, but asynchronously, and the frontend re-authenticates the moment this
+ * action returns to pick the role up. Losing that race means the fresh token
+ * still lacks org_admin and the first JobPosting insert is rejected. The
+ * function is idempotent (an already-assigned role is no longer "available" to
+ * add), so doing both is safe. A failure here is logged, not fatal: the event
+ * trigger retries.
+ */
+async function addKeycloakOrgAdminRole(userId, logger) {
+  const url = process.env.CLOUD_FUNCTION_LINK_ADD_KEYCLOAK_ROLE;
+  const secret = process.env.HASURA_CLOUD_FUNCTION_SECRET;
+  if (!url || !secret) {
+    logger.warn('Keycloak role webhook not configured, relying on the event trigger');
+    return;
+  }
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', secret, role: 'org_admin' },
+      body: JSON.stringify({ event: { data: { new: { userId } } } }),
+    });
+    if (!response.ok) {
+      logger.warn('Synchronous Keycloak role grant failed, relying on the event trigger', {
+        status: response.status,
+      });
+    }
+  } catch (error) {
+    logger.warn('Synchronous Keycloak role grant failed, relying on the event trigger', {
+      error: error.message,
+    });
+  }
+}
+
+export default async function claimJobOrganization(req, logger) {
+  logger.info('########## Claim Job Organization ##########');
+
+  try {
+    const sessionUserId = req.body?.session_variables?.['x-hasura-user-id'];
+    const {
+      organizationId,
+      newOrganizationName,
+      portalAppName,
+      declareAuthorization,
+    } = req.body.input || req.body;
+
+    if (!sessionUserId) {
+      return { success: false, error: 'Missing authenticated session user', messageKey: 'UNAUTHORIZED' };
+    }
+    if (declareAuthorization !== true) {
+      return {
+        success: false,
+        error: 'The claimer must declare they are authorized to act for the organization',
+        messageKey: 'AUTHORIZATION_NOT_DECLARED',
+      };
+    }
+
+    const typedName = typeof newOrganizationName === 'string' ? newOrganizationName.trim() : '';
+    const hasId = Number.isInteger(organizationId) && organizationId > 0;
+    if (hasId === (typedName !== '')) {
+      return {
+        success: false,
+        error: 'Provide exactly one of organizationId or newOrganizationName',
+        messageKey: 'INVALID_ORGANIZATION_INPUT',
+      };
+    }
+    if (!hasId && typedName.length > MAX_ORGANIZATION_NAME_LENGTH) {
+      return {
+        success: false,
+        error: `Organization name must be at most ${MAX_ORGANIZATION_NAME_LENGTH} characters`,
+        messageKey: 'ORGANIZATION_NAME_TOO_LONG',
+      };
+    }
+
+    const client = new GraphQLClient(process.env.HASURA_ENDPOINT, {
+      headers: { 'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET },
+    });
+
+    const claimer = (await client.request(GET_CLAIMER, { userId: sessionUserId }))?.User_by_pk;
+    if (!claimer) {
+      return { success: false, error: 'Claiming user not found', messageKey: 'USER_NOT_FOUND' };
+    }
+
+    let organization;
+    let verification;
+
+    if (hasId) {
+      organization = (await client.request(GET_ORGANIZATION, { id: organizationId }))?.Organization_by_pk;
+      if (!organization) {
+        return { success: false, error: 'Organization not found', messageKey: 'ORGANIZATION_NOT_FOUND' };
+      }
+      verification = classifyClaim(claimer.email, organization);
+    } else {
+      // Dedupe before creating: the StuJo import left thousands of employer
+      // records, many with near-duplicate names, so "create" usually means
+      // "you meant this existing one".
+      const pattern = candidatePattern(typedName);
+      const candidates = pattern
+        ? (await client.request(FIND_ORGANIZATION_CANDIDATES, { pattern }))?.Organization ?? []
+        : [];
+      const existing = matchOrganizationByName(typedName, candidates);
+
+      if (existing) {
+        organization = (await client.request(GET_ORGANIZATION, { id: existing.id }))?.Organization_by_pk;
+        verification = classifyClaim(claimer.email, organization);
+      } else {
+        const created = (await client.request(CREATE_ORGANIZATION, { name: typedName }))
+          ?.insert_Organization_one;
+        organization = { ...created, OrganizationAdmins: [] };
+        verification = CLAIM_NEW_ORGANIZATION;
+      }
+    }
+
+    const grants = organization.OrganizationAdmins ?? [];
+    if (grants.some((grant) => String(grant.userId) === String(sessionUserId) && grant.canManageJobs)) {
+      return {
+        success: true,
+        status: 'ALREADY_GRANTED',
+        organizationId: organization.id,
+        organizationName: organization.name,
+      };
+    }
+
+    const otherJobAdmin = grants.find((grant) => grant.canManageJobs === true);
+    if (otherJobAdmin) {
+      // No grant, no mail: the requester decides whether to ask, in a second
+      // step. Only the display name goes back — never the address.
+      return {
+        success: true,
+        status: 'ALREADY_CLAIMED',
+        organizationId: organization.id,
+        organizationName: organization.name,
+        existingAdminName: displayName(otherJobAdmin.User),
+      };
+    }
+
+    // Everything above must hold BEFORE the insert: add_keycloak_org_admin_role
+    // fires on it and hands out the Keycloak role.
+    await client.request(INSERT_GRANT, {
+      userId: sessionUserId,
+      organizationId: organization.id,
+      claimVerification: verification,
+      authorizationDeclaredAt: new Date().toISOString(),
+    });
+
+    await addKeycloakOrgAdminRole(sessionUserId, logger);
+
+    const contactEmail = await resolveContactEmail(client, portalAppName, logger);
+    if (contactEmail) {
+      // A mail must never undo a claim that already succeeded.
+      const mailResult = await queueEmail({
+        templateType: 'JOB_ORGANIZATION_CLAIMED',
+        variableReplacer: createOrganizationClaimVariableReplacer(
+          { name: organization.name },
+          {
+            userName: displayName(claimer),
+            userEmail: claimer.email,
+            verification: verificationLabel(verification),
+            adminUrl: adminAccessUrl(),
+            contactEmail,
+          }
+        ),
+        recipientEmail: contactEmail,
+        metadata: { type: 'JOB_ORGANIZATION_CLAIMED', organizationId: organization.id },
+        client,
+        logger,
+      });
+      if (!mailResult.success) {
+        logger.error('Could not queue the claim notification', { messageKey: mailResult.messageKey });
+      }
+    } else {
+      logger.warn('No StuJo contact address configured, claim notification skipped', {
+        organizationId: organization.id,
+      });
+    }
+
+    return {
+      success: true,
+      status: 'GRANTED',
+      organizationId: organization.id,
+      organizationName: organization.name,
+    };
+  } catch (error) {
+    logger.error('Error in claimJobOrganization', { error: error.message, stack: error.stack });
+    return {
+      success: false,
+      error: error.message || 'Internal server error',
+      messageKey: 'CLAIM_JOB_ORGANIZATION_ERROR',
+    };
+  }
+}

@@ -14,6 +14,15 @@ import { appendGuestMailFooter, guestSafeCopyRecipients } from '../guestRegistra
  * @param {Object|null} params.recipientUser - Optional recipient User ({id, status}).
  *   When it is a guest, their manage link is appended: a guest has no account
  *   page, so that link is their only route to their own data.
+ * @param {string|null} params.extraBcc - Optional address to blind-copy in
+ *   addition to the template's own bcc, for recipients that are not a property
+ *   of the template but of the request (e.g. a per-portal contact address). It
+ *   is still subject to the guest copy rules below.
+ * @param {Object|null} params.metadata - Optional jsonb written to
+ *   MailLog.metadata, for callers that need to recognise their own mails later
+ *   (deduplication, rate limiting). Note the partial unique index
+ *   MailLog_job_posting_mail_unique constrains rows carrying a `jobPostingId`
+ *   key, so do not reuse that key for anything but a job posting.
  * @param {Object} params.logger - Logger instance
  * @returns {Promise<Object>} Result with mailId and success status
  */
@@ -23,6 +32,8 @@ async function queueEmail({
   recipientEmail,
   courseId = null,
   recipientUser = null,
+  extraBcc = null,
+  metadata = null,
   client,
   logger
 }) {
@@ -167,6 +178,7 @@ async function queueEmail({
         $cc: String
         $bcc: String
         $status: String!
+        $metadata: jsonb
       ) {
         insert_MailLog_one(
           object: {
@@ -177,6 +189,7 @@ async function queueEmail({
             cc: $cc
             bcc: $bcc
             status: $status
+            metadata: $metadata
           }
         ) {
           id
@@ -184,9 +197,14 @@ async function queueEmail({
       }
     `;
 
+    // extraBcc is merged before the guest check, so a guest recipient still
+    // strips every copy — a caller-supplied address must not be a way around it.
+    const templateBcc = [template.bcc, extraBcc]
+      .filter((address) => address && String(address).trim() !== '')
+      .join(',');
     const copies = guestSafeCopyRecipients(recipientUser, {
       cc: template.cc,
-      bcc: template.bcc,
+      bcc: templateBcc || null,
     });
 
     const mailResult = await client.request(INSERT_MAIL_LOG, {
@@ -196,7 +214,8 @@ async function queueEmail({
       to: recipientEmail,
       cc: copies.cc,
       bcc: copies.bcc,
-      status: 'READY_TO_SEND'
+      status: 'READY_TO_SEND',
+      metadata
     });
 
     logger.info(`Email queued: template=${templateType}, recipient=${recipientEmail}, mailId=${mailResult.insert_MailLog_one.id}`);

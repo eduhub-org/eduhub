@@ -795,3 +795,35 @@ type ManageGuestRegistrationResult {
   error: String
   messageKey: String
 }
+
+type Mutation {
+  claimJobOrganization(
+    organizationId: Int
+    newOrganizationName: String
+    portalAppName: String
+    declareAuthorization: Boolean!
+  ): ClaimJobOrganizationResult!
+}
+
+type ClaimJobOrganizationResult {
+  success: Boolean!
+  status: String
+  organizationId: Int
+  organizationName: String
+  existingAdminName: String
+  error: String
+  messageKey: String
+}
+
+type Mutation {
+  requestJobOrganizationAccess(
+    organizationId: Int!
+    portalAppName: String
+  ): RequestJobOrganizationAccessResult!
+}
+
+type RequestJobOrganizationAccessResult {
+  success: Boolean!
+  error: String
+  messageKey: String
+}

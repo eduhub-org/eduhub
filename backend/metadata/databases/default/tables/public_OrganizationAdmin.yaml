@@ -8,10 +8,18 @@ object_relationships:
   - name: User
     using:
       foreign_key_constraint_on: userId
+  - name: ClaimVerification
+    using:
+      foreign_key_constraint_on: claimVerification
 select_permissions:
   # Org admins may read (a) their own grant — so the UI can derive their capabilities even when they
   # have no settings rights — and (b) every admin grant of any organization for which they hold the
   # canManageSettings capability, so they can manage that organization's admin team.
+  #
+  # claimVerification and authorizationDeclaredAt are readable here so the access screen can show
+  # how a grant came about, but they appear in NO insert or update permission: they are written by
+  # the claimJobOrganization action only. A settings admin who could set them on any grant in their
+  # organization would make them worthless as review signals.
   - role: org_admin_access
     permission:
       columns:
@@ -23,6 +31,8 @@ select_permissions:
         - canManageDegrees
         - canManageJobs
         - canManageSettings
+        - claimVerification
+        - authorizationDeclaredAt
         - created_at
         - updated_at
       filter:
