@@ -58,20 +58,39 @@ export const buildPrivilegeCondition = (
   return conditions.length === 1 ? conditions[0] : { _or: conditions };
 };
 
+/** The capability flags of one grant, as much of OrganizationAdmin as the privilege check needs. */
+export type GrantCapabilities = {
+  canManageEvents: boolean;
+  canManageCourses: boolean;
+  canManageDegrees: boolean;
+  canManageJobs: boolean;
+  canManageSettings: boolean;
+};
+
 /**
- * Translation key of the row-delete confirmation, so the question only claims what the person
- * actually holds: a super-admin without any grant loses no organization role, and an org admin
- * without the star loses no super-admin rights.
+ * Whether one grant carries the capability a privilege stands for. Used to narrow the *rows* of the
+ * access table, where buildPrivilegeCondition narrows the people the database returns: filtering by
+ * "can manage events" should list the event grants, not every organization of an event admin.
  *
- * A listed user always holds at least one of the two (the table lists grant holders and the
- * super-admins from Keycloak), so the final case is the organization-only one.
+ * Never true for super-admin, which is a property of the person rather than of a grant, and never
+ * true without a grant (the row of a super-admin who administers no organization).
  */
-export const removeAdminQuestionKey = (isSuperAdmin: boolean, organizationCount: number): string => {
-  if (isSuperAdmin && organizationCount > 0) {
-    return 'remove_admin_confirmation_question_both';
+export const grantHasPrivilege = (grant: GrantCapabilities | null, privilege: AdminPrivilege): boolean => {
+  if (!grant) {
+    return false;
   }
-  if (isSuperAdmin) {
-    return 'remove_admin_confirmation_question_super_admin';
+  switch (privilege) {
+    case 'superAdmin':
+      return false;
+    case 'events':
+      return grant.canManageEvents;
+    case 'courses':
+      return grant.canManageCourses;
+    case 'degrees':
+      return grant.canManageDegrees;
+    case 'jobs':
+      return grant.canManageJobs;
+    case 'settings':
+      return grant.canManageSettings;
   }
-  return 'remove_admin_confirmation_question_organizations';
 };

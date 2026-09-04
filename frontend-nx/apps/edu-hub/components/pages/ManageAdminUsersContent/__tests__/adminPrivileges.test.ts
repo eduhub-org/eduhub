@@ -1,11 +1,15 @@
 import de from '../../../../locales/de.json';
 import en from '../../../../locales/en.json';
-import {
-  ADMIN_PRIVILEGES,
-  buildPrivilegeCondition,
-  privilegeLabelKey,
-  removeAdminQuestionKey,
-} from '../adminPrivileges';
+import { ADMIN_PRIVILEGES, buildPrivilegeCondition, grantHasPrivilege, privilegeLabelKey } from '../adminPrivileges';
+
+const grant = (overrides: Partial<Parameters<typeof grantHasPrivilege>[0]> = {}) => ({
+  canManageEvents: false,
+  canManageCourses: false,
+  canManageDegrees: false,
+  canManageJobs: false,
+  canManageSettings: false,
+  ...overrides,
+});
 
 describe('buildPrivilegeCondition', () => {
   it('does not constrain the list when no privilege is selected', () => {
@@ -65,29 +69,40 @@ describe('privilegeLabelKey', () => {
   });
 });
 
-describe('removeAdminQuestionKey', () => {
-  it('names both when the person holds the star and organization roles', () => {
-    expect(removeAdminQuestionKey(true, 2)).toBe('remove_admin_confirmation_question_both');
+describe('grantHasPrivilege', () => {
+  it('is true when the grant carries the capability', () => {
+    expect(grantHasPrivilege(grant({ canManageJobs: true }), 'jobs')).toBe(true);
   });
 
-  it('names only the super admin rights of a super admin without any grant', () => {
-    expect(removeAdminQuestionKey(true, 0)).toBe('remove_admin_confirmation_question_super_admin');
+  it('is false when the grant does not carry it', () => {
+    expect(grantHasPrivilege(grant({ canManageJobs: true }), 'events')).toBe(false);
   });
 
-  it('names only the organization roles of an admin without the star', () => {
-    expect(removeAdminQuestionKey(false, 1)).toBe('remove_admin_confirmation_question_organizations');
+  it('is false for super admin, which belongs to the person rather than to a grant', () => {
+    expect(grantHasPrivilege(grant({ canManageSettings: true }), 'superAdmin')).toBe(false);
   });
 
-  it('is translated in every locale, for every case', () => {
-    const keys = [
-      removeAdminQuestionKey(true, 2),
-      removeAdminQuestionKey(true, 0),
-      removeAdminQuestionKey(false, 1),
-      // Cannot occur (a listed user holds at least one of the two), but must not read as a key.
-      removeAdminQuestionKey(false, 0),
-    ];
+  it('is false without a grant, for the row of a super admin with no organization', () => {
+    ADMIN_PRIVILEGES.forEach((privilege) => {
+      expect(grantHasPrivilege(null, privilege)).toBe(false);
+    });
+  });
+});
 
-    keys.forEach((key) => {
+describe('locale coverage', () => {
+  it('translates every privilege label in every locale', () => {
+    ADMIN_PRIVILEGES.map(privilegeLabelKey).forEach((key) => {
+      expect(en.manageAdminUsers).toHaveProperty(key);
+      expect(de.manageAdminUsers).toHaveProperty(key);
+    });
+  });
+
+  it('translates every row-delete confirmation in every locale', () => {
+    [
+      'deletion_confirmation_question',
+      'deletion_confirmation_question_super_admin',
+      'remove_super_admin_confirmation_question',
+    ].forEach((key) => {
       expect(en.manageAdminUsers).toHaveProperty(key);
       expect(de.manageAdminUsers).toHaveProperty(key);
     });
