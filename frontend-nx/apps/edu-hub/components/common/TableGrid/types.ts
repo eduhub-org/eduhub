@@ -23,6 +23,25 @@ export interface BulkAction {
   requiresSelection?: boolean;
 }
 
+export interface TableGridFilterOption {
+  value: string;
+  label: string;
+}
+
+/**
+ * A multi-select filter rendered in the TableGrid toolbar. The caller owns the selection and
+ * translates it into query variables, so the same control works for client- and server-side
+ * filtering. Selecting several options is meant as "any of them" (a facet), which is why the
+ * control is a checkbox list rather than a single-choice dropdown.
+ */
+export interface TableGridFilter {
+  id: string;
+  label: string;
+  options: TableGridFilterOption[];
+  selected: string[];
+  onChange: (selected: string[]) => void;
+}
+
 export interface TableGridProps<T extends BaseRow> {
   addButtonText?: string;
   data: T[];
@@ -65,6 +84,14 @@ export interface TableGridProps<T extends BaseRow> {
   deleteVariableName?: string;
   /** Return an error message when delete response indicates failure (e.g. Hasura actions). */
   validateDeleteResult?: (data: unknown) => string | null;
+  /**
+   * Alternative to deleteMutation for rows whose deletion is not a single mutation (e.g. a
+   * database mutation plus a Hasura action). Rejecting surfaces the error dialog, so callers
+   * should throw when a step reports failure. Refetching is the caller's job here.
+   */
+  onRowDelete?: (row: T) => Promise<void>;
+  /** Multi-select filters rendered in the toolbar next to the search field. */
+  filters?: TableGridFilter[];
 }
 
 export interface UseTableGridProps<V> {
@@ -79,7 +106,8 @@ export interface UseTableGridProps<V> {
 } 
 
 export interface TableGridDeleteButtonProps {
-  deleteMutation: DocumentNode;
+  /** Required unless onDelete is given. */
+  deleteMutation?: DocumentNode;
   id: string | number;
   refetchQueries: string[];
   idType: 'number' | 'uuidString';
@@ -89,4 +117,6 @@ export interface TableGridDeleteButtonProps {
   deleteVariableName?: string;
   disabled?: boolean;
   validateDeleteResult?: (data: unknown) => string | null;
+  /** Runs instead of deleteMutation; a rejection is shown in the error dialog. */
+  onDelete?: () => Promise<void>;
 }
