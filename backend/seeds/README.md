@@ -16,6 +16,7 @@ The seed data includes the following users:
 - `admin@example.com`
 - `user@example.com`
 - `instructor@example.com`
+- `orgadmin@example.com` — organization admin with StuJo job-management access
 
 The password for all users is `dev`.
 
