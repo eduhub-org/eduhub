@@ -57,3 +57,21 @@ export const buildPrivilegeCondition = (
   }
   return conditions.length === 1 ? conditions[0] : { _or: conditions };
 };
+
+/**
+ * Translation key of the row-delete confirmation, so the question only claims what the person
+ * actually holds: a super-admin without any grant loses no organization role, and an org admin
+ * without the star loses no super-admin rights.
+ *
+ * A listed user always holds at least one of the two (the table lists grant holders and the
+ * super-admins from Keycloak), so the final case is the organization-only one.
+ */
+export const removeAdminQuestionKey = (isSuperAdmin: boolean, organizationCount: number): string => {
+  if (isSuperAdmin && organizationCount > 0) {
+    return 'remove_admin_confirmation_question_both';
+  }
+  if (isSuperAdmin) {
+    return 'remove_admin_confirmation_question_super_admin';
+  }
+  return 'remove_admin_confirmation_question_organizations';
+};

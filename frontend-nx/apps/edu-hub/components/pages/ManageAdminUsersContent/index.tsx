@@ -46,6 +46,7 @@ import {
   AdminPrivilege,
   buildPrivilegeCondition,
   privilegeLabelKey,
+  removeAdminQuestionKey,
 } from './adminPrivileges';
 
 // Every mutation on a grant changes both the list (capabilities, and possibly whether the user is
@@ -580,8 +581,9 @@ const ManageAdminUsersContent: FC<ManageAdminUsersContentProps> = ({ inSettingsL
                   onRowDelete: handleRowDelete,
                   // Removing your own access would lock you out of this screen.
                   canDeleteRow: (row: AdminUserList_User) => row.id !== currentUserId,
+                  // The question names the person and only the rights they actually hold.
                   generateDeletionConfirmationQuestion: (row: AdminUserList_User) =>
-                    t('remove_admin_confirmation_question', {
+                    t(removeAdminQuestionKey(superAdminUserIds.includes(row.id), row.OrganizationAdmins.length), {
                       firstName: row.firstName,
                       lastName: row.lastName,
                     }),

@@ -1,4 +1,11 @@
-import { ADMIN_PRIVILEGES, buildPrivilegeCondition, privilegeLabelKey } from '../adminPrivileges';
+import de from '../../../../locales/de.json';
+import en from '../../../../locales/en.json';
+import {
+  ADMIN_PRIVILEGES,
+  buildPrivilegeCondition,
+  privilegeLabelKey,
+  removeAdminQuestionKey,
+} from '../adminPrivileges';
 
 describe('buildPrivilegeCondition', () => {
   it('does not constrain the list when no privilege is selected', () => {
@@ -55,5 +62,34 @@ describe('privilegeLabelKey', () => {
       'can_manage_jobs',
       'can_manage_users_and_settings',
     ]);
+  });
+});
+
+describe('removeAdminQuestionKey', () => {
+  it('names both when the person holds the star and organization roles', () => {
+    expect(removeAdminQuestionKey(true, 2)).toBe('remove_admin_confirmation_question_both');
+  });
+
+  it('names only the super admin rights of a super admin without any grant', () => {
+    expect(removeAdminQuestionKey(true, 0)).toBe('remove_admin_confirmation_question_super_admin');
+  });
+
+  it('names only the organization roles of an admin without the star', () => {
+    expect(removeAdminQuestionKey(false, 1)).toBe('remove_admin_confirmation_question_organizations');
+  });
+
+  it('is translated in every locale, for every case', () => {
+    const keys = [
+      removeAdminQuestionKey(true, 2),
+      removeAdminQuestionKey(true, 0),
+      removeAdminQuestionKey(false, 1),
+      // Cannot occur (a listed user holds at least one of the two), but must not read as a key.
+      removeAdminQuestionKey(false, 0),
+    ];
+
+    keys.forEach((key) => {
+      expect(en.manageAdminUsers).toHaveProperty(key);
+      expect(de.manageAdminUsers).toHaveProperty(key);
+    });
   });
 });
