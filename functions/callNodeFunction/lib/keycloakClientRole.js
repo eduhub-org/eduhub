@@ -20,6 +20,13 @@ import KcAdminClient from '@keycloak/keycloak-admin-client';
  * Idempotent: a role the user already holds is no longer "available" to add, so
  * a repeat call is a no-op rather than an error.
  *
+ * `timeoutMs` bounds this twice over, because the two bounds are not the same
+ * thing: the admin client's own `timeout` is per request (it puts an
+ * AbortSignal.timeout on each fetch, which actually cancels a stalled socket),
+ * while the race below bounds the whole four-request sequence — the caller runs
+ * inside a Hasura action whose default budget is 30s, so four independently
+ * bounded requests could still blow it.
+ *
  * @returns {Promise<{ granted: boolean, reason?: string }>} `granted` is true
  *   only when the role is now on the user (freshly added or already there).
  */
@@ -42,21 +49,22 @@ export const addKeycloakClientRole = async (
   // hold the request until the platform timeout and report failure to somebody
   // who does have the access.
   let expire;
-  const timeout = new Promise((_, reject) => {
+  const deadline = new Promise((_, reject) => {
     expire = setTimeout(() => reject(new Error(`Keycloak role grant timed out after ${timeoutMs}ms`)), timeoutMs);
   });
 
   try {
-    return await Promise.race([grant(userId, role, clientId, realmName), timeout]);
+    return await Promise.race([grant(userId, role, clientId, realmName, timeoutMs), deadline]);
   } finally {
     clearTimeout(expire);
   }
 };
 
-const grant = async (userId, role, clientId, realmName) => {
+const grant = async (userId, role, clientId, realmName, timeoutMs) => {
   const kcAdminClient = new KcAdminClient({
     baseUrl: process.env.KEYCLOAK_URL,
     realmName: 'master',
+    timeout: timeoutMs,
   });
 
   await kcAdminClient.auth({

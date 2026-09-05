@@ -91,6 +91,11 @@ const Unternehmen: FC<Props> = ({ portal }) => {
   const [error, setError] = useState<string | null>(null);
   const [claim, setClaim] = useState<ClaimResult | null>(null);
   const [redirecting, setRedirecting] = useState(false);
+  // A re-authentication that never even got as far as leaving the page. signIn
+  // resolves by navigating away, so reaching its rejection path means the
+  // redirect did not happen — without this the employer watches "setting up
+  // your access" forever.
+  const [refreshFailed, setRefreshFailed] = useState(false);
 
   // Where to go once the claim succeeds. `?next=` lets the employer screens
   // send someone here and get them back to what they were doing.
@@ -98,8 +103,15 @@ const Unternehmen: FC<Props> = ({ portal }) => {
 
   // Set by the re-authentication round trip below so the page knows, on the way
   // back, that it must verify the role instead of offering the form again.
+  //
+  // The counter is clamped rather than trusted: it comes from the query string,
+  // and a crafted `attempt=-1000000` would otherwise stay below the ceiling for
+  // a million redirects — a self-inflicted loop through Keycloak.
   const refreshing = router.query.refreshRole === '1';
-  const attempt = Number.parseInt(String(router.query.attempt ?? ''), 10) || 0;
+  const attempt = Math.min(
+    Math.max(0, Number.parseInt(String(router.query.attempt ?? ''), 10) || 0),
+    MAX_ROLE_REFRESH_ATTEMPTS
+  );
 
   const {
     data: optionsData,
@@ -151,8 +163,9 @@ const Unternehmen: FC<Props> = ({ portal }) => {
    * again instead of answering from the existing SSO session.
    */
   const refreshRole = useCallback(
-    (nextAttempt: number) =>
-      signIn(
+    (nextAttempt: number) => {
+      setRefreshFailed(false);
+      return signIn(
         'keycloak',
         {
           callbackUrl: `/mein-stujo/unternehmen?refreshRole=1&attempt=${nextAttempt}&next=${encodeURIComponent(
@@ -163,7 +176,11 @@ const Unternehmen: FC<Props> = ({ portal }) => {
           stujo_portal: portal.appName,
           ...(nextAttempt > 1 ? { prompt: 'login' } : {}),
         }
-      ),
+      ).catch((caught) => {
+        console.error('role refresh sign-in failed', caught);
+        setRefreshFailed(true);
+      });
+    },
     [next, portal.appName]
   );
 
@@ -171,7 +188,7 @@ const Unternehmen: FC<Props> = ({ portal }) => {
   // and otherwise try once more — the add_keycloak_org_admin_role event trigger
   // can still be catching up if the action's synchronous grant did not land.
   useEffect(() => {
-    if (!refreshing || sessionStatus !== 'authenticated') return;
+    if (!refreshing || sessionStatus !== 'authenticated' || refreshFailed) return;
     if (canManageJobs) {
       router.replace(next);
       return;
@@ -179,7 +196,16 @@ const Unternehmen: FC<Props> = ({ portal }) => {
     if (attempt >= MAX_ROLE_REFRESH_ATTEMPTS) return;
     const timer = setTimeout(() => refreshRole(attempt + 1), ROLE_REFRESH_BACKOFF_MS);
     return () => clearTimeout(timer);
-  }, [refreshing, sessionStatus, canManageJobs, attempt, next, refreshRole, router]);
+  }, [
+    refreshing,
+    sessionStatus,
+    canManageJobs,
+    attempt,
+    next,
+    refreshFailed,
+    refreshRole,
+    router,
+  ]);
 
   const handleSubmit = async () => {
     setError(null);
@@ -226,6 +252,7 @@ const Unternehmen: FC<Props> = ({ portal }) => {
       await refreshRole(1);
     } catch (caught: any) {
       console.error('claimJobOrganization failed', caught);
+      setRedirecting(false);
       setError(t('claimNetworkError'));
     }
   };
@@ -282,7 +309,10 @@ const Unternehmen: FC<Props> = ({ portal }) => {
     );
   }
 
-  if (redirecting || (refreshing && !canManageJobs && attempt < MAX_ROLE_REFRESH_ATTEMPTS)) {
+  const waitingForRole =
+    redirecting || (refreshing && !canManageJobs && attempt < MAX_ROLE_REFRESH_ATTEMPTS);
+
+  if (waitingForRole && !refreshFailed) {
     return (
       <Layout portal={portal}>
         <p className="stujo-muted">{t('claimSettingUpAccess')}</p>
@@ -290,10 +320,11 @@ const Unternehmen: FC<Props> = ({ portal }) => {
     );
   }
 
-  // Every silent attempt is spent and the token still has no org_admin role.
-  // The access itself is granted — say so, and say what does fix it — rather
-  // than showing the picker again, which would only re-claim what they hold.
-  if (refreshing && !canManageJobs) {
+  // Every silent attempt is spent, or a redirect never happened, and the token
+  // still has no org_admin role. The access itself is granted — say so, and say
+  // what does fix it — rather than showing the picker again, which would only
+  // re-claim what they already hold.
+  if (!canManageJobs && (refreshFailed || refreshing)) {
     return (
       <Layout portal={portal}>
         <h1>{t('claimTitle')}</h1>
