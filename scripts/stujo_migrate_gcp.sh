@@ -91,12 +91,15 @@ DB_PASS="$(read_remote "awk '/^production:/{f=1} f&&/password:/{print \$2; exit}
 [ -n "${DB_NAME}" ] && [ -n "${DB_USER}" ] && [ -n "${DB_PASS}" ] \
   || { echo 'ERROR: could not read prod DB credentials from '"${DB_CFG}"; exit 1; }
 
-echo "==> Configuring staging targets + fetching secrets (VM service account)"
-export HASURA_URL='https://hasura-staging.opencampus.sh/v1/graphql'
-export KEYCLOAK_URL='https://keycloak-staging.opencampus.sh'
-export KEYCLOAK_REALM='edu-hub'
+echo "==> Configuring targets + fetching secrets (VM service account)"
+# The targets default to STAGING but are all env-overridable, so
+# stujo_migrate_prod.sh (or an ad-hoc export) can point this same runner at
+# production without editing it.
+export HASURA_URL="${HASURA_URL:-https://hasura-staging.opencampus.sh/v1/graphql}"
+export KEYCLOAK_URL="${KEYCLOAK_URL:-https://keycloak-staging.opencampus.sh}"
+export KEYCLOAK_REALM="${KEYCLOAK_REALM:-edu-hub}"
 export KEYCLOAK_USER="${KEYCLOAK_USER:-admin}"
-export GCS_BUCKET='eduhub-staging-new'
+export GCS_BUCKET="${GCS_BUCKET:-eduhub-staging-new}"
 export STUJO_MYSQL_DSN="mysql://${DB_USER}:${DB_PASS}@127.0.0.1:13306/${DB_NAME}"
 export STUJO_FILES_ROOT="${FILES_ROOT}"
 HASURA_ADMIN_SECRET="$(gcloud secrets versions access latest --secret=hasura-graphql-admin-key --project="${GCP_PROJECT}")"
