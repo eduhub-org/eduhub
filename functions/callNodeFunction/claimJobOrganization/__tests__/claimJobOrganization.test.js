@@ -61,12 +61,16 @@ describe('claimJobOrganization', () => {
   let claimJobOrganization;
   let queueEmailMock;
   let requestMock;
-  let fetchMock;
+  let addRoleMock;
 
   beforeAll(async () => {
     queueEmailMock = jest.fn(async () => ({ success: true, messageKey: 'EMAIL_QUEUED_SUCCESS' }));
+    addRoleMock = jest.fn(async () => ({ granted: true, reason: 'ADDED' }));
 
     jest.unstable_mockModule('../../lib/queueEmail.js', () => ({ queueEmail: queueEmailMock }));
+    jest.unstable_mockModule('../../lib/keycloakClientRole.js', () => ({
+      addKeycloakClientRole: addRoleMock,
+    }));
     jest.unstable_mockModule('graphql-request', () => {
       const actual = jest.requireActual('graphql-request');
       return {
@@ -84,13 +88,11 @@ describe('claimJobOrganization', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     queueEmailMock.mockResolvedValue({ success: true, messageKey: 'EMAIL_QUEUED_SUCCESS' });
+    addRoleMock.mockResolvedValue({ granted: true, reason: 'ADDED' });
     process.env.HASURA_ENDPOINT = 'https://test.hasura.app/v1/graphql';
     process.env.HASURA_ADMIN_SECRET = 'test-secret';
     process.env.FRONTEND_URL = 'https://edu.opencampus.sh';
     process.env.STUJO_ADMIN_EMAIL = 'stujo@opencampus.sh';
-    delete process.env.CLOUD_FUNCTION_LINK_ADD_KEYCLOAK_ROLE;
-    fetchMock = jest.fn(async () => ({ ok: true }));
-    global.fetch = fetchMock;
   });
 
   it('refuses a request without an authenticated session user', async () => {
@@ -432,6 +434,68 @@ describe('claimJobOrganization', () => {
 
     expect(result).toMatchObject({ success: true, status: 'GRANTED' });
     expect(queueEmailMock).not.toHaveBeenCalled();
+    expect(mockLogger.warn).toHaveBeenCalled();
+  });
+  // The bug this guards: the grant used to be handed to Keycloak only by the
+  // add_keycloak_org_admin_role event trigger, asynchronously, while the
+  // frontend re-authenticated the instant this action returned. The fresh token
+  // then still lacked org_admin and the employer was told they had no company
+  // until they signed out and back in.
+  it('grants the Keycloak org_admin role before returning a claimed organization', async () => {
+    requestMock = buildRequestMock({
+      organization: { id: 7, name: 'Beispiel GmbH', email: null, website: null, OrganizationAdmins: [] },
+    });
+
+    const result = await claimJobOrganization(claimInput({ organizationId: 7 }), mockLogger);
+
+    expect(result).toMatchObject({ success: true, status: 'GRANTED' });
+    expect(addRoleMock).toHaveBeenCalledTimes(1);
+    expect(addRoleMock.mock.calls[0].slice(0, 2)).toEqual([CLAIMER.id, 'org_admin']);
+  });
+
+  it('grants the Keycloak org_admin role for a newly created organization too', async () => {
+    requestMock = buildRequestMock({ candidates: [], created: { id: 21, name: 'Ganz Neu GmbH' } });
+
+    const result = await claimJobOrganization(
+      claimInput({ newOrganizationName: 'Ganz Neu GmbH' }),
+      mockLogger
+    );
+
+    expect(result).toMatchObject({ success: true, status: 'GRANTED', organizationId: 21 });
+    expect(addRoleMock).toHaveBeenCalledTimes(1);
+    expect(addRoleMock.mock.calls[0].slice(0, 2)).toEqual([CLAIMER.id, 'org_admin']);
+  });
+
+  it('does not touch Keycloak when no grant was made', async () => {
+    requestMock = buildRequestMock({
+      organization: {
+        id: 7,
+        name: 'Beispiel GmbH',
+        email: null,
+        website: null,
+        OrganizationAdmins: [
+          { id: 3, userId: 'someone-else', canManageJobs: true, User: { firstName: 'Bea', lastName: 'B' } },
+        ],
+      },
+    });
+
+    const result = await claimJobOrganization(claimInput({ organizationId: 7 }), mockLogger);
+
+    expect(result).toMatchObject({ status: 'ALREADY_CLAIMED' });
+    expect(addRoleMock).not.toHaveBeenCalled();
+  });
+
+  it('still reports the grant when Keycloak cannot be reached', async () => {
+    // The database access is already committed, so a Keycloak hiccup must not be
+    // reported as a failed claim — the event trigger retries the role.
+    addRoleMock.mockRejectedValue(new Error('Keycloak role grant timed out after 8000ms'));
+    requestMock = buildRequestMock({
+      organization: { id: 7, name: 'Beispiel GmbH', email: null, website: null, OrganizationAdmins: [] },
+    });
+
+    const result = await claimJobOrganization(claimInput({ organizationId: 7 }), mockLogger);
+
+    expect(result).toMatchObject({ success: true, status: 'GRANTED' });
     expect(mockLogger.warn).toHaveBeenCalled();
   });
 });

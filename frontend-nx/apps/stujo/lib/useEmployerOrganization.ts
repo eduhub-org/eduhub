@@ -4,6 +4,7 @@ import { useSession } from 'next-auth/react';
 import { useCallback, useMemo } from 'react';
 
 import { useCurrentUserId } from '@eduhub/hooks/authentication';
+import { AuthRoles } from '@eduhub/types/enums';
 
 import { MY_JOB_ORGANIZATIONS, useEmployerRoleContext } from './employer';
 
@@ -64,10 +65,17 @@ export const useEmployerOrganization = (): EmployerOrganizationState => {
   const employerRole = useEmployerRoleContext();
   const currentUserId = useCurrentUserId();
 
+  // OrganizationAdmin is readable by org_admin_access and admin only, so under
+  // the plain `user` role this query does not fail gracefully — it fails schema
+  // validation. Skipping it keeps the "no company yet" state honest instead of
+  // hiding a permission error behind it; a user whose grant exists but whose
+  // token has not caught up recovers on /mein-stujo/unternehmen, which
+  // re-authenticates and verifies the role.
   const { data, loading } = useQuery(MY_JOB_ORGANIZATIONS, {
     context: employerRole,
     variables: { userId: currentUserId },
-    skip: sessionStatus !== 'authenticated' || !currentUserId,
+    skip:
+      sessionStatus !== 'authenticated' || !currentUserId || employerRole.role === AuthRoles.user,
   });
 
   const organizations = useMemo<EmployerOrganization[]>(

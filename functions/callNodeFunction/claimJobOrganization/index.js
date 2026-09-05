@@ -1,5 +1,6 @@
 import { GraphQLClient, gql } from 'graphql-request';
 
+import { addKeycloakClientRole } from '../lib/keycloakClientRole.js';
 import { queueEmail } from '../lib/queueEmail.js';
 import { createOrganizationClaimVariableReplacer } from '../emailTemplateVariables.js';
 import {
@@ -36,7 +37,7 @@ import {
 const MAX_ORGANIZATION_NAME_LENGTH = 200;
 
 /** How long to wait for the synchronous Keycloak role grant before leaving it to the retry path. */
-const KEYCLOAK_ROLE_TIMEOUT_MS = 5000;
+const KEYCLOAK_ROLE_TIMEOUT_MS = 8000;
 
 const GET_CLAIMER = gql`
   query GetClaimerForOrganizationClaim($userId: uuid!) {
@@ -134,42 +135,31 @@ const INSERT_GRANT = gql`
  * The add_keycloak_org_admin_role event trigger on OrganizationAdmin does this
  * too, but asynchronously, and the frontend re-authenticates the moment this
  * action returns to pick the role up. Losing that race means the fresh token
- * still lacks org_admin and the first JobPosting insert is rejected. The
- * function is idempotent (an already-assigned role is no longer "available" to
- * add), so doing both is safe. A failure here is logged, not fatal: the event
- * trigger retries.
+ * still lacks org_admin, every JobPosting query and insert is rejected, and the
+ * employer is told they have no company until they sign out and in again.
+ *
+ * So the grant is made here, in-process, against the Keycloak admin API — not
+ * by calling the addKeycloakRole webhook, whose URL is only configured on
+ * Hasura and was therefore never set in this runtime, making the whole
+ * "synchronous" path a silent no-op. It is idempotent, so overlapping with the
+ * event trigger is safe.
+ *
+ * A failure is logged, not fatal: the access is already committed in the
+ * database and the event trigger retries the role.
  */
 async function addKeycloakOrgAdminRole(userId, logger) {
-  const url = process.env.CLOUD_FUNCTION_LINK_ADD_KEYCLOAK_ROLE;
-  const secret = process.env.HASURA_CLOUD_FUNCTION_SECRET;
-  if (!url || !secret) {
-    logger.warn('Keycloak role webhook not configured, relying on the event trigger');
-    return;
-  }
-  // Bounded, because by this point the grant is already committed: an endpoint that accepts the
-  // connection and never answers would otherwise hold the action until the platform timeout and
-  // report failure to somebody who does have access. The event trigger retries either way.
-  const controller = new AbortController();
-  const deadline = setTimeout(() => controller.abort(), KEYCLOAK_ROLE_TIMEOUT_MS);
-  try {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', secret, role: 'org_admin' },
-      body: JSON.stringify({ event: { data: { new: { userId } } } }),
-      signal: controller.signal,
-    });
-    if (!response.ok) {
-      logger.warn('Synchronous Keycloak role grant failed, relying on the event trigger', {
-        status: response.status,
-      });
-    }
-  } catch (error) {
+  const result = await addKeycloakClientRole(userId, 'org_admin', logger, {
+    timeoutMs: KEYCLOAK_ROLE_TIMEOUT_MS,
+  }).catch((error) => ({ granted: false, reason: error.message }));
+
+  if (result.granted) {
+    logger.info('Keycloak org_admin role in place for the claimer', { reason: result.reason });
+  } else {
     logger.warn('Synchronous Keycloak role grant failed, relying on the event trigger', {
-      error: error.message,
+      reason: result.reason,
     });
-  } finally {
-    clearTimeout(deadline);
   }
+  return result.granted;
 }
 
 /**
