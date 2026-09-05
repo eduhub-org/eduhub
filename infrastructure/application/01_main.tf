@@ -25,6 +25,12 @@ terraform {
       source  = "cloudflare/cloudflare"
       version = "~> 3.0"
     }
+    # Suffixes the stujo.net managed certificate name (09_stujo_net.tf), the
+    # same way the lb-http module does for the shared certificate.
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.0"
+    }
 
   }
 }
