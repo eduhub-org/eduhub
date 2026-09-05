@@ -46,6 +46,11 @@ export const ADMIN_USER_LIST = gql`
         canManageDegrees
         canManageJobs
         canManageSettings
+        # How the grant came about. Null means a person granted it; a value means
+        # it was claimed self-service on the job board and says what was checked.
+        # Server-controlled, so it is safe to read as a review signal.
+        claimVerification
+        authorizationDeclaredAt
       }
     }
     User_aggregate(where: $filter) {
@@ -151,6 +156,29 @@ export const UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_SETTINGS = gql`
   }
 `;
 
+// Records that a super-admin reviewed an unverified self-service claim and found it legitimate,
+// which is what clears the review marker on the access screen.
+//
+// claimVerification is in no org_admin_access insert or update permission, so this only resolves
+// under the admin role — a settings admin cannot confirm the claim they are the subject of. The
+// filter pins the current state instead of writing by primary key alone: a grant that was revoked
+// or already reviewed in the meantime must not be overwritten, and affected_rows tells the caller
+// which happened.
+export const VERIFY_ORGANIZATION_ADMIN_CLAIM = gql`
+  mutation VerifyOrganizationAdminClaim($id: Int!) {
+    update_OrganizationAdmin(
+      where: { id: { _eq: $id }, claimVerification: { _eq: "SELF_SERVICE_UNVERIFIED" } }
+      _set: { claimVerification: "ADMIN_VERIFIED" }
+    ) {
+      affected_rows
+      returning {
+        id
+        claimVerification
+      }
+    }
+  }
+`;
+
 export const UPDATE_ORGANIZATION_ADMIN_ORGANIZATION_ID = gql`
   mutation UpdateOrganizationAdminOrganizationId($id: Int!, $organizationId: Int!) {
     update_OrganizationAdmin_by_pk(
@@ -172,6 +200,7 @@ export const MY_ORG_ADMIN_CAPABILITIES = gql`
       canManageCourses
       canManageEvents
       canManageDegrees
+      canManageJobs
     }
   }
 `;
@@ -216,6 +245,7 @@ export const ORGANIZATION_ADMINS_BY_ORGANIZATION_ID = gql`
       canManageEvents
       canManageCourses
       canManageDegrees
+      canManageJobs
       canManageSettings
       User {
         id

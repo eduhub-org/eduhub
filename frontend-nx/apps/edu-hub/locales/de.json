@@ -2096,6 +2096,9 @@
     "profile_organization": "Organisation (Profil)",
     "super_admin_label": "Super-Admin",
     "deletion_confirmation_question": "Bist du sicher, dass du die Administrationsrechte von {firstName} {lastName} für die Organisation {organization} löschen möchtest?",
+    "deletion_confirmation_question_super_admin": "Bist du sicher, dass du die Administrationsrechte von {firstName} {lastName} für die Organisation {organization} löschen möchtest? Die Super-Admin-Rechte bleiben davon unberührt.",
+    "remove_super_admin_confirmation_question": "Bist du sicher, dass du die Super-Admin-Rechte von {firstName} {lastName} entfernen möchtest?",
+    "privileges_filter_label": "Berechtigungen",
     "is_super_admin": "Ist Super-Admin",
     "capabilities_heading": "Berechtigungen",
     "can_manage_events": "Kann Events verwalten",
@@ -2104,7 +2107,8 @@
     "can_manage_jobs": "Kann Stellenangebote verwalten",
     "can_manage_users_and_settings": "Kann Benutzer und Einstellungen verwalten",
     "error_loading_admin_users": "Fehler beim Laden der Admin-Benutzer.",
-    "administered_organizations": "Verwaltete Organisationen",
+    "administered_organization": "Verwaltete Organisation",
+    "super_admin_only": "Nur Super-Admin",
     "no_organization_roles": "Keine Organisationsrolle – nur Super-Admin-Rechte.",
     "add_admin_button": "Admin hinzufügen",
     "add_admin_dialog_title": "Admin-Benutzer hinzufügen",
@@ -2121,7 +2125,20 @@
     "add_admin_scope_required": "Bitte wähle eine Organisation aus oder vergib Super-Admin-Rechte.",
     "add_admin_no_organization": "Keine Organisation (nur Super-Admin)",
     "add_admin_super_admin_hint": "Super-Admins verwalten die gesamte Plattform, unabhängig von einer Organisation.",
-    "add_admin_success": "Admin-Benutzer hinzugefügt."
+    "add_admin_success": "Admin-Benutzer hinzugefügt.",
+    "first_settings_admin_hint": "Dieses Unternehmen hat noch niemanden mit diesem Recht. Ohne diese Berechtigung kann hier niemand weitere Admins hinzufügen oder Einstellungen ändern.",
+    "claim_declared_at": "Die Administrationsrechte wurden am {date} beansprucht.",
+    "claim_declared": "Die Administrationsrechte wurden selbst beansprucht.",
+    "claim_needs_review_label": "Administrationsrechte selbst beansprucht – bitte überprüfen!",
+    "verify_claim_button": "Berechtigung bestätigen",
+    "verify_claim_submitting": "Wird bestätigt…",
+    "verify_claim_error": "Die Berechtigung konnte nicht bestätigt werden. Möglicherweise wurde sie inzwischen von jemand anderem bestätigt oder entzogen.",
+    "claim_verification": {
+      "SELF_SERVICE_DOMAIN_VERIFIED": "Die E-Mail-Domain stimmt mit der Organisation überein.",
+      "SELF_SERVICE_UNVERIFIED": "Bitte überprüfen!",
+      "NEW_ORGANIZATION": "Die Organisation wurde dabei neu angelegt.",
+      "ADMIN_VERIFIED": "Die Berechtigung wurde geprüft und bestätigt."
+    }
   },
   "manageAppSettings": {
     "appSettings": "App Einstellungen",
@@ -2634,7 +2651,9 @@
       "JOB_POSTING_EXPIRED": "Stellenanzeige abgelaufen",
       "JOB_POSTING_ADMIN_NOTICE": "Stellenanzeige: Hinweis an Admins",
       "JOB_POSTING_PAYMENT_FAILED": "Stellenanzeige: Zahlung fehlgeschlagen",
-      "JOB_ALERT": "Job-Benachrichtigung"
+      "JOB_ALERT": "Job-Benachrichtigung",
+      "JOB_ORGANIZATION_CLAIMED": "Stellen-Zugang: neu übernommen",
+      "JOB_ORGANIZATION_ACCESS_REQUEST": "Stellen-Zugang: Anfrage an Verwalter:innen"
     },
     "placeholders": {
       "subject": "E-Mail-Betreff eingeben...",
@@ -2687,7 +2706,9 @@
       "JOB_POSTING_EXPIRED": "Geht an den Arbeitgeber, wenn die Laufzeit der Anzeige endet, mit Link zum erneuten Schalten",
       "JOB_POSTING_ADMIN_NOTICE": "Geht an die Plattform-Admins, wenn eine Anzeige veröffentlicht wurde (Prüfung im Nachhinein)",
       "JOB_POSTING_PAYMENT_FAILED": "Geht an den Arbeitgeber, wenn eine verzögerte Zahlung (SEPA) fehlschlägt und die Anzeige offline genommen wird",
-      "JOB_ALERT": "Geht an Abonnenten mit neuen Anzeigen, die zu ihrem Suchprofil passen"
+      "JOB_ALERT": "Geht an Abonnenten mit neuen Anzeigen, die zu ihrem Suchprofil passen",
+      "JOB_ORGANIZATION_CLAIMED": "Geht an die StuJo-Kontaktadresse, wenn jemand die Stellen-Verwaltung eines Unternehmens selbst übernimmt",
+      "JOB_ORGANIZATION_ACCESS_REQUEST": "Geht an die bisherigen Verwalter:innen, wenn jemand anderes Zugang zu ihren Stellenanzeigen anfragt"
     },
     "delete_confirmation": "Bist du sicher, dass du die E-Mail-Vorlage „{title}“ löschen möchtest?",
     "unknown_trigger": "Unbekannter Auslöser-Typ",
