@@ -27,11 +27,16 @@ import { lookupNewJobId } from './lib/legacyRedirects';
 
 export const config = {
   // Page routes only — skip Next internals, the API, and static assets
-  // (anything with a file extension).
-  matcher: ['/((?!_next/static|_next/image|api|favicon.ico|robots.txt|sitemap.xml|.*\\..*).*)'],
+  // (anything with a file extension). "/" is listed separately: the negative
+  // lookahead pattern does not match the bare root, and the portal landing
+  // page is exactly what a legacy inbound link hits most often.
+  matcher: ['/', '/((?!_next/static|_next/image|api|favicon.ico|robots.txt|sitemap.xml|.*\\..*).*)'],
 };
 
 const EN_SUFFIX = '.en.stujo.net';
+
+/** i18n defaultLocale from next.config.js — the default locale carries no path prefix. */
+const DEFAULT_LOCALE = 'de';
 
 // Keyed by exact host, so the staging hosts (stujo-staging.opencampus.sh, …)
 // can never match even if the flag were set there by accident.
@@ -53,18 +58,44 @@ const canonicalRedirectsEnabled = () => process.env.STUJO_CANONICAL_REDIRECTS ==
 /** True for the locale prefix itself, but not for paths like `/energie`. */
 const hasEnPrefix = (pathname: string) => pathname === '/en' || pathname.startsWith('/en/');
 
+/**
+ * The locale prefix Next strips out of `nextUrl.pathname`. It has to be put
+ * back by hand, because these redirects build their Location header from the
+ * request headers rather than from `nextUrl` — see below.
+ */
+const localePrefix = (locale: string | undefined) =>
+  locale && locale !== DEFAULT_LOCALE ? `/${locale}` : '';
+
+/**
+ * Absolute redirect target.
+ *
+ * Deliberately NOT `nextUrl.clone()`: `nextUrl`'s origin is the address the
+ * server listens on (`0.0.0.0:5001` on Cloud Run), not the host the visitor
+ * asked for, so cloning it sends the browser to an unreachable internal URL.
+ * The host comes from the request, and the scheme from the load balancer's
+ * `x-forwarded-proto` (with the request's own scheme as the local-dev
+ * fallback, so http://localhost:5001 keeps working).
+ */
+const absoluteUrl = (req: NextRequest, host: string, path: string) => {
+  const forwardedProto = (req.headers.get('x-forwarded-proto') || '').split(',')[0].trim();
+  const protocol = forwardedProto || req.nextUrl.protocol.replace(':', '');
+  return `${protocol}://${host}${path}${req.nextUrl.search}`;
+};
+
 export async function proxy(req: NextRequest): Promise<NextResponse> {
-  const hostname = (req.headers.get('host') || '').split(':')[0].toLowerCase();
+  const hostWithPort = req.headers.get('host') || req.nextUrl.host;
+  const hostname = hostWithPort.split(':')[0].toLowerCase();
   // With the pages-router i18n config, Next normalizes the locale out of
   // `pathname` and exposes it as `nextUrl.locale`.
-  const { pathname, search } = req.nextUrl;
+  const { pathname } = req.nextUrl;
+  const prefix = localePrefix(req.nextUrl.locale);
 
-  // 1) Canonicalize the interim opencampus.sh hosts → stujo.net (path + query
-  //    kept, including the locale prefix if the visitor had one).
+  // 1) Canonicalize the interim opencampus.sh hosts → stujo.net (path, locale
+  //    prefix and query kept). Always https: the canonical domain is.
   const canonicalHost = CANONICAL_HOSTS[hostname];
   if (canonicalHost && canonicalRedirectsEnabled()) {
-    const path = req.nextUrl.locale === 'en' && !hasEnPrefix(pathname) ? `/en${pathname}` : pathname;
-    return NextResponse.redirect(`https://${canonicalHost}${path === '/' ? '' : path}${search}`, 301);
+    const path = `${prefix}${pathname === '/' ? '' : pathname}`;
+    return NextResponse.redirect(`https://${canonicalHost}${path || '/'}${req.nextUrl.search}`, 301);
   }
 
   // 2) Host-based locale: *.en.stujo.net → <portal>.stujo.net/en/...
@@ -72,7 +103,7 @@ export async function proxy(req: NextRequest): Promise<NextResponse> {
     const newHost =
       hostname === 'en.stujo.net' ? 'stujo.net' : `${hostname.slice(0, -EN_SUFFIX.length)}.stujo.net`;
     const path = hasEnPrefix(pathname) ? pathname : `/en${pathname === '/' ? '' : pathname}`;
-    return NextResponse.redirect(`https://${newHost}${path}${search}`, 301);
+    return NextResponse.redirect(`https://${newHost}${path}${req.nextUrl.search}`, 301);
   }
 
   // 3) Legacy job detail — SLUG-BEARING only: /stellenangebote/:oldId-:slug.
@@ -85,8 +116,7 @@ export async function proxy(req: NextRequest): Promise<NextResponse> {
   if (jobMatch) {
     const newId = await lookupNewJobId(Number(jobMatch[1]));
     if (newId) {
-      const target = req.nextUrl.clone();
-      target.pathname = `/stellenangebote/${newId}`;
+      const target = absoluteUrl(req, hostWithPort, `${prefix}/stellenangebote/${newId}`);
       return NextResponse.redirect(target, 301);
     }
   }
