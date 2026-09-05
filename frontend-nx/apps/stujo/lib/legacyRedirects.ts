@@ -12,6 +12,15 @@
  */
 import { fetchAnonymous } from './hasura';
 
+/**
+ * Deadline for the lookups below. The proxy awaits them before it can answer,
+ * so a Hasura that accepts a request but never completes it would hold the
+ * visitor's request — and a Cloud Run concurrency slot — open until an
+ * infrastructure timeout. Past this point a redirect is not worth waiting for:
+ * the visitor gets the plain 404 instead.
+ */
+const LOOKUP_TIMEOUT_MS = 2000;
+
 /** Old Rails job id → new JobPosting.id (or null if unknown). */
 export async function lookupNewJobId(legacyStujoId: number): Promise<number | null> {
   try {
@@ -23,7 +32,8 @@ export async function lookupNewJobId(legacyStujoId: number): Promise<number | nu
           }
         }
       `,
-      { legacy: legacyStujoId }
+      { legacy: legacyStujoId },
+      AbortSignal.timeout(LOOKUP_TIMEOUT_MS)
     );
     return data.JobPosting[0]?.id ?? null;
   } catch {
@@ -49,7 +59,8 @@ export async function lookupNewOrgIdByLegacySlug(legacySlug: string): Promise<nu
           }
         }
       `,
-      { alias: [`stujo:${legacySlug}`] }
+      { alias: [`stujo:${legacySlug}`] },
+      AbortSignal.timeout(LOOKUP_TIMEOUT_MS)
     );
     return data.Organization[0]?.id ?? null;
   } catch {

@@ -118,8 +118,11 @@ Prerequisite: the release carrying the StuJo schema is **on production**
 redirects depend on) and the app answers on `stujo.opencampus.sh`.
 
 ```bash
-# on the VM, in the production project
-export STRATO_SSH_PASS='…'
+# on the VM, in the production project.
+# Read the SSH password from a prompt rather than typing it into the command
+# line: an exported literal lands in the shell history of a machine that still
+# has to survive until the delta run.
+read -rs -p 'StuJo SSH password: ' STRATO_SSH_PASS && export STRATO_SSH_PASS && echo
 export GCP_PROJECT=<prod-project> GCS_BUCKET=<prod-bucket> HAW_ORG_ID=<id>
 
 # 1. dry run — validates source connectivity and previews the filtered scope

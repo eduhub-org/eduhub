@@ -100,12 +100,24 @@ export KEYCLOAK_URL="${KEYCLOAK_URL:-https://keycloak-staging.opencampus.sh}"
 export KEYCLOAK_REALM="${KEYCLOAK_REALM:-edu-hub}"
 export KEYCLOAK_USER="${KEYCLOAK_USER:-admin}"
 export GCS_BUCKET="${GCS_BUCKET:-eduhub-staging-new}"
+
+# The ETL sends the Hasura admin secret and the Keycloak admin password to
+# these two endpoints, and both are overridable from the environment — so a
+# typo'd or cleartext override would put those credentials on the wire in the
+# clear. Refuse before any secret is fetched, let alone sent.
+for endpoint in "${HASURA_URL}" "${KEYCLOAK_URL}"; do
+  case "${endpoint}" in
+    https://*) ;;
+    *) echo "ERROR: refusing to send credentials to a non-HTTPS endpoint: ${endpoint}" >&2; exit 1 ;;
+  esac
+done
+
 export STUJO_MYSQL_DSN="mysql://${DB_USER}:${DB_PASS}@127.0.0.1:13306/${DB_NAME}"
 export STUJO_FILES_ROOT="${FILES_ROOT}"
 HASURA_ADMIN_SECRET="$(gcloud secrets versions access latest --secret=hasura-graphql-admin-key --project="${GCP_PROJECT}")"
 KEYCLOAK_PW="$(gcloud secrets versions access latest --secret=keycloak-pw --project="${GCP_PROJECT}")"
 [ -n "${HASURA_ADMIN_SECRET}" ] && [ -n "${KEYCLOAK_PW}" ] \
-  || { echo 'ERROR: could not fetch staging secrets from Secret Manager'; exit 1; }
+  || { echo 'ERROR: could not fetch the secrets from Secret Manager'; exit 1; }
 export HASURA_ADMIN_SECRET KEYCLOAK_PW
 
 echo "==================================================================="

@@ -82,6 +82,11 @@ const absoluteUrl = (req: NextRequest, host: string, path: string) => {
   return `${protocol}://${host}${path}${req.nextUrl.search}`;
 };
 
+/**
+ * Applies the three cutover redirects above and passes everything else
+ * through untouched. Every lookup failure falls through rather than erroring:
+ * a redirect that cannot be resolved must never take a page down.
+ */
 export async function proxy(req: NextRequest): Promise<NextResponse> {
   const hostWithPort = req.headers.get('host') || req.nextUrl.host;
   const hostname = hostWithPort.split(':')[0].toLowerCase();
