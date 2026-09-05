@@ -34,6 +34,42 @@ locals {
       domain       = "${app_name}${var.service_name_extension}.opencampus.sh"
     }
   }
+
+  # --- stujo.net cutover (see 09_stujo_net.tf and docs/STUJO_PROD_CUTOVER.md) --
+  #
+  # Two independent switches, applied in two steps so the canonical URLs only
+  # move once the new domain actually serves HTTPS:
+  #
+  #   stujo_net_serving   step 1 — stand up the stujo.net load balancer, its
+  #                       managed certificate and the Cloudflare records. The
+  #                       app keeps answering on *.opencampus.sh exactly as
+  #                       before; stujo.net simply starts working too.
+  #   stujo_net_canonical step 2 — make stujo.net the canonical domain: the
+  #                       interim opencampus.sh hosts 301 to it (proxy.ts),
+  #                       NextAuth callbacks, mail links and Stripe return URLs
+  #                       switch over. Only flip this once the certificate is
+  #                       ACTIVE and the hosts are smoke-tested.
+  #
+  # Both are off unless the workspace sets them, so staging and every plan
+  # before the cutover are unaffected.
+  stujo_net_serving   = var.stujo_net_enabled && var.cloudflare_zone_id_stujo != ""
+  stujo_net_canonical = local.stujo_net_serving && var.stujo_net_canonical
+
+  # Public host of each portal: its stujo.net domain once canonical, the
+  # interim opencampus.sh alias before that. Used for NEXTAUTH_URL, the mail
+  # and Stripe return URLs, and edu-hub's outbound job links.
+  stujo_public_host = local.stujo_net_canonical ? var.stujo_net_canonical_hosts["stujo"] : local.stujo_domain
+  stujo_portal_public_hosts = {
+    for app_name, portal in local.stujo_portals : app_name => (
+      local.stujo_net_canonical ? lookup(var.stujo_net_canonical_hosts, app_name, portal.domain) : portal.domain
+    )
+  }
+
+  # Every hostname the stujo.net load balancer must terminate TLS for: the
+  # portal hosts plus the legacy locale hosts, which only exist to be 301'd.
+  stujo_net_all_hostnames = local.stujo_net_serving ? sort(distinct(concat(
+    keys(var.stujo_net_hosts), var.stujo_net_redirect_hostnames
+  ))) : []
 }
 
 ######
@@ -406,4 +442,67 @@ variable "stujo_seller_organization_id" {
   description = "Organization.id that appears as seller on StuJo job posting invoices (defaults to the employer's organization when empty)"
   type        = string
   default     = ""
+}
+
+######
+# stujo.net domain cutover
+###
+# The real StuJo domain lives in its own Cloudflare zone and is served by its
+# own load balancer (09_stujo_net.tf), deliberately NOT by adding SANs to the
+# shared opencampus.sh certificate: that certificate is a single multi-SAN
+# managed cert, and changing its domain list re-provisions it for Keycloak,
+# Hasura, EduHub and the API too. See docs/STUJO_PROD_CUTOVER.md.
+
+variable "stujo_net_enabled" {
+  description = "Step 1 of the cutover: create the stujo.net load balancer, certificate and DNS records. The app keeps serving on *.opencampus.sh unchanged."
+  type        = bool
+  default     = false
+}
+
+variable "stujo_net_canonical" {
+  description = "Step 2 of the cutover: make stujo.net canonical (301s from the interim opencampus.sh hosts, NextAuth/mail/Stripe URLs). Requires stujo_net_enabled and an ACTIVE certificate."
+  type        = bool
+  default     = false
+}
+
+variable "cloudflare_zone_id_stujo" {
+  description = "Cloudflare zone id of the stujo.net zone (a different zone from opencampus.sh). Empty keeps the whole cutover inert."
+  type        = string
+  default     = ""
+}
+
+variable "stujo_net_hosts" {
+  description = "stujo.net hostnames that serve the app, mapped to the portal (AppSettings.appName) that owns them. Must stay in sync with the JobPortalDomain seed, which is what resolves the branding at request time."
+  type        = map(string)
+  default = {
+    "stujo.net"           = "stujo"
+    "www.stujo.net"       = "stujo"
+    "cau.stujo.net"       = "stujo-cau"
+    "haw-kiel.stujo.net"  = "stujo-haw-kiel"
+    "fh-kiel.stujo.net"   = "stujo-haw-kiel"
+    "flensburg.stujo.net" = "stujo-flensburg"
+  }
+}
+
+variable "stujo_net_canonical_hosts" {
+  description = "Canonical public host per portal — the one used for NextAuth callbacks, mail links and Stripe return URLs once stujo_net_canonical is on. A portal may answer under several hosts, but only one of them may be canonical."
+  type        = map(string)
+  default = {
+    "stujo"           = "stujo.net"
+    "stujo-cau"       = "cau.stujo.net"
+    "stujo-haw-kiel"  = "haw-kiel.stujo.net"
+    "stujo-flensburg" = "flensburg.stujo.net"
+  }
+}
+
+variable "stujo_net_redirect_hostnames" {
+  description = "Legacy stujo.net hostnames that only need to terminate TLS so proxy.ts can 301 them (the Rails *.en.stujo.net locale hosts). Google-managed certificates have no wildcards, so every host must be listed explicitly — fill this from the actual records in the stujo.net zone."
+  type        = list(string)
+  default     = []
+}
+
+variable "stujo_net_record_ttl" {
+  description = "TTL of the stujo.net A records. Lower it (e.g. 60) before the cutover so a rollback to the old server propagates quickly, then raise it again once the move has settled."
+  type        = number
+  default     = 300
 }

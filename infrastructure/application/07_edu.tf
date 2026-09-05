@@ -92,8 +92,11 @@ resource "google_cloud_run_service" "eduhub" {
           value = var.matrix_element_client_url
         }
         env {
+          # Runtime counterpart of the build-time NEXT_PUBLIC_STUJO_URL that
+          # Next inlines into the job tile links (see the GitHub Actions
+          # variable of the same name — that one is what the browser sees).
           name  = "NEXT_PUBLIC_STUJO_URL"
-          value = "https://${local.stujo_domain}"
+          value = "https://${local.stujo_public_host}"
         }
         env {
           name = "GHOST_NEWSLETTER_CREDENTIALS_ENCRYPTION_KEY"
