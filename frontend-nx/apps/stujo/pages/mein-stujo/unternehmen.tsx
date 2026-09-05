@@ -3,10 +3,11 @@ import type { GetServerSideProps } from 'next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { signIn, useSession } from 'next-auth/react';
-import { FC, useCallback, useMemo, useState } from 'react';
+import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
 import DropDownSelector from '@eduhub/components/inputs/DropDownSelector';
+import { useIsAdmin, useIsOrgAdmin } from '@eduhub/hooks/authentication';
 
 import Layout from '../../components/Layout';
 import StuJoLegacyIcon from '../../components/StuJoLegacyIcon';
@@ -21,6 +22,26 @@ import { useEmployerOrganization } from '../../lib/useEmployerOrganization';
 import { resolvePortal, PortalBranding } from '../../lib/portal';
 
 type Props = { portal: PortalBranding };
+
+/**
+ * How many times to re-authenticate before giving up on picking the new role
+ * up silently. The first attempt is an SSO round trip; the second forces a
+ * fresh Keycloak authentication, which is what signing out and back in does.
+ */
+const MAX_ROLE_REFRESH_ATTEMPTS = 2;
+
+/**
+ * Keep `?next=` an in-app destination. It is echoed into a callbackUrl and into
+ * router.replace, so an absolute or protocol-relative value would turn this
+ * page — the one employers are sent to by link — into an open redirect.
+ */
+const safeNext = (value: unknown): string =>
+  typeof value === 'string' && value.startsWith('/') && !value.startsWith('//')
+    ? value
+    : '/mein-stujo/neu';
+
+/** Breathing room for the event trigger before a repeat attempt (ms). */
+const ROLE_REFRESH_BACKOFF_MS = 1500;
 
 type ClaimResult = {
   status?: string | null;
@@ -51,6 +72,14 @@ const Unternehmen: FC<Props> = ({ portal }) => {
   const { status: sessionStatus } = useSession();
   const employerRole = useEmployerRoleContext();
   const { organizations, loading: orgsLoading } = useEmployerOrganization();
+  // Whether this session's token can actually reach the employer screens. The
+  // grant lives in OrganizationAdmin, but Hasura only lets `org_admin` (or a
+  // super-admin's `admin`) read and write job offers, and that role reaches the
+  // token exclusively through Keycloak — so a committed claim is invisible until
+  // the token carries it.
+  const isOrgAdmin = useIsOrgAdmin();
+  const isSuperAdmin = useIsAdmin();
+  const canManageJobs = isOrgAdmin || isSuperAdmin;
 
   // What the picker currently holds, tracked as a tagged value rather than inferred from the
   // string: a company legitimately named "360" would otherwise be read back as organization id 360.
@@ -62,10 +91,27 @@ const Unternehmen: FC<Props> = ({ portal }) => {
   const [error, setError] = useState<string | null>(null);
   const [claim, setClaim] = useState<ClaimResult | null>(null);
   const [redirecting, setRedirecting] = useState(false);
+  // A re-authentication that never even got as far as leaving the page. signIn
+  // resolves by navigating away, so reaching its rejection path means the
+  // redirect did not happen — without this the employer watches "setting up
+  // your access" forever.
+  const [refreshFailed, setRefreshFailed] = useState(false);
 
   // Where to go once the claim succeeds. `?next=` lets the employer screens
   // send someone here and get them back to what they were doing.
-  const next = typeof router.query.next === 'string' ? router.query.next : '/mein-stujo/neu';
+  const next = safeNext(router.query.next);
+
+  // Set by the re-authentication round trip below so the page knows, on the way
+  // back, that it must verify the role instead of offering the form again.
+  //
+  // The counter is clamped rather than trusted: it comes from the query string,
+  // and a crafted `attempt=-1000000` would otherwise stay below the ceiling for
+  // a million redirects — a self-inflicted loop through Keycloak.
+  const refreshing = router.query.refreshRole === '1';
+  const attempt = Math.min(
+    Math.max(0, Number.parseInt(String(router.query.attempt ?? ''), 10) || 0),
+    MAX_ROLE_REFRESH_ATTEMPTS
+  );
 
   const {
     data: optionsData,
@@ -106,6 +152,61 @@ const Unternehmen: FC<Props> = ({ portal }) => {
     [portal.appName, router.asPath]
   );
 
+  /**
+   * Re-authenticate so the fresh token carries the org_admin role, and come back
+   * *here* rather than straight to the posting form: only this page knows a
+   * claim just happened, so only this page can tell "the refresh worked" from
+   * "you have no company yet" — the message the employer used to be dropped
+   * into, with no way out but signing out manually.
+   *
+   * Attempt 2 adds `prompt=login`, which makes Keycloak authenticate the user
+   * again instead of answering from the existing SSO session.
+   */
+  const refreshRole = useCallback(
+    (nextAttempt: number) => {
+      setRefreshFailed(false);
+      return signIn(
+        'keycloak',
+        {
+          callbackUrl: `/mein-stujo/unternehmen?refreshRole=1&attempt=${nextAttempt}&next=${encodeURIComponent(
+            next
+          )}`,
+        },
+        {
+          stujo_portal: portal.appName,
+          ...(nextAttempt > 1 ? { prompt: 'login' } : {}),
+        }
+      ).catch((caught) => {
+        console.error('role refresh sign-in failed', caught);
+        setRefreshFailed(true);
+      });
+    },
+    [next, portal.appName]
+  );
+
+  // Back from a re-authentication: hand the employer on if the role arrived,
+  // and otherwise try once more — the add_keycloak_org_admin_role event trigger
+  // can still be catching up if the action's synchronous grant did not land.
+  useEffect(() => {
+    if (!refreshing || sessionStatus !== 'authenticated' || refreshFailed) return;
+    if (canManageJobs) {
+      router.replace(next);
+      return;
+    }
+    if (attempt >= MAX_ROLE_REFRESH_ATTEMPTS) return;
+    const timer = setTimeout(() => refreshRole(attempt + 1), ROLE_REFRESH_BACKOFF_MS);
+    return () => clearTimeout(timer);
+  }, [
+    refreshing,
+    sessionStatus,
+    canManageJobs,
+    attempt,
+    next,
+    refreshFailed,
+    refreshRole,
+    router,
+  ]);
+
   const handleSubmit = async () => {
     setError(null);
     setNotice(null);
@@ -144,13 +245,14 @@ const Unternehmen: FC<Props> = ({ portal }) => {
       }
 
       // The grant is in the database, but this session's token predates it and
-      // still lacks the org_admin role, so every posting write would be
+      // still lacks the org_admin role, so every posting query and write would be
       // rejected. Re-authenticating is a silent redirect through the existing
       // Keycloak session and comes back with the role.
       setRedirecting(true);
-      await signIn('keycloak', { callbackUrl: next }, { stujo_portal: portal.appName });
+      await refreshRole(1);
     } catch (caught: any) {
       console.error('claimJobOrganization failed', caught);
+      setRedirecting(false);
       setError(t('claimNetworkError'));
     }
   };
@@ -207,10 +309,38 @@ const Unternehmen: FC<Props> = ({ portal }) => {
     );
   }
 
-  if (redirecting) {
+  const waitingForRole =
+    redirecting || (refreshing && !canManageJobs && attempt < MAX_ROLE_REFRESH_ATTEMPTS);
+
+  if (waitingForRole && !refreshFailed) {
     return (
       <Layout portal={portal}>
         <p className="stujo-muted">{t('claimSettingUpAccess')}</p>
+      </Layout>
+    );
+  }
+
+  // Every silent attempt is spent, or a redirect never happened, and the token
+  // still has no org_admin role. The access itself is granted — say so, and say
+  // what does fix it — rather than showing the picker again, which would only
+  // re-claim what they already hold.
+  if (!canManageJobs && (refreshFailed || refreshing)) {
+    return (
+      <Layout portal={portal}>
+        <h1>{t('claimTitle')}</h1>
+        <div className="stujo-notice stujo-notice--error">{t('claimRoleRefreshFailed')}</div>
+        <p className="stujo-form-actions">
+          <button
+            type="button"
+            className="stujo-btn stujo-btn--primary"
+            onClick={() => refreshRole(MAX_ROLE_REFRESH_ATTEMPTS)}
+          >
+            {t('claimRoleRefreshRetry')}
+          </button>
+        </p>
+        <p className="stujo-muted">
+          {t('claimContactFallback', { contact: portal.contactEmail || t('defaultContact') })}
+        </p>
       </Layout>
     );
   }

@@ -128,6 +128,8 @@
     "claimAlreadyClaimedByName": "{name} already manages the job offers of {organization}. We can ask whether you may join.",
     "claimAlreadyClaimed": "Someone else already manages the job offers of {organization}. We can ask whether you may join.",
     "claimRequestAccess": "Request access",
+    "claimRoleRefreshFailed": "Your job management is set up, but your sign-in could not be refreshed. Please try again — or sign out and sign back in, then the access will be there.",
+    "claimRoleRefreshRetry": "Refresh sign-in",
     "claimContactFallback": "Stuck? Write to us at {contact}.",
     "accessRequestSent": "We have passed your request on. You will hear directly from the colleagues who manage the job offers.",
     "accessRequestAlreadySent": "You already have a pending request for this company. Please wait for a reply.",
