@@ -24,6 +24,7 @@ select_permissions:
         - privacyUrl
         - secondaryColor
         - showFaqSection
+        - termsUrl
         - timeZone
         - updated_at
       filter: {}

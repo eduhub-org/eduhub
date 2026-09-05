@@ -58,7 +58,7 @@ export const ApiKeyManager: React.FC<Props> = ({ organization, onError }) => {
   const [generatedKey, setGeneratedKey] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isRegeneration, setIsRegeneration] = useState(false);
-  const [hasKey, setHasKey] = useState<boolean>(Boolean(organization.apiKeyHash));
+  const [hasKey, setHasKey] = useState<boolean>(Boolean(organization.Settings?.apiKeyHash));
   const [revokeOpen, setRevokeOpen] = useState(false);
 
   const [updateApiKeyHash] = useRoleMutation(UPDATE_ORGANIZATION_API_KEY_HASH);

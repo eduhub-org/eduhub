@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { useDropDownLogic } from './hooks';
-import { DropDownSelectorProps } from './types';
+import { DropDownSelectorProps, Option } from './types';
 import { MaterialDropDown } from './components/MaterialDropDown';
 import { EduhubDropDown } from './components/EduhubDropDown';
 import { useRoleMutation } from '../../../hooks/authedMutation';
@@ -108,12 +108,29 @@ const DropDownSelector: React.FC<DropDownSelectorProps> = ({
 
   const handleCreateOption = useCallback(() => {
     if (disabled) return;
-    if (inputValue && !localOptions.some((option) => option.value === inputValue)) {
+    // "Already on the list" means an option with that name, matched the way CreatableDropDown
+    // decides whether to offer creation at all (label or alias, case-insensitive). Comparing the
+    // typed text with `option.value` instead compared it with an id for every id-keyed picker
+    // (organizations, addresses): it missed real duplicates, and it refused a legitimate creation
+    // whenever a name happened to equal an existing row's id — a company called "360".
+    // Trimmed throughout: the guard below would otherwise accept "   " as a name and create a
+    // blank organization, and a name typed with stray spaces would be stored with them.
+    const normalizedName = inputValue.trim();
+    const typedName = normalizedName.toLowerCase();
+    const nameExists = localOptions.some((option) => {
+      if (option.label.trim().toLowerCase() === typedName) return true;
+      const aliases: NonNullable<Option['aliases']> = option.aliases ?? [];
+      return aliases.some((alias) => {
+        const aliasName = typeof alias === 'string' ? alias : alias && 'name' in alias ? alias.name : '';
+        return !!aliasName && aliasName.trim().toLowerCase() === typedName;
+      });
+    });
+    if (normalizedName && !nameExists) {
       if (createOptionMutation) {
         createValue({
           variables: {
             ...identifierVariables,
-            value: inputValue,
+            value: normalizedName,
           },
           onCompleted: (data) => {
             const newValue = data?.createOption?.value || data?.insert_Organization_one?.id || data?.insert_LocationAddress_one?.id;
@@ -132,8 +149,8 @@ const DropDownSelector: React.FC<DropDownSelectorProps> = ({
           },
         });
       } else {
-        onOptionCreated?.(inputValue);
-        debouncedUpdateValue(inputValue);
+        onOptionCreated?.(normalizedName);
+        debouncedUpdateValue(normalizedName);
       }
     }
   }, [

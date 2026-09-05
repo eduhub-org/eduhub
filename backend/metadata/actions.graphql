@@ -688,7 +688,7 @@ type CourseAddonMapping {
 
 
 type Mutation {
-  publishJobPosting(jobPostingId: Int!): PublishJobPostingResult!
+  publishJobPosting(jobPostingId: Int!, acceptTerms: Boolean): PublishJobPostingResult!
 }
 
 type Mutation {
@@ -792,6 +792,38 @@ type ManageGuestRegistrationResult {
   lastName: String
   email: String
   registrations: [GuestRegistrationSummary!]
+  error: String
+  messageKey: String
+}
+
+type Mutation {
+  claimJobOrganization(
+    organizationId: Int
+    newOrganizationName: String
+    portalAppName: String
+    declareAuthorization: Boolean!
+  ): ClaimJobOrganizationResult!
+}
+
+type ClaimJobOrganizationResult {
+  success: Boolean!
+  status: String
+  organizationId: Int
+  organizationName: String
+  existingAdminName: String
+  error: String
+  messageKey: String
+}
+
+type Mutation {
+  requestJobOrganizationAccess(
+    organizationId: Int!
+    portalAppName: String
+  ): RequestJobOrganizationAccessResult!
+}
+
+type RequestJobOrganizationAccessResult {
+  success: Boolean!
   error: String
   messageKey: String
 }

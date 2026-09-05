@@ -1,40 +1,59 @@
 import { gql } from '@apollo/client';
 
-export const ORGANIZATION_ADMIN_LIST = gql`
-  query OrganizationAdminList(
+// One row per admin *person*, so the settings screen can show a single table of all admins:
+// organization admins and super-admins alike.
+//
+// The caller passes the ids of everyone who is an admin (grant holders from ADMIN_GRANTS, super-
+// admins from the getAdminUsers action) and this looks them up, so the filter is a primary-key
+// lookup over a handful of ids. It deliberately does NOT ask the database "which users are admins":
+// that predicate cannot use the User primary key and degrades into a full scan of a table that
+// grows with every signup, on every page change and every keystroke of the search.
+//
+// Each row carries the user's grants, one per organization they administer; the list is empty for a
+// super-admin without any organization role. Role-scoped like the rest of the screen: org admins
+// see only users they administer (User select permission), and only the grants of their own
+// organizations (OrganizationAdmin select permission).
+export const ADMIN_USER_LIST = gql`
+  query AdminUserList(
     $limit: Int = 15
     $offset: Int = 0
-    $filter: OrganizationAdmin_bool_exp = {}
-    $order_by: [OrganizationAdmin_order_by!] = {updated_at: desc}
+    $filter: User_bool_exp = {}
+    $order_by: [User_order_by!] = [{lastName: asc}, {firstName: asc}]
   ) {
-    OrganizationAdmin(
+    User(
       limit: $limit
       offset: $offset
       where: $filter
       order_by: $order_by
     ) {
       id
-      User {
-        id
-        firstName
-        lastName
-        email
-        Organization {
-          id
-          name
-        }
-      }
+      firstName
+      lastName
+      email
       Organization {
         id
         name
       }
-      canManageEvents
-      canManageCourses
-      canManageDegrees
-      canManageJobs
-      canManageSettings
+      OrganizationAdmins(order_by: {Organization: {name: asc}}) {
+        id
+        organizationId
+        Organization {
+          id
+          name
+        }
+        canManageEvents
+        canManageCourses
+        canManageDegrees
+        canManageJobs
+        canManageSettings
+        # How the grant came about. Null means a person granted it; a value means
+        # it was claimed self-service on the job board and says what was checked.
+        # Server-controlled, so it is safe to read as a review signal.
+        claimVerification
+        authorizationDeclaredAt
+      }
     }
-    OrganizationAdmin_aggregate(where: $filter) {
+    User_aggregate(where: $filter) {
       aggregate {
         count
       }
@@ -42,14 +61,20 @@ export const ORGANIZATION_ADMIN_LIST = gql`
   }
 `;
 
-// All settings-admin grants the caller may see (their own orgs). Used to decide, per organization,
-// whether a row is the *sole* settings admin — so the UI can pre-disable turning that flag off or
-// deleting the grant, matching the DB guard that keeps at least one settings admin per org.
-export const SETTINGS_ADMIN_GRANTS = gql`
-  query SettingsAdminGrants {
-    OrganizationAdmin(where: { canManageSettings: { _eq: true } }) {
+// Every admin grant the caller may see (their own organizations; all of them for a super-admin).
+// OrganizationAdmin holds one row per (admin, organization) and is orders of magnitude smaller than
+// User, so it is fetched unpaginated and serves two purposes on the settings screen:
+//   - the set of users to show in the admin table (unioned with the super-admins from Keycloak),
+//   - the per-organization count of settings admins, which decides whether a grant is the *sole*
+//     settings admin of its organization — the UI then pre-disables turning that flag off or
+//     deleting the grant, matching the DB guard that keeps at least one settings admin per org.
+export const ADMIN_GRANTS = gql`
+  query AdminGrants {
+    OrganizationAdmin {
       id
+      userId
       organizationId
+      canManageSettings
     }
   }
 `;
@@ -131,6 +156,29 @@ export const UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_SETTINGS = gql`
   }
 `;
 
+// Records that a super-admin reviewed an unverified self-service claim and found it legitimate,
+// which is what clears the review marker on the access screen.
+//
+// claimVerification is in no org_admin_access insert or update permission, so this only resolves
+// under the admin role — a settings admin cannot confirm the claim they are the subject of. The
+// filter pins the current state instead of writing by primary key alone: a grant that was revoked
+// or already reviewed in the meantime must not be overwritten, and affected_rows tells the caller
+// which happened.
+export const VERIFY_ORGANIZATION_ADMIN_CLAIM = gql`
+  mutation VerifyOrganizationAdminClaim($id: Int!) {
+    update_OrganizationAdmin(
+      where: { id: { _eq: $id }, claimVerification: { _eq: "SELF_SERVICE_UNVERIFIED" } }
+      _set: { claimVerification: "ADMIN_VERIFIED" }
+    ) {
+      affected_rows
+      returning {
+        id
+        claimVerification
+      }
+    }
+  }
+`;
+
 export const UPDATE_ORGANIZATION_ADMIN_ORGANIZATION_ID = gql`
   mutation UpdateOrganizationAdminOrganizationId($id: Int!, $organizationId: Int!) {
     update_OrganizationAdmin_by_pk(
@@ -152,6 +200,7 @@ export const MY_ORG_ADMIN_CAPABILITIES = gql`
       canManageCourses
       canManageEvents
       canManageDegrees
+      canManageJobs
     }
   }
 `;
@@ -196,6 +245,7 @@ export const ORGANIZATION_ADMINS_BY_ORGANIZATION_ID = gql`
       canManageEvents
       canManageCourses
       canManageDegrees
+      canManageJobs
       canManageSettings
       User {
         id

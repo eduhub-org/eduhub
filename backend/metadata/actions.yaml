@@ -123,6 +123,33 @@ actions:
     permissions:
       - role: user_access
     comment: Archives a published/expired StuJo job posting (employer action; status is server-controlled)
+  # Self-service organization onboarding. Both are permitted for user_access and re-check
+  # authorization in the handler: OrganizationAdmin insert requires canManageSettings on the same
+  # organization, so an organization's FIRST grant cannot be created through Hasura at all.
+  - name: claimJobOrganization
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: name
+          value: claimJobOrganization
+    permissions:
+      - role: user_access
+    comment: Grants canManageJobs for an organization that has no job admin yet, creating the organization if needed (StuJo self-service onboarding)
+  - name: requestJobOrganizationAccess
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: name
+          value: requestJobOrganizationAccess
+    permissions:
+      - role: user_access
+    comment: Mails an organization's existing job admins that someone is asking for access to its job offers (grants nothing)
   - name: createStripeJobPostingPrices
     definition:
       kind: synchronous
@@ -481,15 +508,26 @@ actions:
         - name: bucket
           value_from_env: HASURA_BUCKET
         - name: name
-          value: saveImage
+          value: saveOrganizationLogo
         - name: file-path
           value: organizations/org-${organizationid}/public/logo/${filename}
         - name: is-public
           value: "true"
         - name: sizes
           value: '[64, 128, 256, 512]'
+    # Dedicated handler rather than the generic saveImage: the logo is an
+    # Organization column that requires canManageSettings to change, and only a
+    # handler can check that for the *target* organization. It then delegates to
+    # saveImage, so the storage layout above still applies.
+    #
+    # user_access is permitted because action permissions do not resolve
+    # inherited roles: an org admin's requests carry x-hasura-role `user`
+    # (useCurrentRole deliberately never returns org_admin), the same reason
+    # publishJobPosting and archiveJobPosting are permitted for it.
     permissions:
       - role: instructor_access
+      - role: user_access
+    comment: Uploads an organization's logo; the handler requires canManageSettings for that organization
   - name: saveUserProfileImage
     definition:
       kind: synchronous

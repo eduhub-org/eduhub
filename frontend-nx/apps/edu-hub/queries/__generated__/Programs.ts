@@ -9,6 +9,12 @@ import { Program_bool_exp } from "./../../__generated__/globalTypes";
 // GraphQL query operation: Programs
 // ====================================================
 
+export interface Programs_Program_Organization {
+  __typename: "Organization";
+  id: number;
+  name: string;
+}
+
 export interface Programs_Program {
   __typename: "Program";
   id: number;
@@ -61,6 +67,14 @@ export interface Programs_Program {
    * Default Formbricks survey URL for course enrollments/applications. Courses can override this with their own formbricksEnrollmentSurveyUrl.
    */
   defaultFormbricksEnrollmentSurveyUrl: string | null;
+  /**
+   * Organization that owns the program. References Organization.id (0 = platform default)
+   */
+  organizationId: number;
+  /**
+   * An object relationship
+   */
+  Organization: Programs_Program_Organization;
 }
 
 export interface Programs {

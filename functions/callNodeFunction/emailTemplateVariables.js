@@ -205,6 +205,59 @@ export const EMAIL_VARIABLES = {
       example: 'https://edu.opencampus.sh',
       categories: ['general']
     }
+  },
+
+  // StuJo job board variables.
+  //
+  // Documentation and discoverability only: the job board mails do NOT go
+  // through createVariableReplacer below. They are substituted by their own
+  // replacers, which must stay in step with this list --
+  //   frontend-nx/apps/edu-hub/lib/stripeJobPosting.ts  (buildMailVars)
+  //   functions/callNodeFunction/publishJobPosting/index.js  (buildJobPostingMailVars)
+  // whose key sets are asserted identical by a test. Unifying the three is a
+  // separate piece of work; until then, adding a variable means adding it in
+  // both replacers as well as here.
+  JOB_POSTING: {
+    '[JobPosting:Title]': { description: 'Job posting title', example: 'Werkstudent:in Frontend', categories: ['jobposting'] },
+    '[JobPosting:Type]': { description: 'Posting category, as a display label rather than the raw enum', example: 'Studentenjob', categories: ['jobposting'] },
+    '[JobPosting:PublishedAt]': { description: 'Date the posting went live', example: '29. August 2026', categories: ['jobposting'] },
+    '[JobPosting:ExpiresAt]': { description: 'Date the posting comes off the board', example: '24. Oktober 2026', categories: ['jobposting'] },
+    '[JobPosting:Payment]': { description: 'How the posting was paid for', example: '59,50 \u20ac (bezahlt)', categories: ['jobposting'] },
+    '[JobPosting:DashboardUrl]': { description: 'Employer dashboard link', example: 'https://stujo.opencampus.sh/mein-stujo', categories: ['jobposting'] },
+    '[JobPosting:RepostUrl]': { description: 'Link that republishes an expired posting', example: 'https://stujo.opencampus.sh/mein-stujo?repost=1', categories: ['jobposting'] },
+    '[JobPosting:AdminUrl]': { description: 'Admin moderation link', example: 'https://edu.opencampus.sh/manage/settings/jobboerse', categories: ['jobposting'] },
+    '[JobPosting:TermsAcceptedAt]': { description: 'When the employer accepted the terms; empty if never recorded', example: '29. August 2026', categories: ['jobposting'] },
+    // Also used by the organization-claim mails below, which DO go through
+    // createVariableReplacer -- hence the second category.
+    '[Organization:Name]': { description: 'Employer organisation name', example: 'Beispiel GmbH', categories: ['jobposting', 'organizationclaim'] }
+  },
+
+  // Invoice variables. Empty on free and credit-funded postings, which have no
+  // Invoice row -- the [#if:Invoice] block is dropped for those.
+  INVOICE: {
+    '[Invoice:Number]': { description: 'Number printed on the Stripe invoice document, falling back to our record key while Stripe has not finalized it', example: 'VGD1VIPO-0001', categories: ['jobposting'] },
+    '[Invoice:Date]': { description: 'Invoice date', example: '29. August 2026', categories: ['jobposting'] },
+    '[Invoice:NetTotal]': { description: 'Net amount', example: '50,00 \u20ac', categories: ['jobposting'] },
+    '[Invoice:VatRate]': { description: 'VAT percentage, derived from the amounts', example: '19', categories: ['jobposting'] },
+    '[Invoice:VatTotal]': { description: 'VAT amount', example: '9,50 \u20ac', categories: ['jobposting'] },
+    '[Invoice:GrossTotal]': { description: 'Gross amount', example: '59,50 \u20ac', categories: ['jobposting'] },
+    '[Invoice:HostedUrl]': { description: 'Stripe hosted invoice page', example: 'https://invoice.stripe.com/i/example', categories: ['jobposting'] },
+    '[Invoice:PaymentStatus]': { description: 'Whether the invoice is settled', example: 'bezahlt', categories: ['jobposting'] }
+  },
+
+  LEGAL: {
+    '[Legal:TermsUrl]': { description: 'Terms and conditions URL used in the mail footer', example: 'https://www.stujo.net/agb', categories: ['jobposting'] }
+  },
+
+  // StuJo self-service organization claim. Unlike the job board mails above,
+  // these are queued through lib/queueEmail.js and substituted by
+  // createVariableReplacer, so every key here has a branch in it.
+  ORGANIZATION_CLAIM: {
+    '[OrganizationClaim:UserName]': { description: 'Name of the person who claimed the organization, or who is asking for access', example: 'Alex Beispiel', categories: ['organizationclaim'] },
+    '[OrganizationClaim:UserEmail]': { description: 'Their email address, so the recipient can reply to them directly', example: 'alex@beispiel.de', categories: ['organizationclaim'] },
+    '[OrganizationClaim:Verification]': { description: 'How the claim was verified, as a readable sentence rather than the raw enum', example: 'E-Mail-Domain stimmt mit der Website überein', categories: ['organizationclaim'] },
+    '[OrganizationClaim:AdminUrl]': { description: 'Link to the admin screen where the grant can be reviewed or revoked', example: 'https://edu.opencampus.sh/manage/settings/access', categories: ['organizationclaim'] },
+    '[OrganizationClaim:ContactEmail]': { description: 'The address responsible for StuJo enquiries, for the recipient to write to', example: 'stujo@opencampus.sh', categories: ['organizationclaim'] }
   }
 };
 
@@ -370,6 +423,20 @@ export function createVariableReplacer(data, formatDate) {
       .replaceAll('[Project:SubmissionDeadline]', submissionDeadlineBlock)
       .replaceAll('[Project:ReviewComment]', reviewCommentBlock);
 
+    // Organization variables. [Organization:Name] is shared with the job board
+    // mails, which substitute it in their own replacers; this branch serves the
+    // organization-claim mails, which go through queueEmail.
+    result = result.replaceAll('[Organization:Name]', escape(data.organization?.name || ''));
+
+    // Organization-claim variables. The claimer's name and address are
+    // user-supplied, so they are escaped like any other personal data.
+    result = result
+      .replaceAll('[OrganizationClaim:UserName]', escape(data.organizationClaim?.userName || ''))
+      .replaceAll('[OrganizationClaim:UserEmail]', escape(data.organizationClaim?.userEmail || ''))
+      .replaceAll('[OrganizationClaim:Verification]', escape(data.organizationClaim?.verification || ''))
+      .replaceAll('[OrganizationClaim:AdminUrl]', data.organizationClaim?.adminUrl || '')
+      .replaceAll('[OrganizationClaim:ContactEmail]', escape(data.organizationClaim?.contactEmail || ''));
+
     // Session variables (for reminders) - always attempt replacement
     result = result
       .replaceAll('[Session:Title]', escape(data.session?.title || ''))
@@ -398,6 +465,19 @@ export function createEnrollmentVariableReplacer(enrollmentDetails, formatDate) 
     courseLink: `${process.env.FRONTEND_URL || 'https://edu.opencampus.sh'}/course/${enrollmentDetails.Course.id}`,
     certificateLink: enrollmentDetails.certificateLink || null
   }, formatDate);
+}
+
+/**
+ * Convenience function for the StuJo organization-claim emails
+ * @param {Object} organization - Organization data ({ name })
+ * @param {Object} claim - Claim data ({ userName, userEmail, verification, adminUrl, contactEmail })
+ * @returns {Function} Variable replacement function
+ */
+export function createOrganizationClaimVariableReplacer(organization, claim) {
+  return createVariableReplacer({
+    organization,
+    organizationClaim: claim,
+  });
 }
 
 /**

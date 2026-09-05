@@ -41,13 +41,32 @@
     "footerLinksHead": "Hinweise",
     "footerPrices": "Leistungen und Preise",
     "footerUniversityPartners": "Hochschulpartner",
-    "footerPartners": "Gefördert durch"
+    "footerPartners": "Gefördert durch",
+    "Layout": {
+      "home": "Startseite",
+      "switch_to_german": "Auf Deutsch wechseln",
+      "switch_to_english": "Auf Englisch wechseln"
+    },
+    "JobList": {
+      "search_placeholder": "Suchbegriff, z. B. Marketing, Software, …"
+    },
+    "dropdown_selector": {
+      "create_option": "\"{option}\" neu hinzufügen",
+      "none_option": "-- Keine Auswahl --",
+      "name_already_exists": "Ein Eintrag mit diesem Namen existiert bereits."
+    },
+    "notification_snackbar": {
+      "saved": "Gespeichert"
+    },
+    "error": "Ein Fehler ist aufgetreten",
+    "close": "Schließen",
+    "ok": "OK"
   },
   "meinStujo": {
     "title": "Mein StuJo",
     "newOffer": "+ Neues Angebot",
     "checkingLogin": "Anmeldung wird geprüft …",
-    "noOrganization": "Deinem Konto ist noch kein Unternehmen mit Stellen-Verwaltung zugeordnet. Bitte wende Dich an {contact}.",
+    "noOrganization": "Deinem Konto ist noch kein Unternehmen mit Stellen-Verwaltung zugeordnet. Wähle im nächsten Schritt das Unternehmen aus, für das Du Stellenanzeigen veröffentlichen möchtest.",
     "organizationLabel": "Unternehmen",
     "defaultContact": "das StuJo-Team",
     "loading": "Lädt …",
@@ -79,7 +98,45 @@
     "publishNetworkError": "Veröffentlichen fehlgeschlagen: Netzwerkfehler.",
     "archiveFailed": "Archivieren fehlgeschlagen: {error}",
     "archiveNetworkError": "Archivieren fehlgeschlagen: Netzwerkfehler.",
-    "unknownError": "Unbekannter Fehler"
+    "unknownError": "Unbekannter Fehler",
+    "acceptTermsPrefix": "Ich habe die",
+    "acceptTermsLink": "Allgemeinen Geschäftsbedingungen",
+    "acceptTermsSuffix": "gelesen und akzeptiere sie.",
+    "acceptTermsRequired": "Bitte akzeptiere die AGB, um Dein Angebot zu veröffentlichen.",
+    "consentPromptPrefix": "Für die kostenpflichtige Veröffentlichung gelten unsere",
+    "consentPromptSuffix": ".",
+    "consentAcceptAndPublish": "AGB akzeptieren und veröffentlichen",
+    "claimCta": "Unternehmen auswählen",
+    "claimAddAnother": "Weiteres Unternehmen hinzufügen",
+    "claimTitle": "Unternehmen auswählen",
+    "claimIntro": "Wähle das Unternehmen aus, für das Du Stellenanzeigen veröffentlichen möchtest. Steht es noch nicht auf StuJo, tippe einfach seinen Namen ein und lege es neu an.",
+    "claimExistingIntro": "Du verwaltest bereits die Stellenanzeigen von {organizations}. Hier kannst Du ein weiteres Unternehmen hinzufügen.",
+    "claimSignedOutIntro": "Zum Veröffentlichen von Stellenanzeigen brauchst Du ein Konto bei opencampus.sh – dasselbe Konto wie in EduHub. Hast Du schon eins, melde Dich einfach damit an.",
+    "claimRegister": "Konto erstellen",
+    "claimLogin": "Anmelden",
+    "claimOrganizationLabel": "Unternehmen",
+    "claimOrganizationPlaceholder": "Name des Unternehmens",
+    "claimWillCreate": "„{name}“ wird neu angelegt.",
+    "claimDeclaration": "Ich bin berechtigt, im Namen dieses Unternehmens Stellenanzeigen zu veröffentlichen.",
+    "claimDeclarationRequired": "Bitte bestätige, dass Du im Namen dieses Unternehmens handeln darfst.",
+    "claimPickOrganization": "Bitte wähle ein Unternehmen aus oder gib einen Namen ein.",
+    "claimSubmit": "Stellen-Verwaltung übernehmen",
+    "claimCancel": "Abbrechen",
+    "claimSettingUpAccess": "Zugang wird eingerichtet …",
+    "claimFailed": "Der Zugang konnte nicht eingerichtet werden: {error}",
+    "claimNetworkError": "Der Zugang konnte nicht eingerichtet werden. Bitte versuche es später erneut.",
+    "claimAlreadyClaimedByName": "Die Stellenanzeigen von {organization} verwaltet bereits {name}. Wir können Dich fragen, ob Du dazukommen darfst.",
+    "claimAlreadyClaimed": "Die Stellenanzeigen von {organization} verwaltet bereits jemand anderes. Wir können nachfragen, ob Du dazukommen darfst.",
+    "claimRequestAccess": "Zugang anfragen",
+    "claimRoleRefreshFailed": "Deine Stellen-Verwaltung ist eingerichtet, aber Deine Anmeldung konnte nicht aktualisiert werden. Versuche es noch einmal – oder melde Dich ab und wieder an, dann ist der Zugang da.",
+    "claimRoleRefreshRetry": "Anmeldung aktualisieren",
+    "claimContactFallback": "Du kommst nicht weiter? Schreib uns an {contact}.",
+    "accessRequestSent": "Wir haben Deine Anfrage weitergeleitet. Du hörst direkt von den Kolleg:innen, die die Stellenanzeigen verwalten.",
+    "accessRequestAlreadySent": "Für dieses Unternehmen läuft schon eine Anfrage von Dir. Bitte warte die Antwort ab.",
+    "accessRequestFailed": "Die Anfrage konnte nicht gesendet werden: {error}",
+    "claimOptionsLoading": "Unternehmen werden geladen …",
+    "claimOptionsError": "Die Unternehmensliste konnte nicht geladen werden.",
+    "claimOptionsRetry": "Erneut versuchen"
   },
   "jobType": {
     "MINIJOB": "Minijobs",

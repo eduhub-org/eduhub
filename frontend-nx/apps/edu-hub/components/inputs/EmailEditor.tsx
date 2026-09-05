@@ -43,11 +43,27 @@ export function getTemplateCategory(templateType?: string): string {
   ];
   const generalTemplates = ['USER_CREATED'];
   const organizerTemplates = ['ORGANIZER_ADDED'];
+  // StuJo job board mails address employers, not participants, so none of the
+  // enrollment placeholders apply to them.
+  const jobPostingTemplates = [
+    'JOB_POSTING_PUBLISHED',
+    'JOB_POSTING_EXPIRED',
+    'JOB_POSTING_ADMIN_NOTICE',
+    'JOB_POSTING_PAYMENT_FAILED',
+  ];
+  // Also on the job board, but about an organization's access rather than a
+  // posting, so they get their own placeholders instead of the posting ones.
+  const organizationClaimTemplates = [
+    'JOB_ORGANIZATION_CLAIMED',
+    'JOB_ORGANIZATION_ACCESS_REQUEST',
+  ];
 
   if (sessionTemplates.includes(templateType)) return 'session';
   if (enrollmentTemplates.includes(templateType)) return 'enrollment';
   if (generalTemplates.includes(templateType)) return 'general';
   if (organizerTemplates.includes(templateType)) return 'organizer';
+  if (jobPostingTemplates.includes(templateType)) return 'jobposting';
+  if (organizationClaimTemplates.includes(templateType)) return 'organizationclaim';
 
   return 'enrollment';
 }
@@ -79,6 +95,42 @@ const EMAIL_PLACEHOLDERS: EditorVariable[] = [
   { text: '[Session:ReminderTime]', label: 'Reminder Time', categories: ['session'] },
   { text: '[System:PasswordResetLink]', label: 'Password Reset Link', categories: ['general'] },
   { text: '[System:PortalUrl]', label: 'Portal URL', categories: ['general'] },
+  // StuJo job board. Substituted by the two local replacers in
+  // lib/stripeJobPosting.ts and publishJobPosting/index.js, not by the shared
+  // registry in emailTemplateVariables.js.
+  { text: '[JobPosting:Title]', label: 'Posting Title', categories: ['jobposting'] },
+  { text: '[JobPosting:Type]', label: 'Posting Category', categories: ['jobposting'] },
+  { text: '[JobPosting:PublishedAt]', label: 'Published Date', categories: ['jobposting'] },
+  { text: '[JobPosting:ExpiresAt]', label: 'Expiry Date', categories: ['jobposting'] },
+  { text: '[JobPosting:Payment]', label: 'Payment Summary', categories: ['jobposting'] },
+  { text: '[JobPosting:DashboardUrl]', label: 'Employer Dashboard Link', categories: ['jobposting'] },
+  { text: '[JobPosting:RepostUrl]', label: 'Repost Link', categories: ['jobposting'] },
+  { text: '[JobPosting:AdminUrl]', label: 'Admin Link', categories: ['jobposting'] },
+  { text: '[JobPosting:TermsAcceptedAt]', label: 'Terms Accepted Date', categories: ['jobposting'] },
+  { text: '[Organization:Name]', label: 'Employer Name', categories: ['jobposting', 'organizationclaim'] },
+  { text: '[Invoice:Number]', label: 'Invoice Number', categories: ['jobposting'] },
+  { text: '[Invoice:Date]', label: 'Invoice Date', categories: ['jobposting'] },
+  { text: '[Invoice:NetTotal]', label: 'Invoice Net', categories: ['jobposting'] },
+  { text: '[Invoice:VatRate]', label: 'VAT Rate', categories: ['jobposting'] },
+  { text: '[Invoice:VatTotal]', label: 'VAT Amount', categories: ['jobposting'] },
+  { text: '[Invoice:GrossTotal]', label: 'Invoice Gross', categories: ['jobposting'] },
+  { text: '[Invoice:HostedUrl]', label: 'Invoice Online Link', categories: ['jobposting'] },
+  { text: '[Invoice:PaymentStatus]', label: 'Payment Status', categories: ['jobposting'] },
+  { text: '[Legal:TermsUrl]', label: 'Terms URL', categories: ['jobposting'] },
+  // Conditional blocks, offered as chips so a deleted one can be rebuilt.
+  { text: '[#if:Invoice][/if:Invoice]', label: 'Block: has invoice', categories: ['jobposting'] },
+  { text: '[#if:InvoicePdf][/if:InvoicePdf]', label: 'Block: PDF attached', categories: ['jobposting'] },
+  { text: '[#if:InvoiceLink][/if:InvoiceLink]', label: 'Block: invoice link', categories: ['jobposting'] },
+  { text: '[#if:InvoicePending][/if:InvoicePending]', label: 'Block: invoice follows', categories: ['jobposting'] },
+  // Organization claim (StuJo self-service onboarding). Unlike the posting mails
+  // above these go through queueEmail and the shared registry in
+  // emailTemplateVariables.js, so a chip here has a real substitution behind it.
+  { text: '[OrganizationClaim:UserName]', label: 'Person Name', categories: ['organizationclaim'] },
+  { text: '[OrganizationClaim:UserEmail]', label: 'Person Email', categories: ['organizationclaim'] },
+  { text: '[OrganizationClaim:Verification]', label: 'Claim Check', categories: ['organizationclaim'] },
+  { text: '[OrganizationClaim:AdminUrl]', label: 'Access Admin Link', categories: ['organizationclaim'] },
+  { text: '[OrganizationClaim:ContactEmail]', label: 'StuJo Contact Email', categories: ['organizationclaim'] },
+  { text: '[#if:TermsAccepted][/if:TermsAccepted]', label: 'Block: consent date', categories: ['jobposting'] },
 ];
 
 const sanitizeEmailHtml = (content: string): string =>

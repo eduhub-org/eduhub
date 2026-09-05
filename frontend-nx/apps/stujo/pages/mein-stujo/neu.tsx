@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from '@apollo/client';
 import type { GetServerSideProps } from 'next';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { signIn, useSession } from 'next-auth/react';
 import { FC, useEffect, useMemo, useState } from 'react';
@@ -83,6 +84,7 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
   // and the preview once a draft exists.
   const [draftOrganizationId, setDraftOrganizationId] = useState<number | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [acceptTerms, setAcceptTerms] = useState(false);
   // The offer PDF is the centerpiece of a StuJo posting (embedded on the
   // detail page like in the Rails app). Uploaded after the draft exists.
   const [pdfFile, setPdfFile] = useState<File | null>(null);
@@ -254,9 +256,15 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
 
   const publish = async () => {
     setErrorMessage(null);
+    if (requiresConsent && !acceptTerms) {
+      setErrorMessage(t('acceptTermsRequired'));
+      return;
+    }
     const id = savedId ?? (await saveDraft());
     if (!id) return;
-    const result = await publishPosting({ variables: { jobPostingId: id } });
+    const result = await publishPosting({
+      variables: { jobPostingId: id, acceptTerms },
+    });
     const payload = result.data?.publishJobPosting;
     if (payload?.checkoutUrl) {
       window.location.href = payload.checkoutUrl;
@@ -277,6 +285,11 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
     0
   );
   const busy = creating || updating || publishing || uploadingPdf;
+  // Only a paid publish concludes a contract, so only that asks for consent --
+  // the same rule the course registration modal applies via
+  // `config.requiresPayment && !acceptTerms`.
+  const requiresConsent = netPrice > 0 && credits === 0;
+  const termsUrl = portal.termsUrl || '/agb';
 
   const field = (
     label: string,
@@ -315,7 +328,7 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
   if (sessionStatus !== 'authenticated' || orgsLoading) {
     return (
       <Layout portal={portal}>
-        <p className="stujo-muted">Anmeldung wird geprüft …</p>
+        <p className="stujo-muted">{t('checkingLogin')}</p>
       </Layout>
     );
   }
@@ -323,10 +336,18 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
   if (!organization) {
     return (
       <Layout portal={portal}>
-        <h2>Neues Stellenangebot</h2>
+        <h1>{t('newOffer')}</h1>
+        <p style={{ maxWidth: '40em' }}>{t('noOrganization')}</p>
         <p>
-          Deinem Konto ist noch kein Unternehmen mit Stellen-Verwaltung zugeordnet. Bitte wende
-          Dich an {portal.contactEmail || 'das StuJo-Team'}.
+          <Link
+            href="/mein-stujo/unternehmen?next=/mein-stujo/neu"
+            className="stujo-btn stujo-btn--primary"
+          >
+            {t('claimCta')}
+          </Link>
+        </p>
+        <p className="stujo-muted">
+          {t('claimContactFallback', { contact: portal.contactEmail || t('defaultContact') })}
         </p>
       </Layout>
     );
@@ -490,6 +511,23 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
             )}
           </div>
           )}
+          {!isLive && requiresConsent && (
+            <label className="stujo-consent">
+              <input
+                type="checkbox"
+                checked={acceptTerms}
+                disabled={busy}
+                onChange={(event) => setAcceptTerms(event.target.checked)}
+              />
+              <span>
+                {t('acceptTermsPrefix')}{' '}
+                <a href={termsUrl} target="_blank" rel="noreferrer">
+                  {t('acceptTermsLink')}
+                </a>{' '}
+                {t('acceptTermsSuffix')}
+              </span>
+            </label>
+          )}
           <div className="stujo-form-actions">
             <button className="stujo-btn stujo-btn--ghost" disabled={busy} onClick={() => setStep(1)}>
               ← Zurück
@@ -506,7 +544,11 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
                 Änderungen speichern
               </button>
             ) : (
-              <button className="stujo-btn stujo-btn--accent" disabled={busy} onClick={publish}>
+              <button
+                className="stujo-btn stujo-btn--accent"
+                disabled={busy || (requiresConsent && !acceptTerms)}
+                onClick={publish}
+              >
                 {netPrice === 0 || credits > 0
                   ? 'Jetzt veröffentlichen'
                   : `Kostenpflichtig veröffentlichen · ${(grossPrice / 100).toFixed(2).replace('.', ',')} €`}

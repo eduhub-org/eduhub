@@ -1,0 +1,54 @@
+table:
+  name: OrganizationSettings
+  schema: public
+object_relationships:
+  - name: Organization
+    using:
+      manual_configuration:
+        column_mapping:
+          id: id
+        insertion_order: null
+        remote_table:
+          name: Organization
+          schema: public
+array_relationships:
+  # Carries the permission filter below; the view has no foreign keys of its own.
+  - name: OrganizationAdmins
+    using:
+      manual_configuration:
+        column_mapping:
+          id: organizationId
+        insertion_order: null
+        remote_table:
+          name: OrganizationAdmin
+          schema: public
+select_permissions:
+  # The settings-admin-only half of an organization's record. Unlike the Organization select
+  # permission — which any admin of the organization satisfies, a job-board-only grant included —
+  # this one requires canManageSettings, the same capability the Organization update permission
+  # requires to change these values.
+  - role: org_admin_access
+    permission:
+      columns:
+        - id
+        - apiKeyHash
+        - ghostNewsletterApiKeyConfigured
+        - legalName
+        - legalForm
+        - managingDirector
+        - registerCourt
+        - registerNumber
+        - taxNumber
+        - vatId
+        - bankName
+        - invoiceFooterText
+        - invoiceNumberPrefix
+        - defaultVatRate
+        - defaultTaxExemptionNote
+      filter:
+        OrganizationAdmins:
+          _and:
+            - userId:
+                _eq: X-Hasura-User-Id
+            - canManageSettings:
+                _eq: true

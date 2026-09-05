@@ -4,16 +4,20 @@ import { FC, useCallback, useState } from 'react';
 import { MdClose } from 'react-icons/md';
 import { Programs_Program } from '../../../queries/__generated__/Programs';
 import { Button } from '../../common/Button';
+import { programTypeMessageKey } from '../../../helpers/programType';
+import { ProgramType } from '../../../types/enums';
 
 interface SelectProgramDialogProps {
   open: boolean;
   programs: Programs_Program[];
   onClose: (confirmed: boolean, selectedProgram: Programs_Program | null) => void;
-  title: string;
+  /** Decides whether the dialog talks about courses, events or degrees. */
+  programType: ProgramType;
 }
 
-export const SelectProgramDialog: FC<SelectProgramDialogProps> = ({ open, programs, onClose, title }) => {
+export const SelectProgramDialog: FC<SelectProgramDialogProps> = ({ open, programs, onClose, programType }) => {
   const t = useTranslations('manageCourses');
+  const messageKey = programTypeMessageKey(programType);
   const [selectedProgram, setSelectedProgram] = useState<Programs_Program | null>(null);
 
   const handleCancel = useCallback(() => {
@@ -34,7 +38,7 @@ export const SelectProgramDialog: FC<SelectProgramDialogProps> = ({ open, progra
     <Dialog open={open} onClose={handleCancel} maxWidth="sm" fullWidth>
       <DialogTitle className="light">
         <div className="flex justify-between items-center">
-          <span className="text-label-primary">{title}</span>
+          <span className="text-label-primary">{t(`copy_to_program_dialog.title.${messageKey}`)}</span>
           <button
             onClick={handleCancel}
             className="p-1 rounded-full hover:bg-gray-200 transition-colors text-label-primary"
@@ -47,7 +51,7 @@ export const SelectProgramDialog: FC<SelectProgramDialogProps> = ({ open, progra
 
       <DialogContent className="light">
         <div className="mb-4">
-          <p className="text-label-primary">{t('copy_courses_to_program_dialog.description')}</p>
+          <p className="text-label-primary">{t(`copy_to_program_dialog.description.${messageKey}`)}</p>
         </div>
 
         <div className="max-h-96 overflow-auto mb-6">
@@ -70,7 +74,7 @@ export const SelectProgramDialog: FC<SelectProgramDialogProps> = ({ open, progra
         <div className="flex justify-between">
           <Button onClick={handleCancel}>{t('cancel')}</Button>
           <Button filled onClick={handleConfirm} disabled={!selectedProgram}>
-            {t('copy_courses_to_program_dialog.button')}
+            {t(`copy_to_program_dialog.button.${messageKey}`)}
           </Button>
         </div>
       </DialogContent>
