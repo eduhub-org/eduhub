@@ -5,12 +5,12 @@
   "dependencies": {
     "@google-cloud/storage": "^5.3.0",
     "@keycloak/keycloak-admin-client": "26.7.2",
-    "axios": "^1.13.2",
+    "axios": "^1.20.0",
     "body-parser": "1.20.6",
     "got": "^12.5.3",
     "graphql-request": "^6.1.0",
-    "sharp": "^0.35.0",
-    "stripe": "^22.6.0",
+    "sharp": "^0.35.4",
+    "stripe": "^22.6.1",
     "winston": "^3.3.3"
   },
   "devDependencies": {
