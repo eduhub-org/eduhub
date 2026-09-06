@@ -354,10 +354,55 @@ Turning it back off is also how the public face is handed to
    too, `resolveContactEmail` returns null and those mails are skipped rather
    than sent with a blank address. Set it, or give each portal its own
    `JobPortal.contactEmail`.
-6. **Look up `HAW_ORG_ID`** — the prod `Organization.id` of HAW Kiel, the target
-   of the mandate restriction. It is *not* 8 (that was staging):
-   ```graphql
-   query { Organization(where: {name: {_ilike: "%HAW%Kiel%"}}) { id name } }
+6. **Look up `HAW_ORG_ID`** — the prod `Organization.id` of HAW Kiel. The ETL
+   writes it to `JobPosting.restrictedToOrganizationId` for the ~36 jobs whose
+   Rails mandate limits them to HAW students. It is *not* 8; that was staging.
+
+   Run this in the Hasura console (**Data → SQL**) against production, or with
+   `psql` from the migration VM in step 7.
+
+   **Do not search for "HAW" alone.** HAW Kiel is the former *Fachhochschule
+   Kiel* — the repo still calls it `FH_KIEL / HAW Kiel`, and `fh-kiel.stujo.net`
+   is a live host — so the row may carry either name, or the spelled-out
+   "Hochschule für Angewandte Wissenschaften". Cast the net wide and pick by
+   eye; there will not be many rows:
+
+   ```sql
+   SELECT id, name, "legalName", type, aliases
+   FROM "public"."Organization"
+   WHERE name           ~* '(kiel|haw|fachhochschule|angewandte)'
+      OR "legalName"    ~* '(kiel|haw|fachhochschule|angewandte)'
+      OR aliases::text  ~* '(kiel|haw|fachhochschule|angewandte)'
+   ORDER BY name;
+   ```
+
+   Expect CAU Kiel and HAW Kiel both to appear — they are different
+   organizations and the portals are separate (`cau.stujo.net` vs
+   `haw-kiel.stujo.net`). Take the HAW one.
+
+   **If nothing comes back, HAW Kiel has no Organization row in production.**
+   That is a real possibility and it is not a reason to skip the step:
+   `stujo_migrate_prod.sh` refuses to start without `HAW_ORG_ID`, and importing
+   with the wrong id would restrict those jobs to the wrong university —
+   visible to the wrong students, invisible to the right ones. Create the
+   organization first, then use its id.
+
+   Confirm the id before using it, so a mis-paste fails here rather than
+   silently in the import:
+
+   ```sql
+   SELECT id, name FROM "public"."Organization" WHERE id = <HAW_ORG_ID>;
+   ```
+
+   And verify it afterwards, as part of §3's checks — this should return only
+   HAW-restricted jobs, and roughly 36 of them:
+
+   ```sql
+   SELECT o.name, count(*) AS restricted_jobs
+   FROM "public"."JobPosting" jp
+   JOIN "public"."Organization" o ON o.id = jp."restrictedToOrganizationId"
+   WHERE jp."restrictedToOrganizationId" IS NOT NULL
+   GROUP BY o.name;
    ```
 7. **Migration VM** in the production project: a throwaway Debian VM whose
    attached service account has `secretAccessor` on `hasura-graphql-admin-key`
