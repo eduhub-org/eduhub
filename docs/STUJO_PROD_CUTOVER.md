@@ -165,6 +165,18 @@ Turning it back off is also how the public face is handed to
    | `email.stujo.net` | CNAME | open/click tracking + bounce handling | **yes — DNS-only, see d** |
    | `stujo.net` MX ×2 | MX | receiving mail *at Mailgun* | **no — see e** |
 
+   **c0. Read the current records first — the dashboard truncates them.** Use
+   DNS rather than the UI, so you see the whole value:
+
+   ```bash
+   dig +short TXT stujo.net          # the SPF record, and the MS= verification TXT
+   dig +short TXT _dmarc.stujo.net   # v=DMARC1; p=reject;
+   dig +short MX  stujo.net          # Microsoft 365 — must not change
+   ```
+
+   Keep that output. It is the before-picture, and the SPF line is the one you
+   are about to edit by hand.
+
    **c. SPF: EDIT the existing record. Do not add a second one.** This is not
    a hypothetical here — the zone already publishes SPF, because **stujo.net is
    a live Microsoft 365 mail domain**: it has `autodiscover.stujo.net →
@@ -242,7 +254,17 @@ Turning it back off is also how the public face is handed to
    announcing anything to employers.
 
    **g. Set `mailgun_additional_domains = ["stujo.net"]`** in the Terraform
-   workspace and apply.
+   workspace and apply — **only once Mailgun shows the domain verified and the
+   DKIM record resolves.** Under `p=reject` (f) this is a gate, not a step.
+   Confirm both before touching the variable:
+
+   ```bash
+   dig +short TXT <selector>._domainkey.stujo.net   # Mailgun's DKIM, live?
+   dig +short TXT stujo.net | grep spf1             # one record, with both includes?
+   ```
+
+   Then apply. The only diff is `MAILGUN_ADDITIONAL_DOMAINS` on the `sendMail`
+   function — one revision, no other service touched.
 
    **h. Verify with a real message, not with the panel.** Mailgun's green tick
    says the records parse, not that mail aligns. Trigger one StuJo mail (a job
@@ -354,9 +376,33 @@ Turning it back off is also how the public face is handed to
    too, `resolveContactEmail` returns null and those mails are skipped rather
    than sent with a blank address. Set it, or give each portal its own
    `JobPortal.contactEmail`.
-6. **Look up `HAW_ORG_ID`** — the prod `Organization.id` of HAW Kiel. The ETL
-   writes it to `JobPosting.restrictedToOrganizationId` for the ~36 jobs whose
-   Rails mandate limits them to HAW students. It is *not* 8; that was staging.
+6. **`HAW_ORG_ID = 885`** — the prod `Organization.id` of HAW Kiel (name
+   `HAW Kiel`, type `UNIVERSITY`, aliases including `FH Kiel`, `kiel fh`,
+   `Hochschule für Angewandte Wissenschaften Kiel`). Confirm it still holds
+   before the run with the query below; it is *not* 8, which was staging.
+
+   The ETL writes it to `JobPosting.restrictedToOrganizationId` for the ~36 jobs
+   whose Rails mandate limits them to HAW students. Hasura then enforces it:
+   the `anonymous` role sees only rows where that column is null, and
+   `user_access` additionally sees rows restricted to the user's own
+   university.
+
+   **Why only HAW, and not the other portal universities.** Two separate
+   things are easy to conflate here:
+   - The **portals** (`cau`, `haw-kiel`, `flensburg`) are branding only. One
+     shared job pool, resolved by hostname through `JobPortalDomain` /
+     `AppSettings` — `JobPortal.organizationId` is NULL on all four rows. A
+     portal needs no organization id at all.
+   - The **restriction** is a property of the Rails *job*, not of a portal: it
+     comes from that instance's `restrictions`/`mandates` tables, per job. In
+     the production data only HAW's mandate actually restricts anything (36
+     jobs); ZfS restricts one old job and the remaining mandates restrict
+     nothing. So HAW is the only mandate that needs mapping to an
+     `Organization.id`.
+
+   The ETL imports any **non-HAW** mandate unrestricted and logs a warning, by
+   design. That is one job today, but it is a deliberate hand-off rather than a
+   silent drop — see the verification below.
 
    Run this in the Hasura console (**Data → SQL**) against production, or with
    `psql` from the migration VM in step 7.
@@ -394,8 +440,8 @@ Turning it back off is also how the public face is handed to
    SELECT id, name FROM "public"."Organization" WHERE id = <HAW_ORG_ID>;
    ```
 
-   And verify it afterwards, as part of §3's checks — this should return only
-   HAW-restricted jobs, and roughly 36 of them:
+   And verify it afterwards, as part of §3's checks — this should return one
+   row, `HAW Kiel`, with roughly 36 jobs:
 
    ```sql
    SELECT o.name, count(*) AS restricted_jobs
@@ -404,6 +450,17 @@ Turning it back off is also how the public face is handed to
    WHERE jp."restrictedToOrganizationId" IS NOT NULL
    GROUP BY o.name;
    ```
+
+   Then pick up the mandates the ETL deliberately did not map — grep its log:
+
+   ```bash
+   grep 'non-HAW mandates' etl.log
+   ```
+
+   Expect the single ZfS job. It is now visible to everyone rather than to ZfS
+   members; decide whether that matters and restrict it by hand if so. An empty
+   grep is also information: it means the source data changed since this was
+   written, and the 36-job count above deserves a closer look.
 7. **Migration VM** in the production project: a throwaway Debian VM whose
    attached service account has `secretAccessor` on `hasura-graphql-admin-key`
    and `keycloak-pw`, and `objectAdmin` on the production uploads bucket. Check
@@ -679,25 +736,66 @@ Steps:
 
 ### 4.4 Before the first plan: check the provider supports the rules
 
-`01_main.tf` pins `cloudflare/cloudflare ~> 3.0` and no lockfile is committed.
-Origin Rules and Transform Rules are `cloudflare_ruleset` resources with the
-`http_request_origin` and `http_request_late_transform` phases, and **whether
-the resolved 3.x supports those phases needs checking before you rely on
-`09_stujo_net.tf`** — it was written from the documented schema but could not
-be validated (this repo's plans cannot reach the provider registry from every
-environment). A `terraform plan` with `stujo_net_zone_id` set is the cheap
-check: a schema mismatch fails at plan time, before anything is applied.
+`01_main.tf` pins `cloudflare/cloudflare ~> 3.0` and **no lockfile is
+committed**, so every `init` is free to resolve a different 3.x. Origin Rules
+and Transform Rules are `cloudflare_ruleset` resources with the
+`http_request_origin` and `http_request_late_transform` phases;
+`09_stujo_net.tf` was written from the documented schema but could not be
+validated where it was written (the provider registry is not reachable from
+every environment this repo is edited in). Check it before relying on it.
 
-If the pinned version cannot express them, the choices are, in order of
-preference:
+**Step 1 — resolve the provider and check the schema. No credentials, no
+state, nothing applied.**
+
+```bash
+cd infrastructure/application
+terraform init          # downloads the provider; the cloud block only fetches state config
+terraform version       # note the exact cloudflare version it resolved
+terraform validate      # type-checks the config against the provider schema
+```
+
+`terraform validate` is the whole test for the structural question. It needs no
+variables, no credentials and no state, and it fails loudly if
+`cloudflare_ruleset` does not exist, or if `action_parameters.host_header` or
+the `headers { expression = … }` form are not in the schema — which are exactly
+the parts in doubt.
+
+**Step 2 — commit the lockfile that `init` just wrote.**
+
+```bash
+git add .terraform.lock.hcl
+```
+
+This is worth doing regardless of the outcome. Without it, the version that
+passes validate today is not necessarily the version that runs the apply, and
+a provider that silently moves under a DNS change is not a risk worth carrying
+for free.
+
+**Step 3 — a speculative plan, for the parts a schema cannot check.** Phase
+names and expression syntax are validated by Cloudflare's API, not by the
+provider schema, so only a plan reaches them. Set `stujo_net_zone_id` in the
+workspace and run `terraform plan`. With the `cloud` block this is a
+**speculative** run: it reads, it reports, it changes nothing. Read it against
+§4.3's expectations — imports, in-place updates, no destroys.
+
+If you are not ready to leave the variable set, unset it again afterwards; the
+plan has already told you what you needed.
+
+**If the pinned version cannot express the rulesets**, in order of preference:
 
 1. **Create the two rulesets by hand in the dashboard and import them later.**
-   Keeps the cutover on schedule and the provider version out of it.
-2. Raise the provider version. Note this is not a small change: v4 and v5 both
-   carry breaking changes, and v5 renames `cloudflare_record` to
-   `cloudflare_dns_record` — which touches every record in
-   `02_network.tf`, i.e. the opencampus.sh zone that is currently serving
-   production. **Do not bundle a provider major upgrade into this cutover.**
+   Origin Rules and Transform Rules are both UI features; this keeps the
+   cutover on schedule and the provider version out of it. Add
+   `import` blocks for `cloudflare_ruleset.stujo_net_origin[0]` and
+   `cloudflare_ruleset.stujo_net_original_host[0]` afterwards — ruleset import
+   IDs are `<zone_id>/<ruleset_id>`, and the ruleset id is in the URL of the
+   rule in the dashboard.
+2. Raise the provider version — but pin it exactly and read the upgrade guide
+   first. This is not small: v4 and v5 both carry breaking changes, and v5
+   renames `cloudflare_record` to `cloudflare_dns_record`, which touches every
+   record in `02_network.tf` — the opencampus.sh zone that is serving
+   production right now. **Do not bundle a provider major upgrade into this
+   cutover.** Do it deliberately, on its own, afterwards.
 
 ### 4.5 One thing not to carry across
 
@@ -734,6 +832,23 @@ certificates, so `*.en.stujo.net` would need an ACM subscription. But they do
 not need touching either, because they point at Strato and **Strato stays up
 read-only for an agreed period after the cutover** (§5.1). Until then they keep
 working exactly as they do today.
+
+**The 301 is not a way around the certificate.** It is tempting to think the
+redirect saves us — `haw-kiel.en.stujo.net/x` → `haw-kiel.stujo.net/en/x`
+lands on a host that *is* covered, so who needs a certificate for the old one?
+The browser does. To be redirected, the visitor must first complete a TLS
+handshake **with the old hostname**, and that needs a certificate valid for
+`haw-kiel.en.stujo.net` — from Cloudflare if proxied (Universal SSL stops one
+level short) or from whatever the record points at if DNS-only (the Google
+load balancer's certificate covers `*.opencampus.sh` names, not these). Either
+way there is no certificate, so the visitor gets a **certificate warning
+instead of a redirect** — a scarier failure than a dead name, and one that
+teaches people to click through warnings. Old inbound links are `https://`,
+so this is the normal case, not the edge case.
+
+Which is why the choice really is ACM or deletion. `proxy.ts` is ready for
+these hosts either way; the redirect is not the missing piece, the certificate
+is.
 
 (An earlier draft of this section called leaving them "definitely wrong". That
 was written assuming Strato dies at the cutover. It does not — so leaving them
