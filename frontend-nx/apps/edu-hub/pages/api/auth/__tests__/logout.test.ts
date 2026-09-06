@@ -18,16 +18,21 @@ const token = (idToken?: string) => ({
 
 const response = () => {
   const res = {
+    setHeader: jest.fn(),
     status: jest.fn(),
     json: jest.fn(),
   };
   res.status.mockReturnValue(res);
   res.json.mockReturnValue(res);
   return res as unknown as NextApiResponse & {
+    setHeader: jest.Mock;
     status: jest.Mock;
     json: jest.Mock;
   };
 };
+
+const expectNoStore = (res: ReturnType<typeof response>) =>
+  expect(res.setHeader).toHaveBeenCalledWith('Cache-Control', 'no-store');
 
 describe('logout API', () => {
   const originalEnv = process.env;
@@ -57,6 +62,7 @@ describe('logout API', () => {
 
     await handler({} as NextApiRequest, res);
 
+    expectNoStore(res);
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith({
       url:
@@ -71,6 +77,7 @@ describe('logout API', () => {
 
     await handler({} as NextApiRequest, res);
 
+    expectNoStore(res);
     expect(res.json).toHaveBeenCalledWith({ url: 'https://stujo.example' });
   });
 
@@ -80,6 +87,7 @@ describe('logout API', () => {
 
     await handler({} as NextApiRequest, res);
 
+    expectNoStore(res);
     expect(res.json).toHaveBeenCalledWith({ url: 'https://stujo.example' });
   });
 });

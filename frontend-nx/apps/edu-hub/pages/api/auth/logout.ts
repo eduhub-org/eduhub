@@ -4,6 +4,10 @@ import { getToken } from 'next-auth/jwt';
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   console.log('Calling logout handler!');
 
+  // The response may contain a per-session Keycloak URL with an id_token_hint.
+  // Never allow browsers or intermediaries to retain it.
+  res.setHeader('Cache-Control', 'no-store');
+
   // Logging out locally must still work if the Keycloak session is already
   // gone or the token does not contain an id_token. The clients use this URL
   // as their safe fallback instead of being left on an unfinished API request.
