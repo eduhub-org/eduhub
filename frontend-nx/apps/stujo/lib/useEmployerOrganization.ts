@@ -71,11 +71,17 @@ export const useEmployerOrganization = (): EmployerOrganizationState => {
   // hiding a permission error behind it; a user whose grant exists but whose
   // token has not caught up recovers on /mein-stujo/unternehmen, which
   // re-authenticates and verifies the role.
+  //
+  // cache-and-network for the same reason as the postings list: the shared
+  // Apollo client survives client-side navigation, so the credit balance shown
+  // on the dashboard would keep the value it had before a publish spent one.
   const { data, loading } = useQuery(MY_JOB_ORGANIZATIONS, {
     context: employerRole,
     variables: { userId: currentUserId },
     skip:
       sessionStatus !== 'authenticated' || !currentUserId || employerRole.role === AuthRoles.user,
+    fetchPolicy: 'cache-and-network',
+    nextFetchPolicy: 'cache-and-network',
   });
 
   const organizations = useMemo<EmployerOrganization[]>(
@@ -107,5 +113,9 @@ export const useEmployerOrganization = (): EmployerOrganizationState => {
     [router]
   );
 
-  return { organizations, organization, loading, selectOrganization };
+  // Report loading only when there is nothing to show yet -- with
+  // cache-and-network the background refetch keeps `loading` true, which would
+  // otherwise flash the "checking login" screen over an already-rendered
+  // dashboard on every navigation back to it.
+  return { organizations, organization, loading: loading && !data, selectOrganization };
 };
