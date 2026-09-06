@@ -59,9 +59,17 @@ In production stujo.net is served by Cloudflare, which proxies each host onto
 the matching `<service>.opencampus.sh` origin and rewrites the `Host` header on
 the way (see `docs/STUJO_PROD_CUTOVER.md` §1). So the `Host` the app sees is
 *not* what the visitor typed; the real one arrives in `X-Original-Host`, and
-`proxy.ts` prefers it — otherwise a legacy job link would be 301'd off
-stujo.net. Its presence also marks a request as "already on stujo.net", which is
-what stops the canonical redirect from looping.
+both the proxy and portal resolution prefer it:
+
+- `proxy.ts` builds redirects from it — otherwise a legacy job link would be
+  301'd off stujo.net — but only for a host in the stujo.net zone, since an
+  unchecked value in a `Location` is an open redirect. Its mere *presence*
+  marks a request as already on its public domain, which is what stops the
+  canonical redirect from looping.
+- `lib/requestHost.ts` feeds it to `resolvePortal`, so branding follows the
+  visitor's host rather than the origin's. That is what lets a partner's own
+  domain be a `JobPortalDomain` row with no service of its own
+  (`docs/STUJO_PROD_CUTOVER.md` §6).
 
 The full sequence is in
 [`docs/STUJO_PROD_CUTOVER.md`](../../../docs/STUJO_PROD_CUTOVER.md).

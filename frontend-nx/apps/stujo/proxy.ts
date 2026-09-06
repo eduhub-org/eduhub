@@ -71,12 +71,19 @@ const ORIGINAL_HOST_HEADER = 'x-original-host';
 /**
  * The interim `*.opencampus.sh` hosts stay publicly reachable, so anyone can
  * send `X-Original-Host` themselves — nothing about the header proves it came
- * from Cloudflare. Since a redirect below builds its `Location` from it, an
- * unchecked value would turn this app into an open redirect: a link on our own
- * domain that lands on someone else's. So it is only believed for a host in the
- * one zone Cloudflare proxies to us, which is the only zone it can legitimately
- * name. Anything else is ignored and the request is treated as what it is — a
- * direct hit, answered from the `Host` header.
+ * from Cloudflare. The header therefore has two different trust levels here:
+ *
+ * - Its PRESENCE only decides whether to skip the canonical redirect. Forging
+ *   that costs an attacker nothing but the redirect they would have got, and it
+ *   has to work for hosts this file has never heard of — a partner's own domain
+ *   (docs/STUJO_PROD_CUTOVER.md §6) is proxied exactly like a stujo.net host and
+ *   must be served, not bounced to stujo.net.
+ * - Its VALUE is only used to BUILD a `Location`, and there an unchecked host
+ *   would make this an open redirect: a link on our own domain that lands on
+ *   someone else's. So a redirect is built from it only for a host in the
+ *   stujo.net zone — the zone whose legacy URLs these redirects exist for.
+ *   For any other forwarded host there is nothing safe to redirect to, so the
+ *   request is simply served.
  */
 const STUJO_NET_SUFFIX = '.stujo.net';
 const isStujoNetHost = (hostWithPort: string) => {
@@ -126,13 +133,17 @@ const absoluteUrl = (req: NextRequest, host: string, path: string) => {
  * a redirect that cannot be resolved must never take a page down.
  */
 export async function proxy(req: NextRequest): Promise<NextResponse> {
-  // The host the visitor sees: what Cloudflare forwarded — believed only for a
-  // stujo.net host, see above — else the Host header itself (a direct hit on an
-  // opencampus.sh host, or local development).
-  const forwardedHost = req.headers.get(ORIGINAL_HOST_HEADER);
-  const proxiedHost = forwardedHost && isStujoNetHost(forwardedHost) ? forwardedHost : null;
-  const hostWithPort = proxiedHost || req.headers.get('host') || req.nextUrl.host;
+  // The host the visitor sees: what Cloudflare forwarded, else the Host header
+  // itself (a direct hit on an opencampus.sh host, or local development).
+  const forwardedHost = req.headers.get(ORIGINAL_HOST_HEADER)?.trim() || null;
+  const hostWithPort = forwardedHost || req.headers.get('host') || req.nextUrl.host;
   const hostname = hostWithPort.split(':')[0].toLowerCase();
+  // …and the host a redirect may be built from — see the two trust levels above.
+  const redirectHost = forwardedHost
+    ? isStujoNetHost(forwardedHost)
+      ? forwardedHost
+      : null
+    : hostWithPort;
   // With the pages-router i18n config, Next normalizes the locale out of
   // `pathname` and exposes it as `nextUrl.locale`.
   const { pathname } = req.nextUrl;
@@ -141,8 +152,9 @@ export async function proxy(req: NextRequest): Promise<NextResponse> {
   // 1) A direct hit on an interim opencampus.sh host → its stujo.net
   //    equivalent (path, locale prefix and query kept). Always https: the
   //    public domain is. Skipped for anything arriving through Cloudflare —
-  //    that request is already on stujo.net and redirecting it would loop.
-  const canonicalHost = proxiedHost ? undefined : CANONICAL_HOSTS[hostname];
+  //    that request is already on its public domain and redirecting it would
+  //    loop (and would drag a partner's domain onto stujo.net).
+  const canonicalHost = forwardedHost ? undefined : CANONICAL_HOSTS[hostname];
   if (canonicalHost && canonicalRedirectsEnabled()) {
     const path = `${prefix}${pathname === '/' ? '' : pathname}`;
     return NextResponse.redirect(`https://${canonicalHost}${path || '/'}${req.nextUrl.search}`, 301);
@@ -162,11 +174,11 @@ export async function proxy(req: NextRequest): Promise<NextResponse> {
   //    wrongly bounce a valid *new* page (its number may match some job's
   //    legacyStujoId), so only the slugged — unambiguously legacy — shape is
   //    acted on. An unknown id falls through to the normal 404.
-  const jobMatch = pathname.match(/^\/stellenangebote\/(\d+)-[^/]+$/);
+  const jobMatch = redirectHost && pathname.match(/^\/stellenangebote\/(\d+)-[^/]+$/);
   if (jobMatch) {
     const newId = await lookupNewJobId(Number(jobMatch[1]));
     if (newId) {
-      const target = absoluteUrl(req, hostWithPort, `${prefix}/stellenangebote/${newId}`);
+      const target = absoluteUrl(req, redirectHost, `${prefix}/stellenangebote/${newId}`);
       return NextResponse.redirect(target, 301);
     }
   }

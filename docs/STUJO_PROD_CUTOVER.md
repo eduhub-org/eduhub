@@ -298,40 +298,76 @@ At this point stujo.net serves the new app and Rails is only reachable by IP.
 
 ---
 
-## 6. Adding white-label domains later
+## 6. Adding a portal on a partner's domain
 
-Adding a portal today means: a Cloud Run service (one entry in
-`local.stujo_portal_app_names`), a Cloudflare record, a certificate SAN, and the
-seed rows (`AppSettings`/`JobPortal` + `JobPortalDomain`). Only the last is
-really about the portal; the rest is infrastructure churn, and the SAN in
-particular **re-provisions the shared multi-SAN certificate** — the one Keycloak,
-Hasura, EduHub and the API also depend on. That is a poor thing to do routinely.
+A partner (a university, say) can run a white-label StuJo portal on their own
+domain — `jobs.uni-x.de` — without any infrastructure of ours: no Cloud Run
+service, no Terraform, no certificate on our load balancer, no deploy. It is
+the same mechanism stujo.net uses (§1): Cloudflare proxies the host and rewrites
+the origin `Host` to a service we already run; the app resolves the branding
+from `X-Original-Host`, so which service answers does not matter.
 
-**A partner's own domain** (say `jobs.uni-x.de`) needs none of that under the
-setup above: proxy it in Cloudflare, add an Origin Rule pointing at an existing
-`stujo-*.opencampus.sh` service, add the `JobPortalDomain` row. Cloudflare for
-SaaS custom hostnames is the productised version of exactly this pattern when
-the zone belongs to the partner rather than to us.
+Remember what a portal *is* (integration plan §2.4): a **branding** dimension
+only. Every portal shows the same job pool. A partner domain does not get its
+own jobs, its own employers or its own data — if that is what was promised,
+this is the wrong mechanism.
 
-**More `*.opencampus.sh` portals** are the case worth improving, in two steps
-that are independent of this cutover and should be rehearsed on staging first:
+### 1. Decide where the hostname's DNS lives
 
-1. **Move the shared certificate to Certificate Manager** with a DNS-authorized
-   **wildcard** (`*.opencampus.sh`), attached through the `certificate_map`
-   input the `lb-http` module already exposes. A new host then needs no
-   certificate change at all, and the re-provisioning window disappears for
-   every future domain change, not just StuJo's.
-2. **Take ownership of the URL map** (`create_url_map = false` plus our own
-   backend services) so a **wildcard host rule** — GCP host rules accept
-   `*.example.com` — can send every portal host to a single Cloud Run service.
-   The app already resolves branding from the request host, so one service can
-   serve them all.
+| | Partner delegates the hostname to our Cloudflare account | Partner keeps their DNS |
+|---|---|---|
+| What they do | Add an `NS` record for `jobs.uni-x.de` pointing at our Cloudflare nameservers (or move the zone) | `CNAME jobs.uni-x.de` → a hostname we give them |
+| Certificate | Our zone, our certificate — nothing extra | Needs **Cloudflare for SaaS** (custom hostnames): the certificate is issued for *their* name at our edge, validated by DCV. An add-on — check the plan and per-hostname cost before promising a date |
+| Effort | Lowest; prefer it when the partner is willing | Use when their IT will not delegate |
 
-With both in place, and portals named `<portal>.stujo.opencampus.sh` under a
-wildcard record, adding a white-label portal is **a database row** — no
-Terraform, no deploy, no certificate. That is the shape to aim for; it is
-deliberately not bundled into this cutover, because step 2 touches the routing
-Keycloak and Hasura run on.
+The rest is identical either way.
+
+### 2. Seed the portal (the only part that is really about the portal)
+
+Three rows, ideally as a migration so every environment gets them
+(`backend/migrations`, see `1783583081555_insert_stujo_app_settings` and
+`1784400000000_create_table_public_JobPortalDomain` for the shape):
+
+| Table | What it carries |
+|---|---|
+| `AppSettings` | `appName`, logo, favicon, primary/secondary colour, imprint/privacy/terms URLs |
+| `JobPortal` | `slug`, `title`, `contactEmail`, `defaultRegion` |
+| `JobPortalDomain` | `hostname` → `appName` — **this is what maps the partner's domain to their branding** |
+
+### 3. Three Cloudflare rules
+
+1. **DNS:** the hostname as a **proxied** record — `CNAME → stujo.opencampus.sh`
+   (or `A →` the load balancer IP).
+2. **Origin Rule:** Host header override → `stujo.opencampus.sh`. Any StuJo
+   service works, since branding no longer depends on which one answers; the
+   root service is the obvious choice. The override sets the SNI too, so the
+   origin connection stays valid on Full (strict).
+3. **Transform Rule:** set request header `X-Original-Host` = `http.host`. This
+   is what carries the partner's hostname to the app — without it the portal
+   falls back to the origin's own branding. If the existing rule is scoped to
+   the stujo.net zone, the partner's zone needs its own copy.
+
+### 4. Verify
+
+```bash
+curl -sS https://jobs.uni-x.de/ | grep -o '<title>[^<]*</title>'   # their title
+curl -sS -o /dev/null -w '%{http_code}\n' https://jobs.uni-x.de/  # 200, never 301
+```
+
+A 301 to stujo.net means the `X-Original-Host` rule is not firing: the app then
+sees a bare interim host and canonicalises it.
+
+### What a partner domain does *not* get
+
+- **Login, mail links and Stripe return URLs stay on the canonical host**
+  (stujo.net today). `NEXTAUTH_URL` is per Cloud Run service, so an employer
+  signing in from the partner domain lands on ours. If a partner needs login on
+  their own domain, that one *does* need a dedicated service with its own
+  `NEXTAUTH_URL` — the pattern `local.stujo_portals` already implements.
+- **No legacy-URL redirects.** `proxy.ts` deliberately builds redirects only for
+  hosts in the stujo.net zone; a partner domain has no legacy StuJo URLs, and
+  redirecting it to a host outside its own domain would be worse than serving
+  the page.
 
 ---
 

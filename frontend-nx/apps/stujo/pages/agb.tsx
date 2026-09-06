@@ -4,6 +4,7 @@ import { GetServerSideProps } from 'next';
 
 import Layout from '../components/Layout';
 import { resolvePortal, PortalBranding } from '../lib/portal';
+import { portalHost } from '../lib/requestHost';
 
 type Props = { portal: PortalBranding };
 
@@ -143,7 +144,7 @@ const Agb: FC<Props> = ({ portal }) => (
 );
 
 export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => {
-  const portal = await resolvePortal(req.headers.host);
+  const portal = await resolvePortal(portalHost(req));
   return { props: { portal } };
 };
 
