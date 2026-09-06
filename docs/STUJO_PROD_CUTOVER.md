@@ -52,8 +52,12 @@ Cloudflare proxies rather than redirects.
 
 So the domain move needs **no second load balancer, no certificate change, no
 new DNS record on the Google side, and no change to the URL map**. TLS at the
-edge comes from the Cloudflare certificate (Advanced Certificate Manager covers
-`*.stujo.net` and, for the legacy locale hosts, `*.en.stujo.net`).
+edge comes from Cloudflare's **free Universal SSL**, which covers `stujo.net`
+and one level of subdomain — and every host being served is apex or one level,
+so no certificate has to be bought or provisioned for this cutover. (The zone
+has no Advanced Certificate Manager: it is on the Free plan, with zero SNI
+custom certificates. That matters only for the third-level `*.en.stujo.net`
+legacy hosts — §4.6.)
 
 The Cloudflare side is Terraform, not dashboard clicking:
 `infrastructure/application/09_stujo_net.tf` holds the records, the Origin
@@ -92,7 +96,7 @@ Turning it back off is also how the public face is handed to
    |---|---|---|
    | `stujo.net`, `en.stujo.net`, `cau`, `fh-kiel`, `flensburg`, `haw-kiel` (A → `81.169.132.172`) | **Proxied** | **Repoint.** Managed in `09_stujo_net.tf`, imported, value changed to the load balancer IP. |
    | `www.stujo.net` (CNAME → apex) | **Proxied** | Managed but unchanged — it follows the apex. |
-   | `cau.en`, `fh-kiel.en`, `flensburg.en`, `haw-kiel.en` (A → `81.169.132.172`) | DNS only | **Decision, §4.6.** They cannot be proxied without ACM, and unproxied they will point at a dead server. |
+   | `cau.en`, `fh-kiel.en`, `flensburg.en`, `haw-kiel.en` (A → `81.169.132.172`) | DNS only | **Leave during the window; decide at decommission (§4.6).** Universal SSL cannot reach the third level and the zone has no ACM, so they cannot be proxied as things stand. |
    | `stujo.net` MX → `stujo-net.mail.protection.outlook.com` | DNS only | **Leave.** Live Microsoft 365 mail. |
    | `stujo.net` TXT `v=spf1 include:spf.protection.outlook.co…` | DNS only | **Edit by hand** to add Mailgun (§2.2 c). Never add a second SPF record. |
    | `_dmarc.stujo.net` TXT `v=DMARC1; p=reject;` | DNS only | **Leave** — and read §2.2 f, because `p=reject` is why the Mailgun ordering is not optional. |
@@ -103,15 +107,19 @@ Turning it back off is also how the public face is handed to
    third-level `*.en.stujo.net` hosts are DNS-only is the certificate limit
    below — somebody already hit it.
 
-   **The zone is on the Free plan.** Check what that implies before the window:
-   Universal SSL covers `stujo.net` and one level of subdomain, which is why
-   `en.stujo.net` can be proxied and `cau.en.stujo.net` cannot. Covering the
-   third level needs `*.en.stujo.net` on an **Advanced Certificate Manager**
-   certificate — and ACM is a paid add-on, so confirm it is on *this* zone
-   rather than assuming it from the opencampus.sh zone. Confirm too that the
-   Free plan's Origin Rule and Transform Rule allowances cover what §4 needs
-   (four origin rules and one transform rule — comfortably inside the usual
-   limits, but worth seeing rather than assuming).
+   **The zone is on the Free plan, with no Advanced Certificate Manager**
+   (SNI custom certificates: 0, IP certificates: 0 — checked). Free Universal
+   SSL covers `stujo.net` and **one** level of subdomain, and that is exactly
+   why `en.stujo.net` is proxied while `cau.en.stujo.net` is not.
+
+   For the cutover this is a non-issue: every host being served is apex or one
+   level, so Universal SSL already covers all of them and nothing has to be
+   bought. It constrains one thing only — the four third-level
+   `*.en.stujo.net` hosts, §4.6.
+
+   Still worth seeing rather than assuming: that the Free plan's Origin Rule
+   and Transform Rule allowances cover what §4 needs (four origin rules and one
+   transform rule — comfortably inside the usual limits).
 2. **Mail — verify `stujo.net` in Mailgun, or StuJo mail keeps leaving under
    opencampus.sh.** The code side is done: `sendMail` now sends each mail as
    the sender its template carries, through the Mailgun domain that can sign
@@ -202,10 +210,10 @@ Turning it back off is also how the public face is handed to
    holds the mailboxes. Sending verification needs the two TXT records, not the
    MX; leave the MX exactly as it is.
 
-   The upside of the zone already being on M365: **`team@stujo.net` may exist
-   already, or is one mailbox/alias away in the M365 admin centre** rather than
-   a new mail setup. Check before building anything — it is the last thing
-   §2.2 needs, and these mails invite replies.
+   **`team@stujo.net` already exists in the M365 tenant** — so the reply address
+   these mails invite answers to is live, and nothing needs building. Just make
+   sure somebody is actually reading it once the job board starts pointing
+   employers at it.
 
    Do not tidy away `stujo.net TXT "MS=ms88886274"` either. It is Microsoft's
    domain-verification record; removing it can un-verify the domain in the
@@ -588,7 +596,7 @@ no new credential, as long as stujo.net sits in the same Cloudflare account.
 |---|---|---|
 | **Repoint** | `stujo.net`, `en`, `cau`, `fh-kiel`, `haw-kiel`, `flensburg` (A, proxied) and `www` (CNAME → apex, proxied) | **Import.** Declared in `09_stujo_net.tf`; importing makes the cutover an in-place `value` change. `www` needs no change at all — it follows the apex — but is declared so Terraform owns it. |
 | **Leave to Microsoft 365** | `MX`, the SPF `TXT`, `_dmarc`, the `MS=` verification `TXT`, `selector1`/`selector2._domainkey`, `autodiscover` | **Do not import, do not declare.** This is working mail. Terraform cannot touch what it does not declare, so leaving them out is the *safe* option, not the lazy one. The one exception is the SPF record, which must be **edited by hand** to add Mailgun's include (§2.2 c) — editing it in the dashboard and leaving it unmanaged is fine and is what this plan assumes. |
-| **Legacy `en.*`** | `en.stujo.net` (proxied) plus `cau.en`, `fh-kiel.en`, `flensburg.en`, `haw-kiel.en` (DNS-only) | `en.stujo.net` is **imported and repointed** with the rest — it is already proxied, so it is free. The four third-level hosts need ACM before they can be proxied at all: **decide, see §4.6.** Doing nothing is the one option that is actually wrong. |
+| **Legacy `en.*`** | `en.stujo.net` (proxied) plus `cau.en`, `fh-kiel.en`, `flensburg.en`, `haw-kiel.en` (DNS-only) | `en.stujo.net` is **imported and repointed** with the rest — already proxied, so it costs nothing. The four third-level hosts are **left alone during the window**: they cannot be proxied without ACM, and they keep working off Strato until it is decommissioned. Decide then, §4.6. |
 | **Unexplained** | anything nobody recognises | **Leave alone** until somebody can say what it is for. Adopting a record you cannot explain is how a zone loses one it needed. |
 
 The generator emits blocks only for the first row. The rest it prints as a
@@ -658,48 +666,58 @@ There is no conflict: these are different zones, and no stujo.net host is on
 that certificate. But the two rules must not be swapped by someone tidying up
 later. Never proxy an opencampus.sh record; never unproxy a stujo.net one.
 
-### 4.6 The legacy `en.*` hosts — one is free, four are not
+### 4.6 The legacy `en.*` hosts — nothing to do in the window
 
-The zone has five, and they split cleanly along the certificate boundary:
+The zone has five, and they split along the certificate boundary:
 
 | Host | Proxy today | Why |
 |---|---|---|
-| `en.stujo.net` | **Proxied** | Second level — Universal SSL covers it. |
-| `cau.en`, `fh-kiel.en`, `flensburg.en`, `haw-kiel.en` | DNS only | Third level — Universal SSL does **not** reach it. |
+| `en.stujo.net` | **Proxied** | Second level — free Universal SSL covers it. |
+| `cau.en`, `fh-kiel.en`, `flensburg.en`, `haw-kiel.en` | DNS only | Third level — Universal SSL does **not** reach it, and this zone has no ACM. |
 
 That is not an oversight; it is the certificate limit, and somebody already
-hit it. Which makes the decision two decisions, not one:
+hit it.
 
-**`en.stujo.net` — just do it.** It is already proxied, so it costs nothing:
-`09_stujo_net.tf` manages it like the other web hosts, and `proxy.ts` 301s
-`en.stujo.net/x` → `stujo.net/en/x`. Without this it would keep pointing at a
-server that no longer exists. It is in the managed set already.
+**`en.stujo.net` is handled and costs nothing.** Already proxied, so
+`09_stujo_net.tf` manages it like the other web hosts and `proxy.ts` 301s
+`en.stujo.net/x` → `stujo.net/en/x`. The main English entry point survives the
+move. No decision needed.
 
-**`*.en.stujo.net` — needs ACM, so it needs a decision.** To proxy them,
-`*.en.stujo.net` must be on an **Advanced Certificate Manager** certificate for
-this zone (a paid add-on, and this zone is on the Free plan — §2.1). Then add
-them to `local.stujo_net_origin_hosts` and `local.stujo_net_a_records`;
-`proxy.ts` already handles them, 301ing `haw-kiel.en.stujo.net/x` →
-`haw-kiel.stujo.net/en/x`.
+**The four third-level hosts: leave them alone during the cutover.** Proxying
+them is not available — the zone is Free plan with zero SNI custom
+certificates, so `*.en.stujo.net` would need an ACM subscription. But they do
+not need touching either, because they point at Strato and **Strato stays up
+read-only for an agreed period after the cutover** (§5.1). Until then they keep
+working exactly as they do today.
 
-If ACM is not already on the zone, the honest question is whether four legacy
-English portal hostnames justify buying and provisioning a certificate during
-a cutover window. Usually not. Then:
+(An earlier draft of this section called leaving them "definitely wrong". That
+was written assuming Strato dies at the cutover. It does not — so leaving them
+is not just acceptable during the window, it is the right call: it removes a
+decision from the riskiest hour and defers it to when there is data.)
 
-- **Delete the four records** as part of the cutover. Those deep links break,
-  and they break *cleanly* (NXDOMAIN) rather than resolving to a dead server —
-  which is the better failure of the two, and the reason "leave them alone" is
-  the one option that is definitely wrong.
-- Or leave them until Strato is decommissioned (§5.1) and delete them then.
-  They point at a server that is still up but no longer serving stujo.net, so
-  visitors get whatever Strato answers — check what that is before choosing
-  this.
+**Decide at decommission, from the logs.** When Strato is switched off (§5.1),
+the four records must go one way or the other:
 
-Check the traffic before deleting anything; if the English portal URLs turn out
-to be used, ACM is cheap next to re-earning that traffic.
+- **Delete them.** Those English deep links then fail cleanly with NXDOMAIN,
+  which is a better failure than resolving to a server that is gone. This is
+  the default.
+- **Buy ACM** for the zone, add `*.en.stujo.net` to it, proxy the four and add
+  them to `local.stujo_net_origin_hosts` and `local.stujo_net_a_records`.
+  `proxy.ts` already handles them — it 301s `haw-kiel.en.stujo.net/x` →
+  `haw-kiel.stujo.net/en/x` — so this is a certificate purchase, not
+  development work.
+
+**How to get the data, since the obvious way does not work here.** These
+records are DNS-only, so their traffic never reaches Cloudflare and **Cloudflare
+Analytics cannot see it** — the dashboard will show nothing and that is not
+evidence of nothing. The only record is on the Strato box: grep the nginx or
+Rails access logs for those Host headers before it is archived (§5.1), while
+the logs still exist. If the English portal URLs turn out to carry real
+traffic, an ACM subscription is cheap next to re-earning it; if they carry
+none, delete them without ceremony.
 
 One side effect either way: Cloudflare's "your origin IP is partially exposed"
-warning on this zone comes from exactly these DNS-only records sharing an IP
+notice on this zone comes from exactly these DNS-only records sharing an IP
 with the proxied ones. Proxying or deleting them clears it.
 
 ### 4.7 Verify, immediately after the apply
@@ -767,6 +785,16 @@ what you changed: the next `terraform apply` will otherwise put it back.
 1. Keep Rails reachable read-only for the agreed period, then archive the MySQL
    dump and `public/system` (the payment history stays there — invoices are
    deliberately not imported) and decommission the server.
+
+   Two things to do **before** the box is wiped, both of which become
+   impossible afterwards:
+   - **Pull the access logs**, or at least grep them for the
+     `*.en.stujo.net` Host headers. That is the only place the traffic to those
+     four DNS-only records is visible — Cloudflare never sees it — and it is
+     what decides whether they are deleted or given an ACM certificate (§4.6).
+   - **Then delete or repoint those four records.** Once Strato is off they
+     resolve to nothing useful, and this is the moment that stops being
+     harmless.
 2. Send the employer and student communication; then let the first
    `send_job_alerts` Monday run (or un-pause it).
 3. Raise the DNS TTLs again once the move has settled.
@@ -862,13 +890,12 @@ sees a bare interim host and canonicalises it.
   Transform Rules (§4.4) — a plan answers it, and the fallback is to create
   those two rules by hand and import them later.
 - ~~Whether `stujo.net` carries existing mail~~ — **answered: yes, Microsoft
-  365** (§2.2). What remains is whether `team@stujo.net` already exists as a
-  mailbox or alias in that tenant, and the by-hand SPF edit.
-- Whether **ACM covers `*.en.stujo.net` on this zone**, and if not, whether the
-  four third-level English hosts are worth buying it for or should be deleted
-  (§4.6). This is a Free-plan zone, so do not assume ACM from the opencampus.sh
-  one. `en.stujo.net` itself needs no decision — already proxied, already
-  handled.
+  365, and `team@stujo.net` already exists** (§2.2). What remains is the
+  by-hand SPF edit and making sure somebody reads that mailbox.
+- ~~Whether ACM covers `*.en.stujo.net`~~ — **answered: no.** Free plan, zero
+  SNI custom certificates. Nothing to do in the window; the four third-level
+  hosts become a delete-or-buy-ACM decision at decommission, from the Strato
+  logs (§4.6, §5.1).
 - `HAW_ORG_ID` on production (§2.6).
 - The **freeze window** and the communication texts (§2.9).
 - Whether to build `/arbeitgeber` before or after the cutover (§5.5).
