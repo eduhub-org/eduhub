@@ -100,14 +100,24 @@ Turning it back off is also how the public face is handed to
 
    What remains is the Mailgun and DNS half, and it belongs in this window
    because the records go in the zone being re-pointed:
-   - **Verify the domain in Mailgun** — `stujo.net` or `mg.stujo.net`. A
+   - **Verify the domain in Mailgun** — `stujo.net` or `mg.stujo.net`.
+     `sendMail` accepts either, but DMARC does not treat them the same. A
      subdomain leaves the apex free for the zone's other mail and is the usual
-     choice; either aligns, since `sendMail` accepts a configured domain that
-     is the sender's own domain *or* a subdomain of it.
+     choice; it signs as `d=mg.stujo.net` and bounces from the same name, which
+     shares an *organizational* domain with `team@stujo.net` and so aligns only
+     under **relaxed** alignment — `adkim=r`/`aspf=r`, which is what applies
+     when the tags are absent. Under `adkim=s` or `aspf=s` neither identifier
+     matches the `From` exactly and receivers apply the zone's DMARC policy to
+     mail that is genuinely ours. So: check the existing DMARC record before
+     choosing. If the zone publishes strict alignment, or you want it to,
+     verify the apex `stujo.net` instead — that aligns either way.
    - **Publish its records in the stujo.net zone**: SPF, the DKIM key, the
      bounce CNAME, and a DMARC record if the zone has none. Moving DNS
      providers is exactly when such records get lost, so add them deliberately
-     rather than expecting them to survive.
+     rather than expecting them to survive. Then send one mail and read the
+     `Authentication-Results` header on what arrives: `dkim=pass` with a `d=`
+     the receiver accepted for `stujo.net` is the only proof that the domain
+     you picked and the zone's alignment agree.
    - **Set `mailgun_additional_domains`** to that domain in the Terraform
      workspace, and make sure `team@stujo.net` actually delivers somewhere a
      person reads.
@@ -398,8 +408,9 @@ sees a bare interim host and canonicalises it.
 - The **actual host list** in the stujo.net zone (§2.1), including whether the
   `en.*` locale hosts and `fh-kiel.stujo.net` are still in use.
 - Whether `stujo.net` carries **existing mail** that must survive the move,
-  and whether Mailgun should be verified on the apex or on `mg.stujo.net`
-  (§2.2). `team@stujo.net` also needs a mailbox someone reads.
+  and whether Mailgun should be verified on the apex or on `mg.stujo.net` —
+  which turns on the zone's DMARC alignment tags (§2.2). `team@stujo.net` also
+  needs a mailbox someone reads.
 - `HAW_ORG_ID` on production (§2.6).
 - The **freeze window** and the communication texts (§2.9).
 - Whether to build `/arbeitgeber` before or after the cutover (§5.5).

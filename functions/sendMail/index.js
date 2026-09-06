@@ -48,12 +48,17 @@ function configuredDomains() {
  * unaligned, and any DMARC policy on stujo.net will reject or quarantine it.
  *
  * So the domain is derived FROM the sender: the configured Mailgun domain that
- * is either the sender's own domain or a subdomain of it (mg.stujo.net signing
- * for team@stujo.net aligns under DMARC's relaxed mode, which is what the
- * organizational domain is compared on). If no configured domain aligns — the
- * usual case being a domain not verified in Mailgun yet — the mail goes out
- * under the default domain with a matching noreply sender rather than as a
- * misaligned From, so it still arrives.
+ * is either the sender's own domain or a subdomain of it. The subdomain case
+ * (mg.stujo.net signing for team@stujo.net) aligns on the organizational
+ * domain, which DMARC compares only under RELAXED alignment — the default, but
+ * a zone publishing adkim=s or aspf=s would fail such a mail, and nothing here
+ * can see that record. Configure the sending domain accordingly: with strict
+ * alignment, verify the apex rather than a subdomain (docs/STUJO_PROD_CUTOVER.md
+ * §2.2).
+ *
+ * If no configured domain aligns — the usual case being a domain not verified
+ * in Mailgun yet — the mail goes out under the default domain with a matching
+ * noreply sender rather than as a misaligned From, so it still arrives.
  */
 function resolveSender(from) {
   const domains = configuredDomains();
