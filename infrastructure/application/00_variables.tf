@@ -330,10 +330,10 @@ variable "mailgun_additional_domains" {
     published, since a mail whose sender no entry covers falls back to a
     mailgun_domain sender instead.
 
-    A subdomain ("mg.stujo.net") keeps the apex free for the zone's other mail,
-    but it aligns with a team@stujo.net sender only under relaxed DMARC
-    alignment — the default, though a zone with adkim=s or aspf=s needs the
-    apex ("stujo.net") verified instead. See docs/STUJO_PROD_CUTOVER.md §2.2.
+    For StuJo this is the apex, "stujo.net": it signs as d=stujo.net, so it
+    aligns with a team@stujo.net sender under strict DMARC alignment as well as
+    relaxed. A subdomain ("mg.stujo.net") is accepted too, but aligns only
+    under relaxed adkim/aspf. See docs/STUJO_PROD_CUTOVER.md §2.2.
   EOT
   type        = list(string)
   default     = []

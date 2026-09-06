@@ -99,49 +99,166 @@ Turning it back off is also how the public face is handed to
    mailbox, because the organization-access mail asks people to reply to it.
 
    What remains is the Mailgun and DNS half, and it belongs in this window
-   because the records go in the zone being re-pointed:
-   - **Verify the domain in Mailgun** — `stujo.net` or `mg.stujo.net`.
-     `sendMail` accepts either, but DMARC does not treat them the same. A
-     subdomain leaves the apex free for the zone's other mail and is the usual
-     choice; it signs as `d=mg.stujo.net` and bounces from the same name, which
-     shares an *organizational* domain with `team@stujo.net` and so aligns only
-     under **relaxed** alignment — `adkim=r`/`aspf=r`, which is what applies
-     when the tags are absent. Under `adkim=s` or `aspf=s` neither identifier
-     matches the `From` exactly and receivers apply the zone's DMARC policy to
-     mail that is genuinely ours. So: check the existing DMARC record before
-     choosing. If the zone publishes strict alignment, or you want it to,
-     verify the apex `stujo.net` instead — that aligns either way.
-   - **Publish its records in the stujo.net zone**: SPF, the DKIM key, the
-     bounce CNAME, and a DMARC record if the zone has none. Moving DNS
-     providers is exactly when such records get lost, so add them deliberately
-     rather than expecting them to survive. Then send one mail and read the
-     `Authentication-Results` header on what arrives: `dkim=pass` with a `d=`
-     the receiver accepted for `stujo.net` is the only proof that the domain
-     you picked and the zone's alignment agree.
-   - **Set `mailgun_additional_domains`** to that domain in the Terraform
-     workspace, and make sure `team@stujo.net` actually delivers somewhere a
-     person reads.
+   because the records go in the zone being re-pointed. **Decided: verify the
+   apex `stujo.net`, not an `mg.` subdomain.** The only reason to prefer a
+   subdomain is keeping the apex free for a zone's other mail, and this zone
+   carries little beyond `team@stujo.net`; the apex also signs as `d=stujo.net`
+   and so aligns under **strict** DMARC alignment as well as relaxed, whatever
+   the zone publishes now or grows into later. (`sendMail` accepts a subdomain
+   too — a configured domain may be the sender's own domain *or* a subdomain of
+   it — but that shape aligns only under relaxed `adkim`/`aspf`. Worth knowing
+   if a partner domain later wants it; not what we are doing here.)
 
-   Until that variable is set, nothing breaks: a sender no configured domain
-   covers falls back to `noreply@${MAILGUN_DOMAIN}`, so the mail still goes out
-   under opencampus.sh rather than as a misaligned `From` that a DMARC policy
-   on stujo.net would reject. That makes the order free — deploy first and
-   verify later, or the other way round. `sendMail` logs every fallback with
-   the address it wanted, which is how you check the switch actually took.
+   **a. Add the domain in Mailgun — in the EU region.** This account sends
+   through `https://api.eu.mailgun.net` (`functions/sendMail/index.js`), so the
+   domain must be created in the **EU** region, not US. The two regions are
+   separate namespaces with different DNS values; a domain verified in the
+   wrong one is invisible to the API key in use and every send fails with a
+   404-shaped "domain not found". Switch the region in the Mailgun control
+   panel before *Add New Domain*, enter `stujo.net`, and leave DKIM at the
+   default key length unless the zone has a reason otherwise.
+
+   **b. Copy the records Mailgun then shows** — do not copy them from this
+   document. They are per-domain and per-region, and the DKIM value in
+   particular is unique to your domain. Mailgun lists four kinds:
+
+   | Record | Type | Purpose | Add it? |
+   |---|---|---|---|
+   | SPF on `stujo.net` | TXT | authorises Mailgun's senders | **yes — but merge, see c** |
+   | `<selector>._domainkey.stujo.net` | TXT | the DKIM public key | **yes** |
+   | `email.stujo.net` | CNAME | open/click tracking + bounce handling | **yes — DNS-only, see d** |
+   | `stujo.net` MX ×2 | MX | receiving mail *at Mailgun* | **no — see e** |
+
+   **c. SPF: merge, never add a second record.** A domain may publish exactly
+   one SPF TXT record; two is a `permerror` and every receiver treats the
+   result as unauthenticated. If `stujo.net` already has an SPF record (check
+   the zone export from step 1), add Mailgun's `include:` into the existing
+   record rather than creating another, keeping the single trailing `all`
+   mechanism at the end.
+
+   **d. The tracking CNAME must be DNS-only (grey cloud).** Cloudflare proxies
+   a CNAME by default, which answers with Cloudflare's own addresses and
+   breaks Mailgun's tracking and bounce endpoints. Toggle the cloud icon to
+   grey on `email.stujo.net`. The TXT records cannot be proxied, so they need
+   no such care.
+
+   **e. Do NOT add Mailgun's MX records.** Those hand *inbound* mail for
+   `stujo.net` to Mailgun. `team@stujo.net` has to arrive in a mailbox a person
+   reads — these mails invite replies — so the zone's MX must point at whatever
+   hosts that mailbox. This is the one cost of choosing the apex over
+   `mg.stujo.net`, and it is only a cost if you forget: sending verification
+   needs the two TXT records, not the MX. Decide where `team@stujo.net` is
+   hosted, and carry its MX (and its own SPF include, per c) into the
+   Cloudflare zone with everything else in step 1.
+
+   **f. DMARC.** If the zone has no `_dmarc.stujo.net` record, add one — start
+   at `p=none` with a `rua=` address so you see the reports before enforcing
+   anything. If it already has one, read its `adkim`/`aspf` tags; the apex
+   aligns under either setting, which is why it was chosen.
+
+   **g. Set `mailgun_additional_domains = ["stujo.net"]`** in the Terraform
+   workspace and apply.
+
+   **h. Verify with a real message, not with the panel.** Mailgun's green tick
+   says the records parse, not that mail aligns. Trigger one StuJo mail (a job
+   posting publish on a test organization does it) and read the
+   `Authentication-Results` header on what arrives:
+
+   ```
+   dkim=pass header.d=stujo.net
+   spf=pass smtp.mailfrom=...stujo.net
+   dmarc=pass
+   ```
+
+   A `d=` of anything but `stujo.net`, or the mail arriving from
+   `noreply@opencampus.sh`, means the switch did not take — check the function
+   logs for the `Sender not covered by a configured Mailgun domain` line, which
+   names the address it wanted.
+
+   Until step g, nothing breaks: a sender no configured domain covers falls
+   back to `noreply@${MAILGUN_DOMAIN}`, so the mail still goes out under
+   opencampus.sh rather than as a misaligned `From` that a DMARC policy on
+   stujo.net would reject. The order is therefore free — deploy first and
+   verify later, or the other way round.
 
 3. **Lower the TTL** to 60s on every record from group 1 while they still point
    at Strato. Once a record is proxied its TTL stops mattering (Cloudflare
    answers with its own anycast address), so the fast rollback is turning the
    proxy off — but the low TTL is what makes *that* fast in turn.
-4. **Keycloak (prod realm `edu-hub`, client `hasura`):** add the stujo.net
-   redirect URIs and web origins (`https://stujo.net/*`, `https://www.stujo.net/*`,
-   and one per portal host). Without them, login on the new domain fails at the
-   callback — and this is the one step no Terraform in this repo performs.
+4. **Keycloak — production realm `edu-hub`, client `hasura`.** Without this,
+   login on the new domain fails at the callback, and it is the one step no
+   Terraform in this repo performs. All four StuJo portals use the *same*
+   client (`clientId: 'hasura'` in the shared NextAuth config); there is no
+   per-portal client, so everything below goes on that one client.
+
+   The values follow from `NEXTAUTH_URL`, which Terraform sets per service from
+   `stujo_net_canonical_hosts` once `stujo_net_canonical` is on:
+
+   | Service | `NEXTAUTH_URL` after the switch |
+   |---|---|
+   | `stujo` | `https://stujo.net` |
+   | `stujo-cau` | `https://cau.stujo.net` |
+   | `stujo-haw-kiel` | `https://haw-kiel.stujo.net` |
+   | `stujo-flensburg` | `https://flensburg.stujo.net` |
+
+   **Valid redirect URIs** — NextAuth builds its callback as
+   `<NEXTAUTH_URL>/api/auth/callback/keycloak`, so add:
+
+   ```
+   https://stujo.net/api/auth/callback/keycloak
+   https://cau.stujo.net/api/auth/callback/keycloak
+   https://haw-kiel.stujo.net/api/auth/callback/keycloak
+   https://flensburg.stujo.net/api/auth/callback/keycloak
+   ```
+
+   The existing entries use the broader `https://<host>/*` shape. Either works;
+   the exact paths are the tighter choice, since a redirect URI is what an
+   attacker abuses if a client is ever tricked into an open redirect. **Keep
+   the existing `*.opencampus.sh` entries** — those hosts stay reachable and
+   are what you QA on before flipping the switch, and what you fall back to.
+
+   **Valid post logout redirect URIs** — `pages/api/auth/logout.ts` passes
+   `NEXTAUTH_URL` *verbatim* as `post_logout_redirect_uri`, so these are bare
+   origins with no path and no wildcard:
+
+   ```
+   https://stujo.net
+   https://cau.stujo.net
+   https://haw-kiel.stujo.net
+   https://flensburg.stujo.net
+   ```
+
+   If your Keycloak version has no separate field for this, it validates the
+   post-logout URI against the redirect URIs instead — in which case the `/*`
+   shape above already covers it, but the exact-path shape does not. A `+` in
+   this field means "reuse the redirect URIs".
+
+   **Web origins** — add the same four origins. The login code exchange and the
+   token refresh both run server-side (`/api/auth/*`), so CORS is not on the
+   critical path and these are belt-and-braces rather than required; they cost
+   nothing and match how the existing hosts are configured.
+
+   **One thing to know about `www`.** `www.stujo.net` is served (§1), but it is
+   not a `NEXTAUTH_URL`, so a visitor who logs in there is returned to
+   `stujo.net` — the session works, the host just changes under them. If that
+   bothers you, add a Cloudflare **Redirect Rule** `www.stujo.net/*` →
+   `https://stujo.net/$1` (301) and drop `www` from the Origin Rule table, so
+   there is one origin rather than two. Do not add `www` to `NEXTAUTH_URL`
+   instead: two hosts issuing cookies for the same app is the thing that
+   actually breaks sessions.
 5. **Stripe (live):** job posting prices + tax rate bootstrapped
    (`createStripeJobPostingPrices`), webhook endpoint subscribed to
    `checkout.session.completed` **and** `invoice.finalized`, and the workspace
    variables `stujo_admin_email`, `stujo_seller_organization_id`,
    `stripe_tax_rate_id` set as intended.
+
+   `stujo_admin_email` carries more than Stripe: it is also the fallback
+   contact address the organization-claim and access-request mails print, via
+   `resolveContactEmail`. All four `JobPortal` rows currently have
+   `contactEmail` NULL, so every portal falls back to it — and if it is unset
+   too, `resolveContactEmail` returns null and those mails are skipped rather
+   than sent with a blank address. Set it, or give each portal its own
+   `JobPortal.contactEmail`.
 6. **Look up `HAW_ORG_ID`** — the prod `Organization.id` of HAW Kiel, the target
    of the mandate restriction. It is *not* 8 (that was staging):
    ```graphql
@@ -159,6 +276,107 @@ Turning it back off is also how the public face is handed to
 9. **Agree the freeze window** and prepare the communication: employers (their
    password still works — the bcrypt hashes are imported — and where to find
    "Mein StuJo"), students, and the maintenance banner text for the Rails app.
+10. **Announce the window to the employers who have posted.** See §2.10 below —
+    it is the one piece of the communication with a mechanism rather than just
+    a text.
+
+### 2.10 Telling the employers — send it through the platform
+
+**Recommendation: send it from the new platform, not from Outlook.** Not
+because Outlook cannot do it, but because of four things it does badly at this
+size:
+
+- **One mail per recipient, by construction.** A BCC list is one mis-click from
+  disclosing every employer's address to every other employer — a personal-data
+  breach that is reportable under GDPR Art. 33, over an announcement. Rows in
+  `MailLog` cannot make that mistake: each is addressed to one person.
+- **Authenticated sending.** Once §2.2 is done these leave as `team@stujo.net`
+  through Mailgun with SPF and DKIM. A few hundred BCC recipients from a
+  personal mailbox is the exact shape spam filters bury — and this is the one
+  mail you cannot afford to have filtered.
+- **You learn who you failed to reach.** Mailgun logs the bounces, so the
+  employers whose address died with the old platform become a list you can act
+  on, rather than silence. Those are precisely the people who would otherwise
+  be surprised.
+- **It is on the record.** `MailLog` answers "did we tell them, and when?"
+  months later.
+
+It also rehearses the mail path end to end on real recipients before the
+cutover depends on it.
+
+**When:** after the full ETL run (the addresses only exist in the new database
+afterwards) and after §2.2 step g (or it goes out as `noreply@opencampus.sh`),
+and before the freeze — that is the whole point of it.
+
+**a. See who it would reach**, before writing anything:
+
+```graphql
+query CutoverRecipients {
+  OrganizationAdmin(
+    where: {
+      canManageJobs: { _eq: true }
+      Organization: { JobPostings: {} }
+    }
+  ) {
+    User { id email firstName lastName }
+    Organization { id name }
+  }
+}
+```
+
+`Organization: { JobPostings: {} }` means "has at least one job posting in any
+status" — an employer whose posting has long expired still had an account here
+and still needs telling. Check the count against what you expect from Rails
+before going further, and de-duplicate: one person may administer several
+organizations and must not get the mail several times.
+
+**b. Send yourself one first.** Insert a single `MailLog` row addressed to you,
+confirm it arrives, renders, and comes from `team@stujo.net`. The content is
+HTML — the templates in this repo use plain `<p>` and `<a>`; the admin editor's
+DOMPurify configuration strips `<table>`, so do not build a layout out of one.
+
+**c. Then insert one row per recipient.** The `send_mail` event trigger fires
+per row, so the insert *is* the send:
+
+```sql
+INSERT INTO "public"."MailLog" ("subject", "content", "from", "to", "status", "metadata")
+SELECT DISTINCT ON (u."email")
+  'StuJo zieht um: was sich für Dich ändert',
+  '<p>Hallo,</p><p>…</p>',
+  'team@stujo.net',
+  u."email",
+  'READY_TO_SEND',
+  '{"announcement": "stujo-cutover"}'::jsonb
+FROM "public"."OrganizationAdmin" oa
+JOIN "public"."User" u ON u."id" = oa."userId"
+WHERE oa."canManageJobs"
+  AND EXISTS (SELECT 1 FROM "public"."JobPosting" jp WHERE jp."organizationId" = oa."organizationId")
+  AND NOT EXISTS (
+    SELECT 1 FROM "public"."MailLog" m
+    WHERE m."to" = u."email" AND m."metadata" @> '{"announcement": "stujo-cutover"}'::jsonb
+  );
+```
+
+Three things that matter in that statement:
+
+- `DISTINCT ON (u."email")` and the `NOT EXISTS` guard are what make it safe to
+  run twice — the second run inserts nothing. Run it in a transaction and check
+  the row count before committing.
+- The `metadata` key is `announcement`, deliberately **not** `jobPostingId`:
+  the partial unique index `MailLog_job_posting_mail_unique` constrains rows
+  carrying that key and would reject the batch.
+- Send in batches (add a `LIMIT`) if the list runs to thousands, so a mistake
+  in the text costs one batch rather than all of them.
+
+**d. Read the result.** Count the rows, then check Mailgun's log for bounces
+after an hour. Nothing in this repo retries a hard bounce; those addresses are
+a manual follow-up.
+
+**Content, briefly:** these people are being told about a service they use, not
+marketed to, so no consent question arises — but say plainly who is writing,
+what changes and when, that their existing password still works, where "Mein
+StuJo" now is, and give `team@stujo.net` as a reply address that a person
+actually reads (§2.2 e).
 
 ---
 
@@ -407,10 +625,9 @@ sees a bare interim host and canonicalises it.
 
 - The **actual host list** in the stujo.net zone (§2.1), including whether the
   `en.*` locale hosts and `fh-kiel.stujo.net` are still in use.
-- Whether `stujo.net` carries **existing mail** that must survive the move,
-  and whether Mailgun should be verified on the apex or on `mg.stujo.net` —
-  which turns on the zone's DMARC alignment tags (§2.2). `team@stujo.net` also
-  needs a mailbox someone reads.
+- Whether `stujo.net` carries **existing mail** that must survive the move
+  (§2.2), and a mailbox for `team@stujo.net` that someone reads — these mails
+  invite replies.
 - `HAW_ORG_ID` on production (§2.6).
 - The **freeze window** and the communication texts (§2.9).
 - Whether to build `/arbeitgeber` before or after the cutover (§5.5).
