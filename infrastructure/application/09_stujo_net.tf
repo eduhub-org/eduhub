@@ -43,11 +43,15 @@
 # ── The zone carries mail, and none of it is managed here ───────────────────
 #
 # stujo.net is a Microsoft 365 mail domain: autodiscover, the selector1/
-# selector2 DKIM CNAMEs, its MX and its SPF all live in this zone and are
-# deliberately absent from this file. Terraform is not authoritative over a
-# Cloudflare zone — it only knows what is declared — so applying this cannot
-# touch them. Adding Mailgun for team@stujo.net means EDITING the existing SPF
-# record, not adding a second one (§2.2).
+# selector2 DKIM CNAMEs, the MS= verification TXT, its MX and its SPF all live
+# in this zone and are deliberately absent from this file. Terraform is not
+# authoritative over a Cloudflare zone — it only knows what is declared — so
+# applying this cannot touch them.
+#
+# It also publishes DMARC at `p=reject`. That is the strictest policy there is:
+# mail that fails DMARC for stujo.net is REJECTED, not spam-foldered. Nothing
+# in this file affects that, but it is why var.mailgun_additional_domains must
+# stay empty until Mailgun has verified the domain and its DKIM is live (§2.2).
 ###############################################################################
 
 locals {
@@ -60,12 +64,20 @@ locals {
   # Origin Rules, and every host that must be SERVED needs an entry here —
   # including www, whose DNS record this file does not manage.
   #
-  # The en.* legacy locale hosts are absent on purpose. They exist in the zone
-  # but are DNS-only today, and proxying a third-level host needs the ACM
-  # certificate to cover *.en.stujo.net (§2.1). Decide that first; see §4.6.
+  # en.stujo.net is here, its four third-level siblings are not, and the split
+  # is not arbitrary. Universal SSL covers one level, so `en.stujo.net` can be
+  # proxied for free — and it already is — while `cau.en.stujo.net` and the
+  # rest cannot be, which is exactly why they sit DNS-only in the zone today.
+  # Proxying those needs *.en.stujo.net on an ACM certificate (§4.6). Once it
+  # is there, add them here and to stujo_net_a_records; proxy.ts already knows
+  # what to do with them.
+  #
+  # en.stujo.net needs no portal of its own: it only has to REACH the app, and
+  # proxy.ts 301s it to stujo.net/en/... from there.
   stujo_net_origin_hosts = local.stujo_net_enabled ? {
     "stujo.net"           = local.stujo_domain
     "www.stujo.net"       = local.stujo_domain
+    "en.stujo.net"        = local.stujo_domain
     "cau.stujo.net"       = local.stujo_portals["stujo-cau"].domain
     "haw-kiel.stujo.net"  = local.stujo_portals["stujo-haw-kiel"].domain
     "fh-kiel.stujo.net"   = local.stujo_portals["stujo-haw-kiel"].domain
@@ -73,11 +85,13 @@ locals {
   } : {}
 
   # The A records this file manages: every served host except www, which is a
-  # CNAME to the apex and follows it. Trim this to what the zone inventory
-  # actually contains — a host listed here but absent from the zone is CREATED,
-  # which is right for a host that should exist and wrong for a typo.
+  # CNAME to the apex and follows it. All six exist in the zone today, proxied,
+  # pointing at the Strato address — so every one of these is an import
+  # followed by an in-place value change, and the plan should contain no
+  # creates at all.
   stujo_net_a_records = local.stujo_net_enabled ? toset([
     "stujo.net",
+    "en.stujo.net",
     "cau.stujo.net",
     "haw-kiel.stujo.net",
     "fh-kiel.stujo.net",

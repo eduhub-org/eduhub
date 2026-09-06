@@ -118,6 +118,7 @@ records, zone_id, path = json.load(open(sys.argv[1])), sys.argv[2], sys.argv[3]
 # www is its own resource because it stays a CNAME to the apex.
 declared = {
     "stujo.net":           'cloudflare_record.stujo_net["stujo.net"]',
+    "en.stujo.net":        'cloudflare_record.stujo_net["en.stujo.net"]',
     "cau.stujo.net":       'cloudflare_record.stujo_net["cau.stujo.net"]',
     "haw-kiel.stujo.net":  'cloudflare_record.stujo_net["haw-kiel.stujo.net"]',
     "fh-kiel.stujo.net":   'cloudflare_record.stujo_net["fh-kiel.stujo.net"]',

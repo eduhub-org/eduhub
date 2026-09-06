@@ -84,19 +84,34 @@ Turning it back off is also how the public face is handed to
 
 ## 2. Phase 0 — preparation (can all be done before the window)
 
-1. **Inventory the `stujo.net` Cloudflare zone.** Export the records and split
-   them into three groups:
-   - *web records to repoint* — the A/CNAME records for the Strato server
-     (apex, `www`, the portal subdomains, and any `en.*` host);
-   - *records that must stay untouched* — MX, SPF/DKIM/DMARC TXT, and anything
-     for other services;
-   - *hosts nobody uses any more* — decide explicitly to drop them, because
-     every host that should keep working needs its own Origin Rule.
-   Then reconcile that list with the Origin Rule table in §1 and with the
-   `JobPortalDomain` seed, which resolves the branding per host.
-   **Confirm the Advanced Certificate Manager certificate covers them all** —
-   Universal SSL stops at one level, so `cau.en.stujo.net` needs
-   `*.en.stujo.net` on the ACM certificate (or drop those hosts deliberately).
+1. **The `stujo.net` zone — 18 records, all of them known.** The zone was read
+   in full; `scripts/cloudflare_zone_inventory.sh stujo.net` reproduces this
+   and generates the Terraform import blocks (§4.1).
+
+   | Records | Proxy | Disposition |
+   |---|---|---|
+   | `stujo.net`, `en.stujo.net`, `cau`, `fh-kiel`, `flensburg`, `haw-kiel` (A → `81.169.132.172`) | **Proxied** | **Repoint.** Managed in `09_stujo_net.tf`, imported, value changed to the load balancer IP. |
+   | `www.stujo.net` (CNAME → apex) | **Proxied** | Managed but unchanged — it follows the apex. |
+   | `cau.en`, `fh-kiel.en`, `flensburg.en`, `haw-kiel.en` (A → `81.169.132.172`) | DNS only | **Decision, §4.6.** They cannot be proxied without ACM, and unproxied they will point at a dead server. |
+   | `stujo.net` MX → `stujo-net.mail.protection.outlook.com` | DNS only | **Leave.** Live Microsoft 365 mail. |
+   | `stujo.net` TXT `v=spf1 include:spf.protection.outlook.co…` | DNS only | **Edit by hand** to add Mailgun (§2.2 c). Never add a second SPF record. |
+   | `_dmarc.stujo.net` TXT `v=DMARC1; p=reject;` | DNS only | **Leave** — and read §2.2 f, because `p=reject` is why the Mailgun ordering is not optional. |
+   | `selector1`/`selector2._domainkey` CNAMEs, `autodiscover` CNAME, `MS=ms…` TXT | DNS only | **Leave.** M365 DKIM, Autodiscover and domain verification. |
+
+   Two things this settles. Every host in the §1 Origin Rule table exists and
+   is already proxied, so that table needs no revision. And the reason the
+   third-level `*.en.stujo.net` hosts are DNS-only is the certificate limit
+   below — somebody already hit it.
+
+   **The zone is on the Free plan.** Check what that implies before the window:
+   Universal SSL covers `stujo.net` and one level of subdomain, which is why
+   `en.stujo.net` can be proxied and `cau.en.stujo.net` cannot. Covering the
+   third level needs `*.en.stujo.net` on an **Advanced Certificate Manager**
+   certificate — and ACM is a paid add-on, so confirm it is on *this* zone
+   rather than assuming it from the opencampus.sh zone. Confirm too that the
+   Free plan's Origin Rule and Transform Rule allowances cover what §4 needs
+   (four origin rules and one transform rule — comfortably inside the usual
+   limits, but worth seeing rather than assuming).
 2. **Mail — verify `stujo.net` in Mailgun, or StuJo mail keeps leaving under
    opencampus.sh.** The code side is done: `sendMail` now sends each mail as
    the sender its template carries, through the Mailgun domain that can sign
@@ -155,13 +170,20 @@ Turning it back off is also how the public face is handed to
    `all` mechanism, and leave everything else alone:
 
    ```
-   before: v=spf1 include:spf.protection.outlook.com -all
-   after:  v=spf1 include:spf.protection.outlook.com include:<mailgun>.mailgun.org -all
+   now:   v=spf1 include:spf.protection.outlook.co…   (the record in the zone)
+   after: v=spf1 include:spf.protection.outlook.com include:<mailgun> <all-tag>
    ```
 
-   (Copy Mailgun's exact include from its panel; the EU region's differs.)
-   Watch the ten-DNS-lookup SPF limit: two `include:`s is well inside it, but
-   it is the reason not to keep piling them on.
+   Keep the existing trailing `all` mechanism exactly as it is — `-all` or
+   `~all`, whichever the record ends in; the dashboard truncates it, so read
+   the full value before editing. Copy Mailgun's exact include from its panel;
+   the EU region's differs. Watch the ten-DNS-lookup SPF limit: two
+   `include:`s is well inside it, but it is the reason not to keep piling them
+   on.
+
+   Strictly, DKIM alone is enough for DMARC to pass, so a missed SPF edit
+   would not by itself bounce mail under `p=reject`. Do it anyway: one
+   authentication mechanism is not a margin worth running production mail on.
 
    **c2. DKIM will not collide, and M365 is why to check.** M365 owns
    `selector1` and `selector2`; Mailgun publishes under its own selector, so
@@ -185,12 +207,31 @@ Turning it back off is also how the public face is handed to
    a new mail setup. Check before building anything — it is the last thing
    §2.2 needs, and these mails invite replies.
 
-   **f. DMARC.** A domain sending through M365 usually already has
-   `_dmarc.stujo.net`; check the inventory. If it does, leave the policy alone
-   — adding Mailgun as a second authorised sender does not require loosening
-   it, because the apex signs as `d=stujo.net` for a `From` on `stujo.net` and
-   so aligns under strict and relaxed alike. If it does not, add one at
-   `p=none` with a `rua=` address and read the reports before enforcing.
+   Do not tidy away `stujo.net TXT "MS=ms88886274"` either. It is Microsoft's
+   domain-verification record; removing it can un-verify the domain in the
+   tenant, which takes the mail with it.
+
+   **f. DMARC is already at `p=reject` — read this before setting the
+   variable.** The zone publishes `_dmarc.stujo.net = "v=DMARC1; p=reject;"`.
+   That is the strictest policy there is: mail that fails DMARC for stujo.net
+   is **rejected outright**, not delivered to spam. Leave the record alone —
+   adding an authorised sender needs no loosening, and the apex signs as
+   `d=stujo.net` for a `From` on `stujo.net`, so it aligns under the relaxed
+   default and would still align under `adkim=s`.
+
+   What it does change is that **step g is a gate, not a step**. Set
+   `mailgun_additional_domains = ["stujo.net"]` only once Mailgun reports the
+   domain verified and its DKIM record is live in the zone. Do it early and
+   StuJo mail goes out as `team@stujo.net` with neither SPF nor DKIM
+   authorising it — under `p=reject` that mail is bounced, and the recipient
+   never sees it. Until you set it, mail leaves as
+   `noreply@edu.opencampus.sh`, which is a different organizational domain and
+   entirely unaffected by this policy. That is the safe state, and it is the
+   default.
+
+   Belt and braces: send the §2.2 h test mail to an address you control at a
+   provider that reports DMARC (Gmail does) and read the header before
+   announcing anything to employers.
 
    **g. Set `mailgun_additional_domains = ["stujo.net"]`** in the Terraform
    workspace and apply.
@@ -545,9 +586,9 @@ no new credential, as long as stujo.net sits in the same Cloudflare account.
 
 | Bucket | Records seen in the zone | What to do |
 |---|---|---|
-| **Repoint** | `stujo.net`, `cau`, `haw-kiel`, `flensburg` (A, proxied) and `www` (CNAME → apex, proxied) | **Import.** Declared in `09_stujo_net.tf`; importing makes the cutover an in-place `value` change. `www` needs no change at all — it follows the apex — but is declared so Terraform owns it. |
-| **Leave to Microsoft 365** | `MX`, the SPF `TXT`, `selector1`/`selector2._domainkey`, `autodiscover` | **Do not import, do not declare.** This is working mail. Terraform cannot touch what it does not declare, so leaving them out is the *safe* option, not the lazy one. The one exception is the SPF record, which must be **edited by hand** to add Mailgun's include (§2.2 c) — editing it in the dashboard and leaving it unmanaged is fine and is what this plan assumes. |
-| **Legacy `en.*`** | `haw-kiel.en.stujo.net` (A, **DNS-only**) and any siblings | **Decide — see §4.6.** They point at Strato and are not proxied, so after the cutover they resolve to a dead server. Doing nothing is the one option that is actually wrong. |
+| **Repoint** | `stujo.net`, `en`, `cau`, `fh-kiel`, `haw-kiel`, `flensburg` (A, proxied) and `www` (CNAME → apex, proxied) | **Import.** Declared in `09_stujo_net.tf`; importing makes the cutover an in-place `value` change. `www` needs no change at all — it follows the apex — but is declared so Terraform owns it. |
+| **Leave to Microsoft 365** | `MX`, the SPF `TXT`, `_dmarc`, the `MS=` verification `TXT`, `selector1`/`selector2._domainkey`, `autodiscover` | **Do not import, do not declare.** This is working mail. Terraform cannot touch what it does not declare, so leaving them out is the *safe* option, not the lazy one. The one exception is the SPF record, which must be **edited by hand** to add Mailgun's include (§2.2 c) — editing it in the dashboard and leaving it unmanaged is fine and is what this plan assumes. |
+| **Legacy `en.*`** | `en.stujo.net` (proxied) plus `cau.en`, `fh-kiel.en`, `flensburg.en`, `haw-kiel.en` (DNS-only) | `en.stujo.net` is **imported and repointed** with the rest — it is already proxied, so it is free. The four third-level hosts need ACM before they can be proxied at all: **decide, see §4.6.** Doing nothing is the one option that is actually wrong. |
 | **Unexplained** | anything nobody recognises | **Leave alone** until somebody can say what it is for. Adopting a record you cannot explain is how a zone loses one it needed. |
 
 The generator emits blocks only for the first row. The rest it prints as a
@@ -617,33 +658,49 @@ There is no conflict: these are different zones, and no stujo.net host is on
 that certificate. But the two rules must not be swapped by someone tidying up
 later. Never proxy an opencampus.sh record; never unproxy a stujo.net one.
 
-### 4.6 The legacy `en.*` hosts — a decision, not an optional extra
+### 4.6 The legacy `en.*` hosts — one is free, four are not
 
-They exist: `haw-kiel.en.stujo.net` is in the zone, as an **unproxied** A
-record pointing at Strato. Whatever siblings the inventory turns up
-(`en.stujo.net`, `cau.en…`, `flensburg.en…`) will be the same shape. Unproxied
-means Cloudflare passes nothing through, so after the cutover they resolve to a
-server that is gone. Doing nothing is the only option that is definitely wrong.
+The zone has five, and they split cleanly along the certificate boundary:
 
-Three options:
+| Host | Proxy today | Why |
+|---|---|---|
+| `en.stujo.net` | **Proxied** | Second level — Universal SSL covers it. |
+| `cau.en`, `fh-kiel.en`, `flensburg.en`, `haw-kiel.en` | DNS only | Third level — Universal SSL does **not** reach it. |
 
-1. **Serve them.** Proxy them and add them to `local.stujo_net_origin_hosts`;
-   `proxy.ts` then 301s `<portal>.en.stujo.net/x` → `<portal>.stujo.net/en/x`
-   and the old English URLs keep working. **Cost:** these are *third-level*
-   hosts, and Universal SSL stops at one level — the ACM certificate must cover
-   `*.en.stujo.net` or Cloudflare cannot terminate TLS for them (§2.1). Also
-   lower their TTL first: unlike the apex hosts, these are unproxied today, so
-   this change really does propagate.
-2. **Redirect at the edge.** A Cloudflare Redirect Rule instead of the origin
-   round-trip. Same ACM requirement — a Redirect Rule only runs on proxied
-   traffic — so it saves a hop, not the certificate.
-3. **Let them go.** Delete the records. Old English deep links break. Defensible
-   if the analytics say nobody uses them; check before assuming.
+That is not an oversight; it is the certificate limit, and somebody already
+hit it. Which makes the decision two decisions, not one:
 
-Option 1 is the default if `*.en.stujo.net` is already on the ACM certificate,
-since it costs nothing further. If it is not, the question is whether these
-URLs are worth a certificate change during a cutover window — usually not, in
-which case do option 3 now and option 1 later if anyone complains.
+**`en.stujo.net` — just do it.** It is already proxied, so it costs nothing:
+`09_stujo_net.tf` manages it like the other web hosts, and `proxy.ts` 301s
+`en.stujo.net/x` → `stujo.net/en/x`. Without this it would keep pointing at a
+server that no longer exists. It is in the managed set already.
+
+**`*.en.stujo.net` — needs ACM, so it needs a decision.** To proxy them,
+`*.en.stujo.net` must be on an **Advanced Certificate Manager** certificate for
+this zone (a paid add-on, and this zone is on the Free plan — §2.1). Then add
+them to `local.stujo_net_origin_hosts` and `local.stujo_net_a_records`;
+`proxy.ts` already handles them, 301ing `haw-kiel.en.stujo.net/x` →
+`haw-kiel.stujo.net/en/x`.
+
+If ACM is not already on the zone, the honest question is whether four legacy
+English portal hostnames justify buying and provisioning a certificate during
+a cutover window. Usually not. Then:
+
+- **Delete the four records** as part of the cutover. Those deep links break,
+  and they break *cleanly* (NXDOMAIN) rather than resolving to a dead server —
+  which is the better failure of the two, and the reason "leave them alone" is
+  the one option that is definitely wrong.
+- Or leave them until Strato is decommissioned (§5.1) and delete them then.
+  They point at a server that is still up but no longer serving stujo.net, so
+  visitors get whatever Strato answers — check what that is before choosing
+  this.
+
+Check the traffic before deleting anything; if the English portal URLs turn out
+to be used, ACM is cheap next to re-earning that traffic.
+
+One side effect either way: Cloudflare's "your origin IP is partially exposed"
+warning on this zone comes from exactly these DNS-only records sharing an IP
+with the proxied ones. Proxying or deleting them clears it.
 
 ### 4.7 Verify, immediately after the apply
 
@@ -799,23 +856,19 @@ sees a bare interim host and canonicalises it.
 
 ## 7. Open items — decisions or lookups needed before the window
 
-- The **complete host list** in the stujo.net zone (§2.1). A partial dashboard
-  view showed `stujo.net`, `www`, `haw-kiel`, `flensburg` (all proxied),
-  `haw-kiel.en` (DNS-only) and the M365 mail records — but not the whole zone.
-  `scripts/cloudflare_zone_inventory.sh stujo.net` produces the full list, and
-  the same run produces the Terraform import blocks (§4.1). Two specific
-  questions it answers: whether `cau.stujo.net` and `fh-kiel.stujo.net` exist
-  (`fh-kiel` is in the §1 table and in `local.stujo_net_a_records`; if it is
-  not in the zone, Terraform will create it — trim the list if that is wrong),
-  and which other `en.*` hosts there are.
+- ~~The host list in the stujo.net zone~~ — **answered: all 18 records, in
+  §2.1.** Every host in the §1 table exists and is already proxied.
 - Whether the pinned `cloudflare ~> 3.0` provider can express Origin Rules and
   Transform Rules (§4.4) — a plan answers it, and the fallback is to create
   those two rules by hand and import them later.
 - ~~Whether `stujo.net` carries existing mail~~ — **answered: yes, Microsoft
   365** (§2.2). What remains is whether `team@stujo.net` already exists as a
   mailbox or alias in that tenant, and the by-hand SPF edit.
-- Whether the `*.en.stujo.net` hosts are worth keeping, and whether the ACM
-  certificate already covers them (§4.6).
+- Whether **ACM covers `*.en.stujo.net` on this zone**, and if not, whether the
+  four third-level English hosts are worth buying it for or should be deleted
+  (§4.6). This is a Free-plan zone, so do not assume ACM from the opencampus.sh
+  one. `en.stujo.net` itself needs no decision — already proxied, already
+  handled.
 - `HAW_ORG_ID` on production (§2.6).
 - The **freeze window** and the communication texts (§2.9).
 - Whether to build `/arbeitgeber` before or after the cutover (§5.5).
