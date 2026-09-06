@@ -92,11 +92,29 @@ Turning it back off is also how the public face is handed to
    **Confirm the Advanced Certificate Manager certificate covers them all** —
    Universal SSL stops at one level, so `cau.en.stujo.net` needs
    `*.en.stujo.net` on the ACM certificate (or drop those hosts deliberately).
-2. **Mail.** The job-board templates send from `noreply@stujo.net`
-   (`publishJobPosting`, `expire_job_postings`, the claim mails). Confirm
-   Mailgun's sending records for `stujo.net` exist in the *new* zone and that
-   the domain still verifies — moving DNS providers is exactly when SPF/DKIM
-   get lost. Send one test mail before the window.
+2. **Mail — nothing to do for the cutover, but know what it does today.**
+   The job-board templates carry `from: noreply@stujo.net` and that value is
+   stored on the `MailLog` row, but `functions/sendMail` ignores it: it builds
+   `noreply@${MAILGUN_DOMAIN}` and sends through that one Mailgun domain. So
+   StuJo mail leaves under **opencampus.sh** today, exactly like course mail,
+   and the cutover does not change that — the templates' stujo.net addresses
+   are recorded, not used.
+
+   If StuJo mail should come from stujo.net — a fair thing to want once
+   partner-branded portals exist (§6) — it needs two things, and they are worth
+   deciding *before* the window because the DNS half belongs in the zone being
+   re-pointed:
+   - **Mailgun:** verify `stujo.net` (or `mg.stujo.net`) as a sending domain
+     and add its SPF, DKIM and bounce records to the stujo.net zone. Moving DNS
+     providers is exactly when such records get lost, so add them deliberately
+     rather than expecting them to survive.
+   - **Code:** `sendMail` has to honour the row's `from` *and* send through the
+     Mailgun domain that matches it. Sending a stujo.net `From` through the
+     opencampus.sh domain is worse than leaving it alone: SPF and DKIM would
+     align to opencampus.sh, Gmail would show "via opencampus.sh", and a DMARC
+     policy on stujo.net could fail the mail outright. It also needs a guard so
+     only domains we have verified are honoured. That touches the transport
+     every EduHub mail uses, so it belongs in its own change, not this one.
 3. **Lower the TTL** to 60s on every record from group 1 while they still point
    at Strato. Once a record is proxied its TTL stops mattering (Cloudflare
    answers with its own anycast address), so the fast rollback is turning the
