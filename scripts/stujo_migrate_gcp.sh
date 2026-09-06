@@ -102,14 +102,23 @@ export KEYCLOAK_USER="${KEYCLOAK_USER:-admin}"
 export GCS_BUCKET="${GCS_BUCKET:-eduhub-staging-new}"
 
 # The ETL sends the Hasura admin secret and the Keycloak admin password to
-# these two endpoints, and both are overridable from the environment — so a
-# typo'd or cleartext override would put those credentials on the wire in the
-# clear. Refuse before any secret is fetched, let alone sent.
+# these two endpoints, and both are overridable from the environment — an
+# override that is cleartext, typo'd or hostile would put those credentials on
+# someone else's wire. And this runner is invoked by pasting a command line, so
+# "the environment is trustworthy" is a weak assumption.
+#
+# Both are therefore matched against the whole URL shape rather than picked
+# apart: HTTPS, a host inside opencampus.sh, an optional port and path, and
+# nothing else. Anchoring the host this way is what rejects the tricks that
+# subtractive parsing tends to miss — https://hasura.opencampus.sh@evil.example
+# (the host is what follows the @) and https://evil.example#.opencampus.sh (the
+# rest is a fragment). Checked before any secret is fetched, let alone sent.
+ENDPOINT_PATTERN='^https://[A-Za-z0-9.-]+\.opencampus\.sh(:[0-9]+)?(/[^[:space:]]*)?$'
 for endpoint in "${HASURA_URL}" "${KEYCLOAK_URL}"; do
-  case "${endpoint}" in
-    https://*) ;;
-    *) echo "ERROR: refusing to send credentials to a non-HTTPS endpoint: ${endpoint}" >&2; exit 1 ;;
-  esac
+  printf '%s' "${endpoint}" | grep -Eq "${ENDPOINT_PATTERN}" || {
+    echo "ERROR: refusing to send credentials to ${endpoint} — endpoints must be https://<host>.opencampus.sh" >&2
+    exit 1
+  }
 done
 
 export STUJO_MYSQL_DSN="mysql://${DB_USER}:${DB_PASS}@127.0.0.1:13306/${DB_NAME}"
