@@ -2,13 +2,33 @@
 # The stujo.net zone in Cloudflare
 #####
 #
-# stujo.net is not served by our load balancer. Each host here is a PROXIED
+# stujo.net is not served by our load balancer. Each web host is a PROXIED
 # record whose Origin Rule rewrites the origin Host to the matching
 # <service>.opencampus.sh name — which is what the shared load balancer routes
 # on (url_mask) and what its certificate already covers. A Host override in an
 # Origin Rule sets the SNI to the same value, so the zone stays on Full
 # (strict). The visitor's address bar keeps saying stujo.net, because a proxy
 # is not a redirect. See docs/STUJO_PROD_CUTOVER.md §4.
+#
+# ── The zone is ALREADY proxied ─────────────────────────────────────────────
+#
+# stujo.net, www and the portal hosts are orange-cloud today, pointing at the
+# old Strato server. That makes this cutover unusually cheap: the public DNS
+# answer is already Cloudflare's anycast address and does not change at all.
+# Only the ORIGIN behind the proxy moves, which takes effect at once and is
+# invisible to resolver caches.
+#
+# Two consequences for how this file is written:
+#
+#   * The records stay A records pointing at the load balancer IP, rather than
+#     becoming CNAMEs to <service>.opencampus.sh. Same destination either way
+#     (the Origin Rule, not the record, decides the origin Host), but changing
+#     a record's TYPE can force Terraform to destroy and recreate it, and a
+#     recreate is the one thing that would put a gap in a name that currently
+#     resolves. An A -> A value change is an in-place update.
+#   * www.stujo.net is left as the CNAME to the apex that it already is. Its
+#     Host header is still www.stujo.net, so it still needs an Origin Rule —
+#     but it needs no DNS change at all.
 #
 # ── proxied = true here, and that is NOT a contradiction of 02_network.tf ────
 #
@@ -20,14 +40,14 @@
 # either rule across: never proxy an opencampus.sh record, never unproxy one
 # here.
 #
-# ── Adopting a zone that already exists ─────────────────────────────────────
+# ── The zone carries mail, and none of it is managed here ───────────────────
 #
-# The zone predates this file and its records still point at the old platform.
-# Terraform is not authoritative over a Cloudflare zone: it only knows what is
-# declared here, so applying this touches nothing else in the zone. The records
-# below are meant to be IMPORTED rather than created — importing turns the
-# cutover into an in-place update with no window where the name does not
-# resolve. scripts/cloudflare_zone_inventory.sh generates the import blocks.
+# stujo.net is a Microsoft 365 mail domain: autodiscover, the selector1/
+# selector2 DKIM CNAMEs, its MX and its SPF all live in this zone and are
+# deliberately absent from this file. Terraform is not authoritative over a
+# Cloudflare zone — it only knows what is declared — so applying this cannot
+# touch them. Adding Mailgun for team@stujo.net means EDITING the existing SPF
+# record, not adding a second one (§2.2).
 ###############################################################################
 
 locals {
@@ -36,45 +56,70 @@ locals {
   # that is not theirs.
   stujo_net_enabled = var.stujo_net_zone_id != ""
 
-  # Visitor host -> the origin host its traffic must arrive at. The value is
-  # both the CNAME target and the Host header the Origin Rule sets, so the two
-  # can never drift apart.
+  # Visitor host -> the origin host its traffic must arrive at. This drives the
+  # Origin Rules, and every host that must be SERVED needs an entry here —
+  # including www, whose DNS record this file does not manage.
   #
-  # The en.* legacy locale hosts are deliberately absent: proxy.ts 301s them,
-  # but they only need records here if the zone inventory (§2.1) shows them
-  # still in use. Add them to this map if it does.
-  stujo_net_hosts = local.stujo_net_enabled ? {
-    "stujo.net"             = local.stujo_domain
-    "www.stujo.net"         = local.stujo_domain
-    "cau.stujo.net"         = local.stujo_portals["stujo-cau"].domain
-    "haw-kiel.stujo.net"    = local.stujo_portals["stujo-haw-kiel"].domain
-    "fh-kiel.stujo.net"     = local.stujo_portals["stujo-haw-kiel"].domain
-    "flensburg.stujo.net"   = local.stujo_portals["stujo-flensburg"].domain
+  # The en.* legacy locale hosts are absent on purpose. They exist in the zone
+  # but are DNS-only today, and proxying a third-level host needs the ACM
+  # certificate to cover *.en.stujo.net (§2.1). Decide that first; see §4.6.
+  stujo_net_origin_hosts = local.stujo_net_enabled ? {
+    "stujo.net"           = local.stujo_domain
+    "www.stujo.net"       = local.stujo_domain
+    "cau.stujo.net"       = local.stujo_portals["stujo-cau"].domain
+    "haw-kiel.stujo.net"  = local.stujo_portals["stujo-haw-kiel"].domain
+    "fh-kiel.stujo.net"   = local.stujo_portals["stujo-haw-kiel"].domain
+    "flensburg.stujo.net" = local.stujo_portals["stujo-flensburg"].domain
   } : {}
+
+  # The A records this file manages: every served host except www, which is a
+  # CNAME to the apex and follows it. Trim this to what the zone inventory
+  # actually contains — a host listed here but absent from the zone is CREATED,
+  # which is right for a host that should exist and wrong for a typo.
+  stujo_net_a_records = local.stujo_net_enabled ? toset([
+    "stujo.net",
+    "cau.stujo.net",
+    "haw-kiel.stujo.net",
+    "fh-kiel.stujo.net",
+    "flensburg.stujo.net",
+  ]) : toset([])
 
   # One Origin Rule per distinct origin, matching every visitor host that maps
   # to it — four rules rather than six.
   stujo_net_origins = local.stujo_net_enabled ? {
-    for origin in distinct(values(local.stujo_net_hosts)) : origin => [
-      for host, target in local.stujo_net_hosts : host if target == origin
+    for origin in distinct(values(local.stujo_net_origin_hosts)) : origin => [
+      for host, target in local.stujo_net_origin_hosts : host if target == origin
     ]
   } : {}
 }
 
-# The records themselves. Proxied, so Cloudflare terminates TLS for the visitor
-# and the Origin Rule below decides what the origin sees. A CNAME at the apex
-# is fine: Cloudflare flattens it.
+# The web hosts. Already proxied and already A records; this changes only where
+# they point. Import them (§4.3) so that stays an in-place update.
 resource "cloudflare_record" "stujo_net" {
-  for_each = local.stujo_net_hosts
+  for_each = local.stujo_net_a_records
 
   zone_id = var.stujo_net_zone_id
-  name    = each.key
-  type    = "CNAME"
-  value   = each.value
+  name    = each.value
+  type    = "A"
+  value   = module.lb-http.external_ip
   proxied = true
   # Proxied records must carry the automatic TTL; Cloudflare rejects anything
   # else, and pinning it stops a dashboard edit from drifting.
   ttl = 1
+}
+
+# www follows the apex, so it needs no change when the apex moves. Declared
+# anyway, at its current value, so that Terraform owns it and a later edit
+# cannot quietly point it somewhere else.
+resource "cloudflare_record" "stujo_net_www" {
+  count = local.stujo_net_enabled ? 1 : 0
+
+  zone_id = var.stujo_net_zone_id
+  name    = "www.stujo.net"
+  type    = "CNAME"
+  value   = "stujo.net"
+  proxied = true
+  ttl     = 1
 }
 
 # Origin Rules: rewrite the origin Host (and with it the SNI) to the name the
@@ -136,6 +181,11 @@ resource "cloudflare_ruleset" "stujo_net_original_host" {
 # Full (strict) holds because the Origin Rule sets the SNI to a name the
 # origin certificate covers. Strict is also what makes a misconfigured host
 # fail loudly instead of quietly serving from the wrong origin.
+#
+# Check the zone's CURRENT mode before applying: it is proxied today with a
+# Strato origin, so it may well be on Flexible or Full. Moving to strict is
+# correct for the new origin and wrong for the old one — so this applies in the
+# same change that repoints the records, not before it.
 resource "cloudflare_zone_settings_override" "stujo_net" {
   count = local.stujo_net_enabled ? 1 : 0
 

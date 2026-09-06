@@ -114,11 +114,16 @@ import json, sys
 
 records, zone_id, path = json.load(open(sys.argv[1])), sys.argv[2], sys.argv[3]
 
-# Must match local.stujo_net_hosts in infrastructure/application/09_stujo_net.tf.
-declared = [
-    "stujo.net", "www.stujo.net", "cau.stujo.net",
-    "haw-kiel.stujo.net", "fh-kiel.stujo.net", "flensburg.stujo.net",
-]
+# Must match the resources in infrastructure/application/09_stujo_net.tf.
+# www is its own resource because it stays a CNAME to the apex.
+declared = {
+    "stujo.net":           'cloudflare_record.stujo_net["stujo.net"]',
+    "cau.stujo.net":       'cloudflare_record.stujo_net["cau.stujo.net"]',
+    "haw-kiel.stujo.net":  'cloudflare_record.stujo_net["haw-kiel.stujo.net"]',
+    "fh-kiel.stujo.net":   'cloudflare_record.stujo_net["fh-kiel.stujo.net"]',
+    "flensburg.stujo.net": 'cloudflare_record.stujo_net["flensburg.stujo.net"]',
+    "www.stujo.net":       "cloudflare_record.stujo_net_www[0]",
+}
 
 by_name = {}
 for r in records:
@@ -131,7 +136,7 @@ lines = [
     "",
 ]
 missing, ambiguous = [], []
-for host in declared:
+for host, address in declared.items():
     found = by_name.get(host, [])
     if not found:
         missing.append(host)
@@ -141,7 +146,7 @@ for host in declared:
         continue
     lines += [
         "import {",
-        f'  to = cloudflare_record.stujo_net["{host}"]',
+        f"  to = {address}",
         f'  id = "{zone_id}/{found[0]["id"]}"',
         "}",
         "",
@@ -149,6 +154,22 @@ for host in declared:
 
 open(path, "w").write("\n".join(lines))
 print(f"import blocks -> {path}", file=sys.stderr)
+
+# The two groups most easily lost in a zone move, called out by name rather
+# than left for someone to spot in a 40-line table.
+mail = [r for r in records if r["type"] in ("MX", "TXT")
+        or "_domainkey" in r["name"] or r["name"].startswith("autodiscover.")
+        or r["name"].startswith("_dmarc.")]
+if mail:
+    print("\n  MAIL and verification records — NOT imported, decide per §4.2:", file=sys.stderr)
+    for r in sorted(mail, key=lambda r: (r["type"], r["name"])):
+        print(f"    {r['type']:6} {r['name']}", file=sys.stderr)
+
+legacy = [r for r in records if ".en." in r["name"] or r["name"].startswith("en.")]
+if legacy:
+    print("\n  Legacy en.* locale hosts — see §4.6 before proxying them:", file=sys.stderr)
+    for r in sorted(legacy, key=lambda r: r["name"]):
+        print(f"    {r['type']:6} {r['name']}  proxied={r.get('proxied')}", file=sys.stderr)
 if missing:
     print("\n  NOT in the zone (Terraform will CREATE these, which is fine for a", file=sys.stderr)
     print("  host that never existed — but check it is not a typo):", file=sys.stderr)

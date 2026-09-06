@@ -142,12 +142,31 @@ Turning it back off is also how the public face is handed to
    | `email.stujo.net` | CNAME | open/click tracking + bounce handling | **yes — DNS-only, see d** |
    | `stujo.net` MX ×2 | MX | receiving mail *at Mailgun* | **no — see e** |
 
-   **c. SPF: merge, never add a second record.** A domain may publish exactly
-   one SPF TXT record; two is a `permerror` and every receiver treats the
-   result as unauthenticated. If `stujo.net` already has an SPF record (check
-   the zone export from step 1), add Mailgun's `include:` into the existing
-   record rather than creating another, keeping the single trailing `all`
-   mechanism at the end.
+   **c. SPF: EDIT the existing record. Do not add a second one.** This is not
+   a hypothetical here — the zone already publishes SPF, because **stujo.net is
+   a live Microsoft 365 mail domain**: it has `autodiscover.stujo.net →
+   autodiscover.outlook.com` and the `selector1`/`selector2._domainkey` CNAMEs
+   that are M365's DKIM. A domain may publish exactly one SPF TXT record; two
+   is a `permerror` and every receiver treats the result as unauthenticated —
+   so adding Mailgun's include as a new record would break the mail that
+   already works, not just the mail you are adding.
+
+   Take the existing record, insert Mailgun's `include:` before the trailing
+   `all` mechanism, and leave everything else alone:
+
+   ```
+   before: v=spf1 include:spf.protection.outlook.com -all
+   after:  v=spf1 include:spf.protection.outlook.com include:<mailgun>.mailgun.org -all
+   ```
+
+   (Copy Mailgun's exact include from its panel; the EU region's differs.)
+   Watch the ten-DNS-lookup SPF limit: two `include:`s is well inside it, but
+   it is the reason not to keep piling them on.
+
+   **c2. DKIM will not collide, and M365 is why to check.** M365 owns
+   `selector1` and `selector2`; Mailgun publishes under its own selector, so
+   the two coexist. Confirm the selector Mailgun gives you is neither of those
+   before adding it.
 
    **d. The tracking CNAME must be DNS-only (grey cloud).** Cloudflare proxies
    a CNAME by default, which answers with Cloudflare's own addresses and
@@ -156,19 +175,22 @@ Turning it back off is also how the public face is handed to
    no such care.
 
    **e. Do NOT add Mailgun's MX records.** Those hand *inbound* mail for
-   `stujo.net` to Mailgun. `team@stujo.net` has to arrive in a mailbox a person
-   reads — these mails invite replies — so the zone's MX must point at whatever
-   hosts that mailbox. This is the one cost of choosing the apex over
-   `mg.stujo.net`, and it is only a cost if you forget: sending verification
-   needs the two TXT records, not the MX. Decide where `team@stujo.net` is
-   hosted, and carry its MX (and its own SPF include, per c) into the
-   Cloudflare zone with everything else in step 1.
+   `stujo.net` to Mailgun — and stujo.net's inbound mail already belongs to
+   Microsoft 365. Adding them would take delivery away from the tenant that
+   holds the mailboxes. Sending verification needs the two TXT records, not the
+   MX; leave the MX exactly as it is.
 
-   **f. DMARC.** If the zone has no `_dmarc.stujo.net` record, add one — start
-   at `p=none` with a `rua=` address so you see the reports before enforcing
-   anything. Its `adkim`/`aspf` tags do not constrain the choice above: the
-   apex signs as `d=stujo.net` for a `From` on `stujo.net`, which aligns under
-   strict and relaxed alike.
+   The upside of the zone already being on M365: **`team@stujo.net` may exist
+   already, or is one mailbox/alias away in the M365 admin centre** rather than
+   a new mail setup. Check before building anything — it is the last thing
+   §2.2 needs, and these mails invite replies.
+
+   **f. DMARC.** A domain sending through M365 usually already has
+   `_dmarc.stujo.net`; check the inventory. If it does, leave the policy alone
+   — adding Mailgun as a second authorised sender does not require loosening
+   it, because the apex signs as `d=stujo.net` for a `From` on `stujo.net` and
+   so aligns under strict and relaxed alike. If it does not, add one at
+   `p=none` with a `rua=` address and read the reports before enforcing.
 
    **g. Set `mailgun_additional_domains = ["stujo.net"]`** in the Terraform
    workspace and apply.
@@ -199,10 +221,16 @@ Turning it back off is also how the public face is handed to
    or the other way round — and merging the code on its own is a no-op for
    mail.
 
-3. **Lower the TTL** to 60s on every record from group 1 while they still point
-   at Strato. Once a record is proxied its TTL stops mattering (Cloudflare
-   answers with its own anycast address), so the fast rollback is turning the
-   proxy off — but the low TTL is what makes *that* fast in turn.
+3. **TTLs — largely already handled.** The web hosts are **already proxied**,
+   so their public answer is Cloudflare's anycast address and their TTL is
+   irrelevant: repointing them changes only the origin behind the proxy, which
+   takes effect at once and is invisible to resolver caches. There is no DNS
+   propagation step in this cutover and no window to wait out.
+
+   That leaves TTLs to think about only for records you might switch to
+   **DNS-only** in a rollback, and for the mail records if they are ever
+   touched. If a host is unproxied today and you intend to proxy it (the `en.*`
+   locale hosts, §4.6), lower its TTL first — that one *does* propagate.
 4. **Keycloak — production realm `edu-hub`, client `hasura`.** Without this,
    login on the new domain fails at the callback, and it is the one step no
    Terraform in this repo performs. All four StuJo portals use the *same*
@@ -471,8 +499,14 @@ Rules that rewrite the origin `Host`, the Transform Rule that passes
 
 ### 4.1 The zone already exists — adopt it, do not rebuild it
 
-The zone predates Terraform and its records point at the old platform. Two
-facts shape everything below:
+The zone predates Terraform and its records point at the old platform —
+**already proxied**, at a single Strato address. That last detail is the best
+news in this plan: the visitor-facing DNS answer is Cloudflare's anycast
+address today and stays Cloudflare's anycast address afterwards. Nothing
+propagates, nothing is cached against you, and the change is confined to which
+origin Cloudflare talks to.
+
+Three facts shape everything below:
 
 - **Terraform is not authoritative over a Cloudflare zone.** It knows only what
   is declared. Applying `09_stujo_net.tf` cannot delete, touch or even notice a
@@ -480,10 +514,18 @@ facts shape everything below:
   zone's mail records. The flip side is that nothing is cleaned up for you
   either.
 - **A record that is imported and then changed never stops resolving.** One
-  that is deleted and recreated leaves a gap in which the name does not exist —
-  and NXDOMAIN is negatively cached, so the gap can outlast the TTL you
-  carefully lowered in §2.3. This is the whole reason to import rather than
-  recreate.
+  that is deleted and recreated leaves a gap in which the name does not exist,
+  and NXDOMAIN is negatively cached. This is the whole reason to import rather
+  than recreate — and the reason `09_stujo_net.tf` keeps the web hosts as **A
+  records pointing at the load balancer IP** instead of turning them into
+  CNAMEs: changing a record's *type* can force a destroy-and-create, which is
+  exactly the gap importing exists to avoid. The Origin Rule decides the origin
+  Host either way, so the record type buys nothing.
+- **The zone is a live Microsoft 365 mail domain.** `autodiscover`, the
+  `selector1`/`selector2._domainkey` CNAMEs, the MX and the SPF record all
+  belong to mail that works today and must keep working. None of them is
+  declared in `09_stujo_net.tf`, so no apply can touch them — but see §2.2 for
+  the one that must be *edited by hand* when Mailgun is added.
 
 So the question is not "delete or import?" but "which of these records should
 Terraform own?", answered per record. Get the list first:
@@ -501,12 +543,15 @@ no new credential, as long as stujo.net sits in the same Cloudflare account.
 
 ### 4.2 Sort every record into one of four buckets
 
-| Bucket | Records | What to do |
+| Bucket | Records seen in the zone | What to do |
 |---|---|---|
-| **Repoint** | the web hosts: `stujo.net`, `www`, `cau`, `haw-kiel`, `fh-kiel`, `flensburg` | **Import.** They are declared in `09_stujo_net.tf`; importing makes the cutover an in-place update. |
-| **Adopt unchanged** | `MX`, SPF, DKIM, DMARC, domain-verification `TXT` | **Import and declare with their current values**, so the plan shows no change. Now they are in code and cannot be lost in a later edit — which is precisely the §2.2 failure mode. Legitimate to skip; then say so in a comment, so the next person knows the zone is only half-managed. |
-| **Obsolete** | anything serving a Strato-only feature that dies with the old platform | **Leave for now.** Delete them *after* the cutover has settled — either by hand, or by importing and then removing the declaration in a later PR, which leaves an audit trail. Do not do this during the window: every extra change is another thing that can go wrong. |
+| **Repoint** | `stujo.net`, `cau`, `haw-kiel`, `flensburg` (A, proxied) and `www` (CNAME → apex, proxied) | **Import.** Declared in `09_stujo_net.tf`; importing makes the cutover an in-place `value` change. `www` needs no change at all — it follows the apex — but is declared so Terraform owns it. |
+| **Leave to Microsoft 365** | `MX`, the SPF `TXT`, `selector1`/`selector2._domainkey`, `autodiscover` | **Do not import, do not declare.** This is working mail. Terraform cannot touch what it does not declare, so leaving them out is the *safe* option, not the lazy one. The one exception is the SPF record, which must be **edited by hand** to add Mailgun's include (§2.2 c) — editing it in the dashboard and leaving it unmanaged is fine and is what this plan assumes. |
+| **Legacy `en.*`** | `haw-kiel.en.stujo.net` (A, **DNS-only**) and any siblings | **Decide — see §4.6.** They point at Strato and are not proxied, so after the cutover they resolve to a dead server. Doing nothing is the one option that is actually wrong. |
 | **Unexplained** | anything nobody recognises | **Leave alone** until somebody can say what it is for. Adopting a record you cannot explain is how a zone loses one it needed. |
+
+The generator emits blocks only for the first row. The rest it prints as a
+list, so the decision is made rather than defaulted.
 
 The generator only emits blocks for the first bucket. The second is a decision,
 so it asks you to make it rather than making it for you.
@@ -572,12 +617,33 @@ There is no conflict: these are different zones, and no stujo.net host is on
 that certificate. But the two rules must not be swapped by someone tidying up
 later. Never proxy an opencampus.sh record; never unproxy a stujo.net one.
 
-### 4.6 Optional: the legacy locale hosts
+### 4.6 The legacy `en.*` hosts — a decision, not an optional extra
 
-`en.stujo.net` and `<portal>.en.stujo.net` are handled by `proxy.ts`, which
-301s them to the path-based locale. They only need records here if the
-inventory shows them still in use — add them to `local.stujo_net_hosts` if so.
-A Cloudflare Redirect Rule would save an origin round-trip but is not required.
+They exist: `haw-kiel.en.stujo.net` is in the zone, as an **unproxied** A
+record pointing at Strato. Whatever siblings the inventory turns up
+(`en.stujo.net`, `cau.en…`, `flensburg.en…`) will be the same shape. Unproxied
+means Cloudflare passes nothing through, so after the cutover they resolve to a
+server that is gone. Doing nothing is the only option that is definitely wrong.
+
+Three options:
+
+1. **Serve them.** Proxy them and add them to `local.stujo_net_origin_hosts`;
+   `proxy.ts` then 301s `<portal>.en.stujo.net/x` → `<portal>.stujo.net/en/x`
+   and the old English URLs keep working. **Cost:** these are *third-level*
+   hosts, and Universal SSL stops at one level — the ACM certificate must cover
+   `*.en.stujo.net` or Cloudflare cannot terminate TLS for them (§2.1). Also
+   lower their TTL first: unlike the apex hosts, these are unproxied today, so
+   this change really does propagate.
+2. **Redirect at the edge.** A Cloudflare Redirect Rule instead of the origin
+   round-trip. Same ACM requirement — a Redirect Rule only runs on proxied
+   traffic — so it saves a hop, not the certificate.
+3. **Let them go.** Delete the records. Old English deep links break. Defensible
+   if the analytics say nobody uses them; check before assuming.
+
+Option 1 is the default if `*.en.stujo.net` is already on the ACM certificate,
+since it costs nothing further. If it is not, the question is whether these
+URLs are worth a certificate change during a cutover window — usually not, in
+which case do option 3 now and option 1 later if anyone complains.
 
 ### 4.7 Verify, immediately after the apply
 
@@ -631,8 +697,9 @@ At this point stujo.net serves the new app and Rails is only reachable by IP.
 
 | Situation | Action |
 |---|---|
-| A host misbehaves | Fastest: turn its proxy off in the dashboard and point the record back at Strato. Terraform will show the drift on the next plan — reconcile it deliberately afterwards rather than letting an apply silently undo an emergency fix. The reviewed version of the same rollback is to revert the record in `09_stujo_net.tf` and apply. |
+| A host misbehaves | Point the record back at `81.169.132.172` (the Strato address it holds today). Leave the proxy **on** — it was on before this cutover, so turning it off is a second change, not a rollback. The origin swaps back at once, with nothing to propagate. Terraform will show the drift on the next plan; reconcile it deliberately rather than letting an apply silently undo an emergency fix. The reviewed form of the same rollback is to revert the value in `09_stujo_net.tf` and apply. |
 | Redirect loop or wrong host in redirects | Check the `X-Original-Host` ruleset is present and firing; failing that, set `stujo_net_canonical = false` and apply — the 301s stop while stujo.net keeps serving. |
+| TLS errors right after the apply | Check the zone's SSL mode. The `strict` setting applies in the same change as the repoint; if it was on Flexible for the Strato origin, and something about the new origin is off, strict is what surfaces it. Do not "fix" it by dropping to Flexible — that would have Cloudflare talk plaintext to the origin. Fix the Origin Rule instead. |
 | The app itself is the problem | Roll back the Cloud Run revision as usual; the domain setup is independent of it. |
 
 A dashboard rollback beats a correct one during an incident. But write down
@@ -732,16 +799,23 @@ sees a bare interim host and canonicalises it.
 
 ## 7. Open items — decisions or lookups needed before the window
 
-- The **actual host list** in the stujo.net zone (§2.1), including whether the
-  `en.*` locale hosts and `fh-kiel.stujo.net` are still in use.
-  `scripts/cloudflare_zone_inventory.sh stujo.net` produces it, and the same
-  run produces the Terraform import blocks (§4.1).
+- The **complete host list** in the stujo.net zone (§2.1). A partial dashboard
+  view showed `stujo.net`, `www`, `haw-kiel`, `flensburg` (all proxied),
+  `haw-kiel.en` (DNS-only) and the M365 mail records — but not the whole zone.
+  `scripts/cloudflare_zone_inventory.sh stujo.net` produces the full list, and
+  the same run produces the Terraform import blocks (§4.1). Two specific
+  questions it answers: whether `cau.stujo.net` and `fh-kiel.stujo.net` exist
+  (`fh-kiel` is in the §1 table and in `local.stujo_net_a_records`; if it is
+  not in the zone, Terraform will create it — trim the list if that is wrong),
+  and which other `en.*` hosts there are.
 - Whether the pinned `cloudflare ~> 3.0` provider can express Origin Rules and
   Transform Rules (§4.4) — a plan answers it, and the fallback is to create
   those two rules by hand and import them later.
-- Whether `stujo.net` carries **existing mail** that must survive the move
-  (§2.2), and a mailbox for `team@stujo.net` that someone reads — these mails
-  invite replies.
+- ~~Whether `stujo.net` carries existing mail~~ — **answered: yes, Microsoft
+  365** (§2.2). What remains is whether `team@stujo.net` already exists as a
+  mailbox or alias in that tenant, and the by-hand SPF edit.
+- Whether the `*.en.stujo.net` hosts are worth keeping, and whether the ACM
+  certificate already covers them (§4.6).
 - `HAW_ORG_ID` on production (§2.6).
 - The **freeze window** and the communication texts (§2.9).
 - Whether to build `/arbeitgeber` before or after the cutover (§5.5).
