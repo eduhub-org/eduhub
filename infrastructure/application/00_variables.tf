@@ -322,18 +322,21 @@ variable "mailgun_additional_domains" {
     Further verified Mailgun sending domains, beyond mailgun_domain.
 
     A mail carries its own sender (MailTemplate.from), and functions/sendMail
-    sends it through the domain here that can legitimately sign for it — the
-    sender's own domain, or a subdomain of it. That is what lets the job board
-    send as team@stujo.net while everything else sends as opencampus.sh.
+    sends it through the domain here that can legitimately sign for it. That is
+    what lets the job board send as team@stujo.net while everything else keeps
+    sending as it does today.
+
+    The match is EXACT: a mail is sent as its own address only when that
+    address's domain is listed here (or is mailgun_domain). For StuJo that
+    means the apex, "stujo.net" — "mg.stujo.net" would NOT be accepted for a
+    team@stujo.net sender. The rule is strict on purpose: mailgun_domain is
+    edu.opencampus.sh, a subdomain of the opencampus.sh that every existing
+    template sends as, so a looser match would change the From on every EduHub
+    mail. See docs/STUJO_PROD_CUTOVER.md §2.2.
 
     Leave empty until the domain is verified in Mailgun and its DNS records are
-    published, since a mail whose sender no entry covers falls back to a
-    mailgun_domain sender instead.
-
-    For StuJo this is the apex, "stujo.net": it signs as d=stujo.net, so it
-    aligns with a team@stujo.net sender under strict DMARC alignment as well as
-    relaxed. A subdomain ("mg.stujo.net") is accepted too, but aligns only
-    under relaxed adkim/aspf. See docs/STUJO_PROD_CUTOVER.md §2.2.
+    published: a mail whose sender no entry covers falls back to a
+    mailgun_domain sender, which is exactly today's behaviour.
   EOT
   type        = list(string)
   default     = []

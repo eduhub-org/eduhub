@@ -99,15 +99,23 @@ Turning it back off is also how the public face is handed to
    mailbox, because the organization-access mail asks people to reply to it.
 
    What remains is the Mailgun and DNS half, and it belongs in this window
-   because the records go in the zone being re-pointed. **Decided: verify the
-   apex `stujo.net`, not an `mg.` subdomain.** The only reason to prefer a
-   subdomain is keeping the apex free for a zone's other mail, and this zone
-   carries little beyond `team@stujo.net`; the apex also signs as `d=stujo.net`
-   and so aligns under **strict** DMARC alignment as well as relaxed, whatever
-   the zone publishes now or grows into later. (`sendMail` accepts a subdomain
-   too — a configured domain may be the sender's own domain *or* a subdomain of
-   it — but that shape aligns only under relaxed `adkim`/`aspf`. Worth knowing
-   if a partner domain later wants it; not what we are doing here.)
+   because the records go in the zone being re-pointed. **Verify the apex
+   `stujo.net`. A subdomain will not work** — `sendMail` matches a sender
+   against the configured Mailgun domains **exactly**, so `mg.stujo.net` would
+   not be accepted for a `team@stujo.net` sender and those mails would keep
+   falling back to the opencampus.sh domain.
+
+   That rule is deliberately strict, and the reason is this deployment's own
+   `mailgun_domain`: **`edu.opencampus.sh`**, which is a *subdomain* of the
+   `opencampus.sh` that every existing mail template sends as. A rule that also
+   accepted a configured subdomain of the sender's domain would therefore have
+   changed the visible `From` on **every EduHub mail** from
+   `noreply@edu.opencampus.sh` to `noreply@opencampus.sh` — and left it
+   dependent on `opencampus.sh` publishing relaxed DMARC alignment. Exact
+   matching keeps every existing mail exactly as it is and changes only the
+   domains actually configured for. It also means `d=` always equals the `From`
+   domain, so StuJo mail aligns under strict alignment as well as relaxed,
+   whatever the stujo.net zone publishes now or grows into later.
 
    **a. Add the domain in Mailgun — in the EU region.** This account sends
    through `https://api.eu.mailgun.net` (`functions/sendMail/index.js`), so the
@@ -153,8 +161,9 @@ Turning it back off is also how the public face is handed to
 
    **f. DMARC.** If the zone has no `_dmarc.stujo.net` record, add one — start
    at `p=none` with a `rua=` address so you see the reports before enforcing
-   anything. If it already has one, read its `adkim`/`aspf` tags; the apex
-   aligns under either setting, which is why it was chosen.
+   anything. Its `adkim`/`aspf` tags do not constrain the choice above: the
+   apex signs as `d=stujo.net` for a `From` on `stujo.net`, which aligns under
+   strict and relaxed alike.
 
    **g. Set `mailgun_additional_domains = ["stujo.net"]`** in the Terraform
    workspace and apply.
@@ -171,15 +180,19 @@ Turning it back off is also how the public face is handed to
    ```
 
    A `d=` of anything but `stujo.net`, or the mail arriving from
-   `noreply@opencampus.sh`, means the switch did not take — check the function
-   logs for the `Sender not covered by a configured Mailgun domain` line, which
-   names the address it wanted.
+   `noreply@edu.opencampus.sh`, means the switch did not take — check the
+   function logs for the `Sender not covered by a configured Mailgun domain`
+   line, which names the address it wanted. That line is logged once per
+   distinct sender per instance, not once per mail, so expect to see it for
+   `noreply@opencampus.sh` regardless: those templates name a domain this
+   deployment does not send through, which is the pre-existing state, not a
+   fault.
 
-   Until step g, nothing breaks: a sender no configured domain covers falls
-   back to `noreply@${MAILGUN_DOMAIN}`, so the mail still goes out under
-   opencampus.sh rather than as a misaligned `From` that a DMARC policy on
-   stujo.net would reject. The order is therefore free — deploy first and
-   verify later, or the other way round.
+   Until step g, nothing changes at all: a sender no configured domain covers
+   falls back to `noreply@${MAILGUN_DOMAIN}`, which is exactly what every mail
+   sends as today. The order is therefore free — deploy first and verify later,
+   or the other way round — and merging the code on its own is a no-op for
+   mail.
 
 3. **Lower the TTL** to 60s on every record from group 1 while they still point
    at Strato. Once a record is proxied its TTL stops mattering (Cloudflare

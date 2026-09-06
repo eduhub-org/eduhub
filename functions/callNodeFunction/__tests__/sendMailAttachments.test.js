@@ -162,8 +162,11 @@ describe('resolveSender', () => {
   beforeEach(() => {
     previous.domain = process.env.MAILGUN_DOMAIN;
     previous.additional = process.env.MAILGUN_ADDITIONAL_DOMAINS;
-    process.env.MAILGUN_DOMAIN = 'opencampus.sh';
-    process.env.MAILGUN_ADDITIONAL_DOMAINS = 'mg.stujo.net';
+    // The real production value: a SUBDOMAIN of the domain every existing
+    // opencampus.sh template sends as. That relationship is what makes the
+    // exact-match rule below load-bearing rather than a detail.
+    process.env.MAILGUN_DOMAIN = 'edu.opencampus.sh';
+    process.env.MAILGUN_ADDITIONAL_DOMAINS = 'stujo.net';
   });
 
   afterEach(() => {
@@ -173,35 +176,49 @@ describe('resolveSender', () => {
     }
   });
 
-  it('sends a StuJo mail as itself, through the domain that can sign for it', () => {
-    // mg.stujo.net is a subdomain of the sender's domain, so DKIM aligns.
+  it('sends a StuJo mail as itself once its domain is configured', () => {
     expect(resolveSender('team@stujo.net')).toEqual({
       from: 'team@stujo.net',
-      domain: 'mg.stujo.net',
+      domain: 'stujo.net',
       aligned: true,
     });
   });
 
-  it('keeps the default domain for an opencampus.sh sender', () => {
+  it('leaves existing opencampus.sh mail exactly as it was', () => {
+    // The regression this guards: MAILGUN_DOMAIN is edu.opencampus.sh, so a
+    // rule that also accepted a configured SUBDOMAIN of the sender's domain
+    // would start sending every EduHub mail as noreply@opencampus.sh —
+    // a change to every mail the platform sends, riding on opencampus.sh
+    // having relaxed DMARC alignment.
     expect(resolveSender('noreply@opencampus.sh')).toEqual({
-      from: 'noreply@opencampus.sh',
-      domain: 'opencampus.sh',
+      from: 'noreply@edu.opencampus.sh',
+      domain: 'edu.opencampus.sh',
+      aligned: false,
+    });
+  });
+
+  it('sends as the default domain when that is the sender too', () => {
+    expect(resolveSender('noreply@edu.opencampus.sh')).toEqual({
+      from: 'noreply@edu.opencampus.sh',
+      domain: 'edu.opencampus.sh',
       aligned: true,
     });
   });
 
-  it('prefers an exactly matching domain over a subdomain of it', () => {
-    process.env.MAILGUN_ADDITIONAL_DOMAINS = 'mg.stujo.net,stujo.net';
-    expect(resolveSender('team@stujo.net').domain).toBe('stujo.net');
+  it('does not accept a configured subdomain of the sender', () => {
+    // mg.stujo.net would align under relaxed DMARC only, so it fails safe and
+    // visibly instead of sending a From this deployment cannot strictly sign.
+    process.env.MAILGUN_ADDITIONAL_DOMAINS = 'mg.stujo.net';
+    expect(resolveSender('team@stujo.net').aligned).toBe(false);
   });
 
-  it('replaces a sender no configured domain covers rather than sending it unaligned', () => {
-    // The state before stujo.net is verified in Mailgun: the mail still goes
-    // out, just under the domain that can actually sign for it.
+  it('falls back for a sender no configured domain covers', () => {
+    // Also the state before stujo.net is verified in Mailgun: the mail still
+    // goes out, under the domain that can actually sign for it.
     process.env.MAILGUN_ADDITIONAL_DOMAINS = '';
     expect(resolveSender('team@stujo.net')).toEqual({
-      from: 'noreply@opencampus.sh',
-      domain: 'opencampus.sh',
+      from: 'noreply@edu.opencampus.sh',
+      domain: 'edu.opencampus.sh',
       aligned: false,
     });
     expect(resolveSender('x@evil.example').aligned).toBe(false);
@@ -221,18 +238,18 @@ describe('resolveSender', () => {
       undefined,
     ]) {
       expect(resolveSender(value)).toEqual({
-        from: 'noreply@opencampus.sh',
-        domain: 'opencampus.sh',
+        from: 'noreply@edu.opencampus.sh',
+        domain: 'edu.opencampus.sh',
         aligned: false,
       });
     }
   });
 
   it('ignores blank entries and casing in the configured list', () => {
-    process.env.MAILGUN_ADDITIONAL_DOMAINS = ' , MG.STUJO.NET , ';
+    process.env.MAILGUN_ADDITIONAL_DOMAINS = ' , STUJO.NET , ';
     expect(resolveSender('team@stujo.net')).toEqual({
       from: 'team@stujo.net',
-      domain: 'mg.stujo.net',
+      domain: 'stujo.net',
       aligned: true,
     });
   });

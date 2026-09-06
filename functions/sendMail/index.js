@@ -47,18 +47,25 @@ function configuredDomains() {
  * be chosen independently: a From of team@stujo.net signed by opencampus.sh is
  * unaligned, and any DMARC policy on stujo.net will reject or quarantine it.
  *
- * So the domain is derived FROM the sender: the configured Mailgun domain that
- * is either the sender's own domain or a subdomain of it. The subdomain case
- * (mg.stujo.net signing for team@stujo.net) aligns on the organizational
- * domain, which DMARC compares only under RELAXED alignment — the default, but
- * a zone publishing adkim=s or aspf=s would fail such a mail, and nothing here
- * can see that record. Configure the sending domain accordingly: with strict
- * alignment, verify the apex rather than a subdomain (docs/STUJO_PROD_CUTOVER.md
- * §2.2).
+ * So the domain is derived FROM the sender, and the match is EXACT: a mail is
+ * sent as its own address only when that address's domain is itself one of the
+ * configured Mailgun domains. Then `d=` always equals the From domain, so it
+ * aligns under strict DMARC alignment as well as relaxed, and nothing here
+ * depends on a DMARC record this code cannot see.
  *
- * If no configured domain aligns — the usual case being a domain not verified
- * in Mailgun yet — the mail goes out under the default domain with a matching
- * noreply sender rather than as a misaligned From, so it still arrives.
+ * Accepting a configured SUBDOMAIN of the sender's domain would look harmless
+ * — mg.stujo.net signing for team@stujo.net aligns on the organizational
+ * domain — but it is not, for two reasons. It holds only under relaxed
+ * alignment, and it silently widens which senders are honoured: with
+ * MAILGUN_DOMAIN = edu.opencampus.sh, every existing opencampus.sh template
+ * would suddenly send as noreply@opencampus.sh instead of the address this
+ * function used to build. An exact match keeps those mails exactly as they
+ * were and changes only the domains actually configured for.
+ *
+ * If no configured domain matches — a domain not verified in Mailgun yet, or
+ * a template whose sender this deployment does not own — the mail goes out
+ * under the default domain with a matching noreply sender rather than as a
+ * misaligned From, so it still arrives.
  */
 function resolveSender(from) {
   const domains = configuredDomains();
@@ -68,13 +75,35 @@ function resolveSender(from) {
   const match = SINGLE_ADDRESS.exec(String(from || '').trim());
   if (!match) return fallback;
 
-  const address = match[0];
   const senderDomain = match[1].toLowerCase();
-  const sendingDomain =
-    domains.find((domain) => domain === senderDomain) ||
-    domains.find((domain) => domain.endsWith(`.${senderDomain}`));
+  return domains.includes(senderDomain)
+    ? { from: match[0], domain: senderDomain, aligned: true }
+    : fallback;
+}
 
-  return sendingDomain ? { from: address, domain: sendingDomain, aligned: true } : fallback;
+/**
+ * Reports a sender this deployment could not honour — once per distinct
+ * sender, not once per mail.
+ *
+ * The fallback is the steady state for any template whose domain is not a
+ * configured Mailgun domain, so logging every message would put a line in the
+ * log for every mail sent and bury the case worth seeing: a domain that was
+ * supposed to be configured and is not. Instances are reused, so this settles
+ * at roughly one line per sender per cold start.
+ */
+const loggedFallbackSenders = new Set();
+
+function logSenderFallback(mailId, requested, used) {
+  const key = String(requested).trim().toLowerCase();
+  if (loggedFallbackSenders.has(key)) return;
+  // Bounded: MailTemplate.from is a small, admin-controlled set, but the cap
+  // means a pathological one cannot grow this without limit.
+  if (loggedFallbackSenders.size < 20) loggedFallbackSenders.add(key);
+  console.warn('Sender not covered by a configured Mailgun domain, falling back', {
+    mailId,
+    requested,
+    used,
+  });
 }
 
 function isAllowedAttachmentUrl(rawUrl) {
@@ -224,13 +253,7 @@ exports.sendMail = async (req, res) => {
   // for it. A sender that no configured domain covers is replaced rather than
   // sent unaligned -- see resolveSender.
   const sender = resolveSender(from);
-  if (from && !sender.aligned) {
-    console.error('Sender not covered by a configured Mailgun domain, falling back', {
-      mailId: id,
-      requested: from,
-      used: sender.from,
-    });
-  }
+  if (from && !sender.aligned) logSenderFallback(id, from, sender.from);
 
   // Base message configuration
   const msg = {
