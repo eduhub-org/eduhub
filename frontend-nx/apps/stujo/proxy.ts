@@ -86,9 +86,37 @@ const ORIGINAL_HOST_HEADER = 'x-original-host';
  *   request is simply served.
  */
 const STUJO_NET_SUFFIX = '.stujo.net';
-const isStujoNetHost = (hostWithPort: string) => {
-  const hostname = hostWithPort.split(':')[0].toLowerCase();
-  return hostname === 'stujo.net' || hostname.endsWith(STUJO_NET_SUFFIX);
+const isStujoNetHost = (hostname: string) =>
+  hostname === 'stujo.net' || hostname.endsWith(STUJO_NET_SUFFIX);
+
+/**
+ * Strictly parses a `Host`-shaped value into its hostname and its authority.
+ *
+ * A suffix test on the raw string is not enough, because several characters end
+ * the authority in a URL and hand the rest to something else: `@` starts the
+ * host, while `/`, `?` and `#` start the path, query and fragment. Each lets a
+ * value pass a "does it end in .stujo.net?" or "does it start with it?" check
+ * while the browser reads an entirely different host out of the Location
+ * header — `stujo.net:443@attacker.example` and `attacker.example#.en.stujo.net`
+ * both navigate to attacker.example.
+ *
+ * So the value is accepted only as a bare `hostname[:port]` of DNS labels, and
+ * the caller uses the parsed parts rather than the original text. Anything else
+ * — including a bracketed IPv6 literal, which no host of ours is reached by —
+ * returns null and is treated as if the header had not been sent at all.
+ */
+const HOST_PATTERN = /^([a-z0-9](?:[a-z0-9-]*[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)*)(?::(\d{1,5}))?$/;
+
+type ParsedHost = { hostname: string; authority: string };
+
+const parseHost = (value: string | null | undefined): ParsedHost | null => {
+  const raw = value?.trim().toLowerCase();
+  if (!raw) return null;
+  const match = raw.match(HOST_PATTERN);
+  if (!match) return null;
+  const port = match[2];
+  if (port && (Number(port) < 1 || Number(port) > 65535)) return null;
+  return { hostname: match[1], authority: raw };
 };
 
 /**
@@ -135,15 +163,19 @@ const absoluteUrl = (req: NextRequest, host: string, path: string) => {
 export async function proxy(req: NextRequest): Promise<NextResponse> {
   // The host the visitor sees: what Cloudflare forwarded, else the Host header
   // itself (a direct hit on an opencampus.sh host, or local development).
-  const forwardedHost = req.headers.get(ORIGINAL_HOST_HEADER)?.trim() || null;
-  const hostWithPort = forwardedHost || req.headers.get('host') || req.nextUrl.host;
-  const hostname = hostWithPort.split(':')[0].toLowerCase();
-  // …and the host a redirect may be built from — see the two trust levels above.
+  // An unparseable value counts as absent: a genuine Cloudflare rule always
+  // sends a plain host, so the only thing rejecting the rest costs is a 301.
+  const forwardedHost = parseHost(req.headers.get(ORIGINAL_HOST_HEADER));
+  const directHost = parseHost(req.headers.get('host') || req.nextUrl.host);
+  const visitorHost = forwardedHost || directHost;
+  const hostname = visitorHost?.hostname ?? '';
+  // …and the host a redirect may be built from — see the two trust levels
+  // above. Always the PARSED authority, never the raw header text.
   const redirectHost = forwardedHost
-    ? isStujoNetHost(forwardedHost)
-      ? forwardedHost
+    ? isStujoNetHost(forwardedHost.hostname)
+      ? forwardedHost.authority
       : null
-    : hostWithPort;
+    : (directHost?.authority ?? null);
   // With the pages-router i18n config, Next normalizes the locale out of
   // `pathname` and exposes it as `nextUrl.locale`.
   const { pathname } = req.nextUrl;

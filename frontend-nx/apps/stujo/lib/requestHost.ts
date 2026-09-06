@@ -14,6 +14,12 @@ import type { IncomingMessage } from 'http';
  * ever looked up in JobPortalDomain, so a forged header can at worst render
  * another portal's public branding, and an unknown one falls through to the
  * existing AppSettings / APP_NAME resolution.
+ *
+ * That safety comes entirely from the lookup being an EXACT match against a
+ * table of public portals. The value itself is attacker-settable and is not
+ * parsed or validated here, so it must not be used to build a URL, scope a
+ * cookie, or decide anything about authorization. proxy.ts parses it strictly
+ * for exactly that reason.
  */
 export function portalHost(req: Pick<IncomingMessage, 'headers'>): string | undefined {
   const forwarded = req.headers['x-original-host'];
