@@ -69,6 +69,22 @@ const CANONICAL_HOSTS: Record<string, string> = {
 const ORIGINAL_HOST_HEADER = 'x-original-host';
 
 /**
+ * The interim `*.opencampus.sh` hosts stay publicly reachable, so anyone can
+ * send `X-Original-Host` themselves — nothing about the header proves it came
+ * from Cloudflare. Since a redirect below builds its `Location` from it, an
+ * unchecked value would turn this app into an open redirect: a link on our own
+ * domain that lands on someone else's. So it is only believed for a host in the
+ * one zone Cloudflare proxies to us, which is the only zone it can legitimately
+ * name. Anything else is ignored and the request is treated as what it is — a
+ * direct hit, answered from the `Host` header.
+ */
+const STUJO_NET_SUFFIX = '.stujo.net';
+const isStujoNetHost = (hostWithPort: string) => {
+  const hostname = hostWithPort.split(':')[0].toLowerCase();
+  return hostname === 'stujo.net' || hostname.endsWith(STUJO_NET_SUFFIX);
+};
+
+/**
  * Runtime flag (set on the Cloud Run service by Terraform, see
  * var.stujo_net_canonical). Read per request rather than at module load so a
  * revision that only changes the env var takes effect without a rebuild — the
@@ -110,9 +126,11 @@ const absoluteUrl = (req: NextRequest, host: string, path: string) => {
  * a redirect that cannot be resolved must never take a page down.
  */
 export async function proxy(req: NextRequest): Promise<NextResponse> {
-  // The host the visitor sees: what Cloudflare forwarded, else the Host header
-  // itself (a direct hit on an opencampus.sh host, or local development).
-  const proxiedHost = req.headers.get(ORIGINAL_HOST_HEADER);
+  // The host the visitor sees: what Cloudflare forwarded — believed only for a
+  // stujo.net host, see above — else the Host header itself (a direct hit on an
+  // opencampus.sh host, or local development).
+  const forwardedHost = req.headers.get(ORIGINAL_HOST_HEADER);
+  const proxiedHost = forwardedHost && isStujoNetHost(forwardedHost) ? forwardedHost : null;
   const hostWithPort = proxiedHost || req.headers.get('host') || req.nextUrl.host;
   const hostname = hostWithPort.split(':')[0].toLowerCase();
   // With the pages-router i18n config, Next normalizes the locale out of
