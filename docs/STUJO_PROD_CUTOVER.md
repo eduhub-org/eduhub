@@ -55,6 +55,11 @@ new DNS record on the Google side, and no change to the URL map**. TLS at the
 edge comes from the Cloudflare certificate (Advanced Certificate Manager covers
 `*.stujo.net` and, for the legacy locale hosts, `*.en.stujo.net`).
 
+The Cloudflare side is Terraform, not dashboard clicking:
+`infrastructure/application/09_stujo_net.tf` holds the records, the Origin
+Rules, the `X-Original-Host` Transform Rule and the zone's SSL mode. The zone
+predates it and is adopted by import rather than rebuilt — §4.1.
+
 The one thing the app must be told is the visitor's real host, since the Host
 header no longer carries it: a Transform Rule adds `X-Original-Host`, and
 `proxy.ts` builds its redirects from that. Without it a legacy job link would
@@ -459,38 +464,126 @@ the full run needs correcting.
 
 ## 4. Phase B — domain cutover
 
-Everything here happens in the Cloudflare dashboard for the **stujo.net** zone,
-except the last step. Nothing on the Google side changes.
+The stujo.net zone is **managed by Terraform**, in
+`infrastructure/application/09_stujo_net.tf`: the proxied records, the Origin
+Rules that rewrite the origin `Host`, the Transform Rule that passes
+`X-Original-Host`, and the zone's SSL mode. Nothing on the Google side changes.
 
-### Step 1 — rules first, still pointing nowhere
+### 4.1 The zone already exists — adopt it, do not rebuild it
 
-Create the rules before any record is proxied, so nothing is half-configured
-when traffic arrives.
+The zone predates Terraform and its records point at the old platform. Two
+facts shape everything below:
 
-1. **Origin Rules** — one per host group, per the table in §1: *Host header
-   override* → the matching `<service>.opencampus.sh` name. Leave SNI alone; the
-   Host override sets it to the same value, which is what keeps the origin
-   connection valid.
-2. **Transform Rule → Modify Request Header → Set dynamic:**
-   `X-Original-Host = http.host`. This is what lets the app keep a redirected
-   visitor on stujo.net.
-3. **SSL/TLS mode for the zone: Full (strict).** It holds because of the SNI
-   behaviour above; if a host is ever misconfigured, strict mode fails loudly
-   instead of quietly serving from the wrong origin.
-4. Optional: a **Redirect Rule** for the legacy locale hosts,
-   `*.en.stujo.net/*` → `https://<portal>.stujo.net/en/$2` (301). `proxy.ts`
-   also handles this, so the rule is only to save an origin round-trip.
+- **Terraform is not authoritative over a Cloudflare zone.** It knows only what
+  is declared. Applying `09_stujo_net.tf` cannot delete, touch or even notice a
+  record it does not declare, so there is no risk of it quietly removing the
+  zone's mail records. The flip side is that nothing is cleaned up for you
+  either.
+- **A record that is imported and then changed never stops resolving.** One
+  that is deleted and recreated leaves a gap in which the name does not exist —
+  and NXDOMAIN is negatively cached, so the gap can outlast the TTL you
+  carefully lowered in §2.3. This is the whole reason to import rather than
+  recreate.
 
-### Step 2 — repoint the hosts
+So the question is not "delete or import?" but "which of these records should
+Terraform own?", answered per record. Get the list first:
 
-Switch each web record from the Strato server to the app and turn the **proxy
-on** (orange cloud). Either target works, since the Origin Rule decides the
-origin Host either way:
+```bash
+CF_API_EMAIL="$CLOUDFLARE_EMAIL" CF_API_KEY="$CLOUDFLARE_API_KEY" \
+  ./scripts/cloudflare_zone_inventory.sh stujo.net
+```
 
-- `CNAME → stujo.opencampus.sh`, proxied, or
-- `A → <load balancer IP>`, proxied.
+It writes `stujo.net-records.tsv` (the §2.1 inventory) and
+`stujo.net-import.tf` (import blocks for exactly the hosts
+`09_stujo_net.tf` declares). It is read-only; it never writes to Cloudflare.
+The Global API key the provider already uses works, since it is account-wide —
+no new credential, as long as stujo.net sits in the same Cloudflare account.
 
-Leave MX and the SPF/DKIM/DMARC TXT records alone.
+### 4.2 Sort every record into one of four buckets
+
+| Bucket | Records | What to do |
+|---|---|---|
+| **Repoint** | the web hosts: `stujo.net`, `www`, `cau`, `haw-kiel`, `fh-kiel`, `flensburg` | **Import.** They are declared in `09_stujo_net.tf`; importing makes the cutover an in-place update. |
+| **Adopt unchanged** | `MX`, SPF, DKIM, DMARC, domain-verification `TXT` | **Import and declare with their current values**, so the plan shows no change. Now they are in code and cannot be lost in a later edit — which is precisely the §2.2 failure mode. Legitimate to skip; then say so in a comment, so the next person knows the zone is only half-managed. |
+| **Obsolete** | anything serving a Strato-only feature that dies with the old platform | **Leave for now.** Delete them *after* the cutover has settled — either by hand, or by importing and then removing the declaration in a later PR, which leaves an audit trail. Do not do this during the window: every extra change is another thing that can go wrong. |
+| **Unexplained** | anything nobody recognises | **Leave alone** until somebody can say what it is for. Adopting a record you cannot explain is how a zone loses one it needed. |
+
+The generator only emits blocks for the first bucket. The second is a decision,
+so it asks you to make it rather than making it for you.
+
+### 4.3 Import via `import` blocks, not the CLI
+
+State lives in Terraform Cloud, and `required_version = "~> 1.3"` permits
+Terraform ≥ 1.5, so use **`import` blocks** rather than `terraform import`:
+
+- they live in the repo, so the import is reviewed like any other change;
+- they run in the normal plan/apply — no local state access, no one-at-a-time
+  state mutation outside review;
+- **the plan is the cutover review.** It shows each adoption and then exactly
+  what changes: `value: "81.x.x.x" -> "stujo.opencampus.sh"`, `proxied: false ->
+  true`. Nothing happens until it is applied.
+
+Steps:
+
+1. Drop the generated `stujo.net-import.tf` into
+   `infrastructure/application/`, read it, and commit it.
+2. Set `stujo_net_zone_id` in the **production** workspace to the zone ID the
+   script printed. Leave it empty everywhere else — that is what keeps the zone
+   out of the staging and dev plans.
+3. Plan, and read every line. Expect: imports for the web records, an in-place
+   update on each of them, and creates for the two rulesets and the zone
+   setting. Expect **no destroys**. A destroy in this plan means a record was
+   matched wrongly — stop and work out why.
+4. Apply. This is the cutover: at this moment stujo.net starts serving the app.
+5. Delete `stujo.net-import.tf` in a follow-up commit. Applied import blocks are
+   no-ops; leaving them is noise.
+
+### 4.4 Before the first plan: check the provider supports the rules
+
+`01_main.tf` pins `cloudflare/cloudflare ~> 3.0` and no lockfile is committed.
+Origin Rules and Transform Rules are `cloudflare_ruleset` resources with the
+`http_request_origin` and `http_request_late_transform` phases, and **whether
+the resolved 3.x supports those phases needs checking before you rely on
+`09_stujo_net.tf`** — it was written from the documented schema but could not
+be validated (this repo's plans cannot reach the provider registry from every
+environment). A `terraform plan` with `stujo_net_zone_id` set is the cheap
+check: a schema mismatch fails at plan time, before anything is applied.
+
+If the pinned version cannot express them, the choices are, in order of
+preference:
+
+1. **Create the two rulesets by hand in the dashboard and import them later.**
+   Keeps the cutover on schedule and the provider version out of it.
+2. Raise the provider version. Note this is not a small change: v4 and v5 both
+   carry breaking changes, and v5 renames `cloudflare_record` to
+   `cloudflare_dns_record` — which touches every record in
+   `02_network.tf`, i.e. the opencampus.sh zone that is currently serving
+   production. **Do not bundle a provider major upgrade into this cutover.**
+
+### 4.5 One thing not to carry across
+
+`02_network.tf` warns, correctly and loudly, that every record in the
+**opencampus.sh** zone must stay DNS-only: those hosts are on the Google-managed
+multi-SAN certificate, and a single proxied record breaks validation for the
+whole certificate. The stujo.net records are the opposite — `proxied = true`,
+because the proxy *is* the mechanism.
+
+There is no conflict: these are different zones, and no stujo.net host is on
+that certificate. But the two rules must not be swapped by someone tidying up
+later. Never proxy an opencampus.sh record; never unproxy a stujo.net one.
+
+### 4.6 Optional: the legacy locale hosts
+
+`en.stujo.net` and `<portal>.en.stujo.net` are handled by `proxy.ts`, which
+301s them to the path-based locale. They only need records here if the
+inventory shows them still in use — add them to `local.stujo_net_hosts` if so.
+A Cloudflare Redirect Rule would save an origin round-trip but is not required.
+
+### 4.7 Verify, immediately after the apply
+
+The apply in §4.3 *is* the repoint: each web record becomes a proxied CNAME to
+its origin, and the two rulesets start acting on it. Mail records are untouched
+— they were never in the plan.
 
 Smoke-test each host — the address bar must stay on stujo.net throughout:
 
@@ -512,7 +605,7 @@ the `X-Original-Host` rule is not firing.
 At this point stujo.net serves the new app and Rails is only reachable by IP.
 `*.opencampus.sh` still works unchanged, and rollback is one toggle.
 
-### Step 3 — make stujo.net the public face
+### 4.8 Make stujo.net the public face
 
 1. Set `stujo_net_canonical = true` in the production workspace and apply. New
    revisions carry `NEXTAUTH_URL` on the stujo.net hosts, `STUJO_FRONTEND_URL`
@@ -534,13 +627,16 @@ At this point stujo.net serves the new app and Rails is only reachable by IP.
      confirmation mail's links point at stujo.net;
    - an EduHub job tile links to stujo.net.
 
-### Rollback
+### 4.9 Rollback
 
 | Situation | Action |
 |---|---|
-| A host misbehaves | Turn its proxy off (grey cloud) and point the record back at Strato. Nothing else has changed anywhere. |
-| Redirect loop or wrong host in redirects | Check the `X-Original-Host` Transform Rule; failing that, set `stujo_net_canonical = false` and apply — the 301s stop while stujo.net keeps serving. |
+| A host misbehaves | Fastest: turn its proxy off in the dashboard and point the record back at Strato. Terraform will show the drift on the next plan — reconcile it deliberately afterwards rather than letting an apply silently undo an emergency fix. The reviewed version of the same rollback is to revert the record in `09_stujo_net.tf` and apply. |
+| Redirect loop or wrong host in redirects | Check the `X-Original-Host` ruleset is present and firing; failing that, set `stujo_net_canonical = false` and apply — the 301s stop while stujo.net keeps serving. |
 | The app itself is the problem | Roll back the Cloud Run revision as usual; the domain setup is independent of it. |
+
+A dashboard rollback beats a correct one during an incident. But write down
+what you changed: the next `terraform apply` will otherwise put it back.
 
 ## 5. Phase 4 — after the cutover
 
@@ -638,6 +734,11 @@ sees a bare interim host and canonicalises it.
 
 - The **actual host list** in the stujo.net zone (§2.1), including whether the
   `en.*` locale hosts and `fh-kiel.stujo.net` are still in use.
+  `scripts/cloudflare_zone_inventory.sh stujo.net` produces it, and the same
+  run produces the Terraform import blocks (§4.1).
+- Whether the pinned `cloudflare ~> 3.0` provider can express Origin Rules and
+  Transform Rules (§4.4) — a plan answers it, and the fallback is to create
+  those two rules by hand and import them later.
 - Whether `stujo.net` carries **existing mail** that must survive the move
   (§2.2), and a mailbox for `team@stujo.net` that someone reads — these mails
   invite replies.

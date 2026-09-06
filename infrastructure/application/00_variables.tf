@@ -42,8 +42,9 @@ locals {
   # matching <service>.opencampus.sh name. The shared load balancer then routes
   # them with the url_mask it already uses, and its certificate already covers
   # that name — an Origin Rule host override sets the SNI to the same value, so
-  # Full (strict) still holds. Nothing about stujo.net is therefore expressed in
-  # Terraform except which host the app should call itself.
+  # Full (strict) still holds. The zone itself — records, Origin Rules,
+  # X-Original-Host, SSL mode — is in 09_stujo_net.tf; what is decided HERE is
+  # only which host the app should call itself.
   # See docs/STUJO_PROD_CUTOVER.md §4.
   #
   # This one switch says which domain is the public face. On:  the app builds
@@ -120,6 +121,20 @@ variable "service_name_extension" {
 variable "cloudflare_zone_id" {
   description = "The DNS zone ID a record in Cloudflaire will be added to"
   type        = string
+}
+variable "stujo_net_zone_id" {
+  description = <<-EOT
+    Cloudflare zone ID of stujo.net. Empty in every workspace that does not
+    serve it, which is what keeps 09_stujo_net.tf out of those plans.
+
+    The zone itself is not created here — like the opencampus.sh zone, it
+    exists in the Cloudflare account and Terraform manages records inside it.
+    Its existing records must be IMPORTED before the first apply, or the plan
+    will try to create records that are already there and fail on the
+    duplicate. See docs/STUJO_PROD_CUTOVER.md §4.
+  EOT
+  type        = string
+  default     = ""
 }
 variable "cloud_function_ingress_settings" {
   description = "Controls what traffic can reach the cloud functions"
