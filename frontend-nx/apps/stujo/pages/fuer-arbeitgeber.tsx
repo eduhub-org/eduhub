@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 
 import Layout from '../components/Layout';
 import { resolvePortal, PortalBranding } from '../lib/portal';
+import { portalHost } from '../lib/requestHost';
 import { fetchAnonymous } from '../lib/hasura';
 
 type Price = { jobPostingType: string; price: number; currency: string; durationDays: number };
@@ -55,7 +56,7 @@ const ForEmployers: FC<Props> = ({ portal, prices }) => {
 
 export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => {
   const [portal, data] = await Promise.all([
-    resolvePortal(req.headers.host),
+    resolvePortal(portalHost(req)),
     fetchAnonymous<{ JobPostingPrice: Price[] }>(/* GraphQL */ `
       query Prices {
         JobPostingPrice(order_by: { price: asc }) {

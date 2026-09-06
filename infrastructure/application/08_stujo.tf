@@ -8,9 +8,11 @@ resource "google_cloud_run_service_iam_policy" "stujo_noauth_invoker" {
 }
 
 # Define the Google Cloud Run service for the StuJo job board frontend
-# (frontend-nx/apps/stujo, image built via Dockerfile-stujo). Runs under
+# (frontend-nx/apps/stujo, image built via Dockerfile-stujo). Reachable under
 # https://stujo.opencampus.sh (production) and
-# https://stujo-staging.opencampus.sh (staging) — see local.stujo_domain.
+# https://stujo-staging.opencampus.sh (staging) — see local.stujo_domain — and,
+# in production, under stujo.net, which Cloudflare proxies onto exactly these
+# hosts (docs/STUJO_PROD_CUTOVER.md §4).
 resource "google_cloud_run_service" "stujo" {
   provider = google-beta
   name     = local.stujo_service_name
@@ -38,9 +40,21 @@ resource "google_cloud_run_service" "stujo" {
           name  = "API_URL"
           value = "https://${local.hasura_service_name}.opencampus.sh/v1/graphql"
         }
+        # Follows the canonical host: NextAuth builds its callback URLs from
+        # this, so it has to name the domain visitors actually log in on.
         env {
           name  = "NEXTAUTH_URL"
-          value = "https://${local.stujo_domain}"
+          value = "https://${local.stujo_public_host}"
+        }
+        # "true" makes proxy.ts 301 a DIRECT hit on the interim opencampus.sh
+        # hosts to their stujo.net equivalents (requests arriving through
+        # Cloudflare carry X-Original-Host and are served, not redirected).
+        # Runtime env, not a build arg: flipping it is a new revision rather
+        # than a rebuild, so it can be turned on the moment Cloudflare is
+        # serving stujo.net — and off again just as fast.
+        env {
+          name  = "STUJO_CANONICAL_REDIRECTS"
+          value = var.stujo_net_canonical ? "true" : "false"
         }
         # Portal fallback when the request host has no AppSettings.domain match
         env {
@@ -163,9 +177,15 @@ resource "google_cloud_run_service" "stujo_portals" {
           name  = "API_URL"
           value = "https://${local.hasura_service_name}.opencampus.sh/v1/graphql"
         }
+        # The portal's canonical host — its stujo.net domain after the
+        # cutover, the interim opencampus.sh alias before it.
         env {
           name  = "NEXTAUTH_URL"
-          value = "https://${each.value.domain}"
+          value = "https://${local.stujo_portal_public_hosts[each.key]}"
+        }
+        env {
+          name  = "STUJO_CANONICAL_REDIRECTS"
+          value = var.stujo_net_canonical ? "true" : "false"
         }
         # Portal selector: resolvePortal() falls back to APP_NAME when the
         # request host has no AppSettings.domain match.
