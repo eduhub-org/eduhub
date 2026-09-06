@@ -44,7 +44,7 @@ def _queue_mail(client, template, to, variables):
     result = client.send_query(mutation, {
         "subject": subject,
         "content": content,
-        "from": template.get("from") or "noreply@stujo.net",
+        "from": template.get("from") or "team@stujo.net",
         "to": to,
         "bcc": template.get("bcc"),
     })

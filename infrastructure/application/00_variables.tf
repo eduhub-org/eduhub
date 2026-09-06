@@ -317,6 +317,23 @@ variable "mailgun_domain" {
   description = "Domain for the Mailgun API"
   type        = string
 }
+variable "mailgun_additional_domains" {
+  description = <<-EOT
+    Further verified Mailgun sending domains, beyond mailgun_domain.
+
+    A mail carries its own sender (MailTemplate.from), and functions/sendMail
+    sends it through the domain here that can legitimately sign for it — the
+    sender's own domain, or a subdomain of it. That is what lets the job board
+    send as team@stujo.net while everything else sends as opencampus.sh.
+
+    Leave empty until the domain is verified in Mailgun and its DNS records are
+    published, since a mail whose sender no entry covers falls back to a
+    mailgun_domain sender instead. Either "stujo.net" or "mg.stujo.net" works;
+    a subdomain keeps the apex free for the zone's other mail.
+  EOT
+  type        = list(string)
+  default     = []
+}
 
 # API Access
 variable "zoom_account_id" {

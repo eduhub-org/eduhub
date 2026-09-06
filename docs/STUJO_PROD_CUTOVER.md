@@ -92,29 +92,33 @@ Turning it back off is also how the public face is handed to
    **Confirm the Advanced Certificate Manager certificate covers them all** —
    Universal SSL stops at one level, so `cau.en.stujo.net` needs
    `*.en.stujo.net` on the ACM certificate (or drop those hosts deliberately).
-2. **Mail — nothing to do for the cutover, but know what it does today.**
-   The job-board templates carry `from: noreply@stujo.net` and that value is
-   stored on the `MailLog` row, but `functions/sendMail` ignores it: it builds
-   `noreply@${MAILGUN_DOMAIN}` and sends through that one Mailgun domain. So
-   StuJo mail leaves under **opencampus.sh** today, exactly like course mail,
-   and the cutover does not change that — the templates' stujo.net addresses
-   are recorded, not used.
+2. **Mail — verify `stujo.net` in Mailgun, or StuJo mail keeps leaving under
+   opencampus.sh.** The code side is done: `sendMail` now sends each mail as
+   the sender its template carries, through the Mailgun domain that can sign
+   for it, and the StuJo templates send as **`team@stujo.net`** — a real
+   mailbox, because the organization-access mail asks people to reply to it.
 
-   If StuJo mail should come from stujo.net — a fair thing to want once
-   partner-branded portals exist (§6) — it needs two things, and they are worth
-   deciding *before* the window because the DNS half belongs in the zone being
-   re-pointed:
-   - **Mailgun:** verify `stujo.net` (or `mg.stujo.net`) as a sending domain
-     and add its SPF, DKIM and bounce records to the stujo.net zone. Moving DNS
+   What remains is the Mailgun and DNS half, and it belongs in this window
+   because the records go in the zone being re-pointed:
+   - **Verify the domain in Mailgun** — `stujo.net` or `mg.stujo.net`. A
+     subdomain leaves the apex free for the zone's other mail and is the usual
+     choice; either aligns, since `sendMail` accepts a configured domain that
+     is the sender's own domain *or* a subdomain of it.
+   - **Publish its records in the stujo.net zone**: SPF, the DKIM key, the
+     bounce CNAME, and a DMARC record if the zone has none. Moving DNS
      providers is exactly when such records get lost, so add them deliberately
      rather than expecting them to survive.
-   - **Code:** `sendMail` has to honour the row's `from` *and* send through the
-     Mailgun domain that matches it. Sending a stujo.net `From` through the
-     opencampus.sh domain is worse than leaving it alone: SPF and DKIM would
-     align to opencampus.sh, Gmail would show "via opencampus.sh", and a DMARC
-     policy on stujo.net could fail the mail outright. It also needs a guard so
-     only domains we have verified are honoured. That touches the transport
-     every EduHub mail uses, so it belongs in its own change, not this one.
+   - **Set `mailgun_additional_domains`** to that domain in the Terraform
+     workspace, and make sure `team@stujo.net` actually delivers somewhere a
+     person reads.
+
+   Until that variable is set, nothing breaks: a sender no configured domain
+   covers falls back to `noreply@${MAILGUN_DOMAIN}`, so the mail still goes out
+   under opencampus.sh rather than as a misaligned `From` that a DMARC policy
+   on stujo.net would reject. That makes the order free — deploy first and
+   verify later, or the other way round. `sendMail` logs every fallback with
+   the address it wanted, which is how you check the switch actually took.
+
 3. **Lower the TTL** to 60s on every record from group 1 while they still point
    at Strato. Once a record is proxied its TTL stops mattering (Cloudflare
    answers with its own anycast address), so the fast rollback is turning the
@@ -393,7 +397,9 @@ sees a bare interim host and canonicalises it.
 
 - The **actual host list** in the stujo.net zone (§2.1), including whether the
   `en.*` locale hosts and `fh-kiel.stujo.net` are still in use.
-- Whether `stujo.net` carries **mail** that must survive the move (§2.2).
+- Whether `stujo.net` carries **existing mail** that must survive the move,
+  and whether Mailgun should be verified on the apex or on `mg.stujo.net`
+  (§2.2). `team@stujo.net` also needs a mailbox someone reads.
 - `HAW_ORG_ID` on production (§2.6).
 - The **freeze window** and the communication texts (§2.9).
 - Whether to build `/arbeitgeber` before or after the cutover (§5.5).

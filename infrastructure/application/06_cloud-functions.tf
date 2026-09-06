@@ -472,9 +472,10 @@ resource "google_cloudfunctions2_function" "send_mail" {
 
   service_config {
     environment_variables = {
-      HASURA_MAIL_USER = var.hasura_mail_user
-      MAILGUN_DOMAIN   = var.mailgun_domain
-      ENVIRONMENT      = var.environment
+      HASURA_MAIL_USER           = var.hasura_mail_user
+      MAILGUN_DOMAIN             = var.mailgun_domain
+      MAILGUN_ADDITIONAL_DOMAINS = join(",", var.mailgun_additional_domains)
+      ENVIRONMENT                = var.environment
     }
 
     secret_environment_variables {

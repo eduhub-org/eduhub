@@ -20,6 +20,58 @@ const RETRY_DELAY_MS = 250;
 // into an SSRF proxy with its own egress.
 const ATTACHMENT_HOST_SUFFIXES = ['.stripe.com'];
 
+// Local part used when a mail has no usable sender of its own.
+const FALLBACK_LOCAL_PART = 'noreply';
+// A single bare address, deliberately strict: no display name, no comma, no
+// angle brackets and no whitespace of any kind. MailTemplate.from is edited by
+// admins in the UI, and this value goes into a mail header.
+const SINGLE_ADDRESS = /^[^\s@,<>"]+@([A-Za-z0-9-]+(\.[A-Za-z0-9-]+)+)$/;
+
+/**
+ * Mailgun sending domains this deployment may use: the default one plus any
+ * listed in MAILGUN_ADDITIONAL_DOMAINS. Each must be a verified domain in the
+ * Mailgun account — an unverified one is rejected at send time.
+ */
+function configuredDomains() {
+  return [process.env.MAILGUN_DOMAIN, ...String(process.env.MAILGUN_ADDITIONAL_DOMAINS || '').split(',')]
+    .map((domain) => String(domain || '').trim().toLowerCase())
+    .filter(Boolean);
+}
+
+/**
+ * Picks the sender address and the Mailgun domain to send it through.
+ *
+ * A mail carries its own sender (MailLog.from, from MailTemplate.from), which
+ * is how the job board sends as StuJo rather than as opencampus.sh. But the
+ * sending domain decides which DKIM key signs the message, so the two cannot
+ * be chosen independently: a From of team@stujo.net signed by opencampus.sh is
+ * unaligned, and any DMARC policy on stujo.net will reject or quarantine it.
+ *
+ * So the domain is derived FROM the sender: the configured Mailgun domain that
+ * is either the sender's own domain or a subdomain of it (mg.stujo.net signing
+ * for team@stujo.net aligns under DMARC's relaxed mode, which is what the
+ * organizational domain is compared on). If no configured domain aligns — the
+ * usual case being a domain not verified in Mailgun yet — the mail goes out
+ * under the default domain with a matching noreply sender rather than as a
+ * misaligned From, so it still arrives.
+ */
+function resolveSender(from) {
+  const domains = configuredDomains();
+  const fallbackDomain = domains[0];
+  const fallback = { from: `${FALLBACK_LOCAL_PART}@${fallbackDomain}`, domain: fallbackDomain, aligned: false };
+
+  const match = SINGLE_ADDRESS.exec(String(from || '').trim());
+  if (!match) return fallback;
+
+  const address = match[0];
+  const senderDomain = match[1].toLowerCase();
+  const sendingDomain =
+    domains.find((domain) => domain === senderDomain) ||
+    domains.find((domain) => domain.endsWith(`.${senderDomain}`));
+
+  return sendingDomain ? { from: address, domain: sendingDomain, aligned: true } : fallback;
+}
+
 function isAllowedAttachmentUrl(rawUrl) {
   let url;
   try {
@@ -158,14 +210,26 @@ exports.sendMail = async (req, res) => {
   }
 
   // Extract email parameters from the Hasura event payload
-  const { id, subject, content, to, replyTo, cc, bcc, attachments } = req.body.event.data.new;
+  const { id, subject, content, to, from, replyTo, cc, bcc, attachments } = req.body.event.data.new;
 
   // Get mail tag from headers or use default
   const mailTag = req.headers.mailTag || 'eduhub'; // default if not provided
 
+  // The mail's own sender, and the Mailgun domain that can legitimately sign
+  // for it. A sender that no configured domain covers is replaced rather than
+  // sent unaligned -- see resolveSender.
+  const sender = resolveSender(from);
+  if (from && !sender.aligned) {
+    console.error('Sender not covered by a configured Mailgun domain, falling back', {
+      mailId: id,
+      requested: from,
+      used: sender.from,
+    });
+  }
+
   // Base message configuration
   const msg = {
-    from: `noreply@${process.env.MAILGUN_DOMAIN}`,
+    from: sender.from,
     to,
     // Prepend '[STAGING]' to subject in staging environment
     subject: process.env.ENVIRONMENT === 'staging' ? '[STAGING] ' + subject : subject,
@@ -215,7 +279,7 @@ exports.sendMail = async (req, res) => {
           username: 'api',
           key: process.env.MAILGUN_API_KEY,
           url: 'https://api.eu.mailgun.net'
-        }).messages.create(process.env.MAILGUN_DOMAIN, msg);
+        }).messages.create(sender.domain, msg);
         break;
 
       default:
@@ -236,5 +300,6 @@ exports.sendMail = async (req, res) => {
 
 // Exported for unit tests; not part of the cloud function contract.
 exports.resolveAttachments = resolveAttachments;
+exports.resolveSender = resolveSender;
 exports.isAllowedAttachmentUrl = isAllowedAttachmentUrl;
 exports.safeAttachmentFilename = safeAttachmentFilename;
