@@ -8,8 +8,9 @@ starts pointing at it. Two workstreams that meet only at the end:
   except that the legacy job redirects can only resolve once the data is in.
 
 Do A first and QA on the interim `*.opencampus.sh` hosts; do B in a low-traffic
-window. Everything in B is driven by two Terraform switches, so the switch-over
-is an apply, not a merge — nothing has to be held back in review.
+window. B happens almost entirely in Cloudflare — nothing on the Google side
+changes — so the switch-over is a rule, not a merge: nothing has to be held back
+in review.
 
 Companion documents: [`STUJO_INTEGRATION_PLAN.md`](./STUJO_INTEGRATION_PLAN.md)
 (the full integration, §7.3 is the original cutover sketch) and
@@ -26,31 +27,53 @@ Companion documents: [`STUJO_INTEGRATION_PLAN.md`](./STUJO_INTEGRATION_PLAN.md)
 | App + white-label portals | `frontend-nx/apps/stujo`, `infrastructure/application/08_stujo.tf` | live on `stujo.opencampus.sh` + `stujo-<portal>.opencampus.sh` |
 | ETL | `scripts/stujo_etl.py`, `scripts/stujo_migrate_gcp.sh` | run end-to-end against staging, idempotent, with delta upsert |
 | Production ETL runner | `scripts/stujo_migrate_prod.sh` | this change |
-| Legacy 301s | `frontend-nx/apps/stujo/proxy.ts` | this change, off until `STUJO_CANONICAL_REDIRECTS=true` |
-| `stujo.net` load balancer + DNS | `infrastructure/application/09_stujo_net.tf` | this change, inert until the switches below |
+| Legacy 301s | `frontend-nx/apps/stujo/proxy.ts` | this change; the canonical redirect is off until `STUJO_CANONICAL_REDIRECTS=true` |
+| Public host of the app | `var.stujo_net_canonical` (Terraform) | this change, off by default |
 
-### The two Terraform switches
+### How stujo.net is served
 
-Both live in the **production** Terraform Cloud workspace and are `false`
-everywhere until set (staging never sets them):
+**Cloudflare serves it; we do not.** Each stujo.net host is a proxied record
+with an **Origin Rule** that rewrites the origin `Host` to the matching interim
+name:
 
-| Variable | What it does | When |
+| Visitor sees | Origin Host Cloudflare sends | Cloud Run service |
 |---|---|---|
-| `stujo_net_enabled` | Creates the stujo.net load balancer, its managed certificate and the Cloudflare A records. The app keeps answering on `*.opencampus.sh` exactly as before — stujo.net simply starts working too. | §4 step 1 |
-| `stujo_net_canonical` | Makes stujo.net canonical: `NEXTAUTH_URL`, mail links, Stripe return URLs and edu-hub's job links move over, and the interim hosts 301 to stujo.net. | §4 step 4, after the certificate is ACTIVE |
+| `stujo.net`, `www.stujo.net` | `stujo.opencampus.sh` | `stujo` |
+| `cau.stujo.net` | `stujo-cau.opencampus.sh` | `stujo-cau` |
+| `haw-kiel.stujo.net`, `fh-kiel.stujo.net` | `stujo-haw-kiel.opencampus.sh` | `stujo-haw-kiel` |
+| `flensburg.stujo.net` | `stujo-flensburg.opencampus.sh` | `stujo-flensburg` |
 
-Plus `cloudflare_zone_id_stujo` (the zone id of the stujo.net zone — a different
-zone from opencampus.sh) and, if the legacy locale hosts exist,
-`stujo_net_redirect_hostnames`.
+That name is exactly what the existing load balancer routes on (its
+`url_mask` is `<service>.opencampus.sh`) and exactly what its certificate
+already covers — a Host override in an Origin Rule sets the **SNI to the same
+value**, so the origin connection still validates and the zone can stay on
+**Full (strict)**. The visitor's address bar keeps saying `stujo.net`, because
+Cloudflare proxies rather than redirects.
 
-> **Why a second load balancer?** The shared one uses a single multi-SAN managed
-> certificate — adding stujo.net to it re-provisions the certificate for
-> Keycloak, Hasura, EduHub and the API as well, and the new certificate only
-> goes ACTIVE once *every* domain on it validates. It also derives the Cloud Run
-> service from the hostname via `url_mask` (`<service>.opencampus.sh`), which
-> cannot express `cau.stujo.net → stujo-cau`. A dedicated load balancer for
-> stujo.net costs ~$18/month and can only ever break stujo.net. Rationale in
-> the header of `09_stujo_net.tf`.
+So the domain move needs **no second load balancer, no certificate change, no
+new DNS record on the Google side, and no change to the URL map**. TLS at the
+edge comes from the Cloudflare certificate (Advanced Certificate Manager covers
+`*.stujo.net` and, for the legacy locale hosts, `*.en.stujo.net`).
+
+The one thing the app must be told is the visitor's real host, since the Host
+header no longer carries it: a Transform Rule adds `X-Original-Host`, and
+`proxy.ts` builds its redirects from that. Without it a legacy job link would
+be 301'd off stujo.net and onto opencampus.sh.
+
+### The one Terraform switch
+
+`var.stujo_net_canonical` lives in the **production** Terraform Cloud workspace
+and is `false` everywhere until set (staging never sets it). On, it says *which
+domain the app calls itself*: `NEXTAUTH_URL`, the mail links and Stripe return
+URLs in the cloud functions, EduHub's outbound job links, and a 301 from a
+**direct** hit on an interim opencampus.sh host to its stujo.net equivalent.
+Requests arriving through Cloudflare carry `X-Original-Host` and are served, not
+redirected — otherwise they would loop.
+
+Turning it back off is also how the public face is handed to
+`stujo.opencampus.sh` later, when that is the domain being promoted.
+
+---
 
 ---
 
@@ -58,26 +81,26 @@ zone from opencampus.sh) and, if the legacy locale hosts exist,
 
 1. **Inventory the `stujo.net` Cloudflare zone.** Export the records and split
    them into three groups:
-   - *web records to replace* — the A/CNAME records pointing at the Strato
-     server (apex, `www`, the portal subdomains, and any `en.*` host);
+   - *web records to repoint* — the A/CNAME records for the Strato server
+     (apex, `www`, the portal subdomains, and any `en.*` host);
    - *records that must stay untouched* — MX, SPF/DKIM/DMARC TXT, and anything
      for other services;
-   - *hosts nobody uses any more* — decide explicitly to drop them, since every
-     host that should keep working has to be listed in `stujo_net_hosts` (it
-     serves) or `stujo_net_redirect_hostnames` (it only 301s). Google-managed
-     certificates have **no wildcards**, so an unlisted host gets a TLS error,
-     not a redirect.
-   Then reconcile that list with `var.stujo_net_hosts` (default: apex, `www`,
-   `cau`, `haw-kiel`, `fh-kiel`, `flensburg`) and with the `JobPortalDomain`
-   seed, which is what resolves the branding per host.
+   - *hosts nobody uses any more* — decide explicitly to drop them, because
+     every host that should keep working needs its own Origin Rule.
+   Then reconcile that list with the Origin Rule table in §1 and with the
+   `JobPortalDomain` seed, which resolves the branding per host.
+   **Confirm the Advanced Certificate Manager certificate covers them all** —
+   Universal SSL stops at one level, so `cau.en.stujo.net` needs
+   `*.en.stujo.net` on the ACM certificate (or drop those hosts deliberately).
 2. **Mail.** The job-board templates send from `noreply@stujo.net`
    (`publishJobPosting`, `expire_job_postings`, the claim mails). Confirm
    Mailgun's sending records for `stujo.net` exist in the *new* zone and that
    the domain still verifies — moving DNS providers is exactly when SPF/DKIM
    get lost. Send one test mail before the window.
-3. **Lower the TTL** to 60s on every record from group 1 (`stujo_net_record_ttl`
-   covers the new records; the old ones are changed in the dashboard). Raise it
-   again a few days after the cutover.
+3. **Lower the TTL** to 60s on every record from group 1 while they still point
+   at Strato. Once a record is proxied its TTL stops mattering (Cloudflare
+   answers with its own anycast address), so the fast rollback is turning the
+   proxy off — but the low TTL is what makes *that* fast in turn.
 4. **Keycloak (prod realm `edu-hub`, client `hasura`):** add the stujo.net
    redirect URIs and web origins (`https://stujo.net/*`, `https://www.stujo.net/*`,
    and one per portal host). Without them, login on the new domain fails at the
@@ -173,74 +196,88 @@ the full run needs correcting.
 
 ## 4. Phase B — domain cutover
 
-### Step 1 — stand up stujo.net (does not move any traffic yet)
+Everything here happens in the Cloudflare dashboard for the **stujo.net** zone,
+except the last step. Nothing on the Google side changes.
 
-1. In the production workspace set `cloudflare_zone_id_stujo` and
-   `stujo_net_enabled = true` (plus `stujo_net_redirect_hostnames` if the
-   `en.*` hosts are in use).
-2. **Delete the old web A/CNAME records** for those hosts in the Cloudflare
-   dashboard (group 1 from §2.1). Terraform does not adopt existing records: if
-   the old ones stay, Cloudflare answers with both addresses in turn and half
-   the traffic keeps landing on Rails. Leave MX/TXT alone.
-3. `terraform apply`. This creates the IP, the records, the certificate, one
-   backend per portal and the URL map. The Cloud Run services get a new
-   revision (a `STUJO_CANONICAL_REDIRECTS=false` env var) — no behaviour change.
-4. **Wait for the certificate to be ACTIVE.** DNS has to resolve first, so this
-   takes minutes to tens of minutes:
-   ```bash
-   gcloud compute ssl-certificates list --global --project <prod>
-   gcloud compute ssl-certificates describe stujo-net-cert-<suffix> --global \
-     --project <prod> --format='yaml(managed.status, managed.domainStatus)'
-   ```
-   Every domain must show `ACTIVE`. A domain stuck in `FAILED_NOT_VISIBLE` means
-   its record is missing, still points elsewhere, or is Cloudflare-**proxied**
-   (the records must stay DNS-only, or validation can never succeed).
-5. **Smoke-test every host over HTTPS** while the old site is still reachable:
-   ```bash
-   for h in stujo.net www.stujo.net cau.stujo.net haw-kiel.stujo.net \
-            fh-kiel.stujo.net flensburg.stujo.net; do
-     echo "== $h"; curl -sS -o /dev/null -w '%{http_code} %{redirect_url}\n' "https://$h/"
-     curl -sS "https://$h/" | grep -o '<title>[^<]*</title>'   # portal branding
-   done
-   curl -sS -o /dev/null -w '%{http_code} %{redirect_url}\n' http://stujo.net/   # → 301 https
-   ```
-   Check a legacy job URL resolves through the ETL mapping:
-   `https://stujo.net/stellenangebote/<old-rails-id>-<slug>` → 301 →
-   `/stellenangebote/<new-id>`.
+### Step 1 — rules first, still pointing nowhere
+
+Create the rules before any record is proxied, so nothing is half-configured
+when traffic arrives.
+
+1. **Origin Rules** — one per host group, per the table in §1: *Host header
+   override* → the matching `<service>.opencampus.sh` name. Leave SNI alone; the
+   Host override sets it to the same value, which is what keeps the origin
+   connection valid.
+2. **Transform Rule → Modify Request Header → Set dynamic:**
+   `X-Original-Host = http.host`. This is what lets the app keep a redirected
+   visitor on stujo.net.
+3. **SSL/TLS mode for the zone: Full (strict).** It holds because of the SNI
+   behaviour above; if a host is ever misconfigured, strict mode fails loudly
+   instead of quietly serving from the wrong origin.
+4. Optional: a **Redirect Rule** for the legacy locale hosts,
+   `*.en.stujo.net/*` → `https://<portal>.stujo.net/en/$2` (301). `proxy.ts`
+   also handles this, so the rule is only to save an origin round-trip.
+
+### Step 2 — repoint the hosts
+
+Switch each web record from the Strato server to the app and turn the **proxy
+on** (orange cloud). Either target works, since the Origin Rule decides the
+origin Host either way:
+
+- `CNAME → stujo.opencampus.sh`, proxied, or
+- `A → <load balancer IP>`, proxied.
+
+Leave MX and the SPF/DKIM/DMARC TXT records alone.
+
+Smoke-test each host — the address bar must stay on stujo.net throughout:
+
+```bash
+for h in stujo.net www.stujo.net cau.stujo.net haw-kiel.stujo.net \
+         fh-kiel.stujo.net flensburg.stujo.net; do
+  echo "== $h"
+  curl -sS -o /dev/null -w '%{http_code} %{redirect_url}\n' "https://$h/"
+  curl -sS "https://$h/" | grep -o '<title>[^<]*</title>'   # portal branding
+done
+curl -sS -o /dev/null -w '%{http_code} %{redirect_url}\n' http://stujo.net/   # → 301 https
+```
+
+Then a legacy job URL, which must land on **stujo.net**, not opencampus.sh:
+`https://stujo.net/stellenangebote/<old-rails-id>-<slug>` → 301 →
+`https://stujo.net/stellenangebote/<new-id>`. If it redirects to opencampus.sh,
+the `X-Original-Host` rule is not firing.
 
 At this point stujo.net serves the new app and Rails is only reachable by IP.
-`*.opencampus.sh` still works unchanged, and rollback is still one DNS change.
+`*.opencampus.sh` still works unchanged, and rollback is one toggle.
 
-### Step 2 — make stujo.net canonical
+### Step 3 — make stujo.net the public face
 
-1. Set `stujo_net_canonical = true` and apply. This rolls new revisions with
-   `NEXTAUTH_URL` on the stujo.net hosts, `STUJO_FRONTEND_URL` (mail links,
-   Stripe return URLs) on the cloud functions, and turns the
-   `*.opencampus.sh → stujo.net` 301s on.
+1. Set `stujo_net_canonical = true` in the production workspace and apply. New
+   revisions carry `NEXTAUTH_URL` on the stujo.net hosts, `STUJO_FRONTEND_URL`
+   (mail links, Stripe return URLs) on the cloud functions, and
+   `STUJO_CANONICAL_REDIRECTS=true`, which 301s a **direct** hit on an interim
+   opencampus.sh host to its stujo.net equivalent.
 2. Set the production GitHub Actions variable
    `NEXT_PUBLIC_STUJO_URL=https://stujo.net` and re-run the production build, so
-   edu-hub's job tiles link to the canonical domain. (This one is inlined at
-   build time; the Cloud Run env var alone does not reach the browser.)
+   EduHub's job tiles link there. (This one is inlined at build time; the Cloud
+   Run env var alone does not reach the browser.)
 3. Verify:
-   - login on `stujo.net` completes and lands back on stujo.net (this is what
-     the Keycloak redirect URIs from §2.4 are for);
-   - `https://stujo.opencampus.sh/` → 301 → `https://stujo.net/`, and the same
-     per portal host;
-   - `https://en.stujo.net/stellenangebote` → 301 → `https://stujo.net/en/stellenangebote`
-     (only if those hosts were listed in §2.1);
-   - a job posting checkout returns to `stujo.net/mein-stujo` and the
+   - login on `stujo.net` completes and comes back to stujo.net — this is what
+     the Keycloak redirect URIs from §2.4 are for;
+   - `https://stujo.opencampus.sh/` → 301 → `https://stujo.net/`, per portal
+     host as well, and **no redirect loop** on stujo.net itself;
+   - `https://en.stujo.net/stellenangebote` → 301 →
+     `https://stujo.net/en/stellenangebote`;
+   - a job posting checkout returns to `stujo.net/mein-stujo`, and the
      confirmation mail's links point at stujo.net;
-   - an EduHub job tile links to `stujo.net`.
+   - an EduHub job tile links to stujo.net.
 
 ### Rollback
 
 | Situation | Action |
 |---|---|
-| Certificate will not validate | Nothing has moved yet — fix the record, or set `stujo_net_enabled = false` and re-apply. |
-| stujo.net serves but is broken | Point the stujo.net records back at the Strato server (TTL is 60s) and lift the Rails freeze. The GCP-side resources are additive and can stay. |
-| Only the canonical switch is wrong | `stujo_net_canonical = false` + apply: the 301s stop and the URLs revert, while stujo.net keeps serving. |
-
----
+| A host misbehaves | Turn its proxy off (grey cloud) and point the record back at Strato. Nothing else has changed anywhere. |
+| Redirect loop or wrong host in redirects | Check the `X-Original-Host` Transform Rule; failing that, set `stujo_net_canonical = false` and apply — the 301s stop while stujo.net keeps serving. |
+| The app itself is the problem | Roll back the Cloud Run revision as usual; the domain setup is independent of it. |
 
 ## 5. Phase 4 — after the cutover
 
@@ -250,10 +287,10 @@ At this point stujo.net serves the new app and Rails is only reachable by IP.
 2. Send the employer and student communication; then let the first
    `send_job_alerts` Monday run (or un-pause it).
 3. Raise the DNS TTLs again once the move has settled.
-4. Decide when to retire the interim `stujo-<portal>.opencampus.sh` services.
-   They cost nothing at rest (scale to zero) and are the 301 sources for old
-   links, so there is no hurry — but the redirect map in `proxy.ts` and
-   `local.stujo_portals` are what to delete when you do.
+4. **Do not retire the `stujo-<portal>.opencampus.sh` services.** They are no
+   longer just interim aliases: they are the origin stujo.net is proxied onto,
+   and they are the domain that gets promoted later. The only thing that may go
+   is the 301 from them to stujo.net — that is `stujo_net_canonical`.
 5. Watch for 404s on `/arbeitgeber/:id-:slug`: those legacy employer pages have
    no counterpart in the app yet (plan §8.2). The resolver is ready in
    `lib/legacyRedirects.ts`; wiring it up is a small change once the route
@@ -261,7 +298,44 @@ At this point stujo.net serves the new app and Rails is only reachable by IP.
 
 ---
 
-## 6. Open items — decisions or lookups needed before the window
+## 6. Adding white-label domains later
+
+Adding a portal today means: a Cloud Run service (one entry in
+`local.stujo_portal_app_names`), a Cloudflare record, a certificate SAN, and the
+seed rows (`AppSettings`/`JobPortal` + `JobPortalDomain`). Only the last is
+really about the portal; the rest is infrastructure churn, and the SAN in
+particular **re-provisions the shared multi-SAN certificate** — the one Keycloak,
+Hasura, EduHub and the API also depend on. That is a poor thing to do routinely.
+
+**A partner's own domain** (say `jobs.uni-x.de`) needs none of that under the
+setup above: proxy it in Cloudflare, add an Origin Rule pointing at an existing
+`stujo-*.opencampus.sh` service, add the `JobPortalDomain` row. Cloudflare for
+SaaS custom hostnames is the productised version of exactly this pattern when
+the zone belongs to the partner rather than to us.
+
+**More `*.opencampus.sh` portals** are the case worth improving, in two steps
+that are independent of this cutover and should be rehearsed on staging first:
+
+1. **Move the shared certificate to Certificate Manager** with a DNS-authorized
+   **wildcard** (`*.opencampus.sh`), attached through the `certificate_map`
+   input the `lb-http` module already exposes. A new host then needs no
+   certificate change at all, and the re-provisioning window disappears for
+   every future domain change, not just StuJo's.
+2. **Take ownership of the URL map** (`create_url_map = false` plus our own
+   backend services) so a **wildcard host rule** — GCP host rules accept
+   `*.example.com` — can send every portal host to a single Cloud Run service.
+   The app already resolves branding from the request host, so one service can
+   serve them all.
+
+With both in place, and portals named `<portal>.stujo.opencampus.sh` under a
+wildcard record, adding a white-label portal is **a database row** — no
+Terraform, no deploy, no certificate. That is the shape to aim for; it is
+deliberately not bundled into this cutover, because step 2 touches the routing
+Keycloak and Hasura run on.
+
+---
+
+## 7. Open items — decisions or lookups needed before the window
 
 - The **actual host list** in the stujo.net zone (§2.1), including whether the
   `en.*` locale hosts and `fh-kiel.stujo.net` are still in use.

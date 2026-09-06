@@ -9,14 +9,28 @@
  *
  * Three cases, all 301 (Next's `{ permanent: true }` helper emits 308, so the
  * status is set explicitly):
- *   1. Interim `*.opencampus.sh` production hosts → their `stujo.net`
- *      equivalents, so stujo.net is the single canonical domain. Gated on
- *      STUJO_CANONICAL_REDIRECTS so pre-cutover QA on the interim hosts keeps
- *      working, and staging (which never sets it) is never affected.
+ *   1. A DIRECT hit on an interim `*.opencampus.sh` production host → its
+ *      `stujo.net` equivalent, so one domain is the public face. Gated on
+ *      STUJO_CANONICAL_REDIRECTS, so pre-cutover QA on the interim hosts keeps
+ *      working and staging (which never sets it) is never affected.
  *   2. `*.en.stujo.net/<path>` → `<portal>.stujo.net/en/<path>` (the Rails
  *      app's host-based locale → the next i18n path locale).
  *   3. `/stellenangebote/:oldId-:slug` → `/stellenangebote/:newId`, resolving
  *      the old Rails id through JobPosting.legacyStujoId.
+ *
+ * ## stujo.net arrives with a rewritten Host
+ *
+ * stujo.net is not served by our load balancer. Cloudflare proxies its hosts
+ * and rewrites the origin Host to the matching `<service>.opencampus.sh` name,
+ * which is what the load balancer routes on and what its certificate covers.
+ * So on a stujo.net request the `Host` header says `stujo-cau.opencampus.sh`
+ * while the visitor's address bar says `cau.stujo.net`, and the Cloudflare rule
+ * passes the real one in `X-Original-Host`.
+ *
+ * Two consequences, both handled below: a redirect must be built from the
+ * ORIGINAL host, or it would move the visitor off stujo.net; and case 1 must
+ * fire only when that header is absent, or every proxied request would be sent
+ * back to stujo.net, re-proxied, and redirected again — a loop.
  *
  * `/arbeitgeber/:oldId-:slug` is deliberately NOT redirected: that route does
  * not exist in this app yet (plan §8.2). The resolver is ready in
@@ -48,10 +62,17 @@ const CANONICAL_HOSTS: Record<string, string> = {
 };
 
 /**
+ * Header the Cloudflare rule carries the visitor's real host in, since the
+ * origin Host has been rewritten by then. Its presence is also what marks a
+ * request as "arrived through Cloudflare", i.e. already on stujo.net.
+ */
+const ORIGINAL_HOST_HEADER = 'x-original-host';
+
+/**
  * Runtime flag (set on the Cloud Run service by Terraform, see
- * infrastructure/application/09_stujo_net.tf). Read per request rather than at
- * module load so a revision that only changes the env var takes effect without
- * a rebuild — the flag must not turn on before stujo.net actually serves.
+ * var.stujo_net_canonical). Read per request rather than at module load so a
+ * revision that only changes the env var takes effect without a rebuild — the
+ * flag must not turn on before Cloudflare is serving stujo.net.
  */
 const canonicalRedirectsEnabled = () => process.env.STUJO_CANONICAL_REDIRECTS === 'true';
 
@@ -72,9 +93,10 @@ const localePrefix = (locale: string | undefined) =>
  * Deliberately NOT `nextUrl.clone()`: `nextUrl`'s origin is the address the
  * server listens on (`0.0.0.0:5001` on Cloud Run), not the host the visitor
  * asked for, so cloning it sends the browser to an unreachable internal URL.
- * The host comes from the request, and the scheme from the load balancer's
- * `x-forwarded-proto` (with the request's own scheme as the local-dev
- * fallback, so http://localhost:5001 keeps working).
+ * The host is the visitor's own (X-Original-Host ahead of Host, so a stujo.net
+ * visitor stays on stujo.net), and the scheme comes from `x-forwarded-proto`
+ * (with the request's own scheme as the local-dev fallback, so
+ * http://localhost:5001 keeps working).
  */
 const absoluteUrl = (req: NextRequest, host: string, path: string) => {
   const forwardedProto = (req.headers.get('x-forwarded-proto') || '').split(',')[0].trim();
@@ -88,16 +110,21 @@ const absoluteUrl = (req: NextRequest, host: string, path: string) => {
  * a redirect that cannot be resolved must never take a page down.
  */
 export async function proxy(req: NextRequest): Promise<NextResponse> {
-  const hostWithPort = req.headers.get('host') || req.nextUrl.host;
+  // The host the visitor sees: what Cloudflare forwarded, else the Host header
+  // itself (a direct hit on an opencampus.sh host, or local development).
+  const proxiedHost = req.headers.get(ORIGINAL_HOST_HEADER);
+  const hostWithPort = proxiedHost || req.headers.get('host') || req.nextUrl.host;
   const hostname = hostWithPort.split(':')[0].toLowerCase();
   // With the pages-router i18n config, Next normalizes the locale out of
   // `pathname` and exposes it as `nextUrl.locale`.
   const { pathname } = req.nextUrl;
   const prefix = localePrefix(req.nextUrl.locale);
 
-  // 1) Canonicalize the interim opencampus.sh hosts → stujo.net (path, locale
-  //    prefix and query kept). Always https: the canonical domain is.
-  const canonicalHost = CANONICAL_HOSTS[hostname];
+  // 1) A direct hit on an interim opencampus.sh host → its stujo.net
+  //    equivalent (path, locale prefix and query kept). Always https: the
+  //    public domain is. Skipped for anything arriving through Cloudflare —
+  //    that request is already on stujo.net and redirecting it would loop.
+  const canonicalHost = proxiedHost ? undefined : CANONICAL_HOSTS[hostname];
   if (canonicalHost && canonicalRedirectsEnabled()) {
     const path = `${prefix}${pathname === '/' ? '' : pathname}`;
     return NextResponse.redirect(`https://${canonicalHost}${path || '/'}${req.nextUrl.search}`, 301);

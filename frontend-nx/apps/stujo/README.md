@@ -43,16 +43,25 @@ needs, and is inert for everything else:
 
 | From | To | Gated on |
 |---|---|---|
-| `stujo.opencampus.sh`, `stujo-<portal>.opencampus.sh` | the matching `stujo.net` host | `STUJO_CANONICAL_REDIRECTS=true` |
+| a **direct** hit on `stujo.opencampus.sh` / `stujo-<portal>.opencampus.sh` | the matching `stujo.net` host | `STUJO_CANONICAL_REDIRECTS=true` |
 | `*.en.stujo.net/<path>` | `<portal>.stujo.net/en/<path>` | always |
 | `/stellenangebote/:oldId-:slug` | `/stellenangebote/:newId` via `JobPosting.legacyStujoId` | always (slug-bearing URLs only) |
 
 `STUJO_CANONICAL_REDIRECTS` is a **runtime** env var set by Terraform
-(`infrastructure/application/09_stujo_net.tf`), not a `NEXT_PUBLIC_` build
-arg: turning the canonical redirects on is a new Cloud Run revision, so it
-can happen the moment stujo.net's certificate is ACTIVE — and be reverted
-just as quickly. It is unset locally and on staging, so those hosts never
-redirect.
+(`var.stujo_net_canonical`), not a `NEXT_PUBLIC_` build arg: turning the
+canonical redirect on is a new Cloud Run revision rather than a rebuild, so it
+can happen the moment Cloudflare serves stujo.net — and be reverted just as
+quickly. It is unset locally and on staging, so those hosts never redirect.
+
+### `X-Original-Host`
+
+In production stujo.net is served by Cloudflare, which proxies each host onto
+the matching `<service>.opencampus.sh` origin and rewrites the `Host` header on
+the way (see `docs/STUJO_PROD_CUTOVER.md` §1). So the `Host` the app sees is
+*not* what the visitor typed; the real one arrives in `X-Original-Host`, and
+`proxy.ts` prefers it — otherwise a legacy job link would be 301'd off
+stujo.net. Its presence also marks a request as "already on stujo.net", which is
+what stops the canonical redirect from looping.
 
 The full sequence is in
 [`docs/STUJO_PROD_CUTOVER.md`](../../../docs/STUJO_PROD_CUTOVER.md).

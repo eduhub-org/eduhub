@@ -11,8 +11,8 @@ resource "google_cloud_run_service_iam_policy" "stujo_noauth_invoker" {
 # (frontend-nx/apps/stujo, image built via Dockerfile-stujo). Reachable under
 # https://stujo.opencampus.sh (production) and
 # https://stujo-staging.opencampus.sh (staging) — see local.stujo_domain — and,
-# once the cutover switches in 00_variables.tf are on, under stujo.net through
-# the load balancer in 09_stujo_net.tf.
+# in production, under stujo.net, which Cloudflare proxies onto exactly these
+# hosts (docs/STUJO_PROD_CUTOVER.md §4).
 resource "google_cloud_run_service" "stujo" {
   provider = google-beta
   name     = local.stujo_service_name
@@ -46,13 +46,15 @@ resource "google_cloud_run_service" "stujo" {
           name  = "NEXTAUTH_URL"
           value = "https://${local.stujo_public_host}"
         }
-        # "true" makes proxy.ts 301 the interim opencampus.sh hosts to their
-        # stujo.net equivalents. Runtime env, not a build arg: flipping it is a
-        # new revision, not a rebuild, so it can be turned on the moment the
-        # certificate is ACTIVE — and off again just as fast.
+        # "true" makes proxy.ts 301 a DIRECT hit on the interim opencampus.sh
+        # hosts to their stujo.net equivalents (requests arriving through
+        # Cloudflare carry X-Original-Host and are served, not redirected).
+        # Runtime env, not a build arg: flipping it is a new revision rather
+        # than a rebuild, so it can be turned on the moment Cloudflare is
+        # serving stujo.net — and off again just as fast.
         env {
           name  = "STUJO_CANONICAL_REDIRECTS"
-          value = local.stujo_net_canonical ? "true" : "false"
+          value = var.stujo_net_canonical ? "true" : "false"
         }
         # Portal fallback when the request host has no AppSettings.domain match
         env {
@@ -183,7 +185,7 @@ resource "google_cloud_run_service" "stujo_portals" {
         }
         env {
           name  = "STUJO_CANONICAL_REDIRECTS"
-          value = local.stujo_net_canonical ? "true" : "false"
+          value = var.stujo_net_canonical ? "true" : "false"
         }
         # Portal selector: resolvePortal() falls back to APP_NAME when the
         # request host has no AppSettings.domain match.
