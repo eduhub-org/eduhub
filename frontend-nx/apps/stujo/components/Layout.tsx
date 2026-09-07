@@ -25,11 +25,11 @@ const Layout: FC<LayoutProps> = ({ children, fullWidthMain = false, portal }) =>
   const tLayout = useTranslations('common.Layout');
   const router = useRouter();
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
-  const [navigationOpen, setNavigationOpen] = useState(false);
+  const [navigationOpen, setNavigationOpen] = useState(true);
 
   useEffect(() => {
     setAccountMenuOpen(false);
-    setNavigationOpen(false);
+    setNavigationOpen(true);
   }, [router.asPath, router.locale]);
   const { status: sessionStatus } = useSession();
 
@@ -137,7 +137,7 @@ const Layout: FC<LayoutProps> = ({ children, fullWidthMain = false, portal }) =>
           aria-controls="stujo-account-menu"
           onClick={() => setAccountMenuOpen((open) => !open)}
         >
-          <span aria-hidden="true">{accountMenuOpen ? '×' : '☰'}</span>
+          <StuJoLegacyIcon name={accountMenuOpen ? 'close' : 'menu'} className="stujo-menu-icon" />
         </button>
         <nav
           id="stujo-account-menu"
@@ -221,12 +221,15 @@ const Layout: FC<LayoutProps> = ({ children, fullWidthMain = false, portal }) =>
           <button
             type="button"
             className="stujo-menu-toggle stujo-navigation-toggle"
+            aria-label={tLayout('navigation')}
             aria-expanded={navigationOpen}
             aria-controls="stujo-navigation-menu"
             onClick={() => setNavigationOpen((open) => !open)}
           >
-            {tLayout('navigation')}
-            <span aria-hidden="true">{navigationOpen ? '⌃' : '⌄'}</span>
+            <StuJoLegacyIcon
+              name={navigationOpen ? 'chevron-up' : 'chevron-down'}
+              className="stujo-menu-icon"
+            />
           </button>
         </div>
         <div

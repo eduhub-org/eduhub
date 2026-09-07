@@ -1037,8 +1037,12 @@ button.stujo-header-action:hover {
     width: 48px;
     background: #fff;
     color: var(--stujo-primary);
-    font-size: 30px;
-    line-height: 1;
+  }
+
+  .stujo-menu-icon {
+    width: 28px;
+    height: 28px;
+    flex: none;
   }
 
   .stujo-header-topnav {
@@ -1076,20 +1080,19 @@ button.stujo-header-action:hover {
 
   .stujo-navigation-toggle {
     width: 100%;
-    padding: 8px 0;
+    justify-content: flex-end;
+    padding: 8px 10px;
     color: #fff;
     background: transparent;
-    text-transform: uppercase;
-    font-size: 18px;
-  }
-
-  .stujo-navigation-toggle span {
-    font-size: 28px;
   }
 
   .stujo-nav-inner {
     display: none;
     padding-bottom: 12px;
+  }
+
+  .stujo-nav .stujo-nav-home {
+    display: none;
   }
 
   .stujo-nav-inner--open {
