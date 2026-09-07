@@ -254,6 +254,8 @@ export const UPDATE_SESSION_DESCRIPTION = gql`
   }
 `;
 
+export { UPDATE_SESSION_IS_PUBLIC_EVENT } from './publicEvents';
+
 export const INSERT_NEW_SESSION_SPEAKER = gql`
   mutation InsertNewSessionSpeaker($sessionId: Int!, $userId: uuid!) {
     insert_SessionSpeaker(

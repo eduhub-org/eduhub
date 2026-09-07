@@ -52,6 +52,7 @@ select_permissions:
         - description
         - endDateTime
         - id
+        - isPublicEvent
         - startDateTime
         - title
         - updated_at
@@ -65,6 +66,7 @@ select_permissions:
         - description
         - endDateTime
         - id
+        - isPublicEvent
         - startDateTime
         - title
         - updated_at
@@ -88,6 +90,12 @@ update_permissions:
             User:
               id:
                 _eq: X-Hasura-User-Id
+      check: null
+  - role: admin
+    permission:
+      columns:
+        - isPublicEvent
+      filter: {}
       check: null
 delete_permissions:
   - role: instructor_access

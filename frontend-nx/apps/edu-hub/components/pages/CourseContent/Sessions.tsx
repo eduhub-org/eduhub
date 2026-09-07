@@ -1,4 +1,5 @@
 import { FC, useMemo, useState } from 'react';
+import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
 
@@ -71,8 +72,9 @@ export const Sessions: FC<SessionsProps> = ({ sessions, courseLocations, isLogge
             {sessions.length === 1 ? t('sessions.date_singular') : t('sessions.date_plural')}
           </SectionTitle>
           <ul className="max-w-2xl">
-            {visibleSessions.map(({ startDateTime, endDateTime, title, SessionSpeakers, SessionAddresses }, index) => (
-              <li key={index} className="flex mb-4">
+            {visibleSessions.map(
+              ({ id, startDateTime, endDateTime, title, SessionSpeakers, SessionAddresses, isPublicEvent }, index) => (
+              <li key={id ?? index} className="flex mb-4">
                 <div className="flex flex-wrap items-start flex-shrink-0 mb-2">
                   <div className="flex flex-col mr-6">
                     <span className="block text-sm sm:text-lg font-semibold">{displayDate(startDateTime)}</span>
@@ -84,7 +86,17 @@ export const Sessions: FC<SessionsProps> = ({ sessions, courseLocations, isLogge
                   </div>
                 </div>
                 <div className="flex flex-col flex-1">
-                  <span className="block text-sm sm:text-lg break-words">{title}</span>
+                  <div className="flex flex-wrap items-center gap-2 mb-1">
+                    <span className="block text-sm sm:text-lg break-words">{title}</span>
+                    {isPublicEvent ? (
+                      <Link
+                        href={`/event/${id}`}
+                        className="inline-flex items-center rounded-full border border-brand px-2 py-0.5 text-xs font-medium text-brand hover:bg-brand/10"
+                      >
+                        {t('sessions.public_event_badge')}
+                      </Link>
+                    ) : null}
+                  </div>
                   <div className="break-words">
                     {/* Sort SessionAddresses by CourseLocations order */}
                     {(() => {
@@ -182,7 +194,8 @@ export const Sessions: FC<SessionsProps> = ({ sessions, courseLocations, isLogge
                   </div>
                 </div>
               </li>
-            ))}
+            )
+            )}
           </ul>
           {sessions.length > initiallyShownSessions &&
             (showAllSessions ? (

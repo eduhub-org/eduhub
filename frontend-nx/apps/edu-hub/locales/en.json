@@ -362,7 +362,8 @@
       "show_all_dates": "Show all dates",
       "hide_dates": "Collapse dates",
       "date_singular": "Date",
-      "date_plural": "Dates"
+      "date_plural": "Dates",
+      "public_event_badge": "Public event"
     },
     "attendances": {
       "attendances": "Attendances",
@@ -716,6 +717,26 @@
       "success_title": "You have successfully applied",
       "success_body": "You will be informed about your admission no later than one to two days after the application deadline.",
       "success_close_button_title": "Close"
+    }
+  },
+  "event": {
+    "seo": {
+      "title": "EduHub Event | opencampus.sh",
+      "metaDescription": "Public event details on EduHub by opencampus.sh",
+      "ogDescription": "Discover this public event on EduHub",
+      "twitterDescription": "Discover this public event on EduHub"
+    },
+    "EventTile": {
+      "view_event": "View event"
+    },
+    "EventContent": {
+      "not_found": "This public event could not be found.",
+      "date_time_heading": "Date & time",
+      "description_heading": "Description",
+      "speakers_heading": "Speakers",
+      "location_heading": "Location",
+      "course_heading": "Course",
+      "view_course_link": "View parent course"
     }
   },
   "coursePage": {
@@ -1805,6 +1826,10 @@
         "select_location_option_first": "Please select a location option first",
         "location_mismatch_error": "The selected address does not match the location option for this session. Please select an address that belongs to the correct location.",
         "failed_to_load_session_addresses": "Failed to load session addresses."
+      },
+      "public_event": {
+        "label": "Public event",
+        "help_text": "When enabled, this session gets its own public page at /event/[id] and can be shown in event listings. Only admins can change this setting."
       },
       "session_description": {
         "label": "Description",

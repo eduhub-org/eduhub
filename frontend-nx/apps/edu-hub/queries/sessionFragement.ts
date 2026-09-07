@@ -8,6 +8,7 @@ export const SESSION_FRAGMENT = gql`
     endDateTime
     courseId
     description
+    isPublicEvent
     startDateTime
     title
     SessionAddresses {
