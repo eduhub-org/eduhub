@@ -90,4 +90,20 @@ describe('logout API', () => {
     expectNoStore(res);
     expect(res.json).toHaveBeenCalledWith({ url: 'https://stujo.example' });
   });
+
+  it.each([undefined, '/'])('skips Keycloak logout when NEXTAUTH_URL is %s', async (nextAuthUrl) => {
+    if (nextAuthUrl) {
+      process.env.NEXTAUTH_URL = nextAuthUrl;
+    } else {
+      delete process.env.NEXTAUTH_URL;
+    }
+    mockedGetToken.mockResolvedValue(token('token-value'));
+    const res = response();
+
+    await handler({} as NextApiRequest, res);
+
+    expectNoStore(res);
+    expect(res.json).toHaveBeenCalledWith({ url: '/' });
+    expect(warn).toHaveBeenCalledWith('NEXTAUTH_URL is not an absolute application URL; skipping Keycloak logout.');
+  });
 });
