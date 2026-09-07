@@ -212,13 +212,9 @@ services:
       POSTGRES_PASSWORD: postgrespassword
     volumes:
       - ./backend/init.d:/docker-entrypoint-initdb.d:rw
-      # The database is rebuilt from init.d on every container creation. Mount
-      # its data directory explicitly so the image does not create an orphaned
-      # anonymous Docker volume each time the container is replaced.
-      - type: tmpfs
-        target: /var/lib/postgresql/data
-        tmpfs:
-          size: 1g
+      # Reuse one Compose-managed volume instead of creating an orphaned
+      # anonymous volume whenever the container is replaced.
+      - db_hasura_data:/var/lib/postgresql/data
 
   keycloak:
     container_name: eduhub-keycloak
@@ -250,3 +246,6 @@ services:
       - ./keycloak/themes/opencampus:/opt/keycloak/themes/opencampus
       - ./keycloak/themes/edu-hub:/opt/keycloak/themes/edu-hub
       - ./keycloak/disable-theme-cache.cli:/opt/keycloak/startup-scripts/disable-theme-cache.cli
+
+volumes:
+  db_hasura_data:
