@@ -191,6 +191,15 @@ html.stujo-brand #kc-locale-dropdown ul {
   list-style: none;
 }
 
+html.stujo-brand #kc-locale-dropdown ul::before {
+  position: absolute;
+  top: -5px;
+  right: 0;
+  width: 100%;
+  height: 5px;
+  content: '';
+}
+
 html.stujo-brand #kc-locale-dropdown:focus-within ul {
   display: block;
 }
