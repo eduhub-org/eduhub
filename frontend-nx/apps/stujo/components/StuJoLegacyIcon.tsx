@@ -1,6 +1,6 @@
 import { FC } from 'react';
 
-type StuJoLegacyIconName = 'home' | 'plus' | 'search' | 'unlocked' | 'menu' | 'close' | 'chevron-up' | 'chevron-down';
+type StuJoLegacyIconName = 'home' | 'plus' | 'search' | 'unlocked';
 
 interface Props {
   className?: string;
@@ -8,27 +8,6 @@ interface Props {
 }
 
 const glyphs: Record<StuJoLegacyIconName, { path: string; transform: string; viewBox: string }> = {
-  // Solid geometric controls matching the weight of the legacy glyphs.
-  menu: {
-    path: 'M2 3h20v4H2zM2 10h20v4H2zM2 17h20v4H2z',
-    transform: '',
-    viewBox: '0 0 24 24',
-  },
-  close: {
-    path: 'M5 2l7 7 7-7 3 3-7 7 7 7-3 3-7-7-7 7-3-3 7-7-7-7z',
-    transform: '',
-    viewBox: '0 0 24 24',
-  },
-  'chevron-down': {
-    path: 'M2 5l10 10L22 5l4 4-14 14L-2 9z',
-    transform: 'translate(2 0)',
-    viewBox: '0 0 28 28',
-  },
-  'chevron-up': {
-    path: 'M2 5l10 10L22 5l4 4-14 14L-2 9z',
-    transform: 'translate(26 28) rotate(180)',
-    viewBox: '0 0 28 28',
-  },
   // Bootstrap 3.4.1 Glyphicons Halflings, code point U+E021.
   home: {
     path: 'M18 618l620 608q8 7 18.5 7t17.5-7l608-608q8-8 5.5-13t-12.5-5h-175v-575q0-10-7.5-17.5t-17.5-7.5h-250q-10 0-17.5 7.5t-7.5 17.5v375h-300v-375q0-10-7.5-17.5t-17.5-7.5h-250q-10 0-17.5 7.5t-7.5 17.5v575h-175q-10 0-12.5 5t5.5 13z',

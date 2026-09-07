@@ -168,27 +168,27 @@ a:focus {
   position: absolute;
   left: 0;
   top: 0;
-  /* Span 70% of the header width so the white wedge crosses the top edge at
-     ~70% and purple covers the rest, matching the live stujo.net banner. The
-     PNG's diagonal angle already matches; anchoring left keeps the purple
-     starting far left. */
-  width: 70%;
+  /* Keep the native angle and crop the artwork on small screens. These
+     minimum dimensions also apply above the mobile breakpoint. */
+  width: max(720px, 70%);
+  height: auto;
   pointer-events: none;
 }
 
 .stujo-header-logo {
   position: absolute;
-  top: 1.5em;
-  left: 1.5em;
-  width: 13%;
-  max-width: 180px;
+  top: 16px;
+  left: 16px;
+  width: clamp(136px, 13%, 180px);
   height: auto;
   object-fit: contain;
 }
 
 .stujo-header-topnav {
   position: absolute;
-  top: 1.2em;
+  /* Clear the minimum-size wedge at tablet widths, then approach the
+     original desktop position continuously as more room becomes available. */
+  top: clamp(1.2em, calc(300px - 26vw), 100px);
   right: 1.5em;
   display: flex;
   gap: 1.5rem;
@@ -986,108 +986,53 @@ button.stujo-header-action:hover {
   margin: 0;
 }
 
-/* Mobile disclosures retain the portal colors and keep content in flow. */
-.stujo-menu-toggle {
-  display: none;
-}
-
+/* Visible mobile account actions and navigation, using the desktop branding. */
 @media (max-width: 767px) {
   .stujo-header {
     height: auto;
-    min-height: 150px;
-    padding: 110px 1rem 1rem;
-  }
-
-  .stujo-header-diag {
-    width: 100%;
-    height: 90px;
-  }
-
-  .stujo-header-logo {
-    top: 12px;
-    left: 16px;
-    width: auto;
-    max-width: 140px;
-    height: 44px;
-    object-position: left center;
-  }
-
-  .stujo-menu-toggle {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    min-height: 48px;
-    border: 0;
-    font: inherit;
-    font-weight: 700;
-    cursor: pointer;
-    touch-action: manipulation;
-  }
-
-  .stujo-menu-toggle:focus-visible {
-    outline: 3px solid var(--stujo-primary);
-    outline-offset: 3px;
-  }
-
-  .stujo-account-toggle {
-    position: absolute;
-    top: 56px;
-    right: 1rem;
-    justify-content: center;
-    width: 48px;
-    background: #fff;
-    color: var(--stujo-primary);
-  }
-
-  .stujo-menu-icon {
-    width: 28px;
-    height: 28px;
-    flex: none;
+    min-height: 210px;
+    padding: 100px 16px 16px;
   }
 
   .stujo-header-topnav {
     position: static;
-    display: none;
-    width: min(100%, 280px);
-    margin-left: auto;
-    padding: 12px 20px;
-    background: var(--stujo-secondary);
-    border-radius: 4px;
-    gap: 4px;
-  }
-
-  .stujo-header-topnav--open {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: max-content max-content;
+    justify-content: end;
+    gap: 2px 22px;
+    width: 100%;
+    font-size: 15px;
   }
 
   .stujo-header-topnav .stujo-header-action {
-    min-height: 48px;
+    min-height: 44px;
   }
 
-  .stujo-header-topnav a:hover,
-  .stujo-header-topnav button:hover {
-    color: var(--stujo-primary);
+  .stujo-header-topnav > button {
+    grid-column: 2;
+  }
+
+  .stujo-lang-switch {
+    grid-column: 1 / -1;
+    justify-self: end;
   }
 
   .stujo-lang-switch > a {
     display: flex;
     align-items: center;
     justify-content: center;
-    min-width: 44px;
-    min-height: 48px;
+    min-width: 36px;
+    min-height: 44px;
   }
 
-  .stujo-navigation-toggle {
-    width: 100%;
-    justify-content: flex-end;
-    padding: 8px 10px;
-    color: #fff;
-    background: transparent;
+  .stujo-lang-switch .stujo-lang-toggle {
+    width: 44px;
+    height: 44px;
   }
 
   .stujo-nav-inner {
-    display: none;
+    flex-direction: column;
+    padding-top: 12px;
     padding-bottom: 12px;
   }
 
@@ -1095,14 +1040,13 @@ button.stujo-header-action:hover {
     display: none;
   }
 
-  .stujo-nav-inner--open {
-    display: flex;
-    flex-direction: column;
-  }
-
   .stujo-nav a {
     min-height: 48px;
     padding: 10px 12px;
+  }
+
+  .stujo-hero-claim {
+    overflow-wrap: anywhere;
   }
 
   .stujo-landing-cols > div,

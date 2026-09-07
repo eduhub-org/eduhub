@@ -2,7 +2,7 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { signIn, signOut, useSession } from 'next-auth/react';
-import { FC, PropsWithChildren, useCallback, useEffect, useState } from 'react';
+import { FC, PropsWithChildren, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 
 import type { PortalBranding } from '../lib/portal';
@@ -24,13 +24,6 @@ const Layout: FC<LayoutProps> = ({ children, fullWidthMain = false, portal }) =>
   const t = useTranslations('common');
   const tLayout = useTranslations('common.Layout');
   const router = useRouter();
-  const [accountMenuOpen, setAccountMenuOpen] = useState(false);
-  const [navigationOpen, setNavigationOpen] = useState(true);
-
-  useEffect(() => {
-    setAccountMenuOpen(false);
-    setNavigationOpen(true);
-  }, [router.asPath, router.locale]);
   const { status: sessionStatus } = useSession();
 
   // Keycloak end-session logout, same flow as the edu-hub app: fetch the
@@ -107,43 +100,16 @@ const Layout: FC<LayoutProps> = ({ children, fullWidthMain = false, portal }) =>
             where the runtime injects the compiled stylesheet. */}
         {styleVars && <style>{`:root:root { ${styleVars} }`}</style>}
       </Head>
-      <header
-        className="stujo-header"
-        onKeyDown={(event) => {
-          if (event.key === 'Escape' && accountMenuOpen) {
-            setAccountMenuOpen(false);
-            event.currentTarget.querySelector<HTMLButtonElement>('.stujo-menu-toggle')?.focus();
-          }
-        }}
-      >
+      <header className="stujo-header">
         <img src="/stujo_header_diag.png" alt="" className="stujo-header-diag" />
         <Link href="/">
-          <picture>
-            {(!portal.logoUrl || portal.logoUrl.endsWith('/stujo_header_logo.png')) && (
-              <source media="(max-width: 767px)" srcSet="/stujo_bird.png" />
-            )}
-            <img
-              src={portal.logoUrl || '/stujo_header_logo.png'}
-              alt={portal.title}
-              className="stujo-header-logo"
-            />
-          </picture>
+          <img
+            src={portal.logoUrl || '/stujo_header_logo.png'}
+            alt={portal.title}
+            className="stujo-header-logo"
+          />
         </Link>
-        <button
-          type="button"
-          className="stujo-menu-toggle stujo-account-toggle"
-          aria-label={tLayout('account_menu')}
-          aria-expanded={accountMenuOpen}
-          aria-controls="stujo-account-menu"
-          onClick={() => setAccountMenuOpen((open) => !open)}
-        >
-          <StuJoLegacyIcon name={accountMenuOpen ? 'close' : 'menu'} className="stujo-menu-icon" />
-        </button>
-        <nav
-          id="stujo-account-menu"
-          aria-label={tLayout('account_menu')}
-          className={`stujo-header-topnav${accountMenuOpen ? ' stujo-header-topnav--open' : ''}`}
-        >
+        <nav className="stujo-header-topnav" aria-label={tLayout('account_menu')}>
           <span className="stujo-lang-switch">
             <Link
               href={router.asPath}
@@ -207,35 +173,8 @@ const Layout: FC<LayoutProps> = ({ children, fullWidthMain = false, portal }) =>
           )}
         </nav>
       </header>
-      <nav
-        className="stujo-nav"
-        aria-label={tLayout('navigation')}
-        onKeyDown={(event) => {
-          if (event.key === 'Escape' && navigationOpen) {
-            setNavigationOpen(false);
-            event.currentTarget.querySelector<HTMLButtonElement>('.stujo-menu-toggle')?.focus();
-          }
-        }}
-      >
-        <div className="stujo-container">
-          <button
-            type="button"
-            className="stujo-menu-toggle stujo-navigation-toggle"
-            aria-label={tLayout('navigation')}
-            aria-expanded={navigationOpen}
-            aria-controls="stujo-navigation-menu"
-            onClick={() => setNavigationOpen((open) => !open)}
-          >
-            <StuJoLegacyIcon
-              name={navigationOpen ? 'chevron-up' : 'chevron-down'}
-              className="stujo-menu-icon"
-            />
-          </button>
-        </div>
-        <div
-          id="stujo-navigation-menu"
-          className={`stujo-container stujo-nav-inner${navigationOpen ? ' stujo-nav-inner--open' : ''}`}
-        >
+      <nav className="stujo-nav" aria-label={tLayout('navigation')}>
+        <div className="stujo-container stujo-nav-inner">
           <Link href="/" className={`stujo-nav-home ${navClass('/') ?? ''}`} aria-label={tLayout('home')}>
             <StuJoLegacyIcon name="home" className="stujo-nav-home-icon" />
           </Link>
