@@ -34,6 +34,30 @@ locals {
       domain       = "${app_name}${var.service_name_extension}.opencampus.sh"
     }
   }
+
+  # --- stujo.net, the public StuJo domain ---------------------------------
+  #
+  # stujo.net is served by CLOUDFLARE, not by a load balancer of ours: its
+  # hosts are proxied records whose Origin Rule rewrites the origin Host to the
+  # matching <service>.opencampus.sh name. The shared load balancer then routes
+  # them with the url_mask it already uses, and its certificate already covers
+  # that name — an Origin Rule host override sets the SNI to the same value, so
+  # Full (strict) still holds. Nothing about stujo.net is therefore expressed in
+  # Terraform except which host the app should call itself.
+  # See docs/STUJO_PROD_CUTOVER.md §4.
+  #
+  # This one switch says which domain is the public face. On:  the app builds
+  # its absolute URLs (NextAuth callbacks, mail links, Stripe return URLs,
+  # EduHub's job links) from the stujo.net hosts, and a DIRECT hit on an interim
+  # opencampus.sh host is 301'd to its stujo.net equivalent. Off: everything
+  # stays on opencampus.sh — which is also how to hand the public face back to
+  # stujo.opencampus.sh once that is the domain being promoted.
+  stujo_public_host = var.stujo_net_canonical ? var.stujo_net_canonical_hosts["stujo"] : local.stujo_domain
+  stujo_portal_public_hosts = {
+    for app_name, portal in local.stujo_portals : app_name => (
+      var.stujo_net_canonical ? lookup(var.stujo_net_canonical_hosts, app_name, portal.domain) : portal.domain
+    )
+  }
 }
 
 ######
@@ -293,6 +317,30 @@ variable "mailgun_domain" {
   description = "Domain for the Mailgun API"
   type        = string
 }
+variable "mailgun_additional_domains" {
+  description = <<-EOT
+    Further verified Mailgun sending domains, beyond mailgun_domain.
+
+    A mail carries its own sender (MailTemplate.from), and functions/sendMail
+    sends it through the domain here that can legitimately sign for it. That is
+    what lets the job board send as team@stujo.net while everything else keeps
+    sending as it does today.
+
+    The match is EXACT: a mail is sent as its own address only when that
+    address's domain is listed here (or is mailgun_domain). For StuJo that
+    means the apex, "stujo.net" — "mg.stujo.net" would NOT be accepted for a
+    team@stujo.net sender. The rule is strict on purpose: mailgun_domain is
+    edu.opencampus.sh, a subdomain of the opencampus.sh that every existing
+    template sends as, so a looser match would change the From on every EduHub
+    mail. See docs/STUJO_PROD_CUTOVER.md §2.2.
+
+    Leave empty until the domain is verified in Mailgun and its DNS records are
+    published: a mail whose sender no entry covers falls back to a
+    mailgun_domain sender, which is exactly today's behaviour.
+  EOT
+  type        = list(string)
+  default     = []
+}
 
 # API Access
 variable "zoom_account_id" {
@@ -406,4 +454,31 @@ variable "stujo_seller_organization_id" {
   description = "Organization.id that appears as seller on StuJo job posting invoices (defaults to the employer's organization when empty)"
   type        = string
   default     = ""
+}
+
+######
+# stujo.net domain cutover
+###
+# stujo.net stays the domain visitors see, but nothing serves it on our side:
+# Cloudflare proxies its hosts and rewrites the origin Host header (and with it
+# the SNI) to the interim <service>.opencampus.sh name, which the existing load
+# balancer already routes and already has a certificate for. So there is no
+# second load balancer, no certificate change and no new DNS record here — only
+# the question of which hostname the app should present as its own.
+
+variable "stujo_net_canonical" {
+  description = "Make stujo.net the public face: NextAuth callbacks, mail links, Stripe return URLs and EduHub's job links use the stujo.net hosts, and a direct hit on an interim opencampus.sh host 301s there. Turn it off again to hand the public face to stujo.opencampus.sh."
+  type        = bool
+  default     = false
+}
+
+variable "stujo_net_canonical_hosts" {
+  description = "Public stujo.net host per portal (AppSettings.appName), used while stujo_net_canonical is on. Must match the Cloudflare Origin Rules and the JobPortalDomain seed."
+  type        = map(string)
+  default = {
+    "stujo"           = "stujo.net"
+    "stujo-cau"       = "cau.stujo.net"
+    "stujo-haw-kiel"  = "haw-kiel.stujo.net"
+    "stujo-flensburg" = "flensburg.stujo.net"
+  }
 }

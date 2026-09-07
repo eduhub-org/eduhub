@@ -240,7 +240,7 @@ export async function sendJobPostingMail(
         html: false,
       }),
       content: replaceJobPostingVariables(applyConditionalBlocks(template.content, flags), vars),
-      from: template.from || 'noreply@stujo.net',
+      from: template.from || 'team@stujo.net',
       to,
       bcc: bcc || template.bcc || null,
       status: 'READY_TO_SEND',

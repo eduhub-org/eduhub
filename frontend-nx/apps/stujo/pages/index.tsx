@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl';
 import Layout from '../components/Layout';
 import JobCard from '../components/JobCard';
 import { resolvePortal, PortalBranding } from '../lib/portal';
+import { portalHost } from '../lib/requestHost';
 import { fetchJobList, JobListItem } from '../lib/jobs';
 
 type Props = {
@@ -59,7 +60,7 @@ const Home: FC<Props> = ({ portal, jobs, totalCount }) => {
 };
 
 export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => {
-  const portal = await resolvePortal(req.headers.host);
+  const portal = await resolvePortal(portalHost(req));
   const { jobs, totalCount } = await fetchJobList({
     region: portal.defaultRegion ?? undefined,
     limit: 5,

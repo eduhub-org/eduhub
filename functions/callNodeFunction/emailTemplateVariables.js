@@ -223,8 +223,8 @@ export const EMAIL_VARIABLES = {
     '[JobPosting:PublishedAt]': { description: 'Date the posting went live', example: '29. August 2026', categories: ['jobposting'] },
     '[JobPosting:ExpiresAt]': { description: 'Date the posting comes off the board', example: '24. Oktober 2026', categories: ['jobposting'] },
     '[JobPosting:Payment]': { description: 'How the posting was paid for', example: '59,50 \u20ac (bezahlt)', categories: ['jobposting'] },
-    '[JobPosting:DashboardUrl]': { description: 'Employer dashboard link', example: 'https://stujo.opencampus.sh/mein-stujo', categories: ['jobposting'] },
-    '[JobPosting:RepostUrl]': { description: 'Link that republishes an expired posting', example: 'https://stujo.opencampus.sh/mein-stujo?repost=1', categories: ['jobposting'] },
+    '[JobPosting:DashboardUrl]': { description: 'Employer dashboard link', example: 'https://stujo.net/mein-stujo', categories: ['jobposting'] },
+    '[JobPosting:RepostUrl]': { description: 'Link that republishes an expired posting', example: 'https://stujo.net/mein-stujo?repost=1', categories: ['jobposting'] },
     '[JobPosting:AdminUrl]': { description: 'Admin moderation link', example: 'https://edu.opencampus.sh/manage/settings/jobboerse', categories: ['jobposting'] },
     '[JobPosting:TermsAcceptedAt]': { description: 'When the employer accepted the terms; empty if never recorded', example: '29. August 2026', categories: ['jobposting'] },
     // Also used by the organization-claim mails below, which DO go through

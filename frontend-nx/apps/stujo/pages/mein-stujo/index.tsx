@@ -17,6 +17,7 @@ import {
 } from '../../lib/employer';
 import { useEmployerOrganization } from '../../lib/useEmployerOrganization';
 import { resolvePortal, PortalBranding } from '../../lib/portal';
+import { portalHost } from '../../lib/requestHost';
 
 type Props = { portal: PortalBranding };
 
@@ -58,10 +59,17 @@ const MeinStujo: FC<Props> = ({ portal }) => {
     selectOrganization,
   } = useEmployerOrganization();
 
+  // cache-and-network: the Apollo client is a module singleton that outlives
+  // client-side navigation, so a cache-first read served the list from before
+  // /mein-stujo/neu created the posting -- a freshly published offer only
+  // appeared after a hard reload. Cached rows still render instantly; the
+  // network result (new posting, updated status/views) replaces them.
   const { data, loading, refetch } = useQuery(MY_JOB_POSTINGS, {
     context: employerRole,
     variables: { organizationId: organization?.id ?? 0 },
     skip: !organization,
+    fetchPolicy: 'cache-and-network',
+    nextFetchPolicy: 'cache-and-network',
   });
 
   const [publishPosting, { loading: publishing }] = useMutation(PUBLISH_JOB_POSTING_ACTION, {
@@ -259,7 +267,7 @@ const MeinStujo: FC<Props> = ({ portal }) => {
           </tr>
         </thead>
         <tbody>
-          {loading && (
+          {loading && !data && (
             <tr>
               <td colSpan={6} className="stujo-muted">
                 {t('loading')}
@@ -319,7 +327,7 @@ const MeinStujo: FC<Props> = ({ portal }) => {
               </tr>
             );
           })}
-          {!loading && data?.JobPosting?.length === 0 && (
+          {data?.JobPosting?.length === 0 && (
             <tr>
               <td colSpan={6} className="stujo-muted">
                 {t('noOffers')}
@@ -333,7 +341,7 @@ const MeinStujo: FC<Props> = ({ portal }) => {
 };
 
 export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => {
-  const portal = await resolvePortal(req.headers.host);
+  const portal = await resolvePortal(portalHost(req));
   return { props: { portal } };
 };
 

@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 
 import Layout from '../../components/Layout';
 import { resolvePortal, PortalBranding } from '../../lib/portal';
+import { portalHost } from '../../lib/requestHost';
 import { fetchJobDetail, JobDetail } from '../../lib/jobs';
 import { httpUrlOrNull, sanitizeHtml } from '../../lib/sanitizeHtml';
 
@@ -117,7 +118,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req, param
   if (!Number.isInteger(id)) {
     return { notFound: true };
   }
-  const [portal, job] = await Promise.all([resolvePortal(req.headers.host), fetchJobDetail(id)]);
+  const [portal, job] = await Promise.all([resolvePortal(portalHost(req)), fetchJobDetail(id)]);
   if (!job) {
     return { notFound: true };
   }

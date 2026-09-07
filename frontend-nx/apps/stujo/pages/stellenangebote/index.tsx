@@ -7,6 +7,7 @@ import Layout from '../../components/Layout';
 import JobCard from '../../components/JobCard';
 import StuJoLegacyIcon from '../../components/StuJoLegacyIcon';
 import { resolvePortal, PortalBranding } from '../../lib/portal';
+import { portalHost } from '../../lib/requestHost';
 import { fetchJobList, JobListItem } from '../../lib/jobs';
 import { fetchAnonymous } from '../../lib/hasura';
 
@@ -145,7 +146,7 @@ const JobList: FC<Props> = ({
 };
 
 export const getServerSideProps: GetServerSideProps<Props> = async ({ req, query }) => {
-  const portal = await resolvePortal(req.headers.host);
+  const portal = await resolvePortal(portalHost(req));
   const filter = {
     type: typeof query.type === 'string' ? query.type : '',
     region: typeof query.region === 'string' ? query.region : '',
