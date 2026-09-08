@@ -28,7 +28,7 @@ html.stujo-flensburg {
   --kc-cobrand-accent-hover: #013e74;
 }
 
-/* Space Grotesk remains part of the EduHub theme. StuJo uses neutral UI type. */
+/* Plus Jakarta Sans remains part of the EduHub theme. StuJo uses neutral UI type. */
 html.stujo-brand body {
   background-color: var(--kc-cobrand-background);
   color: var(--kc-cobrand-copy);

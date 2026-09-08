@@ -6,13 +6,13 @@
    ============================================================ */
 
 /* ---- Webfont ----------------------------------------------
-   The product uses "Space Grotesk" (Google Fonts) as the single
+   The product uses "Plus Jakarta Sans" (Google Fonts) as the single
    typeface, applied at font-weight 500 (medium) on <body> by default.
    No font file ships in the repo, so we load it from Google Fonts.
    If you have licensed/self-hosted files, drop them in fonts/ and
    swap the @import for an @font-face block.
 ------------------------------------------------------------ */
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+@import 'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200..800&display=swap';
 
 :root {
   /* ---------- Brand ---------- */
@@ -61,7 +61,7 @@
      TYPE SYSTEM
      Family + role tokens. The product is single-typeface.
      ========================================================= */
-  --font-body: 'Space Grotesk', system-ui, sans-serif;
+  --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
 
   /* Weights actually used in the codebase */
   --fw-thin: 300;       /* footer fine print */
