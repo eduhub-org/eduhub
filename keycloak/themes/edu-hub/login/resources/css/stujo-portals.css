@@ -311,6 +311,11 @@ html.stujo-brand .pf-c-input-group .pf-c-button.pf-m-control::after {
   box-shadow: none;
 }
 
+html.stujo-brand .pf-c-input-group:focus-within
+  .pf-c-button.pf-m-control {
+  border-left-color: var(--kc-cobrand-accent);
+}
+
 html.stujo-brand .pf-c-input-group .pf-c-button.pf-m-control:hover,
 html.stujo-brand .pf-c-input-group .pf-c-button.pf-m-control:focus {
   border-left-color: var(--kc-cobrand-accent);
