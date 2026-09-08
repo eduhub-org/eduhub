@@ -70,10 +70,9 @@ locals {
   # rest cannot be, which is exactly why they sit DNS-only in the zone today.
   # Proxying those needs *.en.stujo.net on an Advanced Certificate Manager
   # certificate, and this zone has none — it is on the Free plan with zero SNI
-  # custom certificates. They are therefore left on Strato until it is
-  # decommissioned, and deleted or given ACM then (§4.6). If ACM is ever bought,
-  # add them here and to stujo_net_a_records; proxy.ts already knows what to do
-  # with them.
+  # custom certificates. They are therefore DELETED by hand during the cutover
+  # (§4.6) rather than managed here. If ACM is ever bought, add them to this map
+  # and to stujo_net_a_records; proxy.ts already knows what to do with them.
   #
   # en.stujo.net needs no portal of its own: it only has to REACH the app, and
   # proxy.ts 301s it to stujo.net/en/... from there.

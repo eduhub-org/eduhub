@@ -166,9 +166,13 @@ if mail:
     for r in sorted(mail, key=lambda r: (r["type"], r["name"])):
         print(f"    {r['type']:6} {r['name']}", file=sys.stderr)
 
-legacy = [r for r in records if ".en." in r["name"] or r["name"].startswith("en.")]
+# Only the THIRD-level en.* hosts: en.stujo.net itself is managed and imported
+# above, while its siblings are deleted during the cutover (§4.6) because
+# Universal SSL cannot cover a third-level name and this zone has no ACM.
+legacy = [r for r in records if ".en." in r["name"]]
 if legacy:
-    print("\n  Legacy en.* locale hosts — see §4.6 before proxying them:", file=sys.stderr)
+    print("\n  Third-level en.* hosts — DELETE these during the cutover (§4.6).", file=sys.stderr)
+    print("  They cannot be proxied without ACM and Terraform does not manage them:", file=sys.stderr)
     for r in sorted(legacy, key=lambda r: r["name"]):
         print(f"    {r['type']:6} {r['name']}  proxied={r.get('proxied')}", file=sys.stderr)
 if missing:
