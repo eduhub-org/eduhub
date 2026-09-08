@@ -47,7 +47,7 @@ services:
       # Fix IPv6 localhost resolution for image loading
       NODE_OPTIONS: "--dns-result-order=ipv4first"
       # Hasura configuration
-      HASURA_ADMIN_SECRET: myadminsecretkey
+      HASURA_ADMIN_SECRET: ${DEV_HASURA_ADMIN_SECRET:-myadminsecretkey}
       GRAPHQL_URI: http://hasura:8080/v1/graphql
       # Optional for local dev; required to encrypt Ghost newsletter credentials (see .env.example)
       GHOST_NEWSLETTER_CREDENTIALS_ENCRYPTION_KEY: ${GHOST_NEWSLETTER_CREDENTIALS_ENCRYPTION_KEY:-}
@@ -85,7 +85,7 @@ services:
       CHOKIDAR_USEPOLLING: "true"
       WATCHPACK_POLLING: "true"
       NODE_OPTIONS: "--dns-result-order=ipv4first"
-      HASURA_ADMIN_SECRET: myadminsecretkey
+      HASURA_ADMIN_SECRET: ${DEV_HASURA_ADMIN_SECRET:-myadminsecretkey}
       GRAPHQL_URI: http://hasura:8080/v1/graphql
 
   node_functions:
@@ -108,7 +108,7 @@ services:
       KEYCLOAK_USER: admin
       KEYCLOAK_PW: admin
       HASURA_ENDPOINT: http://hasura:8080/v1/graphql
-      HASURA_ADMIN_SECRET: myadminsecretkey
+      HASURA_ADMIN_SECRET: ${DEV_HASURA_ADMIN_SECRET:-myadminsecretkey}
       HASURA_CLOUD_FUNCTION_SECRET: test1234
       LIBRARY_PATH: "../lib/cloud-storage.js"
       FORMBRICKS_API_KEY: ${FORMBRICKS_API_KEY:-}
@@ -145,8 +145,8 @@ services:
       - ./functions:/functions
       - ./backend/init.d/file_storage:/home/node/www/emulated-bucket
     ports:
-      - "42025:42025"
-      - "42026:42026"
+      - "127.0.0.1:42025:42025"
+      - "127.0.0.1:42026:42026"
     command: sh -c "pip install -r /functions/apiProxy/requirements.txt && pip install -r /functions/callPythonFunction/requirements.txt && /functions/start-python.sh"
     environment:
       ENVIRONMENT: development
@@ -157,12 +157,12 @@ services:
       JWT_ISSUER: http://${DEV_HOST:-localhost}:28080/realms/edu-hub
       JWT_JWKS_URI: http://keycloak:8080/realms/edu-hub/protocol/openid-connect/certs
       JWT_AUDIENCE: hasura
-      HASURA_ADMIN_SECRET: myadminsecretkey
+      HASURA_ADMIN_SECRET: ${DEV_HASURA_ADMIN_SECRET:-myadminsecretkey}
       HASURA_CLOUD_FUNCTION_SECRET: test1234
       BUCKET_NAME: emulated-bucket
       LOCAL_STORAGE_PORT: 4001
       # StuJo job board (expire_job_postings / send_job_alerts mails)
-      STUJO_FRONTEND_URL: ${STUJO_FRONTEND_URL:-http://localhost:5001}
+      STUJO_FRONTEND_URL: ${STUJO_FRONTEND_URL:-http://${DEV_HOST:-localhost}:5001}
       # From repo-root .env (optional; see .env.example → Python serverless functions)
       ZOOM_API_KEY: ${ZOOM_API_KEY:-}
       ZOOM_API_SECRET: ${ZOOM_API_SECRET:-}
@@ -194,7 +194,7 @@ services:
       HASURA_GRAPHQL_DEV_MODE: "true"
       HASURA_GRAPHQL_ENABLED_LOG_TYPES: startup, http-log, webhook-log, websocket-log, query-log
       HASURA_GRAPHQL_LOG_LEVEL: warn
-      HASURA_GRAPHQL_ADMIN_SECRET: myadminsecretkey
+      HASURA_GRAPHQL_ADMIN_SECRET: ${DEV_HASURA_ADMIN_SECRET:-myadminsecretkey}
       HASURA_GRAPHQL_UNAUTHORIZED_ROLE: anonymous
       HASURA_GRAPHQL_EXPERIMENTAL_FEATURES: inherited_roles
       HASURA_GRAPHQL_JWT_SECRET: '{"jwk_url": "http://keycloak:8080/realms/edu-hub/protocol/openid-connect/certs"}'
