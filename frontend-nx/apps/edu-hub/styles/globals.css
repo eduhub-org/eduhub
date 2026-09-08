@@ -152,3 +152,76 @@
   white-space: pre-line;
 }
 
+/*
+ * Homepage hero background (WiSe 26/27 artwork).
+ *
+ * The hero box is 100vh tall and uses `background-size: cover`, and the artwork
+ * is 1.91:1, so the rendered image width is max(100vw, 191vh) — on almost every
+ * screen it is the viewport *height* that decides how large the image has to be.
+ * The tiers below therefore key on both axes. `image-set()` serves WebP where it
+ * is understood; browsers that don't parse it fall back to the preceding
+ * JPEG-only declaration.
+ */
+.homepage-hero {
+  background-image: linear-gradient(360deg, #0f0f0f 0%, rgba(0, 0, 0, 0) 12.18%),
+    linear-gradient(53.37deg, rgba(0, 0, 0, 0.8) 16.6%, rgba(0, 0, 0, 0) 79.45%),
+    url('/images/background_homepage/edu_WiSe2627_header-1280.jpg');
+  background-image: linear-gradient(360deg, #0f0f0f 0%, rgba(0, 0, 0, 0) 12.18%),
+    linear-gradient(53.37deg, rgba(0, 0, 0, 0.8) 16.6%, rgba(0, 0, 0, 0) 79.45%),
+    image-set(
+      url('/images/background_homepage/edu_WiSe2627_header-1280.webp') type('image/webp'),
+      url('/images/background_homepage/edu_WiSe2627_header-1280.jpg') type('image/jpeg')
+    );
+  background-size: cover;
+  /* `cover` on a 1.91:1 artwork inside a 100vh box crops horizontally, and on a
+     phone only ~25% of the width survives. Anchoring left keeps the magenta half
+     of the gradient (and a face) in frame, which is what production showed
+     before; `center`/`right` land on the washed-out middle of the photo. */
+  background-position: left top;
+  background-repeat: no-repeat;
+}
+
+/* rendered width up to ~1920px */
+@media (min-width: 640px), (min-height: 700px) {
+  .homepage-hero {
+    background-image: linear-gradient(360deg, #0f0f0f 0%, rgba(0, 0, 0, 0) 12.18%),
+      linear-gradient(53.37deg, rgba(0, 0, 0, 0.8) 16.6%, rgba(0, 0, 0, 0) 79.45%),
+      url('/images/background_homepage/edu_WiSe2627_header-1920.jpg');
+    background-image: linear-gradient(360deg, #0f0f0f 0%, rgba(0, 0, 0, 0) 12.18%),
+      linear-gradient(53.37deg, rgba(0, 0, 0, 0.8) 16.6%, rgba(0, 0, 0, 0) 79.45%),
+      image-set(
+        url('/images/background_homepage/edu_WiSe2627_header-1920.webp') type('image/webp'),
+        url('/images/background_homepage/edu_WiSe2627_header-1920.jpg') type('image/jpeg')
+      );
+  }
+}
+
+/* rendered width up to ~2560px */
+@media (min-width: 1280px), (min-height: 1000px) {
+  .homepage-hero {
+    background-image: linear-gradient(360deg, #0f0f0f 0%, rgba(0, 0, 0, 0) 12.18%),
+      linear-gradient(53.37deg, rgba(0, 0, 0, 0.8) 16.6%, rgba(0, 0, 0, 0) 79.45%),
+      url('/images/background_homepage/edu_WiSe2627_header-2560.jpg');
+    background-image: linear-gradient(360deg, #0f0f0f 0%, rgba(0, 0, 0, 0) 12.18%),
+      linear-gradient(53.37deg, rgba(0, 0, 0, 0.8) 16.6%, rgba(0, 0, 0, 0) 79.45%),
+      image-set(
+        url('/images/background_homepage/edu_WiSe2627_header-2560.webp') type('image/webp'),
+        url('/images/background_homepage/edu_WiSe2627_header-2560.jpg') type('image/jpeg')
+      );
+  }
+}
+
+/* rendered width beyond 2560px: large desktops and HiDPI screens */
+@media (min-width: 1920px), (min-height: 1400px), (min-resolution: 2dppx) {
+  .homepage-hero {
+    background-image: linear-gradient(360deg, #0f0f0f 0%, rgba(0, 0, 0, 0) 12.18%),
+      linear-gradient(53.37deg, rgba(0, 0, 0, 0.8) 16.6%, rgba(0, 0, 0, 0) 79.45%),
+      url('/images/background_homepage/edu_WiSe2627_header-3200.jpg');
+    background-image: linear-gradient(360deg, #0f0f0f 0%, rgba(0, 0, 0, 0) 12.18%),
+      linear-gradient(53.37deg, rgba(0, 0, 0, 0.8) 16.6%, rgba(0, 0, 0, 0) 79.45%),
+      image-set(
+        url('/images/background_homepage/edu_WiSe2627_header-3200.webp') type('image/webp'),
+        url('/images/background_homepage/edu_WiSe2627_header-3200.jpg') type('image/jpeg')
+      );
+  }
+}
