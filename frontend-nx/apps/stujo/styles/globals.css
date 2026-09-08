@@ -496,7 +496,7 @@ button.stujo-header-action:hover {
   display: grid;
   grid-template-columns: 3fr 2fr;
   gap: 2.5rem;
-  padding: 1.5rem 0;
+  padding: 1.5rem 1rem;
 }
 
 @media (max-width: 768px) {
@@ -984,4 +984,135 @@ button.stujo-header-action:hover {
 
 .stujo-section-head h2 {
   margin: 0;
+}
+
+/* Mobile disclosures retain the portal colors and keep content in flow. */
+.stujo-menu-toggle {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .stujo-header {
+    height: auto;
+    min-height: 150px;
+    padding: 110px 1rem 1rem;
+  }
+
+  .stujo-header-diag {
+    width: 100%;
+    height: 90px;
+  }
+
+  .stujo-header-logo {
+    top: 12px;
+    left: 16px;
+    width: auto;
+    max-width: 140px;
+    height: 44px;
+    object-position: left center;
+  }
+
+  .stujo-menu-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 48px;
+    border: 0;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+
+  .stujo-menu-toggle:focus-visible {
+    outline: 3px solid var(--stujo-primary);
+    outline-offset: 3px;
+  }
+
+  .stujo-account-toggle {
+    position: absolute;
+    top: 56px;
+    right: 1rem;
+    justify-content: center;
+    width: 48px;
+    background: #fff;
+    color: var(--stujo-primary);
+    font-size: 30px;
+    line-height: 1;
+  }
+
+  .stujo-header-topnav {
+    position: static;
+    display: none;
+    width: min(100%, 280px);
+    margin-left: auto;
+    padding: 12px 20px;
+    background: var(--stujo-secondary);
+    border-radius: 4px;
+    gap: 4px;
+  }
+
+  .stujo-header-topnav--open {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .stujo-header-topnav .stujo-header-action {
+    min-height: 48px;
+  }
+
+  .stujo-header-topnav a:hover,
+  .stujo-header-topnav button:hover {
+    color: var(--stujo-primary);
+  }
+
+  .stujo-lang-switch > a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 48px;
+  }
+
+  .stujo-navigation-toggle {
+    width: 100%;
+    padding: 8px 0;
+    color: #fff;
+    background: transparent;
+    text-transform: uppercase;
+    font-size: 18px;
+  }
+
+  .stujo-navigation-toggle span {
+    font-size: 28px;
+  }
+
+  .stujo-nav-inner {
+    display: none;
+    padding-bottom: 12px;
+  }
+
+  .stujo-nav-inner--open {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .stujo-nav a {
+    min-height: 48px;
+    padding: 10px 12px;
+  }
+
+  .stujo-landing-cols > div,
+  .stujo-job-row > div {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .stujo-job-row {
+    flex-wrap: wrap;
+  }
+
+  .stujo-job-row > div {
+    flex: 1 1 220px;
+  }
 }

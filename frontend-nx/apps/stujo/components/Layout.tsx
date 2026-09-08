@@ -2,7 +2,7 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { signIn, signOut, useSession } from 'next-auth/react';
-import { FC, PropsWithChildren, useCallback } from 'react';
+import { FC, PropsWithChildren, useCallback, useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
 import type { PortalBranding } from '../lib/portal';
@@ -24,6 +24,13 @@ const Layout: FC<LayoutProps> = ({ children, fullWidthMain = false, portal }) =>
   const t = useTranslations('common');
   const tLayout = useTranslations('common.Layout');
   const router = useRouter();
+  const [accountMenuOpen, setAccountMenuOpen] = useState(false);
+  const [navigationOpen, setNavigationOpen] = useState(false);
+
+  useEffect(() => {
+    setAccountMenuOpen(false);
+    setNavigationOpen(false);
+  }, [router.asPath, router.locale]);
   const { status: sessionStatus } = useSession();
 
   // Keycloak end-session logout, same flow as the edu-hub app: fetch the
@@ -100,16 +107,43 @@ const Layout: FC<LayoutProps> = ({ children, fullWidthMain = false, portal }) =>
             where the runtime injects the compiled stylesheet. */}
         {styleVars && <style>{`:root:root { ${styleVars} }`}</style>}
       </Head>
-      <header className="stujo-header">
+      <header
+        className="stujo-header"
+        onKeyDown={(event) => {
+          if (event.key === 'Escape' && accountMenuOpen) {
+            setAccountMenuOpen(false);
+            event.currentTarget.querySelector<HTMLButtonElement>('.stujo-menu-toggle')?.focus();
+          }
+        }}
+      >
         <img src="/stujo_header_diag.png" alt="" className="stujo-header-diag" />
         <Link href="/">
-          <img
-            src={portal.logoUrl || '/stujo_header_logo.png'}
-            alt={portal.title}
-            className="stujo-header-logo"
-          />
+          <picture>
+            {(!portal.logoUrl || portal.logoUrl.endsWith('/stujo_header_logo.png')) && (
+              <source media="(max-width: 767px)" srcSet="/stujo_bird.png" />
+            )}
+            <img
+              src={portal.logoUrl || '/stujo_header_logo.png'}
+              alt={portal.title}
+              className="stujo-header-logo"
+            />
+          </picture>
         </Link>
-        <nav className="stujo-header-topnav">
+        <button
+          type="button"
+          className="stujo-menu-toggle stujo-account-toggle"
+          aria-label={tLayout('account_menu')}
+          aria-expanded={accountMenuOpen}
+          aria-controls="stujo-account-menu"
+          onClick={() => setAccountMenuOpen((open) => !open)}
+        >
+          <span aria-hidden="true">{accountMenuOpen ? '×' : '☰'}</span>
+        </button>
+        <nav
+          id="stujo-account-menu"
+          aria-label={tLayout('account_menu')}
+          className={`stujo-header-topnav${accountMenuOpen ? ' stujo-header-topnav--open' : ''}`}
+        >
           <span className="stujo-lang-switch">
             <Link
               href={router.asPath}
@@ -173,8 +207,32 @@ const Layout: FC<LayoutProps> = ({ children, fullWidthMain = false, portal }) =>
           )}
         </nav>
       </header>
-      <nav className="stujo-nav">
-        <div className="stujo-container stujo-nav-inner">
+      <nav
+        className="stujo-nav"
+        aria-label={tLayout('navigation')}
+        onKeyDown={(event) => {
+          if (event.key === 'Escape' && navigationOpen) {
+            setNavigationOpen(false);
+            event.currentTarget.querySelector<HTMLButtonElement>('.stujo-menu-toggle')?.focus();
+          }
+        }}
+      >
+        <div className="stujo-container">
+          <button
+            type="button"
+            className="stujo-menu-toggle stujo-navigation-toggle"
+            aria-expanded={navigationOpen}
+            aria-controls="stujo-navigation-menu"
+            onClick={() => setNavigationOpen((open) => !open)}
+          >
+            {tLayout('navigation')}
+            <span aria-hidden="true">{navigationOpen ? '⌃' : '⌄'}</span>
+          </button>
+        </div>
+        <div
+          id="stujo-navigation-menu"
+          className={`stujo-container stujo-nav-inner${navigationOpen ? ' stujo-nav-inner--open' : ''}`}
+        >
           <Link href="/" className={`stujo-nav-home ${navClass('/') ?? ''}`} aria-label={tLayout('home')}>
             <StuJoLegacyIcon name="home" className="stujo-nav-home-icon" />
           </Link>
