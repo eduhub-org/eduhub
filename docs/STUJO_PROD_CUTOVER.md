@@ -223,6 +223,25 @@ Turning it back off is also how the public face is handed to
    Cloudflare's own addresses and breaks Mailgun's tracking and bounce
    endpoints. TXT records cannot be proxied, so they need no such care.
 
+   **Then check that DKIM still resolves.** Mailgun puts tracking at
+   `email.stujo.net` and DKIM at `email._domainkey.stujo.net` — so the DKIM
+   record sits *below a CNAME*. Strict DNS says a CNAME occludes everything
+   beneath it (RFC 1034: no other data should exist at or under a CNAME node).
+   Cloudflare accepts both and answers exact-name queries anyway, so it
+   normally works — but "normally" is not a standard to hold the record that
+   authenticates mail under `p=reject` to. Verify, from an external resolver
+   rather than whatever your laptop is using:
+
+   ```bash
+   dig +short TXT email._domainkey.stujo.net @1.1.1.1
+   dig +short TXT email._domainkey.stujo.net @8.8.8.8
+   ```
+
+   A `k=rsa; p=…` string from both: proceed. Empty: the DKIM record is
+   unreachable and Mailgun's verification will fail. The fix is to break the
+   collision — have Mailgun reissue DKIM under a different selector, or drop
+   the tracking CNAME, tracking being the optional half of the pair.
+
    **f. DMARC is already at `p=reject` — read this before setting the
    variable.** The zone publishes `_dmarc.stujo.net = "v=DMARC1; p=reject;"`.
    That is the strictest policy there is: mail that fails DMARC for stujo.net
