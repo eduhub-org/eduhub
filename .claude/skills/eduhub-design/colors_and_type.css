@@ -12,7 +12,7 @@
    If you have licensed/self-hosted files, drop them in fonts/ and
    swap the @import for an @font-face block.
 ------------------------------------------------------------ */
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200..800&display=swap');
+@import 'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200..800&display=swap';
 
 :root {
   /* ---------- Brand ---------- */
