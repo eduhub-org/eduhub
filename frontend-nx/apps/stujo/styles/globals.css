@@ -211,6 +211,19 @@ a:focus {
   gap: 0.35em;
 }
 
+button.stujo-header-action {
+  padding: 0;
+  border: 0;
+  color: #fff;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+}
+
+button.stujo-header-action:hover {
+  color: var(--stujo-secondary);
+}
+
 .stujo-header-action--uppercase {
   text-transform: uppercase;
 }
@@ -669,6 +682,12 @@ a:focus {
 
 .stujo-table td a:hover {
   color: var(--stujo-grey);
+}
+
+.stujo-table-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .stujo-chip {
