@@ -5,7 +5,7 @@
  * looked like a standalone StuJo dialog, people with an existing EduHub
  * account did not recognise it and tried to register again, which only got
  * them "email already exists". So the page deliberately stays the EduHub
- * login — dark #222 page, light card, pill buttons, Space Grotesk — and the
+ * login — dark #222 page, light card, pill buttons, Plus Jakarta Sans — and the
  * portal only adds a small co-brand mark next to the EduHub lockup plus one
  * accent colour. Activated via html.stujo-brand (see js/stujo-portal-brand.js).
  *
