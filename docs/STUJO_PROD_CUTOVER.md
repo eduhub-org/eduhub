@@ -126,9 +126,9 @@ Turning it back off is also how the public face is handed to
    for it, and the StuJo templates send as **`team@stujo.net`** — a real
    mailbox, because the organization-access mail asks people to reply to it.
 
-   What remains is the Mailgun and DNS half, and it belongs in this window
-   because the records go in the zone being re-pointed. **Verify the apex
-   `stujo.net`. A subdomain will not work** — `sendMail` matches a sender
+   What remains is the DNS half — the domain itself is already created in
+   Mailgun, on the **apex `stujo.net`**, which is what `sendMail` needs. A
+   subdomain would not have worked — `sendMail` matches a sender
    against the configured Mailgun domains **exactly**, so `mg.stujo.net` would
    not be accepted for a `team@stujo.net` sender and those mails would keep
    falling back to the opencampus.sh domain.
@@ -145,91 +145,83 @@ Turning it back off is also how the public face is handed to
    domain, so StuJo mail aligns under strict alignment as well as relaxed,
    whatever the stujo.net zone publishes now or grows into later.
 
-   **a. Add the domain in Mailgun — in the EU region.** This account sends
-   through `https://api.eu.mailgun.net` (`functions/sendMail/index.js`), so the
-   domain must be created in the **EU** region, not US. The two regions are
-   separate namespaces with different DNS values; a domain verified in the
-   wrong one is invisible to the API key in use and every send fails with a
-   404-shaped "domain not found". Switch the region in the Mailgun control
-   panel before *Add New Domain*, enter `stujo.net`, and leave DKIM at the
-   default key length unless the zone has a reason otherwise.
+   **The domain is created in Mailgun (EU region) and its records are known.**
+   Everything below uses the real values. The account sends through
+   `api.eu.mailgun.net`, and the MX rows Mailgun offers are
+   `mxa.eu.mailgun.org` / `mxb.eu.mailgun.org`, which confirms the domain was
+   created in the right region — a US-region domain would be invisible to the
+   API key in use.
 
-   **b. Copy the records Mailgun then shows** — do not copy them from this
-   document. They are per-domain and per-region, and the DKIM value in
-   particular is unique to your domain. Mailgun lists four kinds:
+   **a. Add the DKIM record.** In Cloudflare, a new **TXT** record:
 
-   | Record | Type | Purpose | Add it? |
-   |---|---|---|---|
-   | SPF on `stujo.net` | TXT | authorises Mailgun's senders | **yes — but merge, see c** |
-   | `<selector>._domainkey.stujo.net` | TXT | the DKIM public key | **yes** |
-   | `email.stujo.net` | CNAME | open/click tracking + bounce handling | **yes — DNS-only, see d** |
-   | `stujo.net` MX ×2 | MX | receiving mail *at Mailgun* | **no — see e** |
+   | Field | Value |
+   |---|---|
+   | Name | `email._domainkey` |
+   | Content | `k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDKiUx29m4XmqBh6whaOh2fIwy1oz0UD8tCRrr6LFGfDFnjXU1rgJF6bv4bYH9tZlSBSI1IDCqiXUp5r10OWMhdGQBoEAhGKxF+OBn/BAl/VdEJYfWgD13/q+CmBcMAmluQLvTjWN/rb+B4m6slKdATVksX6PkBhrkKJrMkFTL6swIDAQAB` |
+   | TTL | Auto |
 
-   **c0. Read the current records first — the dashboard truncates them.** Use
-   DNS rather than the UI, so you see the whole value:
+   **Use Mailgun's copy button — never retype it.** The value is 225
+   characters of base64 in which `0`/`O` and `l`/`I` are visually identical,
+   and one wrong character means DKIM fails silently: the mail still sends, it
+   just fails authentication, which under `p=reject` (f) means it is bounced.
+   At 225 characters it fits in a single TXT string, so no splitting is needed.
+
+   The selector is `email`, which does not collide with Microsoft 365's
+   `selector1`/`selector2` — the two sign side by side.
+
+   **b. EDIT the SPF record. Do not paste Mailgun's.** Mailgun shows
+   `v=spf1 include:mailgun.org ~all` as if it were the whole record. Pasting
+   that would drop Microsoft 365 from SPF and break the mail that already
+   works. A domain may publish exactly one SPF record; two is a `permerror`
+   and receivers treat the result as unauthenticated. So merge:
+
+   ```
+   before: v=spf1 include:spf.protection.outlook.com -all
+   after:  v=spf1 include:spf.protection.outlook.com include:mailgun.org -all
+   ```
+
+   Keep the existing `-all`, not Mailgun's `~all`: the zone already commits to
+   a hard fail and softening it would weaken every domain, not just StuJo's
+   mail. Two `include:` mechanisms is far inside SPF's ten-lookup limit.
+
+   **This edit is the single highest-risk action in the cutover.** A typo here
+   fails SPF for Microsoft 365 under `p=reject`, i.e. the organisation's normal
+   mail starts bouncing. Verify it the moment you save (c), and keep the exact
+   original string to paste back:
+   `v=spf1 include:spf.protection.outlook.com -all`
+
+   **c. Verify the two records resolve, before touching Mailgun's button.**
 
    ```bash
-   dig +short TXT stujo.net          # the SPF record, and the MS= verification TXT
-   dig +short TXT _dmarc.stujo.net   # v=DMARC1; p=reject;
-   dig +short MX  stujo.net          # Microsoft 365 — must not change
+   dig +short TXT email._domainkey.stujo.net
+   dig +short TXT stujo.net
    ```
 
-   Keep that output. It is the before-picture, and the SPF line is the one you
-   are about to edit by hand.
+   The second must show **one** `v=spf1` line, containing both includes and
+   ending `-all`, plus the untouched `"MS=ms88886274"`. If it shows two
+   `v=spf1` lines, delete the one you added and edit the original instead.
 
-   **c. SPF: EDIT the existing record. Do not add a second one.** This is not
-   a hypothetical here — the zone already publishes SPF, because **stujo.net is
-   a live Microsoft 365 mail domain**: it has `autodiscover.stujo.net →
-   autodiscover.outlook.com` and the `selector1`/`selector2._domainkey` CNAMEs
-   that are M365's DKIM. A domain may publish exactly one SPF TXT record; two
-   is a `permerror` and every receiver treats the result as unauthenticated —
-   so adding Mailgun's include as a new record would break the mail that
-   already works, not just the mail you are adding.
+   **d. Do NOT add the MX records.** Mailgun lists `mxa.eu.mailgun.org` and
+   `mxb.eu.mailgun.org` under *Receiving records*, and its own note says to
+   skip them if the domain already receives mail elsewhere. stujo.net receives
+   through Microsoft 365 (`stujo-net.mail.protection.outlook.com`), and
+   `team@stujo.net` is a live mailbox there. Adding Mailgun's MX would take
+   delivery away from the tenant.
 
-   Take the existing record, insert Mailgun's `include:` before the trailing
-   `all` mechanism, and leave everything else alone:
+   Those two rows will therefore stay **Unverified** in Mailgun for ever. That
+   is correct, not a fault, and not something to fix. Sending needs the two
+   TXT records only.
 
-   ```
-   now:   v=spf1 include:spf.protection.outlook.co…   (the record in the zone)
-   after: v=spf1 include:spf.protection.outlook.com include:<mailgun> <all-tag>
-   ```
+   **e. The tracking CNAME — add it, DNS-only.** `functions/sendMail` sets
+   `'o:tracking': true`, so Mailgun rewrites every link in a StuJo mail. With
+   no tracking host of our own it rewrites them to a Mailgun-branded domain,
+   which in a mail from `team@stujo.net` looks wrong and gives filters a
+   sender/link mismatch to dislike. Take the host from Mailgun's *Tracking
+   records* section and add it as a CNAME with the cloud icon **grey**.
 
-   Keep the existing trailing `all` mechanism exactly as it is — `-all` or
-   `~all`, whichever the record ends in; the dashboard truncates it, so read
-   the full value before editing. Copy Mailgun's exact include from its panel;
-   the EU region's differs. Watch the ten-DNS-lookup SPF limit: two
-   `include:`s is well inside it, but it is the reason not to keep piling them
-   on.
-
-   Strictly, DKIM alone is enough for DMARC to pass, so a missed SPF edit
-   would not by itself bounce mail under `p=reject`. Do it anyway: one
-   authentication mechanism is not a margin worth running production mail on.
-
-   **c2. DKIM will not collide, and M365 is why to check.** M365 owns
-   `selector1` and `selector2`; Mailgun publishes under its own selector, so
-   the two coexist. Confirm the selector Mailgun gives you is neither of those
-   before adding it.
-
-   **d. The tracking CNAME must be DNS-only (grey cloud).** Cloudflare proxies
-   a CNAME by default, which answers with Cloudflare's own addresses and
-   breaks Mailgun's tracking and bounce endpoints. Toggle the cloud icon to
-   grey on `email.stujo.net`. The TXT records cannot be proxied, so they need
-   no such care.
-
-   **e. Do NOT add Mailgun's MX records.** Those hand *inbound* mail for
-   `stujo.net` to Mailgun — and stujo.net's inbound mail already belongs to
-   Microsoft 365. Adding them would take delivery away from the tenant that
-   holds the mailboxes. Sending verification needs the two TXT records, not the
-   MX; leave the MX exactly as it is.
-
-   **`team@stujo.net` already exists in the M365 tenant** — so the reply address
-   these mails invite answers to is live, and nothing needs building. Just make
-   sure somebody is actually reading it once the job board starts pointing
-   employers at it.
-
-   Do not tidy away `stujo.net TXT "MS=ms88886274"` either. It is Microsoft's
-   domain-verification record; removing it can un-verify the domain in the
-   tenant, which takes the mail with it.
+   Grey matters: Cloudflare proxies a CNAME by default, which answers with
+   Cloudflare's own addresses and breaks Mailgun's tracking and bounce
+   endpoints. TXT records cannot be proxied, so they need no such care.
 
    **f. DMARC is already at `p=reject` — read this before setting the
    variable.** The zone publishes `_dmarc.stujo.net = "v=DMARC1; p=reject;"`.
@@ -239,41 +231,30 @@ Turning it back off is also how the public face is handed to
    `d=stujo.net` for a `From` on `stujo.net`, so it aligns under the relaxed
    default and would still align under `adkim=s`.
 
-   What it does change is that **step g is a gate, not a step**. Set
-   `mailgun_additional_domains = ["stujo.net"]` only once Mailgun reports the
-   domain verified and its DKIM record is live in the zone. Do it early and
-   StuJo mail goes out as `team@stujo.net` with neither SPF nor DKIM
-   authorising it — under `p=reject` that mail is bounced, and the recipient
-   never sees it. Until you set it, mail leaves as
-   `noreply@edu.opencampus.sh`, which is a different organizational domain and
-   entirely unaffected by this policy. That is the safe state, and it is the
-   default.
+   What it does change is that **step h is a gate, not a step.** Until it is
+   taken, StuJo mail leaves as `noreply@edu.opencampus.sh` — a different
+   organizational domain, entirely outside this policy. That is the safe
+   state, and it is the default.
 
-   Belt and braces: send the §2.2 h test mail to an address you control at a
-   provider that reports DMARC (Gmail does) and read the header before
-   announcing anything to employers.
+   **g. Press Verify in Mailgun and wait for both TXT rows to go green.**
+   DNS is fast on Cloudflare, but Mailgun caches; if a row stays orange,
+   re-check with `dig` first and only then re-press. Do not proceed while
+   either sending record is unverified.
 
-   **g. Set `mailgun_additional_domains = ["stujo.net"]`** in the Terraform
-   workspace and apply — **only once Mailgun shows the domain verified and the
-   DKIM record resolves.** Under `p=reject` (f) this is a gate, not a step.
-   Confirm both before touching the variable:
+   **h. Only now set `mailgun_additional_domains = ["stujo.net"]`** in the
+   production Terraform workspace and apply. The only diff is
+   `MAILGUN_ADDITIONAL_DOMAINS` on the `sendMail` function — one revision, no
+   other service touched.
 
-   ```bash
-   dig +short TXT <selector>._domainkey.stujo.net   # Mailgun's DKIM, live?
-   dig +short TXT stujo.net | grep spf1             # one record, with both includes?
-   ```
-
-   Then apply. The only diff is `MAILGUN_ADDITIONAL_DOMAINS` on the `sendMail`
-   function — one revision, no other service touched.
-
-   **h. Verify with a real message, not with the panel.** Mailgun's green tick
-   says the records parse, not that mail aligns. Trigger one StuJo mail (a job
-   posting publish on a test organization does it) and read the
-   `Authentication-Results` header on what arrives:
+   **i. Verify with a real message, not with the panel.** Mailgun's green tick
+   says the records parse, not that mail aligns. Trigger one StuJo mail — a job
+   posting publish on a test organization does it — sent to an address at a
+   provider that reports DMARC (Gmail does), and read the
+   `Authentication-Results` header:
 
    ```
    dkim=pass header.d=stujo.net
-   spf=pass smtp.mailfrom=...stujo.net
+   spf=pass  smtp.mailfrom=...
    dmarc=pass
    ```
 
@@ -286,11 +267,6 @@ Turning it back off is also how the public face is handed to
    deployment does not send through, which is the pre-existing state, not a
    fault.
 
-   Until step g, nothing changes at all: a sender no configured domain covers
-   falls back to `noreply@${MAILGUN_DOMAIN}`, which is exactly what every mail
-   sends as today. The order is therefore free — deploy first and verify later,
-   or the other way round — and merging the code on its own is a no-op for
-   mail.
 
 3. **TTLs — largely already handled.** The web hosts are **already proxied**,
    so their public answer is Cloudflare's anycast address and their TTL is
