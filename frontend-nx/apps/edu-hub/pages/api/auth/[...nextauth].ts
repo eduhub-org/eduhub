@@ -15,6 +15,9 @@ if (!HASURA_ADMIN_SECRET) {
   );
 }
 
+const publicKeycloakUrl = process.env.NEXT_PUBLIC_AUTH_URL;
+const internalKeycloakUrl = process.env.KEYCLOAK_INTERNAL_URL || publicKeycloakUrl;
+
 const UPDATE_USER = gql`
   mutation update_User($id: ID!) {
     updateFromKeycloak(userid: $id) {
@@ -46,7 +49,7 @@ export const updateUser = async (accessToken: string, userId: string) => {
 const refreshAccessToken = async (token: JWT) => {
   try {
     const refreshedTokens = await axios.post<IKeycloakRefreshTokenApiResponse>(
-      `${process.env.NEXTAUTH_URL}/api/auth/keycloakRefreshToken`,
+      `${process.env.NEXTAUTH_INTERNAL_URL || process.env.NEXTAUTH_URL}/api/auth/keycloakRefreshToken`,
       {
         refreshToken: token?.refreshToken,
       }
@@ -82,8 +85,15 @@ export default NextAuth({
         process.env.CLIENT_SECRET ||
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         process.env.NEXT_AUTH_CLIENT_SECRET!,
-      authorization: `${process.env.NEXT_PUBLIC_AUTH_URL}/auth`,
-      issuer: `${process.env.NEXT_PUBLIC_AUTH_URL}/realms/edu-hub`,
+      // The browser uses the selected LAN/Tailscale hostname. OAuth backchannel
+      // calls stay on Docker's private network, so authentication also works
+      // when that hostname is not resolvable from inside the container.
+      wellKnown: undefined,
+      authorization: `${publicKeycloakUrl}/realms/edu-hub/protocol/openid-connect/auth`,
+      token: `${internalKeycloakUrl}/realms/edu-hub/protocol/openid-connect/token`,
+      userinfo: `${internalKeycloakUrl}/realms/edu-hub/protocol/openid-connect/userinfo`,
+      jwks_endpoint: `${internalKeycloakUrl}/realms/edu-hub/protocol/openid-connect/certs`,
+      issuer: `${publicKeycloakUrl}/realms/edu-hub`,
       idToken: true,
     }),
   ],
