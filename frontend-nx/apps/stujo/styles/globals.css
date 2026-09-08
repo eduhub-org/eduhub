@@ -1038,13 +1038,18 @@ button.stujo-header-action:hover {
     display: flex;
     align-items: center;
     justify-content: center;
-    min-width: 36px;
+    min-width: 44px;
     min-height: 44px;
   }
 
   .stujo-lang-switch .stujo-lang-toggle {
     width: 44px;
     height: 44px;
+  }
+
+  .stujo-posting-actions > * {
+    min-width: 44px;
+    min-height: 44px;
   }
 
   .stujo-hero-claim {
