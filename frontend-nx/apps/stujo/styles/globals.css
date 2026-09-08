@@ -655,6 +655,21 @@ button.stujo-header-action:hover {
   color: var(--stujo-primary);
 }
 
+.stujo-table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.stujo-posting-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.stujo-posting-actions > * {
+  flex-shrink: 0;
+}
+
 .stujo-table {
   width: 100%;
   border-collapse: collapse;
@@ -684,12 +699,6 @@ button.stujo-header-action:hover {
   color: var(--stujo-grey);
 }
 
-.stujo-table-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
 .stujo-chip {
   display: inline-block;
   border-radius: 999px;
@@ -705,6 +714,7 @@ button.stujo-header-action:hover {
 
 .stujo-steps {
   display: flex;
+  flex-wrap: wrap;
   gap: 1.5rem;
   margin: 0.75rem 0 1.25rem;
 }
@@ -729,14 +739,17 @@ button.stujo-header-action:hover {
 
 .stujo-form-row {
   display: flex;
+  flex-wrap: wrap;
   gap: 1rem;
 }
 
 .stujo-form-row .stujo-field {
-  flex: 1;
+  flex: 1 1 12rem;
 }
 
 .stujo-field {
+  min-width: 0;
+  overflow-wrap: anywhere;
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
@@ -748,6 +761,8 @@ button.stujo-header-action:hover {
 .stujo-field input,
 .stujo-field select,
 .stujo-field textarea {
+  width: 100%;
+  min-width: 0;
   font-family: inherit;
   font-weight: 400;
   font-size: 14px;
@@ -759,6 +774,8 @@ button.stujo-header-action:hover {
 
 .stujo-form-actions {
   display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
   justify-content: space-between;
   margin-top: 0.5rem;
 }

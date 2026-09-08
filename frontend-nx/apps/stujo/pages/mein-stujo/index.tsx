@@ -255,89 +255,91 @@ const MeinStujo: FC<Props> = ({ portal }) => {
         ))}
       </div>
 
-      <table className="stujo-table">
-        <thead>
-          <tr>
-            <th>{t('colOffer')}</th>
-            <th>{t('colCategory')}</th>
-            <th>{t('colStatus')}</th>
-            <th>{t('colViews')}</th>
-            <th>{t('colExpires')}</th>
-            <th />
-          </tr>
-        </thead>
-        <tbody>
-          {loading && !data && (
+      <div className="stujo-table-scroll" role="region" aria-label={t('title')} tabIndex={0}>
+        <table className="stujo-table">
+          <thead>
             <tr>
-              <td colSpan={6} className="stujo-muted">
-                {t('loading')}
-              </td>
+              <th>{t('colOffer')}</th>
+              <th>{t('colCategory')}</th>
+              <th>{t('colStatus')}</th>
+              <th>{t('colViews')}</th>
+              <th>{t('colExpires')}</th>
+              <th />
             </tr>
-          )}
-          {data?.JobPosting?.map((posting: any) => {
-            const statusClassName =
-              STATUS_CLASSNAMES[posting.status] ?? STATUS_CLASSNAMES.DRAFT;
-            return (
-              <tr key={posting.id}>
-                <td>
-                  <Link href={`/mein-stujo/neu?id=${posting.id}`} style={{ fontWeight: 600 }}>
-                    {posting.title}
-                  </Link>
-                </td>
-                <td className="stujo-muted">{tType(posting.type)}</td>
-                <td>
-                  <span className={statusClassName}>{t(`status.${posting.status}`)}</span>
-                </td>
-                <td className="stujo-muted">{posting.views}</td>
-                <td className="stujo-muted">{formatDate(posting.expiresAt)}</td>
-                <td style={{ whiteSpace: 'nowrap' }}>
-                  <div className="stujo-table-actions">
-                    <Link
-                      href={`/mein-stujo/neu?id=${posting.id}`}
-                      className="stujo-button-pen"
-                      title={t('edit')}
-                      aria-label={t('edit')}
-                    />
-                    {(posting.status === 'DRAFT' || posting.status === 'PENDING_PAYMENT') && (
-                      <button
-                        className="stujo-btn stujo-btn--small"
-                        disabled={publishing}
-                        onClick={() => handlePublish(posting.id)}
-                      >
-                        {t('publish')}
-                      </button>
-                    )}
-                    {posting.status === 'EXPIRED' && (
-                      <button
-                        className="stujo-btn stujo-btn--small"
-                        disabled={publishing}
-                        onClick={() => handlePublish(posting.id)}
-                      >
-                        {t('repost')}
-                      </button>
-                    )}
-                    {posting.status === 'PUBLISHED' && (
-                      <button
-                        className="stujo-btn stujo-btn--small stujo-btn--ghost"
-                        onClick={() => handleArchive(posting.id)}
-                      >
-                        {t('archive')}
-                      </button>
-                    )}
-                  </div>
+          </thead>
+          <tbody>
+            {loading && !data && (
+              <tr>
+                <td colSpan={6} className="stujo-muted">
+                  {t('loading')}
                 </td>
               </tr>
-            );
-          })}
-          {data?.JobPosting?.length === 0 && (
-            <tr>
-              <td colSpan={6} className="stujo-muted">
-                {t('noOffers')}
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+            )}
+            {data?.JobPosting?.map((posting: any) => {
+              const statusClassName =
+                STATUS_CLASSNAMES[posting.status] ?? STATUS_CLASSNAMES.DRAFT;
+              return (
+                <tr key={posting.id}>
+                  <td>
+                    <Link href={`/mein-stujo/neu?id=${posting.id}`} style={{ fontWeight: 600 }}>
+                      {posting.title}
+                    </Link>
+                  </td>
+                  <td className="stujo-muted">{tType(posting.type)}</td>
+                  <td>
+                    <span className={statusClassName}>{t(`status.${posting.status}`)}</span>
+                  </td>
+                  <td className="stujo-muted">{posting.views}</td>
+                  <td className="stujo-muted">{formatDate(posting.expiresAt)}</td>
+                  <td>
+                    <div className="stujo-posting-actions">
+                      <Link
+                        href={`/mein-stujo/neu?id=${posting.id}`}
+                        className="stujo-button-pen"
+                        title={t('edit')}
+                        aria-label={t('edit')}
+                      />
+                      {(posting.status === 'DRAFT' || posting.status === 'PENDING_PAYMENT') && (
+                        <button
+                          className="stujo-btn stujo-btn--small"
+                          disabled={publishing}
+                          onClick={() => handlePublish(posting.id)}
+                        >
+                          {t('publish')}
+                        </button>
+                      )}
+                      {posting.status === 'EXPIRED' && (
+                        <button
+                          className="stujo-btn stujo-btn--small"
+                          disabled={publishing}
+                          onClick={() => handlePublish(posting.id)}
+                        >
+                          {t('repost')}
+                        </button>
+                      )}
+                      {posting.status === 'PUBLISHED' && (
+                        <button
+                          className="stujo-btn stujo-btn--small stujo-btn--ghost"
+                          onClick={() => handleArchive(posting.id)}
+                        >
+                          {t('archive')}
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+            {data?.JobPosting?.length === 0 && (
+              <tr>
+                <td colSpan={6} className="stujo-muted">
+                  {t('noOffers')}
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
     </Layout>
   );
 };
