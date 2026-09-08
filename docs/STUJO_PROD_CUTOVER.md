@@ -223,24 +223,25 @@ Turning it back off is also how the public face is handed to
    Cloudflare's own addresses and breaks Mailgun's tracking and bounce
    endpoints. TXT records cannot be proxied, so they need no such care.
 
-   **Then check that DKIM still resolves.** Mailgun puts tracking at
-   `email.stujo.net` and DKIM at `email._domainkey.stujo.net` — so the DKIM
-   record sits *below a CNAME*. Strict DNS says a CNAME occludes everything
-   beneath it (RFC 1034: no other data should exist at or under a CNAME node).
-   Cloudflare accepts both and answers exact-name queries anyway, so it
-   normally works — but "normally" is not a standard to hold the record that
-   authenticates mail under `p=reject` to. Verify, from an external resolver
-   rather than whatever your laptop is using:
+   Tracking sits at `email.stujo.net` and DKIM at
+   `email._domainkey.stujo.net`. Those are separate DNS nodes and do not
+   conflict: a CNAME excludes other data at *its own* owner name, not at names
+   beneath it — subtree occlusion is what `DNAME` and a zone cut do, not
+   `CNAME`.
+
+   **Verify DKIM resolves anyway**, from external resolvers rather than
+   whatever your laptop is using — this catches the failure that is actually
+   likely, a transcription error in 225 characters of base64:
 
    ```bash
    dig +short TXT email._domainkey.stujo.net @1.1.1.1
    dig +short TXT email._domainkey.stujo.net @8.8.8.8
    ```
 
-   A `k=rsa; p=…` string from both: proceed. Empty: the DKIM record is
-   unreachable and Mailgun's verification will fail. The fix is to break the
-   collision — have Mailgun reissue DKIM under a different selector, or drop
-   the tracking CNAME, tracking being the optional half of the pair.
+   Both must return the `k=rsa; p=…` string, byte-identical to Mailgun's.
+   Nothing returned means the record is missing or misnamed, and Mailgun's
+   verification will fail. **Checked 2026-09-08: both resolvers return it, and
+   the key parses as a valid 1024-bit RSA SubjectPublicKeyInfo.**
 
    **f. DMARC is already at `p=reject` — read this before setting the
    variable.** The zone publishes `_dmarc.stujo.net = "v=DMARC1; p=reject;"`.
@@ -877,9 +878,13 @@ with the proxied ones. Proxying or deleting them clears it.
 
 ### 4.7 Verify, immediately after the apply
 
-The apply in §4.3 *is* the repoint: each web record becomes a proxied CNAME to
-its origin, and the two rulesets start acting on it. Mail records are untouched
-— they were never in the plan.
+The apply in §4.3 *is* the repoint. The six web hosts stay **proxied A
+records** and only their value changes, to `module.lb-http.external_ip`;
+`www.stujo.net` stays a CNAME to the apex and does not change at all. No record
+changes type, and none is replaced — a destroy-and-create in that plan means
+something matched wrongly (§4.3 step 3). The two rulesets start acting on the
+traffic at the same moment. Mail records are untouched; they were never in the
+plan.
 
 Smoke-test each host — the address bar must stay on stujo.net throughout:
 
