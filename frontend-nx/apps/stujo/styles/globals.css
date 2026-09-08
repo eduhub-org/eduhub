@@ -1030,21 +1030,6 @@ button.stujo-header-action:hover {
     height: 44px;
   }
 
-  .stujo-nav-inner {
-    flex-direction: column;
-    padding-top: 12px;
-    padding-bottom: 12px;
-  }
-
-  .stujo-nav .stujo-nav-home {
-    display: none;
-  }
-
-  .stujo-nav a {
-    min-height: 48px;
-    padding: 10px 12px;
-  }
-
   .stujo-hero-claim {
     overflow-wrap: anywhere;
   }
