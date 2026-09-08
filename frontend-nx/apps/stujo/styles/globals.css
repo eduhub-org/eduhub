@@ -276,18 +276,25 @@ button.stujo-header-action:hover {
 .stujo-nav a {
   display: flex;
   align-items: center;
+  min-width: 0;
+  max-width: 100%;
   color: #fff;
   font-family: var(--stujo-font);
   font-size: 20px;
   font-weight: 700;
   text-transform: uppercase;
   padding: 0.55em 1em;
+  overflow-wrap: anywhere;
 }
 
 .stujo-nav a:hover,
 .stujo-nav a.stujo-nav--active {
   background: #fff;
   color: var(--stujo-primary);
+}
+
+.stujo-nav-home {
+  min-height: 2.53em;
 }
 
 .stujo-nav-home-icon {
@@ -604,10 +611,17 @@ button.stujo-header-action:hover {
   margin-bottom: 1rem;
 }
 
+.stujo-dash-head > div {
+  min-width: 0;
+  max-width: 100%;
+}
+
 /* Company picker, shown only when a user may post for several organizations. */
 .stujo-org-switcher {
   display: flex;
   flex-direction: column;
+  min-width: 0;
+  max-width: 100%;
   gap: 0.2rem;
   margin: 0.25rem 0 0.75rem;
   font-size: 0.8rem;
@@ -615,6 +629,8 @@ button.stujo-header-action:hover {
 
 .stujo-org-switcher select {
   /* Mobile first: full width, comfortable touch target. */
+  width: 100%;
+  max-width: 100%;
   min-height: 44px;
   padding: 0.3rem 0.6rem;
   font-family: inherit;
@@ -633,16 +649,18 @@ button.stujo-header-action:hover {
 }
 
 .stujo-stats {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 8rem), 1fr));
   gap: 1rem;
   margin: 1rem 0 1.5rem;
 }
 
 .stujo-stat {
-  flex: 1;
+  min-width: 0;
   background: #f6f6f4;
   border: 2px solid var(--stujo-border);
   padding: 1rem;
+  overflow-wrap: anywhere;
 }
 
 .stujo-stat--accent {
@@ -655,9 +673,66 @@ button.stujo-header-action:hover {
   color: var(--stujo-primary);
 }
 
-.stujo-table-scroll {
-  max-width: 100%;
-  overflow-x: auto;
+.stujo-posting-list {
+  display: grid;
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stujo-posting-card {
+  min-width: 0;
+  padding: 1rem;
+  border: 2px solid var(--stujo-border);
+  background: #fff;
+}
+
+.stujo-posting-card-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.stujo-posting-card-title {
+  min-width: 0;
+  margin: 0;
+  font-size: 1.1em;
+  overflow-wrap: anywhere;
+}
+
+.stujo-posting-card-title a {
+  color: var(--stujo-primary);
+}
+
+.stujo-posting-card-title a:hover {
+  color: var(--stujo-grey);
+}
+
+.stujo-posting-details {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem 1rem;
+  margin: 1rem 0;
+}
+
+.stujo-posting-details > div:first-child {
+  grid-column: 1 / -1;
+}
+
+.stujo-posting-details dt {
+  color: var(--stujo-grey);
+  font-size: 0.8em;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.stujo-posting-details dd {
+  margin: 0.2rem 0 0;
+  overflow-wrap: anywhere;
 }
 
 .stujo-posting-actions {
@@ -668,6 +743,20 @@ button.stujo-header-action:hover {
 
 .stujo-posting-actions > * {
   flex-shrink: 0;
+}
+
+.stujo-postings-table {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .stujo-posting-list {
+    display: none;
+  }
+
+  .stujo-postings-table {
+    display: table;
+  }
 }
 
 .stujo-table {
@@ -1068,5 +1157,13 @@ button.stujo-header-action:hover {
 
   .stujo-job-row > div {
     flex: 1 1 220px;
+  }
+}
+
+@media (max-width: 280px) {
+  .stujo-nav a {
+    padding-right: 0.75em;
+    padding-left: 0.75em;
+    font-size: 16px;
   }
 }
