@@ -43,6 +43,8 @@
     "footerUniversityPartners": "Hochschulpartner",
     "footerPartners": "Gefördert durch",
     "Layout": {
+      "account_menu": "Sprache und Konto",
+      "navigation": "Navigation",
       "home": "Startseite",
       "switch_to_german": "Auf Deutsch wechseln",
       "switch_to_english": "Auf Englisch wechseln"

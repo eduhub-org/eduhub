@@ -1,73 +1,107 @@
 /*
  * StuJo co-branding for the shared EduHub login theme.
  *
- * StuJo and EduHub are one Keycloak realm and one account. When the login
- * looked like a standalone StuJo dialog, people with an existing EduHub
- * account did not recognise it and tried to register again, which only got
- * them "email already exists". So the page deliberately stays the EduHub
- * login — dark #222 page, light card, pill buttons, Plus Jakarta Sans — and the
- * portal only adds a small co-brand mark next to the EduHub lockup plus one
- * accent colour. Activated via html.stujo-brand (see js/stujo-portal-brand.js).
+ * StuJo and EduHub use the same Keycloak realm and account. StuJo is the
+ * primary product identity on its login routes, while the existing EduHub
+ * lockup remains visible as the shared account provider. Activated via
+ * html.stujo-brand (see js/stujo-portal-brand.js).
  *
  * White-label campus portals add html.stujo-haw-kiel / html.stujo-flensburg
- * on top of stujo-brand; they swap the co-brand logo and the accent colour
- * (values match the AppSettings primaryColor seeds).
+ * on top of stujo-brand; they swap the co-brand logo and accent colour.
  */
 
 html.stujo-brand {
   --kc-cobrand-accent: #a71580;
+  --kc-cobrand-accent-hover: #861065;
+  --kc-cobrand-background: #f5f2f4;
+  --kc-cobrand-border: #e2dde0;
+  --kc-cobrand-copy: #343238;
 }
 
 html.stujo-haw-kiel {
   --kc-cobrand-accent: #04305e;
+  --kc-cobrand-accent-hover: #032544;
 }
 
 html.stujo-flensburg {
   --kc-cobrand-accent: #025095;
+  --kc-cobrand-accent-hover: #013e74;
 }
 
-/* --------------------------------------------------------------------------
- * Header co-brand: the EduHub lockup keeps its place, the portal mark is
- * added beside it. The portal logos are dark artwork made for a white
- * header, so they sit on a small white plate to stay legible on #222.
- * -------------------------------------------------------------------------- */
+/* Plus Jakarta Sans remains part of the EduHub theme. StuJo uses neutral UI type. */
+html.stujo-brand body {
+  background-color: var(--kc-cobrand-background);
+  color: var(--kc-cobrand-copy);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
+}
 
+/* StuJo is placed on the left and the existing EduHub lockup on the right. */
 .navbar-cobrand {
+  display: none;
+}
+
+html.stujo-brand .academy_header_guest .navbar.p-0 {
+  height: 78px;
+  padding: 15px 18px !important;
+}
+
+html.stujo-brand .navbar-logo-wrapper {
+  width: 100%;
+  align-items: center;
+}
+
+/* This theme has no mobile navigation links, so its Bootstrap toggle is inert. */
+html.stujo-brand .academy_header_guest .navbar-toggler {
   display: none;
 }
 
 html.stujo-brand .navbar-cobrand {
   display: flex;
   align-items: center;
+  order: -1;
+  margin-right: auto;
+}
+
+html.stujo-brand .navbar-logo,
+html.stujo-brand .navbar-logo-text {
+  filter: invert(1);
+  opacity: 0.72;
+}
+
+html.stujo-brand .navbar-logo {
+  width: 31px;
+  height: 31px;
+}
+
+html.stujo-brand .navbar-logo-text {
+  width: 34px;
+  height: auto;
+  margin-left: 7px;
 }
 
 .navbar-cobrand-divider {
-  width: 1px;
-  height: 28px;
-  margin: 0 8px;
-  background-color: #4a4a4a;
+  display: none;
 }
 
 .navbar-cobrand-plate {
   display: flex;
   align-items: center;
-  padding: 4px 8px;
-  border-radius: 6px;
-  background-color: #fff;
+  padding: 0;
+  background-color: transparent;
 }
 
 .navbar-cobrand-logo {
   display: none;
   width: auto;
-  height: 20px;
+  height: 32px;
 }
 
 html.stujo-brand .navbar-cobrand-stujo {
   display: block;
 }
 
-/* Campus lockups stack the StuJo mark above the university logo, so they
-   need more height than the plain StuJo wordmark and replace it. */
+/* Campus lockups replace the plain StuJo wordmark. */
 html.stujo-haw-kiel .navbar-cobrand-stujo,
 html.stujo-flensburg .navbar-cobrand-stujo {
   display: none;
@@ -76,61 +110,366 @@ html.stujo-flensburg .navbar-cobrand-stujo {
 html.stujo-haw-kiel .navbar-cobrand-haw-kiel,
 html.stujo-flensburg .navbar-cobrand-flensburg {
   display: block;
-  height: 28px;
+  height: 36px;
 }
 
-@media (min-width: 481px) {
-  .navbar-cobrand-divider {
-    margin: 0 14px;
-  }
-
-  .navbar-cobrand-logo {
-    height: 24px;
-  }
-
-  html.stujo-haw-kiel .navbar-cobrand-haw-kiel,
-  html.stujo-flensburg .navbar-cobrand-flensburg {
-    height: 36px;
-  }
-}
-
-/* --------------------------------------------------------------------------
- * Card: unchanged EduHub card with a thin accent line in the portal colour.
- * No overflow:hidden here — that would clip the locale dropdown.
- * -------------------------------------------------------------------------- */
-
+/* Neutral card with StuJo-coloured actions and no decorative accent bar. */
 html.stujo-brand .card-pf {
+  width: calc(100% - 28px);
+  max-width: 500px;
+  margin-right: auto;
+  margin-left: auto;
+  padding-right: 20px;
+  padding-left: 20px;
+  border: 1px solid var(--kc-cobrand-border);
+  border-radius: 16px;
+  background-color: #fff;
+  box-shadow: 0 12px 35px rgba(51, 28, 42, 0.09);
+}
+
+/* Keep breathing room below tall flows such as registration. */
+html.stujo-brand .login-pf-page {
+  padding-bottom: 40px;
+}
+
+/* Give the full login card a little more room below on laptop viewports.
+   Other, potentially taller Keycloak flows keep their natural position. */
+@media (min-width: 768px) and (min-height: 700px) {
+  html.stujo-brand body.kc-login-page .login-pf-page {
+    transform: translateY(-24px);
+  }
+}
+
+/* Use Keycloak's locale handling, presented as a compact dropdown. */
+html.stujo-brand #kc-locale {
+  position: relative;
+  top: auto;
+  right: auto;
+  width: auto;
+  min-height: 32px;
+  margin-bottom: 20px;
+  text-align: right;
+  z-index: 10;
+}
+
+html.stujo-brand #kc-locale-dropdown {
   position: relative;
 }
 
-html.stujo-brand .card-pf::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  right: 0;
-  left: 0;
-  height: 4px;
-  border-radius: 16px 16px 0 0;
-  background-color: var(--kc-cobrand-accent);
+html.stujo-brand #kc-locale-dropdown a#kc-current-locale-link {
+  display: inline-flex;
+  min-width: 44px;
+  min-height: 44px;
+  align-items: center;
+  padding: 5px 2px;
+  border: 0;
+  background: transparent;
+  color: #706d73;
+  font-size: 14px;
+  line-height: 20px;
+  text-decoration: none;
 }
 
-/* --------------------------------------------------------------------------
- * Shared-account note. Rendered on every page by template.ftl and revealed
- * only for StuJo, because the brand is resolved client-side.
- * -------------------------------------------------------------------------- */
+html.stujo-brand #kc-locale-dropdown a#kc-current-locale-link:hover,
+html.stujo-brand #kc-locale-dropdown a#kc-current-locale-link:focus {
+  color: var(--kc-cobrand-accent);
+}
 
+html.stujo-brand #kc-locale-dropdown a#kc-current-locale-link:focus-visible {
+  border-radius: 3px;
+  outline: 2px solid var(--kc-cobrand-accent);
+  outline-offset: 2px;
+}
+
+html.stujo-brand #kc-locale-dropdown ul {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  min-width: 120px;
+  margin: 0;
+  padding: 4px;
+  border: 1px solid var(--kc-cobrand-border);
+  border-radius: 8px;
+  background-color: #fff;
+  box-shadow: 0 10px 24px rgba(51, 28, 42, 0.12);
+  list-style: none;
+}
+
+html.stujo-brand #kc-locale-dropdown ul::before {
+  position: absolute;
+  top: -5px;
+  right: 0;
+  width: 100%;
+  height: 5px;
+  content: '';
+}
+
+html.stujo-brand #kc-locale-dropdown:focus-within ul {
+  display: block;
+}
+
+html.stujo-brand #kc-locale-dropdown ul a {
+  display: block;
+  padding: 7px 9px;
+  border-radius: 5px;
+  color: var(--kc-cobrand-copy);
+  text-align: left;
+  text-decoration: none;
+}
+
+html.stujo-brand #kc-locale-dropdown ul a:hover,
+html.stujo-brand #kc-locale-dropdown ul a:focus {
+  background-color: #fff2f9;
+  color: var(--kc-cobrand-accent);
+}
+
+.kc-stujo-login-title {
+  display: none;
+}
+
+html.stujo-brand .kc-default-login-title {
+  display: none;
+}
+
+html.stujo-brand .kc-stujo-login-title {
+  display: inline;
+}
+
+html.stujo-brand h1#kc-page-title {
+  margin-top: 0;
+  color: var(--kc-cobrand-copy);
+  font-size: 24px;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+}
+
+html.stujo-brand .pf-c-form-control {
+  height: 44px;
+  border: 1px solid #c6c2c5;
+  border-radius: 7px;
+  background-color: #fff;
+}
+
+html.stujo-brand .pf-c-form-control:hover,
+html.stujo-brand .pf-c-form-control:focus {
+  border-color: var(--kc-cobrand-accent);
+  border-bottom-width: 1px;
+}
+
+html.stujo-brand .pf-c-form-control:focus {
+  outline: none;
+  box-shadow: 0 0 0 1px var(--kc-cobrand-accent);
+}
+
+html.stujo-brand .pf-c-form-control:focus-visible {
+  outline: 1px solid var(--kc-cobrand-accent);
+  outline-offset: 1px;
+}
+
+html.stujo-brand .pf-c-input-group {
+  overflow: hidden;
+  border: 1px solid #c6c2c5;
+  border-radius: 7px;
+  background-color: #fff;
+}
+
+html.stujo-brand .pf-c-input-group:hover {
+  border-color: var(--kc-cobrand-accent);
+}
+
+html.stujo-brand .pf-c-input-group:focus-within {
+  border-color: var(--kc-cobrand-accent);
+  box-shadow: 0 0 0 1px var(--kc-cobrand-accent);
+}
+
+html.stujo-brand .pf-c-input-group .pf-c-form-control,
+html.stujo-brand .pf-c-input-group .pf-c-form-control:hover,
+html.stujo-brand .pf-c-input-group .pf-c-form-control:focus,
+html.stujo-brand .pf-c-input-group .pf-c-form-control:focus-visible {
+  border: 0;
+  border-radius: 0;
+  outline: 0;
+  box-shadow: none;
+}
+
+html.stujo-brand .pf-c-input-group .pf-c-button.pf-m-control {
+  display: inline-flex;
+  flex: 0 0 48px;
+  width: 48px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  margin-left: 0;
+  padding: 0;
+  border: 0;
+  border-left: 1px solid #c6c2c5;
+  border-radius: 0;
+  background-color: #fff;
+  color: var(--kc-cobrand-copy);
+}
+
+html.stujo-brand .pf-c-input-group .pf-c-button.pf-m-control::after {
+  border: 0;
+  box-shadow: none;
+}
+
+html.stujo-brand .pf-c-input-group:focus-within
+  .pf-c-button.pf-m-control {
+  border-left-color: var(--kc-cobrand-accent);
+}
+
+html.stujo-brand .pf-c-input-group .pf-c-button.pf-m-control:hover,
+html.stujo-brand .pf-c-input-group .pf-c-button.pf-m-control:focus {
+  border-left-color: var(--kc-cobrand-accent);
+  outline: 0;
+  color: var(--kc-cobrand-accent);
+}
+
+html.stujo-brand .pf-c-button.pf-m-primary {
+  width: 100%;
+  margin: 0;
+  padding: 10px 24px;
+  border: 0;
+  border-radius: 8px;
+  background-color: var(--kc-cobrand-accent);
+  color: #fff;
+  font-weight: 600;
+  text-transform: none;
+}
+
+html.stujo-brand .pf-c-button.pf-m-primary:hover,
+html.stujo-brand .pf-c-button.pf-m-primary:focus {
+  background-color: var(--kc-cobrand-accent-hover);
+  color: #fff;
+}
+
+html.stujo-brand .card-pf a {
+  color: var(--kc-cobrand-accent);
+}
+
+html.stujo-brand .card-pf a:hover,
+html.stujo-brand .card-pf a:focus {
+  color: var(--kc-cobrand-accent-hover);
+}
+
+/* Identity providers remain data-driven. When DLC is configured, present it
+   as a full-width secondary action separated from the password login. */
+html.stujo-brand #kc-social-providers {
+  margin-top: 24px;
+  text-align: center;
+}
+
+html.stujo-brand #kc-social-providers hr {
+  margin: 0 0 18px;
+  border: 0;
+  border-top: 1px solid var(--kc-cobrand-border);
+}
+
+html.stujo-brand #kc-social-providers h4 {
+  margin: 0 0 14px;
+  color: #77737a;
+  font-size: 16px;
+  font-weight: 400;
+}
+
+html.stujo-brand #kc-social-providers ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+html.stujo-brand #kc-social-providers li {
+  margin-bottom: 10px;
+}
+
+html.stujo-brand #kc-social-providers a {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  padding: 9px 18px;
+  border: 1px solid #cac6c9;
+  border-radius: 8px;
+  background-color: #fff;
+  color: var(--kc-cobrand-copy);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+html.stujo-brand #kc-social-providers a:hover,
+html.stujo-brand #kc-social-providers a:focus {
+  border-color: var(--kc-cobrand-accent);
+  color: var(--kc-cobrand-accent);
+}
+
+/* Remove Keycloak's full-bleed grey registration footer. */
+html.stujo-brand #kc-info {
+  margin: 24px 0 0;
+}
+
+html.stujo-brand #kc-info-wrapper {
+  padding: 18px 0 0;
+  border-top: 1px solid var(--kc-cobrand-border);
+  border-radius: 0;
+  background-color: transparent;
+}
+
+html.stujo-brand #kc-registration {
+  color: #77737a;
+  text-align: center;
+}
+
+/* Account migration note, hidden on EduHub itself. */
 .kc-cobrand-note {
   display: none;
 }
 
 html.stujo-brand .kc-cobrand-note {
-  display: block;
+  display: flex;
+  align-items: flex-start;
   margin: 4px 0 20px;
-  padding: 10px 14px;
-  border-left: 3px solid var(--kc-cobrand-accent);
-  border-radius: 0 8px 8px 0;
-  background-color: #fff;
-  color: #444;
+  padding: 12px 14px;
+  border: 1px solid #ead4e1;
+  border-radius: 9px;
+  background-color: #fff7fb;
+  color: #4e3d47;
   font-size: 13px;
-  line-height: 1.45;
+  line-height: 1.5;
+}
+
+@media (min-width: 768px) {
+  html.stujo-brand .academy_header_guest .navbar.p-0 {
+    height: 92px;
+    padding: 20px 28px !important;
+  }
+
+  html.stujo-brand .navbar-cobrand-logo {
+    height: 42px;
+  }
+
+  html.stujo-haw-kiel .navbar-cobrand-haw-kiel,
+  html.stujo-flensburg .navbar-cobrand-flensburg {
+    height: 46px;
+  }
+
+  html.stujo-brand .navbar-logo {
+    width: 40px;
+    height: 40px;
+  }
+
+  html.stujo-brand .navbar-logo-text {
+    width: 42px;
+    margin-left: 9px;
+  }
+
+  html.stujo-brand .card-pf {
+    width: auto;
+    padding-right: 28px;
+    padding-left: 28px;
+    box-shadow: 0 18px 50px rgba(51, 28, 42, 0.1);
+  }
+
+  html.stujo-brand h1#kc-page-title {
+    font-size: 28px;
+  }
 }

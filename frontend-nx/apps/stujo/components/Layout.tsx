@@ -109,7 +109,7 @@ const Layout: FC<LayoutProps> = ({ children, fullWidthMain = false, portal }) =>
             className="stujo-header-logo"
           />
         </Link>
-        <nav className="stujo-header-topnav">
+        <nav className="stujo-header-topnav" aria-label={tLayout('account_menu')}>
           <span className="stujo-lang-switch">
             <Link
               href={router.asPath}
@@ -173,7 +173,7 @@ const Layout: FC<LayoutProps> = ({ children, fullWidthMain = false, portal }) =>
           )}
         </nav>
       </header>
-      <nav className="stujo-nav">
+      <nav className="stujo-nav" aria-label={tLayout('navigation')}>
         <div className="stujo-container stujo-nav-inner">
           <Link href="/" className={`stujo-nav-home ${navClass('/') ?? ''}`} aria-label={tLayout('home')}>
             <StuJoLegacyIcon name="home" className="stujo-nav-home-icon" />

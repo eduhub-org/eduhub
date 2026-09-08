@@ -43,6 +43,8 @@
     "footerUniversityPartners": "University partners",
     "footerPartners": "Sponsored by",
     "Layout": {
+      "account_menu": "Language and account",
+      "navigation": "Navigation",
       "home": "Home",
       "switch_to_german": "Switch to German",
       "switch_to_english": "Switch to English"

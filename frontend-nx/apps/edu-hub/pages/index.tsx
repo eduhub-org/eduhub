@@ -221,7 +221,7 @@ const Home: FC = () => {
         <meta property="og:description" content={t('seo.ogDescription')} />
         <meta property="og:url" content="https://edu.opencampus.sh" />
         <meta property="og:site_name" content="EduHub" />
-        <meta property="og:image" content="https://edu.opencampus.sh/images/edu_WISE23_HeaderWebsitePreview.png" />
+        <meta property="og:image" content="https://edu.opencampus.sh/images/edu_WiSe2627_header_preview.jpg" />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
         <meta property="og:image:alt" content="EduHub Learning Platform - Tech, Business and Creative Courses" />
@@ -231,7 +231,7 @@ const Home: FC = () => {
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="EduHub | opencampus.sh" />
         <meta name="twitter:description" content={t('seo.twitterDescription')} />
-        <meta name="twitter:image" content="https://edu.opencampus.sh/images/edu_WISE23_HeaderWebsitePreview.png" />
+        <meta name="twitter:image" content="https://edu.opencampus.sh/images/edu_WiSe2627_header_preview.jpg" />
         <meta name="twitter:image:alt" content="EduHub Learning Platform - Tech, Business and Creative Courses" />
         <meta name="twitter:site" content="@opencampus_sh" />
         <meta name="twitter:creator" content="@opencampus_sh" />
@@ -281,13 +281,7 @@ const Home: FC = () => {
         />
       </Head>
       <Page className="text-white">
-        <div
-          className="h-[100vh] mb-11 md:mb-0 bg-cover bg-top-center"
-          style={{
-            background: `linear-gradient(360deg, #0F0F0F 0%, rgba(0, 0, 0, 0) 12.18%), linear-gradient(53.37deg, rgba(0, 0, 0, 0.8) 16.6%, rgba(0, 0, 0, 0) 79.45%), url('/images/background_homepage/edu_WISE23_HeaderWebsite_small.png')`,
-            backgroundSize: 'cover',
-          }}
-        >
+        <div className="homepage-hero h-[100vh] mb-11 md:mb-0">
           <div className="flex flex-col justify-end h-full max-w-screen-xl mx-auto px-3 md:px-16 py-48">
             <div className="text-6xl sm:text-9xl">{t('headline')}</div>
             <div className="text-6xl sm:text-9xl mt-4">{t('subheadline')}</div>
