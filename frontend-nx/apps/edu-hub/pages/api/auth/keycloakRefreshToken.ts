@@ -25,7 +25,9 @@ const keycloakRefreshToken = async (
 ) => {
   if (request.method === 'POST') {
     try {
-      const keycloakUrlToRefreshToken = `${process.env.NEXT_PUBLIC_AUTH_URL}/realms/edu-hub/protocol/openid-connect/token`;
+      const keycloakUrlToRefreshToken = `${
+        process.env.KEYCLOAK_INTERNAL_URL || process.env.NEXT_PUBLIC_AUTH_URL
+      }/realms/edu-hub/protocol/openid-connect/token`;
       const keycloakParamsToRefreshToken = new URLSearchParams();
       const keycloakRefreshTokenBody =
         request.body as IKeycloakRefreshTokenParams['body'];

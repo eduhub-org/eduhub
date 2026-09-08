@@ -1,7 +1,7 @@
 /* Patternfly CSS places a "bg-login.jpg" as the background on this ".login-pf" class.
    This clashes with the "keycloak-bg.png' background defined on the body below.
    Therefore the Patternfly background must be set to none. */
-@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;900&family=Space+Grotesk:wght@400;600&display=swap');
+@import 'https://fonts.googleapis.com/css2?family=Lato:wght@400;900&family=Plus+Jakarta+Sans:wght@200..800&display=swap';
 
 .login-pf {
     background: none;
@@ -11,7 +11,7 @@
     background: url("../img/keycloak-bg.png") no-repeat center center fixed;
     background-size: cover;
     height: 100%;
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
 .content-wrapper {

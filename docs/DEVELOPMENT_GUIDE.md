@@ -31,6 +31,28 @@ See the sections in **`.env.example`** (Matrix, Formbricks, Stripe, Ghost, and *
 
 - **Formbricks Integration:** `FORMBRICKS_API_KEY` — get from Formbricks → Settings → Organization → API Keys. Details: `docs/FORMBRICKS_IMPLEMENTATION_SUMMARY.md`.
 
+### Previewing from a phone
+
+Normal `docker compose up` explicitly binds the development services to
+`127.0.0.1`. This preserves the safe default even if Docker Desktop's global
+port-binding setting changes. For an authenticated phone preview, pass the
+Mac's Tailscale IPv4 address to the helper:
+
+```bash
+scripts/start-network-preview.sh 100.x.y.z -d
+```
+
+Open `http://<address>:5000` for EduHub or `http://<address>:5001` for StuJo.
+The helper rejects non-Tailscale and non-local addresses, binds only EduHub,
+StuJo, file storage, Hasura, and Keycloak to that Tailnet interface, and creates
+a random Hasura admin secret for the preview. Traffic between Tailnet devices
+is encrypted even though the disposable development services use HTTP.
+
+Running ordinary `docker compose up -d` afterward restores localhost-only
+bindings, the normal development secret, and Keycloak's `external` SSL
+requirement. Compose detects and recreates the affected services without
+replacing the development database. Stop the preview when it is finished.
+
 ## Ports
 
 - `4001` - File uploads
@@ -103,4 +125,3 @@ To persist changes you made to the keycloak configuration export the edu-hub rea
 ## Updating frontend-nx packages
 - use `yarn upgrade-interactive` script to check for package updates
 - if package version are explicitly locked in, please check for potential issues or comments while upgrading
-

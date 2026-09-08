@@ -17,7 +17,7 @@ const ProjectWithinCoursePage: FC = () => {
         <title>EduHub | opencampus.sh</title>
         <link rel="icon" href="/favicon.png" />
         <meta property="og:title" content="EduHub | opencampus.sh" />
-        <meta property="og:image" content="https://edu.opencampus.sh/images/edu_WISE23_HeaderWebsitePreview.png" />
+        <meta property="og:image" content="https://edu.opencampus.sh/images/edu_WiSe2627_header_preview.jpg" />
       </Head>
       <Page>
         {Number.isFinite(projectId) ? (

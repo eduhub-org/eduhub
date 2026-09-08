@@ -4,7 +4,12 @@ import { createRequire } from 'node:module';
 // sendMail is CommonJS and lives in a sibling function package; callNodeFunction
 // is the only place in functions/ with a test runner.
 const require = createRequire(import.meta.url);
-const { isAllowedAttachmentUrl, safeAttachmentFilename, resolveAttachments } = require('../../sendMail/index.js');
+const {
+  isAllowedAttachmentUrl,
+  safeAttachmentFilename,
+  resolveAttachments,
+  resolveSender,
+} = require('../../sendMail/index.js');
 
 describe('isAllowedAttachmentUrl', () => {
   it('accepts Stripe invoice documents over https', () => {
@@ -148,5 +153,104 @@ describe('resolveAttachments', () => {
     await expect(
       resolveAttachments([{ url: 'https://files.stripe.com/a.pdf' }], 7)
     ).resolves.toEqual([]);
+  });
+});
+
+describe('resolveSender', () => {
+  const previous = {};
+
+  beforeEach(() => {
+    previous.domain = process.env.MAILGUN_DOMAIN;
+    previous.additional = process.env.MAILGUN_ADDITIONAL_DOMAINS;
+    // The real production value: a SUBDOMAIN of the domain every existing
+    // opencampus.sh template sends as. That relationship is what makes the
+    // exact-match rule below load-bearing rather than a detail.
+    process.env.MAILGUN_DOMAIN = 'edu.opencampus.sh';
+    process.env.MAILGUN_ADDITIONAL_DOMAINS = 'stujo.net';
+  });
+
+  afterEach(() => {
+    for (const [key, name] of [['domain', 'MAILGUN_DOMAIN'], ['additional', 'MAILGUN_ADDITIONAL_DOMAINS']]) {
+      if (previous[key] === undefined) delete process.env[name];
+      else process.env[name] = previous[key];
+    }
+  });
+
+  it('sends a StuJo mail as itself once its domain is configured', () => {
+    expect(resolveSender('team@stujo.net')).toEqual({
+      from: 'team@stujo.net',
+      domain: 'stujo.net',
+      aligned: true,
+    });
+  });
+
+  it('leaves existing opencampus.sh mail exactly as it was', () => {
+    // The regression this guards: MAILGUN_DOMAIN is edu.opencampus.sh, so a
+    // rule that also accepted a configured SUBDOMAIN of the sender's domain
+    // would start sending every EduHub mail as noreply@opencampus.sh —
+    // a change to every mail the platform sends, riding on opencampus.sh
+    // having relaxed DMARC alignment.
+    expect(resolveSender('noreply@opencampus.sh')).toEqual({
+      from: 'noreply@edu.opencampus.sh',
+      domain: 'edu.opencampus.sh',
+      aligned: false,
+    });
+  });
+
+  it('sends as the default domain when that is the sender too', () => {
+    expect(resolveSender('noreply@edu.opencampus.sh')).toEqual({
+      from: 'noreply@edu.opencampus.sh',
+      domain: 'edu.opencampus.sh',
+      aligned: true,
+    });
+  });
+
+  it('does not accept a configured subdomain of the sender', () => {
+    // mg.stujo.net would align under relaxed DMARC only, so it fails safe and
+    // visibly instead of sending a From this deployment cannot strictly sign.
+    process.env.MAILGUN_ADDITIONAL_DOMAINS = 'mg.stujo.net';
+    expect(resolveSender('team@stujo.net').aligned).toBe(false);
+  });
+
+  it('falls back for a sender no configured domain covers', () => {
+    // Also the state before stujo.net is verified in Mailgun: the mail still
+    // goes out, under the domain that can actually sign for it.
+    process.env.MAILGUN_ADDITIONAL_DOMAINS = '';
+    expect(resolveSender('team@stujo.net')).toEqual({
+      from: 'noreply@edu.opencampus.sh',
+      domain: 'edu.opencampus.sh',
+      aligned: false,
+    });
+    expect(resolveSender('x@evil.example').aligned).toBe(false);
+  });
+
+  it('rejects anything that is not a single bare address', () => {
+    // MailTemplate.from is admin-editable free text and lands in a mail header.
+    for (const value of [
+      'Team <team@stujo.net>',
+      'a@stujo.net, b@stujo.net',
+      'team@stujo.net\nBcc: victim@example.com',
+      'team@stujo.net Bcc: victim@example.com',
+      'team@localhost',
+      'not-an-address',
+      '',
+      null,
+      undefined,
+    ]) {
+      expect(resolveSender(value)).toEqual({
+        from: 'noreply@edu.opencampus.sh',
+        domain: 'edu.opencampus.sh',
+        aligned: false,
+      });
+    }
+  });
+
+  it('ignores blank entries and casing in the configured list', () => {
+    process.env.MAILGUN_ADDITIONAL_DOMAINS = ' , STUJO.NET , ';
+    expect(resolveSender('team@stujo.net')).toEqual({
+      from: 'team@stujo.net',
+      domain: 'stujo.net',
+      aligned: true,
+    });
   });
 });

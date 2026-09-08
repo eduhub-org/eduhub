@@ -1,7 +1,8 @@
 <#import "template.ftl" as layout>
-<@layout.registrationLayout displayMessage=!messagesPerField.existsError('username','password') displayInfo=realm.password && realm.registrationAllowed && !registrationDisabled??; section>
+<@layout.registrationLayout bodyClass="kc-login-page" displayMessage=!messagesPerField.existsError('username','password') displayInfo=realm.password && realm.registrationAllowed && !registrationDisabled??; section>
     <#if section = "header">
-        ${msg("loginAccountTitle")}
+        <span class="kc-default-login-title">${msg("loginAccountTitle")}</span>
+        <span class="kc-stujo-login-title">${msg("stujoLoginAccountTitle")}</span>
     <#elseif section = "form">
         <div id="kc-form">
           <div id="kc-form-wrapper">
@@ -33,6 +34,7 @@
                             />
                             <button class="pf-c-button pf-m-control" type="button" aria-label="${msg("showPassword")}"
                                     aria-controls="password"  data-password-toggle
+                                    data-icon-show="fa fa-eye" data-icon-hide="fa fa-eye-slash"
                                     data-label-show="${msg('showPassword')}" data-label-hide="${msg('hidePassword')}">
                                 <i class="fa fa-eye" aria-hidden="true"></i>
                             </button>

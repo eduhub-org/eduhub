@@ -91,18 +91,42 @@ DB_PASS="$(read_remote "awk '/^production:/{f=1} f&&/password:/{print \$2; exit}
 [ -n "${DB_NAME}" ] && [ -n "${DB_USER}" ] && [ -n "${DB_PASS}" ] \
   || { echo 'ERROR: could not read prod DB credentials from '"${DB_CFG}"; exit 1; }
 
-echo "==> Configuring staging targets + fetching secrets (VM service account)"
-export HASURA_URL='https://hasura-staging.opencampus.sh/v1/graphql'
-export KEYCLOAK_URL='https://keycloak-staging.opencampus.sh'
-export KEYCLOAK_REALM='edu-hub'
+echo "==> Configuring targets + fetching secrets (VM service account)"
+# The targets default to STAGING but are all env-overridable, so
+# stujo_migrate_prod.sh (or an ad-hoc export) can point this same runner at
+# production without editing it.
+export HASURA_URL="${HASURA_URL:-https://hasura-staging.opencampus.sh/v1/graphql}"
+export KEYCLOAK_URL="${KEYCLOAK_URL:-https://keycloak-staging.opencampus.sh}"
+export KEYCLOAK_REALM="${KEYCLOAK_REALM:-edu-hub}"
 export KEYCLOAK_USER="${KEYCLOAK_USER:-admin}"
-export GCS_BUCKET='eduhub-staging-new'
+export GCS_BUCKET="${GCS_BUCKET:-eduhub-staging-new}"
+
+# The ETL sends the Hasura admin secret and the Keycloak admin password to
+# these two endpoints, and both are overridable from the environment — an
+# override that is cleartext, typo'd or hostile would put those credentials on
+# someone else's wire. And this runner is invoked by pasting a command line, so
+# "the environment is trustworthy" is a weak assumption.
+#
+# Both are therefore matched against the whole URL shape rather than picked
+# apart: HTTPS, a host inside opencampus.sh, an optional port and path, and
+# nothing else. Anchoring the host this way is what rejects the tricks that
+# subtractive parsing tends to miss — https://hasura.opencampus.sh@evil.example
+# (the host is what follows the @) and https://evil.example#.opencampus.sh (the
+# rest is a fragment). Checked before any secret is fetched, let alone sent.
+ENDPOINT_PATTERN='^https://[A-Za-z0-9.-]+\.opencampus\.sh(:[0-9]+)?(/[^[:space:]]*)?$'
+for endpoint in "${HASURA_URL}" "${KEYCLOAK_URL}"; do
+  printf '%s' "${endpoint}" | grep -Eq "${ENDPOINT_PATTERN}" || {
+    echo "ERROR: refusing to send credentials to ${endpoint} — endpoints must be https://<host>.opencampus.sh" >&2
+    exit 1
+  }
+done
+
 export STUJO_MYSQL_DSN="mysql://${DB_USER}:${DB_PASS}@127.0.0.1:13306/${DB_NAME}"
 export STUJO_FILES_ROOT="${FILES_ROOT}"
 HASURA_ADMIN_SECRET="$(gcloud secrets versions access latest --secret=hasura-graphql-admin-key --project="${GCP_PROJECT}")"
 KEYCLOAK_PW="$(gcloud secrets versions access latest --secret=keycloak-pw --project="${GCP_PROJECT}")"
 [ -n "${HASURA_ADMIN_SECRET}" ] && [ -n "${KEYCLOAK_PW}" ] \
-  || { echo 'ERROR: could not fetch staging secrets from Secret Manager'; exit 1; }
+  || { echo 'ERROR: could not fetch the secrets from Secret Manager'; exit 1; }
 export HASURA_ADMIN_SECRET KEYCLOAK_PW
 
 echo "==================================================================="

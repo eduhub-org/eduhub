@@ -365,7 +365,7 @@ async function queueMail(
     await client.request(INSERT_MAIL_LOG, {
       subject: replaceVars(applyConditionalBlocks(template.subject, flags), vars, { html: false }),
       content: replaceVars(applyConditionalBlocks(template.content, flags), vars),
-      from: template.from || 'noreply@stujo.net',
+      from: template.from || 'team@stujo.net',
       to,
       bcc: template.bcc || null,
       status: 'READY_TO_SEND',

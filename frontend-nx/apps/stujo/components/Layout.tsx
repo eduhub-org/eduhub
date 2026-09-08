@@ -30,9 +30,19 @@ const Layout: FC<LayoutProps> = ({ children, fullWidthMain = false, portal }) =>
   // end-session URL, clear the NextAuth session, then redirect through
   // Keycloak back to the app.
   const logout = useCallback(async () => {
-    const res = await fetch('/api/auth/logout');
-    const jsonPayload = await res.json();
-    const url = JSON.parse(jsonPayload).url;
+    let url = '/';
+
+    try {
+      const res = await fetch('/api/auth/logout');
+      if (res.ok) {
+        const payload = await res.json();
+        if (typeof payload?.url === 'string') url = payload.url;
+      }
+    } catch (error) {
+      console.error('Failed to prepare federated logout', error);
+    }
+
+    // A stale/malformed token must not strand the user on the API route.
     await signOut({ redirect: false });
     router.push(url);
   }, [router]);
@@ -99,7 +109,7 @@ const Layout: FC<LayoutProps> = ({ children, fullWidthMain = false, portal }) =>
             className="stujo-header-logo"
           />
         </Link>
-        <nav className="stujo-header-topnav">
+        <nav className="stujo-header-topnav" aria-label={tLayout('account_menu')}>
           <span className="stujo-lang-switch">
             <Link
               href={router.asPath}
@@ -127,17 +137,14 @@ const Layout: FC<LayoutProps> = ({ children, fullWidthMain = false, portal }) =>
             </Link>
           </span>
           {sessionStatus === 'authenticated' ? (
-            <a
-              href="/api/auth/logout"
-              onClick={(e) => {
-                e.preventDefault();
-                logout();
-              }}
+            <button
+              type="button"
+              onClick={logout}
               className="stujo-header-action stujo-header-action--uppercase"
             >
               <StuJoLegacyIcon name="unlocked" className="stujo-header-action-icon" />
               {t('logout')}
-            </a>
+            </button>
           ) : (
             <>
               <a
@@ -166,7 +173,7 @@ const Layout: FC<LayoutProps> = ({ children, fullWidthMain = false, portal }) =>
           )}
         </nav>
       </header>
-      <nav className="stujo-nav">
+      <nav className="stujo-nav" aria-label={tLayout('navigation')}>
         <div className="stujo-container stujo-nav-inner">
           <Link href="/" className={`stujo-nav-home ${navClass('/') ?? ''}`} aria-label={tLayout('home')}>
             <StuJoLegacyIcon name="home" className="stujo-nav-home-icon" />
