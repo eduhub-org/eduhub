@@ -35,6 +35,12 @@
   --eduhub-bg-modal: #222222;
   --eduhub-bg-card: #2a2a2a;
   --eduhub-bg-footer: #0F0F0F;
+
+  /* Homepage hero overlay: the bottom fade into the page plus the bottom-left
+     scrim that carries the white headline. Intentionally not overridden for
+     light mode - the headline over the hero artwork is always white. */
+  --eduhub-hero-fade: #0F0F0F;
+  --eduhub-hero-scrim: rgba(0, 0, 0, 0.8);
   
   /* Functional Colors (consistent across modes) */
   --eduhub-success: #A2EBA0;
@@ -152,3 +158,82 @@
   white-space: pre-line;
 }
 
+/*
+ * Homepage hero background (WiSe 26/27 artwork).
+ *
+ * The hero box is 100vh tall and uses `background-size: cover`, and the artwork
+ * is 1.91:1, so the rendered image width is max(100vw, 191vh) - on almost every
+ * screen it is the viewport *height* that decides how large the image has to
+ * be. The tiers below therefore key on both axes and only swap the URL; the
+ * gradient overlay is composed once into --hero-overlay.
+ *
+ * The WebP upgrade lives in a separate @supports block rather than as a second
+ * declaration inside each rule. Because the overlay references a custom
+ * property, an `image-set()` declaration would parse as valid in every browser
+ * and then go invalid-at-computed-value-time where `image-set()`/`type()` is
+ * unsupported, which resolves to `background-image: none` instead of falling
+ * back to the JPEG declaration above it.
+ */
+.homepage-hero {
+  --hero-overlay: linear-gradient(360deg, var(--eduhub-hero-fade) 0%, transparent 12.18%),
+    linear-gradient(53.37deg, var(--eduhub-hero-scrim) 16.6%, transparent 79.45%);
+
+  background-image: var(--hero-overlay), url('/images/background_homepage/edu_WiSe2627_header-1280.jpg');
+  background-size: cover;
+  /* `cover` on a 1.91:1 artwork inside a 100vh box crops horizontally, and on a
+     phone only ~25% of the width survives. Anchoring left keeps the magenta half
+     of the gradient (and a face) in frame, which is what production showed
+     before; `center`/`right` land on the washed-out middle of the photo. */
+  background-position: left top;
+  background-repeat: no-repeat;
+}
+
+/* rendered width up to ~1920px */
+@media (min-width: 640px), (min-height: 700px) {
+  .homepage-hero {
+    background-image: var(--hero-overlay), url('/images/background_homepage/edu_WiSe2627_header-1920.jpg');
+  }
+}
+
+/* rendered width up to ~2560px */
+@media (min-width: 1280px), (min-height: 1000px) {
+  .homepage-hero {
+    background-image: var(--hero-overlay), url('/images/background_homepage/edu_WiSe2627_header-2560.jpg');
+  }
+}
+
+/* rendered width beyond 2560px: large desktops and HiDPI screens */
+@media (min-width: 1920px), (min-height: 1400px), (min-resolution: 2dppx) {
+  .homepage-hero {
+    background-image: var(--hero-overlay), url('/images/background_homepage/edu_WiSe2627_header-3200.jpg');
+  }
+}
+
+/* WebP upgrade, same tiers */
+@supports (background-image: image-set(url('/x.webp') type('image/webp'))) {
+  .homepage-hero {
+    background-image: var(--hero-overlay),
+      image-set(url('/images/background_homepage/edu_WiSe2627_header-1280.webp') type('image/webp'));
+  }
+
+  @media (min-width: 640px), (min-height: 700px) {
+    .homepage-hero {
+      background-image: var(--hero-overlay),
+        image-set(url('/images/background_homepage/edu_WiSe2627_header-1920.webp') type('image/webp'));
+    }
+  }
+
+  @media (min-width: 1280px), (min-height: 1000px) {
+    .homepage-hero {
+      background-image: var(--hero-overlay),
+        image-set(url('/images/background_homepage/edu_WiSe2627_header-2560.webp') type('image/webp'));
+    }
+  }
+
+  @media (min-width: 1920px), (min-height: 1400px), (min-resolution: 2dppx) {
+    .homepage-hero {
+      background-image: var(--hero-overlay),
+        image-set(url('/images/background_homepage/edu_WiSe2627_header-3200.webp') type('image/webp'));
+    }
+  }
+}

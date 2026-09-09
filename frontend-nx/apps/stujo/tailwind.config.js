@@ -33,7 +33,7 @@ module.exports = {
   ],
   theme: {
     ...eduHubConfig.theme,
-    // Lato with the live site's fallbacks, not edu-hub's Space Grotesk, so
+    // Lato with the live site's fallbacks, not edu-hub's Plus Jakarta Sans, so
     // shared components read like the surrounding StuJo chrome.
     fontFamily: {
       body: ['var(--stujo-font)'],

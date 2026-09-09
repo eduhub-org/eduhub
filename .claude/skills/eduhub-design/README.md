@@ -35,7 +35,7 @@ Everything here was reverse-engineered from the public EduHub codebase. The read
     `components/pages/CourseContent/index.tsx`.
   - **MUI theme verified:** `config/theme.ts` was cross-checked against these tokens — brand, secondary,
     error/success/warning, `background.default`/`paper`, `text.primary`/`secondary` and the
-    `"Space Grotesk"` family all match exactly. MUI also sets `MuiButton.textTransform: 'none'`
+    `"Plus Jakarta Sans"` family all match exactly. MUI also sets `MuiButton.textTransform: 'none'`
     (buttons are never uppercased) and forces dialogs to white `#fff`/`#222` (equivalent to the
     `.light` token flip used here).
   - Copy lifted from `locales/en.json`.
@@ -101,12 +101,12 @@ closer to a startup/maker community than a traditional academic LMS. Content car
 - See `colors_and_type.css` for the full token set.
 
 ### Typography
-- **One typeface: Space Grotesk** for everything. Default body weight is **medium (500)**.
+- **One typeface: Plus Jakarta Sans** for everything. Default body weight is **medium (500)**.
 - Range used: 300 (footer fine print) → 600/700 (headings, active nav).
 - **Huge hero type** — the headline is `text-9xl` (~8rem) on desktop, dropping to `text-6xl`
   on mobile. Section titles are `text-2xl` semibold. Tile titles `text-3xl`. Body/taglines
   `text-lg`. Meta rows `text-xs`–`text-sm`, often `tracking-wider` and sometimes UPPERCASE
-  (locations). Space Grotesk's geometric, slightly-quirky letterforms carry the brand.
+  (locations). Plus Jakarta Sans' humanist letterforms and generous x-height carry the brand.
 
 ### Backgrounds & imagery
 - **Full-bleed photography** anchors the brand. The signature hero is a **blue duotone photo**
@@ -199,14 +199,14 @@ closer to a startup/maker community than a traditional academic LMS. Content car
 | `assets/` | Logos, hero/coworking imagery, course icons, social icons, favicon. |
 | `preview/` | Small HTML spec cards that populate the Design System tab. |
 | `ui_kits/web/` | **High-fidelity recreation of the EduHub web app** — index.html + JSX components. |
-| `fonts/` | (Empty placeholder — Space Grotesk is loaded from Google Fonts; see note below.) |
+| `fonts/` | (Empty placeholder — Plus Jakarta Sans is loaded from Google Fonts; see note below.) |
 
 ### UI kits
 - **`ui_kits/web/`** — the public learner-facing EduHub web app: landing page with hero + course
   rows, course detail page, login, and the account menu. See its own `README.md`.
 
 ### Font note ⚠️
-**Space Grotesk** is a Google Font and ships no file in the repo, so `colors_and_type.css` loads it
+**Plus Jakarta Sans** is a Google Font and ships no file in the repo, so `colors_and_type.css` loads it
 from Google Fonts (`fonts.googleapis.com`). If you need self-hosted/offline files, drop the `.woff2`
 into `fonts/` and replace the `@import` with an `@font-face` block. **Flag to the user if offline
 licensing matters.**

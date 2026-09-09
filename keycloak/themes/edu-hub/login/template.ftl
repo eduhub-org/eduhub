@@ -66,7 +66,7 @@
     </#if>
 </head>
 
-<body class="${properties.kcBodyClass!}">
+<body class="${properties.kcBodyClass!} ${bodyClass}">
     <div class="content-wrapper">
         <div class="academy_header_guest">
             <nav class="navbar navbar-light navbar-expand-md p-0">
@@ -180,7 +180,12 @@
 
                     <#-- StuJo and EduHub share one account; say so before people
                          try to register a second time. Hidden for EduHub itself. -->
-                    <div class="kc-cobrand-note">${msg("cobrandAccountNote")}</div>
+                    <div class="kc-cobrand-note">
+                        <span>
+                            <strong>${msg("cobrandAccountNoteTitle")}</strong><br>
+                            ${msg("cobrandAccountNote")}
+                        </span>
+                    </div>
 
                     <#nested "form">
 
