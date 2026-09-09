@@ -23,6 +23,7 @@ interface LayoutProps extends PropsWithChildren {
 const Layout: FC<LayoutProps> = ({ children, fullWidthMain = false, portal }) => {
   const t = useTranslations('common');
   const tLayout = useTranslations('common.Layout');
+  const tMeinStujo = useTranslations('meinStujo');
   const router = useRouter();
   const { status: sessionStatus } = useSession();
 
@@ -180,7 +181,7 @@ const Layout: FC<LayoutProps> = ({ children, fullWidthMain = false, portal }) =>
             {t('employers')}
           </Link>
           <Link href="/mein-stujo" className={navClass('/mein-stujo')}>
-            Mein StuJo
+            {tMeinStujo('title')}
           </Link>
         </div>
       </nav>

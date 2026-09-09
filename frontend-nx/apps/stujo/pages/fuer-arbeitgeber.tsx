@@ -1,6 +1,7 @@
 import type { GetServerSideProps } from 'next';
 import { FC } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { useTranslations } from 'next-intl';
 
 import Layout from '../components/Layout';
@@ -16,22 +17,25 @@ type Props = { portal: PortalBranding; prices: Price[] };
  * and the current prices (from JobPostingPrice).
  */
 const ForEmployers: FC<Props> = ({ portal, prices }) => {
+  const t = useTranslations('forEmployers');
   const tType = useTranslations('jobType');
+  const router = useRouter();
+  const formatPrice = (price: Price) =>
+    new Intl.NumberFormat(router.locale === 'en' ? 'en-GB' : 'de-DE', {
+      style: 'currency',
+      currency: price.currency || 'EUR',
+    }).format(price.price / 100);
+
   return (
     <Layout portal={portal}>
-      <h2>Für Arbeitgeber</h2>
-      <p style={{ maxWidth: '46em' }}>
-        Als Karriereportal für Studierende in Kiel und Flensburg bietet StuJo Arbeitgebern die
-        Möglichkeit, Fachkräfte von morgen frühzeitig kennenzulernen und um sie zu werben. Ob
-        Werkstudentenstelle, Praktikum oder erste Festanstellung – StuJo deckt die ganze Bandbreite
-        von Angeboten ab! Dein Stellenangebot ist bis zu 8 Wochen auf allen StuJo-Portalen sichtbar.
-      </p>
-      <h3>Leistungen und Preise</h3>
+      <h2>{t('title')}</h2>
+      <p style={{ maxWidth: '46em' }}>{t('intro')}</p>
+      <h3>{t('pricesTitle')}</h3>
       <table className="stujo-table" style={{ maxWidth: '32rem' }}>
         <thead>
           <tr>
-            <th style={{ textAlign: 'left' }}>Kategorie</th>
-            <th style={{ textAlign: 'right' }}>Preis (netto)</th>
+            <th style={{ textAlign: 'left' }}>{t('category')}</th>
+            <th style={{ textAlign: 'right' }}>{t('netPrice')}</th>
           </tr>
         </thead>
         <tbody>
@@ -39,7 +43,7 @@ const ForEmployers: FC<Props> = ({ portal, prices }) => {
             <tr key={p.jobPostingType}>
               <td>{tType(p.jobPostingType)}</td>
               <td style={{ textAlign: 'right' }}>
-                {p.price === 0 ? 'kostenlos' : `${(p.price / 100).toFixed(2).replace('.', ',')} €`}
+                {p.price === 0 ? t('free') : formatPrice(p)}
               </td>
             </tr>
           ))}
@@ -47,7 +51,7 @@ const ForEmployers: FC<Props> = ({ portal, prices }) => {
       </table>
       <p style={{ marginTop: '1.5rem' }}>
         <Link href="/mein-stujo/neu" className="stujo-btn">
-          Jetzt Angebot einstellen
+          {t('postOffer')}
         </Link>
       </p>
     </Layout>
