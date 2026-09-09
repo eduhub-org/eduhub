@@ -290,7 +290,6 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
   // the same rule the course registration modal applies via
   // `config.requiresPayment && !acceptTerms`.
   const requiresConsent = netPrice > 0 && credits === 0;
-  const termsUrl = portal.termsUrl || '/agb';
 
   const field = (
     label: string,
@@ -522,9 +521,9 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
               />
               <span>
                 {t('acceptTermsPrefix')}{' '}
-                <a href={termsUrl} target="_blank" rel="noreferrer">
+                <Link href="/agb" target="_blank" rel="noreferrer">
                   {t('acceptTermsLink')}
-                </a>{' '}
+                </Link>{' '}
                 {t('acceptTermsSuffix')}
               </span>
             </label>

@@ -83,11 +83,6 @@ const Layout: FC<LayoutProps> = ({ children, fullWidthMain = false, portal }) =>
       ? 'stujo-nav--active'
       : undefined;
 
-  // Legal pages are not part of the job-board migration (yet); fall back to
-  // the live stujo.net pages unless the portal configures its own URLs.
-  const imprintUrl = portal.imprintUrl || 'https://www.stujo.net/impressum';
-  const privacyUrl = portal.privacyUrl || 'https://www.stujo.net/datenschutz';
-  const termsUrl = portal.termsUrl || '/agb';
   const isGerman = router.locale === 'de';
   const otherLocale = isGerman ? 'en' : 'de';
 
@@ -200,11 +195,11 @@ const Layout: FC<LayoutProps> = ({ children, fullWidthMain = false, portal }) =>
           </div>
           <div className="stujo-footer-links">
             <h3>{t('footerLinksHead')}</h3>
-            <a href={termsUrl}>AGB</a>
+            <Link href="/agb">{t('footerTerms')}</Link>
             <Link href="/fuer-arbeitgeber">{t('footerPrices')}</Link>
             <a href="https://www.stujo.net/faq">FAQ</a>
-            <a href={imprintUrl}>Impressum</a>
-            <a href={privacyUrl}>Datenschutz</a>
+            <Link href="/impressum">{t('footerImprint')}</Link>
+            <Link href="/datenschutz">{t('footerPrivacy')}</Link>
           </div>
           <div>
             <h3>{t('footerUniversityPartners')}</h3>
