@@ -32,14 +32,15 @@ bleibt gleich): Absatz 1 des Textes hier und Absatz 1 des HTML-Bodys in der
 
 ## Text (Lesefassung)
 
-Hallo [Vorname],
+Hallo,
 
-StuJo bekommt heute Abend eine neue technische Grundlage – wir ziehen die
-Plattform auf das System von opencampus.sh um. Deshalb kannst Du am
+StuJo bleibt StuJo – bekommt heute Abend aber eine neue technische Basis: Die
+Plattform zieht auf ein komplett erneuertes System um. Deshalb kannst Du am
 Donnerstag, den 10.09.2026, zwischen 20:00 und 24:00 Uhr keine
 Stellenangebote einstellen oder bearbeiten. Deine bereits veröffentlichten
 Angebote bleiben in dieser Zeit online und für Studierende sichtbar. Ab
-Freitagmorgen läuft alles auf der neuen Plattform.
+Freitagmorgen ist alles wie gewohnt erreichbar – mit ein paar neuen
+Möglichkeiten.
 
 **Was gleich bleibt**
 
@@ -75,18 +76,17 @@ Dein StuJo-Team
 
 ---
 
-## Anrede mit Vornamen
-
-`User.firstName` kommt aus `contacts.forname` der Rails-Datenbank
-(`stujo_etl.py`, `sanitize_person_name`) und ist Freitext: leer, „Herr",
-Firmenname und Tippfehler sind alle möglich. Das SQL personalisiert deshalb
-nur, wenn der Wert wie ein Vorname aussieht (Buchstaben, optional ein
-Bindestrich oder ein zweites Wort, 2–30 Zeichen), und schreibt sonst „Hallo,".
-Schritt 1 der `.sql` zeigt vorher, wie viele Zeilen in welchen Fall laufen —
-sieht die Trefferquote schlecht aus, ist „Hallo," für alle die bessere Wahl
-als eine Mail an „Hallo GmbH,".
-
 ## Was der Text bewusst nicht sagt
+
+- **Den Vornamen.** `User.firstName` kommt aus `contacts.forname` der
+  Rails-Datenbank (`stujo_etl.py`, `sanitize_person_name`) und ist Freitext:
+  leer, „Herr", Firmenname und Tippfehler sind alle möglich. Eine Mail an
+  „Hallo GmbH & Co," ist schlechter als „Hallo," — entschieden gegen die
+  Personalisierung.
+- **Einen Betreiberwechsel.** Es gibt keinen: StuJo gehörte auch vorher zu
+  opencampus.sh. Der erste Satz sagt deshalb „neue technische Basis" und nicht
+  „Umzug zu opencampus.sh"; EduHub taucht nur dort auf, wo es wirklich neu ist
+  — bei der Reichweite.
 
 - **Alte Rechnungen.** Die Zahlungshistorie bleibt im Rails-Archiv, sie wandert
   nicht mit (§5.1). Wer Belege braucht, merkt es erst, wenn der Server weg ist.

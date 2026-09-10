@@ -21,14 +21,14 @@
 \set test_recipient 'login@opencampus.sh'
 \set subject 'StuJo zieht um: heute Abend kurz offline, ab morgen mit mehr Reichweite'
 
--- The body, minus the greeting line, which is per recipient (step 3).
+-- The body, minus the greeting line, which is prepended in steps 2 and 3.
 -- Only p/br/strong/ul/li/a — sanitizeEmailHtml (EmailEditor.tsx) drops the
 -- rest, and <table> in particular.
-\set body '<p>StuJo bekommt heute Abend eine neue technische Grundlage – wir ziehen die Plattform auf das System von opencampus.sh um. Deshalb kannst Du am <strong>Donnerstag, den 10.09.2026, zwischen 20:00 und 24:00 Uhr</strong> keine Stellenangebote einstellen oder bearbeiten. Deine bereits veröffentlichten Angebote bleiben in dieser Zeit online und für Studierende sichtbar. Ab Freitagmorgen läuft alles auf der neuen Plattform.</p><p><strong>Was gleich bleibt</strong></p><ul><li>Die Adresse: <a href="https://stujo.net">stujo.net</a>, wie bisher. Alte Links auf Deine Angebote leiten automatisch weiter.</li><li>Dein Zugang: dieselbe E-Mail-Adresse, dasselbe Passwort. Unternehmensdaten, Angebote und freie Kontingente sind mitgezogen.</li><li>Die Preise: unverändert. Minijob-Angebote bleiben kostenlos.</li></ul><p><strong>Was neu ist</strong></p><ul><li><strong>Deine Stellenangebote auf Deiner eigenen Website.</strong> Als Widget in die eigene Karriereseite einbinden – es aktualisiert sich automatisch, sobald Du auf StuJo etwas veröffentlichst. Schreib uns kurz, dann schicken wir Dir die Details.</li><li><strong>Mehr Reichweite über EduHub.</strong> Angebote erscheinen jetzt auch auf <a href="https://edu.opencampus.sh">edu.opencampus.sh</a> – der Kursplattform mit über 2.000 Kursbewerbungen pro Jahr. Dazu die Hochschulportale (CAU, FH Kiel, HAW Kiel, Flensburg) und neu der wöchentliche Job-Letter an Studierende.</li><li><strong>Bezahlen und Abrechnen geht schneller.</strong> Statt Rechnung per Post und Überweisung binnen 30 Tagen: Karte, SEPA-Lastschrift oder Überweisung direkt beim Einstellen, Veröffentlichung unmittelbar nach der Zahlung, Rechnung automatisch per E-Mail.</li><li><strong>Frische Laufzeit geschenkt.</strong> Alle heute online stehenden Angebote starten mit vollen 8 Wochen neu.</li></ul><p><strong>Was Du tun musst:</strong> Nichts. Ab Freitag meldest Du Dich wie gewohnt auf <a href="https://stujo.net">stujo.net</a> an – Deine Angebote findest Du dann unter „Mein StuJo".</p><p>Wenn Du Fragen hast, antworte einfach auf diese E-Mail.</p><p>Dein StuJo-Team</p>'
+\set body '<p>StuJo bleibt StuJo – bekommt heute Abend aber eine neue technische Basis: Die Plattform zieht auf ein komplett erneuertes System um. Deshalb kannst Du am <strong>Donnerstag, den 10.09.2026, zwischen 20:00 und 24:00 Uhr</strong> keine Stellenangebote einstellen oder bearbeiten. Deine bereits veröffentlichten Angebote bleiben in dieser Zeit online und für Studierende sichtbar. Ab Freitagmorgen ist alles wie gewohnt erreichbar – mit ein paar neuen Möglichkeiten.</p><p><strong>Was gleich bleibt</strong></p><ul><li>Die Adresse: <a href="https://stujo.net">stujo.net</a>, wie bisher. Alte Links auf Deine Angebote leiten automatisch weiter.</li><li>Dein Zugang: dieselbe E-Mail-Adresse, dasselbe Passwort. Unternehmensdaten, Angebote und freie Kontingente sind mitgezogen.</li><li>Die Preise: unverändert. Minijob-Angebote bleiben kostenlos.</li></ul><p><strong>Was neu ist</strong></p><ul><li><strong>Deine Stellenangebote auf Deiner eigenen Website.</strong> Als Widget in die eigene Karriereseite einbinden – es aktualisiert sich automatisch, sobald Du auf StuJo etwas veröffentlichst. Schreib uns kurz, dann schicken wir Dir die Details.</li><li><strong>Mehr Reichweite über EduHub.</strong> Angebote erscheinen jetzt auch auf <a href="https://edu.opencampus.sh">edu.opencampus.sh</a> – der Kursplattform mit über 2.000 Kursbewerbungen pro Jahr. Dazu die Hochschulportale (CAU, FH Kiel, HAW Kiel, Flensburg) und neu der wöchentliche Job-Letter an Studierende.</li><li><strong>Bezahlen und Abrechnen geht schneller.</strong> Statt Rechnung per Post und Überweisung binnen 30 Tagen: Karte, SEPA-Lastschrift oder Überweisung direkt beim Einstellen, Veröffentlichung unmittelbar nach der Zahlung, Rechnung automatisch per E-Mail.</li><li><strong>Frische Laufzeit geschenkt.</strong> Alle heute online stehenden Angebote starten mit vollen 8 Wochen neu.</li></ul><p><strong>Was Du tun musst:</strong> Nichts. Ab Freitag meldest Du Dich wie gewohnt auf <a href="https://stujo.net">stujo.net</a> an – Deine Angebote findest Du dann unter „Mein StuJo".</p><p>Wenn Du Fragen hast, antworte einfach auf diese E-Mail.</p><p>Dein StuJo-Team</p>'
 
 
 -- ---------------------------------------------------------------------------
--- Step 1 — who this reaches, and how many get a first name
+-- Step 1 — who this reaches
 -- ---------------------------------------------------------------------------
 -- "has at least one job posting in any status": an employer whose posting
 -- expired years ago still had an account here and still needs telling.
@@ -37,12 +37,10 @@
 CREATE OR REPLACE VIEW pg_temp.cutover_recipients AS
 SELECT DISTINCT ON (u."email")
   u."id"    AS user_id,
-  u."email" AS email,
-  u."firstName" AS first_name,
-  -- firstName is Rails contacts.forname passed through sanitize_person_name:
-  -- free text, so "Herr", a company name or an empty string are all possible.
-  -- Personalize only what looks like a name; everybody else gets "Hallo,".
-  (u."firstName" ~ '^[[:alpha:]]+([ -][[:alpha:]]+)?$' AND length(u."firstName") BETWEEN 2 AND 30) AS name_usable
+  u."email" AS email
+-- No first name in the greeting: User.firstName is Rails contacts.forname and
+-- is free text, so "Herr", a company name and an empty string all occur.
+-- Everybody gets "Hallo,".
 FROM "public"."OrganizationAdmin" oa
 JOIN "public"."User" u ON u."id" = oa."userId"
 WHERE oa."canManageJobs"
@@ -51,19 +49,7 @@ WHERE oa."canManageJobs"
   AND u."email" <> ''
 ORDER BY u."email", u."id";
 
-SELECT count(*) FILTER (WHERE name_usable)       AS mit_vorname,
-       count(*) FILTER (WHERE NOT name_usable)   AS ohne_vorname,
-       count(*)                                  AS gesamt
-FROM pg_temp.cutover_recipients;
-
--- Eyeball the names that would be used — one "Hallo Sekretariat," is enough
--- reason to drop the personalization and greet everyone with "Hallo,".
-SELECT first_name, count(*) AS n
-FROM pg_temp.cutover_recipients
-WHERE name_usable
-GROUP BY first_name
-ORDER BY n DESC, first_name
-LIMIT 40;
+SELECT count(*) AS empfaenger FROM pg_temp.cutover_recipients;
 
 
 -- ---------------------------------------------------------------------------
@@ -108,10 +94,7 @@ BEGIN;
 INSERT INTO "public"."MailLog" ("subject", "content", "from", "to", "status", "metadata")
 SELECT
   :'subject',
-  CASE WHEN r.name_usable
-       THEN '<p>Hallo ' || r.first_name || ',</p>'
-       ELSE '<p>Hallo,</p>'
-  END || :'body',
+  '<p>Hallo,</p>' || :'body',
   'team@stujo.net',
   r.email,
   'READY_TO_SEND',
