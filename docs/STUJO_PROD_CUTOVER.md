@@ -602,21 +602,40 @@ Then **verify** against production Hasura before touching DNS:
 
 ```graphql
 query CutoverCounts {
-  organizations: Organization_aggregate(where: {aliases: {_has_key: "stujo"}}) { aggregate { count } }
+  # NB: not `_has_key: "stujo"`. The ETL writes `stujo:<railsId>-<slug>` as an
+  # ELEMENT of the `aliases` jsonb array, and `_has_key` on an array is an exact
+  # element match, so that predicate returns 0 even after a successful run.
+  organizations: Organization_aggregate(
+    where: {aliases: {_cast: {String: {_ilike: "%stujo:%"}}}}
+  ) { aggregate { count } }
   jobAdmins: OrganizationAdmin_aggregate(where: {canManageJobs: {_eq: true}}) { aggregate { count } }
   published: JobPosting_aggregate(where: {status: {_eq: PUBLISHED}}) { aggregate { count } }
-  archived: JobPosting_aggregate(where: {status: {_eq: ARCHIVED}}) { aggregate { count } }
+  # The ETL imports past postings as EXPIRED, not ARCHIVED — checking ARCHIVED
+  # is always 0 and tells you nothing.
+  expired: JobPosting_aggregate(where: {status: {_eq: EXPIRED}}) { aggregate { count } }
   credits: JobPostingCredit_aggregate { aggregate { count sum { remaining } } }
   alerts: JobAlertSubscription_aggregate(where: {active: {_eq: true}}) { aggregate { count } }
 }
 ```
 
-Expected orders of magnitude from the source audit (plan §9): ~2,480
-organizations, 733 organizations with credits, ~1,000 published postings, 322
-students. Also spot-check, because counts do not catch these:
+Expected orders of magnitude: **~859** organizations, ~1,020 job admins,
+~1,040 PUBLISHED plus ~6,610 EXPIRED postings, and 261 students. Credits are
+**not** 733 rows: `step_credits` imports only *positive remaining* balances
+(`remaining <= 0` is skipped), and on 2026-09-10 exactly **5** organizations
+held one, totalling **20** credits. The "733 organizations with credits" figure
+counts `paymentcounters` rows in the source, most of which are spent. (The
+source audit in plan §9 says ~2,480 organizations; that predates the
+jobless-company filter, which is now the default — see §9 of the plan and the
+`--include-jobless-companies` escape hatch.) Also spot-check, because counts do
+not catch these:
 
-- the file-copy summary at the end of the log (`logos missing` / `pdfs missing`
-  must be 0 — re-run backfills them);
+- the file-copy summary at the end of the log. `logos missing` must be 0.
+  `pdfs missing` is **45** — those Paperclip files are gone at the source (the
+  `original/` directory survives but is empty, e.g. job 12156 while its
+  neighbours 12155/12154 still hold theirs), so no re-run or delta run recovers
+  them. `copy_paperclip_pdf` returns `None` in that case, so the postings import
+  with a NULL pdf: no dangling links, descriptions intact. A number above 45
+  means something new, and is worth investigating;
 - a handful of logos and job PDFs actually load from the bucket;
 - one employer with an imported bcrypt hash can log in on
   `stujo.opencampus.sh` with their **old** password;
