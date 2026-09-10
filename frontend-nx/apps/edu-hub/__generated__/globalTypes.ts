@@ -275,14 +275,11 @@ export enum AppSettings_update_column {
   faqCollectionName = "faqCollectionName",
   faviconUrl = "faviconUrl",
   guestDataRetentionMonths = "guestDataRetentionMonths",
-  imprintUrl = "imprintUrl",
   logoUrl = "logoUrl",
   previewImageURL = "previewImageURL",
   primaryColor = "primaryColor",
-  privacyUrl = "privacyUrl",
   secondaryColor = "secondaryColor",
   showFaqSection = "showFaqSection",
-  termsUrl = "termsUrl",
   timeZone = "timeZone",
   updated_at = "updated_at",
 }
@@ -3696,14 +3693,11 @@ export interface AppSettings_bool_exp {
   faqCollectionName?: String_comparison_exp | null;
   faviconUrl?: String_comparison_exp | null;
   guestDataRetentionMonths?: Int_comparison_exp | null;
-  imprintUrl?: String_comparison_exp | null;
   logoUrl?: String_comparison_exp | null;
   previewImageURL?: String_comparison_exp | null;
   primaryColor?: String_comparison_exp | null;
-  privacyUrl?: String_comparison_exp | null;
   secondaryColor?: String_comparison_exp | null;
   showFaqSection?: Boolean_comparison_exp | null;
-  termsUrl?: String_comparison_exp | null;
   timeZone?: String_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
 }
@@ -3724,14 +3718,11 @@ export interface AppSettings_insert_input {
   faqCollectionName?: string | null;
   faviconUrl?: string | null;
   guestDataRetentionMonths?: number | null;
-  imprintUrl?: string | null;
   logoUrl?: string | null;
   previewImageURL?: string | null;
   primaryColor?: string | null;
-  privacyUrl?: string | null;
   secondaryColor?: string | null;
   showFaqSection?: boolean | null;
-  termsUrl?: string | null;
   timeZone?: string | null;
   updated_at?: any | null;
 }

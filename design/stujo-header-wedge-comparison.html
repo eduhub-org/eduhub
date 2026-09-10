@@ -1,0 +1,529 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>StuJo header wedge comparison</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --preview-width: 1024px;
+        --candidate-opacity: 0.5;
+        --stujo-primary: #a71580;
+        --stujo-gradient-dark: #4b0135;
+        --stujo-gradient: linear-gradient(
+          to right,
+          var(--stujo-gradient-dark),
+          var(--stujo-primary),
+          var(--stujo-gradient-dark)
+        );
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        color: #333;
+        background: #f4f2f0;
+        font:
+          14px/1.45 "Helvetica Neue",
+          Helvetica,
+          Arial,
+          sans-serif;
+      }
+
+      main {
+        width: min(100% - 32px, 1500px);
+        margin: 32px auto 64px;
+      }
+
+      h1,
+      h2,
+      p {
+        margin-top: 0;
+      }
+
+      h1 {
+        margin-bottom: 8px;
+        font-size: 26px;
+      }
+
+      h2 {
+        margin-bottom: 10px;
+        font-size: 18px;
+      }
+
+      .intro {
+        max-width: 74ch;
+        color: #646363;
+      }
+
+      .measurements {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px 18px;
+        margin: 0 0 22px;
+        padding: 0;
+        list-style: none;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .measurements strong {
+        color: #4b0135;
+      }
+
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: end;
+        gap: 16px 22px;
+        padding: 18px;
+        margin-bottom: 28px;
+        background: #fff;
+        border: 1px solid #dedad5;
+      }
+
+      .control {
+        display: grid;
+        gap: 6px;
+      }
+
+      .control label,
+      .control .label {
+        font-weight: 700;
+      }
+
+      .control output {
+        min-width: 5ch;
+        color: #646363;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .control-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      input,
+      select,
+      button {
+        font: inherit;
+      }
+
+      input[type="range"] {
+        width: min(360px, 55vw);
+      }
+
+      select,
+      button {
+        min-height: 36px;
+        padding: 6px 10px;
+        color: #333;
+        background: #fff;
+        border: 1px solid #9b9691;
+      }
+
+      button {
+        cursor: pointer;
+      }
+
+      .preset-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+
+      .preset-buttons button[aria-pressed="true"] {
+        color: #fff;
+        background: #4b0135;
+        border-color: #4b0135;
+      }
+
+      .comparison-list {
+        display: grid;
+        gap: 24px;
+      }
+
+      .comparison-item,
+      .overlay-section {
+        min-width: 0;
+      }
+
+      .viewport-scroll {
+        max-width: 100%;
+        overflow-x: auto;
+        background: repeating-conic-gradient(#e5e5e5 0 25%, #fff 0 50%) 0 / 16px
+          16px;
+        border: 1px solid #c9c5c1;
+      }
+
+      .preview-viewport {
+        width: var(--preview-width);
+        min-width: var(--preview-width);
+        container-type: inline-size;
+      }
+
+      .demo-header {
+        position: relative;
+        height: 15em;
+        overflow: hidden;
+        background: var(--stujo-gradient);
+      }
+
+      @container (min-width: 768px) {
+        .demo-header {
+          height: 22em;
+        }
+      }
+
+      .wedge,
+      .demo-logo {
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+
+      .wedge {
+        width: max(720px, 70%);
+        height: auto;
+        pointer-events: none;
+      }
+
+      .wedge[src$=".svg"] {
+        left: -2px;
+      }
+
+      .wedge-css {
+        aspect-ratio: 1477 / 256;
+        background: linear-gradient(
+          170.166938deg,
+          #fff 0 43.15%,
+          #fdfdfd 44.13%,
+          #f9f9f9 45.11%,
+          #f4f4f4 46.09%,
+          #ededed 47.07%,
+          #e4e4e4 48.05%,
+          #dadada 49.03%,
+          #d1d1d1 50%
+        );
+        clip-path: polygon(0 0, 100% 0, 0 100%);
+      }
+
+      .demo-logo {
+        top: 16px;
+        left: 16px;
+        z-index: 3;
+        width: clamp(136px, 13%, 180px);
+        height: auto;
+      }
+
+      .demo-nav {
+        position: absolute;
+        z-index: 3;
+        top: clamp(1.2em, calc(300px - 26cqw), 100px);
+        right: 1.5em;
+        display: flex;
+        gap: 1.5rem;
+        color: #fff;
+        font-size: 18px;
+        font-weight: 700;
+      }
+
+      @container (max-width: 767px) {
+        .demo-nav {
+          top: 112px;
+          right: 16px;
+          display: grid;
+          gap: 10px 22px;
+          font-size: 15px;
+          text-align: right;
+        }
+      }
+
+      .overlay-section {
+        margin-top: 34px;
+        padding-top: 28px;
+        border-top: 1px solid #c9c5c1;
+      }
+
+      .overlay-original {
+        opacity: calc(1 - var(--candidate-opacity));
+      }
+
+      .overlay-candidate {
+        opacity: var(--candidate-opacity);
+      }
+
+      .difference .overlay-original,
+      .difference .overlay-candidate {
+        opacity: 1;
+      }
+
+      .difference .overlay-candidate {
+        mix-blend-mode: difference;
+      }
+
+      .difference .demo-logo,
+      .difference .demo-nav {
+        display: none;
+      }
+
+      .hint {
+        margin: 10px 0 0;
+        color: #646363;
+      }
+
+      @media (max-width: 700px) {
+        main {
+          width: min(100% - 20px, 1500px);
+          margin-top: 20px;
+        }
+
+        .controls {
+          padding: 14px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>StuJo header wedge comparison</h1>
+      <p class="intro">
+        The three previews use the current responsive header geometry. The
+        checkerboard is visible only where a preview is narrower than the
+        comparison area; it is not part of the header.
+      </p>
+
+      <ul class="measurements" aria-label="Measured source properties">
+        <li><strong>Source</strong> 1477 × 256</li>
+        <li><strong>Aspect ratio</strong> 5.7695:1</li>
+        <li><strong>Edge angle</strong> 9.8331°</li>
+        <li><strong>Fill</strong> #ffffff</li>
+        <li><strong>Shadow</strong> ~35 source px to #d1d1d1</li>
+      </ul>
+
+      <section class="controls" aria-label="Comparison controls">
+        <div class="control">
+          <span class="label">Viewport presets</span>
+          <div class="preset-buttons" id="presets">
+            <button type="button" data-width="375">375</button>
+            <button type="button" data-width="768">768</button>
+            <button type="button" data-width="1024" aria-pressed="true">
+              1024
+            </button>
+            <button type="button" data-width="1440">1440</button>
+            <button type="button" data-width="1920">1920</button>
+          </div>
+        </div>
+
+        <div class="control">
+          <label for="viewport-width">Custom viewport width</label>
+          <div class="control-row">
+            <input
+              id="viewport-width"
+              type="range"
+              min="320"
+              max="1920"
+              step="1"
+              value="1024"
+            />
+            <output id="viewport-output" for="viewport-width">1024px</output>
+          </div>
+        </div>
+
+        <div class="control">
+          <label for="candidate">Overlay candidate</label>
+          <select id="candidate">
+            <option value="svg">SVG</option>
+            <option value="css">CSS</option>
+          </select>
+        </div>
+
+        <div class="control">
+          <label for="overlay-opacity">Candidate in overlay</label>
+          <div class="control-row">
+            <input
+              id="overlay-opacity"
+              type="range"
+              min="0"
+              max="100"
+              step="1"
+              value="50"
+            />
+            <output id="opacity-output" for="overlay-opacity">50%</output>
+          </div>
+        </div>
+
+        <label class="control-row">
+          <input id="difference" type="checkbox" />
+          Difference blend
+        </label>
+      </section>
+
+      <section
+        class="comparison-list"
+        aria-label="Side-by-side implementations"
+      >
+        <article class="comparison-item">
+          <h2>Current PNG reference</h2>
+          <div class="viewport-scroll">
+            <div class="preview-viewport">
+              <div class="demo-header">
+                <img
+                  class="wedge"
+                  src="stujo-assets/stujo_header_diag.png"
+                  alt=""
+                />
+                <img
+                  class="demo-logo"
+                  src="stujo-assets/stujo_header_logo.png"
+                  alt="StuJo"
+                />
+                <div class="demo-nav" aria-hidden="true">
+                  <span>DE | EN</span><span>LOGIN</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="comparison-item">
+          <h2>SVG candidate</h2>
+          <div class="viewport-scroll">
+            <div class="preview-viewport">
+              <div class="demo-header">
+                <img
+                  class="wedge"
+                  src="../frontend-nx/apps/stujo/public/stujo_header_diag.svg"
+                  alt=""
+                />
+                <img
+                  class="demo-logo"
+                  src="stujo-assets/stujo_header_logo.png"
+                  alt="StuJo"
+                />
+                <div class="demo-nav" aria-hidden="true">
+                  <span>DE | EN</span><span>LOGIN</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="comparison-item">
+          <h2>CSS clip-path candidate</h2>
+          <div class="viewport-scroll">
+            <div class="preview-viewport">
+              <div class="demo-header">
+                <div class="wedge wedge-css" aria-hidden="true"></div>
+                <img
+                  class="demo-logo"
+                  src="stujo-assets/stujo_header_logo.png"
+                  alt="StuJo"
+                />
+                <div class="demo-nav" aria-hidden="true">
+                  <span>DE | EN</span><span>LOGIN</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="overlay-section">
+        <h2>Overlay inspection</h2>
+        <div class="viewport-scroll">
+          <div class="preview-viewport">
+            <div class="demo-header" id="overlay-header">
+              <img
+                class="wedge overlay-original"
+                src="stujo-assets/stujo_header_diag.png"
+                alt=""
+              />
+              <img
+                class="wedge overlay-candidate"
+                id="overlay-svg"
+                src="../frontend-nx/apps/stujo/public/stujo_header_diag.svg"
+                alt=""
+              />
+              <div
+                class="wedge wedge-css overlay-candidate"
+                id="overlay-css"
+                aria-hidden="true"
+                hidden
+              ></div>
+              <img
+                class="demo-logo"
+                src="stujo-assets/stujo_header_logo.png"
+                alt="StuJo"
+              />
+              <div class="demo-nav" aria-hidden="true">
+                <span>DE | EN</span><span>LOGIN</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="hint" id="overlay-description" aria-live="polite">
+          Showing an equal crossfade between the PNG reference and SVG
+          candidate.
+        </p>
+      </section>
+    </main>
+
+    <script>
+      const root = document.documentElement;
+      const widthInput = document.getElementById("viewport-width");
+      const widthOutput = document.getElementById("viewport-output");
+      const presets = document.getElementById("presets");
+      const candidate = document.getElementById("candidate");
+      const opacityInput = document.getElementById("overlay-opacity");
+      const opacityOutput = document.getElementById("opacity-output");
+      const difference = document.getElementById("difference");
+      const overlayHeader = document.getElementById("overlay-header");
+      const overlaySvg = document.getElementById("overlay-svg");
+      const overlayCss = document.getElementById("overlay-css");
+      const overlayDescription = document.getElementById("overlay-description");
+
+      function setWidth(value) {
+        const width = Number(value);
+        root.style.setProperty("--preview-width", `${width}px`);
+        widthInput.value = String(width);
+        widthOutput.value = `${width}px`;
+        presets.querySelectorAll("button").forEach((button) => {
+          button.setAttribute(
+            "aria-pressed",
+            String(Number(button.dataset.width) === width),
+          );
+        });
+      }
+
+      function updateOverlay() {
+        const useSvg = candidate.value === "svg";
+        const opacity = Number(opacityInput.value);
+        overlaySvg.hidden = !useSvg;
+        overlayCss.hidden = useSvg;
+        root.style.setProperty("--candidate-opacity", String(opacity / 100));
+        opacityOutput.value = `${opacity}%`;
+        overlayHeader.classList.toggle("difference", difference.checked);
+        overlayDescription.textContent = difference.checked
+          ? `Difference blend between the PNG reference and ${candidate.value.toUpperCase()} candidate.`
+          : `Showing a ${opacity}% ${candidate.value.toUpperCase()} candidate / ${100 - opacity}% PNG reference crossfade.`;
+      }
+
+      widthInput.addEventListener("input", () => setWidth(widthInput.value));
+      presets.addEventListener("click", (event) => {
+        const button = event.target.closest("button[data-width]");
+        if (button) setWidth(button.dataset.width);
+      });
+      candidate.addEventListener("change", updateOverlay);
+      opacityInput.addEventListener("input", updateOverlay);
+      difference.addEventListener("change", updateOverlay);
+
+      setWidth(widthInput.value);
+      updateOverlay();
+    </script>
+  </body>
+</html>

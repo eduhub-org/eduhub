@@ -289,9 +289,9 @@ const MeinStujo: FC<Props> = ({ portal }) => {
           <label className="stujo-consent">
             <span>
               {t('consentPromptPrefix')}{' '}
-              <a href={portal.termsUrl || '/agb'} target="_blank" rel="noreferrer">
+              <Link href="/agb" target="_blank" rel="noreferrer">
                 {t('acceptTermsLink')}
-              </a>
+              </Link>
               {t('consentPromptSuffix')}
             </span>
           </label>
