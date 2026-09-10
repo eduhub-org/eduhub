@@ -9,9 +9,30 @@ mindestens ein Stellenangebot hat. Das ausführbare Statement dazu liegt in
 
 **Wartungsfenster in diesem Entwurf:** Freitag, 11.09.2026, 20:00–24:00 Uhr
 **MESZ** (= 18:00–22:00 UTC; der Text nennt bewusst Ortszeit, der Rest des
-Cutover-Dokuments rechnet in UTC). Steht das Fenster anders, sind drei Stellen
-zu ändern: der Betreff („morgen Abend“), Absatz 1 des Textes hier und Absatz 1
-des HTML-Bodys in der `.sql` — dort Datum, Wochentag und der Tag danach.
+Cutover-Dokuments rechnet in UTC).
+
+Steht das Fenster anders, sind **vier** Stellen im Text zu ändern — je zwei pro
+Datei, plus die Zeile oben. Die `.sql` ist die, die tatsächlich verschickt
+wird; dieses Dokument ist die Lesefassung davon, und beide müssen gleich
+lauten:
+
+| Datei | Stelle | Enthält den Zeitbezug als |
+|---|---|---|
+| `scripts/stujo_cutover_employer_mail.sql` | `\set subject …` | Tagesbezug in der Betreffzeile |
+| `scripts/stujo_cutover_employer_mail.sql` | `\set body …`, erster `<p>` | Tagesbezug, Wochentag + Datum + Uhrzeit, Tag danach |
+| dieses Dokument | Abschnitt „Betreff“ | dieselbe Betreffzeile |
+| dieses Dokument | „Text (Lesefassung)“, Absatz 1 | derselbe Wortlaut wie der HTML-Body |
+
+Danach prüfen, dass vom alten Fenster nichts stehen geblieben ist — mit den
+alten Formulierungen gesucht, muss die Liste leer sein:
+
+```bash
+grep -rn 'morgen Abend\|11\.09\.2026\|Samstagmorgen' \
+  docs/STUJO_CUTOVER_EMPLOYER_MAIL.md scripts/stujo_cutover_employer_mail.sql
+```
+
+(Die Suchbegriffe sind die des aktuellen Entwurfs; beim Ändern durch die
+jeweils ersetzten austauschen.)
 
 **Vor dem Versand:**
 
