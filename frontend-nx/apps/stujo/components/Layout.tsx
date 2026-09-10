@@ -83,11 +83,6 @@ const Layout: FC<LayoutProps> = ({ children, fullWidthMain = false, portal }) =>
       ? 'stujo-nav--active'
       : undefined;
 
-  // Legal pages are not part of the job-board migration (yet); fall back to
-  // the live stujo.net pages unless the portal configures its own URLs.
-  const imprintUrl = portal.imprintUrl || 'https://www.stujo.net/impressum';
-  const privacyUrl = portal.privacyUrl || 'https://www.stujo.net/datenschutz';
-  const termsUrl = portal.termsUrl || '/agb';
   const isGerman = router.locale === 'de';
   const otherLocale = isGerman ? 'en' : 'de';
 
@@ -101,7 +96,7 @@ const Layout: FC<LayoutProps> = ({ children, fullWidthMain = false, portal }) =>
         {styleVars && <style>{`:root:root { ${styleVars} }`}</style>}
       </Head>
       <header className="stujo-header">
-        <img src="/stujo_header_diag.png" alt="" className="stujo-header-diag" />
+        <img src="/stujo_header_diag.svg" alt="" className="stujo-header-diag" />
         <Link href="/">
           <img
             src={portal.logoUrl || '/stujo_header_logo.png'}
@@ -185,7 +180,7 @@ const Layout: FC<LayoutProps> = ({ children, fullWidthMain = false, portal }) =>
             {t('employers')}
           </Link>
           <Link href="/mein-stujo" className={navClass('/mein-stujo')}>
-            Mein StuJo
+            {tLayout('my_stujo')}
           </Link>
         </div>
       </nav>
@@ -195,19 +190,19 @@ const Layout: FC<LayoutProps> = ({ children, fullWidthMain = false, portal }) =>
       <footer className="stujo-footer">
         <div className="stujo-container stujo-footer-cols">
           <div>
-            <h3>{t('footerAboutHead')}</h3>
-            <p>{t('footerAboutText')}</p>
+            <h3>{tLayout('footer_about_head')}</h3>
+            <p>{tLayout('footer_about_text')}</p>
           </div>
           <div className="stujo-footer-links">
-            <h3>{t('footerLinksHead')}</h3>
-            <a href={termsUrl}>AGB</a>
-            <Link href="/fuer-arbeitgeber">{t('footerPrices')}</Link>
-            <a href="https://www.stujo.net/faq">FAQ</a>
-            <a href={imprintUrl}>Impressum</a>
-            <a href={privacyUrl}>Datenschutz</a>
+            <h3>{tLayout('footer_links_head')}</h3>
+            <Link href="/agb">{tLayout('footer_terms')}</Link>
+            <Link href="/fuer-arbeitgeber">{tLayout('footer_prices')}</Link>
+            <Link href="/faq">FAQ</Link>
+            <Link href="/impressum">{tLayout('footer_imprint')}</Link>
+            <Link href="/datenschutz">{tLayout('footer_privacy')}</Link>
           </div>
           <div>
-            <h3>{t('footerUniversityPartners')}</h3>
+            <h3>{tLayout('footer_university_partners')}</h3>
             <a className="stujo-footer-logo-link" href="http://www.uni-kiel.de/" target="_blank" rel="noreferrer">
               <img className="stujo-footer-logo" src="/partner/uni-kiel-logo-norm-228x76.gif" alt="Universität Kiel" />
             </a>
@@ -219,7 +214,7 @@ const Layout: FC<LayoutProps> = ({ children, fullWidthMain = false, portal }) =>
             </a>
           </div>
           <div>
-            <h3>{t('footerPartners')}</h3>
+            <h3>{tLayout('footer_partners')}</h3>
             <a className="stujo-footer-logo-link" href="http://www.wissenschaftszentrumkiel.de/" target="_blank" rel="noreferrer">
               <img className="stujo-footer-logo" src="/partner/Logo-Wissenschaftszentrum.png" alt="Wissenschaftszentrum Kiel" />
             </a>
