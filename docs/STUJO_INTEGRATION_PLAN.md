@@ -233,13 +233,13 @@ unique(`userId`,`jobPostingId`). (Saved *companies* are dropped — low value.)
 - `AppSettings` + `logoUrl`, `faviconUrl`, `primaryColor`, `secondaryColor`,
   `imprintUrl`, `privacyUrl`, `defaultLocale`, `domain` text unique nullable.
   Seed rows `stujo`, `stujo-cau`, `stujo-haw-kiel`, `stujo-flensburg`.
-  **`imprintUrl`, `privacyUrl` and the later `termsUrl` are dead as of
-  2026-09-09.** They were the per-portal escape hatch for legal pages; every
-  portal now serves the in-app `/impressum`, `/datenschutz` and `/agb`, so the
-  frontend no longer reads them. Nothing writes them either (there was never an
-  admin UI). The columns and their anonymous select permission still exist and
-  can be dropped in a migration of their own; the comment on the `termsUrl`
-  migration, which says it mirrors `imprintUrl`/`privacyUrl`, is stale.
+  **`imprintUrl`, `privacyUrl` and the later `termsUrl` were dropped again on
+  2026-09-09** by `..._drop_appsettings_legal_url_columns`, together with their
+  `anonymous` select permission. They were the per-portal escape hatch for
+  legal pages; every portal now serves the in-app `/impressum`,
+  `/datenschutz` and `/agb`, so there is nothing left to override. Nothing had
+  ever written them (there was never an admin UI), so all rows were NULL and no
+  data was lost. `defaultLocale` and `domain` stay.
 
 ### Permissions (mirror `public_Organization.yaml` patterns)
 - `anonymous`: select `PUBLISHED`, non-expired, unrestricted

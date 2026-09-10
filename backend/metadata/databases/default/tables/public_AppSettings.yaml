@@ -17,14 +17,11 @@ select_permissions:
         - faqCollectionName
         - faviconUrl
         - guestDataRetentionMonths
-        - imprintUrl
         - logoUrl
         - previewImageURL
         - primaryColor
-        - privacyUrl
         - secondaryColor
         - showFaqSection
-        - termsUrl
         - timeZone
         - updated_at
       filter: {}
