@@ -6942,21 +6942,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"baseline-browser-mapping@npm:^2.11.12":
+"baseline-browser-mapping@npm:2.11.20, baseline-browser-mapping@npm:^2.11.12":
   version: 2.11.20
   resolution: "baseline-browser-mapping@npm:2.11.20"
   bin:
     baseline-browser-mapping: dist/cli.cjs
   checksum: 57304eb3e402e6ee43836dc5695d0680db1381054ee25dd02dc703eeac9b760f6bb5e3e94ab4a1d09cffa44eac3e56fda10bfa5364a951256149fd55b62f4df1
-  languageName: node
-  linkType: hard
-
-"baseline-browser-mapping@npm:^2.9.19":
-  version: 2.10.43
-  resolution: "baseline-browser-mapping@npm:2.10.43"
-  bin:
-    baseline-browser-mapping: dist/cli.cjs
-  checksum: e6633dd8e139254449f577c2cf0d66af717eae5f1b2ceb557bc0c98fcf505300ca4c0f119603b7c717e6a3d2395ff8f4a992248d02e2dcebc3fcf3e8e696645d
   languageName: node
   linkType: hard
 
@@ -13200,26 +13191,26 @@ __metadata:
   languageName: node
   linkType: hard
 
-"js-yaml@npm:^3.15.1":
-  version: 3.15.1
-  resolution: "js-yaml@npm:3.15.1"
+"js-yaml@npm:^3.15.2":
+  version: 3.15.2
+  resolution: "js-yaml@npm:3.15.2"
   dependencies:
     argparse: ^1.0.7
     esprima: ^4.0.0
   bin:
     js-yaml: bin/js-yaml.js
-  checksum: 536cfb984b61d1544dbdbe394254dd13481a94171cb3a61608572d9112a63cbace9dd900cb83a4e530ac36427fff77d9e1cb6734917c6fea951d00b4f7bbb163
+  checksum: 774d62285fa9aad3883603a7186c58619b582f0257ccf4d7b518dc2dc5c7f88f14b649c1149112b4494da832ba824c35a3e2fda776a12dbe02e99f7adc3a8a47
   languageName: node
   linkType: hard
 
-"js-yaml@npm:^4.3.1":
-  version: 4.3.1
-  resolution: "js-yaml@npm:4.3.1"
+"js-yaml@npm:^4.3.2":
+  version: 4.3.2
+  resolution: "js-yaml@npm:4.3.2"
   dependencies:
     argparse: ^2.0.1
   bin:
     js-yaml: bin/js-yaml.js
-  checksum: 482740e69a1769b355d7182234c0fa197237f02e6a5c8c0b70a763af6a712c9741de350d784a5659e00cf03cedd6ebfa506d59ca45967e3ee50dd4f4df18f2e7
+  checksum: 3c9294448ed83fec340f017f2be056dab05bcba3fc742468a80275d264e982dfd94350a93640eb810e0fdf283bef7c1c810690cc69b7b04a187f781e079d2555
   languageName: node
   linkType: hard
 
@@ -16193,7 +16184,7 @@ __metadata:
     remark-gfm: ^4.0.0
     semantic-release: ^21.1.2
     sharp: ^0.35.4
-    stripe: ^22.6.1
+    stripe: ^22.6.2
     swiper: ^12.1.2
     swr: ^2.4.2
     tailwind-merge: ^2.5.4
@@ -19705,15 +19696,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"stripe@npm:^22.6.1":
-  version: 22.6.1
-  resolution: "stripe@npm:22.6.1"
+"stripe@npm:^22.6.2":
+  version: 22.6.2
+  resolution: "stripe@npm:22.6.2"
   peerDependencies:
     "@types/node": ">=18"
   peerDependenciesMeta:
     "@types/node":
       optional: true
-  checksum: eee2c42227846d2e54f058438d5b6b30796fa7fe6e60d6332a32dfffee7f2183b72f10c1b3d517e5e2a3f4f5bec86343fca797378604f7b3d3e8e4a490ea6c5f
+  checksum: 9ea3675d71edd05409aa35b0bd5deb8394441352c70a40b2071c98fb9b74e680641a14b4618ed285638ebbdf664c65832e0affce44bb2a559a6b3d5f5c7708b0
   languageName: node
   linkType: hard
 
