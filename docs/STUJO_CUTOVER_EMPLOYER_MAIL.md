@@ -4,12 +4,13 @@ Fertiger Text für die Ankündigung aus
 [`STUJO_PROD_CUTOVER.md` §2.10](./STUJO_PROD_CUTOVER.md) — eine Mail pro
 Person, verschickt über `MailLog` / `send_mail`, an alle
 `OrganizationAdmin`-Personen mit `canManageJobs`, deren Organisation
-mindestens ein Stellenangebot hat.
+mindestens ein Stellenangebot hat. Das ausführbare Statement dazu liegt in
+[`../scripts/stujo_cutover_employer_mail.sql`](../scripts/stujo_cutover_employer_mail.sql).
 
 **Wartungsfenster in diesem Entwurf:** Donnerstag, 10.09.2026, 20:00–24:00 Uhr.
-Steht das Fenster anders, sind die Zeiten an drei Stellen zu ändern (Betreff
-bleibt gleich): Absatz 1 des Textes, Absatz 1 des HTML-Bodys, und die
-Stichzeile „ab Freitagmorgen".
+Steht das Fenster anders, sind die Zeiten an zwei Stellen zu ändern (Betreff
+bleibt gleich): Absatz 1 des Textes hier und Absatz 1 des HTML-Bodys in der
+`.sql`.
 
 **Vor dem Versand:**
 
@@ -17,8 +18,9 @@ Stichzeile „ab Freitagmorgen".
    Datenbank) — §3.
 2. Mailgun-Schritt §2.2 g abgeschlossen, sonst geht die Mail als
    `noreply@edu.opencampus.sh` statt `team@stujo.net` raus.
-3. Empfängerzahl gegen die Rails-Erwartung prüfen (§2.10 a).
-4. Eine Testmail an die eigene Adresse (§2.10 b), danach der Batch (§2.10 c).
+3. Empfängerzahl gegen die Rails-Erwartung prüfen (Schritt 1 der `.sql`).
+4. Eine Testmail an die eigene Adresse (Schritt 2), danach der Batch
+   (Schritt 3).
 
 ---
 
@@ -26,19 +28,15 @@ Stichzeile „ab Freitagmorgen".
 
 > StuJo zieht um: heute Abend kurz offline, ab morgen mit mehr Reichweite
 
-Kürzere Alternative, falls der Betreff in der Vorschau abgeschnitten wird:
-
-> StuJo zieht um: was sich für Dich ändert
-
 ---
 
 ## Text (Lesefassung)
 
-Hallo,
+Hallo [Vorname],
 
-StuJo bekommt heute Abend eine neue technische Grundlage: Wir ziehen die
-Plattform auf das System von opencampus.sh um. **Am Donnerstag, den
-10.09.2026, zwischen 20:00 und 24:00 Uhr** kannst Du deshalb keine
+StuJo bekommt heute Abend eine neue technische Grundlage – wir ziehen die
+Plattform auf das System von opencampus.sh um. Deshalb kannst Du am
+Donnerstag, den 10.09.2026, zwischen 20:00 und 24:00 Uhr keine
 Stellenangebote einstellen oder bearbeiten. Deine bereits veröffentlichten
 Angebote bleiben in dieser Zeit online und für Studierende sichtbar. Ab
 Freitagmorgen läuft alles auf der neuen Plattform.
@@ -47,117 +45,73 @@ Freitagmorgen läuft alles auf der neuen Plattform.
 
 - Die Adresse: stujo.net, wie bisher. Alte Links auf Deine Angebote leiten
   automatisch weiter.
-- Dein Zugang: dieselbe E-Mail-Adresse, dasselbe Passwort. Deine
-  Unternehmensdaten, Deine Angebote und Deine freien Kontingente sind
-  mitgezogen.
+- Dein Zugang: dieselbe E-Mail-Adresse, dasselbe Passwort. Unternehmensdaten,
+  Angebote und freie Kontingente sind mitgezogen.
 - Die Preise: unverändert. Minijob-Angebote bleiben kostenlos.
 
 **Was neu ist**
 
-- **Deine Stellenangebote auf Deiner eigenen Website.** Du kannst Deine
-  aktuellen Angebote als Widget in Deine Karriereseite einbinden — ein
-  Zeilen-Schnipsel, der sich automatisch aktualisiert, sobald Du auf StuJo
-  etwas veröffentlichst. Dasselbe gibt es für die Kurse und Projekte von
-  opencampus.sh, falls Du mit uns zusammenarbeitest. Schreib uns kurz, dann
-  richten wir Dir den Zugang dafür ein.
-- **Mehr Reichweite über EduHub.** Deine Angebote erscheinen jetzt auch auf
-  edu.opencampus.sh — der Kursplattform, auf der sich jedes Jahr über 2.000
-  Mal Studierende für Kurse bewerben. Dazu kommen wie bisher die
-  Hochschulportale (CAU, FH Kiel, HAW Kiel, Europa-Universität Flensburg) und
-  neu der wöchentliche Job-Letter, der Studierende montags über passende neue
-  Angebote informiert.
+- **Deine Stellenangebote auf Deiner eigenen Website.** Als Widget in die
+  eigene Karriereseite einbinden – es aktualisiert sich automatisch, sobald Du
+  auf StuJo etwas veröffentlichst. Schreib uns kurz, dann schicken wir Dir die
+  Details.
+- **Mehr Reichweite über EduHub.** Angebote erscheinen jetzt auch auf
+  edu.opencampus.sh – der Kursplattform mit über 2.000 Kursbewerbungen pro
+  Jahr. Dazu die Hochschulportale (CAU, FH Kiel, HAW Kiel, Flensburg) und neu
+  der wöchentliche Job-Letter an Studierende.
 - **Bezahlen und Abrechnen geht schneller.** Statt Rechnung per Post und
-  Überweisung innerhalb von 30 Tagen zahlst Du direkt beim Einstellen — per
-  Karte, SEPA-Lastschrift oder Überweisung. Dein Angebot ist unmittelbar nach
-  der Zahlung online, die Rechnung kommt automatisch per E-Mail.
-- **Ein eigener Bereich „Mein StuJo".** Angebote als Entwurf speichern und
-  vorher in der Vorschau ansehen, abgelaufene Angebote mit zwei Klicks erneut
-  veröffentlichen, sehen wie oft ein Angebot aufgerufen wurde, und Kolleginnen
-  und Kollegen Zugriff auf Euer Unternehmensprofil geben.
-- **Frische Laufzeit geschenkt.** Alle Angebote, die heute online sind,
-  starten auf der neuen Plattform mit vollen 8 Wochen Laufzeit neu.
+  Überweisung binnen 30 Tagen: Karte, SEPA-Lastschrift oder Überweisung direkt
+  beim Einstellen, Veröffentlichung unmittelbar nach der Zahlung, Rechnung
+  automatisch per E-Mail.
+- **Frische Laufzeit geschenkt.** Alle heute online stehenden Angebote starten
+  mit vollen 8 Wochen neu.
 
-**Was Du tun musst**
+**Was Du tun musst:** Nichts. Ab Freitag meldest Du Dich wie gewohnt auf
+stujo.net an – Deine Angebote findest Du dann unter „Mein StuJo".
 
-Nichts. Melde Dich ab Freitag einfach wie gewohnt auf stujo.net an; „Mein
-StuJo" findest Du oben im Menü. Falls die Anmeldung hakt, hilft
-„Passwort vergessen" — und wenn nicht, schreib uns.
+Wenn Du Fragen hast, antworte einfach auf diese E-Mail.
 
-Ein Hinweis noch: Rechnungen und Belege aus der alten Plattform ziehen wir
-nicht mit um. Wenn Du davon noch etwas brauchst, sag uns bitte innerhalb der
-nächsten vier Wochen Bescheid, dann suchen wir es aus dem Archiv heraus.
-
-Antworten auf diese Mail landen bei uns — auf team@stujo.net liest ein Mensch
-mit. Wir freuen uns, wenn Du auch auf der neuen Plattform Studierende für Dich
-gewinnst.
-
-Viele Grüße
 Dein StuJo-Team
 
 ---
 
-## HTML-Body (für `MailLog.content`)
+## Anrede mit Vornamen
 
-Nur `p`, `ul`, `li`, `strong` und `a` — der Editor sanitizet gegen genau diese
-Liste, `table` würde entfernt (§2.10 b).
+`User.firstName` kommt aus `contacts.forname` der Rails-Datenbank
+(`stujo_etl.py`, `sanitize_person_name`) und ist Freitext: leer, „Herr",
+Firmenname und Tippfehler sind alle möglich. Das SQL personalisiert deshalb
+nur, wenn der Wert wie ein Vorname aussieht (Buchstaben, optional ein
+Bindestrich oder ein zweites Wort, 2–30 Zeichen), und schreibt sonst „Hallo,".
+Schritt 1 der `.sql` zeigt vorher, wie viele Zeilen in welchen Fall laufen —
+sieht die Trefferquote schlecht aus, ist „Hallo," für alle die bessere Wahl
+als eine Mail an „Hallo GmbH,".
 
-```html
-<p>Hallo,</p>
-<p>StuJo bekommt heute Abend eine neue technische Grundlage: Wir ziehen die Plattform auf das System von opencampus.sh um. <strong>Am Donnerstag, den 10.09.2026, zwischen 20:00 und 24:00 Uhr</strong> kannst Du deshalb keine Stellenangebote einstellen oder bearbeiten. Deine bereits veröffentlichten Angebote bleiben in dieser Zeit online und für Studierende sichtbar. Ab Freitagmorgen läuft alles auf der neuen Plattform.</p>
-<p><strong>Was gleich bleibt</strong></p>
-<ul>
-<li>Die Adresse: <a href="https://stujo.net">stujo.net</a>, wie bisher. Alte Links auf Deine Angebote leiten automatisch weiter.</li>
-<li>Dein Zugang: dieselbe E-Mail-Adresse, dasselbe Passwort. Deine Unternehmensdaten, Deine Angebote und Deine freien Kontingente sind mitgezogen.</li>
-<li>Die Preise: unverändert. Minijob-Angebote bleiben kostenlos.</li>
-</ul>
-<p><strong>Was neu ist</strong></p>
-<ul>
-<li><strong>Deine Stellenangebote auf Deiner eigenen Website.</strong> Du kannst Deine aktuellen Angebote als Widget in Deine Karriereseite einbinden &ndash; ein Zeilen-Schnipsel, der sich automatisch aktualisiert, sobald Du auf StuJo etwas ver&ouml;ffentlichst. Dasselbe gibt es f&uuml;r die Kurse und Projekte von opencampus.sh, falls Du mit uns zusammenarbeitest. Schreib uns kurz, dann richten wir Dir den Zugang daf&uuml;r ein.</li>
-<li><strong>Mehr Reichweite &uuml;ber EduHub.</strong> Deine Angebote erscheinen jetzt auch auf <a href="https://edu.opencampus.sh">edu.opencampus.sh</a> &ndash; der Kursplattform, auf der sich jedes Jahr &uuml;ber 2.000 Mal Studierende f&uuml;r Kurse bewerben. Dazu kommen wie bisher die Hochschulportale (CAU, FH Kiel, HAW Kiel, Europa-Universit&auml;t Flensburg) und neu der w&ouml;chentliche Job-Letter, der Studierende montags &uuml;ber passende neue Angebote informiert.</li>
-<li><strong>Bezahlen und Abrechnen geht schneller.</strong> Statt Rechnung per Post und &Uuml;berweisung innerhalb von 30 Tagen zahlst Du direkt beim Einstellen &ndash; per Karte, SEPA-Lastschrift oder &Uuml;berweisung. Dein Angebot ist unmittelbar nach der Zahlung online, die Rechnung kommt automatisch per E-Mail.</li>
-<li><strong>Ein eigener Bereich &bdquo;Mein StuJo&ldquo;.</strong> Angebote als Entwurf speichern und vorher in der Vorschau ansehen, abgelaufene Angebote mit zwei Klicks erneut ver&ouml;ffentlichen, sehen wie oft ein Angebot aufgerufen wurde, und Kolleginnen und Kollegen Zugriff auf Euer Unternehmensprofil geben.</li>
-<li><strong>Frische Laufzeit geschenkt.</strong> Alle Angebote, die heute online sind, starten auf der neuen Plattform mit vollen 8 Wochen Laufzeit neu.</li>
-</ul>
-<p><strong>Was Du tun musst</strong></p>
-<p>Nichts. Melde Dich ab Freitag einfach wie gewohnt auf <a href="https://stujo.net">stujo.net</a> an; &bdquo;Mein StuJo&ldquo; findest Du oben im Men&uuml;. Falls die Anmeldung hakt, hilft &bdquo;Passwort vergessen&ldquo; &ndash; und wenn nicht, schreib uns.</p>
-<p>Ein Hinweis noch: Rechnungen und Belege aus der alten Plattform ziehen wir nicht mit um. Wenn Du davon noch etwas brauchst, sag uns bitte innerhalb der n&auml;chsten vier Wochen Bescheid, dann suchen wir es aus dem Archiv heraus.</p>
-<p>Antworten auf diese Mail landen bei uns &ndash; auf <a href="mailto:team@stujo.net">team@stujo.net</a> liest ein Mensch mit. Wir freuen uns, wenn Du auch auf der neuen Plattform Studierende f&uuml;r Dich gewinnst.</p>
-<p>Viele Gr&uuml;&szlig;e<br>Dein StuJo-Team</p>
-```
+## Was der Text bewusst nicht sagt
+
+- **Alte Rechnungen.** Die Zahlungshistorie bleibt im Rails-Archiv, sie wandert
+  nicht mit (§5.1). Wer Belege braucht, merkt es erst, wenn der Server weg ist.
+  Falls das vor dem Abschalten kommuniziert werden soll, gehört ein Satz mit
+  Frist in die Mail — oder in eine zweite, ruhigere Mail nach dem Umzug.
+- **„Passwort vergessen".** Die bcrypt-Hashes sind importiert, das Passwort
+  gilt weiter; wenn die Anmeldung trotzdem hakt, steht der Weg nicht in der
+  Mail. Die Zeile „antworte einfach auf diese E-Mail" fängt das auf, solange
+  jemand `team@stujo.net` liest.
 
 ---
 
-## Versand
+## HTML-Body
 
-Die Testmail an sich selbst zuerst (§2.10 b), dann der Batch. Das Statement ist
-das aus §2.10 c, mit eingesetztem Betreff; `DISTINCT ON` und der
-`NOT EXISTS`-Guard machen es zweimal ausführbar, das `announcement`-Metadatum
-ist bewusst nicht `jobPostingId` (sonst greift der partielle Unique-Index).
-`$$…$$` als Quoting, weil der Body Apostrophe in Attributen enthält.
+Der Body steht in
+[`../scripts/stujo_cutover_employer_mail.sql`](../scripts/stujo_cutover_employer_mail.sql)
+(dort einzeilig, damit das Statement direkt ausführbar ist). Erlaubt sind nur
+`p`, `br`, `strong`, `ul`, `li` und `a` — `sanitizeEmailHtml` in
+`EmailEditor.tsx` filtert gegen genau diese Liste, `table` fliegt raus.
 
-```sql
-BEGIN;
+Zwei Eigenheiten des Versandwegs, die das Format betreffen:
 
-INSERT INTO "public"."MailLog" ("subject", "content", "from", "to", "status", "metadata")
-SELECT DISTINCT ON (u."email")
-  'StuJo zieht um: heute Abend kurz offline, ab morgen mit mehr Reichweite',
-  $$<p>Hallo,</p> … <!-- HTML-Body von oben, in einer Zeile --> $$,
-  'team@stujo.net',
-  u."email",
-  'READY_TO_SEND',
-  '{"announcement": "stujo-cutover"}'::jsonb
-FROM "public"."OrganizationAdmin" oa
-JOIN "public"."User" u ON u."id" = oa."userId"
-WHERE oa."canManageJobs"
-  AND EXISTS (SELECT 1 FROM "public"."JobPosting" jp WHERE jp."organizationId" = oa."organizationId")
-  AND NOT EXISTS (
-    SELECT 1 FROM "public"."MailLog" m
-    WHERE m."to" = u."email" AND m."metadata" @> '{"announcement": "stujo-cutover"}'::jsonb
-  );
-
--- Zeilenzahl gegen die Erwartung aus §2.10 a prüfen, erst dann:
-COMMIT;
-```
-
-Nach einer Stunde das Mailgun-Log auf Bounces ansehen (§2.10 d) — harte
-Bounces werden nirgends nachverfolgt und sind manuelle Nacharbeit.
+- `sendMail` setzt denselben String als `text` **und** als `html`
+  (`functions/sendMail/index.js`). Wer die Mail als reinen Text liest, sieht
+  die Tags. Das gilt für jede EduHub-Mail und wird hier nicht geändert.
+- `'o:tracking': true` lässt Mailgun jeden Link umschreiben — deshalb der
+  Tracking-CNAME aus §2.2 e, sonst tragen die Links in einer Mail von
+  `team@stujo.net` eine Mailgun-Domain.
