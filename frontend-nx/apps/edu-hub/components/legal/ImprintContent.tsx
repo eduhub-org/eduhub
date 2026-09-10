@@ -24,7 +24,7 @@ export const ImprintContent: FC<{ privacyHref: string }> = ({ privacyHref }) => 
         <div className="mt-4">
           <h2 className="text-2xl mb-2">{isEnglish ? 'Address' : 'Anschrift'}</h2>
           <address className="not-italic">
-            <p>Campusbusinessbox e.V.</p>
+            <p>Campus Business Box e.V.</p>
             <p>Wissenschaftszentrum Kiel</p>
             <p>Fraunhoferstraße 13</p>
             <p>24118 Kiel</p>

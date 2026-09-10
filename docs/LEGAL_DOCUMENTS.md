@@ -73,16 +73,20 @@ because it is per organization and can be withdrawn independently.
 
 ## How to Find Which Version a User Accepted
 
-1. Query the user's `termsAcceptedAt` timestamp from their enrollment
+1. Query the user's `termsAcceptedAt` timestamp from their enrollment (or
+   `JobPosting.termsAcceptedAt` for a job posting). Both are `timestamptz`:
+   pass the **complete** timestamp including its time zone to `--until`, not
+   just the date. A date-only bound can select a version published later that
+   same day, which the user never accepted.
 2. Use git to find the document version at that time:
    ```bash
    # AGB (EduHub)
-   git log --until="YYYY-MM-DD" -1 -- frontend-nx/apps/edu-hub/pages/terms/index.tsx
+   git log --until="YYYY-MM-DDTHH:MM:SSZ" -1 -- frontend-nx/apps/edu-hub/pages/terms/index.tsx
    git show <commit-hash>:frontend-nx/apps/edu-hub/pages/terms/index.tsx
    # AGB (StuJo job postings)
-   git log --until="YYYY-MM-DD" -1 -- frontend-nx/apps/stujo/pages/agb.tsx
+   git log --until="YYYY-MM-DDTHH:MM:SSZ" -1 -- frontend-nx/apps/stujo/pages/agb.tsx
    # Privacy policy (both sites)
-   git log --until="YYYY-MM-DD" -1 -- frontend-nx/apps/edu-hub/components/legal/PrivacySections.tsx
+   git log --until="YYYY-MM-DDTHH:MM:SSZ" -1 -- frontend-nx/apps/edu-hub/components/legal/PrivacySections.tsx
    ```
 
    The whole privacy policy deliberately lives in that one file so this

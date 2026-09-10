@@ -154,7 +154,7 @@ All verified against `backend/migrations/` and `backend/metadata/`.
 | PDF/logo uploads (Paperclip, local disk) | GCS via `functions/shared_libs/api_clients/storage_client.py` | Single `BUCKET_NAME` env; blob layout follows the calling function's convention. |
 | Per-portal branding | `AppSettings` (extended, §5) | PK `appName`; current columns: `backgroundImageURL`, `previewImageURL`, `bannerTextDe/En`, `bannerBackgroundColor`, `bannerFontColor`, `timeZone`, `showFaqSection`, `faqCollectionName`, `defaultAttendanceCertificateTemplateId`. |
 | FAQ page | `Faq`/`FaqCollection`/`FaqTranslation` | One collection per portal. |
-| Legal pages | shared components | Done. `/impressum` + `/datenschutz` render `apps/edu-hub/components/legal/*`; StuJo renders the subset of privacy sections that applies to it, plus a job-postings section EduHub does not have. On a campus edition both pages open with a note that CBB is the provider and the university a cooperation partner. `docs/LEGAL_DOCUMENTS.md`. |
+| Legal pages | shared components | Done. `/impressum` + `/datenschutz` render `frontend-nx/apps/edu-hub/components/legal/*`; StuJo renders the subset of privacy sections that applies to it, plus a job-postings section EduHub does not have. On a campus edition both pages open with a note that CBB is the provider and the university a cooperation partner. `docs/LEGAL_DOCUMENTS.md`. |
 
 Hasura roles (corrected from the draft): the metadata roles are `anonymous`,
 `user_access`, `instructor_access`, `org_admin_access` (suffix `_access`;

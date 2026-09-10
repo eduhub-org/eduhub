@@ -489,9 +489,19 @@ export const PrivacyGuestRegistration: FC = () => {
 
   // Read rather than hardcoded: this paragraph is a statement about what we
   // actually do, and the period is configurable.
-  const { data: retentionData } = useRoleQuery<GuestDataRetentionMonths>(GUEST_DATA_RETENTION_MONTHS, {
+  const {
+    data: retentionData,
+    loading: retentionLoading,
+    error: retentionError,
+  } = useRoleQuery<GuestDataRetentionMonths>(GUEST_DATA_RETENTION_MONTHS, {
     context: { role: AuthRoles.anonymous },
   });
+  // Only a successful response tells us the period. While the query is in
+  // flight -- which includes the statically prerendered HTML -- or after it
+  // errored, we do not know it, and a legal document must not assert a number
+  // it has not confirmed. The default applies only when the answer came back
+  // without a setting.
+  const retentionKnown = !retentionLoading && !retentionError && !!retentionData;
   const retentionMonths = retentionData?.AppSettings?.[0]?.guestDataRetentionMonths ?? DEFAULT_GUEST_RETENTION_MONTHS;
   const retentionPeriod = isEnglish
     ? `${retentionMonths} ${retentionMonths === 1 ? 'month' : 'months'}`
@@ -517,10 +527,17 @@ export const PrivacyGuestRegistration: FC = () => {
           ? 'To make sure the email address really belongs to you, a guest registration only becomes valid once you confirm it via a link we send you (double opt-in). If you do not confirm within 7 days, we delete the data you entered.'
           : 'Damit sichergestellt ist, dass die E-Mail-Adresse wirklich dir gehört, wird eine Gast-Anmeldung erst gültig, wenn du sie über einen Link bestätigst, den wir dir zusenden (Double-Opt-in). Bestätigst du nicht innerhalb von 7 Tagen, löschen wir die von dir eingegebenen Daten.'}
       </p>
+      {retentionKnown && (
+        <p>
+          {isEnglish
+            ? `We delete guest data automatically ${retentionPeriod} after the event has ended.`
+            : `Wir löschen Gast-Daten automatisch ${retentionPeriod} nach dem Ende der Veranstaltung.`}
+        </p>
+      )}
       <p>
         {isEnglish
-          ? `We delete guest data automatically ${retentionPeriod} after the event has ended. Independently of that, every email you receive from us about the event contains a link through which you can view your stored data, cancel your registration, or have your data deleted at any time - no account or login required.`
-          : `Wir löschen Gast-Daten automatisch ${retentionPeriod} nach dem Ende der Veranstaltung. Unabhängig davon enthält jede E-Mail, die du von uns zu der Veranstaltung erhältst, einen Link, über den du deine gespeicherten Daten jederzeit einsehen, deine Anmeldung stornieren oder deine Daten löschen lassen kannst - ohne Konto und ohne Anmeldung.`}
+          ? 'Independently of that, every email you receive from us about the event contains a link through which you can view your stored data, cancel your registration, or have your data deleted at any time - no account or login required.'
+          : 'Unabhängig davon enthält jede E-Mail, die du von uns zu der Veranstaltung erhältst, einen Link, über den du deine gespeicherten Daten jederzeit einsehen, deine Anmeldung stornieren oder deine Daten löschen lassen kannst - ohne Konto und ohne Anmeldung.'}
       </p>
       <p>
         {isEnglish

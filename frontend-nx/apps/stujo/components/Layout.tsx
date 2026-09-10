@@ -190,19 +190,19 @@ const Layout: FC<LayoutProps> = ({ children, fullWidthMain = false, portal }) =>
       <footer className="stujo-footer">
         <div className="stujo-container stujo-footer-cols">
           <div>
-            <h3>{t('footerAboutHead')}</h3>
-            <p>{t('footerAboutText')}</p>
+            <h3>{tLayout('footer_about_head')}</h3>
+            <p>{tLayout('footer_about_text')}</p>
           </div>
           <div className="stujo-footer-links">
-            <h3>{t('footerLinksHead')}</h3>
-            <Link href="/agb">{t('footerTerms')}</Link>
-            <Link href="/fuer-arbeitgeber">{t('footerPrices')}</Link>
+            <h3>{tLayout('footer_links_head')}</h3>
+            <Link href="/agb">{tLayout('footer_terms')}</Link>
+            <Link href="/fuer-arbeitgeber">{tLayout('footer_prices')}</Link>
             <a href="https://www.stujo.net/faq">FAQ</a>
-            <Link href="/impressum">{t('footerImprint')}</Link>
-            <Link href="/datenschutz">{t('footerPrivacy')}</Link>
+            <Link href="/impressum">{tLayout('footer_imprint')}</Link>
+            <Link href="/datenschutz">{tLayout('footer_privacy')}</Link>
           </div>
           <div>
-            <h3>{t('footerUniversityPartners')}</h3>
+            <h3>{tLayout('footer_university_partners')}</h3>
             <a className="stujo-footer-logo-link" href="http://www.uni-kiel.de/" target="_blank" rel="noreferrer">
               <img className="stujo-footer-logo" src="/partner/uni-kiel-logo-norm-228x76.gif" alt="Universität Kiel" />
             </a>
@@ -214,7 +214,7 @@ const Layout: FC<LayoutProps> = ({ children, fullWidthMain = false, portal }) =>
             </a>
           </div>
           <div>
-            <h3>{t('footerPartners')}</h3>
+            <h3>{tLayout('footer_partners')}</h3>
             <a className="stujo-footer-logo-link" href="http://www.wissenschaftszentrumkiel.de/" target="_blank" rel="noreferrer">
               <img className="stujo-footer-logo" src="/partner/Logo-Wissenschaftszentrum.png" alt="Wissenschaftszentrum Kiel" />
             </a>
