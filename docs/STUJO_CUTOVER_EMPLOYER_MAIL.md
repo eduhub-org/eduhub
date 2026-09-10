@@ -7,10 +7,32 @@ Person, verschickt über `MailLog` / `send_mail`, an alle
 mindestens ein Stellenangebot hat. Das ausführbare Statement dazu liegt in
 [`../scripts/stujo_cutover_employer_mail.sql`](../scripts/stujo_cutover_employer_mail.sql).
 
-**Wartungsfenster in diesem Entwurf:** Donnerstag, 10.09.2026, 20:00–24:00 Uhr.
-Steht das Fenster anders, sind die Zeiten an zwei Stellen zu ändern (Betreff
-bleibt gleich): Absatz 1 des Textes hier und Absatz 1 des HTML-Bodys in der
-`.sql`.
+**Wartungsfenster in diesem Entwurf:** Freitag, 11.09.2026, 20:00–24:00 Uhr
+**MESZ** (= 18:00–22:00 UTC; der Text nennt bewusst Ortszeit, der Rest des
+Cutover-Dokuments rechnet in UTC).
+
+Steht das Fenster anders, sind **vier** Stellen im Text zu ändern — je zwei pro
+Datei, plus die Zeile oben. Die `.sql` ist die, die tatsächlich verschickt
+wird; dieses Dokument ist die Lesefassung davon, und beide müssen gleich
+lauten:
+
+| Datei | Stelle | Enthält den Zeitbezug als |
+|---|---|---|
+| `scripts/stujo_cutover_employer_mail.sql` | `\set subject …` | Tagesbezug in der Betreffzeile |
+| `scripts/stujo_cutover_employer_mail.sql` | `\set body …`, erster `<p>` | Tagesbezug, Wochentag + Datum + Uhrzeit, Tag danach |
+| dieses Dokument | Abschnitt „Betreff“ | dieselbe Betreffzeile |
+| dieses Dokument | „Text (Lesefassung)“, Absatz 1 | derselbe Wortlaut wie der HTML-Body |
+
+Danach prüfen, dass vom alten Fenster nichts stehen geblieben ist — mit den
+alten Formulierungen gesucht, muss die Liste leer sein:
+
+```bash
+grep -rn 'morgen Abend\|11\.09\.2026\|Samstagmorgen' \
+  docs/STUJO_CUTOVER_EMPLOYER_MAIL.md scripts/stujo_cutover_employer_mail.sql
+```
+
+(Die Suchbegriffe sind die des aktuellen Entwurfs; beim Ändern durch die
+jeweils ersetzten austauschen.)
 
 **Vor dem Versand:**
 
@@ -26,7 +48,7 @@ bleibt gleich): Absatz 1 des Textes hier und Absatz 1 des HTML-Bodys in der
 
 ## Betreff
 
-> StuJo zieht um: heute Abend kurz offline, ab morgen mit mehr Reichweite
+> StuJo zieht um: morgen Abend kurz offline, danach mit mehr Reichweite
 
 ---
 
@@ -34,18 +56,17 @@ bleibt gleich): Absatz 1 des Textes hier und Absatz 1 des HTML-Bodys in der
 
 Hallo,
 
-StuJo bleibt StuJo – bekommt heute Abend aber eine neue technische Basis: Die
+StuJo bleibt StuJo – bekommt morgen Abend aber eine neue technische Basis: Die
 Plattform zieht auf ein komplett erneuertes System um. Deshalb kannst Du am
-Donnerstag, den 10.09.2026, zwischen 20:00 und 24:00 Uhr keine
-Stellenangebote einstellen oder bearbeiten. Deine bereits veröffentlichten
-Angebote bleiben in dieser Zeit online und für Studierende sichtbar. Ab
-Freitagmorgen ist alles wie gewohnt erreichbar – mit ein paar neuen
-Möglichkeiten.
+Freitag, den 11.09.2026, zwischen 20:00 und 24:00 Uhr keine Stellenangebote
+einstellen oder bearbeiten. Deine bereits veröffentlichten Angebote bleiben in
+dieser Zeit online und für Studierende sichtbar. Ab Samstagmorgen ist alles wie
+gewohnt erreichbar – mit ein paar neuen Möglichkeiten.
 
 **Was gleich bleibt**
 
-- Die Adresse: stujo.net, wie bisher. Alte Links auf Deine Angebote leiten
-  automatisch weiter.
+- Die Adressen bleiben: stujo.net wie bisher, ebenso die Portale
+  (cau.stujo.net, fh-kiel.stujo.net, haw-kiel.stujo.net, flensburg.stujo.net).
 - Dein Zugang: dieselbe E-Mail-Adresse, dasselbe Passwort. Unternehmensdaten,
   Angebote und freie Kontingente sind mitgezogen.
 - Die Preise: unverändert. Minijob-Angebote bleiben kostenlos.
@@ -64,11 +85,11 @@ Möglichkeiten.
   Überweisung binnen 30 Tagen: Karte, SEPA-Lastschrift oder Überweisung direkt
   beim Einstellen, Veröffentlichung unmittelbar nach der Zahlung, Rechnung
   automatisch per E-Mail.
-- **Frische Laufzeit geschenkt.** Alle heute online stehenden Angebote starten
-  mit vollen 8 Wochen neu.
+- **Frische Laufzeit geschenkt.** Alle Angebote, die jetzt online sind,
+  starten mit vollen 8 Wochen neu.
 
-**Was Du tun musst:** Nichts. Ab Freitag meldest Du Dich wie gewohnt auf
-stujo.net an – Deine Angebote findest Du dann unter „Mein StuJo".
+**Was Du tun musst:** Nichts. Danach meldest Du Dich wie gewohnt auf stujo.net
+an – Deine Angebote findest Du dort unter „Mein StuJo“.
 
 Wenn Du Fragen hast, antworte einfach auf diese E-Mail.
 
@@ -80,21 +101,24 @@ Dein StuJo-Team
 
 - **Den Vornamen.** `User.firstName` kommt aus `contacts.forname` der
   Rails-Datenbank (`stujo_etl.py`, `sanitize_person_name`) und ist Freitext:
-  leer, „Herr", Firmenname und Tippfehler sind alle möglich. Eine Mail an
-  „Hallo GmbH & Co," ist schlechter als „Hallo," — entschieden gegen die
+  leer, „Herr“, Firmenname und Tippfehler sind alle möglich. Eine Mail an
+  „Hallo GmbH & Co,“ ist schlechter als „Hallo,“ — entschieden gegen die
   Personalisierung.
+- **Die Weiterleitungen.** Alte Angebots-Links funktionieren weiter (§4 legacy
+  301s), aber neben „die Adressen bleiben gleich“ wirft der Satz mehr Fragen
+  auf, als er beantwortet. Es funktioniert — das reicht.
 - **Einen Betreiberwechsel.** Es gibt keinen: StuJo gehörte auch vorher zu
-  opencampus.sh. Der erste Satz sagt deshalb „neue technische Basis" und nicht
-  „Umzug zu opencampus.sh"; EduHub taucht nur dort auf, wo es wirklich neu ist
+  opencampus.sh. Der erste Satz sagt deshalb „neue technische Basis“ und nicht
+  „Umzug zu opencampus.sh“; EduHub taucht nur dort auf, wo es wirklich neu ist
   — bei der Reichweite.
 
 - **Alte Rechnungen.** Die Zahlungshistorie bleibt im Rails-Archiv, sie wandert
   nicht mit (§5.1). Wer Belege braucht, merkt es erst, wenn der Server weg ist.
   Falls das vor dem Abschalten kommuniziert werden soll, gehört ein Satz mit
   Frist in die Mail — oder in eine zweite, ruhigere Mail nach dem Umzug.
-- **„Passwort vergessen".** Die bcrypt-Hashes sind importiert, das Passwort
+- **„Passwort vergessen“.** Die bcrypt-Hashes sind importiert, das Passwort
   gilt weiter; wenn die Anmeldung trotzdem hakt, steht der Weg nicht in der
-  Mail. Die Zeile „antworte einfach auf diese E-Mail" fängt das auf, solange
+  Mail. Die Zeile „antworte einfach auf diese E-Mail“ fängt das auf, solange
   jemand `team@stujo.net` liest.
 
 ---
