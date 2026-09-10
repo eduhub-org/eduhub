@@ -96,7 +96,7 @@ const Layout: FC<LayoutProps> = ({ children, fullWidthMain = false, portal }) =>
         {styleVars && <style>{`:root:root { ${styleVars} }`}</style>}
       </Head>
       <header className="stujo-header">
-        <img src="/stujo_header_diag.png" alt="" className="stujo-header-diag" />
+        <img src="/stujo_header_diag.svg" alt="" className="stujo-header-diag" />
         <Link href="/">
           <img
             src={portal.logoUrl || '/stujo_header_logo.png'}
@@ -197,7 +197,7 @@ const Layout: FC<LayoutProps> = ({ children, fullWidthMain = false, portal }) =>
             <h3>{tLayout('footer_links_head')}</h3>
             <Link href="/agb">{tLayout('footer_terms')}</Link>
             <Link href="/fuer-arbeitgeber">{tLayout('footer_prices')}</Link>
-            <a href="https://www.stujo.net/faq">FAQ</a>
+            <Link href="/faq">FAQ</Link>
             <Link href="/impressum">{tLayout('footer_imprint')}</Link>
             <Link href="/datenschutz">{tLayout('footer_privacy')}</Link>
           </div>

@@ -33,24 +33,24 @@ const FaqItemComponent: FC<FaqItemProps> = ({ faq }) => {
   };
 
   return (
-    <div className="border border-gray-600 rounded-lg mb-4">
+    <div className="border border-border-primary rounded-lg mb-4">
       <button
-        className="w-full p-4 text-left flex justify-between items-center hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+        className="w-full p-4 text-left flex justify-between items-center hover:bg-bg-secondary focus:outline-none focus:ring-2 focus:ring-brand focus:ring-opacity-50"
         onClick={toggleExpanded}
         aria-expanded={isExpanded}
       >
-        <h3 className="text-lg font-medium text-white pr-4">{faq.question}</h3>
+        <h3 className="text-lg font-medium text-label-primary pr-4">{faq.question}</h3>
         {isExpanded ? (
-          <MdExpandLess className="text-gray-400 flex-shrink-0" size={24} />
+          <MdExpandLess className="text-label-secondary flex-shrink-0" size={24} />
         ) : (
-          <MdExpandMore className="text-gray-400 flex-shrink-0" size={24} />
+          <MdExpandMore className="text-label-secondary flex-shrink-0" size={24} />
         )}
       </button>
       {isExpanded && (
-        <div className="px-4 pb-4 border-t border-gray-700">
-          <div className="pt-4 text-gray-200 leading-relaxed">
+        <div className="px-4 pb-4 border-t border-border-primary">
+          <div className="pt-4 text-label-primary leading-relaxed">
             <ReactMarkdown 
-              className="prose prose-invert max-w-none"
+              className="prose max-w-none prose-headings:text-label-primary prose-p:text-label-primary prose-li:text-label-primary prose-strong:text-label-primary prose-a:text-brand"
               remarkPlugins={[remarkGfm]}
             >
               {faq.answer}
@@ -62,6 +62,13 @@ const FaqItemComponent: FC<FaqItemProps> = ({ faq }) => {
   );
 };
 
+/**
+ * Accordion of the FAQ entries in one FaqCollection, in the active locale
+ * (falling back to the English translation). Shared between edu-hub's
+ * homepage section and StuJo's /faq page, so every colour goes through the
+ * `--eduhub-*` design tokens rather than literal greys — StuJo redefines
+ * those tokens light in its globals.css (AGENTS.md rule 10).
+ */
 const FaqSection: FC<FaqSectionProps> = ({ collection = 'default', className = '' }) => {
   const t = useTranslations('common');
   const locale = useLocale();
@@ -110,7 +117,7 @@ const FaqSection: FC<FaqSectionProps> = ({ collection = 'default', className = '
     return (
       <div className={`faq-section ${className}`}>
         <div className="text-center py-8">
-          <p className="text-gray-400">{t('faq.error_loading')}</p>
+          <p className="text-label-secondary">{t('faq.error_loading')}</p>
         </div>
       </div>
     );
@@ -120,7 +127,7 @@ const FaqSection: FC<FaqSectionProps> = ({ collection = 'default', className = '
     return (
       <div className={`faq-section ${className}`}>
         <div className="text-center py-8">
-          <p className="text-gray-400">{t('faq.no_faqs_available')}</p>
+          <p className="text-label-secondary">{t('faq.no_faqs_available')}</p>
         </div>
       </div>
     );
@@ -129,7 +136,7 @@ const FaqSection: FC<FaqSectionProps> = ({ collection = 'default', className = '
   return (
     <div className={`faq-section ${className}`}>
       <div className="max-w-4xl mx-auto">
-        <h2 className="text-3xl font-bold text-center mb-8 text-white">{t('faq.title')}</h2>
+        <h2 className="text-3xl font-bold text-center mb-8 text-label-primary">{t('faq.title')}</h2>
         <div className="space-y-2">
           {faqs.map((faq) => (
             <FaqItemComponent key={faq.id} faq={faq} />
