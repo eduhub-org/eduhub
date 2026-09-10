@@ -154,7 +154,7 @@ All verified against `backend/migrations/` and `backend/metadata/`.
 | PDF/logo uploads (Paperclip, local disk) | GCS via `functions/shared_libs/api_clients/storage_client.py` | Single `BUCKET_NAME` env; blob layout follows the calling function's convention. |
 | Per-portal branding | `AppSettings` (extended, §5) | PK `appName`; current columns: `backgroundImageURL`, `previewImageURL`, `bannerTextDe/En`, `bannerBackgroundColor`, `bannerFontColor`, `timeZone`, `showFaqSection`, `faqCollectionName`, `defaultAttendanceCertificateTemplateId`. |
 | FAQ page | `Faq`/`FaqCollection`/`FaqTranslation` | One collection per portal. |
-| Legal pages | existing mechanism | `docs/LEGAL_DOCUMENTS.md`. |
+| Legal pages | shared components | Done. `/impressum` + `/datenschutz` render `frontend-nx/apps/edu-hub/components/legal/*`; StuJo renders the subset of privacy sections that applies to it, plus a job-postings section EduHub does not have. On a campus edition both pages open with a note that CBB is the provider and the university a cooperation partner. `docs/LEGAL_DOCUMENTS.md`. |
 
 Hasura roles (corrected from the draft): the metadata roles are `anonymous`,
 `user_access`, `instructor_access`, `org_admin_access` (suffix `_access`;
@@ -233,6 +233,13 @@ unique(`userId`,`jobPostingId`). (Saved *companies* are dropped — low value.)
 - `AppSettings` + `logoUrl`, `faviconUrl`, `primaryColor`, `secondaryColor`,
   `imprintUrl`, `privacyUrl`, `defaultLocale`, `domain` text unique nullable.
   Seed rows `stujo`, `stujo-cau`, `stujo-haw-kiel`, `stujo-flensburg`.
+  **`imprintUrl`, `privacyUrl` and the later `termsUrl` were dropped again on
+  2026-09-09** by `..._drop_appsettings_legal_url_columns`, together with their
+  `anonymous` select permission. They were the per-portal escape hatch for
+  legal pages; every portal now serves the in-app `/impressum`,
+  `/datenschutz` and `/agb`, so there is nothing left to override. Nothing had
+  ever written them (there was never an admin UI), so all rows were NULL and no
+  data was lost. `defaultLocale` and `domain` stay.
 
 ### Permissions (mirror `public_Organization.yaml` patterns)
 - `anonymous`: select `PUBLISHED`, non-expired, unrestricted
@@ -325,8 +332,11 @@ posting in the last N years; others are archived, not imported.
    local PDF paths and don't fit the Stripe-shaped `Invoice` table. The Rails
    DB snapshot is archived read-only as the historical record.
 7. **FAQ & static content:** `app/views/pages/faq.html.erb` →
-   `FaqCollection` per portal; AGB/Datenschutz/Impressum via the
-   legal-documents mechanism.
+   `FaqCollection` per portal. AGB/Datenschutz/Impressum are done (2026-09-09):
+   `/agb`, `/datenschutz` and `/impressum` are served in-app, the privacy and
+   imprint text coming from shared edu-hub components so both sites state the
+   same wording -- see `docs/LEGAL_DOCUMENTS.md`. The footer FAQ link is still
+   the only one pointing at `www.stujo.net`.
 
 ### 7.3 Cutover
 1. Deploy alongside; full ETL; QA on a staging domain.
