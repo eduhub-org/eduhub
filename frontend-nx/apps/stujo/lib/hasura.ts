@@ -11,7 +11,11 @@ const API_URL = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || '';
 
 export async function fetchAnonymous<T = unknown>(
   query: string,
-  variables?: Record<string, unknown>
+  variables?: Record<string, unknown>,
+  // Optional deadline. Callers that must not hang on a stalled Hasura — the
+  // redirect proxy above all, which holds a request open while it waits — pass
+  // an AbortSignal.timeout() and treat the abort as "no answer".
+  signal?: AbortSignal
 ): Promise<T> {
   if (!API_URL) {
     throw new Error('API_URL / NEXT_PUBLIC_API_URL is not configured');
@@ -20,6 +24,7 @@ export async function fetchAnonymous<T = unknown>(
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify({ query, variables }),
+    signal,
   });
   if (!res.ok) {
     throw new Error(`Hasura request failed: HTTP ${res.status}`);

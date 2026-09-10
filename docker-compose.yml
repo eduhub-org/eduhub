@@ -5,7 +5,7 @@ services:
   frontend-nx:
     container_name: eduhub-frontend-nx
     ports:
-      - "5000:4200"
+      - "${DEV_BIND_ADDRESS:-127.0.0.1}:5000:4200"
     build:
       context: ./frontend-nx
       dockerfile: Dockerfile-dev
@@ -17,13 +17,29 @@ services:
       - hasura
       - keycloak
     environment:
+      NEXT_PUBLIC_API_URL: http://${DEV_HOST:-localhost}:8080/v1/graphql
+      NEXT_PUBLIC_AUTH_URL: http://${DEV_HOST:-localhost}:28080
+      NEXTAUTH_URL: http://${DEV_HOST:-localhost}:5000
+      # Server-side callbacks stay inside this container and do not depend on
+      # the preview hostname being resolvable from Docker.
+      NEXTAUTH_INTERNAL_URL: http://localhost:5000
+      KEYCLOAK_INTERNAL_URL: http://keycloak:8080
       NEXT_PUBLIC_HELP_DOCS_URL: https://opencampus.gitbook.io/faq/
-      NEXT_PUBLIC_STORAGE_BUCKET_URL: ${GITPOD_WORKSPACE_URL:-http://localhost}:4001/emulated-bucket
+      NEXT_PUBLIC_STORAGE_BUCKET_URL: ${GITPOD_WORKSPACE_URL:-http://${DEV_HOST:-localhost}}:4001/emulated-bucket
       NEXT_PUBLIC_ENVIRONMENT: development
       # Job tile links go to the local StuJo app (frontend-stujo on :5001),
       # not the production fallback in stujoBaseUrl.ts.
-      NEXT_PUBLIC_STUJO_URL: http://localhost:5001
+      NEXT_PUBLIC_STUJO_URL: http://${DEV_HOST:-localhost}:5001
       NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL: ${NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL:-}
+      # The Stripe webhook route lives in this app (pages/api/webhooks/stripe.ts),
+      # so it needs the keys too -- without them `stripe listen --forward-to
+      # localhost:5000/api/webhooks/stripe` (docs/STRIPE_INTEGRATION.md) only
+      # ever gets "Stripe not configured".
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
+      STUJO_FRONTEND_URL: ${STUJO_FRONTEND_URL:-http://${DEV_HOST:-localhost}:5001}
+      STUJO_TERMS_URL: ${STUJO_TERMS_URL:-}
+      STUJO_ADMIN_EMAIL: ${STUJO_ADMIN_EMAIL:-}
       MM_URL: ${MM_URL:-https://chat.opencampus.sh}
       # Enable file watching in Docker environment
       CHOKIDAR_USEPOLLING: "true"
@@ -31,7 +47,7 @@ services:
       # Fix IPv6 localhost resolution for image loading
       NODE_OPTIONS: "--dns-result-order=ipv4first"
       # Hasura configuration
-      HASURA_ADMIN_SECRET: myadminsecretkey
+      HASURA_ADMIN_SECRET: ${DEV_HASURA_ADMIN_SECRET:-myadminsecretkey}
       GRAPHQL_URI: http://hasura:8080/v1/graphql
       # Optional for local dev; required to encrypt Ghost newsletter credentials (see .env.example)
       GHOST_NEWSLETTER_CREDENTIALS_ENCRYPTION_KEY: ${GHOST_NEWSLETTER_CREDENTIALS_ENCRYPTION_KEY:-}
@@ -41,7 +57,7 @@ services:
   frontend-stujo:
     container_name: eduhub-frontend-stujo
     ports:
-      - "5001:4201"
+      - "${DEV_BIND_ADDRESS:-127.0.0.1}:5001:4201"
     build:
       context: ./frontend-nx
       dockerfile: Dockerfile-dev
@@ -58,15 +74,18 @@ services:
       DEV_SELF_PORT: 5001
       APP_NAME: stujo
       NEXT_PUBLIC_ENVIRONMENT: development
-      NEXT_PUBLIC_API_URL: http://localhost:8080/v1/graphql
-      NEXT_PUBLIC_STORAGE_BUCKET_URL: ${GITPOD_WORKSPACE_URL:-http://localhost}:4001/emulated-bucket
+      NEXT_PUBLIC_API_URL: http://${DEV_HOST:-localhost}:8080/v1/graphql
+      NEXT_PUBLIC_AUTH_URL: http://${DEV_HOST:-localhost}:28080
+      NEXT_PUBLIC_STORAGE_BUCKET_URL: ${GITPOD_WORKSPACE_URL:-http://${DEV_HOST:-localhost}}:4001/emulated-bucket
       # SSR queries go directly to the hasura container
       API_URL: http://hasura:8080/v1/graphql
-      NEXTAUTH_URL: http://localhost:5001
+      NEXTAUTH_URL: http://${DEV_HOST:-localhost}:5001
+      NEXTAUTH_INTERNAL_URL: http://localhost:5001
+      KEYCLOAK_INTERNAL_URL: http://keycloak:8080
       CHOKIDAR_USEPOLLING: "true"
       WATCHPACK_POLLING: "true"
       NODE_OPTIONS: "--dns-result-order=ipv4first"
-      HASURA_ADMIN_SECRET: myadminsecretkey
+      HASURA_ADMIN_SECRET: ${DEV_HASURA_ADMIN_SECRET:-myadminsecretkey}
       GRAPHQL_URI: http://hasura:8080/v1/graphql
 
   node_functions:
@@ -78,8 +97,8 @@ services:
       - ./functions:/functions
       - ./backend/init.d/file_storage:/home/node/www/emulated-bucket
     ports:
-      - "42000-42024:42000-42024"
-      - "4001:4001"
+      - "127.0.0.1:42000-42024:42000-42024"
+      - "${DEV_BIND_ADDRESS:-127.0.0.1}:4001:4001"
     command: ["sh", "/functions/start-node.sh"]
     environment:
       ENVIRONMENT: development
@@ -89,25 +108,26 @@ services:
       KEYCLOAK_USER: admin
       KEYCLOAK_PW: admin
       HASURA_ENDPOINT: http://hasura:8080/v1/graphql
-      HASURA_ADMIN_SECRET: myadminsecretkey
+      HASURA_ADMIN_SECRET: ${DEV_HASURA_ADMIN_SECRET:-myadminsecretkey}
       HASURA_CLOUD_FUNCTION_SECRET: test1234
       LIBRARY_PATH: "../lib/cloud-storage.js"
       FORMBRICKS_API_KEY: ${FORMBRICKS_API_KEY:-}
       FORMBRICKS_API_URL: ${FORMBRICKS_API_URL:-https://app.formbricks.com}
       STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+      STUJO_TERMS_URL: ${STUJO_TERMS_URL:-}
       MATRIX_HOMESERVER_URL: ${MATRIX_HOMESERVER_URL:-}
       MATRIX_SERVER_NAME: ${MATRIX_SERVER_NAME:-}
       MATRIX_ELEMENT_CLIENT_URL: ${MATRIX_ELEMENT_CLIENT_URL:-}
       MATRIX_MAIN_SPACE_ID: ${MATRIX_MAIN_SPACE_ID:-}
       MATRIX_ADMIN_USER_ID: ${MATRIX_ADMIN_USER_ID:-}
       MATRIX_ADMIN_ACCESS_TOKEN: ${MATRIX_ADMIN_ACCESS_TOKEN:-}
-      FRONTEND_URL: http://localhost:5000
+      FRONTEND_URL: http://${DEV_HOST:-localhost}:5000
       # StuJo job board (publishJobPosting / createStripeJobPostingPrices)
-      STUJO_FRONTEND_URL: ${STUJO_FRONTEND_URL:-http://localhost:5001}
+      STUJO_FRONTEND_URL: ${STUJO_FRONTEND_URL:-http://${DEV_HOST:-localhost}:5001}
       STUJO_ADMIN_EMAIL: ${STUJO_ADMIN_EMAIL:-}
       STRIPE_TAX_RATE_ID: ${STRIPE_TAX_RATE_ID:-}
       STUJO_SELLER_ORGANIZATION_ID: ${STUJO_SELLER_ORGANIZATION_ID:-}
-      STORAGE_BUCKET_PUBLIC_URL: ${GITPOD_WORKSPACE_URL:-http://localhost}:4001/emulated-bucket
+      STORAGE_BUCKET_PUBLIC_URL: ${GITPOD_WORKSPACE_URL:-http://${DEV_HOST:-localhost}}:4001/emulated-bucket
       # Optional for local dev; required to encrypt Ghost newsletter credentials (see .env.example)
       GHOST_NEWSLETTER_CREDENTIALS_ENCRYPTION_KEY: ${GHOST_NEWSLETTER_CREDENTIALS_ENCRYPTION_KEY:-}
       # Signs the guest self-service manage links. The dev default is fine locally
@@ -125,8 +145,8 @@ services:
       - ./functions:/functions
       - ./backend/init.d/file_storage:/home/node/www/emulated-bucket
     ports:
-      - "42025:42025"
-      - "42026:42026"
+      - "127.0.0.1:42025:42025"
+      - "127.0.0.1:42026:42026"
     command: sh -c "pip install -r /functions/apiProxy/requirements.txt && pip install -r /functions/callPythonFunction/requirements.txt && /functions/start-python.sh"
     environment:
       ENVIRONMENT: development
@@ -134,15 +154,15 @@ services:
       KEYCLOAK_USER: admin
       KEYCLOAK_PW: admin
       HASURA_ENDPOINT: http://hasura:8080/v1/graphql
-      JWT_ISSUER: http://keycloak:8080/realms/edu-hub
+      JWT_ISSUER: http://${DEV_HOST:-localhost}:28080/realms/edu-hub
       JWT_JWKS_URI: http://keycloak:8080/realms/edu-hub/protocol/openid-connect/certs
       JWT_AUDIENCE: hasura
-      HASURA_ADMIN_SECRET: myadminsecretkey
+      HASURA_ADMIN_SECRET: ${DEV_HASURA_ADMIN_SECRET:-myadminsecretkey}
       HASURA_CLOUD_FUNCTION_SECRET: test1234
       BUCKET_NAME: emulated-bucket
       LOCAL_STORAGE_PORT: 4001
       # StuJo job board (expire_job_postings / send_job_alerts mails)
-      STUJO_FRONTEND_URL: ${STUJO_FRONTEND_URL:-http://localhost:5001}
+      STUJO_FRONTEND_URL: ${STUJO_FRONTEND_URL:-http://${DEV_HOST:-localhost}:5001}
       # From repo-root .env (optional; see .env.example → Python serverless functions)
       ZOOM_API_KEY: ${ZOOM_API_KEY:-}
       ZOOM_API_SECRET: ${ZOOM_API_SECRET:-}
@@ -163,7 +183,7 @@ services:
       context: ./backend/
       dockerfile: Dockerfile-dev
     ports:
-      - "8080:8080"
+      - "${DEV_BIND_ADDRESS:-127.0.0.1}:8080:8080"
     depends_on:
       - db_hasura
       - keycloak
@@ -174,7 +194,7 @@ services:
       HASURA_GRAPHQL_DEV_MODE: "true"
       HASURA_GRAPHQL_ENABLED_LOG_TYPES: startup, http-log, webhook-log, websocket-log, query-log
       HASURA_GRAPHQL_LOG_LEVEL: warn
-      HASURA_GRAPHQL_ADMIN_SECRET: myadminsecretkey
+      HASURA_GRAPHQL_ADMIN_SECRET: ${DEV_HASURA_ADMIN_SECRET:-myadminsecretkey}
       HASURA_GRAPHQL_UNAUTHORIZED_ROLE: anonymous
       HASURA_GRAPHQL_EXPERIMENTAL_FEATURES: inherited_roles
       HASURA_GRAPHQL_JWT_SECRET: '{"jwk_url": "http://keycloak:8080/realms/edu-hub/protocol/openid-connect/certs"}'
@@ -202,6 +222,9 @@ services:
       POSTGRES_PASSWORD: postgrespassword
     volumes:
       - ./backend/init.d:/docker-entrypoint-initdb.d:rw
+      # Reuse one Compose-managed volume instead of creating an orphaned
+      # anonymous volume whenever the container is replaced.
+      - db_hasura_data:/var/lib/postgresql/data
 
   keycloak:
     container_name: eduhub-keycloak
@@ -214,22 +237,26 @@ services:
       # Dockerfile-dev), skipping the ~90s Quarkus build on every startup.
       # The SPI theme-cache flags keep live theme reloading that `start-dev`
       # used to provide automatically.
-      - >-
-        unset KC_BOOTSTRAP_ADMIN_USERNAME KC_BOOTSTRAP_ADMIN_PASSWORD &&
-        /opt/keycloak/bin/kc.sh import --optimized --file /opt/keycloak/data/import/master.json --override true &&
-        exec /opt/keycloak/bin/kc.sh start --optimized --import-realm --spi-theme-cache-themes=false --spi-theme-cache-templates=false
+      - /bin/sh /opt/keycloak/start-dev.sh
     ports:
-      - 28080:8080
+      - "${DEV_BIND_ADDRESS:-127.0.0.1}:28080:8080"
     environment:
+      DEV_HOST: ${DEV_HOST:-localhost}
+      DEV_KEYCLOAK_SSL_REQUIRED: ${DEV_KEYCLOAK_SSL_REQUIRED:-external}
       KC_BOOTSTRAP_ADMIN_USERNAME: admin
       KC_BOOTSTRAP_ADMIN_PASSWORD: admin
       KC_HOSTNAME_STRICT: "false"
+      KC_HOSTNAME: http://${DEV_HOST:-localhost}:28080
       KC_HTTP_ENABLED: "true"
       KC_HTTP_HOST: "0.0.0.0"
     volumes:
       - ./keycloak/imports-dev/master.json:/opt/keycloak/data/import/master.json
       - ./keycloak/imports-dev/edu-hub.json:/opt/keycloak/data/import/edu-hub.json
+      - ./keycloak/start-dev.sh:/opt/keycloak/start-dev.sh:ro
       - ./keycloak/imports:/imports
       - ./keycloak/themes/opencampus:/opt/keycloak/themes/opencampus
       - ./keycloak/themes/edu-hub:/opt/keycloak/themes/edu-hub
       - ./keycloak/disable-theme-cache.cli:/opt/keycloak/startup-scripts/disable-theme-cache.cli
+
+volumes:
+  db_hasura_data:

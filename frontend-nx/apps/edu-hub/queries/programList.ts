@@ -54,11 +54,19 @@ export const PROGRAM_STATISTICS = gql`
 `;
 
 
+// organizationId/Organization are selected outside the shared fragment: only the management
+// dashboards need them, to group the programs of a super-admin (who sees every organization) by
+// owning organization.
 export const PROGRAMS_WITH_MINIMUM_PROPERTIES = gql`
   ${PROGRAM_FRAGMENT_MINIMUM_PROPERTIES}
   query Programs($where: Program_bool_exp = {}) {
     Program(order_by: { id: desc }, where: $where) {
       ...ProgramFragmentMinimumProperties
+      organizationId
+      Organization {
+        id
+        name
+      }
     }
   }
 `;

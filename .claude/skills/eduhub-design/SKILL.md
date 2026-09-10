@@ -19,7 +19,7 @@ If creating visual artifacts (slides, mocks, throwaway prototypes, etc), copy as
 create static HTML files for the user to view. If working on production code, copy assets and
 read the rules here to become an expert in designing with this brand.
 
-Core brand reminders: single typeface **Space Grotesk** (medium weight default); **dark**
+Core brand reminders: single typeface **Plus Jakarta Sans** (medium weight default); **dark**
 charcoal surfaces (`#222`/`#0F0F0F`) with content cards flipping to **white** (`.light`); one
 accent — **teal-green `#00A398`**; **pill** buttons with a 2px border that turns teal on hover;
 **rounded-2xl** photo cards with a diagonal protection gradient; full-bleed duotone photography;

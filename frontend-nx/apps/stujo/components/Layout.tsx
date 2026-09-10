@@ -6,6 +6,12 @@ import { FC, PropsWithChildren, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 
 import type { PortalBranding } from '../lib/portal';
+import StuJoLegacyIcon from './StuJoLegacyIcon';
+
+interface LayoutProps extends PropsWithChildren {
+  fullWidthMain?: boolean;
+  portal: PortalBranding;
+}
 
 /**
  * Portal-branded page frame, ported from the live stujo.net layout:
@@ -14,8 +20,9 @@ import type { PortalBranding } from '../lib/portal';
  * (per portal) and are injected as CSS variables, so campus portals can
  * override --stujo-primary / --stujo-secondary.
  */
-const Layout: FC<PropsWithChildren<{ portal: PortalBranding }>> = ({ portal, children }) => {
+const Layout: FC<LayoutProps> = ({ children, fullWidthMain = false, portal }) => {
   const t = useTranslations('common');
+  const tLayout = useTranslations('common.Layout');
   const router = useRouter();
   const { status: sessionStatus } = useSession();
 
@@ -23,9 +30,19 @@ const Layout: FC<PropsWithChildren<{ portal: PortalBranding }>> = ({ portal, chi
   // end-session URL, clear the NextAuth session, then redirect through
   // Keycloak back to the app.
   const logout = useCallback(async () => {
-    const res = await fetch('/api/auth/logout');
-    const jsonPayload = await res.json();
-    const url = JSON.parse(jsonPayload).url;
+    let url = '/';
+
+    try {
+      const res = await fetch('/api/auth/logout');
+      if (res.ok) {
+        const payload = await res.json();
+        if (typeof payload?.url === 'string') url = payload.url;
+      }
+    } catch (error) {
+      console.error('Failed to prepare federated logout', error);
+    }
+
+    // A stale/malformed token must not strand the user on the API route.
     await signOut({ redirect: false });
     router.push(url);
   }, [router]);
@@ -66,10 +83,8 @@ const Layout: FC<PropsWithChildren<{ portal: PortalBranding }>> = ({ portal, chi
       ? 'stujo-nav--active'
       : undefined;
 
-  // Legal pages are not part of the job-board migration (yet); fall back to
-  // the live stujo.net pages unless the portal configures its own URLs.
-  const imprintUrl = portal.imprintUrl || 'https://www.stujo.net/impressum';
-  const privacyUrl = portal.privacyUrl || 'https://www.stujo.net/datenschutz';
+  const isGerman = router.locale === 'de';
+  const otherLocale = isGerman ? 'en' : 'de';
 
   return (
     <>
@@ -81,7 +96,7 @@ const Layout: FC<PropsWithChildren<{ portal: PortalBranding }>> = ({ portal, chi
         {styleVars && <style>{`:root:root { ${styleVars} }`}</style>}
       </Head>
       <header className="stujo-header">
-        <img src="/stujo_header_diag.png" alt="" className="stujo-header-diag" />
+        <img src="/stujo_header_diag.svg" alt="" className="stujo-header-diag" />
         <Link href="/">
           <img
             src={portal.logoUrl || '/stujo_header_logo.png'}
@@ -89,34 +104,42 @@ const Layout: FC<PropsWithChildren<{ portal: PortalBranding }>> = ({ portal, chi
             className="stujo-header-logo"
           />
         </Link>
-        <nav className="stujo-header-topnav">
+        <nav className="stujo-header-topnav" aria-label={tLayout('account_menu')}>
           <span className="stujo-lang-switch">
             <Link
               href={router.asPath}
               locale="de"
               className={router.locale === 'de' ? 'stujo-lang--active' : undefined}
+              aria-current={router.locale === 'de' ? 'page' : undefined}
             >
               DE
             </Link>
-            <span aria-hidden="true">|</span>
+            <Link
+              href={router.asPath}
+              locale={otherLocale}
+              className="stujo-lang-toggle"
+              aria-label={tLayout(isGerman ? 'switch_to_english' : 'switch_to_german')}
+            >
+              <img src={isGerman ? '/icons/language-switch-left.png' : '/icons/language-switch-right.png'} alt="" />
+            </Link>
             <Link
               href={router.asPath}
               locale="en"
               className={router.locale === 'en' ? 'stujo-lang--active' : undefined}
+              aria-current={router.locale === 'en' ? 'page' : undefined}
             >
               EN
             </Link>
           </span>
           {sessionStatus === 'authenticated' ? (
-            <a
-              href="/api/auth/logout"
-              onClick={(e) => {
-                e.preventDefault();
-                logout();
-              }}
+            <button
+              type="button"
+              onClick={logout}
+              className="stujo-header-action stujo-header-action--uppercase"
             >
+              <StuJoLegacyIcon name="unlocked" className="stujo-header-action-icon" />
               {t('logout')}
-            </a>
+            </button>
           ) : (
             <>
               <a
@@ -125,8 +148,10 @@ const Layout: FC<PropsWithChildren<{ portal: PortalBranding }>> = ({ portal, chi
                   e.preventDefault();
                   login(true);
                 }}
+                className="stujo-header-action stujo-header-action--uppercase"
               >
-                + {t('register')}
+                <StuJoLegacyIcon name="plus" className="stujo-header-action-icon" />
+                {t('register')}
               </a>
               <a
                 href="/api/auth/signin"
@@ -134,17 +159,19 @@ const Layout: FC<PropsWithChildren<{ portal: PortalBranding }>> = ({ portal, chi
                   e.preventDefault();
                   login(false);
                 }}
+                className="stujo-header-action stujo-header-action--uppercase"
               >
+                <StuJoLegacyIcon name="unlocked" className="stujo-header-action-icon" />
                 {t('login')}
               </a>
             </>
           )}
         </nav>
       </header>
-      <nav className="stujo-nav">
+      <nav className="stujo-nav" aria-label={tLayout('navigation')}>
         <div className="stujo-container stujo-nav-inner">
-          <Link href="/" className={`stujo-nav-home ${navClass('/') ?? ''}`} aria-label="Home">
-            <img src="/icons/home.png" alt="" />
+          <Link href="/" className={`stujo-nav-home ${navClass('/') ?? ''}`} aria-label={tLayout('home')}>
+            <StuJoLegacyIcon name="home" className="stujo-nav-home-icon" />
           </Link>
           <Link href="/stellenangebote" className={navClass('/stellenangebote')}>
             {t('jobs')}
@@ -153,48 +180,48 @@ const Layout: FC<PropsWithChildren<{ portal: PortalBranding }>> = ({ portal, chi
             {t('employers')}
           </Link>
           <Link href="/mein-stujo" className={navClass('/mein-stujo')}>
-            Mein StuJo
+            {tLayout('my_stujo')}
           </Link>
         </div>
       </nav>
-      <main className="stujo-container" style={{ padding: '1.5rem 1rem', minHeight: '40vh' }}>
+      <main className={fullWidthMain ? 'stujo-main stujo-main--full-width' : 'stujo-container stujo-main'}>
         {children}
       </main>
       <footer className="stujo-footer">
         <div className="stujo-container stujo-footer-cols">
           <div>
-            <h3>{t('footerAboutHead')}</h3>
-            <p>{t('footerAboutText')}</p>
+            <h3>{tLayout('footer_about_head')}</h3>
+            <p>{tLayout('footer_about_text')}</p>
+          </div>
+          <div className="stujo-footer-links">
+            <h3>{tLayout('footer_links_head')}</h3>
+            <Link href="/agb">{tLayout('footer_terms')}</Link>
+            <Link href="/fuer-arbeitgeber">{tLayout('footer_prices')}</Link>
+            <Link href="/faq">FAQ</Link>
+            <Link href="/impressum">{tLayout('footer_imprint')}</Link>
+            <Link href="/datenschutz">{tLayout('footer_privacy')}</Link>
           </div>
           <div>
-            <h3>{t('footerLinksHead')}</h3>
-            <a href="https://www.stujo.net/agb">AGB</a>
-            <Link href="/fuer-arbeitgeber">{t('footerPrices')}</Link>
-            <a href="https://www.stujo.net/faq">FAQ</a>
-            <a href={imprintUrl}>Impressum</a>
-            <a href={privacyUrl}>Datenschutz</a>
-          </div>
-          <div>
-            <h3>{t('footerUniversityPartners')}</h3>
-            <a href="http://www.uni-kiel.de/" target="_blank" rel="noreferrer">
+            <h3>{tLayout('footer_university_partners')}</h3>
+            <a className="stujo-footer-logo-link" href="http://www.uni-kiel.de/" target="_blank" rel="noreferrer">
               <img className="stujo-footer-logo" src="/partner/uni-kiel-logo-norm-228x76.gif" alt="Universität Kiel" />
             </a>
-            <a href="http://www.haw-kiel.de" target="_blank" rel="noreferrer">
+            <a className="stujo-footer-logo-link" href="http://www.haw-kiel.de" target="_blank" rel="noreferrer">
               <img className="stujo-footer-logo" src="/partner/Logo_HAW_Kiel.jpg" alt="HAW Kiel" />
             </a>
-            <a href="http://campuscareer.de/" target="_blank" rel="noreferrer">
+            <a className="stujo-footer-logo-link" href="http://campuscareer.de/" target="_blank" rel="noreferrer">
               <img className="stujo-footer-logo" src="/partner/logo_flensburg.png" alt="Campus Flensburg" />
             </a>
           </div>
           <div>
-            <h3>{t('footerPartners')}</h3>
-            <a href="http://www.wissenschaftszentrumkiel.de/" target="_blank" rel="noreferrer">
+            <h3>{tLayout('footer_partners')}</h3>
+            <a className="stujo-footer-logo-link" href="http://www.wissenschaftszentrumkiel.de/" target="_blank" rel="noreferrer">
               <img className="stujo-footer-logo" src="/partner/Logo-Wissenschaftszentrum.png" alt="Wissenschaftszentrum Kiel" />
             </a>
-            <a href="https://www.opencampus.sh/" target="_blank" rel="noreferrer">
+            <a className="stujo-footer-logo-link" href="https://www.opencampus.sh/" target="_blank" rel="noreferrer">
               <img className="stujo-footer-logo" src="/partner/cbb.png" alt="Campus Business Box e.V." />
             </a>
-            <a href="http://www.kielregion.de/" target="_blank" rel="noreferrer">
+            <a className="stujo-footer-logo-link" href="http://www.kielregion.de/" target="_blank" rel="noreferrer">
               <img className="stujo-footer-logo" src="/partner/KielRegion.jpg" alt="Kiel Region" />
             </a>
           </div>

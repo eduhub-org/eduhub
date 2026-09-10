@@ -1,6 +1,6 @@
-import { BaseRow, TableGridProps } from './types';
+import { BaseRow, TableGridFilter, TableGridProps } from './types';
 import React, { useState, useMemo, useCallback } from 'react';
-import { TextField, Checkbox, Select, MenuItem, FormControl, InputLabel, SelectChangeEvent, ListSubheader, Divider, Tooltip } from '@mui/material';
+import { TextField, Checkbox, Select, MenuItem, FormControl, InputLabel, SelectChangeEvent, ListSubheader, ListItemText, Divider, Tooltip } from '@mui/material';
 import { useTranslations } from 'next-intl';
 import { ArrowDropUp, ArrowDropDown } from '@mui/icons-material';
 import { useRouter } from 'next/router';
@@ -26,6 +26,76 @@ const ExpandableRowWrapper: React.FC<{
   renderFn: (props: { row: any }) => React.ReactElement<any> | null;
   row: any;
 }> = ({ renderFn, row }) => renderFn({ row });
+
+/**
+ * Toolbar facet filter: one dropdown per filter with a checkbox per option, so several values can
+ * be picked at once and the toolbar stays compact as options are added. Matches the styling of the
+ * bulk-action select next to it.
+ */
+const TableGridFilterSelect: React.FC<{ filter: TableGridFilter }> = ({ filter }) => {
+  const labelId = `table-grid-filter-${filter.id}-label`;
+  const optionLabel = (value: string) => filter.options.find((option) => option.value === value)?.label ?? value;
+
+  return (
+    <FormControl variant="outlined" size="small" sx={{ minWidth: 200, maxWidth: 320 }}>
+      <InputLabel id={labelId} sx={{ color: 'var(--eduhub-label-primary)' }}>
+        {filter.label}
+      </InputLabel>
+      <Select
+        multiple
+        labelId={labelId}
+        value={filter.selected}
+        label={filter.label}
+        onChange={(event: SelectChangeEvent<string[]>) => {
+          const { value } = event.target;
+          filter.onChange(typeof value === 'string' ? value.split(',') : value);
+        }}
+        renderValue={(selected) => selected.map(optionLabel).join(', ')}
+        sx={{
+          color: 'var(--eduhub-label-primary)',
+          backgroundColor: 'var(--eduhub-bg-card)',
+          '& .MuiOutlinedInput-notchedOutline': {
+            borderColor: 'var(--eduhub-border-primary)',
+          },
+          '&:hover .MuiOutlinedInput-notchedOutline': {
+            borderColor: 'var(--eduhub-border-secondary)',
+          },
+          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+            borderColor: 'var(--eduhub-brand)',
+          },
+          '& .MuiSvgIcon-root': {
+            color: 'var(--eduhub-label-primary)',
+          },
+        }}
+        MenuProps={{
+          PaperProps: {
+            sx: {
+              backgroundColor: 'var(--eduhub-bg-card)',
+              color: 'var(--eduhub-label-primary)',
+            },
+          },
+        }}
+      >
+        {filter.options.map((option) => (
+          <MenuItem key={option.value} value={option.value} sx={{ color: 'var(--eduhub-label-primary)' }}>
+            <Checkbox
+              size="small"
+              checked={filter.selected.includes(option.value)}
+              sx={{
+                padding: '0 8px 0 0',
+                color: 'var(--eduhub-label-primary)',
+                '&.Mui-checked': {
+                  color: 'var(--eduhub-brand)',
+                },
+              }}
+            />
+            <ListItemText primary={option.label} primaryTypographyProps={{ fontSize: '0.875rem' }} />
+          </MenuItem>
+        ))}
+      </Select>
+    </FormControl>
+  );
+};
 
 const TableGrid = <T extends BaseRow,>({
   addButtonText,
@@ -61,9 +131,14 @@ const TableGrid = <T extends BaseRow,>({
   canDeleteRow,
   deleteVariableName = 'id',
   validateDeleteResult,
+  onRowDelete,
+  filters = [],
 }: TableGridProps<T>) => {
   const router = useRouter();
   const navigateMode = Boolean(rowHref || onRowNavigate);
+  // The delete column is rendered for either flavor: a single delete mutation, or a caller-owned
+  // deletion (onRowDelete) for rows that take more than one mutation to remove.
+  const showDeleteColumn = Boolean(deleteMutation || onRowDelete);
   if (navigateMode && expandableRowComponent) {
     console.warn('TableGrid: rowHref/onRowNavigate is ignored when expandableRowComponent is set');
   }
@@ -312,7 +387,7 @@ const TableGrid = <T extends BaseRow,>({
     
     // Add action column widths (w-10 = 40px, w-20 = 80px)
     const expandButtonWidth = expandableRowComponent || navigateMode ? 40 : 0;
-    const deleteButtonWidth = deleteMutation ? 80 : 0;
+    const deleteButtonWidth = showDeleteColumn ? 80 : 0;
     
     return totalColumnWidth + totalGapWidth + leftPadding + expandButtonWidth + deleteButtonWidth;
   })();
@@ -328,15 +403,15 @@ const TableGrid = <T extends BaseRow,>({
           overflow: 'hidden',
         };
 
-  const showToolbar = Boolean(onAddButtonClick) || showCheckbox || showGlobalSearchField;
+  const showToolbar = Boolean(onAddButtonClick) || showCheckbox || showGlobalSearchField || filters.length > 0;
 
-  const toolbarClassName = 'flex justify-between items-center mb-4';
+  const toolbarClassName = 'flex flex-wrap justify-between items-center gap-3 mb-4';
 
   const toolbar = showToolbar ? (
       <div className={toolbarClassName}>
-        <div className="flex items-center">
+        <div className="flex flex-wrap items-center gap-3">
           {onAddButtonClick && (
-            <div className="text-label-primary mr-4">
+            <div className="text-label-primary">
               <AddButton onClick={onAddButtonClick} title={addButtonText ?? ''} size="medium" />
             </div>
           )}
@@ -427,6 +502,9 @@ const TableGrid = <T extends BaseRow,>({
               </Select>
             </FormControl>
           )}
+          {filters.map((filter) => (
+            <TableGridFilterSelect key={filter.id} filter={filter} />
+          ))}
         </div>
         {showGlobalSearchField && (
           <TextField
@@ -474,7 +552,7 @@ const TableGrid = <T extends BaseRow,>({
         <div
           className={`flex-grow min-w-0 flex gap-3 ${!showCheckbox ? 'pl-3' : ''}`}
           style={{
-            minWidth: `${mainRowContentWidth - (expandableRowComponent != null ? 40 : 0) - (deleteMutation != null ? 80 : 0)}px`,
+            minWidth: `${mainRowContentWidth - (expandableRowComponent != null ? 40 : 0) - (showDeleteColumn ? 80 : 0)}px`,
             width: '100%',
           }}
         >
@@ -512,7 +590,7 @@ const TableGrid = <T extends BaseRow,>({
             </React.Fragment>
           ))}
         </div>
-        {deleteMutation && <div className="w-20 flex-shrink-0" />}
+        {showDeleteColumn && <div className="w-20 flex-shrink-0" />}
         {(expandableRowComponent || navigateMode) && <div className="w-10 flex-shrink-0" />}
       </div>
   );
@@ -553,7 +631,7 @@ const TableGrid = <T extends BaseRow,>({
                   <div
                     className={`flex items-center gap-3 ${!showCheckbox ? 'pl-3' : ''}`}
                     style={{
-                      minWidth: `${mainRowContentWidth - (expandableRowComponent != null || navigateMode ? 40 : 0) - (deleteMutation != null ? 80 : 0)}px`,
+                      minWidth: `${mainRowContentWidth - (expandableRowComponent != null || navigateMode ? 40 : 0) - (showDeleteColumn ? 80 : 0)}px`,
                       width: '100%',
                     }}
                   >
@@ -571,7 +649,7 @@ const TableGrid = <T extends BaseRow,>({
                   </div>
                 </div>
                 {(expandableRowComponent || navigateMode) && <div className="w-10 flex-shrink-0" />}
-                {deleteMutation && <div className="w-20 flex-shrink-0"></div>}
+                {showDeleteColumn && <div className="w-20 flex-shrink-0"></div>}
               </div>
             );
           }
@@ -592,7 +670,7 @@ const TableGrid = <T extends BaseRow,>({
                   <div
                     className={`flex items-center gap-3 ${!showCheckbox ? 'pl-3' : ''}`}
                     style={{
-                      minWidth: `${mainRowContentWidth - (expandableRowComponent != null || navigateMode ? 40 : 0) - (deleteMutation != null ? 80 : 0)}px`,
+                      minWidth: `${mainRowContentWidth - (expandableRowComponent != null || navigateMode ? 40 : 0) - (showDeleteColumn ? 80 : 0)}px`,
                       width: '100%',
                     }}
                   >
@@ -633,10 +711,11 @@ const TableGrid = <T extends BaseRow,>({
                     </button>
                   </div>
                 )}
-                {deleteMutation && (
+                {showDeleteColumn && (
                   <div className="w-20 flex-shrink-0 flex items-center justify-center">
                     <TableGridDeleteButton
                       deleteMutation={deleteMutation}
+                      onDelete={onRowDelete ? () => onRowDelete(row.original) : undefined}
                       id={row.original.id}
                       idType={deleteIdType ?? 'number'}
                       role={role}
@@ -660,7 +739,7 @@ const TableGrid = <T extends BaseRow,>({
                     <div
                       className={`flex items-center gap-3 ${!showCheckbox ? 'pl-3' : ''}`}
                       style={{
-                        minWidth: `${mainRowContentWidth - (expandableRowComponent != null || navigateMode ? 40 : 0) - (deleteMutation != null ? 80 : 0)}px`,
+                        minWidth: `${mainRowContentWidth - (expandableRowComponent != null || navigateMode ? 40 : 0) - (showDeleteColumn ? 80 : 0)}px`,
                         width: '100%',
                       }}
                     >
@@ -672,7 +751,7 @@ const TableGrid = <T extends BaseRow,>({
                     </div>
                   </div>
                   {expandableRowComponent != null && <div className="w-10 flex-shrink-0"></div>}
-                  {deleteMutation && <div className="w-20 flex-shrink-0"></div>}
+                  {showDeleteColumn && <div className="w-20 flex-shrink-0"></div>}
                 </div>
               )}
             </React.Fragment>

@@ -115,6 +115,61 @@ The email template variable system is centralized in `emailTemplateVariables.js`
   - Example: `https://edu.opencampus.sh`
   - Available in: user creation emails
 
+### StuJo Job Board Variables
+*Available in: job posting emails (employer-facing)*
+
+> **These do not go through `createVariableReplacer`.** The job board mails are
+> substituted by their own replacers, in
+> `frontend-nx/apps/edu-hub/lib/stripeJobPosting.ts` (`buildMailVars`) and
+> `functions/callNodeFunction/publishJobPosting/index.js`
+> (`buildJobPostingMailVars`). A test asserts the two key sets are identical,
+> because the replacers only substitute keys they are handed -- a variable added
+> to one path but not the other reaches the employer as literal
+> `[Invoice:Number]` text. Adding a variable therefore means editing both
+> replacers as well as the registry.
+
+- **`[JobPosting:Title]`**: Job posting title
+  - Example: `Werkstudent:in Frontend`
+- **`[JobPosting:Type]`**: Posting category as a display label, not the raw enum
+  - Example: `Studentenjob`
+- **`[JobPosting:PublishedAt]`** / **`[JobPosting:ExpiresAt]`**: Run dates
+  - Example: `29. August 2026`
+- **`[JobPosting:Payment]`**: How the posting was paid for
+  - Example: `59,50 € (bezahlt)`, `kostenlos`, `Kontingent`
+- **`[JobPosting:DashboardUrl]`** / **`[JobPosting:RepostUrl]`** / **`[JobPosting:AdminUrl]`**: Links
+- **`[JobPosting:TermsAcceptedAt]`**: When the employer accepted the terms; empty if never recorded
+- **`[Organization:Name]`**: Employer organisation name
+- **`[Legal:TermsUrl]`**: Terms URL for the mail footer
+
+### Invoice Variables
+*Available in: job posting emails*
+
+Empty on free and credit-funded postings, which have no `Invoice` row.
+
+- **`[Invoice:Number]`**: The number printed on the Stripe invoice document, falling
+  back to our own record key while Stripe has not finalized it
+  - Example: `VGD1VIPO-0001`
+- **`[Invoice:Date]`**, **`[Invoice:NetTotal]`**, **`[Invoice:VatRate]`**,
+  **`[Invoice:VatTotal]`**, **`[Invoice:GrossTotal]`**, **`[Invoice:PaymentStatus]`**
+- **`[Invoice:HostedUrl]`**: Stripe hosted invoice page
+
+### Conditional Blocks
+
+Job board templates support `[#if:Flag] ... [/if:Flag]`, dropped when the flag is
+falsy. This is what lets one template serve paid, free and credit-funded
+postings. Blocks may nest.
+
+| Flag | True when |
+| --- | --- |
+| `Invoice` | The posting was paid for and has an invoice |
+| `InvoicePdf` | The invoice PDF is actually attached to this mail |
+| `InvoiceLink` | A hosted invoice URL exists |
+| `InvoicePending` | Neither PDF nor link exists yet, so the document follows separately |
+| `TermsAccepted` | A consent timestamp was recorded |
+
+`InvoicePdf` is deliberately separate from `Invoice`: the mail must not claim a
+PDF is attached when the fallback sweep had to send without one.
+
 ## Date Formatting
 
 All date variables are automatically formatted based on the app's timezone setting:

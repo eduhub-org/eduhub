@@ -1075,8 +1075,14 @@
       "program": "Program",
       "status": "Status",
       "email_templates": "Templates",
-      "has_custom_templates": "This course has custom email templates"
+      "has_custom_templates": {
+        "courses": "This course has custom email templates",
+        "events": "This event has custom email templates",
+        "degrees": "This degree has custom email templates"
+      }
     },
+    "organization_scope_label": "Organization",
+    "all_organizations_scope": "All organizations",
     "error_loading_programs": "The programs could not be loaded. Please try again later.",
     "empty_state": {
       "events": "No events programs exist yet. Ask a platform admin to set up an events program for your organization before you can manage events here.",
@@ -1087,7 +1093,11 @@
     "close": "Close",
     "cancel": "Cancel",
     "not_published": "Not Published",
-    "default_course_title": "Untitled Course",
+    "default_title": {
+      "courses": "Untitled Course",
+      "events": "Untitled Event",
+      "degrees": "Untitled Degree"
+    },
     "title": "Manage Courses",
     "all_programs": "All",
     "course_degree_title": {
@@ -1214,32 +1224,83 @@
     "add_event_button": "Add Event",
     "add_degree_button": "Add Degree",
     "delete_button": {
-      "delete_course_confirmation": "Are you sure you want to delete the course '{title}'?",
-      "untitled_course": "Untitled Course"
+      "delete_confirmation": {
+        "courses": "Are you sure you want to delete the course \"{title}\"?",
+        "events": "Are you sure you want to delete the event \"{title}\"?",
+        "degrees": "Are you sure you want to delete the degree \"{title}\"?"
+      }
     },
     "bulk_action": {
       "publish": "Publish Selected",
       "unpublish": "Unpublish Selected",
       "copy": "Copy to Program"
     },
-    "copy_courses_to_program_dialog": {
-      "title": "Copy Courses to Program",
-      "description": "Select the target program where the courses should be copied:",
-      "button": "Copy Courses"
+    "copy_to_program_dialog": {
+      "title": {
+        "courses": "Copy Courses to Program",
+        "events": "Copy Events to Program",
+        "degrees": "Copy Degrees to Program"
+      },
+      "description": {
+        "courses": "Select the target program where the courses should be copied:",
+        "events": "Select the target program where the events should be copied:",
+        "degrees": "Select the target program where the degrees should be copied:"
+      },
+      "button": {
+        "courses": "Copy Courses",
+        "events": "Copy Events",
+        "degrees": "Copy Degrees"
+      }
     },
     "notifications": {
-      "course_added_success": "Course added successfully",
-      "course_add_failed": "Failed to add course. Please try again.",
-      "courses_published_success_singular": "Successfully published {count} course",
-      "courses_published_success_plural": "Successfully published {count} courses",
-      "courses_unpublished_success_singular": "Successfully unpublished {count} course",
-      "courses_unpublished_success_plural": "Successfully unpublished {count} courses",
-      "bulk_action_failed": "Failed to {action} courses. Please try again.",
+      "added_success": {
+        "courses": "Course added successfully",
+        "events": "Event added successfully",
+        "degrees": "Degree added successfully"
+      },
+      "add_failed": {
+        "courses": "Failed to add course. Please try again.",
+        "events": "Failed to add event. Please try again.",
+        "degrees": "Failed to add degree. Please try again."
+      },
+      "published_success_singular": {
+        "courses": "Successfully published {count} course",
+        "events": "Successfully published {count} event",
+        "degrees": "Successfully published {count} degree"
+      },
+      "published_success_plural": {
+        "courses": "Successfully published {count} courses",
+        "events": "Successfully published {count} events",
+        "degrees": "Successfully published {count} degrees"
+      },
+      "unpublished_success_singular": {
+        "courses": "Successfully unpublished {count} course",
+        "events": "Successfully unpublished {count} event",
+        "degrees": "Successfully unpublished {count} degree"
+      },
+      "unpublished_success_plural": {
+        "courses": "Successfully unpublished {count} courses",
+        "events": "Successfully unpublished {count} events",
+        "degrees": "Successfully unpublished {count} degrees"
+      },
+      "bulk_action_failed": {
+        "courses": "The bulk action on the selected courses failed. Please try again.",
+        "events": "The bulk action on the selected events failed. Please try again.",
+        "degrees": "The bulk action on the selected degrees failed. Please try again."
+      },
       "attendance_certificate_update_failed": "Failed to update attendance certificate setting",
       "achievement_certificate_update_failed": "Failed to update achievement certificate setting",
       "application_end_update_failed": "Failed to update application end date",
-      "courses_copied_success_singular": "Successfully copied {count} course to {programTitle}",
-      "courses_copied_success_plural": "Successfully copied {count} courses to {programTitle}"
+      "copied_success_singular": {
+        "courses": "Successfully copied {count} course to {programTitle}",
+        "events": "Successfully copied {count} event to {programTitle}",
+        "degrees": "Successfully copied {count} degree to {programTitle}"
+      },
+      "copied_success_plural": {
+        "courses": "Successfully copied {count} courses to {programTitle}",
+        "events": "Successfully copied {count} events to {programTitle}",
+        "degrees": "Successfully copied {count} degrees to {programTitle}"
+      }
     }
   },
   "manageCourse": {
@@ -1928,7 +1989,7 @@
       "help_text": "Default Formbricks survey for course enrollments. Courses can override this with their own enrollment survey URL."
     },
     "delete_button": {
-      "delete_program_confirmation": "Are you sure you want to delete the program '{title}'?",
+      "delete_program_confirmation": "Are you sure you want to delete the program \"{title}\"?",
       "untitled_program": "Untitled Program"
     },
     "Certificates": {
@@ -1995,7 +2056,7 @@
       "programs_published_success_plural": "{count} programs were successfully published",
       "programs_unpublished_success_singular": "Program was successfully unpublished",
       "programs_unpublished_success_plural": "{count} programs were successfully unpublished",
-      "bulk_action_failed": "Bulk action '{action}' failed"
+      "bulk_action_failed": "The bulk action failed. Please try again."
     }
   },
   "manageUsers": {
@@ -2058,6 +2119,12 @@
     "can_manage_users_and_settings": "Can manage users and settings",
     "error_loading_admin_users": "Error loading admin users.",
     "deletion_confirmation_question": "Are you sure you want to delete the admin rights of {firstName} {lastName} for the organization {organization}?",
+    "deletion_confirmation_question_super_admin": "Are you sure you want to delete the admin rights of {firstName} {lastName} for the organization {organization}? Their super admin rights are not affected.",
+    "remove_super_admin_confirmation_question": "Are you sure you want to remove the super admin rights of {firstName} {lastName}?",
+    "privileges_filter_label": "Privileges",
+    "administered_organization": "Administered organization",
+    "super_admin_only": "Super admin only",
+    "no_organization_roles": "No organization role – super admin rights only.",
     "add_admin_button": "Add admin",
     "add_admin_dialog_title": "Add admin user",
     "add_admin_user_label": "User",
@@ -2070,7 +2137,23 @@
     "add_admin_error": "The admin user could not be added.",
     "add_admin_submit": "Add",
     "add_admin_submitting": "Adding…",
-    "add_admin_success": "Admin user added."
+    "add_admin_scope_required": "Please select an organization or grant super admin rights.",
+    "add_admin_no_organization": "No organization (super admin only)",
+    "add_admin_super_admin_hint": "Super admins manage the whole platform, independently of any organization.",
+    "add_admin_success": "Admin user added.",
+    "first_settings_admin_hint": "This company has nobody with this right yet. Without it, nobody here can add further admins or change its settings.",
+    "claim_declared_at": "The administration rights were claimed on {date}.",
+    "claim_declared": "The administration rights were self-claimed.",
+    "claim_needs_review_label": "Administration rights were self-claimed – please review!",
+    "verify_claim_button": "Confirm authorization",
+    "verify_claim_submitting": "Confirming…",
+    "verify_claim_error": "The authorization could not be confirmed. Somebody else may have confirmed or revoked it in the meantime.",
+    "claim_verification": {
+      "SELF_SERVICE_DOMAIN_VERIFIED": "The email domain matches the organization.",
+      "SELF_SERVICE_UNVERIFIED": "Please review!",
+      "NEW_ORGANIZATION": "The organization was created with the claim.",
+      "ADMIN_VERIFIED": "The authorization has been reviewed and confirmed."
+    }
   },
   "manageAppSettings": {
     "backgroundImageURL": "Background image URL",
@@ -2578,7 +2661,14 @@
       "PROJECT_DEADLINE_REMINDER": "Project Deadline Reminder",
       "SESSION_RESCHEDULED": "Session Rescheduled",
       "PAYMENT_RECEIPT": "Payment Receipt",
-      "COURSE_CONTINUATION_INQUIRY": "Course Continuation Inquiry"
+      "COURSE_CONTINUATION_INQUIRY": "Course Continuation Inquiry",
+      "JOB_POSTING_PUBLISHED": "Job posting published",
+      "JOB_POSTING_EXPIRED": "Job posting expired",
+      "JOB_POSTING_ADMIN_NOTICE": "Job posting: admin notice",
+      "JOB_POSTING_PAYMENT_FAILED": "Job posting: payment failed",
+      "JOB_ALERT": "Job alert",
+      "JOB_ORGANIZATION_CLAIMED": "Job access: newly taken over",
+      "JOB_ORGANIZATION_ACCESS_REQUEST": "Job access: request to the current admins"
     },
     "placeholders": {
       "subject": "Enter email subject...",
@@ -2626,9 +2716,16 @@
       "PROJECT_DEADLINE_REMINDER": "Sent 48 hours before a project's submission deadline",
       "SESSION_RESCHEDULED": "Sent to participants when a session's date or time changes",
       "PAYMENT_RECEIPT": "Sent when an invoice for a course or event enrollment is paid",
-      "COURSE_CONTINUATION_INQUIRY": "Sent when a participant reaches the course's limit of missed sessions, asking them not to miss further sessions or to let the team know if they want to stop"
+      "COURSE_CONTINUATION_INQUIRY": "Sent when a participant reaches the course's limit of missed sessions, asking them not to miss further sessions or to let the team know if they want to stop",
+      "JOB_POSTING_PUBLISHED": "Sent to the employer once the posting is live. Carries the payment receipt, the invoice number and the invoice PDF as an attachment. The block between [#if:Invoice] and [/if:Invoice] is dropped for free and credit-funded postings; [#if:InvoicePdf] only renders when the PDF is actually attached.",
+      "JOB_POSTING_EXPIRED": "Sent to the employer when the posting run ends, with a link to post it again",
+      "JOB_POSTING_ADMIN_NOTICE": "Sent to the platform admins when a posting is published (post-hoc moderation)",
+      "JOB_POSTING_PAYMENT_FAILED": "Sent to the employer when a delayed payment (SEPA) fails and the posting is taken offline",
+      "JOB_ALERT": "Sent to subscribers with new postings matching their search profile",
+      "JOB_ORGANIZATION_CLAIMED": "Goes to the StuJo contact address when someone takes over job management for a company themselves",
+      "JOB_ORGANIZATION_ACCESS_REQUEST": "Goes to the current admins when someone else asks for access to their job offers"
     },
-    "delete_confirmation": "Are you sure you want to delete the email template '{title}'?",
+    "delete_confirmation": "Are you sure you want to delete the email template \"{title}\"?",
     "unknown_trigger": "Unknown trigger type",
     "categories": {
       "all": "All",
@@ -2636,7 +2733,8 @@
       "projects": "Project notifications",
       "sessions": "Session reminders",
       "system": "System emails",
-      "other": "Other"
+      "other": "Other",
+      "jobboard": "Job board"
     },
     "category_coming_soon": "Soon",
     "categories_coming_soon_explanation": {}

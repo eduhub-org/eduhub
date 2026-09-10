@@ -10,6 +10,12 @@ import { useAdminQuery } from '../../../hooks/authedQuery';
  * credit grants — the admin counterpart of design/stujo-design.pen.
  */
 
+// Same shape as the check queueEmail applies server-side, so the address an admin types here is
+// the address the mail layer will accept. Deliberately permissive: it rejects the typos that make a
+// recipient unusable, not exotic-but-valid addresses.
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const isValidEmail = (value: string) => EMAIL_PATTERN.test(value);
+
 const JOB_BOARD_ADMIN_QUERY = gql`
   query JobBoardAdmin {
     JobPosting(order_by: { publishedAt: desc_nulls_last }, limit: 25) {
@@ -94,6 +100,18 @@ const UPDATE_PRICE = gql`
   }
 `;
 
+// The address the job board writes to when it needs a human: the self-service claim
+// notifications, and the fallback shown to an employer who cannot get access. Seeded NULL, so until
+// it is filled in the StuJo pages say "write to das StuJo-Team" with no address at all.
+const UPDATE_PORTAL_CONTACT_EMAIL = gql`
+  mutation AdminUpdateJobPortalContactEmail($id: Int!, $contactEmail: String) {
+    update_JobPortal_by_pk(pk_columns: { id: $id }, _set: { contactEmail: $contactEmail }) {
+      id
+      contactEmail
+    }
+  }
+`;
+
 const SEARCH_ORGANIZATIONS = gql`
   query AdminSearchOrganizations($search: String!) {
     Organization(where: { name: { _ilike: $search } }, limit: 20) {
@@ -168,12 +186,14 @@ const ManageJobBoard: FC = () => {
   const [updateStatus] = useAdminMutation(UPDATE_POSTING_STATUS);
   const [updateFeatured] = useAdminMutation(UPDATE_POSTING_FEATURED);
   const [updatePrice] = useAdminMutation(UPDATE_PRICE);
+  const [updatePortalContactEmail] = useAdminMutation(UPDATE_PORTAL_CONTACT_EMAIL);
   const [insertCredit] = useAdminMutation(INSERT_CREDIT);
   const [incrementCredit] = useAdminMutation(INCREMENT_CREDIT);
   const [createStripePrices, { loading: bootstrapping }] = useAdminMutation(CREATE_STRIPE_PRICES);
 
   const [orgSearch, setOrgSearch] = useState('');
   const [bootstrapResult, setBootstrapResult] = useState<string | null>(null);
+  const [portalSaveError, setPortalSaveError] = useState<string | null>(null);
   const { data: orgData } = useAdminQuery(SEARCH_ORGANIZATIONS, {
     variables: { search: `%${orgSearch}%` },
     skip: orgSearch.trim().length < 2,
@@ -276,6 +296,7 @@ const ManageJobBoard: FC = () => {
       </div>
 
       <SectionTitle title="Portale (AppSettings)" />
+      {portalSaveError && <div className="mb-2 text-sm text-error">{portalSaveError}</div>}
       <div className="rounded-lg bg-bg-card overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
@@ -284,6 +305,7 @@ const ManageJobBoard: FC = () => {
               <th className="px-4 py-2">Domain</th>
               <th className="px-4 py-2">Hochschule</th>
               <th className="px-4 py-2">Region-Filter</th>
+              <th className="px-4 py-2">Kontakt-E-Mail</th>
               <th className="px-4 py-2">Branding</th>
             </tr>
           </thead>
@@ -294,6 +316,53 @@ const ManageJobBoard: FC = () => {
                 <td className="px-4 py-2 text-label-secondary">{portal.AppSetting?.domain ?? '–'}</td>
                 <td className="px-4 py-2 text-label-secondary">{portal.Organization?.name ?? '–'}</td>
                 <td className="px-4 py-2 text-label-secondary">{portal.defaultRegion ?? '–'}</td>
+                <td className="px-4 py-2">
+                  <input
+                    type="email"
+                    // 44px minimum touch target, per the mobile guidance in
+                    // .cursor/rules/mobile-responsive-design.mdc.
+                    className="w-full min-h-[44px] touch-manipulation bg-transparent text-label-primary outline-none border-b border-transparent focus:border-brand"
+                    placeholder="nicht gesetzt"
+                    defaultValue={portal.contactEmail ?? ''}
+                    onBlur={async (event) => {
+                      const value = event.target.value.trim();
+                      if (value === (portal.contactEmail ?? '')) {
+                        return;
+                      }
+                      // type="email" only gates form submission, and this field saves on blur, so
+                      // an unusable address would otherwise reach the column that every claim and
+                      // access-request notification is sent to.
+                      if (value !== '' && !isValidEmail(value)) {
+                        event.target.value = portal.contactEmail ?? '';
+                        setPortalSaveError(
+                          `Kontakt-E-Mail für ${portal.slug} nicht gespeichert: keine gültige E-Mail-Adresse.`
+                        );
+                        return;
+                      }
+                      setPortalSaveError(null);
+                      try {
+                        await updatePortalContactEmail({
+                          variables: { id: portal.id, contactEmail: value === '' ? null : value },
+                        });
+                      } catch (saveError: unknown) {
+                        // The field is uncontrolled, so it keeps showing the value that was not
+                        // saved. Say so, and put the stored value back so the two agree.
+                        event.target.value = portal.contactEmail ?? '';
+                        setPortalSaveError(
+                          `Kontakt-E-Mail für ${portal.slug} nicht gespeichert: ${
+                            saveError instanceof Error ? saveError.message : 'unbekannter Fehler'
+                          }`
+                        );
+                        return;
+                      }
+                      // Refetched separately: the write already succeeded, so a failure to read the
+                      // table back must not revert the field or claim the address was not saved.
+                      // The input already shows the stored value; the rest of the table is stale
+                      // until the next refresh.
+                      await refetch().catch(() => undefined);
+                    }}
+                  />
+                </td>
                 <td className="px-4 py-2">
                   <span className="inline-flex gap-1">
                     {[portal.AppSetting?.primaryColor, portal.AppSetting?.secondaryColor]

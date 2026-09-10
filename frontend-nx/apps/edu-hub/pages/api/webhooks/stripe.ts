@@ -1,5 +1,4 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { randomUUID } from 'node:crypto';
 import { GraphQLClient, gql } from 'graphql-request';
 import Stripe from 'stripe';
 import getRawBody from 'raw-body';
@@ -10,7 +9,9 @@ import {
   handleJobPostingAsyncPaymentFailed,
   handleJobPostingCheckoutExpired,
   parseJobPostingId,
+  handleJobPostingInvoiceFinalized,
 } from '../../../lib/stripeJobPosting';
+import { generateInvoiceNumber, resolveStripeInvoice } from '../../../lib/stripeInvoice';
 
 // Disable body parsing - we need raw body for signature verification
 export const config = {
@@ -87,6 +88,7 @@ const INSERT_INVOICE = gql`
     $stripeCheckoutSessionId: String
     $stripePaymentIntentId: String
     $stripeInvoiceId: String
+    $stripeInvoiceNumber: String
     $stripeHostedInvoiceUrl: String
     $stripeInvoicePdfUrl: String
   ) {
@@ -104,6 +106,7 @@ const INSERT_INVOICE = gql`
         stripeCheckoutSessionId: $stripeCheckoutSessionId
         stripePaymentIntentId: $stripePaymentIntentId
         stripeInvoiceId: $stripeInvoiceId
+        stripeInvoiceNumber: $stripeInvoiceNumber
         stripeHostedInvoiceUrl: $stripeHostedInvoiceUrl
         stripeInvoicePdfUrl: $stripeInvoicePdfUrl
       }
@@ -153,20 +156,6 @@ function parseAndValidateEnrollmentId(enrollmentId: string): number | null {
   }
 
   return parsed;
-}
-
-/**
- * Generates a unique invoice number for Stripe Checkout payments.
- * Uses session/payment intent ID as unique suffix when available.
- * Falls back to crypto.randomUUID() when both are absent to avoid collisions.
- */
-function generateInvoiceNumber(
-  prefix: string,
-  sessionId?: string | null,
-  paymentIntentId?: string | null
-): string {
-  const suffix = sessionId || paymentIntentId || `web-${randomUUID()}`;
-  return `${prefix}-${suffix}`;
 }
 
 /**
@@ -278,36 +267,6 @@ const handleStripeWebhook = async (
     }
   );
 
-  /**
-   * Resolves the Stripe-generated invoice document (invoice_creation) so
-   * the Invoice row carries the legally required document references.
-   */
-  const resolveStripeInvoice = async (
-    invoiceRef: string | Stripe.Invoice | null | undefined
-  ): Promise<{ id: string | null; hostedUrl: string | null; pdfUrl: string | null }> => {
-    if (!invoiceRef) {
-      return { id: null, hostedUrl: null, pdfUrl: null };
-    }
-    try {
-      const invoice =
-        typeof invoiceRef === 'string'
-          ? await stripe.invoices.retrieve(invoiceRef)
-          : invoiceRef;
-      return {
-        id: invoice.id ?? null,
-        hostedUrl: invoice.hosted_invoice_url ?? null,
-        pdfUrl: invoice.invoice_pdf ?? null,
-      };
-    } catch (err) {
-      console.warn('Could not resolve Stripe invoice document:', err);
-      return {
-        id: typeof invoiceRef === 'string' ? invoiceRef : null,
-        hostedUrl: null,
-        pdfUrl: null,
-      };
-    }
-  };
-
   const createInvoiceForEnrollment = async (
     enrollmentId: number,
     session: {
@@ -357,7 +316,7 @@ const handleStripeWebhook = async (
       session.stripePaymentIntentId
     );
 
-    const stripeInvoice = await resolveStripeInvoice(session.stripeInvoice);
+    const stripeInvoice = await resolveStripeInvoice(stripe, session.stripeInvoice);
 
     await client.request(INSERT_INVOICE, {
       organizationId,
@@ -372,6 +331,7 @@ const handleStripeWebhook = async (
       stripeCheckoutSessionId: session.stripeCheckoutSessionId,
       stripePaymentIntentId: session.stripePaymentIntentId,
       stripeInvoiceId: stripeInvoice.id,
+      stripeInvoiceNumber: stripeInvoice.number,
       stripeHostedInvoiceUrl: stripeInvoice.hostedUrl,
       stripeInvoicePdfUrl: stripeInvoice.pdfUrl,
     });
@@ -519,6 +479,18 @@ const handleStripeWebhook = async (
           }
         }
 
+        return res.status(200).json({ received: true });
+      }
+
+      // Stripe finalizes invoice_creation invoices asynchronously, so this is
+      // where the document number and the PDF first exist. For job postings it
+      // is also what releases the confirmation mail, which carries the PDF.
+      //
+      // NOTE: this event must be enabled on the endpoint in the Stripe
+      // Dashboard (sandbox and live) -- see docs/STRIPE_INTEGRATION.md. Without
+      // it the mail falls through to the sendPendingJobPostingMails sweep.
+      case 'invoice.finalized': {
+        await handleJobPostingInvoiceFinalized(client, event.data.object as Stripe.Invoice);
         return res.status(200).json({ received: true });
       }
 

@@ -135,3 +135,27 @@
     - name: Hasura-Secret
       value_from_env: HASURA_CLOUD_FUNCTION_SECRET
   comment: Enforces the guest data retention period - anonymizes guests whose events all ended more than AppSettings.guestDataRetentionMonths ago, and deletes signups that were never confirmed (GDPR Art. 5(1)(e))
+- name: send_pending_job_posting_mails
+  webhook: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+  schedule: '*/15 * * * *'
+  include_in_metadata: true
+  payload: {}
+  retry_conf:
+    num_retries: 0
+    retry_interval_seconds: 10
+    timeout_seconds: 3699
+    tolerance_seconds: 21600
+  headers:
+    - name: name
+      value: sendPendingJobPostingMails
+    - name: secret
+      value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+  comment: >-
+    Backstop for the StuJo job posting confirmation mail, which carries the
+    invoice PDF and is therefore held until Stripe finalizes the invoice.
+    Normally sent at checkout.session.completed or on invoice.finalized; this
+    sweep covers the case where neither fired (most plausibly because
+    invoice.finalized is not enabled on the Stripe endpoint), so an employer
+    never pays without hearing anything. Note the headers differ from the Python
+    crons - callNodeFunction dispatches on name/secret, not
+    Function-Name/Hasura-Secret.

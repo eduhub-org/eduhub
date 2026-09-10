@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1477" height="256" viewBox="0 0 1477 256">
+  <defs>
+    <linearGradient id="edge-shadow" x1="732.61" y1="94.02" x2="738.5" y2="128" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" />
+      <stop offset=".143" stop-color="#fdfdfd" />
+      <stop offset=".286" stop-color="#f9f9f9" />
+      <stop offset=".429" stop-color="#f4f4f4" />
+      <stop offset=".571" stop-color="#ededed" />
+      <stop offset=".714" stop-color="#e4e4e4" />
+      <stop offset=".857" stop-color="#dadada" />
+      <stop offset="1" stop-color="#d1d1d1" />
+    </linearGradient>
+  </defs>
+  <path fill="url(#edge-shadow)" d="M0 0H1477L0 256Z" />
+</svg>

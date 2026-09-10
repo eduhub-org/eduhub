@@ -3695,6 +3695,17 @@ INSERT INTO public."User" (id, "firstName", "lastName", email, picture, "externa
 INSERT INTO public."OrganizationAdmin" (id, "userId", "organizationId", "canManageCourses", "canManageEvents", "canManageDegrees", "canManageSettings", "canManageJobs", updated_at, created_at) VALUES
   (9100, 'dddddddd-dddd-dddd-dddd-dddddddddddd', 9100, false, true, false, true, true, now(), now());
 
+-- Draft visible in the dedicated employer dashboard at /mein-stujo. Keeping it
+-- unpublished prevents it from appearing on the public job board.
+INSERT INTO public."JobPosting"
+  (id, "organizationId", "contactUserId", type, status, region, occupation,
+   title, "shortDescription", location, featured, created_at, updated_at)
+VALUES
+  (9925, 9100, 'dddddddd-dddd-dddd-dddd-dddddddddddd', 'WORKING_STUDENT', 'DRAFT',
+   'KIEL', 'IT_TELECOMMUNICATIONS', 'StuJo employer dashboard test',
+   'Draft fixture for testing the authenticated Mein StuJo dashboard and logout flow.',
+   'Kiel', false, now(), now());
+
 -- Instructor of an existing course (id 4), which belongs to a different organization than the one
 -- this user administers, to confirm that instructor access is retained alongside the org_admin role.
 INSERT INTO public."CourseInstructor" (id, "courseId", "userId", created_at, updated_at) VALUES
@@ -3718,3 +3729,4 @@ SELECT pg_catalog.setval(pg_get_serial_sequence('public."Course"', 'id'), (SELEC
 SELECT pg_catalog.setval(pg_get_serial_sequence('public."Organization"', 'id'), (SELECT GREATEST(max(id), 500) FROM public."Organization"), true);
 SELECT pg_catalog.setval(pg_get_serial_sequence('public."OrganizationAdmin"', 'id'), (SELECT max(id) FROM public."OrganizationAdmin"), true);
 SELECT pg_catalog.setval(pg_get_serial_sequence('public."CourseInstructor"', 'id'), (SELECT max(id) FROM public."CourseInstructor"), true);
+SELECT pg_catalog.setval(pg_get_serial_sequence('public."JobPosting"', 'id'), (SELECT max(id) FROM public."JobPosting"), true);

@@ -27,8 +27,6 @@ export type PortalBranding = {
   faviconUrl: string | null;
   primaryColor: string | null;
   secondaryColor: string | null;
-  imprintUrl: string | null;
-  privacyUrl: string | null;
 };
 
 const PORTAL_QUERY = /* GraphQL */ `
@@ -47,8 +45,6 @@ const PORTAL_QUERY = /* GraphQL */ `
       faviconUrl
       primaryColor
       secondaryColor
-      imprintUrl
-      privacyUrl
     }
   }
 `;
@@ -81,8 +77,6 @@ type PortalQueryResult = {
     faviconUrl: string | null;
     primaryColor: string | null;
     secondaryColor: string | null;
-    imprintUrl: string | null;
-    privacyUrl: string | null;
   }[];
 };
 
@@ -148,7 +142,5 @@ export async function resolvePortal(host: string | undefined): Promise<PortalBra
     faviconUrl: settings?.faviconUrl ?? null,
     primaryColor: settings?.primaryColor ?? null,
     secondaryColor: settings?.secondaryColor ?? null,
-    imprintUrl: settings?.imprintUrl ?? null,
-    privacyUrl: settings?.privacyUrl ?? null,
   };
 }

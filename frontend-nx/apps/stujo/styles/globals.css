@@ -4,6 +4,14 @@
    CSS variables). Live values: pink #A71580, green #ACCA23, grey #646363,
    gradient #4B0135 → #A71580 → #4B0135. */
 
+/* Tailwind, so edu-hub components can be reused here rather than forked
+   (AGENTS.md critical rule 10). Preflight is off in tailwind.config.js: the
+   port below relies on browser defaults and sets its own box-sizing and body
+   rules, so the reset would restyle every page. */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
   --stujo-primary: #a71580;
   --stujo-secondary: #acca23;
@@ -24,6 +32,50 @@
   /* Lato is declared like on the live site; its webfont 404s there too, so
      the effective rendering is the same fallback stack. */
   --stujo-font: Lato, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+/* Edu-hub design tokens, mapped to StuJo's values.
+ *
+ * Edu-hub's Tailwind theme resolves every colour to one of these variables, so
+ * defining them here is what makes a shared component render in StuJo branding
+ * instead of edu-hub's teal-on-charcoal. Edu-hub declares its DARK palette on
+ * :root and overrides it under `.light`; StuJo is a white page, so the light
+ * values live directly on :root here. Anything edu-hub paints a brand colour
+ * comes out StuJo pink.
+ */
+:root {
+  --eduhub-brand: var(--stujo-primary);
+  --eduhub-brand-light: #c2359c;
+  --eduhub-brand-dark: var(--stujo-gradient-dark);
+
+  --eduhub-fill-primary: var(--stujo-bg);
+  --eduhub-fill-secondary: #f4f2f0;
+  --eduhub-fill-disabled: #e5e5e5;
+
+  --eduhub-label-primary: var(--stujo-text);
+  --eduhub-label-secondary: var(--stujo-muted);
+  --eduhub-label-disabled: #999999;
+
+  --eduhub-border-primary: var(--stujo-border);
+  --eduhub-border-secondary: var(--stujo-divider);
+
+  --eduhub-bg-primary: var(--stujo-bg);
+  --eduhub-bg-secondary: #f4f2f0;
+  --eduhub-bg-modal: var(--stujo-bg);
+  --eduhub-bg-card: var(--stujo-bg);
+  --eduhub-bg-footer: var(--stujo-gradient-dark);
+
+  --eduhub-success: var(--stujo-secondary);
+  --eduhub-warning: #f2991d;
+  --eduhub-error: var(--stujo-error);
+  --eduhub-info: #1982fc;
+  --eduhub-badge: #e7b24c;
+  --eduhub-badge-contrast: #4a3500;
+
+  --eduhub-status-confirmed: var(--stujo-secondary);
+  --eduhub-status-invited: #f2991d;
+  --eduhub-status-current: var(--stujo-secondary);
+  --eduhub-status-missed: #f2991d66;
 }
 
 * {
@@ -87,6 +139,16 @@ a:focus {
   padding: 0 1rem;
 }
 
+.stujo-main {
+  min-height: 40vh;
+  padding: 1.5rem 1rem;
+}
+
+.stujo-main--full-width {
+  max-width: none;
+  padding: 0;
+}
+
 /* --- Header: gradient banner + green nav bar (partials/header/) --- */
 
 .stujo-header {
@@ -106,27 +168,27 @@ a:focus {
   position: absolute;
   left: 0;
   top: 0;
-  /* Span 70% of the header width so the white wedge crosses the top edge at
-     ~70% and purple covers the rest, matching the live stujo.net banner. The
-     PNG's diagonal angle already matches; anchoring left keeps the purple
-     starting far left. */
-  width: 70%;
+  /* Keep the native angle and crop the artwork on small screens. These
+     minimum dimensions also apply above the mobile breakpoint. */
+  width: max(720px, 70%);
+  height: auto;
   pointer-events: none;
 }
 
 .stujo-header-logo {
   position: absolute;
-  top: 1.5em;
-  left: 1.5em;
-  width: 13%;
-  max-width: 180px;
+  top: 16px;
+  left: 16px;
+  width: clamp(136px, 13%, 180px);
   height: auto;
   object-fit: contain;
 }
 
 .stujo-header-topnav {
   position: absolute;
-  top: 1.2em;
+  /* Clear the minimum-size wedge at tablet widths, then approach the
+     original desktop position continuously as more room becomes available. */
+  top: clamp(1.2em, calc(300px - 26vw), 100px);
   right: 1.5em;
   display: flex;
   gap: 1.5rem;
@@ -143,22 +205,62 @@ a:focus {
   color: var(--stujo-secondary);
 }
 
+.stujo-header-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+}
+
+button.stujo-header-action {
+  padding: 0;
+  border: 0;
+  color: #fff;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+}
+
+button.stujo-header-action:hover {
+  color: var(--stujo-secondary);
+}
+
+.stujo-header-action--uppercase {
+  text-transform: uppercase;
+}
+
+.stujo-header-action-icon {
+  width: 1.2em;
+  height: 1.2em;
+  flex: none;
+}
+
 /* DE | EN switch (live: slider toggle in the upper-right header nav) */
 .stujo-lang-switch {
   display: flex;
-  gap: 0.4rem;
+  align-items: center;
   color: #fff;
 }
 
 .stujo-lang-switch a {
-  opacity: 0.65;
+  color: #fff;
 }
 
 .stujo-lang-switch a.stujo-lang--active,
 .stujo-lang-switch a:hover {
-  opacity: 1;
   color: #fff;
-  text-decoration: underline;
+}
+
+.stujo-lang-switch .stujo-lang-toggle {
+  display: block;
+  width: 3em;
+  height: 3em;
+}
+
+.stujo-lang-toggle img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .stujo-nav {
@@ -174,12 +276,15 @@ a:focus {
 .stujo-nav a {
   display: flex;
   align-items: center;
+  min-width: 0;
+  max-width: 100%;
   color: #fff;
   font-family: var(--stujo-font);
   font-size: 20px;
   font-weight: 700;
   text-transform: uppercase;
   padding: 0.55em 1em;
+  overflow-wrap: anywhere;
 }
 
 .stujo-nav a:hover,
@@ -188,16 +293,14 @@ a:focus {
   color: var(--stujo-primary);
 }
 
-.stujo-nav-home img {
-  height: 1.4em;
-  display: block;
+.stujo-nav-home {
+  min-height: 2.53em;
 }
 
-/* The home glyph is white — invert to pink instead of white so it stays
-   visible in the hover/active state. */
-.stujo-nav a.stujo-nav-home:hover,
-.stujo-nav a.stujo-nav-home.stujo-nav--active {
-  background: var(--stujo-primary);
+.stujo-nav-home-icon {
+  width: 17px;
+  height: 17px;
+  display: block;
 }
 
 /* --- Job list: dotted-rule rows (live /stellenangebote) --- */
@@ -231,8 +334,18 @@ a:focus {
   margin: 0;
 }
 
-.stujo-job-row--featured h3 a {
-  color: var(--stujo-secondary);
+.stujo-job-row--featured {
+  position: relative;
+  isolation: isolate;
+}
+
+.stujo-job-row--featured::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 0 -14px;
+  z-index: -1;
+  background: color-mix(in srgb, var(--stujo-secondary) 7%, white);
+  box-shadow: inset 4px 0 var(--stujo-secondary);
 }
 
 .stujo-badge {
@@ -245,6 +358,17 @@ a:focus {
   margin-right: 0.5rem;
 }
 
+/* Inline links inside muted helper text are still tap targets. 44px minimum on touch,
+   per .cursor/rules/mobile-responsive-design.mdc; desktop keeps the inline flow. */
+@media (hover: none) and (pointer: coarse) {
+  .stujo-muted a {
+    display: inline-flex;
+    align-items: center;
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
+
 .stujo-muted {
   color: var(--stujo-muted);
   font-size: 0.95em;
@@ -254,19 +378,19 @@ a:focus {
 
 .stujo-filterband {
   background: var(--stujo-gradient);
-  padding: 1.25rem;
-  margin: 1rem 0 1.5rem;
+  padding: 1.25rem 0;
+  margin: 0 0 1.5rem;
 }
 
 .stujo-filterbar {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 0.75rem;
 }
 
-@media (max-width: 640px) {
+@media (min-width: 641px) {
   .stujo-filterbar {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
   }
 }
 
@@ -280,7 +404,7 @@ a:focus {
   color: var(--stujo-text);
   background: #fff;
   border: 2px solid var(--stujo-border);
-  border-radius: 0;
+  border-radius: 4px;
 }
 
 .stujo-filterbar .stujo-filter-search {
@@ -290,17 +414,48 @@ a:focus {
 
 .stujo-filterbar .stujo-filter-search input {
   flex: 1;
+  min-width: 0;
+  border-right: 0;
+  border-radius: 4px 0 0 4px;
 }
 
 .stujo-filterbar .stujo-filter-search button {
   height: 34px;
   width: 44px;
   border: none;
+  border-radius: 0 4px 4px 0;
   cursor: pointer;
   background: var(--stujo-secondary);
   color: #fff;
-  font-size: 16px;
-  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stujo-filterbar .stujo-filter-search button:hover,
+.stujo-filterbar .stujo-filter-search button:focus-visible {
+  opacity: 0.9;
+}
+
+.stujo-filter-search-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.stujo-results {
+  padding-bottom: 1.5rem;
+}
+
+@media (max-width: 640px) {
+  .stujo-filterbar select,
+  .stujo-filterbar input,
+  .stujo-filterbar .stujo-filter-search button {
+    height: 44px;
+  }
+
+  .stujo-filterbar .stujo-filter-search button {
+    width: 52px;
+  }
 }
 
 /* --- Landing (partials/_university_landing.scss) --- */
@@ -309,8 +464,20 @@ a:focus {
   background: var(--stujo-gradient);
   color: #fff;
   text-align: center;
-  padding: 3rem 1.5rem;
+  padding: 2em 0;
+  margin-bottom: 2em;
   font-family: var(--stujo-font);
+}
+
+.stujo-hero-content {
+  width: 100%;
+  margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+  .stujo-hero-content {
+    width: 83.3333%;
+  }
 }
 
 .stujo-hero-claim {
@@ -325,14 +492,18 @@ a:focus {
   margin: 0 auto;
   color: #fff;
   font-size: 1.5em;
-  max-width: 46em;
+}
+
+.stujo-hero-tagline {
+  margin-top: 1em;
+  font-weight: bold;
 }
 
 .stujo-landing-cols {
   display: grid;
   grid-template-columns: 3fr 2fr;
   gap: 2.5rem;
-  padding: 1.5rem 0;
+  padding: 1.5rem 1rem;
 }
 
 @media (max-width: 768px) {
@@ -440,10 +611,17 @@ a:focus {
   margin-bottom: 1rem;
 }
 
+.stujo-dash-head > div {
+  min-width: 0;
+  max-width: 100%;
+}
+
 /* Company picker, shown only when a user may post for several organizations. */
 .stujo-org-switcher {
   display: flex;
   flex-direction: column;
+  min-width: 0;
+  max-width: 100%;
   gap: 0.2rem;
   margin: 0.25rem 0 0.75rem;
   font-size: 0.8rem;
@@ -451,6 +629,8 @@ a:focus {
 
 .stujo-org-switcher select {
   /* Mobile first: full width, comfortable touch target. */
+  width: 100%;
+  max-width: 100%;
   min-height: 44px;
   padding: 0.3rem 0.6rem;
   font-family: inherit;
@@ -469,16 +649,18 @@ a:focus {
 }
 
 .stujo-stats {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 8rem), 1fr));
   gap: 1rem;
   margin: 1rem 0 1.5rem;
 }
 
 .stujo-stat {
-  flex: 1;
+  min-width: 0;
   background: #f6f6f4;
   border: 2px solid var(--stujo-border);
   padding: 1rem;
+  overflow-wrap: anywhere;
 }
 
 .stujo-stat--accent {
@@ -489,6 +671,92 @@ a:focus {
   font-size: 1.8em;
   font-weight: bold;
   color: var(--stujo-primary);
+}
+
+.stujo-posting-list {
+  display: grid;
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stujo-posting-card {
+  min-width: 0;
+  padding: 1rem;
+  border: 2px solid var(--stujo-border);
+  background: #fff;
+}
+
+.stujo-posting-card-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.stujo-posting-card-title {
+  min-width: 0;
+  margin: 0;
+  font-size: 1.1em;
+  overflow-wrap: anywhere;
+}
+
+.stujo-posting-card-title a {
+  color: var(--stujo-primary);
+}
+
+.stujo-posting-card-title a:hover {
+  color: var(--stujo-grey);
+}
+
+.stujo-posting-details {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem 1rem;
+  margin: 1rem 0;
+}
+
+.stujo-posting-details > div:first-child {
+  grid-column: 1 / -1;
+}
+
+.stujo-posting-details dt {
+  color: var(--stujo-grey);
+  font-size: 0.8em;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.stujo-posting-details dd {
+  margin: 0.2rem 0 0;
+  overflow-wrap: anywhere;
+}
+
+.stujo-posting-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.stujo-posting-actions > * {
+  flex-shrink: 0;
+}
+
+.stujo-postings-table {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .stujo-posting-list {
+    display: none;
+  }
+
+  .stujo-postings-table {
+    display: table;
+  }
 }
 
 .stujo-table {
@@ -535,6 +803,7 @@ a:focus {
 
 .stujo-steps {
   display: flex;
+  flex-wrap: wrap;
   gap: 1.5rem;
   margin: 0.75rem 0 1.25rem;
 }
@@ -559,14 +828,17 @@ a:focus {
 
 .stujo-form-row {
   display: flex;
+  flex-wrap: wrap;
   gap: 1rem;
 }
 
 .stujo-form-row .stujo-field {
-  flex: 1;
+  flex: 1 1 12rem;
 }
 
 .stujo-field {
+  min-width: 0;
+  overflow-wrap: anywhere;
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
@@ -578,6 +850,8 @@ a:focus {
 .stujo-field input,
 .stujo-field select,
 .stujo-field textarea {
+  width: 100%;
+  min-width: 0;
   font-family: inherit;
   font-weight: 400;
   font-size: 14px;
@@ -589,8 +863,52 @@ a:focus {
 
 .stujo-form-actions {
   display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
   justify-content: space-between;
   margin-top: 0.5rem;
+}
+
+/* Consent checkbox at the point of purchase. Not .stujo-field: that is a
+   column layout and forces bold labels. */
+/* Legal documents (AGB). Narrow measure and generous spacing so long clauses
+   stay readable. */
+.stujo-legal {
+  max-width: 46em;
+  line-height: 1.6;
+}
+
+.stujo-legal h2 {
+  margin-top: 2em;
+  margin-bottom: 0.4em;
+  font-size: 1.1rem;
+}
+
+.stujo-legal p {
+  margin: 0 0 0.9em;
+}
+
+.stujo-legal-date {
+  margin-top: 3em;
+  font-size: 0.85em;
+  opacity: 0.7;
+}
+
+.stujo-consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  margin: 1rem 0 0;
+  max-width: 30rem;
+  font-size: 0.9em;
+  line-height: 1.4;
+}
+
+.stujo-consent input[type='checkbox'] {
+  margin-top: 0.2rem;
+  flex-shrink: 0;
+  width: 1rem;
+  height: 1rem;
 }
 
 .stujo-order-box {
@@ -672,8 +990,14 @@ a:focus {
 
 .stujo-footer-cols {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr) repeat(2, minmax(0, 1fr));
   gap: 2rem;
+}
+
+@media (min-width: 901px) {
+  .stujo-footer-cols > :nth-child(2) {
+    padding-left: 1rem;
+  }
 }
 
 @media (max-width: 900px) {
@@ -696,11 +1020,23 @@ a:focus {
 
 .stujo-footer a {
   color: #fff;
-  display: block;
-  margin-bottom: 0.5em;
 }
 
-.stujo-footer a:hover {
+.stujo-footer-links {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.stujo-footer-links a {
+  display: inline-block;
+  width: fit-content;
+  margin-bottom: 0.1em;
+  padding: 0.3em 0.45em;
+}
+
+.stujo-footer-links a:hover,
+.stujo-footer-links a:focus-visible {
   color: var(--stujo-primary);
   background: #fff;
 }
@@ -710,12 +1046,37 @@ a:focus {
   text-align: justify;
 }
 
+.stujo-footer-logo-link {
+  display: block;
+  width: fit-content;
+  background: #fff;
+  padding: 10px 20px;
+  margin-bottom: 0.6em;
+}
+
+.stujo-footer-logo-link:hover,
+.stujo-footer-logo-link:focus-visible {
+  background: #fff;
+}
+
 .stujo-footer-logo {
   display: block;
   width: 140px;
-  background: #fff;
-  padding: 4px;
-  margin-bottom: 0.6em;
+  height: auto;
+}
+
+@media (max-width: 640px) {
+  .stujo-header-action,
+  .stujo-footer-links a {
+    min-width: 44px;
+    min-height: 44px;
+    touch-action: manipulation;
+  }
+
+  .stujo-footer-links a {
+    display: inline-flex;
+    align-items: center;
+  }
 }
 
 /* --- Misc --- */
@@ -729,4 +1090,80 @@ a:focus {
 
 .stujo-section-head h2 {
   margin: 0;
+}
+
+/* Visible mobile account actions and navigation, using the desktop branding. */
+@media (max-width: 767px) {
+  .stujo-header {
+    height: auto;
+    min-height: 210px;
+    padding: 100px 16px 16px;
+  }
+
+  .stujo-header-topnav {
+    position: static;
+    display: grid;
+    grid-template-columns: max-content max-content;
+    justify-content: end;
+    gap: 2px 22px;
+    width: 100%;
+    font-size: 15px;
+  }
+
+  .stujo-header-topnav .stujo-header-action {
+    min-height: 44px;
+  }
+
+  .stujo-header-topnav > button {
+    grid-column: 2;
+  }
+
+  .stujo-lang-switch {
+    grid-column: 1 / -1;
+    justify-self: end;
+  }
+
+  .stujo-lang-switch > a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .stujo-lang-switch .stujo-lang-toggle {
+    width: 44px;
+    height: 44px;
+  }
+
+  .stujo-posting-actions > * {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .stujo-hero-claim {
+    overflow-wrap: anywhere;
+  }
+
+  .stujo-landing-cols > div,
+  .stujo-job-row > div {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .stujo-job-row {
+    flex-wrap: wrap;
+  }
+
+  .stujo-job-row > div {
+    flex: 1 1 220px;
+  }
+}
+
+@media (max-width: 280px) {
+  .stujo-nav a {
+    padding-right: 0.75em;
+    padding-left: 0.75em;
+    font-size: 16px;
+  }
 }

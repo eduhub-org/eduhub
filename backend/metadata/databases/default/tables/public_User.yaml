@@ -182,7 +182,7 @@ select_permissions:
                             _eq: CONFIRMED
       limit: 100
   # Org admins with canManageSettings may read contact details of users they administer (and their
-  # own record) when managing an organization's admin team on /manage/admin-users. status/updated_at
+  # own record) when managing an organization's admin team on /manage/settings/access. status/updated_at
   # /zipCode/country are needed by the shared user-search picker (SelectUserDialog, also used to add
   # course instructors); the row filter still masks these values for users they do not administer.
   - role: org_admin_access
@@ -209,6 +209,8 @@ select_permissions:
                     - canManageSettings:
                         _eq: true
       limit: 100
+      # The admin table on /manage/settings/access is paginated and reads User_aggregate { count }.
+      allow_aggregations: true
 update_permissions:
   - role: user_access
     permission:

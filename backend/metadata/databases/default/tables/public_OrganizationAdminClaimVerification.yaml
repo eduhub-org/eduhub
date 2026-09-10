@@ -1,0 +1,21 @@
+table:
+  name: OrganizationAdminClaimVerification
+  schema: public
+array_relationships:
+  - name: OrganizationAdmins
+    using:
+      foreign_key_constraint_on:
+        column: claimVerification
+        table:
+          name: OrganizationAdmin
+          schema: public
+select_permissions:
+  # Readable by org admins so the access screen can show the explanation behind a
+  # claim's verification state. The values themselves are not sensitive; which
+  # grants carry them is, and that is scoped by the OrganizationAdmin permission.
+  - role: org_admin_access
+    permission:
+      columns:
+        - value
+        - comment
+      filter: {}

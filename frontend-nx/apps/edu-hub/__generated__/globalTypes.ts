@@ -275,11 +275,9 @@ export enum AppSettings_update_column {
   faqCollectionName = "faqCollectionName",
   faviconUrl = "faviconUrl",
   guestDataRetentionMonths = "guestDataRetentionMonths",
-  imprintUrl = "imprintUrl",
   logoUrl = "logoUrl",
   previewImageURL = "previewImageURL",
   primaryColor = "primaryColor",
-  privacyUrl = "privacyUrl",
   secondaryColor = "secondaryColor",
   showFaqSection = "showFaqSection",
   timeZone = "timeZone",
@@ -1001,6 +999,7 @@ export enum Invoice_select_column {
   stripeCheckoutSessionId = "stripeCheckoutSessionId",
   stripeHostedInvoiceUrl = "stripeHostedInvoiceUrl",
   stripeInvoiceId = "stripeInvoiceId",
+  stripeInvoiceNumber = "stripeInvoiceNumber",
   stripeInvoicePdfUrl = "stripeInvoicePdfUrl",
   stripePaymentIntentId = "stripePaymentIntentId",
   updated_at = "updated_at",
@@ -1027,6 +1026,7 @@ export enum Invoice_update_column {
   stripeCheckoutSessionId = "stripeCheckoutSessionId",
   stripeHostedInvoiceUrl = "stripeHostedInvoiceUrl",
   stripeInvoiceId = "stripeInvoiceId",
+  stripeInvoiceNumber = "stripeInvoiceNumber",
   stripeInvoicePdfUrl = "stripeInvoicePdfUrl",
   stripePaymentIntentId = "stripePaymentIntentId",
   updated_at = "updated_at",
@@ -1129,7 +1129,6 @@ export enum JobPortal_update_column {
  */
 export enum JobPostingCredit_constraint {
   JobPostingCredit_organizationId_jobPostingType_key = "JobPostingCredit_organizationId_jobPostingType_key",
-  JobPostingCredit_organizationId_untyped_unique = "JobPostingCredit_organizationId_untyped_unique",
   JobPostingCredit_pkey = "JobPostingCredit_pkey",
 }
 
@@ -1142,22 +1141,7 @@ export enum JobPostingCredit_select_column {
   jobPostingType = "jobPostingType",
   organizationId = "organizationId",
   remaining = "remaining",
-  unlimited = "unlimited",
   updated_at = "updated_at",
-}
-
-/**
- * select "JobPostingCredit_aggregate_bool_exp_bool_and_arguments_columns" columns of table "JobPostingCredit"
- */
-export enum JobPostingCredit_select_column_JobPostingCredit_aggregate_bool_exp_bool_and_arguments_columns {
-  unlimited = "unlimited",
-}
-
-/**
- * select "JobPostingCredit_aggregate_bool_exp_bool_or_arguments_columns" columns of table "JobPostingCredit"
- */
-export enum JobPostingCredit_select_column_JobPostingCredit_aggregate_bool_exp_bool_or_arguments_columns {
-  unlimited = "unlimited",
 }
 
 /**
@@ -1169,7 +1153,6 @@ export enum JobPostingCredit_update_column {
   jobPostingType = "jobPostingType",
   organizationId = "organizationId",
   remaining = "remaining",
-  unlimited = "unlimited",
   updated_at = "updated_at",
 }
 
@@ -1328,6 +1311,7 @@ export enum JobPosting_select_column {
   slug = "slug",
   startText = "startText",
   status = "status",
+  termsAcceptedAt = "termsAcceptedAt",
   title = "title",
   type = "type",
   updated_at = "updated_at",
@@ -1384,6 +1368,7 @@ export enum JobPosting_update_column {
   slug = "slug",
   startText = "startText",
   status = "status",
+  termsAcceptedAt = "termsAcceptedAt",
   title = "title",
   type = "type",
   updated_at = "updated_at",
@@ -1541,6 +1526,8 @@ export enum MailTemplateType_enum {
   INVITATION_EXPIRING_SOON = "INVITATION_EXPIRING_SOON",
   INVITE = "INVITE",
   JOB_ALERT = "JOB_ALERT",
+  JOB_ORGANIZATION_ACCESS_REQUEST = "JOB_ORGANIZATION_ACCESS_REQUEST",
+  JOB_ORGANIZATION_CLAIMED = "JOB_ORGANIZATION_CLAIMED",
   JOB_POSTING_ADMIN_NOTICE = "JOB_POSTING_ADMIN_NOTICE",
   JOB_POSTING_EXPIRED = "JOB_POSTING_EXPIRED",
   JOB_POSTING_PAYMENT_FAILED = "JOB_POSTING_PAYMENT_FAILED",
@@ -1638,6 +1625,21 @@ export enum MotivationRating_update_column {
 }
 
 /**
+ * unique or primary key constraints on table "OrganizationAdminClaimVerification"
+ */
+export enum OrganizationAdminClaimVerification_constraint {
+  OrganizationAdminClaimVerification_pkey = "OrganizationAdminClaimVerification_pkey",
+}
+
+/**
+ * update columns of table "OrganizationAdminClaimVerification"
+ */
+export enum OrganizationAdminClaimVerification_update_column {
+  comment = "comment",
+  value = "value",
+}
+
+/**
  * unique or primary key constraints on table "OrganizationAdmin"
  */
 export enum OrganizationAdmin_constraint {
@@ -1649,11 +1651,13 @@ export enum OrganizationAdmin_constraint {
  * select columns of table "OrganizationAdmin"
  */
 export enum OrganizationAdmin_select_column {
+  authorizationDeclaredAt = "authorizationDeclaredAt",
   canManageCourses = "canManageCourses",
   canManageDegrees = "canManageDegrees",
   canManageEvents = "canManageEvents",
   canManageJobs = "canManageJobs",
   canManageSettings = "canManageSettings",
+  claimVerification = "claimVerification",
   created_at = "created_at",
   id = "id",
   organizationId = "organizationId",
@@ -1687,11 +1691,13 @@ export enum OrganizationAdmin_select_column_OrganizationAdmin_aggregate_bool_exp
  * update columns of table "OrganizationAdmin"
  */
 export enum OrganizationAdmin_update_column {
+  authorizationDeclaredAt = "authorizationDeclaredAt",
   canManageCourses = "canManageCourses",
   canManageDegrees = "canManageDegrees",
   canManageEvents = "canManageEvents",
   canManageJobs = "canManageJobs",
   canManageSettings = "canManageSettings",
+  claimVerification = "claimVerification",
   created_at = "created_at",
   id = "id",
   organizationId = "organizationId",
@@ -2731,6 +2737,7 @@ export enum UserStatus_update_column {
  */
 export enum User_constraint {
   Person_AnonymId_key = "Person_AnonymId_key",
+  User_email_guest_key = "User_email_guest_key",
   User_email_non_guest_key = "User_email_non_guest_key",
   User_pkey = "User_pkey",
 }
@@ -3686,11 +3693,9 @@ export interface AppSettings_bool_exp {
   faqCollectionName?: String_comparison_exp | null;
   faviconUrl?: String_comparison_exp | null;
   guestDataRetentionMonths?: Int_comparison_exp | null;
-  imprintUrl?: String_comparison_exp | null;
   logoUrl?: String_comparison_exp | null;
   previewImageURL?: String_comparison_exp | null;
   primaryColor?: String_comparison_exp | null;
-  privacyUrl?: String_comparison_exp | null;
   secondaryColor?: String_comparison_exp | null;
   showFaqSection?: Boolean_comparison_exp | null;
   timeZone?: String_comparison_exp | null;
@@ -3713,11 +3718,9 @@ export interface AppSettings_insert_input {
   faqCollectionName?: string | null;
   faviconUrl?: string | null;
   guestDataRetentionMonths?: number | null;
-  imprintUrl?: string | null;
   logoUrl?: string | null;
   previewImageURL?: string | null;
   primaryColor?: string | null;
-  privacyUrl?: string | null;
   secondaryColor?: string | null;
   showFaqSection?: boolean | null;
   timeZone?: string | null;
@@ -6792,6 +6795,7 @@ export interface Invoice_bool_exp {
   stripeCheckoutSessionId?: String_comparison_exp | null;
   stripeHostedInvoiceUrl?: String_comparison_exp | null;
   stripeInvoiceId?: String_comparison_exp | null;
+  stripeInvoiceNumber?: String_comparison_exp | null;
   stripeInvoicePdfUrl?: String_comparison_exp | null;
   stripePaymentIntentId?: String_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
@@ -6823,6 +6827,7 @@ export interface Invoice_insert_input {
   stripeCheckoutSessionId?: string | null;
   stripeHostedInvoiceUrl?: string | null;
   stripeInvoiceId?: string | null;
+  stripeInvoiceNumber?: string | null;
   stripeInvoicePdfUrl?: string | null;
   stripePaymentIntentId?: string | null;
   updated_at?: any | null;
@@ -6848,6 +6853,7 @@ export interface Invoice_max_order_by {
   stripeCheckoutSessionId?: order_by | null;
   stripeHostedInvoiceUrl?: order_by | null;
   stripeInvoiceId?: order_by | null;
+  stripeInvoiceNumber?: order_by | null;
   stripeInvoicePdfUrl?: order_by | null;
   stripePaymentIntentId?: order_by | null;
   updated_at?: order_by | null;
@@ -6873,6 +6879,7 @@ export interface Invoice_min_order_by {
   stripeCheckoutSessionId?: order_by | null;
   stripeHostedInvoiceUrl?: order_by | null;
   stripeInvoiceId?: order_by | null;
+  stripeInvoiceNumber?: order_by | null;
   stripeInvoicePdfUrl?: order_by | null;
   stripePaymentIntentId?: order_by | null;
   updated_at?: order_by | null;
@@ -7205,23 +7212,7 @@ export interface JobPortal_variance_order_by {
 }
 
 export interface JobPostingCredit_aggregate_bool_exp {
-  bool_and?: JobPostingCredit_aggregate_bool_exp_bool_and | null;
-  bool_or?: JobPostingCredit_aggregate_bool_exp_bool_or | null;
   count?: JobPostingCredit_aggregate_bool_exp_count | null;
-}
-
-export interface JobPostingCredit_aggregate_bool_exp_bool_and {
-  arguments: JobPostingCredit_select_column_JobPostingCredit_aggregate_bool_exp_bool_and_arguments_columns;
-  distinct?: boolean | null;
-  filter?: JobPostingCredit_bool_exp | null;
-  predicate: Boolean_comparison_exp;
-}
-
-export interface JobPostingCredit_aggregate_bool_exp_bool_or {
-  arguments: JobPostingCredit_select_column_JobPostingCredit_aggregate_bool_exp_bool_or_arguments_columns;
-  distinct?: boolean | null;
-  filter?: JobPostingCredit_bool_exp | null;
-  predicate: Boolean_comparison_exp;
 }
 
 export interface JobPostingCredit_aggregate_bool_exp_count {
@@ -7279,7 +7270,6 @@ export interface JobPostingCredit_bool_exp {
   jobPostingType?: JobPostingType_enum_comparison_exp | null;
   organizationId?: Int_comparison_exp | null;
   remaining?: Int_comparison_exp | null;
-  unlimited?: Boolean_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
 }
 
@@ -7294,7 +7284,6 @@ export interface JobPostingCredit_insert_input {
   jobPostingType?: JobPostingType_enum | null;
   organizationId?: number | null;
   remaining?: number | null;
-  unlimited?: boolean | null;
   updated_at?: any | null;
 }
 
@@ -7724,6 +7713,7 @@ export interface JobPosting_bool_exp {
   slug?: String_comparison_exp | null;
   startText?: String_comparison_exp | null;
   status?: JobPostingStatus_enum_comparison_exp | null;
+  termsAcceptedAt?: timestamptz_comparison_exp | null;
   title?: String_comparison_exp | null;
   type?: JobPostingType_enum_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
@@ -7772,6 +7762,7 @@ export interface JobPosting_insert_input {
   slug?: string | null;
   startText?: string | null;
   status?: JobPostingStatus_enum | null;
+  termsAcceptedAt?: any | null;
   title?: string | null;
   type?: JobPostingType_enum | null;
   updated_at?: any | null;
@@ -7805,6 +7796,7 @@ export interface JobPosting_max_order_by {
   shortDescription?: order_by | null;
   slug?: order_by | null;
   startText?: order_by | null;
+  termsAcceptedAt?: order_by | null;
   title?: order_by | null;
   updated_at?: order_by | null;
   views?: order_by | null;
@@ -7836,6 +7828,7 @@ export interface JobPosting_min_order_by {
   shortDescription?: order_by | null;
   slug?: order_by | null;
   startText?: order_by | null;
+  termsAcceptedAt?: order_by | null;
   title?: order_by | null;
   updated_at?: order_by | null;
   views?: order_by | null;
@@ -8663,6 +8656,45 @@ export interface MotivationRating_order_by {
   value?: order_by | null;
 }
 
+/**
+ * Boolean expression to filter rows from the table "OrganizationAdminClaimVerification". All fields are combined with a logical 'AND'.
+ */
+export interface OrganizationAdminClaimVerification_bool_exp {
+  OrganizationAdmins?: OrganizationAdmin_bool_exp | null;
+  OrganizationAdmins_aggregate?: OrganizationAdmin_aggregate_bool_exp | null;
+  _and?: OrganizationAdminClaimVerification_bool_exp[] | null;
+  _not?: OrganizationAdminClaimVerification_bool_exp | null;
+  _or?: OrganizationAdminClaimVerification_bool_exp[] | null;
+  comment?: String_comparison_exp | null;
+  value?: String_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "OrganizationAdminClaimVerification"
+ */
+export interface OrganizationAdminClaimVerification_insert_input {
+  OrganizationAdmins?: OrganizationAdmin_arr_rel_insert_input | null;
+  comment?: string | null;
+  value?: string | null;
+}
+
+/**
+ * input type for inserting object relation for remote table "OrganizationAdminClaimVerification"
+ */
+export interface OrganizationAdminClaimVerification_obj_rel_insert_input {
+  data: OrganizationAdminClaimVerification_insert_input;
+  on_conflict?: OrganizationAdminClaimVerification_on_conflict | null;
+}
+
+/**
+ * on_conflict condition type for table "OrganizationAdminClaimVerification"
+ */
+export interface OrganizationAdminClaimVerification_on_conflict {
+  constraint: OrganizationAdminClaimVerification_constraint;
+  update_columns: OrganizationAdminClaimVerification_update_column[];
+  where?: OrganizationAdminClaimVerification_bool_exp | null;
+}
+
 export interface OrganizationAdmin_aggregate_bool_exp {
   bool_and?: OrganizationAdmin_aggregate_bool_exp_bool_and | null;
   bool_or?: OrganizationAdmin_aggregate_bool_exp_bool_or | null;
@@ -8727,16 +8759,19 @@ export interface OrganizationAdmin_avg_order_by {
  * Boolean expression to filter rows from the table "OrganizationAdmin". All fields are combined with a logical 'AND'.
  */
 export interface OrganizationAdmin_bool_exp {
+  ClaimVerification?: OrganizationAdminClaimVerification_bool_exp | null;
   Organization?: Organization_bool_exp | null;
   User?: User_bool_exp | null;
   _and?: OrganizationAdmin_bool_exp[] | null;
   _not?: OrganizationAdmin_bool_exp | null;
   _or?: OrganizationAdmin_bool_exp[] | null;
+  authorizationDeclaredAt?: timestamptz_comparison_exp | null;
   canManageCourses?: Boolean_comparison_exp | null;
   canManageDegrees?: Boolean_comparison_exp | null;
   canManageEvents?: Boolean_comparison_exp | null;
   canManageJobs?: Boolean_comparison_exp | null;
   canManageSettings?: Boolean_comparison_exp | null;
+  claimVerification?: String_comparison_exp | null;
   created_at?: timestamptz_comparison_exp | null;
   id?: Int_comparison_exp | null;
   organizationId?: Int_comparison_exp | null;
@@ -8748,13 +8783,16 @@ export interface OrganizationAdmin_bool_exp {
  * input type for inserting data into table "OrganizationAdmin"
  */
 export interface OrganizationAdmin_insert_input {
+  ClaimVerification?: OrganizationAdminClaimVerification_obj_rel_insert_input | null;
   Organization?: Organization_obj_rel_insert_input | null;
   User?: User_obj_rel_insert_input | null;
+  authorizationDeclaredAt?: any | null;
   canManageCourses?: boolean | null;
   canManageDegrees?: boolean | null;
   canManageEvents?: boolean | null;
   canManageJobs?: boolean | null;
   canManageSettings?: boolean | null;
+  claimVerification?: string | null;
   created_at?: any | null;
   id?: number | null;
   organizationId?: number | null;
@@ -8766,6 +8804,8 @@ export interface OrganizationAdmin_insert_input {
  * order by max() on columns of table "OrganizationAdmin"
  */
 export interface OrganizationAdmin_max_order_by {
+  authorizationDeclaredAt?: order_by | null;
+  claimVerification?: order_by | null;
   created_at?: order_by | null;
   id?: order_by | null;
   organizationId?: order_by | null;
@@ -8777,6 +8817,8 @@ export interface OrganizationAdmin_max_order_by {
  * order by min() on columns of table "OrganizationAdmin"
  */
 export interface OrganizationAdmin_min_order_by {
+  authorizationDeclaredAt?: order_by | null;
+  claimVerification?: order_by | null;
   created_at?: order_by | null;
   id?: order_by | null;
   organizationId?: order_by | null;
@@ -8791,24 +8833,6 @@ export interface OrganizationAdmin_on_conflict {
   constraint: OrganizationAdmin_constraint;
   update_columns: OrganizationAdmin_update_column[];
   where?: OrganizationAdmin_bool_exp | null;
-}
-
-/**
- * Ordering options when selecting data from "OrganizationAdmin".
- */
-export interface OrganizationAdmin_order_by {
-  Organization?: Organization_order_by | null;
-  User?: User_order_by | null;
-  canManageCourses?: order_by | null;
-  canManageDegrees?: order_by | null;
-  canManageEvents?: order_by | null;
-  canManageJobs?: order_by | null;
-  canManageSettings?: order_by | null;
-  created_at?: order_by | null;
-  id?: order_by | null;
-  organizationId?: order_by | null;
-  updated_at?: order_by | null;
-  userId?: order_by | null;
 }
 
 /**
@@ -9036,6 +9060,86 @@ export interface OrganizationNewsletterSubscription_variance_order_by {
 }
 
 /**
+ * Boolean expression to filter rows from the table "OrganizationSettings". All fields are combined with a logical 'AND'.
+ */
+export interface OrganizationSettings_bool_exp {
+  Organization?: Organization_bool_exp | null;
+  OrganizationAdmins?: OrganizationAdmin_bool_exp | null;
+  OrganizationAdmins_aggregate?: OrganizationAdmin_aggregate_bool_exp | null;
+  _and?: OrganizationSettings_bool_exp[] | null;
+  _not?: OrganizationSettings_bool_exp | null;
+  _or?: OrganizationSettings_bool_exp[] | null;
+  apiKeyHash?: String_comparison_exp | null;
+  bankName?: String_comparison_exp | null;
+  defaultTaxExemptionNote?: String_comparison_exp | null;
+  defaultVatRate?: numeric_comparison_exp | null;
+  ghostNewsletterApiKeyConfigured?: Boolean_comparison_exp | null;
+  id?: Int_comparison_exp | null;
+  invoiceFooterText?: String_comparison_exp | null;
+  invoiceNumberPrefix?: String_comparison_exp | null;
+  legalForm?: String_comparison_exp | null;
+  legalName?: String_comparison_exp | null;
+  managingDirector?: String_comparison_exp | null;
+  registerCourt?: String_comparison_exp | null;
+  registerNumber?: String_comparison_exp | null;
+  taxNumber?: String_comparison_exp | null;
+  vatId?: String_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "OrganizationSettings"
+ */
+export interface OrganizationSettings_insert_input {
+  Organization?: Organization_obj_rel_insert_input | null;
+  OrganizationAdmins?: OrganizationAdmin_arr_rel_insert_input | null;
+  apiKeyHash?: string | null;
+  bankName?: string | null;
+  defaultTaxExemptionNote?: string | null;
+  defaultVatRate?: any | null;
+  ghostNewsletterApiKeyConfigured?: boolean | null;
+  id?: number | null;
+  invoiceFooterText?: string | null;
+  invoiceNumberPrefix?: string | null;
+  legalForm?: string | null;
+  legalName?: string | null;
+  managingDirector?: string | null;
+  registerCourt?: string | null;
+  registerNumber?: string | null;
+  taxNumber?: string | null;
+  vatId?: string | null;
+}
+
+/**
+ * input type for inserting object relation for remote table "OrganizationSettings"
+ */
+export interface OrganizationSettings_obj_rel_insert_input {
+  data: OrganizationSettings_insert_input;
+}
+
+/**
+ * Ordering options when selecting data from "OrganizationSettings".
+ */
+export interface OrganizationSettings_order_by {
+  Organization?: Organization_order_by | null;
+  OrganizationAdmins_aggregate?: OrganizationAdmin_aggregate_order_by | null;
+  apiKeyHash?: order_by | null;
+  bankName?: order_by | null;
+  defaultTaxExemptionNote?: order_by | null;
+  defaultVatRate?: order_by | null;
+  ghostNewsletterApiKeyConfigured?: order_by | null;
+  id?: order_by | null;
+  invoiceFooterText?: order_by | null;
+  invoiceNumberPrefix?: order_by | null;
+  legalForm?: order_by | null;
+  legalName?: order_by | null;
+  managingDirector?: order_by | null;
+  registerCourt?: order_by | null;
+  registerNumber?: order_by | null;
+  taxNumber?: order_by | null;
+  vatId?: order_by | null;
+}
+
+/**
  * Boolean expression to filter rows from the table "OrganizationType". All fields are combined with a logical 'AND'.
  */
 export interface OrganizationType_bool_exp {
@@ -9176,6 +9280,7 @@ export interface Organization_bool_exp {
   Programs_aggregate?: Program_aggregate_bool_exp | null;
   Projects?: Project_bool_exp | null;
   Projects_aggregate?: Project_aggregate_bool_exp | null;
+  Settings?: OrganizationSettings_bool_exp | null;
   Users?: User_bool_exp | null;
   Users_aggregate?: User_aggregate_bool_exp | null;
   _and?: Organization_bool_exp[] | null;
@@ -9242,6 +9347,7 @@ export interface Organization_insert_input {
   OrganizationType?: OrganizationType_obj_rel_insert_input | null;
   Programs?: Program_arr_rel_insert_input | null;
   Projects?: Project_arr_rel_insert_input | null;
+  Settings?: OrganizationSettings_obj_rel_insert_input | null;
   Users?: User_arr_rel_insert_input | null;
   addressLine1?: string | null;
   addressLine2?: string | null;
@@ -9415,6 +9521,7 @@ export interface Organization_order_by {
   OrganizationType?: OrganizationType_order_by | null;
   Programs_aggregate?: Program_aggregate_order_by | null;
   Projects_aggregate?: Project_aggregate_order_by | null;
+  Settings?: OrganizationSettings_order_by | null;
   Users_aggregate?: User_aggregate_order_by | null;
   addressLine1?: order_by | null;
   addressLine2?: order_by | null;

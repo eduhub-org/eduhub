@@ -10,10 +10,6 @@
 export interface UpdateOrganizationApiKeyHash_update_Organization_by_pk {
   __typename: "Organization";
   id: number;
-  /**
-   * SHA-256 hash of the organization API key for participant data access. Plain text keys are never stored.
-   */
-  apiKeyHash: string | null;
 }
 
 export interface UpdateOrganizationApiKeyHash {

@@ -28,7 +28,7 @@ export const theme = createTheme({
     },
   },
   typography: {
-    fontFamily: '"Space Grotesk", sans-serif',
+    fontFamily: '"Plus Jakarta Sans", sans-serif',
   },
   components: {
     MuiButton: {

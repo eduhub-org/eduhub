@@ -154,7 +154,7 @@ All verified against `backend/migrations/` and `backend/metadata/`.
 | PDF/logo uploads (Paperclip, local disk) | GCS via `functions/shared_libs/api_clients/storage_client.py` | Single `BUCKET_NAME` env; blob layout follows the calling function's convention. |
 | Per-portal branding | `AppSettings` (extended, §5) | PK `appName`; current columns: `backgroundImageURL`, `previewImageURL`, `bannerTextDe/En`, `bannerBackgroundColor`, `bannerFontColor`, `timeZone`, `showFaqSection`, `faqCollectionName`, `defaultAttendanceCertificateTemplateId`. |
 | FAQ page | `Faq`/`FaqCollection`/`FaqTranslation` | One collection per portal. |
-| Legal pages | existing mechanism | `docs/LEGAL_DOCUMENTS.md`. |
+| Legal pages | shared components | Done. `/impressum` + `/datenschutz` render `frontend-nx/apps/edu-hub/components/legal/*`; StuJo renders the subset of privacy sections that applies to it, plus a job-postings section EduHub does not have. On a campus edition both pages open with a note that CBB is the provider and the university a cooperation partner. `docs/LEGAL_DOCUMENTS.md`. |
 
 Hasura roles (corrected from the draft): the metadata roles are `anonymous`,
 `user_access`, `instructor_access`, `org_admin_access` (suffix `_access`;
@@ -233,6 +233,13 @@ unique(`userId`,`jobPostingId`). (Saved *companies* are dropped — low value.)
 - `AppSettings` + `logoUrl`, `faviconUrl`, `primaryColor`, `secondaryColor`,
   `imprintUrl`, `privacyUrl`, `defaultLocale`, `domain` text unique nullable.
   Seed rows `stujo`, `stujo-cau`, `stujo-haw-kiel`, `stujo-flensburg`.
+  **`imprintUrl`, `privacyUrl` and the later `termsUrl` were dropped again on
+  2026-09-09** by `..._drop_appsettings_legal_url_columns`, together with their
+  `anonymous` select permission. They were the per-portal escape hatch for
+  legal pages; every portal now serves the in-app `/impressum`,
+  `/datenschutz` and `/agb`, so there is nothing left to override. Nothing had
+  ever written them (there was never an admin UI), so all rows were NULL and no
+  data was lost. `defaultLocale` and `domain` stay.
 
 ### Permissions (mirror `public_Organization.yaml` patterns)
 - `anonymous`: select `PUBLISHED`, non-expired, unrestricted
@@ -325,8 +332,11 @@ posting in the last N years; others are archived, not imported.
    local PDF paths and don't fit the Stripe-shaped `Invoice` table. The Rails
    DB snapshot is archived read-only as the historical record.
 7. **FAQ & static content:** `app/views/pages/faq.html.erb` →
-   `FaqCollection` per portal; AGB/Datenschutz/Impressum via the
-   legal-documents mechanism.
+   `FaqCollection` per portal. AGB/Datenschutz/Impressum are done (2026-09-09):
+   `/agb`, `/datenschutz` and `/impressum` are served in-app, the privacy and
+   imprint text coming from shared edu-hub components so both sites state the
+   same wording -- see `docs/LEGAL_DOCUMENTS.md`. The footer FAQ link is still
+   the only one pointing at `www.stujo.net`.
 
 ### 7.3 Cutover
 1. Deploy alongside; full ETL; QA on a staging domain.
@@ -366,6 +376,40 @@ running `next build apps/edu-hub`, with `tsconfig.base.json` path aliases and
   edu-hub. Portal resolution lives in `apps/stujo` only: host →
   `JobPortal.slug` → `appName` → `AppSettings` theming (CSS variables);
   `*.en.stujo.net` → next-intl `en` locale.
+
+**Harmonization is the direction of travel** (product decision, 2026-08-31).
+As implemented, `apps/stujo` shares infrastructure with edu-hub through the
+`@eduhub/*` alias plus `experimental.externalDir` (the planned root `libs/`
+extraction above has not happened and is no longer a precondition), but its UI
+is a standalone CSS port of the Rails design (`--stujo-*` variables, `stujo-*`
+classes, no Tailwind), so no edu-hub component renders correctly in it. The
+agreed target is the opposite: **StuJo is built from the edu-hub component set,
+and the two apps differ only in design-token values.**
+
+The lever is that edu-hub's Tailwind theme is entirely CSS-variable-driven —
+every colour in `apps/edu-hub/tailwind.config.js` resolves to a `var(--eduhub-*)`
+token defined in `apps/edu-hub/styles/globals.css`. So:
+
+1. `apps/stujo` gets Tailwind, extending `apps/edu-hub/tailwind.config.js` and
+   adding `../edu-hub/components/**` to its `content` globs (without that,
+   Tailwind emits no classes for shared components and they render unstyled).
+2. `apps/stujo/styles/globals.css` redefines the `--eduhub-*` token names with
+   StuJo values (brand → `--stujo-primary` #a71580, etc.), and carries the
+   *light* palette at `:root` — edu-hub's `:root` is its dark palette with
+   `.light` overriding.
+3. Shared components are then used as-is with `variant="eduhub"`; `variant`
+   denotes a style family, not an app.
+4. Translation keys used by shared components (`common.dropdown_selector.*`,
+   `common.notification_snackbar.*`, `common.error/close/ok`) must exist in
+   `apps/stujo/locales/*.json` too — the apps have separate `common` namespaces.
+
+Tailwind preflight starts **off** so the ported Rails markup, which still relies
+on browser defaults for lists, tables and spacing, is not reset. Enabling
+preflight and absorbing the resulting StuJo-wide restyle is the next step on
+this track, to be done on its own rather than inside a feature change. The
+`--stujo-*` layer stays as the app's page chrome; it is never a reason to fork a
+shared component. Rule recorded in `AGENTS.md` (critical rule 10) and
+`.claude/commands/frontend-patterns.md`.
 
 ### 8.2 Pages
 - **Public (SSR/ISR, SEO):** portal landing pages (branded hero + job list

@@ -167,7 +167,7 @@ const ExpandableOrganizationRow: React.FC<ExpandableRowProps> = ({ row, onError 
         />
         <GhostNewsletterCredentialManager
           organizationId={row.id}
-          initiallyConfigured={Boolean(row.ghostNewsletterApiKeyConfigured)}
+          initiallyConfigured={Boolean(row.Settings?.ghostNewsletterApiKeyConfigured)}
           onCredentialSaved={() => {
             void syncGhostNewsletterProvider();
           }}
@@ -480,8 +480,11 @@ const ManageOrganizationsContent: FC<ManageOrganizationsContentProps> = ({
         }
 
         // Check for API keys - if target doesn't have one but a merged org does, transfer it
-        const orgsWithApiKeys = orgsToMerge.filter((org) => org.apiKeyHash != null && org.apiKeyHash !== '');
-        const targetHasApiKey = targetOrg.apiKeyHash != null && targetOrg.apiKeyHash !== '';
+        // Settings is null for an admin without canManageSettings, who then sees no key to transfer.
+        const orgsWithApiKeys = orgsToMerge.filter(
+          (org) => org.Settings?.apiKeyHash != null && org.Settings.apiKeyHash !== ''
+        );
+        const targetHasApiKey = targetOrg.Settings?.apiKeyHash != null && targetOrg.Settings.apiKeyHash !== '';
         const shouldTransferApiKey = !targetHasApiKey && orgsWithApiKeys.length === 1;
 
         // Prepare updates - aliases first
@@ -503,7 +506,7 @@ const ManageOrganizationsContent: FC<ManageOrganizationsContentProps> = ({
             await updateOrganizationApiKeyHash({
               variables: {
                 id: parseInt(targetOrgId, 10),
-                apiKeyHash: orgsWithApiKeys[0].apiKeyHash,
+                apiKeyHash: orgsWithApiKeys[0].Settings?.apiKeyHash,
               },
             });
           } catch (apiKeyError) {

@@ -110,8 +110,18 @@ EduHub integrates with [Stripe](https://stripe.com) to handle course enrollment 
    - Select events to listen for:
      - `checkout.session.completed`
      - `checkout.session.expired`
+     - `checkout.session.async_payment_succeeded`
+     - `checkout.session.async_payment_failed`
      - `payment_intent.payment_failed`
+     - `invoice.finalized`
    - Click **Add endpoint**
+
+   > **`invoice.finalized` is required for StuJo job postings.** Their
+   > confirmation mail carries the invoice PDF, and Stripe finalizes
+   > `invoice_creation` invoices asynchronously, so the PDF often does not exist
+   > yet at `checkout.session.completed`. Without this event the mail falls
+   > through to the `send_pending_job_posting_mails` cron sweep and arrives up to
+   > ~30 minutes late. Nothing fails loudly if you forget it, so check it here.
 
 2. **Get Webhook Signing Secret**:
    - Click on your newly created webhook endpoint
@@ -135,7 +145,10 @@ EduHub integrates with [Stripe](https://stripe.com) to handle course enrollment 
    - Select the same events as staging:
      - `checkout.session.completed`
      - `checkout.session.expired`
+     - `checkout.session.async_payment_succeeded`
+     - `checkout.session.async_payment_failed`
      - `payment_intent.payment_failed`
+     - `invoice.finalized`
    - Click **Add endpoint**
 
 3. **Get Live Webhook Signing Secret**:
@@ -199,9 +212,27 @@ To configure Stripe for staging/production:
    - Triggered when a checkout session expires without payment
    - Updates enrollment: `paymentStatus = FAILED`
 
-3. **`payment_intent.payment_failed`**
+3. **`checkout.session.async_payment_succeeded`**
+   - Delayed payment method (SEPA direct debit) settled
+   - Course: enrollment confirmed. Job posting: invoice `ISSUED` -> `PAID`
+
+4. **`checkout.session.async_payment_failed`**
+   - Delayed payment failed after the fact
+   - Job posting: taken offline (`DRAFT`), invoice `CANCELLED`, employer notified
+
+5. **`payment_intent.payment_failed`**
    - Triggered when a payment attempt fails
    - Updates enrollment: `paymentStatus = FAILED`
+
+6. **`invoice.finalized`**
+   - Stripe has assigned the invoice its document number and rendered the PDF
+   - Backfills `Invoice.stripeInvoiceNumber` / `stripeInvoicePdfUrl` /
+     `stripeHostedInvoiceUrl`
+   - For job postings, releases the confirmation mail with the PDF attached if
+     it was not already sent at checkout time. Handled by
+     `handleJobPostingInvoiceFinalized` in `lib/stripeJobPosting.ts`; the
+     `send_pending_job_posting_mails` cron is the backstop when this event never
+     arrives.
 
 ### Webhook Security
 

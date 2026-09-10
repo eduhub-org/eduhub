@@ -17,8 +17,25 @@ import {
 } from '../../lib/employer';
 import { useEmployerOrganization } from '../../lib/useEmployerOrganization';
 import { resolvePortal, PortalBranding } from '../../lib/portal';
+import { portalHost } from '../../lib/requestHost';
 
 type Props = { portal: PortalBranding };
+
+type JobPosting = {
+  id: number;
+  title: string;
+  type: string;
+  status: string;
+  views: number | null;
+  expiresAt: string | null;
+};
+
+type PostingActionsProps = {
+  posting: JobPosting;
+  publishing: boolean;
+  onPublish: (jobPostingId: number) => void;
+  onArchive: (jobPostingId: number) => void;
+};
 
 // Status label text lives in the `meinStujo.status` translation namespace;
 // only the chip styling is kept here (keyed by the same status value).
@@ -38,6 +55,52 @@ const formatDate = (value: string | null) =>
     ? new Date(value).toLocaleDateString('de-DE', { timeZone: 'Europe/Berlin' })
     : '–';
 
+const PostingActions: FC<PostingActionsProps> = ({
+  posting,
+  publishing,
+  onPublish,
+  onArchive,
+}) => {
+  const t = useTranslations('meinStujo');
+
+  return (
+    <div className="stujo-posting-actions">
+      <Link
+        href={`/mein-stujo/neu?id=${posting.id}`}
+        className="stujo-button-pen"
+        title={t('edit')}
+        aria-label={t('edit')}
+      />
+      {(posting.status === 'DRAFT' || posting.status === 'PENDING_PAYMENT') && (
+        <button
+          className="stujo-btn stujo-btn--small"
+          disabled={publishing}
+          onClick={() => onPublish(posting.id)}
+        >
+          {t('publish')}
+        </button>
+      )}
+      {posting.status === 'EXPIRED' && (
+        <button
+          className="stujo-btn stujo-btn--small"
+          disabled={publishing}
+          onClick={() => onPublish(posting.id)}
+        >
+          {t('repost')}
+        </button>
+      )}
+      {posting.status === 'PUBLISHED' && (
+        <button
+          className="stujo-btn stujo-btn--small stujo-btn--ghost"
+          onClick={() => onArchive(posting.id)}
+        >
+          {t('archive')}
+        </button>
+      )}
+    </div>
+  );
+};
+
 /**
  * Employer dashboard ("Mein StuJo") — postings table, stats and the
  * publish/archive/re-post actions, per design/stujo-design.pen.
@@ -48,6 +111,7 @@ const MeinStujo: FC<Props> = ({ portal }) => {
   const router = useRouter();
   const { status: sessionStatus } = useSession();
   const [notice, setNotice] = useState<string | null>(null);
+  const [consentNeededFor, setConsentNeededFor] = useState<number | null>(null);
 
   const employerRole = useEmployerRoleContext();
   const {
@@ -57,10 +121,17 @@ const MeinStujo: FC<Props> = ({ portal }) => {
     selectOrganization,
   } = useEmployerOrganization();
 
+  // cache-and-network: the Apollo client is a module singleton that outlives
+  // client-side navigation, so a cache-first read served the list from before
+  // /mein-stujo/neu created the posting -- a freshly published offer only
+  // appeared after a hard reload. Cached rows still render instantly; the
+  // network result (new posting, updated status/views) replaces them.
   const { data, loading, refetch } = useQuery(MY_JOB_POSTINGS, {
     context: employerRole,
     variables: { organizationId: organization?.id ?? 0 },
     skip: !organization,
+    fetchPolicy: 'cache-and-network',
+    nextFetchPolicy: 'cache-and-network',
   });
 
   const [publishPosting, { loading: publishing }] = useMutation(PUBLISH_JOB_POSTING_ACTION, {
@@ -99,18 +170,23 @@ const MeinStujo: FC<Props> = ({ portal }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router.query.repost, data]);
 
-  const handlePublish = async (jobPostingId: number) => {
+  const handlePublish = async (jobPostingId: number, acceptTerms = false) => {
     setNotice(null);
     try {
-      const result = await publishPosting({ variables: { jobPostingId } });
+      const result = await publishPosting({ variables: { jobPostingId, acceptTerms } });
       const payload = result.data?.publishJobPosting;
       if (payload?.checkoutUrl) {
         window.location.href = payload.checkoutUrl;
         return;
       }
       if (payload?.success) {
+        setConsentNeededFor(null);
         setNotice(payload.usedCredit ? t('noticePublishedCredit') : t('noticePublished'));
         await refetch();
+      } else if (payload?.messageKey === 'TERMS_NOT_ACCEPTED') {
+        // A posting published before consent was recorded, or reposted from an
+        // expiry mail. Ask here rather than failing the action.
+        setConsentNeededFor(jobPostingId);
       } else {
         setNotice(t('publishFailed', { error: payload?.error ?? t('unknownError') }));
       }
@@ -153,6 +229,8 @@ const MeinStujo: FC<Props> = ({ portal }) => {
     };
   }, [data, organization]);
 
+  const postings: JobPosting[] = data?.JobPosting ?? [];
+
   if (sessionStatus !== 'authenticated' || orgsLoading) {
     return (
       <Layout portal={portal}>
@@ -165,7 +243,15 @@ const MeinStujo: FC<Props> = ({ portal }) => {
     return (
       <Layout portal={portal}>
         <h1>{t('title')}</h1>
-        <p>{t('noOrganization', { contact: portal.contactEmail || t('defaultContact') })}</p>
+        <p style={{ maxWidth: '40em' }}>{t('noOrganization')}</p>
+        <p>
+          <Link href="/mein-stujo/unternehmen" className="stujo-btn stujo-btn--primary">
+            {t('claimCta')}
+          </Link>
+        </p>
+        <p className="stujo-muted">
+          {t('claimContactFallback', { contact: portal.contactEmail || t('defaultContact') })}
+        </p>
       </Layout>
     );
   }
@@ -187,6 +273,9 @@ const MeinStujo: FC<Props> = ({ portal }) => {
               {organization.name}
             </p>
           )}
+          <p className="stujo-muted" style={{ margin: '0.25rem 0 0' }}>
+            <Link href="/mein-stujo/unternehmen">{t('claimAddAnother')}</Link>
+          </p>
         </div>
         <Link href="/mein-stujo/neu" className="stujo-btn stujo-btn--primary">
           {t('newOffer')}
@@ -194,6 +283,26 @@ const MeinStujo: FC<Props> = ({ portal }) => {
       </div>
 
       {notice && <div className="stujo-notice">{notice}</div>}
+
+      {consentNeededFor !== null && (
+        <div className="stujo-notice">
+          <label className="stujo-consent">
+            <span>
+              {t('consentPromptPrefix')}{' '}
+              <Link href="/agb" target="_blank" rel="noreferrer">
+                {t('acceptTermsLink')}
+              </Link>
+              {t('consentPromptSuffix')}
+            </span>
+          </label>
+          <button
+            className="stujo-btn stujo-btn--accent"
+            onClick={() => handlePublish(consentNeededFor, true)}
+          >
+            {t('consentAcceptAndPublish')}
+          </button>
+        </div>
+      )}
 
       <div className="stujo-stats">
         {[
@@ -210,93 +319,99 @@ const MeinStujo: FC<Props> = ({ portal }) => {
         ))}
       </div>
 
-      <table className="stujo-table">
-        <thead>
-          <tr>
-            <th>{t('colOffer')}</th>
-            <th>{t('colCategory')}</th>
-            <th>{t('colStatus')}</th>
-            <th>{t('colViews')}</th>
-            <th>{t('colExpires')}</th>
-            <th />
-          </tr>
-        </thead>
-        <tbody>
-          {loading && (
-            <tr>
-              <td colSpan={6} className="stujo-muted">
-                {t('loading')}
-              </td>
-            </tr>
-          )}
-          {data?.JobPosting?.map((posting: any) => {
-            const statusClassName =
-              STATUS_CLASSNAMES[posting.status] ?? STATUS_CLASSNAMES.DRAFT;
-            return (
-              <tr key={posting.id}>
-                <td>
-                  <Link href={`/mein-stujo/neu?id=${posting.id}`} style={{ fontWeight: 600 }}>
-                    {posting.title}
-                  </Link>
-                </td>
-                <td className="stujo-muted">{tType(posting.type)}</td>
-                <td>
-                  <span className={statusClassName}>{t(`status.${posting.status}`)}</span>
-                </td>
-                <td className="stujo-muted">{posting.views}</td>
-                <td className="stujo-muted">{formatDate(posting.expiresAt)}</td>
-                <td style={{ whiteSpace: 'nowrap' }}>
-                  <Link
-                    href={`/mein-stujo/neu?id=${posting.id}`}
-                    className="stujo-button-pen"
-                    title={t('edit')}
-                    aria-label={t('edit')}
+      {loading && !data ? (
+        <p className="stujo-muted">{t('loading')}</p>
+      ) : postings.length === 0 ? (
+        <p className="stujo-muted">{t('noOffers')}</p>
+      ) : (
+        <>
+          <ul className="stujo-posting-list" aria-label={t('title')}>
+            {postings.map((posting) => {
+              const statusClassName =
+                STATUS_CLASSNAMES[posting.status] ?? STATUS_CLASSNAMES.DRAFT;
+
+              return (
+                <li key={posting.id} className="stujo-posting-card">
+                  <div className="stujo-posting-card-head">
+                    <h2 className="stujo-posting-card-title">
+                      <Link href={`/mein-stujo/neu?id=${posting.id}`}>{posting.title}</Link>
+                    </h2>
+                    <span className={statusClassName}>{t(`status.${posting.status}`)}</span>
+                  </div>
+                  <dl className="stujo-posting-details">
+                    <div>
+                      <dt>{t('colCategory')}</dt>
+                      <dd>{tType(posting.type)}</dd>
+                    </div>
+                    <div>
+                      <dt>{t('colViews')}</dt>
+                      <dd>{posting.views}</dd>
+                    </div>
+                    <div>
+                      <dt>{t('colExpires')}</dt>
+                      <dd>{formatDate(posting.expiresAt)}</dd>
+                    </div>
+                  </dl>
+                  <PostingActions
+                    posting={posting}
+                    publishing={publishing}
+                    onPublish={handlePublish}
+                    onArchive={handleArchive}
                   />
-                  {(posting.status === 'DRAFT' || posting.status === 'PENDING_PAYMENT') && (
-                    <button
-                      className="stujo-btn stujo-btn--small"
-                      disabled={publishing}
-                      onClick={() => handlePublish(posting.id)}
-                    >
-                      {t('publish')}
-                    </button>
-                  )}
-                  {posting.status === 'EXPIRED' && (
-                    <button
-                      className="stujo-btn stujo-btn--small"
-                      disabled={publishing}
-                      onClick={() => handlePublish(posting.id)}
-                    >
-                      {t('repost')}
-                    </button>
-                  )}
-                  {posting.status === 'PUBLISHED' && (
-                    <button
-                      className="stujo-btn stujo-btn--small stujo-btn--ghost"
-                      onClick={() => handleArchive(posting.id)}
-                    >
-                      {t('archive')}
-                    </button>
-                  )}
-                </td>
+                </li>
+              );
+            })}
+          </ul>
+
+          <table className="stujo-table stujo-postings-table">
+            <thead>
+              <tr>
+                <th>{t('colOffer')}</th>
+                <th>{t('colCategory')}</th>
+                <th>{t('colStatus')}</th>
+                <th>{t('colViews')}</th>
+                <th>{t('colExpires')}</th>
+                <th />
               </tr>
-            );
-          })}
-          {!loading && data?.JobPosting?.length === 0 && (
-            <tr>
-              <td colSpan={6} className="stujo-muted">
-                {t('noOffers')}
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+            </thead>
+            <tbody>
+              {postings.map((posting) => {
+                const statusClassName =
+                  STATUS_CLASSNAMES[posting.status] ?? STATUS_CLASSNAMES.DRAFT;
+                return (
+                  <tr key={posting.id}>
+                    <td>
+                      <Link href={`/mein-stujo/neu?id=${posting.id}`} style={{ fontWeight: 600 }}>
+                        {posting.title}
+                      </Link>
+                    </td>
+                    <td className="stujo-muted">{tType(posting.type)}</td>
+                    <td>
+                      <span className={statusClassName}>{t(`status.${posting.status}`)}</span>
+                    </td>
+                    <td className="stujo-muted">{posting.views}</td>
+                    <td className="stujo-muted">{formatDate(posting.expiresAt)}</td>
+                    <td>
+                      <PostingActions
+                        posting={posting}
+                        publishing={publishing}
+                        onPublish={handlePublish}
+                        onArchive={handleArchive}
+                      />
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </>
+      )}
     </Layout>
   );
 };
 
 export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => {
-  const portal = await resolvePortal(req.headers.host);
+  const portal = await resolvePortal(portalHost(req));
   return { props: { portal } };
 };
 

@@ -16,6 +16,7 @@ The seed data includes the following users:
 - `admin@example.com`
 - `user@example.com`
 - `instructor@example.com`
+- `orgadmin@example.com` — organization admin with StuJo job-management access
 
 The password for all users is `dev`.
 
@@ -118,12 +119,9 @@ These tables are typically managed through migrations rather than seeds. The `Co
 
 ### FAQ Data Handling
 
-The FAQ tables (`FaqCollection`, `Faq`, `FaqTranslation`) are included in seed exports, but the script automatically filters out FAQ data that is created by migrations to prevent conflicts:
+All FAQ content (`FaqCollection`, `Faq`, `FaqTranslation`) is owned by migrations, not by seeds — the "default" sample collection from `1753957404053`/`1753957404056` and the StuJo collection from `1788800000000_insert_stujo_faq_collection`. The export script therefore strips those three tables from the snapshot entirely, so a fresh database gets its FAQs from the migrations and never re-inserts them from the seed.
 
-- **Excluded**: The initial "default" FAQ collection and its 3 sample FAQs (created by migrations `1753957404053` and `1753957404056`)
-- **Included**: Any additional FAQ collections, FAQs, or translations that you add manually
-
-This allows you to add custom FAQ content via seeds while avoiding conflicts with the migration-created initial FAQ data.
+Add or change FAQ content in a migration; anything inserted only through the Hasura console will not survive an export.
 
 ## Requirements
 

@@ -70,10 +70,51 @@ refetchFilter: (searchFilter) => ({
 })
 ```
 
+## Toolbar Filters
+
+Multi-select facet filters render next to the search field. The caller owns the selection and
+turns it into query variables, so the same control serves client- and server-side filtering.
+Several selected values are meant as "any of them".
+
+```typescript
+filters={[{
+  id: 'privileges',
+  label: t('privileges_filter_label'),
+  options: [{ value: 'events', label: t('can_manage_events') }],
+  selected: privilegeFilter,
+  onChange: (selected) => {
+    setPrivilegeFilter(selected as AdminPrivilege[]);
+    setPageIndex(0); // a changed filter changes what matches
+  },
+}]}
+```
+
+## Row Deletion
+
+Both flavors render the same trash icon, confirmation dialog and error dialog; pick by whether
+deleting a row is one mutation:
+
+```typescript
+// One mutation taking the row id
+deleteMutation={DELETE_THING}
+deleteIdType="number"          // or "uuidString"
+deleteVariableName="id"        // renames the mutation variable
+validateDeleteResult={...}     // surfaces a Hasura action's own failure
+
+// Or a caller-owned deletion, for rows that take more than one mutation
+onRowDelete={async (row) => { ... }}  // rejection opens the error dialog; refetching is yours
+```
+
+`canDeleteRow` disables the control per row, and `generateDeletionConfirmationQuestion` makes the
+confirmation name what is about to be deleted. Omit both props to leave the column out entirely —
+which is how a delete control is limited to a role.
+
 ## Key Rules
 
 - ✅ Always memoize columns with `useMemo`
 - ✅ Use `size` property (not legacy `meta.width`)
 - ✅ Reset pageIndex when filters/pageSize change
+- ✅ Use `filters` for facet filtering instead of building a toolbar control
+- ✅ Name the deleted item in `generateDeletionConfirmationQuestion`
 - ✅ Synchronize pageSize between hook and component
 - ❌ Don't manage offset manually - let useTableGrid handle it
