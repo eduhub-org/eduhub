@@ -50,7 +50,23 @@ export const addKeycloakRole = async (req, res) => {
     const target_role = available_roles.filter(it => it.name === role)[0];
 
     if (!target_role) {
-      return res.json({ message: `Role '${role}' not available for user (already assigned or unknown)` });
+      // "Not available" conflates two very different situations, and reporting both as 200
+      // hid a real fault: `org_admin` was never defined on the production hasura client, so
+      // every OrganizationAdmin insert reported success while granting nothing. Separate them
+      // — an already-assigned role is a legitimate no-op, an undefined role is a config error
+      // that must fail loudly so the event trigger retries and surfaces in the queue.
+      const defined_roles = await kcAdminClient.clients.listRoles({
+        id: hasura_client[0].id,
+      });
+
+      if (!defined_roles.some(it => it.name === role)) {
+        console.error(`Role '${role}' is not defined on the hasura client — cannot grant it`);
+        return res.status(500).json({
+          error: `Role '${role}' is not defined on the hasura client`,
+        });
+      }
+
+      return res.json({ message: `Role '${role}' already assigned to user` });
     }
 
     await kcAdminClient.users.addClientRoleMappings({
