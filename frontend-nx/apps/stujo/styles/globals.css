@@ -166,7 +166,7 @@ a:focus {
 
 .stujo-header-diag {
   position: absolute;
-  left: 0;
+  left: -2px;
   top: 0;
   /* Keep the native angle and crop the artwork on small screens. These
      minimum dimensions also apply above the mobile breakpoint. */
