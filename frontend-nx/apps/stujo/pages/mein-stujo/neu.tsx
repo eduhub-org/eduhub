@@ -67,6 +67,7 @@ const EMPTY_FORM: FormState = {
  */
 const NeuesAngebot: FC<Props> = ({ portal }) => {
   const t = useTranslations('meinStujo');
+  const tOffer = useTranslations('meinStujo.NeuesAngebot');
   const tType = useTranslations('jobType');
   const tOccupation = useTranslations('jobOccupation');
   const tRegion = useTranslations('jobRegion');
@@ -204,7 +205,7 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
     const result = await savePdf({ variables: { base64file, filename, jobpostingid: id } });
     const payload = result.data?.saveJobPostingPdf;
     if (!payload?.success) {
-      setErrorMessage(`PDF-Upload fehlgeschlagen: ${payload?.error ?? 'Unbekannter Fehler'}`);
+      setErrorMessage(tOffer('pdf_upload_failed', { error: payload?.error ?? t('unknownError') }));
       return false;
     }
     await updatePosting({ variables: { id, set: { pdfUrl: payload.accessUrl } } });
@@ -248,7 +249,7 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
 
   const goToPreview = async () => {
     if (!form.title.trim()) {
-      setErrorMessage('Bitte gib einen Titel an.');
+      setErrorMessage(tOffer('title_required'));
       return;
     }
     const id = await saveDraft();
@@ -274,13 +275,18 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
     if (payload?.success) {
       router.push('/mein-stujo?payment=success');
     } else {
-      setErrorMessage(payload?.error ?? 'Veröffentlichen fehlgeschlagen.');
+      setErrorMessage(t('publishFailed', { error: payload?.error ?? t('unknownError') }));
     }
   };
 
   const price = priceData?.JobPostingPrice?.find((row: any) => row.jobPostingType === form.type);
   const netPrice = price?.price ?? 0;
   const grossPrice = Math.round(netPrice * (1 + (Number(price?.vatRate ?? 19) || 19) / 100));
+  const formatPrice = (amount: number) =>
+    new Intl.NumberFormat(router.locale === 'en' ? 'en-GB' : 'de-DE', {
+      style: 'currency',
+      currency: price?.currency ?? 'EUR',
+    }).format(amount / 100);
   const credits = (organization?.JobPostingCredits ?? []).reduce(
     (sum: number, credit: any) => sum + credit.remaining,
     0
@@ -355,7 +361,7 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
 
   return (
     <Layout portal={portal}>
-      <h1>{editId ? 'Angebot bearbeiten' : 'Neues Stellenangebot'}</h1>
+      <h1>{editId ? tOffer('edit_offer_title') : tOffer('create_offer_title')}</h1>
       {organizations.length > 1 &&
         (editId === null && savedId === null ? (
           <OrganizationSwitcher
@@ -371,10 +377,10 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
         ))}
       <div className="stujo-steps">
         <span className={step === 1 ? 'stujo-step stujo-step--active' : 'stujo-step'}>
-          1 · Angebot erstellen
+          {tOffer('step_create_offer')}
         </span>
         <span className={step === 2 ? 'stujo-step stujo-step--active' : 'stujo-step'}>
-          2 · Vorschau & Veröffentlichen
+          {tOffer('step_preview_publish')}
         </span>
       </div>
 
@@ -382,24 +388,24 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
 
       {step === 1 && (
         <div className="stujo-form">
-          {field('Titel des Angebots *', 'title')}
+          {field(tOffer('offer_title_label'), 'title')}
           <div className="stujo-form-row">
-            {select('Kategorie *', 'type', enums?.JobPostingType?.map((e: any) => e.value) ?? [], tType)}
-            {select('Berufsfeld *', 'occupation', enums?.JobOccupation?.map((e: any) => e.value) ?? [], tOccupation)}
-            {select('Region', 'region', enums?.JobRegion?.map((e: any) => e.value) ?? [], tRegion)}
+            {select(tOffer('category_label'), 'type', enums?.JobPostingType?.map((e: any) => e.value) ?? [], tType)}
+            {select(tOffer('occupation_label'), 'occupation', enums?.JobOccupation?.map((e: any) => e.value) ?? [], tOccupation)}
+            {select(tOffer('region_label'), 'region', enums?.JobRegion?.map((e: any) => e.value) ?? [], tRegion)}
           </div>
           <div className="stujo-form-row">
-            {field('Ort', 'location', { placeholder: 'z.B. Kiel' })}
-            {field('Vergütung', 'salaryText', { placeholder: 'z.B. 15 €/Stunde' })}
-            {field('Eintritt', 'startText', { placeholder: 'z.B. ab sofort' })}
-            {field('Std./Woche', 'hoursPerWeek', { type: 'number' })}
+            {field(tOffer('location_label'), 'location', { placeholder: tOffer('location_placeholder') })}
+            {field(tOffer('salary_label'), 'salaryText', { placeholder: tOffer('salary_placeholder') })}
+            {field(tOffer('start_label'), 'startText', { placeholder: tOffer('start_placeholder') })}
+            {field(tOffer('hours_per_week_label'), 'hoursPerWeek', { type: 'number' })}
           </div>
           <div className="stujo-form-row">
-            {field('Dauer', 'durationText', { placeholder: 'z.B. 6 Monate' })}
-            {field('Bewerbungsschluss', 'applicationDeadline', { type: 'date' })}
+            {field(tOffer('duration_label'), 'durationText', { placeholder: tOffer('duration_placeholder') })}
+            {field(tOffer('application_deadline_label'), 'applicationDeadline', { type: 'date' })}
           </div>
           <label className="stujo-field">
-            <span>Beschreibung *</span>
+            <span>{tOffer('description_label')}</span>
             <textarea
               rows={7}
               value={form.description}
@@ -407,7 +413,7 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
             />
           </label>
           <label className="stujo-field">
-            <span>Anforderungen</span>
+            <span>{tOffer('requirements_label')}</span>
             <textarea
               rows={4}
               value={form.requirement}
@@ -415,14 +421,14 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
             />
           </label>
           <label className="stujo-field">
-            <span>Stellenausschreibung als PDF</span>
+            <span>{tOffer('pdf_label')}</span>
             <input
               type="file"
               accept="application/pdf,.pdf"
               onChange={(event) => {
                 const file = event.target.files?.[0] ?? null;
                 if (file && !/\.pdf$/i.test(file.name)) {
-                  setErrorMessage('Bitte wähle eine PDF-Datei aus.');
+                  setErrorMessage(tOffer('select_pdf_file'));
                   return;
                 }
                 setErrorMessage(null);
@@ -431,22 +437,22 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
             />
             {pdfUrl && !pdfFile && (
               <span style={{ fontWeight: 400 }}>
-                Aktuelle Datei:{' '}
+                {tOffer('current_file')}{' '}
                 <a href={resolveStorageUrl(pdfUrl) ?? pdfUrl} target="_blank" rel="noreferrer">
-                  {decodeURIComponent(pdfUrl.split('/').pop() ?? 'PDF ansehen')}
+                  {decodeURIComponent(pdfUrl.split('/').pop() ?? tOffer('view_pdf'))}
                 </a>
               </span>
             )}
             <span className="stujo-muted" style={{ fontWeight: 400 }}>
-              Das PDF wird Studierenden direkt auf der Angebotsseite angezeigt (max. 15 MB).
+              {tOffer('pdf_hint')}
             </span>
           </label>
           <div className="stujo-form-actions">
             <button className="stujo-btn stujo-btn--ghost" disabled={busy} onClick={saveDraft}>
-              Als Entwurf speichern
+              {tOffer('save_draft')}
             </button>
             <button className="stujo-btn stujo-btn--primary" disabled={busy} onClick={goToPreview}>
-              Weiter zur Vorschau →
+              {tOffer('continue_to_preview')}
             </button>
           </div>
         </div>
@@ -454,7 +460,7 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
 
       {step === 2 && (
         <div className="stujo-preview">
-          <h2 style={{ fontSize: '1rem' }}>So sehen Studierende Dein Angebot:</h2>
+          <h2 style={{ fontSize: '1rem' }}>{tOffer('preview_heading')}</h2>
           <JobCard
             job={{
               id: savedId ?? 0,
@@ -470,46 +476,42 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
             }}
           />
           {isLive ? (
-            <div className="stujo-notice">
-              Dieses Angebot ist bereits veröffentlicht – Deine Änderungen werden direkt
-              übernommen.
-            </div>
+            <div className="stujo-notice">{tOffer('live_offer_notice')}</div>
           ) : (
-          <div className="stujo-order-box">
-            <h3>Deine Bestellung</h3>
-            {netPrice === 0 ? (
-              <p>
-                <b>Kostenlos</b> – Minijob-Angebote sind gratis und werden sofort veröffentlicht.
-              </p>
-            ) : credits > 0 ? (
-              <p>
-                Du hast <b>{credits} Gratis-Kontingent{credits > 1 ? 'e' : ''}</b> – dieses Angebot
-                wird ohne Zahlung veröffentlicht.
-              </p>
-            ) : (
-              <>
-                <div className="stujo-order-row">
-                  <span>
-                    {tType(form.type)} · {price?.durationDays ?? 56} Tage
-                  </span>
-                  <span>{(netPrice / 100).toFixed(2).replace('.', ',')} €</span>
-                </div>
-                <div className="stujo-order-row">
-                  <span>{Number(price?.vatRate ?? 19)} % MwSt.</span>
-                  <span>{((grossPrice - netPrice) / 100).toFixed(2).replace('.', ',')} €</span>
-                </div>
-                <div className="stujo-order-row stujo-order-row--total">
-                  <span>Gesamt</span>
-                  <span>{(grossPrice / 100).toFixed(2).replace('.', ',')} €</span>
-                </div>
-                <p className="stujo-muted" style={{ fontSize: '0.8rem' }}>
-                  Zahlung per Karte, SEPA-Lastschrift oder Überweisung über Stripe. Dein Angebot
-                  wird direkt nach der Zahlung veröffentlicht und ist {price?.durationDays ?? 56}{' '}
-                  Tage sichtbar.
+            <div className="stujo-order-box">
+              <h3>{tOffer('order_heading')}</h3>
+              {netPrice === 0 ? (
+                <p>
+                  <b>{tOffer('free')}</b> – {tOffer('free_offer_description')}
                 </p>
-              </>
-            )}
-          </div>
+              ) : credits > 0 ? (
+                <p>
+                  {tOffer('credit_prefix')}{' '}
+                  <b>{tOffer('free_credits', { count: credits })}</b> –{' '}
+                  {tOffer('credit_offer_description')}
+                </p>
+              ) : (
+                <>
+                  <div className="stujo-order-row">
+                    <span>
+                      {tType(form.type)} · {tOffer('days', { count: price?.durationDays ?? 56 })}
+                    </span>
+                    <span>{formatPrice(netPrice)}</span>
+                  </div>
+                  <div className="stujo-order-row">
+                    <span>{tOffer('vat', { rate: Number(price?.vatRate ?? 19) })}</span>
+                    <span>{formatPrice(grossPrice - netPrice)}</span>
+                  </div>
+                  <div className="stujo-order-row stujo-order-row--total">
+                    <span>{tOffer('total')}</span>
+                    <span>{formatPrice(grossPrice)}</span>
+                  </div>
+                  <p className="stujo-muted" style={{ fontSize: '0.8rem' }}>
+                    {tOffer('payment_hint', { count: price?.durationDays ?? 56 })}
+                  </p>
+                </>
+              )}
+            </div>
           )}
           {!isLive && requiresConsent && (
             <label className="stujo-consent">
@@ -530,7 +532,7 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
           )}
           <div className="stujo-form-actions">
             <button className="stujo-btn stujo-btn--ghost" disabled={busy} onClick={() => setStep(1)}>
-              ← Zurück
+              {tOffer('back')}
             </button>
             {isLive ? (
               <button
@@ -541,7 +543,7 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
                   if (id) router.push('/mein-stujo');
                 }}
               >
-                Änderungen speichern
+                {tOffer('save_changes')}
               </button>
             ) : (
               <button
@@ -550,8 +552,8 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
                 onClick={publish}
               >
                 {netPrice === 0 || credits > 0
-                  ? 'Jetzt veröffentlichen'
-                  : `Kostenpflichtig veröffentlichen · ${(grossPrice / 100).toFixed(2).replace('.', ',')} €`}
+                  ? tOffer('publish_now')
+                  : tOffer('publish_paid', { price: formatPrice(grossPrice) })}
               </button>
             )}
           </div>

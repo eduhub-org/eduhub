@@ -180,7 +180,7 @@ const Layout: FC<LayoutProps> = ({ children, fullWidthMain = false, portal }) =>
             {t('employers')}
           </Link>
           <Link href="/mein-stujo" className={navClass('/mein-stujo')}>
-            Mein StuJo
+            {tLayout('my_stujo')}
           </Link>
         </div>
       </nav>
