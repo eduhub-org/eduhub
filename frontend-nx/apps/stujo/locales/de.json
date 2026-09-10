@@ -52,6 +52,11 @@
     "JobList": {
       "search_placeholder": "Suchbegriff, z. B. Marketing, Software, …"
     },
+    "faq": {
+      "title": "Häufig gestellte Fragen",
+      "error_loading": "Fehler beim Laden der FAQs. Bitte versuche es später erneut.",
+      "no_faqs_available": "Keine FAQs verfügbar."
+    },
     "dropdown_selector": {
       "create_option": "\"{option}\" neu hinzufügen",
       "none_option": "-- Keine Auswahl --",

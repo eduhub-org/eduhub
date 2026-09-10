@@ -75,19 +75,14 @@ if [ $? -eq 0 ]; then
         docker exec -w /hasura $CONTAINER_NAME bash -c "
             seed_file=\"seeds/default/$SEED_NAME.sql\"
             
-            # Remove FAQ data created by migrations
-            # Migration 1753957404053 creates FaqCollection with name='default' (id=1)
-            # Migration 1753957404056 creates Faq entries with ids 1-3 and FaqTranslation entries with ids 1-6
-            sed -i \"/INSERT INTO public.\\\"FaqCollection\\\" (id, name.*VALUES (1, 'default'/d\" \"\$seed_file\"
-            sed -i \"/INSERT INTO public.\\\"Faq\\\" (id, \\\"collectionId\\\".*VALUES (1, 1,/d\" \"\$seed_file\"
-            sed -i \"/INSERT INTO public.\\\"Faq\\\" (id, \\\"collectionId\\\".*VALUES (2, 1,/d\" \"\$seed_file\"
-            sed -i \"/INSERT INTO public.\\\"Faq\\\" (id, \\\"collectionId\\\".*VALUES (3, 1,/d\" \"\$seed_file\"
-            sed -i \"/INSERT INTO public.\\\"FaqTranslation\\\" (id, \\\"faqId\\\".*VALUES (1, /d\" \"\$seed_file\"
-            sed -i \"/INSERT INTO public.\\\"FaqTranslation\\\" (id, \\\"faqId\\\".*VALUES (2, /d\" \"\$seed_file\"
-            sed -i \"/INSERT INTO public.\\\"FaqTranslation\\\" (id, \\\"faqId\\\".*VALUES (3, /d\" \"\$seed_file\"
-            sed -i \"/INSERT INTO public.\\\"FaqTranslation\\\" (id, \\\"faqId\\\".*VALUES (4, /d\" \"\$seed_file\"
-            sed -i \"/INSERT INTO public.\\\"FaqTranslation\\\" (id, \\\"faqId\\\".*VALUES (5, /d\" \"\$seed_file\"
-            sed -i \"/INSERT INTO public.\\\"FaqTranslation\\\" (id, \\\"faqId\\\".*VALUES (6, /d\" \"\$seed_file\"
+            # Remove FAQ data created by migrations.
+            # ALL FAQ content is migration-owned (the 'default' sample set and
+            # the 'stujo' collection), so strip the tables wholesale rather
+            # than listing ids — a new FAQ migration would otherwise be
+            # re-inserted by the seed and collide with itself.
+            sed -i \"/INSERT INTO public.\\\"FaqCollection\\\" /d\" \"\$seed_file\"
+            sed -i \"/INSERT INTO public.\\\"Faq\\\" /d\" \"\$seed_file\"
+            sed -i \"/INSERT INTO public.\\\"FaqTranslation\\\" /d\" \"\$seed_file\"
             sed -i \"/SELECT pg_catalog.setval('public.\\\"FaqCollection_id_seq\\\"'/d\" \"\$seed_file\"
             sed -i \"/SELECT pg_catalog.setval('public.\\\"Faq_id_seq\\\"'/d\" \"\$seed_file\"
             sed -i \"/SELECT pg_catalog.setval('public.\\\"FaqTranslation_id_seq\\\"'/d\" \"\$seed_file\"
