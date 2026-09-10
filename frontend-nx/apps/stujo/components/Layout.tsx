@@ -101,7 +101,7 @@ const Layout: FC<LayoutProps> = ({ children, fullWidthMain = false, portal }) =>
         {styleVars && <style>{`:root:root { ${styleVars} }`}</style>}
       </Head>
       <header className="stujo-header">
-        <img src="/stujo_header_diag.png" alt="" className="stujo-header-diag" />
+        <img src="/stujo_header_diag.svg" alt="" className="stujo-header-diag" />
         <Link href="/">
           <img
             src={portal.logoUrl || '/stujo_header_logo.png'}
