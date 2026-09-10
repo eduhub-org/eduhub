@@ -475,6 +475,10 @@ Turning it back off is also how the public face is handed to
 
 ### 2.10 Telling the employers — send it through the platform
 
+The finished German text, the sanitizer-safe HTML body and the filled-in
+insert statement are in
+[`STUJO_CUTOVER_EMPLOYER_MAIL.md`](./STUJO_CUTOVER_EMPLOYER_MAIL.md).
+
 **Recommendation: send it from the new platform, not from Outlook.** Not
 because Outlook cannot do it, but because of four things it does badly at this
 size:
