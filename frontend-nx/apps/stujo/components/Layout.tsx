@@ -202,7 +202,7 @@ const Layout: FC<LayoutProps> = ({ children, fullWidthMain = false, portal }) =>
             <h3>{t('footerLinksHead')}</h3>
             <a href={termsUrl}>AGB</a>
             <Link href="/fuer-arbeitgeber">{t('footerPrices')}</Link>
-            <a href="https://www.stujo.net/faq">FAQ</a>
+            <Link href="/faq">FAQ</Link>
             <a href={imprintUrl}>Impressum</a>
             <a href={privacyUrl}>Datenschutz</a>
           </div>
