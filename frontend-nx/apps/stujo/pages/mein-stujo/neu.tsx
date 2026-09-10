@@ -67,6 +67,7 @@ const EMPTY_FORM: FormState = {
  */
 const NeuesAngebot: FC<Props> = ({ portal }) => {
   const t = useTranslations('meinStujo');
+  const tOffer = useTranslations('meinStujo.NeuesAngebot');
   const tType = useTranslations('jobType');
   const tOccupation = useTranslations('jobOccupation');
   const tRegion = useTranslations('jobRegion');
@@ -204,7 +205,7 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
     const result = await savePdf({ variables: { base64file, filename, jobpostingid: id } });
     const payload = result.data?.saveJobPostingPdf;
     if (!payload?.success) {
-      setErrorMessage(t('pdfUploadFailed', { error: payload?.error ?? t('unknownError') }));
+      setErrorMessage(tOffer('pdf_upload_failed', { error: payload?.error ?? t('unknownError') }));
       return false;
     }
     await updatePosting({ variables: { id, set: { pdfUrl: payload.accessUrl } } });
@@ -248,7 +249,7 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
 
   const goToPreview = async () => {
     if (!form.title.trim()) {
-      setErrorMessage(t('titleRequired'));
+      setErrorMessage(tOffer('title_required'));
       return;
     }
     const id = await saveDraft();
@@ -360,7 +361,7 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
 
   return (
     <Layout portal={portal}>
-      <h1>{editId ? t('editOfferTitle') : t('createOfferTitle')}</h1>
+      <h1>{editId ? tOffer('edit_offer_title') : tOffer('create_offer_title')}</h1>
       {organizations.length > 1 &&
         (editId === null && savedId === null ? (
           <OrganizationSwitcher
@@ -376,10 +377,10 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
         ))}
       <div className="stujo-steps">
         <span className={step === 1 ? 'stujo-step stujo-step--active' : 'stujo-step'}>
-          {t('stepCreateOffer')}
+          {tOffer('step_create_offer')}
         </span>
         <span className={step === 2 ? 'stujo-step stujo-step--active' : 'stujo-step'}>
-          {t('stepPreviewPublish')}
+          {tOffer('step_preview_publish')}
         </span>
       </div>
 
@@ -387,24 +388,24 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
 
       {step === 1 && (
         <div className="stujo-form">
-          {field(t('offerTitleLabel'), 'title')}
+          {field(tOffer('offer_title_label'), 'title')}
           <div className="stujo-form-row">
-            {select(t('categoryLabel'), 'type', enums?.JobPostingType?.map((e: any) => e.value) ?? [], tType)}
-            {select(t('occupationLabel'), 'occupation', enums?.JobOccupation?.map((e: any) => e.value) ?? [], tOccupation)}
-            {select(t('regionLabel'), 'region', enums?.JobRegion?.map((e: any) => e.value) ?? [], tRegion)}
+            {select(tOffer('category_label'), 'type', enums?.JobPostingType?.map((e: any) => e.value) ?? [], tType)}
+            {select(tOffer('occupation_label'), 'occupation', enums?.JobOccupation?.map((e: any) => e.value) ?? [], tOccupation)}
+            {select(tOffer('region_label'), 'region', enums?.JobRegion?.map((e: any) => e.value) ?? [], tRegion)}
           </div>
           <div className="stujo-form-row">
-            {field(t('locationLabel'), 'location', { placeholder: t('locationPlaceholder') })}
-            {field(t('salaryLabel'), 'salaryText', { placeholder: t('salaryPlaceholder') })}
-            {field(t('startLabel'), 'startText', { placeholder: t('startPlaceholder') })}
-            {field(t('hoursPerWeekLabel'), 'hoursPerWeek', { type: 'number' })}
+            {field(tOffer('location_label'), 'location', { placeholder: tOffer('location_placeholder') })}
+            {field(tOffer('salary_label'), 'salaryText', { placeholder: tOffer('salary_placeholder') })}
+            {field(tOffer('start_label'), 'startText', { placeholder: tOffer('start_placeholder') })}
+            {field(tOffer('hours_per_week_label'), 'hoursPerWeek', { type: 'number' })}
           </div>
           <div className="stujo-form-row">
-            {field(t('durationLabel'), 'durationText', { placeholder: t('durationPlaceholder') })}
-            {field(t('applicationDeadlineLabel'), 'applicationDeadline', { type: 'date' })}
+            {field(tOffer('duration_label'), 'durationText', { placeholder: tOffer('duration_placeholder') })}
+            {field(tOffer('application_deadline_label'), 'applicationDeadline', { type: 'date' })}
           </div>
           <label className="stujo-field">
-            <span>{t('descriptionLabel')}</span>
+            <span>{tOffer('description_label')}</span>
             <textarea
               rows={7}
               value={form.description}
@@ -412,7 +413,7 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
             />
           </label>
           <label className="stujo-field">
-            <span>{t('requirementsLabel')}</span>
+            <span>{tOffer('requirements_label')}</span>
             <textarea
               rows={4}
               value={form.requirement}
@@ -420,14 +421,14 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
             />
           </label>
           <label className="stujo-field">
-            <span>{t('pdfLabel')}</span>
+            <span>{tOffer('pdf_label')}</span>
             <input
               type="file"
               accept="application/pdf,.pdf"
               onChange={(event) => {
                 const file = event.target.files?.[0] ?? null;
                 if (file && !/\.pdf$/i.test(file.name)) {
-                  setErrorMessage(t('selectPdfFile'));
+                  setErrorMessage(tOffer('select_pdf_file'));
                   return;
                 }
                 setErrorMessage(null);
@@ -436,22 +437,22 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
             />
             {pdfUrl && !pdfFile && (
               <span style={{ fontWeight: 400 }}>
-                {t('currentFile')}{' '}
+                {tOffer('current_file')}{' '}
                 <a href={resolveStorageUrl(pdfUrl) ?? pdfUrl} target="_blank" rel="noreferrer">
-                  {decodeURIComponent(pdfUrl.split('/').pop() ?? t('viewPdf'))}
+                  {decodeURIComponent(pdfUrl.split('/').pop() ?? tOffer('view_pdf'))}
                 </a>
               </span>
             )}
             <span className="stujo-muted" style={{ fontWeight: 400 }}>
-              {t('pdfHint')}
+              {tOffer('pdf_hint')}
             </span>
           </label>
           <div className="stujo-form-actions">
             <button className="stujo-btn stujo-btn--ghost" disabled={busy} onClick={saveDraft}>
-              {t('saveDraft')}
+              {tOffer('save_draft')}
             </button>
             <button className="stujo-btn stujo-btn--primary" disabled={busy} onClick={goToPreview}>
-              {t('continueToPreview')}
+              {tOffer('continue_to_preview')}
             </button>
           </div>
         </div>
@@ -459,7 +460,7 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
 
       {step === 2 && (
         <div className="stujo-preview">
-          <h2 style={{ fontSize: '1rem' }}>{t('previewHeading')}</h2>
+          <h2 style={{ fontSize: '1rem' }}>{tOffer('preview_heading')}</h2>
           <JobCard
             job={{
               id: savedId ?? 0,
@@ -475,37 +476,38 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
             }}
           />
           {isLive ? (
-            <div className="stujo-notice">{t('liveOfferNotice')}</div>
+            <div className="stujo-notice">{tOffer('live_offer_notice')}</div>
           ) : (
             <div className="stujo-order-box">
-              <h3>{t('orderHeading')}</h3>
+              <h3>{tOffer('order_heading')}</h3>
               {netPrice === 0 ? (
                 <p>
-                  <b>{t('free')}</b> – {t('freeOfferDescription')}
+                  <b>{tOffer('free')}</b> – {tOffer('free_offer_description')}
                 </p>
               ) : credits > 0 ? (
                 <p>
-                  {t('creditPrefix')} <b>{t('freeCredits', { count: credits })}</b> –{' '}
-                  {t('creditOfferDescription')}
+                  {tOffer('credit_prefix')}{' '}
+                  <b>{tOffer('free_credits', { count: credits })}</b> –{' '}
+                  {tOffer('credit_offer_description')}
                 </p>
               ) : (
                 <>
                   <div className="stujo-order-row">
                     <span>
-                      {tType(form.type)} · {t('days', { count: price?.durationDays ?? 56 })}
+                      {tType(form.type)} · {tOffer('days', { count: price?.durationDays ?? 56 })}
                     </span>
                     <span>{formatPrice(netPrice)}</span>
                   </div>
                   <div className="stujo-order-row">
-                    <span>{t('vat', { rate: Number(price?.vatRate ?? 19) })}</span>
+                    <span>{tOffer('vat', { rate: Number(price?.vatRate ?? 19) })}</span>
                     <span>{formatPrice(grossPrice - netPrice)}</span>
                   </div>
                   <div className="stujo-order-row stujo-order-row--total">
-                    <span>{t('total')}</span>
+                    <span>{tOffer('total')}</span>
                     <span>{formatPrice(grossPrice)}</span>
                   </div>
                   <p className="stujo-muted" style={{ fontSize: '0.8rem' }}>
-                    {t('paymentHint', { count: price?.durationDays ?? 56 })}
+                    {tOffer('payment_hint', { count: price?.durationDays ?? 56 })}
                   </p>
                 </>
               )}
@@ -530,7 +532,7 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
           )}
           <div className="stujo-form-actions">
             <button className="stujo-btn stujo-btn--ghost" disabled={busy} onClick={() => setStep(1)}>
-              {t('back')}
+              {tOffer('back')}
             </button>
             {isLive ? (
               <button
@@ -541,7 +543,7 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
                   if (id) router.push('/mein-stujo');
                 }}
               >
-                {t('saveChanges')}
+                {tOffer('save_changes')}
               </button>
             ) : (
               <button
@@ -550,8 +552,8 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
                 onClick={publish}
               >
                 {netPrice === 0 || credits > 0
-                  ? t('publishNow')
-                  : t('publishPaid', { price: formatPrice(grossPrice) })}
+                  ? tOffer('publish_now')
+                  : tOffer('publish_paid', { price: formatPrice(grossPrice) })}
               </button>
             )}
           </div>

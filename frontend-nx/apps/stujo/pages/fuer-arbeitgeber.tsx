@@ -17,7 +17,7 @@ type Props = { portal: PortalBranding; prices: Price[] };
  * and the current prices (from JobPostingPrice).
  */
 const ForEmployers: FC<Props> = ({ portal, prices }) => {
-  const t = useTranslations('forEmployers');
+  const t = useTranslations('forEmployers.ForEmployers');
   const tType = useTranslations('jobType');
   const router = useRouter();
   const formatPrice = (price: Price) =>
@@ -30,12 +30,12 @@ const ForEmployers: FC<Props> = ({ portal, prices }) => {
     <Layout portal={portal}>
       <h2>{t('title')}</h2>
       <p style={{ maxWidth: '46em' }}>{t('intro')}</p>
-      <h3>{t('pricesTitle')}</h3>
+      <h3>{t('prices_title')}</h3>
       <table className="stujo-table" style={{ maxWidth: '32rem' }}>
         <thead>
           <tr>
             <th style={{ textAlign: 'left' }}>{t('category')}</th>
-            <th style={{ textAlign: 'right' }}>{t('netPrice')}</th>
+            <th style={{ textAlign: 'right' }}>{t('net_price')}</th>
           </tr>
         </thead>
         <tbody>
@@ -51,7 +51,7 @@ const ForEmployers: FC<Props> = ({ portal, prices }) => {
       </table>
       <p style={{ marginTop: '1.5rem' }}>
         <Link href="/mein-stujo/neu" className="stujo-btn">
-          {t('postOffer')}
+          {t('post_offer')}
         </Link>
       </p>
     </Layout>
