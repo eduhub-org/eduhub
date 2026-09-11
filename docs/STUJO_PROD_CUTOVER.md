@@ -33,22 +33,21 @@ Companion documents: [`STUJO_INTEGRATION_PLAN.md`](./STUJO_INTEGRATION_PLAN.md)
 ### How stujo.net is served
 
 **Cloudflare serves it; we do not.** Each stujo.net host is a proxied record
-with an **Origin Rule** that rewrites the origin `Host` to the matching interim
-name:
+with a **Worker route** that fetches the matching interim origin and sets
+`X-Original-Host` to the visitor hostname:
 
-| Visitor sees | Origin Host Cloudflare sends | Cloud Run service |
+| Visitor sees | Origin the Worker fetches | Cloud Run service |
 |---|---|---|
 | `stujo.net`, `www.stujo.net` | `stujo.opencampus.sh` | `stujo` |
 | `cau.stujo.net` | `stujo-cau.opencampus.sh` | `stujo-cau` |
 | `haw-kiel.stujo.net`, `fh-kiel.stujo.net` | `stujo-haw-kiel.opencampus.sh` | `stujo-haw-kiel` |
 | `flensburg.stujo.net` | `stujo-flensburg.opencampus.sh` | `stujo-flensburg` |
 
-That name is exactly what the existing load balancer routes on (its
-`url_mask` is `<service>.opencampus.sh`) and exactly what its certificate
-already covers — a Host override in an Origin Rule sets the **SNI to the same
-value**, so the origin connection still validates and the zone can stay on
-**Full (strict)**. The visitor's address bar keeps saying `stujo.net`, because
-Cloudflare proxies rather than redirects.
+That name is exactly what the existing load balancer routes on (its `url_mask`
+is `<service>.opencampus.sh`) and exactly what its certificate covers. A Worker
+`fetch()` to that HTTPS URL uses the origin name for both Host and SNI, so the
+zone can stay on **Full (strict)**. The visitor's address bar keeps saying
+`stujo.net`, because the Worker proxies rather than redirects.
 
 So the domain move needs **no second load balancer, no certificate change, no
 new DNS record on the Google side, and no change to the URL map**. TLS at the
@@ -689,7 +688,7 @@ Three facts shape everything below:
   than recreate — and the reason `09_stujo_net.tf` keeps the web hosts as **A
   records pointing at the load balancer IP** instead of turning them into
   CNAMEs: changing a record's *type* can force a destroy-and-create, which is
-  exactly the gap importing exists to avoid. The Origin Rule decides the origin
+  exactly the gap importing exists to avoid. The Worker decides the origin
   Host either way, so the record type buys nothing.
 - **The zone is a live Microsoft 365 mail domain.** `autodiscover`, the
   `selector1`/`selector2._domainkey` CNAMEs, the MX and the SPF record all
@@ -746,22 +745,18 @@ Steps:
    script printed. Leave it empty everywhere else — that is what keeps the zone
    out of the staging and dev plans.
 3. Plan, and read every line. Expect: imports for the web records, an in-place
-   update on each of them, and creates for the two rulesets and the zone
+   update on each of them, and creates for the Worker, its routes and the zone
    setting. Expect **no destroys**. A destroy in this plan means a record was
    matched wrongly — stop and work out why.
 4. Apply. This is the cutover: at this moment stujo.net starts serving the app.
 5. Delete `stujo.net-import.tf` in a follow-up commit. Applied import blocks are
    no-ops; leaving them is noise.
 
-### 4.4 Before the first plan: check the provider supports the rules
+### 4.4 Before the first plan: check the provider supports Workers
 
-`01_main.tf` pins `cloudflare/cloudflare ~> 3.0` and **no lockfile is
-committed**, so every `init` is free to resolve a different 3.x. Origin Rules
-and Transform Rules are `cloudflare_ruleset` resources with the
-`http_request_origin` and `http_request_late_transform` phases;
-`09_stujo_net.tf` was written from the documented schema but could not be
-validated where it was written (the provider registry is not reachable from
-every environment this repo is edited in). Check it before relying on it.
+`01_main.tf` pins `cloudflare/cloudflare ~> 3.0`. The lockfile pins 3.35.0,
+whose `cloudflare_worker_script` and `cloudflare_worker_route` resources are
+used by `09_stujo_net.tf`. Validate against that provider before relying on it.
 
 **Step 1 — resolve the provider and check the schema. No credentials, no
 state, nothing applied.**
@@ -773,11 +768,8 @@ terraform version       # note the exact cloudflare version it resolved
 terraform validate      # type-checks the config against the provider schema
 ```
 
-`terraform validate` is the whole test for the structural question. It needs no
-variables, no credentials and no state, and it fails loudly if
-`cloudflare_ruleset` does not exist, or if `action_parameters.host_header` or
-the `headers { expression = … }` form are not in the schema — which are exactly
-the parts in doubt.
+`terraform validate` is the structural test. It fails loudly if the installed
+provider does not support the Worker script or route resources.
 
 **Step 2 — commit the lockfile that `init` just wrote.**
 
@@ -800,21 +792,13 @@ workspace and run `terraform plan`. With the `cloud` block this is a
 If you are not ready to leave the variable set, unset it again afterwards; the
 plan has already told you what you needed.
 
-**If the pinned version cannot express the rulesets**, in order of preference:
-
-1. **Create the two rulesets by hand in the dashboard and import them later.**
-   Origin Rules and Transform Rules are both UI features; this keeps the
-   cutover on schedule and the provider version out of it. Add
-   `import` blocks for `cloudflare_ruleset.stujo_net_origin[0]` and
-   `cloudflare_ruleset.stujo_net_original_host[0]` afterwards — ruleset import
-   IDs are `<zone_id>/<ruleset_id>`, and the ruleset id is in the URL of the
-   rule in the dashboard.
-2. Raise the provider version — but pin it exactly and read the upgrade guide
-   first. This is not small: v4 and v5 both carry breaking changes, and v5
-   renames `cloudflare_record` to `cloudflare_dns_record`, which touches every
-   record in `02_network.tf` — the opencampus.sh zone that is serving
-   production right now. **Do not bundle a provider major upgrade into this
-   cutover.** Do it deliberately, on its own, afterwards.
+**If the pinned version cannot express Workers**, raise the provider version,
+but pin it exactly and read the upgrade guide first. This is not small: v4 and
+v5 both carry breaking changes, and v5 renames `cloudflare_record` to
+`cloudflare_dns_record`, which touches every record in `02_network.tf` — the
+opencampus.sh zone that is serving production right now. **Do not bundle a
+provider major upgrade into this cutover.** Do it deliberately, on its own,
+afterwards.
 
 ### 4.5 One thing not to carry across
 
@@ -835,10 +819,10 @@ later. Never proxy an opencampus.sh record; never unproxy a stujo.net one.
 | Host | Proxy today | Disposition |
 |---|---|---|
 | `en.stujo.net` | Proxied | **Keep and repoint.** Second level, so free Universal SSL covers it; `09_stujo_net.tf` manages it and `proxy.ts` 301s `en.stujo.net/x` → `stujo.net/en/x`. |
-| `cau.en`, `fh-kiel.en`, `flensburg.en`, `haw-kiel.en` | DNS only | **Delete.** Third level, which Universal SSL does not reach, and this zone has no ACM. |
+| `cau.en`, `fh-kiel.en`, `flensburg.en`, `haw-kiel.en` | DNS only | **Deleted.** They were legacy aliases and are outside the supported hostname set. |
 
-Deleting is not a compromise here; keeping them proxied was never available
-without buying ACM, and the 301 does not get around that — a browser has to
+Deleting is not a compromise here; they are not part of the supported routing
+map, and the 301 does not get around that — a browser has to
 complete a TLS handshake with the *old* hostname before any redirect can be
 sent, and nothing can present a certificate for it. The alternative to
 deletion was a certificate warning, which is a worse failure than a name that
@@ -930,8 +914,8 @@ At this point stujo.net serves the new app and Rails is only reachable by IP.
 | Situation | Action |
 |---|---|
 | A host misbehaves | Point the record back at `81.169.132.172` (the Strato address it holds today). Leave the proxy **on** — it was on before this cutover, so turning it off is a second change, not a rollback. The origin swaps back at once, with nothing to propagate. Terraform will show the drift on the next plan; reconcile it deliberately rather than letting an apply silently undo an emergency fix. The reviewed form of the same rollback is to revert the value in `09_stujo_net.tf` and apply. |
-| Redirect loop or wrong host in redirects | Check the `X-Original-Host` ruleset is present and firing; failing that, set `stujo_net_canonical = false` and apply — the 301s stop while stujo.net keeps serving. |
-| TLS errors right after the apply | Check the zone's SSL mode. The `strict` setting applies in the same change as the repoint; if it was on Flexible for the Strato origin, and something about the new origin is off, strict is what surfaces it. Do not "fix" it by dropping to Flexible — that would have Cloudflare talk plaintext to the origin. Fix the Origin Rule instead. |
+| Redirect loop or wrong host in redirects | Check that the Worker route is active and that the Worker sets `X-Original-Host`; failing that, set `stujo_net_canonical = false` and apply. |
+| TLS errors right after the apply | Check the zone's SSL mode and the Worker fetch target. Keep `strict`; each `*.opencampus.sh` origin has a valid Google-managed certificate. |
 | The app itself is the problem | Roll back the Cloud Run revision as usual; the domain setup is independent of it. |
 
 A dashboard rollback beats a correct one during an incident. But write down
