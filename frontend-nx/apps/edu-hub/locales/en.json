@@ -254,7 +254,8 @@
     "session_expired_notification": "Your session has expired. Please log in again to continue.",
     "tile_slider_unavailable": "Tile slider temporarily unavailable",
     "course_tile": {
-      "extended_application_period_badge": "Extended application period"
+      "extended_application_period_badge": "Extended application period",
+      "past_event_badge": "Past"
     },
     "no_description_available": "No description available",
     "error_handling": {
@@ -362,7 +363,9 @@
       "show_all_dates": "Show all dates",
       "hide_dates": "Collapse dates",
       "date_singular": "Date",
-      "date_plural": "Dates"
+      "date_plural": "Dates",
+      "agenda": "Agenda",
+      "add_to_calendar": "Add to calendar (.ics)"
     },
     "attendances": {
       "attendances": "Attendances",
@@ -670,7 +673,8 @@
         "back_to_home": "Back to home"
       },
       "close": "Close",
-      "submit": "Submit Application",
+      "submit_approval": "Submit application",
+      "submit_direct": "Submit registration",
       "proceed_to_payment": "Proceed to Payment",
       "submitting": "Submitting...",
       "success_message_approval": "Your application has been submitted successfully. You will receive an email notification once your application has been reviewed.",
@@ -689,7 +693,8 @@
       "survey_title": "Application Questionnaire",
       "survey_completed": "Thank you! Your questionnaire has been successfully submitted.",
       "embed_error": "The questionnaire could not be loaded. Please try again later.",
-      "loading_addons": "Loading payment data"
+      "loading_addons": "Loading payment data",
+      "survey_title_registration": "Registration questionnaire"
     },
     "onboarding_modal": {
       "decline_confirm_text": "Do you really want to decline the invitation to this course?",
@@ -1058,8 +1063,8 @@
     "published": "Published",
     "title": "Program title",
     "short-title": "Short title",
-    "application-start": "Application start",
-    "application-end": "Application deadline",
+    "application-start": "Registration start",
+    "application-end": "Registration deadline",
     "course-start": "Course start",
     "course-end": "Course end"
   },
@@ -1071,7 +1076,7 @@
       "applications": "Applications",
       "confirmed": "Confirmed",
       "unrated_rated_not_informed": "Unrated / Rated but not informed",
-      "application_end": "Application End",
+      "application_end": "Registration Deadline",
       "program": "Program",
       "status": "Status",
       "email_templates": "Templates",
@@ -1290,7 +1295,7 @@
       },
       "attendance_certificate_update_failed": "Failed to update attendance certificate setting",
       "achievement_certificate_update_failed": "Failed to update achievement certificate setting",
-      "application_end_update_failed": "Failed to update application end date",
+      "application_end_update_failed": "Failed to update registration deadline",
       "copied_success_singular": {
         "courses": "Successfully copied {count} course to {programTitle}",
         "events": "Successfully copied {count} event to {programTitle}",
@@ -1945,8 +1950,8 @@
     "headline": "Programs",
     "table_header": {
       "published": "Published",
-      "application_start": "Application Start",
-      "application_end": "Application End",
+      "application_start": "Registration Start",
+      "application_end": "Registration Deadline",
       "course_start": "Course Start",
       "course_end": "Course End",
       "achievement_upload_deadline": "Deadline Perf. Record Upload",

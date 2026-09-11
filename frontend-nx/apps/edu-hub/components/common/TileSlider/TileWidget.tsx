@@ -10,6 +10,7 @@ import {
 import React from 'react';
 import { TileBase } from './TileBase';
 import { shouldShowExtendedApplicationBanner } from './extendedApplicationBanner';
+import { useEventTileMeta } from './eventTileMeta';
 import { getWidgetBaseUrl } from './widgetBaseUrl';
 
 type CourseType = CourseList_Course | CoursesEnrolledByUser_Course | CourseTiles_Course;
@@ -21,6 +22,7 @@ interface TileWidgetProps {
 const TileWidgetComponent: FC<TileWidgetProps> = ({ course }) => {
   const t = useTranslations('common');
   const getWeekdayStartAndEndString = useWeekdayStartAndEndString();
+  const eventMeta = useEventTileMeta(course);
   const showExtendedApplicationBanner = shouldShowExtendedApplicationBanner(
     course.applicationEnd ? new Date(course.applicationEnd) : null,
     course.Program.defaultApplicationEnd ? new Date(course.Program.defaultApplicationEnd) : null,
@@ -34,12 +36,21 @@ const TileWidgetComponent: FC<TileWidgetProps> = ({ course }) => {
       <TileBase 
         coverImage={course?.coverImage ?? null} 
         title={course.title} 
+        cornerBadge={
+          eventMeta.isPast ? (
+            <span className="block rounded-full border border-border-primary bg-bg-secondary px-3 py-1 text-xs font-semibold text-label-secondary shadow-sm">
+              {t('course_tile.past_event_badge')}
+            </span>
+          ) : null
+        }
         bannerText={showExtendedApplicationBanner ? t('course_tile.extended_application_period_badge') : null}
         className="shadow-lg"
         style={{ boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1)' }}
       >
         <div className="flex justify-between mb-3 text-sm tracking-wider">
-          {course.weekDay !== 'NONE' && course.startTime && course.endTime
+          {eventMeta.isEvent
+            ? eventMeta.dateSpan
+            : course.weekDay !== 'NONE' && course.startTime && course.endTime
             ? getWeekdayStartAndEndString(course, t)
             : null}{' '}
           <div className="flex items-center">

@@ -18,6 +18,10 @@ services:
       - keycloak
     environment:
       NEXT_PUBLIC_API_URL: http://${DEV_HOST:-localhost}:8080/v1/graphql
+      # Server-side rendering (the course page's SEO/JSON-LD fetch) runs inside
+      # this container, where the browser-facing localhost:8080 does not resolve.
+      # Production needs no override: NEXT_PUBLIC_API_URL is public there.
+      GRAPHQL_SSR_API_URL: http://hasura:8080/v1/graphql
       NEXT_PUBLIC_AUTH_URL: http://${DEV_HOST:-localhost}:28080
       NEXTAUTH_URL: http://${DEV_HOST:-localhost}:5000
       # Server-side callbacks stay inside this container and do not depend on
