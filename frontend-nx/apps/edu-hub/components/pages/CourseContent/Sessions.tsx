@@ -73,18 +73,15 @@ interface SessionRowProps {
   locations: ResolvedLocation[];
   /** The agenda carries the date in its day heading, so rows there show only times. */
   showDate: boolean;
-  isLoggedInParticipant: boolean;
+  canSeeOnlineLink: boolean;
 }
 
-const SessionRow: FC<SessionRowProps> = ({ session, locations, showDate, isLoggedInParticipant }) => {
+const SessionRow: FC<SessionRowProps> = ({ session, locations, showDate, canSeeOnlineLink }) => {
   const t = useTranslations('course');
   const displayDate = useDisplayDate();
   const formatTimeString = useFormatTimeString();
-  const isAdmin = useIsAdmin();
-  const isInstructor = useIsInstructor();
 
   const { startDateTime, endDateTime, title, description, SessionSpeakers } = session;
-  const canSeeOnlineLink = isLoggedInParticipant || isAdmin || isInstructor;
 
   return (
     <li className="flex mb-4">
@@ -104,7 +101,7 @@ const SessionRow: FC<SessionRowProps> = ({ session, locations, showDate, isLogge
         <span className="block text-sm sm:text-lg break-words">{title}</span>
         <div className="break-words">
           {locations.map((location, index) => (
-            <span key={location.courseLocationId} className="text-sm text-gray-400 ml-0 pl-0">
+            <span key={location.courseLocationId} className="text-sm text-label-secondary ml-0 pl-0">
               {location.locationOption ? (
                 location.locationOption === 'ONLINE' ? (
                   <>
@@ -142,7 +139,7 @@ const SessionRow: FC<SessionRowProps> = ({ session, locations, showDate, isLogge
                   </>
                 )
               ) : (
-                'Location not available'
+                t('sessions.location_not_available')
               )}
               {/* Add separator if this is not the last location with a SessionAddress */}
               {index < locations.length - 1 && ' +\u00A0'}
@@ -150,7 +147,7 @@ const SessionRow: FC<SessionRowProps> = ({ session, locations, showDate, isLogge
           ))}
         </div>
         {description ? (
-          <p className="mt-1 text-sm text-gray-400 whitespace-pre-line break-words">{description}</p>
+          <p className="mt-1 text-sm text-label-secondary whitespace-pre-line break-words">{description}</p>
         ) : null}
         <div className="flex flex-col">
           {SessionSpeakers &&
@@ -180,7 +177,11 @@ export const Sessions: FC<SessionsProps> = ({
   const t = useTranslations('course');
   const locale = useLocale();
   const { timeZone } = useAppSettings();
+  const isAdmin = useIsAdmin();
+  const isInstructor = useIsInstructor();
   const [showAllSessions, setShowAllSessions] = useState(false);
+
+  const canSeeOnlineLink = isLoggedInParticipant || isAdmin || isInstructor;
 
   const initiallyShownSessions = 4;
 
@@ -243,7 +244,12 @@ export const Sessions: FC<SessionsProps> = ({
 
     const icalEvents = sessions.map((session) => {
       const locations = resolveSessionLocations(session, courseLocations, addressMap);
-      const location = locations.map((l) => l.displayAddress || l.locationOption).filter(Boolean).join(' – ');
+      const location = locations
+        .map((l) =>
+          l.locationOption === 'ONLINE' && !canSeeOnlineLink ? l.locationOption : l.displayAddress || l.locationOption
+        )
+        .filter(Boolean)
+        .join(' – ');
 
       return {
         uid: `session-${session.id}@eduhub`,
@@ -260,7 +266,7 @@ export const Sessions: FC<SessionsProps> = ({
       generateICalString(icalEvents, calendarName),
       `${(calendarName || 'eduhub').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'eduhub'}.ics`
     );
-  }, [sessions, courseLocations, addressMap, courseTitle, courseId]);
+  }, [sessions, courseLocations, addressMap, courseTitle, courseId, canSeeOnlineLink]);
 
   if (visibleSessions.length === 0) {
     return null;
@@ -271,8 +277,8 @@ export const Sessions: FC<SessionsProps> = ({
   const addToCalendarButton = !courseTitle ? null : (
     <button
       onClick={handleExportICal}
-      className="flex items-center gap-2 mt-2 mb-6 px-4 py-2 rounded-lg border border-border-primary bg-bg-secondary
-        hover:bg-border-primary text-sm text-label-primary transition-colors"
+      className="flex items-center gap-2 mt-2 mb-6 px-4 py-2 min-h-11 touch-manipulation rounded-lg border
+        border-border-primary bg-bg-secondary hover:bg-border-primary text-sm text-label-primary transition-colors"
     >
       <MdCalendarMonth />
       {t('sessions.add_to_calendar')}
@@ -286,7 +292,8 @@ export const Sessions: FC<SessionsProps> = ({
       const session = visibleSessions[0];
       const locations = locationsBySessionId.get(session.id) ?? [];
       if (!session.title && !session.description && locations.length === 0) {
-        return null;
+        // Nothing to describe, but the dates are still worth exporting.
+        return addToCalendarButton ? <div className="mt-24">{addToCalendarButton}</div> : null;
       }
       return (
         <div className="mt-24">
@@ -295,7 +302,7 @@ export const Sessions: FC<SessionsProps> = ({
               session={session}
               locations={locations}
               showDate={false}
-              isLoggedInParticipant={isLoggedInParticipant}
+              canSeeOnlineLink={canSeeOnlineLink}
             />
           </ul>
           {addToCalendarButton}
@@ -318,7 +325,7 @@ export const Sessions: FC<SessionsProps> = ({
                   session={session}
                   locations={locationsBySessionId.get(session.id) ?? []}
                   showDate={false}
-                  isLoggedInParticipant={isLoggedInParticipant}
+                  canSeeOnlineLink={canSeeOnlineLink}
                 />
               ))}
             </ul>
@@ -341,14 +348,14 @@ export const Sessions: FC<SessionsProps> = ({
             session={session}
             locations={locationsBySessionId.get(session.id) ?? []}
             showDate={true}
-            isLoggedInParticipant={isLoggedInParticipant}
+            canSeeOnlineLink={canSeeOnlineLink}
           />
         ))}
       </ul>
       {sessions.length > initiallyShownSessions &&
         (showAllSessions ? (
           <button
-            className="text-white text-sm sm:text-lg font-semibold hover:underline italic flex items-center pb-6"
+            className="text-white text-sm sm:text-lg font-semibold hover:underline italic flex items-center pb-6 min-h-11 touch-manipulation"
             onClick={() => setShowAllSessions(false)}
           >
             {t('sessions.hide_dates')}
@@ -356,7 +363,7 @@ export const Sessions: FC<SessionsProps> = ({
           </button>
         ) : (
           <button
-            className="text-white text-sm sm:text-lg font-semibold hover:underline italic flex items-center pb-6"
+            className="text-white text-sm sm:text-lg font-semibold hover:underline italic flex items-center pb-6 min-h-11 touch-manipulation"
             onClick={() => setShowAllSessions(true)}
           >
             {t('sessions.show_all_dates')}

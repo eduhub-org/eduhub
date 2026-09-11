@@ -102,7 +102,9 @@ const CoursePage: FC<CoursePageProps> = ({ seo, structuredData }) => {
         {structuredData && (
           <script
             type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+            // Course text is editable by instructors and org admins, so `<` is
+            // escaped to keep it from closing this script tag.
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, '\\u003c') }}
           />
         )}
       </Head>

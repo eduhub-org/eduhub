@@ -1,5 +1,6 @@
 import {
   compareByUpcoming,
+  hasActiveSession,
   formatDayHeading,
   formatSessionDateSpan,
   groupSessionsByDay,
@@ -201,5 +202,44 @@ describe('sortEventCoursesByUpcoming', () => {
 
   it('handles an empty list', () => {
     expect(sortEventCoursesByUpcoming([], now)).toEqual([]);
+  });
+});
+
+describe('hasActiveSession', () => {
+  const now = new Date('2025-09-13T09:00:00Z');
+
+  it('is true while a session is under way', () => {
+    expect(hasActiveSession([session('2025-09-13T08:00:00Z', '2025-09-13T18:00:00Z')], now)).toBe(true);
+  });
+
+  it('is false before it starts and after it ends', () => {
+    expect(hasActiveSession([session('2025-09-13T10:00:00Z', '2025-09-13T12:00:00Z')], now)).toBe(false);
+    expect(hasActiveSession([session('2025-09-13T06:00:00Z', '2025-09-13T07:00:00Z')], now)).toBe(false);
+  });
+
+  it('treats a session with no end as instantaneous', () => {
+    expect(hasActiveSession([session('2025-09-13T09:00:00Z', null)], now)).toBe(true);
+    expect(hasActiveSession([session('2025-09-13T08:00:00Z', null)], now)).toBe(false);
+  });
+});
+
+describe('compareByUpcoming - running events (regression)', () => {
+  const now = new Date('2025-09-13T09:00:00Z');
+
+  // The bug: nextSessionStart only reports sessions that have not begun, so an
+  // event running right now with a session next week sorted by next week and
+  // fell behind an event merely starting tomorrow.
+  it('keeps an event running now ahead of one starting tomorrow', () => {
+    const runningWithLaterSession = {
+      id: 'running',
+      Sessions: [
+        session('2025-09-13T08:00:00Z', '2025-09-13T18:00:00Z'),
+        session('2025-09-20T08:00:00Z', '2025-09-20T10:00:00Z'),
+      ],
+    };
+    const startsTomorrow = { id: 'tomorrow', Sessions: [session('2025-09-14T08:00:00Z', '2025-09-14T10:00:00Z')] };
+
+    const sorted = [startsTomorrow, runningWithLaterSession].sort((a, b) => compareByUpcoming(a, b, now));
+    expect(sorted.map((c) => c.id)).toEqual(['running', 'tomorrow']);
   });
 });

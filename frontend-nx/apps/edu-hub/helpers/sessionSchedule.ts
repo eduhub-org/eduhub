@@ -140,6 +140,15 @@ export const isPastEvent = (sessions: ScheduleSession[], now: Date): boolean => 
   return end != null && end < now;
 };
 
+/** True while a session is under way: it has started and has not ended. */
+export const hasActiveSession = (sessions: ScheduleSession[], now: Date): boolean =>
+  (sessions ?? []).some((session) => {
+    const start = toDate(session.startDateTime);
+    if (!start || start > now) return false;
+    const end = toDate(session.endDateTime) ?? start;
+    return end >= now;
+  });
+
 /**
  * Listing order for events: anything not finished yet first (soonest next
  * session first, so an event already under way stays at the top), then finished
@@ -156,8 +165,10 @@ export const compareByUpcoming = (
     if (!end) return { group: 2, time: 0 };
     // Finished: newest first, so the most recent past event leads the tail.
     if (end < now) return { group: 1, time: -end.getTime() };
-    // Running or upcoming. An event mid-run has no next session on its final
-    // day, so fall back to its end to keep it ahead of later events.
+    // Under way right now: sort as though it starts this instant, so it stays
+    // ahead of anything merely scheduled sooner than its own next session.
+    if (hasActiveSession(sessions, now)) return { group: 0, time: now.getTime() };
+    // Upcoming, or between sessions: order by whichever session comes next.
     return { group: 0, time: (nextSessionStart(sessions, now) ?? end).getTime() };
   };
 

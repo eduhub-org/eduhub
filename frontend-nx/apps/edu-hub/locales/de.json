@@ -365,7 +365,8 @@
       "date_singular": "Termin",
       "date_plural": "Termine",
       "agenda": "Programm",
-      "add_to_calendar": "Zum Kalender hinzufügen (.ics)"
+      "add_to_calendar": "Zum Kalender hinzufügen (.ics)",
+      "location_not_available": "Ort noch nicht bekannt"
     },
     "attendances": {
       "attendances": "Anwesenheiten",

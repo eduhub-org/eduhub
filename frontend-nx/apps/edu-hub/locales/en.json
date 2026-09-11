@@ -365,7 +365,8 @@
       "date_singular": "Date",
       "date_plural": "Dates",
       "agenda": "Agenda",
-      "add_to_calendar": "Add to calendar (.ics)"
+      "add_to_calendar": "Add to calendar (.ics)",
+      "location_not_available": "Location not available"
     },
     "attendances": {
       "attendances": "Attendances",

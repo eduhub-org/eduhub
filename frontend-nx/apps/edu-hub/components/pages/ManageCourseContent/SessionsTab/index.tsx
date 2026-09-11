@@ -1,5 +1,6 @@
 import { QueryResult } from '@apollo/client';
 import { ProgramType } from '../../../../types/enums';
+import { nextSessionTimes } from './sessionDefaults';
 import { FC, useCallback, useMemo, useState } from 'react';
 import { ColumnDef } from '@tanstack/react-table';
 import {
@@ -134,38 +135,11 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
   );
 
   const insertSession = useCallback(async () => {
-    let startTime: Date;
-    let endTime: Date;
-
-    if (courseSessions.length > 0) {
-      const lastSession = courseSessions[courseSessions.length - 1];
-      startTime = new Date(lastSession.startDateTime);
-      endTime = new Date(lastSession.endDateTime);
-      startTime.setDate(startTime.getDate() + 7);
-      endTime.setDate(endTime.getDate() + 7);
-    } else {
-      const today = new Date();
-      startTime = new Date(today);
-      endTime = new Date(today);
-      if (course.startTime) {
-        const [startHours, startMinutes] = course.startTime.split(':').map(Number);
-        startTime.setHours(startHours, startMinutes, 0, 0);
-      } else if (isEventCourse) {
-        // An event has no weekly start time to inherit and 00:00-00:00 is a
-        // useless default, so start at the next full hour instead.
-        startTime.setHours(today.getHours() + 1, 0, 0, 0);
-      } else {
-        startTime.setHours(0, 0, 0, 0);
-      }
-      if (course.endTime) {
-        const [endHours, endMinutes] = course.endTime.split(':').map(Number);
-        endTime.setHours(endHours, endMinutes, 0, 0);
-      } else if (isEventCourse) {
-        endTime.setTime(startTime.getTime() + 2 * 60 * 60 * 1000);
-      } else {
-        endTime.setHours(0, 0, 0, 0);
-      }
-    }
+    const { startTime, endTime } = nextSessionTimes(
+      course,
+      courseSessions[courseSessions.length - 1],
+      isEventCourse
+    );
 
     await insertSessionMutation({
       variables: {
@@ -176,16 +150,7 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
       },
     });
     qResult.refetch();
-  }, [
-    sessionAddresses,
-    courseSessions,
-    insertSessionMutation,
-    course.id,
-    course.startTime,
-    course.endTime,
-    isEventCourse,
-    qResult,
-  ]);
+  }, [sessionAddresses, courseSessions, insertSessionMutation, course, isEventCourse, qResult]);
 
   const [updateSessionStartTime] = useRoleMutation(UPDATE_SESSION_START_TIME);
   const [updateSessionEndTime] = useRoleMutation(UPDATE_SESSION_END_TIME);
