@@ -41,7 +41,7 @@ export const nextSessionTimes = (
   const startTime = new Date(now);
   const endTime = new Date(now);
 
-  if (course.startTime) {
+  if (!isEventCourse && course.startTime) {
     applyTimeOfDay(startTime, course.startTime);
   } else if (isEventCourse) {
     // An event has no weekly start time to inherit and 00:00-00:00 is a useless
@@ -51,7 +51,7 @@ export const nextSessionTimes = (
     startTime.setHours(0, 0, 0, 0);
   }
 
-  if (course.endTime) {
+  if (!isEventCourse && course.endTime) {
     applyTimeOfDay(endTime, course.endTime);
   } else {
     endTime.setHours(0, 0, 0, 0);

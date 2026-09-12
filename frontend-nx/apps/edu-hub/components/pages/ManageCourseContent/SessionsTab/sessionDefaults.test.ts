@@ -27,6 +27,18 @@ describe('nextSessionTimes', () => {
     expect(endTime.getHours()).toBe(17);
   });
 
+  it('ignores stale weekly times for a first event session', () => {
+    const { startTime, endTime } = nextSessionTimes(
+      { startTime: '09:00', endTime: '10:00' },
+      undefined,
+      true,
+      NOW
+    );
+    expect(startTime.getHours()).toBe(15);
+    expect(startTime.getMinutes()).toBe(0);
+    expect(endTime.getHours()).toBe(17);
+  });
+
   // Regression: an event hides the weekly time controls without clearing them,
   // so a stale endTime could land before the generated start.
   it('never produces an end before the start for an event with only a stale endTime', () => {
