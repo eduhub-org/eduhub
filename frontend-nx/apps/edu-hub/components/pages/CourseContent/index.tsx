@@ -19,6 +19,8 @@ import { FundingOrganizations } from './FundingOrganizations';
 import CourseProjectsSection from '../../common/TileSlider/CourseProjectsSection';
 import { InfoPanel } from './InfoPanel';
 import { useWeekdayStartAndEndString } from '../../../helpers/dateTimeHelpers';
+import { useAppSettings } from '../../../contexts/AppSettingsContext';
+import { formatSessionDateSpan } from '../../../helpers/sessionSchedule';
 import { LearningGoals } from './LearningGoals';
 import { Sessions } from './Sessions';
 import { CompletedDegreeCourses, CurrentDegreeCourses } from './DegreeCourses';
@@ -47,6 +49,7 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
   const [showSuccessSnackbar, setShowSuccessSnackbar] = useState(false);
   const [registrationSuccessWaitlist, setRegistrationSuccessWaitlist] = useState(false);
   const getWeekdayStartAndEndString = useWeekdayStartAndEndString();
+  const { timeZone } = useAppSettings();
 
   // Query for authorized course data
   const [
@@ -138,6 +141,8 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
   // Check if course is a degree course
   const isDegreeCourse = course.Program?.type === 'DEGREES';
   const isEventCourse = course.Program?.type === 'EVENTS';
+  // An event has no weekday; its dates come from its sessions.
+  const eventDateSpan = isEventCourse ? formatSessionDateSpan(course.Sessions ?? [], timeZone) : null;
 
   // Check if registration requires payment
   const registrationConfig = course.registrationType 
@@ -190,7 +195,9 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
               <PageBlock>
                 <ContentRow className="items-center">
                   <div className="flex flex-1 flex-col text-white mb-4 lg:mb-20">
-                    {course.weekDay !== 'NONE' ? (
+                    {isEventCourse ? (
+                      eventDateSpan && <span className="text-xs">{eventDateSpan}</span>
+                    ) : course.weekDay !== 'NONE' ? (
                       <span className="text-xs">{getWeekdayStartAndEndString(course, tCommon)}</span>
                     ) : null}
                     <span className="text-2xl mt-2">{course.tagline}</span>
@@ -264,10 +271,13 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                 <PageBlock classname="flex-1 text-white space-y-6">
                   <LearningGoals learningGoals={course.learningGoals} />
                   {!isDegreeCourse ? (
-                    <Sessions 
-                      sessions={course.Sessions} 
+                    <Sessions
+                      sessions={course.Sessions}
                       courseLocations={course.CourseLocations}
-                      isLoggedInParticipant={isLoggedInParticipant} 
+                      isLoggedInParticipant={isLoggedInParticipant}
+                      isEvent={isEventCourse}
+                      courseId={course.id}
+                      courseTitle={course.title}
                     />
                   ) : (
                     <CurrentDegreeCourses degreeCourses={course.DegreeCourses} />

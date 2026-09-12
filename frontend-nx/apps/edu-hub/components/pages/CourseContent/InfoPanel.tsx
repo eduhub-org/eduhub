@@ -4,6 +4,8 @@ import { useTranslations, useLocale } from 'next-intl';
 import { MdAttachMoney, MdCalendarMonth } from 'react-icons/md';
 
 import { useStartTimeString, useEndTimeString, getWeekdayString } from '../../../helpers/dateTimeHelpers';
+import { useAppSettings } from '../../../contexts/AppSettingsContext';
+import { formatSessionDateSpan } from '../../../helpers/sessionSchedule';
 import { Course_Course_by_pk } from '../../../queries/__generated__/Course';
 import UserCard from '../../common/UserCard';
 import { getRegistrationTypeConfig } from './Registration/types';
@@ -20,6 +22,7 @@ export const InfoPanel: FC<IProps> = ({ course }) => {
 
   const getStartTimeString = useStartTimeString();
   const getEndTimeString = useEndTimeString();
+  const { timeZone } = useAppSettings();
 
   // Get ECTS translations object to handle keys with dots/commas
   const ectsTranslations = tCourse.raw('ects') as Record<string, string>;
@@ -31,6 +34,7 @@ export const InfoPanel: FC<IProps> = ({ course }) => {
   // from its member courses (Course.requiredEcts). That is a real number rather than one
   // of the few fixed Course.ects strings, so it is formatted instead of looked up.
   const isDegreeCourse = course.Program?.type === 'DEGREES';
+  const isEventCourse = course.Program?.type === 'EVENTS';
   const requiredEctsDisplay =
     course.requiredEcts != null
       ? Number(course.requiredEcts).toLocaleString(locale, { maximumFractionDigits: 1 })
@@ -94,6 +98,11 @@ export const InfoPanel: FC<IProps> = ({ course }) => {
     );
   }, [relevantSession, locale, getStartTimeString, getEndTimeString]);
 
+  const eventDateSpan = useMemo(
+    () => (isEventCourse ? formatSessionDateSpan(course.Sessions ?? [], timeZone) : null),
+    [isEventCourse, course.Sessions, timeZone]
+  );
+
   // Build location text
   const locationText = useMemo(() => {
     if (!course.CourseLocations || course.CourseLocations.length === 0) return null;
@@ -105,8 +114,9 @@ export const InfoPanel: FC<IProps> = ({ course }) => {
     ));
   }, [course.CourseLocations]);
 
-  const hasWeekday = course.weekDay !== 'NONE';
-  const hasSessionDate = course.weekDay === 'NONE' && sessionDisplay;
+  const hasEventDateSpan = !!eventDateSpan;
+  const hasWeekday = !isEventCourse && course.weekDay !== 'NONE';
+  const hasSessionDate = !isEventCourse && course.weekDay === 'NONE' && sessionDisplay;
   // Only show ECTS if achievement certificate is possible
   const hasEcts = isDegreeCourse
     ? !!requiredEctsDisplay
@@ -118,8 +128,17 @@ export const InfoPanel: FC<IProps> = ({ course }) => {
   const infoElements = useMemo(() => {
     const elements: JSX.Element[] = [];
 
-    // Weekday or Session date
-    if (hasWeekday) {
+    // Event date span, weekday, or single session date
+    if (hasEventDateSpan) {
+      elements.push(
+        <div key="event-date" className="flex flex-col items-center">
+          <div className="flex justify-center items-center mb-2">
+            <MdCalendarMonth className="text-label-primary" size={28} />
+          </div>
+          <span className="text-sm mt-2 text-center">{eventDateSpan}</span>
+        </div>
+      );
+    } else if (hasWeekday) {
       elements.push(
         <div key="weekday" className="flex flex-col items-center">
           <span className="text-lg mt-2 text-center">{getWeekdayString(course, t, false, false)}</span>
@@ -205,6 +224,8 @@ export const InfoPanel: FC<IProps> = ({ course }) => {
 
     return elements;
   }, [
+    hasEventDateSpan,
+    eventDateSpan,
     hasWeekday,
     hasSessionDate,
     hasEcts,

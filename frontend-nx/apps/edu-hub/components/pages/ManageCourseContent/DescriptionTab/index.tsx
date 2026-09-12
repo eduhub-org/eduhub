@@ -174,9 +174,11 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
     { value: 'EN', label: t('languages.EN') },
   ];
 
+  const isEventCourse = course.Program?.type === ProgramType.EVENTS;
+
   // Mirrors the guards in functions/callNodeFunction/registerGuestForCourse.
   const supportsGuestRegistration =
-    course.Program?.type === ProgramType.EVENTS &&
+    isEventCourse &&
     (course.registrationType === CourseRegistrationType_enum.DIRECT_CONFIRMATION ||
       course.registrationType === CourseRegistrationType_enum.DIRECT_WITH_INPUT);
 
@@ -307,36 +309,40 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2">
-        <div className="grid grid-cols-3">
-          <DropDownSelector
-            variant="eduhub"
-            label={t('weekday')}
-            value={course.weekDay ?? 'MONDAY'}
-            options={weekDayOptions}
-            updateValueMutation={UPDATE_COURSE_WEEKDAY}
-            identifierVariables={{ courseId: course.id }}
-            refetchQueries={['ManagedCourse']}
-          />
-          <TimePicker
-            variant="eduhub"
-            label={t('start_time')}
-            currentValue={course.startTime}
-            updateValueMutation={UPDATE_COURSE_START_TIME}
-            identifierVariables={{ courseId: course.id }}
-            refetchQueries={['ManagedCourse']}
-            className="mb-4"
-          />
-          <TimePicker
-            variant="eduhub"
-            label={t('end_time')}
-            currentValue={course.endTime}
-            updateValueMutation={UPDATE_COURSE_END_TIME}
-            identifierVariables={{ courseId: course.id }}
-            refetchQueries={['ManagedCourse']}
-            className="mb-4"
-          />
-          <div />
-        </div>
+        {/* An event does not recur weekly - its dates come from its sessions -
+            so the whole weekday/time column is dropped rather than left empty. */}
+        {isEventCourse ? null : (
+          <div className="grid grid-cols-3">
+            <DropDownSelector
+              variant="eduhub"
+              label={t('weekday')}
+              value={course.weekDay ?? 'MONDAY'}
+              options={weekDayOptions}
+              updateValueMutation={UPDATE_COURSE_WEEKDAY}
+              identifierVariables={{ courseId: course.id }}
+              refetchQueries={['ManagedCourse']}
+            />
+            <TimePicker
+              variant="eduhub"
+              label={t('start_time')}
+              currentValue={course.startTime}
+              updateValueMutation={UPDATE_COURSE_START_TIME}
+              identifierVariables={{ courseId: course.id }}
+              refetchQueries={['ManagedCourse']}
+              className="mb-4"
+            />
+            <TimePicker
+              variant="eduhub"
+              label={t('end_time')}
+              currentValue={course.endTime}
+              updateValueMutation={UPDATE_COURSE_END_TIME}
+              identifierVariables={{ courseId: course.id }}
+              refetchQueries={['ManagedCourse']}
+              className="mb-4"
+            />
+            <div />
+          </div>
+        )}
         <div className="grid grid-cols-2">
           <DropDownSelector
             variant="eduhub"

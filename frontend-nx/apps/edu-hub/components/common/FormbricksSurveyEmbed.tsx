@@ -9,6 +9,11 @@ interface Props {
   onComplete: () => void;
   onError?: (error: string) => void;
   className?: string;
+  /**
+   * Accessible name of the iframe. Defaults to the application wording; a direct
+   * registration passes the registration variant instead.
+   */
+  title?: string;
 }
 
 /**
@@ -16,6 +21,7 @@ interface Props {
  * Listens for the formbricksSurveyCompleted event.
  */
 export const FormbricksSurveyEmbed: FC<Props> = ({
+  title,
   surveyUrl,
   userId,
   courseId,
@@ -100,7 +106,7 @@ export const FormbricksSurveyEmbed: FC<Props> = ({
         style={{ minHeight: '700px', height: '100%' }}
         onLoad={handleIframeLoad}
         onError={handleIframeError}
-        title={t('formbricks.survey_title')}
+        title={title ?? t('formbricks.survey_title')}
         allow="camera; microphone"
       />
     </div>

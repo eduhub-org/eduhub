@@ -129,6 +129,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
   // A "degree" is a course inside a DEGREES program; only such a course carries
   // completion thresholds for its degree certificate.
   const isDegreeCourse = course.Program?.type === ProgramType.DEGREES;
+  const isEventCourse = course.Program?.type === ProgramType.EVENTS;
 
   const projectSubmissionDeadlineValue = useMemo(
     () => submissionDeadlineToCalendarDate(course.projectSubmissionDeadline),
@@ -1062,6 +1063,11 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                     </button>
                     <span>{t('manageCourses.possible_certificates.attendance_certificate')}</span>
                   </div>
+                  {/* Hidden for an event: an event awards attendance, not an
+                      achievement, so ECTS and the project settings that hang off
+                      the achievement certificate do not apply to it. */}
+                  {!isEventCourse && (
+                    <>
                   <div className="flex items-center space-x-2">
                     <button
                       type="button"
@@ -1125,6 +1131,8 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                         refetchQueries={['AdminCourseList']}
                       />
                     </div>
+                  )}
+                    </>
                   )}
                 </div>
 

@@ -254,7 +254,8 @@
     "session_expired_notification": "Deine Sitzung ist abgelaufen. Bitte melde dich erneut an, um fortzufahren.",
     "tile_slider_unavailable": "Kachel-Slider vorübergehend nicht verfügbar",
     "course_tile": {
-      "extended_application_period_badge": "Verlängerte Anmeldefrist"
+      "extended_application_period_badge": "Verlängerte Anmeldefrist",
+      "past_event_badge": "Vergangen"
     },
     "no_description_available": "Keine Beschreibung verfügbar",
     "error_handling": {
@@ -362,7 +363,10 @@
       "show_all_dates": "Alle Termine anzeigen",
       "hide_dates": "Termine einklappen",
       "date_singular": "Termin",
-      "date_plural": "Termine"
+      "date_plural": "Termine",
+      "agenda": "Programm",
+      "add_to_calendar": "Zum Kalender hinzufügen (.ics)",
+      "location_not_available": "Ort noch nicht bekannt"
     },
     "attendances": {
       "attendances": "Anwesenheiten",
@@ -610,7 +614,7 @@
     "registration": {
       "application_deadline": "Bewerbungsschluss: ",
       "registration_deadline": "Anmeldeschluss: ",
-      "apply_now": "Jetzt anmelden",
+      "apply_now": "Jetzt bewerben",
       "join_waitlist": "Auf die Warteliste setzen",
       "register_external": "Über externen Link registrieren",
       "register_with_payment": "Jetzt Registrieren",
@@ -670,7 +674,8 @@
         "back_to_home": "Zurück zur Startseite"
       },
       "close": "Schließen",
-      "submit": "Bewerbung absenden",
+      "submit_approval": "Bewerbung absenden",
+      "submit_direct": "Anmeldung absenden",
       "proceed_to_payment": "Zur Zahlung",
       "submitting": "Wird gesendet...",
       "success_message_approval": "Deine Bewerbung wurde erfolgreich eingereicht. Du erhältst eine E-Mail-Benachrichtigung, sobald deine Bewerbung geprüft wurde.",
@@ -689,7 +694,8 @@
       "survey_title": "Bewerbungsfragebogen",
       "survey_completed": "Vielen Dank! Dein Fragebogen wurde erfolgreich eingereicht.",
       "embed_error": "Der Fragebogen konnte nicht geladen werden. Bitte versuche es später erneut.",
-      "loading_addons": "Lade Zahlungsdaten"
+      "loading_addons": "Lade Zahlungsdaten",
+      "survey_title_registration": "Anmeldefragebogen"
     },
     "onboarding_modal": {
       "decline_confirm_text": "Möchtest du die Einladung zu diesem Kurs wirklich ablehnen?",
@@ -1042,8 +1048,8 @@
     "published": "Veröffentlicht",
     "title": "Programmtitel",
     "short-title": "Kurztitel",
-    "application-start": "Bewerbungsanfang",
-    "application-end": "Bewerbungsende",
+    "application-start": "Anmeldebeginn",
+    "application-end": "Anmeldeschluss",
     "course-start": "Kursstart",
     "course-end": "Kursende"
   },
@@ -1055,7 +1061,7 @@
       "applications": "Bewerbungen",
       "confirmed": "Bestätigt",
       "unrated_rated_not_informed": "Unbewertet / Bewertet aber nicht informiert",
-      "application_end": "Bewerbungs- ende",
+      "application_end": "Anmelde- schluss",
       "program": "Programm",
       "status": "Status",
       "email_templates": "Vorlagen",
@@ -1272,7 +1278,7 @@
       },
       "attendance_certificate_update_failed": "Fehler beim Aktualisieren der Teilnahmebescheinigung-Einstellung",
       "achievement_certificate_update_failed": "Fehler beim Aktualisieren der Leistungsbescheinigung-Einstellung",
-      "application_end_update_failed": "Fehler beim Aktualisieren des Bewerbungsendes",
+      "application_end_update_failed": "Fehler beim Aktualisieren des Anmeldeschlusses",
       "copied_success_singular": {
         "courses": "{count} Kurs erfolgreich in {programTitle} kopiert",
         "events": "{count} Event erfolgreich in {programTitle} kopiert",
@@ -1930,8 +1936,8 @@
     "headline": "Programme",
     "table_header": {
       "published": "Veröffent- licht",
-      "application_start": "Bewerbungs- anfang",
-      "application_end": "Bewerbungs- ende",
+      "application_start": "Anmelde- beginn",
+      "application_end": "Anmelde- schluss",
       "course_start": "Kursstart",
       "course_end": "Kursende",
       "achievement_upload_deadline": "Abgabeschluss Leistungs- nachweise",

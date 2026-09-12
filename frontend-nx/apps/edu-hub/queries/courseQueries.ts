@@ -9,9 +9,6 @@ export const COURSE_TILES = gql`
       where: { published: { _eq: true }, Program: { published: { _eq: true } } }
     ) {
       ...CourseTileFragment
-      Program {
-        type
-      }
       CourseGroups {
         CourseGroupOption {
           id
@@ -37,9 +34,6 @@ export const COURSE_TILES_BY_ORGANIZATION = gql`
       }
     ) {
       ...CourseTileFragment
-      Program {
-        type
-      }
       CourseGroups {
         CourseGroupOption {
           id
