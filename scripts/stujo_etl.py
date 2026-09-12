@@ -1331,16 +1331,31 @@ def main():
         gcs_bucket = storage.Client().bucket(os.environ["GCS_BUCKET"])
 
     keycloak = None  # stays None in dry runs (steps only log what they would do)
-    if not args.dry_run and ({"users", "students"} & steps):
+    if {"users", "students"} & steps:
         kc_url = os.environ.get("KEYCLOAK_URL")
         kc_user = os.environ.get("KEYCLOAK_USER")
         kc_pw = os.environ.get("KEYCLOAK_PW")
         kc_realm = os.environ.get("KEYCLOAK_REALM", "edu-hub")
         if not kc_url or not kc_user or not kc_pw:
-            log.error("KEYCLOAK_URL, KEYCLOAK_USER and KEYCLOAK_PW are required "
-                      "for the users/students steps in a real run")
-            sys.exit(2)
-        keycloak = KeycloakClient(kc_url, kc_realm, kc_user, kc_pw)
+            if not args.dry_run:
+                log.error("KEYCLOAK_URL, KEYCLOAK_USER and KEYCLOAK_PW are required "
+                          "for the users/students steps in a real run")
+                sys.exit(2)
+            log.warning("Keycloak env incomplete — skipping the dry-run credential "
+                        "preflight; a real run would abort here")
+        elif args.dry_run:
+            # Authenticate even though a dry run never touches Keycloak. __init__
+            # only performs a token request (no writes), and without this check a
+            # wrong KEYCLOAK_USER/KEYCLOAK_PW sails through the dry run and only
+            # surfaces once the real run is launched — which is what happened on
+            # the first production attempt (admin-cli rejected a human console
+            # login with HTTP 400). Discard the client afterwards so the steps
+            # still receive None and keep their no-write semantics.
+            KeycloakClient(kc_url, kc_realm, kc_user, kc_pw)
+            log.info("[dry-run] Keycloak admin auth OK (user %s, realm %s)",
+                     kc_user, kc_realm)
+        else:
+            keycloak = KeycloakClient(kc_url, kc_realm, kc_user, kc_pw)
 
     hasura = HasuraClient(hasura_url, admin_secret, args.dry_run)
     cnx = mysql_connection(dsn)

@@ -2,13 +2,12 @@
 # The stujo.net zone in Cloudflare
 #####
 #
-# stujo.net is not served by our load balancer. Each web host is a PROXIED
-# record whose Origin Rule rewrites the origin Host to the matching
-# <service>.opencampus.sh name — which is what the shared load balancer routes
-# on (url_mask) and what its certificate already covers. A Host override in an
-# Origin Rule sets the SNI to the same value, so the zone stays on Full
-# (strict). The visitor's address bar keeps saying stujo.net, because a proxy
-# is not a redirect. See docs/STUJO_PROD_CUTOVER.md §4.
+# stujo.net is served through a Cloudflare Worker. Each web host is a PROXIED
+# record and a Worker route maps it to the matching <service>.opencampus.sh
+# origin. Fetching that URL sets both the origin Host and SNI to a name the
+# shared load balancer routes and its certificate covers. The visitor's
+# address bar keeps saying stujo.net because the Worker returns the upstream
+# response rather than redirecting. See docs/STUJO_PROD_CUTOVER.md §4.
 #
 # ── The zone is ALREADY proxied ─────────────────────────────────────────────
 #
@@ -22,12 +21,12 @@
 #
 #   * The records stay A records pointing at the load balancer IP, rather than
 #     becoming CNAMEs to <service>.opencampus.sh. Same destination either way
-#     (the Origin Rule, not the record, decides the origin Host), but changing
+#     (the Worker, not the record, decides the origin Host), but changing
 #     a record's TYPE can force Terraform to destroy and recreate it, and a
 #     recreate is the one thing that would put a gap in a name that currently
 #     resolves. An A -> A value change is an in-place update.
 #   * www.stujo.net is left as the CNAME to the apex that it already is. Its
-#     Host header is still www.stujo.net, so it still needs an Origin Rule —
+#     Host header is still www.stujo.net, so it still needs a Worker route —
 #     but it needs no DNS change at all.
 #
 # ── proxied = true here, and that is NOT a contradiction of 02_network.tf ────
@@ -61,7 +60,7 @@ locals {
   stujo_net_enabled = var.stujo_net_zone_id != ""
 
   # Visitor host -> the origin host its traffic must arrive at. This drives the
-  # Origin Rules, and every host that must be SERVED needs an entry here —
+  # Worker, and every host that must be SERVED needs an entry here —
   # including www, whose DNS record this file does not manage.
   #
   # en.stujo.net is here, its four third-level siblings are not, and the split
@@ -100,13 +99,6 @@ locals {
     "flensburg.stujo.net",
   ]) : toset([])
 
-  # One Origin Rule per distinct origin, matching every visitor host that maps
-  # to it — four rules rather than six.
-  stujo_net_origins = local.stujo_net_enabled ? {
-    for origin in distinct(values(local.stujo_net_origin_hosts)) : origin => [
-      for host, target in local.stujo_net_origin_hosts : host if target == origin
-    ]
-  } : {}
 }
 
 # The web hosts. Already proxied and already A records; this changes only where
@@ -138,64 +130,51 @@ resource "cloudflare_record" "stujo_net_www" {
   ttl     = 1
 }
 
-# Origin Rules: rewrite the origin Host (and with it the SNI) to the name the
-# load balancer routes on and the certificate covers. Without this the origin
-# would be asked for `cau.stujo.net`, which it holds no certificate for.
-resource "cloudflare_ruleset" "stujo_net_origin" {
+# Proxy to the existing opencampus.sh origins. The Worker changes the fetch URL
+# (therefore Host and SNI) and explicitly tells the app which public hostname
+# the visitor used. This avoids the Enterprise-only Origin Rule Host override.
+resource "cloudflare_worker_script" "stujo_net" {
   count = local.stujo_net_enabled ? 1 : 0
 
-  zone_id     = var.stujo_net_zone_id
-  name        = "StuJo origin host override"
-  description = "Serve each stujo.net host from its <service>.opencampus.sh origin"
-  kind        = "zone"
-  phase       = "http_request_origin"
+  account_id = var.stujo_net_account_id
+  name       = "stujo-net-origin-proxy"
+  content    = <<-JS
+    const ORIGINS = ${jsonencode(local.stujo_net_origin_hosts)};
 
-  dynamic "rules" {
-    for_each = local.stujo_net_origins
-    content {
-      action      = "route"
-      description = "stujo.net -> ${rules.key}"
-      expression  = "(http.host in {${join(" ", [for h in rules.value : "\"${h}\""])}})"
-      enabled     = true
+    addEventListener("fetch", event => {
+      event.respondWith(proxy(event.request));
+    });
 
-      action_parameters {
-        host_header = rules.key
+    async function proxy(request) {
+      const incoming = new URL(request.url);
+      const origin = ORIGINS[incoming.hostname];
+
+      if (!origin) {
+        return new Response("Unknown StuJo host", { status: 421 });
       }
+
+      const upstream = new URL(request.url);
+      upstream.protocol = "https:";
+      upstream.hostname = origin;
+      upstream.port = "";
+
+      const proxied = new Request(upstream.toString(), request);
+      proxied.headers.set("X-Original-Host", incoming.hostname);
+      return fetch(proxied);
     }
-  }
+  JS
 }
 
-# The visitor's real host, for the app. Everything downstream of the Origin
-# Rule sees the rewritten Host, so without this header a legacy job link would
-# 301 the visitor off stujo.net and a portal would render the origin's
-# branding. See frontend-nx/apps/stujo/proxy.ts and lib/requestHost.ts.
-resource "cloudflare_ruleset" "stujo_net_original_host" {
-  count = local.stujo_net_enabled ? 1 : 0
+resource "cloudflare_worker_route" "stujo_net" {
+  for_each = local.stujo_net_origin_hosts
 
   zone_id     = var.stujo_net_zone_id
-  name        = "StuJo original host"
-  description = "Pass the visitor's own host to the origin as X-Original-Host"
-  kind        = "zone"
-  phase       = "http_request_late_transform"
-
-  rules {
-    action      = "rewrite"
-    description = "X-Original-Host = http.host"
-    expression  = "true"
-    enabled     = true
-
-    action_parameters {
-      headers {
-        name       = "X-Original-Host"
-        operation  = "set"
-        expression = "http.host"
-      }
-    }
-  }
+  pattern     = "${each.key}/*"
+  script_name = cloudflare_worker_script.stujo_net[0].name
 }
 
-# Full (strict) holds because the Origin Rule sets the SNI to a name the
-# origin certificate covers. Strict is also what makes a misconfigured host
+# Full (strict) holds because the Worker fetches a hostname the origin
+# certificate covers. Strict is also what makes a misconfigured host
 # fail loudly instead of quietly serving from the wrong origin.
 #
 # Check the zone's CURRENT mode before applying: it is proxied today with a

@@ -339,6 +339,20 @@
         "clientRole" : true,
         "containerId" : "c4bb855a-ab27-4b23-a2ee-be55d7604a57",
         "attributes" : { }
+      }, {
+        "id" : "7f2a91c4-5d38-4e6b-8c19-3a0b7e2d5f61",
+        "name" : "instructor",
+        "composite" : false,
+        "clientRole" : true,
+        "containerId" : "c4bb855a-ab27-4b23-a2ee-be55d7604a57",
+        "attributes" : { }
+      }, {
+        "id" : "e3c85d70-9b41-4a2f-b7d6-482f1c9a0e35",
+        "name" : "admin",
+        "composite" : false,
+        "clientRole" : true,
+        "containerId" : "c4bb855a-ab27-4b23-a2ee-be55d7604a57",
+        "attributes" : { }
       } ]
     }
   },
@@ -649,6 +663,7 @@
     "frontchannelLogout" : false,
     "protocol" : "openid-connect",
     "attributes" : {
+      "post.logout.redirect.uris" : "+",
       "login_theme" : "edu-hub",
       "saml.assertion.signature" : "false",
       "id.token.as.detached.signature" : "false",
