@@ -663,6 +663,7 @@
     "frontchannelLogout" : false,
     "protocol" : "openid-connect",
     "attributes" : {
+      "post.logout.redirect.uris" : "+",
       "login_theme" : "edu-hub",
       "saml.assertion.signature" : "false",
       "id.token.as.detached.signature" : "false",

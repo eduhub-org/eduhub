@@ -3,6 +3,7 @@
 
 # Local Terraform initialization files
 **/.terraform.lock.hcl
+!application/.terraform.lock.hcl
 
 
 # .tfstate files
