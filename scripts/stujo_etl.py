@@ -1252,7 +1252,13 @@ def step_credits(hasura: HasuraClient, counters, org_mapping):
             )
             per_org[org_id] = (prior_remaining, True)
             continue
-        if remaining <= 0:
+        if remaining == 0:
+            # Existing rows must participate even at zero so a delta rerun can
+            # revoke an unlimited grant that disappeared from the Rails source.
+            if org_id in existing:
+                per_org[org_id] = (prior_remaining, prior_unlimited)
+            continue
+        if remaining < 0:
             continue
         per_org[org_id] = (prior_remaining + remaining, prior_unlimited)
 

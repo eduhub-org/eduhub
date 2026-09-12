@@ -96,7 +96,7 @@
     "statActiveOffers": "Active offers",
     "statTotalViews": "Total views",
     "statFreeCredits": "Free credits",
-    "statFreeCreditsUnlimited": "unlimited",
+    "stat_free_credits_unlimited": "unlimited",
     "colOffer": "Offer",
     "colCategory": "Category",
     "colStatus": "Status",

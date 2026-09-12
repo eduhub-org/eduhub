@@ -96,7 +96,7 @@
     "statActiveOffers": "Aktive Angebote",
     "statTotalViews": "Aufrufe gesamt",
     "statFreeCredits": "Freie Kontingente",
-    "statFreeCreditsUnlimited": "unbegrenzt",
+    "stat_free_credits_unlimited": "unbegrenzt",
     "colOffer": "Angebot",
     "colCategory": "Kategorie",
     "colStatus": "Status",

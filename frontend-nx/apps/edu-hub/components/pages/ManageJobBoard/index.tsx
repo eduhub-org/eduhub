@@ -65,7 +65,7 @@ const JOB_BOARD_ADMIN_QUERY = gql`
     JobPostingCredit(
       order_by: { id: desc }
       limit: 50
-      where: { _or: [{ remaining: { _gt: 0 } }, { unlimited: { _eq: true } }] }
+      where: { _or: [{ remaining: { _gte: 0 } }, { unlimited: { _eq: true } }] }
     ) {
       id
       remaining
@@ -233,6 +233,7 @@ const ManageJobBoard: FC = () => {
   const [creditToDelete, setCreditToDelete] = useState<any | null>(null);
   const [bootstrapResult, setBootstrapResult] = useState<string | null>(null);
   const [portalSaveError, setPortalSaveError] = useState<string | null>(null);
+  const [creditSaveError, setCreditSaveError] = useState<string | null>(null);
   const { data: orgData } = useAdminQuery(SEARCH_ORGANIZATIONS, {
     variables: { search: `%${orgSearch}%` },
     skip: orgSearch.trim().length < 2,
@@ -250,6 +251,7 @@ const ManageJobBoard: FC = () => {
    */
   const grantCredit = async (organizationId: number, unlimited: boolean) => {
     setGrantingOrgId(organizationId);
+    setCreditSaveError(null);
     try {
       const existing = await refetchCredit({ organizationId });
       const credit = existing.data?.JobPostingCredit?.[0];
@@ -277,26 +279,52 @@ const ManageJobBoard: FC = () => {
       }
       setOrgSearch('');
       await refetch();
+    } catch (saveError: unknown) {
+      setCreditSaveError(
+        `Kontingent nicht gespeichert: ${
+          saveError instanceof Error ? saveError.message : 'unbekannter Fehler'
+        }`
+      );
     } finally {
       setGrantingOrgId(null);
     }
   };
 
   const updateCredit = async (credit: any, values: { remaining?: number; unlimited?: boolean }) => {
-    await setCredit({
-      variables: {
-        id: credit.id,
-        remaining: values.remaining ?? credit.remaining,
-        unlimited: values.unlimited ?? credit.unlimited,
-      },
-    });
-    await refetch();
+    setCreditSaveError(null);
+    try {
+      await setCredit({
+        variables: {
+          id: credit.id,
+          remaining: values.remaining ?? credit.remaining,
+          unlimited: values.unlimited ?? credit.unlimited,
+        },
+      });
+      await refetch();
+      return true;
+    } catch (saveError: unknown) {
+      setCreditSaveError(
+        `Kontingent nicht gespeichert: ${
+          saveError instanceof Error ? saveError.message : 'unbekannter Fehler'
+        }`
+      );
+      return false;
+    }
   };
 
   const removeCredit = async (credit: any) => {
-    await deleteCredit({ variables: { id: credit.id } });
-    setCreditToDelete(null);
-    await refetch();
+    setCreditSaveError(null);
+    try {
+      await deleteCredit({ variables: { id: credit.id } });
+      await refetch();
+      setCreditToDelete(null);
+    } catch (saveError: unknown) {
+      setCreditSaveError(
+        `Kontingent nicht entfernt: ${
+          saveError instanceof Error ? saveError.message : 'unbekannter Fehler'
+        }`
+      );
+    }
   };
 
   const runBootstrap = async () => {
@@ -506,6 +534,7 @@ const ManageJobBoard: FC = () => {
         title="Kontingent vergeben"
         hint="Anzahl festlegen oder unbegrenzt kostenlos freischalten"
       />
+      {creditSaveError && <div className="mb-2 text-sm text-error">{creditSaveError}</div>}
       <div className="flex items-center gap-3">
         <input
           className="w-72 rounded bg-bg-card px-3 py-2 text-sm text-label-primary outline-none"
@@ -519,7 +548,7 @@ const ManageJobBoard: FC = () => {
             type="number"
             min={1}
             step={1}
-            className="w-20 rounded bg-bg-card px-3 py-2 text-sm text-label-primary outline-none"
+            className="w-20 min-h-[44px] touch-manipulation rounded bg-bg-card px-3 py-2 text-sm text-label-primary outline-none"
             value={grantAmount}
             onChange={(event) => setGrantAmount(event.target.value)}
           />
@@ -589,7 +618,8 @@ const ManageJobBoard: FC = () => {
                           onBlur={async (event) => {
                             const next = Number(event.target.value);
                             if (Number.isInteger(next) && next >= 0 && next !== credit.remaining) {
-                              await updateCredit(credit, { remaining: next });
+                              const saved = await updateCredit(credit, { remaining: next });
+                              if (!saved) event.target.value = String(credit.remaining);
                             }
                           }}
                         />

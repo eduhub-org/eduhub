@@ -308,7 +308,7 @@ const MeinStujo: FC<Props> = ({ portal }) => {
           [t('statTotalViews'), String(stats.views), false],
           [
             t('statFreeCredits'),
-            stats.credits.unlimited ? t('statFreeCreditsUnlimited') : String(stats.credits.total),
+            stats.credits.unlimited ? t('stat_free_credits_unlimited') : String(stats.credits.total),
             true,
           ],
         ].map(([label, value, accent]) => (
