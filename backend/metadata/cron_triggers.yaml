@@ -135,6 +135,28 @@
     - name: Hasura-Secret
       value_from_env: HASURA_CLOUD_FUNCTION_SECRET
   comment: Enforces the guest data retention period - anonymizes guests whose events all ended more than AppSettings.guestDataRetentionMonths ago, and deletes signups that were never confirmed (GDPR Art. 5(1)(e))
+- name: sync_mail_delivery_status
+  webhook: '{{CLOUD_FUNCTION_LINK_CALL_PYTHON_FUNCTION}}'
+  # Offset off the hour so it does not compete with expire_invitations at 0 * * * *.
+  schedule: 15 * * * *
+  include_in_metadata: true
+  payload: {}
+  retry_conf:
+    num_retries: 0
+    retry_interval_seconds: 10
+    timeout_seconds: 3699
+    tolerance_seconds: 21600
+  headers:
+    - name: Function-Name
+      value: sync_mail_delivery_status
+    - name: Hasura-Secret
+      value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+  comment: >-
+    Reads Mailgun delivery events back onto MailLog (DELIVERED / BOUNCED /
+    COMPLAINED) by the v:maillogId variable sendMail attaches, and mails the
+    admin when permanent failures exceed 5% of the window's decided mail. No
+    retries: the run reads a trailing window with deliberate overlap, so the
+    next hour covers whatever this one missed.
 - name: send_pending_job_posting_mails
   webhook: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
   schedule: '*/15 * * * *'

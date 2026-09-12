@@ -178,6 +178,14 @@ resource "google_cloudfunctions2_function" "call_python_function" {
       # StuJo job board (expire_job_postings / send_job_alerts mails). Follows
       # the canonical host, so mail links move to stujo.net at cutover.
       STUJO_FRONTEND_URL = "https://${local.stujo_public_host}"
+      # Mailgun sending domains, mirrored from the send_mail function below:
+      # sync_mail_delivery_status reads delivery events for exactly the domains
+      # this deployment is allowed to send through, so a newly added portal
+      # host gets bounce tracking without a code change.
+      MAILGUN_DOMAIN             = var.mailgun_domain
+      MAILGUN_ADDITIONAL_DOMAINS = join(",", var.mailgun_additional_domains)
+      # Recipient of the sync_mail_delivery_status bounce-rate alert.
+      STUJO_ADMIN_EMAIL = var.stujo_admin_email
     }
 
     secret_environment_variables {
@@ -219,6 +227,19 @@ resource "google_cloudfunctions2_function" "call_python_function" {
       key        = "MM_TOKEN"
       project_id = var.project_id
       secret     = google_secret_manager_secret.mm_token.secret_id
+      version    = "latest"
+    }
+
+    # sync_mail_delivery_status reads the Mailgun events API. This is the same
+    # credential the send_mail function sends with, which is more privilege than
+    # the cron needs -- it never sends. A key scoped to read-only would be the
+    # better shape; it needs minting in Mailgun first, and note the prod key is
+    # domain-restricted, so any replacement must cover every sending domain
+    # above or the events walk 401s per domain.
+    secret_environment_variables {
+      key        = "MAILGUN_API_KEY"
+      project_id = var.project_id
+      secret     = google_secret_manager_secret.mailgun_api_key.secret_id
       version    = "latest"
     }
 
@@ -271,6 +292,13 @@ resource "google_secret_manager_secret_iam_member" "call_python_function_mm_toke
   member     = "serviceAccount:${google_service_account.custom_cloud_function_account.email}"
   depends_on = [google_secret_manager_secret.mm_token]
 }
+
+# No call_python_function_mailgun_api_key binding on purpose. Every function in
+# this file runs as custom_cloud_function_account, and send_mail_mailgun_api_key
+# further down already grants that exact member secretAccessor on this secret.
+# A second google_secret_manager_secret_iam_member for the same
+# (secret, role, member) triple would be two resources managing one binding, so
+# destroying either one would silently revoke the other function's access.
 
 ###############################################################################
 # Create Google cloud function for callNodeFunction

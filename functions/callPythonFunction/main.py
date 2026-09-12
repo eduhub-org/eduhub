@@ -14,6 +14,7 @@ from pythonFunctions.expire_job_postings import expire_job_postings
 from pythonFunctions.load_participation_data import load_participation_data
 from pythonFunctions.send_job_alerts import send_job_alerts
 from pythonFunctions.send_project_deadline_reminders import send_project_deadline_reminders
+from pythonFunctions.sync_mail_delivery_status import sync_mail_delivery_status
 from pythonFunctions.update_enrollment_locations import update_enrollment_locations
 
 # Initialize the logger level
@@ -34,6 +35,7 @@ PYTHON_FUNCTIONS: Dict[str, Callable] = {
     "load_participation_data": load_participation_data,
     "send_job_alerts": send_job_alerts,
     "send_project_deadline_reminders": send_project_deadline_reminders,
+    "sync_mail_delivery_status": sync_mail_delivery_status,
     "update_enrollment_locations": update_enrollment_locations,
 }
 

@@ -267,6 +267,15 @@ exports.sendMail = async (req, res) => {
     'o:tracking': true  // Enable Mailgun's email tracking features
   };
 
+  // Mailgun echoes custom `v:` variables on every event it records for this
+  // message, so sync_mail_delivery_status can join a delivered/bounced event
+  // back onto the exact MailLog row. The alternative -- storing the Mailgun
+  // message id -- would need a write back to the database on the send path,
+  // which this function deliberately does not do: it runs from a Hasura event
+  // trigger with 10 retries, and a failed write would be indistinguishable
+  // from a failed send. Only ever set from MailLog.id, never from the payload.
+  if (Number.isInteger(id)) msg['v:maillogId'] = String(id);
+
   // Add optional email parameters if provided
   if (replyTo) msg['h:Reply-To'] = replyTo;
   if (cc) msg.cc = cc;
@@ -283,6 +292,7 @@ exports.sendMail = async (req, res) => {
       case 'development':
         // Development mode: Log all email attempts without actually sending
         console.log('Development email:', {
+          maillogId: msg['v:maillogId'],
           to: msg.to,
           from: msg.from,
           subject: msg.subject,
