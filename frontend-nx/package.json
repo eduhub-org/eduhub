@@ -7,6 +7,7 @@
     "build": "next build apps/edu-hub --webpack",
     "start:prod": "next start apps/edu-hub -p 5000 -H 0.0.0.0",
     "test": "jest --config apps/edu-hub/jest.config.ts",
+    "test:stujo": "jest --config apps/stujo/jest.config.ts",
     "test:watch": "jest --config apps/edu-hub/jest.config.ts --watch",
     "lint": "eslint \"apps/edu-hub/**/*.{ts,tsx,js,jsx}\"",
     "apollo": "cd apps/edu-hub && rm -rf queries/__generated__ && mkdir -p queries/__generated__ && ../../node_modules/apollo/bin/run client:codegen --includes \"./queries/**/*.ts\" --target typescript",
