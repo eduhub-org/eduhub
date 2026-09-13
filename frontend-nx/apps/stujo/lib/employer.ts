@@ -45,6 +45,7 @@ export const MY_JOB_ORGANIZATIONS = gql`
         JobPostingCredits {
           id
           remaining
+          unlimited
           jobPostingType
         }
       }
