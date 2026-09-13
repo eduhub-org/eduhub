@@ -136,7 +136,7 @@
     "sha.js": "^2.4.12",
     "ws": "^8.21.0",
     "qs": "^6.16.0",
-    "browserslist": "^4.28.8",
+    "browserslist": "^4.28.9",
     "postcss": "^8.5.18",
     "moment": "^2.29.4",
     "linkify-it": "^5.0.2",
@@ -177,7 +177,8 @@
     "postcss-selector-parser@^6.0.10": "^6.1.4",
     "postcss-selector-parser@^6.1.1": "^6.1.4",
     "uuid@^8.3.2": "^11.1.1",
-    "baseline-browser-mapping@^2.9.19": "2.11.20"
+    "baseline-browser-mapping@^2.9.19": "2.11.21",
+    "baseline-browser-mapping@^2.11.20": "2.11.21"
   },
   "packageManager": "yarn@3.4.1"
 }
