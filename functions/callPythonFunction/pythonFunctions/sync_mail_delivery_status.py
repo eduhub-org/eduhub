@@ -176,9 +176,10 @@ def apply_statuses(eduhub_client, statuses):
     """Writes the statuses onto MailLog, never downgrading a row.
 
     Returns:
-        dict: {status: affected_rows}
+        tuple: ({status: affected_rows}, failed update chunks)
     """
     applied = {}
+    failed_updates = []
 
     # Ascending precedence, so that when the same window decides both DELIVERED
     # and COMPLAINED for one mail the stronger write lands last regardless of
@@ -213,13 +214,14 @@ def apply_statuses(eduhub_client, statuses):
             result = eduhub_client.send_query(mutation, {"where": where, "status": status})
             if not isinstance(result, dict) or result.get("errors"):
                 logging.error("Failed to set %s on %d mail(s): %s", status, len(chunk), result)
+                failed_updates.append({"status": status, "mailIds": chunk, "response": result})
                 continue
             affected += result["data"]["update_MailLog"]["affected_rows"]
 
         applied[status] = affected
         logging.info("Set %s on %d MailLog row(s)", status, affected)
 
-    return applied
+    return applied, failed_updates
 
 
 def bounce_rate(counts):
@@ -345,11 +347,20 @@ def sync_mail_delivery_status(arguments):
         )
 
         statuses, counts, failed_domains = collect_statuses(mailgun_client, begin)
-        applied = apply_statuses(eduhub_client, statuses)
-        alert = check_bounce_threshold(eduhub_client, counts, window_description)
+        applied, failed_updates = apply_statuses(eduhub_client, statuses)
+        alert = None
+        if failed_domains:
+            logging.error(
+                "Skipping bounce-rate check because %d Mailgun domain(s) failed",
+                len(failed_domains),
+            )
+        else:
+            alert = check_bounce_threshold(eduhub_client, counts, window_description)
 
+        retryable = bool(failed_domains or failed_updates)
         return {
-            "success": True,
+            "success": not retryable,
+            "retryable": retryable,
             "data": {
                 "window": window_description,
                 "begin": begin.isoformat(),
@@ -357,6 +368,7 @@ def sync_mail_delivery_status(arguments):
                 "eventCounts": counts,
                 "matchedMails": len(statuses),
                 "updated": applied,
+                "failedUpdates": failed_updates,
                 "failedDomains": failed_domains,
                 "alert": alert,
             },
@@ -364,4 +376,4 @@ def sync_mail_delivery_status(arguments):
 
     except Exception as e:
         logging.exception("sync_mail_delivery_status failed")
-        return {"success": False, "error": str(e)}
+        return {"success": False, "retryable": True, "error": str(e)}

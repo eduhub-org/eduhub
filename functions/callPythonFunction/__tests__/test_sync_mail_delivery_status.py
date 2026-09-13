@@ -30,6 +30,7 @@ from pythonFunctions.sync_mail_delivery_status import (
     classify_event,
     collect_statuses,
     resolve_begin,
+    sync_mail_delivery_status,
 )
 
 
@@ -351,9 +352,13 @@ class TestApplyStatuses:
     def test_writes_one_mutation_per_status(self):
         client = FakeEduHubClient()
 
-        applied = apply_statuses(client, {1: STATUS_DELIVERED, 2: STATUS_DELIVERED, 3: STATUS_BOUNCED})
+        applied, failed = apply_statuses(
+            client,
+            {1: STATUS_DELIVERED, 2: STATUS_DELIVERED, 3: STATUS_BOUNCED},
+        )
 
         assert applied == {STATUS_DELIVERED: 2, STATUS_BOUNCED: 1}
+        assert failed == []
         assert len(client.calls) == 2
 
     def test_delivered_never_overwrites_a_terminal_status(self):
@@ -399,10 +404,11 @@ class TestApplyStatuses:
         )
         client = FakeEduHubClient()
 
-        applied = apply_statuses(client, {i: STATUS_DELIVERED for i in range(5)})
+        applied, failed = apply_statuses(client, {i: STATUS_DELIVERED for i in range(5)})
 
         assert [len(c["variables"]["where"]["id"]["_in"]) for c in client.calls] == [2, 2, 1]
         assert applied == {STATUS_DELIVERED: 5}
+        assert failed == []
 
     def test_a_failed_chunk_does_not_abort_the_rest(self, monkeypatch):
         monkeypatch.setattr(
@@ -413,15 +419,67 @@ class TestApplyStatuses:
             {"data": {"update_MailLog": {"affected_rows": 2}}},
         ])
 
-        applied = apply_statuses(client, {i: STATUS_DELIVERED for i in range(4)})
+        applied, failed = apply_statuses(client, {i: STATUS_DELIVERED for i in range(4)})
 
         assert applied == {STATUS_DELIVERED: 2}
+        assert failed == [{
+            "status": STATUS_DELIVERED,
+            "mailIds": [0, 1],
+            "response": {"errors": [{"message": "boom"}]},
+        }]
 
     def test_nothing_to_do_makes_no_calls(self):
         client = FakeEduHubClient()
 
-        assert apply_statuses(client, {}) == {}
+        assert apply_statuses(client, {}) == ({}, [])
         assert client.calls == []
+
+
+class TestSyncMailDeliveryStatus:
+    def test_a_failed_domain_skips_the_partial_rate_and_degrades_the_run(self, monkeypatch):
+        mailgun = FakeMailgunClient(
+            {
+                "stujo.net": [event("failed", i, severity="permanent") for i in range(25)],
+                "edu.opencampus.sh": [],
+            },
+            failing=["edu.opencampus.sh"],
+        )
+        eduhub = FakeEduHubClient()
+        monkeypatch.setattr(
+            "pythonFunctions.sync_mail_delivery_status.MailgunClient", lambda: mailgun
+        )
+        monkeypatch.setattr(
+            "pythonFunctions.sync_mail_delivery_status.EduHubClient", lambda: eduhub
+        )
+
+        result = sync_mail_delivery_status({})
+
+        assert result["success"] is False
+        assert result["retryable"] is True
+        assert result["data"]["alert"] is None
+        assert [entry["domain"] for entry in result["data"]["failedDomains"]] == [
+            "edu.opencampus.sh"
+        ]
+
+    def test_failed_update_ids_are_returned_and_degrade_the_run(self, monkeypatch):
+        mailgun = FakeMailgunClient({"stujo.net": [event("delivered", 4711)]})
+        eduhub = FakeEduHubClient(responses=[{"errors": [{"message": "boom"}]}])
+        monkeypatch.setattr(
+            "pythonFunctions.sync_mail_delivery_status.MailgunClient", lambda: mailgun
+        )
+        monkeypatch.setattr(
+            "pythonFunctions.sync_mail_delivery_status.EduHubClient", lambda: eduhub
+        )
+
+        result = sync_mail_delivery_status({})
+
+        assert result["success"] is False
+        assert result["retryable"] is True
+        assert result["data"]["failedUpdates"] == [{
+            "status": STATUS_DELIVERED,
+            "mailIds": [4711],
+            "response": {"errors": [{"message": "boom"}]},
+        }]
 
 
 class TestBounceRate:

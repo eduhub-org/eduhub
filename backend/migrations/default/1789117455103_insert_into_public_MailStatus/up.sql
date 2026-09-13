@@ -14,3 +14,5 @@ INSERT INTO "public"."MailStatus" ("value", "comment") VALUES
   (E'BOUNCED',       E'Mailgun gave up permanently - the address is invalid or refuses mail'),
   (E'COMPLAINED',    E'The recipient marked the mail as spam - do not mail this address again')
 ON CONFLICT ("value") DO NOTHING;
+
+COMMENT ON TABLE "public"."MailStatus" IS 'The different status a mail in the MailLog can have.';

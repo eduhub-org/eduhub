@@ -1,10 +1,4 @@
-import { jest } from '@jest/globals';
-import { createRequire } from 'node:module';
-
-// sendMail is CommonJS and lives in a sibling function package; callNodeFunction
-// is the only place in functions/ with a test runner.
-const require = createRequire(import.meta.url);
-const { sendMail } = require('../../sendMail/index.js');
+const { sendMail } = require('../index.js');
 
 const SECRET = 'test-cloud-function-secret';
 

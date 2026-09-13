@@ -87,7 +87,8 @@ def call_python_function(request):
         
         # If result is already a dict with success/error info, return it directly
         if isinstance(result, dict) and ("success" in result or "error" in result):
-            return jsonify(result), 200
+            status_code = 503 if result.get("retryable") else 200
+            return jsonify(result), status_code
             
         # Otherwise, wrap the result in a success response
         return jsonify({
