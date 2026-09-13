@@ -23,6 +23,7 @@ import {
   useEmployerRoleContext,
 } from '../../lib/employer';
 import { useEmployerOrganization } from '../../lib/useEmployerOrganization';
+import { summarizeCredits } from '../../lib/credits';
 import { resolvePortal, PortalBranding } from '../../lib/portal';
 import { portalHost } from '../../lib/requestHost';
 import { resolveStorageUrl } from '../../lib/storage';
@@ -287,15 +288,12 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
       style: 'currency',
       currency: price?.currency ?? 'EUR',
     }).format(amount / 100);
-  const credits = (organization?.JobPostingCredits ?? []).reduce(
-    (sum: number, credit: any) => sum + credit.remaining,
-    0
-  );
+  const credits = summarizeCredits(organization?.JobPostingCredits);
   const busy = creating || updating || publishing || uploadingPdf;
   // Only a paid publish concludes a contract, so only that asks for consent --
   // the same rule the course registration modal applies via
   // `config.requiresPayment && !acceptTerms`.
-  const requiresConsent = netPrice > 0 && credits === 0;
+  const requiresConsent = netPrice > 0 && !credits.hasFree;
 
   const field = (
     label: string,
@@ -484,10 +482,15 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
                 <p>
                   <b>{tOffer('free')}</b> – {tOffer('free_offer_description')}
                 </p>
-              ) : credits > 0 ? (
+              ) : credits.unlimited ? (
                 <p>
                   {tOffer('credit_prefix')}{' '}
-                  <b>{tOffer('free_credits', { count: credits })}</b> –{' '}
+                  <b>{tOffer('free_unlimited')}</b> – {tOffer('credit_offer_description')}
+                </p>
+              ) : credits.total > 0 ? (
+                <p>
+                  {tOffer('credit_prefix')}{' '}
+                  <b>{tOffer('free_credits', { count: credits.total })}</b> –{' '}
                   {tOffer('credit_offer_description')}
                 </p>
               ) : (
@@ -551,7 +554,7 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
                 disabled={busy || (requiresConsent && !acceptTerms)}
                 onClick={publish}
               >
-                {netPrice === 0 || credits > 0
+                {netPrice === 0 || credits.hasFree
                   ? tOffer('publish_now')
                   : tOffer('publish_paid', { price: formatPrice(grossPrice) })}
               </button>

@@ -115,11 +115,6 @@ OCCUPATION_TO_ENUM = {
 
 PUBLICATION_DAYS = 56  # 8 weeks, parity with Job.archiveoldjobs
 
-# JobPostingCredit has no "unlimited" flag or free-text column, so the legacy
-# "-1 = unlimited" paymentcounter tier is imported as a sentinel amount that
-# no employer will realistically exhaust (flagged with a warning per org).
-UNLIMITED_CREDITS_SENTINEL = 100000
-
 SITE_STUJO, SITE_ETALENTS = 0, 1  # sitememberships.site
 
 # Paperclip file-copy accounting, reported at the end of the run so "did all
@@ -1219,17 +1214,22 @@ def step_students(hasura: HasuraClient, keycloak, students):
 def step_credits(hasura: HasuraClient, counters, org_mapping):
     """Remaining paymentcounters credits → JobPostingCredit (untyped).
 
+    The legacy "-1 = unlimited" tier maps to JobPostingCredit.unlimited, the
+    same flag the admin job-board settings set via "Unbegrenzt".
+
     on_conflict cannot make this idempotent: the unique constraint on
     (organizationId, jobPostingType) never fires for jobPostingType NULL
-    because Postgres treats NULLs as distinct. Existing untyped rows are
-    therefore queried up front; a delta re-run reconciles their `remaining`
-    to the current StuJo balance (source of truth until cutover) rather than
-    skipping, so credits consumed/bought between runs stay in sync.
+    because Postgres treats NULLs as distinct (uniqueness is enforced by the
+    partial index JobPostingCredit_organizationId_untyped_unique instead, which
+    on_conflict cannot reference). Existing untyped rows are therefore queried
+    up front; a delta re-run reconciles their `remaining` to the current StuJo
+    balance (source of truth until cutover) rather than skipping, so credits
+    consumed/bought between runs stay in sync.
     """
     existing = {
         row["organizationId"]: row
         for row in hasura.query(
-            "query { JobPostingCredit(where: {jobPostingType: {_is_null: true}}) { id organizationId remaining } }"
+            "query { JobPostingCredit(where: {jobPostingType: {_is_null: true}}) { id organizationId remaining unlimited } }"
         )["JobPostingCredit"]
     }
 
@@ -1243,34 +1243,46 @@ def step_credits(hasura: HasuraClient, counters, org_mapping):
         # Rails uses `job` as the generic free-posting counter in the current
         # flow (free == "promo" decrements it); -1 means unlimited legacy tier.
         remaining = pc.get("job") or 0
+        prior_remaining, prior_unlimited = per_org.get(org_id, (0, False))
         if remaining == -1:
             log.warning(
                 "paymentcounter %s (company %s → org %s): legacy UNLIMITED "
-                "tier — imported as %s credits (sentinel, review manually)",
-                pc["id"], pc["company_id"], org_id, UNLIMITED_CREDITS_SENTINEL,
+                "tier — imported as an unlimited credit",
+                pc["id"], pc["company_id"], org_id,
             )
-            remaining = UNLIMITED_CREDITS_SENTINEL
-        if remaining <= 0:
+            per_org[org_id] = (prior_remaining, True)
             continue
-        per_org[org_id] = min(per_org.get(org_id, 0) + remaining, UNLIMITED_CREDITS_SENTINEL)
+        if remaining == 0:
+            # Existing rows must participate even at zero so a delta rerun can
+            # revoke an unlimited grant that disappeared from the Rails source.
+            if org_id in existing:
+                per_org[org_id] = (prior_remaining, prior_unlimited)
+            continue
+        if remaining < 0:
+            continue
+        per_org[org_id] = (prior_remaining + remaining, prior_unlimited)
 
-    for org_id, remaining in sorted(per_org.items()):
+    for org_id, (remaining, unlimited) in sorted(per_org.items()):
         if org_id in existing:
             prior = existing[org_id]
-            if prior["remaining"] != remaining:
+            if prior["remaining"] != remaining or prior["unlimited"] != unlimited:
                 hasura.mutate(
                     """
-                    mutation ($id: Int!, $remaining: Int!) {
-                      update_JobPostingCredit_by_pk(pk_columns: {id: $id}, _set: {remaining: $remaining}) { id }
+                    mutation ($id: Int!, $remaining: Int!, $unlimited: Boolean!) {
+                      update_JobPostingCredit_by_pk(
+                        pk_columns: {id: $id}
+                        _set: {remaining: $remaining, unlimited: $unlimited}
+                      ) { id }
                     }
                     """,
-                    {"id": prior["id"], "remaining": remaining},
+                    {"id": prior["id"], "remaining": remaining, "unlimited": unlimited},
                 )
-                log.info("org %s: reconciled untyped credit %s remaining %s → %s",
-                         org_id, prior["id"], prior["remaining"], remaining)
+                log.info("org %s: reconciled untyped credit %s remaining %s → %s (unlimited %s → %s)",
+                         org_id, prior["id"], prior["remaining"], remaining,
+                         prior["unlimited"], unlimited)
             else:
-                log.info("org %s already has %s untyped credit(s) — unchanged",
-                         org_id, remaining)
+                log.info("org %s already has %s untyped credit(s)%s — unchanged",
+                         org_id, remaining, " + unlimited" if unlimited else "")
             continue
         hasura.mutate(
             """
@@ -1278,9 +1290,11 @@ def step_credits(hasura: HasuraClient, counters, org_mapping):
               insert_JobPostingCredit_one(object: $obj) { id }
             }
             """,
-            {"obj": {"organizationId": org_id, "jobPostingType": None, "remaining": remaining}},
+            {"obj": {"organizationId": org_id, "jobPostingType": None,
+                     "remaining": remaining, "unlimited": unlimited}},
         )
-        log.info("→ %s credit(s) for org %s", remaining, org_id)
+        log.info("→ %s credit(s)%s for org %s", remaining,
+                 " + unlimited" if unlimited else "", org_id)
 
 
 # ---------------------------------------------------------------------------
@@ -1331,16 +1345,31 @@ def main():
         gcs_bucket = storage.Client().bucket(os.environ["GCS_BUCKET"])
 
     keycloak = None  # stays None in dry runs (steps only log what they would do)
-    if not args.dry_run and ({"users", "students"} & steps):
+    if {"users", "students"} & steps:
         kc_url = os.environ.get("KEYCLOAK_URL")
         kc_user = os.environ.get("KEYCLOAK_USER")
         kc_pw = os.environ.get("KEYCLOAK_PW")
         kc_realm = os.environ.get("KEYCLOAK_REALM", "edu-hub")
         if not kc_url or not kc_user or not kc_pw:
-            log.error("KEYCLOAK_URL, KEYCLOAK_USER and KEYCLOAK_PW are required "
-                      "for the users/students steps in a real run")
-            sys.exit(2)
-        keycloak = KeycloakClient(kc_url, kc_realm, kc_user, kc_pw)
+            if not args.dry_run:
+                log.error("KEYCLOAK_URL, KEYCLOAK_USER and KEYCLOAK_PW are required "
+                          "for the users/students steps in a real run")
+                sys.exit(2)
+            log.warning("Keycloak env incomplete — skipping the dry-run credential "
+                        "preflight; a real run would abort here")
+        elif args.dry_run:
+            # Authenticate even though a dry run never touches Keycloak. __init__
+            # only performs a token request (no writes), and without this check a
+            # wrong KEYCLOAK_USER/KEYCLOAK_PW sails through the dry run and only
+            # surfaces once the real run is launched — which is what happened on
+            # the first production attempt (admin-cli rejected a human console
+            # login with HTTP 400). Discard the client afterwards so the steps
+            # still receive None and keep their no-write semantics.
+            KeycloakClient(kc_url, kc_realm, kc_user, kc_pw)
+            log.info("[dry-run] Keycloak admin auth OK (user %s, realm %s)",
+                     kc_user, kc_realm)
+        else:
+            keycloak = KeycloakClient(kc_url, kc_realm, kc_user, kc_pw)
 
     hasura = HasuraClient(hasura_url, admin_secret, args.dry_run)
     cnx = mysql_connection(dsn)

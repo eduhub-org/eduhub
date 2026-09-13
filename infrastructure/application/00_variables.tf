@@ -37,14 +37,12 @@ locals {
 
   # --- stujo.net, the public StuJo domain ---------------------------------
   #
-  # stujo.net is served by CLOUDFLARE, not by a load balancer of ours: its
-  # hosts are proxied records whose Origin Rule rewrites the origin Host to the
-  # matching <service>.opencampus.sh name. The shared load balancer then routes
-  # them with the url_mask it already uses, and its certificate already covers
-  # that name — an Origin Rule host override sets the SNI to the same value, so
-  # Full (strict) still holds. The zone itself — records, Origin Rules,
-  # X-Original-Host, SSL mode — is in 09_stujo_net.tf; what is decided HERE is
-  # only which host the app should call itself.
+  # stujo.net is served by Cloudflare: a Worker proxies each public hostname to
+  # the matching <service>.opencampus.sh origin and passes X-Original-Host to
+  # the app. The shared load balancer routes and has a certificate for those
+  # origin names, so Full (strict) remains valid. The zone, Worker and routes
+  # are in 09_stujo_net.tf; what is decided HERE is only which hostname the app
+  # should call itself.
   # See docs/STUJO_PROD_CUTOVER.md §4.
   #
   # This one switch says which domain is the public face. On:  the app builds
@@ -133,6 +131,11 @@ variable "stujo_net_zone_id" {
     will try to create records that are already there and fail on the
     duplicate. See docs/STUJO_PROD_CUTOVER.md §4.
   EOT
+  type        = string
+  default     = ""
+}
+variable "stujo_net_account_id" {
+  description = "Cloudflare account ID that owns the stujo.net Worker. Empty outside production."
   type        = string
   default     = ""
 }
@@ -475,11 +478,10 @@ variable "stujo_seller_organization_id" {
 # stujo.net domain cutover
 ###
 # stujo.net stays the domain visitors see, but nothing serves it on our side:
-# Cloudflare proxies its hosts and rewrites the origin Host header (and with it
-# the SNI) to the interim <service>.opencampus.sh name, which the existing load
-# balancer already routes and already has a certificate for. So there is no
-# second load balancer, no certificate change and no new DNS record here — only
-# the question of which hostname the app should present as its own.
+# Cloudflare proxies its hosts through a Worker that fetches the interim
+# <service>.opencampus.sh name, which the existing load balancer already routes
+# and already has a certificate for. So there is no second load balancer or
+# certificate change here — only which hostname the app presents as its own.
 
 variable "stujo_net_canonical" {
   description = "Make stujo.net the public face: NextAuth callbacks, mail links, Stripe return URLs and EduHub's job links use the stujo.net hosts, and a direct hit on an interim opencampus.sh host 301s there. Turn it off again to hand the public face to stujo.opencampus.sh."
@@ -488,7 +490,7 @@ variable "stujo_net_canonical" {
 }
 
 variable "stujo_net_canonical_hosts" {
-  description = "Public stujo.net host per portal (AppSettings.appName), used while stujo_net_canonical is on. Must match the Cloudflare Origin Rules and the JobPortalDomain seed."
+  description = "Public stujo.net host per portal (AppSettings.appName), used while stujo_net_canonical is on. Must match the Cloudflare Worker routing map and the JobPortalDomain seed."
   type        = map(string)
   default = {
     "stujo"           = "stujo.net"

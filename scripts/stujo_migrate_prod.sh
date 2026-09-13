@@ -21,7 +21,10 @@
 # Optional env (sensible prod defaults, override only if the naming differs):
 #   HASURA_URL=https://hasura.opencampus.sh/v1/graphql
 #   KEYCLOAK_URL=https://keycloak.opencampus.sh
-#   KEYCLOAK_USER=login@opencampus.sh          (staging used "keycloak")
+#   KEYCLOAK_USER=keycloak                     (master-realm admin; same on staging and prod.
+#                                              NOT login@opencampus.sh — that is a human
+#                                              console login and the admin-cli password
+#                                              grant rejects it with HTTP 400.)
 #   KEYCLOAK_REALM=edu-hub
 #   ETL_STEPS=companies,users,jobs,credits,students
 #   DRY_RUN=1                                  (preview, no writes)
@@ -50,7 +53,7 @@ export GCP_PROJECT GCS_BUCKET HAW_ORG_ID
 export HASURA_URL="${HASURA_URL:-https://hasura.opencampus.sh/v1/graphql}"
 export KEYCLOAK_URL="${KEYCLOAK_URL:-https://keycloak.opencampus.sh}"
 export KEYCLOAK_REALM="${KEYCLOAK_REALM:-edu-hub}"
-export KEYCLOAK_USER="${KEYCLOAK_USER:-login@opencampus.sh}"
+export KEYCLOAK_USER="${KEYCLOAK_USER:-keycloak}"
 
 # ---- Safety confirmation ---------------------------------------------------
 cat <<EOM
