@@ -10,21 +10,23 @@ WHERE "userId"::text LIKE '91000000-0000-0000-0000-%'
 
 DELETE FROM public."CourseEnrollment"
 WHERE "userId"::text LIKE '91000000-0000-0000-0000-%'
-   OR "courseId" IN (8000, 8001, 8002, 8003, 8004, 8005, 8006, 8007, 8008, 8009, 8010, 8011, 8012, 8013, 8014, 8015, 8101, 8102, 8103, 8104, 8105);
+   OR "courseId" IN (8000, 8001, 8002, 8003, 8004, 8005, 8006, 8007, 8008, 8009, 8010, 8011, 8012, 8013, 8014, 8015, 8101, 8102, 8103, 8104, 8105, 8200);
 
 DELETE FROM public."Session"
 WHERE id BETWEEN 81001 AND 81005
-   OR "courseId" IN (8101, 8102, 8103, 8104, 8105);
+   OR id BETWEEN 82001
+                     AND 82024
+   OR "courseId" IN (8101, 8102, 8103, 8104, 8105, 8200);
 
 DELETE FROM public."CourseDegree"
 WHERE "degreeCourseId" = 8000
-   OR "courseId" IN (8001, 8002, 8003, 8004, 8005, 8006, 8007, 8008, 8009, 8010, 8011, 8012, 8013, 8014, 8015, 8101, 8102, 8103, 8104, 8105);
+   OR "courseId" IN (8001, 8002, 8003, 8004, 8005, 8006, 8007, 8008, 8009, 8010, 8011, 8012, 8013, 8014, 8015, 8101, 8102, 8103, 8104, 8105, 8200);
 
 DELETE FROM public."User"
 WHERE id::text LIKE '91000000-0000-0000-0000-%';
 
 DELETE FROM public."Course"
-WHERE id IN (8000, 8001, 8002, 8003, 8004, 8005, 8006, 8007, 8008, 8009, 8010, 8011, 8012, 8013, 8014, 8015, 8101, 8102, 8103, 8104, 8105);
+WHERE id IN (8000, 8001, 8002, 8003, 8004, 8005, 8006, 8007, 8008, 8009, 8010, 8011, 8012, 8013, 8014, 8015, 8101, 8102, 8103, 8104, 8105, 8200);
 
 INSERT INTO public."Course" (id, title, status, ects, tagline, language, "applicationEnd", cost, "achievementCertificatePossible", "attendanceCertificatePossible", "maxMissedSessions", "weekDay", "coverImage", created_at, updated_at, "programId", "headingDescriptionField1", "headingDescriptionField2", "contentDescriptionField1", "contentDescriptionField2", "learningGoals", "chatLink", "maxParticipants", "endTime", "startTime", published, "externalRegistrationLink", "registrationType") VALUES
   (8000, 'Performance Test Degree', 'APPLICANTS_INVITED', '12.5', 'Large opt-in seed degree for course page performance testing.', 'EN', '2026-12-31', '0', true, false, 2, 'NONE', NULL, '2026-05-30 10:00:00+00'::timestamptz, '2026-05-30 10:00:00+00'::timestamptz, 2, 'Performance heading', 'Performance details', 'Generated performance test degree.', 'Generated performance test details.', 'Measure large course and degree participation views.', 'https://chat.opencampus.sh', 5100, '18:00:00', '16:00:00', true, NULL, 'APPROVAL_WITH_INPUT'),
@@ -47,7 +49,8 @@ INSERT INTO public."Course" (id, title, status, ects, tagline, language, "applic
   (8102, 'Performance Event 02', 'APPLICANTS_INVITED', 'NONE', 'Generated event for performance testing.', 'EN', '2026-12-31', '0', false, true, 0, 'NONE', NULL, '2026-05-30 10:00:00+00'::timestamptz, '2026-05-30 10:00:00+00'::timestamptz, 3, NULL, NULL, NULL, NULL, NULL, NULL, 5000, '18:00:00', '10:00:00', true, NULL, 'APPROVAL_WITH_INPUT'),
   (8103, 'Performance Event 03', 'APPLICANTS_INVITED', 'NONE', 'Generated event for performance testing.', 'EN', '2026-12-31', '0', false, true, 0, 'NONE', NULL, '2026-05-30 10:00:00+00'::timestamptz, '2026-05-30 10:00:00+00'::timestamptz, 3, NULL, NULL, NULL, NULL, NULL, NULL, 5000, '18:00:00', '10:00:00', true, NULL, 'APPROVAL_WITH_INPUT'),
   (8104, 'Performance Event 04', 'APPLICANTS_INVITED', 'NONE', 'Generated event for performance testing.', 'EN', '2026-12-31', '0', false, true, 0, 'NONE', NULL, '2026-05-30 10:00:00+00'::timestamptz, '2026-05-30 10:00:00+00'::timestamptz, 3, NULL, NULL, NULL, NULL, NULL, NULL, 5000, '18:00:00', '10:00:00', true, NULL, 'APPROVAL_WITH_INPUT'),
-  (8105, 'Performance Event 05', 'APPLICANTS_INVITED', 'NONE', 'Generated event for performance testing.', 'EN', '2026-12-31', '0', false, true, 0, 'NONE', NULL, '2026-05-30 10:00:00+00'::timestamptz, '2026-05-30 10:00:00+00'::timestamptz, 3, NULL, NULL, NULL, NULL, NULL, NULL, 5000, '18:00:00', '10:00:00', true, NULL, 'APPROVAL_WITH_INPUT')
+  (8105, 'Performance Event 05', 'APPLICANTS_INVITED', 'NONE', 'Generated event for performance testing.', 'EN', '2026-12-31', '0', false, true, 0, 'NONE', NULL, '2026-05-30 10:00:00+00'::timestamptz, '2026-05-30 10:00:00+00'::timestamptz, 3, NULL, NULL, NULL, NULL, NULL, NULL, 5000, '18:00:00', '10:00:00', true, NULL, 'APPROVAL_WITH_INPUT'),
+  (8200, 'Performance Attendance Course', 'APPLICANTS_INVITED', '5', 'Large attendance history for manual attendance performance testing.', 'EN', '2026-12-31', '0', true, true, 6, 'NONE', NULL, '2026-05-30 10:00:00+00'::timestamptz, '2026-05-30 10:00:00+00'::timestamptz, 5, NULL, NULL, NULL, NULL, NULL, NULL, 1000, '18:00:00', '16:00:00', true, NULL, 'APPROVAL_WITH_INPUT')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO public."CourseDegree" (id, "courseId", "degreeCourseId", created_at, updated_at)
@@ -56,7 +59,7 @@ SELECT 8000 + row_number() OVER (),
        8000,
        '2026-05-30 10:00:00+00'::timestamptz,
        '2026-05-30 10:00:00+00'::timestamptz
-FROM unnest(ARRAY[8001, 8002, 8003, 8004, 8005, 8006, 8007, 8008, 8009, 8010, 8011, 8012, 8013, 8014, 8015, 8101, 8102, 8103, 8104, 8105]) AS linked_course(course_id)
+FROM unnest(ARRAY[8001, 8002, 8003, 8004, 8005, 8006, 8007, 8008, 8009, 8010, 8011, 8012, 8013, 8014, 8015, 8101, 8102, 8103, 8104, 8105, 8200]) AS linked_course(course_id)
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO public."Session" (id, title, description, "startDateTime", "endDateTime", "courseId", created_at, updated_at, "attendanceData", questionaire_sent)
@@ -71,6 +74,20 @@ SELECT 81000 + event_series.event_index,
        NULL,
        true
 FROM generate_series(1, 5) AS event_series(event_index)
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO public."Session" (id, title, description, "startDateTime", "endDateTime", "courseId", created_at, updated_at, "attendanceData", questionaire_sent)
+SELECT 82000 + session_series.session_index,
+       'Attendance session ' || lpad(session_series.session_index::text, 2, '0'),
+       'Generated session for manual attendance performance testing',
+       ('2026-06-01 16:00:00+00'::timestamptz + ((session_series.session_index - 1) * interval '7 days')),
+       ('2026-06-01 18:00:00+00'::timestamptz + ((session_series.session_index - 1) * interval '7 days')),
+       8200,
+       '2026-05-30 10:00:00+00'::timestamptz,
+       '2026-05-30 10:00:00+00'::timestamptz,
+       NULL,
+       true
+FROM generate_series(1, 24) AS session_series(session_index)
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO public."User" (id, "firstName", "lastName", email, picture, "externalProfile", "newsletterRegistration", "anonymousId", created_at, updated_at, "matriculationNumber", status, "integerId", "organizationId", occupation, "zipCode", country) VALUES
@@ -30287,6 +30304,71 @@ INSERT INTO public."CourseEnrollment" (id, "courseId", "userId", status, "motiva
   (200500001, 8105, '91000000-0000-0000-0000-000000005000', 'COMPLETED', 'Seeded attended performance event.', 'UNRATED', NULL, '91000000-0000-0000-0000-000000005000/8105/attendance_certificate.pdf', '2026-06-01 10:00:00+00'::timestamptz + (5 * interval '1 day'), '2026-05-30 10:00:00+00'::timestamptz + (5000 * interval '1 second'), NULL)
 ON CONFLICT (id) DO NOTHING;
 
+-- A dedicated course with enough confirmed users, sessions, and competing
+-- attendance rows to reproduce slow manual attendance updates locally.
+INSERT INTO public."CourseEnrollment" (id, "courseId", "userId", status, "motivationLetter", "motivationRating", "achievementCertificateURL", "attendanceCertificateURL", created_at, updated_at, "invitationExpirationDate")
+SELECT 240000000 + participant_index,
+       8200,
+       ('91000000-0000-0000-0000-' || lpad(participant_index::text, 12, '0'))::uuid,
+       'CONFIRMED',
+       'Seeded manual attendance performance course.',
+       'UNRATED',
+       NULL,
+       NULL,
+       '2026-05-30 10:00:00+00'::timestamptz + (participant_index * interval '1 second'),
+       '2026-05-30 10:00:00+00'::timestamptz + (participant_index * interval '1 second'),
+       NULL
+FROM generate_series(1, 1000) AS participant_series(participant_index);
+
+INSERT INTO public."Attendance" (id, "sessionId", "userId", status, created_at, updated_at, "recordedIdentifier", source, "startDateTime", "endDateTime", "totalAttendanceTime", "interruptionCount")
+SELECT 300000000 + (participant_index * 100) + session_index,
+       82000 + session_index,
+       ('91000000-0000-0000-0000-' || lpad(participant_index::text, 12, '0'))::uuid,
+       CASE WHEN (participant_index + session_index) % 5 = 0 THEN 'MISSED' ELSE 'ATTENDED' END,
+       '2026-06-01 18:00:00+00'::timestamptz + (session_index * interval '7 days'),
+       '2026-06-01 18:00:00+00'::timestamptz + (session_index * interval '7 days'),
+       'performance.attendance.' || participant_index || '@example.com',
+       'ZOOM',
+       '2026-06-01 16:00:00+00'::timestamptz + (session_index * interval '7 days'),
+       '2026-06-01 18:00:00+00'::timestamptz + (session_index * interval '7 days'),
+       7200,
+       participant_index % 3
+FROM generate_series(1, 1000) AS participant_series(participant_index)
+CROSS JOIN generate_series(1, 24) AS session_series(session_index);
+
+INSERT INTO public."Attendance" (id, "sessionId", "userId", status, created_at, updated_at, "recordedIdentifier", source, "startDateTime", "endDateTime", "totalAttendanceTime", "interruptionCount")
+SELECT 400000000 + (participant_index * 100) + session_index,
+       82000 + session_index,
+       ('91000000-0000-0000-0000-' || lpad(participant_index::text, 12, '0'))::uuid,
+       CASE WHEN (participant_index + session_index) % 2 = 0 THEN 'ATTENDED' ELSE 'MISSED' END,
+       '2026-06-02 10:00:00+00'::timestamptz + (session_index * interval '7 days'),
+       '2026-06-02 10:00:00+00'::timestamptz + (session_index * interval '7 days'),
+       NULL,
+       'INSTRUCTOR',
+       NULL,
+       NULL,
+       NULL,
+       NULL
+FROM generate_series(1, 1000) AS participant_series(participant_index)
+CROSS JOIN generate_series(1, 24) AS session_series(session_index)
+WHERE (participant_index + session_index) % 3 = 0;
+
+INSERT INTO public."Attendance" (id, "sessionId", "userId", status, created_at, updated_at, "recordedIdentifier", source, "startDateTime", "endDateTime", "totalAttendanceTime", "interruptionCount")
+SELECT 500000000 + (participant_index * 100) + session_index,
+       82000 + session_index,
+       ('91000000-0000-0000-0000-' || lpad(participant_index::text, 12, '0'))::uuid,
+       CASE WHEN (participant_index + session_index) % 2 = 0 THEN 'MISSED' ELSE 'ATTENDED' END,
+       '2026-06-03 10:00:00+00'::timestamptz + (session_index * interval '7 days'),
+       '2026-06-03 10:00:00+00'::timestamptz + (session_index * interval '7 days'),
+       NULL,
+       'INSTRUCTOR',
+       NULL,
+       NULL,
+       NULL,
+       NULL
+FROM generate_series(1, 1000) AS participant_series(participant_index)
+CROSS JOIN generate_series(1, 24) AS session_series(session_index)
+WHERE (participant_index + session_index) % 11 = 0;
 INSERT INTO public."Attendance" (id, "sessionId", "userId", status, created_at, updated_at, "recordedIdentifier", source, "startDateTime", "endDateTime", "totalAttendanceTime", "interruptionCount") VALUES
   (80000051, 81005, '91000000-0000-0000-0000-000000000005', 'ATTENDED', '2026-05-30 10:00:00+00'::timestamptz + (5 * interval '1 second'), '2026-05-30 10:00:00+00'::timestamptz + (5 * interval '1 second'), 'sofia.garcia.perf5@example.com', 'INSTRUCTOR', '2026-06-01 10:00:00+00'::timestamptz + (56 * interval '1 day'), '2026-06-01 18:00:00+00'::timestamptz + (56 * interval '1 day'), 28800, 0),
   (80000061, 81001, '91000000-0000-0000-0000-000000000006', 'ATTENDED', '2026-05-30 10:00:00+00'::timestamptz + (6 * interval '1 second'), '2026-05-30 10:00:00+00'::timestamptz + (6 * interval '1 second'), 'noah.fischer.perf6@example.com', 'INSTRUCTOR', '2026-06-01 10:00:00+00'::timestamptz + (0 * interval '1 day'), '2026-06-01 18:00:00+00'::timestamptz + (0 * interval '1 day'), 28800, 0),
