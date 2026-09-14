@@ -234,6 +234,29 @@ describe('Sessions Component - event agenda', () => {
     expect(screen.getByText('Montag, 15.01.2024')).toBeInTheDocument();
   });
 
+  it('repeats a shared address under each day heading', () => {
+    const oneAddress = [mockSessions[0].SessionAddresses[0]];
+    render(
+      <Sessions
+        sessions={[
+          { ...mockSessions[0], SessionAddresses: oneAddress },
+          secondSession({ SessionAddresses: oneAddress }),
+        ]}
+        courseLocations={mockCourseLocations}
+        isLoggedInParticipant={true}
+        isEvent={true}
+        courseId={1}
+        courseTitle="Test Event"
+      />
+    );
+
+    // Two days, so the address appears twice - once under each heading, rather
+    // than once above the whole agenda where it belongs to no day in particular.
+    expect(screen.getAllByText('Test Address 1')).toHaveLength(2);
+    expect(screen.getByText('Montag, 15.01.2024')).toBeInTheDocument();
+    expect(screen.getByText('Montag, 22.01.2024')).toBeInTheDocument();
+  });
+
   it('offers the calendar export next to the agenda heading rather than after the list', () => {
     render(
       <Sessions

@@ -327,14 +327,14 @@ export const Sessions: FC<SessionsProps> = ({
   // Title on the left, calendar export on the right - the export belongs to the
   // whole list, not to whichever session happens to be rendered last.
   const sectionHeader = (title: string) => (
-    <div className="mt-24 mb-6 flex flex-wrap items-center justify-between gap-4">
+    <div className="mt-12 mb-4 flex flex-wrap items-center justify-between gap-4">
       <SectionTitle className="mb-0">{title}</SectionTitle>
       {addToCalendarButton}
     </div>
   );
 
   const sharedLocationsLine = sharedLocations ? (
-    <div className="max-w-2xl mb-6 break-words">
+    <div className="max-w-2xl mb-3 break-words">
       <SessionLocations locations={sharedLocations} canSeeOnlineLink={canSeeOnlineLink} />
     </div>
   ) : null;
@@ -345,12 +345,14 @@ export const Sessions: FC<SessionsProps> = ({
     return (
       <div>
         {sectionHeader(t('sessions.agenda'))}
-        {sharedLocationsLine}
         {dayGroups.map((group) => (
           <div key={group.dayKey} className="max-w-2xl mb-8">
-            <h3 className="text-lg sm:text-xl font-semibold mb-3">
+            <h3 className={`text-lg sm:text-xl font-semibold ${sharedLocationsLine ? 'mb-1' : 'mb-3'}`}>
               {formatDayHeading(group.dayStart, timeZone, locale)}
             </h3>
+            {/* Repeated per day rather than hoisted above the whole agenda: the
+                address belongs to the day it heads, not to the section title. */}
+            {sharedLocationsLine}
             <ul>
               {group.sessions.map((session) => (
                 <SessionRow

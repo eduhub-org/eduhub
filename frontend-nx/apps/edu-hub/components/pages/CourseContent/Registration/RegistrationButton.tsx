@@ -5,7 +5,7 @@ import { MdInfoOutline } from 'react-icons/md';
 import { CourseRegistrationType_enum } from '../../../../__generated__/globalTypes';
 import { Course_Course_by_pk } from '../../../../queries/__generated__/Course';
 import { Button } from '../../../common/Button';
-import { getRegistrationTypeConfig } from './types';
+import { getRegistrationTypeConfig, isRegistrationClosed } from './types';
 
 /**
  * Props for the RegistrationButton component
@@ -47,11 +47,9 @@ export const RegistrationButton: FC<RegistrationButtonProps> = ({ course, regist
   const locale = useLocale();
   const config = getRegistrationTypeConfig(registrationType);
 
-  // Check if application period has ended
-  const now = new Date();
-  now.setHours(0, 0, 0, 0);
+  const registrationClosed = isRegistrationClosed(course.applicationEnd);
 
-  if (course.applicationEnd <= now) {
+  if (registrationClosed) {
     return (
       <div className="bg-amber-50 rounded-lg p-6 mb-9 w-full">
         <div className="flex items-start space-x-3">
@@ -117,7 +115,7 @@ export const RegistrationButton: FC<RegistrationButtonProps> = ({ course, regist
       <Button
         filled
         onClick={onClick}
-        disabled={course.applicationEnd <= now}
+        disabled={registrationClosed}
         className="light !bg-warning !text-[#222222] hover:bg-opacity-90 transition-all duration-200 px-8 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
       >
         {getButtonText()}
