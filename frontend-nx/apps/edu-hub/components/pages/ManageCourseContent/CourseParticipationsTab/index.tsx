@@ -16,7 +16,6 @@ import { CREATE_CERTIFICATES } from '../../../../queries/actions';
 import { COURSE_PARTICIPATIONS } from '../../../../queries/courseParticipation';
 import {
   CourseParticipations_Course_by_pk_CourseEnrollments,
-  CourseParticipations_Course_by_pk_CourseEnrollments_User_Attendances,
   CourseParticipations_Course_by_pk_ProjectCourses,
   CourseParticipations_Course_by_pk_ProjectCourses_Project,
   CourseParticipations_Course_by_pk_Sessions,
@@ -38,7 +37,6 @@ import {
   UpdateEnrollmentStatusWhenConfirmedVariables,
 } from '../../../../queries/__generated__/UpdateEnrollmentStatusWhenConfirmed';
 import { Tooltip } from '@mui/material';
-import { pickEffectiveAttendance } from '../../../../helpers/attendance';
 import { certificateActionErrorMessage } from '../../../../helpers/certificateMessages';
 import { IoIosCheckmarkCircle } from 'react-icons/io';
 import { GoDotFill } from 'react-icons/go';
@@ -56,6 +54,12 @@ import {
   submissionDeadlineToIsoString,
 } from '../../CourseContent/Projects/projectEffectiveSubmissionDeadline';
 import { QuestionConfirmationDialog } from '../../../common/dialogs/QuestionConfirmationDialog';
+import {
+  AttendanceOverallStatus,
+  collapseAttendancesBySession,
+  getAttendanceStatusFromMap,
+} from '../../../../helpers/courseParticipationAttendance';
+import { useOptimisticAttendance } from './useOptimisticAttendance';
 
 interface CourseParticipationsTabIProps {
   course: ManagedCourse_Course_by_pk;
@@ -81,54 +85,6 @@ function findUserProject(
   return projects.find((p) =>
     p.ProjectAuthors.some((author) => author.userId === enrollment.User.id)
   );
-}
-
-type AttendanceOverallStatus = 'passed' | 'failed' | 'uncertain';
-
-function collapseAttendancesBySession(
-  attendances: readonly CourseParticipations_Course_by_pk_CourseEnrollments_User_Attendances[]
-): Record<number, CourseParticipations_Course_by_pk_CourseEnrollments_User_Attendances> {
-  const bySession = attendances.reduce<
-    Record<number, CourseParticipations_Course_by_pk_CourseEnrollments_User_Attendances[]>
-  >((prev, curr) => {
-    const bucket = prev[curr.Session.id] ?? [];
-    bucket.push(curr);
-    prev[curr.Session.id] = bucket;
-    return prev;
-  }, {});
-
-  const result: Record<number, CourseParticipations_Course_by_pk_CourseEnrollments_User_Attendances> = {};
-  for (const [sessionId, rows] of Object.entries(bySession)) {
-    const effective = pickEffectiveAttendance(rows, (a) => a.id);
-    if (effective !== undefined) {
-      result[Number(sessionId)] = effective;
-    }
-  }
-  return result;
-}
-
-function getAttendanceStatusFromMap(
-  attendanceBySession: Record<number, CourseParticipations_Course_by_pk_CourseEnrollments_User_Attendances>,
-  sessions: CourseParticipations_Course_by_pk_Sessions[],
-  maxMissedSessions: number
-): AttendanceOverallStatus {
-  let missed = 0;
-  let unchecked = 0;
-  for (const session of sessions) {
-    const att = attendanceBySession[session.id];
-    if (!att) {
-      unchecked += 1;
-    } else if (att.status === AttendanceStatus_enum.MISSED) {
-      missed += 1;
-    } else if (att.status === AttendanceStatus_enum.NO_INFO) {
-      unchecked += 1;
-    }
-    // ATTENDED: no change to missed or unchecked
-  }
-
-  if (missed > maxMissedSessions) return 'failed';
-  if (missed + unchecked <= maxMissedSessions) return 'passed';
-  return 'uncertain';
 }
 
 function getAttendanceStatus(
@@ -220,14 +176,32 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
     [courseProjectCourses]
   );
   const maxMissedSessions = courseData?.maxMissedSessions ?? course.maxMissedSessions;
+  const isInitialLoading = loading && !courseData;
+
+  const [insertAttendance] = useRoleMutation<InsertSingleAttendance, InsertSingleAttendanceVariables>(
+    INSERT_SINGLE_ATTENDANCE
+  );
+
+  const handleAttendanceError = useCallback(
+    (message: string) => setBulkActionError(message),
+    []
+  );
+
+  const { enrollmentsWithOverrides, handleDotClick } = useOptimisticAttendance({
+    enrollments,
+    sessions,
+    insertAttendance,
+    refetchParticipations: refetch,
+    onError: handleAttendanceError,
+  });
 
   const extendedEnrollments: ExtendedEnrollment[] = useMemo(
     () =>
-      enrollments.map((enrollment: CourseParticipations_Course_by_pk_CourseEnrollments) => ({
+      enrollmentsWithOverrides.map((enrollment) => ({
         ...enrollment,
         userProject: findUserProject(enrollment, projects),
       })),
-    [enrollments, projects]
+    [enrollmentsWithOverrides, projects]
   );
 
   const totalCount = courseData?.CourseEnrollments_aggregate?.aggregate?.count ?? 0;
@@ -531,42 +505,6 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
     };
   }, [sessions, maxMissedSessions, t]);
 
-  const [insertAttendance] = useRoleMutation<InsertSingleAttendance, InsertSingleAttendanceVariables>(
-    INSERT_SINGLE_ATTENDANCE
-  );
-
-  const handleDotClick = useCallback(
-    async (session: CourseParticipations_Course_by_pk_Sessions, userId: string) => {
-      const enrollment = extendedEnrollments.find((e) => e.userId === userId);
-      if (!enrollment) return;
-      const attBySession = collapseAttendancesBySession(enrollment.User.Attendances);
-      const att = attBySession[session.id];
-      let status: AttendanceStatus_enum;
-      if (
-        !att ||
-        att.status === AttendanceStatus_enum.MISSED ||
-        att.status === AttendanceStatus_enum.NO_INFO
-      ) {
-        status = AttendanceStatus_enum.ATTENDED;
-      } else {
-        status = AttendanceStatus_enum.MISSED;
-      }
-      await insertAttendance({
-        variables: {
-          input: {
-            status,
-            sessionId: session.id,
-            source: 'INSTRUCTOR',
-            userId,
-          },
-        },
-      });
-      refetch();
-      qResult.refetch();
-    },
-    [insertAttendance, extendedEnrollments, refetch, qResult]
-  );
-
   const columns = useMemo<ColumnDef<ExtendedEnrollment>[]>(
     () => [
       {
@@ -757,7 +695,7 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
             setSearchFilter={setSearchFilter}
             sorting={sorting}
             setSorting={setSorting}
-            loading={loading}
+            loading={isInitialLoading}
             error={error}
             bulkActions={bulkActions}
             onBulkAction={handleBulkAction}
@@ -824,7 +762,7 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
           setSearchFilter={setSearchFilter}
           sorting={sorting}
           setSorting={setSorting}
-          loading={loading}
+          loading={isInitialLoading}
           error={error}
           bulkActions={bulkActions}
           onBulkAction={handleBulkAction}
