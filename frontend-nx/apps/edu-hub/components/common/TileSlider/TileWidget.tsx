@@ -29,6 +29,14 @@ const TileWidgetComponent: FC<TileWidgetProps> = ({ course }) => {
     Boolean(course.Program.showExtendedApplicationPeriodBanner)
   );
 
+  // An event is dated by its sessions, a course by its weekly slot; either way
+  // this is one line and the language moved out of it into the footer.
+  const dateLine = eventMeta.isEvent
+    ? eventMeta.dateSpan
+    : course.weekDay !== 'NONE' && course.startTime && course.endTime
+    ? getWeekdayStartAndEndString(course, t)
+    : null;
+
   const courseUrl = `${getWidgetBaseUrl()}/course/${course.id}`;
 
   return (
@@ -47,19 +55,7 @@ const TileWidgetComponent: FC<TileWidgetProps> = ({ course }) => {
         className="shadow-lg"
         style={{ boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1)' }}
       >
-        <div className="flex justify-between mb-3 text-sm tracking-wider">
-          {eventMeta.isEvent
-            ? eventMeta.dateSpan
-            : course.weekDay !== 'NONE' && course.startTime && course.endTime
-            ? getWeekdayStartAndEndString(course, t)
-            : null}{' '}
-          <div className="flex items-center">
-            <div className="w-4 h-4 mr-1">
-              <Image src="/images/course/language.svg" alt="language icon" width={16} height={16} unoptimized className="w-full h-full object-contain" />
-            </div>
-            {t(course.language ?? '')}
-          </div>
-        </div>
+        {dateLine ? <div className="mb-3 text-sm tracking-wider">{dateLine}</div> : null}
         <span className="text-lg mb-auto line-clamp-3">{course.tagline}</span>
         <div className="flex justify-between text-xs items-center tracking-wider">
           <div className="flex uppercase">
@@ -73,7 +69,19 @@ const TileWidgetComponent: FC<TileWidgetProps> = ({ course }) => {
               </React.Fragment>
             ))}
           </div>
-          {!course.Program.published && course.Program.title}
+          {/* The date line above is long enough on its own, so the language sits
+              down here - and gives way to the program title, which is the more
+              useful thing to know about an unpublished program. */}
+          {!course.Program.published && course.Program.title ? (
+            course.Program.title
+          ) : course.language ? (
+            <div className="flex items-center">
+              <div className="w-3 h-3 mr-1">
+                <Image src="/images/course/language.svg" alt="language icon" width={12} height={12} unoptimized className="w-full h-full object-contain" />
+              </div>
+              {t(course.language)}
+            </div>
+          ) : null}
         </div>
       </TileBase>
     </a>

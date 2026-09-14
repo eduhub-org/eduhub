@@ -12,7 +12,10 @@ interface IProps {
 export const DescriptionFields: FC<IProps> = ({ course }) => {
   const t = useTranslations('course');
 
-  const isAchievementCertificatePossible = course.achievementCertificatePossible;
+  // Events do not award achievement certificates, so the attendance rules -
+  // camera on, and so forth - have nothing to apply to.
+  const isEventCourse = course.Program?.type === 'EVENTS';
+  const isAchievementCertificatePossible = !isEventCourse && course.achievementCertificatePossible;
 
   return (
     <>

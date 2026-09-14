@@ -68,6 +68,70 @@ const resolveSessionLocations = (
     ];
   });
 
+/** Stable identity of a session's places, so two sessions can be compared. */
+const locationsSignature = (locations: ResolvedLocation[]): string =>
+  locations.map((l) => `${l.courseLocationId}|${l.locationOption ?? ''}|${l.displayAddress}`).join('||');
+
+interface SessionLocationsProps {
+  locations: ResolvedLocation[];
+  canSeeOnlineLink: boolean;
+}
+
+/** The place(s) of a session, rendered either per row or once above the list. */
+const SessionLocations: FC<SessionLocationsProps> = ({ locations, canSeeOnlineLink }) => {
+  const t = useTranslations('course');
+
+  return (
+    <>
+      {locations.map((location, index) => (
+        <span key={location.courseLocationId} className="text-sm text-label-secondary ml-0 pl-0">
+          {location.locationOption ? (
+            location.locationOption === 'ONLINE' ? (
+              <>
+                {canSeeOnlineLink ? (
+                  isLinkFormat(location.displayAddress) ? (
+                    <a
+                      href={location.displayAddress}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline"
+                    >
+                      ONLINE
+                    </a>
+                  ) : (
+                    <>ONLINE {t('general.link_will_be_provided_soon')}</>
+                  )
+                ) : (
+                  'ONLINE'
+                )}
+              </>
+            ) : location.displayAddress ? (
+              <a
+                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                  location.displayAddress
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline"
+              >
+                {location.displayAddress}
+              </a>
+            ) : (
+              <>
+                {location.locationOption} {t('general.address_will_be_provided_soon')}
+              </>
+            )
+          ) : (
+            t('sessions.location_not_available')
+          )}
+          {/* Add separator if this is not the last location with a SessionAddress */}
+          {index < locations.length - 1 && ' +\u00A0'}
+        </span>
+      ))}
+    </>
+  );
+};
+
 interface SessionRowProps {
   session: Session;
   locations: ResolvedLocation[];
@@ -99,53 +163,11 @@ const SessionRow: FC<SessionRowProps> = ({ session, locations, showDate, canSeeO
       </div>
       <div className="flex flex-col flex-1">
         <span className="block text-sm sm:text-lg break-words">{title}</span>
-        <div className="break-words">
-          {locations.map((location, index) => (
-            <span key={location.courseLocationId} className="text-sm text-label-secondary ml-0 pl-0">
-              {location.locationOption ? (
-                location.locationOption === 'ONLINE' ? (
-                  <>
-                    {canSeeOnlineLink ? (
-                      isLinkFormat(location.displayAddress) ? (
-                        <a
-                          href={location.displayAddress}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="underline"
-                        >
-                          ONLINE
-                        </a>
-                      ) : (
-                        <>ONLINE {t('general.link_will_be_provided_soon')}</>
-                      )
-                    ) : (
-                      'ONLINE'
-                    )}
-                  </>
-                ) : location.displayAddress ? (
-                  <a
-                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-                      location.displayAddress
-                    )}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="underline"
-                  >
-                    {location.displayAddress}
-                  </a>
-                ) : (
-                  <>
-                    {location.locationOption} {t('general.address_will_be_provided_soon')}
-                  </>
-                )
-              ) : (
-                t('sessions.location_not_available')
-              )}
-              {/* Add separator if this is not the last location with a SessionAddress */}
-              {index < locations.length - 1 && ' +\u00A0'}
-            </span>
-          ))}
-        </div>
+        {locations.length > 0 && (
+          <div className="break-words">
+            <SessionLocations locations={locations} canSeeOnlineLink={canSeeOnlineLink} />
+          </div>
+        )}
         {description ? (
           <p className="mt-1 text-sm text-label-secondary whitespace-pre-line break-words">{description}</p>
         ) : null}
@@ -222,13 +244,30 @@ export const Sessions: FC<SessionsProps> = ({
     return map;
   }, [addressData]);
 
+  /**
+   * The places every single session shares, or null when they differ. Computed
+   * over all sessions rather than the visible ones so that expanding "Alle
+   * Termine anzeigen" cannot move the addresses around. Repeating one address
+   * on every row is noise, so in that case it is hoisted above the list; with a
+   * single session there is nothing to repeat and it stays on the row.
+   */
+  const sharedLocations = useMemo(() => {
+    if (sessions.length < 2) return null;
+    const perSession = sessions.map((session) => resolveSessionLocations(session, courseLocations, addressMap));
+    if (perSession.some((locations) => locations.length === 0)) return null;
+
+    const signature = locationsSignature(perSession[0]);
+    return perSession.every((locations) => locationsSignature(locations) === signature) ? perSession[0] : null;
+  }, [sessions, courseLocations, addressMap]);
+
   const locationsBySessionId = useMemo(() => {
     const map = new Map<number, ResolvedLocation[]>();
+    if (sharedLocations) return map;
     visibleSessions.forEach((session) => {
       map.set(session.id, resolveSessionLocations(session, courseLocations, addressMap));
     });
     return map;
-  }, [visibleSessions, courseLocations, addressMap]);
+  }, [visibleSessions, courseLocations, addressMap, sharedLocations]);
 
   const dayGroups = useMemo(
     () => (isEvent ? groupSessionsByDay(visibleSessions, timeZone) : []),
@@ -277,7 +316,7 @@ export const Sessions: FC<SessionsProps> = ({
   const addToCalendarButton = !courseTitle ? null : (
     <button
       onClick={handleExportICal}
-      className="flex items-center gap-2 mt-2 mb-6 px-4 py-2 min-h-11 touch-manipulation rounded-lg border
+      className="flex items-center gap-2 px-4 py-2 min-h-11 touch-manipulation rounded-lg border
         border-border-primary bg-bg-secondary hover:bg-border-primary text-sm text-label-primary transition-colors"
     >
       <MdCalendarMonth />
@@ -285,34 +324,28 @@ export const Sessions: FC<SessionsProps> = ({
     </button>
   );
 
-  if (isEvent) {
-    // A lone session needs no heading and no date column: the date already sits
-    // in the hero and the info panel, so only the title and place are new here.
-    if (sessions.length === 1) {
-      const session = visibleSessions[0];
-      const locations = locationsBySessionId.get(session.id) ?? [];
-      if (!session.title && !session.description && locations.length === 0) {
-        // Nothing to describe, but the dates are still worth exporting.
-        return addToCalendarButton ? <div className="mt-24">{addToCalendarButton}</div> : null;
-      }
-      return (
-        <div className="mt-24">
-          <ul className="max-w-2xl">
-            <SessionRow
-              session={session}
-              locations={locations}
-              showDate={false}
-              canSeeOnlineLink={canSeeOnlineLink}
-            />
-          </ul>
-          {addToCalendarButton}
-        </div>
-      );
-    }
+  // Title on the left, calendar export on the right - the export belongs to the
+  // whole list, not to whichever session happens to be rendered last.
+  const sectionHeader = (title: string) => (
+    <div className="mt-24 mb-6 flex flex-wrap items-center justify-between gap-4">
+      <SectionTitle className="mb-0">{title}</SectionTitle>
+      {addToCalendarButton}
+    </div>
+  );
 
+  const sharedLocationsLine = sharedLocations ? (
+    <div className="max-w-2xl mb-6 break-words">
+      <SessionLocations locations={sharedLocations} canSeeOnlineLink={canSeeOnlineLink} />
+    </div>
+  ) : null;
+
+  if (isEvent) {
+    // Every event agenda is grouped by day, a one-session event included: the
+    // date is no longer shown above the tagline, so the day heading carries it.
     return (
-      <>
-        <SectionTitle className="mt-24">{t('sessions.agenda')}</SectionTitle>
+      <div>
+        {sectionHeader(t('sessions.agenda'))}
+        {sharedLocationsLine}
         {dayGroups.map((group) => (
           <div key={group.dayKey} className="max-w-2xl mb-8">
             <h3 className="text-lg sm:text-xl font-semibold mb-3">
@@ -331,16 +364,14 @@ export const Sessions: FC<SessionsProps> = ({
             </ul>
           </div>
         ))}
-        {addToCalendarButton}
-      </>
+      </div>
     );
   }
 
   return (
-    <>
-      <SectionTitle className="mt-24">
-        {sessions.length === 1 ? t('sessions.date_singular') : t('sessions.date_plural')}
-      </SectionTitle>
+    <div>
+      {sectionHeader(sessions.length === 1 ? t('sessions.date_singular') : t('sessions.date_plural'))}
+      {sharedLocationsLine}
       <ul className="max-w-2xl">
         {visibleSessions.map((session) => (
           <SessionRow
@@ -355,7 +386,7 @@ export const Sessions: FC<SessionsProps> = ({
       {sessions.length > initiallyShownSessions &&
         (showAllSessions ? (
           <button
-            className="text-white text-sm sm:text-lg font-semibold hover:underline italic flex items-center pb-6 min-h-11 touch-manipulation"
+            className="text-white text-sm sm:text-lg font-semibold hover:underline italic flex items-center min-h-11 touch-manipulation"
             onClick={() => setShowAllSessions(false)}
           >
             {t('sessions.hide_dates')}
@@ -363,14 +394,13 @@ export const Sessions: FC<SessionsProps> = ({
           </button>
         ) : (
           <button
-            className="text-white text-sm sm:text-lg font-semibold hover:underline italic flex items-center pb-6 min-h-11 touch-manipulation"
+            className="text-white text-sm sm:text-lg font-semibold hover:underline italic flex items-center min-h-11 touch-manipulation"
             onClick={() => setShowAllSessions(true)}
           >
             {t('sessions.show_all_dates')}
             <IoIosArrowDown className="ml-1" />
           </button>
         ))}
-      {addToCalendarButton}
-    </>
+    </div>
   );
 };
