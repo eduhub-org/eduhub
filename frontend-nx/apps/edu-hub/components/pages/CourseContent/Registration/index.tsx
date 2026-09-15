@@ -132,7 +132,7 @@ export const Registration: FC<RegistrationProps> = ({ course, courseEnrollment, 
             <button
               type="button"
               onClick={openGuestModal}
-              className="mt-3 w-full text-sm text-cta hover:underline min-h-[44px]"
+              className="mt-3 w-full text-sm text-cta-text hover:underline min-h-[44px]"
             >
               {tGuest('register_without_account')}
             </button>

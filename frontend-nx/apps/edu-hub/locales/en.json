@@ -338,7 +338,9 @@
       "no_online_participation_available": "Online participation is not available for this course.",
       "speaker": "Speaker",
       "link_will_be_provided_soon": "(Link will be provided here soon)",
-      "address_will_be_provided_soon": "(Address will be provided here soon)"
+      "address_will_be_provided_soon": "(Address will be provided here soon)",
+      "share": "Share",
+      "link_copied": "Link copied"
     },
     "ects": {
       "5": "5",
@@ -367,7 +369,8 @@
       "agenda": "Agenda",
       "add_to_calendar": "Add to calendar",
       "location_not_available": "Location not available",
-      "untitled_session": "Agenda item"
+      "untitled_session": "Agenda item",
+      "add_to_calendar_short": "Calendar"
     },
     "attendances": {
       "attendances": "Attendances",
@@ -728,7 +731,10 @@
       "dates": "Dates",
       "location": "Location",
       "language": "Language",
-      "price": "Price"
+      "price": "Price",
+      "places": "Places",
+      "places_left": "{count} left",
+      "places_total": "of {count}"
     }
   },
   "coursePage": {

@@ -1,18 +1,23 @@
 import Image from 'next/image';
 import { FC, useMemo, useCallback, Fragment, ReactNode, type JSX } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import { MdAttachMoney, MdCalendarMonth, MdSchool } from 'react-icons/md';
+import { MdAttachMoney, MdCalendarMonth, MdPeopleOutline, MdSchool } from 'react-icons/md';
 
 import { useStartTimeString, useEndTimeString, getWeekdayString } from '../../../helpers/dateTimeHelpers';
 import { useAppSettings } from '../../../contexts/AppSettingsContext';
 import { formatSessionDateSpan } from '../../../helpers/sessionSchedule';
 import { Course_Course_by_pk } from '../../../queries/__generated__/Course';
-import UserCard from '../../common/UserCard';
-import { getRegistrationTypeConfig } from './Registration/types';
+import { getRegistrationTypeConfig, isRegistrationClosed } from './Registration/types';
 
 interface IProps {
   course: Course_Course_by_pk;
 }
+
+/**
+ * The facts of a course - when, where, in which language, what it costs, how
+ * many places are left - as a labelled list. Card chrome is the caller's job:
+ * this renders inside the registration rail, which owns the surface.
+ */
 
 interface FactProps {
   icon: ReactNode;
@@ -38,7 +43,7 @@ const Fact: FC<FactProps> = ({ icon, label, children }) => (
   </div>
 );
 
-export const InfoPanel: FC<IProps> = ({ course }) => {
+export const CourseFacts: FC<IProps> = ({ course }) => {
   const t = useTranslations('common');
   const tCourse = useTranslations('course');
   const tCoursePage = useTranslations('coursePage');
@@ -147,6 +152,14 @@ export const InfoPanel: FC<IProps> = ({ course }) => {
     : !!course.ects && course.achievementCertificatePossible === true;
   const hasLocation = !!locationText;
   const hasLanguage = !!course.language;
+  // Capacity is only a fact worth stating when there is a cap to state it
+  // against, and only while it still means something: a full course says so
+  // through the waitlist CTA, and a closed one should not be advertising free
+  // places next to a notice saying you can no longer take them.
+  const maxParticipants = course.maxParticipants ?? null;
+  const placesLeft =
+    maxParticipants != null ? Math.max(0, maxParticipants - Number(course.activeParticipantCount ?? 0)) : null;
+  const hasPlaces = placesLeft != null && placesLeft > 0 && !isRegistrationClosed(course.applicationEnd);
 
   // Build array of info elements to display
   const infoElements = useMemo(() => {
@@ -254,6 +267,18 @@ export const InfoPanel: FC<IProps> = ({ course }) => {
       );
     }
 
+    // Places left
+    if (hasPlaces && placesLeft != null && maxParticipants != null) {
+      elements.push(
+        <Fact key="places" icon={<MdPeopleOutline size={20} />} label={tCourse('info.places')}>
+          {tCourse('info.places_left', { count: placesLeft })}
+          <span className="block font-medium text-label-secondary mt-0.5">
+            {tCourse('info.places_total', { count: maxParticipants })}
+          </span>
+        </Fact>
+      );
+    }
+
     return elements;
   }, [
     hasEventDateSpan,
@@ -262,6 +287,9 @@ export const InfoPanel: FC<IProps> = ({ course }) => {
     hasSessionDate,
     hasEcts,
     showPrice,
+    hasPlaces,
+    placesLeft,
+    maxParticipants,
     hasLocation,
     hasLanguage,
     course,
@@ -283,32 +311,5 @@ export const InfoPanel: FC<IProps> = ({ course }) => {
     requiredEctsDisplay,
   ]);
 
-  const hasInstructors = !!course.CourseInstructors && course.CourseInstructors.length > 0;
-
-  // Nothing to state and nobody to name: an empty white card is worse than no card.
-  if (infoElements.length === 0 && !hasInstructors) {
-    return null;
-  }
-
-  return (
-    <div className="w-full rounded-2xl bg-fill-primary text-label-primary light p-6">
-      {infoElements.length > 0 && <dl className="flex flex-col gap-4">{infoElements}</dl>}
-
-      {hasInstructors && (
-        <>
-          {infoElements.length > 0 && <div className="border-t border-border-primary my-6" />}
-          <div className="flex flex-col gap-4">
-            {course.CourseInstructors.map((instructor) => (
-              <UserCard
-                className="flex items-center"
-                key={`instructor-${instructor.id || instructor.User?.id}`}
-                user={instructor.User}
-                size="compact"
-              />
-            ))}
-          </div>
-        </>
-      )}
-    </div>
-  );
+  return infoElements.length > 0 ? <dl className="flex flex-col gap-4">{infoElements}</dl> : null;
 };

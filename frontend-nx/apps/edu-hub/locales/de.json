@@ -338,7 +338,9 @@
       "no_online_participation_available": "Für diesen Kurs ist keine Online-Teilnahme verfügbar.",
       "speaker": "Referent:in",
       "link_will_be_provided_soon": "(Link wird hier in Kürze bereitgestellt)",
-      "address_will_be_provided_soon": "(Adresse wird hier in Kürze angegeben)"
+      "address_will_be_provided_soon": "(Adresse wird hier in Kürze angegeben)",
+      "share": "Teilen",
+      "link_copied": "Link kopiert"
     },
     "ects": {
       "5": "5",
@@ -367,7 +369,8 @@
       "agenda": "Programm",
       "add_to_calendar": "Zum Kalender hinzufügen",
       "location_not_available": "Ort noch nicht bekannt",
-      "untitled_session": "Programmpunkt"
+      "untitled_session": "Programmpunkt",
+      "add_to_calendar_short": "Kalender"
     },
     "attendances": {
       "attendances": "Anwesenheiten",
@@ -728,7 +731,10 @@
       "dates": "Termine",
       "location": "Ort",
       "language": "Sprache",
-      "price": "Preis"
+      "price": "Preis",
+      "places": "Plätze",
+      "places_left": "Noch {count} frei",
+      "places_total": "von {count}"
     }
   },
   "coursePage": {

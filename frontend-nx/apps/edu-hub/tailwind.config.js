@@ -46,6 +46,7 @@ module.exports = {
         cta: {
           DEFAULT: 'var(--eduhub-cta)',
           hover: 'var(--eduhub-cta-hover)',
+          text: 'var(--eduhub-cta-text)',
         },
         error: 'var(--eduhub-error)',
         info: 'var(--eduhub-info)',

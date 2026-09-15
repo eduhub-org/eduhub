@@ -17,12 +17,11 @@ import { PageBlock } from '../../common/PageBlock';
 import { DescriptionFields } from './DescriptionFields';
 import { FundingOrganizations } from './FundingOrganizations';
 import CourseProjectsSection from '../../common/TileSlider/CourseProjectsSection';
-import { InfoPanel } from './InfoPanel';
+import { RegistrationRail } from './RegistrationRail';
 import { useWeekdayStartAndEndString } from '../../../helpers/dateTimeHelpers';
 import { LearningGoals } from './LearningGoals';
 import { Sessions } from './Sessions';
 import { CompletedDegreeCourses, CurrentDegreeCourses } from './DegreeCourses';
-import { Registration } from './Registration';
 import PricingSummary from '../../common/PricingSummary';
 import { getRegistrationTypeConfig } from './Registration/types';
 import { getBackgroundImage } from '../../../helpers/imageHandling';
@@ -49,12 +48,25 @@ import NotificationSnackbar from '../../common/dialogs/NotificationSnackbar';
 const SECTION_RHYTHM = 'flex flex-col space-y-16 lg:space-y-24';
 
 /**
- * One width for the registration CTA and the info panel below it. Both columns
- * used to size themselves independently and centre their own contents, which
- * left the button, the deadline, the guest link and the card on four different
- * edges; sharing a rail gives the right-hand side a single vertical line.
+ * The two-column body, as a grid rather than a flex row.
+ *
+ * The rail spans both rows on the right, so it can travel the whole height of
+ * the tagline and the agenda together while `sticky` keeps it in view. Grid
+ * also lets the source order be tagline -> rail -> content, which is what we
+ * want stacked (and for a screen reader: facts before the detail that expands
+ * them) without any of the three moving on desktop.
  */
-const REGISTRATION_RAIL = 'w-full lg:w-[360px] lg:shrink-0';
+const BODY_GRID = 'grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_360px] gap-x-6 gap-y-12 lg:gap-y-8';
+
+/**
+ * Pinned beside the content on wide screens. `self-start` is what gives sticky
+ * room to work - a stretched grid item is already as tall as its area and has
+ * nowhere to travel - and the max height keeps a tall card (a paid course with
+ * add-ons and several instructors) from running off the bottom of the screen.
+ */
+const RAIL_STICKY =
+  'lg:col-start-2 lg:row-start-1 lg:row-span-2 lg:self-start lg:sticky lg:top-6 ' +
+  'lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto';
 
 const CourseContent: FC<{ id: number }> = ({ id }) => {
   const t = useTranslations('course');
@@ -214,24 +226,50 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                 />
               )}
               <PageBlock>
-                {/* Not items-center: ContentRow stacks below lg, where centring
-                    the cross axis centres the tagline horizontally instead. */}
-                <ContentRow>
-                  <div className="flex flex-1 min-w-0 flex-col text-white">
+                <div className={BODY_GRID}>
+                  <div className="flex min-w-0 flex-col text-white lg:col-start-1 lg:row-start-1">
                     {/* An event carries its dates in the agenda below, not here. */}
                     {!isEventCourse && course.weekDay !== 'NONE' ? (
                       <span className="text-xs mb-2">{getWeekdayStartAndEndString(course, tCommon)}</span>
                     ) : null}
                     <span className="text-xl sm:text-2xl leading-snug">{course.tagline}</span>
                   </div>
-                  <div className={REGISTRATION_RAIL}>
-                    <Registration
+
+                  <div className={RAIL_STICKY}>
+                    <RegistrationRail
                       course={course}
                       courseEnrollment={courseEnrollment ?? undefined}
+                      isLoggedInParticipant={isLoggedInParticipant}
                       onRegistrationSuccess={handleRegistrationSuccess}
                     />
                   </div>
-                </ContentRow>
+
+                  <div className="min-w-0 text-white space-y-8 lg:col-start-1 lg:row-start-2">
+                    <LearningGoals learningGoals={course.learningGoals} />
+                    {!isDegreeCourse ? (
+                      <Sessions
+                        sessions={course.Sessions}
+                        courseLocations={course.CourseLocations}
+                        isLoggedInParticipant={isLoggedInParticipant}
+                        isEvent={isEventCourse}
+                      />
+                    ) : (
+                      <CurrentDegreeCourses degreeCourses={course.DegreeCourses} />
+                    )}
+                    {!!(requiresPayment && (course.basePrice || course.basePrice === 0 || course.basePrice === null || addonItems.length > 0)) && (
+                      <div>
+                        <span className="text-3xl font-semibold block mb-6">{tCoursePage('pricing_section_title')}</span>
+                        <PricingSummary
+                          basePrice={course.basePrice || 0}
+                          currency={course.currency || 'EUR'}
+                          addons={addonItems}
+                          showStripeStatus={false}
+                          showTotal={false}
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
               </PageBlock>
               {!isEventCourse &&
                 isCourseWithEnrollment && // needed to assure the type of the course object
@@ -289,43 +327,6 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                   </ContentRow>
                   </>
                 )}
-              <PageBlock>
-                {/* The panel leads in the DOM so that stacked - and for a screen
-                    reader - the facts come before the agenda that details them.
-                    On lg it moves back to the right-hand rail. */}
-                <ContentRow className="gap-12 lg:gap-6">
-                  <div className={`${REGISTRATION_RAIL} lg:order-2`}>
-                    <InfoPanel course={course} />
-                  </div>
-                  <div className="flex-1 min-w-0 text-white space-y-8 lg:order-1">
-                    <LearningGoals learningGoals={course.learningGoals} />
-                    {!isDegreeCourse ? (
-                      <Sessions
-                        sessions={course.Sessions}
-                        courseLocations={course.CourseLocations}
-                        isLoggedInParticipant={isLoggedInParticipant}
-                        isEvent={isEventCourse}
-                        courseId={course.id}
-                        courseTitle={course.title}
-                      />
-                    ) : (
-                      <CurrentDegreeCourses degreeCourses={course.DegreeCourses} />
-                    )}
-                    {!!(requiresPayment && (course.basePrice || course.basePrice === 0 || course.basePrice === null || addonItems.length > 0)) && (
-                      <div>
-                        <span className="text-3xl font-semibold block mb-6">{tCoursePage('pricing_section_title')}</span>
-                        <PricingSummary
-                          basePrice={course.basePrice || 0}
-                          currency={course.currency || 'EUR'}
-                          addons={addonItems}
-                          showStripeStatus={false}
-                          showTotal={false}
-                        />
-                      </div>
-                    )}
-                  </div>
-                </ContentRow>
-              </PageBlock>
               <DescriptionFields course={course} />
               <FundingOrganizations courseFundingOrganizations={course.CourseFundingOrganizations ?? []} />
               <CourseProjectsSection courseId={id} />

@@ -225,8 +225,6 @@ describe('Sessions Component - event agenda', () => {
         courseLocations={mockCourseLocations}
         isLoggedInParticipant={true}
         isEvent={true}
-        courseId={1}
-        courseTitle="Test Event"
       />
     );
 
@@ -245,8 +243,6 @@ describe('Sessions Component - event agenda', () => {
         courseLocations={mockCourseLocations}
         isLoggedInParticipant={true}
         isEvent={true}
-        courseId={1}
-        courseTitle="Test Event"
       />
     );
 
@@ -255,22 +251,5 @@ describe('Sessions Component - event agenda', () => {
     expect(screen.getAllByText('Test Address 1')).toHaveLength(2);
     expect(screen.getByText('Montag, 15.01.2024')).toBeInTheDocument();
     expect(screen.getByText('Montag, 22.01.2024')).toBeInTheDocument();
-  });
-
-  it('offers the calendar export next to the agenda heading rather than after the list', () => {
-    render(
-      <Sessions
-        sessions={[mockSessions[0], secondSession()]}
-        courseLocations={mockCourseLocations}
-        isLoggedInParticipant={true}
-        isEvent={true}
-        courseId={1}
-        courseTitle="Test Event"
-      />
-    );
-
-    const heading = screen.getByText('sessions.agenda');
-    const exportButton = screen.getByRole('button', { name: /sessions.add_to_calendar/ });
-    expect(heading.parentElement).toContainElement(exportButton);
   });
 });
