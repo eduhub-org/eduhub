@@ -8,6 +8,20 @@
  * one invites people into rooms and the other links to them.
  */
 
+/**
+ * The Matrix server name EduHub issues handles under - the domain half of an
+ * MXID, which is `opencampus.sh` even though the homeserver itself lives at
+ * matrix.opencampus.sh (the usual delegation setup). Matches MATRIX_SERVER_NAME
+ * on the serverless side.
+ *
+ * It is a fallback rather than the only source: NEXT_PUBLIC_MATRIX_SERVER_NAME
+ * still wins where it is set, which is what a fork or a second deployment
+ * needs. A handle that already carries its own domain never reaches this -
+ * see toMatrixUserId - so someone bringing an account from another homeserver
+ * is unaffected.
+ */
+export const DEFAULT_MATRIX_SERVER_NAME = 'opencampus.sh';
+
 const trimAndNull = (value: string | null | undefined): string | null => {
   const trimmed = value?.trim();
   return trimmed ? trimmed : null;
@@ -44,14 +58,17 @@ export const toMatrixUserId = (
 
 /**
  * A link that opens a direct message with this person in the configured Element
- * client, or null when either half of the address is missing.
+ * client, or null when the handle or the Element client is missing. The server
+ * name falls back to DEFAULT_MATRIX_SERVER_NAME, so this works unconfigured.
  */
 export const elementDirectMessageUrl = (
   matrixUserHandle: string | null | undefined,
   serverName: string | null | undefined = process.env.NEXT_PUBLIC_MATRIX_SERVER_NAME,
   elementClientUrl: string | null | undefined = process.env.NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL
 ): string | null => {
-  const matrixUserId = toMatrixUserId(matrixUserHandle, serverName);
+  // Resolved here rather than in the default argument so that an empty string
+  // falls back too: an unset Docker build arg inlines as "", not undefined.
+  const matrixUserId = toMatrixUserId(matrixUserHandle, trimAndNull(serverName) ?? DEFAULT_MATRIX_SERVER_NAME);
   const base = trimAndNull(elementClientUrl)?.replace(/\/+$/, '');
   if (!matrixUserId || !base) return null;
   return `${base}/#/user/${matrixUserId}`;

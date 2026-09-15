@@ -1,4 +1,4 @@
-import { elementDirectMessageUrl, toMatrixUserId } from './matrix';
+import { DEFAULT_MATRIX_SERVER_NAME, elementDirectMessageUrl, toMatrixUserId } from './matrix';
 
 describe('toMatrixUserId', () => {
   it('qualifies a bare localpart with the server name', () => {
@@ -50,5 +50,17 @@ describe('elementDirectMessageUrl', () => {
 
   it('returns null when the handle cannot be addressed', () => {
     expect(elementDirectMessageUrl(null, 'matrix.opencampus.sh', 'https://element.example')).toBeNull();
+  });
+
+  it.each([undefined, null, ''])('falls back to the default server name for %p', (serverName) => {
+    expect(elementDirectMessageUrl('nina', serverName, 'https://element.example')).toBe(
+      `https://element.example/#/user/@nina:${DEFAULT_MATRIX_SERVER_NAME}`
+    );
+  });
+
+  it('still prefers a handle that carries its own domain over the fallback', () => {
+    expect(elementDirectMessageUrl('@nina:matrix.org', undefined, 'https://element.example')).toBe(
+      'https://element.example/#/user/@nina:matrix.org'
+    );
   });
 });
