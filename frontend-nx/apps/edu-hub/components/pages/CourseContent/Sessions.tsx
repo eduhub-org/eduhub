@@ -148,21 +148,34 @@ const SessionRow: FC<SessionRowProps> = ({ session, locations, showDate, canSeeO
   const { startDateTime, endDateTime, title, description, SessionSpeakers } = session;
 
   return (
-    <li className="flex mb-4">
-      <div className="flex flex-wrap items-start flex-shrink-0 mb-2">
-        <div className="flex flex-col mr-6">
-          {showDate && (
-            <span className="block text-sm sm:text-lg font-semibold">{displayDate(startDateTime)}</span>
-          )}
-          <span className="text-sm whitespace-nowrap">
-            {formatTimeString(startDateTime)}
-            {' - '}
-            {formatTimeString(endDateTime)}
-          </span>
-        </div>
+    <li className="relative flex flex-col sm:flex-row sm:items-baseline py-4 border-t border-white/10 first:border-t-0">
+      {/* The dot on the rail. Purely decorative - the day heading already says
+          which day these times belong to. */}
+      <span
+        aria-hidden="true"
+        className="hidden sm:block absolute -left-[28px] top-[26px] w-[7px] h-[7px] rounded-full bg-border-primary"
+      />
+      {/* A fixed column rather than shrink-to-fit: "19:00 - 21:00" and
+          "21:00 - 23:00" render at different widths, so without it the titles
+          beside them do not line up. */}
+      <div className="flex flex-col flex-shrink-0 sm:w-28 sm:mr-6 mb-1 sm:mb-0">
+        {showDate && (
+          <span className="block text-sm sm:text-base font-semibold">{displayDate(startDateTime)}</span>
+        )}
+        <span className="text-sm text-label-secondary whitespace-nowrap tabular-nums">
+          {formatTimeString(startDateTime)}
+          {' - '}
+          {formatTimeString(endDateTime)}
+        </span>
       </div>
-      <div className="flex flex-col flex-1">
-        <span className="block text-sm sm:text-lg break-words">{title}</span>
+      <div className="flex flex-col flex-1 min-w-0">
+        {title ? (
+          <span className="block text-base sm:text-lg font-semibold break-words">{title}</span>
+        ) : (
+          <span className="block text-base sm:text-lg italic text-label-disabled">
+            {t('sessions.untitled_session')}
+          </span>
+        )}
         {locations.length > 0 && (
           <div className="break-words">
             <SessionLocations locations={locations} canSeeOnlineLink={canSeeOnlineLink} />
@@ -316,8 +329,8 @@ export const Sessions: FC<SessionsProps> = ({
   const addToCalendarButton = !courseTitle ? null : (
     <button
       onClick={handleExportICal}
-      className="flex items-center gap-2 px-4 py-2 min-h-11 touch-manipulation rounded-lg border
-        border-border-primary bg-bg-secondary hover:bg-border-primary text-sm text-label-primary transition-colors"
+      className="flex items-center gap-2 px-5 py-2 min-h-11 touch-manipulation rounded-full border-2
+        border-border-secondary hover:border-brand hover:text-brand text-sm text-label-primary transition-colors"
     >
       <MdCalendarMonth />
       {t('sessions.add_to_calendar')}
@@ -327,14 +340,14 @@ export const Sessions: FC<SessionsProps> = ({
   // Title on the left, calendar export on the right - the export belongs to the
   // whole list, not to whichever session happens to be rendered last.
   const sectionHeader = (title: string) => (
-    <div className="mt-12 mb-4 flex flex-wrap items-center justify-between gap-4">
+    <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
       <SectionTitle className="mb-0">{title}</SectionTitle>
       {addToCalendarButton}
     </div>
   );
 
   const sharedLocationsLine = sharedLocations ? (
-    <div className="max-w-2xl mb-3 break-words">
+    <div className="max-w-2xl mb-4 break-words">
       <SessionLocations locations={sharedLocations} canSeeOnlineLink={canSeeOnlineLink} />
     </div>
   ) : null;
@@ -345,27 +358,37 @@ export const Sessions: FC<SessionsProps> = ({
     return (
       <div>
         {sectionHeader(t('sessions.agenda'))}
-        {dayGroups.map((group) => (
-          <div key={group.dayKey} className="max-w-2xl mb-8">
-            <h3 className={`text-lg sm:text-xl font-semibold ${sharedLocationsLine ? 'mb-1' : 'mb-3'}`}>
-              {formatDayHeading(group.dayStart, timeZone, locale)}
-            </h3>
-            {/* Repeated per day rather than hoisted above the whole agenda: the
-                address belongs to the day it heads, not to the section title. */}
-            {sharedLocationsLine}
-            <ul>
-              {group.sessions.map((session) => (
-                <SessionRow
-                  key={session.id}
-                  session={session}
-                  locations={locationsBySessionId.get(session.id) ?? []}
-                  showDate={false}
-                  canSeeOnlineLink={canSeeOnlineLink}
-                />
-              ))}
-            </ul>
-          </div>
-        ))}
+        <div>
+          {dayGroups.map((group) => (
+            <div
+              key={group.dayKey}
+              className="max-w-2xl pt-8 mt-8 border-t border-border-primary first:pt-0 first:mt-0 first:border-t-0"
+            >
+              {/* The day is the label of the group, not a second heading competing
+                  with the session titles under it - so it reads as an eyebrow.
+                  Uppercase, tracking and weight carry that on their own; the
+                  colour matches the info panel's micro-labels so the page has
+                  one label treatment rather than two. */}
+              <h3 className="text-sm font-bold uppercase tracking-widest text-label-secondary mb-2">
+                {formatDayHeading(group.dayStart, timeZone, locale)}
+              </h3>
+              {/* Repeated per day rather than hoisted above the whole agenda: the
+                  address belongs to the day it heads, not to the section title. */}
+              {sharedLocationsLine}
+              <ul className="sm:pl-6 sm:border-l sm:border-border-primary">
+                {group.sessions.map((session) => (
+                  <SessionRow
+                    key={session.id}
+                    session={session}
+                    locations={locationsBySessionId.get(session.id) ?? []}
+                    showDate={false}
+                    canSeeOnlineLink={canSeeOnlineLink}
+                  />
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
@@ -388,7 +411,7 @@ export const Sessions: FC<SessionsProps> = ({
       {sessions.length > initiallyShownSessions &&
         (showAllSessions ? (
           <button
-            className="text-white text-sm sm:text-lg font-semibold hover:underline italic flex items-center min-h-11 touch-manipulation"
+            className="mt-4 text-white text-sm sm:text-base font-semibold hover:text-brand flex items-center min-h-11 touch-manipulation transition-colors"
             onClick={() => setShowAllSessions(false)}
           >
             {t('sessions.hide_dates')}
@@ -396,7 +419,7 @@ export const Sessions: FC<SessionsProps> = ({
           </button>
         ) : (
           <button
-            className="text-white text-sm sm:text-lg font-semibold hover:underline italic flex items-center min-h-11 touch-manipulation"
+            className="mt-4 text-white text-sm sm:text-base font-semibold hover:text-brand flex items-center min-h-11 touch-manipulation transition-colors"
             onClick={() => setShowAllSessions(true)}
           >
             {t('sessions.show_all_dates')}

@@ -126,10 +126,13 @@ export const Registration: FC<RegistrationProps> = ({ course, courseEnrollment, 
             second choice on the page, not the default. */}
         {canRegisterAsGuest && (
           <>
+            {/* Same hue as the CTA above it, one step down in weight: filled is
+                the primary way in, text is the quieter one. Both are the same
+                action, so they belong to the same colour family. */}
             <button
               type="button"
               onClick={openGuestModal}
-              className="mt-3 w-full text-sm text-brand hover:underline min-h-[44px]"
+              className="mt-3 w-full text-sm text-cta hover:underline min-h-[44px]"
             >
               {tGuest('register_without_account')}
             </button>

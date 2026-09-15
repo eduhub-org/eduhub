@@ -106,33 +106,36 @@ export const RegistrationButton: FC<RegistrationButtonProps> = ({ course, regist
   };
 
   return (
-    <div className="flex flex-1 flex-col justify-center items-center space-y-4 w-full">
+    <div className="flex flex-col w-full space-y-3">
       {isCourseFull && (
         <div className="bg-warning/20 rounded-lg p-4 w-full text-label-primary text-sm">
           {t('status.course_full_notice')}
         </div>
       )}
+      {/* Full width rather than centred: the button, the deadline below it and
+          the info panel under that all sit on one rail, so they share an edge.
+          The shadow and the hover lift are gone - the design system's rule for
+          a press is a colour change and nothing else, and the ring on hover is a
+          deeper shade of the button rather than the generic brand teal. */}
       <Button
         filled
         onClick={onClick}
         disabled={registrationClosed}
-        className="light !bg-warning !text-[#222222] hover:bg-opacity-90 transition-all duration-200 px-8 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+        className="light !bg-cta !text-[#222222] hover:!border-cta-hover w-full px-8 py-4 text-lg font-semibold"
       >
         {getButtonText()}
       </Button>
-      <div className="text-center">
-        <div className="text-xs text-white/90 mb-1">
-          {config.requiresApproval 
-            ? t('registration.application_deadline') 
-            : t('registration.registration_deadline')}
-        </div>
-        <div className="text-sm font-medium text-white">
+      <div className="text-center text-xs text-label-secondary">
+        {config.requiresApproval
+          ? t('registration.application_deadline')
+          : t('registration.registration_deadline')}{' '}
+        <span className="font-semibold text-label-primary">
           {course.applicationEnd?.toLocaleDateString(locale, {
             year: 'numeric',
             month: '2-digit',
             day: '2-digit',
           }) ?? ''}
-        </div>
+        </span>
       </div>
     </div>
   );

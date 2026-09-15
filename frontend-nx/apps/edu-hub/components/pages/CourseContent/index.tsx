@@ -37,6 +37,25 @@ import {
 import { useIsCourseWithEnrollment } from '../../../hooks/course';
 import NotificationSnackbar from '../../common/dialogs/NotificationSnackbar';
 
+/**
+ * Page rhythm. Every vertical gap on this page comes from one of these, so a gap
+ * reads as a decision rather than an accident:
+ *
+ *   section  space-y-16 lg:space-y-24   between top-level sections
+ *   block    space-y-8                  heading -> content, sibling blocks
+ *   item     space-y-4                  rows within a list
+ *   gutter   PageBlock (mx-6 xl:mx-0)   the one page inset, hero title included
+ */
+const SECTION_RHYTHM = 'flex flex-col space-y-16 lg:space-y-24';
+
+/**
+ * One width for the registration CTA and the info panel below it. Both columns
+ * used to size themselves independently and centre their own contents, which
+ * left the button, the deadline, the guest link and the card on four different
+ * edges; sharing a rail gives the right-hand side a single vertical line.
+ */
+const REGISTRATION_RAIL = 'w-full lg:w-[360px] lg:shrink-0';
+
 const CourseContent: FC<{ id: number }> = ({ id }) => {
   const t = useTranslations('course');
   const tCoursePage = useTranslations('coursePage');
@@ -166,19 +185,26 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
       {getCoursesAuthorizedLoading || getCoursesUnauthorizedLoading ? (
         <CircularProgress />
       ) : (
-        <div className="flex flex-col space-y-12 lg:space-y-24">
-          <div className="flex flex-col space-y-12 lg:space-y-24">
-            <div
-              className="h-96 p-3 text-3xl text-white flex justify-start items-end bg-cover bg-center bg-no-repeat"
+        <div className={SECTION_RHYTHM}>
+          <div
+            className="h-96 text-white flex justify-start items-end bg-cover bg-center bg-no-repeat"
               style={
                 {
                   backgroundImage: `linear-gradient(51.32deg, rgba(0, 0, 0, 0.7) 17.57%, rgba(0, 0, 0, 0) 85.36%), url("${backgroundImage}")`,
                 } as React.CSSProperties
               }
             >
-              <div className="max-w-screen-xl mx-auto w-full">{course.title}</div>
+              {/* PageBlock rather than a padding of its own: the title has to sit
+                  on the same gutter as everything below it at every width. */}
+              <div className="max-w-screen-xl mx-auto w-full pb-8">
+                <PageBlock>
+                  <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-[1.05] break-words">
+                    {course.title}
+                  </h1>
+                </PageBlock>
+              </div>
             </div>
-            <div className="max-w-screen-xl mx-auto w-full">
+            <div className={`max-w-screen-xl mx-auto w-full ${SECTION_RHYTHM}`}>
               {isLoggedIn && resetValues && enrollmentId != null && (
                 <Onboarding
                   course={course}
@@ -188,15 +214,17 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                 />
               )}
               <PageBlock>
-                <ContentRow className="items-center">
-                  <div className="flex flex-1 flex-col text-white mb-4 lg:mb-20">
+                {/* Not items-center: ContentRow stacks below lg, where centring
+                    the cross axis centres the tagline horizontally instead. */}
+                <ContentRow>
+                  <div className="flex flex-1 min-w-0 flex-col text-white">
                     {/* An event carries its dates in the agenda below, not here. */}
                     {!isEventCourse && course.weekDay !== 'NONE' ? (
-                      <span className="text-xs">{getWeekdayStartAndEndString(course, tCommon)}</span>
+                      <span className="text-xs mb-2">{getWeekdayStartAndEndString(course, tCommon)}</span>
                     ) : null}
-                    <span className="text-2xl mt-2">{course.tagline}</span>
+                    <span className="text-xl sm:text-2xl leading-snug">{course.tagline}</span>
                   </div>
-                  <div className="flex flex-1 justify-center items-center mx-6 lg:mx-0 lg:max-w-md">
+                  <div className={REGISTRATION_RAIL}>
                     <Registration
                       course={course}
                       courseEnrollment={courseEnrollment ?? undefined}
@@ -215,12 +243,12 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                         {courseEnrollment &&
                           (courseEnrollment.achievementCertificateURL ||
                             courseEnrollment.attendanceCertificateURL) && (
-                            <div className="mt-24 min-w-0 mx-6 xl:mx-0 text-label-primary">
+                            <PageBlock classname="min-w-0 text-label-primary">
                               <CertificateDownload
                                 courseEnrollment={courseEnrollment}
                                 className="mt-0"
                               />
-                            </div>
+                            </PageBlock>
                           )}
                         <Projects
                           courseId={course.id}
@@ -236,7 +264,7 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                         />
                       </>
                     )}
-                    <ContentRow className="my-24 min-w-0 text-label-primary mx-6 xl:mx-0">
+                    <ContentRow className="min-w-0 text-label-primary mx-6 xl:mx-0">
                       <div className="flex flex-col w-full min-w-0">
                       {!isDegreeCourse && (
                         <>
@@ -261,44 +289,47 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                   </ContentRow>
                   </>
                 )}
-              <ContentRow className="flex mb-24">
-                <PageBlock classname="flex-1 text-white space-y-6">
-                  <LearningGoals learningGoals={course.learningGoals} />
-                  {!isDegreeCourse ? (
-                    <Sessions
-                      sessions={course.Sessions}
-                      courseLocations={course.CourseLocations}
-                      isLoggedInParticipant={isLoggedInParticipant}
-                      isEvent={isEventCourse}
-                      courseId={course.id}
-                      courseTitle={course.title}
-                    />
-                  ) : (
-                    <CurrentDegreeCourses degreeCourses={course.DegreeCourses} />
-                  )}
-                  {!!(requiresPayment && (course.basePrice || course.basePrice === 0 || course.basePrice === null || addonItems.length > 0)) && (
-                    <div className="mt-24">
-                      <span className="text-3xl font-semibold block mb-6">{tCoursePage('pricing_section_title')}</span>
-                      <PricingSummary
-                        basePrice={course.basePrice || 0}
-                        currency={course.currency || 'EUR'}
-                        addons={addonItems}
-                        showStripeStatus={false}
-                        showTotal={false}
-                        className="mb-24"
+              <PageBlock>
+                {/* The panel leads in the DOM so that stacked - and for a screen
+                    reader - the facts come before the agenda that details them.
+                    On lg it moves back to the right-hand rail. */}
+                <ContentRow className="gap-12 lg:gap-6">
+                  <div className={`${REGISTRATION_RAIL} lg:order-2`}>
+                    <InfoPanel course={course} />
+                  </div>
+                  <div className="flex-1 min-w-0 text-white space-y-8 lg:order-1">
+                    <LearningGoals learningGoals={course.learningGoals} />
+                    {!isDegreeCourse ? (
+                      <Sessions
+                        sessions={course.Sessions}
+                        courseLocations={course.CourseLocations}
+                        isLoggedInParticipant={isLoggedInParticipant}
+                        isEvent={isEventCourse}
+                        courseId={course.id}
+                        courseTitle={course.title}
                       />
-                    </div>
-                  )}
-                </PageBlock>
-                <div className="flex flex-1 justify-center items-center mx-6 lg:mx-0 lg:max-w-md pr-0 lg:pr-6 xl:pr-0 ">
-                  <InfoPanel course={course} />
-                </div>
-              </ContentRow>
+                    ) : (
+                      <CurrentDegreeCourses degreeCourses={course.DegreeCourses} />
+                    )}
+                    {!!(requiresPayment && (course.basePrice || course.basePrice === 0 || course.basePrice === null || addonItems.length > 0)) && (
+                      <div>
+                        <span className="text-3xl font-semibold block mb-6">{tCoursePage('pricing_section_title')}</span>
+                        <PricingSummary
+                          basePrice={course.basePrice || 0}
+                          currency={course.currency || 'EUR'}
+                          addons={addonItems}
+                          showStripeStatus={false}
+                          showTotal={false}
+                        />
+                      </div>
+                    )}
+                  </div>
+                </ContentRow>
+              </PageBlock>
               <DescriptionFields course={course} />
               <FundingOrganizations courseFundingOrganizations={course.CourseFundingOrganizations ?? []} />
               <CourseProjectsSection courseId={id} />
             </div>
-          </div>
         </div>
       )}
 

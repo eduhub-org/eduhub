@@ -45,6 +45,17 @@
   /* Functional Colors (consistent across modes) */
   --eduhub-success: #A2EBA0;
   --eduhub-warning: #FFA665;
+
+  /* The primary call to action. Deliberately its own token rather than a reuse
+     of --eduhub-warning: the two happen to share a hex today, but one means
+     "this is the thing to click" and the other means "invited" / "careful", and
+     they should be free to diverge. */
+  --eduhub-cta: #FFA665;
+  /* Hover/focus ring for the CTA. A deeper shade of the button's own colour
+     rather than the teal the generic Button falls back to - a teal ring around
+     an orange fill was the one piece of brand accent still showing at rest on
+     the public course page. */
+  --eduhub-cta-hover: #E8873C;
   --eduhub-error: #D45A5A;
   --eduhub-info: #1982fc;
   --eduhub-badge: #E7B24C;

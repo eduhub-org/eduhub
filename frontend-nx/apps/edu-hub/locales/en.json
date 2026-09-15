@@ -365,8 +365,9 @@
       "date_singular": "Date",
       "date_plural": "Dates",
       "agenda": "Agenda",
-      "add_to_calendar": "Add to calendar (.ics)",
-      "location_not_available": "Location not available"
+      "add_to_calendar": "Add to calendar",
+      "location_not_available": "Location not available",
+      "untitled_session": "Agenda item"
     },
     "attendances": {
       "attendances": "Attendances",
@@ -722,6 +723,12 @@
       "success_title": "You have successfully applied",
       "success_body": "You will be informed about your admission no later than one to two days after the application deadline.",
       "success_close_button_title": "Close"
+    },
+    "info": {
+      "dates": "Dates",
+      "location": "Location",
+      "language": "Language",
+      "price": "Price"
     }
   },
   "coursePage": {

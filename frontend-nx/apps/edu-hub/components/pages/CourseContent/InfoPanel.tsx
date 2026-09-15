@@ -1,7 +1,7 @@
 import Image from 'next/image';
-import { FC, useMemo, useCallback, Fragment, type JSX } from 'react';
+import { FC, useMemo, useCallback, Fragment, ReactNode, type JSX } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import { MdAttachMoney, MdCalendarMonth } from 'react-icons/md';
+import { MdAttachMoney, MdCalendarMonth, MdSchool } from 'react-icons/md';
 
 import { useStartTimeString, useEndTimeString, getWeekdayString } from '../../../helpers/dateTimeHelpers';
 import { useAppSettings } from '../../../contexts/AppSettingsContext';
@@ -13,6 +13,30 @@ import { getRegistrationTypeConfig } from './Registration/types';
 interface IProps {
   course: Course_Course_by_pk;
 }
+
+interface FactProps {
+  icon: ReactNode;
+  label: string;
+  children: ReactNode;
+}
+
+/**
+ * One fact of the panel: icon, what it is, what it says.
+ *
+ * The panel used to be a two-column grid of centred icons with a 7rem column
+ * gap, which forced a date span onto three lines and left almost half the card
+ * empty. A labelled row reads at a glance, wraps predictably, and lets the card
+ * be as tall as its contents.
+ */
+const Fact: FC<FactProps> = ({ icon, label, children }) => (
+  <div className="flex gap-3">
+    <div className="flex-shrink-0 w-5 mt-0.5 text-label-secondary">{icon}</div>
+    <div className="min-w-0">
+      <dt className="text-[11px] font-bold uppercase tracking-wider text-label-secondary mb-0.5">{label}</dt>
+      <dd className="text-sm font-semibold leading-snug break-words">{children}</dd>
+    </div>
+  </div>
+);
 
 export const InfoPanel: FC<IProps> = ({ course }) => {
   const t = useTranslations('common');
@@ -26,7 +50,7 @@ export const InfoPanel: FC<IProps> = ({ course }) => {
 
   // Get ECTS translations object to handle keys with dots/commas
   const ectsTranslations = tCourse.raw('ects') as Record<string, string>;
-  
+
   // Normalize ECTS key (replace dots with underscores) for translation lookup
   const normalizedEctsKey = course.ects?.replaceAll('.', '_') || course.ects;
 
@@ -51,7 +75,7 @@ export const InfoPanel: FC<IProps> = ({ course }) => {
   }, [locale]);
 
   // Check if registration requires payment
-  const registrationConfig = course.registrationType 
+  const registrationConfig = course.registrationType
     ? getRegistrationTypeConfig(course.registrationType)
     : null;
   const requiresPayment = registrationConfig?.requiresPayment ?? false;
@@ -131,94 +155,102 @@ export const InfoPanel: FC<IProps> = ({ course }) => {
     // Event date span, weekday, or single session date
     if (hasEventDateSpan) {
       elements.push(
-        <div key="event-date" className="flex flex-col items-center">
-          <div className="flex justify-center items-center mb-2">
-            <MdCalendarMonth className="text-label-primary" size={28} />
-          </div>
-          <span className="text-sm mt-2 text-center">{eventDateSpan}</span>
-        </div>
+        <Fact key="event-date" icon={<MdCalendarMonth size={20} />} label={tCourse('info.dates')}>
+          {eventDateSpan}
+        </Fact>
       );
     } else if (hasWeekday) {
       elements.push(
-        <div key="weekday" className="flex flex-col items-center">
-          <span className="text-lg mt-2 text-center">{getWeekdayString(course, t, false, false)}</span>
-          <span className="text-sm mt-2 text-center">
+        <Fact key="weekday" icon={<MdCalendarMonth size={20} />} label={tCourse('info.dates')}>
+          {getWeekdayString(course, t, false, false)}
+          <span className="block font-medium text-label-secondary mt-0.5">
             {getStartTimeString(course.startTime)}
             {course.endTime ? <span> - {getEndTimeString(course.endTime)}</span> : ''}
           </span>
-        </div>
+        </Fact>
       );
     } else if (hasSessionDate) {
       elements.push(
-        <div key="session-date" className="flex flex-col items-center">
-          <div className="flex justify-center items-center mb-2">
-            <MdCalendarMonth className="text-label-primary" size={28} />
-          </div>
-          <span className="text-sm mt-2 text-center">{sessionDisplay}</span>
-        </div>
+        <Fact key="session-date" icon={<MdCalendarMonth size={20} />} label={tCourse('info.dates')}>
+          {sessionDisplay}
+        </Fact>
       );
     }
 
     // ECTS
     if (hasEcts) {
       elements.push(
-        <div key="ects" className="flex flex-col items-center">
-          <span className="text-lg mt-2 text-center">{tCourse('general.ects')}</span>
-          <span className="text-sm mt-2 text-center">
-            {isDegreeCourse ? requiredEctsDisplay : ectsTranslations[normalizedEctsKey] || course.ects}
-          </span>
-        </div>
+        <Fact key="ects" icon={<MdSchool size={20} />} label={tCourse('general.ects')}>
+          {isDegreeCourse ? requiredEctsDisplay : ectsTranslations[normalizedEctsKey] || course.ects}
+        </Fact>
       );
     }
 
     // Price
     if (showPrice) {
       elements.push(
-        <div key="price" className="flex flex-col items-center">
-          <div className="flex justify-center items-center mt-2">
-            <MdAttachMoney className="text-label-primary" size={28} />
-          </div>
-          <span className="text-sm mt-2 text-center">
-            {hasPrice ? (
-              <>
-                {formatPrice(basePrice, currency)}
-                {hasAddons && (
-                  <span className="block text-label-secondary text-xs mt-1">
-                    + {tCoursePage('add_ons')}
-                  </span>
-                )}
-              </>
-            ) : basePrice === 0 && hasAddons ? (
-              tCoursePage('variable_price')
-            ) : (
-              tCoursePage('free_course')
-            )}
-          </span>
-        </div>
+        <Fact key="price" icon={<MdAttachMoney size={20} />} label={tCourse('info.price')}>
+          {hasPrice ? (
+            <>
+              {formatPrice(basePrice, currency)}
+              {hasAddons && (
+                <span className="block font-medium text-label-secondary mt-0.5">
+                  + {tCoursePage('add_ons')}
+                </span>
+              )}
+            </>
+          ) : basePrice === 0 && hasAddons ? (
+            tCoursePage('variable_price')
+          ) : (
+            tCoursePage('free_course')
+          )}
+        </Fact>
       );
     }
 
     // Location
     if (hasLocation) {
       elements.push(
-        <div key="location" className="flex flex-col items-center">
-          <div className="flex justify-center items-center mt-2">
-            <Image src="/images/course/pin.svg" alt="Location" width={32} height={43} unoptimized className="w-full h-full object-contain max-w-8 max-h-[43px]" />
-          </div>
-          <span className="text-sm mt-2 text-center">{locationText}</span>
-        </div>
+        <Fact
+          key="location"
+          icon={
+            <Image
+              src="/images/course/pin.svg"
+              alt=""
+              aria-hidden="true"
+              width={20}
+              height={20}
+              unoptimized
+              className="w-5 h-5 object-contain"
+            />
+          }
+          label={tCourse('info.location')}
+        >
+          {locationText}
+        </Fact>
       );
     }
 
     // Language
     if (hasLanguage) {
       elements.push(
-        <div key="language" className="flex flex-col items-center">
-          <div className="flex justify-center items-center mt-2">
-            <Image src="/images/course/language.svg" alt="Language" width={47} height={40} unoptimized className="w-full h-full object-contain max-w-[47px] max-h-10" />
-          </div>
-          <span className="text-sm mt-2 text-center">{t(course.language ?? '')}</span>
-        </div>
+        <Fact
+          key="language"
+          icon={
+            <Image
+              src="/images/course/language.svg"
+              alt=""
+              aria-hidden="true"
+              width={20}
+              height={20}
+              unoptimized
+              className="w-5 h-5 object-contain"
+            />
+          }
+          label={tCourse('info.language')}
+        >
+          {t(course.language ?? '')}
+        </Fact>
       );
     }
 
@@ -251,22 +283,31 @@ export const InfoPanel: FC<IProps> = ({ course }) => {
     requiredEctsDisplay,
   ]);
 
-  return (
-    <div className="flex flex-1 flex-col justify-center items-center mx-6 lg:mx-0 mb-9 rounded-2xl lg:max-w-md bg-fill-primary text-label-primary light p-12 sm:p-24">
-      {/* All info elements in a 2-column grid */}
-      {infoElements.length > 0 && (
-        <div className="grid grid-cols-2 gap-x-28 gap-y-8 w-full mb-8">
-          {infoElements}
-        </div>
-      )}
+  const hasInstructors = !!course.CourseInstructors && course.CourseInstructors.length > 0;
 
-      {/* Instructors */}
-      {course.CourseInstructors && course.CourseInstructors.length > 0 && (
-        <div className="mt-16 justify-start w-full">
-          {course.CourseInstructors.map((instructor) => (
-            <UserCard className="flex items-center mb-6" key={`instructor-${instructor.id || instructor.User?.id}`} user={instructor.User} />
-          ))}
-        </div>
+  // Nothing to state and nobody to name: an empty white card is worse than no card.
+  if (infoElements.length === 0 && !hasInstructors) {
+    return null;
+  }
+
+  return (
+    <div className="w-full rounded-2xl bg-fill-primary text-label-primary light p-6">
+      {infoElements.length > 0 && <dl className="flex flex-col gap-4">{infoElements}</dl>}
+
+      {hasInstructors && (
+        <>
+          {infoElements.length > 0 && <div className="border-t border-border-primary my-6" />}
+          <div className="flex flex-col gap-4">
+            {course.CourseInstructors.map((instructor) => (
+              <UserCard
+                className="flex items-center"
+                key={`instructor-${instructor.id || instructor.User?.id}`}
+                user={instructor.User}
+                size="compact"
+              />
+            ))}
+          </div>
+        </>
       )}
     </div>
   );

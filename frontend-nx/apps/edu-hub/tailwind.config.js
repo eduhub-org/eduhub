@@ -43,6 +43,10 @@ module.exports = {
         },
         success: 'var(--eduhub-success)',
         warning: 'var(--eduhub-warning)',
+        cta: {
+          DEFAULT: 'var(--eduhub-cta)',
+          hover: 'var(--eduhub-cta-hover)',
+        },
         error: 'var(--eduhub-error)',
         info: 'var(--eduhub-info)',
         badge: 'var(--eduhub-badge)',

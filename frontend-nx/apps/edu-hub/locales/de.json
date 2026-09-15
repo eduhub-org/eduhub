@@ -365,8 +365,9 @@
       "date_singular": "Termin",
       "date_plural": "Termine",
       "agenda": "Programm",
-      "add_to_calendar": "Zum Kalender hinzufügen (.ics)",
-      "location_not_available": "Ort noch nicht bekannt"
+      "add_to_calendar": "Zum Kalender hinzufügen",
+      "location_not_available": "Ort noch nicht bekannt",
+      "untitled_session": "Programmpunkt"
     },
     "attendances": {
       "attendances": "Anwesenheiten",
@@ -722,6 +723,12 @@
       "success_title": "Bewerbung erfolgreich eingereicht!",
       "success_body": "Du wirst spätestens ein bis zwei Tage nach Bewerbungsschluss über deine Zulassung informiert.",
       "success_close_button_title": "Schließen"
+    },
+    "info": {
+      "dates": "Termine",
+      "location": "Ort",
+      "language": "Sprache",
+      "price": "Preis"
     }
   },
   "coursePage": {
