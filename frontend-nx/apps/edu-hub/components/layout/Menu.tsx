@@ -90,18 +90,17 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
   const isOrgAdmin = useIsOrgAdmin();
   const orgAdminCaps = useOrgAdminCapabilities();
   const isInstructorOrAdmin = isAdmin || isInstructor;
-  // Organization admins reach the program/course/admin-user management screens (scoped to their own
-  // organization). Other manage links remain super-admin only.
-  const isAdminOrOrgAdmin = isAdmin || isOrgAdmin;
   // Program-type management entries: super-admins see all three; org admins only see types where
   // they hold the matching canManage* capability on at least one organization.
   const canManageCoursesMenu = isAdmin || (isOrgAdmin && orgAdminCaps.canManageCourses);
   const canManageEventsMenu = isAdmin || (isOrgAdmin && orgAdminCaps.canManageEvents);
   const canManageDegreesMenu = isAdmin || (isOrgAdmin && orgAdminCaps.canManageDegrees);
-  // Whether the "Verwaltung" section has any entries for this user (settings is the widest
-  // entry — every admin/org admin sees it — so it gates the section header along with the
-  // program-type links). Plain instructors have no management entries and skip the section.
-  const hasManagement = isAdminOrOrgAdmin || canManageCoursesMenu || canManageEventsMenu || canManageDegreesMenu;
+  // Settings entry: super-admins always see it; org admins only when they hold canManageSettings
+  // on at least one organization (matching Hasura's write permission on OrganizationAdmin/Program).
+  const canManageSettingsMenu = isAdmin || (isOrgAdmin && orgAdminCaps.canManageSettings);
+  // Whether the "Verwaltung" section has any entries for this user. Plain instructors have no
+  // management entries and skip the section.
+  const hasManagement = canManageSettingsMenu || canManageCoursesMenu || canManageEventsMenu || canManageDegreesMenu;
 
   const t = useTranslations('common');
 
@@ -211,7 +210,7 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
         </MenuItem>
       )}
 
-      {isAdminOrOrgAdmin && (
+      {canManageSettingsMenu && (
         <MenuItem
           component={Link}
           href="/manage/settings"

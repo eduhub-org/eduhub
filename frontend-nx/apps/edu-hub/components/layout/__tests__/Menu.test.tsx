@@ -20,7 +20,12 @@ jest.mock('../../../hooks/authentication', () => ({
 }));
 
 jest.mock('../../../hooks/orgAdminCapabilities', () => ({
-  useOrgAdminCapabilities: () => ({ canManageCourses: false, canManageEvents: false, canManageDegrees: false }),
+  useOrgAdminCapabilities: () => ({
+    canManageCourses: false,
+    canManageEvents: false,
+    canManageDegrees: false,
+    canManageSettings: false,
+  }),
 }));
 
 jest.mock('../../../hooks/logout', () => ({

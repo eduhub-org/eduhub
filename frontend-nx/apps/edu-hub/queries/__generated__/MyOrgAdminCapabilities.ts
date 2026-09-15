@@ -19,6 +19,7 @@ export interface MyOrgAdminCapabilities_OrganizationAdmin {
    * May create and manage job postings for this organization
    */
   canManageJobs: boolean;
+  canManageSettings: boolean;
 }
 
 export interface MyOrgAdminCapabilities {
