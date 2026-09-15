@@ -136,6 +136,15 @@
     "archiveFailed": "Archivieren fehlgeschlagen: {error}",
     "archiveNetworkError": "Archivieren fehlgeschlagen: Netzwerkfehler.",
     "unknownError": "Unbekannter Fehler",
+    "organizationWebsite": {
+      "label": "Website",
+      "placeholder": "https://beispiel.de",
+      "save": "Speichern",
+      "saved": "Gespeichert",
+      "invalidUrl": "Bitte eine gültige http(s)-URL eingeben.",
+      "permissionDenied": "Dieses Unternehmen hat bereits eine Person, die die Einstellungen verwaltet. Bitte sie, die Website zu ändern.",
+      "saveError": "Fehler beim Speichern der Website"
+    },
     "NeuesAngebot": {
       "edit_offer_title": "Angebot bearbeiten",
       "create_offer_title": "Neues Stellenangebot",

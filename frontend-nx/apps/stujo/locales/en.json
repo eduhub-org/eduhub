@@ -136,6 +136,15 @@
     "archiveFailed": "Archiving failed: {error}",
     "archiveNetworkError": "Archiving failed: network error.",
     "unknownError": "Unknown error",
+    "organizationWebsite": {
+      "label": "Website",
+      "placeholder": "https://example.com",
+      "save": "Save",
+      "saved": "Saved",
+      "invalidUrl": "Please enter a valid http(s) URL.",
+      "permissionDenied": "This company already has an admin managing settings. Ask them to update the website.",
+      "saveError": "Error saving website"
+    },
     "NeuesAngebot": {
       "edit_offer_title": "Edit job offer",
       "create_offer_title": "New job offer",
