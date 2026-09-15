@@ -17,6 +17,7 @@ import { enUS } from 'date-fns/locale/en-US';
 import { AppSettingsProvider } from '../contexts/AppSettingsContext';
 import { AuthErrorProvider } from '../contexts/AuthErrorContext';
 import { AuthStoreUpdater } from '../components/AuthStoreUpdater';
+import { useIsAdmin, useIsOrgAdmin, useIsSessionLoading } from '../hooks/authentication';
 
 // Import locale messages
 import deMessages from '../locales/de.json';
@@ -59,6 +60,13 @@ const MyApp: FC<AppProps & InitialProps> & {
   }, [locale]);
 
   const [isFBPixelLoaded, setFBPixelLoaded] = useState(false);
+  const isAdmin = useIsAdmin();
+  const isOrgAdmin = useIsOrgAdmin();
+  const isSessionLoading = useIsSessionLoading();
+  // Hold off rendering the script until the session resolves - next/script never
+  // removes an already-inserted <script> tag on unmount, so mounting it first and
+  // hiding it once the admin/org_admin role arrives would not stop it from firing.
+  const canLoadPlausible = !isSessionLoading && !isAdmin && !isOrgAdmin;
 
   useEffect(() => {
     if (isFBPixelLoaded && typeof window.fbq === 'function') {
@@ -109,14 +117,17 @@ const MyApp: FC<AppProps & InitialProps> & {
                     }}
                   />
 
-                  <Script
-                    id="plausible-analytics"
-                    data-domain="edu.opencampus.sh"
-                    src="https://plausible.io/js/script.js"
-                    strategy="afterInteractive"
-                    data-cookieconsent="statistics"
-                    type="text/plain"
-                  />
+                  {/* Skip loading Plausible entirely for admins/org admins so their own usage never counts as traffic */}
+                  {canLoadPlausible && (
+                    <Script
+                      id="plausible-analytics"
+                      data-domain="edu.opencampus.sh"
+                      src="https://plausible.io/js/script.js"
+                      strategy="afterInteractive"
+                      data-cookieconsent="statistics"
+                      type="text/plain"
+                    />
+                  )}
                   <Head>
                     <meta name="viewport" content="initial-scale=1.0, width=device-width" />
                   </Head>
