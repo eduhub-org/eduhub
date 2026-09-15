@@ -158,12 +158,19 @@ export const CourseFacts: FC<IProps> = ({ course }) => {
   // something: a full course says so through the waitlist CTA, and a closed one
   // should not offer free places beside a notice saying you can no longer take
   // them.
-  const participantCount = Number(course.activeParticipantCount ?? 0);
+  // Two different questions, two different numbers. What the page states is
+  // publicParticipantCount (CONFIRMED + REGISTERED): people who have actually
+  // taken their place. How many places are left is measured against
+  // activeParticipantCount, which also counts INVITED, because a held seat is
+  // not available - so a course can read "18 participants" while being full at
+  // 20, and both statements are true.
+  const participantCount = Number(course.publicParticipantCount ?? 0);
+  const occupiedPlaces = Number(course.activeParticipantCount ?? 0);
   // No cap, or a cap of zero, means there is no capacity to report - stated
   // explicitly rather than left to fall out of `placesLeft > 0`, so the rule
   // survives a change to how places are counted.
   const maxParticipants = course.maxParticipants && course.maxParticipants > 0 ? course.maxParticipants : null;
-  const placesLeft = maxParticipants != null ? Math.max(0, maxParticipants - participantCount) : null;
+  const placesLeft = maxParticipants != null ? Math.max(0, maxParticipants - occupiedPlaces) : null;
   const showsPlaces =
     !!course.showAvailablePlaces &&
     maxParticipants != null &&

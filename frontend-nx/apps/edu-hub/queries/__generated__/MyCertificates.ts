@@ -156,6 +156,10 @@ export interface MyCertificates_CourseEnrollment_Course {
    */
   activeParticipantCount: any | null;
   /**
+   * A computed field, executes function "course_public_participant_count"
+   */
+  publicParticipantCount: any | null;
+  /**
    * The time the course ends each week.
    */
   endTime: any | null;

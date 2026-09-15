@@ -335,7 +335,7 @@
       "course_not_available": "Course not available",
       "to_course_chat": "GO TO CHAT",
       "to_online_meeting": "GO TO ONLINE MEETING",
-      "no_online_participation_available": "Online participation is not available for this course.",
+      "no_online_participation_available": "This course does not offer online participation.",
       "speaker": "Speaker",
       "link_will_be_provided_soon": "(Link will be provided here soon)",
       "address_will_be_provided_soon": "(Address will be provided here soon)",

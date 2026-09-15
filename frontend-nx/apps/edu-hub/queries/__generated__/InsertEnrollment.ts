@@ -450,6 +450,10 @@ export interface InsertEnrollment_insert_CourseEnrollment_returning_Course {
    */
   activeParticipantCount: any | null;
   /**
+   * A computed field, executes function "course_public_participant_count"
+   */
+  publicParticipantCount: any | null;
+  /**
    * An array of texts including the learning goals for the course
    */
   learningGoals: string | null;

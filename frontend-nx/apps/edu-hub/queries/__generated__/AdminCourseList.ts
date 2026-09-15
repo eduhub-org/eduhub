@@ -441,6 +441,10 @@ export interface AdminCourseList_Course {
    */
   activeParticipantCount: any | null;
   /**
+   * A computed field, executes function "course_public_participant_count"
+   */
+  publicParticipantCount: any | null;
+  /**
    * An array of texts including the learning goals for the course
    */
   learningGoals: string | null;

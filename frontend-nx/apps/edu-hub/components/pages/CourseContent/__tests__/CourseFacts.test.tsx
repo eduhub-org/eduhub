@@ -43,6 +43,7 @@ const course = (overrides: Record<string, unknown> = {}) =>
     CourseAddonMappings: [],
     applicationEnd: OPEN,
     activeParticipantCount: 12,
+    publicParticipantCount: 12,
     maxParticipants: 20,
     showAvailablePlaces: false,
     ...overrides,
@@ -85,13 +86,36 @@ describe('CourseFacts participant numbers', () => {
   });
 
   it('stops offering places when the course is full', () => {
-    render(<CourseFacts course={course({ showAvailablePlaces: true, activeParticipantCount: 20 })} />);
+    render(
+      <CourseFacts
+        course={course({ showAvailablePlaces: true, activeParticipantCount: 20, publicParticipantCount: 20 })}
+      />
+    );
 
     expect(placesShown()).not.toBeInTheDocument();
   });
 
+  it('states the public count but measures places against held seats', () => {
+    // 18 taken, 2 more invited but not yet accepted: 18 people are taking part,
+    // and there are no places left to offer.
+    render(
+      <CourseFacts
+        course={course({ showAvailablePlaces: true, activeParticipantCount: 20, publicParticipantCount: 18 })}
+      />
+    );
+
+    expect(placesShown()).not.toBeInTheDocument();
+    expect(countShown()).toHaveTextContent('info.participant_count:{"count":18}');
+  });
+
+  it('does not count invited people as participants', () => {
+    render(<CourseFacts course={course({ activeParticipantCount: 12, publicParticipantCount: 9 })} />);
+
+    expect(countShown()).toHaveTextContent('info.participant_count:{"count":9}');
+  });
+
   it('says nothing at all about numbers when nobody has joined yet', () => {
-    render(<CourseFacts course={course({ activeParticipantCount: 0 })} />);
+    render(<CourseFacts course={course({ activeParticipantCount: 0, publicParticipantCount: 0 })} />);
 
     expect(countShown()).not.toBeInTheDocument();
     expect(placesShown()).not.toBeInTheDocument();

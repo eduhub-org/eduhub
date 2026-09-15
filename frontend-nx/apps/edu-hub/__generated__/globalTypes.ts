@@ -6233,6 +6233,7 @@ export interface Course_bool_exp {
   programId?: Int_comparison_exp | null;
   projectProposalsEnabled?: Boolean_comparison_exp | null;
   projectSubmissionDeadline?: timestamptz_comparison_exp | null;
+  publicParticipantCount?: bigint_comparison_exp | null;
   published?: Boolean_comparison_exp | null;
   registrationType?: CourseRegistrationType_enum_comparison_exp | null;
   requiredEcts?: numeric_comparison_exp | null;
@@ -6463,6 +6464,7 @@ export interface Course_order_by {
   programId?: order_by | null;
   projectProposalsEnabled?: order_by | null;
   projectSubmissionDeadline?: order_by | null;
+  publicParticipantCount?: order_by | null;
   published?: order_by | null;
   registrationType?: order_by | null;
   requiredEcts?: order_by | null;

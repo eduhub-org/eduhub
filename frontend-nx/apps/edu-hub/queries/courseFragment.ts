@@ -55,6 +55,7 @@ export const COURSE_FRAGMENT = gql`
     maxParticipants
     showAvailablePlaces
     activeParticipantCount
+    publicParticipantCount
     learningGoals
     headingDescriptionField1
     contentDescriptionField1
@@ -174,6 +175,7 @@ export const COURSE_FRAGMENT_MINIMUM = gql`
     maxParticipants
     showAvailablePlaces
     activeParticipantCount
+    publicParticipantCount
     endTime
     startTime
     registrationType
@@ -204,6 +206,7 @@ export const COURSE_FRAGMENT_ANONYMOUS = gql`
     maxParticipants
     showAvailablePlaces
     activeParticipantCount
+    publicParticipantCount
     learningGoals
     headingDescriptionField1
     contentDescriptionField1
