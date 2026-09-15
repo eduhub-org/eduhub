@@ -734,7 +734,9 @@
       "price": "Price",
       "places": "Places",
       "places_left": "{count} left",
-      "places_total": "of {count}"
+      "places_total": "of {count}",
+      "participants": "Participants",
+      "participant_count": "{count}"
     },
     "participants": {
       "title": "Who's here",
@@ -1325,6 +1327,11 @@
         "events": "Successfully copied {count} events to {programTitle}",
         "degrees": "Successfully copied {count} degrees to {programTitle}"
       }
+    },
+    "participants": {
+      "label": "Participants",
+      "show_available_places": "Show available places on the course page",
+      "show_available_places_hint": "Unchecked, the course page shows only how many people are taking part. Requires a maximum number of participants."
     }
   },
   "manageCourse": {
@@ -3120,5 +3127,8 @@
       "invalid_operation": "That action is not possible.",
       "guest_manage_failed": "That did not work. Please try again later."
     }
+  },
+  "notifications": {
+    "show_available_places_update_failed": "Could not change the display of available places"
   }
 }

@@ -734,7 +734,9 @@
       "price": "Preis",
       "places": "Plätze",
       "places_left": "Noch {count} frei",
-      "places_total": "von {count}"
+      "places_total": "von {count}",
+      "participants": "Teilnehmende",
+      "participant_count": "{count}"
     },
     "participants": {
       "title": "Wer ist dabei",
@@ -1307,6 +1309,11 @@
         "events": "{count} Events erfolgreich in {programTitle} kopiert",
         "degrees": "{count} Degrees erfolgreich in {programTitle} kopiert"
       }
+    },
+    "participants": {
+      "label": "Teilnehmende",
+      "show_available_places": "Freie Plätze auf der Kursseite anzeigen",
+      "show_available_places_hint": "Ohne Haken zeigt die Kursseite nur die Anzahl der Teilnehmenden. Benötigt eine maximale Teilnehmendenzahl."
     }
   },
   "manageCourse": {
@@ -3105,5 +3112,8 @@
       "invalid_operation": "Diese Aktion ist nicht möglich.",
       "guest_manage_failed": "Das hat nicht geklappt. Bitte versuche es später noch einmal."
     }
+  },
+  "notifications": {
+    "show_available_places_update_failed": "Anzeige der freien Plätze konnte nicht geändert werden"
   }
 }

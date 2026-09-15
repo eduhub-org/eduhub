@@ -131,6 +131,10 @@ export interface CourseMinimum_Course_by_pk {
    */
   maxParticipants: number | null;
   /**
+   * When true the course page states how many of the maxParticipants places are still free. Off by default: the page otherwise shows only how many people are taking part, which says the course is alive without advertising how empty it is.
+   */
+  showAvailablePlaces: boolean;
+  /**
    * A computed field, executes function "course_active_participant_count"
    */
   activeParticipantCount: any | null;

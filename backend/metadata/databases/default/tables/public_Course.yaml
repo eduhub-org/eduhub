@@ -138,6 +138,7 @@ select_permissions:
         - learningGoals
         - maxMissedSessions
         - maxParticipants
+        - showAvailablePlaces
         - programId
         - projectProposalsEnabled
         - guestRegistrationEnabled
@@ -190,6 +191,7 @@ select_permissions:
         - learningGoals
         - maxMissedSessions
         - maxParticipants
+        - showAvailablePlaces
         - programId
         - projectProposalsEnabled
         - guestRegistrationEnabled
@@ -235,6 +237,7 @@ select_permissions:
         - learningGoals
         - maxMissedSessions
         - maxParticipants
+        - showAvailablePlaces
         - programId
         - projectProposalsEnabled
         - guestRegistrationEnabled
@@ -287,6 +290,7 @@ select_permissions:
         - learningGoals
         - maxMissedSessions
         - maxParticipants
+        - showAvailablePlaces
         - programId
         - projectProposalsEnabled
         - guestRegistrationEnabled
@@ -334,6 +338,7 @@ update_permissions:
         - learningGoals
         - maxMissedSessions
         - maxParticipants
+        - showAvailablePlaces
         - projectProposalsEnabled
         - guestRegistrationEnabled
         - projectSubmissionDeadline
@@ -375,6 +380,7 @@ update_permissions:
         - learningGoals
         - maxMissedSessions
         - maxParticipants
+        - showAvailablePlaces
         - projectProposalsEnabled
         - guestRegistrationEnabled
         - projectSubmissionDeadline
@@ -505,6 +511,7 @@ insert_permissions:
         - learningGoals
         - maxMissedSessions
         - maxParticipants
+        - showAvailablePlaces
         - programId
         - projectProposalsEnabled
         - guestRegistrationEnabled

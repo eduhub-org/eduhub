@@ -152,14 +152,25 @@ export const CourseFacts: FC<IProps> = ({ course }) => {
     : !!course.ects && course.achievementCertificatePossible === true;
   const hasLocation = !!locationText;
   const hasLanguage = !!course.language;
-  // Capacity is only a fact worth stating when there is a cap to state it
-  // against, and only while it still means something: a full course says so
-  // through the waitlist CTA, and a closed one should not be advertising free
-  // places next to a notice saying you can no longer take them.
-  const maxParticipants = course.maxParticipants ?? null;
-  const placesLeft =
-    maxParticipants != null ? Math.max(0, maxParticipants - Number(course.activeParticipantCount ?? 0)) : null;
-  const hasPlaces = placesLeft != null && placesLeft > 0 && !isRegistrationClosed(course.applicationEnd);
+  // How many people are taking part is the default, and says the course is
+  // alive without advertising how empty it is. How many places are left is the
+  // opt-in (Course.showAvailablePlaces), and only while it still means
+  // something: a full course says so through the waitlist CTA, and a closed one
+  // should not offer free places beside a notice saying you can no longer take
+  // them.
+  const participantCount = Number(course.activeParticipantCount ?? 0);
+  // No cap, or a cap of zero, means there is no capacity to report - stated
+  // explicitly rather than left to fall out of `placesLeft > 0`, so the rule
+  // survives a change to how places are counted.
+  const maxParticipants = course.maxParticipants && course.maxParticipants > 0 ? course.maxParticipants : null;
+  const placesLeft = maxParticipants != null ? Math.max(0, maxParticipants - participantCount) : null;
+  const showsPlaces =
+    !!course.showAvailablePlaces &&
+    maxParticipants != null &&
+    placesLeft != null &&
+    placesLeft > 0 &&
+    !isRegistrationClosed(course.applicationEnd);
+  const showsParticipantCount = !showsPlaces && participantCount > 0;
 
   // Build array of info elements to display
   const infoElements = useMemo(() => {
@@ -267,14 +278,20 @@ export const CourseFacts: FC<IProps> = ({ course }) => {
       );
     }
 
-    // Places left
-    if (hasPlaces && placesLeft != null && maxParticipants != null) {
+    // Places left, or simply how many are taking part
+    if (showsPlaces && placesLeft != null && maxParticipants != null) {
       elements.push(
         <Fact key="places" icon={<MdPeopleOutline size={20} />} label={tCourse('info.places')}>
           {tCourse('info.places_left', { count: placesLeft })}
           <span className="block font-medium text-label-secondary mt-0.5">
             {tCourse('info.places_total', { count: maxParticipants })}
           </span>
+        </Fact>
+      );
+    } else if (showsParticipantCount) {
+      elements.push(
+        <Fact key="participants" icon={<MdPeopleOutline size={20} />} label={tCourse('info.participants')}>
+          {tCourse('info.participant_count', { count: participantCount })}
         </Fact>
       );
     }
@@ -287,7 +304,9 @@ export const CourseFacts: FC<IProps> = ({ course }) => {
     hasSessionDate,
     hasEcts,
     showPrice,
-    hasPlaces,
+    showsPlaces,
+    showsParticipantCount,
+    participantCount,
     placesLeft,
     maxParticipants,
     hasLocation,

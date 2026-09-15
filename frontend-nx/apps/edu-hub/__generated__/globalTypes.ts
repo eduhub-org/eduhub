@@ -867,6 +867,7 @@ export enum Course_select_column {
   registrationType = "registrationType",
   requiredEcts = "requiredEcts",
   requiredEventCount = "requiredEventCount",
+  showAvailablePlaces = "showAvailablePlaces",
   startTime = "startTime",
   status = "status",
   stripePriceId = "stripePriceId",
@@ -886,6 +887,7 @@ export enum Course_select_column_Course_aggregate_bool_exp_bool_and_arguments_co
   guestRegistrationEnabled = "guestRegistrationEnabled",
   projectProposalsEnabled = "projectProposalsEnabled",
   published = "published",
+  showAvailablePlaces = "showAvailablePlaces",
 }
 
 /**
@@ -897,6 +899,7 @@ export enum Course_select_column_Course_aggregate_bool_exp_bool_or_arguments_col
   guestRegistrationEnabled = "guestRegistrationEnabled",
   projectProposalsEnabled = "projectProposalsEnabled",
   published = "published",
+  showAvailablePlaces = "showAvailablePlaces",
 }
 
 /**
@@ -937,6 +940,7 @@ export enum Course_update_column {
   registrationType = "registrationType",
   requiredEcts = "requiredEcts",
   requiredEventCount = "requiredEventCount",
+  showAvailablePlaces = "showAvailablePlaces",
   startTime = "startTime",
   status = "status",
   stripePriceId = "stripePriceId",
@@ -6233,6 +6237,7 @@ export interface Course_bool_exp {
   registrationType?: CourseRegistrationType_enum_comparison_exp | null;
   requiredEcts?: numeric_comparison_exp | null;
   requiredEventCount?: Int_comparison_exp | null;
+  showAvailablePlaces?: Boolean_comparison_exp | null;
   startTime?: time_comparison_exp | null;
   status?: CourseStatus_enum_comparison_exp | null;
   stripePriceId?: String_comparison_exp | null;
@@ -6300,6 +6305,7 @@ export interface Course_insert_input {
   registrationType?: CourseRegistrationType_enum | null;
   requiredEcts?: any | null;
   requiredEventCount?: number | null;
+  showAvailablePlaces?: boolean | null;
   startTime?: any | null;
   status?: CourseStatus_enum | null;
   stripePriceId?: string | null;
@@ -6461,6 +6467,7 @@ export interface Course_order_by {
   registrationType?: order_by | null;
   requiredEcts?: order_by | null;
   requiredEventCount?: order_by | null;
+  showAvailablePlaces?: order_by | null;
   startTime?: order_by | null;
   status?: order_by | null;
   stripePriceId?: order_by | null;
@@ -6509,6 +6516,7 @@ export interface Course_set_input {
   registrationType?: CourseRegistrationType_enum | null;
   requiredEcts?: any | null;
   requiredEventCount?: number | null;
+  showAvailablePlaces?: boolean | null;
   startTime?: any | null;
   status?: CourseStatus_enum | null;
   stripePriceId?: string | null;
