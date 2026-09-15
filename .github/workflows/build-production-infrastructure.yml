@@ -27,6 +27,7 @@ jobs:
       NEXT_PUBLIC_HELP_DOCS_URL: ${{ steps.define_output_variables.outputs.NEXT_PUBLIC_HELP_DOCS_URL }}
       NEXT_PUBLIC_STORAGE_BUCKET_URL: ${{ steps.define_output_variables.outputs.NEXT_PUBLIC_STORAGE_BUCKET_URL }}
       NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL: ${{ steps.define_output_variables.outputs.NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL }}
+      NEXT_PUBLIC_MATRIX_SERVER_NAME: ${{ steps.define_output_variables.outputs.NEXT_PUBLIC_MATRIX_SERVER_NAME }}
       NEXT_PUBLIC_STUJO_URL: ${{ steps.define_output_variables.outputs.NEXT_PUBLIC_STUJO_URL }}
 
     steps:
@@ -39,6 +40,7 @@ jobs:
           NEXT_PUBLIC_HELP_DOCS_URL: ${{ vars.NEXT_PUBLIC_HELP_DOCS_URL }}
           NEXT_PUBLIC_STORAGE_BUCKET_URL: ${{ vars.NEXT_PUBLIC_STORAGE_BUCKET_URL }}
           NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL: ${{ vars.NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL }}
+          NEXT_PUBLIC_MATRIX_SERVER_NAME: ${{ vars.NEXT_PUBLIC_MATRIX_SERVER_NAME }}
           NEXT_PUBLIC_STUJO_URL: ${{ vars.NEXT_PUBLIC_STUJO_URL }}
         run: |
           set -euo pipefail
@@ -49,6 +51,7 @@ jobs:
             printf 'NEXT_PUBLIC_HELP_DOCS_URL=%s\n' "$NEXT_PUBLIC_HELP_DOCS_URL"
             printf 'NEXT_PUBLIC_STORAGE_BUCKET_URL=%s\n' "$NEXT_PUBLIC_STORAGE_BUCKET_URL"
             printf 'NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL=%s\n' "$NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL"
+            printf 'NEXT_PUBLIC_MATRIX_SERVER_NAME=%s\n' "$NEXT_PUBLIC_MATRIX_SERVER_NAME"
             printf 'NEXT_PUBLIC_STUJO_URL=%s\n' "$NEXT_PUBLIC_STUJO_URL"
           } >> "$GITHUB_OUTPUT"
 
@@ -196,6 +199,7 @@ jobs:
       NEXT_PUBLIC_HELP_DOCS_URL: ${{ needs.prepare_environment.outputs.NEXT_PUBLIC_HELP_DOCS_URL }}
       NEXT_PUBLIC_STORAGE_BUCKET_URL: ${{ needs.prepare_environment.outputs.NEXT_PUBLIC_STORAGE_BUCKET_URL }}
       NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL: ${{ needs.prepare_environment.outputs.NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL }}
+      NEXT_PUBLIC_MATRIX_SERVER_NAME: ${{ needs.prepare_environment.outputs.NEXT_PUBLIC_MATRIX_SERVER_NAME }}
       NEXT_PUBLIC_STUJO_URL: ${{ needs.prepare_environment.outputs.NEXT_PUBLIC_STUJO_URL }}
       SHA: ${{ needs.check_folder_changes.outputs.frontend_sha }}
     secrets:
@@ -217,6 +221,7 @@ jobs:
       NEXT_PUBLIC_HELP_DOCS_URL: ${{ needs.prepare_environment.outputs.NEXT_PUBLIC_HELP_DOCS_URL }}
       NEXT_PUBLIC_STORAGE_BUCKET_URL: ${{ needs.prepare_environment.outputs.NEXT_PUBLIC_STORAGE_BUCKET_URL }}
       NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL: ${{ needs.prepare_environment.outputs.NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL }}
+      NEXT_PUBLIC_MATRIX_SERVER_NAME: ${{ needs.prepare_environment.outputs.NEXT_PUBLIC_MATRIX_SERVER_NAME }}
       SHA: ${{ needs.check_folder_changes.outputs.frontend_sha }}
     secrets:
       GCP_REGION: ${{ secrets.GCP_REGION }}

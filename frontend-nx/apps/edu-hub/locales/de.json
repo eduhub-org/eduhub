@@ -735,6 +735,11 @@
       "places": "Plätze",
       "places_left": "Noch {count} frei",
       "places_total": "von {count}"
+    },
+    "participants": {
+      "title": "Wer ist dabei",
+      "message_on_element": "Auf Element schreiben",
+      "and_more": "und {count} weitere"
     }
   },
   "coursePage": {

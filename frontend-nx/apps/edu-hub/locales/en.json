@@ -735,6 +735,11 @@
       "places": "Places",
       "places_left": "{count} left",
       "places_total": "of {count}"
+    },
+    "participants": {
+      "title": "Who's here",
+      "message_on_element": "Message on Element",
+      "and_more": "and {count} more"
     }
   },
   "coursePage": {

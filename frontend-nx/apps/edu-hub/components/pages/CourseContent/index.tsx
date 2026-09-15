@@ -21,6 +21,7 @@ import { RegistrationRail } from './RegistrationRail';
 import { useWeekdayStartAndEndString } from '../../../helpers/dateTimeHelpers';
 import { LearningGoals } from './LearningGoals';
 import { Sessions } from './Sessions';
+import { CourseParticipants } from './CourseParticipants';
 import { CompletedDegreeCourses, CurrentDegreeCourses } from './DegreeCourses';
 import PricingSummary from '../../common/PricingSummary';
 import { getRegistrationTypeConfig } from './Registration/types';
@@ -255,6 +256,12 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                       />
                     ) : (
                       <CurrentDegreeCourses degreeCourses={course.DegreeCourses} />
+                    )}
+                    {/* Only asked for by someone taking part: the Hasura
+                        permission returns an empty list to anyone else, so this
+                        saves a pointless round trip rather than guarding it. */}
+                    {isLoggedInParticipant && (
+                      <CourseParticipants courseId={course.id} currentUserId={userId} />
                     )}
                     {!!(requiresPayment && (course.basePrice || course.basePrice === 0 || course.basePrice === null || addonItems.length > 0)) && (
                       <div>

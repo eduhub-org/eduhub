@@ -35,6 +35,7 @@ services:
       # not the production fallback in stujoBaseUrl.ts.
       NEXT_PUBLIC_STUJO_URL: http://${DEV_HOST:-localhost}:5001
       NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL: ${NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL:-}
+      NEXT_PUBLIC_MATRIX_SERVER_NAME: ${NEXT_PUBLIC_MATRIX_SERVER_NAME:-}
       # The Stripe webhook route lives in this app (pages/api/webhooks/stripe.ts),
       # so it needs the keys too -- without them `stripe listen --forward-to
       # localhost:5000/api/webhooks/stripe` (docs/STRIPE_INTEGRATION.md) only

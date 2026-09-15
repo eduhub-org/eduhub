@@ -1129,6 +1129,7 @@ export enum JobPortal_update_column {
  */
 export enum JobPostingCredit_constraint {
   JobPostingCredit_organizationId_jobPostingType_key = "JobPostingCredit_organizationId_jobPostingType_key",
+  JobPostingCredit_organizationId_untyped_unique = "JobPostingCredit_organizationId_untyped_unique",
   JobPostingCredit_pkey = "JobPostingCredit_pkey",
 }
 
@@ -1141,7 +1142,22 @@ export enum JobPostingCredit_select_column {
   jobPostingType = "jobPostingType",
   organizationId = "organizationId",
   remaining = "remaining",
+  unlimited = "unlimited",
   updated_at = "updated_at",
+}
+
+/**
+ * select "JobPostingCredit_aggregate_bool_exp_bool_and_arguments_columns" columns of table "JobPostingCredit"
+ */
+export enum JobPostingCredit_select_column_JobPostingCredit_aggregate_bool_exp_bool_and_arguments_columns {
+  unlimited = "unlimited",
+}
+
+/**
+ * select "JobPostingCredit_aggregate_bool_exp_bool_or_arguments_columns" columns of table "JobPostingCredit"
+ */
+export enum JobPostingCredit_select_column_JobPostingCredit_aggregate_bool_exp_bool_or_arguments_columns {
+  unlimited = "unlimited",
 }
 
 /**
@@ -1153,6 +1169,7 @@ export enum JobPostingCredit_update_column {
   jobPostingType = "jobPostingType",
   organizationId = "organizationId",
   remaining = "remaining",
+  unlimited = "unlimited",
   updated_at = "updated_at",
 }
 
@@ -7212,7 +7229,23 @@ export interface JobPortal_variance_order_by {
 }
 
 export interface JobPostingCredit_aggregate_bool_exp {
+  bool_and?: JobPostingCredit_aggregate_bool_exp_bool_and | null;
+  bool_or?: JobPostingCredit_aggregate_bool_exp_bool_or | null;
   count?: JobPostingCredit_aggregate_bool_exp_count | null;
+}
+
+export interface JobPostingCredit_aggregate_bool_exp_bool_and {
+  arguments: JobPostingCredit_select_column_JobPostingCredit_aggregate_bool_exp_bool_and_arguments_columns;
+  distinct?: boolean | null;
+  filter?: JobPostingCredit_bool_exp | null;
+  predicate: Boolean_comparison_exp;
+}
+
+export interface JobPostingCredit_aggregate_bool_exp_bool_or {
+  arguments: JobPostingCredit_select_column_JobPostingCredit_aggregate_bool_exp_bool_or_arguments_columns;
+  distinct?: boolean | null;
+  filter?: JobPostingCredit_bool_exp | null;
+  predicate: Boolean_comparison_exp;
 }
 
 export interface JobPostingCredit_aggregate_bool_exp_count {
@@ -7270,6 +7303,7 @@ export interface JobPostingCredit_bool_exp {
   jobPostingType?: JobPostingType_enum_comparison_exp | null;
   organizationId?: Int_comparison_exp | null;
   remaining?: Int_comparison_exp | null;
+  unlimited?: Boolean_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
 }
 
@@ -7284,6 +7318,7 @@ export interface JobPostingCredit_insert_input {
   jobPostingType?: JobPostingType_enum | null;
   organizationId?: number | null;
   remaining?: number | null;
+  unlimited?: boolean | null;
   updated_at?: any | null;
 }
 

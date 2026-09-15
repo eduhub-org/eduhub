@@ -163,23 +163,45 @@ select_permissions:
         - firstName
         - id
         - lastName
+        - matrixUserHandle
         - organizationId
         - picture
       filter:
-        ProjectAuthors:
-          _and:
-            - participationStatus:
-                _eq: ACCEPTED
-            - Project:
-                ProjectCourses:
-                  Course:
+        _or:
+          # Project co-authors, as before.
+          - ProjectAuthors:
+              _and:
+                - participationStatus:
+                    _eq: ACCEPTED
+                - Project:
+                    ProjectCourses:
+                      Course:
+                        CourseEnrollments:
+                          _and:
+                            - User:
+                                id:
+                                  _eq: X-Hasura-User-Id
+                            - status:
+                                _eq: CONFIRMED
+          # Fellow participants of a course you are taking part in yourself.
+          # matrixUserHandle rides along so the directory can offer a direct
+          # message; it is a chat handle inside a room these two already share,
+          # not a contact detail like email, which stays out of this role.
+          - CourseEnrollments:
+              _and:
+                - status:
+                    _in:
+                      - CONFIRMED
+                      - COMPLETED
+                - Course:
                     CourseEnrollments:
                       _and:
-                        - User:
-                            id:
-                              _eq: X-Hasura-User-Id
+                        - userId:
+                            _eq: X-Hasura-User-Id
                         - status:
-                            _eq: CONFIRMED
+                            _in:
+                              - CONFIRMED
+                              - COMPLETED
       limit: 100
   # Org admins with canManageSettings may read contact details of users they administer (and their
   # own record) when managing an organization's admin team on /manage/settings/access. status/updated_at
