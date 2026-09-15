@@ -174,7 +174,15 @@ services:
       LMS_ATTENDANCE_SURVEY_ID: ${LMS_ATTENDANCE_SURVEY_ID:-}
       MM_URL: ${MM_URL:-}
       MM_TOKEN: ${MM_TOKEN:-}
-      
+      # sync_mail_delivery_status reads the Mailgun events API. Unset locally,
+      # where the function then reports a missing key instead of running -- the
+      # events endpoint has no emulator, so there is nothing to point it at.
+      MAILGUN_API_KEY: ${MAILGUN_API_KEY:-}
+      MAILGUN_DOMAIN: ${MAILGUN_DOMAIN:-}
+      MAILGUN_ADDITIONAL_DOMAINS: ${MAILGUN_ADDITIONAL_DOMAINS:-}
+      MAIL_DELIVERY_SYNC_LOOKBACK_HOURS: ${MAIL_DELIVERY_SYNC_LOOKBACK_HOURS:-}
+      STUJO_ADMIN_EMAIL: ${STUJO_ADMIN_EMAIL:-}
+
 
   hasura:
     container_name: eduhub-hasura
