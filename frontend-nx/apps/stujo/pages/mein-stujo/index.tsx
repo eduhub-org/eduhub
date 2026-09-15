@@ -279,6 +279,7 @@ const MeinStujo: FC<Props> = ({ portal }) => {
           </div>
           <div style={{ margin: '0.5rem 0 0' }}>
             <OrganizationWebsiteEditor
+              key={organization.id}
               organization={organization}
               onWebsiteUpdated={refetchOrganizations}
             />

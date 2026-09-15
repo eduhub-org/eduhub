@@ -15,7 +15,15 @@ const ERROR_MESSAGE_KEYS: Record<string, string> = {
   INVALID_INPUT: 'organizationWebsite.invalidUrl',
 };
 
-const HTTP_URL_PATTERN = /^https?:\/\//i;
+// A prefix check alone would accept "https://" (no host); parse it for real.
+const isAbsoluteHttpUrl = (value: string): boolean => {
+  try {
+    const url = new URL(value);
+    return (url.protocol === 'http:' || url.protocol === 'https:') && url.hostname !== '';
+  } catch {
+    return false;
+  }
+};
 
 /**
  * Inline editor for the currently selected organization's public website
@@ -42,7 +50,7 @@ const OrganizationWebsiteEditor: FC<Props> = ({ organization, onWebsiteUpdated }
   });
 
   const trimmed = value.trim();
-  const isValid = trimmed === '' || HTTP_URL_PATTERN.test(trimmed);
+  const isValid = trimmed === '' || isAbsoluteHttpUrl(trimmed);
   const isUnchanged = trimmed === (organization.website ?? '');
 
   const handleChange = (nextValue: string) => {

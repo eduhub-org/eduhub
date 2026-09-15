@@ -15,7 +15,15 @@ import { authorizeOrganizationAdminFieldChange } from '../lib/organizationAdminF
  * authorizeOrganizationAdminFieldChange for that rule.
  */
 
-const HTTP_URL_PATTERN = /^https?:\/\//i;
+// A prefix check alone would accept "https://" (no host); parse it for real.
+const isAbsoluteHttpUrl = (value) => {
+  try {
+    const url = new URL(value);
+    return (url.protocol === 'http:' || url.protocol === 'https:') && url.hostname !== '';
+  } catch {
+    return false;
+  }
+};
 
 const UPDATE_ORGANIZATION_WEBSITE = gql`
   mutation UpdateOrganizationWebsite($organizationId: Int!, $website: String) {
@@ -43,7 +51,7 @@ export default async function updateOrganizationWebsite(req, logger) {
     }
 
     const website = (req.body?.input?.website ?? '').trim();
-    if (website && !HTTP_URL_PATTERN.test(website)) {
+    if (website && !isAbsoluteHttpUrl(website)) {
       return {
         success: false,
         messageKey: 'INVALID_INPUT',
