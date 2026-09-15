@@ -20,6 +20,7 @@ import { DegreeParticipationsTab } from './DegreeParticipationsTab';
 import { useIsAdmin, useIsUserIdInList } from '../../../hooks/authentication';
 import { getRegistrationFeatures } from './ApplicationsTab/registrationConfig';
 import Loading from '../../common/Loading';
+import { ProgramType } from '../../../types/enums';
 
 interface Props {
   courseId: number;
@@ -167,6 +168,8 @@ export const ManageCourseContent: FC<Props> = ({ courseId }) => {
     [course?.registrationType]
   );
 
+  const isEventCourse = course?.Program.type === ProgramType.EVENTS;
+
   if (qResult.loading && !qResult.data) {
     return (
       <PageBlock>
@@ -213,7 +216,7 @@ export const ManageCourseContent: FC<Props> = ({ courseId }) => {
 
             {course.Program.type === 'DEGREES' ? null : (
               <div className={`p-4 m-2 ${determineTabClasses(1, openTabIndex)}`} onClick={openTab1}>
-                {t('sessions')}
+                {t(isEventCourse ? 'programme' : 'sessions')}
               </div>
             )}
 

@@ -240,6 +240,16 @@ export interface ManagedCourseApplications_Course_by_pk_ConfirmedCourseEnrollmen
   aggregate: ManagedCourseApplications_Course_by_pk_ConfirmedCourseEnrollments_aggregate | null;
 }
 
+export interface ManagedCourseApplications_Course_by_pk_CancelledCourseEnrollments_aggregate {
+  __typename: "CourseEnrollment_aggregate_fields";
+  count: number;
+}
+
+export interface ManagedCourseApplications_Course_by_pk_CancelledCourseEnrollments {
+  __typename: "CourseEnrollment_aggregate";
+  aggregate: ManagedCourseApplications_Course_by_pk_CancelledCourseEnrollments_aggregate | null;
+}
+
 export interface ManagedCourseApplications_Course_by_pk {
   __typename: "Course";
   id: number;
@@ -281,6 +291,10 @@ export interface ManagedCourseApplications_Course_by_pk {
    * An aggregate relationship
    */
   ConfirmedCourseEnrollments: ManagedCourseApplications_Course_by_pk_ConfirmedCourseEnrollments;
+  /**
+   * An aggregate relationship
+   */
+  CancelledCourseEnrollments: ManagedCourseApplications_Course_by_pk_CancelledCourseEnrollments;
 }
 
 export interface ManagedCourseApplications {

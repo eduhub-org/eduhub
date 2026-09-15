@@ -12,15 +12,31 @@ import { CourseEnrollmentStatus_enum } from '../../../../__generated__/globalTyp
 
 interface AddParticipantsFormProps {
   courseId: number;
+  hasApplicationProcess: boolean;
+  hasCourseStarted: boolean;
   onSubmit: () => void;
 }
 
-export const AddParticipantsForm: FC<AddParticipantsFormProps> = ({ courseId, onSubmit }) => {
+export const AddParticipantsForm: FC<AddParticipantsFormProps> = ({
+  courseId,
+  hasApplicationProcess,
+  hasCourseStarted,
+  onSubmit,
+}) => {
   const t = useTranslations('manageCourse');
+
+  // Once a course/event has started, "aborted" ("Teilnahme abgebrochen") is the meaningful
+  // status for someone dropping out; beforehand it's "cancelled" ("Registrierung storniert").
+  const dropoutStatus = hasCourseStarted
+    ? CourseEnrollmentStatus_enum.ABORTED
+    : CourseEnrollmentStatus_enum.CANCELLED;
+  const dropoutLabel = hasCourseStarted ? t('add_as_aborted') : t('add_as_cancelled');
 
   // State hooks
   const [selectedUserIds, setSelectedUserIds] = useState<{ id: string; name: string }[]>([]);
-  const [selectedStatus, setSelectedStatus] = useState(CourseEnrollmentStatus_enum.APPLIED);
+  const [selectedStatus, setSelectedStatus] = useState(
+    hasApplicationProcess ? CourseEnrollmentStatus_enum.APPLIED : CourseEnrollmentStatus_enum.CONFIRMED
+  );
   const [userSelectionError, setUserSelectionError] = useState<string | null>(null);
 
   // GraphQL hooks
@@ -43,12 +59,18 @@ export const AddParticipantsForm: FC<AddParticipantsFormProps> = ({ courseId, on
     return [];
   }, [data, loading, error]);
 
-  // Enum to radio button options
+  // Enum to radio button options. Applied/invited only make sense when the course/event
+  // has an approval-based application process; direct registrations only ever go
+  // straight to confirmed (or later get cancelled/aborted).
   const radioOptions = [
-    { value: CourseEnrollmentStatus_enum.APPLIED, label: t('add_as_applied') },
-    { value: CourseEnrollmentStatus_enum.INVITED, label: t('add_as_invited') },
+    ...(hasApplicationProcess
+      ? [
+          { value: CourseEnrollmentStatus_enum.APPLIED, label: t('add_as_applied') },
+          { value: CourseEnrollmentStatus_enum.INVITED, label: t('add_as_invited') },
+        ]
+      : []),
     { value: CourseEnrollmentStatus_enum.CONFIRMED, label: t('add_as_confirmed') },
-    { value: CourseEnrollmentStatus_enum.ABORTED, label: t('add_as_aborted') },
+    { value: dropoutStatus, label: dropoutLabel },
   ];
 
   // Event handlers
@@ -94,7 +116,7 @@ export const AddParticipantsForm: FC<AddParticipantsFormProps> = ({ courseId, on
       <RadioButtonSelector
         className="mt-8"
         immediateCommit={false}
-        label={t('add_as_confirmed')}
+        label={t('status_label')}
         itemId={0}
         currentValue={selectedStatus}
         radioOptions={radioOptions}

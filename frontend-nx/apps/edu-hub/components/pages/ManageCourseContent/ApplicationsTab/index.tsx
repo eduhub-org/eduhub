@@ -280,14 +280,24 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
       approvedApplications: course.ApprovedCourseEnrollments.aggregate?.count ?? 0,
       invitedApplicants: course.InvitedCourseEnrollments.aggregate?.count ?? 0,
       confirmedApplicants: course.ConfirmedCourseEnrollments.aggregate?.count ?? 0,
+      cancelledApplicants: course.CancelledCourseEnrollments.aggregate?.count ?? 0,
     }),
     [
       course.ApprovedCourseEnrollments.aggregate?.count,
       course.ConfirmedCourseEnrollments.aggregate?.count,
       course.InvitedCourseEnrollments.aggregate?.count,
       course.TotalCourseEnrollments.aggregate?.count,
+      course.CancelledCourseEnrollments.aggregate?.count,
     ]
   );
+
+  const hasCourseStarted = useMemo(() => {
+    const firstSession = course.Sessions[0];
+    if (!firstSession) {
+      return false;
+    }
+    return new Date(firstSession.startDateTime).getTime() <= Date.now();
+  }, [course.Sessions]);
 
   const courseEnrollments = useMemo(() => {
     return course.CourseEnrollments ?? [];
@@ -705,6 +715,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
         const isStatusAction = action.startsWith('email_status_');
         const emailActionLabelByValue: Record<string, string> = {
           email_status_CONFIRMED: t('bulk_actions.email_all_confirmed'),
+          email_status_CANCELLED: t('bulk_actions.email_all_cancelled'),
           email_status_INVITED: t('bulk_actions.email_all_invited'),
           email_status_APPLIED: t('bulk_actions.email_all_applied'),
           email_status_REJECTED: t('bulk_actions.email_all_rejected'),
@@ -818,6 +829,26 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
         requiresSelection: true,
         disabledReason: t('bulk_actions.disabled_reasons.select_participants_first'),
       },
+    ];
+
+    // Invitations, rejections, applied/invited/rejected/waitlist statuses, and motivation
+    // ratings only exist as part of an approval-based application process — direct
+    // registrations never move through them, so they don't belong in this menu.
+    if (!features.hasApplicationProcess) {
+      actions.push({
+        value: 'email_status_CONFIRMED',
+        label: t('bulk_actions.email_all_confirmed'),
+        group: t('bulk_actions.email_all_by_status'),
+      });
+      actions.push({
+        value: 'email_status_CANCELLED',
+        label: t('bulk_actions.email_all_cancelled'),
+        group: t('bulk_actions.email_all_by_status'),
+      });
+      return actions;
+    }
+
+    actions.push(
       {
         value: 'send_invitations_selected',
         label: t('bulk_actions.send_invitations_selected'),
@@ -877,11 +908,11 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
         value: 'email_rating_REVIEW',
         label: t('bulk_actions.email_all_review_rating'),
         group: t('bulk_actions.email_all_by_rating'),
-      },
-    ];
+      }
+    );
 
     return actions;
-  }, [isInstructor, t]);
+  }, [features.hasApplicationProcess, isInstructor, t]);
 
   // Rating sort function
   const ratingSortFn = useCallback((a: MotivationRating_enum, b: MotivationRating_enum) => {
@@ -1281,7 +1312,12 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
         onClose={closeAddParticipantsModal}
         title={t('add_participants')}
       >
-        <AddParticipantsForm courseId={course.id} onSubmit={closeAddParticipantsModal} />
+        <AddParticipantsForm
+          courseId={course.id}
+          hasApplicationProcess={features.hasApplicationProcess}
+          hasCourseStarted={hasCourseStarted}
+          onSubmit={closeAddParticipantsModal}
+        />
       </Modal>
 
       {organizerCourseChatLink ? (
@@ -1323,14 +1359,16 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
             </>
           ) : (
             <>
-              {/* Direct Registration: Show only total and confirmed registrations */}
-              <div className="bg-bg-secondary text-label-primary light p-4 rounded-lg">
-                <div className="text-label-secondary text-sm mb-1">{t('statistics_registrations_total')}</div>
-                <div className="text-label-primary text-2xl font-semibold">{applicationStats.totalApplications}</div>
-              </div>
+              {/* Direct Registration: total vs. confirmed is redundant here (nearly every
+                  registration becomes confirmed immediately), so show confirmed vs.
+                  cancelled instead, i.e. people who signed up but no longer plan to attend. */}
               <div className="bg-bg-secondary text-label-primary light p-4 rounded-lg">
                 <div className="text-label-secondary text-sm mb-1">{t('statistics_registrations_confirmed')}</div>
                 <div className="text-label-primary text-2xl font-semibold">{applicationStats.confirmedApplicants}</div>
+              </div>
+              <div className="bg-bg-secondary text-label-primary light p-4 rounded-lg">
+                <div className="text-label-secondary text-sm mb-1">{t('statistics_registrations_cancelled')}</div>
+                <div className="text-label-primary text-2xl font-semibold">{applicationStats.cancelledApplicants}</div>
               </div>
             </>
           )}

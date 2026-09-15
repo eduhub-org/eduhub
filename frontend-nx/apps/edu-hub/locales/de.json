@@ -1324,6 +1324,7 @@
   "manageCourse": {
     "description": "Beschreibung",
     "sessions": "Termine",
+    "programme": "Programm",
     "applications": "Bewerbungen",
     "registrations": "Registrierungen",
     "registrations_and_payments": "Registrierungen und Zahlungen",
@@ -1348,6 +1349,7 @@
     "add_as_applied": "als beworben hinzufügen oder ändern",
     "add_as_invited": "als eingeladen hinzufügen oder ändern",
     "add_as_aborted": "als abgebrochen hinzufügen oder ändern",
+    "add_as_cancelled": "als storniert hinzufügen oder ändern",
     "add_user_error": "Bitte mindestens einen User auswählen!",
     "submit": "Absenden",
     "application_history": {
@@ -1368,6 +1370,7 @@
       "collapse_selected_rows": "Ausgewählte Zeilen einklappen",
       "email_selected": "E-Mail an Ausgewählte",
       "email_all_confirmed": "E-Mail an alle Bestätigten",
+      "email_all_cancelled": "E-Mail an alle Stornierten",
       "email_all_invited": "E-Mail an alle Eingeladenen",
       "email_all_applied": "E-Mail an alle Beworbenen",
       "email_all_rejected": "E-Mail an alle Abgelehnten",
@@ -1437,8 +1440,8 @@
     "statistics_applications_accepted": "Bewerbungen angenommen",
     "statistics_invitations_total": "Einladungen gesamt",
     "statistics_invitations_confirmed": "Einladungen bestätigt",
-    "statistics_registrations_total": "Registrierungen gesamt",
     "statistics_registrations_confirmed": "Bestätigte Registrierungen",
+    "statistics_registrations_cancelled": "Stornierte Registrierungen",
     "payment_status": "Zahlung",
     "payment_status_values": {
       "NONE": "Keine",
