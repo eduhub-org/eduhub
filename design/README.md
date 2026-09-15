@@ -1,5 +1,33 @@
 # EduHub Design Files
 
+## Event page redesign (`event-page-redesign-preview.html`)
+
+### Preview (open in browser)
+
+```bash
+xdg-open design/event-page-redesign-preview.html
+```
+
+Design/UX critique of `/course/[id]` for `Program.type = EVENTS`, plus three
+improvement directions. The spacing, alignment and heading-hierarchy findings
+are program-type agnostic and apply to the course and degree pages too.
+
+| Direction | Description |
+|-----------|-------------|
+| A · Tighten | Same structure; one 5-step spacing scale, one gutter, real `<h1>`, fact-list info card, neutral description card |
+| B · Event-first hero | Hero carries title + date/time/place/language chips; info card dropped, speakers section added, sticky CTA bar |
+| C · Sticky registration rail | Content left, one sticky white card right holding facts + CTA + deadline + calendar/share; collapses above the agenda on mobile |
+
+"Before" captures at 390/1440 live in `event-page-assets/`.
+
+Recommendation: ship A (hygiene, benefits all program types), then C.
+
+High-fidelity Pencil frames: open Pencil in Cursor, create
+`design/event-page-redesign.pen`, then ask the agent to continue (MCP requires
+an active editor document).
+
+---
+
 ## Project tile slider (`project-tile-slider.pen`)
 
 Pencil designs for reusable project tiles, tile slider, and public project pages.

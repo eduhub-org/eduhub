@@ -867,6 +867,7 @@ export enum Course_select_column {
   registrationType = "registrationType",
   requiredEcts = "requiredEcts",
   requiredEventCount = "requiredEventCount",
+  showAvailablePlaces = "showAvailablePlaces",
   startTime = "startTime",
   status = "status",
   stripePriceId = "stripePriceId",
@@ -886,6 +887,7 @@ export enum Course_select_column_Course_aggregate_bool_exp_bool_and_arguments_co
   guestRegistrationEnabled = "guestRegistrationEnabled",
   projectProposalsEnabled = "projectProposalsEnabled",
   published = "published",
+  showAvailablePlaces = "showAvailablePlaces",
 }
 
 /**
@@ -897,6 +899,7 @@ export enum Course_select_column_Course_aggregate_bool_exp_bool_or_arguments_col
   guestRegistrationEnabled = "guestRegistrationEnabled",
   projectProposalsEnabled = "projectProposalsEnabled",
   published = "published",
+  showAvailablePlaces = "showAvailablePlaces",
 }
 
 /**
@@ -937,6 +940,7 @@ export enum Course_update_column {
   registrationType = "registrationType",
   requiredEcts = "requiredEcts",
   requiredEventCount = "requiredEventCount",
+  showAvailablePlaces = "showAvailablePlaces",
   startTime = "startTime",
   status = "status",
   stripePriceId = "stripePriceId",
@@ -1129,6 +1133,7 @@ export enum JobPortal_update_column {
  */
 export enum JobPostingCredit_constraint {
   JobPostingCredit_organizationId_jobPostingType_key = "JobPostingCredit_organizationId_jobPostingType_key",
+  JobPostingCredit_organizationId_untyped_unique = "JobPostingCredit_organizationId_untyped_unique",
   JobPostingCredit_pkey = "JobPostingCredit_pkey",
 }
 
@@ -1141,7 +1146,22 @@ export enum JobPostingCredit_select_column {
   jobPostingType = "jobPostingType",
   organizationId = "organizationId",
   remaining = "remaining",
+  unlimited = "unlimited",
   updated_at = "updated_at",
+}
+
+/**
+ * select "JobPostingCredit_aggregate_bool_exp_bool_and_arguments_columns" columns of table "JobPostingCredit"
+ */
+export enum JobPostingCredit_select_column_JobPostingCredit_aggregate_bool_exp_bool_and_arguments_columns {
+  unlimited = "unlimited",
+}
+
+/**
+ * select "JobPostingCredit_aggregate_bool_exp_bool_or_arguments_columns" columns of table "JobPostingCredit"
+ */
+export enum JobPostingCredit_select_column_JobPostingCredit_aggregate_bool_exp_bool_or_arguments_columns {
+  unlimited = "unlimited",
 }
 
 /**
@@ -1153,6 +1173,7 @@ export enum JobPostingCredit_update_column {
   jobPostingType = "jobPostingType",
   organizationId = "organizationId",
   remaining = "remaining",
+  unlimited = "unlimited",
   updated_at = "updated_at",
 }
 
@@ -6212,10 +6233,12 @@ export interface Course_bool_exp {
   programId?: Int_comparison_exp | null;
   projectProposalsEnabled?: Boolean_comparison_exp | null;
   projectSubmissionDeadline?: timestamptz_comparison_exp | null;
+  publicParticipantCount?: bigint_comparison_exp | null;
   published?: Boolean_comparison_exp | null;
   registrationType?: CourseRegistrationType_enum_comparison_exp | null;
   requiredEcts?: numeric_comparison_exp | null;
   requiredEventCount?: Int_comparison_exp | null;
+  showAvailablePlaces?: Boolean_comparison_exp | null;
   startTime?: time_comparison_exp | null;
   status?: CourseStatus_enum_comparison_exp | null;
   stripePriceId?: String_comparison_exp | null;
@@ -6283,6 +6306,7 @@ export interface Course_insert_input {
   registrationType?: CourseRegistrationType_enum | null;
   requiredEcts?: any | null;
   requiredEventCount?: number | null;
+  showAvailablePlaces?: boolean | null;
   startTime?: any | null;
   status?: CourseStatus_enum | null;
   stripePriceId?: string | null;
@@ -6440,10 +6464,12 @@ export interface Course_order_by {
   programId?: order_by | null;
   projectProposalsEnabled?: order_by | null;
   projectSubmissionDeadline?: order_by | null;
+  publicParticipantCount?: order_by | null;
   published?: order_by | null;
   registrationType?: order_by | null;
   requiredEcts?: order_by | null;
   requiredEventCount?: order_by | null;
+  showAvailablePlaces?: order_by | null;
   startTime?: order_by | null;
   status?: order_by | null;
   stripePriceId?: order_by | null;
@@ -6492,6 +6518,7 @@ export interface Course_set_input {
   registrationType?: CourseRegistrationType_enum | null;
   requiredEcts?: any | null;
   requiredEventCount?: number | null;
+  showAvailablePlaces?: boolean | null;
   startTime?: any | null;
   status?: CourseStatus_enum | null;
   stripePriceId?: string | null;
@@ -7212,7 +7239,23 @@ export interface JobPortal_variance_order_by {
 }
 
 export interface JobPostingCredit_aggregate_bool_exp {
+  bool_and?: JobPostingCredit_aggregate_bool_exp_bool_and | null;
+  bool_or?: JobPostingCredit_aggregate_bool_exp_bool_or | null;
   count?: JobPostingCredit_aggregate_bool_exp_count | null;
+}
+
+export interface JobPostingCredit_aggregate_bool_exp_bool_and {
+  arguments: JobPostingCredit_select_column_JobPostingCredit_aggregate_bool_exp_bool_and_arguments_columns;
+  distinct?: boolean | null;
+  filter?: JobPostingCredit_bool_exp | null;
+  predicate: Boolean_comparison_exp;
+}
+
+export interface JobPostingCredit_aggregate_bool_exp_bool_or {
+  arguments: JobPostingCredit_select_column_JobPostingCredit_aggregate_bool_exp_bool_or_arguments_columns;
+  distinct?: boolean | null;
+  filter?: JobPostingCredit_bool_exp | null;
+  predicate: Boolean_comparison_exp;
 }
 
 export interface JobPostingCredit_aggregate_bool_exp_count {
@@ -7270,6 +7313,7 @@ export interface JobPostingCredit_bool_exp {
   jobPostingType?: JobPostingType_enum_comparison_exp | null;
   organizationId?: Int_comparison_exp | null;
   remaining?: Int_comparison_exp | null;
+  unlimited?: Boolean_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
 }
 
@@ -7284,6 +7328,7 @@ export interface JobPostingCredit_insert_input {
   jobPostingType?: JobPostingType_enum | null;
   organizationId?: number | null;
   remaining?: number | null;
+  unlimited?: boolean | null;
   updated_at?: any | null;
 }
 

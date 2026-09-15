@@ -608,6 +608,18 @@ export const UPDATE_COURSE_ATTENDANCE_CERTIFICATE_POSSIBLE = gql`
   }
 `;
 
+export const UPDATE_COURSE_SHOW_AVAILABLE_PLACES = gql`
+  mutation UpdateCourseShowAvailablePlaces($courseId: Int!, $showAvailablePlaces: Boolean!) {
+    update_Course_by_pk(
+      pk_columns: { id: $courseId }
+      _set: { showAvailablePlaces: $showAvailablePlaces }
+    ) {
+      id
+      showAvailablePlaces
+    }
+  }
+`;
+
 export const UPDATE_COURSE_ACHIEVEMENT_CERTIFICATE_POSSIBLE = gql`
   mutation UpdateCourseAchievementCertificatePossible(
     $courseId: Int!

@@ -115,7 +115,10 @@ export const GuestRegistrationModal: FC<GuestRegistrationModalProps> = ({ visibl
   }, [acceptTerms, course.id, email, firstName, honeypot, lastName, newsletterOptIn, registerGuest]);
 
   return (
-    <Dialog open={visible} onClose={handleClose} fullWidth maxWidth="sm">
+    // The MUI theme paints dialog paper white (see config/theme.ts), while the
+    // label tokens default to the dark aesthetic - so without `light` every
+    // text-label-* class in here renders near-white on white.
+    <Dialog open={visible} onClose={handleClose} fullWidth maxWidth="sm" PaperProps={{ className: 'light' }}>
       <DialogTitle className="flex items-center justify-between">
         <span>{submitted ? t('modal.check_your_inbox') : t('modal.title')}</span>
         <button

@@ -254,7 +254,8 @@
     "session_expired_notification": "Your session has expired. Please log in again to continue.",
     "tile_slider_unavailable": "Tile slider temporarily unavailable",
     "course_tile": {
-      "extended_application_period_badge": "Extended application period"
+      "extended_application_period_badge": "Extended application period",
+      "past_event_badge": "Past"
     },
     "no_description_available": "No description available",
     "error_handling": {
@@ -334,10 +335,12 @@
       "course_not_available": "Course not available",
       "to_course_chat": "GO TO CHAT",
       "to_online_meeting": "GO TO ONLINE MEETING",
-      "no_online_participation_available": "Online participation is not available for this course.",
+      "no_online_participation_available": "This course does not offer online participation.",
       "speaker": "Speaker",
       "link_will_be_provided_soon": "(Link will be provided here soon)",
-      "address_will_be_provided_soon": "(Address will be provided here soon)"
+      "address_will_be_provided_soon": "(Address will be provided here soon)",
+      "share": "Share",
+      "link_copied": "Link copied"
     },
     "ects": {
       "5": "5",
@@ -362,7 +365,12 @@
       "show_all_dates": "Show all dates",
       "hide_dates": "Collapse dates",
       "date_singular": "Date",
-      "date_plural": "Dates"
+      "date_plural": "Dates",
+      "agenda": "Agenda",
+      "add_to_calendar": "Add to calendar",
+      "location_not_available": "Location not available",
+      "untitled_session": "Agenda item",
+      "add_to_calendar_short": "Calendar"
     },
     "attendances": {
       "attendances": "Attendances",
@@ -670,7 +678,8 @@
         "back_to_home": "Back to home"
       },
       "close": "Close",
-      "submit": "Submit Application",
+      "submit_approval": "Submit application",
+      "submit_direct": "Submit registration",
       "proceed_to_payment": "Proceed to Payment",
       "submitting": "Submitting...",
       "success_message_approval": "Your application has been submitted successfully. You will receive an email notification once your application has been reviewed.",
@@ -689,7 +698,8 @@
       "survey_title": "Application Questionnaire",
       "survey_completed": "Thank you! Your questionnaire has been successfully submitted.",
       "embed_error": "The questionnaire could not be loaded. Please try again later.",
-      "loading_addons": "Loading payment data"
+      "loading_addons": "Loading payment data",
+      "survey_title_registration": "Registration questionnaire"
     },
     "onboarding_modal": {
       "decline_confirm_text": "Do you really want to decline the invitation to this course?",
@@ -716,6 +726,22 @@
       "success_title": "You have successfully applied",
       "success_body": "You will be informed about your admission no later than one to two days after the application deadline.",
       "success_close_button_title": "Close"
+    },
+    "info": {
+      "dates": "Dates",
+      "location": "Location",
+      "language": "Language",
+      "price": "Price",
+      "places": "Places",
+      "places_left": "{count} left",
+      "places_total": "of {count}",
+      "participants": "Participants",
+      "participant_count": "{count}"
+    },
+    "participants": {
+      "title": "Who's here",
+      "message_on_element": "Message on Element",
+      "and_more": "and {count} more"
     }
   },
   "coursePage": {
@@ -1058,8 +1084,8 @@
     "published": "Published",
     "title": "Program title",
     "short-title": "Short title",
-    "application-start": "Application start",
-    "application-end": "Application deadline",
+    "application-start": "Registration start",
+    "application-end": "Registration deadline",
     "course-start": "Course start",
     "course-end": "Course end"
   },
@@ -1071,7 +1097,7 @@
       "applications": "Applications",
       "confirmed": "Confirmed",
       "unrated_rated_not_informed": "Unrated / Rated but not informed",
-      "application_end": "Application End",
+      "application_end": "Registration Deadline",
       "program": "Program",
       "status": "Status",
       "email_templates": "Templates",
@@ -1290,7 +1316,7 @@
       },
       "attendance_certificate_update_failed": "Failed to update attendance certificate setting",
       "achievement_certificate_update_failed": "Failed to update achievement certificate setting",
-      "application_end_update_failed": "Failed to update application end date",
+      "application_end_update_failed": "Failed to update registration deadline",
       "copied_success_singular": {
         "courses": "Successfully copied {count} course to {programTitle}",
         "events": "Successfully copied {count} event to {programTitle}",
@@ -1301,6 +1327,11 @@
         "events": "Successfully copied {count} events to {programTitle}",
         "degrees": "Successfully copied {count} degrees to {programTitle}"
       }
+    },
+    "participants": {
+      "label": "Participants",
+      "show_available_places": "Show available places on the course page",
+      "show_available_places_hint": "Unchecked, the course page shows only how many people are taking part. Requires a maximum number of participants."
     }
   },
   "manageCourse": {
@@ -1945,8 +1976,8 @@
     "headline": "Programs",
     "table_header": {
       "published": "Published",
-      "application_start": "Application Start",
-      "application_end": "Application End",
+      "application_start": "Registration Start",
+      "application_end": "Registration Deadline",
       "course_start": "Course Start",
       "course_end": "Course End",
       "achievement_upload_deadline": "Deadline Perf. Record Upload",
@@ -3085,6 +3116,7 @@
       "course_not_available": "This event is currently not available.",
       "guest_registration_not_enabled": "Registration without an account is not available for this event.",
       "course_full": "This event is already full.",
+      "registration_period_ended": "The registration deadline for this event has already passed.",
       "guest_registration_failed": "Your registration could not be processed. Please try again later.",
       "guest_registration_throttled": "A lot of registrations are coming in right now. Please try again in an hour.",
       "guest_account_exists": "An account now exists for this email address. Please log in and complete your registration there.",
@@ -3095,5 +3127,8 @@
       "invalid_operation": "That action is not possible.",
       "guest_manage_failed": "That did not work. Please try again later."
     }
+  },
+  "notifications": {
+    "show_available_places_update_failed": "Could not change the display of available places"
   }
 }

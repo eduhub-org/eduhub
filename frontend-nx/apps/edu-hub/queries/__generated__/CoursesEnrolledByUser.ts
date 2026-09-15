@@ -27,6 +27,7 @@ export interface CoursesEnrolledByUser_Course_Program {
    * Controls whether course tiles should show an extended application period banner after the program deadline has passed while individual course deadlines are still open.
    */
   showExtendedApplicationPeriodBanner: boolean;
+  type: string;
 }
 
 export interface CoursesEnrolledByUser_Course_CourseLocations {
@@ -35,6 +36,19 @@ export interface CoursesEnrolledByUser_Course_CourseLocations {
    * Either 'ONLINE' or one of the possible given offline locations
    */
   locationOption: LocationOption_enum | null;
+}
+
+export interface CoursesEnrolledByUser_Course_Sessions {
+  __typename: "Session";
+  id: number;
+  /**
+   * The day and time of the start of the session
+   */
+  startDateTime: any;
+  /**
+   * The day and time of the end of the session
+   */
+  endDateTime: any;
 }
 
 export interface CoursesEnrolledByUser_Course {
@@ -84,6 +98,10 @@ export interface CoursesEnrolledByUser_Course {
    * An array relationship
    */
   CourseLocations: CoursesEnrolledByUser_Course_CourseLocations[];
+  /**
+   * An array relationship
+   */
+  Sessions: CoursesEnrolledByUser_Course_Sessions[];
 }
 
 export interface CoursesEnrolledByUser {

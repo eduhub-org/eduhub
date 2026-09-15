@@ -38,6 +38,19 @@ export interface CourseTilesByOrganization_Course_CourseLocations {
   locationOption: LocationOption_enum | null;
 }
 
+export interface CourseTilesByOrganization_Course_Sessions {
+  __typename: "Session";
+  id: number;
+  /**
+   * The day and time of the start of the session
+   */
+  startDateTime: any;
+  /**
+   * The day and time of the end of the session
+   */
+  endDateTime: any;
+}
+
 export interface CourseTilesByOrganization_Course_CourseGroups_CourseGroupOption {
   __typename: "CourseGroupOption";
   id: number;
@@ -100,6 +113,10 @@ export interface CourseTilesByOrganization_Course {
    * An array relationship
    */
   CourseLocations: CourseTilesByOrganization_Course_CourseLocations[];
+  /**
+   * An array relationship
+   */
+  Sessions: CourseTilesByOrganization_Course_Sessions[];
   /**
    * An array relationship
    */
