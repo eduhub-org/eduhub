@@ -111,10 +111,32 @@ select_permissions:
       # broader than the row that made them public.
       filter:
         _or:
-          # Course instructors, shown on the course page (CourseInstructor.anonymous).
-          - CourseInstructors: {}
-          # Session speakers, shown in the agenda (SessionSpeaker.anonymous).
-          - SessionSpeakers: {}
+          # Course instructors, shown on the course page. The published
+          # clauses have to be written out here: CourseInstructor.anonymous is
+          # `filter: {}`, and a relationship predicate inside a permission does
+          # not apply the related table's own permission, so a bare
+          # `CourseInstructors: {}` would still expose the instructors of an
+          # unpublished course. The two project branches below are already
+          # written this way.
+          - CourseInstructors:
+              Course:
+                _and:
+                  - published:
+                      _eq: true
+                  - Program:
+                      published:
+                        _eq: true
+          # Session speakers, shown in the agenda, bounded the same way through
+          # the session's course.
+          - SessionSpeakers:
+              Session:
+                Course:
+                  _and:
+                    - published:
+                        _eq: true
+                    - Program:
+                        published:
+                          _eq: true
           # Accepted authors of a published showcase (ProjectAuthor.anonymous).
           - ProjectAuthors:
               _and:
@@ -235,6 +257,33 @@ select_permissions:
                             _in:
                               - CONFIRMED
                               - COMPLETED
+          # Instructors and speakers of a course you are taking part in. The
+          # anonymous branches above are bounded to published courses, and an
+          # instructor is not enrolled in their own course, so without these two
+          # a participant would lose the teaching staff on a course that is not
+          # (or not yet) public - exactly the courses where the staff matters
+          # most to the people already in them.
+          - CourseInstructors:
+              Course:
+                CourseEnrollments:
+                  _and:
+                    - userId:
+                        _eq: X-Hasura-User-Id
+                    - status:
+                        _in:
+                          - CONFIRMED
+                          - COMPLETED
+          - SessionSpeakers:
+              Session:
+                Course:
+                  CourseEnrollments:
+                    _and:
+                      - userId:
+                          _eq: X-Hasura-User-Id
+                      - status:
+                          _in:
+                            - CONFIRMED
+                            - COMPLETED
       limit: 100
   # Org admins with canManageSettings may read contact details of users they administer (and their
   # own record) when managing an organization's admin team on /manage/settings/access. status/updated_at
