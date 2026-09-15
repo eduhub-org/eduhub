@@ -120,6 +120,16 @@ export const SAVE_ORGANIZATION_LOGO = gql`
   }
 `;
 
+export const REMOVE_ORGANIZATION_LOGO = gql`
+  mutation RemoveOrganizationLogo($organizationId: Int!) {
+    removeOrganizationLogo(organizationid: $organizationId) {
+      success
+      messageKey
+      error
+    }
+  }
+`;
+
 export const SAVE_COURSE_IMAGE = gql`
   mutation SaveCourseImage(
     $base64File: String!

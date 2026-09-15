@@ -171,7 +171,12 @@
       "remove_logo": "Logo entfernen",
       "remove_image": "Bild entfernen",
       "remove_image_error": "Fehler beim Entfernen des Bildes",
-      "upload_error": "Fehler beim Hochladen des Bildes"
+      "upload_error": "Fehler beim Hochladen des Bildes",
+      "organization_logo": "Logo der Organisation",
+      "change_logo": "Logo ändern",
+      "view_full_size": "In voller Größe ansehen",
+      "close": "Schließen",
+      "logo_permission_denied": "Diese Organisation hat bereits eine Person, die die Einstellungen verwaltet. Bitte sie, das Logo zu ändern."
     },
     "file_upload": {
       "upload_text": "Klicken, um Datei hochzuladen",

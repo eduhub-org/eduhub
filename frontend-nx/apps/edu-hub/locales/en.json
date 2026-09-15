@@ -171,7 +171,12 @@
       "remove_logo": "Remove logo",
       "remove_image": "Remove image",
       "remove_image_error": "Error removing image",
-      "upload_error": "Error uploading image"
+      "upload_error": "Error uploading image",
+      "organization_logo": "Organization logo",
+      "change_logo": "Change logo",
+      "view_full_size": "View full size",
+      "close": "Close",
+      "logo_permission_denied": "This organization already has an admin managing settings. Ask them to update the logo."
     },
     "file_upload": {
       "upload_text": "Click to upload file",

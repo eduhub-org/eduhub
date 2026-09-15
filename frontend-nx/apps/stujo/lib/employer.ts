@@ -42,6 +42,7 @@ export const MY_JOB_ORGANIZATIONS = gql`
       Organization {
         id
         name
+        logo
         JobPostingCredits {
           id
           remaining

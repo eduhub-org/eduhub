@@ -34,7 +34,6 @@ import {
   UPDATE_ORGANIZATION_NEWSLETTER_DESCRIPTION,
   UPDATE_ORGANIZATION_NEWSLETTER_PROVIDER,
 } from '../../../queries/organization';
-import { UPDATE_ORGANIZATION_LOGO } from '../../../queries/updateOrganization';
 import { UPDATE_USER_ORGANIZATION_ID } from '../../../queries/updateUser';
 import {
   UPDATE_ORGANIZATION_ADMIN_ORGANIZATION_ID,
@@ -238,7 +237,6 @@ const ExpandableOrganizationRow: React.FC<ExpandableRowProps> = ({ row, onError 
           label={t('organization.logo')}
           identifierVariables={{ organizationId: row.id }}
           currentFile={row.logo}
-          updateFileMutation={UPDATE_ORGANIZATION_LOGO}
           onFileUpdated={() => {
             // Refetch the organization list to show updated logo
             refetch();
