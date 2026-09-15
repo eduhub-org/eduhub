@@ -39,7 +39,7 @@
   /* Homepage hero overlay: the bottom fade into the page plus the bottom-left
      scrim that carries the white headline. Intentionally not overridden for
      light mode - the headline over the hero artwork is always white. */
-  --eduhub-hero-fade: #0F0F0F;
+  --eduhub-hero-fade: var(--eduhub-bg-primary);
   --eduhub-hero-scrim: rgba(0, 0, 0, 0.8);
   
   /* Functional Colors (consistent across modes) */
