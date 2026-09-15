@@ -12,6 +12,7 @@ export type EmployerOrganization = {
   id: number;
   name: string;
   logo: string | null;
+  website: string | null;
   JobPostingCredits: Array<{ id: number; remaining: number; jobPostingType: string | null }>;
 };
 

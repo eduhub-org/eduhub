@@ -1,6 +1,6 @@
 import { GraphQLClient, gql } from 'graphql-request';
 
-import { authorizeOrganizationLogoChange } from '../lib/organizationLogoAuthorization.js';
+import { authorizeOrganizationAdminFieldChange } from '../lib/organizationAdminFieldAuthorization.js';
 
 /**
  * Clears an organization's logo, for the people entitled to change it.
@@ -10,7 +10,7 @@ import { authorizeOrganizationLogoChange } from '../lib/organizationLogoAuthoriz
  * replaced upload), only the Organization.logo column to null out. That write
  * has to happen here rather than via a client mutation against Organization
  * for the same reason saveOrganizationLogo persists the column itself — see
- * its comment and authorizeOrganizationLogoChange for the authorization rule.
+ * its comment and authorizeOrganizationAdminFieldChange for the authorization rule.
  */
 
 const CLEAR_ORGANIZATION_LOGO = gql`
@@ -42,7 +42,7 @@ export default async function removeOrganizationLogo(req, logger) {
       headers: { 'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET },
     });
 
-    const authorization = await authorizeOrganizationLogoChange(client, {
+    const authorization = await authorizeOrganizationAdminFieldChange(client, {
       sessionUserId,
       sessionRole,
       organizationId,

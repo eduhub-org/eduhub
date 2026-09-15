@@ -1,17 +1,17 @@
 import { jest } from '@jest/globals';
 
-import { authorizeOrganizationLogoChange } from './organizationLogoAuthorization.js';
+import { authorizeOrganizationAdminFieldChange } from './organizationAdminFieldAuthorization.js';
 
 const grantResponse = (ownGrant, settingsAdminCount) => ({
   ownGrant,
   settingsAdmins: { aggregate: { count: settingsAdminCount } },
 });
 
-describe('authorizeOrganizationLogoChange', () => {
+describe('authorizeOrganizationAdminFieldChange', () => {
   it('authorizes an admin session without querying', async () => {
     const client = { request: jest.fn() };
 
-    const result = await authorizeOrganizationLogoChange(client, {
+    const result = await authorizeOrganizationAdminFieldChange(client, {
       sessionUserId: 'user-1',
       sessionRole: 'admin',
       organizationId: 7,
@@ -24,7 +24,7 @@ describe('authorizeOrganizationLogoChange', () => {
   it('refuses a session with no authenticated user', async () => {
     const client = { request: jest.fn() };
 
-    const result = await authorizeOrganizationLogoChange(client, {
+    const result = await authorizeOrganizationAdminFieldChange(client, {
       sessionUserId: undefined,
       sessionRole: 'user',
       organizationId: 7,
@@ -41,7 +41,7 @@ describe('authorizeOrganizationLogoChange', () => {
       ),
     };
 
-    const result = await authorizeOrganizationLogoChange(client, {
+    const result = await authorizeOrganizationAdminFieldChange(client, {
       sessionUserId: 'user-1',
       sessionRole: 'user',
       organizationId: 7,
@@ -57,7 +57,7 @@ describe('authorizeOrganizationLogoChange', () => {
       ),
     };
 
-    const result = await authorizeOrganizationLogoChange(client, {
+    const result = await authorizeOrganizationAdminFieldChange(client, {
       sessionUserId: 'user-1',
       sessionRole: 'user',
       organizationId: 7,
@@ -73,7 +73,7 @@ describe('authorizeOrganizationLogoChange', () => {
       ),
     };
 
-    const result = await authorizeOrganizationLogoChange(client, {
+    const result = await authorizeOrganizationAdminFieldChange(client, {
       sessionUserId: 'user-1',
       sessionRole: 'user',
       organizationId: 7,
@@ -81,7 +81,7 @@ describe('authorizeOrganizationLogoChange', () => {
 
     expect(result).toEqual({
       authorized: false,
-      reason: "Not authorized to change this organization's logo",
+      reason: "Not authorized to change this organization's data",
     });
   });
 
@@ -92,7 +92,7 @@ describe('authorizeOrganizationLogoChange', () => {
       ),
     };
 
-    const result = await authorizeOrganizationLogoChange(client, {
+    const result = await authorizeOrganizationAdminFieldChange(client, {
       sessionUserId: 'user-1',
       sessionRole: 'user',
       organizationId: 7,
@@ -104,7 +104,7 @@ describe('authorizeOrganizationLogoChange', () => {
   it('refuses a caller with no grant at all for the organization', async () => {
     const client = { request: jest.fn().mockResolvedValue(grantResponse([], 0)) };
 
-    const result = await authorizeOrganizationLogoChange(client, {
+    const result = await authorizeOrganizationAdminFieldChange(client, {
       sessionUserId: 'user-1',
       sessionRole: 'user',
       organizationId: 7,

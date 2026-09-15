@@ -3,7 +3,7 @@ import { Storage } from '@google-cloud/storage';
 
 import saveImage from '../saveImage/index.js';
 import { buildCloudStorage } from '../lib/cloud-storage.js';
-import { authorizeOrganizationLogoChange } from '../lib/organizationLogoAuthorization.js';
+import { authorizeOrganizationAdminFieldChange } from '../lib/organizationAdminFieldAuthorization.js';
 
 /**
  * Uploads an organization's logo, for the people entitled to change it, and
@@ -26,7 +26,7 @@ import { authorizeOrganizationLogoChange } from '../lib/organizationLogoAuthoriz
  * so it writes the column with the same client instead of asking the caller
  * to make a second request Hasura may or may not let through.
  *
- * See authorizeOrganizationLogoChange for the authorization rule itself.
+ * See authorizeOrganizationAdminFieldChange for the authorization rule itself.
  */
 
 const SET_ORGANIZATION_LOGO = gql`
@@ -79,7 +79,7 @@ export default async function saveOrganizationLogo(req, logger) {
       headers: { 'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET },
     });
 
-    const authorization = await authorizeOrganizationLogoChange(client, {
+    const authorization = await authorizeOrganizationAdminFieldChange(client, {
       sessionUserId,
       sessionRole,
       organizationId,

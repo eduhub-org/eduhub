@@ -1,26 +1,26 @@
 import { gql } from 'graphql-request';
 
 /**
- * Authorization for changes to Organization.logo.
+ * Authorization for changes to organization-admin-gated Organization columns
+ * (logo, website, ...).
  *
- * Shared by saveOrganizationLogo and removeOrganizationLogo, which both need
- * the caller's own GraphQL client so they can persist the column themselves
- * (a StuJo request's role is `user`, which has no Hasura update permission on
- * Organization at all — the write has to happen here, not via a follow-up
- * client mutation).
+ * Shared by every handler that needs the caller's own GraphQL client so it
+ * can persist the column itself (a StuJo request's role is `user`, which has
+ * no Hasura update permission on Organization at all — the write has to
+ * happen in the handler, not via a follow-up client mutation).
  *
  * The rule: a settings admin (canManageSettings) may always change it. An org
  * admin with only the job-offer capability (canManageJobs) may change it too,
  * but only while their organization has no settings admin of its own — once
- * one exists, the logo, like every other settings-gated column, is theirs to
+ * one exists, the field, like every other settings-gated column, is theirs to
  * own. This lets a StuJo-only employer (whose claim grants canManageJobs, not
  * canManageSettings — see the rework_organization_admin_bootstrap migration)
- * brand their job board listing without being blocked on nobody having ever
- * claimed the broader settings role for their organization.
+ * maintain their job board profile without being blocked on nobody having
+ * ever claimed the broader settings role for their organization.
  */
 
-const GET_ORGANIZATION_LOGO_GRANT = gql`
-  query GetOrganizationLogoGrant($organizationId: Int!, $userId: uuid!) {
+const GET_ORGANIZATION_ADMIN_GRANT = gql`
+  query GetOrganizationAdminGrant($organizationId: Int!, $userId: uuid!) {
     ownGrant: OrganizationAdmin(
       where: { organizationId: { _eq: $organizationId }, userId: { _eq: $userId } }
       limit: 1
@@ -45,7 +45,7 @@ const GET_ORGANIZATION_LOGO_GRANT = gql`
  * @param {{ sessionUserId: string | undefined, sessionRole: string | undefined, organizationId: number }} params
  * @returns {Promise<{ authorized: true } | { authorized: false, reason: string }>}
  */
-export async function authorizeOrganizationLogoChange(client, { sessionUserId, sessionRole, organizationId }) {
+export async function authorizeOrganizationAdminFieldChange(client, { sessionUserId, sessionRole, organizationId }) {
   if (sessionRole === 'admin') {
     return { authorized: true };
   }
@@ -54,7 +54,7 @@ export async function authorizeOrganizationLogoChange(client, { sessionUserId, s
     return { authorized: false, reason: 'Missing authenticated session user' };
   }
 
-  const data = await client.request(GET_ORGANIZATION_LOGO_GRANT, {
+  const data = await client.request(GET_ORGANIZATION_ADMIN_GRANT, {
     organizationId,
     userId: sessionUserId,
   });
@@ -69,5 +69,5 @@ export async function authorizeOrganizationLogoChange(client, { sessionUserId, s
     return { authorized: true };
   }
 
-  return { authorized: false, reason: "Not authorized to change this organization's logo" };
+  return { authorized: false, reason: "Not authorized to change this organization's data" };
 }

@@ -26,7 +26,7 @@ interface Props {
  * job-offer-only admin (the capability every StuJo dashboard organization
  * implies, since MY_JOB_ORGANIZATIONS filters on canManageJobs) may change it
  * too as long as the organization has no settings admin of its own. See
- * authorizeOrganizationLogoChange in functions/callNodeFunction/lib for the
+ * authorizeOrganizationAdminFieldChange in functions/callNodeFunction/lib for the
  * exact rule. A caller who no longer qualifies (the organization has since
  * gained a settings admin) simply sees the action's error message.
  */
