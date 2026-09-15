@@ -103,7 +103,40 @@ select_permissions:
         - occupation
         - organizationId
         - picture
-      filter: {}
+      # Was `filter: {}`, which made every registered user's name and picture
+      # readable by anyone, logged out, whether or not they had ever appeared on
+      # a public page. Anonymous only ever needs the people a public page
+      # actually renders, so each branch below mirrors the permission of the
+      # table that puts them there - the visibility of a person can never be
+      # broader than the row that made them public.
+      filter:
+        _or:
+          # Course instructors, shown on the course page (CourseInstructor.anonymous).
+          - CourseInstructors: {}
+          # Session speakers, shown in the agenda (SessionSpeaker.anonymous).
+          - SessionSpeakers: {}
+          # Accepted authors of a published showcase (ProjectAuthor.anonymous).
+          - ProjectAuthors:
+              _and:
+                - participationStatus:
+                    _eq: ACCEPTED
+                - Project:
+                    published:
+                      _eq: true
+          # Mentors of a published project or of an open proposal, where they
+          # are the listed contact (ProjectMentor.anonymous).
+          - ProjectMentors:
+              Project:
+                _or:
+                  - published:
+                      _eq: true
+                  - _and:
+                      - status:
+                          _eq: PROPOSED
+                      - _not:
+                          ProjectAuthors:
+                            participationStatus:
+                              _eq: ACCEPTED
       limit: 10
   - role: instructor_access
     permission:
