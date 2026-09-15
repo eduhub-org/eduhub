@@ -1,0 +1,865 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Event page — design critique &amp; directions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand:#00A398; --brand-light:#00C4B8; --brand-dark:#008078;
+  --bg:#222222; --bg-2:#333333; --bg-card:#2a2a2a; --bg-deep:#0F0F0F;
+  --border:#444444;
+  --label:#F2F2F2; --label-2:#D8D8D8; --label-3:#888888;
+  --on-light:#222222; --on-light-2:#666666; --on-light-3:#999999;
+  --light-border:#D8D8D8; --light-divider:#E5E5E5; --light-bg-2:#F2F2F2;
+  --success:#A2EBA0; --warning:#FFA665; --error:#D45A5A;
+
+  /* PROPOSED SPACING SCALE (the whole point of these mocks) */
+  --s-1:4px; --s-2:8px; --s-3:12px; --s-4:16px; --s-6:24px;
+  --s-8:32px; --s-12:48px; --s-16:64px; --s-24:96px;
+  --gutter:24px;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:#141414; color:var(--label);
+  font-family:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-weight:500; -webkit-font-smoothing:antialiased;
+}
+a{color:inherit}
+.page{max-width:1500px;margin:0 auto;padding:56px var(--s-6) 160px}
+
+/* ---------- document chrome ---------- */
+.doc-head{border-bottom:1px solid var(--border);padding-bottom:var(--s-8);margin-bottom:var(--s-16)}
+.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--brand);font-weight:700;margin:0 0 var(--s-3)}
+h1.doc{font-size:clamp(34px,5vw,56px);line-height:1.05;margin:0 0 var(--s-4);font-weight:800;letter-spacing:-.02em}
+.lede{font-size:17px;line-height:1.6;color:var(--label-2);max-width:74ch;margin:0}
+.meta{margin-top:var(--s-6);font-size:13px;color:var(--label-3)}
+
+h2.sec{font-size:30px;font-weight:700;letter-spacing:-.01em;margin:0 0 var(--s-4)}
+h3.sub{font-size:18px;font-weight:700;margin:0 0 var(--s-3)}
+section.block{margin:0 0 var(--s-24)}
+p.body{font-size:15px;line-height:1.65;color:var(--label-2);max-width:78ch;margin:0 0 var(--s-4)}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.88em;background:var(--bg-2);border:1px solid var(--border);border-radius:4px;padding:1px 5px;color:var(--label)}
+
+/* findings table */
+.findings{width:100%;border-collapse:collapse;font-size:14px;margin-top:var(--s-4)}
+.findings th{text-align:left;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--label-3);font-weight:700;padding:0 var(--s-4) var(--s-3) 0;border-bottom:1px solid var(--border)}
+.findings td{padding:var(--s-4) var(--s-4) var(--s-4) 0;border-bottom:1px solid var(--border);vertical-align:top;line-height:1.55;color:var(--label-2)}
+.findings td:first-child{color:var(--label);font-weight:600;width:1%;white-space:nowrap}
+.findings td b{color:var(--label);font-weight:600}
+.sev{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:999px;white-space:nowrap}
+.sev.hi{background:var(--error);color:#2a0d0d}
+.sev.me{background:var(--warning);color:#3a1f06}
+.sev.lo{background:var(--bg-2);color:var(--label-2);border:1px solid var(--border)}
+
+/* scale table */
+.scale{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:var(--s-3);margin-top:var(--s-4)}
+.scale > div{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:var(--s-4)}
+.scale > div > b{display:block;font-size:13px;margin-bottom:6px}
+.scale > div > span{font-size:12px;color:var(--label-3);line-height:1.5;display:block}
+.bar{height:6px;background:var(--brand);border-radius:3px;margin-top:10px}
+
+/* ---------- artboards ---------- */
+.boards{display:flex;gap:var(--s-8);align-items:flex-start;overflow-x:auto;padding-bottom:var(--s-4)}
+.board{flex:0 0 auto}
+.board-label{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--label-3);font-weight:700;margin-bottom:var(--s-3)}
+.frame{background:var(--bg);border-radius:12px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.5);border:1px solid var(--border)}
+.frame.desktop{width:1280px;zoom:.62}
+.frame.mobile{width:390px;zoom:.82}
+.shot{display:block;border-radius:12px;border:1px solid var(--border)}
+
+/* ---------- shared app UI inside the mocks ---------- */
+.appbar{height:74px;display:flex;align-items:center;justify-content:space-between;padding:0 var(--s-6);background:rgba(34,34,34,.55);position:relative;z-index:2}
+.logo{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:800;line-height:1.05;letter-spacing:.06em}
+.logo .ring{width:30px;height:30px;border-radius:999px;border:2px solid #fff;display:grid;place-items:center}
+.logo .ring::after{content:"";border-left:8px solid #fff;border-top:5px solid transparent;border-bottom:5px solid transparent;margin-left:3px}
+.appbar nav{display:flex;align-items:center;gap:var(--s-4);font-size:13px}
+.pill{border-radius:999px;padding:9px 20px;font-size:13px;font-weight:600;border:2px solid transparent;cursor:pointer;font-family:inherit;transition:border-color .15s,background .15s,color .15s}
+.pill.dark{background:var(--bg);color:#fff}
+.pill.white{background:#fff;color:var(--on-light)}
+.pill.ghost{background:transparent;border-color:var(--label-2);color:var(--label)}
+.pill.ghost:hover{border-color:var(--brand);color:var(--brand)}
+.pill.cta{background:var(--warning);color:var(--on-light);font-size:16px;padding:15px 34px;font-weight:700}
+.pill.brand{background:var(--brand);color:#fff}
+.pill.sm{padding:8px 16px;font-size:13px}
+
+.photo{background:
+    linear-gradient(51.32deg, rgba(0,0,0,.78) 17.57%, rgba(0,0,0,0) 85.36%),
+    linear-gradient(180deg, rgba(15,15,15,.25) 0%, rgba(15,15,15,0) 40%, rgba(15,15,15,.85) 100%),
+    linear-gradient(120deg,#1d4a63 0%,#2f6f7d 38%,#7d5f52 72%,#b8794f 100%);
+  background-size:cover}
+
+.container{width:100%;max-width:1280px;margin:0 auto;padding-left:var(--gutter);padding-right:var(--gutter)}
+.h1{font-size:52px;line-height:1.05;font-weight:800;letter-spacing:-.02em;margin:0}
+.h1.sm{font-size:34px}
+.sectitle{font-size:28px;font-weight:700;letter-spacing:-.01em;margin:0}
+.tagline{font-size:20px;line-height:1.5;color:var(--label-2);margin:0;max-width:60ch}
+
+.chiprow{display:flex;flex-wrap:wrap;gap:var(--s-2)}
+.chip{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--label);background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:7px 14px;backdrop-filter:blur(2px)}
+.chip svg{width:14px;height:14px;flex:0 0 auto;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.chip.solid{background:var(--bg-card);border-color:var(--border)}
+
+/* agenda */
+.day{border-top:1px solid var(--border);padding-top:var(--s-6);margin-top:var(--s-6)}
+.day:first-child{border-top:0;margin-top:0;padding-top:0}
+.day-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:var(--s-3);margin-bottom:var(--s-4)}
+.day-date{font-size:13px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--brand)}
+.day-place{font-size:13px;color:var(--label-2);display:inline-flex;align-items:center;gap:6px}
+.day-place svg{width:14px;height:14px;flex:0 0 auto;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;opacity:.7}
+.day-place a{color:var(--label-2);text-decoration:underline;text-underline-offset:3px}
+.rail{position:relative;padding-left:var(--s-6);border-left:1px solid var(--border)}
+.slot{position:relative;display:grid;grid-template-columns:104px 1fr;gap:var(--s-6);padding:var(--s-4) 0}
+.slot + .slot{border-top:1px solid rgba(255,255,255,.07)}
+.slot::before{content:"";position:absolute;left:calc(-1 * var(--s-6) - 4px);top:calc(var(--s-4) + 6px);width:7px;height:7px;border-radius:999px;background:var(--border)}
+.slot.next::before{background:var(--brand)}
+.slot time{font-size:13px;font-weight:600;color:var(--label-2);font-variant-numeric:tabular-nums;white-space:nowrap;padding-top:1px}
+.slot h4{font-size:17px;font-weight:600;margin:0 0 var(--s-2);line-height:1.35}
+.slot p{font-size:14px;line-height:1.6;color:var(--label-2);margin:0;max-width:62ch}
+.slot .untitled{color:var(--label-3);font-style:italic;font-weight:500}
+
+/* cards */
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:var(--s-6)}
+.card.light{background:#fff;color:var(--on-light);border-color:var(--light-border)}
+.factlist{display:flex;flex-direction:column;gap:var(--s-4);margin:0;padding:0;list-style:none}
+.fact{display:grid;grid-template-columns:20px 1fr;gap:var(--s-3);align-items:start}
+.fact svg{width:18px;height:18px;margin-top:2px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;opacity:.65}
+.fact dt{font-size:11px;letter-spacing:.09em;text-transform:uppercase;font-weight:700;opacity:.55;margin-bottom:2px}
+.fact dd{margin:0;font-size:14.5px;font-weight:600;line-height:1.45}
+.fact dd .muted{display:block;font-weight:500;font-size:13px;opacity:.7;margin-top:2px}
+.divider{height:1px;background:var(--border);margin:var(--s-6) 0}
+.divider.light{background:var(--light-divider)}
+
+.deadline{font-size:12.5px;color:var(--label-3);text-align:center;margin-top:var(--s-3)}
+.deadline b{color:var(--label-2);font-weight:600}
+.guestlink{display:block;text-align:center;font-size:13.5px;color:var(--brand);margin-top:var(--s-3);text-decoration:none}
+.guestlink:hover{text-decoration:underline}
+
+.about h3{font-size:20px;font-weight:700;margin:0 0 var(--s-3)}
+.about p{font-size:15.5px;line-height:1.7;color:var(--label-2);margin:0;max-width:70ch}
+
+.speaker{display:flex;gap:var(--s-3);align-items:center}
+.avatar{width:44px;height:44px;border-radius:999px;background:linear-gradient(135deg,#3a5a66,#6c4c3c);flex:0 0 auto}
+.speaker b{display:block;font-size:14px;font-weight:600}
+.card.light .speaker span{color:var(--on-light-2)}
+.speaker span{font-size:12.5px;color:var(--label-2)}
+
+.sticky{position:sticky;top:var(--s-6)}
+.stickybar{display:flex;align-items:center;justify-content:space-between;gap:var(--s-4);background:rgba(34,34,34,.94);border-bottom:1px solid var(--border);padding:var(--s-3) var(--s-6)}
+.stickybar .t{font-size:15px;font-weight:700}
+.stickybar .d{font-size:12.5px;color:var(--label-2)}
+
+.note{display:flex;gap:var(--s-3);align-items:flex-start;background:var(--bg-2);border-left:3px solid var(--brand);border-radius:0 10px 10px 0;padding:var(--s-4);font-size:13.5px;line-height:1.6;color:var(--label-2);max-width:78ch;margin-top:var(--s-4)}
+.note b{color:var(--label)}
+
+.pros{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:var(--s-4);margin-top:var(--s-6)}
+.pros div{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:var(--s-4)}
+.pros b{display:block;font-size:12px;letter-spacing:.09em;text-transform:uppercase;margin-bottom:var(--s-2)}
+.pros.ok b{color:var(--success)}
+.pros ul{margin:0;padding-left:18px;font-size:13.5px;line-height:1.65;color:var(--label-2)}
+.tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:4px 10px;border-radius:999px;border:1px solid var(--border);color:var(--label-2);margin-right:var(--s-2)}
+.tag.brand{border-color:var(--brand);color:var(--brand)}
+</style>
+</head>
+<body>
+<div class="page">
+
+<header class="doc-head">
+  <p class="eyebrow">EduHub · Design review</p>
+  <h1 class="doc">Event page — critique &amp; three directions</h1>
+  <p class="lede">A review of <code>/course/[id]</code> rendered for a course whose <code>Program.type = EVENTS</code>,
+  captured at 390 / 768 / 1440&nbsp;px. The findings below are mostly <em>not</em> event-specific — spacing,
+  alignment and heading hierarchy are shared by every program type, so fixing them here fixes the course
+  and degree pages too.</p>
+  <p class="meta">Components reviewed: <code>CourseContent/index.tsx</code> · <code>InfoPanel.tsx</code> ·
+  <code>Sessions.tsx</code> · <code>Registration/RegistrationButton.tsx</code> · <code>DescriptionFields.tsx</code></p>
+</header>
+
+<!-- ============================ CRITIQUE ============================ -->
+<section class="block">
+  <h2 class="sec">1 · What the current page does wrong</h2>
+
+  <h3 class="sub" style="margin-top:32px">Layout &amp; spacing</h3>
+  <table class="findings">
+    <tr><th>Finding</th><th>Why it hurts</th><th></th></tr>
+    <tr>
+      <td>No spacing scale</td>
+      <td>The page uses <b>~15 distinct vertical values</b> — <code>space-y-24</code>, <code>mb-20</code>, <code>mb-24</code>,
+      <code>mt-24</code>, <code>mt-12</code>, <code>mb-9</code>, <code>pb-12</code>, <code>mb-8</code>, <code>mb-6</code>,
+      <code>mb-4</code>, <code>mb-3</code>, <code>p-12</code>, <code>sm:p-24</code>, <code>gap-y-8</code>, <code>gap-x-28</code>.
+      Nothing rhymes, so no gap reads as intentional and the eye can't tell "new section" from "next paragraph".</td>
+      <td><span class="sev hi">high</span></td>
+    </tr>
+    <tr>
+      <td>Two gutters</td>
+      <td>The hero title is inset <code>p-3</code> (12px); everything below it is <code>mx-6</code> (24px).
+      Below 1280px the page title is visibly out of line with its own content column.</td>
+      <td><span class="sev me">med</span></td>
+    </tr>
+    <tr>
+      <td><code>items-center</code> on a stacking row</td>
+      <td><code>ContentRow</code> is <code>flex-col lg:flex-row</code>; <code>items-center</code> was meant to centre the two
+      columns vertically on desktop, but below <code>lg</code> it centres them <em>horizontally</em>. At 768px the tagline
+      floats in the middle of the page, misaligned with every heading under it.</td>
+      <td><span class="sev hi">high</span></td>
+    </tr>
+    <tr>
+      <td>Ragged right column</td>
+      <td>CTA (<code>justify-center</code>), deadline text, guest link and the white info card each centre themselves
+      independently inside <code>lg:max-w-md</code>. At 1440px the card's left edge and the button's left edge are 90px apart —
+      four fragments, no shared edge.</td>
+      <td><span class="sev me">med</span></td>
+    </tr>
+    <tr>
+      <td>Half-empty info card</td>
+      <td><code>p-12 sm:p-24</code> + <code>grid-cols-2 gap-x-28</code> on three items: at 1440px, <b>~44% of the card is blank
+      white</b> and "11.09.2026 – 18.09.2026" is forced onto three lines by a 112px column gap. On mobile 96px of padding
+      leaves a 200px content well.</td>
+      <td><span class="sev hi">high</span></td>
+    </tr>
+    <tr>
+      <td>Dead zones</td>
+      <td>147px between hero and tagline, ~190px of empty dark between the tagline row and "Programm", ~100px between the
+      info card and the description card. The page carries ~1400px of content across 2600px of scroll.</td>
+      <td><span class="sev me">med</span></td>
+    </tr>
+    <tr>
+      <td>Redundant nesting</td>
+      <td>Two nested <code>&lt;div class="flex flex-col space-y-12 lg:space-y-24"&gt;</code> with identical classes; the outer one
+      wraps a single child. <code>index.tsx</code> mixes <code>PageBlock</code>, <code>ContentRow</code> and raw
+      <code>mx-6 xl:mx-0</code> for the same job.</td>
+      <td><span class="sev lo">low</span></td>
+    </tr>
+  </table>
+
+  <h3 class="sub" style="margin-top:44px">Information architecture</h3>
+  <table class="findings">
+    <tr><th>Finding</th><th>Why it hurts</th><th></th></tr>
+    <tr>
+      <td>The answer is 1400px down</td>
+      <td>On mobile the two facts a visitor came for — <b>when</b> and <b>where</b> — first appear in the white card
+      <em>below</em> the agenda. The hero carries a title and nothing else.</td>
+      <td><span class="sev hi">high</span></td>
+    </tr>
+    <tr>
+      <td>Dates stated twice, differently</td>
+      <td>The info card says "11.09.2026 – 18.09.2026"; the agenda immediately above says "Freitag, 11.09.2026" and
+      "Freitag, 18.09.2026". A span implies a continuous event; it is actually two evenings a week apart.</td>
+      <td><span class="sev me">med</span></td>
+    </tr>
+    <tr>
+      <td>Description is last and loudest</td>
+      <td><code>DescriptionFields</code> — the only copy that says what the event <em>is</em> — renders after the agenda,
+      after the info card, in a full-bleed <code>bg-edu-course-invited</code> block. That token is
+      <code>--eduhub-status-invited</code>: the same orange used for the "you are invited" enrollment state and for the
+      primary CTA. Semantic colour used as decoration.</td>
+      <td><span class="sev hi">high</span></td>
+    </tr>
+    <tr>
+      <td>Registration deadline outlives the event</td>
+      <td>The page cheerfully shows "Anmeldeschluss: 31.10.2026" for an event that ends 18.09.2026. Nothing clamps or
+      warns. Once the event is over the page still reads as open.</td>
+      <td><span class="sev me">med</span></td>
+    </tr>
+    <tr>
+      <td>No status, no scarcity</td>
+      <td>The tile carries a "Vergangen" badge; the page does not. <code>maxParticipants</code> /
+      <code>activeParticipantCount</code> already drive the waitlist but are never surfaced — no "12 Plätze frei",
+      no "noch 3 Tage".</td>
+      <td><span class="sev me">med</span></td>
+    </tr>
+    <tr>
+      <td>People land in two places</td>
+      <td><code>SessionSpeakers</code> render as <code>UserCard</code>s inside agenda rows;
+      <code>CourseInstructors</code> render in the white card. Same entity, two treatments, no "Speakers" section.</td>
+      <td><span class="sev lo">low</span></td>
+    </tr>
+  </table>
+
+  <h3 class="sub" style="margin-top:44px">Typography, colour &amp; components</h3>
+  <table class="findings">
+    <tr><th>Finding</th><th>Why it hurts</th><th></th></tr>
+    <tr>
+      <td>Page title = section title</td>
+      <td>The hero title is <code>text-3xl</code>. <code>SectionTitle</code> ("Programm") is also
+      <code>text-3xl font-semibold</code>. The name of the event and a subhead are the same size — against a brand whose
+      own guidance calls for "huge hero type".</td>
+      <td><span class="sev hi">high</span></td>
+    </tr>
+    <tr>
+      <td>No <code>&lt;h1&gt;</code> anywhere</td>
+      <td>The title renders as a plain <code>&lt;div&gt;</code>. <code>curl</code> of the page returns
+      <b>0 <code>&lt;h1&gt;</code></b>. Day headings jump straight to <code>&lt;h3&gt;</code>. Screen-reader users get no
+      document title, and the JSON-LD/SEO work in <code>55c6070a</code> is undercut by the markup it sits in.</td>
+      <td><span class="sev hi">high</span></td>
+    </tr>
+    <tr>
+      <td>Day vs. item only 2px apart</td>
+      <td>Day heading <code>text-lg sm:text-xl</code> (20px) vs. session title <code>text-sm sm:text-lg</code> (18px). The
+      agenda's two levels barely separate; times in full <code>label-primary</code> white compete with titles.</td>
+      <td><span class="sev me">med</span></td>
+    </tr>
+    <tr>
+      <td>Time column isn't a column</td>
+      <td>The time block is <code>flex-shrink-0</code> with no fixed width, so "19:00 - 21:00" and "21:00 - 23:00" render at
+      slightly different widths and the titles beside them don't align.</td>
+      <td><span class="sev lo">low</span></td>
+    </tr>
+    <tr>
+      <td>Off-brand buttons</td>
+      <td>"Zum Kalender hinzufügen (.ics)" is a grey <code>rounded-lg</code> rectangle on <code>bg-secondary</code>;
+      the brand's buttons are pills with a 2px border that turns teal on hover. "(.ics)" is developer jargon in
+      learner-facing copy.</td>
+      <td><span class="sev lo">low</span></td>
+    </tr>
+    <tr>
+      <td>Three accents competing</td>
+      <td>Orange CTA, orange description block, teal guest link — and the brand has exactly <b>one</b> accent
+      (<code>#00A398</code>). The CTA also carries <code>shadow-lg hover:-translate-y-0.5</code>, a lift the design system
+      explicitly rules out ("press: colour change only").</td>
+      <td><span class="sev me">med</span></td>
+    </tr>
+    <tr>
+      <td>Empty session row</td>
+      <td>A session without a title renders as a lone "21:00 - 23:00" next to nothing. Looks broken rather than terse.</td>
+      <td><span class="sev lo">low</span></td>
+    </tr>
+  </table>
+
+  <div class="note"><span>⚑</span><div><b>Not a bug:</b> the small circular “N” in the bottom-left of the screenshots is
+  the Next.js dev-tools indicator, not page chrome.</div></div>
+</section>
+
+<!-- ============================ BEFORE ============================ -->
+<section class="block">
+  <h2 class="sec">2 · Before</h2>
+  <p class="body">Captured against the local stack, cookie banner suppressed. Note the ragged right column, the
+  half-empty white card and the ~100px void above the orange block.</p>
+  <div class="boards">
+    <div class="board">
+      <p class="board-label">Current · 1440</p>
+      <img class="shot" src="event-page-assets/current-1440.png" width="1440" style="width:760px;height:auto" alt="Current event page at 1440px">
+    </div>
+    <div class="board">
+      <p class="board-label">Current · 390</p>
+      <img class="shot" src="event-page-assets/current-390.png" width="390" style="width:300px;height:auto" alt="Current event page at 390px">
+    </div>
+  </div>
+</section>
+
+<!-- ============================ SCALE ============================ -->
+<section class="block">
+  <h2 class="sec">3 · The shared spacing scale</h2>
+  <p class="body">All three directions below are built on the same five-step rhythm. This is the part worth landing first,
+  because it is program-type agnostic: the same tokens fix the course and degree pages.</p>
+  <div class="scale">
+    <div><b>Section · 96 / 64</b><span>Between top-level sections (hero → about → agenda → description). <code>64</code> under <code>lg</code>.</span><div class="bar" style="width:96px"></div></div>
+    <div><b>Block · 32</b><span>Heading → its content, and between sibling blocks inside a section.</span><div class="bar" style="width:32px"></div></div>
+    <div><b>Item · 16</b><span>Between rows in a list: agenda slots, fact rows, speakers.</span><div class="bar" style="width:16px"></div></div>
+    <div><b>Tight · 8</b><span>Label → value, chip gaps, icon → text.</span><div class="bar" style="width:8px"></div></div>
+    <div><b>Gutter · 24</b><span>One page inset, applied to the hero title too — so the title and the content below share an edge at every width.</span><div class="bar" style="width:24px"></div></div>
+  </div>
+  <div class="note"><span>→</span><div>Concretely: delete the nested <code>space-y-12 lg:space-y-24</code> wrapper, give
+  <code>PageBlock</code> the gutter as its single responsibility, drop <code>items-center</code> from
+  <code>ContentRow</code> (or make it <code>lg:items-center</code>), and replace every ad-hoc
+  <code>mt-24 / mb-20 / mb-9 / pb-12</code> with <code>section</code> / <code>block</code>.</div></div>
+</section>
+
+<!-- ============================ DIRECTION A ============================ -->
+<section class="block">
+  <h2 class="sec">4 · Direction A — Tighten</h2>
+  <p><span class="tag brand">low risk</span><span class="tag">no new components</span><span class="tag">applies to all program types</span></p>
+  <p class="body">Same structure, same components, same reading order. Only the rhythm, the alignment and the two cards
+  change. The white info panel becomes a labelled fact list instead of a 2×2 icon grid with 112px gutters, the description
+  block loses the status-orange, and the hero title becomes a real <code>&lt;h1&gt;</code> at hero scale.
+  This is the version that ships in an afternoon.</p>
+
+  <div class="boards">
+    <div class="board">
+      <p class="board-label">A · Desktop 1280</p>
+      <div class="frame desktop">
+        <div class="photo" style="height:360px;display:flex;flex-direction:column;justify-content:space-between">
+          <div class="appbar">
+            <div class="logo"><span class="ring"></span><span>EDU<br>HUB</span></div>
+            <nav><span style="color:var(--label-2)">EN | <b style="color:#fff">DE</b></span>
+              <button class="pill dark">Anmelden</button><button class="pill white">Registrieren</button></nav>
+          </div>
+          <div class="container" style="padding-bottom:32px">
+            <h1 class="h1">Test Event Course</h1>
+          </div>
+        </div>
+
+        <div class="container" style="padding-top:64px;padding-bottom:96px">
+          <!-- hero row: tagline + CTA, aligned to one baseline -->
+          <div style="display:grid;grid-template-columns:1fr 360px;gap:64px;align-items:start">
+            <div>
+              <p class="tagline">Das hier ist die Kurzbeschreibung des Events</p>
+            </div>
+            <div>
+              <button class="pill cta" style="width:100%">Jetzt registrieren</button>
+              <p class="deadline">Anmeldeschluss <b>31.10.2026</b></p>
+              <a class="guestlink" href="#">Ohne Konto anmelden</a>
+            </div>
+          </div>
+
+          <!-- agenda + fact card -->
+          <div style="display:grid;grid-template-columns:1fr 360px;gap:64px;align-items:start;margin-top:96px">
+            <div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:24px;margin-bottom:32px">
+                <h2 class="sectitle">Programm</h2>
+                <button class="pill ghost sm">Zum Kalender hinzufügen</button>
+              </div>
+
+              <div class="day">
+                <div class="day-head">
+                  <span class="day-date">Freitag, 11.09.2026</span>
+                  <span class="day-place">
+                    <svg viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 1116 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    <a href="#">Starterkitchen, Kuhnkestr. 6, 24118 Kiel</a>
+                  </span>
+                </div>
+                <div class="rail">
+                  <div class="slot next"><time>19:00 – 21:00</time>
+                    <div><h4>Ankommen</h4><p>Wir heißen Euch bei einer Tasse Kaffee willkommen und würden uns über Freunde und Familie freuen.</p></div>
+                  </div>
+                  <div class="slot"><time>21:00 – 23:00</time><div><h4>Los gehts</h4></div></div>
+                </div>
+              </div>
+
+              <div class="day">
+                <div class="day-head">
+                  <span class="day-date">Freitag, 18.09.2026</span>
+                  <span class="day-place">
+                    <svg viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 1116 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    <a href="#">Starterkitchen, Kuhnkestr. 6, 24118 Kiel</a>
+                  </span>
+                </div>
+                <div class="rail">
+                  <div class="slot"><time>21:00 – 23:00</time><div><h4 class="untitled">Programmpunkt</h4></div></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- fact card: same white surface, no 96px padding, no 112px gutter -->
+            <div class="card light">
+              <dl class="factlist">
+                <div class="fact">
+                  <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/></svg>
+                  <div><dt>Termine</dt><dd>2 Abende<span class="muted">11.09. &amp; 18.09.2026</span></dd></div>
+                </div>
+                <div class="fact">
+                  <svg viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 1116 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                  <div><dt>Ort</dt><dd>Kiel<span class="muted">Starterkitchen, Kuhnkestr. 6</span></dd></div>
+                </div>
+                <div class="fact">
+                  <svg viewBox="0 0 24 24"><path d="M5 8h10M9 5v3M11 19l4-9 4 9M12.5 16h5.5"/><path d="M5 8c0 4 3 7 7 8"/></svg>
+                  <div><dt>Sprache</dt><dd>Deutsch</dd></div>
+                </div>
+              </dl>
+              <div class="divider light"></div>
+              <div class="speaker"><span class="avatar"></span><div><b>Nina Petersen</b><span>Organisation</span></div></div>
+            </div>
+          </div>
+
+          <!-- description: neutral card, not status-orange -->
+          <div class="card" style="margin-top:96px">
+            <div class="about"><h3>Hier ist der Titel 1</h3><p>Und hier kommt der Text, der ganz viel</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="board">
+      <p class="board-label">A · Mobile 390</p>
+      <div class="frame mobile">
+        <div class="photo" style="height:300px;display:flex;flex-direction:column;justify-content:space-between">
+          <div class="appbar" style="height:60px;padding:0 24px">
+            <div class="logo" style="font-size:11px"><span class="ring" style="width:24px;height:24px"></span><span>EDU<br>HUB</span></div>
+            <button class="pill dark" style="padding:7px 14px;font-size:12px">Anmelden</button>
+          </div>
+          <div style="padding:0 24px 24px"><h1 class="h1 sm">Test Event Course</h1></div>
+        </div>
+        <div style="padding:32px 24px 64px">
+          <p class="tagline" style="font-size:17px">Das hier ist die Kurzbeschreibung des Events</p>
+          <button class="pill cta" style="width:100%;margin-top:32px">Jetzt registrieren</button>
+          <p class="deadline">Anmeldeschluss <b>31.10.2026</b></p>
+          <a class="guestlink" href="#">Ohne Konto anmelden</a>
+
+          <div class="card light" style="margin-top:64px;padding:20px">
+            <dl class="factlist">
+              <div class="fact"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/></svg><div><dt>Termine</dt><dd>2 Abende<span class="muted">11.09. &amp; 18.09.2026</span></dd></div></div>
+              <div class="fact"><svg viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 1116 0z"/><circle cx="12" cy="10" r="3"/></svg><div><dt>Ort</dt><dd>Kiel<span class="muted">Starterkitchen, Kuhnkestr. 6</span></dd></div></div>
+              <div class="fact"><svg viewBox="0 0 24 24"><path d="M5 8h10M9 5v3M11 19l4-9 4 9M12.5 16h5.5"/><path d="M5 8c0 4 3 7 7 8"/></svg><div><dt>Sprache</dt><dd>Deutsch</dd></div></div>
+            </dl>
+          </div>
+
+          <div style="margin-top:64px">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:32px">
+              <h2 class="sectitle" style="font-size:24px">Programm</h2>
+            </div>
+            <button class="pill ghost sm" style="width:100%;margin-bottom:32px">Zum Kalender hinzufügen</button>
+            <div class="day">
+              <div class="day-head"><span class="day-date">Freitag, 11.09.2026</span></div>
+              <span class="day-place" style="display:block;margin:-8px 0 16px"><a href="#">Starterkitchen, Kuhnkestr. 6, 24118 Kiel</a></span>
+              <div class="rail">
+                <div class="slot next" style="grid-template-columns:1fr;gap:4px"><time>19:00 – 21:00</time><div><h4>Ankommen</h4><p>Wir heißen Euch bei einer Tasse Kaffee willkommen und würden uns über Freunde und Familie freuen.</p></div></div>
+                <div class="slot" style="grid-template-columns:1fr;gap:4px"><time>21:00 – 23:00</time><div><h4>Los gehts</h4></div></div>
+              </div>
+            </div>
+            <div class="day">
+              <div class="day-head"><span class="day-date">Freitag, 18.09.2026</span></div>
+              <span class="day-place" style="display:block;margin:-8px 0 16px"><a href="#">Starterkitchen, Kuhnkestr. 6, 24118 Kiel</a></span>
+              <div class="rail"><div class="slot" style="grid-template-columns:1fr;gap:4px"><time>21:00 – 23:00</time><div><h4 class="untitled">Programmpunkt</h4></div></div></div>
+            </div>
+          </div>
+
+          <div class="card" style="margin-top:64px"><div class="about"><h3>Hier ist der Titel 1</h3><p>Und hier kommt der Text, der ganz viel</p></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pros ok">
+    <div><b>Fixes</b><ul><li>One spacing scale, one gutter, one <code>h1</code></li><li>Right column gets a shared edge</li><li>Info card: 3 labelled facts, no white void</li><li>Description stops wearing the "invited" orange</li></ul></div>
+    <div><b>Leaves open</b><ul><li>You are asked to register before the facts are stated</li><li>CTA scrolls away on long agendas</li><li>Still no status / capacity / speakers section</li></ul></div>
+    <div><b>Effort</b><ul><li>CSS + small JSX moves only</li><li>No query changes</li><li>Safe for courses and degrees on the same pass</li></ul></div>
+  </div>
+</section>
+
+<!-- ============================ DIRECTION B ============================ -->
+<section class="block">
+  <h2 class="sec">5 · Direction B — Event-first hero</h2>
+  <p><span class="tag brand">medium risk</span><span class="tag">event-specific hero</span><span class="tag">kills the info card</span></p>
+  <p class="body">The hero answers the question. Title at hero scale with a fact strip — date, time, place, language,
+  status — directly under it, so on any device the first screen says <em>what, when, where</em>. The white info panel
+  disappears entirely; its contents were only ever those facts plus the organiser, who moves to a proper
+  <b>Speakers</b> section. Body becomes one wide column, and a slim sticky bar carries the CTA once the hero scrolls past.</p>
+
+  <div class="boards">
+    <div class="board">
+      <p class="board-label">B · Desktop 1280</p>
+      <div class="frame desktop">
+        <div class="photo" style="height:420px;display:flex;flex-direction:column;justify-content:space-between">
+          <div class="appbar">
+            <div class="logo"><span class="ring"></span><span>EDU<br>HUB</span></div>
+            <nav><span style="color:var(--label-2)">EN | <b style="color:#fff">DE</b></span>
+              <button class="pill dark">Anmelden</button><button class="pill white">Registrieren</button></nav>
+          </div>
+          <div class="container" style="padding-bottom:40px">
+            <div class="chiprow" style="margin-bottom:20px">
+              <span class="chip" style="background:var(--brand);border-color:var(--brand);color:#fff">Event</span>
+              <span class="chip">Noch 12 Plätze</span>
+            </div>
+            <h1 class="h1" style="margin-bottom:20px">Test Event Course</h1>
+            <p class="tagline" style="color:#fff;opacity:.92;margin-bottom:24px">Das hier ist die Kurzbeschreibung des Events</p>
+            <div class="chiprow">
+              <span class="chip"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/></svg>Fr 11.09. &amp; Fr 18.09.2026</span>
+              <span class="chip"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>19:00 – 23:00</span>
+              <span class="chip"><svg viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 1116 0z"/><circle cx="12" cy="10" r="3"/></svg>Starterkitchen, Kiel</span>
+              <span class="chip"><svg viewBox="0 0 24 24"><path d="M5 8h10M9 5v3M11 19l4-9 4 9M12.5 16h5.5"/><path d="M5 8c0 4 3 7 7 8"/></svg>Deutsch</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- sticky action bar (shown in its scrolled state) -->
+        <div class="stickybar">
+          <div><span class="t">Test Event Course</span> &nbsp;<span class="d">Fr 11.09.2026 · 19:00 · Kiel</span></div>
+          <div style="display:flex;align-items:center;gap:16px">
+            <span class="d">Anmeldeschluss 31.10.2026</span>
+            <button class="pill cta" style="font-size:14px;padding:11px 24px">Jetzt registrieren</button>
+          </div>
+        </div>
+
+        <div class="container" style="padding-top:96px;padding-bottom:96px;max-width:880px;margin-left:0">
+          <div class="about" style="margin-bottom:96px">
+            <h3 style="font-size:24px">Hier ist der Titel 1</h3>
+            <p>Und hier kommt der Text, der ganz viel</p>
+          </div>
+
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:24px;margin-bottom:32px">
+            <h2 class="sectitle">Programm</h2>
+            <button class="pill ghost sm">Zum Kalender hinzufügen</button>
+          </div>
+
+          <div class="day">
+            <div class="day-head">
+              <span class="day-date">Freitag, 11.09.2026</span>
+              <span class="day-place"><svg viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 1116 0z"/><circle cx="12" cy="10" r="3"/></svg><a href="#">Starterkitchen, Kuhnkestr. 6, 24118 Kiel</a></span>
+            </div>
+            <div class="rail">
+              <div class="slot next"><time>19:00 – 21:00</time><div><h4>Ankommen</h4><p>Wir heißen Euch bei einer Tasse Kaffee willkommen und würden uns über Freunde und Familie freuen.</p></div></div>
+              <div class="slot"><time>21:00 – 23:00</time><div><h4>Los gehts</h4></div></div>
+            </div>
+          </div>
+          <div class="day">
+            <div class="day-head">
+              <span class="day-date">Freitag, 18.09.2026</span>
+              <span class="day-place"><svg viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 1116 0z"/><circle cx="12" cy="10" r="3"/></svg><a href="#">Starterkitchen, Kuhnkestr. 6, 24118 Kiel</a></span>
+            </div>
+            <div class="rail"><div class="slot"><time>21:00 – 23:00</time><div><h4 class="untitled">Programmpunkt</h4></div></div></div>
+          </div>
+
+          <div style="margin-top:96px">
+            <h2 class="sectitle" style="margin-bottom:32px">Wer dabei ist</h2>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+              <div class="speaker"><span class="avatar"></span><div><b>Nina Petersen</b><span>Organisation</span></div></div>
+              <div class="speaker"><span class="avatar"></span><div><b>Jonas Reimer</b><span>Speaker · Ankommen</span></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="board">
+      <p class="board-label">B · Mobile 390</p>
+      <div class="frame mobile">
+        <div class="photo" style="min-height:420px;display:flex;flex-direction:column;justify-content:space-between">
+          <div class="appbar" style="height:60px;padding:0 24px">
+            <div class="logo" style="font-size:11px"><span class="ring" style="width:24px;height:24px"></span><span>EDU<br>HUB</span></div>
+            <button class="pill dark" style="padding:7px 14px;font-size:12px">Anmelden</button>
+          </div>
+          <div style="padding:0 24px 24px">
+            <div class="chiprow" style="margin-bottom:14px"><span class="chip" style="background:var(--brand);border-color:var(--brand);color:#fff">Event</span><span class="chip">Noch 12 Plätze</span></div>
+            <h1 class="h1 sm" style="margin-bottom:14px">Test Event Course</h1>
+            <p class="tagline" style="font-size:15px;color:#fff;opacity:.92;margin-bottom:18px">Das hier ist die Kurzbeschreibung des Events</p>
+            <div class="chiprow">
+              <span class="chip"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/></svg>Fr 11.09. &amp; 18.09.2026</span>
+              <span class="chip"><svg viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 1116 0z"/><circle cx="12" cy="10" r="3"/></svg>Kiel</span>
+              <span class="chip"><svg viewBox="0 0 24 24"><path d="M5 8h10M9 5v3M11 19l4-9 4 9M12.5 16h5.5"/><path d="M5 8c0 4 3 7 7 8"/></svg>Deutsch</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="padding:32px 24px 64px">
+          <button class="pill cta" style="width:100%">Jetzt registrieren</button>
+          <p class="deadline">Anmeldeschluss <b>31.10.2026</b></p>
+          <a class="guestlink" href="#">Ohne Konto anmelden</a>
+
+          <div class="about" style="margin-top:64px"><h3>Hier ist der Titel 1</h3><p>Und hier kommt der Text, der ganz viel</p></div>
+
+          <div style="margin-top:64px">
+            <h2 class="sectitle" style="font-size:24px;margin-bottom:32px">Programm</h2>
+            <button class="pill ghost sm" style="width:100%;margin-bottom:32px">Zum Kalender hinzufügen</button>
+            <div class="day">
+              <div class="day-head"><span class="day-date">Freitag, 11.09.2026</span></div>
+              <span class="day-place" style="display:block;margin:-8px 0 16px"><a href="#">Starterkitchen, Kuhnkestr. 6, 24118 Kiel</a></span>
+              <div class="rail">
+                <div class="slot next" style="grid-template-columns:1fr;gap:4px"><time>19:00 – 21:00</time><div><h4>Ankommen</h4><p>Wir heißen Euch bei einer Tasse Kaffee willkommen und würden uns über Freunde und Familie freuen.</p></div></div>
+                <div class="slot" style="grid-template-columns:1fr;gap:4px"><time>21:00 – 23:00</time><div><h4>Los gehts</h4></div></div>
+              </div>
+            </div>
+            <div class="day">
+              <div class="day-head"><span class="day-date">Freitag, 18.09.2026</span></div>
+              <div class="rail"><div class="slot" style="grid-template-columns:1fr;gap:4px"><time>21:00 – 23:00</time><div><h4 class="untitled">Programmpunkt</h4></div></div></div>
+            </div>
+          </div>
+
+          <div style="margin-top:64px">
+            <h2 class="sectitle" style="font-size:24px;margin-bottom:32px">Wer dabei ist</h2>
+            <div style="display:flex;flex-direction:column;gap:16px">
+              <div class="speaker"><span class="avatar"></span><div><b>Nina Petersen</b><span>Organisation</span></div></div>
+              <div class="speaker"><span class="avatar"></span><div><b>Jonas Reimer</b><span>Speaker · Ankommen</span></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="stickybar" style="padding:12px 24px">
+          <div><span class="d">Anmeldeschluss 31.10.</span></div>
+          <button class="pill cta" style="font-size:13px;padding:10px 20px">Registrieren</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pros ok">
+    <div><b>Fixes</b><ul><li>What / when / where in the first screen, every device</li><li>No duplicated date span — the hero states it once</li><li>Description promoted above the agenda</li><li>Speakers get one home</li><li>Sticky bar keeps the CTA reachable</li></ul></div>
+    <div><b>Costs</b><ul><li>Hero needs a per-program-type variant</li><li>Chips need a truncation rule for long addresses</li><li>Sticky bar is new shared chrome</li></ul></div>
+    <div><b>Effort</b><ul><li>New <code>EventHero</code> + <code>Speakers</code></li><li><code>InfoPanel</code> no longer used for events</li><li>Capacity chip needs <code>maxParticipants</code> exposed anonymously</li></ul></div>
+  </div>
+</section>
+
+<!-- ============================ DIRECTION C ============================ -->
+<section class="block">
+  <h2 class="sec">6 · Direction C — Sticky registration rail</h2>
+  <p><span class="tag brand">higher risk</span><span class="tag">conventional (Luma / Eventbrite)</span><span class="tag">best for conversion</span></p>
+  <p class="body">Content left, a single sticky card right. That card absorbs everything the current page scatters across
+  four fragments: CTA, deadline, guest link, facts, calendar export, share. It follows the scroll, so registration is
+  always one click away no matter how long the agenda. On mobile the rail collapses into one compact card directly under
+  the hero — which incidentally is also the fix for the "when/where is 1400px down" problem, without a bespoke hero.</p>
+
+  <div class="boards">
+    <div class="board">
+      <p class="board-label">C · Desktop 1280</p>
+      <div class="frame desktop">
+        <div class="photo" style="height:380px;display:flex;flex-direction:column;justify-content:space-between">
+          <div class="appbar">
+            <div class="logo"><span class="ring"></span><span>EDU<br>HUB</span></div>
+            <nav><span style="color:var(--label-2)">EN | <b style="color:#fff">DE</b></span>
+              <button class="pill dark">Anmelden</button><button class="pill white">Registrieren</button></nav>
+          </div>
+          <div class="container" style="padding-bottom:32px">
+            <div class="chiprow" style="margin-bottom:16px"><span class="chip" style="background:var(--brand);border-color:var(--brand);color:#fff">Event</span></div>
+            <h1 class="h1">Test Event Course</h1>
+          </div>
+        </div>
+
+        <div class="container" style="padding-top:64px;padding-bottom:96px">
+          <div style="display:grid;grid-template-columns:1fr 380px;gap:64px;align-items:start">
+
+            <!-- LEFT: content -->
+            <div>
+              <p class="tagline" style="margin-bottom:64px">Das hier ist die Kurzbeschreibung des Events</p>
+
+              <div class="about" style="margin-bottom:96px"><h3 style="font-size:22px">Hier ist der Titel 1</h3><p>Und hier kommt der Text, der ganz viel</p></div>
+
+              <h2 class="sectitle" style="margin-bottom:32px">Programm</h2>
+              <div class="day">
+                <div class="day-head">
+                  <span class="day-date">Freitag, 11.09.2026</span>
+                  <span class="day-place"><svg viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 1116 0z"/><circle cx="12" cy="10" r="3"/></svg><a href="#">Starterkitchen, Kuhnkestr. 6, 24118 Kiel</a></span>
+                </div>
+                <div class="rail">
+                  <div class="slot next"><time>19:00 – 21:00</time><div><h4>Ankommen</h4><p>Wir heißen Euch bei einer Tasse Kaffee willkommen und würden uns über Freunde und Familie freuen.</p></div></div>
+                  <div class="slot"><time>21:00 – 23:00</time><div><h4>Los gehts</h4></div></div>
+                </div>
+              </div>
+              <div class="day">
+                <div class="day-head">
+                  <span class="day-date">Freitag, 18.09.2026</span>
+                  <span class="day-place"><svg viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 1116 0z"/><circle cx="12" cy="10" r="3"/></svg><a href="#">Starterkitchen, Kuhnkestr. 6, 24118 Kiel</a></span>
+                </div>
+                <div class="rail"><div class="slot"><time>21:00 – 23:00</time><div><h4 class="untitled">Programmpunkt</h4></div></div></div>
+              </div>
+
+              <div style="margin-top:96px">
+                <h2 class="sectitle" style="margin-bottom:32px">Wer dabei ist</h2>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+                  <div class="speaker"><span class="avatar"></span><div><b>Nina Petersen</b><span>Organisation</span></div></div>
+                  <div class="speaker"><span class="avatar"></span><div><b>Jonas Reimer</b><span>Speaker · Ankommen</span></div></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- RIGHT: one sticky card -->
+            <aside class="sticky">
+              <div class="card light" style="padding:24px">
+                <dl class="factlist">
+                  <div class="fact">
+                    <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/></svg>
+                    <div><dt>Termine</dt><dd>Fr 11.09.2026 · 19:00<span class="muted">+ Fr 18.09.2026 · 21:00</span></dd></div>
+                  </div>
+                  <div class="fact">
+                    <svg viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 1116 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    <div><dt>Ort</dt><dd>Starterkitchen<span class="muted">Kuhnkestr. 6, 24118 Kiel</span></dd></div>
+                  </div>
+                  <div class="fact">
+                    <svg viewBox="0 0 24 24"><path d="M5 8h10M9 5v3M11 19l4-9 4 9M12.5 16h5.5"/><path d="M5 8c0 4 3 7 7 8"/></svg>
+                    <div><dt>Sprache</dt><dd>Deutsch</dd></div>
+                  </div>
+                  <div class="fact">
+                    <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 00-3-3.87"/></svg>
+                    <div><dt>Plätze</dt><dd>Noch 12 frei<span class="muted">von 40</span></dd></div>
+                  </div>
+                </dl>
+
+                <div class="divider light"></div>
+
+                <button class="pill cta" style="width:100%">Jetzt registrieren</button>
+                <p class="deadline" style="color:var(--on-light-2)">Anmeldeschluss <b style="color:var(--on-light)">31.10.2026</b></p>
+                <a class="guestlink" href="#" style="color:var(--brand-dark)">Ohne Konto anmelden</a>
+
+                <div class="divider light"></div>
+
+                <div style="display:flex;gap:8px">
+                  <button class="pill sm" style="flex:1;border:2px solid var(--light-border);background:transparent;color:var(--on-light)">Kalender</button>
+                  <button class="pill sm" style="flex:1;border:2px solid var(--light-border);background:transparent;color:var(--on-light)">Teilen</button>
+                </div>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="board">
+      <p class="board-label">C · Mobile 390</p>
+      <div class="frame mobile">
+        <div class="photo" style="height:280px;display:flex;flex-direction:column;justify-content:space-between">
+          <div class="appbar" style="height:60px;padding:0 24px">
+            <div class="logo" style="font-size:11px"><span class="ring" style="width:24px;height:24px"></span><span>EDU<br>HUB</span></div>
+            <button class="pill dark" style="padding:7px 14px;font-size:12px">Anmelden</button>
+          </div>
+          <div style="padding:0 24px 24px">
+            <div class="chiprow" style="margin-bottom:12px"><span class="chip" style="background:var(--brand);border-color:var(--brand);color:#fff">Event</span></div>
+            <h1 class="h1 sm">Test Event Course</h1>
+          </div>
+        </div>
+        <div style="padding:32px 24px 64px">
+          <p class="tagline" style="font-size:16px">Das hier ist die Kurzbeschreibung des Events</p>
+
+          <!-- the rail, collapsed -->
+          <div class="card light" style="margin-top:32px;padding:20px">
+            <dl class="factlist">
+              <div class="fact"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/></svg><div><dt>Termine</dt><dd>Fr 11.09.2026 · 19:00<span class="muted">+ Fr 18.09.2026 · 21:00</span></dd></div></div>
+              <div class="fact"><svg viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 1116 0z"/><circle cx="12" cy="10" r="3"/></svg><div><dt>Ort</dt><dd>Starterkitchen<span class="muted">Kuhnkestr. 6, 24118 Kiel</span></dd></div></div>
+              <div class="fact"><svg viewBox="0 0 24 24"><path d="M5 8h10M9 5v3M11 19l4-9 4 9M12.5 16h5.5"/><path d="M5 8c0 4 3 7 7 8"/></svg><div><dt>Sprache</dt><dd>Deutsch · Noch 12 Plätze</dd></div></div>
+            </dl>
+            <div class="divider light"></div>
+            <button class="pill cta" style="width:100%">Jetzt registrieren</button>
+            <p class="deadline" style="color:var(--on-light-2)">Anmeldeschluss <b style="color:var(--on-light)">31.10.2026</b></p>
+            <a class="guestlink" href="#" style="color:var(--brand-dark)">Ohne Konto anmelden</a>
+          </div>
+
+          <div class="about" style="margin-top:64px"><h3>Hier ist der Titel 1</h3><p>Und hier kommt der Text, der ganz viel</p></div>
+
+          <div style="margin-top:64px">
+            <h2 class="sectitle" style="font-size:24px;margin-bottom:32px">Programm</h2>
+            <button class="pill ghost sm" style="width:100%;margin-bottom:32px">Zum Kalender hinzufügen</button>
+            <div class="day">
+              <div class="day-head"><span class="day-date">Freitag, 11.09.2026</span></div>
+              <span class="day-place" style="display:block;margin:-8px 0 16px"><a href="#">Starterkitchen, Kuhnkestr. 6, 24118 Kiel</a></span>
+              <div class="rail">
+                <div class="slot next" style="grid-template-columns:1fr;gap:4px"><time>19:00 – 21:00</time><div><h4>Ankommen</h4><p>Wir heißen Euch bei einer Tasse Kaffee willkommen und würden uns über Freunde und Familie freuen.</p></div></div>
+                <div class="slot" style="grid-template-columns:1fr;gap:4px"><time>21:00 – 23:00</time><div><h4>Los gehts</h4></div></div>
+              </div>
+            </div>
+            <div class="day">
+              <div class="day-head"><span class="day-date">Freitag, 18.09.2026</span></div>
+              <div class="rail"><div class="slot" style="grid-template-columns:1fr;gap:4px"><time>21:00 – 23:00</time><div><h4 class="untitled">Programmpunkt</h4></div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pros ok">
+    <div><b>Fixes</b><ul><li>Everything registration-related in one object, with one edge</li><li>CTA never scrolls away</li><li>Facts above the agenda on mobile</li><li>Reuses the existing white <code>.light</code> card surface</li></ul></div>
+    <div><b>Costs</b><ul><li>Sticky behaviour needs care with short pages and <code>prefers-reduced-motion</code></li><li>The card grows tall for paid courses (price + add-ons)</li><li>Biggest change to <code>index.tsx</code>'s row structure</li></ul></div>
+    <div><b>Effort</b><ul><li><code>InfoPanel</code> → <code>RegistrationRail</code>, absorbing <code>Registration</code></li><li>Works unchanged for courses and degrees — the rail just lists different facts</li></ul></div>
+  </div>
+</section>
+
+<!-- ============================ RECOMMENDATION ============================ -->
+<section class="block">
+  <h2 class="sec">7 · Recommendation</h2>
+  <p class="body"><b>Ship A first, then C.</b> A is pure hygiene — the spacing scale, the single gutter, the
+  <code>&lt;h1&gt;</code>, the <code>items-center</code> fix — and every line of it benefits the course and degree pages
+  too, so it is the cheapest way to raise the floor across all program types. C is the structural answer: it solves
+  the "facts are below the agenda" problem <em>and</em> the "CTA scrolls away" problem with one component, and its rail
+  degrades naturally to the existing white card for non-events.</p>
+  <p class="body">B's hero fact-strip is the most striking of the three, but it buys the least that C doesn't already
+  buy, at the cost of a second hero variant to maintain. Worth keeping in the drawer as a follow-up for
+  high-profile events (Coding.Waterkant and friends), where a full-bleed hero with the date in it earns its keep.</p>
+  <p class="body">Independent of the direction, four things should be fixed regardless:
+  <b>(1)</b> the missing <code>&lt;h1&gt;</code>, <b>(2)</b> the description block's use of the <code>invited</code>
+  status orange, <b>(3)</b> a registration deadline that may fall after the event ends, and <b>(4)</b> the untitled
+  session rendering as an empty row.</p>
+</section>
+
+</div>
+</body>
+</html>
