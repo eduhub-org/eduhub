@@ -260,6 +260,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
         if (!result?.success) {
           throw new Error(result?.messageKey || 'IMAGE_REMOVE_ERROR');
         }
+        setShowSavedNotification(true);
       } else {
         await updateFile({
           variables: {
@@ -493,8 +494,8 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
             aria-label={accessibleLabel}
             className={prioritizeClasses(className)}
             style={{
-              width: 36,
-              height: 36,
+              width: 44,
+              height: 44,
               border: '1px solid rgba(0,0,0,0.15)',
               padding: imageUrl ? 0 : undefined,
               overflow: 'hidden',
@@ -560,7 +561,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
               </div>
             )}
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center' }}>
-              <Button size="small" variant="outlined" onClick={handleIconClick} disabled={isUploading}>
+              <Button size="small" variant="outlined" onClick={handleIconClick} disabled={isUploading || isRemoving}>
                 {imageUrl ? t('image_uploader.change_logo') : t('image_uploader.upload_new_logo')}
               </Button>
               {imageUrl && (
@@ -569,7 +570,13 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
                 </Button>
               )}
               {imageUrl && (
-                <Button size="small" variant="outlined" color="error" onClick={handleRemoveImage} disabled={isRemoving}>
+                <Button
+                  size="small"
+                  variant="outlined"
+                  color="error"
+                  onClick={handleRemoveImage}
+                  disabled={isUploading || isRemoving}
+                >
                   {t('image_uploader.remove_logo')}
                 </Button>
               )}

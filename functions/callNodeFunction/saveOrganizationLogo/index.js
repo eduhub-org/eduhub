@@ -1,6 +1,8 @@
 import { GraphQLClient, gql } from 'graphql-request';
+import { Storage } from '@google-cloud/storage';
 
 import saveImage from '../saveImage/index.js';
+import { buildCloudStorage } from '../lib/cloud-storage.js';
 import { authorizeOrganizationLogoChange } from '../lib/organizationLogoAuthorization.js';
 
 /**
@@ -35,6 +37,27 @@ const SET_ORGANIZATION_LOGO = gql`
     }
   }
 `;
+
+// Best-effort: if the upload succeeded but the column write didn't (the
+// organization was deleted concurrently, or the mutation threw), the just-
+// uploaded objects would otherwise be orphaned in storage forever. A failure
+// here is logged, never thrown -- it must not turn a real persistence error
+// into a different, more confusing one.
+const cleanUpOrphanedUpload = async (req, logger, uploadResult) => {
+  try {
+    const storage = buildCloudStorage(Storage);
+    const bucketName = req.headers.bucket;
+    await storage.deleteFile(uploadResult.filePath, bucketName);
+    await Promise.all(
+      (uploadResult.resizedPaths ?? []).map((resized) => storage.deleteFile(resized.filePath, bucketName))
+    );
+  } catch (cleanupError) {
+    logger.error('Failed to clean up orphaned organization logo upload', {
+      error: cleanupError.message,
+      filePath: uploadResult.filePath,
+    });
+  }
+};
 
 export default async function saveOrganizationLogo(req, logger) {
   logger.info('########## Save Organization Logo ##########');
@@ -72,7 +95,31 @@ export default async function saveOrganizationLogo(req, logger) {
       return uploadResult;
     }
 
-    await client.request(SET_ORGANIZATION_LOGO, { organizationId, logo: uploadResult.filePath });
+    let persisted;
+    try {
+      persisted = await client.request(SET_ORGANIZATION_LOGO, { organizationId, logo: uploadResult.filePath });
+    } catch (persistError) {
+      logger.error('Failed to persist organization logo', { error: persistError.message, organizationId });
+      await cleanUpOrphanedUpload(req, logger, uploadResult);
+      return {
+        success: false,
+        messageKey: 'IMAGE_SAVE_ERROR',
+        error: 'An error occurred while saving the image',
+      };
+    }
+
+    // A null result (organization deleted concurrently, or no row matched the
+    // primary key) means nothing was actually persisted -- the upload
+    // succeeded, but the column write is not "success" the caller can trust.
+    if (!persisted?.update_Organization_by_pk) {
+      logger.error('Organization not found when persisting logo', { organizationId });
+      await cleanUpOrphanedUpload(req, logger, uploadResult);
+      return {
+        success: false,
+        messageKey: 'ORGANIZATION_NOT_FOUND',
+        error: 'Organization not found',
+      };
+    }
 
     return uploadResult;
   } catch (error) {

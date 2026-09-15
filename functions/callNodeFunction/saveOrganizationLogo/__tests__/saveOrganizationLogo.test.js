@@ -8,6 +8,7 @@ const mockLogger = {
 };
 
 const logoRequest = (sessionVariables, organizationid = 7) => ({
+  headers: { bucket: 'test-bucket' },
   body: {
     session_variables: sessionVariables,
     input: { base64file: 'aGVsbG8=', filename: 'logo.png', organizationid },
@@ -23,6 +24,7 @@ describe('saveOrganizationLogo', () => {
   let saveOrganizationLogo;
   let saveImageMock;
   let requestMock;
+  let deleteFileMock;
 
   beforeAll(async () => {
     saveImageMock = jest.fn(async () => ({
@@ -40,6 +42,10 @@ describe('saveOrganizationLogo', () => {
         })),
       };
     });
+    jest.unstable_mockModule('@google-cloud/storage', () => ({ Storage: jest.fn() }));
+    jest.unstable_mockModule('../../lib/cloud-storage.js', () => ({
+      buildCloudStorage: () => ({ deleteFile: (...args) => deleteFileMock(...args) }),
+    }));
 
     const module = await import('../index.js');
     saveOrganizationLogo = module.default;
@@ -51,6 +57,7 @@ describe('saveOrganizationLogo', () => {
     process.env.HASURA_ENDPOINT = 'https://test.hasura.app/v1/graphql';
     process.env.HASURA_ADMIN_SECRET = 'test-secret';
     requestMock = jest.fn(async () => ({ update_Organization_by_pk: { id: 7, logo: null } }));
+    deleteFileMock = jest.fn().mockResolvedValue(undefined);
   });
 
   it('uploads and persists for a super-admin without looking for a grant', async () => {
@@ -153,5 +160,48 @@ describe('saveOrganizationLogo', () => {
 
     expect(result).toMatchObject({ success: false, messageKey: 'IMAGE_SAVE_ERROR' });
     expect(requestMock).not.toHaveBeenCalled();
+  });
+
+  it('cleans up the upload and fails when the persisting mutation throws', async () => {
+    saveImageMock.mockResolvedValue({
+      success: true,
+      filePath: 'organizations/org-7/public/logo/logo.png',
+      resizedPaths: [{ size: 64, filePath: 'organizations/org-7/public/logo/logo-64.webp' }],
+    });
+    requestMock = jest.fn().mockRejectedValue(new Error('connection reset'));
+
+    const result = await saveOrganizationLogo(
+      logoRequest({ 'x-hasura-user-id': 'user-1', 'x-hasura-role': 'admin' }),
+      mockLogger
+    );
+
+    expect(result).toMatchObject({ success: false, messageKey: 'IMAGE_SAVE_ERROR' });
+    expect(deleteFileMock).toHaveBeenCalledWith('organizations/org-7/public/logo/logo.png', 'test-bucket');
+    expect(deleteFileMock).toHaveBeenCalledWith('organizations/org-7/public/logo/logo-64.webp', 'test-bucket');
+  });
+
+  it('cleans up the upload and fails when the organization no longer exists', async () => {
+    saveImageMock.mockResolvedValue({ success: true, filePath: 'organizations/org-7/public/logo/logo.png' });
+    requestMock = jest.fn().mockResolvedValue({ update_Organization_by_pk: null });
+
+    const result = await saveOrganizationLogo(
+      logoRequest({ 'x-hasura-user-id': 'user-1', 'x-hasura-role': 'admin' }),
+      mockLogger
+    );
+
+    expect(result).toMatchObject({ success: false, messageKey: 'ORGANIZATION_NOT_FOUND' });
+    expect(deleteFileMock).toHaveBeenCalledWith('organizations/org-7/public/logo/logo.png', 'test-bucket');
+  });
+
+  it('does not fail the request when cleanup itself throws', async () => {
+    requestMock = jest.fn().mockRejectedValue(new Error('connection reset'));
+    deleteFileMock = jest.fn().mockRejectedValue(new Error('storage unavailable'));
+
+    const result = await saveOrganizationLogo(
+      logoRequest({ 'x-hasura-user-id': 'user-1', 'x-hasura-role': 'admin' }),
+      mockLogger
+    );
+
+    expect(result).toMatchObject({ success: false, messageKey: 'IMAGE_SAVE_ERROR' });
   });
 });
