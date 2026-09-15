@@ -211,7 +211,7 @@ export const useRegistrationHandler = ({
         if (result.data?.insert_CourseEnrollment?.affected_rows && result.data.insert_CourseEnrollment.affected_rows > 0) {
           trackEvent('Registration: Completed', {
             courseId: course.id,
-            status: status === CourseEnrollmentStatus_enum.WAITLIST ? 'waitlist' : 'confirmed',
+            status: status.toLowerCase(),
           });
           onSuccess?.({ waitlist: status === CourseEnrollmentStatus_enum.WAITLIST });
           return {
