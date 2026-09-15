@@ -6,6 +6,7 @@ import SettingsSidebar from './SettingsSidebar';
 import { SETTINGS_NAV_GROUPS, SETTINGS_NAV_ITEMS, SettingsNavItemId } from './config';
 import { canAccessSettingsItem, useSettingsCapabilities } from './access';
 import { useIsOrgAdmin } from '../../../hooks/authentication';
+import { useOrgAdminCapabilities } from '../../../hooks/orgAdminCapabilities';
 
 type SettingsLayoutProps = {
   children: ReactNode;
@@ -18,6 +19,7 @@ const SettingsLayout: FC<SettingsLayoutProps> = ({ children, activeItemId }) => 
   const router = useRouter();
   const capabilities = useSettingsCapabilities();
   const isOrgAdmin = useIsOrgAdmin();
+  const { canManageSettings } = useOrgAdminCapabilities();
   const activeItem = activeItemId ? SETTINGS_NAV_ITEMS[activeItemId] : undefined;
 
   const handleMobileNavChange = (value: string) => {
@@ -26,7 +28,7 @@ const SettingsLayout: FC<SettingsLayoutProps> = ({ children, activeItemId }) => 
       return;
     }
     const item = SETTINGS_NAV_ITEMS[value as SettingsNavItemId];
-    if (!item || !canAccessSettingsItem(item, capabilities, isOrgAdmin) || item.status === 'soon') {
+    if (!item || !canAccessSettingsItem(item, capabilities, isOrgAdmin, canManageSettings) || item.status === 'soon') {
       return;
     }
     router.push(item.href);
@@ -48,7 +50,9 @@ const SettingsLayout: FC<SettingsLayoutProps> = ({ children, activeItemId }) => 
           {SETTINGS_NAV_GROUPS.map((group) => {
             const visibleItems = group.items.filter((itemId) => {
               const item = SETTINGS_NAV_ITEMS[itemId];
-              return canAccessSettingsItem(item, capabilities, isOrgAdmin) && item.status !== 'soon';
+              return (
+                canAccessSettingsItem(item, capabilities, isOrgAdmin, canManageSettings) && item.status !== 'soon'
+              );
             });
 
             if (visibleItems.length === 0) {
