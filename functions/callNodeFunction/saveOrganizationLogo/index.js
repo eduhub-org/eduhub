@@ -1,9 +1,11 @@
 import { GraphQLClient, gql } from 'graphql-request';
 
 import saveImage from '../saveImage/index.js';
+import { authorizeOrganizationLogoChange } from '../lib/organizationLogoAuthorization.js';
 
 /**
- * Uploads an organization's logo, for the people entitled to change it.
+ * Uploads an organization's logo, for the people entitled to change it, and
+ * persists the resulting path onto Organization.logo itself.
  *
  * This action used to point straight at the generic saveImage handler, which
  * has no notion of who owns the target path: the only gate was the action
@@ -13,26 +15,23 @@ import saveImage from '../saveImage/index.js';
  * hands the org_admin role to members of the public, so "any org admin" is no
  * longer a safe audience for an unchecked write.
  *
- * The rule enforced here is the one that already governs the `logo` column on
- * Organization: canManageSettings for that organization. A job-only grant, the
- * kind a StuJo claim produces, does not qualify.
+ * The column write also happens here rather than in a follow-up client
+ * mutation against Organization: a StuJo request's session role is `user`,
+ * which carries no Hasura update permission on Organization at all, and even
+ * under `org_admin` the column's update permission requires canManageSettings
+ * unconditionally — it cannot express the job-offer-only fallback below. This
+ * handler already holds an admin-secret client for the authorization check,
+ * so it writes the column with the same client instead of asking the caller
+ * to make a second request Hasura may or may not let through.
  *
- * Authorization has to live in the handler because Hasura action permissions
- * are role-level only and cannot express "this organization" — the same reason
- * publishJobPosting and archiveJobPosting check their grant themselves.
+ * See authorizeOrganizationLogoChange for the authorization rule itself.
  */
 
-const GET_SETTINGS_GRANT = gql`
-  query GetOrganizationSettingsGrant($organizationId: Int!, $userId: uuid!) {
-    OrganizationAdmin(
-      where: {
-        organizationId: { _eq: $organizationId }
-        userId: { _eq: $userId }
-        canManageSettings: { _eq: true }
-      }
-      limit: 1
-    ) {
+const SET_ORGANIZATION_LOGO = gql`
+  mutation SetOrganizationLogo($organizationId: Int!, $logo: String) {
+    update_Organization_by_pk(pk_columns: { id: $organizationId }, _set: { logo: $logo }) {
       id
+      logo
     }
   }
 `;
@@ -53,35 +52,29 @@ export default async function saveOrganizationLogo(req, logger) {
       };
     }
 
-    if (sessionRole !== 'admin') {
-      if (!sessionUserId) {
-        return {
-          success: false,
-          messageKey: 'UNAUTHORIZED',
-          error: 'Missing authenticated session user',
-        };
-      }
+    const client = new GraphQLClient(process.env.HASURA_ENDPOINT, {
+      headers: { 'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET },
+    });
 
-      const client = new GraphQLClient(process.env.HASURA_ENDPOINT, {
-        headers: { 'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET },
-      });
-      const data = await client.request(GET_SETTINGS_GRANT, {
-        organizationId,
-        userId: sessionUserId,
-      });
-
-      if (!data?.OrganizationAdmin?.length) {
-        return {
-          success: false,
-          messageKey: 'UNAUTHORIZED',
-          error: 'Not authorized to change this organization\'s logo',
-        };
-      }
+    const authorization = await authorizeOrganizationLogoChange(client, {
+      sessionUserId,
+      sessionRole,
+      organizationId,
+    });
+    if (!authorization.authorized) {
+      return { success: false, messageKey: 'UNAUTHORIZED', error: authorization.reason };
     }
 
     // The path template, bucket and sizes still come from the action headers, so
     // the storage layout stays declared in the metadata next to the other uploads.
-    return await saveImage(req);
+    const uploadResult = await saveImage(req);
+    if (!uploadResult?.success) {
+      return uploadResult;
+    }
+
+    await client.request(SET_ORGANIZATION_LOGO, { organizationId, logo: uploadResult.filePath });
+
+    return uploadResult;
   } catch (error) {
     logger.error('Error in saveOrganizationLogo', { error: error.message, stack: error.stack });
     return {

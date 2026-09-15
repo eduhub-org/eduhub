@@ -1,27 +1,62 @@
 import React, { useState, useCallback, useRef } from 'react';
 import { DocumentNode } from 'graphql';
+import { gql } from '@apollo/client';
 import { useTheme } from '@mui/material/styles';
 import Tooltip from '@mui/material/Tooltip';
 import { HelpOutline, CloudUpload } from '@mui/icons-material';
 import Button from '@mui/material/Button';
+import Popover from '@mui/material/Popover';
+import Dialog from '@mui/material/Dialog';
 import { useRoleMutation } from '../../hooks/authedMutation';
 import { useTranslations } from 'next-intl';
 import { prioritizeClasses } from '../../helpers/util';
 import { AlertMessageDialog } from '../common/dialogs/AlertMessageDialog';
 import Snackbar from '@mui/material/Snackbar';
 import { IconButton } from '@mui/material';
-import { MdPhotoCamera } from 'react-icons/md';
-import { SAVE_USER_PROFILE_IMAGE, SAVE_ORGANIZATION_LOGO } from '../../queries/actions';
+import { MdPhotoCamera, MdClose } from 'react-icons/md';
+import { SAVE_USER_PROFILE_IMAGE, SAVE_ORGANIZATION_LOGO, REMOVE_ORGANIZATION_LOGO } from '../../queries/actions';
 import { useSession } from 'next-auth/react';
 import { getPublicUrl } from '../../helpers/filehandling';
+
+// Apollo's useMutation needs a document even when it will never actually be
+// called: organizationLogo persists through the save/removeOrganizationLogo
+// actions themselves (see their handlers), so callers for that element pass
+// no updateFileMutation at all. Keeping the hook call unconditional (rather
+// than skipping it) keeps hook order stable across renders.
+const NOOP_UPDATE_FILE_MUTATION = gql`
+  mutation NoopImageUploaderUpdateFile {
+    __typename
+  }
+`;
+
+// Friendly copy for the messageKeys the organizationLogo actions return.
+// Those keys (UNAUTHORIZED, IMAGE_SAVE_ERROR, ...) are not translation paths
+// themselves, unlike the profilePicture path's keys below.
+const LOGO_ERROR_MESSAGE_KEYS: Record<string, string> = {
+  UNAUTHORIZED: 'image_uploader.logo_permission_denied',
+  IMAGE_SAVE_ERROR: 'image_uploader.upload_error',
+  IMAGE_REMOVE_ERROR: 'image_uploader.remove_image_error',
+  INVALID_INPUT: 'image_uploader.upload_error',
+};
+
+const resolveLogoErrorMessage = (t: (key: string) => string, messageKey?: string): string =>
+  t(LOGO_ERROR_MESSAGE_KEYS[messageKey ?? ''] ?? 'image_uploader.upload_error');
 
 type ImageUploaderProps = {
   variant: 'material' | 'eduhub';
   element?: 'profilePicture' | 'organizationLogo' | 'default';
+  // 'trigger' renders a compact button (for placement next to e.g. a picker) that
+  // opens a popover with the same controls, instead of the permanently inlined
+  // upload field. Only meaningful for element === 'organizationLogo'.
+  layout?: 'inline' | 'trigger';
+  // Accessible label for the trigger button; falls back to `label`.
+  triggerLabel?: string;
   label?: string;
   identifierVariables: Record<string, any>;
   currentFile: string | null;
-  updateFileMutation: DocumentNode;
+  // Not needed for organizationLogo: the save/removeOrganizationLogo actions
+  // persist the column themselves. Still required for profilePicture/default.
+  updateFileMutation?: DocumentNode;
   onFileUpdated?: (data: any) => void;
   refetchQueries?: string[];
   helpText?: string;
@@ -35,6 +70,8 @@ type ImageUploaderProps = {
 const ImageUploader: React.FC<ImageUploaderProps> = ({
   variant,
   element = 'profilePicture',
+  layout = 'inline',
+  triggerLabel,
   label,
   identifierVariables,
   currentFile,
@@ -54,10 +91,12 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isErrorDialogOpen, setIsErrorDialogOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [triggerAnchorEl, setTriggerAnchorEl] = useState<HTMLElement | null>(null);
+  const [isFullSizeOpen, setIsFullSizeOpen] = useState(false);
 
   const theme = useTheme();
 
-  const [updateFile] = useRoleMutation(updateFileMutation, {
+  const [updateFile] = useRoleMutation(updateFileMutation ?? NOOP_UPDATE_FILE_MUTATION, {
     onError: (error) => {
       console.error('Update file error:', error);
       handleError(t(error.message));
@@ -84,6 +123,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
   const { data: sessionData } = useSession();
   const [saveUserProfileImage] = useRoleMutation(SAVE_USER_PROFILE_IMAGE);
   const [saveOrganizationLogo] = useRoleMutation(SAVE_ORGANIZATION_LOGO);
+  const [removeOrganizationLogo] = useRoleMutation(REMOVE_ORGANIZATION_LOGO);
 
   const handleError = useCallback((message: string) => {
     setErrorMessage(message);
@@ -152,12 +192,11 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
             const uploadResult = saveResult.data?.saveOrganizationLogo;
 
             if (uploadResult?.success) {
-              await updateFile({
-                variables: {
-                  ...identifierVariables,
-                  logo: uploadResult.filePath,
-                },
-              });
+              // saveOrganizationLogo persists Organization.logo itself (see its
+              // handler): a caller here may only hold the job-offer-only
+              // fallback, which has no Hasura update permission to fall back to.
+              if (onFileUpdated) onFileUpdated({ logo: uploadResult.filePath });
+              setShowSavedNotification(true);
             } else {
               throw new Error(uploadResult?.messageKey || 'IMAGE_SAVE_ERROR');
             }
@@ -167,7 +206,12 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
           setIsUploading(false);
         } catch (error) {
           console.error('File upload error:', error);
-          handleError(t(error instanceof Error ? error.message : 'IMAGE_SAVE_ERROR'));
+          const messageKey = error instanceof Error ? error.message : undefined;
+          handleError(
+            element === 'organizationLogo'
+              ? resolveLogoErrorMessage(t, messageKey)
+              : t(messageKey || 'IMAGE_SAVE_ERROR')
+          );
           setIsUploading(false);
         }
       }
@@ -181,6 +225,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
       element,
       saveUserProfileImage,
       saveOrganizationLogo,
+      onFileUpdated,
       sessionData,
     ]
   );
@@ -206,12 +251,15 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
           },
         });
       } else if (element === 'organizationLogo') {
-        await updateFile({
-          variables: {
-            ...identifierVariables,
-            logo: null,
-          },
+        // removeOrganizationLogo persists Organization.logo itself, same
+        // reason as the save path above.
+        const removeResult = await removeOrganizationLogo({
+          variables: { organizationId: identifierVariables.organizationId },
         });
+        const result = removeResult.data?.removeOrganizationLogo;
+        if (!result?.success) {
+          throw new Error(result?.messageKey || 'IMAGE_REMOVE_ERROR');
+        }
       } else {
         await updateFile({
           variables: {
@@ -227,10 +275,15 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
       setIsRemoving(false);
     } catch (error) {
       console.error('Remove image error:', error);
-      handleError(t('image_uploader.remove_image_error'));
+      const messageKey = error instanceof Error ? error.message : undefined;
+      handleError(
+        element === 'organizationLogo'
+          ? resolveLogoErrorMessage(t, messageKey)
+          : t('image_uploader.remove_image_error')
+      );
       setIsRemoving(false);
     }
-  }, [updateFile, identifierVariables, element, onFileUpdated, handleError, t]);
+  }, [updateFile, removeOrganizationLogo, identifierVariables, element, onFileUpdated, handleError, t]);
 
   const renderImageUpload = (
     imageUrl: string | null,
@@ -405,6 +458,157 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
     </div>
   );
 
+  const handleTriggerClick = useCallback((event: React.MouseEvent<HTMLElement>) => {
+    setTriggerAnchorEl(event.currentTarget);
+  }, []);
+
+  const handleTriggerClose = useCallback(() => {
+    setTriggerAnchorEl(null);
+  }, []);
+
+  const handleOpenFullSize = useCallback(() => {
+    setIsFullSizeOpen(true);
+  }, []);
+
+  const handleCloseFullSize = useCallback(() => {
+    setIsFullSizeOpen(false);
+  }, []);
+
+  // Compact affordance for placement next to e.g. an organization picker: a small
+  // button showing the current logo (or a placeholder) that opens a popover with
+  // the same change/remove controls as renderOrganizationLogo, plus a full-size
+  // preview. Used by StuJo's organization switcher; the expandable settings row
+  // keeps the permanently inlined renderOrganizationLogo above.
+  const renderOrganizationLogoTrigger = () => {
+    const imageUrl = currentFile ? getPublicUrl(currentFile) : null;
+    const accessibleLabel = triggerLabel || label || t('image_uploader.organization_logo');
+    const isPopoverOpen = Boolean(triggerAnchorEl);
+
+    return (
+      <>
+        <Tooltip title={accessibleLabel} placement="bottom">
+          <IconButton
+            onClick={handleTriggerClick}
+            size="small"
+            aria-label={accessibleLabel}
+            className={prioritizeClasses(className)}
+            style={{
+              width: 36,
+              height: 36,
+              border: '1px solid rgba(0,0,0,0.15)',
+              padding: imageUrl ? 0 : undefined,
+              overflow: 'hidden',
+            }}
+          >
+            {imageUrl ? (
+              <img
+                src={imageUrl}
+                alt={accessibleLabel}
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              />
+            ) : (
+              <MdPhotoCamera size="1.25em" />
+            )}
+          </IconButton>
+        </Tooltip>
+        <Popover
+          open={isPopoverOpen}
+          anchorEl={triggerAnchorEl}
+          onClose={handleTriggerClose}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+          transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+        >
+          <div
+            style={{
+              padding: 16,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 12,
+              alignItems: 'center',
+              minWidth: 200,
+            }}
+          >
+            {label && <div style={{ fontWeight: 600, fontSize: '0.85rem' }}>{label}</div>}
+            {imageUrl ? (
+              <img
+                src={imageUrl}
+                alt={accessibleLabel}
+                onClick={handleOpenFullSize}
+                style={{
+                  width: 96,
+                  height: 96,
+                  objectFit: 'cover',
+                  borderRadius: 8,
+                  cursor: 'zoom-in',
+                  border: '1px solid rgba(0,0,0,0.15)',
+                }}
+              />
+            ) : (
+              <div
+                style={{
+                  width: 96,
+                  height: 96,
+                  borderRadius: 8,
+                  background: 'rgba(0,0,0,0.05)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: theme.palette.text.disabled,
+                }}
+              >
+                <MdPhotoCamera size="2em" />
+              </div>
+            )}
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center' }}>
+              <Button size="small" variant="outlined" onClick={handleIconClick} disabled={isUploading}>
+                {imageUrl ? t('image_uploader.change_logo') : t('image_uploader.upload_new_logo')}
+              </Button>
+              {imageUrl && (
+                <Button size="small" variant="outlined" onClick={handleOpenFullSize}>
+                  {t('image_uploader.view_full_size')}
+                </Button>
+              )}
+              {imageUrl && (
+                <Button size="small" variant="outlined" color="error" onClick={handleRemoveImage} disabled={isRemoving}>
+                  {t('image_uploader.remove_logo')}
+                </Button>
+              )}
+            </div>
+            {isUploading && <div className="text-sm text-blue-600">{t('image_uploader.uploading')}...</div>}
+            {isRemoving && <div className="text-sm text-red-600">{t('image_uploader.removing')}...</div>}
+          </div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept={acceptedFileTypes}
+            onChange={handleFileChange}
+            style={{ display: 'none' }}
+            id="organization-logo-trigger-input"
+          />
+        </Popover>
+        {imageUrl && (
+          <Dialog open={isFullSizeOpen} onClose={handleCloseFullSize} maxWidth="md">
+            <div style={{ position: 'relative' }}>
+              <IconButton
+                onClick={handleCloseFullSize}
+                aria-label={t('image_uploader.close')}
+                size="small"
+                style={{ position: 'absolute', top: 8, right: 8, background: 'rgba(255,255,255,0.85)' }}
+              >
+                <MdClose />
+              </IconButton>
+              <img
+                src={imageUrl}
+                alt={accessibleLabel}
+                style={{ display: 'block', maxWidth: '100%', maxHeight: '80vh' }}
+              />
+            </div>
+          </Dialog>
+        )}
+      </>
+    );
+  };
+
   const renderMaterialUI = () => (
     <div className="col-span-10 flex flex-col mt-3">
       {label && <label className="mb-2">{label}</label>}
@@ -435,7 +639,9 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
     <>
       {variant === 'material'
         ? element === 'organizationLogo'
-          ? renderOrganizationLogo()
+          ? layout === 'trigger'
+            ? renderOrganizationLogoTrigger()
+            : renderOrganizationLogo()
           : renderMaterialUI()
         : renderEduhub()}
       {isErrorDialogOpen && (
