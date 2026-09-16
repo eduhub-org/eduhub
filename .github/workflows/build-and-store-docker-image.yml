@@ -37,6 +37,9 @@ on:
         type: string
       # Element web client URL — must be set at docker build time for Next.js client bundle
       NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL:
+        required: false
+        type: string
+      # Matrix server name — must be set at docker build time for Next.js client bundle
       NEXT_PUBLIC_MATRIX_SERVER_NAME:
         required: false
         type: string
