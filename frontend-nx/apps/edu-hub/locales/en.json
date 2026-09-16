@@ -1342,6 +1342,7 @@
   "manageCourse": {
     "description": "Description",
     "sessions": "Dates",
+    "programme": "Programme",
     "applications": "Applications",
     "registrations": "Registrations",
     "registrations_and_payments": "Registrations and Payments",
@@ -1366,6 +1367,7 @@
     "add_as_applied": "add or change as applied",
     "add_as_invited": "add or change as invited",
     "add_as_aborted": "add or change as aborted",
+    "add_as_cancelled": "add or change as cancelled",
     "add_user_error": "Please select at least one user!",
     "submit": "Submit",
     "application_history": {
@@ -1386,6 +1388,7 @@
       "collapse_selected_rows": "Collapse Selected Rows",
       "email_selected": "Email Selected",
       "email_all_confirmed": "Email all Confirmed",
+      "email_all_cancelled": "Email all Cancelled",
       "email_all_invited": "Email all Invited",
       "email_all_applied": "Email all Applied",
       "email_all_rejected": "Email all Rejected",
@@ -1455,8 +1458,8 @@
     "statistics_applications_accepted": "Accepted Applications",
     "statistics_invitations_total": "Total Invitations",
     "statistics_invitations_confirmed": "Confirmed Invitations",
-    "statistics_registrations_total": "Total Registrations",
     "statistics_registrations_confirmed": "Confirmed Registrations",
+    "statistics_registrations_cancelled": "Cancelled Registrations",
     "payment_status": "Payment",
     "payment_status_values": {
       "NONE": "None",

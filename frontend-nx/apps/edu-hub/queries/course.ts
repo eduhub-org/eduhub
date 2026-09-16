@@ -143,6 +143,13 @@ export const MANAGED_COURSE_APPLICATIONS = gql`
           count
         }
       }
+      CancelledCourseEnrollments: CourseEnrollments_aggregate(
+        where: { status: { _in: [CANCELLED, ABORTED] } }
+      ) {
+        aggregate {
+          count
+        }
+      }
     }
   }
 `;
