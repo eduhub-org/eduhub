@@ -35,17 +35,17 @@ See the sections in **`.env.example`** (Matrix, Formbricks, Stripe, Ghost, and *
 
 Normal `docker compose up` explicitly binds the development services to
 `127.0.0.1`. This preserves the safe default even if Docker Desktop's global
-port-binding setting changes. For an authenticated phone preview, pass the
-Mac's Tailscale IPv4 address to the helper:
+port-binding setting changes. For an authenticated phone preview, connect the
+Mac to Tailscale and run the helper:
 
 ```bash
-scripts/start-network-preview.sh 100.x.y.z
+scripts/start-network-preview.sh
 ```
 
 Open `http://<address>:5000` for EduHub or `http://<address>:5001` for StuJo.
-The helper rejects non-Tailscale and non-local addresses, binds only EduHub,
-StuJo, file storage, Hasura, and Keycloak to that Tailnet interface, and uses
-the standard `myadminsecretkey` development Hasura secret. Traffic between
+The helper detects the Mac's IPv4 address through the Tailscale CLI, binds only
+EduHub, StuJo, file storage, Hasura, and Keycloak to that Tailnet interface, and
+uses the standard `myadminsecretkey` development Hasura secret. Traffic between
 Tailnet devices is encrypted even though the disposable development services
 use HTTP.
 
@@ -55,9 +55,9 @@ helper returns after both servers report that they are ready. Hasura starts
 independently and may still be applying migrations, metadata, or seeds when the
 helper returns.
 
-The helper takes only the Tailscale address and manages the detached, staged
-startup itself. Additional Docker Compose options are rejected because they
-cannot be applied safely to every startup stage.
+The helper takes no arguments and manages the detached, staged startup itself.
+Docker Compose options are rejected because they cannot be applied safely to
+every startup stage.
 
 Running ordinary `docker compose up -d` afterward restores localhost-only
 bindings and Keycloak's `external` SSL requirement. Compose detects and

@@ -1,12 +1,32 @@
 #!/bin/sh
 set -eu
 
-if [ "$#" -ne 1 ]; then
-  echo "Usage: $0 <Tailscale-IPv4>" >&2
+if [ "$#" -ne 0 ]; then
+  echo "Usage: $0" >&2
   exit 1
 fi
 
-dev_host=$1
+if command -v tailscale >/dev/null 2>&1; then
+  tailscale_command=tailscale
+elif [ -x /Applications/Tailscale.app/Contents/MacOS/Tailscale ]; then
+  tailscale_command=/Applications/Tailscale.app/Contents/MacOS/Tailscale
+else
+  echo "Tailscale CLI is required to detect this machine's preview address." >&2
+  exit 1
+fi
+
+if ! dev_host=$(TAILSCALE_BE_CLI=1 "$tailscale_command" ip -4); then
+  echo "Could not detect this machine's Tailscale IPv4 address." >&2
+  exit 1
+fi
+
+case "$dev_host" in
+  ''|*'
+'*)
+    echo "Expected exactly one Tailscale IPv4 address." >&2
+    exit 1
+    ;;
+esac
 
 if ! printf '%s\n' "$dev_host" | awk -F. '
   NF != 4 { exit 1 }
@@ -17,21 +37,7 @@ if ! printf '%s\n' "$dev_host" | awk -F. '
     if ($1 != 100 || $2 < 64 || $2 > 127) exit 1
   }
 '; then
-  echo "Preview host must be a Tailscale IPv4 address (received: $dev_host)" >&2
-  exit 1
-fi
-
-if command -v ip >/dev/null 2>&1; then
-  local_ipv4_addresses=$(ip -o -4 addr show | awk '{ split($4, a, "/"); print a[1] }')
-elif command -v ifconfig >/dev/null 2>&1; then
-  local_ipv4_addresses=$(ifconfig | awk '$1 == "inet" { print $2 }')
-else
-  echo "Could not inspect this machine's network interfaces." >&2
-  exit 1
-fi
-
-if ! printf '%s\n' "$local_ipv4_addresses" | grep -Fqx "$dev_host"; then
-  echo "Preview host is not assigned to this machine: $dev_host" >&2
+  echo "Tailscale returned an invalid IPv4 address: $dev_host" >&2
   exit 1
 fi
 
