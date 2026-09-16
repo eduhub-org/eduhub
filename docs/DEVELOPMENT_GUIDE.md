@@ -39,19 +39,30 @@ port-binding setting changes. For an authenticated phone preview, pass the
 Mac's Tailscale IPv4 address to the helper:
 
 ```bash
-scripts/start-network-preview.sh 100.x.y.z -d
+scripts/start-network-preview.sh 100.x.y.z
 ```
 
 Open `http://<address>:5000` for EduHub or `http://<address>:5001` for StuJo.
 The helper rejects non-Tailscale and non-local addresses, binds only EduHub,
-StuJo, file storage, Hasura, and Keycloak to that Tailnet interface, and creates
-a random Hasura admin secret for the preview. Traffic between Tailnet devices
-is encrypted even though the disposable development services use HTTP.
+StuJo, file storage, Hasura, and Keycloak to that Tailnet interface, and uses
+the standard `myadminsecretkey` development Hasura secret. Traffic between
+Tailnet devices is encrypted even though the disposable development services
+use HTTP.
+
+The helper starts both frontend containers together. Their shared Yarn
+installation is serialized internally before either Next.js server starts. The
+helper returns after both servers report that they are ready. Hasura starts
+independently and may still be applying migrations, metadata, or seeds when the
+helper returns.
+
+The helper takes only the Tailscale address and manages the detached, staged
+startup itself. Additional Docker Compose options are rejected because they
+cannot be applied safely to every startup stage.
 
 Running ordinary `docker compose up -d` afterward restores localhost-only
-bindings, the normal development secret, and Keycloak's `external` SSL
-requirement. Compose detects and recreates the affected services without
-replacing the development database. Stop the preview when it is finished.
+bindings and Keycloak's `external` SSL requirement. Compose detects and
+recreates the affected services without replacing the development database.
+Stop the preview when it is finished.
 
 ## Ports
 
