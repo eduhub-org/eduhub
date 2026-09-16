@@ -39,6 +39,33 @@ export const GUEST_ALLOWED_REGISTRATION_TYPES = new Set([
   'DIRECT_WITH_INPUT',
 ]);
 
+/** The app's default timezone. Display can follow AppSettings, but the
+ *  registration cut-off has to be one day boundary for every visitor. */
+const REGISTRATION_TIME_ZONE = 'Europe/Berlin';
+
+/**
+ * Whether a course has stopped accepting registrations.
+ *
+ * `Course.applicationEnd` is a date without a time - "last day before
+ * applications are closed" - so the deadline day itself is still open and the
+ * cut-off is the start of the following day. Mirrors `isRegistrationClosed` in
+ * the frontend Registration component: that copy keeps the guest link off a
+ * page where it would fail, this one is what actually enforces it.
+ *
+ * A missing deadline is treated as closed. The column is NOT NULL, so this
+ * cannot happen - and a guard that cannot verify its condition should refuse.
+ */
+export function isCourseRegistrationClosed(applicationEnd, now = new Date()) {
+  if (!applicationEnd) return true;
+  const today = new Intl.DateTimeFormat('en-CA', {
+    timeZone: REGISTRATION_TIME_ZONE,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(now);
+  return String(applicationEnd).slice(0, 10) < today;
+}
+
 export function getFrontendUrl() {
   return (process.env.FRONTEND_URL || DEFAULT_FRONTEND_URL).replace(/\/+$/, '');
 }

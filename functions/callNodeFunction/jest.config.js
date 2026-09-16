@@ -2,6 +2,7 @@ export default {
   testEnvironment: 'node',
   transform: {},
   testTimeout: 10000,
+  roots: ['<rootDir>', '<rootDir>/../sendMail'],
   testMatch: [
     '**/__tests__/**/*.test.js',
     '**/?(*.)+(spec|test).js'
@@ -14,4 +15,4 @@ export default {
   ],
   coverageReporters: ['text', 'lcov', 'html'],
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js']
-}; 
+};

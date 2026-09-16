@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 
 import { useIsAdmin, useIsOrgAdmin } from '../../../hooks/authentication';
+import { useOrgAdminCapabilities } from '../../../hooks/orgAdminCapabilities';
 import type { SettingsCapability, SettingsNavItemDef } from './config';
 
 /**
@@ -25,9 +26,12 @@ export const useSettingsCapabilities = (): Set<SettingsCapability> => {
 export const canAccessSettingsItem = (
   item: SettingsNavItemDef,
   capabilities: Set<SettingsCapability>,
-  isOrgAdmin: boolean
+  isOrgAdmin: boolean,
+  // Org admin holds canManageSettings on at least one organization (mirrors the Hasura write
+  // permission that actually gates OrganizationAdmin/Program mutations).
+  canManageSettings: boolean
 ): boolean => {
-  if ((item.id === 'access' || item.id === 'programs') && isOrgAdmin) {
+  if ((item.id === 'access' || item.id === 'programs') && isOrgAdmin && canManageSettings) {
     return true;
   }
   return capabilities.has(item.requiredCapability);
@@ -36,7 +40,8 @@ export const canAccessSettingsItem = (
 export const useCanAccessSettingsItem = (item: SettingsNavItemDef): boolean => {
   const capabilities = useSettingsCapabilities();
   const isOrgAdmin = useIsOrgAdmin();
-  return canAccessSettingsItem(item, capabilities, isOrgAdmin);
+  const { canManageSettings } = useOrgAdminCapabilities();
+  return canAccessSettingsItem(item, capabilities, isOrgAdmin, canManageSettings);
 };
 
 /** @deprecated Use useCanAccessSettingsItem */

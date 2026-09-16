@@ -12,6 +12,7 @@ import { RegistrationStatus } from './RegistrationStatus';
 import { RegistrationModal } from './RegistrationModal';
 import { GuestRegistrationModal } from './GuestRegistrationModal';
 import { useRegistrationHandler } from './hooks/useRegistrationHandler';
+import { isRegistrationClosed } from './types';
 
 /**
  * Props for the Registration component
@@ -58,9 +59,12 @@ export const Registration: FC<RegistrationProps> = ({ course, courseEnrollment, 
 
   // Mirrors the backend guard in registerGuestForCourse. Both checks exist on
   // purpose: this one keeps the button off a page where it would fail, the
-  // server-side one is what actually enforces it.
+  // server-side one is what actually enforces it. The deadline is part of that:
+  // without it the link sits directly under the "registration period ended"
+  // notice and offers the way in that the notice just took away.
   const canRegisterAsGuest =
     !!course.guestRegistrationEnabled &&
+    !isRegistrationClosed(course.applicationEnd) &&
     (course.registrationType === CourseRegistrationType_enum.DIRECT_CONFIRMATION ||
       course.registrationType === CourseRegistrationType_enum.DIRECT_WITH_INPUT);
 
@@ -122,10 +126,13 @@ export const Registration: FC<RegistrationProps> = ({ course, courseEnrollment, 
             second choice on the page, not the default. */}
         {canRegisterAsGuest && (
           <>
+            {/* Same hue as the CTA above it, one step down in weight: filled is
+                the primary way in, text is the quieter one. Both are the same
+                action, so they belong to the same colour family. */}
             <button
               type="button"
               onClick={openGuestModal}
-              className="mt-3 w-full text-sm text-brand hover:underline min-h-[44px]"
+              className="mt-3 w-full text-sm text-cta-text hover:underline min-h-[44px]"
             >
               {tGuest('register_without_account')}
             </button>

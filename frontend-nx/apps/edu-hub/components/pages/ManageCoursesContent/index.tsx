@@ -10,7 +10,12 @@ import { Programs_Program } from '../../../queries/__generated__/Programs';
 import {
   UPDATE_COURSE_ACHIEVEMENT_CERTIFICATE_POSSIBLE,
   UPDATE_COURSE_ATTENDANCE_CERTIFICATE_POSSIBLE,
+  UPDATE_COURSE_SHOW_AVAILABLE_PLACES,
 } from '../../../queries/course';
+import {
+  UpdateCourseShowAvailablePlaces,
+  UpdateCourseShowAvailablePlacesVariables,
+} from '../../../queries/__generated__/UpdateCourseShowAvailablePlaces';
 import {
   UpdateCourseAttendanceCertificatePossible,
   UpdateCourseAttendanceCertificatePossibleVariables,
@@ -269,6 +274,13 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
+  const [updateShowAvailablePlaces] = useManageMutation<
+    UpdateCourseShowAvailablePlaces,
+    UpdateCourseShowAvailablePlacesVariables
+  >(UPDATE_COURSE_SHOW_AVAILABLE_PLACES, {
+    refetchQueries: ['AdminCourseList'],
+  });
+
   const [updateAttendanceCertificatePossible] = useManageMutation<
     UpdateCourseAttendanceCertificatePossible,
     UpdateCourseAttendanceCertificatePossibleVariables
@@ -433,6 +445,21 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
       return [];
     }
   }, [degreeCoursesQuery.data, degreeCoursesQuery.loading, degreeCoursesQuery.error]);
+
+  const handleShowAvailablePlaces = useCallback(
+    async (c: AdminCourseList_Course, showAvailablePlaces: boolean) => {
+      try {
+        await updateShowAvailablePlaces({
+          variables: { courseId: c.id, showAvailablePlaces },
+        });
+      } catch (error) {
+        console.error('Error updating available places setting:', error);
+        setErrorMessage(t('notifications.show_available_places_update_failed'));
+        setShowErrorNotification(true);
+      }
+    },
+    [updateShowAvailablePlaces, t]
+  );
 
   const handleAttendanceCertificatePossible = useCallback(
     async (c: AdminCourseList_Course, isPossible: boolean) => {
@@ -844,6 +871,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
               courseGroupOptions={courseGroupOptions}
               sliderCourseGroupIds={sliderCourseGroupIds}
               degreeCourses={degreeCourses}
+              onSetShowAvailablePlaces={handleShowAvailablePlaces}
               onSetAttendanceCertificatePossible={handleAttendanceCertificatePossible}
               onSetAchievementCertificatePossible={handleAchievementCertificatePossible}
             />

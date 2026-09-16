@@ -168,3 +168,88 @@ describe('Sessions Component - Separator Logic', () => {
     expect(screen.queryByText('Test Address 2')).not.toBeInTheDocument();
   });
 });
+
+/** Same session shape as the mocks above, at a second date. */
+const secondSession = (
+  overrides: Partial<Course_Course_by_pk_Sessions> = {}
+): Course_Course_by_pk_Sessions => ({
+  ...mockSessions[0],
+  id: 2,
+  title: 'Second Session',
+  startDateTime: '2024-01-22T10:00:00Z',
+  endDateTime: '2024-01-22T12:00:00Z',
+  ...overrides,
+});
+
+describe('Sessions Component - shared addresses', () => {
+  it('lists an address once when every session uses the same one', () => {
+    const oneAddress = [mockSessions[0].SessionAddresses[0]];
+    render(
+      <Sessions
+        sessions={[
+          { ...mockSessions[0], SessionAddresses: oneAddress },
+          secondSession({ SessionAddresses: oneAddress }),
+        ]}
+        courseLocations={mockCourseLocations}
+        isLoggedInParticipant={true}
+      />
+    );
+
+    expect(screen.getAllByText('Test Address 1')).toHaveLength(1);
+    expect(screen.getByText('Test Session')).toBeInTheDocument();
+    expect(screen.getByText('Second Session')).toBeInTheDocument();
+  });
+
+  it('keeps the address on each row when the sessions differ', () => {
+    render(
+      <Sessions
+        sessions={[
+          { ...mockSessions[0], SessionAddresses: [mockSessions[0].SessionAddresses[0]] },
+          secondSession({ SessionAddresses: [mockSessions[0].SessionAddresses[1]] }),
+        ]}
+        courseLocations={mockCourseLocations}
+        isLoggedInParticipant={true}
+      />
+    );
+
+    expect(screen.getByText('Test Address 1')).toBeInTheDocument();
+    expect(screen.getByText('Test Address 2')).toBeInTheDocument();
+  });
+});
+
+describe('Sessions Component - event agenda', () => {
+  it('groups a single-session event under a day heading, like a multi-day one', () => {
+    render(
+      <Sessions
+        sessions={mockSessions}
+        courseLocations={mockCourseLocations}
+        isLoggedInParticipant={true}
+        isEvent={true}
+      />
+    );
+
+    expect(screen.getByText('sessions.agenda')).toBeInTheDocument();
+    expect(screen.getByText('Montag, 15.01.2024')).toBeInTheDocument();
+  });
+
+  it('repeats a shared address under each day heading', () => {
+    const oneAddress = [mockSessions[0].SessionAddresses[0]];
+    render(
+      <Sessions
+        sessions={[
+          { ...mockSessions[0], SessionAddresses: oneAddress },
+          secondSession({ SessionAddresses: oneAddress }),
+        ]}
+        courseLocations={mockCourseLocations}
+        isLoggedInParticipant={true}
+        isEvent={true}
+      />
+    );
+
+    // Two days, so the address appears twice - once under each heading, rather
+    // than once above the whole agenda where it belongs to no day in particular.
+    expect(screen.getAllByText('Test Address 1')).toHaveLength(2);
+    expect(screen.getByText('Montag, 15.01.2024')).toBeInTheDocument();
+    expect(screen.getByText('Montag, 22.01.2024')).toBeInTheDocument();
+  });
+});

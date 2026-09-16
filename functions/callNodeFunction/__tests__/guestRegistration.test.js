@@ -22,6 +22,7 @@ const {
   normalizeEmail,
   normalizeName,
   GUEST_ALLOWED_REGISTRATION_TYPES,
+  isCourseRegistrationClosed,
 } = await import('../guestRegistration.js');
 
 const USER_ID = '7c9e6679-7425-40de-944b-e07fc1f90ae7';
@@ -368,5 +369,33 @@ describe('allowed registration types', () => {
     ]) {
       expect(GUEST_ALLOWED_REGISTRATION_TYPES.has(type)).toBe(false);
     }
+  });
+});
+
+describe('registration deadline', () => {
+  // 2026-09-14T09:00Z is 11:00 in Europe/Berlin, so the Berlin day is the 14th.
+  const noon = new Date('2026-09-14T09:00:00Z');
+
+  it('keeps the deadline day itself open', () => {
+    expect(isCourseRegistrationClosed('2026-09-14', noon)).toBe(false);
+  });
+
+  it('closes from the following day', () => {
+    expect(isCourseRegistrationClosed('2026-09-13', noon)).toBe(true);
+  });
+
+  it('stays open before the deadline', () => {
+    expect(isCourseRegistrationClosed('2026-09-30', noon)).toBe(false);
+  });
+
+  it('uses the Berlin day, not UTC', () => {
+    // 22:30 UTC on the 13th is already 00:30 on the 14th in Berlin, so a
+    // deadline of the 13th has passed even though it is still the 13th in UTC.
+    const afterBerlinMidnight = new Date('2026-09-13T22:30:00Z');
+    expect(isCourseRegistrationClosed('2026-09-13', afterBerlinMidnight)).toBe(true);
+  });
+
+  it('refuses rather than guesses when the deadline is missing', () => {
+    expect(isCourseRegistrationClosed(null, noon)).toBe(true);
   });
 });

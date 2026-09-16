@@ -17,6 +17,7 @@
 - "!include public_CourseAddonMapping.yaml"
 - "!include public_CourseDegree.yaml"
 - "!include public_CourseEnrollment.yaml"
+- "!include public_CourseParticipant.yaml"
 - "!include public_CourseEnrollmentAddon.yaml"
 - "!include public_CourseEnrollmentStatus.yaml"
 - "!include public_CourseFundingOrganization.yaml"

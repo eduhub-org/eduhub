@@ -89,6 +89,7 @@ interface ExpandableCourseRowProps {
   courseGroupOptions: { id: number; name: string }[];
   sliderCourseGroupIds: number[];
   degreeCourses: { id: number; name: string }[];
+  onSetShowAvailablePlaces: (c: AdminCourseList_Course, show: boolean) => any;
   onSetAttendanceCertificatePossible: (c: AdminCourseList_Course, isPossible: boolean) => any;
   onSetAchievementCertificatePossible: (c: AdminCourseList_Course, isPossible: boolean) => any;
 }
@@ -98,6 +99,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
   courseGroupOptions,
   sliderCourseGroupIds,
   degreeCourses,
+  onSetShowAvailablePlaces,
   onSetAttendanceCertificatePossible,
   onSetAchievementCertificatePossible,
 }) => {
@@ -129,6 +131,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
   // A "degree" is a course inside a DEGREES program; only such a course carries
   // completion thresholds for its degree certificate.
   const isDegreeCourse = course.Program?.type === ProgramType.DEGREES;
+  const isEventCourse = course.Program?.type === ProgramType.EVENTS;
 
   const projectSubmissionDeadlineValue = useMemo(
     () => submissionDeadlineToCalendarDate(course.projectSubmissionDeadline),
@@ -492,6 +495,10 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
   });
 
 
+
+  const handleToggleShowAvailablePlaces = useCallback(() => {
+    onSetShowAvailablePlaces(course, !course.showAvailablePlaces);
+  }, [course, onSetShowAvailablePlaces]);
 
   const handleToggleAttendanceCertificatePossible = useCallback(() => {
     onSetAttendanceCertificatePossible(course, !course.attendanceCertificatePossible);
@@ -920,7 +927,40 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
               </div>
             </div>
 
-            {/* 5. Email Templates - Card Container */}
+            {/* 5. Participants - what the public course page states about numbers */}
+            <div className="bg-fill-primary border border-border-primary rounded-lg p-4">
+              <h4 className="text-sm font-medium text-label-primary mb-3">
+                {t('manageCourses.participants.label')}
+              </h4>
+              <div className="flex items-center space-x-2">
+                <button
+                  type="button"
+                  className="cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+                  onClick={handleToggleShowAvailablePlaces}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleToggleShowAvailablePlaces();
+                    }
+                  }}
+                  role="checkbox"
+                  aria-checked={!!course.showAvailablePlaces}
+                  aria-label={t('manageCourses.participants.show_available_places')}
+                >
+                  {course.showAvailablePlaces ? (
+                    <MdCheckBox className="w-6 h-6 text-blue-600" />
+                  ) : (
+                    <MdOutlineCheckBoxOutlineBlank className="w-6 h-6 text-label-disabled" />
+                  )}
+                </button>
+                <span>{t('manageCourses.participants.show_available_places')}</span>
+              </div>
+              <p className="mt-2 text-xs text-label-secondary">
+                {t('manageCourses.participants.show_available_places_hint')}
+              </p>
+            </div>
+
+            {/* 6. Email Templates - Card Container */}
             <div className="bg-fill-primary border border-border-primary rounded-lg p-4 space-y-4">
               <h4 className="text-sm font-medium text-label-primary mb-2">
                 {t('manageCourses.email_templates.label')}
@@ -1062,6 +1102,11 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                     </button>
                     <span>{t('manageCourses.possible_certificates.attendance_certificate')}</span>
                   </div>
+                  {/* Hidden for an event: an event awards attendance, not an
+                      achievement, so ECTS and the project settings that hang off
+                      the achievement certificate do not apply to it. */}
+                  {!isEventCourse && (
+                    <>
                   <div className="flex items-center space-x-2">
                     <button
                       type="button"
@@ -1125,6 +1170,8 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                         refetchQueries={['AdminCourseList']}
                       />
                     </div>
+                  )}
+                    </>
                   )}
                 </div>
 

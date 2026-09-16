@@ -225,7 +225,9 @@ export const ManageCourseContent: FC<Props> = ({ courseId }) => {
 
             {course.externalRegistrationLink || course.Program.type === 'DEGREES' ? null : (
               <div className={`p-4 m-2 ${determineTabClasses(3, openTabIndex)}`} onClick={openTab3}>
-                {t('participations_and_achievements')}
+                {/* Without achievement certificates the tab holds no projects
+                    section, so promising them in its name is misleading. */}
+                {t(course.achievementCertificatePossible ? 'participations_and_achievements' : 'participations')}
               </div>
             )}
 

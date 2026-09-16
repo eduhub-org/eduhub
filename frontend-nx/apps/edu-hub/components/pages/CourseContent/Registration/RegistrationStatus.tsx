@@ -71,7 +71,8 @@ const buildCourseChatLink = (course: Course_Course_by_pk & { matrixRoomId?: stri
  * @returns JSX element with course resource buttons
  */
 const courseActionButtonClassName =
-  'w-full max-w-md px-8 py-3.5 sm:px-10 sm:py-4 text-base sm:text-lg font-semibold uppercase tracking-wide shadow-md transition-shadow flex items-center justify-center min-h-[3.25rem] sm:min-h-[3.5rem]';
+  'w-full max-w-md px-6 py-3 text-base font-semibold uppercase tracking-wide ' +
+  'flex items-center justify-center min-h-[3.25rem]';
 
 const CourseLinkInfos: FC<{ course: Course_Course_by_pk }> = ({ course }) => {
   const t = useTranslations('course');
@@ -85,49 +86,33 @@ const CourseLinkInfos: FC<{ course: Course_Course_by_pk }> = ({ course }) => {
     ? t('general.link_will_be_provided_soon')
     : t('general.no_online_participation_available');
 
+  // Chat is filled, the meeting outlined: `filled inverted` and plain `filled`
+  // resolve to the same dark pill on a light surface, so the two needed telling
+  // apart by weight rather than by colour. The chat button was brand teal, the
+  // largest teal object on the public site; the shadows went with it, the design
+  // system's press being a colour change and nothing else.
   return (
-    <div className="flex flex-col items-center w-full gap-10">
+    <div className="flex flex-col items-center w-full gap-3">
       {chatLink && (
-        <div className="w-full flex justify-center">
-          <Button
-            className={`!bg-brand !text-white !border-brand hover:!bg-brand-light hover:!border-brand-light hover:shadow-lg ${courseActionButtonClassName}`}
-            as="a"
-            href={chatLink}
-            filled
-          >
-            {t('general.to_course_chat')}
-          </Button>
-        </div>
+        <Button className={courseActionButtonClassName} as="a" href={chatLink} filled>
+          {t('general.to_course_chat')}
+        </Button>
       )}
-      <div className="w-full flex flex-col items-center">
-        {hasOnlineMeeting ? (
-          <Button
-            className={`hover:shadow-lg ${courseActionButtonClassName}`}
-            as="a"
-            href={onlineMeetingUrl!}
-            target="_blank"
-            rel="noopener noreferrer"
-            filled
-            inverted
-          >
-            {t('general.to_online_meeting')}
-          </Button>
-        ) : (
-          <Button
-            className={courseActionButtonClassName}
-            disabled
-            title={onlineMeetingUnavailableMessage}
-            aria-label={onlineMeetingUnavailableMessage}
-          >
-            {t('general.to_online_meeting')}
-          </Button>
-        )}
-        {!hasOnlineMeeting && (
-          <p className="mt-3 text-sm text-center text-label-secondary max-w-md px-4">
-            {onlineMeetingUnavailableMessage}
-          </p>
-        )}
-      </div>
+      {hasOnlineMeeting ? (
+        <Button
+          className={courseActionButtonClassName}
+          as="a"
+          href={onlineMeetingUrl!}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {t('general.to_online_meeting')}
+        </Button>
+      ) : (
+        /* A disabled button plus an explanation below it was two blocks of
+           chrome saying there is nothing to click. One line says it. */
+        <p className="text-sm text-center text-label-secondary">{onlineMeetingUnavailableMessage}</p>
+      )}
     </div>
   );
 };

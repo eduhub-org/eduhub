@@ -129,6 +129,11 @@ export default async function confirmGuestRegistration(req, logger) {
     // since. Every condition registerGuestForCourse enforces has to hold again
     // here, or a week-old token becomes a way to create an enrollment the
     // current settings would refuse.
+    //
+    // The one deliberate exception is applicationEnd. It governs when a
+    // registration may be *started*, and this token proves it was started in
+    // time; refusing here would strand anyone who signs up on the last day and
+    // opens the mail the next morning.
     if (
       !course ||
       !course.published ||

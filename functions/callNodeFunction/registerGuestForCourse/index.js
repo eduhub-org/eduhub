@@ -9,6 +9,7 @@ import {
   classifyGuestThrottle,
   createHasuraClient,
   findUsersByEmail,
+  isCourseRegistrationClosed,
   isHoneypotTripped,
   isValidEmail,
   isValidName,
@@ -43,6 +44,7 @@ const GET_COURSE = gql`
       published
       guestRegistrationEnabled
       registrationType
+      applicationEnd
       maxParticipants
       activeParticipantCount
       Program {
@@ -234,6 +236,12 @@ export default async function registerGuestForCourse(req, logger) {
     }
     if (!GUEST_ALLOWED_REGISTRATION_TYPES.has(course.registrationType)) {
       return { success: false, messageKey: 'GUEST_REGISTRATION_NOT_ENABLED' };
+    }
+    // The page hides the guest link once the deadline passes, but that check
+    // runs in a browser; without this one a script - or a stale tab - could
+    // still register after registration closed.
+    if (isCourseRegistrationClosed(course.applicationEnd)) {
+      return { success: false, messageKey: 'REGISTRATION_PERIOD_ENDED' };
     }
     if (
       course.maxParticipants != null &&
