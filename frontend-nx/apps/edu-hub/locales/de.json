@@ -1790,7 +1790,7 @@
       "waitlist_badge": "Warteliste",
       "aborted": "Abgebrochen",
       "rejected": "Bewerbung abgelehnt",
-      "cancelled": "Einladung abgelehnt",
+      "cancelled": "Storniert",
       "invitation_expired": "Einladung abgelaufen"
     },
     "invitation_deadline": "Ablaufdatum Einladung",

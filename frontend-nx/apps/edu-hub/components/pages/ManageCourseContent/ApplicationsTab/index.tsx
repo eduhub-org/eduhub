@@ -291,13 +291,10 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
     ]
   );
 
-  const hasCourseStarted = useMemo(() => {
-    const firstSession = course.Sessions[0];
-    if (!firstSession) {
-      return false;
-    }
-    return new Date(firstSession.startDateTime).getTime() <= Date.now();
-  }, [course.Sessions]);
+  // Evaluated fresh on every render (not memoized) so opening the modal after the first
+  // session's start time has passed picks up the change without needing a refetch.
+  const firstSession = course.Sessions[0];
+  const hasCourseStarted = firstSession != null && new Date(firstSession.startDateTime).getTime() <= Date.now();
 
   const courseEnrollments = useMemo(() => {
     return course.CourseEnrollments ?? [];
@@ -724,12 +721,20 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
           email_rating_DECLINE: t('bulk_actions.email_all_decline_rating'),
           email_rating_REVIEW: t('bulk_actions.email_all_review_rating'),
         };
+        // "Cancelled" covers both pre-start (CANCELLED) and post-start (ABORTED) dropouts,
+        // matching the CancelledCourseEnrollments aggregate behind the statistics card.
         const filter = isStatusAction
-          ? {
-              status: {
-                _eq: action.replace('email_status_', '') as CourseEnrollmentStatus_enum,
-              },
-            }
+          ? action === 'email_status_CANCELLED'
+            ? {
+                status: {
+                  _in: [CourseEnrollmentStatus_enum.CANCELLED, CourseEnrollmentStatus_enum.ABORTED],
+                },
+              }
+            : {
+                status: {
+                  _eq: action.replace('email_status_', '') as CourseEnrollmentStatus_enum,
+                },
+              }
           : {
               motivationRating: {
                 _eq: action.replace('email_rating_', '') as MotivationRating_enum,
