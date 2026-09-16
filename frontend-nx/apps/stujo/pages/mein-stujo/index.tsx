@@ -8,6 +8,8 @@ import { useTranslations } from 'next-intl';
 
 import Layout from '../../components/Layout';
 import OrganizationSwitcher from '../../components/OrganizationSwitcher';
+import OrganizationLogoEditor from '../../components/OrganizationLogoEditor';
+import OrganizationWebsiteEditor from '../../components/OrganizationWebsiteEditor';
 import {
   ACTION_ROLE_CONTEXT,
   ARCHIVE_JOB_POSTING_ACTION,
@@ -120,6 +122,7 @@ const MeinStujo: FC<Props> = ({ portal }) => {
     organization,
     loading: orgsLoading,
     selectOrganization,
+    refetchOrganizations,
   } = useEmployerOrganization();
 
   // cache-and-network: the Apollo client is a module singleton that outlives
@@ -259,18 +262,28 @@ const MeinStujo: FC<Props> = ({ portal }) => {
       <div className="stujo-dash-head">
         <div>
           <h1 style={{ margin: 0 }}>{t('title')}</h1>
-          {organizations.length > 1 ? (
-            <OrganizationSwitcher
-              organizations={organizations}
-              selectedId={organization.id}
-              label={t('organizationLabel')}
-              onSelect={selectOrganization}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            {organizations.length > 1 ? (
+              <OrganizationSwitcher
+                organizations={organizations}
+                selectedId={organization.id}
+                label={t('organizationLabel')}
+                onSelect={selectOrganization}
+              />
+            ) : (
+              <p className="stujo-muted" style={{ margin: '0.25rem 0 0' }}>
+                {organization.name}
+              </p>
+            )}
+            <OrganizationLogoEditor organization={organization} onLogoUpdated={refetchOrganizations} />
+          </div>
+          <div style={{ margin: '0.5rem 0 0' }}>
+            <OrganizationWebsiteEditor
+              key={organization.id}
+              organization={organization}
+              onWebsiteUpdated={refetchOrganizations}
             />
-          ) : (
-            <p className="stujo-muted" style={{ margin: '0.25rem 0 0' }}>
-              {organization.name}
-            </p>
-          )}
+          </div>
           <p className="stujo-muted" style={{ margin: '0.25rem 0 0' }}>
             <Link href="/mein-stujo/unternehmen">{t('claimAddAnother')}</Link>
           </p>

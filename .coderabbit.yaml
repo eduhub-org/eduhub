@@ -1,3 +1,32 @@
+# Keep CodeRabbit's output small. Every comment it *creates* sends a GitHub
+# notification email to everyone subscribed to the PR, so the goal here is
+# fewer comments and a walkthrough that holds findings instead of filler.
+# Only keys that differ from CodeRabbit's defaults are listed.
 reviews:
+  # "quiet" surfaces only the most important feedback; "chill" (the default)
+  # and "assertive" add progressively more nitpicks.
+  profile: quiet
+
+  # Strip the walkthrough comment down to the actual review findings.
+  review_status: false
+  changed_files_summary: false
+  sequence_diagrams: false
+  estimate_code_review_effort: false
+  assess_linked_issues: false
+  related_issues: false
+  related_prs: false
+  suggested_labels: false
+  suggested_reviewers: false
+  in_progress_fortune: false
+
   auto_review:
+    # Don't post a fresh review on every push to an open PR.
     auto_incremental_review: false
+    # Dependency bumps don't need an AI review. Skipped silently.
+    ignore_usernames:
+      - "dependabot[bot]"
+
+chat:
+  # Only reply when someone explicitly tags @coderabbitai, instead of
+  # chiming in on comment threads unprompted.
+  auto_reply: false

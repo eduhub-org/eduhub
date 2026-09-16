@@ -42,6 +42,8 @@ export const MY_JOB_ORGANIZATIONS = gql`
       Organization {
         id
         name
+        logo
+        website
         JobPostingCredits {
           id
           remaining
@@ -49,6 +51,22 @@ export const MY_JOB_ORGANIZATIONS = gql`
           jobPostingType
         }
       }
+    }
+  }
+`;
+
+// Authorization mirrors save/removeOrganizationLogo (see
+// authorizeOrganizationAdminFieldChange): a settings admin may always change
+// it, and a job-offer-only admin may too as long as the organization has no
+// settings admin of its own. Called under ACTION_ROLE_CONTEXT for the same
+// reason those two are.
+export const UPDATE_ORGANIZATION_WEBSITE_ACTION = gql`
+  mutation UpdateOrganizationWebsiteAction($organizationId: Int!, $website: String) {
+    updateOrganizationWebsite(organizationid: $organizationId, website: $website) {
+      success
+      website
+      error
+      messageKey
     }
   }
 `;

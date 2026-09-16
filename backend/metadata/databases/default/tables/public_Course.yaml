@@ -111,6 +111,12 @@ computed_fields:
         name: course_active_participant_count
         schema: public
       table_argument: course_row
+  - name: publicParticipantCount
+    definition:
+      function:
+        name: course_public_participant_count
+        schema: public
+      table_argument: course_row
 select_permissions:
   - role: anonymous
     permission:
@@ -138,6 +144,7 @@ select_permissions:
         - learningGoals
         - maxMissedSessions
         - maxParticipants
+        - showAvailablePlaces
         - programId
         - projectProposalsEnabled
         - guestRegistrationEnabled
@@ -157,6 +164,7 @@ select_permissions:
         - courseSeriesId
       computed_fields:
         - activeParticipantCount
+        - publicParticipantCount
       filter:
         _and:
           - Program:
@@ -190,6 +198,7 @@ select_permissions:
         - learningGoals
         - maxMissedSessions
         - maxParticipants
+        - showAvailablePlaces
         - programId
         - projectProposalsEnabled
         - guestRegistrationEnabled
@@ -209,6 +218,7 @@ select_permissions:
         - matrixRoomId
       computed_fields:
         - activeParticipantCount
+        - publicParticipantCount
       filter: {}
   - role: user_access
     permission:
@@ -235,6 +245,7 @@ select_permissions:
         - learningGoals
         - maxMissedSessions
         - maxParticipants
+        - showAvailablePlaces
         - programId
         - projectProposalsEnabled
         - guestRegistrationEnabled
@@ -254,6 +265,7 @@ select_permissions:
         - matrixRoomId
       computed_fields:
         - activeParticipantCount
+        - publicParticipantCount
       filter:
         CourseEnrollments:
           User:
@@ -287,6 +299,7 @@ select_permissions:
         - learningGoals
         - maxMissedSessions
         - maxParticipants
+        - showAvailablePlaces
         - programId
         - projectProposalsEnabled
         - guestRegistrationEnabled
@@ -306,6 +319,7 @@ select_permissions:
         - matrixRoomId
       computed_fields:
         - activeParticipantCount
+        - publicParticipantCount
       filter:
         Program:
           Organization:
@@ -334,6 +348,7 @@ update_permissions:
         - learningGoals
         - maxMissedSessions
         - maxParticipants
+        - showAvailablePlaces
         - projectProposalsEnabled
         - guestRegistrationEnabled
         - projectSubmissionDeadline
@@ -375,6 +390,7 @@ update_permissions:
         - learningGoals
         - maxMissedSessions
         - maxParticipants
+        - showAvailablePlaces
         - projectProposalsEnabled
         - guestRegistrationEnabled
         - projectSubmissionDeadline
@@ -505,6 +521,7 @@ insert_permissions:
         - learningGoals
         - maxMissedSessions
         - maxParticipants
+        - showAvailablePlaces
         - programId
         - projectProposalsEnabled
         - guestRegistrationEnabled

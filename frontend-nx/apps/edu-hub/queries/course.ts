@@ -143,6 +143,13 @@ export const MANAGED_COURSE_APPLICATIONS = gql`
           count
         }
       }
+      CancelledCourseEnrollments: CourseEnrollments_aggregate(
+        where: { status: { _in: [CANCELLED, ABORTED] } }
+      ) {
+        aggregate {
+          count
+        }
+      }
     }
   }
 `;
@@ -604,6 +611,18 @@ export const UPDATE_COURSE_ATTENDANCE_CERTIFICATE_POSSIBLE = gql`
       _set: { attendanceCertificatePossible: $isPossible }
     ) {
       id
+    }
+  }
+`;
+
+export const UPDATE_COURSE_SHOW_AVAILABLE_PLACES = gql`
+  mutation UpdateCourseShowAvailablePlaces($courseId: Int!, $showAvailablePlaces: Boolean!) {
+    update_Course_by_pk(
+      pk_columns: { id: $courseId }
+      _set: { showAvailablePlaces: $showAvailablePlaces }
+    ) {
+      id
+      showAvailablePlaces
     }
   }
 `;

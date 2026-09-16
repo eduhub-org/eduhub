@@ -516,9 +516,13 @@ actions:
         - name: sizes
           value: '[64, 128, 256, 512]'
     # Dedicated handler rather than the generic saveImage: the logo is an
-    # Organization column that requires canManageSettings to change, and only a
-    # handler can check that for the *target* organization. It then delegates to
-    # saveImage, so the storage layout above still applies.
+    # Organization column, and only a handler can check who may change it for
+    # the *target* organization (canManageSettings, or canManageJobs while that
+    # organization has no settings admin of its own — see
+    # authorizeOrganizationAdminFieldChange). It then delegates to saveImage for the
+    # upload and persists the resulting path onto Organization.logo itself,
+    # since a StuJo request's role (`user`) has no Hasura update permission on
+    # Organization to fall back on.
     #
     # user_access is permitted because action permissions do not resolve
     # inherited roles: an org admin's requests carry x-hasura-role `user`
@@ -527,7 +531,40 @@ actions:
     permissions:
       - role: instructor_access
       - role: user_access
-    comment: Uploads an organization's logo; the handler requires canManageSettings for that organization
+    comment: Uploads an organization's logo and persists it; see authorizeOrganizationAdminFieldChange for who may
+  - name: removeOrganizationLogo
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: name
+          value: removeOrganizationLogo
+    # Counterpart to saveOrganizationLogo, same authorization rule and same
+    # reason the column write happens in the handler rather than a follow-up
+    # client mutation. No file involved, so no bucket/file-path/sizes headers.
+    permissions:
+      - role: instructor_access
+      - role: user_access
+    comment: Clears an organization's logo; see authorizeOrganizationAdminFieldChange for who may
+  - name: updateOrganizationWebsite
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: name
+          value: updateOrganizationWebsite
+    # Same authorization rule and same reason the column write happens in the
+    # handler rather than a follow-up client mutation as save/removeOrganizationLogo
+    # — see authorizeOrganizationAdminFieldChange. user_access is permitted for
+    # the same reason: an org admin's requests carry x-hasura-role `user`.
+    permissions:
+      - role: instructor_access
+      - role: user_access
+    comment: Updates or clears an organization's public website link; see authorizeOrganizationAdminFieldChange for who may
   - name: saveUserProfileImage
     definition:
       kind: synchronous
@@ -704,4 +741,5 @@ custom_types:
     - name: ConfirmGuestRegistrationResult
     - name: ManageGuestRegistrationResult
     - name: GuestRegistrationSummary
+    - name: UpdateOrganizationWebsiteResult
   scalars: []

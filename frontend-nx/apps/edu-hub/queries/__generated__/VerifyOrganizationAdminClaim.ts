@@ -11,7 +11,7 @@ export interface VerifyOrganizationAdminClaim_update_OrganizationAdmin_returning
   __typename: "OrganizationAdmin";
   id: number;
   /**
-   * How this grant was obtained, NULL when a person granted it. Server-controlled: written by the claimJobOrganization action only, never by a client, since the value is what tells a reviewer whether the claim needs checking.
+   * How this grant was obtained, NULL when a person granted it. Server-controlled: written by the claimJobOrganization action, and set to ADMIN_VERIFIED when a super-admin reviews the claim. Never writable by a client role, since the value is what tells a reviewer whether the claim needs checking.
    */
   claimVerification: string | null;
 }

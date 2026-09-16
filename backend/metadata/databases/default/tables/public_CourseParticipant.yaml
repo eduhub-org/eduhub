@@ -1,0 +1,51 @@
+table:
+  name: CourseParticipant
+  schema: public
+object_relationships:
+  - name: Course
+    using:
+      manual_configuration:
+        column_mapping:
+          courseId: id
+        insertion_order: null
+        remote_table:
+          name: Course
+          schema: public
+  - name: User
+    using:
+      manual_configuration:
+        column_mapping:
+          userId: id
+        insertion_order: null
+        remote_table:
+          name: User
+          schema: public
+select_permissions:
+  # A participant may see who else is taking part in the same course. The row
+  # filter is the whole access rule: you must be a participant of the course
+  # you are asking about, which is why the frontend query only has to name the
+  # course. The view carries no enrollment status, so nothing here can reveal
+  # who merely applied.
+  - role: user_access_others
+    permission:
+      columns:
+        - courseId
+        - userId
+      filter:
+        Course:
+          CourseEnrollments:
+            _and:
+              - userId:
+                  _eq: X-Hasura-User-Id
+              - status:
+                  _in:
+                    - CONFIRMED
+                    - COMPLETED
+      allow_aggregations: true
+  - role: instructor_access
+    permission:
+      columns:
+        - courseId
+        - userId
+      filter: {}
+      allow_aggregations: true

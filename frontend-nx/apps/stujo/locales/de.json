@@ -69,6 +69,20 @@
     "notification_snackbar": {
       "saved": "Gespeichert"
     },
+    "image_uploader": {
+      "uploading": "Hochladen...",
+      "removing": "Entfernen...",
+      "file_size_exceeds_limit": "Die Datei ist zu groß. Bitte wähle eine Datei mit einer Größe von {maxFileSize}MB oder weniger.",
+      "upload_new_logo": "Logo hochladen",
+      "change_logo": "Logo ändern",
+      "remove_logo": "Logo entfernen",
+      "remove_image_error": "Fehler beim Entfernen des Bildes",
+      "upload_error": "Fehler beim Hochladen des Bildes",
+      "organization_logo": "Firmenlogo",
+      "view_full_size": "In voller Größe ansehen",
+      "close": "Schließen",
+      "logo_permission_denied": "Dieses Unternehmen hat bereits eine Person, die die Einstellungen verwaltet. Bitte sie, das Logo zu ändern."
+    },
     "error": "Ein Fehler ist aufgetreten",
     "close": "Schließen",
     "ok": "OK"
@@ -122,6 +136,15 @@
     "archiveFailed": "Archivieren fehlgeschlagen: {error}",
     "archiveNetworkError": "Archivieren fehlgeschlagen: Netzwerkfehler.",
     "unknownError": "Unbekannter Fehler",
+    "organizationWebsite": {
+      "label": "Website",
+      "placeholder": "https://beispiel.de",
+      "save": "Speichern",
+      "saved": "Gespeichert",
+      "invalidUrl": "Bitte eine gültige http(s)-URL eingeben.",
+      "permissionDenied": "Dieses Unternehmen hat bereits eine Person, die die Einstellungen verwaltet. Bitte sie, die Website zu ändern.",
+      "saveError": "Fehler beim Speichern der Website"
+    },
     "NeuesAngebot": {
       "edit_offer_title": "Angebot bearbeiten",
       "create_offer_title": "Neues Stellenangebot",

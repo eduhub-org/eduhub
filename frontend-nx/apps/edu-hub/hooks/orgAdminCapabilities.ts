@@ -10,12 +10,14 @@ export type OrgAdminCapabilities = {
   canManageCourses: boolean;
   canManageEvents: boolean;
   canManageDegrees: boolean;
+  canManageSettings: boolean;
 };
 
 const EMPTY_ORG_ADMIN_CAPABILITIES: OrgAdminCapabilities = {
   canManageCourses: false,
   canManageEvents: false,
   canManageDegrees: false,
+  canManageSettings: false,
 };
 
 /**
@@ -39,6 +41,7 @@ export const useOrgAdminCapabilities = (): OrgAdminCapabilities => {
       canManageCourses: data.OrganizationAdmin.some((grant) => grant.canManageCourses),
       canManageEvents: data.OrganizationAdmin.some((grant) => grant.canManageEvents),
       canManageDegrees: data.OrganizationAdmin.some((grant) => grant.canManageDegrees),
+      canManageSettings: data.OrganizationAdmin.some((grant) => grant.canManageSettings),
     };
   }, [isOrgAdmin, data]);
 };

@@ -69,6 +69,20 @@
     "notification_snackbar": {
       "saved": "Saved"
     },
+    "image_uploader": {
+      "uploading": "Uploading...",
+      "removing": "Removing...",
+      "file_size_exceeds_limit": "The file is too large. Please choose a file with a size of {maxFileSize}MB or less.",
+      "upload_new_logo": "Upload logo",
+      "change_logo": "Change logo",
+      "remove_logo": "Remove logo",
+      "remove_image_error": "Error removing image",
+      "upload_error": "Error uploading image",
+      "organization_logo": "Company logo",
+      "view_full_size": "View full size",
+      "close": "Close",
+      "logo_permission_denied": "This company already has an admin managing settings. Ask them to update the logo."
+    },
     "error": "An error occurred",
     "close": "Close",
     "ok": "OK"
@@ -122,6 +136,15 @@
     "archiveFailed": "Archiving failed: {error}",
     "archiveNetworkError": "Archiving failed: network error.",
     "unknownError": "Unknown error",
+    "organizationWebsite": {
+      "label": "Website",
+      "placeholder": "https://example.com",
+      "save": "Save",
+      "saved": "Saved",
+      "invalidUrl": "Please enter a valid http(s) URL.",
+      "permissionDenied": "This company already has an admin managing settings. Ask them to update the website.",
+      "saveError": "Error saving website"
+    },
     "NeuesAngebot": {
       "edit_offer_title": "Edit job offer",
       "create_offer_title": "New job offer",

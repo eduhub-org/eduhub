@@ -31,9 +31,12 @@ export const FundingOrganizations: FC<IProps> = ({ courseFundingOrganizations })
     return null;
   }
 
+  // Same story as DescriptionFields: this was the "invited" status orange used
+  // as decoration. The logos need a light surface, so it keeps `light` and
+  // drops the tint.
   return (
-    <div className="mt-10 bg-edu-course-invited text-label-primary light rounded-2xl p-4 mx-6 xl:mx-0">
-      <span className="text-sm font-medium tracking-wide mb-4 block text-label-primary">
+    <div className="bg-fill-primary text-label-primary light rounded-2xl p-6 mx-6 xl:mx-0">
+      <span className="text-sm font-medium tracking-wide mb-4 block text-label-secondary">
         {t('funded_by')}
       </span>
       <div className="flex flex-col sm:flex-row flex-wrap items-center gap-6 sm:gap-8">

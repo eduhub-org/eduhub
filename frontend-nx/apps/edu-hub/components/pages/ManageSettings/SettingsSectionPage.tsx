@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl';
 
 import { Page } from '../../layout/Page';
 import { useIsAdmin, useIsOrgAdmin } from '../../../hooks/authentication';
+import { useOrgAdminCapabilities } from '../../../hooks/orgAdminCapabilities';
 import SettingsLayout from './SettingsLayout';
 import { SettingsNavItemId } from './config';
 
@@ -24,9 +25,13 @@ const SettingsSectionPage: FC<SettingsSectionPageProps> = ({
 }) => {
   const isAdmin = useIsAdmin();
   const isOrgAdmin = useIsOrgAdmin();
+  const { canManageSettings } = useOrgAdminCapabilities();
   const t = useTranslations('manageSettings');
   const title = pageTitle ?? t(`nav.items.${itemId}.label`);
-  const canView = isAdmin || (allowOrgAdmin && isOrgAdmin);
+  // Org admins reach these pages only with canManageSettings on at least one organization — the same
+  // capability Hasura requires to actually write OrganizationAdmin/Program, so the gate matches what
+  // is enforceable rather than "is an org admin of any kind."
+  const canView = isAdmin || (allowOrgAdmin && isOrgAdmin && canManageSettings);
 
   return (
     <>
