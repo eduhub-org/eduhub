@@ -327,12 +327,16 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
         </div>
       ) : (
         <Tooltip title={tooltipText} placement="top">
-          <div
-            className="w-40 h-40 bg-gray-100 border-2 border-dashed border-gray-300 rounded-full flex items-center justify-center cursor-pointer hover:bg-gray-200 transition-colors duration-200"
+          {/* A button, not a clickable div: the file input behind it is
+              display:none, so this is the only control a keyboard user has. */}
+          <button
+            type="button"
+            aria-label={tooltipText}
             onClick={handleIconClick}
+            className="w-40 h-40 bg-gray-100 border-2 border-dashed border-gray-300 rounded-full flex items-center justify-center cursor-pointer appearance-none hover:bg-gray-200 transition-colors duration-200"
           >
             <MdPhotoCamera size="2em" className="text-gray-400" />
-          </div>
+          </button>
         </Tooltip>
       )}
       {renderFileInput('profile-picture-input')}

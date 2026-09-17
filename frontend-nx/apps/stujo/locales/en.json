@@ -137,26 +137,26 @@
     "archiveFailed": "Archiving failed: {error}",
     "archiveNetworkError": "Archiving failed: network error.",
     "unknownError": "Unknown error",
-    "organizationWebsite": {
+    "OrganizationWebsite": {
       "label": "Website",
       "placeholder": "https://example.com",
       "save": "Save",
       "saved": "Saved",
-      "invalidUrl": "Please enter a valid http(s) URL.",
-      "permissionDenied": "This company already has an admin managing settings. Ask them to update the website.",
-      "saveError": "Error saving website",
+      "invalid_url": "Please enter a valid http(s) URL.",
+      "permission_denied": "This company already has an admin managing settings. Ask them to update the website.",
+      "save_error": "Error saving website",
       "none": "No website yet",
       "hint": "Full address including https://"
     },
-    "organizationProfile": {
+    "OrganizationProfile": {
       "title": "Edit company profile",
-      "editButton": "Edit company profile",
-      "editButtonAria": "Edit company profile of {organization}",
+      "edit_button": "Edit company profile",
+      "edit_button_aria": "Edit company profile of {organization}",
       "intro": "Your logo and website appear on all of your job offers.",
-      "logoHeading": "Logo",
-      "logoAlt": "{organization} logo",
-      "logoHint": "PNG or JPG, max. 2 MB. Your logo is shown in full and never cropped.",
-      "websiteHeading": "Website",
+      "logo_heading": "Logo",
+      "logo_alt": "{organization} logo",
+      "logo_hint": "PNG or JPG, max. 2 MB. Your logo is shown in full and never cropped.",
+      "website_heading": "Website",
       "done": "Done"
     },
     "NeuesAngebot": {

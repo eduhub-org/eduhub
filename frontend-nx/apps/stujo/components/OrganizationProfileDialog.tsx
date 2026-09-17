@@ -41,22 +41,22 @@ const OrganizationProfileDialog: FC<Props> = ({
     <DialogShell
       open={open}
       onClose={onClose}
-      title={t('organizationProfile.title')}
+      title={t('OrganizationProfile.title')}
       ariaLabelledBy={TITLE_ID}
       maxWidth="sm"
       fullWidth
     >
       <div className="stujo-org-profile">
-        <p className="stujo-muted">{t('organizationProfile.intro')}</p>
+        <p className="stujo-muted">{t('OrganizationProfile.intro')}</p>
 
         <section className="stujo-org-profile-section">
-          <h3>{t('organizationProfile.logoHeading')}</h3>
+          <h3>{t('OrganizationProfile.logo_heading')}</h3>
           <OrganizationLogoEditor organization={organization} onLogoUpdated={onOrganizationUpdated} />
-          <p className="stujo-field-hint">{t('organizationProfile.logoHint')}</p>
+          <p className="stujo-field-hint">{t('OrganizationProfile.logo_hint')}</p>
         </section>
 
         <section className="stujo-org-profile-section">
-          <h3>{t('organizationProfile.websiteHeading')}</h3>
+          <h3>{t('OrganizationProfile.website_heading')}</h3>
           {/* key: resets the local draft when the user switches company while
               the dialog is mounted. */}
           <OrganizationWebsiteField
@@ -68,7 +68,7 @@ const OrganizationProfileDialog: FC<Props> = ({
 
         <div className="stujo-org-profile-actions">
           <button type="button" className="stujo-btn stujo-btn--primary" onClick={onClose}>
-            {t('organizationProfile.done')}
+            {t('OrganizationProfile.done')}
           </button>
         </div>
       </div>

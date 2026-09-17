@@ -61,7 +61,7 @@ describe('OrganizationIdentityRow', () => {
     renderRow([organization()]);
 
     expect(screen.queryByRole('link', { name: /example/ })).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'organizationWebsite.none' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'OrganizationWebsite.none' })).toBeInTheDocument();
   });
 
   it('renders the company without artwork when there is no logo', () => {
@@ -77,7 +77,7 @@ describe('OrganizationIdentityRow', () => {
     const logo = screen.getByRole('img');
     expect(logo).toHaveAttribute('src', 'https://cdn.test/logo.png');
     expect(logo).toHaveAccessibleName(
-      'organizationProfile.logoAlt:{"organization":"Nordwerk Maschinenbau GmbH"}'
+      'OrganizationProfile.logo_alt:{"organization":"Nordwerk Maschinenbau GmbH"}'
     );
   });
 
@@ -111,7 +111,7 @@ describe('OrganizationIdentityRow', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     fireEvent.click(
       screen.getByRole('button', {
-        name: 'organizationProfile.editButtonAria:{"organization":"Nordwerk Maschinenbau GmbH"}',
+        name: 'OrganizationProfile.edit_button_aria:{"organization":"Nordwerk Maschinenbau GmbH"}',
       })
     );
 

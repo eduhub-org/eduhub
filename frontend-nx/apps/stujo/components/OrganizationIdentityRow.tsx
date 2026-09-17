@@ -51,7 +51,7 @@ const OrganizationIdentityRow: FC<Props> = ({
           <span className="stujo-org-logo">
             <img
               src={logoUrl}
-              alt={t('organizationProfile.logoAlt', { organization: organization.name })}
+              alt={t('OrganizationProfile.logo_alt', { organization: organization.name })}
               onError={() => setLogoBroken(true)}
             />
           </span>
@@ -85,7 +85,7 @@ const OrganizationIdentityRow: FC<Props> = ({
             </a>
           ) : (
             <button type="button" className="stujo-linkish" onClick={openDialog}>
-              {t('organizationWebsite.none')}
+              {t('OrganizationWebsite.none')}
             </button>
           )}
         </div>
@@ -93,10 +93,10 @@ const OrganizationIdentityRow: FC<Props> = ({
         <button
           type="button"
           className="stujo-btn stujo-btn--small stujo-btn--ghost stujo-org-edit"
-          aria-label={t('organizationProfile.editButtonAria', { organization: organization.name })}
+          aria-label={t('OrganizationProfile.edit_button_aria', { organization: organization.name })}
           onClick={openDialog}
         >
-          {t('organizationProfile.editButton')}
+          {t('OrganizationProfile.edit_button')}
         </button>
       </div>
 

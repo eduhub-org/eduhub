@@ -15,8 +15,8 @@ const INPUT_ID = 'stujo-organization-website';
 const MESSAGE_ID = `${INPUT_ID}-message`;
 
 const ERROR_MESSAGE_KEYS: Record<string, string> = {
-  UNAUTHORIZED: 'organizationWebsite.permissionDenied',
-  INVALID_INPUT: 'organizationWebsite.invalidUrl',
+  UNAUTHORIZED: 'OrganizationWebsite.permission_denied',
+  INVALID_INPUT: 'OrganizationWebsite.invalid_url',
 };
 
 /**
@@ -65,29 +65,29 @@ const OrganizationWebsiteField: FC<Props> = ({ organization, onWebsiteUpdated })
         setSaved(true);
         onWebsiteUpdated();
       } else {
-        setError(t(ERROR_MESSAGE_KEYS[payload?.messageKey ?? ''] ?? 'organizationWebsite.saveError'));
+        setError(t(ERROR_MESSAGE_KEYS[payload?.messageKey ?? ''] ?? 'OrganizationWebsite.save_error'));
       }
     } catch (updateError) {
       console.error('updateOrganizationWebsite failed', updateError);
-      setError(t('organizationWebsite.saveError'));
+      setError(t('OrganizationWebsite.save_error'));
     }
   };
 
   return (
     <div className="stujo-field">
-      <label htmlFor={INPUT_ID}>{t('organizationWebsite.label')}</label>
+      <label htmlFor={INPUT_ID}>{t('OrganizationWebsite.label')}</label>
       <input
         id={INPUT_ID}
         type="url"
         inputMode="url"
         autoComplete="url"
         value={value}
-        placeholder={t('organizationWebsite.placeholder')}
+        placeholder={t('OrganizationWebsite.placeholder')}
         aria-invalid={!isValid}
         aria-describedby={!isValid || error ? MESSAGE_ID : undefined}
         onChange={(event) => handleChange(event.target.value)}
       />
-      <p className="stujo-field-hint">{t('organizationWebsite.hint')}</p>
+      <p className="stujo-field-hint">{t('OrganizationWebsite.hint')}</p>
       <div className="stujo-field-actions">
         <button
           type="button"
@@ -95,13 +95,13 @@ const OrganizationWebsiteField: FC<Props> = ({ organization, onWebsiteUpdated })
           disabled={!isValid || isUnchanged || loading}
           onClick={handleSave}
         >
-          {t('organizationWebsite.save')}
+          {t('OrganizationWebsite.save')}
         </button>
-        {saved && !error && <span className="stujo-muted">{t('organizationWebsite.saved')}</span>}
+        {saved && !error && <span className="stujo-muted">{t('OrganizationWebsite.saved')}</span>}
       </div>
       {(!isValid || error) && (
         <p id={MESSAGE_ID} className="stujo-field-error" role="alert">
-          {!isValid ? t('organizationWebsite.invalidUrl') : error}
+          {!isValid ? t('OrganizationWebsite.invalid_url') : error}
         </p>
       )}
     </div>

@@ -166,4 +166,22 @@ describe('ImageUploader — profile picture', () => {
     expect(avatar).toHaveClass('rounded-full');
     expect(avatar).toHaveClass('object-cover');
   });
+
+  // The file input is display:none, so this button is the only way in for
+  // someone who is not using a mouse.
+  it('offers a keyboard-reachable upload target when there is no picture', () => {
+    render(
+      <ImageUploader
+        variant="eduhub"
+        element="profilePicture"
+        identifierVariables={{ userId: 'u1' }}
+        currentFile={null}
+        user={{ picture: null }}
+      />
+    );
+
+    expect(
+      screen.getByRole('button', { name: 'image_uploader.upload_new_profile_picture' })
+    ).toBeInTheDocument();
+  });
 });
