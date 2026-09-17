@@ -480,8 +480,11 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
             : t('attendance_status_uncertain');
 
       return (
-        <div className="flex flex-row items-center gap-4">
-          <div className="flex flex-row items-center gap-1 flex-wrap">
+        <div className="flex items-center gap-3 w-full">
+          <div
+            className="grid gap-1 flex-shrink-0"
+            style={{ gridTemplateColumns: 'repeat(8, 1.5em)' }}
+          >
             {dotsData.map((d) => (
               <Dot
                 key={d.session.id}
@@ -492,7 +495,7 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
               />
             ))}
           </div>
-          <div className="flex flex-row items-center gap-1 flex-shrink-0">
+          <div className="flex items-center gap-1 flex-shrink-0 w-16">
             <span className="text-label-primary text-sm whitespace-nowrap">{`${attended}/${total}`}</span>
             <Tooltip title={statusTooltip}>
               <span className="inline-flex">
