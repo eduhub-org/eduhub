@@ -1,8 +1,7 @@
-import Image from 'next/image';
-import { FC, useMemo } from 'react';
+import { FC } from 'react';
 import { isLinkFormat } from '../../helpers/util';
 import { useTranslations } from 'next-intl';
-import { getPublicImageUrl } from '../../helpers/filehandling';
+import UserAvatar from './UserAvatar';
 
 type Size = 'small' | 'compact' | 'medium' | 'large';
 
@@ -43,11 +42,6 @@ const UserCard: FC<UserCardProps> = ({ user, role, className, size = 'large' }) 
   const { imageSize, imageSolution, fontSize } = sizeConfigs[size];
   const showName = size !== 'small';
 
-  const userPictureUrl = useMemo(
-    () => getPublicImageUrl(user?.picture ?? null, imageSolution) || '/images/common/mystery.svg',
-    [user?.picture, imageSolution]
-  );
-
   const displayName = `${user?.firstName ?? ''} ${user?.lastName ?? ''}`.trim();
 
   const getProfileLink = (url: string) => {
@@ -71,13 +65,12 @@ const UserCard: FC<UserCardProps> = ({ user, role, className, size = 'large' }) 
 
   return (
     <div className={`flex items-start ${className}`}>
-      <Image
-        src={userPictureUrl}
+      <UserAvatar
+        picture={user?.picture ?? null}
+        imageResolution={imageSolution}
+        imageSize={imageSize}
         alt={displayName ? `${t('image_of')} ${displayName}` : t('image_of')}
-        width={imageSize}
-        height={imageSize}
         className="rounded-full object-cover mr-4"
-        style={{ width: `${imageSize}px`, height: `${imageSize}px` }}
       />
       {showName && (
         <div className={`flex flex-col ${fontSize}`}>

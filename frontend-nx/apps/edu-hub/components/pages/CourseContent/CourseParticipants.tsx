@@ -1,11 +1,10 @@
-import Image from 'next/image';
 import { FC, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import { SiElement } from 'react-icons/si';
 
 import { SectionTitle } from '../../common/SectionTitle';
+import UserAvatar from '../../common/UserAvatar';
 import { elementDirectMessageUrl } from '../../../helpers/matrix';
-import { getPublicImageUrl } from '../../../helpers/filehandling';
 import { useRoleQuery } from '../../../hooks/authedQuery';
 import { COURSE_PARTICIPANTS } from '../../../queries/courseParticipant';
 import {
@@ -35,24 +34,19 @@ const Participant: FC<{ participant: CourseParticipants_CourseParticipant }> = (
   const t = useTranslations('course');
   const user = participant.User;
 
-  const pictureUrl = useMemo(
-    () => getPublicImageUrl(user?.picture ?? null, 64) || '/images/common/mystery.svg',
-    [user?.picture]
-  );
   const elementUrl = useMemo(() => elementDirectMessageUrl(user?.matrixUserHandle), [user?.matrixUserHandle]);
 
   const displayName = `${user?.firstName ?? ''} ${user?.lastName ?? ''}`.trim();
 
   return (
     <div className="flex items-center gap-3 min-w-0">
-      <Image
-        src={pictureUrl}
+      <UserAvatar
+        picture={user?.picture ?? null}
+        imageResolution={64}
+        imageSize={AVATAR_PX}
         alt=""
-        aria-hidden="true"
-        width={AVATAR_PX}
-        height={AVATAR_PX}
+        ariaHidden
         className="rounded-full object-cover flex-shrink-0"
-        style={{ width: `${AVATAR_PX}px`, height: `${AVATAR_PX}px` }}
       />
       <div className="flex flex-col min-w-0">
         <span className="text-sm font-semibold truncate">{displayName}</span>
