@@ -5,15 +5,13 @@ import { useTheme } from '@mui/material/styles';
 import Tooltip from '@mui/material/Tooltip';
 import { HelpOutline, CloudUpload } from '@mui/icons-material';
 import Button from '@mui/material/Button';
-import Popover from '@mui/material/Popover';
-import Dialog from '@mui/material/Dialog';
 import { useRoleMutation } from '../../hooks/authedMutation';
 import { useTranslations } from 'next-intl';
 import { prioritizeClasses } from '../../helpers/util';
 import { AlertMessageDialog } from '../common/dialogs/AlertMessageDialog';
 import Snackbar from '@mui/material/Snackbar';
 import { IconButton } from '@mui/material';
-import { MdPhotoCamera, MdClose } from 'react-icons/md';
+import { MdPhotoCamera } from 'react-icons/md';
 import { SAVE_USER_PROFILE_IMAGE, SAVE_ORGANIZATION_LOGO, REMOVE_ORGANIZATION_LOGO } from '../../queries/actions';
 import { useSession } from 'next-auth/react';
 import { getPublicUrl } from '../../helpers/filehandling';
@@ -45,12 +43,6 @@ const resolveLogoErrorMessage = (t: (key: string) => string, messageKey?: string
 type ImageUploaderProps = {
   variant: 'material' | 'eduhub';
   element?: 'profilePicture' | 'organizationLogo' | 'default';
-  // 'trigger' renders a compact button (for placement next to e.g. a picker) that
-  // opens a popover with the same controls, instead of the permanently inlined
-  // upload field. Only meaningful for element === 'organizationLogo'.
-  layout?: 'inline' | 'trigger';
-  // Accessible label for the trigger button; falls back to `label`.
-  triggerLabel?: string;
   label?: string;
   identifierVariables: Record<string, any>;
   currentFile: string | null;
@@ -70,8 +62,6 @@ type ImageUploaderProps = {
 const ImageUploader: React.FC<ImageUploaderProps> = ({
   variant,
   element = 'profilePicture',
-  layout = 'inline',
-  triggerLabel,
   label,
   identifierVariables,
   currentFile,
@@ -91,8 +81,6 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isErrorDialogOpen, setIsErrorDialogOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const [triggerAnchorEl, setTriggerAnchorEl] = useState<HTMLElement | null>(null);
-  const [isFullSizeOpen, setIsFullSizeOpen] = useState(false);
 
   const theme = useTheme();
 
@@ -294,8 +282,8 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
     size: 'small' | 'large' = 'large',
     borderRadius: 'rounded' | 'rounded-full' = 'rounded-full'
   ) => {
-    const sizeClasses = size === 'small' ? 'w-16 h-16' : 'w-40 h-40';
-    const containerClasses = size === 'small' ? 'h-16 w-16' : 'h-40 w-80';
+    const sizeClasses = size === 'small' ? 'w-28 h-28' : 'w-40 h-40';
+    const containerClasses = size === 'small' ? 'h-28 w-28' : 'h-40 w-80';
     const marginClasses = size === 'small' ? 'mb-2' : 'mb-6';
 
     return (
@@ -459,163 +447,6 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
     </div>
   );
 
-  const handleTriggerClick = useCallback((event: React.MouseEvent<HTMLElement>) => {
-    setTriggerAnchorEl(event.currentTarget);
-  }, []);
-
-  const handleTriggerClose = useCallback(() => {
-    setTriggerAnchorEl(null);
-  }, []);
-
-  const handleOpenFullSize = useCallback(() => {
-    setIsFullSizeOpen(true);
-  }, []);
-
-  const handleCloseFullSize = useCallback(() => {
-    setIsFullSizeOpen(false);
-  }, []);
-
-  // Compact affordance for placement next to e.g. an organization picker: a small
-  // button showing the current logo (or a placeholder) that opens a popover with
-  // the same change/remove controls as renderOrganizationLogo, plus a full-size
-  // preview. Used by StuJo's organization switcher; the expandable settings row
-  // keeps the permanently inlined renderOrganizationLogo above.
-  const renderOrganizationLogoTrigger = () => {
-    const imageUrl = currentFile ? getPublicUrl(currentFile) : null;
-    const accessibleLabel = triggerLabel || label || t('image_uploader.organization_logo');
-    const isPopoverOpen = Boolean(triggerAnchorEl);
-
-    return (
-      <>
-        <Tooltip title={accessibleLabel} placement="bottom">
-          <IconButton
-            onClick={handleTriggerClick}
-            size="small"
-            aria-label={accessibleLabel}
-            className={prioritizeClasses(className)}
-            style={{
-              width: 44,
-              height: 44,
-              border: '1px solid rgba(0,0,0,0.15)',
-              padding: imageUrl ? 0 : undefined,
-              overflow: 'hidden',
-            }}
-          >
-            {imageUrl ? (
-              <img
-                src={imageUrl}
-                alt={accessibleLabel}
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              />
-            ) : (
-              <MdPhotoCamera size="1.25em" />
-            )}
-          </IconButton>
-        </Tooltip>
-        <Popover
-          open={isPopoverOpen}
-          anchorEl={triggerAnchorEl}
-          onClose={handleTriggerClose}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-          transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-        >
-          <div
-            style={{
-              padding: 16,
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 12,
-              alignItems: 'center',
-              minWidth: 200,
-            }}
-          >
-            {label && <div style={{ fontWeight: 600, fontSize: '0.85rem' }}>{label}</div>}
-            {imageUrl ? (
-              <img
-                src={imageUrl}
-                alt={accessibleLabel}
-                onClick={handleOpenFullSize}
-                style={{
-                  width: 96,
-                  height: 96,
-                  objectFit: 'cover',
-                  borderRadius: 8,
-                  cursor: 'zoom-in',
-                  border: '1px solid rgba(0,0,0,0.15)',
-                }}
-              />
-            ) : (
-              <div
-                style={{
-                  width: 96,
-                  height: 96,
-                  borderRadius: 8,
-                  background: 'rgba(0,0,0,0.05)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: theme.palette.text.disabled,
-                }}
-              >
-                <MdPhotoCamera size="2em" />
-              </div>
-            )}
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center' }}>
-              <Button size="small" variant="outlined" onClick={handleIconClick} disabled={isUploading || isRemoving}>
-                {imageUrl ? t('image_uploader.change_logo') : t('image_uploader.upload_new_logo')}
-              </Button>
-              {imageUrl && (
-                <Button size="small" variant="outlined" onClick={handleOpenFullSize}>
-                  {t('image_uploader.view_full_size')}
-                </Button>
-              )}
-              {imageUrl && (
-                <Button
-                  size="small"
-                  variant="outlined"
-                  color="error"
-                  onClick={handleRemoveImage}
-                  disabled={isUploading || isRemoving}
-                >
-                  {t('image_uploader.remove_logo')}
-                </Button>
-              )}
-            </div>
-            {isUploading && <div className="text-sm text-blue-600">{t('image_uploader.uploading')}...</div>}
-            {isRemoving && <div className="text-sm text-red-600">{t('image_uploader.removing')}...</div>}
-          </div>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept={acceptedFileTypes}
-            onChange={handleFileChange}
-            style={{ display: 'none' }}
-            id="organization-logo-trigger-input"
-          />
-        </Popover>
-        {imageUrl && (
-          <Dialog open={isFullSizeOpen} onClose={handleCloseFullSize} maxWidth="md">
-            <div style={{ position: 'relative' }}>
-              <IconButton
-                onClick={handleCloseFullSize}
-                aria-label={t('image_uploader.close')}
-                size="small"
-                style={{ position: 'absolute', top: 8, right: 8, background: 'rgba(255,255,255,0.85)' }}
-              >
-                <MdClose />
-              </IconButton>
-              <img
-                src={imageUrl}
-                alt={accessibleLabel}
-                style={{ display: 'block', maxWidth: '100%', maxHeight: '80vh' }}
-              />
-            </div>
-          </Dialog>
-        )}
-      </>
-    );
-  };
-
   const renderMaterialUI = () => (
     <div className="col-span-10 flex flex-col mt-3">
       {label && <label className="mb-2">{label}</label>}
@@ -646,9 +477,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
     <>
       {variant === 'material'
         ? element === 'organizationLogo'
-          ? layout === 'trigger'
-            ? renderOrganizationLogoTrigger()
-            : renderOrganizationLogo()
+          ? renderOrganizationLogo()
           : renderMaterialUI()
         : renderEduhub()}
       {isErrorDialogOpen && (
