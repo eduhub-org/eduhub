@@ -63,6 +63,8 @@ export const COURSE_PARTICIPATIONS = gql`
 export const COURSE_PARTICIPATION_ATTENDANCES = gql`
   query CourseParticipationAttendances($courseId: Int!, $userIds: [uuid!]!) {
     Attendance(
+      distinct_on: [userId, sessionId, source]
+      order_by: [{ userId: asc }, { sessionId: asc }, { source: asc }, { id: desc }]
       where: {
         userId: { _in: $userIds }
         Session: { courseId: { _eq: $courseId } }

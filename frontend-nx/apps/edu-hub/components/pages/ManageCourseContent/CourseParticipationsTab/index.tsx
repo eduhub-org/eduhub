@@ -183,6 +183,7 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
     {
       variables: { courseId: course.id, userIds: pageUserIds },
       skip: pageUserIds.length === 0,
+      fetchPolicy: 'cache-and-network',
     }
   );
   const attendancesByUser = useMemo(
@@ -526,9 +527,17 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
               <Dot
                 key={d.session.id}
                 color={d.color}
-                className="cursor-pointer hover:border-2 hover:border-indigo-200 hover:rounded-full"
+                className={
+                  attendanceLoading
+                    ? 'cursor-wait opacity-60'
+                    : 'cursor-pointer hover:border-2 hover:border-indigo-200 hover:rounded-full'
+                }
                 title={new Date(d.session.startDateTime).toLocaleString()}
-                onClick={() => onDotClick(d.session, enrollment.userId)}
+                onClick={
+                  attendanceLoading
+                    ? undefined
+                    : () => onDotClick(d.session, enrollment.userId)
+                }
               />
             ))}
           </div>
@@ -543,7 +552,7 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
         </div>
       );
     };
-  }, [sessions, maxMissedSessions, t]);
+  }, [attendanceLoading, sessions, maxMissedSessions, t]);
 
   const columns = useMemo<ColumnDef<ExtendedEnrollment>[]>(
     () => [
@@ -882,6 +891,7 @@ function ParticipationTable({
       bulkActions={bulkActions}
       onBulkAction={onBulkAction}
       expandableRowComponent={expandableRowComponent}
+      preserveRowsWhileLoading
     />
   );
 }

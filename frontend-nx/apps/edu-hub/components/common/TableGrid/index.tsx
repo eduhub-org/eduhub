@@ -1,6 +1,6 @@
 import { BaseRow, TableGridFilter, TableGridProps } from './types';
-import React, { useState, useMemo, useCallback } from 'react';
-import { TextField, Checkbox, Select, MenuItem, FormControl, InputLabel, SelectChangeEvent, ListSubheader, ListItemText, Divider, Tooltip } from '@mui/material';
+import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
+import { TextField, Checkbox, Select, MenuItem, FormControl, InputLabel, SelectChangeEvent, ListSubheader, ListItemText, Divider, Tooltip, CircularProgress } from '@mui/material';
 import { useTranslations } from 'next-intl';
 import { ArrowDropUp, ArrowDropDown } from '@mui/icons-material';
 import { useRouter } from 'next/router';
@@ -126,6 +126,7 @@ const TableGrid = <T extends BaseRow,>({
   onSortingChange: externalOnSortingChange,
   compactRows = false,
   rounded = false,
+  preserveRowsWhileLoading = false,
   rowHref,
   onRowNavigate,
   canDeleteRow,
@@ -167,6 +168,26 @@ const TableGrid = <T extends BaseRow,>({
   const t = useTranslations();
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
   const [internalSorting, setInternalSorting] = useState<SortingState>([]);
+  const settledPageRef = useRef<{
+    data: T[];
+    pageIndex: number;
+    pageSize: number;
+    totalCount: number | undefined;
+  } | null>(null);
+
+  useEffect(() => {
+    if (!loading && !error) {
+      settledPageRef.current = { data, pageIndex, pageSize, totalCount };
+    }
+  }, [data, error, loading, pageIndex, pageSize, totalCount]);
+
+  const retainedPage =
+    preserveRowsWhileLoading && loading ? settledPageRef.current : null;
+  const tableData = retainedPage?.data ?? data;
+  const tablePageIndex = retainedPage?.pageIndex ?? pageIndex;
+  const tablePageSize = retainedPage?.pageSize ?? pageSize;
+  const tableTotalCount = retainedPage?.totalCount ?? totalCount;
+  const isShowingRetainedPage = retainedPage !== null;
   
   // Use external sorting if provided (server-side sorting), otherwise use internal (client-side sorting)
   const sorting = externalSorting !== undefined ? externalSorting : internalSorting;
@@ -242,7 +263,7 @@ const TableGrid = <T extends BaseRow,>({
     if (handleRowExpansionBulkAction(selectedAction)) {
       return;
     }
-    handleBulkActionChange(selectedAction, data);
+    handleBulkActionChange(selectedAction, tableData);
   };
 
   const handlePrevious = () => {
@@ -282,9 +303,9 @@ const TableGrid = <T extends BaseRow,>({
             size: 50, // Fixed width for checkbox column
             header: () => (
               <Checkbox
-                checked={isAllSelected(data)}
-                indeterminate={isSomeSelected(data)}
-                onChange={() => toggleAllRows(data)}
+                checked={isAllSelected(tableData)}
+                indeterminate={isSomeSelected(tableData)}
+                onChange={() => toggleAllRows(tableData)}
                 sx={{
                   color: 'var(--eduhub-label-primary)',
                   '&.Mui-checked': {
@@ -318,11 +339,11 @@ const TableGrid = <T extends BaseRow,>({
       size: col.size || (col.meta?.width ? col.meta.width * 100 : undefined),
     }));
     return [...selectionColumn, ...dataColumns];
-  }, [columns, showCheckbox, toggleRowSelection, selectedRowIds, toggleAllRows, data, isAllSelected, isSomeSelected]);
+  }, [columns, showCheckbox, toggleRowSelection, selectedRowIds, toggleAllRows, tableData, isAllSelected, isSomeSelected]);
 
 
   const table = useReactTable({
-    data,
+    data: tableData,
     defaultColumn: {
       enableSorting: false,
       size: 150, // Default column width
@@ -339,7 +360,9 @@ const TableGrid = <T extends BaseRow,>({
     state: {
       sorting,
       globalFilter: searchFilter,
-      ...(enablePagination && { pagination: { pageIndex, pageSize } }),
+      ...(enablePagination && {
+        pagination: { pageIndex: tablePageIndex, pageSize: tablePageSize },
+      }),
     },
     globalFilterFn: fuzzyFilter,
     onGlobalFilterChange: onGlobalFilterChange,
@@ -352,7 +375,7 @@ const TableGrid = <T extends BaseRow,>({
     enableMultiRowSelection: true,
   });
 
-  const totalPages = Math.ceil((totalCount || 0) / pageSize);
+  const totalPages = Math.ceil((tableTotalCount || 0) / tablePageSize);
 
   // Calculate total width of main row content for proper alignment and scrolling
   // Use cell column sizes (from data rows) to avoid sort arrow width issues in headers
@@ -610,7 +633,7 @@ const TableGrid = <T extends BaseRow,>({
   );
 
   const tableBodyRows =
-    !loading &&
+    (!loading || isShowingRetainedPage) &&
         !error &&
         (() => {
           // When server-side sorting is enabled, pagination is also server-side
@@ -618,7 +641,10 @@ const TableGrid = <T extends BaseRow,>({
           // When server-side sorting is NOT enabled but pagination is enabled,
           // we slice for client-side pagination (backward compatibility)
           const rowsToDisplay = enablePagination && !isServerSideSorting
-            ? table.getRowModel().rows.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize)
+            ? table.getRowModel().rows.slice(
+                tablePageIndex * tablePageSize,
+                (tablePageIndex + 1) * tablePageSize
+              )
             : table.getRowModel().rows;
 
           const rowMarginClass = 'mb-1';
@@ -761,79 +787,94 @@ const TableGrid = <T extends BaseRow,>({
 
   return (
     <div className="min-w-0 max-w-full">
-      {toolbar}
-      <div className="overflow-x-auto max-w-full">
-        <div className="w-full" style={{ minWidth: `${mainRowContentWidth}px` }}>
-          {tableHeaderRow}
-          {rounded ? (
-            <div className="rounded-2xl overflow-hidden border border-border-primary min-w-0">
-              {tableBodyRows}
+      <div className="relative" aria-busy={loading}>
+        <div className={isShowingRetainedPage ? 'pointer-events-none opacity-60' : ''}>
+          {toolbar}
+          <div className="overflow-x-auto max-w-full">
+            <div className="w-full" style={{ minWidth: `${mainRowContentWidth}px` }}>
+              {tableHeaderRow}
+              {rounded ? (
+                <div className="rounded-2xl overflow-hidden border border-border-primary min-w-0">
+                  {tableBodyRows}
+                </div>
+              ) : (
+                tableBodyRows
+              )}
             </div>
-          ) : (
-            tableBodyRows
-          )}
-        </div>
-      </div>
-
-      {/* Pagination */}
-      {!loading && !error && enablePagination && (totalCount ?? 0) > 0 && (
-        <div className="flex justify-end pb-10 text-label-primary mt-4">
-          <div className="flex flex-row items-center space-x-5">
-            {onPageSizeChange && (
-              <FormControl sx={{ m: 1, minWidth: 130 }} size="small">
-                <InputLabel id="page-size-select-label" sx={{ color: 'white' }}>
-                  {t('common.table_grid.items_per_page')}
-                </InputLabel>
-                <Select
-                  labelId="page-size-select-label"
-                  id="page-size-select"
-                  value={pageSize}
-                  label={t('common.table_grid.items_per_page')}
-                  onChange={(e) => onPageSizeChange(Number(e.target.value))}
-                  sx={{
-                    color: 'white',
-                    '.MuiOutlinedInput-notchedOutline': {
-                      borderColor: 'rgba(255, 255, 255, 0.23)',
-                    },
-                    '&:hover .MuiOutlinedInput-notchedOutline': {
-                      borderColor: 'rgba(255, 255, 255, 0.5)',
-                    },
-                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                      borderColor: 'white',
-                    },
-                    '.MuiSvgIcon-root': {
-                      color: 'white',
-                    },
-                  }}
-                >
-                  {availablePageSizes.map((size) => (
-                    <MenuItem key={size} value={size}>
-                      {size}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            )}
-            {pageIndex > 0 && (
-              <MdArrowBack
-                className="border-2 rounded-full cursor-pointer hover:bg-indigo-100"
-                size={30}
-                onClick={handlePrevious}
-              />
-            )}
-            <p className="font-medium">
-              {t('common.table_grid.pagination_text', { currentPage: pageIndex + 1, totalPage: totalPages })}
-            </p>
-            {pageIndex < totalPages - 1 && (
-              <MdArrowForward
-                className="border-2 rounded-full cursor-pointer hover:bg-indigo-100"
-                size={30}
-                onClick={handleNext}
-              />
-            )}
           </div>
+
+          {/* Pagination */}
+          {(!loading || isShowingRetainedPage) &&
+            !error &&
+            enablePagination &&
+            (tableTotalCount ?? 0) > 0 && (
+              <div className="flex justify-end pb-10 text-label-primary mt-4">
+                <div className="flex flex-row items-center space-x-5">
+                  {onPageSizeChange && (
+                    <FormControl sx={{ m: 1, minWidth: 130 }} size="small">
+                      <InputLabel id="page-size-select-label" sx={{ color: 'white' }}>
+                        {t('common.table_grid.items_per_page')}
+                      </InputLabel>
+                      <Select
+                        labelId="page-size-select-label"
+                        id="page-size-select"
+                        value={tablePageSize}
+                        label={t('common.table_grid.items_per_page')}
+                        onChange={(e) => onPageSizeChange(Number(e.target.value))}
+                        sx={{
+                          color: 'white',
+                          '.MuiOutlinedInput-notchedOutline': {
+                            borderColor: 'rgba(255, 255, 255, 0.23)',
+                          },
+                          '&:hover .MuiOutlinedInput-notchedOutline': {
+                            borderColor: 'rgba(255, 255, 255, 0.5)',
+                          },
+                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                            borderColor: 'white',
+                          },
+                          '.MuiSvgIcon-root': {
+                            color: 'white',
+                          },
+                        }}
+                      >
+                        {availablePageSizes.map((size) => (
+                          <MenuItem key={size} value={size}>
+                            {size}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  )}
+                  {tablePageIndex > 0 && (
+                    <MdArrowBack
+                      className="border-2 rounded-full cursor-pointer hover:bg-indigo-100"
+                      size={30}
+                      onClick={handlePrevious}
+                    />
+                  )}
+                  <p className="font-medium">
+                    {t('common.table_grid.pagination_text', {
+                      currentPage: tablePageIndex + 1,
+                      totalPage: totalPages,
+                    })}
+                  </p>
+                  {tablePageIndex < totalPages - 1 && (
+                    <MdArrowForward
+                      className="border-2 rounded-full cursor-pointer hover:bg-indigo-100"
+                      size={30}
+                      onClick={handleNext}
+                    />
+                  )}
+                </div>
+              </div>
+            )}
         </div>
-      )}
+        {isShowingRetainedPage && (
+          <div className="absolute inset-0 flex justify-center pt-16">
+            <CircularProgress size={28} />
+          </div>
+        )}
+      </div>
     </div>
   );
 };

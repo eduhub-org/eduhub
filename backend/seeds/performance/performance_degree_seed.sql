@@ -30329,8 +30329,8 @@ SELECT 300000000 + (participant_index * 100) + session_index,
        '2026-06-01 18:00:00+00'::timestamptz + (session_index * interval '7 days'),
        'performance.attendance.' || participant_index || '@example.com',
        'ZOOM',
-       '2026-06-01 16:00:00+00'::timestamptz + (session_index * interval '7 days'),
-       '2026-06-01 18:00:00+00'::timestamptz + (session_index * interval '7 days'),
+       '2026-06-01 16:00:00+00'::timestamptz + ((session_index - 1) * interval '7 days'),
+       '2026-06-01 18:00:00+00'::timestamptz + ((session_index - 1) * interval '7 days'),
        7200,
        participant_index % 3
 FROM generate_series(1, 1000) AS participant_series(participant_index)
