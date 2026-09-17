@@ -19,10 +19,20 @@ const useLogout = () => {
       console.error('Failed to prepare federated logout', error);
     }
 
+    // Leave protected pages before clearing the session. Some pages start a
+    // login as soon as they become unauthenticated, which would otherwise
+    // race the intended Keycloak logout redirect.
+    try {
+      await router.replace('/');
+    } catch (error) {
+      // A failed client-side navigation must not prevent local logout.
+      console.error('Failed to leave protected page before logout', error);
+    }
+
     // Always clear the local session, even if Keycloak logout preparation
-    // failed, then return to a real application page.
+    // failed, then use a full-page navigation for the external IdP URL.
     await signOut({ redirect: false });
-    router.push(url);
+    window.location.replace(url);
   }, [router]);
 };
 
