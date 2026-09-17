@@ -174,8 +174,8 @@
       "upload_error": "Fehler beim Hochladen des Bildes",
       "organization_logo": "Logo der Organisation",
       "change_logo": "Logo ändern",
-      "view_full_size": "In voller Größe ansehen",
-      "close": "Schließen",
+      "add_logo": "Logo hinzufügen",
+      "logo_unavailable": "Logo konnte nicht geladen werden",
       "logo_permission_denied": "Diese Organisation hat bereits eine Person, die die Einstellungen verwaltet. Bitte sie, das Logo zu ändern."
     },
     "file_upload": {

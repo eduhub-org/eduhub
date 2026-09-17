@@ -45,6 +45,35 @@ Open in Pencil: `design/project-tile-slider.pen`
 
 ---
 
+## StuJo job board (`stujo-design.pen`)
+
+Pencil port of the stujo.net design, plus the employer dashboard and the
+EduHub-side admin screens. This is the reference for `apps/stujo`.
+
+| Screen | Description |
+|--------|-------------|
+| Screen - Landing | Hero, latest offers, employer teaser |
+| Screen - Job List | Filter band and job rows |
+| Screen - Job Detail | Facts grid, employer logo and website, description |
+| Screen - Employer Dashboard | "Mein StuJo": stats tiles and postings table |
+| Screen - Mein StuJo (Identitaetsleiste V2) | Dashboard header reworked as one identity row: logo, company, website link, and a single "Firmenprofil bearbeiten" entry point |
+| Screen - Create Posting | Two-step posting form |
+| Screen - Publish & Checkout | Order box and payment step |
+| Screen - EduHub Admin Jobboerse | Credit grants, the admin counterpart |
+| Job Tile Redesign v2 | Tile explorations for the EduHub tile slider |
+
+Reusable components in the file: Button Primary, Button Ghost, Badge, Status
+Chip, Site Header, Job Card, Site Footer, and the Job Tile variants.
+
+Colours are variables themed on a `portal` axis (`stujo`, `flensburg`, `haw`),
+so the same frames show each portal's branding. Use `$primary`, `$accent`,
+`$text-primary`, `$text-muted`, `$text-grey`, `$border`, `$bg`, `$bg-soft` and
+`$font` rather than hard-coded values.
+
+Open in Pencil: `design/stujo-design.pen`
+
+---
+
 ## Menu redesign (`menu-redesign-preview.html`)
 
 ### Preview (open in browser)
