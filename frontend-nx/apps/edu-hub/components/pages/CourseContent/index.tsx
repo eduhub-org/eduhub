@@ -17,12 +17,12 @@ import { PageBlock } from '../../common/PageBlock';
 import { DescriptionFields } from './DescriptionFields';
 import { FundingOrganizations } from './FundingOrganizations';
 import CourseProjectsSection from '../../common/TileSlider/CourseProjectsSection';
-import { InfoPanel } from './InfoPanel';
+import { RegistrationRail } from './RegistrationRail';
 import { useWeekdayStartAndEndString } from '../../../helpers/dateTimeHelpers';
 import { LearningGoals } from './LearningGoals';
 import { Sessions } from './Sessions';
+import { CourseParticipants } from './CourseParticipants';
 import { CompletedDegreeCourses, CurrentDegreeCourses } from './DegreeCourses';
-import { Registration } from './Registration';
 import PricingSummary from '../../common/PricingSummary';
 import { getRegistrationTypeConfig } from './Registration/types';
 import { getBackgroundImage } from '../../../helpers/imageHandling';
@@ -36,6 +36,38 @@ import {
 } from './Projects/projectEffectiveSubmissionDeadline';
 import { useIsCourseWithEnrollment } from '../../../hooks/course';
 import NotificationSnackbar from '../../common/dialogs/NotificationSnackbar';
+
+/**
+ * Page rhythm. Every vertical gap on this page comes from one of these, so a gap
+ * reads as a decision rather than an accident:
+ *
+ *   section  space-y-16 lg:space-y-24   between top-level sections
+ *   block    space-y-8                  heading -> content, sibling blocks
+ *   item     space-y-4                  rows within a list
+ *   gutter   PageBlock (mx-6 xl:mx-0)   the one page inset, hero title included
+ */
+const SECTION_RHYTHM = 'flex flex-col space-y-16 lg:space-y-24';
+
+/**
+ * The two-column body, as a grid rather than a flex row.
+ *
+ * The rail spans both rows on the right, so it can travel the whole height of
+ * the tagline and the agenda together while `sticky` keeps it in view. Grid
+ * also lets the source order be tagline -> rail -> content, which is what we
+ * want stacked (and for a screen reader: facts before the detail that expands
+ * them) without any of the three moving on desktop.
+ */
+const BODY_GRID = 'grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_360px] gap-x-6 gap-y-12 lg:gap-y-8';
+
+/**
+ * Pinned beside the content on wide screens. `self-start` is what gives sticky
+ * room to work - a stretched grid item is already as tall as its area and has
+ * nowhere to travel - and the max height keeps a tall card (a paid course with
+ * add-ons and several instructors) from running off the bottom of the screen.
+ */
+const RAIL_STICKY =
+  'lg:col-start-2 lg:row-start-1 lg:row-span-2 lg:self-start lg:sticky lg:top-6 ' +
+  'lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto';
 
 const CourseContent: FC<{ id: number }> = ({ id }) => {
   const t = useTranslations('course');
@@ -166,19 +198,26 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
       {getCoursesAuthorizedLoading || getCoursesUnauthorizedLoading ? (
         <CircularProgress />
       ) : (
-        <div className="flex flex-col space-y-12 lg:space-y-24">
-          <div className="flex flex-col space-y-12 lg:space-y-24">
-            <div
-              className="h-96 p-3 text-3xl text-white flex justify-start items-end bg-cover bg-center bg-no-repeat"
+        <div className={SECTION_RHYTHM}>
+          <div
+            className="h-96 text-white flex justify-start items-end bg-cover bg-center bg-no-repeat"
               style={
                 {
                   backgroundImage: `linear-gradient(51.32deg, rgba(0, 0, 0, 0.7) 17.57%, rgba(0, 0, 0, 0) 85.36%), url("${backgroundImage}")`,
                 } as React.CSSProperties
               }
             >
-              <div className="max-w-screen-xl mx-auto w-full">{course.title}</div>
+              {/* PageBlock rather than a padding of its own: the title has to sit
+                  on the same gutter as everything below it at every width. */}
+              <div className="max-w-screen-xl mx-auto w-full pb-8">
+                <PageBlock>
+                  <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-[1.05] break-words">
+                    {course.title}
+                  </h1>
+                </PageBlock>
+              </div>
             </div>
-            <div className="max-w-screen-xl mx-auto w-full">
+            <div className={`max-w-screen-xl mx-auto w-full ${SECTION_RHYTHM}`}>
               {isLoggedIn && resetValues && enrollmentId != null && (
                 <Onboarding
                   course={course}
@@ -188,21 +227,56 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                 />
               )}
               <PageBlock>
-                <ContentRow className="items-center">
-                  <div className="flex flex-1 flex-col text-white mb-4 lg:mb-20">
-                    {course.weekDay !== 'NONE' ? (
-                      <span className="text-xs">{getWeekdayStartAndEndString(course, tCommon)}</span>
+                <div className={BODY_GRID}>
+                  <div className="flex min-w-0 flex-col text-white lg:col-start-1 lg:row-start-1">
+                    {/* An event carries its dates in the agenda below, not here. */}
+                    {!isEventCourse && course.weekDay !== 'NONE' ? (
+                      <span className="text-xs mb-2">{getWeekdayStartAndEndString(course, tCommon)}</span>
                     ) : null}
-                    <span className="text-2xl mt-2">{course.tagline}</span>
+                    <span className="text-xl sm:text-2xl leading-snug">{course.tagline}</span>
                   </div>
-                  <div className="flex flex-1 justify-center items-center mx-6 lg:mx-0 lg:max-w-md">
-                    <Registration
+
+                  <div className={RAIL_STICKY}>
+                    <RegistrationRail
                       course={course}
                       courseEnrollment={courseEnrollment ?? undefined}
+                      isLoggedInParticipant={isLoggedInParticipant}
                       onRegistrationSuccess={handleRegistrationSuccess}
                     />
                   </div>
-                </ContentRow>
+
+                  <div className="min-w-0 text-white space-y-8 lg:col-start-1 lg:row-start-2">
+                    <LearningGoals learningGoals={course.learningGoals} />
+                    {!isDegreeCourse ? (
+                      <Sessions
+                        sessions={course.Sessions}
+                        courseLocations={course.CourseLocations}
+                        isLoggedInParticipant={isLoggedInParticipant}
+                        isEvent={isEventCourse}
+                      />
+                    ) : (
+                      <CurrentDegreeCourses degreeCourses={course.DegreeCourses} />
+                    )}
+                    {/* Only asked for by someone taking part: the Hasura
+                        permission returns an empty list to anyone else, so this
+                        saves a pointless round trip rather than guarding it. */}
+                    {isLoggedInParticipant && (
+                      <CourseParticipants courseId={course.id} currentUserId={userId} />
+                    )}
+                    {!!(requiresPayment && (course.basePrice || course.basePrice === 0 || course.basePrice === null || addonItems.length > 0)) && (
+                      <div>
+                        <span className="text-3xl font-semibold block mb-6">{tCoursePage('pricing_section_title')}</span>
+                        <PricingSummary
+                          basePrice={course.basePrice || 0}
+                          currency={course.currency || 'EUR'}
+                          addons={addonItems}
+                          showStripeStatus={false}
+                          showTotal={false}
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
               </PageBlock>
               {!isEventCourse &&
                 isCourseWithEnrollment && // needed to assure the type of the course object
@@ -214,12 +288,12 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                         {courseEnrollment &&
                           (courseEnrollment.achievementCertificateURL ||
                             courseEnrollment.attendanceCertificateURL) && (
-                            <div className="mt-24 min-w-0 mx-6 xl:mx-0 text-label-primary">
+                            <PageBlock classname="min-w-0 text-label-primary">
                               <CertificateDownload
                                 courseEnrollment={courseEnrollment}
                                 className="mt-0"
                               />
-                            </div>
+                            </PageBlock>
                           )}
                         <Projects
                           courseId={course.id}
@@ -235,7 +309,7 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                         />
                       </>
                     )}
-                    <ContentRow className="my-24 min-w-0 text-label-primary mx-6 xl:mx-0">
+                    <ContentRow className="min-w-0 text-label-primary mx-6 xl:mx-0">
                       <div className="flex flex-col w-full min-w-0">
                       {!isDegreeCourse && (
                         <>
@@ -260,41 +334,10 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                   </ContentRow>
                   </>
                 )}
-              <ContentRow className="flex">
-                <PageBlock classname="flex-1 text-white space-y-6">
-                  <LearningGoals learningGoals={course.learningGoals} />
-                  {!isDegreeCourse ? (
-                    <Sessions 
-                      sessions={course.Sessions} 
-                      courseLocations={course.CourseLocations}
-                      isLoggedInParticipant={isLoggedInParticipant} 
-                    />
-                  ) : (
-                    <CurrentDegreeCourses degreeCourses={course.DegreeCourses} />
-                  )}
-                  {!!(requiresPayment && (course.basePrice || course.basePrice === 0 || course.basePrice === null || addonItems.length > 0)) && (
-                    <div className="mt-24">
-                      <span className="text-3xl font-semibold block mb-6">{tCoursePage('pricing_section_title')}</span>
-                      <PricingSummary
-                        basePrice={course.basePrice || 0}
-                        currency={course.currency || 'EUR'}
-                        addons={addonItems}
-                        showStripeStatus={false}
-                        showTotal={false}
-                        className="mb-24"
-                      />
-                    </div>
-                  )}
-                </PageBlock>
-                <div className="flex flex-1 justify-center items-center mx-6 lg:mx-0 lg:max-w-md pr-0 lg:pr-6 xl:pr-0 ">
-                  <InfoPanel course={course} />
-                </div>
-              </ContentRow>
               <DescriptionFields course={course} />
               <FundingOrganizations courseFundingOrganizations={course.CourseFundingOrganizations ?? []} />
               <CourseProjectsSection courseId={id} />
             </div>
-          </div>
         </div>
       )}
 

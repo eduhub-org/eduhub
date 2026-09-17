@@ -22,6 +22,7 @@ import { AuthRoles } from '../types/enums';
 
 import { COURSE_GROUP_OPTIONS } from '../queries/courseGroupOptions';
 import { isKnownCourseGroupOptionTitle } from '../helpers/courseGroupOptions';
+import { sortEventCoursesByUpcoming } from '../helpers/sessionSchedule';
 import { COURSE_TILES, COURSES_BY_INSTRUCTOR, COURSES_ENROLLED_BY_USER } from '../queries/courseQueries';
 import { APP_SETTINGS } from '../queries/appSettings';
 import { CourseGroupOptions } from '../queries/__generated__/CourseGroupOptions';
@@ -125,7 +126,12 @@ const Home: FC = () => {
               publishedCourses.filter((course) =>
                 course.CourseGroups.some((courseGroup) => courseGroup.CourseGroupOption.id === option.id)
               );
-          return { kind: 'course' as const, id: option.id, title: option.title, courses: filteredCourses };
+          return {
+            kind: 'course' as const,
+            id: option.id,
+            title: option.title,
+            courses: sortEventCoursesByUpcoming(filteredCourses),
+          };
         }),
     [publishedCourses, courseGroupOptionsData]
   );

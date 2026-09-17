@@ -53,7 +53,9 @@ export const COURSE_FRAGMENT = gql`
     projectSubmissionDeadline
     programId
     maxParticipants
+    showAvailablePlaces
     activeParticipantCount
+    publicParticipantCount
     learningGoals
     headingDescriptionField1
     contentDescriptionField1
@@ -171,7 +173,9 @@ export const COURSE_FRAGMENT_MINIMUM = gql`
     chatLink
     published
     maxParticipants
+    showAvailablePlaces
     activeParticipantCount
+    publicParticipantCount
     endTime
     startTime
     registrationType
@@ -200,7 +204,9 @@ export const COURSE_FRAGMENT_ANONYMOUS = gql`
     attendanceCertificatePossible
     programId
     maxParticipants
+    showAvailablePlaces
     activeParticipantCount
+    publicParticipantCount
     learningGoals
     headingDescriptionField1
     contentDescriptionField1

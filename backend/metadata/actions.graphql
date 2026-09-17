@@ -248,6 +248,27 @@ type Mutation {
 }
 
 type Mutation {
+  removeOrganizationLogo(organizationid: Int!): RemoveOrganizationLogoResult!
+}
+
+type RemoveOrganizationLogoResult {
+  success: Boolean!
+  error: String
+  messageKey: String
+}
+
+type Mutation {
+  updateOrganizationWebsite(organizationid: Int!, website: String): UpdateOrganizationWebsiteResult!
+}
+
+type UpdateOrganizationWebsiteResult {
+  success: Boolean!
+  website: String
+  error: String
+  messageKey: String
+}
+
+type Mutation {
   saveUserProfileImage(
     base64file: String!
     filename: String!

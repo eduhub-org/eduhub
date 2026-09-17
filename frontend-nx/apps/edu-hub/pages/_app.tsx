@@ -17,6 +17,7 @@ import { enUS } from 'date-fns/locale/en-US';
 import { AppSettingsProvider } from '../contexts/AppSettingsContext';
 import { AuthErrorProvider } from '../contexts/AuthErrorContext';
 import { AuthStoreUpdater } from '../components/AuthStoreUpdater';
+import { useIsAdmin, useIsOrgAdmin, useIsSessionLoading } from '../hooks/authentication';
 
 // Import locale messages
 import deMessages from '../locales/de.json';
@@ -46,6 +47,34 @@ import '../styles/widget.css';
 interface InitialProps {
   cookies: unknown;
 }
+
+// Must be rendered as a descendant of SessionProvider - useSession() reads
+// context provided by the SessionProvider element in MyApp's own return
+// value, which isn't visible to hooks called in MyApp's own render.
+const PlausibleAnalytics: FC = () => {
+  const isAdmin = useIsAdmin();
+  const isOrgAdmin = useIsOrgAdmin();
+  const isSessionLoading = useIsSessionLoading();
+  // Hold off rendering the script until the session resolves - next/script never
+  // removes an already-inserted <script> tag on unmount, so mounting it first and
+  // hiding it once the admin/org_admin role arrives would not stop it from firing.
+  const canLoadPlausible = !isSessionLoading && !isAdmin && !isOrgAdmin;
+
+  if (!canLoadPlausible) {
+    return null;
+  }
+
+  return (
+    <Script
+      id="plausible-analytics"
+      data-domain="edu.opencampus.sh"
+      src="https://plausible.io/js/script.js"
+      strategy="afterInteractive"
+      data-cookieconsent="statistics"
+      type="text/plain"
+    />
+  );
+};
 
 // @ts-expect-error Typing does not work correctly here because of getInitialProps
 const MyApp: FC<AppProps & InitialProps> & {
@@ -109,14 +138,8 @@ const MyApp: FC<AppProps & InitialProps> & {
                     }}
                   />
 
-                  <Script
-                    id="plausible-analytics"
-                    data-domain="edu.opencampus.sh"
-                    src="https://plausible.io/js/script.js"
-                    strategy="afterInteractive"
-                    data-cookieconsent="statistics"
-                    type="text/plain"
-                  />
+                  {/* Skip loading Plausible entirely for admins/org admins so their own usage never counts as traffic */}
+                  <PlausibleAnalytics />
                   <Head>
                     <meta name="viewport" content="initial-scale=1.0, width=device-width" />
                   </Head>

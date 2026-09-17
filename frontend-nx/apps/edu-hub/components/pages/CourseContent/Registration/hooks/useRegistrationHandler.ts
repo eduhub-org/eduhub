@@ -25,6 +25,7 @@ import {
 } from '../../../../../queries/__generated__/GetEnrollmentTermsAcceptedAt';
 import { CREATE_STRIPE_CHECKOUT } from '../../../../../queries/stripe';
 import { CreateStripeCheckout, CreateStripeCheckoutVariables } from '../../../../../queries/__generated__/CreateStripeCheckout';
+import { trackEvent } from '../../../../../lib/plausible';
 import { getRegistrationTypeConfig, RegistrationFormData, RegistrationResult } from '../types';
 
 /**
@@ -208,6 +209,10 @@ export const useRegistrationHandler = ({
         });
 
         if (result.data?.insert_CourseEnrollment?.affected_rows && result.data.insert_CourseEnrollment.affected_rows > 0) {
+          trackEvent('Registration: Completed', {
+            courseId: course.id,
+            status: status.toLowerCase(),
+          });
           onSuccess?.({ waitlist: status === CourseEnrollmentStatus_enum.WAITLIST });
           return {
             success: true,
@@ -277,9 +282,11 @@ export const useRegistrationHandler = ({
         });
 
         if (checkoutResult.data?.createStripeCheckout?.success && checkoutResult.data.createStripeCheckout.checkoutUrl) {
+          trackEvent('Registration: Checkout Started', { courseId: course.id });
+
           // Redirect to Stripe Checkout
           window.location.href = checkoutResult.data.createStripeCheckout.checkoutUrl;
-          
+
           return {
             success: true,
             paymentUrl: checkoutResult.data.createStripeCheckout.checkoutUrl,
@@ -317,6 +324,8 @@ export const useRegistrationHandler = ({
       return;
     }
 
+    trackEvent('Registration: Started', { courseId: course.id, registrationType });
+
     if (isCourseFull) {
       // Waitlist: only open the modal when there is an application form (survey or motivation letter).
       // Payment UI and createEnrollmentWithAddons must not run for full courses; submit goes to WAITLIST.
@@ -343,7 +352,7 @@ export const useRegistrationHandler = ({
     if (config.isDirect) {
       handleDirectRegistration();
     }
-  }, [userId, handleLogin, config, handleExternalRegistration, handleDirectRegistration, isCourseFull]);
+  }, [userId, handleLogin, config, handleExternalRegistration, handleDirectRegistration, isCourseFull, course.id, registrationType]);
 
   const submitRegistration = useCallback(
     async (formData: RegistrationFormData): Promise<RegistrationResult> => {

@@ -7,7 +7,10 @@ array_relationships:
     using:
       manual_configuration:
         column_mapping:
-          value: id
+          # MailStatus.value -> MailLog.status. This mapped to MailLog.id until
+          # 2026-09, which joined a status string against a serial primary key
+          # and therefore returned nothing for every row.
+          value: status
         insertion_order: null
         remote_table:
           name: MailLog

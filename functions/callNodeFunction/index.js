@@ -27,6 +27,8 @@ import archiveJobPosting from "./archiveJobPosting/index.js";
 import claimJobOrganization from "./claimJobOrganization/index.js";
 import requestJobOrganizationAccess from "./requestJobOrganizationAccess/index.js";
 import saveOrganizationLogo from "./saveOrganizationLogo/index.js";
+import removeOrganizationLogo from "./removeOrganizationLogo/index.js";
+import updateOrganizationWebsite from "./updateOrganizationWebsite/index.js";
 import createEnrollmentWithAddons from "./createEnrollmentWithAddons/index.js";
 import syncGhostNewsletterSubscription from "./syncGhostNewsletterSubscription/index.js";
 import createMatrixRoom from "./createMatrixRoom/index.js";
@@ -96,6 +98,8 @@ const functionMap = {
   claimJobOrganization,
   requestJobOrganizationAccess,
   saveOrganizationLogo,
+  removeOrganizationLogo,
+  updateOrganizationWebsite,
   createEnrollmentWithAddons,
   createMatrixRoom,
   updateMatrixInstructorPowerLevel,

@@ -15,6 +15,7 @@ import { COURSE_TILES, COURSE_TILES_BY_ORGANIZATION } from '../../queries/course
 import { COURSE_GROUP_OPTIONS } from '../../queries/courseGroupOptions';
 import { CourseTiles, CourseTiles_Course } from '../../queries/__generated__/CourseTiles';
 import { CourseGroupOptions } from '../../queries/__generated__/CourseGroupOptions';
+import { sortEventCoursesByUpcoming } from '../../helpers/sessionSchedule';
 
 type CourseTilesByOrganization = CourseTiles;
 
@@ -91,10 +92,11 @@ const WidgetCourses: FC = () => {
   }, [coursesData, group, selectedGroupIds, groupOptionsData, groupOptionsLoading, groupOptionsError]);
 
   const publishedCourses = useMemo(() => {
-    return filteredCourses.filter((course) => {
+    const published = filteredCourses.filter((course) => {
       const courseWithPublished = course as CourseTiles_Course & { published?: boolean };
       return courseWithPublished.published === true && course.Program?.published === true;
     });
+    return sortEventCoursesByUpcoming(published);
   }, [filteredCourses]);
 
   const isLoading =

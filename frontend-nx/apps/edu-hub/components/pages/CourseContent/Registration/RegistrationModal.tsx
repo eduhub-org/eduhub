@@ -468,6 +468,7 @@ export const RegistrationModal: FC<RegistrationModalProps> = ({
             onComplete={handleFormbricksComplete}
             onError={setError}
             className="h-full w-full"
+            title={config.requiresApproval ? t('formbricks.survey_title') : t('formbricks.survey_title_registration')}
           />
           {formbricksSurveyCompleted && (
             <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-md">
@@ -671,8 +672,10 @@ export const RegistrationModal: FC<RegistrationModalProps> = ({
                 </div>
               ) : config.requiresPayment && !isCourseFull ? (
                 t('modal.proceed_to_payment')
+              ) : config.requiresApproval ? (
+                t('modal.submit_approval')
               ) : (
-                t('modal.submit')
+                t('modal.submit_direct')
               )}
             </Button>
           </div>

@@ -18,6 +18,10 @@ services:
       - keycloak
     environment:
       NEXT_PUBLIC_API_URL: http://${DEV_HOST:-localhost}:8080/v1/graphql
+      # Server-side rendering (the course page's SEO/JSON-LD fetch) runs inside
+      # this container, where the browser-facing localhost:8080 does not resolve.
+      # Production needs no override: NEXT_PUBLIC_API_URL is public there.
+      GRAPHQL_SSR_API_URL: http://hasura:8080/v1/graphql
       NEXT_PUBLIC_AUTH_URL: http://${DEV_HOST:-localhost}:28080
       NEXTAUTH_URL: http://${DEV_HOST:-localhost}:5000
       # Server-side callbacks stay inside this container and do not depend on
@@ -31,6 +35,7 @@ services:
       # not the production fallback in stujoBaseUrl.ts.
       NEXT_PUBLIC_STUJO_URL: http://${DEV_HOST:-localhost}:5001
       NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL: ${NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL:-}
+      NEXT_PUBLIC_MATRIX_SERVER_NAME: ${NEXT_PUBLIC_MATRIX_SERVER_NAME:-}
       # The Stripe webhook route lives in this app (pages/api/webhooks/stripe.ts),
       # so it needs the keys too -- without them `stripe listen --forward-to
       # localhost:5000/api/webhooks/stripe` (docs/STRIPE_INTEGRATION.md) only
@@ -174,7 +179,15 @@ services:
       LMS_ATTENDANCE_SURVEY_ID: ${LMS_ATTENDANCE_SURVEY_ID:-}
       MM_URL: ${MM_URL:-}
       MM_TOKEN: ${MM_TOKEN:-}
-      
+      # sync_mail_delivery_status reads the Mailgun events API. Unset locally,
+      # where the function then reports a missing key instead of running -- the
+      # events endpoint has no emulator, so there is nothing to point it at.
+      MAILGUN_API_KEY: ${MAILGUN_API_KEY:-}
+      MAILGUN_DOMAIN: ${MAILGUN_DOMAIN:-}
+      MAILGUN_ADDITIONAL_DOMAINS: ${MAILGUN_ADDITIONAL_DOMAINS:-}
+      MAIL_DELIVERY_SYNC_LOOKBACK_HOURS: ${MAIL_DELIVERY_SYNC_LOOKBACK_HOURS:-}
+      STUJO_ADMIN_EMAIL: ${STUJO_ADMIN_EMAIL:-}
+
 
   hasura:
     container_name: eduhub-hasura

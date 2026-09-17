@@ -11,6 +11,8 @@ import { MY_JOB_ORGANIZATIONS, useEmployerRoleContext } from './employer';
 export type EmployerOrganization = {
   id: number;
   name: string;
+  logo: string | null;
+  website: string | null;
   JobPostingCredits: Array<{ id: number; remaining: number; jobPostingType: string | null }>;
 };
 
@@ -47,6 +49,10 @@ type EmployerOrganizationState = {
   organization: EmployerOrganization | null;
   loading: boolean;
   selectOrganization: (id: number) => void;
+  // Exposed so the logo editor can pick up a change made through the
+  // save/removeOrganizationLogo actions: those persist the column with their
+  // own admin-secret client, not through Apollo, so the cache never sees it.
+  refetchOrganizations: () => void;
 };
 
 /**
@@ -75,7 +81,7 @@ export const useEmployerOrganization = (): EmployerOrganizationState => {
   // cache-and-network for the same reason as the postings list: the shared
   // Apollo client survives client-side navigation, so the credit balance shown
   // on the dashboard would keep the value it had before a publish spent one.
-  const { data, loading } = useQuery(MY_JOB_ORGANIZATIONS, {
+  const { data, loading, refetch } = useQuery(MY_JOB_ORGANIZATIONS, {
     context: employerRole,
     variables: { userId: currentUserId },
     skip:
@@ -113,9 +119,19 @@ export const useEmployerOrganization = (): EmployerOrganizationState => {
     [router]
   );
 
+  const refetchOrganizations = useCallback(() => {
+    void refetch();
+  }, [refetch]);
+
   // Report loading only when there is nothing to show yet -- with
   // cache-and-network the background refetch keeps `loading` true, which would
   // otherwise flash the "checking login" screen over an already-rendered
   // dashboard on every navigation back to it.
-  return { organizations, organization, loading: loading && !data, selectOrganization };
+  return {
+    organizations,
+    organization,
+    loading: loading && !data,
+    selectOrganization,
+    refetchOrganizations,
+  };
 };

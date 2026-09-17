@@ -1,4 +1,5 @@
 from .eduhub_client import EduHubClient
+from .mailgun_client import MailgunClient
 from .zoom_client import ZoomClient
 from .limesurvey_client import LimeSurveyClient
 from .mattermost_client import MattermostClient

@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Accent options — course page</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#222222; --bg-2:#333333; --bg-card:#2a2a2a; --border:#444444;
+  --label:#F2F2F2; --label-2:#D8D8D8; --label-3:#888888;
+  --brand:#00A398; --warning:#FFA665;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:#141414;color:var(--label);font-family:"Plus Jakarta Sans",system-ui,sans-serif;font-weight:500;-webkit-font-smoothing:antialiased}
+.page{max-width:1480px;margin:0 auto;padding:48px 24px 120px}
+.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--label-3);font-weight:700;margin:0 0 12px}
+h1{font-size:44px;line-height:1.05;margin:0 0 16px;font-weight:800;letter-spacing:-.02em}
+.lede{font-size:16px;line-height:1.6;color:var(--label-2);max-width:78ch;margin:0 0 8px}
+h2{font-size:26px;font-weight:700;margin:0 0 8px;letter-spacing:-.01em}
+.note{background:var(--bg-2);border-left:3px solid var(--warning);border-radius:0 10px 10px 0;padding:16px;font-size:14px;line-height:1.65;color:var(--label-2);max-width:82ch;margin:24px 0}
+.note b{color:var(--label)}
+
+table.cr{border-collapse:collapse;font-size:13.5px;margin:16px 0 40px}
+table.cr th{text-align:left;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--label-3);font-weight:700;padding:0 20px 8px 0;border-bottom:1px solid var(--border)}
+table.cr td{padding:10px 20px 10px 0;border-bottom:1px solid var(--border);color:var(--label-2)}
+table.cr td:first-child{color:var(--label)}
+.sw{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;margin-right:8px}
+code{font-family:ui-monospace,Menlo,monospace;font-size:.88em;background:var(--bg-2);border:1px solid var(--border);border-radius:4px;padding:1px 5px}
+
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px;margin-top:8px}
+.opt{background:var(--bg);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.opt.pick{border-color:var(--warning)}
+.opt header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.opt header b{font-size:15px;font-weight:700}
+.opt header span{font-size:12px;color:var(--label-3)}
+.tag{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:3px 9px;border-radius:999px;background:var(--warning);color:#3a1f06}
+.body{padding:24px 20px 26px;display:grid;grid-template-columns:1fr 210px;gap:28px;align-items:start}
+.why{padding:0 20px 20px;font-size:13px;line-height:1.6;color:var(--label-2)}
+.why b{color:var(--label)}
+
+/* the real bits under test */
+.sectitle{font-size:22px;font-weight:700;margin:0 0 20px}
+.day + .day{border-top:1px solid var(--border);margin-top:20px;padding-top:20px}
+.day-date{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;display:block;margin-bottom:6px}
+.day-place{font-size:12.5px;color:var(--label-2);text-decoration:underline;text-underline-offset:3px;display:block;margin-bottom:12px}
+.rail{padding-left:18px;border-left:1px solid var(--border)}
+.slot{display:grid;grid-template-columns:82px 1fr;gap:16px;padding:10px 0;position:relative}
+.slot + .slot{border-top:1px solid rgba(255,255,255,.07)}
+.slot::before{content:"";position:absolute;left:-22px;top:17px;width:6px;height:6px;border-radius:999px;background:var(--border)}
+.slot time{font-size:12.5px;color:var(--label-2);font-variant-numeric:tabular-nums;white-space:nowrap}
+.slot h4{font-size:14.5px;font-weight:600;margin:0}
+.cta{display:block;width:100%;border:2px solid transparent;border-radius:999px;background:var(--warning);color:#222;font-family:inherit;font-size:14px;font-weight:700;padding:12px 18px;cursor:pointer}
+.deadline{font-size:11.5px;color:var(--label-2);text-align:center;margin:10px 0 0}
+.deadline b{color:var(--label);font-weight:600}
+.guest{display:block;text-align:center;font-size:12.5px;margin-top:10px;text-decoration:none}
+.guest:hover{text-decoration:underline}
+</style>
+</head>
+<body>
+<div class="page">
+
+<p class="eyebrow">EduHub · colour options</p>
+<h1>Replacing brand teal on the course page</h1>
+<p class="lede">Two elements use <code>text-brand</code> <b>at rest</b> on the public course page: the agenda day label
+and the “Ohne Konto anmelden” link. Below, the same markup in four palettes. All four clear WCAG AA on <code>#222222</code>.</p>
+
+<div class="note"><b>Worth separating first:</b> teal also appears as the <b>hover / focus</b> colour of every button,
+menu item and link in the app — it is baked into the shared <code>Button</code> and the header. That use is invisible
+until you interact, so it is a different decision from the two at-rest uses here. If you only dislike the at-rest teal,
+changing these two spots gets you there and leaves the hover language intact across admin and public alike.</div>
+
+<h2>Contrast on the page background</h2>
+<table class="cr">
+  <tr><th>Candidate</th><th>Hex</th><th>Ratio on #222</th><th>Normal text</th></tr>
+  <tr><td><span class="sw" style="background:#00A398"></span>brand (current)</td><td><code>#00A398</code></td><td>5.07 : 1</td><td>AA</td></tr>
+  <tr><td><span class="sw" style="background:#D8D8D8"></span>label-secondary</td><td><code>#D8D8D8</code></td><td>11.16 : 1</td><td>AA</td></tr>
+  <tr><td><span class="sw" style="background:#F2F2F2"></span>label-primary</td><td><code>#F2F2F2</code></td><td>14.21 : 1</td><td>AA</td></tr>
+  <tr><td><span class="sw" style="background:#FFA665"></span>warning (the CTA orange)</td><td><code>#FFA665</code></td><td>8.25 : 1</td><td>AA</td></tr>
+  <tr><td><span class="sw" style="background:#E8C58A"></span>sand — new</td><td><code>#E8C58A</code></td><td>9.69 : 1</td><td>AA</td></tr>
+  <tr><td><span class="sw" style="background:#9DB4C0"></span>slate — new</td><td><code>#9DB4C0</code></td><td>7.37 : 1</td><td>AA</td></tr>
+</table>
+
+<h2>The options</h2>
+<div class="grid">
+
+  <!-- 1 -->
+  <section class="opt pick">
+    <header><b>1 · Neutral</b><span class="tag">recommended</span></header>
+    <div class="body">
+      <div>
+        <p class="sectitle">Programm</p>
+        <div class="day">
+          <span class="day-date" style="color:#D8D8D8">Freitag, 11.09.2026</span>
+          <span class="day-place">Starterkitchen, Kuhnkestr. 6, 24118 Kiel</span>
+          <div class="rail">
+            <div class="slot"><time>19:00 – 21:00</time><h4>Ankommen</h4></div>
+            <div class="slot"><time>21:00 – 23:00</time><h4>Los gehts</h4></div>
+          </div>
+        </div>
+        <div class="day">
+          <span class="day-date" style="color:#D8D8D8">Freitag, 18.09.2026</span>
+          <div class="rail"><div class="slot"><time>21:00 – 23:00</time><h4>Programmpunkt</h4></div></div>
+        </div>
+      </div>
+      <div>
+        <button class="cta">Jetzt registrieren</button>
+        <p class="deadline">Anmeldeschluss <b>31.10.2026</b></p>
+        <a class="guest" href="#" style="color:#F2F2F2;text-decoration:underline;text-underline-offset:3px">Ohne Konto anmelden</a>
+      </div>
+    </div>
+    <p class="why"><b>No accent but the CTA.</b> The day label leans on uppercase + tracking + weight, which already
+    separates it from the session titles; the link leans on an underline. Nothing new to maintain, nothing that can
+    clash, and the orange button becomes the single coloured thing on the page — which is exactly what you want a
+    primary action to be. Closest to the brand's "one accent, used sparingly" rule.</p>
+  </section>
+
+  <!-- 2 -->
+  <section class="opt pick">
+    <header><b>2 · Neutral label + CTA-orange link</b><span class="tag">recommended</span></header>
+    <div class="body">
+      <div>
+        <p class="sectitle">Programm</p>
+        <div class="day">
+          <span class="day-date" style="color:#D8D8D8">Freitag, 11.09.2026</span>
+          <span class="day-place">Starterkitchen, Kuhnkestr. 6, 24118 Kiel</span>
+          <div class="rail">
+            <div class="slot"><time>19:00 – 21:00</time><h4>Ankommen</h4></div>
+            <div class="slot"><time>21:00 – 23:00</time><h4>Los gehts</h4></div>
+          </div>
+        </div>
+        <div class="day">
+          <span class="day-date" style="color:#D8D8D8">Freitag, 18.09.2026</span>
+          <div class="rail"><div class="slot"><time>21:00 – 23:00</time><h4>Programmpunkt</h4></div></div>
+        </div>
+      </div>
+      <div>
+        <button class="cta">Jetzt registrieren</button>
+        <p class="deadline">Anmeldeschluss <b>31.10.2026</b></p>
+        <a class="guest" href="#" style="color:#FFA665">Ohne Konto anmelden</a>
+      </div>
+    </div>
+    <p class="why"><b>The link joins the button's family.</b> Guest registration is the same job as the CTA at lower
+    weight, so sharing its hue says that: filled orange = primary, orange text = the quieter way in. One warm family on
+    the whole page. The catch is that <code>warning</code> is also <code>--eduhub-status-invited</code>; if you go this
+    way it is worth adding a <code>--eduhub-cta</code> token at the same hex, so "colour of the primary action" stops
+    being spelled "invited".</p>
+  </section>
+
+  <!-- 3 -->
+  <section class="opt">
+    <header><b>3 · Warm sand accent</b><span>one new public accent</span></header>
+    <div class="body">
+      <div>
+        <p class="sectitle">Programm</p>
+        <div class="day">
+          <span class="day-date" style="color:#E8C58A">Freitag, 11.09.2026</span>
+          <span class="day-place">Starterkitchen, Kuhnkestr. 6, 24118 Kiel</span>
+          <div class="rail">
+            <div class="slot"><time>19:00 – 21:00</time><h4>Ankommen</h4></div>
+            <div class="slot"><time>21:00 – 23:00</time><h4>Los gehts</h4></div>
+          </div>
+        </div>
+        <div class="day">
+          <span class="day-date" style="color:#E8C58A">Freitag, 18.09.2026</span>
+          <div class="rail"><div class="slot"><time>21:00 – 23:00</time><h4>Programmpunkt</h4></div></div>
+        </div>
+      </div>
+      <div>
+        <button class="cta">Jetzt registrieren</button>
+        <p class="deadline">Anmeldeschluss <b>31.10.2026</b></p>
+        <a class="guest" href="#" style="color:#E8C58A;text-decoration:underline;text-underline-offset:3px">Ohne Konto anmelden</a>
+      </div>
+    </div>
+    <p class="why"><b>Keeps a tint, drops the teal.</b> A desaturated sand sits in the CTA's family but lighter and
+    duller, so it reads as secondary rather than competing. Costs one new token. The risk is muddiness — sand next to
+    the orange button is a narrow hue gap, and on a page with a lot of orange it can start to look like one
+    washed-out colour rather than two deliberate ones.</p>
+  </section>
+
+  <!-- 4 -->
+  <section class="opt">
+    <header><b>4 · Cool slate accent</b><span>maximum separation</span></header>
+    <div class="body">
+      <div>
+        <p class="sectitle">Programm</p>
+        <div class="day">
+          <span class="day-date" style="color:#9DB4C0">Freitag, 11.09.2026</span>
+          <span class="day-place">Starterkitchen, Kuhnkestr. 6, 24118 Kiel</span>
+          <div class="rail">
+            <div class="slot"><time>19:00 – 21:00</time><h4>Ankommen</h4></div>
+            <div class="slot"><time>21:00 – 23:00</time><h4>Los gehts</h4></div>
+          </div>
+        </div>
+        <div class="day">
+          <span class="day-date" style="color:#9DB4C0">Freitag, 18.09.2026</span>
+          <div class="rail"><div class="slot"><time>21:00 – 23:00</time><h4>Programmpunkt</h4></div></div>
+        </div>
+      </div>
+      <div>
+        <button class="cta">Jetzt registrieren</button>
+        <p class="deadline">Anmeldeschluss <b>31.10.2026</b></p>
+        <a class="guest" href="#" style="color:#9DB4C0;text-decoration:underline;text-underline-offset:3px">Ohne Konto anmelden</a>
+      </div>
+    </div>
+    <p class="why"><b>A cool counterweight to the warm CTA.</b> Clean hue separation, so the button keeps all the heat
+    on the page and nothing competes with it. But it is a second hue family on a brand that claims one, it is close
+    enough to grey that it can read as disabled at small sizes, and a muted blue link is the most generic choice
+    of the four.</p>
+  </section>
+
+</div>
+</div>
+</body>
+</html>
