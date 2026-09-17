@@ -11,7 +11,7 @@ import { prioritizeClasses } from '../../helpers/util';
 import { AlertMessageDialog } from '../common/dialogs/AlertMessageDialog';
 import Snackbar from '@mui/material/Snackbar';
 import { IconButton } from '@mui/material';
-import { MdPhotoCamera } from 'react-icons/md';
+import { MdPhotoCamera, MdDelete } from 'react-icons/md';
 import { SAVE_USER_PROFILE_IMAGE, SAVE_ORGANIZATION_LOGO, REMOVE_ORGANIZATION_LOGO } from '../../queries/actions';
 import { useSession } from 'next-auth/react';
 import { getPublicUrl } from '../../helpers/filehandling';
@@ -81,6 +81,9 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isErrorDialogOpen, setIsErrorDialogOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  // Keyed by the URL that failed rather than a boolean: a replacement upload
+  // produces a different URL, so the fallback clears itself.
+  const [failedLogoSrc, setFailedLogoSrc] = useState<string | null>(null);
 
   const theme = useTheme();
 
@@ -274,90 +277,139 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
     }
   }, [updateFile, removeOrganizationLogo, identifierVariables, element, onFileUpdated, handleError, t]);
 
-  const renderImageUpload = (
-    imageUrl: string | null,
-    altText: string,
-    tooltipText: string,
-    inputId: string,
-    size: 'small' | 'large' = 'large',
-    borderRadius: 'rounded' | 'rounded-full' = 'rounded-full'
-  ) => {
-    const sizeClasses = size === 'small' ? 'w-28 h-28' : 'w-40 h-40';
-    const containerClasses = size === 'small' ? 'h-28 w-28' : 'h-40 w-80';
-    const marginClasses = size === 'small' ? 'mb-2' : 'mb-6';
+  const renderFileInput = (inputId: string) => (
+    <input
+      ref={fileInputRef}
+      type="file"
+      accept={acceptedFileTypes}
+      onChange={handleFileChange}
+      style={{ display: 'none' }}
+      id={inputId}
+    />
+  );
+
+  // Avatar and logo differ on every axis that matters -- box ratio, fit,
+  // radius, background, where the controls sit, and what the empty state says
+  // -- so they are two helpers rather than one helper branching on a flag.
+  const renderAvatarUpload = (imageUrl: string | null, altText: string, tooltipText: string) => (
+    <div className="h-40 w-80 flex items-center mb-6 relative">
+      {imageUrl ? (
+        <div className="relative">
+          <img
+            src={imageUrl}
+            alt={altText}
+            className="w-40 h-40 object-cover rounded-full border border-solid border-gray-300"
+            onError={(e) => {
+              e.currentTarget.style.display = 'none';
+            }}
+          />
+          <Tooltip title={tooltipText} placement="top">
+            <IconButton
+              onClick={handleIconClick}
+              aria-label={tooltipText}
+              className="absolute top-2 left-2 bg-white hover:bg-gray-200 shadow-md transition-colors duration-200"
+            >
+              <MdPhotoCamera size="1.5em" className="text-gray-800" />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title={t('image_uploader.remove_profile_picture')} placement="top">
+            <IconButton
+              onClick={handleRemoveImage}
+              aria-label={t('image_uploader.remove_profile_picture')}
+              className="absolute top-1 right-1 bg-white hover:bg-red-100 shadow-md transition-colors duration-200"
+              // 44px is the project's minimum touch target; MUI's own
+              // size="small" padding would otherwise decide this.
+              style={{ width: '44px', height: '44px' }}
+            >
+              <MdDelete size="1.25em" className="text-red-600" />
+            </IconButton>
+          </Tooltip>
+        </div>
+      ) : (
+        <Tooltip title={tooltipText} placement="top">
+          <div
+            className="w-40 h-40 bg-gray-100 border-2 border-dashed border-gray-300 rounded-full flex items-center justify-center cursor-pointer hover:bg-gray-200 transition-colors duration-200"
+            onClick={handleIconClick}
+          >
+            <MdPhotoCamera size="2em" className="text-gray-400" />
+          </div>
+        </Tooltip>
+      )}
+      {renderFileInput('profile-picture-input')}
+    </div>
+  );
+
+  const renderProfilePicture = () =>
+    renderAvatarUpload(
+      user?.picture ? getPublicUrl(user.picture) : null,
+      'Profile picture',
+      t('image_uploader.upload_new_profile_picture')
+    );
+
+  // Same footprint as a rendered logo, so the row never changes height when a
+  // logo is added, removed, or fails to load. The whole tile is the target.
+  const renderLogoPlaceholder = (labelText: string) => (
+    <button
+      type="button"
+      onClick={handleIconClick}
+      className="h-24 w-44 shrink-0 flex flex-col items-center justify-center gap-1 appearance-none cursor-pointer rounded-md border-2 border-dashed border-gray-300 bg-gray-50 p-2 font-body text-xs text-label-secondary hover:bg-gray-100"
+    >
+      <MdPhotoCamera size="1.5em" aria-hidden="true" />
+      <span>{labelText}</span>
+    </button>
+  );
+
+  const renderLogoPreview = () => {
+    const logoUrl = currentFile ? getPublicUrl(currentFile) : null;
+    const canRenderLogo = Boolean(logoUrl) && failedLogoSrc !== logoUrl;
 
     return (
-      <div className={`${containerClasses} flex items-center ${marginClasses} relative`}>
-        {imageUrl ? (
-          <div className="relative">
+      <div className="flex items-center gap-2">
+        {canRenderLogo ? (
+          <div className="h-24 w-44 shrink-0 flex items-center justify-center rounded-md border border-solid border-gray-300 bg-white p-2">
             <img
-              src={imageUrl}
-              alt={altText}
-              className={`${sizeClasses} object-cover ${borderRadius} border border-gray-300`}
-              onError={(e) => {
-                e.currentTarget.style.display = 'none';
-              }}
+              src={logoUrl as string}
+              alt={t('image_uploader.organization_logo')}
+              // contain, never cover: a wordmark is landscape and must stay
+              // whole, matching how the same logo renders on a job advert.
+              // max-*-full and block are explicit because StuJo switches
+              // Tailwind's preflight off, so `img` keeps the UA defaults.
+              className="block max-h-full max-w-full object-contain"
+              onError={() => setFailedLogoSrc(logoUrl)}
             />
-            <Tooltip title={tooltipText} placement="top">
+          </div>
+        ) : (
+          renderLogoPlaceholder(
+            currentFile ? t('image_uploader.logo_unavailable') : t('image_uploader.add_logo')
+          )
+        )}
+
+        {/* Gated on the stored value, not on the rendered one: a logo that
+            cannot be displayed must still be removable. */}
+        {currentFile && (
+          <div className="flex items-center gap-1">
+            <Tooltip title={t('image_uploader.change_logo')} placement="top">
               <IconButton
                 onClick={handleIconClick}
-                className="absolute top-2 left-2 bg-white hover:bg-gray-200 shadow-md transition-colors duration-200"
-                size="small"
+                aria-label={t('image_uploader.change_logo')}
+                style={{ width: '44px', height: '44px' }}
               >
-                <MdPhotoCamera size={size === 'small' ? '1em' : '1.5em'} className="text-gray-800" />
+                <MdPhotoCamera size="1.25em" className="text-gray-800" />
               </IconButton>
             </Tooltip>
-            <Tooltip
-              title={
-                element === 'organizationLogo'
-                  ? t('image_uploader.remove_logo')
-                  : t('image_uploader.remove_profile_picture')
-              }
-              placement="top"
-            >
+            <Tooltip title={t('image_uploader.remove_logo')} placement="top">
               <IconButton
                 onClick={handleRemoveImage}
-                className="absolute top-1 right-1 bg-white hover:bg-red-100 shadow-md transition-colors duration-200"
-                size="small"
-                style={{ width: '20px', height: '20px', minWidth: '20px' }}
+                disabled={isRemoving}
+                aria-label={t('image_uploader.remove_logo')}
+                style={{ width: '44px', height: '44px', color: 'var(--eduhub-error)' }}
               >
-                <svg width="0.75em" height="0.75em" viewBox="0 0 24 24" fill="currentColor" className="text-red-600">
-                  <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
-                </svg>
+                <MdDelete size="1.25em" />
               </IconButton>
             </Tooltip>
           </div>
-        ) : (
-          <Tooltip title={tooltipText} placement="top">
-            <div
-              className={`${sizeClasses} bg-gray-100 border-2 border-dashed border-gray-300 ${borderRadius} flex items-center justify-center cursor-pointer hover:bg-gray-200 transition-colors duration-200`}
-              onClick={handleIconClick}
-            >
-              <MdPhotoCamera size={size === 'small' ? '1.5em' : '2em'} className="text-gray-400" />
-            </div>
-          </Tooltip>
         )}
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept={acceptedFileTypes}
-          onChange={handleFileChange}
-          style={{ display: 'none' }}
-          id={inputId}
-        />
       </div>
-    );
-  };
-
-  const renderProfilePicture = () => {
-    const imageUrl = user?.picture ? getPublicUrl(user.picture) : null;
-    return renderImageUpload(
-      imageUrl,
-      'Profile picture',
-      t('image_uploader.upload_new_profile_picture'),
-      'profile-picture-input',
-      'large',
-      'rounded-full'
     );
   };
 
@@ -401,49 +453,24 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
     </div>
   );
 
+  // items-start rather than a full-width block: StuJo renders this inline in a
+  // flex row next to the organization name, where w-full would stretch it.
   const renderOrganizationLogo = () => (
-    <div className="col-span-10 flex mt-3">
-      <div className="w-full">
-        {label && (
-          <div
-            className="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-standard"
-            style={{
-              color: 'rgb(34, 34, 34)',
-              fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-              fontWeight: 400,
-              fontSize: '0.75rem',
-              lineHeight: '1.4375em',
-              letterSpacing: '0.00938em',
-              padding: 0,
-              position: 'relative',
-              display: 'block',
-              transformOrigin: 'top left',
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              maxWidth: '100%',
-              marginBottom: '4px',
-            }}
-          >
-            {label}
-          </div>
-        )}
-        {renderImageUpload(
-          currentFile ? getPublicUrl(currentFile) : null,
-          'Organization logo',
-          t('image_uploader.upload_new_logo'),
-          'organization-logo-input',
-          'small',
-          'rounded'
-        )}
-        {isUploading && <div className="text-sm text-blue-600 mt-1">{t('image_uploader.uploading')}...</div>}
-        {isRemoving && <div className="text-sm text-red-600 mt-1">{t('image_uploader.removing')}...</div>}
-        {helpText && (
-          <Tooltip title={t(helpText)} placement="top">
-            <HelpOutline style={{ cursor: 'pointer', color: theme.palette.text.disabled, marginLeft: '8px' }} />
-          </Tooltip>
-        )}
-      </div>
+    <div className="flex flex-col items-start gap-2">
+      {(label || helpText) && (
+        <div className="flex items-center gap-2 font-body text-xs text-label-secondary">
+          {label && <span>{label}</span>}
+          {helpText && (
+            <Tooltip title={t(helpText)} placement="top">
+              <HelpOutline style={{ cursor: 'pointer', fontSize: '1rem', color: theme.palette.text.disabled }} />
+            </Tooltip>
+          )}
+        </div>
+      )}
+      {renderLogoPreview()}
+      {isUploading && <p className="m-0 text-xs text-label-secondary">{t('image_uploader.uploading')}</p>}
+      {isRemoving && <p className="m-0 text-xs text-label-secondary">{t('image_uploader.removing')}</p>}
+      {renderFileInput('organization-logo-input')}
     </div>
   );
 
