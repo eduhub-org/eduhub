@@ -417,7 +417,11 @@ const Unternehmen: FC<Props> = ({ portal }) => {
               // "create" is chosen (it fires right after onOptionCreated). onOptionCreated is what
               // distinguishes them, so it tags the selection and onValueUpdated only overrides that
               // tag when the value is a known option's id.
-              onValueUpdated={(value: string) => {
+              onValueUpdated={(value: unknown) => {
+                if (typeof value !== 'string' || value === '') {
+                  setSelection({ kind: 'none' });
+                  return;
+                }
                 const picked = options.find((option: { value: string }) => option.value === value);
                 setSelection(picked ? { kind: 'existing', id: value } : { kind: 'new', name: value });
               }}
