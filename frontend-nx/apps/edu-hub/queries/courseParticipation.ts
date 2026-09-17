@@ -26,14 +26,6 @@ export const COURSE_PARTICIPATIONS = gql`
           firstName
           lastName
           email
-          Attendances(where: { Session: { courseId: { _eq: $courseId } } }) {
-            id
-            status
-            source
-            Session {
-              id
-            }
-          }
         }
       }
       CourseEnrollments_aggregate(
@@ -64,6 +56,23 @@ export const COURSE_PARTICIPATIONS = gql`
       maxMissedSessions
       attendanceCertificatePossible
       achievementCertificatePossible
+    }
+  }
+`;
+
+export const COURSE_PARTICIPATION_ATTENDANCES = gql`
+  query CourseParticipationAttendances($courseId: Int!, $userIds: [uuid!]!) {
+    Attendance(
+      where: {
+        userId: { _in: $userIds }
+        Session: { courseId: { _eq: $courseId } }
+      }
+    ) {
+      id
+      userId
+      sessionId
+      status
+      source
     }
   }
 `;

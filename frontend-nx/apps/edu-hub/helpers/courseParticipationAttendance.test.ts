@@ -5,6 +5,7 @@ import {
   collapseAttendancesBySession,
   getAttendanceStatusFromMap,
   getNextAttendanceStatus,
+  groupAttendancesByUser,
 } from './courseParticipationAttendance';
 
 type AttendanceRow = {
@@ -73,6 +74,40 @@ describe('course participation attendance', () => {
 
     expect(effective[1]?.status).toBe(AttendanceStatus_enum.MISSED);
     expect(effective[1]?.source).toBe('INSTRUCTOR');
+  });
+
+  it('groups separately loaded attendance rows by participant', () => {
+    const result = groupAttendancesByUser([
+      {
+        id: 1,
+        userId: 'user-1',
+        sessionId: 10,
+        status: AttendanceStatus_enum.ATTENDED,
+        source: 'ZOOM',
+      },
+      {
+        id: 2,
+        userId: 'user-2',
+        sessionId: 11,
+        status: AttendanceStatus_enum.MISSED,
+        source: 'INSTRUCTOR',
+      },
+      {
+        id: 3,
+        userId: null,
+        sessionId: 12,
+        status: AttendanceStatus_enum.NO_INFO,
+        source: 'ZOOM',
+      },
+    ]);
+
+    expect(result['user-1']).toEqual([
+      expect.objectContaining({ id: 1, Session: { id: 10 } }),
+    ]);
+    expect(result['user-2']).toEqual([
+      expect.objectContaining({ id: 2, Session: { id: 11 } }),
+    ]);
+    expect(Object.keys(result)).toHaveLength(2);
   });
 
   it('calculates the overall attendance state from the effective rows', () => {

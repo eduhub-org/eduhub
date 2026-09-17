@@ -13,9 +13,16 @@ import {
   REMOVE_ATTENDANCE_CERTIFICATES,
 } from '../../../../queries/courseEnrollment';
 import { CREATE_CERTIFICATES } from '../../../../queries/actions';
-import { COURSE_PARTICIPATIONS } from '../../../../queries/courseParticipation';
 import {
-  CourseParticipations_Course_by_pk_CourseEnrollments,
+  COURSE_PARTICIPATION_ATTENDANCES,
+  COURSE_PARTICIPATIONS,
+} from '../../../../queries/courseParticipation';
+import {
+  CourseParticipationAttendances,
+  CourseParticipationAttendancesVariables,
+} from '../../../../queries/__generated__/CourseParticipationAttendances';
+import {
+  CourseParticipations_Course_by_pk,
   CourseParticipations_Course_by_pk_ProjectCourses,
   CourseParticipations_Course_by_pk_ProjectCourses_Project,
   CourseParticipations_Course_by_pk_Sessions,
@@ -56,8 +63,10 @@ import {
 import { QuestionConfirmationDialog } from '../../../common/dialogs/QuestionConfirmationDialog';
 import {
   AttendanceOverallStatus,
+  CourseEnrollmentWithAttendances,
   collapseAttendancesBySession,
   getAttendanceStatusFromMap,
+  groupAttendancesByUser,
 } from '../../../../helpers/courseParticipationAttendance';
 import { useOptimisticAttendance } from './useOptimisticAttendance';
 
@@ -66,11 +75,11 @@ interface CourseParticipationsTabIProps {
   qResult: QueryResult<any, any>;
 }
 
-type ExtendedEnrollment = CourseParticipations_Course_by_pk_CourseEnrollments & {
+type ExtendedEnrollment = CourseEnrollmentWithAttendances & {
   userProject?: CourseParticipations_Course_by_pk_ProjectCourses_Project;
 };
 
-const EMPTY_ENROLLMENTS: CourseParticipations_Course_by_pk_CourseEnrollments[] = [];
+const EMPTY_ENROLLMENTS: CourseEnrollmentWithAttendances[] = [];
 const EMPTY_SESSIONS: CourseParticipations_Course_by_pk_Sessions[] = [];
 
 interface IDotData {
@@ -79,7 +88,7 @@ interface IDotData {
 }
 
 function findUserProject(
-  enrollment: CourseParticipations_Course_by_pk_CourseEnrollments,
+  enrollment: CourseEnrollmentWithAttendances,
   projects: CourseParticipations_Course_by_pk_ProjectCourses_Project[]
 ): CourseParticipations_Course_by_pk_ProjectCourses_Project | undefined {
   return projects.find((p) =>
@@ -155,14 +164,42 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
     defaultSort: [{ User: { lastName: 'asc' } }],
   });
 
-  const courseData = data?.Course_by_pk;
+  const courseData = data?.Course_by_pk as CourseParticipations_Course_by_pk | null | undefined;
   const courseEnrollments = courseData?.CourseEnrollments;
   const courseSessions = courseData?.Sessions;
   const courseProjectCourses = courseData?.ProjectCourses;
 
-  const enrollments = useMemo(
-    () => courseEnrollments ?? EMPTY_ENROLLMENTS,
+  const pageUserIds = useMemo(
+    () => courseEnrollments?.map((enrollment) => enrollment.userId) ?? [],
     [courseEnrollments]
+  );
+  const {
+    data: attendanceData,
+    loading: attendanceLoading,
+    error: attendanceError,
+    refetch: refetchAttendances,
+  } = useRoleQuery<CourseParticipationAttendances, CourseParticipationAttendancesVariables>(
+    COURSE_PARTICIPATION_ATTENDANCES,
+    {
+      variables: { courseId: course.id, userIds: pageUserIds },
+      skip: pageUserIds.length === 0,
+    }
+  );
+  const attendancesByUser = useMemo(
+    () => groupAttendancesByUser(attendanceData?.Attendance ?? []),
+    [attendanceData?.Attendance]
+  );
+
+  const enrollments = useMemo(
+    () =>
+      courseEnrollments?.map((enrollment) => ({
+        ...enrollment,
+        User: {
+          ...enrollment.User,
+          Attendances: attendancesByUser[enrollment.userId] ?? [],
+        },
+      })) ?? EMPTY_ENROLLMENTS,
+    [attendancesByUser, courseEnrollments]
   );
   const sessions = useMemo(
     () => courseSessions ?? EMPTY_SESSIONS,
@@ -176,7 +213,7 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
     [courseProjectCourses]
   );
   const maxMissedSessions = courseData?.maxMissedSessions ?? course.maxMissedSessions;
-  const isInitialLoading = loading && !courseData;
+  const isInitialLoading = (loading && !courseData) || (attendanceLoading && !attendanceData);
 
   const [insertAttendance] = useRoleMutation<InsertSingleAttendance, InsertSingleAttendanceVariables>(
     INSERT_SINGLE_ATTENDANCE
@@ -191,7 +228,7 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
     enrollments,
     sessions,
     insertAttendance,
-    refetchParticipations: refetch,
+    refetchAttendances,
     onError: handleAttendanceError,
   });
 
@@ -699,7 +736,7 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
             sorting={sorting}
             setSorting={setSorting}
             loading={isInitialLoading}
-            error={error}
+            error={error ?? attendanceError}
             bulkActions={bulkActions}
             onBulkAction={handleBulkAction}
             expandableRowComponent={ExpandableParticipationRow}
@@ -766,7 +803,7 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
           sorting={sorting}
           setSorting={setSorting}
           loading={isInitialLoading}
-          error={error}
+          error={error ?? attendanceError}
           bulkActions={bulkActions}
           onBulkAction={handleBulkAction}
           expandableRowComponent={ExpandableParticipationRow}

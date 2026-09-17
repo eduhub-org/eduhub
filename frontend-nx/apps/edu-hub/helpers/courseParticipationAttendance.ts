@@ -1,19 +1,59 @@
 import { AttendanceStatus_enum } from '../__generated__/globalTypes';
-import {
-  CourseParticipations_Course_by_pk_CourseEnrollments_User_Attendances,
+import type {
+  CourseParticipations_Course_by_pk_CourseEnrollments,
   CourseParticipations_Course_by_pk_Sessions,
 } from '../queries/__generated__/CourseParticipations';
 import { ATTENDANCE_SOURCE_INSTRUCTOR } from './attendance';
 
-export type AttendanceLike = Pick<
-  CourseParticipations_Course_by_pk_CourseEnrollments_User_Attendances,
-  'id' | 'status' | 'source' | 'Session'
->;
+export interface AttendanceLike {
+  id: number;
+  status: AttendanceStatus_enum;
+  source: string;
+  Session: { __typename?: 'Session'; id: number };
+}
+
+export interface AttendanceRowLike {
+  id: number;
+  userId: string | null;
+  sessionId: number;
+  status: AttendanceStatus_enum;
+  source: string;
+}
+
+export type CourseEnrollmentWithAttendances = Omit<
+  CourseParticipations_Course_by_pk_CourseEnrollments,
+  'User'
+> & {
+  User: CourseParticipations_Course_by_pk_CourseEnrollments['User'] & {
+    Attendances: AttendanceLike[];
+  };
+};
 
 export type AttendanceOverallStatus = 'passed' | 'failed' | 'uncertain';
 
 export function attendanceOverrideKey(userId: string, sessionId: number): string {
   return `${userId}:${sessionId}`;
+}
+
+export function groupAttendancesByUser(
+  attendances: readonly AttendanceRowLike[]
+): Record<string, AttendanceLike[]> {
+  const result: Record<string, AttendanceLike[]> = {};
+
+  for (const attendance of attendances) {
+    if (!attendance.userId) continue;
+
+    const userAttendances = result[attendance.userId] ?? [];
+    userAttendances.push({
+      id: attendance.id,
+      status: attendance.status,
+      source: attendance.source,
+      Session: { id: attendance.sessionId },
+    });
+    result[attendance.userId] = userAttendances;
+  }
+
+  return result;
 }
 
 export function collapseAttendancesBySession(

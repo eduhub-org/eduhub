@@ -1,15 +1,13 @@
 import { MutationFunction } from '@apollo/client';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AttendanceStatus_enum } from '../../../../__generated__/globalTypes';
-import {
-  CourseParticipations_Course_by_pk_CourseEnrollments,
-  CourseParticipations_Course_by_pk_Sessions,
-} from '../../../../queries/__generated__/CourseParticipations';
+import { CourseParticipations_Course_by_pk_Sessions } from '../../../../queries/__generated__/CourseParticipations';
 import {
   InsertSingleAttendance,
   InsertSingleAttendanceVariables,
 } from '../../../../queries/__generated__/InsertSingleAttendance';
 import {
+  CourseEnrollmentWithAttendances,
   applyAttendanceOverrides,
   attendanceOverrideKey,
   collapseAttendancesBySession,
@@ -20,10 +18,10 @@ import { ATTENDANCE_SOURCE_INSTRUCTOR } from '../../../../helpers/attendance';
 const REFETCH_DEBOUNCE_MS = 1500;
 
 interface UseOptimisticAttendanceOptions {
-  enrollments: readonly CourseParticipations_Course_by_pk_CourseEnrollments[];
+  enrollments: readonly CourseEnrollmentWithAttendances[];
   sessions: readonly CourseParticipations_Course_by_pk_Sessions[];
   insertAttendance: MutationFunction<InsertSingleAttendance, InsertSingleAttendanceVariables>;
-  refetchParticipations: () => Promise<unknown>;
+  refetchAttendances: () => Promise<unknown>;
   onError: (message: string) => void;
 }
 
@@ -31,7 +29,7 @@ export function useOptimisticAttendance({
   enrollments,
   sessions,
   insertAttendance,
-  refetchParticipations,
+  refetchAttendances,
   onError,
 }: UseOptimisticAttendanceOptions) {
   const [overrides, setOverrides] = useState<Record<string, AttendanceStatus_enum>>({});
@@ -57,7 +55,7 @@ export function useOptimisticAttendance({
       if (pendingMutationsRef.current > 0) return;
 
       const syncedThroughVersion = nextVersionRef.current;
-      void refetchParticipations()
+      void refetchAttendances()
         .then(() => {
           if (!mountedRef.current) return;
           const nextOverrides: Record<string, AttendanceStatus_enum> = {};
@@ -80,7 +78,7 @@ export function useOptimisticAttendance({
           }
         });
     }, REFETCH_DEBOUNCE_MS);
-  }, [onError, refetchParticipations, replaceOverrides]);
+  }, [onError, refetchAttendances, replaceOverrides]);
 
   useEffect(
     () => {
@@ -134,7 +132,7 @@ export function useOptimisticAttendance({
             delete nextVersions[key];
             overrideVersionsRef.current = nextVersions;
             replaceOverrides(nextOverrides);
-            void refetchParticipations().catch(() => undefined);
+            void refetchAttendances().catch(() => undefined);
           }
           if (mountedRef.current) {
             onError(error instanceof Error ? error.message : String(error));
@@ -151,7 +149,7 @@ export function useOptimisticAttendance({
       enrollments,
       insertAttendance,
       onError,
-      refetchParticipations,
+      refetchAttendances,
       replaceOverrides,
       scheduleBackgroundSync,
     ]
