@@ -10,6 +10,7 @@ jest.mock('next/router', () => ({ useRouter: jest.fn() }));
 const mockedSignOut = signOut as jest.MockedFunction<typeof signOut>;
 const mockedUseRouter = useRouter as jest.MockedFunction<typeof useRouter>;
 const originalFetch = global.fetch;
+const originalLocation = Object.getOwnPropertyDescriptor(window, 'location');
 
 const deferred = <T,>() => {
   let resolve!: (value: T) => void;
@@ -35,6 +36,7 @@ describe('useLogout', () => {
 
   afterEach(() => {
     global.fetch = originalFetch;
+    if (originalLocation) Object.defineProperty(window, 'location', originalLocation);
     jest.restoreAllMocks();
   });
 
@@ -68,5 +70,24 @@ describe('useLogout', () => {
 
     await waitFor(() => expect(mockedSignOut).toHaveBeenCalledWith({ redirect: false }));
     expect(error).toHaveBeenCalledWith('Failed to leave protected page before logout', navigationError);
+  });
+
+  it('finishes logout with a full-page redirect to Keycloak', async () => {
+    const replaceLocation = jest.fn();
+    Object.defineProperty(window, 'location', {
+      configurable: true,
+      value: { replace: replaceLocation },
+    });
+    mockedUseRouter.mockReturnValue({
+      replace: jest.fn().mockResolvedValue(true),
+    } as unknown as ReturnType<typeof useRouter>);
+    mockedSignOut.mockResolvedValue({ url: '/' });
+
+    render(<LogoutButton />);
+    fireEvent.click(screen.getByRole('button', { name: 'Logout' }));
+
+    await waitFor(() =>
+      expect(replaceLocation).toHaveBeenCalledWith('https://login.example/logout')
+    );
   });
 });
