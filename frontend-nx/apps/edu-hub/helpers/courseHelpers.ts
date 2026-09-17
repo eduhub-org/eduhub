@@ -1,10 +1,10 @@
 import { Course_Course_by_pk } from '../queries/__generated__/Course';
 import { CourseWithEnrollment_Course_by_pk } from '../queries/__generated__/CourseWithEnrollment';
 import {
-  CourseParticipations_Course_by_pk_CourseEnrollments,
   CourseParticipations_Course_by_pk_Sessions,
 } from '../queries/__generated__/CourseParticipations';
 import { AttendanceStatus_enum } from '../__generated__/globalTypes';
+import { CourseEnrollmentWithAttendances } from './courseParticipationAttendance';
 
 export const hasProgram = (
   course: Course_Course_by_pk | CourseWithEnrollment_Course_by_pk
@@ -45,7 +45,7 @@ export const enrollmentStatusForCourse = (
  * @returns An array of attendance records for each participant in the provided course enrollment array.
  */
 export const getAttendancesForParticipants = (
-  participationList: CourseParticipations_Course_by_pk_CourseEnrollments[],
+  participationList: CourseEnrollmentWithAttendances[],
   sessions: CourseParticipations_Course_by_pk_Sessions[]
 ) => {
   const attendances = participationList.flatMap((participant) => {

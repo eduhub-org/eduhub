@@ -75,6 +75,8 @@ export interface TableGridProps<T extends BaseRow> {
   compactRows?: boolean;
   /** When true, wraps the table in a rounded card (e.g. course page sections) */
   rounded?: boolean;
+  /** Keep the last settled page mounted while replacement rows are loading. */
+  preserveRowsWhileLoading?: boolean;
   /** Navigate to full-page editor on chevron click (mutually exclusive with expandableRowComponent). */
   rowHref?: (row: T) => string;
   onRowNavigate?: (row: T) => void;
