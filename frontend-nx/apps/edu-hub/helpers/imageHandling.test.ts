@@ -1,7 +1,7 @@
 import { getBackgroundImage, getTileImage } from './imageHandling';
 
 const STORAGE_BUCKET_URL = 'http://preview.example.test:4001/emulated-bucket';
-const COVER_IMAGE_PATH = 'public/courseid_4/cover_image/cover_image.jpg';
+const COVER_IMAGE_PATH = 'courses/course-4/public/cover-image/cover_image.jpg';
 
 describe('imageHandling', () => {
   const previousStorageBucketUrl = process.env.NEXT_PUBLIC_STORAGE_BUCKET_URL;
@@ -38,7 +38,7 @@ describe('imageHandling', () => {
       `${STORAGE_BUCKET_URL}/${COVER_IMAGE_PATH}`
     );
     expect(requestedImageUrl).toBe(
-      `${STORAGE_BUCKET_URL}/public/courseid_4/cover_image/cover_image-460.webp`
+      `${STORAGE_BUCKET_URL}/courses/course-4/public/cover-image/cover_image-460.webp`
     );
   });
 
@@ -47,7 +47,7 @@ describe('imageHandling', () => {
       `${STORAGE_BUCKET_URL}/${COVER_IMAGE_PATH}`
     );
     expect(requestedImageUrl).toBe(
-      `${STORAGE_BUCKET_URL}/public/courseid_4/cover_image/cover_image-1024.webp`
+      `${STORAGE_BUCKET_URL}/courses/course-4/public/cover-image/cover_image-1024.webp`
     );
   });
 });

@@ -73,7 +73,8 @@ const updateKeycloakUser = async (userId, updatedFields, token) => {
 /**
  * Resolves a picture path from the DB to a full public URL.
  * Legacy full URLs (http/https) are returned as-is.
- * Relative paths containing "/public/" are prefixed with STORAGE_BUCKET_PUBLIC_URL.
+ * Relative paths with a root or nested public segment are prefixed with
+ * STORAGE_BUCKET_PUBLIC_URL.
  */
 const resolvePictureUrl = (picturePath) => {
   if (!picturePath) return null;
