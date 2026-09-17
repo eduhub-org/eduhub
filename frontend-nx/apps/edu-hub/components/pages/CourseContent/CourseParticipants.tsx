@@ -12,6 +12,7 @@ import {
   CourseParticipants as CourseParticipantsData,
   CourseParticipantsVariables,
   CourseParticipants_CourseParticipant,
+  CourseParticipants_CourseParticipant_User,
 } from '../../../queries/__generated__/CourseParticipants';
 
 interface CourseParticipantsProps {
@@ -21,6 +22,14 @@ interface CourseParticipantsProps {
 }
 
 const AVATAR_PX = 48;
+
+/**
+ * How filled-in a profile is, so the people easiest to recognize and reach
+ * lead the list. The photo dominates the score: it is what actually makes
+ * someone recognizable in the grid, well above a handle or profile link.
+ */
+const profileCompletenessScore = (user: CourseParticipants_CourseParticipant_User | null): number =>
+  (user?.picture ? 4 : 0) + (user?.matrixUserHandle ? 2 : 0) + (user?.externalProfile ? 1 : 0);
 
 const Participant: FC<{ participant: CourseParticipants_CourseParticipant }> = ({ participant }) => {
   const t = useTranslations('course');
@@ -79,10 +88,12 @@ export const CourseParticipants: FC<CourseParticipantsProps> = ({ courseId, curr
     variables: { courseId },
   });
 
-  const participants = useMemo(
-    () => (data?.CourseParticipant ?? []).filter((p) => p.User && p.userId !== currentUserId),
-    [data?.CourseParticipant, currentUserId]
-  );
+  const participants = useMemo(() => {
+    const others = (data?.CourseParticipant ?? []).filter((p) => p.User && p.userId !== currentUserId);
+    return [...others].sort(
+      (a, b) => profileCompletenessScore(b.User) - profileCompletenessScore(a.User)
+    );
+  }, [data?.CourseParticipant, currentUserId]);
 
   // The total counts everyone; the list shows everyone but the viewer, so the
   // "and N more" is measured against what is actually on screen.
