@@ -35,6 +35,9 @@ describe('filehandling', () => {
       expect(getPublicUrl('project-docs-instructions/public/instruction-1/file.pdf')).toBe(
         `${STORAGE_BUCKET_URL}/project-docs-instructions/public/instruction-1/file.pdf`
       );
+      expect(getPublicUrl('public/courseid_4/cover_image/cover_image.jpg')).toBe(
+        `${STORAGE_BUCKET_URL}/public/courseid_4/cover_image/cover_image.jpg`
+      );
     });
 
     it('returns legacy http(s) URLs unchanged', () => {
