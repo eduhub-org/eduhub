@@ -17,6 +17,7 @@ import { enUS } from 'date-fns/locale/en-US';
 import { AppSettingsProvider } from '../contexts/AppSettingsContext';
 import { AuthErrorProvider } from '../contexts/AuthErrorContext';
 import { AuthStoreUpdater } from '../components/AuthStoreUpdater';
+import { ImpersonationProvider } from '../contexts/ImpersonationContext';
 import { useIsAdmin, useIsOrgAdmin, useIsSessionLoading } from '../hooks/authentication';
 
 // Import locale messages
@@ -109,6 +110,10 @@ const MyApp: FC<AppProps & InitialProps> & {
   return (
     <NextIntlClientProvider locale={locale} messages={messages[locale]} timeZone="Europe/Berlin">
       <SessionProvider session={pageProps.session}>
+        {/* Above AuthStoreUpdater and everything else that asks "who am I":
+            while a super-admin impersonates someone, this provider is what all
+            of those answers come from. */}
+        <ImpersonationProvider>
         <AuthStoreUpdater />
         <ApolloProvider client={client}>
           <AppCacheProvider {...pageProps}>
@@ -149,6 +154,7 @@ const MyApp: FC<AppProps & InitialProps> & {
             </ThemeProvider>
           </AppCacheProvider>
         </ApolloProvider>
+        </ImpersonationProvider>
       </SessionProvider>
     </NextIntlClientProvider>
   );

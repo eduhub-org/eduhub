@@ -3143,5 +3143,11 @@
   },
   "notifications": {
     "show_available_places_update_failed": "Anzeige der freien Plätze konnte nicht geändert werden"
+  },
+  "impersonation": {
+    "banner": "Du siehst EduHub gerade als {name}. Nur lesend – Änderungen sind nicht möglich.",
+    "exit": "Zurück zu meinem Konto",
+    "action": "Ansicht übernehmen",
+    "start_failed": "Die Ansicht konnte nicht übernommen werden."
   }
 }
