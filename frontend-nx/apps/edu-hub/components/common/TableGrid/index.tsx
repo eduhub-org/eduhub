@@ -788,7 +788,10 @@ const TableGrid = <T extends BaseRow,>({
   return (
     <div className="min-w-0 max-w-full">
       <div className="relative" aria-busy={loading}>
-        <div className={isShowingRetainedPage ? 'pointer-events-none opacity-60' : ''}>
+        <div
+          className={isShowingRetainedPage ? 'pointer-events-none opacity-60' : ''}
+          inert={isShowingRetainedPage || undefined}
+        >
           {toolbar}
           <div className="overflow-x-auto max-w-full">
             <div className="w-full" style={{ minWidth: `${mainRowContentWidth}px` }}>

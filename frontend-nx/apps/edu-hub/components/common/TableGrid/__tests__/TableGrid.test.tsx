@@ -52,6 +52,7 @@ describe('TableGrid loading behavior', () => {
     rerender(table([], true, true));
 
     expect(screen.getByText('Previous page')).toBeInTheDocument();
+    expect(screen.getByText('Previous page').closest('[inert]')).toBeInTheDocument();
     expect(screen.getByRole('progressbar')).toBeInTheDocument();
     expect(screen.getByText('common.table_grid.pagination_text')).toBeInTheDocument();
 
@@ -59,6 +60,7 @@ describe('TableGrid loading behavior', () => {
 
     expect(screen.queryByText('Previous page')).not.toBeInTheDocument();
     expect(screen.getByText('Next page')).toBeInTheDocument();
+    expect(screen.getByText('Next page').closest('[inert]')).not.toBeInTheDocument();
   });
 
   it('keeps the existing empty loading behavior by default', () => {
