@@ -3,6 +3,7 @@ import { FC, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
 import { ACTION_ROLE_CONTEXT, UPDATE_ORGANIZATION_WEBSITE_ACTION } from '../lib/employer';
+import { isAbsoluteHttpUrl } from '../lib/website';
 import type { EmployerOrganization } from '../lib/useEmployerOrganization';
 
 interface Props {
@@ -10,24 +11,17 @@ interface Props {
   onWebsiteUpdated: () => void;
 }
 
+const INPUT_ID = 'stujo-organization-website';
+const MESSAGE_ID = `${INPUT_ID}-message`;
+
 const ERROR_MESSAGE_KEYS: Record<string, string> = {
   UNAUTHORIZED: 'organizationWebsite.permissionDenied',
   INVALID_INPUT: 'organizationWebsite.invalidUrl',
 };
 
-// A prefix check alone would accept "https://" (no host); parse it for real.
-const isAbsoluteHttpUrl = (value: string): boolean => {
-  try {
-    const url = new URL(value);
-    return (url.protocol === 'http:' || url.protocol === 'https:') && url.hostname !== '';
-  } catch {
-    return false;
-  }
-};
-
 /**
- * Inline editor for the currently selected organization's public website
- * link, placed next to OrganizationLogoEditor in the dashboard header.
+ * Website field inside the company profile dialog. The dashboard header
+ * shows the stored value as a link; this is where it is changed.
  *
  * Authorization is enforced server-side by the updateOrganizationWebsite
  * action, not here -- same rule as the logo (see
@@ -39,7 +33,7 @@ const isAbsoluteHttpUrl = (value: string): boolean => {
  * whether a settings admin exists; a caller who no longer qualifies simply
  * sees the action's error message on save.
  */
-const OrganizationWebsiteEditor: FC<Props> = ({ organization, onWebsiteUpdated }) => {
+const OrganizationWebsiteField: FC<Props> = ({ organization, onWebsiteUpdated }) => {
   const t = useTranslations('meinStujo');
   const [value, setValue] = useState(organization.website ?? '');
   const [error, setError] = useState<string | null>(null);
@@ -80,43 +74,38 @@ const OrganizationWebsiteEditor: FC<Props> = ({ organization, onWebsiteUpdated }
   };
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
+    <div className="stujo-field">
+      <label htmlFor={INPUT_ID}>{t('organizationWebsite.label')}</label>
       <input
+        id={INPUT_ID}
         type="url"
+        inputMode="url"
+        autoComplete="url"
         value={value}
         placeholder={t('organizationWebsite.placeholder')}
-        aria-label={t('organizationWebsite.label')}
+        aria-invalid={!isValid}
+        aria-describedby={!isValid || error ? MESSAGE_ID : undefined}
         onChange={(event) => handleChange(event.target.value)}
-        style={{
-          padding: '0.35rem 0.6rem',
-          border: '2px solid var(--stujo-border)',
-          fontSize: '14px',
-          minWidth: '14rem',
-        }}
       />
-      <button
-        type="button"
-        className="stujo-btn stujo-btn--small"
-        disabled={!isValid || isUnchanged || loading}
-        onClick={handleSave}
-      >
-        {t('organizationWebsite.save')}
-      </button>
-      {!isValid && (
-        <span style={{ color: 'var(--stujo-error)', fontSize: '0.8rem' }}>
-          {t('organizationWebsite.invalidUrl')}
-        </span>
-      )}
-      {error && (
-        <span style={{ color: 'var(--stujo-error)', fontSize: '0.8rem' }}>{error}</span>
-      )}
-      {saved && !error && (
-        <span className="stujo-muted" style={{ fontSize: '0.8rem' }}>
-          {t('organizationWebsite.saved')}
-        </span>
+      <p className="stujo-field-hint">{t('organizationWebsite.hint')}</p>
+      <div className="stujo-field-actions">
+        <button
+          type="button"
+          className="stujo-btn stujo-btn--small"
+          disabled={!isValid || isUnchanged || loading}
+          onClick={handleSave}
+        >
+          {t('organizationWebsite.save')}
+        </button>
+        {saved && !error && <span className="stujo-muted">{t('organizationWebsite.saved')}</span>}
+      </div>
+      {(!isValid || error) && (
+        <p id={MESSAGE_ID} className="stujo-field-error" role="alert">
+          {!isValid ? t('organizationWebsite.invalidUrl') : error}
+        </p>
       )}
     </div>
   );
 };
 
-export default OrganizationWebsiteEditor;
+export default OrganizationWebsiteField;

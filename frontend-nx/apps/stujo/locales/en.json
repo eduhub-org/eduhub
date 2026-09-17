@@ -79,11 +79,12 @@
       "remove_image_error": "Error removing image",
       "upload_error": "Error uploading image",
       "organization_logo": "Company logo",
-      "view_full_size": "View full size",
-      "close": "Close",
+      "add_logo": "Add logo",
+      "logo_unavailable": "Logo could not be loaded",
       "logo_permission_denied": "This company already has an admin managing settings. Ask them to update the logo."
     },
     "error": "An error occurred",
+    "warning": "Warning",
     "close": "Close",
     "ok": "OK"
   },
@@ -143,7 +144,20 @@
       "saved": "Saved",
       "invalidUrl": "Please enter a valid http(s) URL.",
       "permissionDenied": "This company already has an admin managing settings. Ask them to update the website.",
-      "saveError": "Error saving website"
+      "saveError": "Error saving website",
+      "none": "No website yet",
+      "hint": "Full address including https://"
+    },
+    "organizationProfile": {
+      "title": "Edit company profile",
+      "editButton": "Edit company profile",
+      "editButtonAria": "Edit company profile of {organization}",
+      "intro": "Your logo and website appear on all of your job offers.",
+      "logoHeading": "Logo",
+      "logoAlt": "{organization} logo",
+      "logoHint": "PNG or JPG, max. 2 MB. Your logo is shown in full and never cropped.",
+      "websiteHeading": "Website",
+      "done": "Done"
     },
     "NeuesAngebot": {
       "edit_offer_title": "Edit job offer",
