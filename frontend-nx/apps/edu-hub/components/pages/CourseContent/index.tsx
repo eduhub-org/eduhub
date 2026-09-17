@@ -36,6 +36,7 @@ import {
 } from './Projects/projectEffectiveSubmissionDeadline';
 import { useIsCourseWithEnrollment } from '../../../hooks/course';
 import NotificationSnackbar from '../../common/dialogs/NotificationSnackbar';
+import { ParticipantPreviewNotice } from './ParticipantPreviewNotice';
 
 /**
  * Page rhythm. Every vertical gap on this page comes from one of these, so a gap
@@ -198,6 +199,10 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
       {getCoursesAuthorizedLoading || getCoursesUnauthorizedLoading ? (
         <CircularProgress />
       ) : (
+        <>
+          {/* Outside the section rhythm: the notice belongs to the page chrome,
+              not to the content, so it sits flush above the hero. */}
+          {courseEnrollment?.isTest && <ParticipantPreviewNotice courseId={course.id} />}
         <div className={SECTION_RHYTHM}>
           <div
             className="h-96 text-white flex justify-start items-end bg-cover bg-center bg-no-repeat"
@@ -339,6 +344,7 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
               <CourseProjectsSection courseId={id} />
             </div>
         </div>
+        </>
       )}
 
       <NotificationSnackbar

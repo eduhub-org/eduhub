@@ -27,7 +27,7 @@ const COURSES_WITH_SESSIONS = gql`query {
                   closingQuestionnaire
                   title
                 }
-                CourseEnrollments(where: {status: {_eq: CONFIRMED}}) {
+                CourseEnrollments(where: {isTest: {_eq: false}, status: {_eq: CONFIRMED}}) {
                   User {
                     id
                     email

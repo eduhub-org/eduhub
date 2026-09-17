@@ -40,7 +40,7 @@ export const PROGRAM_STATISTICS = gql`
             userId
           }
         }
-        CourseEnrollments {
+        CourseEnrollments(where: { isTest: { _eq: false } }) {
           id
           status
           attendanceCertificateURL

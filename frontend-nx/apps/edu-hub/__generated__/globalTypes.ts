@@ -4983,6 +4983,7 @@ export interface CourseEnrollment_bool_exp {
   created_at?: timestamptz_comparison_exp | null;
   id?: Int_comparison_exp | null;
   invitationExpirationDate?: date_comparison_exp | null;
+  isTest?: Boolean_comparison_exp | null;
   location?: LocationOption_enum_comparison_exp | null;
   motivationLetter?: String_comparison_exp | null;
   motivationRating?: MotivationRating_enum_comparison_exp | null;

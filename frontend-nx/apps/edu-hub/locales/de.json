@@ -747,6 +747,10 @@
       "title": "Wer ist dabei",
       "message_on_element": "Auf Element schreiben",
       "and_more": "und {count} weitere"
+    },
+    "participant_preview": {
+      "notice": "Vorschau: Du siehst diese Seite als Teilnehmer:in.",
+      "end": "Vorschau beenden"
     }
   },
   "coursePage": {
@@ -1935,6 +1939,22 @@
     "guest_registration": {
       "label": "Anmeldung ohne Konto erlauben",
       "help_text": "Erlaubt die Anmeldung mit Name und E-Mail-Adresse, ohne dass ein Konto angelegt wird. Die Anmeldung wird erst nach Bestätigung per E-Mail gültig. Nur für Veranstaltungen mit direkter Anmeldung möglich."
+    },
+    "participant_preview": {
+      "start": "Als Teilnehmer:in ansehen",
+      "open": "Teilnehmer:innen-Ansicht öffnen",
+      "end": "Vorschau beenden",
+      "start_dialog_title": "Teilnehmer:innen-Ansicht starten",
+      "start_dialog_question": "Damit wirst Du für diesen Kurs als Teilnehmer:in eingetragen, damit Du die Kursseite genau so siehst wie Deine Teilnehmenden. Diese Anmeldung ist unsichtbar: Sie taucht in keiner Teilnehmendenliste, keiner Zählung, keiner Statistik, keinem Export und keiner E-Mail auf. Achtung: Was Du in der Vorschau tatsächlich absendest, etwa ein vorgeschlagenes Projekt, ist echt und für Teilnehmende sichtbar, bis Du die Vorschau beendest.",
+      "end_dialog_title": "Vorschau beenden",
+      "end_dialog_question": "Damit wird Deine Vorschau-Anmeldung entfernt. Projekte, die nur Du in der Vorschau angelegt hast, sowie Deine Anwesenheiten in diesem Kurs werden mit gelöscht.",
+      "errors": {
+        "TEST_ENROLLMENT_FAILED": "Die Vorschau konnte nicht geändert werden. Bitte versuche es später noch einmal.",
+        "TEST_ENROLLMENT_UNAUTHORIZED": "Nur Dozierende dieses Kurses können die Teilnehmer:innen-Ansicht nutzen.",
+        "TEST_ENROLLMENT_ALREADY_PARTICIPANT": "Du bist in diesem Kurs bereits regulär angemeldet und siehst die Kursseite schon als Teilnehmer:in.",
+        "TEST_ENROLLMENT_COURSE_NOT_FOUND": "Dieser Kurs existiert nicht mehr.",
+        "TEST_ENROLLMENT_INVALID_INPUT": "Die Anfrage war fehlerhaft."
+      }
     }
   },
   "manageProjects": {

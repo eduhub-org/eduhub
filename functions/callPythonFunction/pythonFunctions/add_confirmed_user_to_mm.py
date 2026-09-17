@@ -28,6 +28,17 @@ def add_confirmed_user_to_mm(payload):
     logging.debug(f"Payload: {payload}")
 
     try:
+        if is_test_enrollment(payload):
+            # A preview enrollment is an instructor looking at their own course,
+            # not a participation - they must not be pulled into the course chat.
+            logging.info("Preview enrollment, no action needed")
+            return {
+                "success": True,
+                "action": "skipped",
+                "reason": "Preview enrollment",
+                "messageKey": "ENROLLMENT_IS_TEST"
+            }
+
         if not is_new_status_confirmed(payload):
             logging.info("User status is not CONFIRMED, no action needed")
             return {
@@ -91,6 +102,22 @@ def add_confirmed_user_to_mm(payload):
             "error": str(e),
             "messageKey": "MATTERMOST_ADD_USER_FAILED"
         }
+
+
+def is_test_enrollment(payload):
+    """Check whether the enrollment is a preview enrollment (CourseEnrollment.isTest).
+
+    Args:
+        payload (dict): The event payload from Hasura
+
+    Returns:
+        bool: True when the row is a preview enrollment
+    """
+    try:
+        return bool(payload["event"]["data"]["new"]["isTest"])
+    except KeyError:
+        logging.info("isTest key not found in payload")
+        return False
 
 
 def is_new_status_confirmed(payload):

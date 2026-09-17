@@ -12,7 +12,7 @@ export const COURSE_PARTICIPATIONS = gql`
       CourseEnrollments(
         limit: $limit
         offset: $offset
-        where: { _and: [{ status: { _eq: CONFIRMED } }, $filter] }
+        where: { _and: [{ isTest: { _eq: false } }, { status: { _eq: CONFIRMED } }, $filter] }
         order_by: $order_by
       ) {
         id
@@ -37,7 +37,7 @@ export const COURSE_PARTICIPATIONS = gql`
         }
       }
       CourseEnrollments_aggregate(
-        where: { _and: [{ status: { _eq: CONFIRMED } }, $filter] }
+        where: { _and: [{ isTest: { _eq: false } }, { status: { _eq: CONFIRMED } }, $filter] }
       ) {
         aggregate {
           count

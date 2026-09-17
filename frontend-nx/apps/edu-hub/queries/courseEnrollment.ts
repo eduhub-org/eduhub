@@ -61,7 +61,7 @@ export const COURSE_ENROLLMENTS = gql`
   ) {
     CourseEnrollment(
       order_by: { id: desc }
-      where: $where
+      where: { _and: [{ isTest: { _eq: false } }, $where] }
       limit: $limit
       offset: $offset
     ) {
@@ -80,7 +80,7 @@ export const COURSE_ENROLLMENTS_WITH_USER = gql`
   ) {
     CourseEnrollment(
       order_by: { id: desc }
-      where: $where
+      where: { _and: [{ isTest: { _eq: false } }, $where] }
       limit: $limit
       offset: $offset
     ) {

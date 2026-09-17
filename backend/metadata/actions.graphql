@@ -5,6 +5,25 @@ type Mutation {
 }
 
 type Mutation {
+  createTestEnrollment(
+    courseId: Int!
+  ): TestEnrollmentResult!
+}
+
+type Mutation {
+  removeTestEnrollment(
+    courseId: Int!
+  ): TestEnrollmentResult!
+}
+
+type TestEnrollmentResult {
+  success: Boolean!
+  messageKey: String!
+  error: String
+  enrollmentId: Int
+}
+
+type Mutation {
   copyProjectFromTemplate(
     parentProjectId: Int!
     courseId: Int!

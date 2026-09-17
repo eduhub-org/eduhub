@@ -63,7 +63,7 @@ export default async function sendCourseUpdateEmail(req, logger) {
           Course_by_pk(id: $courseId) {
             id
             title
-            CourseEnrollments(where: { status: { _in: [CONFIRMED, REGISTERED] } }) {
+            CourseEnrollments(where: { isTest: { _eq: false }, status: { _in: [CONFIRMED, REGISTERED] } }) {
               User { id email firstName lastName status }
             }
           }
