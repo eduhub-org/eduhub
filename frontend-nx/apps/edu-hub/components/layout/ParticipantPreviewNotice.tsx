@@ -6,6 +6,7 @@ import { MdVisibility } from 'react-icons/md';
 import { useParticipantPreview } from '../../contexts/ParticipantPreviewContext';
 import { useRoleMutation } from '../../hooks/authedMutation';
 import { REMOVE_TEST_ENROLLMENT } from '../../queries/testEnrollment';
+import { RemoveTestEnrollment, RemoveTestEnrollmentVariables } from '../../queries/__generated__/RemoveTestEnrollment';
 
 /**
  * Says out loud that this page is a preview.
@@ -24,7 +25,9 @@ export const ParticipantPreviewNotice: FC = () => {
   const t = useTranslations('course.participant_preview');
   const router = useRouter();
   const { courseId } = useParticipantPreview();
-  const [removeTestEnrollment, { loading }] = useRoleMutation(REMOVE_TEST_ENROLLMENT);
+  const [removeTestEnrollment, { loading }] = useRoleMutation<RemoveTestEnrollment, RemoveTestEnrollmentVariables>(
+    REMOVE_TEST_ENROLLMENT
+  );
 
   const handleEnd = useCallback(async () => {
     if (courseId == null) return;

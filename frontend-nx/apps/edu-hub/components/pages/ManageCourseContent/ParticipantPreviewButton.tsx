@@ -8,11 +8,16 @@ import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
 import { useRoleMutation } from '../../../hooks/authedMutation';
 import { useRoleQuery } from '../../../hooks/authedQuery';
 import { useUserId } from '../../../hooks/user';
+import { CREATE_TEST_ENROLLMENT, MY_TEST_ENROLLMENT, REMOVE_TEST_ENROLLMENT } from '../../../queries/testEnrollment';
+import { MyTestEnrollment, MyTestEnrollmentVariables } from '../../../queries/__generated__/MyTestEnrollment';
 import {
-  CREATE_TEST_ENROLLMENT,
-  MY_TEST_ENROLLMENT,
-  REMOVE_TEST_ENROLLMENT,
-} from '../../../queries/testEnrollment';
+  CreateTestEnrollment,
+  CreateTestEnrollmentVariables,
+} from '../../../queries/__generated__/CreateTestEnrollment';
+import {
+  RemoveTestEnrollment,
+  RemoveTestEnrollmentVariables,
+} from '../../../queries/__generated__/RemoveTestEnrollment';
 
 interface ParticipantPreviewButtonProps {
   courseId: number;
@@ -40,11 +45,17 @@ export const ParticipantPreviewButton: FC<ParticipantPreviewButtonProps> = ({ co
     () => ({ variables: { courseId, userId: userId ?? '' }, skip: !userId }),
     [courseId, userId]
   );
-  const { data, refetch } = useRoleQuery(MY_TEST_ENROLLMENT, queryOptions);
+  const { data, refetch } = useRoleQuery<MyTestEnrollment, MyTestEnrollmentVariables>(MY_TEST_ENROLLMENT, queryOptions);
   const hasPreview = (data?.CourseEnrollment?.length ?? 0) > 0;
 
-  const [createTestEnrollment, { loading: creating }] = useRoleMutation(CREATE_TEST_ENROLLMENT);
-  const [removeTestEnrollment, { loading: removing }] = useRoleMutation(REMOVE_TEST_ENROLLMENT);
+  const [createTestEnrollment, { loading: creating }] = useRoleMutation<
+    CreateTestEnrollment,
+    CreateTestEnrollmentVariables
+  >(CREATE_TEST_ENROLLMENT);
+  const [removeTestEnrollment, { loading: removing }] = useRoleMutation<
+    RemoveTestEnrollment,
+    RemoveTestEnrollmentVariables
+  >(REMOVE_TEST_ENROLLMENT);
 
   const coursePath = `/course/${courseId}`;
 
@@ -106,11 +117,7 @@ export const ParticipantPreviewButton: FC<ParticipantPreviewButtonProps> = ({ co
         onConfirm={confirming === 'remove' ? handleRemove : handleCreate}
       />
 
-      <ErrorMessageDialog
-        open={errorMessage !== ''}
-        errorMessage={errorMessage}
-        onClose={() => setErrorMessage('')}
-      />
+      <ErrorMessageDialog open={errorMessage !== ''} errorMessage={errorMessage} onClose={() => setErrorMessage('')} />
     </div>
   );
 };
