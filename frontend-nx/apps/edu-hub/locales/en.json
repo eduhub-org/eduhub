@@ -630,11 +630,7 @@
       "register_now": "Register Now",
       "accept_invitation": "Accept invitation",
       "placeholder_motivation_letter": "My motivation ...",
-      "retry_payment": "Retry Payment",
-      "cancel_participation": "Cancel registration",
-      "abort_participation": "Abort participation",
-      "cancel_participation_confirm": "Do you really want to cancel your registration for “{title}”? Your place will be released.",
-      "abort_participation_confirm": "Do you really want to abort your participation in “{title}”?"
+      "retry_payment": "Retry Payment"
     },
     "status": {
       "applied": "Your application is under review",
@@ -693,9 +689,7 @@
       "submitting": "Submitting...",
       "success_message_approval": "Your application has been submitted successfully. You will receive an email notification once your application has been reviewed.",
       "success_message_direct": "You have been successfully registered for this course. You will receive a confirmation email shortly.",
-      "success_message_waitlist": "You are on the waitlist for this course.",
-      "cancel_success_message": "Your registration has been cancelled.",
-      "abort_success_message": "Your participation has been aborted."
+      "success_message_waitlist": "You are on the waitlist for this course."
     },
     "errors": {
       "motivation_letter_required": "Please provide a motivation letter",
@@ -703,8 +697,7 @@
       "terms_record_failed": "We could not record your acceptance of the Terms and Conditions. Please try again.",
       "registration_failed": "Registration failed. Please try again.",
       "complete_survey_first": "Please complete the questionnaire first.",
-      "failed_to_load_organization_options": "Failed to load organization options.",
-      "participation_exit_failed": "Your registration could not be changed right now. Please try again."
+      "failed_to_load_organization_options": "Failed to load organization options."
     },
     "formbricks": {
       "survey_title": "Application Questionnaire",
@@ -754,6 +747,17 @@
       "title": "Who's here",
       "message_on_element": "Message on Element",
       "and_more": "and {count} more"
+    },
+    "ParticipationExitButton": {
+      "cancel_participation": "Cancel registration",
+      "abort_participation": "Abort participation",
+      "cancel_participation_confirm": "Do you really want to cancel your registration for “{title}”? Your place will be released.",
+      "abort_participation_confirm": "Do you really want to abort your participation in “{title}”?",
+      "exit_failed": "Your registration could not be changed right now. Please try again."
+    },
+    "CourseContent": {
+      "cancel_success_message": "Your registration has been cancelled.",
+      "abort_success_message": "Your participation has been aborted."
     }
   },
   "coursePage": {

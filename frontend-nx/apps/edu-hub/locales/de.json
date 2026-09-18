@@ -630,11 +630,7 @@
       "register_now": "Jetzt registrieren",
       "accept_invitation": "Einladung annehmen",
       "placeholder_motivation_letter": "Meine Motivation ...",
-      "retry_payment": "Zahlung erneut versuchen",
-      "cancel_participation": "Anmeldung stornieren",
-      "abort_participation": "Teilnahme abbrechen",
-      "cancel_participation_confirm": "Möchtest du deine Anmeldung für „{title}“ wirklich stornieren? Dein Platz wird dann wieder frei.",
-      "abort_participation_confirm": "Möchtest du deine Teilnahme an „{title}“ wirklich abbrechen?"
+      "retry_payment": "Zahlung erneut versuchen"
     },
     "status": {
       "applied": "Deine Bewerbung ist in der Prüfung",
@@ -693,9 +689,7 @@
       "submitting": "Wird gesendet...",
       "success_message_approval": "Deine Bewerbung wurde erfolgreich eingereicht. Du erhältst eine E-Mail-Benachrichtigung, sobald deine Bewerbung geprüft wurde.",
       "success_message_direct": "Du wurdest erfolgreich für diesen Kurs registriert. Du erhältst in Kürze eine Bestätigungs-E-Mail.",
-      "success_message_waitlist": "Du stehst auf der Warteliste für diesen Kurs.",
-      "cancel_success_message": "Deine Anmeldung wurde storniert.",
-      "abort_success_message": "Deine Teilnahme wurde abgebrochen."
+      "success_message_waitlist": "Du stehst auf der Warteliste für diesen Kurs."
     },
     "errors": {
       "motivation_letter_required": "Bitte schreib uns, warum du an diesem Kurs teilnehmen möchtest",
@@ -703,8 +697,7 @@
       "terms_record_failed": "Deine Zustimmung zu den Allgemeinen Geschäftsbedingungen konnte nicht gespeichert werden. Bitte versuche es erneut.",
       "registration_failed": "Registrierung fehlgeschlagen. Bitte versuche es erneut.",
       "complete_survey_first": "Bitte fülle zuerst den Fragebogen vollständig aus.",
-      "failed_to_load_organization_options": "Organisationsoptionen konnten nicht geladen werden.",
-      "participation_exit_failed": "Deine Anmeldung konnte gerade nicht geändert werden. Bitte versuche es erneut."
+      "failed_to_load_organization_options": "Organisationsoptionen konnten nicht geladen werden."
     },
     "formbricks": {
       "survey_title": "Bewerbungsfragebogen",
@@ -754,6 +747,17 @@
       "title": "Wer ist dabei",
       "message_on_element": "Auf Element schreiben",
       "and_more": "und {count} weitere"
+    },
+    "ParticipationExitButton": {
+      "cancel_participation": "Anmeldung stornieren",
+      "abort_participation": "Teilnahme abbrechen",
+      "cancel_participation_confirm": "Möchtest du deine Anmeldung für „{title}“ wirklich stornieren? Dein Platz wird dann wieder frei.",
+      "abort_participation_confirm": "Möchtest du deine Teilnahme an „{title}“ wirklich abbrechen?",
+      "exit_failed": "Deine Anmeldung konnte gerade nicht geändert werden. Bitte versuche es erneut."
+    },
+    "CourseContent": {
+      "cancel_success_message": "Deine Anmeldung wurde storniert.",
+      "abort_success_message": "Deine Teilnahme wurde abgebrochen."
     }
   },
   "coursePage": {

@@ -11,6 +11,15 @@ import { CourseEnrollmentStatus_enum } from '../../../../__generated__/globalTyp
  */
 export type ParticipationExitKind = 'CANCEL' | 'ABORT';
 
+/**
+ * What came back from an exit attempt. `changed` is false when the guarded
+ * update matched no row, i.e. the enrollment moved on behind the page.
+ */
+export interface ParticipationExitOutcome {
+  kind: ParticipationExitKind;
+  changed: boolean;
+}
+
 export const PARTICIPATION_EXIT_STATUS: Record<ParticipationExitKind, CourseEnrollmentStatus_enum> = {
   CANCEL: CourseEnrollmentStatus_enum.CANCELLED,
   ABORT: CourseEnrollmentStatus_enum.ABORTED,
@@ -65,27 +74,33 @@ const toTime = (value: string | Date | null | undefined): number | null => {
  * spelled out server-side in
  * `functions/callNodeFunction/manageGuestRegistration/index.js`.
  *
- * Sessions may be only half planned, so the end falls back to the latest known
- * start: a missing `endDateTime` should not read as "already over" and lock a
- * participant out of leaving.
+ * Sessions may be only half planned. A `null` end means the end is unknown, not
+ * that the session is over the instant it begins, so a course whose last session
+ * has no `endDateTime` gets an open-ended window (`end: null`) rather than one
+ * that closes at that session's start and locks the participant out mid-session.
  */
 const getCourseWindow = (
   sessions: readonly ParticipationExitSession[]
-): { start: number; end: number } | null => {
+): { start: number; end: number | null } | null => {
   let start: number | null = null;
+  let latestStart: number | null = null;
   let end: number | null = null;
 
   for (const session of sessions) {
     const sessionStart = toTime(session.startDateTime);
     const sessionEnd = toTime(session.endDateTime);
 
-    if (sessionStart != null && (start == null || sessionStart < start)) start = sessionStart;
-    for (const candidate of [sessionStart, sessionEnd]) {
-      if (candidate != null && (end == null || candidate > end)) end = candidate;
+    if (sessionStart != null) {
+      if (start == null || sessionStart < start) start = sessionStart;
+      if (latestStart == null || sessionStart > latestStart) latestStart = sessionStart;
     }
+    if (sessionEnd != null && (end == null || sessionEnd > end)) end = sessionEnd;
   }
 
-  if (start == null || end == null) return null;
+  if (start == null) return null;
+  // A session starting after every end we know of carries the course past that
+  // last end, and we cannot say how far - so the window stays open.
+  if (end == null || (latestStart != null && latestStart > end)) return { start, end: null };
   return { start, end };
 };
 
@@ -119,7 +134,9 @@ export const getParticipationExitKind = ({
   const nowTime = now.getTime();
   if (nowTime < window.start) return 'CANCEL';
   // Between two sessions still counts as running: a weekly course is under way
-  // on the days in between, and that is exactly when someone drops out.
-  if (nowTime <= window.end) return 'ABORT';
+  // on the days in between, and that is exactly when someone drops out. An
+  // open-ended window (no known end) keeps the exit available rather than
+  // withdrawing it at a moment we cannot actually place.
+  if (window.end == null || nowTime <= window.end) return 'ABORT';
   return null;
 };

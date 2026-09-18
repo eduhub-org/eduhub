@@ -24,7 +24,7 @@ import { Sessions } from './Sessions';
 import { CourseParticipants } from './CourseParticipants';
 import { CompletedDegreeCourses, CurrentDegreeCourses } from './DegreeCourses';
 import PricingSummary from '../../common/PricingSummary';
-import { ParticipationExitKind } from './Registration/participationExit';
+import { ParticipationExitKind, ParticipationExitOutcome } from './Registration/participationExit';
 import { getRegistrationTypeConfig } from './Registration/types';
 import { getBackgroundImage } from '../../../helpers/imageHandling';
 import { Attendances } from './Attendances';
@@ -150,10 +150,12 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
 
   // The user cancelled or aborted their own participation. The refetch is what
   // moves the rail on to the new status card - the snackbar only says so.
-  const handleParticipationExit = (kind: ParticipationExitKind) => {
-    setRegistrationSuccessWaitlist(false);
-    setParticipationExitKind(kind);
-    setShowSuccessSnackbar(true);
+  const handleParticipationExit = ({ kind, changed }: ParticipationExitOutcome) => {
+    if (changed) {
+      setRegistrationSuccessWaitlist(false);
+      setParticipationExitKind(kind);
+      setShowSuccessSnackbar(true);
+    }
     refetchCourse();
   };
 
@@ -161,8 +163,8 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
   const getSuccessMessage = () => {
     if (participationExitKind) {
       return participationExitKind === 'CANCEL'
-        ? t('modal.cancel_success_message')
-        : t('modal.abort_success_message');
+        ? t('CourseContent.cancel_success_message')
+        : t('CourseContent.abort_success_message');
     }
     if (registrationSuccessWaitlist) {
       return t('modal.success_message_waitlist');

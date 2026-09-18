@@ -13,7 +13,7 @@ import { RegistrationModal } from './RegistrationModal';
 import { GuestRegistrationModal } from './GuestRegistrationModal';
 import { ParticipationExitButton } from './ParticipationExitButton';
 import { useRegistrationHandler } from './hooks/useRegistrationHandler';
-import { ParticipationExitKind } from './participationExit';
+import { ParticipationExitOutcome } from './participationExit';
 import { isRegistrationClosed } from './types';
 
 /**
@@ -33,7 +33,7 @@ interface RegistrationProps {
    */
   onRegistrationSuccess?: (info?: { waitlist: boolean }) => void;
   /** Called after the user cancelled or aborted their own participation. */
-  onParticipationExit?: (kind: ParticipationExitKind) => void;
+  onParticipationExit?: (outcome: ParticipationExitOutcome) => void;
 }
 
 /**

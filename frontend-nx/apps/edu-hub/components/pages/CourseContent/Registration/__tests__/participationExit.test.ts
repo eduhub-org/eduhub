@@ -65,18 +65,45 @@ describe('getParticipationExitKind', () => {
     }
   });
 
-  it('falls back to the latest known start when end times are missing', () => {
+  it('keeps the window open when no session carries an end time', () => {
     // A half-planned agenda must not read as "already over" and strand a
-    // participant with no way out.
+    // participant with no way out. An unknown end is unknown, not immediate:
+    // the session may well still be running a minute after it started.
     const halfPlanned = [
       { startDateTime: '2026-03-10T10:00:00+00:00', endDateTime: null },
       { startDateTime: '2026-03-12T10:00:00+00:00', endDateTime: null },
     ];
     expect(
+      getParticipationExitKind({ status: CourseEnrollmentStatus_enum.CONFIRMED, sessions: halfPlanned, now: at('2026-03-09T08:00:00Z') })
+    ).toBe('CANCEL');
+    expect(
       getParticipationExitKind({ status: CourseEnrollmentStatus_enum.CONFIRMED, sessions: halfPlanned, now: at('2026-03-11T08:00:00Z') })
     ).toBe('ABORT');
     expect(
       getParticipationExitKind({ status: CourseEnrollmentStatus_enum.CONFIRMED, sessions: halfPlanned, now: at('2026-03-12T10:01:00Z') })
+    ).toBe('ABORT');
+  });
+
+  it('keeps the window open when only the last session lacks an end time', () => {
+    const trailingOpen = [
+      { startDateTime: '2026-03-10T10:00:00+00:00', endDateTime: '2026-03-10T12:00:00+00:00' },
+      { startDateTime: '2026-03-12T10:00:00+00:00', endDateTime: null },
+    ];
+    expect(
+      getParticipationExitKind({ status: CourseEnrollmentStatus_enum.CONFIRMED, sessions: trailingOpen, now: at('2026-03-12T10:01:00Z') })
+    ).toBe('ABORT');
+  });
+
+  it('closes on the last end time when only an earlier session lacks one', () => {
+    const leadingOpen = [
+      { startDateTime: '2026-03-10T10:00:00+00:00', endDateTime: null },
+      { startDateTime: '2026-03-12T10:00:00+00:00', endDateTime: '2026-03-12T12:00:00+00:00' },
+    ];
+    expect(
+      getParticipationExitKind({ status: CourseEnrollmentStatus_enum.CONFIRMED, sessions: leadingOpen, now: at('2026-03-12T11:00:00Z') })
+    ).toBe('ABORT');
+    expect(
+      getParticipationExitKind({ status: CourseEnrollmentStatus_enum.CONFIRMED, sessions: leadingOpen, now: at('2026-03-12T12:01:00Z') })
     ).toBeNull();
   });
 

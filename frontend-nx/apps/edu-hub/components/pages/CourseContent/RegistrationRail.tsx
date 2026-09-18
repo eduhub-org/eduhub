@@ -8,7 +8,7 @@ import { useIsAdmin, useIsInstructor } from '../../../hooks/authentication';
 import UserCard from '../../common/UserCard';
 import { CourseFacts } from './CourseFacts';
 import { Registration } from './Registration';
-import { ParticipationExitKind } from './Registration/participationExit';
+import { ParticipationExitOutcome } from './Registration/participationExit';
 import { useCourseCalendarExport, useSessionAddressMap } from './sessionLocations';
 
 interface RegistrationRailProps {
@@ -17,7 +17,7 @@ interface RegistrationRailProps {
   /** Whether the viewer may see online meeting links in the calendar export. */
   isLoggedInParticipant: boolean;
   onRegistrationSuccess?: (info?: { waitlist: boolean }) => void;
-  onParticipationExit?: (kind: ParticipationExitKind) => void;
+  onParticipationExit?: (outcome: ParticipationExitOutcome) => void;
 }
 
 const Divider: FC = () => <div className="border-t border-border-primary my-6" />;

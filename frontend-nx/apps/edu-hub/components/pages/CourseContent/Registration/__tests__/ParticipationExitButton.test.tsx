@@ -2,7 +2,7 @@ import React from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
-import { CourseEnrollmentStatus_enum } from '../../../../../__generated__/globalTypes';
+import { CourseEnrollmentStatus_enum, InvoiceStatus_enum } from '../../../../../__generated__/globalTypes';
 import { ParticipationExitButton } from '../ParticipationExitButton';
 
 jest.mock('next-intl', () => ({
@@ -40,7 +40,9 @@ const renderButton = (props: Record<string, unknown> = {}) =>
 
 describe('ParticipationExitButton', () => {
   beforeEach(() => {
-    cancelOwnEnrollment.mockReset().mockResolvedValue({ data: {} });
+    cancelOwnEnrollment
+      .mockReset()
+      .mockResolvedValue({ data: { update_CourseEnrollment: { affected_rows: 1 } } });
     jest.useFakeTimers({ doNotFake: ['setTimeout', 'queueMicrotask'] }).setSystemTime(
       new Date('2026-03-01T00:00:00Z')
     );
@@ -52,13 +54,17 @@ describe('ParticipationExitButton', () => {
 
   it('offers cancelling before the course starts', () => {
     renderButton();
-    expect(screen.getByRole('button', { name: 'registration.cancel_participation' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'ParticipationExitButton.cancel_participation' })
+    ).toBeInTheDocument();
   });
 
   it('offers aborting once the course is running', () => {
     jest.setSystemTime(new Date('2026-03-10T11:00:00Z'));
     renderButton();
-    expect(screen.getByRole('button', { name: 'registration.abort_participation' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'ParticipationExitButton.abort_participation' })
+    ).toBeInTheDocument();
   });
 
   it('renders nothing once the course is over', () => {
@@ -74,16 +80,38 @@ describe('ParticipationExitButton', () => {
     expect(container).toBeEmptyDOMElement();
   });
 
+  it('renders nothing when any invoice was paid, even behind a newer one', () => {
+    const { container } = renderButton({
+      courseEnrollment: enrollment({
+        Invoices: [{ status: InvoiceStatus_enum.ISSUED }, { status: InvoiceStatus_enum.PAID }],
+      }),
+    });
+    expect(container).toBeEmptyDOMElement();
+  });
+
+  it('reports no success when the enrollment had already moved on', async () => {
+    cancelOwnEnrollment.mockResolvedValue({ data: { update_CourseEnrollment: { affected_rows: 0 } } });
+    const onExit = jest.fn();
+    renderButton({ onExit });
+
+    clickButton('ParticipationExitButton.cancel_participation');
+    clickButton('confirm');
+
+    // The caller still refetches - that is how the participant finds out where
+    // the enrollment actually stands - but it must not claim a cancellation.
+    await waitFor(() => expect(onExit).toHaveBeenCalledWith({ kind: 'CANCEL', changed: false }));
+  });
+
   it('asks before it acts, and only then sends the status change', async () => {
     const onExit = jest.fn();
     renderButton({ onExit });
 
-    clickButton('registration.cancel_participation');
+    clickButton('ParticipationExitButton.cancel_participation');
     expect(cancelOwnEnrollment).not.toHaveBeenCalled();
 
     clickButton('confirm');
 
-    await waitFor(() => expect(onExit).toHaveBeenCalledWith('CANCEL'));
+    await waitFor(() => expect(onExit).toHaveBeenCalledWith({ kind: 'CANCEL', changed: true }));
     expect(cancelOwnEnrollment).toHaveBeenCalledWith({
       variables: { enrollmentId: 77, status: CourseEnrollmentStatus_enum.CANCELLED },
     });
@@ -93,7 +121,7 @@ describe('ParticipationExitButton', () => {
     jest.setSystemTime(new Date('2026-03-10T11:00:00Z'));
     renderButton();
 
-    clickButton('registration.abort_participation');
+    clickButton('ParticipationExitButton.abort_participation');
     clickButton('confirm');
 
     await waitFor(() =>
@@ -108,10 +136,10 @@ describe('ParticipationExitButton', () => {
     const onExit = jest.fn();
     renderButton({ onExit });
 
-    clickButton('registration.cancel_participation');
+    clickButton('ParticipationExitButton.cancel_participation');
     clickButton('confirm');
 
-    expect(await screen.findByText('errors.participation_exit_failed')).toBeInTheDocument();
+    expect(await screen.findByText('ParticipationExitButton.exit_failed')).toBeInTheDocument();
     expect(onExit).not.toHaveBeenCalled();
   });
 });
