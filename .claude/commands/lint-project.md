@@ -11,7 +11,7 @@ yarn lint --fix     # auto-fix where possible
 
 ## Prerequisites
 
-- Node 20 (`nvm use 20`)
+- Node 22 (`nvm use 22`)
 - Yarn 3.4.1 (Corepack-managed; the repo provides `.yarnrc.yml`)
 
 ## Notes

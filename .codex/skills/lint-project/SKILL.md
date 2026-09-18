@@ -23,7 +23,7 @@ yarn lint --fix
 ## Expectations
 
 - this matches the frontend lint step used in CI
-- use Node.js 20.x and Yarn 3.4.1 when reproducing local results
+- use Node.js 22.x and Yarn 3.4.1 when reproducing local results
 - if local and CI results differ, reinstall dependencies with the repo's locked versions
 
 ## Good Workflow
