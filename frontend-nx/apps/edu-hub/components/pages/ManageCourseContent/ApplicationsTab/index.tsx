@@ -49,7 +49,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import Modal from '../../../common/Modal';
 import AddParticipantsForm from './AddParticipantsForm';
 import TableGrid from '../../../common/TableGrid';
-import { useTableGrid } from '../../../common/TableGrid/hooks';
+import { useDeferredBulkAction, useTableGrid } from '../../../common/TableGrid/hooks';
 import { createMultiWordSearchCondition } from '../../../common/TableGrid/utils';
 import { ColumnDef, SortingState } from '@tanstack/react-table';
 import { GoDotFill } from 'react-icons/go';
@@ -383,6 +383,10 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
     actionType: 'selected' | 'all';
   } | null>(null);
 
+  // Sending invitations or rejections finishes in a dialog, so the selection is only released once
+  // that dialog reports success.
+  const dialogBulkAction = useDeferredBulkAction();
+
   const handleOpenInviteDialog = useCallback(
     (enrollmentIds: number[], selectedCount: number | undefined, actionType: 'selected' | 'all') => {
       const idToRow = new Map(courseEnrollments.map((e) => [e.id, e]));
@@ -393,7 +397,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
         );
       if (enrollmentsToSend.length === 0) {
         showBulkNotice(t('bulk_actions.no_eligible_invitations'));
-        return;
+        return false;
       }
       setInviteDialogData({
         enrollmentsToSend,
@@ -403,6 +407,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
       });
       setInviteExpireDate(getDefaultInviteExpireDate());
       setIsInviteDialogOpen(true);
+      return true;
     },
     [courseEnrollments, getDefaultInviteExpireDate, showBulkNotice, t]
   );
@@ -413,7 +418,9 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
     setIsInviteDialogOpen(false);
     setInviteDialogData(null);
     setInviteError(null);
-  }, []);
+    // Cancelled (a completed send settles the action before closing): the rows stay selected.
+    dialogBulkAction.fail();
+  }, [dialogBulkAction]);
 
   const handleSendInvitations = useCallback(async () => {
     if (!inviteDialogData) return;
@@ -428,6 +435,8 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
 
     if (enrollmentIds.length === 0) {
       showBulkNotice(t('bulk_actions.no_eligible_invitations'));
+      // Nothing was sent, so the rows stay selected.
+      dialogBulkAction.fail();
       handleCloseInviteDialog();
       return;
     }
@@ -452,6 +461,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
         t('bulk_actions.send_invitations_error', { error: errorMessage }) || 
         `Failed to send invitations: ${errorMessage}`
       );
+      // The dialog stays open with the error; the rows stay selected for a retry.
       return;
     }
 
@@ -465,6 +475,11 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
         4000
       );
     }
+    if (invitedCount === 0) {
+      dialogBulkAction.fail();
+    } else {
+      dialogBulkAction.succeed();
+    }
     handleCloseInviteDialog();
 
     try {
@@ -473,6 +488,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
       console.error('ApplicationsTab: refetch after bulk invite failed', refetchError);
     }
   }, [
+    dialogBulkAction,
     inviteDialogData,
     inviteExpireDate,
     courseEnrollments,
@@ -503,7 +519,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
         );
       if (enrollmentsToSend.length === 0) {
         showBulkNotice(t('bulk_actions.no_eligible_rejections'));
-        return;
+        return false;
       }
       setRejectionDialogData({
         enrollmentsToSend,
@@ -512,6 +528,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
         actionType,
       });
       setIsRejectionDialogOpen(true);
+      return true;
     },
     [courseEnrollments, showBulkNotice, t]
   );
@@ -522,7 +539,9 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
     setIsRejectionDialogOpen(false);
     setRejectionDialogData(null);
     setRejectionError(null);
-  }, []);
+    // Cancelled (a completed send settles the action before closing): the rows stay selected.
+    dialogBulkAction.fail();
+  }, [dialogBulkAction]);
 
   const handleSendRejections = useCallback(async () => {
     if (!rejectionDialogData) return;
@@ -537,6 +556,8 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
 
     if (enrollmentIds.length === 0) {
       showBulkNotice(t('bulk_actions.no_eligible_rejections'));
+      // Nothing was sent, so the rows stay selected.
+      dialogBulkAction.fail();
       handleCloseRejectionDialog();
       return;
     }
@@ -561,6 +582,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
         t('bulk_actions.send_rejections_error', { error: errorMessage }) || 
         `Failed to send rejections: ${errorMessage}`
       );
+      // The dialog stays open with the error; the rows stay selected for a retry.
       return;
     }
 
@@ -574,6 +596,11 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
         4000
       );
     }
+    if (declinedCount === 0) {
+      dialogBulkAction.fail();
+    } else {
+      dialogBulkAction.succeed();
+    }
     handleCloseRejectionDialog();
 
     try {
@@ -582,6 +609,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
       console.error('ApplicationsTab: refetch after bulk decline failed', refetchError);
     }
   }, [
+    dialogBulkAction,
     rejectionDialogData,
     courseEnrollments,
     updateEnrollmentStatusWhenApplied,
@@ -672,37 +700,55 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
         if (selectedRows.length === 0) {
           setIsNoSelectionDialogOpen(true);
         }
-        return;
+        return false;
       }
 
       // Handle invitation actions
       if (action === 'send_invitations_selected') {
+        // Nothing happened in these cases, so the rows stay selected.
         if (selectedRows.length === 0) {
           setIsNoSelectionDialogOpen(true);
-          return;
+          return false;
         }
         const enrollmentsToSend = selectedRows.filter((e) => isInviteEligibleEnrollment(e));
         if (enrollmentsToSend.length === 0) {
           showBulkNotice(t('bulk_actions.no_eligible_invitations'));
-          return;
+          return false;
         }
-        handleOpenInviteDialog(enrollmentsToSend.map((e) => e.id), selectedRows.length, 'selected');
-        return;
+        const opened = handleOpenInviteDialog(
+          enrollmentsToSend.map((e) => e.id),
+          selectedRows.length,
+          'selected'
+        );
+        if (!opened) {
+          return false;
+        }
+        // handleSendInvitations settles the action once the dialog is confirmed.
+        return dialogBulkAction.start();
       }
 
       // Handle rejection actions
       if (action === 'send_rejections_selected') {
+        // Nothing happened in these cases, so the rows stay selected.
         if (selectedRows.length === 0) {
           setIsNoSelectionDialogOpen(true);
-          return;
+          return false;
         }
         const enrollmentsToSend = selectedRows.filter((e) => isRejectionEligibleEnrollment(e));
         if (enrollmentsToSend.length === 0) {
           showBulkNotice(t('bulk_actions.no_eligible_rejections'));
-          return;
+          return false;
         }
-        handleOpenRejectionDialog(enrollmentsToSend.map((e) => e.id), selectedRows.length, 'selected');
-        return;
+        const opened = handleOpenRejectionDialog(
+          enrollmentsToSend.map((e) => e.id),
+          selectedRows.length,
+          'selected'
+        );
+        if (!opened) {
+          return false;
+        }
+        // handleSendRejections settles the action once the dialog is confirmed.
+        return dialogBulkAction.start();
       }
 
       // Handle email actions (existing)
@@ -762,7 +808,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
 
           if (emails.length === 0) {
             showBulkNotice(t('bulk_actions.no_email_recipients'));
-            return;
+            return false;
           }
 
           setBulkEmailDialogData({
@@ -778,17 +824,20 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
         } finally {
           setBulkEmailPendingLabel(null);
         }
-        return;
+        // These actions address everyone matching the filter rather than the selection, so the
+        // selection is left untouched.
+        return false;
       }
 
+      // Nothing happened in these cases, so the rows stay selected.
       if (targetEnrollments.length === 0) {
-        return;
+        return false;
       }
 
       const emails = targetEnrollments.map((e) => e.User.email).filter(Boolean);
       if (emails.length === 0) {
         showBulkNotice(t('bulk_actions.no_email_recipients'));
-        return;
+        return false;
       }
 
       openMailtoOrShowFallback({
@@ -802,6 +851,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
     [
       buildMailtoUrl,
       course.id,
+      dialogBulkAction,
       handleOpenInviteDialog,
       handleOpenRejectionDialog,
       loadBulkEmailRecipients,

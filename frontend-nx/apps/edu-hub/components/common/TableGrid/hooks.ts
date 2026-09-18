@@ -170,9 +170,42 @@ export function useTableGrid<V>({
   };
 }
 
+/**
+ * Bridges bulk actions that only finish later — typically after a confirmation dialog — to the
+ * promise `onBulkAction` returns. `start()` hands TableGrid a promise that stays pending while the
+ * dialog is open, so the row selection stays marked until `succeed()` or `fail()` settles it.
+ */
+export const useDeferredBulkAction = () => {
+  const pendingRef = useRef<{ resolve: () => void; reject: () => void } | null>(null);
+
+  const start = useCallback(() => {
+    // A new action supersedes an unfinished one; keeping that selection is the safe default.
+    pendingRef.current?.reject();
+    pendingRef.current = null;
+    return new Promise<void>((resolve, reject) => {
+      pendingRef.current = {
+        resolve,
+        reject: () => reject(new Error('Bulk action was not completed')),
+      };
+    });
+  }, []);
+
+  const succeed = useCallback(() => {
+    pendingRef.current?.resolve();
+    pendingRef.current = null;
+  }, []);
+
+  const fail = useCallback(() => {
+    pendingRef.current?.reject();
+    pendingRef.current = null;
+  }, []);
+
+  return { start, succeed, fail };
+};
+
 export const useBulkActions = <T extends BaseRow>(
   _bulkActions: BulkAction[],
-  onBulkAction: (action: string, selectedRows: T[]) => void
+  onBulkAction: (action: string, selectedRows: T[]) => void | boolean | Promise<void | boolean>
 ) => {
   const [selectedRowIds, setSelectedRowIds] = useState<Set<number>>(new Set());
   const [bulkAction, setBulkAction] = useState<string>('');
@@ -199,11 +232,27 @@ export const useBulkActions = <T extends BaseRow>(
     });
   }, []);
 
-  const handleBulkActionChange = useCallback((action: string, data: T[]) => {
-    if (onBulkAction && action) {
-      const selectedRowsData = data.filter((row) => selectedRowIds.has(row.id));
-      onBulkAction(action, selectedRowsData);
-      setSelectedRowIds(new Set());
+  /**
+   * Runs the bulk action and only drops the row selection once it actually succeeded: a handler
+   * that rejects (or resolves to `false`, e.g. because nothing was applicable) keeps the rows
+   * marked so the user can correct the problem and retry without reselecting everything.
+   */
+  const handleBulkActionChange = useCallback(async (action: string, data: T[]) => {
+    if (!onBulkAction || !action) {
+      return;
+    }
+
+    const selectedRowsData = data.filter((row) => selectedRowIds.has(row.id));
+
+    try {
+      const result = await onBulkAction(action, selectedRowsData);
+      if (result !== false) {
+        setSelectedRowIds(new Set());
+      }
+    } catch {
+      // Keep the selection; the handler is responsible for reporting the error to the user.
+    } finally {
+      // The dropdown is a menu, not a state, so it always returns to its placeholder.
       setBulkAction('');
     }
   }, [onBulkAction, selectedRowIds]);

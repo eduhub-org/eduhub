@@ -263,7 +263,7 @@ const TableGrid = <T extends BaseRow,>({
     if (handleRowExpansionBulkAction(selectedAction)) {
       return;
     }
-    handleBulkActionChange(selectedAction, tableData);
+    void handleBulkActionChange(selectedAction, tableData);
   };
 
   const handlePrevious = () => {
