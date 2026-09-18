@@ -53,6 +53,7 @@ const GET_CONTEXT = `
       id
       isTest
       status
+      created_at
     }
   }
 `;
@@ -77,12 +78,20 @@ const INSERT_TEST_ENROLLMENT = `
  * What a preview may have authored. Removing the enrollment without this leaves
  * a project standing in the course showcase, visible to real participants, with
  * no participation behind it.
+ *
+ * Bounded by when the preview began ($since). Nothing ties an authorship to an
+ * enrollment, so without that bound this would also collect work the user
+ * authored in this course before ever previewing it -- and the sole-author rule
+ * below would then delete the project outright. An authorship needs no
+ * enrollment behind it (a co-author added to someone else's project has one,
+ * as does anyone whose enrollment was later removed), so that is reachable.
  */
 const GET_PREVIEW_ARTEFACTS = `
-  query TestEnrollmentArtefacts($courseId: Int!, $userId: uuid!) {
+  query TestEnrollmentArtefacts($courseId: Int!, $userId: uuid!, $since: timestamptz!) {
     ProjectAuthor(
       where: {
         userId: { _eq: $userId }
+        created_at: { _gte: $since }
         Project: { ProjectCourses: { courseId: { _eq: $courseId } } }
       }
     ) {
@@ -109,6 +118,7 @@ const DELETE_PREVIEW = `
     $projectIds: [Int!]!
     $sessionIds: [Int!]!
     $userId: uuid!
+    $since: timestamptz!
   ) {
     delete_ProjectAuthor(where: { id: { _in: $authorIds } }) {
       affected_rows
@@ -117,7 +127,11 @@ const DELETE_PREVIEW = `
       affected_rows
     }
     delete_Attendance(
-      where: { userId: { _eq: $userId }, sessionId: { _in: $sessionIds } }
+      where: {
+        userId: { _eq: $userId }
+        sessionId: { _in: $sessionIds }
+        created_at: { _gte: $since }
+      }
     ) {
       affected_rows
     }
@@ -220,7 +234,9 @@ export default async function manageTestEnrollment(req, logger) {
     return unauthorized("This is a real enrollment and is not removable here");
   }
 
-  const artefacts = await client.request(GET_PREVIEW_ARTEFACTS, { courseId, userId });
+  // Everything removed below is bounded by this: the moment the preview began.
+  const since = existing.created_at;
+  const artefacts = await client.request(GET_PREVIEW_ARTEFACTS, { courseId, userId, since });
   const authorIds = artefacts.ProjectAuthor.map((author) => author.id);
   // Only projects the preview was the sole author of: a project with a real
   // co-author keeps standing, it just loses the preview authorship.
@@ -235,6 +251,7 @@ export default async function manageTestEnrollment(req, logger) {
     projectIds,
     sessionIds,
     userId,
+    since,
   });
 
   logger.info("Removed preview enrollment", {
