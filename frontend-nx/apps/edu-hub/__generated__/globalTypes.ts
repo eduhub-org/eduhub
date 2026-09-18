@@ -583,6 +583,7 @@ export enum CourseEnrollment_select_column {
   created_at = "created_at",
   id = "id",
   invitationExpirationDate = "invitationExpirationDate",
+  isTest = "isTest",
   location = "location",
   motivationLetter = "motivationLetter",
   motivationRating = "motivationRating",
@@ -590,6 +591,20 @@ export enum CourseEnrollment_select_column {
   termsAcceptedAt = "termsAcceptedAt",
   updated_at = "updated_at",
   userId = "userId",
+}
+
+/**
+ * select "CourseEnrollment_aggregate_bool_exp_bool_and_arguments_columns" columns of table "CourseEnrollment"
+ */
+export enum CourseEnrollment_select_column_CourseEnrollment_aggregate_bool_exp_bool_and_arguments_columns {
+  isTest = "isTest",
+}
+
+/**
+ * select "CourseEnrollment_aggregate_bool_exp_bool_or_arguments_columns" columns of table "CourseEnrollment"
+ */
+export enum CourseEnrollment_select_column_CourseEnrollment_aggregate_bool_exp_bool_or_arguments_columns {
+  isTest = "isTest",
 }
 
 /**
@@ -603,6 +618,7 @@ export enum CourseEnrollment_update_column {
   created_at = "created_at",
   id = "id",
   invitationExpirationDate = "invitationExpirationDate",
+  isTest = "isTest",
   location = "location",
   motivationLetter = "motivationLetter",
   motivationRating = "motivationRating",
@@ -4914,7 +4930,23 @@ export interface CourseEnrollmentStatus_order_by {
 }
 
 export interface CourseEnrollment_aggregate_bool_exp {
+  bool_and?: CourseEnrollment_aggregate_bool_exp_bool_and | null;
+  bool_or?: CourseEnrollment_aggregate_bool_exp_bool_or | null;
   count?: CourseEnrollment_aggregate_bool_exp_count | null;
+}
+
+export interface CourseEnrollment_aggregate_bool_exp_bool_and {
+  arguments: CourseEnrollment_select_column_CourseEnrollment_aggregate_bool_exp_bool_and_arguments_columns;
+  distinct?: boolean | null;
+  filter?: CourseEnrollment_bool_exp | null;
+  predicate: Boolean_comparison_exp;
+}
+
+export interface CourseEnrollment_aggregate_bool_exp_bool_or {
+  arguments: CourseEnrollment_select_column_CourseEnrollment_aggregate_bool_exp_bool_or_arguments_columns;
+  distinct?: boolean | null;
+  filter?: CourseEnrollment_bool_exp | null;
+  predicate: Boolean_comparison_exp;
 }
 
 export interface CourseEnrollment_aggregate_bool_exp_count {
@@ -5013,6 +5045,7 @@ export interface CourseEnrollment_insert_input {
   created_at?: any | null;
   id?: number | null;
   invitationExpirationDate?: any | null;
+  isTest?: boolean | null;
   location?: LocationOption_enum | null;
   motivationLetter?: string | null;
   motivationRating?: MotivationRating_enum | null;
@@ -5093,6 +5126,7 @@ export interface CourseEnrollment_order_by {
   created_at?: order_by | null;
   id?: order_by | null;
   invitationExpirationDate?: order_by | null;
+  isTest?: order_by | null;
   location?: order_by | null;
   motivationLetter?: order_by | null;
   motivationRating?: order_by | null;
