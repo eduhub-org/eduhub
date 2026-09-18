@@ -18,6 +18,7 @@ import { AppSettingsProvider } from '../contexts/AppSettingsContext';
 import { AuthErrorProvider } from '../contexts/AuthErrorContext';
 import { AuthStoreUpdater } from '../components/AuthStoreUpdater';
 import { ImpersonationProvider } from '../contexts/ImpersonationContext';
+import { ParticipantPreviewProvider } from '../contexts/ParticipantPreviewContext';
 import { useIsAdmin, useIsOrgAdmin, useIsSessionLoading } from '../hooks/authentication';
 
 // Import locale messages
@@ -120,6 +121,7 @@ const MyApp: FC<AppProps & InitialProps> & {
             <ThemeProvider theme={theme}>
               <AuthErrorProvider>
                 <AppSettingsProvider>
+                <ParticipantPreviewProvider>
                   {/* Global Site Code Pixel - Facebook Pixel */}
                   <Script
                     id="fb-pixel"
@@ -149,6 +151,7 @@ const MyApp: FC<AppProps & InitialProps> & {
                     <meta name="viewport" content="initial-scale=1.0, width=device-width" />
                   </Head>
                   <Component {...pageProps} />
+                </ParticipantPreviewProvider>
                 </AppSettingsProvider>
               </AuthErrorProvider>
             </ThemeProvider>

@@ -3,12 +3,9 @@ import { FC, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { MdVisibility } from 'react-icons/md';
 
-import { useRoleMutation } from '../../../hooks/authedMutation';
-import { REMOVE_TEST_ENROLLMENT } from '../../../queries/testEnrollment';
-
-interface ParticipantPreviewNoticeProps {
-  courseId: number;
-}
+import { useParticipantPreview } from '../../contexts/ParticipantPreviewContext';
+import { useRoleMutation } from '../../hooks/authedMutation';
+import { REMOVE_TEST_ENROLLMENT } from '../../queries/testEnrollment';
 
 /**
  * Says out loud that this page is a preview.
@@ -17,16 +14,25 @@ interface ParticipantPreviewNoticeProps {
  * instructor sees while holding a preview enrollment is exactly the participant
  * page, which is the point - and precisely why they need telling that the
  * participant they are looking at is themselves.
+ *
+ * Rendered by Page above the header rather than by the course page inside it,
+ * because the header is absolutely positioned over the top of `<main>` and would
+ * otherwise cover this bar and its button. The course page declares the preview
+ * through ParticipantPreviewContext.
  */
-export const ParticipantPreviewNotice: FC<ParticipantPreviewNoticeProps> = ({ courseId }) => {
+export const ParticipantPreviewNotice: FC = () => {
   const t = useTranslations('course.participant_preview');
   const router = useRouter();
+  const { courseId } = useParticipantPreview();
   const [removeTestEnrollment, { loading }] = useRoleMutation(REMOVE_TEST_ENROLLMENT);
 
   const handleEnd = useCallback(async () => {
+    if (courseId == null) return;
     await removeTestEnrollment({ variables: { courseId } });
     router.push(`/manage/course/${courseId}`);
   }, [courseId, removeTestEnrollment, router]);
+
+  if (courseId == null) return null;
 
   return (
     <div className="w-full bg-status-confirmed light text-label-primary">
