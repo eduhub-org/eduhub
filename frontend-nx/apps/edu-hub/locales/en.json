@@ -747,6 +747,10 @@
       "title": "Who's here",
       "message_on_element": "Message on Element",
       "and_more": "and {count} more"
+    },
+    "participant_preview": {
+      "notice": "Preview: you are seeing this page as a participant.",
+      "end": "End preview"
     }
   },
   "coursePage": {
@@ -1950,6 +1954,22 @@
     "guest_registration": {
       "label": "Allow registration without an account",
       "help_text": "Lets people register with just a name and email address, without creating an account. The registration only becomes valid once confirmed by email. Only available for events with direct registration."
+    },
+    "participant_preview": {
+      "start": "View as participant",
+      "open": "Open participant view",
+      "end": "End preview",
+      "start_dialog_title": "Start the participant view",
+      "start_dialog_question": "This enrolls you in this course as a participant, so you see the course page exactly as your participants do. The enrollment is invisible: it appears in no participant list, no count, no statistic, no export and no email. Note that anything you really submit while previewing, such as a proposed project, is real and visible to participants until you end the preview.",
+      "end_dialog_title": "End the preview",
+      "end_dialog_question": "This removes your preview enrollment. Projects only you created while previewing, and your attendances in this course, are deleted with it.",
+      "errors": {
+        "TEST_ENROLLMENT_FAILED": "The preview could not be changed. Please try again later.",
+        "TEST_ENROLLMENT_UNAUTHORIZED": "Only instructors of this course can use the participant view.",
+        "TEST_ENROLLMENT_ALREADY_PARTICIPANT": "You are already enrolled in this course, so you already see the course page as a participant.",
+        "TEST_ENROLLMENT_COURSE_NOT_FOUND": "This course no longer exists.",
+        "TEST_ENROLLMENT_INVALID_INPUT": "The request was malformed."
+      }
     }
   },
   "manageProjects": {
@@ -3138,5 +3158,11 @@
   },
   "notifications": {
     "show_available_places_update_failed": "Could not change the display of available places"
+  },
+  "impersonation": {
+    "banner": "You are viewing EduHub as {name}. Read-only – no changes are possible.",
+    "exit": "Back to my account",
+    "action": "View as this user",
+    "start_failed": "Could not switch to this user's view."
   }
 }

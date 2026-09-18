@@ -1,6 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getToken } from 'next-auth/jwt';
 
+import { endImpersonation } from '../../../helpers/impersonation';
+
 const getApplicationUrl = () => {
   const applicationUrl = process.env.NEXTAUTH_URL;
 
@@ -26,6 +28,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   // as their safe fallback instead of being left on an unfinished API request.
   const applicationUrl = getApplicationUrl();
   const fallbackUrl = applicationUrl || '/';
+
+  // An impersonation must never outlive the session it was started from.
+  await endImpersonation(req, res);
 
   try {
     const token = await getToken({ req });

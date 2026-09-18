@@ -56,6 +56,14 @@ services:
       GRAPHQL_URI: http://hasura:8080/v1/graphql
       # Optional for local dev; required to encrypt Ghost newsletter credentials (see .env.example)
       GHOST_NEWSLETTER_CREDENTIALS_ENCRYPTION_KEY: ${GHOST_NEWSLETTER_CREDENTIALS_ENCRYPTION_KEY:-}
+      # Signs the httpOnly cookie that names the user a super-admin is currently
+      # impersonating (pages/api/impersonation). Mirrors GUEST_TOKEN_SECRET: a dev
+      # default here, a real secret in production.
+      IMPERSONATION_TOKEN_SECRET: ${IMPERSONATION_TOKEN_SECRET:-dev-impersonation-token-secret}
+      # Set to "true" to let impersonated sessions write as well as read. Off by
+      # default and deliberately a single switch -- see the read-only gate in
+      # pages/api/impersonation/graphql.ts.
+      IMPERSONATION_ALLOW_WRITES: ${IMPERSONATION_ALLOW_WRITES:-}
 
   # StuJo job board frontend (apps/stujo) — same dev image as edu-hub,
   # served on http://localhost:5001

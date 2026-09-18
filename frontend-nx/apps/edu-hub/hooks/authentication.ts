@@ -1,5 +1,6 @@
 import { useSession } from 'next-auth/react';
 import { AuthRoles } from '../types/enums';
+import { useViewAs } from './viewAs';
 
 // Utility function to extract Hasura roles from session data
 const hasRole = (sessionData: any, role: AuthRoles): boolean => (
@@ -16,14 +17,20 @@ export const useIsLoggedIn = (): boolean => {
   return (status === 'authenticated') && !!sessionData?.accessToken;
 };
 
+// The elevated-role hooks all report false while the app is acting as a plain
+// user. That is what closes the management surface during an impersonation: the
+// nav in Menu.tsx and the guard in ManageCourseContent both key on these, and
+// the requests themselves are pinned to `user` server-side either way.
 export const useIsAdmin = (): boolean => {
+  const { asPlainUser } = useViewAs();
   const { data: sessionData } = useSession();
-  return hasRole(sessionData, AuthRoles.admin);
+  return !asPlainUser && hasRole(sessionData, AuthRoles.admin);
 };
 
 export const useIsInstructor = (): boolean => {
+  const { asPlainUser } = useViewAs();
   const { data: sessionData } = useSession();
-  return hasRole(sessionData, AuthRoles.instructor);
+  return !asPlainUser && hasRole(sessionData, AuthRoles.instructor);
 };
 
 // Whether the current user administers at least one organization. Used purely for UI gating/nav.
@@ -32,14 +39,17 @@ export const useIsInstructor = (): boolean => {
 // resources from other organizations (granted via the instructor path) is not lost. The org_admin
 // role is only ever applied explicitly via useOrgAdminQuery / useOrgAdminMutation.
 export const useIsOrgAdmin = (): boolean => {
+  const { asPlainUser } = useViewAs();
   const { data: sessionData } = useSession();
-  return hasRole(sessionData, AuthRoles.org_admin);
+  return !asPlainUser && hasRole(sessionData, AuthRoles.org_admin);
 };
 
 // The Hasura user id of the signed-in user (the Keycloak `sub`, mapped onto the
 // x-hasura-user-id claim), or null while signed out. Single source for the claim path.
 export const useCurrentUserId = (): string | null => {
+  const { userId: viewedUserId } = useViewAs();
   const { data: sessionData } = useSession();
+  if (viewedUserId) return viewedUserId;
   return sessionData?.profile?.['https://hasura.io/jwt/claims']?.['x-hasura-user-id'] ?? null;
 };
 
@@ -49,8 +59,9 @@ export const useIsUserIdInList = (allowedIds: string[]): boolean => {
 };
 
 export const useIsUser = (): boolean => {
+  const { asPlainUser } = useViewAs();
   const { data: sessionData } = useSession();
-  return hasRole(sessionData, AuthRoles.user);
+  return asPlainUser || hasRole(sessionData, AuthRoles.user);
 };
 
 export const useCurrentRole = (): AuthRoles => {

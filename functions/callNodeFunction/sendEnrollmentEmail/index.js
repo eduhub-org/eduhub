@@ -29,6 +29,17 @@ export default async function sendEnrollmentEmail(req, logger) {
     const enrollment = data.new;
     const oldEnrollment = data.old;
 
+    // A preview enrollment is an instructor looking at their own course, not a
+    // participation. It must not generate a confirmation, an invitation, a
+    // certificate mail or anything else addressed to a participant.
+    if (enrollment?.isTest) {
+      return {
+        success: true,
+        messageKey: 'NO_ACTION_NEEDED',
+        message: 'Preview enrollment - no enrollment mail sent'
+      };
+    }
+
     // Create GraphQL client
     const client = new GraphQLClient(process.env.HASURA_ENDPOINT, {
       headers: {

@@ -4,20 +4,30 @@ import { User } from '../queries/__generated__/User';
 import { USER } from '../queries/user';
 
 import { useAuthedQuery } from './authedQuery';
+import { useViewAs } from './viewAs';
 
+/**
+ * The user the UI is acting for. While a super-admin impersonates someone this
+ * is the impersonated user, so every consumer - and useUser() below with it -
+ * follows without a change of its own.
+ */
 export const useUserId = () => {
+  const { userId: viewedUserId } = useViewAs();
   const { data } = useSession();
+  if (viewedUserId) return viewedUserId;
 
   return data?.profile?.sub;
 };
 export const useUser = () => {
-  const { data: session } = useSession();
+  // Keyed on useUserId rather than on the session directly, so the profile the
+  // app shows is the profile of whoever it is currently acting for.
+  const userId = useUserId();
 
   const { data } = useAuthedQuery<User>(USER, {
     variables: {
-      userId: session?.profile?.sub,
+      userId,
     },
-    skip: !session,
+    skip: !userId,
   });
 
   if (data?.User_by_pk) {
