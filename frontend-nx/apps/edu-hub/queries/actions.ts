@@ -278,3 +278,15 @@ export const SEND_SESSION_REMINDERS = gql`
     }
   }
 `;
+
+export const NOTIFY_SESSION_PARTICIPANTS = gql`
+  mutation NotifySessionParticipants($sessionId: Int!) {
+    notifySessionParticipants(sessionId: $sessionId) {
+      success
+      queued
+      total
+      error
+      messageKey
+    }
+  }
+`;
