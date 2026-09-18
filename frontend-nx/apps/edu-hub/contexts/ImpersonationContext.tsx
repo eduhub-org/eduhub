@@ -51,10 +51,19 @@ export const ImpersonationProvider: FC<{ children: ReactNode }> = ({ children })
   // Route through the proxy from the very first request, before the server has
   // confirmed anything. Getting this wrong fails closed: the proxy refuses a
   // request it cannot authorise.
-  const [markerPresent] = useState(hasImpersonationMarker);
-  if (markerPresent && typeof window !== 'undefined') {
-    setImpersonationState({ active: true, targetUserId: null });
-  }
+  //
+  // Done inside the initializer, which React runs once, rather than in the
+  // render body: from there it re-ran on every render and would put `active`
+  // back after the session check below had already cleared it, leaving a
+  // browser with a stale marker routing every query into a proxy that refuses
+  // all of them.
+  const [markerPresent] = useState(() => {
+    const present = hasImpersonationMarker();
+    if (present && typeof window !== 'undefined') {
+      setImpersonationState({ active: true, targetUserId: null });
+    }
+    return present;
+  });
 
   // Apollo caches by query, not by viewer, so anything read as one identity
   // would otherwise still be sitting there for the next one.
@@ -120,7 +129,15 @@ export const ImpersonationProvider: FC<{ children: ReactNode }> = ({ children })
   );
 
   const stop = useCallback(async () => {
-    await fetch('/api/impersonation/stop', { method: 'POST', credentials: 'same-origin' });
+    // Only drop the target once the server says the impersonation is over. The
+    // stop route clears the cookie before it checks anything, so a refusal here
+    // is not expected -- but hiding the banner while the cookie is still live
+    // is the one outcome worth ruling out.
+    const response = await fetch('/api/impersonation/stop', {
+      method: 'POST',
+      credentials: 'same-origin',
+    });
+    if (!response.ok) return;
     await applyTarget(null);
   }, [applyTarget]);
 

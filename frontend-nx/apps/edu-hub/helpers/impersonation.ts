@@ -50,8 +50,7 @@ const requireEnv = (name: string): string => {
   return value;
 };
 
-const signingSecret = (): string =>
-  process.env.IMPERSONATION_TOKEN_SECRET || requireEnv('NEXTAUTH_SECRET');
+const signingSecret = (): string => process.env.IMPERSONATION_TOKEN_SECRET || requireEnv('NEXTAUTH_SECRET');
 
 export type ImpersonationPayload = {
   targetUserId: string;
@@ -73,15 +72,29 @@ export const adminClient = () =>
     headers: { 'x-hasura-admin-secret': requireEnv('HASURA_ADMIN_SECRET') },
   });
 
-const sign = (payload: string) =>
-  crypto.createHmac('sha256', signingSecret()).update(payload).digest('base64url');
+const sign = (payload: string) => crypto.createHmac('sha256', signingSecret()).update(payload).digest('base64url');
 
 export const encodeCookie = (payload: ImpersonationPayload): string => {
   const body = Buffer.from(JSON.stringify(payload)).toString('base64url');
   return `${body}.${sign(body)}`;
 };
 
-/** Returns the payload only for a cookie this server signed. */
+/**
+ * How far a cookie's `iat` may sit in the future before it is rejected. The same
+ * process signs and verifies, so this is not for clock drift between machines --
+ * it only keeps a cookie minted a moment ago from being refused.
+ */
+const CLOCK_SKEW_TOLERANCE_MS = 60 * 1000;
+
+/**
+ * Returns the payload only for a cookie this server signed and that has not
+ * expired.
+ *
+ * The expiry check is here rather than left to the browser: `maxAge` only
+ * governs what the browser chooses to send, so a copied cookie would otherwise
+ * stay valid for as long as its audit row is open -- indefinitely, if the admin
+ * closed the tab instead of pressing stop. `iat` is what bounds that.
+ */
 export const decodeCookie = (raw: string | undefined): ImpersonationPayload | null => {
   if (!raw) return null;
   const [body, signature] = raw.split('.');
@@ -98,6 +111,14 @@ export const decodeCookie = (raw: string | undefined): ImpersonationPayload | nu
     if (typeof parsed?.targetUserId !== 'string' || typeof parsed?.sessionId !== 'number') {
       return null;
     }
+
+    // Missing, non-finite, future and expired timestamps are all refused: a
+    // cookie that cannot say when it was issued cannot be shown to be current.
+    if (typeof parsed?.iat !== 'number' || !Number.isFinite(parsed.iat)) return null;
+    const age = Date.now() - parsed.iat;
+    if (age < -CLOCK_SKEW_TOLERANCE_MS) return null;
+    if (age > COOKIE_MAX_AGE_SECONDS * 1000) return null;
+
     return parsed as ImpersonationPayload;
   } catch {
     return null;
@@ -137,9 +158,7 @@ export const readImpersonationCookie = (req: NextApiRequest): ImpersonationPaylo
  * never from a header, so an impersonated request cannot dress itself up as a
  * different caller.
  */
-export const resolveAdminCaller = async (
-  req: NextApiRequest
-): Promise<{ userId: string } | null> => {
+export const resolveAdminCaller = async (req: NextApiRequest): Promise<{ userId: string } | null> => {
   const token = (await getToken({ req })) as SessionToken | null;
   const claims = token?.profile?.['https://hasura.io/jwt/claims'];
   const userId = claims?.['x-hasura-user-id'];

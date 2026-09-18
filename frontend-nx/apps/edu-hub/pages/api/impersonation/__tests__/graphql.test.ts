@@ -13,7 +13,11 @@ jest.mock('graphql-request', () => ({
 }));
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const { encodeCookie, IMPERSONATION_COOKIE } = require('../../../../helpers/impersonation');
+const {
+  encodeCookie,
+  IMPERSONATION_COOKIE,
+  COOKIE_MAX_AGE_SECONDS,
+} = require('../../../../helpers/impersonation');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const handler = require('../graphql').default;
 
@@ -97,6 +101,64 @@ describe('impersonation GraphQL proxy', () => {
     const res = response();
     await handler(
       request({ headers: { host: 'edu.test', cookie: `${IMPERSONATION_COOKIE}=forged.signature` } } as never),
+      res
+    );
+    expect(res.status).toHaveBeenCalledWith(403);
+    expect(global.fetch).not.toHaveBeenCalled();
+  });
+
+  // The cookie's own maxAge only governs what the browser sends, so these are
+  // what actually bound an impersonation in time.
+  it('refuses a correctly signed cookie that has expired', async () => {
+    const res = response();
+    const expired = encodeCookie({
+      targetUserId: TARGET,
+      sessionId: 7,
+      iat: Date.now() - (COOKIE_MAX_AGE_SECONDS * 1000 + 1000),
+    });
+    await handler(
+      request({ headers: { host: 'edu.test', cookie: `${IMPERSONATION_COOKIE}=${expired}` } } as never),
+      res
+    );
+    expect(res.status).toHaveBeenCalledWith(403);
+    expect(global.fetch).not.toHaveBeenCalled();
+  });
+
+  it('accepts a correctly signed cookie just inside its lifetime', async () => {
+    const res = response();
+    const fresh = encodeCookie({
+      targetUserId: TARGET,
+      sessionId: 7,
+      iat: Date.now() - (COOKIE_MAX_AGE_SECONDS * 1000 - 5000),
+    });
+    await handler(
+      request({ headers: { host: 'edu.test', cookie: `${IMPERSONATION_COOKIE}=${fresh}` } } as never),
+      res
+    );
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(global.fetch).toHaveBeenCalledTimes(1);
+  });
+
+  it('refuses a cookie dated in the future', async () => {
+    const res = response();
+    const future = encodeCookie({
+      targetUserId: TARGET,
+      sessionId: 7,
+      iat: Date.now() + 10 * 60 * 1000,
+    });
+    await handler(
+      request({ headers: { host: 'edu.test', cookie: `${IMPERSONATION_COOKIE}=${future}` } } as never),
+      res
+    );
+    expect(res.status).toHaveBeenCalledWith(403);
+    expect(global.fetch).not.toHaveBeenCalled();
+  });
+
+  it('refuses a cookie with no issued-at at all', async () => {
+    const res = response();
+    const undated = encodeCookie({ targetUserId: TARGET, sessionId: 7 } as never);
+    await handler(
+      request({ headers: { host: 'edu.test', cookie: `${IMPERSONATION_COOKIE}=${undated}` } } as never),
       res
     );
     expect(res.status).toHaveBeenCalledWith(403);
