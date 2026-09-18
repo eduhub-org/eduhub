@@ -1858,7 +1858,7 @@
       },
       "notify_participants": {
         "title": "Inform participants?",
-        "question": "{sessions, plural, one {This session's date or time has changed.} other {The dates or times of # sessions have changed.}} Should the {participants, plural, one {one registered participant} other {# registered participants}} be informed by email?",
+        "question": "{sessions, plural, one {This session's date or time has changed.} other {The dates or times of # sessions have changed.}} {participants, plural, one {Should the registered participant be informed by email?} other {Should the # registered participants be informed by email?}}",
         "confirm": "Inform",
         "cancel": "Don't inform",
         "sent": "The participants have been informed.",

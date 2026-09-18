@@ -180,15 +180,23 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
       if (event) {
         const newStartDate = copyDateTime(event, session.startDateTime);
         const newEndDate = copyDateTime(event, session.endDateTime);
-        await updateSessionStartTime({
-          variables: { sessionId: session.id, value: newStartDate.toISOString() },
-        });
-        await updateSessionEndTime({
-          variables: { sessionId: session.id, value: newEndDate.toISOString() },
-        });
-        await qResult.refetch();
-        // Both writes are one edit to the user, so this only queues one prompt.
-        registerChange(session.id);
+        // The two writes are not one transaction. Once the start time lands the
+        // session's timing has changed, so the prompt is owed even if the end
+        // time or the refetch then fails.
+        let timingChanged = false;
+        try {
+          await updateSessionStartTime({
+            variables: { sessionId: session.id, value: newStartDate.toISOString() },
+          });
+          timingChanged = true;
+          await updateSessionEndTime({
+            variables: { sessionId: session.id, value: newEndDate.toISOString() },
+          });
+          await qResult.refetch();
+        } finally {
+          // Both writes are one edit to the user, so this only queues one prompt.
+          if (timingChanged) registerChange(session.id);
+        }
       }
     },
     [updateSessionStartTime, updateSessionEndTime, qResult, registerChange]

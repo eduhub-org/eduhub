@@ -86,6 +86,9 @@ const useNotifyParticipantsPrompt = (participantCount: number): NotifyParticipan
           const { data } = await notifySessionParticipants({ variables: { sessionId } });
           const result = data?.notifySessionParticipants;
           if (result?.success) {
+            // Drop only what demonstrably went out, so retrying the rest
+            // cannot mail an already-notified session a second time.
+            pendingSessionIds.current.delete(sessionId);
             notified += 1;
           } else {
             failure = result?.error || t('SessionsTab.notify_participants.failed');
@@ -95,10 +98,12 @@ const useNotifyParticipantsPrompt = (participantCount: number): NotifyParticipan
         }
       }
     } finally {
-      pendingSessionIds.current.clear();
-      setPendingCount(0);
+      const remaining = pendingSessionIds.current.size;
+      setPendingCount(remaining);
       setSending(false);
-      setPromptOpen(false);
+      // Whatever did not go out keeps the prompt open behind the error, so
+      // confirming again retries just those sessions.
+      setPromptOpen(remaining > 0);
     }
 
     if (failure) {

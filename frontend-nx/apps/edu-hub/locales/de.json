@@ -1840,7 +1840,7 @@
       },
       "notify_participants": {
         "title": "Teilnehmende informieren?",
-        "question": "{sessions, plural, one {Der Termin dieser Session wurde geändert.} other {Die Termine von # Sessions wurden geändert.}} Sollen die {participants, plural, one {eine angemeldete Person} other {# angemeldeten Personen}} per E-Mail darüber informiert werden?",
+        "question": "{sessions, plural, one {Der Termin dieser Session wurde geändert.} other {Die Termine von # Sessions wurden geändert.}} {participants, plural, one {Soll die angemeldete Person per E-Mail darüber informiert werden?} other {Sollen die # angemeldeten Personen per E-Mail darüber informiert werden?}}",
         "confirm": "Informieren",
         "cancel": "Nicht informieren",
         "sent": "Die Teilnehmenden wurden informiert.",

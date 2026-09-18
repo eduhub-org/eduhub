@@ -107,4 +107,47 @@ describe('useNotifyParticipantsPrompt', () => {
     );
     expect(result.current.savedMessage).toBeNull();
   });
+
+  it('keeps only the sessions that failed, so a retry does not re-mail the rest', async () => {
+    notifyMutation.mockImplementation(({ variables }: { variables: { sessionId: number } }) =>
+      Promise.resolve({
+        data: {
+          notifySessionParticipants:
+            variables.sessionId === 2
+              ? { success: false, error: 'Only 1 of 3 notifications were queued' }
+              : { success: true },
+        },
+      })
+    );
+    const { result } = renderHook(() => useNotifyParticipantsPrompt(5));
+
+    act(() => result.current.registerChange(1));
+    act(() => result.current.registerChange(2));
+    settle();
+    await act(async () => { await result.current.confirm(); });
+
+    // Session 1 went out; session 2 did not, so the prompt stays up for it.
+    await waitFor(() => expect(result.current.pendingCount).toBe(1));
+    expect(result.current.promptOpen).toBe(true);
+    expect(result.current.errorMessage).toBe('Only 1 of 3 notifications were queued');
+
+    notifyMutation.mockClear();
+    succeed();
+    await act(async () => { await result.current.confirm(); });
+
+    expect(notifyMutation).toHaveBeenCalledTimes(1);
+    expect(notifyMutation).toHaveBeenCalledWith({ variables: { sessionId: 2 } });
+    await waitFor(() => expect(result.current.promptOpen).toBe(false));
+  });
+
+  it('closes the prompt once every pending session has gone out', async () => {
+    const { result } = renderHook(() => useNotifyParticipantsPrompt(5));
+
+    act(() => result.current.registerChange(1));
+    settle();
+    await act(async () => { await result.current.confirm(); });
+
+    await waitFor(() => expect(result.current.promptOpen).toBe(false));
+    expect(result.current.pendingCount).toBe(0);
+  });
 });

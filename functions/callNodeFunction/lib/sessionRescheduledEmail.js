@@ -95,5 +95,18 @@ export async function sendSessionRescheduledEmails({ session, client, logger }) 
   }
 
   logger.info(`SESSION_RESCHEDULED for course ${course.id}: queued ${queued}/${uniqueRecipients.length}`);
+  // queueEmail fails per recipient (bad address, missing template, insert
+  // error) without stopping the loop. A partial batch is not a success: the
+  // caller shows the editor "participants informed", so it has to hear that
+  // some of them were not.
+  if (queued < uniqueRecipients.length) {
+    return {
+      success: false,
+      messageKey: 'SESSION_RESCHEDULED_QUEUE_FAILED',
+      error: `Only ${queued} of ${uniqueRecipients.length} notifications were queued`,
+      queued,
+      total: uniqueRecipients.length,
+    };
+  }
   return { success: true, messageKey: 'SESSION_RESCHEDULED_QUEUED', queued, total: uniqueRecipients.length };
 }
