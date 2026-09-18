@@ -257,12 +257,6 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                     ) : (
                       <CurrentDegreeCourses degreeCourses={course.DegreeCourses} />
                     )}
-                    {/* Only asked for by someone taking part: the Hasura
-                        permission returns an empty list to anyone else, so this
-                        saves a pointless round trip rather than guarding it. */}
-                    {isLoggedInParticipant && (
-                      <CourseParticipants courseId={course.id} currentUserId={userId} />
-                    )}
                     {!!(requiresPayment && (course.basePrice || course.basePrice === 0 || course.basePrice === null || addonItems.length > 0)) && (
                       <div>
                         <span className="text-3xl font-semibold block mb-6">{tCoursePage('pricing_section_title')}</span>
@@ -334,6 +328,14 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                   </ContentRow>
                   </>
                 )}
+              {/* Below attendances: only asked for by someone taking part, the
+                  Hasura permission returns an empty list to anyone else, so this
+                  saves a pointless round trip rather than guarding it. */}
+              {isLoggedInParticipant && (
+                <div className="min-w-0 text-white mx-6 xl:mx-0">
+                  <CourseParticipants courseId={course.id} currentUserId={userId} />
+                </div>
+              )}
               <DescriptionFields course={course} />
               <FundingOrganizations courseFundingOrganizations={course.CourseFundingOrganizations ?? []} />
               <CourseProjectsSection courseId={id} />

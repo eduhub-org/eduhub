@@ -61,6 +61,11 @@ realistic participation statuses and motivation ratings so Applications,
 Participations, Degree Participations, and bulk email flows can be tested with
 large row counts.
 
+It also includes a `Performance Attendance Course` (course ID 8200) with up to
+1000 confirmed participants, 24 sessions, automated attendance rows, instructor
+overrides, and repeated instructor overrides. This course is the representative
+fixture for measuring manual attendance table rendering and update timing.
+
 ## Regenerating The Dataset
 
 Run this from the repository root when the generator logic or target size
@@ -108,13 +113,16 @@ Useful checks after loading the performance dataset:
 - Exercise Applications bulk email actions for status and rating groups. Large
   recipient groups should fall back to copying emails when the generated
   `mailto:` URL would exceed the configured limit.
+- Open the Performance Attendance Course and measure attendance dot update timing.
+  The table should resolve automated rows, instructor overrides, and the latest
+  of multiple instructor overrides consistently.
 - Watch GraphQL response sizes and browser memory in the local dev tools when
   switching tabs.
 
 ## Future Follow-Ups
 
-- Measure `CourseParticipations` with the performance dataset and split static
-  metadata from paged rows if it is still large.
+- Split `CourseParticipations` static metadata from paged rows if measurements
+  show that it is still a meaningful bottleneck.
 - Replace normal course page all-enrollment loading with a viewer-specific
   enrollment query.
 - Add focused tests around server-side `TableGrid` pagination, sorting, and

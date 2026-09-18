@@ -18,7 +18,12 @@ jest.mock('../../../../hooks/authedQuery', () => ({
   useRoleQuery: (...args: unknown[]) => mockUseRoleQuery(...args),
 }));
 
-const participant = (id: string, firstName: string, matrixUserHandle: string | null = null) => ({
+const participant = (
+  id: string,
+  firstName: string,
+  matrixUserHandle: string | null = null,
+  extra: { picture?: string | null; externalProfile?: string | null } = {}
+) => ({
   __typename: 'CourseParticipant',
   userId: id,
   User: {
@@ -26,8 +31,8 @@ const participant = (id: string, firstName: string, matrixUserHandle: string | n
     id,
     firstName,
     lastName: 'Test',
-    picture: null,
-    externalProfile: null,
+    picture: extra.picture ?? null,
+    externalProfile: extra.externalProfile ?? null,
     matrixUserHandle,
   },
 });
@@ -99,5 +104,28 @@ describe('CourseParticipants', () => {
     const { container } = render(<CourseParticipants courseId={1} currentUserId="me" />);
 
     expect(container).toBeEmptyDOMElement();
+  });
+
+  it('leads with the most complete profiles, the photo weighing most', () => {
+    withData(
+      [
+        participant('me', 'Ich'),
+        // Name only.
+        participant('u2', 'Bare'),
+        // Photo, but no handle or external profile: still ranks above a
+        // handle alone, since the photo is what people actually recognize.
+        participant('u3', 'Photo', null, { picture: '/uploads/photo.jpg' }),
+        // Handle and external profile, no photo.
+        participant('u4', 'HandleAndLink', 'handleandlink.test.ab12cd', {
+          externalProfile: 'https://example.com/u4',
+        }),
+      ],
+      4
+    );
+
+    render(<CourseParticipants courseId={1} currentUserId="me" />);
+
+    const names = screen.getAllByText(/Test$/).map((el) => el.textContent);
+    expect(names).toEqual(['Photo Test', 'HandleAndLink Test', 'Bare Test']);
   });
 });

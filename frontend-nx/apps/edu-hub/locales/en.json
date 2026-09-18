@@ -174,8 +174,8 @@
       "upload_error": "Error uploading image",
       "organization_logo": "Organization logo",
       "change_logo": "Change logo",
-      "view_full_size": "View full size",
-      "close": "Close",
+      "add_logo": "Add logo",
+      "logo_unavailable": "Logo could not be loaded",
       "logo_permission_denied": "This organization already has an admin managing settings. Ask them to update the logo."
     },
     "file_upload": {

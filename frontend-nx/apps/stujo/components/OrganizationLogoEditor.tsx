@@ -14,12 +14,10 @@ interface Props {
 }
 
 /**
- * Compact logo editor for the currently selected organization, placed to the
- * right of OrganizationSwitcher. Reuses ImageUploader's organizationLogo
- * element -- the same one edu-hub's organization settings row inlines
- * permanently -- in its compact 'trigger' layout: a small button opens a
- * popover with change/remove/view-full-size controls instead of a
- * permanently visible upload field.
+ * Logo editor for the currently selected organization, placed to the right
+ * of OrganizationSwitcher. Reuses ImageUploader's organizationLogo element,
+ * the same one edu-hub's organization settings row inlines, so the upload
+ * control and preview look and behave identically in both places.
  *
  * Authorization is enforced server-side by the save/removeOrganizationLogo
  * actions, not here: a settings admin may always change the logo, and a
@@ -37,9 +35,7 @@ const OrganizationLogoEditor: FC<Props> = ({ organization, onLogoUpdated }) => {
     <ImageUploader
       variant="material"
       element="organizationLogo"
-      layout="trigger"
-      triggerLabel={t('image_uploader.organization_logo')}
-      label={organization.name}
+      label={t('image_uploader.organization_logo')}
       identifierVariables={{ organizationId: organization.id }}
       currentFile={organization.logo}
       onFileUpdated={onLogoUpdated}
