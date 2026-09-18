@@ -170,6 +170,7 @@ const TableGrid = <T extends BaseRow,>({
   const [internalSorting, setInternalSorting] = useState<SortingState>([]);
   const settledPageRef = useRef<{
     data: T[];
+    columns: ColumnDef<T>[];
     pageIndex: number;
     pageSize: number;
     totalCount: number | undefined;
@@ -177,13 +178,16 @@ const TableGrid = <T extends BaseRow,>({
 
   useEffect(() => {
     if (!loading && !error) {
-      settledPageRef.current = { data, pageIndex, pageSize, totalCount };
+      settledPageRef.current = { data, columns, pageIndex, pageSize, totalCount };
     }
-  }, [data, error, loading, pageIndex, pageSize, totalCount]);
+  }, [columns, data, error, loading, pageIndex, pageSize, totalCount]);
 
   const retainedPage =
     preserveRowsWhileLoading && loading ? settledPageRef.current : null;
   const tableData = retainedPage?.data ?? data;
+  // Cell renderers can close over query data (e.g. attendance sessions).
+  // Keep them with the rows so loading cannot shrink the retained page.
+  const tableColumns = retainedPage?.columns ?? columns;
   const tablePageIndex = retainedPage?.pageIndex ?? pageIndex;
   const tablePageSize = retainedPage?.pageSize ?? pageSize;
   const tableTotalCount = retainedPage?.totalCount ?? totalCount;
@@ -333,13 +337,13 @@ const TableGrid = <T extends BaseRow,>({
         ]
       : [];
 
-    const dataColumns = columns.map((col) => ({
+    const dataColumns = tableColumns.map((col) => ({
       ...col,
       // Backward compatibility: convert meta.width to size if size is not specified
       size: col.size || (col.meta?.width ? col.meta.width * 100 : undefined),
     }));
     return [...selectionColumn, ...dataColumns];
-  }, [columns, showCheckbox, toggleRowSelection, selectedRowIds, toggleAllRows, tableData, isAllSelected, isSomeSelected]);
+  }, [tableColumns, showCheckbox, toggleRowSelection, selectedRowIds, toggleAllRows, tableData, isAllSelected, isSomeSelected]);
 
 
   const table = useReactTable({

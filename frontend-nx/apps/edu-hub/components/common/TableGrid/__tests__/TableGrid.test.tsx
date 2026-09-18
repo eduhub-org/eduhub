@@ -25,9 +25,14 @@ const columns: ColumnDef<TestRow>[] = [
   },
 ];
 
-const table = (data: TestRow[], loading: boolean, preserveRowsWhileLoading = false) => (
+const table = (
+  data: TestRow[],
+  loading: boolean,
+  preserveRowsWhileLoading = false,
+  pageColumns = columns
+) => (
   <TableGrid
-    columns={columns}
+    columns={pageColumns}
     data={data}
     enablePagination
     error={undefined}
@@ -46,6 +51,40 @@ const table = (data: TestRow[], loading: boolean, preserveRowsWhileLoading = fal
 );
 
 describe('TableGrid loading behavior', () => {
+  it('retains cell renderers and their query context until the replacement page settles', () => {
+    const attendanceColumns = (sessions: string[]): ColumnDef<TestRow>[] => [{
+      accessorKey: 'name',
+      header: 'Attendance',
+      cell: ({ row }) => (
+        <div>
+          {row.original.name}
+          {sessions.map((session) => <span key={session}>{session}</span>)}
+        </div>
+      ),
+    }];
+    const settledColumns = attendanceColumns(['Session 1', 'Session 2']);
+    const { rerender } = render(table([{ id: 1, name: 'Previous page' }], false, true, settledColumns));
+    const previousCell = screen.getByText('Previous page');
+
+    // The participant query clears its data, including sessions, on a cache miss.
+    rerender(table([], true, true, attendanceColumns([])));
+    expect(screen.getByText('Session 1')).toBeInTheDocument();
+    expect(screen.getByText('Session 2')).toBeInTheDocument();
+    expect(screen.getByText('Previous page')).toBe(previousCell);
+
+    // Participants arrive before the separate attendance query has settled.
+    rerender(table([{ id: 2, name: 'Next page' }], true, true, attendanceColumns(['New session'])));
+    expect(screen.getByText('Previous page')).toBe(previousCell);
+    expect(screen.queryByText('New session')).not.toBeInTheDocument();
+    expect(screen.getByText('common.table_grid.pagination_text')).toBeInTheDocument();
+
+    rerender(table([{ id: 2, name: 'Next page' }], false, true, attendanceColumns(['New session'])));
+    expect(screen.queryByText('Previous page')).not.toBeInTheDocument();
+    expect(screen.queryByText('Session 1')).not.toBeInTheDocument();
+    expect(screen.getByText('Next page')).toBeInTheDocument();
+    expect(screen.getByText('New session')).toBeInTheDocument();
+  });
+
   it('retains the last settled rows when opted in', () => {
     const { rerender } = render(table([{ id: 1, name: 'Previous page' }], false, true));
 
