@@ -60,6 +60,66 @@ describe('useBulkActions selection handling', () => {
     expect(result.current.selectedRowIds).toEqual(new Set([1, 2]));
   });
 
+  it('keeps a row that was selected while the action was running', async () => {
+    let finishAction: () => void = () => undefined;
+    const onBulkAction = jest.fn(
+      () => new Promise<void>((resolve) => {
+        finishAction = resolve;
+      })
+    );
+    const { result } = renderHook(() => useBulkActions<TestRow>([], onBulkAction));
+
+    act(() => {
+      result.current.toggleRowSelection(1);
+    });
+
+    let pending: Promise<void> = Promise.resolve();
+    act(() => {
+      pending = result.current.handleBulkActionChange('publish', rows);
+    });
+
+    act(() => {
+      result.current.toggleRowSelection(2);
+    });
+
+    await act(async () => {
+      finishAction();
+      await pending;
+    });
+
+    expect(onBulkAction).toHaveBeenCalledWith('publish', [{ id: 1 }]);
+    expect(result.current.selectedRowIds).toEqual(new Set([2]));
+  });
+
+  it('ignores a second action while the first one is still running', async () => {
+    let finishAction: () => void = () => undefined;
+    const onBulkAction = jest.fn(
+      () => new Promise<void>((resolve) => {
+        finishAction = resolve;
+      })
+    );
+    const { result } = renderHook(() => useBulkActions<TestRow>([], onBulkAction));
+
+    selectAllRows(result);
+
+    let pending: Promise<void> = Promise.resolve();
+    act(() => {
+      pending = result.current.handleBulkActionChange('publish', rows);
+    });
+    expect(result.current.isBulkActionPending).toBe(true);
+
+    await act(async () => {
+      await result.current.handleBulkActionChange('unpublish', rows);
+    });
+    expect(onBulkAction).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      finishAction();
+      await pending;
+    });
+    expect(result.current.isBulkActionPending).toBe(false);
+  });
+
   it('only passes the selected rows to the action', async () => {
     const onBulkAction = jest.fn().mockResolvedValue(undefined);
     const { result } = renderHook(() => useBulkActions<TestRow>([], onBulkAction));

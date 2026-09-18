@@ -278,7 +278,13 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
       setPendingAbortRows([]);
       refetch();
       qResult.refetch();
-      abortBulkAction.succeed();
+      // The mutation only touches enrollments that are still confirmed, so zero affected rows
+      // means nothing was marked and the rows stay selected.
+      if (affectedRows === 0) {
+        abortBulkAction.fail();
+      } else {
+        abortBulkAction.succeed();
+      }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : String(err);
       setBulkActionError(t('participations_bulk_actions.mark_aborted_error', { error: errorMessage }));

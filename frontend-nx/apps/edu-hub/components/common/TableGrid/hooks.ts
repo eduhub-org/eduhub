@@ -209,6 +209,11 @@ export const useBulkActions = <T extends BaseRow>(
 ) => {
   const [selectedRowIds, setSelectedRowIds] = useState<Set<number>>(new Set());
   const [bulkAction, setBulkAction] = useState<string>('');
+  // A second action started while the first is still running would settle the wrong deferred
+  // action (see useDeferredBulkAction), so only one runs at a time. The ref guards against a
+  // second call before the state update lands.
+  const [isBulkActionPending, setIsBulkActionPending] = useState(false);
+  const isBulkActionPendingRef = useRef(false);
 
   const toggleRowSelection = useCallback((rowId: number) => {
     setSelectedRowIds(prev => {
@@ -238,20 +243,31 @@ export const useBulkActions = <T extends BaseRow>(
    * marked so the user can correct the problem and retry without reselecting everything.
    */
   const handleBulkActionChange = useCallback(async (action: string, data: T[]) => {
-    if (!onBulkAction || !action) {
+    if (!onBulkAction || !action || isBulkActionPendingRef.current) {
       return;
     }
 
     const selectedRowsData = data.filter((row) => selectedRowIds.has(row.id));
 
+    isBulkActionPendingRef.current = true;
+    setIsBulkActionPending(true);
+
     try {
       const result = await onBulkAction(action, selectedRowsData);
       if (result !== false) {
-        setSelectedRowIds(new Set());
+        // Only the rows this action ran on: a row selected while it was running was not part
+        // of it and stays marked.
+        setSelectedRowIds((currentIds) => {
+          const remainingIds = new Set(currentIds);
+          selectedRowsData.forEach((row) => remainingIds.delete(row.id));
+          return remainingIds;
+        });
       }
     } catch {
       // Keep the selection; the handler is responsible for reporting the error to the user.
     } finally {
+      isBulkActionPendingRef.current = false;
+      setIsBulkActionPending(false);
       // The dropdown is a menu, not a state, so it always returns to its placeholder.
       setBulkAction('');
     }
@@ -273,6 +289,7 @@ export const useBulkActions = <T extends BaseRow>(
   return {
     selectedRowIds,
     bulkAction,
+    isBulkActionPending,
     setBulkAction,
     toggleRowSelection,
     toggleAllRows,

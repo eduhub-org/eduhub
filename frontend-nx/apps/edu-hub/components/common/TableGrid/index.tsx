@@ -209,6 +209,7 @@ const TableGrid = <T extends BaseRow,>({
   const {
     selectedRowIds,
     bulkAction,
+    isBulkActionPending,
     setBulkAction,
     toggleRowSelection,
     toggleAllRows,
@@ -251,6 +252,10 @@ const TableGrid = <T extends BaseRow,>({
 
   // Add this new function to handle the Select onChange event
   const handleSelectChange = (event: SelectChangeEvent<string>) => {
+    // A running action owns the selection until it finishes, so it is not interrupted.
+    if (isBulkActionPending) {
+      return;
+    }
     const selectedAction = event.target.value;
     const actionConfig = bulkActions.find((action) => action.value === selectedAction);
     const isDisabled =
@@ -447,6 +452,7 @@ const TableGrid = <T extends BaseRow,>({
                 labelId="bulk-action-label"
                 value={bulkAction}
                 onChange={handleSelectChange}
+                disabled={isBulkActionPending}
                 label={t('common.table_grid.bulk_action')}
                 sx={{
                   color: 'var(--eduhub-label-primary)',
