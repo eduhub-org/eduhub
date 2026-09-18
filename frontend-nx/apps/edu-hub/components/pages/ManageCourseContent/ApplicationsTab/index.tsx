@@ -17,6 +17,7 @@ import {
 import { useLazyRoleQuery, useRoleQuery } from '../../../../hooks/authedQuery';
 import { MANAGED_COURSE_APPLICATIONS, MANAGED_COURSE_APPLICATION_RECIPIENTS } from '../../../../queries/course';
 import Dot from '../../../common/Dot';
+import { CourseEnrollmentStatistics } from './CourseEnrollmentStatistics';
 import { OnlyInstructor } from '../../../common/OnlyLoggedIn';
 import { useIsInstructor, useIsAdmin } from '../../../../hooks/authentication';
 import {
@@ -274,23 +275,6 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
 
   const expandableRowWidths = useMemo(() => getExpandableRowWidths(features), [features]);
   
-  const applicationStats = useMemo(
-    () => ({
-      totalApplications: course.TotalCourseEnrollments.aggregate?.count ?? 0,
-      approvedApplications: course.ApprovedCourseEnrollments.aggregate?.count ?? 0,
-      invitedApplicants: course.InvitedCourseEnrollments.aggregate?.count ?? 0,
-      confirmedApplicants: course.ConfirmedCourseEnrollments.aggregate?.count ?? 0,
-      cancelledApplicants: course.CancelledCourseEnrollments.aggregate?.count ?? 0,
-    }),
-    [
-      course.ApprovedCourseEnrollments.aggregate?.count,
-      course.ConfirmedCourseEnrollments.aggregate?.count,
-      course.InvitedCourseEnrollments.aggregate?.count,
-      course.TotalCourseEnrollments.aggregate?.count,
-      course.CancelledCourseEnrollments.aggregate?.count,
-    ]
-  );
-
   // Evaluated fresh on every render (not memoized) so opening the modal after the first
   // session's start time has passed picks up the change without needing a refetch.
   const firstSession = course.Sessions[0];
@@ -781,8 +765,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
           email_rating_DECLINE: t('bulk_actions.email_all_decline_rating'),
           email_rating_REVIEW: t('bulk_actions.email_all_review_rating'),
         };
-        // "Cancelled" covers both pre-start (CANCELLED) and post-start (ABORTED) dropouts,
-        // matching the CancelledCourseEnrollments aggregate behind the statistics card.
+        // The cancellation email action includes both CANCELLED and ABORTED.
         const filter = isStatusAction
           ? action === 'email_status_CANCELLED'
             ? {
@@ -1006,6 +989,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
       CANCELLED: 6,
       REGISTERED: 7,
       WAITLIST: 8,
+      EXPIRED: 9,
     };
     return order[a] - order[b];
   }, []);
@@ -1174,7 +1158,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
                   {t('status.waitlist_badge')}
                 </span>
               )}
-              {expired && (enrollment.status === 'APPLIED' || enrollment.status === 'INVITED') && (
+              {(enrollment.status === 'EXPIRED' || (expired && enrollment.status === 'INVITED')) && (
                 <IoIosCloseCircle
                   className="inline"
                   title={t('status.invitation_expired')}
@@ -1403,46 +1387,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
         </div>
       ) : null}
 
-      {/* Statistics Cards */}
-      {courseEnrollments.length > 0 && (
-        <div className={`grid grid-cols-1 md:grid-cols-2 ${features.hasApplicationProcess ? 'lg:grid-cols-4' : 'lg:grid-cols-2'} gap-4 mb-6`}>
-          {features.hasApplicationProcess ? (
-            <>
-              {/* Approval-based Registration: Show all 4 cards */}
-              <div className="bg-bg-secondary text-label-primary light p-4 rounded-lg">
-                <div className="text-label-secondary text-sm mb-1">{t('statistics_applications_total')}</div>
-                <div className="text-label-primary text-2xl font-semibold">{applicationStats.totalApplications}</div>
-              </div>
-              <div className="bg-bg-secondary text-label-primary light p-4 rounded-lg">
-                <div className="text-label-secondary text-sm mb-1">{t('statistics_applications_accepted')}</div>
-                <div className="text-label-primary text-2xl font-semibold">{applicationStats.approvedApplications}</div>
-              </div>
-              <div className="bg-bg-secondary text-label-primary light p-4 rounded-lg">
-                <div className="text-label-secondary text-sm mb-1">{t('statistics_invitations_total')}</div>
-                <div className="text-label-primary text-2xl font-semibold">{applicationStats.invitedApplicants}</div>
-              </div>
-              <div className="bg-bg-secondary text-label-primary light p-4 rounded-lg">
-                <div className="text-label-secondary text-sm mb-1">{t('statistics_invitations_confirmed')}</div>
-                <div className="text-label-primary text-2xl font-semibold">{applicationStats.confirmedApplicants}</div>
-              </div>
-            </>
-          ) : (
-            <>
-              {/* Direct Registration: total vs. confirmed is redundant here (nearly every
-                  registration becomes confirmed immediately), so show confirmed vs.
-                  cancelled instead, i.e. people who signed up but no longer plan to attend. */}
-              <div className="bg-bg-secondary text-label-primary light p-4 rounded-lg">
-                <div className="text-label-secondary text-sm mb-1">{t('statistics_registrations_confirmed')}</div>
-                <div className="text-label-primary text-2xl font-semibold">{applicationStats.confirmedApplicants}</div>
-              </div>
-              <div className="bg-bg-secondary text-label-primary light p-4 rounded-lg">
-                <div className="text-label-secondary text-sm mb-1">{t('statistics_registrations_cancelled')}</div>
-                <div className="text-label-primary text-2xl font-semibold">{applicationStats.cancelledApplicants}</div>
-              </div>
-            </>
-          )}
-        </div>
-      )}
+      <CourseEnrollmentStatistics course={course} hasCourseStarted={hasCourseStarted} />
 
       <div>
         <OnlyInstructor>
