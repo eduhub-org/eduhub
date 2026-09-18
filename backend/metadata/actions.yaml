@@ -596,6 +596,21 @@ actions:
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
     permissions:
       - role: instructor_access
+  - name: notifySessionParticipants
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      headers:
+        - name: name
+          value: notifySessionParticipants
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+    permissions:
+      - role: instructor_access
+    comment: Mails active participants that a session was rescheduled. Called from
+      the Sessions tab after the editor confirms the prompt; there is no automatic
+      trigger any more. Authorization is in the handler, because the action queries
+      with the admin secret and Session row permissions do not apply to it.
   - name: updateFromKeycloak
     definition:
       kind: synchronous
@@ -685,6 +700,7 @@ custom_types:
     - name: CourseInput
     - name: SelectedAddonInput
   objects:
+    - name: NotifySessionParticipantsResult
     - name: CreateUserResult
     - name: loadFileOutput
     - name: result
