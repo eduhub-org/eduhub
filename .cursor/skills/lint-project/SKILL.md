@@ -21,12 +21,12 @@ yarn lint --fix
 
 The GitHub Action (`.github/workflows/frontend-code-checks.yml`) uses:
 - `yarn lint`
-- Node.js 20.x
+- Node.js 22.x
 - Fresh `yarn install --immutable` before linting
 
 **To match CI results locally:**
 1. Use `yarn lint` (as shown in commands above)
-2. Ensure Node.js 20.x (matches CI)
+2. Ensure Node.js 22.x (matches CI)
 3. Reinstall dependencies with `yarn install --immutable` if results differ
 
 ## Common Issues
