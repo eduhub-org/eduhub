@@ -131,7 +131,7 @@ class EduHubClient:
         query = """query($program_id:Int!) {
             Program_by_pk(id: $program_id) {
                 Courses {
-                    CourseEnrollments {
+                    CourseEnrollments(where: {isTest: {_eq: false}}) {
                         achievementCertificateURL
                         attendanceCertificateURL
                         courseId
