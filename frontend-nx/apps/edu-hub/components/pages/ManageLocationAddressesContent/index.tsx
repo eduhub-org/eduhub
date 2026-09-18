@@ -34,7 +34,7 @@ import {
   normalizeAndFilterAliases,
   combineAliases,
 } from '../../../helpers/aliasUtils';
-import { useTableGrid } from '../../common/TableGrid/hooks';
+import { useDeferredBulkAction, useTableGrid } from '../../common/TableGrid/hooks';
 import { createMultiWordSearchCondition } from '../../common/TableGrid/utils';
 import { LocationOption_enum } from '../../../__generated__/globalTypes';
 import {
@@ -322,17 +322,29 @@ const ManageLocationAddressesContent: FC<ManageLocationAddressesContentProps> = 
     [t]
   );
 
-  const handleBulkAction = useCallback((action: string, selectedRows: LocationAddressListLocationAddress[]) => {
-    if (selectedRows.length === 0) return;
+  // Both bulk actions finish in a dialog, so the selection is only released once that dialog
+  // reports success.
+  const dialogBulkAction = useDeferredBulkAction();
 
-    if (action === 'delete') {
-      setBulkActionDialogOpen(true);
-      setSelectedRowsForBulkAction(selectedRows);
-    } else if (action === 'merge') {
-      setMergeDialogOpen(true);
-      setSelectedRowsForBulkAction(selectedRows);
-    }
-  }, []);
+  const handleBulkAction = useCallback(
+    (action: string, selectedRows: LocationAddressListLocationAddress[]) => {
+      // Nothing happened, so the rows stay selected.
+      if (selectedRows.length === 0) return false;
+
+      if (action === 'delete') {
+        setBulkActionDialogOpen(true);
+        setSelectedRowsForBulkAction(selectedRows);
+        return dialogBulkAction.start();
+      }
+      if (action === 'merge') {
+        setMergeDialogOpen(true);
+        setSelectedRowsForBulkAction(selectedRows);
+        return dialogBulkAction.start();
+      }
+      return false;
+    },
+    [dialogBulkAction]
+  );
 
   const handleCloseErrorDialog = () => {
     setError(null);
@@ -498,6 +510,7 @@ const ManageLocationAddressesContent: FC<ManageLocationAddressesContentProps> = 
         debouncedRefetch();
 
         console.log(`Successfully merged ${addressesToMerge.length} location addresses into ${targetAddress.shortLabel}`);
+        dialogBulkAction.succeed();
       } catch (error) {
         console.error('Error merging location addresses:', error);
         if (error instanceof ApolloError) {
@@ -505,10 +518,13 @@ const ManageLocationAddressesContent: FC<ManageLocationAddressesContentProps> = 
         } else {
           setError(t('error.merge_failed'));
         }
+        // The merge failed, so the rows stay selected for a retry.
+        dialogBulkAction.fail();
       }
       setSelectedRowsForBulkAction([]);
     },
     [
+      dialogBulkAction,
       selectedRowsForBulkAction,
       deleteLocationAddress,
       updateLocationAddressAliases,
@@ -529,6 +545,7 @@ const ManageLocationAddressesContent: FC<ManageLocationAddressesContentProps> = 
         selectedRowsForBulkAction.map((address) => deleteLocationAddress({ variables: { id: address.id } }))
       );
       debouncedRefetch();
+      dialogBulkAction.succeed();
     } catch (error) {
       console.error('Error deleting location addresses:', error);
       if (error instanceof ApolloError) {
@@ -536,9 +553,11 @@ const ManageLocationAddressesContent: FC<ManageLocationAddressesContentProps> = 
       } else {
         setError(t('error.bulk_delete_failed'));
       }
+      // The deletion failed, so the rows stay selected for a retry.
+      dialogBulkAction.fail();
     }
     setSelectedRowsForBulkAction([]);
-  }, [selectedRowsForBulkAction, deleteLocationAddress, debouncedRefetch, t]);
+  }, [dialogBulkAction, selectedRowsForBulkAction, deleteLocationAddress, debouncedRefetch, t]);
 
   const table = (
     <>
@@ -579,6 +598,8 @@ const ManageLocationAddressesContent: FC<ManageLocationAddressesContentProps> = 
             onClose={() => {
               setBulkActionDialogOpen(false);
               setSelectedRowsForBulkAction([]);
+              // Cancelled: the rows stay selected.
+              dialogBulkAction.fail();
             }}
           />
           <MergeLocationAddressesDialog
@@ -586,6 +607,8 @@ const ManageLocationAddressesContent: FC<ManageLocationAddressesContentProps> = 
             onClose={() => {
               setMergeDialogOpen(false);
               setSelectedRowsForBulkAction([]);
+              // Cancelled: the rows stay selected.
+              dialogBulkAction.fail();
             }}
             onConfirm={handleMergeConfirmation}
             selectedAddresses={selectedRowsForBulkAction}

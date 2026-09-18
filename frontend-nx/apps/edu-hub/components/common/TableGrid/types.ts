@@ -60,7 +60,12 @@ export interface TableGridProps<T extends BaseRow> {
   showCheckbox?: boolean;
   showGlobalSearchField?: boolean;
   onAddButtonClick?: () => void;
-  onBulkAction?: (action: string, selectedRows: T[]) => void;
+  /**
+   * Runs a bulk action on the selected rows. The row selection is only cleared once the action
+   * succeeded, so a handler must reject (or resolve to `false` when it did not do anything) to
+   * keep the rows marked for a retry.
+   */
+  onBulkAction?: (action: string, selectedRows: T[]) => void | boolean | Promise<void | boolean>;
   bulkActions?: BulkAction[];
   totalCount?: number;
   pageIndex: number;

@@ -49,7 +49,7 @@ import { IoIosCheckmarkCircle } from 'react-icons/io';
 import { GoDotFill } from 'react-icons/go';
 import { ColumnDef, Row } from '@tanstack/react-table';
 import TableGrid from '../../../common/TableGrid';
-import { useTableGrid } from '../../../common/TableGrid/hooks';
+import { useDeferredBulkAction, useTableGrid } from '../../../common/TableGrid/hooks';
 import { createMultiWordSearchCondition } from '../../../common/TableGrid/utils';
 import { BulkAction } from '../../../common/TableGrid/types';
 import NotificationSnackbar from '../../../common/dialogs/NotificationSnackbar';
@@ -252,6 +252,10 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
     [setPageIndex]
   );
 
+  // Marking participations as aborted finishes in a confirmation dialog, so the selection is only
+  // released once that dialog reports success.
+  const abortBulkAction = useDeferredBulkAction();
+
   const handleConfirmAbortParticipations = useCallback(async () => {
     const enrollmentIds = pendingAbortRows.map((r) => r.id);
     setAbortDialogOpen(false);
@@ -274,14 +278,24 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
       setPendingAbortRows([]);
       refetch();
       qResult.refetch();
+      // The mutation only touches enrollments that are still confirmed, so zero affected rows
+      // means nothing was marked and the rows stay selected.
+      if (affectedRows === 0) {
+        abortBulkAction.fail();
+      } else {
+        abortBulkAction.succeed();
+      }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : String(err);
       setBulkActionError(t('participations_bulk_actions.mark_aborted_error', { error: errorMessage }));
       setPendingAbortRows([]);
       refetch();
       qResult.refetch();
+      // The update failed, so the rows stay selected for a retry.
+      abortBulkAction.fail();
     }
   }, [
+    abortBulkAction,
     pendingAbortRows,
     updateEnrollmentStatusWhenConfirmed,
     course.id,
@@ -293,12 +307,14 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
   const handleBulkAction = useCallback(
     async (action: string, selectedRows: ExtendedEnrollment[]) => {
       if (action === 'mark_participation_aborted') {
+        // Nothing happened, so the rows stay selected.
         if (selectedRows.length === 0) {
-          return;
+          return false;
         }
         setPendingAbortRows(selectedRows);
         setAbortDialogOpen(true);
-        return;
+        // handleConfirmAbortParticipations settles the action.
+        return abortBulkAction.start();
       }
 
       try {
@@ -405,9 +421,11 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
             .map((r) => r.User?.email)
             .filter(Boolean)
             .join(',');
-          if (emails) {
-            window.location.href = `mailto:?bcc=${emails}`;
+          if (!emails) {
+            // No recipient, so nothing happened and the rows stay selected.
+            return false;
           }
+          window.location.href = `mailto:?bcc=${emails}`;
           return;
         }
         setSnackbarOpen(true);
@@ -418,9 +436,12 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
         setBulkActionError(msg);
         refetch();
         qResult.refetch();
+        // Rethrow so TableGrid keeps the rows selected for a retry.
+        throw err;
       }
     },
     [
+      abortBulkAction,
       course.id,
       createCertificates,
       removeAchievementCertificates,
@@ -711,10 +732,14 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
       onClose={() => {
         setAbortDialogOpen(false);
         setPendingAbortRows([]);
+        // Cancelled: the rows stay selected.
+        abortBulkAction.fail();
       }}
       onCancel={() => {
         setAbortDialogOpen(false);
         setPendingAbortRows([]);
+        // Cancelled: the rows stay selected.
+        abortBulkAction.fail();
       }}
       onConfirm={handleConfirmAbortParticipations}
     />
@@ -868,7 +893,7 @@ function ParticipationTable({
   loading: boolean;
   error: ApolloError | null | undefined;
   bulkActions: BulkAction[];
-  onBulkAction: (action: string, rows: ExtendedEnrollment[]) => void;
+  onBulkAction: (action: string, rows: ExtendedEnrollment[]) => void | boolean | Promise<void | boolean>;
   expandableRowComponent: (props: { row: ExtendedEnrollment }) => JSX.Element;
 }) {
   return (

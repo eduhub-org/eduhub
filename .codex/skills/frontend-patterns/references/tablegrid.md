@@ -10,7 +10,10 @@ Check these before adding a control of your own around a table:
 - `showGlobalSearchField` with `refetchFilter` / `createMultiWordSearchCondition` for search
 - `filters` for multi-select facet filters in the toolbar — the caller owns the selection and
   turns it into query variables; several selected values read as "any of them"
-- `bulkActions` with `onBulkAction` for actions over selected rows (adds the checkbox column)
+- `bulkActions` with `onBulkAction` for actions over selected rows (adds the checkbox column);
+  the selection is only cleared once the action succeeded, so let the handler reject on failure
+  and return `false` when it did not do anything, and use `useDeferredBulkAction` for actions
+  that only finish in a dialog
 - `deleteMutation`, or `onRowDelete` where deleting a row takes more than one mutation, for the
   row delete column; both share the confirmation and error dialogs
 - `expandableRowComponent` for row detail, or `rowHref` / `onRowNavigate` to open a full page
