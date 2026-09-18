@@ -130,7 +130,12 @@ export const MANAGED_COURSE_APPLICATIONS = gql`
         }
       }
       InvitedCourseEnrollments: CourseEnrollments_aggregate(
-        where: { status: { _in: [INVITED, CONFIRMED] } }
+        where: {
+          _or: [
+            { status: { _in: [INVITED, CONFIRMED, COMPLETED, REGISTERED, EXPIRED, ABORTED] } }
+            { status: { _eq: CANCELLED }, invitationExpirationDate: { _is_null: false } }
+          ]
+        }
       ) {
         aggregate {
           count
@@ -143,8 +148,43 @@ export const MANAGED_COURSE_APPLICATIONS = gql`
           count
         }
       }
+      RejectedCourseEnrollments: CourseEnrollments_aggregate(
+        where: { status: { _eq: REJECTED } }
+      ) {
+        aggregate {
+          count
+        }
+      }
+      ExpiredCourseEnrollments: CourseEnrollments_aggregate(
+        where: { status: { _eq: EXPIRED } }
+      ) {
+        aggregate {
+          count
+        }
+      }
+      AbortedCourseEnrollments: CourseEnrollments_aggregate(
+        where: { status: { _eq: ABORTED } }
+      ) {
+        aggregate {
+          count
+        }
+      }
+      PendingCourseEnrollments: CourseEnrollments_aggregate(
+        where: { status: { _in: [APPLIED, INVITED] } }
+      ) {
+        aggregate {
+          count
+        }
+      }
+      WaitlistedCourseEnrollments: CourseEnrollments_aggregate(
+        where: { status: { _eq: WAITLIST } }
+      ) {
+        aggregate {
+          count
+        }
+      }
       CancelledCourseEnrollments: CourseEnrollments_aggregate(
-        where: { status: { _in: [CANCELLED, ABORTED] } }
+        where: { status: { _eq: CANCELLED } }
       ) {
         aggregate {
           count
