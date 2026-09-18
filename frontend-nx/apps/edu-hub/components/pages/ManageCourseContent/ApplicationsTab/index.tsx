@@ -413,17 +413,20 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
   );
 
   const [inviteError, setInviteError] = useState<string | null>(null);
+  // Closing the dialog settles the bulk action, so it stays closed while the mutation runs.
+  const [isSendingInvitations, setIsSendingInvitations] = useState(false);
 
   const handleCloseInviteDialog = useCallback(() => {
+    if (isSendingInvitations) return;
     setIsInviteDialogOpen(false);
     setInviteDialogData(null);
     setInviteError(null);
     // Cancelled (a completed send settles the action before closing): the rows stay selected.
     dialogBulkAction.fail();
-  }, [dialogBulkAction]);
+  }, [dialogBulkAction, isSendingInvitations]);
 
   const handleSendInvitations = useCallback(async () => {
-    if (!inviteDialogData) return;
+    if (!inviteDialogData || isSendingInvitations) return;
 
     const idToRow = new Map(courseEnrollments.map((e) => [e.id, e]));
     const enrollmentIds = inviteDialogData.enrollmentsToSend
@@ -442,6 +445,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
     }
 
     let invitedCount = 0;
+    setIsSendingInvitations(true);
     try {
       const result = await updateEnrollmentStatusForInvite({
         variables: {
@@ -463,6 +467,8 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
       );
       // The dialog stays open with the error; the rows stay selected for a retry.
       return;
+    } finally {
+      setIsSendingInvitations(false);
     }
 
     if (invitedCount === 0) {
@@ -490,6 +496,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
   }, [
     dialogBulkAction,
     inviteDialogData,
+    isSendingInvitations,
     inviteExpireDate,
     courseEnrollments,
     updateEnrollmentStatusForInvite,
@@ -534,17 +541,20 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
   );
 
   const [rejectionError, setRejectionError] = useState<string | null>(null);
+  // Closing the dialog settles the bulk action, so it stays closed while the mutation runs.
+  const [isSendingRejections, setIsSendingRejections] = useState(false);
 
   const handleCloseRejectionDialog = useCallback(() => {
+    if (isSendingRejections) return;
     setIsRejectionDialogOpen(false);
     setRejectionDialogData(null);
     setRejectionError(null);
     // Cancelled (a completed send settles the action before closing): the rows stay selected.
     dialogBulkAction.fail();
-  }, [dialogBulkAction]);
+  }, [dialogBulkAction, isSendingRejections]);
 
   const handleSendRejections = useCallback(async () => {
-    if (!rejectionDialogData) return;
+    if (!rejectionDialogData || isSendingRejections) return;
 
     const idToRow = new Map(courseEnrollments.map((e) => [e.id, e]));
     const enrollmentIds = rejectionDialogData.enrollmentsToSend
@@ -563,6 +573,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
     }
 
     let declinedCount = 0;
+    setIsSendingRejections(true);
     try {
       const result = await updateEnrollmentStatusWhenApplied({
         variables: {
@@ -584,6 +595,8 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
       );
       // The dialog stays open with the error; the rows stay selected for a retry.
       return;
+    } finally {
+      setIsSendingRejections(false);
     }
 
     if (declinedCount === 0) {
@@ -611,6 +624,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
   }, [
     dialogBulkAction,
     rejectionDialogData,
+    isSendingRejections,
     courseEnrollments,
     updateEnrollmentStatusWhenApplied,
     qResult,
@@ -1474,7 +1488,12 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
         <DialogTitle>
           <div className="flex justify-between items-center">
             <div className="text-xl font-semibold text-label-primary">{t('bulk_actions.send_invitations_dialog_title')}</div>
-            <div className="cursor-pointer text-label-primary" onClick={handleCloseInviteDialog}>
+            <div
+              className={`text-label-primary ${
+                isSendingInvitations ? 'pointer-events-none opacity-50' : 'cursor-pointer'
+              }`}
+              onClick={handleCloseInviteDialog}
+            >
               <MdClose className="w-6 h-6" />
             </div>
           </div>
@@ -1513,10 +1532,10 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
                 </div>
               </div>
               <div className="flex justify-end gap-3">
-                <OldButton onClick={handleCloseInviteDialog} inverted>
+                <OldButton onClick={handleCloseInviteDialog} inverted disabled={isSendingInvitations}>
                   {tCommon('cancel')}
                 </OldButton>
-                <OldButton onClick={handleSendInvitations} filled>
+                <OldButton onClick={handleSendInvitations} filled disabled={isSendingInvitations}>
                   {t('bulk_actions.send_invitations_confirm')}
                 </OldButton>
               </div>
@@ -1536,7 +1555,12 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
         <DialogTitle>
           <div className="flex justify-between items-center">
             <div className="text-xl font-semibold text-label-primary">{t('bulk_actions.send_rejections_dialog_title')}</div>
-            <div className="cursor-pointer text-label-primary" onClick={handleCloseRejectionDialog}>
+            <div
+              className={`text-label-primary ${
+                isSendingRejections ? 'pointer-events-none opacity-50' : 'cursor-pointer'
+              }`}
+              onClick={handleCloseRejectionDialog}
+            >
               <MdClose className="w-6 h-6" />
             </div>
           </div>
@@ -1562,10 +1586,10 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
                 </p>
               </div>
               <div className="flex justify-end gap-3">
-                <OldButton onClick={handleCloseRejectionDialog} inverted>
+                <OldButton onClick={handleCloseRejectionDialog} inverted disabled={isSendingRejections}>
                   {tCommon('cancel')}
                 </OldButton>
-                <OldButton onClick={handleSendRejections} filled>
+                <OldButton onClick={handleSendRejections} filled disabled={isSendingRejections}>
                   {t('bulk_actions.send_rejections_confirm')}
                 </OldButton>
               </div>
