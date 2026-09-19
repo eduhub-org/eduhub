@@ -69,6 +69,7 @@
     "stripe": "^22.6.2",
     "swiper": "^12.1.2",
     "tailwind-merge": "^2.5.4",
+    "tslib": "^2.7.0",
     "use-debounce": "^10.0.4",
     "uuid": "^11.1.1"
   },
