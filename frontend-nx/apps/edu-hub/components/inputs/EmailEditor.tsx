@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react';
+import { gql } from '@apollo/client';
 import { DocumentNode } from 'graphql';
 import { Button, IconButton, Divider, ToggleButton, ToggleButtonGroup } from '@mui/material';
 import {
@@ -22,7 +23,6 @@ import { useTranslations } from 'next-intl';
 import { useRoleMutation } from '../../hooks/authedMutation';
 import NotificationSnackbar from '../common/dialogs/NotificationSnackbar';
 import { LinkDialog } from '../common/dialogs/LinkDialog';
-import { gql } from 'graphql-tag';
 
 export type EditorVariable = { text: string; label: string; categories?: string[] };
 
