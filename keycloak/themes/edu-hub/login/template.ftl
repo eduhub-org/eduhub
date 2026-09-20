@@ -71,8 +71,8 @@
         <div class="academy_header_guest">
             <nav class="navbar navbar-light navbar-expand-md p-0">
                 <div class="navbar-logo-wrapper">
-                    <img class="navbar-logo" src="${url.resourcesPath}/img/edu_logo.svg">
-                    <img class="navbar-logo-text" src="${url.resourcesPath}/img/logo_text.svg">
+                    <img class="navbar-logo" src="${url.resourcesPath}/img/edu_logo.svg" alt="">
+                    <img class="navbar-logo-text" src="${url.resourcesPath}/img/logo_text.svg" alt="EduHub">
                     <#-- Co-brand slot: the EduHub lockup above always stays, the
                          portal mark is added next to it so people recognise that
                          StuJo runs on their EduHub account. Revealed by
@@ -85,13 +85,6 @@
                             <img class="navbar-cobrand-logo navbar-cobrand-flensburg" src="${url.resourcesPath}/img/stujo_logo_flensburg.png" alt="StuJo Campus Flensburg">
                         </span>
                     </div>
-                </div>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="true" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse p-2" id="navbarNav">
-                <div class="my-2 my-lg-0 navbar-nav" >
-                </div>
                 </div>
             </nav>
             </div>
