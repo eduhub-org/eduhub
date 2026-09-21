@@ -71,6 +71,7 @@ export const MANAGED_COURSE_APPLICATIONS = gql`
     $offset: Int = 0
     $filter: CourseEnrollment_bool_exp = {}
     $order_by: [CourseEnrollment_order_by!] = [{ id: asc }]
+    $expirationCutoff: timestamptz!
   ) {
     Course_by_pk(id: $id) {
       id
@@ -155,8 +156,17 @@ export const MANAGED_COURSE_APPLICATIONS = gql`
           count
         }
       }
+      # The hourly expire_invitations cron flips lapsed INVITED enrollments to
+      # EXPIRED, so between runs an invitation can be past its expiration date
+      # while still INVITED. The table marks those as expired, so the aggregate
+      # applies the same date rule to stay consistent.
       ExpiredCourseEnrollments: CourseEnrollments_aggregate(
-        where: { status: { _eq: EXPIRED } }
+        where: {
+          _or: [
+            { status: { _eq: EXPIRED } }
+            { status: { _eq: INVITED }, invitationExpirationDate: { _lt: $expirationCutoff } }
+          ]
+        }
       ) {
         aggregate {
           count

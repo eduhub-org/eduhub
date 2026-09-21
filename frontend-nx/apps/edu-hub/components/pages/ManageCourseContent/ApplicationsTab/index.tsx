@@ -147,11 +147,17 @@ interface ApplicationsTabContentProps {
   setSorting: (sorting: SortingState | ((prev: SortingState) => SortingState)) => void;
 }
 
+// An invitation counts as expired once its expiration date is before today. The
+// expire_invitations cron only flips lapsed INVITED enrollments to EXPIRED once
+// an hour, so the same cutoff is applied client-side and passed to the expired
+// invitations aggregate to keep the table and the statistics cards in sync.
+const invitationExpirationCutoff = () => new Date(new Date().setHours(0, 0, 0, 0)).toISOString();
+
 const isExpired = (enrollment: ApplicationEnrollment) => {
   if (enrollment.invitationExpirationDate == null) {
     return false;
   }
-  return new Date(enrollment.invitationExpirationDate).setHours(0, 0, 0, 0) < new Date().setHours(0, 0, 0, 0);
+  return new Date(enrollment.invitationExpirationDate).getTime() < new Date(invitationExpirationCutoff()).getTime();
 };
 
 const isInviteEligibleEnrollment = (enrollment: ApplicationEnrollment) =>
@@ -181,7 +187,7 @@ export const ApplicationsTab: FC<IProps> = ({ course }) => {
   } = useTableGrid<ManagedCourseApplicationsVariables>({
     queryHook: useRoleQuery,
     query: MANAGED_COURSE_APPLICATIONS,
-    queryVariables: { id: course.id },
+    queryVariables: { id: course.id, expirationCutoff: invitationExpirationCutoff() },
     pageSize,
     refetchFilter: (search) => {
       const searchCondition = createMultiWordSearchCondition(search, [

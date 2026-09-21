@@ -380,4 +380,5 @@ export interface ManagedCourseApplicationsVariables {
   offset?: number | null;
   filter?: CourseEnrollment_bool_exp | null;
   order_by?: CourseEnrollment_order_by[] | null;
+  expirationCutoff: any;
 }
