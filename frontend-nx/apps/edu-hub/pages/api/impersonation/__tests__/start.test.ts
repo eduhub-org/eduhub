@@ -49,6 +49,7 @@ describe('impersonation start', () => {
     mockedGetToken.mockResolvedValue(tokenFor(['user', 'instructor', 'admin']) as never);
     mockRequest
       .mockResolvedValueOnce({ User_by_pk: { id: TARGET, firstName: 'Ada', lastName: 'L', email: 'a@e.test' } })
+      .mockResolvedValueOnce({ update_ImpersonationSession: { affected_rows: 0 } })
       .mockResolvedValueOnce({ insert_ImpersonationSession_one: { id: 42 } });
   });
 
@@ -71,6 +72,24 @@ describe('impersonation start', () => {
     const res = response();
     await handler(request({ userId: TARGET }), res);
     expect(res.status).toHaveBeenCalledWith(404);
+  });
+
+  // One cookie means one impersonation at a time, so a row this admin left open
+  // is a row nothing can close any more: endImpersonation only ever reaches the
+  // one the current cookie names. Closing them here is what keeps an open row
+  // meaning "reading as somebody right now".
+  it('closes whatever this admin left open before opening the next one', async () => {
+    const res = response();
+    await handler(request({ userId: TARGET }), res);
+
+    expect(res.status).toHaveBeenCalledWith(200);
+    const [closeDocument, closeVariables] = mockRequest.mock.calls[1];
+    expect(closeDocument).toContain('update_ImpersonationSession');
+    expect(closeDocument).toContain('ended_at: { _is_null: true }');
+    expect(closeVariables).toEqual({ adminUserId: ADMIN });
+
+    // And it happens before the insert, so the new row is never one of them.
+    expect(mockRequest.mock.calls[2][0]).toContain('insert_ImpersonationSession_one');
   });
 
   it('records the session and sets an httpOnly cookie naming the target', async () => {

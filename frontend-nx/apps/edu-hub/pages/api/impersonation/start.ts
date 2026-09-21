@@ -19,6 +19,28 @@ const GET_TARGET = `
   }
 `;
 
+/**
+ * Closes anything this admin still has open before opening the next one.
+ *
+ * One cookie means one impersonation at a time, and `endImpersonation` can only
+ * ever close the row the current cookie names -- so a row the cookie stopped
+ * naming (it expired, the browser dropped it, the admin cleared it) would stay
+ * open with no code path left that could reach it. Ending it here is what keeps
+ * "open row" meaning "reading as someone right now".
+ *
+ * Matches ImpersonationSession_open_idx.
+ */
+const CLOSE_OPEN_SESSIONS = `
+  mutation CloseOpenImpersonationSessions($adminUserId: uuid!) {
+    update_ImpersonationSession(
+      where: { adminUserId: { _eq: $adminUserId }, ended_at: { _is_null: true } }
+      _set: { ended_at: "now()" }
+    ) {
+      affected_rows
+    }
+  }
+`;
+
 const OPEN_SESSION = `
   mutation OpenImpersonationSession($adminUserId: uuid!, $targetUserId: uuid!) {
     insert_ImpersonationSession_one(
@@ -66,6 +88,17 @@ export default async function impersonationStart(req: NextApiRequest, res: NextA
     });
     if (!target) {
       return res.status(404).json({ error: 'User not found.' });
+    }
+
+    const closed = await client.request<{ update_ImpersonationSession: { affected_rows: number } }>(
+      CLOSE_OPEN_SESSIONS,
+      { adminUserId: admin.userId }
+    );
+    if (closed.update_ImpersonationSession.affected_rows > 0) {
+      console.info('Closed impersonation sessions left open', {
+        adminUserId: admin.userId,
+        count: closed.update_ImpersonationSession.affected_rows,
+      });
     }
 
     const opened = await client.request<{ insert_ImpersonationSession_one: { id: number } }>(

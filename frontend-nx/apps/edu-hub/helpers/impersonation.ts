@@ -94,8 +94,18 @@ const CLOCK_SKEW_TOLERANCE_MS = 60 * 1000;
  * governs what the browser chooses to send, so a copied cookie would otherwise
  * stay valid for as long as its audit row is open -- indefinitely, if the admin
  * closed the tab instead of pressing stop. `iat` is what bounds that.
+ *
+ * `ignoreExpiry` is for closing an audit row and nothing else. Authorising a
+ * request must honour the expiry; naming the row to close is not an
+ * authorisation -- the caller still has to be the signed-in admin the row
+ * itself names, which CLOSE_SESSION checks. Without it, the ordinary "leave the
+ * tab for an hour, then press stop" path leaves `ended_at` NULL for good, and
+ * the table stops being able to say how long anyone read as anyone.
  */
-export const decodeCookie = (raw: string | undefined): ImpersonationPayload | null => {
+export const decodeCookie = (
+  raw: string | undefined,
+  { ignoreExpiry = false }: { ignoreExpiry?: boolean } = {}
+): ImpersonationPayload | null => {
   if (!raw) return null;
   const [body, signature] = raw.split('.');
   if (!body || !signature) return null;
@@ -117,7 +127,7 @@ export const decodeCookie = (raw: string | undefined): ImpersonationPayload | nu
     if (typeof parsed?.iat !== 'number' || !Number.isFinite(parsed.iat)) return null;
     const age = Date.now() - parsed.iat;
     if (age < -CLOCK_SKEW_TOLERANCE_MS) return null;
-    if (age > COOKIE_MAX_AGE_SECONDS * 1000) return null;
+    if (!ignoreExpiry && age > COOKIE_MAX_AGE_SECONDS * 1000) return null;
 
     return parsed as ImpersonationPayload;
   } catch {
@@ -150,8 +160,10 @@ export const clearImpersonationCookie = (res: NextApiResponse) => {
   ]);
 };
 
-export const readImpersonationCookie = (req: NextApiRequest): ImpersonationPayload | null =>
-  decodeCookie(parse(req.headers?.cookie || '')[IMPERSONATION_COOKIE]);
+export const readImpersonationCookie = (
+  req: NextApiRequest,
+  options?: { ignoreExpiry?: boolean }
+): ImpersonationPayload | null => decodeCookie(parse(req.headers?.cookie || '')[IMPERSONATION_COOKIE], options);
 
 /**
  * The signed-in super-admin, or null. Identity comes from the NextAuth token,
@@ -232,7 +244,10 @@ const CLOSE_SESSION = `
  * did not get through.
  */
 export const endImpersonation = async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
-  const payload = readImpersonationCookie(req);
+  // Past its expiry the cookie no longer authorises anything -- the proxy has
+  // been refusing it since the hour ran out -- but it still names the row this
+  // admin left open, and that row is the only thing left to close.
+  const payload = readImpersonationCookie(req, { ignoreExpiry: true });
   clearImpersonationCookie(res);
   if (!payload) return;
 
