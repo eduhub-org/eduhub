@@ -229,3 +229,40 @@ export const UPDATE_ENROLLMENT_STATUS_FOR_INVITE = gql`
     }
   }
 `;
+
+/**
+ * A participant ending their own participation: CANCELLED before the course
+ * runs, ABORTED while it does (see `getParticipationExitKind`).
+ *
+ * Guarded on the statuses a participant still holds a place from, so a page
+ * left open cannot overwrite a verdict that landed in the meantime - an
+ * `affected_rows` of 0 means the enrollment has moved on and the caller should
+ * just refetch. Which row is reachable at all is Hasura's business: the
+ * `user_access` update permission filters on `userId = X-Hasura-User-Id`.
+ *
+ * Deliberately not UPDATE_ENROLLMENT_STATUS: that one also sets
+ * `invitationExpirationDate`, so calling it without `expire` NULLs a column
+ * this action has no business touching.
+ */
+export const CANCEL_OWN_ENROLLMENT = gql`
+  mutation CancelOwnEnrollment(
+    $enrollmentId: Int!
+    $status: CourseEnrollmentStatus_enum!
+  ) {
+    update_CourseEnrollment(
+      where: {
+        _and: [
+          { id: { _eq: $enrollmentId } }
+          { status: { _in: [APPLIED, WAITLIST, INVITED, CONFIRMED, REGISTERED] } }
+        ]
+      }
+      _set: { status: $status }
+    ) {
+      affected_rows
+      returning {
+        id
+        status
+      }
+    }
+  }
+`;

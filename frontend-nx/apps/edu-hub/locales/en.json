@@ -636,7 +636,7 @@
       "applied": "Your application is under review",
       "aborted": "You aborted the participation",
       "rejected": "Unfortunately, your application has been rejected",
-      "cancelled": "Your invitation has been cancelled",
+      "cancelled": "You cancelled your registration",
       "invited": "You have been invited and need to confirm your participation",
       "invitation_expired": "Your invitation has expired",
       "payment_pending": "Your payment has not been completed yet. You can review your selections and try again.",
@@ -747,6 +747,17 @@
       "title": "Who's here",
       "message_on_element": "Message on Element",
       "and_more": "and {count} more"
+    },
+    "ParticipationExitButton": {
+      "cancel_participation": "Cancel registration",
+      "abort_participation": "Abort participation",
+      "cancel_participation_confirm": "Do you really want to cancel your registration for “{title}”? Your place will be released.",
+      "abort_participation_confirm": "Do you really want to abort your participation in “{title}”?",
+      "exit_failed": "Your registration could not be changed right now. Please try again."
+    },
+    "CourseContent": {
+      "cancel_success_message": "Your registration has been cancelled.",
+      "abort_success_message": "Your participation has been aborted."
     }
   },
   "coursePage": {
