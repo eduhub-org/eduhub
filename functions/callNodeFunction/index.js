@@ -40,6 +40,7 @@ import deleteProjectDocumentationInstruction from "./deleteProjectDocumentationI
 import saveProjectDocumentationInstruction from "./saveProjectDocumentationInstruction/index.js";
 import sendProjectEmail from "./sendProjectEmail/index.js";
 import sendCourseUpdateEmail from "./sendCourseUpdateEmail/index.js";
+import notifySessionParticipants from "./notifySessionParticipants/index.js";
 import registerGuestForCourse from "./registerGuestForCourse/index.js";
 import confirmGuestRegistration from "./confirmGuestRegistration/index.js";
 import manageGuestRegistration from "./manageGuestRegistration/index.js";
@@ -111,6 +112,7 @@ const functionMap = {
   saveProjectDocumentationInstruction,
   sendProjectEmail,
   sendCourseUpdateEmail,
+  notifySessionParticipants,
   registerGuestForCourse,
   confirmGuestRegistration,
   manageGuestRegistration,
