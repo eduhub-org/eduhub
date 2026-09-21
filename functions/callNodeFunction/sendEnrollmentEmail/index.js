@@ -59,6 +59,7 @@ export default async function sendEnrollmentEmail(req, logger) {
           Course {
             id
             title
+            registrationType
             startTime
             endTime
             basePrice
@@ -155,7 +156,16 @@ export default async function sendEnrollmentEmail(req, logger) {
             baseTemplateType = 'APPLICATION_RECEIVED';
             break;
           case 'CONFIRMED':
-            baseTemplateType = 'APPLICATION_CONFIRMED';
+            // Signed-in direct signups use CONFIRMED, while guests use
+            // REGISTERED. Both must use the event's registration template.
+            baseTemplateType = [
+              'DIRECT_CONFIRMATION',
+              'DIRECT_WITH_INPUT',
+              'DIRECT_CONFIRMATION_AND_PAYMENT',
+              'DIRECT_WITH_INPUT_AND_PAYMENT',
+            ].includes(enrollmentDetails.Course?.registrationType)
+              ? 'REGISTRATION_CONFIRMED'
+              : 'APPLICATION_CONFIRMED';
             break;
           case 'INVITED':
             baseTemplateType = 'INVITE';
@@ -374,4 +384,4 @@ export default async function sendEnrollmentEmail(req, logger) {
       messageKey: 'EMAIL_PROCESSING_FAILED'
     };
   }
-} 
+}
