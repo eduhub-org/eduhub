@@ -281,6 +281,18 @@ type Mutation {
 }
 
 type Mutation {
+  notifySessionParticipants(sessionId: Int!): NotifySessionParticipantsResult!
+}
+
+type NotifySessionParticipantsResult {
+  success: Boolean!
+  queued: Int
+  total: Int
+  error: String
+  messageKey: String
+}
+
+type Mutation {
   updateFromKeycloak(
     userid: ID!
   ): result

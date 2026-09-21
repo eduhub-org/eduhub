@@ -1855,6 +1855,14 @@
         "review_button": "Review attendance data",
         "no_data": "No attendance data available",
         "dialog_title": "Attendance data"
+      },
+      "notify_participants": {
+        "title": "Inform participants?",
+        "question": "{sessions, plural, one {This session's date or time has changed.} other {The dates or times of # sessions have changed.}} {participants, plural, one {Should the registered participant be informed by email?} other {Should the # registered participants be informed by email?}}",
+        "confirm": "Inform",
+        "cancel": "Don't inform",
+        "sent": "The participants have been informed.",
+        "failed": "The participants could not be informed."
       }
     },
     "location": {

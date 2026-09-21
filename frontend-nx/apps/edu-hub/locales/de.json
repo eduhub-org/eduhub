@@ -1837,6 +1837,14 @@
         "review_button": "Anwesenheitsdaten ansehen",
         "no_data": "Keine Anwesenheitsdaten vorhanden",
         "dialog_title": "Anwesenheitsdaten"
+      },
+      "notify_participants": {
+        "title": "Teilnehmende informieren?",
+        "question": "{sessions, plural, one {Der Termin dieser Session wurde geändert.} other {Die Termine von # Sessions wurden geändert.}} {participants, plural, one {Soll die angemeldete Person per E-Mail darüber informiert werden?} other {Sollen die # angemeldeten Personen per E-Mail darüber informiert werden?}}",
+        "confirm": "Informieren",
+        "cancel": "Nicht informieren",
+        "sent": "Die Teilnehmenden wurden informiert.",
+        "failed": "Die Teilnehmenden konnten nicht informiert werden."
       }
     },
     "location": {
