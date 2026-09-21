@@ -1,11 +1,13 @@
 import { useRouter } from 'next/router';
-import { FC, useCallback } from 'react';
+import { FC, useCallback, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { MdVisibility } from 'react-icons/md';
 
+import { ErrorMessageDialog } from '../common/dialogs/ErrorMessageDialog';
 import { useParticipantPreview } from '../../contexts/ParticipantPreviewContext';
 import { useRoleMutation } from '../../hooks/authedMutation';
-import { REMOVE_TEST_ENROLLMENT } from '../../queries/testEnrollment';
+import { useUserId } from '../../hooks/user';
+import { MY_TEST_ENROLLMENT, REMOVE_TEST_ENROLLMENT } from '../../queries/testEnrollment';
 import { RemoveTestEnrollment, RemoveTestEnrollmentVariables } from '../../queries/__generated__/RemoveTestEnrollment';
 
 /**
@@ -24,16 +26,36 @@ import { RemoveTestEnrollment, RemoveTestEnrollmentVariables } from '../../queri
 export const ParticipantPreviewNotice: FC = () => {
   const t = useTranslations('course.participant_preview');
   const router = useRouter();
+  const userId = useUserId();
   const { courseId } = useParticipantPreview();
+  const [errorMessage, setErrorMessage] = useState('');
   const [removeTestEnrollment, { loading }] = useRoleMutation<RemoveTestEnrollment, RemoveTestEnrollmentVariables>(
     REMOVE_TEST_ENROLLMENT
   );
 
+  // The same three things ParticipantPreviewButton.handleRemove does, because
+  // this is the same removal: read the payload (the action reports refusal in
+  // it rather than by throwing), refresh what the manage screen will read back
+  // -- MY_TEST_ENROLLMENT is cache-first, so the page this navigates to would
+  // otherwise still offer to open a preview that is gone -- and only then go.
   const handleEnd = useCallback(async () => {
     if (courseId == null) return;
-    await removeTestEnrollment({ variables: { courseId } });
-    router.push(`/manage/course/${courseId}`);
-  }, [courseId, removeTestEnrollment, router]);
+    try {
+      const result = await removeTestEnrollment({
+        variables: { courseId },
+        refetchQueries: userId ? [{ query: MY_TEST_ENROLLMENT, variables: { courseId, userId } }] : [],
+        awaitRefetchQueries: true,
+      });
+      const payload = result.data?.removeTestEnrollment;
+      if (!payload?.success) {
+        setErrorMessage(t(`errors.${payload?.messageKey ?? 'TEST_ENROLLMENT_FAILED'}`));
+        return;
+      }
+      router.push(`/manage/course/${courseId}`);
+    } catch {
+      setErrorMessage(t('errors.TEST_ENROLLMENT_FAILED'));
+    }
+  }, [courseId, removeTestEnrollment, router, t, userId]);
 
   if (courseId == null) return null;
 
@@ -53,6 +75,7 @@ export const ParticipantPreviewNotice: FC = () => {
           {t('end')}
         </button>
       </div>
+      <ErrorMessageDialog open={errorMessage !== ''} errorMessage={errorMessage} onClose={() => setErrorMessage('')} />
     </div>
   );
 };
