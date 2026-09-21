@@ -99,6 +99,7 @@ const GET_PREVIEW_ARTEFACTS = `
       projectId
       Project {
         id
+        created_at
         ProjectAuthors {
           id
           userId
@@ -238,10 +239,19 @@ export default async function manageTestEnrollment(req, logger) {
   const since = existing.created_at;
   const artefacts = await client.request(GET_PREVIEW_ARTEFACTS, { courseId, userId, since });
   const authorIds = artefacts.ProjectAuthor.map((author) => author.id);
-  // Only projects the preview was the sole author of: a project with a real
-  // co-author keeps standing, it just loses the preview authorship.
+  // Only projects the preview itself brought into being: the preview must be
+  // their sole author, and they must not have existed before the preview did.
+  //
+  // The second half is what the `since` bound on the authorship cannot say on
+  // its own. An authorship acquired during the preview window through some
+  // other path -- a super-admin adding themselves to an existing project, say
+  // -- is still dropped, but the project behind it predates the preview and is
+  // nobody's to delete here.
+  const sinceMs = new Date(since).getTime();
   const projectIds = artefacts.ProjectAuthor.filter(
-    (author) => author.Project.ProjectAuthors.every((other) => other.userId === userId)
+    (author) =>
+      author.Project.ProjectAuthors.every((other) => other.userId === userId) &&
+      new Date(author.Project.created_at).getTime() >= sinceMs
   ).map((author) => author.projectId);
   const sessionIds = artefacts.Session.map((session) => session.id);
 
