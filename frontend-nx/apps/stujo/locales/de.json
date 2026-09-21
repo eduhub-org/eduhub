@@ -79,11 +79,12 @@
       "remove_image_error": "Fehler beim Entfernen des Bildes",
       "upload_error": "Fehler beim Hochladen des Bildes",
       "organization_logo": "Firmenlogo",
-      "view_full_size": "In voller Größe ansehen",
-      "close": "Schließen",
+      "add_logo": "Logo hinzufügen",
+      "logo_unavailable": "Logo konnte nicht geladen werden",
       "logo_permission_denied": "Dieses Unternehmen hat bereits eine Person, die die Einstellungen verwaltet. Bitte sie, das Logo zu ändern."
     },
     "error": "Ein Fehler ist aufgetreten",
+    "warning": "Hinweis",
     "close": "Schließen",
     "ok": "OK"
   },
@@ -136,14 +137,27 @@
     "archiveFailed": "Archivieren fehlgeschlagen: {error}",
     "archiveNetworkError": "Archivieren fehlgeschlagen: Netzwerkfehler.",
     "unknownError": "Unbekannter Fehler",
-    "organizationWebsite": {
+    "OrganizationWebsite": {
       "label": "Website",
       "placeholder": "https://beispiel.de",
       "save": "Speichern",
       "saved": "Gespeichert",
-      "invalidUrl": "Bitte eine gültige http(s)-URL eingeben.",
-      "permissionDenied": "Dieses Unternehmen hat bereits eine Person, die die Einstellungen verwaltet. Bitte sie, die Website zu ändern.",
-      "saveError": "Fehler beim Speichern der Website"
+      "invalid_url": "Bitte eine gültige http(s)-URL eingeben.",
+      "permission_denied": "Dieses Unternehmen hat bereits eine Person, die die Einstellungen verwaltet. Bitte sie, die Website zu ändern.",
+      "save_error": "Fehler beim Speichern der Website",
+      "none": "Noch keine Website hinterlegt",
+      "hint": "Vollständige Adresse inklusive https://"
+    },
+    "OrganizationProfile": {
+      "title": "Firmenprofil bearbeiten",
+      "edit_button": "Firmenprofil bearbeiten",
+      "edit_button_aria": "Firmenprofil von {organization} bearbeiten",
+      "intro": "Logo und Website erscheinen auf allen Deinen Stellenangeboten.",
+      "logo_heading": "Logo",
+      "logo_alt": "Logo von {organization}",
+      "logo_hint": "PNG oder JPG, maximal 2 MB. Dein Logo wird vollständig angezeigt und nicht beschnitten.",
+      "website_heading": "Website",
+      "done": "Fertig"
     },
     "NeuesAngebot": {
       "edit_offer_title": "Angebot bearbeiten",

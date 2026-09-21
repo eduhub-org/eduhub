@@ -32,7 +32,7 @@ import { DELETE_A_COURSE } from '../../../queries/mutateCourse';
 
 import TableGrid from '../../common/TableGrid';
 import Loading from '../../common/Loading';
-import { useTableGrid } from '../../common/TableGrid/hooks';
+import { useDeferredBulkAction, useTableGrid } from '../../common/TableGrid/hooks';
 import { createMultiWordSearchCondition } from '../../common/TableGrid/utils';
 import { useManageQuery } from '../../../hooks/authedQuery';
 import { useManageRole } from '../../../hooks/authentication';
@@ -184,7 +184,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
   }, []);
 
   // Use TableGrid hook with proper refetchFilter for search debouncing
-  const { data, loading, error, searchFilter, pageIndex, sorting, setSearchFilter, setPageIndex, setSorting } = useTableGrid({
+  const { data, loading, error, refetch, searchFilter, pageIndex, sorting, setSearchFilter, setPageIndex, setSorting } = useTableGrid({
     queryHook: useManageQuery,
     query: ADMIN_COURSE_LIST,
     queryVariables: filter,
@@ -330,10 +330,21 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
     }
   }, [filter.where.programId?._eq, sortedPrograms, insertCourse, t, messageKey]);
 
+  // Copying runs in two steps (bulk action opens the dialog, the dialog does the work), so the
+  // selection is only released once the copy itself succeeded.
+  const copyBulkAction = useDeferredBulkAction();
+
   // Bulk action handlers
   const handleBulkAction = useCallback(
     async (action: string, selectedCourses: AdminCourseList_Course[]) => {
       const courseIds = selectedCourses.map((course) => course.id);
+
+      if (action === 'copy') {
+        // Open program selection dialog; handleProgramDialogClose settles the action.
+        setCoursesToCopy(selectedCourses);
+        setShowProgramDialog(true);
+        return copyBulkAction.start();
+      }
 
       try {
         if (action === 'publish') {
@@ -348,6 +359,9 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
               })
             )
           );
+          // The publish mutation only returns the id, so the list rows (published marker and
+          // status) have to be refetched for the page to show the new state.
+          await refetch();
           setSuccessMessage(
             t(
               selectedCourses.length === 1
@@ -371,6 +385,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
               })
             )
           );
+          await refetch();
           setSuccessMessage(
             t(
               selectedCourses.length === 1
@@ -382,18 +397,16 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
             )
           );
           setShowSuccessNotification(true);
-        } else if (action === 'copy') {
-          // Open program selection dialog
-          setCoursesToCopy(selectedCourses);
-          setShowProgramDialog(true);
         }
       } catch (error) {
         console.error(`Error during bulk ${action} action:`, error);
         setErrorMessage(t(`notifications.bulk_action_failed.${messageKey}`));
         setShowErrorNotification(true);
+        // Rethrow so TableGrid keeps the rows selected for a retry.
+        throw error;
       }
     },
-    [updateCourse, t, messageKey]
+    [copyBulkAction, refetch, updateCourse, t, messageKey]
   );
 
   const bulkActions = [
@@ -592,14 +605,22 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
             )
           );
           setShowSuccessNotification(true);
+          copyBulkAction.succeed();
         } catch (error) {
           console.error('Error copying courses:', error);
+          setErrorMessage(t(`notifications.bulk_action_failed.${messageKey}`));
+          setShowErrorNotification(true);
+          // The copy failed, so the rows stay selected for a retry.
+          copyBulkAction.fail();
         }
+      } else {
+        // Cancelled: nothing was copied, so the rows stay selected.
+        copyBulkAction.fail();
       }
 
       setCoursesToCopy([]);
     },
-    [coursesToCopy, copyCourses, t, messageKey]
+    [copyBulkAction, coursesToCopy, copyCourses, t, messageKey]
   );
 
   const courseStatus = (status: string) => {

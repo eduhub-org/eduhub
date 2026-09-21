@@ -24,6 +24,7 @@ import { Sessions } from './Sessions';
 import { CourseParticipants } from './CourseParticipants';
 import { CompletedDegreeCourses, CurrentDegreeCourses } from './DegreeCourses';
 import PricingSummary from '../../common/PricingSummary';
+import { ParticipationExitKind, ParticipationExitOutcome } from './Registration/participationExit';
 import { getRegistrationTypeConfig } from './Registration/types';
 import { getBackgroundImage } from '../../../helpers/imageHandling';
 import { Attendances } from './Attendances';
@@ -79,6 +80,7 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
   const [resetValues, setResetValues] = useState<boolean | null>(null);
   const [showSuccessSnackbar, setShowSuccessSnackbar] = useState(false);
   const [registrationSuccessWaitlist, setRegistrationSuccessWaitlist] = useState(false);
+  const [participationExitKind, setParticipationExitKind] = useState<ParticipationExitKind | null>(null);
   const getWeekdayStartAndEndString = useWeekdayStartAndEndString();
 
   // Query for authorized course data
@@ -149,13 +151,30 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
 
   // Handle registration success
   const handleRegistrationSuccess = (info?: { waitlist: boolean }) => {
+    setParticipationExitKind(null);
     setRegistrationSuccessWaitlist(!!info?.waitlist);
     setShowSuccessSnackbar(true);
     refetchCourse();
   };
 
+  // The user cancelled or aborted their own participation. The refetch is what
+  // moves the rail on to the new status card - the snackbar only says so.
+  const handleParticipationExit = ({ kind, changed }: ParticipationExitOutcome) => {
+    if (changed) {
+      setRegistrationSuccessWaitlist(false);
+      setParticipationExitKind(kind);
+      setShowSuccessSnackbar(true);
+    }
+    refetchCourse();
+  };
+
   // Get success message based on registration type (waitlist vs approval vs direct)
   const getSuccessMessage = () => {
+    if (participationExitKind) {
+      return participationExitKind === 'CANCEL'
+        ? t('CourseContent.cancel_success_message')
+        : t('CourseContent.abort_success_message');
+    }
     if (registrationSuccessWaitlist) {
       return t('modal.success_message_waitlist');
     }
@@ -248,6 +267,7 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                       courseEnrollment={courseEnrollment ?? undefined}
                       isLoggedInParticipant={isLoggedInParticipant}
                       onRegistrationSuccess={handleRegistrationSuccess}
+                      onParticipationExit={handleParticipationExit}
                     />
                   </div>
 
@@ -262,12 +282,6 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                       />
                     ) : (
                       <CurrentDegreeCourses degreeCourses={course.DegreeCourses} />
-                    )}
-                    {/* Only asked for by someone taking part: the Hasura
-                        permission returns an empty list to anyone else, so this
-                        saves a pointless round trip rather than guarding it. */}
-                    {isLoggedInParticipant && (
-                      <CourseParticipants courseId={course.id} currentUserId={userId} />
                     )}
                     {!!(requiresPayment && (course.basePrice || course.basePrice === 0 || course.basePrice === null || addonItems.length > 0)) && (
                       <div>
@@ -340,6 +354,14 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                   </ContentRow>
                   </>
                 )}
+              {/* Below attendances: only asked for by someone taking part, the
+                  Hasura permission returns an empty list to anyone else, so this
+                  saves a pointless round trip rather than guarding it. */}
+              {isLoggedInParticipant && (
+                <div className="min-w-0 text-white mx-6 xl:mx-0">
+                  <CourseParticipants courseId={course.id} currentUserId={userId} />
+                </div>
+              )}
               <DescriptionFields course={course} />
               <FundingOrganizations courseFundingOrganizations={course.CourseFundingOrganizations ?? []} />
               <CourseProjectsSection courseId={id} />
@@ -352,6 +374,7 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
         onClose={() => {
           setShowSuccessSnackbar(false);
           setRegistrationSuccessWaitlist(false);
+          setParticipationExitKind(null);
         }}
         message={getSuccessMessage()}
         duration={4000}

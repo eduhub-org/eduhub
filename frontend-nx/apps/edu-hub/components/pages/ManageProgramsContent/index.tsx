@@ -179,6 +179,8 @@ export const ManageProgramsContent: FC<ManageProgramsContentProps> = ({ inSettin
         console.error(`Error during bulk ${action} action:`, error);
         setErrorMessage(t('notifications.bulk_action_failed', { action }));
         setShowErrorNotification(true);
+        // Rethrow so TableGrid keeps the rows selected for a retry.
+        throw error;
       }
     },
     [updatePublished, t]

@@ -174,8 +174,8 @@
       "upload_error": "Fehler beim Hochladen des Bildes",
       "organization_logo": "Logo der Organisation",
       "change_logo": "Logo ändern",
-      "view_full_size": "In voller Größe ansehen",
-      "close": "Schließen",
+      "add_logo": "Logo hinzufügen",
+      "logo_unavailable": "Logo konnte nicht geladen werden",
       "logo_permission_denied": "Diese Organisation hat bereits eine Person, die die Einstellungen verwaltet. Bitte sie, das Logo zu ändern."
     },
     "file_upload": {
@@ -636,7 +636,7 @@
       "applied": "Deine Bewerbung ist in der Prüfung",
       "aborted": "Du hast die Teilnahme abgebrochen",
       "rejected": "Leider wurde deine Bewerbung abgelehnt",
-      "cancelled": "Du hast deine Einladung abgelehnt",
+      "cancelled": "Du hast deine Anmeldung storniert",
       "invited": "Du wurdest eingeladen und musst deine Teilnahme bestätigen",
       "invitation_expired": "Deine Einladung ist abgelaufen",
       "payment_pending": "Deine Zahlung wurde noch nicht abgeschlossen. Du kannst deine Auswahl überprüfen und es erneut versuchen.",
@@ -750,7 +750,25 @@
     },
     "participant_preview": {
       "notice": "Vorschau: Du siehst diese Seite als Teilnehmer:in.",
-      "end": "Vorschau beenden"
+      "end": "Vorschau beenden",
+      "errors": {
+        "TEST_ENROLLMENT_FAILED": "Die Vorschau konnte nicht beendet werden. Bitte versuche es später noch einmal.",
+        "TEST_ENROLLMENT_UNAUTHORIZED": "Nur Dozierende dieses Kurses können die Teilnehmer:innen-Ansicht nutzen.",
+        "TEST_ENROLLMENT_ALREADY_PARTICIPANT": "Du bist in diesem Kurs regulär angemeldet, es gibt also keine Vorschau zu beenden.",
+        "TEST_ENROLLMENT_COURSE_NOT_FOUND": "Dieser Kurs existiert nicht mehr.",
+        "TEST_ENROLLMENT_INVALID_INPUT": "Die Anfrage war fehlerhaft."
+      }
+    },
+    "ParticipationExitButton": {
+      "cancel_participation": "Anmeldung stornieren",
+      "abort_participation": "Teilnahme abbrechen",
+      "cancel_participation_confirm": "Möchtest du deine Anmeldung für „{title}“ wirklich stornieren? Dein Platz wird dann wieder frei.",
+      "abort_participation_confirm": "Möchtest du deine Teilnahme an „{title}“ wirklich abbrechen?",
+      "exit_failed": "Deine Anmeldung konnte gerade nicht geändert werden. Bitte versuche es erneut."
+    },
+    "CourseContent": {
+      "cancel_success_message": "Deine Anmeldung wurde storniert.",
+      "abort_success_message": "Deine Teilnahme wurde abgebrochen."
     }
   },
   "coursePage": {
@@ -1841,6 +1859,14 @@
         "review_button": "Anwesenheitsdaten ansehen",
         "no_data": "Keine Anwesenheitsdaten vorhanden",
         "dialog_title": "Anwesenheitsdaten"
+      },
+      "notify_participants": {
+        "title": "Teilnehmende informieren?",
+        "question": "{sessions, plural, one {Der Termin dieser Session wurde geändert.} other {Die Termine von # Sessions wurden geändert.}} {participants, plural, one {Soll die angemeldete Person per E-Mail darüber informiert werden?} other {Sollen die # angemeldeten Personen per E-Mail darüber informiert werden?}}",
+        "confirm": "Informieren",
+        "cancel": "Nicht informieren",
+        "sent": "Die Teilnehmenden wurden informiert.",
+        "failed": "Die Teilnehmenden konnten nicht informiert werden."
       }
     },
     "location": {

@@ -174,8 +174,8 @@
       "upload_error": "Error uploading image",
       "organization_logo": "Organization logo",
       "change_logo": "Change logo",
-      "view_full_size": "View full size",
-      "close": "Close",
+      "add_logo": "Add logo",
+      "logo_unavailable": "Logo could not be loaded",
       "logo_permission_denied": "This organization already has an admin managing settings. Ask them to update the logo."
     },
     "file_upload": {
@@ -636,7 +636,7 @@
       "applied": "Your application is under review",
       "aborted": "You aborted the participation",
       "rejected": "Unfortunately, your application has been rejected",
-      "cancelled": "Your invitation has been cancelled",
+      "cancelled": "You cancelled your registration",
       "invited": "You have been invited and need to confirm your participation",
       "invitation_expired": "Your invitation has expired",
       "payment_pending": "Your payment has not been completed yet. You can review your selections and try again.",
@@ -750,7 +750,25 @@
     },
     "participant_preview": {
       "notice": "Preview: you are seeing this page as a participant.",
-      "end": "End preview"
+      "end": "End preview",
+      "errors": {
+        "TEST_ENROLLMENT_FAILED": "The preview could not be ended. Please try again later.",
+        "TEST_ENROLLMENT_UNAUTHORIZED": "Only instructors of this course can use the participant view.",
+        "TEST_ENROLLMENT_ALREADY_PARTICIPANT": "You are enrolled in this course for real, so there is no preview to end.",
+        "TEST_ENROLLMENT_COURSE_NOT_FOUND": "This course no longer exists.",
+        "TEST_ENROLLMENT_INVALID_INPUT": "The request was malformed."
+      }
+    },
+    "ParticipationExitButton": {
+      "cancel_participation": "Cancel registration",
+      "abort_participation": "Abort participation",
+      "cancel_participation_confirm": "Do you really want to cancel your registration for “{title}”? Your place will be released.",
+      "abort_participation_confirm": "Do you really want to abort your participation in “{title}”?",
+      "exit_failed": "Your registration could not be changed right now. Please try again."
+    },
+    "CourseContent": {
+      "cancel_success_message": "Your registration has been cancelled.",
+      "abort_success_message": "Your participation has been aborted."
     }
   },
   "coursePage": {
@@ -1859,6 +1877,14 @@
         "review_button": "Review attendance data",
         "no_data": "No attendance data available",
         "dialog_title": "Attendance data"
+      },
+      "notify_participants": {
+        "title": "Inform participants?",
+        "question": "{sessions, plural, one {This session's date or time has changed.} other {The dates or times of # sessions have changed.}} {participants, plural, one {Should the registered participant be informed by email?} other {Should the # registered participants be informed by email?}}",
+        "confirm": "Inform",
+        "cancel": "Don't inform",
+        "sent": "The participants have been informed.",
+        "failed": "The participants could not be informed."
       }
     },
     "location": {

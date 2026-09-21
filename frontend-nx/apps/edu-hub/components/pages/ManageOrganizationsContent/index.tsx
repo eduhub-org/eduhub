@@ -51,7 +51,7 @@ import { MergeOrganizationsDialog } from './MergeOrganizationsDialog';
 import { ApiKeyManager } from './ApiKeyManager';
 import { GhostNewsletterCredentialManager } from './GhostNewsletterCredentialManager';
 import CommonPageHeader from '../../common/CommonPageHeader';
-import { useTableGrid } from '../../common/TableGrid/hooks';
+import { useDeferredBulkAction, useTableGrid } from '../../common/TableGrid/hooks';
 import { createMultiWordSearchCondition } from '../../common/TableGrid/utils';
 
 type ExpandableRowProps = {
@@ -418,17 +418,29 @@ const ManageOrganizationsContent: FC<ManageOrganizationsContentProps> = ({
     [t]
   );
 
-  const handleBulkAction = useCallback((action: string, selectedRows: OrganizationList_Organization[]) => {
-    if (selectedRows.length === 0) return;
+  // Both bulk actions finish in a dialog, so the selection is only released once that dialog
+  // reports success.
+  const dialogBulkAction = useDeferredBulkAction();
 
-    if (action === 'delete') {
-      setBulkActionDialogOpen(true);
-      setSelectedRowsForBulkAction(selectedRows);
-    } else if (action === 'merge') {
-      setMergeDialogOpen(true);
-      setSelectedRowsForBulkAction(selectedRows);
-    }
-  }, []);
+  const handleBulkAction = useCallback(
+    (action: string, selectedRows: OrganizationList_Organization[]) => {
+      // Nothing happened, so the rows stay selected.
+      if (selectedRows.length === 0) return false;
+
+      if (action === 'delete') {
+        setBulkActionDialogOpen(true);
+        setSelectedRowsForBulkAction(selectedRows);
+        return dialogBulkAction.start();
+      }
+      if (action === 'merge') {
+        setMergeDialogOpen(true);
+        setSelectedRowsForBulkAction(selectedRows);
+        return dialogBulkAction.start();
+      }
+      return false;
+    },
+    [dialogBulkAction]
+  );
 
   const handleMergeConfirmation = useCallback(
     async (targetOrgId: string, targetOrg: OrganizationList_Organization) => {
@@ -631,6 +643,7 @@ const ManageOrganizationsContent: FC<ManageOrganizationsContentProps> = ({
 
         // Optional: Show success message
         console.log(`Successfully merged ${orgsToMerge.length} organizations into ${targetOrg.name}`);
+        dialogBulkAction.succeed();
       } catch (error) {
         console.error('Error merging organizations:', error);
         if (error instanceof ApolloError) {
@@ -638,10 +651,13 @@ const ManageOrganizationsContent: FC<ManageOrganizationsContentProps> = ({
         } else {
           setError(t('error.merge_failed'));
         }
+        // The merge failed, so the rows stay selected for a retry.
+        dialogBulkAction.fail();
       }
       setSelectedRowsForBulkAction([]);
     },
     [
+      dialogBulkAction,
       selectedRowsForBulkAction,
       deleteOrganization,
       updateOrganizationAliases,
@@ -666,6 +682,7 @@ const ManageOrganizationsContent: FC<ManageOrganizationsContentProps> = ({
     try {
       await Promise.all(selectedRowsForBulkAction.map((org) => deleteOrganization({ variables: { id: org.id } })));
       debouncedRefetch();
+      dialogBulkAction.succeed();
     } catch (error) {
       console.error('Error deleting organizations:', error);
       if (error instanceof ApolloError) {
@@ -673,9 +690,11 @@ const ManageOrganizationsContent: FC<ManageOrganizationsContentProps> = ({
       } else {
         setError(t('error.bulk_delete_failed'));
       }
+      // The deletion failed, so the rows stay selected for a retry.
+      dialogBulkAction.fail();
     }
     setSelectedRowsForBulkAction([]);
-  }, [selectedRowsForBulkAction, deleteOrganization, debouncedRefetch, t]);
+  }, [dialogBulkAction, selectedRowsForBulkAction, deleteOrganization, debouncedRefetch, t]);
 
   const table = (
     <>
@@ -716,6 +735,8 @@ const ManageOrganizationsContent: FC<ManageOrganizationsContentProps> = ({
             onClose={() => {
               setBulkActionDialogOpen(false);
               setSelectedRowsForBulkAction([]);
+              // Cancelled: the rows stay selected.
+              dialogBulkAction.fail();
             }}
           />
           <MergeOrganizationsDialog
@@ -723,6 +744,8 @@ const ManageOrganizationsContent: FC<ManageOrganizationsContentProps> = ({
             onClose={() => {
               setMergeDialogOpen(false);
               setSelectedRowsForBulkAction([]);
+              // Cancelled: the rows stay selected.
+              dialogBulkAction.fail();
             }}
             onConfirm={handleMergeConfirmation}
             selectedOrganizations={selectedRowsForBulkAction}
