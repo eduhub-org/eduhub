@@ -12,9 +12,13 @@ import { useViewAs } from './viewAs';
  * follows without a change of its own.
  */
 export const useUserId = () => {
-  const { userId: viewedUserId } = useViewAs();
+  const { userId: viewedUserId, asPlainUser } = useViewAs();
   const { data } = useSession();
   if (viewedUserId) return viewedUserId;
+  // Impersonating, target not resolved yet: the signed-in admin's id is the one
+  // answer that would be wrong here, since the requests built from it are
+  // already being answered as somebody else. See useCurrentUserId.
+  if (asPlainUser) return undefined;
 
   return data?.profile?.sub;
 };

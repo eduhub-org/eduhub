@@ -1,6 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, FC, ReactNode } from 'react';
 
-import { client } from '../config/apollo';
 import { setImpersonationState } from '../config/impersonationStore';
 import { IMPERSONATION_MARKER_COOKIE } from '../helpers/impersonationMarker';
 
@@ -24,14 +23,23 @@ export type ImpersonationTarget = {
 type ImpersonationContextValue = {
   /** Null unless a super-admin is currently viewing the app as someone else. */
   target: ImpersonationTarget | null;
+  /**
+   * True only while this browser carries the marker and the server has not said
+   * yet who it names. `target` is null either way, so this is what tells "not
+   * impersonating" apart from "impersonating somebody, name pending" -- and the
+   * identity hooks have to treat the second as an impersonation, because the
+   * transport already does.
+   */
   loading: boolean;
   start: (userId: string) => Promise<{ ok: boolean; error?: string }>;
   stop: () => Promise<void>;
 };
 
+// No provider means no impersonation: loading false, so the identity hooks
+// answer from the session as they always did.
 const ImpersonationContext = createContext<ImpersonationContextValue>({
   target: null,
-  loading: true,
+  loading: false,
   start: async () => ({ ok: false }),
   stop: async () => undefined,
 });
@@ -46,7 +54,6 @@ const ImpersonationContext = createContext<ImpersonationContextValue>({
  */
 export const ImpersonationProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const [target, setTarget] = useState<ImpersonationTarget | null>(null);
-  const [loading, setLoading] = useState(true);
 
   // Route through the proxy from the very first request, before the server has
   // confirmed anything. Getting this wrong fails closed: the proxy refuses a
@@ -65,12 +72,24 @@ export const ImpersonationProvider: FC<{ children: ReactNode }> = ({ children })
     return present;
   });
 
+  // Only a browser that is already routing through the proxy has anything to
+  // wait for; for everyone else there is nothing pending and the identity hooks
+  // must not be held back for even one render.
+  const [loading, setLoading] = useState(markerPresent);
+
   // Apollo caches by query, not by viewer, so anything read as one identity
   // would otherwise still be sitting there for the next one.
+  //
+  // The client is pulled in here rather than imported at the top: every identity
+  // hook reaches this module through useViewAs, so a static import would put
+  // config/apollo -- and the HTTP link it builds on import -- in the graph of
+  // anything that asks who the user is. It only belongs in the graph of the
+  // switch itself, which happens in a browser, on a click.
   const applyTarget = useCallback(async (next: ImpersonationTarget | null) => {
     setImpersonationState({ active: next !== null, targetUserId: next?.id ?? null });
     setTarget(next);
     try {
+      const { client } = await import('../config/apollo');
       await client.clearStore();
     } catch {
       /* a failed cache reset must not strand the caller mid-switch */
@@ -110,20 +129,30 @@ export const ImpersonationProvider: FC<{ children: ReactNode }> = ({ children })
     };
   }, [markerPresent]);
 
+  // Both of these answer with a value rather than a rejection. A dropped
+  // connection, or the HTML a proxy serves instead of JSON on a bad day, throws
+  // out of `fetch`/`json()` -- and callers use try/finally to clear a pending
+  // flag, so a rejection reaches nobody and the button looks like it did
+  // nothing at all. Refusal and failure are the same thing to them anyway.
   const start = useCallback(
     async (userId: string) => {
-      const response = await fetch('/api/impersonation/start', {
-        method: 'POST',
-        credentials: 'same-origin',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId }),
-      });
-      const data = await response.json();
-      if (!response.ok || !data?.active) {
-        return { ok: false, error: data?.error as string | undefined };
+      try {
+        const response = await fetch('/api/impersonation/start', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId }),
+        });
+        const data = await response.json();
+        if (!response.ok || !data?.active) {
+          return { ok: false, error: data?.error as string | undefined };
+        }
+        await applyTarget(data.target);
+        return { ok: true };
+      } catch (error) {
+        console.error('Could not start impersonation', error);
+        return { ok: false };
       }
-      await applyTarget(data.target);
-      return { ok: true };
     },
     [applyTarget]
   );
@@ -133,11 +162,16 @@ export const ImpersonationProvider: FC<{ children: ReactNode }> = ({ children })
     // stop route clears the cookie before it checks anything, so a refusal here
     // is not expected -- but hiding the banner while the cookie is still live
     // is the one outcome worth ruling out.
-    const response = await fetch('/api/impersonation/stop', {
-      method: 'POST',
-      credentials: 'same-origin',
-    });
-    if (!response.ok) return;
+    try {
+      const response = await fetch('/api/impersonation/stop', {
+        method: 'POST',
+        credentials: 'same-origin',
+      });
+      if (!response.ok) return;
+    } catch (error) {
+      console.error('Could not stop impersonation', error);
+      return;
+    }
     await applyTarget(null);
   }, [applyTarget]);
 

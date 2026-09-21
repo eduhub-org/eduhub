@@ -47,10 +47,31 @@ export const useIsOrgAdmin = (): boolean => {
 // The Hasura user id of the signed-in user (the Keycloak `sub`, mapped onto the
 // x-hasura-user-id claim), or null while signed out. Single source for the claim path.
 export const useCurrentUserId = (): string | null => {
-  const { userId: viewedUserId } = useViewAs();
+  const { userId: viewedUserId, asPlainUser } = useViewAs();
   const { data: sessionData } = useSession();
   if (viewedUserId) return viewedUserId;
+  // Viewing as someone whose id has not arrived yet. Handing back the
+  // signed-in admin's id here would build query variables for one identity
+  // while the request is answered as another, and the empty result would then
+  // sit in the cache under those variables. Null is the honest answer, and
+  // callers already handle it -- it is what a signed-out visitor gets.
+  if (asPlainUser) return null;
   return sessionData?.profile?.['https://hasura.io/jwt/claims']?.['x-hasura-user-id'] ?? null;
+};
+
+/**
+ * Whether the signed-in person holds an elevated role, read straight from the
+ * session and past the view-as masking above.
+ *
+ * For the one consumer that is not UI gating: the Plausible script, which must
+ * stay out of an admin's browser whoever they are currently viewing as. The
+ * masking exists so the management surface closes during an impersonation; an
+ * analytics tag is not a management surface, and `next/script` never removes
+ * one it has inserted, so letting it through once outlives the impersonation.
+ */
+export const useHasElevatedSessionRole = (): boolean => {
+  const { data: sessionData } = useSession();
+  return hasRole(sessionData, AuthRoles.admin) || hasRole(sessionData, AuthRoles.org_admin);
 };
 
 export const useIsUserIdInList = (allowedIds: string[]): boolean => {
