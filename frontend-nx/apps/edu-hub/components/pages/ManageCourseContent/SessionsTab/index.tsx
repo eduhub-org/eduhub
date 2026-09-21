@@ -59,6 +59,10 @@ import { Card } from '../../../common/Card';
 import { SelectUserDialog } from '../../../common/dialogs/SelectUserDialog';
 import { CreateUserDialog } from '../../../common/dialogs/CreateUserDialog';
 import AttendanceDataDialog from './AttendanceDataDialog';
+import useNotifyParticipantsPrompt from './useNotifyParticipantsPrompt';
+import { QuestionConfirmationDialog } from '../../../common/dialogs/QuestionConfirmationDialog';
+import { ErrorMessageDialog } from '../../../common/dialogs/ErrorMessageDialog';
+import NotificationSnackbar from '../../../common/dialogs/NotificationSnackbar';
 
 interface IProps {
   course: ManagedCourse_Course_by_pk;
@@ -96,6 +100,22 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
   const isEventCourse = course.Program?.type === ProgramType.EVENTS;
 
   const [searchFilter, setSearchFilter] = useState('');
+
+  // Counts CONFIRMED + REGISTERED enrollees, i.e. exactly the people the
+  // reschedule mail would reach. Already selected via AdminCourseFragment.
+  const participantCount = Number(course.publicParticipantCount ?? 0);
+  const {
+    registerChange,
+    promptOpen,
+    pendingCount,
+    sending,
+    confirm: confirmNotification,
+    cancel: cancelNotification,
+    errorMessage: notificationError,
+    clearError: clearNotificationError,
+    savedMessage: notificationSaved,
+    clearSaved: clearNotificationSaved,
+  } = useNotifyParticipantsPrompt(participantCount);
 
   const courseSessions = useMemo(() => {
     const result = [...course.Sessions];
@@ -160,16 +180,26 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
       if (event) {
         const newStartDate = copyDateTime(event, session.startDateTime);
         const newEndDate = copyDateTime(event, session.endDateTime);
-        await updateSessionStartTime({
-          variables: { sessionId: session.id, value: newStartDate.toISOString() },
-        });
-        await updateSessionEndTime({
-          variables: { sessionId: session.id, value: newEndDate.toISOString() },
-        });
-        await qResult.refetch();
+        // The two writes are not one transaction. Once the start time lands the
+        // session's timing has changed, so the prompt is owed even if the end
+        // time or the refetch then fails.
+        let timingChanged = false;
+        try {
+          await updateSessionStartTime({
+            variables: { sessionId: session.id, value: newStartDate.toISOString() },
+          });
+          timingChanged = true;
+          await updateSessionEndTime({
+            variables: { sessionId: session.id, value: newEndDate.toISOString() },
+          });
+          await qResult.refetch();
+        } finally {
+          // Both writes are one edit to the user, so this only queues one prompt.
+          if (timingChanged) registerChange(session.id);
+        }
       }
     },
-    [updateSessionStartTime, updateSessionEndTime, qResult]
+    [updateSessionStartTime, updateSessionEndTime, qResult, registerChange]
   );
 
   const handlePageSizeChange = useCallback((newSize: number) => {
@@ -232,6 +262,7 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
             identifierVariables={{ sessionId: row.original.id }}
             refetchQueries={['ManagedCourse']}
             saveAsDateTime={true}
+            onValueUpdated={() => registerChange(row.original.id)}
           />
         ),
       },
@@ -250,6 +281,7 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
             identifierVariables={{ sessionId: row.original.id }}
             refetchQueries={['ManagedCourse']}
             saveAsDateTime={true}
+            onValueUpdated={() => registerChange(row.original.id)}
           />
         ),
       },
@@ -289,7 +321,7 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
         ),
       },
     ],
-    [tCoursePage, lectureStart, lectureEnd, handleSetDate]
+    [tCoursePage, lectureStart, lectureEnd, handleSetDate, registerChange]
   );
 
   return (
@@ -321,6 +353,34 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
         onAddButtonClick={insertSession}
         addButtonText={t('add_session')}
         showGlobalSearchField={true}
+      />
+
+      <QuestionConfirmationDialog
+        open={promptOpen}
+        title={t('SessionsTab.notify_participants.title')}
+        question={t('SessionsTab.notify_participants.question', {
+          participants: participantCount,
+          sessions: pendingCount,
+        })}
+        confirmationText={t('SessionsTab.notify_participants.confirm')}
+        cancelText={t('SessionsTab.notify_participants.cancel')}
+        confirmDisabled={sending}
+        onClose={cancelNotification}
+        onConfirm={confirmNotification}
+      />
+
+      {notificationError && (
+        <ErrorMessageDialog
+          errorMessage={notificationError}
+          open={!!notificationError}
+          onClose={clearNotificationError}
+        />
+      )}
+
+      <NotificationSnackbar
+        open={!!notificationSaved}
+        onClose={clearNotificationSaved}
+        message={notificationSaved ?? ''}
       />
     </div>
   );

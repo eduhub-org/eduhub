@@ -35,11 +35,17 @@ const MAX_ROLE_REFRESH_ATTEMPTS = 2;
  * Keep `?next=` an in-app destination. It is echoed into a callbackUrl and into
  * router.replace, so an absolute or protocol-relative value would turn this
  * page — the one employers are sent to by link — into an open redirect.
+ *
+ * The default is the dashboard, not the posting form: adding a company is its
+ * own errand (most often "Weiteres Unternehmen hinzufügen"), and landing in a
+ * half-filled job offer is a non sequitur. The one flow that *did* start from
+ * the posting form passes `?next=/mein-stujo/neu` explicitly, so it still
+ * returns there.
  */
 const safeNext = (value: unknown): string =>
   typeof value === 'string' && value.startsWith('/') && !value.startsWith('//')
     ? value
-    : '/mein-stujo/neu';
+    : '/mein-stujo';
 
 /** Breathing room for the event trigger before a repeat attempt (ms). */
 const ROLE_REFRESH_BACKOFF_MS = 1500;

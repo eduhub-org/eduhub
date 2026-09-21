@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -e
+
 # proxy access to keycloak for nextauth
 socat tcp-listen:28080,reuseaddr,fork tcp:keycloak:8080 &
 # proxy access to hasura for the updateUser callback
@@ -10,8 +12,19 @@ socat tcp-listen:${DEV_SELF_PORT:-5000},reuseaddr,fork tcp:localhost:${DEV_APP_P
 socat tcp-listen:4001,reuseaddr,fork tcp:node_functions:4001 &
 # proxy access to python_functions
 socat tcp-listen:42025,reuseaddr,fork tcp:python_functions:42025 &
-# make sure all libraries exist
-yarn
+# Both frontend containers share this working tree. Lock the stable .yarn
+# directory so their dependency installations cannot modify it concurrently.
+app_name=${DEV_APP:-edu-hub}
+printf '%s [%s] Waiting for the shared Yarn install lock\n' \
+  "$(date -Iseconds)" "$app_name"
+(
+  flock -x 9
+  printf '%s [%s] Acquired the shared Yarn install lock\n' \
+    "$(date -Iseconds)" "$app_name"
+  yarn
+  printf '%s [%s] Finished the shared Yarn install\n' \
+    "$(date -Iseconds)" "$app_name"
+) 9<.yarn
 # start the development server (DEV_APP selects the app: edu-hub or stujo)
 # Force webpack: Next 16 defaults `next dev` to Turbopack, which 404s the
 # Pages Router next-auth catch-all (`/api/auth/[...nextauth]`). Production

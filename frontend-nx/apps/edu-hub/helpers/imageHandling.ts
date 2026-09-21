@@ -1,4 +1,4 @@
-import { getPublicImageUrl } from "./filehandling";
+import { getPublicImageUrl, getPublicUrl } from "./filehandling";
 
 export const getBackgroundImage = (filePath: string | null): Promise<string> => {
 
@@ -27,6 +27,8 @@ export const getBackgroundImage = (filePath: string | null): Promise<string> => 
       ? `${filePath.split('.').slice(0, -1).join('.')}-${optimalSize}.${filePath.split('.').pop()}`
       : '';
   
+    const originalImageLink = filePath ? getPublicUrl(filePath) : null;
+
     // Fallback to the original image if the optimal one is not available or to random image if none is provided
     return new Promise((resolve) => {
       const img = new Image();
@@ -37,7 +39,7 @@ export const getBackgroundImage = (filePath: string | null): Promise<string> => 
       };
 
       img.onerror = () => {
-        resolve(filePath ?? 'https://picsum.photos/1280/620');
+        resolve(originalImageLink ?? 'https://picsum.photos/1280/620');
       };
     });
   };
@@ -57,6 +59,8 @@ export const getBackgroundImage = (filePath: string | null): Promise<string> => 
       ? `${filePath.split('.').slice(0, -1).join('.')}-${tileImageSize}.${filePath.split('.').pop()}`
       : '';
   
+    const originalImageLink = filePath ? getPublicUrl(filePath) : null;
+
     // Fallback to the original image if the optimal one is not available or to random image if none is provided
     return new Promise((resolve) => {
       const img = new Image();
@@ -67,7 +71,7 @@ export const getBackgroundImage = (filePath: string | null): Promise<string> => 
       };
 
       img.onerror = () => {
-        resolve(filePath ?? 'https://picsum.photos/240/144');
+        resolve(originalImageLink ?? 'https://picsum.photos/240/144');
       };
     });
   };
