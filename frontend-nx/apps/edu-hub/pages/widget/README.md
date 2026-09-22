@@ -73,19 +73,17 @@ NEXT_PUBLIC_BASE_URL=https://edu.opencampus.sh
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `group` | number | No | Filter courses by group order (1-5). If not provided, shows all courses. |
+| `group` | number | No | Filter courses by a single course group (`CourseGroupOption` id). If not provided, shows all courses. |
+| `groups` | string | No | Comma-separated `CourseGroupOption` ids. Courses in any of the groups are included. |
 | `lang` | string | No | Language code (`de` or `en`). Defaults to German. |
 | `apiKey` | string | No | Organization API key for organization-specific filtering. Format: `edh_live_org123_sk_...` |
 
 ## Course Groups
 
-Course groups are numbered 1-5 and represent different course categories. Use the `group` parameter to filter:
-
-- `group=1` - First course group
-- `group=2` - Second course group
-- `group=3` - Third course group
-- `group=4` - Fourth course group
-- `group=5` - Fifth course group
+Course groups represent course categories (the sliders configured in the admin
+area). The `group` / `groups` parameters take the group's **id** (not its slider
+position), e.g. `group=7` shows the courses of the `CourseGroupOption` with id 7.
+Groups based on a program type include all published courses of that type.
 
 ## API Key Authentication
 
@@ -224,7 +222,7 @@ Uses the same parameters as the course widget:
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `group` | number | No | Filter by course group order (1–5). If not provided, shows all home-eligible projects. |
+| `group` | number | No | Filter by a single course group (`CourseGroupOption` id). If not provided, shows all home-eligible projects. |
 | `groups` | string | No | Comma-separated `CourseGroupOption` ids. Projects linked to a course in any matching group are included. |
 | `locale` | string | No | Language code (`de` or `en`). Defaults to German. |
 | `apiKey` | string | No | Organization API key. When valid, only that organization's projects are shown (server-side). Format: `edh_live_org123_sk_...` |
@@ -300,7 +298,7 @@ Uses the same parameters as the project widget:
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `group` | number | No | Filter by job slider `order`. If not provided, shows all published jobs. |
+| `group` | number | No | Filter by a single JOB slider (`CourseGroupOption` id). If not provided, shows all published jobs. |
 | `groups` | string | No | Comma-separated `CourseGroupOption` ids of JOB sliders. Jobs whose type is in the union of the selected sliders' job types are included. |
 | `locale` | string | No | Language code (`de` or `en`). Defaults to German. |
 | `apiKey` | string | No | Organization API key. When valid, only that organization's postings are shown (server-side). Format: `edh_live_org123_sk_...` |
