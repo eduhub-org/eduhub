@@ -766,6 +766,17 @@ type ArchiveJobPostingResult {
 }
 
 type Mutation {
+  setJobPostingActive(jobPostingId: Int!, active: Boolean!): SetJobPostingActiveResult!
+}
+
+type SetJobPostingActiveResult {
+  success: Boolean!
+  status: String
+  error: String
+  messageKey: String
+}
+
+type Mutation {
   registerGuestForCourse(
     courseId: Int!
     firstName: String!
