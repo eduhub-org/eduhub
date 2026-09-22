@@ -35,6 +35,7 @@ type JobPosting = {
 type PostingActionsProps = {
   posting: JobPosting;
   publishing: boolean;
+  changingStatus: boolean;
   onPublish: (jobPostingId: number) => void;
   onArchive: (jobPostingId: number) => void;
   onSetActive: (jobPostingId: number, active: boolean) => void;
@@ -71,6 +72,7 @@ const formatDate = (value: string | null) =>
 const PostingActions: FC<PostingActionsProps> = ({
   posting,
   publishing,
+  changingStatus,
   onPublish,
   onArchive,
   onSetActive,
@@ -106,6 +108,7 @@ const PostingActions: FC<PostingActionsProps> = ({
       {posting.status === 'DEACTIVATED' && isWindowOpen(posting) && (
         <button
           className="stujo-btn stujo-btn--small"
+          disabled={changingStatus}
           onClick={() => onSetActive(posting.id, true)}
         >
           {t('reactivate')}
@@ -114,6 +117,7 @@ const PostingActions: FC<PostingActionsProps> = ({
       {posting.status === 'PUBLISHED' && (
         <button
           className="stujo-btn stujo-btn--small stujo-btn--ghost"
+          disabled={changingStatus}
           onClick={() => onSetActive(posting.id, false)}
         >
           {t('deactivate')}
@@ -175,6 +179,9 @@ const MeinStujo: FC<Props> = ({ portal }) => {
   const [setPostingActive] = useMutation(SET_JOB_POSTING_ACTIVE_ACTION, {
     context: ACTION_ROLE_CONTEXT,
   });
+  // Covers the mutation and the refetch after it, so a double click cannot
+  // send a second transition before the list shows the new status.
+  const [changingStatus, setChangingStatus] = useState(false);
 
   useEffect(() => {
     if (sessionStatus === 'unauthenticated') {
@@ -251,6 +258,8 @@ const MeinStujo: FC<Props> = ({ portal }) => {
   };
 
   const handleSetActive = async (jobPostingId: number, active: boolean) => {
+    if (changingStatus) return;
+    setChangingStatus(true);
     setNotice(null);
     try {
       const result = await setPostingActive({ variables: { jobPostingId, active } });
@@ -262,11 +271,14 @@ const MeinStujo: FC<Props> = ({ portal }) => {
       } else {
         setNotice(t('setActiveFailed', { error: payload?.error ?? t('unknownError') }));
       }
-      await refetch();
     } catch (error) {
       console.error('setJobPostingActive failed', error);
       setNotice(t('setActiveNetworkError'));
     }
+    // A failed refresh must not overwrite the mutation's notice: the status
+    // has already changed on the server.
+    await refetch().catch((error) => console.error('Job posting refresh failed', error));
+    setChangingStatus(false);
   };
 
   const stats = useMemo(() => {
@@ -400,6 +412,7 @@ const MeinStujo: FC<Props> = ({ portal }) => {
                   <PostingActions
                     posting={posting}
                     publishing={publishing}
+                    changingStatus={changingStatus}
                     onPublish={handlePublish}
                     onArchive={handleArchive}
                     onSetActive={handleSetActive}
@@ -441,6 +454,7 @@ const MeinStujo: FC<Props> = ({ portal }) => {
                       <PostingActions
                         posting={posting}
                         publishing={publishing}
+                        changingStatus={changingStatus}
                         onPublish={handlePublish}
                         onArchive={handleArchive}
                         onSetActive={handleSetActive}
