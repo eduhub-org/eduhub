@@ -71,6 +71,7 @@ export const MANAGED_COURSE_APPLICATIONS = gql`
     $offset: Int = 0
     $filter: CourseEnrollment_bool_exp = {}
     $order_by: [CourseEnrollment_order_by!] = [{ id: asc }]
+    $expirationCutoff: timestamptz!
   ) {
     Course_by_pk(id: $id) {
       id
@@ -132,7 +133,13 @@ export const MANAGED_COURSE_APPLICATIONS = gql`
         }
       }
       InvitedCourseEnrollments: CourseEnrollments_aggregate(
-        where: { isTest: { _eq: false }, status: { _in: [INVITED, CONFIRMED] } }
+        where: {
+          isTest: { _eq: false }
+          _or: [
+            { status: { _in: [INVITED, CONFIRMED, COMPLETED, REGISTERED, EXPIRED, ABORTED] } }
+            { status: { _eq: CANCELLED }, invitationExpirationDate: { _is_null: false } }
+          ]
+        }
       ) {
         aggregate {
           count
@@ -145,8 +152,53 @@ export const MANAGED_COURSE_APPLICATIONS = gql`
           count
         }
       }
+      RejectedCourseEnrollments: CourseEnrollments_aggregate(
+        where: { isTest: { _eq: false }, status: { _eq: REJECTED } }
+      ) {
+        aggregate {
+          count
+        }
+      }
+      # The hourly expire_invitations cron flips lapsed INVITED enrollments to
+      # EXPIRED, so between runs an invitation can be past its expiration date
+      # while still INVITED. The table marks those as expired, so the aggregate
+      # applies the same date rule to stay consistent.
+      ExpiredCourseEnrollments: CourseEnrollments_aggregate(
+        where: {
+          isTest: { _eq: false }
+          _or: [
+            { status: { _eq: EXPIRED } }
+            { status: { _eq: INVITED }, invitationExpirationDate: { _lt: $expirationCutoff } }
+          ]
+        }
+      ) {
+        aggregate {
+          count
+        }
+      }
+      AbortedCourseEnrollments: CourseEnrollments_aggregate(
+        where: { isTest: { _eq: false }, status: { _eq: ABORTED } }
+      ) {
+        aggregate {
+          count
+        }
+      }
+      PendingCourseEnrollments: CourseEnrollments_aggregate(
+        where: { isTest: { _eq: false }, status: { _in: [APPLIED, INVITED] } }
+      ) {
+        aggregate {
+          count
+        }
+      }
+      WaitlistedCourseEnrollments: CourseEnrollments_aggregate(
+        where: { isTest: { _eq: false }, status: { _eq: WAITLIST } }
+      ) {
+        aggregate {
+          count
+        }
+      }
       CancelledCourseEnrollments: CourseEnrollments_aggregate(
-        where: { isTest: { _eq: false }, status: { _in: [CANCELLED, ABORTED] } }
+        where: { isTest: { _eq: false }, status: { _eq: CANCELLED } }
       ) {
         aggregate {
           count

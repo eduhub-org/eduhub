@@ -244,6 +244,56 @@ export interface ManagedCourseApplications_Course_by_pk_ConfirmedCourseEnrollmen
   aggregate: ManagedCourseApplications_Course_by_pk_ConfirmedCourseEnrollments_aggregate | null;
 }
 
+export interface ManagedCourseApplications_Course_by_pk_RejectedCourseEnrollments_aggregate {
+  __typename: "CourseEnrollment_aggregate_fields";
+  count: number;
+}
+
+export interface ManagedCourseApplications_Course_by_pk_RejectedCourseEnrollments {
+  __typename: "CourseEnrollment_aggregate";
+  aggregate: ManagedCourseApplications_Course_by_pk_RejectedCourseEnrollments_aggregate | null;
+}
+
+export interface ManagedCourseApplications_Course_by_pk_ExpiredCourseEnrollments_aggregate {
+  __typename: "CourseEnrollment_aggregate_fields";
+  count: number;
+}
+
+export interface ManagedCourseApplications_Course_by_pk_ExpiredCourseEnrollments {
+  __typename: "CourseEnrollment_aggregate";
+  aggregate: ManagedCourseApplications_Course_by_pk_ExpiredCourseEnrollments_aggregate | null;
+}
+
+export interface ManagedCourseApplications_Course_by_pk_AbortedCourseEnrollments_aggregate {
+  __typename: "CourseEnrollment_aggregate_fields";
+  count: number;
+}
+
+export interface ManagedCourseApplications_Course_by_pk_AbortedCourseEnrollments {
+  __typename: "CourseEnrollment_aggregate";
+  aggregate: ManagedCourseApplications_Course_by_pk_AbortedCourseEnrollments_aggregate | null;
+}
+
+export interface ManagedCourseApplications_Course_by_pk_PendingCourseEnrollments_aggregate {
+  __typename: "CourseEnrollment_aggregate_fields";
+  count: number;
+}
+
+export interface ManagedCourseApplications_Course_by_pk_PendingCourseEnrollments {
+  __typename: "CourseEnrollment_aggregate";
+  aggregate: ManagedCourseApplications_Course_by_pk_PendingCourseEnrollments_aggregate | null;
+}
+
+export interface ManagedCourseApplications_Course_by_pk_WaitlistedCourseEnrollments_aggregate {
+  __typename: "CourseEnrollment_aggregate_fields";
+  count: number;
+}
+
+export interface ManagedCourseApplications_Course_by_pk_WaitlistedCourseEnrollments {
+  __typename: "CourseEnrollment_aggregate";
+  aggregate: ManagedCourseApplications_Course_by_pk_WaitlistedCourseEnrollments_aggregate | null;
+}
+
 export interface ManagedCourseApplications_Course_by_pk_CancelledCourseEnrollments_aggregate {
   __typename: "CourseEnrollment_aggregate_fields";
   count: number;
@@ -298,6 +348,26 @@ export interface ManagedCourseApplications_Course_by_pk {
   /**
    * An aggregate relationship
    */
+  RejectedCourseEnrollments: ManagedCourseApplications_Course_by_pk_RejectedCourseEnrollments;
+  /**
+   * An aggregate relationship
+   */
+  ExpiredCourseEnrollments: ManagedCourseApplications_Course_by_pk_ExpiredCourseEnrollments;
+  /**
+   * An aggregate relationship
+   */
+  AbortedCourseEnrollments: ManagedCourseApplications_Course_by_pk_AbortedCourseEnrollments;
+  /**
+   * An aggregate relationship
+   */
+  PendingCourseEnrollments: ManagedCourseApplications_Course_by_pk_PendingCourseEnrollments;
+  /**
+   * An aggregate relationship
+   */
+  WaitlistedCourseEnrollments: ManagedCourseApplications_Course_by_pk_WaitlistedCourseEnrollments;
+  /**
+   * An aggregate relationship
+   */
   CancelledCourseEnrollments: ManagedCourseApplications_Course_by_pk_CancelledCourseEnrollments;
 }
 
@@ -314,4 +384,5 @@ export interface ManagedCourseApplicationsVariables {
   offset?: number | null;
   filter?: CourseEnrollment_bool_exp | null;
   order_by?: CourseEnrollment_order_by[] | null;
+  expirationCutoff: any;
 }
