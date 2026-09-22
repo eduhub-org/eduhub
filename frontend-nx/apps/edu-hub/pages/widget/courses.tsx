@@ -90,7 +90,9 @@ const WidgetCourses: FC = () => {
 
   const isLoading =
     coursesLoading || apiKeyValidating || (selectedGroupIds.length > 0 && groupOptionsLoading);
-  const hasError = Boolean(coursesError || apiKeyError);
+  const hasError = Boolean(
+    coursesError || apiKeyError || (selectedGroupIds.length > 0 && groupOptionsError)
+  );
 
   return (
     <WidgetSliderShell

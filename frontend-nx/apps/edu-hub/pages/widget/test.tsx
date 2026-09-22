@@ -109,18 +109,14 @@ const WidgetTestPage: FC = () => {
           <h2 style={{ color: '#666', marginTop: 0 }}>Test 2: Filter by Course Group</h2>
           <div style={{ margin: '10px 0' }}>
             <label style={{ marginRight: '10px' }}>Group id:</label>
-            <select 
-              value={group} 
+            <input
+              type="number"
+              min="1"
+              placeholder="All"
+              value={group}
               onChange={(e) => setGroup(e.target.value)}
-              style={{ padding: '8px', margin: '5px', border: '1px solid #ddd', borderRadius: '4px' }}
-            >
-              <option value="">All</option>
-              <option value="1">Group id 1</option>
-              <option value="2">Group id 2</option>
-              <option value="3">Group id 3</option>
-              <option value="4">Group id 4</option>
-              <option value="5">Group id 5</option>
-            </select>
+              style={{ padding: '8px', margin: '5px', border: '1px solid #ddd', borderRadius: '4px', width: '80px' }}
+            />
             <label style={{ marginRight: '10px', marginLeft: '20px' }}>Language:</label>
             <select 
               value={lang} 

@@ -19,7 +19,8 @@ export const parseWidgetGroupIds = (
   if (!raw) return [];
   const ids = raw
     .split(',')
-    .map((value) => parseInt(value.trim(), 10))
-    .filter((value) => !isNaN(value));
+    .map((value) => value.trim())
+    .filter((value) => /^\d+$/.test(value))
+    .map(Number);
   return Array.from(new Set(ids));
 };
