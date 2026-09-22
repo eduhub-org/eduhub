@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { FC, useCallback, useMemo, useState } from 'react';
+import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { ColumnDef } from '@tanstack/react-table';
 import { useManageMutation } from '../../../hooks/authedMutation';
 import { useRoleQuery } from '../../../hooks/authedQuery';
@@ -62,7 +62,33 @@ import { MdMarkEmailRead, MdOpenInNew } from 'react-icons/md';
 import { ProgramsMenubar } from '../../layout/ProgramsMenubar';
 import type { StaticComponentProperty } from '../../../types/UIComponents';
 import { ProgramType } from '../../../types/enums';
-import { programTabLabel } from './organizationScope';
+import {
+  programTabLabel,
+  programTabStorageKey,
+  resolveProgramTab,
+  StoredProgramTab,
+} from './organizationScope';
+
+// Last selected program tab per program type and organization, so admins return to the program they
+// worked on last (see programTabStorageKey). Browser-only; losing it just falls back to the default.
+const PROGRAM_TAB_STORAGE_KEY = 'eduhub.manage.programTab.v1';
+
+const readStoredProgramTabs = (): Record<string, StoredProgramTab> => {
+  try {
+    const parsed = JSON.parse(window.localStorage.getItem(PROGRAM_TAB_STORAGE_KEY) ?? '{}');
+    return parsed && typeof parsed === 'object' ? parsed : {};
+  } catch {
+    return {};
+  }
+};
+
+const storeProgramTab = (key: string, tab: StoredProgramTab) => {
+  try {
+    window.localStorage.setItem(PROGRAM_TAB_STORAGE_KEY, JSON.stringify({ ...readStoredProgramTabs(), [key]: tab }));
+  } catch {
+    // Storage can be unavailable (private mode, blocked site data); the default tab still works.
+  }
+};
 
 interface IProps {
   programs: Programs_Program[];
@@ -253,17 +279,14 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
     manageRole
   );
 
-  // Handle program tab clicks (moved after useTableGrid to access setPageIndex)
-  const handleTabClick = useCallback(
-    (property: StaticComponentProperty) => {
+  // Select a program tab (moved after useTableGrid to access setPageIndex)
+  const applyProgramTab = useCallback(
+    (tabId: number) => {
       // Update the base filter with the new program selection. Keep program-type scope so the
       // "All" tab never leaks courses of other types.
       updateFilter({
         ...filter,
-        where:
-          property.key === allTabId
-            ? { ...programTypeWhere }
-            : { ...programTypeWhere, programId: { _eq: property.key } },
+        where: tabId === allTabId ? { ...programTypeWhere } : { ...programTypeWhere, programId: { _eq: tabId } },
       });
       // Reset pagination state when switching programs
       setPageIndex(0);
@@ -271,6 +294,50 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
     },
     [filter, updateFilter, allTabId, setPageIndex, programTypeWhere]
   );
+
+  const programTabKey = programTabStorageKey(programType, organizationId);
+
+  const handleTabClick = useCallback(
+    (property: StaticComponentProperty) => {
+      const tabId = property.key;
+      applyProgramTab(tabId);
+      storeProgramTab(programTabKey, tabId === allTabId ? 'all' : tabId);
+    },
+    [applyProgramTab, programTabKey, allTabId]
+  );
+
+  // Restore the tab remembered for this program type and organization. Read after mount (not during
+  // render) because localStorage is browser-only; runs once per mount — an organization change
+  // remounts this component (see ProgramManagementDashboard).
+  const [programTabRestored, setProgramTabRestored] = useState(false);
+  useEffect(() => {
+    if (programTabRestored) {
+      return;
+    }
+    setProgramTabRestored(true);
+    // Without tabs (a single program) there is nothing to switch back to, so keep the default.
+    if (programs.length <= 1) {
+      return;
+    }
+    const tabId = resolveProgramTab(
+      readStoredProgramTabs()[programTabKey],
+      menubarPrograms.map((program) => program.id),
+      allTabId,
+      defaultProgramId
+    );
+    if (tabId !== undefined && tabId !== currentProgramId) {
+      applyProgramTab(tabId);
+    }
+  }, [
+    programTabRestored,
+    programs.length,
+    programTabKey,
+    menubarPrograms,
+    allTabId,
+    defaultProgramId,
+    currentProgramId,
+    applyProgramTab,
+  ]);
 
   // Dialog state for program selection
   const [showProgramDialog, setShowProgramDialog] = useState(false);

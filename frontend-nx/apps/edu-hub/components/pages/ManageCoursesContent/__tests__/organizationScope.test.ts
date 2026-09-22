@@ -1,4 +1,10 @@
-import { organizationScopeOptions, programTabLabel, resolveOrganizationScope } from '../organizationScope';
+import {
+  organizationScopeOptions,
+  programTabLabel,
+  programTabStorageKey,
+  resolveOrganizationScope,
+  resolveProgramTab,
+} from '../organizationScope';
 
 const program = (id: number, name: string) => ({ Organization: { id, name } });
 
@@ -81,5 +87,33 @@ describe('programTabLabel', () => {
 
   it('adds the program name when the organization has several programs', () => {
     expect(programTabLabel(programs[0], programs)).toBe('EduHub Default (WS24)');
+  });
+});
+
+describe('resolveProgramTab', () => {
+  const allTabId = -1;
+  const tabIds = [11, 12, allTabId];
+
+  it('restores a remembered program that is still shown', () => {
+    expect(resolveProgramTab(12, tabIds, allTabId, 11)).toBe(12);
+  });
+
+  it('restores the remembered "All programs" tab', () => {
+    expect(resolveProgramTab('all', tabIds, allTabId, 11)).toBe(allTabId);
+  });
+
+  it('falls back when the remembered program is no longer shown', () => {
+    expect(resolveProgramTab(99, tabIds, allTabId, 11)).toBe(11);
+  });
+
+  it('falls back when nothing is remembered', () => {
+    expect(resolveProgramTab(undefined, tabIds, allTabId, 11)).toBe(11);
+  });
+});
+
+describe('programTabStorageKey', () => {
+  it('is specific to program type and organization', () => {
+    expect(programTabStorageKey('COURSES', 0)).toBe('COURSES:0');
+    expect(programTabStorageKey('EVENTS', null)).toBe('EVENTS:all');
   });
 });

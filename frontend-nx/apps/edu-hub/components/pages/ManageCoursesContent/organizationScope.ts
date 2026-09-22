@@ -88,3 +88,26 @@ export const programTabLabel = (program: TabProgram, programs: TabProgram[]): st
   const programsOfOrganization = programs.filter((p) => p.Organization?.id === organizationId).length;
   return programsOfOrganization === 1 ? program.Organization.name : `${program.Organization.name} (${programName})`;
 };
+
+/** Remembered program tab: a program id, or "all" for the "All programs" tab. */
+export type StoredProgramTab = number | 'all';
+
+/** Key of the remembered program tab within the per-browser map, one per program type and organization. */
+export const programTabStorageKey = (programType: string, organizationId: number | null): string =>
+  `${programType}:${organizationId ?? 'all'}`;
+
+/**
+ * The tab to select: the remembered one if it is still among the visible tabs (a program may have
+ * been deleted or dropped out of the most recent ones), otherwise the fallback.
+ */
+export const resolveProgramTab = (
+  stored: StoredProgramTab | null | undefined,
+  tabIds: number[],
+  allTabId: number,
+  fallbackId: number | undefined
+): number | undefined => {
+  if (stored === 'all') {
+    return tabIds.includes(allTabId) ? allTabId : fallbackId;
+  }
+  return typeof stored === 'number' && tabIds.includes(stored) ? stored : fallbackId;
+};
