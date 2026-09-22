@@ -1225,6 +1225,7 @@ export enum JobPostingStatus_constraint {
 
 export enum JobPostingStatus_enum {
   ARCHIVED = "ARCHIVED",
+  DEACTIVATED = "DEACTIVATED",
   DRAFT = "DRAFT",
   EXPIRED = "EXPIRED",
   PENDING_PAYMENT = "PENDING_PAYMENT",

@@ -13,6 +13,7 @@ import {
   ARCHIVE_JOB_POSTING_ACTION,
   MY_JOB_POSTINGS,
   PUBLISH_JOB_POSTING_ACTION,
+  SET_JOB_POSTING_ACTIVE_ACTION,
   useEmployerRoleContext,
 } from '../../lib/employer';
 import { useEmployerOrganization } from '../../lib/useEmployerOrganization';
@@ -36,6 +37,7 @@ type PostingActionsProps = {
   publishing: boolean;
   onPublish: (jobPostingId: number) => void;
   onArchive: (jobPostingId: number) => void;
+  onSetActive: (jobPostingId: number, active: boolean) => void;
 };
 
 // Status label text lives in the `meinStujo.status` translation namespace;
@@ -46,7 +48,17 @@ const STATUS_CLASSNAMES: Record<string, string> = {
   DRAFT: 'stujo-chip stujo-chip--grey',
   PENDING_PAYMENT: 'stujo-chip stujo-chip--yellow',
   ARCHIVED: 'stujo-chip stujo-chip--grey',
+  DEACTIVATED: 'stujo-chip stujo-chip--yellow',
 };
+
+// The publication window keeps running while a posting is deactivated, so it
+// can only be reactivated before its original expiry date. Afterwards it is
+// re-posted like an expired one.
+const isWindowOpen = (posting: JobPosting) =>
+  Boolean(posting.expiresAt) && new Date(posting.expiresAt as string) > new Date();
+
+const canRepost = (posting: JobPosting) =>
+  posting.status === 'EXPIRED' || (posting.status === 'DEACTIVATED' && !isWindowOpen(posting));
 
 // Pin the timezone so server (UTC) and client (local) render the same
 // calendar day; otherwise timestamps near midnight UTC hydrate as off-by-one
@@ -61,6 +73,7 @@ const PostingActions: FC<PostingActionsProps> = ({
   publishing,
   onPublish,
   onArchive,
+  onSetActive,
 }) => {
   const t = useTranslations('meinStujo');
 
@@ -81,7 +94,7 @@ const PostingActions: FC<PostingActionsProps> = ({
           {t('publish')}
         </button>
       )}
-      {posting.status === 'EXPIRED' && (
+      {canRepost(posting) && (
         <button
           className="stujo-btn stujo-btn--small"
           disabled={publishing}
@@ -90,7 +103,23 @@ const PostingActions: FC<PostingActionsProps> = ({
           {t('repost')}
         </button>
       )}
+      {posting.status === 'DEACTIVATED' && isWindowOpen(posting) && (
+        <button
+          className="stujo-btn stujo-btn--small"
+          onClick={() => onSetActive(posting.id, true)}
+        >
+          {t('reactivate')}
+        </button>
+      )}
       {posting.status === 'PUBLISHED' && (
+        <button
+          className="stujo-btn stujo-btn--small stujo-btn--ghost"
+          onClick={() => onSetActive(posting.id, false)}
+        >
+          {t('deactivate')}
+        </button>
+      )}
+      {(posting.status === 'PUBLISHED' || posting.status === 'DEACTIVATED') && (
         <button
           className="stujo-btn stujo-btn--small stujo-btn--ghost"
           onClick={() => onArchive(posting.id)}
@@ -104,7 +133,8 @@ const PostingActions: FC<PostingActionsProps> = ({
 
 /**
  * Employer dashboard ("Mein StuJo") — postings table, stats and the
- * publish/archive/re-post actions, per design/stujo-design.pen.
+ * publish/deactivate/reactivate/archive/re-post actions, per
+ * design/stujo-design.pen.
  */
 const MeinStujo: FC<Props> = ({ portal }) => {
   const t = useTranslations('meinStujo');
@@ -142,6 +172,9 @@ const MeinStujo: FC<Props> = ({ portal }) => {
   const [archivePosting] = useMutation(ARCHIVE_JOB_POSTING_ACTION, {
     context: ACTION_ROLE_CONTEXT,
   });
+  const [setPostingActive] = useMutation(SET_JOB_POSTING_ACTIVE_ACTION, {
+    context: ACTION_ROLE_CONTEXT,
+  });
 
   useEffect(() => {
     if (sessionStatus === 'unauthenticated') {
@@ -166,7 +199,7 @@ const MeinStujo: FC<Props> = ({ portal }) => {
     if (!repostId || !data?.JobPosting) return;
     const posting = data.JobPosting.find((p: any) => p.id === repostId);
     router.replace('/mein-stujo', undefined, { shallow: true });
-    if (posting && ['EXPIRED', 'DRAFT', 'PENDING_PAYMENT'].includes(posting.status)) {
+    if (posting && (['DRAFT', 'PENDING_PAYMENT'].includes(posting.status) || canRepost(posting))) {
       handlePublish(repostId);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -214,6 +247,25 @@ const MeinStujo: FC<Props> = ({ portal }) => {
     } catch (error) {
       console.error('archiveJobPosting failed', error);
       setNotice(t('archiveNetworkError'));
+    }
+  };
+
+  const handleSetActive = async (jobPostingId: number, active: boolean) => {
+    setNotice(null);
+    try {
+      const result = await setPostingActive({ variables: { jobPostingId, active } });
+      const payload = result.data?.setJobPostingActive;
+      if (payload?.success) {
+        setNotice(active ? t('noticeReactivated') : t('noticeDeactivated'));
+      } else if (payload?.messageKey === 'WINDOW_EXPIRED') {
+        setNotice(t('reactivateWindowExpired'));
+      } else {
+        setNotice(t('setActiveFailed', { error: payload?.error ?? t('unknownError') }));
+      }
+      await refetch();
+    } catch (error) {
+      console.error('setJobPostingActive failed', error);
+      setNotice(t('setActiveNetworkError'));
     }
   };
 
@@ -350,6 +402,7 @@ const MeinStujo: FC<Props> = ({ portal }) => {
                     publishing={publishing}
                     onPublish={handlePublish}
                     onArchive={handleArchive}
+                    onSetActive={handleSetActive}
                   />
                 </li>
               );
@@ -390,6 +443,7 @@ const MeinStujo: FC<Props> = ({ portal }) => {
                         publishing={publishing}
                         onPublish={handlePublish}
                         onArchive={handleArchive}
+                        onSetActive={handleSetActive}
                       />
                     </td>
                   </tr>
