@@ -193,10 +193,12 @@ export const UPDATE_ORGANIZATION_ADMIN_ORGANIZATION_ID = gql`
 
 // Capability flags on the current user's OrganizationAdmin grants. Run under org_admin so Hasura
 // returns the caller's own rows. Used for menu/page visibility: show Courses/Events/Degrees/Settings
-// when any grant carries the matching canManage* flag.
+// when any grant carries the matching canManage* flag. Ordered oldest first, so the first row is the
+// organization the admin was initially granted (the default scope of the program dashboards).
 export const MY_ORG_ADMIN_CAPABILITIES = gql`
   query MyOrgAdminCapabilities($userId: uuid!) {
-    OrganizationAdmin(where: { userId: { _eq: $userId } }) {
+    OrganizationAdmin(where: { userId: { _eq: $userId } }, order_by: [{ created_at: asc }, { id: asc }]) {
+      organizationId
       canManageCourses
       canManageEvents
       canManageDegrees

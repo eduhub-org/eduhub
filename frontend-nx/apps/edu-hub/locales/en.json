@@ -1125,6 +1125,10 @@
     },
     "organization_scope_label": "Organization",
     "all_organizations_scope": "All organizations",
+    "add_disabled_hint": {
+      "select_organization": "Select an organization to add a new offering.",
+      "select_program": "Select a program to add a new offering."
+    },
     "error_loading_programs": "The programs could not be loaded. Please try again later.",
     "empty_state": {
       "events": "No events programs exist yet. Ask a platform admin to set up an events program for your organization before you can manage events here.",

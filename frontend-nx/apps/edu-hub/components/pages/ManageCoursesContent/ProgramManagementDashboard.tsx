@@ -4,56 +4,64 @@ import { useTranslations } from 'next-intl';
 import CommonPageHeader from '../../common/CommonPageHeader';
 import Loading from '../../common/Loading';
 import DropDownSelector from '../../inputs/DropDownSelector';
-import { useManageQuery } from '../../../hooks/authedQuery';
-import { useIsAdmin } from '../../../hooks/authentication';
+import { useManageQuery, useOrgAdminQuery } from '../../../hooks/authedQuery';
+import { useIsAdmin, useIsOrgAdmin } from '../../../hooks/authentication';
 import { useManageProgramWhere } from '../../../hooks/manageScope';
+import { useUserId } from '../../../hooks/user';
+import { MY_ORG_ADMIN_CAPABILITIES } from '../../../queries/organizationAdmin';
 import { PROGRAMS_WITH_MINIMUM_PROPERTIES } from '../../../queries/programList';
+import { MyOrgAdminCapabilities } from '../../../queries/__generated__/MyOrgAdminCapabilities';
 import { Programs } from '../../../queries/__generated__/Programs';
 import { ProgramType } from '../../../types/enums';
 import { programTypeMessageKey } from '../../../helpers/programType';
 import { Program_bool_exp } from '../../../__generated__/globalTypes';
 import ManageCoursesContent from './index';
-import { organizationScopeOptions, resolveOrganizationScope } from './organizationScope';
+import {
+  DEFAULT_ORGANIZATION_ID,
+  organizationScopeOptions,
+  resolveOrganizationScope,
+  StoredOrganizationScope,
+} from './organizationScope';
 
 interface ProgramManagementDashboardProps {
   programType: ProgramType;
 }
 
 // The chosen organization is remembered across the Courses/Degrees/Events screens (and reloads), so
-// a super-admin does not have to re-pick it on every tab. "All organizations" is stored explicitly
-// so it is not confused with "nothing chosen yet".
-const ORGANIZATION_SCOPE_STORAGE_KEY = 'eduhub.manage.programOrganizationScope';
+// an admin does not have to re-pick it on every tab. "All organizations" is stored explicitly so it
+// is not confused with "nothing chosen yet". The key was versioned when "nothing chosen" stopped
+// meaning "all organizations", so a stale "all" from that time does not override the new default.
+const ORGANIZATION_SCOPE_STORAGE_KEY = 'eduhub.manage.programOrganizationScope.v2';
 const ALL_ORGANIZATIONS = 'all';
 
 /**
- * Organization scope of the program dashboards. `null` means "all organizations".
+ * Remembered organization scope of the program dashboards (see StoredOrganizationScope).
  *
  * The stored value is read after mount rather than during render: the management pages are
  * server-rendered and localStorage is browser-only, so reading it while rendering would make the
  * first client render differ from the server markup.
  */
-const useStoredOrganizationScope = (enabled: boolean) => {
-  const [organizationId, setOrganizationId] = useState<number | null>(null);
+const useStoredOrganizationScope = () => {
+  const [storedScope, setStoredScope] = useState<StoredOrganizationScope>(null);
 
   useEffect(() => {
-    if (!enabled) {
-      return;
-    }
     try {
       const stored = window.localStorage.getItem(ORGANIZATION_SCOPE_STORAGE_KEY);
-      if (stored && stored !== ALL_ORGANIZATIONS) {
+      if (stored === ALL_ORGANIZATIONS) {
+        setStoredScope(ALL_ORGANIZATIONS);
+      } else if (stored) {
         const parsed = Number(stored);
         if (Number.isInteger(parsed)) {
-          setOrganizationId(parsed);
+          setStoredScope(parsed);
         }
       }
     } catch {
       // Storage can be unavailable (private mode, blocked site data); the default scope still works.
     }
-  }, [enabled]);
+  }, []);
 
   const selectOrganization = useCallback((next: number | null) => {
-    setOrganizationId(next);
+    setStoredScope(next === null ? ALL_ORGANIZATIONS : next);
     try {
       window.localStorage.setItem(
         ORGANIZATION_SCOPE_STORAGE_KEY,
@@ -64,7 +72,27 @@ const useStoredOrganizationScope = (enabled: boolean) => {
     }
   }, []);
 
-  return [organizationId, selectOrganization] as const;
+  return [storedScope, selectOrganization] as const;
+};
+
+/**
+ * Organization of the current org admin's oldest grant — the organization they were initially given
+ * access to. Null for super-admins (who usually hold no grants) and while loading.
+ */
+const useInitialOrganizationId = (): { initialOrganizationId: number | null; loading: boolean } => {
+  const isOrgAdmin = useIsOrgAdmin();
+  const isAdmin = useIsAdmin();
+  const userId = useUserId();
+  const skip = isAdmin || !isOrgAdmin || !userId;
+  const { data, loading } = useOrgAdminQuery<MyOrgAdminCapabilities>(MY_ORG_ADMIN_CAPABILITIES, {
+    variables: { userId },
+    skip,
+  });
+  return {
+    initialOrganizationId: data?.OrganizationAdmin?.[0]?.organizationId ?? null,
+    // An org admin whose user id is not known yet has not started the query either.
+    loading: !isAdmin && isOrgAdmin && (!userId || loading),
+  };
 };
 
 const ProgramManagementDashboard: FC<ProgramManagementDashboardProps> = ({ programType }) => {
@@ -88,7 +116,8 @@ const ProgramManagementDashboard: FC<ProgramManagementDashboardProps> = ({ progr
     variables: { where },
   });
 
-  const [storedOrganizationId, selectOrganization] = useStoredOrganizationScope(isAdmin);
+  const [storedScope, selectOrganization] = useStoredOrganizationScope();
+  const { initialOrganizationId, loading: initialOrganizationLoading } = useInitialOrganizationId();
 
   const headline = useMemo(() => {
     switch (programType) {
@@ -105,14 +134,18 @@ const ProgramManagementDashboard: FC<ProgramManagementDashboardProps> = ({ progr
 
   const organizationOptions = useMemo(() => organizationScopeOptions(allPrograms), [allPrograms]);
 
-  // A super-admin sees the programs of every organization at once, which makes the program tabs
-  // unusable as soon as more than one organization runs programs. The selector narrows them (and
-  // the course list below) to a single organization. Org admins are already scoped by Hasura.
-  const showOrganizationSelector = isAdmin && organizationOptions.length > 1;
+  // Admins who see the programs of more than one organization (every super-admin, and org admins of
+  // several organizations) pick one organization at a time; the program tabs and the course list
+  // below are narrowed to it. Only super-admins may additionally look at all organizations at once.
+  // New offerings can only be created while a single organization is in scope.
+  const showOrganizationSelector = organizationOptions.length > 1;
+  const allowAllOrganizations = isAdmin && showOrganizationSelector;
 
-  const organizationId = showOrganizationSelector
-    ? resolveOrganizationScope(storedOrganizationId, organizationOptions)
-    : null;
+  // Null only when a super-admin explicitly chose "all organizations" (or nothing is visible).
+  const organizationId = resolveOrganizationScope(storedScope, organizationOptions, {
+    allowAll: allowAllOrganizations,
+    initialOrganizationId,
+  });
 
   const programs = useMemo(
     () =>
@@ -135,7 +168,7 @@ const ProgramManagementDashboard: FC<ProgramManagementDashboardProps> = ({ progr
         value={organizationId === null ? '' : String(organizationId)}
         options={organizationOptions}
         searchable
-        nullable
+        nullable={allowAllOrganizations}
         nullableLabel={t('all_organizations_scope')}
         onValueUpdated={handleOrganizationChange}
       />
@@ -143,7 +176,14 @@ const ProgramManagementDashboard: FC<ProgramManagementDashboardProps> = ({ progr
   );
 
   const body = () => {
-    if (programListRequest.loading) {
+    // Until an org admin's initial grant is known, the fallback organization may not be the one the
+    // dashboard settles on — so do not render (and allow creating offerings in) it. Not needed when
+    // the default organization or a remembered one is in effect, as the grant cannot change those.
+    const waitingForInitialOrganization =
+      initialOrganizationLoading &&
+      organizationId !== DEFAULT_ORGANIZATION_ID &&
+      !(typeof storedScope === 'number' && storedScope === organizationId);
+    if (programListRequest.loading || waitingForInitialOrganization) {
       return <Loading />;
     }
     if (programListRequest.error) {
