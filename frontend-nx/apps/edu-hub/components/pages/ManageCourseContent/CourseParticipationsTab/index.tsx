@@ -575,8 +575,8 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
     };
   }, [attendanceLoading, sessions, maxMissedSessions, t]);
 
-  const columns = useMemo<ColumnDef<ExtendedEnrollment>[]>(
-    () => [
+  const columns = useMemo<ColumnDef<ExtendedEnrollment>[]>(() => {
+    const allColumns: ColumnDef<ExtendedEnrollment>[] = [
       {
         id: 'User.firstName',
         header: t('first_name'),
@@ -706,13 +706,13 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
           );
         },
       },
-    ].filter(
+    ];
+    return allColumns.filter(
       (column) =>
         course.achievementCertificatePossible ||
         (column.id !== 'achievement' && column.id !== 'achievement_cert')
-    ),
-    [t, AttendanceDotsCell, handleDotClick, course.achievementCertificatePossible]
-  );
+    );
+  }, [t, AttendanceDotsCell, handleDotClick, course.achievementCertificatePossible]);
 
   const ExpandableParticipationRow = useCallback(
     ({ row }: { row: ExtendedEnrollment }) => (
