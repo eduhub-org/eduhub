@@ -1,4 +1,4 @@
-import { organizationScopeOptions, resolveOrganizationScope } from '../organizationScope';
+import { organizationScopeOptions, programTabLabel, resolveOrganizationScope } from '../organizationScope';
 
 const program = (id: number, name: string) => ({ Organization: { id, name } });
 
@@ -24,18 +24,62 @@ describe('organizationScopeOptions', () => {
 });
 
 describe('resolveOrganizationScope', () => {
-  const options = organizationScopeOptions([program(1, 'EduHub Default'), program(2, 'Uni Kiel')]);
+  const withDefault = organizationScopeOptions([
+    program(0, 'EduHub Default'),
+    program(2, 'Uni Kiel'),
+    program(5, 'FH Kiel'),
+  ]);
+  const withoutDefault = organizationScopeOptions([program(2, 'Uni Kiel'), program(5, 'FH Kiel')]);
 
   it('keeps a remembered organization that owns programs of this type', () => {
-    expect(resolveOrganizationScope(2, options)).toBe(2);
+    expect(resolveOrganizationScope(2, withDefault)).toBe(2);
   });
 
-  it('falls back to all organizations when nothing is remembered', () => {
-    expect(resolveOrganizationScope(null, options)).toBeNull();
+  it('defaults to the EduHub default organization when nothing is remembered', () => {
+    expect(resolveOrganizationScope(null, withDefault, { initialOrganizationId: 5 })).toBe(0);
   });
 
-  it('falls back to all organizations when the remembered one owns no program of this type', () => {
+  it('defaults to the initially granted organization when the default one is not visible', () => {
+    expect(resolveOrganizationScope(null, withoutDefault, { initialOrganizationId: 2 })).toBe(2);
+  });
+
+  it('falls back to the first option when neither default applies', () => {
+    expect(resolveOrganizationScope(null, withoutDefault)).toBe(5);
+  });
+
+  it('replaces a remembered organization that owns no program of this type by the default', () => {
     // Happens when switching from Courses to Events: the organization runs courses but no events.
-    expect(resolveOrganizationScope(3, options)).toBeNull();
+    expect(resolveOrganizationScope(3, withDefault)).toBe(0);
+  });
+
+  it('honours "all organizations" only when it is allowed', () => {
+    expect(resolveOrganizationScope('all', withDefault, { allowAll: true })).toBeNull();
+    expect(resolveOrganizationScope('all', withDefault, { allowAll: false })).toBe(0);
+  });
+
+  it('returns null when there are no options', () => {
+    expect(resolveOrganizationScope(null, [])).toBeNull();
+  });
+});
+
+describe('programTabLabel', () => {
+  const tabProgram = (id: number, shortTitle: string, orgId: number, orgName: string) => ({
+    id,
+    title: `${shortTitle} long`,
+    shortTitle,
+    Organization: { id: orgId, name: orgName },
+  });
+  const programs = [
+    tabProgram(1, 'WS24', 0, 'EduHub Default'),
+    tabProgram(2, 'SS25', 0, 'EduHub Default'),
+    tabProgram(3, 'Kurse', 2, 'Uni Kiel'),
+  ];
+
+  it('shows only the organization name for its single program', () => {
+    expect(programTabLabel(programs[2], programs)).toBe('Uni Kiel');
+  });
+
+  it('adds the program name when the organization has several programs', () => {
+    expect(programTabLabel(programs[0], programs)).toBe('EduHub Default (WS24)');
   });
 });

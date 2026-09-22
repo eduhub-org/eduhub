@@ -99,6 +99,7 @@ const TableGridFilterSelect: React.FC<{ filter: TableGridFilter }> = ({ filter }
 
 const TableGrid = <T extends BaseRow,>({
   addButtonText,
+  addButtonDisabledHint,
   data,
   columns,
   deleteMutation,
@@ -440,7 +441,15 @@ const TableGrid = <T extends BaseRow,>({
         <div className="flex flex-wrap items-center gap-3">
           {onAddButtonClick && (
             <div className="text-label-primary">
-              <AddButton onClick={onAddButtonClick} title={addButtonText ?? ''} size="medium" />
+              <AddButton
+                onClick={onAddButtonClick}
+                title={addButtonText ?? ''}
+                size="medium"
+                disabled={Boolean(addButtonDisabledHint)}
+              />
+              {addButtonDisabledHint && (
+                <p className="mt-1 text-sm text-label-secondary">{addButtonDisabledHint}</p>
+              )}
             </div>
           )}
           {showCheckbox && (
