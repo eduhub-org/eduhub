@@ -16,7 +16,12 @@ import { ProgramType } from '../../../types/enums';
 import { programTypeMessageKey } from '../../../helpers/programType';
 import { Program_bool_exp } from '../../../__generated__/globalTypes';
 import ManageCoursesContent from './index';
-import { organizationScopeOptions, resolveOrganizationScope, StoredOrganizationScope } from './organizationScope';
+import {
+  DEFAULT_ORGANIZATION_ID,
+  organizationScopeOptions,
+  resolveOrganizationScope,
+  StoredOrganizationScope,
+} from './organizationScope';
 
 interface ProgramManagementDashboardProps {
   programType: ProgramType;
@@ -74,15 +79,20 @@ const useStoredOrganizationScope = () => {
  * Organization of the current org admin's oldest grant — the organization they were initially given
  * access to. Null for super-admins (who usually hold no grants) and while loading.
  */
-const useInitialOrganizationId = (): number | null => {
+const useInitialOrganizationId = (): { initialOrganizationId: number | null; loading: boolean } => {
   const isOrgAdmin = useIsOrgAdmin();
   const isAdmin = useIsAdmin();
   const userId = useUserId();
-  const { data } = useOrgAdminQuery<MyOrgAdminCapabilities>(MY_ORG_ADMIN_CAPABILITIES, {
+  const skip = isAdmin || !isOrgAdmin || !userId;
+  const { data, loading } = useOrgAdminQuery<MyOrgAdminCapabilities>(MY_ORG_ADMIN_CAPABILITIES, {
     variables: { userId },
-    skip: isAdmin || !isOrgAdmin || !userId,
+    skip,
   });
-  return data?.OrganizationAdmin?.[0]?.organizationId ?? null;
+  return {
+    initialOrganizationId: data?.OrganizationAdmin?.[0]?.organizationId ?? null,
+    // An org admin whose user id is not known yet has not started the query either.
+    loading: !isAdmin && isOrgAdmin && (!userId || loading),
+  };
 };
 
 const ProgramManagementDashboard: FC<ProgramManagementDashboardProps> = ({ programType }) => {
@@ -107,7 +117,7 @@ const ProgramManagementDashboard: FC<ProgramManagementDashboardProps> = ({ progr
   });
 
   const [storedScope, selectOrganization] = useStoredOrganizationScope();
-  const initialOrganizationId = useInitialOrganizationId();
+  const { initialOrganizationId, loading: initialOrganizationLoading } = useInitialOrganizationId();
 
   const headline = useMemo(() => {
     switch (programType) {
@@ -166,7 +176,14 @@ const ProgramManagementDashboard: FC<ProgramManagementDashboardProps> = ({ progr
   );
 
   const body = () => {
-    if (programListRequest.loading) {
+    // Until an org admin's initial grant is known, the fallback organization may not be the one the
+    // dashboard settles on — so do not render (and allow creating offerings in) it. Not needed when
+    // the default organization or a remembered one is in effect, as the grant cannot change those.
+    const waitingForInitialOrganization =
+      initialOrganizationLoading &&
+      organizationId !== DEFAULT_ORGANIZATION_ID &&
+      !(typeof storedScope === 'number' && storedScope === organizationId);
+    if (programListRequest.loading || waitingForInitialOrganization) {
       return <Loading />;
     }
     if (programListRequest.error) {
