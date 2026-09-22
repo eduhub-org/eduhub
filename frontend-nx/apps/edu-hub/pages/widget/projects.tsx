@@ -43,7 +43,7 @@ const WidgetProjects: FC = () => {
     context: WIDGET_ANONYMOUS_CONTEXT,
   });
 
-  const selectedGroupIds = useMemo(() => parseWidgetGroupIds(groups), [groups]);
+  const selectedGroupIds = useMemo(() => parseWidgetGroupIds(groups, group), [groups, group]);
 
   const {
     data: groupOptionsData,
@@ -58,18 +58,14 @@ const WidgetProjects: FC = () => {
 
   const filteredProjects = useMemo(() => {
     const projects = projectsData?.Project ?? [];
-    const groupOrder = group ? parseInt(group as string, 10) : null;
-
     return filterProjectsByWidgetGroups(projects, {
       selectedGroupIds,
-      groupOrder,
       groupOptions: groupOptionsData?.CourseGroupOption ?? [],
       groupOptionsLoading,
       groupOptionsError: Boolean(groupOptionsError),
     });
   }, [
     projectsData,
-    group,
     selectedGroupIds,
     groupOptionsData,
     groupOptionsLoading,
