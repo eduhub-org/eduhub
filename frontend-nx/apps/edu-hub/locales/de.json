@@ -1348,6 +1348,7 @@
     "participations_tab_projects_subtitle": "Vorlagen, Kopien, Autor:innen und Veröffentlichung.",
     "participations_tab_enrollments_heading": "Teilnehmende",
     "participations_tab_enrollments_subtitle": "Anwesenheit, Projektbewertung und Zertifikate.",
+    "participations_tab_enrollments_subtitle_attendance_only": "Anwesenheiten und Zertifikate.",
     "degree_participations": "Degree-Teilnahmen",
     "attendances": "Teilnahmen",
     "certificate_achievement": "Projekt",

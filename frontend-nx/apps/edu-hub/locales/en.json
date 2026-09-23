@@ -1366,6 +1366,7 @@
     "participations_tab_projects_subtitle": "Templates, copies, authors, and publishing.",
     "participations_tab_enrollments_heading": "Participants",
     "participations_tab_enrollments_subtitle": "Attendance, project grading, and certificates.",
+    "participations_tab_enrollments_subtitle_attendance_only": "Attendance and certificates.",
     "degree_participations": "Degree Participations",
     "attendances": "Attendances",
     "certificate_achievement": "Project",
