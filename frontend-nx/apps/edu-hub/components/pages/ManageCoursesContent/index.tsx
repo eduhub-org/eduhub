@@ -40,6 +40,7 @@ import { useManageCourseWhere } from '../../../hooks/manageScope';
 import { ADMIN_COURSE_LIST } from '../../../queries/courseList';
 import { GET_COURSE_TEMPLATES_COUNT } from '../../../queries/emailTemplates';
 import ExpandableCourseRow from './ExpandableCourseRow';
+import { getRegistrationFeatures } from '../ManageCourseContent/ApplicationsTab/registrationConfig';
 import { useParallelQueries } from '../../../hooks/useParallelQueries';
 import { CourseEnrollmentStatus_enum, order_by } from '../../../__generated__/globalTypes';
 import { useTranslations, useLocale } from 'next-intl';
@@ -89,6 +90,10 @@ const storeProgramTab = (key: string, tab: StoredProgramTab) => {
     // Storage can be unavailable (private mode, blocked site data); the default tab still works.
   }
 };
+
+// Courses without an application process only report confirmed participants.
+const hasApplicationProcess = (course: AdminCourseList_Course) =>
+  getRegistrationFeatures(course.registrationType).hasApplicationProcess;
 
 interface IProps {
   programs: Programs_Program[];
@@ -765,6 +770,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
 
   const getApplicationsCount = useCallback(
     (course: AdminCourseList_Course) => {
+      if (!hasApplicationProcess(course)) return '';
       const statusCounts = getStatusCounts(course);
       return Object.keys(statusCounts).reduce((sum, key) => sum + statusCounts[key], 0);
     },
@@ -781,6 +787,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
 
   const getUnratedAndRatedButNotInformed = useCallback(
     (course: AdminCourseList_Course) => {
+      if (!hasApplicationProcess(course)) return '';
       const statusCounts = getStatusCounts(course);
       const unrated = statusCounts[CourseEnrollmentStatus_enum.APPLIED] ?? 0;
       const ratedButNotInformed = statusCounts[CourseEnrollmentStatus_enum.COMPLETED] ?? 0;
