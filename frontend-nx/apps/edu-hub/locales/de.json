@@ -1109,6 +1109,10 @@
     },
     "organization_scope_label": "Organisation",
     "all_organizations_scope": "Alle Organisationen",
+    "add_disabled_hint": {
+      "select_organization": "Wähle eine Organisation aus, um ein neues Angebot hinzuzufügen.",
+      "select_program": "Wähle ein Programm aus, um ein neues Angebot hinzuzufügen."
+    },
     "error_loading_programs": "Die Programme konnten nicht geladen werden. Bitte versuche es später erneut.",
     "empty_state": {
       "events": "Es gibt noch kein Veranstaltungsprogramm. Bitte einen Plattform-Admin, ein Veranstaltungsprogramm für deine Organisation anzulegen, bevor du hier Veranstaltungen verwalten kannst.",
@@ -1344,6 +1348,7 @@
     "participations_tab_projects_subtitle": "Vorlagen, Kopien, Autor:innen und Veröffentlichung.",
     "participations_tab_enrollments_heading": "Teilnehmende",
     "participations_tab_enrollments_subtitle": "Anwesenheit, Projektbewertung und Zertifikate.",
+    "participations_tab_enrollments_subtitle_attendance_only": "Anwesenheiten und Zertifikate.",
     "degree_participations": "Degree-Teilnahmen",
     "attendances": "Teilnahmen",
     "certificate_achievement": "Projekt",

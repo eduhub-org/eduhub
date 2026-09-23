@@ -182,6 +182,19 @@ export const ARCHIVE_JOB_POSTING_ACTION = gql`
   }
 `;
 
+// Reversible counterpart to archiving: PUBLISHED <-> DEACTIVATED, allowed only
+// while the posting's publication window (expiresAt) is still open.
+export const SET_JOB_POSTING_ACTIVE_ACTION = gql`
+  mutation SetJobPostingActiveAction($jobPostingId: Int!, $active: Boolean!) {
+    setJobPostingActive(jobPostingId: $jobPostingId, active: $active) {
+      success
+      status
+      error
+      messageKey
+    }
+  }
+`;
+
 /**
  * Options for the organization picker on the onboarding page — the same shape
  * and the same generous limit as edu-hub's ORGANIZATION_OPTIONS, because the

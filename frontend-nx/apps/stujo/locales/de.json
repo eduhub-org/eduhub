@@ -121,12 +121,15 @@
     "publish": "Veröffentlichen",
     "repost": "Erneut inserieren",
     "archive": "Archivieren",
+    "deactivate": "Deaktivieren",
+    "reactivate": "Reaktivieren",
     "status": {
       "PUBLISHED": "Aktiv",
       "EXPIRED": "Abgelaufen",
       "DRAFT": "Entwurf",
       "PENDING_PAYMENT": "Zahlung offen",
-      "ARCHIVED": "Archiviert"
+      "ARCHIVED": "Archiviert",
+      "DEACTIVATED": "Deaktiviert"
     },
     "noticePaymentSuccess": "Zahlung erfolgreich – Dein Angebot ist veröffentlicht.",
     "noticePaymentCancelled": "Zahlung abgebrochen – Dein Angebot ist weiterhin als Entwurf gespeichert.",
@@ -136,6 +139,11 @@
     "publishNetworkError": "Veröffentlichen fehlgeschlagen: Netzwerkfehler.",
     "archiveFailed": "Archivieren fehlgeschlagen: {error}",
     "archiveNetworkError": "Archivieren fehlgeschlagen: Netzwerkfehler.",
+    "noticeDeactivated": "Dein Angebot ist deaktiviert. Du kannst es bis zum Ablaufdatum wieder aktivieren.",
+    "noticeReactivated": "Dein Angebot ist wieder online.",
+    "reactivateWindowExpired": "Die Laufzeit ist abgelaufen – bitte inseriere das Angebot erneut.",
+    "setActiveFailed": "Statusänderung fehlgeschlagen: {error}",
+    "setActiveNetworkError": "Statusänderung fehlgeschlagen: Netzwerkfehler.",
     "unknownError": "Unbekannter Fehler",
     "OrganizationWebsite": {
       "label": "Website",

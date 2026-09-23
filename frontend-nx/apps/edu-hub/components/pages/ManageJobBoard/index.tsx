@@ -194,6 +194,7 @@ const STATUS_STYLES: Record<string, string> = {
   PUBLISHED: 'bg-green-900/40 text-green-300',
   EXPIRED: 'bg-red-900/40 text-red-300',
   ARCHIVED: 'bg-gray-700 text-gray-300',
+  DEACTIVATED: 'bg-yellow-900/40 text-yellow-300',
   DRAFT: 'bg-gray-700 text-gray-300',
   PENDING_PAYMENT: 'bg-yellow-900/40 text-yellow-300',
 };

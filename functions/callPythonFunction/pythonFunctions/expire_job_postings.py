@@ -56,8 +56,8 @@ def _queue_mail(client, template, to, variables):
 
 def expire_job_postings(arguments):
     """
-    Flips PUBLISHED job postings whose expiresAt has passed to EXPIRED
-    (StuJo job board). Runs daily via the expire_job_postings cron trigger
+    Flips PUBLISHED and DEACTIVATED job postings whose expiresAt has passed
+    to EXPIRED (StuJo job board). Runs daily via the expire_job_postings cron trigger
     and replaces both the Rails 2-month archiver and its evergreen
     ("recurring") renewal mechanism.
 
@@ -82,12 +82,13 @@ def expire_job_postings(arguments):
         now = datetime.now(timezone.utc).isoformat()
 
         # status is a Hasura enum table (is_enum), so the GraphQL document
-        # must use enum literals (PUBLISHED / EXPIRED), not quoted strings.
+        # must use enum literals (PUBLISHED / DEACTIVATED / EXPIRED), not quoted
+        # strings. DEACTIVATED postings expire too, so they can be re-posted.
         expire_mutation = """
         mutation ExpireJobPostings($now: timestamptz!) {
             update_JobPosting(
                 where: {
-                    status: {_eq: PUBLISHED},
+                    status: {_in: [PUBLISHED, DEACTIVATED]},
                     expiresAt: {_lte: $now}
                 },
                 _set: {status: EXPIRED}
