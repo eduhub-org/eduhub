@@ -28,11 +28,10 @@ interface ProgramManagementDashboardProps {
 }
 
 // The chosen organization is remembered across the Courses/Degrees/Events screens (and reloads), so
-// an admin does not have to re-pick it on every tab. "All organizations" is stored explicitly so it
-// is not confused with "nothing chosen yet". The key was versioned when "nothing chosen" stopped
-// meaning "all organizations", so a stale "all" from that time does not override the new default.
+// an admin does not have to re-pick it on every tab. The key was versioned when "nothing chosen"
+// stopped meaning "all organizations", so a stale choice from that time does not override the
+// default. A stored "all" from the since-removed "All organizations" option is ignored when read.
 const ORGANIZATION_SCOPE_STORAGE_KEY = 'eduhub.manage.programOrganizationScope.v2';
-const ALL_ORGANIZATIONS = 'all';
 
 /**
  * Remembered organization scope of the program dashboards (see StoredOrganizationScope).
@@ -47,9 +46,7 @@ const useStoredOrganizationScope = () => {
   useEffect(() => {
     try {
       const stored = window.localStorage.getItem(ORGANIZATION_SCOPE_STORAGE_KEY);
-      if (stored === ALL_ORGANIZATIONS) {
-        setStoredScope(ALL_ORGANIZATIONS);
-      } else if (stored) {
+      if (stored) {
         const parsed = Number(stored);
         if (Number.isInteger(parsed)) {
           setStoredScope(parsed);
@@ -60,13 +57,10 @@ const useStoredOrganizationScope = () => {
     }
   }, []);
 
-  const selectOrganization = useCallback((next: number | null) => {
-    setStoredScope(next === null ? ALL_ORGANIZATIONS : next);
+  const selectOrganization = useCallback((next: number) => {
+    setStoredScope(next);
     try {
-      window.localStorage.setItem(
-        ORGANIZATION_SCOPE_STORAGE_KEY,
-        next === null ? ALL_ORGANIZATIONS : String(next)
-      );
+      window.localStorage.setItem(ORGANIZATION_SCOPE_STORAGE_KEY, String(next));
     } catch {
       // See above: losing the preference is harmless.
     }
@@ -98,7 +92,6 @@ const useInitialOrganizationId = (): { initialOrganizationId: number | null; loa
 const ProgramManagementDashboard: FC<ProgramManagementDashboardProps> = ({ programType }) => {
   const t = useTranslations('manageCourses');
   const tCoursePage = useTranslations('coursePage');
-  const isAdmin = useIsAdmin();
 
   // Org admins only see programs (and therefore courses) of organizations they administer; for
   // super-admins the where filter is empty. useManageQuery pins admin vs org_admin accordingly.
@@ -136,27 +129,23 @@ const ProgramManagementDashboard: FC<ProgramManagementDashboardProps> = ({ progr
 
   // Admins who see the programs of more than one organization (every super-admin, and org admins of
   // several organizations) pick one organization at a time; the program tabs and the course list
-  // below are narrowed to it. Only super-admins may additionally look at all organizations at once.
-  // New offerings can only be created while a single organization is in scope.
+  // below are narrowed to it.
   const showOrganizationSelector = organizationOptions.length > 1;
-  const allowAllOrganizations = isAdmin && showOrganizationSelector;
 
-  // Null only when a super-admin explicitly chose "all organizations" (or nothing is visible).
-  const organizationId = resolveOrganizationScope(storedScope, organizationOptions, {
-    allowAll: allowAllOrganizations,
-    initialOrganizationId,
-  });
+  // Null only when no program is visible at all.
+  const organizationId = resolveOrganizationScope(storedScope, organizationOptions, { initialOrganizationId });
 
   const programs = useMemo(
-    () =>
-      organizationId === null
-        ? [...allPrograms]
-        : allPrograms.filter((program) => program.organizationId === organizationId),
+    () => allPrograms.filter((program) => program.organizationId === organizationId),
     [allPrograms, organizationId]
   );
 
   const handleOrganizationChange = useCallback(
-    (value: string) => selectOrganization(value ? Number(value) : null),
+    (value: string) => {
+      if (value) {
+        selectOrganization(Number(value));
+      }
+    },
     [selectOrganization]
   );
 
@@ -168,8 +157,6 @@ const ProgramManagementDashboard: FC<ProgramManagementDashboardProps> = ({ progr
         value={organizationId === null ? '' : String(organizationId)}
         options={organizationOptions}
         searchable
-        nullable={allowAllOrganizations}
-        nullableLabel={t('all_organizations_scope')}
         onValueUpdated={handleOrganizationChange}
       />
     </div>
@@ -189,7 +176,7 @@ const ProgramManagementDashboard: FC<ProgramManagementDashboardProps> = ({ progr
     if (programListRequest.error) {
       return <div className="py-8 text-center text-error">{t('error_loading_programs')}</div>;
     }
-    if (programs.length === 0) {
+    if (organizationId === null || programs.length === 0) {
       // No program of this type is visible to the current admin yet. Org admins cannot create
       // programs from the management UI (creation is platform-admin only and always produces a
       // COURSES program owned by the default organization), so an informative empty state is shown
@@ -204,7 +191,7 @@ const ProgramManagementDashboard: FC<ProgramManagementDashboardProps> = ({ progr
       // Remounting on an organization change resets the selected program tab and the course
       // filters, which would otherwise still point at a program of the previous organization.
       <ManageCoursesContent
-        key={organizationId ?? ALL_ORGANIZATIONS}
+        key={organizationId}
         programs={programs}
         programType={programType}
         organizationId={organizationId}
