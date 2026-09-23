@@ -17,6 +17,7 @@ import {
 import { useLazyRoleQuery, useRoleQuery } from '../../../../hooks/authedQuery';
 import { MANAGED_COURSE_APPLICATIONS, MANAGED_COURSE_APPLICATION_RECIPIENTS } from '../../../../queries/course';
 import Dot from '../../../common/Dot';
+import { CourseEnrollmentStatistics } from './CourseEnrollmentStatistics';
 import { OnlyInstructor } from '../../../common/OnlyLoggedIn';
 import { useIsInstructor, useIsAdmin } from '../../../../hooks/authentication';
 import {
@@ -49,7 +50,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import Modal from '../../../common/Modal';
 import AddParticipantsForm from './AddParticipantsForm';
 import TableGrid from '../../../common/TableGrid';
-import { useTableGrid } from '../../../common/TableGrid/hooks';
+import { useDeferredBulkAction, useTableGrid } from '../../../common/TableGrid/hooks';
 import { createMultiWordSearchCondition } from '../../../common/TableGrid/utils';
 import { ColumnDef, SortingState } from '@tanstack/react-table';
 import { GoDotFill } from 'react-icons/go';
@@ -146,11 +147,17 @@ interface ApplicationsTabContentProps {
   setSorting: (sorting: SortingState | ((prev: SortingState) => SortingState)) => void;
 }
 
+// An invitation counts as expired once its expiration date is before today. The
+// expire_invitations cron only flips lapsed INVITED enrollments to EXPIRED once
+// an hour, so the same cutoff is applied client-side and passed to the expired
+// invitations aggregate to keep the table and the statistics cards in sync.
+const invitationExpirationCutoff = () => new Date(new Date().setHours(0, 0, 0, 0)).toISOString();
+
 const isExpired = (enrollment: ApplicationEnrollment) => {
   if (enrollment.invitationExpirationDate == null) {
     return false;
   }
-  return new Date(enrollment.invitationExpirationDate).setHours(0, 0, 0, 0) < new Date().setHours(0, 0, 0, 0);
+  return new Date(enrollment.invitationExpirationDate).getTime() < new Date(invitationExpirationCutoff()).getTime();
 };
 
 const isInviteEligibleEnrollment = (enrollment: ApplicationEnrollment) =>
@@ -180,7 +187,7 @@ export const ApplicationsTab: FC<IProps> = ({ course }) => {
   } = useTableGrid<ManagedCourseApplicationsVariables>({
     queryHook: useRoleQuery,
     query: MANAGED_COURSE_APPLICATIONS,
-    queryVariables: { id: course.id },
+    queryVariables: { id: course.id, expirationCutoff: invitationExpirationCutoff() },
     pageSize,
     refetchFilter: (search) => {
       const searchCondition = createMultiWordSearchCondition(search, [
@@ -274,23 +281,6 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
 
   const expandableRowWidths = useMemo(() => getExpandableRowWidths(features), [features]);
   
-  const applicationStats = useMemo(
-    () => ({
-      totalApplications: course.TotalCourseEnrollments.aggregate?.count ?? 0,
-      approvedApplications: course.ApprovedCourseEnrollments.aggregate?.count ?? 0,
-      invitedApplicants: course.InvitedCourseEnrollments.aggregate?.count ?? 0,
-      confirmedApplicants: course.ConfirmedCourseEnrollments.aggregate?.count ?? 0,
-      cancelledApplicants: course.CancelledCourseEnrollments.aggregate?.count ?? 0,
-    }),
-    [
-      course.ApprovedCourseEnrollments.aggregate?.count,
-      course.ConfirmedCourseEnrollments.aggregate?.count,
-      course.InvitedCourseEnrollments.aggregate?.count,
-      course.TotalCourseEnrollments.aggregate?.count,
-      course.CancelledCourseEnrollments.aggregate?.count,
-    ]
-  );
-
   // Evaluated fresh on every render (not memoized) so opening the modal after the first
   // session's start time has passed picks up the change without needing a refetch.
   const firstSession = course.Sessions[0];
@@ -383,6 +373,10 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
     actionType: 'selected' | 'all';
   } | null>(null);
 
+  // Sending invitations or rejections finishes in a dialog, so the selection is only released once
+  // that dialog reports success.
+  const dialogBulkAction = useDeferredBulkAction();
+
   const handleOpenInviteDialog = useCallback(
     (enrollmentIds: number[], selectedCount: number | undefined, actionType: 'selected' | 'all') => {
       const idToRow = new Map(courseEnrollments.map((e) => [e.id, e]));
@@ -393,7 +387,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
         );
       if (enrollmentsToSend.length === 0) {
         showBulkNotice(t('bulk_actions.no_eligible_invitations'));
-        return;
+        return false;
       }
       setInviteDialogData({
         enrollmentsToSend,
@@ -403,20 +397,26 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
       });
       setInviteExpireDate(getDefaultInviteExpireDate());
       setIsInviteDialogOpen(true);
+      return true;
     },
     [courseEnrollments, getDefaultInviteExpireDate, showBulkNotice, t]
   );
 
   const [inviteError, setInviteError] = useState<string | null>(null);
+  // Closing the dialog settles the bulk action, so it stays closed while the mutation runs.
+  const [isSendingInvitations, setIsSendingInvitations] = useState(false);
 
   const handleCloseInviteDialog = useCallback(() => {
+    if (isSendingInvitations) return;
     setIsInviteDialogOpen(false);
     setInviteDialogData(null);
     setInviteError(null);
-  }, []);
+    // Cancelled (a completed send settles the action before closing): the rows stay selected.
+    dialogBulkAction.fail();
+  }, [dialogBulkAction, isSendingInvitations]);
 
   const handleSendInvitations = useCallback(async () => {
-    if (!inviteDialogData) return;
+    if (!inviteDialogData || isSendingInvitations) return;
 
     const idToRow = new Map(courseEnrollments.map((e) => [e.id, e]));
     const enrollmentIds = inviteDialogData.enrollmentsToSend
@@ -428,11 +428,14 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
 
     if (enrollmentIds.length === 0) {
       showBulkNotice(t('bulk_actions.no_eligible_invitations'));
+      // Nothing was sent, so the rows stay selected.
+      dialogBulkAction.fail();
       handleCloseInviteDialog();
       return;
     }
 
     let invitedCount = 0;
+    setIsSendingInvitations(true);
     try {
       const result = await updateEnrollmentStatusForInvite({
         variables: {
@@ -452,7 +455,10 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
         t('bulk_actions.send_invitations_error', { error: errorMessage }) || 
         `Failed to send invitations: ${errorMessage}`
       );
+      // The dialog stays open with the error; the rows stay selected for a retry.
       return;
+    } finally {
+      setIsSendingInvitations(false);
     }
 
     if (invitedCount === 0) {
@@ -465,6 +471,11 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
         4000
       );
     }
+    if (invitedCount === 0) {
+      dialogBulkAction.fail();
+    } else {
+      dialogBulkAction.succeed();
+    }
     handleCloseInviteDialog();
 
     try {
@@ -473,7 +484,9 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
       console.error('ApplicationsTab: refetch after bulk invite failed', refetchError);
     }
   }, [
+    dialogBulkAction,
     inviteDialogData,
+    isSendingInvitations,
     inviteExpireDate,
     courseEnrollments,
     updateEnrollmentStatusForInvite,
@@ -503,7 +516,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
         );
       if (enrollmentsToSend.length === 0) {
         showBulkNotice(t('bulk_actions.no_eligible_rejections'));
-        return;
+        return false;
       }
       setRejectionDialogData({
         enrollmentsToSend,
@@ -512,20 +525,26 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
         actionType,
       });
       setIsRejectionDialogOpen(true);
+      return true;
     },
     [courseEnrollments, showBulkNotice, t]
   );
 
   const [rejectionError, setRejectionError] = useState<string | null>(null);
+  // Closing the dialog settles the bulk action, so it stays closed while the mutation runs.
+  const [isSendingRejections, setIsSendingRejections] = useState(false);
 
   const handleCloseRejectionDialog = useCallback(() => {
+    if (isSendingRejections) return;
     setIsRejectionDialogOpen(false);
     setRejectionDialogData(null);
     setRejectionError(null);
-  }, []);
+    // Cancelled (a completed send settles the action before closing): the rows stay selected.
+    dialogBulkAction.fail();
+  }, [dialogBulkAction, isSendingRejections]);
 
   const handleSendRejections = useCallback(async () => {
-    if (!rejectionDialogData) return;
+    if (!rejectionDialogData || isSendingRejections) return;
 
     const idToRow = new Map(courseEnrollments.map((e) => [e.id, e]));
     const enrollmentIds = rejectionDialogData.enrollmentsToSend
@@ -537,11 +556,14 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
 
     if (enrollmentIds.length === 0) {
       showBulkNotice(t('bulk_actions.no_eligible_rejections'));
+      // Nothing was sent, so the rows stay selected.
+      dialogBulkAction.fail();
       handleCloseRejectionDialog();
       return;
     }
 
     let declinedCount = 0;
+    setIsSendingRejections(true);
     try {
       const result = await updateEnrollmentStatusWhenApplied({
         variables: {
@@ -561,7 +583,10 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
         t('bulk_actions.send_rejections_error', { error: errorMessage }) || 
         `Failed to send rejections: ${errorMessage}`
       );
+      // The dialog stays open with the error; the rows stay selected for a retry.
       return;
+    } finally {
+      setIsSendingRejections(false);
     }
 
     if (declinedCount === 0) {
@@ -574,6 +599,11 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
         4000
       );
     }
+    if (declinedCount === 0) {
+      dialogBulkAction.fail();
+    } else {
+      dialogBulkAction.succeed();
+    }
     handleCloseRejectionDialog();
 
     try {
@@ -582,7 +612,9 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
       console.error('ApplicationsTab: refetch after bulk decline failed', refetchError);
     }
   }, [
+    dialogBulkAction,
     rejectionDialogData,
+    isSendingRejections,
     courseEnrollments,
     updateEnrollmentStatusWhenApplied,
     qResult,
@@ -672,37 +704,55 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
         if (selectedRows.length === 0) {
           setIsNoSelectionDialogOpen(true);
         }
-        return;
+        return false;
       }
 
       // Handle invitation actions
       if (action === 'send_invitations_selected') {
+        // Nothing happened in these cases, so the rows stay selected.
         if (selectedRows.length === 0) {
           setIsNoSelectionDialogOpen(true);
-          return;
+          return false;
         }
         const enrollmentsToSend = selectedRows.filter((e) => isInviteEligibleEnrollment(e));
         if (enrollmentsToSend.length === 0) {
           showBulkNotice(t('bulk_actions.no_eligible_invitations'));
-          return;
+          return false;
         }
-        handleOpenInviteDialog(enrollmentsToSend.map((e) => e.id), selectedRows.length, 'selected');
-        return;
+        const opened = handleOpenInviteDialog(
+          enrollmentsToSend.map((e) => e.id),
+          selectedRows.length,
+          'selected'
+        );
+        if (!opened) {
+          return false;
+        }
+        // handleSendInvitations settles the action once the dialog is confirmed.
+        return dialogBulkAction.start();
       }
 
       // Handle rejection actions
       if (action === 'send_rejections_selected') {
+        // Nothing happened in these cases, so the rows stay selected.
         if (selectedRows.length === 0) {
           setIsNoSelectionDialogOpen(true);
-          return;
+          return false;
         }
         const enrollmentsToSend = selectedRows.filter((e) => isRejectionEligibleEnrollment(e));
         if (enrollmentsToSend.length === 0) {
           showBulkNotice(t('bulk_actions.no_eligible_rejections'));
-          return;
+          return false;
         }
-        handleOpenRejectionDialog(enrollmentsToSend.map((e) => e.id), selectedRows.length, 'selected');
-        return;
+        const opened = handleOpenRejectionDialog(
+          enrollmentsToSend.map((e) => e.id),
+          selectedRows.length,
+          'selected'
+        );
+        if (!opened) {
+          return false;
+        }
+        // handleSendRejections settles the action once the dialog is confirmed.
+        return dialogBulkAction.start();
       }
 
       // Handle email actions (existing)
@@ -721,8 +771,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
           email_rating_DECLINE: t('bulk_actions.email_all_decline_rating'),
           email_rating_REVIEW: t('bulk_actions.email_all_review_rating'),
         };
-        // "Cancelled" covers both pre-start (CANCELLED) and post-start (ABORTED) dropouts,
-        // matching the CancelledCourseEnrollments aggregate behind the statistics card.
+        // The cancellation email action includes both CANCELLED and ABORTED.
         const filter = isStatusAction
           ? action === 'email_status_CANCELLED'
             ? {
@@ -762,7 +811,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
 
           if (emails.length === 0) {
             showBulkNotice(t('bulk_actions.no_email_recipients'));
-            return;
+            return false;
           }
 
           setBulkEmailDialogData({
@@ -778,17 +827,20 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
         } finally {
           setBulkEmailPendingLabel(null);
         }
-        return;
+        // These actions address everyone matching the filter rather than the selection, so the
+        // selection is left untouched.
+        return false;
       }
 
+      // Nothing happened in these cases, so the rows stay selected.
       if (targetEnrollments.length === 0) {
-        return;
+        return false;
       }
 
       const emails = targetEnrollments.map((e) => e.User.email).filter(Boolean);
       if (emails.length === 0) {
         showBulkNotice(t('bulk_actions.no_email_recipients'));
-        return;
+        return false;
       }
 
       openMailtoOrShowFallback({
@@ -802,6 +854,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
     [
       buildMailtoUrl,
       course.id,
+      dialogBulkAction,
       handleOpenInviteDialog,
       handleOpenRejectionDialog,
       loadBulkEmailRecipients,
@@ -942,6 +995,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
       CANCELLED: 6,
       REGISTERED: 7,
       WAITLIST: 8,
+      EXPIRED: 9,
     };
     return order[a] - order[b];
   }, []);
@@ -1110,7 +1164,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
                   {t('status.waitlist_badge')}
                 </span>
               )}
-              {expired && (enrollment.status === 'APPLIED' || enrollment.status === 'INVITED') && (
+              {(enrollment.status === 'EXPIRED' || (expired && enrollment.status === 'INVITED')) && (
                 <IoIosCloseCircle
                   className="inline"
                   title={t('status.invitation_expired')}
@@ -1339,46 +1393,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
         </div>
       ) : null}
 
-      {/* Statistics Cards */}
-      {courseEnrollments.length > 0 && (
-        <div className={`grid grid-cols-1 md:grid-cols-2 ${features.hasApplicationProcess ? 'lg:grid-cols-4' : 'lg:grid-cols-2'} gap-4 mb-6`}>
-          {features.hasApplicationProcess ? (
-            <>
-              {/* Approval-based Registration: Show all 4 cards */}
-              <div className="bg-bg-secondary text-label-primary light p-4 rounded-lg">
-                <div className="text-label-secondary text-sm mb-1">{t('statistics_applications_total')}</div>
-                <div className="text-label-primary text-2xl font-semibold">{applicationStats.totalApplications}</div>
-              </div>
-              <div className="bg-bg-secondary text-label-primary light p-4 rounded-lg">
-                <div className="text-label-secondary text-sm mb-1">{t('statistics_applications_accepted')}</div>
-                <div className="text-label-primary text-2xl font-semibold">{applicationStats.approvedApplications}</div>
-              </div>
-              <div className="bg-bg-secondary text-label-primary light p-4 rounded-lg">
-                <div className="text-label-secondary text-sm mb-1">{t('statistics_invitations_total')}</div>
-                <div className="text-label-primary text-2xl font-semibold">{applicationStats.invitedApplicants}</div>
-              </div>
-              <div className="bg-bg-secondary text-label-primary light p-4 rounded-lg">
-                <div className="text-label-secondary text-sm mb-1">{t('statistics_invitations_confirmed')}</div>
-                <div className="text-label-primary text-2xl font-semibold">{applicationStats.confirmedApplicants}</div>
-              </div>
-            </>
-          ) : (
-            <>
-              {/* Direct Registration: total vs. confirmed is redundant here (nearly every
-                  registration becomes confirmed immediately), so show confirmed vs.
-                  cancelled instead, i.e. people who signed up but no longer plan to attend. */}
-              <div className="bg-bg-secondary text-label-primary light p-4 rounded-lg">
-                <div className="text-label-secondary text-sm mb-1">{t('statistics_registrations_confirmed')}</div>
-                <div className="text-label-primary text-2xl font-semibold">{applicationStats.confirmedApplicants}</div>
-              </div>
-              <div className="bg-bg-secondary text-label-primary light p-4 rounded-lg">
-                <div className="text-label-secondary text-sm mb-1">{t('statistics_registrations_cancelled')}</div>
-                <div className="text-label-primary text-2xl font-semibold">{applicationStats.cancelledApplicants}</div>
-              </div>
-            </>
-          )}
-        </div>
-      )}
+      <CourseEnrollmentStatistics course={course} hasCourseStarted={hasCourseStarted} />
 
       <div>
         <OnlyInstructor>
@@ -1424,7 +1439,12 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
         <DialogTitle>
           <div className="flex justify-between items-center">
             <div className="text-xl font-semibold text-label-primary">{t('bulk_actions.send_invitations_dialog_title')}</div>
-            <div className="cursor-pointer text-label-primary" onClick={handleCloseInviteDialog}>
+            <div
+              className={`text-label-primary ${
+                isSendingInvitations ? 'pointer-events-none opacity-50' : 'cursor-pointer'
+              }`}
+              onClick={handleCloseInviteDialog}
+            >
               <MdClose className="w-6 h-6" />
             </div>
           </div>
@@ -1463,10 +1483,10 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
                 </div>
               </div>
               <div className="flex justify-end gap-3">
-                <OldButton onClick={handleCloseInviteDialog} inverted>
+                <OldButton onClick={handleCloseInviteDialog} inverted disabled={isSendingInvitations}>
                   {tCommon('cancel')}
                 </OldButton>
-                <OldButton onClick={handleSendInvitations} filled>
+                <OldButton onClick={handleSendInvitations} filled disabled={isSendingInvitations}>
                   {t('bulk_actions.send_invitations_confirm')}
                 </OldButton>
               </div>
@@ -1486,7 +1506,12 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
         <DialogTitle>
           <div className="flex justify-between items-center">
             <div className="text-xl font-semibold text-label-primary">{t('bulk_actions.send_rejections_dialog_title')}</div>
-            <div className="cursor-pointer text-label-primary" onClick={handleCloseRejectionDialog}>
+            <div
+              className={`text-label-primary ${
+                isSendingRejections ? 'pointer-events-none opacity-50' : 'cursor-pointer'
+              }`}
+              onClick={handleCloseRejectionDialog}
+            >
               <MdClose className="w-6 h-6" />
             </div>
           </div>
@@ -1512,10 +1537,10 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
                 </p>
               </div>
               <div className="flex justify-end gap-3">
-                <OldButton onClick={handleCloseRejectionDialog} inverted>
+                <OldButton onClick={handleCloseRejectionDialog} inverted disabled={isSendingRejections}>
                   {tCommon('cancel')}
                 </OldButton>
-                <OldButton onClick={handleSendRejections} filled>
+                <OldButton onClick={handleSendRejections} filled disabled={isSendingRejections}>
                   {t('bulk_actions.send_rejections_confirm')}
                 </OldButton>
               </div>

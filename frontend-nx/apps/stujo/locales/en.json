@@ -79,11 +79,12 @@
       "remove_image_error": "Error removing image",
       "upload_error": "Error uploading image",
       "organization_logo": "Company logo",
-      "view_full_size": "View full size",
-      "close": "Close",
+      "add_logo": "Add logo",
+      "logo_unavailable": "Logo could not be loaded",
       "logo_permission_denied": "This company already has an admin managing settings. Ask them to update the logo."
     },
     "error": "An error occurred",
+    "warning": "Warning",
     "close": "Close",
     "ok": "OK"
   },
@@ -120,12 +121,15 @@
     "publish": "Publish",
     "repost": "Repost",
     "archive": "Archive",
+    "deactivate": "Deactivate",
+    "reactivate": "Reactivate",
     "status": {
       "PUBLISHED": "Active",
       "EXPIRED": "Expired",
       "DRAFT": "Draft",
       "PENDING_PAYMENT": "Payment pending",
-      "ARCHIVED": "Archived"
+      "ARCHIVED": "Archived",
+      "DEACTIVATED": "Deactivated"
     },
     "noticePaymentSuccess": "Payment successful – your offer is published.",
     "noticePaymentCancelled": "Payment cancelled – your offer is still saved as a draft.",
@@ -135,15 +139,33 @@
     "publishNetworkError": "Publishing failed: network error.",
     "archiveFailed": "Archiving failed: {error}",
     "archiveNetworkError": "Archiving failed: network error.",
+    "noticeDeactivated": "Your offer is deactivated. You can reactivate it until its expiry date.",
+    "noticeReactivated": "Your offer is online again.",
+    "reactivateWindowExpired": "The publication period has ended – please repost the offer.",
+    "setActiveFailed": "Changing the status failed: {error}",
+    "setActiveNetworkError": "Changing the status failed: network error.",
     "unknownError": "Unknown error",
-    "organizationWebsite": {
+    "OrganizationWebsite": {
       "label": "Website",
       "placeholder": "https://example.com",
       "save": "Save",
       "saved": "Saved",
-      "invalidUrl": "Please enter a valid http(s) URL.",
-      "permissionDenied": "This company already has an admin managing settings. Ask them to update the website.",
-      "saveError": "Error saving website"
+      "invalid_url": "Please enter a valid http(s) URL.",
+      "permission_denied": "This company already has an admin managing settings. Ask them to update the website.",
+      "save_error": "Error saving website",
+      "none": "No website yet",
+      "hint": "Full address including https://"
+    },
+    "OrganizationProfile": {
+      "title": "Edit company profile",
+      "edit_button": "Edit company profile",
+      "edit_button_aria": "Edit company profile of {organization}",
+      "intro": "Your logo and website appear on all of your job offers.",
+      "logo_heading": "Logo",
+      "logo_alt": "{organization} logo",
+      "logo_hint": "PNG or JPG, max. 2 MB. Your logo is shown in full and never cropped.",
+      "website_heading": "Website",
+      "done": "Done"
     },
     "NeuesAngebot": {
       "edit_offer_title": "Edit job offer",

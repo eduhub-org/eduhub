@@ -44,6 +44,8 @@ export interface TableGridFilter {
 
 export interface TableGridProps<T extends BaseRow> {
   addButtonText?: string;
+  /** When set, the add button is disabled and this text explains why. */
+  addButtonDisabledHint?: string | null;
   data: T[];
   columns: ColumnDef<T>[];
   deleteMutation?: DocumentNode;
@@ -60,7 +62,12 @@ export interface TableGridProps<T extends BaseRow> {
   showCheckbox?: boolean;
   showGlobalSearchField?: boolean;
   onAddButtonClick?: () => void;
-  onBulkAction?: (action: string, selectedRows: T[]) => void;
+  /**
+   * Runs a bulk action on the selected rows. The row selection is only cleared once the action
+   * succeeded, so a handler must reject (or resolve to `false` when it did not do anything) to
+   * keep the rows marked for a retry.
+   */
+  onBulkAction?: (action: string, selectedRows: T[]) => void | boolean | Promise<void | boolean>;
   bulkActions?: BulkAction[];
   totalCount?: number;
   pageIndex: number;
@@ -75,6 +82,8 @@ export interface TableGridProps<T extends BaseRow> {
   compactRows?: boolean;
   /** When true, wraps the table in a rounded card (e.g. course page sections) */
   rounded?: boolean;
+  /** Keep the last settled page mounted while replacement rows are loading. */
+  preserveRowsWhileLoading?: boolean;
   /** Navigate to full-page editor on chevron click (mutually exclusive with expandableRowComponent). */
   rowHref?: (row: T) => string;
   onRowNavigate?: (row: T) => void;

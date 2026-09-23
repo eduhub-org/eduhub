@@ -65,6 +65,11 @@ Load it into a running local Docker database:
 bash backend/seeds/utils/load_performance_degree_seed.sh
 ```
 
+For manual attendance performance testing, open `Performance Attendance Course`
+(course ID 8200). With the default 5000-user generation it contains 1000
+confirmed participants, 24 sessions, and competing automated and instructor
+attendance histories. The performance seed remains opt-in.
+
 The loader uses the Hasura container and reads
 `/hasura-seeds/performance/performance_degree_seed.sql`, which is available
 through the existing `./backend/seeds:/hasura-seeds` Docker volume. This avoids

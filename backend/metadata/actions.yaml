@@ -123,6 +123,18 @@ actions:
     permissions:
       - role: user_access
     comment: Archives a published/expired StuJo job posting (employer action; status is server-controlled)
+  - name: setJobPostingActive
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: name
+          value: setJobPostingActive
+    permissions:
+      - role: user_access
+    comment: Deactivates a published StuJo job posting or reactivates a deactivated one within its publication window (employer action; status is server-controlled)
   # Self-service organization onboarding. Both are permitted for user_access and re-check
   # authorization in the handler: OrganizationAdmin insert requires canManageSettings on the same
   # organization, so an organization's FIRST grant cannot be created through Hasura at all.
@@ -527,7 +539,7 @@ actions:
     # user_access is permitted because action permissions do not resolve
     # inherited roles: an org admin's requests carry x-hasura-role `user`
     # (useCurrentRole deliberately never returns org_admin), the same reason
-    # publishJobPosting and archiveJobPosting are permitted for it.
+    # publishJobPosting, archiveJobPosting and setJobPostingActive are permitted for it.
     permissions:
       - role: instructor_access
       - role: user_access
@@ -596,6 +608,21 @@ actions:
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
     permissions:
       - role: instructor_access
+  - name: notifySessionParticipants
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      headers:
+        - name: name
+          value: notifySessionParticipants
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+    permissions:
+      - role: instructor_access
+    comment: Mails active participants that a session was rescheduled. Called from
+      the Sessions tab after the editor confirms the prompt; there is no automatic
+      trigger any more. Authorization is in the handler, because the action queries
+      with the admin secret and Session row permissions do not apply to it.
   - name: updateFromKeycloak
     definition:
       kind: synchronous
@@ -685,6 +712,7 @@ custom_types:
     - name: CourseInput
     - name: SelectedAddonInput
   objects:
+    - name: NotifySessionParticipantsResult
     - name: CreateUserResult
     - name: loadFileOutput
     - name: result
@@ -742,4 +770,5 @@ custom_types:
     - name: ManageGuestRegistrationResult
     - name: GuestRegistrationSummary
     - name: UpdateOrganizationWebsiteResult
+    - name: SetJobPostingActiveResult
   scalars: []

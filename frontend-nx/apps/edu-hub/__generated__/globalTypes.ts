@@ -550,6 +550,7 @@ export enum CourseEnrollmentStatus_enum {
   CANCELLED = "CANCELLED",
   COMPLETED = "COMPLETED",
   CONFIRMED = "CONFIRMED",
+  EXPIRED = "EXPIRED",
   INVITED = "INVITED",
   REGISTERED = "REGISTERED",
   REJECTED = "REJECTED",
@@ -1224,6 +1225,7 @@ export enum JobPostingStatus_constraint {
 
 export enum JobPostingStatus_enum {
   ARCHIVED = "ARCHIVED",
+  DEACTIVATED = "DEACTIVATED",
   DRAFT = "DRAFT",
   EXPIRED = "EXPIRED",
   PENDING_PAYMENT = "PENDING_PAYMENT",

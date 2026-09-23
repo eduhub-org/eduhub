@@ -9,6 +9,7 @@
 
 export interface MyOrgAdminCapabilities_OrganizationAdmin {
   __typename: "OrganizationAdmin";
+  organizationId: number;
   canManageCourses: boolean;
   canManageEvents: boolean;
   /**

@@ -24,6 +24,7 @@ import createStripeJobPostingPrices from "./createStripeJobPostingPrices/index.j
 import publishJobPosting from "./publishJobPosting/index.js";
 import sendPendingJobPostingMails from "./sendPendingJobPostingMails/index.js";
 import archiveJobPosting from "./archiveJobPosting/index.js";
+import setJobPostingActive from "./setJobPostingActive/index.js";
 import claimJobOrganization from "./claimJobOrganization/index.js";
 import requestJobOrganizationAccess from "./requestJobOrganizationAccess/index.js";
 import saveOrganizationLogo from "./saveOrganizationLogo/index.js";
@@ -40,6 +41,7 @@ import deleteProjectDocumentationInstruction from "./deleteProjectDocumentationI
 import saveProjectDocumentationInstruction from "./saveProjectDocumentationInstruction/index.js";
 import sendProjectEmail from "./sendProjectEmail/index.js";
 import sendCourseUpdateEmail from "./sendCourseUpdateEmail/index.js";
+import notifySessionParticipants from "./notifySessionParticipants/index.js";
 import registerGuestForCourse from "./registerGuestForCourse/index.js";
 import confirmGuestRegistration from "./confirmGuestRegistration/index.js";
 import manageGuestRegistration from "./manageGuestRegistration/index.js";
@@ -95,6 +97,7 @@ const functionMap = {
   publishJobPosting,
   sendPendingJobPostingMails,
   archiveJobPosting,
+  setJobPostingActive,
   claimJobOrganization,
   requestJobOrganizationAccess,
   saveOrganizationLogo,
@@ -111,6 +114,7 @@ const functionMap = {
   saveProjectDocumentationInstruction,
   sendProjectEmail,
   sendCourseUpdateEmail,
+  notifySessionParticipants,
   registerGuestForCourse,
   confirmGuestRegistration,
   manageGuestRegistration,

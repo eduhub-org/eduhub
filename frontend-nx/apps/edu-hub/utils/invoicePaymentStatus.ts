@@ -30,6 +30,25 @@ export function getPaymentStatusFromInvoices(
 }
 
 /**
+ * Whether money has actually been taken for this enrollment.
+ *
+ * Deliberately looks at every invoice rather than the latest one:
+ * `createStripeCheckout` opens a fresh checkout session each time it is called
+ * and the webhook inserts one invoice per session, with nothing making
+ * `courseEnrollmentId` unique. A retry after a successful payment therefore
+ * leaves a newer non-PAID invoice in front of the PAID one, and a
+ * latest-invoice-only reading would call a paid enrollment unpaid.
+ *
+ * `getPaymentStatusFromInvoices` stays latest-only on purpose - what to show and
+ * whether a retry is possible are questions about the most recent attempt.
+ */
+export function hasPaidInvoice(
+  invoices: Array<{ status: InvoiceStatus_enum }> | null | undefined
+): boolean {
+  return (invoices ?? []).some((invoice) => invoice.status === InvoiceStatus_enum.PAID);
+}
+
+/**
  * Checks if the user can retry payment (pending or failed invoice).
  */
 export function canRetryPayment(

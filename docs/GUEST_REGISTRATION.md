@@ -64,7 +64,8 @@ never becomes a registration and never receives follow-up mail.
 
 ## Enabling it for an event
 
-Manage course → Description tab → **Allow registration without an account**.
+Manage courses → expand the course row → registration settings card →
+**Allow registration without an account**, next to the registration type it depends on.
 
 The toggle only appears, and the backend only accepts a guest registration,
 when all of these hold:

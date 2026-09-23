@@ -281,6 +281,18 @@ type Mutation {
 }
 
 type Mutation {
+  notifySessionParticipants(sessionId: Int!): NotifySessionParticipantsResult!
+}
+
+type NotifySessionParticipantsResult {
+  success: Boolean!
+  queued: Int
+  total: Int
+  error: String
+  messageKey: String
+}
+
+type Mutation {
   updateFromKeycloak(
     userid: ID!
   ): result
@@ -749,6 +761,17 @@ type Mutation {
 
 type ArchiveJobPostingResult {
   success: Boolean!
+  error: String
+  messageKey: String
+}
+
+type Mutation {
+  setJobPostingActive(jobPostingId: Int!, active: Boolean!): SetJobPostingActiveResult!
+}
+
+type SetJobPostingActiveResult {
+  success: Boolean!
+  status: String
   error: String
   messageKey: String
 }

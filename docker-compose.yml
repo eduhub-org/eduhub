@@ -95,7 +95,7 @@ services:
 
   node_functions:
     container_name: eduhub-node-functions
-    image: node:22-bullseye
+    image: node:22-bookworm
     user: "node"
     working_dir: /functions
     volumes:

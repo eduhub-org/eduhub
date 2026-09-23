@@ -3,33 +3,11 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { CourseEnrollment_bool_exp, CourseEnrollment_order_by, CourseEnrollmentStatus_enum, AttendanceStatus_enum, ProjectStatus_enum, ProjectRating_enum } from "./../../__generated__/globalTypes";
+import { CourseEnrollment_bool_exp, CourseEnrollment_order_by, CourseEnrollmentStatus_enum, ProjectStatus_enum, ProjectRating_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: CourseParticipations
 // ====================================================
-
-export interface CourseParticipations_Course_by_pk_CourseEnrollments_User_Attendances_Session {
-  __typename: "Session";
-  id: number;
-}
-
-export interface CourseParticipations_Course_by_pk_CourseEnrollments_User_Attendances {
-  __typename: "Attendance";
-  id: number;
-  /**
-   * The attendance status: MISSED for a user registered for the session but not recorded (or recognized), otherwise ATTENDED
-   */
-  status: AttendanceStatus_enum;
-  /**
-   * The source that provided the recorded names of the attendees.
-   */
-  source: string;
-  /**
-   * An object relationship
-   */
-  Session: CourseParticipations_Course_by_pk_CourseEnrollments_User_Attendances_Session;
-}
 
 export interface CourseParticipations_Course_by_pk_CourseEnrollments_User {
   __typename: "User";
@@ -46,10 +24,6 @@ export interface CourseParticipations_Course_by_pk_CourseEnrollments_User {
    * The user's email address
    */
   email: string;
-  /**
-   * An array relationship
-   */
-  Attendances: CourseParticipations_Course_by_pk_CourseEnrollments_User_Attendances[];
 }
 
 export interface CourseParticipations_Course_by_pk_CourseEnrollments {

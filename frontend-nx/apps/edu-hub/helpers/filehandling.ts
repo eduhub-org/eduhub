@@ -2,7 +2,8 @@ import log from 'loglevel';
 
 const isPublicLegacy = (filePath: string) => filePath.startsWith("https://") || filePath.startsWith("http://");
 
-const isPublic = (filePath: string) => filePath.includes("/public/");
+const isPublic = (filePath: string) =>
+  filePath.startsWith('public/') || filePath.includes('/public/');
 
 /** Same-origin path served from the Next.js `public/` folder (not protocol-relative). */
 export const isStaticAppPath = (filePath: string): boolean =>
