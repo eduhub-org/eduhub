@@ -43,12 +43,8 @@ const WidgetJobs: FC = () => {
     context: WIDGET_ANONYMOUS_CONTEXT,
   });
 
-  const selectedGroupIds = useMemo(() => parseWidgetGroupIds(groups), [groups]);
-  const groupOrder = group ? parseInt(group as string, 10) : null;
-  // Unlike projects (which carry course-group membership directly), jobs resolve
-  // their slider filter through the CourseGroupOption list, so it is needed for
-  // both the `groups` and the single `group` order param.
-  const needsGroupOptions = selectedGroupIds.length > 0 || (groupOrder != null && !isNaN(groupOrder));
+  const selectedGroupIds = useMemo(() => parseWidgetGroupIds(groups, group), [groups, group]);
+  const needsGroupOptions = selectedGroupIds.length > 0;
 
   const {
     data: groupOptionsData,
@@ -66,12 +62,11 @@ const WidgetJobs: FC = () => {
 
     return filterJobsByWidgetSliders(jobs, {
       selectedGroupIds,
-      groupOrder,
       groupOptions: groupOptionsData?.CourseGroupOption ?? [],
       groupOptionsLoading,
       groupOptionsError: Boolean(groupOptionsError),
     });
-  }, [jobsData, groupOrder, selectedGroupIds, groupOptionsData, groupOptionsLoading, groupOptionsError]);
+  }, [jobsData, selectedGroupIds, groupOptionsData, groupOptionsLoading, groupOptionsError]);
 
   const isLoading = jobsLoading || apiKeyValidating || (needsGroupOptions && groupOptionsLoading);
   const hasError = Boolean(jobsError || apiKeyError || (needsGroupOptions && groupOptionsError));

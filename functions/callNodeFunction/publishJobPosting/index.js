@@ -33,6 +33,7 @@ const GET_POSTING = gql`
       title
       type
       status
+      expiresAt
       organizationId
       contactUserId
       termsAcceptedAt
@@ -405,7 +406,13 @@ export default async function publishJobPosting(req, logger) {
       return { success: false, error: 'Not authorized to publish this posting', messageKey: 'UNAUTHORIZED' };
     }
 
-    if (!['DRAFT', 'EXPIRED', 'PENDING_PAYMENT'].includes(posting.status)) {
+    // A DEACTIVATED posting whose window has ended is effectively EXPIRED
+    // until the daily expire_job_postings cron flips it; within its window it
+    // is reactivated for free via setJobPostingActive instead.
+    const deactivatedAndExpired =
+      posting.status === 'DEACTIVATED' &&
+      (!posting.expiresAt || new Date(posting.expiresAt) <= new Date());
+    if (!['DRAFT', 'EXPIRED', 'PENDING_PAYMENT'].includes(posting.status) && !deactivatedAndExpired) {
       return {
         success: false,
         error: `Posting in status ${posting.status} cannot be published`,
