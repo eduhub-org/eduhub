@@ -6,8 +6,8 @@ type OrganizationScopeOption = { value: string; label: string };
 /** Organization id of the platform default organization ("EduHub Default"). */
 export const DEFAULT_ORGANIZATION_ID = 0;
 
-/** Stored scope: an organization id, "all organizations", or null when nothing was chosen yet. */
-export type StoredOrganizationScope = number | 'all' | null;
+/** Stored scope: an organization id, or null when nothing was chosen yet. */
+export type StoredOrganizationScope = number | null;
 
 /**
  * The organizations that own at least one of the given programs, as dropdown options sorted by name.
@@ -49,44 +49,19 @@ export const defaultOrganizationScope = (
 };
 
 /**
- * The organization actually in effect, or null for "all organizations" (only when `allowAll` and
- * explicitly chosen). A remembered organization is dropped when it owns no program of the current
+ * The organization actually in effect, or null when there are no options. A remembered organization is dropped when it owns no program of the current
  * type — which happens routinely when switching between the Courses, Degrees and Events screens —
  * so the selector never shows a value that is not among its options.
  */
 export const resolveOrganizationScope = (
   stored: StoredOrganizationScope,
   options: OrganizationScopeOption[],
-  { allowAll = false, initialOrganizationId = null }: { allowAll?: boolean; initialOrganizationId?: number | null } = {}
+  { initialOrganizationId = null }: { initialOrganizationId?: number | null } = {}
 ): number | null => {
-  if (stored === 'all' && allowAll) {
-    return null;
-  }
   if (typeof stored === 'number' && hasOption(options, stored)) {
     return stored;
   }
   return defaultOrganizationScope(options, initialOrganizationId);
-};
-
-type TabProgram = {
-  id: number;
-  title: string;
-  shortTitle?: string | null;
-  Organization?: { id: number; name: string } | null;
-};
-
-/**
- * Program tab label: the organization name when it is the organization's only program of this type,
- * otherwise "Organization (Program)". `programs` are all programs of the type the admin can see.
- */
-export const programTabLabel = (program: TabProgram, programs: TabProgram[]): string => {
-  const programName = program.shortTitle ?? program.title;
-  if (!program.Organization) {
-    return programName;
-  }
-  const organizationId = program.Organization.id;
-  const programsOfOrganization = programs.filter((p) => p.Organization?.id === organizationId).length;
-  return programsOfOrganization === 1 ? program.Organization.name : `${program.Organization.name} (${programName})`;
 };
 
 /** Remembered program tab: a program id, or "all" for the "All programs" tab. */
