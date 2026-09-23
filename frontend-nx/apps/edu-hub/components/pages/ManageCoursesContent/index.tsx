@@ -64,7 +64,6 @@ import { ProgramsMenubar } from '../../layout/ProgramsMenubar';
 import type { StaticComponentProperty } from '../../../types/UIComponents';
 import { ProgramType } from '../../../types/enums';
 import {
-  programTabLabel,
   programTabStorageKey,
   resolveProgramTab,
   StoredProgramTab,
@@ -99,14 +98,11 @@ interface IProps {
   programs: Programs_Program[];
   /** Scopes the list (including the "All" tab) to a single Program.type. */
   programType: ProgramType;
-  /**
-   * Organization the dashboard is scoped to, or null when a super-admin looks at all organizations
-   * at once (new offerings cannot be created then); see ProgramManagementDashboard.
-   */
-  organizationId?: number | null;
+  /** Organization the dashboard is scoped to; see ProgramManagementDashboard. */
+  organizationId: number;
 }
 
-const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationId = null }) => {
+const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationId }) => {
   const t = useTranslations('manageCourses');
   const tCommon = useTranslations('common');
   const locale = useLocale();
@@ -117,12 +113,12 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
   const orgCourseWhere = useManageCourseWhere();
 
   // Scopes every course query — including the "All" tab, which applies no program filter — to the
-  // current program type and, for a super-admin who picked one, to a single organization.
+  // current program type and the selected organization.
   const programTypeWhere = useMemo(
     () => ({
       Program: {
         type: { _eq: programType },
-        ...(organizationId === null ? {} : { organizationId: { _eq: organizationId } }),
+        organizationId: { _eq: organizationId },
       },
     }),
     [programType, organizationId]
@@ -196,22 +192,15 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
     const recentOtherPrograms = otherPrograms.slice(0, maxOtherPrograms);
     programs.push(...recentOtherPrograms);
 
-    // Tabs are named after the owning organization, plus the program when the organization runs
-    // more than one program of this type.
-    const labelledPrograms: Programs_Program[] = programs.map((program) => ({
-      ...program,
-      shortTitle: programTabLabel(program, sortedPrograms),
-    }));
-
     // Add "All" option as a pseudo-program
-    labelledPrograms.push({
+    programs.push({
       id: allTabId,
       shortTitle: t('all_programs'),
       title: t('all_programs'),
       __typename: 'Program',
     } as Programs_Program);
 
-    return labelledPrograms;
+    return programs;
   }, [sortedPrograms, allTabId, maxOtherPrograms, t]);
 
   // Derive current program ID from filter (single source of truth)
@@ -381,20 +370,15 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
 
   const [copyCourses] = useManageMutation(COPY_COURSES_TO_PROGRAM);
 
-  // A new offering needs a concrete program, hence a single organization in scope and a program tab
-  // (not "All") selected.
+  // A new offering needs a concrete program, hence a program tab (not "All") selected.
   const selectedProgramId = filter.where.programId?._eq;
   const addDisabledHint =
-    organizationId === null
-      ? t('add_disabled_hint.select_organization')
-      : selectedProgramId === undefined || selectedProgramId === null
-        ? t('add_disabled_hint.select_program')
-        : null;
+    selectedProgramId === undefined || selectedProgramId === null ? t('add_disabled_hint.select_program') : null;
 
   // Add course handler
   const handleAddCourse = useCallback(async () => {
     const selectedProgram = sortedPrograms.find((program) => program.id === selectedProgramId);
-    if (organizationId === null || !selectedProgram) {
+    if (!selectedProgram) {
       return;
     }
 
@@ -420,7 +404,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
       setErrorMessage(t(`notifications.add_failed.${messageKey}`));
       setShowErrorNotification(true);
     }
-  }, [selectedProgramId, organizationId, sortedPrograms, insertCourse, t, messageKey]);
+  }, [selectedProgramId, sortedPrograms, insertCourse, t, messageKey]);
 
   // Copying runs in two steps (bulk action opens the dialog, the dialog does the work), so the
   // selection is only released once the copy itself succeeded.

@@ -1,6 +1,5 @@
 import {
   organizationScopeOptions,
-  programTabLabel,
   programTabStorageKey,
   resolveOrganizationScope,
   resolveProgramTab,
@@ -58,35 +57,8 @@ describe('resolveOrganizationScope', () => {
     expect(resolveOrganizationScope(3, withDefault)).toBe(0);
   });
 
-  it('honours "all organizations" only when it is allowed', () => {
-    expect(resolveOrganizationScope('all', withDefault, { allowAll: true })).toBeNull();
-    expect(resolveOrganizationScope('all', withDefault, { allowAll: false })).toBe(0);
-  });
-
   it('returns null when there are no options', () => {
     expect(resolveOrganizationScope(null, [])).toBeNull();
-  });
-});
-
-describe('programTabLabel', () => {
-  const tabProgram = (id: number, shortTitle: string, orgId: number, orgName: string) => ({
-    id,
-    title: `${shortTitle} long`,
-    shortTitle,
-    Organization: { id: orgId, name: orgName },
-  });
-  const programs = [
-    tabProgram(1, 'WS24', 0, 'EduHub Default'),
-    tabProgram(2, 'SS25', 0, 'EduHub Default'),
-    tabProgram(3, 'Kurse', 2, 'Uni Kiel'),
-  ];
-
-  it('shows only the organization name for its single program', () => {
-    expect(programTabLabel(programs[2], programs)).toBe('Uni Kiel');
-  });
-
-  it('adds the program name when the organization has several programs', () => {
-    expect(programTabLabel(programs[0], programs)).toBe('EduHub Default (WS24)');
   });
 });
 
