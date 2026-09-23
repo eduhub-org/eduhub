@@ -44,6 +44,8 @@ export interface TableGridFilter {
 
 export interface TableGridProps<T extends BaseRow> {
   addButtonText?: string;
+  /** When set, the add button is disabled and this text explains why. */
+  addButtonDisabledHint?: string | null;
   data: T[];
   columns: ColumnDef<T>[];
   deleteMutation?: DocumentNode;

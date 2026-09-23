@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { FC, useCallback, useMemo, useState } from 'react';
+import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { ColumnDef } from '@tanstack/react-table';
 import { useManageMutation } from '../../../hooks/authedMutation';
 import { useRoleQuery } from '../../../hooks/authedQuery';
@@ -40,6 +40,7 @@ import { useManageCourseWhere } from '../../../hooks/manageScope';
 import { ADMIN_COURSE_LIST } from '../../../queries/courseList';
 import { GET_COURSE_TEMPLATES_COUNT } from '../../../queries/emailTemplates';
 import ExpandableCourseRow from './ExpandableCourseRow';
+import { getRegistrationFeatures } from '../ManageCourseContent/ApplicationsTab/registrationConfig';
 import { useParallelQueries } from '../../../hooks/useParallelQueries';
 import { CourseEnrollmentStatus_enum, order_by } from '../../../__generated__/globalTypes';
 import { useTranslations, useLocale } from 'next-intl';
@@ -62,14 +63,45 @@ import { MdMarkEmailRead, MdOpenInNew } from 'react-icons/md';
 import { ProgramsMenubar } from '../../layout/ProgramsMenubar';
 import type { StaticComponentProperty } from '../../../types/UIComponents';
 import { ProgramType } from '../../../types/enums';
+import {
+  programTabLabel,
+  programTabStorageKey,
+  resolveProgramTab,
+  StoredProgramTab,
+} from './organizationScope';
+
+// Last selected program tab per program type and organization, so admins return to the program they
+// worked on last (see programTabStorageKey). Browser-only; losing it just falls back to the default.
+const PROGRAM_TAB_STORAGE_KEY = 'eduhub.manage.programTab.v1';
+
+const readStoredProgramTabs = (): Record<string, StoredProgramTab> => {
+  try {
+    const parsed = JSON.parse(window.localStorage.getItem(PROGRAM_TAB_STORAGE_KEY) ?? '{}');
+    return parsed && typeof parsed === 'object' ? parsed : {};
+  } catch {
+    return {};
+  }
+};
+
+const storeProgramTab = (key: string, tab: StoredProgramTab) => {
+  try {
+    window.localStorage.setItem(PROGRAM_TAB_STORAGE_KEY, JSON.stringify({ ...readStoredProgramTabs(), [key]: tab }));
+  } catch {
+    // Storage can be unavailable (private mode, blocked site data); the default tab still works.
+  }
+};
+
+// Courses without an application process only report confirmed participants.
+const hasApplicationProcess = (course: AdminCourseList_Course) =>
+  getRegistrationFeatures(course.registrationType).hasApplicationProcess;
 
 interface IProps {
   programs: Programs_Program[];
   /** Scopes the list (including the "All" tab) to a single Program.type. */
   programType: ProgramType;
   /**
-   * Organization the dashboard is scoped to, or null for all organizations. Only super-admins ever
-   * see more than one organization; see ProgramManagementDashboard.
+   * Organization the dashboard is scoped to, or null when a super-admin looks at all organizations
+   * at once (new offerings cannot be created then); see ProgramManagementDashboard.
    */
   organizationId?: number | null;
 }
@@ -164,15 +196,22 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
     const recentOtherPrograms = otherPrograms.slice(0, maxOtherPrograms);
     programs.push(...recentOtherPrograms);
 
+    // Tabs are named after the owning organization, plus the program when the organization runs
+    // more than one program of this type.
+    const labelledPrograms: Programs_Program[] = programs.map((program) => ({
+      ...program,
+      shortTitle: programTabLabel(program, sortedPrograms),
+    }));
+
     // Add "All" option as a pseudo-program
-    programs.push({
+    labelledPrograms.push({
       id: allTabId,
       shortTitle: t('all_programs'),
       title: t('all_programs'),
       __typename: 'Program',
     } as Programs_Program);
 
-    return programs;
+    return labelledPrograms;
   }, [sortedPrograms, allTabId, maxOtherPrograms, t]);
 
   // Derive current program ID from filter (single source of truth)
@@ -245,17 +284,14 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
     manageRole
   );
 
-  // Handle program tab clicks (moved after useTableGrid to access setPageIndex)
-  const handleTabClick = useCallback(
-    (property: StaticComponentProperty) => {
+  // Select a program tab (moved after useTableGrid to access setPageIndex)
+  const applyProgramTab = useCallback(
+    (tabId: number) => {
       // Update the base filter with the new program selection. Keep program-type scope so the
       // "All" tab never leaks courses of other types.
       updateFilter({
         ...filter,
-        where:
-          property.key === allTabId
-            ? { ...programTypeWhere }
-            : { ...programTypeWhere, programId: { _eq: property.key } },
+        where: tabId === allTabId ? { ...programTypeWhere } : { ...programTypeWhere, programId: { _eq: tabId } },
       });
       // Reset pagination state when switching programs
       setPageIndex(0);
@@ -263,6 +299,50 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
     },
     [filter, updateFilter, allTabId, setPageIndex, programTypeWhere]
   );
+
+  const programTabKey = programTabStorageKey(programType, organizationId);
+
+  const handleTabClick = useCallback(
+    (property: StaticComponentProperty) => {
+      const tabId = property.key;
+      applyProgramTab(tabId);
+      storeProgramTab(programTabKey, tabId === allTabId ? 'all' : tabId);
+    },
+    [applyProgramTab, programTabKey, allTabId]
+  );
+
+  // Restore the tab remembered for this program type and organization. Read after mount (not during
+  // render) because localStorage is browser-only; runs once per mount — an organization change
+  // remounts this component (see ProgramManagementDashboard).
+  const [programTabRestored, setProgramTabRestored] = useState(false);
+  useEffect(() => {
+    if (programTabRestored) {
+      return;
+    }
+    setProgramTabRestored(true);
+    // Without tabs (a single program) there is nothing to switch back to, so keep the default.
+    if (programs.length <= 1) {
+      return;
+    }
+    const tabId = resolveProgramTab(
+      readStoredProgramTabs()[programTabKey],
+      menubarPrograms.map((program) => program.id),
+      allTabId,
+      defaultProgramId
+    );
+    if (tabId !== undefined && tabId !== currentProgramId) {
+      applyProgramTab(tabId);
+    }
+  }, [
+    programTabRestored,
+    programs.length,
+    programTabKey,
+    menubarPrograms,
+    allTabId,
+    defaultProgramId,
+    currentProgramId,
+    applyProgramTab,
+  ]);
 
   // Dialog state for program selection
   const [showProgramDialog, setShowProgramDialog] = useState(false);
@@ -301,10 +381,22 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
 
   const [copyCourses] = useManageMutation(COPY_COURSES_TO_PROGRAM);
 
+  // A new offering needs a concrete program, hence a single organization in scope and a program tab
+  // (not "All") selected.
+  const selectedProgramId = filter.where.programId?._eq;
+  const addDisabledHint =
+    organizationId === null
+      ? t('add_disabled_hint.select_organization')
+      : selectedProgramId === undefined || selectedProgramId === null
+        ? t('add_disabled_hint.select_program')
+        : null;
+
   // Add course handler
   const handleAddCourse = useCallback(async () => {
-    const selectedProgramId = filter.where.programId?._eq;
     const selectedProgram = sortedPrograms.find((program) => program.id === selectedProgramId);
+    if (organizationId === null || !selectedProgram) {
+      return;
+    }
 
     try {
       await insertCourse({
@@ -315,7 +407,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
               ? selectedProgram.defaultApplicationEnd
               : new Date(),
           maxMissedSessions: 2,
-          programId: selectedProgramId ?? 0,
+          programId: selectedProgram.id,
           locationOption: LocationOption_enum.ONLINE,
         },
         refetchQueries: ['AdminCourseList'],
@@ -328,7 +420,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
       setErrorMessage(t(`notifications.add_failed.${messageKey}`));
       setShowErrorNotification(true);
     }
-  }, [filter.where.programId?._eq, sortedPrograms, insertCourse, t, messageKey]);
+  }, [selectedProgramId, organizationId, sortedPrograms, insertCourse, t, messageKey]);
 
   // Copying runs in two steps (bulk action opens the dialog, the dialog does the work), so the
   // selection is only released once the copy itself succeeded.
@@ -678,6 +770,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
 
   const getApplicationsCount = useCallback(
     (course: AdminCourseList_Course) => {
+      if (!hasApplicationProcess(course)) return '';
       const statusCounts = getStatusCounts(course);
       return Object.keys(statusCounts).reduce((sum, key) => sum + statusCounts[key], 0);
     },
@@ -694,6 +787,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
 
   const getUnratedAndRatedButNotInformed = useCallback(
     (course: AdminCourseList_Course) => {
+      if (!hasApplicationProcess(course)) return '';
       const statusCounts = getStatusCounts(course);
       const unrated = statusCounts[CourseEnrollmentStatus_enum.APPLIED] ?? 0;
       const ratedButNotInformed = statusCounts[CourseEnrollmentStatus_enum.COMPLETED] ?? 0;
@@ -885,6 +979,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
           bulkActions={bulkActions}
           onBulkAction={handleBulkAction}
           onAddButtonClick={handleAddCourse}
+          addButtonDisabledHint={addDisabledHint}
           addButtonText={addButtonText}
           expandableRowComponent={(props) => (
             <ExpandableCourseRow

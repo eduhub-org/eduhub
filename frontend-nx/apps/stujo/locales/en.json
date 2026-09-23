@@ -121,12 +121,15 @@
     "publish": "Publish",
     "repost": "Repost",
     "archive": "Archive",
+    "deactivate": "Deactivate",
+    "reactivate": "Reactivate",
     "status": {
       "PUBLISHED": "Active",
       "EXPIRED": "Expired",
       "DRAFT": "Draft",
       "PENDING_PAYMENT": "Payment pending",
-      "ARCHIVED": "Archived"
+      "ARCHIVED": "Archived",
+      "DEACTIVATED": "Deactivated"
     },
     "noticePaymentSuccess": "Payment successful – your offer is published.",
     "noticePaymentCancelled": "Payment cancelled – your offer is still saved as a draft.",
@@ -136,6 +139,11 @@
     "publishNetworkError": "Publishing failed: network error.",
     "archiveFailed": "Archiving failed: {error}",
     "archiveNetworkError": "Archiving failed: network error.",
+    "noticeDeactivated": "Your offer is deactivated. You can reactivate it until its expiry date.",
+    "noticeReactivated": "Your offer is online again.",
+    "reactivateWindowExpired": "The publication period has ended – please repost the offer.",
+    "setActiveFailed": "Changing the status failed: {error}",
+    "setActiveNetworkError": "Changing the status failed: network error.",
     "unknownError": "Unknown error",
     "OrganizationWebsite": {
       "label": "Website",

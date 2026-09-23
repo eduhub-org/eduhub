@@ -42,12 +42,14 @@ import TagSelector from '../../inputs/TagSelector';
 import { isKnownCourseGroupOptionTitle } from '../../../helpers/courseGroupOptions';
 import InputField from '../../inputs/InputField';
 import DropDownSelector from '../../inputs/DropDownSelector';
+import CheckboxSelector from '../../inputs/CheckboxSelector';
 import RadioSelector, { RadioSelectorOption } from '../../inputs/RadioSelector';
 import FileUploadField from '../../inputs/FileUploadField';
 import DatePicker from '../../inputs/DatePicker';
 import {
   UPDATE_COURSE_ECTS,
   UPDATE_COURSE_EXTERNAL_REGISTRATION_LINK,
+  UPDATE_COURSE_GUEST_REGISTRATION_ENABLED,
   UPDATE_COURSE_MAX_MISSED_SESSION,
   UPDATE_COURSE_REGISTRATION_TYPE,
   UPDATE_COURSE_LEARNING_GOALS,
@@ -132,6 +134,12 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
   // completion thresholds for its degree certificate.
   const isDegreeCourse = course.Program?.type === ProgramType.DEGREES;
   const isEventCourse = course.Program?.type === ProgramType.EVENTS;
+
+  // Mirrors the guards in functions/callNodeFunction/registerGuestForCourse.
+  const supportsGuestRegistration =
+    isEventCourse &&
+    (course.registrationType === CourseRegistrationType_enum.DIRECT_CONFIRMATION ||
+      course.registrationType === CourseRegistrationType_enum.DIRECT_WITH_INPUT);
 
   const projectSubmissionDeadlineValue = useMemo(
     () => submissionDeadlineToCalendarDate(course.projectSubmissionDeadline),
@@ -746,6 +754,21 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                   updateValueMutation={UPDATE_COURSE_EXTERNAL_REGISTRATION_LINK}
                   refetchQueries={['AdminCourseList']}
                   helpText={t('manageCourses.external_registration_link.help_text')}
+                />
+              )}
+
+              {/* Only meaningful for standalone events registered directly - the
+                  backend rejects guest registration for anything else, so showing
+                  the toggle elsewhere would just promise something that cannot work. */}
+              {supportsGuestRegistration && (
+                <CheckboxSelector
+                  variant="material"
+                  label={t('manageCourse.guest_registration.label')}
+                  helpText={t('manageCourse.guest_registration.help_text')}
+                  checked={Boolean(course.guestRegistrationEnabled)}
+                  updateValueMutation={UPDATE_COURSE_GUEST_REGISTRATION_ENABLED}
+                  identifierVariables={{ courseId: course.id }}
+                  refetchQueries={['AdminCourseList']}
                 />
               )}
 
