@@ -78,6 +78,7 @@ services:
       DEV_APP_PORT: 4201
       DEV_SELF_PORT: 5001
       APP_NAME: stujo
+      STUJO_ADMIN_EMAIL: ${STUJO_ADMIN_EMAIL:-}
       NEXT_PUBLIC_ENVIRONMENT: development
       NEXT_PUBLIC_API_URL: http://${DEV_HOST:-localhost}:8080/v1/graphql
       NEXT_PUBLIC_AUTH_URL: http://${DEV_HOST:-localhost}:28080
