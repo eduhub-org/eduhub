@@ -1,6 +1,8 @@
 import logging
 import os
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
+
+from dateutil import tz
 
 from api_clients import EduHubClient
 
@@ -19,6 +21,10 @@ from pythonFunctions.mail_helpers import (
 # the applications table and statistics already treat them as expired by date.
 EXPIRY_GRACE_DAYS = 3
 
+# "Today" is the Europe/Berlin calendar day, the same boundary the applications
+# table uses and REGISTRATION_TIME_ZONE in the frontend registration code.
+INVITATION_TIME_ZONE = tz.gettz("Europe/Berlin")
+
 MAIL_TYPE = "INVITATION_EXPIRING_SOON"
 
 
@@ -35,9 +41,9 @@ def expire_invitations(arguments):
 
     invitationExpirationDate is a Postgres date: the last day the invitation
     can be confirmed. The GraphQL variables must therefore be typed date, not
-    timestamptz (Hasura rejects the latter), and "today" is the UTC date, so
-    the job never expires an invitation before its last day has ended in
-    Germany.
+    timestamptz (Hasura rejects the latter), and "today" is the Europe/Berlin
+    day: the reminder goes out right after midnight on the last day, and the
+    invitation expires right after that day has ended.
 
     Note on the set_invitation_expiration_date DB trigger: it resets
     invitationExpirationDate to NOW() + 2 days on any update where the new
@@ -56,7 +62,7 @@ def expire_invitations(arguments):
 
     try:
         client = EduHubClient()
-        today = datetime.now(timezone.utc).date()
+        today = datetime.now(INVITATION_TIME_ZONE).date()
         today_iso = today.isoformat()
         grace_start_iso = (today - timedelta(days=EXPIRY_GRACE_DAYS)).isoformat()
         frontend_url = os.environ.get("FRONTEND_URL") or "https://edu.opencampus.sh"
