@@ -183,7 +183,7 @@ actions:
           value: publishJobPosting
     permissions:
       - role: user_access
-    comment: Publishes a StuJo job posting (free/credit) or creates the Stripe checkout session for it
+    comment: Publishes a StuJo job posting (free/credit/invoice) or creates the Stripe checkout session for it
   - name: saveJobPostingPdf
     definition:
       kind: synchronous
@@ -710,6 +710,7 @@ custom_types:
   input_objects:
     - name: AddonMappingInput
     - name: CourseInput
+    - name: JobPostingBillingInput
     - name: SelectedAddonInput
   objects:
     - name: NotifySessionParticipantsResult

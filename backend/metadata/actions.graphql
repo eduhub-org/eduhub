@@ -342,6 +342,17 @@ input CourseInput {
   stripePriceId: String
 }
 
+input JobPostingBillingInput {
+  legalName: String!
+  addressLine1: String!
+  addressLine2: String
+  postalCode: String!
+  city: String!
+  country: String!
+  vatId: String
+  reference: String
+}
+
 input SelectedAddonInput {
   questionId: String!
   choiceId: String!
@@ -721,7 +732,12 @@ type CourseAddonMapping {
 
 
 type Mutation {
-  publishJobPosting(jobPostingId: Int!, acceptTerms: Boolean): PublishJobPostingResult!
+  publishJobPosting(
+    jobPostingId: Int!
+    acceptTerms: Boolean
+    paymentMethod: String
+    billing: JobPostingBillingInput
+  ): PublishJobPostingResult!
 }
 
 type Mutation {

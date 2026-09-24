@@ -61,6 +61,13 @@ resource "google_cloud_run_service" "stujo" {
           name  = "APP_NAME"
           value = "stujo"
         }
+        # Default StuJo contact when the root JobPortal has no contactEmail
+        # (e.g. the "Kauf auf Rechnung" hint in the order box). Same fallback
+        # as resolveContactEmail in the cloud functions.
+        env {
+          name  = "STUJO_ADMIN_EMAIL"
+          value = var.stujo_admin_email
+        }
         env {
           name = "HASURA_ADMIN_SECRET"
           value_from {
@@ -192,6 +199,11 @@ resource "google_cloud_run_service" "stujo_portals" {
         env {
           name  = "APP_NAME"
           value = each.key
+        }
+        # Default StuJo contact, the same on every portal (see the root service).
+        env {
+          name  = "STUJO_ADMIN_EMAIL"
+          value = var.stujo_admin_email
         }
         env {
           name = "HASURA_ADMIN_SECRET"

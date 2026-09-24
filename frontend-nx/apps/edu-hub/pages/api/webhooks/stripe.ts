@@ -10,6 +10,7 @@ import {
   handleJobPostingCheckoutExpired,
   parseJobPostingId,
   handleJobPostingInvoiceFinalized,
+  handleJobPostingInvoiceStatusEvent,
 } from '../../../lib/stripeJobPosting';
 import { generateInvoiceNumber, resolveStripeInvoice } from '../../../lib/stripeInvoice';
 
@@ -491,6 +492,23 @@ const handleStripeWebhook = async (
       // it the mail falls through to the sendPendingJobPostingMails sweep.
       case 'invoice.finalized': {
         await handleJobPostingInvoiceFinalized(client, event.data.object as Stripe.Invoice);
+        return res.status(200).json({ received: true });
+      }
+
+      // "Kauf auf Rechnung": Stripe reconciles the bank transfer to the
+      // customer's virtual IBAN and reports the result here. Only acts on
+      // invoices publishJobPosting issued with metadata.paymentMethod INVOICE.
+      //
+      // NOTE: these events must be enabled on the endpoint in the Stripe
+      // Dashboard (sandbox and live) -- see docs/STRIPE_INTEGRATION.md.
+      case 'invoice.paid':
+      case 'invoice.overdue':
+      case 'invoice.voided': {
+        await handleJobPostingInvoiceStatusEvent(
+          client,
+          event.type,
+          event.data.object as Stripe.Invoice
+        );
         return res.status(200).json({ received: true });
       }
 
