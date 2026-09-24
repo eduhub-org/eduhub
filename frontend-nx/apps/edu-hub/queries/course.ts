@@ -71,7 +71,7 @@ export const MANAGED_COURSE_APPLICATIONS = gql`
     $offset: Int = 0
     $filter: CourseEnrollment_bool_exp = {}
     $order_by: [CourseEnrollment_order_by!] = [{ id: asc }]
-    $expirationCutoff: timestamptz!
+    $expirationCutoff: date!
   ) {
     Course_by_pk(id: $id) {
       id
