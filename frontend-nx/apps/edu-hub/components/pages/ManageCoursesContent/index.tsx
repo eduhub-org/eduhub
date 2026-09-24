@@ -99,7 +99,7 @@ interface IProps {
   /** Scopes the list (including the "All" tab) to a single Program.type. */
   programType: ProgramType;
   /** Organization the dashboard is scoped to; see ProgramManagementDashboard. */
-  organizationId: number;
+  organizationId: number | null;
 }
 
 const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationId }) => {
@@ -118,7 +118,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
     () => ({
       Program: {
         type: { _eq: programType },
-        organizationId: { _eq: organizationId },
+        ...(organizationId === null ? {} : { organizationId: { _eq: organizationId } }),
       },
     }),
     [programType, organizationId]
@@ -370,15 +370,20 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
 
   const [copyCourses] = useManageMutation(COPY_COURSES_TO_PROGRAM);
 
-  // A new offering needs a concrete program, hence a program tab (not "All") selected.
+  // A new offering needs a concrete program, hence a single organization in scope and a program tab
+  // (not "All") selected.
   const selectedProgramId = filter.where.programId?._eq;
   const addDisabledHint =
-    selectedProgramId === undefined || selectedProgramId === null ? t('add_disabled_hint.select_program') : null;
+    organizationId === null
+      ? t('add_disabled_hint.select_organization')
+      : selectedProgramId === undefined || selectedProgramId === null
+        ? t('add_disabled_hint.select_program')
+        : null;
 
   // Add course handler
   const handleAddCourse = useCallback(async () => {
     const selectedProgram = sortedPrograms.find((program) => program.id === selectedProgramId);
-    if (!selectedProgram) {
+    if (organizationId === null || !selectedProgram) {
       return;
     }
 
@@ -404,7 +409,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
       setErrorMessage(t(`notifications.add_failed.${messageKey}`));
       setShowErrorNotification(true);
     }
-  }, [selectedProgramId, sortedPrograms, insertCourse, t, messageKey]);
+  }, [selectedProgramId, organizationId, sortedPrograms, insertCourse, t, messageKey]);
 
   // Copying runs in two steps (bulk action opens the dialog, the dialog does the work), so the
   // selection is only released once the copy itself succeeded.
