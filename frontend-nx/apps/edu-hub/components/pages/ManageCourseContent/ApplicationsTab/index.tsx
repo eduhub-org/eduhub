@@ -1,4 +1,5 @@
 import { QueryResult } from '@apollo/client';
+import { format } from 'date-fns';
 import { FC, useCallback, useMemo, useState } from 'react';
 import {
   ManagedCourse_Course_by_pk,
@@ -151,7 +152,9 @@ interface ApplicationsTabContentProps {
 // expire_invitations cron only flips lapsed INVITED enrollments to EXPIRED once
 // an hour, so the same cutoff is applied client-side and passed to the expired
 // invitations aggregate to keep the table and the statistics cards in sync.
-const invitationExpirationCutoff = () => new Date(new Date().setHours(0, 0, 0, 0)).toISOString();
+// invitationExpirationDate is a Postgres date, so the cutoff is today's local
+// calendar date ("yyyy-MM-dd"); Hasura rejects a timestamp variable for it.
+const invitationExpirationCutoff = () => format(new Date(), 'yyyy-MM-dd');
 
 const isExpired = (enrollment: ApplicationEnrollment) => {
   if (enrollment.invitationExpirationDate == null) {

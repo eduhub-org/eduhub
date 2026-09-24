@@ -12,8 +12,10 @@ describe('expired invitations aggregate', () => {
     query.indexOf('AbortedCourseEnrollments:')
   );
 
-  it('accepts an expiration cutoff variable', () => {
-    expect(query).toContain('$expirationCutoff: timestamptz!');
+  // invitationExpirationDate is a Postgres date. Hasura rejects the whole
+  // query when a timestamptz variable is compared against it.
+  it('types the expiration cutoff like the date column it filters', () => {
+    expect(query).toContain('$expirationCutoff: date!');
   });
 
   it('counts enrollments already flipped to EXPIRED', () => {

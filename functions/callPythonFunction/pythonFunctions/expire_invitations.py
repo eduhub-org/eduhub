@@ -11,8 +11,13 @@ from pythonFunctions.mail_helpers import (
     queue_mail,
 )
 
-# How long before an invitation expires we send the "expiring soon" reminder.
-REMINDER_LEAD_HOURS = 24
+# Only invitations that lapsed within this many days are flipped to EXPIRED.
+# Every flip sends an INVITATION_EXPIRED mail, and this job never ran
+# successfully before the date/timestamptz fix, so without the bound its first
+# run would mail everyone whose invitation lapsed at any time in the past. The
+# window still covers a few missed runs. Older lapsed invitations stay INVITED;
+# the applications table and statistics already treat them as expired by date.
+EXPIRY_GRACE_DAYS = 3
 
 MAIL_TYPE = "INVITATION_EXPIRING_SOON"
 
@@ -20,11 +25,19 @@ MAIL_TYPE = "INVITATION_EXPIRING_SOON"
 def expire_invitations(arguments):
     """
     Handles course-invitation expiry:
-      1. Sends an INVITATION_EXPIRING_SOON reminder ~24h before an invitation's
-         invitationExpirationDate (deduped via MailLog metadata).
-      2. Flips lapsed INVITED enrollments (past their invitationExpirationDate)
-         to EXPIRED. The send_enrollment_status_email event trigger then sends
-         the INVITATION_EXPIRED mail.
+      1. Sends an INVITATION_EXPIRING_SOON reminder on the invitation's last
+         day, i.e. when invitationExpirationDate is today (deduped via MailLog
+         metadata).
+      2. Flips lapsed INVITED enrollments (invitationExpirationDate before
+         today, within EXPIRY_GRACE_DAYS) to EXPIRED. The
+         send_enrollment_status_email event trigger then sends the
+         INVITATION_EXPIRED mail.
+
+    invitationExpirationDate is a Postgres date: the last day the invitation
+    can be confirmed. The GraphQL variables must therefore be typed date, not
+    timestamptz (Hasura rejects the latter), and "today" is the UTC date, so
+    the job never expires an invitation before its last day has ended in
+    Germany.
 
     Note on the set_invitation_expiration_date DB trigger: it resets
     invitationExpirationDate to NOW() + 2 days on any update where the new
@@ -43,18 +56,18 @@ def expire_invitations(arguments):
 
     try:
         client = EduHubClient()
-        now = datetime.now(timezone.utc)
-        now_iso = now.isoformat()
-        reminder_cutoff_iso = (now + timedelta(hours=REMINDER_LEAD_HOURS)).isoformat()
+        today = datetime.now(timezone.utc).date()
+        today_iso = today.isoformat()
+        grace_start_iso = (today - timedelta(days=EXPIRY_GRACE_DAYS)).isoformat()
         frontend_url = os.environ.get("FRONTEND_URL") or "https://edu.opencampus.sh"
 
-        # 1. Reminders for invitations expiring within the lead window (not yet lapsed).
+        # 1. Reminders for invitations whose last day is today (not yet lapsed).
         reminder_query = """
-        query ExpiringSoonInvitations($now: timestamptz!, $cutoff: timestamptz!) {
+        query ExpiringSoonInvitations($today: date!) {
             CourseEnrollment(
                 where: {
                     status: {_eq: INVITED},
-                    invitationExpirationDate: {_gt: $now, _lte: $cutoff}
+                    invitationExpirationDate: {_eq: $today}
                 }
             ) {
                 id
@@ -64,9 +77,7 @@ def expire_invitations(arguments):
             }
         }
         """
-        reminder_result = client.send_query(
-            reminder_query, {"now": now_iso, "cutoff": reminder_cutoff_iso}
-        )
+        reminder_result = client.send_query(reminder_query, {"today": today_iso})
         if not isinstance(reminder_result, dict) or reminder_result.get("errors"):
             logging.error(f"Failed to query expiring invitations: {reminder_result}")
             return {"success": False, "error": str(reminder_result)}
@@ -126,16 +137,21 @@ def expire_invitations(arguments):
         # 2. Flip lapsed INVITED invitations to EXPIRED. The event trigger sends
         # INVITATION_EXPIRED. status is a Hasura enum -> use enum literals.
         expire_mutation = """
-        mutation ExpireInvitations($now: timestamptz!) {
+        mutation ExpireInvitations($today: date!, $graceStart: date!) {
             update_CourseEnrollment(
-                where: {status: {_eq: INVITED}, invitationExpirationDate: {_lte: $now}},
+                where: {
+                    status: {_eq: INVITED},
+                    invitationExpirationDate: {_lt: $today, _gte: $graceStart}
+                },
                 _set: {status: EXPIRED}
             ) {
                 affected_rows
             }
         }
         """
-        expire_result = client.send_query(expire_mutation, {"now": now_iso})
+        expire_result = client.send_query(
+            expire_mutation, {"today": today_iso, "graceStart": grace_start_iso}
+        )
         if not isinstance(expire_result, dict) or expire_result.get("errors"):
             logging.error(f"Failed to expire invitations: {expire_result}")
             return {"success": False, "error": str(expire_result)}
