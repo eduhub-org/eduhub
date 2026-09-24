@@ -164,7 +164,11 @@ const isExpired = (enrollment: ApplicationEnrollment) => {
   if (enrollment.invitationExpirationDate == null) {
     return false;
   }
-  return new Date(enrollment.invitationExpirationDate).getTime() < new Date(invitationExpirationCutoff()).getTime();
+  // The Apollo cache stores this date as a Date pinned to UTC midnight (see
+  // config/apollo.ts), so its calendar day is read back in UTC. "yyyy-MM-dd"
+  // strings compare chronologically.
+  const expirationDay = formatInTimeZone(new Date(enrollment.invitationExpirationDate), 'UTC', 'yyyy-MM-dd');
+  return expirationDay < invitationExpirationCutoff();
 };
 
 const isInviteEligibleEnrollment = (enrollment: ApplicationEnrollment) =>
