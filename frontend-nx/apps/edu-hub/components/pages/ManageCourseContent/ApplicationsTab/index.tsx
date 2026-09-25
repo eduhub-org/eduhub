@@ -1,4 +1,6 @@
 import { QueryResult } from '@apollo/client';
+import { format } from 'date-fns';
+import { formatInTimeZone } from 'date-fns-tz';
 import { FC, useCallback, useMemo, useState } from 'react';
 import {
   ManagedCourse_Course_by_pk,
@@ -151,21 +153,22 @@ interface ApplicationsTabContentProps {
 // expire_invitations cron only flips lapsed INVITED enrollments to EXPIRED once
 // an hour, so the same cutoff is applied client-side and passed to the expired
 // invitations aggregate to keep the table and the statistics cards in sync.
-// invitationExpirationDate is a Postgres `date`, so the cutoff is today's local
-// date as YYYY-MM-DD (Hasura rejects the query for any other variable type).
-const invitationExpirationCutoff = () => {
-  const today = new Date();
-  const month = String(today.getMonth() + 1).padStart(2, '0');
-  const day = String(today.getDate()).padStart(2, '0');
-  return `${today.getFullYear()}-${month}-${day}`;
-};
+// invitationExpirationDate is a Postgres date, so the cutoff is a calendar day
+// ("yyyy-MM-dd"); Hasura rejects a timestamp variable for it. "Today" is the
+// Europe/Berlin day for every viewer, the same boundary as the cron and as
+// REGISTRATION_TIME_ZONE in CourseContent/Registration/types.ts.
+const INVITATION_TIME_ZONE = 'Europe/Berlin';
+const invitationExpirationCutoff = () => formatInTimeZone(new Date(), INVITATION_TIME_ZONE, 'yyyy-MM-dd');
 
 const isExpired = (enrollment: ApplicationEnrollment) => {
   if (enrollment.invitationExpirationDate == null) {
     return false;
   }
-  // YYYY-MM-DD strings compare chronologically.
-  return String(enrollment.invitationExpirationDate).slice(0, 10) < invitationExpirationCutoff();
+  // The Apollo cache stores this date as a Date pinned to UTC midnight (see
+  // config/apollo.ts), so its calendar day is read back in UTC. "yyyy-MM-dd"
+  // strings compare chronologically.
+  const expirationDay = formatInTimeZone(new Date(enrollment.invitationExpirationDate), 'UTC', 'yyyy-MM-dd');
+  return expirationDay < invitationExpirationCutoff();
 };
 
 const isInviteEligibleEnrollment = (enrollment: ApplicationEnrollment) =>
@@ -449,7 +452,9 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
         variables: {
           enrollmentIds,
           status: CourseEnrollmentStatus_enum.INVITED,
-          expire: inviteExpireDate,
+          // The day the picker shows. Sending the Date itself would store its
+          // UTC day, which in Germany is the previous day shortly after midnight.
+          expire: format(inviteExpireDate, 'yyyy-MM-dd'),
         },
       });
       invitedCount = result.data?.update_CourseEnrollment?.affected_rows ?? 0;
