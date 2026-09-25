@@ -50,7 +50,7 @@ export const ADMIN_COURSE_LIST = gql`
       Program {
         ...ProgramFragmentMinimumProperties
       }
-      CourseEnrollments {
+      CourseEnrollments(where: { isTest: { _eq: false } }) {
         id
         CourseEnrollmentStatus {
           value
@@ -76,6 +76,7 @@ export const ADMIN_COURSE_LIST = gql`
       AppliedAndUnratedCount: CourseEnrollments_aggregate(
         where: {
           _and: [
+            { isTest: { _eq: false } }
             { CourseEnrollmentStatus: { value: { _eq: "APPLIED" } } }
             { MotivationRating: { value: { _eq: "UNRATED" } } }
           ]

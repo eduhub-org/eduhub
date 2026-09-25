@@ -33,6 +33,7 @@
 - "!include public_FaqCollection.yaml"
 - "!include public_FaqTranslation.yaml"
 - "!include public_GuestRegistrationToken.yaml"
+- "!include public_ImpersonationSession.yaml"
 - "!include public_Invoice.yaml"
 - "!include public_InvoiceStatus.yaml"
 - "!include public_JobAlertSubscription.yaml"

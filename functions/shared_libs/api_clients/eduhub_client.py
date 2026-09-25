@@ -87,7 +87,7 @@ class EduHubClient:
     def get_course_participants_from_session_id(self, session_id):
         variables = {"session_id": f"{session_id}"}
         query = """query($session_id: Int) {
-            CourseEnrollment(where: {Course: {Sessions: {id: {_eq: $session_id}}}}) {
+            CourseEnrollment(where: {isTest: {_eq: false}, Course: {Sessions: {id: {_eq: $session_id}}}}) {
                 User {
                     id
                     firstName
@@ -109,7 +109,7 @@ class EduHubClient:
     def get_participants_from_course(self, course_id):
         variables = {"course_id": course_id}
         query = """query($course_id: Int) {
-            CourseEnrollment(where: {courseId: {_eq: $course_id}}) {
+            CourseEnrollment(where: {isTest: {_eq: false}, courseId: {_eq: $course_id}}) {
                 User {
                     id
                     firstName
@@ -131,7 +131,7 @@ class EduHubClient:
         query = """query($program_id:Int!) {
             Program_by_pk(id: $program_id) {
                 Courses {
-                    CourseEnrollments {
+                    CourseEnrollments(where: {isTest: {_eq: false}}) {
                         achievementCertificateURL
                         attendanceCertificateURL
                         courseId
@@ -186,7 +186,7 @@ class EduHubClient:
         """
         # GraphQL query
         query = """query GetEnrollments($userIds: [uuid!]!, $courseId: Int!) {
-            CourseEnrollment(where: {userId: {_in: $userIds}, Course: {id: {_eq: $courseId}}}) {
+            CourseEnrollment(where: {isTest: {_eq: false}, userId: {_in: $userIds}, Course: {id: {_eq: $courseId}}}) {
                 User {
                     Attendances {
                         Session {
@@ -291,6 +291,7 @@ class EduHubClient:
         query = """query GetDegreeParticipations($userIds: [uuid!]!, $degreeCourseId: Int!) {
             CourseEnrollment(
                 where: {
+                    isTest: {_eq: false},
                     userId: {_in: $userIds},
                     Course: {CourseDegrees: {degreeCourseId: {_eq: $degreeCourseId}}},
                     _or: [

@@ -24,6 +24,7 @@ export const COMPLETED_DEGREE_ENROLLMENTS = gql`
   query CompletedDegreeEnrollments($degreeCourseId: Int!, $userId: uuid!) {
     CourseEnrollment(
       where: {
+        isTest: { _eq: false },
         _or: [
           {
             userId: { _eq: $userId },
@@ -65,7 +66,7 @@ export const DEGREE_PARTICIPANTS_WITH_DEGREE_ENROLLMENTS = gql`
       CourseEnrollments(
         limit: $limit
         offset: $offset
-        where: $filter
+        where: { _and: [{ isTest: { _eq: false } }, $filter] }
         order_by: $order_by
       ) {
         id
@@ -81,7 +82,9 @@ export const DEGREE_PARTICIPANTS_WITH_DEGREE_ENROLLMENTS = gql`
           firstName
           lastName
           email
-          CourseEnrollments(where: { Course: { CourseDegrees: { degreeCourseId: { _eq: $degreeCourseId } } } }) {
+          CourseEnrollments(
+            where: { isTest: { _eq: false }, Course: { CourseDegrees: { degreeCourseId: { _eq: $degreeCourseId } } } }
+          ) {
             id
             status
             achievementCertificateURL
@@ -98,7 +101,7 @@ export const DEGREE_PARTICIPANTS_WITH_DEGREE_ENROLLMENTS = gql`
           }
         }
       }
-      CourseEnrollments_aggregate(where: $filter) {
+      CourseEnrollments_aggregate(where: { _and: [{ isTest: { _eq: false } }, $filter] }) {
         aggregate {
           count
         }

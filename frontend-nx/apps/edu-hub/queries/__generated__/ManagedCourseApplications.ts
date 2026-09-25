@@ -161,6 +161,10 @@ export interface ManagedCourseApplications_Course_by_pk_CourseEnrollments {
    */
   status: CourseEnrollmentStatus_enum;
   /**
+   * Preview enrollment an instructor or admin created on their own course to see the participant view. Never counted, listed, exported, certified or mailed about.
+   */
+  isTest: boolean;
+  /**
    * Organization paying for this enrollment (B2B). NULL means the enrolling user pays personally (B2C)
    */
   billingOrganizationId: number | null;

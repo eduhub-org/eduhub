@@ -9,6 +9,8 @@ import { MdClose } from 'react-icons/md';
 import useLogout from '../../hooks/logout';
 import { Footer } from './Footer';
 import { Header } from './Header';
+import { ImpersonationBanner } from './ImpersonationBanner';
+import { ParticipantPreviewNotice } from './ParticipantPreviewNotice';
 import { useAppSettings } from '../../contexts/AppSettingsContext';
 
 type PageProps = {
@@ -63,6 +65,12 @@ export const Page: FC<PageProps> = ({ children, className }) => {
 
   return (
     <>
+      {/* First thing on every page, above even the app-settings banner: if this
+          is somebody else's account, that outranks whatever the banner says. */}
+      <ImpersonationBanner />
+      {/* Also page chrome, and above the wrapper for the same reason: the header
+          inside it is absolutely positioned and would cover this bar. */}
+      <ParticipantPreviewNotice />
       <Transition
         as="div"
         show={bannerState.isVisible && !appSettingsLoading && !appSettingsError}
