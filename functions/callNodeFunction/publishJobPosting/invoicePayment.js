@@ -22,6 +22,9 @@ import { gql } from 'graphql-request';
 
 export const INVOICE_DAYS_UNTIL_DUE = 30;
 
+/** error.code thrown by `publish` when another request published first. */
+export const POSTING_NOT_PUBLISHABLE = 'POSTING_NOT_PUBLISHABLE';
+
 // Stripe caps invoice custom field values at 140 characters.
 const REFERENCE_MAX_LENGTH = 140;
 const FIELD_MAX_LENGTH = 200;
@@ -107,6 +110,22 @@ const UPDATE_ORGANIZATION_BILLING = gql`
     }
   }
 `;
+
+const GET_QUEUED_PUBLISHED_MAIL = gql`
+  query GetQueuedJobPostingPublishedMail($contains: jsonb!) {
+    MailLog(where: { metadata: { _contains: $contains } }, limit: 1) {
+      id
+    }
+  }
+`;
+
+/** True when this posting's confirmation mail was queued by an earlier publication. */
+export async function hasQueuedPublishedMail(client, jobPostingId) {
+  const { MailLog } = await client.request(GET_QUEUED_PUBLISHED_MAIL, {
+    contains: { type: 'JOB_POSTING_PUBLISHED', jobPostingId },
+  });
+  return MailLog.length > 0;
+}
 
 const trimOrNull = (value) => {
   if (value === null || value === undefined) return null;
@@ -269,7 +288,9 @@ export async function applyCustomerBilling(stripe, customerId, billing, logger) 
  * Order matters: the Invoice row is inserted before finalization so the
  * invoice.finalized webhook (and the sendPendingJobPostingMails sweep) find it
  * by stripeInvoiceId. `publish` runs between creating the draft and inserting
- * the row, so a failure before it leaves only a deletable draft.
+ * the row, so a failure up to and including it deletes the draft. A failure
+ * after it carries the draft id as `error.stripeInvoiceId` for the caller's
+ * admin notice.
  *
  * @returns {Promise<Object>} the finalized Stripe invoice and our row id
  */
@@ -292,9 +313,11 @@ export async function issueBankTransferInvoice({
   );
 
   let totals;
+  let publishResult;
   try {
     await stripe.invoiceItems.create(buildInvoiceItemParams({ customerId, invoiceId: draft.id, lineItem }));
     totals = await stripe.invoices.retrieve(draft.id);
+    publishResult = await publish();
   } catch (error) {
     await stripe.invoices.del(draft.id).catch((deleteError) =>
       logger.warn('Could not delete the draft invoice', { invoiceId: draft.id, error: deleteError.message })
@@ -302,8 +325,15 @@ export async function issueBankTransferInvoice({
     throw error;
   }
 
-  const publishResult = await publish();
+  try {
+    return await recordAndFinalize({ stripe, client, draft, totals, currency, reference, invoiceRow, publishResult });
+  } catch (error) {
+    error.stripeInvoiceId = draft.id;
+    throw error;
+  }
+}
 
+async function recordAndFinalize({ stripe, client, draft, totals, currency, reference, invoiceRow, publishResult }) {
   const grossTotal = totals.total;
   const netTotal = totals.subtotal;
   const { insert_Invoice_one: row } = await client.request(INSERT_JOB_INVOICE, {

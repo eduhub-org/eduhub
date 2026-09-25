@@ -6,6 +6,7 @@ import {
   buildBankTransferInvoiceParams,
   buildInvoiceItemParams,
   fillOrganizationBilling,
+  hasQueuedPublishedMail,
   issueBankTransferInvoice,
   normalizeBillingInput,
 } from '../publishJobPosting/invoicePayment.js';
@@ -274,5 +275,46 @@ describe('issueBankTransferInvoice', () => {
     expect(stripe.invoices.del).toHaveBeenCalledWith('in_1');
     expect(publish).not.toHaveBeenCalled();
     expect(client.request).not.toHaveBeenCalled();
+  });
+
+  it('deletes the draft and records nothing when another request published first', async () => {
+    const stripe = makeStripe();
+    const client = { request: jest.fn() };
+    const publish = jest.fn().mockRejectedValue(new Error('Posting was published concurrently'));
+
+    await expect(run(stripe, client, publish)).rejects.toThrow('published concurrently');
+
+    expect(stripe.invoices.del).toHaveBeenCalledWith('in_1');
+    expect(client.request).not.toHaveBeenCalled();
+    expect(stripe.invoices.finalizeInvoice).not.toHaveBeenCalled();
+  });
+
+  it('names the draft on a failure after publishing, and keeps it for a human', async () => {
+    const stripe = makeStripe();
+    stripe.invoices.finalizeInvoice.mockRejectedValue(new Error('bank transfers not activated'));
+    const client = { request: jest.fn().mockResolvedValue({ insert_Invoice_one: { id: 42 } }) };
+
+    const error = await run(stripe, client, jest.fn().mockResolvedValue({})).catch((e) => e);
+
+    expect(error.message).toBe('bank transfers not activated');
+    expect(error.stripeInvoiceId).toBe('in_1');
+    expect(stripe.invoices.del).not.toHaveBeenCalled();
+  });
+});
+
+describe('hasQueuedPublishedMail', () => {
+  it('looks the confirmation up by its dedup key', async () => {
+    const client = { request: jest.fn().mockResolvedValue({ MailLog: [{ id: 1 }] }) };
+
+    expect(await hasQueuedPublishedMail(client, 7)).toBe(true);
+    expect(client.request.mock.calls[0][1]).toEqual({
+      contains: { type: 'JOB_POSTING_PUBLISHED', jobPostingId: 7 },
+    });
+  });
+
+  it('is false for a first publication', async () => {
+    const client = { request: jest.fn().mockResolvedValue({ MailLog: [] }) };
+
+    expect(await hasQueuedPublishedMail(client, 7)).toBe(false);
   });
 });

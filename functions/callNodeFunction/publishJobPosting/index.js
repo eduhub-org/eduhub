@@ -9,9 +9,11 @@ import {
   getOrCreateTaxRate,
 } from '../lib/stripeTax.js';
 import {
+  POSTING_NOT_PUBLISHABLE,
   applyCustomerBilling,
   buildInvoicePaymentDescription,
   fillOrganizationBilling,
+  hasQueuedPublishedMail,
   issueBankTransferInvoice,
   loadInvoiceOrganization,
   normalizeBillingInput,
@@ -109,6 +111,24 @@ const PUBLISH_POSTING = gql`
     ) {
       id
       status
+    }
+  }
+`;
+
+// The invoice path bills before anyone pays, so the publish must be the
+// guard against a second concurrent request (two tabs, a double submit):
+// only one of them can move the posting out of a publishable status.
+const PUBLISH_POSTING_IF_PUBLISHABLE = gql`
+  mutation PublishJobPostingIfPublishable(
+    $id: Int!
+    $publishedAt: timestamptz!
+    $expiresAt: timestamptz!
+  ) {
+    update_JobPosting(
+      where: { id: { _eq: $id }, status: { _in: [DRAFT, EXPIRED, PENDING_PAYMENT, DEACTIVATED] } }
+      _set: { status: PUBLISHED, publishedAt: $publishedAt, expiresAt: $expiresAt }
+    ) {
+      affected_rows
     }
   }
 `;
@@ -448,7 +468,19 @@ async function publishByInvoice({
         jobPostingId: posting.id,
       },
       publish: async () => {
-        published = await publishPosting(client, posting.id, durationDays);
+        const publishedAt = new Date();
+        const expiresAt = new Date(publishedAt.getTime() + durationDays * 24 * 60 * 60 * 1000);
+        const result = await client.request(PUBLISH_POSTING_IF_PUBLISHABLE, {
+          id: posting.id,
+          publishedAt: publishedAt.toISOString(),
+          expiresAt: expiresAt.toISOString(),
+        });
+        if (result.update_JobPosting.affected_rows !== 1) {
+          const error = new Error('Posting was published concurrently');
+          error.code = POSTING_NOT_PUBLISHABLE;
+          throw error;
+        }
+        published = { publishedAt, expiresAt };
         return published;
       },
     });
@@ -461,13 +493,40 @@ async function publishByInvoice({
     });
     if (published) {
       // The posting is live but the invoice is not finalized: needs a human,
-      // not a retry that would publish (and bill) a second time.
+      // not a retry that would publish (and bill) a second time. Not deduped
+      // on the posting, so an earlier publication's notice cannot swallow it.
+      if (process.env.STUJO_ADMIN_EMAIL) {
+        await sendJobPostingMail(
+          client,
+          logger,
+          'JOB_POSTING_ADMIN_NOTICE',
+          process.env.STUJO_ADMIN_EMAIL,
+          buildJobPostingMailVars(posting, {
+            expiresAt: published.expiresAt,
+            publishedAt: published.publishedAt,
+            paymentDescription:
+              `Rechnung NICHT ausgestellt – bitte manuell prüfen (Stripe-Entwurf ` +
+              `${error.stripeInvoiceId ?? 'unbekannt'}, Fehler: ${error.message})`,
+          }),
+          null,
+          {
+            Invoice: false,
+            InvoicePdf: false,
+            InvoiceLink: false,
+            InvoicePending: false,
+            TermsAccepted: Boolean(posting.termsAcceptedAt),
+          }
+        );
+      }
       return {
         success: true,
         published: true,
         paid: false,
         expiresAt: published.expiresAt.toISOString(),
       };
+    }
+    if (error.code === POSTING_NOT_PUBLISHABLE) {
+      return { success: false, error: error.message, messageKey: 'INVALID_STATUS' };
     }
     return { success: false, error: error.message, messageKey: 'INVOICE_PAYMENT_FAILED' };
   }
@@ -503,8 +562,21 @@ async function publishByInvoice({
     TermsAccepted: Boolean(posting.termsAcceptedAt),
   };
 
-  // Deduped against the invoice.finalized webhook by MailLog_job_posting_mail_unique.
-  if (posting.ContactUser?.email) {
+  // The confirmation is deduped per posting (MailLog_job_posting_mail_unique),
+  // so a repost of an expired posting cannot queue it again. Then Stripe
+  // sends this invoice itself, so its bank details still reach the employer.
+  const alreadyMailed = await hasQueuedPublishedMail(client, posting.id);
+  if (alreadyMailed) {
+    try {
+      await stripe.invoices.sendInvoice(invoice.id);
+    } catch (error) {
+      logger.error('Could not send the repost invoice through Stripe', {
+        jobPostingId: posting.id,
+        stripeInvoiceId: invoice.id,
+        error: error.message,
+      });
+    }
+  } else if (posting.ContactUser?.email) {
     await sendJobPostingMail(
       client,
       logger,
