@@ -72,6 +72,7 @@ def expire_invitations(arguments):
         query ExpiringSoonInvitations($today: date!) {
             CourseEnrollment(
                 where: {
+                    isTest: {_eq: false},
                     status: {_eq: INVITED},
                     invitationExpirationDate: {_eq: $today}
                 }
@@ -146,6 +147,7 @@ def expire_invitations(arguments):
         mutation ExpireInvitations($today: date!, $graceStart: date!) {
             update_CourseEnrollment(
                 where: {
+                    isTest: {_eq: false},
                     status: {_eq: INVITED},
                     invitationExpirationDate: {_lt: $today, _gte: $graceStart}
                 },

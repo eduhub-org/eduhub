@@ -37,6 +37,7 @@ import {
 } from './Projects/projectEffectiveSubmissionDeadline';
 import { useIsCourseWithEnrollment } from '../../../hooks/course';
 import NotificationSnackbar from '../../common/dialogs/NotificationSnackbar';
+import { useDeclareParticipantPreview } from '../../../contexts/ParticipantPreviewContext';
 
 /**
  * Page rhythm. Every vertical gap on this page comes from one of these, so a gap
@@ -126,6 +127,14 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
   const course = authorizedCourseData?.Course_by_pk || unauthorizedCourseData?.Course_by_pk;
   const enrollmentId = getCourseEnrollment(authorizedCourseData?.Course_by_pk, userId ?? '')?.id;
 
+  // Get the course enrollment of the current user (necessary for admins and instructors)
+  const courseEnrollment = getCourseEnrollment(course, userId ?? undefined);
+
+  // The preview notice is page chrome, so Page renders it above the header; this
+  // only says whether there is one. Declared here rather than further down
+  // because the `!course` guard below returns early, and a hook may not.
+  useDeclareParticipantPreview(courseEnrollment?.isTest && course ? course.id : null);
+
   const isCourseWithEnrollment = useIsCourseWithEnrollment(course);
 
   const [backgroundImage, setBackgroundImage] = useState<string>('');
@@ -203,9 +212,6 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
     validatedPrice: mapping.validatedPrice,
     currency: mapping.currency || course.currency || 'EUR',
   })) || [];
-
-  // Get the course enrollment of the current user (necessary for admins and instructors)
-  const courseEnrollment = getCourseEnrollment(course, userId ?? undefined);
 
   const isLoggedInParticipant =
     isLoggedIn &&

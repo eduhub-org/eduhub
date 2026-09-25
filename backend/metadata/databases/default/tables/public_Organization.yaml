@@ -145,6 +145,8 @@ select_permissions:
         - addressLine1
         - addressLine2
         - aliases
+        # StuJo "Kauf auf Rechnung" approval; read-only here, set by admins
+        - allowInvoicePayment
         - city
         - country
         - created_at

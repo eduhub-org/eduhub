@@ -87,6 +87,7 @@ def update_enrollment_locations(arguments):
         query GetEnrollments($courseIds: [Int!]!) {
             CourseEnrollment(
                 where: {
+                    isTest: {_eq: false},
                     courseId: {_in: $courseIds}
                 }
             ) {

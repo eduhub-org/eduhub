@@ -11,6 +11,12 @@ import { useCurrentUserId } from '@eduhub/hooks/authentication';
 import Layout from '../../components/Layout';
 import JobCard from '../../components/JobCard';
 import OrganizationSwitcher from '../../components/OrganizationSwitcher';
+import InvoicePaymentSection, {
+  BillingForm,
+  PaymentMethod,
+  initialBillingForm,
+  isBillingComplete,
+} from '../../components/InvoicePaymentSection';
 import {
   ACTION_ROLE_CONTEXT,
   CREATE_JOB_POSTING,
@@ -64,7 +70,9 @@ const EMPTY_FORM: FormState = {
  * Two-step posting creation (form -> preview & publish), per
  * design/stujo-design.pen. Also used for editing drafts (?id=...).
  * Publishing runs through the publishJobPosting action: free/credit
- * postings go live directly, paid ones redirect to Stripe Checkout.
+ * postings go live directly, paid ones redirect to Stripe Checkout -- or,
+ * for organizations approved for "Kauf auf Rechnung", go live at once and
+ * are billed by bank transfer invoice.
  */
 const NeuesAngebot: FC<Props> = ({ portal }) => {
   const t = useTranslations('meinStujo');
@@ -92,6 +100,8 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
   // detail page like in the Rails app). Uploaded after the draft exists.
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('CHECKOUT');
+  const [billing, setBilling] = useState<BillingForm | null>(null);
 
   const employerRole = useEmployerRoleContext();
   const {
@@ -121,6 +131,11 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
       selectedOrganization
     );
   }, [draftOrganizationId, editData, organizations, selectedOrganization]);
+
+  // Pre-filled once per organization; the employer's edits are kept after.
+  useEffect(() => {
+    if (organization) setBilling(initialBillingForm(organization));
+  }, [organization?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const { data: priceData } = useQuery(MY_JOB_POSTINGS, {
     context: employerRole,
@@ -170,7 +185,11 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
         requirement: posting.requirement ?? '',
       });
       setPdfUrl(posting.pdfUrl ?? null);
+      // The dashboard sends invoice-approved organizations here to choose
+      // how to pay instead of straight to Stripe.
+      if (router.query.step === 'preview' && posting.status !== 'PUBLISHED') setStep(2);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editData]);
 
   const setField = (key: keyof FormState) => (value: string) =>
@@ -263,10 +282,18 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
       setErrorMessage(t('acceptTermsRequired'));
       return;
     }
+    if (payByInvoice && !(billing && isBillingComplete(billing))) {
+      setErrorMessage(tOffer('billing_incomplete'));
+      return;
+    }
     const id = savedId ?? (await saveDraft());
     if (!id) return;
     const result = await publishPosting({
-      variables: { jobPostingId: id, acceptTerms },
+      variables: {
+        jobPostingId: id,
+        acceptTerms,
+        ...(payByInvoice ? { paymentMethod: 'INVOICE', billing } : {}),
+      },
     });
     const payload = result.data?.publishJobPosting;
     if (payload?.checkoutUrl) {
@@ -274,7 +301,9 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
       return;
     }
     if (payload?.success) {
-      router.push('/mein-stujo?payment=success');
+      router.push(payByInvoice ? '/mein-stujo?payment=invoice' : '/mein-stujo?payment=success');
+    } else if (payload?.messageKey === 'INVALID_VAT_ID') {
+      setErrorMessage(tOffer('billing_invalid_vat_id'));
     } else {
       setErrorMessage(t('publishFailed', { error: payload?.error ?? t('unknownError') }));
     }
@@ -294,6 +323,8 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
   // the same rule the course registration modal applies via
   // `config.requiresPayment && !acceptTerms`.
   const requiresConsent = netPrice > 0 && !credits.hasFree;
+  const payByInvoice =
+    requiresConsent && paymentMethod === 'INVOICE' && organization?.allowInvoicePayment === true;
 
   const field = (
     label: string,
@@ -512,6 +543,17 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
                   <p className="stujo-muted" style={{ fontSize: '0.8rem' }}>
                     {tOffer('payment_hint', { count: price?.durationDays ?? 56 })}
                   </p>
+                  {billing && (
+                    <InvoicePaymentSection
+                      organization={organization}
+                      contactEmail={portal.defaultContactEmail}
+                      paymentMethod={paymentMethod}
+                      onPaymentMethodChange={setPaymentMethod}
+                      billing={billing}
+                      onBillingChange={setBilling}
+                      disabled={busy}
+                    />
+                  )}
                 </>
               )}
             </div>
@@ -556,7 +598,9 @@ const NeuesAngebot: FC<Props> = ({ portal }) => {
               >
                 {netPrice === 0 || credits.hasFree
                   ? tOffer('publish_now')
-                  : tOffer('publish_paid', { price: formatPrice(grossPrice) })}
+                  : payByInvoice
+                    ? tOffer('publish_invoice', { price: formatPrice(grossPrice) })
+                    : tOffer('publish_paid', { price: formatPrice(grossPrice) })}
               </button>
             )}
           </div>

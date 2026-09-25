@@ -26,7 +26,7 @@ export interface SaveOrganizationLogo_saveOrganizationLogo {
 
 export interface SaveOrganizationLogo {
   /**
-   * Uploads an organization's logo; the handler requires canManageSettings for that organization
+   * Uploads an organization's logo and persists it; see authorizeOrganizationAdminFieldChange for who may
    */
   saveOrganizationLogo: SaveOrganizationLogo_saveOrganizationLogo;
 }

@@ -23,6 +23,10 @@ export type PortalBranding = {
   title: string;
   defaultRegion: string | null;
   contactEmail: string | null;
+  /** The StuJo team's address, the same on every portal (e.g. for requests
+   *  only the team can grant, like invoice payment): the root `stujo`
+   *  portal's contactEmail, else STUJO_ADMIN_EMAIL. Resolved server-side. */
+  defaultContactEmail: string | null;
   logoUrl: string | null;
   faviconUrl: string | null;
   primaryColor: string | null;
@@ -123,9 +127,8 @@ export async function resolvePortal(host: string | undefined): Promise<PortalBra
   const appName =
     domainMapping?.appName || settingsByDomain?.appName || FALLBACK_APP_NAME;
 
-  const portal =
-    data.JobPortal.find((p) => p.appName === appName) ||
-    data.JobPortal.find((p) => p.slug === 'stujo');
+  const rootPortal = data.JobPortal.find((p) => p.slug === 'stujo');
+  const portal = data.JobPortal.find((p) => p.appName === appName) || rootPortal;
   const settings = data.AppSettings.find((s) => s.appName === appName);
 
   if (!portal) {
@@ -138,6 +141,8 @@ export async function resolvePortal(host: string | undefined): Promise<PortalBra
     title: portal.title,
     defaultRegion: portal.defaultRegion,
     contactEmail: portal.contactEmail,
+    // Same fallback as resolveContactEmail in the cloud functions.
+    defaultContactEmail: rootPortal?.contactEmail || process.env.STUJO_ADMIN_EMAIL || null,
     logoUrl: settings?.logoUrl ?? null,
     faviconUrl: settings?.faviconUrl ?? null,
     primaryColor: settings?.primaryColor ?? null,
