@@ -311,3 +311,34 @@ describe('Sessions Component - program sessions', () => {
     expect(screen.getAllByText(/sessions.program_session$/)).toHaveLength(1);
   });
 });
+
+describe('Sessions Component - program sessions in an event agenda', () => {
+  it('does not hoist the course address onto a day with only program sessions', () => {
+    const oneAddress = [mockSessions[0].SessionAddresses[0]];
+    render(
+      <Sessions
+        sessions={[
+          { ...mockSessions[0], SessionAddresses: oneAddress },
+          secondSession({ SessionAddresses: oneAddress }),
+        ]}
+        programSessions={[
+          secondSession({
+            id: 9,
+            title: 'Program Opening',
+            programId: 4,
+            startDateTime: '2024-01-29T10:00:00Z',
+            endDateTime: '2024-01-29T11:00:00Z',
+            SessionAddresses: [],
+          }),
+        ]}
+        courseLocations={mockCourseLocations}
+        isLoggedInParticipant={true}
+        isEvent={true}
+      />
+    );
+
+    // Three days, but only the two course days carry the shared address.
+    expect(screen.getByText('Montag, 29.01.2024')).toBeInTheDocument();
+    expect(screen.getAllByText('Test Address 1')).toHaveLength(2);
+  });
+});

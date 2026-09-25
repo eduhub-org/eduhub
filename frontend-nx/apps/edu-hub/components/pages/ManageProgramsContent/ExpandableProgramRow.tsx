@@ -440,8 +440,10 @@ const ExpandableProgramRow: FC<ExpandableProgramRowProps> = ({ program }) => {
             </div>
           </div>
 
-          {/* Program-wide sessions, shown in every course of the program */}
-          <ProgramSessionsCard program={program} />
+          {/* Program-wide sessions, shown in every course of the program.
+              Degree course pages list courses instead of sessions, so degree
+              programs do not get any. */}
+          {program.type !== 'DEGREES' && <ProgramSessionsCard program={program} />}
         </div>
       </div>
     </div>

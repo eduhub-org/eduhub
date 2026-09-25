@@ -35,18 +35,24 @@ insert_permissions:
           # teaches within the program that owns the session.
           - User:
               CourseEnrollments:
-                Course:
-                  _and:
-                    - CourseInstructors:
-                        User:
-                          id:
-                            _eq: X-Hasura-User-Id
-                    - Program:
-                        Sessions:
-                          id:
-                            _ceq:
-                              - $
-                              - sessionId
+                _and:
+                  - status:
+                      _in:
+                        - CONFIRMED
+                        - REGISTERED
+                        - COMPLETED
+                  - Course:
+                      _and:
+                        - CourseInstructors:
+                            User:
+                              id:
+                                _eq: X-Hasura-User-Id
+                        - Program:
+                            Sessions:
+                              id:
+                                _ceq:
+                                  - $
+                                  - sessionId
       columns:
         - sessionId
         - source
@@ -83,18 +89,24 @@ select_permissions:
           # teaches within the program that owns the session.
           - User:
               CourseEnrollments:
-                Course:
-                  _and:
-                    - CourseInstructors:
-                        User:
-                          id:
-                            _eq: X-Hasura-User-Id
-                    - Program:
-                        Sessions:
-                          id:
-                            _ceq:
-                              - $
-                              - sessionId
+                _and:
+                  - status:
+                      _in:
+                        - CONFIRMED
+                        - REGISTERED
+                        - COMPLETED
+                  - Course:
+                      _and:
+                        - CourseInstructors:
+                            User:
+                              id:
+                                _eq: X-Hasura-User-Id
+                        - Program:
+                            Sessions:
+                              id:
+                                _ceq:
+                                  - $
+                                  - sessionId
   - role: user_access
     permission:
       columns:
@@ -141,16 +153,22 @@ update_permissions:
           # teaches within the program that owns the session.
           - User:
               CourseEnrollments:
-                Course:
-                  _and:
-                    - CourseInstructors:
-                        User:
-                          id:
-                            _eq: X-Hasura-User-Id
-                    - Program:
-                        Sessions:
-                          id:
-                            _ceq:
-                              - $
-                              - sessionId
+                _and:
+                  - status:
+                      _in:
+                        - CONFIRMED
+                        - REGISTERED
+                        - COMPLETED
+                  - Course:
+                      _and:
+                        - CourseInstructors:
+                            User:
+                              id:
+                                _eq: X-Hasura-User-Id
+                        - Program:
+                            Sessions:
+                              id:
+                                _ceq:
+                                  - $
+                                  - sessionId
       check: {}

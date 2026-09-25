@@ -112,14 +112,15 @@ class EduHubClient:
         )
 
     def get_program_participants_from_session_id(self, session_id):
-        """Participants of a program-wide session: everyone confirmed in any
-        course of the session's program, once per user (a user may take
-        several courses of the same program)."""
+        """Participants of a program-wide session: everyone confirmed or
+        registered in any course of the session's program (the statuses the
+        continuation check counts), once per user (a user may take several
+        courses of the same program)."""
         variables = {"session_id": session_id}
         query = """query($session_id: Int!) {
             CourseEnrollment(where: {
                 isTest: {_eq: false},
-                status: {_eq: CONFIRMED},
+                status: {_in: [CONFIRMED, REGISTERED]},
                 Course: {Program: {Sessions: {id: {_eq: $session_id}}}}
             }) {
                 User {
@@ -131,8 +132,9 @@ class EduHubClient:
             }
         }"""
         result = self.send_query(query, variables)
-        if result.get("data") is None:
-            return logging.error(f"{result}")
+        if not isinstance(result, dict) or result.get("data") is None:
+            logging.error(f"{result}")
+            raise ValueError(f"Could not load participants of program session {session_id}: {result}")
         users = [item["User"] for item in result["data"]["CourseEnrollment"]]
         return pd.DataFrame(
             users, columns=["id", "firstName", "lastName", "email"]

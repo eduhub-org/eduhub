@@ -278,7 +278,8 @@ export const Sessions: FC<SessionsProps> = ({
               </h3>
               {/* Repeated per day rather than hoisted above the whole agenda: the
                   address belongs to the day it heads, not to the section title. */}
-              {sharedLocationsLine}
+              {/* A day with only program sessions has no course place to hoist. */}
+              {group.sessions.some((session) => !isProgramSession(session)) && sharedLocationsLine}
               <ul className="sm:pl-6 sm:border-l sm:border-border-primary">
                 {group.sessions.map((session) => (
                   <SessionRow
