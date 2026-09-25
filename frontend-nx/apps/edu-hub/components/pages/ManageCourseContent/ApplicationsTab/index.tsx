@@ -151,13 +151,21 @@ interface ApplicationsTabContentProps {
 // expire_invitations cron only flips lapsed INVITED enrollments to EXPIRED once
 // an hour, so the same cutoff is applied client-side and passed to the expired
 // invitations aggregate to keep the table and the statistics cards in sync.
-const invitationExpirationCutoff = () => new Date(new Date().setHours(0, 0, 0, 0)).toISOString();
+// invitationExpirationDate is a Postgres `date`, so the cutoff is today's local
+// date as YYYY-MM-DD (Hasura rejects the query for any other variable type).
+const invitationExpirationCutoff = () => {
+  const today = new Date();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+  return `${today.getFullYear()}-${month}-${day}`;
+};
 
 const isExpired = (enrollment: ApplicationEnrollment) => {
   if (enrollment.invitationExpirationDate == null) {
     return false;
   }
-  return new Date(enrollment.invitationExpirationDate).getTime() < new Date(invitationExpirationCutoff()).getTime();
+  // YYYY-MM-DD strings compare chronologically.
+  return String(enrollment.invitationExpirationDate).slice(0, 10) < invitationExpirationCutoff();
 };
 
 const isInviteEligibleEnrollment = (enrollment: ApplicationEnrollment) =>

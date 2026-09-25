@@ -13,7 +13,7 @@ describe('expired invitations aggregate', () => {
   );
 
   it('accepts an expiration cutoff variable', () => {
-    expect(query).toContain('$expirationCutoff: timestamptz!');
+    expect(query).toContain('$expirationCutoff: date!');
   });
 
   it('counts enrollments already flipped to EXPIRED', () => {
