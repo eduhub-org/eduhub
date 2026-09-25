@@ -2624,6 +2624,7 @@ export enum SessionAddress_select_column {
   created_at = "created_at",
   id = "id",
   locationAddressId = "locationAddressId",
+  locationOption = "locationOption",
   sessionId = "sessionId",
   updated_at = "updated_at",
 }
@@ -2637,6 +2638,7 @@ export enum SessionAddress_update_column {
   created_at = "created_at",
   id = "id",
   locationAddressId = "locationAddressId",
+  locationOption = "locationOption",
   sessionId = "sessionId",
   updated_at = "updated_at",
 }
@@ -2688,6 +2690,7 @@ export enum Session_select_column {
   endDateTime = "endDateTime",
   id = "id",
   isMandatory = "isMandatory",
+  programId = "programId",
   questionaire_sent = "questionaire_sent",
   startDateTime = "startDateTime",
   title = "title",
@@ -2721,6 +2724,7 @@ export enum Session_update_column {
   endDateTime = "endDateTime",
   id = "id",
   isMandatory = "isMandatory",
+  programId = "programId",
   questionaire_sent = "questionaire_sent",
   startDateTime = "startDateTime",
   title = "title",
@@ -9845,6 +9849,8 @@ export interface Program_bool_exp {
   DefaultProjectType?: ProjectType_bool_exp | null;
   Organization?: Organization_bool_exp | null;
   ProgramType?: ProgramType_bool_exp | null;
+  Sessions?: Session_bool_exp | null;
+  Sessions_aggregate?: Session_aggregate_bool_exp | null;
   _and?: Program_bool_exp[] | null;
   _not?: Program_bool_exp | null;
   _or?: Program_bool_exp[] | null;
@@ -9885,6 +9891,7 @@ export interface Program_insert_input {
   DefaultProjectType?: ProjectType_obj_rel_insert_input | null;
   Organization?: Organization_obj_rel_insert_input | null;
   ProgramType?: ProgramType_obj_rel_insert_input | null;
+  Sessions?: Session_arr_rel_insert_input | null;
   achievementCertificateTemplateURL?: string | null;
   achievementRecordUploadDeadline?: any | null;
   applicationStart?: any | null;
@@ -9995,6 +10002,7 @@ export interface Program_order_by {
   DefaultProjectType?: ProjectType_order_by | null;
   Organization?: Organization_order_by | null;
   ProgramType?: ProgramType_order_by | null;
+  Sessions_aggregate?: Session_aggregate_order_by | null;
   achievementCertificateTemplateURL?: order_by | null;
   achievementRecordUploadDeadline?: order_by | null;
   applicationStart?: order_by | null;
@@ -12337,6 +12345,7 @@ export interface SessionAddress_bool_exp {
   created_at?: timestamptz_comparison_exp | null;
   id?: Int_comparison_exp | null;
   locationAddressId?: Int_comparison_exp | null;
+  locationOption?: LocationOption_enum_comparison_exp | null;
   sessionId?: Int_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
 }
@@ -12353,6 +12362,7 @@ export interface SessionAddress_insert_input {
   created_at?: any | null;
   id?: number | null;
   locationAddressId?: number | null;
+  locationOption?: LocationOption_enum | null;
   sessionId?: number | null;
   updated_at?: any | null;
 }
@@ -12680,6 +12690,7 @@ export interface Session_arr_rel_insert_input {
 export interface Session_avg_order_by {
   courseId?: order_by | null;
   id?: order_by | null;
+  programId?: order_by | null;
 }
 
 /**
@@ -12689,6 +12700,7 @@ export interface Session_bool_exp {
   Attendances?: Attendance_bool_exp | null;
   Attendances_aggregate?: Attendance_aggregate_bool_exp | null;
   Course?: Course_bool_exp | null;
+  Program?: Program_bool_exp | null;
   SessionAddresses?: SessionAddress_bool_exp | null;
   SessionAddresses_aggregate?: SessionAddress_aggregate_bool_exp | null;
   SessionSpeakers?: SessionSpeaker_bool_exp | null;
@@ -12703,6 +12715,7 @@ export interface Session_bool_exp {
   endDateTime?: timestamptz_comparison_exp | null;
   id?: Int_comparison_exp | null;
   isMandatory?: Boolean_comparison_exp | null;
+  programId?: Int_comparison_exp | null;
   questionaire_sent?: Boolean_comparison_exp | null;
   startDateTime?: timestamptz_comparison_exp | null;
   title?: String_comparison_exp | null;
@@ -12715,6 +12728,7 @@ export interface Session_bool_exp {
 export interface Session_insert_input {
   Attendances?: Attendance_arr_rel_insert_input | null;
   Course?: Course_obj_rel_insert_input | null;
+  Program?: Program_obj_rel_insert_input | null;
   SessionAddresses?: SessionAddress_arr_rel_insert_input | null;
   SessionSpeakers?: SessionSpeaker_arr_rel_insert_input | null;
   attendanceData?: string | null;
@@ -12724,6 +12738,7 @@ export interface Session_insert_input {
   endDateTime?: any | null;
   id?: number | null;
   isMandatory?: boolean | null;
+  programId?: number | null;
   questionaire_sent?: boolean | null;
   startDateTime?: any | null;
   title?: string | null;
@@ -12740,6 +12755,7 @@ export interface Session_max_order_by {
   description?: order_by | null;
   endDateTime?: order_by | null;
   id?: order_by | null;
+  programId?: order_by | null;
   startDateTime?: order_by | null;
   title?: order_by | null;
   updated_at?: order_by | null;
@@ -12755,6 +12771,7 @@ export interface Session_min_order_by {
   description?: order_by | null;
   endDateTime?: order_by | null;
   id?: order_by | null;
+  programId?: order_by | null;
   startDateTime?: order_by | null;
   title?: order_by | null;
   updated_at?: order_by | null;
@@ -12783,6 +12800,7 @@ export interface Session_on_conflict {
 export interface Session_stddev_order_by {
   courseId?: order_by | null;
   id?: order_by | null;
+  programId?: order_by | null;
 }
 
 /**
@@ -12791,6 +12809,7 @@ export interface Session_stddev_order_by {
 export interface Session_stddev_pop_order_by {
   courseId?: order_by | null;
   id?: order_by | null;
+  programId?: order_by | null;
 }
 
 /**
@@ -12799,6 +12818,7 @@ export interface Session_stddev_pop_order_by {
 export interface Session_stddev_samp_order_by {
   courseId?: order_by | null;
   id?: order_by | null;
+  programId?: order_by | null;
 }
 
 /**
@@ -12807,6 +12827,7 @@ export interface Session_stddev_samp_order_by {
 export interface Session_sum_order_by {
   courseId?: order_by | null;
   id?: order_by | null;
+  programId?: order_by | null;
 }
 
 /**
@@ -12815,6 +12836,7 @@ export interface Session_sum_order_by {
 export interface Session_var_pop_order_by {
   courseId?: order_by | null;
   id?: order_by | null;
+  programId?: order_by | null;
 }
 
 /**
@@ -12823,6 +12845,7 @@ export interface Session_var_pop_order_by {
 export interface Session_var_samp_order_by {
   courseId?: order_by | null;
   id?: order_by | null;
+  programId?: order_by | null;
 }
 
 /**
@@ -12831,6 +12854,7 @@ export interface Session_var_samp_order_by {
 export interface Session_variance_order_by {
   courseId?: order_by | null;
   id?: order_by | null;
+  programId?: order_by | null;
 }
 
 /**

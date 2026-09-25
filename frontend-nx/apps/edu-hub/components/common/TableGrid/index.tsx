@@ -131,6 +131,9 @@ const TableGrid = <T extends BaseRow,>({
   rowHref,
   onRowNavigate,
   canDeleteRow,
+  showDeleteForRow,
+  canExpandRow,
+  rowClassName,
   deleteVariableName = 'id',
   validateDeleteResult,
   onRowDelete,
@@ -703,11 +706,13 @@ const TableGrid = <T extends BaseRow,>({
                 ? 'mb-0'
                 : rowMarginClass;
 
+            const rowExpandable = canExpandRow ? canExpandRow(row.original) : true;
+
             return (
             <React.Fragment key={row.id}>
               {/* Primary Row */}
               <div className={`flex items-stretch ${primaryRowMargin}`}>
-                <div className={`flex-grow min-w-0 overflow-hidden bg-bg-secondary text-label-primary light ${compactRows ? 'py-1' : 'py-2'}`}>
+                <div className={`flex-grow min-w-0 overflow-hidden bg-bg-secondary text-label-primary light ${compactRows ? 'py-1' : 'py-2'} ${rowClassName?.(row.original) ?? ''}`}>
                   <div
                     className={`flex items-center gap-3 ${!showCheckbox ? 'pl-3' : ''}`}
                     style={{
@@ -741,7 +746,8 @@ const TableGrid = <T extends BaseRow,>({
                     </button>
                   </div>
                 )}
-                {expandableRowComponent && (
+                {expandableRowComponent && !rowExpandable && <div className="w-10 flex-shrink-0" />}
+                {expandableRowComponent && rowExpandable && (
                   <div className="w-10 flex-shrink-0 flex items-stretch bg-gray-300">
                     <button
                       type="button"
@@ -752,7 +758,10 @@ const TableGrid = <T extends BaseRow,>({
                     </button>
                   </div>
                 )}
-                {showDeleteColumn && (
+                {showDeleteColumn && showDeleteForRow && !showDeleteForRow(row.original) && (
+                  <div className="w-20 flex-shrink-0" />
+                )}
+                {showDeleteColumn && (!showDeleteForRow || showDeleteForRow(row.original)) && (
                   <div className="w-20 flex-shrink-0 flex items-center justify-center">
                     <TableGridDeleteButton
                       deleteMutation={deleteMutation}
@@ -774,7 +783,7 @@ const TableGrid = <T extends BaseRow,>({
                 )}
               </div>
               {/* Expandable Row */}
-              {expandableRowComponent && expandedRows.has(row.original.id) && (
+              {expandableRowComponent && rowExpandable && expandedRows.has(row.original.id) && (
                 <div className="flex items-stretch mb-1">
                   <div className="flex-grow bg-bg-secondary text-label-primary py-2 overflow-x-auto light">
                     <div

@@ -477,7 +477,12 @@ class CertificateCreator:
                 if not enrollment.get('User') or not enrollment.get('Course'):
                     raise CertificateError("Missing required enrollment data", "MISSING_ENROLLMENT_DATA")
                 
-                session_titles = self.get_attended_sessions(enrollment, enrollment["Course"]["Sessions"])
+                # Program-wide sessions belong to every course of the program;
+                # get_attended_sessions sorts and drops the optional ones.
+                program_sessions = (enrollment["Course"].get("Program") or {}).get("Sessions", [])
+                session_titles = self.get_attended_sessions(
+                    enrollment, enrollment["Course"]["Sessions"] + program_sessions
+                )
                 return {
                     "full_name": f"{enrollment['User']['firstName'].upper()} {enrollment['User']['lastName'].upper()}",
                     "course_name": enrollment["Course"]["title"],

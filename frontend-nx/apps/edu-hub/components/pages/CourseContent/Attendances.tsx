@@ -1,5 +1,5 @@
 import { useTranslations, useLocale } from 'next-intl';
-import { FC } from 'react';
+import { FC, useMemo } from 'react';
 
 import { CourseWithEnrollment_Course_by_pk } from '../../../queries/__generated__/CourseWithEnrollment';
 import { SectionTitle } from '../../common/SectionTitle';
@@ -9,6 +9,7 @@ import { AttendanceStatus_enum } from '../../../__generated__/globalTypes';
 import { CourseWithEnrollment_Course_by_pk_Sessions } from '../../../queries/__generated__/CourseWithEnrollment';
 import { pickEffectiveAttendance } from '../../../helpers/attendance';
 import { countMandatorySessions, isMandatorySession } from '../../../helpers/courseParticipationAttendance';
+import { isProgramSession, mergeSessions } from '../../../helpers/programSessions';
 
 const getBgColor = (status: AttendanceStatus_enum | string) => {
   if (status === NO_INFO) {
@@ -70,13 +71,17 @@ const AttendanceEntry: FC<AttendanceEntryProps> = ({ session }) => {
 
   return (
     <span
+      title={isProgramSession(session) ? t('sessions.program_session') : undefined}
       className={`flex flex-col text-sm ${fontWeight} text-center px-4 py-3 ${bgColor} ${optionalClasses} rounded overflow-hidden whitespace-nowrap text-ellipsis`}
     >
-      {session.startDateTime.toLocaleDateString(locale, {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-      })}
+      <span>
+        {isProgramSession(session) && '◆ '}
+        {new Date(session.startDateTime).toLocaleDateString(locale, {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+        })}
+      </span>
       {isOptional && <span className="text-xs font-normal">{t('attendances.optional')}</span>}
     </span>
   );
@@ -88,7 +93,12 @@ interface AttendancesProps {
 
 export const Attendances: FC<AttendancesProps> = ({ course }) => {
   const t = useTranslations('course');
-  const hasOptionalSessions = course.Sessions.some((session) => !isMandatorySession(session));
+  // Program-wide sessions count like course sessions when they are mandatory.
+  const sessions = useMemo(
+    () => mergeSessions<CourseWithEnrollment_Course_by_pk_Sessions>(course.Sessions, course.Program?.Sessions),
+    [course.Sessions, course.Program?.Sessions]
+  );
+  const hasOptionalSessions = sessions.some((session) => !isMandatorySession(session));
 
   return (
     <div className="flex flex-col w-full mb-4 md:mb-0">
@@ -98,14 +108,14 @@ export const Attendances: FC<AttendancesProps> = ({ course }) => {
           {hasOptionalSessions
             ? t('attendances.max_missed_mandatory_sessions', {
                 count: course.maxMissedSessions,
-                total: countMandatorySessions(course.Sessions),
+                total: countMandatorySessions(sessions),
               })
             : t('attendances.max_missed_sessions_plural', {
                 count: course.maxMissedSessions,
               })}
         </span>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3">
-          {course.Sessions.map((session) => (
+          {sessions.map((session) => (
             <AttendanceEntry key={session.id} session={session} />
           ))}
         </div>

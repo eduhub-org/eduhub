@@ -40,6 +40,7 @@ const mockSessions: Course_Course_by_pk_Sessions[] = [
     endDateTime: '2024-01-15T12:00:00Z',
     title: 'Test Session',
     isMandatory: true,
+    programId: null,
     SessionSpeakers: [],
     SessionAddresses: [
       {
@@ -47,6 +48,7 @@ const mockSessions: Course_Course_by_pk_Sessions[] = [
         id: 1,
         address: 'Test Address 1',
         locationAddressId: null,
+        locationOption: null,
         CourseLocation: {
           __typename: 'CourseLocation',
           id: 1,
@@ -60,6 +62,7 @@ const mockSessions: Course_Course_by_pk_Sessions[] = [
         id: 2,
         address: 'Test Address 2',
         locationAddressId: null,
+        locationOption: null,
         CourseLocation: {
           __typename: 'CourseLocation',
           id: 2,
@@ -280,5 +283,31 @@ describe('Sessions Component - optional sessions', () => {
 
     expect(screen.queryByText('sessions.optional')).not.toBeInTheDocument();
     expect(screen.queryByText('sessions.optional_hint')).not.toBeInTheDocument();
+  });
+});
+
+describe('Sessions Component - program sessions', () => {
+  it('merges program sessions into the schedule and marks them', () => {
+    const programSession = secondSession({
+      id: 9,
+      title: 'Program Opening',
+      programId: 4,
+      startDateTime: '2024-01-18T10:00:00Z',
+      endDateTime: '2024-01-18T11:00:00Z',
+      SessionAddresses: [],
+    });
+    render(
+      <Sessions
+        sessions={[mockSessions[0], secondSession()]}
+        programSessions={[programSession]}
+        programTitle="SoSe 24"
+        courseLocations={mockCourseLocations}
+        isLoggedInParticipant={true}
+      />
+    );
+
+    const titles = screen.getAllByText(/Session|Program Opening/).map((el) => el.textContent);
+    expect(titles).toEqual(['Test Session', 'Program Opening', 'Second Session']);
+    expect(screen.getAllByText(/sessions.program_session$/)).toHaveLength(1);
   });
 });

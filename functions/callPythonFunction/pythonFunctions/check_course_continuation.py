@@ -53,6 +53,13 @@ def check_course_continuation(arguments):
                         userId
                     }
                 }
+                Program {
+                    Sessions(where: {isMandatory: {_eq: true}}) {
+                        Attendances(where: {status: {_eq: MISSED}}) {
+                            userId
+                        }
+                    }
+                }
             }
         }
         """
@@ -75,10 +82,12 @@ def check_course_continuation(arguments):
             if max_missed is None:
                 continue
 
-            # Count MISSED attendances per user across the course's mandatory
-            # sessions (the query already leaves out optional ones).
+            # Count MISSED attendances per user across the mandatory sessions
+            # (the query already leaves out optional ones).
             missed_by_user = {}
-            for session in course.get("Sessions", []):
+            # Mandatory program-wide sessions count like the course's own.
+            program_sessions = (course.get("Program") or {}).get("Sessions", [])
+            for session in course.get("Sessions", []) + program_sessions:
                 for att in session.get("Attendances", []):
                     uid = att.get("userId")
                     if uid is not None:

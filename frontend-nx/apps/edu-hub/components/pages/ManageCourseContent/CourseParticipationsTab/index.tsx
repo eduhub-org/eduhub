@@ -70,6 +70,7 @@ import {
   isMandatorySession,
 } from '../../../../helpers/courseParticipationAttendance';
 import { useOptimisticAttendance } from './useOptimisticAttendance';
+import { isProgramSession, mergeSessions } from '../../../../helpers/programSessions';
 
 interface CourseParticipationsTabIProps {
   course: ManagedCourse_Course_by_pk;
@@ -168,6 +169,8 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
   const courseData = data?.Course_by_pk as CourseParticipations_Course_by_pk | null | undefined;
   const courseEnrollments = courseData?.CourseEnrollments;
   const courseSessions = courseData?.Sessions;
+  const programSessions = courseData?.Program?.Sessions;
+  const programTitle = courseData?.Program?.title ?? '';
   const courseProjectCourses = courseData?.ProjectCourses;
 
   const pageUserIds = useMemo(
@@ -203,9 +206,14 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
       })) ?? EMPTY_ENROLLMENTS,
     [attendancesByUser, courseEnrollments]
   );
+  // Program-wide sessions count toward passing like course sessions (when
+  // mandatory), so they get dots and are part of every status calculation.
   const sessions = useMemo(
-    () => courseSessions ?? EMPTY_SESSIONS,
-    [courseSessions]
+    () =>
+      courseSessions || programSessions
+        ? mergeSessions<CourseParticipations_Course_by_pk_Sessions>(courseSessions, programSessions)
+        : EMPTY_SESSIONS,
+    [courseSessions, programSessions]
   );
   const projects = useMemo<CourseParticipations_Course_by_pk_ProjectCourses_Project[]>(
     () =>
@@ -557,11 +565,13 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
                     ? 'cursor-wait opacity-60'
                     : 'cursor-pointer hover:border-2 hover:border-indigo-200 hover:rounded-full'
                 }
-                title={
-                  isMandatorySession(d.session)
-                    ? new Date(d.session.startDateTime).toLocaleString()
-                    : `${new Date(d.session.startDateTime).toLocaleString()} · ${t('attendance_optional_session')}`
-                }
+                title={[
+                  new Date(d.session.startDateTime).toLocaleString(),
+                  isProgramSession(d.session) ? `${t('attendance_program_session')} (${programTitle})` : null,
+                  isMandatorySession(d.session) ? null : t('attendance_optional_session'),
+                ]
+                  .filter(Boolean)
+                  .join(' · ')}
                 onClick={
                   attendanceLoading
                     ? undefined
@@ -581,7 +591,7 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
         </div>
       );
     };
-  }, [attendanceLoading, sessions, maxMissedSessions, t]);
+  }, [attendanceLoading, sessions, maxMissedSessions, programTitle, t]);
 
   const columns = useMemo<ColumnDef<ExtendedEnrollment>[]>(() => {
     const allColumns: ColumnDef<ExtendedEnrollment>[] = [

@@ -111,3 +111,14 @@ def test_only_mandatory_sessions_are_counted(monkeypatch):
     monkeypatch.setattr(mod, "get_default_mail_template", lambda client, mail_type: TEMPLATE)
     assert mod.check_course_continuation({})["success"] is True
     assert "Sessions(where: {isMandatory: {_eq: true}})" in queries[0]
+
+
+def test_mandatory_program_sessions_count_toward_the_limit(run):
+    """A missed mandatory program session counts in every course of the program."""
+    user = _user(1)
+    course = _course(7, 2, [user], {1: 1})
+    course["Program"] = {"Sessions": [{"Attendances": [{"userId": 1}]}]}
+
+    queued = run([course])
+
+    assert len(queued) == 1

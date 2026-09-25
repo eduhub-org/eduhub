@@ -156,3 +156,21 @@ class TestGetAttendedSessionsInstructorPrecedence:
             enrollment, [mandatory, optional, legacy]
         )
         assert result == ["Mandatory", "No flag"]
+
+    def test_program_sessions_are_merged_in_date_order(self):
+        course_session = {"id": 100, "title": "Course", "startDateTime": "2026-01-02", "isMandatory": True}
+        program_mandatory = {"id": 200, "title": "Program", "startDateTime": "2026-01-01", "isMandatory": True}
+        program_optional = {"id": 201, "title": "Program optional", "startDateTime": "2026-01-03", "isMandatory": False}
+        enrollment = {
+            "User": {
+                "Attendances": [
+                    _att(1, "ATTENDED", "ZOOM", session_id=100),
+                    _att(2, "ATTENDED", "ZOOM", session_id=200),
+                    _att(3, "ATTENDED", "ZOOM", session_id=201),
+                ]
+            }
+        }
+        result = self._creator().get_attended_sessions(
+            enrollment, [course_session] + [program_mandatory, program_optional]
+        )
+        assert result == ["Program", "Course"]

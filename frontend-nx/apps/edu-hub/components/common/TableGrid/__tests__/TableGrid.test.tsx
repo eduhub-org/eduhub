@@ -73,3 +73,34 @@ describe('TableGrid loading behavior', () => {
     expect(screen.queryByText('common.table_grid.pagination_text')).not.toBeInTheDocument();
   });
 });
+
+describe('TableGrid per-row options', () => {
+  it('hides the expand chevron and adds classes for the rows it is told to', () => {
+    render(
+      <TableGrid<TestRow>
+        columns={columns}
+        data={[
+          { id: 1, name: 'Editable' },
+          { id: 2, name: 'Locked' },
+        ]}
+        enablePagination={false}
+        error={undefined}
+        loading={false}
+        pageIndex={0}
+        onPageChange={jest.fn()}
+        refetchQueries={[]}
+        searchFilter=""
+        onSearchFilterChange={jest.fn()}
+        showGlobalSearchField={false}
+        expandableRowComponent={() => <div>details</div>}
+        canExpandRow={(row) => row.id !== 2}
+        rowClassName={(row) => (row.id === 2 ? 'locked-row' : '')}
+      />
+    );
+
+    // Only the editable row gets an expand button.
+    expect(screen.getAllByRole('button')).toHaveLength(1);
+    expect(screen.getByText('Locked').closest('.locked-row')).toBeInTheDocument();
+    expect(screen.getByText('Editable').closest('.locked-row')).not.toBeInTheDocument();
+  });
+});

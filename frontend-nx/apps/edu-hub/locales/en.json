@@ -375,6 +375,8 @@
       "add_to_calendar": "Add to calendar",
       "location_not_available": "Location not available",
       "optional": "optional",
+      "program_session": "Program session",
+      "program_session_tooltip": "Session of the program “{program}” – it takes place for all courses of the program.",
       "optional_hint": "All sessions are mandatory unless marked “optional”.",
       "untitled_session": "Agenda item",
       "add_to_calendar_short": "Calendar"
@@ -948,6 +950,7 @@
     "add_external_speaker": "Add External Speaker",
     "remove_external_speaker": "Remove External Speaker",
     "mandatory": "Mandatory",
+    "program_session": "Program session",
     "mandatory_help": "Only mandatory sessions count toward the allowed absences and appear on the certificate. Attendance is still tracked.",
     "session_title": "Session Title",
     "confirmDeleteSession": "Do you really want to delete the session?",
@@ -1728,6 +1731,7 @@
     "attendance_cert_not_issued": "No attendance certificate issued",
     "achievement_cert_issued": "Achievement certificate issued",
     "achievement_cert_not_issued": "No achievement certificate issued",
+    "attendance_program_session": "Program session",
     "attendance_optional_session": "optional",
     "attendance_status_passed": "Attendance requirement met",
     "attendance_status_failed": "Attendance requirement not met",
@@ -1857,6 +1861,7 @@
     "course_not_found": "Course {courseId} could not be found!",
     "add_session": "Add Session",
     "SessionsTab": {
+      "program_session_locked": "Managed by the program admin",
       "sessionAddresses": {
         "online": {
           "label": "Online",
@@ -2045,6 +2050,15 @@
     }
   },
   "managePrograms": {
+    "program_sessions": {
+      "title": "Program sessions",
+      "help_text": "These sessions appear in every course of the program. They are optional by default; mandatory ones count toward the allowed absences in each course.",
+      "add": "Add session",
+      "confirm_delete": "Do you really want to delete this program session? It disappears from all courses and recorded attendance is lost.",
+      "location": "Location",
+      "online_link_placeholder": "Link to the online session",
+      "location_address_placeholder": "Select an address"
+    },
     "headline": "Programs",
     "table_header": {
       "published": "Published",

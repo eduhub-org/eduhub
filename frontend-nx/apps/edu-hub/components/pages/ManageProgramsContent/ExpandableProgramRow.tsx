@@ -48,6 +48,7 @@ import {
   loadParticipationDataVariables,
 } from '../../../queries/__generated__/loadParticipationData';
 import InputField from '../../inputs/InputField';
+import ProgramSessionsCard from './ProgramSessionsCard';
 import { Button } from '../../common/Button';
 import FileUploadField from '../../inputs/FileUploadField';
 import NotificationSnackbar from '../../common/dialogs/NotificationSnackbar';
@@ -438,6 +439,9 @@ const ExpandableProgramRow: FC<ExpandableProgramRowProps> = ({ program }) => {
               </div>
             </div>
           </div>
+
+          {/* Program-wide sessions, shown in every course of the program */}
+          <ProgramSessionsCard program={program} />
         </div>
       </div>
     </div>

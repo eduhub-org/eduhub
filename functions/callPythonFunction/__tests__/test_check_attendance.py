@@ -463,3 +463,94 @@ class TestCheckAttendanceOrchestration:
         assert fake_eduhub.inserts[0]["matchType"] == MATCH_TYPE_NAME
         assert fake_eduhub.inserts[0]["source"] == "LIMESURVEY"
         assert len(fake_eduhub.session_updates) == 1
+
+
+# ----------------------------------------------------------------------
+# Program-wide sessions
+# ----------------------------------------------------------------------
+
+
+class TestProgramSessions:
+    def test_session_locations_come_from_session_addresses(self):
+        from pythonFunctions.check_attendance import session_locations
+
+        session = {
+            "programId": 4,
+            "Course": None,
+            "SessionAddresses": [
+                {"locationOption": "ONLINE", "address": "https://zoom.us/j/9", "LocationAddress": None},
+                {"locationOption": "KIEL", "address": "", "LocationAddress": {"address": "Audimax"}},
+                {"locationOption": None, "address": "legacy"},
+            ],
+        }
+
+        assert session_locations(session) == [
+            {"locationOption": "ONLINE", "defaultSessionAddress": "https://zoom.us/j/9"},
+            {"locationOption": "KIEL", "defaultSessionAddress": "Audimax"},
+        ]
+
+    def test_program_session_uses_program_participants(self, monkeypatch):
+        from pythonFunctions import check_attendance as mod
+
+        session = {
+            "id": 21,
+            "title": "Program opening",
+            "startDateTime": pd.Timestamp("2026-01-01T10:00:00Z"),
+            "endDateTime": pd.Timestamp("2026-01-01T11:30:00Z"),
+            "programId": 4,
+            "Course": None,
+            "SessionAddresses": [
+                {"locationOption": "ONLINE", "address": "https://zoom.us/j/9", "LocationAddress": None}
+            ],
+        }
+        participants_df = pd.DataFrame(
+            [{"id": "u-alice", "firstName": "Alice", "lastName": "Wonderland", "email": "alice@example.com"}]
+        )
+        zoom_df = pd.DataFrame(
+            [
+                {
+                    "name": "Alice",
+                    "email": "alice@example.com",
+                    "joinDateTime": "2026-01-01T10:00:00+00:00",
+                    "leaveDateTime": "2026-01-01T11:25:00+00:00",
+                    "duration": 5100,
+                    "interruptionCount": 0,
+                }
+            ]
+        )
+        zoom_urls = []
+
+        class FakeEduHub:
+            url = "http://fake"
+
+            def __init__(self):
+                self.inserts = []
+
+            def get_finished_sessions_without_attendance_check(self):
+                return [session]
+
+            def get_course_participants_from_session_id(self, _sid):
+                raise AssertionError("program sessions must not use the course participant query")
+
+            def get_program_participants_from_session_id(self, sid):
+                assert sid == 21
+                return participants_df
+
+            def insert_attendance(self, df):
+                self.inserts.append(df.iloc[0].to_dict())
+
+            def update_session_attendanceData(self, df, sid):
+                pass
+
+        class FakeZoom:
+            def get_session_attendance(self, url, session_start=None, session_end=None):
+                zoom_urls.append(url)
+                return zoom_df.copy()
+
+        fake_eduhub = FakeEduHub()
+        monkeypatch.setattr(mod, "EduHubClient", lambda: fake_eduhub)
+        monkeypatch.setattr(mod, "ZoomClient", lambda: FakeZoom())
+
+        assert mod.check_attendance({})["success"] is True
+        assert zoom_urls == ["https://zoom.us/j/9"]
+        assert [(r["userId"], r["status"]) for r in fake_eduhub.inserts] == [("u-alice", "ATTENDED")]

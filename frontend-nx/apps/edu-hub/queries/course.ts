@@ -7,24 +7,42 @@ import {
   COURSE_FRAGMENT_ANONYMOUS,
 } from './courseFragment';
 import { ADMIN_ENROLLMENT_FRAGMENT } from './enrollmentFragment';
-import { ADMIN_SESSION_FRAGMENT } from './sessionFragement';
+import { ADMIN_SESSION_FRAGMENT, SESSION_FRAGMENT } from './sessionFragement';
 import { USER_FRAGMENT } from './userFragment';
 import { PROGRAM_FRAGMENT_MINIMUM_PROPERTIES } from './programFragment';
 
+// Program-wide sessions are shown in every course of the program. Kept out
+// of the course fragments so course lists do not fetch them.
 export const COURSE = gql`
   ${COURSE_FRAGMENT}
+  ${SESSION_FRAGMENT}
   query Course($id: Int!) {
     Course_by_pk(id: $id) {
       ...CourseFragment
+      Program {
+        id
+        title
+        Sessions(order_by: { startDateTime: asc }) {
+          ...SessionFragment
+        }
+      }
     }
   }
 `;
 
 export const COURSE_ANONYMOUS = gql`
   ${COURSE_FRAGMENT_ANONYMOUS}
+  ${SESSION_FRAGMENT}
   query CourseAnonymous($id: Int!) {
     Course_by_pk(id: $id) {
       ...CourseFragmentAnonymous
+      Program {
+        id
+        title
+        Sessions(order_by: { startDateTime: asc }) {
+          ...SessionFragment
+        }
+      }
     }
   }
 `;
@@ -46,6 +64,7 @@ export const COURSE_MINIMUM = gql`
 export const MANAGED_COURSE = gql`
   ${ADMIN_COURSE_FRAGMENT}
   ${ADMIN_SESSION_FRAGMENT}
+  ${SESSION_FRAGMENT}
   query ManagedCourse($id: Int!) {
     Course_by_pk(id: $id) {
       ...AdminCourseFragment
@@ -57,6 +76,13 @@ export const MANAGED_COURSE = gql`
       }
       Sessions(order_by: { startDateTime: asc }) {
         ...AdminSessionFragment
+      }
+      Program {
+        id
+        title
+        Sessions(order_by: { startDateTime: asc }) {
+          ...SessionFragment
+        }
       }
     }
   }
