@@ -129,7 +129,17 @@ const DELETE_PREVIEW = `
     delete_ProjectAuthor(where: { id: { _in: $authorIds } }) {
       affected_rows
     }
-    delete_Project(where: { id: { _in: $projectIds } }) {
+    # Re-checked here, not only in the handler: someone may have joined a
+    # project between reading the artefacts and this delete, and the
+    # ProjectAuthor foreign key cascades, so a stale id would take them with
+    # it. The authorships above are gone by now (the fields of one request run
+    # in order, in one transaction), so any author left is somebody else's.
+    delete_Project(
+      where: {
+        id: { _in: $projectIds }
+        _not: { ProjectAuthors: { userId: { _neq: $userId } } }
+      }
+    ) {
       affected_rows
     }
     delete_Attendance(

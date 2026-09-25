@@ -83,6 +83,21 @@ describe('removing a preview after losing the instructorship', () => {
   });
 });
 
+describe('deleting what a preview authored', () => {
+  it('re-checks authorship inside the delete rather than trusting the ids read before it', async () => {
+    answer({ instructs: true, enrollment: preview });
+    await call('remove', 'instructor');
+    const [[document, variables]] = deleteCalls();
+    // Authorships go first, then only projects nobody else authors any more.
+    expect(document.indexOf('delete_ProjectAuthor')).toBeLessThan(document.indexOf('delete_Project('));
+    const flat = document.replace(/\s+/g, ' ');
+    expect(flat).toContain(
+      'delete_Project( where: { id: { _in: $projectIds } _not: { ProjectAuthors: { userId: { _neq: $userId } } } }'
+    );
+    expect(variables.userId).toBe(USER_ID);
+  });
+});
+
 describe('creating a preview', () => {
   it('still requires instructing the course', async () => {
     answer({ instructs: false, enrollment: null });
