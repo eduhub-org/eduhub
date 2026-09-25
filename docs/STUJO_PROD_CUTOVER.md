@@ -360,7 +360,9 @@ Turning it back off is also how the public face is handed to
    actually breaks sessions.
 5. **Stripe (live):** job posting prices + tax rate bootstrapped
    (`createStripeJobPostingPrices`), webhook endpoint subscribed to
-   `checkout.session.completed` **and** `invoice.finalized`, and the workspace
+   `checkout.session.completed` **and** `invoice.finalized` (plus
+   `invoice.paid`, `invoice.overdue`, `invoice.voided` and the Bank transfers
+   payment method activated, for "Kauf auf Rechnung"), and the workspace
    variables `stujo_admin_email`, `stujo_seller_organization_id`,
    `stripe_tax_rate_id` set as intended.
 
