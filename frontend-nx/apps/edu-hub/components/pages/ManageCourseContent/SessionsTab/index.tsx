@@ -414,7 +414,7 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
         }
         canExpandRow={(row) => !isProgramSession(row)}
         showDeleteForRow={(row) => !isProgramSession(row)}
-        rowClassName={(row) => (isProgramSession(row) ? '!bg-fill-secondary text-label-secondary' : '')}
+        rowClassName={(row) => (isProgramSession(row) ? 'opacity-70' : '')}
         deleteMutation={canDeleteSessions ? DELETE_SESSION : undefined}
         deleteIdType="number"
         generateDeletionConfirmationQuestion={(row) =>

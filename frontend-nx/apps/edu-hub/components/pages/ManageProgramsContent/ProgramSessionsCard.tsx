@@ -251,7 +251,7 @@ const ProgramSessionsCard: FC<ProgramSessionsCardProps> = ({ program }) => {
       {
         id: 'title',
         header: tCoursePage('title'),
-        size: 260,
+        size: 220,
         enableSorting: false,
         cell: ({ row }) => (
           <div className="w-full min-w-0 flex items-center">
@@ -289,7 +289,7 @@ const ProgramSessionsCard: FC<ProgramSessionsCardProps> = ({ program }) => {
       {
         id: 'location',
         header: t('location'),
-        size: 380,
+        size: 300,
         enableSorting: false,
         cell: ({ row }) => <ProgramSessionLocation address={row.original.SessionAddresses[0]} />,
       },
