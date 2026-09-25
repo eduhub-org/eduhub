@@ -67,6 +67,7 @@ import {
   collapseAttendancesBySession,
   getAttendanceStatusFromMap,
   groupAttendancesByUser,
+  isMandatorySession,
 } from '../../../../helpers/courseParticipationAttendance';
 import { useOptimisticAttendance } from './useOptimisticAttendance';
 
@@ -525,8 +526,10 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
       };
 
       const dotsData: IDotData[] = sessions.map((s: CourseParticipations_Course_by_pk_Sessions) => ({ session: s, color: dotColor(s) }));
-      const missed = dotsData.filter((d) => d.color === 'red').length;
-      const attended = dotsData.filter((d) => d.color === 'lightgreen').length;
+      // Optional sessions are shown (and editable) but not counted.
+      const mandatoryDots = dotsData.filter((d) => isMandatorySession(d.session));
+      const missed = mandatoryDots.filter((d) => d.color === 'red').length;
+      const attended = mandatoryDots.filter((d) => d.color === 'lightgreen').length;
       const total = attended + missed;
       const status = getAttendanceStatusFromMap(attendanceBySession, sessions, maxMissedSessions);
       const statusDotColor: DotColor =
@@ -548,12 +551,17 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
               <Dot
                 key={d.session.id}
                 color={d.color}
+                hollow={!isMandatorySession(d.session)}
                 className={
                   attendanceLoading
                     ? 'cursor-wait opacity-60'
                     : 'cursor-pointer hover:border-2 hover:border-indigo-200 hover:rounded-full'
                 }
-                title={new Date(d.session.startDateTime).toLocaleString()}
+                title={
+                  isMandatorySession(d.session)
+                    ? new Date(d.session.startDateTime).toLocaleString()
+                    : `${new Date(d.session.startDateTime).toLocaleString()} · ${t('attendance_optional_session')}`
+                }
                 onClick={
                   attendanceLoading
                     ? undefined

@@ -228,6 +228,7 @@ class EduHubClient:
                         id
                         title
                         startDateTime
+                        isMandatory
                     }
                     id
                     ects

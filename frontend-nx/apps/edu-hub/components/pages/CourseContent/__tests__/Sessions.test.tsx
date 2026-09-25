@@ -39,6 +39,7 @@ const mockSessions: Course_Course_by_pk_Sessions[] = [
     startDateTime: '2024-01-15T10:00:00Z',
     endDateTime: '2024-01-15T12:00:00Z',
     title: 'Test Session',
+    isMandatory: true,
     SessionSpeakers: [],
     SessionAddresses: [
       {
@@ -251,5 +252,33 @@ describe('Sessions Component - event agenda', () => {
     expect(screen.getAllByText('Test Address 1')).toHaveLength(2);
     expect(screen.getByText('Montag, 15.01.2024')).toBeInTheDocument();
     expect(screen.getByText('Montag, 22.01.2024')).toBeInTheDocument();
+  });
+});
+
+describe('Sessions Component - optional sessions', () => {
+  it('marks optional sessions and explains the default once', () => {
+    render(
+      <Sessions
+        sessions={[mockSessions[0], secondSession({ isMandatory: false })]}
+        courseLocations={mockCourseLocations}
+        isLoggedInParticipant={true}
+      />
+    );
+
+    expect(screen.getAllByText('sessions.optional')).toHaveLength(1);
+    expect(screen.getByText('sessions.optional_hint')).toBeInTheDocument();
+  });
+
+  it('shows neither pill nor hint when every session is mandatory', () => {
+    render(
+      <Sessions
+        sessions={[mockSessions[0], secondSession()]}
+        courseLocations={mockCourseLocations}
+        isLoggedInParticipant={true}
+      />
+    );
+
+    expect(screen.queryByText('sessions.optional')).not.toBeInTheDocument();
+    expect(screen.queryByText('sessions.optional_hint')).not.toBeInTheDocument();
   });
 });

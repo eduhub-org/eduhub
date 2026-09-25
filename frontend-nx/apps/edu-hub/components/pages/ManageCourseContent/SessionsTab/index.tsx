@@ -15,6 +15,7 @@ import {
   INSERT_SESSION_WITH_ADDRESSES,
   UPDATE_SESSION_DESCRIPTION,
   UPDATE_SESSION_END_TIME,
+  UPDATE_SESSION_IS_MANDATORY,
   UPDATE_SESSION_START_TIME,
   UPDATE_SESSION_TITLE,
 } from '../../../../queries/course';
@@ -53,6 +54,8 @@ import { formatTruncatedList, makeFullName } from '../../../../helpers/util';
 import OptimisticDatePicker from '../../../inputs/OptimisticDatePicker';
 import TimePicker from '../../../inputs/TimePicker';
 import InputField from '../../../inputs/InputField';
+import CheckboxSelector from '../../../inputs/CheckboxSelector';
+import { Tooltip } from '@mui/material';
 import SessionAddresses from './SessionAddresses';
 import ManagedItemList from '../../../common/ManagedItemList';
 import { Card } from '../../../common/Card';
@@ -288,7 +291,7 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
       {
         header: tCoursePage('title'),
         accessorKey: 'title',
-        size: 380,
+        size: 300,
         enableSorting: true,
         cell: ({ row }) => (
           <div className="w-full min-w-0 flex items-center">
@@ -302,6 +305,30 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
               updateValueMutation={UPDATE_SESSION_TITLE}
               refetchQueries={['ManagedCourse']}
               fullWidth
+            />
+          </div>
+        ),
+      },
+      {
+        id: 'isMandatory',
+        header: () => (
+          <Tooltip title={tCoursePage('mandatory_help')}>
+            <span>{tCoursePage('mandatory')}</span>
+          </Tooltip>
+        ),
+        accessorKey: 'isMandatory',
+        size: 90,
+        enableSorting: false,
+        meta: { align: 'center' },
+        cell: ({ row }) => (
+          <div className="w-full flex items-center justify-center">
+            <CheckboxSelector
+              variant="eduhub"
+              className="[&_input]:mr-0"
+              checked={row.original.isMandatory}
+              updateValueMutation={UPDATE_SESSION_IS_MANDATORY}
+              identifierVariables={{ sessionId: row.original.id }}
+              refetchQueries={['ManagedCourse']}
             />
           </div>
         ),

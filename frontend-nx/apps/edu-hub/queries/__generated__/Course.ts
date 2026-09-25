@@ -97,6 +97,10 @@ export interface Course_Course_by_pk_Sessions {
    */
   title: string;
   /**
+   * If false, attendance is tracked but does not count toward passing (maxMissedSessions) or certificates
+   */
+  isMandatory: boolean;
+  /**
    * An array relationship
    */
   SessionAddresses: Course_Course_by_pk_Sessions_SessionAddresses[];

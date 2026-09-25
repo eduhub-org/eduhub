@@ -95,3 +95,19 @@ class TestThreshold:
     def test_skips_courses_without_limit(self, run):
         course = _course(7, None, [_user(1)], {1: 3})
         assert run([course]) == []
+
+
+def test_only_mandatory_sessions_are_counted(monkeypatch):
+    """Optional sessions are tracked but must not push anyone over the limit,
+    so the course query only fetches missed attendances of mandatory sessions."""
+    queries = []
+
+    class RecordingClient(FakeClient):
+        def send_query(self, query, variables):
+            queries.append(query)
+            return super().send_query(query, variables)
+
+    monkeypatch.setattr(mod, "EduHubClient", lambda: RecordingClient([]))
+    monkeypatch.setattr(mod, "get_default_mail_template", lambda client, mail_type: TEMPLATE)
+    assert mod.check_course_continuation({})["success"] is True
+    assert "Sessions(where: {isMandatory: {_eq: true}})" in queries[0]

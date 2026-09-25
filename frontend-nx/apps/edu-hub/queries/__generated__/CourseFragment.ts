@@ -97,6 +97,10 @@ export interface CourseFragment_Sessions {
    */
   title: string;
   /**
+   * If false, attendance is tracked but does not count toward passing (maxMissedSessions) or certificates
+   */
+  isMandatory: boolean;
+  /**
    * An array relationship
    */
   SessionAddresses: CourseFragment_Sessions_SessionAddresses[];

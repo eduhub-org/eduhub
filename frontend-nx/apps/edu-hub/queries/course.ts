@@ -282,6 +282,18 @@ export const UPDATE_SESSION_TITLE = gql`
   }
 `;
 
+export const UPDATE_SESSION_IS_MANDATORY = gql`
+  mutation UpdateSessionIsMandatory($sessionId: Int!, $value: Boolean!) {
+    update_Session_by_pk(
+      pk_columns: { id: $sessionId }
+      _set: { isMandatory: $value }
+    ) {
+      id
+      isMandatory
+    }
+  }
+`;
+
 export const UPDATE_SESSION_START_TIME = gql`
   mutation UpdateSessionStartTime($sessionId: Int!, $value: timestamptz!) {
     update_Session_by_pk(

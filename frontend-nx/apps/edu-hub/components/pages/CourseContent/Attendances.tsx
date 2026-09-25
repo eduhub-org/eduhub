@@ -8,6 +8,7 @@ import Dot from '../../common/Dot';
 import { AttendanceStatus_enum } from '../../../__generated__/globalTypes';
 import { CourseWithEnrollment_Course_by_pk_Sessions } from '../../../queries/__generated__/CourseWithEnrollment';
 import { pickEffectiveAttendance } from '../../../helpers/attendance';
+import { countMandatorySessions, isMandatorySession } from '../../../helpers/courseParticipationAttendance';
 
 const getBgColor = (status: AttendanceStatus_enum | string) => {
   if (status === NO_INFO) {
@@ -45,7 +46,9 @@ interface AttendanceEntryProps {
 const { NO_INFO, ATTENDED, MISSED } = AttendanceStatus_enum;
 
 const AttendanceEntry: FC<AttendanceEntryProps> = ({ session }) => {
+  const t = useTranslations('course');
   const locale = useLocale();
+  const isOptional = !isMandatorySession(session);
 
   // Prefer INSTRUCTOR-sourced rows over automated ones; within the pool, pick
   // the most recently updated row. `updated_at` can be null for freshly
@@ -61,16 +64,20 @@ const AttendanceEntry: FC<AttendanceEntryProps> = ({ session }) => {
 
   // const textColor = status === MISSED ? 'text-gray-500' : '';
 
+  // Optional sessions keep their status colour but get a dashed outline and a
+  // label, since they do not count toward the allowed absences.
+  const optionalClasses = isOptional ? 'border-2 border-dashed border-label-secondary' : '';
+
   return (
     <span
-      // className={`text-sm bg-gray-200 text-center px-4 py-3 rounded`}
-      className={`text-sm ${fontWeight} text-center px-4 py-3 ${bgColor} rounded overflow-hidden whitespace-nowrap text-ellipsis`}
+      className={`flex flex-col text-sm ${fontWeight} text-center px-4 py-3 ${bgColor} ${optionalClasses} rounded overflow-hidden whitespace-nowrap text-ellipsis`}
     >
       {session.startDateTime.toLocaleDateString(locale, {
         year: 'numeric',
         month: '2-digit',
         day: '2-digit',
       })}
+      {isOptional && <span className="text-xs font-normal">{t('attendances.optional')}</span>}
     </span>
   );
 };
@@ -81,15 +88,21 @@ interface AttendancesProps {
 
 export const Attendances: FC<AttendancesProps> = ({ course }) => {
   const t = useTranslations('course');
+  const hasOptionalSessions = course.Sessions.some((session) => !isMandatorySession(session));
 
   return (
     <div className="flex flex-col w-full mb-4 md:mb-0">
       <SectionTitle>{t('attendances.attendances')}</SectionTitle>
       <div className="rounded-2xl overflow-hidden border border-border-primary bg-fill-primary light text-label-primary p-4 min-w-0">
         <span className="text-lg mb-4 block">
-          {t('attendances.max_missed_sessions_plural', {
-            count: course.maxMissedSessions,
-          })}
+          {hasOptionalSessions
+            ? t('attendances.max_missed_mandatory_sessions', {
+                count: course.maxMissedSessions,
+                total: countMandatorySessions(course.Sessions),
+              })
+            : t('attendances.max_missed_sessions_plural', {
+                count: course.maxMissedSessions,
+              })}
         </span>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3">
           {course.Sessions.map((session) => (

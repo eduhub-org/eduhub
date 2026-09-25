@@ -138,3 +138,21 @@ class TestGetAttendedSessionsInstructorPrecedence:
             enrollment, [session_later, session_earlier]
         )
         assert result == ["First", "Second"]
+
+    def test_optional_sessions_are_left_out(self):
+        mandatory = {"id": 100, "title": "Mandatory", "startDateTime": "2026-01-01", "isMandatory": True}
+        optional = {"id": 101, "title": "Optional", "startDateTime": "2026-01-02", "isMandatory": False}
+        legacy = {"id": 102, "title": "No flag", "startDateTime": "2026-01-03"}
+        enrollment = {
+            "User": {
+                "Attendances": [
+                    _att(1, "ATTENDED", "ZOOM", session_id=100),
+                    _att(2, "ATTENDED", "ZOOM", session_id=101),
+                    _att(3, "ATTENDED", "ZOOM", session_id=102),
+                ]
+            }
+        }
+        result = self._creator().get_attended_sessions(
+            enrollment, [mandatory, optional, legacy]
+        )
+        assert result == ["Mandatory", "No flag"]

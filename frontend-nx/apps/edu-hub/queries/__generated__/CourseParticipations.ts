@@ -80,6 +80,10 @@ export interface CourseParticipations_Course_by_pk_Sessions {
    * The title of the session
    */
   title: string;
+  /**
+   * If false, attendance is tracked but does not count toward passing (maxMissedSessions) or certificates
+   */
+  isMandatory: boolean;
 }
 
 export interface CourseParticipations_Course_by_pk_ProjectCourses_Project_ProjectAuthors {

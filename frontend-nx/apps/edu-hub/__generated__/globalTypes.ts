@@ -1822,6 +1822,7 @@ export enum Organization_select_column {
   addressLine1 = "addressLine1",
   addressLine2 = "addressLine2",
   aliases = "aliases",
+  allowInvoicePayment = "allowInvoicePayment",
   apiKeyHash = "apiKeyHash",
   bankBic = "bankBic",
   bankIban = "bankIban",
@@ -1870,6 +1871,7 @@ export enum Organization_select_column {
  * select "Organization_aggregate_bool_exp_bool_and_arguments_columns" columns of table "Organization"
  */
 export enum Organization_select_column_Organization_aggregate_bool_exp_bool_and_arguments_columns {
+  allowInvoicePayment = "allowInvoicePayment",
   ghostNewsletterApiKeyConfigured = "ghostNewsletterApiKeyConfigured",
   ghostNewsletterDoubleOptInEnabled = "ghostNewsletterDoubleOptInEnabled",
 }
@@ -1878,6 +1880,7 @@ export enum Organization_select_column_Organization_aggregate_bool_exp_bool_and_
  * select "Organization_aggregate_bool_exp_bool_or_arguments_columns" columns of table "Organization"
  */
 export enum Organization_select_column_Organization_aggregate_bool_exp_bool_or_arguments_columns {
+  allowInvoicePayment = "allowInvoicePayment",
   ghostNewsletterApiKeyConfigured = "ghostNewsletterApiKeyConfigured",
   ghostNewsletterDoubleOptInEnabled = "ghostNewsletterDoubleOptInEnabled",
 }
@@ -1889,6 +1892,7 @@ export enum Organization_update_column {
   addressLine1 = "addressLine1",
   addressLine2 = "addressLine2",
   aliases = "aliases",
+  allowInvoicePayment = "allowInvoicePayment",
   apiKeyHash = "apiKeyHash",
   bankBic = "bankBic",
   bankIban = "bankIban",
@@ -2683,6 +2687,7 @@ export enum Session_select_column {
   description = "description",
   endDateTime = "endDateTime",
   id = "id",
+  isMandatory = "isMandatory",
   questionaire_sent = "questionaire_sent",
   startDateTime = "startDateTime",
   title = "title",
@@ -2693,6 +2698,7 @@ export enum Session_select_column {
  * select "Session_aggregate_bool_exp_bool_and_arguments_columns" columns of table "Session"
  */
 export enum Session_select_column_Session_aggregate_bool_exp_bool_and_arguments_columns {
+  isMandatory = "isMandatory",
   questionaire_sent = "questionaire_sent",
 }
 
@@ -2700,6 +2706,7 @@ export enum Session_select_column_Session_aggregate_bool_exp_bool_and_arguments_
  * select "Session_aggregate_bool_exp_bool_or_arguments_columns" columns of table "Session"
  */
 export enum Session_select_column_Session_aggregate_bool_exp_bool_or_arguments_columns {
+  isMandatory = "isMandatory",
   questionaire_sent = "questionaire_sent",
 }
 
@@ -2713,6 +2720,7 @@ export enum Session_update_column {
   description = "description",
   endDateTime = "endDateTime",
   id = "id",
+  isMandatory = "isMandatory",
   questionaire_sent = "questionaire_sent",
   startDateTime = "startDateTime",
   title = "title",
@@ -9371,6 +9379,7 @@ export interface Organization_bool_exp {
   addressLine1?: String_comparison_exp | null;
   addressLine2?: String_comparison_exp | null;
   aliases?: jsonb_comparison_exp | null;
+  allowInvoicePayment?: Boolean_comparison_exp | null;
   apiKeyHash?: String_comparison_exp | null;
   bankBic?: String_comparison_exp | null;
   bankIban?: String_comparison_exp | null;
@@ -9434,6 +9443,7 @@ export interface Organization_insert_input {
   addressLine1?: string | null;
   addressLine2?: string | null;
   aliases?: any | null;
+  allowInvoicePayment?: boolean | null;
   apiKeyHash?: string | null;
   bankBic?: string | null;
   bankIban?: string | null;
@@ -9608,6 +9618,7 @@ export interface Organization_order_by {
   addressLine1?: order_by | null;
   addressLine2?: order_by | null;
   aliases?: order_by | null;
+  allowInvoicePayment?: order_by | null;
   apiKeyHash?: order_by | null;
   bankBic?: order_by | null;
   bankIban?: order_by | null;
@@ -12691,6 +12702,7 @@ export interface Session_bool_exp {
   description?: String_comparison_exp | null;
   endDateTime?: timestamptz_comparison_exp | null;
   id?: Int_comparison_exp | null;
+  isMandatory?: Boolean_comparison_exp | null;
   questionaire_sent?: Boolean_comparison_exp | null;
   startDateTime?: timestamptz_comparison_exp | null;
   title?: String_comparison_exp | null;
@@ -12711,6 +12723,7 @@ export interface Session_insert_input {
   description?: string | null;
   endDateTime?: any | null;
   id?: number | null;
+  isMandatory?: boolean | null;
   questionaire_sent?: boolean | null;
   startDateTime?: any | null;
   title?: string | null;

@@ -40,6 +40,7 @@ export const COURSE_PARTICIPATIONS = gql`
         startDateTime
         endDateTime
         title
+        isMandatory
       }
       ProjectCourses {
         Project {

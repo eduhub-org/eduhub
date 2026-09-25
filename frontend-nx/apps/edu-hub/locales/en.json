@@ -374,12 +374,16 @@
       "agenda": "Agenda",
       "add_to_calendar": "Add to calendar",
       "location_not_available": "Location not available",
+      "optional": "optional",
+      "optional_hint": "All sessions are mandatory unless marked “optional”.",
       "untitled_session": "Agenda item",
       "add_to_calendar_short": "Calendar"
     },
     "attendances": {
       "attendances": "Attendances",
       "max_missed_sessions": "You may miss at most one session",
+      "max_missed_mandatory_sessions": "You may miss at most {count} of {total} mandatory sessions",
+      "optional": "optional",
       "max_missed_sessions_plural": "You may miss at most {count} sessions",
       "attendance_status": {
         "ATTENDED": "Attended",
@@ -943,6 +947,8 @@
     "external_speakers": "External Speakers",
     "add_external_speaker": "Add External Speaker",
     "remove_external_speaker": "Remove External Speaker",
+    "mandatory": "Mandatory",
+    "mandatory_help": "Only mandatory sessions count toward the allowed absences and appear on the certificate. Attendance is still tracked.",
     "session_title": "Session Title",
     "confirmDeleteSession": "Do you really want to delete the session?",
     "cannotDeletePastSession": "You cannot delete a session that is in the past! If you really want to delete the session, please contact an administrator.",
@@ -1722,6 +1728,7 @@
     "attendance_cert_not_issued": "No attendance certificate issued",
     "achievement_cert_issued": "Achievement certificate issued",
     "achievement_cert_not_issued": "No achievement certificate issued",
+    "attendance_optional_session": "optional",
     "attendance_status_passed": "Attendance requirement met",
     "attendance_status_failed": "Attendance requirement not met",
     "attendance_status_uncertain": "Attendance status pending",

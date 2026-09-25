@@ -610,6 +610,7 @@ class CertificateCreator:
     def get_attended_sessions(self, enrollment, sessions):
         """
         Gets the titles of attended sessions for a given enrollment, MISSED Sessions are ignored.
+        Optional sessions (isMandatory = false) never appear on a certificate.
 
         Args:
             enrollment (dict): The enrollment data for the user.
@@ -624,6 +625,11 @@ class CertificateCreator:
         attended_sessions = []
 
         for session in sessions:
+            # Optional sessions are tracked, but do not belong on the certificate.
+            # A missing flag counts as mandatory.
+            if session.get("isMandatory") is False:
+                continue
+
             # Get every attendance record for one session
             attendances_for_session = [
                 attendance
