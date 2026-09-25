@@ -1396,6 +1396,7 @@
     "add_as_aborted": "add or change as aborted",
     "add_as_cancelled": "add or change as cancelled",
     "add_user_error": "Please select at least one user!",
+    "add_user_preview_conflict": "Not added because they have a participant preview open on this course: {names}. The preview has to be ended first.",
     "submit": "Submit",
     "application_history": {
       "label": "Previous Applications and Participations",

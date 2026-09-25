@@ -1378,6 +1378,7 @@
     "add_as_aborted": "als abgebrochen hinzufügen oder ändern",
     "add_as_cancelled": "als storniert hinzufügen oder ändern",
     "add_user_error": "Bitte mindestens einen User auswählen!",
+    "add_user_preview_conflict": "Nicht hinzugefügt, weil gerade eine Teilnehmenden-Vorschau für diesen Kurs aktiv ist: {names}. Die Vorschau muss erst beendet werden.",
     "submit": "Absenden",
     "application_history": {
       "label": "Bisherige Bewerbungen und Teilnahmen",
