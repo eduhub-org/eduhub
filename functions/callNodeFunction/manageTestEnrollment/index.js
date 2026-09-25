@@ -26,6 +26,11 @@ const ROLES_ALLOWED_WITHOUT_INSTRUCTORSHIP = new Set(["admin"]);
 // reach the manage-course screen in the first place (see the guard in
 // ManageCourseContent) - add them here and to actions.yaml together, or not at all.
 const ROLES_ALLOWED = new Set(["admin", "instructor", "instructor_access"]);
+// Ending a preview is also open to plain users (actions.yaml grants
+// removeTestEnrollment to user_access too): whoever lost the instructor role
+// while previewing must still be able to end it. The handler only ever removes
+// the caller's own `isTest` row, so this reaches nothing else.
+const ROLES_ALLOWED_TO_REMOVE = new Set([...ROLES_ALLOWED, "user", "user_access"]);
 
 const ensureHasuraClient = () => {
   if (!process.env.HASURA_ENDPOINT || !process.env.HASURA_ADMIN_SECRET) {
@@ -161,7 +166,8 @@ export default async function manageTestEnrollment(req, logger) {
   }
 
   const role = req.body?.session_variables?.["x-hasura-role"];
-  if (!ROLES_ALLOWED.has(role)) {
+  const allowedRoles = operation === "remove" ? ROLES_ALLOWED_TO_REMOVE : ROLES_ALLOWED;
+  if (!allowedRoles.has(role)) {
     return unauthorized("Insufficient permissions to manage a preview enrollment");
   }
 
@@ -190,13 +196,19 @@ export default async function manageTestEnrollment(req, logger) {
     };
   }
 
+  const existing = context.CourseEnrollment[0] ?? null;
+
   // A super-admin may preview any course; everyone else only one they instruct.
+  // Ending one's own preview needs no instructorship: someone removed from the
+  // course while previewing it would otherwise keep a hidden CONFIRMED
+  // enrollment -- and the participant surface with it -- that nothing can end.
+  // The row is scoped to the caller's own userId above and must be `isTest`
+  // (checked below), so this can only ever remove their own preview.
   const instructsCourse = context.Course_by_pk.CourseInstructors.length > 0;
-  if (!instructsCourse && !ROLES_ALLOWED_WITHOUT_INSTRUCTORSHIP.has(role)) {
+  const endingOwnPreview = operation === "remove" && existing?.isTest === true;
+  if (!instructsCourse && !endingOwnPreview && !ROLES_ALLOWED_WITHOUT_INSTRUCTORSHIP.has(role)) {
     return unauthorized("Only an instructor of this course may preview it");
   }
-
-  const existing = context.CourseEnrollment[0] ?? null;
 
   if (operation === "create") {
     if (existing && !existing.isTest) {

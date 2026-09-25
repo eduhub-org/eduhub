@@ -90,7 +90,8 @@ actions:
           value: remove
     permissions:
       - role: instructor_access
-    comment: Removes the caller's preview enrollment on a course they instruct, together with anything it authored (project authorships, orphaned projects, attendances)
+      - role: user_access
+    comment: Removes the caller's own preview enrollment (also after they stopped instructing the course), together with anything it authored (project authorships, orphaned projects, attendances)
   - name: copyProjectFromTemplate
     definition:
       kind: synchronous
