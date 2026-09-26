@@ -748,6 +748,17 @@
       "message_on_element": "Auf Element schreiben",
       "and_more": "und {count} weitere"
     },
+    "participant_preview": {
+      "notice": "Vorschau: Du siehst diese Seite als Teilnehmer:in.",
+      "end": "Vorschau beenden",
+      "errors": {
+        "TEST_ENROLLMENT_FAILED": "Die Vorschau konnte nicht beendet werden. Bitte versuche es später noch einmal.",
+        "TEST_ENROLLMENT_UNAUTHORIZED": "Nur Dozierende dieses Kurses können die Teilnehmer:innen-Ansicht nutzen.",
+        "TEST_ENROLLMENT_ALREADY_PARTICIPANT": "Du bist in diesem Kurs regulär angemeldet, es gibt also keine Vorschau zu beenden.",
+        "TEST_ENROLLMENT_COURSE_NOT_FOUND": "Dieser Kurs existiert nicht mehr.",
+        "TEST_ENROLLMENT_INVALID_INPUT": "Die Anfrage war fehlerhaft."
+      }
+    },
     "ParticipationExitButton": {
       "cancel_participation": "Anmeldung stornieren",
       "abort_participation": "Teilnahme abbrechen",
@@ -1365,6 +1376,7 @@
     "add_as_aborted": "als abgebrochen hinzufügen oder ändern",
     "add_as_cancelled": "als storniert hinzufügen oder ändern",
     "add_user_error": "Bitte mindestens einen User auswählen!",
+    "add_user_preview_conflict": "Nicht hinzugefügt, weil gerade eine Teilnehmenden-Vorschau für diesen Kurs aktiv ist: {names}. Die Vorschau muss erst beendet werden.",
     "submit": "Absenden",
     "application_history": {
       "label": "Bisherige Bewerbungen und Teilnahmen",
@@ -1964,6 +1976,22 @@
     "guest_registration": {
       "label": "Anmeldung ohne Konto erlauben",
       "help_text": "Erlaubt die Anmeldung mit Name und E-Mail-Adresse, ohne dass ein Konto angelegt wird. Die Anmeldung wird erst nach Bestätigung per E-Mail gültig. Nur für Veranstaltungen mit direkter Anmeldung möglich."
+    },
+    "participant_preview": {
+      "start": "Als Teilnehmer:in ansehen",
+      "open": "Teilnehmer:innen-Ansicht öffnen",
+      "end": "Vorschau beenden",
+      "start_dialog_title": "Teilnehmer:innen-Ansicht starten",
+      "start_dialog_question": "Damit wirst Du für diesen Kurs als Teilnehmer:in eingetragen, damit Du die Kursseite genau so siehst wie Deine Teilnehmenden. Diese Anmeldung ist unsichtbar: Sie taucht in keiner Teilnehmendenliste, keiner Zählung, keiner Statistik, keinem Export und keiner E-Mail auf. Achtung: Was Du in der Vorschau tatsächlich absendest, etwa ein vorgeschlagenes Projekt, ist echt und für Teilnehmende sichtbar, bis Du die Vorschau beendest.",
+      "end_dialog_title": "Vorschau beenden",
+      "end_dialog_question": "Damit wird Deine Vorschau-Anmeldung entfernt. Projekte, die nur Du in der Vorschau angelegt hast, sowie Deine Anwesenheiten in diesem Kurs werden mit gelöscht.",
+      "errors": {
+        "TEST_ENROLLMENT_FAILED": "Die Vorschau konnte nicht geändert werden. Bitte versuche es später noch einmal.",
+        "TEST_ENROLLMENT_UNAUTHORIZED": "Nur Dozierende dieses Kurses können die Teilnehmer:innen-Ansicht nutzen.",
+        "TEST_ENROLLMENT_ALREADY_PARTICIPANT": "Du bist in diesem Kurs bereits regulär angemeldet und siehst die Kursseite schon als Teilnehmer:in.",
+        "TEST_ENROLLMENT_COURSE_NOT_FOUND": "Dieser Kurs existiert nicht mehr.",
+        "TEST_ENROLLMENT_INVALID_INPUT": "Die Anfrage war fehlerhaft."
+      }
     }
   },
   "manageProjects": {
@@ -3152,5 +3180,11 @@
   },
   "notifications": {
     "show_available_places_update_failed": "Anzeige der freien Plätze konnte nicht geändert werden"
+  },
+  "impersonation": {
+    "banner": "Du siehst EduHub gerade als {name}. Nur lesend – Änderungen sind nicht möglich.",
+    "exit": "Zurück zu meinem Konto",
+    "action": "Ansicht übernehmen",
+    "start_failed": "Die Ansicht konnte nicht übernommen werden."
   }
 }

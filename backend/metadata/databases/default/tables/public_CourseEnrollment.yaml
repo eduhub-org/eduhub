@@ -116,6 +116,15 @@ insert_permissions:
         - motivationLetter
         - location
         - termsAcceptedAt
+# `isTest` marks a preview enrollment an instructor or admin created on their own course to see the
+# participant view (see the column comment in migration 1789646311422). It is readable so the UI can
+# tell preview from reality, but it is deliberately absent from every insert/update column list and
+# from user_access_others: the flag is written only by the createTestEnrollment / removeTestEnrollment
+# actions, whose handler runs with the admin secret after checking that the caller instructs the
+# course. Routing it through an action rather than an instructor_access insert permission is what
+# keeps the inherited-role merge intact -- see the note at the top of inherited_roles.yaml; pinning an
+# explicit `- role: instructor` insert rule here would override the merge and break the existing
+# "add participants" flow, which inserts enrollments for other users under user_access.
 select_permissions:
   - role: instructor_access
     permission:
@@ -134,6 +143,7 @@ select_permissions:
         - invitationExpirationDate
         - location
         - termsAcceptedAt
+        - isTest
       filter: {}
       allow_aggregations: true
   - role: user_access
@@ -152,6 +162,7 @@ select_permissions:
         - userId
         - location
         - termsAcceptedAt
+        - isTest
       filter:
         _and:
           - userId:
@@ -188,6 +199,7 @@ select_permissions:
         - invitationExpirationDate
         - location
         - termsAcceptedAt
+        - isTest
       filter:
         _or:
           - Course:

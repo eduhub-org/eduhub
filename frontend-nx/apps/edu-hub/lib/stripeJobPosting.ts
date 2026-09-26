@@ -759,6 +759,10 @@ export async function handleJobPostingInvoiceFinalized(
   });
 
   if (!row.jobPostingId) return;
+  // publishJobPosting finalizes bank transfer invoices itself and queues the
+  // confirmation right after, with the transfer instructions this generic
+  // "Zahlung ausstehend" text lacks. The sweep stays the backstop.
+  if (isJobPostingBankTransferInvoice(invoiceDoc)) return;
 
   const data = await client.request<PostingForWebhook>(GET_POSTING_FOR_WEBHOOK, {
     id: row.jobPostingId,
@@ -789,4 +793,77 @@ export async function handleJobPostingInvoiceFinalized(
     stripeInvoiceNumber: invoiceDoc.number,
     confirmationQueuedNow: sent,
   });
+}
+
+/**
+ * Status transitions for the "Kauf auf Rechnung" bank transfer invoices that
+ * publishJobPosting issues (metadata.paymentMethod INVOICE). Checkout invoices
+ * are left alone: their status follows the checkout.session.* events.
+ *
+ * Paid -> PAID, overdue -> OVERDUE (+ notice to the StuJo admin; the posting
+ * stays online, admins decide), voided -> CANCELLED. Each only moves forward
+ * from the states listed, so a re-delivered or late event never undoes a
+ * later one (e.g. an overdue event arriving after the payment).
+ */
+const INVOICE_STATUS_TRANSITIONS: Record<string, { to: string; from: string[] }> = {
+  'invoice.paid': { to: 'PAID', from: ['ISSUED', 'OVERDUE'] },
+  'invoice.overdue': { to: 'OVERDUE', from: ['ISSUED'] },
+  'invoice.voided': { to: 'CANCELLED', from: ['ISSUED', 'OVERDUE'] },
+};
+
+export function isJobPostingBankTransferInvoice(invoiceDoc: Stripe.Invoice): boolean {
+  return (
+    invoiceDoc.metadata?.source === 'stujo' && invoiceDoc.metadata?.paymentMethod === 'INVOICE'
+  );
+}
+
+export async function handleJobPostingInvoiceStatusEvent(
+  client: GraphQLClient,
+  eventType: string,
+  invoiceDoc: Stripe.Invoice
+): Promise<void> {
+  const transition = INVOICE_STATUS_TRANSITIONS[eventType];
+  if (!transition || !invoiceDoc.id || !isJobPostingBankTransferInvoice(invoiceDoc)) return;
+
+  const { Invoice: rows } = await client.request<{
+    Invoice: Array<{ id: number; jobPostingId: number | null; status: string; grossTotal: number; currency: string }>;
+  }>(GET_INVOICE_BY_STRIPE_ID, { stripeInvoiceId: invoiceDoc.id });
+  const row = rows[0];
+  if (!row || !transition.from.includes(row.status)) return;
+
+  await client.request(UPDATE_INVOICE_STATUS, { id: row.id, status: transition.to });
+  console.log('Job posting bank transfer invoice status changed', {
+    stripeInvoiceId: invoiceDoc.id,
+    jobPostingId: row.jobPostingId,
+    from: row.status,
+    to: transition.to,
+  });
+
+  if (transition.to !== 'OVERDUE' || !row.jobPostingId || !process.env.STUJO_ADMIN_EMAIL) return;
+  const data = await client.request<PostingForWebhook>(GET_POSTING_FOR_WEBHOOK, {
+    id: row.jobPostingId,
+  });
+  const posting = data.JobPosting_by_pk;
+  if (!posting) return;
+  // Not deduped on metadata: JOB_POSTING_ADMIN_NOTICE already carries the
+  // posting's dedup key from its publication, and the status guard above
+  // makes this send once per invoice.
+  await queueMail(
+    client,
+    'JOB_POSTING_ADMIN_NOTICE',
+    process.env.STUJO_ADMIN_EMAIL,
+    buildMailVars(
+      posting,
+      posting.expiresAt ? new Date(posting.expiresAt) : null,
+      `${formatAmount(row.grossTotal, row.currency)} per Rechnung (Überweisung) – ÜBERFÄLLIG, ` +
+        `Rechnung ${invoiceDoc.number ?? invoiceDoc.id}`
+    ),
+    {
+      Invoice: false,
+      InvoicePdf: false,
+      InvoiceLink: false,
+      InvoicePending: false,
+      TermsAccepted: Boolean(posting.termsAcceptedAt),
+    }
+  );
 }

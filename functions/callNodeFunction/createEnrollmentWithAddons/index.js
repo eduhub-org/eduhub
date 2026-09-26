@@ -35,6 +35,11 @@ const GET_COURSE_ADDONS = `
 //   acceptance timestamp.
 // - motivationLetter is the only field that may legitimately change on a
 //   retry of this same flow.
+//
+// The `where` keeps a preview enrollment (isTest) out of reach: upserting onto
+// it would hand back a hidden row that no mail, count or certificate sees and
+// that ending the preview deletes. No row is returned, so this reports
+// ENROLLMENT_CREATION_FAILED instead.
 const CREATE_ENROLLMENT = `
   mutation CreateEnrollment(
     $courseId: Int!
@@ -54,6 +59,7 @@ const CREATE_ENROLLMENT = `
       on_conflict: {
         constraint: uniqueUserCourse
         update_columns: [motivationLetter]
+        where: { isTest: { _eq: false } }
       }
     ) {
       affected_rows

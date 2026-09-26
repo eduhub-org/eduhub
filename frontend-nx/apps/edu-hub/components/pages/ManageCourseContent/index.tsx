@@ -17,6 +17,7 @@ import { SessionsTab } from './SessionsTab';
 import { ApplicationsTab } from './ApplicationsTab';
 import { CourseParticipationsTab } from './CourseParticipationsTab';
 import { DegreeParticipationsTab } from './DegreeParticipationsTab';
+import { ParticipantPreviewButton } from './ParticipantPreviewButton';
 import { useIsAdmin, useIsUserIdInList } from '../../../hooks/authentication';
 import { getRegistrationFeatures } from './ApplicationsTab/registrationConfig';
 import Loading from '../../common/Loading';
@@ -205,8 +206,9 @@ export const ManageCourseContent: FC<Props> = ({ courseId }) => {
     <>
       <PageBlock>
         <div className="max-w-screen-xl mx-auto mt-20">
-          <div className="flex flex-row mb-12 mt-12 text-white">
+          <div className="flex flex-col gap-4 mb-12 mt-12 text-white sm:flex-row sm:items-center sm:justify-between">
             <h1 className="text-4xl font-bold">{course.title}</h1>
+            <ParticipantPreviewButton courseId={courseId} />
           </div>
 
           <div className="grid grid-cols-4 mb-20">

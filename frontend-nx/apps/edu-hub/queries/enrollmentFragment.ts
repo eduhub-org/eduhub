@@ -8,6 +8,7 @@ export const ENROLLMENT_FRAGMENT = gql`
     id
     created_at
     status
+    isTest
     billingOrganizationId
     achievementCertificateURL
     attendanceCertificateURL

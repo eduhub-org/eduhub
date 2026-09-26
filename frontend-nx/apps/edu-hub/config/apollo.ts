@@ -1,17 +1,35 @@
 import { ApolloClient, ApolloLink, InMemoryCache, createHttpLink } from '@apollo/client';
 import { AuthRoles } from '../types/enums';
 import { getAuthState } from './authStore';
+import { getImpersonationState } from './impersonationStore';
 
 const httpLink = createHttpLink({
   uri: process.env.NEXT_PUBLIC_API_URL,
   credentials: 'include',
 });
 
+/**
+ * While a super-admin is impersonating someone, every operation goes to our own
+ * API route instead of straight to Hasura. The route re-checks that the caller
+ * is an admin with an open impersonation, refuses anything that is not a query,
+ * and only then forwards with `x-hasura-user-id` set to the impersonated user.
+ * `same-origin` credentials carry the NextAuth session and the impersonation
+ * cookie, which is the whole authentication of that request.
+ */
+const impersonationHttpLink = createHttpLink({
+  uri: '/api/impersonation/graphql',
+  credentials: 'same-origin',
+});
+
 const authLink = new ApolloLink((operation, forward) => {
   const { accessToken, role } = getAuthState();
   const roleOverride = operation.getContext().role as AuthRoles | undefined;
   const effectiveRole = roleOverride ?? role;
-  const willAddAuth = !!(accessToken && effectiveRole !== AuthRoles.anonymous);
+  // While impersonating, the proxy decides the role and the identity. Sending
+  // the admin's own bearer token and role along would be, at best, ignored -- and
+  // at worst an invitation to honour it.
+  const willAddAuth =
+    !!(accessToken && effectiveRole !== AuthRoles.anonymous) && !getImpersonationState().active;
 
   if (willAddAuth) {
     operation.setContext((prev: Record<string, unknown>) => {
@@ -37,7 +55,10 @@ export const client = new ApolloClient({
   // The transport URI is supplied by `httpLink` (createHttpLink) in the link
   // chain below; a top-level `uri` alongside `link` is redundant and Apollo
   // Client 3.14 warns against it.
-  link: ApolloLink.from([authLink, httpLink]),
+  link: ApolloLink.from([
+    authLink,
+    ApolloLink.split(() => getImpersonationState().active, impersonationHttpLink, httpLink),
+  ]),
   cache: new InMemoryCache({
     typePolicies: {
       Query: {

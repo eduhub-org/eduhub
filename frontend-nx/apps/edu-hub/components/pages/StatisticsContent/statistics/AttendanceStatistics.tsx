@@ -4,7 +4,13 @@ import { TimeSeriesLineChart } from '../../../common/charts/TimeSeriesLineChart'
 import { useRoleQuery } from '../../../../hooks/authedQuery';
 import { PROGRAM_STATISTICS } from '../../../../queries/programList';
 import { PROGRAM_TYPES } from '../../../../queries/programList';
-import { ProgramStatistics } from '../../../../queries/__generated__/ProgramStatistics';
+import {
+  ProgramStatistics,
+  ProgramStatistics_Program,
+  ProgramStatistics_Program_Courses,
+  ProgramStatistics_Program_Courses_Sessions,
+  ProgramStatistics_Program_Courses_Sessions_Attendances,
+} from '../../../../queries/__generated__/ProgramStatistics';
 import { ProgramTypesList } from '../../../../queries/__generated__/ProgramTypesList';
 import Loading from '../../../common/Loading';
 import TagSelector from '../../../inputs/TagSelector';
@@ -33,28 +39,42 @@ export const AttendanceStatistics: FC = () => {
   );
 
   // Calculate attendances for a program's sessions
-  const calculateAttendances = (program: any) => {
+  const calculateAttendances = (program: ProgramStatistics_Program) => {
     return (
-      program.Courses?.reduce((courseSum: number, course: any) => {
+      program.Courses?.reduce((courseSum: number, course: ProgramStatistics_Program_Courses) => {
         return (
           courseSum +
-          (course.Sessions?.reduce((sessionSum: number, session: any) => {
-            // Group attendances by userId and get the most recent one for each user
-            const latestAttendances = session.Attendances?.reduce((acc: any, attendance: any) => {
-              const existingAttendance = acc[attendance.userId];
-              if (!existingAttendance || existingAttendance.id < attendance.id) {
-                acc[attendance.userId] = attendance;
-              }
-              return acc;
-            }, {});
+          (() => {
+            // Whoever is previewing this course as a participant. Their
+            // attendances are real rows on real sessions, so nothing upstream
+            // filters them out of the numbers -- see PreviewEnrollments in
+            // PROGRAM_STATISTICS.
+            const previewUserIds = new Set<string>(
+              course.PreviewEnrollments?.map((enrollment) => enrollment.userId) ?? []
+            );
 
-            // Count only ATTENDED status from the latest attendances
-            const attendedCount = Object.values(latestAttendances || {}).filter(
-              (attendance: any) => attendance.status === AttendanceStatus_enum.ATTENDED
-            ).length;
+            return (
+              course.Sessions?.reduce((sessionSum: number, session: ProgramStatistics_Program_Courses_Sessions) => {
+                // Group attendances by userId and get the most recent one for each user
+                const latestAttendances = session.Attendances?.filter(
+                  (attendance) => !previewUserIds.has(attendance.userId)
+                ).reduce<Record<string, ProgramStatistics_Program_Courses_Sessions_Attendances>>((acc, attendance) => {
+                  const existingAttendance = acc[attendance.userId];
+                  if (!existingAttendance || existingAttendance.id < attendance.id) {
+                    acc[attendance.userId] = attendance;
+                  }
+                  return acc;
+                }, {});
 
-            return sessionSum + attendedCount;
-          }, 0) || 0)
+                // Count only ATTENDED status from the latest attendances
+                const attendedCount = Object.values(latestAttendances || {}).filter(
+                  (attendance) => attendance.status === AttendanceStatus_enum.ATTENDED
+                ).length;
+
+                return sessionSum + attendedCount;
+              }, 0) || 0
+            );
+          })()
         );
       }, 0) || 0
     );

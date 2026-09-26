@@ -45,7 +45,7 @@ def check_course_continuation(arguments):
                 id
                 title
                 maxMissedSessions
-                CourseEnrollments(where: {status: {_in: [CONFIRMED, REGISTERED]}}) {
+                CourseEnrollments(where: {isTest: {_eq: false}, status: {_in: [CONFIRMED, REGISTERED]}}) {
                     User { id email firstName lastName }
                 }
                 Sessions {

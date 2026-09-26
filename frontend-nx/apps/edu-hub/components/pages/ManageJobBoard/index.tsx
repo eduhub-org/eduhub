@@ -76,6 +76,13 @@ const JOB_BOARD_ADMIN_QUERY = gql`
         name
       }
     }
+    InvoicePaymentOrganizations: Organization(
+      where: { allowInvoicePayment: { _eq: true } }
+      order_by: { name: asc }
+    ) {
+      id
+      name
+    }
   }
 `;
 
@@ -123,6 +130,18 @@ const SEARCH_ORGANIZATIONS = gql`
     Organization(where: { name: { _ilike: $search } }, limit: 20) {
       id
       name
+      allowInvoicePayment
+    }
+  }
+`;
+
+// "Kauf auf Rechnung": approved organizations may pay paid postings by bank
+// transfer invoice instead of Stripe Checkout (see publishJobPosting).
+const SET_INVOICE_PAYMENT = gql`
+  mutation AdminSetOrganizationInvoicePayment($id: Int!, $allowed: Boolean!) {
+    update_Organization_by_pk(pk_columns: { id: $id }, _set: { allowInvoicePayment: $allowed }) {
+      id
+      allowInvoicePayment
     }
   }
 `;
@@ -226,6 +245,8 @@ const ManageJobBoard: FC = () => {
   const [incrementCredit] = useAdminMutation(INCREMENT_CREDIT);
   const [setCredit] = useAdminMutation(SET_CREDIT);
   const [deleteCredit] = useAdminMutation(DELETE_CREDIT);
+  const [setInvoicePayment] = useAdminMutation(SET_INVOICE_PAYMENT);
+  const [invoicePaymentError, setInvoicePaymentError] = useState<string | null>(null);
   const [createStripePrices, { loading: bootstrapping }] = useAdminMutation(CREATE_STRIPE_PRICES);
 
   const [orgSearch, setOrgSearch] = useState('');
@@ -235,11 +256,25 @@ const ManageJobBoard: FC = () => {
   const [bootstrapResult, setBootstrapResult] = useState<string | null>(null);
   const [portalSaveError, setPortalSaveError] = useState<string | null>(null);
   const [creditSaveError, setCreditSaveError] = useState<string | null>(null);
-  const { data: orgData } = useAdminQuery(SEARCH_ORGANIZATIONS, {
+  const { data: orgData, refetch: refetchOrgSearch } = useAdminQuery(SEARCH_ORGANIZATIONS, {
     variables: { search: `%${orgSearch}%` },
     skip: orgSearch.trim().length < 2,
   });
   const { refetch: refetchCredit } = useAdminQuery(GET_CREDIT_FOR_ORG, { skip: true });
+
+  const toggleInvoicePayment = async (organizationId: number, allowed: boolean) => {
+    setInvoicePaymentError(null);
+    try {
+      await setInvoicePayment({ variables: { id: organizationId, allowed } });
+      await Promise.all([refetch(), orgSearch.trim().length >= 2 ? refetchOrgSearch() : null]);
+    } catch (toggleError) {
+      setInvoicePaymentError(
+        `Kauf auf Rechnung konnte nicht geändert werden: ${
+          toggleError instanceof Error ? toggleError.message : String(toggleError)
+        }`
+      );
+    }
+  };
 
   const parsedAmount = Number(grantAmount.replace(',', '.'));
   const amount = Number.isInteger(parsedAmount) && parsedAmount > 0 ? parsedAmount : 1;
@@ -576,6 +611,13 @@ const ManageJobBoard: FC = () => {
                 >
                   Unbegrenzt
                 </button>
+                <button
+                  className="text-xs font-semibold text-brand hover:text-brand-light"
+                  title="Kostenpflichtige Anzeigen per Rechnung (Überweisung, 30 Tage) statt online bezahlen"
+                  onClick={() => toggleInvoicePayment(org.id, !org.allowInvoicePayment)}
+                >
+                  {org.allowInvoicePayment ? 'Rechnung entziehen' : 'Rechnung erlauben'}
+                </button>
               </span>
             </li>
           ))}
@@ -583,6 +625,28 @@ const ManageJobBoard: FC = () => {
             <li className="px-3 py-2 text-sm text-label-secondary">Keine Treffer</li>
           )}
         </ul>
+      )}
+      {invoicePaymentError && <div className="mt-2 text-sm text-error">{invoicePaymentError}</div>}
+      {data?.InvoicePaymentOrganizations?.length > 0 && (
+        <>
+          <SectionTitle
+            title="Kauf auf Rechnung"
+            hint="Diese Organisationen dürfen per Überweisung zahlen; Stripe gleicht den Zahlungseingang automatisch ab"
+          />
+          <ul className="w-[34rem] rounded-lg bg-bg-card divide-y divide-white/10">
+            {data.InvoicePaymentOrganizations.map((org: any) => (
+              <li key={org.id} className="flex items-center justify-between gap-3 px-3 py-2 text-sm">
+                <span className="text-label-primary">{org.name}</span>
+                <button
+                  className="text-xs font-semibold text-brand hover:text-brand-light"
+                  onClick={() => toggleInvoicePayment(org.id, false)}
+                >
+                  Entziehen
+                </button>
+              </li>
+            ))}
+          </ul>
+        </>
       )}
       {data?.JobPostingCredit?.length > 0 && (
         <>
