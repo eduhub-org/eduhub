@@ -795,7 +795,7 @@ const TableGrid = <T extends BaseRow,>({
                     type="button"
                     onClick={() => handleRowNavigate(row.original)}
                     className="w-full flex items-center justify-center text-label-primary hover:bg-table-expand-hover transition-colors duration-200"
-                    aria-label="Open"
+                    aria-label={t('common.table_grid.open_row')}
                   >
                     <MdChevronRight size={22} />
                   </button>
@@ -808,6 +808,7 @@ const TableGrid = <T extends BaseRow,>({
                     type="button"
                     onClick={() => toggleRowExpansion(row.original.id)}
                     aria-expanded={isExpanded}
+                    aria-label={t(isExpanded ? 'common.table_grid.collapse_row' : 'common.table_grid.expand_row')}
                     className="w-full flex items-center justify-center text-label-primary hover:bg-table-expand-hover transition-colors duration-200"
                   >
                     {isExpanded ? <IoIosArrowUp size={20} /> : <IoIosArrowDown size={20} />}
@@ -873,6 +874,7 @@ const TableGrid = <T extends BaseRow,>({
                     type="button"
                     onClick={() => toggleRowExpansion(row.original.id)}
                     aria-expanded={isExpanded}
+                    aria-label={t(isExpanded ? 'common.table_grid.collapse_row' : 'common.table_grid.expand_row')}
                     className="w-8 h-8 flex-shrink-0 rounded-lg flex items-center justify-center bg-table-expand hover:bg-table-expand-hover text-label-primary"
                   >
                     {isExpanded ? <IoIosArrowUp size={20} /> : <IoIosArrowDown size={20} />}
@@ -882,7 +884,7 @@ const TableGrid = <T extends BaseRow,>({
                   <button
                     type="button"
                     onClick={() => handleRowNavigate(row.original)}
-                    aria-label="Open"
+                    aria-label={t('common.table_grid.open_row')}
                     className="w-8 h-8 flex-shrink-0 rounded-lg flex items-center justify-center bg-table-expand hover:bg-table-expand-hover text-label-primary"
                   >
                     <MdChevronRight size={22} />

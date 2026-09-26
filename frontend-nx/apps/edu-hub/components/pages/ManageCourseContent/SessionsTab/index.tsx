@@ -308,6 +308,7 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
             <CheckboxSelector
               variant="switch"
               label={label}
+              ariaLabel={tCoursePage('mandatory')}
               checked={session.isMandatory}
               disabled={isLastMandatory}
               updateValueMutation={UPDATE_SESSION_IS_MANDATORY}
@@ -556,14 +557,25 @@ const MissingSessionAddress: FC<{
     INSERT_SESSION_ADDRESS
   );
   const [showError, setShowError] = useState(true);
+  const [refreshError, setRefreshError] = useState('');
 
   const createAddress = async () => {
     if (entry.courseLocationId == null) return;
     setShowError(true);
-    await insertSessionAddress({
-      variables: { sessionId, address: '', courseLocationId: entry.courseLocationId },
-    });
-    await qResult.refetch();
+    setRefreshError('');
+    try {
+      await insertSessionAddress({
+        variables: { sessionId, address: '', courseLocationId: entry.courseLocationId },
+      });
+    } catch {
+      // The mutation's error state drives the dialog below.
+      return;
+    }
+    try {
+      await qResult.refetch();
+    } catch (refetchError) {
+      setRefreshError(refetchError instanceof Error ? refetchError.message : String(refetchError));
+    }
   };
 
   return (
@@ -584,9 +596,12 @@ const MissingSessionAddress: FC<{
         </button>
       </div>
       <ErrorMessageDialog
-        errorMessage={error?.message ?? ''}
-        open={!!error && showError}
-        onClose={() => setShowError(false)}
+        errorMessage={error?.message || refreshError}
+        open={(!!error || !!refreshError) && showError}
+        onClose={() => {
+          setShowError(false);
+          setRefreshError('');
+        }}
       />
     </>
   );

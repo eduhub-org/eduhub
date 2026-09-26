@@ -11,6 +11,7 @@ import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
 const CheckboxSelector: React.FC<CheckboxSelectorProps> = ({
   variant,
   label,
+  ariaLabel,
   checked,
   updateValueMutation,
   role,
@@ -41,6 +42,7 @@ const CheckboxSelector: React.FC<CheckboxSelectorProps> = ({
 
   const checkboxProps = {
     label,
+    ariaLabel,
     localChecked,
     handleValueChange,
     helpText,

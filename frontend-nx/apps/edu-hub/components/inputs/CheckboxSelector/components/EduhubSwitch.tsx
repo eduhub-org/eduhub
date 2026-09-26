@@ -13,6 +13,7 @@ interface EduhubSwitchProps extends Omit<CheckboxSelectorProps, 'variant' | 'che
  */
 export const EduhubSwitch: React.FC<EduhubSwitchProps> = ({
   label,
+  ariaLabel,
   localChecked,
   handleValueChange,
   disabled = false,
@@ -32,7 +33,7 @@ export const EduhubSwitch: React.FC<EduhubSwitchProps> = ({
         checked={localChecked}
         onChange={handleValueChange}
         disabled={disabled}
-        aria-label={label}
+        aria-label={ariaLabel ?? label}
         className="peer sr-only"
       />
       <span

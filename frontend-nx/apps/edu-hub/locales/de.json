@@ -156,7 +156,10 @@
       "none": "Keine Aktion",
       "items_per_page": "Einträge pro Seite",
       "selected_count": "{count} ausgewählt",
-      "clear_selection": "Auswahl aufheben"
+      "clear_selection": "Auswahl aufheben",
+      "expand_row": "Details anzeigen",
+      "collapse_row": "Details ausblenden",
+      "open_row": "Öffnen"
     },
     "table_grid_delete_button": {
       "delete": "Löschen",
