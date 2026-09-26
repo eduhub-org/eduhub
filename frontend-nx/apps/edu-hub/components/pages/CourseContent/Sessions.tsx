@@ -90,6 +90,34 @@ const SessionLocations: FC<SessionLocationsProps> = ({ locations, canSeeOnlineLi
   );
 };
 
+/**
+ * The small uppercase line above a title that marks the exceptions: a session
+ * shared by all courses of the program, and an optional one. Mandatory course
+ * sessions - the default - get none.
+ */
+const SessionEyebrow: FC<{ session: Session; programTitle?: string | null }> = ({ session, programTitle }) => {
+  const t = useTranslations('course');
+  const isShared = isProgramSession(session);
+  const isOptional = session.isMandatory === false;
+  if (!isShared && !isOptional) return null;
+
+  return (
+    <span className="flex flex-wrap items-center gap-x-2 text-[11px] font-bold uppercase tracking-widest mb-0.5">
+      {isShared && (
+        <Tooltip title={t('sessions.program_session_tooltip', { program: programTitle ?? '' })}>
+          <span className="text-label-cross-course">{t('sessions.program_session')}</span>
+        </Tooltip>
+      )}
+      {isShared && isOptional && (
+        <span aria-hidden="true" className="text-label-disabled">
+          ·
+        </span>
+      )}
+      {isOptional && <span className="text-label-disabled">{t('sessions.optional')}</span>}
+    </span>
+  );
+};
+
 interface SessionRowProps {
   session: Session;
   locations: ResolvedLocation[];
@@ -128,27 +156,14 @@ const SessionRow: FC<SessionRowProps> = ({ session, locations, showDate, canSeeO
         </span>
       </div>
       <div className="flex flex-col flex-1 min-w-0">
-        <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
-          {title ? (
-            <span className="block text-base sm:text-lg font-semibold break-words">{title}</span>
-          ) : (
-            <span className="block text-base sm:text-lg italic text-label-disabled">
-              {t('sessions.untitled_session')}
-            </span>
-          )}
-          {isProgramSession(session) && (
-            <Tooltip title={t('sessions.program_session_tooltip', { program: programTitle ?? '' })}>
-              <span className="inline-block rounded-full border border-brand px-2 py-0.5 text-xs text-brand whitespace-nowrap">
-                ◆ {t('sessions.program_session')}
-              </span>
-            </Tooltip>
-          )}
-          {session.isMandatory === false && (
-            <span className="inline-block rounded-full border border-label-secondary px-2 py-0.5 text-xs text-label-secondary whitespace-nowrap">
-              {t('sessions.optional')}
-            </span>
-          )}
-        </div>
+        <SessionEyebrow session={session} programTitle={programTitle} />
+        {title ? (
+          <span className="block text-base sm:text-lg font-semibold break-words">{title}</span>
+        ) : (
+          <span className="block text-base sm:text-lg italic text-label-disabled">
+            {t('sessions.untitled_session')}
+          </span>
+        )}
         {locations.length > 0 && (
           <div className="break-words">
             <SessionLocations locations={locations} canSeeOnlineLink={canSeeOnlineLink} />

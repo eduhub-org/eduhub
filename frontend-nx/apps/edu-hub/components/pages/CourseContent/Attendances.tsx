@@ -74,15 +74,15 @@ const AttendanceEntry: FC<AttendanceEntryProps> = ({ session }) => {
       title={isProgramSession(session) ? t('sessions.program_session') : undefined}
       className={`flex flex-col text-sm ${fontWeight} text-center px-4 py-3 ${bgColor} ${optionalClasses} rounded overflow-hidden whitespace-nowrap text-ellipsis`}
     >
-      <span>
-        {isProgramSession(session) && '◆ '}
-        {new Date(session.startDateTime).toLocaleDateString(locale, {
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit',
-        })}
-      </span>
-      {isOptional && <span className="text-xs font-normal">{t('attendances.optional')}</span>}
+      {new Date(session.startDateTime).toLocaleDateString(locale, {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+      })}
+      {isProgramSession(session) && (
+        <span className="text-[10px] font-normal uppercase tracking-wider">{t('sessions.program_session')}</span>
+      )}
+      {isOptional && <span className="text-[10px] font-normal uppercase tracking-wider">{t('attendances.optional')}</span>}
     </span>
   );
 };

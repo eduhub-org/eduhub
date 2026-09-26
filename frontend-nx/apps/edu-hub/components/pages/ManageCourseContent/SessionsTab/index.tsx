@@ -335,8 +335,8 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
               <div className="w-full min-w-0 flex items-center gap-2 px-2">
                 <MdLock className="flex-shrink-0 text-label-secondary" aria-label={programSessionTooltip} />
                 <span className="truncate">{row.original.title || tCoursePage('session_title')}</span>
-                <span className="flex-shrink-0 rounded-full border border-brand px-2 py-0.5 text-xs text-brand whitespace-nowrap">
-                  ◆ {tCoursePage('program_session')}
+                <span className="flex-shrink-0 text-[11px] font-bold uppercase tracking-widest text-label-cross-course whitespace-nowrap">
+                  {tCoursePage('program_session')}
                 </span>
               </div>
             </Tooltip>
