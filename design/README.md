@@ -28,6 +28,26 @@ an active editor document).
 
 ---
 
+## Manage course, responsive (`manage-course-mobile.pen`)
+
+Mobile (375 px) and desktop (1280/1024 px) designs for the manage course page, following the sessions tab
+(`sessions-tab.pen`, option A @ 375 px) as the reference.
+
+| Screen | Description |
+|--------|-------------|
+| Tabs · 2×2 tiles (chosen) | Today's green tiles wrapped 2×2 below md; unchanged single row from md up |
+| Beschreibung @ 375 | Labelled sections, stacked grids, info-block accordions (mobile only), location cards |
+| Bewerbungen @ 375 | Compact stats, selection bar, sort/select-all controls, TableGrid mobile cards with expanded rating/application |
+| Projekte & Teilnahmen @ 375 | Project cards with full-width action; participant cards with read-only attendance dots and per-session toggles when expanded (mobile only) |
+| Beschreibung @ 1280 | Today's 2-column layout + page gutter, less space under the tiles, aligned location headers |
+| Bewerbungen @ 1280 / @ 1024 | Standard selection bar, delete in expanded row; `Organisation` hidden below xl |
+| Projekte & Teilnahmen @ 1280 / @ 1024 | Today's boxes and clickable attendance dots; `Projekt` + `Leistungs-Zert.` hidden below xl |
+| Breakpoint plan (TableGrid) | `hideBelow` proposals per table for 768/1024/1280 px |
+
+Open in Pencil: `design/manage-course-mobile.pen`
+
+---
+
 ## Project tile slider (`project-tile-slider.pen`)
 
 Pencil designs for reusable project tiles, tile slider, and public project pages.
