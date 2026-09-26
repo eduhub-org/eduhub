@@ -159,7 +159,12 @@
       "clear_selection": "Auswahl aufheben",
       "expand_row": "Details anzeigen",
       "collapse_row": "Details ausblenden",
-      "open_row": "Öffnen"
+      "open_row": "Öffnen",
+      "select_all": "Alle",
+      "sort_by": "Sortieren",
+      "sort_default": "Standardsortierung",
+      "sort_asc": "{column}, aufsteigend",
+      "sort_desc": "{column}, absteigend"
     },
     "table_grid_delete_button": {
       "delete": "Löschen",
@@ -2018,7 +2023,10 @@
         "TEST_ENROLLMENT_COURSE_NOT_FOUND": "Dieser Kurs existiert nicht mehr.",
         "TEST_ENROLLMENT_INVALID_INPUT": "Die Anfrage war fehlerhaft."
       }
-    }
+    },
+    "info_block_mobile_summary": "{title} · {count} Zeichen",
+    "info_block_mobile_untitled": "Ohne Titel",
+    "info_block_mobile_empty": "Noch leer"
   },
   "manageProjects": {
     "headline": "Projekte",

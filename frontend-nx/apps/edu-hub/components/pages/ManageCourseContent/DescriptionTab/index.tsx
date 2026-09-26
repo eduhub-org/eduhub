@@ -48,6 +48,7 @@ import {
 } from '../../../../queries/__generated__/InsertSessionAddress';
 import InputField from '../../../inputs/InputField';
 import { Button as ChatLinkButton } from '../../../common/Button';
+import MobileCollapsible from './MobileCollapsible';
 interface IProps {
   course: ManagedCourse_Course_by_pk;
   qResult: QueryResult<any, any>;
@@ -174,6 +175,14 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
 
   const isEventCourse = course.Program?.type === ProgramType.EVENTS;
 
+  const infoBlockSummary = (heading: string | null, content: string | null) =>
+    heading || content
+      ? t('info_block_mobile_summary', {
+          title: heading || t('info_block_mobile_untitled'),
+          count: content?.length ?? 0,
+        })
+      : t('info_block_mobile_empty');
+
   const courseLocations = [...course.CourseLocations];
   courseLocations.sort((a, b) => a.id - b.id);
 
@@ -213,7 +222,8 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
             </Tooltip>
             <h3 className="text-label-primary text-md">{t('learning_goals.label')}</h3>
           </div>
-          <div className="p-4 h-64 overflow-y-auto text-white">
+          {/* Phones size the goals to their content instead of reserving a fixed block. */}
+          <div className="p-4 md:h-64 overflow-y-auto text-white">
             {course.learningGoals ? (
               <ul className="list-none">
                 {course.learningGoals
@@ -248,72 +258,84 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
         </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2">
-        <div className="min-h-0">
-          <InputField
-            variant="eduhub"
-            type="input"
-            value={course.headingDescriptionField1 ?? ''}
-            itemId={course.id}
-            updateValueMutation={UPDATE_COURSE_HEADING_DESCRIPTION_1}
-            refetchQueries={['ManagedCourse']}
-            label={t('info_block_1_title.label')}
-            placeholder={t('info_block_1_title.placeholder')}
-            helpText={t('info_block_1_title.help_text')}
-            className="mb-0"
-          />
-          <InputField
-            variant="eduhub"
-            type="markdown"
-            value={course.contentDescriptionField1 ?? ''}
-            itemId={course.id}
-            updateValueMutation={UPDATE_COURSE_CONTENT_DESCRIPTION_FIELD_1}
-            refetchQueries={['ManagedCourse']}
-            placeholder={t('info_block_1_content.placeholder')}
-            maxLength={10000}
-            className="h-64"
-          />
-        </div>
-        <div className="min-h-0">
-          <InputField
-            variant="eduhub"
-            type="input"
-            value={course.headingDescriptionField2 ?? ''}
-            itemId={course.id}
-            updateValueMutation={UPDATE_COURSE_HEADING_DESCRIPTION_2}
-            refetchQueries={['ManagedCourse']}
-            label={t('info_block_2_title.label')}
-            helpText={t('info_block_2_title.help_text')}
-            placeholder={t('info_block_2_title.placeholder')}
-            className="mb-0"
-          />
-          <InputField
-            variant="eduhub"
-            type="markdown"
-            value={course.contentDescriptionField2 ?? ''}
-            itemId={course.id}
-            updateValueMutation={UPDATE_COURSE_CONTENT_DESCRIPTION_FIELD_2}
-            refetchQueries={['ManagedCourse']}
-            placeholder={t('info_block_2_content.placeholder')}
-            maxLength={10000}
-            className="h-64"
-          />
-        </div>
+        <MobileCollapsible
+          title={t('info_block_1_title.label')}
+          summary={infoBlockSummary(course.headingDescriptionField1, course.contentDescriptionField1)}
+        >
+          <div className="min-h-0">
+            <InputField
+              variant="eduhub"
+              type="input"
+              value={course.headingDescriptionField1 ?? ''}
+              itemId={course.id}
+              updateValueMutation={UPDATE_COURSE_HEADING_DESCRIPTION_1}
+              refetchQueries={['ManagedCourse']}
+              label={t('info_block_1_title.label')}
+              placeholder={t('info_block_1_title.placeholder')}
+              helpText={t('info_block_1_title.help_text')}
+              className="mb-0"
+            />
+            <InputField
+              variant="eduhub"
+              type="markdown"
+              value={course.contentDescriptionField1 ?? ''}
+              itemId={course.id}
+              updateValueMutation={UPDATE_COURSE_CONTENT_DESCRIPTION_FIELD_1}
+              refetchQueries={['ManagedCourse']}
+              placeholder={t('info_block_1_content.placeholder')}
+              maxLength={10000}
+              className="h-64"
+            />
+          </div>
+        </MobileCollapsible>
+        <MobileCollapsible
+          title={t('info_block_2_title.label')}
+          summary={infoBlockSummary(course.headingDescriptionField2, course.contentDescriptionField2)}
+        >
+          <div className="min-h-0">
+            <InputField
+              variant="eduhub"
+              type="input"
+              value={course.headingDescriptionField2 ?? ''}
+              itemId={course.id}
+              updateValueMutation={UPDATE_COURSE_HEADING_DESCRIPTION_2}
+              refetchQueries={['ManagedCourse']}
+              label={t('info_block_2_title.label')}
+              helpText={t('info_block_2_title.help_text')}
+              placeholder={t('info_block_2_title.placeholder')}
+              className="mb-0"
+            />
+            <InputField
+              variant="eduhub"
+              type="markdown"
+              value={course.contentDescriptionField2 ?? ''}
+              itemId={course.id}
+              updateValueMutation={UPDATE_COURSE_CONTENT_DESCRIPTION_FIELD_2}
+              refetchQueries={['ManagedCourse']}
+              placeholder={t('info_block_2_content.placeholder')}
+              maxLength={10000}
+              className="h-64"
+            />
+          </div>
+        </MobileCollapsible>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2">
         {/* An event does not recur weekly - its dates come from its sessions -
             so the whole weekday/time column is dropped rather than left empty. */}
         {isEventCourse ? null : (
-          <div className="grid grid-cols-3">
-            <DropDownSelector
-              variant="eduhub"
-              label={t('weekday')}
-              value={course.weekDay ?? 'MONDAY'}
-              options={weekDayOptions}
-              updateValueMutation={UPDATE_COURSE_WEEKDAY}
-              identifierVariables={{ courseId: course.id }}
-              refetchQueries={['ManagedCourse']}
-            />
+          <div className="grid grid-cols-2 sm:grid-cols-3">
+            <div className="col-span-2 sm:col-span-1">
+              <DropDownSelector
+                variant="eduhub"
+                label={t('weekday')}
+                value={course.weekDay ?? 'MONDAY'}
+                options={weekDayOptions}
+                updateValueMutation={UPDATE_COURSE_WEEKDAY}
+                identifierVariables={{ courseId: course.id }}
+                refetchQueries={['ManagedCourse']}
+              />
+            </div>
             <TimePicker
               variant="eduhub"
               label={t('start_time')}
@@ -332,7 +354,6 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
               refetchQueries={['ManagedCourse']}
               className="mb-4"
             />
-            <div />
           </div>
         )}
         <div className="grid grid-cols-2">
@@ -364,10 +385,13 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
       </div>
 
       <div>
-        <div className="grid grid-cols-12 text-label-primary px-2">
-          <div className="col-span-2">{t('location.label')}</div>
-          <div className="col-span-7">{t('address.label')}</div>
-        </div>
+        {/* Phones show each location as a card, so the column headings only exist from md up. */}
+        {courseLocations.length > 0 && (
+          <div className="hidden md:grid grid-cols-12 text-label-primary px-2">
+            <div className="col-span-2">{t('location.label')}</div>
+            <div className="col-span-7">{t('address.label')}</div>
+          </div>
+        )}
         {courseLocations.map((loc) => (
           <Locations key={loc.id} location={loc} onDelete={handleDeleteCourseLocation} />
         ))}

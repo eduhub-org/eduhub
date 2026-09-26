@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ColumnDef } from '@tanstack/react-table';
 
@@ -171,6 +171,25 @@ describe('TableGrid responsive options', () => {
     renderGrid({ renderMobileRow: (row) => <span>card {row.name}</span> });
     expect(screen.getByText('card Row one')).toBeInTheDocument();
     expect(screen.queryByText('Name')).not.toBeInTheDocument();
+  });
+
+  it('replaces the missing header row on phones with select-all and sort controls', () => {
+    mockMatchMedia(true);
+    renderGrid({
+      columns: [{ ...columns[0], enableSorting: true }],
+      renderMobileRow: (row) => <span>card {row.name}</span>,
+      bulkActions: [{ value: 'email', label: 'Email' }],
+      onBulkAction: jest.fn(),
+    });
+
+    expect(screen.getByText('common.table_grid.sort_default')).toBeInTheDocument();
+    expect(screen.queryByText('common.table_grid.selected_count')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByLabelText('common.table_grid.select_all'));
+
+    // The toolbar turns into the selection bar with the count.
+    expect(screen.getByText('common.table_grid.selected_count')).toBeInTheDocument();
+    expect(screen.getByText('common.table_grid.clear_selection')).toBeInTheDocument();
   });
 });
 
