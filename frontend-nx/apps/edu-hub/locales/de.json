@@ -385,7 +385,6 @@
       "attendances": "Anwesenheiten",
       "max_missed_sessions": "Du darfst an maximal einem Termin fehlen",
       "max_missed_mandatory_sessions": "Du darfst an maximal {count} von {total} Pflichtterminen fehlen",
-      "optional": "optional",
       "max_missed_sessions_plural": "Du darfst an maximal {count} Terminen fehlen",
       "attendance_status": {
         "ATTENDED": "Teilgenommen",

@@ -385,7 +385,6 @@
       "attendances": "Attendances",
       "max_missed_sessions": "You may miss at most one session",
       "max_missed_mandatory_sessions": "You may miss at most {count} of {total} mandatory sessions",
-      "optional": "optional",
       "max_missed_sessions_plural": "You may miss at most {count} sessions",
       "attendance_status": {
         "ATTENDED": "Attended",
