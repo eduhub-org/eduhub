@@ -16,7 +16,7 @@ export interface RemoveTestEnrollment_removeTestEnrollment {
 
 export interface RemoveTestEnrollment {
   /**
-   * Removes the caller's preview enrollment on a course they instruct, together with anything it authored (project authorships, orphaned projects, attendances)
+   * Removes the caller's own preview enrollment (also after they stopped instructing the course), together with anything it authored (project authorships, orphaned projects, attendances)
    */
   removeTestEnrollment: RemoveTestEnrollment_removeTestEnrollment;
 }

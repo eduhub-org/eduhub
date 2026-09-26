@@ -12,14 +12,18 @@ const NotificationSnackbar: React.FC<NotificationSnackbarProps> = ({
   open,
   onClose,
   message,
-  duration = 2000,
+  duration = 4000,
 }) => {
   return (
     <Snackbar
       anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       open={open}
       autoHideDuration={duration}
-      onClose={onClose}
+      // Auto-saving fields keep the user clicking and typing; closing on every click-away made the
+      // confirmation vanish before it could be read.
+      onClose={(_event, reason) => {
+        if (reason !== 'clickaway') onClose();
+      }}
       message={message}
     />
   );

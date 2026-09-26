@@ -116,7 +116,7 @@ def check_attendance(arguments):
             attendance_incomplete = False
             incomplete_reason = None
 
-            for location in session["Course"]["CourseLocations"]:
+            for location in session_locations(session):
                 logging.info("### Getting attendances for %s", location["locationOption"])
 
                 if location["locationOption"] == "ONLINE":
@@ -206,9 +206,14 @@ def check_attendance(arguments):
                 )
                 continue
 
-            course_participants = eduhub_client.get_course_participants_from_session_id(
-                session["id"]
-            )
+            if session.get("programId") is not None:
+                course_participants = eduhub_client.get_program_participants_from_session_id(
+                    session["id"]
+                )
+            else:
+                course_participants = eduhub_client.get_course_participants_from_session_id(
+                    session["id"]
+                )
             logging.info(
                 "########## Checking attendances for the %s confirmed participants in the session's course",
                 len(course_participants),
@@ -261,6 +266,26 @@ def check_attendance(arguments):
 
 #############################################################################################
 # Helper functions
+
+
+def session_locations(session):
+    """Where a session takes place, as {locationOption, defaultSessionAddress}.
+
+    Course sessions use their course's locations. Program sessions have no
+    course, so each SessionAddress carries its own location option and the
+    address (the meeting link for ONLINE) directly.
+    """
+    if session.get("programId") is None:
+        return session["Course"]["CourseLocations"]
+    return [
+        {
+            "locationOption": sa["locationOption"],
+            "defaultSessionAddress": (sa.get("LocationAddress") or {}).get("address")
+            or sa.get("address"),
+        }
+        for sa in session.get("SessionAddresses", [])
+        if sa.get("locationOption")
+    ]
 
 
 def get_offline_session_attendance(session, location):

@@ -137,7 +137,12 @@ export function useTableGrid<V>({
 
   const queryResult = queryHook(query, queryOptions);
 
-  const { data, loading, error, refetch } = queryResult;
+  const { loading, error, refetch } = queryResult;
+  // A new search or page is a new set of variables, for which Apollo reports no data while it
+  // loads. Keeping the previous rows lets pages keep the table - and its focused search field -
+  // mounted; `initialLoading` is only true while nothing has been loaded yet.
+  const data = queryResult.data ?? queryResult.previousData;
+  const initialLoading = loading && !data;
 
   const handleSetSearchFilter = useCallback((value: string) => {
     setSearchFilter(value);
@@ -157,6 +162,7 @@ export function useTableGrid<V>({
     queryResult,
     data,
     loading,
+    initialLoading,
     error,
     refetch,
     searchFilter,

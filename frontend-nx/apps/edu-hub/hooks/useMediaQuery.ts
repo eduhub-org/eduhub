@@ -4,7 +4,8 @@ export const useMediaQuery = (query: string): boolean => {
   const [matches, setMatches] = useState(false);
 
   useEffect(() => {
-    if (typeof window === 'undefined') {
+    // SSR, and test environments such as jsdom, have no matchMedia: keep the default.
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
       return;
     }
 

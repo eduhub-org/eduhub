@@ -154,9 +154,15 @@
       "bulk_action": "Sammelaktion",
       "apply": "Ausführen",
       "none": "Keine Aktion",
-      "items_per_page": "Einträge pro Seite"
+      "items_per_page": "Einträge pro Seite",
+      "selected_count": "{count} ausgewählt",
+      "clear_selection": "Auswahl aufheben",
+      "expand_row": "Details anzeigen",
+      "collapse_row": "Details ausblenden",
+      "open_row": "Öffnen"
     },
     "table_grid_delete_button": {
+      "delete": "Löschen",
       "confirm_delete": "Löschen bestätigen",
       "deletion_confirmation_question": "Bist du sicher, dass du diesen Eintrag löschen möchtest?"
     },
@@ -374,12 +380,17 @@
       "agenda": "Programm",
       "add_to_calendar": "Zum Kalender hinzufügen",
       "location_not_available": "Ort noch nicht bekannt",
+      "optional": "optional",
+      "program_session": "Kursübergreifend",
+      "program_session_tooltip": "Findet für alle Kurse von „{program}“ statt",
+      "optional_hint": "Alle Termine sind Pflicht, außer als „optional“ markierte.",
       "untitled_session": "Programmpunkt",
       "add_to_calendar_short": "Kalender"
     },
     "attendances": {
       "attendances": "Anwesenheiten",
       "max_missed_sessions": "Du darfst an maximal einem Termin fehlen",
+      "max_missed_mandatory_sessions": "Du darfst an maximal {count} von {total} Pflichtterminen fehlen",
       "max_missed_sessions_plural": "Du darfst an maximal {count} Terminen fehlen",
       "attendance_status": {
         "ATTENDED": "Teilgenommen",
@@ -935,6 +946,10 @@
     "external_speakers": "Externe Referenten",
     "add_external_speaker": "Externen Referenten hinzufügen",
     "remove_external_speaker": "Externen Referenten entfernen",
+    "mandatory": "Pflicht",
+    "program_session": "Kursübergreifend",
+    "mandatory_last_session": "Mindestens ein Termin muss Pflicht bleiben.",
+    "mandatory_help": "Nur Pflichttermine zählen zu den erlaubten Fehlterminen und erscheinen auf dem Zertifikat. Anwesenheiten werden trotzdem erfasst.",
     "session_title": "Titel des Termins",
     "confirmDeleteSession": "Möchtest du den Termin wirklich löschen?",
     "cannotDeletePastSession": "Du kannst keinen Termin der in der Vergangenheit liegt löschen! Solltest du den Termin wirklich löschen wollen, kontaktiere bitte einen Administrator.",
@@ -1704,6 +1719,8 @@
     "attendance_cert_not_issued": "Keine Teilnahmebescheinigung ausgestellt",
     "achievement_cert_issued": "Leistungszertifikat ausgestellt",
     "achievement_cert_not_issued": "Kein Leistungszertifikat ausgestellt",
+    "attendance_program_session": "Kursübergreifend",
+    "attendance_optional_session": "optional",
     "attendance_status_passed": "Anwesenheitsanforderung erfüllt",
     "attendance_status_failed": "Anwesenheitsanforderung nicht erfüllt",
     "attendance_status_uncertain": "Anwesenheitsstatus noch offen",
@@ -1832,6 +1849,14 @@
     "course_not_found": "Kurs {courseId} wurde nicht gefunden!",
     "add_session": "Termin hinzufügen",
     "SessionsTab": {
+      "date_time": "Datum & Zeit",
+      "edit_date_time": "Datum und Uhrzeit ändern",
+      "location": "Ort",
+      "optional": "Optional",
+      "no_address": "Keine Adresse",
+      "create_address": "Adresse anlegen",
+      "schedule": "Termin",
+      "program_session_locked": "Wird vom Programm-Admin verwaltet",
       "sessionAddresses": {
         "online": {
           "label": "Online",
@@ -1868,6 +1893,7 @@
       "attendance_data": {
         "label": "Anwesenheitsdaten",
         "review_button": "Anwesenheitsdaten ansehen",
+        "review_short": "Ansehen",
         "no_data": "Keine Anwesenheitsdaten vorhanden",
         "dialog_title": "Anwesenheitsdaten"
       },
@@ -2023,6 +2049,15 @@
     }
   },
   "managePrograms": {
+    "program_sessions": {
+      "title": "Programm-Termine",
+      "help_text": "Diese Termine erscheinen in allen Kursen des Programms. Sie sind standardmäßig optional; Pflichttermine zählen in jedem Kurs zu den erlaubten Fehlterminen.",
+      "add": "Termin hinzufügen",
+      "confirm_delete": "Willst Du diesen Programm-Termin wirklich löschen? Er verschwindet aus allen Kursen und erfasste Anwesenheiten gehen verloren.",
+      "location": "Ort",
+      "online_link_placeholder": "Link zum Online-Termin",
+      "location_address_placeholder": "Adresse auswählen"
+    },
     "headline": "Programme",
     "table_header": {
       "published": "Veröffent- licht",

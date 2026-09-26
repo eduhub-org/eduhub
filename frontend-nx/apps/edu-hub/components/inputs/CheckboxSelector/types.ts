@@ -3,8 +3,10 @@ import { DocumentNode } from 'graphql';
 import { AuthRoles } from '../../../types/enums';
 
 export type CheckboxSelectorProps = {
-  variant: 'material' | 'eduhub';
+  variant: 'material' | 'eduhub' | 'switch';
   label?: string;
+  /** Accessible name when no visible label is shown (e.g. a switch in a table column). */
+  ariaLabel?: string;
   checked: boolean;
   updateValueMutation?: DocumentNode;
   /** Overrides the Hasura role used for updateValueMutation (defaults to the current session role). */

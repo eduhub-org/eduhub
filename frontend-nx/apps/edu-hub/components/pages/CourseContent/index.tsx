@@ -276,6 +276,8 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                     {!isDegreeCourse ? (
                       <Sessions
                         sessions={course.Sessions}
+                        programSessions={course.Program?.Sessions}
+                        programTitle={course.Program?.title}
                         courseLocations={course.CourseLocations}
                         isLoggedInParticipant={isLoggedInParticipant}
                         isEvent={isEventCourse}
