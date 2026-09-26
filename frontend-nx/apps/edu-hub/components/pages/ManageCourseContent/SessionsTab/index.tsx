@@ -107,7 +107,7 @@ const parseSearchValue = (searchValue: string) => {
   return { firstName: trimmed, lastName: '', email: '' };
 };
 
-/** Small uppercase label above a session title (KURSÜBERGREIFEND, OPTIONAL). */
+/** Small uppercase label above a session title (KURSÜBERGREIFEND). */
 const Eyebrow: FC<{ children: ReactNode; icon?: ReactNode }> = ({ children, icon }) => (
   <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest text-label-secondary whitespace-nowrap">
     {icon}
@@ -283,15 +283,13 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
 
   const eyebrowOf = useCallback(
     (session: SessionRow) => {
+      // Optional sessions need no label: the Pflicht switch in the same row already says so.
       if (isProgramSession(session)) {
         return <Eyebrow icon={<MdLock aria-hidden />}>{tCoursePage('program_session')}</Eyebrow>;
       }
-      if (showMandatoryColumn && !isMandatorySession(session)) {
-        return <Eyebrow>{t('SessionsTab.optional')}</Eyebrow>;
-      }
       return null;
     },
-    [showMandatoryColumn, t, tCoursePage]
+    [tCoursePage]
   );
 
   const mandatoryControl = useCallback(
