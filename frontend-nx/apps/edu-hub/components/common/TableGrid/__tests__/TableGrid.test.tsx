@@ -104,3 +104,72 @@ describe('TableGrid per-row options', () => {
     expect(screen.getByText('Editable').closest('.locked-row')).not.toBeInTheDocument();
   });
 });
+
+/** jsdom has no matchMedia; answer every query with `matches`. */
+const mockMatchMedia = (matches: boolean) => {
+  Object.defineProperty(window, 'matchMedia', {
+    configurable: true,
+    writable: true,
+    value: (query: string) => ({
+      matches,
+      media: query,
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+    }),
+  });
+};
+
+describe('TableGrid responsive options', () => {
+  afterEach(() => {
+    delete (window as { matchMedia?: unknown }).matchMedia;
+  });
+
+  const responsiveColumns: ColumnDef<TestRow>[] = [
+    ...columns,
+    {
+      id: 'extra',
+      header: 'Extra',
+      meta: { hideBelow: 'xl' },
+      cell: () => <span>extra cell</span>,
+    },
+  ];
+
+  const renderGrid = (props: Partial<React.ComponentProps<typeof TableGrid<TestRow>>> = {}) =>
+    render(
+      <TableGrid<TestRow>
+        columns={responsiveColumns}
+        data={[{ id: 1, name: 'Row one' }]}
+        enablePagination={false}
+        error={undefined}
+        loading={false}
+        pageIndex={0}
+        onPageChange={jest.fn()}
+        refetchQueries={[]}
+        searchFilter=""
+        onSearchFilterChange={jest.fn()}
+        showGlobalSearchField={false}
+        {...props}
+      />
+    );
+
+  it('shows every column when the screen size is unknown', () => {
+    renderGrid();
+    expect(screen.getByText('Extra')).toBeInTheDocument();
+    expect(screen.getByText('extra cell')).toBeInTheDocument();
+  });
+
+  it('drops columns marked hideBelow on narrower screens', () => {
+    mockMatchMedia(true);
+    renderGrid();
+    expect(screen.queryByText('Extra')).not.toBeInTheDocument();
+    expect(screen.queryByText('extra cell')).not.toBeInTheDocument();
+    expect(screen.getByText('Row one')).toBeInTheDocument();
+  });
+
+  it('renders the mobile card summary on phones when one is provided', () => {
+    mockMatchMedia(true);
+    renderGrid({ renderMobileRow: (row) => <span>card {row.name}</span> });
+    expect(screen.getByText('card Row one')).toBeInTheDocument();
+    expect(screen.queryByText('Name')).not.toBeInTheDocument();
+  });
+});

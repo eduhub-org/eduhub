@@ -154,9 +154,12 @@
       "bulk_action": "Bulk Action",
       "apply": "Apply",
       "none": "None",
-      "items_per_page": "Items per page"
+      "items_per_page": "Items per page",
+      "selected_count": "{count} selected",
+      "clear_selection": "Clear selection"
     },
     "table_grid_delete_button": {
+      "delete": "Delete",
       "confirm_delete": "Confirm Deletion",
       "deletion_confirmation_question": "Are you sure you want to delete this entry?"
     },

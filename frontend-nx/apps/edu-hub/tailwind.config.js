@@ -42,6 +42,11 @@ module.exports = {
           card: 'var(--eduhub-bg-card)',
           footer: 'var(--eduhub-bg-footer)',
         },
+        table: {
+          divider: 'var(--eduhub-table-divider)',
+          expand: 'var(--eduhub-table-expand)',
+          'expand-hover': 'var(--eduhub-table-expand-hover)',
+        },
         success: 'var(--eduhub-success)',
         warning: 'var(--eduhub-warning)',
         cta: {

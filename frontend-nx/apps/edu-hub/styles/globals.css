@@ -72,6 +72,12 @@
   --eduhub-status-invited: #FFA665;
   --eduhub-status-current: #A2EBA0;
   --eduhub-status-missed: #F2991D66;
+
+  /* TableGrid: row dividers on the white rows, and the grey expand strip that
+     closes each row. Same in both scopes, since rows are always light. */
+  --eduhub-table-divider: #C4C4C4;
+  --eduhub-table-expand: #E2E2E2;
+  --eduhub-table-expand-hover: #D0D0D0;
 }
 
 /* Light theme - for light background sections (current) or full light mode (future) */
