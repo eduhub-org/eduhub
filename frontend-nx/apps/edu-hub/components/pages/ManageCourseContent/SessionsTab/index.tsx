@@ -247,11 +247,12 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
   const programSessionTooltip = t('SessionsTab.program_session_locked');
 
   // Mandatory only matters for passing, so the column is shown only when a
-  // certificate can be earned. At least one session must stay mandatory: the
-  // last mandatory course session cannot be unticked (which also locks the
-  // only session of a single-session offering).
+  // certificate can be earned. At least one course session must stay
+  // mandatory: the last mandatory one cannot be unticked (which also locks the
+  // only session of a single-session offering). Program sessions do not count
+  // here, since the program admin can change or remove them at any time.
   const showMandatoryColumn = Boolean(course.attendanceCertificatePossible || course.achievementCertificatePossible);
-  const mandatoryCount = useMemo(() => tableSessions.filter(isMandatorySession).length, [tableSessions]);
+  const mandatoryCount = useMemo(() => courseSessions.filter(isMandatorySession).length, [courseSessions]);
 
   const columns = useMemo<ColumnDef<SessionRow>[]>(() => {
     const allColumns: ColumnDef<SessionRow>[] = [
