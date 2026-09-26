@@ -38,6 +38,10 @@ export interface AdminSessionFragment_SessionAddresses {
    */
   locationAddressId: number | null;
   /**
+   * Location option of a program session address (course session addresses use courseLocationId instead)
+   */
+  locationOption: LocationOption_enum | null;
+  /**
    * An object relationship
    */
   CourseLocation: AdminSessionFragment_SessionAddresses_CourseLocation | null;
@@ -105,7 +109,7 @@ export interface AdminSessionFragment {
   /**
    * The ID of the course the session belongs to
    */
-  courseId: number;
+  courseId: number | null;
   /**
    * A description of the session
    */
@@ -118,6 +122,14 @@ export interface AdminSessionFragment {
    * The title of the session
    */
   title: string;
+  /**
+   * If false, attendance is tracked but does not count toward passing (maxMissedSessions) or certificates
+   */
+  isMandatory: boolean;
+  /**
+   * Set for program-wide sessions (courseId is then NULL); shown in every course of the program
+   */
+  programId: number | null;
   /**
    * An array relationship
    */

@@ -39,6 +39,8 @@ const mockSessions: Course_Course_by_pk_Sessions[] = [
     startDateTime: '2024-01-15T10:00:00Z',
     endDateTime: '2024-01-15T12:00:00Z',
     title: 'Test Session',
+    isMandatory: true,
+    programId: null,
     SessionSpeakers: [],
     SessionAddresses: [
       {
@@ -46,6 +48,7 @@ const mockSessions: Course_Course_by_pk_Sessions[] = [
         id: 1,
         address: 'Test Address 1',
         locationAddressId: null,
+        locationOption: null,
         CourseLocation: {
           __typename: 'CourseLocation',
           id: 1,
@@ -59,6 +62,7 @@ const mockSessions: Course_Course_by_pk_Sessions[] = [
         id: 2,
         address: 'Test Address 2',
         locationAddressId: null,
+        locationOption: null,
         CourseLocation: {
           __typename: 'CourseLocation',
           id: 2,
@@ -251,5 +255,90 @@ describe('Sessions Component - event agenda', () => {
     expect(screen.getAllByText('Test Address 1')).toHaveLength(2);
     expect(screen.getByText('Montag, 15.01.2024')).toBeInTheDocument();
     expect(screen.getByText('Montag, 22.01.2024')).toBeInTheDocument();
+  });
+});
+
+describe('Sessions Component - optional sessions', () => {
+  it('marks optional sessions and explains the default once', () => {
+    render(
+      <Sessions
+        sessions={[mockSessions[0], secondSession({ isMandatory: false })]}
+        courseLocations={mockCourseLocations}
+        isLoggedInParticipant={true}
+      />
+    );
+
+    expect(screen.getAllByText('sessions.optional')).toHaveLength(1);
+    expect(screen.getByText('sessions.optional_hint')).toBeInTheDocument();
+  });
+
+  it('shows neither pill nor hint when every session is mandatory', () => {
+    render(
+      <Sessions
+        sessions={[mockSessions[0], secondSession()]}
+        courseLocations={mockCourseLocations}
+        isLoggedInParticipant={true}
+      />
+    );
+
+    expect(screen.queryByText('sessions.optional')).not.toBeInTheDocument();
+    expect(screen.queryByText('sessions.optional_hint')).not.toBeInTheDocument();
+  });
+});
+
+describe('Sessions Component - program sessions', () => {
+  it('merges program sessions into the schedule and marks them', () => {
+    const programSession = secondSession({
+      id: 9,
+      title: 'Program Opening',
+      programId: 4,
+      startDateTime: '2024-01-18T10:00:00Z',
+      endDateTime: '2024-01-18T11:00:00Z',
+      SessionAddresses: [],
+    });
+    render(
+      <Sessions
+        sessions={[mockSessions[0], secondSession()]}
+        programSessions={[programSession]}
+        programTitle="SoSe 24"
+        courseLocations={mockCourseLocations}
+        isLoggedInParticipant={true}
+      />
+    );
+
+    const titles = screen.getAllByText(/Session|Program Opening/).map((el) => el.textContent);
+    expect(titles).toEqual(['Test Session', 'Program Opening', 'Second Session']);
+    expect(screen.getAllByText(/sessions.program_session$/)).toHaveLength(1);
+  });
+});
+
+describe('Sessions Component - program sessions in an event agenda', () => {
+  it('does not hoist the course address onto a day with only program sessions', () => {
+    const oneAddress = [mockSessions[0].SessionAddresses[0]];
+    render(
+      <Sessions
+        sessions={[
+          { ...mockSessions[0], SessionAddresses: oneAddress },
+          secondSession({ SessionAddresses: oneAddress }),
+        ]}
+        programSessions={[
+          secondSession({
+            id: 9,
+            title: 'Program Opening',
+            programId: 4,
+            startDateTime: '2024-01-29T10:00:00Z',
+            endDateTime: '2024-01-29T11:00:00Z',
+            SessionAddresses: [],
+          }),
+        ]}
+        courseLocations={mockCourseLocations}
+        isLoggedInParticipant={true}
+        isEvent={true}
+      />
+    );
+
+    // Three days, but only the two course days carry the shared address.
+    expect(screen.getByText('Montag, 29.01.2024')).toBeInTheDocument();
+    expect(screen.getAllByText('Test Address 1')).toHaveLength(2);
   });
 });

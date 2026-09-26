@@ -33,6 +33,8 @@ const session = {
   courseId: 1,
   title: 'Ankommen',
   description: '',
+  isMandatory: true,
+  programId: null,
   startDateTime: '2026-09-11T17:00:00Z',
   endDateTime: '2026-09-11T19:00:00Z',
   SessionSpeakers: [],

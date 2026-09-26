@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { GoDotFill } from 'react-icons/go';
+import { GoDot, GoDotFill } from 'react-icons/go';
 export type DotColor = 'grey' | 'lightgreen' | 'orange' | 'red';
 
 const DOT_COLOR_MAP: Record<DotColor, string> = {
@@ -15,13 +15,16 @@ interface DotProps {
   className?: string;
   onClick?: () => void;
   title?: string;
+  /** Render an outlined ring instead of a filled dot (e.g. optional sessions). */
+  hollow?: boolean;
 }
 
-export const Dot: FC<DotProps> = ({ color, size = 'DEFAULT', className, onClick, title }) => {
+export const Dot: FC<DotProps> = ({ color, size = 'DEFAULT', className, onClick, title, hollow }) => {
   const sz = size === 'LARGE' ? '2.5em' : '1.5em';
   const cssColor = color ? DOT_COLOR_MAP[color] : undefined;
+  const Icon = hollow ? GoDot : GoDotFill;
   return (
-    <GoDotFill
+    <Icon
       onClick={onClick}
       size={sz}
       className={`${className || ''} inline-block`}

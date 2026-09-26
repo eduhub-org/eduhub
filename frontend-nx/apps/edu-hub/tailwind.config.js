@@ -29,6 +29,7 @@ module.exports = {
           primary: 'var(--eduhub-label-primary)',
           secondary: 'var(--eduhub-label-secondary)',
           disabled: 'var(--eduhub-label-disabled)',
+          'cross-course': 'var(--eduhub-label-cross-course)',
         },
         border: {
           primary: 'var(--eduhub-border-primary)',

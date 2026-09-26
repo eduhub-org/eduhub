@@ -24,6 +24,8 @@
   --eduhub-label-primary: #F2F2F2;
   --eduhub-label-secondary: #D8D8D8;
   --eduhub-label-disabled: #888888;
+  /* Marks sessions shared by all courses of a program ("Kursübergreifend") */
+  --eduhub-label-cross-course: #8DB8F0;
   
   /* Border Colors */
   --eduhub-border-primary: #444444;
@@ -83,6 +85,7 @@
   --eduhub-label-primary: #222222;
   --eduhub-label-secondary: #666666;
   --eduhub-label-disabled: #999999;
+  --eduhub-label-cross-course: #2F6DB5;
   
   /* Border Colors */
   --eduhub-border-primary: #D8D8D8;

@@ -24,12 +24,35 @@ insert_permissions:
   - role: instructor_access
     permission:
       check:
-        Session:
-          Course:
-            CourseInstructors:
-              User:
-                id:
-                  _eq: X-Hasura-User-Id
+        _or:
+          - Session:
+              Course:
+                CourseInstructors:
+                  User:
+                    id:
+                      _eq: X-Hasura-User-Id
+          # Program sessions: only participants of a course the instructor
+          # teaches within the program that owns the session.
+          - User:
+              CourseEnrollments:
+                _and:
+                  - status:
+                      _in:
+                        - CONFIRMED
+                        - REGISTERED
+                        - COMPLETED
+                  - Course:
+                      _and:
+                        - CourseInstructors:
+                            User:
+                              id:
+                                _eq: X-Hasura-User-Id
+                        - Program:
+                            Sessions:
+                              id:
+                                _ceq:
+                                  - $
+                                  - sessionId
       columns:
         - sessionId
         - source
@@ -55,12 +78,35 @@ select_permissions:
         - source
         - location
       filter:
-        Session:
-          Course:
-            CourseInstructors:
-              User:
-                id:
-                  _eq: X-Hasura-User-Id
+        _or:
+          - Session:
+              Course:
+                CourseInstructors:
+                  User:
+                    id:
+                      _eq: X-Hasura-User-Id
+          # Program sessions: only participants of a course the instructor
+          # teaches within the program that owns the session.
+          - User:
+              CourseEnrollments:
+                _and:
+                  - status:
+                      _in:
+                        - CONFIRMED
+                        - REGISTERED
+                        - COMPLETED
+                  - Course:
+                      _and:
+                        - CourseInstructors:
+                            User:
+                              id:
+                                _eq: X-Hasura-User-Id
+                        - Program:
+                            Sessions:
+                              id:
+                                _ceq:
+                                  - $
+                                  - sessionId
   - role: user_access
     permission:
       columns:
@@ -96,10 +142,33 @@ update_permissions:
         - totalAttendanceTime
         - location
       filter:
-        Session:
-          Course:
-            CourseInstructors:
-              User:
-                id:
-                  _eq: X-Hasura-User-Id
+        _or:
+          - Session:
+              Course:
+                CourseInstructors:
+                  User:
+                    id:
+                      _eq: X-Hasura-User-Id
+          # Program sessions: only participants of a course the instructor
+          # teaches within the program that owns the session.
+          - User:
+              CourseEnrollments:
+                _and:
+                  - status:
+                      _in:
+                        - CONFIRMED
+                        - REGISTERED
+                        - COMPLETED
+                  - Course:
+                      _and:
+                        - CourseInstructors:
+                            User:
+                              id:
+                                _eq: X-Hasura-User-Id
+                        - Program:
+                            Sessions:
+                              id:
+                                _ceq:
+                                  - $
+                                  - sessionId
       check: {}

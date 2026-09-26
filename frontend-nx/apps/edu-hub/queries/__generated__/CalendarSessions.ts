@@ -140,11 +140,11 @@ export interface CalendarSessions_Session {
   /**
    * The ID of the course the session belongs to
    */
-  courseId: number;
+  courseId: number | null;
   /**
    * An object relationship
    */
-  Course: CalendarSessions_Session_Course;
+  Course: CalendarSessions_Session_Course | null;
   /**
    * An array relationship
    */

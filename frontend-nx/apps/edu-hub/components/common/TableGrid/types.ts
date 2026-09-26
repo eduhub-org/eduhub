@@ -89,6 +89,12 @@ export interface TableGridProps<T extends BaseRow> {
   onRowNavigate?: (row: T) => void;
   /** When false, the row delete control is disabled (TableGrid delete column). */
   canDeleteRow?: (row: T) => boolean;
+  /** When false, the row delete control is not rendered at all (e.g. rows owned elsewhere). */
+  showDeleteForRow?: (row: T) => boolean;
+  /** When false, the row has no expand chevron (expandableRowComponent mode). */
+  canExpandRow?: (row: T) => boolean;
+  /** Extra classes for a primary row's background cell, e.g. to mark read-only rows. */
+  rowClassName?: (row: T) => string;
   /** GraphQL variable name for delete mutation (default: id). */
   deleteVariableName?: string;
   /** Return an error message when delete response indicates failure (e.g. Hasura actions). */

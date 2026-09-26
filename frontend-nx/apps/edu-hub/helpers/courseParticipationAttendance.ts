@@ -79,15 +79,30 @@ export function collapseAttendancesBySession(
   return result;
 }
 
+/** Sessions are mandatory unless explicitly marked otherwise. */
+export function isMandatorySession(session: { isMandatory?: boolean | null }): boolean {
+  return session.isMandatory !== false;
+}
+
+export function countMandatorySessions(
+  sessions: readonly { isMandatory?: boolean | null }[]
+): number {
+  return sessions.filter(isMandatorySession).length;
+}
+
+/** Optional sessions are tracked but never count toward passing. */
 export function getAttendanceStatusFromMap(
   attendanceBySession: Record<number, AttendanceLike>,
-  sessions: readonly Pick<CourseParticipations_Course_by_pk_Sessions, 'id'>[],
+  sessions: readonly (Pick<CourseParticipations_Course_by_pk_Sessions, 'id'> & {
+    isMandatory?: boolean | null;
+  })[],
   maxMissedSessions: number
 ): AttendanceOverallStatus {
   let missed = 0;
   let unchecked = 0;
 
   for (const session of sessions) {
+    if (!isMandatorySession(session)) continue;
     const attendance = attendanceBySession[session.id];
     if (!attendance || attendance.status === AttendanceStatus_enum.NO_INFO) {
       unchecked += 1;

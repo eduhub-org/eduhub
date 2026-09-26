@@ -3,6 +3,7 @@ import {
   applyAttendanceOverrides,
   attendanceOverrideKey,
   collapseAttendancesBySession,
+  countMandatorySessions,
   getAttendanceStatusFromMap,
   getNextAttendanceStatus,
   groupAttendancesByUser,
@@ -119,5 +120,26 @@ describe('course participation attendance', () => {
     expect(getAttendanceStatusFromMap(bySession, sessions, 0)).toBe('failed');
     expect(getAttendanceStatusFromMap(bySession, sessions, 1)).toBe('uncertain');
     expect(getAttendanceStatusFromMap(bySession, sessions, 2)).toBe('passed');
+  });
+
+  it('ignores optional sessions when calculating the overall state', () => {
+    const optionalSessions = [
+      { id: 1 },
+      { id: 2, isMandatory: false },
+      { id: 3, isMandatory: false },
+    ];
+    const bySession = collapseAttendancesBySession([
+      attendance(1, 1, AttendanceStatus_enum.ATTENDED, 'INSTRUCTOR'),
+      attendance(2, 2, AttendanceStatus_enum.MISSED, 'ZOOM'),
+    ]);
+
+    // Session 2 was missed and session 3 is unchecked, but both are optional.
+    expect(getAttendanceStatusFromMap(bySession, optionalSessions, 0)).toBe('passed');
+    expect(countMandatorySessions(optionalSessions)).toBe(1);
+  });
+
+  it('treats sessions without an explicit flag as mandatory', () => {
+    const unflagged = [{ id: 1 }, { id: 2, isMandatory: null }];
+    expect(countMandatorySessions(unflagged)).toBe(2);
   });
 });

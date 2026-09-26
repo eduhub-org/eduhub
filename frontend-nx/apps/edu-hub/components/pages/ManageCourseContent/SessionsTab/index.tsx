@@ -15,6 +15,7 @@ import {
   INSERT_SESSION_WITH_ADDRESSES,
   UPDATE_SESSION_DESCRIPTION,
   UPDATE_SESSION_END_TIME,
+  UPDATE_SESSION_IS_MANDATORY,
   UPDATE_SESSION_START_TIME,
   UPDATE_SESSION_TITLE,
 } from '../../../../queries/course';
@@ -22,6 +23,7 @@ import {
   ManagedCourse,
   ManagedCourseVariables,
   ManagedCourse_Course_by_pk,
+  ManagedCourse_Course_by_pk_Program_Sessions,
   ManagedCourse_Course_by_pk_Sessions,
 } from '../../../../queries/__generated__/ManagedCourse';
 import {
@@ -53,6 +55,12 @@ import { formatTruncatedList, makeFullName } from '../../../../helpers/util';
 import OptimisticDatePicker from '../../../inputs/OptimisticDatePicker';
 import TimePicker from '../../../inputs/TimePicker';
 import InputField from '../../../inputs/InputField';
+import CheckboxSelector from '../../../inputs/CheckboxSelector';
+import { Tooltip } from '@mui/material';
+import { MdLock } from 'react-icons/md';
+import { isProgramSession, mergeSessions } from '../../../../helpers/programSessions';
+import { isMandatorySession } from '../../../../helpers/courseParticipationAttendance';
+import { useDisplayDate, useFormatTimeString } from '../../../../helpers/dateTimeHelpers';
 import SessionAddresses from './SessionAddresses';
 import ManagedItemList from '../../../common/ManagedItemList';
 import { Card } from '../../../common/Card';
@@ -63,6 +71,9 @@ import useNotifyParticipantsPrompt from './useNotifyParticipantsPrompt';
 import { QuestionConfirmationDialog } from '../../../common/dialogs/QuestionConfirmationDialog';
 import { ErrorMessageDialog } from '../../../common/dialogs/ErrorMessageDialog';
 import NotificationSnackbar from '../../../common/dialogs/NotificationSnackbar';
+
+/** Course sessions are editable; program sessions are shown read-only. */
+type SessionRow = ManagedCourse_Course_by_pk_Sessions | ManagedCourse_Course_by_pk_Program_Sessions;
 
 interface IProps {
   course: ManagedCourse_Course_by_pk;
@@ -94,6 +105,8 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
   const t = useTranslations('manageCourse');
   const tCoursePage = useTranslations('coursePage');
   const isAdmin = useIsAdmin();
+  const displayDate = useDisplayDate();
+  const formatTimeString = useFormatTimeString();
 
   const [pageIndex, setPageIndex] = useState(0);
   const [pageSize, setPageSize] = useState(15);
@@ -136,10 +149,17 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
     [courseLocationIds]
   );
 
+  // Program-wide sessions are listed alongside for context, but are managed on
+  // the program; course-only logic (defaults, delete guard) ignores them.
+  const tableSessions = useMemo<SessionRow[]>(
+    () => mergeSessions<SessionRow>(courseSessions, course.Program?.Sessions),
+    [courseSessions, course.Program?.Sessions]
+  );
+
   const filteredSessions = useMemo(() => {
-    if (!searchFilter.trim()) return courseSessions;
+    if (!searchFilter.trim()) return tableSessions;
     const searchLower = searchFilter.toLowerCase();
-    return courseSessions.filter((session) => {
+    return tableSessions.filter((session) => {
       const titleMatch = session.title?.toLowerCase().includes(searchLower);
       const speakerMatch = (session.SessionSpeakers || []).some(
         (s) =>
@@ -148,7 +168,7 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
       );
       return titleMatch || speakerMatch;
     });
-  }, [courseSessions, searchFilter]);
+  }, [tableSessions, searchFilter]);
 
   const [insertSessionMutation] = useRoleMutation<InsertSessionWithAddresses, InsertSessionWithAddressesVariables>(
     INSERT_SESSION_WITH_ADDRESSES
@@ -176,7 +196,7 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
   const [updateSessionEndTime] = useRoleMutation(UPDATE_SESSION_END_TIME);
 
   const handleSetDate = useCallback(
-    async (session: ManagedCourse_Course_by_pk_Sessions, event: Date | null) => {
+    async (session: SessionRow, event: Date | null) => {
       if (event) {
         const newStartDate = copyDateTime(event, session.startDateTime);
         const newEndDate = copyDateTime(event, session.endDateTime);
@@ -224,15 +244,28 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
     return !lastSession || lastSession.endDateTime >= new Date();
   }, [isAdmin, courseSessions]);
 
-  const columns = useMemo<ColumnDef<ManagedCourse_Course_by_pk_Sessions>[]>(
-    () => [
+  const programSessionTooltip = t('SessionsTab.program_session_locked');
+
+  // Mandatory only matters for passing, so the column is shown only when a
+  // certificate can be earned. At least one course session must stay
+  // mandatory: the last mandatory one cannot be unticked (which also locks the
+  // only session of a single-session offering). Program sessions do not count
+  // here, since the program admin can change or remove them at any time.
+  const showMandatoryColumn = Boolean(course.attendanceCertificatePossible || course.achievementCertificatePossible);
+  const mandatoryCount = useMemo(() => courseSessions.filter(isMandatorySession).length, [courseSessions]);
+
+  const columns = useMemo<ColumnDef<SessionRow>[]>(() => {
+    const allColumns: ColumnDef<SessionRow>[] = [
       {
         id: 'date',
         header: tCoursePage('date'),
         accessorKey: 'startDateTime',
         size: 130,
         enableSorting: true,
-        cell: ({ row }) => (
+        cell: ({ row }) =>
+          isProgramSession(row.original) ? (
+            <span className="px-2">{displayDate(row.original.startDateTime)}</span>
+          ) : (
           <div className="w-full light flex items-center">
             <OptimisticDatePicker
               minDate={lectureStart}
@@ -244,7 +277,7 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
               showWeekends={true}
             />
           </div>
-        ),
+          ),
       },
       {
         id: 'startTime',
@@ -252,7 +285,10 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
         accessorKey: 'startDateTime',
         size: 100,
         enableSorting: false,
-        cell: ({ row }) => (
+        cell: ({ row }) =>
+          isProgramSession(row.original) ? (
+            <span className="px-2 tabular-nums">{formatTimeString(row.original.startDateTime)}</span>
+          ) : (
           <TimePicker
             variant="eduhub"
             compact
@@ -264,14 +300,17 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
             saveAsDateTime={true}
             onValueUpdated={() => registerChange(row.original.id)}
           />
-        ),
+          ),
       },
       {
         header: tCoursePage('end_time'),
         accessorKey: 'endDateTime',
         size: 100,
         enableSorting: false,
-        cell: ({ row }) => (
+        cell: ({ row }) =>
+          isProgramSession(row.original) ? (
+            <span className="px-2 tabular-nums">{formatTimeString(row.original.endDateTime)}</span>
+          ) : (
           <TimePicker
             variant="eduhub"
             compact
@@ -283,14 +322,25 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
             saveAsDateTime={true}
             onValueUpdated={() => registerChange(row.original.id)}
           />
-        ),
+          ),
       },
       {
         header: tCoursePage('title'),
         accessorKey: 'title',
-        size: 380,
+        size: 300,
         enableSorting: true,
-        cell: ({ row }) => (
+        cell: ({ row }) =>
+          isProgramSession(row.original) ? (
+            <Tooltip title={programSessionTooltip}>
+              <div className="w-full min-w-0 flex items-center gap-2 px-2">
+                <MdLock className="flex-shrink-0 text-label-secondary" aria-label={programSessionTooltip} />
+                <span className="truncate">{row.original.title || tCoursePage('session_title')}</span>
+                <span className="flex-shrink-0 text-[11px] font-bold uppercase tracking-widest text-label-cross-course whitespace-nowrap">
+                  {tCoursePage('program_session')}
+                </span>
+              </div>
+            </Tooltip>
+          ) : (
           <div className="w-full min-w-0 flex items-center">
             <InputField
               variant="material"
@@ -304,7 +354,38 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
               fullWidth
             />
           </div>
+          ),
+      },
+      {
+        id: 'isMandatory',
+        header: () => (
+          <Tooltip title={tCoursePage('mandatory_help')}>
+            <span>{tCoursePage('mandatory')}</span>
+          </Tooltip>
         ),
+        accessorKey: 'isMandatory',
+        size: 90,
+        enableSorting: false,
+        meta: { align: 'center' },
+        cell: ({ row }) => {
+          const isProgram = isProgramSession(row.original);
+          const isLastMandatory = !isProgram && isMandatorySession(row.original) && mandatoryCount <= 1;
+          return (
+            <Tooltip title={isLastMandatory ? tCoursePage('mandatory_last_session') : ''}>
+              <div className="w-full flex items-center justify-center">
+                <CheckboxSelector
+                  variant="eduhub"
+                  className="[&_input]:mr-0"
+                  checked={row.original.isMandatory}
+                  disabled={isProgram || isLastMandatory}
+                  updateValueMutation={isProgram ? undefined : UPDATE_SESSION_IS_MANDATORY}
+                  identifierVariables={{ sessionId: row.original.id }}
+                  refetchQueries={['ManagedCourse']}
+                />
+              </div>
+            </Tooltip>
+          );
+        },
       },
       {
         header: tCoursePage('external_speakers'),
@@ -320,21 +401,37 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
           </span>
         ),
       },
-    ],
-    [tCoursePage, lectureStart, lectureEnd, handleSetDate, registerChange]
-  );
+    ];
+    return showMandatoryColumn ? allColumns : allColumns.filter((column) => column.id !== 'isMandatory');
+  }, [
+    tCoursePage,
+    lectureStart,
+    lectureEnd,
+    handleSetDate,
+    registerChange,
+    displayDate,
+    formatTimeString,
+    programSessionTooltip,
+    showMandatoryColumn,
+    mandatoryCount,
+  ]);
 
   return (
     <div>
-      <TableGrid<ManagedCourse_Course_by_pk_Sessions>
+      <TableGrid<SessionRow>
         data={filteredSessions}
         columns={columns}
         compactRows
         loading={false}
         error={null}
-        expandableRowComponent={(props) => (
-          <ExpandableSessionRowContent session={props.row} qResult={qResult} />
-        )}
+        expandableRowComponent={(props) =>
+          isProgramSession(props.row) ? null : (
+            <ExpandableSessionRowContent session={props.row as ManagedCourse_Course_by_pk_Sessions} qResult={qResult} />
+          )
+        }
+        canExpandRow={(row) => !isProgramSession(row)}
+        showDeleteForRow={(row) => !isProgramSession(row)}
+        rowClassName={(row) => (isProgramSession(row) ? 'opacity-70' : '')}
         deleteMutation={canDeleteSessions ? DELETE_SESSION : undefined}
         deleteIdType="number"
         generateDeletionConfirmationQuestion={(row) =>

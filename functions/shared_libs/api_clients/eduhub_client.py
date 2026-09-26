@@ -61,6 +61,7 @@ class EduHubClient:
                 title
                 startDateTime
                 endDateTime
+                programId
                 Course {
                     CourseLocations {
                         locationOption
@@ -69,6 +70,10 @@ class EduHubClient:
                 }
                 SessionAddresses {
                     address
+                    locationOption
+                    LocationAddress {
+                        address
+                    }
                 }
             }
         }"""
@@ -105,6 +110,34 @@ class EduHubClient:
         return pd.DataFrame(
             unnested_list[0], columns=["id", "firstName", "lastName", "email"]
         )
+
+    def get_program_participants_from_session_id(self, session_id):
+        """Participants of a program-wide session: everyone confirmed,
+        registered or completed in any course of the session's program (the
+        statuses instructors may record program attendance for), once per
+        user (a user may take several courses of the same program)."""
+        variables = {"session_id": session_id}
+        query = """query($session_id: Int!) {
+            CourseEnrollment(where: {
+                isTest: {_eq: false},
+                status: {_in: [CONFIRMED, REGISTERED, COMPLETED]},
+                Course: {Program: {Sessions: {id: {_eq: $session_id}}}}
+            }) {
+                User {
+                    id
+                    firstName
+                    lastName
+                    email
+                }
+            }
+        }"""
+        result = self.send_query(query, variables)
+        # Partial data with errors would silently drop participants.
+        self._raise_on_graphql_errors(result, "get_program_participants_from_session_id")
+        users = [item["User"] for item in result["data"]["CourseEnrollment"]]
+        return pd.DataFrame(
+            users, columns=["id", "firstName", "lastName", "email"]
+        ).drop_duplicates(subset="id", ignore_index=True)
 
     def get_participants_from_course(self, course_id):
         variables = {"course_id": course_id}
@@ -221,6 +254,12 @@ class EduHubClient:
                         attendanceCertificateTemplateURL
                         AttendanceCertificateTemplate { html }
                         id
+                        Sessions(order_by: {startDateTime: asc}) {
+                            id
+                            title
+                            startDateTime
+                            isMandatory
+                        }
                     }
                     AchievementCertificateTemplate { html }
                     AttendanceCertificateTemplate { html }
@@ -228,6 +267,7 @@ class EduHubClient:
                         id
                         title
                         startDateTime
+                        isMandatory
                     }
                     id
                     ects

@@ -10,10 +10,13 @@ export const SESSION_FRAGMENT = gql`
     description
     startDateTime
     title
+    isMandatory
+    programId
     SessionAddresses {
       id
       address
       locationAddressId
+      locationOption
       CourseLocation {
         id
         locationOption
