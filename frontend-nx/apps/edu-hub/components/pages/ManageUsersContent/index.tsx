@@ -61,7 +61,7 @@ const ManageUsersContent: FC = () => {
     setPageIndex(0); // Reset to first page when page size changes
   };
 
-  const { data, loading, error, pageIndex, sorting, setPageIndex, setSorting, searchFilter, setSearchFilter, refetch } = useTableGrid({
+  const { data, loading, initialLoading, error, pageIndex, sorting, setPageIndex, setSorting, searchFilter, setSearchFilter, refetch } = useTableGrid({
     queryHook: useAdminQuery,
     query: USERS_BY_LAST_NAME,
     pageSize: pageSize,
@@ -130,8 +130,8 @@ const ManageUsersContent: FC = () => {
   return (
     <PageBlock>
       <div className="max-w-screen-xl mx-auto mt-20">
-        {loading && <Loading />}
-        {!loading && !error && (
+        {initialLoading && <Loading />}
+        {!initialLoading && !error && (
           <div>
             <div className="flex justify-between items-center mb-4">
               <CommonPageHeader headline={t('headline')} />

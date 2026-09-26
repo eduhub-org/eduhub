@@ -922,12 +922,13 @@ const TableGrid = <T extends BaseRow,>({
 
   return (
     <div className="min-w-0 max-w-full">
+      {/* The toolbar stays interactive while rows reload, so typing in the search field goes on. */}
+      {toolbar}
       <div className="relative" aria-busy={loading}>
         <div
           className={isShowingRetainedPage ? 'pointer-events-none opacity-60' : ''}
           inert={isShowingRetainedPage || undefined}
         >
-          {toolbar}
           {useMobileCards ? (
             mobileCards
           ) : (
