@@ -173,3 +173,38 @@ describe('TableGrid responsive options', () => {
     expect(screen.queryByText('Name')).not.toBeInTheDocument();
   });
 });
+
+describe('TableGrid cell stability', () => {
+  it('keeps cell DOM and focus when the caller rebuilds its column definitions', () => {
+    const makeColumns = (): ColumnDef<TestRow>[] => [
+      { id: 'edit', header: 'Edit', cell: ({ row }) => <input aria-label={`edit ${row.original.name}`} defaultValue="" /> },
+    ];
+    const grid = (cols: ColumnDef<TestRow>[]) => (
+      <TableGrid<TestRow>
+        columns={cols}
+        data={[{ id: 1, name: 'one' }]}
+        enablePagination={false}
+        error={undefined}
+        loading={false}
+        pageIndex={0}
+        onPageChange={jest.fn()}
+        refetchQueries={[]}
+        searchFilter=""
+        onSearchFilterChange={jest.fn()}
+        showGlobalSearchField={false}
+      />
+    );
+    const { rerender } = render(grid(makeColumns()));
+    const input = screen.getByLabelText('edit one') as HTMLInputElement;
+    input.focus();
+    input.value = 'typed';
+
+    // A refetch typically yields new column objects with new cell functions.
+    rerender(grid(makeColumns()));
+
+    const after = screen.getByLabelText('edit one') as HTMLInputElement;
+    expect(after).toBe(input);
+    expect(after.value).toBe('typed');
+    expect(document.activeElement).toBe(after);
+  });
+});

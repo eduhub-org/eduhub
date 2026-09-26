@@ -7,6 +7,7 @@ import { useRouter } from 'next/router';
 import { MdArrowBack, MdArrowForward, MdChevronRight } from 'react-icons/md';
 import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
 import {
+  CellContext,
   ColumnDef,
   flexRender,
   getCoreRowModel,
@@ -28,6 +29,17 @@ const neutralCheckboxSx = {
   '&.Mui-checked, &.MuiCheckbox-indeterminate': {
     color: 'var(--eduhub-label-primary)',
   },
+};
+
+/**
+ * Renders a cell with a component type that never changes. flexRender mounts a cell function as its
+ * own component, so every new column definition (callers often rebuild columns from refetched data)
+ * remounted all cells: inputs lost focus mid-typing and their "saved" feedback vanished. Calling the
+ * cell function here keeps the same hooks per column while the DOM and state survive.
+ */
+const StableCell: React.FC<{ context: CellContext<any, unknown> }> = ({ context }) => {
+  const render = context.column.columnDef.cell;
+  return <>{typeof render === 'function' ? render(context) : render}</>;
 };
 
 /** Stable wrapper so expandable row content is not remounted when parent re-renders (e.g. after refetch). */
@@ -784,7 +796,7 @@ const TableGrid = <T extends BaseRow,>({
                       className={`flex items-center min-h-0 ${cell.column.id === 'selection' ? '' : 'min-w-0'} ${cellAlignCenter ? 'justify-center' : ''} ${cell.column.columnDef.meta?.className || ''}`}
                       style={getDataColumnStyle(cell.column.id, cell.column.getSize())}
                     >
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      <StableCell context={cell.getContext()} />
                     </div>
                   );})}
                 </div>

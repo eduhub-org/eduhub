@@ -304,6 +304,7 @@ export const UPDATE_SESSION_TITLE = gql`
       _set: { title: $text }
     ) {
       id
+      title
     }
   }
 `;
@@ -349,6 +350,7 @@ export const UPDATE_SESSION_DESCRIPTION = gql`
       _set: { description: $text }
     ) {
       id
+      description
     }
   }
 `;
