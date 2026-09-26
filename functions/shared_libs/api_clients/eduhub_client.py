@@ -132,9 +132,8 @@ class EduHubClient:
             }
         }"""
         result = self.send_query(query, variables)
-        if not isinstance(result, dict) or result.get("data") is None:
-            logging.error(f"{result}")
-            raise ValueError(f"Could not load participants of program session {session_id}: {result}")
+        # Partial data with errors would silently drop participants.
+        self._raise_on_graphql_errors(result, "get_program_participants_from_session_id")
         users = [item["User"] for item in result["data"]["CourseEnrollment"]]
         return pd.DataFrame(
             users, columns=["id", "firstName", "lastName", "email"]
