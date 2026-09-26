@@ -112,15 +112,15 @@ class EduHubClient:
         )
 
     def get_program_participants_from_session_id(self, session_id):
-        """Participants of a program-wide session: everyone confirmed or
-        registered in any course of the session's program (the statuses the
-        continuation check counts), once per user (a user may take several
-        courses of the same program)."""
+        """Participants of a program-wide session: everyone confirmed,
+        registered or completed in any course of the session's program (the
+        statuses instructors may record program attendance for), once per
+        user (a user may take several courses of the same program)."""
         variables = {"session_id": session_id}
         query = """query($session_id: Int!) {
             CourseEnrollment(where: {
                 isTest: {_eq: false},
-                status: {_in: [CONFIRMED, REGISTERED]},
+                status: {_in: [CONFIRMED, REGISTERED, COMPLETED]},
                 Course: {Program: {Sessions: {id: {_eq: $session_id}}}}
             }) {
                 User {
