@@ -1,7 +1,7 @@
 import { QueryResult } from '@apollo/client';
 import { ProgramType } from '../../../../types/enums';
 import { nextSessionTimes } from './sessionDefaults';
-import { FC, ReactNode, useCallback, useMemo, useState } from 'react';
+import { FC, ReactNode, useCallback, useMemo, useRef, useState } from 'react';
 import { ColumnDef } from '@tanstack/react-table';
 import {
   identityEventMapper,
@@ -321,6 +321,29 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
     [mandatoryCount, t, tCoursePage]
   );
 
+  // TableGrid renders each cell function as a component, so a new function identity remounts the
+  // cell. Every save refetches the course, which used to rebuild these columns: the title input
+  // lost focus mid-typing and the "saved" snackbar vanished with the unmounted cell. The columns
+  // therefore only depend on layout inputs and read everything else through this ref.
+  const cellContext = useRef({
+    handleSetDate,
+    registerChange,
+    lectureStart,
+    lectureEnd,
+    locationsOf,
+    eyebrowOf,
+    mandatoryControl,
+  });
+  cellContext.current = {
+    handleSetDate,
+    registerChange,
+    lectureStart,
+    lectureEnd,
+    locationsOf,
+    eyebrowOf,
+    mandatoryControl,
+  };
+
   const columns = useMemo<ColumnDef<SessionRow>[]>(() => {
     const allColumns: ColumnDef<SessionRow>[] = [
       {
@@ -333,10 +356,10 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
           <SessionDateTimeCell
             session={row.original}
             readOnly={isProgramSession(row.original)}
-            onSetDate={(event) => handleSetDate(row.original, event)}
-            onTimeChanged={() => registerChange(row.original.id)}
-            minDate={lectureStart}
-            maxDate={lectureEnd}
+            onSetDate={(event) => cellContext.current.handleSetDate(row.original, event)}
+            onTimeChanged={() => cellContext.current.registerChange(row.original.id)}
+            minDate={cellContext.current.lectureStart}
+            maxDate={cellContext.current.lectureEnd}
           />
         ),
       },
@@ -346,11 +369,11 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
         size: 240,
         enableSorting: true,
         cell: ({ row }) => {
-          const eyebrow = eyebrowOf(row.original);
+          const eyebrow = cellContext.current.eyebrowOf(row.original);
           // Below lg the location column is gone, so its icons move under the title.
           const inlineLocations = (
             <div className="lg:hidden">
-              <SessionLocationChips entries={locationsOf(row.original)} iconsOnly />
+              <SessionLocationChips entries={cellContext.current.locationsOf(row.original)} iconsOnly />
             </div>
           );
           return isProgramSession(row.original) ? (
@@ -386,7 +409,7 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
         size: belowXl ? 90 : 160,
         enableSorting: false,
         meta: { hideBelow: 'lg' },
-        cell: ({ row }) => <SessionLocationChips entries={locationsOf(row.original)} iconsOnly={belowXl} />,
+        cell: ({ row }) => <SessionLocationChips entries={cellContext.current.locationsOf(row.original)} iconsOnly={belowXl} />,
       },
       {
         id: 'speakers',
@@ -415,24 +438,11 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
         size: 80,
         enableSorting: false,
         meta: { align: 'center' },
-        cell: ({ row }) => <div className="w-full flex items-center justify-center">{mandatoryControl(row.original)}</div>,
+        cell: ({ row }) => <div className="w-full flex items-center justify-center">{cellContext.current.mandatoryControl(row.original)}</div>,
       },
     ];
     return showMandatoryColumn ? allColumns : allColumns.filter((column) => column.id !== 'isMandatory');
-  }, [
-    t,
-    tCoursePage,
-    lectureStart,
-    lectureEnd,
-    handleSetDate,
-    registerChange,
-    programSessionTooltip,
-    showMandatoryColumn,
-    belowXl,
-    locationsOf,
-    eyebrowOf,
-    mandatoryControl,
-  ]);
+  }, [t, tCoursePage, programSessionTooltip, showMandatoryColumn, belowXl]);
 
   // Phones get one card per session instead of the table.
   const renderMobileRow = useCallback(
