@@ -36,10 +36,10 @@ through the `@eduhub/*` alias (`tsconfig.base.json`) with
 
 Default login: `admin@example.com` / `dev`.
 
-## Host commands (run from `frontend-nx/` with Node 20 + Yarn 3.4.1)
+## Host commands (run from `frontend-nx/` with Node 22 + Yarn 3.4.1)
 
 ```bash
-nvm use 20
+nvm use 22
 yarn lint           # ESLint (matches CI)
 yarn test           # Jest + RTL
 yarn build

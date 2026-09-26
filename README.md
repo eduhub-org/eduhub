@@ -107,7 +107,7 @@ We welcome contributions from everyone. Please read the
 - Pull request and automated release process
 - Code style and testing requirements
 
-Frontend commands (from `frontend-nx/`, Node 20 and Yarn 3.4.1):
+Frontend commands (from `frontend-nx/`, Node 22 and Yarn 3.4.1):
 
 ```bash
 yarn install
