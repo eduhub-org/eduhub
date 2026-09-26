@@ -42,9 +42,15 @@ export const useDropDownLogic = (
     }
   );
 
-  const validateValue = useCallback((newValue: string, isMandatory = false) => {
-    return isMandatory ? newValue !== '' : true;
-  }, []);
+  const validateValue = useCallback(
+    (newValue: string, isMandatory = false) => {
+      if (newValue !== '') return true;
+      // Callback-only selectors own their empty state. Mutation-backed selectors may only persist
+      // an empty value when explicitly nullable, in which case it is converted to null below.
+      return !isMandatory && (!updateValueMutation || nullable);
+    },
+    [nullable, updateValueMutation]
+  );
 
   const debouncedUpdateValue = useDebouncedCallback((newValue: string, isMandatory = false) => {
     if (validateValue(newValue, isMandatory)) {
@@ -145,4 +151,4 @@ export const useDropDownLogic = (
     debouncedUpdateValue,
     validateValue,
   };
-}; 
+};
