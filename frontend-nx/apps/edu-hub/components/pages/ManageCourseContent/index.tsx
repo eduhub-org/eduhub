@@ -110,9 +110,14 @@ export const ManageCourseContent: FC<Props> = ({ courseId }) => {
     ];
   }, [course, isDegreeCourse]);
 
-  const openTabIndex =
-    chosenTabIndex ??
-    (rememberedTabIndex != null && visibleTabIndices.includes(rememberedTabIndex) ? rememberedTabIndex : 0);
+  // A tab that is no longer shown (e.g. after an external registration link was set) never stays open.
+  const isVisibleTab = (tabIndex: number | null): tabIndex is number =>
+    tabIndex != null && visibleTabIndices.includes(tabIndex);
+  const openTabIndex = isVisibleTab(chosenTabIndex)
+    ? chosenTabIndex
+    : isVisibleTab(rememberedTabIndex)
+      ? rememberedTabIndex
+      : 0;
 
   const selectTab = useCallback(
     (tabIndex: number) => {
