@@ -1864,6 +1864,13 @@
     "course_not_found": "Course {courseId} could not be found!",
     "add_session": "Add Session",
     "SessionsTab": {
+      "date_time": "Date & time",
+      "edit_date_time": "Change date and time",
+      "location": "Location",
+      "optional": "Optional",
+      "no_address": "No address",
+      "create_address": "Create address",
+      "schedule": "Session",
       "program_session_locked": "Managed by the program admin",
       "sessionAddresses": {
         "online": {
@@ -1901,6 +1908,7 @@
       "attendance_data": {
         "label": "Attendance data",
         "review_button": "Review attendance data",
+        "review_short": "View",
         "no_data": "No attendance data available",
         "dialog_title": "Attendance data"
       },

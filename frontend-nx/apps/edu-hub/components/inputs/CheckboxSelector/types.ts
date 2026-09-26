@@ -3,7 +3,7 @@ import { DocumentNode } from 'graphql';
 import { AuthRoles } from '../../../types/enums';
 
 export type CheckboxSelectorProps = {
-  variant: 'material' | 'eduhub';
+  variant: 'material' | 'eduhub' | 'switch';
   label?: string;
   checked: boolean;
   updateValueMutation?: DocumentNode;

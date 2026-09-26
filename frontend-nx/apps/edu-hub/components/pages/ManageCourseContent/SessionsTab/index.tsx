@@ -1,7 +1,7 @@
 import { QueryResult } from '@apollo/client';
 import { ProgramType } from '../../../../types/enums';
 import { nextSessionTimes } from './sessionDefaults';
-import { FC, useCallback, useMemo, useState } from 'react';
+import { FC, ReactNode, useCallback, useMemo, useState } from 'react';
 import { ColumnDef } from '@tanstack/react-table';
 import {
   identityEventMapper,
@@ -12,6 +12,7 @@ import {
   DELETE_SESSION,
   DELETE_SESSION_SPEAKER,
   INSERT_NEW_SESSION_SPEAKER,
+  INSERT_SESSION_ADDRESS,
   INSERT_SESSION_WITH_ADDRESSES,
   UPDATE_SESSION_DESCRIPTION,
   UPDATE_SESSION_END_TIME,
@@ -23,6 +24,7 @@ import {
   ManagedCourse,
   ManagedCourseVariables,
   ManagedCourse_Course_by_pk,
+  ManagedCourse_Course_by_pk_CourseLocations,
   ManagedCourse_Course_by_pk_Program_Sessions,
   ManagedCourse_Course_by_pk_Sessions,
 } from '../../../../queries/__generated__/ManagedCourse';
@@ -30,6 +32,10 @@ import {
   InsertSessionWithAddresses,
   InsertSessionWithAddressesVariables,
 } from '../../../../queries/__generated__/InsertSessionWithAddresses';
+import {
+  InsertSessionAddress,
+  InsertSessionAddressVariables,
+} from '../../../../queries/__generated__/InsertSessionAddress';
 import {
   DeleteSessionSpeaker,
   DeleteSessionSpeakerVariables,
@@ -44,26 +50,25 @@ import {
   UserSelectionWithFilter_User,
 } from '../../../../queries/__generated__/UserSelectionWithFilter';
 import { useTranslations } from 'next-intl';
-import { LocationOption_enum, order_by, SessionAddress_insert_input } from '../../../../__generated__/globalTypes';
+import { order_by, SessionAddress_insert_input } from '../../../../__generated__/globalTypes';
 import { useLazyRoleQuery } from '../../../../hooks/authedQuery';
 import { useCurrentRole, useIsAdmin } from '../../../../hooks/authentication';
 import { useManagementRoleContext } from '../../../../hooks/managementRole';
+import { useMediaQuery } from '../../../../hooks/useMediaQuery';
 import { USER_SELECTION_WITH_FILTER, buildUserSelectionFilter } from '../../../../queries/user';
 
 import TableGrid from '../../../common/TableGrid';
 import { formatTruncatedList, makeFullName } from '../../../../helpers/util';
-import OptimisticDatePicker from '../../../inputs/OptimisticDatePicker';
-import TimePicker from '../../../inputs/TimePicker';
 import InputField from '../../../inputs/InputField';
 import CheckboxSelector from '../../../inputs/CheckboxSelector';
 import { Tooltip } from '@mui/material';
-import { MdLock } from 'react-icons/md';
+import { MdLock, MdVisibility } from 'react-icons/md';
 import { isProgramSession, mergeSessions } from '../../../../helpers/programSessions';
 import { isMandatorySession } from '../../../../helpers/courseParticipationAttendance';
-import { useDisplayDate, useFormatTimeString } from '../../../../helpers/dateTimeHelpers';
 import SessionAddresses from './SessionAddresses';
+import { LocationIcon, SessionLocationChips, SessionLocationEntry, sessionLocationEntries } from './SessionLocations';
+import { SessionDateTimeCell, SessionTimeEditor, useSessionDateLabel } from './SessionTimeEditor';
 import ManagedItemList from '../../../common/ManagedItemList';
-import { Card } from '../../../common/Card';
 import { SelectUserDialog } from '../../../common/dialogs/SelectUserDialog';
 import { CreateUserDialog } from '../../../common/dialogs/CreateUserDialog';
 import AttendanceDataDialog from './AttendanceDataDialog';
@@ -71,6 +76,7 @@ import useNotifyParticipantsPrompt from './useNotifyParticipantsPrompt';
 import { QuestionConfirmationDialog } from '../../../common/dialogs/QuestionConfirmationDialog';
 import { ErrorMessageDialog } from '../../../common/dialogs/ErrorMessageDialog';
 import NotificationSnackbar from '../../../common/dialogs/NotificationSnackbar';
+import { useFormatTimeString } from '../../../../helpers/dateTimeHelpers';
 
 /** Course sessions are editable; program sessions are shown read-only. */
 type SessionRow = ManagedCourse_Course_by_pk_Sessions | ManagedCourse_Course_by_pk_Program_Sessions;
@@ -101,11 +107,24 @@ const parseSearchValue = (searchValue: string) => {
   return { firstName: trimmed, lastName: '', email: '' };
 };
 
+/** Small uppercase label above a session title (KURSÜBERGREIFEND, OPTIONAL). */
+const Eyebrow: FC<{ children: ReactNode; icon?: ReactNode }> = ({ children, icon }) => (
+  <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest text-label-secondary whitespace-nowrap">
+    {icon}
+    {children}
+  </span>
+);
+
+/** Section heading inside the expanded row. */
+const SectionLabel: FC<{ children: ReactNode }> = ({ children }) => (
+  <h4 className="mb-3 text-[11px] font-bold uppercase tracking-wider text-label-secondary">{children}</h4>
+);
+
 export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
   const t = useTranslations('manageCourse');
   const tCoursePage = useTranslations('coursePage');
   const isAdmin = useIsAdmin();
-  const displayDate = useDisplayDate();
+  const dateLabel = useSessionDateLabel();
   const formatTimeString = useFormatTimeString();
 
   const [pageIndex, setPageIndex] = useState(0);
@@ -254,107 +273,138 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
   const showMandatoryColumn = Boolean(course.attendanceCertificatePossible || course.achievementCertificatePossible);
   const mandatoryCount = useMemo(() => courseSessions.filter(isMandatorySession).length, [courseSessions]);
 
+  // Location chips show their label only where there is room for it.
+  const belowXl = useMediaQuery('(max-width: 1279px)');
+
+  const locationsOf = useCallback(
+    (session: SessionRow) => sessionLocationEntries(session, course.CourseLocations),
+    [course.CourseLocations]
+  );
+
+  const eyebrowOf = useCallback(
+    (session: SessionRow) => {
+      if (isProgramSession(session)) {
+        return <Eyebrow icon={<MdLock aria-hidden />}>{tCoursePage('program_session')}</Eyebrow>;
+      }
+      if (showMandatoryColumn && !isMandatorySession(session)) {
+        return <Eyebrow>{t('SessionsTab.optional')}</Eyebrow>;
+      }
+      return null;
+    },
+    [showMandatoryColumn, t, tCoursePage]
+  );
+
+  const mandatoryControl = useCallback(
+    (session: SessionRow, label?: string) => {
+      if (isProgramSession(session)) {
+        return (
+          <span className="text-xs text-label-secondary">
+            {isMandatorySession(session) ? tCoursePage('mandatory') : t('SessionsTab.optional')}
+          </span>
+        );
+      }
+      const isLastMandatory = isMandatorySession(session) && mandatoryCount <= 1;
+      return (
+        <Tooltip title={isLastMandatory ? tCoursePage('mandatory_last_session') : ''}>
+          <span>
+            <CheckboxSelector
+              variant="switch"
+              label={label}
+              checked={session.isMandatory}
+              disabled={isLastMandatory}
+              updateValueMutation={UPDATE_SESSION_IS_MANDATORY}
+              identifierVariables={{ sessionId: session.id }}
+              refetchQueries={['ManagedCourse']}
+            />
+          </span>
+        </Tooltip>
+      );
+    },
+    [mandatoryCount, t, tCoursePage]
+  );
+
   const columns = useMemo<ColumnDef<SessionRow>[]>(() => {
     const allColumns: ColumnDef<SessionRow>[] = [
       {
         id: 'date',
-        header: tCoursePage('date'),
+        header: t('SessionsTab.date_time'),
         accessorKey: 'startDateTime',
-        size: 130,
+        size: 160,
         enableSorting: true,
-        cell: ({ row }) =>
-          isProgramSession(row.original) ? (
-            <span className="px-2">{displayDate(row.original.startDateTime)}</span>
-          ) : (
-          <div className="w-full light flex items-center">
-            <OptimisticDatePicker
-              minDate={lectureStart}
-              maxDate={lectureEnd}
-              className="w-full !bg-fill-primary !text-label-primary border border-border-primary rounded px-2 py-1.5 h-9"
-              value={row.original.startDateTime}
-              onChange={(event) => handleSetDate(row.original, event)}
-              showLoading={true}
-              showWeekends={true}
-            />
-          </div>
-          ),
-      },
-      {
-        id: 'startTime',
-        header: tCoursePage('start_time'),
-        accessorKey: 'startDateTime',
-        size: 100,
-        enableSorting: false,
-        cell: ({ row }) =>
-          isProgramSession(row.original) ? (
-            <span className="px-2 tabular-nums">{formatTimeString(row.original.startDateTime)}</span>
-          ) : (
-          <TimePicker
-            variant="eduhub"
-            compact
-            className="!text-label-primary"
-            currentValue={row.original.startDateTime}
-            updateValueMutation={UPDATE_SESSION_START_TIME}
-            identifierVariables={{ sessionId: row.original.id }}
-            refetchQueries={['ManagedCourse']}
-            saveAsDateTime={true}
-            onValueUpdated={() => registerChange(row.original.id)}
+        cell: ({ row }) => (
+          <SessionDateTimeCell
+            session={row.original}
+            readOnly={isProgramSession(row.original)}
+            onSetDate={(event) => handleSetDate(row.original, event)}
+            onTimeChanged={() => registerChange(row.original.id)}
+            minDate={lectureStart}
+            maxDate={lectureEnd}
           />
-          ),
-      },
-      {
-        header: tCoursePage('end_time'),
-        accessorKey: 'endDateTime',
-        size: 100,
-        enableSorting: false,
-        cell: ({ row }) =>
-          isProgramSession(row.original) ? (
-            <span className="px-2 tabular-nums">{formatTimeString(row.original.endDateTime)}</span>
-          ) : (
-          <TimePicker
-            variant="eduhub"
-            compact
-            className="!text-label-primary"
-            currentValue={row.original.endDateTime}
-            updateValueMutation={UPDATE_SESSION_END_TIME}
-            identifierVariables={{ sessionId: row.original.id }}
-            refetchQueries={['ManagedCourse']}
-            saveAsDateTime={true}
-            onValueUpdated={() => registerChange(row.original.id)}
-          />
-          ),
+        ),
       },
       {
         header: tCoursePage('title'),
         accessorKey: 'title',
-        size: 300,
+        size: 240,
         enableSorting: true,
-        cell: ({ row }) =>
-          isProgramSession(row.original) ? (
+        cell: ({ row }) => {
+          const eyebrow = eyebrowOf(row.original);
+          // Below lg the location column is gone, so its icons move under the title.
+          const inlineLocations = (
+            <div className="lg:hidden">
+              <SessionLocationChips entries={locationsOf(row.original)} iconsOnly />
+            </div>
+          );
+          return isProgramSession(row.original) ? (
             <Tooltip title={programSessionTooltip}>
-              <div className="w-full min-w-0 flex items-center gap-2 px-2">
-                <MdLock className="flex-shrink-0 text-label-secondary" aria-label={programSessionTooltip} />
-                <span className="truncate">{row.original.title || tCoursePage('session_title')}</span>
-                <span className="flex-shrink-0 text-[11px] font-bold uppercase tracking-widest text-label-cross-course whitespace-nowrap">
-                  {tCoursePage('program_session')}
-                </span>
+              <div className="w-full min-w-0 flex flex-col gap-0.5 px-2">
+                {eyebrow}
+                <span className="truncate text-label-secondary">{row.original.title || tCoursePage('session_title')}</span>
+                {inlineLocations}
               </div>
             </Tooltip>
           ) : (
-          <div className="w-full min-w-0 flex items-center">
-            <InputField
-              variant="material"
-              type="input"
-              compact
-              placeholder={tCoursePage('session_title')}
-              itemId={row.original.id}
-              value={row.original.title || ''}
-              updateValueMutation={UPDATE_SESSION_TITLE}
-              refetchQueries={['ManagedCourse']}
-              fullWidth
-            />
-          </div>
-          ),
+            <div className="w-full min-w-0 flex flex-col gap-0.5">
+              {eyebrow && <div className="px-2">{eyebrow}</div>}
+              <InputField
+                variant="material"
+                type="input"
+                compact
+                placeholder={tCoursePage('session_title')}
+                itemId={row.original.id}
+                value={row.original.title || ''}
+                updateValueMutation={UPDATE_SESSION_TITLE}
+                refetchQueries={['ManagedCourse']}
+                fullWidth
+              />
+              <div className="px-2">{inlineLocations}</div>
+            </div>
+          );
+        },
+      },
+      {
+        id: 'location',
+        header: t('SessionsTab.location'),
+        size: belowXl ? 90 : 160,
+        enableSorting: false,
+        meta: { hideBelow: 'lg' },
+        cell: ({ row }) => <SessionLocationChips entries={locationsOf(row.original)} iconsOnly={belowXl} />,
+      },
+      {
+        id: 'speakers',
+        header: tCoursePage('external_speakers'),
+        accessorKey: 'SessionSpeakers',
+        size: 170,
+        enableSorting: false,
+        meta: { hideBelow: 'xl' },
+        cell: ({ row }) => (
+          <span className="flex items-center text-label-secondary">
+            {formatTruncatedList(
+              row.original.SessionSpeakers,
+              (s) => makeFullName(s.User.firstName, s.User.lastName ?? '')
+            )}
+          </span>
+        ),
       },
       {
         id: 'isMandatory',
@@ -364,57 +414,48 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
           </Tooltip>
         ),
         accessorKey: 'isMandatory',
-        size: 90,
+        size: 80,
         enableSorting: false,
         meta: { align: 'center' },
-        cell: ({ row }) => {
-          const isProgram = isProgramSession(row.original);
-          const isLastMandatory = !isProgram && isMandatorySession(row.original) && mandatoryCount <= 1;
-          return (
-            <Tooltip title={isLastMandatory ? tCoursePage('mandatory_last_session') : ''}>
-              <div className="w-full flex items-center justify-center">
-                <CheckboxSelector
-                  variant="eduhub"
-                  className="[&_input]:mr-0"
-                  checked={row.original.isMandatory}
-                  disabled={isProgram || isLastMandatory}
-                  updateValueMutation={isProgram ? undefined : UPDATE_SESSION_IS_MANDATORY}
-                  identifierVariables={{ sessionId: row.original.id }}
-                  refetchQueries={['ManagedCourse']}
-                />
-              </div>
-            </Tooltip>
-          );
-        },
-      },
-      {
-        header: tCoursePage('external_speakers'),
-        accessorKey: 'SessionSpeakers',
-        size: 250,
-        enableSorting: false,
-        cell: ({ row }) => (
-          <span className="flex items-center">
-            {formatTruncatedList(
-              row.original.SessionSpeakers,
-              (s) => makeFullName(s.User.firstName, s.User.lastName ?? '')
-            )}
-          </span>
-        ),
+        cell: ({ row }) => <div className="w-full flex items-center justify-center">{mandatoryControl(row.original)}</div>,
       },
     ];
     return showMandatoryColumn ? allColumns : allColumns.filter((column) => column.id !== 'isMandatory');
   }, [
+    t,
     tCoursePage,
     lectureStart,
     lectureEnd,
     handleSetDate,
     registerChange,
-    displayDate,
-    formatTimeString,
     programSessionTooltip,
     showMandatoryColumn,
-    mandatoryCount,
+    belowXl,
+    locationsOf,
+    eyebrowOf,
+    mandatoryControl,
   ]);
+
+  // Phones get one card per session instead of the table.
+  const renderMobileRow = useCallback(
+    (session: SessionRow) => (
+      <div className="flex flex-col gap-1 min-w-0">
+        <span className="text-xs font-semibold text-label-secondary tabular-nums">
+          {dateLabel(session.startDateTime)} · {formatTimeString(session.startDateTime)} –{' '}
+          {formatTimeString(session.endDateTime)}
+        </span>
+        {eyebrowOf(session)}
+        <span className={`font-semibold ${isProgramSession(session) ? 'text-label-secondary' : ''}`}>
+          {session.title || tCoursePage('session_title')}
+        </span>
+        <div className="flex items-center justify-between gap-2">
+          <SessionLocationChips entries={locationsOf(session)} />
+          {showMandatoryColumn && mandatoryControl(session, tCoursePage('mandatory'))}
+        </div>
+      </div>
+    ),
+    [dateLabel, formatTimeString, eyebrowOf, tCoursePage, locationsOf, showMandatoryColumn, mandatoryControl]
+  );
 
   return (
     <div>
@@ -426,12 +467,20 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
         error={null}
         expandableRowComponent={(props) =>
           isProgramSession(props.row) ? null : (
-            <ExpandableSessionRowContent session={props.row as ManagedCourse_Course_by_pk_Sessions} qResult={qResult} />
+            <ExpandableSessionRowContent
+              session={props.row as ManagedCourse_Course_by_pk_Sessions}
+              courseLocations={course.CourseLocations}
+              qResult={qResult}
+              onSetDate={(event) => handleSetDate(props.row, event)}
+              onTimeChanged={() => registerChange(props.row.id)}
+              minDate={lectureStart}
+              maxDate={lectureEnd}
+            />
           )
         }
         canExpandRow={(row) => !isProgramSession(row)}
         showDeleteForRow={(row) => !isProgramSession(row)}
-        rowClassName={(row) => (isProgramSession(row) ? 'opacity-70' : '')}
+        renderMobileRow={renderMobileRow}
         deleteMutation={canDeleteSessions ? DELETE_SESSION : undefined}
         deleteIdType="number"
         generateDeletionConfirmationQuestion={(row) =>
@@ -483,18 +532,84 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
   );
 };
 
+/**
+ * A course location the session has no address row for. The row is normally created with the
+ * session (or with the location), so this only shows up for older or imported data - and without
+ * it the address could not be set at all.
+ */
+const MissingSessionAddress: FC<{
+  entry: SessionLocationEntry;
+  sessionId: number;
+  qResult: QueryResult<ManagedCourse, ManagedCourseVariables>;
+}> = ({ entry, sessionId, qResult }) => {
+  const t = useTranslations('manageCourse.SessionsTab');
+  const tCommon = useTranslations('common');
+  const [insertSessionAddress, { loading, error }] = useRoleMutation<InsertSessionAddress, InsertSessionAddressVariables>(
+    INSERT_SESSION_ADDRESS
+  );
+  const [showError, setShowError] = useState(true);
+
+  const createAddress = async () => {
+    if (entry.courseLocationId == null) return;
+    setShowError(true);
+    await insertSessionAddress({
+      variables: { sessionId, address: '', courseLocationId: entry.courseLocationId },
+    });
+    await qResult.refetch();
+  };
+
+  return (
+    <>
+      <span className="flex items-center gap-2 font-semibold text-label-primary">
+        <LocationIcon option={entry.option} className="text-label-secondary" />
+        {tCommon(`location.${entry.option}`)}
+      </span>
+      <div className="flex flex-wrap items-center gap-3">
+        <span className="text-sm text-amber-700">{t('no_address')}</span>
+        <button
+          type="button"
+          onClick={createAddress}
+          disabled={loading}
+          className="inline-flex items-center rounded-full border-[1.5px] border-label-primary px-3 py-1 text-sm font-semibold text-label-primary hover:bg-bg-secondary disabled:opacity-50"
+        >
+          {t('create_address')}
+        </button>
+      </div>
+      <ErrorMessageDialog
+        errorMessage={error?.message ?? ''}
+        open={!!error && showError}
+        onClose={() => setShowError(false)}
+      />
+    </>
+  );
+};
+
 interface ExpandableSessionRowContentProps {
   session: ManagedCourse_Course_by_pk_Sessions;
+  courseLocations: ManagedCourse_Course_by_pk_CourseLocations[];
   qResult: QueryResult<ManagedCourse, ManagedCourseVariables>;
+  onSetDate: (event: Date | null) => void;
+  onTimeChanged: () => void;
+  minDate?: Date;
+  maxDate?: Date;
 }
 
-const ExpandableSessionRowContent: FC<ExpandableSessionRowContentProps> = ({ session, qResult }) => {
+const ExpandableSessionRowContent: FC<ExpandableSessionRowContentProps> = ({
+  session,
+  courseLocations,
+  qResult,
+  onSetDate,
+  onTimeChanged,
+  minDate,
+  maxDate,
+}) => {
   const t = useTranslations('manageCourse');
   const tCoursePage = useTranslations('coursePage');
-  const tCommon = useTranslations('common');
   const managementRole = useManagementRoleContext();
   const currentRole = useCurrentRole();
   const queryRole = managementRole ?? currentRole;
+  // On phones the row cells are not shown, so date, time and title are edited here.
+  const isPhone = useMediaQuery('(max-width: 767px)');
 
   const [createUserDialogOpen, setCreateUserDialogOpen] = useState(false);
   const [searchValueForNewUser, setSearchValueForNewUser] = useState('');
@@ -502,6 +617,8 @@ const ExpandableSessionRowContent: FC<ExpandableSessionRowContentProps> = ({ ses
 
   const hasAttendanceData =
     Boolean(session.attendanceData) && session.attendanceData !== 'true';
+
+  const locations = useMemo(() => sessionLocationEntries(session, courseLocations), [session, courseLocations]);
 
   const [insertSessionSpeaker] = useRoleMutation<InsertNewSessionSpeaker, InsertNewSessionSpeakerVariables>(
     INSERT_NEW_SESSION_SPEAKER
@@ -578,90 +695,108 @@ const ExpandableSessionRowContent: FC<ExpandableSessionRowContentProps> = ({ ses
 
   return (
     <div className="w-full flex-1 min-w-0">
-      <div className="bg-fill-primary text-label-primary light p-6 w-full">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
-          <div className="space-y-4 w-full min-w-0">
-            <Card title={tCommon('addresses')}>
-              <div className="grid grid-cols-[minmax(5rem,auto)_1fr] gap-x-4 gap-y-2 items-center">
-                {[...(session.SessionAddresses || [])]
-                  .sort((a, b) => {
-                    const locationOptions = Object.values(LocationOption_enum);
-                    return (
-                      locationOptions.indexOf(a.CourseLocation?.locationOption ?? LocationOption_enum.ONLINE) -
-                      locationOptions.indexOf(b.CourseLocation?.locationOption ?? LocationOption_enum.ONLINE)
-                    );
-                  })
-                  .map((address) => (
-                    <SessionAddresses key={address.id} address={address} refetchQueries={['ManagedCourse']} />
-                  ))}
-              </div>
-            </Card>
-
-            <Card
-              title={t('SessionsTab.session_description.label')}
-              helpText={t('SessionsTab.session_description.help_text')}
-            >
-              <InputField
-                variant="eduhub"
-                type="textarea"
-                value={session.description || ''}
-                label=""
-                updateValueMutation={UPDATE_SESSION_DESCRIPTION}
-                refetchQueries={['ManagedCourse']}
-                itemId={session.id}
-                placeholder={t('SessionsTab.session_description.placeholder')}
-                helpText=""
-                className="h-64 border-2 border-border-primary"
-                maxLength={500}
+      {/* One column on phones, two on laptops (description below), three on wide screens. */}
+      <div className="bg-bg-secondary/40 text-label-primary p-4 md:p-6 w-full grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-[1fr_1fr_18rem] gap-x-8 gap-y-6">
+        {isPhone && (
+          <section>
+            <SectionLabel>{t('SessionsTab.schedule')}</SectionLabel>
+            <div className="flex flex-col gap-3">
+              <SessionTimeEditor
+                session={session}
+                onSetDate={onSetDate}
+                onTimeChanged={onTimeChanged}
+                minDate={minDate}
+                maxDate={maxDate}
               />
-            </Card>
-          </div>
+              <InputField
+                variant="material"
+                type="input"
+                compact
+                placeholder={tCoursePage('session_title')}
+                itemId={session.id}
+                value={session.title || ''}
+                updateValueMutation={UPDATE_SESSION_TITLE}
+                refetchQueries={['ManagedCourse']}
+                fullWidth
+              />
+            </div>
+          </section>
+        )}
 
-          <div className="space-y-4 w-full min-w-0">
-            <ManagedItemList
-              title={tCoursePage('external_speakers')}
-              items={session.SessionSpeakers}
-              renderItem={(speaker) => ({
-                label: makeFullName(speaker.User.firstName, speaker.User.lastName ?? ''),
-                sublabel: speaker.User.email ? `(${speaker.User.email})` : undefined,
-              })}
-              getItemKey={(speaker) => speaker.id}
-              onDelete={deleteSpeakerHandler}
-              onAdd={handleNewSpeaker}
-              addButtonLabel={tCoursePage('add_external_speaker')}
-              removeAriaLabel={tCoursePage('remove_external_speaker')}
-              SelectionDialog={SelectUserDialog}
-              dialogTitle={tCoursePage('add_external_speaker')}
-              checkDuplicate={(speaker, user) => speaker.User.id === user.id}
-              additionalDialogProps={{
-                onAddNewUser: handleAddNewUser,
-                showAddNewUserOption: true,
-              }}
-            />
-
-            <Card title={t('SessionsTab.attendance_data.label')}>
-              <div className="flex flex-col gap-2">
-                <button
-                  type="button"
-                  disabled={!hasAttendanceData}
-                  onClick={hasAttendanceData ? () => setAttendanceOpen(true) : undefined}
-                  // `onTouchStart` ensures the dialog opens on the initial tap on
-                  // touch devices that delay the synthetic `click` event.
-                  onTouchStart={hasAttendanceData ? () => setAttendanceOpen(true) : undefined}
-                  aria-label={t('SessionsTab.attendance_data.review_button')}
-                  // 44px minimum height meets WCAG 2.5.5 / iOS HIG touch-target guidance.
-                  className="self-start inline-flex items-center justify-center min-h-[44px] px-4 py-2 rounded bg-brand hover:bg-brand-dark text-fill-primary font-medium disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-brand"
-                >
-                  {t('SessionsTab.attendance_data.review_button')}
-                </button>
-                {!hasAttendanceData && (
-                  <output className="text-sm text-label-secondary">
-                    {t('SessionsTab.attendance_data.no_data')}
-                  </output>
-                )}
-              </div>
-            </Card>
+        <section className="order-1 min-w-0">
+          <SectionLabel>{t('SessionsTab.location')}</SectionLabel>
+          <div className="grid grid-cols-[minmax(5rem,auto)_1fr] gap-x-4 gap-y-3 items-center">
+            {locations.map((entry) =>
+              entry.address ? (
+                <SessionAddresses key={entry.key} address={entry.address} refetchQueries={['ManagedCourse']} />
+              ) : (
+                <MissingSessionAddress key={entry.key} entry={entry} sessionId={session.id} qResult={qResult} />
+              )
+            )}
           </div>
+        </section>
+
+        <section className="order-3 lg:col-span-2 xl:col-span-1 xl:order-2 min-w-0">
+          <SectionLabel>{t('SessionsTab.session_description.label')}</SectionLabel>
+          <InputField
+            variant="eduhub"
+            type="textarea"
+            value={session.description || ''}
+            label=""
+            updateValueMutation={UPDATE_SESSION_DESCRIPTION}
+            refetchQueries={['ManagedCourse']}
+            itemId={session.id}
+            placeholder={t('SessionsTab.session_description.placeholder')}
+            helpText=""
+            className="h-32 border border-border-primary rounded-md"
+            maxLength={500}
+          />
+        </section>
+
+        <div className="order-2 xl:order-3 min-w-0 flex flex-col gap-5">
+          <ManagedItemList
+            title={tCoursePage('external_speakers')}
+            items={session.SessionSpeakers}
+            renderItem={(speaker) => ({
+              label: makeFullName(speaker.User.firstName, speaker.User.lastName ?? ''),
+              sublabel: speaker.User.email ?? undefined,
+            })}
+            getItemKey={(speaker) => speaker.id}
+            onDelete={deleteSpeakerHandler}
+            onAdd={handleNewSpeaker}
+            addButtonLabel={tCoursePage('add_external_speaker')}
+            removeAriaLabel={tCoursePage('remove_external_speaker')}
+            SelectionDialog={SelectUserDialog}
+            dialogTitle={tCoursePage('add_external_speaker')}
+            checkDuplicate={(speaker, user) => speaker.User.id === user.id}
+            additionalDialogProps={{
+              onAddNewUser: handleAddNewUser,
+              showAddNewUserOption: true,
+            }}
+          />
+
+          <section className="border-t border-table-divider pt-4">
+            <SectionLabel>{t('SessionsTab.attendance_data.label')}</SectionLabel>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              {!hasAttendanceData && (
+                <output className="text-sm text-label-secondary">{t('SessionsTab.attendance_data.no_data')}</output>
+              )}
+              <button
+                type="button"
+                disabled={!hasAttendanceData}
+                onClick={hasAttendanceData ? () => setAttendanceOpen(true) : undefined}
+                // `onTouchStart` ensures the dialog opens on the initial tap on
+                // touch devices that delay the synthetic `click` event.
+                onTouchStart={hasAttendanceData ? () => setAttendanceOpen(true) : undefined}
+                aria-label={t('SessionsTab.attendance_data.review_button')}
+                // 44px minimum height meets WCAG 2.5.5 / iOS HIG touch-target guidance.
+                className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full border-[1.5px] border-label-primary px-4 text-sm font-semibold text-label-primary hover:bg-bg-secondary disabled:border-border-primary disabled:text-label-disabled disabled:cursor-not-allowed disabled:hover:bg-transparent"
+              >
+                <MdVisibility aria-hidden />
+                {t('SessionsTab.attendance_data.review_short')}
+              </button>
+            </div>
+          </section>
         </div>
       </div>
 

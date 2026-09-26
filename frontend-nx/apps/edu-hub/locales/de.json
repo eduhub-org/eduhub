@@ -1846,6 +1846,13 @@
     "course_not_found": "Kurs {courseId} wurde nicht gefunden!",
     "add_session": "Termin hinzufügen",
     "SessionsTab": {
+      "date_time": "Datum & Zeit",
+      "edit_date_time": "Datum und Uhrzeit ändern",
+      "location": "Ort",
+      "optional": "Optional",
+      "no_address": "Keine Adresse",
+      "create_address": "Adresse anlegen",
+      "schedule": "Termin",
       "program_session_locked": "Wird vom Programm-Admin verwaltet",
       "sessionAddresses": {
         "online": {
@@ -1883,6 +1890,7 @@
       "attendance_data": {
         "label": "Anwesenheitsdaten",
         "review_button": "Anwesenheitsdaten ansehen",
+        "review_short": "Ansehen",
         "no_data": "Keine Anwesenheitsdaten vorhanden",
         "dialog_title": "Anwesenheitsdaten"
       },
