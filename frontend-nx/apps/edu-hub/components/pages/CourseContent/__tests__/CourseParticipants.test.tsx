@@ -11,6 +11,7 @@ jest.mock('next-intl', () => ({
 
 jest.mock('../../../../helpers/filehandling', () => ({
   getPublicImageUrl: () => '/images/common/mystery.svg',
+  getPublicUrl: () => '/images/common/mystery.svg',
 }));
 
 const mockUseRoleQuery = jest.fn();
