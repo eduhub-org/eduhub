@@ -59,6 +59,7 @@ import CheckboxSelector from '../../../inputs/CheckboxSelector';
 import { Tooltip } from '@mui/material';
 import { MdLock } from 'react-icons/md';
 import { isProgramSession, mergeSessions } from '../../../../helpers/programSessions';
+import { isMandatorySession } from '../../../../helpers/courseParticipationAttendance';
 import { useDisplayDate, useFormatTimeString } from '../../../../helpers/dateTimeHelpers';
 import SessionAddresses from './SessionAddresses';
 import ManagedItemList from '../../../common/ManagedItemList';
@@ -245,8 +246,15 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
 
   const programSessionTooltip = t('SessionsTab.program_session_locked');
 
-  const columns = useMemo<ColumnDef<SessionRow>[]>(
-    () => [
+  // Mandatory only matters for passing, so the column is shown only when a
+  // certificate can be earned. At least one session must stay mandatory: the
+  // last mandatory course session cannot be unticked (which also locks the
+  // only session of a single-session offering).
+  const showMandatoryColumn = Boolean(course.attendanceCertificatePossible || course.achievementCertificatePossible);
+  const mandatoryCount = useMemo(() => tableSessions.filter(isMandatorySession).length, [tableSessions]);
+
+  const columns = useMemo<ColumnDef<SessionRow>[]>(() => {
+    const allColumns: ColumnDef<SessionRow>[] = [
       {
         id: 'date',
         header: tCoursePage('date'),
@@ -358,19 +366,25 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
         size: 90,
         enableSorting: false,
         meta: { align: 'center' },
-        cell: ({ row }) => (
-          <div className="w-full flex items-center justify-center">
-            <CheckboxSelector
-              variant="eduhub"
-              className="[&_input]:mr-0"
-              checked={row.original.isMandatory}
-              disabled={isProgramSession(row.original)}
-              updateValueMutation={isProgramSession(row.original) ? undefined : UPDATE_SESSION_IS_MANDATORY}
-              identifierVariables={{ sessionId: row.original.id }}
-              refetchQueries={['ManagedCourse']}
-            />
-          </div>
-        ),
+        cell: ({ row }) => {
+          const isProgram = isProgramSession(row.original);
+          const isLastMandatory = !isProgram && isMandatorySession(row.original) && mandatoryCount <= 1;
+          return (
+            <Tooltip title={isLastMandatory ? tCoursePage('mandatory_last_session') : ''}>
+              <div className="w-full flex items-center justify-center">
+                <CheckboxSelector
+                  variant="eduhub"
+                  className="[&_input]:mr-0"
+                  checked={row.original.isMandatory}
+                  disabled={isProgram || isLastMandatory}
+                  updateValueMutation={isProgram ? undefined : UPDATE_SESSION_IS_MANDATORY}
+                  identifierVariables={{ sessionId: row.original.id }}
+                  refetchQueries={['ManagedCourse']}
+                />
+              </div>
+            </Tooltip>
+          );
+        },
       },
       {
         header: tCoursePage('external_speakers'),
@@ -386,18 +400,20 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
           </span>
         ),
       },
-    ],
-    [
-      tCoursePage,
-      lectureStart,
-      lectureEnd,
-      handleSetDate,
-      registerChange,
-      displayDate,
-      formatTimeString,
-      programSessionTooltip,
-    ]
-  );
+    ];
+    return showMandatoryColumn ? allColumns : allColumns.filter((column) => column.id !== 'isMandatory');
+  }, [
+    tCoursePage,
+    lectureStart,
+    lectureEnd,
+    handleSetDate,
+    registerChange,
+    displayDate,
+    formatTimeString,
+    programSessionTooltip,
+    showMandatoryColumn,
+    mandatoryCount,
+  ]);
 
   return (
     <div>

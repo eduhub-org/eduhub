@@ -943,6 +943,7 @@
     "remove_external_speaker": "Externen Referenten entfernen",
     "mandatory": "Pflicht",
     "program_session": "Programm-Termin",
+    "mandatory_last_session": "Mindestens ein Termin muss Pflicht bleiben.",
     "mandatory_help": "Nur Pflichttermine zählen zu den erlaubten Fehlterminen und erscheinen auf dem Zertifikat. Anwesenheiten werden trotzdem erfasst.",
     "session_title": "Titel des Termins",
     "confirmDeleteSession": "Möchtest du den Termin wirklich löschen?",
