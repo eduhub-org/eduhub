@@ -109,6 +109,30 @@ export function isOnlineCourseProject(
   );
 }
 
+export type PublicationDecision = 'granted' | 'declined';
+
+/**
+ * The team's publication decision as staff see it. Teams decide when they submit, so from then on
+ * there are only two states: the latest consent event is "granted", or not (declining at
+ * submission stores no event, a later withdrawal stores "withdrawn"). Before submission, and for
+ * online courses, which never ask for consent, there is no decision.
+ */
+export function getPublicationDecision(project: {
+  status: ProjectStatus_enum | string;
+  type?: string | null;
+  ProjectType?: { value?: string | null } | null;
+  ProjectConsentEvents?: { eventType: string }[] | null;
+}): PublicationDecision | null {
+  const isPostSubmission =
+    project.status === ProjectStatus_enum.SUBMITTED ||
+    project.status === ProjectStatus_enum.COMPLETED ||
+    project.status === ProjectStatus_enum.PUBLISHED;
+  if (!isPostSubmission || isOnlineCourseProject(project)) {
+    return null;
+  }
+  return project.ProjectConsentEvents?.[0]?.eventType === 'granted' ? 'granted' : 'declined';
+}
+
 /** Download / external-link buttons in project preview (student list & panel). */
 export function shouldShowProjectResourceDownloadLinks(
   status: ProjectStatus_enum
