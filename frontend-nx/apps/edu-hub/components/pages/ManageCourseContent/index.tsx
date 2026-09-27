@@ -122,6 +122,9 @@ export const ManageCourseContent: FC<Props> = ({ courseId }) => {
   const selectTab = useCallback(
     (tabIndex: number) => {
       setChosenTabIndex(tabIndex);
+      // Mirror what a reload would read, so a selection that becomes hidden falls back to the
+      // first tab rather than to an older remembered one.
+      setRememberedTabIndex(tabIndex);
       storeLastOpenedTab(courseId, tabIndex);
     },
     [courseId]
