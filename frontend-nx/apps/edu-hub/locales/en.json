@@ -1191,7 +1191,7 @@
     "course_series": {
       "label": "Course series",
       "placeholder": "Select or create a course series",
-      "help_text": "All runs of the same course belong to one course series. The course page shows projects from past runs of the series. A course without a series joins the series with the same title automatically when it is published.",
+      "help_text": "All runs of the same course belong to one course series. The course page shows projects from past runs of the series. When a course without a series is published, it is grouped automatically with earlier courses of the same title. One-off courses don't need a series.",
       "none": "No course series",
       "other_runs": "Other runs in this series:",
       "no_other_runs": "No other runs in this series yet."

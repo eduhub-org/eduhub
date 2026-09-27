@@ -1,8 +1,10 @@
--- Keep Course.courseSeriesId filled after the one-off backfill (1780600000006):
--- when a course is published it joins the series of an earlier run with the
--- same title in the same organization, or gets a new series. Admins/org admins
--- correct the grouping by hand in Manage Courses; copied courses carry their
--- source's series.
+-- Keep Course.courseSeriesId meaningful after the one-off backfill
+-- (1780600000006): a series exists only for a course that actually recurs.
+-- When a course is published it joins the series of an earlier run with the
+-- same title in the same organization; if that earlier run has no series yet,
+-- a series is created for both. A course without an earlier run keeps no series
+-- (it has no past projects to show). Admins/org admins group runs with differing
+-- titles by hand in Manage Courses; copied courses carry their source's series.
 
 -- Titles the admin UI gives a freshly added course ("default_title" in the
 -- locales). A course still titled like this is never matched, otherwise such
@@ -17,15 +19,18 @@ RETURNS boolean AS $$
     );
 $$ LANGUAGE sql IMMUTABLE;
 
--- Finds the series for a course title within the program's organization, or
--- creates one. Prefers the series of the latest course with that title (so a
--- manually regrouped series keeps attracting new runs), then a series with that
--- title (e.g. one created moments ago for another course of this batch).
+-- Returns the series a course with this title joins within the program's
+-- organization, or NULL when it has no earlier run. In order of preference:
+-- the series of the latest other course with that title (so a manually regrouped
+-- series keeps attracting new runs); a series with that title; or, if another
+-- course with that title has no series yet, a new series that this function
+-- also assigns to that course.
 CREATE OR REPLACE FUNCTION "public"."resolve_course_series"(course_id integer, course_title text, program_id integer)
 RETURNS integer AS $$
 DECLARE
   _org integer;
   _series integer;
+  _other_course integer;
 BEGIN
   SELECT p."organizationId" INTO _org FROM "public"."Program" p WHERE p."id" = program_id;
 
@@ -48,9 +53,22 @@ BEGIN
   END IF;
 
   IF _series IS NULL THEN
-    INSERT INTO "public"."CourseSeries" ("title", "organizationId")
-    VALUES (trim(course_title), _org)
-    RETURNING "id" INTO _series;
+    SELECT c."id" INTO _other_course
+    FROM "public"."Course" c
+    JOIN "public"."Program" p ON p."id" = c."programId"
+    WHERE c."id" <> course_id
+      AND c."courseSeriesId" IS NULL
+      AND lower(trim(c."title")) = lower(trim(course_title))
+      AND p."organizationId" IS NOT DISTINCT FROM _org
+    ORDER BY c."id" DESC
+    LIMIT 1;
+
+    IF _other_course IS NOT NULL THEN
+      INSERT INTO "public"."CourseSeries" ("title", "organizationId")
+      VALUES (trim(course_title), _org)
+      RETURNING "id" INTO _series;
+      UPDATE "public"."Course" SET "courseSeriesId" = _series WHERE "id" = _other_course;
+    END IF;
   END IF;
 
   RETURN _series;
@@ -112,13 +130,39 @@ BEFORE INSERT OR UPDATE OF "courseSeriesId", "programId" ON "public"."Course"
 FOR EACH ROW
 EXECUTE PROCEDURE "public"."check_course_series_organization"();
 
--- Catch up on the courses created since the first backfill. updated_at is left
--- alone so the admin course list (ordered by it) keeps its order.
+-- Bring existing data in line: drop the single-course series (most of them
+-- come from the first backfill, which gave every title a series), then group
+-- the courses without a series that share a title. updated_at is left alone so
+-- the admin course list keeps its order.
 ALTER TABLE "public"."Course" DISABLE TRIGGER "set_public_Course_updated_at";
 
 UPDATE "public"."Course" c
-SET "courseSeriesId" = "public"."resolve_course_series"(c."id", c."title", c."programId")
-WHERE c."courseSeriesId" IS NULL
-  AND NOT "public"."course_title_is_placeholder"(c."title");
+SET "courseSeriesId" = NULL
+WHERE c."courseSeriesId" IS NOT NULL
+  AND NOT EXISTS (
+    SELECT 1 FROM "public"."Course" other
+    WHERE other."courseSeriesId" = c."courseSeriesId" AND other."id" <> c."id"
+  );
+
+DELETE FROM "public"."CourseSeries" cs
+WHERE NOT EXISTS (SELECT 1 FROM "public"."Course" c WHERE c."courseSeriesId" = cs."id");
+
+-- Row by row, so a series created for one pair is seen by the next course.
+DO $$
+DECLARE
+  _course record;
+BEGIN
+  FOR _course IN
+    SELECT c."id" FROM "public"."Course" c
+    WHERE c."courseSeriesId" IS NULL
+      AND NOT "public"."course_title_is_placeholder"(c."title")
+    ORDER BY c."id"
+  LOOP
+    UPDATE "public"."Course" c
+    SET "courseSeriesId" = "public"."resolve_course_series"(c."id", c."title", c."programId")
+    WHERE c."id" = _course."id" AND c."courseSeriesId" IS NULL;
+  END LOOP;
+END;
+$$;
 
 ALTER TABLE "public"."Course" ENABLE TRIGGER "set_public_Course_updated_at";
