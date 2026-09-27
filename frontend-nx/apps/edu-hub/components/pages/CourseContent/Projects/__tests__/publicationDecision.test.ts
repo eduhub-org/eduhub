@@ -21,6 +21,12 @@ describe('getPublicationDecision', () => {
     ).toBe('declined');
   });
 
+  it('keeps the decision after a submission was reviewed as incomplete', () => {
+    expect(
+      getPublicationDecision({ status: ProjectStatus_enum.INCOMPLETE, ProjectConsentEvents: [{ eventType: 'granted' }] })
+    ).toBe('granted');
+  });
+
   it('has no decision for online courses, which never ask for consent', () => {
     expect(getPublicationDecision({ ...submitted, type: PROJECT_TYPE_ONLINE_COURSE, ProjectConsentEvents: [] })).toBeNull();
   });

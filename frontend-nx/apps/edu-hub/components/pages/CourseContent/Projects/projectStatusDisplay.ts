@@ -126,6 +126,8 @@ export function getPublicationDecision(project: {
   const isPostSubmission =
     project.status === ProjectStatus_enum.SUBMITTED ||
     project.status === ProjectStatus_enum.COMPLETED ||
+    // A reviewed submission that was not accepted still carries the team's decision.
+    project.status === ProjectStatus_enum.INCOMPLETE ||
     project.status === ProjectStatus_enum.PUBLISHED;
   if (!isPostSubmission || isOnlineCourseProject(project)) {
     return null;
