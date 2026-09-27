@@ -222,6 +222,10 @@ export interface AdminCourseList_Course_Program {
    * Matrix room id for the program-wide instructor Element chat (!room:server); invites are sent via admin API.
    */
   matrixInstructorRoomId: string | null;
+  /**
+   * Organization that owns the program. References Organization.id (0 = platform default)
+   */
+  organizationId: number;
 }
 
 export interface AdminCourseList_Course_CourseGroups_CourseGroupOption {
@@ -314,6 +318,41 @@ export interface AdminCourseList_Course_CourseAddonMappings {
    */
   validatedPrice: number;
   currency: string;
+}
+
+export interface AdminCourseList_Course_CourseSeries_Courses_Program {
+  __typename: "Program";
+  id: number;
+  /**
+   * The 6 letter short title for the program.
+   */
+  shortTitle: string | null;
+  /**
+   * The title of the program
+   */
+  title: string;
+}
+
+export interface AdminCourseList_Course_CourseSeries_Courses {
+  __typename: "Course";
+  id: number;
+  /**
+   * The title of the course (only editable by an admin user)
+   */
+  title: string;
+  /**
+   * An object relationship
+   */
+  Program: AdminCourseList_Course_CourseSeries_Courses_Program;
+}
+
+export interface AdminCourseList_Course_CourseSeries {
+  __typename: "CourseSeries";
+  id: number;
+  /**
+   * An array relationship
+   */
+  Courses: AdminCourseList_Course_CourseSeries_Courses[];
 }
 
 export interface AdminCourseList_Course_CourseEnrollments_CourseEnrollmentStatus {
@@ -554,6 +593,14 @@ export interface AdminCourseList_Course {
    * Stripe Price ID for the base course price
    */
   stripePriceId: string | null;
+  /**
+   * Links this course to its CourseSeries (the set of all iterations of the same course). Used to surface projects from past iterations.
+   */
+  courseSeriesId: number | null;
+  /**
+   * An object relationship
+   */
+  CourseSeries: AdminCourseList_Course_CourseSeries | null;
   /**
    * An array relationship
    */
