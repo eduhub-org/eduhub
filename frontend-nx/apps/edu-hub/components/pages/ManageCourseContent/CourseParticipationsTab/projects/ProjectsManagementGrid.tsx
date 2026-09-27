@@ -68,7 +68,12 @@ import {
 import { translateErrorMessage } from '../../../../../helpers/errorHandling';
 import { PROJECT_TAGLINE_MAX_LENGTH } from '../../../CourseContent/Projects/projectDefaults';
 import StatusChip from '../../../CourseContent/Projects/StatusChip';
-import { isProjectTypeEditable, canManagePublicationSuggestion } from '../../../CourseContent/Projects/projectStatusDisplay';
+import {
+  isProjectTypeEditable,
+  canManagePublicationSuggestion,
+  getPublicationDecision,
+} from '../../../CourseContent/Projects/projectStatusDisplay';
+import { IoIosCheckmarkCircle, IoIosCloseCircle } from 'react-icons/io';
 import ProjectPreviewLayout from '../../../CourseContent/Projects/ProjectPreviewLayout';
 import ProjectReviewComment from '../../../CourseContent/Projects/ProjectReviewComment';
 import ProjectFormFieldSection from '../../../CourseContent/Projects/ProjectFormFieldSection';
@@ -375,6 +380,29 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
     [updateProjectType, documentationInstructionsWithPdf, t, tCommon]
   );
 
+  // The title with the team's publication decision underneath, once there is one.
+  const renderTitle = useCallback(
+    (project: ProjectRow) => {
+      const decision = getPublicationDecision(project);
+      return (
+        <div className="min-w-0">
+          <span className="font-medium text-label-primary">{project.title}</span>
+          {decision && (
+            <span className="mt-0.5 flex items-center gap-1 text-xs text-label-secondary">
+              {decision === 'granted' ? (
+                <IoIosCheckmarkCircle className="shrink-0" style={{ color: 'var(--eduhub-success)' }} />
+              ) : (
+                <IoIosCloseCircle className="shrink-0" style={{ color: 'var(--eduhub-error)' }} />
+              )}
+              {tCourse(`projects.publication_consent.table_${decision}`)}
+            </span>
+          )}
+        </div>
+      );
+    },
+    [tCourse]
+  );
+
   const renderAuthors = useCallback(
     (project: ProjectRow) => {
       // Instructors/admins see EXCLUDED authors too, marked as excluded.
@@ -545,9 +573,7 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
         header: t('projects.table.title'),
         accessorKey: 'title',
         enableSorting: true,
-        cell: ({ row }) => (
-          <span className="font-medium text-label-primary">{row.original.title}</span>
-        ),
+        cell: ({ row }) => renderTitle(row.original),
       },
       {
         id: 'authors',
@@ -566,7 +592,7 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
         cell: ({ row }) => renderProjectAction(row.original),
       },
     ],
-    [renderAuthors, renderProjectAction, renderType, t]
+    [renderAuthors, renderProjectAction, renderTitle, renderType, t]
   );
 
   const renderMobileRow = useCallback(
@@ -580,7 +606,7 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
             suggestedForPublication={project.suggestedForPublication}
           />
         </div>
-        <div className="font-semibold text-label-primary">{project.title}</div>
+        {renderTitle(project)}
         <div className="flex flex-col gap-1 text-xs text-label-secondary">
           {renderAuthors(project)}
           {renderType(project)}
@@ -588,7 +614,7 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
         <div className="pt-1">{renderProjectAction(project)}</div>
       </div>
     ),
-    [renderAuthors, renderProjectAction, renderType]
+    [renderAuthors, renderProjectAction, renderTitle, renderType]
   );
 
   const expandableRowComponent = useCallback(
