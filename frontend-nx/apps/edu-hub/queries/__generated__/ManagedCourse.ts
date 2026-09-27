@@ -38,6 +38,10 @@ export interface ManagedCourse_Course_by_pk_Sessions_SessionAddresses {
    */
   locationAddressId: number | null;
   /**
+   * Location option of a program session address (course session addresses use courseLocationId instead)
+   */
+  locationOption: LocationOption_enum | null;
+  /**
    * An object relationship
    */
   CourseLocation: ManagedCourse_Course_by_pk_Sessions_SessionAddresses_CourseLocation | null;
@@ -105,7 +109,7 @@ export interface ManagedCourse_Course_by_pk_Sessions {
   /**
    * The ID of the course the session belongs to
    */
-  courseId: number;
+  courseId: number | null;
   /**
    * A description of the session
    */
@@ -118,6 +122,14 @@ export interface ManagedCourse_Course_by_pk_Sessions {
    * The title of the session
    */
   title: string;
+  /**
+   * If false, attendance is tracked but does not count toward passing (maxMissedSessions) or certificates
+   */
+  isMandatory: boolean;
+  /**
+   * Set for program-wide sessions (courseId is then NULL); shown in every course of the program
+   */
+  programId: number | null;
   /**
    * An array relationship
    */
@@ -183,6 +195,115 @@ export interface ManagedCourse_Course_by_pk_CourseLocations {
   defaultSessionAddressId: number | null;
 }
 
+export interface ManagedCourse_Course_by_pk_Program_Sessions_SessionAddresses_CourseLocation {
+  __typename: "CourseLocation";
+  id: number;
+  /**
+   * Either 'ONLINE' or one of the possible given offline locations
+   */
+  locationOption: LocationOption_enum | null;
+  /**
+   * Will be used as default for any new session address.
+   */
+  defaultSessionAddress: string | null;
+  /**
+   * References a LocationAddress that serves as the default for sessions in this course location. Replaces the legacy text-based defaultSessionAddress field.
+   */
+  defaultSessionAddressId: number | null;
+}
+
+export interface ManagedCourse_Course_by_pk_Program_Sessions_SessionAddresses {
+  __typename: "SessionAddress";
+  id: number;
+  /**
+   * Where the session will take place; might be an offline or online location which is provided according to the provided type
+   */
+  address: string;
+  /**
+   * Foreign key to LocationAddress. Replaces the free-text address field with a structured address reference. Nullable during migration period.
+   */
+  locationAddressId: number | null;
+  /**
+   * Location option of a program session address (course session addresses use courseLocationId instead)
+   */
+  locationOption: LocationOption_enum | null;
+  /**
+   * An object relationship
+   */
+  CourseLocation: ManagedCourse_Course_by_pk_Program_Sessions_SessionAddresses_CourseLocation | null;
+}
+
+export interface ManagedCourse_Course_by_pk_Program_Sessions_SessionSpeakers_User {
+  __typename: "User";
+  id: any;
+  /**
+   * The user's first name
+   */
+  firstName: string;
+  /**
+   * The user's last name
+   */
+  lastName: string;
+  /**
+   * The user's profile picture
+   */
+  picture: string | null;
+  /**
+   * A link to an external profile, for example in LinkedIn or Xing
+   */
+  externalProfile: string | null;
+}
+
+export interface ManagedCourse_Course_by_pk_Program_Sessions_SessionSpeakers {
+  __typename: "SessionSpeaker";
+  id: number;
+  /**
+   * An object relationship
+   */
+  User: ManagedCourse_Course_by_pk_Program_Sessions_SessionSpeakers_User;
+}
+
+export interface ManagedCourse_Course_by_pk_Program_Sessions {
+  __typename: "Session";
+  id: number;
+  /**
+   * The day and time of the end of the session
+   */
+  endDateTime: any;
+  /**
+   * The ID of the course the session belongs to
+   */
+  courseId: number | null;
+  /**
+   * A description of the session
+   */
+  description: string;
+  /**
+   * The day and time of the start of the session
+   */
+  startDateTime: any;
+  /**
+   * The title of the session
+   */
+  title: string;
+  /**
+   * If false, attendance is tracked but does not count toward passing (maxMissedSessions) or certificates
+   */
+  isMandatory: boolean;
+  /**
+   * Set for program-wide sessions (courseId is then NULL); shown in every course of the program
+   */
+  programId: number | null;
+  /**
+   * An array relationship
+   */
+  SessionAddresses: ManagedCourse_Course_by_pk_Program_Sessions_SessionAddresses[];
+  /**
+   * An array relationship
+   */
+  SessionSpeakers: ManagedCourse_Course_by_pk_Program_Sessions_SessionSpeakers[];
+}
+
 export interface ManagedCourse_Course_by_pk_Program {
   __typename: "Program";
   id: number;
@@ -240,6 +361,10 @@ export interface ManagedCourse_Course_by_pk_Program {
    * Matrix room id for the program-wide instructor Element chat (!room:server); invites are sent via admin API.
    */
   matrixInstructorRoomId: string | null;
+  /**
+   * An array relationship
+   */
+  Sessions: ManagedCourse_Course_by_pk_Program_Sessions[];
 }
 
 export interface ManagedCourse_Course_by_pk_CourseGroups_CourseGroupOption {

@@ -138,6 +138,7 @@ const ManageLocationAddressesContent: FC<ManageLocationAddressesContentProps> = 
   const {
     data,
     loading,
+    initialLoading,
     error: queryError,
     pageIndex,
     setPageIndex,
@@ -561,8 +562,8 @@ const ManageLocationAddressesContent: FC<ManageLocationAddressesContentProps> = 
 
   const table = (
     <>
-      {loading && <Loading />}
-      {!loading && (
+      {initialLoading && <Loading />}
+      {!initialLoading && (
         <div>
           {!inSettingsLayout && <CommonPageHeader headline={t('headline')} />}
           <TableGrid

@@ -154,9 +154,15 @@
       "bulk_action": "Bulk Action",
       "apply": "Apply",
       "none": "None",
-      "items_per_page": "Items per page"
+      "items_per_page": "Items per page",
+      "selected_count": "{count} selected",
+      "clear_selection": "Clear selection",
+      "expand_row": "Show details",
+      "collapse_row": "Hide details",
+      "open_row": "Open"
     },
     "table_grid_delete_button": {
+      "delete": "Delete",
       "confirm_delete": "Confirm Deletion",
       "deletion_confirmation_question": "Are you sure you want to delete this entry?"
     },
@@ -374,12 +380,17 @@
       "agenda": "Agenda",
       "add_to_calendar": "Add to calendar",
       "location_not_available": "Location not available",
+      "optional": "optional",
+      "program_session": "Cross-course",
+      "program_session_tooltip": "Takes place for all courses of “{program}”",
+      "optional_hint": "All sessions are mandatory unless marked “optional”.",
       "untitled_session": "Agenda item",
       "add_to_calendar_short": "Calendar"
     },
     "attendances": {
       "attendances": "Attendances",
       "max_missed_sessions": "You may miss at most one session",
+      "max_missed_mandatory_sessions": "You may miss at most {count} of {total} mandatory sessions",
       "max_missed_sessions_plural": "You may miss at most {count} sessions",
       "attendance_status": {
         "ATTENDED": "Attended",
@@ -943,6 +954,10 @@
     "external_speakers": "External Speakers",
     "add_external_speaker": "Add External Speaker",
     "remove_external_speaker": "Remove External Speaker",
+    "mandatory": "Mandatory",
+    "program_session": "Cross-course",
+    "mandatory_last_session": "At least one session must stay mandatory.",
+    "mandatory_help": "Only mandatory sessions count toward the allowed absences and appear on the certificate. Attendance is still tracked.",
     "session_title": "Session Title",
     "confirmDeleteSession": "Do you really want to delete the session?",
     "cannotDeletePastSession": "You cannot delete a session that is in the past! If you really want to delete the session, please contact an administrator.",
@@ -1722,6 +1737,8 @@
     "attendance_cert_not_issued": "No attendance certificate issued",
     "achievement_cert_issued": "Achievement certificate issued",
     "achievement_cert_not_issued": "No achievement certificate issued",
+    "attendance_program_session": "Cross-course",
+    "attendance_optional_session": "optional",
     "attendance_status_passed": "Attendance requirement met",
     "attendance_status_failed": "Attendance requirement not met",
     "attendance_status_uncertain": "Attendance status pending",
@@ -1850,6 +1867,14 @@
     "course_not_found": "Course {courseId} could not be found!",
     "add_session": "Add Session",
     "SessionsTab": {
+      "date_time": "Date & time",
+      "edit_date_time": "Change date and time",
+      "location": "Location",
+      "optional": "Optional",
+      "no_address": "No address",
+      "create_address": "Create address",
+      "schedule": "Session",
+      "program_session_locked": "Managed by the program admin",
       "sessionAddresses": {
         "online": {
           "label": "Online",
@@ -1886,6 +1911,7 @@
       "attendance_data": {
         "label": "Attendance data",
         "review_button": "Review attendance data",
+        "review_short": "View",
         "no_data": "No attendance data available",
         "dialog_title": "Attendance data"
       },
@@ -2038,6 +2064,15 @@
     }
   },
   "managePrograms": {
+    "program_sessions": {
+      "title": "Program sessions",
+      "help_text": "These sessions appear in every course of the program. They are optional by default; mandatory ones count toward the allowed absences in each course.",
+      "add": "Add session",
+      "confirm_delete": "Do you really want to delete this program session? It disappears from all courses and recorded attendance is lost.",
+      "location": "Location",
+      "online_link_placeholder": "Link to the online session",
+      "location_address_placeholder": "Select an address"
+    },
     "headline": "Programs",
     "table_header": {
       "published": "Published",

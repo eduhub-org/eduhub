@@ -40,6 +40,8 @@ export const COURSE_PARTICIPATIONS = gql`
         startDateTime
         endDateTime
         title
+        isMandatory
+        programId
       }
       ProjectCourses {
         Project {
@@ -51,6 +53,18 @@ export const COURSE_PARTICIPATIONS = gql`
           ProjectAuthors(where: { participationStatus: { _eq: ACCEPTED } }) {
             userId
           }
+        }
+      }
+      Program {
+        id
+        title
+        Sessions(order_by: { startDateTime: asc }) {
+          id
+          startDateTime
+          endDateTime
+          title
+          isMandatory
+          programId
         }
       }
       maxMissedSessions
@@ -67,7 +81,9 @@ export const COURSE_PARTICIPATION_ATTENDANCES = gql`
       order_by: [{ userId: asc }, { sessionId: asc }, { source: asc }, { id: desc }]
       where: {
         userId: { _in: $userIds }
-        Session: { courseId: { _eq: $courseId } }
+        Session: {
+          _or: [{ courseId: { _eq: $courseId } }, { Program: { Courses: { id: { _eq: $courseId } } } }]
+        }
       }
     ) {
       id

@@ -33,6 +33,16 @@ const pickerInput = () =>
   document.querySelector('.optimistic-datepicker input') as HTMLInputElement | null;
 
 describe('ReviewDeadlineExtensionField', () => {
+  // The picker blocks days before today, so pin "today" to keep the picked
+  // days in the future no matter when the suite runs.
+  beforeEach(() => {
+    jest.useFakeTimers({ now: new Date('2026-09-01T12:00:00') });
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
   it('offers the custom date through the standard date picker, not a bare date input', () => {
     setup();
 

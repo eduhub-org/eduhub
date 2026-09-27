@@ -273,6 +273,7 @@ const ManageOrganizationsContent: FC<ManageOrganizationsContentProps> = ({
   const {
     data,
     loading,
+    initialLoading,
     error: queryError,
     pageIndex,
     setPageIndex,
@@ -698,8 +699,8 @@ const ManageOrganizationsContent: FC<ManageOrganizationsContentProps> = ({
 
   const table = (
     <>
-      {loading && <Loading />}
-      {!loading && (
+      {initialLoading && <Loading />}
+      {!initialLoading && (
         <div>
           {!inSettingsLayout && <CommonPageHeader headline={t('headline')} />}
           <TableGrid

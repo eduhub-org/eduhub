@@ -212,7 +212,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
   }, []);
 
   // Use TableGrid hook with proper refetchFilter for search debouncing
-  const { data, loading, error, refetch, searchFilter, pageIndex, sorting, setSearchFilter, setPageIndex, setSorting } = useTableGrid({
+  const { data, loading, initialLoading, error, refetch, searchFilter, pageIndex, sorting, setSearchFilter, setPageIndex, setSorting } = useTableGrid({
     queryHook: useManageQuery,
     query: ADMIN_COURSE_LIST,
     queryVariables: filter,
@@ -939,7 +939,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
         </div>
       )}
 
-      {loading ? (
+      {initialLoading ? (
         <div className="pb-12 pt-16">
           <Loading />
         </div>

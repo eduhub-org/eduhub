@@ -67,8 +67,10 @@ import {
   collapseAttendancesBySession,
   getAttendanceStatusFromMap,
   groupAttendancesByUser,
+  isMandatorySession,
 } from '../../../../helpers/courseParticipationAttendance';
 import { useOptimisticAttendance } from './useOptimisticAttendance';
+import { isProgramSession, mergeSessions } from '../../../../helpers/programSessions';
 
 interface CourseParticipationsTabIProps {
   course: ManagedCourse_Course_by_pk;
@@ -167,6 +169,8 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
   const courseData = data?.Course_by_pk as CourseParticipations_Course_by_pk | null | undefined;
   const courseEnrollments = courseData?.CourseEnrollments;
   const courseSessions = courseData?.Sessions;
+  const programSessions = courseData?.Program?.Sessions;
+  const programTitle = courseData?.Program?.title ?? '';
   const courseProjectCourses = courseData?.ProjectCourses;
 
   const pageUserIds = useMemo(
@@ -202,9 +206,14 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
       })) ?? EMPTY_ENROLLMENTS,
     [attendancesByUser, courseEnrollments]
   );
+  // Program-wide sessions count toward passing like course sessions (when
+  // mandatory), so they get dots and are part of every status calculation.
   const sessions = useMemo(
-    () => courseSessions ?? EMPTY_SESSIONS,
-    [courseSessions]
+    () =>
+      courseSessions || programSessions
+        ? mergeSessions<CourseParticipations_Course_by_pk_Sessions>(courseSessions, programSessions)
+        : EMPTY_SESSIONS,
+    [courseSessions, programSessions]
   );
   const projects = useMemo<CourseParticipations_Course_by_pk_ProjectCourses_Project[]>(
     () =>
@@ -525,8 +534,10 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
       };
 
       const dotsData: IDotData[] = sessions.map((s: CourseParticipations_Course_by_pk_Sessions) => ({ session: s, color: dotColor(s) }));
-      const missed = dotsData.filter((d) => d.color === 'red').length;
-      const attended = dotsData.filter((d) => d.color === 'lightgreen').length;
+      // Optional sessions are shown (and editable) but not counted.
+      const mandatoryDots = dotsData.filter((d) => isMandatorySession(d.session));
+      const missed = mandatoryDots.filter((d) => d.color === 'red').length;
+      const attended = mandatoryDots.filter((d) => d.color === 'lightgreen').length;
       const total = attended + missed;
       const status = getAttendanceStatusFromMap(attendanceBySession, sessions, maxMissedSessions);
       const statusDotColor: DotColor =
@@ -548,12 +559,19 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
               <Dot
                 key={d.session.id}
                 color={d.color}
+                hollow={!isMandatorySession(d.session)}
                 className={
                   attendanceLoading
                     ? 'cursor-wait opacity-60'
                     : 'cursor-pointer hover:border-2 hover:border-indigo-200 hover:rounded-full'
                 }
-                title={new Date(d.session.startDateTime).toLocaleString()}
+                title={[
+                  new Date(d.session.startDateTime).toLocaleString(),
+                  isProgramSession(d.session) ? `${t('attendance_program_session')} (${programTitle})` : null,
+                  isMandatorySession(d.session) ? null : t('attendance_optional_session'),
+                ]
+                  .filter(Boolean)
+                  .join(' · ')}
                 onClick={
                   attendanceLoading
                     ? undefined
@@ -573,7 +591,7 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
         </div>
       );
     };
-  }, [attendanceLoading, sessions, maxMissedSessions, t]);
+  }, [attendanceLoading, sessions, maxMissedSessions, programTitle, t]);
 
   const columns = useMemo<ColumnDef<ExtendedEnrollment>[]>(() => {
     const allColumns: ColumnDef<ExtendedEnrollment>[] = [

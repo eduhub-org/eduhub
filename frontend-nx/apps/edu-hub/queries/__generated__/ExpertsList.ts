@@ -96,7 +96,7 @@ export interface ExpertsList_User_SessionSpeakers_Session {
   /**
    * An object relationship
    */
-  Course: ExpertsList_User_SessionSpeakers_Session_Course;
+  Course: ExpertsList_User_SessionSpeakers_Session_Course | null;
 }
 
 export interface ExpertsList_User_SessionSpeakers {

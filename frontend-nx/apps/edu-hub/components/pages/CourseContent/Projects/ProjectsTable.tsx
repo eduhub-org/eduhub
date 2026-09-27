@@ -386,7 +386,6 @@ const ProjectsTable: FC<ProjectsTableProps> = ({
       addButtonText={showProposeButton ? t('projects.table.propose_button') : undefined}
       onAddButtonClick={showProposeButton ? onProposeClick : undefined}
       expandableRowComponent={expandableRowComponent}
-      rounded
     />
   );
 };
