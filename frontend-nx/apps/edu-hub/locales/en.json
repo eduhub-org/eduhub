@@ -159,7 +159,12 @@
       "clear_selection": "Clear selection",
       "expand_row": "Show details",
       "collapse_row": "Hide details",
-      "open_row": "Open"
+      "open_row": "Open",
+      "select_all": "All",
+      "sort_by": "Sort by",
+      "sort_default": "Default order",
+      "sort_asc": "{column}, ascending",
+      "sort_desc": "{column}, descending"
     },
     "table_grid_delete_button": {
       "delete": "Delete",
@@ -2033,7 +2038,10 @@
         "TEST_ENROLLMENT_COURSE_NOT_FOUND": "This course no longer exists.",
         "TEST_ENROLLMENT_INVALID_INPUT": "The request was malformed."
       }
-    }
+    },
+    "info_block_mobile_summary": "{title} · {count} characters",
+    "info_block_mobile_untitled": "Untitled",
+    "info_block_mobile_empty": "Empty"
   },
   "manageProjects": {
     "headline": "Projects",

@@ -1,5 +1,5 @@
 import { useTranslations } from 'next-intl';
-import { FC, useCallback, useMemo, useState } from 'react';
+import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { useRoleMutation } from '../../../hooks/authedMutation';
 import { useRoleQuery } from '../../../hooks/authedQuery';
 import { MANAGED_COURSE, UPDATE_COURSE_STATUS } from '../../../queries/course';
@@ -22,30 +22,16 @@ import { useIsAdmin, useIsUserIdInList } from '../../../hooks/authentication';
 import { getRegistrationFeatures } from './ApplicationsTab/registrationConfig';
 import Loading from '../../common/Loading';
 import { ProgramType } from '../../../types/enums';
+import { readLastOpenedTab, storeLastOpenedTab } from './lastOpenedTab';
 
 interface Props {
   courseId: number;
 }
 
-const determineTabClasses = (tabIndex: number, selectedTabIndex: number) => {
-  const maxAllowedTab = 5;
-
-  if (tabIndex === selectedTabIndex) {
-    // Active tab: dark background with light text (like second image)
-    return 'bg-bg-card text-label-primary';
-  }
-
-  if (tabIndex < maxAllowedTab) {
-    // Inactive tabs: light green background with dark text for good contrast (like second image)
-    return 'light bg-status-confirmed text-label-primary cursor-pointer hover:bg-status-confirmed hover:opacity-90';
-  }
-
-  if (tabIndex === maxAllowedTab) {
-    return 'bg-bg-secondary text-label-secondary cursor-pointer';
-  }
-
-  return 'bg-bg-secondary text-label-disabled';
-};
+const determineTabClasses = (tabIndex: number, selectedTabIndex: number) =>
+  tabIndex === selectedTabIndex
+    ? 'bg-bg-card text-label-primary'
+    : 'light bg-status-confirmed text-label-primary cursor-pointer hover:bg-status-confirmed hover:opacity-90';
 
 const getNextCourseStatus = (course: ManagedCourse_Course_by_pk) => {
   switch (course.status) {
@@ -101,39 +87,48 @@ export const ManageCourseContent: FC<Props> = ({ courseId }) => {
 
   const course: ManagedCourse_Course_by_pk | null = qResult.data?.Course_by_pk || null;
 
-  const maxAllowedTab = 5;
+  // null until the user picks a tab here; until then the tab remembered for this course (if it is
+  // still shown) or the first tab is open.
+  const [chosenTabIndex, setChosenTabIndex] = useState<number | null>(null);
+  const [rememberedTabIndex, setRememberedTabIndex] = useState<number | null>(null);
 
-  const [openTabIndex, setOpenTabIndex] = useState(0);
+  // Read on mount, while the course is still loading, so the page opens on the right tab directly.
+  useEffect(() => {
+    setChosenTabIndex(null);
+    setRememberedTabIndex(readLastOpenedTab(courseId));
+  }, [courseId]);
 
-  const openTab0 = useCallback(() => {
-    if (maxAllowedTab >= 0) {
-      setOpenTabIndex(0);
-    }
-  }, [setOpenTabIndex, maxAllowedTab]);
+  const isDegreeCourse = course?.Program.type === ProgramType.DEGREES;
+  const visibleTabIndices = useMemo(() => {
+    if (course == null) return [0];
+    return [
+      0,
+      ...(isDegreeCourse ? [] : [1]),
+      ...(course.externalRegistrationLink ? [] : [2]),
+      ...(course.externalRegistrationLink || isDegreeCourse ? [] : [3]),
+      ...(isDegreeCourse ? [4] : []),
+    ];
+  }, [course, isDegreeCourse]);
 
-  const openTab1 = useCallback(() => {
-    if (maxAllowedTab >= 1) {
-      setOpenTabIndex(1);
-    }
-  }, [setOpenTabIndex, maxAllowedTab]);
+  // A tab that is no longer shown (e.g. after an external registration link was set) never stays open.
+  const isVisibleTab = (tabIndex: number | null): tabIndex is number =>
+    tabIndex != null && visibleTabIndices.includes(tabIndex);
+  const openTabIndex = isVisibleTab(chosenTabIndex)
+    ? chosenTabIndex
+    : isVisibleTab(rememberedTabIndex)
+      ? rememberedTabIndex
+      : 0;
 
-  const openTab2 = useCallback(() => {
-    if (maxAllowedTab >= 2) {
-      setOpenTabIndex(2);
-    }
-  }, [setOpenTabIndex, maxAllowedTab]);
-
-  const openTab3 = useCallback(() => {
-    if (maxAllowedTab >= 3) {
-      setOpenTabIndex(3);
-    }
-  }, [setOpenTabIndex, maxAllowedTab]);
-
-  const openTab4 = useCallback(() => {
-    if (maxAllowedTab >= 3) {
-      setOpenTabIndex(4);
-    }
-  }, [setOpenTabIndex, maxAllowedTab]);
+  const selectTab = useCallback(
+    (tabIndex: number) => {
+      setChosenTabIndex(tabIndex);
+      // Mirror what a reload would read, so a selection that becomes hidden falls back to the
+      // first tab rather than to an older remembered one.
+      setRememberedTabIndex(tabIndex);
+      storeLastOpenedTab(courseId, tabIndex);
+    },
+    [courseId]
+  );
 
   const [isCantUpgradeOpen, setCantUpgradeOpen] = useState(false);
   const handleCloseCantUpgrade = useCallback(() => {
@@ -149,7 +144,7 @@ export const ManageCourseContent: FC<Props> = ({ courseId }) => {
       if (course != null && confirmAnswer) {
         const nextStatus = getNextCourseStatus(course);
         if (nextStatus !== course.status) {
-          setOpenTabIndex(openTabIndex + 1);
+          setChosenTabIndex(openTabIndex + 1);
         }
         await updateCourseStatusMutation({
           variables: {
@@ -202,45 +197,40 @@ export const ManageCourseContent: FC<Props> = ({ courseId }) => {
     return <div></div>;
   }
 
+  const tabLabels: Record<number, string> = {
+    0: t('description'),
+    1: t(isEventCourse ? 'programme' : 'sessions'),
+    2: t(registrationFeatures.tabNameKey),
+    // Without achievement certificates the tab holds no projects section, so promising them in its
+    // name is misleading.
+    3: t(course.achievementCertificatePossible ? 'participations_and_achievements' : 'participations'),
+    4: t('degree_participations'),
+  };
+
   return (
     <>
       <PageBlock>
-        <div className="max-w-screen-xl mx-auto mt-20">
-          <div className="flex flex-col gap-4 mb-12 mt-12 text-white sm:flex-row sm:items-center sm:justify-between">
-            <h1 className="text-4xl font-bold">{course.title}</h1>
+        {/* PageBlock drops its side margin from xl up, where a 1280px wide window would otherwise let
+            the content touch the edges; from 2xl on the centred column has room of its own. */}
+        <div className="max-w-screen-xl mx-auto mt-20 xl:px-12 2xl:px-0">
+          <div className="flex flex-col gap-4 mb-6 mt-6 md:mb-12 md:mt-12 text-white sm:flex-row sm:items-center sm:justify-between">
+            <h1 className="text-3xl md:text-4xl font-bold">{course.title}</h1>
             <ParticipantPreviewButton courseId={courseId} />
           </div>
 
-          <div className="grid grid-cols-4 mb-20">
-            <div className={`p-4 m-2 ${determineTabClasses(0, openTabIndex)}`} onClick={openTab0}>
-              {t('description')}
-            </div>
-
-            {course.Program.type === 'DEGREES' ? null : (
-              <div className={`p-4 m-2 ${determineTabClasses(1, openTabIndex)}`} onClick={openTab1}>
-                {t(isEventCourse ? 'programme' : 'sessions')}
-              </div>
-            )}
-
-            {course.externalRegistrationLink ? null : (
-              <div className={`p-4 m-2 ${determineTabClasses(2, openTabIndex)}`} onClick={openTab2}>
-                {t(registrationFeatures.tabNameKey)}
-              </div>
-            )}
-
-            {course.externalRegistrationLink || course.Program.type === 'DEGREES' ? null : (
-              <div className={`p-4 m-2 ${determineTabClasses(3, openTabIndex)}`} onClick={openTab3}>
-                {/* Without achievement certificates the tab holds no projects
-                    section, so promising them in its name is misleading. */}
-                {t(course.achievementCertificatePossible ? 'participations_and_achievements' : 'participations')}
-              </div>
-            )}
-
-            {course.Program.type === 'DEGREES' ? (
-              <div className={`p-4 m-2 ${determineTabClasses(4, openTabIndex)}`} onClick={openTab4}>
-                {t('degree_participations')}
-              </div>
-            ) : null}
+          {/* Two tiles per row on phones, one row from md up. */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 mb-8 md:mb-12">
+            {visibleTabIndices.map((tabIndex) => (
+              <button
+                key={tabIndex}
+                type="button"
+                onClick={() => selectTab(tabIndex)}
+                aria-pressed={tabIndex === openTabIndex}
+                className={`p-3 md:p-4 text-left text-sm md:text-base ${determineTabClasses(tabIndex, openTabIndex)}`}
+              >
+                {tabLabels[tabIndex]}
+              </button>
+            ))}
           </div>
 
           {openTabIndex === 0 && <DescriptionTab course={course} qResult={qResult} />}

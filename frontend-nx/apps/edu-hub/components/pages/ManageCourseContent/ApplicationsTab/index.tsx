@@ -16,7 +16,7 @@ import {
 } from '../../../../queries/__generated__/ManagedCourseApplicationRecipients';
 import { useLazyRoleQuery, useRoleQuery } from '../../../../hooks/authedQuery';
 import { MANAGED_COURSE_APPLICATIONS, MANAGED_COURSE_APPLICATION_RECIPIENTS } from '../../../../queries/course';
-import Dot from '../../../common/Dot';
+import Dot, { DotColor } from '../../../common/Dot';
 import { CourseEnrollmentStatistics } from './CourseEnrollmentStatistics';
 import { OnlyInstructor } from '../../../common/OnlyLoggedIn';
 import { useIsInstructor, useIsAdmin } from '../../../../hooks/authentication';
@@ -62,59 +62,118 @@ import { BulkAction } from '../../../common/TableGrid/types';
 import { ApolloError } from '@apollo/client';
 import { ErrorMessageDialog } from '../../../common/dialogs/ErrorMessageDialog';
 import { FormbricksResponsesDisplay } from './FormbricksResponsesDisplay';
-import { getRegistrationFeatures, type RegistrationFeatures } from './registrationConfig';
+import { getRegistrationFeatures } from './registrationConfig';
 import NotificationSnackbar from '../../../common/dialogs/NotificationSnackbar';
 import Loading from '../../../common/Loading';
 
 /** Matches TableGrid `gap-3` between columns; keep in sync with expandable row width math. */
-const APPLICATION_TABLE_GAP_PX = 12;
 const BULK_EMAIL_MAILTO_URL_LIMIT = 1800;
 const BULK_EMAIL_RECIPIENT_LIMIT = 10000;
 const BULK_EMAIL_PREVIEW_COUNT = 8;
 
 /**
- * Default pixel widths for Applications tab columns (accessorKey → size).
- * Used by both TableGrid column defs and ExpandableApplicationRow alignment.
+ * Default pixel widths for Applications tab columns (accessorKey → size). TableGrid treats them as
+ * minimum widths.
  */
 const APPLICATION_TABLE_COLUMN_SIZES = {
   'User.firstName': 200,
   'User.lastName': 200,
   'User.Organization.name': 300,
   created_at: 104,
-  motivationRating: 100,
+  motivationRating: 120,
   Invoices: 120,
   status: 120,
 } as const;
 
-function sumColumnWidthsWithGaps(widths: number[]): number {
-  if (widths.length === 0) {
-    return 0;
+/** The status icon of an enrollment; the table shows it alone, the mobile card next to its label. */
+const renderStatusIcon = (enrollment: ApplicationEnrollment, t: (key: string) => string, size = '1.5em') => {
+  const expired = isExpired(enrollment);
+  return (
+    <div>
+      {!expired && enrollment.status === 'APPLIED' && (
+        <GoDotFill className="inline" title={t('status.applied')} color="grey" size={size} />
+      )}
+      {!expired && enrollment.status === 'INVITED' && (
+        <IoIosCheckmarkCircle className="inline" title={t('status.invited')} color="grey" size={size} />
+      )}
+      {(enrollment.status === 'CONFIRMED' || enrollment.status === 'COMPLETED') && (
+        <IoIosCheckmarkCircle
+          className="inline"
+          title={t('status.invitation_confirmed')}
+          color="lightgreen"
+          size={size}
+        />
+      )}
+      {enrollment.status === 'REGISTERED' && (
+        <IoIosCheckmarkCircle
+          className="inline"
+          title={t('status.registered')}
+          color="lightgreen"
+          size={size}
+        />
+      )}
+      {enrollment.status === 'ABORTED' && (
+        <IoIosCheckmarkCircle title={t('status.aborted')} color="red" size={size} className="inline" />
+      )}
+      {enrollment.status === 'REJECTED' && (
+        <IoIosCloseCircle title={t('status.rejected')} color="red" size={size} className="inline" />
+      )}
+      {enrollment.status === 'CANCELLED' && (
+        <IoIosCloseCircle title={t('status.cancelled')} color="red" size={size} className="inline" />
+      )}
+      {enrollment.status === 'WAITLIST' && (
+        <span
+          className="inline-block max-w-full truncate text-[11px] font-semibold text-label-primary bg-bg-secondary px-1.5 py-0.5 rounded border border-border-primary"
+          title={t('status.waitlist')}
+        >
+          {t('status.waitlist_badge')}
+        </span>
+      )}
+      {(enrollment.status === 'EXPIRED' || (expired && enrollment.status === 'INVITED')) && (
+        <IoIosCloseCircle
+          className="inline"
+          title={t('status.invitation_expired')}
+          color="grey"
+          size={size}
+        />
+      )}
+    </div>
+  );
+};
+
+const statusLabelKey = (enrollment: ApplicationEnrollment): string => {
+  if (enrollment.status === 'EXPIRED' || (isExpired(enrollment) && enrollment.status === 'INVITED')) {
+    return 'status.invitation_expired';
   }
-  return widths.reduce((acc, w, i) => (i === 0 ? w : acc + APPLICATION_TABLE_GAP_PX + w), 0);
-}
-
-/** Widths for the three expandable blocks so they line up with the table columns above. */
-function getExpandableRowWidths(features: RegistrationFeatures) {
-  const s = APPLICATION_TABLE_COLUMN_SIZES;
-  const emailWidth = sumColumnWidthsWithGaps([s['User.firstName'], s['User.lastName']]);
-
-  // Questionnaire / motivation: columns from organization up to (but not including) motivationRating.
-  // With application process: org + created_at. Without: org, and if payment-only flow includes payment before status.
-  let middleParts: number[];
-  if (features.hasApplicationProcess) {
-    middleParts = [s['User.Organization.name'], s.created_at];
-  } else {
-    middleParts = [s['User.Organization.name']];
-    if (features.hasPayment) {
-      middleParts.push(s.Invoices);
-    }
+  switch (enrollment.status) {
+    case 'APPLIED':
+      return 'status.applied';
+    case 'INVITED':
+      return 'status.invited';
+    case 'CONFIRMED':
+    case 'COMPLETED':
+      return 'status.invitation_confirmed';
+    case 'REGISTERED':
+      return 'status.registered';
+    case 'ABORTED':
+      return 'status.aborted';
+    case 'REJECTED':
+      return 'status.rejected';
+    case 'CANCELLED':
+      return 'status.cancelled';
+    case 'WAITLIST':
+      return 'status.waitlist';
+    default:
+      return 'status.applied';
   }
-  const questionnaireWidth = sumColumnWidthsWithGaps(middleParts);
+};
 
-  const ratingWidth = s.motivationRating;
-
-  return { emailWidth, questionnaireWidth, ratingWidth };
-}
+const RATING_OPTIONS: { value: MotivationRating_enum; color: DotColor; labelKey: string }[] = [
+  { value: MotivationRating_enum.UNRATED, color: 'grey', labelKey: 'rating.not_rated' },
+  { value: MotivationRating_enum.INVITE, color: 'lightgreen', labelKey: 'rating.invite' },
+  { value: MotivationRating_enum.REVIEW, color: 'orange', labelKey: 'rating.unclear' },
+  { value: MotivationRating_enum.DECLINE, color: 'red', labelKey: 'rating.reject' },
+];
 
 interface IProps {
   course: ManagedCourse_Course_by_pk;
@@ -287,7 +346,6 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
     [course.registrationType]
   );
 
-  const expandableRowWidths = useMemo(() => getExpandableRowWidths(features), [features]);
   
   // Evaluated fresh on every render (not memoized) so opening the modal after the first
   // session's start time has passed picks up the change without needing a refetch.
@@ -1031,6 +1089,8 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
           accessorKey: 'User.Organization.name',
           size: APPLICATION_TABLE_COLUMN_SIZES['User.Organization.name'],
           enableSorting: true,
+          // Shown in the expanded row instead on narrower screens.
+          meta: { hideBelow: 'xl' },
           cell: ({ row }) => {
             const orgName = row.original.User.Organization?.name;
             return (
@@ -1049,6 +1109,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
           accessorKey: 'created_at',
           size: APPLICATION_TABLE_COLUMN_SIZES.created_at,
           enableSorting: true,
+          meta: { hideBelow: 'lg' },
           sortingFn: (rowA, rowB) => {
             const ta = rowA.original.created_at
               ? new Date(rowA.original.created_at as string).getTime()
@@ -1103,6 +1164,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
           accessorKey: 'Invoices',
           size: APPLICATION_TABLE_COLUMN_SIZES.Invoices,
           enableSorting: false,
+          meta: { hideBelow: 'lg' },
           cell: ({ row }) => {
             const paymentStatus = getPaymentStatusFromInvoices(row.original.Invoices);
             return (
@@ -1128,61 +1190,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
         meta: {
           align: 'center',
         },
-        cell: ({ row }) => {
-          const enrollment = row.original;
-          const expired = isExpired(enrollment);
-          return (
-            <div>
-              {!expired && enrollment.status === 'APPLIED' && (
-                <GoDotFill className="inline" title={t('status.applied')} color="grey" size="1.5em" />
-              )}
-              {!expired && enrollment.status === 'INVITED' && (
-                <IoIosCheckmarkCircle className="inline" title={t('status.invited')} color="grey" size="1.5em" />
-              )}
-              {(enrollment.status === 'CONFIRMED' || enrollment.status === 'COMPLETED') && (
-                <IoIosCheckmarkCircle
-                  className="inline"
-                  title={t('status.invitation_confirmed')}
-                  color="lightgreen"
-                  size="1.5em"
-                />
-              )}
-              {enrollment.status === 'REGISTERED' && (
-                <IoIosCheckmarkCircle
-                  className="inline"
-                  title={t('status.registered')}
-                  color="lightgreen"
-                  size="1.5em"
-                />
-              )}
-              {enrollment.status === 'ABORTED' && (
-                <IoIosCheckmarkCircle title={t('status.aborted')} color="red" size="1.5em" className="inline" />
-              )}
-              {enrollment.status === 'REJECTED' && (
-                <IoIosCloseCircle title={t('status.rejected')} color="red" size="1.5em" className="inline" />
-              )}
-              {enrollment.status === 'CANCELLED' && (
-                <IoIosCloseCircle title={t('status.cancelled')} color="red" size="1.5em" className="inline" />
-              )}
-              {enrollment.status === 'WAITLIST' && (
-                <span
-                  className="inline-block max-w-full truncate text-[11px] font-semibold text-label-primary bg-bg-secondary px-1.5 py-0.5 rounded border border-border-primary"
-                  title={t('status.waitlist')}
-                >
-                  {t('status.waitlist_badge')}
-                </span>
-              )}
-              {(enrollment.status === 'EXPIRED' || (expired && enrollment.status === 'INVITED')) && (
-                <IoIosCloseCircle
-                  className="inline"
-                  title={t('status.invitation_expired')}
-                  color="grey"
-                  size="1.5em"
-                />
-              )}
-            </div>
-          );
-        },
+        cell: ({ row }) => renderStatusIcon(row.original, t),
       });
 
       return baseColumns;
@@ -1192,22 +1200,6 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
 
   // Expandable row component
   const ExpandableApplicationRow = ({ row: enrollment }: { row: ApplicationEnrollment }) => {
-    const setUnrated = useCallback(() => {
-      setEnrollmentRating(enrollment, MotivationRating_enum.UNRATED);
-    }, [enrollment]);
-
-    const setInvite = useCallback(() => {
-      setEnrollmentRating(enrollment, MotivationRating_enum.INVITE);
-    }, [enrollment]);
-
-    const setReview = useCallback(() => {
-      setEnrollmentRating(enrollment, MotivationRating_enum.REVIEW);
-    }, [enrollment]);
-
-    const setDecline = useCallback(() => {
-      setEnrollmentRating(enrollment, MotivationRating_enum.DECLINE);
-    }, [enrollment]);
-
     // Access Organization from the User object
     const orgName = enrollment.User.Organization?.name;
     
@@ -1216,21 +1208,25 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
     const hasFormbricksSurvey = !!effectiveSurveyUrl;
 
     return (
-      <div className="pt-5 pb-5 text-label-primary">
-        <div className="flex items-start gap-3 pl-3">
-          {/* Email and Application History — width matches firstName + gap + lastName (see APPLICATION_TABLE_COLUMN_SIZES) */}
-          <div style={{ width: expandableRowWidths.emailWidth, flexShrink: 0 }}>
-            <div className="mb-4">
+      <div className="w-full p-4 md:p-5 text-label-primary">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)] lg:grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)_auto]">
+          {/* Email, organization (its column is hidden below xl) and application history */}
+          <div className="min-w-0 space-y-4">
+            <div>
               <div className="text-sm font-medium text-label-primary mb-1">{t('email')}</div>
-              <div className="text-label-primary break-words font-medium pl-4" title={enrollment.User.email}>
+              <div className="text-label-primary break-words font-medium md:pl-4" title={enrollment.User.email}>
                 {enrollment.User.email}
               </div>
+            </div>
+            <div className="xl:hidden">
+              <div className="text-sm font-medium text-label-primary mb-1">{t('organization')}</div>
+              <div className="text-label-primary break-words md:pl-4">{orgName || '-'}</div>
             </div>
             <div>
               <div className="text-sm font-medium text-label-primary mb-2">{t('application_history.label')}</div>
               <div className="space-y-1">
                 {enrollment.User.CourseEnrollments.length > 0 && enrollment.User.CourseEnrollments.filter(e => e.courseId !== enrollment.courseId).length === 0 ? (
-                  <div className="text-sm text-label-secondary italic pl-4">{t('no_applications_present')}</div>
+                  <div className="text-sm text-label-secondary italic md:pl-4">{t('no_applications_present')}</div>
                 ) : (
                   enrollment.User.CourseEnrollments.map((pastEnrollment, index) => {
                     if (pastEnrollment.courseId === enrollment.courseId) {
@@ -1246,7 +1242,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
                     return (
                       <div
                         key={index}
-                        className="text-sm text-gray-900 whitespace-normal break-words pl-4"
+                        className="text-sm text-gray-900 whitespace-normal break-words md:pl-4"
                       >
                         {pastEnrollment.Course?.title} ({pastEnrollment.Course?.Program.shortTitle}{ectsInfo})
                         {orgName ? ` - ${orgName}` : ''} - {tCommon(pastEnrollment.status)}
@@ -1258,9 +1254,8 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
             </div>
           </div>
 
-          {/* Application Content — spans org (+ created_at when application process) columns; width from APPLICATION_TABLE_COLUMN_SIZES */}
           {features.hasQuestionnaire && (
-            <div style={{ width: expandableRowWidths.questionnaireWidth, flexShrink: 0 }}>
+            <div className="min-w-0">
               <div className="mb-4">
                 {hasFormbricksSurvey ? (
                   <FormbricksResponsesDisplay
@@ -1272,7 +1267,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
                 ) : (
                   <>
                     <div className="text-sm font-medium text-label-primary mb-1">{t('application')}</div>
-                    <div className="text-label-primary whitespace-pre-wrap break-words pl-4">
+                    <div className="text-label-primary whitespace-pre-wrap break-words md:pl-4">
                       {enrollment.motivationLetter || '-'}
                     </div>
                   </>
@@ -1281,9 +1276,9 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
             </div>
           )}
 
-          {/* Rating Controls — width matches motivationRating column */}
+          {/* Rating controls: large labelled buttons, so they are easy to hit on phones */}
           {features.hasApplicationProcess && (
-            <div style={{ width: expandableRowWidths.ratingWidth, flexShrink: 0 }}>
+            <div>
               <div className="mb-4">
                 <div className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-1">
                   {t('evaluation')}
@@ -1291,55 +1286,28 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
                     <HelpOutline style={{ cursor: 'pointer', color: theme.palette.text.disabled }} />
                   </Tooltip>
                 </div>
-                <div className="flex gap-2 pl-4">
-                  <button
-                    onClick={setUnrated}
-                    className="cursor-pointer hover:opacity-80 hover:scale-110 transition-all duration-200 p-1 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300"
-                    title={t('rating.not_rated')}
-                    aria-label={t('rating.not_rated')}
-                  >
-                    <Dot
-                      color="grey"
-                      size={enrollment.motivationRating === 'UNRATED' ? 'LARGE' : 'DEFAULT'}
-                      className="block"
-                    />
-                  </button>
-                  <button
-                    onClick={setInvite}
-                    className="cursor-pointer hover:opacity-80 hover:scale-110 transition-all duration-200 p-1 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300"
-                    title={t('rating.invite')}
-                    aria-label={t('rating.invite')}
-                  >
-                    <Dot
-                      color="lightgreen"
-                      size={enrollment.motivationRating === 'INVITE' ? 'LARGE' : 'DEFAULT'}
-                      className="block"
-                    />
-                  </button>
-                  <button
-                    onClick={setReview}
-                    className="cursor-pointer hover:opacity-80 hover:scale-110 transition-all duration-200 p-1 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300"
-                    title={t('rating.unclear')}
-                    aria-label={t('rating.unclear')}
-                  >
-                    <Dot
-                      color="orange"
-                      size={enrollment.motivationRating === 'REVIEW' ? 'LARGE' : 'DEFAULT'}
-                      className="block"
-                    />
-                  </button>
-                  <button
-                    onClick={setDecline}
-                    className="cursor-pointer hover:opacity-80 hover:scale-110 transition-all duration-200 p-1 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300"
-                    title={t('rating.reject')}
-                    aria-label={t('rating.reject')}
-                  >
-                    <Dot
-                      color="red"
-                      size={enrollment.motivationRating === 'DECLINE' ? 'LARGE' : 'DEFAULT'}
-                      className="block"
-                    />
-                  </button>
+                <div className="grid grid-cols-4 gap-2 md:flex">
+                  {RATING_OPTIONS.map((option) => {
+                    const isActive = enrollment.motivationRating === option.value;
+                    return (
+                      <button
+                        key={option.value}
+                        type="button"
+                        onClick={() => setEnrollmentRating(enrollment, option.value)}
+                        aria-pressed={isActive}
+                        className={`flex min-h-11 flex-col items-center justify-center rounded-lg px-1 py-1 text-[11px] leading-tight text-center transition-colors ${
+                          isActive
+                            ? 'font-semibold border-2 border-label-primary'
+                            : 'border-2 border-transparent bg-bg-secondary hover:opacity-80'
+                        }`}
+                      >
+                        <span className="text-[10px]">
+                          <Dot color={option.color} className="block" />
+                        </span>
+                        {t(option.labelKey)}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
@@ -1360,6 +1328,45 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
       </div>
     );
   };
+
+  // Phones: one card per enrollment, with the rating and status spelled out instead of a legend.
+  const renderMobileRow = useCallback(
+    (enrollment: ApplicationEnrollment) => {
+      const orgName = enrollment.User.Organization?.name;
+      const rating = RATING_OPTIONS.find((option) => option.value === enrollment.motivationRating);
+      return (
+        <div className="flex flex-col gap-1">
+          <div className="font-semibold">
+            {enrollment.User.firstName} {enrollment.User.lastName}
+          </div>
+          {orgName && <div className="truncate text-xs text-label-secondary">{orgName}</div>}
+          <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 pt-1 text-xs text-label-secondary">
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+              {features.hasApplicationProcess && enrollment.created_at && (
+                <span className="tabular-nums">{displayDate(enrollment.created_at)}</span>
+              )}
+              {features.hasApplicationProcess && rating && (
+                <span className="flex items-center gap-1">
+                  <span className="text-[10px]">
+                    <Dot color={rating.color} className="block" />
+                  </span>
+                  {t(rating.labelKey)}
+                </span>
+              )}
+              {features.hasPayment && (
+                <span>{t(`payment_status_values.${getPaymentStatusFromInvoices(enrollment.Invoices)}`)}</span>
+              )}
+            </div>
+            <span className="inline-flex items-center gap-1 rounded-full bg-bg-secondary px-2 py-0.5 font-semibold">
+              {renderStatusIcon(enrollment, t, '1.2em')}
+              {t(statusLabelKey(enrollment))}
+            </span>
+          </div>
+        </div>
+      );
+    },
+    [features, displayDate, t]
+  );
 
   const handlePageSizeChange = useCallback((newSize: number) => {
     setPageSize(newSize);
@@ -1411,6 +1418,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
             loading={loading}
             error={error}
             expandableRowComponent={ExpandableApplicationRow}
+            renderMobileRow={renderMobileRow}
             bulkActions={bulkActions}
             onBulkAction={handleBulkEmailAction}
             enablePagination={true}
@@ -1432,7 +1440,8 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
         </OnlyInstructor>
 
         {courseEnrollments.length > 0 && features.hasApplicationProcess && (
-          <div className="-mt-8 mb-3">{infoDots}</div>
+          // Mobile cards name the rating next to its dot, so the legend is only needed for the table.
+          <div className="hidden md:block -mt-8 mb-3">{infoDots}</div>
         )}
       </div>
 
