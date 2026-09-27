@@ -583,6 +583,11 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
       {
         id: 'type',
         header: t('projects.table.type'),
+        // Sorts by the name shown in the cell; projects without a type go last either way.
+        accessorFn: (project) =>
+          project.type ? tCourse(`projects.type_label.${project.type}` as never) : undefined,
+        enableSorting: true,
+        sortUndefined: 'last',
         meta: { className: 'max-w-[14rem]' },
         cell: ({ row }) => renderType(row.original),
       },
@@ -592,7 +597,7 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
         cell: ({ row }) => renderProjectAction(row.original),
       },
     ],
-    [renderAuthors, renderProjectAction, renderTitle, renderType, t]
+    [renderAuthors, renderProjectAction, renderTitle, renderType, t, tCourse]
   );
 
   const renderMobileRow = useCallback(
