@@ -235,7 +235,8 @@ export const useBulkActions = <T extends BaseRow>(
 
   const toggleAllRows = useCallback((data: T[]) => {
     setSelectedRowIds(prev => {
-      if (prev.size === data.length) {
+      // Compare by row id, not count: a new page of the same size is not "all selected".
+      if (data.length > 0 && data.every(row => prev.has(row.id))) {
         return new Set();
       } else {
         return new Set(data.map(row => row.id));
@@ -285,11 +286,12 @@ export const useBulkActions = <T extends BaseRow>(
   }, []);
 
   const isAllSelected = useMemo(() => (data: T[]) => {
-    return data.length > 0 && selectedRowIds.size === data.length;
+    return data.length > 0 && data.every(row => selectedRowIds.has(row.id));
   }, [selectedRowIds]);
 
   const isSomeSelected = useMemo(() => (data: T[]) => {
-    return selectedRowIds.size > 0 && selectedRowIds.size < data.length;
+    const selectedCount = data.filter(row => selectedRowIds.has(row.id)).length;
+    return selectedCount > 0 && selectedCount < data.length;
   }, [selectedRowIds]);
 
   return {
