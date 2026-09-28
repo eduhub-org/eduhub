@@ -18,29 +18,16 @@ const fullDetails = {
   tax_ids: [{ type: 'eu_vat', value: 'de 123 456 789' }],
 };
 
-const makeClient = (organization: Record<string, unknown> | null) => {
-  const calls: Array<{ query: string; variables: Record<string, unknown> }> = [];
-  const request = jest.fn(async (query: unknown, variables: Record<string, unknown>) => {
-    const text = String((query as { loc?: { source: { body: string } } })?.loc?.source.body ?? query);
-    calls.push({ query: text, variables });
-    if (text.includes('GetOrganizationBillingForWebhook')) return { Organization_by_pk: organization };
-    return {};
-  });
-  const updates = () =>
-    calls.filter((call) => call.query.includes('FillOrganizationBillingFromCheckout')).map((call) => call.variables);
-  return { client: { request } as unknown as GraphQLClient, calls, updates };
+const makeClient = () => {
+  const request = jest.fn<Promise<unknown>, [unknown, Record<string, unknown>]>(async () => ({
+    update_Organization_many: [],
+  }));
+  const updates = () => request.mock.calls.map(([, variables]) => variables.updates);
+  return { client: { request } as unknown as GraphQLClient, request, updates };
 };
 
-const emptyOrganization = {
-  id: 3,
-  legalName: null,
-  addressLine1: null,
-  addressLine2: null,
-  postalCode: null,
-  city: null,
-  country: null,
-  vatId: null,
-};
+const isEmpty = (field: string) => ({ _or: [{ [field]: { _is_null: true } }, { [field]: { _eq: '' } }] });
+const byId = { id: { _eq: 3 } };
 
 describe('billingFromCheckout', () => {
   it('maps and normalizes the collected details, dropping empty values', () => {
@@ -64,62 +51,51 @@ describe('billingFromCheckout', () => {
 });
 
 describe('fillOrganizationBillingFromCheckout', () => {
-  it('fills an organization without billing data', async () => {
-    const { client, updates } = makeClient(emptyOrganization);
+  it('writes each field only where it is still empty, in one request', async () => {
+    const { client, updates } = makeClient();
 
     await fillOrganizationBillingFromCheckout(client, 3, fullDetails);
 
     expect(updates()).toEqual([
-      {
-        id: 3,
-        set: {
-          legalName: 'MPG&E Handel und Service GmbH',
-          vatId: 'DE123456789',
-          addressLine1: 'Musterstr. 1',
-          postalCode: '24103',
-          city: 'Kiel',
-          country: 'DE',
+      [
+        {
+          where: { _and: [byId, isEmpty('legalName')] },
+          _set: { legalName: 'MPG&E Handel und Service GmbH' },
         },
-      },
+        { where: { _and: [byId, isEmpty('vatId')] }, _set: { vatId: 'DE123456789' } },
+        {
+          // The address only lands on an organization without any address.
+          where: {
+            _and: [
+              byId,
+              isEmpty('addressLine1'),
+              isEmpty('addressLine2'),
+              isEmpty('postalCode'),
+              isEmpty('city'),
+              isEmpty('country'),
+            ],
+          },
+          _set: { addressLine1: 'Musterstr. 1', postalCode: '24103', city: 'Kiel', country: 'DE' },
+        },
+      ],
     ]);
   });
 
-  it('never overwrites what the organization already has, and keeps its address whole', async () => {
-    const { client, updates } = makeClient({
-      ...emptyOrganization,
-      legalName: 'MPG&E GmbH',
-      addressLine1: 'Alte Str. 5',
-    });
-
-    await fillOrganizationBillingFromCheckout(client, 3, fullDetails);
-
-    expect(updates()).toEqual([{ id: 3, set: { vatId: 'DE123456789' } }]);
-  });
-
   it('does not save a partial address a card payment collected', async () => {
-    const { client, calls } = makeClient(emptyOrganization);
+    const { client, request } = makeClient();
 
     await fillOrganizationBillingFromCheckout(client, 3, {
       address: { line1: null, line2: null, postal_code: '24103', city: null, country: 'DE', state: null },
     });
 
-    expect(calls).toEqual([]);
+    expect(request).not.toHaveBeenCalled();
   });
 
-  it('writes nothing when there is nothing new', async () => {
-    const { client, updates } = makeClient({
-      id: 3,
-      legalName: 'MPG&E Handel und Service GmbH',
-      addressLine1: 'Musterstr. 1',
-      addressLine2: null,
-      postalCode: '24103',
-      city: 'Kiel',
-      country: 'DE',
-      vatId: 'DE123456789',
-    });
+  it('sends nothing when Checkout collected nothing', async () => {
+    const { client, request } = makeClient();
 
-    await fillOrganizationBillingFromCheckout(client, 3, fullDetails);
+    await fillOrganizationBillingFromCheckout(client, 3, null);
 
-    expect(updates()).toEqual([]);
+    expect(request).not.toHaveBeenCalled();
   });
 });

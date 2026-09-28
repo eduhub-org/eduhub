@@ -5,7 +5,6 @@ import {
   buildInvoiceCreation,
   buildJobPostingPaymentDescription,
   buildPaymentMethodConfig,
-  buildServicePeriodField,
   getOrCreateCustomer,
   getOrCreateTaxRate,
 } from '../lib/stripeTax.js';
@@ -887,11 +886,11 @@ export default async function publishJobPosting(req, logger) {
       // checkout.session.async_payment_* events.
       ...buildPaymentMethodConfig(customerId),
       // Stripe issues a real, sequentially numbered invoice (§14 UStG).
-      // The webhook publishes on payment, so the runtime starts about now.
+      // The webhook publishes when the session completes, which is also when
+      // Stripe dates the invoice; dates fixed now would be off by however
+      // long the employer takes to pay, and the field cannot change later.
       invoice_creation: buildInvoiceCreation(sellerOrganization, {
-        customFields: [
-          buildServicePeriodField(new Date(), new Date(Date.now() + durationDays * 24 * 60 * 60 * 1000)),
-        ],
+        customFields: [{ name: 'Leistungszeitraum', value: `${durationDays} Tage ab Rechnungsdatum` }],
         metadata: {
           jobPostingId: String(posting.id),
           organizationId: String(posting.organizationId),

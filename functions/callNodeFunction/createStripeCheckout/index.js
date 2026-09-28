@@ -83,7 +83,8 @@ const GET_ENROLLMENT_ADDONS = `
  * Builds success and cancel URLs server-side from FRONTEND_URL for security.
  * Reads addons from CourseEnrollmentAddon table using enrollmentId.
  * 
- * @param {Object} req - Request object containing body with courseId, enrollmentId, formbricksResponseId, userEmail
+ * @param {Object} req - Request object containing body with courseId, enrollmentId, formbricksResponseId
+ *   (a userEmail in the input is ignored; the enrolled user's email is used)
  * @param {Object} logger - Winston logger instance
  * @returns {Object} Checkout session URL
  */
@@ -97,7 +98,6 @@ export default async function createStripeCheckout(req, logger) {
       courseId,
       enrollmentId,
       formbricksResponseId,
-      userEmail
     } = req.body.input || req.body;
 
     if (!courseId) {
@@ -170,7 +170,10 @@ export default async function createStripeCheckout(req, logger) {
     }
 
     // Fetch enrollment once to verify ownership and get user email if needed.
-    let emailToUse = userEmail;
+    // The Stripe customer is always the enrolled user's: a client-supplied
+    // userEmail would select (and let Checkout update) someone else's
+    // customer record, so it is deliberately ignored.
+    let emailToUse = null;
     try {
       const enrollmentData = await client.request(GET_ENROLLMENT_USER, { enrollmentId });
       const enrollment = enrollmentData.CourseEnrollment_by_pk;
@@ -198,9 +201,7 @@ export default async function createStripeCheckout(req, logger) {
         };
       }
 
-      if ((!emailToUse || emailToUse.trim() === '') && enrollment?.User?.email) {
-        emailToUse = enrollment.User.email;
-      }
+      emailToUse = enrollment?.User?.email || null;
     } catch (error) {
       logger.warn('Could not verify enrollment ownership', { error: error.message });
       return {

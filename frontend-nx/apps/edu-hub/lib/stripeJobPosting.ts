@@ -484,31 +484,18 @@ export async function queueJobPostingConfirmation(
   return true;
 }
 
-const GET_ORGANIZATION_BILLING = gql`
-  query GetOrganizationBillingForWebhook($id: Int!) {
-    Organization_by_pk(id: $id) {
-      id
-      legalName
-      addressLine1
-      addressLine2
-      postalCode
-      city
-      country
-      vatId
-    }
-  }
-`;
-
-const UPDATE_ORGANIZATION_BILLING = gql`
-  mutation FillOrganizationBillingFromCheckout($id: Int!, $set: Organization_set_input!) {
-    update_Organization_by_pk(pk_columns: { id: $id }, _set: $set) {
-      id
+// One request, one transaction: each update carries its own "still empty"
+// condition, so a value written after this webhook read nothing is never
+// overwritten, whether by a settings admin or by a concurrent delivery.
+const FILL_ORGANIZATION_BILLING = gql`
+  mutation FillOrganizationBillingFromCheckout($updates: [Organization_updates!]!) {
+    update_Organization_many(updates: $updates) {
+      affected_rows
     }
   }
 `;
 
 type BillingField = 'legalName' | 'addressLine1' | 'addressLine2' | 'postalCode' | 'city' | 'country' | 'vatId';
-type OrganizationBilling = { id: number } & Partial<Record<BillingField, string | null>>;
 
 /** The subset of Checkout's customer_details the billing data comes from. */
 type CheckoutCustomerDetails = {
@@ -544,13 +531,22 @@ export function billingFromCheckout(details: CheckoutCustomerDetails): Partial<R
   >;
 }
 
+const isEmpty = (field: BillingField) => ({
+  _or: [{ [field]: { _is_null: true } }, { [field]: { _eq: '' } }],
+});
+
+const ADDRESS_FIELDS: BillingField[] = ['addressLine1', 'addressLine2', 'postalCode', 'city', 'country'];
+
 /**
  * Saves the billing address entered in Checkout on the employer
  * organization, so the next order (and the "Kauf auf Rechnung" form) is
  * prefilled. Mirrors fillOrganizationBilling in publishJobPosting: only
  * columns that are still empty are written, so data a settings admin
- * maintains is never overwritten. An address is only taken as a whole,
- * because card payments may collect just country and postal code.
+ * maintains is never overwritten. The address is written as a whole and
+ * only onto an organization without any address, because mixing its
+ * street with Checkout's city would produce an address nobody entered;
+ * a partial one (card payments may collect just country and postal code)
+ * is ignored.
  */
 export async function fillOrganizationBillingFromCheckout(
   client: GraphQLClient,
@@ -558,37 +554,25 @@ export async function fillOrganizationBillingFromCheckout(
   details: CheckoutCustomerDetails
 ): Promise<void> {
   const billing = billingFromCheckout(details);
-  const hasFullAddress = Boolean(billing.addressLine1 && billing.postalCode && billing.city && billing.country);
-  if (!hasFullAddress && !billing.vatId && !billing.legalName) {
-    return;
-  }
+  const byId = { id: { _eq: organizationId } };
+  const updates: Array<{ where: Record<string, unknown>; _set: Partial<Record<BillingField, string>> }> = [];
 
-  const { Organization_by_pk: organization } = await client.request<{
-    Organization_by_pk: OrganizationBilling | null;
-  }>(GET_ORGANIZATION_BILLING, { id: organizationId });
-  if (!organization) {
-    return;
-  }
-
-  // An address already on the organization wins as a whole: mixing its
-  // street with Checkout's city would produce an address nobody entered.
-  const addressFields: BillingField[] = ['addressLine1', 'addressLine2', 'postalCode', 'city', 'country'];
-  const hasAddress = addressFields.some((field) => organization[field]);
-  const candidates: BillingField[] = [
-    'legalName',
-    'vatId',
-    ...(hasFullAddress && !hasAddress ? addressFields : []),
-  ];
-
-  const set: Partial<Record<BillingField, string>> = {};
-  for (const field of candidates) {
+  for (const field of ['legalName', 'vatId'] as const) {
     const value = billing[field];
-    if (value && !organization[field]) {
-      set[field] = value;
+    if (value) {
+      updates.push({ where: { _and: [byId, isEmpty(field)] }, _set: { [field]: value } });
     }
   }
-  if (Object.keys(set).length > 0) {
-    await client.request(UPDATE_ORGANIZATION_BILLING, { id: organizationId, set });
+  if (billing.addressLine1 && billing.postalCode && billing.city && billing.country) {
+    const address: Partial<Record<BillingField, string>> = {};
+    for (const field of ADDRESS_FIELDS) {
+      if (billing[field]) address[field] = billing[field];
+    }
+    updates.push({ where: { _and: [byId, ...ADDRESS_FIELDS.map(isEmpty)] }, _set: address });
+  }
+
+  if (updates.length > 0) {
+    await client.request(FILL_ORGANIZATION_BILLING, { updates });
   }
 }
 
