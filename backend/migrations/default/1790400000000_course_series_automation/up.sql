@@ -1,8 +1,8 @@
 -- Keep Course.courseSeriesId meaningful after the one-off backfill
 -- (1780600000006): a series exists only for a course that actually recurs.
--- When a course is published it joins the series of an earlier run with the
--- same title in the same organization; if that earlier run has no series yet,
--- a series is created for both. A course without an earlier run keeps no series
+-- When a course is published it joins the series of another run with the
+-- same title in the same organization; if that run has no series yet, a series
+-- is created for both. A course without another run keeps no series
 -- (it has no past projects to show). Admins/org admins group runs with differing
 -- titles by hand in Manage Courses; copied courses carry their source's series.
 
@@ -20,7 +20,8 @@ RETURNS boolean AS $$
 $$ LANGUAGE sql IMMUTABLE;
 
 -- Returns the series a course with this title joins within the program's
--- organization, or NULL when it has no earlier run. In order of preference:
+-- organization, or NULL when it has no other run. The runs of a course form a
+-- set, so the id order of the courses doesn't matter. In order of preference:
 -- the series of the latest other course with that title (so a manually regrouped
 -- series keeps attracting new runs); a series with that title; or, if another
 -- course with that title has no series yet, a new series that this function
