@@ -114,6 +114,9 @@ EduHub integrates with [Stripe](https://stripe.com) to handle course enrollment 
      - `checkout.session.async_payment_failed`
      - `payment_intent.payment_failed`
      - `invoice.finalized`
+     - `invoice.paid`
+     - `invoice.overdue`
+     - `invoice.voided`
    - Click **Add endpoint**
 
    > **`invoice.finalized` is required for StuJo job postings.** Their
@@ -122,6 +125,18 @@ EduHub integrates with [Stripe](https://stripe.com) to handle course enrollment 
    > yet at `checkout.session.completed`. Without this event the mail falls
    > through to the `send_pending_job_posting_mails` cron sweep and arrives up to
    > ~30 minutes late. Nothing fails loudly if you forget it, so check it here.
+
+   > **`invoice.paid`, `invoice.overdue` and `invoice.voided` drive StuJo
+   > "Kauf auf Rechnung".** Organizations an admin approved
+   > (`Organization.allowInvoicePayment`, toggled on the job board settings page)
+   > get a Stripe invoice paid by EU bank transfer instead of Checkout. Stripe
+   > assigns each customer a virtual IBAN and matches incoming transfers itself;
+   > `invoice.paid` then flips our `Invoice` row to `PAID`, `invoice.overdue`
+   > marks it `OVERDUE` and notifies `STUJO_ADMIN_EMAIL`. Without these events
+   > the row stays `ISSUED` although the money arrived. This also requires
+   > **Settings → Payment methods → Bank transfers** to be activated on the
+   > account (sandbox and live); otherwise issuing the invoice fails with
+   > `INVOICE_PAYMENT_FAILED`.
 
 2. **Get Webhook Signing Secret**:
    - Click on your newly created webhook endpoint
@@ -149,6 +164,9 @@ EduHub integrates with [Stripe](https://stripe.com) to handle course enrollment 
      - `checkout.session.async_payment_failed`
      - `payment_intent.payment_failed`
      - `invoice.finalized`
+     - `invoice.paid`
+     - `invoice.overdue`
+     - `invoice.voided`
    - Click **Add endpoint**
 
 3. **Get Live Webhook Signing Secret**:

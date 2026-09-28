@@ -80,6 +80,14 @@ export interface CourseParticipations_Course_by_pk_Sessions {
    * The title of the session
    */
   title: string;
+  /**
+   * If false, attendance is tracked but does not count toward passing (maxMissedSessions) or certificates
+   */
+  isMandatory: boolean;
+  /**
+   * Set for program-wide sessions (courseId is then NULL); shown in every course of the program
+   */
+  programId: number | null;
 }
 
 export interface CourseParticipations_Course_by_pk_ProjectCourses_Project_ProjectAuthors {
@@ -111,6 +119,44 @@ export interface CourseParticipations_Course_by_pk_ProjectCourses {
   Project: CourseParticipations_Course_by_pk_ProjectCourses_Project;
 }
 
+export interface CourseParticipations_Course_by_pk_Program_Sessions {
+  __typename: "Session";
+  id: number;
+  /**
+   * The day and time of the start of the session
+   */
+  startDateTime: any;
+  /**
+   * The day and time of the end of the session
+   */
+  endDateTime: any;
+  /**
+   * The title of the session
+   */
+  title: string;
+  /**
+   * If false, attendance is tracked but does not count toward passing (maxMissedSessions) or certificates
+   */
+  isMandatory: boolean;
+  /**
+   * Set for program-wide sessions (courseId is then NULL); shown in every course of the program
+   */
+  programId: number | null;
+}
+
+export interface CourseParticipations_Course_by_pk_Program {
+  __typename: "Program";
+  id: number;
+  /**
+   * The title of the program
+   */
+  title: string;
+  /**
+   * An array relationship
+   */
+  Sessions: CourseParticipations_Course_by_pk_Program_Sessions[];
+}
+
 export interface CourseParticipations_Course_by_pk {
   __typename: "Course";
   /**
@@ -129,6 +175,10 @@ export interface CourseParticipations_Course_by_pk {
    * An array relationship
    */
   ProjectCourses: CourseParticipations_Course_by_pk_ProjectCourses[];
+  /**
+   * An object relationship
+   */
+  Program: CourseParticipations_Course_by_pk_Program;
   /**
    * The maximum number of sessions a participant can miss while still receiving a certificate
    */

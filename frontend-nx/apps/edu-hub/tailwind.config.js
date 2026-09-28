@@ -29,6 +29,7 @@ module.exports = {
           primary: 'var(--eduhub-label-primary)',
           secondary: 'var(--eduhub-label-secondary)',
           disabled: 'var(--eduhub-label-disabled)',
+          'cross-course': 'var(--eduhub-label-cross-course)',
         },
         border: {
           primary: 'var(--eduhub-border-primary)',
@@ -40,6 +41,11 @@ module.exports = {
           modal: 'var(--eduhub-bg-modal)',
           card: 'var(--eduhub-bg-card)',
           footer: 'var(--eduhub-bg-footer)',
+        },
+        table: {
+          divider: 'var(--eduhub-table-divider)',
+          expand: 'var(--eduhub-table-expand)',
+          'expand-hover': 'var(--eduhub-table-expand-hover)',
         },
         success: 'var(--eduhub-success)',
         warning: 'var(--eduhub-warning)',

@@ -1,9 +1,6 @@
-import { gql } from "@apollo/client";
+import { gql } from '@apollo/client';
 
-import {
-  ADMIN_PROGRAM_FRAGMENT,
-  PROGRAM_FRAGMENT_MINIMUM_PROPERTIES,
-} from "./programFragment";
+import { ADMIN_PROGRAM_FRAGMENT, PROGRAM_FRAGMENT_MINIMUM_PROPERTIES } from './programFragment';
 
 export const PROGRAM_LIST = gql`
   ${ADMIN_PROGRAM_FRAGMENT}
@@ -40,7 +37,14 @@ export const PROGRAM_STATISTICS = gql`
             userId
           }
         }
-        CourseEnrollments {
+        # Preview enrollments are excluded above, but their attendances are not:
+        # Sessions.Attendances is a separate relation and Hasura cannot correlate
+        # a nested filter back to this course. So name the preview holders here
+        # and let AttendanceStatistics drop their rows.
+        PreviewEnrollments: CourseEnrollments(where: { isTest: { _eq: true } }) {
+          userId
+        }
+        CourseEnrollments(where: { isTest: { _eq: false } }) {
           id
           status
           attendanceCertificateURL
@@ -52,7 +56,6 @@ export const PROGRAM_STATISTICS = gql`
     }
   }
 `;
-
 
 // organizationId/Organization are selected outside the shared fragment: only the management
 // dashboards need them, to group the programs of a super-admin (who sees every organization) by

@@ -1,6 +1,5 @@
 import { FC, useCallback, useMemo, useState, ReactElement } from 'react';
-import { MdAddCircle } from 'react-icons/md';
-import { Card } from './Card';
+import { MdAdd, MdClose } from 'react-icons/md';
 
 interface ManagedItemListProps<T, TSelected> {
   readonly title: string;
@@ -111,35 +110,41 @@ function ManagedItemList<T, TSelected>({
 
   return (
     <>
-      <Card title={title}>
+      <section>
+        <h4 className="mb-3 text-[11px] font-bold uppercase tracking-wider text-label-secondary">{title}</h4>
         <div className="space-y-2">
           {items.map((item) => {
             const { label, sublabel } = renderItem(item);
             return (
-              <div key={getItemKey(item)} className="flex items-center justify-between bg-fill-disabled p-2 rounded">
-                <div className="flex-1">
-                  <div className="font-medium text-label-primary">{label}</div>
-                  {sublabel && <div className="text-sm text-label-secondary mt-1">{sublabel}</div>}
+              <div
+                key={getItemKey(item)}
+                className="flex items-center justify-between gap-2 rounded-md border border-border-primary bg-fill-primary px-3 py-2"
+              >
+                <div className="flex-1 min-w-0">
+                  <div className="font-semibold text-label-primary truncate">{label}</div>
+                  {sublabel && <div className="text-xs text-label-secondary truncate">{sublabel}</div>}
                 </div>
                 <button
+                  type="button"
                   onClick={() => handleDelete(item)}
-                  className="text-error hover:opacity-80 p-1 transition-opacity"
+                  className="p-1 text-label-secondary hover:text-error transition-colors"
                   aria-label={removeAriaLabel}
                 >
-                  ×
+                  <MdClose aria-hidden />
                 </button>
               </div>
             );
           })}
           <button
+            type="button"
             onClick={openDialog}
-            className="flex items-center space-x-2 text-brand hover:opacity-90 p-2 w-full rounded hover:bg-fill-disabled transition-colors"
+            className="inline-flex min-h-[36px] items-center gap-1.5 rounded-full border-[1.5px] border-label-primary px-3.5 py-1.5 text-sm font-semibold text-label-primary hover:bg-bg-secondary transition-colors"
           >
-            <MdAddCircle className="w-5 h-5" />
+            <MdAdd aria-hidden />
             <span>{addButtonLabel}</span>
           </button>
         </div>
-      </Card>
+      </section>
 
       {dialogOpen && (
         <SelectionDialog

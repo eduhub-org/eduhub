@@ -161,13 +161,15 @@ export async function getOrCreateCustomer(stripe, email, name = null) {
  * SEPA settles asynchronously — webhook consumers must handle
  * checkout.session.async_payment_succeeded / _failed.
  *
- * EU bank transfer (customer_balance) was part of the 2026-07-10
- * agreement but is not offered: the capability needs additional
- * verification that the live account does not have, and Checkout
- * rejects the whole session when an unactivated type is listed. Adding
- * it back means one entry here plus its payment_method_options block
- * (funding_type 'bank_transfer', eu_bank_transfer country DE) and a
- * customer on the session. The longer-term direction is to stop
+ * EU bank transfer (customer_balance) is deliberately not offered in
+ * Checkout: Checkout rejects the whole session when an unactivated type is
+ * listed. StuJo employers who need to pay by transfer use "Kauf auf
+ * Rechnung" instead (publishJobPosting/invoicePayment.js), which issues a
+ * Stripe invoice with customer_balance and is limited to organizations an
+ * admin approved. Adding it here would mean one entry plus its
+ * payment_method_options block (funding_type 'bank_transfer',
+ * eu_bank_transfer country DE) and a customer on the session. The
+ * longer-term direction is to stop
  * hardcoding the list and pass a payment_method_configuration chosen
  * per course instead (issue #1889).
  *

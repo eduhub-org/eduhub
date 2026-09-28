@@ -35,6 +35,14 @@ export interface ProgramStatistics_Program_Courses_Sessions {
   Attendances: ProgramStatistics_Program_Courses_Sessions_Attendances[];
 }
 
+export interface ProgramStatistics_Program_Courses_PreviewEnrollments {
+  __typename: "CourseEnrollment";
+  /**
+   * The ID of the user that enrolled for the given course
+   */
+  userId: any;
+}
+
 export interface ProgramStatistics_Program_Courses_CourseEnrollments {
   __typename: "CourseEnrollment";
   id: number;
@@ -69,6 +77,10 @@ export interface ProgramStatistics_Program_Courses {
    * An array relationship
    */
   Sessions: ProgramStatistics_Program_Courses_Sessions[];
+  /**
+   * An array relationship
+   */
+  PreviewEnrollments: ProgramStatistics_Program_Courses_PreviewEnrollments[];
   /**
    * An array relationship
    */

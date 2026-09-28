@@ -7,5 +7,7 @@ declare module '@tanstack/table-core' {
     className?: string;
     /** When set, header and cell content are centered in the column (e.g. icon columns). */
     align?: 'center';
+    /** TableGrid leaves the column out below this breakpoint (lg = 1024px, xl = 1280px). */
+    hideBelow?: 'lg' | 'xl';
   }
 }

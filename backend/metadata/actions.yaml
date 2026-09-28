@@ -63,6 +63,35 @@ actions:
     permissions:
       - role: instructor_access
     comment: Creates Matrix program space and course room, then stores matrix ids in Hasura
+  - name: createTestEnrollment
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: name
+          value: manageTestEnrollment
+        - name: operation
+          value: create
+    permissions:
+      - role: instructor_access
+    comment: Creates a hidden preview enrollment (CourseEnrollment.isTest) for the caller on a course they instruct, so they can see the participant view of it
+  - name: removeTestEnrollment
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: name
+          value: manageTestEnrollment
+        - name: operation
+          value: remove
+    permissions:
+      - role: instructor_access
+      - role: user_access
+    comment: Removes the caller's own preview enrollment (also after they stopped instructing the course), together with anything it authored (project authorships, orphaned projects, attendances)
   - name: copyProjectFromTemplate
     definition:
       kind: synchronous
@@ -183,7 +212,7 @@ actions:
           value: publishJobPosting
     permissions:
       - role: user_access
-    comment: Publishes a StuJo job posting (free/credit) or creates the Stripe checkout session for it
+    comment: Publishes a StuJo job posting (free/credit/invoice) or creates the Stripe checkout session for it
   - name: saveJobPostingPdf
     definition:
       kind: synchronous
@@ -710,6 +739,7 @@ custom_types:
   input_objects:
     - name: AddonMappingInput
     - name: CourseInput
+    - name: JobPostingBillingInput
     - name: SelectedAddonInput
   objects:
     - name: NotifySessionParticipantsResult

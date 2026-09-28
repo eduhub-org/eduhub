@@ -34,6 +34,7 @@ import { AppSettings } from '../queries/__generated__/AppSettings';
 const Home: FC = () => {
   const t = useTranslations('startPage');
   const tCommon = useTranslations('common');
+  const tEventsFeed = useTranslations('eventsFeed');
   const locale = useLocale();
   const router = useRouter();
   const isLoggedIn = useIsLoggedIn();
@@ -218,6 +219,12 @@ const Home: FC = () => {
         <meta name="keywords" content={t('seo.keywords')} />
         <meta name="author" content="opencampus.sh" />
         <meta name="robots" content="index, follow" />
+        <link
+          rel="alternate"
+          type="application/rss+xml"
+          title={tEventsFeed('title')}
+          href={locale === 'en' ? '/en/events/rss.xml' : '/events/rss.xml'}
+        />
         <link rel="canonical" href="https://edu.opencampus.sh" />
         <link rel="icon" href="/favicon.png" />
         

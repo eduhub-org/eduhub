@@ -24,6 +24,8 @@
   --eduhub-label-primary: #F2F2F2;
   --eduhub-label-secondary: #D8D8D8;
   --eduhub-label-disabled: #888888;
+  /* Marks sessions shared by all courses of a program ("Kursübergreifend") */
+  --eduhub-label-cross-course: #8DB8F0;
   
   /* Border Colors */
   --eduhub-border-primary: #444444;
@@ -70,6 +72,12 @@
   --eduhub-status-invited: #FFA665;
   --eduhub-status-current: #A2EBA0;
   --eduhub-status-missed: #F2991D66;
+
+  /* TableGrid: row dividers on the white rows, and the grey expand strip that
+     closes each row. Same in both scopes, since rows are always light. */
+  --eduhub-table-divider: #C4C4C4;
+  --eduhub-table-expand: #E2E2E2;
+  --eduhub-table-expand-hover: #D0D0D0;
 }
 
 /* Light theme - for light background sections (current) or full light mode (future) */
@@ -83,6 +91,7 @@
   --eduhub-label-primary: #222222;
   --eduhub-label-secondary: #666666;
   --eduhub-label-disabled: #999999;
+  --eduhub-label-cross-course: #2F6DB5;
   
   /* Border Colors */
   --eduhub-border-primary: #D8D8D8;

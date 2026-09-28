@@ -154,9 +154,20 @@
       "bulk_action": "Bulk Action",
       "apply": "Apply",
       "none": "None",
-      "items_per_page": "Items per page"
+      "items_per_page": "Items per page",
+      "selected_count": "{count} selected",
+      "clear_selection": "Clear selection",
+      "expand_row": "Show details",
+      "collapse_row": "Hide details",
+      "open_row": "Open",
+      "select_all": "All",
+      "sort_by": "Sort by",
+      "sort_default": "Default order",
+      "sort_asc": "{column}, ascending",
+      "sort_desc": "{column}, descending"
     },
     "table_grid_delete_button": {
+      "delete": "Delete",
       "confirm_delete": "Confirm Deletion",
       "deletion_confirmation_question": "Are you sure you want to delete this entry?"
     },
@@ -374,12 +385,17 @@
       "agenda": "Agenda",
       "add_to_calendar": "Add to calendar",
       "location_not_available": "Location not available",
+      "optional": "optional",
+      "program_session": "Cross-course",
+      "program_session_tooltip": "Takes place for all courses of “{program}”",
+      "optional_hint": "All sessions are mandatory unless marked “optional”.",
       "untitled_session": "Agenda item",
       "add_to_calendar_short": "Calendar"
     },
     "attendances": {
       "attendances": "Attendances",
       "max_missed_sessions": "You may miss at most one session",
+      "max_missed_mandatory_sessions": "You may miss at most {count} of {total} mandatory sessions",
       "max_missed_sessions_plural": "You may miss at most {count} sessions",
       "attendance_status": {
         "ATTENDED": "Attended",
@@ -590,7 +606,9 @@
         "details_summary": "What will be published?",
         "description": "opencampus.sh (operated by the non-profit Campus Business Box e.V.) may publish this project as a showcase example on the platform and in promotional materials, and may enter it for participation or submission for prizes. What will be shared: project title, description, cover image, files and links, and the names and Element room links of the contributing authors. Consent is voluntary and can be granted or withdrawn at any time from your project view; withdrawing removes the project from publication.",
         "status_granted": "Consent granted by {name} on {date}.",
-        "status_withdrawn": "Consent withdrawn by {name} on {date} — the project will not be published."
+        "status_withdrawn": "Consent withdrawn by {name} on {date} — the project will not be published.",
+        "table_granted": "Publication approved",
+        "table_declined": "Publication declined"
       },
       "submit_dialog": {
         "title": "Submit project for review",
@@ -747,6 +765,17 @@
       "title": "Who's here",
       "message_on_element": "Message on Element",
       "and_more": "and {count} more"
+    },
+    "participant_preview": {
+      "notice": "Preview: you are seeing this page as a participant.",
+      "end": "End preview",
+      "errors": {
+        "TEST_ENROLLMENT_FAILED": "The preview could not be ended. Please try again later.",
+        "TEST_ENROLLMENT_UNAUTHORIZED": "Only instructors of this course can use the participant view.",
+        "TEST_ENROLLMENT_ALREADY_PARTICIPANT": "You are enrolled in this course for real, so there is no preview to end.",
+        "TEST_ENROLLMENT_COURSE_NOT_FOUND": "This course no longer exists.",
+        "TEST_ENROLLMENT_INVALID_INPUT": "The request was malformed."
+      }
     },
     "ParticipationExitButton": {
       "cancel_participation": "Cancel registration",
@@ -932,6 +961,10 @@
     "external_speakers": "External Speakers",
     "add_external_speaker": "Add External Speaker",
     "remove_external_speaker": "Remove External Speaker",
+    "mandatory": "Mandatory",
+    "program_session": "Cross-course",
+    "mandatory_last_session": "At least one session must stay mandatory.",
+    "mandatory_help": "Only mandatory sessions count toward the allowed absences and appear on the certificate. Attendance is still tracked.",
     "session_title": "Session Title",
     "confirmDeleteSession": "Do you really want to delete the session?",
     "cannotDeletePastSession": "You cannot delete a session that is in the past! If you really want to delete the session, please contact an administrator.",
@@ -1156,6 +1189,14 @@
       "label": "Course Group",
       "placeholder": "Select course groups",
       "slider_badge": "Homepage slider"
+    },
+    "course_series": {
+      "label": "Course series",
+      "placeholder": "Select or create a course series",
+      "help_text": "All runs of the same course belong to one course series. The course page shows projects from past runs of the series. When a course without a series is published, it is grouped automatically with earlier courses of the same title. One-off courses don't need a series.",
+      "none": "No course series",
+      "other_runs": "Other runs in this series:",
+      "no_other_runs": "No other runs in this series yet."
     },
     "cover_image": {
       "label": "Cover Image",
@@ -1383,6 +1424,7 @@
     "add_as_aborted": "add or change as aborted",
     "add_as_cancelled": "add or change as cancelled",
     "add_user_error": "Please select at least one user!",
+    "add_user_preview_conflict": "Not added because they have a participant preview open on this course: {names}. The preview has to be ended first.",
     "submit": "Submit",
     "application_history": {
       "label": "Previous Applications and Participations",
@@ -1710,6 +1752,8 @@
     "attendance_cert_not_issued": "No attendance certificate issued",
     "achievement_cert_issued": "Achievement certificate issued",
     "achievement_cert_not_issued": "No achievement certificate issued",
+    "attendance_program_session": "Cross-course",
+    "attendance_optional_session": "optional",
     "attendance_status_passed": "Attendance requirement met",
     "attendance_status_failed": "Attendance requirement not met",
     "attendance_status_uncertain": "Attendance status pending",
@@ -1838,6 +1882,14 @@
     "course_not_found": "Course {courseId} could not be found!",
     "add_session": "Add Session",
     "SessionsTab": {
+      "date_time": "Date & time",
+      "edit_date_time": "Change date and time",
+      "location": "Location",
+      "optional": "Optional",
+      "no_address": "No address",
+      "create_address": "Create address",
+      "schedule": "Session",
+      "program_session_locked": "Managed by the program admin",
       "sessionAddresses": {
         "online": {
           "label": "Online",
@@ -1874,6 +1926,7 @@
       "attendance_data": {
         "label": "Attendance data",
         "review_button": "Review attendance data",
+        "review_short": "View",
         "no_data": "No attendance data available",
         "dialog_title": "Attendance data"
       },
@@ -1979,7 +2032,26 @@
     "guest_registration": {
       "label": "Allow registration without an account",
       "help_text": "Lets people register with just a name and email address, without creating an account. The registration only becomes valid once confirmed by email. Only available for events with direct registration."
-    }
+    },
+    "participant_preview": {
+      "start": "View as participant",
+      "open": "Open participant view",
+      "end": "End preview",
+      "start_dialog_title": "Start the participant view",
+      "start_dialog_question": "This enrolls you in this course as a participant, so you see the course page exactly as your participants do. The enrollment is invisible: it appears in no participant list, no count, no statistic, no export and no email. Note that anything you really submit while previewing, such as a proposed project, is real and visible to participants until you end the preview.",
+      "end_dialog_title": "End the preview",
+      "end_dialog_question": "This removes your preview enrollment. Projects only you created while previewing, and your attendances in this course, are deleted with it.",
+      "errors": {
+        "TEST_ENROLLMENT_FAILED": "The preview could not be changed. Please try again later.",
+        "TEST_ENROLLMENT_UNAUTHORIZED": "Only instructors of this course can use the participant view.",
+        "TEST_ENROLLMENT_ALREADY_PARTICIPANT": "You are already enrolled in this course, so you already see the course page as a participant.",
+        "TEST_ENROLLMENT_COURSE_NOT_FOUND": "This course no longer exists.",
+        "TEST_ENROLLMENT_INVALID_INPUT": "The request was malformed."
+      }
+    },
+    "info_block_mobile_summary": "{title} · {count} characters",
+    "info_block_mobile_untitled": "Untitled",
+    "info_block_mobile_empty": "Empty"
   },
   "manageProjects": {
     "headline": "Projects",
@@ -2010,6 +2082,15 @@
     }
   },
   "managePrograms": {
+    "program_sessions": {
+      "title": "Program sessions",
+      "help_text": "These sessions appear in every course of the program. They are optional by default; mandatory ones count toward the allowed absences in each course.",
+      "add": "Add session",
+      "confirm_delete": "Do you really want to delete this program session? It disappears from all courses and recorded attendance is lost.",
+      "location": "Location",
+      "online_link_placeholder": "Link to the online session",
+      "location_address_placeholder": "Select an address"
+    },
     "headline": "Programs",
     "table_header": {
       "published": "Published",
@@ -3167,5 +3248,15 @@
   },
   "notifications": {
     "show_available_places_update_failed": "Could not change the display of available places"
+  },
+  "impersonation": {
+    "banner": "You are viewing EduHub as {name}. Read-only – no changes are possible.",
+    "exit": "Back to my account",
+    "action": "View as this user",
+    "start_failed": "Could not switch to this user's view."
+  },
+  "eventsFeed": {
+    "title": "EduHub Events | opencampus.sh",
+    "description": "Upcoming events at opencampus.sh"
   }
 }

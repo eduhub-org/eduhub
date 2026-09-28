@@ -10,6 +10,10 @@
 export interface UpdateSessionDescription_update_Session_by_pk {
   __typename: "Session";
   id: number;
+  /**
+   * A description of the session
+   */
+  description: string;
 }
 
 export interface UpdateSessionDescription {

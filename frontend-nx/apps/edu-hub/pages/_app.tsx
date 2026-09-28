@@ -17,7 +17,9 @@ import { enUS } from 'date-fns/locale/en-US';
 import { AppSettingsProvider } from '../contexts/AppSettingsContext';
 import { AuthErrorProvider } from '../contexts/AuthErrorContext';
 import { AuthStoreUpdater } from '../components/AuthStoreUpdater';
-import { useIsAdmin, useIsOrgAdmin, useIsSessionLoading } from '../hooks/authentication';
+import { ImpersonationProvider } from '../contexts/ImpersonationContext';
+import { ParticipantPreviewProvider } from '../contexts/ParticipantPreviewContext';
+import { useHasElevatedSessionRole, useIsSessionLoading } from '../hooks/authentication';
 
 // Import locale messages
 import deMessages from '../locales/de.json';
@@ -52,13 +54,16 @@ interface InitialProps {
 // context provided by the SessionProvider element in MyApp's own return
 // value, which isn't visible to hooks called in MyApp's own render.
 const PlausibleAnalytics: FC = () => {
-  const isAdmin = useIsAdmin();
-  const isOrgAdmin = useIsOrgAdmin();
+  // Deliberately the session's own roles rather than useIsAdmin/useIsOrgAdmin:
+  // those report false while the admin views the app as someone else, and by
+  // the very reason below, letting the tag in for an impersonation would leave
+  // it in the document afterwards too.
+  const hasElevatedRole = useHasElevatedSessionRole();
   const isSessionLoading = useIsSessionLoading();
   // Hold off rendering the script until the session resolves - next/script never
   // removes an already-inserted <script> tag on unmount, so mounting it first and
   // hiding it once the admin/org_admin role arrives would not stop it from firing.
-  const canLoadPlausible = !isSessionLoading && !isAdmin && !isOrgAdmin;
+  const canLoadPlausible = !isSessionLoading && !hasElevatedRole;
 
   if (!canLoadPlausible) {
     return null;
@@ -109,12 +114,17 @@ const MyApp: FC<AppProps & InitialProps> & {
   return (
     <NextIntlClientProvider locale={locale} messages={messages[locale]} timeZone="Europe/Berlin">
       <SessionProvider session={pageProps.session}>
+        {/* Above AuthStoreUpdater and everything else that asks "who am I":
+            while a super-admin impersonates someone, this provider is what all
+            of those answers come from. */}
+        <ImpersonationProvider>
         <AuthStoreUpdater />
         <ApolloProvider client={client}>
           <AppCacheProvider {...pageProps}>
             <ThemeProvider theme={theme}>
               <AuthErrorProvider>
                 <AppSettingsProvider>
+                <ParticipantPreviewProvider>
                   {/* Global Site Code Pixel - Facebook Pixel */}
                   <Script
                     id="fb-pixel"
@@ -144,11 +154,13 @@ const MyApp: FC<AppProps & InitialProps> & {
                     <meta name="viewport" content="initial-scale=1.0, width=device-width" />
                   </Head>
                   <Component {...pageProps} />
+                </ParticipantPreviewProvider>
                 </AppSettingsProvider>
               </AuthErrorProvider>
             </ThemeProvider>
           </AppCacheProvider>
         </ApolloProvider>
+        </ImpersonationProvider>
       </SessionProvider>
     </NextIntlClientProvider>
   );

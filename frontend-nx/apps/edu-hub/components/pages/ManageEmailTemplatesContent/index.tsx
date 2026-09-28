@@ -10,7 +10,6 @@ import { useRoleQuery } from '../../../hooks/authedQuery';
 import { PageBlock } from '../../common/PageBlock';
 import CommonPageHeader from '../../common/CommonPageHeader';
 import { useTableGrid } from '../../common/TableGrid/hooks';
-import { createMultiWordSearchCondition } from '../../common/TableGrid/utils';
 import { Button } from '../../common/Button';
 
 import {
@@ -86,7 +85,7 @@ const ManageEmailTemplatesContent: FC<ManageEmailTemplatesContentProps> = ({
   // Determine the courseId to filter by (default templates use NULL)
   const filterCourseId = courseId !== undefined ? courseId : null;
 
-  const { data, loading, error, searchFilter, setSearchFilter } = useTableGrid({
+  const { data, loading, initialLoading, error, searchFilter, setSearchFilter } = useTableGrid({
     queryHook: useRoleQuery,
     query: EMAIL_TEMPLATES_LIST,
     pageSize: 50, // Fixed page size since pagination is disabled
@@ -95,22 +94,25 @@ const ManageEmailTemplatesContent: FC<ManageEmailTemplatesContentProps> = ({
         ? { courseId: { _eq: filterCourseId } }
         : { courseId: { _is_null: true } },
     },
-    refetchFilter: (searchFilter: string) => {
-      const searchCondition = createMultiWordSearchCondition(searchFilter, ['type', 'subject']);
-      return {
-        filter: {
-          _and: [
-            filterCourseId !== null
-              ? { courseId: { _eq: filterCourseId } }
-              : { courseId: { _is_null: true } },
-            ...(Object.keys(searchCondition).length > 0 ? [searchCondition] : []),
-          ],
-        },
-      };
-    },
   });
 
   let emailTemplates: EmailTemplateRow[] = data?.MailTemplate || [];
+
+  // Searched in the browser: every template of the scope is loaded anyway, and people search for
+  // the translated template name they see. `type` is an enum, so the server cannot _ilike it.
+  const searchWords = searchFilter.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  if (searchWords.length > 0) {
+    emailTemplates = emailTemplates.filter((template) => {
+      const haystack = [
+        getTranslation(t, `template_types.${template.type}`, template.type),
+        template.type,
+        template.subject ?? '',
+      ]
+        .join(' ')
+        .toLowerCase();
+      return searchWords.every((word) => haystack.includes(word));
+    });
+  }
 
   // Filter by available template types if provided
   if (availableTemplateTypes && availableTemplateTypes.length > 0) {
@@ -218,7 +220,7 @@ const ManageEmailTemplatesContent: FC<ManageEmailTemplatesContentProps> = ({
     [inSettingsLayout]
   );
 
-  if (loading) return <Loading />;
+  if (initialLoading) return <Loading />;
 
   const content = (
     <>

@@ -539,6 +539,10 @@ const InputField: React.FC<InputFieldProps> = ({
     [debouncedUpdateText, type, min]
   );
 
+  // A pending edit is saved right away when the field goes away (dialog closed, row collapsed,
+  // page left) instead of being dropped with the debounce timer.
+  useEffect(() => () => debouncedUpdateText.flush(), [debouncedUpdateText]);
+
   const handleBlur = useCallback(() => {
     setHasBlurred(true);
     if (!validateInput(localText)) {

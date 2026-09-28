@@ -1,4 +1,4 @@
-import { FC, useCallback, useState } from 'react';
+import { FC, useCallback, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { MdCalendarMonth, MdCheck, MdIosShare } from 'react-icons/md';
 
@@ -10,6 +10,7 @@ import { CourseFacts } from './CourseFacts';
 import { Registration } from './Registration';
 import { ParticipationExitOutcome } from './Registration/participationExit';
 import { useCourseCalendarExport, useSessionAddressMap } from './sessionLocations';
+import { mergeSessions } from '../../../helpers/programSessions';
 
 interface RegistrationRailProps {
   course: Course_Course_by_pk;
@@ -49,7 +50,10 @@ export const RegistrationRail: FC<RegistrationRailProps> = ({
   const isInstructor = useIsInstructor();
   const [shareState, setShareState] = useState<'idle' | 'copied'>('idle');
 
-  const sessions = course.Sessions ?? [];
+  const sessions = useMemo(
+    () => mergeSessions(course.Sessions, course.Program?.Sessions),
+    [course.Sessions, course.Program?.Sessions]
+  );
   const addressMap = useSessionAddressMap(sessions);
   const handleExportICal = useCourseCalendarExport({
     sessions,

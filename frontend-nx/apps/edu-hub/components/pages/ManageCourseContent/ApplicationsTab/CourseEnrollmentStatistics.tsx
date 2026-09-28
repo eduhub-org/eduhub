@@ -3,6 +3,20 @@ import { useTranslations } from 'next-intl';
 import { ManagedCourseApplications_Course_by_pk } from '../../../../queries/__generated__/ManagedCourseApplications';
 import { getRegistrationFeatures } from './registrationConfig';
 
+/**
+ * One cell of the statistics strip: the number first, so a row of them scans quickly, and its label
+ * underneath. Phones show two per row (the labels are too long for three), an odd last cell
+ * filling the row; from md up every cell shares a single row.
+ */
+const StatCard: FC<{ label: string; value: number }> = ({ label, value }) => (
+  <div className="min-w-0 flex-1 basis-[40%] md:basis-0 bg-bg-card px-3 py-2 md:px-4">
+    <div className="text-lg md:text-xl font-semibold tabular-nums text-label-primary">{value}</div>
+    <div className="truncate text-xs text-label-secondary" title={label}>
+      {label}
+    </div>
+  </div>
+);
+
 interface Props {
   course: ManagedCourseApplications_Course_by_pk;
   hasCourseStarted: boolean;
@@ -25,64 +39,32 @@ export const CourseEnrollmentStatistics: FC<Props> = ({ course, hasCourseStarted
 
   return (
     <>
-      {/* Statistics Cards */}
+      {/* Statistics strip: one compact framed row; the 1px gaps over the border colour draw the
+          dividers between the cells. */}
       {applicationStats.totalApplications > 0 && (
-        <div className={`grid grid-cols-1 md:grid-cols-2 ${features.hasApplicationProcess ? 'lg:grid-cols-5' : 'lg:grid-cols-3'} gap-4 mb-6`}>
+        <div className="flex flex-wrap gap-px overflow-hidden rounded-lg border border-border-primary bg-border-primary mb-8">
           {features.hasApplicationProcess ? (
             <>
               {/* Approval-based Registration: Show application outcomes */}
-              <div className="bg-bg-secondary text-label-primary light p-4 rounded-lg">
-                <div className="text-label-secondary text-sm mb-1">{t('statistics_applications_total')}</div>
-                <div className="text-label-primary text-2xl font-semibold">{applicationStats.totalApplications}</div>
-              </div>
-              <div className="bg-bg-secondary text-label-primary light p-4 rounded-lg">
-                <div className="text-label-secondary text-sm mb-1">{t('statistics_invitations_total')}</div>
-                <div className="text-label-primary text-2xl font-semibold">{applicationStats.invitedApplicants}</div>
-              </div>
-              <div className="bg-bg-secondary text-label-primary light p-4 rounded-lg">
-                <div className="text-label-secondary text-sm mb-1">{t('statistics_applications_rejected')}</div>
-                <div className="text-label-primary text-2xl font-semibold">{applicationStats.rejectedApplications}</div>
-              </div>
-              <div className="bg-bg-secondary text-label-primary light p-4 rounded-lg">
-                <div className="text-label-secondary text-sm mb-1">{t('statistics_participation_confirmed')}</div>
-                <div className="text-label-primary text-2xl font-semibold">{applicationStats.confirmedApplicants}</div>
-              </div>
-              <div className="bg-bg-secondary text-label-primary light p-4 rounded-lg">
-                <div className="text-label-secondary text-sm mb-1">{t(hasCourseStarted ? 'statistics_participation_aborted' : 'statistics_invitations_expired')}</div>
-                <div className="text-label-primary text-2xl font-semibold">{hasCourseStarted ? applicationStats.abortedParticipants : applicationStats.expiredInvitations}</div>
-              </div>
+              <StatCard label={t('statistics_applications_total')} value={applicationStats.totalApplications} />
+              <StatCard label={t('statistics_invitations_total')} value={applicationStats.invitedApplicants} />
+              <StatCard label={t('statistics_applications_rejected')} value={applicationStats.rejectedApplications} />
+              <StatCard label={t('statistics_participation_confirmed')} value={applicationStats.confirmedApplicants} />
+              <StatCard label={t(hasCourseStarted ? 'statistics_participation_aborted' : 'statistics_invitations_expired')} value={hasCourseStarted ? applicationStats.abortedParticipants : applicationStats.expiredInvitations} />
             </>
           ) : (
             <>
-              <div className="bg-bg-secondary text-label-primary light p-4 rounded-lg">
-                <div className="text-label-secondary text-sm mb-1">{t('statistics_registrations_total')}</div>
-                <div className="text-label-primary text-2xl font-semibold">{applicationStats.totalApplications}</div>
-              </div>
-              <div className="bg-bg-secondary text-label-primary light p-4 rounded-lg">
-                <div className="text-label-secondary text-sm mb-1">{t('statistics_registrations_confirmed')}</div>
-                <div className="text-label-primary text-2xl font-semibold">{applicationStats.confirmedApplicants}</div>
-              </div>
-              <div className="bg-bg-secondary text-label-primary light p-4 rounded-lg">
-                <div className="text-label-secondary text-sm mb-1">{t('statistics_registrations_cancelled')}</div>
-                <div className="text-label-primary text-2xl font-semibold">{applicationStats.cancelledApplicants}</div>
-              </div>
+              <StatCard label={t('statistics_registrations_total')} value={applicationStats.totalApplications} />
+              <StatCard label={t('statistics_registrations_confirmed')} value={applicationStats.confirmedApplicants} />
+              <StatCard label={t('statistics_registrations_cancelled')} value={applicationStats.cancelledApplicants} />
               {applicationStats.pendingRegistrations > 0 && (
-                <div className="bg-bg-secondary text-label-primary light p-4 rounded-lg">
-                  <div className="text-label-secondary text-sm mb-1">{t('statistics_registrations_pending')}</div>
-                  <div className="text-label-primary text-2xl font-semibold">{applicationStats.pendingRegistrations}</div>
-                </div>
+                <StatCard label={t('statistics_registrations_pending')} value={applicationStats.pendingRegistrations} />
               )}
               {applicationStats.waitlistedRegistrations > 0 && (
-                <div className="bg-bg-secondary text-label-primary light p-4 rounded-lg">
-                  <div className="text-label-secondary text-sm mb-1">{t('statistics_registrations_waitlisted')}</div>
-                  <div className="text-label-primary text-2xl font-semibold">{applicationStats.waitlistedRegistrations}</div>
-                </div>
+                <StatCard label={t('statistics_registrations_waitlisted')} value={applicationStats.waitlistedRegistrations} />
               )}
               {hasCourseStarted && (
-                <div className="bg-bg-secondary text-label-primary light p-4 rounded-lg">
-                  <div className="text-label-secondary text-sm mb-1">{t('statistics_participation_aborted')}</div>
-                  <div className="text-label-primary text-2xl font-semibold">{applicationStats.abortedParticipants}</div>
-                </div>
+                <StatCard label={t('statistics_participation_aborted')} value={applicationStats.abortedParticipants} />
               )}
             </>
           )}

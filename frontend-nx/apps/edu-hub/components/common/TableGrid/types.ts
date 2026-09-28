@@ -1,6 +1,6 @@
 import { ApolloError, DocumentNode } from '@apollo/client';
 import { ColumnDef, SortingState } from '@tanstack/react-table';
-import { ReactElement } from 'react';
+import { ReactElement, ReactNode } from 'react';
 
 import { AuthRoles } from '../../../types/enums';
 
@@ -80,8 +80,11 @@ export interface TableGridProps<T extends BaseRow> {
   onSortingChange?: (sorting: SortingState | ((prev: SortingState) => SortingState)) => void;
   /** When true, uses reduced row padding for more compact table layout */
   compactRows?: boolean;
-  /** When true, wraps the table in a rounded card (e.g. course page sections) */
-  rounded?: boolean;
+  /**
+   * Card summary of a row for phones (< 768px). When given, TableGrid renders one card per row
+   * there instead of the grid; the expand button, expanded content and delete stay built in.
+   */
+  renderMobileRow?: (row: T) => ReactNode;
   /** Keep the last settled page mounted while replacement rows are loading. */
   preserveRowsWhileLoading?: boolean;
   /** Navigate to full-page editor on chevron click (mutually exclusive with expandableRowComponent). */
@@ -89,6 +92,12 @@ export interface TableGridProps<T extends BaseRow> {
   onRowNavigate?: (row: T) => void;
   /** When false, the row delete control is disabled (TableGrid delete column). */
   canDeleteRow?: (row: T) => boolean;
+  /** When false, the row delete control is not rendered at all (e.g. rows owned elsewhere). */
+  showDeleteForRow?: (row: T) => boolean;
+  /** When false, the row has no expand chevron (expandableRowComponent mode). */
+  canExpandRow?: (row: T) => boolean;
+  /** Extra classes for a primary row's background cell, e.g. to mark read-only rows. */
+  rowClassName?: (row: T) => string;
   /** GraphQL variable name for delete mutation (default: id). */
   deleteVariableName?: string;
   /** Return an error message when delete response indicates failure (e.g. Hasura actions). */
@@ -128,4 +137,6 @@ export interface TableGridDeleteButtonProps {
   validateDeleteResult?: (data: unknown) => string | null;
   /** Runs instead of deleteMutation; a rejection is shown in the error dialog. */
   onDelete?: () => Promise<void>;
+  /** Renders a text button with this label instead of the bare bin icon (e.g. in mobile cards). */
+  label?: string;
 }

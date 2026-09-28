@@ -137,7 +137,12 @@ export function useTableGrid<V>({
 
   const queryResult = queryHook(query, queryOptions);
 
-  const { data, loading, error, refetch } = queryResult;
+  const { loading, error, refetch } = queryResult;
+  // A new search or page is a new set of variables, for which Apollo reports no data while it
+  // loads. Keeping the previous rows lets pages keep the table - and its focused search field -
+  // mounted; `initialLoading` is only true while nothing has been loaded yet.
+  const data = queryResult.data ?? queryResult.previousData;
+  const initialLoading = loading && !data;
 
   const handleSetSearchFilter = useCallback((value: string) => {
     setSearchFilter(value);
@@ -157,6 +162,7 @@ export function useTableGrid<V>({
     queryResult,
     data,
     loading,
+    initialLoading,
     error,
     refetch,
     searchFilter,
@@ -229,7 +235,8 @@ export const useBulkActions = <T extends BaseRow>(
 
   const toggleAllRows = useCallback((data: T[]) => {
     setSelectedRowIds(prev => {
-      if (prev.size === data.length) {
+      // Compare by row id, not count: a new page of the same size is not "all selected".
+      if (data.length > 0 && data.every(row => prev.has(row.id))) {
         return new Set();
       } else {
         return new Set(data.map(row => row.id));
@@ -279,11 +286,12 @@ export const useBulkActions = <T extends BaseRow>(
   }, []);
 
   const isAllSelected = useMemo(() => (data: T[]) => {
-    return data.length > 0 && selectedRowIds.size === data.length;
+    return data.length > 0 && data.every(row => selectedRowIds.has(row.id));
   }, [selectedRowIds]);
 
   const isSomeSelected = useMemo(() => (data: T[]) => {
-    return selectedRowIds.size > 0 && selectedRowIds.size < data.length;
+    const selectedCount = data.filter(row => selectedRowIds.has(row.id)).length;
+    return selectedCount > 0 && selectedCount < data.length;
   }, [selectedRowIds]);
 
   return {

@@ -74,6 +74,7 @@ export default async function sendSessionReminders(req, logger) {
               # signup included. Those people are attending, so they get the
               # reminder.
               CourseEnrollments: {
+                isTest: { _eq: false }
                 status: { _in: [CONFIRMED, REGISTERED] }
               }
             }
@@ -98,7 +99,7 @@ export default async function sendSessionReminders(req, logger) {
               id
               startDateTime
             }
-            CourseEnrollments(where: { status: { _in: [CONFIRMED, REGISTERED] } }) {
+            CourseEnrollments(where: { isTest: { _eq: false }, status: { _in: [CONFIRMED, REGISTERED] } }) {
               id
               User {
                 id

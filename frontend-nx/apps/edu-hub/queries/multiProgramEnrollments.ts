@@ -10,7 +10,7 @@ export const MULTI_PROGRAM_ENROLLMENTS = gql`
       Courses {
         id
         title
-        CourseEnrollments {
+        CourseEnrollments(where: { isTest: { _eq: false } }) {
           id
           status
           attendanceCertificateURL

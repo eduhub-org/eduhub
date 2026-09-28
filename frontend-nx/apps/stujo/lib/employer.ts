@@ -44,6 +44,14 @@ export const MY_JOB_ORGANIZATIONS = gql`
         name
         logo
         website
+        # "Kauf auf Rechnung": approval flag plus the address the order form
+        # pre-fills (legalName and vatId are settings-only columns).
+        allowInvoicePayment
+        addressLine1
+        addressLine2
+        postalCode
+        city
+        country
         JobPostingCredits {
           id
           remaining
@@ -159,8 +167,18 @@ export const DELETE_DRAFT_POSTING = gql`
 `;
 
 export const PUBLISH_JOB_POSTING_ACTION = gql`
-  mutation PublishJobPostingAction($jobPostingId: Int!, $acceptTerms: Boolean) {
-    publishJobPosting(jobPostingId: $jobPostingId, acceptTerms: $acceptTerms) {
+  mutation PublishJobPostingAction(
+    $jobPostingId: Int!
+    $acceptTerms: Boolean
+    $paymentMethod: String
+    $billing: JobPostingBillingInput
+  ) {
+    publishJobPosting(
+      jobPostingId: $jobPostingId
+      acceptTerms: $acceptTerms
+      paymentMethod: $paymentMethod
+      billing: $billing
+    ) {
       success
       published
       checkoutUrl
@@ -168,6 +186,18 @@ export const PUBLISH_JOB_POSTING_ACTION = gql`
       usedCredit
       error
       messageKey
+    }
+  }
+`;
+
+// Billing country picker for "Kauf auf Rechnung". Country is readable by
+// user_access, so this runs under ACTION_ROLE_CONTEXT.
+export const COUNTRY_OPTIONS = gql`
+  query StujoCountryOptions {
+    Country(order_by: { name_de: asc }) {
+      code
+      name_de
+      name_en
     }
   }
 `;

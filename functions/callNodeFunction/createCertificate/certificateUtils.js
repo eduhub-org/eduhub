@@ -208,7 +208,7 @@ export const fetchEnrollments = async (userIds, courseId) => {
   const query = gql`
     query GetEnrollments($userIds: [uuid!]!, $courseId: Int!) {
       CourseEnrollment(
-        where: { userId: { _in: $userIds }, Course: { id: { _eq: $courseId } } }
+        where: { isTest: { _eq: false }, userId: { _in: $userIds }, Course: { id: { _eq: $courseId } } }
       ) {
         User {
           Attendances {
