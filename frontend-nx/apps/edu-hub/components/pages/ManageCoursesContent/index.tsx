@@ -653,6 +653,10 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
               registrationType: course.registrationType,
               externalRegistrationLink: course.externalRegistrationLink,
               programId: targetProgram.id,
+              // A copy is the next run of the same course. A series belongs to one organization,
+              // so a copy into another organization's program gets its own series when it is published.
+              courseSeriesId:
+                course.Program?.organizationId === targetProgram.organizationId ? course.courseSeriesId : null,
               published: false, // Always start as unpublished
               // Copy tile slider groups
               CourseGroups: courseGroups.length > 0 ? { data: courseGroups } : undefined,

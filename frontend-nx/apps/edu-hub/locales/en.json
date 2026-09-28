@@ -1188,6 +1188,14 @@
       "placeholder": "Select course groups",
       "slider_badge": "Homepage slider"
     },
+    "course_series": {
+      "label": "Course series",
+      "placeholder": "Select or create a course series",
+      "help_text": "All runs of the same course belong to one course series. The course page shows projects from past runs of the series. When a course without a series is published, it is grouped automatically with earlier courses of the same title. One-off courses don't need a series.",
+      "none": "No course series",
+      "other_runs": "Other runs in this series:",
+      "no_other_runs": "No other runs in this series yet."
+    },
     "cover_image": {
       "label": "Cover Image",
       "upload_text": "Click to upload cover image",

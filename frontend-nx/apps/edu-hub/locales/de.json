@@ -1172,6 +1172,14 @@
       "placeholder": "Kursgruppen auswählen",
       "slider_badge": "Startseiten-Slider"
     },
+    "course_series": {
+      "label": "Kursreihe",
+      "placeholder": "Kursreihe auswählen oder neu anlegen",
+      "help_text": "Alle Durchläufe desselben Kurses gehören zu einer Kursreihe. Auf der Kursseite werden Projekte aus vergangenen Durchläufen der Reihe gezeigt. Beim Veröffentlichen wird ein Kurs ohne Reihe automatisch mit früheren Kursen gleichen Titels zu einer Reihe zusammengefasst. Einmalige Kurse brauchen keine Reihe.",
+      "none": "Keine Kursreihe",
+      "other_runs": "Weitere Durchläufe dieser Reihe:",
+      "no_other_runs": "Noch keine weiteren Durchläufe in dieser Reihe."
+    },
     "cover_image": {
       "label": "Titelbild",
       "upload_text": "Klicken um Titelbild hochzuladen oder Datei hier ablegen",

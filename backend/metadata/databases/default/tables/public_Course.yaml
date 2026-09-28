@@ -317,6 +317,7 @@ select_permissions:
         - stripeProductId
         - stripePriceId
         - matrixRoomId
+        - courseSeriesId
       computed_fields:
         - activeParticipantCount
         - publicParticipantCount
@@ -408,6 +409,7 @@ update_permissions:
         - applicationEnd
         - cost
         - externalRegistrationLink
+        - courseSeriesId
       filter:
         _or:
           - Program:
@@ -537,6 +539,7 @@ insert_permissions:
         - currency
         - stripeProductId
         - stripePriceId
+        - courseSeriesId
       check:
         _or:
           - Program:
