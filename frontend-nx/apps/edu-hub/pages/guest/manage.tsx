@@ -40,6 +40,7 @@ const GuestManage: FC = () => {
   const [errorKey, setErrorKey] = useState<string>('errors.invalid_token');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
+  const [organizationName, setOrganizationName] = useState('');
   const [email, setEmail] = useState('');
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
@@ -63,6 +64,7 @@ const GuestManage: FC = () => {
 
         setFirstName(response.firstName ?? '');
         setLastName(response.lastName ?? '');
+        setOrganizationName(response.organizationName ?? '');
         setEmail(response.email ?? '');
         setRegistrations((response.registrations ?? []) as Registration[]);
         setState('ready');
@@ -131,6 +133,7 @@ const GuestManage: FC = () => {
                 <p>
                   {firstName} {lastName}
                 </p>
+                {organizationName && <p>{organizationName}</p>}
                 <p>{email}</p>
                 <p className="text-sm text-label-secondary">{t('manage.retention_notice')}</p>
               </section>

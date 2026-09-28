@@ -82,7 +82,7 @@ when all of these hold:
 
 | Question | Answer |
 |---|---|
-| What is collected | First name, last name, email. Nothing else. |
+| What is collected | First name, last name, email, and optionally an organization (for name tags and participant lists). Nothing else. |
 | Legal basis | Art. 6(1)(b) — performance of a contract / pre-contractual measures. Note this differs from regular participant profile data, which the privacy policy bases on Art. 6(1)(f). |
 | Retention | `AppSettings.guestDataRetentionMonths`, default **12**, counted from the end of the event. Enforced by the `anonymize_guest_data` cron. |
 | Erasure on request | Self-service via the manage link in every mail. No login needed. Cancels any registration still ahead of them, then anonymizes the record. |

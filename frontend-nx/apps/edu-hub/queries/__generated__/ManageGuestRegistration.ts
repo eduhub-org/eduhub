@@ -21,6 +21,7 @@ export interface ManageGuestRegistration_manageGuestRegistration {
   success: boolean;
   firstName: string | null;
   lastName: string | null;
+  organizationName: string | null;
   email: string | null;
   registrations: ManageGuestRegistration_manageGuestRegistration_registrations[] | null;
   error: string | null;

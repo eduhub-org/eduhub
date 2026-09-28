@@ -553,6 +553,16 @@ export function isValidName(name) {
   return name.length >= 1 && name.length <= 100;
 }
 
+/** Optional field: an empty value is stored as null rather than ''. */
+export function normalizeOrganizationName(name) {
+  const normalized = normalizeName(name);
+  return normalized === '' ? null : normalized;
+}
+
+export function isValidOrganizationName(name) {
+  return name === null || name.length <= 200;
+}
+
 /* ------------------------------------------------------------- user lookup */
 
 const FIND_USERS_BY_EMAIL = gql`
@@ -562,6 +572,7 @@ const FIND_USERS_BY_EMAIL = gql`
       status
       firstName
       lastName
+      organizationName
     }
   }
 `;

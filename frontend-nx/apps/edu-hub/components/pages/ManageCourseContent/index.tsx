@@ -18,6 +18,7 @@ import { ApplicationsTab } from './ApplicationsTab';
 import { CourseParticipationsTab } from './CourseParticipationsTab';
 import { DegreeParticipationsTab } from './DegreeParticipationsTab';
 import { ParticipantPreviewButton } from './ParticipantPreviewButton';
+import { ParticipantExportMenu } from './ParticipantExport/ParticipantExportMenu';
 import { useIsAdmin, useIsUserIdInList } from '../../../hooks/authentication';
 import { getRegistrationFeatures } from './ApplicationsTab/registrationConfig';
 import Loading from '../../common/Loading';
@@ -215,7 +216,11 @@ export const ManageCourseContent: FC<Props> = ({ courseId }) => {
         <div className="max-w-screen-xl mx-auto mt-20 xl:px-12 2xl:px-0">
           <div className="flex flex-col gap-4 mb-6 mt-6 md:mb-12 md:mt-12 text-white sm:flex-row sm:items-center sm:justify-between">
             <h1 className="text-3xl md:text-4xl font-bold">{course.title}</h1>
-            <ParticipantPreviewButton courseId={courseId} />
+            <div className="flex flex-wrap items-center gap-3">
+              {/* Registrations only exist in EduHub when they are not handled elsewhere. */}
+              {visibleTabIndices.includes(2) && <ParticipantExportMenu courseId={courseId} />}
+              <ParticipantPreviewButton courseId={courseId} />
+            </div>
           </div>
 
           {/* Two tiles per row on phones, one row from md up. */}

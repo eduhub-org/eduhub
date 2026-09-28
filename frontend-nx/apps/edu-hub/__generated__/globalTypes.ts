@@ -2814,6 +2814,7 @@ export enum User_select_column {
   newsletterRegistration = "newsletterRegistration",
   occupation = "occupation",
   organizationId = "organizationId",
+  organizationName = "organizationName",
   picture = "picture",
   status = "status",
   updated_at = "updated_at",
@@ -2855,6 +2856,7 @@ export enum User_update_column {
   newsletterRegistration = "newsletterRegistration",
   occupation = "occupation",
   organizationId = "organizationId",
+  organizationName = "organizationName",
   picture = "picture",
   status = "status",
   updated_at = "updated_at",
@@ -13110,6 +13112,7 @@ export interface User_bool_exp {
   newsletterRegistration?: Boolean_comparison_exp | null;
   occupation?: UserOccupation_enum_comparison_exp | null;
   organizationId?: Int_comparison_exp | null;
+  organizationName?: String_comparison_exp | null;
   picture?: String_comparison_exp | null;
   status?: UserStatus_enum_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
@@ -13152,6 +13155,7 @@ export interface User_insert_input {
   newsletterRegistration?: boolean | null;
   occupation?: UserOccupation_enum | null;
   organizationId?: number | null;
+  organizationName?: string | null;
   picture?: string | null;
   status?: UserStatus_enum | null;
   updated_at?: any | null;
@@ -13177,6 +13181,7 @@ export interface User_max_order_by {
   matriculationNumber?: order_by | null;
   matrixUserHandle?: order_by | null;
   organizationId?: order_by | null;
+  organizationName?: order_by | null;
   picture?: order_by | null;
   updated_at?: order_by | null;
   zipCode?: order_by | null;
@@ -13201,6 +13206,7 @@ export interface User_min_order_by {
   matriculationNumber?: order_by | null;
   matrixUserHandle?: order_by | null;
   organizationId?: order_by | null;
+  organizationName?: order_by | null;
   picture?: order_by | null;
   updated_at?: order_by | null;
   zipCode?: order_by | null;
@@ -13259,6 +13265,7 @@ export interface User_order_by {
   newsletterRegistration?: order_by | null;
   occupation?: order_by | null;
   organizationId?: order_by | null;
+  organizationName?: order_by | null;
   picture?: order_by | null;
   status?: order_by | null;
   updated_at?: order_by | null;

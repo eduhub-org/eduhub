@@ -40,6 +40,7 @@ const GET_GUEST_OVERVIEW = gql`
       id
       firstName
       lastName
+      organizationName
       email
       CourseEnrollments {
         status
@@ -146,6 +147,7 @@ const ANONYMIZE_GUEST = gql`
       _set: {
         firstName: "ANON_USER"
         lastName: "ANON_USER"
+        organizationName: null
         email: $email
         picture: null
         externalProfile: null
@@ -275,6 +277,7 @@ export default async function manageGuestRegistration(req, logger) {
       messageKey: operation === 'CANCEL_ENROLLMENT' ? 'GUEST_ENROLLMENT_CANCELLED' : 'GUEST_DATA_LISTED',
       firstName: user.firstName,
       lastName: user.lastName,
+      organizationName: user.organizationName,
       email: user.email,
       // Sorted here rather than in the query: the ordering key is now an
       // aggregate over related rows, which order_by cannot reach. Undated events

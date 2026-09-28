@@ -178,6 +178,7 @@ select_permissions:
         - matrixUserHandle
         - newsletterRegistration
         - occupation
+        - organizationName
         - picture
         - status
         - updated_at
@@ -201,6 +202,7 @@ select_permissions:
         - newsletterRegistration
         - occupation
         - organizationId
+        - organizationName
         - picture
         - status
         - updated_at

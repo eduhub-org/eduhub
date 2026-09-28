@@ -817,6 +817,8 @@ type Mutation {
     firstName: String!
     lastName: String!
     email: String!
+    """Optional free-text organization, e.g. for name tags."""
+    organizationName: String
     acceptTerms: Boolean!
     newsletterOptIn: Boolean
     """Honeypot. A person never fills this; anything non-empty is discarded."""
@@ -869,6 +871,7 @@ type ManageGuestRegistrationResult {
   success: Boolean!
   firstName: String
   lastName: String
+  organizationName: String
   email: String
   registrations: [GuestRegistrationSummary!]
   error: String

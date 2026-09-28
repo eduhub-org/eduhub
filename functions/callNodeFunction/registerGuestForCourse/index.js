@@ -13,9 +13,11 @@ import {
   isHoneypotTripped,
   isValidEmail,
   isValidName,
+  isValidOrganizationName,
   issueConfirmToken,
   normalizeEmail,
   normalizeName,
+  normalizeOrganizationName,
   queueGuestMail,
 } from '../guestRegistration.js';
 
@@ -58,11 +60,17 @@ const GET_COURSE = gql`
 `;
 
 const INSERT_GUEST_USER = gql`
-  mutation InsertGuestUser($firstName: String!, $lastName: String!, $email: String!) {
+  mutation InsertGuestUser(
+    $firstName: String!
+    $lastName: String!
+    $organizationName: String
+    $email: String!
+  ) {
     insert_User_one(
       object: {
         firstName: $firstName
         lastName: $lastName
+        organizationName: $organizationName
         email: $email
         status: GUEST
       }
@@ -73,10 +81,15 @@ const INSERT_GUEST_USER = gql`
 `;
 
 const UPDATE_GUEST_USER_NAME = gql`
-  mutation UpdateGuestUserName($id: uuid!, $firstName: String!, $lastName: String!) {
+  mutation UpdateGuestUserName(
+    $id: uuid!
+    $firstName: String!
+    $lastName: String!
+    $organizationName: String
+  ) {
     update_User_by_pk(
       pk_columns: { id: $id }
-      _set: { firstName: $firstName, lastName: $lastName }
+      _set: { firstName: $firstName, lastName: $lastName, organizationName: $organizationName }
     ) {
       id
     }
@@ -190,6 +203,7 @@ export default async function registerGuestForCourse(req, logger) {
     const courseId = Number(input.courseId);
     const firstName = normalizeName(input.firstName);
     const lastName = normalizeName(input.lastName);
+    const organizationName = normalizeOrganizationName(input.organizationName);
     const email = normalizeEmail(input.email);
     const acceptTerms = input.acceptTerms === true;
     const newsletterOptIn = input.newsletterOptIn === true;
@@ -208,6 +222,9 @@ export default async function registerGuestForCourse(req, logger) {
     }
     if (!isValidName(firstName) || !isValidName(lastName)) {
       return { success: false, messageKey: 'INVALID_NAME' };
+    }
+    if (!isValidOrganizationName(organizationName)) {
+      return { success: false, messageKey: 'INVALID_ORGANIZATION' };
     }
     if (!isValidEmail(email)) {
       return { success: false, messageKey: 'INVALID_EMAIL' };
@@ -335,12 +352,28 @@ export default async function registerGuestForCourse(req, logger) {
       userId = existingUser.id;
       // Someone re-submitting with a corrected spelling should see the
       // correction; the address is the identity, the name is just a label.
-      if (existingUser.firstName !== firstName || existingUser.lastName !== lastName) {
-        await client.request(UPDATE_GUEST_USER_NAME, { id: userId, firstName, lastName });
+      // A blank organization keeps the one given earlier rather than erasing it.
+      const nextOrganizationName = organizationName ?? existingUser.organizationName ?? null;
+      if (
+        existingUser.firstName !== firstName ||
+        existingUser.lastName !== lastName ||
+        (existingUser.organizationName ?? null) !== nextOrganizationName
+      ) {
+        await client.request(UPDATE_GUEST_USER_NAME, {
+          id: userId,
+          firstName,
+          lastName,
+          organizationName: nextOrganizationName,
+        });
       }
     } else {
       try {
-        const inserted = await client.request(INSERT_GUEST_USER, { firstName, lastName, email });
+        const inserted = await client.request(INSERT_GUEST_USER, {
+          firstName,
+          lastName,
+          organizationName,
+          email,
+        });
         userId = inserted.insert_User_one.id;
         logger.info(`Created GUEST user for course ${course.id}`);
       } catch (insertError) {

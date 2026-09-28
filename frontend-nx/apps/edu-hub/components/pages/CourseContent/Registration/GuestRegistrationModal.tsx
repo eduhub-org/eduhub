@@ -39,6 +39,7 @@ export const GuestRegistrationModal: FC<GuestRegistrationModalProps> = ({ visibl
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
+  const [organizationName, setOrganizationName] = useState('');
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [newsletterOptIn, setNewsletterOptIn] = useState(false);
   // Bots fill every field they find. A human never sees this one, so anything
@@ -57,6 +58,7 @@ export const GuestRegistrationModal: FC<GuestRegistrationModalProps> = ({ visibl
     setFirstName('');
     setLastName('');
     setEmail('');
+    setOrganizationName('');
     setAcceptTerms(false);
     setNewsletterOptIn(false);
     setHoneypot('');
@@ -92,6 +94,7 @@ export const GuestRegistrationModal: FC<GuestRegistrationModalProps> = ({ visibl
           firstName: firstName.trim(),
           lastName: lastName.trim(),
           email: email.trim(),
+          organizationName: organizationName.trim() || null,
           acceptTerms,
           newsletterOptIn,
           // Forwarded rather than checked here: a script calling the action
@@ -112,7 +115,17 @@ export const GuestRegistrationModal: FC<GuestRegistrationModalProps> = ({ visibl
     } catch {
       setErrorKey('errors.guest_registration_failed');
     }
-  }, [acceptTerms, course.id, email, firstName, honeypot, lastName, newsletterOptIn, registerGuest]);
+  }, [
+    acceptTerms,
+    course.id,
+    email,
+    firstName,
+    honeypot,
+    lastName,
+    newsletterOptIn,
+    organizationName,
+    registerGuest,
+  ]);
 
   return (
     // The MUI theme paints dialog paper white (see config/theme.ts), while the
@@ -174,6 +187,19 @@ export const GuestRegistrationModal: FC<GuestRegistrationModalProps> = ({ visibl
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={loading}
                 autoComplete="email"
+                className="border border-gray-300 rounded px-3 py-2 min-h-[44px]"
+              />
+            </label>
+
+            <label className="flex flex-col text-sm">
+              <span className="mb-1 text-label-primary">{t('modal.organization')}</span>
+              <input
+                type="text"
+                value={organizationName}
+                onChange={(e) => setOrganizationName(e.target.value)}
+                disabled={loading}
+                maxLength={200}
+                autoComplete="organization"
                 className="border border-gray-300 rounded px-3 py-2 min-h-[44px]"
               />
             </label>

@@ -138,6 +138,10 @@ export interface ManagedCourseApplications_Course_by_pk_CourseEnrollments_User {
    * An array relationship
    */
   CourseEnrollments: ManagedCourseApplications_Course_by_pk_CourseEnrollments_User_CourseEnrollments[];
+  /**
+   * Free-text organization the user belongs to, e.g. entered during guest registration. Used when no organizationId is set.
+   */
+  organizationName: string | null;
 }
 
 export interface ManagedCourseApplications_Course_by_pk_CourseEnrollments {
