@@ -226,7 +226,8 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
     [courseProjectCourses]
   );
   const maxMissedSessions = courseData?.maxMissedSessions ?? course.maxMissedSessions;
-  const isInitialLoading = (loading && !courseData) || (attendanceLoading && !attendanceData);
+  // A page is settled only when its participants and attendance data are ready.
+  const isPageLoading = loading || attendanceLoading;
 
   const [insertAttendance] = useRoleMutation<InsertSingleAttendance, InsertSingleAttendanceVariables>(
     INSERT_SINGLE_ATTENDANCE
@@ -853,7 +854,7 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
             setSearchFilter={setSearchFilter}
             sorting={sorting}
             setSorting={setSorting}
-            loading={isInitialLoading}
+            loading={isPageLoading}
             error={error ?? attendanceError}
             bulkActions={bulkActions}
             onBulkAction={handleBulkAction}
@@ -921,7 +922,7 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
           setSearchFilter={setSearchFilter}
           sorting={sorting}
           setSorting={setSorting}
-          loading={isInitialLoading}
+          loading={isPageLoading}
           error={error ?? attendanceError}
           bulkActions={bulkActions}
           onBulkAction={handleBulkAction}
