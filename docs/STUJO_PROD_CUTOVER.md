@@ -364,7 +364,9 @@ Turning it back off is also how the public face is handed to
    `invoice.paid`, `invoice.overdue`, `invoice.voided` and the Bank transfers
    payment method activated, for "Kauf auf Rechnung"), and the workspace
    variables `stujo_admin_email`, `stujo_seller_organization_id`,
-   `stripe_tax_rate_id` set as intended.
+   `stripe_tax_rate_id` set as intended. Invoice document settings
+   (support address, `rechnungen@opencampus.sh`, USt-IdNr., prefix `EDUHUB`)
+   configured per `docs/STRIPE_INTEGRATION.md`.
 
    `stujo_admin_email` carries more than Stripe: it is also the fallback
    contact address the organization-claim and access-request mails print, via

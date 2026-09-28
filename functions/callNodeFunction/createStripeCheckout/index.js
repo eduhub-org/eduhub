@@ -7,6 +7,8 @@ import {
   buildPaymentMethodConfig,
   getOrCreateCustomer,
   buildCoursePaymentDescription,
+  buildCourseSource,
+  buildServicePeriodField,
 } from '../lib/stripeTax.js';
 
 const GET_COURSE_AND_ADDONS = `
@@ -20,6 +22,8 @@ const GET_COURSE_AND_ADDONS = `
       stripePriceId
       Program {
         type
+        lectureStart
+        lectureEnd
         Organization {
           id
           name
@@ -485,6 +489,12 @@ export default async function createStripeCheckout(req, logger) {
       stripeCustomerId = await getOrCreateCustomer(stripe, emailToUse.trim());
     }
 
+    const source = buildCourseSource(course.Program?.type || null);
+    // Time of supply: the program's lecture period, else the purchase day.
+    const servicePeriod = course.Program?.lectureStart
+      ? buildServicePeriodField(course.Program.lectureStart, course.Program.lectureEnd)
+      : buildServicePeriodField(new Date());
+
     // Create Stripe Checkout Session
     const sessionConfig = {
       line_items: lineItems,
@@ -494,7 +504,14 @@ export default async function createStripeCheckout(req, logger) {
       ...buildPaymentMethodConfig(stripeCustomerId),
       // Stripe issues a real, sequentially numbered invoice (§14 UStG);
       // the webhook stores its hosted/PDF URLs on the Invoice row.
-      invoice_creation: buildInvoiceCreation(organization),
+      invoice_creation: buildInvoiceCreation(organization, {
+        customFields: [servicePeriod],
+        metadata: {
+          courseId: String(courseId),
+          enrollmentId: String(enrollmentId),
+          source,
+        },
+      }),
       success_url: successUrl,
       cancel_url: cancelUrl,
       metadata: {
@@ -502,7 +519,7 @@ export default async function createStripeCheckout(req, logger) {
         courseName: course.title || '',
         enrollmentId: String(enrollmentId),
         formbricksResponseId: formbricksResponseId || '',
-        source: 'eduhub',
+        source,
         organizationId: organization?.id != null ? String(organization.id) : '',
         organizationName: organization?.name || '',
         selectedAddons: (() => {
@@ -543,6 +560,7 @@ export default async function createStripeCheckout(req, logger) {
           enrollmentId: String(enrollmentId),
           organizationId: organization?.id != null ? String(organization.id) : '',
           organizationName: organization?.name || '',
+          source,
         }
       }
     };
