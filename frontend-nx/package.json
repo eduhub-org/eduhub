@@ -2,6 +2,9 @@
   "name": "opencampus",
   "version": "0.1.0",
   "license": "MIT",
+  "engines": {
+    "node": ">=22 <23"
+  },
   "scripts": {
     "start": "next dev apps/edu-hub -p 5000 -H 0.0.0.0 --webpack",
     "build": "next build apps/edu-hub --webpack",
