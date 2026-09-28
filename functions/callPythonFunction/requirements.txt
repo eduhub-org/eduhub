@@ -2,14 +2,7 @@
 # Run this locally via: python -m pip install -r requirements.txt
 pandas
 requests
-pyyaml
-Authlib
 flask>=1.0,<3.0  # Specifying Flask version to be compatible with Functions Framework
-python-Levenshtein
 thefuzz
-typing
-authlib
-datetime
-python-dateutil
 google-cloud-storage
 xhtml2pdf
