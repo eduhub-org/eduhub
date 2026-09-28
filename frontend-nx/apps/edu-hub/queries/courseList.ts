@@ -49,7 +49,9 @@ export const ADMIN_COURSE_LIST = gql`
       ...AdminCourseFragment
       Program {
         ...ProgramFragmentMinimumProperties
+        organizationId
       }
+      courseSeriesId
       CourseEnrollments(where: { isTest: { _eq: false } }) {
         id
         CourseEnrollmentStatus {

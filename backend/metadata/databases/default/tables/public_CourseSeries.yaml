@@ -32,3 +32,27 @@ select_permissions:
             - Program:
                 published:
                   _eq: true
+  - role: org_admin_access
+    permission:
+      columns:
+        - id
+        - title
+        - organizationId
+        - created_at
+        - updated_at
+      filter:
+        Organization:
+          OrganizationAdmins:
+            userId:
+              _eq: X-Hasura-User-Id
+insert_permissions:
+  - role: org_admin_access
+    permission:
+      check:
+        Organization:
+          OrganizationAdmins:
+            userId:
+              _eq: X-Hasura-User-Id
+      columns:
+        - title
+        - organizationId

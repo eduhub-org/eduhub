@@ -68,7 +68,12 @@ import {
 import { translateErrorMessage } from '../../../../../helpers/errorHandling';
 import { PROJECT_TAGLINE_MAX_LENGTH } from '../../../CourseContent/Projects/projectDefaults';
 import StatusChip from '../../../CourseContent/Projects/StatusChip';
-import { isProjectTypeEditable, canManagePublicationSuggestion } from '../../../CourseContent/Projects/projectStatusDisplay';
+import {
+  isProjectTypeEditable,
+  canManagePublicationSuggestion,
+  getPublicationDecision,
+} from '../../../CourseContent/Projects/projectStatusDisplay';
+import { IoIosCheckmarkCircle, IoIosCloseCircle } from 'react-icons/io';
 import ProjectPreviewLayout from '../../../CourseContent/Projects/ProjectPreviewLayout';
 import ProjectReviewComment from '../../../CourseContent/Projects/ProjectReviewComment';
 import ProjectFormFieldSection from '../../../CourseContent/Projects/ProjectFormFieldSection';
@@ -375,6 +380,179 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
     [updateProjectType, documentationInstructionsWithPdf, t, tCommon]
   );
 
+  // The title with the team's publication decision underneath, once there is one.
+  const renderTitle = useCallback(
+    (project: ProjectRow) => {
+      const decision = getPublicationDecision(project);
+      return (
+        <div className="min-w-0">
+          <span className="font-medium text-label-primary">{project.title}</span>
+          {decision && (
+            <span className="mt-0.5 flex items-center gap-1 text-xs text-label-secondary">
+              {decision === 'granted' ? (
+                <IoIosCheckmarkCircle className="shrink-0" style={{ color: 'var(--eduhub-success)' }} />
+              ) : (
+                <IoIosCloseCircle className="shrink-0" style={{ color: 'var(--eduhub-error)' }} />
+              )}
+              {tCourse(`projects.publication_consent.table_${decision}`)}
+            </span>
+          )}
+        </div>
+      );
+    },
+    [tCourse]
+  );
+
+  const renderAuthors = useCallback(
+    (project: ProjectRow) => {
+      // Instructors/admins see EXCLUDED authors too, marked as excluded.
+      const authors = getDisplayAuthors(project.ProjectAuthors, {
+        includeExcluded: true,
+      });
+      if (authors.length === 0) {
+        return (
+          <span className="text-label-secondary">
+            {t('projects.table.no_authors')}
+          </span>
+        );
+      }
+      return (
+        <span>
+          {authors
+            .map((a) => {
+              const name = makeFullName(
+                a.User?.firstName ?? '',
+                a.User?.lastName ?? ''
+              );
+              if (!name) return '';
+              return isExcludedAuthor(a)
+                ? tCourse('projects.table.author_excluded_inline', { name })
+                : name;
+            })
+            .filter(Boolean)
+            .join(', ')}
+        </span>
+      );
+    },
+    [t, tCourse]
+  );
+
+  const renderType = useCallback(
+    (project: ProjectRow) => {
+      const typeValue = project.type;
+      if (!typeValue) {
+        return (
+          <span className="text-label-secondary">
+            {t('projects.type_select_placeholder')}
+          </span>
+        );
+      }
+      const projectType = projectTypesList.find((pt) => pt.value === typeValue);
+      const deliverables = projectType
+        ? PROJECT_REQUIREMENT_KEYS.filter((key) => flagsOfProjectType(projectType)[key]).map(
+            (key) => t(`projects.requirements.${REQUIREMENT_I18N_KEY[key]}.short` as never)
+          )
+        : [];
+      return (
+        <Tooltip title={deliverables.join(', ')}>
+          <div className="min-w-0">
+            <span className="font-medium text-label-primary">
+              {tCourse(`projects.type_label.${typeValue}` as never)}
+            </span>
+            {deliverables.length > 0 ? (
+              <span className="block text-xs text-label-secondary truncate">
+                {deliverables.join(', ')}
+              </span>
+            ) : null}
+          </div>
+        </Tooltip>
+      );
+    },
+    [projectTypesList, t, tCourse]
+  );
+
+  // The next step for a project; a table column on desktop, a full-width button in the mobile card.
+  const renderProjectAction = useCallback(
+    (project: ProjectRow) => {
+      if (project.status === ProjectStatus_enum.PROPOSED) {
+        const hasAcceptedAuthor = (project.ProjectAuthors ?? []).some(
+          (a) =>
+            a.participationStatus === ProjectParticipationStatus_enum.ACCEPTED
+        );
+        if (!hasAcceptedAuthor) {
+          const copyCount = templateCopyCountByParentId.get(project.id) ?? 0;
+          const deleteDisabled = copyCount > 0 || deleteProjectLoading;
+          const deleteButton = (
+            <Button
+              className="w-full"
+              onClick={() => setDeleteTemplateTarget(project)}
+              disabled={deleteDisabled}
+            >
+              {t('projects.actions.delete_template')}
+            </Button>
+          );
+          return copyCount > 0 ? (
+            <Tooltip title={t('projects.delete_template_disabled_tooltip')}>
+              <span className="block w-full">{deleteButton}</span>
+            </Tooltip>
+          ) : (
+            deleteButton
+          );
+        }
+        return (
+          <Button onClick={() => setConfirmProject(project)} className="w-full">
+            {t('projects.actions.confirm_project')}
+          </Button>
+        );
+      }
+      if (project.status === ProjectStatus_enum.ONGOING) {
+        const evaluateBtn = (
+          <Button disabled className="w-full">
+            {t('projects.actions.evaluate_project')}
+          </Button>
+        );
+        return (
+          <Tooltip title={t('projects.actions.evaluate_disabled_tooltip')}>
+            <span className="block w-full">{evaluateBtn}</span>
+          </Tooltip>
+        );
+      }
+      if (project.status === ProjectStatus_enum.SUBMITTED) {
+        return (
+          <Button filled onClick={() => setReviewProject(project)} className="w-full">
+            {t('projects.actions.evaluate_project')}
+          </Button>
+        );
+      }
+      if (canManagePublicationSuggestion(project.status)) {
+        if (project.suggestedForPublication) {
+          return (
+            <Button
+              onClick={() =>
+                handleTogglePublicationSuggestion(project.id, false)
+              }
+              className="w-full"
+            >
+              {t('projects.actions.withdraw_publication_suggestion')}
+            </Button>
+          );
+        }
+        return (
+          <Button
+            onClick={() =>
+              handleTogglePublicationSuggestion(project.id, true)
+            }
+            className="w-full"
+          >
+            {t('projects.actions.suggest_for_publication')}
+          </Button>
+        );
+      }
+      return null;
+    },
+    [deleteProjectLoading, handleTogglePublicationSuggestion, t, templateCopyCountByParentId]
+  );
+
   const columns = useMemo<ColumnDef<ProjectRow>[]>(
     () => [
       {
@@ -395,170 +573,53 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
         header: t('projects.table.title'),
         accessorKey: 'title',
         enableSorting: true,
-        cell: ({ row }) => (
-          <span className="font-medium text-label-primary">{row.original.title}</span>
-        ),
+        cell: ({ row }) => renderTitle(row.original),
       },
       {
         id: 'authors',
         header: t('projects.table.authors'),
-        cell: ({ row }) => {
-          // Instructors/admins see EXCLUDED authors too, marked as excluded.
-          const authors = getDisplayAuthors(row.original.ProjectAuthors, {
-            includeExcluded: true,
-          });
-          if (authors.length === 0) {
-            return (
-              <span className="text-label-secondary">
-                {t('projects.table.no_authors')}
-              </span>
-            );
-          }
-          return (
-            <span>
-              {authors
-                .map((a) => {
-                  const name = makeFullName(
-                    a.User?.firstName ?? '',
-                    a.User?.lastName ?? ''
-                  );
-                  if (!name) return '';
-                  return isExcludedAuthor(a)
-                    ? tCourse('projects.table.author_excluded_inline', { name })
-                    : name;
-                })
-                .filter(Boolean)
-                .join(', ')}
-            </span>
-          );
-        },
+        cell: ({ row }) => renderAuthors(row.original),
       },
       {
         id: 'type',
         header: t('projects.table.type'),
+        // Sorts by the name shown in the cell; projects without a type go last either way.
+        accessorFn: (project) =>
+          project.type ? tCourse(`projects.type_label.${project.type}` as never) : undefined,
+        enableSorting: true,
+        sortUndefined: 'last',
         meta: { className: 'max-w-[14rem]' },
-        cell: ({ row }) => {
-          const typeValue = row.original.type;
-          if (!typeValue) {
-            return (
-              <span className="text-label-secondary">
-                {t('projects.type_select_placeholder')}
-              </span>
-            );
-          }
-          const projectType = projectTypesList.find((pt) => pt.value === typeValue);
-          const deliverables = projectType
-            ? PROJECT_REQUIREMENT_KEYS.filter((key) => flagsOfProjectType(projectType)[key]).map(
-                (key) => t(`projects.requirements.${REQUIREMENT_I18N_KEY[key]}.short` as never)
-              )
-            : [];
-          return (
-            <Tooltip title={deliverables.join(', ')}>
-              <div className="min-w-0">
-                <span className="font-medium text-label-primary">
-                  {tCourse(`projects.type_label.${typeValue}` as never)}
-                </span>
-                {deliverables.length > 0 ? (
-                  <span className="block text-xs text-label-secondary truncate">
-                    {deliverables.join(', ')}
-                  </span>
-                ) : null}
-              </div>
-            </Tooltip>
-          );
-        },
+        cell: ({ row }) => renderType(row.original),
       },
       {
         id: 'action',
         header: '',
-        cell: ({ row }) => {
-          const project = row.original;
-          if (project.status === ProjectStatus_enum.PROPOSED) {
-            const hasAcceptedAuthor = (project.ProjectAuthors ?? []).some(
-              (a) =>
-                a.participationStatus === ProjectParticipationStatus_enum.ACCEPTED
-            );
-            if (!hasAcceptedAuthor) {
-              const copyCount = templateCopyCountByParentId.get(project.id) ?? 0;
-              const deleteDisabled = copyCount > 0 || deleteProjectLoading;
-              const deleteButton = (
-                <Button
-                  className="w-full"
-                  onClick={() => setDeleteTemplateTarget(project)}
-                  disabled={deleteDisabled}
-                >
-                  {t('projects.actions.delete_template')}
-                </Button>
-              );
-              return copyCount > 0 ? (
-                <Tooltip title={t('projects.delete_template_disabled_tooltip')}>
-                  <span className="block w-full">{deleteButton}</span>
-                </Tooltip>
-              ) : (
-                deleteButton
-              );
-            }
-            return (
-              <Button onClick={() => setConfirmProject(project)} className="w-full">
-                {t('projects.actions.confirm_project')}
-              </Button>
-            );
-          }
-          if (project.status === ProjectStatus_enum.ONGOING) {
-            const evaluateBtn = (
-              <Button disabled className="w-full">
-                {t('projects.actions.evaluate_project')}
-              </Button>
-            );
-            return (
-              <Tooltip title={t('projects.actions.evaluate_disabled_tooltip')}>
-                <span className="block w-full">{evaluateBtn}</span>
-              </Tooltip>
-            );
-          }
-          if (project.status === ProjectStatus_enum.SUBMITTED) {
-            return (
-              <Button filled onClick={() => setReviewProject(project)} className="w-full">
-                {t('projects.actions.evaluate_project')}
-              </Button>
-            );
-          }
-          if (canManagePublicationSuggestion(project.status)) {
-            if (project.suggestedForPublication) {
-              return (
-                <Button
-                  onClick={() =>
-                    handleTogglePublicationSuggestion(project.id, false)
-                  }
-                  className="w-full"
-                >
-                  {t('projects.actions.withdraw_publication_suggestion')}
-                </Button>
-              );
-            }
-            return (
-              <Button
-                onClick={() =>
-                  handleTogglePublicationSuggestion(project.id, true)
-                }
-                className="w-full"
-              >
-                {t('projects.actions.suggest_for_publication')}
-              </Button>
-            );
-          }
-          return null;
-        },
+        cell: ({ row }) => renderProjectAction(row.original),
       },
     ],
-    [
-      deleteProjectLoading,
-      handleTogglePublicationSuggestion,
-      projectTypesList,
-      t,
-      tCourse,
-      templateCopyCountByParentId,
-    ]
+    [renderAuthors, renderProjectAction, renderTitle, renderType, t, tCourse]
+  );
+
+  const renderMobileRow = useCallback(
+    (project: ProjectRow) => (
+      <div className="flex flex-col gap-2">
+        <div>
+          <StatusChip
+            status={project.status}
+            rating={project.rating}
+            ratingComment={project.ratingComment}
+            suggestedForPublication={project.suggestedForPublication}
+          />
+        </div>
+        {renderTitle(project)}
+        <div className="flex flex-col gap-1 text-xs text-label-secondary">
+          {renderAuthors(project)}
+          {renderType(project)}
+        </div>
+        <div className="pt-1">{renderProjectAction(project)}</div>
+      </div>
+    ),
+    [renderAuthors, renderProjectAction, renderTitle, renderType]
   );
 
   const expandableRowComponent = useCallback(
@@ -1029,6 +1090,7 @@ const ProjectsManagementGrid: FC<ProjectsManagementGridProps> = ({
         addButtonText={t('projects.add_button')}
         onAddButtonClick={() => setAddDialogOpen(true)}
         expandableRowComponent={expandableRowComponent}
+        renderMobileRow={renderMobileRow}
       />
 
       <ConfirmProjectDialog

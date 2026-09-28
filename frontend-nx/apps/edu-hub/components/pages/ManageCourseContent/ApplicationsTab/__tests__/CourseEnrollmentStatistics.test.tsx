@@ -26,7 +26,8 @@ const course = (registrationType: CourseRegistrationType_enum | null) =>
     WaitlistedCourseEnrollments: count(3),
   } as unknown as ManagedCourseApplications_Course_by_pk);
 
-const displayedCount = (key: string) => screen.getByText(key).nextElementSibling?.textContent;
+// Each statistic shows its number above its label.
+const displayedCount = (key: string) => screen.getByText(key).previousElementSibling?.textContent;
 
 describe('approval statistics', () => {
   it.each([CourseRegistrationType_enum.APPROVAL_WITH_INPUT, null])(

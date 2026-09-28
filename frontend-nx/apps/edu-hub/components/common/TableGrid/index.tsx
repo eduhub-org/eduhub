@@ -31,6 +31,33 @@ const neutralCheckboxSx = {
   },
 };
 
+/** Outlined select on the dark page surface (bulk action, mobile sort). */
+const darkSelectSx = {
+  color: 'var(--eduhub-label-primary)',
+  backgroundColor: 'var(--eduhub-bg-card)',
+  '& .MuiOutlinedInput-notchedOutline': {
+    borderColor: 'var(--eduhub-border-primary)',
+  },
+  '&:hover .MuiOutlinedInput-notchedOutline': {
+    borderColor: 'var(--eduhub-border-secondary)',
+  },
+  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+    borderColor: 'var(--eduhub-brand)',
+  },
+  '& .MuiSvgIcon-root': {
+    color: 'var(--eduhub-label-primary)',
+  },
+};
+
+const darkSelectMenuProps = {
+  PaperProps: {
+    sx: {
+      backgroundColor: 'var(--eduhub-bg-card)',
+      color: 'var(--eduhub-label-primary)',
+    },
+  },
+};
+
 /**
  * Renders a cell with a component type that never changes. flexRender mounts a cell function as its
  * own component, so every new column definition (callers often rebuild columns from refetched data)
@@ -195,6 +222,7 @@ const TableGrid = <T extends BaseRow,>({
   const [internalSorting, setInternalSorting] = useState<SortingState>([]);
   const settledPageRef = useRef<{
     data: T[];
+    columns: ColumnDef<T>[];
     pageIndex: number;
     pageSize: number;
     totalCount: number | undefined;
@@ -202,13 +230,16 @@ const TableGrid = <T extends BaseRow,>({
 
   useEffect(() => {
     if (!loading && !error) {
-      settledPageRef.current = { data, pageIndex, pageSize, totalCount };
+      settledPageRef.current = { data, columns, pageIndex, pageSize, totalCount };
     }
-  }, [data, error, loading, pageIndex, pageSize, totalCount]);
+  }, [columns, data, error, loading, pageIndex, pageSize, totalCount]);
 
   const retainedPage =
     preserveRowsWhileLoading && loading ? settledPageRef.current : null;
   const tableData = retainedPage?.data ?? data;
+  // Cell renderers can close over query data (e.g. attendance sessions).
+  // Keep them with the rows so loading cannot shrink the retained page.
+  const tableColumns = retainedPage?.columns ?? columns;
   const tablePageIndex = retainedPage?.pageIndex ?? pageIndex;
   const tablePageSize = retainedPage?.pageSize ?? pageSize;
   const tableTotalCount = retainedPage?.totalCount ?? totalCount;
@@ -350,13 +381,13 @@ const TableGrid = <T extends BaseRow,>({
         ]
       : [];
 
-    const dataColumns = columns.map((col) => ({
+    const dataColumns = tableColumns.map((col) => ({
       ...col,
       // Backward compatibility: convert meta.width to size if size is not specified
       size: col.size || (col.meta?.width ? col.meta.width * 100 : undefined),
     }));
     return [...selectionColumn, ...dataColumns];
-  }, [columns, showCheckbox, toggleRowSelection, selectedRowIds, toggleAllRows, tableData, isAllSelected, isSomeSelected]);
+  }, [tableColumns, showCheckbox, toggleRowSelection, selectedRowIds, toggleAllRows, tableData, isAllSelected, isSomeSelected]);
 
 
   // Columns can opt out below a breakpoint (meta.hideBelow). Hidden columns also leave the row
@@ -464,6 +495,7 @@ const TableGrid = <T extends BaseRow,>({
         };
 
   const showToolbar = Boolean(onAddButtonClick) || showCheckbox || showGlobalSearchField || filters.length > 0;
+  const hasSelection = showCheckbox && selectedRowIds.size > 0;
 
   const toolbarClassName = 'flex flex-wrap justify-between items-center gap-3 mb-4';
 
@@ -484,6 +516,17 @@ const TableGrid = <T extends BaseRow,>({
             </div>
           )}
           {showCheckbox && (
+            // While rows are selected, the count, the action and "clear" read as one selection bar.
+            <div
+              className={`flex flex-wrap items-center gap-3 ${
+                hasSelection ? 'rounded-lg border border-border-primary bg-bg-card py-2 pl-3 pr-2' : ''
+              }`}
+            >
+            {hasSelection && (
+              <span className="text-sm font-semibold text-label-primary">
+                {t('common.table_grid.selected_count', { count: selectedRowIds.size })}
+              </span>
+            )}
             <FormControl variant="outlined" size="small" sx={{ minWidth: 200 }}>
               <InputLabel id="bulk-action-label" sx={{ color: 'var(--eduhub-label-primary)' }}>
                 {t('common.table_grid.bulk_action')}
@@ -494,30 +537,8 @@ const TableGrid = <T extends BaseRow,>({
                 onChange={handleSelectChange}
                 disabled={isBulkActionPending}
                 label={t('common.table_grid.bulk_action')}
-                sx={{
-                  color: 'var(--eduhub-label-primary)',
-                  backgroundColor: 'var(--eduhub-bg-card)',
-                  '& .MuiOutlinedInput-notchedOutline': {
-                    borderColor: 'var(--eduhub-border-primary)',
-                  },
-                  '&:hover .MuiOutlinedInput-notchedOutline': {
-                    borderColor: 'var(--eduhub-border-secondary)',
-                  },
-                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                    borderColor: 'var(--eduhub-brand)',
-                  },
-                  '& .MuiSvgIcon-root': {
-                    color: 'var(--eduhub-label-primary)',
-                  },
-                }}
-                MenuProps={{
-                  PaperProps: {
-                    sx: {
-                      backgroundColor: 'var(--eduhub-bg-card)',
-                      color: 'var(--eduhub-label-primary)',
-                    },
-                  },
-                }}
+                sx={darkSelectSx}
+                MenuProps={darkSelectMenuProps}
               >
                 <MenuItem value="" sx={{ color: 'var(--eduhub-label-primary)' }}>
                   <em>{t('common.table_grid.none')}</em>
@@ -570,20 +591,16 @@ const TableGrid = <T extends BaseRow,>({
                 }, [] as React.ReactNode[])}
               </Select>
             </FormControl>
-          )}
-          {showCheckbox && selectedRowIds.size > 0 && (
-            <div className="flex items-center gap-3 text-sm text-label-primary">
-              <span className="font-semibold">
-                {t('common.table_grid.selected_count', { count: selectedRowIds.size })}
-              </span>
+            {hasSelection && (
               <button
                 type="button"
                 onClick={clearSelections}
                 disabled={isBulkActionPending}
-                className="underline text-label-secondary hover:text-label-primary disabled:opacity-50"
+                className="text-sm underline text-label-secondary hover:text-label-primary disabled:opacity-50"
               >
                 {t('common.table_grid.clear_selection')}
               </button>
+            )}
             </div>
           )}
           {filters.map((filter) => (
@@ -598,7 +615,8 @@ const TableGrid = <T extends BaseRow,>({
             variant="outlined"
             size="small"
             sx={{
-              width: '16rem',
+              // Full width once the toolbar wraps on phones.
+              width: { xs: '100%', sm: '16rem' },
               backgroundColor: 'var(--eduhub-bg-card)',
               '& .MuiInputBase-input': {
                 color: 'var(--eduhub-label-primary)',
@@ -861,6 +879,62 @@ const TableGrid = <T extends BaseRow,>({
       });
     })();
 
+  // Cards have no header row, so phones get its two jobs as explicit controls: select all, and sort.
+  const sortableColumns = table
+    .getAllLeafColumns()
+    .filter((column) => column.getCanSort() && typeof column.columnDef.header === 'string');
+  const currentSortValue = sorting[0] ? `${sorting[0].id}:${sorting[0].desc ? 'desc' : 'asc'}` : '';
+  const handleMobileSortChange = (event: SelectChangeEvent<string>) => {
+    const value = event.target.value;
+    const separator = value.lastIndexOf(':');
+    handleSortingChange(
+      separator < 0 ? [] : [{ id: value.slice(0, separator), desc: value.slice(separator + 1) === 'desc' }]
+    );
+  };
+  const mobileListControls =
+    showBody && rowsToDisplay.length > 0 && (showCheckbox || sortableColumns.length > 0) ? (
+      <div className="flex items-center justify-between gap-3 mb-2">
+        {showCheckbox ? (
+          <label className="flex items-center text-sm text-label-primary -ml-2 cursor-pointer">
+            <Checkbox
+              checked={isAllSelected(tableData)}
+              indeterminate={isSomeSelected(tableData)}
+              onChange={() => toggleAllRows(tableData)}
+              sx={neutralCheckboxSx}
+            />
+            {t('common.table_grid.select_all')}
+          </label>
+        ) : (
+          <span />
+        )}
+        {sortableColumns.length > 0 && (
+          <FormControl size="small" sx={{ minWidth: 0, maxWidth: '65%' }}>
+            <Select
+              value={currentSortValue}
+              displayEmpty
+              onChange={handleMobileSortChange}
+              inputProps={{ 'aria-label': t('common.table_grid.sort_by') }}
+              sx={darkSelectSx}
+              MenuProps={darkSelectMenuProps}
+            >
+              <MenuItem value="">{t('common.table_grid.sort_default')}</MenuItem>
+              {sortableColumns.flatMap((column) => {
+                const columnLabel = column.columnDef.header as string;
+                return [
+                  <MenuItem key={`${column.id}:asc`} value={`${column.id}:asc`}>
+                    {t('common.table_grid.sort_asc', { column: columnLabel })}
+                  </MenuItem>,
+                  <MenuItem key={`${column.id}:desc`} value={`${column.id}:desc`}>
+                    {t('common.table_grid.sort_desc', { column: columnLabel })}
+                  </MenuItem>,
+                ];
+              })}
+            </Select>
+          </FormControl>
+        )}
+      </div>
+    ) : null;
+
   // Phones: tables that provide a card summary render one card per row instead of the grid.
   const mobileCards =
     showBody &&
@@ -930,7 +1004,10 @@ const TableGrid = <T extends BaseRow,>({
           inert={isShowingRetainedPage || undefined}
         >
           {useMobileCards ? (
-            mobileCards
+            <>
+              {mobileListControls}
+              {mobileCards}
+            </>
           ) : (
           <div className="overflow-x-auto max-w-full">
             <div className="w-full" style={{ minWidth: `${mainRowContentWidth}px` }}>

@@ -6,6 +6,14 @@ import { useManageMutation } from '../../../hooks/authedMutation';
 import { SAVE_COURSE_IMAGE } from '../../../queries/actions';
 import { INSERT_COURSE_GROUP_TAG, DELETE_COURSE_GROUP_TAG } from '../../../queries/courseGroup';
 import { INSERT_COURSE_DEGREE_TAG, DELETE_COURSE_DEGREE_TAG } from '../../../queries/courseDegree';
+import {
+  COURSE_SERIES_OPTIONS,
+  COURSE_SERIES_RUNS,
+  CREATE_COURSE_SERIES,
+  UPDATE_COURSE_SERIES,
+} from '../../../queries/courseSeries';
+import { CourseSeriesOptions, CourseSeriesOptionsVariables } from '../../../queries/__generated__/CourseSeriesOptions';
+import { CourseSeriesRuns, CourseSeriesRunsVariables } from '../../../queries/__generated__/CourseSeriesRuns';
 import { DELETE_COURSE_INSRTRUCTOR, INSERT_A_COURSEINSTRUCTOR } from '../../../queries/mutateCourseInstructor';
 import { USER_SELECTION_WITH_FILTER, buildUserSelectionFilter } from '../../../queries/user';
 import { AdminCourseList_Course } from '../../../queries/__generated__/AdminCourseList';
@@ -123,6 +131,28 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
 
   // Get default templates
   const { data: defaultTemplatesData } = useRoleQuery<GetDefaultTemplates>(GET_DEFAULT_TEMPLATES);
+
+  // A course series belongs to the organization of the course's program.
+  const courseOrganizationId = course.Program?.organizationId ?? null;
+  const { data: courseSeriesData } = useRoleQuery<CourseSeriesOptions, CourseSeriesOptionsVariables>(
+    COURSE_SERIES_OPTIONS,
+    {
+      variables: { organizationId: courseOrganizationId ?? 0 },
+      skip: courseOrganizationId === null,
+    }
+  );
+  const courseSeriesOptions = useMemo(
+    () => courseSeriesData?.CourseSeries.map((series) => ({ value: series.id.toString(), label: series.title })) ?? [],
+    [courseSeriesData]
+  );
+  const { data: courseSeriesRunsData } = useRoleQuery<CourseSeriesRuns, CourseSeriesRunsVariables>(
+    COURSE_SERIES_RUNS,
+    {
+      variables: { courseSeriesId: course.courseSeriesId ?? 0 },
+      skip: course.courseSeriesId === null,
+    }
+  );
+  const otherSeriesRuns = courseSeriesRunsData?.Course.filter((run) => run.id !== course.id) ?? [];
 
   const [insertEmailTemplate] = useManageMutation<InsertEmailTemplate, InsertEmailTemplateVariables>(
     INSERT_EMAIL_TEMPLATE
@@ -888,6 +918,46 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                 refetchQueries={['AdminCourseList']}
               />
             </div>
+
+            {/* Course Series - Card Container - past runs' projects are shown on the course page */}
+            {courseOrganizationId !== null && (
+              <div className="bg-fill-primary border border-border-primary rounded-lg p-4 space-y-2">
+                <h4 className="text-sm font-medium text-label-primary">{t('manageCourses.course_series.label')}</h4>
+                <DropDownSelector
+                  variant="material"
+                  label={t('manageCourses.course_series.label')}
+                  placeholder={t('manageCourses.course_series.placeholder')}
+                  helpText={t('manageCourses.course_series.help_text')}
+                  value={course.courseSeriesId?.toString() ?? ''}
+                  options={courseSeriesOptions}
+                  updateValueMutation={UPDATE_COURSE_SERIES}
+                  createOptionMutation={CREATE_COURSE_SERIES}
+                  identifierVariables={{ itemId: course.id, organizationId: courseOrganizationId }}
+                  creatable
+                  nullable
+                  nullableLabel={t('manageCourses.course_series.none')}
+                  refetchQueries={['AdminCourseList', 'CourseSeriesOptions', 'CourseSeriesRuns']}
+                />
+                {course.courseSeriesId !== null && (
+                  <div className="text-sm text-label-secondary">
+                    {otherSeriesRuns.length > 0 ? (
+                      <>
+                        <p>{t('manageCourses.course_series.other_runs')}</p>
+                        <ul className="list-disc pl-5">
+                          {otherSeriesRuns.map((run) => (
+                            <li key={run.id}>
+                              {run.title} ({run.Program?.shortTitle || run.Program?.title})
+                            </li>
+                          ))}
+                        </ul>
+                      </>
+                    ) : (
+                      <p>{t('manageCourses.course_series.no_other_runs')}</p>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* 3. Cover Image Upload - Card Container */}
             <div className="bg-fill-primary border border-border-primary rounded-lg p-4">

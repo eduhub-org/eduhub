@@ -159,7 +159,12 @@
       "clear_selection": "Auswahl aufheben",
       "expand_row": "Details anzeigen",
       "collapse_row": "Details ausblenden",
-      "open_row": "Öffnen"
+      "open_row": "Öffnen",
+      "select_all": "Alle",
+      "sort_by": "Sortieren",
+      "sort_default": "Standardsortierung",
+      "sort_asc": "{column}, aufsteigend",
+      "sort_desc": "{column}, absteigend"
     },
     "table_grid_delete_button": {
       "delete": "Löschen",
@@ -601,7 +606,9 @@
         "details_summary": "Was wird veröffentlicht?",
         "description": "opencampus.sh (betrieben vom gemeinnützigen Verein Campus Business Box e.V.) kann dieses Projekt als Showcase-Beispiel auf der Plattform und in Werbematerialien veröffentlichen sowie für die Teilnahme oder Einreichung bei Preisen verwenden. Was geteilt wird: Projekttitel, Beschreibung, Titelbild, hochgeladene Dateien und Links sowie die Namen und Element-Raum-Links der beitragenden Autor:innen. Die Einwilligung ist freiwillig und kann jederzeit in deiner Projektansicht erteilt oder widerrufen werden; ein Widerruf entfernt das Projekt aus der Veröffentlichung.",
         "status_granted": "Einwilligung erteilt von {name} am {date}.",
-        "status_withdrawn": "Einwilligung widerrufen von {name} am {date} — das Projekt wird nicht veröffentlicht."
+        "status_withdrawn": "Einwilligung widerrufen von {name} am {date} — das Projekt wird nicht veröffentlicht.",
+        "table_granted": "Veröffentlichung zugestimmt",
+        "table_declined": "Veröffentlichung abgelehnt"
       },
       "submit_dialog": {
         "title": "Projekt zur Bewertung einreichen",
@@ -1166,6 +1173,14 @@
       "label": "Kursgruppe",
       "placeholder": "Kursgruppen auswählen",
       "slider_badge": "Startseiten-Slider"
+    },
+    "course_series": {
+      "label": "Kursreihe",
+      "placeholder": "Kursreihe auswählen oder neu anlegen",
+      "help_text": "Alle Durchläufe desselben Kurses gehören zu einer Kursreihe. Auf der Kursseite werden Projekte aus vergangenen Durchläufen der Reihe gezeigt. Beim Veröffentlichen wird ein Kurs ohne Reihe automatisch mit früheren Kursen gleichen Titels zu einer Reihe zusammengefasst. Einmalige Kurse brauchen keine Reihe.",
+      "none": "Keine Kursreihe",
+      "other_runs": "Weitere Durchläufe dieser Reihe:",
+      "no_other_runs": "Noch keine weiteren Durchläufe in dieser Reihe."
     },
     "cover_image": {
       "label": "Titelbild",
@@ -2018,7 +2033,10 @@
         "TEST_ENROLLMENT_COURSE_NOT_FOUND": "Dieser Kurs existiert nicht mehr.",
         "TEST_ENROLLMENT_INVALID_INPUT": "Die Anfrage war fehlerhaft."
       }
-    }
+    },
+    "info_block_mobile_summary": "{title} · {count} Zeichen",
+    "info_block_mobile_untitled": "Ohne Titel",
+    "info_block_mobile_empty": "Noch leer"
   },
   "manageProjects": {
     "headline": "Projekte",
@@ -3221,5 +3239,9 @@
     "exit": "Zurück zu meinem Konto",
     "action": "Ansicht übernehmen",
     "start_failed": "Die Ansicht konnte nicht übernommen werden."
+  },
+  "eventsFeed": {
+    "title": "EduHub Events | opencampus.sh",
+    "description": "Kommende Events bei opencampus.sh"
   }
 }

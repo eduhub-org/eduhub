@@ -159,7 +159,12 @@
       "clear_selection": "Clear selection",
       "expand_row": "Show details",
       "collapse_row": "Hide details",
-      "open_row": "Open"
+      "open_row": "Open",
+      "select_all": "All",
+      "sort_by": "Sort by",
+      "sort_default": "Default order",
+      "sort_asc": "{column}, ascending",
+      "sort_desc": "{column}, descending"
     },
     "table_grid_delete_button": {
       "delete": "Delete",
@@ -601,7 +606,9 @@
         "details_summary": "What will be published?",
         "description": "opencampus.sh (operated by the non-profit Campus Business Box e.V.) may publish this project as a showcase example on the platform and in promotional materials, and may enter it for participation or submission for prizes. What will be shared: project title, description, cover image, files and links, and the names and Element room links of the contributing authors. Consent is voluntary and can be granted or withdrawn at any time from your project view; withdrawing removes the project from publication.",
         "status_granted": "Consent granted by {name} on {date}.",
-        "status_withdrawn": "Consent withdrawn by {name} on {date} — the project will not be published."
+        "status_withdrawn": "Consent withdrawn by {name} on {date} — the project will not be published.",
+        "table_granted": "Publication approved",
+        "table_declined": "Publication declined"
       },
       "submit_dialog": {
         "title": "Submit project for review",
@@ -1182,6 +1189,14 @@
       "label": "Course Group",
       "placeholder": "Select course groups",
       "slider_badge": "Homepage slider"
+    },
+    "course_series": {
+      "label": "Course series",
+      "placeholder": "Select or create a course series",
+      "help_text": "All runs of the same course belong to one course series. The course page shows projects from past runs of the series. When a course without a series is published, it is grouped automatically with earlier courses of the same title. One-off courses don't need a series.",
+      "none": "No course series",
+      "other_runs": "Other runs in this series:",
+      "no_other_runs": "No other runs in this series yet."
     },
     "cover_image": {
       "label": "Cover Image",
@@ -2033,7 +2048,10 @@
         "TEST_ENROLLMENT_COURSE_NOT_FOUND": "This course no longer exists.",
         "TEST_ENROLLMENT_INVALID_INPUT": "The request was malformed."
       }
-    }
+    },
+    "info_block_mobile_summary": "{title} · {count} characters",
+    "info_block_mobile_untitled": "Untitled",
+    "info_block_mobile_empty": "Empty"
   },
   "manageProjects": {
     "headline": "Projects",
@@ -3236,5 +3254,9 @@
     "exit": "Back to my account",
     "action": "View as this user",
     "start_failed": "Could not switch to this user's view."
+  },
+  "eventsFeed": {
+    "title": "EduHub Events | opencampus.sh",
+    "description": "Upcoming events at opencampus.sh"
   }
 }

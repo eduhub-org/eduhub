@@ -222,6 +222,10 @@ export interface AdminCourseList_Course_Program {
    * Matrix room id for the program-wide instructor Element chat (!room:server); invites are sent via admin API.
    */
   matrixInstructorRoomId: string | null;
+  /**
+   * Organization that owns the program. References Organization.id (0 = platform default)
+   */
+  organizationId: number;
 }
 
 export interface AdminCourseList_Course_CourseGroups_CourseGroupOption {
@@ -554,6 +558,10 @@ export interface AdminCourseList_Course {
    * Stripe Price ID for the base course price
    */
   stripePriceId: string | null;
+  /**
+   * Links this course to its CourseSeries (the set of all iterations of the same course). Used to surface projects from past iterations.
+   */
+  courseSeriesId: number | null;
   /**
    * An array relationship
    */
