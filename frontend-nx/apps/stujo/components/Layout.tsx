@@ -1,9 +1,11 @@
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { signIn, signOut, useSession } from 'next-auth/react';
+import { signIn, useSession } from 'next-auth/react';
 import { FC, PropsWithChildren, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
+
+import useLogout from '@eduhub/hooks/logout';
 
 import type { PortalBranding } from '../lib/portal';
 import StuJoLegacyIcon from './StuJoLegacyIcon';
@@ -25,27 +27,7 @@ const Layout: FC<LayoutProps> = ({ children, fullWidthMain = false, portal }) =>
   const tLayout = useTranslations('common.Layout');
   const router = useRouter();
   const { status: sessionStatus } = useSession();
-
-  // Keycloak end-session logout, same flow as the edu-hub app: fetch the
-  // end-session URL, clear the NextAuth session, then redirect through
-  // Keycloak back to the app.
-  const logout = useCallback(async () => {
-    let url = '/';
-
-    try {
-      const res = await fetch('/api/auth/logout');
-      if (res.ok) {
-        const payload = await res.json();
-        if (typeof payload?.url === 'string') url = payload.url;
-      }
-    } catch (error) {
-      console.error('Failed to prepare federated logout', error);
-    }
-
-    // A stale/malformed token must not strand the user on the API route.
-    await signOut({ redirect: false });
-    router.push(url);
-  }, [router]);
+  const logout = useLogout();
 
   // Login/registration use the standard OIDC full-page redirect. Keycloak
   // and the portal will live on different domains in production, where
