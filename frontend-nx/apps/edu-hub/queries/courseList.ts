@@ -52,18 +52,6 @@ export const ADMIN_COURSE_LIST = gql`
         organizationId
       }
       courseSeriesId
-      CourseSeries {
-        id
-        Courses(order_by: { id: desc }) {
-          id
-          title
-          Program {
-            id
-            shortTitle
-            title
-          }
-        }
-      }
       CourseEnrollments(where: { isTest: { _eq: false } }) {
         id
         CourseEnrollmentStatus {

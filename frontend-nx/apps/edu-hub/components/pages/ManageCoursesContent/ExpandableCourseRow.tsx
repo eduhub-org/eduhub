@@ -6,8 +6,14 @@ import { useManageMutation } from '../../../hooks/authedMutation';
 import { SAVE_COURSE_IMAGE } from '../../../queries/actions';
 import { INSERT_COURSE_GROUP_TAG, DELETE_COURSE_GROUP_TAG } from '../../../queries/courseGroup';
 import { INSERT_COURSE_DEGREE_TAG, DELETE_COURSE_DEGREE_TAG } from '../../../queries/courseDegree';
-import { COURSE_SERIES_OPTIONS, CREATE_COURSE_SERIES, UPDATE_COURSE_SERIES } from '../../../queries/courseSeries';
+import {
+  COURSE_SERIES_OPTIONS,
+  COURSE_SERIES_RUNS,
+  CREATE_COURSE_SERIES,
+  UPDATE_COURSE_SERIES,
+} from '../../../queries/courseSeries';
 import { CourseSeriesOptions, CourseSeriesOptionsVariables } from '../../../queries/__generated__/CourseSeriesOptions';
+import { CourseSeriesRuns, CourseSeriesRunsVariables } from '../../../queries/__generated__/CourseSeriesRuns';
 import { DELETE_COURSE_INSRTRUCTOR, INSERT_A_COURSEINSTRUCTOR } from '../../../queries/mutateCourseInstructor';
 import { USER_SELECTION_WITH_FILTER, buildUserSelectionFilter } from '../../../queries/user';
 import { AdminCourseList_Course } from '../../../queries/__generated__/AdminCourseList';
@@ -139,7 +145,14 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
     () => courseSeriesData?.CourseSeries.map((series) => ({ value: series.id.toString(), label: series.title })) ?? [],
     [courseSeriesData]
   );
-  const otherSeriesRuns = course.CourseSeries?.Courses.filter((run) => run.id !== course.id) ?? [];
+  const { data: courseSeriesRunsData } = useRoleQuery<CourseSeriesRuns, CourseSeriesRunsVariables>(
+    COURSE_SERIES_RUNS,
+    {
+      variables: { courseSeriesId: course.courseSeriesId ?? 0 },
+      skip: course.courseSeriesId === null,
+    }
+  );
+  const otherSeriesRuns = courseSeriesRunsData?.Course.filter((run) => run.id !== course.id) ?? [];
 
   const [insertEmailTemplate] = useManageMutation<InsertEmailTemplate, InsertEmailTemplateVariables>(
     INSERT_EMAIL_TEMPLATE
@@ -923,7 +936,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                   creatable
                   nullable
                   nullableLabel={t('manageCourses.course_series.none')}
-                  refetchQueries={['AdminCourseList', 'CourseSeriesOptions']}
+                  refetchQueries={['AdminCourseList', 'CourseSeriesOptions', 'CourseSeriesRuns']}
                 />
                 {course.courseSeriesId !== null && (
                   <div className="text-sm text-label-secondary">

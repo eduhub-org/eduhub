@@ -320,41 +320,6 @@ export interface AdminCourseList_Course_CourseAddonMappings {
   currency: string;
 }
 
-export interface AdminCourseList_Course_CourseSeries_Courses_Program {
-  __typename: "Program";
-  id: number;
-  /**
-   * The 6 letter short title for the program.
-   */
-  shortTitle: string | null;
-  /**
-   * The title of the program
-   */
-  title: string;
-}
-
-export interface AdminCourseList_Course_CourseSeries_Courses {
-  __typename: "Course";
-  id: number;
-  /**
-   * The title of the course (only editable by an admin user)
-   */
-  title: string;
-  /**
-   * An object relationship
-   */
-  Program: AdminCourseList_Course_CourseSeries_Courses_Program;
-}
-
-export interface AdminCourseList_Course_CourseSeries {
-  __typename: "CourseSeries";
-  id: number;
-  /**
-   * An array relationship
-   */
-  Courses: AdminCourseList_Course_CourseSeries_Courses[];
-}
-
 export interface AdminCourseList_Course_CourseEnrollments_CourseEnrollmentStatus {
   __typename: "CourseEnrollmentStatus";
   value: string;
@@ -597,10 +562,6 @@ export interface AdminCourseList_Course {
    * Links this course to its CourseSeries (the set of all iterations of the same course). Used to surface projects from past iterations.
    */
   courseSeriesId: number | null;
-  /**
-   * An object relationship
-   */
-  CourseSeries: AdminCourseList_Course_CourseSeries | null;
   /**
    * An array relationship
    */

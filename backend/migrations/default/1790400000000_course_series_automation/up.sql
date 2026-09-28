@@ -34,6 +34,11 @@ DECLARE
 BEGIN
   SELECT p."organizationId" INTO _org FROM "public"."Program" p WHERE p."id" = program_id;
 
+  -- Serialize resolution per organization and normalized title, so two courses
+  -- published at the same time cannot each create their own series. Under read
+  -- committed, the lookups below then see a series the other transaction created.
+  PERFORM pg_advisory_xact_lock(hashtext(coalesce(_org::text, '') || ':' || lower(trim(course_title))));
+
   SELECT c."courseSeriesId" INTO _series
   FROM "public"."Course" c
   JOIN "public"."CourseSeries" cs ON cs."id" = c."courseSeriesId"
@@ -75,7 +80,8 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql VOLATILE;
 
--- A course without a series gets one when it is published. Not on a title
+-- A course without a series gets one when it is published (or inserted as
+-- published, e.g. through the API). Not on a title
 -- change: the title field auto-saves while the admin types, so an intermediate
 -- title ("Machine Lea") would pick or create the wrong series. Publishing is a
 -- single deliberate step with the final title, and past projects only show on
@@ -84,10 +90,10 @@ $$ LANGUAGE plpgsql VOLATILE;
 CREATE OR REPLACE FUNCTION "public"."assign_course_series_on_publish"()
 RETURNS TRIGGER AS $$
 BEGIN
-  IF NEW."published" AND NOT OLD."published"
+  IF NEW."published"
      AND NEW."courseSeriesId" IS NULL
-     AND OLD."courseSeriesId" IS NULL
-     AND NOT "public"."course_title_is_placeholder"(NEW."title") THEN
+     AND NOT "public"."course_title_is_placeholder"(NEW."title")
+     AND (TG_OP = 'INSERT' OR (NOT OLD."published" AND OLD."courseSeriesId" IS NULL)) THEN
     NEW."courseSeriesId" := "public"."resolve_course_series"(NEW."id", NEW."title", NEW."programId");
   END IF;
   RETURN NEW;
@@ -95,7 +101,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER "assign_Course_courseSeriesId_on_publish"
-BEFORE UPDATE OF "published" ON "public"."Course"
+BEFORE INSERT OR UPDATE OF "published" ON "public"."Course"
 FOR EACH ROW
 EXECUTE PROCEDURE "public"."assign_course_series_on_publish"();
 

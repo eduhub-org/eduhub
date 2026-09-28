@@ -9,6 +9,21 @@ export const COURSE_SERIES_OPTIONS = gql`
   }
 `;
 
+// Runs of one series, loaded by the expanded course row only.
+export const COURSE_SERIES_RUNS = gql`
+  query CourseSeriesRuns($courseSeriesId: Int!) {
+    Course(where: { courseSeriesId: { _eq: $courseSeriesId } }, order_by: { id: desc }) {
+      id
+      title
+      Program {
+        id
+        shortTitle
+        title
+      }
+    }
+  }
+`;
+
 // Variables follow DropDownSelector's contract: `itemId` + `value` (the series id, null clears it).
 export const UPDATE_COURSE_SERIES = gql`
   mutation UpdateCourseSeries($itemId: Int!, $value: Int) {
