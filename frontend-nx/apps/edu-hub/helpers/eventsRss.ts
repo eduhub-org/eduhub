@@ -37,8 +37,13 @@ export interface EventsRssOptions {
   now?: Date;
 }
 
+/** Drops characters XML 1.0 forbids (e.g. U+000B), which would make the whole feed unparsable. */
+const removeInvalidXmlCharacters = (text: string): string =>
+  // eslint-disable-next-line no-control-regex -- matching control characters is the point
+  text.replace(/[^\u0009\u000A\u000D\u0020-\uD7FF\uE000-\uFFFD\u{10000}-\u{10FFFF}]/gu, '');
+
 const escapeXml = (text: string): string =>
-  text
+  removeInvalidXmlCharacters(text)
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
@@ -46,7 +51,8 @@ const escapeXml = (text: string): string =>
     .replace(/'/g, '&apos;');
 
 /** Wraps HTML in CDATA, splitting any "]]>" so it cannot close the section early. */
-const cdata = (html: string): string => `<![CDATA[${html.replace(/]]>/g, ']]]]><![CDATA[>')}]]>`;
+const cdata = (html: string): string =>
+  `<![CDATA[${removeInvalidXmlCharacters(html).replace(/]]>/g, ']]]]><![CDATA[>')}]]>`;
 
 /** RFC 822 date, as RSS 2.0 requires. */
 const rssDate = (value: Date | string): string => new Date(value).toUTCString();

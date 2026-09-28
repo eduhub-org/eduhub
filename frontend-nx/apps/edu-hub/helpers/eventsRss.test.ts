@@ -116,6 +116,23 @@ describe('buildEventsRss content:encoded', () => {
     expect(xml).toContain('<content:encoded><![CDATA[<h2>About</h2><p>a ]]]]><![CDATA[> b</p>]]></content:encoded>');
   });
 
+  it('drops characters XML 1.0 forbids from text and content', () => {
+    const xml = buildEventsRss(
+      [
+        event(14, [], {
+          title: 'Talk\u000Bs',
+          headingDescriptionField1: 'About',
+          contentDescriptionField1: 'a\u0001b',
+        }),
+      ],
+      OPTIONS
+    );
+    expect(xml).toContain('<title>Talks</title>');
+    expect(xml).toContain('<p>ab</p>');
+    expect(xml).not.toContain('\u0001');
+    expect(xml).not.toContain('\u000B');
+  });
+
   it('leaves content:encoded out when there is nothing to show', () => {
     expect(buildEventsRss([event(13, [])], OPTIONS)).not.toContain('<content:encoded>');
   });

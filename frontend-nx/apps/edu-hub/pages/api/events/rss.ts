@@ -33,7 +33,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       language: locale,
       baseUrl: `${origin}${localePrefix}`,
       feedUrl: `${origin}${localePrefix}/events/rss.xml`,
-      renderMarkdown: markdownToHtml,
+      renderMarkdown: (markdown) => markdownToHtml(markdown, origin),
     });
 
     res.setHeader('Content-Type', 'application/rss+xml; charset=utf-8');
