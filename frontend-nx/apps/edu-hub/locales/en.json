@@ -3254,5 +3254,9 @@
     "exit": "Back to my account",
     "action": "View as this user",
     "start_failed": "Could not switch to this user's view."
+  },
+  "eventsFeed": {
+    "title": "EduHub Events | opencampus.sh",
+    "description": "Upcoming events at opencampus.sh"
   }
 }
