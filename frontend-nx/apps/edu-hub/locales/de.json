@@ -3239,5 +3239,9 @@
     "exit": "Zurück zu meinem Konto",
     "action": "Ansicht übernehmen",
     "start_failed": "Die Ansicht konnte nicht übernommen werden."
+  },
+  "eventsFeed": {
+    "title": "EduHub Events | opencampus.sh",
+    "description": "Kommende Events bei opencampus.sh"
   }
 }

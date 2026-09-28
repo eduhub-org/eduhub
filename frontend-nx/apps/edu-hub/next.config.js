@@ -120,6 +120,16 @@ const nextConfig = {
       { source: '/manage/email-templates', destination: '/manage/settings/emails', permanent: false },
     ];
   },
+  async rewrites() {
+    return [
+      // Public URLs for the events RSS feed. `locale: false` because the API
+      // route itself is not localised; the language travels as a query param.
+      // Next matches these after prefixing the default locale, so the German
+      // feed at /events/rss.xml arrives here as /de/events/rss.xml.
+      { source: '/de/events/rss.xml', destination: '/api/events/rss', locale: false },
+      { source: '/en/events/rss.xml', destination: '/api/events/rss?locale=en', locale: false },
+    ];
+  },
   async headers() {
     return [
       {
