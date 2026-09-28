@@ -4454,7 +4454,7 @@
         },
         {
           "type": "frame",
-          "id": "imuDz",
+          "id": "Igxxy",
           "name": "Group Kursprojekte",
           "width": "fill_container",
           "stroke": "$border",
@@ -4472,7 +4472,7 @@
           "children": [
             {
               "type": "frame",
-              "id": "rChRE",
+              "id": "Tvzn8",
               "name": "gh",
               "width": "fill_container",
               "layout": "vertical",
@@ -4480,7 +4480,7 @@
               "children": [
                 {
                   "type": "text",
-                  "id": "nJOky",
+                  "id": "sL8Ve",
                   "name": "Kursprojekte",
                   "fill": "$label-primary",
                   "content": "Kursprojekte",
@@ -4490,7 +4490,7 @@
                 },
                 {
                   "type": "text",
-                  "id": "ia7mV",
+                  "id": "NOpGx",
                   "name": "Vorlagen, Kopien, Autor:",
                   "fill": "$label-muted",
                   "textGrowth": "fixed-width",
@@ -4504,7 +4504,7 @@
             },
             {
               "type": "frame",
-              "id": "r8mSI",
+              "id": "CNzjC",
               "name": "AddButton",
               "fill": "$label-primary",
               "cornerRadius": 999,
@@ -4517,7 +4517,7 @@
               "children": [
                 {
                   "type": "icon",
-                  "id": "wfBxT",
+                  "id": "a2YzN",
                   "name": "circle-plus",
                   "width": 16,
                   "height": 16,
@@ -4527,7 +4527,7 @@
                 },
                 {
                   "type": "text",
-                  "id": "orKlw",
+                  "id": "kwDXo",
                   "name": "Projekt hinzufügen",
                   "fill": "$on-light-primary",
                   "content": "Projekt hinzufügen",
@@ -4539,8 +4539,8 @@
             },
             {
               "type": "frame",
-              "id": "y3eyi",
-              "name": "Project Churn-Vorhersage für Stadtwerke Kiel",
+              "id": "ZyVmy",
+              "name": "Project Churn-Vorhersage Stadtwerke",
               "clip": true,
               "width": "fill_container",
               "fill": "$white",
@@ -4549,7 +4549,7 @@
               "children": [
                 {
                   "type": "frame",
-                  "id": "x3CC0q",
+                  "id": "PdQfF",
                   "name": "Head",
                   "width": "fill_container",
                   "gap": 12,
@@ -4562,7 +4562,7 @@
                   "children": [
                     {
                       "type": "frame",
-                      "id": "jyktc",
+                      "id": "flLsV",
                       "name": "main",
                       "width": "fill_container",
                       "layout": "vertical",
@@ -4570,7 +4570,7 @@
                       "children": [
                         {
                           "type": "frame",
-                          "id": "J9z2D",
+                          "id": "l4JjdJ",
                           "name": "chip Eingereicht",
                           "fill": "$light-bg-secondary",
                           "cornerRadius": 999,
@@ -4583,7 +4583,7 @@
                           "children": [
                             {
                               "type": "icon",
-                              "id": "Z2nkU",
+                              "id": "mSKOF",
                               "name": "circle-dot",
                               "width": 13,
                               "height": 13,
@@ -4593,7 +4593,7 @@
                             },
                             {
                               "type": "text",
-                              "id": "o0Esd",
+                              "id": "mX6Oa",
                               "name": "Eingereicht",
                               "fill": "$on-light-secondary",
                               "content": "Eingereicht",
@@ -4605,7 +4605,7 @@
                         },
                         {
                           "type": "text",
-                          "id": "ilD8F",
+                          "id": "vvNcR",
                           "name": "Churn-Vorhersage für Sta",
                           "fill": "$on-light-primary",
                           "textGrowth": "fixed-width",
@@ -4617,21 +4617,50 @@
                         },
                         {
                           "type": "frame",
-                          "id": "hgWq8",
+                          "id": "ZGqNV",
+                          "name": "consent line",
+                          "gap": 4,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon",
+                              "id": "lgRx2",
+                              "name": "circle-check",
+                              "width": 13,
+                              "height": 13,
+                              "icon": "circle-check",
+                              "library": "lucide",
+                              "fill": "$status-green"
+                            },
+                            {
+                              "type": "text",
+                              "id": "wkmzh",
+                              "name": "Veröffentlichung zugesti",
+                              "fill": "$on-light-secondary",
+                              "content": "Veröffentlichung zugestimmt",
+                              "fontFamily": "$font",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "wUQX2",
                           "name": "meta",
                           "gap": 10,
                           "alignItems": "center",
                           "children": [
                             {
                               "type": "frame",
-                              "id": "LuoD8",
+                              "id": "mKoKG",
                               "name": "a",
                               "gap": 4,
                               "alignItems": "center",
                               "children": [
                                 {
                                   "type": "icon",
-                                  "id": "M0MeYz",
+                                  "id": "E7Vkl",
                                   "name": "users",
                                   "width": 13,
                                   "height": 13,
@@ -4641,10 +4670,10 @@
                                 },
                                 {
                                   "type": "text",
-                                  "id": "KH9g1",
-                                  "name": "3 Autor:innen",
+                                  "id": "TjzyT",
+                                  "name": "E. Bauer, N. Ali +1",
                                   "fill": "$on-light-secondary",
-                                  "content": "3 Autor:innen",
+                                  "content": "E. Bauer, N. Ali +1",
                                   "fontFamily": "$font",
                                   "fontSize": 12,
                                   "fontWeight": "normal"
@@ -4653,14 +4682,14 @@
                             },
                             {
                               "type": "frame",
-                              "id": "TiTSl",
+                              "id": "J5TfR",
                               "name": "t",
                               "gap": 4,
                               "alignItems": "center",
                               "children": [
                                 {
                                   "type": "icon",
-                                  "id": "r9hkbs",
+                                  "id": "U79U6",
                                   "name": "file-text",
                                   "width": 13,
                                   "height": 13,
@@ -4670,7 +4699,7 @@
                                 },
                                 {
                                   "type": "text",
-                                  "id": "E6lYXa",
+                                  "id": "zF4R4",
                                   "name": "Projektbericht",
                                   "fill": "$on-light-secondary",
                                   "content": "Projektbericht",
@@ -4686,7 +4715,7 @@
                     },
                     {
                       "type": "frame",
-                      "id": "fP4ls",
+                      "id": "XeWT4",
                       "name": "Expand button",
                       "width": 32,
                       "height": 32,
@@ -4697,7 +4726,7 @@
                       "children": [
                         {
                           "type": "icon",
-                          "id": "H96XX",
+                          "id": "CM4qa",
                           "name": "chevron-down",
                           "width": 20,
                           "height": 20,
@@ -4711,7 +4740,7 @@
                 },
                 {
                   "type": "frame",
-                  "id": "XpREz",
+                  "id": "oosGq",
                   "name": "Action",
                   "width": "fill_container",
                   "padding": [
@@ -4723,21 +4752,28 @@
                   "children": [
                     {
                       "type": "frame",
-                      "id": "y4NUWW",
+                      "id": "S8hRYi",
                       "name": "Btn Projekt bewerten",
                       "width": "fill_container",
-                      "height": 40,
                       "fill": "$on-light-primary",
                       "cornerRadius": 999,
+                      "padding": [
+                        8,
+                        12
+                      ],
                       "justifyContent": "center",
                       "alignItems": "center",
                       "children": [
                         {
                           "type": "text",
-                          "id": "bs02F",
+                          "id": "jt0u5",
                           "name": "Projekt bewerten",
                           "fill": "$white",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
                           "content": "Projekt bewerten",
+                          "lineHeight": 1.2,
+                          "textAlign": "center",
                           "fontFamily": "$font",
                           "fontSize": 13,
                           "fontWeight": "600"
@@ -4750,8 +4786,8 @@
             },
             {
               "type": "frame",
-              "id": "x1yo4",
-              "name": "Project Vorlage: ML-Projekt",
+              "id": "g0egfD",
+              "name": "Project Chatbot Bürgeramt",
               "clip": true,
               "width": "fill_container",
               "fill": "$white",
@@ -4760,7 +4796,7 @@
               "children": [
                 {
                   "type": "frame",
-                  "id": "COXVa",
+                  "id": "ZsOTG",
                   "name": "Head",
                   "width": "fill_container",
                   "gap": 12,
@@ -4773,7 +4809,7 @@
                   "children": [
                     {
                       "type": "frame",
-                      "id": "fGDMd",
+                      "id": "sJlDF",
                       "name": "main",
                       "width": "fill_container",
                       "layout": "vertical",
@@ -4781,8 +4817,8 @@
                       "children": [
                         {
                           "type": "frame",
-                          "id": "OxKTs",
-                          "name": "chip Vorlage",
+                          "id": "W1e3F",
+                          "name": "chip Bestanden",
                           "fill": "$light-bg-secondary",
                           "cornerRadius": 999,
                           "gap": 4,
@@ -4794,20 +4830,20 @@
                           "children": [
                             {
                               "type": "icon",
-                              "id": "T58rJf",
-                              "name": "file",
+                              "id": "QnMYF",
+                              "name": "circle-check",
                               "width": 13,
                               "height": 13,
-                              "icon": "file",
+                              "icon": "circle-check",
                               "library": "lucide",
-                              "fill": "$on-light-muted"
+                              "fill": "$status-green"
                             },
                             {
                               "type": "text",
-                              "id": "VaX2p",
-                              "name": "Vorlage",
+                              "id": "XVeyW",
+                              "name": "Bestanden",
                               "fill": "$on-light-secondary",
-                              "content": "Vorlage",
+                              "content": "Bestanden",
                               "fontFamily": "$font",
                               "fontSize": 12,
                               "fontWeight": "600"
@@ -4816,33 +4852,62 @@
                         },
                         {
                           "type": "text",
-                          "id": "G9nld8",
-                          "name": "Vorlage: ML-Projekt",
+                          "id": "F4SbTk",
+                          "name": "Chatbot für das Bürgeram",
                           "fill": "$on-light-primary",
                           "textGrowth": "fixed-width",
                           "width": "fill_container",
-                          "content": "Vorlage: ML-Projekt",
+                          "content": "Chatbot für das Bürgeramt",
                           "fontFamily": "$font",
                           "fontSize": 15,
                           "fontWeight": "600"
                         },
                         {
                           "type": "frame",
-                          "id": "ajPK0",
+                          "id": "TVHjY",
+                          "name": "consent line",
+                          "gap": 4,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon",
+                              "id": "i0yRa",
+                              "name": "circle-x",
+                              "width": 13,
+                              "height": 13,
+                              "icon": "circle-x",
+                              "library": "lucide",
+                              "fill": "$error"
+                            },
+                            {
+                              "type": "text",
+                              "id": "pFoFp",
+                              "name": "Veröffentlichung abgeleh",
+                              "fill": "$on-light-secondary",
+                              "content": "Veröffentlichung abgelehnt",
+                              "fontFamily": "$font",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "XLher",
                           "name": "meta",
                           "gap": 10,
                           "alignItems": "center",
                           "children": [
                             {
                               "type": "frame",
-                              "id": "K6YAf",
+                              "id": "hpxyS",
                               "name": "a",
                               "gap": 4,
                               "alignItems": "center",
                               "children": [
                                 {
                                   "type": "icon",
-                                  "id": "V1q5Y",
+                                  "id": "aACYX",
                                   "name": "users",
                                   "width": 13,
                                   "height": 13,
@@ -4852,10 +4917,10 @@
                                 },
                                 {
                                   "type": "text",
-                                  "id": "IavIz",
-                                  "name": "Keine Autor:innen",
+                                  "id": "BIqtG",
+                                  "name": "L. Ludwig, T. Brown",
                                   "fill": "$on-light-secondary",
-                                  "content": "Keine Autor:innen",
+                                  "content": "L. Ludwig, T. Brown",
                                   "fontFamily": "$font",
                                   "fontSize": 12,
                                   "fontWeight": "normal"
@@ -4864,14 +4929,14 @@
                             },
                             {
                               "type": "frame",
-                              "id": "CRAQy",
+                              "id": "dV2GC",
                               "name": "t",
                               "gap": 4,
                               "alignItems": "center",
                               "children": [
                                 {
                                   "type": "icon",
-                                  "id": "NcUDR",
+                                  "id": "L1okgM",
                                   "name": "file-text",
                                   "width": 13,
                                   "height": 13,
@@ -4881,10 +4946,10 @@
                                 },
                                 {
                                   "type": "text",
-                                  "id": "J7ZlC",
-                                  "name": "Typ wählen",
+                                  "id": "PaGcD",
+                                  "name": "Prototyp",
                                   "fill": "$on-light-secondary",
-                                  "content": "Typ wählen",
+                                  "content": "Prototyp",
                                   "fontFamily": "$font",
                                   "fontSize": 12,
                                   "fontWeight": "normal"
@@ -4897,7 +4962,7 @@
                     },
                     {
                       "type": "frame",
-                      "id": "rKBot",
+                      "id": "W6ipy",
                       "name": "Expand button",
                       "width": 32,
                       "height": 32,
@@ -4908,7 +4973,7 @@
                       "children": [
                         {
                           "type": "icon",
-                          "id": "Jq5S1",
+                          "id": "zuduw",
                           "name": "chevron-down",
                           "width": 20,
                           "height": 20,
@@ -4922,7 +4987,7 @@
                 },
                 {
                   "type": "frame",
-                  "id": "x6OrIn",
+                  "id": "bDSFv",
                   "name": "Action",
                   "width": "fill_container",
                   "padding": [
@@ -4934,22 +4999,246 @@
                   "children": [
                     {
                       "type": "frame",
-                      "id": "erfwQ",
-                      "name": "Btn Vorlage löschen",
+                      "id": "XrFPA",
+                      "name": "Btn Zur Veröffentlichung vorschlagen",
                       "width": "fill_container",
-                      "height": 40,
                       "cornerRadius": 999,
                       "stroke": "$on-light-primary",
                       "strokeWidth": 1.5,
+                      "padding": [
+                        8,
+                        12
+                      ],
                       "justifyContent": "center",
                       "alignItems": "center",
                       "children": [
                         {
                           "type": "text",
-                          "id": "lIE4Z",
-                          "name": "Vorlage löschen",
+                          "id": "P1F7E",
+                          "name": "Zur Veröffentlichung vor",
                           "fill": "$on-light-primary",
-                          "content": "Vorlage löschen",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Zur Veröffentlichung vorschlagen",
+                          "lineHeight": 1.2,
+                          "textAlign": "center",
+                          "fontFamily": "$font",
+                          "fontSize": 12,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "nrg63",
+              "name": "Project Verkehrsfluss-Analyse",
+              "clip": true,
+              "width": "fill_container",
+              "fill": "$white",
+              "cornerRadius": 10,
+              "layout": "vertical",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "PtvkJ",
+                  "name": "Head",
+                  "width": "fill_container",
+                  "gap": 12,
+                  "padding": [
+                    12,
+                    12,
+                    12,
+                    14
+                  ],
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "CmFxZ",
+                      "name": "main",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 5,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "idfKr",
+                          "name": "chip In Bearbeitung",
+                          "fill": "$light-bg-secondary",
+                          "cornerRadius": 999,
+                          "gap": 4,
+                          "padding": [
+                            3,
+                            8
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon",
+                              "id": "YWnSp",
+                              "name": "loader",
+                              "width": 13,
+                              "height": 13,
+                              "icon": "loader",
+                              "library": "lucide",
+                              "fill": "$on-light-muted"
+                            },
+                            {
+                              "type": "text",
+                              "id": "N6FPbI",
+                              "name": "In Bearbeitung",
+                              "fill": "$on-light-secondary",
+                              "content": "In Bearbeitung",
+                              "fontFamily": "$font",
+                              "fontSize": 12,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "RhW4g",
+                          "name": "Verkehrsfluss-Analyse In",
+                          "fill": "$on-light-primary",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Verkehrsfluss-Analyse Innenstadt",
+                          "fontFamily": "$font",
+                          "fontSize": 15,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "ausay",
+                          "name": "meta",
+                          "gap": 10,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "JgfGS",
+                              "name": "a",
+                              "gap": 4,
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "w5rl2",
+                                  "name": "users",
+                                  "width": 13,
+                                  "height": 13,
+                                  "icon": "users",
+                                  "library": "lucide",
+                                  "fill": "$on-light-secondary"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "zuiIr",
+                                  "name": "S. Berger, M. Bianchi",
+                                  "fill": "$on-light-secondary",
+                                  "content": "S. Berger, M. Bianchi",
+                                  "fontFamily": "$font",
+                                  "fontSize": 12,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "HKFJk",
+                              "name": "t",
+                              "gap": 4,
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "dmfX3",
+                                  "name": "file-text",
+                                  "width": 13,
+                                  "height": 13,
+                                  "icon": "file-text",
+                                  "library": "lucide",
+                                  "fill": "$on-light-secondary"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "b24fh",
+                                  "name": "Projektbericht",
+                                  "fill": "$on-light-secondary",
+                                  "content": "Projektbericht",
+                                  "fontFamily": "$font",
+                                  "fontSize": 12,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "EjXIS",
+                      "name": "Expand button",
+                      "width": 32,
+                      "height": 32,
+                      "fill": "$expand-strip",
+                      "cornerRadius": 8,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "VmsSu",
+                          "name": "chevron-down",
+                          "width": 20,
+                          "height": 20,
+                          "icon": "chevron-down",
+                          "library": "lucide",
+                          "fill": "$on-light-primary"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "l90IA",
+                  "name": "Action",
+                  "width": "fill_container",
+                  "padding": [
+                    0,
+                    14,
+                    14,
+                    14
+                  ],
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "JaMKo",
+                      "name": "Btn disabled",
+                      "width": "fill_container",
+                      "cornerRadius": 999,
+                      "stroke": "$light-border",
+                      "strokeWidth": 1.5,
+                      "padding": [
+                        8,
+                        12
+                      ],
+                      "justifyContent": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "ZHd27",
+                          "name": "Projekt bewerten",
+                          "fill": "$on-light-muted",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Projekt bewerten",
+                          "textAlign": "center",
                           "fontFamily": "$font",
                           "fontSize": 13,
                           "fontWeight": "600"
@@ -13713,7 +14002,7 @@
         },
         {
           "type": "frame",
-          "id": "T28GO",
+          "id": "AtnsM",
           "name": "Box Kursprojekte",
           "width": "fill_container",
           "fill": "$bg-card",
@@ -13726,7 +14015,7 @@
           "children": [
             {
               "type": "frame",
-              "id": "N1hKZ",
+              "id": "U3vXV",
               "name": "gh",
               "width": "fill_container",
               "stroke": "$border",
@@ -13744,7 +14033,7 @@
               "children": [
                 {
                   "type": "text",
-                  "id": "MYruf",
+                  "id": "aA97B",
                   "name": "Kursprojekte",
                   "fill": "$label-primary",
                   "content": "Kursprojekte",
@@ -13754,7 +14043,7 @@
                 },
                 {
                   "type": "text",
-                  "id": "iwh7P",
+                  "id": "LusZy",
                   "name": "Vorlagen, Kopien, Autor:",
                   "fill": "$label-secondary",
                   "content": "Vorlagen, Kopien, Autor:innen und Veröffentlichung.",
@@ -13766,7 +14055,7 @@
             },
             {
               "type": "frame",
-              "id": "PnKxY",
+              "id": "N9NnHC",
               "name": "AddButton",
               "fill": "$label-primary",
               "cornerRadius": 999,
@@ -13779,7 +14068,7 @@
               "children": [
                 {
                   "type": "icon",
-                  "id": "AmEcm",
+                  "id": "I0Dxi",
                   "name": "circle-plus",
                   "width": 16,
                   "height": 16,
@@ -13789,7 +14078,7 @@
                 },
                 {
                   "type": "text",
-                  "id": "CnDAK",
+                  "id": "btvoA",
                   "name": "Projekt hinzufügen",
                   "fill": "$on-light-primary",
                   "content": "Projekt hinzufügen",
@@ -13801,7 +14090,7 @@
             },
             {
               "type": "frame",
-              "id": "yNepg",
+              "id": "kX0kV",
               "name": "Table",
               "clip": true,
               "width": "fill_container",
@@ -13812,7 +14101,7 @@
               "children": [
                 {
                   "type": "frame",
-                  "id": "ScNe1",
+                  "id": "faqd5",
                   "name": "Header",
                   "width": "fill_container",
                   "height": 44,
@@ -13820,9 +14109,9 @@
                   "children": [
                     {
                       "type": "frame",
-                      "id": "Sq0E5",
+                      "id": "N1OF1",
                       "name": "cell",
-                      "width": 130,
+                      "width": 180,
                       "height": "fill_container",
                       "gap": 6,
                       "padding": [
@@ -13833,7 +14122,7 @@
                       "children": [
                         {
                           "type": "text",
-                          "id": "qTdKh",
+                          "id": "xE1QA",
                           "name": "Status",
                           "fill": "$label-secondary",
                           "content": "Status",
@@ -13845,7 +14134,7 @@
                     },
                     {
                       "type": "frame",
-                      "id": "cizhJ",
+                      "id": "MIfmP",
                       "name": "cell",
                       "width": "fill_container",
                       "height": "fill_container",
@@ -13858,7 +14147,7 @@
                       "children": [
                         {
                           "type": "text",
-                          "id": "lLnmq",
+                          "id": "u3wDN",
                           "name": "Titel",
                           "fill": "$label-secondary",
                           "content": "Titel",
@@ -13868,7 +14157,7 @@
                         },
                         {
                           "type": "icon",
-                          "id": "k8xICu",
+                          "id": "HJSpO",
                           "name": "chevrons-up-down",
                           "width": 12,
                           "height": 12,
@@ -13880,7 +14169,7 @@
                     },
                     {
                       "type": "frame",
-                      "id": "NmJwh",
+                      "id": "XLSrH",
                       "name": "cell",
                       "width": 220,
                       "height": "fill_container",
@@ -13893,7 +14182,7 @@
                       "children": [
                         {
                           "type": "text",
-                          "id": "tWrVn",
+                          "id": "ncFw0",
                           "name": "Autor:innen",
                           "fill": "$label-secondary",
                           "content": "Autor:innen",
@@ -13905,9 +14194,9 @@
                     },
                     {
                       "type": "frame",
-                      "id": "aTvjV",
+                      "id": "PqYRP",
                       "name": "cell",
-                      "width": 170,
+                      "width": 150,
                       "height": "fill_container",
                       "gap": 6,
                       "padding": [
@@ -13918,7 +14207,7 @@
                       "children": [
                         {
                           "type": "text",
-                          "id": "pTTNI",
+                          "id": "D1cmt5",
                           "name": "Typ",
                           "fill": "$label-secondary",
                           "content": "Typ",
@@ -13930,9 +14219,9 @@
                     },
                     {
                       "type": "frame",
-                      "id": "b8Tsi1",
+                      "id": "xtjda",
                       "name": "cell",
-                      "width": 190,
+                      "width": 210,
                       "height": "fill_container",
                       "gap": 6,
                       "padding": [
@@ -13943,7 +14232,7 @@
                     },
                     {
                       "type": "frame",
-                      "id": "dNEvT",
+                      "id": "i6BbC",
                       "name": "cell",
                       "width": 44,
                       "height": "fill_container",
@@ -13958,10 +14247,10 @@
                 },
                 {
                   "type": "frame",
-                  "id": "a0zMNn",
-                  "name": "Row Churn-Vorhersage für Stadtwerke Kiel",
+                  "id": "LggmK",
+                  "name": "Row Churn-Vorhersage Stadtwerke",
                   "width": "fill_container",
-                  "height": 60,
+                  "height": 64,
                   "fill": "$white",
                   "stroke": "$light-divider",
                   "strokeWidth": {
@@ -13970,9 +14259,9 @@
                   "children": [
                     {
                       "type": "frame",
-                      "id": "A4RET",
+                      "id": "a6OHp",
                       "name": "cell",
-                      "width": 130,
+                      "width": 180,
                       "height": "fill_container",
                       "gap": 6,
                       "padding": [
@@ -13983,7 +14272,7 @@
                       "children": [
                         {
                           "type": "frame",
-                          "id": "Zy1M5",
+                          "id": "BO4oX",
                           "name": "chip Eingereicht",
                           "fill": "$light-bg-secondary",
                           "cornerRadius": 999,
@@ -13996,7 +14285,7 @@
                           "children": [
                             {
                               "type": "icon",
-                              "id": "aii1R",
+                              "id": "lFBkD",
                               "name": "circle-dot",
                               "width": 13,
                               "height": 13,
@@ -14006,7 +14295,7 @@
                             },
                             {
                               "type": "text",
-                              "id": "kWG4B",
+                              "id": "isZVU",
                               "name": "Eingereicht",
                               "fill": "$on-light-secondary",
                               "content": "Eingereicht",
@@ -14020,32 +14309,64 @@
                     },
                     {
                       "type": "frame",
-                      "id": "LCGaC",
+                      "id": "R73OqH",
                       "name": "cell",
                       "width": "fill_container",
                       "height": "fill_container",
-                      "gap": 6,
+                      "layout": "vertical",
+                      "gap": 3,
                       "padding": [
                         0,
                         10
                       ],
-                      "alignItems": "center",
+                      "justifyContent": "center",
                       "children": [
                         {
                           "type": "text",
-                          "id": "f0HQU",
+                          "id": "zLeIk",
                           "name": "Churn-Vorhersage für Sta",
                           "fill": "$on-light-primary",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
                           "content": "Churn-Vorhersage für Stadtwerke Kiel",
                           "fontFamily": "$font",
                           "fontSize": 14,
                           "fontWeight": "600"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "KnVXH",
+                          "name": "consent line",
+                          "gap": 4,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon",
+                              "id": "J7dMN8",
+                              "name": "circle-check",
+                              "width": 13,
+                              "height": 13,
+                              "icon": "circle-check",
+                              "library": "lucide",
+                              "fill": "$status-green"
+                            },
+                            {
+                              "type": "text",
+                              "id": "h0rDM1",
+                              "name": "Veröffentlichung zugesti",
+                              "fill": "$on-light-secondary",
+                              "content": "Veröffentlichung zugestimmt",
+                              "fontFamily": "$font",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            }
+                          ]
                         }
                       ]
                     },
                     {
                       "type": "frame",
-                      "id": "iWTyQ",
+                      "id": "QGa4P",
                       "name": "cell",
                       "width": 220,
                       "height": "fill_container",
@@ -14058,9 +14379,11 @@
                       "children": [
                         {
                           "type": "text",
-                          "id": "iYwf8",
+                          "id": "I5hss",
                           "name": "Emil Bauer, Nora Ali +1",
                           "fill": "$on-light-primary",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
                           "content": "Emil Bauer, Nora Ali +1",
                           "fontFamily": "$font",
                           "fontSize": 13,
@@ -14070,9 +14393,9 @@
                     },
                     {
                       "type": "frame",
-                      "id": "uxC4S",
+                      "id": "RVsc7",
                       "name": "cell",
-                      "width": 170,
+                      "width": 150,
                       "height": "fill_container",
                       "gap": 6,
                       "padding": [
@@ -14083,31 +14406,21 @@
                       "children": [
                         {
                           "type": "text",
-                          "id": "T9Omz",
+                          "id": "mDltv",
                           "name": "Projektbericht",
                           "fill": "$on-light-primary",
                           "content": "Projektbericht",
                           "fontFamily": "$font",
                           "fontSize": 13,
                           "fontWeight": "normal"
-                        },
-                        {
-                          "type": "icon",
-                          "id": "iaBfq",
-                          "name": "info",
-                          "width": 13,
-                          "height": 13,
-                          "icon": "info",
-                          "library": "lucide",
-                          "fill": "$on-light-muted"
                         }
                       ]
                     },
                     {
                       "type": "frame",
-                      "id": "raH88",
+                      "id": "lB6qt",
                       "name": "cell",
-                      "width": 190,
+                      "width": 210,
                       "height": "fill_container",
                       "gap": 6,
                       "padding": [
@@ -14118,21 +14431,28 @@
                       "children": [
                         {
                           "type": "frame",
-                          "id": "W6OWg",
+                          "id": "bajPg",
                           "name": "Btn Projekt bewerten",
                           "width": "fill_container",
-                          "height": 34,
                           "fill": "$on-light-primary",
                           "cornerRadius": 999,
+                          "padding": [
+                            8,
+                            12
+                          ],
                           "justifyContent": "center",
                           "alignItems": "center",
                           "children": [
                             {
                               "type": "text",
-                              "id": "l8VxR",
+                              "id": "A5B2WV",
                               "name": "Projekt bewerten",
                               "fill": "$white",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
                               "content": "Projekt bewerten",
+                              "lineHeight": 1.2,
+                              "textAlign": "center",
                               "fontFamily": "$font",
                               "fontSize": 13,
                               "fontWeight": "600"
@@ -14143,7 +14463,7 @@
                     },
                     {
                       "type": "frame",
-                      "id": "XZd4G",
+                      "id": "U34sCn",
                       "name": "expand",
                       "width": 44,
                       "height": "fill_container",
@@ -14153,7 +14473,7 @@
                       "children": [
                         {
                           "type": "icon",
-                          "id": "Kpxkd",
+                          "id": "Z6GeVV",
                           "name": "chevron-down",
                           "width": 20,
                           "height": 20,
@@ -14167,10 +14487,10 @@
                 },
                 {
                   "type": "frame",
-                  "id": "LlseW",
-                  "name": "Row Vorlage: ML-Projekt",
+                  "id": "I3hbi",
+                  "name": "Row Chatbot Bürgeramt",
                   "width": "fill_container",
-                  "height": 60,
+                  "height": 64,
                   "fill": "$white",
                   "stroke": "$light-divider",
                   "strokeWidth": {
@@ -14179,9 +14499,9 @@
                   "children": [
                     {
                       "type": "frame",
-                      "id": "JJRF4",
+                      "id": "Vgbe5",
                       "name": "cell",
-                      "width": 130,
+                      "width": 180,
                       "height": "fill_container",
                       "gap": 6,
                       "padding": [
@@ -14192,8 +14512,8 @@
                       "children": [
                         {
                           "type": "frame",
-                          "id": "F4s6Ls",
-                          "name": "chip Vorlage",
+                          "id": "vbbLP",
+                          "name": "chip Bestanden",
                           "fill": "$light-bg-secondary",
                           "cornerRadius": 999,
                           "gap": 4,
@@ -14205,20 +14525,20 @@
                           "children": [
                             {
                               "type": "icon",
-                              "id": "a9wV99",
-                              "name": "file",
+                              "id": "pQRCi",
+                              "name": "circle-check",
                               "width": 13,
                               "height": 13,
-                              "icon": "file",
+                              "icon": "circle-check",
                               "library": "lucide",
-                              "fill": "$on-light-muted"
+                              "fill": "$status-green"
                             },
                             {
                               "type": "text",
-                              "id": "O2SIx",
-                              "name": "Vorlage",
+                              "id": "g8sE2",
+                              "name": "Bestanden",
                               "fill": "$on-light-secondary",
-                              "content": "Vorlage",
+                              "content": "Bestanden",
                               "fontFamily": "$font",
                               "fontSize": 12,
                               "fontWeight": "600"
@@ -14229,32 +14549,64 @@
                     },
                     {
                       "type": "frame",
-                      "id": "bh7ek",
+                      "id": "xpXsr",
                       "name": "cell",
                       "width": "fill_container",
                       "height": "fill_container",
-                      "gap": 6,
+                      "layout": "vertical",
+                      "gap": 3,
                       "padding": [
                         0,
                         10
                       ],
-                      "alignItems": "center",
+                      "justifyContent": "center",
                       "children": [
                         {
                           "type": "text",
-                          "id": "Vh5Ey",
-                          "name": "Vorlage: ML-Projekt",
+                          "id": "L2egxc",
+                          "name": "Chatbot für das Bürgeram",
                           "fill": "$on-light-primary",
-                          "content": "Vorlage: ML-Projekt",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Chatbot für das Bürgeramt",
                           "fontFamily": "$font",
                           "fontSize": 14,
                           "fontWeight": "600"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "zmke2",
+                          "name": "consent line",
+                          "gap": 4,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon",
+                              "id": "X3GjY",
+                              "name": "circle-x",
+                              "width": 13,
+                              "height": 13,
+                              "icon": "circle-x",
+                              "library": "lucide",
+                              "fill": "$error"
+                            },
+                            {
+                              "type": "text",
+                              "id": "tdzyT",
+                              "name": "Veröffentlichung abgeleh",
+                              "fill": "$on-light-secondary",
+                              "content": "Veröffentlichung abgelehnt",
+                              "fontFamily": "$font",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            }
+                          ]
                         }
                       ]
                     },
                     {
                       "type": "frame",
-                      "id": "f8P1qc",
+                      "id": "BrwcT",
                       "name": "cell",
                       "width": 220,
                       "height": "fill_container",
@@ -14267,10 +14619,12 @@
                       "children": [
                         {
                           "type": "text",
-                          "id": "S9tPG",
-                          "name": "Keine Autor:innen",
-                          "fill": "$on-light-muted",
-                          "content": "Keine Autor:innen",
+                          "id": "JyBCQ",
+                          "name": "Lena Ludwig, Theo Brown",
+                          "fill": "$on-light-primary",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Lena Ludwig, Theo Brown",
                           "fontFamily": "$font",
                           "fontSize": 13,
                           "fontWeight": "normal"
@@ -14279,9 +14633,9 @@
                     },
                     {
                       "type": "frame",
-                      "id": "uBE7g",
+                      "id": "ro12d",
                       "name": "cell",
-                      "width": 170,
+                      "width": 150,
                       "height": "fill_container",
                       "gap": 6,
                       "padding": [
@@ -14292,7 +14646,673 @@
                       "children": [
                         {
                           "type": "text",
-                          "id": "w5HK01",
+                          "id": "t3gpp",
+                          "name": "Prototyp",
+                          "fill": "$on-light-primary",
+                          "content": "Prototyp",
+                          "fontFamily": "$font",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "hRz0o",
+                      "name": "cell",
+                      "width": 210,
+                      "height": "fill_container",
+                      "gap": 6,
+                      "padding": [
+                        0,
+                        10
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "RQ5fD",
+                          "name": "Btn Zur Veröffentlichung vorschlagen",
+                          "width": "fill_container",
+                          "cornerRadius": 999,
+                          "stroke": "$on-light-primary",
+                          "strokeWidth": 1.5,
+                          "padding": [
+                            8,
+                            12
+                          ],
+                          "justifyContent": "center",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "yOLXo",
+                              "name": "Zur Veröffentlichung vor",
+                              "fill": "$on-light-primary",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "Zur Veröffentlichung vorschlagen",
+                              "lineHeight": 1.2,
+                              "textAlign": "center",
+                              "fontFamily": "$font",
+                              "fontSize": 12,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "j8tejs",
+                      "name": "expand",
+                      "width": 44,
+                      "height": "fill_container",
+                      "fill": "$expand-strip",
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "A1UL1j",
+                          "name": "chevron-down",
+                          "width": 20,
+                          "height": 20,
+                          "icon": "chevron-down",
+                          "library": "lucide",
+                          "fill": "$on-light-primary"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "lnAOl",
+                  "name": "Row Energie-Dashboard",
+                  "width": "fill_container",
+                  "height": 64,
+                  "fill": "$white",
+                  "stroke": "$light-divider",
+                  "strokeWidth": {
+                    "bottom": 1
+                  },
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "lpSYQ",
+                      "name": "cell",
+                      "width": 180,
+                      "height": "fill_container",
+                      "gap": 6,
+                      "padding": [
+                        0,
+                        10
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "m918gN",
+                          "name": "chip Zur Veröffentlichung vorgeschlagen",
+                          "width": "fill_container",
+                          "fill": "$light-bg-secondary",
+                          "cornerRadius": 10,
+                          "gap": 4,
+                          "padding": [
+                            3,
+                            8
+                          ],
+                          "children": [
+                            {
+                              "type": "icon",
+                              "id": "f86XE9",
+                              "name": "send",
+                              "width": 13,
+                              "height": 13,
+                              "icon": "send",
+                              "library": "lucide",
+                              "fill": "$status-green"
+                            },
+                            {
+                              "type": "text",
+                              "id": "r9Ylr",
+                              "name": "Zur Veröffentlichung vor",
+                              "fill": "$on-light-secondary",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "Zur Veröffentlichung vorgeschlagen",
+                              "lineHeight": 1.2,
+                              "fontFamily": "$font",
+                              "fontSize": 12,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "zyL5X",
+                      "name": "cell",
+                      "width": "fill_container",
+                      "height": "fill_container",
+                      "layout": "vertical",
+                      "gap": 3,
+                      "padding": [
+                        0,
+                        10
+                      ],
+                      "justifyContent": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "cvI2L",
+                          "name": "Energie-Dashboard für Qu",
+                          "fill": "$on-light-primary",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Energie-Dashboard für Quartiere",
+                          "fontFamily": "$font",
+                          "fontSize": 14,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "cyDy1",
+                          "name": "consent line",
+                          "gap": 4,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon",
+                              "id": "I109N",
+                              "name": "circle-check",
+                              "width": 13,
+                              "height": 13,
+                              "icon": "circle-check",
+                              "library": "lucide",
+                              "fill": "$status-green"
+                            },
+                            {
+                              "type": "text",
+                              "id": "camRR",
+                              "name": "Veröffentlichung zugesti",
+                              "fill": "$on-light-secondary",
+                              "content": "Veröffentlichung zugestimmt",
+                              "fontFamily": "$font",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "D2OZA2",
+                      "name": "cell",
+                      "width": 220,
+                      "height": "fill_container",
+                      "gap": 6,
+                      "padding": [
+                        0,
+                        10
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "t6ritF",
+                          "name": "Maya Carter",
+                          "fill": "$on-light-primary",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Maya Carter",
+                          "fontFamily": "$font",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "SNf1j",
+                      "name": "cell",
+                      "width": 150,
+                      "height": "fill_container",
+                      "gap": 6,
+                      "padding": [
+                        0,
+                        10
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "SVHI1",
+                          "name": "Projektbericht",
+                          "fill": "$on-light-primary",
+                          "content": "Projektbericht",
+                          "fontFamily": "$font",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "ozRHG",
+                      "name": "cell",
+                      "width": 210,
+                      "height": "fill_container",
+                      "gap": 6,
+                      "padding": [
+                        0,
+                        10
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "m6iZwA",
+                          "name": "Btn Vorschlag zurückziehen",
+                          "width": "fill_container",
+                          "cornerRadius": 999,
+                          "stroke": "$on-light-primary",
+                          "strokeWidth": 1.5,
+                          "padding": [
+                            8,
+                            12
+                          ],
+                          "justifyContent": "center",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "sI9tv",
+                              "name": "Vorschlag zurückziehen",
+                              "fill": "$on-light-primary",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "Vorschlag zurückziehen",
+                              "lineHeight": 1.2,
+                              "textAlign": "center",
+                              "fontFamily": "$font",
+                              "fontSize": 13,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "nAgIp",
+                      "name": "expand",
+                      "width": 44,
+                      "height": "fill_container",
+                      "fill": "$expand-strip",
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "dYsHs",
+                          "name": "chevron-down",
+                          "width": 20,
+                          "height": 20,
+                          "icon": "chevron-down",
+                          "library": "lucide",
+                          "fill": "$on-light-primary"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "w1qEw",
+                  "name": "Row Verkehrsfluss-Analyse",
+                  "width": "fill_container",
+                  "height": 64,
+                  "fill": "$white",
+                  "stroke": "$light-divider",
+                  "strokeWidth": {
+                    "bottom": 1
+                  },
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "SxENr",
+                      "name": "cell",
+                      "width": 180,
+                      "height": "fill_container",
+                      "gap": 6,
+                      "padding": [
+                        0,
+                        10
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "T3dEMf",
+                          "name": "chip In Bearbeitung",
+                          "fill": "$light-bg-secondary",
+                          "cornerRadius": 999,
+                          "gap": 4,
+                          "padding": [
+                            3,
+                            8
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon",
+                              "id": "vOL5o",
+                              "name": "loader",
+                              "width": 13,
+                              "height": 13,
+                              "icon": "loader",
+                              "library": "lucide",
+                              "fill": "$on-light-muted"
+                            },
+                            {
+                              "type": "text",
+                              "id": "MHww6",
+                              "name": "In Bearbeitung",
+                              "fill": "$on-light-secondary",
+                              "content": "In Bearbeitung",
+                              "fontFamily": "$font",
+                              "fontSize": 12,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "PlZFR",
+                      "name": "cell",
+                      "width": "fill_container",
+                      "height": "fill_container",
+                      "layout": "vertical",
+                      "gap": 3,
+                      "padding": [
+                        0,
+                        10
+                      ],
+                      "justifyContent": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "m2mML",
+                          "name": "Verkehrsfluss-Analyse In",
+                          "fill": "$on-light-primary",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Verkehrsfluss-Analyse Innenstadt",
+                          "fontFamily": "$font",
+                          "fontSize": 14,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "fepPc",
+                      "name": "cell",
+                      "width": 220,
+                      "height": "fill_container",
+                      "gap": 6,
+                      "padding": [
+                        0,
+                        10
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "xoTWT",
+                          "name": "Samir Berger, Mina Bianc",
+                          "fill": "$on-light-primary",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Samir Berger, Mina Bianchi",
+                          "fontFamily": "$font",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "KyqzQ",
+                      "name": "cell",
+                      "width": 150,
+                      "height": "fill_container",
+                      "gap": 6,
+                      "padding": [
+                        0,
+                        10
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "CalRM",
+                          "name": "Projektbericht",
+                          "fill": "$on-light-primary",
+                          "content": "Projektbericht",
+                          "fontFamily": "$font",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "LIRCh",
+                      "name": "cell",
+                      "width": 210,
+                      "height": "fill_container",
+                      "gap": 6,
+                      "padding": [
+                        0,
+                        10
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "lxCKa",
+                          "name": "Btn disabled",
+                          "width": "fill_container",
+                          "cornerRadius": 999,
+                          "stroke": "$light-border",
+                          "strokeWidth": 1.5,
+                          "padding": [
+                            8,
+                            12
+                          ],
+                          "justifyContent": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "U3fHHQ",
+                              "name": "Projekt bewerten",
+                              "fill": "$on-light-muted",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "Projekt bewerten",
+                              "textAlign": "center",
+                              "fontFamily": "$font",
+                              "fontSize": 13,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "sTdLy",
+                      "name": "expand",
+                      "width": 44,
+                      "height": "fill_container",
+                      "fill": "$expand-strip",
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "eFJkX",
+                          "name": "chevron-down",
+                          "width": 20,
+                          "height": 20,
+                          "icon": "chevron-down",
+                          "library": "lucide",
+                          "fill": "$on-light-primary"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "t1EHp",
+                  "name": "Row Vorlage: ML-Projekt",
+                  "width": "fill_container",
+                  "height": 64,
+                  "fill": "$white",
+                  "stroke": "$light-divider",
+                  "strokeWidth": {
+                    "bottom": 1
+                  },
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "m5QbZc",
+                      "name": "cell",
+                      "width": 180,
+                      "height": "fill_container",
+                      "gap": 6,
+                      "padding": [
+                        0,
+                        10
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "IFWPb",
+                          "name": "chip Projektvorlage",
+                          "fill": "$light-bg-secondary",
+                          "cornerRadius": 999,
+                          "gap": 4,
+                          "padding": [
+                            3,
+                            8
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon",
+                              "id": "IqlsE",
+                              "name": "file",
+                              "width": 13,
+                              "height": 13,
+                              "icon": "file",
+                              "library": "lucide",
+                              "fill": "$on-light-muted"
+                            },
+                            {
+                              "type": "text",
+                              "id": "M4QB2",
+                              "name": "Projektvorlage",
+                              "fill": "$on-light-secondary",
+                              "content": "Projektvorlage",
+                              "fontFamily": "$font",
+                              "fontSize": 12,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "ioa8C",
+                      "name": "cell",
+                      "width": "fill_container",
+                      "height": "fill_container",
+                      "layout": "vertical",
+                      "gap": 3,
+                      "padding": [
+                        0,
+                        10
+                      ],
+                      "justifyContent": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "KG88o",
+                          "name": "Vorlage: ML-Projekt",
+                          "fill": "$on-light-primary",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Vorlage: ML-Projekt",
+                          "fontFamily": "$font",
+                          "fontSize": 14,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "avT7t",
+                      "name": "cell",
+                      "width": 220,
+                      "height": "fill_container",
+                      "gap": 6,
+                      "padding": [
+                        0,
+                        10
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "Idyfb",
+                          "name": "Keine Autor:innen",
+                          "fill": "$on-light-muted",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Keine Autor:innen",
+                          "fontFamily": "$font",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "UpWbw",
+                      "name": "cell",
+                      "width": 150,
+                      "height": "fill_container",
+                      "gap": 6,
+                      "padding": [
+                        0,
+                        10
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "FkWPG",
                           "name": "Typ wählen",
                           "fill": "$on-light-muted",
                           "content": "Typ wählen",
@@ -14304,9 +15324,9 @@
                     },
                     {
                       "type": "frame",
-                      "id": "ZWTZA",
+                      "id": "hjMZG",
                       "name": "cell",
-                      "width": 190,
+                      "width": 210,
                       "height": "fill_container",
                       "gap": 6,
                       "padding": [
@@ -14317,22 +15337,29 @@
                       "children": [
                         {
                           "type": "frame",
-                          "id": "Y9ysbW",
+                          "id": "XCDd9",
                           "name": "Btn Vorlage löschen",
                           "width": "fill_container",
-                          "height": 34,
                           "cornerRadius": 999,
                           "stroke": "$on-light-primary",
                           "strokeWidth": 1.5,
+                          "padding": [
+                            8,
+                            12
+                          ],
                           "justifyContent": "center",
                           "alignItems": "center",
                           "children": [
                             {
                               "type": "text",
-                              "id": "BQgjH",
+                              "id": "Q515Xa",
                               "name": "Vorlage löschen",
                               "fill": "$on-light-primary",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
                               "content": "Vorlage löschen",
+                              "lineHeight": 1.2,
+                              "textAlign": "center",
                               "fontFamily": "$font",
                               "fontSize": 13,
                               "fontWeight": "600"
@@ -14343,7 +15370,7 @@
                     },
                     {
                       "type": "frame",
-                      "id": "TGR5a",
+                      "id": "dnnoa",
                       "name": "expand",
                       "width": 44,
                       "height": "fill_container",
@@ -14353,7 +15380,7 @@
                       "children": [
                         {
                           "type": "icon",
-                          "id": "ktwby",
+                          "id": "c6sid1",
                           "name": "chevron-down",
                           "width": 20,
                           "height": 20,
@@ -14364,6 +15391,35 @@
                       ]
                     }
                   ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "krkm1",
+              "name": "Consent note",
+              "width": "fill_container",
+              "fill": "$bg-secondary",
+              "cornerRadius": 8,
+              "stroke": "$border",
+              "strokeWidth": 1,
+              "padding": [
+                10,
+                14
+              ],
+              "children": [
+                {
+                  "type": "text",
+                  "id": "LypeZ",
+                  "name": "The team's publication d",
+                  "fill": "$label-secondary",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "The team's publication decision sits under the title at every width (no extra column). It is shown once a project is submitted (SUBMITTED, COMPLETED, PUBLISHED) and has two states: 'Veröffentlichung zugestimmt' when the latest ProjectConsentEvent is 'granted', otherwise 'Veröffentlichung abgelehnt' (declining at submission stores no event; a later withdrawal stores 'withdrawn'). No line before submission, for templates, or in online courses, which don't ask for consent.",
+                  "lineHeight": 1.5,
+                  "fontFamily": "$font",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
                 }
               ]
             }
@@ -14493,7 +15549,7 @@
                       "type": "frame",
                       "id": "K967oV",
                       "name": "cell",
-                      "width": 48,
+                      "width": 180,
                       "height": "fill_container",
                       "gap": 6,
                       "padding": [
@@ -14719,7 +15775,7 @@
                       "type": "frame",
                       "id": "A2hO4z",
                       "name": "cell",
-                      "width": 48,
+                      "width": 180,
                       "height": "fill_container",
                       "gap": 6,
                       "padding": [
@@ -15001,7 +16057,7 @@
                       "type": "frame",
                       "id": "cpbt3",
                       "name": "cell",
-                      "width": 48,
+                      "width": 180,
                       "height": "fill_container",
                       "gap": 6,
                       "padding": [
@@ -15287,7 +16343,7 @@
                       "type": "frame",
                       "id": "gnIps",
                       "name": "blk E-MAIL",
-                      "width": "fill_container",
+                      "width": 180,
                       "fill": "$white",
                       "cornerRadius": 8,
                       "stroke": "$light-divider",
@@ -15312,6 +16368,8 @@
                           "id": "JOOUS",
                           "name": "emil.bauer@example.com",
                           "fill": "$on-light-primary",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
                           "content": "emil.bauer@example.com",
                           "fontFamily": "$font",
                           "fontSize": 14,
@@ -15402,7 +16460,7 @@
                       "type": "frame",
                       "id": "TRbaN",
                       "name": "cell",
-                      "width": 48,
+                      "width": 180,
                       "height": "fill_container",
                       "gap": 6,
                       "padding": [
@@ -15684,7 +16742,7 @@
                       "type": "frame",
                       "id": "psraT",
                       "name": "cell",
-                      "width": 48,
+                      "width": 180,
                       "height": "fill_container",
                       "gap": 6,
                       "padding": [
@@ -16295,7 +17353,7 @@
         },
         {
           "type": "frame",
-          "id": "suJjv",
+          "id": "GZ8CK",
           "name": "Box Kursprojekte",
           "width": "fill_container",
           "fill": "$bg-card",
@@ -16308,7 +17366,7 @@
           "children": [
             {
               "type": "frame",
-              "id": "f40ee",
+              "id": "IAzlk",
               "name": "gh",
               "width": "fill_container",
               "stroke": "$border",
@@ -16326,7 +17384,7 @@
               "children": [
                 {
                   "type": "text",
-                  "id": "cf61X",
+                  "id": "wUkWi",
                   "name": "Kursprojekte",
                   "fill": "$label-primary",
                   "content": "Kursprojekte",
@@ -16336,7 +17394,7 @@
                 },
                 {
                   "type": "text",
-                  "id": "Kj4Fz",
+                  "id": "u61jYR",
                   "name": "Vorlagen, Kopien, Autor:",
                   "fill": "$label-secondary",
                   "content": "Vorlagen, Kopien, Autor:innen und Veröffentlichung.",
@@ -16348,7 +17406,7 @@
             },
             {
               "type": "frame",
-              "id": "z3m6ym",
+              "id": "e2rW7",
               "name": "AddButton",
               "fill": "$label-primary",
               "cornerRadius": 999,
@@ -16361,7 +17419,7 @@
               "children": [
                 {
                   "type": "icon",
-                  "id": "fPbP6",
+                  "id": "bdiQK",
                   "name": "circle-plus",
                   "width": 16,
                   "height": 16,
@@ -16371,7 +17429,7 @@
                 },
                 {
                   "type": "text",
-                  "id": "OEfaO",
+                  "id": "jXiS4",
                   "name": "Projekt hinzufügen",
                   "fill": "$on-light-primary",
                   "content": "Projekt hinzufügen",
@@ -16383,7 +17441,7 @@
             },
             {
               "type": "frame",
-              "id": "XEYLs",
+              "id": "m68zE",
               "name": "Table",
               "clip": true,
               "width": "fill_container",
@@ -16394,7 +17452,7 @@
               "children": [
                 {
                   "type": "frame",
-                  "id": "w8IKL",
+                  "id": "hURwU",
                   "name": "Header",
                   "width": "fill_container",
                   "height": 44,
@@ -16402,9 +17460,9 @@
                   "children": [
                     {
                       "type": "frame",
-                      "id": "iAeAT",
+                      "id": "R9kF3n",
                       "name": "cell",
-                      "width": 120,
+                      "width": 165,
                       "height": "fill_container",
                       "gap": 6,
                       "padding": [
@@ -16415,7 +17473,7 @@
                       "children": [
                         {
                           "type": "text",
-                          "id": "hBJ7r",
+                          "id": "PPJ1r",
                           "name": "Status",
                           "fill": "$label-secondary",
                           "content": "Status",
@@ -16427,7 +17485,7 @@
                     },
                     {
                       "type": "frame",
-                      "id": "CB0IU",
+                      "id": "SUZCT",
                       "name": "cell",
                       "width": "fill_container",
                       "height": "fill_container",
@@ -16440,7 +17498,7 @@
                       "children": [
                         {
                           "type": "text",
-                          "id": "Y3nNL",
+                          "id": "m5s9MD",
                           "name": "Titel",
                           "fill": "$label-secondary",
                           "content": "Titel",
@@ -16450,7 +17508,7 @@
                         },
                         {
                           "type": "icon",
-                          "id": "h0xsAW",
+                          "id": "NrOMx",
                           "name": "chevrons-up-down",
                           "width": 12,
                           "height": 12,
@@ -16462,9 +17520,9 @@
                     },
                     {
                       "type": "frame",
-                      "id": "qp1fl",
+                      "id": "W4m2mg",
                       "name": "cell",
-                      "width": 170,
+                      "width": 160,
                       "height": "fill_container",
                       "gap": 6,
                       "padding": [
@@ -16475,7 +17533,7 @@
                       "children": [
                         {
                           "type": "text",
-                          "id": "oOWe1",
+                          "id": "ZPHAF",
                           "name": "Autor:innen",
                           "fill": "$label-secondary",
                           "content": "Autor:innen",
@@ -16487,9 +17545,9 @@
                     },
                     {
                       "type": "frame",
-                      "id": "gfbhI",
+                      "id": "GATLd",
                       "name": "cell",
-                      "width": 130,
+                      "width": 120,
                       "height": "fill_container",
                       "gap": 6,
                       "padding": [
@@ -16500,7 +17558,7 @@
                       "children": [
                         {
                           "type": "text",
-                          "id": "qP1Ys",
+                          "id": "lcabm",
                           "name": "Typ",
                           "fill": "$label-secondary",
                           "content": "Typ",
@@ -16512,9 +17570,9 @@
                     },
                     {
                       "type": "frame",
-                      "id": "yhKpM",
+                      "id": "H0Z84",
                       "name": "cell",
-                      "width": 170,
+                      "width": 190,
                       "height": "fill_container",
                       "gap": 6,
                       "padding": [
@@ -16525,7 +17583,7 @@
                     },
                     {
                       "type": "frame",
-                      "id": "g50qIX",
+                      "id": "lm6bP",
                       "name": "cell",
                       "width": 44,
                       "height": "fill_container",
@@ -16540,10 +17598,10 @@
                 },
                 {
                   "type": "frame",
-                  "id": "i1whL",
+                  "id": "gG1Mb",
                   "name": "Row Churn-Vorhersage Stadtwerke",
                   "width": "fill_container",
-                  "height": 60,
+                  "height": 64,
                   "fill": "$white",
                   "stroke": "$light-divider",
                   "strokeWidth": {
@@ -16552,9 +17610,9 @@
                   "children": [
                     {
                       "type": "frame",
-                      "id": "FwvZk",
+                      "id": "UPFXh",
                       "name": "cell",
-                      "width": 120,
+                      "width": 165,
                       "height": "fill_container",
                       "gap": 6,
                       "padding": [
@@ -16565,7 +17623,7 @@
                       "children": [
                         {
                           "type": "frame",
-                          "id": "c0Us5",
+                          "id": "c5rbax",
                           "name": "chip Eingereicht",
                           "fill": "$light-bg-secondary",
                           "cornerRadius": 999,
@@ -16578,7 +17636,7 @@
                           "children": [
                             {
                               "type": "icon",
-                              "id": "I6faZ",
+                              "id": "NDnI8",
                               "name": "circle-dot",
                               "width": 13,
                               "height": 13,
@@ -16588,7 +17646,7 @@
                             },
                             {
                               "type": "text",
-                              "id": "A53eL",
+                              "id": "HvIYM",
                               "name": "Eingereicht",
                               "fill": "$on-light-secondary",
                               "content": "Eingereicht",
@@ -16602,34 +17660,66 @@
                     },
                     {
                       "type": "frame",
-                      "id": "A12VFN",
+                      "id": "a70heI",
                       "name": "cell",
                       "width": "fill_container",
                       "height": "fill_container",
-                      "gap": 6,
+                      "layout": "vertical",
+                      "gap": 3,
                       "padding": [
                         0,
                         10
                       ],
-                      "alignItems": "center",
+                      "justifyContent": "center",
                       "children": [
                         {
                           "type": "text",
-                          "id": "B5IE5",
+                          "id": "u1aDOG",
                           "name": "Churn-Vorhersage Stadtwe",
                           "fill": "$on-light-primary",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
                           "content": "Churn-Vorhersage Stadtwerke",
                           "fontFamily": "$font",
                           "fontSize": 14,
                           "fontWeight": "600"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "V8rdjk",
+                          "name": "consent line",
+                          "gap": 4,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon",
+                              "id": "uLuE7",
+                              "name": "circle-check",
+                              "width": 12,
+                              "height": 12,
+                              "icon": "circle-check",
+                              "library": "lucide",
+                              "fill": "$status-green"
+                            },
+                            {
+                              "type": "text",
+                              "id": "GNLIC",
+                              "name": "Veröffentlichung zugesti",
+                              "fill": "$on-light-secondary",
+                              "content": "Veröffentlichung zugestimmt",
+                              "fontFamily": "$font",
+                              "fontSize": 11,
+                              "fontWeight": "normal"
+                            }
+                          ]
                         }
                       ]
                     },
                     {
                       "type": "frame",
-                      "id": "HX5Hx",
+                      "id": "C5tp82",
                       "name": "cell",
-                      "width": 170,
+                      "width": 160,
                       "height": "fill_container",
                       "gap": 6,
                       "padding": [
@@ -16640,9 +17730,11 @@
                       "children": [
                         {
                           "type": "text",
-                          "id": "Z5uiAd",
+                          "id": "kCN6h",
                           "name": "E. Bauer, N. Ali +1",
                           "fill": "$on-light-primary",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
                           "content": "E. Bauer, N. Ali +1",
                           "fontFamily": "$font",
                           "fontSize": 13,
@@ -16652,9 +17744,9 @@
                     },
                     {
                       "type": "frame",
-                      "id": "Z5pvy0",
+                      "id": "lWDvk",
                       "name": "cell",
-                      "width": 130,
+                      "width": 120,
                       "height": "fill_container",
                       "gap": 6,
                       "padding": [
@@ -16665,31 +17757,21 @@
                       "children": [
                         {
                           "type": "text",
-                          "id": "jKoJJ",
+                          "id": "e48hI",
                           "name": "Projektbericht",
                           "fill": "$on-light-primary",
                           "content": "Projektbericht",
                           "fontFamily": "$font",
                           "fontSize": 13,
                           "fontWeight": "normal"
-                        },
-                        {
-                          "type": "icon",
-                          "id": "A1axP",
-                          "name": "info",
-                          "width": 13,
-                          "height": 13,
-                          "icon": "info",
-                          "library": "lucide",
-                          "fill": "$on-light-muted"
                         }
                       ]
                     },
                     {
                       "type": "frame",
-                      "id": "ab9P3",
+                      "id": "pMWyr",
                       "name": "cell",
-                      "width": 170,
+                      "width": 190,
                       "height": "fill_container",
                       "gap": 6,
                       "padding": [
@@ -16700,21 +17782,28 @@
                       "children": [
                         {
                           "type": "frame",
-                          "id": "VT2A1",
+                          "id": "a2z5a0",
                           "name": "Btn Projekt bewerten",
                           "width": "fill_container",
-                          "height": 34,
                           "fill": "$on-light-primary",
                           "cornerRadius": 999,
+                          "padding": [
+                            8,
+                            12
+                          ],
                           "justifyContent": "center",
                           "alignItems": "center",
                           "children": [
                             {
                               "type": "text",
-                              "id": "Atpu2",
+                              "id": "pgmuz",
                               "name": "Projekt bewerten",
                               "fill": "$white",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
                               "content": "Projekt bewerten",
+                              "lineHeight": 1.2,
+                              "textAlign": "center",
                               "fontFamily": "$font",
                               "fontSize": 13,
                               "fontWeight": "600"
@@ -16725,7 +17814,7 @@
                     },
                     {
                       "type": "frame",
-                      "id": "w9kmv",
+                      "id": "CoWC5",
                       "name": "expand",
                       "width": 44,
                       "height": "fill_container",
@@ -16735,7 +17824,7 @@
                       "children": [
                         {
                           "type": "icon",
-                          "id": "aFNyt",
+                          "id": "Y3qmg",
                           "name": "chevron-down",
                           "width": 20,
                           "height": 20,
@@ -16749,10 +17838,10 @@
                 },
                 {
                   "type": "frame",
-                  "id": "fpEbJ",
-                  "name": "Row Vorlage: ML-Projekt",
+                  "id": "vnGLV",
+                  "name": "Row Chatbot Bürgeramt",
                   "width": "fill_container",
-                  "height": 60,
+                  "height": 64,
                   "fill": "$white",
                   "stroke": "$light-divider",
                   "strokeWidth": {
@@ -16761,9 +17850,9 @@
                   "children": [
                     {
                       "type": "frame",
-                      "id": "xm01i",
+                      "id": "szjWt",
                       "name": "cell",
-                      "width": 120,
+                      "width": 165,
                       "height": "fill_container",
                       "gap": 6,
                       "padding": [
@@ -16774,8 +17863,8 @@
                       "children": [
                         {
                           "type": "frame",
-                          "id": "v9VWsM",
-                          "name": "chip Vorlage",
+                          "id": "EleVy",
+                          "name": "chip Bestanden",
                           "fill": "$light-bg-secondary",
                           "cornerRadius": 999,
                           "gap": 4,
@@ -16787,20 +17876,20 @@
                           "children": [
                             {
                               "type": "icon",
-                              "id": "QEKW6",
-                              "name": "file",
+                              "id": "T5spW",
+                              "name": "circle-check",
                               "width": 13,
                               "height": 13,
-                              "icon": "file",
+                              "icon": "circle-check",
                               "library": "lucide",
-                              "fill": "$on-light-muted"
+                              "fill": "$status-green"
                             },
                             {
                               "type": "text",
-                              "id": "wT0p8",
-                              "name": "Vorlage",
+                              "id": "JWNUy",
+                              "name": "Bestanden",
                               "fill": "$on-light-secondary",
-                              "content": "Vorlage",
+                              "content": "Bestanden",
                               "fontFamily": "$font",
                               "fontSize": 12,
                               "fontWeight": "600"
@@ -16811,9 +17900,66 @@
                     },
                     {
                       "type": "frame",
-                      "id": "kGufA",
+                      "id": "kNmol",
                       "name": "cell",
                       "width": "fill_container",
+                      "height": "fill_container",
+                      "layout": "vertical",
+                      "gap": 3,
+                      "padding": [
+                        0,
+                        10
+                      ],
+                      "justifyContent": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "RNv97",
+                          "name": "Chatbot Bürgeramt",
+                          "fill": "$on-light-primary",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Chatbot Bürgeramt",
+                          "fontFamily": "$font",
+                          "fontSize": 14,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "myJhV",
+                          "name": "consent line",
+                          "gap": 4,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon",
+                              "id": "dEjwO",
+                              "name": "circle-x",
+                              "width": 12,
+                              "height": 12,
+                              "icon": "circle-x",
+                              "library": "lucide",
+                              "fill": "$error"
+                            },
+                            {
+                              "type": "text",
+                              "id": "OgmRd",
+                              "name": "Veröffentlichung abgeleh",
+                              "fill": "$on-light-secondary",
+                              "content": "Veröffentlichung abgelehnt",
+                              "fontFamily": "$font",
+                              "fontSize": 11,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "qEMbD",
+                      "name": "cell",
+                      "width": 160,
                       "height": "fill_container",
                       "gap": 6,
                       "padding": [
@@ -16824,9 +17970,650 @@
                       "children": [
                         {
                           "type": "text",
-                          "id": "dZS8W",
+                          "id": "IB9tU",
+                          "name": "L. Ludwig, T. Brown",
+                          "fill": "$on-light-primary",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "L. Ludwig, T. Brown",
+                          "fontFamily": "$font",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "A1sOi",
+                      "name": "cell",
+                      "width": 120,
+                      "height": "fill_container",
+                      "gap": 6,
+                      "padding": [
+                        0,
+                        10
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "Nm4AZ",
+                          "name": "Prototyp",
+                          "fill": "$on-light-primary",
+                          "content": "Prototyp",
+                          "fontFamily": "$font",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "VeIZZ",
+                      "name": "cell",
+                      "width": 190,
+                      "height": "fill_container",
+                      "gap": 6,
+                      "padding": [
+                        0,
+                        10
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "UIXQZ",
+                          "name": "Btn Zur Veröffentlichung vorschlagen",
+                          "width": "fill_container",
+                          "cornerRadius": 999,
+                          "stroke": "$on-light-primary",
+                          "strokeWidth": 1.5,
+                          "padding": [
+                            8,
+                            12
+                          ],
+                          "justifyContent": "center",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "tx9Ii",
+                              "name": "Zur Veröffentlichung vor",
+                              "fill": "$on-light-primary",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "Zur Veröffentlichung vorschlagen",
+                              "lineHeight": 1.2,
+                              "textAlign": "center",
+                              "fontFamily": "$font",
+                              "fontSize": 12,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "Vnhut",
+                      "name": "expand",
+                      "width": 44,
+                      "height": "fill_container",
+                      "fill": "$expand-strip",
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "xZ2Id",
+                          "name": "chevron-down",
+                          "width": 20,
+                          "height": 20,
+                          "icon": "chevron-down",
+                          "library": "lucide",
+                          "fill": "$on-light-primary"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "LEQvc",
+                  "name": "Row Energie-Dashboard",
+                  "width": "fill_container",
+                  "height": 64,
+                  "fill": "$white",
+                  "stroke": "$light-divider",
+                  "strokeWidth": {
+                    "bottom": 1
+                  },
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "K4mT0r",
+                      "name": "cell",
+                      "width": 165,
+                      "height": "fill_container",
+                      "gap": 6,
+                      "padding": [
+                        0,
+                        10
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "jd4zF",
+                          "name": "chip Zur Veröffentlichung vorgeschlagen",
+                          "width": "fill_container",
+                          "fill": "$light-bg-secondary",
+                          "cornerRadius": 10,
+                          "gap": 4,
+                          "padding": [
+                            3,
+                            8
+                          ],
+                          "children": [
+                            {
+                              "type": "icon",
+                              "id": "rlKCI",
+                              "name": "send",
+                              "width": 13,
+                              "height": 13,
+                              "icon": "send",
+                              "library": "lucide",
+                              "fill": "$status-green"
+                            },
+                            {
+                              "type": "text",
+                              "id": "nwuud",
+                              "name": "Zur Veröffentlichung vor",
+                              "fill": "$on-light-secondary",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "Zur Veröffentlichung vorgeschlagen",
+                              "lineHeight": 1.2,
+                              "fontFamily": "$font",
+                              "fontSize": 12,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "t0O7jg",
+                      "name": "cell",
+                      "width": "fill_container",
+                      "height": "fill_container",
+                      "layout": "vertical",
+                      "gap": 3,
+                      "padding": [
+                        0,
+                        10
+                      ],
+                      "justifyContent": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "hjUaM",
+                          "name": "Energie-Dashboard",
+                          "fill": "$on-light-primary",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Energie-Dashboard",
+                          "fontFamily": "$font",
+                          "fontSize": 14,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "DIRzc",
+                          "name": "consent line",
+                          "gap": 4,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon",
+                              "id": "oIw2w",
+                              "name": "circle-check",
+                              "width": 12,
+                              "height": 12,
+                              "icon": "circle-check",
+                              "library": "lucide",
+                              "fill": "$status-green"
+                            },
+                            {
+                              "type": "text",
+                              "id": "nLju6",
+                              "name": "Veröffentlichung zugesti",
+                              "fill": "$on-light-secondary",
+                              "content": "Veröffentlichung zugestimmt",
+                              "fontFamily": "$font",
+                              "fontSize": 11,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "jiq1y",
+                      "name": "cell",
+                      "width": 160,
+                      "height": "fill_container",
+                      "gap": 6,
+                      "padding": [
+                        0,
+                        10
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "SBOj6",
+                          "name": "M. Carter",
+                          "fill": "$on-light-primary",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "M. Carter",
+                          "fontFamily": "$font",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "mPkDg",
+                      "name": "cell",
+                      "width": 120,
+                      "height": "fill_container",
+                      "gap": 6,
+                      "padding": [
+                        0,
+                        10
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "zZy3x",
+                          "name": "Projektbericht",
+                          "fill": "$on-light-primary",
+                          "content": "Projektbericht",
+                          "fontFamily": "$font",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "OHl2q",
+                      "name": "cell",
+                      "width": 190,
+                      "height": "fill_container",
+                      "gap": 6,
+                      "padding": [
+                        0,
+                        10
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "PkQSy",
+                          "name": "Btn Vorschlag zurückziehen",
+                          "width": "fill_container",
+                          "cornerRadius": 999,
+                          "stroke": "$on-light-primary",
+                          "strokeWidth": 1.5,
+                          "padding": [
+                            8,
+                            12
+                          ],
+                          "justifyContent": "center",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "udIkr",
+                              "name": "Vorschlag zurückziehen",
+                              "fill": "$on-light-primary",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "Vorschlag zurückziehen",
+                              "lineHeight": 1.2,
+                              "textAlign": "center",
+                              "fontFamily": "$font",
+                              "fontSize": 13,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "ENgtv",
+                      "name": "expand",
+                      "width": 44,
+                      "height": "fill_container",
+                      "fill": "$expand-strip",
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "p1yAZX",
+                          "name": "chevron-down",
+                          "width": 20,
+                          "height": 20,
+                          "icon": "chevron-down",
+                          "library": "lucide",
+                          "fill": "$on-light-primary"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "Walqb",
+                  "name": "Row Verkehrsfluss-Analyse",
+                  "width": "fill_container",
+                  "height": 64,
+                  "fill": "$white",
+                  "stroke": "$light-divider",
+                  "strokeWidth": {
+                    "bottom": 1
+                  },
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "z5EGXw",
+                      "name": "cell",
+                      "width": 165,
+                      "height": "fill_container",
+                      "gap": 6,
+                      "padding": [
+                        0,
+                        10
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "eL6XR",
+                          "name": "chip In Bearbeitung",
+                          "fill": "$light-bg-secondary",
+                          "cornerRadius": 999,
+                          "gap": 4,
+                          "padding": [
+                            3,
+                            8
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon",
+                              "id": "kHy2N",
+                              "name": "loader",
+                              "width": 13,
+                              "height": 13,
+                              "icon": "loader",
+                              "library": "lucide",
+                              "fill": "$on-light-muted"
+                            },
+                            {
+                              "type": "text",
+                              "id": "p57rub",
+                              "name": "In Bearbeitung",
+                              "fill": "$on-light-secondary",
+                              "content": "In Bearbeitung",
+                              "fontFamily": "$font",
+                              "fontSize": 12,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "Oj6pQ",
+                      "name": "cell",
+                      "width": "fill_container",
+                      "height": "fill_container",
+                      "layout": "vertical",
+                      "gap": 3,
+                      "padding": [
+                        0,
+                        10
+                      ],
+                      "justifyContent": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "Af6hP",
+                          "name": "Verkehrsfluss-Analyse",
+                          "fill": "$on-light-primary",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Verkehrsfluss-Analyse",
+                          "fontFamily": "$font",
+                          "fontSize": 14,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "JqD7n",
+                      "name": "cell",
+                      "width": 160,
+                      "height": "fill_container",
+                      "gap": 6,
+                      "padding": [
+                        0,
+                        10
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "dIPCU",
+                          "name": "S. Berger, M. Bianchi",
+                          "fill": "$on-light-primary",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "S. Berger, M. Bianchi",
+                          "fontFamily": "$font",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "gobVj",
+                      "name": "cell",
+                      "width": 120,
+                      "height": "fill_container",
+                      "gap": 6,
+                      "padding": [
+                        0,
+                        10
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "ULwiP",
+                          "name": "Projektbericht",
+                          "fill": "$on-light-primary",
+                          "content": "Projektbericht",
+                          "fontFamily": "$font",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "F5zgJW",
+                      "name": "cell",
+                      "width": 190,
+                      "height": "fill_container",
+                      "gap": 6,
+                      "padding": [
+                        0,
+                        10
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "EEQjx",
+                          "name": "Btn disabled",
+                          "width": "fill_container",
+                          "cornerRadius": 999,
+                          "stroke": "$light-border",
+                          "strokeWidth": 1.5,
+                          "padding": [
+                            8,
+                            12
+                          ],
+                          "justifyContent": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "H1Fdp",
+                              "name": "Projekt bewerten",
+                              "fill": "$on-light-muted",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "Projekt bewerten",
+                              "textAlign": "center",
+                              "fontFamily": "$font",
+                              "fontSize": 13,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "Uc9Ih",
+                      "name": "expand",
+                      "width": 44,
+                      "height": "fill_container",
+                      "fill": "$expand-strip",
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "hqVN7",
+                          "name": "chevron-down",
+                          "width": 20,
+                          "height": 20,
+                          "icon": "chevron-down",
+                          "library": "lucide",
+                          "fill": "$on-light-primary"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "hfOZe",
+                  "name": "Row Vorlage: ML-Projekt",
+                  "width": "fill_container",
+                  "height": 64,
+                  "fill": "$white",
+                  "stroke": "$light-divider",
+                  "strokeWidth": {
+                    "bottom": 1
+                  },
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "KHXkB",
+                      "name": "cell",
+                      "width": 165,
+                      "height": "fill_container",
+                      "gap": 6,
+                      "padding": [
+                        0,
+                        10
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "D5w2Nz",
+                          "name": "chip Projektvorlage",
+                          "fill": "$light-bg-secondary",
+                          "cornerRadius": 999,
+                          "gap": 4,
+                          "padding": [
+                            3,
+                            8
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon",
+                              "id": "p9eVi",
+                              "name": "file",
+                              "width": 13,
+                              "height": 13,
+                              "icon": "file",
+                              "library": "lucide",
+                              "fill": "$on-light-muted"
+                            },
+                            {
+                              "type": "text",
+                              "id": "szjcF",
+                              "name": "Projektvorlage",
+                              "fill": "$on-light-secondary",
+                              "content": "Projektvorlage",
+                              "fontFamily": "$font",
+                              "fontSize": 12,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "p2a1g",
+                      "name": "cell",
+                      "width": "fill_container",
+                      "height": "fill_container",
+                      "layout": "vertical",
+                      "gap": 3,
+                      "padding": [
+                        0,
+                        10
+                      ],
+                      "justifyContent": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "lEzTo",
                           "name": "Vorlage: ML-Projekt",
                           "fill": "$on-light-primary",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
                           "content": "Vorlage: ML-Projekt",
                           "fontFamily": "$font",
                           "fontSize": 14,
@@ -16836,9 +18623,9 @@
                     },
                     {
                       "type": "frame",
-                      "id": "NPZiw",
+                      "id": "F9NWb",
                       "name": "cell",
-                      "width": 170,
+                      "width": 160,
                       "height": "fill_container",
                       "gap": 6,
                       "padding": [
@@ -16849,9 +18636,11 @@
                       "children": [
                         {
                           "type": "text",
-                          "id": "WUfXo",
+                          "id": "yaBgi",
                           "name": "Keine Autor:innen",
                           "fill": "$on-light-muted",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
                           "content": "Keine Autor:innen",
                           "fontFamily": "$font",
                           "fontSize": 13,
@@ -16861,9 +18650,9 @@
                     },
                     {
                       "type": "frame",
-                      "id": "W01lV",
+                      "id": "jrqc8",
                       "name": "cell",
-                      "width": 130,
+                      "width": 120,
                       "height": "fill_container",
                       "gap": 6,
                       "padding": [
@@ -16874,7 +18663,7 @@
                       "children": [
                         {
                           "type": "text",
-                          "id": "rtcHc",
+                          "id": "tI95S",
                           "name": "Typ wählen",
                           "fill": "$on-light-muted",
                           "content": "Typ wählen",
@@ -16886,9 +18675,9 @@
                     },
                     {
                       "type": "frame",
-                      "id": "j8LJiA",
+                      "id": "jXeCE",
                       "name": "cell",
-                      "width": 170,
+                      "width": 190,
                       "height": "fill_container",
                       "gap": 6,
                       "padding": [
@@ -16899,22 +18688,29 @@
                       "children": [
                         {
                           "type": "frame",
-                          "id": "n0FE3x",
+                          "id": "Tauvc",
                           "name": "Btn Vorlage löschen",
                           "width": "fill_container",
-                          "height": 34,
                           "cornerRadius": 999,
                           "stroke": "$on-light-primary",
                           "strokeWidth": 1.5,
+                          "padding": [
+                            8,
+                            12
+                          ],
                           "justifyContent": "center",
                           "alignItems": "center",
                           "children": [
                             {
                               "type": "text",
-                              "id": "mrvsN",
+                              "id": "ya4C0",
                               "name": "Vorlage löschen",
                               "fill": "$on-light-primary",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
                               "content": "Vorlage löschen",
+                              "lineHeight": 1.2,
+                              "textAlign": "center",
                               "fontFamily": "$font",
                               "fontSize": 13,
                               "fontWeight": "600"
@@ -16925,7 +18721,7 @@
                     },
                     {
                       "type": "frame",
-                      "id": "uYmch",
+                      "id": "Q7Ywue",
                       "name": "expand",
                       "width": 44,
                       "height": "fill_container",
@@ -16935,7 +18731,7 @@
                       "children": [
                         {
                           "type": "icon",
-                          "id": "CZ4p3",
+                          "id": "roa2Q",
                           "name": "chevron-down",
                           "width": 20,
                           "height": 20,
@@ -16946,6 +18742,35 @@
                       ]
                     }
                   ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "TYXJj",
+              "name": "Consent note",
+              "width": "fill_container",
+              "fill": "$bg-secondary",
+              "cornerRadius": 8,
+              "stroke": "$border",
+              "strokeWidth": 1,
+              "padding": [
+                10,
+                14
+              ],
+              "children": [
+                {
+                  "type": "text",
+                  "id": "IX7Kw",
+                  "name": "Same line under the titl",
+                  "fill": "$label-secondary",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "Same line under the title as at 1280; the table keeps its columns.",
+                  "lineHeight": 1.5,
+                  "fontFamily": "$font",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
                 }
               ]
             }
@@ -17075,7 +18900,7 @@
                       "type": "frame",
                       "id": "ulLUt",
                       "name": "cell",
-                      "width": 48,
+                      "width": 165,
                       "height": "fill_container",
                       "gap": 6,
                       "padding": [
@@ -17249,7 +19074,7 @@
                       "type": "frame",
                       "id": "OOWa1",
                       "name": "cell",
-                      "width": 48,
+                      "width": 165,
                       "height": "fill_container",
                       "gap": 6,
                       "padding": [
@@ -17479,7 +19304,7 @@
                       "type": "frame",
                       "id": "owSW7",
                       "name": "cell",
-                      "width": 48,
+                      "width": 165,
                       "height": "fill_container",
                       "gap": 6,
                       "padding": [
@@ -17713,7 +19538,7 @@
                       "type": "frame",
                       "id": "S8TNNI",
                       "name": "blk E-MAIL",
-                      "width": "fill_container",
+                      "width": 165,
                       "fill": "$white",
                       "cornerRadius": 8,
                       "stroke": "$light-divider",
@@ -17738,6 +19563,8 @@
                           "id": "er7ob",
                           "name": "emil.bauer@example.com",
                           "fill": "$on-light-primary",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
                           "content": "emil.bauer@example.com",
                           "fontFamily": "$font",
                           "fontSize": 14,
@@ -17912,7 +19739,7 @@
                       "type": "frame",
                       "id": "p2wsj",
                       "name": "cell",
-                      "width": 48,
+                      "width": 165,
                       "height": "fill_container",
                       "gap": 6,
                       "padding": [
@@ -18142,7 +19969,7 @@
                       "type": "frame",
                       "id": "U8DcVt",
                       "name": "cell",
-                      "width": 48,
+                      "width": 165,
                       "height": "fill_container",
                       "gap": 6,
                       "padding": [

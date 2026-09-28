@@ -606,7 +606,9 @@
         "details_summary": "Was wird veröffentlicht?",
         "description": "opencampus.sh (betrieben vom gemeinnützigen Verein Campus Business Box e.V.) kann dieses Projekt als Showcase-Beispiel auf der Plattform und in Werbematerialien veröffentlichen sowie für die Teilnahme oder Einreichung bei Preisen verwenden. Was geteilt wird: Projekttitel, Beschreibung, Titelbild, hochgeladene Dateien und Links sowie die Namen und Element-Raum-Links der beitragenden Autor:innen. Die Einwilligung ist freiwillig und kann jederzeit in deiner Projektansicht erteilt oder widerrufen werden; ein Widerruf entfernt das Projekt aus der Veröffentlichung.",
         "status_granted": "Einwilligung erteilt von {name} am {date}.",
-        "status_withdrawn": "Einwilligung widerrufen von {name} am {date} — das Projekt wird nicht veröffentlicht."
+        "status_withdrawn": "Einwilligung widerrufen von {name} am {date} — das Projekt wird nicht veröffentlicht.",
+        "table_granted": "Veröffentlichung zugestimmt",
+        "table_declined": "Veröffentlichung abgelehnt"
       },
       "submit_dialog": {
         "title": "Projekt zur Bewertung einreichen",

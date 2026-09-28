@@ -606,7 +606,9 @@
         "details_summary": "What will be published?",
         "description": "opencampus.sh (operated by the non-profit Campus Business Box e.V.) may publish this project as a showcase example on the platform and in promotional materials, and may enter it for participation or submission for prizes. What will be shared: project title, description, cover image, files and links, and the names and Element room links of the contributing authors. Consent is voluntary and can be granted or withdrawn at any time from your project view; withdrawing removes the project from publication.",
         "status_granted": "Consent granted by {name} on {date}.",
-        "status_withdrawn": "Consent withdrawn by {name} on {date} — the project will not be published."
+        "status_withdrawn": "Consent withdrawn by {name} on {date} — the project will not be published.",
+        "table_granted": "Publication approved",
+        "table_declined": "Publication declined"
       },
       "submit_dialog": {
         "title": "Submit project for review",
