@@ -212,7 +212,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
   }, []);
 
   // Use TableGrid hook with proper refetchFilter for search debouncing
-  const { data, loading, error, refetch, searchFilter, pageIndex, sorting, setSearchFilter, setPageIndex, setSorting } = useTableGrid({
+  const { data, loading, initialLoading, error, refetch, searchFilter, pageIndex, sorting, setSearchFilter, setPageIndex, setSorting } = useTableGrid({
     queryHook: useManageQuery,
     query: ADMIN_COURSE_LIST,
     queryVariables: filter,
@@ -653,6 +653,10 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
               registrationType: course.registrationType,
               externalRegistrationLink: course.externalRegistrationLink,
               programId: targetProgram.id,
+              // A copy is the next run of the same course. A series belongs to one organization,
+              // so a copy into another organization's program gets its own series when it is published.
+              courseSeriesId:
+                course.Program?.organizationId === targetProgram.organizationId ? course.courseSeriesId : null,
               published: false, // Always start as unpublished
               // Copy tile slider groups
               CourseGroups: courseGroups.length > 0 ? { data: courseGroups } : undefined,
@@ -939,7 +943,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
         </div>
       )}
 
-      {loading ? (
+      {initialLoading ? (
         <div className="pb-12 pt-16">
           <Loading />
         </div>

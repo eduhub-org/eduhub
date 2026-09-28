@@ -87,8 +87,12 @@ export const AddParticipantsForm: FC<AddParticipantsFormProps> = ({
     }
     setUserSelectionError(null); // Clear any previous errors
 
+    // A user holding a preview enrollment on this course is left out by the
+    // upsert (affected_rows 0) rather than silently turned into a hidden
+    // participant, so say who was skipped instead of closing the form.
+    const skippedUsers: { id: string; name: string }[] = [];
     for (const user of selectedUserIds) {
-      await insertEnrollment({
+      const result = await insertEnrollment({
         variables: {
           courseId,
           userId: user.id,
@@ -96,6 +100,17 @@ export const AddParticipantsForm: FC<AddParticipantsFormProps> = ({
           status: selectedStatus as CourseEnrollmentStatus_enum,
         },
       }).catch((err) => console.error(`Failed to insert for user ${user.id}: ${err}`));
+      if (result && !result.data?.insert_CourseEnrollment?.affected_rows) {
+        skippedUsers.push(user);
+      }
+    }
+
+    if (skippedUsers.length > 0) {
+      setSelectedUserIds(skippedUsers);
+      setUserSelectionError(
+        t('add_user_preview_conflict', { names: skippedUsers.map((user) => user.name).join(', ') })
+      );
+      return;
     }
 
     onSubmit();

@@ -193,6 +193,8 @@ const MeinStujo: FC<Props> = ({ portal }) => {
   useEffect(() => {
     if (router.query.payment === 'success') {
       setNotice(t('noticePaymentSuccess'));
+    } else if (router.query.payment === 'invoice') {
+      setNotice(t('noticePublishedInvoice'));
     } else if (router.query.payment === 'cancelled') {
       setNotice(t('noticePaymentCancelled'));
     }
@@ -212,8 +214,22 @@ const MeinStujo: FC<Props> = ({ portal }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router.query.repost, data]);
 
+  // An organization approved for "Kauf auf Rechnung" chooses how to pay in
+  // the order box, so a paid publish goes there instead of straight to Stripe.
+  const choosesPaymentMethod = (jobPostingId: number) => {
+    if (!organization?.allowInvoicePayment) return false;
+    if (summarizeCredits(organization.JobPostingCredits).hasFree) return false;
+    const posting = data?.JobPosting?.find((p: any) => p.id === jobPostingId);
+    const price = data?.JobPostingPrice?.find((row: any) => row.jobPostingType === posting?.type);
+    return (price?.price ?? 0) > 0;
+  };
+
   const handlePublish = async (jobPostingId: number, acceptTerms = false) => {
     setNotice(null);
+    if (choosesPaymentMethod(jobPostingId)) {
+      router.push(`/mein-stujo/neu?id=${jobPostingId}&step=preview`);
+      return;
+    }
     try {
       const result = await publishPosting({ variables: { jobPostingId, acceptTerms } });
       const payload = result.data?.publishJobPosting;

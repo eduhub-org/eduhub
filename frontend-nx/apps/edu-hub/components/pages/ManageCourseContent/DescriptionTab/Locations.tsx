@@ -91,9 +91,10 @@ export const Locations: FC<LocationsIProps> = ({ location, onDelete }) => {
   }, [addressData]);
 
   return (
-    <div className="grid grid-cols-12 items-center">
+    // Phones: a card with the location type and delete on top and the address below it.
+    <div className="grid grid-cols-[minmax(0,1fr)_auto] md:grid-cols-12 items-center mb-3 md:mb-0 rounded-lg border border-border-primary bg-bg-card p-2 md:p-0 md:border-0 md:bg-transparent md:rounded-none">
       {location && (
-        <div className="col-span-2">
+        <div className="md:col-span-2">
           <DropDownSelector
             variant="eduhub"
             options={locationOptions}
@@ -106,7 +107,7 @@ export const Locations: FC<LocationsIProps> = ({ location, onDelete }) => {
         </div>
       )}
       {location && (
-        <div className="col-span-7">
+        <div className="col-span-2 row-start-2 md:row-start-auto md:col-span-7">
           {isOnline ? (
             <InputField
               variant="eduhub"

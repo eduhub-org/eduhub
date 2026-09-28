@@ -154,9 +154,20 @@
       "bulk_action": "Sammelaktion",
       "apply": "Ausführen",
       "none": "Keine Aktion",
-      "items_per_page": "Einträge pro Seite"
+      "items_per_page": "Einträge pro Seite",
+      "selected_count": "{count} ausgewählt",
+      "clear_selection": "Auswahl aufheben",
+      "expand_row": "Details anzeigen",
+      "collapse_row": "Details ausblenden",
+      "open_row": "Öffnen",
+      "select_all": "Alle",
+      "sort_by": "Sortieren",
+      "sort_default": "Standardsortierung",
+      "sort_asc": "{column}, aufsteigend",
+      "sort_desc": "{column}, absteigend"
     },
     "table_grid_delete_button": {
+      "delete": "Löschen",
       "confirm_delete": "Löschen bestätigen",
       "deletion_confirmation_question": "Bist du sicher, dass du diesen Eintrag löschen möchtest?"
     },
@@ -374,12 +385,17 @@
       "agenda": "Programm",
       "add_to_calendar": "Zum Kalender hinzufügen",
       "location_not_available": "Ort noch nicht bekannt",
+      "optional": "optional",
+      "program_session": "Kursübergreifend",
+      "program_session_tooltip": "Findet für alle Kurse von „{program}“ statt",
+      "optional_hint": "Alle Termine sind Pflicht, außer als „optional“ markierte.",
       "untitled_session": "Programmpunkt",
       "add_to_calendar_short": "Kalender"
     },
     "attendances": {
       "attendances": "Anwesenheiten",
       "max_missed_sessions": "Du darfst an maximal einem Termin fehlen",
+      "max_missed_mandatory_sessions": "Du darfst an maximal {count} von {total} Pflichtterminen fehlen",
       "max_missed_sessions_plural": "Du darfst an maximal {count} Terminen fehlen",
       "attendance_status": {
         "ATTENDED": "Teilgenommen",
@@ -590,7 +606,9 @@
         "details_summary": "Was wird veröffentlicht?",
         "description": "opencampus.sh (betrieben vom gemeinnützigen Verein Campus Business Box e.V.) kann dieses Projekt als Showcase-Beispiel auf der Plattform und in Werbematerialien veröffentlichen sowie für die Teilnahme oder Einreichung bei Preisen verwenden. Was geteilt wird: Projekttitel, Beschreibung, Titelbild, hochgeladene Dateien und Links sowie die Namen und Element-Raum-Links der beitragenden Autor:innen. Die Einwilligung ist freiwillig und kann jederzeit in deiner Projektansicht erteilt oder widerrufen werden; ein Widerruf entfernt das Projekt aus der Veröffentlichung.",
         "status_granted": "Einwilligung erteilt von {name} am {date}.",
-        "status_withdrawn": "Einwilligung widerrufen von {name} am {date} — das Projekt wird nicht veröffentlicht."
+        "status_withdrawn": "Einwilligung widerrufen von {name} am {date} — das Projekt wird nicht veröffentlicht.",
+        "table_granted": "Veröffentlichung zugestimmt",
+        "table_declined": "Veröffentlichung abgelehnt"
       },
       "submit_dialog": {
         "title": "Projekt zur Bewertung einreichen",
@@ -747,6 +765,17 @@
       "title": "Wer ist dabei",
       "message_on_element": "Auf Element schreiben",
       "and_more": "und {count} weitere"
+    },
+    "participant_preview": {
+      "notice": "Vorschau: Du siehst diese Seite als Teilnehmer:in.",
+      "end": "Vorschau beenden",
+      "errors": {
+        "TEST_ENROLLMENT_FAILED": "Die Vorschau konnte nicht beendet werden. Bitte versuche es später noch einmal.",
+        "TEST_ENROLLMENT_UNAUTHORIZED": "Nur Dozierende dieses Kurses können die Teilnehmer:innen-Ansicht nutzen.",
+        "TEST_ENROLLMENT_ALREADY_PARTICIPANT": "Du bist in diesem Kurs regulär angemeldet, es gibt also keine Vorschau zu beenden.",
+        "TEST_ENROLLMENT_COURSE_NOT_FOUND": "Dieser Kurs existiert nicht mehr.",
+        "TEST_ENROLLMENT_INVALID_INPUT": "Die Anfrage war fehlerhaft."
+      }
     },
     "ParticipationExitButton": {
       "cancel_participation": "Anmeldung stornieren",
@@ -924,6 +953,10 @@
     "external_speakers": "Externe Referenten",
     "add_external_speaker": "Externen Referenten hinzufügen",
     "remove_external_speaker": "Externen Referenten entfernen",
+    "mandatory": "Pflicht",
+    "program_session": "Kursübergreifend",
+    "mandatory_last_session": "Mindestens ein Termin muss Pflicht bleiben.",
+    "mandatory_help": "Nur Pflichttermine zählen zu den erlaubten Fehlterminen und erscheinen auf dem Zertifikat. Anwesenheiten werden trotzdem erfasst.",
     "session_title": "Titel des Termins",
     "confirmDeleteSession": "Möchtest du den Termin wirklich löschen?",
     "cannotDeletePastSession": "Du kannst keinen Termin der in der Vergangenheit liegt löschen! Solltest du den Termin wirklich löschen wollen, kontaktiere bitte einen Administrator.",
@@ -1140,6 +1173,14 @@
       "label": "Kursgruppe",
       "placeholder": "Kursgruppen auswählen",
       "slider_badge": "Startseiten-Slider"
+    },
+    "course_series": {
+      "label": "Kursreihe",
+      "placeholder": "Kursreihe auswählen oder neu anlegen",
+      "help_text": "Alle Durchläufe desselben Kurses gehören zu einer Kursreihe. Auf der Kursseite werden Projekte aus vergangenen Durchläufen der Reihe gezeigt. Beim Veröffentlichen wird ein Kurs ohne Reihe automatisch mit früheren Kursen gleichen Titels zu einer Reihe zusammengefasst. Einmalige Kurse brauchen keine Reihe.",
+      "none": "Keine Kursreihe",
+      "other_runs": "Weitere Durchläufe dieser Reihe:",
+      "no_other_runs": "Noch keine weiteren Durchläufe in dieser Reihe."
     },
     "cover_image": {
       "label": "Titelbild",
@@ -1365,6 +1406,7 @@
     "add_as_aborted": "als abgebrochen hinzufügen oder ändern",
     "add_as_cancelled": "als storniert hinzufügen oder ändern",
     "add_user_error": "Bitte mindestens einen User auswählen!",
+    "add_user_preview_conflict": "Nicht hinzugefügt, weil gerade eine Teilnehmenden-Vorschau für diesen Kurs aktiv ist: {names}. Die Vorschau muss erst beendet werden.",
     "submit": "Absenden",
     "application_history": {
       "label": "Bisherige Bewerbungen und Teilnahmen",
@@ -1692,6 +1734,8 @@
     "attendance_cert_not_issued": "Keine Teilnahmebescheinigung ausgestellt",
     "achievement_cert_issued": "Leistungszertifikat ausgestellt",
     "achievement_cert_not_issued": "Kein Leistungszertifikat ausgestellt",
+    "attendance_program_session": "Kursübergreifend",
+    "attendance_optional_session": "optional",
     "attendance_status_passed": "Anwesenheitsanforderung erfüllt",
     "attendance_status_failed": "Anwesenheitsanforderung nicht erfüllt",
     "attendance_status_uncertain": "Anwesenheitsstatus noch offen",
@@ -1820,6 +1864,14 @@
     "course_not_found": "Kurs {courseId} wurde nicht gefunden!",
     "add_session": "Termin hinzufügen",
     "SessionsTab": {
+      "date_time": "Datum & Zeit",
+      "edit_date_time": "Datum und Uhrzeit ändern",
+      "location": "Ort",
+      "optional": "Optional",
+      "no_address": "Keine Adresse",
+      "create_address": "Adresse anlegen",
+      "schedule": "Termin",
+      "program_session_locked": "Wird vom Programm-Admin verwaltet",
       "sessionAddresses": {
         "online": {
           "label": "Online",
@@ -1856,6 +1908,7 @@
       "attendance_data": {
         "label": "Anwesenheitsdaten",
         "review_button": "Anwesenheitsdaten ansehen",
+        "review_short": "Ansehen",
         "no_data": "Keine Anwesenheitsdaten vorhanden",
         "dialog_title": "Anwesenheitsdaten"
       },
@@ -1964,7 +2017,26 @@
     "guest_registration": {
       "label": "Anmeldung ohne Konto erlauben",
       "help_text": "Erlaubt die Anmeldung mit Name und E-Mail-Adresse, ohne dass ein Konto angelegt wird. Die Anmeldung wird erst nach Bestätigung per E-Mail gültig. Nur für Veranstaltungen mit direkter Anmeldung möglich."
-    }
+    },
+    "participant_preview": {
+      "start": "Als Teilnehmer:in ansehen",
+      "open": "Teilnehmer:innen-Ansicht öffnen",
+      "end": "Vorschau beenden",
+      "start_dialog_title": "Teilnehmer:innen-Ansicht starten",
+      "start_dialog_question": "Damit wirst Du für diesen Kurs als Teilnehmer:in eingetragen, damit Du die Kursseite genau so siehst wie Deine Teilnehmenden. Diese Anmeldung ist unsichtbar: Sie taucht in keiner Teilnehmendenliste, keiner Zählung, keiner Statistik, keinem Export und keiner E-Mail auf. Achtung: Was Du in der Vorschau tatsächlich absendest, etwa ein vorgeschlagenes Projekt, ist echt und für Teilnehmende sichtbar, bis Du die Vorschau beendest.",
+      "end_dialog_title": "Vorschau beenden",
+      "end_dialog_question": "Damit wird Deine Vorschau-Anmeldung entfernt. Projekte, die nur Du in der Vorschau angelegt hast, sowie Deine Anwesenheiten in diesem Kurs werden mit gelöscht.",
+      "errors": {
+        "TEST_ENROLLMENT_FAILED": "Die Vorschau konnte nicht geändert werden. Bitte versuche es später noch einmal.",
+        "TEST_ENROLLMENT_UNAUTHORIZED": "Nur Dozierende dieses Kurses können die Teilnehmer:innen-Ansicht nutzen.",
+        "TEST_ENROLLMENT_ALREADY_PARTICIPANT": "Du bist in diesem Kurs bereits regulär angemeldet und siehst die Kursseite schon als Teilnehmer:in.",
+        "TEST_ENROLLMENT_COURSE_NOT_FOUND": "Dieser Kurs existiert nicht mehr.",
+        "TEST_ENROLLMENT_INVALID_INPUT": "Die Anfrage war fehlerhaft."
+      }
+    },
+    "info_block_mobile_summary": "{title} · {count} Zeichen",
+    "info_block_mobile_untitled": "Ohne Titel",
+    "info_block_mobile_empty": "Noch leer"
   },
   "manageProjects": {
     "headline": "Projekte",
@@ -1995,6 +2067,15 @@
     }
   },
   "managePrograms": {
+    "program_sessions": {
+      "title": "Programm-Termine",
+      "help_text": "Diese Termine erscheinen in allen Kursen des Programms. Sie sind standardmäßig optional; Pflichttermine zählen in jedem Kurs zu den erlaubten Fehlterminen.",
+      "add": "Termin hinzufügen",
+      "confirm_delete": "Willst Du diesen Programm-Termin wirklich löschen? Er verschwindet aus allen Kursen und erfasste Anwesenheiten gehen verloren.",
+      "location": "Ort",
+      "online_link_placeholder": "Link zum Online-Termin",
+      "location_address_placeholder": "Adresse auswählen"
+    },
     "headline": "Programme",
     "table_header": {
       "published": "Veröffent- licht",
@@ -3152,5 +3233,11 @@
   },
   "notifications": {
     "show_available_places_update_failed": "Anzeige der freien Plätze konnte nicht geändert werden"
+  },
+  "impersonation": {
+    "banner": "Du siehst EduHub gerade als {name}. Nur lesend – Änderungen sind nicht möglich.",
+    "exit": "Zurück zu meinem Konto",
+    "action": "Ansicht übernehmen",
+    "start_failed": "Die Ansicht konnte nicht übernommen werden."
   }
 }

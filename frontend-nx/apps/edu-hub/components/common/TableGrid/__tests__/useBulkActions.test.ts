@@ -176,3 +176,23 @@ describe('useDeferredBulkAction', () => {
     await expect(current).resolves.toBeUndefined();
   });
 });
+
+describe('useBulkActions select-all', () => {
+  it('judges "all selected" by row id, not by count', () => {
+    const { result } = renderHook(() => useBulkActions<TestRow>([], jest.fn()));
+    const nextPage: TestRow[] = [{ id: 3 }, { id: 4 }];
+
+    selectAllRows(result);
+    expect(result.current.isAllSelected(rows)).toBe(true);
+
+    // Same size, different rows (e.g. the next page): nothing on it is selected yet.
+    expect(result.current.isAllSelected(nextPage)).toBe(false);
+    expect(result.current.isSomeSelected(nextPage)).toBe(false);
+
+    act(() => result.current.toggleAllRows(nextPage));
+    expect([...result.current.selectedRowIds].sort()).toEqual([3, 4]);
+
+    act(() => result.current.toggleAllRows(nextPage));
+    expect(result.current.selectedRowIds.size).toBe(0);
+  });
+});

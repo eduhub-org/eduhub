@@ -8,6 +8,16 @@ import {
   getOrCreateCustomer,
   getOrCreateTaxRate,
 } from '../lib/stripeTax.js';
+import {
+  POSTING_NOT_PUBLISHABLE,
+  applyCustomerBilling,
+  buildInvoicePaymentDescription,
+  fillOrganizationBilling,
+  hasQueuedPublishedMail,
+  issueBankTransferInvoice,
+  loadInvoiceOrganization,
+  normalizeBillingInput,
+} from './invoicePayment.js';
 
 /**
  * Single entry point for publishing a StuJo job posting (phase 4 of
@@ -20,6 +30,9 @@ import {
  * - Otherwise                           -> status PENDING_PAYMENT + Stripe
  *   Checkout Session (card, SEPA debit; net price + fixed 19% VAT).
  *   The webhook publishes on checkout.session.completed.
+ * - paymentMethod INVOICE (organizations with allowInvoicePayment only)
+ *                                       -> Stripe invoice paid by bank
+ *   transfer, published immediately; see invoicePayment.js.
  *
  * Caller must be an OrganizationAdmin with canManageJobs for the posting's
  * organization. Direct status changes are blocked by Hasura permissions,
@@ -98,6 +111,24 @@ const PUBLISH_POSTING = gql`
     ) {
       id
       status
+    }
+  }
+`;
+
+// The invoice path bills before anyone pays, so the publish must be the
+// guard against a second concurrent request (two tabs, a double submit):
+// only one of them can move the posting out of a publishable status.
+const PUBLISH_POSTING_IF_PUBLISHABLE = gql`
+  mutation PublishJobPostingIfPublishable(
+    $id: Int!
+    $publishedAt: timestamptz!
+    $expiresAt: timestamptz!
+  ) {
+    update_JobPosting(
+      where: { id: { _eq: $id }, status: { _in: [DRAFT, EXPIRED, PENDING_PAYMENT, DEACTIVATED] } }
+      _set: { status: PUBLISHED, publishedAt: $publishedAt, expiresAt: $expiresAt }
+    ) {
+      affected_rows
     }
   }
 `;
@@ -322,14 +353,19 @@ export function buildJobPostingMailVars(posting, { expiresAt, publishedAt, payme
   };
 }
 
-export async function publishAndNotify(client, logger, posting, durationDays) {
+async function publishPosting(client, postingId, durationDays) {
   const publishedAt = new Date();
   const expiresAt = new Date(publishedAt.getTime() + durationDays * 24 * 60 * 60 * 1000);
   await client.request(PUBLISH_POSTING, {
-    id: posting.id,
+    id: postingId,
     publishedAt: publishedAt.toISOString(),
     expiresAt: expiresAt.toISOString(),
   });
+  return { publishedAt, expiresAt };
+}
+
+export async function publishAndNotify(client, logger, posting, durationDays) {
+  const { publishedAt, expiresAt } = await publishPosting(client, posting.id, durationDays);
 
   const vars = buildJobPostingMailVars(posting, {
     expiresAt,
@@ -372,13 +408,223 @@ export async function publishAndNotify(client, logger, posting, durationDays) {
   return { publishedAt, expiresAt };
 }
 
+/**
+ * The INVOICE branch of the paid path: bank transfer invoice, immediate
+ * publish, and the confirmation mail with the invoice PDF attached.
+ */
+async function publishByInvoice({
+  stripe,
+  client,
+  logger,
+  posting,
+  billing,
+  invoiceOrganization,
+  customerId: existingCustomerId,
+  lineItem,
+  currency,
+  sellerOrganization,
+  sellerOrgId,
+  sessionUserId,
+  durationDays,
+}) {
+  const customerId =
+    existingCustomerId ?? (await stripe.customers.create({ name: billing.legalName })).id;
+  const vatError = await applyCustomerBilling(stripe, customerId, billing, logger);
+  if (vatError) {
+    return { success: false, error: 'The VAT ID was rejected', messageKey: vatError };
+  }
+  // Only pre-fills the next order; never worth failing the publish for.
+  await fillOrganizationBilling(client, invoiceOrganization, billing).catch((error) =>
+    logger.warn('Could not save the billing address on the organization', { error: error.message })
+  );
+
+  let published = null;
+  let issued;
+  try {
+    issued = await issueBankTransferInvoice({
+      stripe,
+      client,
+      logger,
+      customerId,
+      lineItem,
+      currency,
+      footer: buildInvoiceCreation(sellerOrganization).invoice_data?.footer ?? null,
+      description: buildJobPostingPaymentDescription(
+        posting.title || null,
+        posting.Organization?.name || null
+      ),
+      reference: billing.reference,
+      metadata: {
+        jobPostingId: String(posting.id),
+        organizationId: String(posting.organizationId),
+        organizationName: posting.Organization?.name || '',
+        userId: String(sessionUserId),
+        source: 'stujo',
+      },
+      invoiceRow: {
+        // The platform (not the employer) is the selling organization.
+        organizationId: Number.isInteger(sellerOrgId) ? sellerOrgId : posting.organizationId,
+        userId: sessionUserId,
+        jobPostingId: posting.id,
+      },
+      publish: async () => {
+        const publishedAt = new Date();
+        const expiresAt = new Date(publishedAt.getTime() + durationDays * 24 * 60 * 60 * 1000);
+        const result = await client.request(PUBLISH_POSTING_IF_PUBLISHABLE, {
+          id: posting.id,
+          publishedAt: publishedAt.toISOString(),
+          expiresAt: expiresAt.toISOString(),
+        });
+        if (result.update_JobPosting.affected_rows !== 1) {
+          const error = new Error('Posting was published concurrently');
+          error.code = POSTING_NOT_PUBLISHABLE;
+          throw error;
+        }
+        published = { publishedAt, expiresAt };
+        return published;
+      },
+    });
+  } catch (error) {
+    // Most likely the bank transfer capability is not active on the account.
+    logger.error('Could not issue the bank transfer invoice', {
+      jobPostingId: posting.id,
+      publishedAlready: Boolean(published),
+      error: error.message,
+    });
+    if (published) {
+      // The posting is live but the invoice is not finalized: needs a human,
+      // not a retry that would publish (and bill) a second time. Not deduped
+      // on the posting, so an earlier publication's notice cannot swallow it.
+      if (process.env.STUJO_ADMIN_EMAIL) {
+        await sendJobPostingMail(
+          client,
+          logger,
+          'JOB_POSTING_ADMIN_NOTICE',
+          process.env.STUJO_ADMIN_EMAIL,
+          buildJobPostingMailVars(posting, {
+            expiresAt: published.expiresAt,
+            publishedAt: published.publishedAt,
+            paymentDescription:
+              `Rechnung NICHT ausgestellt – bitte manuell prüfen (Stripe-Entwurf ` +
+              `${error.stripeInvoiceId ?? 'unbekannt'}, Fehler: ${error.message})`,
+          }),
+          null,
+          {
+            Invoice: false,
+            InvoicePdf: false,
+            InvoiceLink: false,
+            InvoicePending: false,
+            TermsAccepted: Boolean(posting.termsAcceptedAt),
+          }
+        );
+      }
+      return {
+        success: true,
+        published: true,
+        paid: false,
+        expiresAt: published.expiresAt.toISOString(),
+      };
+    }
+    if (error.code === POSTING_NOT_PUBLISHABLE) {
+      return { success: false, error: error.message, messageKey: 'INVALID_STATUS' };
+    }
+    return { success: false, error: error.message, messageKey: 'INVOICE_PAYMENT_FAILED' };
+  }
+
+  const { invoice, grossTotal, netTotal } = issued;
+  const { publishedAt, expiresAt } = published;
+  const dueDate = invoice.due_date ? new Date(invoice.due_date * 1000) : null;
+  const formattedGross = formatJobPostingAmount(grossTotal, currency);
+  const invoiceMail = {
+    number: invoice.number || `STUJO-${invoice.id}`,
+    date: new Date(),
+    hostedUrl: invoice.hosted_invoice_url ?? null,
+    netTotal,
+    vatTotal: grossTotal - netTotal,
+    grossTotal,
+    currency,
+    paid: false,
+  };
+  const vars = buildJobPostingMailVars(posting, {
+    expiresAt,
+    publishedAt,
+    paymentDescription: dueDate
+      ? buildInvoicePaymentDescription(formattedGross, dueDate, formatJobPostingDate)
+      : `${formattedGross} per Rechnung (Überweisung)`,
+    invoice: invoiceMail,
+  });
+  const pdfUrl = invoice.invoice_pdf ?? null;
+  const flags = {
+    Invoice: true,
+    InvoicePdf: Boolean(pdfUrl),
+    InvoiceLink: Boolean(invoiceMail.hostedUrl),
+    InvoicePending: !pdfUrl && !invoiceMail.hostedUrl,
+    TermsAccepted: Boolean(posting.termsAcceptedAt),
+  };
+
+  // The confirmation is deduped per posting (MailLog_job_posting_mail_unique),
+  // so a repost of an expired posting cannot queue it again. Then Stripe
+  // sends this invoice itself, so its bank details still reach the employer.
+  const alreadyMailed = await hasQueuedPublishedMail(client, posting.id);
+  if (alreadyMailed) {
+    try {
+      await stripe.invoices.sendInvoice(invoice.id);
+    } catch (error) {
+      logger.error('Could not send the repost invoice through Stripe', {
+        jobPostingId: posting.id,
+        stripeInvoiceId: invoice.id,
+        error: error.message,
+      });
+    }
+  } else if (posting.ContactUser?.email) {
+    await sendJobPostingMail(
+      client,
+      logger,
+      'JOB_POSTING_PUBLISHED',
+      posting.ContactUser.email,
+      vars,
+      null,
+      flags,
+      posting.id,
+      pdfUrl
+        ? [
+            {
+              url: pdfUrl,
+              filename: `rechnung-${invoiceMail.number.replace(/[^A-Za-z0-9._-]+/g, '-')}.pdf`,
+              contentType: 'application/pdf',
+            },
+          ]
+        : null
+    );
+  }
+  if (process.env.STUJO_ADMIN_EMAIL) {
+    await sendJobPostingMail(
+      client,
+      logger,
+      'JOB_POSTING_ADMIN_NOTICE',
+      process.env.STUJO_ADMIN_EMAIL,
+      vars,
+      null,
+      { ...flags, InvoicePdf: false },
+      posting.id
+    );
+  }
+
+  logger.info('Published job posting on invoice', {
+    jobPostingId: posting.id,
+    stripeInvoiceId: invoice.id,
+  });
+  return { success: true, published: true, paid: false, expiresAt: expiresAt.toISOString() };
+}
+
 export default async function publishJobPosting(req, logger) {
   logger.info('########## Publish Job Posting ##########');
 
   try {
     const sessionUserId = req.body?.session_variables?.['x-hasura-user-id'];
     const sessionRole = req.body?.session_variables?.['x-hasura-role'];
-    const { jobPostingId, acceptTerms } = req.body.input || req.body;
+    const { jobPostingId, acceptTerms, paymentMethod, billing: billingInput } =
+      req.body.input || req.body;
 
     if (!jobPostingId) {
       return { success: false, error: 'jobPostingId is required', messageKey: 'MISSING_JOB_POSTING_ID' };
@@ -500,6 +746,27 @@ export default async function publishJobPosting(req, logger) {
       };
     }
 
+    // "Kauf auf Rechnung" is checked before any Stripe call, so a refused or
+    // incomplete request never leaves a customer or draft invoice behind.
+    const payByInvoice = paymentMethod === 'INVOICE';
+    let billing = null;
+    let invoiceOrganization = null;
+    if (payByInvoice) {
+      invoiceOrganization = await loadInvoiceOrganization(client, posting.organizationId);
+      if (!invoiceOrganization?.allowInvoicePayment) {
+        return {
+          success: false,
+          error: 'Invoice payment is not enabled for this organization',
+          messageKey: 'INVOICE_PAYMENT_NOT_ALLOWED',
+        };
+      }
+      const normalized = normalizeBillingInput(billingInput);
+      if (normalized.error) {
+        return { success: false, error: 'Billing address is incomplete', messageKey: normalized.error };
+      }
+      billing = normalized.billing;
+    }
+
     const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
     if (!stripeSecretKey) {
       return { success: false, error: 'Stripe secret key not configured', messageKey: 'STRIPE_NOT_CONFIGURED' };
@@ -592,6 +859,24 @@ export default async function publishJobPosting(req, logger) {
         posting.ContactUser.email,
         posting.Organization?.name || null
       );
+    }
+
+    if (payByInvoice) {
+      return await publishByInvoice({
+        stripe,
+        client,
+        logger,
+        posting,
+        billing,
+        invoiceOrganization,
+        customerId,
+        lineItem,
+        currency,
+        sellerOrganization,
+        sellerOrgId,
+        sessionUserId,
+        durationDays,
+      });
     }
 
     const sessionConfig = {

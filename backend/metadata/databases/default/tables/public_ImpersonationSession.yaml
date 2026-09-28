@@ -1,0 +1,14 @@
+table:
+  name: ImpersonationSession
+  schema: public
+object_relationships:
+  - name: AdminUser
+    using:
+      foreign_key_constraint_on: adminUserId
+  - name: TargetUser
+    using:
+      foreign_key_constraint_on: targetUserId
+# No permission blocks on purpose. This is the audit trail of super-admins reading the platform as
+# somebody else, so only `admin` may read it (admin has full access by default in this repo), and the
+# rows are written exclusively by the /api/impersonation routes through the admin secret. Granting any
+# role write access here would let the audited party author their own audit.

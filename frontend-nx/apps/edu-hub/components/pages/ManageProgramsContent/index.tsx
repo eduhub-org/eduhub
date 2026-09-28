@@ -58,7 +58,7 @@ export const ManageProgramsContent: FC<ManageProgramsContentProps> = ({ inSettin
   });
 
   // Use TableGrid hook with server-side sorting
-  const { data, loading, error, searchFilter, pageIndex, sorting, setSearchFilter, setPageIndex, setSorting } = useTableGrid({
+  const { data, loading, initialLoading, error, searchFilter, pageIndex, sorting, setSearchFilter, setPageIndex, setSorting } = useTableGrid({
     queryHook: useManageQuery,
     query: PROGRAM_LIST,
     queryVariables: filter,
@@ -361,7 +361,7 @@ export const ManageProgramsContent: FC<ManageProgramsContentProps> = ({ inSettin
     [setPageIndex]
   );
 
-  if (loading) {
+  if (initialLoading) {
     return <CircularProgress />;
   }
 

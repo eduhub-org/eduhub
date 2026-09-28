@@ -10,6 +10,10 @@
 export interface UpdateSessionTitle_update_Session_by_pk {
   __typename: "Session";
   id: number;
+  /**
+   * The title of the session
+   */
+  title: string;
 }
 
 export interface UpdateSessionTitle {

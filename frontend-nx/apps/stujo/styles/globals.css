@@ -1179,6 +1179,38 @@ button.stujo-header-action:hover {
   font-weight: bold;
 }
 
+/* Payment choice (online vs. "Kauf auf Rechnung") inside the order box. */
+.stujo-payment-methods {
+  border: 0;
+  border-top: 1px dotted var(--stujo-divider);
+  margin: 0.75rem 0 0;
+  padding: 0.75rem 0 0;
+  min-width: 0;
+}
+
+.stujo-payment-methods legend {
+  padding: 0;
+  font-weight: bold;
+}
+
+.stujo-payment-methods .stujo-consent {
+  margin-top: 0.5rem;
+}
+
+.stujo-payment-methods input[type='radio'] {
+  margin-top: 0.2rem;
+  flex-shrink: 0;
+}
+
+.stujo-payment-hint {
+  font-size: 0.8rem;
+  margin: 0.5rem 0 0;
+}
+
+.stujo-billing-form {
+  margin-top: 0.75rem;
+}
+
 /* --- Job detail --- */
 
 .stujo-detail-grid {

@@ -19,9 +19,13 @@ export const UPDATE_ENROLLMENT = gql`
         status: $status
         termsAcceptedAt: $termsAcceptedAt
       },
+      # A preview enrollment (isTest) is never taken over: the upsert would keep
+      # the flag, leaving a real participation hidden, unmailed and deleted with
+      # the preview. The conflict then updates nothing and affected_rows is 0.
       on_conflict: {
         constraint: uniqueUserCourse,
-        update_columns: [status, termsAcceptedAt]
+        update_columns: [status, termsAcceptedAt],
+        where: { isTest: { _eq: false } }
       }
     ) {
       affected_rows

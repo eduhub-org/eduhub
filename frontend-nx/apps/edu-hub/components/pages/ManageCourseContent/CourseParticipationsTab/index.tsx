@@ -1,6 +1,6 @@
 import { ApolloError, QueryResult } from '@apollo/client';
 import { useTranslations } from 'next-intl';
-import { FC, useCallback, useMemo, useState, type JSX } from 'react';
+import { FC, ReactNode, useCallback, useMemo, useState, type JSX } from 'react';
 import { useIsAdmin, useIsInstructor } from '../../../../hooks/authentication';
 import { useRoleMutation } from '../../../../hooks/authedMutation';
 import Dot, { DotColor } from '../../../common/Dot';
@@ -67,8 +67,12 @@ import {
   collapseAttendancesBySession,
   getAttendanceStatusFromMap,
   groupAttendancesByUser,
+  isMandatorySession,
 } from '../../../../helpers/courseParticipationAttendance';
 import { useOptimisticAttendance } from './useOptimisticAttendance';
+import { isProgramSession, mergeSessions } from '../../../../helpers/programSessions';
+import { useDisplayDate } from '../../../../helpers/dateTimeHelpers';
+import { EduhubSwitch } from '../../../inputs/CheckboxSelector/components/EduhubSwitch';
 
 interface CourseParticipationsTabIProps {
   course: ManagedCourse_Course_by_pk;
@@ -107,6 +111,7 @@ function getAttendanceStatus(
 
 export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ course, qResult }) => {
   const t = useTranslations('manageCourse');
+  const displayDate = useDisplayDate();
   const tCommon = useTranslations('common');
   const tCoursePage = useTranslations('coursePage');
   const isAdmin = useIsAdmin();
@@ -167,6 +172,8 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
   const courseData = data?.Course_by_pk as CourseParticipations_Course_by_pk | null | undefined;
   const courseEnrollments = courseData?.CourseEnrollments;
   const courseSessions = courseData?.Sessions;
+  const programSessions = courseData?.Program?.Sessions;
+  const programTitle = courseData?.Program?.title ?? '';
   const courseProjectCourses = courseData?.ProjectCourses;
 
   const pageUserIds = useMemo(
@@ -202,9 +209,14 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
       })) ?? EMPTY_ENROLLMENTS,
     [attendancesByUser, courseEnrollments]
   );
+  // Program-wide sessions count toward passing like course sessions (when
+  // mandatory), so they get dots and are part of every status calculation.
   const sessions = useMemo(
-    () => courseSessions ?? EMPTY_SESSIONS,
-    [courseSessions]
+    () =>
+      courseSessions || programSessions
+        ? mergeSessions<CourseParticipations_Course_by_pk_Sessions>(courseSessions, programSessions)
+        : EMPTY_SESSIONS,
+    [courseSessions, programSessions]
   );
   const projects = useMemo<CourseParticipations_Course_by_pk_ProjectCourses_Project[]>(
     () =>
@@ -505,15 +517,9 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
     t,
   ]);
 
-  const AttendanceDotsCell = useMemo(() => {
-    return function AttendanceDotsCellInner({
-      row,
-      onDotClick,
-    }: {
-      row: Row<ExtendedEnrollment>;
-      onDotClick: (session: CourseParticipations_Course_by_pk_Sessions, userId: string) => void;
-    }) {
-      const enrollment = row.original;
+  // Dots, counts and overall status of one participant, shared by the table cell and the mobile card.
+  const summarizeAttendance = useCallback(
+    (enrollment: ExtendedEnrollment) => {
       const attendanceBySession = collapseAttendancesBySession(enrollment.User.Attendances);
 
       const dotColor = (sn: CourseParticipations_Course_by_pk_Sessions): DotColor => {
@@ -525,8 +531,10 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
       };
 
       const dotsData: IDotData[] = sessions.map((s: CourseParticipations_Course_by_pk_Sessions) => ({ session: s, color: dotColor(s) }));
-      const missed = dotsData.filter((d) => d.color === 'red').length;
-      const attended = dotsData.filter((d) => d.color === 'lightgreen').length;
+      // Optional sessions are shown (and editable) but not counted.
+      const mandatoryDots = dotsData.filter((d) => isMandatorySession(d.session));
+      const missed = mandatoryDots.filter((d) => d.color === 'red').length;
+      const attended = mandatoryDots.filter((d) => d.color === 'lightgreen').length;
       const total = attended + missed;
       const status = getAttendanceStatusFromMap(attendanceBySession, sessions, maxMissedSessions);
       const statusDotColor: DotColor =
@@ -537,6 +545,21 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
           : status === 'failed'
             ? t('attendance_status_failed')
             : t('attendance_status_uncertain');
+      return { dotsData, attended, total, statusDotColor, statusTooltip };
+    },
+    [sessions, maxMissedSessions, t]
+  );
+
+  const AttendanceDotsCell = useMemo(() => {
+    return function AttendanceDotsCellInner({
+      row,
+      onDotClick,
+    }: {
+      row: Row<ExtendedEnrollment>;
+      onDotClick: (session: CourseParticipations_Course_by_pk_Sessions, userId: string) => void;
+    }) {
+      const enrollment = row.original;
+      const { dotsData, attended, total, statusDotColor, statusTooltip } = summarizeAttendance(enrollment);
 
       return (
         <div className="flex items-center gap-3 w-full">
@@ -548,12 +571,19 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
               <Dot
                 key={d.session.id}
                 color={d.color}
+                hollow={!isMandatorySession(d.session)}
                 className={
                   attendanceLoading
                     ? 'cursor-wait opacity-60'
                     : 'cursor-pointer hover:border-2 hover:border-indigo-200 hover:rounded-full'
                 }
-                title={new Date(d.session.startDateTime).toLocaleString()}
+                title={[
+                  new Date(d.session.startDateTime).toLocaleString(),
+                  isProgramSession(d.session) ? `${t('attendance_program_session')} (${programTitle})` : null,
+                  isMandatorySession(d.session) ? null : t('attendance_optional_session'),
+                ]
+                  .filter(Boolean)
+                  .join(' · ')}
                 onClick={
                   attendanceLoading
                     ? undefined
@@ -573,7 +603,7 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
         </div>
       );
     };
-  }, [attendanceLoading, sessions, maxMissedSessions, t]);
+  }, [attendanceLoading, summarizeAttendance, programTitle, t]);
 
   const columns = useMemo<ColumnDef<ExtendedEnrollment>[]>(() => {
     const allColumns: ColumnDef<ExtendedEnrollment>[] = [
@@ -609,7 +639,8 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
         id: 'achievement',
         header: () => <span className="text-center w-full block">{t('certificate_achievement')}</span>,
         size: 120,
-        meta: { className: 'justify-center' },
+        // Below xl the project rating and the achievement certificate move into the expanded row.
+        meta: { className: 'justify-center', hideBelow: 'xl' },
         cell: ({ row }) => {
           const project = row.original.userProject;
           if (!project) {
@@ -682,7 +713,7 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
         id: 'achievement_cert',
         header: () => <span className="text-center w-full block">{t('achievement_cert_col')}</span>,
         size: 100,
-        meta: { className: 'justify-center' },
+        meta: { className: 'justify-center', hideBelow: 'xl' },
         cell: ({ row }) => {
           const hasCert = !!row.original.achievementCertificateURL;
           return (
@@ -716,9 +747,58 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
 
   const ExpandableParticipationRow = useCallback(
     ({ row }: { row: ExtendedEnrollment }) => (
-      <ExpandableRowContent enrollment={row} t={t} />
+      <ExpandableRowContent
+        enrollment={row}
+        t={t}
+        attendance={summarizeAttendance(row)}
+        onToggleAttendance={(session) => handleDotClick(session, row.userId)}
+        attendanceDisabled={attendanceLoading}
+        showAchievement={course.achievementCertificatePossible}
+        formatDate={displayDate}
+      />
     ),
-    [t]
+    [t, summarizeAttendance, handleDotClick, attendanceLoading, course.achievementCertificatePossible, displayDate]
+  );
+
+  // Phones: the dots are only a summary here, because they are too small to tap reliably. The
+  // expanded card lists each session with a switch instead.
+  const renderMobileRow = useCallback(
+    (enrollment: ExtendedEnrollment) => {
+      const { dotsData, attended, total, statusDotColor, statusTooltip } = summarizeAttendance(enrollment);
+      return (
+        <div className="flex flex-col gap-2">
+          <div className="font-semibold">
+            {enrollment.User.firstName} {enrollment.User.lastName}
+          </div>
+          <div className="flex flex-wrap items-center gap-1 text-[10px]" title={statusTooltip}>
+            {dotsData.map((d) => (
+              <Dot key={d.session.id} color={d.color} hollow={!isMandatorySession(d.session)} className="block" />
+            ))}
+            <span className="ml-1 text-xs font-semibold text-label-primary">{`${attended}/${total}`}</span>
+            <Dot color={statusDotColor} className="block" />
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {course.achievementCertificatePossible && (
+              <StatusChip
+                label={t('certificate_achievement')}
+                icon={<ProjectRatingIcon project={enrollment.userProject} />}
+              />
+            )}
+            <StatusChip
+              label={t('attendance_cert_col')}
+              icon={<CertificateIcon issued={!!enrollment.attendanceCertificateURL} size={14} />}
+            />
+            {course.achievementCertificatePossible && (
+              <StatusChip
+                label={t('achievement_cert_col')}
+                icon={<CertificateIcon issued={!!enrollment.achievementCertificateURL} size={14} />}
+              />
+            )}
+          </div>
+        </div>
+      );
+    },
+    [summarizeAttendance, course.achievementCertificatePossible, t]
   );
 
   const abortConfirmationDialog = (
@@ -778,6 +858,7 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
             bulkActions={bulkActions}
             onBulkAction={handleBulkAction}
             expandableRowComponent={ExpandableParticipationRow}
+            renderMobileRow={renderMobileRow}
           />
         </section>
         <NotificationSnackbar
@@ -845,6 +926,7 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
           bulkActions={bulkActions}
           onBulkAction={handleBulkAction}
           expandableRowComponent={ExpandableParticipationRow}
+          renderMobileRow={renderMobileRow}
         />
       </section>
       <NotificationSnackbar
@@ -882,6 +964,7 @@ function ParticipationTable({
   bulkActions,
   onBulkAction,
   expandableRowComponent,
+  renderMobileRow,
 }: {
   columns: ColumnDef<ExtendedEnrollment>[];
   data: ExtendedEnrollment[];
@@ -899,6 +982,7 @@ function ParticipationTable({
   bulkActions: BulkAction[];
   onBulkAction: (action: string, rows: ExtendedEnrollment[]) => void | boolean | Promise<void | boolean>;
   expandableRowComponent: (props: { row: ExtendedEnrollment }) => JSX.Element;
+  renderMobileRow: (row: ExtendedEnrollment) => ReactNode;
 }) {
   return (
     <TableGrid<ExtendedEnrollment>
@@ -920,29 +1004,136 @@ function ParticipationTable({
       bulkActions={bulkActions}
       onBulkAction={onBulkAction}
       expandableRowComponent={expandableRowComponent}
+      renderMobileRow={renderMobileRow}
       preserveRowsWhileLoading
     />
   );
 }
 
+const StatusChip: FC<{ label: string; icon: ReactNode }> = ({ label, icon }) => (
+  <span className="inline-flex items-center gap-1 rounded-full bg-bg-secondary px-2 py-0.5 text-xs font-semibold text-label-secondary">
+    {icon}
+    {label}
+  </span>
+);
+
+const CertificateIcon: FC<{ issued: boolean; size?: number }> = ({ issued, size = 18 }) =>
+  issued ? (
+    <IoIosCheckmarkCircle size={size} style={{ color: 'var(--eduhub-success)' }} />
+  ) : (
+    <GoDotFill size={size} style={{ color: 'var(--eduhub-label-disabled)' }} />
+  );
+
+const ProjectRatingIcon: FC<{ project?: CourseParticipations_Course_by_pk_ProjectCourses_Project }> = ({
+  project,
+}) => {
+  if (!project) {
+    return (
+      <span className="leading-none" style={{ color: 'var(--eduhub-label-disabled)' }} aria-hidden>
+        −
+      </span>
+    );
+  }
+  const color: DotColor =
+    project.rating === ProjectRating_enum.PASSED
+      ? 'lightgreen'
+      : project.rating === ProjectRating_enum.FAILED
+        ? 'red'
+        : 'grey';
+  return (
+    <span className="text-[9px]">
+      <Dot color={color} className="block" />
+    </span>
+  );
+};
+
 function ExpandableRowContent({
   enrollment,
   t,
+  attendance,
+  onToggleAttendance,
+  attendanceDisabled,
+  showAchievement,
+  formatDate,
 }: {
   enrollment: ExtendedEnrollment;
   t: (key: string) => string;
+  attendance: { dotsData: IDotData[]; attended: number; total: number };
+  onToggleAttendance: (session: CourseParticipations_Course_by_pk_Sessions) => void;
+  attendanceDisabled: boolean;
+  showAchievement: boolean;
+  formatDate: (date: string) => string;
 }) {
   const hasCertificates =
     !!enrollment.attendanceCertificateURL || !!enrollment.achievementCertificateURL;
+  const project = enrollment.userProject;
+  const projectStatusKey = !project
+    ? 'achievement_not_submitted'
+    : project.rating === ProjectRating_enum.PASSED
+      ? 'achievement_passed'
+      : project.rating === ProjectRating_enum.FAILED
+        ? 'achievement_failed'
+        : 'achievement_unrated';
 
   return (
-    <div className="bg-fill-primary text-label-primary light p-6 w-full">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+    <div className="bg-fill-primary text-label-primary light p-4 md:p-6 w-full">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 w-full">
         <Card title={t('email')}>
           <div className="text-label-primary break-words text-sm">
             {enrollment.User?.email ?? '-'}
           </div>
         </Card>
+
+        {/* Phones edit attendance here, one switch per session (on = attended). */}
+        {attendance.dotsData.length > 0 && (
+          <div className="md:hidden">
+            <Card title={`${t('attendances')} · ${attendance.attended}/${attendance.total}`}>
+              <ul className="divide-y divide-table-divider">
+                {attendance.dotsData.map((d) => (
+                  <li key={d.session.id} className="flex items-center justify-between gap-3">
+                    <div className="min-w-0 flex items-start gap-2">
+                      <span className="mt-0.5 text-[9px]">
+                        <Dot color={d.color} hollow={!isMandatorySession(d.session)} className="block" />
+                      </span>
+                      <div className="min-w-0">
+                        <div className="text-sm font-semibold">
+                          {formatDate(d.session.startDateTime)}
+                          {isMandatorySession(d.session) ? '' : ` · ${t('attendance_optional_session')}`}
+                        </div>
+                        <div className="truncate text-xs text-label-secondary">{d.session.title}</div>
+                      </div>
+                    </div>
+                    <EduhubSwitch
+                      localChecked={d.color === 'lightgreen'}
+                      handleValueChange={() => onToggleAttendance(d.session)}
+                      ariaLabel={`${t('attendances')}: ${formatDate(d.session.startDateTime)} ${d.session.title}`}
+                      disabled={attendanceDisabled}
+                      errorMessage=""
+                    />
+                  </li>
+                ))}
+              </ul>
+            </Card>
+          </div>
+        )}
+
+        {/* While the project and achievement certificate columns are hidden (below xl). */}
+        {showAchievement && (
+          <div className="xl:hidden">
+            <Card title={`${t('certificate_achievement')} · ${t('achievement_cert_col')}`}>
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center gap-2">
+                  <ProjectRatingIcon project={project} />
+                  {t(projectStatusKey)}
+                </div>
+                <div className="flex items-center gap-2">
+                  <CertificateIcon issued={!!enrollment.achievementCertificateURL} size={16} />
+                  {t(enrollment.achievementCertificateURL ? 'achievement_cert_issued' : 'achievement_cert_not_issued')}
+                </div>
+              </div>
+            </Card>
+          </div>
+        )}
 
         {hasCertificates && (
           <Card title={t('certificates_section')}>

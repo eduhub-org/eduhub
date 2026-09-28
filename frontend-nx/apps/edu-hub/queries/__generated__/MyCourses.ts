@@ -55,6 +55,10 @@ export interface MyCourses_User_by_pk_CourseEnrollments_Course_Sessions_SessionA
    */
   locationAddressId: number | null;
   /**
+   * Location option of a program session address (course session addresses use courseLocationId instead)
+   */
+  locationOption: LocationOption_enum | null;
+  /**
    * An object relationship
    */
   CourseLocation: MyCourses_User_by_pk_CourseEnrollments_Course_Sessions_SessionAddresses_CourseLocation | null;
@@ -100,7 +104,7 @@ export interface MyCourses_User_by_pk_CourseEnrollments_Course_Sessions {
   /**
    * The ID of the course the session belongs to
    */
-  courseId: number;
+  courseId: number | null;
   /**
    * A description of the session
    */
@@ -113,6 +117,14 @@ export interface MyCourses_User_by_pk_CourseEnrollments_Course_Sessions {
    * The title of the session
    */
   title: string;
+  /**
+   * If false, attendance is tracked but does not count toward passing (maxMissedSessions) or certificates
+   */
+  isMandatory: boolean;
+  /**
+   * Set for program-wide sessions (courseId is then NULL); shown in every course of the program
+   */
+  programId: number | null;
   /**
    * An array relationship
    */
@@ -391,6 +403,10 @@ export interface MyCourses_User_by_pk_CourseEnrollments_Course_CourseEnrollments
    */
   status: CourseEnrollmentStatus_enum;
   /**
+   * Preview enrollment an instructor or admin created on their own course to see the participant view. Never counted, listed, exported, certified or mailed about.
+   */
+  isTest: boolean;
+  /**
    * Organization paying for this enrollment (B2B). NULL means the enrolling user pays personally (B2C)
    */
   billingOrganizationId: number | null;
@@ -598,6 +614,10 @@ export interface MyCourses_User_by_pk_CourseEnrollments {
    * The users current enrollment status to this course
    */
   status: CourseEnrollmentStatus_enum;
+  /**
+   * Preview enrollment an instructor or admin created on their own course to see the participant view. Never counted, listed, exported, certified or mailed about.
+   */
+  isTest: boolean;
   /**
    * Organization paying for this enrollment (B2B). NULL means the enrolling user pays personally (B2C)
    */

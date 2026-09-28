@@ -15,6 +15,7 @@ import { LocationOption_enum } from '../../../../__generated__/globalTypes';
 import { Tooltip } from '@mui/material';
 import { HelpOutline } from '@mui/icons-material';
 import { ErrorMessageDialog } from '../../../common/dialogs/ErrorMessageDialog';
+import { LocationIcon } from './SessionLocations';
 
 interface SessionAddressesIProps {
   address: ManagedCourse_Course_by_pk_Sessions_SessionAddresses | null;
@@ -92,8 +93,12 @@ export const SessionAddresses: FC<SessionAddressesIProps> = ({ address, refetchQ
 
 
   const labelCell = (
-    <span className="text-label-primary flex-shrink-0" style={{ minWidth: '5rem' }}>
-      {label}:
+    <span className="flex flex-shrink-0 items-center gap-2 font-semibold text-label-primary" style={{ minWidth: '5rem' }}>
+      <LocationIcon
+        option={address?.CourseLocation?.locationOption ?? LocationOption_enum.ONLINE}
+        className="text-label-secondary"
+      />
+      {label}
     </span>
   );
 

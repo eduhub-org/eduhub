@@ -5,6 +5,25 @@ type Mutation {
 }
 
 type Mutation {
+  createTestEnrollment(
+    courseId: Int!
+  ): TestEnrollmentResult!
+}
+
+type Mutation {
+  removeTestEnrollment(
+    courseId: Int!
+  ): TestEnrollmentResult!
+}
+
+type TestEnrollmentResult {
+  success: Boolean!
+  messageKey: String!
+  error: String
+  enrollmentId: Int
+}
+
+type Mutation {
   copyProjectFromTemplate(
     parentProjectId: Int!
     courseId: Int!
@@ -340,6 +359,17 @@ input CourseInput {
   currency: String
   stripeProductId: String
   stripePriceId: String
+}
+
+input JobPostingBillingInput {
+  legalName: String!
+  addressLine1: String!
+  addressLine2: String
+  postalCode: String!
+  city: String!
+  country: String!
+  vatId: String
+  reference: String
 }
 
 input SelectedAddonInput {
@@ -721,7 +751,12 @@ type CourseAddonMapping {
 
 
 type Mutation {
-  publishJobPosting(jobPostingId: Int!, acceptTerms: Boolean): PublishJobPostingResult!
+  publishJobPosting(
+    jobPostingId: Int!
+    acceptTerms: Boolean
+    paymentMethod: String
+    billing: JobPostingBillingInput
+  ): PublishJobPostingResult!
 }
 
 type Mutation {

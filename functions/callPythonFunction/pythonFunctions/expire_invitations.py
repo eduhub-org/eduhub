@@ -53,6 +53,7 @@ def expire_invitations(arguments):
         query ExpiringSoonInvitations($now: timestamptz!, $cutoff: timestamptz!) {
             CourseEnrollment(
                 where: {
+                    isTest: {_eq: false},
                     status: {_eq: INVITED},
                     invitationExpirationDate: {_gt: $now, _lte: $cutoff}
                 }
@@ -128,7 +129,7 @@ def expire_invitations(arguments):
         expire_mutation = """
         mutation ExpireInvitations($now: timestamptz!) {
             update_CourseEnrollment(
-                where: {status: {_eq: INVITED}, invitationExpirationDate: {_lte: $now}},
+                where: {isTest: {_eq: false}, status: {_eq: INVITED}, invitationExpirationDate: {_lte: $now}},
                 _set: {status: EXPIRED}
             ) {
                 affected_rows

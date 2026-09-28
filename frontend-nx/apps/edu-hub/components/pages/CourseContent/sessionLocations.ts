@@ -19,7 +19,8 @@ import { LOCATION_ADDRESSES_BY_IDS } from '../../../queries/locationAddress';
 
 /** One location of one session, with its address already resolved for display. */
 export interface ResolvedLocation {
-  courseLocationId: number;
+  /** Stable per location: `cl-<CourseLocation id>`, or `sa-<SessionAddress id>` for program sessions. */
+  key: string;
   locationOption: string | null;
   displayAddress: string;
 }
@@ -32,6 +33,28 @@ export type AddressMap = Map<number, { address: string }>;
  * the legacy free-text fields.
  */
 export const resolveSessionLocations = (
+  session: Session,
+  courseLocations: CourseLocation[],
+  addressMap: AddressMap
+): ResolvedLocation[] =>
+  session.programId != null ? resolveProgramSessionLocations(session, addressMap) : resolveCourseSessionLocations(session, courseLocations, addressMap);
+
+/**
+ * Program sessions have no CourseLocation: each SessionAddress carries its own
+ * location option and either a LocationAddress or a free-text address (the
+ * meeting link for online sessions).
+ */
+const resolveProgramSessionLocations = (session: Session, addressMap: AddressMap): ResolvedLocation[] =>
+  session.SessionAddresses.filter((sa) => sa.locationOption).map((sa) => ({
+    key: `sa-${sa.id}`,
+    locationOption: sa.locationOption,
+    displayAddress:
+      sa.locationAddressId && addressMap.has(sa.locationAddressId)
+        ? addressMap.get(sa.locationAddressId)!.address
+        : sa.address ?? '',
+  }));
+
+const resolveCourseSessionLocations = (
   session: Session,
   courseLocations: CourseLocation[],
   addressMap: AddressMap
@@ -54,7 +77,7 @@ export const resolveSessionLocations = (
 
     return [
       {
-        courseLocationId: courseLocation.id,
+        key: `cl-${courseLocation.id}`,
         locationOption: CourseLocation?.locationOption ?? null,
         displayAddress,
       },
@@ -63,7 +86,7 @@ export const resolveSessionLocations = (
 
 /** Stable identity of a session's places, so two sessions can be compared. */
 export const locationsSignature = (locations: ResolvedLocation[]): string =>
-  locations.map((l) => `${l.courseLocationId}|${l.locationOption ?? ''}|${l.displayAddress}`).join('||');
+  locations.map((l) => `${l.key}|${l.locationOption ?? ''}|${l.displayAddress}`).join('||');
 
 /**
  * The LocationAddress rows referenced by these sessions, by id. Two callers
