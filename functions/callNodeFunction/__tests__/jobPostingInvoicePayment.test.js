@@ -204,6 +204,7 @@ describe('issueBankTransferInvoice', () => {
         hosted_invoice_url: 'https://invoice.stripe.com/i/1',
         invoice_pdf: 'https://pay.stripe.com/invoice/1/pdf',
       }),
+      update: jest.fn().mockResolvedValue({}),
       del: jest.fn().mockResolvedValue({}),
     },
     invoiceItems: { create: jest.fn().mockResolvedValue({}) },
@@ -262,6 +263,31 @@ describe('issueBankTransferInvoice', () => {
       notes: 'Bestellnummer: B-4711',
     });
     expect(stripe.invoices.finalizeInvoice).toHaveBeenCalledWith('in_1', { auto_advance: false });
+  });
+
+  it('adds the posting runtime next to the Bestellnummer before finalizing', async () => {
+    const order = [];
+    const stripe = makeStripe();
+    stripe.invoices.update.mockImplementation(async () => order.push('update'));
+    stripe.invoices.finalizeInvoice.mockImplementation(async () => {
+      order.push('finalize');
+      return { id: 'in_1' };
+    });
+    const client = { request: jest.fn().mockResolvedValue({ insert_Invoice_one: { id: 42 } }) };
+    const publish = jest.fn().mockResolvedValue({
+      publishedAt: new Date('2026-10-01T10:00:00Z'),
+      expiresAt: new Date('2026-10-31T10:00:00Z'),
+    });
+
+    await run(stripe, client, publish);
+
+    expect(order).toEqual(['update', 'finalize']);
+    expect(stripe.invoices.update).toHaveBeenCalledWith('in_1', {
+      custom_fields: [
+        { name: 'Bestellnummer', value: 'B-4711' },
+        { name: 'Leistungszeitraum', value: '01.10.2026 \u2013 31.10.2026' },
+      ],
+    });
   });
 
   it('deletes the draft and does not publish when the line item fails', async () => {
