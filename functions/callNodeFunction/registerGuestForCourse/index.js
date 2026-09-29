@@ -81,15 +81,10 @@ const INSERT_GUEST_USER = gql`
 `;
 
 const UPDATE_GUEST_USER_NAME = gql`
-  mutation UpdateGuestUserName(
-    $id: uuid!
-    $firstName: String!
-    $lastName: String!
-    $organizationName: String
-  ) {
+  mutation UpdateGuestUserName($id: uuid!, $firstName: String!, $lastName: String!) {
     update_User_by_pk(
       pk_columns: { id: $id }
-      _set: { firstName: $firstName, lastName: $lastName, organizationName: $organizationName }
+      _set: { firstName: $firstName, lastName: $lastName }
     ) {
       id
     }
@@ -352,19 +347,11 @@ export default async function registerGuestForCourse(req, logger) {
       userId = existingUser.id;
       // Someone re-submitting with a corrected spelling should see the
       // correction; the address is the identity, the name is just a label.
-      // A blank organization keeps the one given earlier rather than erasing it.
-      const nextOrganizationName = organizationName ?? existingUser.organizationName ?? null;
-      if (
-        existingUser.firstName !== firstName ||
-        existingUser.lastName !== lastName ||
-        (existingUser.organizationName ?? null) !== nextOrganizationName
-      ) {
-        await client.request(UPDATE_GUEST_USER_NAME, {
-          id: userId,
-          firstName,
-          lastName,
-          organizationName: nextOrganizationName,
-        });
+      // The organization, unlike the name, is not written here: it travels
+      // with the confirmation token and only lands once the address owner uses
+      // the link (confirmGuestRegistration).
+      if (existingUser.firstName !== firstName || existingUser.lastName !== lastName) {
+        await client.request(UPDATE_GUEST_USER_NAME, { id: userId, firstName, lastName });
       }
     } else {
       try {
@@ -388,7 +375,7 @@ export default async function registerGuestForCourse(req, logger) {
       }
     }
 
-    const rawToken = await issueConfirmToken(client, userId, course.id, newsletterOptIn);
+    const rawToken = await issueConfirmToken(client, userId, course.id, newsletterOptIn, organizationName);
 
     await queueGuestMail(client, logger, {
       templateType: 'GUEST_REGISTRATION_CONFIRM',
