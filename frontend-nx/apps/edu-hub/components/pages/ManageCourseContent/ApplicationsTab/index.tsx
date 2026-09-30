@@ -1,7 +1,7 @@
 import { QueryResult } from '@apollo/client';
 import { format } from 'date-fns';
 import { formatInTimeZone } from 'date-fns-tz';
-import { FC, useCallback, useMemo, useState } from 'react';
+import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ManagedCourse_Course_by_pk,
 } from '../../../../queries/__generated__/ManagedCourse';
@@ -43,6 +43,7 @@ import { HelpOutline } from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
 import { MdClose } from 'react-icons/md';
 import DatePicker from 'react-datepicker';
+import { ensurePortalContainer } from '../../../inputs/OptimisticDatePicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import {
   UpdateEnrollmentStatusWhenApplied,
@@ -218,6 +219,8 @@ interface ApplicationsTabContentProps {
 // REGISTRATION_TIME_ZONE in CourseContent/Registration/types.ts.
 const INVITATION_TIME_ZONE = 'Europe/Berlin';
 const invitationExpirationCutoff = () => formatInTimeZone(new Date(), INVITATION_TIME_ZONE, 'yyyy-MM-dd');
+
+const INVITE_DATEPICKER_PORTAL_ID = 'invite-datepicker-portal';
 
 const isExpired = (enrollment: ApplicationEnrollment) => {
   if (enrollment.invitationExpirationDate == null) {
@@ -408,22 +411,12 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
     setBulkNoticeOpen(false);
   }, []);
 
-  // Calculate default invitation expiration date (3 days before first session, or 3 days from now)
+  // Default invitation expiration date: one week from today
   const getDefaultInviteExpireDate = useCallback(() => {
-    const now = new Date();
-    if (course.Sessions && course.Sessions.length > 0) {
-      const firstSession = course.Sessions[0];
-      const firstSessionDate = new Date(firstSession.startDateTime);
-      const defaultDate = new Date(firstSessionDate);
-      defaultDate.setDate(defaultDate.getDate() - 3);
-      // Make sure it's not in the past
-      return defaultDate < now ? new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000) : defaultDate;
-    }
-    // If no sessions, default to 3 days from now
     const defaultDate = new Date();
-    defaultDate.setDate(defaultDate.getDate() + 3);
+    defaultDate.setDate(defaultDate.getDate() + 7);
     return defaultDate;
-  }, [course.Sessions]);
+  }, []);
 
   const [inviteExpireDate, setInviteExpireDate] = useState(() => getDefaultInviteExpireDate());
   const handleSetInviteExpireDate = useCallback(
@@ -432,6 +425,10 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
     },
     [getDefaultInviteExpireDate]
   );
+
+  useEffect(() => {
+    ensurePortalContainer(INVITE_DATEPICKER_PORTAL_ID);
+  }, []);
 
   // Dialog state for invitations
   const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
@@ -1454,6 +1451,9 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
       <Dialog
         open={isInviteDialogOpen}
         onClose={handleCloseInviteDialog}
+        // The date picker calendar is portaled outside the dialog; without this the
+        // focus trap pulls focus back and interferes with the calendar navigation.
+        disableEnforceFocus
         maxWidth="sm"
         fullWidth
         PaperProps={{ className: 'light' }}
@@ -1501,6 +1501,9 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
                     minDate={new Date()}
                     locale={locale}
                     className="w-full p-2 rounded border border-border-primary bg-fill-primary text-label-primary"
+                    // Render the calendar outside the dialog so it is not clipped by it
+                    portalId={INVITE_DATEPICKER_PORTAL_ID}
+                    popperPlacement="bottom-start"
                   />
                 </div>
               </div>

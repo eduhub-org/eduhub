@@ -71,7 +71,7 @@ const injectHighlightingStyles = () => {
 
 // Ensure a portal target exists at body level so the popper isn't clipped by
 // ancestors that establish overflow/stacking contexts (e.g. table containers).
-const ensurePortalContainer = (id: string) => {
+export const ensurePortalContainer = (id: string) => {
   if (typeof document === 'undefined' || !id) return;
   let container = document.getElementById(id);
   if (!container) {
