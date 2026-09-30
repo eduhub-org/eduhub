@@ -12,6 +12,12 @@ import { QuestionConfirmationDialog } from '../../../common/dialogs/QuestionConf
 
 import { PARTICIPATION_EXIT_STATUS, ParticipationExitOutcome, getParticipationExitKind } from './participationExit';
 
+/** Outlined like the rail's calendar/share buttons, in the error colour; shared with CancellationRequestButton. */
+export const participationExitButtonClassName =
+  'mt-3 flex w-full items-center justify-center px-4 py-2 min-h-11 touch-manipulation rounded-full ' +
+  'border-2 border-border-primary hover:border-error text-sm font-semibold text-error transition-colors ' +
+  'disabled:text-label-disabled disabled:hover:border-border-primary';
+
 interface ParticipationExitButtonProps {
   courseEnrollment: CourseWithEnrollment_Course_by_pk_CourseEnrollments;
   courseTitle: string;
@@ -27,11 +33,12 @@ interface ParticipationExitButtonProps {
 /**
  * The way out of a course or event, for the person taking part in it.
  *
- * Sits under the enrollment status card as a quiet text action rather than a
- * second call to action: the rail's one filled button is the way *in*, and
- * leaving should be reachable without competing with it. The confirmation step
- * is what makes that safe - the same shape as declining an invitation in
- * `Onboarding.tsx`.
+ * Sits under the enrollment status card as an outlined button - the same shape
+ * as the calendar/share buttons further down the rail, in the error colour -
+ * rather than a second filled call to action: the rail's one filled button is
+ * the way *in*, and leaving should be reachable without competing with it. The
+ * confirmation step is what makes that safe - the same shape as declining an
+ * invitation in `Onboarding.tsx`.
  *
  * Renders nothing at all when there is nothing to offer (see
  * `getParticipationExitKind`), so callers can drop it in unconditionally.
@@ -98,7 +105,7 @@ export const ParticipationExitButton: FC<ParticipationExitButtonProps> = ({
         type="button"
         disabled={isSubmitting}
         onClick={() => setIsConfirming(true)}
-        className="mt-3 w-full text-sm text-error hover:underline min-h-[44px] touch-manipulation disabled:text-label-disabled disabled:no-underline"
+        className={participationExitButtonClassName}
       >
         {isCancel
           ? t('ParticipationExitButton.cancel_participation')

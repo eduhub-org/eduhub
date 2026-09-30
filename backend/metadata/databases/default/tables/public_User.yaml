@@ -312,6 +312,57 @@ select_permissions:
                         _eq: X-Hasura-User-Id
                     - canManageSettings:
                         _eq: true
+          # The course management page: people enrolled in a course whose program type the admin
+          # may manage (same capability rule as CourseEnrollment), and the organizers of the
+          # organization's courses.
+          - CourseEnrollments:
+              Course:
+                Program:
+                  _or:
+                    - _and:
+                        - type:
+                            _eq: EVENTS
+                        - Organization:
+                            OrganizationAdmins:
+                              _and:
+                                - userId:
+                                    _eq: X-Hasura-User-Id
+                                - canManageEvents:
+                                    _eq: true
+                    - _and:
+                        - type:
+                            _eq: COURSES
+                        - Organization:
+                            OrganizationAdmins:
+                              _and:
+                                - userId:
+                                    _eq: X-Hasura-User-Id
+                                - canManageCourses:
+                                    _eq: true
+                    - _and:
+                        - type:
+                            _eq: DEGREES
+                        - Organization:
+                            OrganizationAdmins:
+                              _and:
+                                - userId:
+                                    _eq: X-Hasura-User-Id
+                                - canManageDegrees:
+                                    _eq: true
+                    - Organization:
+                        OrganizationAdmins:
+                          _and:
+                            - userId:
+                                _eq: X-Hasura-User-Id
+                            - canManageSettings:
+                                _eq: true
+          - CourseInstructors:
+              Course:
+                Program:
+                  Organization:
+                    OrganizationAdmins:
+                      userId:
+                        _eq: X-Hasura-User-Id
       limit: 100
       # The admin table on /manage/settings/access is paginated and reads User_aggregate { count }.
       allow_aggregations: true

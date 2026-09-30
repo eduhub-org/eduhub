@@ -135,9 +135,13 @@ select_permissions:
             User:
               id:
                 _eq: X-Hasura-User-Id
+  # Program sessions of the admin's organizations, and - for the course management page - the
+  # sessions of courses whose program type the admin may manage (course sessions have no programId).
   - role: org_admin_access
     permission:
       columns:
+        - attendanceData
+        - courseId
         - created_at
         - description
         - endDateTime
@@ -148,11 +152,52 @@ select_permissions:
         - title
         - updated_at
       filter:
-        Program:
-          Organization:
-            OrganizationAdmins:
-              userId:
-                _eq: X-Hasura-User-Id
+        _or:
+          - Program:
+              Organization:
+                OrganizationAdmins:
+                  userId:
+                    _eq: X-Hasura-User-Id
+          - Course:
+              Program:
+                _or:
+                  - _and:
+                      - type:
+                          _eq: EVENTS
+                      - Organization:
+                          OrganizationAdmins:
+                            _and:
+                              - userId:
+                                  _eq: X-Hasura-User-Id
+                              - canManageEvents:
+                                  _eq: true
+                  - _and:
+                      - type:
+                          _eq: COURSES
+                      - Organization:
+                          OrganizationAdmins:
+                            _and:
+                              - userId:
+                                  _eq: X-Hasura-User-Id
+                              - canManageCourses:
+                                  _eq: true
+                  - _and:
+                      - type:
+                          _eq: DEGREES
+                      - Organization:
+                          OrganizationAdmins:
+                            _and:
+                              - userId:
+                                  _eq: X-Hasura-User-Id
+                              - canManageDegrees:
+                                  _eq: true
+                  - Organization:
+                      OrganizationAdmins:
+                        _and:
+                          - userId:
+                              _eq: X-Hasura-User-Id
+                          - canManageSettings:
+                              _eq: true
 update_permissions:
   - role: instructor_access
     permission:
