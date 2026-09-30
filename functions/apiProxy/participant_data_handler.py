@@ -645,7 +645,7 @@ def get_course_participants(course_id, auth_info, eduhub_client, location_id=Non
     """
     query = """
     query GetCourseParticipants($courseId: Int!) {
-        CourseEnrollment(where: {courseId: {_eq: $courseId}}) {
+        CourseEnrollment(where: {isTest: {_eq: false}, courseId: {_eq: $courseId}}) {
             id
             status
             created_at

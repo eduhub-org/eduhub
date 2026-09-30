@@ -24,6 +24,7 @@ import { Sessions } from './Sessions';
 import { CourseParticipants } from './CourseParticipants';
 import { CompletedDegreeCourses, CurrentDegreeCourses } from './DegreeCourses';
 import PricingSummary from '../../common/PricingSummary';
+import { ParticipationExitKind, ParticipationExitOutcome } from './Registration/participationExit';
 import { getRegistrationTypeConfig } from './Registration/types';
 import { getBackgroundImage } from '../../../helpers/imageHandling';
 import { Attendances } from './Attendances';
@@ -36,6 +37,7 @@ import {
 } from './Projects/projectEffectiveSubmissionDeadline';
 import { useIsCourseWithEnrollment } from '../../../hooks/course';
 import NotificationSnackbar from '../../common/dialogs/NotificationSnackbar';
+import { useDeclareParticipantPreview } from '../../../contexts/ParticipantPreviewContext';
 
 /**
  * Page rhythm. Every vertical gap on this page comes from one of these, so a gap
@@ -78,6 +80,7 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
   const [resetValues, setResetValues] = useState<boolean | null>(null);
   const [showSuccessSnackbar, setShowSuccessSnackbar] = useState(false);
   const [registrationSuccessWaitlist, setRegistrationSuccessWaitlist] = useState(false);
+  const [participationExitKind, setParticipationExitKind] = useState<ParticipationExitKind | null>(null);
   const getWeekdayStartAndEndString = useWeekdayStartAndEndString();
 
   // Query for authorized course data
@@ -124,6 +127,14 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
   const course = authorizedCourseData?.Course_by_pk || unauthorizedCourseData?.Course_by_pk;
   const enrollmentId = getCourseEnrollment(authorizedCourseData?.Course_by_pk, userId ?? '')?.id;
 
+  // Get the course enrollment of the current user (necessary for admins and instructors)
+  const courseEnrollment = getCourseEnrollment(course, userId ?? undefined);
+
+  // The preview notice is page chrome, so Page renders it above the header; this
+  // only says whether there is one. Declared here rather than further down
+  // because the `!course` guard below returns early, and a hook may not.
+  useDeclareParticipantPreview(courseEnrollment?.isTest && course ? course.id : null);
+
   const isCourseWithEnrollment = useIsCourseWithEnrollment(course);
 
   const [backgroundImage, setBackgroundImage] = useState<string>('');
@@ -140,13 +151,30 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
 
   // Handle registration success
   const handleRegistrationSuccess = (info?: { waitlist: boolean }) => {
+    setParticipationExitKind(null);
     setRegistrationSuccessWaitlist(!!info?.waitlist);
     setShowSuccessSnackbar(true);
     refetchCourse();
   };
 
+  // The user cancelled or aborted their own participation. The refetch is what
+  // moves the rail on to the new status card - the snackbar only says so.
+  const handleParticipationExit = ({ kind, changed }: ParticipationExitOutcome) => {
+    if (changed) {
+      setRegistrationSuccessWaitlist(false);
+      setParticipationExitKind(kind);
+      setShowSuccessSnackbar(true);
+    }
+    refetchCourse();
+  };
+
   // Get success message based on registration type (waitlist vs approval vs direct)
   const getSuccessMessage = () => {
+    if (participationExitKind) {
+      return participationExitKind === 'CANCEL'
+        ? t('CourseContent.cancel_success_message')
+        : t('CourseContent.abort_success_message');
+    }
     if (registrationSuccessWaitlist) {
       return t('modal.success_message_waitlist');
     }
@@ -184,9 +212,6 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
     validatedPrice: mapping.validatedPrice,
     currency: mapping.currency || course.currency || 'EUR',
   })) || [];
-
-  // Get the course enrollment of the current user (necessary for admins and instructors)
-  const courseEnrollment = getCourseEnrollment(course, userId ?? undefined);
 
   const isLoggedInParticipant =
     isLoggedIn &&
@@ -242,6 +267,7 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                       courseEnrollment={courseEnrollment ?? undefined}
                       isLoggedInParticipant={isLoggedInParticipant}
                       onRegistrationSuccess={handleRegistrationSuccess}
+                      onParticipationExit={handleParticipationExit}
                     />
                   </div>
 
@@ -250,6 +276,8 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                     {!isDegreeCourse ? (
                       <Sessions
                         sessions={course.Sessions}
+                        programSessions={course.Program?.Sessions}
+                        programTitle={course.Program?.title}
                         courseLocations={course.CourseLocations}
                         isLoggedInParticipant={isLoggedInParticipant}
                         isEvent={isEventCourse}
@@ -348,6 +376,7 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
         onClose={() => {
           setShowSuccessSnackbar(false);
           setRegistrationSuccessWaitlist(false);
+          setParticipationExitKind(null);
         }}
         message={getSuccessMessage()}
         duration={4000}

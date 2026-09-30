@@ -42,7 +42,7 @@ const WidgetCourses: FC = () => {
     context: WIDGET_ANONYMOUS_CONTEXT,
   });
 
-  const selectedGroupIds = useMemo(() => parseWidgetGroupIds(groups), [groups]);
+  const selectedGroupIds = useMemo(() => parseWidgetGroupIds(groups, group), [groups, group]);
 
   const {
     data: groupOptionsData,
@@ -77,19 +77,8 @@ const WidgetCourses: FC = () => {
       );
     }
 
-    if (!group) {
-      return courses;
-    }
-
-    const groupOrder = parseInt(group as string, 10);
-    if (isNaN(groupOrder)) {
-      return courses;
-    }
-
-    return courses.filter((course) =>
-      course.CourseGroups.some((courseGroup) => courseGroup.CourseGroupOption.order === groupOrder)
-    );
-  }, [coursesData, group, selectedGroupIds, groupOptionsData, groupOptionsLoading, groupOptionsError]);
+    return courses;
+  }, [coursesData, selectedGroupIds, groupOptionsData, groupOptionsLoading, groupOptionsError]);
 
   const publishedCourses = useMemo(() => {
     const published = filteredCourses.filter((course) => {
@@ -101,7 +90,9 @@ const WidgetCourses: FC = () => {
 
   const isLoading =
     coursesLoading || apiKeyValidating || (selectedGroupIds.length > 0 && groupOptionsLoading);
-  const hasError = Boolean(coursesError || apiKeyError);
+  const hasError = Boolean(
+    coursesError || apiKeyError || (selectedGroupIds.length > 0 && groupOptionsError)
+  );
 
   return (
     <WidgetSliderShell

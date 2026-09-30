@@ -9,40 +9,31 @@ export const filterProjectsByWidgetGroups = (
   projects: ProjectTileFragment[],
   options: {
     selectedGroupIds: number[];
-    groupOrder: number | null;
     groupOptions: CourseGroupOptions_CourseGroupOption[];
     groupOptionsLoading: boolean;
     groupOptionsError: boolean;
   }
 ): ProjectTileFragment[] => {
-  const { selectedGroupIds, groupOrder, groupOptions, groupOptionsLoading, groupOptionsError } = options;
+  const { selectedGroupIds, groupOptions, groupOptionsLoading, groupOptionsError } = options;
 
-  if (selectedGroupIds.length > 0) {
-    if (groupOptionsLoading || groupOptionsError) {
-      return [];
-    }
-    const selectedOptions = groupOptions.filter((option) => selectedGroupIds.includes(option.id));
-    if (selectedOptions.length === 0) {
-      return [];
-    }
-    return projects.filter((project) =>
-      selectedOptions.some((option) =>
-        option.programType
-          ? project.ProjectCourses.some((pc) => pc.Course?.Program?.type === option.programType)
-          : project.ProjectCourses.some((pc) =>
-              pc.Course?.CourseGroups.some((cg) => cg.CourseGroupOption.id === option.id)
-            )
-      )
-    );
-  }
-
-  if (groupOrder == null || isNaN(groupOrder)) {
+  if (selectedGroupIds.length === 0) {
     return projects;
   }
 
+  if (groupOptionsLoading || groupOptionsError) {
+    return [];
+  }
+  const selectedOptions = groupOptions.filter((option) => selectedGroupIds.includes(option.id));
+  if (selectedOptions.length === 0) {
+    return [];
+  }
   return projects.filter((project) =>
-    project.ProjectCourses.some((pc) =>
-      pc.Course?.CourseGroups.some((cg) => cg.CourseGroupOption.order === groupOrder)
+    selectedOptions.some((option) =>
+      option.programType
+        ? project.ProjectCourses.some((pc) => pc.Course?.Program?.type === option.programType)
+        : project.ProjectCourses.some((pc) =>
+            pc.Course?.CourseGroups.some((cg) => cg.CourseGroupOption.id === option.id)
+          )
     )
   );
 };

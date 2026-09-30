@@ -59,11 +59,12 @@ export const useCheckboxLogic = (
     [debouncedUpdateValue, setLocalChecked]
   );
 
+  // Follow the prop only when it changes (e.g. after the refetch). Comparing it with the local
+  // value on every render would undo each click right away, so the control flipped back and only
+  // jumped to the new state once the refetch landed - after the "saved" snackbar.
   useEffect(() => {
-    if (checked !== localChecked) {
-      setLocalChecked(checked);
-    }
-  }, [checked, localChecked]);
+    setLocalChecked(checked);
+  }, [checked]);
 
   // Return different objects based on whether we have a mutation
   if (!updateValueMutation) {

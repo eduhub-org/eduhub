@@ -1,6 +1,7 @@
 import { FC, useMemo, useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
+import { Tooltip } from '@mui/material';
 
 import { Course_Course_by_pk_Sessions as Session, Course_Course_by_pk_CourseLocations as CourseLocation } from '../../../queries/__generated__/Course';
 import { SectionTitle } from '../../common/SectionTitle';
@@ -9,6 +10,7 @@ import { useAppSettings } from '../../../contexts/AppSettingsContext';
 import { useDisplayDate, useFormatTimeString } from '../../../helpers/dateTimeHelpers';
 import { formatDayHeading, groupSessionsByDay } from '../../../helpers/sessionSchedule';
 import { isLinkFormat } from '../../../helpers/util';
+import { isProgramSession, mergeSessions } from '../../../helpers/programSessions';
 import { useIsAdmin, useIsInstructor } from '../../../hooks/authentication';
 import {
   ResolvedLocation,
@@ -19,6 +21,9 @@ import {
 
 interface SessionsProps {
   sessions: Session[];
+  /** Program-wide sessions, merged into the schedule and marked as such. */
+  programSessions?: Session[] | null;
+  programTitle?: string | null;
   courseLocations: CourseLocation[];
   isLoggedInParticipant: boolean;
   /** Events publish an agenda: grouped by day, always expanded, no "Termine" heading. */
@@ -37,7 +42,7 @@ const SessionLocations: FC<SessionLocationsProps> = ({ locations, canSeeOnlineLi
   return (
     <>
       {locations.map((location, index) => (
-        <span key={location.courseLocationId} className="text-sm text-label-secondary ml-0 pl-0">
+        <span key={location.key} className="text-sm text-label-secondary ml-0 pl-0">
           {location.locationOption ? (
             location.locationOption === 'ONLINE' ? (
               <>
@@ -85,15 +90,44 @@ const SessionLocations: FC<SessionLocationsProps> = ({ locations, canSeeOnlineLi
   );
 };
 
+/**
+ * The small uppercase line above a title that marks the exceptions: a session
+ * shared by all courses of the program, and an optional one. Mandatory course
+ * sessions - the default - get none.
+ */
+const SessionEyebrow: FC<{ session: Session; programTitle?: string | null }> = ({ session, programTitle }) => {
+  const t = useTranslations('course');
+  const isShared = isProgramSession(session);
+  const isOptional = session.isMandatory === false;
+  if (!isShared && !isOptional) return null;
+
+  return (
+    <span className="flex flex-wrap items-center gap-x-2 text-[11px] font-bold uppercase tracking-widest mb-0.5">
+      {isShared && (
+        <Tooltip title={t('sessions.program_session_tooltip', { program: programTitle ?? '' })}>
+          <span className="text-label-cross-course">{t('sessions.program_session')}</span>
+        </Tooltip>
+      )}
+      {isShared && isOptional && (
+        <span aria-hidden="true" className="text-label-disabled">
+          ·
+        </span>
+      )}
+      {isOptional && <span className="text-label-disabled">{t('sessions.optional')}</span>}
+    </span>
+  );
+};
+
 interface SessionRowProps {
   session: Session;
   locations: ResolvedLocation[];
   /** The agenda carries the date in its day heading, so rows there show only times. */
   showDate: boolean;
   canSeeOnlineLink: boolean;
+  programTitle?: string | null;
 }
 
-const SessionRow: FC<SessionRowProps> = ({ session, locations, showDate, canSeeOnlineLink }) => {
+const SessionRow: FC<SessionRowProps> = ({ session, locations, showDate, canSeeOnlineLink, programTitle }) => {
   const t = useTranslations('course');
   const displayDate = useDisplayDate();
   const formatTimeString = useFormatTimeString();
@@ -122,6 +156,7 @@ const SessionRow: FC<SessionRowProps> = ({ session, locations, showDate, canSeeO
         </span>
       </div>
       <div className="flex flex-col flex-1 min-w-0">
+        <SessionEyebrow session={session} programTitle={programTitle} />
         {title ? (
           <span className="block text-base sm:text-lg font-semibold break-words">{title}</span>
         ) : (
@@ -155,7 +190,9 @@ const SessionRow: FC<SessionRowProps> = ({ session, locations, showDate, canSeeO
 };
 
 export const Sessions: FC<SessionsProps> = ({
-  sessions,
+  sessions: courseSessions,
+  programSessions,
+  programTitle,
   courseLocations,
   isLoggedInParticipant,
   isEvent = false,
@@ -170,6 +207,8 @@ export const Sessions: FC<SessionsProps> = ({
   const canSeeOnlineLink = isLoggedInParticipant || isAdmin || isInstructor;
 
   const initiallyShownSessions = 4;
+
+  const sessions = useMemo(() => mergeSessions(courseSessions, programSessions), [courseSessions, programSessions]);
 
   // An agenda that hides its second day behind "Alle Termine anzeigen" defeats
   // the purpose, so events always render in full.
@@ -186,19 +225,21 @@ export const Sessions: FC<SessionsProps> = ({
    * on every row is noise, so in that case it is hoisted above the list; with a
    * single session there is nothing to repeat and it stays on the row.
    */
+  // Program sessions have their own places, so they neither decide nor use
+  // the hoisted line - they always show their location on the row.
   const sharedLocations = useMemo(() => {
-    if (sessions.length < 2) return null;
-    const perSession = sessions.map((session) => resolveSessionLocations(session, courseLocations, addressMap));
+    if (courseSessions.length < 2) return null;
+    const perSession = courseSessions.map((session) => resolveSessionLocations(session, courseLocations, addressMap));
     if (perSession.some((locations) => locations.length === 0)) return null;
 
     const signature = locationsSignature(perSession[0]);
     return perSession.every((locations) => locationsSignature(locations) === signature) ? perSession[0] : null;
-  }, [sessions, courseLocations, addressMap]);
+  }, [courseSessions, courseLocations, addressMap]);
 
   const locationsBySessionId = useMemo(() => {
     const map = new Map<number, ResolvedLocation[]>();
-    if (sharedLocations) return map;
     visibleSessions.forEach((session) => {
+      if (sharedLocations && !isProgramSession(session)) return;
       map.set(session.id, resolveSessionLocations(session, courseLocations, addressMap));
     });
     return map;
@@ -217,6 +258,12 @@ export const Sessions: FC<SessionsProps> = ({
   // registration rail now, alongside the other whole-course actions.
   const sectionHeader = (title: string) => <SectionTitle className="mb-8">{title}</SectionTitle>;
 
+  // Mandatory is the default, so only the exceptions carry a pill; the hint
+  // explains that once, and only when there is an exception to explain.
+  const optionalHint = sessions.some((session) => session.isMandatory === false) ? (
+    <p className="max-w-2xl -mt-6 mb-6 text-sm text-label-secondary">{t('sessions.optional_hint')}</p>
+  ) : null;
+
   const sharedLocationsLine = sharedLocations ? (
     <div className="max-w-2xl mb-4 break-words">
       <SessionLocations locations={sharedLocations} canSeeOnlineLink={canSeeOnlineLink} />
@@ -229,6 +276,7 @@ export const Sessions: FC<SessionsProps> = ({
     return (
       <div>
         {sectionHeader(t('sessions.agenda'))}
+        {optionalHint}
         <div>
           {dayGroups.map((group) => (
             <div
@@ -245,7 +293,8 @@ export const Sessions: FC<SessionsProps> = ({
               </h3>
               {/* Repeated per day rather than hoisted above the whole agenda: the
                   address belongs to the day it heads, not to the section title. */}
-              {sharedLocationsLine}
+              {/* A day with only program sessions has no course place to hoist. */}
+              {group.sessions.some((session) => !isProgramSession(session)) && sharedLocationsLine}
               <ul className="sm:pl-6 sm:border-l sm:border-border-primary">
                 {group.sessions.map((session) => (
                   <SessionRow
@@ -254,6 +303,7 @@ export const Sessions: FC<SessionsProps> = ({
                     locations={locationsBySessionId.get(session.id) ?? []}
                     showDate={false}
                     canSeeOnlineLink={canSeeOnlineLink}
+                    programTitle={programTitle}
                   />
                 ))}
               </ul>
@@ -267,6 +317,7 @@ export const Sessions: FC<SessionsProps> = ({
   return (
     <div>
       {sectionHeader(sessions.length === 1 ? t('sessions.date_singular') : t('sessions.date_plural'))}
+      {optionalHint}
       {sharedLocationsLine}
       <ul className="max-w-2xl">
         {visibleSessions.map((session) => (
@@ -276,6 +327,7 @@ export const Sessions: FC<SessionsProps> = ({
             locations={locationsBySessionId.get(session.id) ?? []}
             showDate={true}
             canSeeOnlineLink={canSeeOnlineLink}
+            programTitle={programTitle}
           />
         ))}
       </ul>

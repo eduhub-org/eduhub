@@ -29,6 +29,17 @@ export default async function sendEnrollmentEmail(req, logger) {
     const enrollment = data.new;
     const oldEnrollment = data.old;
 
+    // A preview enrollment is an instructor looking at their own course, not a
+    // participation. It must not generate a confirmation, an invitation, a
+    // certificate mail or anything else addressed to a participant.
+    if (enrollment?.isTest) {
+      return {
+        success: true,
+        messageKey: 'NO_ACTION_NEEDED',
+        message: 'Preview enrollment - no enrollment mail sent'
+      };
+    }
+
     // Create GraphQL client
     const client = new GraphQLClient(process.env.HASURA_ENDPOINT, {
       headers: {
@@ -59,6 +70,7 @@ export default async function sendEnrollmentEmail(req, logger) {
           Course {
             id
             title
+            registrationType
             startTime
             endTime
             basePrice
@@ -155,7 +167,16 @@ export default async function sendEnrollmentEmail(req, logger) {
             baseTemplateType = 'APPLICATION_RECEIVED';
             break;
           case 'CONFIRMED':
-            baseTemplateType = 'APPLICATION_CONFIRMED';
+            // Signed-in direct signups use CONFIRMED, while guests use
+            // REGISTERED. Both must use the event's registration template.
+            baseTemplateType = [
+              'DIRECT_CONFIRMATION',
+              'DIRECT_WITH_INPUT',
+              'DIRECT_CONFIRMATION_AND_PAYMENT',
+              'DIRECT_WITH_INPUT_AND_PAYMENT',
+            ].includes(enrollmentDetails.Course?.registrationType)
+              ? 'REGISTRATION_CONFIRMED'
+              : 'APPLICATION_CONFIRMED';
             break;
           case 'INVITED':
             baseTemplateType = 'INVITE';
@@ -374,4 +395,4 @@ export default async function sendEnrollmentEmail(req, logger) {
       messageKey: 'EMAIL_PROCESSING_FAILED'
     };
   }
-} 
+}

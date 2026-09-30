@@ -7,24 +7,42 @@ import {
   COURSE_FRAGMENT_ANONYMOUS,
 } from './courseFragment';
 import { ADMIN_ENROLLMENT_FRAGMENT } from './enrollmentFragment';
-import { ADMIN_SESSION_FRAGMENT } from './sessionFragement';
+import { ADMIN_SESSION_FRAGMENT, SESSION_FRAGMENT } from './sessionFragement';
 import { USER_FRAGMENT } from './userFragment';
 import { PROGRAM_FRAGMENT_MINIMUM_PROPERTIES } from './programFragment';
 
+// Program-wide sessions are shown in every course of the program. Kept out
+// of the course fragments so course lists do not fetch them.
 export const COURSE = gql`
   ${COURSE_FRAGMENT}
+  ${SESSION_FRAGMENT}
   query Course($id: Int!) {
     Course_by_pk(id: $id) {
       ...CourseFragment
+      Program {
+        id
+        title
+        Sessions(order_by: { startDateTime: asc }) {
+          ...SessionFragment
+        }
+      }
     }
   }
 `;
 
 export const COURSE_ANONYMOUS = gql`
   ${COURSE_FRAGMENT_ANONYMOUS}
+  ${SESSION_FRAGMENT}
   query CourseAnonymous($id: Int!) {
     Course_by_pk(id: $id) {
       ...CourseFragmentAnonymous
+      Program {
+        id
+        title
+        Sessions(order_by: { startDateTime: asc }) {
+          ...SessionFragment
+        }
+      }
     }
   }
 `;
@@ -46,6 +64,7 @@ export const COURSE_MINIMUM = gql`
 export const MANAGED_COURSE = gql`
   ${ADMIN_COURSE_FRAGMENT}
   ${ADMIN_SESSION_FRAGMENT}
+  ${SESSION_FRAGMENT}
   query ManagedCourse($id: Int!) {
     Course_by_pk(id: $id) {
       ...AdminCourseFragment
@@ -57,6 +76,13 @@ export const MANAGED_COURSE = gql`
       }
       Sessions(order_by: { startDateTime: asc }) {
         ...AdminSessionFragment
+      }
+      Program {
+        id
+        title
+        Sessions(order_by: { startDateTime: asc }) {
+          ...SessionFragment
+        }
       }
     }
   }
@@ -71,6 +97,7 @@ export const MANAGED_COURSE_APPLICATIONS = gql`
     $offset: Int = 0
     $filter: CourseEnrollment_bool_exp = {}
     $order_by: [CourseEnrollment_order_by!] = [{ id: asc }]
+    $expirationCutoff: date!
   ) {
     Course_by_pk(id: $id) {
       id
@@ -88,13 +115,13 @@ export const MANAGED_COURSE_APPLICATIONS = gql`
       CourseEnrollments(
         limit: $limit
         offset: $offset
-        where: $filter
+        where: { _and: [{ isTest: { _eq: false } }, $filter] }
         order_by: $order_by
       ) {
         ...AdminEnrollmentFragment
         User {
           ...UserFragment
-          CourseEnrollments {
+          CourseEnrollments(where: { isTest: { _eq: false } }) {
             status
             courseId
             achievementCertificateURL
@@ -114,37 +141,90 @@ export const MANAGED_COURSE_APPLICATIONS = gql`
           }
         }
       }
-      CourseEnrollments_aggregate(where: $filter) {
+      CourseEnrollments_aggregate(where: { _and: [{ isTest: { _eq: false } }, $filter] }) {
         aggregate {
           count
         }
       }
-      TotalCourseEnrollments: CourseEnrollments_aggregate {
+      TotalCourseEnrollments: CourseEnrollments_aggregate(where: { isTest: { _eq: false } }) {
         aggregate {
           count
         }
       }
-      ApprovedCourseEnrollments: CourseEnrollments_aggregate(where: { motivationRating: { _eq: INVITE } }) {
+      ApprovedCourseEnrollments: CourseEnrollments_aggregate(
+        where: { isTest: { _eq: false }, motivationRating: { _eq: INVITE } }
+      ) {
         aggregate {
           count
         }
       }
       InvitedCourseEnrollments: CourseEnrollments_aggregate(
-        where: { status: { _in: [INVITED, CONFIRMED] } }
+        where: {
+          isTest: { _eq: false }
+          _or: [
+            { status: { _in: [INVITED, CONFIRMED, COMPLETED, REGISTERED, EXPIRED, ABORTED] } }
+            { status: { _eq: CANCELLED }, invitationExpirationDate: { _is_null: false } }
+          ]
+        }
       ) {
         aggregate {
           count
         }
       }
       ConfirmedCourseEnrollments: CourseEnrollments_aggregate(
-        where: { status: { _in: [CONFIRMED, COMPLETED, REGISTERED] } }
+        where: { isTest: { _eq: false }, status: { _in: [CONFIRMED, COMPLETED, REGISTERED] } }
+      ) {
+        aggregate {
+          count
+        }
+      }
+      RejectedCourseEnrollments: CourseEnrollments_aggregate(
+        where: { isTest: { _eq: false }, status: { _eq: REJECTED } }
+      ) {
+        aggregate {
+          count
+        }
+      }
+      # The hourly expire_invitations cron flips lapsed INVITED enrollments to
+      # EXPIRED, so between runs an invitation can be past its expiration date
+      # while still INVITED. The table marks those as expired, so the aggregate
+      # applies the same date rule to stay consistent.
+      ExpiredCourseEnrollments: CourseEnrollments_aggregate(
+        where: {
+          isTest: { _eq: false }
+          _or: [
+            { status: { _eq: EXPIRED } }
+            { status: { _eq: INVITED }, invitationExpirationDate: { _lt: $expirationCutoff } }
+          ]
+        }
+      ) {
+        aggregate {
+          count
+        }
+      }
+      AbortedCourseEnrollments: CourseEnrollments_aggregate(
+        where: { isTest: { _eq: false }, status: { _eq: ABORTED } }
+      ) {
+        aggregate {
+          count
+        }
+      }
+      PendingCourseEnrollments: CourseEnrollments_aggregate(
+        where: { isTest: { _eq: false }, status: { _in: [APPLIED, INVITED] } }
+      ) {
+        aggregate {
+          count
+        }
+      }
+      WaitlistedCourseEnrollments: CourseEnrollments_aggregate(
+        where: { isTest: { _eq: false }, status: { _eq: WAITLIST } }
       ) {
         aggregate {
           count
         }
       }
       CancelledCourseEnrollments: CourseEnrollments_aggregate(
-        where: { status: { _in: [CANCELLED, ABORTED] } }
+        where: { isTest: { _eq: false }, status: { _eq: CANCELLED } }
       ) {
         aggregate {
           count
@@ -164,7 +244,7 @@ export const MANAGED_COURSE_APPLICATION_RECIPIENTS = gql`
       id
       CourseEnrollments(
         limit: $limit
-        where: $filter
+        where: { _and: [{ isTest: { _eq: false } }, $filter] }
         order_by: [{ User: { lastName: asc } }, { User: { firstName: asc } }, { id: asc }]
       ) {
         id
@@ -177,7 +257,7 @@ export const MANAGED_COURSE_APPLICATION_RECIPIENTS = gql`
           email
         }
       }
-      CourseEnrollments_aggregate(where: $filter) {
+      CourseEnrollments_aggregate(where: { _and: [{ isTest: { _eq: false } }, $filter] }) {
         aggregate {
           count
         }
@@ -224,6 +304,19 @@ export const UPDATE_SESSION_TITLE = gql`
       _set: { title: $text }
     ) {
       id
+      title
+    }
+  }
+`;
+
+export const UPDATE_SESSION_IS_MANDATORY = gql`
+  mutation UpdateSessionIsMandatory($sessionId: Int!, $value: Boolean!) {
+    update_Session_by_pk(
+      pk_columns: { id: $sessionId }
+      _set: { isMandatory: $value }
+    ) {
+      id
+      isMandatory
     }
   }
 `;
@@ -257,6 +350,7 @@ export const UPDATE_SESSION_DESCRIPTION = gql`
       _set: { description: $text }
     ) {
       id
+      description
     }
   }
 `;

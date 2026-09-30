@@ -68,6 +68,35 @@ EduHub integrates with [Stripe](https://stripe.com) to handle course enrollment 
 3. Copy your **Secret Key** (starts with `sk_test_...` for test mode)
 4. Copy your **Publishable Key** (starts with `pk_test_...` for test mode)
 
+#### Invoice document settings (sandbox and live)
+
+Stripe prints the seller block and the invoice number from account
+settings; no code passes them. Configure each account once:
+
+- **Settings → Business → Public details:** support address
+  (Fraunhoferstr. 13, 24118 Kiel) and support email
+  `rechnungen@opencampus.sh`. The legal address under *Unternehmensdaten* is
+  not printed on invoices.
+- **Settings → Billing → Invoices:** default account tax ID `eu_vat`
+  `DE322443015`, and invoice number prefix `EDUHUB` (FastBill and Billomat
+  also issue opencampus invoices, so the prefix keeps the sequences apart).
+
+The code adds the rest of what §14 UStG requires:
+
+- **Buyer address:** Checkout requires a billing address and offers an
+  optional tax ID field (`buildPaymentMethodConfig`); "Kauf auf Rechnung"
+  collects both in the StuJo order form.
+- **Leistungszeitraum / Leistungsdatum** as an invoice custom field
+  (`buildServicePeriodField`): the exact posting runtime on "Kauf auf
+  Rechnung" invoices, "N Tage ab Rechnungsdatum" on Checkout job posting
+  invoices (the posting goes live when Stripe dates the invoice, and the
+  field is fixed before payment), the program's `lectureStart`–`lectureEnd`
+  for courses (the purchase day when unset).
+- **German invoices:** customers get `preferred_locales: ['de']`.
+- **`metadata.source`** on sessions, payments and invoices: `stujo`,
+  `courses`, `events` or `degrees` (`buildCourseSource`; `eduhub` for an
+  unknown program type).
+
 ### 2. Environment Configuration
 
 #### Development Environment
@@ -114,6 +143,9 @@ EduHub integrates with [Stripe](https://stripe.com) to handle course enrollment 
      - `checkout.session.async_payment_failed`
      - `payment_intent.payment_failed`
      - `invoice.finalized`
+     - `invoice.paid`
+     - `invoice.overdue`
+     - `invoice.voided`
    - Click **Add endpoint**
 
    > **`invoice.finalized` is required for StuJo job postings.** Their
@@ -122,6 +154,18 @@ EduHub integrates with [Stripe](https://stripe.com) to handle course enrollment 
    > yet at `checkout.session.completed`. Without this event the mail falls
    > through to the `send_pending_job_posting_mails` cron sweep and arrives up to
    > ~30 minutes late. Nothing fails loudly if you forget it, so check it here.
+
+   > **`invoice.paid`, `invoice.overdue` and `invoice.voided` drive StuJo
+   > "Kauf auf Rechnung".** Organizations an admin approved
+   > (`Organization.allowInvoicePayment`, toggled on the job board settings page)
+   > get a Stripe invoice paid by EU bank transfer instead of Checkout. Stripe
+   > assigns each customer a virtual IBAN and matches incoming transfers itself;
+   > `invoice.paid` then flips our `Invoice` row to `PAID`, `invoice.overdue`
+   > marks it `OVERDUE` and notifies `STUJO_ADMIN_EMAIL`. Without these events
+   > the row stays `ISSUED` although the money arrived. This also requires
+   > **Settings → Payment methods → Bank transfers** to be activated on the
+   > account (sandbox and live); otherwise issuing the invoice fails with
+   > `INVOICE_PAYMENT_FAILED`.
 
 2. **Get Webhook Signing Secret**:
    - Click on your newly created webhook endpoint
@@ -149,6 +193,9 @@ EduHub integrates with [Stripe](https://stripe.com) to handle course enrollment 
      - `checkout.session.async_payment_failed`
      - `payment_intent.payment_failed`
      - `invoice.finalized`
+     - `invoice.paid`
+     - `invoice.overdue`
+     - `invoice.voided`
    - Click **Add endpoint**
 
 3. **Get Live Webhook Signing Secret**:

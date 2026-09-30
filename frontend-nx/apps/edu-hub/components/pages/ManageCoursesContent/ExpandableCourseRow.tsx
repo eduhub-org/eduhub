@@ -6,6 +6,14 @@ import { useManageMutation } from '../../../hooks/authedMutation';
 import { SAVE_COURSE_IMAGE } from '../../../queries/actions';
 import { INSERT_COURSE_GROUP_TAG, DELETE_COURSE_GROUP_TAG } from '../../../queries/courseGroup';
 import { INSERT_COURSE_DEGREE_TAG, DELETE_COURSE_DEGREE_TAG } from '../../../queries/courseDegree';
+import {
+  COURSE_SERIES_OPTIONS,
+  COURSE_SERIES_RUNS,
+  CREATE_COURSE_SERIES,
+  UPDATE_COURSE_SERIES,
+} from '../../../queries/courseSeries';
+import { CourseSeriesOptions, CourseSeriesOptionsVariables } from '../../../queries/__generated__/CourseSeriesOptions';
+import { CourseSeriesRuns, CourseSeriesRunsVariables } from '../../../queries/__generated__/CourseSeriesRuns';
 import { DELETE_COURSE_INSRTRUCTOR, INSERT_A_COURSEINSTRUCTOR } from '../../../queries/mutateCourseInstructor';
 import { USER_SELECTION_WITH_FILTER, buildUserSelectionFilter } from '../../../queries/user';
 import { AdminCourseList_Course } from '../../../queries/__generated__/AdminCourseList';
@@ -42,12 +50,14 @@ import TagSelector from '../../inputs/TagSelector';
 import { isKnownCourseGroupOptionTitle } from '../../../helpers/courseGroupOptions';
 import InputField from '../../inputs/InputField';
 import DropDownSelector from '../../inputs/DropDownSelector';
+import CheckboxSelector from '../../inputs/CheckboxSelector';
 import RadioSelector, { RadioSelectorOption } from '../../inputs/RadioSelector';
 import FileUploadField from '../../inputs/FileUploadField';
 import DatePicker from '../../inputs/DatePicker';
 import {
   UPDATE_COURSE_ECTS,
   UPDATE_COURSE_EXTERNAL_REGISTRATION_LINK,
+  UPDATE_COURSE_GUEST_REGISTRATION_ENABLED,
   UPDATE_COURSE_MAX_MISSED_SESSION,
   UPDATE_COURSE_REGISTRATION_TYPE,
   UPDATE_COURSE_LEARNING_GOALS,
@@ -122,6 +132,28 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
   // Get default templates
   const { data: defaultTemplatesData } = useRoleQuery<GetDefaultTemplates>(GET_DEFAULT_TEMPLATES);
 
+  // A course series belongs to the organization of the course's program.
+  const courseOrganizationId = course.Program?.organizationId ?? null;
+  const { data: courseSeriesData } = useRoleQuery<CourseSeriesOptions, CourseSeriesOptionsVariables>(
+    COURSE_SERIES_OPTIONS,
+    {
+      variables: { organizationId: courseOrganizationId ?? 0 },
+      skip: courseOrganizationId === null,
+    }
+  );
+  const courseSeriesOptions = useMemo(
+    () => courseSeriesData?.CourseSeries.map((series) => ({ value: series.id.toString(), label: series.title })) ?? [],
+    [courseSeriesData]
+  );
+  const { data: courseSeriesRunsData } = useRoleQuery<CourseSeriesRuns, CourseSeriesRunsVariables>(
+    COURSE_SERIES_RUNS,
+    {
+      variables: { courseSeriesId: course.courseSeriesId ?? 0 },
+      skip: course.courseSeriesId === null,
+    }
+  );
+  const otherSeriesRuns = courseSeriesRunsData?.Course.filter((run) => run.id !== course.id) ?? [];
+
   const [insertEmailTemplate] = useManageMutation<InsertEmailTemplate, InsertEmailTemplateVariables>(
     INSERT_EMAIL_TEMPLATE
   );
@@ -132,6 +164,12 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
   // completion thresholds for its degree certificate.
   const isDegreeCourse = course.Program?.type === ProgramType.DEGREES;
   const isEventCourse = course.Program?.type === ProgramType.EVENTS;
+
+  // Mirrors the guards in functions/callNodeFunction/registerGuestForCourse.
+  const supportsGuestRegistration =
+    isEventCourse &&
+    (course.registrationType === CourseRegistrationType_enum.DIRECT_CONFIRMATION ||
+      course.registrationType === CourseRegistrationType_enum.DIRECT_WITH_INPUT);
 
   const projectSubmissionDeadlineValue = useMemo(
     () => submissionDeadlineToCalendarDate(course.projectSubmissionDeadline),
@@ -749,6 +787,21 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                 />
               )}
 
+              {/* Only meaningful for standalone events registered directly - the
+                  backend rejects guest registration for anything else, so showing
+                  the toggle elsewhere would just promise something that cannot work. */}
+              {supportsGuestRegistration && (
+                <CheckboxSelector
+                  variant="material"
+                  label={t('manageCourse.guest_registration.label')}
+                  helpText={t('manageCourse.guest_registration.help_text')}
+                  checked={Boolean(course.guestRegistrationEnabled)}
+                  updateValueMutation={UPDATE_COURSE_GUEST_REGISTRATION_ENABLED}
+                  identifierVariables={{ courseId: course.id }}
+                  refetchQueries={['AdminCourseList']}
+                />
+              )}
+
               {/* Formbricks Survey Configuration - Show for courses that require input */}
               {(course.registrationType === CourseRegistrationType_enum.APPROVAL_WITH_INPUT ||
                 course.registrationType === CourseRegistrationType_enum.DIRECT_WITH_INPUT ||
@@ -865,6 +918,46 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                 refetchQueries={['AdminCourseList']}
               />
             </div>
+
+            {/* Course Series - Card Container - past runs' projects are shown on the course page */}
+            {courseOrganizationId !== null && (
+              <div className="bg-fill-primary border border-border-primary rounded-lg p-4 space-y-2">
+                <h4 className="text-sm font-medium text-label-primary">{t('manageCourses.course_series.label')}</h4>
+                <DropDownSelector
+                  variant="material"
+                  label={t('manageCourses.course_series.label')}
+                  placeholder={t('manageCourses.course_series.placeholder')}
+                  helpText={t('manageCourses.course_series.help_text')}
+                  value={course.courseSeriesId?.toString() ?? ''}
+                  options={courseSeriesOptions}
+                  updateValueMutation={UPDATE_COURSE_SERIES}
+                  createOptionMutation={CREATE_COURSE_SERIES}
+                  identifierVariables={{ itemId: course.id, organizationId: courseOrganizationId }}
+                  creatable
+                  nullable
+                  nullableLabel={t('manageCourses.course_series.none')}
+                  refetchQueries={['AdminCourseList', 'CourseSeriesOptions', 'CourseSeriesRuns']}
+                />
+                {course.courseSeriesId !== null && (
+                  <div className="text-sm text-label-secondary">
+                    {otherSeriesRuns.length > 0 ? (
+                      <>
+                        <p>{t('manageCourses.course_series.other_runs')}</p>
+                        <ul className="list-disc pl-5">
+                          {otherSeriesRuns.map((run) => (
+                            <li key={run.id}>
+                              {run.title} ({run.Program?.shortTitle || run.Program?.title})
+                            </li>
+                          ))}
+                        </ul>
+                      </>
+                    ) : (
+                      <p>{t('manageCourses.course_series.no_other_runs')}</p>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* 3. Cover Image Upload - Card Container */}
             <div className="bg-fill-primary border border-border-primary rounded-lg p-4">

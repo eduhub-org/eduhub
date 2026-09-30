@@ -338,6 +338,8 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
         } catch (err) {
           console.error('Certificate generation error:', err);
           setBulkActionError(err instanceof Error ? err.message : tCommon('error_handling.certificate_generation_failed'));
+          // Rethrow so TableGrid keeps the rows selected for a retry.
+          throw err;
         }
       } else if (action === 'delete-achievement-certificates') {
         try {
@@ -369,6 +371,8 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
         } catch (err) {
           console.error('Certificate deletion error:', err);
           setBulkActionError(err instanceof Error ? err.message : tCommon('error_handling.certificate_deletion_failed'));
+          // Rethrow so TableGrid keeps the rows selected for a retry.
+          throw err;
         }
       }
     },

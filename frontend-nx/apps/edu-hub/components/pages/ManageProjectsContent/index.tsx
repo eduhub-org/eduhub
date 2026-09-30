@@ -367,7 +367,6 @@ const ManageProjectsContent: FC<ManageProjectsContentProps> = ({ inSettingsLayou
         onSortingChange={setSorting}
         refetchQueries={['AdminProjectList']}
         expandableRowComponent={expandableRowComponent}
-        rounded
       />
 
       <NotificationSnackbar

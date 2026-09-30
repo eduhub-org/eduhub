@@ -4,7 +4,7 @@ import { GraphQLClient, gql } from 'graphql-request';
  * Employer-facing archive action for StuJo job postings. JobPosting.status
  * is server-controlled (Hasura permissions exclude it from org-admin
  * updates), so taking a posting offline goes through this action.
- * Only PUBLISHED or EXPIRED postings can be archived; authorization
+ * Only PUBLISHED, DEACTIVATED or EXPIRED postings can be archived; authorization
  * mirrors publishJobPosting (canManageJobs on the posting's organization).
  */
 
@@ -65,7 +65,7 @@ export default async function archiveJobPosting(req, logger) {
       return { success: false, error: 'Not authorized to archive this posting', messageKey: 'UNAUTHORIZED' };
     }
 
-    if (!['PUBLISHED', 'EXPIRED'].includes(posting.status)) {
+    if (!['PUBLISHED', 'DEACTIVATED', 'EXPIRED'].includes(posting.status)) {
       return {
         success: false,
         error: `Posting in status ${posting.status} cannot be archived`,

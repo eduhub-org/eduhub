@@ -484,6 +484,98 @@ export async function queueJobPostingConfirmation(
   return true;
 }
 
+// One request, one transaction: each update carries its own "still empty"
+// condition, so a value written after this webhook read nothing is never
+// overwritten, whether by a settings admin or by a concurrent delivery.
+const FILL_ORGANIZATION_BILLING = gql`
+  mutation FillOrganizationBillingFromCheckout($updates: [Organization_updates!]!) {
+    update_Organization_many(updates: $updates) {
+      affected_rows
+    }
+  }
+`;
+
+type BillingField = 'legalName' | 'addressLine1' | 'addressLine2' | 'postalCode' | 'city' | 'country' | 'vatId';
+
+/** The subset of Checkout's customer_details the billing data comes from. */
+type CheckoutCustomerDetails = {
+  business_name?: string | null;
+  address?: Stripe.Address | null;
+  tax_ids?: Array<{ type: string; value: string | null }> | null;
+} | null;
+
+const clean = (value: string | null | undefined): string | null => {
+  const trimmed = value?.trim();
+  return trimmed ? trimmed : null;
+};
+
+/**
+ * Maps the billing details Checkout collected onto Organization columns.
+ * The legal name only comes from the business name field: the plain
+ * `name` is usually a person (the cardholder), not the company.
+ */
+export function billingFromCheckout(details: CheckoutCustomerDetails): Partial<Record<BillingField, string>> {
+  const address = details?.address;
+  const vatId = details?.tax_ids?.find((taxId) => taxId.type === 'eu_vat')?.value;
+  const billing: Partial<Record<BillingField, string | null>> = {
+    legalName: clean(details?.business_name),
+    addressLine1: clean(address?.line1),
+    addressLine2: clean(address?.line2),
+    postalCode: clean(address?.postal_code),
+    city: clean(address?.city),
+    country: clean(address?.country)?.toUpperCase() ?? null,
+    vatId: clean(vatId)?.replace(/\s+/g, '').toUpperCase() ?? null,
+  };
+  return Object.fromEntries(Object.entries(billing).filter(([, value]) => value)) as Partial<
+    Record<BillingField, string>
+  >;
+}
+
+const isEmpty = (field: BillingField) => ({
+  _or: [{ [field]: { _is_null: true } }, { [field]: { _eq: '' } }],
+});
+
+const ADDRESS_FIELDS: BillingField[] = ['addressLine1', 'addressLine2', 'postalCode', 'city', 'country'];
+
+/**
+ * Saves the billing address entered in Checkout on the employer
+ * organization, so the next order (and the "Kauf auf Rechnung" form) is
+ * prefilled. Mirrors fillOrganizationBilling in publishJobPosting: only
+ * columns that are still empty are written, so data a settings admin
+ * maintains is never overwritten. The address is written as a whole and
+ * only onto an organization without any address, because mixing its
+ * street with Checkout's city would produce an address nobody entered;
+ * a partial one (card payments may collect just country and postal code)
+ * is ignored.
+ */
+export async function fillOrganizationBillingFromCheckout(
+  client: GraphQLClient,
+  organizationId: number,
+  details: CheckoutCustomerDetails
+): Promise<void> {
+  const billing = billingFromCheckout(details);
+  const byId = { id: { _eq: organizationId } };
+  const updates: Array<{ where: Record<string, unknown>; _set: Partial<Record<BillingField, string>> }> = [];
+
+  for (const field of ['legalName', 'vatId'] as const) {
+    const value = billing[field];
+    if (value) {
+      updates.push({ where: { _and: [byId, isEmpty(field)] }, _set: { [field]: value } });
+    }
+  }
+  if (billing.addressLine1 && billing.postalCode && billing.city && billing.country) {
+    const address: Partial<Record<BillingField, string>> = {};
+    for (const field of ADDRESS_FIELDS) {
+      if (billing[field]) address[field] = billing[field];
+    }
+    updates.push({ where: { _and: [byId, ...ADDRESS_FIELDS.map(isEmpty)] }, _set: address });
+  }
+
+  if (updates.length > 0) {
+    await client.request(FILL_ORGANIZATION_BILLING, { updates });
+  }
+}
+
 /**
  * checkout.session.completed for a job posting: publish + invoice + mails.
  */
@@ -636,6 +728,15 @@ export async function handleJobPostingCheckoutCompleted(
     );
   }
 
+  // Only pre-fills the next order; never worth failing the webhook for.
+  await fillOrganizationBillingFromCheckout(client, posting.organizationId, session.customer_details).catch(
+    (error: unknown) =>
+      console.warn('Could not save the Checkout billing address on the organization', {
+        organizationId: posting.organizationId,
+        error: error instanceof Error ? error.message : String(error),
+      })
+  );
+
   console.log('Job posting published via Stripe webhook', {
     jobPostingId: posting.id,
     sessionId: session.id,
@@ -759,6 +860,10 @@ export async function handleJobPostingInvoiceFinalized(
   });
 
   if (!row.jobPostingId) return;
+  // publishJobPosting finalizes bank transfer invoices itself and queues the
+  // confirmation right after, with the transfer instructions this generic
+  // "Zahlung ausstehend" text lacks. The sweep stays the backstop.
+  if (isJobPostingBankTransferInvoice(invoiceDoc)) return;
 
   const data = await client.request<PostingForWebhook>(GET_POSTING_FOR_WEBHOOK, {
     id: row.jobPostingId,
@@ -789,4 +894,77 @@ export async function handleJobPostingInvoiceFinalized(
     stripeInvoiceNumber: invoiceDoc.number,
     confirmationQueuedNow: sent,
   });
+}
+
+/**
+ * Status transitions for the "Kauf auf Rechnung" bank transfer invoices that
+ * publishJobPosting issues (metadata.paymentMethod INVOICE). Checkout invoices
+ * are left alone: their status follows the checkout.session.* events.
+ *
+ * Paid -> PAID, overdue -> OVERDUE (+ notice to the StuJo admin; the posting
+ * stays online, admins decide), voided -> CANCELLED. Each only moves forward
+ * from the states listed, so a re-delivered or late event never undoes a
+ * later one (e.g. an overdue event arriving after the payment).
+ */
+const INVOICE_STATUS_TRANSITIONS: Record<string, { to: string; from: string[] }> = {
+  'invoice.paid': { to: 'PAID', from: ['ISSUED', 'OVERDUE'] },
+  'invoice.overdue': { to: 'OVERDUE', from: ['ISSUED'] },
+  'invoice.voided': { to: 'CANCELLED', from: ['ISSUED', 'OVERDUE'] },
+};
+
+export function isJobPostingBankTransferInvoice(invoiceDoc: Stripe.Invoice): boolean {
+  return (
+    invoiceDoc.metadata?.source === 'stujo' && invoiceDoc.metadata?.paymentMethod === 'INVOICE'
+  );
+}
+
+export async function handleJobPostingInvoiceStatusEvent(
+  client: GraphQLClient,
+  eventType: string,
+  invoiceDoc: Stripe.Invoice
+): Promise<void> {
+  const transition = INVOICE_STATUS_TRANSITIONS[eventType];
+  if (!transition || !invoiceDoc.id || !isJobPostingBankTransferInvoice(invoiceDoc)) return;
+
+  const { Invoice: rows } = await client.request<{
+    Invoice: Array<{ id: number; jobPostingId: number | null; status: string; grossTotal: number; currency: string }>;
+  }>(GET_INVOICE_BY_STRIPE_ID, { stripeInvoiceId: invoiceDoc.id });
+  const row = rows[0];
+  if (!row || !transition.from.includes(row.status)) return;
+
+  await client.request(UPDATE_INVOICE_STATUS, { id: row.id, status: transition.to });
+  console.log('Job posting bank transfer invoice status changed', {
+    stripeInvoiceId: invoiceDoc.id,
+    jobPostingId: row.jobPostingId,
+    from: row.status,
+    to: transition.to,
+  });
+
+  if (transition.to !== 'OVERDUE' || !row.jobPostingId || !process.env.STUJO_ADMIN_EMAIL) return;
+  const data = await client.request<PostingForWebhook>(GET_POSTING_FOR_WEBHOOK, {
+    id: row.jobPostingId,
+  });
+  const posting = data.JobPosting_by_pk;
+  if (!posting) return;
+  // Not deduped on metadata: JOB_POSTING_ADMIN_NOTICE already carries the
+  // posting's dedup key from its publication, and the status guard above
+  // makes this send once per invoice.
+  await queueMail(
+    client,
+    'JOB_POSTING_ADMIN_NOTICE',
+    process.env.STUJO_ADMIN_EMAIL,
+    buildMailVars(
+      posting,
+      posting.expiresAt ? new Date(posting.expiresAt) : null,
+      `${formatAmount(row.grossTotal, row.currency)} per Rechnung (Überweisung) – ÜBERFÄLLIG, ` +
+        `Rechnung ${invoiceDoc.number ?? invoiceDoc.id}`
+    ),
+    {
+      Invoice: false,
+      InvoicePdf: false,
+      InvoiceLink: false,
+      InvoicePending: false,
+      TermsAccepted: Boolean(posting.termsAcceptedAt),
+    }
+  );
 }

@@ -13,6 +13,12 @@ export type EmployerOrganization = {
   name: string;
   logo: string | null;
   website: string | null;
+  allowInvoicePayment: boolean;
+  addressLine1: string | null;
+  addressLine2: string | null;
+  postalCode: string | null;
+  city: string | null;
+  country: string | null;
   JobPostingCredits: Array<{ id: number; remaining: number; jobPostingType: string | null }>;
 };
 

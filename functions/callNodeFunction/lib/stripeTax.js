@@ -50,15 +50,53 @@ export async function getOrCreateTaxRate(stripe, percentage, inclusive, logger) 
   return created.id;
 }
 
+const INVOICE_DATE_FORMAT = new Intl.DateTimeFormat('de-DE', {
+  day: '2-digit',
+  month: '2-digit',
+  year: 'numeric',
+  timeZone: 'Europe/Berlin',
+});
+
+/** dd.mm.yyyy in German time, e.g. "01.10.2026". */
+export function formatInvoiceDate(date) {
+  return INVOICE_DATE_FORMAT.format(new Date(date));
+}
+
+/**
+ * Invoice custom field for the time of supply (§14 Abs. 4 Nr. 6 UStG):
+ * "Leistungszeitraum" for a start and end, "Leistungsdatum" for a single day.
+ *
+ * @param {Date|string|null} start
+ * @param {Date|string|null} end
+ * @returns {{name: string, value: string}|null} null without a start
+ */
+export function buildServicePeriodField(start, end = null) {
+  if (!start) {
+    return null;
+  }
+  const from = formatInvoiceDate(start);
+  const to = end ? formatInvoiceDate(end) : null;
+  if (!to || to === from) {
+    return { name: 'Leistungsdatum', value: from };
+  }
+  return { name: 'Leistungszeitraum', value: `${from} \u2013 ${to}` };
+}
+
 /**
  * Builds the invoice_creation block for a Checkout Session so Stripe
  * issues a real, sequentially numbered invoice document (§14 UStG).
+ * Seller address, invoice email, VAT ID and the number prefix come from
+ * the Stripe account settings (docs/STRIPE_INTEGRATION.md), not from here.
  *
  * @param {Object} organization - row with invoiceFooterText,
  *   defaultVatRate, defaultTaxExemptionNote (all optional)
+ * @param {Object} [options]
+ * @param {Array<{name: string, value: string}|null>} [options.customFields]
+ *   printed in the invoice header (Stripe allows up to four)
+ * @param {Object|null} [options.metadata] - copied onto the invoice object
  * @returns {Object} invoice_creation config
  */
-export function buildInvoiceCreation(organization) {
+export function buildInvoiceCreation(organization, { customFields = [], metadata = null } = {}) {
   const footerParts = [];
   if (organization?.invoiceFooterText) {
     footerParts.push(organization.invoiceFooterText);
@@ -71,6 +109,13 @@ export function buildInvoiceCreation(organization) {
   if (footerParts.length > 0) {
     // Stripe caps the footer at 5000 chars; ours are short legal notes.
     invoiceData.footer = footerParts.join('\n');
+  }
+  const fields = customFields.filter(Boolean);
+  if (fields.length > 0) {
+    invoiceData.custom_fields = fields;
+  }
+  if (metadata) {
+    invoiceData.metadata = metadata;
   }
   return { enabled: true, ...(Object.keys(invoiceData).length ? { invoice_data: invoiceData } : {}) };
 }
@@ -107,6 +152,18 @@ function buildDescription(app, organizationName, title, typeLabel) {
 }
 
 /**
+ * Stripe metadata.source for a course/event/degree purchase, so the
+ * dashboard can tell the offerings apart from StuJo ('stujo'). An unknown or
+ * missing program type keeps the old generic 'eduhub'.
+ *
+ * @param {string|null} programType - Program.type (COURSES, EVENTS, DEGREES)
+ * @returns {string}
+ */
+export function buildCourseSource(programType) {
+  return PROGRAM_TYPE_LABELS[programType] ? programType.toLowerCase() : 'eduhub';
+}
+
+/**
  * Description for a course/event/degree enrollment payment, e.g.
  * "EduHub opencampus Design Thinking (Kurs)".
  *
@@ -137,6 +194,8 @@ export function buildJobPostingPaymentDescription(title, organizationName) {
   return buildDescription('StuJo', organizationName, title, 'Stellenanzeige');
 }
 
+const INVOICE_LOCALE = 'de';
+
 /**
  * Finds (by email) or creates the Stripe Customer for a checkout, so
  * repeat purchases attach to one customer record and its invoices stay
@@ -150,9 +209,19 @@ export function buildJobPostingPaymentDescription(title, organizationName) {
 export async function getOrCreateCustomer(stripe, email, name = null) {
   const existing = await stripe.customers.list({ email, limit: 1 });
   if (existing.data.length > 0) {
-    return existing.data[0].id;
+    const customer = existing.data[0];
+    // Stripe renders invoices in the customer's locale; customers created
+    // before German invoices keep English ones until this is set.
+    if (!customer.preferred_locales?.length) {
+      await stripe.customers.update(customer.id, { preferred_locales: [INVOICE_LOCALE] });
+    }
+    return customer.id;
   }
-  const created = await stripe.customers.create({ email, ...(name ? { name } : {}) });
+  const created = await stripe.customers.create({
+    email,
+    ...(name ? { name } : {}),
+    preferred_locales: [INVOICE_LOCALE],
+  });
   return created.id;
 }
 
@@ -161,13 +230,15 @@ export async function getOrCreateCustomer(stripe, email, name = null) {
  * SEPA settles asynchronously — webhook consumers must handle
  * checkout.session.async_payment_succeeded / _failed.
  *
- * EU bank transfer (customer_balance) was part of the 2026-07-10
- * agreement but is not offered: the capability needs additional
- * verification that the live account does not have, and Checkout
- * rejects the whole session when an unactivated type is listed. Adding
- * it back means one entry here plus its payment_method_options block
- * (funding_type 'bank_transfer', eu_bank_transfer country DE) and a
- * customer on the session. The longer-term direction is to stop
+ * EU bank transfer (customer_balance) is deliberately not offered in
+ * Checkout: Checkout rejects the whole session when an unactivated type is
+ * listed. StuJo employers who need to pay by transfer use "Kauf auf
+ * Rechnung" instead (publishJobPosting/invoicePayment.js), which issues a
+ * Stripe invoice with customer_balance and is limited to organizations an
+ * admin approved. Adding it here would mean one entry plus its
+ * payment_method_options block (funding_type 'bank_transfer',
+ * eu_bank_transfer country DE) and a customer on the session. The
+ * longer-term direction is to stop
  * hardcoding the list and pass a payment_method_configuration chosen
  * per course instead (issue #1889).
  *
@@ -175,8 +246,21 @@ export async function getOrCreateCustomer(stripe, email, name = null) {
  */
 export function buildPaymentMethodConfig(customerId = null) {
   const types = ['card', 'sepa_debit'];
+  // §14 UStG: the invoice must carry the buyer's full address. The tax ID
+  // is optional and lets a business buyer's USt-IdNr. print on the invoice.
+  const billing = {
+    billing_address_collection: 'required',
+    tax_id_collection: { enabled: true },
+  };
   if (!customerId) {
-    return { payment_method_types: types, customer_creation: 'always' };
+    return { payment_method_types: types, customer_creation: 'always', ...billing };
   }
-  return { customer: customerId, payment_method_types: types };
+  return {
+    customer: customerId,
+    payment_method_types: types,
+    ...billing,
+    // Stripe requires this for tax_id_collection on an existing customer;
+    // it also saves the entered address for the invoice.
+    customer_update: { name: 'auto', address: 'auto' },
+  };
 }

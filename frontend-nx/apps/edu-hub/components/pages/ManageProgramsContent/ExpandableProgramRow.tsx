@@ -48,6 +48,7 @@ import {
   loadParticipationDataVariables,
 } from '../../../queries/__generated__/loadParticipationData';
 import InputField from '../../inputs/InputField';
+import ProgramSessionsCard from './ProgramSessionsCard';
 import { Button } from '../../common/Button';
 import FileUploadField from '../../inputs/FileUploadField';
 import NotificationSnackbar from '../../common/dialogs/NotificationSnackbar';
@@ -438,6 +439,11 @@ const ExpandableProgramRow: FC<ExpandableProgramRowProps> = ({ program }) => {
               </div>
             </div>
           </div>
+
+          {/* Program-wide sessions, shown in every course of the program.
+              Degree course pages list courses instead of sessions, so degree
+              programs do not get any. */}
+          {program.type !== 'DEGREES' && <ProgramSessionsCard program={program} />}
         </div>
       </div>
     </div>

@@ -184,7 +184,9 @@ Branding/landing dimension — **not** job scoping (§2.4).
   `INTERNSHIP`, `THESIS`, `PERMANENT`, `TRAINEE`,
   `STATE_RECOGNITION_INTERNSHIP` (1:1 the Rails categories)
 - `status` FK → **`JobPostingStatus`**: `DRAFT`, `PENDING_PAYMENT`,
-  `PUBLISHED`, `EXPIRED`, `ARCHIVED`
+  `PUBLISHED`, `EXPIRED`, `ARCHIVED`, `DEACTIVATED` (employer took a published
+  posting offline; reactivatable via `setJobPostingActive` until `expiresAt`,
+  the window keeps running)
 - `region` FK → **`JobRegion`**: `FLENSBURG`, `KIEL`,
   `SCHLESWIG_HOLSTEIN_HAMBURG`, `GERMANY`, `DENMARK`, `ABROAD`
 - `occupation` FK → **`JobOccupation`** lookup (seed from Rails
@@ -256,7 +258,7 @@ unique(`userId`,`jobPostingId`). (Saved *companies* are dropped — low value.)
 
 ### Cron
 Add `expire_job_postings` to `backend/metadata/cron_triggers.yaml` (daily,
-alongside `check_attendance` etc.): flips `PUBLISHED` past `expiresAt` →
+alongside `check_attendance` etc.): flips `PUBLISHED`/`DEACTIVATED` past `expiresAt` →
 `EXPIRED` and sends the employer a reminder mail with a re-post link.
 Replaces both the Rails 2-month archiver and the `recurring` mechanism.
 

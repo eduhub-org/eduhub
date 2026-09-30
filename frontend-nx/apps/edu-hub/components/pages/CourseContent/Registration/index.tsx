@@ -11,7 +11,9 @@ import { RegistrationButton } from './RegistrationButton';
 import { RegistrationStatus } from './RegistrationStatus';
 import { RegistrationModal } from './RegistrationModal';
 import { GuestRegistrationModal } from './GuestRegistrationModal';
+import { ParticipationExitButton } from './ParticipationExitButton';
 import { useRegistrationHandler } from './hooks/useRegistrationHandler';
+import { ParticipationExitOutcome } from './participationExit';
 import { isRegistrationClosed } from './types';
 
 /**
@@ -30,6 +32,8 @@ interface RegistrationProps {
    * `waitlist` is true when the user was placed on the course waitlist (course full).
    */
   onRegistrationSuccess?: (info?: { waitlist: boolean }) => void;
+  /** Called after the user cancelled or aborted their own participation. */
+  onParticipationExit?: (outcome: ParticipationExitOutcome) => void;
 }
 
 /**
@@ -50,7 +54,12 @@ interface RegistrationProps {
  * @param props - The component props
  * @returns JSX element representing the registration interface
  */
-export const Registration: FC<RegistrationProps> = ({ course, courseEnrollment, onRegistrationSuccess }) => {
+export const Registration: FC<RegistrationProps> = ({
+  course,
+  courseEnrollment,
+  onRegistrationSuccess,
+  onParticipationExit,
+}) => {
   const isLoggedIn = useIsLoggedIn();
   const tGuest = useTranslations('guest');
   const [isGuestModalOpen, setIsGuestModalOpen] = useState(false);
@@ -89,6 +98,12 @@ export const Registration: FC<RegistrationProps> = ({ course, courseEnrollment, 
             ? () => registrationHandler.retryPayment(courseEnrollment.id)
             : undefined
           }
+        />
+        <ParticipationExitButton
+          courseEnrollment={courseEnrollment}
+          courseTitle={course.title ?? ''}
+          sessions={course.Sessions ?? null}
+          onExit={onParticipationExit}
         />
         {/* Always render modal so it can be opened for retry payment flow */}
         <RegistrationModal

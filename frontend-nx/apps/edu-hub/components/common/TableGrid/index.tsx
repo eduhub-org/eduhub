@@ -7,6 +7,7 @@ import { useRouter } from 'next/router';
 import { MdArrowBack, MdArrowForward, MdChevronRight } from 'react-icons/md';
 import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
 import {
+  CellContext,
   ColumnDef,
   flexRender,
   getCoreRowModel,
@@ -20,6 +21,53 @@ import { rankItem } from '@tanstack/match-sorter-utils';
 import AddButton from '../AddButton';
 import { useBulkActions } from './hooks';
 import TableGridDeleteButton from './components/TableGridDeleteButton';
+import { useMediaQuery } from '../../../hooks/useMediaQuery';
+
+/** Checkboxes follow the text colour of their surface instead of a brand accent. */
+const neutralCheckboxSx = {
+  color: 'var(--eduhub-label-primary)',
+  '&.Mui-checked, &.MuiCheckbox-indeterminate': {
+    color: 'var(--eduhub-label-primary)',
+  },
+};
+
+/** Outlined select on the dark page surface (bulk action, mobile sort). */
+const darkSelectSx = {
+  color: 'var(--eduhub-label-primary)',
+  backgroundColor: 'var(--eduhub-bg-card)',
+  '& .MuiOutlinedInput-notchedOutline': {
+    borderColor: 'var(--eduhub-border-primary)',
+  },
+  '&:hover .MuiOutlinedInput-notchedOutline': {
+    borderColor: 'var(--eduhub-border-secondary)',
+  },
+  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+    borderColor: 'var(--eduhub-brand)',
+  },
+  '& .MuiSvgIcon-root': {
+    color: 'var(--eduhub-label-primary)',
+  },
+};
+
+const darkSelectMenuProps = {
+  PaperProps: {
+    sx: {
+      backgroundColor: 'var(--eduhub-bg-card)',
+      color: 'var(--eduhub-label-primary)',
+    },
+  },
+};
+
+/**
+ * Renders a cell with a component type that never changes. flexRender mounts a cell function as its
+ * own component, so every new column definition (callers often rebuild columns from refetched data)
+ * remounted all cells: inputs lost focus mid-typing and their "saved" feedback vanished. Calling the
+ * cell function here keeps the same hooks per column while the DOM and state survive.
+ */
+const StableCell: React.FC<{ context: CellContext<any, unknown> }> = ({ context }) => {
+  const render = context.column.columnDef.cell;
+  return <>{typeof render === 'function' ? render(context) : render}</>;
+};
 
 /** Stable wrapper so expandable row content is not remounted when parent re-renders (e.g. after refetch). */
 const ExpandableRowWrapper: React.FC<{
@@ -85,7 +133,7 @@ const TableGridFilterSelect: React.FC<{ filter: TableGridFilter }> = ({ filter }
                 padding: '0 8px 0 0',
                 color: 'var(--eduhub-label-primary)',
                 '&.Mui-checked': {
-                  color: 'var(--eduhub-brand)',
+                  color: 'var(--eduhub-label-primary)',
                 },
               }}
             />
@@ -99,6 +147,7 @@ const TableGridFilterSelect: React.FC<{ filter: TableGridFilter }> = ({ filter }
 
 const TableGrid = <T extends BaseRow,>({
   addButtonText,
+  addButtonDisabledHint,
   data,
   columns,
   deleteMutation,
@@ -125,11 +174,14 @@ const TableGrid = <T extends BaseRow,>({
   sorting: externalSorting,
   onSortingChange: externalOnSortingChange,
   compactRows = false,
-  rounded = false,
+  renderMobileRow,
   preserveRowsWhileLoading = false,
   rowHref,
   onRowNavigate,
   canDeleteRow,
+  showDeleteForRow,
+  canExpandRow,
+  rowClassName,
   deleteVariableName = 'id',
   validateDeleteResult,
   onRowDelete,
@@ -170,6 +222,7 @@ const TableGrid = <T extends BaseRow,>({
   const [internalSorting, setInternalSorting] = useState<SortingState>([]);
   const settledPageRef = useRef<{
     data: T[];
+    columns: ColumnDef<T>[];
     pageIndex: number;
     pageSize: number;
     totalCount: number | undefined;
@@ -177,13 +230,16 @@ const TableGrid = <T extends BaseRow,>({
 
   useEffect(() => {
     if (!loading && !error) {
-      settledPageRef.current = { data, pageIndex, pageSize, totalCount };
+      settledPageRef.current = { data, columns, pageIndex, pageSize, totalCount };
     }
-  }, [data, error, loading, pageIndex, pageSize, totalCount]);
+  }, [columns, data, error, loading, pageIndex, pageSize, totalCount]);
 
   const retainedPage =
     preserveRowsWhileLoading && loading ? settledPageRef.current : null;
   const tableData = retainedPage?.data ?? data;
+  // Cell renderers can close over query data (e.g. attendance sessions).
+  // Keep them with the rows so loading cannot shrink the retained page.
+  const tableColumns = retainedPage?.columns ?? columns;
   const tablePageIndex = retainedPage?.pageIndex ?? pageIndex;
   const tablePageSize = retainedPage?.pageSize ?? pageSize;
   const tableTotalCount = retainedPage?.totalCount ?? totalCount;
@@ -209,6 +265,7 @@ const TableGrid = <T extends BaseRow,>({
   const {
     selectedRowIds,
     bulkAction,
+    isBulkActionPending,
     setBulkAction,
     toggleRowSelection,
     toggleAllRows,
@@ -251,6 +308,10 @@ const TableGrid = <T extends BaseRow,>({
 
   // Add this new function to handle the Select onChange event
   const handleSelectChange = (event: SelectChangeEvent<string>) => {
+    // A running action owns the selection until it finishes, so it is not interrupted.
+    if (isBulkActionPending) {
+      return;
+    }
     const selectedAction = event.target.value;
     const actionConfig = bulkActions.find((action) => action.value === selectedAction);
     const isDisabled =
@@ -263,7 +324,7 @@ const TableGrid = <T extends BaseRow,>({
     if (handleRowExpansionBulkAction(selectedAction)) {
       return;
     }
-    handleBulkActionChange(selectedAction, tableData);
+    void handleBulkActionChange(selectedAction, tableData);
   };
 
   const handlePrevious = () => {
@@ -306,41 +367,47 @@ const TableGrid = <T extends BaseRow,>({
                 checked={isAllSelected(tableData)}
                 indeterminate={isSomeSelected(tableData)}
                 onChange={() => toggleAllRows(tableData)}
-                sx={{
-                  color: 'var(--eduhub-label-primary)',
-                  '&.Mui-checked': {
-                    color: 'var(--eduhub-brand)',
-                  },
-                  '&.MuiCheckbox-indeterminate': {
-                    color: 'var(--eduhub-brand)',
-                  },
-                }}
+                sx={neutralCheckboxSx}
               />
             ),
             cell: ({ row }) => (
               <Checkbox
                 checked={selectedRowIds.has(row.original.id)}
                 onChange={() => toggleRowSelection(row.original.id)}
-                sx={{
-                  color: 'var(--eduhub-label-primary)',
-                  '&.Mui-checked': {
-                    color: 'var(--eduhub-brand)',
-                  },
-                }}
+                sx={neutralCheckboxSx}
               />
             ),
           },
         ]
       : [];
 
-    const dataColumns = columns.map((col) => ({
+    const dataColumns = tableColumns.map((col) => ({
       ...col,
       // Backward compatibility: convert meta.width to size if size is not specified
       size: col.size || (col.meta?.width ? col.meta.width * 100 : undefined),
     }));
     return [...selectionColumn, ...dataColumns];
-  }, [columns, showCheckbox, toggleRowSelection, selectedRowIds, toggleAllRows, tableData, isAllSelected, isSomeSelected]);
+  }, [tableColumns, showCheckbox, toggleRowSelection, selectedRowIds, toggleAllRows, tableData, isAllSelected, isSomeSelected]);
 
+
+  // Columns can opt out below a breakpoint (meta.hideBelow). Hidden columns also leave the row
+  // width calculation, so narrow screens do not scroll sideways for columns nobody sees.
+  // max-width queries start out false during SSR, i.e. everything is shown until measured.
+  const belowLg = useMediaQuery('(max-width: 1023px)');
+  const belowXl = useMediaQuery('(max-width: 1279px)');
+  const isPhone = useMediaQuery('(max-width: 767px)');
+  const useMobileCards = Boolean(renderMobileRow) && isPhone;
+  const columnVisibility = useMemo(() => {
+    const visibility: Record<string, boolean> = {};
+    columns.forEach((col) => {
+      const hideBelow = col.meta?.hideBelow;
+      const id = col.id ?? (col as { accessorKey?: string }).accessorKey;
+      if (hideBelow && id) {
+        visibility[id] = hideBelow === 'xl' ? !belowXl : !belowLg;
+      }
+    });
+    return visibility;
+  }, [columns, belowLg, belowXl]);
 
   const table = useReactTable({
     data: tableData,
@@ -359,6 +426,7 @@ const TableGrid = <T extends BaseRow,>({
     columnResizeMode: 'onChange',
     state: {
       sorting,
+      columnVisibility,
       globalFilter: searchFilter,
       ...(enablePagination && {
         pagination: { pageIndex: tablePageIndex, pageSize: tablePageSize },
@@ -427,6 +495,7 @@ const TableGrid = <T extends BaseRow,>({
         };
 
   const showToolbar = Boolean(onAddButtonClick) || showCheckbox || showGlobalSearchField || filters.length > 0;
+  const hasSelection = showCheckbox && selectedRowIds.size > 0;
 
   const toolbarClassName = 'flex flex-wrap justify-between items-center gap-3 mb-4';
 
@@ -435,10 +504,29 @@ const TableGrid = <T extends BaseRow,>({
         <div className="flex flex-wrap items-center gap-3">
           {onAddButtonClick && (
             <div className="text-label-primary">
-              <AddButton onClick={onAddButtonClick} title={addButtonText ?? ''} size="medium" />
+              <AddButton
+                onClick={onAddButtonClick}
+                title={addButtonText ?? ''}
+                size="medium"
+                disabled={Boolean(addButtonDisabledHint)}
+              />
+              {addButtonDisabledHint && (
+                <p className="mt-1 text-sm text-label-secondary">{addButtonDisabledHint}</p>
+              )}
             </div>
           )}
           {showCheckbox && (
+            // While rows are selected, the count, the action and "clear" read as one selection bar.
+            <div
+              className={`flex flex-wrap items-center gap-3 ${
+                hasSelection ? 'rounded-lg border border-border-primary bg-bg-card py-2 pl-3 pr-2' : ''
+              }`}
+            >
+            {hasSelection && (
+              <span className="text-sm font-semibold text-label-primary">
+                {t('common.table_grid.selected_count', { count: selectedRowIds.size })}
+              </span>
+            )}
             <FormControl variant="outlined" size="small" sx={{ minWidth: 200 }}>
               <InputLabel id="bulk-action-label" sx={{ color: 'var(--eduhub-label-primary)' }}>
                 {t('common.table_grid.bulk_action')}
@@ -447,31 +535,10 @@ const TableGrid = <T extends BaseRow,>({
                 labelId="bulk-action-label"
                 value={bulkAction}
                 onChange={handleSelectChange}
+                disabled={isBulkActionPending}
                 label={t('common.table_grid.bulk_action')}
-                sx={{
-                  color: 'var(--eduhub-label-primary)',
-                  backgroundColor: 'var(--eduhub-bg-card)',
-                  '& .MuiOutlinedInput-notchedOutline': {
-                    borderColor: 'var(--eduhub-border-primary)',
-                  },
-                  '&:hover .MuiOutlinedInput-notchedOutline': {
-                    borderColor: 'var(--eduhub-border-secondary)',
-                  },
-                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                    borderColor: 'var(--eduhub-brand)',
-                  },
-                  '& .MuiSvgIcon-root': {
-                    color: 'var(--eduhub-label-primary)',
-                  },
-                }}
-                MenuProps={{
-                  PaperProps: {
-                    sx: {
-                      backgroundColor: 'var(--eduhub-bg-card)',
-                      color: 'var(--eduhub-label-primary)',
-                    },
-                  },
-                }}
+                sx={darkSelectSx}
+                MenuProps={darkSelectMenuProps}
               >
                 <MenuItem value="" sx={{ color: 'var(--eduhub-label-primary)' }}>
                   <em>{t('common.table_grid.none')}</em>
@@ -524,6 +591,17 @@ const TableGrid = <T extends BaseRow,>({
                 }, [] as React.ReactNode[])}
               </Select>
             </FormControl>
+            {hasSelection && (
+              <button
+                type="button"
+                onClick={clearSelections}
+                disabled={isBulkActionPending}
+                className="text-sm underline text-label-secondary hover:text-label-primary disabled:opacity-50"
+              >
+                {t('common.table_grid.clear_selection')}
+              </button>
+            )}
+            </div>
           )}
           {filters.map((filter) => (
             <TableGridFilterSelect key={filter.id} filter={filter} />
@@ -537,7 +615,8 @@ const TableGrid = <T extends BaseRow,>({
             variant="outlined"
             size="small"
             sx={{
-              width: '16rem',
+              // Full width once the toolbar wraps on phones.
+              width: { xs: '100%', sm: '16rem' },
               backgroundColor: 'var(--eduhub-bg-card)',
               '& .MuiInputBase-input': {
                 color: 'var(--eduhub-label-primary)',
@@ -570,14 +649,19 @@ const TableGrid = <T extends BaseRow,>({
       </div>
   ) : null;
 
+  // Content width of a row, i.e. without the expand strip and the delete gutter.
+  const rowContentMinWidth =
+    mainRowContentWidth - (expandableRowComponent != null || navigateMode ? 40 : 0) - (showDeleteColumn ? 80 : 0);
+  const hasRowEndStrip = Boolean(expandableRowComponent || navigateMode);
+
+  // The table is a rounded frame: a header bar, white rows separated by divider lines, and a grey
+  // strip closing each row. The delete bin sits outside the frame, next to its row.
   const tableHeaderRow = (
-          <div className="flex items-center mb-1 bg-bg-primary text-label-primary py-2">
+    <div className="flex items-stretch">
+      <div className="flex-grow min-w-0 flex items-stretch rounded-t-xl overflow-hidden bg-bg-secondary text-label-secondary text-sm font-semibold">
         <div
           className={`flex-grow min-w-0 flex gap-3 ${!showCheckbox ? 'pl-3' : ''}`}
-          style={{
-            minWidth: `${mainRowContentWidth - (expandableRowComponent != null ? 40 : 0) - (showDeleteColumn ? 80 : 0)}px`,
-            width: '100%',
-          }}
+          style={{ minWidth: `${rowContentMinWidth}px`, width: '100%' }}
         >
           {table.getHeaderGroups().map((headerGroup) => (
             <React.Fragment key={headerGroup.id}>
@@ -613,9 +697,10 @@ const TableGrid = <T extends BaseRow,>({
             </React.Fragment>
           ))}
         </div>
-        {showDeleteColumn && <div className="w-20 flex-shrink-0" />}
-        {(expandableRowComponent || navigateMode) && <div className="w-10 flex-shrink-0" />}
+        {hasRowEndStrip && <div className="w-10 flex-shrink-0" />}
       </div>
+      {showDeleteColumn && <div className="w-20 flex-shrink-0" />}
+    </div>
   );
 
   const handleRowNavigate = useCallback(
@@ -632,179 +717,305 @@ const TableGrid = <T extends BaseRow,>({
     [onRowNavigate, rowHref, router]
   );
 
+  // When server-side sorting is enabled, pagination is also server-side
+  // Don't slice - data is already paginated by the server
+  // When server-side sorting is NOT enabled but pagination is enabled,
+  // we slice for client-side pagination (backward compatibility)
+  const rowsToDisplay =
+    enablePagination && !isServerSideSorting
+      ? table.getRowModel().rows.slice(tablePageIndex * tablePageSize, (tablePageIndex + 1) * tablePageSize)
+      : table.getRowModel().rows;
+  const showBody = (!loading || isShowingRetainedPage) && !error;
+
+  const renderDeleteButton = (row: T, label?: string) => (
+    <TableGridDeleteButton
+      deleteMutation={deleteMutation}
+      onDelete={onRowDelete ? () => onRowDelete(row) : undefined}
+      id={row.id}
+      idType={deleteIdType ?? 'number'}
+      role={role}
+      deleteVariableName={deleteVariableName}
+      disabled={canDeleteRow ? !canDeleteRow(row) : false}
+      validateDeleteResult={validateDeleteResult}
+      deletionConfirmationQuestion={
+        generateDeletionConfirmationQuestion ? generateDeletionConfirmationQuestion(row) : undefined
+      }
+      refetchQueries={refetchQueries}
+      label={label}
+    />
+  );
+
+  const rowHasDelete = (row: T) => showDeleteColumn && (!showDeleteForRow || showDeleteForRow(row));
+
+  const selectionCheckbox = (row: T) => (
+    <Checkbox
+      checked={selectedRowIds.has(row.id)}
+      onChange={() => toggleRowSelection(row.id)}
+      sx={neutralCheckboxSx}
+    />
+  );
+
   const tableBodyRows =
-    (!loading || isShowingRetainedPage) &&
-        !error &&
-        (() => {
-          // When server-side sorting is enabled, pagination is also server-side
-          // Don't slice - data is already paginated by the server
-          // When server-side sorting is NOT enabled but pagination is enabled,
-          // we slice for client-side pagination (backward compatibility)
-          const rowsToDisplay = enablePagination && !isServerSideSorting
-            ? table.getRowModel().rows.slice(
-                tablePageIndex * tablePageSize,
-                (tablePageIndex + 1) * tablePageSize
-              )
-            : table.getRowModel().rows;
-
-          const rowMarginClass = 'mb-1';
-
-          // If there are no rows, render an empty row
-          if (rowsToDisplay.length === 0) {
-            return (
-              <div className={`flex items-stretch ${rowMarginClass}`}>
-                <div className={`flex-grow min-w-0 overflow-hidden bg-bg-secondary text-label-primary light ${compactRows ? 'py-1' : 'py-2'}`}>
+    showBody &&
+    (() => {
+      // If there are no rows, render an empty row
+      if (rowsToDisplay.length === 0) {
+        return (
+          <div className="flex items-stretch">
+            <div className={`flex-grow min-w-0 overflow-hidden rounded-b-xl bg-fill-primary text-label-primary light ${compactRows ? 'py-1' : 'py-2'}`}>
+              <div
+                className={`flex items-center gap-3 ${!showCheckbox ? 'pl-3' : ''}`}
+                style={{ minWidth: `${rowContentMinWidth}px`, width: '100%' }}
+              >
+                {table.getHeaderGroups()[0]?.headers.map((header) => {
+                  const emptyAlignCenter = header.column.columnDef.meta?.align === 'center';
+                  return (
                   <div
-                    className={`flex items-center gap-3 ${!showCheckbox ? 'pl-3' : ''}`}
-                    style={{
-                      minWidth: `${mainRowContentWidth - (expandableRowComponent != null || navigateMode ? 40 : 0) - (showDeleteColumn ? 80 : 0)}px`,
-                      width: '100%',
-                    }}
+                    key={header.id}
+                    className={`flex items-center min-h-0 ${header.column.id === 'selection' ? '' : 'min-w-0'} ${emptyAlignCenter ? 'justify-center' : ''} ${header.column.columnDef.meta?.className || ''}`}
+                    style={getDataColumnStyle(header.column.id, header.getSize())}
                   >
-                    {table.getHeaderGroups()[0]?.headers.map((header) => {
-                      const emptyAlignCenter = header.column.columnDef.meta?.align === 'center';
-                      return (
-                      <div
-                        key={header.id}
-                        className={`flex items-center min-h-0 ${header.column.id === 'selection' ? '' : 'min-w-0'} ${emptyAlignCenter ? 'justify-center' : ''} ${header.column.columnDef.meta?.className || ''}`}
-                        style={getDataColumnStyle(header.column.id, header.getSize())}
-                      >
-                        <span className="text-label-secondary">-</span>
-                      </div>
-                    );})}
+                    <span className="text-label-secondary">-</span>
                   </div>
-                </div>
-                {(expandableRowComponent || navigateMode) && <div className="w-10 flex-shrink-0" />}
-                {showDeleteColumn && <div className="w-20 flex-shrink-0"></div>}
+                );})}
               </div>
-            );
-          }
+            </div>
+            {showDeleteColumn && <div className="w-20 flex-shrink-0"></div>}
+          </div>
+        );
+      }
 
-          // Otherwise, render the actual data rows
-          return rowsToDisplay.map((row, rowIndex) => {
-            const isLastRow = rowIndex === rowsToDisplay.length - 1;
-            const primaryRowMargin =
-              expandedRows.has(row.original.id) || (rounded && isLastRow)
-                ? 'mb-0'
-                : rowMarginClass;
+      // Otherwise, render the actual data rows
+      return rowsToDisplay.map((row, rowIndex) => {
+        const isLastRow = rowIndex === rowsToDisplay.length - 1;
+        const isExpanded = expandedRows.has(row.original.id);
+        const rowExpandable = canExpandRow ? canExpandRow(row.original) : true;
+        const rowSurface = selectedRowIds.has(row.original.id) ? 'bg-bg-secondary' : 'bg-fill-primary';
 
-            return (
-            <React.Fragment key={row.id}>
-              {/* Primary Row */}
-              <div className={`flex items-stretch ${primaryRowMargin}`}>
-                <div className={`flex-grow min-w-0 overflow-hidden bg-bg-secondary text-label-primary light ${compactRows ? 'py-1' : 'py-2'}`}>
-                  <div
-                    className={`flex items-center gap-3 ${!showCheckbox ? 'pl-3' : ''}`}
-                    style={{
-                      minWidth: `${mainRowContentWidth - (expandableRowComponent != null || navigateMode ? 40 : 0) - (showDeleteColumn ? 80 : 0)}px`,
-                      width: '100%',
-                    }}
-                  >
-                    {row.getVisibleCells().map((cell) => {
-                      const cellAlignCenter = cell.column.columnDef.meta?.align === 'center';
-                      return (
-                      <div
-                        key={cell.id}
-                        className={`flex items-center min-h-0 ${cell.column.id === 'selection' ? '' : 'min-w-0'} ${cellAlignCenter ? 'justify-center' : ''} ${cell.column.columnDef.meta?.className || ''}`}
-                        style={getDataColumnStyle(cell.column.id, cell.column.getSize())}
-                      >
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                      </div>
-                    );})}
-                  </div>
-                </div>
-                {/* Add expand/collapse button here */}
-                {navigateMode && !expandableRowComponent && (
-                  <div className="w-10 flex-shrink-0 flex items-stretch bg-gray-300">
-                    <button
-                      type="button"
-                      onClick={() => handleRowNavigate(row.original)}
-                      className="w-full flex items-center justify-center hover:bg-gray-400 transition-colors duration-200"
-                      aria-label="Open"
-                    >
-                      <MdChevronRight size={22} />
-                    </button>
-                  </div>
-                )}
-                {expandableRowComponent && (
-                  <div className="w-10 flex-shrink-0 flex items-stretch bg-gray-300">
-                    <button
-                      type="button"
-                      onClick={() => toggleRowExpansion(row.original.id)}
-                      className="w-full flex items-center justify-center hover:bg-gray-400 transition-colors duration-200"
-                    >
-                      {expandedRows.has(row.original.id) ? <IoIosArrowUp size={20} /> : <IoIosArrowDown size={20} />}
-                    </button>
-                  </div>
-                )}
-                {showDeleteColumn && (
-                  <div className="w-20 flex-shrink-0 flex items-center justify-center">
-                    <TableGridDeleteButton
-                      deleteMutation={deleteMutation}
-                      onDelete={onRowDelete ? () => onRowDelete(row.original) : undefined}
-                      id={row.original.id}
-                      idType={deleteIdType ?? 'number'}
-                      role={role}
-                      deleteVariableName={deleteVariableName}
-                      disabled={canDeleteRow ? !canDeleteRow(row.original) : false}
-                      validateDeleteResult={validateDeleteResult}
-                      deletionConfirmationQuestion={
-                        generateDeletionConfirmationQuestion
-                          ? generateDeletionConfirmationQuestion(row.original)
-                          : undefined
-                      }
-                      refetchQueries={refetchQueries}
-                    />
-                  </div>
-                )}
-              </div>
-              {/* Expandable Row */}
-              {expandableRowComponent && expandedRows.has(row.original.id) && (
-                <div className="flex items-stretch mb-1">
-                  <div className="flex-grow bg-bg-secondary text-label-primary py-2 overflow-x-auto light">
+        return (
+        <React.Fragment key={row.id}>
+          {/* Primary Row */}
+          <div className="flex items-stretch">
+            <div
+              className={`flex-grow min-w-0 flex items-stretch overflow-hidden light text-label-primary ${rowSurface} ${
+                rowIndex > 0 ? 'border-t border-table-divider' : ''
+              } ${isLastRow && !isExpanded ? 'rounded-b-xl' : ''} ${rowClassName?.(row.original) ?? ''}`}
+            >
+              <div className={`flex-grow min-w-0 ${compactRows ? 'py-1' : 'py-2'}`}>
+                <div
+                  className={`flex items-center gap-3 ${!showCheckbox ? 'pl-3' : ''}`}
+                  style={{ minWidth: `${rowContentMinWidth}px`, width: '100%' }}
+                >
+                  {row.getVisibleCells().map((cell) => {
+                    const cellAlignCenter = cell.column.columnDef.meta?.align === 'center';
+                    return (
                     <div
-                      className={`flex items-center gap-3 ${!showCheckbox ? 'pl-3' : ''}`}
-                      style={{
-                        minWidth: `${mainRowContentWidth - (expandableRowComponent != null || navigateMode ? 40 : 0) - (showDeleteColumn ? 80 : 0)}px`,
-                        width: '100%',
-                      }}
+                      key={cell.id}
+                      className={`flex items-center min-h-0 ${cell.column.id === 'selection' ? '' : 'min-w-0'} ${cellAlignCenter ? 'justify-center' : ''} ${cell.column.columnDef.meta?.className || ''}`}
+                      style={getDataColumnStyle(cell.column.id, cell.column.getSize())}
                     >
-                      <ExpandableRowWrapper
-                        key={`expandableRow-${row.id}`}
-                        renderFn={expandableRowComponent}
-                        row={row.original}
-                      />
+                      <StableCell context={cell.getContext()} />
                     </div>
-                  </div>
-                  {expandableRowComponent != null && <div className="w-10 flex-shrink-0"></div>}
-                  {showDeleteColumn && <div className="w-20 flex-shrink-0"></div>}
+                  );})}
+                </div>
+              </div>
+              {navigateMode && !expandableRowComponent && (
+                <div className="w-10 flex-shrink-0 flex items-stretch bg-table-expand">
+                  <button
+                    type="button"
+                    onClick={() => handleRowNavigate(row.original)}
+                    className="w-full flex items-center justify-center text-label-primary hover:bg-table-expand-hover transition-colors duration-200"
+                    aria-label={t('common.table_grid.open_row')}
+                  >
+                    <MdChevronRight size={22} />
+                  </button>
                 </div>
               )}
-            </React.Fragment>
+              {expandableRowComponent && !rowExpandable && <div className="w-10 flex-shrink-0" />}
+              {expandableRowComponent && rowExpandable && (
+                <div className="w-10 flex-shrink-0 flex items-stretch bg-table-expand">
+                  <button
+                    type="button"
+                    onClick={() => toggleRowExpansion(row.original.id)}
+                    aria-expanded={isExpanded}
+                    aria-label={t(isExpanded ? 'common.table_grid.collapse_row' : 'common.table_grid.expand_row')}
+                    className="w-full flex items-center justify-center text-label-primary hover:bg-table-expand-hover transition-colors duration-200"
+                  >
+                    {isExpanded ? <IoIosArrowUp size={20} /> : <IoIosArrowDown size={20} />}
+                  </button>
+                </div>
+              )}
+            </div>
+            {showDeleteColumn && (
+              <div className="w-20 flex-shrink-0 flex items-center justify-center">
+                {rowHasDelete(row.original) && renderDeleteButton(row.original)}
+              </div>
+            )}
+          </div>
+          {/* Expandable Row */}
+          {expandableRowComponent && rowExpandable && isExpanded && (
+            <div className="flex items-stretch">
+              <div
+                className={`flex-grow min-w-0 overflow-x-auto light bg-fill-primary text-label-primary border-t border-table-divider ${
+                  isLastRow ? 'rounded-b-xl' : ''
+                }`}
+              >
+                <div
+                  className="flex items-stretch"
+                  style={{ minWidth: `${mainRowContentWidth - (showDeleteColumn ? 80 : 0)}px`, width: '100%' }}
+                >
+                  <ExpandableRowWrapper
+                    key={`expandableRow-${row.id}`}
+                    renderFn={expandableRowComponent}
+                    row={row.original}
+                  />
+                </div>
+              </div>
+              {showDeleteColumn && <div className="w-20 flex-shrink-0"></div>}
+            </div>
+          )}
+        </React.Fragment>
+      );
+      });
+    })();
+
+  // Cards have no header row, so phones get its two jobs as explicit controls: select all, and sort.
+  const sortableColumns = table
+    .getAllLeafColumns()
+    .filter((column) => column.getCanSort() && typeof column.columnDef.header === 'string');
+  const currentSortValue = sorting[0] ? `${sorting[0].id}:${sorting[0].desc ? 'desc' : 'asc'}` : '';
+  const handleMobileSortChange = (event: SelectChangeEvent<string>) => {
+    const value = event.target.value;
+    const separator = value.lastIndexOf(':');
+    handleSortingChange(
+      separator < 0 ? [] : [{ id: value.slice(0, separator), desc: value.slice(separator + 1) === 'desc' }]
+    );
+  };
+  const mobileListControls =
+    showBody && rowsToDisplay.length > 0 && (showCheckbox || sortableColumns.length > 0) ? (
+      <div className="flex items-center justify-between gap-3 mb-2">
+        {showCheckbox ? (
+          <label className="flex items-center text-sm text-label-primary -ml-2 cursor-pointer">
+            <Checkbox
+              checked={isAllSelected(tableData)}
+              indeterminate={isSomeSelected(tableData)}
+              onChange={() => toggleAllRows(tableData)}
+              sx={neutralCheckboxSx}
+            />
+            {t('common.table_grid.select_all')}
+          </label>
+        ) : (
+          <span />
+        )}
+        {sortableColumns.length > 0 && (
+          <FormControl size="small" sx={{ minWidth: 0, maxWidth: '65%' }}>
+            <Select
+              value={currentSortValue}
+              displayEmpty
+              onChange={handleMobileSortChange}
+              inputProps={{ 'aria-label': t('common.table_grid.sort_by') }}
+              sx={darkSelectSx}
+              MenuProps={darkSelectMenuProps}
+            >
+              <MenuItem value="">{t('common.table_grid.sort_default')}</MenuItem>
+              {sortableColumns.flatMap((column) => {
+                const columnLabel = column.columnDef.header as string;
+                return [
+                  <MenuItem key={`${column.id}:asc`} value={`${column.id}:asc`}>
+                    {t('common.table_grid.sort_asc', { column: columnLabel })}
+                  </MenuItem>,
+                  <MenuItem key={`${column.id}:desc`} value={`${column.id}:desc`}>
+                    {t('common.table_grid.sort_desc', { column: columnLabel })}
+                  </MenuItem>,
+                ];
+              })}
+            </Select>
+          </FormControl>
+        )}
+      </div>
+    ) : null;
+
+  // Phones: tables that provide a card summary render one card per row instead of the grid.
+  const mobileCards =
+    showBody &&
+    (rowsToDisplay.length === 0 ? (
+      <div className="rounded-xl light bg-fill-primary text-label-secondary p-4 text-center">-</div>
+    ) : (
+      <div className="flex flex-col gap-2">
+        {rowsToDisplay.map((row) => {
+          const isExpanded = expandedRows.has(row.original.id);
+          const rowExpandable = Boolean(expandableRowComponent) && (canExpandRow ? canExpandRow(row.original) : true);
+          return (
+            <div
+              key={row.id}
+              className={`rounded-xl overflow-hidden light text-label-primary ${
+                selectedRowIds.has(row.original.id) ? 'bg-bg-secondary' : 'bg-fill-primary'
+              } ${rowClassName?.(row.original) ?? ''}`}
+            >
+              <div className="flex items-start gap-2 p-3">
+                {showCheckbox && <div className="-ml-2 -mt-2">{selectionCheckbox(row.original)}</div>}
+                <div className="flex-1 min-w-0">{renderMobileRow?.(row.original)}</div>
+                {rowExpandable && (
+                  <button
+                    type="button"
+                    onClick={() => toggleRowExpansion(row.original.id)}
+                    aria-expanded={isExpanded}
+                    aria-label={t(isExpanded ? 'common.table_grid.collapse_row' : 'common.table_grid.expand_row')}
+                    className="w-8 h-8 flex-shrink-0 rounded-lg flex items-center justify-center bg-table-expand hover:bg-table-expand-hover text-label-primary"
+                  >
+                    {isExpanded ? <IoIosArrowUp size={20} /> : <IoIosArrowDown size={20} />}
+                  </button>
+                )}
+                {navigateMode && !expandableRowComponent && (
+                  <button
+                    type="button"
+                    onClick={() => handleRowNavigate(row.original)}
+                    aria-label={t('common.table_grid.open_row')}
+                    className="w-8 h-8 flex-shrink-0 rounded-lg flex items-center justify-center bg-table-expand hover:bg-table-expand-hover text-label-primary"
+                  >
+                    <MdChevronRight size={22} />
+                  </button>
+                )}
+                {!rowExpandable && rowHasDelete(row.original) && renderDeleteButton(row.original)}
+              </div>
+              {rowExpandable && isExpanded && (
+                <div className="border-t border-table-divider">
+                  <ExpandableRowWrapper renderFn={expandableRowComponent!} row={row.original} />
+                  {rowHasDelete(row.original) && (
+                    <div className="border-t border-table-divider flex justify-center">
+                      {renderDeleteButton(row.original, t('common.table_grid_delete_button.delete'))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           );
-          });
-        })();
+        })}
+      </div>
+    ));
 
   return (
     <div className="min-w-0 max-w-full">
+      {/* The toolbar stays interactive while rows reload, so typing in the search field goes on. */}
+      {toolbar}
       <div className="relative" aria-busy={loading}>
         <div
           className={isShowingRetainedPage ? 'pointer-events-none opacity-60' : ''}
           inert={isShowingRetainedPage || undefined}
         >
-          {toolbar}
+          {useMobileCards ? (
+            <>
+              {mobileListControls}
+              {mobileCards}
+            </>
+          ) : (
           <div className="overflow-x-auto max-w-full">
             <div className="w-full" style={{ minWidth: `${mainRowContentWidth}px` }}>
               {tableHeaderRow}
-              {rounded ? (
-                <div className="rounded-2xl overflow-hidden border border-border-primary min-w-0">
-                  {tableBodyRows}
-                </div>
-              ) : (
-                tableBodyRows
-              )}
+              {tableBodyRows}
             </div>
           </div>
+          )}
 
           {/* Pagination */}
           {(!loading || isShowingRetainedPage) &&

@@ -14,7 +14,7 @@ import useErrorHandler from '../../hooks/useErrorHandler';
 import { AlertMessageDialog } from '../common/dialogs/AlertMessageDialog';
 import { ErrorMessageDialog } from '../common/dialogs/ErrorMessageDialog';
 import NotificationSnackbar from '../common/dialogs/NotificationSnackbar';
-import { gql } from 'graphql-tag';
+import { gql } from '@apollo/client';
 
 /**
  * InputField Component
@@ -538,6 +538,10 @@ const InputField: React.FC<InputFieldProps> = ({
     },
     [debouncedUpdateText, type, min]
   );
+
+  // A pending edit is saved right away when the field goes away (dialog closed, row collapsed,
+  // page left) instead of being dropped with the debounce timer.
+  useEffect(() => () => debouncedUpdateText.flush(), [debouncedUpdateText]);
 
   const handleBlur = useCallback(() => {
     setHasBlurred(true);

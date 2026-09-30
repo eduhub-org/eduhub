@@ -9,7 +9,8 @@ Automatically sends emails when course enrollment status changes. Triggered by H
 
 **Supported Status Changes:**
 - `APPLIED` → APPLICATION_RECEIVED email
-- `CONFIRMED` → APPLICATION_CONFIRMED email  
+- `CONFIRMED` → REGISTRATION_CONFIRMED for direct registration;
+  APPLICATION_CONFIRMED for application workflows
 - `INVITED` → INVITE email
 - `REJECTED` → DECLINE email
 - `REGISTERED` → REGISTRATION_CONFIRMED email
@@ -174,4 +175,4 @@ The tests are designed to be deterministic and can be run in CI/CD environments.
 
 - Describe blocks: Feature or component being tested
 - Test cases: "should [expected behavior] when [condition]"
-- Use clear, descriptive names that explain the test purpose 
+- Use clear, descriptive names that explain the test purpose

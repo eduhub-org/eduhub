@@ -8,10 +8,15 @@ export const ENROLLMENT_FRAGMENT = gql`
     id
     created_at
     status
+    isTest
     billingOrganizationId
     achievementCertificateURL
     attendanceCertificateURL
-    Invoices(limit: 1, order_by: { created_at: desc }) {
+    # Newest first, and deliberately unlimited: an enrollment can carry several
+    # invoices (a retry opens a second checkout session), so callers asking
+    # whether it was ever paid need all of them. Readers that want the most
+    # recent attempt still take the first element.
+    Invoices(order_by: { created_at: desc }) {
       id
       status
       stripeHostedInvoiceUrl

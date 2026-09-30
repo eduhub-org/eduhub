@@ -11,6 +11,7 @@ import { createServerApolloClient } from '../../config/apolloServer';
 import { COURSE_SEO } from '../../queries/courseSeo';
 import { getPublicImageUrl } from '../../helpers/filehandling';
 import { buildCourseStructuredData, StructuredDataCourse } from '../../helpers/courseStructuredData';
+import { requestOrigin } from '../../helpers/requestOrigin';
 
 const FALLBACK_TITLE = 'EduHub | opencampus.sh';
 const FALLBACK_IMAGE = 'https://edu.opencampus.sh/images/edu_WiSe2627_header_preview.jpg';
@@ -24,14 +25,6 @@ interface CoursePageProps {
   } | null;
   structuredData: Record<string, any> | null;
 }
-
-/** Origin of the current request, so staging and preview hosts stay self-consistent. */
-const requestOrigin = (context: GetServerSidePropsContext): string => {
-  const forwardedProto = context.req.headers['x-forwarded-proto'];
-  const proto = (Array.isArray(forwardedProto) ? forwardedProto[0] : forwardedProto)?.split(',')[0] ?? 'https';
-  const host = context.req.headers.host ?? 'edu.opencampus.sh';
-  return `${proto}://${host}`;
-};
 
 /**
  * The page's own data still loads client-side through Apollo. This fetch exists
@@ -55,7 +48,7 @@ const loadCourseSeo = async (context: GetServerSidePropsContext): Promise<Course
     const course = data?.Course_by_pk as StructuredDataCourse | null;
     if (!course) return empty;
 
-    const siteUrl = requestOrigin(context);
+    const siteUrl = requestOrigin(context.req);
     return {
       seo: {
         title: `${course.title} | EduHub`,

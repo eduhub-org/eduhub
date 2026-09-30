@@ -11,6 +11,7 @@ interface AddButtonProps {
   onClick: () => void;
   size?: ButtonSize;
   className?: string;
+  disabled?: boolean;
 }
 
 const AddButton: React.FC<AddButtonProps> = ({
@@ -18,6 +19,7 @@ const AddButton: React.FC<AddButtonProps> = ({
   onClick,
   size = 'medium',
   className,
+  disabled,
   ...rest
 }) => {
 
@@ -32,6 +34,7 @@ const AddButton: React.FC<AddButtonProps> = ({
     <Button
       filled
       onClick={onClick}
+      disabled={disabled}
       className={`flex items-center ${sizeClasses[size]} ${className || ''}`}
       {...rest}
     >

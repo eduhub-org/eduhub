@@ -94,7 +94,7 @@ const ManageExpertsContent: FC = () => {
   const t = useTranslations('manageExperts');
   const [pageSize, setPageSize] = useState(20);
 
-  const { data, loading, error, pageIndex, setPageIndex, searchFilter, setSearchFilter } = useTableGrid({
+  const { data, loading, initialLoading, error, pageIndex, setPageIndex, searchFilter, setSearchFilter } = useTableGrid({
     queryHook: useAdminQuery,
     query: EXPERTS_LIST,
     pageSize: pageSize,
@@ -153,8 +153,8 @@ const ManageExpertsContent: FC = () => {
   return (
     <PageBlock>
       <div className="max-w-screen-xl mx-auto mt-20">
-        {loading && <Loading />}
-        {!loading && !error && (
+        {initialLoading && <Loading />}
+        {!initialLoading && !error && (
           <div>
             <div className="flex justify-between items-center mb-4">
               <CommonPageHeader headline={t('headline')} />

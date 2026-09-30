@@ -58,7 +58,7 @@ export const ManageProgramsContent: FC<ManageProgramsContentProps> = ({ inSettin
   });
 
   // Use TableGrid hook with server-side sorting
-  const { data, loading, error, searchFilter, pageIndex, sorting, setSearchFilter, setPageIndex, setSorting } = useTableGrid({
+  const { data, loading, initialLoading, error, searchFilter, pageIndex, sorting, setSearchFilter, setPageIndex, setSorting } = useTableGrid({
     queryHook: useManageQuery,
     query: PROGRAM_LIST,
     queryVariables: filter,
@@ -179,6 +179,8 @@ export const ManageProgramsContent: FC<ManageProgramsContentProps> = ({ inSettin
         console.error(`Error during bulk ${action} action:`, error);
         setErrorMessage(t('notifications.bulk_action_failed', { action }));
         setShowErrorNotification(true);
+        // Rethrow so TableGrid keeps the rows selected for a retry.
+        throw error;
       }
     },
     [updatePublished, t]
@@ -359,7 +361,7 @@ export const ManageProgramsContent: FC<ManageProgramsContentProps> = ({ inSettin
     [setPageIndex]
   );
 
-  if (loading) {
+  if (initialLoading) {
     return <CircularProgress />;
   }
 

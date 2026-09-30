@@ -1,4 +1,4 @@
-import { FC, useCallback, useState } from 'react';
+import { FC, useCallback, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { MdCalendarMonth, MdCheck, MdIosShare } from 'react-icons/md';
 
@@ -8,7 +8,9 @@ import { useIsAdmin, useIsInstructor } from '../../../hooks/authentication';
 import UserCard from '../../common/UserCard';
 import { CourseFacts } from './CourseFacts';
 import { Registration } from './Registration';
+import { ParticipationExitOutcome } from './Registration/participationExit';
 import { useCourseCalendarExport, useSessionAddressMap } from './sessionLocations';
+import { mergeSessions } from '../../../helpers/programSessions';
 
 interface RegistrationRailProps {
   course: Course_Course_by_pk;
@@ -16,6 +18,7 @@ interface RegistrationRailProps {
   /** Whether the viewer may see online meeting links in the calendar export. */
   isLoggedInParticipant: boolean;
   onRegistrationSuccess?: (info?: { waitlist: boolean }) => void;
+  onParticipationExit?: (outcome: ParticipationExitOutcome) => void;
 }
 
 const Divider: FC = () => <div className="border-t border-border-primary my-6" />;
@@ -40,13 +43,17 @@ export const RegistrationRail: FC<RegistrationRailProps> = ({
   courseEnrollment,
   isLoggedInParticipant,
   onRegistrationSuccess,
+  onParticipationExit,
 }) => {
   const t = useTranslations('course');
   const isAdmin = useIsAdmin();
   const isInstructor = useIsInstructor();
   const [shareState, setShareState] = useState<'idle' | 'copied'>('idle');
 
-  const sessions = course.Sessions ?? [];
+  const sessions = useMemo(
+    () => mergeSessions(course.Sessions, course.Program?.Sessions),
+    [course.Sessions, course.Program?.Sessions]
+  );
   const addressMap = useSessionAddressMap(sessions);
   const handleExportICal = useCourseCalendarExport({
     sessions,
@@ -97,6 +104,7 @@ export const RegistrationRail: FC<RegistrationRailProps> = ({
         course={course}
         courseEnrollment={courseEnrollment}
         onRegistrationSuccess={onRegistrationSuccess}
+        onParticipationExit={onParticipationExit}
       />
 
       <Divider />

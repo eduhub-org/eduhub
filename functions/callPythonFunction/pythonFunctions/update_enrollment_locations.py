@@ -42,6 +42,8 @@ def update_enrollment_locations(arguments):
             Session(
                 where: {
                     endDateTime: {_gte: $timeThreshold}
+                    # Program-wide sessions have no course (and no course enrollments to update)
+                    courseId: {_is_null: false}
                 }
             ) {
                 id
@@ -87,6 +89,7 @@ def update_enrollment_locations(arguments):
         query GetEnrollments($courseIds: [Int!]!) {
             CourseEnrollment(
                 where: {
+                    isTest: {_eq: false},
                     courseId: {_in: $courseIds}
                 }
             ) {
