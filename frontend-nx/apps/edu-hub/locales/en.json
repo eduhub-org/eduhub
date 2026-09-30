@@ -1485,6 +1485,7 @@
       "send_rejections_all_count_plural": "{count} persons with red rating were identified and will be notified of their rejection for this course.",
       "send_rejections_confirm": "Send Rejections",
       "send_invitations_error": "Failed to send invitations: {error}",
+      "cancel_registrations_error": "The registrations could not be cancelled: {error}",
       "send_rejections_error": "Failed to send rejections: {error}",
       "no_eligible_invitations": "No applicants are eligible for an invitation right now (green rating with applied or invited status).",
       "manage_registrations": "Manage registrations",

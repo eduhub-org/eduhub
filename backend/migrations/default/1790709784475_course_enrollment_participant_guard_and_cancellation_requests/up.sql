@@ -180,6 +180,11 @@ BEGIN
   IF NEW.status = 'CONFIRMED'
      AND course_row."registrationType" IN ('DIRECT_CONFIRMATION', 'DIRECT_WITH_INPUT') THEN
     IF course_row."maxParticipants" IS NOT NULL THEN
+      -- Serialize registrations for the same course until commit, or two
+      -- concurrent ones could both see the last free place. An advisory lock
+      -- rather than FOR UPDATE on the Course row, so organizers editing the
+      -- course are not blocked by it.
+      PERFORM pg_advisory_xact_lock(hashtext('CourseEnrollmentCapacity'), NEW."courseId");
       -- Same count as course_active_participant_count; this row is not in it,
       -- being either new or CANCELLED.
       SELECT COUNT(*) INTO active_count

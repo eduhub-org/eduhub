@@ -1467,6 +1467,7 @@
       "send_rejections_all_count_plural": "{count} Personen mit roter Bewertung wurden identifiziert und werden über ihre Ablehnung für diesen Kurs informiert.",
       "send_rejections_confirm": "Ablehnungen senden",
       "send_invitations_error": "Fehler beim Senden der Einladungen: {error}",
+      "cancel_registrations_error": "Die Registrierungen konnten nicht storniert werden: {error}",
       "send_rejections_error": "Fehler beim Senden der Ablehnungen: {error}",
       "no_eligible_invitations": "Gerade gibt es niemanden mit grüner Bewertung und Status „beworben“ oder „eingeladen“, den du einladen könntest.",
       "manage_registrations": "Registrierungen verwalten",

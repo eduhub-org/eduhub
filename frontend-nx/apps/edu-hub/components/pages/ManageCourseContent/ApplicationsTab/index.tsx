@@ -604,6 +604,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
   // Cancelling registrations: the ids waiting for confirmation, null while no dialog is open.
   const [cancelEnrollmentIds, setCancelEnrollmentIds] = useState<number[] | null>(null);
   const [isCancellingEnrollments, setIsCancellingEnrollments] = useState(false);
+  const [cancelError, setCancelError] = useState<string | null>(null);
 
   const handleCloseCancelDialog = useCallback(() => {
     if (isCancellingEnrollments) return;
@@ -622,7 +623,12 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
       });
       cancelledCount = result.data?.update_CourseEnrollment?.affected_rows ?? 0;
     } catch (error) {
-      console.error('ApplicationsTab: cancelling registrations failed', error);
+      // A failed request is not "nothing eligible": say what went wrong, keep the rows selected.
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      setCancelError(t('bulk_actions.cancel_registrations_error', { error: errorMessage }));
+      setCancelEnrollmentIds(null);
+      dialogBulkAction.fail();
+      return;
     } finally {
       setIsCancellingEnrollments(false);
     }
@@ -1830,6 +1836,11 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
         errorMessage={rejectionError || ''}
         open={!!rejectionError}
         onClose={() => setRejectionError(null)}
+      />
+      <ErrorMessageDialog
+        errorMessage={cancelError || ''}
+        open={!!cancelError}
+        onClose={() => setCancelError(null)}
       />
       <NotificationSnackbar
         open={bulkNoticeOpen}
