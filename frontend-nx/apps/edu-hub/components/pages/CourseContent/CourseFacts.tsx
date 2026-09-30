@@ -25,6 +25,9 @@ interface FactProps {
   children: ReactNode;
 }
 
+/** Share of maxParticipants from which the participant count is shown. */
+const PARTICIPANT_COUNT_THRESHOLD = 0.8;
+
 /**
  * One fact of the panel: icon, what it is, what it says.
  *
@@ -177,7 +180,15 @@ export const CourseFacts: FC<IProps> = ({ course }) => {
     placesLeft != null &&
     placesLeft > 0 &&
     !isRegistrationClosed(course.applicationEnd);
-  const showsParticipantCount = !showsPlaces && participantCount > 0;
+  // A low count reads as an empty course and puts people (and partners) off,
+  // especially during the application phase, when applicants are not counted
+  // yet. So the count only appears once the course is at least 80% full; with
+  // no cap there is nothing to measure against, and it stays hidden.
+  const showsParticipantCount =
+    !showsPlaces &&
+    maxParticipants != null &&
+    participantCount > 0 &&
+    participantCount >= PARTICIPANT_COUNT_THRESHOLD * maxParticipants;
 
   // Build array of info elements to display
   const infoElements = useMemo(() => {
