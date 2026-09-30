@@ -2033,6 +2033,21 @@
       "label": "Allow registration without an account",
       "help_text": "Lets people register with just a name and email address, without creating an account. The registration only becomes valid once confirmed by email. Only available for events with direct registration."
     },
+    "instructor_confidentiality": {
+      "title": "Confidentiality of personal data",
+      "intro": "Before you manage your course, please confirm once that you will treat participants' personal data confidentially.",
+      "points": {
+        "access": "As an instructor you get access to personal data of participants and other users, for example names, email addresses, organizations, application documents and attendance.",
+        "purpose": "You use this data only to run your courses and events, and only as opencampus.sh intends.",
+        "no_disclosure": "You do not pass it on to anyone else and do not use it for your own purposes, such as your own mailing lists or advertising.",
+        "exports": "You keep exports and printouts (participant lists, attendance lists, name tags) safe and delete or shred them once the event is over.",
+        "incidents": "If data gets lost or misused, for example a list left behind, you tell the opencampus.sh team straight away.",
+        "duration": "This commitment continues after your time as an instructor ends."
+      },
+      "checkbox": "I have read this and commit to keeping personal data confidential.",
+      "accept": "Confirm",
+      "failed": "Your confirmation could not be saved. Please try again."
+    },
     "participant_export": {
       "button": "Export participants",
       "csv": "Participant list (CSV for Excel)",

@@ -2018,6 +2018,21 @@
       "label": "Anmeldung ohne Konto erlauben",
       "help_text": "Erlaubt die Anmeldung mit Name und E-Mail-Adresse, ohne dass ein Konto angelegt wird. Die Anmeldung wird erst nach Bestätigung per E-Mail gültig. Nur für Veranstaltungen mit direkter Anmeldung möglich."
     },
+    "instructor_confidentiality": {
+      "title": "Vertraulichkeit personenbezogener Daten",
+      "intro": "Bevor du deinen Kurs verwaltest, bestätige bitte einmalig, dass du die personenbezogenen Daten der Teilnehmenden vertraulich behandelst.",
+      "points": {
+        "access": "Als Kursleitung erhältst du Zugriff auf personenbezogene Daten von Teilnehmenden und anderen Nutzer:innen, zum Beispiel Namen, E-Mail-Adressen, Organisationen, Bewerbungsunterlagen und Anwesenheiten.",
+        "purpose": "Du verwendest diese Daten ausschließlich zur Durchführung deiner Kurse und Veranstaltungen und nur so, wie es opencampus.sh vorsieht.",
+        "no_disclosure": "Du gibst sie nicht an Dritte weiter und nutzt sie nicht für eigene Zwecke, etwa eigene Verteiler oder Werbung.",
+        "exports": "Exporte und Ausdrucke (Teilnahmelisten, Anwesenheitslisten, Namensschilder) bewahrst du sicher auf und löschst bzw. vernichtest sie nach der Veranstaltung.",
+        "incidents": "Gehen Daten verloren oder werden sie missbraucht, zum Beispiel eine liegen gelassene Liste, informierst du umgehend das Team von opencampus.sh.",
+        "duration": "Diese Verpflichtung gilt auch nach dem Ende deiner Tätigkeit als Kursleitung fort."
+      },
+      "checkbox": "Ich habe die Hinweise gelesen und verpflichte mich, personenbezogene Daten vertraulich zu behandeln.",
+      "accept": "Bestätigen",
+      "failed": "Deine Bestätigung konnte nicht gespeichert werden. Bitte versuch es noch einmal."
+    },
     "participant_export": {
       "button": "Teilnehmende exportieren",
       "csv": "Teilnahmeliste (CSV für Excel)",

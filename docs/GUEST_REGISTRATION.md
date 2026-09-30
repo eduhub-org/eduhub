@@ -88,6 +88,16 @@ when all of these hold:
 | Erasure on request | Self-service via the manage link in every mail. No login needed. Cancels any registration still ahead of them, then anonymizes the record. |
 | Marketing | Separate, unticked, never required. Recorded only after confirmation, then handed to Ghost for its own double opt-in. |
 
+### Who sees guest data
+
+Instructors read `User` / `CourseEnrollment` without a course filter
+(`instructor_access` uses `filter: {}`): the user search they use to add
+speakers, co-instructors and participants needs it. This is deliberate. It is
+covered organisationally rather than technically: before an instructor can use
+the manage-course page, they accept a confidentiality commitment once per text
+version (`InstructorConfidentialityGate`, stored in
+`InstructorConfidentialityAcceptance`). Admins skip it.
+
 ### Retention job
 
 `functions/callPythonFunction/pythonFunctions/anonymize_guest_data.py`, daily at
