@@ -92,6 +92,72 @@ select_permissions:
                     User:
                       id:
                         _eq: X-Hasura-User-Id
+  - role: org_admin_access
+    permission:
+      columns:
+        - id
+        - title
+        - url
+        - projectTypeValue
+        - isDefault
+        - createdByUserId
+        - created_at
+        - updated_at
+      filter:
+        _or:
+          - createdByUserId:
+              _is_null: true
+          - createdByUserId:
+              _eq: X-Hasura-User-Id
+          - isDefault:
+              _eq: true
+          - Projects:
+              _or:
+                - ProjectCourses:
+                    Course:
+                      Program:
+                        _or:
+                          - _and:
+                              - type:
+                                  _eq: EVENTS
+                              - Organization:
+                                  OrganizationAdmins:
+                                    _and:
+                                      - userId:
+                                          _eq: X-Hasura-User-Id
+                                      - canManageEvents:
+                                          _eq: true
+                          - _and:
+                              - type:
+                                  _eq: COURSES
+                              - Organization:
+                                  OrganizationAdmins:
+                                    _and:
+                                      - userId:
+                                          _eq: X-Hasura-User-Id
+                                      - canManageCourses:
+                                          _eq: true
+                          - _and:
+                              - type:
+                                  _eq: DEGREES
+                              - Organization:
+                                  OrganizationAdmins:
+                                    _and:
+                                      - userId:
+                                          _eq: X-Hasura-User-Id
+                                      - canManageDegrees:
+                                          _eq: true
+                          - Organization:
+                              OrganizationAdmins:
+                                _and:
+                                  - userId:
+                                      _eq: X-Hasura-User-Id
+                                  - canManageSettings:
+                                      _eq: true
+                - ProjectMentors:
+                    User:
+                      id:
+                        _eq: X-Hasura-User-Id
 insert_permissions:
   # createdByUserId is a preset, so Hasura removes it from this role's insert input
   # type: an instructor can neither forge ownership nor create a platform-wide
@@ -99,6 +165,14 @@ insert_permissions:
   # absent too: it may only ever come from the filePath the
   # saveProjectDocumentationInstruction action returns.
   - role: instructor_access
+    permission:
+      set:
+        createdByUserId: x-hasura-user-id
+      check: {}
+      columns:
+        - title
+        - projectTypeValue
+  - role: org_admin_access
     permission:
       set:
         createdByUserId: x-hasura-user-id
@@ -130,6 +204,23 @@ update_permissions:
               _eq: X-Hasura-User-Id
           - isDefault:
               _eq: false
+  - role: org_admin_access
+    permission:
+      columns:
+        - title
+        - url
+      filter:
+        _and:
+          - createdByUserId:
+              _eq: X-Hasura-User-Id
+          - isDefault:
+              _eq: false
+      check:
+        _and:
+          - createdByUserId:
+              _eq: X-Hasura-User-Id
+          - isDefault:
+              _eq: false
 delete_permissions:
   # Rollback path only. Creating is three non-atomic steps (insert -> upload -> set
   # url); when the upload fails the draft row has to go. Restricted to url IS NULL so
@@ -137,6 +228,16 @@ delete_permissions:
   # Project.documentationInstructionId is ON DELETE RESTRICT and referencing projects
   # must be reassigned to the type default first.
   - role: instructor_access
+    permission:
+      filter:
+        _and:
+          - createdByUserId:
+              _eq: X-Hasura-User-Id
+          - isDefault:
+              _eq: false
+          - url:
+              _is_null: true
+  - role: org_admin_access
     permission:
       filter:
         _and:

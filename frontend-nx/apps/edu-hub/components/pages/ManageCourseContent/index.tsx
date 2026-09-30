@@ -38,15 +38,11 @@ interface Props {
 
 interface CourseManagementProps extends Props {
   /**
-   * The viewer manages this course as an org admin (the page runs under org_admin). For now they
-   * get the description and the registrations; the other tabs need org_admin permissions that do
-   * not exist yet (sessions, locations, projects, attendance, certificates).
+   * The viewer manages this course as an org admin (the page runs under org_admin). They get every
+   * tab an instructor gets; only the participant preview stays with the course's own instructors.
    */
   manageAsOrgAdmin: boolean;
 }
-
-/** Tabs an org admin can use; see CourseManagementProps.manageAsOrgAdmin. */
-const ORG_ADMIN_TAB_INDICES = [0, 2];
 
 const determineTabClasses = (tabIndex: number, selectedTabIndex: number) =>
   tabIndex === selectedTabIndex
@@ -167,15 +163,14 @@ const CourseManagement: FC<CourseManagementProps> = ({ courseId, manageAsOrgAdmi
   const isDegreeCourse = course?.Program.type === ProgramType.DEGREES;
   const visibleTabIndices = useMemo(() => {
     if (course == null) return [0];
-    const tabs = [
+    return [
       0,
       ...(isDegreeCourse ? [] : [1]),
       ...(course.externalRegistrationLink ? [] : [2]),
       ...(course.externalRegistrationLink || isDegreeCourse ? [] : [3]),
       ...(isDegreeCourse ? [4] : []),
     ];
-    return manageAsOrgAdmin ? tabs.filter((tab) => ORG_ADMIN_TAB_INDICES.includes(tab)) : tabs;
-  }, [course, isDegreeCourse, manageAsOrgAdmin]);
+  }, [course, isDegreeCourse]);
 
   // A tab that is no longer shown (e.g. after an external registration link was set) never stays open.
   const isVisibleTab = (tabIndex: number | null): tabIndex is number =>
@@ -301,9 +296,7 @@ const CourseManagement: FC<CourseManagementProps> = ({ courseId, manageAsOrgAdmi
             ))}
           </div>
 
-          {openTabIndex === 0 && (
-            <DescriptionTab course={course} qResult={qResult} canEditLocations={!manageAsOrgAdmin} />
-          )}
+          {openTabIndex === 0 && <DescriptionTab course={course} qResult={qResult} />}
           {openTabIndex === 1 && <SessionsTab course={course} qResult={qResult} />}
           {openTabIndex === 2 && <ApplicationsTab course={course} manageAsOrgAdmin={manageAsOrgAdmin} />}
           {openTabIndex === 3 && <CourseParticipationsTab course={course} qResult={qResult} />}

@@ -20,3 +20,11 @@ select_permissions:
       filter:
         userId:
           _eq: X-Hasura-User-Id
+  - role: org_admin_access
+    permission:
+      columns:
+        - degreeCourseId
+        - userId
+        - ectsTotal
+        - attendedEventCount
+      filter: {}

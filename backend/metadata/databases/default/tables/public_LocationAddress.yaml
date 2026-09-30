@@ -39,6 +39,15 @@ insert_permissions:
         - address
         - description
         - aliases
+  - role: org_admin_access
+    permission:
+      check: {}
+      columns:
+        - locationOption
+        - shortLabel
+        - address
+        - description
+        - aliases
 select_permissions:
   - role: anonymous
     permission:
@@ -79,6 +88,19 @@ select_permissions:
         - updated_at
       filter: {}
       allow_aggregations: true
+  - role: org_admin_access
+    permission:
+      columns:
+        - id
+        - locationOption
+        - shortLabel
+        - address
+        - description
+        - aliases
+        - created_at
+        - updated_at
+      filter: {}
+      allow_aggregations: true
 update_permissions:
   - role: instructor_access
     permission:
@@ -98,10 +120,22 @@ update_permissions:
         - aliases
       filter: {}
       check: {}
+  - role: org_admin_access
+    permission:
+      columns:
+        - shortLabel
+        - address
+        - description
+        - aliases
+      filter: {}
+      check: {}
 delete_permissions:
   - role: instructor_access
     permission:
       filter: {}
   - role: user_access
+    permission:
+      filter: {}
+  - role: org_admin_access
     permission:
       filter: {}
