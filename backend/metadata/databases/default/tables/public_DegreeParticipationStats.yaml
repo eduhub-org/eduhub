@@ -1,6 +1,16 @@
 table:
   name: DegreeParticipationStats
   schema: public
+object_relationships:
+  - name: DegreeCourse
+    using:
+      manual_configuration:
+        column_mapping:
+          degreeCourseId: id
+        insertion_order: null
+        remote_table:
+          name: Course
+          schema: public
 select_permissions:
   - role: instructor_access
     permission:
@@ -20,3 +30,52 @@ select_permissions:
       filter:
         userId:
           _eq: X-Hasura-User-Id
+  # Only the degree courses the org admin may manage (the view has no row scope of its own).
+  - role: org_admin_access
+    permission:
+      columns:
+        - degreeCourseId
+        - userId
+        - ectsTotal
+        - attendedEventCount
+      filter:
+        DegreeCourse:
+          Program:
+            _or:
+              - _and:
+                  - type:
+                      _eq: EVENTS
+                  - Organization:
+                      OrganizationAdmins:
+                        _and:
+                          - userId:
+                              _eq: X-Hasura-User-Id
+                          - canManageEvents:
+                              _eq: true
+              - _and:
+                  - type:
+                      _eq: COURSES
+                  - Organization:
+                      OrganizationAdmins:
+                        _and:
+                          - userId:
+                              _eq: X-Hasura-User-Id
+                          - canManageCourses:
+                              _eq: true
+              - _and:
+                  - type:
+                      _eq: DEGREES
+                  - Organization:
+                      OrganizationAdmins:
+                        _and:
+                          - userId:
+                              _eq: X-Hasura-User-Id
+                          - canManageDegrees:
+                              _eq: true
+              - Organization:
+                  OrganizationAdmins:
+                    _and:
+                      - userId:
+                          _eq: X-Hasura-User-Id
+                      - canManageSettings:
+                          _eq: true

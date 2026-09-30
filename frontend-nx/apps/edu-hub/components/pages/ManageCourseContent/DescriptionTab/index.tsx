@@ -52,11 +52,9 @@ import MobileCollapsible from './MobileCollapsible';
 interface IProps {
   course: ManagedCourse_Course_by_pk;
   qResult: QueryResult<any, any>;
-  /** False for an org admin: CourseLocation / SessionAddress writes have no org_admin permission yet. */
-  canEditLocations?: boolean;
 }
 
-export const DescriptionTab: FC<IProps> = ({ course, qResult, canEditLocations = true }) => {
+export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
   const { error, handleError, resetError } = useErrorHandler();
   const t = useTranslations('manageCourse');
   const tCourse = useTranslations('course');
@@ -386,27 +384,23 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult, canEditLocations =
         </div>
       </div>
 
-      {canEditLocations && (
-        <>
-          <div>
-            {/* Phones show each location as a card, so the column headings only exist from md up. */}
-            {courseLocations.length > 0 && (
-              <div className="hidden md:grid grid-cols-12 text-label-primary px-2">
-                <div className="col-span-2">{t('location.label')}</div>
-                <div className="col-span-7">{t('address.label')}</div>
-              </div>
-            )}
-            {courseLocations.map((loc) => (
-              <Locations key={loc.id} location={loc} onDelete={handleDeleteCourseLocation} />
-            ))}
+      <div>
+        {/* Phones show each location as a card, so the column headings only exist from md up. */}
+        {courseLocations.length > 0 && (
+          <div className="hidden md:grid grid-cols-12 text-label-primary px-2">
+            <div className="col-span-2">{t('location.label')}</div>
+            <div className="col-span-7">{t('address.label')}</div>
           </div>
-          <div className="flex justify-start text-white">
-            <Button onClick={handleInsertCourseLocation} startIcon={<MdAddCircle />} color="inherit">
-              {t('add_new_location')}
-            </Button>
-          </div>
-        </>
-      )}
+        )}
+        {courseLocations.map((loc) => (
+          <Locations key={loc.id} location={loc} onDelete={handleDeleteCourseLocation} />
+        ))}
+      </div>
+      <div className="flex justify-start text-white">
+        <Button onClick={handleInsertCourseLocation} startIcon={<MdAddCircle />} color="inherit">
+          {t('add_new_location')}
+        </Button>
+      </div>
       {error && <ErrorMessageDialog errorMessage={error} open={!!error} onClose={resetError} />}
     </div>
   );

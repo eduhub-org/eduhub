@@ -1,10 +1,11 @@
 import { GraphQLClient } from 'graphql-request';
 import { sendSessionRescheduledEmails } from '../lib/sessionRescheduledEmail.js';
+import { ORG_ADMIN_ROLES, isOrgAdminOfCourse } from '../lib/orgAdminScope.js';
 
 // Request roles from session_variables, not the inherited-role names used in
 // actions.yaml: a request carries `instructor`/`admin`, Hasura maps it to
 // `instructor_access` internally.
-const ALLOWED_ROLES = new Set(['admin', 'instructor_access', 'instructor']);
+const ALLOWED_ROLES = new Set(['admin', 'instructor_access', 'instructor', ...ORG_ADMIN_ROLES]);
 const ADMIN_ROLES = new Set(['admin']);
 
 const GET_SESSION_FOR_NOTIFICATION = `
@@ -86,7 +87,12 @@ export default async function notifySessionParticipants(req, logger) {
     }
 
     const isInstructorOfCourse = (session.Course?.CourseInstructors || []).length > 0;
-    if (!ADMIN_ROLES.has(role) && !isInstructorOfCourse) {
+    // An org admin manages the course without instructing it (course management page).
+    const mayManage =
+      ADMIN_ROLES.has(role) ||
+      isInstructorOfCourse ||
+      (ORG_ADMIN_ROLES.has(role) && (await isOrgAdminOfCourse(client, userId, session.courseId)));
+    if (!mayManage) {
       logger.warn(`User ${userId} is not an instructor of course ${session.courseId}`);
       return {
         success: false,

@@ -106,6 +106,45 @@ describe('notifySessionParticipants', () => {
     expect(mockSendSessionRescheduledEmails).not.toHaveBeenCalled();
   });
 
+  const orgAdminGrants = (programType, grants) => ({
+    Course_by_pk: { Program: { type: programType, Organization: { OrganizationAdmins: grants } } },
+  });
+  const grant = (caps) => ({
+    canManageCourses: false,
+    canManageEvents: false,
+    canManageDegrees: false,
+    canManageSettings: false,
+    ...caps,
+  });
+
+  it('mails participants for an org admin who may manage the course', async () => {
+    mockGraphqlRequest
+      .mockResolvedValueOnce(session([]))
+      .mockResolvedValueOnce(orgAdminGrants('EVENTS', [grant({ canManageEvents: true })]));
+
+    const result = await notifySessionParticipants(
+      buildRequest({ role: 'org_admin', userId: STRANGER_ID }),
+      mockLogger
+    );
+
+    expect(result.success).toBe(true);
+    expect(mockSendSessionRescheduledEmails).toHaveBeenCalledTimes(1);
+  });
+
+  it('refuses an org admin without the capability for the program type', async () => {
+    mockGraphqlRequest
+      .mockResolvedValueOnce(session([]))
+      .mockResolvedValueOnce(orgAdminGrants('EVENTS', [grant({ canManageCourses: true })]));
+
+    const result = await notifySessionParticipants(
+      buildRequest({ role: 'org_admin', userId: STRANGER_ID }),
+      mockLogger
+    );
+
+    expect(result.messageKey).toBe('NOTIFY_SESSION_UNAUTHORIZED');
+    expect(mockSendSessionRescheduledEmails).not.toHaveBeenCalled();
+  });
+
   it('refuses a plain user role', async () => {
     const result = await notifySessionParticipants(
       buildRequest({ role: 'user', userId: INSTRUCTOR_ID }),
