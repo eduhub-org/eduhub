@@ -288,7 +288,9 @@ select_permissions:
   # Org admins with canManageSettings may read contact details of users they administer (and their
   # own record) when managing an organization's admin team on /manage/settings/access. status/updated_at
   # /zipCode/country are needed by the shared user-search picker (SelectUserDialog, also used to add
-  # course instructors); the row filter still masks these values for users they do not administer.
+  # course instructors). Admins holding a course, event, degree or settings capability read these
+  # columns for all users through the _exists branch below, as instructors do; job-board-only admins
+  # stay limited to themselves and their co-admins.
   - role: org_admin_access
     permission:
       columns:
