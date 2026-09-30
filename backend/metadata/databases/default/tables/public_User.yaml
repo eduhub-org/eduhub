@@ -545,23 +545,26 @@ select_permissions:
         - externalProfile
         - occupation
       filter:
-        _exists:
-          _table:
-            name: OrganizationAdmin
-            schema: public
-          _where:
-            _and:
-              - userId:
-                  _eq: X-Hasura-User-Id
-              - _or:
-                  - canManageCourses:
-                      _eq: true
-                  - canManageEvents:
-                      _eq: true
-                  - canManageDegrees:
-                      _eq: true
-                  - canManageSettings:
-                      _eq: true
+        _and:
+          - status:
+              _eq: ACTIVE
+          - _exists:
+              _table:
+                name: OrganizationAdmin
+                schema: public
+              _where:
+                _and:
+                  - userId:
+                      _eq: X-Hasura-User-Id
+                  - _or:
+                      - canManageCourses:
+                          _eq: true
+                      - canManageEvents:
+                          _eq: true
+                      - canManageDegrees:
+                          _eq: true
+                      - canManageSettings:
+                          _eq: true
       limit: 100
 update_permissions:
   - role: user_access
