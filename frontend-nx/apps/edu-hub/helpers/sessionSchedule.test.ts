@@ -8,6 +8,7 @@ import {
   lastSessionEnd,
   nextSessionStart,
   sessionDayKey,
+  sortCoursesByUpcoming,
   sortEventCoursesByUpcoming,
 } from './sessionSchedule';
 
@@ -202,6 +203,55 @@ describe('sortEventCoursesByUpcoming', () => {
 
   it('handles an empty list', () => {
     expect(sortEventCoursesByUpcoming([], now)).toEqual([]);
+  });
+});
+
+describe('sortCoursesByUpcoming', () => {
+  const now = new Date('2025-09-13T09:00:00Z');
+  const item = (id: string, type: string, sessions: { startDateTime: string; endDateTime: string | null }[]) => ({
+    id,
+    Program: { type },
+    Sessions: sessions,
+  });
+
+  it('interleaves events and courses by the date they next begin', () => {
+    const input = [
+      item('course-late', 'COURSES', [session('2025-10-20T08:00:00Z', '2025-10-20T10:00:00Z')]),
+      item('event-soon', 'EVENTS', [session('2025-09-14T08:00:00Z', '2025-09-14T10:00:00Z')]),
+      item('course-soon', 'COURSES', [session('2025-09-16T08:00:00Z', '2025-09-16T10:00:00Z')]),
+    ];
+    expect(sortCoursesByUpcoming(input, now).map((c) => c.id)).toEqual([
+      'event-soon',
+      'course-soon',
+      'course-late',
+    ]);
+  });
+
+  it('puts running courses after upcoming items, then finished, then undated', () => {
+    const input = [
+      item('undated', 'COURSES', []),
+      item('finished', 'EVENTS', [session('2025-09-01T08:00:00Z', '2025-09-01T10:00:00Z')]),
+      item('running', 'COURSES', [
+        session('2025-09-01T08:00:00Z', '2025-09-01T10:00:00Z'),
+        session('2025-09-20T08:00:00Z', '2025-09-20T10:00:00Z'),
+      ]),
+      item('upcoming', 'COURSES', [session('2025-10-01T08:00:00Z', '2025-10-01T10:00:00Z')]),
+    ];
+    expect(sortCoursesByUpcoming(input, now).map((c) => c.id)).toEqual([
+      'upcoming',
+      'running',
+      'finished',
+      'undated',
+    ]);
+  });
+
+  it('does not mutate its input', () => {
+    const input = [
+      item('b', 'COURSES', [session('2025-10-01T08:00:00Z')]),
+      item('a', 'COURSES', [session('2025-09-20T08:00:00Z')]),
+    ];
+    sortCoursesByUpcoming(input, now);
+    expect(input.map((c) => c.id)).toEqual(['b', 'a']);
   });
 });
 
