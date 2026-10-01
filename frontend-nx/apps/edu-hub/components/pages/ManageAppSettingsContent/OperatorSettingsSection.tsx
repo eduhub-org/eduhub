@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { useSession } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
@@ -26,6 +26,9 @@ const OperatorSettingsSection: FC = () => {
   const { data: sessionData } = useSession();
   const t = useTranslations('manageAppSettings');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  // Saving before the stored values are in the form would write them back as
+  // null, so editing stays off until the first successful load.
+  const [initialized, setInitialized] = useState(false);
 
   const methods = useForm<Inputs>({ defaultValues: { operatorName: '', privacyContactEmail: '' } });
   const {
@@ -34,19 +37,21 @@ const OperatorSettingsSection: FC = () => {
     reset,
   } = methods;
 
-  const { refetch } = useAdminQuery<AppSettings>(APP_SETTINGS, {
+  const { data, error, loading, refetch } = useAdminQuery<AppSettings>(APP_SETTINGS, {
     variables: { appName: 'edu' },
-    onCompleted: (data) => {
-      const [appSettings] = data.AppSettings;
-      if (appSettings) {
-        reset({
-          operatorName: appSettings.operatorName ?? '',
-          privacyContactEmail: appSettings.privacyContactEmail ?? '',
-        });
-      }
-    },
     skip: !sessionData,
   });
+
+  const appSettings = data?.AppSettings[0];
+  useEffect(() => {
+    if (appSettings && !initialized) {
+      reset({
+        operatorName: appSettings.operatorName ?? '',
+        privacyContactEmail: appSettings.privacyContactEmail ?? '',
+      });
+      setInitialized(true);
+    }
+  }, [appSettings, initialized, reset]);
 
   const [updateOperator] = useAdminMutation<UpdateOperator, UpdateOperatorVariables>(UPDATE_APP_SETTINGS_OPERATOR);
 
@@ -72,19 +77,33 @@ const OperatorSettingsSection: FC = () => {
         {t('operator.title')}
       </label>
       <p className="text-sm text-label-secondary mb-4">{t('operator.help')}</p>
+      {!initialized && error && !loading && (
+        <div className="mb-4 text-sm text-error">
+          {t('errorLoadingSettings')}{' '}
+          <button type="button" className="underline" onClick={() => refetch()}>
+            {t('retry')}
+          </button>
+        </div>
+      )}
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <FormFieldRow<Inputs> label={t('operator.operatorName')} name="operatorName" placeholder="opencampus.sh" />
+          <FormFieldRow<Inputs>
+            label={t('operator.operatorName')}
+            name="operatorName"
+            placeholder="opencampus.sh"
+            disabled={!initialized}
+          />
           <FormFieldRow<Inputs>
             label={t('operator.privacyContactEmail')}
             name="privacyContactEmail"
             type="email"
             placeholder="datenschutz@example.org"
+            disabled={!initialized}
           />
           <Button
             as="button"
             type="submit"
-            disabled={isSubmitting}
+            disabled={!initialized || isSubmitting}
             filled
             inverted
             className="mt-8 block mx-auto mb-5 disabled:opacity-50"

@@ -67,8 +67,12 @@ export const InstructorConfidentialityGate: FC<InstructorConfidentialityGateProp
       // A second click, or a second tab, hits the unique key; the refetch below
       // then finds the first acceptance, so only a real failure is reported.
     }
-    const result = await refetch();
-    if (!result.data?.InstructorConfidentialityAcceptance?.length) {
+    try {
+      const result = await refetch();
+      if (!result.data?.InstructorConfidentialityAcceptance?.length) {
+        setErrorMessage(t('failed'));
+      }
+    } catch {
       setErrorMessage(t('failed'));
     }
   }, [accept, refetch, t]);

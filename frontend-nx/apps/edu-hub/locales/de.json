@@ -2387,6 +2387,8 @@
     "saving": "Speichern...",
     "loading": "Wird geladen...",
     "errorSavingSettings": "Beim Speichern der Einstellungen ist ein Fehler aufgetreten. Bitte versuche es erneut.",
+    "errorLoadingSettings": "Die Einstellungen konnten nicht geladen werden.",
+    "retry": "Erneut versuchen",
     "course_groups": {
       "label": "Kursgruppierungen",
       "help_text": "Lege fest, welche Kursgruppierungen es gibt und in welcher Reihenfolge die als Slider markierten Gruppen auf der Startseite erscheinen. Die Gruppen \"Courses\", \"Events\" und \"Degrees\" werden automatisch aus den veröffentlichten Angeboten des jeweiligen Programmtyps befüllt. Zusätzliche Gruppen können angelegt und in einem Org-Widget ausgewählt werden, ohne auf der Startseite zu erscheinen.",

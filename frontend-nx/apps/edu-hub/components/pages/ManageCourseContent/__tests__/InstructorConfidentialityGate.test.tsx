@@ -74,6 +74,18 @@ describe('InstructorConfidentialityGate', () => {
     expect(screen.queryByText('failed')).not.toBeInTheDocument();
   });
 
+  it('reports a failure when the check after accepting fails', async () => {
+    const refetch = jest.fn().mockRejectedValue(new Error('network down'));
+    mockUseRoleQuery.mockReturnValue({ data: notAccepted, loading: false, refetch });
+
+    render(<InstructorConfidentialityGate>page content</InstructorConfidentialityGate>);
+    fireEvent.click(screen.getByRole('checkbox'));
+    fireEvent.click(screen.getByRole('button', { name: 'accept' }));
+
+    expect(await screen.findByText('failed')).toBeInTheDocument();
+    expect(screen.queryByText('page content')).not.toBeInTheDocument();
+  });
+
   it('names the configured operator and privacy contact', () => {
     mockAppSettings.operatorName = 'opencampus.sh';
     mockAppSettings.privacyContactEmail = 'datenschutz@example.org';

@@ -2407,6 +2407,8 @@
     "saving": "Saving...",
     "loading": "Loading...",
     "errorSavingSettings": "An error occurred while saving the settings. Please try again.",
+    "errorLoadingSettings": "The settings could not be loaded.",
+    "retry": "Try again",
     "timeZones": {
       "Europe/Berlin": "Berlin",
       "Europe/London": "London",

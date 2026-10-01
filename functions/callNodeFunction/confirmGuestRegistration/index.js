@@ -179,6 +179,18 @@ export default async function confirmGuestRegistration(req, logger) {
       return { success: false, messageKey: 'COURSE_FULL' };
     }
 
+    // Deferred from submission for the same reason as the newsletter consent:
+    // only the address owner may change what their participant records show.
+    // A blank field on the form never erases an earlier value. Written before
+    // the enrollment and the token use, so a failure here leaves the link
+    // retryable instead of spending it with the organization unapplied.
+    if (token.organizationName && token.organizationName !== token.User?.organizationName) {
+      await client.request(UPDATE_GUEST_ORGANIZATION, {
+        userId: token.userId,
+        organizationName: token.organizationName,
+      });
+    }
+
     // Recorded at confirmation rather than at submission: the registration only
     // legally exists once the address is confirmed, so that is when consent to
     // the terms takes effect.
@@ -189,16 +201,6 @@ export default async function confirmGuestRegistration(req, logger) {
     });
 
     await markConfirmTokenUsed(client, token.id);
-
-    // Deferred from submission for the same reason as the newsletter consent:
-    // only the address owner may change what their participant records show.
-    // A blank field on the form never erases an earlier value.
-    if (token.organizationName && token.organizationName !== token.User?.organizationName) {
-      await client.request(UPDATE_GUEST_ORGANIZATION, {
-        userId: token.userId,
-        organizationName: token.organizationName,
-      });
-    }
 
     if (token.newsletterOptIn && course.Program.organizationId) {
       await client.request(UPSERT_NEWSLETTER_SUBSCRIPTION, {
