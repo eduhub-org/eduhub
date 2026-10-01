@@ -408,12 +408,26 @@ resource "google_cloudfunctions2_function" "call_node_function" {
       version    = "latest"
     }
 
+    secret_environment_variables {
+      key        = "GUEST_TOKEN_SECRET"
+      project_id = var.project_id
+      secret     = google_secret_manager_secret.guest_token_secret.secret_id
+      version    = "latest"
+    }
+
     max_instance_count    = 20
     available_memory      = "512M"
     timeout_seconds       = 60
     ingress_settings      = var.cloud_function_ingress_settings
     service_account_email = google_service_account.custom_cloud_function_account.email
   }
+
+  # "latest" only resolves once a version exists and the service account may
+  # read it; without this the first apply can deploy the function too early.
+  depends_on = [
+    google_secret_manager_secret_version.guest_token_secret,
+    google_secret_manager_secret_iam_member.call_node_function_guest_token_secret,
+  ]
 }
 
 # Make sure the Cloud Function's service account can access all required secrets
@@ -457,6 +471,13 @@ resource "google_secret_manager_secret_iam_member" "call_node_function_ghost_enc
   role       = "roles/secretmanager.secretAccessor"
   member     = "serviceAccount:${google_service_account.custom_cloud_function_account.email}"
   depends_on = [google_secret_manager_secret.ghost_newsletter_credentials_encryption_key]
+}
+
+resource "google_secret_manager_secret_iam_member" "call_node_function_guest_token_secret" {
+  secret_id  = google_secret_manager_secret.guest_token_secret.id
+  role       = "roles/secretmanager.secretAccessor"
+  member     = "serviceAccount:${google_service_account.custom_cloud_function_account.email}"
+  depends_on = [google_secret_manager_secret.guest_token_secret]
 }
 
 
