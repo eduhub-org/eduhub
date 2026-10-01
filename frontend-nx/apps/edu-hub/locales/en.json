@@ -3281,6 +3281,7 @@
   },
   "eventsFeed": {
     "title": "EduHub Events | opencampus.sh",
-    "description": "Upcoming events at opencampus.sh"
+    "description": "Upcoming events at opencampus.sh",
+    "icalCategory": "Education"
   }
 }

@@ -128,6 +128,9 @@ const nextConfig = {
       // feed at /events/rss.xml arrives here as /de/events/rss.xml.
       { source: '/de/events/rss.xml', destination: '/api/events/rss', locale: false },
       { source: '/en/events/rss.xml', destination: '/api/events/rss?locale=en', locale: false },
+      // The same for the iCal feed that event portals import.
+      { source: '/de/events/calendar.ics', destination: '/api/events/ical', locale: false },
+      { source: '/en/events/calendar.ics', destination: '/api/events/ical?locale=en', locale: false },
     ];
   },
   async headers() {
