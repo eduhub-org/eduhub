@@ -1,6 +1,6 @@
 import { FC, useCallback, useState } from 'react';
 
-import { CourseRegistrationType_enum } from '../../../../__generated__/globalTypes';
+import { CourseEnrollmentStatus_enum, CourseRegistrationType_enum } from '../../../../__generated__/globalTypes';
 import { canRetryPayment } from '../../../../utils/invoicePaymentStatus';
 import { Course_Course_by_pk } from '../../../../queries/__generated__/Course';
 import { CourseWithEnrollment_Course_by_pk_CourseEnrollments } from '../../../../queries/__generated__/CourseWithEnrollment';
@@ -12,6 +12,7 @@ import { RegistrationStatus } from './RegistrationStatus';
 import { RegistrationModal } from './RegistrationModal';
 import { GuestRegistrationModal } from './GuestRegistrationModal';
 import { ParticipationExitButton } from './ParticipationExitButton';
+import { CancellationRequestButton } from './CancellationRequestButton';
 import { useRegistrationHandler } from './hooks/useRegistrationHandler';
 import { ParticipationExitOutcome } from './participationExit';
 import { isRegistrationClosed } from './types';
@@ -34,6 +35,8 @@ interface RegistrationProps {
   onRegistrationSuccess?: (info?: { waitlist: boolean }) => void;
   /** Called after the user cancelled or aborted their own participation. */
   onParticipationExit?: (outcome: ParticipationExitOutcome) => void;
+  /** Called after a participant of a paid course asked the organizers to cancel. */
+  onCancellationRequested?: (changed: boolean) => void;
 }
 
 /**
@@ -59,6 +62,7 @@ export const Registration: FC<RegistrationProps> = ({
   courseEnrollment,
   onRegistrationSuccess,
   onParticipationExit,
+  onCancellationRequested,
 }) => {
   const isLoggedIn = useIsLoggedIn();
   const tGuest = useTranslations('guest');
@@ -87,6 +91,41 @@ export const Registration: FC<RegistrationProps> = ({
     onSuccess: onRegistrationSuccess,
   });
 
+  // A cancellation is not the end of the road: while registration is open the
+  // participant can come back through the ordinary flow, which reuses this row.
+  // REJECTED and ABORTED stay final - the organizer's verdict, or a course
+  // already under way. The server enforces the same rule
+  // (course_enrollment_guard_participant_changes).
+  const canRegisterAgain =
+    courseEnrollment?.status === CourseEnrollmentStatus_enum.CANCELLED &&
+    !isRegistrationClosed(course.applicationEnd);
+
+  if (courseEnrollment && canRegisterAgain) {
+    return (
+      <div className="w-full">
+        <RegistrationStatus courseEnrollment={courseEnrollment} course={course} />
+        <div className="mt-4">
+          <RegistrationButton
+            course={course}
+            registrationType={course.registrationType || CourseRegistrationType_enum.APPROVAL_WITH_INPUT}
+            isCourseFull={isCourseFull}
+            onClick={registrationHandler.handleRegistration}
+          />
+        </div>
+        <RegistrationModal
+          visible={registrationHandler.isModalOpen}
+          closeModal={registrationHandler.closeModal}
+          course={course}
+          registrationType={registrationHandler.registrationType}
+          onSubmit={registrationHandler.submitRegistration}
+          isLoading={registrationHandler.isLoading}
+          retryEnrollmentId={registrationHandler.retryEnrollmentId}
+          isCourseFull={isCourseFull && !registrationHandler.retryEnrollmentId}
+        />
+      </div>
+    );
+  }
+
   // If user has an enrollment, show status
   if (courseEnrollment) {
     return (
@@ -104,6 +143,11 @@ export const Registration: FC<RegistrationProps> = ({
           courseTitle={course.title ?? ''}
           sessions={course.Sessions ?? null}
           onExit={onParticipationExit}
+        />
+        <CancellationRequestButton
+          courseEnrollment={courseEnrollment}
+          sessions={course.Sessions ?? null}
+          onRequested={onCancellationRequested}
         />
         {/* Always render modal so it can be opened for retry payment flow */}
         <RegistrationModal

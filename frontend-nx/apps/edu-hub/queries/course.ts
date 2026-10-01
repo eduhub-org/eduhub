@@ -61,6 +61,25 @@ export const COURSE_MINIMUM = gql`
 `;
 
 // Query to get the shell data needed for the initial manage course page.
+/**
+ * Whether the viewer may manage this course as an org admin: sent as org_admin with the
+ * useManageCourseWhere scope (the course's program type must match one of their capabilities), so
+ * it comes back empty for a course they may only read. The organizers tell the page whether the
+ * viewer instructs the course, in which case the instructor role keeps applying.
+ */
+export const ORG_ADMIN_MANAGEABLE_COURSE = gql`
+  query OrgAdminManageableCourse($where: Course_bool_exp!) {
+    Course(where: $where, limit: 1) {
+      id
+      CourseInstructors {
+        User {
+          id
+        }
+      }
+    }
+  }
+`;
+
 export const MANAGED_COURSE = gql`
   ${ADMIN_COURSE_FRAGMENT}
   ${ADMIN_SESSION_FRAGMENT}

@@ -1,5 +1,5 @@
 import { CourseEnrollmentStatus_enum } from '../../../../../__generated__/globalTypes';
-import { getParticipationExitKind } from '../participationExit';
+import { canRequestCancellation, getParticipationExitKind } from '../participationExit';
 
 /** A two-session course running 10-12 March, each session 10:00-12:00 UTC. */
 const sessions = [
@@ -150,5 +150,47 @@ describe('getParticipationExitKind', () => {
         now: at('2026-03-09T23:00:00Z'),
       })
     ).toBeNull();
+  });
+});
+
+describe('canRequestCancellation', () => {
+  const before = at('2026-03-09T23:00:00Z');
+
+  it('is offered for a paid enrollment that could otherwise be cancelled', () => {
+    expect(
+      canRequestCancellation({ status: CourseEnrollmentStatus_enum.CONFIRMED, sessions, hasPaidInvoice: true, now: before })
+    ).toBe(true);
+  });
+
+  it('is not offered without a payment - that enrollment is cancelled directly', () => {
+    expect(
+      canRequestCancellation({ status: CourseEnrollmentStatus_enum.CONFIRMED, sessions, hasPaidInvoice: false, now: before })
+    ).toBe(false);
+  });
+
+  it('is offered only once', () => {
+    expect(
+      canRequestCancellation({
+        status: CourseEnrollmentStatus_enum.CONFIRMED,
+        sessions,
+        hasPaidInvoice: true,
+        cancellationRequestedAt: '2026-03-01T10:00:00Z',
+        now: before,
+      })
+    ).toBe(false);
+  });
+
+  it('is not offered once the course is over or the enrollment has ended', () => {
+    expect(
+      canRequestCancellation({
+        status: CourseEnrollmentStatus_enum.CONFIRMED,
+        sessions,
+        hasPaidInvoice: true,
+        now: at('2026-03-13T00:00:00Z'),
+      })
+    ).toBe(false);
+    expect(
+      canRequestCancellation({ status: CourseEnrollmentStatus_enum.CANCELLED, sessions, hasPaidInvoice: true, now: before })
+    ).toBe(false);
   });
 });

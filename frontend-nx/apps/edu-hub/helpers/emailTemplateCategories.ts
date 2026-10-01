@@ -40,6 +40,8 @@ const CATEGORY_BY_TYPE: Record<string, EmailTemplateCategory> = {
   ENROLLMENT_CANCELLED: 'application',
   ENROLLMENT_ABORTED: 'application',
   PAYMENT_RECEIPT: 'application',
+  CANCELLATION_REQUEST_ORGANIZER: 'application',
+  CANCELLATION_REQUEST_CONFIRMATION: 'application',
   // End of the enrollment lifecycle: certificates signal course completion
   CERTIFICATE_ACHIEVEMENT_READY: 'application',
   CERTIFICATE_ATTENDANCE_READY: 'application',

@@ -580,6 +580,8 @@ export enum CourseEnrollment_select_column {
   achievementCertificateURL = "achievementCertificateURL",
   attendanceCertificateURL = "attendanceCertificateURL",
   billingOrganizationId = "billingOrganizationId",
+  cancellationRequestReason = "cancellationRequestReason",
+  cancellationRequestedAt = "cancellationRequestedAt",
   courseId = "courseId",
   created_at = "created_at",
   id = "id",
@@ -615,6 +617,8 @@ export enum CourseEnrollment_update_column {
   achievementCertificateURL = "achievementCertificateURL",
   attendanceCertificateURL = "attendanceCertificateURL",
   billingOrganizationId = "billingOrganizationId",
+  cancellationRequestReason = "cancellationRequestReason",
+  cancellationRequestedAt = "cancellationRequestedAt",
   courseId = "courseId",
   created_at = "created_at",
   id = "id",
@@ -1553,6 +1557,8 @@ export enum MailTemplateType_enum {
   APPLICATION_CONFIRMED = "APPLICATION_CONFIRMED",
   APPLICATION_RECEIVED = "APPLICATION_RECEIVED",
   APPLICATION_RECEIVED_PAID = "APPLICATION_RECEIVED_PAID",
+  CANCELLATION_REQUEST_CONFIRMATION = "CANCELLATION_REQUEST_CONFIRMATION",
+  CANCELLATION_REQUEST_ORGANIZER = "CANCELLATION_REQUEST_ORGANIZER",
   CERTIFICATE_ACHIEVEMENT_READY = "CERTIFICATE_ACHIEVEMENT_READY",
   CERTIFICATE_ATTENDANCE_READY = "CERTIFICATE_ATTENDANCE_READY",
   COURSE_CONTINUATION_INQUIRY = "COURSE_CONTINUATION_INQUIRY",
@@ -5027,6 +5033,8 @@ export interface CourseEnrollment_bool_exp {
   achievementCertificateURL?: String_comparison_exp | null;
   attendanceCertificateURL?: String_comparison_exp | null;
   billingOrganizationId?: Int_comparison_exp | null;
+  cancellationRequestReason?: String_comparison_exp | null;
+  cancellationRequestedAt?: timestamptz_comparison_exp | null;
   courseId?: Int_comparison_exp | null;
   created_at?: timestamptz_comparison_exp | null;
   id?: Int_comparison_exp | null;
@@ -5057,6 +5065,8 @@ export interface CourseEnrollment_insert_input {
   achievementCertificateURL?: string | null;
   attendanceCertificateURL?: string | null;
   billingOrganizationId?: number | null;
+  cancellationRequestReason?: string | null;
+  cancellationRequestedAt?: any | null;
   courseId?: number | null;
   created_at?: any | null;
   id?: number | null;
@@ -5078,6 +5088,8 @@ export interface CourseEnrollment_max_order_by {
   achievementCertificateURL?: order_by | null;
   attendanceCertificateURL?: order_by | null;
   billingOrganizationId?: order_by | null;
+  cancellationRequestReason?: order_by | null;
+  cancellationRequestedAt?: order_by | null;
   courseId?: order_by | null;
   created_at?: order_by | null;
   id?: order_by | null;
@@ -5095,6 +5107,8 @@ export interface CourseEnrollment_min_order_by {
   achievementCertificateURL?: order_by | null;
   attendanceCertificateURL?: order_by | null;
   billingOrganizationId?: order_by | null;
+  cancellationRequestReason?: order_by | null;
+  cancellationRequestedAt?: order_by | null;
   courseId?: order_by | null;
   created_at?: order_by | null;
   id?: order_by | null;
@@ -5138,6 +5152,8 @@ export interface CourseEnrollment_order_by {
   achievementCertificateURL?: order_by | null;
   attendanceCertificateURL?: order_by | null;
   billingOrganizationId?: order_by | null;
+  cancellationRequestReason?: order_by | null;
+  cancellationRequestedAt?: order_by | null;
   courseId?: order_by | null;
   created_at?: order_by | null;
   id?: order_by | null;

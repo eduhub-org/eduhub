@@ -1,8 +1,16 @@
 import { useTranslations } from 'next-intl';
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { useRoleMutation } from '../../../hooks/authedMutation';
-import { useRoleQuery } from '../../../hooks/authedQuery';
-import { MANAGED_COURSE, UPDATE_COURSE_STATUS } from '../../../queries/course';
+import { useOrgAdminQuery, useRoleQuery } from '../../../hooks/authedQuery';
+import { MANAGED_COURSE, ORG_ADMIN_MANAGEABLE_COURSE, UPDATE_COURSE_STATUS } from '../../../queries/course';
+import {
+  OrgAdminManageableCourse,
+  OrgAdminManageableCourseVariables,
+} from '../../../queries/__generated__/OrgAdminManageableCourse';
+import { ManagementRoleProvider } from '../../../hooks/managementRole';
+import { useManageCourseWhere } from '../../../hooks/manageScope';
+import { useUserId } from '../../../hooks/user';
+import { AuthRoles } from '../../../types/enums';
 import {
   ManagedCourse,
   ManagedCourseVariables,
@@ -20,7 +28,7 @@ import { DegreeParticipationsTab } from './DegreeParticipationsTab';
 import { ParticipantPreviewButton } from './ParticipantPreviewButton';
 import { ParticipantExportMenu } from './ParticipantExport/ParticipantExportMenu';
 import { InstructorConfidentialityGate } from './InstructorConfidentialityGate';
-import { useIsAdmin, useIsUserIdInList } from '../../../hooks/authentication';
+import { useIsAdmin, useIsOrgAdmin, useIsUserIdInList } from '../../../hooks/authentication';
 import { getRegistrationFeatures } from './ApplicationsTab/registrationConfig';
 import Loading from '../../common/Loading';
 import { ProgramType } from '../../../types/enums';
@@ -28,6 +36,14 @@ import { readLastOpenedTab, storeLastOpenedTab } from './lastOpenedTab';
 
 interface Props {
   courseId: number;
+}
+
+interface CourseManagementProps extends Props {
+  /**
+   * The viewer manages this course as an org admin (the page runs under org_admin). They get every
+   * tab an instructor gets; only the participant preview stays with the course's own instructors.
+   */
+  manageAsOrgAdmin: boolean;
 }
 
 const determineTabClasses = (tabIndex: number, selectedTabIndex: number) =>
@@ -63,7 +79,53 @@ const getNextCourseStatus = (course: ManagedCourse_Course_by_pk) => {
  *
  * @returns {any} the component
  */
+/**
+ * Picks the role the course is managed under, then renders it. Admins and the course's own
+ * instructors keep their session role, as before. An org admin who does not instruct the course
+ * manages it as org_admin - but only if its program type matches one of their capabilities: they
+ * can read every course of their organization, and would otherwise get a page on which every save
+ * fails.
+ */
 export const ManageCourseContent: FC<Props> = ({ courseId }) => {
+  const isAdmin = useIsAdmin();
+  const isOrgAdmin = useIsOrgAdmin();
+  const userId = useUserId();
+  const manageCourseWhere = useManageCourseWhere();
+  const checkAsOrgAdmin = isOrgAdmin && !isAdmin;
+
+  const variables = useMemo(
+    () => ({ where: { _and: [{ id: { _eq: courseId } }, manageCourseWhere] } }),
+    [courseId, manageCourseWhere]
+  );
+  const { data, loading } = useOrgAdminQuery<OrgAdminManageableCourse, OrgAdminManageableCourseVariables>(
+    ORG_ADMIN_MANAGEABLE_COURSE,
+    { variables, skip: !checkAsOrgAdmin }
+  );
+
+  if (checkAsOrgAdmin && (loading || !userId)) {
+    return (
+      <PageBlock>
+        <div className="min-h-[50vh] flex items-center justify-center">
+          <Loading />
+        </div>
+      </PageBlock>
+    );
+  }
+
+  const manageable = checkAsOrgAdmin ? data?.Course[0] : undefined;
+  const instructsCourse = !!manageable?.CourseInstructors.some((ci) => ci.User?.id === userId);
+
+  if (manageable && !instructsCourse) {
+    return (
+      <ManagementRoleProvider role={AuthRoles.org_admin}>
+        <CourseManagement courseId={courseId} manageAsOrgAdmin />
+      </ManagementRoleProvider>
+    );
+  }
+  return <CourseManagement courseId={courseId} manageAsOrgAdmin={false} />;
+};
+
+const CourseManagement: FC<CourseManagementProps> = ({ courseId, manageAsOrgAdmin }) => {
   const t = useTranslations('manageCourse');
   const managedCourseQueryOptions = useMemo(
     () => ({
@@ -80,7 +142,7 @@ export const ManageCourseContent: FC<Props> = ({ courseId }) => {
   );
 
   const isAdmin = useIsAdmin();
-  const instructorIds = qResult?.data?.Course_by_pk?.CourseInstructors.map((ci) => ci.User.id);
+  const instructorIds = qResult?.data?.Course_by_pk?.CourseInstructors.flatMap((ci) => (ci.User ? [ci.User.id] : []));
   const isInstructorOfCourse = useIsUserIdInList(instructorIds ?? []);
 
   if (qResult.error) {
@@ -195,7 +257,7 @@ export const ManageCourseContent: FC<Props> = ({ courseId }) => {
 
   // If the user is neither an admin nor an instructor for this course return empty div
   // (is equivalent to a non existing course)
-  if (!isAdmin && !isInstructorOfCourse) {
+  if (!isAdmin && !isInstructorOfCourse && !manageAsOrgAdmin) {
     return <div></div>;
   }
 
@@ -216,7 +278,8 @@ export const ManageCourseContent: FC<Props> = ({ courseId }) => {
         <div className="flex flex-wrap items-center gap-3">
           {/* Registrations only exist in EduHub when they are not handled elsewhere. */}
           {visibleTabIndices.includes(2) && <ParticipantExportMenu courseId={courseId} />}
-          <ParticipantPreviewButton courseId={courseId} />
+          {/* The preview action is for the course's own instructors. */}
+          {!manageAsOrgAdmin && <ParticipantPreviewButton courseId={courseId} />}
         </div>
       </div>
 
@@ -237,7 +300,7 @@ export const ManageCourseContent: FC<Props> = ({ courseId }) => {
 
       {openTabIndex === 0 && <DescriptionTab course={course} qResult={qResult} />}
       {openTabIndex === 1 && <SessionsTab course={course} qResult={qResult} />}
-      {openTabIndex === 2 && <ApplicationsTab course={course} />}
+      {openTabIndex === 2 && <ApplicationsTab course={course} manageAsOrgAdmin={manageAsOrgAdmin} />}
       {openTabIndex === 3 && <CourseParticipationsTab course={course} qResult={qResult} />}
       {openTabIndex === 4 && <DegreeParticipationsTab course={course} />}
     </>
@@ -249,8 +312,12 @@ export const ManageCourseContent: FC<Props> = ({ courseId }) => {
         {/* PageBlock drops its side margin from xl up, where a 1280px wide window would otherwise let
             the content touch the edges; from 2xl on the centred column has room of its own. */}
         <div className="max-w-screen-xl mx-auto mt-20 xl:px-12 2xl:px-0">
-          {/* Admins (opencampus.sh staff) skip this; instructors commit once. */}
-          {isAdmin ? pageBody : <InstructorConfidentialityGate>{pageBody}</InstructorConfidentialityGate>}
+          {/* Instructors commit once; admins (opencampus.sh staff) and org admins skip this. */}
+          {isAdmin || manageAsOrgAdmin ? (
+            pageBody
+          ) : (
+            <InstructorConfidentialityGate>{pageBody}</InstructorConfidentialityGate>
+          )}
         </div>
       </PageBlock>
       <QuestionConfirmationDialog

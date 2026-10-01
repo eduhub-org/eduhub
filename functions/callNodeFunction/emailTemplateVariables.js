@@ -258,6 +258,17 @@ export const EMAIL_VARIABLES = {
     '[OrganizationClaim:Verification]': { description: 'How the claim was verified, as a readable sentence rather than the raw enum', example: 'E-Mail-Domain stimmt mit der Website überein', categories: ['organizationclaim'] },
     '[OrganizationClaim:AdminUrl]': { description: 'Link to the admin screen where the grant can be reviewed or revoked', example: 'https://edu.opencampus.sh/manage/settings/access', categories: ['organizationclaim'] },
     '[OrganizationClaim:ContactEmail]': { description: 'The address responsible for StuJo enquiries, for the recipient to write to', example: 'stujo@opencampus.sh', categories: ['organizationclaim'] }
+  },
+
+  // Cancellation request of a paid enrollment (sendCancellationRequestEmail).
+  // [User:*] is the recipient - an organizer, or the participant for the
+  // confirmation - so the participant has their own keys here.
+  CANCELLATION_REQUEST: {
+    '[Cancellation:ParticipantName]': { description: 'Name of the participant asking to cancel', example: 'Alex Beispiel', categories: ['cancellationrequest'] },
+    '[Cancellation:ParticipantEmail]': { description: 'Their email address, so the organizer can reply directly', example: 'alex@beispiel.de', categories: ['cancellationrequest'] },
+    '[Cancellation:RequestedAt]': { description: 'When the cancellation was requested', example: '29.09.2026', categories: ['cancellationrequest'] },
+    '[Cancellation:Reason]': { description: 'Labelled block with the reason the participant gave; empty when they gave none', example: 'Begründung / Reason: ...', categories: ['cancellationrequest'] },
+    '[Cancellation:ManageLink]': { description: 'Link to the course management page with the applications', example: 'https://edu.opencampus.sh/manage/course/123', categories: ['cancellationrequest'] }
   }
 };
 
@@ -445,6 +456,23 @@ export function createVariableReplacer(data, formatDate) {
       .replaceAll('[Session:Duration]', data.session?.duration || '')
       .replaceAll('[Session:ReminderText]', data.session?.reminderText || '')
       .replaceAll('[Session:ReminderTime]', data.session?.reminderTime || '');
+
+    // Cancellation request variables. The reason is participant-authored text,
+    // so it is substituted last - never rescanned for the placeholders above -
+    // and as a labelled block that disappears when no reason was given.
+    const cancellationReason = (data.cancellation?.reason || '').trim();
+    let cancellationReasonBlock = '';
+    if (cancellationReason) {
+      cancellationReasonBlock = isHtml
+        ? `<p><strong>Begründung / Reason:</strong><br>${escapeHtml(cancellationReason).replaceAll('\n', '<br>')}</p>`
+        : cancellationReason.replace(/\s+/g, ' ');
+    }
+    result = result
+      .replaceAll('[Cancellation:ParticipantName]', escape(data.cancellation?.participantName || ''))
+      .replaceAll('[Cancellation:ParticipantEmail]', escape(data.cancellation?.participantEmail || ''))
+      .replaceAll('[Cancellation:RequestedAt]', data.cancellation?.requestedAt ? formatDate(data.cancellation.requestedAt) : '')
+      .replaceAll('[Cancellation:ManageLink]', data.cancellation?.manageLink || '')
+      .replaceAll('[Cancellation:Reason]', cancellationReasonBlock);
     
     return result;
   };
@@ -478,6 +506,22 @@ export function createOrganizationClaimVariableReplacer(organization, claim) {
     organization,
     organizationClaim: claim,
   });
+}
+
+/**
+ * Convenience function for the cancellation request emails
+ * @param {Object} recipientUser - Recipient ({ firstName, lastName }): an organizer, or the participant
+ * @param {Object} course - Course data ({ id, title })
+ * @param {Object} cancellation - ({ participantName, participantEmail, requestedAt, reason, manageLink })
+ * @param {Function} formatDate - Date formatting function
+ * @returns {Function} Variable replacement function
+ */
+export function createCancellationRequestVariableReplacer(recipientUser, course, cancellation, formatDate) {
+  return createVariableReplacer({
+    user: recipientUser,
+    course,
+    cancellation,
+  }, formatDate);
 }
 
 /**

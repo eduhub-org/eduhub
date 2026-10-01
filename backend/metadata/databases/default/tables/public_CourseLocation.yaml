@@ -41,6 +41,64 @@ insert_permissions:
         - defaultSessionAddressId
         - id
         - locationOption
+  - role: org_admin_access
+    permission:
+      check:
+        _and:
+          - Course:
+              Program:
+                _or:
+                  - _and:
+                      - type:
+                          _eq: EVENTS
+                      - Organization:
+                          OrganizationAdmins:
+                            _and:
+                              - userId:
+                                  _eq: X-Hasura-User-Id
+                              - canManageEvents:
+                                  _eq: true
+                  - _and:
+                      - type:
+                          _eq: COURSES
+                      - Organization:
+                          OrganizationAdmins:
+                            _and:
+                              - userId:
+                                  _eq: X-Hasura-User-Id
+                              - canManageCourses:
+                                  _eq: true
+                  - _and:
+                      - type:
+                          _eq: DEGREES
+                      - Organization:
+                          OrganizationAdmins:
+                            _and:
+                              - userId:
+                                  _eq: X-Hasura-User-Id
+                              - canManageDegrees:
+                                  _eq: true
+                  - Organization:
+                      OrganizationAdmins:
+                        _and:
+                          - userId:
+                              _eq: X-Hasura-User-Id
+                          - canManageSettings:
+                              _eq: true
+          - _or:
+              - defaultSessionAddressId:
+                  _is_null: true
+              - DefaultSessionAddress:
+                  locationOption:
+                    _ceq:
+                      - $
+                      - locationOption
+      columns:
+        - courseId
+        - defaultSessionAddress
+        - defaultSessionAddressId
+        - id
+        - locationOption
 select_permissions:
   - role: anonymous
     permission:
@@ -87,6 +145,104 @@ update_permissions:
                 _ceq:
                   - $
                   - locationOption
+  - role: org_admin_access
+    permission:
+      columns:
+        - courseId
+        - defaultSessionAddress
+        - defaultSessionAddressId
+        - locationOption
+      filter:
+        Course:
+          Program:
+            _or:
+              - _and:
+                  - type:
+                      _eq: EVENTS
+                  - Organization:
+                      OrganizationAdmins:
+                        _and:
+                          - userId:
+                              _eq: X-Hasura-User-Id
+                          - canManageEvents:
+                              _eq: true
+              - _and:
+                  - type:
+                      _eq: COURSES
+                  - Organization:
+                      OrganizationAdmins:
+                        _and:
+                          - userId:
+                              _eq: X-Hasura-User-Id
+                          - canManageCourses:
+                              _eq: true
+              - _and:
+                  - type:
+                      _eq: DEGREES
+                  - Organization:
+                      OrganizationAdmins:
+                        _and:
+                          - userId:
+                              _eq: X-Hasura-User-Id
+                          - canManageDegrees:
+                              _eq: true
+              - Organization:
+                  OrganizationAdmins:
+                    _and:
+                      - userId:
+                          _eq: X-Hasura-User-Id
+                      - canManageSettings:
+                          _eq: true
+      check:
+        _and:
+          - Course:
+              Program:
+                _or:
+                  - _and:
+                      - type:
+                          _eq: EVENTS
+                      - Organization:
+                          OrganizationAdmins:
+                            _and:
+                              - userId:
+                                  _eq: X-Hasura-User-Id
+                              - canManageEvents:
+                                  _eq: true
+                  - _and:
+                      - type:
+                          _eq: COURSES
+                      - Organization:
+                          OrganizationAdmins:
+                            _and:
+                              - userId:
+                                  _eq: X-Hasura-User-Id
+                              - canManageCourses:
+                                  _eq: true
+                  - _and:
+                      - type:
+                          _eq: DEGREES
+                      - Organization:
+                          OrganizationAdmins:
+                            _and:
+                              - userId:
+                                  _eq: X-Hasura-User-Id
+                              - canManageDegrees:
+                                  _eq: true
+                  - Organization:
+                      OrganizationAdmins:
+                        _and:
+                          - userId:
+                              _eq: X-Hasura-User-Id
+                          - canManageSettings:
+                              _eq: true
+          - _or:
+              - defaultSessionAddressId:
+                  _is_null: true
+              - DefaultSessionAddress:
+                  locationOption:
+                    _ceq:
+                      - $
+                      - locationOption
 delete_permissions:
   - role: instructor_access
     permission:
@@ -96,3 +252,46 @@ delete_permissions:
             User:
               id:
                 _eq: X-Hasura-User-Id
+  - role: org_admin_access
+    permission:
+      filter:
+        Course:
+          Program:
+            _or:
+              - _and:
+                  - type:
+                      _eq: EVENTS
+                  - Organization:
+                      OrganizationAdmins:
+                        _and:
+                          - userId:
+                              _eq: X-Hasura-User-Id
+                          - canManageEvents:
+                              _eq: true
+              - _and:
+                  - type:
+                      _eq: COURSES
+                  - Organization:
+                      OrganizationAdmins:
+                        _and:
+                          - userId:
+                              _eq: X-Hasura-User-Id
+                          - canManageCourses:
+                              _eq: true
+              - _and:
+                  - type:
+                      _eq: DEGREES
+                  - Organization:
+                      OrganizationAdmins:
+                        _and:
+                          - userId:
+                              _eq: X-Hasura-User-Id
+                          - canManageDegrees:
+                              _eq: true
+              - Organization:
+                  OrganizationAdmins:
+                    _and:
+                      - userId:
+                          _eq: X-Hasura-User-Id
+                      - canManageSettings:
+                          _eq: true

@@ -1,5 +1,7 @@
 import { gql } from 'graphql-request';
 
+import { buildServicePeriodField } from '../lib/stripeTax.js';
+
 /**
  * "Kauf auf Rechnung" for StuJo job postings.
  *
@@ -165,6 +167,8 @@ export function normalizeBillingInput(input) {
   return { billing, error: null };
 }
 
+const buildReferenceFields = (reference) => (reference ? [{ name: 'Bestellnummer', value: reference }] : []);
+
 /**
  * Parameters for the draft Stripe invoice. auto_advance stays false so a
  * draft left behind by a failed request is never finalized or mailed by
@@ -194,7 +198,7 @@ export function buildBankTransferInvoiceParams({
         },
       },
     },
-    ...(reference ? { custom_fields: [{ name: 'Bestellnummer', value: reference }] } : {}),
+    ...(reference ? { custom_fields: buildReferenceFields(reference) } : {}),
     ...(footer ? { footer } : {}),
     ...(description ? { description } : {}),
     metadata: { ...metadata, paymentMethod: 'INVOICE' },
@@ -346,6 +350,15 @@ async function recordAndFinalize({ stripe, client, draft, totals, currency, refe
     stripeInvoiceId: draft.id,
     notes: reference ? `Bestellnummer: ${reference}` : null,
   });
+
+  // The runtime is only known once `publish` ran, so the service period is
+  // added to the draft here, next to the Bestellnummer, before finalizing.
+  const servicePeriod = buildServicePeriodField(publishResult?.publishedAt, publishResult?.expiresAt);
+  if (servicePeriod) {
+    await stripe.invoices.update(draft.id, {
+      custom_fields: [...buildReferenceFields(reference), servicePeriod],
+    });
+  }
 
   const finalized = await stripe.invoices.finalizeInvoice(draft.id, { auto_advance: false });
   await client.request(BACKFILL_INVOICE_DOCUMENT, {

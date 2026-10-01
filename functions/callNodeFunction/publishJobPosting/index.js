@@ -886,7 +886,17 @@ export default async function publishJobPosting(req, logger) {
       // checkout.session.async_payment_* events.
       ...buildPaymentMethodConfig(customerId),
       // Stripe issues a real, sequentially numbered invoice (§14 UStG).
-      invoice_creation: buildInvoiceCreation(sellerOrganization),
+      // The webhook publishes when the session completes, which is also when
+      // Stripe dates the invoice; dates fixed now would be off by however
+      // long the employer takes to pay, and the field cannot change later.
+      invoice_creation: buildInvoiceCreation(sellerOrganization, {
+        customFields: [{ name: 'Leistungszeitraum', value: `${durationDays} Tage ab Rechnungsdatum` }],
+        metadata: {
+          jobPostingId: String(posting.id),
+          organizationId: String(posting.organizationId),
+          source: 'stujo',
+        },
+      }),
       success_url: `${frontendUrl}/mein-stujo?payment=success&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${frontendUrl}/mein-stujo?payment=cancelled&posting=${posting.id}`,
       metadata: {

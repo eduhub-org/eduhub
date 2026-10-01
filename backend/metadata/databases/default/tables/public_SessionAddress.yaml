@@ -30,52 +30,95 @@ insert_permissions:
   - role: org_admin_access
     permission:
       check:
-        Session:
-          Program:
-            _or:
-              - _and:
-                  - type:
-                      _eq: EVENTS
+        _or:
+          - Session:
+              Program:
+                _or:
+                  - _and:
+                      - type:
+                          _eq: EVENTS
+                      - Organization:
+                          OrganizationAdmins:
+                            _and:
+                              - userId:
+                                  _eq: X-Hasura-User-Id
+                              - canManageEvents:
+                                  _eq: true
+                  - _and:
+                      - type:
+                          _eq: COURSES
+                      - Organization:
+                          OrganizationAdmins:
+                            _and:
+                              - userId:
+                                  _eq: X-Hasura-User-Id
+                              - canManageCourses:
+                                  _eq: true
+                  - _and:
+                      - type:
+                          _eq: DEGREES
+                      - Organization:
+                          OrganizationAdmins:
+                            _and:
+                              - userId:
+                                  _eq: X-Hasura-User-Id
+                              - canManageDegrees:
+                                  _eq: true
                   - Organization:
                       OrganizationAdmins:
                         _and:
                           - userId:
                               _eq: X-Hasura-User-Id
-                          - canManageEvents:
+                          - canManageSettings:
                               _eq: true
-              - _and:
-                  - type:
-                      _eq: COURSES
-                  - Organization:
-                      OrganizationAdmins:
-                        _and:
-                          - userId:
-                              _eq: X-Hasura-User-Id
-                          - canManageCourses:
-                              _eq: true
-              - _and:
-                  - type:
-                      _eq: DEGREES
-                  - Organization:
-                      OrganizationAdmins:
-                        _and:
-                          - userId:
-                              _eq: X-Hasura-User-Id
-                          - canManageDegrees:
-                              _eq: true
-              # A settings admin manages every program type for their organization (no type constraint).
-              - Organization:
-                  OrganizationAdmins:
-                    _and:
-                      - userId:
-                          _eq: X-Hasura-User-Id
-                      - canManageSettings:
-                          _eq: true
+          - Session:
+              Course:
+                Program:
+                  _or:
+                    - _and:
+                        - type:
+                            _eq: EVENTS
+                        - Organization:
+                            OrganizationAdmins:
+                              _and:
+                                - userId:
+                                    _eq: X-Hasura-User-Id
+                                - canManageEvents:
+                                    _eq: true
+                    - _and:
+                        - type:
+                            _eq: COURSES
+                        - Organization:
+                            OrganizationAdmins:
+                              _and:
+                                - userId:
+                                    _eq: X-Hasura-User-Id
+                                - canManageCourses:
+                                    _eq: true
+                    - _and:
+                        - type:
+                            _eq: DEGREES
+                        - Organization:
+                            OrganizationAdmins:
+                              _and:
+                                - userId:
+                                    _eq: X-Hasura-User-Id
+                                - canManageDegrees:
+                                    _eq: true
+                    - Organization:
+                        OrganizationAdmins:
+                          _and:
+                            - userId:
+                                _eq: X-Hasura-User-Id
+                            - canManageSettings:
+                                _eq: true
       columns:
         - address
         - locationAddressId
         - locationOption
         - sessionId
+        - courseLocationId
+        - id
 select_permissions:
   - role: anonymous
     permission:
@@ -128,48 +171,171 @@ update_permissions:
         - locationAddressId
         - locationOption
       filter:
-        Session:
-          Program:
-            _or:
-              - _and:
-                  - type:
-                      _eq: EVENTS
+        _or:
+          - Session:
+              Program:
+                _or:
+                  - _and:
+                      - type:
+                          _eq: EVENTS
+                      - Organization:
+                          OrganizationAdmins:
+                            _and:
+                              - userId:
+                                  _eq: X-Hasura-User-Id
+                              - canManageEvents:
+                                  _eq: true
+                  - _and:
+                      - type:
+                          _eq: COURSES
+                      - Organization:
+                          OrganizationAdmins:
+                            _and:
+                              - userId:
+                                  _eq: X-Hasura-User-Id
+                              - canManageCourses:
+                                  _eq: true
+                  - _and:
+                      - type:
+                          _eq: DEGREES
+                      - Organization:
+                          OrganizationAdmins:
+                            _and:
+                              - userId:
+                                  _eq: X-Hasura-User-Id
+                              - canManageDegrees:
+                                  _eq: true
                   - Organization:
                       OrganizationAdmins:
                         _and:
                           - userId:
                               _eq: X-Hasura-User-Id
-                          - canManageEvents:
+                          - canManageSettings:
                               _eq: true
-              - _and:
-                  - type:
-                      _eq: COURSES
+          - Session:
+              Course:
+                Program:
+                  _or:
+                    - _and:
+                        - type:
+                            _eq: EVENTS
+                        - Organization:
+                            OrganizationAdmins:
+                              _and:
+                                - userId:
+                                    _eq: X-Hasura-User-Id
+                                - canManageEvents:
+                                    _eq: true
+                    - _and:
+                        - type:
+                            _eq: COURSES
+                        - Organization:
+                            OrganizationAdmins:
+                              _and:
+                                - userId:
+                                    _eq: X-Hasura-User-Id
+                                - canManageCourses:
+                                    _eq: true
+                    - _and:
+                        - type:
+                            _eq: DEGREES
+                        - Organization:
+                            OrganizationAdmins:
+                              _and:
+                                - userId:
+                                    _eq: X-Hasura-User-Id
+                                - canManageDegrees:
+                                    _eq: true
+                    - Organization:
+                        OrganizationAdmins:
+                          _and:
+                            - userId:
+                                _eq: X-Hasura-User-Id
+                            - canManageSettings:
+                                _eq: true
+      check:
+        _or:
+          - Session:
+              Program:
+                _or:
+                  - _and:
+                      - type:
+                          _eq: EVENTS
+                      - Organization:
+                          OrganizationAdmins:
+                            _and:
+                              - userId:
+                                  _eq: X-Hasura-User-Id
+                              - canManageEvents:
+                                  _eq: true
+                  - _and:
+                      - type:
+                          _eq: COURSES
+                      - Organization:
+                          OrganizationAdmins:
+                            _and:
+                              - userId:
+                                  _eq: X-Hasura-User-Id
+                              - canManageCourses:
+                                  _eq: true
+                  - _and:
+                      - type:
+                          _eq: DEGREES
+                      - Organization:
+                          OrganizationAdmins:
+                            _and:
+                              - userId:
+                                  _eq: X-Hasura-User-Id
+                              - canManageDegrees:
+                                  _eq: true
                   - Organization:
                       OrganizationAdmins:
                         _and:
                           - userId:
                               _eq: X-Hasura-User-Id
-                          - canManageCourses:
+                          - canManageSettings:
                               _eq: true
-              - _and:
-                  - type:
-                      _eq: DEGREES
-                  - Organization:
-                      OrganizationAdmins:
-                        _and:
-                          - userId:
-                              _eq: X-Hasura-User-Id
-                          - canManageDegrees:
-                              _eq: true
-              # A settings admin manages every program type for their organization (no type constraint).
-              - Organization:
-                  OrganizationAdmins:
-                    _and:
-                      - userId:
-                          _eq: X-Hasura-User-Id
-                      - canManageSettings:
-                          _eq: true
-      check: null
+          - Session:
+              Course:
+                Program:
+                  _or:
+                    - _and:
+                        - type:
+                            _eq: EVENTS
+                        - Organization:
+                            OrganizationAdmins:
+                              _and:
+                                - userId:
+                                    _eq: X-Hasura-User-Id
+                                - canManageEvents:
+                                    _eq: true
+                    - _and:
+                        - type:
+                            _eq: COURSES
+                        - Organization:
+                            OrganizationAdmins:
+                              _and:
+                                - userId:
+                                    _eq: X-Hasura-User-Id
+                                - canManageCourses:
+                                    _eq: true
+                    - _and:
+                        - type:
+                            _eq: DEGREES
+                        - Organization:
+                            OrganizationAdmins:
+                              _and:
+                                - userId:
+                                    _eq: X-Hasura-User-Id
+                                - canManageDegrees:
+                                    _eq: true
+                    - Organization:
+                        OrganizationAdmins:
+                          _and:
+                            - userId:
+                                _eq: X-Hasura-User-Id
+                            - canManageSettings:
+                                _eq: true
 delete_permissions:
   - role: instructor_access
     permission:
@@ -183,44 +349,85 @@ delete_permissions:
   - role: org_admin_access
     permission:
       filter:
-        Session:
-          Program:
-            _or:
-              - _and:
-                  - type:
-                      _eq: EVENTS
+        _or:
+          - Session:
+              Program:
+                _or:
+                  - _and:
+                      - type:
+                          _eq: EVENTS
+                      - Organization:
+                          OrganizationAdmins:
+                            _and:
+                              - userId:
+                                  _eq: X-Hasura-User-Id
+                              - canManageEvents:
+                                  _eq: true
+                  - _and:
+                      - type:
+                          _eq: COURSES
+                      - Organization:
+                          OrganizationAdmins:
+                            _and:
+                              - userId:
+                                  _eq: X-Hasura-User-Id
+                              - canManageCourses:
+                                  _eq: true
+                  - _and:
+                      - type:
+                          _eq: DEGREES
+                      - Organization:
+                          OrganizationAdmins:
+                            _and:
+                              - userId:
+                                  _eq: X-Hasura-User-Id
+                              - canManageDegrees:
+                                  _eq: true
                   - Organization:
                       OrganizationAdmins:
                         _and:
                           - userId:
                               _eq: X-Hasura-User-Id
-                          - canManageEvents:
+                          - canManageSettings:
                               _eq: true
-              - _and:
-                  - type:
-                      _eq: COURSES
-                  - Organization:
-                      OrganizationAdmins:
-                        _and:
-                          - userId:
-                              _eq: X-Hasura-User-Id
-                          - canManageCourses:
-                              _eq: true
-              - _and:
-                  - type:
-                      _eq: DEGREES
-                  - Organization:
-                      OrganizationAdmins:
-                        _and:
-                          - userId:
-                              _eq: X-Hasura-User-Id
-                          - canManageDegrees:
-                              _eq: true
-              # A settings admin manages every program type for their organization (no type constraint).
-              - Organization:
-                  OrganizationAdmins:
-                    _and:
-                      - userId:
-                          _eq: X-Hasura-User-Id
-                      - canManageSettings:
-                          _eq: true
+          - Session:
+              Course:
+                Program:
+                  _or:
+                    - _and:
+                        - type:
+                            _eq: EVENTS
+                        - Organization:
+                            OrganizationAdmins:
+                              _and:
+                                - userId:
+                                    _eq: X-Hasura-User-Id
+                                - canManageEvents:
+                                    _eq: true
+                    - _and:
+                        - type:
+                            _eq: COURSES
+                        - Organization:
+                            OrganizationAdmins:
+                              _and:
+                                - userId:
+                                    _eq: X-Hasura-User-Id
+                                - canManageCourses:
+                                    _eq: true
+                    - _and:
+                        - type:
+                            _eq: DEGREES
+                        - Organization:
+                            OrganizationAdmins:
+                              _and:
+                                - userId:
+                                    _eq: X-Hasura-User-Id
+                                - canManageDegrees:
+                                    _eq: true
+                    - Organization:
+                        OrganizationAdmins:
+                          _and:
+                            - userId:
+                                _eq: X-Hasura-User-Id
+                            - canManageSettings:
+                                _eq: true

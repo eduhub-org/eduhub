@@ -26,4 +26,7 @@
 - role_name: org_admin
   role_set:
     - org_admin_access
+    # Public profile fields of all users for the course management page's user picker
+    # (see public_User.yaml); contact details stay with org_admin_access's row filter.
+    - org_admin_access_others
     - anonymous
