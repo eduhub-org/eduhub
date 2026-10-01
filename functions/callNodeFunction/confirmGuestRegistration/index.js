@@ -93,12 +93,16 @@ const UPSERT_NEWSLETTER_SUBSCRIPTION = gql`
   }
 `;
 
-export default async function confirmGuestRegistration(req, logger) {
+export default async function confirmGuestRegistration(
+  req,
+  logger,
+  { client: providedClient } = {}
+) {
   logger.info('########## Confirm Guest Registration ##########');
 
   try {
     const rawToken = req.body?.input?.token;
-    const client = createHasuraClient();
+    const client = providedClient ?? createHasuraClient();
 
     const resolved = await resolveConfirmToken(client, rawToken);
     if (!resolved.ok) {
@@ -106,6 +110,11 @@ export default async function confirmGuestRegistration(req, logger) {
     }
 
     const { token } = resolved;
+
+    // This is configuration validation as well as the credential returned to the
+    // guest. Do it before any write: a missing production secret must not create
+    // an enrollment and then tell the guest that confirmation failed.
+    const manageToken = buildManageToken(token.userId);
 
     // registerGuestForCourse refuses to start a guest signup for an address that
     // already has an account, but a token stays valid for a week and the account
@@ -150,15 +159,16 @@ export default async function confirmGuestRegistration(req, logger) {
       courseId: course.id,
     });
 
-    // Treated as success: a double-clicked link should look like it worked,
-    // not like an error.
+    // An enrollment can already exist while this token is still unused, for
+    // example after a duplicate registration attempt. Treat that as success
+    // without inserting another row.
     if (existing?.CourseEnrollment?.length) {
       await markConfirmTokenUsed(client, token.id);
       return {
         success: true,
         courseId: course.id,
         courseTitle: course.title,
-        manageToken: buildManageToken(token.userId),
+        manageToken,
         messageKey: 'GUEST_REGISTRATION_ALREADY_CONFIRMED',
       };
     }
@@ -196,7 +206,7 @@ export default async function confirmGuestRegistration(req, logger) {
       success: true,
       courseId: course.id,
       courseTitle: course.title,
-      manageToken: buildManageToken(token.userId),
+      manageToken,
       messageKey: 'GUEST_REGISTRATION_CONFIRMED',
     };
   } catch (error) {

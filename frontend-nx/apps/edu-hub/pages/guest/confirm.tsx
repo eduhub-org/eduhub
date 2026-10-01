@@ -74,7 +74,7 @@ const GuestConfirm: FC = () => {
   }, [confirm, router.isReady, router.query.token]);
 
   return (
-    <div className="max-w-screen-md mx-auto mt-14">
+    <div className="w-full">
       <Head>
         <title>{t('confirm.page_title')} | EduHub | opencampus.sh</title>
         {/* This URL carries a single-use credential; keep it out of search indexes. */}
@@ -82,7 +82,7 @@ const GuestConfirm: FC = () => {
         <link rel="icon" href="/favicon.png" />
       </Head>
       <Page>
-        <div className="px-6 py-12 space-y-6">
+        <div className="max-w-screen-md mx-auto px-6 pt-28 pb-12 space-y-6">
           {state === 'pending' && <p>{t('confirm.checking')}</p>}
 
           {state === 'success' && (
