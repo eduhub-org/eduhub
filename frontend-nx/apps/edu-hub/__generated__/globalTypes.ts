@@ -276,8 +276,10 @@ export enum AppSettings_update_column {
   faviconUrl = "faviconUrl",
   guestDataRetentionMonths = "guestDataRetentionMonths",
   logoUrl = "logoUrl",
+  operatorName = "operatorName",
   previewImageURL = "previewImageURL",
   primaryColor = "primaryColor",
+  privacyContactEmail = "privacyContactEmail",
   secondaryColor = "secondaryColor",
   showFaqSection = "showFaqSection",
   timeZone = "timeZone",
@@ -3753,8 +3755,10 @@ export interface AppSettings_bool_exp {
   faviconUrl?: String_comparison_exp | null;
   guestDataRetentionMonths?: Int_comparison_exp | null;
   logoUrl?: String_comparison_exp | null;
+  operatorName?: String_comparison_exp | null;
   previewImageURL?: String_comparison_exp | null;
   primaryColor?: String_comparison_exp | null;
+  privacyContactEmail?: String_comparison_exp | null;
   secondaryColor?: String_comparison_exp | null;
   showFaqSection?: Boolean_comparison_exp | null;
   timeZone?: String_comparison_exp | null;
@@ -3778,8 +3782,10 @@ export interface AppSettings_insert_input {
   faviconUrl?: string | null;
   guestDataRetentionMonths?: number | null;
   logoUrl?: string | null;
+  operatorName?: string | null;
   previewImageURL?: string | null;
   primaryColor?: string | null;
+  privacyContactEmail?: string | null;
   secondaryColor?: string | null;
   showFaqSection?: boolean | null;
   timeZone?: string | null;

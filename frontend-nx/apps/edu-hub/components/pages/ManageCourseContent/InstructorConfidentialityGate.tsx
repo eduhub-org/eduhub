@@ -7,6 +7,7 @@ import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
 import { useRoleMutation } from '../../../hooks/authedMutation';
 import { useRoleQuery } from '../../../hooks/authedQuery';
 import { useUserId } from '../../../hooks/user';
+import { useAppSettings } from '../../../contexts/AppSettingsContext';
 import { AuthRoles } from '../../../types/enums';
 import {
   ACCEPT_INSTRUCTOR_CONFIDENTIALITY,
@@ -40,6 +41,7 @@ interface InstructorConfidentialityGateProps {
 export const InstructorConfidentialityGate: FC<InstructorConfidentialityGateProps> = ({ children }) => {
   const t = useTranslations('manageCourse.instructor_confidentiality');
   const userId = useUserId();
+  const { operatorName, privacyContactEmail } = useAppSettings();
 
   const [confirmed, setConfirmed] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -71,6 +73,16 @@ export const InstructorConfidentialityGate: FC<InstructorConfidentialityGateProp
     }
   }, [accept, refetch, t]);
 
+  // Both come from AppSettings (Settings > Operator & privacy) and are optional.
+  const operator = operatorName?.trim() || t('operator_generic');
+  const baseRecipient = operatorName?.trim()
+    ? t('recipient_operator', { operator: operatorName.trim() })
+    : t('recipient_generic');
+  const recipient = privacyContactEmail?.trim()
+    ? t('recipient_contact', { recipient: baseRecipient, email: privacyContactEmail.trim() })
+    : baseRecipient;
+  const pointValues = { operator, recipient };
+
   if (!userId || (loading && !data)) {
     return <Loading />;
   }
@@ -85,7 +97,7 @@ export const InstructorConfidentialityGate: FC<InstructorConfidentialityGateProp
       <p className="mb-4">{t('intro')}</p>
       <ul className="list-disc pl-6 space-y-2 mb-6">
         {COMMITMENT_POINTS.map((point) => (
-          <li key={point}>{t(`points.${point}`)}</li>
+          <li key={point}>{t(`points.${point}`, pointValues)}</li>
         ))}
       </ul>
       <label className="flex items-start gap-3 mb-6 cursor-pointer">

@@ -18,8 +18,10 @@ select_permissions:
         - faviconUrl
         - guestDataRetentionMonths
         - logoUrl
+        - operatorName
         - previewImageURL
         - primaryColor
+        - privacyContactEmail
         - secondaryColor
         - showFaqSection
         - timeZone

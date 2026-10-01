@@ -2058,15 +2058,19 @@
       "intro": "Before you manage your course, please confirm once that you will treat participants' personal data confidentially.",
       "points": {
         "access": "As an instructor you get access to personal data of participants and other users, for example names, email addresses, organizations, application documents and attendance.",
-        "purpose": "You use this data only to run your courses and events, and only as opencampus.sh intends.",
+        "purpose": "You use this data only to run your courses and events, and only as {operator} intends.",
         "no_disclosure": "You do not pass it on to anyone else and do not use it for your own purposes, such as your own mailing lists or advertising.",
         "exports": "You keep exports and printouts (participant lists, attendance lists, name tags) safe and delete or shred them once the event is over.",
-        "incidents": "If data gets lost or misused, for example a list left behind, you tell the opencampus.sh team straight away.",
+        "incidents": "If data gets lost or misused, for example a list left behind, you tell {recipient} straight away.",
         "duration": "This commitment continues after your time as an instructor ends."
       },
       "checkbox": "I have read this and commit to keeping personal data confidential.",
       "accept": "Confirm",
-      "failed": "Your confirmation could not be saved. Please try again."
+      "failed": "Your confirmation could not be saved. Please try again.",
+      "operator_generic": "the operator of this platform",
+      "recipient_operator": "the {operator} team",
+      "recipient_generic": "the operator of this platform",
+      "recipient_contact": "{recipient} at {email}"
     },
     "participant_export": {
       "button": "Export participants",
@@ -2411,6 +2415,12 @@
       "America/New_York": "New York",
       "America/Los_Angeles": "Los Angeles",
       "Asia/Tokyo": "Tokio"
+    },
+    "operator": {
+      "title": "Operator & privacy",
+      "help": "Used in texts such as the instructor confidentiality commitment. Empty fields fall back to neutral wording.",
+      "operatorName": "Operator name",
+      "privacyContactEmail": "Email for data protection questions and incidents"
     },
     "timeZoneHelpText": "The time zone is used to display dates and times in the application. General times like the recurring course time, which are not bound to a specific day, will always be displayed in the original time and not adjusted.",
     "projectDocumentationInstructions": {
@@ -3074,6 +3084,10 @@
         "time-zone": {
           "label": "Time zone",
           "description": "Default time zone for dates and times"
+        },
+        "operator": {
+          "label": "Operator & privacy",
+          "description": "Operator name and contact for data protection questions"
         },
         "access": {
           "label": "Access & roles",

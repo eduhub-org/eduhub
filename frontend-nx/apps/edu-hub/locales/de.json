@@ -2043,15 +2043,19 @@
       "intro": "Bevor du deinen Kurs verwaltest, bestätige bitte einmalig, dass du die personenbezogenen Daten der Teilnehmenden vertraulich behandelst.",
       "points": {
         "access": "Als Kursleitung erhältst du Zugriff auf personenbezogene Daten von Teilnehmenden und anderen Nutzer:innen, zum Beispiel Namen, E-Mail-Adressen, Organisationen, Bewerbungsunterlagen und Anwesenheiten.",
-        "purpose": "Du verwendest diese Daten ausschließlich zur Durchführung deiner Kurse und Veranstaltungen und nur so, wie es opencampus.sh vorsieht.",
+        "purpose": "Du verwendest diese Daten ausschließlich zur Durchführung deiner Kurse und Veranstaltungen und nur so, wie es {operator} vorsieht.",
         "no_disclosure": "Du gibst sie nicht an Dritte weiter und nutzt sie nicht für eigene Zwecke, etwa eigene Verteiler oder Werbung.",
         "exports": "Exporte und Ausdrucke (Teilnahmelisten, Anwesenheitslisten, Namensschilder) bewahrst du sicher auf und löschst bzw. vernichtest sie nach der Veranstaltung.",
-        "incidents": "Gehen Daten verloren oder werden sie missbraucht, zum Beispiel eine liegen gelassene Liste, informierst du umgehend das Team von opencampus.sh.",
+        "incidents": "Gehen Daten verloren oder werden sie missbraucht, zum Beispiel eine liegen gelassene Liste, informierst du umgehend {recipient}.",
         "duration": "Diese Verpflichtung gilt auch nach dem Ende deiner Tätigkeit als Kursleitung fort."
       },
       "checkbox": "Ich habe die Hinweise gelesen und verpflichte mich, personenbezogene Daten vertraulich zu behandeln.",
       "accept": "Bestätigen",
-      "failed": "Deine Bestätigung konnte nicht gespeichert werden. Bitte versuch es noch einmal."
+      "failed": "Deine Bestätigung konnte nicht gespeichert werden. Bitte versuch es noch einmal.",
+      "operator_generic": "der Betreiber dieser Plattform",
+      "recipient_operator": "das Team von {operator}",
+      "recipient_generic": "den Betreiber dieser Plattform",
+      "recipient_contact": "{recipient} unter {email}"
     },
     "participant_export": {
       "button": "Teilnehmende exportieren",
@@ -2368,6 +2372,12 @@
       "America/New_York": "New York",
       "America/Los_Angeles": "Los Angeles",
       "Asia/Tokyo": "Tokio"
+    },
+    "operator": {
+      "title": "Betreiber & Datenschutz",
+      "help": "Wird in Texten wie der Vertraulichkeitserklärung für Kursleitungen verwendet. Leere Felder werden durch neutrale Formulierungen ersetzt.",
+      "operatorName": "Name des Betreibers",
+      "privacyContactEmail": "E-Mail für Datenschutzfragen und -vorfälle"
     },
     "faqSettings": "FAQ Einstellungen",
     "showFaqSection": "FAQ-Bereich auf der Startseite anzeigen",
@@ -3059,6 +3069,10 @@
         "time-zone": {
           "label": "Zeitzone",
           "description": "Standard-Zeitzone für Datums- und Zeitangaben"
+        },
+        "operator": {
+          "label": "Betreiber & Datenschutz",
+          "description": "Name des Betreibers und Kontakt für Datenschutzfragen"
         },
         "access": {
           "label": "Zugriff & Rollen",

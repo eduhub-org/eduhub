@@ -96,7 +96,10 @@ speakers, co-instructors and participants needs it. This is deliberate. It is
 covered organisationally rather than technically: before an instructor can use
 the manage-course page, they accept a confidentiality commitment once per text
 version (`InstructorConfidentialityGate`, stored in
-`InstructorConfidentialityAcceptance`). Admins skip it.
+`InstructorConfidentialityAcceptance`). Admins and org admins skip it. The text
+names the operator and the privacy contact from Settings > Operator & privacy
+(`AppSettings.operatorName` / `privacyContactEmail`) and falls back to neutral
+wording when they are empty.
 
 ### Retention job
 
