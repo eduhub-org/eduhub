@@ -140,3 +140,18 @@ export const getParticipationExitKind = ({
   if (window.end == null || nowTime <= window.end) return 'ABORT';
   return null;
 };
+
+/**
+ * Whether a participant may ask the organizers to cancel a paid enrollment.
+ *
+ * The counterpart of `getParticipationExitKind` returning null for a paid one:
+ * wherever an unpaid enrollment could be cancelled or aborted, a paid one can
+ * be put in front of the organizers instead - once. The guard trigger in the
+ * database enforces the same.
+ */
+export const canRequestCancellation = ({
+  cancellationRequestedAt,
+  hasPaidInvoice = false,
+  ...args
+}: ParticipationExitArgs & { cancellationRequestedAt?: string | Date | null }): boolean =>
+  hasPaidInvoice && !cancellationRequestedAt && getParticipationExitKind({ ...args, hasPaidInvoice: false }) !== null;

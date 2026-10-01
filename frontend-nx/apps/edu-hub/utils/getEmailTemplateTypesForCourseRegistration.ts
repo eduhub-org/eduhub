@@ -25,11 +25,17 @@ export function getEmailTemplateTypesForCourseRegistration(
     return [];
   }
 
+  // Only a paid enrollment is cancelled by request (sendCancellationRequestEmail).
   if (
-    registrationType === CourseRegistrationType_enum.DIRECT_WITH_INPUT ||
-    registrationType === CourseRegistrationType_enum.DIRECT_CONFIRMATION ||
     registrationType === CourseRegistrationType_enum.DIRECT_WITH_INPUT_AND_PAYMENT ||
     registrationType === CourseRegistrationType_enum.DIRECT_CONFIRMATION_AND_PAYMENT
+  ) {
+    return [...allTemplates, 'CANCELLATION_REQUEST_ORGANIZER', 'CANCELLATION_REQUEST_CONFIRMATION'];
+  }
+
+  if (
+    registrationType === CourseRegistrationType_enum.DIRECT_WITH_INPUT ||
+    registrationType === CourseRegistrationType_enum.DIRECT_CONFIRMATION
   ) {
     // Self-service registration plus admin actions (invite, add as applied, etc.)
     return [...allTemplates];

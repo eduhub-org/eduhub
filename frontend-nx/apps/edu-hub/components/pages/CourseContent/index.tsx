@@ -81,6 +81,7 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
   const [showSuccessSnackbar, setShowSuccessSnackbar] = useState(false);
   const [registrationSuccessWaitlist, setRegistrationSuccessWaitlist] = useState(false);
   const [participationExitKind, setParticipationExitKind] = useState<ParticipationExitKind | null>(null);
+  const [cancellationRequested, setCancellationRequested] = useState(false);
   const getWeekdayStartAndEndString = useWeekdayStartAndEndString();
 
   // Query for authorized course data
@@ -152,6 +153,7 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
   // Handle registration success
   const handleRegistrationSuccess = (info?: { waitlist: boolean }) => {
     setParticipationExitKind(null);
+    setCancellationRequested(false);
     setRegistrationSuccessWaitlist(!!info?.waitlist);
     setShowSuccessSnackbar(true);
     refetchCourse();
@@ -168,8 +170,24 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
     refetchCourse();
   };
 
+  // A participant of a paid course asked the organizers to cancel. Nothing has
+  // changed about the enrollment yet; the refetch brings up the "requested"
+  // notice in place of the button.
+  const handleCancellationRequested = (changed: boolean) => {
+    if (changed) {
+      setRegistrationSuccessWaitlist(false);
+      setParticipationExitKind(null);
+      setCancellationRequested(true);
+      setShowSuccessSnackbar(true);
+    }
+    refetchCourse();
+  };
+
   // Get success message based on registration type (waitlist vs approval vs direct)
   const getSuccessMessage = () => {
+    if (cancellationRequested) {
+      return t('CourseContent.cancellation_request_success_message');
+    }
     if (participationExitKind) {
       return participationExitKind === 'CANCEL'
         ? t('CourseContent.cancel_success_message')
@@ -268,6 +286,7 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                       isLoggedInParticipant={isLoggedInParticipant}
                       onRegistrationSuccess={handleRegistrationSuccess}
                       onParticipationExit={handleParticipationExit}
+                      onCancellationRequested={handleCancellationRequested}
                     />
                   </div>
 
@@ -377,6 +396,7 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
           setShowSuccessSnackbar(false);
           setRegistrationSuccessWaitlist(false);
           setParticipationExitKind(null);
+          setCancellationRequested(false);
         }}
         message={getSuccessMessage()}
         duration={4000}

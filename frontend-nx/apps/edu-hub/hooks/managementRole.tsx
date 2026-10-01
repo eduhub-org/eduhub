@@ -14,9 +14,11 @@ const ManagementRoleContext = createContext<AuthRoles | undefined>(undefined);
 // current session role. Outside a provider the context is undefined and those hooks fall back to the
 // session role, so all non-management usage is unchanged. An explicit `role` passed to a hook still
 // wins over the context.
-export const ManagementRoleProvider: FC<{ children: ReactNode }> = ({ children }) => {
-  const role = useManageRole();
-  return <ManagementRoleContext.Provider value={role}>{children}</ManagementRoleContext.Provider>;
+// `role` pins the role instead of deriving it - for a page that has already decided which role the
+// viewer manages it under (the course management page, per course).
+export const ManagementRoleProvider: FC<{ children: ReactNode; role?: AuthRoles }> = ({ children, role }) => {
+  const manageRole = useManageRole();
+  return <ManagementRoleContext.Provider value={role ?? manageRole}>{children}</ManagementRoleContext.Provider>;
 };
 
 export const useManagementRoleContext = (): AuthRoles | undefined => useContext(ManagementRoleContext);

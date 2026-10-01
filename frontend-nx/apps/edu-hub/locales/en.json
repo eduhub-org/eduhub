@@ -784,9 +784,20 @@
       "abort_participation_confirm": "Do you really want to abort your participation in “{title}”?",
       "exit_failed": "Your registration could not be changed right now. Please try again."
     },
+    "CancellationRequest": {
+      "request_cancellation": "Request cancellation",
+      "dialog_title": "Request cancellation",
+      "dialog_body": "You have already paid for this registration, so the organizers decide on a cancellation and any refund. We will forward your request to them and send you a confirmation by email. Your registration stays in place until they decide.",
+      "reason_label": "Reason (optional)",
+      "reason_placeholder": "Why would you like to cancel?",
+      "send_request": "Send request",
+      "requested_notice": "Cancellation requested on {date}. The organizers have been informed and will get back to you.",
+      "request_failed": "Your request could not be sent right now. Please try again."
+    },
     "CourseContent": {
       "cancel_success_message": "Your registration has been cancelled.",
-      "abort_success_message": "Your participation has been aborted."
+      "abort_success_message": "Your participation has been aborted.",
+      "cancellation_request_success_message": "Your request has been sent to the organizers."
     }
   },
   "coursePage": {
@@ -1474,8 +1485,15 @@
       "send_rejections_all_count_plural": "{count} persons with red rating were identified and will be notified of their rejection for this course.",
       "send_rejections_confirm": "Send Rejections",
       "send_invitations_error": "Failed to send invitations: {error}",
+      "cancel_registrations_error": "The registrations could not be cancelled: {error}",
       "send_rejections_error": "Failed to send rejections: {error}",
       "no_eligible_invitations": "No applicants are eligible for an invitation right now (green rating with applied or invited status).",
+      "manage_registrations": "Manage registrations",
+      "cancel_registrations_selected": "Cancel selected registrations",
+      "cancel_registrations_question": "Do you want to cancel {count, plural, one {the selected registration} other {the # selected registrations}}? The participants will be informed by email. Issue any refund in Stripe.",
+      "cancel_registrations_confirm": "Cancel registrations",
+      "registrations_cancelled": "{count, plural, one {# registration cancelled} other {# registrations cancelled}}",
+      "no_eligible_cancellations": "None of the selected registrations can be cancelled.",
       "no_eligible_rejections": "No applicants are eligible for a decline email right now (red rating and applied status only).",
       "invitations_queued_singular": "{count} invitation was applied; confirmation emails will be sent.",
       "invitations_queued_plural": "{count} invitations were applied; confirmation emails will be sent.",
@@ -1871,6 +1889,8 @@
       "registered": "Registered",
       "waitlist": "Waitlist",
       "waitlist_badge": "WAITLIST",
+      "cancellation_requested": "Cancellation requested",
+      "cancellation_requested_badge": "CANCEL REQUESTED",
       "aborted": "aborted",
       "rejected": "Rejected",
       "cancelled": "Cancelled",
@@ -2790,6 +2810,8 @@
       "APPLICATION_RECEIVED_PAID": "Application Received (Paid)",
       "USER_CREATED": "User Created",
       "ORGANIZER_ADDED": "Organizer Added",
+      "CANCELLATION_REQUEST_ORGANIZER": "Cancellation Request (to Organizers)",
+      "CANCELLATION_REQUEST_CONFIRMATION": "Cancellation Request (Confirmation)",
       "WAITLIST_NOTICE": "Waitlist Notice",
       "CERTIFICATE_ACHIEVEMENT_READY": "Achievement Certificate Ready",
       "CERTIFICATE_ATTENDANCE_READY": "Attendance Certificate Ready",
@@ -2845,6 +2867,8 @@
       "SESSION_REMINDER": "Sent before sessions start (24h, 1h, 15min before)",
       "USER_CREATED": "Sent when a new user account is created",
       "ORGANIZER_ADDED": "Sent when a user is added as an organizer to a course or event",
+      "CANCELLATION_REQUEST_ORGANIZER": "Sent to organizers and organization admins when someone asks to cancel a paid registration",
+      "CANCELLATION_REQUEST_CONFIRMATION": "Sent to participants confirming their cancellation request for a paid registration",
       "WAITLIST_NOTICE": "Sent when a user joins the waitlist because the course is full",
       "CERTIFICATE_ACHIEVEMENT_READY": "Sent when an achievement certificate is issued for a participant",
       "CERTIFICATE_ATTENDANCE_READY": "Sent when an attendance certificate is issued for a participant",
@@ -3257,6 +3281,7 @@
   },
   "eventsFeed": {
     "title": "EduHub Events | opencampus.sh",
-    "description": "Upcoming events at opencampus.sh"
+    "description": "Upcoming events at opencampus.sh",
+    "icalCategory": "Education"
   }
 }

@@ -1,4 +1,5 @@
 import { GraphQLClient } from 'graphql-request';
+import { isCourseRegistrationClosed } from '../guestRegistration.js';
 import { validateAndExtractFormbricksSurvey, buildLabelToChoiceIdMap, matchAddonsFromResponse, fetchAllFormbricksResponses } from '../lib/formbricks.js';
 
 const normalizeUserId = (value) => String(value ?? '').trim().toLowerCase();
@@ -66,6 +67,39 @@ const CREATE_ENROLLMENT = `
       returning {
         id
       }
+    }
+  }
+`;
+
+// A re-registration after the participant cancelled: the upsert above leaves
+// the status alone (see there), so a CANCELLED row is moved back to the start
+// of the payment flow explicitly. Guarded on CANCELLED so it can never touch a
+// row in any other state - above all not a paid one. A cancellation request
+// from the earlier participation does not carry over (the guard trigger does
+// the same for free courses, but this runs with the admin secret).
+const GET_ENROLLMENT_STATE = `
+  query GetEnrollmentState($enrollmentId: Int!) {
+    CourseEnrollment_by_pk(id: $enrollmentId) {
+      status
+      Course {
+        applicationEnd
+      }
+    }
+  }
+`;
+
+const REACTIVATE_CANCELLED_ENROLLMENT = `
+  mutation ReactivateCancelledEnrollment($enrollmentId: Int!) {
+    update_CourseEnrollment(
+      where: { id: { _eq: $enrollmentId }, status: { _eq: CANCELLED } }
+      _set: {
+        status: APPLIED
+        paymentStatus: PENDING
+        cancellationRequestedAt: null
+        cancellationRequestReason: null
+      }
+    ) {
+      affected_rows
     }
   }
 `;
@@ -414,6 +448,24 @@ export default async function createEnrollmentWithAddons(req, logger) {
     }
 
     logger.info('Enrollment created successfully', { enrollmentId });
+
+    const enrollmentState = await client.request(GET_ENROLLMENT_STATE, { enrollmentId });
+    const existing = enrollmentState.CourseEnrollment_by_pk;
+    if (existing?.status === 'CANCELLED') {
+      // Same deadline as for a free course (course_enrollment_guard_participant_changes);
+      // this action runs with the admin secret, so the trigger does not see it.
+      if (isCourseRegistrationClosed(existing.Course?.applicationEnd)) {
+        return {
+          success: false,
+          error: 'Registration for this course is closed',
+          messageKey: 'REGISTRATION_CLOSED',
+          enrollmentId: null,
+          selectedAddons: []
+        };
+      }
+      await client.request(REACTIVATE_CANCELLED_ENROLLMENT, { enrollmentId });
+      logger.info('Reactivated cancelled enrollment for re-registration', { enrollmentId });
+    }
 
     // Step 2: Fetch addon selections from Formbricks (if survey URL provided)
     if (!formbricksSurveyUrl) {

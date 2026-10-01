@@ -225,6 +225,12 @@ const Home: FC = () => {
           title={tEventsFeed('title')}
           href={locale === 'en' ? '/en/events/rss.xml' : '/events/rss.xml'}
         />
+        <link
+          rel="alternate"
+          type="text/calendar"
+          title={tEventsFeed('title')}
+          href={locale === 'en' ? '/en/events/calendar.ics' : '/events/calendar.ics'}
+        />
         <link rel="canonical" href="https://edu.opencampus.sh" />
         <link rel="icon" href="/favicon.png" />
         

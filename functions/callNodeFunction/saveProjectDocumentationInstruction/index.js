@@ -6,7 +6,9 @@ import saveFile from "../saveFile/index.js";
  * request role Hasura puts in session_variables (`instructor`), not the
  * inherited-role name used in actions.yaml permissions (`instructor_access`).
  */
-const NON_ADMIN_ROLES = new Set(["instructor"]);
+// Org admins manage courses from the course management page like instructors do;
+// the ownership check below applies to them the same way.
+const NON_ADMIN_ROLES = new Set(["instructor", "org_admin"]);
 
 // saveFileResult declares filePath/accessUrl as String! (actions.graphql), so a
 // failure response must still carry them: omitting them (or sending null) makes

@@ -65,14 +65,57 @@ select_permissions:
         - userId
         - vatTotal
       filter:
-        JobPosting:
-          Organization:
-            OrganizationAdmins:
-              _and:
-                - userId:
-                    _eq: X-Hasura-User-Id
-                - canManageJobs:
-                    _eq: true
+        _or:
+          - JobPosting:
+              Organization:
+                OrganizationAdmins:
+                  _and:
+                    - userId:
+                        _eq: X-Hasura-User-Id
+                    - canManageJobs:
+                        _eq: true
+          # Payment status of enrollments on the course management page.
+          - CourseEnrollment:
+              Course:
+                Program:
+                  _or:
+                    - _and:
+                        - type:
+                            _eq: EVENTS
+                        - Organization:
+                            OrganizationAdmins:
+                              _and:
+                                - userId:
+                                    _eq: X-Hasura-User-Id
+                                - canManageEvents:
+                                    _eq: true
+                    - _and:
+                        - type:
+                            _eq: COURSES
+                        - Organization:
+                            OrganizationAdmins:
+                              _and:
+                                - userId:
+                                    _eq: X-Hasura-User-Id
+                                - canManageCourses:
+                                    _eq: true
+                    - _and:
+                        - type:
+                            _eq: DEGREES
+                        - Organization:
+                            OrganizationAdmins:
+                              _and:
+                                - userId:
+                                    _eq: X-Hasura-User-Id
+                                - canManageDegrees:
+                                    _eq: true
+                    - Organization:
+                        OrganizationAdmins:
+                          _and:
+                            - userId:
+                                _eq: X-Hasura-User-Id
+                            - canManageSettings:
+                                _eq: true
       allow_aggregations: true
   - role: instructor_access
     permission:
