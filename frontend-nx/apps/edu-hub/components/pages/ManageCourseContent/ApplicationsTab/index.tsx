@@ -20,7 +20,6 @@ import { useLazyRoleQuery, useRoleQuery } from '../../../../hooks/authedQuery';
 import { MANAGED_COURSE_APPLICATIONS, MANAGED_COURSE_APPLICATION_RECIPIENTS } from '../../../../queries/course';
 import Dot, { DotColor } from '../../../common/Dot';
 import { CourseEnrollmentStatistics } from './CourseEnrollmentStatistics';
-import { OnlyInstructor } from '../../../common/OnlyLoggedIn';
 import { useIsInstructor, useIsAdmin } from '../../../../hooks/authentication';
 import {
   identityEventMapper,
@@ -33,10 +32,15 @@ import {
   UpdateEnrollmentRatingVariables,
 } from '../../../../queries/__generated__/UpdateEnrollmentRating';
 import {
+  CANCEL_ENROLLMENTS_BY_ORGANIZER,
   UPDATE_ENROLLMENT_STATUS_FOR_INVITE,
   UPDATE_ENROLLMENT_STATUS_WHEN_APPLIED,
   UPDATE_ENROLLMENT_RATING,
 } from '../../../../queries/insertEnrollment';
+import {
+  CancelEnrollmentsByOrganizer,
+  CancelEnrollmentsByOrganizerVariables,
+} from '../../../../queries/__generated__/CancelEnrollmentsByOrganizer';
 import { Button as OldButton } from '../../../common/Button';
 import { Dialog, DialogTitle, Tooltip } from '@mui/material';
 import { HelpOutline } from '@mui/icons-material';
@@ -64,6 +68,7 @@ import { useDisplayDate } from '../../../../helpers/dateTimeHelpers';
 import { BulkAction } from '../../../common/TableGrid/types';
 import { ApolloError } from '@apollo/client';
 import { ErrorMessageDialog } from '../../../common/dialogs/ErrorMessageDialog';
+import { QuestionConfirmationDialog } from '../../../common/dialogs/QuestionConfirmationDialog';
 import { FormbricksResponsesDisplay } from './FormbricksResponsesDisplay';
 import { getRegistrationFeatures } from './registrationConfig';
 import NotificationSnackbar from '../../../common/dialogs/NotificationSnackbar';
@@ -87,6 +92,9 @@ const APPLICATION_TABLE_COLUMN_SIZES = {
   Invoices: 120,
   status: 120,
 } as const;
+
+/** Statuses in which a participant's cancellation request still awaits the organizer. */
+const CANCELLATION_REQUEST_OPEN_STATUSES: string[] = ['APPLIED', 'WAITLIST', 'INVITED', 'CONFIRMED', 'REGISTERED'];
 
 /** The status icon of an enrollment; the table shows it alone, the mobile card next to its label. */
 const renderStatusIcon = (enrollment: ApplicationEnrollment, t: (key: string) => string, size = '1.5em') => {
@@ -140,6 +148,21 @@ const renderStatusIcon = (enrollment: ApplicationEnrollment, t: (key: string) =>
           size={size}
         />
       )}
+      {/* A paid participant asked to cancel: the decision (and any refund in
+          Stripe) is the organizer's, so the request stays visible until the
+          enrollment is cancelled or otherwise ended. */}
+      {enrollment.cancellationRequestedAt && CANCELLATION_REQUEST_OPEN_STATUSES.includes(enrollment.status) && (
+        <span
+          className="mt-1 block max-w-full truncate text-[11px] font-semibold text-error bg-bg-secondary px-1.5 py-0.5 rounded border border-error"
+          title={
+            enrollment.cancellationRequestReason
+              ? `${t('status.cancellation_requested')}: ${enrollment.cancellationRequestReason}`
+              : t('status.cancellation_requested')
+          }
+        >
+          {t('status.cancellation_requested_badge')}
+        </span>
+      )}
     </div>
   );
 };
@@ -180,6 +203,8 @@ const RATING_OPTIONS: { value: MotivationRating_enum; color: DotColor; labelKey:
 
 interface IProps {
   course: ManagedCourse_Course_by_pk;
+  /** The viewer manages the course as an org admin: they may act on registrations like its instructors. */
+  manageAsOrgAdmin?: boolean;
 }
 
 type ApplicationCourse = ManagedCourseApplications_Course_by_pk;
@@ -207,6 +232,7 @@ interface ApplicationsTabContentProps {
   setSearchFilter: (value: string) => void;
   sorting: SortingState;
   setSorting: (sorting: SortingState | ((prev: SortingState) => SortingState)) => void;
+  manageAsOrgAdmin: boolean;
 }
 
 // An invitation counts as expired once its expiration date is before today. The
@@ -243,7 +269,7 @@ const isRejectionEligibleEnrollment = (enrollment: ApplicationEnrollment) =>
   enrollment.motivationRating === 'DECLINE' &&
   (enrollment.status === 'APPLIED' || enrollment.status === 'WAITLIST');
 
-export const ApplicationsTab: FC<IProps> = ({ course }) => {
+export const ApplicationsTab: FC<IProps> = ({ course, manageAsOrgAdmin = false }) => {
   const t = useTranslations('manageCourse');
   const [pageSize, setPageSize] = useState(20);
   const {
@@ -317,6 +343,7 @@ export const ApplicationsTab: FC<IProps> = ({ course }) => {
       setSearchFilter={setSearchFilter}
       sorting={sorting}
       setSorting={setSorting}
+      manageAsOrgAdmin={manageAsOrgAdmin}
     />
   );
 };
@@ -334,13 +361,15 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
   setSearchFilter,
   sorting,
   setSorting,
+  manageAsOrgAdmin,
 }) => {
   const t = useTranslations('manageCourse');
   const tCommon = useTranslations('common');
   const tCourse = useTranslations('course');
   const locale = useLocale();
   const displayDate = useDisplayDate();
-  const isInstructor = useIsInstructor();
+  // An org admin managing the course acts on registrations like its instructors.
+  const isInstructor = useIsInstructor() || manageAsOrgAdmin;
   const isAdmin = useIsAdmin();
   const theme = useTheme();
   const matrixRoomId = course.matrixRoomId?.trim();
@@ -386,6 +415,11 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
     UpdateEnrollmentStatusWhenApplied,
     UpdateEnrollmentStatusWhenAppliedVariables
   >(UPDATE_ENROLLMENT_STATUS_FOR_INVITE);
+
+  const [cancelEnrollmentsByOrganizer] = useRoleMutation<
+    CancelEnrollmentsByOrganizer,
+    CancelEnrollmentsByOrganizerVariables
+  >(CANCEL_ENROLLMENTS_BY_ORGANIZER);
 
   const [updateEnrollmentStatusWhenApplied] = useRoleMutation<
     UpdateEnrollmentStatusWhenApplied,
@@ -562,6 +596,61 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
     handleCloseInviteDialog,
     showBulkNotice,
     t,
+  ]);
+
+  // Cancelling registrations: the ids waiting for confirmation, null while no dialog is open.
+  const [cancelEnrollmentIds, setCancelEnrollmentIds] = useState<number[] | null>(null);
+  const [isCancellingEnrollments, setIsCancellingEnrollments] = useState(false);
+  const [cancelError, setCancelError] = useState<string | null>(null);
+
+  const handleCloseCancelDialog = useCallback(() => {
+    if (isCancellingEnrollments) return;
+    setCancelEnrollmentIds(null);
+    // Not confirmed: the rows stay selected.
+    dialogBulkAction.fail();
+  }, [dialogBulkAction, isCancellingEnrollments]);
+
+  const handleConfirmCancelEnrollments = useCallback(async () => {
+    if (!cancelEnrollmentIds || isCancellingEnrollments) return;
+    let cancelledCount = 0;
+    setIsCancellingEnrollments(true);
+    try {
+      const result = await cancelEnrollmentsByOrganizer({
+        variables: { enrollmentIds: cancelEnrollmentIds, courseId: course.id },
+      });
+      cancelledCount = result.data?.update_CourseEnrollment?.affected_rows ?? 0;
+    } catch (error) {
+      // A failed request is not "nothing eligible": say what went wrong, keep the rows selected.
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      setCancelError(t('bulk_actions.cancel_registrations_error', { error: errorMessage }));
+      setCancelEnrollmentIds(null);
+      dialogBulkAction.fail();
+      return;
+    } finally {
+      setIsCancellingEnrollments(false);
+    }
+    setCancelEnrollmentIds(null);
+    if (cancelledCount === 0) {
+      showBulkNotice(t('bulk_actions.no_eligible_cancellations'));
+      dialogBulkAction.fail();
+      return;
+    }
+    showBulkNotice(t('bulk_actions.registrations_cancelled', { count: cancelledCount }), 4000);
+    dialogBulkAction.succeed();
+    try {
+      await qResult.refetch();
+    } catch (refetchError) {
+      console.error('ApplicationsTab: refetch after cancelling registrations failed', refetchError);
+    }
+  }, [
+    cancelEnrollmentIds,
+    isCancellingEnrollments,
+    cancelEnrollmentsByOrganizer,
+    course.id,
+    showBulkNotice,
+    t,
+    dialogBulkAction,
+    qResult,
   ]);
 
   // Dialog state for rejections
@@ -799,6 +888,24 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
         return dialogBulkAction.start();
       }
 
+      if (action === 'cancel_registrations_selected') {
+        // Nothing happened in these cases, so the rows stay selected.
+        if (selectedRows.length === 0) {
+          setIsNoSelectionDialogOpen(true);
+          return false;
+        }
+        const enrollmentIds = selectedRows
+          .filter((e) => CANCELLATION_REQUEST_OPEN_STATUSES.includes(e.status))
+          .map((e) => e.id);
+        if (enrollmentIds.length === 0) {
+          showBulkNotice(t('bulk_actions.no_eligible_cancellations'));
+          return false;
+        }
+        setCancelEnrollmentIds(enrollmentIds);
+        // handleConfirmCancelEnrollments settles the action once the dialog is confirmed.
+        return dialogBulkAction.start();
+      }
+
       // Handle rejection actions
       if (action === 'send_rejections_selected') {
         // Nothing happened in these cases, so the rows stay selected.
@@ -923,6 +1030,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
       buildMailtoUrl,
       course.id,
       dialogBulkAction,
+      setCancelEnrollmentIds,
       handleOpenInviteDialog,
       handleOpenRejectionDialog,
       loadBulkEmailRecipients,
@@ -956,6 +1064,19 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
         disabledReason: t('bulk_actions.disabled_reasons.select_participants_first'),
       },
     ];
+
+    // Cancelling is the organizer's side of a participant's cancellation request (a paid
+    // registration cannot be cancelled by the participant), and applies to every registration type.
+    actions.push({
+      value: 'cancel_registrations_selected',
+      label: t('bulk_actions.cancel_registrations_selected'),
+      group: t('bulk_actions.manage_registrations'),
+      requiresSelection: true,
+      disabled: !isInstructor,
+      disabledReason: !isInstructor
+        ? t('bulk_actions.disabled_reasons.instructors_only')
+        : t('bulk_actions.disabled_reasons.select_participants_first'),
+    });
 
     // Invitations, rejections, applied/invited/rejected/waitlist statuses, and motivation
     // ratings only exist as part of an approval-based application process — direct
@@ -1413,7 +1534,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
       <CourseEnrollmentStatistics course={course} hasCourseStarted={hasCourseStarted} />
 
       <div>
-        <OnlyInstructor>
+        {(isInstructor || isAdmin) && (
           <TableGrid<ApplicationEnrollment>
             columns={columns}
             data={courseEnrollments}
@@ -1439,7 +1560,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
               onAddButtonClick: openAddParticipantsModal,
             })}
           />
-        </OnlyInstructor>
+        )}
 
         {courseEnrollments.length > 0 && features.hasApplicationProcess && (
           // Mobile cards name the rating next to its dot, so the legend is only needed for the table.
@@ -1519,6 +1640,15 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
           )}
         </div>
       </Dialog>
+
+      <QuestionConfirmationDialog
+        open={cancelEnrollmentIds != null}
+        onClose={handleCloseCancelDialog}
+        onConfirm={handleConfirmCancelEnrollments}
+        confirmDisabled={isCancellingEnrollments}
+        confirmationText={t('bulk_actions.cancel_registrations_confirm')}
+        question={t('bulk_actions.cancel_registrations_question', { count: cancelEnrollmentIds?.length ?? 0 })}
+      />
 
       {/* Rejection Dialog */}
       <Dialog
@@ -1709,6 +1839,11 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
         errorMessage={rejectionError || ''}
         open={!!rejectionError}
         onClose={() => setRejectionError(null)}
+      />
+      <ErrorMessageDialog
+        errorMessage={cancelError || ''}
+        open={!!cancelError}
+        onClose={() => setCancelError(null)}
       />
       <NotificationSnackbar
         open={bulkNoticeOpen}

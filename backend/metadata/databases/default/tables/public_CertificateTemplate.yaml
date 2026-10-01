@@ -40,3 +40,12 @@ select_permissions:
         - created_at
         - updated_at
       filter: {}
+  - role: org_admin_access
+    permission:
+      columns:
+        - id
+        - name
+        - html
+        - created_at
+        - updated_at
+      filter: {}

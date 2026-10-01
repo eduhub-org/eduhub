@@ -784,9 +784,20 @@
       "abort_participation_confirm": "Möchtest du deine Teilnahme an „{title}“ wirklich abbrechen?",
       "exit_failed": "Deine Anmeldung konnte gerade nicht geändert werden. Bitte versuche es erneut."
     },
+    "CancellationRequest": {
+      "request_cancellation": "Stornierung anfragen",
+      "dialog_title": "Stornierung anfragen",
+      "dialog_body": "Du hast für diese Anmeldung bereits bezahlt. Über eine Stornierung und eine mögliche Erstattung entscheiden deshalb die Veranstalter. Wir leiten deine Anfrage an sie weiter und schicken dir eine Bestätigung per E-Mail. Bis zur Entscheidung bleibt deine Anmeldung bestehen.",
+      "reason_label": "Begründung (optional)",
+      "reason_placeholder": "Warum möchtest du stornieren?",
+      "send_request": "Anfrage senden",
+      "requested_notice": "Stornierung am {date} angefragt. Die Veranstalter wurden informiert und melden sich bei dir.",
+      "request_failed": "Deine Anfrage konnte gerade nicht gesendet werden. Bitte versuche es erneut."
+    },
     "CourseContent": {
       "cancel_success_message": "Deine Anmeldung wurde storniert.",
-      "abort_success_message": "Deine Teilnahme wurde abgebrochen."
+      "abort_success_message": "Deine Teilnahme wurde abgebrochen.",
+      "cancellation_request_success_message": "Deine Anfrage wurde an die Veranstalter gesendet."
     }
   },
   "coursePage": {
@@ -1456,8 +1467,15 @@
       "send_rejections_all_count_plural": "{count} Personen mit roter Bewertung wurden identifiziert und werden über ihre Ablehnung für diesen Kurs informiert.",
       "send_rejections_confirm": "Ablehnungen senden",
       "send_invitations_error": "Fehler beim Senden der Einladungen: {error}",
+      "cancel_registrations_error": "Die Registrierungen konnten nicht storniert werden: {error}",
       "send_rejections_error": "Fehler beim Senden der Ablehnungen: {error}",
       "no_eligible_invitations": "Gerade gibt es niemanden mit grüner Bewertung und Status „beworben“ oder „eingeladen“, den du einladen könntest.",
+      "manage_registrations": "Registrierungen verwalten",
+      "cancel_registrations_selected": "Ausgewählte Registrierungen stornieren",
+      "cancel_registrations_question": "Möchtest du {count, plural, one {die ausgewählte Registrierung} other {die # ausgewählten Registrierungen}} stornieren? Die Teilnehmenden werden per E-Mail informiert. Eine Erstattung veranlasst du bei Bedarf in Stripe.",
+      "cancel_registrations_confirm": "Stornieren",
+      "registrations_cancelled": "{count, plural, one {# Registrierung storniert} other {# Registrierungen storniert}}",
+      "no_eligible_cancellations": "Keine der ausgewählten Registrierungen kann storniert werden.",
       "no_eligible_rejections": "Gerade gibt es niemanden mit roter Bewertung und Status „beworben“, dem du eine Ablehnung schicken könntest.",
       "invitations_queued_singular": "{count} Einladung wurde ausgelöst; Bestätigungs-E-Mails werden verschickt.",
       "invitations_queued_plural": "{count} Einladungen wurden ausgelöst; Bestätigungs-E-Mails werden verschickt.",
@@ -1853,6 +1871,8 @@
       "registered": "Registriert",
       "waitlist": "Warteliste",
       "waitlist_badge": "Warteliste",
+      "cancellation_requested": "Stornierung angefragt",
+      "cancellation_requested_badge": "Storno angefragt",
       "aborted": "Abgebrochen",
       "rejected": "Bewerbung abgelehnt",
       "cancelled": "Storniert",
@@ -2775,6 +2795,8 @@
       "APPLICATION_RECEIVED_PAID": "Bewerbung erhalten (kostenpflichtig)",
       "USER_CREATED": "Benutzer erstellt",
       "ORGANIZER_ADDED": "Organisator hinzugefügt",
+      "CANCELLATION_REQUEST_ORGANIZER": "Stornierungsanfrage (an Veranstalter)",
+      "CANCELLATION_REQUEST_CONFIRMATION": "Stornierungsanfrage (Bestätigung)",
       "WAITLIST_NOTICE": "Wartelisten-Benachrichtigung",
       "CERTIFICATE_ACHIEVEMENT_READY": "Leistungszertifikat verfügbar",
       "CERTIFICATE_ATTENDANCE_READY": "Teilnahmebescheinigung verfügbar",
@@ -2830,6 +2852,8 @@
       "SESSION_REMINDER": "Gesendet vor Beginn der Sitzungen (24h, 1h, 15min vorher)",
       "USER_CREATED": "Gesendet, wenn ein neues Benutzerkonto erstellt wird",
       "ORGANIZER_ADDED": "Gesendet, wenn ein Benutzer als Organisator zu einem Kurs oder Event hinzugefügt wird",
+      "CANCELLATION_REQUEST_ORGANIZER": "Gesendet an Veranstalter und Organisations-Admins, wenn jemand die Stornierung einer bezahlten Anmeldung anfragt",
+      "CANCELLATION_REQUEST_CONFIRMATION": "Gesendet an Teilnehmende als Bestätigung ihrer Stornierungsanfrage für eine bezahlte Anmeldung",
       "WAITLIST_NOTICE": "Gesendet, wenn ein Benutzer auf die Warteliste kommt, weil der Kurs voll ist",
       "CERTIFICATE_ACHIEVEMENT_READY": "Gesendet, wenn ein Leistungszertifikat für eine Teilnahme ausgestellt wird",
       "CERTIFICATE_ATTENDANCE_READY": "Gesendet, wenn eine Teilnahmebescheinigung für eine Teilnahme ausgestellt wird",

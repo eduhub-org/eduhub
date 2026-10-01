@@ -318,6 +318,7 @@ select_permissions:
         - stripePriceId
         - matrixRoomId
         - courseSeriesId
+        - registrationType
       computed_fields:
         - activeParticipantCount
         - publicParticipantCount

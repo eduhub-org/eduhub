@@ -2,6 +2,8 @@ import { ApolloError, QueryResult } from '@apollo/client';
 import { useTranslations } from 'next-intl';
 import { FC, ReactNode, useCallback, useMemo, useState, type JSX } from 'react';
 import { useIsAdmin, useIsInstructor } from '../../../../hooks/authentication';
+import { useManagementRoleContext } from '../../../../hooks/managementRole';
+import { AuthRoles } from '../../../../types/enums';
 import { useRoleMutation } from '../../../../hooks/authedMutation';
 import Dot, { DotColor } from '../../../common/Dot';
 import { CertificateDownload } from '../../../common/CertificateDownload';
@@ -115,7 +117,9 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
   const tCommon = useTranslations('common');
   const tCoursePage = useTranslations('coursePage');
   const isAdmin = useIsAdmin();
-  const isInstructor = useIsInstructor();
+  // An org admin managing the course (the page runs under org_admin) acts like its instructors.
+  const managesAsOrgAdmin = useManagementRoleContext() === AuthRoles.org_admin;
+  const isInstructor = useIsInstructor() || managesAsOrgAdmin;
 
   const [pageSize, setPageSize] = useState(20);
   const [snackbarOpen, setSnackbarOpen] = useState(false);

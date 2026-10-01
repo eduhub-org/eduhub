@@ -554,6 +554,10 @@ export interface CourseWithEnrollment_Course_by_pk_CourseEnrollments {
    * An array relationship
    */
   Invoices: CourseWithEnrollment_Course_by_pk_CourseEnrollments_Invoices[];
+  /**
+   * When the participant asked the organizer to cancel this paid enrollment. Set once, server time; cleared when they register again.
+   */
+  cancellationRequestedAt: any | null;
 }
 
 export interface CourseWithEnrollment_Course_by_pk {

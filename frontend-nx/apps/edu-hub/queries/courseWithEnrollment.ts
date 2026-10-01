@@ -18,6 +18,7 @@ export const COURSE_WITH_ENROLLMENT = gql`
       # LinkVideoCall
       CourseEnrollments {
         ...EnrollmentFragment
+        cancellationRequestedAt
       }
       CourseLocations {
         id
