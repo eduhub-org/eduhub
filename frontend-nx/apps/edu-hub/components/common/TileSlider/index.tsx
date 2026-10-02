@@ -48,9 +48,9 @@ const NavButton: FC<NavButtonProps> = ({
   <button
     id={idSuffix}
     type="button"
-    className={`${className} flex w-12 items-center justify-center ${direction === 'previous' ? 'rounded-l-none rounded-r-2xl' : 'rounded-r-none rounded-l-2xl'} bg-transparent transition-opacity focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-white ${isWidget ? 'h-[435px]' : 'h-[431px]'} ${!visible ? 'pointer-events-none opacity-0' : ''}`}
+    className={`${className} flex w-12 items-center justify-center rounded-none bg-transparent transition-opacity focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-white ${isWidget ? 'h-[435px]' : 'h-[431px]'} ${!visible ? 'pointer-events-none opacity-0' : ''}`}
     style={{
-      background: `linear-gradient(${direction === 'previous' ? '90deg' : '270deg'}, rgba(15, 15, 15, 0.45), rgba(15, 15, 15, 0))`,
+      background: `linear-gradient(${direction === 'previous' ? '90deg' : '270deg'}, rgba(15, 15, 15, 0.65), rgba(15, 15, 15, 0))`,
     }}
     onClick={onClick}
     disabled={!visible}
