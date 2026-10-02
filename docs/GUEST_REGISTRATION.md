@@ -205,11 +205,11 @@ at their own link is usually the fastest complete answer.
 - **`GUEST_TOKEN_SECRET` is a signing key.** Anyone holding it can mint a manage
   link for any guest. The dev default in `docker-compose.yml` is fine locally and
   nowhere else. Staging and production take it from the sensitive Terraform
-  Cloud variable `guest_token_secret` (one stable value of at least 32 characters
-  per workspace), which lands in Secret Manager as `guest-token-secret` and
-  reaches `call-node-function`. Without it confirmation stops before an
-  enrollment is written, and guest mails cannot include the management link.
-  Do not rotate it casually — every manage link already emailed stops working.
+  Cloud variable `guest_token_secret` (one value per workspace), which lands in
+  Secret Manager as `guest-token-secret` and reaches `call-node-function`. Without
+  it every confirmation fails *after* the enrollment is written: the guest sees
+  an error, then "link already used". Do not rotate it casually — every manage
+  link already emailed stops working.
 
 ## Files
 
