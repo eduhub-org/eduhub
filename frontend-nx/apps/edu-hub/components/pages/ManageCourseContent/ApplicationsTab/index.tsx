@@ -371,6 +371,9 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
   // An org admin managing the course acts on registrations like its instructors.
   const isInstructor = useIsInstructor() || manageAsOrgAdmin;
   const isAdmin = useIsAdmin();
+  // Inviting, rejecting and cancelling registrations is open to the course's instructors, super
+  // admins, and org admins whose grant covers the course's program type (manageAsOrgAdmin).
+  const canDecideRegistrations = isInstructor || isAdmin;
   const theme = useTheme();
   const matrixRoomId = course.matrixRoomId?.trim();
   const elementBaseUrl = process.env.NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL?.replace(/\/+$/, '');
@@ -1072,8 +1075,8 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
       label: t('bulk_actions.cancel_registrations_selected'),
       group: t('bulk_actions.manage_registrations'),
       requiresSelection: true,
-      disabled: !isInstructor,
-      disabledReason: !isInstructor
+      disabled: !canDecideRegistrations,
+      disabledReason: !canDecideRegistrations
         ? t('bulk_actions.disabled_reasons.instructors_only')
         : t('bulk_actions.disabled_reasons.select_participants_first'),
     });
@@ -1101,8 +1104,8 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
         label: t('bulk_actions.send_invitations_selected'),
         group: t('bulk_actions.send_decisions'),
         requiresSelection: true,
-        disabled: !isInstructor,
-        disabledReason: !isInstructor
+        disabled: !canDecideRegistrations,
+        disabledReason: !canDecideRegistrations
           ? t('bulk_actions.disabled_reasons.instructors_only')
           : t('bulk_actions.disabled_reasons.select_participants_first'),
       },
@@ -1111,8 +1114,8 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
         label: t('bulk_actions.send_rejections_selected'),
         group: t('bulk_actions.send_decisions'),
         requiresSelection: true,
-        disabled: !isInstructor,
-        disabledReason: !isInstructor
+        disabled: !canDecideRegistrations,
+        disabledReason: !canDecideRegistrations
           ? t('bulk_actions.disabled_reasons.instructors_only')
           : t('bulk_actions.disabled_reasons.select_participants_first'),
       },
@@ -1159,7 +1162,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
     );
 
     return actions;
-  }, [features.hasApplicationProcess, isInstructor, t]);
+  }, [features.hasApplicationProcess, canDecideRegistrations, t]);
 
   // Rating sort function
   const ratingSortFn = useCallback((a: MotivationRating_enum, b: MotivationRating_enum) => {
