@@ -57,6 +57,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import Modal from '../../../common/Modal';
 import AddParticipantsForm from './AddParticipantsForm';
 import TableGrid from '../../../common/TableGrid';
+import { ParticipantExportMenu } from '../ParticipantExport/ParticipantExportMenu';
 import { useDeferredBulkAction, useTableGrid } from '../../../common/TableGrid/hooks';
 import { createMultiWordSearchCondition } from '../../../common/TableGrid/utils';
 import { ColumnDef, SortingState } from '@tanstack/react-table';
@@ -1558,6 +1559,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
             sorting={sorting}
             onSortingChange={setSorting}
             refetchQueries={[]}
+            toolbarActions={<ParticipantExportMenu courseId={course.id} />}
             {...(isAdmin && {
               addButtonText: t('add_participants'),
               onAddButtonClick: openAddParticipantsModal,

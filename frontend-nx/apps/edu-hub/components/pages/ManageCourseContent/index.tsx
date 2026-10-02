@@ -26,7 +26,6 @@ import { ApplicationsTab } from './ApplicationsTab';
 import { CourseParticipationsTab } from './CourseParticipationsTab';
 import { DegreeParticipationsTab } from './DegreeParticipationsTab';
 import { ParticipantPreviewButton } from './ParticipantPreviewButton';
-import { ParticipantExportMenu } from './ParticipantExport/ParticipantExportMenu';
 import { InstructorConfidentialityGate } from './InstructorConfidentialityGate';
 import { useIsAdmin, useIsOrgAdmin, useIsUserIdInList } from '../../../hooks/authentication';
 import { getRegistrationFeatures } from './ApplicationsTab/registrationConfig';
@@ -276,8 +275,6 @@ const CourseManagement: FC<CourseManagementProps> = ({ courseId, manageAsOrgAdmi
       <div className="flex flex-col gap-4 mb-6 mt-6 md:mb-12 md:mt-12 text-white sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-3xl md:text-4xl font-bold">{course.title}</h1>
         <div className="flex flex-wrap items-center gap-3">
-          {/* Registrations only exist in EduHub when they are not handled elsewhere. */}
-          {visibleTabIndices.includes(2) && <ParticipantExportMenu courseId={courseId} />}
           {/* The preview action is for the course's own instructors. */}
           {!manageAsOrgAdmin && <ParticipantPreviewButton courseId={courseId} />}
         </div>
