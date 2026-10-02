@@ -102,11 +102,11 @@ export const Header: FC = () => {
                 <div className="flex">
                   <LoginButton />
                 </div>
-                <div className="ml-3">
-                  <OnlyDesktop>
+                <OnlyDesktop>
+                  <div className="ml-3">
                     <RegisterButton />
-                  </OnlyDesktop>
-                </div>
+                  </div>
+                </OnlyDesktop>
               </div>
             )}
           </div>

@@ -1,4 +1,4 @@
-import { getPublicUrl, getSafeFileHref, isStaticAppPath } from './filehandling';
+import { getPublicImageUrl, getPublicUrl, getSafeFileHref, isStaticAppPath } from './filehandling';
 
 const STORAGE_BUCKET_URL = 'https://storage.example.test/eduhub-bucket';
 const STATIC_PREFIX = '/project-documentation-instructions/';
@@ -50,6 +50,33 @@ describe('filehandling', () => {
     it('returns null for private or empty paths', () => {
       expect(getPublicUrl('project-docs-instructions/private/instruction-1/file.pdf')).toBeNull();
       expect(getPublicUrl('')).toBeNull();
+    });
+  });
+
+  describe('getPublicImageUrl', () => {
+    it.each([
+      '/images/share/logo_dlc.svg',
+      '/images/share/foerderlogos_2.svg',
+      '/images/share/logo-kiel-sailing-city.svg',
+    ])('keeps checked-in image assets unchanged: %s', (path) => {
+      expect(getPublicImageUrl(path, 512)).toBe(path);
+    });
+
+    it('still resolves resized public storage images', () => {
+      expect(getPublicImageUrl('organizations/org-160/public/logo.png', 512)).toBe(
+        `${STORAGE_BUCKET_URL}/organizations/org-160/public/logo-512.webp`
+      );
+    });
+
+    it.each([
+      '/api/internal/secret',
+      '/images/../api/internal/secret',
+      '/images/%2e%2e/api/internal/secret',
+      '//example.test/logo.svg',
+      'organizations/org-160/private/logo.png',
+      null,
+    ])('rejects non-image static paths and non-public images: %s', (path) => {
+      expect(getPublicImageUrl(path, 512)).toBeNull();
     });
   });
 

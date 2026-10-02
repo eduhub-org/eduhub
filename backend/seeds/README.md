@@ -31,6 +31,27 @@ There are two ways to manage seed data:
    - This file is automatically applied when starting a fresh database
    - After making changes to the database that should be persisted, export the current state using the export script (see below)
 
+### Course Funding Logos
+
+The default seed reuses the footer's checked-in SVGs so course funding sections
+work without uploading images to the storage emulator:
+
+- `Present Course 1` (4) and `Current Course A` (301): one wide EU/SH logo band.
+- `Current Course B` (302): DLC, EU/SH, and Kiel logos to exercise wrapping.
+- `This is a Degree` (7): DLC and EU/SH logos.
+- Other courses retain the empty funding-logo state.
+
+These fixtures load automatically with a fresh database. To add just these
+fixtures to an existing local Docker database, run from the repository root:
+
+```bash
+sed -n '/^-- Course funding-logo fixtures/,$p' backend/seeds/default/initial_seeds.sql |
+  docker compose exec -T db_hasura psql -U postgres -d postgres \
+    -v ON_ERROR_STOP=1 --single-transaction
+```
+
+The fixture block is repeatable and does not reset existing development data.
+
 ### Regenerating the ML Degree Participant Seeds
 
 The 300 Machine Learning Degree participant rows in
