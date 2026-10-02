@@ -244,6 +244,9 @@ actions:
           value: createUser
     permissions:
       - role: instructor_access
+      # Org admins on the course management page. Listed as org_admin itself: the
+      # inherited role does not pick up an org_admin_access action permission.
+      - role: org_admin
     comment: Creates a new user in Keycloak and Hasura, schedules welcome email
   - name: getAdminUsers
     definition:
@@ -267,6 +270,9 @@ actions:
           value: getFormbricksResponses
     permissions:
       - role: instructor_access
+      # Org admins on the course management page. Listed as org_admin itself: the
+      # inherited role does not pick up an org_admin_access action permission.
+      - role: org_admin
     comment: Fetches Formbricks survey responses for a course enrollment
   - name: getFormbricksAddonSelections
     definition:
@@ -451,6 +457,9 @@ actions:
           value: .pdf
     permissions:
       - role: instructor_access
+      # Org admins on the course management page. Listed as org_admin itself: the
+      # inherited role does not pick up an org_admin_access action permission.
+      - role: org_admin
     comment: Stores an instruction PDF. The handler verifies that a non-admin caller owns the target non-default instruction before delegating to saveFile.
   - name: setProjectDocumentationInstructionDefault
     definition:
@@ -474,6 +483,9 @@ actions:
     permissions:
       - role: admin
       - role: instructor_access
+      # Org admins on the course management page. Listed as org_admin itself: the
+      # inherited role does not pick up an org_admin_access action permission.
+      - role: org_admin
     comment: Reassigns projects using the instruction to the type default, then deletes the non-default instruction. Instructors may only delete instructions they created (verified in the handler).
   - name: saveProjectImage
     definition:
@@ -495,6 +507,9 @@ actions:
     permissions:
       - role: instructor_access
       - role: user_access
+      # Org admins on the course management page. Listed as org_admin itself: the
+      # inherited role does not pick up an org_admin_access action permission.
+      - role: org_admin
   - name: saveProjectDocumentation
     definition:
       kind: synchronous
@@ -648,6 +663,9 @@ actions:
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
     permissions:
       - role: instructor_access
+      # Org admins on the course management page. Listed as org_admin itself: the
+      # inherited role does not pick up an org_admin_access action permission.
+      - role: org_admin
     comment: Mails active participants that a session was rescheduled. Called from
       the Sessions tab after the editor confirms the prompt; there is no automatic
       trigger any more. Authorization is in the handler, because the action queries

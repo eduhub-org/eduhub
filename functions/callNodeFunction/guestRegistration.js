@@ -98,6 +98,7 @@ const INSERT_CONFIRM_TOKEN = gql`
     $courseId: Int!
     $expiresAt: timestamptz!
     $newsletterOptIn: Boolean!
+    $organizationName: String
   ) {
     insert_GuestRegistrationToken_one(
       object: {
@@ -106,6 +107,7 @@ const INSERT_CONFIRM_TOKEN = gql`
         courseId: $courseId
         expiresAt: $expiresAt
         newsletterOptIn: $newsletterOptIn
+        organizationName: $organizationName
       }
     ) {
       id
@@ -120,12 +122,14 @@ const FIND_CONFIRM_TOKEN = gql`
       userId
       courseId
       newsletterOptIn
+      organizationName
       expiresAt
       usedAt
       User {
         id
         firstName
         lastName
+        organizationName
         email
         status
       }
@@ -141,7 +145,13 @@ const MARK_CONFIRM_TOKEN_USED = gql`
   }
 `;
 
-export async function issueConfirmToken(client, userId, courseId, newsletterOptIn = false) {
+export async function issueConfirmToken(
+  client,
+  userId,
+  courseId,
+  newsletterOptIn = false,
+  organizationName = null
+) {
   const rawToken = generateRawToken();
   const expiresAt = new Date(
     Date.now() + CONFIRM_TOKEN_TTL_DAYS * 24 * 60 * 60 * 1000
@@ -152,6 +162,7 @@ export async function issueConfirmToken(client, userId, courseId, newsletterOptI
     courseId,
     expiresAt,
     newsletterOptIn: Boolean(newsletterOptIn),
+    organizationName,
   });
   return rawToken;
 }
@@ -551,6 +562,16 @@ export function normalizeName(name) {
 
 export function isValidName(name) {
   return name.length >= 1 && name.length <= 100;
+}
+
+/** Optional field: an empty value is stored as null rather than ''. */
+export function normalizeOrganizationName(name) {
+  const normalized = normalizeName(name);
+  return normalized === '' ? null : normalized;
+}
+
+export function isValidOrganizationName(name) {
+  return name === null || name.length <= 200;
 }
 
 /* ------------------------------------------------------------- user lookup */

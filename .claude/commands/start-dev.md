@@ -42,7 +42,7 @@ docker compose down -v                   # stop, wipe DB and Keycloak data
 ## Host vs container
 
 Lint, tests, type-check, and build run on the **host** from `frontend-nx/`,
-not inside containers. Use `nvm use 20` and Yarn 3.4.1 via Corepack.
+not inside containers. Use `nvm use 22` and Yarn 3.4.1 via Corepack.
 
 ## Cloud / Docker-in-Docker
 

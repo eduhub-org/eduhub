@@ -43,6 +43,7 @@ export type SettingsNavItemId =
   | 'course-groups'
   | 'badges'
   | 'time-zone'
+  | 'operator'
   | 'access'
   | 'organizations';
 
@@ -175,6 +176,14 @@ export const SETTINGS_NAV_ITEMS: Record<SettingsNavItemId, SettingsNavItemDef> =
     status: 'live',
     groupId: 'system',
   },
+  operator: {
+    id: 'operator',
+    icon: MdOutlineBusiness,
+    href: '/manage/settings/operator',
+    requiredCapability: 'admin',
+    status: 'live',
+    groupId: 'system',
+  },
   access: {
     id: 'access',
     icon: MdOutlineLock,
@@ -218,7 +227,7 @@ export const SETTINGS_NAV_GROUPS: SettingsNavGroupDef[] = [
   },
   {
     id: 'system',
-    items: ['time-zone', 'access', 'organizations'],
+    items: ['time-zone', 'operator', 'access', 'organizations'],
   },
 ];
 

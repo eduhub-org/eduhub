@@ -74,4 +74,12 @@ export interface AdminEnrollmentFragment {
    * Rating that the user's motivation letter received from the course instructor
    */
   motivationRating: MotivationRating_enum;
+  /**
+   * When the participant asked the organizer to cancel this paid enrollment. Set once, server time; cleared when they register again.
+   */
+  cancellationRequestedAt: any | null;
+  /**
+   * Optional reason the participant gave with their cancellation request.
+   */
+  cancellationRequestReason: string | null;
 }

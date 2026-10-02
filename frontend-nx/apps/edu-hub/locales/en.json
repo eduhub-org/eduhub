@@ -784,9 +784,20 @@
       "abort_participation_confirm": "Do you really want to abort your participation in “{title}”?",
       "exit_failed": "Your registration could not be changed right now. Please try again."
     },
+    "CancellationRequest": {
+      "request_cancellation": "Request cancellation",
+      "dialog_title": "Request cancellation",
+      "dialog_body": "You have already paid for this registration, so the organizers decide on a cancellation and any refund. We will forward your request to them and send you a confirmation by email. Your registration stays in place until they decide.",
+      "reason_label": "Reason (optional)",
+      "reason_placeholder": "Why would you like to cancel?",
+      "send_request": "Send request",
+      "requested_notice": "Cancellation requested on {date}. The organizers have been informed and will get back to you.",
+      "request_failed": "Your request could not be sent right now. Please try again."
+    },
     "CourseContent": {
       "cancel_success_message": "Your registration has been cancelled.",
-      "abort_success_message": "Your participation has been aborted."
+      "abort_success_message": "Your participation has been aborted.",
+      "cancellation_request_success_message": "Your request has been sent to the organizers."
     }
   },
   "coursePage": {
@@ -1474,8 +1485,15 @@
       "send_rejections_all_count_plural": "{count} persons with red rating were identified and will be notified of their rejection for this course.",
       "send_rejections_confirm": "Send Rejections",
       "send_invitations_error": "Failed to send invitations: {error}",
+      "cancel_registrations_error": "The registrations could not be cancelled: {error}",
       "send_rejections_error": "Failed to send rejections: {error}",
       "no_eligible_invitations": "No applicants are eligible for an invitation right now (green rating with applied or invited status).",
+      "manage_registrations": "Manage registrations",
+      "cancel_registrations_selected": "Cancel selected registrations",
+      "cancel_registrations_question": "Do you want to cancel {count, plural, one {the selected registration} other {the # selected registrations}}? The participants will be informed by email. Issue any refund in Stripe.",
+      "cancel_registrations_confirm": "Cancel registrations",
+      "registrations_cancelled": "{count, plural, one {# registration cancelled} other {# registrations cancelled}}",
+      "no_eligible_cancellations": "None of the selected registrations can be cancelled.",
       "no_eligible_rejections": "No applicants are eligible for a decline email right now (red rating and applied status only).",
       "invitations_queued_singular": "{count} invitation was applied; confirmation emails will be sent.",
       "invitations_queued_plural": "{count} invitations were applied; confirmation emails will be sent.",
@@ -1497,7 +1515,7 @@
       "no_selection_dialog_title": "No Selection",
       "disabled_reasons": {
         "select_participants_first": "Select participants first.",
-        "instructors_only": "Only instructors can run this bulk action.",
+        "instructors_only": "Only instructors and admins can run this bulk action.",
         "no_eligible_invitations": "No participants with green rating and status applied/invited are currently available.",
         "no_eligible_rejections": "No participants with red rating and status applied are currently available.",
         "no_confirmed": "No participants with status confirmed are currently available.",
@@ -1778,7 +1796,7 @@
       "mark_aborted_success_plural": "{count} participations were marked as aborted.",
       "mark_aborted_error": "Could not mark participations as aborted: {error}",
       "disabled_reasons": {
-        "instructors_only": "Only instructors can run this bulk action."
+        "instructors_only": "Only instructors and admins can run this bulk action."
       }
     },
     "certificates_group": "Certificates",
@@ -1871,6 +1889,8 @@
       "registered": "Registered",
       "waitlist": "Waitlist",
       "waitlist_badge": "WAITLIST",
+      "cancellation_requested": "Cancellation requested",
+      "cancellation_requested_badge": "CANCEL REQUESTED",
       "aborted": "aborted",
       "rejected": "Rejected",
       "cancelled": "Cancelled",
@@ -2032,6 +2052,49 @@
     "guest_registration": {
       "label": "Allow registration without an account",
       "help_text": "Lets people register with just a name and email address, without creating an account. The registration only becomes valid once confirmed by email. Only available for events with direct registration."
+    },
+    "instructor_confidentiality": {
+      "title": "Confidentiality of personal data",
+      "intro": "Before you manage your course, please confirm once that you will treat participants' personal data confidentially.",
+      "points": {
+        "access": "As an instructor you get access to personal data of participants and other users, for example names, email addresses, organizations, application documents and attendance.",
+        "purpose": "You use this data only to run your courses and events, and only as {operator} intends.",
+        "no_disclosure": "You do not pass it on to anyone else and do not use it for your own purposes, such as your own mailing lists or advertising.",
+        "exports": "You keep exports and printouts (participant lists, attendance lists, name tags) safe and delete or shred them once the event is over.",
+        "incidents": "If data gets lost or misused, for example a list left behind, you tell {recipient} straight away.",
+        "duration": "This commitment continues after your time as an instructor ends."
+      },
+      "checkbox": "I have read this and commit to keeping personal data confidential.",
+      "accept": "Confirm",
+      "failed": "Your confirmation could not be saved. Please try again.",
+      "operator_generic": "the operator of this platform",
+      "recipient_operator": "the {operator} team",
+      "recipient_generic": "the operator of this platform",
+      "recipient_contact": "{recipient} at {email}"
+    },
+    "participant_export": {
+      "button": "Export participants",
+      "csv": "Participant list (CSV for Excel)",
+      "attendance_list": "Attendance list (print / PDF)",
+      "name_tags": "Name tags (print / PDF)",
+      "hint": "Includes all registered and confirmed participants.",
+      "file_suffix": "participants",
+      "first_name": "First name",
+      "last_name": "Last name",
+      "organization": "Organization",
+      "email": "Email",
+      "status": "Status",
+      "number": "No.",
+      "present": "Present",
+      "signature": "Signature",
+      "count": "{count, plural, =1 {1 participant} other {# participants}}",
+      "no_participants": "There are no registered or confirmed participants yet.",
+      "failed": "The participant data could not be loaded. Please try again.",
+      "statuses": {
+        "REGISTERED": "registered",
+        "CONFIRMED": "confirmed",
+        "COMPLETED": "completed"
+      }
     },
     "participant_preview": {
       "start": "View as participant",
@@ -2344,6 +2407,8 @@
     "saving": "Saving...",
     "loading": "Loading...",
     "errorSavingSettings": "An error occurred while saving the settings. Please try again.",
+    "errorLoadingSettings": "The settings could not be loaded.",
+    "retry": "Try again",
     "timeZones": {
       "Europe/Berlin": "Berlin",
       "Europe/London": "London",
@@ -2352,6 +2417,12 @@
       "America/New_York": "New York",
       "America/Los_Angeles": "Los Angeles",
       "Asia/Tokyo": "Tokio"
+    },
+    "operator": {
+      "title": "Operator & privacy",
+      "help": "Used in texts such as the instructor confidentiality commitment. Empty fields fall back to neutral wording.",
+      "operatorName": "Operator name",
+      "privacyContactEmail": "Email for data protection questions and incidents"
     },
     "timeZoneHelpText": "The time zone is used to display dates and times in the application. General times like the recurring course time, which are not bound to a specific day, will always be displayed in the original time and not adjusted.",
     "projectDocumentationInstructions": {
@@ -2790,6 +2861,8 @@
       "APPLICATION_RECEIVED_PAID": "Application Received (Paid)",
       "USER_CREATED": "User Created",
       "ORGANIZER_ADDED": "Organizer Added",
+      "CANCELLATION_REQUEST_ORGANIZER": "Cancellation Request (to Organizers)",
+      "CANCELLATION_REQUEST_CONFIRMATION": "Cancellation Request (Confirmation)",
       "WAITLIST_NOTICE": "Waitlist Notice",
       "CERTIFICATE_ACHIEVEMENT_READY": "Achievement Certificate Ready",
       "CERTIFICATE_ATTENDANCE_READY": "Attendance Certificate Ready",
@@ -2845,6 +2918,8 @@
       "SESSION_REMINDER": "Sent before sessions start (24h, 1h, 15min before)",
       "USER_CREATED": "Sent when a new user account is created",
       "ORGANIZER_ADDED": "Sent when a user is added as an organizer to a course or event",
+      "CANCELLATION_REQUEST_ORGANIZER": "Sent to organizers and organization admins when someone asks to cancel a paid registration",
+      "CANCELLATION_REQUEST_CONFIRMATION": "Sent to participants confirming their cancellation request for a paid registration",
       "WAITLIST_NOTICE": "Sent when a user joins the waitlist because the course is full",
       "CERTIFICATE_ACHIEVEMENT_READY": "Sent when an achievement certificate is issued for a participant",
       "CERTIFICATE_ATTENDANCE_READY": "Sent when an attendance certificate is issued for a participant",
@@ -3011,6 +3086,10 @@
         "time-zone": {
           "label": "Time zone",
           "description": "Default time zone for dates and times"
+        },
+        "operator": {
+          "label": "Operator & privacy",
+          "description": "Operator name and contact for data protection questions"
         },
         "access": {
           "label": "Access & roles",
@@ -3184,9 +3263,10 @@
       "first_name": "First name",
       "last_name": "Last name",
       "email": "Email address",
+      "organization": "Organization (optional)",
       "accept_terms": "I have read and accept the <terms>Terms and Conditions</terms> and the <privacy>Privacy Policy</privacy>.",
       "newsletter_opt_in": "Email me about future events from this organiser. This is optional and you can withdraw it at any time.",
-      "data_notice": "We store your name and email address in order to run the event and to tell you about changes to it. After that we delete them automatically. The link in every email lets you view or delete your data at any time.",
+      "data_notice": "We store your name, email address and, if given, your organization in order to run the event and to tell you about changes to it. After that we delete them automatically. The link in every email lets you view or delete your data at any time.",
       "submit": "Send registration",
       "submitting": "Sending …",
       "cancel": "Cancel",
@@ -3228,6 +3308,7 @@
       "email_required": "Please enter your email address.",
       "terms_required": "Please accept the terms and the privacy policy.",
       "invalid_name": "Please check your name.",
+      "invalid_organization": "The organization name can be at most 200 characters long.",
       "invalid_email": "Please check your email address.",
       "invalid_course": "This event could not be found.",
       "terms_not_accepted": "Please accept the terms and the privacy policy.",
@@ -3257,6 +3338,7 @@
   },
   "eventsFeed": {
     "title": "EduHub Events | opencampus.sh",
-    "description": "Upcoming events at opencampus.sh"
+    "description": "Upcoming events at opencampus.sh",
+    "icalCategory": "Education"
   }
 }

@@ -514,8 +514,8 @@ export const PrivacyGuestRegistration: FC = () => {
       </h3>
       <p>
         {isEnglish
-          ? 'For some events you can register without creating a user account ("guest registration"). In that case we only collect your first name, last name, and email address. We use this data solely to run the event you registered for: to confirm your registration, to keep the participant list, and to inform you about changes to that event (for example a change of date or its cancellation).'
-          : 'Für manche Veranstaltungen kannst du dich anmelden, ohne ein Nutzerkonto anzulegen („Gast-Anmeldung"). Dabei erheben wir ausschließlich deinen Vornamen, deinen Nachnamen und deine E-Mail-Adresse. Wir verwenden diese Daten allein zur Durchführung der Veranstaltung, für die du dich angemeldet hast: zur Bestätigung deiner Anmeldung, für die Teilnahmeliste und um dich über Änderungen an dieser Veranstaltung zu informieren (etwa eine Terminverschiebung oder den Ausfall).'}
+          ? 'For some events you can register without creating a user account ("guest registration"). In that case we only collect your first name, last name, and email address, plus your organization if you choose to provide it. We use this data solely to run the event you registered for: to confirm your registration, to keep the participant list and print name tags, and to inform you about changes to that event (for example a change of date or its cancellation).'
+          : 'Für manche Veranstaltungen kannst du dich anmelden, ohne ein Nutzerkonto anzulegen („Gast-Anmeldung"). Dabei erheben wir ausschließlich deinen Vornamen, deinen Nachnamen und deine E-Mail-Adresse sowie – falls du sie angibst – deine Organisation. Wir verwenden diese Daten allein zur Durchführung der Veranstaltung, für die du dich angemeldet hast: zur Bestätigung deiner Anmeldung, für die Teilnahmeliste und Namensschilder und um dich über Änderungen an dieser Veranstaltung zu informieren (etwa eine Terminverschiebung oder den Ausfall).'}
       </p>
       <p>
         {isEnglish

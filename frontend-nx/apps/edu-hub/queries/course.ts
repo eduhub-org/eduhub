@@ -61,6 +61,25 @@ export const COURSE_MINIMUM = gql`
 `;
 
 // Query to get the shell data needed for the initial manage course page.
+/**
+ * Whether the viewer may manage this course as an org admin: sent as org_admin with the
+ * useManageCourseWhere scope (the course's program type must match one of their capabilities), so
+ * it comes back empty for a course they may only read. The organizers tell the page whether the
+ * viewer instructs the course, in which case the instructor role keeps applying.
+ */
+export const ORG_ADMIN_MANAGEABLE_COURSE = gql`
+  query OrgAdminManageableCourse($where: Course_bool_exp!) {
+    Course(where: $where, limit: 1) {
+      id
+      CourseInstructors {
+        User {
+          id
+        }
+      }
+    }
+  }
+`;
+
 export const MANAGED_COURSE = gql`
   ${ADMIN_COURSE_FRAGMENT}
   ${ADMIN_SESSION_FRAGMENT}
@@ -135,6 +154,7 @@ export const MANAGED_COURSE_APPLICATIONS = gql`
               }
             }
           }
+          organizationName
           Organization {
             id
             name
@@ -895,6 +915,42 @@ export const UPDATE_COURSE_GUEST_REGISTRATION_ENABLED = gql`
     update_Course_by_pk(pk_columns: { id: $courseId }, _set: { guestRegistrationEnabled: $value }) {
       id
       guestRegistrationEnabled
+    }
+  }
+`;
+
+/**
+ * Everyone with an active enrollment, for the participant exports on the
+ * manage-course page (CSV, attendance list, name tags). Guests are REGISTERED,
+ * regular participants CONFIRMED or COMPLETED.
+ */
+export const MANAGED_COURSE_PARTICIPANT_EXPORT = gql`
+  query ManagedCourseParticipantExport($id: Int!) {
+    Course_by_pk(id: $id) {
+      id
+      title
+      Sessions(order_by: { startDateTime: asc }, limit: 1) {
+        id
+        startDateTime
+      }
+      CourseEnrollments(
+        where: { isTest: { _eq: false }, status: { _in: [REGISTERED, CONFIRMED, COMPLETED] } }
+        order_by: [{ User: { lastName: asc } }, { User: { firstName: asc } }, { id: asc }]
+      ) {
+        id
+        status
+        User {
+          id
+          firstName
+          lastName
+          email
+          organizationName
+          Organization {
+            id
+            name
+          }
+        }
+      }
     }
   }
 `;

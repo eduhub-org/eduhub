@@ -1,0 +1,29 @@
+table:
+  name: InstructorConfidentialityAcceptance
+  schema: public
+object_relationships:
+  - name: User
+    using:
+      foreign_key_constraint_on: userId
+# Append-only audit record: instructors insert their own acceptance (userId is
+# preset from the session, created_at comes from the database) and read their
+# own rows. No update or delete for anyone but admin.
+insert_permissions:
+  - role: instructor_access
+    permission:
+      columns:
+        - version
+      check: {}
+      set:
+        userId: x-hasura-User-Id
+select_permissions:
+  - role: instructor_access
+    permission:
+      columns:
+        - id
+        - userId
+        - version
+        - created_at
+      filter:
+        userId:
+          _eq: X-Hasura-User-Id

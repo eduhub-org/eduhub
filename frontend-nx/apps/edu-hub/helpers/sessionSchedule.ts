@@ -195,3 +195,39 @@ export const sortEventCoursesByUpcoming = <
   }
   return [...courses].sort((a, b) => compareByUpcoming(a, b, now));
 };
+
+/**
+ * Widget order for any mix of courses and events, soonest date first.
+ *
+ * Events are ranked by their next session (see `compareByUpcoming`); a course
+ * is ranked by when it starts — its first session. So the list leads with
+ * whatever begins next, whether that is an event or a course. Courses that have
+ * already started but not yet finished follow everything still to come, then
+ * finished items (most recently finished first), then anything without a date.
+ */
+export const sortCoursesByUpcoming = <
+  T extends { Program?: { type?: string | null } | null; Sessions?: ScheduleSession[] | null }
+>(
+  courses: T[],
+  now: Date = new Date()
+): T[] => {
+  const rank = (course: T) => {
+    const sessions = course.Sessions ?? [];
+    const end = lastSessionEnd(sessions);
+    if (!end) return { group: 3, time: 0 };
+    if (end < now) return { group: 2, time: -end.getTime() };
+    if (course.Program?.type === 'EVENTS') {
+      const time = hasActiveSession(sessions, now)
+        ? now.getTime()
+        : (nextSessionStart(sessions, now) ?? end).getTime();
+      return { group: 0, time };
+    }
+    const start = firstSessionStart(sessions) ?? end;
+    return start >= now ? { group: 0, time: start.getTime() } : { group: 1, time: start.getTime() };
+  };
+
+  return courses
+    .map((course) => ({ course, rank: rank(course) }))
+    .sort((a, b) => a.rank.group - b.rank.group || a.rank.time - b.rank.time)
+    .map(({ course }) => course);
+};

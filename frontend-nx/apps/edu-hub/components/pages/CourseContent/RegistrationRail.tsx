@@ -19,6 +19,7 @@ interface RegistrationRailProps {
   isLoggedInParticipant: boolean;
   onRegistrationSuccess?: (info?: { waitlist: boolean }) => void;
   onParticipationExit?: (outcome: ParticipationExitOutcome) => void;
+  onCancellationRequested?: (changed: boolean) => void;
 }
 
 const Divider: FC = () => <div className="border-t border-border-primary my-6" />;
@@ -44,6 +45,7 @@ export const RegistrationRail: FC<RegistrationRailProps> = ({
   isLoggedInParticipant,
   onRegistrationSuccess,
   onParticipationExit,
+  onCancellationRequested,
 }) => {
   const t = useTranslations('course');
   const isAdmin = useIsAdmin();
@@ -105,6 +107,7 @@ export const RegistrationRail: FC<RegistrationRailProps> = ({
         courseEnrollment={courseEnrollment}
         onRegistrationSuccess={onRegistrationSuccess}
         onParticipationExit={onParticipationExit}
+        onCancellationRequested={onCancellationRequested}
       />
 
       <Divider />

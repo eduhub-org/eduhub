@@ -40,6 +40,7 @@ const GuestManage: FC = () => {
   const [errorKey, setErrorKey] = useState<string>('errors.invalid_token');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
+  const [organizationName, setOrganizationName] = useState('');
   const [email, setEmail] = useState('');
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
@@ -63,6 +64,7 @@ const GuestManage: FC = () => {
 
         setFirstName(response.firstName ?? '');
         setLastName(response.lastName ?? '');
+        setOrganizationName(response.organizationName ?? '');
         setEmail(response.email ?? '');
         setRegistrations((response.registrations ?? []) as Registration[]);
         setState('ready');
@@ -91,7 +93,7 @@ const GuestManage: FC = () => {
   );
 
   return (
-    <div className="max-w-screen-md mx-auto mt-14">
+    <div className="w-full">
       <Head>
         <title>{t('manage.page_title')} | EduHub | opencampus.sh</title>
         {/* This URL carries a credential; keep it out of search indexes. */}
@@ -99,7 +101,7 @@ const GuestManage: FC = () => {
         <link rel="icon" href="/favicon.png" />
       </Head>
       <Page>
-        <div className="px-6 py-12 space-y-8">
+        <div className="max-w-screen-md mx-auto px-6 pt-28 pb-12 space-y-8">
           {state === 'pending' && <p>{t('manage.loading')}</p>}
 
           {state === 'error' && (
@@ -131,6 +133,7 @@ const GuestManage: FC = () => {
                 <p>
                   {firstName} {lastName}
                 </p>
+                {organizationName && <p>{organizationName}</p>}
                 <p>{email}</p>
                 <p className="text-sm text-label-secondary">{t('manage.retention_notice')}</p>
               </section>
