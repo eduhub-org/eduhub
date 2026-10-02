@@ -36,6 +36,46 @@ export const UPDATE_ENROLLMENT = gql`
   }
 `;
 
+/**
+ * A participant registering themselves. Same upsert as UPDATE_ENROLLMENT, but
+ * it also takes over the motivation letter: on an existing row that is a
+ * re-registration after a cancellation, and the letter just submitted is the
+ * one that applies. UPDATE_ENROLLMENT stays without it because the instructor
+ * "add participants" flow sends an empty letter and must not blank a real one.
+ *
+ * Which statuses and transitions are allowed is enforced server-side by the
+ * course_enrollment_guard_participant_changes trigger.
+ */
+export const REGISTER_OWN_ENROLLMENT = gql`
+  mutation RegisterOwnEnrollment(
+    $userId: uuid!
+    $courseId: Int!
+    $motivationLetter: String!
+    $status: CourseEnrollmentStatus_enum!
+    $termsAcceptedAt: timestamptz
+  ) {
+    insert_CourseEnrollment(
+      objects: {
+        userId: $userId
+        courseId: $courseId
+        motivationLetter: $motivationLetter,
+        status: $status
+        termsAcceptedAt: $termsAcceptedAt
+      },
+      on_conflict: {
+        constraint: uniqueUserCourse,
+        update_columns: [status, termsAcceptedAt, motivationLetter],
+        where: { isTest: { _eq: false } }
+      }
+    ) {
+      affected_rows
+      returning {
+        id
+      }
+    }
+  }
+`;
+
 export const INSERT_ENROLLMENT = gql`
   ${COURSE_FRAGMENT}
   ${ENROLLMENT_FRAGMENT}
@@ -210,6 +250,29 @@ export const UPDATE_ENROLLMENT_STATUS_WHEN_CONFIRMED = gql`
   }
 `;
 
+/**
+ * An organizer cancelling registrations (e.g. after a participant's cancellation request). Guarded
+ * on the statuses a participant still holds a place from, so a row that moved on in the meantime -
+ * completed, rejected, already cancelled - is left alone; the status change sends the participant
+ * the ENROLLMENT_CANCELLED mail. Any refund is issued in Stripe.
+ */
+export const CANCEL_ENROLLMENTS_BY_ORGANIZER = gql`
+  mutation CancelEnrollmentsByOrganizer($enrollmentIds: [Int!]!, $courseId: Int!) {
+    update_CourseEnrollment(
+      where: {
+        _and: [
+          { id: { _in: $enrollmentIds } }
+          { courseId: { _eq: $courseId } }
+          { status: { _in: [APPLIED, WAITLIST, INVITED, CONFIRMED, REGISTERED] } }
+        ]
+      }
+      _set: { status: CANCELLED }
+    ) {
+      affected_rows
+    }
+  }
+`;
+
 /** Bulk invite update for APPLIED, WAITLIST, or already INVITED rows (supports invite resend/deadline changes). */
 export const UPDATE_ENROLLMENT_STATUS_FOR_INVITE = gql`
   mutation UpdateEnrollmentStatusForInvite(
@@ -248,6 +311,36 @@ export const UPDATE_ENROLLMENT_STATUS_FOR_INVITE = gql`
  * `invitationExpirationDate`, so calling it without `expire` NULLs a column
  * this action has no business touching.
  */
+/**
+ * A participant of a paid course asking the organizers to cancel: they cannot
+ * cancel it themselves, because a refund is the organizer's decision.
+ *
+ * The client value of `cancellationRequestedAt` is only a signal - the guard
+ * trigger overwrites it with the server time and allows it once, on a paid
+ * enrollment still held. Setting it fires the send_cancellation_request_email
+ * event trigger. Guarded on NULL like CANCEL_OWN_ENROLLMENT on its statuses,
+ * so a page left open cannot send a second request.
+ */
+export const REQUEST_ENROLLMENT_CANCELLATION = gql`
+  mutation RequestEnrollmentCancellation(
+    $enrollmentId: Int!
+    $requestedAt: timestamptz!
+    $reason: String
+  ) {
+    update_CourseEnrollment(
+      where: {
+        _and: [
+          { id: { _eq: $enrollmentId } }
+          { cancellationRequestedAt: { _is_null: true } }
+        ]
+      }
+      _set: { cancellationRequestedAt: $requestedAt, cancellationRequestReason: $reason }
+    ) {
+      affected_rows
+    }
+  }
+`;
+
 export const CANCEL_OWN_ENROLLMENT = gql`
   mutation CancelOwnEnrollment(
     $enrollmentId: Int!

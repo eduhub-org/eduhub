@@ -784,9 +784,20 @@
       "abort_participation_confirm": "Möchtest du deine Teilnahme an „{title}“ wirklich abbrechen?",
       "exit_failed": "Deine Anmeldung konnte gerade nicht geändert werden. Bitte versuche es erneut."
     },
+    "CancellationRequest": {
+      "request_cancellation": "Stornierung anfragen",
+      "dialog_title": "Stornierung anfragen",
+      "dialog_body": "Du hast für diese Anmeldung bereits bezahlt. Über eine Stornierung und eine mögliche Erstattung entscheiden deshalb die Veranstalter. Wir leiten deine Anfrage an sie weiter und schicken dir eine Bestätigung per E-Mail. Bis zur Entscheidung bleibt deine Anmeldung bestehen.",
+      "reason_label": "Begründung (optional)",
+      "reason_placeholder": "Warum möchtest du stornieren?",
+      "send_request": "Anfrage senden",
+      "requested_notice": "Stornierung am {date} angefragt. Die Veranstalter wurden informiert und melden sich bei dir.",
+      "request_failed": "Deine Anfrage konnte gerade nicht gesendet werden. Bitte versuche es erneut."
+    },
     "CourseContent": {
       "cancel_success_message": "Deine Anmeldung wurde storniert.",
-      "abort_success_message": "Deine Teilnahme wurde abgebrochen."
+      "abort_success_message": "Deine Teilnahme wurde abgebrochen.",
+      "cancellation_request_success_message": "Deine Anfrage wurde an die Veranstalter gesendet."
     }
   },
   "coursePage": {
@@ -1456,8 +1467,15 @@
       "send_rejections_all_count_plural": "{count} Personen mit roter Bewertung wurden identifiziert und werden über ihre Ablehnung für diesen Kurs informiert.",
       "send_rejections_confirm": "Ablehnungen senden",
       "send_invitations_error": "Fehler beim Senden der Einladungen: {error}",
+      "cancel_registrations_error": "Die Registrierungen konnten nicht storniert werden: {error}",
       "send_rejections_error": "Fehler beim Senden der Ablehnungen: {error}",
       "no_eligible_invitations": "Gerade gibt es niemanden mit grüner Bewertung und Status „beworben“ oder „eingeladen“, den du einladen könntest.",
+      "manage_registrations": "Registrierungen verwalten",
+      "cancel_registrations_selected": "Ausgewählte Registrierungen stornieren",
+      "cancel_registrations_question": "Möchtest du {count, plural, one {die ausgewählte Registrierung} other {die # ausgewählten Registrierungen}} stornieren? Die Teilnehmenden werden per E-Mail informiert. Eine Erstattung veranlasst du bei Bedarf in Stripe.",
+      "cancel_registrations_confirm": "Stornieren",
+      "registrations_cancelled": "{count, plural, one {# Registrierung storniert} other {# Registrierungen storniert}}",
+      "no_eligible_cancellations": "Keine der ausgewählten Registrierungen kann storniert werden.",
       "no_eligible_rejections": "Gerade gibt es niemanden mit roter Bewertung und Status „beworben“, dem du eine Ablehnung schicken könntest.",
       "invitations_queued_singular": "{count} Einladung wurde ausgelöst; Bestätigungs-E-Mails werden verschickt.",
       "invitations_queued_plural": "{count} Einladungen wurden ausgelöst; Bestätigungs-E-Mails werden verschickt.",
@@ -1853,6 +1871,8 @@
       "registered": "Registriert",
       "waitlist": "Warteliste",
       "waitlist_badge": "Warteliste",
+      "cancellation_requested": "Stornierung angefragt",
+      "cancellation_requested_badge": "Storno angefragt",
       "aborted": "Abgebrochen",
       "rejected": "Bewerbung abgelehnt",
       "cancelled": "Storniert",
@@ -2017,6 +2037,49 @@
     "guest_registration": {
       "label": "Anmeldung ohne Konto erlauben",
       "help_text": "Erlaubt die Anmeldung mit Name und E-Mail-Adresse, ohne dass ein Konto angelegt wird. Die Anmeldung wird erst nach Bestätigung per E-Mail gültig. Nur für Veranstaltungen mit direkter Anmeldung möglich."
+    },
+    "instructor_confidentiality": {
+      "title": "Vertraulichkeit personenbezogener Daten",
+      "intro": "Bevor du deinen Kurs verwaltest, bestätige bitte einmalig, dass du die personenbezogenen Daten der Teilnehmenden vertraulich behandelst.",
+      "points": {
+        "access": "Als Kursleitung erhältst du Zugriff auf personenbezogene Daten von Teilnehmenden und anderen Nutzer:innen, zum Beispiel Namen, E-Mail-Adressen, Organisationen, Bewerbungsunterlagen und Anwesenheiten.",
+        "purpose": "Du verwendest diese Daten ausschließlich zur Durchführung deiner Kurse und Veranstaltungen und nur so, wie es {operator} vorsieht.",
+        "no_disclosure": "Du gibst sie nicht an Dritte weiter und nutzt sie nicht für eigene Zwecke, etwa eigene Verteiler oder Werbung.",
+        "exports": "Exporte und Ausdrucke (Teilnahmelisten, Anwesenheitslisten, Namensschilder) bewahrst du sicher auf und löschst bzw. vernichtest sie nach der Veranstaltung.",
+        "incidents": "Gehen Daten verloren oder werden sie missbraucht, zum Beispiel eine liegen gelassene Liste, informierst du umgehend {recipient}.",
+        "duration": "Diese Verpflichtung gilt auch nach dem Ende deiner Tätigkeit als Kursleitung fort."
+      },
+      "checkbox": "Ich habe die Hinweise gelesen und verpflichte mich, personenbezogene Daten vertraulich zu behandeln.",
+      "accept": "Bestätigen",
+      "failed": "Deine Bestätigung konnte nicht gespeichert werden. Bitte versuch es noch einmal.",
+      "operator_generic": "der Betreiber dieser Plattform",
+      "recipient_operator": "das Team von {operator}",
+      "recipient_generic": "den Betreiber dieser Plattform",
+      "recipient_contact": "{recipient} unter {email}"
+    },
+    "participant_export": {
+      "button": "Teilnehmende exportieren",
+      "csv": "Teilnahmeliste (CSV für Excel)",
+      "attendance_list": "Anwesenheitsliste (Drucken / PDF)",
+      "name_tags": "Namensschilder (Drucken / PDF)",
+      "hint": "Enthält alle angemeldeten und bestätigten Teilnehmenden.",
+      "file_suffix": "teilnehmende",
+      "first_name": "Vorname",
+      "last_name": "Nachname",
+      "organization": "Organisation",
+      "email": "E-Mail",
+      "status": "Status",
+      "number": "Nr.",
+      "present": "Anwesend",
+      "signature": "Unterschrift",
+      "count": "{count, plural, =1 {1 Teilnehmer:in} other {# Teilnehmende}}",
+      "no_participants": "Es gibt noch keine angemeldeten oder bestätigten Teilnehmenden.",
+      "failed": "Die Teilnahmedaten konnten nicht geladen werden. Bitte versuch es noch einmal.",
+      "statuses": {
+        "REGISTERED": "angemeldet",
+        "CONFIRMED": "bestätigt",
+        "COMPLETED": "abgeschlossen"
+      }
     },
     "participant_preview": {
       "start": "Als Teilnehmer:in ansehen",
@@ -2310,6 +2373,12 @@
       "America/Los_Angeles": "Los Angeles",
       "Asia/Tokyo": "Tokio"
     },
+    "operator": {
+      "title": "Betreiber & Datenschutz",
+      "help": "Wird in Texten wie der Vertraulichkeitserklärung für Kursleitungen verwendet. Leere Felder werden durch neutrale Formulierungen ersetzt.",
+      "operatorName": "Name des Betreibers",
+      "privacyContactEmail": "E-Mail für Datenschutzfragen und -vorfälle"
+    },
     "faqSettings": "FAQ Einstellungen",
     "showFaqSection": "FAQ-Bereich auf der Startseite anzeigen",
     "faqCollectionName": "Angezeigte FAQ-Sammlung",
@@ -2318,6 +2387,8 @@
     "saving": "Speichern...",
     "loading": "Wird geladen...",
     "errorSavingSettings": "Beim Speichern der Einstellungen ist ein Fehler aufgetreten. Bitte versuche es erneut.",
+    "errorLoadingSettings": "Die Einstellungen konnten nicht geladen werden.",
+    "retry": "Erneut versuchen",
     "course_groups": {
       "label": "Kursgruppierungen",
       "help_text": "Lege fest, welche Kursgruppierungen es gibt und in welcher Reihenfolge die als Slider markierten Gruppen auf der Startseite erscheinen. Die Gruppen \"Courses\", \"Events\" und \"Degrees\" werden automatisch aus den veröffentlichten Angeboten des jeweiligen Programmtyps befüllt. Zusätzliche Gruppen können angelegt und in einem Org-Widget ausgewählt werden, ohne auf der Startseite zu erscheinen.",
@@ -2775,6 +2846,8 @@
       "APPLICATION_RECEIVED_PAID": "Bewerbung erhalten (kostenpflichtig)",
       "USER_CREATED": "Benutzer erstellt",
       "ORGANIZER_ADDED": "Organisator hinzugefügt",
+      "CANCELLATION_REQUEST_ORGANIZER": "Stornierungsanfrage (an Veranstalter)",
+      "CANCELLATION_REQUEST_CONFIRMATION": "Stornierungsanfrage (Bestätigung)",
       "WAITLIST_NOTICE": "Wartelisten-Benachrichtigung",
       "CERTIFICATE_ACHIEVEMENT_READY": "Leistungszertifikat verfügbar",
       "CERTIFICATE_ATTENDANCE_READY": "Teilnahmebescheinigung verfügbar",
@@ -2830,6 +2903,8 @@
       "SESSION_REMINDER": "Gesendet vor Beginn der Sitzungen (24h, 1h, 15min vorher)",
       "USER_CREATED": "Gesendet, wenn ein neues Benutzerkonto erstellt wird",
       "ORGANIZER_ADDED": "Gesendet, wenn ein Benutzer als Organisator zu einem Kurs oder Event hinzugefügt wird",
+      "CANCELLATION_REQUEST_ORGANIZER": "Gesendet an Veranstalter und Organisations-Admins, wenn jemand die Stornierung einer bezahlten Anmeldung anfragt",
+      "CANCELLATION_REQUEST_CONFIRMATION": "Gesendet an Teilnehmende als Bestätigung ihrer Stornierungsanfrage für eine bezahlte Anmeldung",
       "WAITLIST_NOTICE": "Gesendet, wenn ein Benutzer auf die Warteliste kommt, weil der Kurs voll ist",
       "CERTIFICATE_ACHIEVEMENT_READY": "Gesendet, wenn ein Leistungszertifikat für eine Teilnahme ausgestellt wird",
       "CERTIFICATE_ATTENDANCE_READY": "Gesendet, wenn eine Teilnahmebescheinigung für eine Teilnahme ausgestellt wird",
@@ -2996,6 +3071,10 @@
         "time-zone": {
           "label": "Zeitzone",
           "description": "Standard-Zeitzone für Datums- und Zeitangaben"
+        },
+        "operator": {
+          "label": "Betreiber & Datenschutz",
+          "description": "Name des Betreibers und Kontakt für Datenschutzfragen"
         },
         "access": {
           "label": "Zugriff & Rollen",
@@ -3169,9 +3248,10 @@
       "first_name": "Vorname",
       "last_name": "Nachname",
       "email": "E-Mail-Adresse",
+      "organization": "Organisation (optional)",
       "accept_terms": "Ich habe die <terms>Allgemeinen Geschäftsbedingungen (AGB)</terms> sowie die <privacy>Datenschutzerklärung</privacy> gelesen und akzeptiere sie.",
       "newsletter_opt_in": "Informiert mich per E-Mail über weitere Veranstaltungen dieses Veranstalters. Das ist freiwillig und du kannst es jederzeit widerrufen.",
-      "data_notice": "Wir speichern deinen Namen und deine E-Mail-Adresse, um die Veranstaltung durchzuführen und dich über Änderungen zu informieren. Danach löschen wir sie automatisch. Über den Link in jeder E-Mail kannst du deine Daten jederzeit einsehen oder löschen lassen.",
+      "data_notice": "Wir speichern deinen Namen, deine E-Mail-Adresse und ggf. deine Organisation, um die Veranstaltung durchzuführen und dich über Änderungen zu informieren. Danach löschen wir sie automatisch. Über den Link in jeder E-Mail kannst du deine Daten jederzeit einsehen oder löschen lassen.",
       "submit": "Anmeldung abschicken",
       "submitting": "Wird gesendet …",
       "cancel": "Abbrechen",
@@ -3213,6 +3293,7 @@
       "email_required": "Bitte gib deine E-Mail-Adresse an.",
       "terms_required": "Bitte akzeptiere die AGB und die Datenschutzerklärung.",
       "invalid_name": "Bitte prüfe deinen Namen.",
+      "invalid_organization": "Der Name der Organisation darf höchstens 200 Zeichen lang sein.",
       "invalid_email": "Bitte prüfe deine E-Mail-Adresse.",
       "invalid_course": "Diese Veranstaltung wurde nicht gefunden.",
       "terms_not_accepted": "Bitte akzeptiere die AGB und die Datenschutzerklärung.",
@@ -3242,6 +3323,7 @@
   },
   "eventsFeed": {
     "title": "EduHub Events | opencampus.sh",
-    "description": "Kommende Events bei opencampus.sh"
+    "description": "Kommende Events bei opencampus.sh",
+    "icalCategory": "Bildung"
   }
 }

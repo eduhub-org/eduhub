@@ -13,9 +13,11 @@ import {
   isHoneypotTripped,
   isValidEmail,
   isValidName,
+  isValidOrganizationName,
   issueConfirmToken,
   normalizeEmail,
   normalizeName,
+  normalizeOrganizationName,
   queueGuestMail,
 } from '../guestRegistration.js';
 
@@ -58,11 +60,17 @@ const GET_COURSE = gql`
 `;
 
 const INSERT_GUEST_USER = gql`
-  mutation InsertGuestUser($firstName: String!, $lastName: String!, $email: String!) {
+  mutation InsertGuestUser(
+    $firstName: String!
+    $lastName: String!
+    $organizationName: String
+    $email: String!
+  ) {
     insert_User_one(
       object: {
         firstName: $firstName
         lastName: $lastName
+        organizationName: $organizationName
         email: $email
         status: GUEST
       }
@@ -190,6 +198,7 @@ export default async function registerGuestForCourse(req, logger) {
     const courseId = Number(input.courseId);
     const firstName = normalizeName(input.firstName);
     const lastName = normalizeName(input.lastName);
+    const organizationName = normalizeOrganizationName(input.organizationName);
     const email = normalizeEmail(input.email);
     const acceptTerms = input.acceptTerms === true;
     const newsletterOptIn = input.newsletterOptIn === true;
@@ -208,6 +217,9 @@ export default async function registerGuestForCourse(req, logger) {
     }
     if (!isValidName(firstName) || !isValidName(lastName)) {
       return { success: false, messageKey: 'INVALID_NAME' };
+    }
+    if (!isValidOrganizationName(organizationName)) {
+      return { success: false, messageKey: 'INVALID_ORGANIZATION' };
     }
     if (!isValidEmail(email)) {
       return { success: false, messageKey: 'INVALID_EMAIL' };
@@ -335,12 +347,20 @@ export default async function registerGuestForCourse(req, logger) {
       userId = existingUser.id;
       // Someone re-submitting with a corrected spelling should see the
       // correction; the address is the identity, the name is just a label.
+      // The organization, unlike the name, is not written here: it travels
+      // with the confirmation token and only lands once the address owner uses
+      // the link (confirmGuestRegistration).
       if (existingUser.firstName !== firstName || existingUser.lastName !== lastName) {
         await client.request(UPDATE_GUEST_USER_NAME, { id: userId, firstName, lastName });
       }
     } else {
       try {
-        const inserted = await client.request(INSERT_GUEST_USER, { firstName, lastName, email });
+        const inserted = await client.request(INSERT_GUEST_USER, {
+          firstName,
+          lastName,
+          organizationName,
+          email,
+        });
         userId = inserted.insert_User_one.id;
         logger.info(`Created GUEST user for course ${course.id}`);
       } catch (insertError) {
@@ -355,7 +375,7 @@ export default async function registerGuestForCourse(req, logger) {
       }
     }
 
-    const rawToken = await issueConfirmToken(client, userId, course.id, newsletterOptIn);
+    const rawToken = await issueConfirmToken(client, userId, course.id, newsletterOptIn, organizationName);
 
     await queueGuestMail(client, logger, {
       templateType: 'GUEST_REGISTRATION_CONFIRM',

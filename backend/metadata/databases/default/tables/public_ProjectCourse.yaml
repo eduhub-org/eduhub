@@ -30,11 +30,20 @@ insert_permissions:
   - role: instructor_access
     permission:
       check:
-        Course:
-          CourseInstructors:
-            User:
-              id:
-                _eq: X-Hasura-User-Id
+        _and:
+          - Course:
+              CourseInstructors:
+                User:
+                  id:
+                    _eq: X-Hasura-User-Id
+          - Project:
+              _or:
+                - proposedByUserId:
+                    _eq: X-Hasura-User-Id
+                - Organization:
+                    OrganizationAdmins:
+                      userId:
+                        _eq: X-Hasura-User-Id
       columns:
         - courseId
         - created_at
@@ -48,11 +57,79 @@ insert_permissions:
   - role: instructor
     permission:
       check:
-        Course:
-          CourseInstructors:
-            User:
-              id:
-                _eq: X-Hasura-User-Id
+        _and:
+          - Course:
+              CourseInstructors:
+                User:
+                  id:
+                    _eq: X-Hasura-User-Id
+          - Project:
+              _or:
+                - proposedByUserId:
+                    _eq: X-Hasura-User-Id
+                - Organization:
+                    OrganizationAdmins:
+                      userId:
+                        _eq: X-Hasura-User-Id
+      columns:
+        - courseId
+        - created_at
+        - id
+        - projectId
+        - updated_at
+  # The project is bound as well as the course: otherwise whoever manages a course could link another organization's project to it and reach it through ProjectCourses.
+  - role: org_admin_access
+    permission:
+      check:
+        _and:
+          - Course:
+              Program:
+                _or:
+                  - _and:
+                      - type:
+                          _eq: EVENTS
+                      - Organization:
+                          OrganizationAdmins:
+                            _and:
+                              - userId:
+                                  _eq: X-Hasura-User-Id
+                              - canManageEvents:
+                                  _eq: true
+                  - _and:
+                      - type:
+                          _eq: COURSES
+                      - Organization:
+                          OrganizationAdmins:
+                            _and:
+                              - userId:
+                                  _eq: X-Hasura-User-Id
+                              - canManageCourses:
+                                  _eq: true
+                  - _and:
+                      - type:
+                          _eq: DEGREES
+                      - Organization:
+                          OrganizationAdmins:
+                            _and:
+                              - userId:
+                                  _eq: X-Hasura-User-Id
+                              - canManageDegrees:
+                                  _eq: true
+                  - Organization:
+                      OrganizationAdmins:
+                        _and:
+                          - userId:
+                              _eq: X-Hasura-User-Id
+                          - canManageSettings:
+                              _eq: true
+          - Project:
+              _or:
+                - proposedByUserId:
+                    _eq: X-Hasura-User-Id
+                - Organization:
+                    OrganizationAdmins:
+                      userId:
+                        _eq: X-Hasura-User-Id
       columns:
         - courseId
         - created_at
@@ -111,24 +188,78 @@ select_permissions:
             User:
               id:
                 _eq: X-Hasura-User-Id
+  - role: org_admin_access
+    permission:
+      columns:
+        - courseId
+        - created_at
+        - id
+        - projectId
+        - updated_at
+      filter:
+        Course:
+          Program:
+            _or:
+              - _and:
+                  - type:
+                      _eq: EVENTS
+                  - Organization:
+                      OrganizationAdmins:
+                        _and:
+                          - userId:
+                              _eq: X-Hasura-User-Id
+                          - canManageEvents:
+                              _eq: true
+              - _and:
+                  - type:
+                      _eq: COURSES
+                  - Organization:
+                      OrganizationAdmins:
+                        _and:
+                          - userId:
+                              _eq: X-Hasura-User-Id
+                          - canManageCourses:
+                              _eq: true
+              - _and:
+                  - type:
+                      _eq: DEGREES
+                  - Organization:
+                      OrganizationAdmins:
+                        _and:
+                          - userId:
+                              _eq: X-Hasura-User-Id
+                          - canManageDegrees:
+                              _eq: true
+              - Organization:
+                  OrganizationAdmins:
+                    _and:
+                      - userId:
+                          _eq: X-Hasura-User-Id
+                      - canManageSettings:
+                          _eq: true
 update_permissions:
   - role: instructor_access
     permission:
       columns:
         - courseId
         - projectId
-      filter:
+      filter: &id001
         Course:
           CourseInstructors:
             User:
               id:
                 _eq: X-Hasura-User-Id
       check:
-        Course:
-          CourseInstructors:
-            User:
-              id:
-                _eq: X-Hasura-User-Id
+        _and:
+          - *id001
+          - Project:
+              _or:
+                - proposedByUserId:
+                    _eq: X-Hasura-User-Id
+                - Organization:
+                    OrganizationAdmins:
+                      userId:
+                        _eq: X-Hasura-User-Id
 delete_permissions:
   - role: instructor_access
     permission:

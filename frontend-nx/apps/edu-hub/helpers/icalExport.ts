@@ -7,6 +7,33 @@ interface ICalEvent {
   /** Absolute link back to the page the entry came from. */
   url?: string;
   uid: string;
+  categories?: string[];
+  /** Absolute URL of an image for the entry, written as ATTACH. */
+  imageUrl?: string;
+  lastModified?: string;
+}
+
+interface ICalOptions {
+  /** Written as X-WR-TIMEZONE so subscribing clients show the events in local time. */
+  timeZone?: string;
+  /** How often a subscriber should re-fetch the calendar, as an RFC 5545 duration (e.g. "PT6H"). */
+  refreshInterval?: string;
+  /** Stamp for DTSTAMP; defaults to the current time. */
+  now?: Date;
+}
+
+const IMAGE_TYPES: Record<string, string> = {
+  jpg: 'image/jpeg',
+  jpeg: 'image/jpeg',
+  png: 'image/png',
+  webp: 'image/webp',
+  gif: 'image/gif',
+};
+
+function imageAttachment(imageUrl: string): string {
+  const extension = imageUrl.split('?')[0].split('.').pop()?.toLowerCase() ?? '';
+  const type = IMAGE_TYPES[extension];
+  return type ? `ATTACH;FMTTYPE=${type}:${imageUrl}` : `ATTACH:${imageUrl}`;
 }
 
 function escapeICalText(text: string): string {
@@ -58,7 +85,8 @@ function foldICalLine(line: string): string {
   return chunks.join('\r\n ');
 }
 
-export function generateICalString(events: ICalEvent[], calendarName: string): string {
+export function generateICalString(events: ICalEvent[], calendarName: string, options: ICalOptions = {}): string {
+  const dtStamp = formatICalDate((options.now ?? new Date()).toISOString());
   const lines: string[] = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
@@ -67,6 +95,13 @@ export function generateICalString(events: ICalEvent[], calendarName: string): s
     'CALSCALE:GREGORIAN',
     'METHOD:PUBLISH',
   ];
+  if (options.timeZone) {
+    lines.push(`X-WR-TIMEZONE:${options.timeZone}`);
+  }
+  if (options.refreshInterval) {
+    lines.push(`REFRESH-INTERVAL;VALUE=DURATION:${options.refreshInterval}`);
+    lines.push(`X-PUBLISHED-TTL:${options.refreshInterval}`);
+  }
 
   for (const event of events) {
     lines.push('BEGIN:VEVENT');
@@ -83,7 +118,16 @@ export function generateICalString(events: ICalEvent[], calendarName: string): s
     if (event.url) {
       lines.push(`URL:${event.url}`);
     }
-    lines.push(`DTSTAMP:${formatICalDate(new Date().toISOString())}`);
+    if (event.categories?.length) {
+      lines.push(`CATEGORIES:${event.categories.map(escapeICalText).join(',')}`);
+    }
+    if (event.imageUrl) {
+      lines.push(imageAttachment(event.imageUrl));
+    }
+    if (event.lastModified) {
+      lines.push(`LAST-MODIFIED:${formatICalDate(event.lastModified)}`);
+    }
+    lines.push(`DTSTAMP:${dtStamp}`);
     lines.push('END:VEVENT');
   }
 

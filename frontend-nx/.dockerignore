@@ -1,0 +1,47 @@
+# Dependencies
+node_modules
+**/node_modules
+
+# Framework and generated build output
+.next
+**/.next
+dist
+**/dist
+out
+**/out
+out-tsc
+**/out-tsc
+coverage
+**/coverage
+.nx
+**/.nx
+.turbo
+**/.turbo
+tmp
+**/tmp
+*.tsbuildinfo
+**/*.tsbuildinfo
+
+# Local Yarn cache and installation state. Keep releases, plugins, and patches.
+.yarn/cache
+.yarn/unplugged
+.yarn/sdks
+.yarn/install-state.gz
+.yarn/build-state.yml
+.pnp.*
+
+# Logs
+*.log
+**/*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Common OS-generated files
+.DS_Store
+**/.DS_Store
+Thumbs.db
+**/Thumbs.db
+Desktop.ini
+**/Desktop.ini

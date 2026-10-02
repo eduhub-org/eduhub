@@ -95,9 +95,9 @@ export const CreatableDropDown: React.FC<CreatableDropDownProps> = ({
     [allowCreate, getFilteredOptions]
   );
 
-  const handleValueChange = (value: string | null) => {
+  const handleValueChange = (value: string) => {
     const syntheticEvent = {
-      target: { value: value === null ? null : value },
+      target: { value },
     } as SelectChangeEvent<string>;
     onValueChange(syntheticEvent);
   };
@@ -156,7 +156,7 @@ export const CreatableDropDown: React.FC<CreatableDropDownProps> = ({
             if (disabled) return;
             onInputChange(e.target.value);
             if (!e.target.value) {
-              handleValueChange(null);
+              handleValueChange('');
               setIsCleared(true);
             } else {
               setIsCleared(false);

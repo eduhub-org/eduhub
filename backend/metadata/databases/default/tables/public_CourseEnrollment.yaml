@@ -45,6 +45,12 @@ array_relationships:
         table:
           name: Invoice
           schema: public
+# user_access keeps `check: {}` and a writable `userId`/`status` because the instructor "add
+# participants" flow inserts for other users through it. What a participant may actually do with
+# their own enrollment - which statuses, which transitions, whose row - is enforced by the
+# course_enrollment_guard_participant_changes trigger (migration 1790709784475), since a Hasura
+# check sees only the new row and never the transition. `motivationLetter` is an update column so
+# re-registering after a cancellation can submit a new letter; the trigger allows that only then.
 insert_permissions:
   - role: user_access
     permission:
@@ -144,6 +150,8 @@ select_permissions:
         - location
         - termsAcceptedAt
         - isTest
+        - cancellationRequestedAt
+        - cancellationRequestReason
       filter: {}
       allow_aggregations: true
   - role: user_access
@@ -163,6 +171,8 @@ select_permissions:
         - location
         - termsAcceptedAt
         - isTest
+        - cancellationRequestedAt
+        - cancellationRequestReason
       filter:
         _and:
           - userId:
@@ -200,6 +210,8 @@ select_permissions:
         - location
         - termsAcceptedAt
         - isTest
+        - cancellationRequestedAt
+        - cancellationRequestReason
       filter:
         _or:
           - Course:
@@ -255,9 +267,12 @@ update_permissions:
         - billingOrganizationId
         - invitationExpirationDate
         - motivationRating
+        - motivationLetter
         - status
         - location
         - termsAcceptedAt
+        - cancellationRequestedAt
+        - cancellationRequestReason
       filter:
         _or:
           - Course:
@@ -273,9 +288,12 @@ update_permissions:
         - billingOrganizationId
         - invitationExpirationDate
         - motivationRating
+        - motivationLetter
         - status
         - location
         - termsAcceptedAt
+        - cancellationRequestedAt
+        - cancellationRequestReason
       filter:
         userId:
           _eq: X-Hasura-User-Id
@@ -286,9 +304,12 @@ update_permissions:
         - billingOrganizationId
         - invitationExpirationDate
         - motivationRating
+        - motivationLetter
         - status
         - location
         - termsAcceptedAt
+        - cancellationRequestedAt
+        - cancellationRequestReason
       filter:
         _or:
           - Course:
@@ -422,6 +443,27 @@ event_triggers:
       - name: Function-Name
         value: add_confirmed_user_to_mm
       - name: Hasura-Secret
+        value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+  # A participant of a paid course asked the organizers to cancel (the guard
+  # trigger only lets that column go from NULL to a server timestamp, once).
+  - name: send_cancellation_request_email
+    definition:
+      enable_manual: true
+      update:
+        columns:
+          - cancellationRequestedAt
+    # The node function dispatcher answers 200 even on failure, so retries would
+    # never fire; a partial failure is redelivered from the event log instead
+    # (the function skips recipients that already have their mail).
+    retry_conf:
+      interval_sec: 10
+      num_retries: 0
+      timeout_sec: 120
+    webhook: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+    headers:
+      - name: name
+        value: sendCancellationRequestEmail
+      - name: secret
         value_from_env: HASURA_CLOUD_FUNCTION_SECRET
   - name: send_enrollment_status_email
     definition:

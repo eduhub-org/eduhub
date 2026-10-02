@@ -3,7 +3,9 @@ import { GraphQLClient } from "graphql-request";
 // Request roles from session_variables, not the inherited-role names used in
 // actions.yaml permissions. Instructors are additionally limited to instructions
 // they created (checked below).
-const ALLOWED_ROLES = new Set(["admin", "instructor"]);
+// Org admins manage courses from the course management page like instructors do;
+// the ownership check below applies to them the same way.
+const ALLOWED_ROLES = new Set(["admin", "instructor", "org_admin"]);
 
 const ensureHasuraClient = () => {
   if (!process.env.HASURA_ENDPOINT || !process.env.HASURA_ADMIN_SECRET) {

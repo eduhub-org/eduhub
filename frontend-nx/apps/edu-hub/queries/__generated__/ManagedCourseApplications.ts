@@ -138,6 +138,10 @@ export interface ManagedCourseApplications_Course_by_pk_CourseEnrollments_User {
    * An array relationship
    */
   CourseEnrollments: ManagedCourseApplications_Course_by_pk_CourseEnrollments_User_CourseEnrollments[];
+  /**
+   * Free-text organization the user belongs to, e.g. entered during guest registration. Used when no organizationId is set.
+   */
+  organizationName: string | null;
 }
 
 export interface ManagedCourseApplications_Course_by_pk_CourseEnrollments {
@@ -188,6 +192,14 @@ export interface ManagedCourseApplications_Course_by_pk_CourseEnrollments {
    * Rating that the user's motivation letter received from the course instructor
    */
   motivationRating: MotivationRating_enum;
+  /**
+   * When the participant asked the organizer to cancel this paid enrollment. Set once, server time; cleared when they register again.
+   */
+  cancellationRequestedAt: any | null;
+  /**
+   * Optional reason the participant gave with their cancellation request.
+   */
+  cancellationRequestReason: string | null;
   /**
    * An object relationship
    */

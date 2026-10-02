@@ -11,6 +11,8 @@ interface AppSettingsContextType {
   bannerTextDe: string | null;
   bannerTextEn: string | null;
   previewImageURL: string | null;
+  operatorName: string | null;
+  privacyContactEmail: string | null;
   loading: boolean;
   error: any;
 }
@@ -23,6 +25,8 @@ const defaultSettings: AppSettingsContextType = {
   bannerTextDe: null,
   bannerTextEn: null,
   previewImageURL: null,
+  operatorName: null,
+  privacyContactEmail: null,
   loading: true,
   error: null,
 };

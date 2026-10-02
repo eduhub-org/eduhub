@@ -10,11 +10,14 @@ import { useCurrentRole } from '../../../../../hooks/authentication';
 import { useUserId } from '../../../../../hooks/user';
 import { AuthRoles } from '../../../../../types/enums';
 import {
-  UPDATE_ENROLLMENT,
+  REGISTER_OWN_ENROLLMENT,
   UPDATE_ENROLLMENT_TERMS_ACCEPTED,
   GET_ENROLLMENT_TERMS_ACCEPTED_AT,
 } from '../../../../../queries/insertEnrollment';
-import { UpdateEnrollment, UpdateEnrollmentVariables } from '../../../../../queries/__generated__/UpdateEnrollment';
+import {
+  RegisterOwnEnrollment,
+  RegisterOwnEnrollmentVariables,
+} from '../../../../../queries/__generated__/RegisterOwnEnrollment';
 import {
   UpdateEnrollmentTermsAccepted,
   UpdateEnrollmentTermsAcceptedVariables,
@@ -81,8 +84,8 @@ export const useRegistrationHandler = ({
   const { data: sessionData } = useSession();
   const currentRole = useCurrentRole();
 
-  const [updateEnrollmentMutation] = useAuthedMutation<UpdateEnrollment, UpdateEnrollmentVariables>(
-    UPDATE_ENROLLMENT
+  const [updateEnrollmentMutation] = useAuthedMutation<RegisterOwnEnrollment, RegisterOwnEnrollmentVariables>(
+    REGISTER_OWN_ENROLLMENT
   );
 
   const [createStripeCheckoutMutation] = useAuthedMutation<CreateStripeCheckout, CreateStripeCheckoutVariables>(

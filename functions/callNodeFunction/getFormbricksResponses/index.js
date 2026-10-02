@@ -1,3 +1,5 @@
+import { GraphQLClient } from 'graphql-request';
+import { ORG_ADMIN_ROLES, isOrgAdminOfCourse } from '../lib/orgAdminScope.js';
 import { validateAndExtractFormbricksSurvey, fetchAllFormbricksResponses } from '../lib/formbricks.js';
 
 /**
@@ -33,6 +35,22 @@ export default async function getFormbricksResponses(req, logger) {
         error: 'Missing required parameters: courseId and userId are required',
         messageKey: 'MISSING_PARAMETERS'
       };
+    }
+
+    // An org admin only for the courses they may manage (course management page).
+    // The handler predates role checks for instructors; this does not add one for them.
+    const sessionVariables = req.body?.session_variables || {};
+    if (ORG_ADMIN_ROLES.has(sessionVariables['x-hasura-role'])) {
+      const client = new GraphQLClient(process.env.HASURA_ENDPOINT, {
+        headers: { 'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET },
+      });
+      if (!(await isOrgAdminOfCourse(client, sessionVariables['x-hasura-user-id'], Number(courseId)))) {
+        return {
+          success: false,
+          error: 'Not allowed to read the responses of this course',
+          messageKey: 'UNAUTHORIZED'
+        };
+      }
     }
     
     // Extract base URL and survey ID from the survey URL (with SSRF protection)

@@ -69,6 +69,14 @@ const INSERT_ENROLLMENT = gql`
   }
 `;
 
+const UPDATE_GUEST_ORGANIZATION = gql`
+  mutation UpdateGuestOrganization($userId: uuid!, $organizationName: String!) {
+    update_User_by_pk(pk_columns: { id: $userId }, _set: { organizationName: $organizationName }) {
+      id
+    }
+  }
+`;
+
 /**
  * Marketing consent is only recorded now, once the address has proven to belong
  * to the person using it. Status PENDING hands it to the existing Ghost sync
@@ -93,12 +101,16 @@ const UPSERT_NEWSLETTER_SUBSCRIPTION = gql`
   }
 `;
 
-export default async function confirmGuestRegistration(req, logger) {
+export default async function confirmGuestRegistration(
+  req,
+  logger,
+  { client: providedClient } = {}
+) {
   logger.info('########## Confirm Guest Registration ##########');
 
   try {
     const rawToken = req.body?.input?.token;
-    const client = createHasuraClient();
+    const client = providedClient ?? createHasuraClient();
 
     const resolved = await resolveConfirmToken(client, rawToken);
     if (!resolved.ok) {
@@ -106,6 +118,11 @@ export default async function confirmGuestRegistration(req, logger) {
     }
 
     const { token } = resolved;
+
+    // This is configuration validation as well as the credential returned to the
+    // guest. Do it before any write: a missing production secret must not create
+    // an enrollment and then tell the guest that confirmation failed.
+    const manageToken = buildManageToken(token.userId);
 
     // registerGuestForCourse refuses to start a guest signup for an address that
     // already has an account, but a token stays valid for a week and the account
@@ -150,15 +167,16 @@ export default async function confirmGuestRegistration(req, logger) {
       courseId: course.id,
     });
 
-    // Treated as success: a double-clicked link should look like it worked,
-    // not like an error.
+    // An enrollment can already exist while this token is still unused, for
+    // example after a duplicate registration attempt. Treat that as success
+    // without inserting another row.
     if (existing?.CourseEnrollment?.length) {
       await markConfirmTokenUsed(client, token.id);
       return {
         success: true,
         courseId: course.id,
         courseTitle: course.title,
-        manageToken: buildManageToken(token.userId),
+        manageToken,
         messageKey: 'GUEST_REGISTRATION_ALREADY_CONFIRMED',
       };
     }
@@ -169,6 +187,18 @@ export default async function confirmGuestRegistration(req, logger) {
       course.activeParticipantCount >= course.maxParticipants
     ) {
       return { success: false, messageKey: 'COURSE_FULL' };
+    }
+
+    // Deferred from submission for the same reason as the newsletter consent:
+    // only the address owner may change what their participant records show.
+    // A blank field on the form never erases an earlier value. Written before
+    // the enrollment and the token use, so a failure here leaves the link
+    // retryable instead of spending it with the organization unapplied.
+    if (token.organizationName && token.organizationName !== token.User?.organizationName) {
+      await client.request(UPDATE_GUEST_ORGANIZATION, {
+        userId: token.userId,
+        organizationName: token.organizationName,
+      });
     }
 
     // Recorded at confirmation rather than at submission: the registration only
@@ -196,7 +226,7 @@ export default async function confirmGuestRegistration(req, logger) {
       success: true,
       courseId: course.id,
       courseTitle: course.title,
-      manageToken: buildManageToken(token.userId),
+      manageToken,
       messageKey: 'GUEST_REGISTRATION_CONFIRMED',
     };
   } catch (error) {

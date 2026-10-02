@@ -276,8 +276,10 @@ export enum AppSettings_update_column {
   faviconUrl = "faviconUrl",
   guestDataRetentionMonths = "guestDataRetentionMonths",
   logoUrl = "logoUrl",
+  operatorName = "operatorName",
   previewImageURL = "previewImageURL",
   primaryColor = "primaryColor",
+  privacyContactEmail = "privacyContactEmail",
   secondaryColor = "secondaryColor",
   showFaqSection = "showFaqSection",
   timeZone = "timeZone",
@@ -580,6 +582,8 @@ export enum CourseEnrollment_select_column {
   achievementCertificateURL = "achievementCertificateURL",
   attendanceCertificateURL = "attendanceCertificateURL",
   billingOrganizationId = "billingOrganizationId",
+  cancellationRequestReason = "cancellationRequestReason",
+  cancellationRequestedAt = "cancellationRequestedAt",
   courseId = "courseId",
   created_at = "created_at",
   id = "id",
@@ -615,6 +619,8 @@ export enum CourseEnrollment_update_column {
   achievementCertificateURL = "achievementCertificateURL",
   attendanceCertificateURL = "attendanceCertificateURL",
   billingOrganizationId = "billingOrganizationId",
+  cancellationRequestReason = "cancellationRequestReason",
+  cancellationRequestedAt = "cancellationRequestedAt",
   courseId = "courseId",
   created_at = "created_at",
   id = "id",
@@ -1553,6 +1559,8 @@ export enum MailTemplateType_enum {
   APPLICATION_CONFIRMED = "APPLICATION_CONFIRMED",
   APPLICATION_RECEIVED = "APPLICATION_RECEIVED",
   APPLICATION_RECEIVED_PAID = "APPLICATION_RECEIVED_PAID",
+  CANCELLATION_REQUEST_CONFIRMATION = "CANCELLATION_REQUEST_CONFIRMATION",
+  CANCELLATION_REQUEST_ORGANIZER = "CANCELLATION_REQUEST_ORGANIZER",
   CERTIFICATE_ACHIEVEMENT_READY = "CERTIFICATE_ACHIEVEMENT_READY",
   CERTIFICATE_ATTENDANCE_READY = "CERTIFICATE_ATTENDANCE_READY",
   COURSE_CONTINUATION_INQUIRY = "COURSE_CONTINUATION_INQUIRY",
@@ -2814,6 +2822,7 @@ export enum User_select_column {
   newsletterRegistration = "newsletterRegistration",
   occupation = "occupation",
   organizationId = "organizationId",
+  organizationName = "organizationName",
   picture = "picture",
   status = "status",
   updated_at = "updated_at",
@@ -2855,6 +2864,7 @@ export enum User_update_column {
   newsletterRegistration = "newsletterRegistration",
   occupation = "occupation",
   organizationId = "organizationId",
+  organizationName = "organizationName",
   picture = "picture",
   status = "status",
   updated_at = "updated_at",
@@ -3745,8 +3755,10 @@ export interface AppSettings_bool_exp {
   faviconUrl?: String_comparison_exp | null;
   guestDataRetentionMonths?: Int_comparison_exp | null;
   logoUrl?: String_comparison_exp | null;
+  operatorName?: String_comparison_exp | null;
   previewImageURL?: String_comparison_exp | null;
   primaryColor?: String_comparison_exp | null;
+  privacyContactEmail?: String_comparison_exp | null;
   secondaryColor?: String_comparison_exp | null;
   showFaqSection?: Boolean_comparison_exp | null;
   timeZone?: String_comparison_exp | null;
@@ -3770,8 +3782,10 @@ export interface AppSettings_insert_input {
   faviconUrl?: string | null;
   guestDataRetentionMonths?: number | null;
   logoUrl?: string | null;
+  operatorName?: string | null;
   previewImageURL?: string | null;
   primaryColor?: string | null;
+  privacyContactEmail?: string | null;
   secondaryColor?: string | null;
   showFaqSection?: boolean | null;
   timeZone?: string | null;
@@ -5025,6 +5039,8 @@ export interface CourseEnrollment_bool_exp {
   achievementCertificateURL?: String_comparison_exp | null;
   attendanceCertificateURL?: String_comparison_exp | null;
   billingOrganizationId?: Int_comparison_exp | null;
+  cancellationRequestReason?: String_comparison_exp | null;
+  cancellationRequestedAt?: timestamptz_comparison_exp | null;
   courseId?: Int_comparison_exp | null;
   created_at?: timestamptz_comparison_exp | null;
   id?: Int_comparison_exp | null;
@@ -5055,6 +5071,8 @@ export interface CourseEnrollment_insert_input {
   achievementCertificateURL?: string | null;
   attendanceCertificateURL?: string | null;
   billingOrganizationId?: number | null;
+  cancellationRequestReason?: string | null;
+  cancellationRequestedAt?: any | null;
   courseId?: number | null;
   created_at?: any | null;
   id?: number | null;
@@ -5076,6 +5094,8 @@ export interface CourseEnrollment_max_order_by {
   achievementCertificateURL?: order_by | null;
   attendanceCertificateURL?: order_by | null;
   billingOrganizationId?: order_by | null;
+  cancellationRequestReason?: order_by | null;
+  cancellationRequestedAt?: order_by | null;
   courseId?: order_by | null;
   created_at?: order_by | null;
   id?: order_by | null;
@@ -5093,6 +5113,8 @@ export interface CourseEnrollment_min_order_by {
   achievementCertificateURL?: order_by | null;
   attendanceCertificateURL?: order_by | null;
   billingOrganizationId?: order_by | null;
+  cancellationRequestReason?: order_by | null;
+  cancellationRequestedAt?: order_by | null;
   courseId?: order_by | null;
   created_at?: order_by | null;
   id?: order_by | null;
@@ -5136,6 +5158,8 @@ export interface CourseEnrollment_order_by {
   achievementCertificateURL?: order_by | null;
   attendanceCertificateURL?: order_by | null;
   billingOrganizationId?: order_by | null;
+  cancellationRequestReason?: order_by | null;
+  cancellationRequestedAt?: order_by | null;
   courseId?: order_by | null;
   created_at?: order_by | null;
   id?: order_by | null;
@@ -13110,6 +13134,7 @@ export interface User_bool_exp {
   newsletterRegistration?: Boolean_comparison_exp | null;
   occupation?: UserOccupation_enum_comparison_exp | null;
   organizationId?: Int_comparison_exp | null;
+  organizationName?: String_comparison_exp | null;
   picture?: String_comparison_exp | null;
   status?: UserStatus_enum_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
@@ -13152,6 +13177,7 @@ export interface User_insert_input {
   newsletterRegistration?: boolean | null;
   occupation?: UserOccupation_enum | null;
   organizationId?: number | null;
+  organizationName?: string | null;
   picture?: string | null;
   status?: UserStatus_enum | null;
   updated_at?: any | null;
@@ -13177,6 +13203,7 @@ export interface User_max_order_by {
   matriculationNumber?: order_by | null;
   matrixUserHandle?: order_by | null;
   organizationId?: order_by | null;
+  organizationName?: order_by | null;
   picture?: order_by | null;
   updated_at?: order_by | null;
   zipCode?: order_by | null;
@@ -13201,6 +13228,7 @@ export interface User_min_order_by {
   matriculationNumber?: order_by | null;
   matrixUserHandle?: order_by | null;
   organizationId?: order_by | null;
+  organizationName?: order_by | null;
   picture?: order_by | null;
   updated_at?: order_by | null;
   zipCode?: order_by | null;
@@ -13259,6 +13287,7 @@ export interface User_order_by {
   newsletterRegistration?: order_by | null;
   occupation?: order_by | null;
   organizationId?: order_by | null;
+  organizationName?: order_by | null;
   picture?: order_by | null;
   status?: order_by | null;
   updated_at?: order_by | null;

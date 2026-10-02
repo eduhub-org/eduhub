@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react';
+import { gql } from '@apollo/client';
 import { DocumentNode } from 'graphql';
 import { Button, IconButton, Divider, ToggleButton, ToggleButtonGroup } from '@mui/material';
 import {
@@ -22,7 +23,6 @@ import { useTranslations } from 'next-intl';
 import { useRoleMutation } from '../../hooks/authedMutation';
 import NotificationSnackbar from '../common/dialogs/NotificationSnackbar';
 import { LinkDialog } from '../common/dialogs/LinkDialog';
-import { gql } from 'graphql-tag';
 
 export type EditorVariable = { text: string; label: string; categories?: string[] };
 
@@ -43,6 +43,9 @@ export function getTemplateCategory(templateType?: string): string {
   ];
   const generalTemplates = ['USER_CREATED'];
   const organizerTemplates = ['ORGANIZER_ADDED'];
+  // Cancellation request of a paid enrollment: [User:*] is the recipient, the
+  // participant has their own [Cancellation:*] placeholders.
+  const cancellationRequestTemplates = ['CANCELLATION_REQUEST_ORGANIZER', 'CANCELLATION_REQUEST_CONFIRMATION'];
   // StuJo job board mails address employers, not participants, so none of the
   // enrollment placeholders apply to them.
   const jobPostingTemplates = [
@@ -62,6 +65,7 @@ export function getTemplateCategory(templateType?: string): string {
   if (enrollmentTemplates.includes(templateType)) return 'enrollment';
   if (generalTemplates.includes(templateType)) return 'general';
   if (organizerTemplates.includes(templateType)) return 'organizer';
+  if (cancellationRequestTemplates.includes(templateType)) return 'cancellationrequest';
   if (jobPostingTemplates.includes(templateType)) return 'jobposting';
   if (organizationClaimTemplates.includes(templateType)) return 'organizationclaim';
 
@@ -80,9 +84,9 @@ export const CERTIFICATE_HTML_VARIABLES: EditorVariable[] = [
 ];
 
 const EMAIL_PLACEHOLDERS: EditorVariable[] = [
-  { text: '[User:FirstName]', label: 'User Firstname', categories: ['enrollment', 'session', 'general', 'organizer'] },
-  { text: '[User:LastName]', label: 'User Lastname', categories: ['enrollment', 'session', 'general', 'organizer'] },
-  { text: '[Enrollment:CourseId--Course:Name]', label: 'Course Name', categories: ['enrollment', 'session', 'organizer'] },
+  { text: '[User:FirstName]', label: 'User Firstname', categories: ['enrollment', 'session', 'general', 'organizer', 'cancellationrequest'] },
+  { text: '[User:LastName]', label: 'User Lastname', categories: ['enrollment', 'session', 'general', 'organizer', 'cancellationrequest'] },
+  { text: '[Enrollment:CourseId--Course:Name]', label: 'Course Name', categories: ['enrollment', 'session', 'organizer', 'cancellationrequest'] },
   { text: '[Course:StartTime]', label: 'Course Start', categories: ['enrollment'] },
   { text: '[Course:EndTime]', label: 'Course End', categories: ['enrollment'] },
   { text: '[Enrollment:CreatedAt]', label: 'Application Date', categories: ['enrollment'] },
@@ -131,6 +135,12 @@ const EMAIL_PLACEHOLDERS: EditorVariable[] = [
   { text: '[OrganizationClaim:AdminUrl]', label: 'Access Admin Link', categories: ['organizationclaim'] },
   { text: '[OrganizationClaim:ContactEmail]', label: 'StuJo Contact Email', categories: ['organizationclaim'] },
   { text: '[#if:TermsAccepted][/if:TermsAccepted]', label: 'Block: consent date', categories: ['jobposting'] },
+  // Cancellation request of a paid enrollment (sendCancellationRequestEmail).
+  { text: '[Cancellation:ParticipantName]', label: 'Participant Name', categories: ['cancellationrequest'] },
+  { text: '[Cancellation:ParticipantEmail]', label: 'Participant Email', categories: ['cancellationrequest'] },
+  { text: '[Cancellation:RequestedAt]', label: 'Request Date', categories: ['cancellationrequest'] },
+  { text: '[Cancellation:Reason]', label: 'Reason (block)', categories: ['cancellationrequest'] },
+  { text: '[Cancellation:ManageLink]', label: 'Course Management Link', categories: ['cancellationrequest'] },
 ];
 
 const sanitizeEmailHtml = (content: string): string =>

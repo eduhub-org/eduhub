@@ -19,8 +19,10 @@ const {
   NO_SUCH_USER_ID,
   isValidEmail,
   isValidName,
+  isValidOrganizationName,
   normalizeEmail,
   normalizeName,
+  normalizeOrganizationName,
   GUEST_ALLOWED_REGISTRATION_TYPES,
   isCourseRegistrationClosed,
 } = await import('../guestRegistration.js');
@@ -106,6 +108,15 @@ describe('input normalization', () => {
     expect(isValidName('A')).toBe(true);
     expect(isValidName('')).toBe(false);
     expect(isValidName('x'.repeat(101))).toBe(false);
+  });
+
+  it('treats the organization as optional and bounds its length', () => {
+    expect(normalizeOrganizationName('  opencampus   sh ')).toBe('opencampus sh');
+    expect(normalizeOrganizationName('   ')).toBeNull();
+    expect(normalizeOrganizationName(undefined)).toBeNull();
+    expect(isValidOrganizationName(null)).toBe(true);
+    expect(isValidOrganizationName('x'.repeat(200))).toBe(true);
+    expect(isValidOrganizationName('x'.repeat(201))).toBe(false);
   });
 });
 
