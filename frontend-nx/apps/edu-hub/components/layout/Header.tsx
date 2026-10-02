@@ -72,7 +72,7 @@ export const Header: FC = () => {
           </button>
         </div>
         <ClientOnly>
-          <div className="flex-shrink ">
+          <div className="shrink-0">
             {isLoggedIn && user ? (
               <div className="flex">
                 <div className="flex">
