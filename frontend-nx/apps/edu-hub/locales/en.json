@@ -1515,7 +1515,7 @@
       "no_selection_dialog_title": "No Selection",
       "disabled_reasons": {
         "select_participants_first": "Select participants first.",
-        "instructors_only": "Only instructors can run this bulk action.",
+        "instructors_only": "Only instructors and admins can run this bulk action.",
         "no_eligible_invitations": "No participants with green rating and status applied/invited are currently available.",
         "no_eligible_rejections": "No participants with red rating and status applied are currently available.",
         "no_confirmed": "No participants with status confirmed are currently available.",
@@ -1796,7 +1796,7 @@
       "mark_aborted_success_plural": "{count} participations were marked as aborted.",
       "mark_aborted_error": "Could not mark participations as aborted: {error}",
       "disabled_reasons": {
-        "instructors_only": "Only instructors can run this bulk action."
+        "instructors_only": "Only instructors and admins can run this bulk action."
       }
     },
     "certificates_group": "Certificates",

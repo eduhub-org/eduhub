@@ -1497,7 +1497,7 @@
       "no_selection_dialog_title": "Keine Auswahl",
       "disabled_reasons": {
         "select_participants_first": "Wähle zuerst Teilnehmende aus.",
-        "instructors_only": "Diese Sammelaktion können nur Instructor:innen ausführen.",
+        "instructors_only": "Diese Sammelaktion können nur Instructor:innen und Admins ausführen.",
         "no_eligible_invitations": "Aktuell sind keine Teilnehmenden mit grüner Bewertung und Status „beworben/eingeladen“ verfügbar.",
         "no_eligible_rejections": "Aktuell sind keine Teilnehmenden mit roter Bewertung und Status „beworben“ verfügbar.",
         "no_confirmed": "Aktuell sind keine Teilnehmenden mit Status „bestätigt“ verfügbar.",
@@ -1778,7 +1778,7 @@
       "mark_aborted_success_plural": "{count} Teilnahmen wurden als abgebrochen markiert.",
       "mark_aborted_error": "Teilnahmen konnten nicht als abgebrochen markiert werden: {error}",
       "disabled_reasons": {
-        "instructors_only": "Diese Sammelaktion können nur Instructor:innen ausführen."
+        "instructors_only": "Diese Sammelaktion können nur Instructor:innen und Admins ausführen."
       }
     },
     "certificates_group": "Zertifikate",
