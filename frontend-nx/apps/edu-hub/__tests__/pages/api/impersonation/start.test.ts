@@ -17,7 +17,7 @@ const { decodeCookie, IMPERSONATION_COOKIE } = require('../../../../helpers/impe
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { IMPERSONATION_MARKER_COOKIE } = require('../../../../helpers/impersonationMarker');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const handler = require('../start').default;
+const handler = require('../../../../pages/api/impersonation/start').default;
 
 const mockedGetToken = getToken as jest.MockedFunction<typeof getToken>;
 
