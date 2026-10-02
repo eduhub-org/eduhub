@@ -371,6 +371,9 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
   // An org admin managing the course acts on registrations like its instructors.
   const isInstructor = useIsInstructor() || manageAsOrgAdmin;
   const isAdmin = useIsAdmin();
+  // Inviting, rejecting and cancelling registrations is open to the course's instructors, super
+  // admins, and org admins whose grant covers the course's program type (manageAsOrgAdmin).
+  const canDecideRegistrations = isInstructor || isAdmin;
   const theme = useTheme();
   const matrixRoomId = course.matrixRoomId?.trim();
   const elementBaseUrl = process.env.NEXT_PUBLIC_MATRIX_ELEMENT_CLIENT_URL?.replace(/\/+$/, '');
@@ -1072,8 +1075,8 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
       label: t('bulk_actions.cancel_registrations_selected'),
       group: t('bulk_actions.manage_registrations'),
       requiresSelection: true,
-      disabled: !isInstructor,
-      disabledReason: !isInstructor
+      disabled: !canDecideRegistrations,
+      disabledReason: !canDecideRegistrations
         ? t('bulk_actions.disabled_reasons.instructors_only')
         : t('bulk_actions.disabled_reasons.select_participants_first'),
     });
@@ -1101,8 +1104,8 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
         label: t('bulk_actions.send_invitations_selected'),
         group: t('bulk_actions.send_decisions'),
         requiresSelection: true,
-        disabled: !isInstructor,
-        disabledReason: !isInstructor
+        disabled: !canDecideRegistrations,
+        disabledReason: !canDecideRegistrations
           ? t('bulk_actions.disabled_reasons.instructors_only')
           : t('bulk_actions.disabled_reasons.select_participants_first'),
       },
@@ -1111,8 +1114,8 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
         label: t('bulk_actions.send_rejections_selected'),
         group: t('bulk_actions.send_decisions'),
         requiresSelection: true,
-        disabled: !isInstructor,
-        disabledReason: !isInstructor
+        disabled: !canDecideRegistrations,
+        disabledReason: !canDecideRegistrations
           ? t('bulk_actions.disabled_reasons.instructors_only')
           : t('bulk_actions.disabled_reasons.select_participants_first'),
       },
@@ -1159,7 +1162,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
     );
 
     return actions;
-  }, [features.hasApplicationProcess, isInstructor, t]);
+  }, [features.hasApplicationProcess, canDecideRegistrations, t]);
 
   // Rating sort function
   const ratingSortFn = useCallback((a: MotivationRating_enum, b: MotivationRating_enum) => {
@@ -1215,7 +1218,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
           // Shown in the expanded row instead on narrower screens.
           meta: { hideBelow: 'xl' },
           cell: ({ row }) => {
-            const orgName = row.original.User.Organization?.name;
+            const orgName = row.original.User.Organization?.name ?? row.original.User.organizationName;
             return (
               <div className="truncate" title={orgName || ''}>
                 {orgName || '-'}
@@ -1324,7 +1327,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
   // Expandable row component
   const ExpandableApplicationRow = ({ row: enrollment }: { row: ApplicationEnrollment }) => {
     // Access Organization from the User object
-    const orgName = enrollment.User.Organization?.name;
+    const orgName = enrollment.User.Organization?.name ?? enrollment.User.organizationName;
     
     // Get effective Formbricks survey URL (course-level overrides program default)
     const effectiveSurveyUrl = course.formbricksEnrollmentSurveyUrl || course.Program?.defaultFormbricksEnrollmentSurveyUrl || null;
@@ -1455,7 +1458,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
   // Phones: one card per enrollment, with the rating and status spelled out instead of a legend.
   const renderMobileRow = useCallback(
     (enrollment: ApplicationEnrollment) => {
-      const orgName = enrollment.User.Organization?.name;
+      const orgName = enrollment.User.Organization?.name ?? enrollment.User.organizationName;
       const rating = RATING_OPTIONS.find((option) => option.value === enrollment.motivationRating);
       return (
         <div className="flex flex-col gap-1">

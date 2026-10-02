@@ -311,6 +311,7 @@ const Onboarding: FC<OnboardingProps> = ({ course, enrollmentId, refetchCourse, 
             updateValueMutation={UPDATE_USER_ORGANIZATION_ID}
             identifierVariables={{ userId }}
             createOptionMutation={CREATE_ORGANIZATION}
+            nullable={true}
             className="text-black mb-2"
             disabled={isOrganizationLookupUnavailable}
           />

@@ -145,6 +145,7 @@ mutation AnonymizeGuest($userId: uuid!, $email: String!, $anonName: String!) {
         _set: {
             firstName: $anonName
             lastName: $anonName
+            organizationName: null
             email: $email
             picture: null
             externalProfile: null

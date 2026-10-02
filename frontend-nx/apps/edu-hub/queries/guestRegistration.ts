@@ -23,6 +23,7 @@ export const REGISTER_GUEST_FOR_COURSE = gql`
     $firstName: String!
     $lastName: String!
     $email: String!
+    $organizationName: String
     $acceptTerms: Boolean!
     $newsletterOptIn: Boolean
     $website: String
@@ -32,6 +33,7 @@ export const REGISTER_GUEST_FOR_COURSE = gql`
       firstName: $firstName
       lastName: $lastName
       email: $email
+      organizationName: $organizationName
       acceptTerms: $acceptTerms
       newsletterOptIn: $newsletterOptIn
       website: $website
@@ -69,6 +71,7 @@ export const MANAGE_GUEST_REGISTRATION = gql`
       success
       firstName
       lastName
+      organizationName
       email
       registrations {
         courseId

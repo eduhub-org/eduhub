@@ -1515,7 +1515,7 @@
       "no_selection_dialog_title": "No Selection",
       "disabled_reasons": {
         "select_participants_first": "Select participants first.",
-        "instructors_only": "Only instructors can run this bulk action.",
+        "instructors_only": "Only instructors and admins can run this bulk action.",
         "no_eligible_invitations": "No participants with green rating and status applied/invited are currently available.",
         "no_eligible_rejections": "No participants with red rating and status applied are currently available.",
         "no_confirmed": "No participants with status confirmed are currently available.",
@@ -1796,7 +1796,7 @@
       "mark_aborted_success_plural": "{count} participations were marked as aborted.",
       "mark_aborted_error": "Could not mark participations as aborted: {error}",
       "disabled_reasons": {
-        "instructors_only": "Only instructors can run this bulk action."
+        "instructors_only": "Only instructors and admins can run this bulk action."
       }
     },
     "certificates_group": "Certificates",
@@ -2052,6 +2052,49 @@
     "guest_registration": {
       "label": "Allow registration without an account",
       "help_text": "Lets people register with just a name and email address, without creating an account. The registration only becomes valid once confirmed by email. Only available for events with direct registration."
+    },
+    "instructor_confidentiality": {
+      "title": "Confidentiality of personal data",
+      "intro": "Before you manage your course, please confirm once that you will treat participants' personal data confidentially.",
+      "points": {
+        "access": "As an instructor you get access to personal data of participants and other users, for example names, email addresses, organizations, application documents and attendance.",
+        "purpose": "You use this data only to run your courses and events, and only as {operator} intends.",
+        "no_disclosure": "You do not pass it on to anyone else and do not use it for your own purposes, such as your own mailing lists or advertising.",
+        "exports": "You keep exports and printouts (participant lists, attendance lists, name tags) safe and delete or shred them once the event is over.",
+        "incidents": "If data gets lost or misused, for example a list left behind, you tell {recipient} straight away.",
+        "duration": "This commitment continues after your time as an instructor ends."
+      },
+      "checkbox": "I have read this and commit to keeping personal data confidential.",
+      "accept": "Confirm",
+      "failed": "Your confirmation could not be saved. Please try again.",
+      "operator_generic": "the operator of this platform",
+      "recipient_operator": "the {operator} team",
+      "recipient_generic": "the operator of this platform",
+      "recipient_contact": "{recipient} at {email}"
+    },
+    "participant_export": {
+      "button": "Export participants",
+      "csv": "Participant list (CSV for Excel)",
+      "attendance_list": "Attendance list (print / PDF)",
+      "name_tags": "Name tags (print / PDF)",
+      "hint": "Includes all registered and confirmed participants.",
+      "file_suffix": "participants",
+      "first_name": "First name",
+      "last_name": "Last name",
+      "organization": "Organization",
+      "email": "Email",
+      "status": "Status",
+      "number": "No.",
+      "present": "Present",
+      "signature": "Signature",
+      "count": "{count, plural, =1 {1 participant} other {# participants}}",
+      "no_participants": "There are no registered or confirmed participants yet.",
+      "failed": "The participant data could not be loaded. Please try again.",
+      "statuses": {
+        "REGISTERED": "registered",
+        "CONFIRMED": "confirmed",
+        "COMPLETED": "completed"
+      }
     },
     "participant_preview": {
       "start": "View as participant",
@@ -2364,6 +2407,8 @@
     "saving": "Saving...",
     "loading": "Loading...",
     "errorSavingSettings": "An error occurred while saving the settings. Please try again.",
+    "errorLoadingSettings": "The settings could not be loaded.",
+    "retry": "Try again",
     "timeZones": {
       "Europe/Berlin": "Berlin",
       "Europe/London": "London",
@@ -2372,6 +2417,12 @@
       "America/New_York": "New York",
       "America/Los_Angeles": "Los Angeles",
       "Asia/Tokyo": "Tokio"
+    },
+    "operator": {
+      "title": "Operator & privacy",
+      "help": "Used in texts such as the instructor confidentiality commitment. Empty fields fall back to neutral wording.",
+      "operatorName": "Operator name",
+      "privacyContactEmail": "Email for data protection questions and incidents"
     },
     "timeZoneHelpText": "The time zone is used to display dates and times in the application. General times like the recurring course time, which are not bound to a specific day, will always be displayed in the original time and not adjusted.",
     "projectDocumentationInstructions": {
@@ -3036,6 +3087,10 @@
           "label": "Time zone",
           "description": "Default time zone for dates and times"
         },
+        "operator": {
+          "label": "Operator & privacy",
+          "description": "Operator name and contact for data protection questions"
+        },
         "access": {
           "label": "Access & roles",
           "description": "Admin users and organization roles"
@@ -3208,9 +3263,10 @@
       "first_name": "First name",
       "last_name": "Last name",
       "email": "Email address",
+      "organization": "Organization (optional)",
       "accept_terms": "I have read and accept the <terms>Terms and Conditions</terms> and the <privacy>Privacy Policy</privacy>.",
       "newsletter_opt_in": "Email me about future events from this organiser. This is optional and you can withdraw it at any time.",
-      "data_notice": "We store your name and email address in order to run the event and to tell you about changes to it. After that we delete them automatically. The link in every email lets you view or delete your data at any time.",
+      "data_notice": "We store your name, email address and, if given, your organization in order to run the event and to tell you about changes to it. After that we delete them automatically. The link in every email lets you view or delete your data at any time.",
       "submit": "Send registration",
       "submitting": "Sending …",
       "cancel": "Cancel",
@@ -3252,6 +3308,7 @@
       "email_required": "Please enter your email address.",
       "terms_required": "Please accept the terms and the privacy policy.",
       "invalid_name": "Please check your name.",
+      "invalid_organization": "The organization name can be at most 200 characters long.",
       "invalid_email": "Please check your email address.",
       "invalid_course": "This event could not be found.",
       "terms_not_accepted": "Please accept the terms and the privacy policy.",

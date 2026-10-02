@@ -82,11 +82,24 @@ when all of these hold:
 
 | Question | Answer |
 |---|---|
-| What is collected | First name, last name, email. Nothing else. |
+| What is collected | First name, last name, email, and optionally an organization (for name tags and participant lists). Nothing else. |
 | Legal basis | Art. 6(1)(b) — performance of a contract / pre-contractual measures. Note this differs from regular participant profile data, which the privacy policy bases on Art. 6(1)(f). |
 | Retention | `AppSettings.guestDataRetentionMonths`, default **12**, counted from the end of the event. Enforced by the `anonymize_guest_data` cron. |
 | Erasure on request | Self-service via the manage link in every mail. No login needed. Cancels any registration still ahead of them, then anonymizes the record. |
 | Marketing | Separate, unticked, never required. Recorded only after confirmation, then handed to Ghost for its own double opt-in. |
+
+### Who sees guest data
+
+Instructors read `User` / `CourseEnrollment` without a course filter
+(`instructor_access` uses `filter: {}`): the user search they use to add
+speakers, co-instructors and participants needs it. This is deliberate. It is
+covered organisationally rather than technically: before an instructor can use
+the manage-course page, they accept a confidentiality commitment once per text
+version (`InstructorConfidentialityGate`, stored in
+`InstructorConfidentialityAcceptance`). Admins and org admins skip it. The text
+names the operator and the privacy contact from Settings > Operator & privacy
+(`AppSettings.operatorName` / `privacyContactEmail`) and falls back to neutral
+wording when they are empty.
 
 ### Retention job
 
@@ -176,8 +189,8 @@ at their own link is usually the fastest complete answer.
   would mean processing and storing it, a worse trade than two counters. Revisit
   only if real abuse appears.
 - **Tokens.** The confirmation token is random, stored only as a SHA-256 hash,
-  single use, 7 days. The manage token is a stateless HMAC over the user id
-  signed with `GUEST_TOKEN_SECRET` — nothing is stored, so any mailer can
+  single use, and valid for 7 days. The manage token is a stateless HMAC over the
+  user id signed with `GUEST_TOKEN_SECRET` — nothing is stored, so any mailer can
   regenerate the link, and the trade-off is that an individual link cannot be
   revoked. It stops working when the guest record is anonymized.
 - **These handlers hold the Hasura admin secret.** Like every handler in
@@ -191,7 +204,12 @@ at their own link is usually the fastest complete answer.
   the part that restricts anything.
 - **`GUEST_TOKEN_SECRET` is a signing key.** Anyone holding it can mint a manage
   link for any guest. The dev default in `docker-compose.yml` is fine locally and
-  nowhere else.
+  nowhere else. Staging and production take it from the sensitive Terraform
+  Cloud variable `guest_token_secret` (one value per workspace), which lands in
+  Secret Manager as `guest-token-secret` and reaches `call-node-function`. Without
+  it every confirmation fails *after* the enrollment is written: the guest sees
+  an error, then "link already used". Do not rotate it casually — every manage
+  link already emailed stops working.
 
 ## Files
 

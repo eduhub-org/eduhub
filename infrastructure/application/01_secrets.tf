@@ -249,6 +249,23 @@ resource "google_secret_manager_secret_version" "ghost_newsletter_credentials_en
   secret_data = var.ghost_newsletter_credentials_encryption_key
 }
 
+# ===== Guest Token Secret =====
+# Signs guest manage links (/guest/manage). Anyone holding it can manage or
+# erase any guest's data; rotating it breaks every link already emailed.
+resource "google_secret_manager_secret" "guest_token_secret" {
+  provider  = google-beta
+  secret_id = "guest-token-secret"
+  replication {
+    auto {}
+  }
+}
+
+resource "google_secret_manager_secret_version" "guest_token_secret" {
+  provider    = google-beta
+  secret      = google_secret_manager_secret.guest_token_secret.name
+  secret_data = var.guest_token_secret
+}
+
 # ===== Stripe Secret Key =====
 resource "google_secret_manager_secret" "stripe_secret_key" {
   provider  = google-beta

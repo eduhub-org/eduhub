@@ -40,6 +40,14 @@ export interface AppSettings_AppSettings {
   timeZone: string;
   showFaqSection: boolean;
   faqCollectionName: string;
+  /**
+   * Display name of the organisation operating this instance, used in user-facing texts.
+   */
+  operatorName: string | null;
+  /**
+   * Email address for data protection questions and incidents.
+   */
+  privacyContactEmail: string | null;
 }
 
 export interface AppSettings {
