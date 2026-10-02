@@ -31,25 +31,38 @@ interface NavButtonProps {
   onClick: () => void;
   imgSrc: string;
   label: string;
+  direction: 'previous' | 'next';
   isWidget?: boolean;
 }
 
-const buttonStyles = {
-  background:
-    'linear-gradient(0deg, rgba(15, 15, 15, 0.7), rgba(15, 15, 15, 0.7)), linear-gradient(270deg, rgba(34, 34, 34, 0.5) 0%, rgba(255, 253, 253, 0) 105.56%)',
-};
-
-const NavButton: FC<NavButtonProps> = ({ idSuffix, className, visible, onClick, imgSrc, label, isWidget = false }) => (
+const NavButton: FC<NavButtonProps> = ({
+  idSuffix,
+  className,
+  visible,
+  onClick,
+  imgSrc,
+  label,
+  direction,
+  isWidget = false,
+}) => (
   <button
     id={idSuffix}
     type="button"
-    className={`${className} flex w-12 items-center justify-center transition-opacity focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-white ${isWidget ? 'h-[435px]' : 'h-[431px]'} ${!visible ? 'pointer-events-none opacity-0' : ''}`}
-    style={buttonStyles}
+    className={`${className} flex w-12 items-center justify-center ${direction === 'previous' ? 'rounded-l-none rounded-r-2xl' : 'rounded-r-none rounded-l-2xl'} bg-transparent transition-opacity focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-white ${isWidget ? 'h-[435px]' : 'h-[431px]'} ${!visible ? 'pointer-events-none opacity-0' : ''}`}
+    style={{
+      background: `linear-gradient(${direction === 'previous' ? '90deg' : '270deg'}, rgba(15, 15, 15, 0.45), rgba(15, 15, 15, 0))`,
+    }}
     onClick={onClick}
     disabled={!visible}
     aria-label={label}
   >
-    <img className="block h-6 w-6" src={imgSrc} alt="" aria-hidden="true" />
+    <img
+      className={`block h-6 w-6 ${direction === 'previous' ? '-translate-x-1.5' : 'translate-x-1.5'}`}
+      style={{ filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.65))' }}
+      src={imgSrc}
+      alt=""
+      aria-hidden="true"
+    />
   </button>
 );
 
@@ -256,6 +269,7 @@ function TileSlider<T extends TileSliderItem>({ items, renderTile, isWidget = fa
             onClick={swiperPrev}
             imgSrc="/images/common/slider-previous-arrow.svg"
             label={t('tile_slider_previous')}
+            direction="previous"
             isWidget={isWidget}
           />
           <NavButton
@@ -265,6 +279,7 @@ function TileSlider<T extends TileSliderItem>({ items, renderTile, isWidget = fa
             onClick={swiperNext}
             imgSrc="/images/common/slider-next-arrow.svg"
             label={t('tile_slider_next')}
+            direction="next"
             isWidget={isWidget}
           />
         </>
