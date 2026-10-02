@@ -26,6 +26,8 @@ import { ApplicationsTab } from './ApplicationsTab';
 import { CourseParticipationsTab } from './CourseParticipationsTab';
 import { DegreeParticipationsTab } from './DegreeParticipationsTab';
 import { ParticipantPreviewButton } from './ParticipantPreviewButton';
+import { ParticipantExportMenu } from './ParticipantExport/ParticipantExportMenu';
+import { InstructorConfidentialityGate } from './InstructorConfidentialityGate';
 import { useIsAdmin, useIsOrgAdmin, useIsUserIdInList } from '../../../hooks/authentication';
 import { getRegistrationFeatures } from './ApplicationsTab/registrationConfig';
 import Loading from '../../common/Loading';
@@ -269,38 +271,53 @@ const CourseManagement: FC<CourseManagementProps> = ({ courseId, manageAsOrgAdmi
     4: t('degree_participations'),
   };
 
+  const pageBody = (
+    <>
+      <div className="flex flex-col gap-4 mb-6 mt-6 md:mb-12 md:mt-12 text-white sm:flex-row sm:items-center sm:justify-between">
+        <h1 className="text-3xl md:text-4xl font-bold">{course.title}</h1>
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Registrations only exist in EduHub when they are not handled elsewhere. */}
+          {visibleTabIndices.includes(2) && <ParticipantExportMenu courseId={courseId} />}
+          {/* The preview action is for the course's own instructors. */}
+          {!manageAsOrgAdmin && <ParticipantPreviewButton courseId={courseId} />}
+        </div>
+      </div>
+
+      {/* Two tiles per row on phones, one row from md up. */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 mb-8 md:mb-12">
+        {visibleTabIndices.map((tabIndex) => (
+          <button
+            key={tabIndex}
+            type="button"
+            onClick={() => selectTab(tabIndex)}
+            aria-pressed={tabIndex === openTabIndex}
+            className={`p-3 md:p-4 text-left text-sm md:text-base ${determineTabClasses(tabIndex, openTabIndex)}`}
+          >
+            {tabLabels[tabIndex]}
+          </button>
+        ))}
+      </div>
+
+      {openTabIndex === 0 && <DescriptionTab course={course} qResult={qResult} />}
+      {openTabIndex === 1 && <SessionsTab course={course} qResult={qResult} />}
+      {openTabIndex === 2 && <ApplicationsTab course={course} manageAsOrgAdmin={manageAsOrgAdmin} />}
+      {openTabIndex === 3 && <CourseParticipationsTab course={course} qResult={qResult} />}
+      {openTabIndex === 4 && <DegreeParticipationsTab course={course} />}
+    </>
+  );
+
   return (
     <>
       <PageBlock>
         {/* PageBlock drops its side margin from xl up, where a 1280px wide window would otherwise let
             the content touch the edges; from 2xl on the centred column has room of its own. */}
         <div className="max-w-screen-xl mx-auto mt-20 xl:px-12 2xl:px-0">
-          <div className="flex flex-col gap-4 mb-6 mt-6 md:mb-12 md:mt-12 text-white sm:flex-row sm:items-center sm:justify-between">
-            <h1 className="text-3xl md:text-4xl font-bold">{course.title}</h1>
-            {/* The preview action is for the course's own instructors. */}
-            {!manageAsOrgAdmin && <ParticipantPreviewButton courseId={courseId} />}
-          </div>
-
-          {/* Two tiles per row on phones, one row from md up. */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 mb-8 md:mb-12">
-            {visibleTabIndices.map((tabIndex) => (
-              <button
-                key={tabIndex}
-                type="button"
-                onClick={() => selectTab(tabIndex)}
-                aria-pressed={tabIndex === openTabIndex}
-                className={`p-3 md:p-4 text-left text-sm md:text-base ${determineTabClasses(tabIndex, openTabIndex)}`}
-              >
-                {tabLabels[tabIndex]}
-              </button>
-            ))}
-          </div>
-
-          {openTabIndex === 0 && <DescriptionTab course={course} qResult={qResult} />}
-          {openTabIndex === 1 && <SessionsTab course={course} qResult={qResult} />}
-          {openTabIndex === 2 && <ApplicationsTab course={course} manageAsOrgAdmin={manageAsOrgAdmin} />}
-          {openTabIndex === 3 && <CourseParticipationsTab course={course} qResult={qResult} />}
-          {openTabIndex === 4 && <DegreeParticipationsTab course={course} />}
+          {/* Instructors commit once; admins (opencampus.sh staff) and org admins skip this. */}
+          {isAdmin || manageAsOrgAdmin ? (
+            pageBody
+          ) : (
+            <InstructorConfidentialityGate>{pageBody}</InstructorConfidentialityGate>
+          )}
         </div>
       </PageBlock>
       <QuestionConfirmationDialog

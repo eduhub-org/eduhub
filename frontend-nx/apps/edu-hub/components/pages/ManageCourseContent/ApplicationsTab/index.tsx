@@ -1215,7 +1215,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
           // Shown in the expanded row instead on narrower screens.
           meta: { hideBelow: 'xl' },
           cell: ({ row }) => {
-            const orgName = row.original.User.Organization?.name;
+            const orgName = row.original.User.Organization?.name ?? row.original.User.organizationName;
             return (
               <div className="truncate" title={orgName || ''}>
                 {orgName || '-'}
@@ -1324,7 +1324,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
   // Expandable row component
   const ExpandableApplicationRow = ({ row: enrollment }: { row: ApplicationEnrollment }) => {
     // Access Organization from the User object
-    const orgName = enrollment.User.Organization?.name;
+    const orgName = enrollment.User.Organization?.name ?? enrollment.User.organizationName;
     
     // Get effective Formbricks survey URL (course-level overrides program default)
     const effectiveSurveyUrl = course.formbricksEnrollmentSurveyUrl || course.Program?.defaultFormbricksEnrollmentSurveyUrl || null;
@@ -1455,7 +1455,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
   // Phones: one card per enrollment, with the rating and status spelled out instead of a legend.
   const renderMobileRow = useCallback(
     (enrollment: ApplicationEnrollment) => {
-      const orgName = enrollment.User.Organization?.name;
+      const orgName = enrollment.User.Organization?.name ?? enrollment.User.organizationName;
       const rating = RATING_OPTIONS.find((option) => option.value === enrollment.motivationRating);
       return (
         <div className="flex flex-col gap-1">

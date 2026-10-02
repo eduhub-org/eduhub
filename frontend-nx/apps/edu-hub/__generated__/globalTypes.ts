@@ -276,8 +276,10 @@ export enum AppSettings_update_column {
   faviconUrl = "faviconUrl",
   guestDataRetentionMonths = "guestDataRetentionMonths",
   logoUrl = "logoUrl",
+  operatorName = "operatorName",
   previewImageURL = "previewImageURL",
   primaryColor = "primaryColor",
+  privacyContactEmail = "privacyContactEmail",
   secondaryColor = "secondaryColor",
   showFaqSection = "showFaqSection",
   timeZone = "timeZone",
@@ -2820,6 +2822,7 @@ export enum User_select_column {
   newsletterRegistration = "newsletterRegistration",
   occupation = "occupation",
   organizationId = "organizationId",
+  organizationName = "organizationName",
   picture = "picture",
   status = "status",
   updated_at = "updated_at",
@@ -2861,6 +2864,7 @@ export enum User_update_column {
   newsletterRegistration = "newsletterRegistration",
   occupation = "occupation",
   organizationId = "organizationId",
+  organizationName = "organizationName",
   picture = "picture",
   status = "status",
   updated_at = "updated_at",
@@ -3751,8 +3755,10 @@ export interface AppSettings_bool_exp {
   faviconUrl?: String_comparison_exp | null;
   guestDataRetentionMonths?: Int_comparison_exp | null;
   logoUrl?: String_comparison_exp | null;
+  operatorName?: String_comparison_exp | null;
   previewImageURL?: String_comparison_exp | null;
   primaryColor?: String_comparison_exp | null;
+  privacyContactEmail?: String_comparison_exp | null;
   secondaryColor?: String_comparison_exp | null;
   showFaqSection?: Boolean_comparison_exp | null;
   timeZone?: String_comparison_exp | null;
@@ -3776,8 +3782,10 @@ export interface AppSettings_insert_input {
   faviconUrl?: string | null;
   guestDataRetentionMonths?: number | null;
   logoUrl?: string | null;
+  operatorName?: string | null;
   previewImageURL?: string | null;
   primaryColor?: string | null;
+  privacyContactEmail?: string | null;
   secondaryColor?: string | null;
   showFaqSection?: boolean | null;
   timeZone?: string | null;
@@ -13126,6 +13134,7 @@ export interface User_bool_exp {
   newsletterRegistration?: Boolean_comparison_exp | null;
   occupation?: UserOccupation_enum_comparison_exp | null;
   organizationId?: Int_comparison_exp | null;
+  organizationName?: String_comparison_exp | null;
   picture?: String_comparison_exp | null;
   status?: UserStatus_enum_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
@@ -13168,6 +13177,7 @@ export interface User_insert_input {
   newsletterRegistration?: boolean | null;
   occupation?: UserOccupation_enum | null;
   organizationId?: number | null;
+  organizationName?: string | null;
   picture?: string | null;
   status?: UserStatus_enum | null;
   updated_at?: any | null;
@@ -13193,6 +13203,7 @@ export interface User_max_order_by {
   matriculationNumber?: order_by | null;
   matrixUserHandle?: order_by | null;
   organizationId?: order_by | null;
+  organizationName?: order_by | null;
   picture?: order_by | null;
   updated_at?: order_by | null;
   zipCode?: order_by | null;
@@ -13217,6 +13228,7 @@ export interface User_min_order_by {
   matriculationNumber?: order_by | null;
   matrixUserHandle?: order_by | null;
   organizationId?: order_by | null;
+  organizationName?: order_by | null;
   picture?: order_by | null;
   updated_at?: order_by | null;
   zipCode?: order_by | null;
@@ -13275,6 +13287,7 @@ export interface User_order_by {
   newsletterRegistration?: order_by | null;
   occupation?: order_by | null;
   organizationId?: order_by | null;
+  organizationName?: order_by | null;
   picture?: order_by | null;
   status?: order_by | null;
   updated_at?: order_by | null;

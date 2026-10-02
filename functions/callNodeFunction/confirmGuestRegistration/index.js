@@ -69,6 +69,14 @@ const INSERT_ENROLLMENT = gql`
   }
 `;
 
+const UPDATE_GUEST_ORGANIZATION = gql`
+  mutation UpdateGuestOrganization($userId: uuid!, $organizationName: String!) {
+    update_User_by_pk(pk_columns: { id: $userId }, _set: { organizationName: $organizationName }) {
+      id
+    }
+  }
+`;
+
 /**
  * Marketing consent is only recorded now, once the address has proven to belong
  * to the person using it. Status PENDING hands it to the existing Ghost sync
@@ -169,6 +177,18 @@ export default async function confirmGuestRegistration(req, logger) {
       course.activeParticipantCount >= course.maxParticipants
     ) {
       return { success: false, messageKey: 'COURSE_FULL' };
+    }
+
+    // Deferred from submission for the same reason as the newsletter consent:
+    // only the address owner may change what their participant records show.
+    // A blank field on the form never erases an earlier value. Written before
+    // the enrollment and the token use, so a failure here leaves the link
+    // retryable instead of spending it with the organization unapplied.
+    if (token.organizationName && token.organizationName !== token.User?.organizationName) {
+      await client.request(UPDATE_GUEST_ORGANIZATION, {
+        userId: token.userId,
+        organizationName: token.organizationName,
+      });
     }
 
     // Recorded at confirmation rather than at submission: the registration only

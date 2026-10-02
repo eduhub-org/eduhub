@@ -13,6 +13,21 @@ export const APP_SETTINGS = gql`
       timeZone
       showFaqSection
       faqCollectionName
+      operatorName
+      privacyContactEmail
+    }
+  }
+`;
+
+export const UPDATE_APP_SETTINGS_OPERATOR = gql`
+  mutation UpdateOperator($appName: String!, $operatorName: String, $privacyContactEmail: String) {
+    update_AppSettings_by_pk(
+      pk_columns: { appName: $appName }
+      _set: { operatorName: $operatorName, privacyContactEmail: $privacyContactEmail }
+    ) {
+      appName
+      operatorName
+      privacyContactEmail
     }
   }
 `;
