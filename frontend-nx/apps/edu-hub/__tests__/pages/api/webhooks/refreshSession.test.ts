@@ -1,6 +1,6 @@
 import type Stripe from 'stripe';
 
-import { refreshSession, requireAmountTotal } from '../stripe';
+import { refreshSession, requireAmountTotal } from '../../../../pages/api/webhooks/stripe';
 
 /**
  * refreshSession re-reads a Checkout Session so the recorded amounts come from

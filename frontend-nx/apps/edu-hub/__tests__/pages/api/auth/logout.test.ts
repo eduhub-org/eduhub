@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getToken } from 'next-auth/jwt';
 
-import handler from '../logout';
+import handler from '../../../../pages/api/auth/logout';
 
 jest.mock('next-auth/jwt', () => ({ getToken: jest.fn() }));
 

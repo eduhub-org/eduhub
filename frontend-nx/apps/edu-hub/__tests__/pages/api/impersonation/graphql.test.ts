@@ -19,7 +19,7 @@ const {
   COOKIE_MAX_AGE_SECONDS,
 } = require('../../../../helpers/impersonation');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const handler = require('../graphql').default;
+const handler = require('../../../../pages/api/impersonation/graphql').default;
 
 const mockedGetToken = getToken as jest.MockedFunction<typeof getToken>;
 
