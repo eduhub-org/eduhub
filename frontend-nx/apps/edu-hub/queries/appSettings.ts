@@ -15,6 +15,8 @@ export const APP_SETTINGS = gql`
       faqCollectionName
       operatorName
       privacyContactEmail
+      heroHeadlineDe
+      heroHeadlineEn
     }
   }
 `;
@@ -28,6 +30,29 @@ export const UPDATE_APP_SETTINGS_OPERATOR = gql`
       appName
       operatorName
       privacyContactEmail
+    }
+  }
+`;
+
+export const HOMEPAGE_HERO = gql`
+  query HomepageHero($appName: String!) {
+    AppSettings(where: { appName: { _eq: $appName } }) {
+      appName
+      heroHeadlineDe
+      heroHeadlineEn
+    }
+  }
+`;
+
+export const UPDATE_APP_SETTINGS_HERO_HEADLINE = gql`
+  mutation UpdateHeroHeadline($appName: String!, $heroHeadlineDe: String, $heroHeadlineEn: String) {
+    update_AppSettings_by_pk(
+      pk_columns: { appName: $appName }
+      _set: { heroHeadlineDe: $heroHeadlineDe, heroHeadlineEn: $heroHeadlineEn }
+    ) {
+      appName
+      heroHeadlineDe
+      heroHeadlineEn
     }
   }
 `;
