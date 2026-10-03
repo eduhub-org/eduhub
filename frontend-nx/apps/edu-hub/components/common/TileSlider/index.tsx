@@ -29,7 +29,6 @@ interface NavButtonProps {
   className: string;
   visible: boolean;
   onClick: () => void;
-  imgSrc: string;
   label: string;
   direction: 'previous' | 'next';
   isWidget?: boolean;
@@ -40,7 +39,6 @@ const NavButton: FC<NavButtonProps> = ({
   className,
   visible,
   onClick,
-  imgSrc,
   label,
   direction,
   isWidget = false,
@@ -52,17 +50,32 @@ const NavButton: FC<NavButtonProps> = ({
     style={{
       background: `linear-gradient(${direction === 'previous' ? '90deg' : '270deg'}, rgba(15, 15, 15, 0.65), rgba(15, 15, 15, 0))`,
     }}
-    onClick={onClick}
+    onClick={(event) => {
+      // Swiper prevents the click following a drag, even if the card snaps back.
+      if (!event.defaultPrevented) onClick();
+    }}
     disabled={!visible}
     aria-label={label}
+    data-tile-slider-nav
   >
-    <img
-      className={`block h-6 w-6 ${direction === 'previous' ? '-translate-x-1.5' : 'translate-x-1.5'}`}
+    <svg
+      className={`pointer-events-none select-none block h-6 w-6 ${direction === 'previous' ? '-translate-x-1.5' : 'translate-x-1.5'}`}
       style={{ filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.65))' }}
-      src={imgSrc}
-      alt=""
+      viewBox="0 0 31 62"
+      fill="none"
       aria-hidden="true"
-    />
+      focusable="false"
+    >
+      <path
+        d={
+          direction === 'previous'
+            ? 'M25.9817 58.9287L6.95209 31L25.9817 3.07136'
+            : 'M4.95209 3.07129L23.9817 31L4.95209 58.9286'
+        }
+        stroke="#F2F2F2"
+        strokeWidth="10"
+      />
+    </svg>
   </button>
 );
 
@@ -206,6 +219,8 @@ function TileSlider<T extends TileSliderItem>({ items, renderTile, isWidget = fa
         modules={[Mousewheel]}
         speed={250}
         longSwipesRatio={0.35}
+        touchEventsTarget="container"
+        focusableElements="input, select, option, textarea, button:not([data-tile-slider-nav]), video, label"
         spaceBetween={COMMON_SPACE_BETWEEN}
         slidesPerView="auto"
         slidesOffsetBefore={COMMON_EDGE_OFFSET}
@@ -261,31 +276,29 @@ function TileSlider<T extends TileSliderItem>({ items, renderTile, isWidget = fa
             <div className="h-full w-full">{renderTile(item)}</div>
           </SwiperSlide>
         ))}
+        {items.length > 1 && isSwiperReady && (
+          <div slot="container-end">
+            <NavButton
+              idSuffix={`prev-${idSuffix}`}
+              className="absolute top-0 left-0 z-10"
+              visible={prevVisible}
+              onClick={swiperPrev}
+              label={t('tile_slider_previous')}
+              direction="previous"
+              isWidget={isWidget}
+            />
+            <NavButton
+              idSuffix={`next-${idSuffix}`}
+              className="absolute top-0 right-0 z-10"
+              visible={nextVisible}
+              onClick={swiperNext}
+              label={t('tile_slider_next')}
+              direction="next"
+              isWidget={isWidget}
+            />
+          </div>
+        )}
       </Swiper>
-      {items.length > 1 && isSwiperReady && (
-        <>
-          <NavButton
-            idSuffix={`prev-${idSuffix}`}
-            className="absolute top-0 left-0 z-10"
-            visible={prevVisible}
-            onClick={swiperPrev}
-            imgSrc="/images/common/slider-previous-arrow.svg"
-            label={t('tile_slider_previous')}
-            direction="previous"
-            isWidget={isWidget}
-          />
-          <NavButton
-            idSuffix={`next-${idSuffix}`}
-            className="absolute top-0 right-0 z-10"
-            visible={nextVisible}
-            onClick={swiperNext}
-            imgSrc="/images/common/slider-next-arrow.svg"
-            label={t('tile_slider_next')}
-            direction="next"
-            isWidget={isWidget}
-          />
-        </>
-      )}
     </div>
   );
 }
