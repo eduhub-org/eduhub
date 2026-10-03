@@ -1522,6 +1522,7 @@
     "statistics_registrations_pending": "Anmeldungen ausstehend",
     "statistics_registrations_waitlisted": "Auf der Warteliste",
     "statistics_registrations_confirmed": "Bestätigte Registrierungen",
+    "statistics_registrations_guests": "davon als Gast",
     "statistics_registrations_cancelled": "Stornierte Registrierungen",
     "payment_status": "Zahlung",
     "payment_status_values": {
@@ -1868,7 +1869,6 @@
       "applied": "Beworben",
       "invited": "Eingeladen",
       "invitation_confirmed": "Einladung bestätigt",
-      "registered": "Registriert",
       "waitlist": "Warteliste",
       "waitlist_badge": "Warteliste",
       "cancellation_requested": "Stornierung angefragt",
@@ -1876,7 +1876,10 @@
       "aborted": "Abgebrochen",
       "rejected": "Bewerbung abgelehnt",
       "cancelled": "Storniert",
-      "invitation_expired": "Einladung abgelaufen"
+      "invitation_expired": "Einladung abgelaufen",
+      "registered_account": "Angemeldet mit Konto",
+      "registered_guest": "Angemeldet als Gast",
+      "guest_badge": "Gast"
     },
     "invitation_deadline": "Ablaufdatum Einladung",
     "loading_course": "Kurs wird geladen...",
@@ -3259,7 +3262,7 @@
       "close": "Schließen",
       "check_your_inbox": "Schau in dein Postfach",
       "confirmation_sent": "Wir haben eine E-Mail an {email} geschickt. Bitte bestätige darüber deine Anmeldung.",
-      "confirmation_hint": "Erst nach der Bestätigung ist deine Anmeldung gültig. Der Link ist 7 Tage gültig."
+      "confirmation_hint": "Erst nach der Bestätigung ist deine Anmeldung gültig. Der Link ist 24 Stunden gültig, höchstens bis zum Beginn der Veranstaltung."
     },
     "confirm": {
       "page_title": "Anmeldung bestätigen",

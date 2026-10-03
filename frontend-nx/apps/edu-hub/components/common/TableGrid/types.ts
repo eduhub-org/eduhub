@@ -110,6 +110,8 @@ export interface TableGridProps<T extends BaseRow> {
   onRowDelete?: (row: T) => Promise<void>;
   /** Multi-select filters rendered in the toolbar next to the search field. */
   filters?: TableGridFilter[];
+  /** Extra controls rendered in the toolbar right after the bulk-action select. */
+  toolbarActions?: ReactNode;
 }
 
 export interface UseTableGridProps<V> {

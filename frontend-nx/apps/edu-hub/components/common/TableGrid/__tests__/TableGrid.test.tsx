@@ -230,6 +230,11 @@ describe('TableGrid responsive options', () => {
     expect(screen.getByText('common.table_grid.selected_count')).toBeInTheDocument();
     expect(screen.getByText('common.table_grid.clear_selection')).toBeInTheDocument();
   });
+
+  it('renders toolbar actions even when the toolbar has nothing else to show', () => {
+    renderGrid({ toolbarActions: <button type="button">Export</button> });
+    expect(screen.getByRole('button', { name: 'Export' })).toBeInTheDocument();
+  });
 });
 
 describe('TableGrid cell stability', () => {

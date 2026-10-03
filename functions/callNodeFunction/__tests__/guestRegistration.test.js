@@ -25,6 +25,7 @@ const {
   normalizeOrganizationName,
   GUEST_ALLOWED_REGISTRATION_TYPES,
   isCourseRegistrationClosed,
+  confirmTokenExpiresAt,
 } = await import('../guestRegistration.js');
 
 const USER_ID = '7c9e6679-7425-40de-944b-e07fc1f90ae7';
@@ -408,5 +409,23 @@ describe('registration deadline', () => {
 
   it('refuses rather than guesses when the deadline is missing', () => {
     expect(isCourseRegistrationClosed(null, noon)).toBe(true);
+  });
+});
+
+describe('confirmation link expiry', () => {
+  const now = new Date('2026-10-05T10:00:00Z');
+
+  it('lasts 24 hours when no session starts sooner', () => {
+    expect(confirmTokenExpiresAt(now).toISOString()).toBe('2026-10-06T10:00:00.000Z');
+    expect(confirmTokenExpiresAt(now, '2026-10-09T08:00:00Z').toISOString()).toBe('2026-10-06T10:00:00.000Z');
+  });
+
+  it('ends when the next session starts within the 24 hours', () => {
+    expect(confirmTokenExpiresAt(now, '2026-10-05T18:00:00Z').toISOString()).toBe('2026-10-05T18:00:00.000Z');
+  });
+
+  it('ignores a session start that is not in the future', () => {
+    expect(confirmTokenExpiresAt(now, '2026-10-05T10:00:00Z').toISOString()).toBe('2026-10-06T10:00:00.000Z');
+    expect(confirmTokenExpiresAt(now, '2026-10-04T10:00:00Z').toISOString()).toBe('2026-10-06T10:00:00.000Z');
   });
 });
