@@ -63,7 +63,7 @@ import { createMultiWordSearchCondition } from '../../../common/TableGrid/utils'
 import { ColumnDef, SortingState } from '@tanstack/react-table';
 import { GoDotFill } from 'react-icons/go';
 import { IoIosCheckmarkCircle, IoIosCloseCircle } from 'react-icons/io';
-import { CourseEnrollmentStatus_enum, MotivationRating_enum } from '../../../../__generated__/globalTypes';
+import { CourseEnrollmentStatus_enum, MotivationRating_enum, UserStatus_enum } from '../../../../__generated__/globalTypes';
 import { getPaymentStatusFromInvoices } from '../../../../utils/invoicePaymentStatus';
 import { useDisplayDate } from '../../../../helpers/dateTimeHelpers';
 import { BulkAction } from '../../../common/TableGrid/types';
@@ -97,8 +97,16 @@ const APPLICATION_TABLE_COLUMN_SIZES = {
 /** Statuses in which a participant's cancellation request still awaits the organizer. */
 const CANCELLATION_REQUEST_OPEN_STATUSES: string[] = ['APPLIED', 'WAITLIST', 'INVITED', 'CONFIRMED', 'REGISTERED'];
 
+/** Guests registered without an account; unconfirmed guest sign-ups have no enrollment yet. */
+const isGuest = (enrollment: ApplicationEnrollment) => enrollment.User.status === UserStatus_enum.GUEST;
+
 /** The status icon of an enrollment; the table shows it alone, the mobile card next to its label. */
-const renderStatusIcon = (enrollment: ApplicationEnrollment, t: (key: string) => string, size = '1.5em') => {
+const renderStatusIcon = (
+  enrollment: ApplicationEnrollment,
+  t: (key: string) => string,
+  hasApplicationProcess: boolean,
+  size = '1.5em'
+) => {
   const expired = isExpired(enrollment);
   return (
     <div>
@@ -108,18 +116,12 @@ const renderStatusIcon = (enrollment: ApplicationEnrollment, t: (key: string) =>
       {!expired && enrollment.status === 'INVITED' && (
         <IoIosCheckmarkCircle className="inline" title={t('status.invited')} color="grey" size={size} />
       )}
-      {(enrollment.status === 'CONFIRMED' || enrollment.status === 'COMPLETED') && (
+      {(enrollment.status === 'CONFIRMED' ||
+        enrollment.status === 'COMPLETED' ||
+        enrollment.status === 'REGISTERED') && (
         <IoIosCheckmarkCircle
           className="inline"
-          title={t('status.invitation_confirmed')}
-          color="lightgreen"
-          size={size}
-        />
-      )}
-      {enrollment.status === 'REGISTERED' && (
-        <IoIosCheckmarkCircle
-          className="inline"
-          title={t('status.registered')}
+          title={t(statusLabelKey(enrollment, hasApplicationProcess))}
           color="lightgreen"
           size={size}
         />
@@ -168,7 +170,7 @@ const renderStatusIcon = (enrollment: ApplicationEnrollment, t: (key: string) =>
   );
 };
 
-const statusLabelKey = (enrollment: ApplicationEnrollment): string => {
+const statusLabelKey = (enrollment: ApplicationEnrollment, hasApplicationProcess: boolean): string => {
   if (enrollment.status === 'EXPIRED' || (isExpired(enrollment) && enrollment.status === 'INVITED')) {
     return 'status.invitation_expired';
   }
@@ -177,11 +179,13 @@ const statusLabelKey = (enrollment: ApplicationEnrollment): string => {
       return 'status.applied';
     case 'INVITED':
       return 'status.invited';
+    // Without an application process nobody was invited: account users land in CONFIRMED,
+    // guests in REGISTERED once they confirmed their email address.
     case 'CONFIRMED':
     case 'COMPLETED':
-      return 'status.invitation_confirmed';
     case 'REGISTERED':
-      return 'status.registered';
+      if (isGuest(enrollment)) return 'status.registered_guest';
+      return hasApplicationProcess ? 'status.invitation_confirmed' : 'status.registered_account';
     case 'ABORTED':
       return 'status.aborted';
     case 'REJECTED':
@@ -1317,7 +1321,20 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
         meta: {
           align: 'center',
         },
-        cell: ({ row }) => renderStatusIcon(row.original, t),
+        cell: ({ row }) => (
+          <div>
+            {renderStatusIcon(row.original, t, features.hasApplicationProcess)}
+            {/* The table shows icons only, so the guest/account difference needs a visible mark. */}
+            {isGuest(row.original) && (
+              <span
+                className="mt-1 block max-w-full truncate text-[11px] font-semibold text-label-primary bg-bg-secondary px-1.5 py-0.5 rounded border border-border-primary"
+                title={t('status.registered_guest')}
+              >
+                {t('status.guest_badge')}
+              </span>
+            )}
+          </div>
+        ),
       });
 
       return baseColumns;
@@ -1485,8 +1502,8 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
               )}
             </div>
             <span className="inline-flex items-center gap-1 rounded-full bg-bg-secondary px-2 py-0.5 font-semibold">
-              {renderStatusIcon(enrollment, t, '1.2em')}
-              {t(statusLabelKey(enrollment))}
+              {renderStatusIcon(enrollment, t, features.hasApplicationProcess, '1.2em')}
+              {t(statusLabelKey(enrollment, features.hasApplicationProcess))}
             </span>
           </div>
         </div>

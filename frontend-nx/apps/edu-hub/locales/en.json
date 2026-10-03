@@ -1540,6 +1540,7 @@
     "statistics_registrations_pending": "Pending Registrations",
     "statistics_registrations_waitlisted": "Waitlisted Registrations",
     "statistics_registrations_confirmed": "Confirmed Registrations",
+    "statistics_registrations_guests": "of which guests",
     "statistics_registrations_cancelled": "Cancelled Registrations",
     "payment_status": "Payment",
     "payment_status_values": {
@@ -1886,7 +1887,6 @@
       "applied": "Applied",
       "invited": "Invited",
       "invitation_confirmed": "invitation confirmed",
-      "registered": "Registered",
       "waitlist": "Waitlist",
       "waitlist_badge": "WAITLIST",
       "cancellation_requested": "Cancellation requested",
@@ -1894,7 +1894,10 @@
       "aborted": "aborted",
       "rejected": "Rejected",
       "cancelled": "Cancelled",
-      "invitation_expired": "Invitation expired"
+      "invitation_expired": "Invitation expired",
+      "registered_account": "Registered with account",
+      "registered_guest": "Registered as guest",
+      "guest_badge": "Guest"
     },
     "invitation_deadline": "Invitation deadline",
     "loading_course": "Loading course...",
