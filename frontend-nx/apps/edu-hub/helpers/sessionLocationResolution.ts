@@ -31,9 +31,15 @@ export interface ResolvedLocation {
   key: string;
   locationOption: string | null;
   displayAddress: string;
+  /** The LocationAddress's short label, when the address was resolved through one. */
+  label?: string;
 }
 
-export type AddressMap = Map<number, { address: string }>;
+export type AddressMap = Map<number, { address: string; shortLabel?: string | null }>;
+
+/** The short label of a LocationAddress, if it has a non-empty one. */
+const labelOf = (addressMap: AddressMap, id: number | null | undefined): string | undefined =>
+  (id && addressMap.get(id)?.shortLabel?.trim()) || undefined;
 
 /**
  * Which locations a session takes place at, in the order the course lists them,
@@ -62,6 +68,7 @@ const resolveProgramSessionLocations = (session: ResolvableSession, addressMap: 
       sa.locationAddressId && addressMap.has(sa.locationAddressId)
         ? addressMap.get(sa.locationAddressId)!.address
         : sa.address ?? '',
+    label: labelOf(addressMap, sa.locationAddressId),
   }));
 
 const resolveCourseSessionLocations = (
@@ -88,6 +95,7 @@ const resolveCourseSessionLocations = (
         key: `cl-${courseLocation.id}`,
         locationOption: CourseLocation?.locationOption ?? null,
         displayAddress,
+        label: labelOf(addressMap, effectiveAddressId),
       },
     ];
   });

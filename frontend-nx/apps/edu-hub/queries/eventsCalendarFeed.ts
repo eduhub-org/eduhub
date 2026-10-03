@@ -18,6 +18,7 @@ export const EVENTS_CALENDAR_FEED = gql`
       title
       tagline
       coverImage
+      registrationType
       headingDescriptionField1
       contentDescriptionField1
       headingDescriptionField2
