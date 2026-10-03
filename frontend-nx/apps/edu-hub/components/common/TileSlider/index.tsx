@@ -1,5 +1,6 @@
-import React, { FC, ReactNode, useRef, useState, useEffect } from 'react';
+import React, { FC, ReactNode, useCallback, useRef, useState, useEffect } from 'react';
 import { Mousewheel } from 'swiper/modules';
+import type { Swiper as SwiperInstance } from 'swiper';
 import { Swiper, SwiperSlide, SwiperRef } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/mousewheel';
@@ -8,6 +9,7 @@ import { useTranslations } from 'next-intl';
 import { CourseList_Course } from '../../../queries/__generated__/CourseList';
 import { CourseTiles_Course } from '../../../queries/__generated__/CourseTiles';
 import { CoursesEnrolledByUser_Course } from '../../../queries/__generated__/CoursesEnrolledByUser';
+import { desktopSnapGrid, desktopTileWidth, EDGE_OFFSET, NAVIGATION_WIDTH, TILE_GAP } from './desktopLayout';
 
 export type CourseType = CourseList_Course | CourseTiles_Course | CoursesEnrolledByUser_Course;
 
@@ -20,7 +22,7 @@ interface TileSliderProps<T extends TileSliderItem> {
   items: T[];
   /** Renders the tile content for a single item (course, project, …). */
   renderTile: (item: T) => ReactNode;
-  /** Widget embed mode: transparent background, visible overflow, taller nav. */
+  /** Widget embed mode: transparent background and taller navigation. */
   isWidget?: boolean;
 }
 
@@ -29,38 +31,73 @@ interface NavButtonProps {
   className: string;
   visible: boolean;
   onClick: () => void;
-  imgSrc: string;
-  imgAlt: string;
+  label: string;
+  direction: 'previous' | 'next';
+  gradientWidth: number;
   isWidget?: boolean;
 }
 
-const buttonStyles = {
-  background:
-    'linear-gradient(0deg, rgba(15, 15, 15, 0.7), rgba(15, 15, 15, 0.7)), linear-gradient(270deg, rgba(34, 34, 34, 0.5) 0%, rgba(255, 253, 253, 0) 105.56%)',
-};
+// Cubic Hermite smoothstep(0, 1, t) = t * t * (3 - 2 * t).
+// Generate 32 samples of 0.75 * (1 - smoothstep) once at module load to
+// reduce slope changes between CSS stops without changing the fade's profile.
+const NAVIGATION_GRADIENT_STOPS = Array.from({ length: 32 }, (_, index) => {
+  const t = index / 31;
+  const opacity = 0.75 * (1 - t * t * (3 - 2 * t));
+  return `rgba(15, 15, 15, ${opacity.toFixed(5)}) ${(t * 100).toFixed(4)}%`;
+}).join(', ');
 
-const NavButton: FC<NavButtonProps> = ({ idSuffix, className, visible, onClick, imgSrc, imgAlt, isWidget = false }) => (
+const NavButton: FC<NavButtonProps> = ({
+  idSuffix,
+  className,
+  visible,
+  onClick,
+  label,
+  direction,
+  gradientWidth,
+  isWidget = false,
+}) => (
   <button
     id={idSuffix}
-    className={`${className} w-10 ${isWidget ? 'h-[435px]' : 'h-[431px]'} ${!visible ? 'hidden' : ''}`}
-    style={buttonStyles}
-    onClick={onClick}
+    type="button"
+    className={`${className} flex w-12 items-center justify-center rounded-none bg-transparent transition-opacity focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-white ${isWidget ? 'h-[435px]' : 'h-[431px]'} ${!visible ? 'pointer-events-none opacity-0' : ''}`}
+    onClick={(event) => {
+      // Swiper prevents the click following a drag, even if the card snaps back.
+      if (!event.defaultPrevented) onClick();
+    }}
+    disabled={!visible}
+    aria-label={label}
+    data-tile-slider-nav
   >
-    <img src={imgSrc} alt={imgAlt} />
+    <span
+      aria-hidden="true"
+      className={`pointer-events-none absolute inset-y-0 ${direction === 'previous' ? 'left-0' : 'right-0'}`}
+      style={{
+        width: gradientWidth,
+        background: `linear-gradient(${direction === 'previous' ? '90deg' : '270deg'}, ${NAVIGATION_GRADIENT_STOPS})`,
+      }}
+    />
+    <svg
+      className={`relative pointer-events-none select-none block h-6 w-6 ${direction === 'previous' ? '-translate-x-1.5' : 'translate-x-1.5'}`}
+      style={{ filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.65))' }}
+      viewBox="0 0 31 62"
+      fill="none"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <path
+        d={
+          direction === 'previous'
+            ? 'M25.9817 58.9287L6.95209 31L25.9817 3.07136'
+            : 'M4.95209 3.07129L23.9817 31L4.95209 58.9286'
+        }
+        stroke="#F2F2F2"
+        strokeWidth="10"
+      />
+    </svg>
   </button>
 );
 
-const COMMON_SPACE_BETWEEN = 11;
-const COMMON_OFFSET = 12;
-
-const breakpoints = {
-  460: { spaceBetween: COMMON_SPACE_BETWEEN, slidesOffsetBefore: COMMON_OFFSET, slidesOffsetAfter: COMMON_OFFSET },
-  640: { spaceBetween: COMMON_SPACE_BETWEEN, slidesOffsetBefore: COMMON_OFFSET, slidesOffsetAfter: COMMON_OFFSET },
-  768: { spaceBetween: COMMON_SPACE_BETWEEN },
-  1024: { spaceBetween: COMMON_SPACE_BETWEEN },
-  1280: { spaceBetween: COMMON_SPACE_BETWEEN },
-  1536: { spaceBetween: COMMON_SPACE_BETWEEN },
-};
+const MOBILE_BREAKPOINT = 768;
 
 /**
  * Shared horizontal tile carousel (Swiper). Content-agnostic: callers supply the
@@ -76,37 +113,58 @@ function TileSlider<T extends TileSliderItem>({ items, renderTile, isWidget = fa
   const [isSwiperReady, setIsSwiperReady] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [isClient, setIsClient] = useState(false);
+  const [containerWidth, setContainerWidth] = useState(0);
+  const isMobileLayout = containerWidth < MOBILE_BREAKPOINT;
+  const tileWidth = desktopTileWidth(containerWidth, items.length);
+  const gradientWidth = isMobileLayout
+    ? NAVIGATION_WIDTH
+    : desktopSnapGrid(containerWidth, tileWidth, items.length).gradientWidth;
   const idSuffix = useRef(Date.now().toString()).current; // unique identifier
 
-  const handleSlideChange = () => {
-    if (swiperRef.current?.swiper) {
-      const swiper = swiperRef.current.swiper;
-      setPrevVisible(!swiper.isBeginning);
-      setNextVisible(!swiper.isEnd);
-    }
-  };
+  const syncNavigation = useCallback(() => {
+    const swiper = swiperRef.current?.swiper;
+    if (!swiper || swiper.destroyed) return;
+
+    const canNavigate = !swiper.isLocked && items.length > 1;
+    setPrevVisible(canNavigate && !swiper.isBeginning);
+    setNextVisible(canNavigate && !swiper.isEnd);
+  }, [items.length]);
 
   const swiperPrev = () => swiperRef.current?.swiper?.slidePrev();
   const swiperNext = () => swiperRef.current?.swiper?.slideNext();
 
-  const calculateTileWidth = () => {
-    const tileWidth = window.innerWidth >= 375 ? 325 : 275; // Match xs: 375px breakpoint from tailwind.config.js
-    return tileWidth;
+  const alignDesktopSlides = (swiper: SwiperInstance) => {
+    if (swiper.params.centeredSlides || !swiper.slides.length) return;
+
+    // Swiper has measured the container and cards. Only adjust resting snap
+    // positions; its gestures, transitions, edge state and controls stay native.
+    const grids = desktopSnapGrid(swiper.width, swiper.slidesSizesGrid[0], swiper.slides.length);
+    swiper.slidesGrid = grids.slidesGrid;
+    swiper.snapGrid = grids.snapGrid;
   };
 
   useEffect(() => {
-    const checkIfAllTilesFit = () => {
-      const containerWidth = containerRef.current ? containerRef.current.offsetWidth : 0;
-      const tileWidth = calculateTileWidth();
-      const totalTileWidth = items.length * tileWidth;
-      setNextVisible(totalTileWidth > containerWidth);
-    };
-    checkIfAllTilesFit();
-    window.addEventListener('resize', checkIfAllTilesFit);
-    return () => {
-      window.removeEventListener('resize', checkIfAllTilesFit);
-    };
-  }, [items]);
+    const container = containerRef.current;
+    if (!container) return;
+
+    const updateLayout = () => setContainerWidth(container.clientWidth);
+    const resizeObserver = new ResizeObserver(updateLayout);
+    updateLayout();
+    resizeObserver.observe(container);
+
+    return () => resizeObserver.disconnect();
+  }, [isClient]);
+
+  useEffect(() => {
+    const swiper = swiperRef.current?.swiper;
+    if (!swiper || swiper.destroyed) return;
+
+    swiper.update();
+    if (swiper.activeIndex >= items.length) {
+      swiper.slideTo(Math.max(items.length - 1, 0), 0);
+    }
+    syncNavigation();
+  }, [items, containerWidth, syncNavigation]);
 
   // Ensure we're on the client side before initializing Swiper
   useEffect(() => {
@@ -181,20 +239,37 @@ function TileSlider<T extends TileSliderItem>({ items, renderTile, isWidget = fa
 
   return (
     <div
-      className={`relative ${isWidget ? 'h-[435px] bg-transparent overflow-hidden' : 'h-[431px]'}`}
+      className={`relative overflow-hidden ${isWidget ? 'h-[435px] bg-transparent' : 'h-[431px]'}`}
       ref={containerRef}
       style={{ overscrollBehaviorX: 'contain' }}
+      data-tile-slider
     >
       <Swiper
-        className={isWidget ? '!overflow-visible' : ''}
+        className="h-full"
         ref={swiperRef}
         modules={[Mousewheel]}
-        breakpoints={breakpoints}
-        spaceBetween={COMMON_SPACE_BETWEEN}
-        slidesPerView={'auto'}
-        slidesOffsetBefore={13}
-        slidesOffsetAfter={13}
-        onSlideChange={handleSlideChange}
+        speed={250}
+        longSwipesRatio={0.35}
+        touchEventsTarget="container"
+        focusableElements="input, select, option, textarea, button:not([data-tile-slider-nav]), video, label"
+        spaceBetween={TILE_GAP}
+        slidesPerView="auto"
+        // Desktop edge insets are included in its group snap grid. Keeping the
+        // native offsets at zero lets Swiper derive overflow from that grid.
+        slidesOffsetBefore={isMobileLayout ? EDGE_OFFSET : 0}
+        slidesOffsetAfter={isMobileLayout ? EDGE_OFFSET : 0}
+        centeredSlides={isMobileLayout}
+        centeredSlidesBounds={isMobileLayout}
+        watchOverflow
+        observer
+        observeParents
+        onSlidesUpdated={alignDesktopSlides}
+        onSlideChange={syncNavigation}
+        onReachBeginning={syncNavigation}
+        onReachEnd={syncNavigation}
+        onFromEdge={syncNavigation}
+        onResize={syncNavigation}
+        onUpdate={syncNavigation}
         mousewheel={{
           forceToAxis: true,
           sensitivity: 1,
@@ -202,9 +277,9 @@ function TileSlider<T extends TileSliderItem>({ items, renderTile, isWidget = fa
         }}
         onInit={(swiper) => {
           try {
-            // Ensure swiper is properly initialized
             if (swiper && swiper.params) {
               setIsSwiperReady(true);
+              requestAnimationFrame(syncNavigation);
             } else {
               console.warn('Swiper initialization failed - params undefined');
               setHasError(true);
@@ -216,10 +291,7 @@ function TileSlider<T extends TileSliderItem>({ items, renderTile, isWidget = fa
         }}
         onSwiper={(swiper) => {
           try {
-            // Additional safety check
-            if (swiper && swiper.params) {
-              // Swiper instance created successfully
-            } else {
+            if (!swiper || !swiper.params) {
               console.warn('Swiper instance creation failed - params undefined');
               setHasError(true);
             }
@@ -230,33 +302,39 @@ function TileSlider<T extends TileSliderItem>({ items, renderTile, isWidget = fa
         }}
       >
         {items.map((item) => (
-          <SwiperSlide key={item.id} className="whitespace-normal !h-[431px] !w-[275px] xs:!w-[325px]">
-            {renderTile(item)}
+          <SwiperSlide
+            key={item.id}
+            className="flex !h-[431px] justify-center whitespace-normal"
+            style={{ width: isMobileLayout ? 'min(325px, calc(100% - 96px))' : tileWidth }}
+          >
+            <div className="h-full w-full">{renderTile(item)}</div>
           </SwiperSlide>
         ))}
+        {items.length > 1 && isSwiperReady && (
+          <div slot="container-end">
+            <NavButton
+              idSuffix={`prev-${idSuffix}`}
+              className="absolute top-0 left-0 z-10"
+              visible={prevVisible}
+              onClick={swiperPrev}
+              label={t('tile_slider_previous')}
+              direction="previous"
+              gradientWidth={gradientWidth}
+              isWidget={isWidget}
+            />
+            <NavButton
+              idSuffix={`next-${idSuffix}`}
+              className="absolute top-0 right-0 z-10"
+              visible={nextVisible}
+              onClick={swiperNext}
+              label={t('tile_slider_next')}
+              direction="next"
+              gradientWidth={gradientWidth}
+              isWidget={isWidget}
+            />
+          </div>
+        )}
       </Swiper>
-      {items.length > 1 && isSwiperReady && (
-        <>
-          <NavButton
-            idSuffix={`prev-${idSuffix}`}
-            className="absolute top-0 left-0 z-10"
-            visible={prevVisible}
-            onClick={swiperPrev}
-            imgSrc="/images/common/slider-previous-arrow.svg"
-            imgAlt="Previous"
-            isWidget={isWidget}
-          />
-          <NavButton
-            idSuffix={`next-${idSuffix}`}
-            className="absolute top-0 right-0 z-10"
-            visible={nextVisible}
-            onClick={swiperNext}
-            imgSrc="/images/common/slider-next-arrow.svg"
-            imgAlt="Next"
-            isWidget={isWidget}
-          />
-        </>
-      )}
     </div>
   );
 }

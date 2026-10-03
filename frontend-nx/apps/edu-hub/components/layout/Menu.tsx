@@ -128,6 +128,7 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
       }}
       PaperProps={{
         className: 'light',
+        sx: { mt: '8px' },
       }}
     >
       <ListSubheader disableSticky>{t('menu.section_personal')}</ListSubheader>

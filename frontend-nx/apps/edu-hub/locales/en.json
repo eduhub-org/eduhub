@@ -269,6 +269,8 @@
     },
     "session_expired_notification": "Your session has expired. Please log in again to continue.",
     "tile_slider_unavailable": "Tile slider temporarily unavailable",
+    "tile_slider_previous": "Previous slide",
+    "tile_slider_next": "Next slide",
     "course_tile": {
       "extended_application_period_badge": "Extended application period",
       "past_event_badge": "Past"
