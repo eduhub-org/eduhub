@@ -1,10 +1,9 @@
 /*
- * StuJo co-branding for the shared EduHub login theme.
+ * Shared Keycloak login layout for EduHub, StuJo, and campus portals.
  *
- * StuJo and EduHub use the same Keycloak realm and account. StuJo is the
- * primary product identity on its login routes, while the existing EduHub
- * lockup remains visible as the shared account provider. Activated via
- * html.stujo-brand (see js/stujo-portal-brand.js).
+ * Unscoped rules define the common structure and EduHub defaults. StuJo
+ * branding is scoped to html.stujo-brand (see js/stujo-portal-brand.js),
+ * retaining the EduHub lockup as the shared account provider.
  *
  * White-label campus portals add html.stujo-haw-kiel / html.stujo-flensburg
  * on top of stujo-brand; they swap the co-brand logo and accent colour.
@@ -17,6 +16,7 @@
   --kc-cobrand-border: #dedede;
   --kc-cobrand-copy: #222;
   --kc-field-border: #c6c2c5;
+  --kc-field-height: 36px;
   --kc-danger: #c9190b;
 }
 
@@ -123,7 +123,7 @@ html.stujo-flensburg .navbar-cobrand-flensburg {
   height: 36px;
 }
 
-/* Neutral card with StuJo-coloured actions and no decorative accent bar. */
+/* Shared card with brand-token colours and no decorative accent bar. */
 .login-pf-page .card-pf {
   width: calc(100% - 28px);
   max-width: 500px;
@@ -254,10 +254,16 @@ h1#kc-page-title {
 }
 
 .pf-c-form-control {
-  height: 44px;
   border: 1px solid var(--kc-field-border);
   border-radius: 7px;
   background-color: #fff;
+}
+
+/* Match PatternFly's selector so its calculated height cannot override ours.
+   Textareas keep their natural height. */
+.pf-c-form-control:not(textarea) {
+  box-sizing: border-box;
+  height: var(--kc-field-height);
 }
 
 .pf-c-form-control:hover,
@@ -277,6 +283,9 @@ h1#kc-page-title {
 }
 
 .pf-c-input-group {
+  box-sizing: border-box;
+  height: var(--kc-field-height);
+  align-items: stretch;
   overflow: hidden;
   border: 1px solid var(--kc-field-border);
   border-radius: 7px;
@@ -302,11 +311,17 @@ h1#kc-page-title {
   box-shadow: none;
 }
 
+.pf-c-input-group .pf-c-form-control:not(textarea) {
+  height: auto;
+  min-height: 0;
+}
+
 .pf-c-input-group .pf-c-button.pf-m-control {
   display: inline-flex;
   flex: 0 0 48px;
   width: 48px;
-  height: 44px;
+  height: auto;
+  min-height: 0;
   align-items: center;
   justify-content: center;
   margin-left: 0;

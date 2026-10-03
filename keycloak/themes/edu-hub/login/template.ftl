@@ -76,7 +76,7 @@
                     <#-- Co-brand slot: the EduHub lockup above always stays, the
                          portal mark is added next to it so people recognise that
                          StuJo runs on their EduHub account. Revealed by
-                         css/stujo-portals.css via js/stujo-portal-brand.js. -->
+                         css/shared-login.css via js/stujo-portal-brand.js. -->
                     <div class="navbar-cobrand">
                         <span class="navbar-cobrand-divider"></span>
                         <span class="navbar-cobrand-plate">
