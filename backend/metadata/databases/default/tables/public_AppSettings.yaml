@@ -17,6 +17,8 @@ select_permissions:
         - faqCollectionName
         - faviconUrl
         - guestDataRetentionMonths
+        - heroHeadlineDe
+        - heroHeadlineEn
         - logoUrl
         - operatorName
         - previewImageURL

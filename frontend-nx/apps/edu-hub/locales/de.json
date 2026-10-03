@@ -988,8 +988,7 @@
     "findCourses": "Finde deine Kurse",
     "learnSubheadline": "Hier wieder ein super Text",
     "registerNow": "jetzt registrieren",
-    "headline": "Updates für",
-    "subheadline": "deinen Weg",
+    "heroHeadline": "Deine **Kurse**\nDeine **Zukunft**",
     "seo": {
       "metaDescription": "EduHub von opencampus.sh – Deine Plattform für Tech-, Business- und Kreativkurse. Lerne Programmierung, Unternehmertum und mehr in unserer Community of Learning.",
       "ogDescription": "Starte deine Lernreise mit EduHub von opencampus.sh! Werde Teil einer aktiven Community und entdecke Expertenkurse in Tech, Business und Kreativität.",
@@ -2360,6 +2359,10 @@
     "bannerFontColor": "News Banner Textfarbe",
     "bannerTextDe": "News Banner Text DE",
     "bannerTextEn": "News Banner Text EN",
+    "heroHeadlineSettings": "Startseiten-Überschrift",
+    "heroHeadlineDe": "Überschrift DE",
+    "heroHeadlineEn": "Überschrift EN",
+    "heroHeadlineHint": "Markdown: **fett** markiert die hervorgehobenen Wörter, jeder Zeilenumbruch beginnt eine neue Zeile. Lass ein Feld leer, um den Standardtext zu verwenden.",
     "bannerSettings": "Banner Einstellungen",
     "courseGroupOptions": "Kursgruppierungen Reihenfolge",
     "timeZone": "Zeitzone",
@@ -3030,7 +3033,7 @@
       "items": {
         "appearance": {
           "label": "Erscheinungsbild",
-          "description": "Farben und Texte des News-Banners"
+          "description": "Startseiten-Überschrift und News-Banner"
         },
         "homepage": {
           "label": "Startseiten-Inhalte",
@@ -3101,7 +3104,7 @@
     "groups": {
       "appearance": {
         "label": "Erscheinungsbild",
-        "description": "Farben und Texte des News-Banners"
+        "description": "Startseiten-Überschrift und News-Banner"
       },
       "homepage": {
         "label": "Startseiten-Inhalte",

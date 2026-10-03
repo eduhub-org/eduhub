@@ -275,6 +275,8 @@ export enum AppSettings_update_column {
   faqCollectionName = "faqCollectionName",
   faviconUrl = "faviconUrl",
   guestDataRetentionMonths = "guestDataRetentionMonths",
+  heroHeadlineDe = "heroHeadlineDe",
+  heroHeadlineEn = "heroHeadlineEn",
   logoUrl = "logoUrl",
   operatorName = "operatorName",
   previewImageURL = "previewImageURL",
@@ -3754,6 +3756,8 @@ export interface AppSettings_bool_exp {
   faqCollectionName?: String_comparison_exp | null;
   faviconUrl?: String_comparison_exp | null;
   guestDataRetentionMonths?: Int_comparison_exp | null;
+  heroHeadlineDe?: String_comparison_exp | null;
+  heroHeadlineEn?: String_comparison_exp | null;
   logoUrl?: String_comparison_exp | null;
   operatorName?: String_comparison_exp | null;
   previewImageURL?: String_comparison_exp | null;
@@ -3781,6 +3785,8 @@ export interface AppSettings_insert_input {
   faqCollectionName?: string | null;
   faviconUrl?: string | null;
   guestDataRetentionMonths?: number | null;
+  heroHeadlineDe?: string | null;
+  heroHeadlineEn?: string | null;
   logoUrl?: string | null;
   operatorName?: string | null;
   previewImageURL?: string | null;

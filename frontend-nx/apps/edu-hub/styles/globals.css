@@ -38,11 +38,18 @@
   --eduhub-bg-card: #2a2a2a;
   --eduhub-bg-footer: #0F0F0F;
 
-  /* Homepage hero overlay: the bottom fade into the page plus the bottom-left
-     scrim that carries the white headline. Intentionally not overridden for
-     light mode - the headline over the hero artwork is always white. */
+  /* Homepage hero overlay: the bottom fade into the page plus the left-to-right
+     brand tint over the photo (Figma "EDU Header": #e9b9f7 -> #eebf48 -> #fff).
+     Figma tests it at 80% opacity, which leaves only a fifth of the photo
+     visible; 60% keeps the photo recognisable while the black headline stays
+     legible. Intentionally not overridden for light mode - the tint is what
+     carries the black headline. Colours are RGB channels so the one opacity
+     applies to all three stops. */
   --eduhub-hero-fade: var(--eduhub-bg-primary);
-  --eduhub-hero-scrim: rgba(0, 0, 0, 0.8);
+  --eduhub-hero-tint-opacity: 0.6;
+  --eduhub-hero-tint-start: 233 185 247;
+  --eduhub-hero-tint-mid: 238 191 72;
+  --eduhub-hero-tint-end: 255 255 255;
   
   /* Functional Colors (consistent across modes) */
   --eduhub-success: #A2EBA0;
@@ -194,6 +201,10 @@
  * be. The tiers below therefore key on both axes and only swap the URL; the
  * gradient overlay is composed once into --hero-overlay.
  *
+ * Portrait viewports (phones, upright tablets) get their own portrait crop of
+ * the photo and the tint stops of the Figma "Mobil" frame - see the last two
+ * blocks, which come after the landscape tiers so they win the cascade.
+ *
  * The WebP upgrade lives in a separate @supports block rather than as a second
  * declaration inside each rule. Because the overlay references a custom
  * property, an `image-set()` declaration would parse as valid in every browser
@@ -202,17 +213,38 @@
  * back to the JPEG declaration above it.
  */
 .homepage-hero {
-  --hero-overlay: linear-gradient(360deg, var(--eduhub-hero-fade) 0%, transparent 12.18%),
-    linear-gradient(53.37deg, var(--eduhub-hero-scrim) 16.6%, transparent 79.45%);
+  /* The bottom fade is solid where the course sliders overlap the hero (their
+     negative top margin, ~130px) so their white titles stay legible, and clears
+     before the headline, which sits above it via the hero's bottom padding. */
+  --hero-tint-start-at: 1.493%;
+  --hero-tint-mid-at: 49.568%;
+  --hero-overlay: linear-gradient(0deg, var(--eduhub-hero-fade) 140px, transparent 240px),
+    linear-gradient(
+      to right,
+      rgb(var(--eduhub-hero-tint-start) / var(--eduhub-hero-tint-opacity)) var(--hero-tint-start-at),
+      rgb(var(--eduhub-hero-tint-mid) / var(--eduhub-hero-tint-opacity)) var(--hero-tint-mid-at),
+      rgb(var(--eduhub-hero-tint-end) / var(--eduhub-hero-tint-opacity)) 98.576%
+    );
 
   background-image: var(--hero-overlay), url('/images/background_homepage/edu_WiSe2627_header-1280.jpg');
   background-size: cover;
-  /* `cover` on a 1.91:1 artwork inside a 100vh box crops horizontally, and on a
-     phone only ~25% of the width survives. Anchoring left keeps the magenta half
-     of the gradient (and a face) in frame, which is what production showed
-     before; `center`/`right` land on the washed-out middle of the photo. */
+  /* `cover` on a 1.91:1 photo inside a 100vh box crops horizontally, and on a
+     phone only ~25% of the width survives. Anchoring left keeps a face in
+     frame. The tint is sized to the box, not the photo, so every viewport gets
+     the full lilac-to-white sweep regardless of the crop. */
   background-position: left top;
   background-repeat: no-repeat;
+}
+
+/* The hero tint on a plain light ground, for the headline preview in the app settings. */
+.homepage-hero-tint {
+  background-color: #fff;
+  background-image: linear-gradient(
+    to right,
+    rgb(var(--eduhub-hero-tint-start) / var(--eduhub-hero-tint-opacity)) 1.493%,
+    rgb(var(--eduhub-hero-tint-mid) / var(--eduhub-hero-tint-opacity)) 49.568%,
+    rgb(var(--eduhub-hero-tint-end) / var(--eduhub-hero-tint-opacity)) 98.576%
+  );
 }
 
 /* rendered width up to ~1920px */
@@ -261,6 +293,38 @@
     .homepage-hero {
       background-image: var(--hero-overlay),
         image-set(url('/images/background_homepage/edu_WiSe2627_header-3200.webp') type('image/webp'));
+    }
+  }
+}
+
+/* Portrait viewports: dedicated 0.46:1 crop, so `cover` barely trims it. */
+@media (max-aspect-ratio: 3/4) {
+  .homepage-hero {
+    --hero-tint-start-at: 8.961%;
+    --hero-tint-mid-at: 61.237%;
+    background-image: var(--hero-overlay), url('/images/background_homepage/edu_WiSe2627_header-mobile-828.jpg');
+    background-position: center top;
+  }
+}
+
+@media (max-aspect-ratio: 3/4) and (min-resolution: 2.5dppx), (max-aspect-ratio: 3/4) and (min-width: 600px) {
+  .homepage-hero {
+    background-image: var(--hero-overlay), url('/images/background_homepage/edu_WiSe2627_header-mobile-1290.jpg');
+  }
+}
+
+@supports (background-image: image-set(url('/x.webp') type('image/webp'))) {
+  @media (max-aspect-ratio: 3/4) {
+    .homepage-hero {
+      background-image: var(--hero-overlay),
+        image-set(url('/images/background_homepage/edu_WiSe2627_header-mobile-828.webp') type('image/webp'));
+    }
+  }
+
+  @media (max-aspect-ratio: 3/4) and (min-resolution: 2.5dppx), (max-aspect-ratio: 3/4) and (min-width: 600px) {
+    .homepage-hero {
+      background-image: var(--hero-overlay),
+        image-set(url('/images/background_homepage/edu_WiSe2627_header-mobile-1290.webp') type('image/webp'));
     }
   }
 }

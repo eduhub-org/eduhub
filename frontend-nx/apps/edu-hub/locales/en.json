@@ -1004,8 +1004,7 @@
     "findCourses": "Find your courses",
     "learnSubheadline": "subline",
     "registerNow": "Register now",
-    "headline": "Start Hacking",
-    "subheadline": "Your Life",
+    "heroHeadline": "Your **Courses**\nYour **Future**",
     "seo": {
       "metaDescription": "EduHub by opencampus.sh – Your platform for tech, business, and creative courses. Learn coding, entrepreneurship, and more in our vibrant Community of Learning.",
       "ogDescription": "Start your learning journey with EduHub by opencampus.sh! Join an active community and explore expert-led courses in tech, business, and creativity.",
@@ -2398,6 +2397,10 @@
       "error_loading": "The course groups could not be loaded."
     },
     "timeZone": "Time Zone",
+    "heroHeadlineSettings": "Homepage headline",
+    "heroHeadlineDe": "Headline DE",
+    "heroHeadlineEn": "Headline EN",
+    "heroHeadlineHint": "Markdown: **bold** marks the emphasised words, each line break starts a new line. Leave a field empty to use the default text.",
     "bannerSettings": "Banner Settings",
     "faqSettings": "FAQ Settings",
     "showFaqSection": "Show FAQ section on homepage",
@@ -3045,7 +3048,7 @@
       "items": {
         "appearance": {
           "label": "Appearance",
-          "description": "News banner colors and texts"
+          "description": "Homepage headline and news banner"
         },
         "homepage": {
           "label": "Homepage content",
@@ -3116,7 +3119,7 @@
     "groups": {
       "appearance": {
         "label": "Appearance",
-        "description": "News banner colors and texts"
+        "description": "Homepage headline and news banner"
       },
       "homepage": {
         "label": "Homepage content",
