@@ -113,7 +113,9 @@ export const getPublicImageUrl = (filePath: string | null, size: number): string
 
   // Checked-in image assets have no generated storage resize variants.
   if (isStaticAppPath(filePath)) {
-    return getSafeFileHref(safeDecodeURIComponent(filePath), {
+    const decodedPath = safeDecodeURIComponent(filePath);
+    if (decodedPath.includes('%') || decodedPath.includes('\\')) return null;
+    return getSafeFileHref(decodedPath, {
       allowedStaticPrefixes: ['/images/'],
     });
   }
