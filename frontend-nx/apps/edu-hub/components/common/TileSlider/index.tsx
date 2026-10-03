@@ -1,5 +1,6 @@
 import React, { FC, ReactNode, useCallback, useRef, useState, useEffect } from 'react';
 import { Mousewheel } from 'swiper/modules';
+import type { Swiper as SwiperInstance } from 'swiper';
 import { Swiper, SwiperSlide, SwiperRef } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/mousewheel';
@@ -8,6 +9,7 @@ import { useTranslations } from 'next-intl';
 import { CourseList_Course } from '../../../queries/__generated__/CourseList';
 import { CourseTiles_Course } from '../../../queries/__generated__/CourseTiles';
 import { CoursesEnrolledByUser_Course } from '../../../queries/__generated__/CoursesEnrolledByUser';
+import { desktopSnapGrid, desktopTileWidth, EDGE_OFFSET, NAVIGATION_WIDTH, TILE_GAP } from './desktopLayout';
 
 export type CourseType = CourseList_Course | CourseTiles_Course | CoursesEnrolledByUser_Course;
 
@@ -31,8 +33,18 @@ interface NavButtonProps {
   onClick: () => void;
   label: string;
   direction: 'previous' | 'next';
+  gradientWidth: number;
   isWidget?: boolean;
 }
+
+// Cubic Hermite smoothstep(0, 1, t) = t * t * (3 - 2 * t).
+// Generate 32 samples of 0.75 * (1 - smoothstep) once at module load to
+// reduce slope changes between CSS stops without changing the fade's profile.
+const NAVIGATION_GRADIENT_STOPS = Array.from({ length: 32 }, (_, index) => {
+  const t = index / 31;
+  const opacity = 0.75 * (1 - t * t * (3 - 2 * t));
+  return `rgba(15, 15, 15, ${opacity.toFixed(5)}) ${(t * 100).toFixed(4)}%`;
+}).join(', ');
 
 const NavButton: FC<NavButtonProps> = ({
   idSuffix,
@@ -41,15 +53,13 @@ const NavButton: FC<NavButtonProps> = ({
   onClick,
   label,
   direction,
+  gradientWidth,
   isWidget = false,
 }) => (
   <button
     id={idSuffix}
     type="button"
     className={`${className} flex w-12 items-center justify-center rounded-none bg-transparent transition-opacity focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-white ${isWidget ? 'h-[435px]' : 'h-[431px]'} ${!visible ? 'pointer-events-none opacity-0' : ''}`}
-    style={{
-      background: `linear-gradient(${direction === 'previous' ? '90deg' : '270deg'}, rgba(15, 15, 15, 0.65), rgba(15, 15, 15, 0))`,
-    }}
     onClick={(event) => {
       // Swiper prevents the click following a drag, even if the card snaps back.
       if (!event.defaultPrevented) onClick();
@@ -58,8 +68,16 @@ const NavButton: FC<NavButtonProps> = ({
     aria-label={label}
     data-tile-slider-nav
   >
+    <span
+      aria-hidden="true"
+      className={`pointer-events-none absolute inset-y-0 ${direction === 'previous' ? 'left-0' : 'right-0'}`}
+      style={{
+        width: gradientWidth,
+        background: `linear-gradient(${direction === 'previous' ? '90deg' : '270deg'}, ${NAVIGATION_GRADIENT_STOPS})`,
+      }}
+    />
     <svg
-      className={`pointer-events-none select-none block h-6 w-6 ${direction === 'previous' ? '-translate-x-1.5' : 'translate-x-1.5'}`}
+      className={`relative pointer-events-none select-none block h-6 w-6 ${direction === 'previous' ? '-translate-x-1.5' : 'translate-x-1.5'}`}
       style={{ filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.65))' }}
       viewBox="0 0 31 62"
       fill="none"
@@ -79,8 +97,6 @@ const NavButton: FC<NavButtonProps> = ({
   </button>
 );
 
-const COMMON_SPACE_BETWEEN = 11;
-const COMMON_EDGE_OFFSET = 12;
 const MOBILE_BREAKPOINT = 768;
 
 /**
@@ -97,7 +113,12 @@ function TileSlider<T extends TileSliderItem>({ items, renderTile, isWidget = fa
   const [isSwiperReady, setIsSwiperReady] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [isClient, setIsClient] = useState(false);
-  const [isMobileLayout, setIsMobileLayout] = useState(true);
+  const [containerWidth, setContainerWidth] = useState(0);
+  const isMobileLayout = containerWidth < MOBILE_BREAKPOINT;
+  const tileWidth = desktopTileWidth(containerWidth, items.length);
+  const gradientWidth = isMobileLayout
+    ? NAVIGATION_WIDTH
+    : desktopSnapGrid(containerWidth, tileWidth, items.length).gradientWidth;
   const idSuffix = useRef(Date.now().toString()).current; // unique identifier
 
   const syncNavigation = useCallback(() => {
@@ -112,11 +133,21 @@ function TileSlider<T extends TileSliderItem>({ items, renderTile, isWidget = fa
   const swiperPrev = () => swiperRef.current?.swiper?.slidePrev();
   const swiperNext = () => swiperRef.current?.swiper?.slideNext();
 
+  const alignDesktopSlides = (swiper: SwiperInstance) => {
+    if (swiper.params.centeredSlides || !swiper.slides.length) return;
+
+    // Swiper has measured the container and cards. Only adjust resting snap
+    // positions; its gestures, transitions, edge state and controls stay native.
+    const grids = desktopSnapGrid(swiper.width, swiper.slidesSizesGrid[0], swiper.slides.length);
+    swiper.slidesGrid = grids.slidesGrid;
+    swiper.snapGrid = grids.snapGrid;
+  };
+
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
-    const updateLayout = () => setIsMobileLayout(container.clientWidth < MOBILE_BREAKPOINT);
+    const updateLayout = () => setContainerWidth(container.clientWidth);
     const resizeObserver = new ResizeObserver(updateLayout);
     updateLayout();
     resizeObserver.observe(container);
@@ -133,7 +164,7 @@ function TileSlider<T extends TileSliderItem>({ items, renderTile, isWidget = fa
       swiper.slideTo(Math.max(items.length - 1, 0), 0);
     }
     syncNavigation();
-  }, [items, isMobileLayout, syncNavigation]);
+  }, [items, containerWidth, syncNavigation]);
 
   // Ensure we're on the client side before initializing Swiper
   useEffect(() => {
@@ -221,15 +252,18 @@ function TileSlider<T extends TileSliderItem>({ items, renderTile, isWidget = fa
         longSwipesRatio={0.35}
         touchEventsTarget="container"
         focusableElements="input, select, option, textarea, button:not([data-tile-slider-nav]), video, label"
-        spaceBetween={COMMON_SPACE_BETWEEN}
+        spaceBetween={TILE_GAP}
         slidesPerView="auto"
-        slidesOffsetBefore={COMMON_EDGE_OFFSET}
-        slidesOffsetAfter={COMMON_EDGE_OFFSET}
+        // Desktop edge insets are included in its group snap grid. Keeping the
+        // native offsets at zero lets Swiper derive overflow from that grid.
+        slidesOffsetBefore={isMobileLayout ? EDGE_OFFSET : 0}
+        slidesOffsetAfter={isMobileLayout ? EDGE_OFFSET : 0}
         centeredSlides={isMobileLayout}
         centeredSlidesBounds={isMobileLayout}
         watchOverflow
         observer
         observeParents
+        onSlidesUpdated={alignDesktopSlides}
         onSlideChange={syncNavigation}
         onReachBeginning={syncNavigation}
         onReachEnd={syncNavigation}
@@ -270,8 +304,8 @@ function TileSlider<T extends TileSliderItem>({ items, renderTile, isWidget = fa
         {items.map((item) => (
           <SwiperSlide
             key={item.id}
-            className={`flex !h-[431px] justify-center whitespace-normal ${isMobileLayout ? '' : '!w-[325px]'}`}
-            style={isMobileLayout ? { width: 'min(325px, calc(100% - 96px))' } : undefined}
+            className="flex !h-[431px] justify-center whitespace-normal"
+            style={{ width: isMobileLayout ? 'min(325px, calc(100% - 96px))' : tileWidth }}
           >
             <div className="h-full w-full">{renderTile(item)}</div>
           </SwiperSlide>
@@ -285,6 +319,7 @@ function TileSlider<T extends TileSliderItem>({ items, renderTile, isWidget = fa
               onClick={swiperPrev}
               label={t('tile_slider_previous')}
               direction="previous"
+              gradientWidth={gradientWidth}
               isWidget={isWidget}
             />
             <NavButton
@@ -294,6 +329,7 @@ function TileSlider<T extends TileSliderItem>({ items, renderTile, isWidget = fa
               onClick={swiperNext}
               label={t('tile_slider_next')}
               direction="next"
+              gradientWidth={gradientWidth}
               isWidget={isWidget}
             />
           </div>
