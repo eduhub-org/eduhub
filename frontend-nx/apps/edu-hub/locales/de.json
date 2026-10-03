@@ -3262,7 +3262,7 @@
       "close": "Schließen",
       "check_your_inbox": "Schau in dein Postfach",
       "confirmation_sent": "Wir haben eine E-Mail an {email} geschickt. Bitte bestätige darüber deine Anmeldung.",
-      "confirmation_hint": "Erst nach der Bestätigung ist deine Anmeldung gültig. Der Link ist 7 Tage gültig."
+      "confirmation_hint": "Erst nach der Bestätigung ist deine Anmeldung gültig. Der Link ist 24 Stunden gültig, höchstens bis zum Beginn der Veranstaltung."
     },
     "confirm": {
       "page_title": "Anmeldung bestätigen",

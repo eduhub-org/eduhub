@@ -3277,7 +3277,7 @@
       "close": "Close",
       "check_your_inbox": "Check your inbox",
       "confirmation_sent": "We sent an email to {email}. Please confirm your registration from there.",
-      "confirmation_hint": "Your registration only becomes valid once confirmed. The link is valid for 7 days."
+      "confirmation_hint": "Your registration only becomes valid once confirmed. The link is valid for 24 hours, but no longer than until the event starts."
     },
     "confirm": {
       "page_title": "Confirm registration",
