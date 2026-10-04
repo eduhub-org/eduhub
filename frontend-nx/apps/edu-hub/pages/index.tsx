@@ -293,7 +293,7 @@ const Home: FC = () => {
             <div className="text-6xl sm:text-9xl mt-4">{t('subheadline')}</div>
           </div>
         </div>
-        <div className="max-w-screen-xl mx-auto md:mt-[-130px] md:pl-16 mt-[-180px]">
+        <div className="max-w-screen-xl mx-auto md:mt-[-130px] md:px-16 mt-[-180px]">
           {isLoading ? (
             <Loading />
           ) : (

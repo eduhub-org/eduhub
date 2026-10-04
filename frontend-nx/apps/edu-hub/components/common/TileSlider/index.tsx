@@ -1,15 +1,19 @@
 import React, { FC, ReactNode, useCallback, useRef, useState, useEffect } from 'react';
-import { Mousewheel } from 'swiper/modules';
+import { FreeMode, Mousewheel } from 'swiper/modules';
 import type { Swiper as SwiperInstance } from 'swiper';
 import { Swiper, SwiperSlide, SwiperRef } from 'swiper/react';
 import 'swiper/css';
+import 'swiper/css/free-mode';
 import 'swiper/css/mousewheel';
 import { useTranslations } from 'next-intl';
+import { useMediaQuery } from '../../../hooks/useMediaQuery';
 
 import { CourseList_Course } from '../../../queries/__generated__/CourseList';
 import { CourseTiles_Course } from '../../../queries/__generated__/CourseTiles';
 import { CoursesEnrolledByUser_Course } from '../../../queries/__generated__/CoursesEnrolledByUser';
-import { desktopSnapGrid, desktopTileWidth, EDGE_OFFSET, NAVIGATION_WIDTH, TILE_GAP } from './desktopLayout';
+import { desktopSnapGrid, desktopTileWidth, NAVIGATION_WIDTH, TILE_GAP } from './desktopLayout';
+import { MOBILE_EDGE_OFFSET, mobileSnapGrid } from './mobileLayout';
+import { WheelSnap } from './wheelSnap';
 
 export type CourseType = CourseList_Course | CourseTiles_Course | CoursesEnrolledByUser_Course;
 
@@ -107,6 +111,8 @@ const MOBILE_BREAKPOINT = 768;
 function TileSlider<T extends TileSliderItem>({ items, renderTile, isWidget = false }: TileSliderProps<T>) {
   const t = useTranslations('common');
   const swiperRef = useRef<SwiperRef | null>(null);
+  const activeSlide = useRef(0);
+  const restoringSlide = useRef(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [nextVisible, setNextVisible] = useState(true);
   const [prevVisible, setPrevVisible] = useState(false);
@@ -115,6 +121,10 @@ function TileSlider<T extends TileSliderItem>({ items, renderTile, isWidget = fa
   const [isClient, setIsClient] = useState(false);
   const [containerWidth, setContainerWidth] = useState(0);
   const isMobileLayout = containerWidth < MOBILE_BREAKPOINT;
+  const isDesktopViewport = useMediaQuery(`(min-width: ${MOBILE_BREAKPOINT}px)`);
+  // Card browsing follows container width; homepage edge alignment follows the
+  // page's content grid. Narrow widgets retain their own mobile inset.
+  const edgeOffset = isMobileLayout && (isWidget || !isDesktopViewport) ? MOBILE_EDGE_OFFSET : 0;
   const tileWidth = desktopTileWidth(containerWidth, items.length);
   const gradientWidth = isMobileLayout
     ? NAVIGATION_WIDTH
@@ -133,8 +143,19 @@ function TileSlider<T extends TileSliderItem>({ items, renderTile, isWidget = fa
   const swiperPrev = () => swiperRef.current?.swiper?.slidePrev();
   const swiperNext = () => swiperRef.current?.swiper?.slideNext();
 
-  const alignDesktopSlides = (swiper: SwiperInstance) => {
-    if (swiper.params.centeredSlides || !swiper.slides.length) return;
+  const alignSlides = (swiper: SwiperInstance) => {
+    if (!swiper.slides.length) return;
+
+    if (swiper.params.centeredSlides) {
+      swiper.snapGrid = mobileSnapGrid(
+        swiper.width,
+        swiper.slidesSizesGrid[0],
+        swiper.slides.length,
+        swiper.snapGrid,
+        edgeOffset
+      );
+      return;
+    }
 
     // Swiper has measured the container and cards. Only adjust resting snap
     // positions; its gestures, transitions, edge state and controls stay native.
@@ -160,11 +181,17 @@ function TileSlider<T extends TileSliderItem>({ items, renderTile, isWidget = fa
     if (!swiper || swiper.destroyed) return;
 
     swiper.update();
+    // A viewport mode change may mount before ResizeObserver reports the new
+    // container width. Restore selection only after its card layout is current.
+    if (restoringSlide.current && containerWidth === swiper.width) {
+      restoringSlide.current = false;
+      swiper.slideTo(Math.min(activeSlide.current, items.length - 1), 0);
+    }
     if (swiper.activeIndex >= items.length) {
       swiper.slideTo(Math.max(items.length - 1, 0), 0);
     }
     syncNavigation();
-  }, [items, containerWidth, syncNavigation]);
+  }, [items, containerWidth, edgeOffset, isDesktopViewport, syncNavigation]);
 
   // Ensure we're on the client side before initializing Swiper
   useEffect(() => {
@@ -184,26 +211,6 @@ function TileSlider<T extends TileSliderItem>({ items, renderTile, isWidget = fa
 
     return () => clearTimeout(timeout);
   }, [isSwiperReady, hasError, isClient]);
-
-  // Prevent browser navigation on horizontal scroll
-  useEffect(() => {
-    if (!containerRef.current) return;
-
-    const container = containerRef.current;
-
-    const handleWheel = (e: WheelEvent) => {
-      // Only prevent default for horizontal scrolling
-      if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
-        e.preventDefault();
-      }
-    };
-
-    container.addEventListener('wheel', handleWheel, { passive: false });
-
-    return () => {
-      container.removeEventListener('wheel', handleWheel);
-    };
-  }, []);
 
   // Don't render Swiper if no items
   if (!items || items.length === 0) {
@@ -243,28 +250,49 @@ function TileSlider<T extends TileSliderItem>({ items, renderTile, isWidget = fa
       ref={containerRef}
       style={{ overscrollBehaviorX: 'contain' }}
       data-tile-slider
+      onWheelCapture={(event) => {
+        // Native Mousewheel must not consume horizontal browser pinch/zoom.
+        if (event.ctrlKey || event.metaKey) event.stopPropagation();
+      }}
     >
       <Swiper
+        // Reinitialize only when input mode changes: native sticky timers and
+        // free-mode CSS classes otherwise survive dynamic parameter changes.
+        key={isDesktopViewport ? 'desktop' : 'mobile'}
         className="h-full"
         ref={swiperRef}
-        modules={[Mousewheel]}
+        initialSlide={Math.min(activeSlide.current, items.length - 1)}
+        modules={[Mousewheel, FreeMode, WheelSnap]}
+        // Input mode follows the viewport, not narrow widget/container widths.
+        // WheelSnap settles free scrolling and groups normal-mode wheel input;
+        // pointer drags stay native, and mobile keeps default snapping mode.
+        freeMode={{ enabled: isDesktopViewport, sticky: true }}
         speed={250}
         longSwipesRatio={0.35}
         touchEventsTarget="container"
         focusableElements="input, select, option, textarea, button:not([data-tile-slider-nav]), video, label"
         spaceBetween={TILE_GAP}
         slidesPerView="auto"
-        // Desktop edge insets are included in its group snap grid. Keeping the
-        // native offsets at zero lets Swiper derive overflow from that grid.
-        slidesOffsetBefore={isMobileLayout ? EDGE_OFFSET : 0}
-        slidesOffsetAfter={isMobileLayout ? EDGE_OFFSET : 0}
+        // Desktop edges are flush; only mobile layouts need an internal inset.
+        slidesOffsetBefore={edgeOffset}
+        slidesOffsetAfter={edgeOffset}
         centeredSlides={isMobileLayout}
         centeredSlidesBounds={isMobileLayout}
         watchOverflow
         observer
         observeParents
-        onSlidesUpdated={alignDesktopSlides}
-        onSlideChange={syncNavigation}
+        onSlidesUpdated={alignSlides}
+        onSlideChange={(swiper) => {
+          // Ignore the outgoing instance's resize realignment while its input
+          // mode no longer matches the viewport, before React remounts it.
+          if (
+            !restoringSlide.current &&
+            window.matchMedia(`(min-width: ${MOBILE_BREAKPOINT}px)`).matches === isDesktopViewport
+          ) {
+            activeSlide.current = swiper.activeIndex;
+          }
+          syncNavigation();
+        }}
         onReachBeginning={syncNavigation}
         onReachEnd={syncNavigation}
         onFromEdge={syncNavigation}
@@ -274,6 +302,9 @@ function TileSlider<T extends TileSliderItem>({ items, renderTile, isWidget = fa
           forceToAxis: true,
           sensitivity: 1,
           releaseOnEdges: false,
+        }}
+        onBeforeInit={() => {
+          restoringSlide.current = true;
         }}
         onInit={(swiper) => {
           try {

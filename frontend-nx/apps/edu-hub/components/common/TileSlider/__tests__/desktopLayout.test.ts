@@ -1,4 +1,4 @@
-import { desktopSnapGrid, desktopTileWidth, EDGE_OFFSET, NAVIGATION_WIDTH, TILE_GAP } from '../desktopLayout';
+import { desktopSnapGrid, desktopTileWidth, NAVIGATION_WIDTH, TILE_GAP } from '../desktopLayout';
 
 describe('desktop slider layout', () => {
   it.each([960, 1216])('centers a group of complete cards at %ipx', (width) => {
@@ -13,13 +13,12 @@ describe('desktop slider layout', () => {
     expect(snapGrid[2] - snapGrid[1]).toBe(tileWidth + TILE_GAP);
   });
 
-  it('keeps the first and last cards at the narrow inset', () => {
-    const width = 960;
+  it.each([768, 896, 960, 1152, 1216])('keeps the first and last cards flush at %ipx', (width) => {
     const tileWidth = desktopTileWidth(width, 7);
     const { snapGrid } = desktopSnapGrid(width, tileWidth, 7);
 
-    expect(-snapGrid[0]).toBe(EDGE_OFFSET);
-    expect(7 * tileWidth + 6 * TILE_GAP - snapGrid[snapGrid.length - 1]).toBe(width - EDGE_OFFSET);
+    expect(snapGrid[0]).toBe(0);
+    expect(7 * tileWidth + 6 * TILE_GAP - snapGrid[snapGrid.length - 1]).toBe(width);
   });
 
   it('never leaves tiny neighbor previews at desktop resting positions', () => {
@@ -64,12 +63,13 @@ describe('desktop slider layout', () => {
 
   it.each([0, 1, 2, 3])('does not add navigation when %i cards fit', (count) => {
     const tileWidth = desktopTileWidth(1216, count);
-    expect(desktopSnapGrid(1216, tileWidth, count).snapGrid).toEqual([-EDGE_OFFSET]);
+    expect(desktopSnapGrid(1216, tileWidth, count).snapGrid).toEqual([0]);
   });
 
-  it('shrinks a nearly fitting row rather than scrolling a few pixels', () => {
-    const tileWidth = desktopTileWidth(1010, 3);
-    expect(tileWidth).toBeLessThan(325);
-    expect(desktopSnapGrid(1010, tileWidth, 3).snapGrid).toEqual([-EDGE_OFFSET]);
+  it('fits an exact row without reserving unused edge insets', () => {
+    const width = 3 * 325 + 2 * TILE_GAP;
+    const tileWidth = desktopTileWidth(width, 3);
+    expect(tileWidth).toBe(325);
+    expect(desktopSnapGrid(width, tileWidth, 3).snapGrid).toEqual([0]);
   });
 });
