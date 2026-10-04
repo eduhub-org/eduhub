@@ -4,6 +4,7 @@ import {
   htmlToPlainText,
   IcalFeedEvent,
   IcalFeedSession,
+  labelLookup,
   registrationKind,
 } from './eventsIcal';
 import { generateICalString } from './icalExport';
@@ -164,6 +165,25 @@ describe('buildEventsIcal', () => {
     expect(lines(ics)).toContain('LOCATION:Coworking (Kuhnkestr. 6\\, Kiel)');
   });
 
+  it('finds the short label of a free-text address by address or alias', () => {
+    const labelByAddress = labelLookup([
+      { shortLabel: 'Coworking', address: 'Kuhnkestr. 6', aliases: ['Kuhnkestraße 6'], locationOption: 'KIEL' },
+      { shortLabel: 'Generic Address', address: 'Somewhere 1', aliases: null, locationOption: 'KIEL' },
+    ]);
+    const freeText = (id: number, address: string) =>
+      session(id, '2026-10-01T08:00:00Z', '2026-10-01T10:00:00Z', {
+        SessionAddresses: [{ id, address, locationAddressId: null, CourseLocation: KIEL }],
+      });
+    const ics = buildEventsIcal(
+      [event(1, [freeText(1, ' kuhnkestr.  6 ')]), event(2, [freeText(2, 'Kuhnkestraße 6')]), event(3, [freeText(3, 'Somewhere 1')])],
+      { ...OPTIONS, labelByAddress }
+    );
+    const result = lines(ics);
+    expect(result).toContain('LOCATION:Coworking (kuhnkestr.  6\\, Kiel)');
+    expect(result).toContain('LOCATION:Coworking (Kuhnkestraße 6\\, Kiel)');
+    expect(result).toContain('LOCATION:Somewhere 1\\, Kiel');
+  });
+
   it('merges the sessions of one event on the same day into a single entry', () => {
     const ics = buildEventsIcal(
       [
@@ -228,6 +248,7 @@ describe('feedLocation', () => {
   it('puts a short label first unless it just repeats the address', () => {
     expect(feedLocation([{ ...location('KIEL', 'Kuhnkestr. 6'), label: 'Coworking' }])).toBe('Coworking (Kuhnkestr. 6, Kiel)');
     expect(feedLocation([{ ...location('KIEL', 'Kuhnkestr. 6'), label: 'Kuhnkestr. 6' }])).toBe('Kuhnkestr. 6, Kiel');
+    expect(feedLocation([{ ...location('KIEL', 'Kuhnkestr. 6'), label: 'Generic Address' }])).toBe('Kuhnkestr. 6, Kiel');
     expect(feedLocation([{ ...location('ONLINE', 'https://meet.example'), label: 'Zoom' }])).toBe('Online');
   });
 

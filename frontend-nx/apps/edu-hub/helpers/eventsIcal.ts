@@ -16,7 +16,13 @@ import { formatInTimeZone } from 'date-fns-tz';
 import { getPublicImageUrl } from './filehandling';
 import { generateICalString } from './icalExport';
 import { RssEvent, selectCurrentEvents } from './eventsRss';
-import { AddressMap, resolveSessionLocations, ResolvableSession, ResolvedLocation } from './sessionLocationResolution';
+import {
+  AddressMap,
+  meaningfulLabel,
+  resolveSessionLocations,
+  ResolvableSession,
+  ResolvedLocation,
+} from './sessionLocationResolution';
 
 const TIME_ZONE = 'Europe/Berlin';
 
@@ -41,11 +47,40 @@ export interface EventsIcalOptions {
   baseUrl: string;
   /** LocationAddress rows referenced by the sessions, by id. */
   addressMap: AddressMap;
+  /** Short label of the place a free-text address names, see `labelLookup`. */
+  labelByAddress?: LabelLookup;
   /** Renders a description field's Markdown to plain text for DESCRIPTION. */
   renderPlainText: (markdown: string) => string;
   categories?: string[];
   now?: Date;
 }
+
+export type LabelLookup = (locationOption: string, address: string) => string | undefined;
+
+const normalizeAddress = (text: string): string => text.trim().toLowerCase().replace(/\s+/g, ' ');
+
+/**
+ * Finds the LocationAddress a free-text address names, by its address or one
+ * of its aliases within the same location option, so legacy sessions that only
+ * store text like "Kuhnkestr. 6" still get the place's short label.
+ */
+export const labelLookup = (
+  addresses: { shortLabel: string; address: string; aliases?: unknown; locationOption: string }[]
+): LabelLookup => {
+  const labels = new Map<string, string>();
+  addresses.forEach(({ shortLabel, address, aliases, locationOption }) => {
+    const label = meaningfulLabel(shortLabel);
+    if (!label) return;
+    const names = [address, ...(Array.isArray(aliases) ? aliases : [])].filter(
+      (name): name is string => typeof name === 'string' && name.trim() !== ''
+    );
+    names.forEach((name) => {
+      const key = `${locationOption}|${normalizeAddress(name)}`;
+      if (!labels.has(key)) labels.set(key, label);
+    });
+  });
+  return (locationOption, address) => labels.get(`${locationOption}|${normalizeAddress(address)}`);
+};
 
 /** Anything that looks like a link, so a meeting URL can never pass as an address. */
 const LINK_PATTERN = /(https?:\/\/|www\.)/i;
@@ -86,7 +121,7 @@ export const feedLocation = (locations: ResolvedLocation[]): string | undefined 
         : address.toLowerCase().includes(city.toLowerCase())
         ? address
         : `${address}, ${city}`;
-    const label = location.label?.trim();
+    const label = meaningfulLabel(location.label);
     return label && label !== address && !LINK_PATTERN.test(label) ? `${label} (${fullAddress})` : fullAddress;
   });
 
@@ -216,7 +251,13 @@ export const buildEventsIcal = (events: IcalFeedEvent[], options: EventsIcalOpti
         endDateTime: end.toISOString(),
         description: describe(event, link, options.renderPlainText, schedule),
         location: feedLocation(
-          day.flatMap(({ session }) => resolveSessionLocations(session, event.CourseLocations ?? [], options.addressMap))
+          day
+            .flatMap(({ session }) => resolveSessionLocations(session, event.CourseLocations ?? [], options.addressMap))
+            .map((location) =>
+              location.label || !location.locationOption || !options.labelByAddress
+                ? location
+                : { ...location, label: options.labelByAddress(location.locationOption, location.displayAddress) }
+            )
         ),
         url: link,
         categories: options.categories,

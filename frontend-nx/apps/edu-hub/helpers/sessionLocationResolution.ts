@@ -37,9 +37,18 @@ export interface ResolvedLocation {
 
 export type AddressMap = Map<number, { address: string; shortLabel?: string | null }>;
 
-/** The short label of a LocationAddress, if it has a non-empty one. */
+/** Placeholder label the LocationAddress migration gave addresses it could not match. */
+const PLACEHOLDER_LABEL = 'generic address';
+
+/** A short label worth showing: non-empty and not the migration placeholder. */
+export const meaningfulLabel = (label: string | null | undefined): string | undefined => {
+  const trimmed = label?.trim();
+  return trimmed && trimmed.toLowerCase() !== PLACEHOLDER_LABEL ? trimmed : undefined;
+};
+
+/** The short label of a LocationAddress, if it has a meaningful one. */
 const labelOf = (addressMap: AddressMap, id: number | null | undefined): string | undefined =>
-  (id && addressMap.get(id)?.shortLabel?.trim()) || undefined;
+  id ? meaningfulLabel(addressMap.get(id)?.shortLabel) : undefined;
 
 /**
  * Which locations a session takes place at, in the order the course lists them,
