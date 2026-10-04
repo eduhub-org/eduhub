@@ -62,6 +62,10 @@ describe('filehandling', () => {
       expect(getPublicImageUrl(path, 512)).toBe(path);
     });
 
+    it('decodes valid checked-in image paths', () => {
+      expect(getPublicImageUrl('/images/share/logo%5Fdlc.svg', 512)).toBe('/images/share/logo_dlc.svg');
+    });
+
     it('still resolves resized public storage images', () => {
       expect(getPublicImageUrl('organizations/org-160/public/logo.png', 512)).toBe(
         `${STORAGE_BUCKET_URL}/organizations/org-160/public/logo-512.webp`
@@ -72,6 +76,11 @@ describe('filehandling', () => {
       '/api/internal/secret',
       '/images/../api/internal/secret',
       '/images/%2e%2e/api/internal/secret',
+      '/images/%252e%252e/api/internal/secret',
+      '/images/..\\api/internal/secret',
+      '/images/..%5capi/internal/secret',
+      '/images/..%255capi/internal/secret',
+      '/images/share/logo%ZZ.svg',
       '//example.test/logo.svg',
       'organizations/org-160/private/logo.png',
       null,
