@@ -121,6 +121,7 @@ export const MANAGED_COURSE_APPLICATIONS = gql`
     Course_by_pk(id: $id) {
       id
       registrationType
+      guestRegistrationEnabled
       matrixRoomId
       formbricksEnrollmentSurveyUrl
       Program {
@@ -154,6 +155,7 @@ export const MANAGED_COURSE_APPLICATIONS = gql`
               }
             }
           }
+          status
           organizationName
           Organization {
             id
@@ -224,6 +226,18 @@ export const MANAGED_COURSE_APPLICATIONS = gql`
       }
       AbortedCourseEnrollments: CourseEnrollments_aggregate(
         where: { isTest: { _eq: false }, status: { _eq: ABORTED } }
+      ) {
+        aggregate {
+          count
+        }
+      }
+      # Active participants without an account; unconfirmed guest sign-ups have no enrollment yet.
+      GuestCourseEnrollments: CourseEnrollments_aggregate(
+        where: {
+          isTest: { _eq: false }
+          status: { _in: [CONFIRMED, COMPLETED, REGISTERED] }
+          User: { status: { _eq: GUEST } }
+        }
       ) {
         aggregate {
           count

@@ -14,6 +14,7 @@ const count = (value: number) => ({
 const course = (registrationType: CourseRegistrationType_enum | null) =>
   ({
     registrationType,
+    guestRegistrationEnabled: false,
     CourseEnrollments: [], // A table search with no matches must not hide course totals.
     TotalCourseEnrollments: count(20),
     InvitedCourseEnrollments: count(15),
@@ -22,6 +23,7 @@ const course = (registrationType: CourseRegistrationType_enum | null) =>
     ExpiredCourseEnrollments: count(2),
     AbortedCourseEnrollments: count(4),
     CancelledCourseEnrollments: count(1),
+    GuestCourseEnrollments: count(0),
     PendingCourseEnrollments: count(2),
     WaitlistedCourseEnrollments: count(3),
   } as unknown as ManagedCourseApplications_Course_by_pk);
@@ -89,5 +91,29 @@ describe.each([
     expect(screen.queryByText('statistics_registrations_pending')).toBeNull();
     expect(screen.queryByText('statistics_registrations_waitlisted')).toBeNull();
     expect(displayedCount('statistics_registrations_total')).toBe('20');
+  });
+});
+
+describe('guest participants', () => {
+  it('shows how many participants registered as guests when guest sign-up is enabled', () => {
+    const data = course(CourseRegistrationType_enum.DIRECT_CONFIRMATION);
+    data.guestRegistrationEnabled = true;
+    data.GuestCourseEnrollments = count(4);
+    render(<CourseEnrollmentStatistics course={data} hasCourseStarted={false} />);
+    expect(displayedCount('statistics_registrations_guests')).toBe('4');
+  });
+
+  it('keeps the guest count after guest sign-up was switched off', () => {
+    const data = course(CourseRegistrationType_enum.DIRECT_CONFIRMATION);
+    data.GuestCourseEnrollments = count(2);
+    render(<CourseEnrollmentStatistics course={data} hasCourseStarted={false} />);
+    expect(displayedCount('statistics_registrations_guests')).toBe('2');
+  });
+
+  it('hides the guest count for events without guests and guest sign-up', () => {
+    render(
+      <CourseEnrollmentStatistics course={course(CourseRegistrationType_enum.DIRECT_CONFIRMATION)} hasCourseStarted={false} />
+    );
+    expect(screen.queryByText('statistics_registrations_guests')).toBeNull();
   });
 });

@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { CourseEnrollment_bool_exp, CourseEnrollment_order_by, CourseRegistrationType_enum, CourseEnrollmentStatus_enum, InvoiceStatus_enum, MotivationRating_enum } from "./../../__generated__/globalTypes";
+import { CourseEnrollment_bool_exp, CourseEnrollment_order_by, CourseRegistrationType_enum, CourseEnrollmentStatus_enum, InvoiceStatus_enum, UserStatus_enum, MotivationRating_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: ManagedCourseApplications
@@ -138,6 +138,10 @@ export interface ManagedCourseApplications_Course_by_pk_CourseEnrollments_User {
    * An array relationship
    */
   CourseEnrollments: ManagedCourseApplications_Course_by_pk_CourseEnrollments_User_CourseEnrollments[];
+  /**
+   * Current user status
+   */
+  status: UserStatus_enum;
   /**
    * Free-text organization the user belongs to, e.g. entered during guest registration. Used when no organizationId is set.
    */
@@ -286,6 +290,16 @@ export interface ManagedCourseApplications_Course_by_pk_AbortedCourseEnrollments
   aggregate: ManagedCourseApplications_Course_by_pk_AbortedCourseEnrollments_aggregate | null;
 }
 
+export interface ManagedCourseApplications_Course_by_pk_GuestCourseEnrollments_aggregate {
+  __typename: "CourseEnrollment_aggregate_fields";
+  count: number;
+}
+
+export interface ManagedCourseApplications_Course_by_pk_GuestCourseEnrollments {
+  __typename: "CourseEnrollment_aggregate";
+  aggregate: ManagedCourseApplications_Course_by_pk_GuestCourseEnrollments_aggregate | null;
+}
+
 export interface ManagedCourseApplications_Course_by_pk_PendingCourseEnrollments_aggregate {
   __typename: "CourseEnrollment_aggregate_fields";
   count: number;
@@ -320,6 +334,10 @@ export interface ManagedCourseApplications_Course_by_pk {
   __typename: "Course";
   id: number;
   registrationType: CourseRegistrationType_enum | null;
+  /**
+   * Whether visitors without an account may register for this course/event with just name and email. Only honoured for courses in a Program of type EVENTS with a direct registration type.
+   */
+  guestRegistrationEnabled: boolean;
   matrixRoomId: string | null;
   /**
    * Full URL to the Formbricks survey for course enrollment/application (for iframe embedding). Overrides program default if set.
@@ -369,6 +387,10 @@ export interface ManagedCourseApplications_Course_by_pk {
    * An aggregate relationship
    */
   AbortedCourseEnrollments: ManagedCourseApplications_Course_by_pk_AbortedCourseEnrollments;
+  /**
+   * An aggregate relationship
+   */
+  GuestCourseEnrollments: ManagedCourseApplications_Course_by_pk_GuestCourseEnrollments;
   /**
    * An aggregate relationship
    */

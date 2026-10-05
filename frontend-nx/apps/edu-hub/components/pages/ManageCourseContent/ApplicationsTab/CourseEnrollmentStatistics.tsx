@@ -33,6 +33,7 @@ export const CourseEnrollmentStatistics: FC<Props> = ({ course, hasCourseStarted
     confirmedApplicants: course.ConfirmedCourseEnrollments.aggregate?.count ?? 0,
     cancelledApplicants: course.CancelledCourseEnrollments.aggregate?.count ?? 0,
     abortedParticipants: course.AbortedCourseEnrollments.aggregate?.count ?? 0,
+    guestParticipants: course.GuestCourseEnrollments.aggregate?.count ?? 0,
     pendingRegistrations: course.PendingCourseEnrollments.aggregate?.count ?? 0,
     waitlistedRegistrations: course.WaitlistedCourseEnrollments.aggregate?.count ?? 0,
   };
@@ -56,6 +57,10 @@ export const CourseEnrollmentStatistics: FC<Props> = ({ course, hasCourseStarted
             <>
               <StatCard label={t('statistics_registrations_total')} value={applicationStats.totalApplications} />
               <StatCard label={t('statistics_registrations_confirmed')} value={applicationStats.confirmedApplicants} />
+              {/* Kept after guest sign-up is switched off, as long as guests are still registered. */}
+              {(course.guestRegistrationEnabled || applicationStats.guestParticipants > 0) && (
+                <StatCard label={t('statistics_registrations_guests')} value={applicationStats.guestParticipants} />
+              )}
               <StatCard label={t('statistics_registrations_cancelled')} value={applicationStats.cancelledApplicants} />
               {applicationStats.pendingRegistrations > 0 && (
                 <StatCard label={t('statistics_registrations_pending')} value={applicationStats.pendingRegistrations} />
