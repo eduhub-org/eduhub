@@ -1,4 +1,4 @@
-import { FC, useCallback } from 'react';
+import { FC, useCallback, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
 import { useManageMutation } from '../../../hooks/authedMutation';
@@ -24,21 +24,29 @@ const RegistrationTypeSwitches: FC<RegistrationTypeSwitchesProps> = ({ courseId,
   const flags = registrationTypeToFlags(registrationType);
   const currentType = flagsToRegistrationType(flags);
 
+  // Each switch writes the whole registration type, derived from the stored one. Until the
+  // refetched type arrives the switches are locked, so a quick second click cannot build on
+  // stale flags and undo the first change.
+  const [saving, setSaving] = useState(false);
   const [updateRegistrationType] = useManageMutation(UPDATE_COURSE_REGISTRATION_TYPE, {
     refetchQueries: ['AdminCourseList'],
+    awaitRefetchQueries: true,
   });
 
   const setFlag = useCallback(
     async (flag: keyof RegistrationFlags, value: boolean) => {
       const nextType = flagsToRegistrationType({ ...flags, [flag]: value });
-      if (nextType === currentType) return;
+      if (saving || nextType === currentType) return;
+      setSaving(true);
       try {
         await updateRegistrationType({ variables: { itemId: courseId, value: nextType } });
       } catch (err) {
         handleError(err instanceof Error ? err.message : String(err));
+      } finally {
+        setSaving(false);
       }
     },
-    [flags, currentType, courseId, updateRegistrationType, handleError]
+    [flags, currentType, saving, courseId, updateRegistrationType, handleError]
   );
 
   const renderSwitch = (flag: keyof RegistrationFlags, checked: boolean, disabled = false) => (
@@ -47,7 +55,7 @@ const RegistrationTypeSwitches: FC<RegistrationTypeSwitchesProps> = ({ courseId,
         variant="switch"
         label={t(`registration_switches.${flag}.label`)}
         checked={checked}
-        disabled={disabled}
+        disabled={disabled || saving}
         onValueUpdated={(value: boolean) => setFlag(flag, value)}
       />
       <p className="text-xs text-label-secondary -mt-2">{t(`registration_switches.${flag}.help_text`)}</p>

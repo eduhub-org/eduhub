@@ -125,9 +125,13 @@ const CourseEmailTemplatesSection: FC<CourseEmailTemplatesSectionProps> = ({ cou
       } catch (err) {
         // Created meanwhile in another tab: open that copy instead.
         if (isUniquenessViolation(err)) {
-          const refreshed = await refetchCourseTemplates();
-          const existing = refreshed.data?.MailTemplate.find((template) => template.type === type);
-          if (existing) setEditingTemplateId(existing.id);
+          try {
+            const refreshed = await refetchCourseTemplates();
+            const existing = refreshed.data?.MailTemplate.find((template) => template.type === type);
+            if (existing) setEditingTemplateId(existing.id);
+          } catch (refetchErr) {
+            handleError(refetchErr instanceof Error ? refetchErr.message : String(refetchErr));
+          }
         } else {
           handleError(err instanceof Error ? err.message : String(err));
         }

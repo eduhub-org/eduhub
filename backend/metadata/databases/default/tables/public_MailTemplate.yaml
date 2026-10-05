@@ -146,6 +146,17 @@ select_permissions:
                               _eq: X-Hasura-User-Id
                           - canManageDegrees:
                               _eq: true
+          # Settings admins may write any course template of their organization (see the insert
+          # rules), so they must be able to read those rows back too.
+          - Course:
+              Program:
+                Organization:
+                  OrganizationAdmins:
+                    _and:
+                      - userId:
+                          _eq: X-Hasura-User-Id
+                      - canManageSettings:
+                          _eq: true
       allow_aggregations: true
 update_permissions:
   # Org admins may edit course-specific templates for courses whose program they manage. Global
