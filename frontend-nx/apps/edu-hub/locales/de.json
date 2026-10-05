@@ -1180,9 +1180,10 @@
       "placeholder": "Kachel-Slider Gruppen auswählen"
     },
     "course_group": {
-      "label": "Kursgruppe",
+      "label": "Slider & Widgets",
       "placeholder": "Kursgruppen auswählen",
-      "slider_badge": "Startseiten-Slider"
+      "slider_badge": "Startseiten-Slider",
+      "help_text": "Ordnet das Angebot Slidern auf der Startseite oder in Widgets zu. Slider und Widget-Gruppen werden in den Einstellungen unter Kursgruppen definiert. Jedes Angebot erscheint automatisch im Slider seines Typs (Kurse, Events, Degrees); markierte Gruppen sind auf der Startseite sichtbar."
     },
     "course_series": {
       "label": "Kursreihe",
@@ -1206,10 +1207,10 @@
       "add": "Förderorganisation hinzufügen"
     },
     "certificates": {
-      "label": "Bescheinigungen"
+      "enable": "Bescheinigungen vergeben",
+      "disabled_hint": "Aktiviere dies, wenn Teilnehmende einen Teilnahmenachweis oder ein Leistungszertifikat erhalten sollen."
     },
     "possible_certificates": {
-      "label": "Mögliche Bescheinigungen",
       "attendance_certificate": "Teilnahmenachweis",
       "achievement_certificate": "Leistungszertifikat"
     },
@@ -1229,7 +1230,6 @@
     },
     "registration_type": {
       "label": "Anmeldeart",
-      "help_text": "Wähle aus, wie sich Teilnehmer für diesen Kurs anmelden können",
       "options": {
         "APPROVAL_WITH_INPUT": "Zulassung mit Fragebogen und Bewerbungsprozess",
         "DIRECT_CONFIRMATION": "Direkte Zulassung ohne Fragebogen",
@@ -1266,9 +1266,17 @@
     },
     "email_templates": {
       "label": "E-Mail-Vorlagen",
-      "create_button": "E-Mail-Vorlagen erstellen",
-      "edit_button": "E-Mail-Vorlagen bearbeiten",
-      "external_registration_note": "E-Mail-Vorlagen sind für externe Anmeldungen nicht verfügbar."
+      "external_registration_note": "E-Mail-Vorlagen sind für externe Anmeldungen nicht verfügbar.",
+      "help_text": "Ohne Anpassung werden die Standardvorlagen verschickt. Passe nur an, was für dieses Angebot anders sein soll.",
+      "standard": "Standard",
+      "customized": "Angepasst",
+      "customize": "Anpassen",
+      "edit": "Bearbeiten",
+      "reset": "Zurücksetzen",
+      "reset_confirm": "Möchtest Du die Anpassung von „{name}“ löschen? Danach wird wieder die Standardvorlage verschickt.",
+      "other_customized": "Weitere angepasste Vorlagen",
+      "dialog_hint": "Änderungen werden automatisch gespeichert und gelten nur für dieses Angebot.",
+      "default_missing": "Für diese E-Mail gibt es keine Standardvorlage, die kopiert werden kann."
     },
     "ects": {
       "label": "ECTS-Punkte",
@@ -1295,7 +1303,8 @@
     "learning_goals": {
       "label": "Lernziele",
       "help_text": "Definiere, was die Teilnehmer nach Abschluss dieses Kurses erreichen werden. Schreibe jedes Lernziel in eine neue Zeile ohne Nummerierung. Verwende Handlungsverben wie 'verstehen', 'anwenden', 'analysieren', 'erstellen' (siehe: https://www.bloomstaxonomy.org).",
-      "placeholder": "Die Grundlagen des Themas verstehen\nSchlüsselkonzepte in praktischen Szenarien anwenden\nKomplexe Probleme und Lösungen analysieren\nInnovative Ansätze entwickeln"
+      "placeholder": "Die Grundlagen des Themas verstehen\nSchlüsselkonzepte in praktischen Szenarien anwenden\nKomplexe Probleme und Lösungen analysieren\nInnovative Ansätze entwickeln",
+      "certificate_hint": "Die Lernziele erscheinen auf dem Leistungszertifikat."
     },
     "add_course_button": "Kurs hinzufügen",
     "add_event_button": "Event hinzufügen",
@@ -1383,6 +1392,26 @@
       "label": "Teilnehmende",
       "show_available_places": "Freie Plätze auf der Kursseite anzeigen",
       "show_available_places_hint": "Ohne Haken zeigt die Kursseite nur die Anzahl der Teilnehmenden. Benötigt eine maximale Teilnehmendenzahl."
+    },
+    "registration_switches": {
+      "external": {
+        "label": "Externe Anmeldung",
+        "help_text": "Die Anmeldung läuft über eine externe Seite. Die übrigen Optionen entfallen."
+      },
+      "application": {
+        "label": "Bewerbungsprozess",
+        "help_text": "Interessierte bewerben sich, und Du wählst aus, wer teilnimmt."
+      },
+      "questionnaire": {
+        "label": "Fragebogen",
+        "help_text": "Bei der Anmeldung wird ein Fragebogen (Formbricks) ausgefüllt."
+      },
+      "payment": {
+        "label": "Zahlung",
+        "help_text": "Die Teilnahme ist kostenpflichtig und wird bei der Anmeldung bezahlt."
+      },
+      "application_locks_hint": "Ein Bewerbungsprozess enthält immer einen Fragebogen und lässt sich nicht mit einer Zahlung kombinieren.",
+      "summary": "Anmeldeart: {mode}"
     }
   },
   "manageCourse": {

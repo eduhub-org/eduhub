@@ -1196,9 +1196,10 @@
       "placeholder": "Select tile slider groups"
     },
     "course_group": {
-      "label": "Course Group",
+      "label": "Sliders & widgets",
       "placeholder": "Select course groups",
-      "slider_badge": "Homepage slider"
+      "slider_badge": "Homepage slider",
+      "help_text": "Adds the offering to sliders on the homepage or in widgets. Sliders and widget groups are defined in the settings under course groups. Every offering automatically appears in the slider of its type (courses, events, degrees); marked groups are visible on the homepage."
     },
     "course_series": {
       "label": "Course series",
@@ -1222,10 +1223,10 @@
       "add": "Add Funding Organization"
     },
     "certificates": {
-      "label": "Certificates"
+      "enable": "Award certificates",
+      "disabled_hint": "Turn this on if participants should receive an attendance or achievement certificate."
     },
     "possible_certificates": {
-      "label": "Possible Certificates",
       "attendance_certificate": "Attendance Certificate",
       "achievement_certificate": "Achievement Certificate"
     },
@@ -1245,7 +1246,6 @@
     },
     "registration_type": {
       "label": "Registration Type",
-      "help_text": "Select how participants can register for this course",
       "options": {
         "APPROVAL_WITH_INPUT": "Approval Required with Questionnaire and Application Process",
         "DIRECT_CONFIRMATION": "Direct Confirmation without Questionnaire",
@@ -1284,9 +1284,17 @@
     },
     "email_templates": {
       "label": "Email Templates",
-      "create_button": "Create Email Templates",
-      "edit_button": "Edit Email Templates",
-      "external_registration_note": "Email templates are not available for external registration courses."
+      "external_registration_note": "Email templates are not available for external registration courses.",
+      "help_text": "Without changes, the default templates are sent. Only customize what should differ for this offering.",
+      "standard": "Default",
+      "customized": "Customized",
+      "customize": "Customize",
+      "edit": "Edit",
+      "reset": "Reset",
+      "reset_confirm": "Delete the customized \"{name}\"? The default template will be sent again afterwards.",
+      "other_customized": "Other customized templates",
+      "dialog_hint": "Changes are saved automatically and apply to this offering only.",
+      "default_missing": "There is no default template to copy for this email."
     },
     "ects": {
       "label": "ECTS Credits",
@@ -1313,7 +1321,8 @@
     "learning_goals": {
       "label": "Learning Goals",
       "help_text": "Define what participants will achieve after completing this course. Write each learning goal on a new line without numbering. Use action verbs like 'understand', 'apply', 'analyze', 'create' (see: https://www.bloomstaxonomy.org).",
-      "placeholder": "Understand the fundamentals of the topic\nApply key concepts in practical scenarios\nAnalyze complex problems and solutions\nCreate innovative approaches"
+      "placeholder": "Understand the fundamentals of the topic\nApply key concepts in practical scenarios\nAnalyze complex problems and solutions\nCreate innovative approaches",
+      "certificate_hint": "Learning goals are printed on the achievement certificate."
     },
     "add_course_button": "Add Course",
     "add_event_button": "Add Event",
@@ -1401,6 +1410,26 @@
       "label": "Participants",
       "show_available_places": "Show available places on the course page",
       "show_available_places_hint": "Unchecked, the course page shows only how many people are taking part. Requires a maximum number of participants."
+    },
+    "registration_switches": {
+      "external": {
+        "label": "External registration",
+        "help_text": "Registration happens on an external page. The other options do not apply."
+      },
+      "application": {
+        "label": "Application process",
+        "help_text": "People apply, and you choose who takes part."
+      },
+      "questionnaire": {
+        "label": "Questionnaire",
+        "help_text": "A questionnaire (Formbricks) is filled in when registering."
+      },
+      "payment": {
+        "label": "Payment",
+        "help_text": "Taking part costs a fee that is paid when registering."
+      },
+      "application_locks_hint": "An application process always includes a questionnaire and cannot be combined with payment.",
+      "summary": "Registration type: {mode}"
     }
   },
   "manageCourse": {
