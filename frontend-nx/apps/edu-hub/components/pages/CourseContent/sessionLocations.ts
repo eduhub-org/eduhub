@@ -14,8 +14,10 @@ import {
   Course_Course_by_pk_CourseLocations as CourseLocation,
 } from '../../../queries/__generated__/Course';
 import { generateICalString, downloadICalFile } from '../../../helpers/icalExport';
+import { blockSchedule, contiguousBlocks, TimedSession } from '../../../helpers/sessionSchedule';
 import {
   AddressMap,
+  labelledAddress,
   referencedAddressIds,
   resolveSessionLocations,
   ResolvedLocation,
@@ -53,6 +55,84 @@ export const useSessionAddressMap = (sessions: Session[]): AddressMap => {
   }, [data]);
 };
 
+/** The timezone the export's merged entries spell their schedule in. */
+const TIME_ZONE = 'Europe/Berlin';
+
+interface CourseIcalArgs {
+  sessions: Session[];
+  courseLocations: CourseLocation[];
+  addressMap: AddressMap;
+  /** Online meeting links are only written into the file for people entitled to them. */
+  canSeeOnlineLink: boolean;
+  calendarName: string;
+  courseUrl?: string;
+}
+
+const toDate = (value: Date | string | null | undefined): Date | null => {
+  if (value == null) return null;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
+};
+
+/**
+ * The calendar entries for a course: one per run of back-to-back sessions, so
+ * a talk followed directly by a get-together is one appointment while a break
+ * splits the day. A lone session keeps its own title and description; a merged
+ * run is named after the course and lists its sessions in the description.
+ */
+export const buildCourseIcalEvents = ({
+  sessions,
+  courseLocations,
+  addressMap,
+  canSeeOnlineLink,
+  calendarName,
+  courseUrl,
+}: CourseIcalArgs) => {
+  const timed = sessions.flatMap((session): TimedSession<Session>[] => {
+    const start = toDate(session.startDateTime);
+    return start ? [{ session, start, end: toDate(session.endDateTime) ?? start }] : [];
+  });
+
+  return contiguousBlocks(timed, TIME_ZONE).map((block) => {
+    const [first] = block;
+    const end = new Date(Math.max(...block.map((item) => item.end.getTime())));
+
+    const places = block.flatMap(({ session }) =>
+      resolveSessionLocations(session, courseLocations, addressMap).map((l) =>
+        l.locationOption === 'ONLINE'
+          ? canSeeOnlineLink
+            ? l.displayAddress || l.locationOption
+            : l.locationOption
+          : labelledAddress(l.label, l.displayAddress) || l.locationOption
+      )
+    );
+    const location = [...new Set(places.filter(Boolean))].join(' – ');
+
+    const isMerged = block.length > 1;
+    const title = isMerged || !first.session.title ? calendarName : `${calendarName} – ${first.session.title}`;
+    const description = isMerged
+      ? [
+          blockSchedule(block, calendarName, TIME_ZONE),
+          ...block
+            .filter(({ session }) => session.description?.trim())
+            .map(({ session }) =>
+              session.title?.trim() ? `${session.title.trim()}:\n${session.description}` : session.description
+            ),
+        ].join('\n\n')
+      : first.session.description || undefined;
+
+    return {
+      uid: `session-${first.session.id}@eduhub`,
+      title,
+      startDateTime: first.start.toISOString(),
+      endDateTime: end.toISOString(),
+      description,
+      location: location || undefined,
+      url: courseUrl,
+    };
+  });
+};
+
 interface CalendarExportArgs {
   sessions: Session[];
   courseLocations: CourseLocation[];
@@ -83,24 +163,13 @@ export const useCourseCalendarExport = ({
         ? `${window.location.origin}/course/${courseId}`
         : undefined;
 
-    const icalEvents = sessions.map((session) => {
-      const locations = resolveSessionLocations(session, courseLocations, addressMap);
-      const location = locations
-        .map((l) =>
-          l.locationOption === 'ONLINE' && !canSeeOnlineLink ? l.locationOption : l.displayAddress || l.locationOption
-        )
-        .filter(Boolean)
-        .join(' – ');
-
-      return {
-        uid: `session-${session.id}@eduhub`,
-        title: session.title ? `${calendarName} – ${session.title}` : calendarName,
-        startDateTime: session.startDateTime,
-        endDateTime: session.endDateTime,
-        description: session.description || undefined,
-        location: location || undefined,
-        url: courseUrl,
-      };
+    const icalEvents = buildCourseIcalEvents({
+      sessions,
+      courseLocations,
+      addressMap,
+      canSeeOnlineLink,
+      calendarName,
+      courseUrl,
     });
 
     downloadICalFile(

@@ -1,4 +1,12 @@
-import { buildEventsIcal, feedLocation, htmlToPlainText, IcalFeedEvent, IcalFeedSession } from './eventsIcal';
+import {
+  buildEventsIcal,
+  feedLocation,
+  htmlToPlainText,
+  IcalFeedEvent,
+  IcalFeedSession,
+  labelLookup,
+  registrationKind,
+} from './eventsIcal';
 import { generateICalString } from './icalExport';
 
 jest.mock('./filehandling', () => ({
@@ -33,7 +41,7 @@ const event = (id: number, sessions: IcalFeedSession[], overrides: Partial<IcalF
 const OPTIONS = {
   calendarName: 'EduHub Events',
   baseUrl: 'https://edu.example',
-  addressMap: new Map<number, { address: string }>(),
+  addressMap: new Map<number, { address: string; shortLabel?: string | null }>(),
   renderPlainText: (markdown: string) => markdown,
   now: NOW,
 };
@@ -61,6 +69,7 @@ describe('buildEventsIcal', () => {
     expect(vevents(ics)).toHaveLength(2);
     expect(result).toContain('UID:session-3@eduhub');
     expect(result).toContain('UID:session-4@eduhub');
+    expect(result).toContain('X-EDUHUB-REGISTRATION:APPLICATION');
     // A session without an end is written as starting and ending at the same time.
     expect(result).toContain('DTSTART:20261002T080000Z');
     expect(result).toContain('DTEND:20261002T080000Z');
@@ -141,6 +150,99 @@ describe('buildEventsIcal', () => {
     expect(lines(ics)).toContain('LOCATION:Christian-Albrechts-Platz 4\\, 24118 Kiel – Online');
     expect(ics).not.toContain('zoom');
   });
+
+  it('puts the short label of the LocationAddress before the address', () => {
+    const ics = buildEventsIcal(
+      [
+        event(1, [
+          session(1, '2026-10-01T08:00:00Z', '2026-10-01T10:00:00Z', {
+            SessionAddresses: [{ id: 1, address: '', locationAddressId: 7, CourseLocation: KIEL }],
+          }),
+        ]),
+      ],
+      { ...OPTIONS, addressMap: new Map([[7, { address: 'Kuhnkestr. 6', shortLabel: 'Coworking' }]]) }
+    );
+    expect(lines(ics)).toContain('LOCATION:Coworking (Kuhnkestr. 6\\, Kiel)');
+  });
+
+  it('finds the short label of a free-text address by address or alias', () => {
+    const labelByAddress = labelLookup([
+      { shortLabel: 'Coworking', address: 'Kuhnkestr. 6', aliases: ['Kuhnkestraße 6'], locationOption: 'KIEL' },
+      { shortLabel: 'Generic Address', address: 'Somewhere 1', aliases: null, locationOption: 'KIEL' },
+    ]);
+    const freeText = (id: number, address: string) =>
+      session(id, '2026-10-01T08:00:00Z', '2026-10-01T10:00:00Z', {
+        SessionAddresses: [{ id, address, locationAddressId: null, CourseLocation: KIEL }],
+      });
+    const ics = buildEventsIcal(
+      [event(1, [freeText(1, ' kuhnkestr.  6 ')]), event(2, [freeText(2, 'Kuhnkestraße 6')]), event(3, [freeText(3, 'Somewhere 1')])],
+      { ...OPTIONS, labelByAddress }
+    );
+    const result = lines(ics);
+    expect(result).toContain('LOCATION:Coworking (kuhnkestr.  6\\, Kiel)');
+    expect(result).toContain('LOCATION:Coworking (Kuhnkestraße 6\\, Kiel)');
+    expect(result).toContain('LOCATION:Somewhere 1\\, Kiel');
+  });
+
+  it('merges the sessions of one event on the same day into a single entry', () => {
+    const ics = buildEventsIcal(
+      [
+        event(1, [
+          session(1, '2026-10-01T12:00:00Z', '2026-10-01T13:30:00Z', { title: 'Podiumsdiskussion' }),
+          session(2, '2026-10-01T13:30:00Z', '2026-10-01T15:00:00Z', { title: 'Austausch' }),
+          session(3, '2026-10-02T12:00:00Z', '2026-10-02T13:00:00Z', { title: 'Workshop' }),
+        ]),
+      ],
+      OPTIONS
+    );
+    const entries = vevents(ics).map(lines);
+    expect(entries).toHaveLength(2);
+    expect(entries[0]).toEqual(
+      expect.arrayContaining([
+        'UID:session-1@eduhub',
+        'SUMMARY:Event 1',
+        'DTSTART:20261001T120000Z',
+        'DTEND:20261001T150000Z',
+        'DESCRIPTION:14:00–15:30 Podiumsdiskussion\\n15:30–17:00 Austausch\\n\\nhttps://edu.example/course/1',
+      ])
+    );
+    expect(entries[1]).toEqual(expect.arrayContaining(['UID:session-3@eduhub', 'SUMMARY:Event 1 – Workshop']));
+  });
+
+  it('keeps sessions separated by a break as separate entries', () => {
+    const ics = buildEventsIcal(
+      [
+        event(1, [
+          session(1, '2026-10-01T08:00:00Z', '2026-10-01T10:00:00Z'),
+          session(2, '2026-10-01T11:00:00Z', '2026-10-01T12:00:00Z'),
+        ]),
+      ],
+      OPTIONS
+    );
+    expect(vevents(ics)).toHaveLength(2);
+  });
+
+  it('flags how people get into the event', () => {
+    const ics = buildEventsIcal(
+      [event(1, [session(1, '2026-10-01T08:00:00Z', '2026-10-01T10:00:00Z')], { registrationType: 'DIRECT_CONFIRMATION' })],
+      OPTIONS
+    );
+    expect(lines(ics)).toContain('X-EDUHUB-REGISTRATION:REGISTRATION');
+  });
+});
+
+describe('registrationKind', () => {
+  it.each([
+    ['DIRECT_CONFIRMATION', 'REGISTRATION'],
+    ['DIRECT_WITH_INPUT', 'REGISTRATION'],
+    ['EXTERNAL_REGISTRATION', 'REGISTRATION'],
+    ['DIRECT_CONFIRMATION_AND_PAYMENT', 'PAID'],
+    ['DIRECT_WITH_INPUT_AND_PAYMENT', 'PAID'],
+    ['APPROVAL_WITH_INPUT', 'APPLICATION'],
+    [null, 'APPLICATION'],
+  ])('maps %s to %s', (registrationType, kind) => {
+    expect(registrationKind(registrationType)).toBe(kind);
+  });
 });
 
 describe('feedLocation', () => {
@@ -154,6 +256,13 @@ describe('feedLocation', () => {
   it('falls back to the city when there is no address or the address is a link', () => {
     expect(feedLocation([location('HEIDE', '')])).toBe('Heide');
     expect(feedLocation([location('KIEL', 'www.example.com/room')])).toBe('Kiel');
+  });
+
+  it('puts a short label first unless it just repeats the address', () => {
+    expect(feedLocation([{ ...location('KIEL', 'Kuhnkestr. 6'), label: 'Coworking' }])).toBe('Coworking (Kuhnkestr. 6, Kiel)');
+    expect(feedLocation([{ ...location('KIEL', 'Kuhnkestr. 6'), label: 'Kuhnkestr. 6' }])).toBe('Kuhnkestr. 6, Kiel');
+    expect(feedLocation([{ ...location('KIEL', 'Kuhnkestr. 6'), label: 'Generic Address' }])).toBe('Kuhnkestr. 6, Kiel');
+    expect(feedLocation([{ ...location('ONLINE', 'https://meet.example'), label: 'Zoom' }])).toBe('Online');
   });
 
   it('writes online places as just "Online" and drops duplicates and empty options', () => {
