@@ -46,6 +46,22 @@ export const meaningfulLabel = (label: string | null | undefined): string | unde
   return trimmed && trimmed.toLowerCase() !== PLACEHOLDER_LABEL ? trimmed : undefined;
 };
 
+/**
+ * A place as "Label (Address)": the label first when it is meaningful and
+ * differs from the address, the address alone otherwise. `address` is what is
+ * shown; `rawAddress` (defaulting to it) is what the label is compared with, for
+ * callers that decorate the address, e.g. by appending the city.
+ */
+export const labelledAddress = (
+  label: string | null | undefined,
+  address: string,
+  rawAddress: string = address
+): string => {
+  const meaningful = meaningfulLabel(label);
+  if (!meaningful || meaningful === rawAddress.trim()) return address;
+  return address.trim() ? `${meaningful} (${address})` : meaningful;
+};
+
 /** The short label of a LocationAddress, if it has a meaningful one. */
 const labelOf = (addressMap: AddressMap, id: number | null | undefined): string | undefined =>
   id ? meaningfulLabel(addressMap.get(id)?.shortLabel) : undefined;

@@ -6,18 +6,19 @@
  * from iCal feeds rather than RSS, since only iCal carries machine-readable
  * start, end and location.
  *
- * Every day of an event becomes its own VEVENT, so a multi-day event is listed
- * on each of its dates, while back-to-back sessions on one day (a talk, then a
- * get-together) form a single entry. Kept pure (the caller passes "now", the resolved addresses and
+ * Every run of back-to-back sessions becomes its own VEVENT: a multi-day event
+ * is listed on each of its dates and a break splits a day, while a talk followed
+ * directly by a get-together forms a single entry. Kept pure (the caller passes "now", the resolved addresses and
  * every URL) so it can be unit-tested without a request or a GraphQL server.
  */
 
-import { formatInTimeZone } from 'date-fns-tz';
 import { getPublicImageUrl } from './filehandling';
 import { generateICalString } from './icalExport';
 import { RssEvent, selectCurrentEvents } from './eventsRss';
+import { blockSchedule, contiguousBlocks, TimedSession } from './sessionSchedule';
 import {
   AddressMap,
+  labelledAddress,
   meaningfulLabel,
   resolveSessionLocations,
   ResolvableSession,
@@ -121,8 +122,8 @@ export const feedLocation = (locations: ResolvedLocation[]): string | undefined 
         : address.toLowerCase().includes(city.toLowerCase())
         ? address
         : `${address}, ${city}`;
-    const label = meaningfulLabel(location.label);
-    return label && label !== address && !LINK_PATTERN.test(label) ? `${label} (${fullAddress})` : fullAddress;
+    const label = location.label && !LINK_PATTERN.test(location.label) ? location.label : undefined;
+    return labelledAddress(label, fullAddress, address);
   });
 
   const unique = [...new Set(parts.filter((part): part is string => Boolean(part)))];
@@ -188,31 +189,7 @@ const toDate = (value: Date | string | null | undefined): Date | null => {
   return Number.isNaN(date.getTime()) ? null : date;
 };
 
-type UpcomingSession = { session: IcalFeedSession; start: Date; end: Date };
-
-const berlinTime = (date: Date): string => formatInTimeZone(date, TIME_ZONE, 'HH:mm');
-
-/** One line per session, e.g. "14:00–15:30 Podiumsdiskussion". */
-const scheduleOf = (sessions: UpcomingSession[], eventTitle: string): string =>
-  sessions
-    .map(({ session, start, end }) => {
-      const time = end > start ? `${berlinTime(start)}–${berlinTime(end)}` : berlinTime(start);
-      const title = session.title?.trim();
-      return title && title !== eventTitle ? `${time} ${title}` : time;
-    })
-    .join('\n');
-
-/** Upcoming sessions grouped by their (Berlin) start day, each group ordered by start. */
-const groupByDay = (sessions: UpcomingSession[]): UpcomingSession[][] => {
-  const days = new Map<string, UpcomingSession[]>();
-  [...sessions]
-    .sort((a, b) => a.start.getTime() - b.start.getTime())
-    .forEach((item) => {
-      const day = formatInTimeZone(item.start, TIME_ZONE, 'yyyy-MM-dd');
-      days.set(day, [...(days.get(day) ?? []), item]);
-    });
-  return [...days.values()];
-};
+type UpcomingSession = TimedSession<IcalFeedSession>;
 
 export const buildEventsIcal = (events: IcalFeedEvent[], options: EventsIcalOptions): string => {
   const now = options.now ?? new Date();
@@ -231,14 +208,14 @@ export const buildEventsIcal = (events: IcalFeedEvent[], options: EventsIcalOpti
       return end < now ? [] : [{ session, start, end }];
     });
 
-    return groupByDay(upcoming).map((day) => {
+    return contiguousBlocks(upcoming, TIME_ZONE).map((day) => {
       const first = day[0];
       const end = new Date(Math.max(...day.map((item) => item.end.getTime())));
 
       let title = event.title;
       let schedule: string | undefined;
       if (day.length > 1) {
-        schedule = scheduleOf(day, event.title);
+        schedule = blockSchedule(day, event.title, TIME_ZONE);
       } else {
         const sessionTitle = first.session.title?.trim();
         if (sessions.length > 1 && sessionTitle && sessionTitle !== event.title) title = `${event.title} – ${sessionTitle}`;

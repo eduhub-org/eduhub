@@ -209,6 +209,19 @@ describe('buildEventsIcal', () => {
     expect(entries[1]).toEqual(expect.arrayContaining(['UID:session-3@eduhub', 'SUMMARY:Event 1 – Workshop']));
   });
 
+  it('keeps sessions separated by a break as separate entries', () => {
+    const ics = buildEventsIcal(
+      [
+        event(1, [
+          session(1, '2026-10-01T08:00:00Z', '2026-10-01T10:00:00Z'),
+          session(2, '2026-10-01T11:00:00Z', '2026-10-01T12:00:00Z'),
+        ]),
+      ],
+      OPTIONS
+    );
+    expect(vevents(ics)).toHaveLength(2);
+  });
+
   it('flags how people get into the event', () => {
     const ics = buildEventsIcal(
       [event(1, [session(1, '2026-10-01T08:00:00Z', '2026-10-01T10:00:00Z')], { registrationType: 'DIRECT_CONFIRMATION' })],
