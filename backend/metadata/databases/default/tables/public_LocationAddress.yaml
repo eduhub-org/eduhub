@@ -30,15 +30,6 @@ insert_permissions:
         - address
         - description
         - aliases
-  - role: user_access
-    permission:
-      check: {}
-      columns:
-        - locationOption
-        - shortLabel
-        - address
-        - description
-        - aliases
   - role: org_admin_access
     permission:
       check: {}
@@ -111,15 +102,6 @@ update_permissions:
         - aliases
       filter: {}
       check: {}
-  - role: user_access
-    permission:
-      columns:
-        - shortLabel
-        - address
-        - description
-        - aliases
-      filter: {}
-      check: {}
   - role: org_admin_access
     permission:
       columns:
@@ -131,9 +113,6 @@ update_permissions:
       check: {}
 delete_permissions:
   - role: instructor_access
-    permission:
-      filter: {}
-  - role: user_access
     permission:
       filter: {}
   - role: org_admin_access
