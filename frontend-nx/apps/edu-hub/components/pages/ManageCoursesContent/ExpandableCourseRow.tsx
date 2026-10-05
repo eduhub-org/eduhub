@@ -1,6 +1,6 @@
 import { FC, Fragment, useCallback, useMemo, useState, useEffect } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
-import { MdCheckBox, MdOutlineCheckBoxOutlineBlank, MdAddCircle, MdForum } from 'react-icons/md';
+import { MdAddCircle, MdForum } from 'react-icons/md';
 import { useManageMutation } from '../../../hooks/authedMutation';
 import { SAVE_COURSE_IMAGE } from '../../../queries/actions';
 import { INSERT_COURSE_GROUP_TAG, DELETE_COURSE_GROUP_TAG } from '../../../queries/courseGroup';
@@ -76,6 +76,7 @@ import PricingSummary from '../../common/PricingSummary';
 import RegistrationTypeSwitches from './RegistrationTypeSwitches';
 import CourseEmailTemplatesSection from './CourseEmailTemplatesSection';
 import CertificatesSection, { LearningGoalsField } from './CertificatesSection';
+import FieldHint from './FieldHint';
 
 interface ExpandableCourseRowProps {
   course: AdminCourseList_Course;
@@ -140,6 +141,10 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
   // Check if course requires payment
   const requiresPayment = course.registrationType === 'DIRECT_WITH_INPUT_AND_PAYMENT' ||
     course.registrationType === 'DIRECT_CONFIRMATION_AND_PAYMENT';
+  const requiresQuestionnaire =
+    course.registrationType === CourseRegistrationType_enum.APPROVAL_WITH_INPUT ||
+    course.registrationType === CourseRegistrationType_enum.DIRECT_WITH_INPUT ||
+    course.registrationType === CourseRegistrationType_enum.DIRECT_WITH_INPUT_AND_PAYMENT;
 
   // Payment and add-on validation state
   const [isValidationDialogOpen, setIsValidationDialogOpen] = useState(false);
@@ -384,10 +389,6 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
 
 
 
-  const handleToggleShowAvailablePlaces = useCallback(() => {
-    onSetShowAvailablePlaces(course, !course.showAvailablePlaces);
-  }, [course, onSetShowAvailablePlaces]);
-
   // Instructor management functions
   const openInstructorDialog = useCallback(() => {
     setInstructorDialogOpen(true);
@@ -588,145 +589,185 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
   return (
     <div className="w-full flex-1 min-w-0 light">
       <div className="bg-bg-secondary p-4 sm:p-6 w-full">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 w-full">
+        {/* Left: how people sign up and hear from the offering. Right: what is shown about it and
+            what it awards. The cards that grow with the registration options (questionnaire,
+            payment) sit on the left, the ones that grow with certificates on the right, so the
+            columns stay about the same length. */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 w-full items-start">
           {/* Left Column */}
           <div className="space-y-4 w-full min-w-0">
-            {/* 1. Registration: switches plus the fields each of them needs */}
-            <div className="bg-fill-primary border border-border-primary rounded-lg p-4 space-y-4">
+            {/* Registration: switches plus the fields each of them needs */}
+            <Card className="space-y-4">
               <RegistrationTypeSwitches courseId={course.id} registrationType={course.registrationType} />
 
-              {/* External Registration Link */}
               {isExternalRegistration && (
-                <InputField
-                  variant="material"
-                  type="link"
-                  label={t('manageCourses.external_registration_link.label')}
-                  placeholder={t('manageCourses.external_registration_link.label')}
-                  itemId={course.id}
-                  value={course.externalRegistrationLink || ''}
-                  updateValueMutation={UPDATE_COURSE_EXTERNAL_REGISTRATION_LINK}
-                  refetchQueries={['AdminCourseList']}
-                  helpText={t('manageCourses.external_registration_link.help_text')}
-                />
+                <div>
+                  <InputField
+                    variant="material"
+                    type="link"
+                    label={t('manageCourses.external_registration_link.label')}
+                    placeholder={t('manageCourses.external_registration_link.label')}
+                    itemId={course.id}
+                    value={course.externalRegistrationLink || ''}
+                    updateValueMutation={UPDATE_COURSE_EXTERNAL_REGISTRATION_LINK}
+                    refetchQueries={['AdminCourseList']}
+                  />
+                  <FieldHint>{t('manageCourses.external_registration_link.help_text')}</FieldHint>
+                </div>
               )}
 
               {/* Only meaningful for standalone events registered directly - the
                   backend rejects guest registration for anything else, so showing
                   the toggle elsewhere would just promise something that cannot work. */}
               {supportsGuestRegistration && (
-                <CheckboxSelector
+                <div>
+                  <CheckboxSelector
+                    variant="material"
+                    label={t('manageCourse.guest_registration.label')}
+                    checked={Boolean(course.guestRegistrationEnabled)}
+                    updateValueMutation={UPDATE_COURSE_GUEST_REGISTRATION_ENABLED}
+                    identifierVariables={{ courseId: course.id }}
+                    refetchQueries={['AdminCourseList']}
+                  />
+                  <FieldHint className="ml-8">{t('manageCourse.guest_registration.help_text')}</FieldHint>
+                </div>
+              )}
+            </Card>
+
+            {/* Questionnaire - for every registration type that asks for input */}
+            {requiresQuestionnaire && (
+              <Card title={t('manageCourse.formbricks.title')} description={t('manageCourse.formbricks.help_text')}>
+                <InputField
                   variant="material"
-                  label={t('manageCourse.guest_registration.label')}
-                  helpText={t('manageCourse.guest_registration.help_text')}
-                  checked={Boolean(course.guestRegistrationEnabled)}
-                  updateValueMutation={UPDATE_COURSE_GUEST_REGISTRATION_ENABLED}
-                  identifierVariables={{ courseId: course.id }}
+                  type="link"
+                  placeholder={
+                    course.Program?.defaultFormbricksEnrollmentSurveyUrl || t('manageCourse.formbricks.survey_url_helper')
+                  }
+                  itemId={course.id}
+                  value={course.formbricksEnrollmentSurveyUrl || ''}
+                  updateValueMutation={SAVE_COURSE_FORMBRICKS_ENROLLMENT_SURVEY}
                   refetchQueries={['AdminCourseList']}
                 />
-              )}
+                <button
+                  type="button"
+                  onClick={() => setIsFormbricksHelpDialogOpen(true)}
+                  className="text-xs text-blue-600 hover:text-blue-800 mt-1 underline"
+                >
+                  {t('manageCourse.formbricks.learn_more')}
+                </button>
+              </Card>
+            )}
 
-              {/* Formbricks Survey Configuration - Show for courses that require input */}
-              {(course.registrationType === CourseRegistrationType_enum.APPROVAL_WITH_INPUT ||
-                course.registrationType === CourseRegistrationType_enum.DIRECT_WITH_INPUT ||
-                course.registrationType === 'DIRECT_WITH_INPUT_AND_PAYMENT') && (
-                <div className="mt-4 pt-4 border-t border-border-primary">
-                  <div className="mb-4">
-                    <span>{t('manageCourse.formbricks.title')}</span>
-                    <br />
-                    <InputField
-                      variant="material"
-                      type="link"
-                      placeholder={course.Program?.defaultFormbricksEnrollmentSurveyUrl || t('manageCourse.formbricks.survey_url_helper')}
-                      itemId={course.id}
-                      value={course.formbricksEnrollmentSurveyUrl || ''}
-                      updateValueMutation={SAVE_COURSE_FORMBRICKS_ENROLLMENT_SURVEY}
-                      refetchQueries={['AdminCourseList']}
-                      helpText={t('manageCourse.formbricks.help_text')}
-                      onValueUpdated={() => {
-                        // Refetch handled via refetchQueries prop
-                      }}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setIsFormbricksHelpDialogOpen(true)}
-                      className="text-xs text-blue-600 hover:text-blue-800 mt-1 underline"
-                    >
-                      {t('manageCourse.formbricks.learn_more')}
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {/* Payment Configuration - Show for courses that require payment */}
-              {requiresPayment && (
-                <div className="mt-4 pt-4 border-t border-border-primary">
-                  <div className="space-y-4">
+            {/* Pricing - configuration and the resulting summary together */}
+            {requiresPayment && (
+              <Card title={t('manageCourse.pricing.title')} description={t('manageCourse.pricing.base_price_help')}>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <span className="font-medium">{t('manageCourse.pricing.title')}</span>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="space-y-1">
-                        <InputField
-                          variant="material"
-                          type="number"
-                          label={t('manageCourse.pricing.base_price')}
-                          placeholder="0"
-                          itemId={course.id}
-                          value={(course as any).basePrice?.toString() || '0'}
-                          updateValueMutation={UPDATE_COURSE_BASE_PRICE}
-                          refetchQueries={['AdminCourseList']}
-                          helpText={t('manageCourse.pricing.base_price_help')}
-                          min={0}
-                          onValueUpdated={handleSyncStripeBasePrice}
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setIsBasePriceHelpDialogOpen(true)}
-                          className="text-xs text-blue-600 hover:text-blue-800 mt-1 underline"
-                        >
-                          {t('manageCourse.pricing.base_price_learn_more')}
-                        </button>
-                      </div>
-
-                      <DropDownSelector
+                      <InputField
                         variant="material"
-                        label={t('manageCourse.pricing.currency')}
-                        value={(course as any).currency || 'EUR'}
-                        options={[
-                          { value: 'EUR', label: 'EUR (€)' },
-                          { value: 'USD', label: 'USD ($)' },
-                          { value: 'GBP', label: 'GBP (£)' },
-                        ]}
-                        updateValueMutation={UPDATE_COURSE_CURRENCY}
-                        identifierVariables={{ itemId: course.id }}
+                        type="number"
+                        label={t('manageCourse.pricing.base_price')}
+                        placeholder="0"
+                        itemId={course.id}
+                        value={(course as any).basePrice?.toString() || '0'}
+                        updateValueMutation={UPDATE_COURSE_BASE_PRICE}
                         refetchQueries={['AdminCourseList']}
+                        min={0}
                         onValueUpdated={handleSyncStripeBasePrice}
                       />
+                      <button
+                        type="button"
+                        onClick={() => setIsBasePriceHelpDialogOpen(true)}
+                        className="text-xs text-blue-600 hover:text-blue-800 mt-1 underline"
+                      >
+                        {t('manageCourse.pricing.base_price_learn_more')}
+                      </button>
                     </div>
 
-                    {/* Survey Validation - Show if survey URL exists */}
-                    {(course.formbricksEnrollmentSurveyUrl || course.Program?.defaultFormbricksEnrollmentSurveyUrl) && (
-                      <div className="mt-4">
-                        <Button
-                          onClick={handleValidateSurvey}
-                          disabled={isValidatingSurvey}
-                        >
-                          {isValidatingSurvey ? t('manageCourse.pricing.validating') : t('manageCourse.pricing.validate_addons')}
-                        </Button>
-                        <p className="text-sm text-label-secondary mt-2">
-                          {t('manageCourse.pricing.validate_help')}
-                        </p>
-                      </div>
-                    )}
+                    <DropDownSelector
+                      variant="material"
+                      label={t('manageCourse.pricing.currency')}
+                      value={(course as any).currency || 'EUR'}
+                      options={[
+                        { value: 'EUR', label: 'EUR (€)' },
+                        { value: 'USD', label: 'USD ($)' },
+                        { value: 'GBP', label: 'GBP (£)' },
+                      ]}
+                      updateValueMutation={UPDATE_COURSE_CURRENCY}
+                      identifierVariables={{ itemId: course.id }}
+                      refetchQueries={['AdminCourseList']}
+                      onValueUpdated={handleSyncStripeBasePrice}
+                    />
                   </div>
-                </div>
-              )}
-            </div>
 
-            {/* 2. Cover image */}
-            <div className="bg-fill-primary border border-border-primary rounded-lg p-4">
-              <h4 className="text-sm font-medium text-label-primary mb-3">{t('manageCourses.cover_image.label')}</h4>
+                  {/* Survey Validation - Show if survey URL exists */}
+                  {(course.formbricksEnrollmentSurveyUrl || course.Program?.defaultFormbricksEnrollmentSurveyUrl) && (
+                    <div>
+                      <Button onClick={handleValidateSurvey} disabled={isValidatingSurvey}>
+                        {isValidatingSurvey ? t('manageCourse.pricing.validating') : t('manageCourse.pricing.validate_addons')}
+                      </Button>
+                      <FieldHint>{t('manageCourse.pricing.validate_help')}</FieldHint>
+                    </div>
+                  )}
+
+                  {(course as any).basePrice > 0 || (addonMappings && addonMappings.length > 0) ? (
+                    <div>
+                      <PricingSummary
+                        basePrice={(course as any).basePrice || 0}
+                        currency={(course as any).currency || 'EUR'}
+                        stripeProductId={(course as any).stripeProductId}
+                        stripePriceId={(course as any).stripePriceId}
+                        addons={addonMappings || []}
+                        showStripeStatus={true}
+                        showTotal={false}
+                      />
+                      {addonMappings && addonMappings.length > 0 && (
+                        <FieldHint className="italic">{t('manageCourse.addons.manage_hint')}</FieldHint>
+                      )}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-label-secondary italic">{t('manageCourse.pricing.no_pricing_configured')}</p>
+                  )}
+                </div>
+              </Card>
+            )}
+
+            <CourseEmailTemplatesSection course={course} />
+
+            {/* Participant chat (Matrix / legacy channel) */}
+            <Card
+              title={t('manageCourses.participant_chat.title')}
+              description={t(
+                legacyChatUrl && !matrixRoomId
+                  ? 'manageCourses.participant_chat.explanation_external'
+                  : 'manageCourses.participant_chat.explanation'
+              )}
+            >
+              <div className="flex items-center gap-3 flex-wrap">
+                {openParticipantChatHref ? (
+                  <Button as="a" href={openParticipantChatHref} target="_blank" rel="noreferrer" filled>
+                    <span className="inline-flex items-center gap-2">
+                      <MdForum className="w-4 h-4" />
+                      {t(participantChatButtonKey)}
+                    </span>
+                  </Button>
+                ) : (
+                  <Button onClick={() => setMatrixDialogOpen(true)}>
+                    <span className="inline-flex items-center gap-2">
+                      <MdForum className="w-4 h-4" />
+                      {t('manageCourses.matrix_room.button_create')}
+                    </span>
+                  </Button>
+                )}
+              </div>
+            </Card>
+          </div>
+
+          {/* Right Column */}
+          <div className="space-y-4 w-full min-w-0">
+            {/* Cover image - every offering has one, so it leads the column */}
+            <Card title={t('manageCourses.cover_image.label')} description={t('manageCourses.cover_image.help_text')}>
               <FileUploadField
                 variant="material"
                 currentFileUrl={course?.coverImage}
@@ -753,170 +794,9 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                   handleError(translated);
                 }}
               />
-            </div>
+            </Card>
 
-            {/* 3. Sliders & widgets - which homepage sliders and widgets list the offering */}
-            <div className="bg-fill-primary border border-border-primary rounded-lg p-4 space-y-2">
-              <h4 className="text-sm font-medium text-label-primary">{t('manageCourses.course_group.label')}</h4>
-              <p className="text-xs text-label-secondary">{t('manageCourses.course_group.help_text')}</p>
-              <TagSelector
-                variant="material"
-                label={t('manageCourses.course_group.label')}
-                placeholder={t('manageCourses.course_group.placeholder')}
-                itemId={course.id}
-                values={currentCourseGroups}
-                options={courseGroupOptions}
-                markedOptionIds={sliderCourseGroupIds}
-                markLabel={t('manageCourses.course_group.slider_badge')}
-                insertValueMutation={INSERT_COURSE_GROUP_TAG}
-                deleteValueMutation={DELETE_COURSE_GROUP_TAG}
-                refetchQueries={['AdminCourseList']}
-              />
-            </div>
-
-            {/* Course Series - Card Container - past runs' projects are shown on the course page */}
-            {courseOrganizationId !== null && (
-              <div className="bg-fill-primary border border-border-primary rounded-lg p-4 space-y-2">
-                <h4 className="text-sm font-medium text-label-primary">{t('manageCourses.course_series.label')}</h4>
-                <DropDownSelector
-                  variant="material"
-                  label={t('manageCourses.course_series.label')}
-                  placeholder={t('manageCourses.course_series.placeholder')}
-                  helpText={t('manageCourses.course_series.help_text')}
-                  value={course.courseSeriesId?.toString() ?? ''}
-                  options={courseSeriesOptions}
-                  updateValueMutation={UPDATE_COURSE_SERIES}
-                  createOptionMutation={CREATE_COURSE_SERIES}
-                  identifierVariables={{ itemId: course.id, organizationId: courseOrganizationId }}
-                  creatable
-                  nullable
-                  nullableLabel={t('manageCourses.course_series.none')}
-                  refetchQueries={['AdminCourseList', 'CourseSeriesOptions', 'CourseSeriesRuns']}
-                />
-                {course.courseSeriesId !== null && (
-                  <div className="text-sm text-label-secondary">
-                    {otherSeriesRuns.length > 0 ? (
-                      <>
-                        <p>{t('manageCourses.course_series.other_runs')}</p>
-                        <ul className="list-disc pl-5">
-                          {otherSeriesRuns.map((run) => (
-                            <li key={run.id}>
-                              {run.title} ({run.Program?.shortTitle || run.Program?.title})
-                            </li>
-                          ))}
-                        </ul>
-                      </>
-                    ) : (
-                      <p>{t('manageCourses.course_series.no_other_runs')}</p>
-                    )}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Participants - what the public course page states about numbers */}
-            <div className="bg-fill-primary border border-border-primary rounded-lg p-4">
-              <h4 className="text-sm font-medium text-label-primary mb-3">
-                {t('manageCourses.participants.label')}
-              </h4>
-              <div className="flex items-center space-x-2">
-                <button
-                  type="button"
-                  className="cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
-                  onClick={handleToggleShowAvailablePlaces}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      handleToggleShowAvailablePlaces();
-                    }
-                  }}
-                  role="checkbox"
-                  aria-checked={!!course.showAvailablePlaces}
-                  aria-label={t('manageCourses.participants.show_available_places')}
-                >
-                  {course.showAvailablePlaces ? (
-                    <MdCheckBox className="w-6 h-6 text-blue-600" />
-                  ) : (
-                    <MdOutlineCheckBoxOutlineBlank className="w-6 h-6 text-label-disabled" />
-                  )}
-                </button>
-                <span>{t('manageCourses.participants.show_available_places')}</span>
-              </div>
-              <p className="mt-2 text-xs text-label-secondary">
-                {t('manageCourses.participants.show_available_places_hint')}
-              </p>
-            </div>
-
-            {/* 4. Communication: participant chat (Matrix / legacy channel) */}
-            <div className="bg-fill-primary border border-border-primary rounded-lg p-4 space-y-4">
-              <h4 className="text-sm font-medium text-label-primary">
-                {t('manageCourses.participant_chat.title')}
-              </h4>
-              <div className="flex items-center gap-3 flex-wrap">
-                {openParticipantChatHref ? (
-                  <Button
-                    as="a"
-                    href={openParticipantChatHref}
-                    target="_blank"
-                    rel="noreferrer"
-                    filled
-                  >
-                    <span className="inline-flex items-center gap-2">
-                      <MdForum className="w-4 h-4" />
-                      {t(participantChatButtonKey)}
-                    </span>
-                  </Button>
-                ) : (
-                  <Button onClick={() => setMatrixDialogOpen(true)}>
-                    <span className="inline-flex items-center gap-2">
-                      <MdForum className="w-4 h-4" />
-                      {t('manageCourses.matrix_room.button_create')}
-                    </span>
-                  </Button>
-                )}
-              </div>
-            </div>
-
-            <CourseEmailTemplatesSection course={course} />
-          </div>
-
-          {/* Right Column */}
-          <div className="space-y-4 w-full min-w-0">
-            {/* 1. Pricing Summary - Read-only Display (only for payment courses) */}
-            {requiresPayment && (
-              <>
-                {(course as any).basePrice > 0 || (addonMappings && addonMappings.length > 0) ? (
-                  <>
-                    <PricingSummary
-                      basePrice={(course as any).basePrice || 0}
-                      currency={(course as any).currency || 'EUR'}
-                      stripeProductId={(course as any).stripeProductId}
-                      stripePriceId={(course as any).stripePriceId}
-                      addons={addonMappings || []}
-                      showStripeStatus={true}
-                      showTotal={false}
-                    />
-                    
-                    {/* Hint for managing addons */}
-                    {addonMappings && addonMappings.length > 0 && (
-                      <p className="text-xs text-label-secondary mt-2 italic px-4">
-                        {t('manageCourse.addons.manage_hint')}
-                      </p>
-                    )}
-                  </>
-                ) : (
-                  <div className="bg-fill-primary border border-border-primary rounded-lg p-4">
-                    <p className="text-sm text-label-secondary italic">
-                      {t('manageCourse.pricing.no_pricing_configured')}
-                    </p>
-                  </div>
-                )}
-              </>
-            )}
-
-            {/* 2. Instructors */}
-            <div className="bg-fill-primary border border-border-primary rounded-lg p-4">
-              <h4 className="text-sm font-medium text-label-primary mb-3">{t('manageCourses.instructors.label')}</h4>
+            <Card title={t('manageCourses.instructors.label')} description={t('manageCourses.instructors.help_text')}>
               <div className="space-y-2">
                 {course.CourseInstructors.map((courseInstructor) => (
                   <Fragment key={courseInstructor.User.id}>
@@ -931,9 +811,9 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                   <span>{t('manageCourses.instructors.add')}</span>
                 </button>
               </div>
-            </div>
+            </Card>
 
-            {/* 3. Certificates - hidden for a degree: the flags are forced by a trigger
+            {/* Certificates - hidden for a degree: the flags are forced by a trigger
                 (achievement possible, attendance not), a degree is not assigned to another
                 degree and has no sessions to miss; its thresholds live in the card below. */}
             {!isDegreeCourse && (
@@ -952,40 +832,113 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
             {isDegreeCourse && (
               <Card
                 title={t('manageCourses.degree_requirements.label')}
-                helpText={t('manageCourses.degree_requirements.help_text')}
-                className="space-y-4"
+                description={t('manageCourses.degree_requirements.help_text')}
               >
-                <InputField
-                  variant="material"
-                  type="decimal"
-                  label={t('manageCourses.degree_requirements.required_ects.label')}
-                  placeholder={t('manageCourses.degree_requirements.required_ects.placeholder')}
-                  itemId={course.id}
-                  value={course.requiredEcts != null ? String(course.requiredEcts) : ''}
-                  updateValueMutation={UPDATE_COURSE_REQUIRED_ECTS}
-                  refetchQueries={['AdminCourseList']}
-                  helpText={t('manageCourses.degree_requirements.required_ects.help_text')}
-                  min={0}
-                />
-
-                <InputField
-                  variant="material"
-                  type="number"
-                  label={t('manageCourses.degree_requirements.required_event_count.label')}
-                  placeholder={t('manageCourses.degree_requirements.required_event_count.placeholder')}
-                  itemId={course.id}
-                  value={course.requiredEventCount != null ? String(course.requiredEventCount) : ''}
-                  updateValueMutation={UPDATE_COURSE_REQUIRED_EVENT_COUNT}
-                  refetchQueries={['AdminCourseList']}
-                  helpText={t('manageCourses.degree_requirements.required_event_count.help_text')}
-                  min={0}
-                />
-                <LearningGoalsField course={course} />
+                <div className="space-y-4">
+                  <div>
+                    <InputField
+                      variant="material"
+                      type="decimal"
+                      label={t('manageCourses.degree_requirements.required_ects.label')}
+                      placeholder={t('manageCourses.degree_requirements.required_ects.placeholder')}
+                      itemId={course.id}
+                      value={course.requiredEcts != null ? String(course.requiredEcts) : ''}
+                      updateValueMutation={UPDATE_COURSE_REQUIRED_ECTS}
+                      refetchQueries={['AdminCourseList']}
+                      min={0}
+                    />
+                    <FieldHint>{t('manageCourses.degree_requirements.required_ects.help_text')}</FieldHint>
+                  </div>
+                  <div>
+                    <InputField
+                      variant="material"
+                      type="number"
+                      label={t('manageCourses.degree_requirements.required_event_count.label')}
+                      placeholder={t('manageCourses.degree_requirements.required_event_count.placeholder')}
+                      itemId={course.id}
+                      value={course.requiredEventCount != null ? String(course.requiredEventCount) : ''}
+                      updateValueMutation={UPDATE_COURSE_REQUIRED_EVENT_COUNT}
+                      refetchQueries={['AdminCourseList']}
+                      min={0}
+                    />
+                    <FieldHint>{t('manageCourses.degree_requirements.required_event_count.help_text')}</FieldHint>
+                  </div>
+                  <LearningGoalsField course={course} />
+                </div>
               </Card>
             )}
 
-            {/* 4. Funding organizations - last, rarely needed */}
-            <div className="bg-fill-primary border border-border-primary rounded-lg p-4 w-full">
+            {/* Visibility - homepage sliders and widgets, course series, available places */}
+            <Card title={t('manageCourses.course_group.label')} description={t('manageCourses.course_group.help_text')}>
+              <div className="space-y-5">
+                <TagSelector
+                  variant="material"
+                  label={t('manageCourses.course_group.label')}
+                  placeholder={t('manageCourses.course_group.placeholder')}
+                  itemId={course.id}
+                  values={currentCourseGroups}
+                  options={courseGroupOptions}
+                  markedOptionIds={sliderCourseGroupIds}
+                  markLabel={t('manageCourses.course_group.slider_badge')}
+                  insertValueMutation={INSERT_COURSE_GROUP_TAG}
+                  deleteValueMutation={DELETE_COURSE_GROUP_TAG}
+                  refetchQueries={['AdminCourseList']}
+                />
+
+                {/* Course series - past runs' projects are shown on the course page */}
+                {courseOrganizationId !== null && (
+                  <div>
+                    <DropDownSelector
+                      variant="material"
+                      label={t('manageCourses.course_series.label')}
+                      placeholder={t('manageCourses.course_series.placeholder')}
+                      value={course.courseSeriesId?.toString() ?? ''}
+                      options={courseSeriesOptions}
+                      updateValueMutation={UPDATE_COURSE_SERIES}
+                      createOptionMutation={CREATE_COURSE_SERIES}
+                      identifierVariables={{ itemId: course.id, organizationId: courseOrganizationId }}
+                      creatable
+                      nullable
+                      nullableLabel={t('manageCourses.course_series.none')}
+                      refetchQueries={['AdminCourseList', 'CourseSeriesOptions', 'CourseSeriesRuns']}
+                    />
+                    <FieldHint>{t('manageCourses.course_series.help_text')}</FieldHint>
+                    {course.courseSeriesId !== null && (
+                      <div className="mt-2 text-sm text-label-secondary">
+                        {otherSeriesRuns.length > 0 ? (
+                          <>
+                            <p>{t('manageCourses.course_series.other_runs')}</p>
+                            <ul className="list-disc pl-5">
+                              {otherSeriesRuns.map((run) => (
+                                <li key={run.id}>
+                                  {run.title} ({run.Program?.shortTitle || run.Program?.title})
+                                </li>
+                              ))}
+                            </ul>
+                          </>
+                        ) : (
+                          <p>{t('manageCourses.course_series.no_other_runs')}</p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* What the public course page states about numbers */}
+                <div>
+                  <CheckboxSelector
+                    variant="material"
+                    label={t('manageCourses.participants.show_available_places')}
+                    checked={Boolean(course.showAvailablePlaces)}
+                    onValueUpdated={(value: boolean) => onSetShowAvailablePlaces(course, value)}
+                  />
+                  <FieldHint className="ml-8">{t('manageCourses.participants.show_available_places_hint')}</FieldHint>
+                </div>
+              </div>
+            </Card>
+
+            {/* Funding organizations - last, rarely needed */}
+            <Card>
               <EntityListManager
                 variant="material"
                 label={t('manageCourses.funding_organizations.label')}
@@ -1013,7 +966,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                 buildDeleteVariables={(courseId, organizationId) => ({ courseId, organizationId })}
                 refetchQueries={['AdminCourseList']}
               />
-            </div>
+            </Card>
           </div>
         </div>
       </div>

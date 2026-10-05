@@ -19,6 +19,8 @@ import DatePicker from '../../inputs/DatePicker';
 import TagSelector from '../../inputs/TagSelector';
 import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
 import { submissionDeadlineToCalendarDate } from '../CourseContent/Projects/projectEffectiveSubmissionDeadline';
+import Card from '../../common/Card';
+import FieldHint from './FieldHint';
 
 interface CertificatesSectionProps {
   course: AdminCourseList_Course;
@@ -42,10 +44,10 @@ export const LearningGoalsField: FC<{ course: AdminCourseList_Course }> = ({ cou
         itemId={course.id}
         label={t('learning_goals.label')}
         placeholder={t('learning_goals.placeholder')}
-        helpText={`${t('learning_goals.certificate_hint')} ${t('learning_goals.help_text')}`}
         maxLength={500}
         className="h-32 !text-label-primary"
       />
+      <FieldHint className="px-2">{`${t('learning_goals.certificate_hint')} ${t('learning_goals.help_text')}`}</FieldHint>
     </div>
   );
 };
@@ -132,7 +134,7 @@ const CertificatesSection: FC<CertificatesSectionProps> = ({
   }));
 
   return (
-    <div className="bg-fill-primary border border-border-primary rounded-lg p-4 space-y-3">
+    <Card>
       <div>
         <CheckboxSelector
           variant="switch"
@@ -140,11 +142,11 @@ const CertificatesSection: FC<CertificatesSectionProps> = ({
           checked={showDetails}
           onValueUpdated={handleToggleCertificates}
         />
-        {!showDetails && <p className="text-xs text-label-secondary -mt-2">{t('certificates.disabled_hint')}</p>}
+        {!showDetails && <FieldHint>{t('certificates.disabled_hint')}</FieldHint>}
       </div>
 
       {showDetails && (
-        <div className="space-y-4 border-t border-border-primary pt-3">
+        <div className="space-y-4 border-t border-border-primary pt-3 mt-3">
           <div className="space-y-1">
             <CheckboxSelector
               variant="switch"
@@ -166,17 +168,19 @@ const CertificatesSection: FC<CertificatesSectionProps> = ({
 
           {!isEventCourse && course.achievementCertificatePossible && (
             <div className="space-y-4 sm:ml-4">
-              <InputField
-                variant="material"
-                type="ects"
-                label={t('ects.label')}
-                placeholder={t('ects.label')}
-                itemId={course.id}
-                value={course.ects || ''}
-                updateValueMutation={UPDATE_COURSE_ECTS}
-                refetchQueries={['AdminCourseList']}
-                helpText={t('ects.help_text')}
-              />
+              <div>
+                <InputField
+                  variant="material"
+                  type="ects"
+                  label={t('ects.label')}
+                  placeholder={t('ects.label')}
+                  itemId={course.id}
+                  value={course.ects || ''}
+                  updateValueMutation={UPDATE_COURSE_ECTS}
+                  refetchQueries={['AdminCourseList']}
+                />
+                <FieldHint>{t('ects.help_text')}</FieldHint>
+              </div>
 
               <div>
                 <p className="text-sm font-medium text-label-primary mb-1">
@@ -192,34 +196,38 @@ const CertificatesSection: FC<CertificatesSectionProps> = ({
                 />
               </div>
 
-              <DatePicker
-                variant="material"
-                label={t('project_options.submission_deadline.label')}
-                helpText={t('project_options.submission_deadline.help_text')}
-                itemId={course.id}
-                value={projectSubmissionDeadlineValue}
-                updateValueMutation={UPDATE_COURSE_PROJECT_SUBMISSION_DEADLINE}
-                identifierVariables={{ itemId: course.id }}
-                dateFieldName="value"
-                refetchQueries={['AdminCourseList']}
-              />
+              <div>
+                <DatePicker
+                  variant="material"
+                  label={t('project_options.submission_deadline.label')}
+                  itemId={course.id}
+                  value={projectSubmissionDeadlineValue}
+                  updateValueMutation={UPDATE_COURSE_PROJECT_SUBMISSION_DEADLINE}
+                  identifierVariables={{ itemId: course.id }}
+                  dateFieldName="value"
+                  refetchQueries={['AdminCourseList']}
+                />
+                <FieldHint>{t('project_options.submission_deadline.help_text')}</FieldHint>
+              </div>
 
               <LearningGoalsField course={course} />
             </div>
           )}
 
-          <InputField
-            variant="material"
-            type="number"
-            label={t('max_missed_sessions.label')}
-            placeholder={t('max_missed_sessions.label')}
-            itemId={course.id}
-            value={String(course.maxMissedSessions ?? 2)}
-            updateValueMutation={UPDATE_COURSE_MAX_MISSED_SESSION}
-            refetchQueries={['AdminCourseList']}
-            helpText={t('max_missed_sessions.help_text')}
-            min={0}
-          />
+          <div>
+            <InputField
+              variant="material"
+              type="number"
+              label={t('max_missed_sessions.label')}
+              placeholder={t('max_missed_sessions.label')}
+              itemId={course.id}
+              value={String(course.maxMissedSessions ?? 2)}
+              updateValueMutation={UPDATE_COURSE_MAX_MISSED_SESSION}
+              refetchQueries={['AdminCourseList']}
+              min={0}
+            />
+            <FieldHint>{t('max_missed_sessions.help_text')}</FieldHint>
+          </div>
 
           <TagSelector
             variant="material"
@@ -236,7 +244,7 @@ const CertificatesSection: FC<CertificatesSectionProps> = ({
       )}
 
       {error && <ErrorMessageDialog errorMessage={error} open={!!error} onClose={resetError} />}
-    </div>
+    </Card>
   );
 };
 

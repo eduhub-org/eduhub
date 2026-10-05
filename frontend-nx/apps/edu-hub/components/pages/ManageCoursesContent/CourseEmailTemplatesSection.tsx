@@ -1,6 +1,6 @@
 import { FC, useCallback, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { MdEdit, MdEmail, MdRestartAlt } from 'react-icons/md';
+import { MdEdit, MdRestartAlt } from 'react-icons/md';
 
 import { useRoleQuery } from '../../../hooks/authedQuery';
 import { useManageMutation } from '../../../hooks/authedMutation';
@@ -16,6 +16,7 @@ import { InsertEmailTemplate, InsertEmailTemplateVariables } from '../../../quer
 import { DeleteEmailTemplate, DeleteEmailTemplateVariables } from '../../../queries/__generated__/DeleteEmailTemplate';
 import { CourseRegistrationType_enum } from '../../../__generated__/globalTypes';
 import { getEditableEmailTemplateTypes } from '../../../utils/getEditableEmailTemplateTypes';
+import Card from '../../common/Card';
 import { DialogShell } from '../../common/dialogs/DialogShell';
 import { QuestionConfirmationDialog } from '../../common/dialogs/QuestionConfirmationDialog';
 import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
@@ -210,16 +211,9 @@ const CourseEmailTemplatesSection: FC<CourseEmailTemplatesSectionProps> = ({ cou
   };
 
   return (
-    <div className="bg-fill-primary border border-border-primary rounded-lg p-4 space-y-2">
-      <h4 className="text-sm font-medium text-label-primary flex items-center gap-2">
-        <MdEmail className="w-4 h-4" />
-        {t('label')}
-      </h4>
-      {isExternalRegistration ? (
-        <p className="text-sm text-label-secondary">{t('external_registration_note')}</p>
-      ) : (
+    <Card title={t('label')} description={isExternalRegistration ? t('external_registration_note') : t('help_text')}>
+      {!isExternalRegistration && (
         <>
-          <p className="text-xs text-label-secondary">{t('help_text')}</p>
           <ul>{editableTypes.map(renderRow)}</ul>
           {otherCustomizedTemplates.length > 0 && (
             <div className="pt-2">
@@ -250,7 +244,7 @@ const CourseEmailTemplatesSection: FC<CourseEmailTemplatesSectionProps> = ({ cou
       />
 
       {error && <ErrorMessageDialog errorMessage={error} open={!!error} onClose={resetError} />}
-    </div>
+    </Card>
   );
 };
 

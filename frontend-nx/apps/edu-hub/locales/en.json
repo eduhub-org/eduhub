@@ -1212,11 +1212,13 @@
     "cover_image": {
       "label": "Cover Image",
       "upload_text": "Click to upload cover image",
-      "alt": "Course cover image"
+      "alt": "Course cover image",
+      "help_text": "Shown on the course page and in the sliders."
     },
     "instructors": {
       "label": "Instructors",
-      "add": "Add Instructor"
+      "add": "Add Instructor",
+      "help_text": "Instructors can manage the offering and are named on the course page."
     },
     "funding_organizations": {
       "label": "Funding Organizations",
@@ -1263,7 +1265,9 @@
       "title": "Participant chat",
       "button_open_element": "To Element room",
       "button_open_mattermost": "To Mattermost channel",
-      "button_open_chat": "Open chat"
+      "button_open_chat": "Open chat",
+      "explanation": "A Matrix room is the chat for this offering. Confirmed participants see a button to the room on the course page and join it from there. Instructors automatically get moderator rights in the room; instructors added later are also invited.",
+      "explanation_external": "Confirmed participants see a button to this chat on the course page."
     },
     "matrix_room": {
       "button_create": "Create Matrix Room",

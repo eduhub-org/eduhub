@@ -1196,11 +1196,13 @@
     "cover_image": {
       "label": "Titelbild",
       "upload_text": "Klicken um Titelbild hochzuladen oder Datei hier ablegen",
-      "alt": "Kurs-Titelbild"
+      "alt": "Kurs-Titelbild",
+      "help_text": "Wird auf der Kursseite und in den Slidern gezeigt."
     },
     "instructors": {
       "label": "Kursleitung",
-      "add": "Kursleitung hinzufügen"
+      "add": "Kursleitung hinzufügen",
+      "help_text": "Kursleitungen können das Angebot verwalten und werden auf der Kursseite genannt."
     },
     "funding_organizations": {
       "label": "Förderorganisationen",
@@ -1247,7 +1249,9 @@
       "title": "Teilnehmenden-Chat",
       "button_open_element": "Zum Element-Raum",
       "button_open_mattermost": "Zum Mattermost-Channel",
-      "button_open_chat": "Zum Chat"
+      "button_open_chat": "Zum Chat",
+      "explanation": "Ein Matrix-Raum ist der Chat für dieses Angebot. Bestätigte Teilnehmende sehen auf der Kursseite einen Button zum Raum und treten darüber bei. Kursleitungen erhalten im Raum automatisch Moderationsrechte; später hinzugefügte Kursleitungen werden zusätzlich eingeladen.",
+      "explanation_external": "Bestätigte Teilnehmende sehen auf der Kursseite einen Button zu diesem Chat."
     },
     "matrix_room": {
       "button_create": "Matrix-Raum erstellen",
