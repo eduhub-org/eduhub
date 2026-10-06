@@ -13,6 +13,10 @@ module.exports = {
         32: 'repeat(32, minmax(0, 1fr))',
         24: 'repeat(24, minmax(0, 1fr))',
       },
+      // Under `extend`, so the default scale (`min-w-0` above all) stays available.
+      minWidth: {
+        menu: '225px',
+      },
       colors: {
         // Semantic colors (preferred)
         brand: {
@@ -86,9 +90,6 @@ module.exports = {
     },
     listStyleType: {
       check: '{ list-style-image: url(img/iphone.png); }',
-    },
-    minWidth: {
-      menu: '225px',
     },
     screens: {
       xs: '375px',

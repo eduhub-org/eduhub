@@ -3730,3 +3730,30 @@ SELECT pg_catalog.setval(pg_get_serial_sequence('public."Organization"', 'id'), 
 SELECT pg_catalog.setval(pg_get_serial_sequence('public."OrganizationAdmin"', 'id'), (SELECT max(id) FROM public."OrganizationAdmin"), true);
 SELECT pg_catalog.setval(pg_get_serial_sequence('public."CourseInstructor"', 'id'), (SELECT max(id) FROM public."CourseInstructor"), true);
 SELECT pg_catalog.setval(pg_get_serial_sequence('public."JobPosting"', 'id'), (SELECT max(id) FROM public."JobPosting"), true);
+
+-- Course funding-logo fixtures: reuse the checked-in website footer SVGs.
+-- Single wide logo: Present Course 1 (4), Current Course A (301).
+-- Multiple logos: Current Course B (302), This is a Degree (7).
+-- Keep the other courses without logos to exercise the empty state as well.
+INSERT INTO public."Organization" (id, name, type, logo) VALUES
+  (501, 'Digital Learning Campus', 'NON_PROFIT_ORGANIZATION', '/images/share/logo_dlc.svg'),
+  (502, 'Europäische Union und Schleswig-Holstein', 'PUBLIC_SECTOR', '/images/share/foerderlogos_2.svg'),
+  (503, 'Kiel. Sailing. City.', 'PUBLIC_SECTOR', '/images/share/logo-kiel-sailing-city.svg')
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO public."CourseFundingOrganization" (id, "courseId", "organizationId") VALUES
+  (4, 4, 502),
+  (5, 301, 502),
+  (6, 302, 501),
+  (7, 302, 502),
+  (8, 302, 503),
+  (9, 7, 501),
+  (10, 7, 502)
+ON CONFLICT (id) DO NOTHING;
+
+SELECT pg_catalog.setval('public."Organization_id_seq"',
+  GREATEST((SELECT max(id) FROM public."Organization"),
+           (SELECT last_value FROM public."Organization_id_seq")), true);
+SELECT pg_catalog.setval('public."CourseFundingOrganization_id_seq"',
+  GREATEST((SELECT max(id) FROM public."CourseFundingOrganization"),
+           (SELECT last_value FROM public."CourseFundingOrganization_id_seq")), true);

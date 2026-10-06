@@ -46,6 +46,12 @@ describe('account Menu', () => {
     logout.mockClear();
   });
 
+  it('leaves an 8px gap below the avatar trigger', async () => {
+    await renderMenu();
+
+    expect(screen.getByRole('menu').closest('.MuiPaper-root')).toHaveStyle({ marginTop: '8px' });
+  });
+
   // Regression guard: the rows used to wrap a nested <Link> inside the MenuItem. The MenuItem took
   // focus and owned the click handler while only the nested anchor navigated, so both a click next
   // to the label and a keyboard Enter closed the menu without going anywhere.

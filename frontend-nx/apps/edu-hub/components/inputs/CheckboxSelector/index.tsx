@@ -22,6 +22,7 @@ const CheckboxSelector: React.FC<CheckboxSelectorProps> = ({
   identifierVariables,
   disabled = false,
   suppressFeedback = false,
+  labelPlacement = 'start',
 }) => {
   const t = useTranslations('common');
 
@@ -57,7 +58,7 @@ const CheckboxSelector: React.FC<CheckboxSelectorProps> = ({
       {variant === 'material' ? (
         <MaterialCheckbox {...checkboxProps} />
       ) : variant === 'switch' ? (
-        <EduhubSwitch {...checkboxProps} />
+        <EduhubSwitch {...checkboxProps} labelPlacement={labelPlacement} />
       ) : (
         <EduhubCheckbox {...checkboxProps} />
       )}

@@ -1,3 +1,4 @@
+import { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import { FC, Fragment, useMemo, useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
@@ -13,6 +14,7 @@ import { Tile } from '../components/common/TileSlider/Tile';
 import HomeProjectSlider from '../components/common/TileSlider/HomeProjectSlider';
 import HomeJobSlider from '../components/common/TileSlider/HomeJobSlider';
 import FaqSection from '../components/common/FaqSection';
+import HeroHeadline from '../components/common/HeroHeadline';
 import NotificationSnackbar from '../components/common/dialogs/NotificationSnackbar';
 
 import { useAuthedQuery, useRoleQuery } from '../hooks/authedQuery';
@@ -24,14 +26,41 @@ import { COURSE_GROUP_OPTIONS } from '../queries/courseGroupOptions';
 import { isKnownCourseGroupOptionTitle } from '../helpers/courseGroupOptions';
 import { sortEventCoursesByUpcoming } from '../helpers/sessionSchedule';
 import { COURSE_TILES, COURSES_BY_INSTRUCTOR, COURSES_ENROLLED_BY_USER } from '../queries/courseQueries';
-import { APP_SETTINGS } from '../queries/appSettings';
+import { APP_SETTINGS, HOMEPAGE_HERO } from '../queries/appSettings';
 import { CourseGroupOptions } from '../queries/__generated__/CourseGroupOptions';
 import { CourseTiles } from '../queries/__generated__/CourseTiles';
 import { CoursesByInstructor } from '../queries/__generated__/CoursesByInstructor';
 import { CoursesEnrolledByUser } from '../queries/__generated__/CoursesEnrolledByUser';
 import { AppSettings } from '../queries/__generated__/AppSettings';
+import { HomepageHero } from '../queries/__generated__/HomepageHero';
+import { createServerApolloClient } from '../config/apolloServer';
 
-const Home: FC = () => {
+interface HomeProps {
+  /** Admin-set hero headline (Markdown) for the request locale; null falls back to the translation. */
+  heroHeadline: string | null;
+}
+
+/**
+ * Loads the admin-editable hero headline on the server so the first paint
+ * already shows it instead of swapping from the default after hydration.
+ * Best-effort: any failure keeps the built-in translation.
+ */
+export const getServerSideProps: GetServerSideProps<HomeProps> = async ({ locale }) => {
+  try {
+    const { data } = await createServerApolloClient().query<HomepageHero>({
+      query: HOMEPAGE_HERO,
+      variables: { appName: 'edu' },
+    });
+    const settings = data?.AppSettings[0];
+    const headline = locale === 'en' ? settings?.heroHeadlineEn : settings?.heroHeadlineDe;
+    return { props: { heroHeadline: headline?.trim() || null } };
+  } catch (error) {
+    console.error('Failed to load homepage hero headline', error);
+    return { props: { heroHeadline: null } };
+  }
+};
+
+const Home: FC<HomeProps> = ({ heroHeadline }) => {
   const t = useTranslations('startPage');
   const tCommon = useTranslations('common');
   const tEventsFeed = useTranslations('eventsFeed');
@@ -301,12 +330,11 @@ const Home: FC = () => {
       </Head>
       <Page className="text-white">
         <div className="homepage-hero h-[100vh] mb-11 md:mb-0">
-          <div className="flex flex-col justify-end h-full max-w-screen-xl mx-auto px-3 md:px-16 py-48">
-            <div className="text-6xl sm:text-9xl">{t('headline')}</div>
-            <div className="text-6xl sm:text-9xl mt-4">{t('subheadline')}</div>
+          <div className="flex flex-col justify-end h-full max-w-screen-xl mx-auto px-3 md:px-16 pt-48 pb-60">
+            <HeroHeadline markdown={heroHeadline ?? t('heroHeadline')} className="text-[clamp(2.5rem,10vw,8rem)]" />
           </div>
         </div>
-        <div className="max-w-screen-xl mx-auto md:mt-[-130px] md:pl-16 mt-[-180px]">
+        <div className="max-w-screen-xl mx-auto md:mt-[-130px] md:px-16 mt-[-180px]">
           {isLoading ? (
             <Loading />
           ) : (

@@ -6,6 +6,8 @@ interface CardProps {
   readonly children: ReactNode;
   readonly title?: string;
   readonly helpText?: string;
+  /** Explanation shown as visible text under the title (preferred over the helpText tooltip). */
+  readonly description?: string;
   readonly className?: string;
 }
 
@@ -13,7 +15,7 @@ interface CardProps {
  * Standard card component for consistent styling across EduHub.
  * Uses theme variables for background, border, and rounded corners.
  */
-export const Card: FC<CardProps> = ({ children, title, helpText, className = '' }) => (
+export const Card: FC<CardProps> = ({ children, title, helpText, description, className = '' }) => (
   <div
     className={`light bg-fill-primary border border-border-primary rounded-lg p-4 ${className}`.trim()}
   >
@@ -29,6 +31,7 @@ export const Card: FC<CardProps> = ({ children, title, helpText, className = '' 
         )}
       </div>
     )}
+    {description && <p className="-mt-2 mb-3 text-xs text-label-secondary whitespace-pre-line">{description}</p>}
     {children}
   </div>
 );

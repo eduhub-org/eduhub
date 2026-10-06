@@ -87,7 +87,12 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
   // Query for authorized course data
   const [
     getCoursesAuthorized,
-    { data: authorizedCourseData, refetch: refetchCourse, loading: getCoursesAuthorizedLoading },
+    {
+      data: authorizedCourseData,
+      refetch: refetchCourse,
+      loading: getCoursesAuthorizedLoading,
+      called: getCoursesAuthorizedCalled,
+    },
   ] = useLazyRoleQuery<CourseWithEnrollment>(COURSE_WITH_ENROLLMENT, {
     variables: {
       id,
@@ -108,12 +113,14 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
   });
 
   // Query for unauthorized course data
-  const [getCoursesUnauthorized, { data: unauthorizedCourseData, loading: getCoursesUnauthorizedLoading }] =
-    useLazyRoleQuery<Course, CourseVariables>(COURSE_ANONYMOUS, {
-      variables: {
-        id,
-      },
-    });
+  const [
+    getCoursesUnauthorized,
+    { data: unauthorizedCourseData, loading: getCoursesUnauthorizedLoading, called: getCoursesUnauthorizedCalled },
+  ] = useLazyRoleQuery<Course, CourseVariables>(COURSE_ANONYMOUS, {
+    variables: {
+      id,
+    },
+  });
 
   // Call the appropriate query based on user authentication status
   useEffect(() => {
@@ -204,8 +211,18 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
     return config.requiresApproval ? t('modal.success_message_approval') : t('modal.success_message_direct');
   };
 
+  // The queries are lazy and only fire from the effect above, so the first
+  // render has no data and no loading flag yet. Treat "not asked yet" as
+  // loading too, or the page flashes "not available" before every load.
+  const isCourseLoading = isLoggedIn
+    ? !getCoursesAuthorizedCalled || getCoursesAuthorizedLoading
+    : !getCoursesUnauthorizedCalled || getCoursesUnauthorizedLoading;
+
   // Ensure course is defined before extracting its properties
   if (!course) {
+    if (isCourseLoading) {
+      return <CircularProgress />;
+    }
     return (
       <div className="flex justify-center max-w-screen-xl mx-auto w-full pt-32">
         <div className="text-white">{t('general.course_not_available')}</div>
