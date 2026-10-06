@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { LocationOption_enum } from "./../../__generated__/globalTypes";
+import { LocationOption_enum, CourseRegistrationType_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: EventsCalendarFeed
@@ -101,6 +101,7 @@ export interface EventsCalendarFeed_Course {
    * The cover image for the course
    */
   coverImage: string | null;
+  registrationType: CourseRegistrationType_enum | null;
   /**
    * Heading of the the first course description field
    */

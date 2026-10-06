@@ -29,8 +29,8 @@ row's id instead is not possible: most foreign keys to `User(id)` are
 Both guest handlers refuse to act on an address that already has an account:
 `registerGuestForCourse` mails `GUEST_ALREADY_HAS_ACCOUNT` instead of creating a
 record, and `confirmGuestRegistration` repeats the check when the link is used,
-because a token stays valid for a week and the account may appear inside that
-window. So only the guest-first ordering ever produces two rows.
+because a token stays valid for up to a day and the account may appear inside
+that window. So only the guest-first ordering ever produces two rows.
 
 Resolving an address is deliberately not a `limit: 1` lookup — see
 `findUsersByEmail`. Once both rows can exist, picking between them by row order
@@ -189,7 +189,9 @@ at their own link is usually the fastest complete answer.
   would mean processing and storing it, a worse trade than two counters. Revisit
   only if real abuse appears.
 - **Tokens.** The confirmation token is random, stored only as a SHA-256 hash,
-  single use, and valid for 7 days. The manage token is a stateless HMAC over the
+  single use, and valid for 24 hours but never past the start of the event's next
+  session (`confirmTokenExpiresAt`): an unconfirmed guest holds no place, so the
+  window only has to absorb slow mail delivery. The manage token is a stateless HMAC over the
   user id signed with `GUEST_TOKEN_SECRET` — nothing is stored, so any mailer can
   regenerate the link, and the trade-off is that an individual link cannot be
   revoked. It stops working when the guest record is anonymized.

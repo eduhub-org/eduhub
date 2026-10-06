@@ -15,8 +15,9 @@ import { escapeHtml } from './emailTemplateVariables.js';
  * Two token kinds, deliberately different:
  *
  *   confirmation  Random, stored hashed in `GuestRegistrationToken`, single use,
- *                 7 days. It carries pending state (which course, whether the
- *                 marketing box was ticked), so it has to be a row.
+ *                 24 hours but never past the next session start. It carries
+ *                 pending state (which course, whether the marketing box was
+ *                 ticked), so it has to be a row.
  *
  *   manage        Stateless HMAC over the user id. Carries no state, so there is
  *                 nothing to store -- which means any mailer can regenerate the
@@ -26,7 +27,21 @@ import { escapeHtml } from './emailTemplateVariables.js';
  *                 anonymized, which is the only revocation this needs.
  */
 
-export const CONFIRM_TOKEN_TTL_DAYS = 7;
+export const CONFIRM_TOKEN_TTL_HOURS = 24;
+
+/**
+ * When a confirmation link stops working: 24 hours after it was issued, or at
+ * the start of the next session if that comes first. Unconfirmed guests hold
+ * no place, so the window only has to cover a slow mail server or a switch of
+ * device - and a sign-up must not turn valid once the event is underway. On a
+ * multi-day event that already started, the cap is the next session, so a
+ * guest who signs up on day one can still confirm in time for day two.
+ */
+export function confirmTokenExpiresAt(now = new Date(), nextSessionStart = null) {
+  const ttlEnd = new Date(now.getTime() + CONFIRM_TOKEN_TTL_HOURS * 60 * 60 * 1000);
+  const sessionStart = nextSessionStart ? new Date(nextSessionStart) : null;
+  return sessionStart && sessionStart > now && sessionStart < ttlEnd ? sessionStart : ttlEnd;
+}
 
 const DEFAULT_FRONTEND_URL = 'https://edu.opencampus.sh';
 
@@ -150,12 +165,11 @@ export async function issueConfirmToken(
   userId,
   courseId,
   newsletterOptIn = false,
-  organizationName = null
+  organizationName = null,
+  nextSessionStart = null
 ) {
   const rawToken = generateRawToken();
-  const expiresAt = new Date(
-    Date.now() + CONFIRM_TOKEN_TTL_DAYS * 24 * 60 * 60 * 1000
-  ).toISOString();
+  const expiresAt = confirmTokenExpiresAt(new Date(), nextSessionStart).toISOString();
   await client.request(INSERT_CONFIRM_TOKEN, {
     tokenHash: hashToken(rawToken),
     userId,

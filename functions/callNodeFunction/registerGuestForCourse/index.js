@@ -39,7 +39,7 @@ import {
  */
 
 const GET_COURSE = gql`
-  query GetGuestRegistrationCourse($courseId: Int!) {
+  query GetGuestRegistrationCourse($courseId: Int!, $now: timestamptz!) {
     Course_by_pk(id: $courseId) {
       id
       title
@@ -49,6 +49,14 @@ const GET_COURSE = gql`
       applicationEnd
       maxParticipants
       activeParticipantCount
+      # Caps the confirmation link (see confirmTokenExpiresAt).
+      NextSession: Sessions(
+        where: { startDateTime: { _gt: $now } }
+        order_by: { startDateTime: asc }
+        limit: 1
+      ) {
+        startDateTime
+      }
       Program {
         id
         published
@@ -232,7 +240,7 @@ export default async function registerGuestForCourse(req, logger) {
 
     const client = createHasuraClient();
 
-    const courseData = await client.request(GET_COURSE, { courseId });
+    const courseData = await client.request(GET_COURSE, { courseId, now: new Date().toISOString() });
     const course = courseData?.Course_by_pk;
 
     // Every one of these is a hard no. They are reported plainly because they
@@ -375,7 +383,14 @@ export default async function registerGuestForCourse(req, logger) {
       }
     }
 
-    const rawToken = await issueConfirmToken(client, userId, course.id, newsletterOptIn, organizationName);
+    const rawToken = await issueConfirmToken(
+      client,
+      userId,
+      course.id,
+      newsletterOptIn,
+      organizationName,
+      course.NextSession?.[0]?.startDateTime ?? null
+    );
 
     await queueGuestMail(client, logger, {
       templateType: 'GUEST_REGISTRATION_CONFIRM',

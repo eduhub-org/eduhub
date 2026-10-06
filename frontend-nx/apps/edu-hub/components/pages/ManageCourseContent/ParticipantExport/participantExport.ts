@@ -117,10 +117,15 @@ export const buildAttendanceListHtml = ({
 @page { size: A4 portrait; margin: 15mm 12mm; }
 h1 { font-size: 16pt; margin: 0 0 2mm; }
 p.meta { font-size: 10pt; margin: 0 0 5mm; }
-table { width: 100%; border-collapse: collapse; font-size: 10pt; }
+/* Every cell draws its own right and bottom edge, so each row keeps its lines when the table breaks
+   across pages (collapsed borders straddle the cell edge and get lost there). Chromium clips a
+   frame line that ends exactly at the page edge, hence the table stays a hair narrower. */
+table { width: calc(100% - 0.5mm); border-collapse: separate; border-spacing: 0; font-size: 10pt; }
 thead { display: table-header-group; }
-th, td { border: 0.3mm solid #000; padding: 2mm; text-align: left; vertical-align: middle; }
-th { background: #eee; }
+th, td { border-right: 0.3mm solid #000; border-bottom: 0.3mm solid #000; padding: 2mm; text-align: left;
+  vertical-align: middle; }
+th { border-top: 0.3mm solid #000; background: #eee; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+th:first-child, td:first-child { border-left: 0.3mm solid #000; }
 tr { break-inside: avoid; height: 10mm; }
 td.num { width: 8mm; text-align: right; }
 td.box { width: 18mm; text-align: center; }

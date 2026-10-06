@@ -186,6 +186,7 @@ const TableGrid = <T extends BaseRow,>({
   validateDeleteResult,
   onRowDelete,
   filters = [],
+  toolbarActions,
 }: TableGridProps<T>) => {
   const router = useRouter();
   const navigateMode = Boolean(rowHref || onRowNavigate);
@@ -494,7 +495,8 @@ const TableGrid = <T extends BaseRow,>({
           overflow: 'hidden',
         };
 
-  const showToolbar = Boolean(onAddButtonClick) || showCheckbox || showGlobalSearchField || filters.length > 0;
+  const showToolbar =
+    Boolean(onAddButtonClick) || showCheckbox || showGlobalSearchField || filters.length > 0 || Boolean(toolbarActions);
   const hasSelection = showCheckbox && selectedRowIds.size > 0;
 
   const toolbarClassName = 'flex flex-wrap justify-between items-center gap-3 mb-4';
@@ -603,6 +605,7 @@ const TableGrid = <T extends BaseRow,>({
             )}
             </div>
           )}
+          {toolbarActions}
           {filters.map((filter) => (
             <TableGridFilterSelect key={filter.id} filter={filter} />
           ))}

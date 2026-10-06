@@ -1,13 +1,13 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { createServerApolloClient } from '../../../config/apolloServer';
-import { buildEventsIcal, htmlToPlainText } from '../../../helpers/eventsIcal';
+import { buildEventsIcal, htmlToPlainText, labelLookup } from '../../../helpers/eventsIcal';
 import { markdownToHtml } from '../../../helpers/markdownToHtml';
 import { requestOrigin } from '../../../helpers/requestOrigin';
-import { AddressMap, referencedAddressIds } from '../../../helpers/sessionLocationResolution';
+import { AddressMap } from '../../../helpers/sessionLocationResolution';
 import { EVENTS_CALENDAR_FEED } from '../../../queries/eventsCalendarFeed';
-import { LOCATION_ADDRESSES_BY_IDS } from '../../../queries/locationAddress';
+import { LOCATION_ADDRESSES_FOR_FEED } from '../../../queries/locationAddress';
 import { EventsCalendarFeed } from '../../../queries/__generated__/EventsCalendarFeed';
-import { LocationAddressesByIds } from '../../../queries/__generated__/LocationAddressesByIds';
+import { LocationAddressesForFeed } from '../../../queries/__generated__/LocationAddressesForFeed';
 import de from '../../../locales/de.json';
 import en from '../../../locales/en.json';
 
@@ -29,23 +29,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     const client = createServerApolloClient();
-    const { data } = await client.query<EventsCalendarFeed>({ query: EVENTS_CALENDAR_FEED });
+    const [{ data }, { data: addressData }] = await Promise.all([
+      client.query<EventsCalendarFeed>({ query: EVENTS_CALENDAR_FEED }),
+      client.query<LocationAddressesForFeed>({ query: LOCATION_ADDRESSES_FOR_FEED }),
+    ]);
     const events = data?.Course ?? [];
 
-    const addressIds = referencedAddressIds(events.flatMap((event) => event.Sessions));
-    const addressMap: AddressMap = new Map();
-    if (addressIds.length > 0) {
-      const { data: addresses } = await client.query<LocationAddressesByIds>({
-        query: LOCATION_ADDRESSES_BY_IDS,
-        variables: { ids: addressIds },
-      });
-      addresses?.LocationAddress.forEach((address) => addressMap.set(address.id, address));
-    }
+    // All of them, not just the referenced ids: free-text addresses are matched too.
+    const addresses = addressData?.LocationAddress ?? [];
+    const addressMap: AddressMap = new Map(addresses.map((address) => [address.id, address]));
 
     const ics = buildEventsIcal(events, {
       calendarName: messages.title,
       baseUrl: `${origin}${localePrefix}`,
       addressMap,
+      labelByAddress: labelLookup(addresses),
       renderPlainText: (markdown) => htmlToPlainText(markdownToHtml(markdown, origin)),
       categories: [messages.icalCategory],
     });

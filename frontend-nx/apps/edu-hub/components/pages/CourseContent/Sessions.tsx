@@ -10,6 +10,7 @@ import { useAppSettings } from '../../../contexts/AppSettingsContext';
 import { useDisplayDate, useFormatTimeString } from '../../../helpers/dateTimeHelpers';
 import { formatDayHeading, groupSessionsByDay } from '../../../helpers/sessionSchedule';
 import { isLinkFormat } from '../../../helpers/util';
+import { labelledAddress } from '../../../helpers/sessionLocationResolution';
 import { isProgramSession, mergeSessions } from '../../../helpers/programSessions';
 import { useIsAdmin, useIsInstructor } from '../../../hooks/authentication';
 import {
@@ -72,7 +73,7 @@ const SessionLocations: FC<SessionLocationsProps> = ({ locations, canSeeOnlineLi
                 rel="noopener noreferrer"
                 className="underline"
               >
-                {location.displayAddress}
+                {labelledAddress(location.label, location.displayAddress)}
               </a>
             ) : (
               <>
