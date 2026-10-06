@@ -269,6 +269,8 @@
     },
     "session_expired_notification": "Deine Sitzung ist abgelaufen. Bitte melde dich erneut an, um fortzufahren.",
     "tile_slider_unavailable": "Kachel-Slider vorübergehend nicht verfügbar",
+    "tile_slider_previous": "Vorherige Kachel",
+    "tile_slider_next": "Nächste Kachel",
     "course_tile": {
       "extended_application_period_badge": "Verlängerte Anmeldefrist",
       "past_event_badge": "Vergangen"
