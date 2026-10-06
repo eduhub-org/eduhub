@@ -622,14 +622,15 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
               {supportsGuestRegistration && (
                 <div>
                   <CheckboxSelector
-                    variant="material"
+                    variant="switch"
+                    labelPlacement="end"
                     label={t('manageCourse.guest_registration.label')}
                     checked={Boolean(course.guestRegistrationEnabled)}
                     updateValueMutation={UPDATE_COURSE_GUEST_REGISTRATION_ENABLED}
                     identifierVariables={{ courseId: course.id }}
                     refetchQueries={['AdminCourseList']}
                   />
-                  <FieldHint className="ml-8">{t('manageCourse.guest_registration.help_text')}</FieldHint>
+                  <FieldHint className="ml-11">{t('manageCourse.guest_registration.help_text')}</FieldHint>
                 </div>
               )}
             </Card>
@@ -927,12 +928,13 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                 {/* What the public course page states about numbers */}
                 <div>
                   <CheckboxSelector
-                    variant="material"
+                    variant="switch"
+                    labelPlacement="end"
                     label={t('manageCourses.participants.show_available_places')}
                     checked={Boolean(course.showAvailablePlaces)}
                     onValueUpdated={(value: boolean) => onSetShowAvailablePlaces(course, value)}
                   />
-                  <FieldHint className="ml-8">{t('manageCourses.participants.show_available_places_hint')}</FieldHint>
+                  <FieldHint className="ml-11">{t('manageCourses.participants.show_available_places_hint')}</FieldHint>
                 </div>
               </div>
             </Card>

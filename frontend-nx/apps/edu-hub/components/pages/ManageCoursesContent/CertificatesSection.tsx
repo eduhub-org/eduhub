@@ -138,11 +138,12 @@ const CertificatesSection: FC<CertificatesSectionProps> = ({
       <div>
         <CheckboxSelector
           variant="switch"
+          labelPlacement="end"
           label={t('certificates.enable')}
           checked={showDetails}
           onValueUpdated={handleToggleCertificates}
         />
-        {!showDetails && <FieldHint>{t('certificates.disabled_hint')}</FieldHint>}
+        {!showDetails && <FieldHint className="ml-11">{t('certificates.disabled_hint')}</FieldHint>}
       </div>
 
       {showDetails && (
@@ -150,6 +151,7 @@ const CertificatesSection: FC<CertificatesSectionProps> = ({
           <div className="space-y-1">
             <CheckboxSelector
               variant="switch"
+              labelPlacement="end"
               label={t('possible_certificates.attendance_certificate')}
               checked={Boolean(course.attendanceCertificatePossible)}
               onValueUpdated={(value: boolean) => onSetAttendanceCertificatePossible(course, value)}
@@ -159,6 +161,7 @@ const CertificatesSection: FC<CertificatesSectionProps> = ({
             {!isEventCourse && (
               <CheckboxSelector
                 variant="switch"
+                labelPlacement="end"
                 label={t('possible_certificates.achievement_certificate')}
                 checked={Boolean(course.achievementCertificatePossible)}
                 onValueUpdated={(value: boolean) => onSetAchievementCertificatePossible(course, value)}

@@ -53,12 +53,13 @@ const RegistrationTypeSwitches: FC<RegistrationTypeSwitchesProps> = ({ courseId,
     <div>
       <CheckboxSelector
         variant="switch"
+        labelPlacement="end"
         label={t(`registration_switches.${flag}.label`)}
         checked={checked}
         disabled={disabled || saving}
         onValueUpdated={(value: boolean) => setFlag(flag, value)}
       />
-      <p className="text-xs text-label-secondary -mt-2">{t(`registration_switches.${flag}.help_text`)}</p>
+      <p className="text-xs text-label-secondary -mt-2 ml-11">{t(`registration_switches.${flag}.help_text`)}</p>
     </div>
   );
 
