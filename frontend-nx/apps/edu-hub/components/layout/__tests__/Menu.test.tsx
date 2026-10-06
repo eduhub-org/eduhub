@@ -4,6 +4,8 @@ import '@testing-library/jest-dom';
 import { Menu } from '../Menu';
 
 const logout = jest.fn();
+let mockIsOrgAdmin = false;
+let mockCanViewStatistics = false;
 
 jest.mock('next-intl', () => ({
   useTranslations: () => (key: string) => key,
@@ -16,7 +18,7 @@ jest.mock('next/router', () => ({
 jest.mock('../../../hooks/authentication', () => ({
   useIsAdmin: () => false,
   useIsInstructor: () => false,
-  useIsOrgAdmin: () => false,
+  useIsOrgAdmin: () => mockIsOrgAdmin,
 }));
 
 jest.mock('../../../hooks/orgAdminCapabilities', () => ({
@@ -25,6 +27,7 @@ jest.mock('../../../hooks/orgAdminCapabilities', () => ({
     canManageEvents: false,
     canManageDegrees: false,
     canManageSettings: false,
+    canViewStatistics: mockCanViewStatistics,
   }),
 }));
 
@@ -44,6 +47,8 @@ const renderMenu = async () => {
 describe('account Menu', () => {
   beforeEach(() => {
     logout.mockClear();
+    mockIsOrgAdmin = false;
+    mockCanViewStatistics = false;
   });
 
   // Regression guard: the rows used to wrap a nested <Link> inside the MenuItem. The MenuItem took
@@ -90,5 +95,21 @@ describe('account Menu', () => {
 
     expect(screen.getByRole('menuitem', { name: 'menu.profile' })).toHaveClass('Mui-selected');
     expect(screen.getByRole('menuitem', { name: 'menu.my_certificates' })).not.toHaveClass('Mui-selected');
+  });
+
+  it('hides the statistics entry from org admins without canViewStatistics', async () => {
+    mockIsOrgAdmin = true;
+    await renderMenu();
+
+    expect(screen.queryByRole('menuitem', { name: 'menu.statistics' })).toBeNull();
+  });
+
+  it('shows the statistics entry to org admins with canViewStatistics', async () => {
+    mockIsOrgAdmin = true;
+    mockCanViewStatistics = true;
+    await renderMenu();
+
+    expect(screen.getByRole('menuitem', { name: 'menu.statistics' })).toHaveAttribute('href', '/statistics');
+    expect(screen.getByText('menu.section_management')).toBeInTheDocument();
   });
 });

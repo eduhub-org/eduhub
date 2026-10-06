@@ -180,6 +180,7 @@ select_permissions:
                 _eq: X-Hasura-User-Id
   # Program sessions of the admin's organizations, and - for the course management page - the
   # sessions of courses whose program type the admin may manage (course sessions have no programId).
+  # canViewStatistics opens the course sessions of every program type for the statistics page.
   - role: org_admin_access
     permission:
       columns:
@@ -240,6 +241,13 @@ select_permissions:
                           - userId:
                               _eq: X-Hasura-User-Id
                           - canManageSettings:
+                              _eq: true
+                  - Organization:
+                      OrganizationAdmins:
+                        _and:
+                          - userId:
+                              _eq: X-Hasura-User-Id
+                          - canViewStatistics:
                               _eq: true
 update_permissions:
   - role: instructor_access

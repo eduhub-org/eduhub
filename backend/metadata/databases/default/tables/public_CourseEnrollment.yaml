@@ -192,6 +192,8 @@ select_permissions:
   # Org admins may read enrollments for courses whose program belongs to an organization they
   # administer, gated by the capability matching that program type or by canManageSettings. The
   # column set mirrors instructor_access so the management UI can display/edit the same fields.
+  # canViewStatistics grants the same read access across all program types of the organization,
+  # since the statistics page aggregates the enrollments of every program client-side.
   - role: org_admin_access
     permission:
       columns:
@@ -258,6 +260,15 @@ select_permissions:
                       - userId:
                           _eq: X-Hasura-User-Id
                       - canManageSettings:
+                          _eq: true
+          - Course:
+              Program:
+                Organization:
+                  OrganizationAdmins:
+                    _and:
+                      - userId:
+                          _eq: X-Hasura-User-Id
+                      - canViewStatistics:
                           _eq: true
       allow_aggregations: true
 update_permissions:
