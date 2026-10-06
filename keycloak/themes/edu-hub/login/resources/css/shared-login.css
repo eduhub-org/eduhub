@@ -412,6 +412,7 @@ h1#kc-page-title {
   min-height: 44px;
   align-items: center;
   justify-content: center;
+  gap: 8px;
   padding: 9px 18px;
   border: 1px solid #cac6c9;
   border-radius: 8px;
@@ -419,6 +420,11 @@ h1#kc-page-title {
   color: var(--kc-cobrand-copy);
   font-weight: 600;
   text-decoration: none;
+}
+
+/* Flex layout replaces the legacy offsets for floated provider icons. */
+#kc-social-providers .kc-social-provider-name {
+  position: static;
 }
 
 #kc-social-providers a:hover,
