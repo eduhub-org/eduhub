@@ -1,4 +1,4 @@
-import { FC, useCallback, useState } from 'react';
+import { FC, useCallback, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
 import { useManageMutation } from '../../../hooks/authedMutation';
@@ -28,6 +28,9 @@ const RegistrationTypeSwitches: FC<RegistrationTypeSwitchesProps> = ({ courseId,
   // refetched type arrives the switches are locked, so a quick second click cannot build on
   // stale flags and undo the first change.
   const [saving, setSaving] = useState(false);
+  // State only updates after the next render; the ref closes the gap for a second click
+  // that arrives before the switches are disabled.
+  const savingRef = useRef(false);
   const [updateRegistrationType] = useManageMutation(UPDATE_COURSE_REGISTRATION_TYPE, {
     refetchQueries: ['AdminCourseList'],
     awaitRefetchQueries: true,
@@ -36,17 +39,19 @@ const RegistrationTypeSwitches: FC<RegistrationTypeSwitchesProps> = ({ courseId,
   const setFlag = useCallback(
     async (flag: keyof RegistrationFlags, value: boolean) => {
       const nextType = flagsToRegistrationType({ ...flags, [flag]: value });
-      if (saving || nextType === currentType) return;
+      if (savingRef.current || nextType === currentType) return;
+      savingRef.current = true;
       setSaving(true);
       try {
         await updateRegistrationType({ variables: { itemId: courseId, value: nextType } });
       } catch (err) {
         handleError(err instanceof Error ? err.message : String(err));
       } finally {
+        savingRef.current = false;
         setSaving(false);
       }
     },
-    [flags, currentType, saving, courseId, updateRegistrationType, handleError]
+    [flags, currentType, courseId, updateRegistrationType, handleError]
   );
 
   const renderSwitch = (flag: keyof RegistrationFlags, checked: boolean, disabled = false) => (
