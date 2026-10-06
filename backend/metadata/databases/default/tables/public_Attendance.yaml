@@ -166,6 +166,26 @@ insert_permissions:
         - userId
         - location
 select_permissions:
+  # canViewStatistics: attendance status per user and session, for the statistics page. Deliberately
+  # no recordedIdentifier, times, location or source.
+  - role: org_admin_statistics
+    permission:
+      columns:
+        - id
+        - sessionId
+        - userId
+        - status
+      filter:
+        Session:
+          Course:
+            Program:
+              Organization:
+                OrganizationAdmins:
+                  _and:
+                    - userId:
+                        _eq: X-Hasura-User-Id
+                    - canViewStatistics:
+                        _eq: true
   - role: instructor_access
     permission:
       columns:
@@ -234,7 +254,6 @@ select_permissions:
         User:
           id:
             _eq: X-Hasura-User-Id
-  # canViewStatistics: attendances of every program type of the organization, for the statistics page.
   - role: org_admin_access
     permission:
       columns:
@@ -294,13 +313,6 @@ select_permissions:
                             - userId:
                                 _eq: X-Hasura-User-Id
                             - canManageSettings:
-                                _eq: true
-                    - Organization:
-                        OrganizationAdmins:
-                          _and:
-                            - userId:
-                                _eq: X-Hasura-User-Id
-                            - canViewStatistics:
                                 _eq: true
           - User:
               CourseEnrollments:
