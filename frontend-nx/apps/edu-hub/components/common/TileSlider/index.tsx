@@ -26,7 +26,7 @@ interface TileSliderProps<T extends TileSliderItem> {
   items: T[];
   /** Renders the tile content for a single item (course, project, …). */
   renderTile: (item: T) => ReactNode;
-  /** Widget embed mode: transparent background and taller navigation. */
+  /** Widget embed mode: transparent background and bottom shadow clearance. */
   isWidget?: boolean;
 }
 
@@ -38,7 +38,6 @@ interface NavButtonProps {
   label: string;
   direction: 'previous' | 'next';
   gradientWidth: number;
-  isWidget?: boolean;
 }
 
 // Cubic Hermite smoothstep(0, 1, t) = t * t * (3 - 2 * t).
@@ -58,12 +57,11 @@ const NavButton: FC<NavButtonProps> = ({
   label,
   direction,
   gradientWidth,
-  isWidget = false,
 }) => (
   <button
     id={idSuffix}
     type="button"
-    className={`${className} flex w-12 items-center justify-center rounded-none bg-transparent transition-opacity focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-white ${isWidget ? 'h-[435px]' : 'h-[431px]'} ${!visible ? 'pointer-events-none opacity-0' : ''}`}
+    className={`${className} flex h-[431px] w-12 items-center justify-center rounded-none bg-transparent transition-opacity focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-white ${!visible ? 'pointer-events-none opacity-0' : ''}`}
     onClick={(event) => {
       // Swiper prevents the click following a drag, even if the card snaps back.
       if (!event.defaultPrevented) onClick();
@@ -122,13 +120,16 @@ function TileSlider<T extends TileSliderItem>({ items, renderTile, isWidget = fa
   const [containerWidth, setContainerWidth] = useState(0);
   const isMobileLayout = containerWidth < MOBILE_BREAKPOINT;
   const isDesktopViewport = useMediaQuery(`(min-width: ${MOBILE_BREAKPOINT}px)`);
-  // Card browsing follows container width; homepage edge alignment follows the
-  // page's content grid. Narrow widgets retain their own mobile inset.
-  const edgeOffset = isMobileLayout && (isWidget || !isDesktopViewport) ? MOBILE_EDGE_OFFSET : 0;
-  const tileWidth = desktopTileWidth(containerWidth, items.length);
+  // Widgets reserve one card gap for outer shadows at either browsing edge.
+  // Homepage alignment still follows the page's content grid.
+  const edgeOffset = isWidget ? TILE_GAP : isMobileLayout && !isDesktopViewport ? MOBILE_EDGE_OFFSET : 0;
+  // Widget insets live in our snap grid. Native nonzero offsets make Swiper
+  // check overflow against its adjusted slidesGrid instead of the snap range.
+  const nativeEdgeOffset = isMobileLayout && !isWidget ? edgeOffset : 0;
+  const tileWidth = desktopTileWidth(containerWidth, items.length, isWidget ? edgeOffset : 0);
   const gradientWidth = isMobileLayout
     ? NAVIGATION_WIDTH
-    : desktopSnapGrid(containerWidth, tileWidth, items.length).gradientWidth;
+    : desktopSnapGrid(containerWidth, tileWidth, items.length, edgeOffset).gradientWidth;
   const idSuffix = useRef(Date.now().toString()).current; // unique identifier
 
   const syncNavigation = useCallback(() => {
@@ -159,7 +160,7 @@ function TileSlider<T extends TileSliderItem>({ items, renderTile, isWidget = fa
 
     // Swiper has measured the container and cards. Only adjust resting snap
     // positions; its gestures, transitions, edge state and controls stay native.
-    const grids = desktopSnapGrid(swiper.width, swiper.slidesSizesGrid[0], swiper.slides.length);
+    const grids = desktopSnapGrid(swiper.width, swiper.slidesSizesGrid[0], swiper.slides.length, edgeOffset);
     swiper.slidesGrid = grids.slidesGrid;
     swiper.snapGrid = grids.snapGrid;
   };
@@ -246,7 +247,7 @@ function TileSlider<T extends TileSliderItem>({ items, renderTile, isWidget = fa
 
   return (
     <div
-      className={`relative overflow-hidden ${isWidget ? 'h-[435px] bg-transparent' : 'h-[431px]'}`}
+      className={`relative overflow-hidden ${isWidget ? 'h-[460px] bg-transparent' : 'h-[431px]'}`}
       ref={containerRef}
       style={{ overscrollBehaviorX: 'contain' }}
       data-tile-slider
@@ -259,7 +260,8 @@ function TileSlider<T extends TileSliderItem>({ items, renderTile, isWidget = fa
         // Reinitialize only when input mode changes: native sticky timers and
         // free-mode CSS classes otherwise survive dynamic parameter changes.
         key={isDesktopViewport ? 'desktop' : 'mobile'}
-        className="h-full"
+        // Keep cards and controls top-aligned; widget clearance is bottom-only.
+        className="h-[431px]"
         ref={swiperRef}
         initialSlide={Math.min(activeSlide.current, items.length - 1)}
         modules={[Mousewheel, FreeMode, WheelSnap]}
@@ -273,9 +275,9 @@ function TileSlider<T extends TileSliderItem>({ items, renderTile, isWidget = fa
         focusableElements="input, select, option, textarea, button:not([data-tile-slider-nav]), video, label"
         spaceBetween={TILE_GAP}
         slidesPerView="auto"
-        // Desktop edges are flush; only mobile layouts need an internal inset.
-        slidesOffsetBefore={edgeOffset}
-        slidesOffsetAfter={edgeOffset}
+        // Only widgets need desktop insets; homepage content edges stay flush.
+        slidesOffsetBefore={nativeEdgeOffset}
+        slidesOffsetAfter={nativeEdgeOffset}
         centeredSlides={isMobileLayout}
         centeredSlidesBounds={isMobileLayout}
         watchOverflow
@@ -351,7 +353,6 @@ function TileSlider<T extends TileSliderItem>({ items, renderTile, isWidget = fa
               label={t('tile_slider_previous')}
               direction="previous"
               gradientWidth={gradientWidth}
-              isWidget={isWidget}
             />
             <NavButton
               idSuffix={`next-${idSuffix}`}
@@ -361,7 +362,6 @@ function TileSlider<T extends TileSliderItem>({ items, renderTile, isWidget = fa
               label={t('tile_slider_next')}
               direction="next"
               gradientWidth={gradientWidth}
-              isWidget={isWidget}
             />
           </div>
         )}

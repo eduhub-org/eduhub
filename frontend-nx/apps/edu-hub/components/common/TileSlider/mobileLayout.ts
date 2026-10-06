@@ -16,8 +16,9 @@ export function mobileSnapGrid(
   const contentWidth = itemCount * tileWidth + (itemCount - 1) * TILE_GAP;
   const last = Math.max(first, contentWidth - containerWidth + edgeOffset);
 
-  // Swiper subtracts both offsets from its slide area before applying bounds,
-  // which otherwise counts them again at the last snap. Collapse duplicate
-  // stops when the complete row fits so native overflow state stays correct.
-  return Array.from(new Set(snapGrid.map((snap) => Math.min(last, Math.max(first, snap)))));
+  // Bound the native centered middle snaps, but supply the actual edge stops
+  // ourselves so widget insets do not depend on Swiper's native offsets.
+  // Collapse duplicates when the complete row fits to preserve overflow state.
+  const middleSnaps = snapGrid.slice(1, -1).map((snap) => Math.min(last, Math.max(first, snap)));
+  return Array.from(new Set([first, ...middleSnaps, last]));
 }

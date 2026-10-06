@@ -136,8 +136,42 @@ describe('TileSlider input modes', () => {
 
     expect(latestProps().freeMode.enabled).toBe(true);
     expect(latestProps().centeredSlides).toBe(true);
-    expect(latestProps().slidesOffsetBefore).toBe(12);
-    expect(latestProps().slidesOffsetAfter).toBe(12);
+    expect(latestProps().slidesOffsetBefore).toBe(0);
+    expect(latestProps().slidesOffsetAfter).toBe(0);
+  });
+
+  it.each([320, 768, 1152])('reserves equal shadow insets only for widgets at %ipx', (width) => {
+    mockContainerWidth = width;
+    const { rerender } = render(<TileSlider items={items} renderTile={renderTile} isWidget />);
+
+    expect(latestProps().slidesOffsetBefore).toBe(0);
+    expect(latestProps().slidesOffsetAfter).toBe(0);
+    const swiper = {
+      width,
+      slides: items.map(() => document.createElement('div')),
+      slidesSizesGrid: [325],
+      snapGrid: [-11],
+      params: { centeredSlides: width < 768 },
+    } as unknown as SwiperInstance;
+    latestProps().onSlidesUpdated(swiper);
+    expect(swiper.snapGrid[0]).toBe(-11);
+
+    rerender(<TileSlider items={items} renderTile={renderTile} />);
+    expect(latestProps().slidesOffsetBefore).toBe(0);
+    expect(latestProps().slidesOffsetAfter).toBe(0);
+    swiper.snapGrid = [0];
+    latestProps().onSlidesUpdated(swiper);
+    expect(swiper.snapGrid[0]).toBe(0);
+  });
+
+  it.each([true, false])('keeps card-height controls while reserving bottom clearance only for widgets (%s)', (isWidget) => {
+    const { container } = render(<TileSlider items={items} renderTile={renderTile} isWidget={isWidget} />);
+
+    expect(container.querySelector('[data-tile-slider]')).toHaveClass(isWidget ? 'h-[460px]' : 'h-[431px]');
+    expect(latestProps().className).toBe('h-[431px]');
+    screen.getAllByRole('button').forEach((button) => {
+      expect(button).toHaveClass('h-[431px]');
+    });
   });
 
   it('reinitializes native input mode on viewport changes while preserving the selected card', () => {

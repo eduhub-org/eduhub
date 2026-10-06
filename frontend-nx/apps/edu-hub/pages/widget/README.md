@@ -45,7 +45,7 @@ NEXT_PUBLIC_BASE_URL=https://edu.opencampus.sh
 <iframe 
   src="https://edu.opencampus.sh/widget/courses" 
   frameborder="0" 
-  style="width:100%; height:435px; border:none; background:transparent;">
+  style="width:100%; height:460px; border:none; background:transparent;">
 </iframe>
 ```
 
@@ -55,7 +55,7 @@ NEXT_PUBLIC_BASE_URL=https://edu.opencampus.sh
 <iframe 
   src="https://edu.opencampus.sh/widget/courses?group=1&lang=de" 
   frameborder="0" 
-  style="width:100%; height:435px; border:none; background:transparent;">
+  style="width:100%; height:460px; border:none; background:transparent;">
 </iframe>
 ```
 
@@ -65,7 +65,7 @@ NEXT_PUBLIC_BASE_URL=https://edu.opencampus.sh
 <iframe 
   src="https://edu.opencampus.sh/widget/courses?apiKey=edh_live_org123_sk_abcdef1234567890&group=1&lang=de" 
   frameborder="0" 
-  style="width:100%; height:435px; border:none; background:transparent;">
+  style="width:100%; height:460px; border:none; background:transparent;">
 </iframe>
 ```
 
@@ -101,8 +101,11 @@ To show only courses funded by a specific organization:
 
 The widget is responsive and adapts to the iframe container size. Recommended iframe dimensions:
 
-- **Height**: 435px (matches the course tile height exactly)
+- **Height**: 460px (431px cards plus bottom clearance for their shadows)
 - **Width**: 100% of container (responsive)
+
+Existing 435px embeds retain the same top alignment and card size, but still
+clip the bottom shadow. Increase their iframe height to 460px to show it fully.
 
 ### Widget Features
 
@@ -119,7 +122,7 @@ You can customize the iframe appearance:
 <iframe 
   src="https://edu.opencampus.sh/widget/courses?group=1" 
   frameborder="0" 
-  style="width:100%; height:435px; border:none; background:transparent;">
+  style="width:100%; height:460px; border:none; background:transparent;">
 </iframe>
 ```
 
@@ -139,7 +142,7 @@ You can customize the iframe appearance:
 <iframe 
   src="https://edu.opencampus.sh/widget/courses?group=1&lang=de" 
   frameborder="0" 
-  style="width:100%; height:435px; border:none; background:transparent;">
+  style="width:100%; height:460px; border:none; background:transparent;">
 </iframe>
 ```
 
@@ -149,7 +152,7 @@ You can customize the iframe appearance:
 <iframe 
   src="https://edu.opencampus.sh/widget/courses?apiKey=YOUR_API_KEY&lang=en" 
   frameborder="0" 
-  style="width:100%; height:435px; border:none; background:transparent;">
+  style="width:100%; height:460px; border:none; background:transparent;">
 </iframe>
 ```
 
@@ -159,7 +162,7 @@ You can customize the iframe appearance:
 <iframe 
   src="https://edu.opencampus.sh/widget/courses" 
   frameborder="0" 
-  style="width:100%; height:435px; border:none; background:transparent;">
+  style="width:100%; height:460px; border:none; background:transparent;">
 </iframe>
 ```
 
@@ -179,7 +182,7 @@ public project page and open in a new tab.
 <iframe
   src="https://edu.opencampus.sh/widget/projects"
   frameborder="0"
-  style="width:100%; height:435px; border:none; background:transparent;">
+  style="width:100%; height:460px; border:none; background:transparent;">
 </iframe>
 ```
 
@@ -191,7 +194,7 @@ Same query parameters as the course widget (`group`, `groups`):
 <iframe
   src="https://edu.opencampus.sh/widget/projects?group=1&locale=de"
   frameborder="0"
-  style="width:100%; height:435px; border:none; background:transparent;">
+  style="width:100%; height:460px; border:none; background:transparent;">
 </iframe>
 ```
 
@@ -201,7 +204,7 @@ Multiple groups (comma-separated option ids):
 <iframe
   src="https://edu.opencampus.sh/widget/projects?groups=3,7&locale=de"
   frameborder="0"
-  style="width:100%; height:435px; border:none; background:transparent;">
+  style="width:100%; height:460px; border:none; background:transparent;">
 </iframe>
 ```
 
@@ -214,7 +217,7 @@ Projects are matched when any linked course belongs to the selected course group
 <iframe
   src="https://edu.opencampus.sh/widget/projects?apiKey=edh_live_org123_sk_abcdef1234567890&locale=en"
   frameborder="0"
-  style="width:100%; height:435px; border:none; background:transparent;">
+  style="width:100%; height:460px; border:none; background:transparent;">
 </iframe>
 ```
 
@@ -253,7 +256,7 @@ from inside an iframe without any extra configuration.
 <iframe
   src="https://edu.opencampus.sh/widget/jobs"
   frameborder="0"
-  style="width:100%; height:435px; border:none; background:transparent;">
+  style="width:100%; height:460px; border:none; background:transparent;">
 </iframe>
 ```
 
@@ -267,7 +270,7 @@ the union of the selected sliders' job types:
 <iframe
   src="https://edu.opencampus.sh/widget/jobs?group=1&locale=de"
   frameborder="0"
-  style="width:100%; height:435px; border:none; background:transparent;">
+  style="width:100%; height:460px; border:none; background:transparent;">
 </iframe>
 ```
 
@@ -277,7 +280,7 @@ Multiple sliders (comma-separated option ids):
 <iframe
   src="https://edu.opencampus.sh/widget/jobs?groups=3,7&locale=de"
   frameborder="0"
-  style="width:100%; height:435px; border:none; background:transparent;">
+  style="width:100%; height:460px; border:none; background:transparent;">
 </iframe>
 ```
 
@@ -290,7 +293,7 @@ filtering is applied when any selected slider selects zero types.
 <iframe
   src="https://edu.opencampus.sh/widget/jobs?apiKey=edh_live_org123_sk_abcdef1234567890&locale=en"
   frameborder="0"
-  style="width:100%; height:435px; border:none; background:transparent;">
+  style="width:100%; height:460px; border:none; background:transparent;">
 </iframe>
 ```
 
