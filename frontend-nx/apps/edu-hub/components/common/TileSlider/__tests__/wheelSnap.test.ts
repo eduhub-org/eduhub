@@ -1,5 +1,5 @@
 import type { Swiper as SwiperInstance } from 'swiper';
-import { WheelSnap, WHEEL_GESTURE_IDLE_MS, WHEEL_SNAP_IDLE_MS } from '../wheelSnap';
+import { WheelSnap, WHEEL_SNAP_IDLE_MS } from '../wheelSnap';
 
 const originalMatchMedia = window.matchMedia;
 let reducedMotion = false;
@@ -51,9 +51,9 @@ function createSlider(freeModeEnabled = true, pointerSticky = true) {
   });
   emit('init');
 
-  // A real bubble listener lets capture-phase gesture grouping stop this shim
-  // exactly as it stops native Mousewheel. Model only native accepted events:
-  // native translation/normal commands happen before the scroll event emits.
+  // Model accepted native events with a real bubble listener. WheelSnap must
+  // leave normal-mode packets to native Mousewheel rather than group them.
+  // Native translation/normal commands happen before the scroll event emits.
   const nativeWheel = jest.fn((event: WheelEvent) => {
     const horizontal = event.shiftKey && event.deltaX === 0 ? event.deltaY : event.deltaX;
     const vertical = event.shiftKey && event.deltaX === 0 ? 0 : event.deltaY;
@@ -171,12 +171,12 @@ describe('WheelSnap', () => {
     expect(event.defaultPrevented).toBe(false);
   });
 
-  it('preserves default touch configuration and cancels wheel grouping when a touch starts', () => {
+  it('preserves default touch configuration and native normal-mode wheel input', () => {
     const slider = createSlider(false);
     slider.wheel();
     slider.emit('touchStart');
     slider.wheel();
-    jest.advanceTimersByTime(WHEEL_GESTURE_IDLE_MS);
+    jest.advanceTimersByTime(1000);
 
     expect(slider.freeMode.enabled).toBe(false);
     expect(slider.freeMode.sticky).toBe(true);
@@ -296,46 +296,43 @@ describe('WheelSnap', () => {
     expect(slider.slideToClosest).toHaveBeenCalledWith(0, true);
   });
 
-  describe('normal-mode wheel gesture grouping', () => {
-    it('uses a 100ms free-mode settling delay and a separate 250ms gesture boundary', () => {
+  describe('native normal-mode wheel input', () => {
+    it('keeps the 100ms settling delay exclusive to free mode', () => {
       expect(WHEEL_SNAP_IDLE_MS).toBe(100);
-      expect(WHEEL_GESTURE_IDLE_MS).toBe(250);
+      const slider = createSlider(false);
+      slider.wheel();
+
+      expect(jest.getTimerCount()).toBe(0);
+      jest.advanceTimersByTime(1000);
+      expect(slider.slideToClosest).not.toHaveBeenCalled();
     });
 
-    it('allows one native card command for a long gesture and a new command after its tail is quiet', () => {
+    it('passes the complete long wheel stream to native Mousewheel without a gesture gate', () => {
       const slider = createSlider(false);
       const first = slider.wheel({ deltaX: 100 });
       expect(first.defaultPrevented).toBe(false);
       [80, 70, 25, 5, 0.1].forEach((deltaX) => {
         jest.advanceTimersByTime(48);
-        expect(slider.wheel({ deltaX }).defaultPrevented).toBe(true);
+        expect(slider.wheel({ deltaX }).defaultPrevented).toBe(false);
       });
 
-      expect(slider.nativeWheel).toHaveBeenCalledTimes(1);
-      expect(slider.nativeCommands).toHaveBeenCalledTimes(1);
-      jest.advanceTimersByTime(WHEEL_GESTURE_IDLE_MS - 1);
-      expect(slider.nativeCommands).toHaveBeenCalledTimes(1);
-      jest.advanceTimersByTime(1);
-      expect(slider.wheel({ deltaX: 25 }).defaultPrevented).toBe(false);
-
-      expect(slider.nativeCommands).toHaveBeenCalledTimes(2);
+      expect(slider.nativeWheel).toHaveBeenCalledTimes(6);
+      expect(jest.getTimerCount()).toBe(0);
       expect(slider.slideToClosest).not.toHaveBeenCalled();
       expect(slider.setTranslate).not.toHaveBeenCalled();
     });
 
-    it('groups direction changes within the same uninterrupted wheel stream', () => {
+    it('leaves direction changes within the same wheel stream to native navigation', () => {
       const slider = createSlider(false);
       slider.wheel({ deltaX: 40 });
-      expect(slider.wheel({ deltaX: -40 }).defaultPrevented).toBe(true);
+      expect(slider.wheel({ deltaX: -40 }).defaultPrevented).toBe(false);
 
-      expect(slider.nativeCommands).toHaveBeenCalledTimes(1);
+      expect(slider.nativeCommands).toHaveBeenCalledTimes(2);
       expect(slider.nativeCommands).toHaveBeenCalledWith('next');
-      jest.advanceTimersByTime(WHEEL_GESTURE_IDLE_MS);
-      slider.wheel({ deltaX: -40 });
       expect(slider.nativeCommands).toHaveBeenLastCalledWith('previous');
     });
 
-    it('does not consume a gesture until native navigation accepts an event after animation', () => {
+    it('does not queue wheel commands during animation or block input afterwards', () => {
       const slider = createSlider(false);
       slider.swiper.animating = true;
       expect(slider.wheel().defaultPrevented).toBe(false);
@@ -344,13 +341,16 @@ describe('WheelSnap', () => {
       expect(slider.nativeCommands).not.toHaveBeenCalled();
 
       slider.swiper.animating = false;
+      slider.emit('transitionEnd');
+      jest.advanceTimersByTime(1000);
+      expect(slider.nativeCommands).not.toHaveBeenCalled();
       expect(slider.wheel().defaultPrevented).toBe(false);
-      expect(slider.wheel().defaultPrevented).toBe(true);
       expect(slider.nativeCommands).toHaveBeenCalledTimes(1);
+      expect(slider.nativeWheel).toHaveBeenCalledTimes(3);
     });
 
     it.each(['vertical', 'ctrlKey', 'metaKey'])(
-      'does not block %s input or let it extend the horizontal gesture gate',
+      'leaves %s input untouched and keeps horizontal wheel input native',
       (input) => {
         const slider = createSlider(false);
         slider.wheel();
@@ -360,23 +360,23 @@ describe('WheelSnap', () => {
         expect(slider.nativeWheel).toHaveBeenCalledTimes(2);
         expect(slider.nativeCommands).toHaveBeenCalledTimes(1);
 
-        jest.advanceTimersByTime(WHEEL_GESTURE_IDLE_MS - 200);
         slider.wheel();
         expect(slider.nativeCommands).toHaveBeenCalledTimes(2);
+        expect(jest.getTimerCount()).toBe(0);
       }
     );
 
-    it('groups Shift plus vertical wheels as native horizontal navigation', () => {
+    it('leaves Shift plus vertical wheels as native horizontal navigation', () => {
       const slider = createSlider(false);
       slider.wheel({ deltaX: 0, deltaY: 30, shiftKey: true });
       const tail = slider.wheel({ deltaX: 0, deltaY: 10, shiftKey: true });
 
-      expect(tail.defaultPrevented).toBe(true);
-      expect(slider.nativeCommands).toHaveBeenCalledTimes(1);
+      expect(tail.defaultPrevented).toBe(false);
+      expect(slider.nativeCommands).toHaveBeenCalledTimes(2);
       expect(slider.nativeCommands).toHaveBeenCalledWith('next');
     });
 
-    it('does not group wheel events from the native no-mousewheel subtree', () => {
+    it('preserves native filtering of the no-mousewheel subtree', () => {
       const slider = createSlider(false);
       const ignored = document.createElement('div');
       ignored.className = 'swiper-no-mousewheel';
@@ -386,27 +386,27 @@ describe('WheelSnap', () => {
       expect(slider.wheel({}, ignored).defaultPrevented).toBe(false);
       expect(slider.nativeCommands).toHaveBeenCalledTimes(1);
 
-      jest.advanceTimersByTime(WHEEL_GESTURE_IDLE_MS - 200);
       slider.wheel();
       expect(slider.nativeCommands).toHaveBeenCalledTimes(2);
     });
 
-    it('keeps normal-mode gesture boundaries independent across multiple sliders', () => {
+    it('does not gate normal-mode wheel input across multiple sliders', () => {
       const first = createSlider(false);
       const second = createSlider(false);
       first.wheel();
-      jest.advanceTimersByTime(WHEEL_GESTURE_IDLE_MS / 2);
+      jest.advanceTimersByTime(50);
       second.wheel();
-      jest.advanceTimersByTime(WHEEL_GESTURE_IDLE_MS / 2);
+      jest.advanceTimersByTime(50);
 
       expect(first.wheel().defaultPrevented).toBe(false);
-      expect(second.wheel().defaultPrevented).toBe(true);
+      expect(second.wheel().defaultPrevented).toBe(false);
       expect(first.nativeCommands).toHaveBeenCalledTimes(2);
-      expect(second.nativeCommands).toHaveBeenCalledTimes(1);
+      expect(second.nativeCommands).toHaveBeenCalledTimes(2);
+      expect(jest.getTimerCount()).toBe(0);
     });
 
     it.each(['beforeTransitionStart', 'beforeResize', 'resize', 'observerUpdate', 'disable', 'touchStart'])(
-      'clears the old wheel gesture gate after %s',
+      'keeps normal-mode wheel input native after %s',
       (event) => {
         const slider = createSlider(false);
         slider.wheel();
@@ -417,15 +417,15 @@ describe('WheelSnap', () => {
       }
     );
 
-    it.each(['slidesUpdated', 'update'])('keeps the gesture gate for a same-geometry %s', (event) => {
+    it.each(['slidesUpdated', 'update'])('does not gate wheel input after a same-geometry %s', (event) => {
       const slider = createSlider(false);
       slider.wheel();
       slider.emit(event);
-      expect(slider.wheel().defaultPrevented).toBe(true);
-      expect(slider.nativeCommands).toHaveBeenCalledTimes(1);
+      expect(slider.wheel().defaultPrevented).toBe(false);
+      expect(slider.nativeCommands).toHaveBeenCalledTimes(2);
     });
 
-    it.each(['slidesUpdated', 'update'])('clears the gate when %s reports new card identities', (event) => {
+    it.each(['slidesUpdated', 'update'])('leaves wheel input native when %s reports new cards', (event) => {
       const slider = createSlider(false);
       slider.wheel();
       slider.swiper.slides[0] = document.createElement('div');
@@ -434,7 +434,7 @@ describe('WheelSnap', () => {
       expect(slider.nativeCommands).toHaveBeenCalledTimes(2);
     });
 
-    it('removes normal-mode wheel grouping on destruction', () => {
+    it('leaves no normal-mode capture interception on destruction', () => {
       const slider = createSlider(false);
       slider.wheel();
       slider.emit('beforeDestroy');

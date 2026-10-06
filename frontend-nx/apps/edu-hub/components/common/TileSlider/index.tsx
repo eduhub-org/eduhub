@@ -264,7 +264,7 @@ function TileSlider<T extends TileSliderItem>({ items, renderTile, isWidget = fa
         initialSlide={Math.min(activeSlide.current, items.length - 1)}
         modules={[Mousewheel, FreeMode, WheelSnap]}
         // Input mode follows the viewport, not narrow widget/container widths.
-        // WheelSnap settles free scrolling and groups normal-mode wheel input;
+        // WheelSnap only settles free scrolling; normal-mode wheel input and
         // pointer drags stay native, and mobile keeps default snapping mode.
         freeMode={{ enabled: isDesktopViewport, sticky: true }}
         speed={250}
