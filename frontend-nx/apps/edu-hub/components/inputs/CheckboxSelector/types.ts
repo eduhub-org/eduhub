@@ -21,4 +21,6 @@ export type CheckboxSelectorProps = {
   disabled?: boolean;
   /** Omits saved snackbar and error dialog (e.g. checkbox lists inside modals). */
   suppressFeedback?: boolean;
+  /** Switch variant only: 'end' puts the switch first and the label after it. Defaults to 'start'. */
+  labelPlacement?: 'start' | 'end';
 };

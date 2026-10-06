@@ -1180,36 +1180,39 @@
       "placeholder": "Kachel-Slider Gruppen auswählen"
     },
     "course_group": {
-      "label": "Kursgruppe",
-      "placeholder": "Kursgruppen auswählen",
-      "slider_badge": "Startseiten-Slider"
+      "label": "Slider & Widgets",
+      "placeholder": "Gruppen auswählen",
+      "slider_badge": "Startseiten-Slider",
+      "help_text": "Ordnet das Angebot Slidern auf der Startseite oder in Widgets zu. Slider und Widget-Gruppen werden in den Einstellungen unter Kursgruppen definiert. Jedes Angebot erscheint automatisch im Slider seines Typs (Kurse, Events, Degrees); markierte Gruppen sind auf der Startseite sichtbar."
     },
     "course_series": {
-      "label": "Kursreihe",
-      "placeholder": "Kursreihe auswählen oder neu anlegen",
-      "help_text": "Alle Durchläufe desselben Kurses gehören zu einer Kursreihe. Auf der Kursseite werden Projekte aus vergangenen Durchläufen der Reihe gezeigt. Beim Veröffentlichen wird ein Kurs ohne Reihe automatisch mit früheren Kursen gleichen Titels zu einer Reihe zusammengefasst. Einmalige Kurse brauchen keine Reihe.",
-      "none": "Keine Kursreihe",
+      "label": "Reihe",
+      "placeholder": "Reihe auswählen oder neu anlegen",
+      "help_text": "Alle Durchläufe desselben Angebots gehören zu einer Reihe. Auf der Seite des Angebots werden Projekte aus vergangenen Durchläufen der Reihe gezeigt. Beim Veröffentlichen wird ein Angebot ohne Reihe automatisch mit früheren Angeboten gleichen Titels zu einer Reihe zusammengefasst. Einmalige Angebote brauchen keine Reihe.",
+      "none": "Keine Reihe",
       "other_runs": "Weitere Durchläufe dieser Reihe:",
       "no_other_runs": "Noch keine weiteren Durchläufe in dieser Reihe."
     },
     "cover_image": {
       "label": "Titelbild",
       "upload_text": "Klicken um Titelbild hochzuladen oder Datei hier ablegen",
-      "alt": "Kurs-Titelbild"
+      "alt": "Titelbild des Angebots",
+      "help_text": "Wird auf der Seite des Angebots und in den Slidern gezeigt."
     },
     "instructors": {
-      "label": "Kursleitung",
-      "add": "Kursleitung hinzufügen"
+      "label": "Leitung",
+      "add": "Leitung hinzufügen",
+      "help_text": "Die Leitung kann das Angebot verwalten und wird auf seiner Seite genannt."
     },
     "funding_organizations": {
       "label": "Förderorganisationen",
       "add": "Förderorganisation hinzufügen"
     },
     "certificates": {
-      "label": "Bescheinigungen"
+      "enable": "Bescheinigungen vergeben",
+      "disabled_hint": "Aktiviere dies, wenn Teilnehmende einen Teilnahmenachweis oder ein Leistungszertifikat erhalten sollen."
     },
     "possible_certificates": {
-      "label": "Mögliche Bescheinigungen",
       "attendance_certificate": "Teilnahmenachweis",
       "achievement_certificate": "Leistungszertifikat"
     },
@@ -1229,7 +1232,6 @@
     },
     "registration_type": {
       "label": "Anmeldeart",
-      "help_text": "Wähle aus, wie sich Teilnehmer für diesen Kurs anmelden können",
       "options": {
         "APPROVAL_WITH_INPUT": "Zulassung mit Fragebogen und Bewerbungsprozess",
         "DIRECT_CONFIRMATION": "Direkte Zulassung ohne Fragebogen",
@@ -1247,7 +1249,9 @@
       "title": "Teilnehmenden-Chat",
       "button_open_element": "Zum Element-Raum",
       "button_open_mattermost": "Zum Mattermost-Channel",
-      "button_open_chat": "Zum Chat"
+      "button_open_chat": "Zum Chat",
+      "explanation": "Ein Matrix-Raum ist der Chat für dieses Angebot. Bestätigte Teilnehmende sehen auf der Seite des Angebots einen Button zum Raum und treten darüber bei. Die Leitung erhält im Raum automatisch Moderationsrechte; wer später zur Leitung hinzukommt, wird zusätzlich eingeladen.",
+      "explanation_external": "Bestätigte Teilnehmende sehen auf der Seite des Angebots einen Button zu diesem Chat."
     },
     "matrix_room": {
       "button_create": "Matrix-Raum erstellen",
@@ -1266,9 +1270,17 @@
     },
     "email_templates": {
       "label": "E-Mail-Vorlagen",
-      "create_button": "E-Mail-Vorlagen erstellen",
-      "edit_button": "E-Mail-Vorlagen bearbeiten",
-      "external_registration_note": "E-Mail-Vorlagen sind für externe Anmeldungen nicht verfügbar."
+      "external_registration_note": "E-Mail-Vorlagen sind für externe Anmeldungen nicht verfügbar.",
+      "help_text": "Ohne Anpassung werden die Standardvorlagen verschickt. Passe nur an, was für dieses Angebot anders sein soll.",
+      "standard": "Standard",
+      "customized": "Angepasst",
+      "customize": "Anpassen",
+      "edit": "Bearbeiten",
+      "reset": "Zurücksetzen",
+      "reset_confirm": "Möchtest Du die Anpassung von „{name}“ löschen? Danach wird wieder die Standardvorlage verschickt.",
+      "other_customized": "Weitere angepasste Vorlagen",
+      "dialog_hint": "Änderungen werden automatisch gespeichert und gelten nur für dieses Angebot.",
+      "default_missing": "Für diese E-Mail gibt es keine Standardvorlage, die kopiert werden kann."
     },
     "ects": {
       "label": "ECTS-Punkte",
@@ -1294,8 +1306,9 @@
     },
     "learning_goals": {
       "label": "Lernziele",
-      "help_text": "Definiere, was die Teilnehmer nach Abschluss dieses Kurses erreichen werden. Schreibe jedes Lernziel in eine neue Zeile ohne Nummerierung. Verwende Handlungsverben wie 'verstehen', 'anwenden', 'analysieren', 'erstellen' (siehe: https://www.bloomstaxonomy.org).",
-      "placeholder": "Die Grundlagen des Themas verstehen\nSchlüsselkonzepte in praktischen Szenarien anwenden\nKomplexe Probleme und Lösungen analysieren\nInnovative Ansätze entwickeln"
+      "help_text": "Definiere, was die Teilnehmenden am Ende erreicht haben sollen. Schreibe jedes Lernziel in eine neue Zeile ohne Nummerierung. Verwende Handlungsverben wie 'verstehen', 'anwenden', 'analysieren', 'erstellen' (siehe: https://www.bloomstaxonomy.org).",
+      "placeholder": "Die Grundlagen des Themas verstehen\nSchlüsselkonzepte in praktischen Szenarien anwenden\nKomplexe Probleme und Lösungen analysieren\nInnovative Ansätze entwickeln",
+      "certificate_hint": "Die Lernziele erscheinen auf dem Leistungszertifikat."
     },
     "add_course_button": "Kurs hinzufügen",
     "add_event_button": "Event hinzufügen",
@@ -1381,8 +1394,28 @@
     },
     "participants": {
       "label": "Teilnehmende",
-      "show_available_places": "Freie Plätze auf der Kursseite anzeigen",
-      "show_available_places_hint": "Ohne Haken zeigt die Kursseite nur die Anzahl der Teilnehmenden. Benötigt eine maximale Teilnehmendenzahl."
+      "show_available_places": "Freie Plätze auf der Seite des Angebots anzeigen",
+      "show_available_places_hint": "Ausgeschaltet zeigt die Seite nur die Anzahl der Teilnehmenden. Benötigt eine maximale Teilnehmendenzahl."
+    },
+    "registration_switches": {
+      "external": {
+        "label": "Externe Anmeldung",
+        "help_text": "Die Anmeldung läuft über eine externe Seite. Die übrigen Optionen entfallen."
+      },
+      "application": {
+        "label": "Bewerbungsprozess",
+        "help_text": "Interessierte bewerben sich, und Du wählst aus, wer teilnimmt."
+      },
+      "questionnaire": {
+        "label": "Fragebogen",
+        "help_text": "Bei der Anmeldung wird ein Fragebogen (Formbricks) ausgefüllt."
+      },
+      "payment": {
+        "label": "Zahlung",
+        "help_text": "Die Teilnahme ist kostenpflichtig und wird bei der Anmeldung bezahlt."
+      },
+      "application_locks_hint": "Ein Bewerbungsprozess enthält immer einen Fragebogen und lässt sich nicht mit einer Zahlung kombinieren.",
+      "summary": "Anmeldeart: {mode}"
     }
   },
   "manageCourse": {
@@ -1792,7 +1825,7 @@
     "formbricks": {
       "title": "Fragebogen URL",
       "description": "Verknüpfe einen Formbricks-Fragebogen, der anstelle des Motivationsschreibens bei der Einschreibung/Bewerbung angezeigt wird.",
-      "tooltip": "Bewerber füllen diesen Fragebogen aus, wenn sie sich für den Kurs anmelden. Die Antworten werden in der Bewerbungsübersicht angezeigt.",
+      "tooltip": "Bewerber füllen diesen Fragebogen aus, wenn sie sich für das Angebot anmelden. Die Antworten werden in der Bewerbungsübersicht angezeigt.",
       "survey_url_label": "Formbricks Einschreibungs-Survey URL",
       "survey_url_helper": "Füge die URL deines Formbricks Link-Surveys ein",
       "survey_url_helper_with_default": "Füge die URL deines Formbricks Link-Surveys ein (leer lassen, um Programm-Standard zu verwenden)",
@@ -1803,8 +1836,8 @@
       "help_text": "Sammle Anmeldeinformationen und optionale Zusatzoptionen über einen Formbricks-Fragebogen.",
       "learn_more": "Mehr erfahren",
       "setup_dialog_title": "Formbricks Fragebogen Einrichtung",
-      "setup_dialog_content": "Der Formbricks-Fragebogen erfüllt zwei Zwecke:\n\n1. Anmeldeinformationen sammeln\nSammle Bewerberinformationen, Motivationsschreiben und andere Anmeldedetails, die in der Bewerbungsübersicht angezeigt werden.\n\n2. Add-On-Preise definieren (für kostenpflichtige Kurse)\nWenn dein Kurs kostenpflichtig ist, kannst du Fragen zu optionalen Zusatzoptionen einbinden (z.B. \"Möchtest du ein Zertifikat hinzufügen? (+€50)\"). Das System extrahiert automatisch Preise, die in den Fragen erwähnt werden.\n\nTipp: Wenn du verschiedene Preiskategorien über Add-Ons anbietest (z.B. Basis, Standard, Premium), setze den Grundpreis auf 0. Das InfoPanel zeigt dann \"Preis: variabel\" an. Weitere Details findest du im Hilfetext des Grundpreises.\n\n---\n\nHidden Fields Konfiguration\n\nWichtig: Du musst Hidden Fields in deinem Formbricks Survey konfigurieren!\n\nErforderliche Hidden Fields:\n• eduhubUserId - Wird automatisch mit der EduHub Benutzer-ID befüllt\n• eduhubCourseId - Wird automatisch mit der Kurs-ID befüllt\n• eduhubEnrollmentId - Wird automatisch mit der Anmeldungs-ID befüllt (optional)\n\nIn Formbricks: Survey bearbeiten → Hidden Fields aktivieren → Diese Feld-IDs hinzufügen. Ohne diese Konfiguration können Antworten nicht korrekt zugeordnet werden.\n\nHinweis: eduhubEnrollmentId ist optional, da die Anmeldung erst nach Abschluss des Fragebogens erstellt wird.\n\n---\n\nAdd-On-Preis Extraktion\n\nFür kostenpflichtige Kurse:\n1. Füge Auswahloptionen für Add-Ons mit Preisinformationen in deine Fragen ein (z.B. \"Zertifikat (+€50)\" oder \"Workshop-Materialien: €25\")\n2. Verwende den Button \"Add-Ons validieren\" im Bereich Preiseinstellungen\n3. Das System analysiert deinen Fragebogen und extrahiert erkannte Preise\n4. Überprüfe und validiere die extrahierten Preise im Validierungsdialog\n5. Validierte Add-Ons werden automatisch mit Stripe synchronisiert für die Zahlungsabwicklung",
-      "help_text_hidden_fields": "Wichtig: Du musst Hidden Fields in deinem Formbricks Survey konfigurieren!\n\nErforderliche Hidden Fields:\n• eduhubUserId - Wird automatisch mit der EduHub Benutzer-ID befüllt\n• eduhubCourseId - Wird automatisch mit der Kurs-ID befüllt\n• eduhubEnrollmentId - Wird automatisch mit der Anmeldungs-ID befüllt (optional)\n\nIn Formbricks: Survey bearbeiten → Hidden Fields aktivieren → Diese Feld-IDs hinzufügen. Ohne diese Konfiguration können Antworten nicht korrekt zugeordnet werden.\n\nHinweis: eduhubEnrollmentId ist optional, da die Anmeldung erst nach Abschluss des Fragebogens erstellt wird.",
+      "setup_dialog_content": "Der Formbricks-Fragebogen erfüllt zwei Zwecke:\n\n1. Anmeldeinformationen sammeln\nSammle Bewerberinformationen, Motivationsschreiben und andere Anmeldedetails, die in der Bewerbungsübersicht angezeigt werden.\n\n2. Add-On-Preise definieren (für kostenpflichtige Angebote)\nWenn dein Angebot kostenpflichtig ist, kannst du Fragen zu optionalen Zusatzoptionen einbinden (z.B. \"Möchtest du ein Zertifikat hinzufügen? (+€50)\"). Das System extrahiert automatisch Preise, die in den Fragen erwähnt werden.\n\nTipp: Wenn du verschiedene Preiskategorien über Add-Ons anbietest (z.B. Basis, Standard, Premium), setze den Grundpreis auf 0. Das InfoPanel zeigt dann \"Preis: variabel\" an. Weitere Details findest du im Hilfetext des Grundpreises.\n\n---\n\nHidden Fields Konfiguration\n\nWichtig: Du musst Hidden Fields in deinem Formbricks Survey konfigurieren!\n\nErforderliche Hidden Fields:\n• eduhubUserId - Wird automatisch mit der EduHub Benutzer-ID befüllt\n• eduhubCourseId - Wird automatisch mit der ID des Angebots befüllt\n• eduhubEnrollmentId - Wird automatisch mit der Anmeldungs-ID befüllt (optional)\n\nIn Formbricks: Survey bearbeiten → Hidden Fields aktivieren → Diese Feld-IDs hinzufügen. Ohne diese Konfiguration können Antworten nicht korrekt zugeordnet werden.\n\nHinweis: eduhubEnrollmentId ist optional, da die Anmeldung erst nach Abschluss des Fragebogens erstellt wird.\n\n---\n\nAdd-On-Preis Extraktion\n\nFür kostenpflichtige Angebote:\n1. Füge Auswahloptionen für Add-Ons mit Preisinformationen in deine Fragen ein (z.B. \"Zertifikat (+€50)\" oder \"Workshop-Materialien: €25\")\n2. Verwende den Button \"Add-Ons validieren\" im Bereich Preiseinstellungen\n3. Das System analysiert deinen Fragebogen und extrahiert erkannte Preise\n4. Überprüfe und validiere die extrahierten Preise im Validierungsdialog\n5. Validierte Add-Ons werden automatisch mit Stripe synchronisiert für die Zahlungsabwicklung",
+      "help_text_hidden_fields": "Wichtig: Du musst Hidden Fields in deinem Formbricks Survey konfigurieren!\n\nErforderliche Hidden Fields:\n• eduhubUserId - Wird automatisch mit der EduHub Benutzer-ID befüllt\n• eduhubCourseId - Wird automatisch mit der ID des Angebots befüllt\n• eduhubEnrollmentId - Wird automatisch mit der Anmeldungs-ID befüllt (optional)\n\nIn Formbricks: Survey bearbeiten → Hidden Fields aktivieren → Diese Feld-IDs hinzufügen. Ohne diese Konfiguration können Antworten nicht korrekt zugeordnet werden.\n\nHinweis: eduhubEnrollmentId ist optional, da die Anmeldung erst nach Abschluss des Fragebogens erstellt wird.",
       "errors": {
         "FORMBRICKS_NOT_CONFIGURED": "Formbricks ist nicht konfiguriert. Bitte wende dich an die Administration.",
         "INVALID_SURVEY_URL": "Bitte gib eine gültige Formbricks Link-Survey-URL aus einer vertrauenswürdigen Formbricks-Domain ein.",
@@ -1815,7 +1848,7 @@
         "FORMBRICKS_REQUIRED_HIDDEN_FIELDS_MISSING": "Im Formbricks Survey fehlen erforderliche Hidden Fields. Bitte konfiguriere mindestens eduhubUserId und eduhubCourseId.",
         "FORMBRICKS_SURVEY_SAVE_ERROR": "Speichern der Formbricks-Survey-URL ist fehlgeschlagen. Bitte versuche es erneut.",
         "HASURA_NOT_CONFIGURED": "Die Serverkonfiguration ist unvollständig. Bitte wende dich an den Support.",
-        "COURSE_NOT_FOUND": "Der ausgewählte Kurs existiert nicht mehr."
+        "COURSE_NOT_FOUND": "Das ausgewählte Angebot existiert nicht mehr."
       },
       "no_survey_url": "Keine Fragebogen-URL konfiguriert",
       "loading_responses": "Lade Antworten...",
@@ -1827,10 +1860,10 @@
     "pricing": {
       "title": "Preiseinstellungen",
       "base_price": "Grundpreis (in Cent)",
-      "base_price_help": "Der Grundpreis für den Kurs in der kleinsten Währungseinheit (z.B. Cent für EUR). Bei 0 gelten Sonderregeln.",
+      "base_price_help": "Der Grundpreis für die Teilnahme in der kleinsten Währungseinheit (z.B. Cent für EUR). Bei 0 gelten Sonderregeln.",
       "base_price_learn_more": "Mehr erfahren",
       "base_price_dialog_title": "Grundpreis und variable Preise",
-      "base_price_dialog_content": "Der Grundpreis ist der Basisbetrag für die Kursteilnahme und wird in der kleinsten Währungseinheit angegeben (z.B. Cent für EUR).\n\n--- Standardfall: Grundpreis > 0 ---\n\nWenn du einen Grundpreis über 0 festlegst, wird dieser Betrag im InfoPanel des Kurses angezeigt. Falls du zusätzlich Zusatzoptionen (Add-Ons) definiert hast, erscheint ein Hinweis \"+ Zusatzoptionen\".\n\nBeispiel:\n• Grundpreis: 5000 Cent (50,00 EUR)\n• Add-On: Zertifikat für 1500 Cent (15,00 EUR)\n→ InfoPanel zeigt: \"50,00 EUR + Zusatzoptionen\"\n\n--- Sonderfall: Grundpreis = 0 ---\n\nDer Grundpreis 0 hat eine besondere Bedeutung und bietet Flexibilität für verschiedene Preiskategorien:\n\n1. Mit Zusatzoptionen (Add-Ons):\n   Das InfoPanel zeigt \"Preis: variabel\" an. Dies ist besonders nützlich, wenn:\n   • Verschiedene Preiskategorien über den Fragebogen angeboten werden\n   • Teilnehmende zwischen verschiedenen Paketen wählen können\n   • Der finale Preis von individuellen Add-On-Auswahlen abhängt\n\n   Beispiel: Du bietest verschiedene Teilnahmepakete an:\n   • Basis-Teilnahme: 0 EUR (Grundpreis)\n   • Standard-Paket: +50 EUR (Add-On)\n   • Premium-Paket: +100 EUR (Add-On)\n   → InfoPanel zeigt: \"Preis: variabel\"\n\n2. Ohne Zusatzoptionen:\n   Das InfoPanel zeigt \"Kostenfrei\" an.\n   Der Kurs ist vollständig kostenfrei ohne Zahlungsoptionen.\n\n--- Integration mit Fragebogen ---\n\nAdd-Ons werden über den Formbricks-Fragebogen definiert und validiert:\n1. Füge Auswahloptionen mit Preisinformationen in deinen Fragebogen ein\n2. Verwende den Button \"Add-Ons validieren\" um Preise zu extrahieren\n3. Validierte Add-Ons werden mit Stripe synchronisiert\n4. Bei der Anmeldung wählen Teilnehmende ihre gewünschten Optionen\n\nWeitere Details zur Fragebogen-Integration findest du im Hilfetext der Fragebogen URL.",
+      "base_price_dialog_content": "Der Grundpreis ist der Basisbetrag für die Teilnahme und wird in der kleinsten Währungseinheit angegeben (z.B. Cent für EUR).\n\n--- Standardfall: Grundpreis > 0 ---\n\nWenn du einen Grundpreis über 0 festlegst, wird dieser Betrag im InfoPanel des Angebots angezeigt. Falls du zusätzlich Zusatzoptionen (Add-Ons) definiert hast, erscheint ein Hinweis \"+ Zusatzoptionen\".\n\nBeispiel:\n• Grundpreis: 5000 Cent (50,00 EUR)\n• Add-On: Zertifikat für 1500 Cent (15,00 EUR)\n→ InfoPanel zeigt: \"50,00 EUR + Zusatzoptionen\"\n\n--- Sonderfall: Grundpreis = 0 ---\n\nDer Grundpreis 0 hat eine besondere Bedeutung und bietet Flexibilität für verschiedene Preiskategorien:\n\n1. Mit Zusatzoptionen (Add-Ons):\n   Das InfoPanel zeigt \"Preis: variabel\" an. Dies ist besonders nützlich, wenn:\n   • Verschiedene Preiskategorien über den Fragebogen angeboten werden\n   • Teilnehmende zwischen verschiedenen Paketen wählen können\n   • Der finale Preis von individuellen Add-On-Auswahlen abhängt\n\n   Beispiel: Du bietest verschiedene Teilnahmepakete an:\n   • Basis-Teilnahme: 0 EUR (Grundpreis)\n   • Standard-Paket: +50 EUR (Add-On)\n   • Premium-Paket: +100 EUR (Add-On)\n   → InfoPanel zeigt: \"Preis: variabel\"\n\n2. Ohne Zusatzoptionen:\n   Das InfoPanel zeigt \"Kostenfrei\" an.\n   Das Angebot ist vollständig kostenfrei ohne Zahlungsoptionen.\n\n--- Integration mit Fragebogen ---\n\nAdd-Ons werden über den Formbricks-Fragebogen definiert und validiert:\n1. Füge Auswahloptionen mit Preisinformationen in deinen Fragebogen ein\n2. Verwende den Button \"Add-Ons validieren\" um Preise zu extrahieren\n3. Validierte Add-Ons werden mit Stripe synchronisiert\n4. Bei der Anmeldung wählen Teilnehmende ihre gewünschten Optionen\n\nWeitere Details zur Fragebogen-Integration findest du im Hilfetext der Fragebogen URL.",
       "currency": "Währung",
       "validate_addons": "Add-Ons validieren",
       "validating": "Validiere...",
@@ -2899,19 +2932,19 @@
       "generating_preview": "Wird generiert..."
     },
     "triggers": {
-      "APPLICATION_RECEIVED": "Gesendet, wenn ein Benutzer sich für einen Kurs bewirbt",
+      "APPLICATION_RECEIVED": "Gesendet, wenn ein Benutzer sich für ein Angebot bewirbt",
       "APPLICATION_CONFIRMED": "Gesendet, wenn die Teilnahme eines Benutzers bestätigt wird",
-      "INVITE": "Gesendet, wenn ein Admin Benutzer zu einem Kurs einlädt",
+      "INVITE": "Gesendet, wenn ein Admin Benutzer zu einem Angebot einlädt",
       "DECLINE": "Gesendet, wenn ein Admin Bewerbungen ablehnt",
-      "REGISTRATION_CONFIRMED": "Gesendet, wenn sich ein Benutzer direkt für einen Kurs/eine Veranstaltung registriert",
-      "REGISTRATION_CONFIRMED_PAID": "Gesendet, wenn die Zahlung eines Benutzers für einen Kurs bestätigt wurde",
+      "REGISTRATION_CONFIRMED": "Gesendet, wenn sich ein Benutzer direkt für ein Angebot registriert",
+      "REGISTRATION_CONFIRMED_PAID": "Gesendet, wenn die Zahlung eines Benutzers für ein Angebot bestätigt wurde",
       "APPLICATION_RECEIVED_PAID": "Gesendet, wenn eine Bewerbung für einen kostenpflichtigen Kurs eingegangen ist",
       "SESSION_REMINDER": "Gesendet vor Beginn der Sitzungen (24h, 1h, 15min vorher)",
       "USER_CREATED": "Gesendet, wenn ein neues Benutzerkonto erstellt wird",
       "ORGANIZER_ADDED": "Gesendet, wenn ein Benutzer als Organisator zu einem Kurs oder Event hinzugefügt wird",
       "CANCELLATION_REQUEST_ORGANIZER": "Gesendet an Veranstalter und Organisations-Admins, wenn jemand die Stornierung einer bezahlten Anmeldung anfragt",
       "CANCELLATION_REQUEST_CONFIRMATION": "Gesendet an Teilnehmende als Bestätigung ihrer Stornierungsanfrage für eine bezahlte Anmeldung",
-      "WAITLIST_NOTICE": "Gesendet, wenn ein Benutzer auf die Warteliste kommt, weil der Kurs voll ist",
+      "WAITLIST_NOTICE": "Gesendet, wenn ein Benutzer auf die Warteliste kommt, weil das Angebot ausgebucht ist",
       "CERTIFICATE_ACHIEVEMENT_READY": "Gesendet, wenn ein Leistungszertifikat für eine Teilnahme ausgestellt wird",
       "CERTIFICATE_ATTENDANCE_READY": "Gesendet, wenn eine Teilnahmebescheinigung für eine Teilnahme ausgestellt wird",
       "ENROLLMENT_CANCELLED": "Gesendet, wenn eine Anmeldung storniert wird",

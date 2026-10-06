@@ -599,6 +599,10 @@ export interface AdminCourseList_CourseGroupOption {
    * When set, this group automatically includes all published courses of the given program type (e.g. COURSES, EVENTS, DEGREES) instead of relying on manual CourseGroup assignments.
    */
   programType: string | null;
+  /**
+   * Whether this slider row renders courses (COURSE, default), projects (PROJECT) or jobs (JOB). PROJECT rows compose their membership from the ProjectSliderCourseGroup / ProjectSliderProjectGroup selections. JOB rows compose their membership from the JobSliderJobType selections.
+   */
+  contentType: string;
 }
 
 export interface AdminCourseList {

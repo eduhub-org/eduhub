@@ -1196,36 +1196,39 @@
       "placeholder": "Select tile slider groups"
     },
     "course_group": {
-      "label": "Course Group",
-      "placeholder": "Select course groups",
-      "slider_badge": "Homepage slider"
+      "label": "Sliders & widgets",
+      "placeholder": "Select groups",
+      "slider_badge": "Homepage slider",
+      "help_text": "Adds the offering to sliders on the homepage or in widgets. Sliders and widget groups are defined in the settings under course groups. Every offering automatically appears in the slider of its type (courses, events, degrees); marked groups are visible on the homepage."
     },
     "course_series": {
-      "label": "Course series",
-      "placeholder": "Select or create a course series",
-      "help_text": "All runs of the same course belong to one course series. The course page shows projects from past runs of the series. When a course without a series is published, it is grouped automatically with earlier courses of the same title. One-off courses don't need a series.",
-      "none": "No course series",
+      "label": "Series",
+      "placeholder": "Select or create a series",
+      "help_text": "All runs of the same offering belong to one series. The offering's page shows projects from past runs of the series. When an offering without a series is published, it is grouped automatically with earlier offerings of the same title. One-off offerings don't need a series.",
+      "none": "No series",
       "other_runs": "Other runs in this series:",
       "no_other_runs": "No other runs in this series yet."
     },
     "cover_image": {
       "label": "Cover Image",
       "upload_text": "Click to upload cover image",
-      "alt": "Course cover image"
+      "alt": "Cover image of the offering",
+      "help_text": "Shown on the offering's page and in the sliders."
     },
     "instructors": {
       "label": "Instructors",
-      "add": "Add Instructor"
+      "add": "Add Instructor",
+      "help_text": "Instructors can manage the offering and are named on its page."
     },
     "funding_organizations": {
       "label": "Funding Organizations",
       "add": "Add Funding Organization"
     },
     "certificates": {
-      "label": "Certificates"
+      "enable": "Award certificates",
+      "disabled_hint": "Turn this on if participants should receive an attendance or achievement certificate."
     },
     "possible_certificates": {
-      "label": "Possible Certificates",
       "attendance_certificate": "Attendance Certificate",
       "achievement_certificate": "Achievement Certificate"
     },
@@ -1245,7 +1248,6 @@
     },
     "registration_type": {
       "label": "Registration Type",
-      "help_text": "Select how participants can register for this course",
       "options": {
         "APPROVAL_WITH_INPUT": "Approval Required with Questionnaire and Application Process",
         "DIRECT_CONFIRMATION": "Direct Confirmation without Questionnaire",
@@ -1263,7 +1265,9 @@
       "title": "Participant chat",
       "button_open_element": "To Element room",
       "button_open_mattermost": "To Mattermost channel",
-      "button_open_chat": "Open chat"
+      "button_open_chat": "Open chat",
+      "explanation": "A Matrix room is the chat for this offering. Confirmed participants see a button to the room on the offering's page and join it from there. Instructors automatically get moderator rights in the room; instructors added later are also invited.",
+      "explanation_external": "Confirmed participants see a button to this chat on the offering's page."
     },
     "matrix_room": {
       "button_create": "Create Matrix Room",
@@ -1284,9 +1288,17 @@
     },
     "email_templates": {
       "label": "Email Templates",
-      "create_button": "Create Email Templates",
-      "edit_button": "Edit Email Templates",
-      "external_registration_note": "Email templates are not available for external registration courses."
+      "external_registration_note": "Email templates are not available for offerings with external registration.",
+      "help_text": "Without changes, the default templates are sent. Only customize what should differ for this offering.",
+      "standard": "Default",
+      "customized": "Customized",
+      "customize": "Customize",
+      "edit": "Edit",
+      "reset": "Reset",
+      "reset_confirm": "Delete the customized \"{name}\"? The default template will be sent again afterwards.",
+      "other_customized": "Other customized templates",
+      "dialog_hint": "Changes are saved automatically and apply to this offering only.",
+      "default_missing": "There is no default template to copy for this email."
     },
     "ects": {
       "label": "ECTS Credits",
@@ -1312,8 +1324,9 @@
     },
     "learning_goals": {
       "label": "Learning Goals",
-      "help_text": "Define what participants will achieve after completing this course. Write each learning goal on a new line without numbering. Use action verbs like 'understand', 'apply', 'analyze', 'create' (see: https://www.bloomstaxonomy.org).",
-      "placeholder": "Understand the fundamentals of the topic\nApply key concepts in practical scenarios\nAnalyze complex problems and solutions\nCreate innovative approaches"
+      "help_text": "Define what participants should have achieved by the end. Write each learning goal on a new line without numbering. Use action verbs like 'understand', 'apply', 'analyze', 'create' (see: https://www.bloomstaxonomy.org).",
+      "placeholder": "Understand the fundamentals of the topic\nApply key concepts in practical scenarios\nAnalyze complex problems and solutions\nCreate innovative approaches",
+      "certificate_hint": "Learning goals are printed on the achievement certificate."
     },
     "add_course_button": "Add Course",
     "add_event_button": "Add Event",
@@ -1399,8 +1412,28 @@
     },
     "participants": {
       "label": "Participants",
-      "show_available_places": "Show available places on the course page",
-      "show_available_places_hint": "Unchecked, the course page shows only how many people are taking part. Requires a maximum number of participants."
+      "show_available_places": "Show available places on the offering's page",
+      "show_available_places_hint": "When off, the page only shows how many people are taking part. Requires a maximum number of participants."
+    },
+    "registration_switches": {
+      "external": {
+        "label": "External registration",
+        "help_text": "Registration happens on an external page. The other options do not apply."
+      },
+      "application": {
+        "label": "Application process",
+        "help_text": "People apply, and you choose who takes part."
+      },
+      "questionnaire": {
+        "label": "Questionnaire",
+        "help_text": "A questionnaire (Formbricks) is filled in when registering."
+      },
+      "payment": {
+        "label": "Payment",
+        "help_text": "Taking part costs a fee that is paid when registering."
+      },
+      "application_locks_hint": "An application process always includes a questionnaire and cannot be combined with payment.",
+      "summary": "Registration type: {mode}"
     }
   },
   "manageCourse": {
@@ -1810,7 +1843,7 @@
     "formbricks": {
       "title": "Enrollment Questionnaire",
       "description": "Link a Formbricks questionnaire that will be shown instead of the motivation letter during enrollment/application.",
-      "tooltip": "Applicants will fill out this questionnaire when registering for the course. Responses will be displayed in the applications overview.",
+      "tooltip": "Applicants will fill out this questionnaire when registering for the offering. Responses will be displayed in the applications overview.",
       "survey_url_label": "Formbricks Enrollment Survey URL",
       "survey_url_helper": "Paste the URL of your Formbricks Link Survey",
       "survey_url_helper_with_default": "Paste the URL of your Formbricks Link Survey (leave empty to use program default)",
@@ -1821,8 +1854,8 @@
       "help_text": "Collect registration information and optional add-on selections via Formbricks survey.",
       "learn_more": "Learn more",
       "setup_dialog_title": "Formbricks Survey Setup",
-      "setup_dialog_content": "The Formbricks survey serves two purposes:\n\n1. Collect Registration Information\nCollect applicant information, motivation letters, and other registration details that will be displayed in the applications overview.\n\n2. Define Add-on Prices (for payment-enabled courses)\nIf your course requires payment, you can include questions about optional add-ons (e.g., \"Would you like to add a certificate? (+€50)\"). The system automatically extracts prices mentioned in survey questions.\n\nTip: If you offer different price categories via add-ons (e.g., Basic, Standard, Premium), set the base price to 0. The InfoPanel will then display \"Price: variable\". For more details, see the base price help text.\n\n---\n\nHidden Fields Configuration\n\nImportant: You must configure Hidden Fields in your Formbricks survey!\n\nRequired Hidden Fields:\n• eduhubUserId - Automatically filled with EduHub user ID\n• eduhubCourseId - Automatically filled with course ID\n• eduhubEnrollmentId - Automatically filled with enrollment ID (optional)\n\nIn Formbricks: Edit Survey → Enable Hidden Fields → Add these field IDs. Without this configuration, responses cannot be properly matched.\n\nNote: eduhubEnrollmentId is optional because the enrollment is created AFTER the survey is completed during registration.\n\n---\n\nAdd-on Price Extraction\n\nFor courses with payment enabled:\n1. Include add-on selection answer options with price information in your survey questions (e.g., \"Certificate (+€50)\" or \"Workshop materials: €25\")\n2. Use the \"Validate Add-ons\" button in the Pricing Settings section\n3. The system will analyze your survey and extract detected prices\n4. Review and validate the extracted prices in the validation dialog\n5. Validated add-ons are automatically synced with Stripe for payment processing",
-      "help_text_hidden_fields": "Important: You must configure Hidden Fields in your Formbricks survey!\n\nRequired Hidden Fields:\n• eduhubUserId - Automatically filled with EduHub user ID\n• eduhubCourseId - Automatically filled with course ID\n• eduhubEnrollmentId - Automatically filled with enrollment ID (optional)\n\nIn Formbricks: Edit Survey → Enable Hidden Fields → Add these field IDs. Without this configuration, responses cannot be properly matched.\n\nNote: eduhubEnrollmentId is optional because the enrollment is created AFTER the survey is completed during registration.",
+      "setup_dialog_content": "The Formbricks survey serves two purposes:\n\n1. Collect Registration Information\nCollect applicant information, motivation letters, and other registration details that will be displayed in the applications overview.\n\n2. Define Add-on Prices (for paid offerings)\nIf your offering requires payment, you can include questions about optional add-ons (e.g., \"Would you like to add a certificate? (+€50)\"). The system automatically extracts prices mentioned in survey questions.\n\nTip: If you offer different price categories via add-ons (e.g., Basic, Standard, Premium), set the base price to 0. The InfoPanel will then display \"Price: variable\". For more details, see the base price help text.\n\n---\n\nHidden Fields Configuration\n\nImportant: You must configure Hidden Fields in your Formbricks survey!\n\nRequired Hidden Fields:\n• eduhubUserId - Automatically filled with EduHub user ID\n• eduhubCourseId - Automatically filled with the offering ID\n• eduhubEnrollmentId - Automatically filled with enrollment ID (optional)\n\nIn Formbricks: Edit Survey → Enable Hidden Fields → Add these field IDs. Without this configuration, responses cannot be properly matched.\n\nNote: eduhubEnrollmentId is optional because the enrollment is created AFTER the survey is completed during registration.\n\n---\n\nAdd-on Price Extraction\n\nFor paid offerings:\n1. Include add-on selection answer options with price information in your survey questions (e.g., \"Certificate (+€50)\" or \"Workshop materials: €25\")\n2. Use the \"Validate Add-ons\" button in the Pricing Settings section\n3. The system will analyze your survey and extract detected prices\n4. Review and validate the extracted prices in the validation dialog\n5. Validated add-ons are automatically synced with Stripe for payment processing",
+      "help_text_hidden_fields": "Important: You must configure Hidden Fields in your Formbricks survey!\n\nRequired Hidden Fields:\n• eduhubUserId - Automatically filled with EduHub user ID\n• eduhubCourseId - Automatically filled with the offering ID\n• eduhubEnrollmentId - Automatically filled with enrollment ID (optional)\n\nIn Formbricks: Edit Survey → Enable Hidden Fields → Add these field IDs. Without this configuration, responses cannot be properly matched.\n\nNote: eduhubEnrollmentId is optional because the enrollment is created AFTER the survey is completed during registration.",
       "no_survey_url": "No survey URL configured",
       "loading_responses": "Loading responses...",
       "error_loading_responses": "Error loading questionnaire responses",
@@ -1839,16 +1872,16 @@
         "FORMBRICKS_REQUIRED_HIDDEN_FIELDS_MISSING": "The survey must define hidden fields eduhubUserId and eduhubCourseId.",
         "FORMBRICKS_SURVEY_SAVE_ERROR": "Saving the Formbricks survey URL failed. Please try again.",
         "HASURA_NOT_CONFIGURED": "The server configuration is incomplete. Please contact support.",
-        "COURSE_NOT_FOUND": "The selected course no longer exists."
+        "COURSE_NOT_FOUND": "The selected offering no longer exists."
       }
     },
     "pricing": {
       "title": "Pricing Settings",
       "base_price": "Base Price (in cents)",
-      "base_price_help": "The base price for the course in the smallest currency unit (e.g., cents for EUR). Special rules apply when set to 0.",
+      "base_price_help": "The base price for taking part in the smallest currency unit (e.g., cents for EUR). Special rules apply when set to 0.",
       "base_price_learn_more": "Learn more",
       "base_price_dialog_title": "Base Price and Variable Pricing",
-      "base_price_dialog_content": "The base price is the base amount for course participation and is specified in the smallest currency unit (e.g., cents for EUR).\n\n--- Standard Case: Base Price > 0 ---\n\nWhen you set a base price above 0, this amount is displayed in the course InfoPanel. If you have additionally defined add-ons, a note \"+ Add-ons\" will appear.\n\nExample:\n• Base price: 5000 cents (50.00 EUR)\n• Add-on: Certificate for 1500 cents (15.00 EUR)\n→ InfoPanel shows: \"50.00 EUR + Add-ons\"\n\n--- Special Case: Base Price = 0 ---\n\nA base price of 0 has special significance and provides flexibility for different price categories:\n\n1. With Add-ons:\n   The InfoPanel displays \"Price: variable\". This is particularly useful when:\n   • Offering different price categories via the questionnaire\n   • Participants can choose between different packages\n   • The final price depends on individual add-on selections\n\n   Example: You offer different participation packages:\n   • Basic participation: 0 EUR (base price)\n   • Standard package: +50 EUR (add-on)\n   • Premium package: +100 EUR (add-on)\n   → InfoPanel shows: \"Price: variable\"\n\n2. Without Add-ons:\n   The InfoPanel displays \"Free\".\n   The course is completely free without payment options.\n\n--- Integration with Questionnaire ---\n\nAdd-ons are defined and validated via the Formbricks questionnaire:\n1. Include selection options with price information in your questionnaire\n2. Use the \"Validate Add-ons\" button to extract prices\n3. Validated add-ons are synced with Stripe\n4. During registration, participants select their desired options\n\nFor more details on questionnaire integration, see the help text for the Questionnaire URL.",
+      "base_price_dialog_content": "The base price is the base amount for taking part and is specified in the smallest currency unit (e.g., cents for EUR).\n\n--- Standard Case: Base Price > 0 ---\n\nWhen you set a base price above 0, this amount is displayed in the InfoPanel of the offering. If you have additionally defined add-ons, a note \"+ Add-ons\" will appear.\n\nExample:\n• Base price: 5000 cents (50.00 EUR)\n• Add-on: Certificate for 1500 cents (15.00 EUR)\n→ InfoPanel shows: \"50.00 EUR + Add-ons\"\n\n--- Special Case: Base Price = 0 ---\n\nA base price of 0 has special significance and provides flexibility for different price categories:\n\n1. With Add-ons:\n   The InfoPanel displays \"Price: variable\". This is particularly useful when:\n   • Offering different price categories via the questionnaire\n   • Participants can choose between different packages\n   • The final price depends on individual add-on selections\n\n   Example: You offer different participation packages:\n   • Basic participation: 0 EUR (base price)\n   • Standard package: +50 EUR (add-on)\n   • Premium package: +100 EUR (add-on)\n   → InfoPanel shows: \"Price: variable\"\n\n2. Without Add-ons:\n   The InfoPanel displays \"Free\".\n   The offering is completely free without payment options.\n\n--- Integration with Questionnaire ---\n\nAdd-ons are defined and validated via the Formbricks questionnaire:\n1. Include selection options with price information in your questionnaire\n2. Use the \"Validate Add-ons\" button to extract prices\n3. Validated add-ons are synced with Stripe\n4. During registration, participants select their desired options\n\nFor more details on questionnaire integration, see the help text for the Questionnaire URL.",
       "currency": "Currency",
       "validate_addons": "Validate Add-ons",
       "validating": "Validating...",
@@ -2914,19 +2947,19 @@
       "generating_preview": "Generating..."
     },
     "triggers": {
-      "APPLICATION_RECEIVED": "Sent when a user applies for a course",
+      "APPLICATION_RECEIVED": "Sent when a user applies for an offering",
       "APPLICATION_CONFIRMED": "Sent when a user's participation is confirmed",
-      "INVITE": "Sent when admin invites users to a course",
+      "INVITE": "Sent when admin invites users to an offering",
       "DECLINE": "Sent when admin rejects applications",
-      "REGISTRATION_CONFIRMED": "Sent when a user directly registers for a course/event",
-      "REGISTRATION_CONFIRMED_PAID": "Sent when a user's payment for a course registration is confirmed",
+      "REGISTRATION_CONFIRMED": "Sent when a user directly registers for an offering",
+      "REGISTRATION_CONFIRMED_PAID": "Sent when a user's payment for a registration is confirmed",
       "APPLICATION_RECEIVED_PAID": "Sent when an application for a paid course is received",
       "SESSION_REMINDER": "Sent before sessions start (24h, 1h, 15min before)",
       "USER_CREATED": "Sent when a new user account is created",
       "ORGANIZER_ADDED": "Sent when a user is added as an organizer to a course or event",
       "CANCELLATION_REQUEST_ORGANIZER": "Sent to organizers and organization admins when someone asks to cancel a paid registration",
       "CANCELLATION_REQUEST_CONFIRMATION": "Sent to participants confirming their cancellation request for a paid registration",
-      "WAITLIST_NOTICE": "Sent when a user joins the waitlist because the course is full",
+      "WAITLIST_NOTICE": "Sent when a user joins the waitlist because the offering is full",
       "CERTIFICATE_ACHIEVEMENT_READY": "Sent when an achievement certificate is issued for a participant",
       "CERTIFICATE_ATTENDANCE_READY": "Sent when an attendance certificate is issued for a participant",
       "ENROLLMENT_CANCELLED": "Sent when an enrollment is cancelled",

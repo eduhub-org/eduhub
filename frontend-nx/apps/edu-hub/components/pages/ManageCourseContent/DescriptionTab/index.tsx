@@ -201,7 +201,9 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
           </ChatLinkButton>
         </div>
       ) : null}
-      <div className="grid grid-cols-1 md:grid-cols-2">
+      {/* Learning goals are printed on the achievement certificate, so without one there is
+          nothing to show next to the short description and it takes the full width. */}
+      <div className={`grid grid-cols-1 ${course.achievementCertificatePossible ? 'md:grid-cols-2' : ''}`}>
         <InputField
           variant="eduhub"
           type="textarea"
@@ -215,47 +217,49 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
           className="h-64"
           maxLength={500}
         />
-        <div className="mx-4 mb-4">
-          <div className="flex items-center mb-2">
-            <Tooltip title={t('learning_goals.help_text')} placement="top">
-              <HelpOutline className="text-label-primary cursor-pointer mr-1" />
-            </Tooltip>
-            <h3 className="text-label-primary text-md">{t('learning_goals.label')}</h3>
-          </div>
-          {/* Phones size the goals to their content instead of reserving a fixed block. */}
-          <div className="p-4 md:h-64 overflow-y-auto text-white">
-            {course.learningGoals ? (
-              <ul className="list-none">
-                {course.learningGoals
-                  .split('\n')
-                  .filter((goal) => goal.trim() !== '')
-                  .map((goal) => {
-                    const goalKey = goal.trim().substring(0, 50).replace(/\s+/g, '-');
-                    return (
-                      <li key={goalKey} className="pl-6 mb-6">
-                        <div className="flex">
-                          <img src="/images/course/checkmark.svg" alt="check mark" className="mr-2 inline-block" />
-                          <div className="ml-2">
-                            {goal.split('\n').map((line) => {
-                              const lineKey = `${goalKey}-${line.trim().substring(0, 20).replace(/\s+/g, '-')}`;
-                              return (
-                                <span key={lineKey}>
-                                  {line}
-                                  <br />
-                                </span>
-                              );
-                            })}
+        {course.achievementCertificatePossible && (
+          <div className="mx-4 mb-4">
+            <div className="flex items-center mb-2">
+              <Tooltip title={t('learning_goals.help_text')} placement="top">
+                <HelpOutline className="text-label-primary cursor-pointer mr-1" />
+              </Tooltip>
+              <h3 className="text-label-primary text-md">{t('learning_goals.label')}</h3>
+            </div>
+            {/* Phones size the goals to their content instead of reserving a fixed block. */}
+            <div className="p-4 md:h-64 overflow-y-auto text-white">
+              {course.learningGoals ? (
+                <ul className="list-none">
+                  {course.learningGoals
+                    .split('\n')
+                    .filter((goal) => goal.trim() !== '')
+                    .map((goal) => {
+                      const goalKey = goal.trim().substring(0, 50).replace(/\s+/g, '-');
+                      return (
+                        <li key={goalKey} className="pl-6 mb-6">
+                          <div className="flex">
+                            <img src="/images/course/checkmark.svg" alt="check mark" className="mr-2 inline-block" />
+                            <div className="ml-2">
+                              {goal.split('\n').map((line) => {
+                                const lineKey = `${goalKey}-${line.trim().substring(0, 20).replace(/\s+/g, '-')}`;
+                                return (
+                                  <span key={lineKey}>
+                                    {line}
+                                    <br />
+                                  </span>
+                                );
+                              })}
+                            </div>
                           </div>
-                        </div>
-                      </li>
-                    );
-                  })}
-              </ul>
-            ) : (
-              <p className="text-gray-400 italic">{t('learning_goals.read_only_placeholder')}</p>
-            )}
+                        </li>
+                      );
+                    })}
+                </ul>
+              ) : (
+                <p className="text-gray-400 italic">{t('learning_goals.read_only_placeholder')}</p>
+              )}
+            </div>
           </div>
-        </div>
+        )}
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2">
         <MobileCollapsible
