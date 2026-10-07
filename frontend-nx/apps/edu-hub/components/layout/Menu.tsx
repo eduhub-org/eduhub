@@ -98,9 +98,17 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
   // Settings entry: super-admins always see it; org admins only when they hold canManageSettings
   // on at least one organization (matching Hasura's write permission on OrganizationAdmin/Program).
   const canManageSettingsMenu = isAdmin || (isOrgAdmin && orgAdminCaps.canManageSettings);
+  // Statistics entry: super-admins always see it; org admins when they hold canViewStatistics on at
+  // least one organization (they then see the statistics of those organizations' programs).
+  const canViewStatisticsMenu = isAdmin || (isOrgAdmin && orgAdminCaps.canViewStatistics);
   // Whether the "Verwaltung" section has any entries for this user. Plain instructors have no
   // management entries and skip the section.
-  const hasManagement = canManageSettingsMenu || canManageCoursesMenu || canManageEventsMenu || canManageDegreesMenu;
+  const hasManagement =
+    canManageSettingsMenu ||
+    canManageCoursesMenu ||
+    canManageEventsMenu ||
+    canManageDegreesMenu ||
+    canViewStatisticsMenu;
 
   const t = useTranslations('common');
 
@@ -128,6 +136,7 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
       }}
       PaperProps={{
         className: 'light',
+        sx: { mt: '8px' },
       }}
     >
       <ListSubheader disableSticky>{t('menu.section_personal')}</ListSubheader>
@@ -204,7 +213,7 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
         </MenuItem>
       )}
 
-      {isAdmin && (
+      {canViewStatisticsMenu && (
         <MenuItem component={Link} href="/statistics" onClick={closeMenu} selected={isActiveRoute('/statistics')}>
           {t('menu.statistics')}
         </MenuItem>

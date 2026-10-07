@@ -29,7 +29,7 @@ export const WidgetSliderShell: FC<WidgetSliderShellProps> = ({
       <meta name="robots" content="noindex, nofollow" />
     </Head>
     <ClientOnly>
-      <div className="min-h-[435px] h-[435px] bg-transparent overflow-hidden flex items-center">
+      <div className="min-h-[460px] h-[460px] bg-transparent overflow-hidden flex items-center">
         {isLoading ? (
           <div className="flex items-center justify-center w-full h-full">
             <Loading />

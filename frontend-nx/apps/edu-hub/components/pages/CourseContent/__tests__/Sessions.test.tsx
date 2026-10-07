@@ -21,8 +21,9 @@ jest.mock('../../../../hooks/authentication', () => ({
   useIsInstructor: () => false,
 }));
 
+const mockUseRoleQuery = jest.fn<{ data: unknown }, unknown[]>(() => ({ data: null }));
 jest.mock('../../../../hooks/authedQuery', () => ({
-  useRoleQuery: () => ({ data: null }),
+  useRoleQuery: (...args: unknown[]) => mockUseRoleQuery(...args),
 }));
 
 jest.mock('../../../../helpers/util', () => ({
@@ -340,5 +341,30 @@ describe('Sessions Component - program sessions in an event agenda', () => {
     // Three days, but only the two course days carry the shared address.
     expect(screen.getByText('Montag, 29.01.2024')).toBeInTheDocument();
     expect(screen.getAllByText('Test Address 1')).toHaveLength(2);
+  });
+});
+
+describe('Sessions Component - labelled places', () => {
+  afterEach(() => mockUseRoleQuery.mockImplementation(() => ({ data: null })));
+
+  it('shows the short label of a LocationAddress first and links the map to the address', () => {
+    mockUseRoleQuery.mockImplementation(() => ({
+      data: { LocationAddress: [{ id: 7, shortLabel: 'Coworking', address: 'Kuhnkestr. 6', locationOption: 'KIEL' }] },
+    }));
+    render(
+      <Sessions
+        sessions={[
+          {
+            ...mockSessions[0],
+            SessionAddresses: [{ ...mockSessions[0].SessionAddresses[0], locationAddressId: 7 }],
+          },
+        ]}
+        courseLocations={mockCourseLocations}
+        isLoggedInParticipant={true}
+      />
+    );
+
+    const link = screen.getByText('Coworking (Kuhnkestr. 6)');
+    expect(link).toHaveAttribute('href', expect.stringContaining(encodeURIComponent('Kuhnkestr. 6')));
   });
 });

@@ -186,3 +186,19 @@ export const COURSE_LOCATIONS_BY_DEFAULT_SESSION_ADDRESS_ID = gql`
     }
   }
 `;
+
+/**
+ * Every LocationAddress, for the public iCal feed: it resolves addresses by id
+ * and also recognises free-text addresses that match one by address or alias.
+ */
+export const LOCATION_ADDRESSES_FOR_FEED = gql`
+  query LocationAddressesForFeed {
+    LocationAddress {
+      id
+      shortLabel
+      address
+      aliases
+      locationOption
+    }
+  }
+`;

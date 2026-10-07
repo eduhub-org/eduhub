@@ -2,6 +2,7 @@ import React, { FC, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { TimeSeriesLineChart } from '../../../common/charts/TimeSeriesLineChart';
 import { useRoleQuery } from '../../../../hooks/authedQuery';
+import { useStatisticsProgramWhere } from '../../../../hooks/manageScope';
 import { PROGRAM_STATISTICS } from '../../../../queries/programList';
 import { ProgramStatistics } from '../../../../queries/__generated__/ProgramStatistics';
 import Loading from '../../../common/Loading';
@@ -20,7 +21,10 @@ export const CertificateStatistics: FC = () => {
   const [selectedTypes, setSelectedTypes] = useState<{ id: number; name: string }[]>([]);
 
   const { data: typeData } = useRoleQuery<ProgramTypesList>(PROGRAM_TYPES);
-  const { data: programData, loading, error } = useRoleQuery<ProgramStatistics>(PROGRAM_STATISTICS);
+  const programWhere = useStatisticsProgramWhere();
+  const { data: programData, loading, error } = useRoleQuery<ProgramStatistics>(PROGRAM_STATISTICS, {
+    variables: { where: programWhere },
+  });
 
   const typeOptions = useMemo(
     () =>

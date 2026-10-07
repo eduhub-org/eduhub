@@ -497,8 +497,11 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
         data.CourseGroupOption
           // Program-type based groups (Courses, Events, Degrees) are assigned
           // automatically via the program type, so they must not be manually
-          // selectable here.
-          ?.filter((option: { programType: string | null }) => option.programType == null)
+          // selectable here. Project and job slider rows are not course groups.
+          ?.filter(
+            (option: { programType: string | null; contentType: string }) =>
+              option.programType == null && option.contentType === 'COURSE'
+          )
           .map((option: { id: number; title: string | null }) => ({
             id: option.id,
             name: isKnownCourseGroupOptionTitle(option.title)
@@ -917,6 +920,57 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
     ]
   );
 
+  // Phones: one card per offering instead of the wide grid; the expanded row holds the rest.
+  const renderMobileRow = useCallback(
+    (course: AdminCourseList_Course) => {
+      const applications = getApplicationsCount(course);
+      return (
+        <div className="flex flex-col gap-1 min-w-0">
+          <div className="flex items-center gap-2 min-w-0">
+            <span
+              className={`w-3 h-3 shrink-0 rounded-full ${course.published ? 'bg-green-500' : 'bg-red-500'}`}
+              title={course.published ? t('table_header.published') : t('not_published')}
+            />
+            <div className="flex-1 min-w-0">
+              <InputField
+                variant="material"
+                type="input"
+                placeholder={t(`default_title.${messageKey}`)}
+                itemId={course.id}
+                value={course.title || ''}
+                updateValueMutation={UPDATE_COURSE_TITLE}
+                refetchQueries={['AdminCourseList']}
+              />
+            </div>
+            <a
+              href={`course/${course.id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="shrink-0 text-blue-600 hover:text-blue-800"
+              title={t('open_in_new_tab')}
+              aria-label={t('open_in_new_tab')}
+            >
+              <MdOpenInNew className="text-lg" aria-hidden />
+            </a>
+          </div>
+          <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-label-secondary">
+            {course.Program?.shortTitle && <span>{course.Program.shortTitle}</span>}
+            <span>{courseStatus(course.status)}</span>
+            {applications !== '' && (
+              <span>
+                {t('table_header.applications')}: {applications}
+              </span>
+            )}
+            <span>
+              {t('table_header.confirmed')}: {getConfirmedCount(course)}
+            </span>
+          </div>
+        </div>
+      );
+    },
+    [t, messageKey, getApplicationsCount, getConfirmedCount]
+  );
+
   const handlePageSizeChange = useCallback(
     (newPageSize: number) => {
       // Update the filter with new page size (useTableGrid handles offset)
@@ -969,6 +1023,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, programType, organizationI
           onAddButtonClick={handleAddCourse}
           addButtonDisabledHint={addDisabledHint}
           addButtonText={addButtonText}
+          renderMobileRow={renderMobileRow}
           expandableRowComponent={(props) => (
             <ExpandableCourseRow
               course={props.row}

@@ -104,3 +104,28 @@ export const useManageCourseWhere = (): Course_bool_exp => {
     };
   }, [isAdmin, userId]);
 };
+
+// Program_bool_exp scoping for the statistics page. Org admins see the statistics of every program
+// (all types) of the organizations where their grant carries canViewStatistics - the same rule as
+// the canViewStatistics branches of the Hasura org_admin_access select permissions. Without it the
+// page would also list other organizations' published programs (public read) with empty numbers.
+export const useStatisticsProgramWhere = (): Program_bool_exp => {
+  const isAdmin = useIsAdmin();
+  const userId = useUserId();
+
+  return useMemo(() => {
+    if (isAdmin) {
+      return {};
+    }
+    if (!userId) {
+      return MATCH_NONE;
+    }
+    return {
+      Organization: {
+        OrganizationAdmins: {
+          _and: [{ userId: { _eq: userId } }, { canViewStatistics: { _eq: true } }],
+        },
+      },
+    };
+  }, [isAdmin, userId]);
+};

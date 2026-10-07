@@ -21,8 +21,8 @@ export const PROGRAM_LIST = gql`
 
 export const PROGRAM_STATISTICS = gql`
   ${ADMIN_PROGRAM_FRAGMENT}
-  query ProgramStatistics {
-    Program {
+  query ProgramStatistics($where: Program_bool_exp = {}) {
+    Program(where: $where) {
       ...AdminProgramFragment
       Courses {
         id

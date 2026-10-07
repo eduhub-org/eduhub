@@ -29,4 +29,8 @@
     # Public profile fields of all users for the course management page's user picker
     # (see public_User.yaml); contact details stay with org_admin_access's row filter.
     - org_admin_access_others
+    # Statistics-only read surface for grants with canViewStatistics: the few enrollment, session
+    # and attendance columns the statistics page aggregates, nothing participant-identifying beyond
+    # the user id (see the org_admin_statistics rules on those tables).
+    - org_admin_statistics
     - anonymous

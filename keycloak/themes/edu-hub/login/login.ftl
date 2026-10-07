@@ -28,7 +28,7 @@
                     <div class="${properties.kcFormGroupClass!}">
                         <label for="password" class="${properties.kcLabelClass!}">${msg("password")}</label>
 
-                        <div class="${properties.kcInputGroup!}">
+                        <div class="${properties.kcInputGroup!}<#if messagesPerField.existsError('username','password')> kc-input-group-invalid</#if>">
                             <input tabindex="2" id="password" class="${properties.kcInputClass!}" name="password" type="password" autocomplete="off"
                                    aria-invalid="<#if messagesPerField.existsError('username','password')>true</#if>"
                             />

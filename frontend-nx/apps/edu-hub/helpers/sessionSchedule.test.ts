@@ -1,5 +1,7 @@
 import {
+  blockSchedule,
   compareByUpcoming,
+  contiguousBlocks,
   hasActiveSession,
   formatDayHeading,
   formatSessionDateSpan,
@@ -291,5 +293,46 @@ describe('compareByUpcoming - running events (regression)', () => {
 
     const sorted = [startsTomorrow, runningWithLaterSession].sort((a, b) => compareByUpcoming(a, b, now));
     expect(sorted.map((c) => c.id)).toEqual(['running', 'tomorrow']);
+  });
+});
+
+describe('contiguousBlocks', () => {
+  const timed = (id: number, start: string, end: string) => ({
+    session: { id, title: `S${id}` },
+    start: new Date(start),
+    end: new Date(end),
+  });
+  const ids = (blocks: { session: { id: number } }[][]) => blocks.map((block) => block.map((item) => item.session.id));
+
+  it('joins back-to-back and overlapping sessions and splits at a break or a new day', () => {
+    const blocks = contiguousBlocks(
+      [
+        timed(3, '2025-09-12T10:00:00Z', '2025-09-12T11:00:00Z'),
+        timed(1, '2025-09-12T07:00:00Z', '2025-09-12T08:00:00Z'),
+        timed(2, '2025-09-12T07:30:00Z', '2025-09-12T09:00:00Z'),
+        timed(4, '2025-09-12T11:00:00Z', '2025-09-12T12:00:00Z'),
+        timed(5, '2025-09-13T07:00:00Z', '2025-09-13T08:00:00Z'),
+      ],
+      TZ
+    );
+    expect(ids(blocks)).toEqual([[1, 2], [3, 4], [5]]);
+  });
+
+  it('does not carry a run across midnight', () => {
+    const blocks = contiguousBlocks(
+      [timed(1, '2025-09-12T20:00:00Z', '2025-09-12T22:00:00Z'), timed(2, '2025-09-12T22:00:00Z', '2025-09-12T23:00:00Z')],
+      TZ
+    );
+    expect(ids(blocks)).toEqual([[1], [2]]);
+  });
+});
+
+describe('blockSchedule', () => {
+  it('lists each session with its local times and a title that adds something', () => {
+    const block = [
+      { session: { title: 'Talk' }, start: new Date('2025-09-12T12:00:00Z'), end: new Date('2025-09-12T13:30:00Z') },
+      { session: { title: 'Event' }, start: new Date('2025-09-12T13:30:00Z'), end: new Date('2025-09-12T13:30:00Z') },
+    ];
+    expect(blockSchedule(block, 'Event', TZ)).toBe('14:00–15:30 Talk\n15:30');
   });
 });

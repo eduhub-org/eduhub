@@ -275,6 +275,8 @@ export enum AppSettings_update_column {
   faqCollectionName = "faqCollectionName",
   faviconUrl = "faviconUrl",
   guestDataRetentionMonths = "guestDataRetentionMonths",
+  heroHeadlineDe = "heroHeadlineDe",
+  heroHeadlineEn = "heroHeadlineEn",
   logoUrl = "logoUrl",
   operatorName = "operatorName",
   previewImageURL = "previewImageURL",
@@ -1704,6 +1706,7 @@ export enum OrganizationAdmin_select_column {
   canManageEvents = "canManageEvents",
   canManageJobs = "canManageJobs",
   canManageSettings = "canManageSettings",
+  canViewStatistics = "canViewStatistics",
   claimVerification = "claimVerification",
   created_at = "created_at",
   id = "id",
@@ -1721,6 +1724,7 @@ export enum OrganizationAdmin_select_column_OrganizationAdmin_aggregate_bool_exp
   canManageEvents = "canManageEvents",
   canManageJobs = "canManageJobs",
   canManageSettings = "canManageSettings",
+  canViewStatistics = "canViewStatistics",
 }
 
 /**
@@ -1732,6 +1736,7 @@ export enum OrganizationAdmin_select_column_OrganizationAdmin_aggregate_bool_exp
   canManageEvents = "canManageEvents",
   canManageJobs = "canManageJobs",
   canManageSettings = "canManageSettings",
+  canViewStatistics = "canViewStatistics",
 }
 
 /**
@@ -1744,6 +1749,7 @@ export enum OrganizationAdmin_update_column {
   canManageEvents = "canManageEvents",
   canManageJobs = "canManageJobs",
   canManageSettings = "canManageSettings",
+  canViewStatistics = "canViewStatistics",
   claimVerification = "claimVerification",
   created_at = "created_at",
   id = "id",
@@ -3754,6 +3760,8 @@ export interface AppSettings_bool_exp {
   faqCollectionName?: String_comparison_exp | null;
   faviconUrl?: String_comparison_exp | null;
   guestDataRetentionMonths?: Int_comparison_exp | null;
+  heroHeadlineDe?: String_comparison_exp | null;
+  heroHeadlineEn?: String_comparison_exp | null;
   logoUrl?: String_comparison_exp | null;
   operatorName?: String_comparison_exp | null;
   previewImageURL?: String_comparison_exp | null;
@@ -3781,6 +3789,8 @@ export interface AppSettings_insert_input {
   faqCollectionName?: string | null;
   faviconUrl?: string | null;
   guestDataRetentionMonths?: number | null;
+  heroHeadlineDe?: string | null;
+  heroHeadlineEn?: string | null;
   logoUrl?: string | null;
   operatorName?: string | null;
   previewImageURL?: string | null;
@@ -8889,6 +8899,7 @@ export interface OrganizationAdmin_bool_exp {
   canManageEvents?: Boolean_comparison_exp | null;
   canManageJobs?: Boolean_comparison_exp | null;
   canManageSettings?: Boolean_comparison_exp | null;
+  canViewStatistics?: Boolean_comparison_exp | null;
   claimVerification?: String_comparison_exp | null;
   created_at?: timestamptz_comparison_exp | null;
   id?: Int_comparison_exp | null;
@@ -8910,6 +8921,7 @@ export interface OrganizationAdmin_insert_input {
   canManageEvents?: boolean | null;
   canManageJobs?: boolean | null;
   canManageSettings?: boolean | null;
+  canViewStatistics?: boolean | null;
   claimVerification?: string | null;
   created_at?: any | null;
   id?: number | null;

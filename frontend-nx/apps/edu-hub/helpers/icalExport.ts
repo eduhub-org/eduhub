@@ -11,6 +11,8 @@ interface ICalEvent {
   /** Absolute URL of an image for the entry, written as ATTACH. */
   imageUrl?: string;
   lastModified?: string;
+  /** Non-standard properties such as `X-FOO`, written as name and escaped text value. */
+  extraProperties?: Record<string, string>;
 }
 
 interface ICalOptions {
@@ -127,6 +129,9 @@ export function generateICalString(events: ICalEvent[], calendarName: string, op
     if (event.lastModified) {
       lines.push(`LAST-MODIFIED:${formatICalDate(event.lastModified)}`);
     }
+    Object.entries(event.extraProperties ?? {}).forEach(([name, value]) => {
+      lines.push(`${name}:${escapeICalText(value)}`);
+    });
     lines.push(`DTSTAMP:${dtStamp}`);
     lines.push('END:VEVENT');
   }

@@ -231,3 +231,52 @@ export const sortCoursesByUpcoming = <
     .sort((a, b) => a.rank.group - b.rank.group || a.rank.time - b.rank.time)
     .map(({ course }) => course);
 };
+
+/** A session with its parsed start and end (a missing end counts as the start). */
+export type TimedSession<S> = { session: S; start: Date; end: Date };
+
+/**
+ * Runs of sessions that follow each other without a break on one calendar day:
+ * a session joins the run when it starts no later than the run ends. Calendar
+ * exports write each run as a single entry, so a talk followed directly by a
+ * get-together is one appointment, while a lunch break splits the day.
+ */
+export const contiguousBlocks = <S>(items: TimedSession<S>[], timeZone: string): TimedSession<S>[][] => {
+  const blocks: TimedSession<S>[][] = [];
+  let blockEnd: Date | null = null;
+  let blockDay: string | null = null;
+
+  [...items]
+    .sort((a, b) => a.start.getTime() - b.start.getTime())
+    .forEach((item) => {
+      const day = formatInTimeZone(item.start, timeZone, 'yyyy-MM-dd');
+      if (blockEnd && day === blockDay && item.start <= blockEnd) {
+        blocks[blocks.length - 1].push(item);
+        if (item.end > blockEnd) blockEnd = item.end;
+      } else {
+        blocks.push([item]);
+        blockEnd = item.end;
+        blockDay = day;
+      }
+    });
+
+  return blocks;
+};
+
+/**
+ * One line per session of a block, e.g. "14:00–15:30 Podiumsdiskussion". The
+ * title is left out when it is empty or merely repeats the parent's title.
+ */
+export const blockSchedule = (
+  block: TimedSession<{ title?: string | null }>[],
+  parentTitle: string,
+  timeZone: string
+): string =>
+  block
+    .map(({ session, start, end }) => {
+      const startTime = formatInTimeZone(start, timeZone, 'HH:mm');
+      const time = end > start ? `${startTime}–${formatInTimeZone(end, timeZone, 'HH:mm')}` : startTime;
+      const title = session.title?.trim();
+      return title && title !== parentTitle ? `${time} ${title}` : time;
+    })
+    .join('\n');

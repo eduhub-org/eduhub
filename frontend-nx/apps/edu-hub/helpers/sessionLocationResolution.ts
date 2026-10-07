@@ -31,9 +31,40 @@ export interface ResolvedLocation {
   key: string;
   locationOption: string | null;
   displayAddress: string;
+  /** The LocationAddress's short label, when the address was resolved through one. */
+  label?: string;
 }
 
-export type AddressMap = Map<number, { address: string }>;
+export type AddressMap = Map<number, { address: string; shortLabel?: string | null }>;
+
+/** Placeholder label the LocationAddress migration gave addresses it could not match. */
+const PLACEHOLDER_LABEL = 'generic address';
+
+/** A short label worth showing: non-empty and not the migration placeholder. */
+export const meaningfulLabel = (label: string | null | undefined): string | undefined => {
+  const trimmed = label?.trim();
+  return trimmed && trimmed.toLowerCase() !== PLACEHOLDER_LABEL ? trimmed : undefined;
+};
+
+/**
+ * A place as "Label (Address)": the label first when it is meaningful and
+ * differs from the address, the address alone otherwise. `address` is what is
+ * shown; `rawAddress` (defaulting to it) is what the label is compared with, for
+ * callers that decorate the address, e.g. by appending the city.
+ */
+export const labelledAddress = (
+  label: string | null | undefined,
+  address: string,
+  rawAddress: string = address
+): string => {
+  const meaningful = meaningfulLabel(label);
+  if (!meaningful || meaningful === rawAddress.trim()) return address;
+  return address.trim() ? `${meaningful} (${address})` : meaningful;
+};
+
+/** The short label of a LocationAddress, if it has a meaningful one. */
+const labelOf = (addressMap: AddressMap, id: number | null | undefined): string | undefined =>
+  id ? meaningfulLabel(addressMap.get(id)?.shortLabel) : undefined;
 
 /**
  * Which locations a session takes place at, in the order the course lists them,
@@ -62,6 +93,7 @@ const resolveProgramSessionLocations = (session: ResolvableSession, addressMap: 
       sa.locationAddressId && addressMap.has(sa.locationAddressId)
         ? addressMap.get(sa.locationAddressId)!.address
         : sa.address ?? '',
+    label: labelOf(addressMap, sa.locationAddressId),
   }));
 
 const resolveCourseSessionLocations = (
@@ -88,6 +120,7 @@ const resolveCourseSessionLocations = (
         key: `cl-${courseLocation.id}`,
         locationOption: CourseLocation?.locationOption ?? null,
         displayAddress,
+        label: labelOf(addressMap, effectiveAddressId),
       },
     ];
   });

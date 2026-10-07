@@ -132,6 +132,31 @@ insert_permissions:
 # explicit `- role: instructor` insert rule here would override the merge and break the existing
 # "add participants" flow, which inserts enrollments for other users under user_access.
 select_permissions:
+  # canViewStatistics: only the columns the statistics page aggregates. Deliberately no
+  # motivationLetter, rating, invitation, billing or cancellation fields; the certificate URLs are
+  # only counted (and are storage paths that getSignedUrl refuses for org admins).
+  - role: org_admin_statistics
+    permission:
+      columns:
+        - id
+        - courseId
+        - userId
+        - status
+        - isTest
+        - attendanceCertificateURL
+        - achievementCertificateURL
+        - created_at
+        - updated_at
+      filter:
+        Course:
+          Program:
+            Organization:
+              OrganizationAdmins:
+                _and:
+                  - userId:
+                      _eq: X-Hasura-User-Id
+                  - canViewStatistics:
+                      _eq: true
   - role: instructor_access
     permission:
       columns:

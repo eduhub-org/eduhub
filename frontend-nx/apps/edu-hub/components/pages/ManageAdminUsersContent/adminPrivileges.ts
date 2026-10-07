@@ -1,10 +1,25 @@
 import { User_bool_exp } from '../../../__generated__/globalTypes';
 
 /** Everything the access table can be filtered on: the Keycloak role plus the grant capabilities. */
-export type AdminPrivilege = 'superAdmin' | 'events' | 'courses' | 'degrees' | 'jobs' | 'settings';
+export type AdminPrivilege =
+  | 'superAdmin'
+  | 'events'
+  | 'courses'
+  | 'degrees'
+  | 'jobs'
+  | 'statistics'
+  | 'settings';
 
 /** Order the filter offers them in: the platform-wide role first, then the per-organization ones. */
-export const ADMIN_PRIVILEGES: AdminPrivilege[] = ['superAdmin', 'events', 'courses', 'degrees', 'jobs', 'settings'];
+export const ADMIN_PRIVILEGES: AdminPrivilege[] = [
+  'superAdmin',
+  'events',
+  'courses',
+  'degrees',
+  'jobs',
+  'statistics',
+  'settings',
+];
 
 /**
  * A capability privilege matches a user when *some* grant of theirs carries the flag. Super-admin
@@ -15,6 +30,7 @@ const CAPABILITY_CONDITION: Record<Exclude<AdminPrivilege, 'superAdmin'>, User_b
   courses: { OrganizationAdmins: { canManageCourses: { _eq: true } } },
   degrees: { OrganizationAdmins: { canManageDegrees: { _eq: true } } },
   jobs: { OrganizationAdmins: { canManageJobs: { _eq: true } } },
+  statistics: { OrganizationAdmins: { canViewStatistics: { _eq: true } } },
   settings: { OrganizationAdmins: { canManageSettings: { _eq: true } } },
 };
 
@@ -33,6 +49,8 @@ export const privilegeLabelKey = (privilege: AdminPrivilege): string => {
       return 'can_manage_degrees';
     case 'jobs':
       return 'can_manage_jobs';
+    case 'statistics':
+      return 'can_view_statistics';
   }
 };
 
@@ -65,6 +83,7 @@ export type GrantCapabilities = {
   canManageDegrees: boolean;
   canManageJobs: boolean;
   canManageSettings: boolean;
+  canViewStatistics: boolean;
 };
 
 /**
@@ -90,6 +109,8 @@ export const grantHasPrivilege = (grant: GrantCapabilities | null, privilege: Ad
       return grant.canManageDegrees;
     case 'jobs':
       return grant.canManageJobs;
+    case 'statistics':
+      return grant.canViewStatistics;
     case 'settings':
       return grant.canManageSettings;
   }

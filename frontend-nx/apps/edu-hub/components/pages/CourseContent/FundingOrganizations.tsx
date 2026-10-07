@@ -50,7 +50,7 @@ export const FundingOrganizations: FC<IProps> = ({ courseFundingOrganizations })
           return (
             <div
               key={cfo.id}
-              className="flex shrink-0 items-center justify-center"
+              className="flex min-w-0 max-w-full shrink-0 items-center justify-center"
               style={{ width: LOGO_WIDTH, height: LOGO_HEIGHT }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
