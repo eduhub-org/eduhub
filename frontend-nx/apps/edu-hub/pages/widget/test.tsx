@@ -87,7 +87,7 @@ const WidgetTestPage: FC = () => {
         <title>EduHub Widget Test Page</title>
         <meta name="robots" content="noindex, nofollow" />
       </Head>
-      <div style={{ fontFamily: 'Arial, sans-serif', maxWidth: '1200px', margin: '0 auto', padding: '20px', background: '#f5f5f5', minHeight: '100vh' }}>
+      <div style={{ fontFamily: 'Arial, sans-serif', maxWidth: '1200px', margin: '0 auto', padding: '20px', background: '#f5f5f5', color: '#333', minHeight: '100vh' }}>
         <h1 style={{ color: '#333' }}>EduHub Course Widget Test Page</h1>
         
         <div style={{ background: 'white', padding: '20px', margin: '20px 0', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
@@ -98,7 +98,7 @@ const WidgetTestPage: FC = () => {
           <iframe 
             src={buildWidgetUrl()} 
             frameBorder="0" 
-            style={{ width: '100%', height: '435px', border: 'none', borderRadius: '4px', overflow: 'hidden', background: 'transparent' }}
+            style={{ width: '100%', height: '460px', border: 'none', borderRadius: '4px', overflow: 'hidden', background: 'transparent' }}
             title="Test 1: All Courses"
             allow="fullscreen"
             loading="lazy"
@@ -133,7 +133,7 @@ const WidgetTestPage: FC = () => {
           <iframe 
             src={buildWidgetUrl()} 
             frameBorder="0" 
-            style={{ width: '100%', height: '435px', border: 'none', borderRadius: '4px', overflow: 'hidden', background: 'transparent' }}
+            style={{ width: '100%', height: '460px', border: 'none', borderRadius: '4px', overflow: 'hidden', background: 'transparent' }}
             title="Test 2: Filter by Course Group"
             key={`${group}-${lang}`}
             allow="fullscreen"
@@ -159,7 +159,7 @@ const WidgetTestPage: FC = () => {
           <iframe 
             src={buildWidgetUrl(true)} 
             frameBorder="0" 
-            style={{ width: '100%', height: '435px', border: 'none', borderRadius: '4px', overflow: 'hidden', background: 'transparent' }}
+            style={{ width: '100%', height: '460px', border: 'none', borderRadius: '4px', overflow: 'hidden', background: 'transparent' }}
             title="Test 3: With API Key"
             key={apiKey}
             allow="fullscreen"
@@ -232,7 +232,7 @@ const WidgetTestPage: FC = () => {
           <iframe 
             src={buildWidgetUrl(false, '99', lang)} 
             frameBorder="0" 
-            style={{ width: '100%', height: '435px', border: 'none', borderRadius: '4px', marginBottom: '20px', overflow: 'hidden', background: 'transparent' }}
+            style={{ width: '100%', height: '460px', border: 'none', borderRadius: '4px', marginBottom: '20px', overflow: 'hidden', background: 'transparent' }}
             title="Test 5: Invalid Group"
             allow="fullscreen"
             loading="lazy"
@@ -245,7 +245,7 @@ const WidgetTestPage: FC = () => {
           <iframe 
             src={buildWidgetUrl(false, '', lang).replace('/widget/courses', '/widget/courses?apiKey=invalid_key')} 
             frameBorder="0" 
-            style={{ width: '100%', height: '435px', border: 'none', borderRadius: '4px', overflow: 'hidden', background: 'transparent' }}
+            style={{ width: '100%', height: '460px', border: 'none', borderRadius: '4px', overflow: 'hidden', background: 'transparent' }}
             title="Test 5: Invalid API Key"
             allow="fullscreen"
             loading="lazy"
@@ -257,4 +257,3 @@ const WidgetTestPage: FC = () => {
 };
 
 export default WidgetTestPage;
-

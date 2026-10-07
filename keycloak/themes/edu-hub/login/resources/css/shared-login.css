@@ -1,14 +1,24 @@
 /*
- * StuJo co-branding for the shared EduHub login theme.
+ * Shared Keycloak login layout for EduHub, StuJo, and campus portals.
  *
- * StuJo and EduHub use the same Keycloak realm and account. StuJo is the
- * primary product identity on its login routes, while the existing EduHub
- * lockup remains visible as the shared account provider. Activated via
- * html.stujo-brand (see js/stujo-portal-brand.js).
+ * Unscoped rules define the common structure and EduHub defaults. StuJo
+ * branding is scoped to html.stujo-brand (see js/stujo-portal-brand.js),
+ * retaining the EduHub lockup as the shared account provider.
  *
  * White-label campus portals add html.stujo-haw-kiel / html.stujo-flensburg
  * on top of stujo-brand; they swap the co-brand logo and accent colour.
  */
+
+:root {
+  --kc-cobrand-accent: #222;
+  --kc-cobrand-accent-hover: #0b7478;
+  --kc-cobrand-background: #222;
+  --kc-cobrand-border: #dedede;
+  --kc-cobrand-copy: #222;
+  --kc-field-border: #c6c2c5;
+  --kc-field-height: 36px;
+  --kc-danger: #c9190b;
+}
 
 html.stujo-brand {
   --kc-cobrand-accent: #a71580;
@@ -41,18 +51,18 @@ html.stujo-brand body {
   display: none;
 }
 
-html.stujo-brand .academy_header_guest .navbar.p-0 {
+.academy_header_guest .navbar.p-0 {
   height: 78px;
   padding: 15px 18px !important;
 }
 
-html.stujo-brand .navbar-logo-wrapper {
+.navbar-logo-wrapper {
   width: 100%;
   align-items: center;
 }
 
 /* This theme has no mobile navigation links, so its Bootstrap toggle is inert. */
-html.stujo-brand .academy_header_guest .navbar-toggler {
+.academy_header_guest .navbar-toggler {
   display: none;
 }
 
@@ -69,7 +79,7 @@ html.stujo-brand .navbar-logo-text {
   opacity: 0.72;
 }
 
-html.stujo-brand .navbar-logo {
+.navbar-logo {
   width: 31px;
   height: 31px;
 }
@@ -113,8 +123,8 @@ html.stujo-flensburg .navbar-cobrand-flensburg {
   height: 36px;
 }
 
-/* Neutral card with StuJo-coloured actions and no decorative accent bar. */
-html.stujo-brand .card-pf {
+/* Shared card with brand-token colours and no decorative accent bar. */
+.login-pf-page .card-pf {
   width: calc(100% - 28px);
   max-width: 500px;
   margin-right: auto;
@@ -128,7 +138,7 @@ html.stujo-brand .card-pf {
 }
 
 /* Keep breathing room below tall flows such as registration. */
-html.stujo-brand .login-pf-page {
+.login-pf-page {
   padding-bottom: 40px;
 }
 
@@ -141,7 +151,7 @@ html.stujo-brand .login-pf-page {
 }
 
 /* Use Keycloak's locale handling, presented as a compact dropdown. */
-html.stujo-brand #kc-locale {
+#kc-locale {
   position: relative;
   top: auto;
   right: auto;
@@ -152,11 +162,11 @@ html.stujo-brand #kc-locale {
   z-index: 10;
 }
 
-html.stujo-brand #kc-locale-dropdown {
+#kc-locale-dropdown {
   position: relative;
 }
 
-html.stujo-brand #kc-locale-dropdown a#kc-current-locale-link {
+#kc-locale-dropdown a#kc-current-locale-link {
   display: inline-flex;
   min-width: 44px;
   min-height: 44px;
@@ -170,18 +180,18 @@ html.stujo-brand #kc-locale-dropdown a#kc-current-locale-link {
   text-decoration: none;
 }
 
-html.stujo-brand #kc-locale-dropdown a#kc-current-locale-link:hover,
-html.stujo-brand #kc-locale-dropdown a#kc-current-locale-link:focus {
+#kc-locale-dropdown a#kc-current-locale-link:hover,
+#kc-locale-dropdown a#kc-current-locale-link:focus {
   color: var(--kc-cobrand-accent);
 }
 
-html.stujo-brand #kc-locale-dropdown a#kc-current-locale-link:focus-visible {
+#kc-locale-dropdown a#kc-current-locale-link:focus-visible {
   border-radius: 3px;
   outline: 2px solid var(--kc-cobrand-accent);
   outline-offset: 2px;
 }
 
-html.stujo-brand #kc-locale-dropdown ul {
+#kc-locale-dropdown ul {
   position: absolute;
   top: calc(100% + 4px);
   right: 0;
@@ -195,7 +205,7 @@ html.stujo-brand #kc-locale-dropdown ul {
   list-style: none;
 }
 
-html.stujo-brand #kc-locale-dropdown ul::before {
+#kc-locale-dropdown ul::before {
   position: absolute;
   top: -5px;
   right: 0;
@@ -204,11 +214,11 @@ html.stujo-brand #kc-locale-dropdown ul::before {
   content: '';
 }
 
-html.stujo-brand #kc-locale-dropdown:focus-within ul {
+#kc-locale-dropdown:focus-within ul {
   display: block;
 }
 
-html.stujo-brand #kc-locale-dropdown ul a {
+#kc-locale-dropdown ul a {
   display: block;
   padding: 7px 9px;
   border-radius: 5px;
@@ -217,8 +227,8 @@ html.stujo-brand #kc-locale-dropdown ul a {
   text-decoration: none;
 }
 
-html.stujo-brand #kc-locale-dropdown ul a:hover,
-html.stujo-brand #kc-locale-dropdown ul a:focus {
+#kc-locale-dropdown ul a:hover,
+#kc-locale-dropdown ul a:focus {
   background-color: #fff2f9;
   color: var(--kc-cobrand-accent);
 }
@@ -235,7 +245,7 @@ html.stujo-brand .kc-stujo-login-title {
   display: inline;
 }
 
-html.stujo-brand h1#kc-page-title {
+h1#kc-page-title {
   margin-top: 0;
   color: var(--kc-cobrand-copy);
   font-size: 24px;
@@ -243,89 +253,104 @@ html.stujo-brand h1#kc-page-title {
   letter-spacing: -0.02em;
 }
 
-html.stujo-brand .pf-c-form-control {
-  height: 44px;
-  border: 1px solid #c6c2c5;
+.pf-c-form-control {
+  border: 1px solid var(--kc-field-border);
   border-radius: 7px;
   background-color: #fff;
 }
 
-html.stujo-brand .pf-c-form-control:hover,
-html.stujo-brand .pf-c-form-control:focus {
+/* Match PatternFly's selector so its calculated height cannot override ours.
+   Textareas keep their natural height. */
+.pf-c-form-control:not(textarea) {
+  box-sizing: border-box;
+  height: var(--kc-field-height);
+}
+
+.pf-c-form-control:hover,
+.pf-c-form-control:focus {
   border-color: var(--kc-cobrand-accent);
   border-bottom-width: 1px;
 }
 
-html.stujo-brand .pf-c-form-control:focus {
+.pf-c-form-control:focus {
   outline: none;
   box-shadow: 0 0 0 1px var(--kc-cobrand-accent);
 }
 
-html.stujo-brand .pf-c-form-control:focus-visible {
+.pf-c-form-control:focus-visible {
   outline: 1px solid var(--kc-cobrand-accent);
   outline-offset: 1px;
 }
 
-html.stujo-brand .pf-c-input-group {
+.pf-c-input-group {
+  box-sizing: border-box;
+  height: var(--kc-field-height);
+  align-items: stretch;
   overflow: hidden;
-  border: 1px solid #c6c2c5;
+  border: 1px solid var(--kc-field-border);
   border-radius: 7px;
   background-color: #fff;
 }
 
-html.stujo-brand .pf-c-input-group:hover {
+.pf-c-input-group:hover {
   border-color: var(--kc-cobrand-accent);
 }
 
-html.stujo-brand .pf-c-input-group:focus-within {
+.pf-c-input-group:focus-within {
   border-color: var(--kc-cobrand-accent);
   box-shadow: 0 0 0 1px var(--kc-cobrand-accent);
 }
 
-html.stujo-brand .pf-c-input-group .pf-c-form-control,
-html.stujo-brand .pf-c-input-group .pf-c-form-control:hover,
-html.stujo-brand .pf-c-input-group .pf-c-form-control:focus,
-html.stujo-brand .pf-c-input-group .pf-c-form-control:focus-visible {
+.pf-c-input-group .pf-c-form-control,
+.pf-c-input-group .pf-c-form-control:hover,
+.pf-c-input-group .pf-c-form-control:focus,
+.pf-c-input-group .pf-c-form-control:focus-visible {
   border: 0;
   border-radius: 0;
   outline: 0;
   box-shadow: none;
 }
 
-html.stujo-brand .pf-c-input-group .pf-c-button.pf-m-control {
+.pf-c-input-group .pf-c-form-control:not(textarea) {
+  height: auto;
+  min-height: 0;
+}
+
+.pf-c-input-group .pf-c-button.pf-m-control {
   display: inline-flex;
   flex: 0 0 48px;
   width: 48px;
-  height: 44px;
+  height: auto;
+  min-height: 0;
   align-items: center;
   justify-content: center;
   margin-left: 0;
   padding: 0;
   border: 0;
-  border-left: 1px solid #c6c2c5;
+  border-left: 1px solid var(--kc-field-border);
   border-radius: 0;
   background-color: #fff;
   color: var(--kc-cobrand-copy);
 }
 
-html.stujo-brand .pf-c-input-group .pf-c-button.pf-m-control::after {
+.pf-c-input-group .pf-c-button.pf-m-control::after {
   border: 0;
   box-shadow: none;
 }
 
-html.stujo-brand .pf-c-input-group:focus-within
+.pf-c-input-group:focus-within
   .pf-c-button.pf-m-control {
   border-left-color: var(--kc-cobrand-accent);
 }
 
-html.stujo-brand .pf-c-input-group .pf-c-button.pf-m-control:hover,
-html.stujo-brand .pf-c-input-group .pf-c-button.pf-m-control:focus {
+.pf-c-input-group .pf-c-button.pf-m-control:hover,
+.pf-c-input-group .pf-c-button.pf-m-control:focus {
   border-left-color: var(--kc-cobrand-accent);
   outline: 0;
   color: var(--kc-cobrand-accent);
 }
 
-html.stujo-brand .pf-c-button.pf-m-primary {
+.pf-c-button.pf-m-primary {
   width: 100%;
   margin: 0;
   padding: 10px 24px;
@@ -337,56 +362,57 @@ html.stujo-brand .pf-c-button.pf-m-primary {
   text-transform: none;
 }
 
-html.stujo-brand .pf-c-button.pf-m-primary:hover,
-html.stujo-brand .pf-c-button.pf-m-primary:focus {
+.pf-c-button.pf-m-primary:hover,
+.pf-c-button.pf-m-primary:focus {
   background-color: var(--kc-cobrand-accent-hover);
   color: #fff;
 }
 
-html.stujo-brand .card-pf a {
+.card-pf a {
   color: var(--kc-cobrand-accent);
 }
 
-html.stujo-brand .card-pf a:hover,
-html.stujo-brand .card-pf a:focus {
+.card-pf a:hover,
+.card-pf a:focus {
   color: var(--kc-cobrand-accent-hover);
 }
 
 /* Identity providers remain data-driven. When DLC is configured, present it
    as a full-width secondary action separated from the password login. */
-html.stujo-brand #kc-social-providers {
+#kc-social-providers {
   margin-top: 24px;
   text-align: center;
 }
 
-html.stujo-brand #kc-social-providers hr {
+#kc-social-providers hr {
   margin: 0 0 18px;
   border: 0;
   border-top: 1px solid var(--kc-cobrand-border);
 }
 
-html.stujo-brand #kc-social-providers h4 {
+#kc-social-providers h4 {
   margin: 0 0 14px;
   color: #77737a;
   font-size: 16px;
   font-weight: 400;
 }
 
-html.stujo-brand #kc-social-providers ul {
+#kc-social-providers ul {
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-html.stujo-brand #kc-social-providers li {
+#kc-social-providers li {
   margin-bottom: 10px;
 }
 
-html.stujo-brand #kc-social-providers a {
+#kc-social-providers a {
   display: flex;
   min-height: 44px;
   align-items: center;
   justify-content: center;
+  gap: 8px;
   padding: 9px 18px;
   border: 1px solid #cac6c9;
   border-radius: 8px;
@@ -396,25 +422,30 @@ html.stujo-brand #kc-social-providers a {
   text-decoration: none;
 }
 
-html.stujo-brand #kc-social-providers a:hover,
-html.stujo-brand #kc-social-providers a:focus {
+/* Flex layout replaces the legacy offsets for floated provider icons. */
+#kc-social-providers .kc-social-provider-name {
+  position: static;
+}
+
+#kc-social-providers a:hover,
+#kc-social-providers a:focus {
   border-color: var(--kc-cobrand-accent);
   color: var(--kc-cobrand-accent);
 }
 
 /* Remove Keycloak's full-bleed grey registration footer. */
-html.stujo-brand #kc-info {
+#kc-info {
   margin: 24px 0 0;
 }
 
-html.stujo-brand #kc-info-wrapper {
+#kc-info-wrapper {
   padding: 18px 0 0;
   border-top: 1px solid var(--kc-cobrand-border);
   border-radius: 0;
   background-color: transparent;
 }
 
-html.stujo-brand #kc-registration {
+#kc-registration {
   color: #77737a;
   text-align: center;
 }
@@ -438,7 +469,7 @@ html.stujo-brand .kc-cobrand-note {
 }
 
 @media (min-width: 768px) {
-  html.stujo-brand .academy_header_guest .navbar.p-0 {
+  .academy_header_guest .navbar.p-0 {
     height: 92px;
     padding: 20px 28px !important;
   }
@@ -452,24 +483,85 @@ html.stujo-brand .kc-cobrand-note {
     height: 46px;
   }
 
-  html.stujo-brand .navbar-logo {
+  .navbar-logo {
     width: 40px;
     height: 40px;
   }
 
-  html.stujo-brand .navbar-logo-text {
+  .navbar-logo-text {
     width: 42px;
     margin-left: 9px;
   }
 
-  html.stujo-brand .card-pf {
+  .login-pf-page .card-pf {
     width: auto;
     padding-right: 28px;
     padding-left: 28px;
     box-shadow: 0 18px 50px rgba(51, 28, 42, 0.1);
   }
 
-  html.stujo-brand h1#kc-page-title {
+  h1#kc-page-title {
     font-size: 28px;
+  }
+}
+
+/* Shared Keycloak structure for EduHub, StuJo, and campus brands. */
+.login-pf body {
+  min-height: 100vh;
+  height: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.content-wrapper {
+  min-height: 100vh;
+  padding-bottom: 40px;
+}
+
+.academy_header_guest .navbar.p-0 {
+  justify-content: flex-start;
+}
+
+.navbar-logo-wrapper {
+  min-width: 0;
+  align-items: center;
+}
+
+#kc-content-wrapper,
+#kc-form-wrapper {
+  margin-top: 0;
+}
+
+#kc-form-login .form-group {
+  margin-bottom: 18px;
+}
+
+#kc-form-buttons {
+  margin-top: 22px;
+}
+
+.pf-c-input-group.kc-input-group-invalid {
+  border-color: var(--kc-danger);
+  box-shadow: 0 0 0 1px var(--kc-danger);
+}
+
+.pf-c-input-group.kc-input-group-invalid .pf-c-button.pf-m-control {
+  border-left-color: var(--kc-danger);
+}
+
+.pf-c-input-group .pf-c-button.pf-m-control:focus-visible,
+#kc-social-providers a:focus-visible,
+.pf-c-button.pf-m-primary:focus-visible {
+  outline: 2px solid var(--kc-cobrand-accent);
+  outline-offset: 2px;
+}
+
+@media (max-width: 767px) {
+  .content-wrapper {
+    padding-bottom: 24px;
+  }
+
+  .login-pf-page .card-pf {
+    margin-top: 20px;
   }
 }

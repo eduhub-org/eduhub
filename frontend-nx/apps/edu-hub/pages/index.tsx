@@ -334,7 +334,7 @@ const Home: FC<HomeProps> = ({ heroHeadline }) => {
             <HeroHeadline markdown={heroHeadline ?? t('heroHeadline')} className="text-[clamp(2.5rem,10vw,8rem)]" />
           </div>
         </div>
-        <div className="max-w-screen-xl mx-auto md:mt-[-130px] md:pl-16 mt-[-180px]">
+        <div className="max-w-screen-xl mx-auto md:mt-[-130px] md:px-16 mt-[-180px]">
           {isLoading ? (
             <Loading />
           ) : (

@@ -100,6 +100,7 @@ export const ADMIN_COURSE_LIST = gql`
       order
       sliderGroup
       programType
+      contentType
     }
   }
 `;

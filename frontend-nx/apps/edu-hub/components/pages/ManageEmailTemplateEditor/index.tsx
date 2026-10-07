@@ -7,7 +7,7 @@ import Loading from '../../common/Loading';
 import InputField from '../../inputs/InputField';
 import EmailEditor from '../../inputs/EmailEditor';
 import { Button } from '../../common/Button';
-import { useAdminQuery } from '../../../hooks/authedQuery';
+import { useRoleQuery } from '../../../hooks/authedQuery';
 import {
   EMAIL_TEMPLATES_LIST,
   UPDATE_EMAIL_TEMPLATE_SUBJECT_TEXT,
@@ -34,7 +34,7 @@ const ManageEmailTemplateEditor: FC<ManageEmailTemplateEditorProps> = ({ templat
   const [showPreview, setShowPreview] = useState(false);
   const [previewLoading, setPreviewLoading] = useState(false);
 
-  const { data, loading, error } = useAdminQuery<EmailTemplatesList>(EMAIL_TEMPLATES_LIST, {
+  const { data, loading, error } = useRoleQuery<EmailTemplatesList>(EMAIL_TEMPLATES_LIST, {
     variables: {
       limit: 1,
       offset: 0,
