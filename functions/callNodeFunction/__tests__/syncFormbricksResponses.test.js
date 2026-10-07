@@ -111,4 +111,28 @@ describe('syncFormbricksResponses', () => {
     expect(stored.provider).toBe('formbricks');
     expect(stored.response.finished).toBe(true);
   });
+  it('pages through all candidates before fetching the surveys', async () => {
+    const offsets = [];
+    request.mockImplementation(async (document, variables) => {
+      if (document.includes('query GetEnrollmentsWithoutQuestionnaireResponse')) {
+        offsets.push(variables.offset);
+        // A full first page, then a short one
+        const size = variables.offset === 0 ? variables.limit : 2;
+        return {
+          CourseEnrollment: Array.from({ length: size }, (_, i) =>
+            enrollment(variables.offset + i + 1, `u${variables.offset + i + 1}`, URL_A, null)
+          ),
+        };
+      }
+      return {};
+    });
+    loadFormbricksSurveyResponses.mockResolvedValue(loaded(URL_A, [raw('r', 'u1002')]));
+
+    const result = await syncFormbricksResponses({ body: {} }, logger);
+
+    expect(offsets).toEqual([0, 1000]);
+    expect(loadFormbricksSurveyResponses).toHaveBeenCalledTimes(1);
+    expect(result).toMatchObject({ candidates: 1002, surveys: 1, stored: 1 });
+    expect(storedIds()).toEqual([1002]);
+  });
 });

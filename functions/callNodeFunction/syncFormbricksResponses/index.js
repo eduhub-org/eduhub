@@ -24,7 +24,7 @@ const MAX_AGE_DAYS = 120;
 const PAGE_SIZE = 1000;
 
 const GET_CANDIDATES = gql`
-  query GetEnrollmentsWithoutQuestionnaireResponse($after: timestamptz!, $limit: Int!) {
+  query GetEnrollmentsWithoutQuestionnaireResponse($after: timestamptz!, $limit: Int!, $offset: Int!) {
     CourseEnrollment(
       where: {
         isTest: { _eq: false }
@@ -40,8 +40,9 @@ const GET_CANDIDATES = gql`
           ]
         }
       }
-      order_by: { created_at: desc }
+      order_by: [{ created_at: desc }, { id: desc }]
       limit: $limit
+      offset: $offset
     ) {
       id
       userId
@@ -90,7 +91,13 @@ export default async function syncFormbricksResponses(req, logger) {
   });
 
   const after = new Date(Date.now() - MAX_AGE_DAYS * 24 * 60 * 60 * 1000).toISOString();
-  const { CourseEnrollment: candidates } = await client.request(GET_CANDIDATES, { after, limit: PAGE_SIZE });
+  // All pages before storing anything: stored rows leave the filter, which would shift later pages.
+  const candidates = [];
+  for (let offset = 0; ; offset += PAGE_SIZE) {
+    const { CourseEnrollment: page } = await client.request(GET_CANDIDATES, { after, limit: PAGE_SIZE, offset });
+    candidates.push(...page);
+    if (page.length < PAGE_SIZE) break;
+  }
   const groups = groupBySurveyUrl(candidates);
 
   let stored = 0;
