@@ -70,6 +70,7 @@ import { BulkAction } from '../../../common/TableGrid/types';
 import { ApolloError } from '@apollo/client';
 import { ErrorMessageDialog } from '../../../common/dialogs/ErrorMessageDialog';
 import { QuestionConfirmationDialog } from '../../../common/dialogs/QuestionConfirmationDialog';
+import { EnrollmentHistory } from '../../../common/EnrollmentHistory';
 import { FormbricksResponsesDisplay } from './FormbricksResponsesDisplay';
 import { getRegistrationFeatures } from './registrationConfig';
 import NotificationSnackbar from '../../../common/dialogs/NotificationSnackbar';
@@ -1366,36 +1367,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
               <div className="text-sm font-medium text-label-primary mb-1">{t('organization')}</div>
               <div className="text-label-primary break-words md:pl-4">{orgName || '-'}</div>
             </div>
-            <div>
-              <div className="text-sm font-medium text-label-primary mb-2">{t('application_history.label')}</div>
-              <div className="space-y-1">
-                {enrollment.User.CourseEnrollments.length > 0 && enrollment.User.CourseEnrollments.filter(e => e.courseId !== enrollment.courseId).length === 0 ? (
-                  <div className="text-sm text-label-secondary italic md:pl-4">{t('no_applications_present')}</div>
-                ) : (
-                  enrollment.User.CourseEnrollments.map((pastEnrollment, index) => {
-                    if (pastEnrollment.courseId === enrollment.courseId) {
-                      return null;
-                    }
-                    // Format ECTS if available (only for courses with achievement certificates)
-                    let ectsInfo = '';
-                    if (pastEnrollment.achievementCertificateURL && pastEnrollment.Course?.ects) {
-                      let ects = pastEnrollment.Course.ects.replace(',', '.');
-                      ects = isNaN(parseFloat(ects)) ? '0' : parseFloat(ects).toString();
-                      ectsInfo = `; ${ects} ECTS`;
-                    }
-                    return (
-                      <div
-                        key={index}
-                        className="text-sm text-gray-900 whitespace-normal break-words md:pl-4"
-                      >
-                        {pastEnrollment.Course?.title} ({pastEnrollment.Course?.Program.shortTitle}{ectsInfo})
-                        {orgName ? ` - ${orgName}` : ''} - {tCommon(pastEnrollment.status)}
-                      </div>
-                    );
-                  })
-                )}
-              </div>
-            </div>
+            <EnrollmentHistory enrollments={enrollment.User.CourseEnrollments} excludeCourseId={enrollment.courseId} />
           </div>
 
           {features.hasQuestionnaire && (
@@ -1403,6 +1375,7 @@ const ApplicationsTabContent: FC<ApplicationsTabContentProps> = ({
               <div className="mb-4">
                 {hasFormbricksSurvey ? (
                   <FormbricksResponsesDisplay
+                    storedResponse={enrollment.questionnaireResponse}
                     courseId={enrollment.courseId}
                     userId={enrollment.userId}
                     enrollmentId={enrollment.id}

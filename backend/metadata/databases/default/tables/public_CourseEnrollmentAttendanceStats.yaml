@@ -1,0 +1,78 @@
+table:
+  name: CourseEnrollmentAttendanceStats
+  schema: public
+object_relationships:
+  - name: CourseEnrollment
+    using:
+      manual_configuration:
+        column_mapping:
+          enrollmentId: id
+        insertion_order: null
+        remote_table:
+          name: CourseEnrollment
+          schema: public
+# Only counts per enrollment, never the Attendance rows themselves, so instructors can judge an
+# applicant's commitment in other courses (the Attendance filter hides those rows from them).
+select_permissions:
+  - role: instructor_access
+    permission:
+      columns:
+        - enrollmentId
+        - attendedSessions
+        - totalSessions
+      filter: {}
+  # Same scope as the org admin's CourseEnrollment select permission.
+  - role: org_admin_access
+    permission:
+      columns:
+        - enrollmentId
+        - attendedSessions
+        - totalSessions
+      filter:
+        CourseEnrollment:
+          _or:
+            - Course:
+                Program:
+                  _and:
+                    - type:
+                        _eq: EVENTS
+                    - Organization:
+                        OrganizationAdmins:
+                          _and:
+                            - userId:
+                                _eq: X-Hasura-User-Id
+                            - canManageEvents:
+                                _eq: true
+            - Course:
+                Program:
+                  _and:
+                    - type:
+                        _eq: COURSES
+                    - Organization:
+                        OrganizationAdmins:
+                          _and:
+                            - userId:
+                                _eq: X-Hasura-User-Id
+                            - canManageCourses:
+                                _eq: true
+            - Course:
+                Program:
+                  _and:
+                    - type:
+                        _eq: DEGREES
+                    - Organization:
+                        OrganizationAdmins:
+                          _and:
+                            - userId:
+                                _eq: X-Hasura-User-Id
+                            - canManageDegrees:
+                                _eq: true
+            - Course:
+                Program:
+                  Organization:
+                    OrganizationAdmins:
+                      _and:
+                        - userId:
+                            _eq: X-Hasura-User-Id
+                        - canManageSettings:
+                            _eq: true

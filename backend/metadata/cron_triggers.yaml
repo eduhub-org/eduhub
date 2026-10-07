@@ -180,3 +180,24 @@
     never pays without hearing anything. Note the headers differ from the Python
     crons - callNodeFunction dispatches on name/secret, not
     Function-Name/Hasura-Secret.
+- name: sync_formbricks_responses
+  webhook: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+  schedule: 20 2 * * *
+  include_in_metadata: true
+  payload: {}
+  retry_conf:
+    num_retries: 0
+    retry_interval_seconds: 10
+    timeout_seconds: 3699
+    tolerance_seconds: 21600
+  headers:
+    - name: name
+      value: syncFormbricksResponses
+    - name: secret
+      value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+  comment: >-
+    Copies new or changed Formbricks application questionnaire responses into
+    CourseEnrollment.questionnaireResponse (enrollments of the last 120 days
+    without a stored or with an unfinished response), so the applications tab
+    rarely has to call Formbricks on demand. Uses the callNodeFunction
+    name/secret headers.

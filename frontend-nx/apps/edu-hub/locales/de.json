@@ -2333,6 +2333,10 @@
       "first_name_placeholder": "Vorname eingeben",
       "last_name_placeholder": "Nachname eingeben",
       "email_placeholder": "E-Mail-Adresse eingeben"
+    },
+    "expanded": {
+      "profile": "Profil",
+      "history": "Bewerbungen und Teilnahmen"
     }
   },
   "manageAdminUsers": {
@@ -3367,5 +3371,25 @@
     "title": "EduHub Events | opencampus.sh",
     "description": "Kommende Events bei opencampus.sh",
     "icalCategory": "Bildung"
+  },
+  "enrollmentHistory": {
+    "label": "Bisherige Bewerbungen und Teilnahmen",
+    "empty": "Keine weiteren Bewerbungen vorhanden",
+    "legend": "Grün: abgeschlossen (mit Zertifikat) · Blau: nimmt teil · Grau: offen · Orange: selbst zurückgezogen oder Einladung verfallen · Rot: abgelehnt oder abgebrochen. Die Anwesenheit zählt besuchte Pflichttermine, die bereits stattgefunden haben.",
+    "attendance": "{percent} % anwesend ({attended}/{total})",
+    "attendance_tooltip": "Besuchte Pflichttermine von {total} bereits erfassten Pflichtterminen",
+    "ects": "{ects} ECTS",
+    "status": {
+      "APPLIED": "beworben",
+      "INVITED": "eingeladen",
+      "WAITLIST": "Warteliste",
+      "REGISTERED": "angemeldet",
+      "CONFIRMED": "nimmt teil",
+      "COMPLETED": "abgeschlossen",
+      "CANCELLED": "selbst zurückgezogen",
+      "EXPIRED": "Einladung verfallen",
+      "REJECTED": "abgelehnt",
+      "ABORTED": "abgebrochen"
+    }
   }
 }

@@ -2348,6 +2348,10 @@
       "first_name_placeholder": "Enter first name",
       "last_name_placeholder": "Enter last name",
       "email_placeholder": "Enter email address"
+    },
+    "expanded": {
+      "profile": "Profile",
+      "history": "Applications and Participations"
     }
   },
   "manageAdminUsers": {
@@ -3382,5 +3386,25 @@
     "title": "EduHub Events | opencampus.sh",
     "description": "Upcoming events at opencampus.sh",
     "icalCategory": "Education"
+  },
+  "enrollmentHistory": {
+    "label": "Previous Applications and Participations",
+    "empty": "No other applications present",
+    "legend": "Green: completed (with certificate) · Blue: participating · Gray: open · Orange: withdrew or invitation expired · Red: rejected or aborted. Attendance counts attended mandatory sessions that have already taken place.",
+    "attendance": "{percent}% attended ({attended}/{total})",
+    "attendance_tooltip": "Attended mandatory sessions out of {total} recorded mandatory sessions",
+    "ects": "{ects} ECTS",
+    "status": {
+      "APPLIED": "applied",
+      "INVITED": "invited",
+      "WAITLIST": "waitlist",
+      "REGISTERED": "registered",
+      "CONFIRMED": "participating",
+      "COMPLETED": "completed",
+      "CANCELLED": "withdrew",
+      "EXPIRED": "invitation expired",
+      "REJECTED": "rejected",
+      "ABORTED": "aborted"
+    }
   }
 }

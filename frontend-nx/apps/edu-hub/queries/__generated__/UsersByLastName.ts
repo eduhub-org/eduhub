@@ -26,6 +26,10 @@ export interface UsersByLastName_User_CourseEnrollments_Course_Program {
    * The 6 letter short title for the program.
    */
   shortTitle: string | null;
+  /**
+   * The first day a course lecture can possibly be in this program.
+   */
+  lectureStart: any | null;
 }
 
 export interface UsersByLastName_User_CourseEnrollments_Course {
@@ -36,31 +40,45 @@ export interface UsersByLastName_User_CourseEnrollments_Course {
    */
   title: string;
   /**
+   * The number of ECTS of the course (only editable by an admin user))
+   */
+  ects: string;
+  /**
    * An object relationship
    */
   Program: UsersByLastName_User_CourseEnrollments_Course_Program;
+}
+
+export interface UsersByLastName_User_CourseEnrollments_AttendanceStats {
+  __typename: "CourseEnrollmentAttendanceStats";
+  attendedSessions: number | null;
+  totalSessions: number | null;
 }
 
 export interface UsersByLastName_User_CourseEnrollments {
   __typename: "CourseEnrollment";
   id: number;
   /**
-   * The ID of the course of this enrollment from the given user
-   */
-  courseId: number;
-  /**
-   * The ID of the user that enrolled for the given course
-   */
-  userId: any;
-  /**
    * The users current enrollment status to this course
    */
   status: CourseEnrollmentStatus_enum;
-  updated_at: any | null;
+  /**
+   * The ID of the course of this enrollment from the given user
+   */
+  courseId: number;
+  created_at: any | null;
+  /**
+   * URL to the file containing the user's achievement certificate (if he obtained one)
+   */
+  achievementCertificateURL: string | null;
   /**
    * An object relationship
    */
   Course: UsersByLastName_User_CourseEnrollments_Course;
+  /**
+   * An object relationship
+   */
+  AttendanceStats: UsersByLastName_User_CourseEnrollments_AttendanceStats | null;
 }
 
 export interface UsersByLastName_User {

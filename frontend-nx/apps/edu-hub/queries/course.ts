@@ -7,6 +7,7 @@ import {
   COURSE_FRAGMENT_ANONYMOUS,
 } from './courseFragment';
 import { ADMIN_ENROLLMENT_FRAGMENT } from './enrollmentFragment';
+import { ENROLLMENT_HISTORY_FRAGMENT } from './enrollmentHistoryFragment';
 import { ADMIN_SESSION_FRAGMENT, SESSION_FRAGMENT } from './sessionFragement';
 import { USER_FRAGMENT } from './userFragment';
 import { PROGRAM_FRAGMENT_MINIMUM_PROPERTIES } from './programFragment';
@@ -109,6 +110,7 @@ export const MANAGED_COURSE = gql`
 
 export const MANAGED_COURSE_APPLICATIONS = gql`
   ${ADMIN_ENROLLMENT_FRAGMENT}
+  ${ENROLLMENT_HISTORY_FRAGMENT}
   ${USER_FRAGMENT}
   query ManagedCourseApplications(
     $id: Int!
@@ -139,21 +141,11 @@ export const MANAGED_COURSE_APPLICATIONS = gql`
         order_by: $order_by
       ) {
         ...AdminEnrollmentFragment
+        questionnaireResponse
         User {
           ...UserFragment
           CourseEnrollments(where: { isTest: { _eq: false } }) {
-            status
-            courseId
-            achievementCertificateURL
-            attendanceCertificateURL
-            Course {
-              id
-              title
-              ects
-              Program {
-                shortTitle
-              }
-            }
+            ...EnrollmentHistoryFragment
           }
           status
           organizationName
