@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { AttendanceStatus_enum, CourseEnrollmentStatus_enum } from "./../../__generated__/globalTypes";
+import { AttendanceStatus_enum, CourseEnrollmentStatus_enum, Program_bool_exp } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: ProgramStatistics
@@ -191,4 +191,8 @@ export interface ProgramStatistics {
    * fetch data from the table: "Program"
    */
   Program: ProgramStatistics_Program[];
+}
+
+export interface ProgramStatisticsVariables {
+  where?: Program_bool_exp | null;
 }

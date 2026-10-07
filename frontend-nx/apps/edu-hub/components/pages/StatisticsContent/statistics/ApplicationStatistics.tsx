@@ -2,6 +2,7 @@ import React, { FC, useMemo, useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { Checkbox, FormControlLabel } from '@mui/material';
 import { useRoleQuery } from '../../../../hooks/authedQuery';
+import { useStatisticsProgramWhere } from '../../../../hooks/manageScope';
 import { MULTI_PROGRAM_ENROLLMENTS } from '../../../../queries/multiProgramEnrollments';
 import { MultiProgramEnrollments } from '../../../../queries/__generated__/MultiProgramEnrollments';
 import { TimeSeriesLineChart } from '../../../common/charts/TimeSeriesLineChart';
@@ -16,7 +17,10 @@ export const ApplicationStatistics: FC = () => {
   const [useActualDates, setUseActualDates] = useState(false);
 
   // Query for program list (for selector)
-  const { data: programListData } = useRoleQuery<ProgramStatistics>(PROGRAM_LIST);
+  const programWhere = useStatisticsProgramWhere();
+  const { data: programListData } = useRoleQuery<ProgramStatistics>(PROGRAM_LIST, {
+    variables: { where: programWhere },
+  });
 
   // Query for enrollment data
   const { data, loading, error } = useRoleQuery<MultiProgramEnrollments>(MULTI_PROGRAM_ENROLLMENTS, {

@@ -2354,6 +2354,7 @@
     "can_manage_courses": "Kann Kurse verwalten",
     "can_manage_degrees": "Kann Degrees verwalten",
     "can_manage_jobs": "Kann Stellenangebote verwalten",
+    "can_view_statistics": "Kann Statistiken einsehen",
     "can_manage_users_and_settings": "Kann Benutzer und Einstellungen verwalten",
     "error_loading_admin_users": "Fehler beim Laden der Admin-Benutzer.",
     "administered_organization": "Verwaltete Organisation",

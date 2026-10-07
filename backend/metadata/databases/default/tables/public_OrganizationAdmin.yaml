@@ -32,6 +32,7 @@ select_permissions:
         - canManageDegrees
         - canManageJobs
         - canManageSettings
+        - canViewStatistics
         - claimVerification
         - authorizationDeclaredAt
         - created_at
@@ -62,6 +63,7 @@ insert_permissions:
         - canManageDegrees
         - canManageJobs
         - canManageSettings
+        - canViewStatistics
       check:
         Organization:
           OrganizationAdmins:
@@ -82,6 +84,7 @@ update_permissions:
         - canManageDegrees
         - canManageJobs
         - canManageSettings
+        - canViewStatistics
       filter:
         Organization:
           OrganizationAdmins:

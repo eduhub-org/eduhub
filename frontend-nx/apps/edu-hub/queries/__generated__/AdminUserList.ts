@@ -41,6 +41,10 @@ export interface AdminUserList_User_OrganizationAdmins {
   canManageJobs: boolean;
   canManageSettings: boolean;
   /**
+   * Allows the organization admin to view the statistics (applications, courses, sessions, attendances, certificates) of all programs of the organization
+   */
+  canViewStatistics: boolean;
+  /**
    * How this grant was obtained, NULL when a person granted it. Server-controlled: written by the claimJobOrganization action, and set to ADMIN_VERIFIED when a super-admin reviews the claim. Never writable by a client role, since the value is what tells a reviewer whether the claim needs checking.
    */
   claimVerification: string | null;
