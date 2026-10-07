@@ -21,6 +21,10 @@ export interface MyOrgAdminCapabilities_OrganizationAdmin {
    */
   canManageJobs: boolean;
   canManageSettings: boolean;
+  /**
+   * Allows the organization admin to view the statistics (applications, courses, sessions, attendances, certificates) of all programs of the organization
+   */
+  canViewStatistics: boolean;
 }
 
 export interface MyOrgAdminCapabilities {

@@ -46,6 +46,7 @@ export const ADMIN_USER_LIST = gql`
         canManageDegrees
         canManageJobs
         canManageSettings
+        canViewStatistics
         # How the grant came about. Null means a person granted it; a value means
         # it was claimed self-service on the job board and says what was checked.
         # Server-controlled, so it is safe to read as a review signal.
@@ -144,6 +145,18 @@ export const UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_JOBS = gql`
   }
 `;
 
+export const UPDATE_ORGANIZATION_ADMIN_CAN_VIEW_STATISTICS = gql`
+  mutation UpdateOrganizationAdminCanViewStatistics($itemId: Int!, $value: Boolean!) {
+    update_OrganizationAdmin_by_pk(
+      pk_columns: { id: $itemId },
+      _set: { canViewStatistics: $value }
+    ) {
+      id
+      canViewStatistics
+    }
+  }
+`;
+
 export const UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_SETTINGS = gql`
   mutation UpdateOrganizationAdminCanManageSettings($itemId: Int!, $value: Boolean!) {
     update_OrganizationAdmin_by_pk(
@@ -192,8 +205,8 @@ export const UPDATE_ORGANIZATION_ADMIN_ORGANIZATION_ID = gql`
 `;
 
 // Capability flags on the current user's OrganizationAdmin grants. Run under org_admin so Hasura
-// returns the caller's own rows. Used for menu/page visibility: show Courses/Events/Degrees/Settings
-// when any grant carries the matching canManage* flag. Ordered oldest first, so the first row is the
+// returns the caller's own rows. Used for menu/page visibility: show Courses/Events/Degrees/Settings/
+// Statistics when any grant carries the matching canManage* / canViewStatistics flag. Ordered oldest first, so the first row is the
 // organization the admin was initially granted (the default scope of the program dashboards).
 export const MY_ORG_ADMIN_CAPABILITIES = gql`
   query MyOrgAdminCapabilities($userId: uuid!) {
@@ -204,6 +217,7 @@ export const MY_ORG_ADMIN_CAPABILITIES = gql`
       canManageDegrees
       canManageJobs
       canManageSettings
+      canViewStatistics
     }
   }
 `;
@@ -250,6 +264,7 @@ export const ORGANIZATION_ADMINS_BY_ORGANIZATION_ID = gql`
       canManageDegrees
       canManageJobs
       canManageSettings
+      canViewStatistics
       User {
         id
         firstName

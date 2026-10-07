@@ -13,6 +13,7 @@ const grant = (id: number, organizationName: string, overrides: Record<string, u
     canManageDegrees: false,
     canManageJobs: false,
     canManageSettings: false,
+    canViewStatistics: false,
     claimVerification: null,
     authorizationDeclaredAt: null,
     ...overrides,

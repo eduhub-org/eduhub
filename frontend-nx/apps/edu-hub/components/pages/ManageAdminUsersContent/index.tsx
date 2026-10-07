@@ -23,6 +23,7 @@ import {
   UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_COURSES,
   UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_DEGREES,
   UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_JOBS,
+  UPDATE_ORGANIZATION_ADMIN_CAN_VIEW_STATISTICS,
   UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_SETTINGS,
   VERIFY_ORGANIZATION_ADMIN_CLAIM,
 } from '../../../queries/organizationAdmin';
@@ -137,6 +138,12 @@ const OrganizationGrantBlock: FC<{
         label: t('can_manage_jobs'),
         checked: grant.canManageJobs,
         mutation: UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_JOBS,
+      },
+      {
+        key: 'statistics',
+        label: t('can_view_statistics'),
+        checked: grant.canViewStatistics,
+        mutation: UPDATE_ORGANIZATION_ADMIN_CAN_VIEW_STATISTICS,
       },
       {
         key: 'settings',
