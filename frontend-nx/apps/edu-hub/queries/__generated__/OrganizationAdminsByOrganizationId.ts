@@ -41,6 +41,10 @@ export interface OrganizationAdminsByOrganizationId_OrganizationAdmin {
   canManageJobs: boolean;
   canManageSettings: boolean;
   /**
+   * Allows the organization admin to view the statistics (applications, courses, sessions, attendances, certificates) of all programs of the organization
+   */
+  canViewStatistics: boolean;
+  /**
    * An object relationship
    */
   User: OrganizationAdminsByOrganizationId_OrganizationAdmin_User;

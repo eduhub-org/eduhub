@@ -67,6 +67,7 @@ const AddAdminDialog: FC<AddAdminDialogProps> = ({
   const [canManageCourses, setCanManageCourses] = useState(false);
   const [canManageDegrees, setCanManageDegrees] = useState(false);
   const [canManageJobs, setCanManageJobs] = useState(false);
+  const [canViewStatistics, setCanViewStatistics] = useState(false);
   const [canManageSettings, setCanManageSettings] = useState(false);
   const [grantSuperAdmin, setGrantSuperAdmin] = useState(false);
   // Set once the OrganizationAdmin row exists, so a retry after a failed super-admin promotion
@@ -88,6 +89,7 @@ const AddAdminDialog: FC<AddAdminDialogProps> = ({
       setCanManageCourses(false);
       setCanManageDegrees(false);
       setCanManageJobs(false);
+      setCanViewStatistics(false);
       setCanManageSettings(false);
       setGrantSuperAdmin(false);
       grantCreatedRef.current = false;
@@ -184,6 +186,7 @@ const AddAdminDialog: FC<AddAdminDialogProps> = ({
       !canManageCourses &&
       !canManageDegrees &&
       !canManageJobs &&
+      !canViewStatistics &&
       !canManageSettings
     ) {
       setValidationError(t('add_admin_capability_required'));
@@ -201,6 +204,7 @@ const AddAdminDialog: FC<AddAdminDialogProps> = ({
               canManageCourses,
               canManageDegrees,
               canManageJobs,
+              canViewStatistics,
               canManageSettings,
             },
           },
@@ -245,6 +249,7 @@ const AddAdminDialog: FC<AddAdminDialogProps> = ({
     canManageCourses,
     canManageDegrees,
     canManageJobs,
+    canViewStatistics,
     canManageSettings,
     insertOrganizationAdmin,
     setAdminStatus,
@@ -259,6 +264,7 @@ const AddAdminDialog: FC<AddAdminDialogProps> = ({
       { label: t('can_manage_courses'), checked: canManageCourses, set: setCanManageCourses },
       { label: t('can_manage_degrees'), checked: canManageDegrees, set: setCanManageDegrees },
       { label: t('can_manage_jobs'), checked: canManageJobs, set: setCanManageJobs },
+      { label: t('can_view_statistics'), checked: canViewStatistics, set: setCanViewStatistics },
       {
         label: t('can_manage_users_and_settings'),
         checked: canManageSettings,
@@ -271,6 +277,7 @@ const AddAdminDialog: FC<AddAdminDialogProps> = ({
       canManageCourses,
       canManageDegrees,
       canManageJobs,
+      canViewStatistics,
       canManageSettings,
       needsSettingsAdmin,
       t,

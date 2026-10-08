@@ -144,6 +144,24 @@ insert_permissions:
         - courseId
         - id
 select_permissions:
+  # canViewStatistics: the sessions of the organization's courses, for the statistics page.
+  # Deliberately no attendanceData, title or description.
+  - role: org_admin_statistics
+    permission:
+      columns:
+        - id
+        - courseId
+        - startDateTime
+      filter:
+        Course:
+          Program:
+            Organization:
+              OrganizationAdmins:
+                _and:
+                  - userId:
+                      _eq: X-Hasura-User-Id
+                  - canViewStatistics:
+                      _eq: true
   - role: anonymous
     permission:
       columns:

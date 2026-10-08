@@ -1706,6 +1706,7 @@ export enum OrganizationAdmin_select_column {
   canManageEvents = "canManageEvents",
   canManageJobs = "canManageJobs",
   canManageSettings = "canManageSettings",
+  canViewStatistics = "canViewStatistics",
   claimVerification = "claimVerification",
   created_at = "created_at",
   id = "id",
@@ -1723,6 +1724,7 @@ export enum OrganizationAdmin_select_column_OrganizationAdmin_aggregate_bool_exp
   canManageEvents = "canManageEvents",
   canManageJobs = "canManageJobs",
   canManageSettings = "canManageSettings",
+  canViewStatistics = "canViewStatistics",
 }
 
 /**
@@ -1734,6 +1736,7 @@ export enum OrganizationAdmin_select_column_OrganizationAdmin_aggregate_bool_exp
   canManageEvents = "canManageEvents",
   canManageJobs = "canManageJobs",
   canManageSettings = "canManageSettings",
+  canViewStatistics = "canViewStatistics",
 }
 
 /**
@@ -1746,6 +1749,7 @@ export enum OrganizationAdmin_update_column {
   canManageEvents = "canManageEvents",
   canManageJobs = "canManageJobs",
   canManageSettings = "canManageSettings",
+  canViewStatistics = "canViewStatistics",
   claimVerification = "claimVerification",
   created_at = "created_at",
   id = "id",
@@ -8895,6 +8899,7 @@ export interface OrganizationAdmin_bool_exp {
   canManageEvents?: Boolean_comparison_exp | null;
   canManageJobs?: Boolean_comparison_exp | null;
   canManageSettings?: Boolean_comparison_exp | null;
+  canViewStatistics?: Boolean_comparison_exp | null;
   claimVerification?: String_comparison_exp | null;
   created_at?: timestamptz_comparison_exp | null;
   id?: Int_comparison_exp | null;
@@ -8916,6 +8921,7 @@ export interface OrganizationAdmin_insert_input {
   canManageEvents?: boolean | null;
   canManageJobs?: boolean | null;
   canManageSettings?: boolean | null;
+  canViewStatistics?: boolean | null;
   claimVerification?: string | null;
   created_at?: any | null;
   id?: number | null;

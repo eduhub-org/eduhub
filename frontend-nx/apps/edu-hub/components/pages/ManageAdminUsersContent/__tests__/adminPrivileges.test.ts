@@ -8,6 +8,7 @@ const grant = (overrides: Partial<Parameters<typeof grantHasPrivilege>[0]> = {})
   canManageDegrees: false,
   canManageJobs: false,
   canManageSettings: false,
+  canViewStatistics: false,
   ...overrides,
 });
 
@@ -64,6 +65,7 @@ describe('privilegeLabelKey', () => {
       'can_manage_courses',
       'can_manage_degrees',
       'can_manage_jobs',
+      'can_view_statistics',
       'can_manage_users_and_settings',
     ]);
   });
@@ -72,6 +74,11 @@ describe('privilegeLabelKey', () => {
 describe('grantHasPrivilege', () => {
   it('is true when the grant carries the capability', () => {
     expect(grantHasPrivilege(grant({ canManageJobs: true }), 'jobs')).toBe(true);
+  });
+
+  it('matches the statistics privilege on canViewStatistics', () => {
+    expect(grantHasPrivilege(grant({ canViewStatistics: true }), 'statistics')).toBe(true);
+    expect(grantHasPrivilege(grant({ canManageSettings: true }), 'statistics')).toBe(false);
   });
 
   it('is false when the grant does not carry it', () => {
