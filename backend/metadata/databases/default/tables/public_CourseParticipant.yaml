@@ -26,13 +26,11 @@ select_permissions:
   # you are asking about, which is why the frontend query only has to name the
   # course. The view carries no enrollment status, so nothing here can reveal
   # who merely applied. REGISTERED counts as taking part: it is how direct
-  # event signups (with an account or as a guest) are enrolled. isGuest only
-  # says that someone signed up without an account, so the list can mark them.
+  # event signups (with an account or as a guest) are enrolled.
   - role: user_access_others
     permission:
       columns:
         - courseId
-        - isGuest
         - userId
       filter:
         Course:
@@ -50,7 +48,6 @@ select_permissions:
     permission:
       columns:
         - courseId
-        - isGuest
         - userId
       filter: {}
       allow_aggregations: true

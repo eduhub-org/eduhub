@@ -54,17 +54,7 @@ const Participant: FC<{ participant: CourseParticipants_CourseParticipant }> = (
         className="rounded-full object-cover flex-shrink-0"
       />
       <div className="flex flex-col min-w-0">
-        <span className="flex items-center gap-2 min-w-0">
-          <span className="text-sm font-semibold truncate">{fullName(user)}</span>
-          {participant.isGuest && (
-            <span
-              className="flex-shrink-0 text-[11px] font-semibold text-label-secondary px-1.5 py-0.5 rounded-full border border-border-primary"
-              title={t('participants.guest_hint')}
-            >
-              {t('participants.guest_badge')}
-            </span>
-          )}
-        </span>
+        <span className="text-sm font-semibold truncate">{fullName(user)}</span>
         {elementUrl ? (
           <a
             href={elementUrl}
@@ -86,7 +76,7 @@ const Participant: FC<{ participant: CourseParticipants_CourseParticipant }> = (
  *
  * Collapsed, it is a stack of overlapping faces with the head count, the way
  * event platforms show who is going; expanded, the full directory. Guests,
- * who signed up without an account, are listed too and marked as such.
+ * who signed up without an account, are listed like everyone else.
  *
  * Rendered only for someone who is taking part themselves - the Hasura
  * permission on CourseParticipant enforces the same thing, so a non-participant
@@ -122,7 +112,6 @@ export const CourseParticipants: FC<CourseParticipantsProps> = ({ courseId, curr
 
   const stacked = participants.slice(0, STACK_SIZE);
   const beyondStack = othersTotal - stacked.length;
-  const guestCount = participants.filter((p) => p.isGuest).length;
 
   return (
     <div>
@@ -163,12 +152,6 @@ export const CourseParticipants: FC<CourseParticipantsProps> = ({ courseId, curr
         <span className="flex flex-col">
           <span className="text-sm font-semibold text-label-primary">
             {t('participants.count', { count: total })}
-            {guestCount > 0 && (
-              <span className="font-normal text-label-secondary">
-                {' · '}
-                {t('participants.guest_count', { count: guestCount })}
-              </span>
-            )}
           </span>
           <span className="inline-flex items-center gap-1 text-xs text-label-secondary group-hover:text-brand transition-colors">
             {expanded ? t('participants.show_less') : t('participants.show_all')}

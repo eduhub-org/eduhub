@@ -16,7 +16,6 @@ export const COURSE_PARTICIPANTS = gql`
       limit: $limit
     ) {
       userId
-      isGuest
       User {
         id
         firstName

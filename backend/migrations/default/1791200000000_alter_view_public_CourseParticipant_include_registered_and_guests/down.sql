@@ -1,7 +1,4 @@
--- A column cannot be removed with CREATE OR REPLACE VIEW, so recreate it.
-DROP VIEW IF EXISTS "public"."CourseParticipant";
-
-CREATE VIEW "public"."CourseParticipant" AS
+CREATE OR REPLACE VIEW "public"."CourseParticipant" AS
   SELECT
     "courseId",
     "userId"

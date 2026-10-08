@@ -768,9 +768,6 @@
       "message_on_element": "Message on Element",
       "and_more": "and {count} more",
       "count": "{count, plural, one {# participant} other {# participants}}",
-      "guest_count": "{count, plural, one {# guest} other {# guests}}",
-      "guest_badge": "Guest",
-      "guest_hint": "Signed up as a guest, without an account",
       "show_all": "Show all",
       "show_less": "Show less"
     },

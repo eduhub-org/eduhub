@@ -23,11 +23,10 @@ const participant = (
   id: string,
   firstName: string,
   matrixUserHandle: string | null = null,
-  extra: { picture?: string | null; externalProfile?: string | null; isGuest?: boolean } = {}
+  extra: { picture?: string | null; externalProfile?: string | null } = {}
 ) => ({
   __typename: 'CourseParticipant',
   userId: id,
-  isGuest: extra.isGuest ?? false,
   User: {
     __typename: 'User',
     id,
@@ -155,19 +154,5 @@ describe('CourseParticipants', () => {
     expect(toggle).toHaveAttribute('aria-expanded', 'true');
     expect(screen.getByText('P0 Test')).toBeInTheDocument();
     expect(screen.getByText('participants.show_less')).toBeInTheDocument();
-  });
-
-  it('lists guests and marks them', () => {
-    withData(
-      [participant('u2', 'Aisha'), participant('g1', 'Gast', null, { isGuest: true })],
-      3
-    );
-
-    render(<CourseParticipants courseId={1} currentUserId="me" />);
-
-    expect(screen.getByText(/participants.guest_count:\{"count":1\}/)).toBeInTheDocument();
-    expand();
-    expect(screen.getByText('Gast Test')).toBeInTheDocument();
-    expect(screen.getAllByText('participants.guest_badge')).toHaveLength(1);
   });
 });
